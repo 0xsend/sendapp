@@ -37,7 +37,7 @@ function abbreviateNumber(
   if (tier === 0) {
     return (
       (!sign ? '-' : '') +
-      num.toLocaleString(undefined, {
+      num.toLocaleString('en-US', {
         maximumFractionDigits: digit,
       })
     )
@@ -56,12 +56,12 @@ function abbreviateNumber(
   const flooredScaled = floor(scaled, digit)
 
   // convert the floored number to a string
-  let rounded = flooredScaled.toLocaleString(undefined, {
+  let rounded = flooredScaled.toLocaleString('en-US', {
     maximumFractionDigits: digit,
   })
 
   if (!padding) {
-    rounded = Number(rounded).toLocaleString(undefined, {
+    rounded = Number(rounded).toLocaleString('en-US', {
       maximumFractionDigits: digit,
     })
   }
@@ -79,7 +79,7 @@ export default function formatAmount(
 
   // Check for zero
   if (amount === 0) {
-    return Number(amount).toLocaleString(undefined, {
+    return Number(amount).toLocaleString('en-US', {
       useGrouping: true,
       maximumFractionDigits: maxDecimals,
       minimumFractionDigits: maxDecimals,
@@ -120,7 +120,7 @@ export default function formatAmount(
 
   return (
     (lessThanMin ? '>' : '') +
-    Number(Number(amount).toFixed(maxDecimals)).toLocaleString(undefined, {
+    Number(Number(amount).toFixed(maxDecimals)).toLocaleString('en-US', {
       useGrouping: true,
       minimumFractionDigits: (decimals || 0) < maxDecimals ? decimals : maxDecimals,
       maximumFractionDigits: maxDecimals,
