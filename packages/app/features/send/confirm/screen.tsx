@@ -317,14 +317,14 @@ export function SendConfirm() {
               case isBalanceLoading || isFeesLoading || isGasLoading:
                 return (
                   <Button.Icon>
-                    <Spinner size="small" color="$color" />
+                    <Spinner size="small" color="$color12" />
                   </Button.Icon>
                 )
               case isTransferPending && !isTransferError:
                 return (
                   <>
                     <Button.Icon>
-                      <Spinner size="small" color="$color" />
+                      <Spinner size="small" color="$color12" />
                     </Button.Icon>
                     <Button.Text>Sending...</Button.Text>
                   </>
@@ -333,7 +333,7 @@ export function SendConfirm() {
                 return (
                   <>
                     <Button.Icon>
-                      <Spinner size="small" color="$color" />
+                      <Spinner size="small" color="$color12" />
                     </Button.Icon>
                     <Button.Text>Confirming...</Button.Text>
                   </>
@@ -370,7 +370,7 @@ export function SendRecipient({ ...props }: YStackProps) {
   const { recipient, idType } = queryParams
   const router = useRouter()
   const { data: profile, isLoading, error } = useProfileLookup(idType ?? 'tag', recipient ?? '')
-  const href = useProfileHref(idType ?? 'tag', recipient ?? '')
+  const href = profile ? `/profile/${profile?.sendid}` : ''
 
   if (isLoading) return <Spinner size="large" />
   if (error) throw new Error(error.message)

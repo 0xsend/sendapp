@@ -52,7 +52,7 @@ export function ActivityRewardsScreen() {
       <YStack f={1} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
         <Header />
         <Stack w="100%" f={1} jc={'center'} ai={'center'}>
-          <Spinner color="$color" size="large" />
+          <Spinner color="$color12" size="large" />
         </Stack>
       </YStack>
     )
