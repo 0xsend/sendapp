@@ -1,6 +1,7 @@
 import type { Database, Tables } from '@my/supabase/database.types'
 import { createClient } from '@supabase/supabase-js'
 import { selectAll } from 'app/utils/supabase/selectAll'
+import type { Address } from 'viem'
 
 if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
   throw new Error(
@@ -30,6 +31,23 @@ export async function fetchDistribution(id: string) {
     .single()
 }
 
+export async function fetchSendSlashData(distributionNumber: number) {
+  // Get settings
+  const { data: settings } = await supabaseAdmin
+    .from('send_slash')
+    .select('*')
+    .eq('distribution_number', distributionNumber)
+    .single()
+
+  // Get verifications
+  const { data: verifications } = await supabaseAdmin
+    .from('distribution_verifications')
+    .select('*')
+    .eq('distribution_id', distributionNumber)
+    .eq('type', 'send_ceiling')
+
+  return { settings, verifications }
+}
 export async function fetchAllVerifications(distributionId: number) {
   return selectAll(
     supabaseAdmin
