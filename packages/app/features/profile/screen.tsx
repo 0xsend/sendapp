@@ -185,7 +185,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                               fetchNextPage()
                             }}
                             disabled={isFetchingNextPageActivities || isFetchingActivities}
-                            color="$color"
+                            color="$color11"
                             width={200}
                             mx="auto"
                           >

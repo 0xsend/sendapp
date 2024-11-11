@@ -5,6 +5,7 @@ import {
   Header,
   Paragraph,
   Stack,
+  Theme,
   usePwa,
   XStack,
   type ButtonProps,
@@ -31,17 +32,15 @@ export function SendTopNav() {
         $lg={{ pt: !isPwa && '$5', pb: '$3' }}
       >
         <XStack ai="center" $lg={{ f: 1 }} w="20%" $gtLg={{ display: 'none' }}>
-          <Button
-            onPress={back}
-            jc="flex-start"
-            icon={
+          <Button onPress={back}>
+            <ButtonOg.Icon>
               <IconArrowLeft
                 size={'$1.5'}
-                color={'$primary'}
+                $theme-dark={{ color: '$primary' }}
                 $theme-light={{ color: '$color12' }}
               />
-            }
-          />
+            </ButtonOg.Icon>
+          </Button>
           <Paragraph size={'$8'} col={'$color10'}>
             {(() => {
               switch (true) {
@@ -72,7 +71,7 @@ export function SendTopNav() {
                 case Boolean(sendParams.recipient):
                   return 'Enter Amount'
                 default:
-                  return ''
+                  return 'Select Recipient'
               }
             })()}
           </H2>
@@ -86,13 +85,13 @@ function Button(props: ButtonProps) {
   return (
     <ButtonOg
       bc="transparent"
+      jc="flex-start"
       chromeless
       circular
-      jc={'center'}
       ai={'center'}
+      bw={0}
       hoverStyle={{
         backgroundColor: 'transparent',
-        borderColor: '$background',
       }}
       pressStyle={{
         backgroundColor: 'transparent',
