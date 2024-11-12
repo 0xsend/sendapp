@@ -6,7 +6,8 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
     {
       "flex": 1,
       "flexDirection": "column",
-      "paddingBottom": 13,
+      "gap": 32,
+      "paddingBottom": 18,
       "paddingTop": 13,
       "width": "100%",
     }
