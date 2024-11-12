@@ -182,7 +182,11 @@ export function useSendtagCheckout() {
   const pendingTags = usePendingTags() ?? []
   const amountDue = useMemo(() => total(pendingTags ?? []), [pendingTags])
   const { data: referrer } = useReferrer()
-  const { data: referred } = api.referrals.getReferred.useQuery()
+  const {
+    data: referred,
+    isLoading: isLoadingReferred,
+    error: referredError,
+  } = api.referrals.getReferred.useQuery()
   const { data: reward } = useReferralReward({ tags: pendingTags })
   const referrerAddress = referred?.referrerSendAccount?.address ?? referrer?.address ?? zeroAddress
 
@@ -235,5 +239,7 @@ export function useSendtagCheckout() {
     usdcFees,
     usdcFeesError,
     isLoadingUSDCFees,
+    isLoadingReferred,
+    referredError,
   }
 }
