@@ -138,7 +138,7 @@ const Profile = (
           <Stack w={200}>
             <ProfileButtons.SendButton
               identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
-              idType="tag"
+              idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
             />
           </Stack>
         </Row>
