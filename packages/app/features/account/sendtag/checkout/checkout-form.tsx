@@ -459,7 +459,8 @@ function ConfirmTagPrice({ tag }: { tag: { name: string } }) {
 
 function TotalPrice() {
   const pendingTags = usePendingTags()
-  const { usdcFees, usdcFeesError, isLoadingUSDCFees } = useSendtagCheckout()
+  const { usdcFees, usdcFeesError, isLoadingUSDCFees, isLoadingReferred, referredError } =
+    useSendtagCheckout()
   const _total = useMemo(() => total(pendingTags ?? []), [pendingTags])
 
   return (
@@ -485,7 +486,10 @@ function TotalPrice() {
       {usdcFeesError && (
         <Paragraph color="$error">{usdcFeesError?.message?.split('.').at(0)}</Paragraph>
       )}
-      {isLoadingUSDCFees && <Spinner size="small" color={'$color11'} />}
+      {referredError && (
+        <Paragraph color="$error">{referredError?.message?.split('.').at(0)}</Paragraph>
+      )}
+      {(isLoadingUSDCFees || isLoadingReferred) && <Spinner size="small" color={'$color11'} />}
       {usdcFees && (
         <Paragraph
           fontFamily={'$mono'}
