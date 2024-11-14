@@ -8,7 +8,7 @@ export class OnboardingPage {
 
   public readonly accountName = `test-${Math.floor(Math.random() * 1000000)}`
 
-  async completeOnboarding(expect: Expect<OnboardingPage>) {
+  async completeOnboarding(expect: Expect) {
     await this.page.goto('/')
     expect(this.page).toHaveURL('/auth/onboarding') // no send accounts redirects to onboarding page
 
