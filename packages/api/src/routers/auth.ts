@@ -70,7 +70,7 @@ export const authRouter = createTRPCRouter({
       if (error) {
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message: error instanceof Error ? error.message : 'Unknown error',
+          message: error.message,
         })
       }
 
