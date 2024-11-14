@@ -41,11 +41,15 @@ export const authRouter = createTRPCRouter({
       }
 
       if (!bypassPhoneCheck) {
+        log('checking if phone is already used', { phone })
+
         const { data } = await supabaseAdmin
           .rpc('profile_lookup', { lookup_type: 'phone', identifier: phone })
           .maybeSingle()
 
         if (data) {
+          log('phone is already used', { phone })
+
           return {
             wasPhoneAlreadyUsed: true,
           }
@@ -63,7 +67,7 @@ export const authRouter = createTRPCRouter({
             })
           }
           const errMessage = r.error?.message.toLowerCase()
-          log('signInWithOtp', { errMessage })
+          log('signInWithOtp', { errMessage, phone })
           return r
         })
 
@@ -73,6 +77,8 @@ export const authRouter = createTRPCRouter({
           message: error.message,
         })
       }
+
+      log('successfully signed up with otp', { phone })
 
       return {
         wasPhoneAlreadyUsed: false,
