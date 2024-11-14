@@ -1,7 +1,7 @@
 # -*- mode: python -*-
 
-load("ext://uibutton", "cmd_button", "location")
 load("./common.Tiltfile", "CI")
+load("ext://uibutton", "cmd_button", "location")
 
 _prj_root = os.path.join(
     os.getcwd(),
@@ -182,17 +182,6 @@ local_resource(
         "contracts:build",
     ],
     trigger_mode = TRIGGER_MODE_MANUAL,
-)
-
-local_resource(
-    "anvil:anvil-deploy-fjord-send-verifier-fixtures",
-    "yarn contracts dev:anvil-deploy-fjord-send-verifier-fixtures",
-    dir = _prj_root,
-    labels = labels,
-    resource_deps = _infra_resource_deps + [
-        "anvil:base",
-        "contracts:build",
-    ],
 )
 
 local_resource(
