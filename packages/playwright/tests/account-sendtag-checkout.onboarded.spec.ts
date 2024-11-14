@@ -191,7 +191,7 @@ test('can confirm a tag', async ({ checkoutPage, supabase, user: { profile: myPr
   await addPendingTag(checkoutPage, tagName)
   await confirmTags(checkoutPage, [tagName])
   await verifyTagsInDatabase(supabase, [tagName])
-  await expect(checkoutPage.page).toHaveTitle('Send | Sendtag')
+  await expect(checkoutPage.page).toHaveTitle('Send | Sendtags')
 
   const receiptEvent = {
     event_name: 'tag_receipt_usdc',
