@@ -196,7 +196,12 @@ jobs:
             has_errors=$(tilt dump engine | jq '
               .ManifestTargets
               | to_entries
-              | map(select(.value.State.RuntimeState.Status == "error"))
+              | map(
+                  select(
+                    .value.State.RuntimeState.Status == "error" or
+                    (.value.State.BuildHistory | length > 0 and .[0].Error != null)
+                  )
+                )
               | length > 0
             ')
 
@@ -205,7 +210,12 @@ jobs:
               tilt dump engine | jq '
                 .ManifestTargets
                 | to_entries
-                | map(select(.value.State.RuntimeState.Status == "error"))
+                | map(
+                    select(
+                      .value.State.RuntimeState.Status == "error" or
+                      (.value.State.BuildHistory | length > 0 and .[0].Error != null)
+                    )
+                  )
                 | map(.key)
               '
               exit 1
@@ -216,14 +226,16 @@ jobs:
               break
             else
               echo "Tilt not ready, retrying..."
-              tilt dump engine | jq '
-                .ManifestTargets
-                | to_entries
-                | map({key: (.value.State.RuntimeState.Status // "in_progress"), value: .key})
-                | group_by(.key)
-                | map({key: .[0].key, value: map(.value)})
-                | from_entries
-              '
+              if [ "${{runner.debug}}" == "1" ]; then
+                tilt dump engine | jq '
+                  .ManifestTargets
+                  | to_entries
+                  | map({key: (.value.State.RuntimeState.Status // "in_progress"), value: .key})
+                  | group_by(.key)
+                  | map({key: .[0].key, value: map(.value)})
+                  | from_entries
+                '
+              fi
             fi
             if ((i == max_attempts)); then
               echo "Reached maximum attempts, exiting"
