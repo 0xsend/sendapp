@@ -10,7 +10,7 @@ import { hexToBytea } from 'app/utils/hexToBytea'
 import { shorten } from 'app/utils/strings'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 import debug from 'debug'
-import { parseUnits } from 'viem'
+import { isAddress, parseUnits } from 'viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { ProfilePage } from './fixtures/profiles'
 import { SendPage } from './fixtures/send'
@@ -274,6 +274,8 @@ async function handleTokenTransfer({
     const history = page.getByTestId('TokenDetailsHistory')
     await expect(history).toBeVisible()
     await expect(history.getByText(`${decimalAmount} ${token.symbol}`)).toBeVisible()
-    await expect(history.getByText(counterparty)).toBeVisible()
+    await expect(
+      history.getByText(isAddress(counterparty) ? shorten(counterparty ?? '', 5, 4) : counterparty)
+    ).toBeVisible()
   }
 }

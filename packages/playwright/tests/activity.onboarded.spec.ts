@@ -9,6 +9,7 @@ import crypto from 'node:crypto'
 import { zeroAddress } from 'viem'
 import { expect, test } from './fixtures/send-accounts'
 import { testBaseClient } from './fixtures/viem'
+import { shorten } from 'app/utils/strings'
 
 let log: debug.Debugger
 
@@ -265,7 +266,7 @@ test('can visit activity page and see correct activity feed', async ({
   // Deposit
   await expect.soft(activityRows.nth(9)).toContainText('Deposit')
   await expect.soft(activityRows.nth(9)).toContainText('0.019032 USDC')
-  await expect.soft(activityRows.nth(9)).toContainText(anotherSendAccount.address)
+  await expect.soft(activityRows.nth(9)).toContainText(shorten(anotherSendAccount.address, 5, 4))
 })
 
 test('can search on activity page', async ({ page, context }) => {
