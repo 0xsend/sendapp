@@ -1,10 +1,8 @@
 import type { PostgrestError } from '@supabase/supabase-js'
 import { TRPCError } from '@trpc/server'
 import { reward, total } from 'app/data/sendtags'
-import {
-  fetchReferrer,
-  fetchSendtagCheckoutReceipts,
-} from 'app/features/account/sendtag/checkout/checkout-utils'
+import { fetchReferrer } from 'app/features/account/sendtag/checkout/checkout-utils'
+import { fetchSendtagCheckoutReceipts } from 'app/features/account/sendtag/checkout/checkout-utils.fetchSendtagCheckoutReceipts'
 import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
