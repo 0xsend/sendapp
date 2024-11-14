@@ -30,7 +30,7 @@ export class SendPage {
   }
 
   async fillAndSubmitForm(amount: string) {
-    await this.expect(this.page.getByText('Enter Amount')).toBeVisible()
+    await this.expect(this.page.locator('h2', { hasText: 'Enter Amount' })).toBeVisible()
     await this.expect(this.amountInput).toBeVisible()
     await this.amountInput.fill(amount)
     await this.expect(this.continueButton).toBeVisible()
