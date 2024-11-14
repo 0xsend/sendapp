@@ -31,6 +31,25 @@ export const authRouter = createTRPCRouter({
           message: 'Captcha token is required',
         })
       }
+
+      const { data, error } = await supabaseAdmin
+        .rpc('profile_lookup', { lookup_type: 'phone', identifier: phone })
+        .maybeSingle()
+
+      if (data) {
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          message: 'User is onboarded',
+        })
+      }
+
+      if (error) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: error.message,
+        })
+      }
+
       try {
         const result = await supabaseAdmin.auth
           .signInWithOtp({ phone: `${countrycode}${phone}`, options: { captchaToken } })
