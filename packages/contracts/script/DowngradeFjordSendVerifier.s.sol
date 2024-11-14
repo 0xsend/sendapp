@@ -9,7 +9,7 @@ import {SendVerifier, SendVerifierProxy} from "../src/SendVerifier.sol";
 /**
  * Downgrades the SendVerifierProxy to the legacy verifier implementation.
  */
-contract DeployFjordSendVerifierScript is Script, Helper {
+contract DowngradeFjordSendVerifierScript is Script, Helper {
     function setUp() public {
         this.labels();
     }
