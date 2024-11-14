@@ -10,7 +10,7 @@ export const authRouter = createTRPCRouter({
   signInWithOtp: publicProcedure
     .input(
       z.object({
-        phone: z.string(),
+        phone: z.string().trim(),
         countrycode: z.string(),
         captchaToken: z.string().optional(),
         bypassPhoneCheck: z.boolean().optional().default(false),
