@@ -33,7 +33,7 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
   return (
     <>
       <Head>
-        <title>Send | Home</title>
+        <title>Send</title>
       </Head>
       {session ? (
         <MobileButtonRowLayout.Home>
