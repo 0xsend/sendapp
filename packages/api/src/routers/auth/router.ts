@@ -41,12 +41,8 @@ export const authRouter = createTRPCRouter({
         })
       }
 
-      console.log('before bybass')
-
       if (!bypassPhoneCheck) {
         log('checking if phone is already used', { phone })
-
-        console.log('no bypass')
 
         const { data } = await supabaseAdmin
           .rpc('profile_lookup', { lookup_type: 'phone', identifier: phone })
@@ -54,8 +50,6 @@ export const authRouter = createTRPCRouter({
 
         if (data) {
           log('phone is already used', { phone })
-
-          console.log('phone already used')
 
           return {
             status: AuthStatus.PhoneAlreadyUsed,
