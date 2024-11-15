@@ -39,7 +39,6 @@
     "@wagmi/chains": "^1.8.0",
     "@wagmi/connectors": "^5.1.1",
     "@wagmi/core": "^2.13.1",
-    "@web3modal/wagmi": "^5.0.2",
     "base64-arraybuffer": "^1.0.2",
     "burnt": "^0.12.1",
     "cbor": "^9.0.1",

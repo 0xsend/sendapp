@@ -7,7 +7,6 @@ import {
 import { Button, ButtonText } from '@my/ui'
 import type { SignMessageErrorType } from '@wagmi/core'
 import type { SignState } from 'app/features/auth/account-recovery/account-recovery'
-import { OpenConnectModalWrapper } from 'app/utils/OpenConnectModalWrapper'
 import { useAccount, useSignMessage } from 'wagmi'
 import type { SignMessageData, SignMessageVariables } from 'wagmi/query'
 
@@ -48,10 +47,8 @@ export default function RecoverWithEOA(props: Props) {
   }
 
   return (
-    <OpenConnectModalWrapper width={'50%'}>
-      <Button onPress={isConnected ? onPress : null} theme="green" br="$4">
-        <ButtonText testID="account-recovery-eoa-btn">EOA</ButtonText>
-      </Button>
-    </OpenConnectModalWrapper>
+    <Button onPress={isConnected ? onPress : null} theme="green" br="$4">
+      <ButtonText testID="account-recovery-eoa-btn">EOA</ButtonText>
+    </Button>
   )
 }
