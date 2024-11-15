@@ -45,7 +45,7 @@ export const authRouter = createTRPCRouter({
         log('checking if phone is already used', { phone })
 
         const { data } = await supabaseAdmin
-          .rpc('profile_lookup', { lookup_type: 'phone', identifier: phone })
+          .rpc('profile_lookup', { lookup_type: 'phone', identifier: `${countrycode}${phone}` })
           .maybeSingle()
 
         if (data) {
