@@ -11,6 +11,9 @@ import {
   Heading,
   LinkableButton,
   LinearGradient,
+  Stack,
+  Card,
+  Square,
 } from '@my/ui'
 import {
   IconAccount,
@@ -114,79 +117,25 @@ export function AccountScreen() {
   ]
 
   return (
-    <YStack
-      gap={'$size.1.5'}
-      width={'100%'}
-      pb={'$size.1.5'}
-      pt={'$3'}
-      $gtMd={{ flexDirection: 'row', ai: 'stretch', alignSelf: 'flex-start' }}
-      $gtLg={{ pt: 0 }}
-      ai="center"
-    >
-      <YStack bg={'$color1'} br={'$6'} maxWidth={avatarWidth}>
-        <YStack ai={'flex-start'} h="100%">
-          <YStack pos={'relative'}>
-            <Avatar size={avatarWidth} btlr={'$6'} btrr={'$6'} bc="$color2">
-              <Avatar.Image accessibilityLabel="" src={avatar_url ?? ''} />
-              <Avatar.Fallback f={1} ai={'center'} theme="green_active">
-                <IconAccount size={avatarWidth * 0.9} $theme-light={{ color: '$color12' }} />
-              </Avatar.Fallback>
-            </Avatar>
-            <LinearGradient
-              start={[0, 1]}
-              end={[0, 0]}
-              width={'100%'}
-              height={'$9'}
-              colors={['$color1', '$color1', 'transparent']}
-              pos={'absolute'}
-              pointerEvents={'none'}
-              b={0}
-              zIndex={2}
-            />
-            <XStack
-              zIndex={3}
-              pos={'absolute'}
-              bottom={'0'}
-              px={'$size.1'}
-              ai={'center'}
-              jc={'space-between'}
-              w={'100%'}
-              $gtXs={{ px: '$size.3.5' }}
-            >
-              <Heading fontSize={'$10'} fontWeight={'900'} color={'$color12'}>
-                {name ? name.toUpperCase() : '---'}
-              </Heading>
-            </XStack>
-          </YStack>
-          <YStack
-            $gtXs={{ p: '$size.3.5' }}
-            p={'$size.1'}
-            pt={'$size.0.9'}
-            jc={'space-between'}
-            f={1}
-            width={'100%'}
-          >
-            <YStack>
-              <XStack gap="$size.0.75">
-                <Paragraph color={'$color10'} size="$6">
-                  Send ID:
-                </Paragraph>
-                <Paragraph size="$6">{send_id}</Paragraph>
-              </XStack>
-              <YStack
-                flexDirection="row"
-                gap={'$size.0.75'}
-                flexWrap="wrap"
-                flexGrow={1}
-                mt={'$size.0.9'}
-              >
-                {tags?.map((tag) => (
-                  <TagPill key={tag.name}>{tag.name}</TagPill>
-                ))}
-              </YStack>
-            </YStack>
-
-            <XStack gap="$size.0.9" mt={'$size.1.5'}>
+    <YStack f={1} gap={'$size.1.5'} $lg={{ ai: 'center', fullscreen: true }} px>
+      <Stack
+        pt="$3"
+        pos="relative"
+        $md={{ maw: avatarWidth }}
+        width={'100%'}
+        ai="center"
+        $gtMd={{ flexDirection: 'row', ai: 'flex-start' }}
+      >
+        <Square
+          $gtMd={{ flexDirection: 'row', ai: 'flex-start', gap: '$size.1.5' }}
+          h="100%"
+          w="100%"
+          jc="flex-start"
+        >
+          {/* Add this Stack for flex */}
+          <Stack $md={{ display: 'none' }} ai="flex-start" width={'100%'} maw={avatarWidth} />
+          <XStack gap="$size.0.9" $gtMd={{ maxWidth: 480, f: 1 }} w="100%" ai="center">
+            <Theme inverse>
               <LinkableButton
                 href={media.lg ? '/account?nav=settings' : '/account/settings/edit-profile'}
                 // on smaller screens, we don't want to navigate to the settings screen but open bottom sheet
@@ -203,7 +152,6 @@ export function AccountScreen() {
                       },
                     }
                   : {})}
-                theme={'green'}
                 borderRadius={'$3'}
                 flexBasis={'50%'}
                 flexShrink={1}
@@ -214,100 +162,170 @@ export function AccountScreen() {
                     Settings
                   </Button.Text>
                   <Button.Icon>
-                    <IconGear size={20} />
+                    <IconGear size={'$1.5'} />
                   </Button.Icon>
                 </XStack>
               </LinkableButton>
-              <Button
-                onPress={shareOrCopyOnPress}
-                theme="green"
-                variant={'outlined'}
-                borderRadius={'$3'}
-                flexBasis={'50%'}
-                flexShrink={1}
-                borderColor={'$primary'}
-                ai={'center'}
-              >
-                <XStack jc={'space-between'} gap={'$size.0.75'} ai={'center'}>
-                  <Button.Text color="$color12" fontWeight={600} tt={'uppercase'}>
-                    Share
-                  </Button.Text>
-                  <Button.Icon>
-                    <IconShare
-                      size="$1"
-                      col={'$background'}
-                      $theme-light={{ color: '$color12' }}
-                      $platform-web={{ cursor: 'pointer' }}
-                    />
-                  </Button.Icon>
-                </XStack>
-              </Button>
-            </XStack>
-          </YStack>
-        </YStack>
-      </YStack>
-
-      <YStack gap={'$size.1.5'} maxWidth={480} f={1} width="100%">
-        {links.map((linkProps) => (
-          <StackButton key={linkProps.label} {...linkProps} />
-        ))}
-
-        <YStack
-          backgroundColor={'$color1'}
-          jc={'space-between'}
-          borderRadius={'$6'}
-          p={'$size.1'}
-          $gtXs={{ p: '$size.3.5' }}
-          f={1}
-        >
-          <XStack ai={'center'} jc="space-between">
-            <Paragraph size={'$9'} color="$color12" fontWeight={600}>
-              Referrals
-            </Paragraph>
-            <Paragraph
-              ff={'$mono'}
-              py={'$size.0.5'}
-              px={'$size.0.9'}
-              borderWidth={1}
+            </Theme>
+            <Button
+              onPress={shareOrCopyOnPress}
+              theme="green"
+              variant={'outlined'}
+              borderRadius={'$3'}
+              flexBasis={'50%'}
+              flexShrink={1}
               borderColor={'$primary'}
               $theme-light={{ borderColor: '$color12' }}
-              borderRadius={'$4'}
+              ai={'center'}
             >
-              {referralsCount ?? 0}
-            </Paragraph>
+              <XStack jc={'space-between'} gap={'$size.0.75'} ai={'center'}>
+                <Button.Text color="$color12" fontWeight={600} tt={'uppercase'}>
+                  Share
+                </Button.Text>
+                <Button.Icon>
+                  <IconShare size={'$1'} color={'$color12'} $platform-web={{ cursor: 'pointer' }} />
+                </Button.Icon>
+              </XStack>
+            </Button>
           </XStack>
-          <YStack>
-            <Paragraph color="$color10">Referral Code</Paragraph>
-            <XStack py={'$2.5'} borderRadius={'$4'}>
-              <TooltipSimple label={<Paragraph color="$white">{'Copy'}</Paragraph>}>
-                <Button
-                  bc={'$color0'}
-                  br="$2"
-                  aria-label={'Copy'}
-                  f={1}
-                  fd="row"
-                  chromeless
-                  onPress={copyOnPress}
-                  color="$color12"
-                  justifyContent="space-between"
-                  iconAfter={
-                    <Theme name="green_Button">
-                      <IconCopy
-                        size="$1"
-                        col={'$background'}
-                        $theme-light={{ color: '$color12' }}
-                        $platform-web={{ cursor: 'pointer' }}
-                      />
-                    </Theme>
-                  }
+        </Square>
+      </Stack>
+
+      <Stack
+        gap={'$size.1.5'}
+        pb={'$size.1.5'}
+        width={'100%'}
+        fd="column"
+        $gtMd={{ flexDirection: 'row', ai: 'flex-start' }}
+        $gtLg={{ pt: 0 }}
+        ai="center"
+      >
+        <Card br={'$6'} maxWidth={avatarWidth}>
+          <YStack ai={'flex-start'} h="100%">
+            <YStack pos={'relative'}>
+              <Avatar size={avatarWidth} btlr={'$6'} btrr={'$6'} bc="$color2">
+                <Avatar.Image accessibilityLabel="" src={avatar_url ?? ''} />
+                <Avatar.Fallback f={1} ai={'center'} theme="green_active">
+                  <IconAccount size={avatarWidth * 0.9} $theme-light={{ color: '$color12' }} />
+                </Avatar.Fallback>
+              </Avatar>
+              <LinearGradient
+                start={[0, 1]}
+                end={[0, 0]}
+                width={'100%'}
+                height={'$9'}
+                colors={['$color1', '$color1', 'transparent']}
+                pos={'absolute'}
+                pointerEvents={'none'}
+                b={0}
+                zIndex={2}
+              />
+              <XStack
+                zIndex={3}
+                pos={'absolute'}
+                bottom={'0'}
+                px={'$size.1'}
+                ai={'center'}
+                jc={'space-between'}
+                w={'100%'}
+                $gtXs={{ px: '$size.3.5' }}
+              >
+                <Heading fontSize={'$10'} fontWeight={'900'} color={'$color12'}>
+                  {name ? name.toUpperCase() : '---'}
+                </Heading>
+              </XStack>
+            </YStack>
+            <YStack
+              $gtXs={{ p: '$size.3.5' }}
+              p={'$size.1'}
+              pt={'$size.0.9'}
+              jc={'space-between'}
+              f={1}
+              width={'100%'}
+            >
+              <YStack>
+                <XStack gap="$size.0.75">
+                  <Paragraph color={'$color10'} size="$6">
+                    Send ID:
+                  </Paragraph>
+                  <Paragraph size="$6">{send_id}</Paragraph>
+                </XStack>
+                <YStack
+                  flexDirection="row"
+                  gap={'$size.0.75'}
+                  flexWrap="wrap"
+                  flexGrow={1}
+                  mt={'$size.0.9'}
                 >
-                  <Button.Text size={'$6'}>SEND.APP/{refCode}</Button.Text>
-                </Button>
-              </TooltipSimple>
+                  {tags?.map((tag) => (
+                    <TagPill key={tag.name}>{tag.name}</TagPill>
+                  ))}
+                </YStack>
+              </YStack>
+            </YStack>
+          </YStack>
+        </Card>
+        <YStack gap={'$size.1.5'} maxWidth={480} f={1} width="100%" $md={{ px: '$3' }}>
+          {links.map((linkProps) => (
+            <StackButton key={linkProps.label} {...linkProps} />
+          ))}
+          <YStack
+            backgroundColor={'$color1'}
+            jc={'space-between'}
+            borderRadius={'$6'}
+            p={'$size.1'}
+            $gtXs={{ p: '$size.3.5' }}
+            f={1}
+          >
+            <XStack ai={'center'} jc="space-between">
+              <Paragraph size={'$9'} color="$color12" fontWeight={600}>
+                Referrals
+              </Paragraph>
+              <Paragraph
+                ff={'$mono'}
+                py={'$size.0.5'}
+                px={'$size.0.9'}
+                borderWidth={1}
+                borderColor={'$primary'}
+                $theme-light={{ borderColor: '$color12' }}
+                borderRadius={'$4'}
+              >
+                {referralsCount ?? 0}
+              </Paragraph>
             </XStack>
+            <YStack>
+              <Paragraph color="$color10">Referral Code</Paragraph>
+              <XStack py={'$2.5'} borderRadius={'$4'}>
+                <TooltipSimple label={<Paragraph color="$white">{'Copy'}</Paragraph>}>
+                  <Button
+                    bc={'$color0'}
+                    br="$2"
+                    aria-label={'Copy'}
+                    f={1}
+                    fd="row"
+                    chromeless
+                    onPress={copyOnPress}
+                    color="$color12"
+                    justifyContent="space-between"
+                    iconAfter={
+                      <Theme name="green_Button">
+                        <IconCopy
+                          size="$1"
+                          col={'$background'}
+                          $theme-light={{ color: '$color12' }}
+                          $platform-web={{ cursor: 'pointer' }}
+                        />
+                      </Theme>
+                    }
+                  >
+                    <Button.Text size={'$6'}>SEND.APP/{refCode}</Button.Text>
+                  </Button>
+                </TooltipSimple>
+              </XStack>
+            </YStack>
           </YStack>
         </YStack>
-      </YStack>
+      </Stack>
     </YStack>
   )
 }
