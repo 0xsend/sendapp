@@ -29,6 +29,12 @@ const SignUpSchema = z.object({
   phone: formFields.text.min(1).max(20),
 })
 
+enum PageState {
+  SignupForm = 'SignUpForm',
+  VerifyCode = 'VerifyCode',
+  BackUpPrompt = 'BackUpPrompt',
+}
+
 export const SignUpForm = () => {
   const form = useForm<z.infer<typeof SignUpSchema>>()
   const router = useRouter()
@@ -37,7 +43,7 @@ export const SignUpForm = () => {
   const toast = useToastController()
   const [captchaToken, setCaptchaToken] = useState<string | undefined>()
   const [isSigningIn, setIsSigningIn] = useState(false)
-  const [shouldShowBackUpPrompt, setShouldShowBackUpPrompt] = useState(false)
+  const [pageState, setPageState] = useState(PageState.SignupForm)
 
   const { mutateAsync: signInWithOtpMutateAsync } = api.auth.signInWithOtp.useMutation({
     retry: false,
@@ -51,8 +57,11 @@ export const SignUpForm = () => {
     { retry: false }
   )
 
-  const handleSignIn = async (isNumberAlreadyUsed = false) => {
+  const handleSignIn = async (options: { isPhoneAlreadyUsed?: boolean } = {}) => {
+    const { isPhoneAlreadyUsed = false } = options
+
     setIsSigningIn(true)
+
     try {
       const challengeData = await getChallengeMutateAsync()
 
@@ -76,12 +85,8 @@ export const SignUpForm = () => {
 
       router.push(redirectUri ?? '/')
     } catch (error) {
-      if (
-        isNumberAlreadyUsed &&
-        error instanceof DOMException &&
-        error.name === 'NotAllowedError'
-      ) {
-        setShouldShowBackUpPrompt(true)
+      if (isPhoneAlreadyUsed && error instanceof DOMException && error.name === 'NotAllowedError') {
+        setPageState(PageState.BackUpPrompt)
         return
       }
 
@@ -95,8 +100,12 @@ export const SignUpForm = () => {
     }
   }
 
-  async function signUpWithPhone(formData: z.infer<typeof SignUpSchema>, bypassPhoneCheck = false) {
+  async function signUpWithPhone(
+    formData: z.infer<typeof SignUpSchema>,
+    options: { bypassPhoneCheck?: boolean } = {}
+  ) {
     const { phone, countrycode } = formData
+    const { bypassPhoneCheck = false } = options
 
     try {
       const { status } = await signInWithOtpMutateAsync({
@@ -107,8 +116,11 @@ export const SignUpForm = () => {
       })
 
       if (status === AuthStatus.PhoneAlreadyUsed) {
-        await handleSignIn(true)
+        await handleSignIn({ isPhoneAlreadyUsed: true })
+        return
       }
+
+      setPageState(PageState.VerifyCode)
     } catch (error) {
       console.error("Couldn't send OTP", error)
       const errorMessage = error.message.toLowerCase()
@@ -118,12 +130,15 @@ export const SignUpForm = () => {
 
   function handleBackUpConfirm() {
     const formData = form.getValues()
-    void signUpWithPhone(formData, true)
-    setShouldShowBackUpPrompt(false)
+    void signUpWithPhone(formData, { bypassPhoneCheck: true })
   }
 
   function handleBackUpDenial() {
-    void handleSignIn(true)
+    void handleSignIn({ isPhoneAlreadyUsed: true })
+  }
+
+  function handleGoBackFromBackUpPrompt() {
+    setPageState(PageState.SignupForm)
   }
 
   useEffect(() => () => toast.hide(), [toast])
@@ -141,7 +156,7 @@ export const SignUpForm = () => {
     <SchemaForm
       form={form}
       schema={SignUpSchema}
-      onSubmit={(formData) => signUpWithPhone(formData, false)}
+      onSubmit={signUpWithPhone}
       defaultValues={{ phone: '', countrycode: '' }}
       formProps={{
         flex: 1,
@@ -279,24 +294,40 @@ export const SignUpForm = () => {
         </SubmitButton>
         <Button
           borderColor="$primary"
+          $theme-light={{ borderColor: '$color12' }}
           variant="outlined"
           size="$4"
           w="$12"
           onPress={handleBackUpDenial}
         >
-          <Button.Text color="$white" $gtMd={{ color: '$color12' }}>
-            NO
-          </Button.Text>
+          <Button.Text color="$color12">NO</Button.Text>
         </Button>
+      </XStack>
+      <XStack ai="baseline" gap="$1">
+        <SubmitButton onPress={handleGoBackFromBackUpPrompt} unstyled>
+          <ButtonText color="$color11" size="$2" textDecorationLine="underline">
+            Go back
+          </ButtonText>
+        </SubmitButton>
+        <Paragraph size="$2" color="$color11">
+          to sign up form
+        </Paragraph>
       </XStack>
     </YStack>
   )
 
   return (
     <FormProvider {...form}>
-      {!form.formState.isSubmitSuccessful && !shouldShowBackUpPrompt && signUpForm}
-      {form.formState.isSubmitSuccessful && !shouldShowBackUpPrompt && verifyCode}
-      {form.formState.isSubmitSuccessful && shouldShowBackUpPrompt && backUpForm}
+      {(() => {
+        switch (pageState) {
+          case PageState.SignupForm:
+            return signUpForm
+          case PageState.VerifyCode:
+            return verifyCode
+          case PageState.BackUpPrompt:
+            return backUpForm
+        }
+      })()}
     </FormProvider>
   )
 }
