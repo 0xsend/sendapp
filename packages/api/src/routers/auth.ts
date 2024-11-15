@@ -6,6 +6,11 @@ import { createTRPCRouter, publicProcedure } from '../trpc'
 
 const log = debug('api:auth')
 
+export enum AuthStatus {
+  SignedIn = 'SignedIn',
+  PhoneAlreadyUsed = 'PhoneAlreadyUsed',
+}
+
 export const authRouter = createTRPCRouter({
   signInWithOtp: publicProcedure
     .input(
@@ -51,7 +56,7 @@ export const authRouter = createTRPCRouter({
           log('phone is already used', { phone })
 
           return {
-            wasPhoneAlreadyUsed: true,
+            status: AuthStatus.PhoneAlreadyUsed,
           }
         }
       }
@@ -81,7 +86,7 @@ export const authRouter = createTRPCRouter({
       log('successfully signed up with otp', { phone })
 
       return {
-        wasPhoneAlreadyUsed: false,
+        status: AuthStatus.SignedIn,
       }
     }),
 })
