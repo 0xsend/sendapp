@@ -2,14 +2,10 @@ import { TRPCError } from '@trpc/server'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import debug from 'debug'
 import { z } from 'zod'
-import { createTRPCRouter, publicProcedure } from '../trpc'
+import { createTRPCRouter, publicProcedure } from '../../trpc'
+import { AuthStatus } from './types'
 
 const log = debug('api:auth')
-
-export enum AuthStatus {
-  SignedIn = 'SignedIn',
-  PhoneAlreadyUsed = 'PhoneAlreadyUsed',
-}
 
 export const authRouter = createTRPCRouter({
   signInWithOtp: publicProcedure
@@ -45,8 +41,12 @@ export const authRouter = createTRPCRouter({
         })
       }
 
+      console.log('before bybass')
+
       if (!bypassPhoneCheck) {
         log('checking if phone is already used', { phone })
+
+        console.log('no bypass')
 
         const { data } = await supabaseAdmin
           .rpc('profile_lookup', { lookup_type: 'phone', identifier: phone })
@@ -54,6 +54,8 @@ export const authRouter = createTRPCRouter({
 
         if (data) {
           log('phone is already used', { phone })
+
+          console.log('phone already used')
 
           return {
             status: AuthStatus.PhoneAlreadyUsed,
