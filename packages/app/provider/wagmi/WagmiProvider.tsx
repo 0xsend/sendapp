@@ -1,8 +1,6 @@
-import type { FC, ReactNode } from 'react'
 import { WagmiProvider as OGWagmiProvider } from 'wagmi'
-import { projectId, config } from './config'
-
-if (!projectId) throw new Error('Project ID is not defined')
+import { config } from '@my/wagmi'
+import type { FC, ReactNode } from 'react'
 
 export const WagmiProvider: FC<{ children: ReactNode }> = ({
   children,
@@ -10,4 +8,10 @@ export const WagmiProvider: FC<{ children: ReactNode }> = ({
   children: ReactNode
 }) => {
   return <OGWagmiProvider config={config}>{children}</OGWagmiProvider>
+}
+
+declare module 'wagmi' {
+  interface Register {
+    config: typeof config
+  }
 }
