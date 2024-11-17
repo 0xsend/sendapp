@@ -70,7 +70,7 @@ export class CheckoutPage {
     await this.page.getByRole('button', { name: 'Pricing' }).hover()
   }
 
-  async confirmTags(expect: Expect<CheckoutPage>) {
+  async confirmTags(expect: Expect) {
     // sign transaction
     log('sign transaction')
     const confirmTagsRequest = this.page.waitForRequest(

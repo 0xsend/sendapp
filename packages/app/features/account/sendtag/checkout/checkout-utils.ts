@@ -20,6 +20,7 @@ import { useUSDCFees } from 'app/utils/useUSDCFees'
 import { useUser } from 'app/utils/useUser'
 import { useMemo } from 'react'
 import { encodeFunctionData, erc20Abi, zeroAddress } from 'viem'
+import { fetchSendtagCheckoutReceipts } from './checkout-utils.fetchSendtagCheckoutReceipts'
 
 export const verifyAddressMsg = (a: string | `0x${string}`) =>
   `I am the owner of the address: ${a}.
@@ -140,22 +141,6 @@ export function useReferralReward({ tags }: { tags: { name: string }[] }) {
     },
     enabled: !!referrer,
   })
-}
-
-/**
- * Fetches the sendtag checkout receipts.
- * Returns an array of receipts with numerics converted to strings to avoid overflows.
- * @param supabase
- * @returns The sendtag checkout receipts.
- */
-export function fetchSendtagCheckoutReceipts(supabase: SupabaseClient<Database>) {
-  return supabase.from('sendtag_checkout_receipts').select(`
-      event_id,
-      amount::text,
-      referrer,
-      reward::text,
-      tx_hash
-    `)
 }
 
 function sendtagCheckoutReceiptsQueryOptions(supabase: SupabaseClient<Database>) {

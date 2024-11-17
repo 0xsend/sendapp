@@ -63,7 +63,6 @@
     "@biomejs/biome": "^1.6.3",
     "dotenv-cli": "^7.3.0",
     "lefthook": "^1.5.5",
-    "snaplet": "^0.42.1",
     "zx": "^8.1.2"
   }
 }

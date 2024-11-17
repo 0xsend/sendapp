@@ -6264,7 +6264,7 @@ __metadata:
     "@my/snaplet": "workspace:*"
     "@my/supabase": "workspace:*"
     "@my/wagmi": "workspace:*"
-    "@playwright/test": "npm:^1.45.1"
+    "@playwright/test": "npm:^1.48.2"
     "@supabase/supabase-js": "npm:2.44.2"
     "@types/bun": "npm:^1.1.6"
     "@types/jsonwebtoken": "npm:^9.0.2"
@@ -6970,14 +6970,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@playwright/test@npm:^1.45.1":
-  version: 1.45.1
-  resolution: "@playwright/test@npm:1.45.1"
+"@playwright/test@npm:^1.48.2":
+  version: 1.48.2
+  resolution: "@playwright/test@npm:1.48.2"
   dependencies:
-    playwright: "npm:1.45.1"
+    playwright: "npm:1.48.2"
   bin:
     playwright: cli.js
-  checksum: 10/718316ae739438f686914350beb3aeded6c96d7adfe1b65509fc50c4e322172fe58b7c9f215c3d5bef52a263839b83162f843027ae8d8e96970b3dd8f87211d2
+  checksum: 10/8557f9d60b93b9a60b66599d46f991b56df26b691f9285e8755298dabd9f42d1421c330a7d7578b76445fdd56040fe790d3f1081daa80e5e89a380170e0fd217
   languageName: node
   linkType: hard
 
@@ -28697,27 +28697,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:1.45.1":
-  version: 1.45.1
-  resolution: "playwright-core@npm:1.45.1"
+"playwright-core@npm:1.48.2":
+  version: 1.48.2
+  resolution: "playwright-core@npm:1.48.2"
   bin:
     playwright-core: cli.js
-  checksum: 10/206a5ecd2de7b8cefa5136331fa22012416b37eb2c471e3105c09a8a17a10621efa900acb6a780314f06aa2a3d6651aad3a323fa360d046ccce8f3844b3ca615
+  checksum: 10/dd029f797b1afb2240713a032fecc50e1ffc5464a39c075570cf10e929c145da3a8d0951a3f2b279e33b2f09cbeb8ff4330822cb1078452c0c75cc4ce34ca171
   languageName: node
   linkType: hard
 
-"playwright@npm:1.45.1":
-  version: 1.45.1
-  resolution: "playwright@npm:1.45.1"
+"playwright@npm:1.48.2":
+  version: 1.48.2
+  resolution: "playwright@npm:1.48.2"
   dependencies:
     fsevents: "npm:2.3.2"
-    playwright-core: "npm:1.45.1"
+    playwright-core: "npm:1.48.2"
   dependenciesMeta:
     fsevents:
       optional: true
   bin:
     playwright: cli.js
-  checksum: 10/092d510a79ca8fb1d0c1a83460735b9eaf02261a48df2ae1b025f95ee31e2be9d962ddc62c7e5c0d2c44e5b982b66aaf3fe24243f736ab14dbfd2d6e88897824
+  checksum: 10/331af352504336f419cdf1369f0ef399c6f0e905fdb79a5e97c41f33e74766efd21430ab6ae2de0b237ae765ebfbe701e119a990d8dc01bcdac3bc43c1fa1fbf
   languageName: node
   linkType: hard
 
@@ -31408,7 +31408,6 @@ __metadata:
     eslint: "npm:^8.46.0"
     lefthook: "npm:^1.5.5"
     node-gyp: "npm:^9.3.1"
-    snaplet: "npm:^0.42.1"
     turbo: "npm:^2.0.3"
     typescript: "npm:^5.5.3"
     zx: "npm:^8.1.2"
@@ -31851,15 +31850,6 @@ __metadata:
     dot-case: "npm:^3.0.4"
     tslib: "npm:^2.0.3"
   checksum: 10/0a7a79900bbb36f8aaa922cf111702a3647ac6165736d5dc96d3ef367efc50465cac70c53cd172c382b022dac72ec91710608e5393de71f76d7142e6fd80e8a3
-  languageName: node
-  linkType: hard
-
-"snaplet@npm:^0.42.1":
-  version: 0.42.1
-  resolution: "snaplet@npm:0.42.1"
-  bin:
-    snaplet: bin/snaplet.js
-  checksum: 10/2a79ff70ec40864d4cffaf69d196f1777a99b38489d158609d9b7c09d05d396ca9fc76463f75710922048b98ba960cbe307f2978d575244672bc4bf53c7bf4a7
   languageName: node
   linkType: hard
 

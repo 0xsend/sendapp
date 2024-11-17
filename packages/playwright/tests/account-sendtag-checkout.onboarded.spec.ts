@@ -3,11 +3,10 @@ import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
 import { userOnboarded, type SeedClient } from '@my/snaplet'
 import type { Database } from '@my/supabase/database.types'
 import { usdcAddress } from '@my/wagmi'
-import type { Page } from '@playwright/test'
-import { devices, mergeTests } from '@playwright/test'
+import { devices, mergeTests, type Page } from '@playwright/test'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { price, pricing, reward, total } from 'app/data/sendtags'
-import { fetchSendtagCheckoutReceipts } from 'app/features/account/sendtag/checkout/checkout-utils'
+import { fetchSendtagCheckoutReceipts } from 'app/features/account/sendtag/checkout/checkout-utils.fetchSendtagCheckoutReceipts'
 import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import debug from 'debug'
@@ -192,7 +191,7 @@ test('can confirm a tag', async ({ checkoutPage, supabase, user: { profile: myPr
   await addPendingTag(checkoutPage, tagName)
   await confirmTags(checkoutPage, [tagName])
   await verifyTagsInDatabase(supabase, [tagName])
-  await expect(checkoutPage.page).toHaveTitle('Send | Sendtag')
+  await expect(checkoutPage.page).toHaveTitle('Send | Sendtags')
 
   const receiptEvent = {
     event_name: 'tag_receipt_usdc',

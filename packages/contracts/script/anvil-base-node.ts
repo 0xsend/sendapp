@@ -25,7 +25,7 @@ await $`docker run --rm \
           --network=supabase_network_send \
           -p=0.0.0.0:8546:8546 \
           --name=sendapp-anvil-base \
-          ghcr.io/foundry-rs/foundry "anvil \
+          ghcr.io/foundry-rs/foundry:nightly "anvil \
             --host=0.0.0.0 \
             --port=8546 \
             --chain-id=$NEXT_PUBLIC_BASE_CHAIN_ID \
