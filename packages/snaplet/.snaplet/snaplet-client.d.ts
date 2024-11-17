@@ -14,6 +14,19 @@ type Inflection = {
   oppositeBaseNameMap?: Record<string, string>;
 };
 type Override = {
+  _http_response?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      status_code?: string;
+      content_type?: string;
+      headers?: string;
+      content?: string;
+      timed_out?: string;
+      error_msg?: string;
+      created?: string;
+    };
+  }
   activity?: {
     name?: string;
     fields?: {
@@ -26,6 +39,27 @@ type Override = {
       created_at?: string;
       users_activity_from_user_idTousers?: string;
       users_activity_to_user_idTousers?: string;
+    };
+  }
+  affiliate_stats?: {
+    name?: string;
+    fields?: {
+      paymaster_tx_count?: string;
+      user_id?: string;
+      id?: string;
+      created_at?: string;
+      updated_at?: string;
+      profiles?: string;
+    };
+  }
+  audit_log_entries?: {
+    name?: string;
+    fields?: {
+      instance_id?: string;
+      id?: string;
+      payload?: string;
+      created_at?: string;
+      ip_address?: string;
     };
   }
   buckets?: {
@@ -42,6 +76,8 @@ type Override = {
       allowed_mime_types?: string;
       owner_id?: string;
       objects?: string;
+      s3_multipart_uploads?: string;
+      s3_multipart_uploads_parts?: string;
     };
   }
   chain_addresses?: {
@@ -89,6 +125,9 @@ type Override = {
       distribution_id?: string;
       created_at?: string;
       updated_at?: string;
+      multiplier_min?: string;
+      multiplier_max?: string;
+      multiplier_step?: string;
       distributions?: string;
     };
   }
@@ -101,6 +140,7 @@ type Override = {
       type?: string;
       metadata?: string;
       created_at?: string;
+      weight?: string;
       users?: string;
       distributions?: string;
     };
@@ -129,6 +169,33 @@ type Override = {
       distribution_verifications?: string;
     };
   }
+  feature_info?: {
+    name?: string;
+    fields?: {
+      feature?: string;
+      schema_name?: string;
+      proname?: string;
+      obj_identity?: string;
+    };
+  }
+  flow_state?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      user_id?: string;
+      auth_code?: string;
+      code_challenge_method?: string;
+      code_challenge?: string;
+      provider_type?: string;
+      provider_access_token?: string;
+      provider_refresh_token?: string;
+      created_at?: string;
+      updated_at?: string;
+      authentication_method?: string;
+      auth_code_issued_at?: string;
+      saml_relay_states?: string;
+    };
+  }
   hooks?: {
     name?: string;
     fields?: {
@@ -139,6 +206,83 @@ type Override = {
       request_id?: string;
     };
   }
+  http_request_queue?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      method?: string;
+      url?: string;
+      headers?: string;
+      body?: string;
+      timeout_milliseconds?: string;
+    };
+  }
+  identities?: {
+    name?: string;
+    fields?: {
+      provider_id?: string;
+      user_id?: string;
+      identity_data?: string;
+      provider?: string;
+      last_sign_in_at?: string;
+      created_at?: string;
+      updated_at?: string;
+      email?: string;
+      id?: string;
+      users?: string;
+    };
+  }
+  ig_updates?: {
+    name?: string;
+    fields?: {
+      name?: string;
+      src_name?: string;
+      backfill?: string;
+      num?: string;
+      latency?: string;
+      nrows?: string;
+      stop?: string;
+    };
+  }
+  instances?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      uuid?: string;
+      raw_base_config?: string;
+      created_at?: string;
+      updated_at?: string;
+    };
+  }
+  integrations?: {
+    name?: string;
+    fields?: {
+      name?: string;
+      conf?: string;
+    };
+  }
+  key?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      status?: string;
+      created?: string;
+      expires?: string;
+      key_type?: string;
+      key_id?: string;
+      key_context?: string;
+      name?: string;
+      associated_data?: string;
+      raw_key?: string;
+      raw_key_nonce?: string;
+      parent_key?: string;
+      comment?: string;
+      user_data?: string;
+      key?: string;
+      key?: string;
+      secrets?: string;
+    };
+  }
   leaderboard_referrals_all_time?: {
     name?: string;
     fields?: {
@@ -147,6 +291,59 @@ type Override = {
       rewards_usdc?: string;
       updated_at?: string;
       users?: string;
+    };
+  }
+  messages?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      topic?: string;
+      extension?: string;
+      inserted_at?: string;
+      updated_at?: string;
+    };
+  }
+  mfa_amr_claims?: {
+    name?: string;
+    fields?: {
+      session_id?: string;
+      created_at?: string;
+      updated_at?: string;
+      authentication_method?: string;
+      id?: string;
+      sessions?: string;
+    };
+  }
+  mfa_challenges?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      factor_id?: string;
+      created_at?: string;
+      verified_at?: string;
+      ip_address?: string;
+      otp_code?: string;
+      web_authn_session_data?: string;
+      mfa_factors?: string;
+    };
+  }
+  mfa_factors?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      user_id?: string;
+      friendly_name?: string;
+      factor_type?: string;
+      status?: string;
+      created_at?: string;
+      updated_at?: string;
+      secret?: string;
+      phone?: string;
+      last_challenged_at?: string;
+      web_authn_credential?: string;
+      web_authn_aaguid?: string;
+      users?: string;
+      mfa_challenges?: string;
     };
   }
   storage_migrations?: {
@@ -179,7 +376,21 @@ type Override = {
       path_tokens?: string;
       version?: string;
       owner_id?: string;
+      user_metadata?: string;
       buckets?: string;
+    };
+  }
+  one_time_tokens?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      user_id?: string;
+      token_type?: string;
+      token_hash?: string;
+      relates_to?: string;
+      created_at?: string;
+      updated_at?: string;
+      users?: string;
     };
   }
   profiles?: {
@@ -193,6 +404,7 @@ type Override = {
       is_public?: string;
       send_id?: string;
       users?: string;
+      affiliate_stats?: string;
       referrals_referrals_referred_idToprofiles?: string;
       referrals_referrals_referrer_idToprofiles?: string;
     };
@@ -220,10 +432,95 @@ type Override = {
       tags?: string;
     };
   }
+  refresh_tokens?: {
+    name?: string;
+    fields?: {
+      instance_id?: string;
+      id?: string;
+      token?: string;
+      user_id?: string;
+      revoked?: string;
+      created_at?: string;
+      updated_at?: string;
+      parent?: string;
+      session_id?: string;
+      sessions?: string;
+    };
+  }
+  s3_multipart_uploads?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      in_progress_size?: string;
+      upload_signature?: string;
+      bucket_id?: string;
+      key?: string;
+      version?: string;
+      owner_id?: string;
+      created_at?: string;
+      user_metadata?: string;
+      buckets?: string;
+      s3_multipart_uploads_parts?: string;
+    };
+  }
+  s3_multipart_uploads_parts?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      upload_id?: string;
+      size?: string;
+      part_number?: string;
+      bucket_id?: string;
+      key?: string;
+      etag?: string;
+      owner_id?: string;
+      version?: string;
+      created_at?: string;
+      buckets?: string;
+      s3_multipart_uploads?: string;
+    };
+  }
+  saml_providers?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      sso_provider_id?: string;
+      entity_id?: string;
+      metadata_xml?: string;
+      metadata_url?: string;
+      attribute_mapping?: string;
+      created_at?: string;
+      updated_at?: string;
+      name_id_format?: string;
+      sso_providers?: string;
+    };
+  }
+  saml_relay_states?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      sso_provider_id?: string;
+      request_id?: string;
+      for_email?: string;
+      redirect_to?: string;
+      created_at?: string;
+      updated_at?: string;
+      flow_state_id?: string;
+      flow_state?: string;
+      sso_providers?: string;
+    };
+  }
   auth_schema_migrations?: {
     name?: string;
     fields?: {
       version?: string;
+    };
+  }
+  realtime_schema_migrations?: {
+    name?: string;
+    fields?: {
+      version?: string;
+      inserted_at?: string;
     };
   }
   supabase_migrations_schema_migrations?: {
@@ -232,6 +529,27 @@ type Override = {
       version?: string;
       statements?: string;
       name?: string;
+    };
+  }
+  secrets?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      name?: string;
+      description?: string;
+      secret?: string;
+      key_id?: string;
+      nonce?: string;
+      created_at?: string;
+      updated_at?: string;
+      key?: string;
+    };
+  }
+  seed_files?: {
+    name?: string;
+    fields?: {
+      path?: string;
+      hash?: string;
     };
   }
   send_account_created?: {
@@ -425,6 +743,68 @@ type Override = {
       abi_idx?: string;
     };
   }
+  sessions?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      user_id?: string;
+      created_at?: string;
+      updated_at?: string;
+      factor_id?: string;
+      aal?: string;
+      not_after?: string;
+      refreshed_at?: string;
+      user_agent?: string;
+      ip?: string;
+      tag?: string;
+      users?: string;
+      mfa_amr_claims?: string;
+      refresh_tokens?: string;
+    };
+  }
+  sources?: {
+    name?: string;
+    fields?: {
+      name?: string;
+      chain_id?: string;
+      url?: string;
+    };
+  }
+  sso_domains?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      sso_provider_id?: string;
+      domain?: string;
+      created_at?: string;
+      updated_at?: string;
+      sso_providers?: string;
+    };
+  }
+  sso_providers?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      resource_id?: string;
+      created_at?: string;
+      updated_at?: string;
+      saml_providers?: string;
+      saml_relay_states?: string;
+      sso_domains?: string;
+    };
+  }
+  subscription?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      subscription_id?: string;
+      entity?: string;
+      filters?: string;
+      claims?: string;
+      claims_role?: string;
+      created_at?: string;
+    };
+  }
   tag_receipts?: {
     name?: string;
     fields?: {
@@ -454,6 +834,23 @@ type Override = {
       users?: string;
       referrals?: string;
       tag_receipts?: string;
+    };
+  }
+  task_updates?: {
+    name?: string;
+    fields?: {
+      num?: string;
+      hash?: string;
+      insert_at?: string;
+      src_hash?: string;
+      src_num?: string;
+      nblocks?: string;
+      nrows?: string;
+      latency?: string;
+      src_name?: string;
+      stop?: string;
+      chain_id?: string;
+      ig_name?: string;
     };
   }
   users?: {
@@ -494,6 +891,10 @@ type Override = {
       is_sso_user?: string;
       deleted_at?: string;
       is_anonymous?: string;
+      identities?: string;
+      mfa_factors?: string;
+      one_time_tokens?: string;
+      sessions?: string;
       leaderboard_referrals_all_time?: string;
       activity_activity_from_user_idTousers?: string;
       activity_activity_to_user_idTousers?: string;
@@ -549,6 +950,12 @@ interface FingerprintNumberField {
   }
 }
 export interface Fingerprint {
+  HttpResponses?: {
+    id?: FingerprintNumberField;
+    statusCode?: FingerprintNumberField;
+    headers?: FingerprintJsonField;
+    created?: FingerprintDateField;
+  }
   activities?: {
     id?: FingerprintNumberField;
     data?: FingerprintJsonField;
@@ -556,11 +963,23 @@ export interface Fingerprint {
     fromUser?: FingerprintRelationField;
     toUser?: FingerprintRelationField;
   }
+  affiliateStats?: {
+    paymasterTxCount?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    user?: FingerprintRelationField;
+  }
+  auditLogEntries?: {
+    payload?: FingerprintJsonField;
+    createdAt?: FingerprintDateField;
+  }
   buckets?: {
     createdAt?: FingerprintDateField;
     updatedAt?: FingerprintDateField;
     fileSizeLimit?: FingerprintNumberField;
     objects?: FingerprintRelationField;
+    s3MultipartUploads?: FingerprintRelationField;
+    s3MultipartUploadsParts?: FingerprintRelationField;
   }
   chainAddresses?: {
     createdAt?: FingerprintDateField;
@@ -590,6 +1009,9 @@ export interface Fingerprint {
     distributionId?: FingerprintNumberField;
     createdAt?: FingerprintDateField;
     updatedAt?: FingerprintDateField;
+    multiplierMin?: FingerprintNumberField;
+    multiplierMax?: FingerprintNumberField;
+    multiplierStep?: FingerprintNumberField;
     distribution?: FingerprintRelationField;
   }
   distributionVerifications?: {
@@ -597,6 +1019,7 @@ export interface Fingerprint {
     distributionId?: FingerprintNumberField;
     metadata?: FingerprintJsonField;
     createdAt?: FingerprintDateField;
+    weight?: FingerprintNumberField;
     user?: FingerprintRelationField;
     distribution?: FingerprintRelationField;
   }
@@ -619,17 +1042,82 @@ export interface Fingerprint {
     distributionVerificationValues?: FingerprintRelationField;
     distributionVerifications?: FingerprintRelationField;
   }
+  featureInfos?: {
+
+  }
+  flowStates?: {
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    authCodeIssuedAt?: FingerprintDateField;
+    samlRelayStates?: FingerprintRelationField;
+  }
   hooks?: {
     id?: FingerprintNumberField;
     hookTableId?: FingerprintNumberField;
     createdAt?: FingerprintDateField;
     requestId?: FingerprintNumberField;
   }
+  httpRequestQueues?: {
+    id?: FingerprintNumberField;
+    headers?: FingerprintJsonField;
+    timeoutMilliseconds?: FingerprintNumberField;
+  }
+  identities?: {
+    identityData?: FingerprintJsonField;
+    lastSignInAt?: FingerprintDateField;
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    user?: FingerprintRelationField;
+  }
+  igUpdates?: {
+    num?: FingerprintNumberField;
+    nrows?: FingerprintNumberField;
+    stop?: FingerprintNumberField;
+  }
+  instances?: {
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+  }
+  integrations?: {
+    conf?: FingerprintJsonField;
+  }
+  keys?: {
+    created?: FingerprintDateField;
+    expires?: FingerprintDateField;
+    keyId?: FingerprintNumberField;
+    keysByParentKey?: FingerprintRelationField;
+    keysByParentKey?: FingerprintRelationField;
+    secrets?: FingerprintRelationField;
+  }
   leaderboardReferralsAllTimes?: {
     referrals?: FingerprintNumberField;
     rewardsUsdc?: FingerprintNumberField;
     updatedAt?: FingerprintDateField;
     user?: FingerprintRelationField;
+  }
+  messages?: {
+    id?: FingerprintNumberField;
+    insertedAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+  }
+  mfaAmrClaims?: {
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    session?: FingerprintRelationField;
+  }
+  mfaChallenges?: {
+    createdAt?: FingerprintDateField;
+    verifiedAt?: FingerprintDateField;
+    webAuthnSessionData?: FingerprintJsonField;
+    factor?: FingerprintRelationField;
+  }
+  mfaFactors?: {
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    lastChallengedAt?: FingerprintDateField;
+    webAuthnCredential?: FingerprintJsonField;
+    user?: FingerprintRelationField;
+    mfaChallengesByFactorId?: FingerprintRelationField;
   }
   storageMigrations?: {
     id?: FingerprintNumberField;
@@ -643,11 +1131,18 @@ export interface Fingerprint {
     updatedAt?: FingerprintDateField;
     lastAccessedAt?: FingerprintDateField;
     metadata?: FingerprintJsonField;
+    userMetadata?: FingerprintJsonField;
     bucket?: FingerprintRelationField;
+  }
+  oneTimeTokens?: {
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    user?: FingerprintRelationField;
   }
   profiles?: {
     sendId?: FingerprintNumberField;
     i?: FingerprintRelationField;
+    affiliateStatsByUserId?: FingerprintRelationField;
     referralsByReferredId?: FingerprintRelationField;
     referralsByReferrerId?: FingerprintRelationField;
   }
@@ -662,10 +1157,54 @@ export interface Fingerprint {
     referrer?: FingerprintRelationField;
     tagByTag?: FingerprintRelationField;
   }
+  refreshTokens?: {
+    id?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    session?: FingerprintRelationField;
+  }
+  s3MultipartUploads?: {
+    inProgressSize?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+    userMetadata?: FingerprintJsonField;
+    bucket?: FingerprintRelationField;
+    s3MultipartUploadsPartsByUploadId?: FingerprintRelationField;
+  }
+  s3MultipartUploadsParts?: {
+    size?: FingerprintNumberField;
+    partNumber?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+    bucket?: FingerprintRelationField;
+    upload?: FingerprintRelationField;
+  }
+  samlProviders?: {
+    attributeMapping?: FingerprintJsonField;
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    ssoProvider?: FingerprintRelationField;
+  }
+  samlRelayStates?: {
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    flowState?: FingerprintRelationField;
+    ssoProvider?: FingerprintRelationField;
+  }
   authSchemaMigrations?: {
 
   }
+  realtimeSchemaMigrations?: {
+    version?: FingerprintNumberField;
+    insertedAt?: FingerprintDateField;
+  }
   supabaseMigrationsSchemaMigrations?: {
+
+  }
+  secrets?: {
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    key?: FingerprintRelationField;
+  }
+  seedFiles?: {
 
   }
   sendAccountCreateds?: {
@@ -765,6 +1304,35 @@ export interface Fingerprint {
     logIdx?: FingerprintNumberField;
     abiIdx?: FingerprintNumberField;
   }
+  sessions?: {
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    notAfter?: FingerprintDateField;
+    refreshedAt?: FingerprintDateField;
+    user?: FingerprintRelationField;
+    mfaAmrClaims?: FingerprintRelationField;
+    refreshTokens?: FingerprintRelationField;
+  }
+  sources?: {
+    chainId?: FingerprintNumberField;
+  }
+  ssoDomains?: {
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    ssoProvider?: FingerprintRelationField;
+  }
+  ssoProviders?: {
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    samlProviders?: FingerprintRelationField;
+    samlRelayStates?: FingerprintRelationField;
+    ssoDomains?: FingerprintRelationField;
+  }
+  subscriptions?: {
+    id?: FingerprintNumberField;
+    claims?: FingerprintJsonField;
+    createdAt?: FingerprintDateField;
+  }
   tagReceipts?: {
     id?: FingerprintNumberField;
     createdAt?: FingerprintDateField;
@@ -778,6 +1346,15 @@ export interface Fingerprint {
     user?: FingerprintRelationField;
     referralsByTag?: FingerprintRelationField;
     tagReceipts?: FingerprintRelationField;
+  }
+  taskUpdates?: {
+    num?: FingerprintNumberField;
+    insertAt?: FingerprintDateField;
+    srcNum?: FingerprintNumberField;
+    nblocks?: FingerprintNumberField;
+    nrows?: FingerprintNumberField;
+    stop?: FingerprintNumberField;
+    chainId?: FingerprintNumberField;
   }
   users?: {
     emailConfirmedAt?: FingerprintDateField;
@@ -797,6 +1374,10 @@ export interface Fingerprint {
     bannedUntil?: FingerprintDateField;
     reauthenticationSentAt?: FingerprintDateField;
     deletedAt?: FingerprintDateField;
+    identities?: FingerprintRelationField;
+    mfaFactors?: FingerprintRelationField;
+    oneTimeTokens?: FingerprintRelationField;
+    sessions?: FingerprintRelationField;
     leaderboardReferralsAllTimes?: FingerprintRelationField;
     activitiesByFromUserId?: FingerprintRelationField;
     activitiesByToUserId?: FingerprintRelationField;

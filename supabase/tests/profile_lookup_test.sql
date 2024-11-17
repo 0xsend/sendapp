@@ -1,5 +1,5 @@
 BEGIN;
-SELECT plan(9);
+SELECT plan(10);
 CREATE EXTENSION "basejump-supabase_test_helpers";
 SELECT tests.create_supabase_user('valid_tag_user');
 SELECT tests.authenticate_as_service_role();
@@ -9,6 +9,17 @@ INSERT INTO send_accounts (user_id, address, chain_id, init_code)
 VALUES (
     tests.get_supabase_uid('valid_tag_user'),
     '0x1234567890ABCDEF1234567890ABCDEF12345678',
+    1,
+    '\\x00112233445566778899AABBCCDDEEFF'
+);
+SELECT tests.create_supabase_user('kennyl');
+SELECT tests.authenticate_as_service_role();
+INSERT INTO tags (user_id, name, status)
+VALUES (tests.get_supabase_uid('kennyl'), 'kennyl', 'confirmed');
+INSERT INTO send_accounts (user_id, address, chain_id, init_code)
+VALUES (
+    tests.get_supabase_uid('kennyl'),
+    '0xb0b0000000000000000000000000000000000000',
     1,
     '\\x00112233445566778899AABBCCDDEEFF'
 );
@@ -92,6 +103,15 @@ SELECT throws_ok($$
 SELECT throws_ok($$
     SELECT
       public.profile_lookup('invalid_lookup_type', 'valid_tag') $$, 'invalid input value for enum lookup_type_enum: "invalid_lookup_type"', 'Test invalid lookup_type profile_lookup call');
+-- Test looking up kenny_ does not return kennyl
+SELECT tests.authenticate_as_service_role();
+SELECT results_eq($$
+    SELECT
+      count(*) FROM public.profile_lookup('tag', 'kenny_') $$, $$
+    VALUES (
+      0::bigint
+    ) $$, 'Test looking up kenny_ does not return kennyl');
+
 SELECT *
 FROM
     finish();
