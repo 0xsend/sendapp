@@ -1,3 +1,5 @@
 {
-  "adapter": "pg"
+  "adapter": "pg",
+  "targetDatabaseUrl": "postgresql://postgres:postgres@localhost:54322/postgres",
+  "sourceDatabaseUrl": "postgresql://postgres:postgres@localhost:54322/postgres"
 }

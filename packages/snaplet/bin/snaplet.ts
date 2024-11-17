@@ -80,8 +80,10 @@ if (argv.restore) {
       process.exit(1)
     }
   )
+  console.log(chalk.green('Done restoring database'))
   if (rmMigs) {
     // now migrate the database with the latest migrations
+    console.log(chalk.blue('Migrating database after restoring snapshot...'))
     await $`git checkout ${prjRoot}/supabase/migrations`.catch((e) => {
       console.log(chalk.red('Error checking out migrations:'), e)
       process.exit(1)
@@ -90,8 +92,11 @@ if (argv.restore) {
       console.log(chalk.red('Error migrating database:'), e)
       process.exit(1)
     })
+    console.log(chalk.green('Done migrating database'))
     process.exit(0)
   }
+  console.log(chalk.green('Done restoring database'))
+  process.exit(0)
 }
 
 if (argv.onboardUsers) {

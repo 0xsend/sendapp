@@ -1,6 +1,0 @@
-{
-  "projectId": "clnag5zv700ezlyu5rumcywau",
-  "sourceDatabaseUrl": "postgresql://postgres:postgres@localhost:54322/postgres",
-  "targetDatabaseUrl": "postgresql://postgres:postgres@localhost:54322/postgres",
-  "publicKey": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAvR+BEAXcKLtSOfVl16Vl\np7alDJiHRftuT9F0kqlRN0jUOM41H/GhKpQCi6sO/UiK7pC34Ab5GwKgssglrTs4\n+C/4+TDUkQTXzDIWq5T2uZ6O9cNunrS7D6oJhn1y59Uf6VkCsH29k5+1Wa7XYQ+W\nBScRPxdAnJR1RTESSq0kVSSd8iFrffjvGDbV4UvBWoPTt5GBmlFKvTvR8VF4fvA6\nVoLEeO9KKWqko0lvNCGZaMLB9ZT1eiiCAvZnI0wZzHu8L8/sIx7SdDqQW0VJr0AN\nz1Lok0CHCWu8QxXtr9e9M17FzDw7g4dTMs4D7HTtmSv+nx5AGc0fe6W6Hp3ua4uV\njxVW4fh56/Ne3WSvUPCBb3hR+gKRSt5q8FWuHcleJ9f7/8mhl2YBUIINHRjFJtyG\nRDZhPncrn56982RA4fzQKk6cMDe1PoI8WRMHIVwCFQxmbM4GKQKn/I5HLeuTR50s\nnqNdS8VPTrxj8pnseLE9C/OWD2CJmQGWm1I1dnTlbKEvAgMBAAE=\n-----END PUBLIC KEY-----\n"
-}
