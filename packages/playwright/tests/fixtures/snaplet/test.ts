@@ -4,7 +4,6 @@ import { copycat } from '@snaplet/copycat'
 import { createSeedClient } from '@snaplet/seed'
 import debug from 'debug'
 import pg from 'pg'
-import { SeedPg } from '@snaplet/seed/adapter-pg'
 
 let log: debug.Debugger
 

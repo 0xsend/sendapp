@@ -6,7 +6,6 @@ const useIsSubmitting = () => {
   try {
     return useFormState().isSubmitting
   } catch (error) {
-    console.log(error)
     return false
   }
 }

@@ -5,7 +5,7 @@ type Json = Nested<JsonPrimitive>;
 type Enum_auth_aal_level = 'aal1' | 'aal2' | 'aal3';
 type Enum_auth_code_challenge_method = 'plain' | 's256';
 type Enum_auth_factor_status = 'unverified' | 'verified';
-type Enum_auth_factor_type = 'totp' | 'webauthn';
+type Enum_auth_factor_type = 'phone' | 'totp' | 'webauthn';
 type Enum_auth_one_time_token_type = 'confirmation_token' | 'email_change_token_current' | 'email_change_token_new' | 'phone_change_token' | 'reauthentication_token' | 'recovery_token';
 type Enum_net_request_status = 'ERROR' | 'PENDING' | 'SUCCESS';
 type Enum_pgsodium_key_status = 'default' | 'expired' | 'invalid' | 'valid';
@@ -15,7 +15,10 @@ type Enum_pgtle_pg_tle_features = 'clientauth' | 'passcheck';
 type Enum_public_key_type_enum = 'ES256';
 type Enum_public_lookup_type_enum = 'address' | 'phone' | 'refcode' | 'sendid' | 'tag';
 type Enum_public_tag_status = 'confirmed' | 'pending';
-type Enum_public_verification_type = 'tag_referral' | 'tag_registration';
+type Enum_public_verification_type = 'create_passkey' | 'send_one_hundred' | 'send_streak' | 'send_ten' | 'tag_referral' | 'tag_registration' | 'total_tag_referrals';
+type Enum_public_verification_value_mode = 'aggregate' | 'individual';
+type Enum_realtime_action = 'DELETE' | 'ERROR' | 'INSERT' | 'TRUNCATE' | 'UPDATE';
+type Enum_realtime_equality_op = 'eq' | 'gt' | 'gte' | 'in' | 'lt' | 'lte' | 'neq';
 interface Table_net_http_response {
   id: number | null;
   status_code: number | null;
@@ -34,6 +37,13 @@ interface Table_public_activity {
   to_user_id: string | null;
   data: Json | null;
   created_at: string;
+}
+interface Table_public_affiliate_stats {
+  paymaster_tx_count: number;
+  user_id: string | null;
+  id: string;
+  created_at: string;
+  updated_at: string;
 }
 interface Table_auth_audit_log_entries {
   instance_id: string | null;
@@ -85,6 +95,9 @@ interface Table_public_distribution_verification_values {
   distribution_id: number;
   created_at: string;
   updated_at: string;
+  multiplier_min: number;
+  multiplier_max: number;
+  multiplier_step: number;
 }
 interface Table_public_distribution_verifications {
   id: number;
@@ -93,6 +106,7 @@ interface Table_public_distribution_verifications {
   type: Enum_public_verification_type;
   metadata: Json | null;
   created_at: string;
+  weight: number;
 }
 interface Table_public_distributions {
   id: number;
@@ -199,6 +213,13 @@ interface Table_private_leaderboard_referrals_all_time {
   rewards_usdc: number | null;
   updated_at: string | null;
 }
+interface Table_realtime_messages {
+  id: number;
+  topic: string;
+  extension: string;
+  inserted_at: string;
+  updated_at: string;
+}
 interface Table_auth_mfa_amr_claims {
   session_id: string;
   created_at: string;
@@ -212,6 +233,8 @@ interface Table_auth_mfa_challenges {
   created_at: string;
   verified_at: string | null;
   ip_address: string;
+  otp_code: string | null;
+  web_authn_session_data: Json | null;
 }
 interface Table_auth_mfa_factors {
   id: string;
@@ -222,6 +245,10 @@ interface Table_auth_mfa_factors {
   created_at: string;
   updated_at: string;
   secret: string | null;
+  phone: string | null;
+  last_challenged_at: string | null;
+  web_authn_credential: Json | null;
+  web_authn_aaguid: string | null;
 }
 interface Table_storage_migrations {
   id: number;
@@ -244,6 +271,7 @@ interface Table_storage_objects {
   metadata: Json | null;
   version: string | null;
   owner_id: string | null;
+  user_metadata: Json | null;
 }
 interface Table_auth_one_time_tokens {
   id: string;
@@ -296,6 +324,7 @@ interface Table_storage_s_3_multipart_uploads {
   version: string;
   owner_id: string | null;
   created_at: string;
+  user_metadata: Json | null;
 }
 interface Table_storage_s_3_multipart_uploads_parts {
   id: string;
@@ -333,6 +362,10 @@ interface Table_auth_saml_relay_states {
 interface Table_auth_schema_migrations {
   version: string;
 }
+interface Table_realtime_schema_migrations {
+  version: number;
+  inserted_at: string | null;
+}
 interface Table_supabase_migrations_schema_migrations {
   version: string;
   statements: string[] | null;
@@ -347,6 +380,10 @@ interface Table_vault_secrets {
   nonce: string | null;
   created_at: string;
   updated_at: string;
+}
+interface Table_supabase_migrations_seed_files {
+  path: string;
+  hash: string;
 }
 interface Table_public_send_account_created {
   chain_id: number;
@@ -525,6 +562,34 @@ interface Table_auth_sso_providers {
   created_at: string | null;
   updated_at: string | null;
 }
+interface Table_realtime_subscription {
+  id: number;
+  subscription_id: string;
+  /**
+  * We couldn't determine the type of this column. The type might be coming from an unknown extension
+  * or be specific to your database. Please if it's a common used type report this issue so we can fix it!
+  * Otherwise, please manually type this column by casting it to the correct type.
+  * @example
+  * Here is a cast example for copycat use:
+  * ```
+  * copycat.scramble(row.unknownColumn as string)
+  * ```
+  */
+  entity: unknown;
+  /**
+  * We couldn't determine the type of this column. The type might be coming from an unknown extension
+  * or be specific to your database. Please if it's a common used type report this issue so we can fix it!
+  * Otherwise, please manually type this column by casting it to the correct type.
+  * @example
+  * Here is a cast example for copycat use:
+  * ```
+  * copycat.scramble(row.unknownColumn as string)
+  * ```
+  */
+  filters: unknown[];
+  claims: Json;
+  created_at: string;
+}
 interface Table_public_tag_receipts {
   tag_name: string;
   hash: string | null;
@@ -607,12 +672,6 @@ interface Table_public_webauthn_credentials {
   updated_at: string;
   deleted_at: string | null;
 }
-interface Schema_analytics {
-
-}
-interface Schema_realtime {
-
-}
 interface Schema_auth {
   audit_log_entries: Table_auth_audit_log_entries;
   flow_state: Table_auth_flow_state;
@@ -661,6 +720,7 @@ interface Schema_private {
 }
 interface Schema_public {
   activity: Table_public_activity;
+  affiliate_stats: Table_public_affiliate_stats;
   chain_addresses: Table_public_chain_addresses;
   challenges: Table_public_challenges;
   distribution_shares: Table_public_distribution_shares;
@@ -687,7 +747,9 @@ interface Schema_public {
   webauthn_credentials: Table_public_webauthn_credentials;
 }
 interface Schema_realtime {
-
+  messages: Table_realtime_messages;
+  schema_migrations: Table_realtime_schema_migrations;
+  subscription: Table_realtime_subscription;
 }
 interface Schema_shovel {
   ig_updates: Table_shovel_ig_updates;
@@ -708,13 +770,12 @@ interface Schema_supabase_functions {
 }
 interface Schema_supabase_migrations {
   schema_migrations: Table_supabase_migrations_schema_migrations;
+  seed_files: Table_supabase_migrations_seed_files;
 }
 interface Schema_vault {
   secrets: Table_vault_secrets;
 }
 interface Database {
-  _analytics: Schema__analytics;
-  _realtime: Schema__realtime;
   auth: Schema_auth;
   dbdev: Schema_dbdev;
   extensions: Schema_extensions;
@@ -750,6 +811,20 @@ interface Tables_relationships {
     children: {
 
     };
+    parentDestinationsTables: "auth.users" | {};
+    childDestinationsTables:  | {};
+    
+  };
+  "public.affiliate_stats": {
+    parent: {
+       affiliate_stats_user_id_fkey: "public.profiles";
+    };
+    children: {
+
+    };
+    parentDestinationsTables: "public.profiles" | {};
+    childDestinationsTables:  | {};
+    
   };
   "storage.buckets": {
     parent: {
@@ -760,6 +835,9 @@ interface Tables_relationships {
        s3_multipart_uploads_bucket_id_fkey: "storage.s3_multipart_uploads";
        s3_multipart_uploads_parts_bucket_id_fkey: "storage.s3_multipart_uploads_parts";
     };
+    parentDestinationsTables:  | {};
+    childDestinationsTables: "storage.objects" | "storage.s3_multipart_uploads" | "storage.s3_multipart_uploads_parts" | {};
+    
   };
   "public.chain_addresses": {
     parent: {
@@ -768,6 +846,9 @@ interface Tables_relationships {
     children: {
 
     };
+    parentDestinationsTables: "auth.users" | {};
+    childDestinationsTables:  | {};
+    
   };
   "public.distribution_shares": {
     parent: {
@@ -777,6 +858,9 @@ interface Tables_relationships {
     children: {
 
     };
+    parentDestinationsTables: "auth.users" | "public.distributions" | {};
+    childDestinationsTables:  | {};
+    
   };
   "public.distribution_verification_values": {
     parent: {
@@ -785,6 +869,9 @@ interface Tables_relationships {
     children: {
 
     };
+    parentDestinationsTables: "public.distributions" | {};
+    childDestinationsTables:  | {};
+    
   };
   "public.distribution_verifications": {
     parent: {
@@ -794,6 +881,9 @@ interface Tables_relationships {
     children: {
 
     };
+    parentDestinationsTables: "auth.users" | "public.distributions" | {};
+    childDestinationsTables:  | {};
+    
   };
   "public.distributions": {
     parent: {
@@ -804,6 +894,9 @@ interface Tables_relationships {
        distribution_verification_values_distribution_id_fkey: "public.distribution_verification_values";
        distribution_verifications_distribution_id_fkey: "public.distribution_verifications";
     };
+    parentDestinationsTables:  | {};
+    childDestinationsTables: "public.distribution_shares" | "public.distribution_verification_values" | "public.distribution_verifications" | {};
+    
   };
   "auth.flow_state": {
     parent: {
@@ -812,6 +905,9 @@ interface Tables_relationships {
     children: {
        saml_relay_states_flow_state_id_fkey: "auth.saml_relay_states";
     };
+    parentDestinationsTables:  | {};
+    childDestinationsTables: "auth.saml_relay_states" | {};
+    
   };
   "auth.identities": {
     parent: {
@@ -820,6 +916,9 @@ interface Tables_relationships {
     children: {
 
     };
+    parentDestinationsTables: "auth.users" | {};
+    childDestinationsTables:  | {};
+    
   };
   "pgsodium.key": {
     parent: {
@@ -829,6 +928,9 @@ interface Tables_relationships {
        key_parent_key_fkey: "pgsodium.key";
        secrets_key_id_fkey: "vault.secrets";
     };
+    parentDestinationsTables: "pgsodium.key" | {};
+    childDestinationsTables: "pgsodium.key" | "vault.secrets" | {};
+    
   };
   "private.leaderboard_referrals_all_time": {
     parent: {
@@ -837,6 +939,9 @@ interface Tables_relationships {
     children: {
 
     };
+    parentDestinationsTables: "auth.users" | {};
+    childDestinationsTables:  | {};
+    
   };
   "auth.mfa_amr_claims": {
     parent: {
@@ -845,6 +950,9 @@ interface Tables_relationships {
     children: {
 
     };
+    parentDestinationsTables: "auth.sessions" | {};
+    childDestinationsTables:  | {};
+    
   };
   "auth.mfa_challenges": {
     parent: {
@@ -853,6 +961,9 @@ interface Tables_relationships {
     children: {
 
     };
+    parentDestinationsTables: "auth.mfa_factors" | {};
+    childDestinationsTables:  | {};
+    
   };
   "auth.mfa_factors": {
     parent: {
@@ -861,6 +972,9 @@ interface Tables_relationships {
     children: {
        mfa_challenges_auth_factor_id_fkey: "auth.mfa_challenges";
     };
+    parentDestinationsTables: "auth.users" | {};
+    childDestinationsTables: "auth.mfa_challenges" | {};
+    
   };
   "storage.objects": {
     parent: {
@@ -869,6 +983,9 @@ interface Tables_relationships {
     children: {
 
     };
+    parentDestinationsTables: "storage.buckets" | {};
+    childDestinationsTables:  | {};
+    
   };
   "auth.one_time_tokens": {
     parent: {
@@ -877,15 +994,22 @@ interface Tables_relationships {
     children: {
 
     };
+    parentDestinationsTables: "auth.users" | {};
+    childDestinationsTables:  | {};
+    
   };
   "public.profiles": {
     parent: {
        profiles_id_fkey: "auth.users";
     };
     children: {
+       affiliate_stats_user_id_fkey: "public.affiliate_stats";
        referrals_referred_id_fkey: "public.referrals";
        referrals_referrer_id_fkey: "public.referrals";
     };
+    parentDestinationsTables: "auth.users" | {};
+    childDestinationsTables: "public.affiliate_stats" | "public.referrals" | {};
+    
   };
   "public.receipts": {
     parent: {
@@ -894,6 +1018,9 @@ interface Tables_relationships {
     children: {
 
     };
+    parentDestinationsTables: "auth.users" | {};
+    childDestinationsTables:  | {};
+    
   };
   "public.referrals": {
     parent: {
@@ -904,6 +1031,9 @@ interface Tables_relationships {
     children: {
 
     };
+    parentDestinationsTables: "public.profiles" | "public.tags" | {};
+    childDestinationsTables:  | {};
+    
   };
   "auth.refresh_tokens": {
     parent: {
@@ -912,6 +1042,9 @@ interface Tables_relationships {
     children: {
 
     };
+    parentDestinationsTables: "auth.sessions" | {};
+    childDestinationsTables:  | {};
+    
   };
   "storage.s3_multipart_uploads": {
     parent: {
@@ -920,6 +1053,9 @@ interface Tables_relationships {
     children: {
        s3_multipart_uploads_parts_upload_id_fkey: "storage.s3_multipart_uploads_parts";
     };
+    parentDestinationsTables: "storage.buckets" | {};
+    childDestinationsTables: "storage.s3_multipart_uploads_parts" | {};
+    
   };
   "storage.s3_multipart_uploads_parts": {
     parent: {
@@ -929,6 +1065,9 @@ interface Tables_relationships {
     children: {
 
     };
+    parentDestinationsTables: "storage.buckets" | "storage.s3_multipart_uploads" | {};
+    childDestinationsTables:  | {};
+    
   };
   "auth.saml_providers": {
     parent: {
@@ -937,6 +1076,9 @@ interface Tables_relationships {
     children: {
 
     };
+    parentDestinationsTables: "auth.sso_providers" | {};
+    childDestinationsTables:  | {};
+    
   };
   "auth.saml_relay_states": {
     parent: {
@@ -946,6 +1088,9 @@ interface Tables_relationships {
     children: {
 
     };
+    parentDestinationsTables: "auth.flow_state" | "auth.sso_providers" | {};
+    childDestinationsTables:  | {};
+    
   };
   "vault.secrets": {
     parent: {
@@ -954,6 +1099,9 @@ interface Tables_relationships {
     children: {
 
     };
+    parentDestinationsTables: "pgsodium.key" | {};
+    childDestinationsTables:  | {};
+    
   };
   "public.send_account_credentials": {
     parent: {
@@ -963,6 +1111,9 @@ interface Tables_relationships {
     children: {
 
     };
+    parentDestinationsTables: "public.send_accounts" | "public.webauthn_credentials" | {};
+    childDestinationsTables:  | {};
+    
   };
   "public.send_accounts": {
     parent: {
@@ -971,6 +1122,9 @@ interface Tables_relationships {
     children: {
        account_credentials_account_id_fkey: "public.send_account_credentials";
     };
+    parentDestinationsTables: "auth.users" | {};
+    childDestinationsTables: "public.send_account_credentials" | {};
+    
   };
   "auth.sessions": {
     parent: {
@@ -980,6 +1134,9 @@ interface Tables_relationships {
        mfa_amr_claims_session_id_fkey: "auth.mfa_amr_claims";
        refresh_tokens_session_id_fkey: "auth.refresh_tokens";
     };
+    parentDestinationsTables: "auth.users" | {};
+    childDestinationsTables: "auth.mfa_amr_claims" | "auth.refresh_tokens" | {};
+    
   };
   "auth.sso_domains": {
     parent: {
@@ -988,6 +1145,9 @@ interface Tables_relationships {
     children: {
 
     };
+    parentDestinationsTables: "auth.sso_providers" | {};
+    childDestinationsTables:  | {};
+    
   };
   "auth.sso_providers": {
     parent: {
@@ -998,6 +1158,9 @@ interface Tables_relationships {
        saml_relay_states_sso_provider_id_fkey: "auth.saml_relay_states";
        sso_domains_sso_provider_id_fkey: "auth.sso_domains";
     };
+    parentDestinationsTables:  | {};
+    childDestinationsTables: "auth.saml_providers" | "auth.saml_relay_states" | "auth.sso_domains" | {};
+    
   };
   "public.tag_receipts": {
     parent: {
@@ -1006,6 +1169,9 @@ interface Tables_relationships {
     children: {
 
     };
+    parentDestinationsTables: "public.tags" | {};
+    childDestinationsTables:  | {};
+    
   };
   "public.tags": {
     parent: {
@@ -1015,6 +1181,9 @@ interface Tables_relationships {
        referrals_tag_fkey: "public.referrals";
        tag_receipts_tag_name_fkey: "public.tag_receipts";
     };
+    parentDestinationsTables: "auth.users" | {};
+    childDestinationsTables: "public.referrals" | "public.tag_receipts" | {};
+    
   };
   "auth.users": {
     parent: {
@@ -1037,6 +1206,9 @@ interface Tables_relationships {
        tags_user_id_fkey: "public.tags";
        webauthn_credentials_user_id_fkey: "public.webauthn_credentials";
     };
+    parentDestinationsTables:  | {};
+    childDestinationsTables: "auth.identities" | "auth.mfa_factors" | "auth.one_time_tokens" | "auth.sessions" | "private.leaderboard_referrals_all_time" | "public.activity" | "public.chain_addresses" | "public.distribution_shares" | "public.distribution_verifications" | "public.profiles" | "public.receipts" | "public.send_accounts" | "public.tags" | "public.webauthn_credentials" | {};
+    
   };
   "public.webauthn_credentials": {
     parent: {
@@ -1045,6 +1217,9 @@ interface Tables_relationships {
     children: {
        account_credentials_credential_id_fkey: "public.send_account_credentials";
     };
+    parentDestinationsTables: "auth.users" | {};
+    childDestinationsTables: "public.send_account_credentials" | {};
+    
   };
 }
 //#endregion
@@ -1265,7 +1440,8 @@ type SubsetTarget<TSelectedTable extends SelectedTable> = {
 
 type GetSelectedTableChildrenKeys<TTable extends keyof Tables_relationships> = keyof Tables_relationships[TTable]['children']
 type GetSelectedTableParentKeys<TTable extends keyof Tables_relationships> = keyof Tables_relationships[TTable]['parent']
-type GetSelectedTableRelationsKeys<TTable extends keyof Tables_relationships> = GetSelectedTableChildrenKeys<TTable> | GetSelectedTableParentKeys<TTable>
+type GetRelationDestinationKey<TTable extends keyof Tables_relationships> = Tables_relationships[TTable]['parentDestinationsTables'] | Tables_relationships[TTable]['childDestinationsTables']
+type GetSelectedTableRelationsKeys<TTable extends keyof Tables_relationships> = GetSelectedTableChildrenKeys<TTable> | GetSelectedTableParentKeys<TTable> | GetRelationDestinationKey<TTable>
 type SelectedTablesWithRelationsIds<TSelectedTable extends SelectedTable['id']> = TSelectedTable extends keyof Tables_relationships ? TSelectedTable : never
 
 /**
@@ -1275,7 +1451,12 @@ type FollowNullableRelationsOptions<TSelectedTable extends SelectedTable> =
   // Type can be a global boolean definition
   boolean
   // Or can be a mix of $default and table specific definition
-  | { $default: boolean } & ({
+  | {
+      $default: boolean |
+      {
+        [Key in GetSelectedTableRelationsKeys<SelectedTablesWithRelationsIds<TSelectedTable["id"]>> | '$default']?:  boolean
+      }
+    } & ({
   // If it's a table specific definition and the table has relationships
   [TTable in SelectedTablesWithRelationsIds<TSelectedTable["id"]>]?:
     // It's either a boolean or a mix of $default and relationship specific definition
@@ -1293,7 +1474,12 @@ type MaxCyclesLoopOptions<TSelectedTable extends SelectedTable> =
 // Type can be a global number definition
 number
 // Or can be a mix of $default and table specific definition
-| { $default: number } & ({
+| {
+    $default: number |
+    {
+      [Key in GetSelectedTableRelationsKeys<SelectedTablesWithRelationsIds<TSelectedTable["id"]>> | '$default']?:  number
+    }
+  } & ({
   // If it's a table specific definition and the table has relationships
   [TTable in SelectedTablesWithRelationsIds<TSelectedTable["id"]>]?:
     // It's either a number or a mix of $default and relationship specific definition
@@ -1311,7 +1497,12 @@ type MaxChildrenPerNodeOptions<TSelectedTable extends SelectedTable> =
 // Type can be a global number definition
 number
 // Or can be a mix of $default and table specific definition
-| { $default: number } & ({
+| {
+    $default: number |
+    {
+      [Key in GetSelectedTableRelationsKeys<SelectedTablesWithRelationsIds<TSelectedTable["id"]>> | '$default']?:  number
+    }
+  } & ({
   // If it's a table specific definition and the table has relationships
   [TTable in SelectedTablesWithRelationsIds<TSelectedTable["id"]>]?:
     // It's either a number or a mix of $default and relationship specific definition
@@ -1379,6 +1570,15 @@ type SubsetConfig<TSelectedTable extends SelectedTable> = {
    * By default, the algorithm will not sort the tasks.
    */
   taskSortAlgorithm?: "children" | "idsCount";
+
+  /**
+   * Specifies whether to consider all targets collectively ('together'),
+   * or one target at a time ('sequential') when the traversal algorithm is
+   * determining the next steps.
+   *
+   * By default, the 'together' will be used.
+   */
+  traversalMode?: "sequential" | "together";
 }
 //#endregion
 

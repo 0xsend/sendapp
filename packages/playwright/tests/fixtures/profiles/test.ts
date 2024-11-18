@@ -12,7 +12,7 @@ export class ProfilePage {
     this.sendButton = page.getByRole('link', { name: 'SEND' })
   }
 
-  async visit(tag: string, expect?: Expect<ProfilePage>) {
+  async visit(tag: string, expect?: Expect) {
     await this.page.goto(`/${tag}`)
     const title = await this.page.title()
     expect?.(title).toBe('Send | Profile')

@@ -196,7 +196,6 @@ export type Database = {
           created_at: string
           distribution_id: number
           fixed_value: number
-          mode: Database["public"]["Enums"]["verification_value_mode"]
           multiplier_max: number
           multiplier_min: number
           multiplier_step: number
@@ -208,7 +207,6 @@ export type Database = {
           created_at?: string
           distribution_id: number
           fixed_value: number
-          mode?: Database["public"]["Enums"]["verification_value_mode"]
           multiplier_max?: number
           multiplier_min?: number
           multiplier_step?: number
@@ -220,7 +218,6 @@ export type Database = {
           created_at?: string
           distribution_id?: number
           fixed_value?: number
-          mode?: Database["public"]["Enums"]["verification_value_mode"]
           multiplier_max?: number
           multiplier_min?: number
           multiplier_step?: number
