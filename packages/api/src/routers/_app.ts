@@ -1,6 +1,6 @@
 import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server'
 import { createTRPCRouter } from '../trpc'
-import { authRouter } from './auth'
+import { authRouter } from './auth/router'
 import { chainAddressRouter } from './chainAddress'
 import { distributionRouter } from './distribution'
 import { tagRouter } from './tag'
