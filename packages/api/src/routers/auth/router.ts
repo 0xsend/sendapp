@@ -14,11 +14,11 @@ export const authRouter = createTRPCRouter({
         phone: z.string().trim(),
         countrycode: z.string(),
         captchaToken: z.string().optional(),
-        bypassPhoneCheck: z.boolean().optional().default(false),
+        bypassOnboardedCheck: z.boolean().optional().default(false),
       })
     )
     .mutation(async ({ input }) => {
-      const { phone, countrycode, captchaToken, bypassPhoneCheck } = input
+      const { phone, countrycode, captchaToken, bypassOnboardedCheck } = input
 
       if (!phone) {
         throw new TRPCError({
@@ -41,7 +41,7 @@ export const authRouter = createTRPCRouter({
         })
       }
 
-      if (!bypassPhoneCheck) {
+      if (!bypassOnboardedCheck) {
         log('checking if phone is already used', { phone })
 
         const { data } = await supabaseAdmin

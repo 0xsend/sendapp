@@ -102,17 +102,17 @@ export const SignUpForm = () => {
 
   async function signUpWithPhone(
     formData: z.infer<typeof SignUpSchema>,
-    options: { bypassPhoneCheck?: boolean } = {}
+    options: { bypassOnboardedCheck?: boolean } = {}
   ) {
     const { phone, countrycode } = formData
-    const { bypassPhoneCheck = false } = options
+    const { bypassOnboardedCheck = false } = options
 
     try {
       const { status } = await signInWithOtpMutateAsync({
         phone,
         countrycode,
         captchaToken,
-        bypassPhoneCheck,
+        bypassOnboardedCheck,
       })
 
       if (status === AuthStatus.PhoneAlreadyUsed) {
@@ -130,7 +130,7 @@ export const SignUpForm = () => {
 
   function handleBackUpConfirm() {
     const formData = form.getValues()
-    void signUpWithPhone(formData, { bypassPhoneCheck: true })
+    void signUpWithPhone(formData, { bypassOnboardedCheck: true })
   }
 
   function handleBackUpDenial() {
