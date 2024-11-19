@@ -58,21 +58,21 @@ export type Database = {
         Row: {
           created_at: string
           id: string
-          paymaster_tx_count: number
+          send_plus_minus: number
           updated_at: string
           user_id: string | null
         }
         Insert: {
           created_at?: string
           id?: string
-          paymaster_tx_count?: number
+          send_plus_minus?: number
           updated_at?: string
           user_id?: string | null
         }
         Update: {
           created_at?: string
           id?: string
-          paymaster_tx_count?: number
+          send_plus_minus?: number
           updated_at?: string
           user_id?: string | null
         }
@@ -1115,6 +1115,34 @@ export type Database = {
         }
         Relationships: []
       }
+      affiliate_referrals: {
+        Row: {
+          referral:
+            | Database["public"]["CompositeTypes"]["affiliate_referral_type"]
+            | null
+        }
+        Relationships: []
+      }
+      affiliate_stats_summary: {
+        Row: {
+          affiliate_send_score: number | null
+          created_at: string | null
+          id: string | null
+          network_plus_minus: number | null
+          referral_count: number | null
+          send_plus_minus: number | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       distribution_verifications_summary: {
         Row: {
           distribution_id: number | null
@@ -1330,6 +1358,22 @@ export type Database = {
         avatar_url: string
         send_id: number
         tags: unknown
+      }
+      affiliate_referral_type: {
+        referred_id: string
+        send_plus_minus: number
+        avatar_url: string
+        tag: string
+        created_at: string
+      }
+      affiliate_stats_summary_type: {
+        id: number
+        created_at: string
+        user_id: string
+        send_plus_minus: number
+        referral_count: number
+        network_plus_minus: number
+        affiliate_send_score: number
       }
       multiplier_info: {
         type: string
