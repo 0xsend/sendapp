@@ -1,5 +1,6 @@
 import {
   AnimatePresence,
+  Avatar,
   Button,
   Card,
   CardHeader,
@@ -11,6 +12,7 @@ import {
   Stack,
   XStack,
   YStack,
+  Link,
 } from '@my/ui'
 
 import { useAffiliateReferrals } from './utils/useAffiliateReferrals'
@@ -22,7 +24,7 @@ import { useAffiliateStats } from './utils/useAffiliateStats'
 
 export const AffiliateScreen = () => {
   return (
-    <YStack f={1} width={'100%'} gap="$4">
+    <YStack width={'100%'} gap="$4" pb="$6">
       <XStack alignItems="center" width={'100%'} jc="flex-end" gap="$6">
         <LinkableButton href="/leaderboard" fontWeight={'bold'}>
           Check Leaderboard
@@ -57,7 +59,7 @@ const StatsCards = () => {
             <Spinner alignSelf="flex-start" size="large" color="$color12" mt="auto" p="$4" />
           ) : (
             <>
-              <Paragraph pl="$4" pb="$3" fontWeight="600" size={'$12'} lineHeight={'$10'}>
+              <Paragraph pl="$4" pb="$3" fontWeight="600" size={'$12'} lineHeight={'$11'}>
                 {affiliateStats?.referral_count || 0}
               </Paragraph>
             </>
@@ -65,28 +67,28 @@ const StatsCards = () => {
         </Card>
         <Card $gtLg={{ flexShrink: 0, flexBasis: '32%' }} w="100%" mih={152}>
           <CardHeader>
-            <Label color={'$color10'}>Affiliate Send Score</Label>
+            <Label color={'$color10'}>Network Rewards Share</Label>
           </CardHeader>
           {isLoading ? (
             <Spinner alignSelf="flex-start" size="large" color="$color12" mt="auto" p="$4" />
           ) : (
             <>
-              <Paragraph pl="$4" pb="$3" fontWeight="600" size={'$12'} lineHeight={'$10'}>
-                {formatAmount(affiliateStats?.affiliate_send_score || 0, 10)}
+              <Paragraph pl="$4" pb="$3" fontWeight="600" size={'$12'} lineHeight={'$11'}>
+                {formatAmount(affiliateStats?.affiliate_send_score || 0, 10, 0)}
               </Paragraph>
             </>
           )}
         </Card>
         <Card $gtLg={{ flexShrink: 0, flexBasis: '32%' }} w="100%" mih={152}>
           <CardHeader>
-            <Label color={'$color10'}>Affiliate Network +/-</Label>
+            <Label color={'$color10'}>Network +/-</Label>
           </CardHeader>
           {isLoading ? (
             <Spinner alignSelf="flex-start" size="large" color="$color12" mt="auto" p="$4" />
           ) : (
             <>
-              <Paragraph pl="$4" pb="$3" fontWeight="600" size={'$12'} lineHeight={'$10'}>
-                {affiliateStats?.send_plus_minus || 0}
+              <Paragraph pl="$4" pb="$3" fontWeight="600" size={'$12'} lineHeight={'$11'}>
+                {formatAmount(affiliateStats?.network_plus_minus || 0, 10, 0)}
               </Paragraph>
             </>
           )}
@@ -100,7 +102,7 @@ const StatsCards = () => {
 }
 
 const ReferralsList = () => {
-  const pageSize = 10
+  const pageSize = 30
   const result = useAffiliateReferrals({
     pageSize,
   })
@@ -115,13 +117,14 @@ const ReferralsList = () => {
   } = result
 
   const { pages } = data ?? {}
+
   return (
-    <YStack f={1} width={'100%'} space="$4">
-      <XStack alignItems="center" width={'100%'} gap="$3">
+    <YStack space="$4">
+      <XStack alignItems="center" gap="$3">
         <H3 fontWeight={'normal'}>Referrals</H3>
       </XStack>
-      <YStack f={1} width={'100%'} p="$6" bg="$background" space="$4" br="$8">
-        <ReferralsHeader />
+
+      <Card gap="$5" p="$5" w="100%" fd="row" flexWrap="wrap">
         {(() => {
           switch (true) {
             case isLoadingReferrals:
@@ -141,19 +144,11 @@ const ReferralsList = () => {
             default: {
               return pages?.map((referrals) => {
                 return referrals?.map(({ referral }) => {
+                  if (!referral) return null
                   return (
                     <Fragment key={`${referral.referred_id}-${referral.tag}`}>
                       <AnimateEnter>
-                        <XStack gap="$1" ai="center">
-                          <Paragraph w="12%" f={1} mb="0" size="$5" lineHeight="$4" ta="center">
-                            /{referral.tag}
-                          </Paragraph>
-                          <XStack f={1} ai="center" w="12%" jc="center" mb="0" gap="$2">
-                            <Paragraph size="$5" lineHeight="$4" ta="center">
-                              ?
-                            </Paragraph>
-                          </XStack>
-                        </XStack>
+                        <ReferralsListRow referral={referral} />
                       </AnimateEnter>
                     </Fragment>
                   )
@@ -172,10 +167,10 @@ const ReferralsList = () => {
                     fetchNextPage()
                   }}
                   disabled={isFetchingNextPageReferrals || isFetchingReferrals}
-                  color="$color"
                   width={200}
                   mx="auto"
                   mb="$6"
+                  bc="$color3"
                 >
                   Load More
                 </Button>
@@ -183,27 +178,67 @@ const ReferralsList = () => {
             </>
           ) : null}
         </AnimateEnter>
-      </YStack>
+      </Card>
     </YStack>
   )
 }
 
-const ReferralsHeader = () => (
-  <XStack gap="$1" ai="center">
-    <Paragraph w="12%" mb="0" size="$5" lineHeight="$4">
-      #
-    </Paragraph>
-    <Paragraph w="12%" f={1} mb="0" size="$5" lineHeight="$4" ta="center">
-      Sendtag
-    </Paragraph>
-    <Paragraph w="12%" f={1} mb="0" size="$5" lineHeight="$4" ta="center">
-      Referred Date
-    </Paragraph>
-  </XStack>
-)
+const ReferralsListRow = ({ referral }) => {
+  const date = new Date(referral?.created_at).toLocaleString(undefined, { dateStyle: 'medium' })
 
-const ReferralsListRow = () => {
-  return <YStack f={1} width={'100%'} space="$4" />
+  return (
+    <Card bc="$color0" ai="center">
+      <Link
+        href={`/profile/${referral.profile?.send_id}`}
+        f={1}
+        als="stretch"
+        px="$5"
+        py="$3"
+        w="100%"
+        h="100%"
+      >
+        <XStack gap="$5" f={1} ai="center" jc={'space-between'}>
+          <XStack gap="$3.5" f={1} ai="center">
+            <Avatar size="$4.5" br="$4" gap="$2">
+              <Avatar.Image src={referral.avatar_url ?? ''} />
+              <Avatar.Fallback jc="center" bc="$olive">
+                <Avatar size="$4.5" br="$4">
+                  <Avatar.Image
+                    src={
+                      'https://ui-avatars.com/api/?name=TODO&size=256&format=png&background=86ad7f'
+                    }
+                  />
+                </Avatar>
+              </Avatar.Fallback>
+            </Avatar>
+
+            <YStack>
+              <XStack gap="$1.5" width={'100%'}>
+                <Paragraph color="$color12" fontSize="$5">
+                  /{referral.tag}
+                </Paragraph>
+              </XStack>
+
+              <Stack>
+                <Paragraph color="$color10" size={'$3'}>
+                  {date}
+                </Paragraph>
+              </Stack>
+            </YStack>
+          </XStack>
+          <Stack als="flex-start">
+            <Paragraph
+              theme={referral.send_plus_minus >= 0 ? 'green_active' : 'red_active'}
+              size={'$8'}
+              lh={'$1'}
+            >
+              {referral.send_plus_minus >= 0 ? '+' : '-'}
+            </Paragraph>
+          </Stack>
+        </XStack>
+      </Link>
+    </Card>
+  )
 }
 
 function AnimateEnter({ children }: { children: React.ReactNode }) {
