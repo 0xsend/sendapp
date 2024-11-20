@@ -118,3 +118,90 @@ test('skip otp for existing user trying to sign up using already used phone numb
     })
   }
 })
+
+test('user can sign in with passkey from backing up page', async ({ page, pg, authenticator }) => {
+  const phone = generatePhone()
+  await page.goto('/')
+
+  const signUpLink = page.getByRole('link', { name: 'SIGN-UP' })
+  await expect(signUpLink).toBeVisible()
+  await signUpLink.click()
+  await expect(page).toHaveURL('/auth/sign-up')
+
+  try {
+    await signUp(page, phone, expect)
+
+    await page.context().clearCookies()
+    await page.goto('/')
+    const signUpLink = page.getByRole('link', { name: 'SIGN-UP' })
+    await expect(signUpLink).toBeVisible()
+    await signUpLink.click()
+
+    await expect(page).toHaveURL('/auth/sign-up')
+    authenticator.cancelNextOperation()
+    await page.getByLabel('Phone number').fill(phone)
+    const signUpButton = page.getByRole('button', { name: 'Sign Up' })
+    await expect(signUpButton).toBeVisible()
+    await signUpButton.click()
+
+    const noBackUpButton = page.getByRole('button', { name: 'NO' })
+    await expect(noBackUpButton).toBeVisible()
+    await noBackUpButton.click()
+
+    const depositButton = page.getByRole('link', { name: 'Deposit' })
+    await expect(depositButton).toBeVisible()
+  } finally {
+    await pg.query('DELETE FROM auth.users WHERE phone = $1', [phone]).catch((e) => {
+      log('delete failed', e)
+    })
+  }
+})
+
+test('user can sign in as back up using otp from backing up page', async ({
+  page,
+  pg,
+  authenticator,
+}) => {
+  const phone = generatePhone()
+  await page.goto('/')
+
+  const signUpLink = page.getByRole('link', { name: 'SIGN-UP' })
+  await expect(signUpLink).toBeVisible()
+  await signUpLink.click()
+  await expect(page).toHaveURL('/auth/sign-up')
+
+  try {
+    await signUp(page, phone, expect)
+
+    await page.context().clearCookies()
+    await page.goto('/')
+    const signUpLink = page.getByRole('link', { name: 'SIGN-UP' })
+    await expect(signUpLink).toBeVisible()
+    await signUpLink.click()
+
+    await expect(page).toHaveURL('/auth/sign-up')
+    authenticator.cancelNextOperation()
+    await page.getByLabel('Phone number').fill(phone)
+    const signUpButton = page.getByRole('button', { name: 'Sign Up' })
+    await expect(signUpButton).toBeVisible()
+    await signUpButton.click()
+
+    const yesBackUpButton = page.getByRole('button', { name: 'YES' })
+    await expect(yesBackUpButton).toBeVisible()
+    await yesBackUpButton.click()
+
+    const otpInput = page.getByLabel('One-time Password')
+    await expect(otpInput).toBeVisible()
+    await otpInput.fill('123456')
+    const verifyAccountButton = page.getByRole('button', { name: 'VERIFY ACCOUNT' })
+    await expect(verifyAccountButton).toBeVisible()
+    await verifyAccountButton.click()
+
+    const depositButton = page.getByRole('link', { name: 'Deposit' })
+    await expect(depositButton).toBeVisible()
+  } finally {
+    await pg.query('DELETE FROM auth.users WHERE phone = $1', [phone]).catch((e) => {
+      log('delete failed', e)
+    })
+  }
+})
