@@ -5,6 +5,7 @@ import { countries } from 'app/utils/country'
 import { SUPABASE_URL } from 'app/utils/supabase/admin'
 import debug from 'debug'
 import { signUp } from './fixtures/send-accounts'
+import { generatePhone } from './utils/generators'
 
 let log: debug.Debugger
 
@@ -18,7 +19,7 @@ const randomCountry = () =>
   countries[Math.floor(Math.random() * countries.length)] as (typeof countries)[number]
 
 test('can sign up', async ({ page, pg }) => {
-  const phone = `${Math.floor(Math.random() * 1e9)}`
+  const phone = generatePhone()
   // naive but go to home page to see if user is logged in
   await page.goto('/')
   const signUpLink = page.getByRole('link', { name: 'SIGN-UP' })
@@ -50,7 +51,7 @@ test('can sign up', async ({ page, pg }) => {
 
 test('country code is selected based on geoip', async ({ page, context, pg }) => {
   const country = randomCountry()
-  const phone = `${Math.floor(Math.random() * 1e9)}`
+  const phone = generatePhone()
 
   await page.route('https://ipapi.co/json/', async (route) => {
     await route.fulfill({
@@ -79,5 +80,41 @@ test('country code is selected based on geoip', async ({ page, context, pg }) =>
     await signUp(page, phone, expect)
   } finally {
     await pg.query('DELETE FROM auth.users WHERE phone = $1', [phone])
+  }
+})
+
+test('skip otp for existing user trying to sign up using already used phone number', async ({
+  page,
+  pg,
+}) => {
+  const phone = generatePhone()
+  await page.goto('/')
+
+  const signUpLink = page.getByRole('link', { name: 'SIGN-UP' })
+  await expect(signUpLink).toBeVisible()
+  await signUpLink.click()
+  await expect(page).toHaveURL('/auth/sign-up')
+
+  try {
+    await signUp(page, phone, expect)
+
+    await page.context().clearCookies()
+    await page.goto('/')
+    const signUpLink = page.getByRole('link', { name: 'SIGN-UP' })
+    await expect(signUpLink).toBeVisible()
+    await signUpLink.click()
+
+    await expect(page).toHaveURL('/auth/sign-up')
+    await page.getByLabel('Phone number').fill(phone)
+    const signUpButton = page.getByRole('button', { name: 'Sign Up' })
+    await expect(signUpButton).toBeVisible()
+    await signUpButton.click()
+
+    const depositButton = await page.getByRole('link', { name: 'Deposit' })
+    await expect(depositButton).toBeVisible()
+  } finally {
+    await pg.query('DELETE FROM auth.users WHERE phone = $1', [phone]).catch((e) => {
+      log('delete failed', e)
+    })
   }
 })

@@ -12,6 +12,7 @@ import jwt, { type JwtPayload } from 'jsonwebtoken'
 import config from '../../../playwright.config'
 import { assert } from 'app/utils/assert'
 import { faker } from '@faker-js/faker'
+import { generatePhone } from '../../utils/generators'
 
 const randomCountry = () =>
   countries[Math.floor(Math.random() * countries.length)] as (typeof countries)[number]
@@ -105,7 +106,7 @@ const authTest = snapletTest.extend<{
     const { parallelIndex } = test.info()
     log = debug(`test:auth:${parallelIndex}`)
 
-    const randomNumber = Math.floor(Math.random() * 1e9)
+    const randomNumber = generatePhone()
     const country = randomCountry()
     const { data, error } = await supabaseAdmin.auth.signUp({
       options: {
