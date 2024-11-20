@@ -85,7 +85,11 @@ export const SignUpForm = () => {
 
       router.push(redirectUri ?? '/')
     } catch (error) {
-      if (isPhoneAlreadyUsed && error instanceof DOMException && error.name === 'NotAllowedError') {
+      if (
+        isPhoneAlreadyUsed &&
+        error.constructor.name === 'DOMException' &&
+        error.name === 'NotAllowedError'
+      ) {
         setPageState(PageState.BackUpPrompt)
         return
       }
