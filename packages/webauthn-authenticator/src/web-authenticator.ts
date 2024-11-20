@@ -125,6 +125,15 @@ function generateAssertionObject(
 
 export class Authenticator {
   public readonly credentials: Record<string, WebauthnCredential> = {}
+  private cancelNext = false
+
+  private throwNotAllowedError() {
+    throw {
+      name: 'NotAllowedError',
+      message: 'The operation either timed out or was not allowed.',
+      constructor: { name: 'DOMException' },
+    }
+  }
 
   /**
    * Creates a new public key credential to be used for WebAuthn attestations and assertions.
@@ -180,6 +189,12 @@ export class Authenticator {
     credentialOptions: CredentialCreationOptionsSerialized
   ): Promise<PublicKeyCredentialAttestationSerialized> {
     log('createPublicKeyCredential', credentialOptions)
+
+    if (this.cancelNext) {
+      this.cancelNext = false
+      this.throwNotAllowedError()
+    }
+
     const credOptsPubKey = credentialOptions.publicKey
     if (
       !credOptsPubKey ||
@@ -240,6 +255,12 @@ export class Authenticator {
    */
   async getPublicKeyCredential(credentialRequestOptions: CredentialRequestOptionsSerialized) {
     log('getPublicKeyCredential', credentialRequestOptions)
+
+    if (this.cancelNext) {
+      this.cancelNext = false
+      this.throwNotAllowedError()
+    }
+
     const credReqOptsPubKey = credentialRequestOptions.publicKey
     const clientDataJSON = {
       type: 'webauthn.get',
@@ -285,5 +306,9 @@ export class Authenticator {
     } as PublicKeyCredentialAssertionSerialized
 
     return credentialResponse
+  }
+
+  cancelNextOperation() {
+    this.cancelNext = true
   }
 }

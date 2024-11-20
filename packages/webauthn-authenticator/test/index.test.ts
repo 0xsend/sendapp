@@ -106,6 +106,23 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
 
         verifyAssertion({ cred: cred2, testBytes, keyPair })
       })
+
+      it('should throw exception after calling cancelNextOperation', async () => {
+        const { Authenticator } = await import('../src')
+
+        const authenticator = new Authenticator()
+        authenticator.cancelNextOperation()
+
+        await expect(
+          authenticator.createPublicKeyCredential({} as CredentialCreationOptionsSerialized)
+        ).rejects.toThrowError('The operation either timed out or was not allowed.')
+
+        authenticator.cancelNextOperation()
+
+        await expect(
+          authenticator.getPublicKeyCredential({} as CredentialRequestOptionsSerialized)
+        ).rejects.toThrowError('The operation either timed out or was not allowed.')
+      })
     })
 
     describe('without mock', () => {
@@ -195,6 +212,23 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
         const cred2 = deserializePublicKeyCredentialAssertion(credSer2)
 
         verifyAssertion({ cred: cred2, testBytes, keyPair })
+      })
+
+      it('should throw exception after calling cancelNextOperation', async () => {
+        const { Authenticator } = await import('../src')
+
+        const authenticator = new Authenticator()
+        authenticator.cancelNextOperation()
+
+        await expect(
+          authenticator.createPublicKeyCredential({} as CredentialCreationOptionsSerialized)
+        ).rejects.toThrowError('The operation either timed out or was not allowed.')
+
+        authenticator.cancelNextOperation()
+
+        await expect(
+          authenticator.getPublicKeyCredential({} as CredentialRequestOptionsSerialized)
+        ).rejects.toThrowError('The operation either timed out or was not allowed.')
       })
     })
   })
