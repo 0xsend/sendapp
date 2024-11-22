@@ -1256,6 +1256,28 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_affiliate_referrals: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          referred_id: string
+          send_plus_minus: number
+          avatar_url: string
+          tag: string
+          created_at: string
+        }[]
+      }
+      get_affiliate_stats_summary: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          created_at: string
+          user_id: string
+          send_plus_minus: number
+          referral_count: number
+          network_plus_minus: number
+          affiliate_send_score: number
+        }[]
+      }
       insert_challenge: {
         Args: Record<PropertyKey, never>
         Returns: {

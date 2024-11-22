@@ -11,7 +11,7 @@ export function useAffiliateReferrals({ pageSize = 10 }: { pageSize?: number } =
   async function fetchAffiliateReferrals({ pageParam }: { pageParam: number }) {
     const from = pageParam * pageSize
     const to = (pageParam + 1) * pageSize - 1
-    const request = supabase.from('affiliate_referrals').select('*').range(from, to)
+    const request = supabase.rpc('get_affiliate_referrals').select('*').range(from, to)
     const { data, error } = await request
     throwIf(error)
     return data
