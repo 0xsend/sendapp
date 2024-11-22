@@ -119,67 +119,57 @@ const ReferralsList = () => {
 
   const { pages } = data ?? {}
 
+  if (isLoadingReferrals) {
+    return <Spinner size="small" color="$color12" />
+  }
+
   return (
     <YStack space="$4">
       <XStack alignItems="center" gap="$3">
-        <H3 fontWeight={'normal'}>Referrals</H3>
+        <H3 fontWeight={'normal'}>{!pages || !pages[0]?.length ? 'No Referrals' : 'Referrals'}</H3>
       </XStack>
-
-      <Card gap="$5" p="$5" w="100%" fd="row" flexWrap="wrap">
-        {(() => {
-          switch (true) {
-            case isLoadingReferrals:
-              return <Spinner size="small" />
-            case referralsError !== null:
+      {Boolean(pages?.[0]?.length) && (
+        <Card gap="$5" p="$5" w="100%" fd="row" flexWrap="wrap">
+          {referralsError && (
+            <Paragraph maxWidth={'600'} fontFamily={'$mono'} fontSize={'$5'} color={'$color12'}>
+              {referralsError?.message.split('.').at(0) ?? `${referralsError}`}
+            </Paragraph>
+          )}
+          {pages?.map((referrals) => {
+            return referrals?.map(({ referral }) => {
+              if (!referral) return null
               return (
-                <Paragraph maxWidth={'600'} fontFamily={'$mono'} fontSize={'$5'} color={'$color12'}>
-                  {referralsError?.message.split('.').at(0) ?? `${referralsError}`}
-                </Paragraph>
+                <Fragment key={`${referral.referred_id}-${referral.tag}`}>
+                  <AnimateEnter>
+                    <ReferralsListRow referral={referral} />
+                  </AnimateEnter>
+                </Fragment>
               )
-            case pages?.length === 0:
-              return (
-                <>
-                  <Paragraph col={'$color12'}>No referrals</Paragraph>
-                </>
-              )
-            default: {
-              return pages?.map((referrals) => {
-                return referrals?.map(({ referral }) => {
-                  if (!referral) return null
-                  return (
-                    <Fragment key={`${referral.referred_id}-${referral.tag}`}>
-                      <AnimateEnter>
-                        <ReferralsListRow referral={referral} />
-                      </AnimateEnter>
-                    </Fragment>
-                  )
-                })
-              })
-            }
-          }
-        })()}
-        <AnimateEnter>
-          {!isLoadingReferrals && (isFetchingNextPageReferrals || hasNextPage) ? (
-            <>
-              {isFetchingNextPageReferrals && <Spinner size="small" />}
-              {hasNextPage && (
-                <Button
-                  onPress={() => {
-                    fetchNextPage()
-                  }}
-                  disabled={isFetchingNextPageReferrals || isFetchingReferrals}
-                  width={200}
-                  mx="auto"
-                  mb="$6"
-                  bc="$color3"
-                >
-                  Load More
-                </Button>
-              )}
-            </>
-          ) : null}
-        </AnimateEnter>
-      </Card>
+            })
+          })}
+          <AnimateEnter>
+            {!isLoadingReferrals && (isFetchingNextPageReferrals || hasNextPage) ? (
+              <>
+                {isFetchingNextPageReferrals && <Spinner size="small" />}
+                {hasNextPage && (
+                  <Button
+                    onPress={() => {
+                      fetchNextPage()
+                    }}
+                    disabled={isFetchingNextPageReferrals || isFetchingReferrals}
+                    width={200}
+                    mx="auto"
+                    mb="$6"
+                    bc="$color3"
+                  >
+                    Load More
+                  </Button>
+                )}
+              </>
+            ) : null}
+          </AnimateEnter>
+        </Card>
+      )}
     </YStack>
   )
 }
