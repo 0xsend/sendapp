@@ -16,10 +16,7 @@ import {
 } from '@my/ui'
 
 import { useAffiliateReferrals } from './utils/useAffiliateReferrals'
-
 import { Fragment } from 'react'
-
-import formatAmount from 'app/utils/formatAmount'
 import { useAffiliateStats } from './utils/useAffiliateStats'
 
 export const AffiliateScreen = () => {
@@ -136,7 +133,7 @@ const ReferralsList = () => {
             </Paragraph>
           )}
           {pages?.map((referrals) => {
-            return referrals?.map(({ referral }) => {
+            return referrals?.map((referral) => {
               if (!referral) return null
               return (
                 <Fragment key={`${referral.referred_id}-${referral.tag}`}>

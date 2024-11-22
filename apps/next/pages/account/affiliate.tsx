@@ -12,7 +12,7 @@ export const Page: NextPageWithLayout = () => {
         <title>Send | Affiliates</title>
         <meta
           name="description"
-          content="View your network, track your score, and see your referrals activity."
+          content="View your network and track referral activity."
           key="desc"
         />
       </Head>
@@ -21,7 +21,7 @@ export const Page: NextPageWithLayout = () => {
   )
 }
 
-const subheader = 'View your network, track your score, and see your referrals activity.'
+const subheader = 'View your network and track referral activity.'
 
 export const getServerSideProps = userProtectedGetSSP()
 
