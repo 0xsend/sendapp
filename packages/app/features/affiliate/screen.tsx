@@ -27,7 +27,7 @@ export const AffiliateScreen = () => {
     <YStack width={'100%'} gap="$4" pb="$6">
       <XStack alignItems="center" width={'100%'} jc="flex-end" gap="$6">
         <LinkableButton href="/leaderboard" fontWeight={'bold'}>
-          Check Leaderboard
+          Leaderboard
         </LinkableButton>
       </XStack>
       <StatsCards />
@@ -46,7 +46,6 @@ const StatsCards = () => {
         $gtLg={{ fd: 'row' }}
         flexWrap="wrap"
         ai="flex-start"
-        jc="space-around"
         gap="$3"
         mb="$4"
         width={'100%'}
@@ -65,6 +64,8 @@ const StatsCards = () => {
             </>
           )}
         </Card>
+        {/*
+        Need to rework this
         <Card $gtLg={{ flexShrink: 0, flexBasis: '32%' }} w="100%" mih={152}>
           <CardHeader>
             <Label color={'$color10'}>Network Rewards Share</Label>
@@ -92,7 +93,7 @@ const StatsCards = () => {
               </Paragraph>
             </>
           )}
-        </Card>
+        </Card> */}
       </Stack>
       {affiliateStatsError && (
         <Paragraph theme={'red_active'}>{affiliateStatsError?.message}</Paragraph>
@@ -226,7 +227,7 @@ const ReferralsListRow = ({ referral }) => {
               </Stack>
             </YStack>
           </XStack>
-          <Stack als="flex-start">
+          {/* <Stack als="flex-start">
             <Paragraph
               theme={referral.send_plus_minus >= 0 ? 'green_active' : 'red_active'}
               size={'$8'}
@@ -234,7 +235,7 @@ const ReferralsListRow = ({ referral }) => {
             >
               {referral.send_plus_minus >= 0 ? '+' : '-'}
             </Paragraph>
-          </Stack>
+          </Stack> */}
         </XStack>
       </Link>
     </Card>
