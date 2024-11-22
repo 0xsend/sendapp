@@ -103,7 +103,6 @@ export const PersonalInfoScreen = () => {
           },
           bc: '$color0',
           pl: '$8',
-          hideOptionalLabel: true,
           iconBefore: (
             <Text color="$color10" userSelect={'none'} lineHeight={8}>
               @
