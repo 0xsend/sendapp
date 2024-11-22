@@ -26,6 +26,7 @@ export const TextField = (
     iconBefore?: React.ReactNode
     iconAfter?: React.ReactNode
     iconProps?: IconProps
+    hideOptionalLabel?: boolean
   }
 ) => {
   const media = useMedia()
@@ -57,7 +58,7 @@ export const TextField = (
             color={props.labelProps?.color ?? '$olive'}
             {...props.labelProps}
           >
-            {label} {isOptional && '(Optional)'}
+            {label} {isOptional && !props.hideOptionalLabel && '(Optional)'}
           </Label>
         )}
         <Shake shakeKey={error?.errorMessage}>

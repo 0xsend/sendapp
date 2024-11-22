@@ -345,6 +345,7 @@ export type Database = {
           name: string | null
           referral_code: string | null
           send_id: number
+          x_username: string | null
         }
         Insert: {
           about?: string | null
@@ -354,6 +355,7 @@ export type Database = {
           name?: string | null
           referral_code?: string | null
           send_id?: number
+          x_username?: string | null
         }
         Update: {
           about?: string | null
@@ -363,6 +365,7 @@ export type Database = {
           name?: string | null
           referral_code?: string | null
           send_id?: number
+          x_username?: string | null
         }
         Relationships: [
           {
