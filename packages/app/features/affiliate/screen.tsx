@@ -18,6 +18,7 @@ import {
 import { useAffiliateReferrals } from './utils/useAffiliateReferrals'
 import { Fragment } from 'react'
 import { useAffiliateStats } from './utils/useAffiliateStats'
+import type { Functions } from '@my/supabase/database.types'
 
 export const AffiliateScreen = () => {
   return (
@@ -171,20 +172,14 @@ const ReferralsList = () => {
   )
 }
 
-const ReferralsListRow = ({ referral }) => {
+const ReferralsListRow = ({
+  referral,
+}: { referral: Functions<'get_affiliate_referrals'>[number] }) => {
   const date = new Date(referral?.created_at).toLocaleString(undefined, { dateStyle: 'medium' })
 
   return (
     <Card bc="$color0" ai="center">
-      <Link
-        href={`/profile/${referral.profile?.send_id}`}
-        f={1}
-        als="stretch"
-        px="$5"
-        py="$3"
-        w="100%"
-        h="100%"
-      >
+      <Link href={`/${referral.tag}`} f={1} als="stretch" px="$5" py="$3" w="100%" h="100%">
         <XStack gap="$5" f={1} ai="center" jc={'space-between'}>
           <XStack gap="$3.5" f={1} ai="center">
             <Avatar size="$4.5" br="$4" gap="$2">
