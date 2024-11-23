@@ -28,61 +28,6 @@ CREATE POLICY "Users can see own and referrals affiliate stats" ON affiliate_sta
         WHERE
           referrer_id = auth.uid() AND referred_id = affiliate_stats.user_id));
 
-CREATE OR REPLACE FUNCTION initialize_send_plus_minus()
-  RETURNS void
-  LANGUAGE plpgsql
-  SECURITY DEFINER
-  SET search_path = public
-  AS $$
-BEGIN
-  UPDATE
-    affiliate_stats a
-  SET
-    send_plus_minus =( WITH sent_amount AS(
-        SELECT
-          COALESCE(SUM(stt.v::numeric), 0) AS total
-        FROM
-          send_token_transfers stt
-          INNER JOIN send_accounts sa ON sa.address = concat('0x', encode(stt.f, 'hex'))::citext
-        WHERE
-          sa.user_id = a.user_id),
-        received_amount AS(
-          SELECT
-            COALESCE(SUM(stt.v::numeric), 0) AS total
-          FROM
-            send_token_transfers stt
-            INNER JOIN send_accounts sa ON sa.address = concat('0x', encode(stt.t, 'hex'))::citext
-            LEFT JOIN referrals r ON r.referrer_id = sa.user_id
-          WHERE
-            sa.user_id = a.user_id
-            AND concat('0x', encode(stt.f, 'hex'))::citext NOT IN(
-              SELECT
-                sa2.address
-              FROM
-                send_accounts sa2
-                INNER JOIN referrals r2 ON r2.referrer_id = sa2.user_id
-              WHERE
-                r2.referred_id = a.user_id))
-            SELECT
-(
-                SELECT
-                  total
-                FROM
-                  sent_amount) -(
-                  SELECT
-                    total
-                  FROM
-                    received_amount));
-END;
-$$;
-
--- Execute the function
-SELECT
-  initialize_send_plus_minus();
-
--- Drop the function after use
-DROP FUNCTION initialize_send_plus_minus();
-
 CREATE OR REPLACE FUNCTION public.update_affiliate_stats_on_transfer()
   RETURNS TRIGGER
   LANGUAGE plpgsql
