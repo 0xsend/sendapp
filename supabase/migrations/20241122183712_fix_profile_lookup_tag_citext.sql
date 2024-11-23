@@ -11,7 +11,7 @@ begin
     return query --
         select case when p.id = ( select auth.uid() ) then p.id end              as id,
                p.avatar_url::text                                                as avatar_url,
-               p.name::text                                                      as tag,
+               p.name::text                                                      as name,
                p.about::text                                                     as about,
                p.referral_code                                                   as refcode,
                t.name                                                            as tag,
