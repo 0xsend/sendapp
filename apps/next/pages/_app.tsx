@@ -1,6 +1,5 @@
 import '../public/reset.css'
 import '../styles/globals.css'
-
 import 'raf/polyfill'
 import '@my/ui/src/config/fonts.css'
 
@@ -10,37 +9,11 @@ import type { AuthProviderProps } from 'app/provider/auth'
 import { api } from 'app/utils/api'
 import type { NextPage } from 'next'
 import Head from 'next/head'
-import { useEffect, type ReactElement, type ReactNode } from 'react'
+import type { ReactElement, ReactNode } from 'react'
 import type { SolitoAppProps } from 'solito'
 import { Provider } from 'app/provider'
-import { projectId, config as wagmiConfig } from 'app/provider/wagmi/config'
-import { createWeb3Modal, useWeb3ModalTheme } from '@web3modal/wagmi/react'
-import { baseMainnetClient } from '@my/wagmi'
 import { YStack, H1, H2 } from '@my/ui'
 import { IconSendLogo } from 'app/components/icons'
-
-createWeb3Modal({
-  wagmiConfig,
-  projectId,
-  defaultChain: baseMainnetClient.chain,
-  themeVariables: {
-    '--w3m-accent': '#86AE80',
-  },
-  tokens: {
-    8453: {
-      address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
-    },
-    845337: {
-      address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
-    },
-    1: {
-      address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-    },
-    1337: {
-      address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-    },
-  },
-})
 
 if (process.env.NODE_ENV === 'production') {
   require('../public/tamagui.css')
@@ -57,12 +30,7 @@ function MyApp({
   // reference: https://nextjs.org/docs/pages/building-your-application/routing/pages-and-layouts
   const getLayout = Component.getLayout || ((page) => page)
 
-  const [theme, setTheme] = useRootTheme()
-  const { setThemeMode } = useWeb3ModalTheme()
-
-  useEffect(() => {
-    setThemeMode(theme)
-  }, [theme, setThemeMode])
+  const [, setTheme] = useRootTheme()
 
   return (
     <>

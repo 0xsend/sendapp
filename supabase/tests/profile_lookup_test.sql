@@ -1,5 +1,5 @@
 BEGIN;
-SELECT plan(10);
+SELECT plan(11);
 CREATE EXTENSION "basejump-supabase_test_helpers";
 SELECT tests.create_supabase_user('valid_tag_user');
 SELECT tests.authenticate_as_service_role();
@@ -111,6 +111,14 @@ SELECT results_eq($$
     VALUES (
       0::bigint
     ) $$, 'Test looking up kenny_ does not return kennyl');
+
+-- Test profile lookup by tag is case insensitive
+SELECT results_eq($$
+    SELECT
+      id::uuid, avatar_url, name, about, tag, address, chain_id, is_public, sendid, all_tags FROM public.profile_lookup('tag', 'VALID_TAG') $$, $$
+    VALUES (NULL::uuid, NULL, NULL, NULL, 'valid_tag'::citext, '0x1234567890abcdef1234567890abcdef12345678'::citext, 1, FALSE,(
+        SELECT
+          current_setting('vars.send_id')::int),ARRAY['valid_tag']::text[]) $$, 'Test valid tag lookup is case insensitive');
 
 SELECT *
 FROM

@@ -20,7 +20,6 @@ import {
   IconShare,
   IconBadgeCheck,
   IconArrowRight,
-  IconLeaderboard,
 } from 'app/components/icons'
 import { getReferralHref } from 'app/utils/getReferralLink'
 import { useUser } from 'app/utils/useUser'
@@ -30,6 +29,7 @@ import { useRootScreenParams } from 'app/routers/params'
 import { type PropsWithChildren, type ReactNode, useEffect, useState } from 'react'
 import { useConfirmedTags } from 'app/utils/tags'
 import { useUserReferralsCount } from 'app/utils/useUserReferralsCount'
+import { IconRocket } from 'app/components/icons/IconRocket'
 
 export function AccountScreen() {
   const media = useMedia()
@@ -107,9 +107,9 @@ export function AccountScreen() {
       icon: <IconStarOutline size={20} $theme-light={{ color: '$color12' }} />,
     },
     {
-      label: 'Leaderboard',
-      href: '/leaderboard',
-      icon: <IconLeaderboard size={20} $theme-light={{ color: '$color12' }} />,
+      label: 'Affiliate',
+      href: '/account/affiliate',
+      icon: <IconRocket size={24} $theme-light={{ color: '$color12' }} />,
     },
   ]
 
