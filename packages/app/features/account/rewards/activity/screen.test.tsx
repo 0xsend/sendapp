@@ -58,9 +58,7 @@ jest.mock('app/utils/useChainAddresses', () => ({
   useChainAddresses: jest.fn().mockReturnValue({ data: { address: '0x123' } }),
 }))
 jest.mock('wagmi')
-jest.mock('@web3modal/wagmi/react', () => ({
-  useWeb3Modal: jest.fn().mockReturnValue({ open: jest.fn() }),
-}))
+
 jest.mock('@my/wagmi', () => ({
   __esModule: true,
   ...jest.requireActual('@my/wagmi'),
