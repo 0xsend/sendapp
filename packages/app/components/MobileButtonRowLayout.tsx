@@ -152,7 +152,7 @@ const ActivityRewards = ({ children, ...props }: XStackProps) => {
   const { data: distributions, isLoading } = useMonthlyDistributions()
   const distribution =
     distributions?.find((d) => d.number === queryParams.distribution) ?? distributions?.[0]
-  const shareAmount = distribution?.distribution_shares?.[0]?.amount
+  const shareAmount = distribution?.distribution_shares?.[0]?.amount_after_slash
 
   const isVisible = distribution !== undefined && shareAmount !== undefined && shareAmount > 0
   const distributionMonth = distribution?.timezone_adjusted_qualification_end.toLocaleString(
