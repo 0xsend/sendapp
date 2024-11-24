@@ -226,6 +226,7 @@ export function ActivityRewardsScreen() {
           <DistributionRequirementsCard distribution={distributions[selectedDistributionIndex]} />
           <SendPerksCards distribution={distributions[selectedDistributionIndex]} />
           <MultiplierCards distribution={distributions[selectedDistributionIndex]} />
+          <RewardsProgressCard distribution={distributions[selectedDistributionIndex]} />
           <ClaimableRewardsCard distribution={distributions[selectedDistributionIndex]} />
         </YStack>
       )}
@@ -588,10 +589,83 @@ const MultiplierCard = ({ children }: PropsWithChildren<CardProps>) => {
   )
 }
 
+const RewardsProgressCard = ({
+  distribution,
+}: {
+  distribution: UseDistributionsResultData[number]
+}) => {
+  const shareAmount = distribution.distribution_shares?.[0]?.amount
+  const slashedAmount = distribution.distribution_shares?.[0]?.amount_after_slash
+
+  if (!shareAmount || !slashedAmount) return null
+
+  const percentage = Math.floor((Number(slashedAmount) / Number(shareAmount)) * 100)
+
+  return (
+    <YStack f={1} w={'100%'} gap="$5">
+      <H3 fontWeight={'600'} color={'$color12'}>
+        Progress
+      </H3>
+      <Card br={'$6'} p="$7" w={'100%'}>
+        <YStack gap="$4" w="100%">
+          <XStack jc="space-between" ai="center">
+            <Paragraph color="$color11">Current Rewards</Paragraph>
+            <Paragraph
+              ff={'$mono'}
+              py={'$size.0.5'}
+              px={'$size.0.9'}
+              borderWidth={1}
+              borderColor={'$primary'}
+              $theme-light={{ borderColor: '$color12' }}
+              borderRadius={'$4'}
+            >
+              {percentage}%
+            </Paragraph>
+          </XStack>
+
+          <Stack w="100%" h="$1" br="$10" bc="$color3" overflow="hidden">
+            <Stack
+              w={`${percentage}%`}
+              h="100%"
+              br="$10"
+              animation="quick"
+              $theme-light={{
+                bc: '$color12',
+              }}
+              $theme-dark={{
+                bc: '$primary',
+              }}
+            />
+          </Stack>
+
+          <XStack jc="space-between" ai="center">
+            <YStack>
+              <Paragraph color="$color10" size="$3">
+                Current
+              </Paragraph>
+              <Paragraph fontFamily="$mono" color="$color12">
+                {formatAmount(slashedAmount, 9, 0)} SEND
+              </Paragraph>
+            </YStack>
+            <YStack ai="flex-end">
+              <Paragraph color="$color10" size="$3">
+                Estimated Maximum
+              </Paragraph>
+              <Paragraph fontFamily="$mono" color="$color12">
+                {formatAmount(shareAmount, 9, 0)} SEND
+              </Paragraph>
+            </YStack>
+          </XStack>
+        </YStack>
+      </Card>
+    </YStack>
+  )
+}
+
 const ClaimableRewardsCard = ({
   distribution,
 }: { distribution: UseDistributionsResultData[number] }) => {
-  const shareAmount = distribution.distribution_shares?.[0]?.amount
+  const shareAmount = distribution.distribution_shares?.[0]?.amount_after_slash
   if (shareAmount === undefined || shareAmount === 0) return null
   const now = new Date()
   const isQualificationOver = distribution.qualification_end < now

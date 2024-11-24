@@ -51,10 +51,13 @@ export function RewardsScreen() {
             title="Activity Rewards"
             href="/account/rewards/activity"
             isLoading={isLoadingDistributions || isTrancheActiveLoading || isClaimedLoading}
-            reward={currentDistribution?.distribution_shares?.[0]?.amount.toLocaleString() ?? ''}
+            reward={
+              currentDistribution?.distribution_shares?.[0]?.amount_after_slash.toLocaleString() ??
+              ''
+            }
             claimStatus={(() => {
               switch (true) {
-                case !share || !share.amount:
+                case !share || !share.amount_after_slash:
                   return undefined
                 case !isTrancheActive:
                   return 'Upcoming Reward'
