@@ -39,7 +39,7 @@ export const TextField = (
     },
   } = useTsController<string>()
 
-  const { label, placeholder, isOptional, maxLength, isEmail } = useStringFieldInfo()
+  const { label, placeholder, maxLength, isEmail } = useStringFieldInfo()
   const themeName = useThemeName()
   const id = useId()
   const disabled = isSubmitting
@@ -57,7 +57,7 @@ export const TextField = (
             color={props.labelProps?.color ?? '$olive'}
             {...props.labelProps}
           >
-            {label} {isOptional && '(Optional)'}
+            {label}
           </Label>
         )}
         <Shake shakeKey={error?.errorMessage}>
