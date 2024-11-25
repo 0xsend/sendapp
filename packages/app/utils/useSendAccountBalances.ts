@@ -4,6 +4,7 @@ import { useSendAccount } from './send-accounts'
 import { useTokenPrices } from './useTokenPrices'
 import { convertBalanceToFiat } from './convertBalanceToUSD'
 import { coins } from '../data/coins'
+import { useEffect } from 'react'
 
 type BalanceOfResult =
   | {
@@ -19,7 +20,7 @@ type BalanceOfResult =
   | undefined
 
 export const useSendAccountBalances = () => {
-  const { data: tokenPrices } = useTokenPrices()
+  const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
   const { data: sendAccount } = useSendAccount()
 
   const tokenContracts = coins
@@ -74,7 +75,12 @@ export const useSendAccountBalances = () => {
       )
 
   if (!tokenPrices) {
-    return { balances, isLoading, totalBalance: undefined }
+    return {
+      balances,
+      isLoading,
+      totalBalance: undefined,
+      isLoadingTotalBalance: isLoadingTokenPrices,
+    }
   }
 
   const totalBalance = coins.reduce((total, coin) => {
@@ -83,5 +89,5 @@ export const useSendAccountBalances = () => {
     return total + (convertBalanceToFiat(coin.token, balance ?? 0n, price) ?? 0)
   }, 0)
 
-  return { balances, totalBalance, isLoading }
+  return { balances, totalBalance, isLoading, isLoadingTotalBalance: isLoadingTokenPrices }
 }

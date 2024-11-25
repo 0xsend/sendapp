@@ -112,6 +112,7 @@ describe('Distributor V2 Worker', () => {
           multiplier_max: 2.5,
           multiplier_step: 0.1,
           distribution_id: 4,
+          mode: 'individual',
         },
         {
           type: 'total_tag_referrals',
@@ -120,6 +121,9 @@ describe('Distributor V2 Worker', () => {
           multiplier_min: 1.0,
           multiplier_max: 2.0,
           multiplier_step: 0.01,
+          mode: 'aggregate',
+          created_at: '2024-04-06T16:49:02.569245+00:00',
+          updated_at: '2024-04-06T16:49:02.569245+00:00',
           distribution_id: 4,
         },
         {
@@ -127,6 +131,7 @@ describe('Distributor V2 Worker', () => {
           fixed_value: 200,
           bips_value: 0,
           distribution_id: 4,
+          mode: 'individual',
         },
         {
           type: 'tag_registration',
@@ -135,6 +140,7 @@ describe('Distributor V2 Worker', () => {
           distribution_id: 4,
           created_at: '2024-04-06T16:49:02.569245+00:00',
           updated_at: '2024-04-06T16:49:02.569245+00:00',
+          mode: 'individual',
         },
         {
           type: 'send_ten',
@@ -143,6 +149,7 @@ describe('Distributor V2 Worker', () => {
           distribution_id: 4,
           created_at: '2024-04-06T16:49:02.569245+00:00',
           updated_at: '2024-04-06T16:49:02.569245+00:00',
+          mode: 'individual',
         },
         {
           type: 'send_one_hundred',
@@ -151,6 +158,19 @@ describe('Distributor V2 Worker', () => {
           distribution_id: 4,
           created_at: '2024-04-06T16:49:02.569245+00:00',
           updated_at: '2024-04-06T16:49:02.569245+00:00',
+          mode: 'individual',
+        },
+        {
+          type: 'send_streak',
+          fixed_value: 10,
+          bips_value: 0,
+          distribution_id: 4,
+          multiplier_min: 1.0,
+          multiplier_max: 5.0,
+          multiplier_step: 0.2,
+          created_at: '2024-04-06T16:49:02.569245+00:00',
+          updated_at: '2024-04-06T16:49:02.569245+00:00',
+          mode: 'aggregate',
         },
       ],
     } as Tables<'distributions'> & {
@@ -181,11 +201,11 @@ describe('Distributor V2 Worker', () => {
       Back of the napkin
       Pool = 10,000
       Fixed
-        Bobs = 200 + 200 + 100 + 100 + 50 = 650 * 1.5 * 1.01 = 985
+        Bobs = 200 + 200 + 100 + 100 + 50 + 50 = 700 * 1.5 * 1.01 * 2 = 2121
         Alices = 100 + 100 * 1.05 = 205
-      Hodlers = 10,000 - 985 - 205 = 8810
-        Bobs = 8810 * 1,000,000 /1,500,000 = 5873
-        Alices = 8810 * 500,000 /1,500,000 = 2937
+      Hodlers = 10,000 - 2121 - 205 = 7674
+        Bobs = 7674 * 1,000,000 /1,500,000 = 5116
+        Alices = 7674 * 500,000 /1,500,000 = 2558
       */
       fetchAllVerifications: mock((distributionId: number) => {
         return Promise.resolve({
@@ -194,19 +214,23 @@ describe('Distributor V2 Worker', () => {
             {
               user_id,
               type: 'tag_referral',
+              weight: 1,
             },
 
             {
               user_id,
               type: 'tag_registration',
+              weight: 1,
             },
             {
               user_id,
               type: 'send_ten',
+              weight: 1,
             },
             {
               user_id,
               type: 'send_one_hundred',
+              weight: 1,
             },
             {
               user_id,
@@ -214,15 +238,26 @@ describe('Distributor V2 Worker', () => {
               metadata: {
                 value: 2,
               },
+              weight: 2,
+            },
+            {
+              user_id: user_id,
+              type: 'send_streak',
+              metadata: {
+                value: 5,
+              },
+              weight: 5,
             },
             // alice only has tag_registration
             {
               user_id: user_id2,
               type: 'tag_registration',
+              weight: 1,
             },
             {
               user_id: user_id2,
               type: 'send_ten',
+              weight: 1,
             },
             {
               user_id: user_id2,
@@ -230,9 +265,10 @@ describe('Distributor V2 Worker', () => {
               metadata: {
                 value: 5,
               },
+              weight: 5,
             },
           ],
-          count: 9,
+          count: 10,
           error: null,
         })
       }),

@@ -12,7 +12,7 @@ import { fetchAllBalances, isMerkleDropActive } from './wagmi'
 import { calculateWeights, PERC_DENOM } from './weights'
 
 type Multiplier = {
-  value: number
+  value?: number
   min: number
   max: number
   step: number
@@ -165,6 +165,7 @@ export class DistributorV2Worker {
         acc[verification.type] = {
           fixedValue: BigInt(verification.fixed_value),
           bipsValue: BigInt(verification.bips_value),
+          mode: verification.mode,
           multiplier_min: verification.multiplier_min,
           multiplier_max: verification.multiplier_max,
           multiplier_step: verification.multiplier_step,
@@ -176,6 +177,7 @@ export class DistributorV2Worker {
         {
           fixedValue?: bigint
           bipsValue?: bigint
+          mode: Database['public']['Enums']['verification_value_mode']
           multiplier_min: number
           multiplier_max: number
           multiplier_step: number
@@ -294,68 +296,61 @@ export class DistributorV2Worker {
       if (!hodler || !hodler.address) continue
       const { address } = hodler
       if (!minBalanceByAddress[address]) continue
-
       let userFixedAmount = 0n
-      let totalReferrals = 0
+
       const multipliers: Record<string, Multiplier> = {}
 
       for (const verification of verifications) {
         const verificationValue = verificationValues[verification.type]
         if (!verificationValue) continue
 
-        // Calculate fixed amount
-        if (verificationValue.fixedValue) {
-          userFixedAmount += verificationValue.fixedValue
-        }
-
         // Initialize or update multiplier info
-        if (!multipliers[verification.type] && verificationValue.multiplier_min) {
+        if (
+          !multipliers[verification.type] &&
+          (verificationValue.multiplier_step > 0 || verificationValue.multiplier_max > 1) //@todo: should have a better way to tell if multipliers are enabled
+        ) {
           multipliers[verification.type] = {
-            value: 1.0,
+            value: undefined,
             min: verificationValue.multiplier_min,
             max: verificationValue.multiplier_max,
             step: verificationValue.multiplier_step,
           }
         }
         const multiplierInfo = multipliers[verification.type]
-        if (!multiplierInfo) continue
 
-        // Calculate multipliers
-        switch (verification.type) {
-          case 'total_tag_referrals': {
-            // @ts-expect-error this is json
-            totalReferrals = verification.metadata?.value ?? 0
-            // Minus 1 from the count so 1 = multiplier min
-            if (totalReferrals > 0n) {
-              multiplierInfo.value = Math.min(
-                multiplierInfo.min + (totalReferrals - 1) * multiplierInfo.step,
-                multiplierInfo.max
-              )
-            } else {
-              multiplierInfo.value = 0
-            }
+        const weight = verification.weight
 
-            break
+        // Calculate fixed amount
+        if (verificationValue.fixedValue) {
+          userFixedAmount += verificationValue.fixedValue * BigInt(weight)
+        }
+
+        if (!multiplierInfo) {
+          continue
+        }
+
+        if (weight === 1) {
+          // Individual behavior
+          if (multiplierInfo.value === undefined) {
+            multiplierInfo.value = multiplierInfo.min
+          } else if (multiplierInfo.value < multiplierInfo.max) {
+            multiplierInfo.value = Math.min(
+              multiplierInfo.value + multiplierInfo.step,
+              multiplierInfo.max
+            )
           }
-          case 'tag_referral': {
-            multiplierInfo.value = Math.max(multiplierInfo.value, multiplierInfo.min)
-            // Count tag_referral verifications
-            const tagReferralCount = verifications.filter((v) => v.type === 'tag_referral').length
-            // Increase multiplier for each additional tag_referral. Minus 1 from the count so 1 = multiplier min
-            for (let i = 1; i < tagReferralCount; i++) {
-              multiplierInfo.value = Math.min(
-                multiplierInfo.min + (tagReferralCount - 1) * multiplierInfo.step,
-                multiplierInfo.max
-              )
-            }
-            break
-          }
+        } else {
+          // Aggregate behavior
+          multiplierInfo.value = Math.min(
+            multiplierInfo.min + (weight - 1) * multiplierInfo.step,
+            multiplierInfo.max
+          )
         }
       }
 
       // Calculate the final multiplier
       const finalMultiplier = Object.values(multipliers).reduce(
-        (acc, info) => acc * info.value,
+        (acc, info) => acc * (info.value ?? 1.0),
         1.0
       )
 
@@ -377,8 +372,7 @@ export class DistributorV2Worker {
     }
 
     // Calculate hodler pool share weights
-    // -500 to account for rounding errors
-    const hodlerPoolAvailableAmount = distAmt - fixedPoolAllocatedAmount - 500n
+    const hodlerPoolAvailableAmount = distAmt - fixedPoolAllocatedAmount
 
     let hodlerShares: { address: string; amount: bigint }[] = []
     if (hodlerPoolAvailableAmount > 0n) {
@@ -494,7 +488,7 @@ export class DistributorV2Worker {
       } catch (error) {
         this.log.error(error, `Error processing block. ${(error as Error).message}`)
       }
-      await sleep(60_000)
+      await sleep(process.env.NODE_ENV !== 'production' ? 10_000 : 21_600_000)
     }
 
     this.log.info('Distributor stopped.')

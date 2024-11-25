@@ -20,8 +20,6 @@ import {
   IconShare,
   IconBadgeCheck,
   IconArrowRight,
-  IconQRFull,
-  IconLeaderboard,
 } from 'app/components/icons'
 import { getReferralHref } from 'app/utils/getReferralLink'
 import { useUser } from 'app/utils/useUser'
@@ -31,6 +29,7 @@ import { useRootScreenParams } from 'app/routers/params'
 import { type PropsWithChildren, type ReactNode, useEffect, useState } from 'react'
 import { useConfirmedTags } from 'app/utils/tags'
 import { useUserReferralsCount } from 'app/utils/useUserReferralsCount'
+import { IconRocket } from 'app/components/icons/IconRocket'
 
 export function AccountScreen() {
   const media = useMedia()
@@ -108,9 +107,9 @@ export function AccountScreen() {
       icon: <IconStarOutline size={20} $theme-light={{ color: '$color12' }} />,
     },
     {
-      label: 'Leaderboard',
-      href: '/leaderboard',
-      icon: <IconLeaderboard size={20} $theme-light={{ color: '$color12' }} />,
+      label: 'Affiliate',
+      href: '/account/affiliate',
+      icon: <IconRocket size={24} $theme-light={{ color: '$color12' }} />,
     },
   ]
 
@@ -119,7 +118,7 @@ export function AccountScreen() {
       gap={'$size.1.5'}
       width={'100%'}
       pb={'$size.1.5'}
-      pt={'$size.3.5'}
+      pt={'$3'}
       $gtMd={{ flexDirection: 'row', ai: 'stretch', alignSelf: 'flex-start' }}
       $gtLg={{ pt: 0 }}
       ai="center"
@@ -130,7 +129,7 @@ export function AccountScreen() {
             <Avatar size={avatarWidth} btlr={'$6'} btrr={'$6'} bc="$color2">
               <Avatar.Image accessibilityLabel="" src={avatar_url ?? ''} />
               <Avatar.Fallback f={1} ai={'center'} theme="green_active">
-                <IconAccount size={avatarWidth * 0.9} c$theme-light={{ color: '$color12' }} />
+                <IconAccount size={avatarWidth * 0.9} $theme-light={{ color: '$color12' }} />
               </Avatar.Fallback>
             </Avatar>
             <LinearGradient

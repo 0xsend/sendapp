@@ -6,6 +6,7 @@ import { sendCoin } from 'app/data/coins'
 import { assert } from 'app/utils/assert'
 import debug from 'debug'
 import { signUp } from './fixtures/send-accounts'
+import { generatePhone } from './utils/generators'
 
 let log: debug.Debugger
 
@@ -16,7 +17,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('redirect on sign-in', async ({ page, pg }) => {
-  const phone = `${Math.floor(Math.random() * 1e9)}`
+  const phone = generatePhone()
   // naive but go to home page to see if user is logged in
   await page.goto('/auth/sign-up')
   await expect(page).toHaveURL('/auth/sign-up')
@@ -43,7 +44,7 @@ test('redirect on sign-in', async ({ page, pg }) => {
 })
 
 test('redirect to send confirm page on sign-in', async ({ page, seed, pg }) => {
-  const phone = `${Math.floor(Math.random() * 1e9)}`
+  const phone = generatePhone()
   const plan = await seed.users([userOnboarded])
   const tag = plan.tags[0]
   assert(!!tag?.name, 'tag not found')

@@ -156,7 +156,7 @@ const config: Config = {
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
   transformIgnorePatterns: [
-    'node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|moti|sentry-expo|native-base|react-native-svg|solito|@web3modal|@web3modal/*|@wagmi|wagmi/*|viem|viem/*|@tamagui/animations-moti|superjson)',
+    'node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|moti|sentry-expo|native-base|react-native-svg|solito|@tamagui/animations-moti)',
   ],
 
   moduleNameMapper: {

@@ -93,7 +93,7 @@ export const BackupScreen = () => {
               </YStack>
             )
           case isLoading || isLoadingWebAuthnCreds:
-            return <Spinner size="large" color="$color" />
+            return <Spinner size="large" color="$color12" />
           case !webAuthnCreds:
             return (
               <YStack w={'100%'} gap={'$6'}>

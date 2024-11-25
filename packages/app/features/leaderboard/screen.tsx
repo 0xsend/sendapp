@@ -44,16 +44,6 @@ function Leaderboard({ title, list }: { title: string; list: LeaderboardEntry[] 
           <LeaderBoardHeader isReferrals={isReferrals} />
           <LeaderboardList list={list} isReferrals={isReferrals} />
         </YStack>
-        <LinearGradient
-          pos="absolute"
-          w="100%"
-          h={'$size.9'}
-          locations={[0, 1]}
-          colors={['transparent', 'black']}
-          b={0}
-          borderBottomRightRadius={'$8'}
-          borderBottomLeftRadius={'$8'}
-        />
       </YStack>
     </Card>
   )
@@ -120,7 +110,7 @@ function LeaderboardList({
               $theme-light={{ backgroundColor: '$white' }}
             />
           </Avatar>
-          <Paragraph mb="0" lineHeight="$4" color="$primary">
+          <Paragraph mb="0" lineHeight="$4" color="$primary" $theme-light={{ color: '$color12' }}>
             {getName(user)}
           </Paragraph>
         </XStack>

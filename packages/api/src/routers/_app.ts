@@ -1,6 +1,6 @@
 import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server'
 import { createTRPCRouter } from '../trpc'
-import { authRouter } from './auth'
+import { authRouter } from './auth/router'
 import { chainAddressRouter } from './chainAddress'
 import { distributionRouter } from './distribution'
 import { tagRouter } from './tag'
@@ -8,6 +8,7 @@ import { secretShopRouter } from './secretShop'
 import { sendAccountRouter } from './sendAccount'
 import { transferRouter } from './transfer'
 import { accountRecoveryRouter } from './account-recovery/router'
+import { referralsRouter } from './referrals'
 
 export const appRouter = createTRPCRouter({
   chainAddress: chainAddressRouter,
@@ -18,6 +19,7 @@ export const appRouter = createTRPCRouter({
   secretShop: secretShopRouter,
   sendAccount: sendAccountRouter,
   transfer: transferRouter,
+  referrals: referralsRouter,
 })
 
 export type AppRouter = typeof appRouter

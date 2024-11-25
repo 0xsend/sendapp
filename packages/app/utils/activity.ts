@@ -1,5 +1,5 @@
 import { formatUnits, isAddressEqual } from 'viem'
-import formatAmount from './formatAmount'
+import formatAmount, { localizeAmount } from './formatAmount'
 import {
   isTagReceiptsEvent,
   isReferralsEvent,
@@ -9,6 +9,7 @@ import {
 import type { Activity } from 'app/utils/zod/activity'
 import { isSendAccountReceiveEvent } from './zod/activity/SendAccountReceiveEventSchema'
 import { baseMainnet, sendtagCheckoutAddress, tokenPaymasterAddress } from '@my/wagmi'
+import { shorten } from './strings'
 
 const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
   Object.values(addresses).map((a) => [a, label])
@@ -20,7 +21,8 @@ const AddressLabels = {
   ),
 }
 
-const labelAddress = (address: `0x${string}`): string => AddressLabels[address] ?? address
+const labelAddress = (address: `0x${string}`): string =>
+  AddressLabels[address] ?? shorten(address ?? '', 5, 4)
 
 /**
  * Returns the counterpart of the activity which could be the logged in user.
@@ -62,7 +64,7 @@ export function amountFromActivity(activity: Activity): string {
     case isSendAccountTransfersEvent(activity): {
       const { v, coin } = activity.data
       if (coin) {
-        const amount = formatUnits(v, coin.decimals)
+        const amount = localizeAmount(formatUnits(v, coin.decimals))
         return `${amount} ${coin.symbol}`
       }
       return formatAmount(`${v}`, 5, 0)
@@ -70,14 +72,14 @@ export function amountFromActivity(activity: Activity): string {
     case isSendAccountReceiveEvent(activity): {
       const { coin } = activity.data
       if (coin) {
-        const amount = formatUnits(activity.data.value, coin.decimals)
+        const amount = localizeAmount(formatUnits(activity.data.value, coin.decimals))
         return `${amount} ${coin.symbol}`
       }
       return formatAmount(`${activity.data.value}`, 5, 0)
     }
     case isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity): {
       const data = activity.data
-      const amount = formatUnits(data.value, data.coin.decimals)
+      const amount = localizeAmount(formatUnits(data.value, data.coin.decimals))
       return `${amount} ${data.coin.symbol}`
     }
     case isReferralsEvent(activity) && !!activity.from_user?.id: {
@@ -114,6 +116,8 @@ export function eventNameFromActivity(activity: Activity) {
   switch (true) {
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Referral Reward'
+    case isERC20Transfer && to_user?.send_id === undefined:
+      return 'Withdraw'
     case isTransferOrReceive && from_user === null:
       return 'Deposit'
     case isTransferOrReceive && !!to_user?.id:

@@ -100,6 +100,11 @@ const mockWagmi = {
     switchAccount: jest.fn(),
     connectos: [],
   }),
+  useEstimateFeesPerGas: jest.fn().mockReturnValue({
+    data: { baseFee: 100000, gasFees: 100000 },
+    isSuccess: true,
+    error: null,
+  }),
 }
 
 export const useChainId = mockWagmi.useChainId
@@ -115,4 +120,5 @@ export const useWaitForTransactionReceipt = mockWagmi.useWaitForTransactionRecei
 export const usePrepareTransactionRequest = mockWagmi.usePrepareTransactionRequest
 export const useSendTransaction = mockWagmi.useSendTransaction
 export const useSwitchAccount = mockWagmi.useSwitchAccount
+export const useEstimateFeesPerGas = mockWagmi.useEstimateFeesPerGas
 export default mockWagmi

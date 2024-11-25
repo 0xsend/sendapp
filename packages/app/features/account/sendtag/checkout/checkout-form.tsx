@@ -44,6 +44,7 @@ import { CheckoutTagSchema } from './CheckoutTagSchema'
 import { ConfirmButton } from './components/checkout-confirm-button'
 import { SendTagPricingDialog, SendTagPricingTooltip } from './SendTagPricingDialog'
 import formatAmount from 'app/utils/formatAmount'
+import { api } from 'app/utils/api'
 
 export const CheckoutForm = () => {
   const user = useUser()
@@ -56,6 +57,7 @@ export const CheckoutForm = () => {
   const has5Tags = user?.tags?.length === 5
   const media = useMedia()
   const router = useRouter()
+  const { data: referred, isLoading: isLoadingReferred } = api.referrals.getReferred.useQuery()
 
   async function createSendTag({ name }: z.infer<typeof CheckoutTagSchema>) {
     if (!user.user) return console.error('No user')
@@ -277,9 +279,16 @@ export const CheckoutForm = () => {
           )
         }}
       </SchemaForm>
-
-      <ReferredBy />
-
+      {(() => {
+        switch (true) {
+          case isLoadingReferred:
+            return <Spinner alignSelf="flex-start" size="large" color="$color11" />
+          case !referred:
+            return <ReferredBy />
+          default:
+            return null
+        }
+      })()}
       {hasPendingTags && (
         <Theme name="green">
           <AnimatePresence>
@@ -389,8 +398,8 @@ function ReferredBy() {
         </YStack>
         {referrer && (
           <Fade jc="flex-end" ai="flex-start" h="100%">
-            <YStack gap="$2" jc="flex-end">
-              <Link href={`/profile/${referrer.sendid}`}>
+            <Link href={`/profile/${referrer.sendid}`}>
+              <XStack gap="$2" jc="flex-end">
                 <Avatar size="$2" br="$3" mx="auto">
                   <Avatar.Image src={referrer.avatar_url ?? ''} />
                   <Avatar.Fallback jc="center">
@@ -409,8 +418,8 @@ function ReferredBy() {
                     }
                   })()}
                 </Paragraph>
-              </Link>
-            </YStack>
+              </XStack>
+            </Link>
           </Fade>
         )}
         {referrerError && (
@@ -450,7 +459,8 @@ function ConfirmTagPrice({ tag }: { tag: { name: string } }) {
 
 function TotalPrice() {
   const pendingTags = usePendingTags()
-  const { usdcFees, usdcFeesError, isLoadingUSDCFees } = useSendtagCheckout()
+  const { usdcFees, usdcFeesError, isLoadingUSDCFees, isLoadingReferred, referredError } =
+    useSendtagCheckout()
   const _total = useMemo(() => total(pendingTags ?? []), [pendingTags])
 
   return (
@@ -476,7 +486,10 @@ function TotalPrice() {
       {usdcFeesError && (
         <Paragraph color="$error">{usdcFeesError?.message?.split('.').at(0)}</Paragraph>
       )}
-      {isLoadingUSDCFees && <Spinner size="small" color={'$color11'} />}
+      {referredError && (
+        <Paragraph color="$error">{referredError?.message?.split('.').at(0)}</Paragraph>
+      )}
+      {(isLoadingUSDCFees || isLoadingReferred) && <Spinner size="small" color={'$color11'} />}
       {usdcFees && (
         <Paragraph
           fontFamily={'$mono'}

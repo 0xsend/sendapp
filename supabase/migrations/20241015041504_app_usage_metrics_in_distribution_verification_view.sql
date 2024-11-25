@@ -41,11 +41,10 @@ SELECT
   BOOL_OR(bc.type = 'send_one_hundred'::public.verification_type) AS has_send_one_hundred,
   BOOL_OR(bc.type = 'create_passkey'::public.verification_type) AS has_create_passkey,
   jsonb_object_agg(bc.type, jsonb_build_object('value', CASE WHEN bc.type_count = 0 THEN
-        1
-      WHEN bc.type = 'total_tag_referrals'::public.verification_type THEN
-        LEAST(dvv.multiplier_min +((bc.total_referrals) * dvv.multiplier_step), dvv.multiplier_max)
-    ELSE
-      LEAST(dvv.multiplier_min +((bc.type_count - 1) * dvv.multiplier_step), dvv.multiplier_max)
+        0
+      ELSE
+        -- @todo double check that when count = 1, this value = min
+        LEAST(dvv.multiplier_min +(bc.type_count - 1) * dvv.multiplier_step, dvv.multiplier_max)
       END, 'multiplier_min', dvv.multiplier_min, 'multiplier_max', dvv.multiplier_max, 'multiplier_step', dvv.multiplier_step)) AS multipliers
 FROM
   base_counts bc
@@ -53,5 +52,4 @@ FROM
     AND bc.type = dvv.type
 GROUP BY
   bc.distribution_id,
-  bc.user_id;
-
+  bc.user_id

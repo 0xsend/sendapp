@@ -8,12 +8,26 @@ import {
   sendUniswapV3PoolAddress,
   useReadSendMerkleDropTrancheActive,
   useReadSendMerkleDropIsClaimed,
+  baseMainnetClient,
+  entryPointAddress,
+  sendAccountAbi,
+  tokenPaymasterAddress,
+  baseMainnetBundlerClient,
 } from '@my/wagmi'
 import type { PostgrestError } from '@supabase/supabase-js'
-import { type UseQueryResult, useQuery } from '@tanstack/react-query'
+import { type UseQueryResult, useMutation, useQuery } from '@tanstack/react-query'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useBalance, useSimulateContract } from 'wagmi'
 import { api } from './api'
+import { useSendAccount } from './send-accounts'
+import { getUserOperationHash, type UserOperation } from 'permissionless'
+import { assert } from './assert'
+import { type CallExecutionError, encodeFunctionData, isAddress } from 'viem'
+import { defaultUserOp } from './useUserOpTransferMutation'
+import { signUserOp } from './signUserOp'
+import { byteaToBase64 } from './byteaToBase64'
+import { throwNiceError } from './userop'
+import { adjustUTCDateForTimezone } from './dateHelper'
 
 export const DISTRIBUTION_INITIAL_POOL_AMOUNT = BigInt(20e9)
 
@@ -24,6 +38,7 @@ type UseDistributionResultDistribution = Omit<
 
 export type UseDistributionsResultData = (UseDistributionResultDistribution & {
   qualification_end: Date
+  timezone_adjusted_qualification_end: Date
   qualification_start: Date
   claim_end: Date
   distribution_shares: Tables<'distribution_shares'>[]
@@ -38,6 +53,7 @@ export const useDistributions = (): UseQueryResult<UseDistributionsResultData, P
       const { data, error } = await supabase
         .from('distributions')
         .select('*, distribution_shares(*), distribution_verifications_summary(*)')
+        .order('number', { ascending: false })
 
       if (error) {
         throw error
@@ -46,6 +62,44 @@ export const useDistributions = (): UseQueryResult<UseDistributionsResultData, P
       return data.map((distribution) => ({
         ...distribution,
         qualification_end: new Date(distribution.qualification_end),
+        timezone_adjusted_qualification_end: adjustUTCDateForTimezone(
+          new Date(distribution.qualification_end)
+        ),
+        qualification_start: new Date(distribution.qualification_start),
+        claim_end: new Date(distribution.claim_end),
+      }))
+    },
+  })
+}
+
+//@todo: make a Zod type for the JSON in distribution_verifications_summary
+/*
+After distribution 6 we switched to monthly distributions
+This function cuts out the first 6 distributions
+*/
+export const useMonthlyDistributions = () => {
+  const supabase = useSupabase()
+  const { data: sendAccount } = useSendAccount()
+  return useQuery({
+    queryKey: ['monthly_distributions', sendAccount?.created_at],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('distributions')
+        .select('*, distribution_shares(*), distribution_verifications_summary(*)')
+        .gt('number', 6)
+        .gt('qualification_end', sendAccount?.created_at)
+        .order('number', { ascending: false })
+
+      if (error) {
+        throw error
+      }
+
+      return data.map((distribution) => ({
+        ...distribution,
+        qualification_end: new Date(distribution.qualification_end),
+        timezone_adjusted_qualification_end: adjustUTCDateForTimezone(
+          new Date(distribution.qualification_end)
+        ),
         qualification_start: new Date(distribution.qualification_start),
         claim_end: new Date(distribution.claim_end),
       }))
@@ -157,6 +211,194 @@ export function useSendMerkleDropIsClaimed({
 type SendMerkleDropClaimTrancheArgs = {
   distribution: UseDistributionsResultData[number]
   share?: UseDistributionsResultData[number]['distribution_shares'][number]
+}
+
+export type UseUserOpClaimMutationArgs = {
+  /**
+   * The user operation to send.
+   */
+  userOp: UserOperation<'v0.7'>
+  /**
+   * The valid until epoch timestamp for the user op.
+   */
+  validUntil?: number
+  /**
+   * The signature version of the user op.
+   */
+  version?: number
+  /**
+   * The list of send account credentials to use for signing the user op.
+   */
+  webauthnCreds: { raw_credential_id: `\\x${string}`; name: string }[]
+}
+
+/**
+ * Given a Send Account, distribution, and share, returns a mutation to claim send rewards
+ *
+ * @param userOp The user operation to send.
+ * @param validUntil The valid until timestamp for the user op.
+ */
+export function useUserOpClaimMutation() {
+  return useMutation({
+    mutationFn: sendUserOpClaim,
+  })
+}
+
+export async function sendUserOpClaim({
+  userOp,
+  version,
+  validUntil,
+  webauthnCreds,
+}: UseUserOpClaimMutationArgs) {
+  const chainId = baseMainnetClient.chain.id
+  const entryPoint = entryPointAddress[chainId]
+  const userOpHash = getUserOperationHash({
+    userOperation: userOp,
+    entryPoint,
+    chainId,
+  })
+
+  // simulate
+  await baseMainnetClient
+    .call({
+      account: entryPointAddress[baseMainnetClient.chain.id],
+      to: userOp.sender,
+      data: userOp.callData,
+    })
+    .catch((e) => {
+      const error = e as CallExecutionError
+      console.error('Failed to simulate userop', e)
+      if (error.shortMessage) throw error.shortMessage
+      throw e
+    })
+
+  userOp.signature = await signUserOp({
+    userOpHash,
+    version,
+    validUntil,
+    allowedCredentials:
+      webauthnCreds?.map((c) => ({
+        id: byteaToBase64(c.raw_credential_id),
+        userHandle: c.name,
+      })) ?? [],
+  })
+  try {
+    const hash = await baseMainnetBundlerClient.sendUserOperation({
+      userOperation: userOp,
+    })
+    const receipt = await baseMainnetBundlerClient.waitForUserOperationReceipt({ hash })
+    assert(receipt.success === true, 'Failed to send userOp')
+    return receipt
+  } catch (e) {
+    throwNiceError(e)
+  }
+}
+
+export function useGenerateClaimUserOp({
+  distribution,
+  share,
+  nonce,
+}: {
+  distribution: UseDistributionsResultData[number]
+  share?: UseDistributionsResultData[number]['distribution_shares'][number]
+  nonce?: bigint
+}): UseQueryResult<UserOperation<'v0.7'>> {
+  const trancheId = BigInt(distribution.number - 1) // tranches are 0-indexed
+  const chainId = distribution.chain_id as keyof typeof sendMerkleDropAddress
+  // get the merkle proof from the database
+  const {
+    data: merkleProof,
+    isLoading: isLoadingProof,
+    error: errorProof,
+  } = api.distribution.proof.useQuery({ distributionId: distribution.id })
+  const { address: sender, amount, index } = share ?? {}
+
+  const {
+    data: isClaimed,
+    isLoading: isClaimedLoading,
+    error: isClaimedError,
+  } = useSendMerkleDropIsClaimed({
+    chainId,
+    tranche: trancheId,
+    index: share?.index !== undefined ? BigInt(share.index) : undefined,
+  })
+
+  const {
+    data: trancheActive,
+    isLoading: isLoadingTrancheActive,
+    error: errorTrancheActive,
+  } = useReadSendMerkleDropTrancheActive({
+    chainId,
+    args: [trancheId],
+  })
+
+  const enabled =
+    !isLoadingProof &&
+    !errorProof &&
+    merkleProof !== undefined &&
+    index !== undefined &&
+    amount !== undefined &&
+    sender !== undefined &&
+    !isClaimedLoading &&
+    !isClaimedError &&
+    isClaimed !== undefined &&
+    !isClaimed &&
+    !isLoadingTrancheActive &&
+    !errorTrancheActive &&
+    trancheActive !== undefined &&
+    trancheActive // tranche is onchain and active
+
+  return useQuery({
+    queryKey: [
+      'generateClaimUserOp',
+      sender,
+      String(amount),
+      String(index),
+      String(nonce),
+      String(chainId),
+      enabled,
+      String(trancheId),
+      merkleProof,
+    ],
+    enabled: enabled,
+    queryFn: () => {
+      assert(!!sender && isAddress(sender), 'Invalid send account address')
+      assert(typeof amount === 'number' && amount > 0, 'Invalid amount')
+      assert(typeof nonce === 'bigint' && nonce >= 0n, 'Invalid nonce')
+
+      const callData = encodeFunctionData({
+        abi: sendAccountAbi,
+        functionName: 'executeBatch',
+        args: [
+          [
+            {
+              dest: sendMerkleDropAddress[chainId],
+              value: 0n,
+              data: encodeFunctionData({
+                abi: sendMerkleDropAbi,
+                functionName: 'claimTranche',
+                // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount, and merkleProof are defined when enabled is true
+                args: [sender!, trancheId, BigInt(index!), BigInt(amount!), merkleProof!],
+              }),
+            },
+          ],
+        ],
+      })
+
+      const paymaster = tokenPaymasterAddress[chainId]
+      const userOp: UserOperation<'v0.7'> = {
+        ...defaultUserOp,
+        sender,
+        nonce,
+        callData,
+        paymaster,
+        paymasterData: '0x',
+        signature: '0x',
+      }
+
+      return userOp
+    },
+  })
 }
 
 export const usePrepareSendMerkleDropClaimTrancheWrite = ({

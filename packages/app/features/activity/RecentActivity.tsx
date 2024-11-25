@@ -1,6 +1,6 @@
 import { Button, Paragraph, Spinner, XStack, YStack, Fade } from '@my/ui'
 import { useActivityFeed } from './utils/useActivityFeed'
-import { TableLabel, MobileSectionLabel, RowLabel } from './screen'
+import { TableLabel, RowLabel } from './screen'
 import { ActivityRow } from './ActivityRow'
 import { Fragment } from 'react'
 import type { PostgrestError } from '@supabase/postgrest-js'
@@ -19,7 +19,6 @@ export function RecentActivity() {
           <TableLabel textAlign="right">Amount</TableLabel>
         </XStack>
       </XStack>
-      <MobileSectionLabel>ACTIVITIES</MobileSectionLabel>
       <ActivityFeed {...result} />
     </YStack>
   )
@@ -91,7 +90,7 @@ function ActivityFeed(
                   fetchNextPage()
                 }}
                 disabled={isFetchingNextPageActivities || isFetchingActivities}
-                color="$color"
+                color="$color10"
                 width={200}
                 mx="auto"
               >

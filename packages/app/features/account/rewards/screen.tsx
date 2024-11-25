@@ -1,604 +1,159 @@
+import { YStack, H1, Paragraph, XStack, LinkableButton, Button, Image, Stack } from '@my/ui'
+import type { sendMerkleDropAddress } from '@my/wagmi'
+import { IconArrowRight, IconSend } from 'app/components/icons'
 import {
-  Button,
-  ButtonText,
-  Card,
-  H1,
-  H2,
-  H3,
-  Label,
-  Link,
-  Paragraph,
-  ScrollView,
-  Spinner,
-  Stack,
-  Text,
-  Theme,
-  View,
-  XStack,
-  YStack,
-  useThemeName,
-} from '@my/ui'
-import {
-  type UseDistributionsResultData,
-  useDistributions,
+  useMonthlyDistributions,
+  useSendMerkleDropIsClaimed,
   useSendMerkleDropTrancheActive,
 } from 'app/utils/distributions'
-import { useRewardsScreenParams } from 'app/routers/params'
-import { type TimeRemaining, useTimeRemaining } from 'app/utils/useTimeRemaining'
-import { useChainAddresses } from 'app/utils/useChainAddresses'
-import { DistributionClaimButton } from './components/DistributionClaimButton'
-import { type sendMerkleDropAddress, sendTokenAddress, useReadSendTokenBalanceOf } from '@my/wagmi'
-import { assert } from 'app/utils/assert'
-import formatAmount from 'app/utils/formatAmount'
-import { useSendPrice } from 'app/utils/coin-gecko'
-import { useConfirmedTags } from 'app/utils/tags'
-import { IconPlus } from 'app/components/icons'
 
 export function RewardsScreen() {
-  const { data: distributions, isLoading } = useDistributions()
-  const sortedDistributions = distributions?.sort((a, b) => a.number - b.number)
+  const { data: distributions, isLoading: isLoadingDistributions } = useMonthlyDistributions()
+  const currentDistribution = distributions?.[0]
+  const trancheId = BigInt((currentDistribution?.number ?? 0) - 1) // tranches are 0-indexed
+  const chainId = currentDistribution?.chain_id as keyof typeof sendMerkleDropAddress
+  const share = currentDistribution?.distribution_shares?.[0]
 
-  const [queryParams] = useRewardsScreenParams()
-  const selectedDistributionIndex = queryParams.distribution
-    ? queryParams.distribution - 1
-    : sortedDistributions
-      ? sortedDistributions.length - 1
-      : 0
-
-  const selectedDistribution = sortedDistributions?.at(selectedDistributionIndex)
-
-  if (isLoading)
-    return (
-      <Stack w="100%" f={1} jc={'center'} ai={'center'}>
-        <Spinner color="$color" size="large" />
-      </Stack>
-    )
+  // find out if the tranche is active using SendMerkleDrop.trancheActive(uint256 _tranche)
+  const { data: isTrancheActive, isLoading: isTrancheActiveLoading } =
+    useSendMerkleDropTrancheActive({
+      tranche: trancheId,
+      chainId: chainId,
+    })
+  // find out if user is eligible onchain using SendMerkleDrop.isClaimed(uint256 _tranche, uint256 _index)
+  const { data: isClaimed, isLoading: isClaimedLoading } = useSendMerkleDropIsClaimed({
+    chainId,
+    tranche: trancheId,
+    index: share?.index !== undefined ? BigInt(share.index) : undefined,
+  })
 
   return (
-    <YStack f={1} my="auto" gap="$6" pb="$2" $gtSm={{ pb: '$8', h: '95%' }} jc="space-between">
-      {selectedDistribution ? (
-        <>
-          <YStack gap="$4" f={2}>
-            <DistributionRewardsSection distribution={selectedDistribution} />
-          </YStack>
-          <DistributionRewardsList distributions={sortedDistributions} />
-        </>
-      ) : (
-        <Stack f={1} gap="$6" jc="center" ai="center">
-          <H2>No distributions available</H2>
-        </Stack>
-      )}
+    <YStack pt={'$size.3.5'} $gtLg={{ pt: 0 }} f={1}>
+      <YStack pb={'$size.3.5'}>
+        <YStack w={'100%'} mb={'$size.3.5'} gap={'$size.0.9'}>
+          <H1
+            size={'$9'}
+            fontWeight={'900'}
+            color="$color12"
+            tt={'uppercase'}
+            verticalAlign={'middle'}
+          >
+            Invest Time, EARN Send
+          </H1>
+          <Paragraph color={'$color10'} size={'$5'}>
+            Participate in the Send Ecosystem and earn Send Tokens. Your Network! Your Rewards!
+          </Paragraph>
+        </YStack>
+
+        <YStack $gtLg={{ flexDirection: 'row' }} gap={'$size.3.5'}>
+          {/* @TODO: href, reward */}
+          <Section
+            title="Activity Rewards"
+            href="/account/rewards/activity"
+            isLoading={isLoadingDistributions || isTrancheActiveLoading || isClaimedLoading}
+            reward={currentDistribution?.distribution_shares?.[0]?.amount.toLocaleString() ?? ''}
+            claimStatus={(() => {
+              switch (true) {
+                case !share || !share.amount:
+                  return undefined
+                case !isTrancheActive:
+                  return 'Upcoming Reward'
+                case isClaimed:
+                  return 'Claimed'
+                default:
+                  return 'Claimable'
+              }
+            })()}
+          />
+        </YStack>
+      </YStack>
     </YStack>
   )
 }
 
-const DistributionRewardsSection = ({
-  distribution,
-}: { distribution: UseDistributionsResultData[number] }) => {
-  const trancheId = BigInt(distribution.number - 1) // tranches are 0-indexed
-  const chainId = distribution.chain_id as keyof typeof sendMerkleDropAddress
-  const {
-    data: isTrancheActive,
-    isLoading: isTrancheActiveLoading,
-    error: isTrancheActiveError,
-  } = useSendMerkleDropTrancheActive({
-    tranche: trancheId,
-    chainId: chainId,
-  })
-  const shareAmount = distribution.distribution_shares?.[0]?.amount
-
-  const now = new Date()
-  const isBeforeQualification = now < distribution.qualification_start
-  const isDuringQualification =
-    now >= distribution.qualification_start && now <= distribution.qualification_end
-  const isAfterQualification = now > distribution.qualification_end
-  const isClaimable = now > distribution.qualification_end && now <= distribution.claim_end
-
-  const confirmedTags = useConfirmedTags()
-
-  const timeRemaining = useTimeRemaining(
-    isDuringQualification
-      ? distribution.qualification_end
-      : isClaimable
-        ? distribution.claim_end
-        : now
-  )
-
+const Section = ({
+  title,
+  href,
+  reward,
+  isLoading = false,
+  claimStatus,
+}: {
+  //@todo: using props like this is weird, better to pass children so we don't have to pass as much state
+  title: string
+  href: string
+  reward: string
+  isLoading?: boolean
+  claimStatus?: 'Claimable' | 'Claimed' | 'Upcoming Reward'
+}) => {
   return (
-    <YStack f={1} $lg={{ gap: '$5', pt: '$6' }} $gtSm={{ pt: '$6', gap: '$8' }}>
-      <Stack gap="$2" $gtSm={{ gap: '$6' }}>
-        <Label fontFamily={'$mono'} fontSize={'$5'}>
-          ROUND
-        </Label>
-        <XStack w="100%" ai="center" jc="space-around" mt="auto">
-          <Stack>
-            <Theme inverse>
-              <H1
-                fontFamily={'$mono'}
-                fontWeight={'300'}
-                fontSize={54}
-                $gtSm={{ fontSize: 79 }}
-                col="$background"
-              >
-                #{distribution.number}
-              </H1>
-            </Theme>
-          </Stack>
-          <View borderRightWidth={1} borderColor={'$decay'} w={0} h="100%" ai="stretch" mx="$4" />
-          <Stack
-            $gtSm={{ fd: 'row', gap: '$0' }}
-            fd="column"
-            gap="$4"
-            f={1}
-            justifyContent="space-between"
-          >
-            <YStack gap="$2" f={1} maw={312} jc="center">
-              <Theme inverse>
-                {(() => {
-                  switch (true) {
-                    case isBeforeQualification:
-                      return (
-                        <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$5'}>
-                          Round has not started
-                        </Paragraph>
-                      )
-                    case shareAmount === undefined ||
-                      shareAmount === 0 ||
-                      confirmedTags?.length === 0:
-                      return (
-                        <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$5'}>
-                          Not eligible
-                        </Paragraph>
-                      )
-                    case isDuringQualification:
-                      return (
-                        <>
-                          <Theme inverse>
-                            <Label fontFamily={'$mono'}>Closing in</Label>
-                          </Theme>
-                          <DistributionRewardTimer timeRemaining={timeRemaining} />
-                        </>
-                      )
-                    case isTrancheActiveLoading:
-                      return (
-                        <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$5'}>
-                          Checking claimability...
-                        </Paragraph>
-                      )
-                    case !!isTrancheActiveError:
-                      return (
-                        <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$5'}>
-                          Error checking claimability. Please try again later
-                        </Paragraph>
-                      )
-                    case isAfterQualification && !isTrancheActive:
-                      return (
-                        <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$5'}>
-                          Rewards will be available soon
-                        </Paragraph>
-                      )
+    <YStack
+      f={1}
+      pos={'relative'}
+      overflow="hidden"
+      borderRadius={'$6'}
+      backgroundColor={'$black'}
+      maw={500}
+    >
+      <Image
+        pos={'absolute'}
+        br={'$6'}
+        t={0}
+        zIndex={0}
+        source={{
+          height: 1024,
+          width: 1024,
+          uri: 'https://ghassets.send.app/app_images/flower.jpg',
+        }}
+        h={'100%'}
+        w={'100%'}
+        objectFit="cover"
+      />
+      <Stack pos="absolute" t={0} l={0} h="100%" w="100%" backgroundColor={'black'} opacity={0.2} />
 
-                    case isClaimable:
-                      return (
-                        <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$5'}>
-                          Claim Rewards
-                        </Paragraph>
-                      )
-                    default:
-                      return (
-                        <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$5'}>
-                          {`Expired ${now.toLocaleDateString(undefined, {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric',
-                          })}`}
-                        </Paragraph>
-                      )
-                  }
-                })()}
-              </Theme>
-            </YStack>
-            <YStack $gtSm={{ ai: 'flex-end' }}>
-              <Label fontFamily={'$mono'}>Status</Label>
-              <Theme inverse>
-                <DistributionStatus distribution={distribution} />
-              </Theme>
-            </YStack>
-          </Stack>
-        </XStack>
-      </Stack>
-      {confirmedTags?.length === -1 ? (
-        <Card
-          w="100%"
-          jc={'space-around'}
+      <YStack p={'$5'} jc="space-between" mih={290}>
+        <XStack
+          gap={6}
           ai="center"
-          f={1}
-          my="auto"
-          $md={{ br: '$6' }}
-          p="$6"
-          br="$6"
+          alignSelf="flex-start"
+          pos={'relative'}
+          p={'$size.0.75'}
+          pr={'$size.0.9'}
+          borderRadius={'$4'}
+          backgroundColor={'#1F352A'}
         >
-          <Paragraph fontSize={'$6'} $xs={{ fontSize: '$4' }} fontWeight={'500'} color={'$color12'}>
-            Register a Sendtag to unlock rewards
+          <IconSend size={24} color="$primary" />
+          <Paragraph size={'$5'} color="$white">
+            {title}
           </Paragraph>
-          <Stack jc="center" ai="center">
-            <Link
-              href={'/account/sendtag/checkout'}
-              theme="green"
-              borderRadius={'$4'}
-              p={'$3.5'}
-              $xs={{ p: '$2.5', px: '$4' }}
-              px="$6"
-              maw={301}
-              bg="$primary"
-            >
-              <XStack gap={'$1.5'} ai={'center'} jc="center">
-                <IconPlus col={'$black'} />
-                <Paragraph textTransform="uppercase" col={'$black'}>
-                  SENDTAGS
+        </XStack>
+        <XStack gap={'$size.1'} jc="space-between">
+          <YStack w="100%">
+            <Paragraph fontWeight={400} color={'$white'} size={'$5'}>
+              {isLoading ? '' : claimStatus}
+            </Paragraph>
+            <XStack ai={'center'} jc="space-between">
+              {isLoading ? (
+                <Stack />
+              ) : (
+                <Paragraph
+                  fontWeight={500}
+                  ff={'$mono'}
+                  size={'$8'}
+                  $gtXs={{ size: '$9' }}
+                  color="$white"
+                >
+                  {reward === '' ? '' : `${reward} SEND`}
                 </Paragraph>
-              </XStack>
-            </Link>
-          </Stack>
-        </Card>
-      ) : (
-        <Stack fd="column" $gtLg={{ fd: 'row', mah: 248 }} gap="$2" f={1} my="auto">
-          <YStack $gtLg={{ w: '50%' }} gap="$2" $gtSm={{ gap: '$4' }}>
-            <Stack f={1} gap="$2" $gtSm={{ gap: '$4' }}>
-              <SendBalanceCard distribution={distribution} />
-            </Stack>
-            <XStack f={1} gap="$2" $gtSm={{ gap: '$4' }}>
-              <MinBalanceCard hodler_min_balance={distribution.hodler_min_balance} />
-              <ReferralsCard
-                referrals={distribution.distribution_verifications_summary[0]?.tag_referrals ?? 0}
-              />
+              )}
+              <LinkableButton href={href} unstyled borderRadius={'$3'} p={'$size.0.5'}>
+                <Button.Icon>
+                  <IconArrowRight size={'3'} color={'$primary'} />
+                </Button.Icon>
+              </LinkableButton>
             </XStack>
           </YStack>
-          <Stack f={1} $gtLg={{ w: '50%', f: 1 }}>
-            <SendRewardsCard distribution={distribution} />
-          </Stack>
-        </Stack>
-      )}
-    </YStack>
-  )
-}
-
-const DistributionRewardTimer = ({ timeRemaining }: { timeRemaining: TimeRemaining }) => {
-  return (
-    <XStack ai={'flex-start'} jc="space-between" maw={312}>
-      <DistributionRewardTimerDigit>
-        {String(timeRemaining.days).padStart(2, '0')}D
-      </DistributionRewardTimerDigit>
-      <DistributionRewardTimerDigit>:</DistributionRewardTimerDigit>
-      <DistributionRewardTimerDigit>
-        {String(timeRemaining.hours).padStart(2, '0')}Hr
-      </DistributionRewardTimerDigit>
-      <DistributionRewardTimerDigit>:</DistributionRewardTimerDigit>
-      <DistributionRewardTimerDigit>
-        {String(timeRemaining.minutes).padStart(2, '0')}Min
-      </DistributionRewardTimerDigit>
-      <DistributionRewardTimerDigit>:</DistributionRewardTimerDigit>
-      <DistributionRewardTimerDigit>
-        {String(timeRemaining.seconds).padStart(2, '0')}Sec
-      </DistributionRewardTimerDigit>
-    </XStack>
-  )
-}
-
-const DistributionRewardTimerDigit = ({ children }: { children?: string | string[] }) => (
-  <Text
-    fontWeight={'500'}
-    fontSize="$5"
-    $gtMd={{ fontSize: '$7' }}
-    col="$background"
-    fontFamily={'$mono'}
-  >
-    {children}
-  </Text>
-)
-
-const SendBalanceCard = ({
-  distribution,
-}: { distribution: UseDistributionsResultData[number] }) => {
-  const {
-    data: addresses,
-    isLoading: isLoadingChainAddresses,
-    error: chainAddressesError,
-  } = useChainAddresses()
-
-  if (chainAddressesError) throw chainAddressesError
-
-  const address = addresses?.[0]?.address
-
-  const chainId = distribution.chain_id as keyof typeof sendTokenAddress
-  assert(chainId in sendTokenAddress, 'Chain ID not found in sendTokenAddress')
-
-  const {
-    data: snapshotBalance,
-    isLoading: isLoadingSnapshotBalance,
-    error: snapshotBalanceError,
-  } = useReadSendTokenBalanceOf({
-    chainId,
-    args: address ? [address] : undefined,
-    blockNumber: distribution.snapshot_block_num
-      ? BigInt(distribution.snapshot_block_num)
-      : undefined,
-    query: {
-      enabled: !!address,
-    },
-  })
-
-  if (snapshotBalanceError) throw snapshotBalanceError
-
-  return (
-    <Card
-      bw={1}
-      br={12}
-      theme="ghost_alt1"
-      p="$4"
-      $xs={{ p: '$2.5' }}
-      $gtLg={{ p: '$4' }}
-      jc="center"
-    >
-      <YStack gap="$2" $gtLg={{ gap: '$4' }}>
-        <Label
-          fontFamily={'$mono'}
-          fontSize={'$5'}
-          theme="green"
-          col={'$color2'}
-          $theme-light={{ col: '$color12' }}
-        >
-          Snapshot Send Balance
-        </Label>
-        {isLoadingSnapshotBalance || isLoadingChainAddresses ? (
-          <Spinner color={'$color'} />
-        ) : (
-          <Theme reset>
-            <Paragraph fontFamily={'$mono'} fontSize={'$7'} fontWeight={'500'} color={'$color12'}>
-              {(() => {
-                switch (true) {
-                  case snapshotBalance === undefined:
-                    return 'Error fetching SEND balance'
-                  default:
-                    return `${formatAmount(snapshotBalance.toString(), 9, 0)} SEND`
-                }
-              })()}
-            </Paragraph>
-          </Theme>
-        )}
-      </YStack>
-    </Card>
-  )
-}
-const MinBalanceCard = ({ hodler_min_balance }: { hodler_min_balance: number }) => (
-  <Card
-    f={2}
-    theme="ghost_alt1"
-    bw={1}
-    br={12}
-    $xs={{ p: '$2.5' }}
-    p="$4"
-    $gtLg={{ p: '$4' }}
-    jc="center"
-  >
-    <YStack gap="$2" $gtLg={{ gap: '$4' }}>
-      <Label
-        fontFamily={'$mono'}
-        fontSize={'$5'}
-        theme="green"
-        col={'$color2'}
-        $theme-light={{ col: '$color12' }}
-      >
-        Min Balance required
-      </Label>
-      <Paragraph fontFamily={'$mono'} fontSize={'$7'} fontWeight={'500'} color={'$color12'}>
-        {hodler_min_balance ? `${formatAmount(hodler_min_balance, 9, 0)} SEND` : '?'}
-      </Paragraph>
-    </YStack>
-  </Card>
-)
-
-const ReferralsCard = ({ referrals }: { referrals: number | null }) => (
-  <Card
-    f={1}
-    borderWidth={1}
-    br={12}
-    theme="ghost_alt1"
-    $xs={{ p: '$2.5' }}
-    p="$4"
-    $gtLg={{ p: '$4' }}
-    jc="center"
-  >
-    <YStack gap="$2" $gtLg={{ gap: '$4' }}>
-      <Label
-        fontFamily={'$mono'}
-        fontSize={'$5'}
-        theme="green"
-        col={'$color2'}
-        $theme-light={{ col: '$color12' }}
-      >
-        Referrals
-      </Label>
-
-      <Paragraph fontFamily={'$mono'} fontSize={'$7'} fontWeight={'500'} col={'$color12'}>
-        {referrals !== null ? referrals : '---'}
-      </Paragraph>
-    </YStack>
-  </Card>
-)
-
-const SendRewardsCard = ({
-  distribution,
-}: { distribution: UseDistributionsResultData[number] }) => {
-  const shareAmount = distribution.distribution_shares?.[0]?.amount
-  const { data: sendPrice } = useSendPrice()
-  const pricePerSend = sendPrice?.['send-token'].usd
-  const rewardValue = pricePerSend && shareAmount ? shareAmount * pricePerSend : undefined
-
-  return (
-    <Card f={1} mih={198} p="$6" $gtLg={{ f: 1, p: '$6' }} $gtMd={{ f: 2 }} br={12} jc="center">
-      <YStack gap="$4" mx="auto" jc="center" ai="center">
-        <Stack gap="$6">
-          <Label fontFamily={'$mono'} col="$olive" ta="left" fontSize={'$5'}>
-            Rewards
-          </Label>
-          <Stack>
-            <Theme inverse>
-              <Paragraph
-                fontFamily={'$mono'}
-                col="$background"
-                $gtXs={{ fontSize: '$10' }}
-                fontSize={'$9'}
-                fontWeight={'500'}
-                lh={40}
-              >
-                {shareAmount === undefined ? 'N/A' : `${formatAmount(shareAmount, 10, 0)} SEND`}
-              </Paragraph>
-            </Theme>
-            {rewardValue && (
-              <Paragraph fontFamily={'$mono'} col="$color8" opacity={0.6}>
-                {`${rewardValue.toFixed(2)} USD`}
-              </Paragraph>
-            )}
-          </Stack>
-        </Stack>
-        <DistributionClaimButton distribution={distribution} />
-      </YStack>
-    </Card>
-  )
-}
-
-const DistributionStatus = ({
-  distribution,
-}: { distribution: UseDistributionsResultData[number] }) => {
-  const isClaimActive = distribution.qualification_end > new Date()
-  return (
-    <H3 fontSize="$5" $gtMd={{ fontSize: '$7' }} fontWeight={'500'} col="$background">
-      {isClaimActive ? 'OPEN' : 'CLOSED'}
-    </H3>
-  )
-}
-
-const DistributionRewardsList = ({
-  distributions,
-}: { distributions?: (UseDistributionsResultData[number] | undefined)[] }) => {
-  const { isLoading, error } = useDistributions()
-  const [queryParams, setParams] = useRewardsScreenParams()
-
-  const isDark = useThemeName().includes('dark')
-
-  if (error) throw error
-
-  if (isLoading) return <DistributionRewardsSkeleton />
-
-  if (!distributions) return <DistributionRewardsSkeleton />
-
-  return (
-    <Stack my="auto">
-      <ScrollView
-        $gtLg={{ f: 1 }}
-        my="auto"
-        overflow="scroll"
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-        pb="$5"
-      >
-        <XStack w="100%" gap="$2" jc={'space-between'} maw={1072} mx="auto">
-          {distributions?.map((distribution, i) => {
-            return distribution?.id === undefined ? (
-              <Card
-                key={`inactive-${i + 1}`}
-                f={1}
-                maw={84}
-                miw="$7"
-                h="$2"
-                br={6}
-                disabled
-                jc="center"
-                opacity={0.5}
-              >
-                <Paragraph
-                  size={'$1'}
-                  padding={'unset'}
-                  ta="center"
-                  margin={'unset'}
-                  col="$color12"
-                >
-                  {`# ${i + 1}`}
-                </Paragraph>
-              </Card>
-            ) : queryParams.distribution === distribution?.number ||
-              (queryParams.distribution === undefined &&
-                distribution?.number === distributions?.length) ? (
-              <Stack key={distribution?.number ?? i + 1} maw={84} miw="$7" h="$2" jc="center">
-                <View
-                  theme="green_alt1"
-                  position="absolute"
-                  top={-5}
-                  left={0}
-                  right={0}
-                  mx="auto"
-                  w={0}
-                  h={0}
-                  borderLeftColor={'transparent'}
-                  borderRightColor={'transparent'}
-                  borderBottomColor={'$background'}
-                  borderBottomWidth={8}
-                  borderLeftWidth={8}
-                  borderRightWidth={8}
-                />
-                <Button
-                  theme="green"
-                  onPress={() =>
-                    setParams({ distribution: distribution?.number }, { webBehavior: 'replace' })
-                  }
-                  br={6}
-                  h="$2"
-                  disabled
-                >
-                  <ButtonText
-                    size={'$1'}
-                    padding={'unset'}
-                    ta="center"
-                    margin={'unset'}
-                    col="$black"
-                  >
-                    {`# ${distribution?.number}  `}
-                  </ButtonText>
-                </Button>
-              </Stack>
-            ) : (
-              <Button
-                key={distribution.number}
-                f={1}
-                maw={84}
-                miw="$7"
-                h="$2"
-                br={6}
-                theme={isDark ? 'green_alt2' : undefined}
-                $theme-light={{ bc: '$color2' }}
-                onPress={() =>
-                  setParams({ distribution: distribution?.number }, { webBehavior: 'replace' })
-                }
-              >
-                <ButtonText
-                  size={'$1'}
-                  padding={'unset'}
-                  ta="center"
-                  margin={'unset'}
-                  col="$color12"
-                >
-                  {`# ${distribution?.number}  `}
-                </ButtonText>
-              </Button>
-            )
-          })}
         </XStack>
-      </ScrollView>
-    </Stack>
+      </YStack>
+    </YStack>
   )
-}
-
-const DistributionRewardsSkeleton = () => {
-  return null
 }

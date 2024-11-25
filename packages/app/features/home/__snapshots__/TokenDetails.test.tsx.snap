@@ -6,6 +6,8 @@ exports[`TokenDetails 1`] = `
     {
       "flex": 1,
       "flexDirection": "column",
+      "gap": 24,
+      "paddingBottom": 24,
     }
   }
 >
@@ -13,7 +15,289 @@ exports[`TokenDetails 1`] = `
     style={
       {
         "flexDirection": "column",
-        "marginTop": 18,
+        "gap": 24,
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "backgroundColor": "#111f22",
+          "borderBottomLeftRadius": 16,
+          "borderBottomRightRadius": 16,
+          "borderTopLeftRadius": 16,
+          "borderTopRightRadius": 16,
+          "flexDirection": "column",
+          "justifyContent": "space-between",
+          "paddingBottom": 21,
+          "paddingLeft": 21,
+          "paddingRight": 21,
+          "paddingTop": 21,
+          "position": "relative",
+          "width": "100%",
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "flexDirection": "column",
+            "gap": 18,
+          }
+        }
+      >
+        <View
+          focusVisibleStyle={
+            {
+              "borderColor": "$background",
+            }
+          }
+          pointerEvents="none"
+          role="button"
+          style={
+            {
+              "alignItems": "center",
+              "backgroundColor": "transparent",
+              "borderBottomColor": "transparent",
+              "borderBottomLeftRadius": 16,
+              "borderBottomRightRadius": 16,
+              "borderBottomWidth": 1,
+              "borderLeftColor": "transparent",
+              "borderLeftWidth": 1,
+              "borderRightColor": "transparent",
+              "borderRightWidth": 1,
+              "borderStyle": "solid",
+              "borderTopColor": "transparent",
+              "borderTopLeftRadius": 16,
+              "borderTopRightRadius": 16,
+              "borderTopWidth": 1,
+              "flexDirection": "row",
+              "flexWrap": "nowrap",
+              "gap": 7,
+              "height": 44,
+              "justifyContent": "flex-start",
+              "paddingBottom": 0,
+              "paddingLeft": 0,
+              "paddingRight": 0,
+              "paddingTop": 0,
+              "shadowColor": "rgb(0,0,0)",
+              "shadowOffset": {
+                "height": 0,
+                "width": 0,
+              },
+              "shadowOpacity": 0,
+              "shadowRadius": 0,
+            }
+          }
+        >
+          <RNSVGSvgView
+            align="xMidYMid"
+            bbHeight={32}
+            bbWidth={32}
+            color="#FFFFFF"
+            focusable={false}
+            height={32}
+            meetOrSlice={0}
+            minX={0}
+            minY={0}
+            strokeWidth="2"
+            style={
+              [
+                {
+                  "backgroundColor": "transparent",
+                  "borderWidth": 0,
+                },
+                {},
+                {
+                  "flex": 0,
+                  "height": 32,
+                  "width": 32,
+                },
+              ]
+            }
+            tintColor="#FFFFFF"
+            vbHeight={32}
+            vbWidth={32}
+            width={32}
+          >
+            <RNSVGGroup
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+              propList={
+                [
+                  "strokeWidth",
+                ]
+              }
+              strokeWidth="2"
+            >
+              <RNSVGGroup
+                clipPath="clip0_265_2602"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+              >
+                <RNSVGPath
+                  d="M16 32C24.8691 32 32 24.8691 32 16C32 7.13091 24.8691 0 16 0C7.13091 0 0 7.13091 0 16C0 24.8691 7.13091 32 16 32Z"
+                  fill={
+                    {
+                      "payload": 4280776138,
+                      "type": 0,
+                    }
+                  }
+                  propList={
+                    [
+                      "fill",
+                    ]
+                  }
+                />
+                <RNSVGPath
+                  d="M20.402 18.5334C20.402 16.1999 19.0027 15.4003 16.1999 15.0657C14.201 14.8007 13.8012 14.2662 13.8012 13.3319C13.8012 12.3976 14.4704 11.7979 15.8001 11.7979C16.9995 11.7979 17.6687 12.1977 17.9989 13.1972C18.0641 13.3971 18.264 13.5318 18.4682 13.5318H19.5372C19.8023 13.5318 20.0065 13.3319 20.0065 13.0625V12.9973C19.7414 11.5285 18.5378 10.3987 17.0081 10.264V8.66486C17.0081 8.39979 16.8083 8.19555 16.4737 8.13037H15.4742C15.2091 8.13037 15.0049 8.33026 14.9397 8.66486V10.1988C12.9408 10.4639 11.6719 11.7979 11.6719 13.4666C11.6719 15.6654 13.006 16.5345 15.8045 16.8648C17.673 17.1994 18.2727 17.5991 18.2727 18.6638C18.2727 19.7284 17.3384 20.4628 16.0739 20.4628C14.34 20.4628 13.7404 19.7284 13.5405 18.729C13.4753 18.4639 13.2754 18.3292 13.0712 18.3292H11.937C11.6719 18.3292 11.4677 18.5291 11.4677 18.7985V18.8637C11.7328 20.5323 12.8017 21.7317 15.0005 22.0619V23.6611C15.0005 23.9261 15.2004 24.1304 15.535 24.1956H16.5345C16.7996 24.1956 17.0038 23.9957 17.069 23.6611V22.0619C19.0679 21.7273 20.402 20.3281 20.402 18.5291V18.5334Z"
+                  fill={
+                    {
+                      "payload": 4294967295,
+                      "type": 0,
+                    }
+                  }
+                  propList={
+                    [
+                      "fill",
+                    ]
+                  }
+                />
+                <RNSVGPath
+                  d="M12.6018 25.5339C7.40032 23.6653 4.73655 17.8685 6.67029 12.7321C7.66974 9.93365 9.86855 7.80002 12.6018 6.80057C12.8669 6.66586 13.0016 6.46597 13.0016 6.13136V5.19709C13.0016 4.93202 12.8669 4.72778 12.6018 4.6626C12.5367 4.6626 12.402 4.6626 12.3368 4.72778C6.00108 6.73538 2.5334 13.4665 4.53232 19.8022C5.73167 23.535 8.59967 26.403 12.3324 27.6023C12.5975 27.737 12.8669 27.6023 12.9321 27.3372C12.9973 27.272 12.9973 27.2025 12.9973 27.0722V26.1379C12.9973 25.938 12.7974 25.6686 12.5975 25.5382L12.6018 25.5339ZM19.6676 4.73213C19.4025 4.59742 19.1331 4.73213 19.0679 4.9972C19.0027 5.06238 19.0027 5.13191 19.0027 5.26227V6.19655C19.0027 6.46162 19.2026 6.73104 19.4025 6.86575C24.604 8.7343 27.2678 14.5311 25.3341 19.6675C24.3346 22.466 22.1358 24.5996 19.4025 25.599C19.1374 25.7338 19.0027 25.9336 19.0027 26.2682V27.2025C19.0027 27.4676 19.1374 27.6718 19.4025 27.737C19.4677 27.737 19.6024 27.737 19.6676 27.6718C25.9989 25.6729 29.4666 18.9374 27.4677 12.6061C26.2683 8.80817 23.3351 5.94016 19.6676 4.74082V4.73213Z"
+                  fill={
+                    {
+                      "payload": 4294967295,
+                      "type": 0,
+                    }
+                  }
+                  propList={
+                    [
+                      "fill",
+                    ]
+                  }
+                />
+              </RNSVGGroup>
+              <RNSVGDefs>
+                <clipPath
+                  id="clip0_265_2602"
+                >
+                  <RNSVGRect
+                    fill={
+                      {
+                        "payload": 4294967295,
+                        "type": 0,
+                      }
+                    }
+                    height="32"
+                    propList={
+                      [
+                        "fill",
+                      ]
+                    }
+                    width="32"
+                    x={0}
+                    y={0}
+                  />
+                </clipPath>
+              </RNSVGDefs>
+            </RNSVGGroup>
+          </RNSVGSvgView>
+          <View
+            pointerEvents="none"
+            style={
+              {
+                "height": 0,
+                "minHeight": 0,
+                "minWidth": 11.088000000000001,
+                "width": 11.088000000000001,
+              }
+            }
+          />
+          <Text
+            lineBreakMode="clip"
+            numberOfLines={1}
+            style={
+              {
+                "color": "#FFFFFF",
+                "flexGrow": 0,
+                "flexShrink": 1,
+                "fontFamily": "System",
+                "fontSize": 24,
+                "fontWeight": "700",
+                "lineHeight": 25,
+                "textTransform": "uppercase",
+                "userSelect": "none",
+              }
+            }
+            suppressHighlighting={true}
+          >
+            USDC
+          </Text>
+        </View>
+        <View
+          style={
+            {
+              "flexDirection": "column",
+              "gap": 18,
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "flex-end",
+                "flexDirection": "row",
+                "gap": 7,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "fontFamily": "System",
+                  "fontSize": 55.199999999999996,
+                  "fontWeight": "900",
+                  "lineHeight": 38,
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              0
+            </Text>
+            <Text
+              style={
+                {
+                  "color": "#B2B2B2",
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            />
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "flexDirection": "column",
+        "gap": 13,
       }
     }
   >
@@ -37,108 +321,31 @@ exports[`TokenDetails 1`] = `
           "color": "#FFFFFF",
           "display": "flex",
           "fontFamily": "System",
-          "fontSize": 19.2,
+          "fontSize": 21.599999999999998,
           "fontWeight": "500",
           "lineHeight": 44,
-          "textTransform": "uppercase",
           "userSelect": "none",
         }
       }
       suppressHighlighting={true}
     >
-      USDC BALANCE
+      Activity
     </Text>
     <View
       style={
         {
-          "alignItems": "flex-end",
-          "flexDirection": "row",
-          "gap": 7,
-        }
-      }
-    >
-      <Text
-        accessibilityRole="header"
-        style={
-          {
-            "color": "#FFFFFF",
-            "fontFamily": "System",
-            "fontSize": 46,
-            "fontWeight": "700",
-            "lineHeight": 38,
-            "marginBottom": 0,
-            "marginLeft": 0,
-            "marginRight": 0,
-            "marginTop": 0,
-            "textTransform": "none",
-            "userSelect": "auto",
-          }
-        }
-        suppressHighlighting={true}
-      >
-        0
-      </Text>
-      <Text
-        style={
-          {
-            "color": "#B2B2B2",
-            "fontFamily": "System",
-            "fontSize": 16.8,
-            "fontWeight": "400",
-            "lineHeight": 19,
-            "userSelect": "auto",
-          }
-        }
-        suppressHighlighting={true}
-      />
-    </View>
-  </View>
-  <View
-    style={
-      {
-        "paddingBottom": 18,
-        "paddingTop": 18,
-        "width": "100%",
-      }
-    }
-  >
-    <View
-      style={
-        {
-          "borderBottomColor": "#343434",
-          "borderBottomWidth": 1,
-          "borderLeftColor": "#343434",
-          "borderLeftWidth": 0,
-          "borderRightColor": "#343434",
-          "borderRightWidth": 0,
-          "borderStyle": "solid",
-          "borderTopColor": "#343434",
-          "borderTopWidth": 0,
-          "flex": 1,
-          "flexShrink": 0,
-          "height": 0,
-          "maxHeight": 0,
-          "transform": [
-            {
-              "translateY": -0.5,
-            },
-          ],
-        }
-      }
-    />
-  </View>
-  <View
-    style={
-      {
-        "flexDirection": "column",
-      }
-    }
-  >
-    <View
-      style={
-        {
+          "backgroundColor": "#111f22",
+          "borderBottomLeftRadius": 16,
+          "borderBottomRightRadius": 16,
+          "borderTopLeftRadius": 16,
+          "borderTopRightRadius": 16,
           "flexDirection": "column",
           "gap": 24,
+          "paddingBottom": 24,
+          "paddingLeft": 24,
+          "paddingRight": 24,
+          "paddingTop": 24,
+          "position": "relative",
         }
       }
       testID="TokenDetailsHistory"
@@ -194,13 +401,10 @@ exports[`TokenDetails 1`] = `
           style={
             {
               "alignItems": "center",
-              "borderBottomColor": "#3E4A3C",
-              "borderBottomWidth": 1,
-              "borderStyle": "solid",
               "flexDirection": "row",
               "gap": 18,
               "justifyContent": "space-between",
-              "paddingBottom": 24,
+              "paddingBottom": 7,
               "width": "100%",
             }
           }
@@ -363,19 +567,20 @@ exports[`TokenDetails 1`] = `
                     {
                       "color": "#FFFFFF",
                       "fontFamily": "System",
-                      "fontSize": 24,
+                      "fontSize": 21.599999999999998,
                     }
                   }
                   suppressHighlighting={true}
                 >
-                  Sent
+                  Withdraw
                 </Text>
                 <Text
                   style={
                     {
                       "color": "#FFFFFF",
                       "fontFamily": "System",
-                      "fontSize": 24,
+                      "fontSize": 19.2,
+                      "textAlign": "right",
                     }
                   }
                   suppressHighlighting={true}
@@ -388,7 +593,7 @@ exports[`TokenDetails 1`] = `
                   {
                     "alignItems": "flex-start",
                     "flex": 1,
-                    "flexDirection": "column",
+                    "flexDirection": "row",
                     "gap": 4,
                     "justifyContent": "space-between",
                     "overflow": "hidden",
@@ -399,26 +604,34 @@ exports[`TokenDetails 1`] = `
                 <Text
                   style={
                     {
-                      "color": "#86AE80",
+                      "color": "#B2B2B2",
                       "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
                       "maxWidth": "100%",
                       "overflow": "hidden",
+                      "userSelect": "auto",
                     }
                   }
                   suppressHighlighting={true}
                 >
-                  0x93F2FA7A16a7365e3895b0F6E6Ac7a832d6c761a
+                  0x93F...761a
                 </Text>
                 <Text
                   style={
                     {
-                      "color": "#FFFFFF",
+                      "color": "#B2B2B2",
                       "fontFamily": "System",
+                      "fontSize": 15.6,
+                      "fontWeight": "300",
+                      "lineHeight": 18,
+                      "userSelect": "auto",
                     }
                   }
                   suppressHighlighting={true}
                 >
-                  6/2/2024, 2:22:06 AM
+                  5 mon ago
                 </Text>
               </View>
             </View>
@@ -455,13 +668,10 @@ exports[`TokenDetails 1`] = `
           style={
             {
               "alignItems": "center",
-              "borderBottomColor": "#3E4A3C",
-              "borderBottomWidth": 1,
-              "borderStyle": "solid",
               "flexDirection": "row",
               "gap": 18,
               "justifyContent": "space-between",
-              "paddingBottom": 24,
+              "paddingBottom": 7,
               "width": "100%",
             }
           }
@@ -624,7 +834,7 @@ exports[`TokenDetails 1`] = `
                     {
                       "color": "#FFFFFF",
                       "fontFamily": "System",
-                      "fontSize": 24,
+                      "fontSize": 21.599999999999998,
                     }
                   }
                   suppressHighlighting={true}
@@ -636,7 +846,8 @@ exports[`TokenDetails 1`] = `
                     {
                       "color": "#FFFFFF",
                       "fontFamily": "System",
-                      "fontSize": 24,
+                      "fontSize": 19.2,
+                      "textAlign": "right",
                     }
                   }
                   suppressHighlighting={true}
@@ -649,7 +860,7 @@ exports[`TokenDetails 1`] = `
                   {
                     "alignItems": "flex-start",
                     "flex": 1,
-                    "flexDirection": "column",
+                    "flexDirection": "row",
                     "gap": 4,
                     "justifyContent": "space-between",
                     "overflow": "hidden",
@@ -660,26 +871,34 @@ exports[`TokenDetails 1`] = `
                 <Text
                   style={
                     {
-                      "color": "#86AE80",
+                      "color": "#B2B2B2",
                       "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
                       "maxWidth": "100%",
                       "overflow": "hidden",
+                      "userSelect": "auto",
                     }
                   }
                   suppressHighlighting={true}
                 >
-                  0xa71CE00000000000000000000000000000000000
+                  0xa71...0000
                 </Text>
                 <Text
                   style={
                     {
-                      "color": "#FFFFFF",
+                      "color": "#B2B2B2",
                       "fontFamily": "System",
+                      "fontSize": 15.6,
+                      "fontWeight": "300",
+                      "lineHeight": 18,
+                      "userSelect": "auto",
                     }
                   }
                   suppressHighlighting={true}
                 >
-                  6/2/2024, 2:22:02 AM
+                  5 mon ago
                 </Text>
               </View>
             </View>
@@ -716,13 +935,10 @@ exports[`TokenDetails 1`] = `
           style={
             {
               "alignItems": "center",
-              "borderBottomColor": "#3E4A3C",
-              "borderBottomWidth": 1,
-              "borderStyle": "solid",
               "flexDirection": "row",
               "gap": 18,
               "justifyContent": "space-between",
-              "paddingBottom": 24,
+              "paddingBottom": 7,
               "width": "100%",
             }
           }
@@ -885,7 +1101,7 @@ exports[`TokenDetails 1`] = `
                     {
                       "color": "#FFFFFF",
                       "fontFamily": "System",
-                      "fontSize": 24,
+                      "fontSize": 21.599999999999998,
                     }
                   }
                   suppressHighlighting={true}
@@ -897,7 +1113,8 @@ exports[`TokenDetails 1`] = `
                     {
                       "color": "#FFFFFF",
                       "fontFamily": "System",
-                      "fontSize": 24,
+                      "fontSize": 19.2,
+                      "textAlign": "right",
                     }
                   }
                   suppressHighlighting={true}
@@ -910,7 +1127,7 @@ exports[`TokenDetails 1`] = `
                   {
                     "alignItems": "flex-start",
                     "flex": 1,
-                    "flexDirection": "column",
+                    "flexDirection": "row",
                     "gap": 4,
                     "justifyContent": "space-between",
                     "overflow": "hidden",
@@ -918,29 +1135,43 @@ exports[`TokenDetails 1`] = `
                   }
                 }
               >
+                <View
+                  href="/profile/42"
+                  testID="MockSolitoLink"
+                >
+                  <Text
+                    style={
+                      {
+                        "color": "#B2B2B2",
+                        "fontFamily": "System",
+                        "fontSize": 16.8,
+                        "fontWeight": "400",
+                        "lineHeight": 19,
+                        "maxWidth": "100%",
+                        "overflow": "hidden",
+                        "textDecorationLine": "underline",
+                        "userSelect": "auto",
+                      }
+                    }
+                    suppressHighlighting={true}
+                  >
+                    /alice
+                  </Text>
+                </View>
                 <Text
                   style={
                     {
-                      "color": "#86AE80",
+                      "color": "#B2B2B2",
                       "fontFamily": "System",
-                      "maxWidth": "100%",
-                      "overflow": "hidden",
+                      "fontSize": 15.6,
+                      "fontWeight": "300",
+                      "lineHeight": 18,
+                      "userSelect": "auto",
                     }
                   }
                   suppressHighlighting={true}
                 >
-                  /alice
-                </Text>
-                <Text
-                  style={
-                    {
-                      "color": "#FFFFFF",
-                      "fontFamily": "System",
-                    }
-                  }
-                  suppressHighlighting={true}
-                >
-                  6/2/2024, 2:21:44 AM
+                  5 mon ago
                 </Text>
               </View>
             </View>

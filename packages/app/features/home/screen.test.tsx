@@ -8,6 +8,20 @@ jest.mock('app/routers/params', () => ({
   useNav: jest.fn().mockReturnValue([undefined, jest.fn()]),
 }))
 
+jest.mock('@react-native-async-storage/async-storage', () => ({
+  getItem: jest.fn().mockReturnValue(Promise.resolve(null)),
+  setItem: jest.fn().mockReturnValue(Promise.resolve()),
+}))
+
+jest.mock('react-use-precision-timer', () => ({
+  useStopwatch: jest.fn().mockReturnValue({
+    isRunning: jest.fn().mockReturnValue(false),
+    start: jest.fn(),
+    pause: jest.fn(),
+    getElapsedRunningTime: jest.fn().mockReturnValue(0),
+  }),
+}))
+
 jest.mock('solito', () => {
   // console.log('mock solito')
   const mockCreateParam = jest.fn(() => {
@@ -97,6 +111,13 @@ jest.mock('app/utils/send-accounts', () => ({
       sendid: 1,
       all_tags: ['test'],
     },
+  }),
+}))
+
+jest.mock('app/utils/useIsSendingUnlocked', () => ({
+  useIsSendingUnlocked: jest.fn().mockReturnValue({
+    isSendingUnlocked: true,
+    isLoading: false,
   }),
 }))
 

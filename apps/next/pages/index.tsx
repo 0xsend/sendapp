@@ -1,6 +1,6 @@
 import type { Database } from '@my/supabase/database.types'
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
-import { ButtonOption, TopNav } from 'app/components/TopNav'
+import { TopNav } from 'app/components/TopNav'
 import { HomeLayout } from 'app/features/home/layout.web'
 import { HomeScreen } from 'app/features/home/screen'
 import { SplashScreen } from 'app/features/splash/screen'
@@ -33,13 +33,11 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
   return (
     <>
       <Head>
-        <title>Send | Home</title>
+        <title>Send</title>
       </Head>
       {session ? (
         <MobileButtonRowLayout.Home>
-          <HomeLayout
-            TopNav={<TopNav header="Home" button={ButtonOption.PROFILE} showLogo={true} />}
-          >
+          <HomeLayout TopNav={<TopNav header="Home" showLogo={true} />}>
             <HomeScreen />
           </HomeLayout>
         </MobileButtonRowLayout.Home>

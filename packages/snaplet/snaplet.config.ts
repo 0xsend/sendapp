@@ -52,22 +52,29 @@ export default defineConfig({
     // @ts-ignore
     pgtap: false,
     public: {
-      // activity: false,
+      challenges: false,
+      activity: false,
+      send_account_transfers: false,
+      send_token_transfers: false,
+      receipts: false,
+      tag_receipts: false,
     },
   },
   // TODO: figure out how much data we need to snapshot
   // subset: {
   //   targets: [
-  //     // {
-  //     //   table: "public.activity",
-  //     //   orderBy: `"activity"."created_at" desc`,
-  //     //   percent: 10
-  //     // },
-  //     // {
-  //     //   table: "public.send_account_transfers",
-  //     //   orderBy: `"send_account_transfers"."block_num" desc`,
-  //     //   percent: 5
-  //     // }
+  //     {
+  //       table: 'public.activity',
+  //       orderBy: `"activity"."created_at" desc`,
+  //       where: `"activity"."created_at" > current_date - interval '31 day'`,
+  //     },
+  //     {
+  //       table: 'public.send_account_transfers',
+  //       orderBy: `"send_account_transfers"."block_num" desc`,
+  //       // 30 days of transfers
+  //       // avg 2 sec block time means 86400 / 2 = 43200 blocks per day
+  //       where: `"send_account_transfers"."block_time" > (43200 * 31)`,
+  //     },
   //   ],
   // },
   transform: {
@@ -89,6 +96,7 @@ export default defineConfig({
         }
 
         return {
+          ...row,
           email: copycat.email(row.email, {
             limit: 255,
           }),
@@ -99,34 +107,45 @@ export default defineConfig({
     },
     storage: {
       buckets: ({ row }) => {
-        return {}
+        return row
       },
       objects: ({ row }) => {
-        return {}
+        return row
       },
     },
 
     public: {
       profiles: ({ row }) => {
         return {
+          ...row,
           name: copycat.fullName(row.name),
           about: copycat.sentence(row.about),
           referral_code: copycat.scramble(row.referral_code),
         }
       },
+      send_accounts: ({ row }) => {
+        return row
+      },
       send_account_transfers: ({ row }) => {
-        return {}
+        return row
       },
       send_account_created: ({ row }) => {
-        return {}
+        return row
       },
       send_token_transfers: ({ row }) => {
-        return {}
+        return row
       },
       tags: ({ row }) => {
-        return {
-          // name: tagName(copycat.username(row.name)),
-        }
+        return row
+      },
+      distributions: ({ row }) => {
+        return row
+      },
+      distribution_shares: ({ row }) => {
+        return row
+      },
+      distribution_verification_values: ({ row }) => {
+        return row
       },
       distribution_verifications: ({ row }) => {
         if (row.metadata === null) {
@@ -146,19 +165,13 @@ export default defineConfig({
         }
       },
       referrals: ({ row }) => {
-        return {
-          // tag: tagName(row.tag),
-        }
+        return row
       },
       tag_receipts: ({ row }) => {
-        return {
-          // tag_name: tagName(row.tag_name),
-        }
+        return row
       },
       tag_reservations: ({ row }) => {
-        return {
-          // tag_name: tagName(row.tag_name),
-        }
+        return row
       },
     },
   },

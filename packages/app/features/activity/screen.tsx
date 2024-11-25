@@ -6,7 +6,6 @@ import {
   H4,
   Paragraph,
   ScrollView,
-  Separator,
   Spinner,
   Text,
   XStack,
@@ -29,9 +28,9 @@ const suggestions = [
 export function ActivityScreen() {
   return (
     <TagSearchProvider>
-      <YStack f={1} width={'100%'} pb="$3">
+      <YStack f={1} width={'100%'} pb="$4" gap="$6" $lg={{ pt: '$3' }}>
         <YStack width={'100%'} gap="$size.1.5" $gtSm={{ gap: '$size.2.5' }}>
-          <Search label="SEARCH BY" />
+          <Search />
         </YStack>
         <ActivityBody />
       </YStack>
@@ -71,7 +70,6 @@ function ActivityBody() {
             <Suggestions />
           */}
 
-          <Separator $gtMd={{ display: 'none' }} />
           <RecentActivity />
         </YStack>
       )}

@@ -29,7 +29,7 @@ import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
 import { Adapt, Dialog, Sheet } from 'tamagui'
 import { type Address, isAddress } from 'viem'
-import { IconAccount } from './icons'
+import { IconAccount, IconSearch } from './icons'
 import { baseMainnet } from '@my/wagmi'
 import { useEnsName } from 'wagmi'
 
@@ -104,7 +104,6 @@ function SearchResults() {
       key="searchResults"
       animation="quick"
       gap="$size.2.5"
-      mt="$size.3.5"
       width="100%"
       enterStyle={{
         opacity: 0,
@@ -453,7 +452,13 @@ function Search({ label, placeholder = 'Sendtag, Phone, Send ID, Address' }: Sea
   return (
     <>
       {label !== undefined && (
-        <H4 color="$gray11Light" fontFamily={'$mono'} fontWeight={'500'} size={'$5'}>
+        <H4
+          color="$gray11Light"
+          fontFamily={'$mono'}
+          fontWeight={'500'}
+          size={'$5'}
+          tt={'uppercase'}
+        >
           {label}
         </H4>
       )}
@@ -468,9 +473,10 @@ function Search({ label, placeholder = 'Sendtag, Phone, Send ID, Address' }: Sea
             schema={SearchSchema}
             props={{
               query: {
+                pr: '$size.3.5',
+                pl: '$8',
                 accessibilityRole: 'search',
                 placeholder,
-                pr: '$size.3.5',
                 hoverStyle: {
                   boc: '$color12',
                 },
@@ -480,6 +486,7 @@ function Search({ label, placeholder = 'Sendtag, Phone, Send ID, Address' }: Sea
                 $gtLg: {
                   w: 455,
                 },
+                iconBefore: <IconSearch />,
               },
             }}
             formProps={{

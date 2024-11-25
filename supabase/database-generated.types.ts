@@ -58,21 +58,21 @@ export type Database = {
         Row: {
           created_at: string
           id: string
-          paymaster_tx_count: number
+          send_plus_minus: number
           updated_at: string
           user_id: string | null
         }
         Insert: {
           created_at?: string
           id?: string
-          paymaster_tx_count?: number
+          send_plus_minus?: number
           updated_at?: string
           user_id?: string | null
         }
         Update: {
           created_at?: string
           id?: string
-          paymaster_tx_count?: number
+          send_plus_minus?: number
           updated_at?: string
           user_id?: string | null
         }
@@ -242,6 +242,7 @@ export type Database = {
           metadata: Json | null
           type: Database["public"]["Enums"]["verification_type"]
           user_id: string
+          weight: number
         }
         Insert: {
           created_at?: string
@@ -250,6 +251,7 @@ export type Database = {
           metadata?: Json | null
           type: Database["public"]["Enums"]["verification_type"]
           user_id: string
+          weight?: number
         }
         Update: {
           created_at?: string
@@ -258,6 +260,7 @@ export type Database = {
           metadata?: Json | null
           type?: Database["public"]["Enums"]["verification_type"]
           user_id?: string
+          weight?: number
         }
         Relationships: [
           {
@@ -426,7 +429,7 @@ export type Database = {
           {
             foreignKeyName: "referrals_referred_id_fkey"
             columns: ["referred_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -1112,31 +1115,51 @@ export type Database = {
         }
         Relationships: []
       }
-      distribution_verifications_summary: {
+      affiliate_referrals: {
         Row: {
-          distribution_id: number | null
-          has_create_passkey: boolean | null
-          has_send_one_hundred: boolean | null
-          has_send_ten: boolean | null
-          multipliers: Json | null
-          tag_referrals: number | null
-          tag_registrations: number | null
-          total_referrals: number | null
+          referral:
+            | Database["public"]["CompositeTypes"]["affiliate_referral_type"]
+            | null
+        }
+        Relationships: []
+      }
+      affiliate_stats_summary: {
+        Row: {
+          affiliate_send_score: number | null
+          created_at: string | null
+          id: string | null
+          network_plus_minus: number | null
+          referral_count: number | null
+          send_plus_minus: number | null
           user_id: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "distribution_verifications_distribution_id_fkey"
+            foreignKeyName: "affiliate_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      distribution_verifications_summary: {
+        Row: {
+          distribution_id: number | null
+          multipliers:
+            | Database["public"]["CompositeTypes"]["multiplier_info"][]
+            | null
+          user_id: string | null
+          verification_values:
+            | Database["public"]["CompositeTypes"]["verification_value_info"][]
+            | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "distribution_verification_values_distribution_id_fkey"
             columns: ["distribution_id"]
             isOneToOne: false
             referencedRelation: "distributions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "distribution_verifications_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -1233,6 +1256,28 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_affiliate_referrals: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          referred_id: string
+          send_plus_minus: number
+          avatar_url: string
+          tag: string
+          created_at: string
+        }[]
+      }
+      get_affiliate_stats_summary: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          created_at: string
+          user_id: string
+          send_plus_minus: number
+          referral_count: number
+          network_plus_minus: number
+          affiliate_send_score: number
+        }[]
+      }
       insert_challenge: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -1325,6 +1370,8 @@ export type Database = {
         | "send_ten"
         | "send_one_hundred"
         | "total_tag_referrals"
+        | "send_streak"
+      verification_value_mode: "individual" | "aggregate"
     }
     CompositeTypes: {
       activity_feed_user: {
@@ -1334,11 +1381,42 @@ export type Database = {
         send_id: number
         tags: unknown
       }
+      affiliate_referral_type: {
+        referred_id: string
+        send_plus_minus: number
+        avatar_url: string
+        tag: string
+        created_at: string
+      }
+      affiliate_stats_summary_type: {
+        id: number
+        created_at: string
+        user_id: string
+        send_plus_minus: number
+        referral_count: number
+        network_plus_minus: number
+        affiliate_send_score: number
+      }
+      multiplier_info: {
+        type: string
+        value: number
+        multiplier_min: number
+        multiplier_max: number
+        multiplier_step: number
+        metadata: Json
+      }
       tag_search_result: {
         avatar_url: string
         tag_name: string
         send_id: number
         phone: string
+      }
+      verification_value_info: {
+        type: string
+        weight: number
+        fixed_value: number
+        bips_value: number
+        metadata: Json
       }
     }
   }

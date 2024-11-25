@@ -1,6 +1,6 @@
 import { Button, Paragraph, Spinner, Stack, SubmitButton, XStack, YStack } from '@my/ui'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
-import { coins, type coin } from 'app/data/coins'
+import { type coins, coinsDict, type coin } from 'app/data/coins'
 import { useSendScreenParams } from 'app/routers/params'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import formatAmount from 'app/utils/formatAmount'
@@ -8,15 +8,11 @@ import { useSendAccount } from 'app/utils/send-accounts'
 import { useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
-import { formatUnits, parseUnits } from 'viem'
+import { formatUnits } from 'viem'
 import { useBalance } from 'wagmi'
 import { z } from 'zod'
 import { SendRecipient } from './confirm/screen'
-
-const removeDuplicateInString = (text: string, substring: string) => {
-  const [first, ...after] = text.split(substring)
-  return first + (after.length ? `${substring}${after.join('')}` : '')
-}
+import { sanitizeAmount, localizeAmount } from 'app/utils/formatAmount'
 
 const SendAmountSchema = z.object({
   amount: formFields.text,
@@ -44,11 +40,13 @@ export function SendAmountForm() {
   })
 
   useEffect(() => {
-    const subscription = form.watch(({ amount, token }) => {
+    const subscription = form.watch(({ amount, token: _token }) => {
+      const token = _token as keyof typeof coinsDict
+      const sanitizedAmount = sanitizeAmount(amount, coinsDict[token].decimals)
       setSendParams(
         {
           ...sendParams,
-          amount: amount,
+          amount: sanitizedAmount.toString(),
           sendToken: token as coins[number]['token'],
         },
         { webBehavior: 'replace' }
@@ -58,8 +56,8 @@ export function SendAmountForm() {
   }, [form, setSendParams, sendParams])
 
   const sendToken = sendParams.sendToken ?? usdcAddress[baseMainnet.id]
-  const selectedCoin = coins.find((c) => c.token === sendToken) ?? (coins[0] as coin)
-  const parsedAmount = parseUnits(sendParams.amount ?? '0', selectedCoin.decimals)
+  const parsedAmount = BigInt(sendParams.amount ?? '0')
+  const formAmount = form.watch('amount')
 
   const canSubmit =
     !balanceIsLoading &&
@@ -71,13 +69,12 @@ export function SendAmountForm() {
   async function onSubmit() {
     if (!canSubmit) return
 
-    const amount = formatUnits(parsedAmount, selectedCoin.decimals)
     router.push({
       pathname: '/send/confirm',
       query: {
         idType: sendParams.idType,
         recipient: sendParams.recipient,
-        amount: amount,
+        amount: sendParams.amount,
         sendToken: sendToken,
       },
     })
@@ -102,10 +99,33 @@ export function SendAmountForm() {
             $sm: {
               bc: 'transparent',
               w: '100%',
-              ta: 'center',
+              fontSize: (() => {
+                switch (true) {
+                  case formAmount === undefined:
+                    return '$14'
+                  case formAmount.length > 6:
+                    return '$11'
+                  case formAmount.length > 9:
+                    return '$9'
+                  default:
+                    return '$14'
+                }
+              })(),
             },
             color: '$color12',
-            fontSize: 112,
+            fontSize: (() => {
+              switch (true) {
+                case formAmount === undefined:
+                  return 112
+                case formAmount.length > 9:
+                  return '$12'
+
+                case formAmount.length > 6:
+                  return '$13'
+                default:
+                  return 112
+              }
+            })(),
             fontWeight: '400',
             lineHeight: '$1',
             autoFocus: true,
@@ -121,9 +141,9 @@ export function SendAmountForm() {
             outlineStyle: 'solid',
             fontFamily: '$mono',
             inputMode: balance?.decimals ? 'decimal' : 'numeric',
-            onChangeText: (text) => {
-              const formattedText = removeDuplicateInString(text, '.').replace(/[^0-9.]/g, '') //remove duplicate "." then filter out any letters
-              form.setValue('amount', formattedText)
+            onChangeText: (amount) => {
+              const localizedAmount = localizeAmount(amount)
+              form.setValue('amount', localizedAmount)
             },
           },
           token: {
@@ -134,13 +154,14 @@ export function SendAmountForm() {
           testID: 'SendForm',
           $gtSm: { maxWidth: '100%' },
           jc: 'flex-start',
-          als: 'flex-start',
           f: 1,
           height: '100%',
         }}
         defaultValues={{
           token: sendToken,
-          amount: sendParams.amount,
+          amount: sendParams.amount
+            ? localizeAmount(formatUnits(BigInt(sendParams.amount), coinsDict[sendToken].decimals))
+            : undefined,
         }}
         renderAfter={({ submit }) => (
           <YStack gap="$5" $gtSm={{ maw: 500 }} $gtLg={{ mx: 0 }} mx="auto">

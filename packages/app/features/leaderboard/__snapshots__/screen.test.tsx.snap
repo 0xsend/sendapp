@@ -355,45 +355,6 @@ exports[`LeaderboardScreen renders leaderboard screen: LeaderboardScreen 1`] = `
             </Text>
           </View>
         </View>
-        <View
-          style={
-            {
-              "borderBottomLeftRadius": 22,
-              "borderBottomRightRadius": 22,
-              "bottom": 0,
-              "flexDirection": "column",
-              "height": 94,
-              "overflow": "hidden",
-              "position": "absolute",
-              "width": "100%",
-            }
-          }
-        >
-          <ViewManagerAdapter_ExpoLinearGradient
-            colors={
-              [
-                0,
-                4279377955,
-              ]
-            }
-            locations={
-              [
-                0,
-                1,
-              ]
-            }
-            style={
-              {
-                "bottom": 0,
-                "left": 0,
-                "position": "absolute",
-                "right": 0,
-                "top": 0,
-                "zIndex": 0,
-              }
-            }
-          />
-        </View>
       </View>
     </View>
   </View>

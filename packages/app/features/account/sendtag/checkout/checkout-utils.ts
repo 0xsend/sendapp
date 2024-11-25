@@ -8,6 +8,7 @@ import {
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import { reward, total } from 'app/data/sendtags'
+import { api } from 'app/utils/api'
 import { assert } from 'app/utils/assert'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
@@ -19,6 +20,7 @@ import { useUSDCFees } from 'app/utils/useUSDCFees'
 import { useUser } from 'app/utils/useUser'
 import { useMemo } from 'react'
 import { encodeFunctionData, erc20Abi, zeroAddress } from 'viem'
+import { fetchSendtagCheckoutReceipts } from './checkout-utils.fetchSendtagCheckoutReceipts'
 
 export const verifyAddressMsg = (a: string | `0x${string}`) =>
   `I am the owner of the address: ${a}.
@@ -45,7 +47,6 @@ export function useReferralCode() {
     queryFn: () => getCookie(REFERRAL_COOKIE_NAME) || null,
   })
 }
-
 /**
  * Fetches the referrer profile by referral code or tag.
  * If the referrer is the same as the profile, returns null. The referrer should also have a send account and sendtag.
@@ -88,7 +89,7 @@ export async function fetchReferrer({
       .maybeSingle(),
   ])
 
-  const referrer = [profileByTag, profileByReferralCode].find((p) => {
+  const referrer = [profileByReferralCode, profileByTag].find((p) => {
     if (!p) return false
     if (p.id === profile.id) return false // no self referrals
     if (!p.address) return false // need a send account
@@ -142,22 +143,6 @@ export function useReferralReward({ tags }: { tags: { name: string }[] }) {
   })
 }
 
-/**
- * Fetches the sendtag checkout receipts.
- * Returns an array of receipts with numerics converted to strings to avoid overflows.
- * @param supabase
- * @returns The sendtag checkout receipts.
- */
-export function fetchSendtagCheckoutReceipts(supabase: SupabaseClient<Database>) {
-  return supabase.from('sendtag_checkout_receipts').select(`
-      event_id,
-      amount::text,
-      referrer,
-      reward::text,
-      tx_hash
-    `)
-}
-
 function sendtagCheckoutReceiptsQueryOptions(supabase: SupabaseClient<Database>) {
   return queryOptions({
     queryKey: ['sendtag_checkout_transfers', supabase] as const,
@@ -182,10 +167,17 @@ export function useSendtagCheckout() {
   const pendingTags = usePendingTags() ?? []
   const amountDue = useMemo(() => total(pendingTags ?? []), [pendingTags])
   const { data: referrer } = useReferrer()
+  const {
+    data: referred,
+    isLoading: isLoadingReferred,
+    error: referredError,
+  } = api.referrals.getReferred.useQuery()
   const { data: reward } = useReferralReward({ tags: pendingTags })
+  const referrerAddress = referred?.referrerSendAccount?.address ?? referrer?.address ?? zeroAddress
+
   const checkoutArgs = useMemo(
-    () => [amountDue, referrer?.address ?? zeroAddress, reward ?? 0n] as const,
-    [amountDue, referrer, reward]
+    () => [amountDue, referrerAddress ?? zeroAddress, reward ?? 0n] as const,
+    [amountDue, referrerAddress, reward]
   )
   const calls = useMemo(
     () => [
@@ -232,5 +224,7 @@ export function useSendtagCheckout() {
     usdcFees,
     usdcFeesError,
     isLoadingUSDCFees,
+    isLoadingReferred,
+    referredError,
   }
 }

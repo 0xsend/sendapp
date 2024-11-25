@@ -105,13 +105,12 @@ exports[`DepositScreen renders the deposit screen 1`] = `
             numberOfLines={1}
             style={
               {
-                "backgroundColor": "#40FB50",
-                "color": "#12643F",
+                "color": "#FFFFFF",
                 "flexGrow": 0,
                 "flexShrink": 1,
                 "fontFamily": "System",
                 "fontSize": 16.8,
-                "fontWeight": "400",
+                "fontWeight": "500",
                 "lineHeight": 19,
                 "paddingLeft": 7,
                 "paddingRight": 7,
@@ -120,7 +119,7 @@ exports[`DepositScreen renders the deposit screen 1`] = `
             }
             suppressHighlighting={true}
           >
-            0xb0b...0000
+            0xb0b0...00000
           </Text>
           <View
             pointerEvents="none"

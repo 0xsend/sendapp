@@ -18,6 +18,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { IconAccount } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { coinsDict } from 'app/data/coins'
+import { useTokenActivityFeed } from 'app/features/home/utils/useTokenActivityFeed'
 import { useSendScreenParams } from 'app/routers/params'
 import { assert } from 'app/utils/assert'
 import formatAmount from 'app/utils/formatAmount'
@@ -32,12 +33,13 @@ import { useGenerateTransferUserOp } from 'app/utils/useUserOpTransferMutation'
 import { useAccountNonce } from 'app/utils/userop'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'solito/router'
-import { formatUnits, isAddress, parseUnits } from 'viem'
+import { formatUnits, isAddress, parseUnits, type Hex } from 'viem'
 import { useEstimateFeesPerGas } from 'wagmi'
 import { api } from 'app/utils/api'
 import { getUserOperationHash } from 'permissionless'
 import { signUserOp } from 'app/utils/signUserOp'
 import { byteaToBase64 } from 'app/utils/byteaToBase64'
+import { localizeAmount } from 'app/utils/formatAmount'
 
 export function SendConfirmScreen() {
   const [queryParams] = useSendScreenParams()
@@ -67,7 +69,7 @@ export function SendConfirmScreen() {
 export function SendConfirm() {
   const router = useRouter()
   const [queryParams] = useSendScreenParams()
-  const { sendToken, recipient, idType } = queryParams
+  const { sendToken, recipient, idType, amount } = queryParams
 
   const { mutateAsync: transfer } = api.transfer.withUserOp.useMutation()
 
@@ -96,7 +98,6 @@ export function SendConfirm() {
       .filter((c) => !!c.webauthn_credentials)
       .map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? []
 
-  const amount = parseUnits((queryParams.amount ?? '0').toString(), tokenDecimals ?? 0)
   const {
     data: nonce,
     error: nonceError,
@@ -109,7 +110,7 @@ export function SendConfirm() {
     // @ts-expect-error some work to` do here
     to: profile?.address ?? recipient,
     token: sendToken === 'eth' ? undefined : sendToken,
-    amount: BigInt(amount),
+    amount: BigInt(queryParams.amount ?? '0'),
     nonce: nonce ?? 0n,
   })
 
@@ -121,7 +122,11 @@ export function SendConfirm() {
     userOp,
   })
 
-  const { data: feesPerGas, error: feesPerGasError } = useEstimateFeesPerGas({
+  const {
+    data: feesPerGas,
+    isLoading: isGasLoading,
+    error: feesPerGasError,
+  } = useEstimateFeesPerGas({
     chainId: baseMainnet.id,
   })
 
@@ -129,10 +134,10 @@ export function SendConfirm() {
 
   const hasEnoughGas = usdcFees && (usdcBalance ?? BigInt(0)) >= usdcFees.baseFee + usdcFees.gasFees
 
-  const hasEnoughBalance = tokenBalance && tokenBalance >= amount
+  const hasEnoughBalance = tokenBalance && tokenBalance >= BigInt(amount ?? '0')
 
   const canSubmit =
-    Number(queryParams.amount) > 0 &&
+    BigInt(queryParams.amount ?? '0') > 0 &&
     coinsDict[queryParams.sendToken] &&
     hasEnoughGas &&
     hasEnoughBalance
@@ -147,7 +152,7 @@ export function SendConfirm() {
       assert(!!feesPerGas, 'Fees per gas is not available')
       assert(!!profile?.address, 'Could not resolve recipients send account')
 
-      assert(tokenBalance >= amount, 'Insufficient balance')
+      assert(tokenBalance >= BigInt(amount ?? '0'), 'Insufficient balance')
       const sender = sendAccount?.address as `0x${string}`
       assert(isAddress(sender), 'No sender address')
       const _userOp = {
@@ -279,11 +284,29 @@ export function SendConfirm() {
         >
           {(() => {
             switch (true) {
-              case isBalanceLoading || isFeesLoading:
+              case isBalanceLoading || isFeesLoading || isGasLoading:
                 return (
                   <Button.Icon>
-                    <Spinner size="small" color="$color" />
+                    <Spinner size="small" color="$color12" />
                   </Button.Icon>
+                )
+              case isTransferPending && !isTransferError:
+                return (
+                  <>
+                    <Button.Icon>
+                      <Spinner size="small" color="$color12" />
+                    </Button.Icon>
+                    <Button.Text>Sending...</Button.Text>
+                  </>
+                )
+              case sentTxHash !== undefined:
+                return (
+                  <>
+                    <Button.Icon>
+                      <Spinner size="small" color="$color12" />
+                    </Button.Icon>
+                    <Button.Text>Confirming...</Button.Text>
+                  </>
                 )
               case !hasEnoughBalance:
                 return <Button.Text>Insufficient Balance</Button.Text>
@@ -317,7 +340,7 @@ export function SendRecipient({ ...props }: YStackProps) {
   const { recipient, idType } = queryParams
   const router = useRouter()
   const { data: profile, isLoading, error } = useProfileLookup(idType ?? 'tag', recipient ?? '')
-  const href = useProfileHref(idType ?? 'tag', recipient ?? '')
+  const href = profile ? `/profile/${profile?.sendid}` : ''
 
   if (isLoading) return <Spinner size="large" />
   if (error) throw new Error(error.message)
@@ -395,6 +418,9 @@ const SendAmount = () => {
   const [queryParams] = useSendScreenParams()
   const { sendToken, recipient, idType, amount } = queryParams
   const router = useRouter()
+  const localizedAmount = localizeAmount(
+    formatUnits(BigInt(queryParams.amount ?? ''), coinsDict[queryParams.sendToken].decimals)
+  )
   return (
     <YStack gap="$2.5" f={1} $gtLg={{ maw: 350 }} jc="space-between">
       <XStack jc="space-between" ai="center" gap="$3">
@@ -437,7 +463,7 @@ const SendAmount = () => {
         f={1}
       >
         <Paragraph fontSize="$9" fontWeight="600" color="$color12">
-          {queryParams.amount}
+          {localizedAmount}
         </Paragraph>
         <IconCoin coin={coinsDict[queryParams.sendToken]} />
       </XStack>

@@ -3,11 +3,10 @@ import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
 import { userOnboarded, type SeedClient } from '@my/snaplet'
 import type { Database } from '@my/supabase/database.types'
 import { usdcAddress } from '@my/wagmi'
-import type { Page } from '@playwright/test'
-import { devices, mergeTests } from '@playwright/test'
+import { devices, mergeTests, type Page } from '@playwright/test'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { price, pricing, reward, total } from 'app/data/sendtags'
-import { fetchSendtagCheckoutReceipts } from 'app/features/account/sendtag/checkout/checkout-utils'
+import { fetchSendtagCheckoutReceipts } from 'app/features/account/sendtag/checkout/checkout-utils.fetchSendtagCheckoutReceipts'
 import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import debug from 'debug'
@@ -130,6 +129,16 @@ const checkReferralCodeVisibility = async (
   await expect(referredBy).toBeVisible()
 }
 
+const checkReferralCodeHidden = async (
+  checkoutPage: CheckoutPage,
+  referrer: { tags: string[]; referral_code: string }
+) => {
+  const refcode = checkoutPage.page.getByLabel('Referral Code:')
+  const referredBy = checkoutPage.page.getByText(`/${referrer.tags[0]}`)
+  await expect(refcode).toBeHidden()
+  await expect(referredBy).toBeHidden()
+}
+
 const verifyCheckoutReceipt = async (
   supabase: SupabaseClient<Database>,
   tagsToRegister: string[],
@@ -182,7 +191,7 @@ test('can confirm a tag', async ({ checkoutPage, supabase, user: { profile: myPr
   await addPendingTag(checkoutPage, tagName)
   await confirmTags(checkoutPage, [tagName])
   await verifyTagsInDatabase(supabase, [tagName])
-  await expect(checkoutPage.page).toHaveTitle('Send | Sendtag')
+  await expect(checkoutPage.page).toHaveTitle('Send | Sendtags')
 
   const receiptEvent = {
     event_name: 'tag_receipt_usdc',
@@ -268,7 +277,7 @@ test('can refer a tag', async ({
       send_id: myProfile.send_id,
     },
     data: {
-      tags: tagsToRegister,
+      tags: [tagsToRegister[0]],
     },
   })
 
@@ -299,7 +308,7 @@ test('can refer multiple tags in separate transactions', async ({
   await confirmTags(checkoutPage, firstTags)
   await verifyTagsInDatabase(supabase, firstTags)
   await verifyCheckoutReceipt(supabase, firstTags, referrerSendAccount.address)
-  await verifyActivityFeed(supabase, {
+  await expect(supabase).toHaveEventInActivityFeed({
     event_name: 'referrals',
     from_user: {
       send_id: referrer.send_id,
@@ -310,7 +319,7 @@ test('can refer multiple tags in separate transactions', async ({
       send_id: myProfile.send_id,
     },
     data: {
-      tags: firstTags,
+      tags: [firstTags[0]],
     },
   })
   const firstRewardAmount = await verifyReferralReward(
@@ -327,7 +336,7 @@ test('can refer multiple tags in separate transactions', async ({
   for (const tagName of secondTags) {
     await addPendingTag(checkoutPage, tagName)
   }
-  await checkReferralCodeVisibility(checkoutPage, {
+  await checkReferralCodeHidden(checkoutPage, {
     referral_code: referrer.referral_code,
     tags: referrerTags,
   })
@@ -339,20 +348,6 @@ test('can refer multiple tags in separate transactions', async ({
   await confirmTags(checkoutPage, secondTags)
   await verifyTagsInDatabase(supabase, [...firstTags, ...secondTags])
   await verifyCheckoutReceipt(supabase, secondTags, referrerSendAccount.address)
-  await verifyActivityFeed(supabase, {
-    event_name: 'referrals',
-    from_user: {
-      send_id: referrer.send_id,
-      tags: referrerTags,
-    },
-    to_user: {
-      id: myProfile.id,
-      send_id: myProfile.send_id,
-    },
-    data: {
-      tags: secondTags,
-    },
-  })
   const secondRewardAmount = await verifyReferralReward(
     referrerSendAccount.address as `0x${string}`,
     secondTags,
@@ -368,7 +363,7 @@ test('can refer multiple tags in separate transactions', async ({
   expect(leaderboardData?.[0]).toBeTruthy()
   assert(!!leaderboardData?.[0], 'leaderboard data not found')
   expect(leaderboardData[0].rewards_usdc).toBe((firstRewardAmount + secondRewardAmount).toString())
-  expect(leaderboardData[0].referrals).toBe((firstTags.length + secondTags.length).toString())
+  expect(leaderboardData[0].referrals).toBe((1).toString())
   log('leaderboard', leaderboardData)
 
   log('done')

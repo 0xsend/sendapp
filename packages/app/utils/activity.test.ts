@@ -19,6 +19,7 @@ import { byteaToHexEthAddress } from './zod'
 import { EventSchema } from './zod/activity'
 import { tokenPaymasterAddress } from '@my/wagmi'
 import { assert } from './assert'
+import { shorten } from './strings'
 
 jest.mock('@my/wagmi')
 
@@ -74,7 +75,7 @@ describe('test eventNameFromActivity', () => {
 describe('test subtextFromActivity', () => {
   it('should return the address when transfer and to user ID is present and no from user ID', () => {
     expect(subtextFromActivity(EventSchema.parse(mockReceivedTransfer))).toBe(
-      byteaToHexEthAddress.parse(mockReceivedTransfer.data.f)
+      shorten(byteaToHexEthAddress.parse(mockReceivedTransfer.data.f), 5, 4)
     )
   })
   it('should return the to user tags when transfer and from user ID is present', () => {

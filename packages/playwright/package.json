@@ -9,7 +9,7 @@
     "@my/snaplet": "workspace:*",
     "@my/supabase": "workspace:*",
     "@my/wagmi": "workspace:*",
-    "@playwright/test": "^1.45.1",
+    "@playwright/test": "^1.48.2",
     "@supabase/supabase-js": "2.44.2",
     "@types/bun": "^1.1.6",
     "@types/jsonwebtoken": "^9.0.2",
