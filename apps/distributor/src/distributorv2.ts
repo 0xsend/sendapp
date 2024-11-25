@@ -415,8 +415,12 @@ export class DistributorV2Worker {
 
       if (sendCeilingData && sendCeilingData.weight > 0n) {
         const scaledPreviousReward = previousReward / BigInt(sendSlash.scaling_divisor)
+        const cappedSendScore =
+          sendCeilingData.weight > scaledPreviousReward
+            ? scaledPreviousReward
+            : sendCeilingData.weight
         if (scaledPreviousReward > 0n) {
-          const slashPercentage = (sendCeilingData.weight * PERC_DENOM) / scaledPreviousReward
+          const slashPercentage = (cappedSendScore * PERC_DENOM) / scaledPreviousReward
           amountAfterSlash = (amount * slashPercentage) / PERC_DENOM
         } else {
           amountAfterSlash = 0n
@@ -532,6 +536,11 @@ export class DistributorV2Worker {
         const fixedPoolAmountAfterSlash =
           fixedPoolAmountsByAddress[share.address]?.amountAfterSlash || 0n
         const amountAfterSlash = hodlerPoolAmountAfterSlash + fixedPoolAmountAfterSlash
+
+        // Skip if amountAfterSlash is 0
+        if (amountAfterSlash <= 0n) {
+          return null
+        }
 
         // Update totals
         totalAmount += amount
