@@ -1339,17 +1339,28 @@ export type Database = {
           user_id: string
         }
       }
-      sum_qualification_sends: {
-        Args: {
-          distribution_number: number
-          send_ceiling: number
-        }
-        Returns: {
-          user_id: string
-          amount: number
-          sent_to: string[]
-        }[]
-      }
+      sum_qualification_sends:
+        | {
+            Args: {
+              distribution_number: number
+            }
+            Returns: {
+              user_id: string
+              amount: number
+              sent_to: string[]
+            }[]
+          }
+        | {
+            Args: {
+              distribution_number: number
+              send_ceiling: number
+            }
+            Returns: {
+              user_id: string
+              amount: number
+              sent_to: string[]
+            }[]
+          }
       tag_search: {
         Args: {
           query: string
