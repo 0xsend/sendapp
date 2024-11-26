@@ -1,17 +1,16 @@
 import {
-  SubmitButton,
-  YStack,
+  Button,
   isWeb,
+  Paragraph,
+  SubmitButton,
+  Text,
   useToastController,
   XStack,
-  Button,
-  Text,
-  Paragraph,
+  YStack,
 } from '@my/ui'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useUser } from 'app/utils/useUser'
-import { useRouter } from 'solito/router'
 import type { z } from 'zod'
 import { FormProvider, useForm } from 'react-hook-form'
 import { VerifyCode } from 'app/features/auth/components/VerifyCode'
@@ -26,32 +25,39 @@ enum FormState {
 
 export const PersonalInfoScreen = () => {
   const { user, profile } = useUser()
-
   const supabase = useSupabase()
   const toast = useToastController()
-  const router = useRouter()
   const form = useForm<z.infer<typeof AuthUserSchema>>() // Using react-hook-form
   const { mutateAsync: mutateAuthAsync } = useAuthUserMutation()
   const { mutateAsync: mutateProfileAsync } = useProfileMutation()
   const [formState, setFormState] = useState<FormState>(FormState.PersonalInfoForm)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  function handleSuccessAuthUpdate() {
+  async function handleSuccessCodeVerification() {
+    setFormState(FormState.PersonalInfoForm)
+    toast.show('Phone number updated')
+
+    if (!isWeb) {
+      await supabase.auth.refreshSession()
+    }
+  }
+
+  async function handleUserUpdate() {
+    const values = form.getValues()
     setFormState(FormState.VerificationCode)
+    await mutateAuthAsync(values)
   }
 
   async function handleSubmit() {
     setErrorMessage(null)
     const values = form.getValues()
+    const shouldUpdateUser = user?.phone !== values.phone
 
     try {
-      if (profile && profile.x_username !== values.xUsername) {
-        await mutateProfileAsync(values)
-      }
+      await mutateProfileAsync(values)
 
-      if (user && user.phone !== values.phone) {
-        await mutateAuthAsync(values)
-        handleSuccessAuthUpdate()
+      if (shouldUpdateUser) {
+        await handleUserUpdate()
       }
     } catch (error) {
       console.error(error)
@@ -70,13 +76,7 @@ export const PersonalInfoScreen = () => {
     <VerifyCode
       type={'phone_change'}
       phone={form.getValues().phone}
-      onSuccess={async () => {
-        toast.show('Phone number updated')
-        router.back()
-        if (!isWeb) {
-          await supabase.auth.refreshSession()
-        }
-      }}
+      onSuccess={handleSuccessCodeVerification}
     />
   )
 

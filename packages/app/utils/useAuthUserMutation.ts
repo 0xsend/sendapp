@@ -29,7 +29,8 @@ export const useAuthUserMutation = () => {
       }
     },
     async onSuccess() {
-      await queryClient.invalidateQueries({ queryKey: ['profile'] })
+      await queryClient.invalidateQueries({ queryKey: ['user'] })
+
       toast.show('Check your phone', {
         message: 'We sent you a confirmation code to your phone.',
       })
