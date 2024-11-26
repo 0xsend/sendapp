@@ -35,6 +35,9 @@ enum PageState {
   BackUpPrompt = 'BackUpPrompt',
 }
 
+const WEBKIT_CANCEL_PASSKEY_PROMPT_ERROR_NAME = 'NotAllowedError'
+const FIREFOX_CANCEL_PASSKEY_PROMPT_ERROR_NAME = 'AbortError'
+
 export const SignUpForm = () => {
   const form = useForm<z.infer<typeof SignUpSchema>>()
   const router = useRouter()
@@ -85,11 +88,12 @@ export const SignUpForm = () => {
 
       router.push(redirectUri ?? '/')
     } catch (error) {
-      if (
-        isPhoneAlreadyUsed &&
+      const wasPasskeyPromptCanceled =
         error.constructor.name === 'DOMException' &&
-        error.name === 'NotAllowedError'
-      ) {
+        (error.name === WEBKIT_CANCEL_PASSKEY_PROMPT_ERROR_NAME ||
+          error.name === FIREFOX_CANCEL_PASSKEY_PROMPT_ERROR_NAME)
+
+      if (isPhoneAlreadyUsed && wasPasskeyPromptCanceled) {
         setPageState(PageState.BackUpPrompt)
         return
       }
