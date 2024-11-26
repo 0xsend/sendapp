@@ -3,9 +3,9 @@ drop function if exists "public"."profile_lookup"(lookup_type lookup_type_enum, 
 set check_function_bodies = off;
 
 CREATE OR REPLACE FUNCTION public.profile_lookup(lookup_type lookup_type_enum, identifier text)
- RETURNS TABLE(id uuid, avatar_url text, name text, about text, refcode text, x_username text, tag citext, address citext, chain_id integer, is_public boolean, sendid integer, all_tags text[])
- LANGUAGE plpgsql
- IMMUTABLE SECURITY DEFINER
+    RETURNS TABLE(id uuid, avatar_url text, name text, about text, refcode text, x_username text, tag citext, address citext, chain_id integer, is_public boolean, sendid integer, all_tags text[])
+    LANGUAGE plpgsql
+    IMMUTABLE SECURITY DEFINER
 AS $function$
 begin
     if identifier is null or identifier = '' then raise exception 'identifier cannot be null or empty'; end if;
@@ -16,7 +16,7 @@ begin
                p.name::text                                                      as name,
                p.about::text                                                     as about,
                p.referral_code                                                   as refcode,
-               p.x_username as x_username,
+               p.x_username                                                      as x_username,
                t.name                                                            as tag,
                sa.address                                                        as address,
                sa.chain_id                                                       as chain_id,
@@ -43,5 +43,4 @@ begin
 end;
 $function$
 ;
-
 
