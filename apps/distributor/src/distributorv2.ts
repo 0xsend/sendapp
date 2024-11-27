@@ -291,7 +291,7 @@ export class DistributorV2Worker {
     const { data: sendSlash, error: sendSlashError } = await supabaseAdmin
       .from('send_slash')
       .select('*')
-      .eq('distribution_number', distribution.number)
+      .eq('distribution_id', distribution.id)
       .single()
 
     if (sendSlashError) {
