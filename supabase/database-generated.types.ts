@@ -861,27 +861,30 @@ export type Database = {
       }
       send_slash: {
         Row: {
+          distribution_id: number | null
           distribution_number: number
           minimum_sends: number
           scaling_divisor: number
         }
         Insert: {
+          distribution_id?: number | null
           distribution_number: number
           minimum_sends?: number
           scaling_divisor?: number
         }
         Update: {
+          distribution_id?: number | null
           distribution_number?: number
           minimum_sends?: number
           scaling_divisor?: number
         }
         Relationships: [
           {
-            foreignKeyName: "send_slash_distribution_number_fkey"
-            columns: ["distribution_number"]
-            isOneToOne: true
+            foreignKeyName: "send_slash_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
             referencedRelation: "distributions"
-            referencedColumns: ["number"]
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1339,28 +1342,16 @@ export type Database = {
           user_id: string
         }
       }
-      sum_qualification_sends:
-        | {
-            Args: {
-              distribution_number: number
-            }
-            Returns: {
-              user_id: string
-              amount: number
-              sent_to: string[]
-            }[]
-          }
-        | {
-            Args: {
-              distribution_number: number
-              send_ceiling: number
-            }
-            Returns: {
-              user_id: string
-              amount: number
-              sent_to: string[]
-            }[]
-          }
+      sum_qualification_sends: {
+        Args: {
+          distribution_number: number
+        }
+        Returns: {
+          user_id: string
+          amount: number
+          sent_to: string[]
+        }[]
+      }
       tag_search: {
         Args: {
           query: string

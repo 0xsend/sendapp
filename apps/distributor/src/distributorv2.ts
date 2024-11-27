@@ -291,7 +291,7 @@ export class DistributorV2Worker {
     const { data: sendSlash, error: sendSlashError } = await supabaseAdmin
       .from('send_slash')
       .select('*')
-      .eq('distribution_number', distribution.number)
+      .eq('distribution_id', distribution.id)
       .single()
 
     if (sendSlashError) {
@@ -319,8 +319,12 @@ export class DistributorV2Worker {
     const sendCeilingVerifications = verifications.filter((v) => v.type === 'send_ceiling')
     const sendCeilingByUserId = sendCeilingVerifications.reduce(
       (acc, v) => {
+        const previousReward =
+          previousSharesByUserId[v.user_id] || BigInt(distribution.hodler_min_balance)
+        const maxWeight = previousReward / BigInt(sendSlash.scaling_divisor)
         acc[v.user_id] = {
-          weight: BigInt(v.weight || 0),
+          // Cap the weight to maxWeight
+          weight: BigInt(v.weight || 0) > maxWeight ? maxWeight : BigInt(v.weight || 0),
           // @ts-expect-error @todo metadata is untyped but value is the convention
           ceiling: BigInt(v.metadata?.value || 0),
         }
@@ -454,7 +458,10 @@ export class DistributorV2Worker {
 
       // Calculate time adjustment for slashed amounts
       const hourlyHodlerAmount = (hodlerPoolAvailableAmount * PERC_DENOM) / BigInt(hoursInMonth)
-      const timeAdjustedAmount = (hourlyHodlerAmount * BigInt(currentHour + 1)) / PERC_DENOM
+      const timeAdjustedAmount =
+        (hourlyHodlerAmount * BigInt(currentHour + 1)) / PERC_DENOM > hodlerPoolAvailableAmount
+          ? hodlerPoolAvailableAmount
+          : (hourlyHodlerAmount * BigInt(currentHour + 1)) / PERC_DENOM
 
       // First calculate slashed balances for everyone
       const balances = minBalanceAddresses.map((balance) => {
@@ -465,7 +472,12 @@ export class DistributorV2Worker {
         if (sendCeilingData && sendCeilingData.weight > 0n) {
           const previousReward =
             previousSharesByUserId[userId] || BigInt(distribution.hodler_min_balance)
-          slashPercentage = (sendCeilingData.weight * PERC_DENOM) / previousReward
+          const scaledPreviousReward = previousReward / BigInt(sendSlash.scaling_divisor)
+          const cappedWeight =
+            sendCeilingData.weight > scaledPreviousReward
+              ? scaledPreviousReward
+              : sendCeilingData.weight
+          slashPercentage = (cappedWeight * PERC_DENOM) / scaledPreviousReward
         }
 
         const balanceAfterSlash = (
@@ -529,7 +541,10 @@ export class DistributorV2Worker {
         // Non-slashed amounts
         const hodlerPoolAmount = share.amount
         const fixedPoolAmount = fixedPoolAmountsByAddress[share.address]?.amount || 0n
-        const amount = hodlerPoolAmount + fixedPoolAmount > distAmt ? distAmt : hodlerPoolAmount
+        const amount =
+          hodlerPoolAmount + fixedPoolAmount > distAmt
+            ? distAmt
+            : hodlerPoolAmount + fixedPoolAmount
 
         // Slashed amounts - ensure we always have a value
         const hodlerPoolAmountAfterSlash = share.amountAfterSlash || 0n
@@ -616,11 +631,17 @@ export class DistributorV2Worker {
 
     while (this.running) {
       try {
+        const now = new Date()
+        const nextHour = new Date(now)
+        nextHour.setHours(nextHour.getHours() + 1, 0, 0, 0)
+        const targetTime = new Date(nextHour.getTime() - 60000) // 1 minute before next hour
+        const waitTime = Math.max(0, targetTime.getTime() - now.getTime())
+
+        process.env.NODE_ENV === 'development' ? await sleep(10_000) : await sleep(waitTime)
         await this.calculateDistributions()
       } catch (error) {
         this.log.error(error, `Error processing block. ${(error as Error).message}`)
       }
-      await sleep(process.env.NODE_ENV !== 'production' ? 10_000 : 21_600_000)
     }
 
     this.log.info('Distributor stopped.')
