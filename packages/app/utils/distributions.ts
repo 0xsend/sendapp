@@ -43,7 +43,7 @@ export type UseDistributionsResultData = (UseDistributionResultDistribution & {
   claim_end: Date
   distribution_shares: Tables<'distribution_shares'>[]
   distribution_verifications_summary: Views<'distribution_verifications_summary'>[]
-  send_slash: Tables<'send_slash'> | null
+  send_slash: Tables<'send_slash'>[]
 })[]
 
 export const useDistributions = (): UseQueryResult<UseDistributionsResultData, PostgrestError> => {
@@ -73,7 +73,6 @@ export const useDistributions = (): UseQueryResult<UseDistributionsResultData, P
   })
 }
 
-//@todo: make a Zod type for the JSON in distribution_verifications_summary
 /*
 After distribution 6 we switched to monthly distributions
 This function cuts out the first 6 distributions
@@ -84,6 +83,7 @@ export const useMonthlyDistributions = (): UseQueryResult<
 > => {
   const supabase = useSupabase()
   const { data: sendAccount } = useSendAccount()
+
   return useQuery({
     queryKey: ['monthly_distributions', sendAccount?.created_at],
     queryFn: async () => {

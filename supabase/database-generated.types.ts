@@ -861,19 +861,19 @@ export type Database = {
       }
       send_slash: {
         Row: {
-          distribution_id: number | null
+          distribution_id: number
           distribution_number: number
           minimum_sends: number
           scaling_divisor: number
         }
         Insert: {
-          distribution_id?: number | null
+          distribution_id: number
           distribution_number: number
           minimum_sends?: number
           scaling_divisor?: number
         }
         Update: {
-          distribution_id?: number | null
+          distribution_id?: number
           distribution_number?: number
           minimum_sends?: number
           scaling_divisor?: number
