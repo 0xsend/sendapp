@@ -354,6 +354,7 @@ const DistributionRequirementsCard = ({
     .at(0)
     ?.verification_values?.find(({ type }) => type === 'tag_registration')?.weight
 
+  const sendSlash = distribution.send_slash.at(0)
   const sendCeiling = distribution.distribution_verifications_summary[0]?.verification_values?.find(
     ({ type }) => type === 'send_ceiling'
   )
@@ -365,8 +366,8 @@ const DistributionRequirementsCard = ({
   let percent = 0
   let balanceAfterSlash = 0n
 
-  if (sendCeiling?.weight && distribution.send_slash?.scaling_divisor) {
-    const scaledPreviousReward = previousReward / distribution.send_slash.scaling_divisor
+  if (sendCeiling?.weight && sendSlash?.scaling_divisor) {
+    const scaledPreviousReward = previousReward / sendSlash.scaling_divisor
     // Multiply by 10000 to get 4 decimal places of precision
     percent = Math.min((sendCeiling.weight / scaledPreviousReward) * 10000, 10000)
     balanceAfterSlash = snapshotBalance
@@ -633,17 +634,18 @@ const RewardsProgressCard = ({
   distribution: UseDistributionsResultData[number]
   previousDistribution?: UseDistributionsResultData[number]
 }) => {
+  const sendSlash = distribution.send_slash.at(0)
   const sendCeiling = distribution.distribution_verifications_summary[0]?.verification_values?.find(
     ({ type }) => type === 'send_ceiling'
   )
 
-  if (!sendCeiling || !distribution.send_slash) return null
+  if (!sendCeiling || !sendSlash) return null
 
   const previousReward =
     previousDistribution?.distribution_shares?.[0]?.amount_after_slash ??
     distribution.hodler_min_balance
 
-  const scaledPreviousReward = previousReward / distribution.send_slash.scaling_divisor
+  const scaledPreviousReward = previousReward / sendSlash.scaling_divisor
 
   const progress = Math.min(Math.floor((sendCeiling.weight / scaledPreviousReward) * 100), 100)
 
