@@ -43,6 +43,7 @@ export type UseDistributionsResultData = (UseDistributionResultDistribution & {
   claim_end: Date
   distribution_shares: Tables<'distribution_shares'>[]
   distribution_verifications_summary: Views<'distribution_verifications_summary'>[]
+  send_slash: Tables<'send_slash'> | null
 })[]
 
 export const useDistributions = (): UseQueryResult<UseDistributionsResultData, PostgrestError> => {
@@ -77,7 +78,10 @@ export const useDistributions = (): UseQueryResult<UseDistributionsResultData, P
 After distribution 6 we switched to monthly distributions
 This function cuts out the first 6 distributions
 */
-export const useMonthlyDistributions = () => {
+export const useMonthlyDistributions = (): UseQueryResult<
+  UseDistributionsResultData,
+  PostgrestError
+> => {
   const supabase = useSupabase()
   const { data: sendAccount } = useSendAccount()
   return useQuery({
@@ -85,7 +89,12 @@ export const useMonthlyDistributions = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('distributions')
-        .select('*, distribution_shares(*), distribution_verifications_summary(*)')
+        .select(`
+          *,
+          distribution_shares(*),
+          distribution_verifications_summary(*),
+          send_slash(*)
+        `)
         .gt('number', 6)
         .gt('qualification_end', sendAccount?.created_at)
         .order('number', { ascending: false })
