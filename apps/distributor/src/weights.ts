@@ -33,16 +33,6 @@ export function calculatePercentageWithBips(value: bigint, bips: bigint) {
   return percentage / PERC_DENOM
 }
 
-const calculateSlashPercentage = (
-  weight: bigint,
-  scaledPreviousReward: bigint,
-  percDenom: bigint = PERC_DENOM
-): bigint => {
-  return (weight * percDenom) / scaledPreviousReward > percDenom
-    ? percDenom
-    : (weight * percDenom) / scaledPreviousReward
-}
-
 /**
  * Given a list of balances and a distribution amount, calculate the distribution weights and share amounts.
  */
@@ -99,6 +89,12 @@ export function calculateWeights(
     const poolWeight = poolWeights[address] ?? 0n
     const poolWeightAfterSlash = poolWeightsAfterSlash[address] ?? 0n
     const totalWeight = totalWeightAfterSlash - poolWeightAfterSlash + poolWeight
+
+    // with capped slashed balances:
+    // totalWeightAfterSlash = sum of all capped slashed balances
+    // -poolWeightAfterSlash = remove this user's capped slashed balance
+    // +poolWeight = add their full unslashed balance
+
     const potentialAmount = (poolWeight * amount) / totalWeight
     const slashedAmount = (poolWeightAfterSlash * timeAdjustedAmount) / totalWeightAfterSlash
 
