@@ -25,9 +25,15 @@ export const DatePickerPopover = ({
     }
   }, [])
 
+  const onDatesChange = (value: Date[]) => {
+    if (value[0]) {
+      onChange(value[0])
+    }
+  }
+
   const config = {
-    selectedDates: value,
-    onDatesChange: onChange,
+    selectedDates: value ? [value] : [],
+    onDatesChange,
     calendar: {
       startDay: 1 as const,
     },

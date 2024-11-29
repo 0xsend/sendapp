@@ -12,6 +12,7 @@ import {
   SelectField,
   TextAreaField,
   TextField,
+  DateField,
 } from '../components/FormFields'
 import type { ComponentProps } from 'react'
 import { useFormContext } from 'react-hook-form'
@@ -46,6 +47,7 @@ export const formFields = {
   countrycode: createUniqueFieldSchema(z.string(), 'countrycode_select'),
   otp: createUniqueFieldSchema(z.string(), 'otp'),
   coin: createUniqueFieldSchema(z.string(), 'coin'),
+  date: z.date(),
 }
 
 const mapping = [
@@ -59,6 +61,7 @@ const mapping = [
   [formFields.countrycode, CountryCodeField] as const,
   [formFields.otp, OTPField] as const,
   [formFields.coin, CoinField],
+  [formFields.date, DateField] as const,
 ] as const
 
 const FormComponent = (props: FormProps) => {
