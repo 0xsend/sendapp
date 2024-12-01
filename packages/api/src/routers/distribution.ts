@@ -17,7 +17,7 @@ export const distributionRouter = createTRPCRouter({
       const { data: shares, error: sharesError } = await selectAll(
         supabaseAdmin
           .from('distribution_shares')
-          .select('index, address, amount, user_id', { count: 'exact' })
+          .select('index, address, amount_after_slash, user_id', { count: 'exact' })
           .eq('distribution_id', distributionId)
           .order('index', { ascending: true })
       )
@@ -48,11 +48,19 @@ export const distributionRouter = createTRPCRouter({
 
       // could save some cycles and save this to the database
       const tree = StandardMerkleTree.of(
-        shares.map(({ index, address, amount }) => [index, address, amount]),
+        shares.map(({ index, address, amount_after_slash }) => [
+          index,
+          address,
+          amount_after_slash,
+        ]),
         ['uint256', 'address', 'uint256']
       )
 
       // this is what the user will need to submit to claim their tokens
-      return tree.getProof([myShare.index, myShare.address, myShare.amount]) as `0x${string}`[]
+      return tree.getProof([
+        myShare.index,
+        myShare.address,
+        myShare.amount_after_slash,
+      ]) as `0x${string}`[]
     }),
 })
