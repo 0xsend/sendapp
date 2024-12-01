@@ -225,12 +225,12 @@ export function ActivityRewardsScreen() {
       ) : (
         <YStack f={1} w={'100%'} gap={'$7'}>
           <DistributionRequirementsCard distribution={distributions[selectedDistributionIndex]} />
-          <SendPerksCards distribution={distributions[selectedDistributionIndex]} />
-          <MultiplierCards distribution={distributions[selectedDistributionIndex]} />
           <RewardsProgressCard
             distribution={distributions[selectedDistributionIndex]}
             previousDistribution={distributions[selectedDistributionIndex - 1]}
           />
+          <SendPerksCards distribution={distributions[selectedDistributionIndex]} />
+          <MultiplierCards distribution={distributions[selectedDistributionIndex]} />
           <ClaimableRewardsCard distribution={distributions[selectedDistributionIndex]} />
         </YStack>
       )}
@@ -327,11 +327,17 @@ const DistributionRequirementsCard = ({
   distribution: UseDistributionsResultData[number]
   previousDistribution?: UseDistributionsResultData[number]
 }) => {
-  const hasSent = Boolean(
-    distribution.distribution_verifications_summary
-      .at(0)
-      ?.verification_values?.find(({ type }) => type === 'send_ten')
-  )
+  const hasSent =
+    distribution.number < 9 ||
+    Boolean(
+      distribution.distribution_verifications_summary
+        .at(0)
+        ?.verification_values?.find(({ type }) => type === 'send_ceiling')
+    )
+
+  const now = new Date()
+
+  const isQualificationOver = distribution.qualification_end < now
   const { data: sendAccount } = useSendAccount()
   const {
     data: snapshotBalance,
@@ -375,6 +381,8 @@ const DistributionRequirementsCard = ({
         ? snapshotBalance
         : (BigInt(snapshotBalance) * BigInt(Math.round(percent))) / BigInt(10000)
       : 0n
+  } else if (isQualificationOver && distribution.number < 9) {
+    balanceAfterSlash = snapshotBalance ?? 0n
   }
 
   return (
