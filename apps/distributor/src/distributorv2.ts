@@ -452,7 +452,8 @@ export class DistributorV2Worker {
     }[] = []
 
     if (hodlerPoolAvailableAmount > 0n) {
-      const currentDate = new Date()
+      const endDate = new Date(distribution.qualification_end)
+      const currentDate = new Date() > endDate ? endDate : new Date()
       const hoursInMonth = getHoursInMonth(currentDate)
       const currentHour = getCurrentHourInMonth(currentDate)
 
