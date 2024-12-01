@@ -185,10 +185,14 @@ export const useSendSellCountDuringDistribution = (
 export function useSendMerkleDropTrancheActive({
   chainId,
   tranche,
-}: { chainId: keyof typeof sendMerkleDropAddress; tranche: bigint }) {
+  enabled = true,
+}: { chainId: keyof typeof sendMerkleDropAddress; tranche: bigint; enabled?: boolean }) {
   return useReadSendMerkleDropTrancheActive({
     chainId,
     args: [tranche],
+    query: {
+      enabled: enabled && Boolean(tranche),
+    },
   })
 }
 
@@ -202,17 +206,19 @@ export function useSendMerkleDropIsClaimed({
   chainId,
   tranche,
   index,
+  enabled = true,
 }: {
   chainId: keyof typeof sendMerkleDropAddress
   tranche: bigint
   index?: bigint
+  enabled?: boolean
 }) {
   return useReadSendMerkleDropIsClaimed({
     chainId,
     // @ts-expect-error index is undefined if not provided
     args: [tranche, index],
     query: {
-      enabled: index !== undefined,
+      enabled: enabled && Boolean(tranche) && Boolean(index),
     },
   })
 }
