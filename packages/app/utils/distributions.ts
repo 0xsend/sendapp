@@ -326,7 +326,7 @@ export function useGenerateClaimUserOp({
     isLoading: isLoadingProof,
     error: errorProof,
   } = api.distribution.proof.useQuery({ distributionId: distribution.id })
-  const { address: sender, amount, index } = share ?? {}
+  const { address: sender, amount_after_slash, index } = share ?? {}
 
   const {
     data: isClaimed,
@@ -352,7 +352,7 @@ export function useGenerateClaimUserOp({
     !errorProof &&
     merkleProof !== undefined &&
     index !== undefined &&
-    amount !== undefined &&
+    amount_after_slash !== undefined &&
     sender !== undefined &&
     !isClaimedLoading &&
     !isClaimedError &&
@@ -367,7 +367,7 @@ export function useGenerateClaimUserOp({
     queryKey: [
       'generateClaimUserOp',
       sender,
-      String(amount),
+      String(amount_after_slash),
       String(index),
       String(nonce),
       String(chainId),
@@ -378,7 +378,7 @@ export function useGenerateClaimUserOp({
     enabled: enabled,
     queryFn: () => {
       assert(!!sender && isAddress(sender), 'Invalid send account address')
-      assert(typeof amount === 'number' && amount > 0, 'Invalid amount')
+      assert(typeof amount_after_slash === 'number' && amount_after_slash > 0, 'Invalid amount')
       assert(typeof nonce === 'bigint' && nonce >= 0n, 'Invalid nonce')
 
       const callData = encodeFunctionData({
@@ -392,8 +392,17 @@ export function useGenerateClaimUserOp({
               data: encodeFunctionData({
                 abi: sendMerkleDropAbi,
                 functionName: 'claimTranche',
-                // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount, and merkleProof are defined when enabled is true
-                args: [sender!, trancheId, BigInt(index!), BigInt(amount!), merkleProof!],
+                args: [
+                  // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount_after_slash, and merkleProof are defined when enabled is true
+                  sender!,
+                  trancheId,
+                  // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount_after_slash, and merkleProof are defined when enabled is true
+                  BigInt(index!),
+                  // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount_after_slash, and merkleProof are defined when enabled is true
+                  BigInt(amount_after_slash!),
+                  // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount_after_slash, and merkleProof are defined when enabled is true
+                  merkleProof!,
+                ],
               }),
             },
           ],
@@ -428,7 +437,7 @@ export const usePrepareSendMerkleDropClaimTrancheWrite = ({
     isLoading: isLoadingProof,
     error: errorProof,
   } = api.distribution.proof.useQuery({ distributionId: distribution.id })
-  const { address, amount, index } = share ?? {}
+  const { address, amount_after_slash, index } = share ?? {}
 
   const {
     data: isClaimed,
@@ -454,7 +463,7 @@ export const usePrepareSendMerkleDropClaimTrancheWrite = ({
     !errorProof &&
     merkleProof !== undefined &&
     index !== undefined &&
-    amount !== undefined &&
+    amount_after_slash !== undefined &&
     address !== undefined &&
     !isClaimedLoading &&
     !isClaimedError &&
@@ -482,8 +491,8 @@ export const usePrepareSendMerkleDropClaimTrancheWrite = ({
     //     bytes32[] memory _merkleProof
     // )
     args: enabled
-      ? // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount, and merkleProof are defined when enabled is true
-        [address!, trancheId, BigInt(index!), BigInt(amount!), merkleProof!]
+      ? // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount_after_slash, and merkleProof are defined when enabled is true
+        [address!, trancheId, BigInt(index!), BigInt(amount_after_slash!), merkleProof!]
       : undefined,
   })
 }
