@@ -16,7 +16,6 @@ import { useRouter } from 'solito/router'
 import { z } from 'zod'
 import { FormProvider, useForm } from 'react-hook-form'
 import { RecoveryOptions } from '@my/api/src/routers/account-recovery/types'
-import { AuthStatus } from '@my/api/src/routers/auth/types'
 import { VerifyCode } from 'app/features/auth/components/VerifyCode'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { api } from 'app/utils/api'
@@ -34,9 +33,6 @@ enum PageState {
   VerifyCode = 'VerifyCode',
   BackUpPrompt = 'BackUpPrompt',
 }
-
-const WEBKIT_CANCEL_PASSKEY_PROMPT_ERROR_NAME = 'NotAllowedError'
-const FIREFOX_CANCEL_PASSKEY_PROMPT_ERROR_NAME = 'AbortError'
 
 export const SignUpForm = () => {
   const form = useForm<z.infer<typeof SignUpSchema>>()
@@ -60,9 +56,7 @@ export const SignUpForm = () => {
     { retry: false }
   )
 
-  const handleSignIn = async (options: { isPhoneAlreadyUsed?: boolean } = {}) => {
-    const { isPhoneAlreadyUsed = false } = options
-
+  const handleSignIn = async () => {
     setIsSigningIn(true)
 
     try {
@@ -88,16 +82,6 @@ export const SignUpForm = () => {
 
       router.push(redirectUri ?? '/')
     } catch (error) {
-      const wasPasskeyPromptCanceled =
-        error.constructor.name === 'DOMException' &&
-        (error.name === WEBKIT_CANCEL_PASSKEY_PROMPT_ERROR_NAME ||
-          error.name === FIREFOX_CANCEL_PASSKEY_PROMPT_ERROR_NAME)
-
-      if (isPhoneAlreadyUsed && wasPasskeyPromptCanceled) {
-        setPageState(PageState.BackUpPrompt)
-        return
-      }
-
       toast.show(formatErrorMessage(error), {
         preset: 'error',
         isUrgent: true,
@@ -108,25 +92,15 @@ export const SignUpForm = () => {
     }
   }
 
-  async function signUpWithPhone(
-    formData: z.infer<typeof SignUpSchema>,
-    options: { bypassOnboardedCheck?: boolean } = {}
-  ) {
+  async function signUpWithPhone(formData: z.infer<typeof SignUpSchema>) {
     const { phone, countrycode } = formData
-    const { bypassOnboardedCheck = false } = options
 
     try {
-      const { status } = await signInWithOtpMutateAsync({
+      await signInWithOtpMutateAsync({
         phone,
         countrycode,
         captchaToken,
-        bypassOnboardedCheck,
       })
-
-      if (status === AuthStatus.PhoneAlreadyUsed) {
-        await handleSignIn({ isPhoneAlreadyUsed: true })
-        return
-      }
 
       setPageState(PageState.VerifyCode)
     } catch (error) {
@@ -138,11 +112,11 @@ export const SignUpForm = () => {
 
   function handleBackUpConfirm() {
     const formData = form.getValues()
-    void signUpWithPhone(formData, { bypassOnboardedCheck: true })
+    void signUpWithPhone(formData)
   }
 
   function handleBackUpDenial() {
-    void handleSignIn({ isPhoneAlreadyUsed: true })
+    void handleSignIn()
   }
 
   function handleGoBackFromBackUpPrompt() {
@@ -235,7 +209,7 @@ export const SignUpForm = () => {
               <Paragraph size="$2" color="$color11">
                 Already have an account?
               </Paragraph>
-              <SubmitButton onPress={() => handleSignIn()} disabled={isSigningIn} unstyled>
+              <SubmitButton onPress={handleSignIn} disabled={isSigningIn} unstyled>
                 <ButtonText color="$color11" size="$2" textDecorationLine="underline">
                   {isSigningIn ? 'Signing in...' : 'Sign in'}
                 </ButtonText>
