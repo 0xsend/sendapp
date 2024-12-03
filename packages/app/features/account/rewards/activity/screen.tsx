@@ -27,6 +27,7 @@ import formatAmount from 'app/utils/formatAmount'
 import { zeroAddress } from 'viem'
 import { type PropsWithChildren, useRef, useId, useState } from 'react'
 import { DistributionClaimButton } from '../components/DistributionClaimButton'
+import { useSendAccount } from 'app/utils/send-accounts'
 
 //@todo get this from the db
 const verificationTypesAndTitles = {
@@ -224,6 +225,10 @@ export function ActivityRewardsScreen() {
       ) : (
         <YStack f={1} w={'100%'} gap={'$7'}>
           <DistributionRequirementsCard distribution={distributions[selectedDistributionIndex]} />
+          <RewardsProgressCard
+            distribution={distributions[selectedDistributionIndex]}
+            previousDistribution={distributions[selectedDistributionIndex - 1]}
+          />
           <SendPerksCards distribution={distributions[selectedDistributionIndex]} />
           <MultiplierCards distribution={distributions[selectedDistributionIndex]} />
           <ClaimableRewardsCard distribution={distributions[selectedDistributionIndex]} />
@@ -317,19 +322,35 @@ const Header = () => (
 
 const DistributionRequirementsCard = ({
   distribution,
-}: { distribution: UseDistributionsResultData[number] }) => {
+  previousDistribution,
+}: {
+  distribution: UseDistributionsResultData[number]
+  previousDistribution?: UseDistributionsResultData[number]
+}) => {
+  const hasSent =
+    distribution.number < 9 ||
+    Boolean(
+      distribution.distribution_verifications_summary
+        .at(0)
+        ?.verification_values?.find(({ type }) => type === 'send_ceiling')
+    )
+
+  const now = new Date()
+
+  const isQualificationOver = distribution.qualification_end < now
+  const { data: sendAccount } = useSendAccount()
   const {
     data: snapshotBalance,
     isLoading: isLoadingSnapshotBalance,
     error: snapshotBalanceError,
   } = useReadSendTokenBalanceOf({
     chainId: distribution.chain_id as keyof typeof sendTokenAddress,
-    args: [distribution.distribution_shares.at(0)?.address ?? zeroAddress],
+    args: [sendAccount?.address ?? zeroAddress],
     blockNumber: distribution.snapshot_block_num
       ? BigInt(distribution.snapshot_block_num)
       : undefined,
     query: {
-      enabled: !!distribution.distribution_shares.at(0)?.address,
+      enabled: hasSent && Boolean(sendAccount?.address),
     },
   })
 
@@ -339,13 +360,39 @@ const DistributionRequirementsCard = ({
     .at(0)
     ?.verification_values?.find(({ type }) => type === 'tag_registration')?.weight
 
+  const sendSlash = distribution.send_slash.at(0)
+  const sendCeiling = distribution.distribution_verifications_summary[0]?.verification_values?.find(
+    ({ type }) => type === 'send_ceiling'
+  )
+
+  const previousReward =
+    previousDistribution?.distribution_shares?.[0]?.amount_after_slash ??
+    distribution.hodler_min_balance
+
+  let percent = 0
+  let balanceAfterSlash = 0n
+
+  if (sendCeiling?.weight && sendSlash?.scaling_divisor) {
+    const scaledPreviousReward = previousReward / sendSlash.scaling_divisor
+    // Multiply by 10000 to get 4 decimal places of precision
+    percent = Math.min((sendCeiling.weight / scaledPreviousReward) * 10000, 10000)
+    balanceAfterSlash = snapshotBalance
+      ? percent === 10000
+        ? snapshotBalance
+        : (BigInt(snapshotBalance) * BigInt(Math.round(percent))) / BigInt(10000)
+      : 0n
+  } else if (isQualificationOver && distribution.number < 9) {
+    balanceAfterSlash = snapshotBalance ?? 0n
+  }
+
   return (
     <Card br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
       <Stack ai="center" jc="space-between" gap="$5" $gtXs={{ flexDirection: 'row' }}>
         <YStack gap="$2">
           <Label fontSize={'$5'} col={'$color10'}>
-            Your SEND Balance
+            Your Qualifying Balance
           </Label>
+
           {isLoadingSnapshotBalance ? (
             <Spinner size="small" color={'$color11'} />
           ) : (
@@ -358,7 +405,7 @@ const DistributionRequirementsCard = ({
                 fontSize={'$9'}
                 $gtXl={{ fontSize: '$10' }}
               >
-                {`${formatAmount(snapshotBalance?.toString() ?? 0, 9, 0)} SEND`}
+                {`${formatAmount(balanceAfterSlash?.toString() ?? 0, 9, 0)} SEND`}
               </Paragraph>
             </Theme>
           )}
@@ -588,10 +635,72 @@ const MultiplierCard = ({ children }: PropsWithChildren<CardProps>) => {
   )
 }
 
+const RewardsProgressCard = ({
+  distribution,
+  previousDistribution,
+}: {
+  distribution: UseDistributionsResultData[number]
+  previousDistribution?: UseDistributionsResultData[number]
+}) => {
+  const sendSlash = distribution.send_slash.at(0)
+  const sendCeiling = distribution.distribution_verifications_summary[0]?.verification_values?.find(
+    ({ type }) => type === 'send_ceiling'
+  )
+
+  if (!sendCeiling || !sendSlash) return null
+
+  const previousReward =
+    previousDistribution?.distribution_shares?.[0]?.amount_after_slash ??
+    distribution.hodler_min_balance
+
+  const scaledPreviousReward = previousReward / sendSlash.scaling_divisor
+
+  const progress = Math.min(Math.floor((sendCeiling.weight / scaledPreviousReward) * 100), 100)
+
+  return (
+    <YStack f={1} w={'100%'} gap="$5">
+      <H3 fontWeight={'600'} color={'$color12'}>
+        Send Progress
+      </H3>
+      <Card br={'$6'} p="$7" $xs={{ p: '$5' }} w={'100%'} maw={500}>
+        <YStack gap="$4" w="100%">
+          <XStack jc="flex-end">
+            <Paragraph
+              ff={'$mono'}
+              py={'$size.0.5'}
+              px={'$size.0.9'}
+              borderWidth={1}
+              borderColor={'$primary'}
+              $theme-light={{ borderColor: '$color12' }}
+              borderRadius={'$4'}
+            >
+              {progress}%
+            </Paragraph>
+          </XStack>
+          <Stack w="100%" h="$1" br="$10" bc="$color3">
+            <Stack
+              w={`${progress}%`}
+              h="100%"
+              br="$10"
+              animation="quick"
+              $theme-light={{
+                bc: '$color12',
+              }}
+              $theme-dark={{
+                bc: '$primary',
+              }}
+            />
+          </Stack>
+        </YStack>
+      </Card>
+    </YStack>
+  )
+}
+
 const ClaimableRewardsCard = ({
   distribution,
 }: { distribution: UseDistributionsResultData[number] }) => {
-  const shareAmount = distribution.distribution_shares?.[0]?.amount
+  const shareAmount = distribution.distribution_shares?.[0]?.amount_after_slash
   if (shareAmount === undefined || shareAmount === 0) return null
   const now = new Date()
   const isQualificationOver = distribution.qualification_end < now
@@ -606,7 +715,7 @@ const ClaimableRewardsCard = ({
   return (
     <YStack f={1} w={'100%'} gap="$5" $sm={{ display: 'none' }}>
       <H3 fontWeight={'600'} color={'$color12'}>
-        {isQualificationOver ? `Total ${distributionMonth}` : `Estimated ${distributionMonth}`}
+        {isQualificationOver ? `Total ${distributionMonth}` : ` ${distributionMonth} Rewards`}
       </H3>
       <Card br={'$6'} p="$7" ai={'center'} w={'100%'}>
         <Stack ai="center" jc="space-between" fd="row" w="100%">

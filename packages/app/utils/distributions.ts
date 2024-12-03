@@ -43,6 +43,7 @@ export type UseDistributionsResultData = (UseDistributionResultDistribution & {
   claim_end: Date
   distribution_shares: Tables<'distribution_shares'>[]
   distribution_verifications_summary: Views<'distribution_verifications_summary'>[]
+  send_slash: Tables<'send_slash'>[]
 })[]
 
 export const useDistributions = (): UseQueryResult<UseDistributionsResultData, PostgrestError> => {
@@ -72,20 +73,28 @@ export const useDistributions = (): UseQueryResult<UseDistributionsResultData, P
   })
 }
 
-//@todo: make a Zod type for the JSON in distribution_verifications_summary
 /*
 After distribution 6 we switched to monthly distributions
 This function cuts out the first 6 distributions
 */
-export const useMonthlyDistributions = () => {
+export const useMonthlyDistributions = (): UseQueryResult<
+  UseDistributionsResultData,
+  PostgrestError
+> => {
   const supabase = useSupabase()
   const { data: sendAccount } = useSendAccount()
+
   return useQuery({
     queryKey: ['monthly_distributions', sendAccount?.created_at],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('distributions')
-        .select('*, distribution_shares(*), distribution_verifications_summary(*)')
+        .select(`
+          *,
+          distribution_shares(*),
+          distribution_verifications_summary(*),
+          send_slash(*)
+        `)
         .gt('number', 6)
         .gt('qualification_end', sendAccount?.created_at)
         .order('number', { ascending: false })
@@ -176,10 +185,14 @@ export const useSendSellCountDuringDistribution = (
 export function useSendMerkleDropTrancheActive({
   chainId,
   tranche,
-}: { chainId: keyof typeof sendMerkleDropAddress; tranche: bigint }) {
+  enabled = true,
+}: { chainId: keyof typeof sendMerkleDropAddress; tranche: bigint; enabled?: boolean }) {
   return useReadSendMerkleDropTrancheActive({
     chainId,
     args: [tranche],
+    query: {
+      enabled: enabled && Boolean(tranche),
+    },
   })
 }
 
@@ -193,17 +206,19 @@ export function useSendMerkleDropIsClaimed({
   chainId,
   tranche,
   index,
+  enabled = true,
 }: {
   chainId: keyof typeof sendMerkleDropAddress
   tranche: bigint
   index?: bigint
+  enabled?: boolean
 }) {
   return useReadSendMerkleDropIsClaimed({
     chainId,
     // @ts-expect-error index is undefined if not provided
     args: [tranche, index],
     query: {
-      enabled: index !== undefined,
+      enabled: enabled && Boolean(tranche) && Boolean(index),
     },
   })
 }
@@ -311,7 +326,7 @@ export function useGenerateClaimUserOp({
     isLoading: isLoadingProof,
     error: errorProof,
   } = api.distribution.proof.useQuery({ distributionId: distribution.id })
-  const { address: sender, amount, index } = share ?? {}
+  const { address: sender, amount_after_slash, index } = share ?? {}
 
   const {
     data: isClaimed,
@@ -337,7 +352,7 @@ export function useGenerateClaimUserOp({
     !errorProof &&
     merkleProof !== undefined &&
     index !== undefined &&
-    amount !== undefined &&
+    amount_after_slash !== undefined &&
     sender !== undefined &&
     !isClaimedLoading &&
     !isClaimedError &&
@@ -352,7 +367,7 @@ export function useGenerateClaimUserOp({
     queryKey: [
       'generateClaimUserOp',
       sender,
-      String(amount),
+      String(amount_after_slash),
       String(index),
       String(nonce),
       String(chainId),
@@ -363,7 +378,7 @@ export function useGenerateClaimUserOp({
     enabled: enabled,
     queryFn: () => {
       assert(!!sender && isAddress(sender), 'Invalid send account address')
-      assert(typeof amount === 'number' && amount > 0, 'Invalid amount')
+      assert(typeof amount_after_slash === 'number' && amount_after_slash > 0, 'Invalid amount')
       assert(typeof nonce === 'bigint' && nonce >= 0n, 'Invalid nonce')
 
       const callData = encodeFunctionData({
@@ -377,8 +392,17 @@ export function useGenerateClaimUserOp({
               data: encodeFunctionData({
                 abi: sendMerkleDropAbi,
                 functionName: 'claimTranche',
-                // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount, and merkleProof are defined when enabled is true
-                args: [sender!, trancheId, BigInt(index!), BigInt(amount!), merkleProof!],
+                args: [
+                  // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount_after_slash, and merkleProof are defined when enabled is true
+                  sender!,
+                  trancheId,
+                  // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount_after_slash, and merkleProof are defined when enabled is true
+                  BigInt(index!),
+                  // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount_after_slash, and merkleProof are defined when enabled is true
+                  BigInt(amount_after_slash!),
+                  // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount_after_slash, and merkleProof are defined when enabled is true
+                  merkleProof!,
+                ],
               }),
             },
           ],
@@ -413,7 +437,7 @@ export const usePrepareSendMerkleDropClaimTrancheWrite = ({
     isLoading: isLoadingProof,
     error: errorProof,
   } = api.distribution.proof.useQuery({ distributionId: distribution.id })
-  const { address, amount, index } = share ?? {}
+  const { address, amount_after_slash, index } = share ?? {}
 
   const {
     data: isClaimed,
@@ -439,7 +463,7 @@ export const usePrepareSendMerkleDropClaimTrancheWrite = ({
     !errorProof &&
     merkleProof !== undefined &&
     index !== undefined &&
-    amount !== undefined &&
+    amount_after_slash !== undefined &&
     address !== undefined &&
     !isClaimedLoading &&
     !isClaimedError &&
@@ -467,8 +491,8 @@ export const usePrepareSendMerkleDropClaimTrancheWrite = ({
     //     bytes32[] memory _merkleProof
     // )
     args: enabled
-      ? // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount, and merkleProof are defined when enabled is true
-        [address!, trancheId, BigInt(index!), BigInt(amount!), merkleProof!]
+      ? // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount_after_slash, and merkleProof are defined when enabled is true
+        [address!, trancheId, BigInt(index!), BigInt(amount_after_slash!), merkleProof!]
       : undefined,
   })
 }

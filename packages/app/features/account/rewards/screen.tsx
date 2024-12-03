@@ -2,29 +2,30 @@ import { YStack, H1, Paragraph, XStack, LinkableButton, Button, Image, Stack } f
 import type { sendMerkleDropAddress } from '@my/wagmi'
 import { IconArrowRight, IconSend } from 'app/components/icons'
 import {
-  useMonthlyDistributions,
+  useActiveDistribution,
   useSendMerkleDropIsClaimed,
   useSendMerkleDropTrancheActive,
 } from 'app/utils/distributions'
 
 export function RewardsScreen() {
-  const { data: distributions, isLoading: isLoadingDistributions } = useMonthlyDistributions()
-  const currentDistribution = distributions?.[0]
-  const trancheId = BigInt((currentDistribution?.number ?? 0) - 1) // tranches are 0-indexed
-  const chainId = currentDistribution?.chain_id as keyof typeof sendMerkleDropAddress
-  const share = currentDistribution?.distribution_shares?.[0]
+  const { distribution, isLoading: isLoadingDistribution } = useActiveDistribution()
+  const trancheId = BigInt((distribution?.number ?? 0) - 1) // tranches are 0-indexed
+  const chainId = distribution?.chain_id as keyof typeof sendMerkleDropAddress
+  const share = distribution?.distribution_shares?.[0]
 
   // find out if the tranche is active using SendMerkleDrop.trancheActive(uint256 _tranche)
   const { data: isTrancheActive, isLoading: isTrancheActiveLoading } =
     useSendMerkleDropTrancheActive({
       tranche: trancheId,
       chainId: chainId,
+      enabled: Boolean(trancheId && chainId),
     })
   // find out if user is eligible onchain using SendMerkleDrop.isClaimed(uint256 _tranche, uint256 _index)
   const { data: isClaimed, isLoading: isClaimedLoading } = useSendMerkleDropIsClaimed({
     chainId,
     tranche: trancheId,
     index: share?.index !== undefined ? BigInt(share.index) : undefined,
+    enabled: Boolean(trancheId && chainId && share?.index !== undefined),
   })
 
   return (
@@ -50,11 +51,13 @@ export function RewardsScreen() {
           <Section
             title="Activity Rewards"
             href="/account/rewards/activity"
-            isLoading={isLoadingDistributions || isTrancheActiveLoading || isClaimedLoading}
-            reward={currentDistribution?.distribution_shares?.[0]?.amount.toLocaleString() ?? ''}
+            isLoading={isLoadingDistribution || isTrancheActiveLoading || isClaimedLoading}
+            reward={
+              distribution?.distribution_shares?.[0]?.amount_after_slash.toLocaleString() ?? ''
+            }
             claimStatus={(() => {
               switch (true) {
-                case !share || !share.amount:
+                case !share || !share.amount_after_slash:
                   return undefined
                 case !isTrancheActive:
                   return 'Upcoming Reward'

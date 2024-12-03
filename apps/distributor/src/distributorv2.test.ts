@@ -103,6 +103,7 @@ describe('Distributor V2 Worker', () => {
       updated_at: '2024-04-06T16:49:02.569245+00:00',
       snapshot_block_num: 13261327,
       chain_id: 845337,
+      send_slash_divisor: 150,
       distribution_verification_values: [
         {
           type: 'tag_referral',
@@ -112,7 +113,6 @@ describe('Distributor V2 Worker', () => {
           multiplier_max: 2.5,
           multiplier_step: 0.1,
           distribution_id: 4,
-          mode: 'individual',
         },
         {
           type: 'total_tag_referrals',
@@ -121,7 +121,7 @@ describe('Distributor V2 Worker', () => {
           multiplier_min: 1.0,
           multiplier_max: 2.0,
           multiplier_step: 0.01,
-          mode: 'aggregate',
+
           created_at: '2024-04-06T16:49:02.569245+00:00',
           updated_at: '2024-04-06T16:49:02.569245+00:00',
           distribution_id: 4,
@@ -131,7 +131,6 @@ describe('Distributor V2 Worker', () => {
           fixed_value: 200,
           bips_value: 0,
           distribution_id: 4,
-          mode: 'individual',
         },
         {
           type: 'tag_registration',
@@ -140,7 +139,6 @@ describe('Distributor V2 Worker', () => {
           distribution_id: 4,
           created_at: '2024-04-06T16:49:02.569245+00:00',
           updated_at: '2024-04-06T16:49:02.569245+00:00',
-          mode: 'individual',
         },
         {
           type: 'send_ten',
@@ -149,7 +147,6 @@ describe('Distributor V2 Worker', () => {
           distribution_id: 4,
           created_at: '2024-04-06T16:49:02.569245+00:00',
           updated_at: '2024-04-06T16:49:02.569245+00:00',
-          mode: 'individual',
         },
         {
           type: 'send_one_hundred',
@@ -158,7 +155,6 @@ describe('Distributor V2 Worker', () => {
           distribution_id: 4,
           created_at: '2024-04-06T16:49:02.569245+00:00',
           updated_at: '2024-04-06T16:49:02.569245+00:00',
-          mode: 'individual',
         },
         {
           type: 'send_streak',
@@ -170,7 +166,6 @@ describe('Distributor V2 Worker', () => {
           multiplier_step: 0.2,
           created_at: '2024-04-06T16:49:02.569245+00:00',
           updated_at: '2024-04-06T16:49:02.569245+00:00',
-          mode: 'aggregate',
         },
       ],
     } as Tables<'distributions'> & {

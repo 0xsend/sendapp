@@ -137,6 +137,7 @@ export type Database = {
         Row: {
           address: string
           amount: number
+          amount_after_slash: number
           bonus_pool_amount: number
           created_at: string
           distribution_id: number
@@ -150,6 +151,7 @@ export type Database = {
         Insert: {
           address: string
           amount: number
+          amount_after_slash: number
           bonus_pool_amount: number
           created_at?: string
           distribution_id: number
@@ -163,6 +165,7 @@ export type Database = {
         Update: {
           address?: string
           amount?: number
+          amount_after_slash?: number
           bonus_pool_amount?: number
           created_at?: string
           distribution_id?: number
@@ -859,6 +862,35 @@ export type Database = {
         }
         Relationships: []
       }
+      send_slash: {
+        Row: {
+          distribution_id: number
+          distribution_number: number
+          minimum_sends: number
+          scaling_divisor: number
+        }
+        Insert: {
+          distribution_id: number
+          distribution_number: number
+          minimum_sends?: number
+          scaling_divisor?: number
+        }
+        Update: {
+          distribution_id?: number
+          distribution_number?: number
+          minimum_sends?: number
+          scaling_divisor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "send_slash_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "distributions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       send_token_transfers: {
         Row: {
           abi_idx: number
@@ -1118,34 +1150,6 @@ export type Database = {
         }
         Relationships: []
       }
-      affiliate_referrals: {
-        Row: {
-          referral:
-            | Database["public"]["CompositeTypes"]["affiliate_referral_type"]
-            | null
-        }
-        Relationships: []
-      }
-      affiliate_stats_summary: {
-        Row: {
-          affiliate_send_score: number | null
-          created_at: string | null
-          id: string | null
-          network_plus_minus: number | null
-          referral_count: number | null
-          send_plus_minus: number | null
-          user_id: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "affiliate_stats_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       distribution_verifications_summary: {
         Row: {
           distribution_id: number | null
@@ -1169,6 +1173,12 @@ export type Database = {
       }
     }
     Functions: {
+      calculate_and_insert_send_ceiling_verification: {
+        Args: {
+          distribution_number: number
+        }
+        Returns: undefined
+      }
       citext:
         | {
             Args: {
@@ -1275,10 +1285,7 @@ export type Database = {
           id: string
           created_at: string
           user_id: string
-          send_plus_minus: number
           referral_count: number
-          network_plus_minus: number
-          affiliate_send_score: number
         }[]
       }
       insert_challenge: {
@@ -1338,6 +1345,16 @@ export type Database = {
           user_id: string
         }
       }
+      sum_qualification_sends: {
+        Args: {
+          distribution_number: number
+        }
+        Returns: {
+          user_id: string
+          amount: number
+          sent_to: string[]
+        }[]
+      }
       tag_search: {
         Args: {
           query: string
@@ -1374,6 +1391,7 @@ export type Database = {
         | "send_one_hundred"
         | "total_tag_referrals"
         | "send_streak"
+        | "send_ceiling"
       verification_value_mode: "individual" | "aggregate"
     }
     CompositeTypes: {
@@ -1383,22 +1401,6 @@ export type Database = {
         avatar_url: string
         send_id: number
         tags: unknown
-      }
-      affiliate_referral_type: {
-        referred_id: string
-        send_plus_minus: number
-        avatar_url: string
-        tag: string
-        created_at: string
-      }
-      affiliate_stats_summary_type: {
-        id: number
-        created_at: string
-        user_id: string
-        send_plus_minus: number
-        referral_count: number
-        network_plus_minus: number
-        affiliate_send_score: number
       }
       multiplier_info: {
         type: string
