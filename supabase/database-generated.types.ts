@@ -1316,6 +1316,7 @@ export type Database = {
           name: string
           about: string
           refcode: string
+          x_username: string
           tag: string
           address: string
           chain_id: number
