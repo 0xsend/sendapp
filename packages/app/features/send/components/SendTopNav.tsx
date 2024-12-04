@@ -3,6 +3,7 @@ import {
   Container,
   H2,
   Header,
+  isWeb,
   Paragraph,
   Stack,
   Theme,
@@ -18,9 +19,16 @@ import { useRouter } from 'solito/router'
 export function SendTopNav() {
   const [sendParams] = useSendScreenParams()
   const { back } = useRouter()
+
   const path = usePathname()
 
   const isPwa = usePwa()
+
+  const handleBack = () => {
+    if (isWeb || window.history.length > 1) {
+      back()
+    }
+  }
 
   return (
     <Header w="100%">
@@ -32,7 +40,7 @@ export function SendTopNav() {
         $lg={{ pt: !isPwa && '$5', pb: '$3' }}
       >
         <XStack ai="center" $lg={{ f: 1 }} w="20%" $gtLg={{ display: 'none' }}>
-          <Button onPress={back}>
+          <Button onPress={handleBack}>
             <ButtonOg.Icon>
               <IconArrowLeft
                 size={'$1.5'}
