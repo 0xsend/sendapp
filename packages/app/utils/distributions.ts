@@ -42,7 +42,6 @@ export type UseDistributionsResultData = (UseDistributionResultDistribution & {
   qualification_start: Date
   claim_end: Date
   distribution_shares: Tables<'distribution_shares'>[]
-  distribution_verifications_summary: Views<'distribution_verifications_summary'>[]
   send_slash: Tables<'send_slash'>[]
 })[]
 
@@ -55,7 +54,6 @@ export const useDistributions = (): UseQueryResult<UseDistributionsResultData, P
         .from('distributions')
         .select('*, distribution_shares(*), distribution_verifications_summary(*)')
         .order('number', { ascending: false })
-
       if (error) {
         throw error
       }
@@ -73,14 +71,12 @@ export const useDistributions = (): UseQueryResult<UseDistributionsResultData, P
   })
 }
 
+//@todo: make a Zod type for the JSON in distribution_verifications_summary
 /*
 After distribution 6 we switched to monthly distributions
 This function cuts out the first 6 distributions
 */
-export const useMonthlyDistributions = (): UseQueryResult<
-  UseDistributionsResultData,
-  PostgrestError
-> => {
+export const useMonthlyDistributions = () => {
   const supabase = useSupabase()
   const { data: sendAccount } = useSendAccount()
 
@@ -92,16 +88,13 @@ export const useMonthlyDistributions = (): UseQueryResult<
         .select(`
           *,
           distribution_shares(*),
-          distribution_verifications_summary(*),
           send_slash(*)
         `)
         .gt('number', 6)
         .gt('qualification_end', sendAccount?.created_at)
         .order('number', { ascending: false })
-      console.log('data: ', data)
-      if (error) {
-        throw error
-      }
+
+      if (error) throw error
 
       return data.map((distribution) => ({
         ...distribution,
@@ -113,6 +106,28 @@ export const useMonthlyDistributions = (): UseQueryResult<
         claim_end: new Date(distribution.claim_end),
       }))
     },
+  })
+}
+
+export const useDistributionVerifications = (
+  distributionId?: number
+): UseQueryResult<Views<'distribution_verifications_summary'>, PostgrestError> => {
+  const supabase = useSupabase()
+
+  return useQuery({
+    queryKey: ['distribution_verifications', distributionId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('distribution_verifications_summary')
+        .select('*')
+        // @ts-expect-error disabled if no distributionNumber
+        .eq('distribution_id', distributionId)
+        .single()
+
+      if (error) throw error
+      return data
+    },
+    enabled: Boolean(distributionId),
   })
 }
 
@@ -185,14 +200,16 @@ export const useSendSellCountDuringDistribution = (
 export function useSendMerkleDropTrancheActive({
   chainId,
   tranche,
-  enabled = true,
-}: { chainId: keyof typeof sendMerkleDropAddress; tranche: bigint; enabled?: boolean }) {
+  query,
+}: {
+  chainId: keyof typeof sendMerkleDropAddress
+  tranche: bigint
+  query?: { enabled?: boolean }
+}) {
   return useReadSendMerkleDropTrancheActive({
     chainId,
     args: [tranche],
-    query: {
-      enabled: enabled && Boolean(tranche),
-    },
+    query,
   })
 }
 
@@ -206,20 +223,18 @@ export function useSendMerkleDropIsClaimed({
   chainId,
   tranche,
   index,
-  enabled = true,
+  query,
 }: {
   chainId: keyof typeof sendMerkleDropAddress
   tranche: bigint
   index?: bigint
-  enabled?: boolean
+  query?: { enabled?: boolean }
 }) {
   return useReadSendMerkleDropIsClaimed({
     chainId,
     // @ts-expect-error index is undefined if not provided
     args: [tranche, index],
-    query: {
-      enabled: enabled && Boolean(tranche) && Boolean(index),
-    },
+    query,
   })
 }
 
