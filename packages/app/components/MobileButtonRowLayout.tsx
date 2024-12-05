@@ -14,12 +14,13 @@ import { useScrollDirection } from '../provider/scroll'
 import { ProfileButtons } from 'app/features/profile/ProfileButtons'
 import { useUser } from 'app/utils/useUser'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
-import { useProfileScreenParams, useRewardsScreenParams } from 'app/routers/params'
+import { useProfileScreenParams } from 'app/routers/params'
 import { useMonthlyDistributions } from 'app/utils/distributions'
 import { DistributionClaimButton } from 'app/features/account/rewards/components/DistributionClaimButton'
 import formatAmount from 'app/utils/formatAmount'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { useIsSendingUnlocked } from 'app/utils/useIsSendingUnlocked'
+import { useDistributionContext } from 'app/features/account/rewards/DistributionContext'
 
 const Row = styled(XStack, {
   w: '100%',
@@ -148,23 +149,28 @@ const Profile = (
 }
 
 const ActivityRewards = ({ children, ...props }: XStackProps) => {
-  const [queryParams] = useRewardsScreenParams()
+  const { distribution } = useDistributionContext()
   const { data: distributions, isLoading } = useMonthlyDistributions()
-  const distribution =
-    distributions?.find((d) => d.number === queryParams.distribution) ?? distributions?.[0]
-  const shareAmount = distribution?.distribution_shares?.[0]?.amount_after_slash
 
-  const isVisible = distribution !== undefined && shareAmount !== undefined && shareAmount > 0
-  const distributionMonth = distribution?.timezone_adjusted_qualification_end.toLocaleString(
-    'default',
-    {
+  // Memoize selected distribution
+  const selectedDistribution =
+    distributions?.find((d) => d.number === distribution) ?? distributions?.[0]
+
+  // Memoize derived values
+
+  const shareAmount = selectedDistribution?.distribution_shares?.[0]?.amount_after_slash
+
+  const isVisible =
+    selectedDistribution !== undefined && shareAmount !== undefined && shareAmount > 0
+  const distributionMonth =
+    selectedDistribution?.timezone_adjusted_qualification_end.toLocaleString('default', {
       month: 'long',
-    }
-  )
+    })
 
   const now = new Date()
   const isQualificationOver =
-    distribution?.qualification_end !== undefined && distribution.qualification_end < now
+    selectedDistribution?.qualification_end !== undefined &&
+    selectedDistribution.qualification_end < now
 
   return (
     <>
@@ -187,7 +193,8 @@ const ActivityRewards = ({ children, ...props }: XStackProps) => {
             >
               {shareAmount === undefined ? '' : `${formatAmount(shareAmount, 10, 0)} SEND`}
             </Paragraph>
-            {isVisible && <DistributionClaimButton distribution={distribution} />}
+            {/* @ts-expect-error selectedDistribution must be defined when isVisible is true */}
+            {isVisible && <DistributionClaimButton distribution={selectedDistribution} />}
           </Row>
         </Stack>
       </MobileButtonRow>
@@ -195,9 +202,9 @@ const ActivityRewards = ({ children, ...props }: XStackProps) => {
   )
 }
 
-Home.displayName = 'Home'
-Profile.displayName = 'Profile'
-ActivityRewards.displayName = 'ActivityRewards'
+Home.displayName = 'MobileButtonRowHome'
+Profile.displayName = 'MobileButtonRowProfile'
+ActivityRewards.displayName = 'MobileButtonRowActivityRewards'
 
 MobileButtonRow.Home = Home
 MobileButtonRow.Profile = Profile

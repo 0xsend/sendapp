@@ -21,13 +21,13 @@ import {
 import { type sendTokenAddress, useReadSendTokenBalanceOf } from '@my/wagmi'
 import { CheckCircle2, ChevronDown, ChevronUp, Dot } from '@tamagui/lucide-icons'
 import { IconAccount, IconInfoCircle, IconX } from 'app/components/icons'
-import { useRewardsScreenParams } from 'app/routers/params'
 import { useMonthlyDistributions, type UseDistributionsResultData } from 'app/utils/distributions'
 import formatAmount from 'app/utils/formatAmount'
 import { zeroAddress } from 'viem'
 import { type PropsWithChildren, useRef, useId, useState } from 'react'
 import { DistributionClaimButton } from '../components/DistributionClaimButton'
 import { useSendAccount } from 'app/utils/send-accounts'
+import { useDistributionContext } from '../DistributionContext'
 
 //@todo get this from the db
 const verificationTypesAndTitles = {
@@ -41,14 +41,30 @@ const verificationTypesAndTitles = {
 } as const
 
 export function ActivityRewardsScreen() {
-  const [queryParams, setRewardsScreenParams] = useRewardsScreenParams()
-  const { data: distributions, isLoading } = useMonthlyDistributions()
+  const { distribution, setDistribution } = useDistributionContext()
+
+  const { data: distributions, isLoading: isLoadingDistributions } = useMonthlyDistributions()
+
   const [isOpen, setIsOpen] = useState(false)
+
   const id = useId()
 
   const selectTriggerRef = useRef<HTMLSelectElement>(null)
 
-  if (isLoading)
+  const selectedDistributionIndex =
+    distributions !== undefined && distributions.length <= (distribution ?? 0)
+      ? distributions?.findIndex((d) => d.number === distribution)
+      : 0
+
+  console.log('selectedDistributionIndex: ', selectedDistributionIndex)
+
+  const onValueChange = (value: string) => {
+    const newDistribution = distributions?.[Number(value)]
+    if (newDistribution?.number === distribution) return
+    setDistribution(newDistribution?.number)
+  }
+
+  if (isLoadingDistributions) {
     return (
       <YStack f={1} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
         <Header />
@@ -57,7 +73,9 @@ export function ActivityRewardsScreen() {
         </Stack>
       </YStack>
     )
-  if (!distributions)
+  }
+
+  if (!distributions?.length) {
     return (
       <YStack f={1} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
         <Header />
@@ -68,25 +86,14 @@ export function ActivityRewardsScreen() {
         </Stack>
       </YStack>
     )
+  }
 
-  const selectedDistributionIndex =
-    queryParams.distribution === undefined || distributions.length > queryParams.distribution
-      ? 0
-      : distributions.findIndex((d) => d.number === queryParams.distribution)
-
-  const distributionDates = distributions.map(
+  const distributionDates = distributions?.map(
     (d) =>
       `${d.timezone_adjusted_qualification_end.toLocaleString('default', {
         month: 'long',
       })} ${d.timezone_adjusted_qualification_end.toLocaleString('default', { year: 'numeric' })}`
   )
-
-  const onValueChange = (value: string) => {
-    setRewardsScreenParams(
-      { distribution: distributions[Number(value)]?.number },
-      { webBehavior: 'replace' }
-    )
-  }
 
   return (
     <YStack f={1} pb={'$12'} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
