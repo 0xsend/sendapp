@@ -318,12 +318,17 @@ const DistributionRequirementsCard = ({
   }
 
   const previousReward =
-    previousDistribution?.distribution_shares?.[0]?.amount_after_slash ??
-    distribution.hodler_min_balance
+    previousDistribution?.distribution_shares?.reduce(
+      (acc, curr) => acc + curr.amount_after_slash,
+      0
+    ) ?? distribution.hodler_min_balance
 
   const scaledPreviousReward = previousReward / sendSlash.scaling_divisor
 
-  const progress = (sendCeiling.weight / scaledPreviousReward).toFixed(1)
+  const progress = (
+    (Math.min(sendCeiling.weight, scaledPreviousReward) / scaledPreviousReward) *
+    100
+  ).toFixed(1)
 
   return (
     <Card br={12} p="$5" gap="$4" $gtMd={{ gap: '$6', p: '$7' }}>
