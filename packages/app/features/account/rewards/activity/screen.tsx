@@ -3,30 +3,33 @@ import {
   H1,
   Paragraph,
   XStack,
-  Button,
   Image,
   LinearGradient,
   Stack,
   Spinner,
-  Select,
   H3,
-  Adapt,
-  Sheet,
-  type SelectItemProps,
   Card,
   Label,
   Theme,
   type CardProps,
 } from '@my/ui'
 import { type sendTokenAddress, useReadSendTokenBalanceOf } from '@my/wagmi'
-import { CheckCircle2, ChevronDown, ChevronUp, Dot } from '@tamagui/lucide-icons'
-import { IconAccount, IconInfoCircle, IconX } from 'app/components/icons'
-import { useMonthlyDistributions, type UseDistributionsResultData } from 'app/utils/distributions'
+import { CheckCircle2 } from '@tamagui/lucide-icons'
+import { IconAccount, IconInfoCircle } from 'app/components/icons'
+import {
+  useDistributionVerifications,
+  useMonthlyDistributions,
+  type UseDistributionsResultData,
+} from 'app/utils/distributions'
 import formatAmount from 'app/utils/formatAmount'
 import { zeroAddress } from 'viem'
-import { type PropsWithChildren, useRef, useId, useState } from 'react'
+import { type PropsWithChildren, useState, memo } from 'react'
 import { DistributionClaimButton } from '../components/DistributionClaimButton'
 import { useSendAccount } from 'app/utils/send-accounts'
+import type { Tables } from '@my/supabase/database-generated.types'
+import type { UseQueryResult } from '@tanstack/react-query'
+import type { PostgrestError } from '@supabase/postgrest-js'
+import { DistributionSelect } from '../components/DistributionSelect'
 import { useDistributionContext } from '../DistributionContext'
 
 //@todo get this from the db
@@ -44,25 +47,20 @@ export function ActivityRewardsScreen() {
   const { distribution, setDistribution } = useDistributionContext()
 
   const { data: distributions, isLoading: isLoadingDistributions } = useMonthlyDistributions()
-
   const [isOpen, setIsOpen] = useState(false)
-
-  const id = useId()
-
-  const selectTriggerRef = useRef<HTMLSelectElement>(null)
 
   const selectedDistributionIndex =
     distributions !== undefined && distributions.length <= (distribution ?? 0)
       ? distributions?.findIndex((d) => d.number === distribution)
       : 0
 
-  console.log('selectedDistributionIndex: ', selectedDistributionIndex)
-
   const onValueChange = (value: string) => {
     const newDistribution = distributions?.[Number(value)]
     if (newDistribution?.number === distribution) return
     setDistribution(newDistribution?.number)
   }
+
+  const verificationsQuery = useDistributionVerifications(distribution ?? distributions?.[0]?.id)
 
   if (isLoadingDistributions) {
     return (
@@ -103,180 +101,56 @@ export function ActivityRewardsScreen() {
           {`${distributionDates[selectedDistributionIndex]?.split(' ')[0] ?? 'Monthly'} Rewards`}
         </H3>
         {distributions.length > 1 && (
-          <Select
-            native={false}
-            id={id}
-            value={selectedDistributionIndex.toString() ?? '0'}
-            onValueChange={onValueChange}
+          <DistributionSelect
+            distributions={distributions}
+            selectedIndex={selectedDistributionIndex}
+            isOpen={isOpen}
             onOpenChange={setIsOpen}
-            defaultValue="0"
-            open={isOpen}
-          >
-            <Select.Trigger
-              ref={selectTriggerRef}
-              testID={'SelectDistributionDate'}
-              br="$3"
-              w={'fit-content'}
-              bw={'$1'}
-              $theme-light={{
-                boc: isOpen ? '$color1' : '$black',
-                bc: isOpen ? '$color1' : '$transparent',
-              }}
-              $theme-dark={{
-                boc: isOpen ? '$color1' : '$primary',
-                bc: isOpen ? '$color1' : '$transparent',
-                hoverStyle: { bc: '$color1' },
-              }}
-              iconAfter={
-                isOpen ? (
-                  <ChevronUp
-                    $theme-dark={{
-                      color: '$color12',
-                    }}
-                    color={'$color11'}
-                  />
-                ) : (
-                  <ChevronDown
-                    $theme-dark={{
-                      color: '$primary',
-                      hoverStyle: { color: '$color0' },
-                    }}
-                    color="$black"
-                  />
-                )
-              }
-            >
-              <Select.Value
-                testID={'SelectDistributionDateValue'}
-                color={'$color12'}
-                hoverStyle={{ color: '$color0' }}
-                placeholder={distributions[selectedDistributionIndex]?.number}
-              />
-            </Select.Trigger>
-
-            <Adapt when="sm" platform="touch">
-              <Sheet
-                native
-                modal
-                dismissOnSnapToBottom
-                snapPoints={[30]}
-                animation={'quick'}
-                disableDrag
-              >
-                <Sheet.Frame maw={738} bc={'$color1'}>
-                  <Sheet.Handle
-                    py="$5"
-                    f={1}
-                    bc="transparent"
-                    jc={'space-between'}
-                    opacity={1}
-                    m={0}
-                  >
-                    <XStack ai="center" jc="space-between" w="100%" px="$4">
-                      <Paragraph fontSize={'$5'} fontWeight={'700'} color={'$color12'}>
-                        Select Month
-                      </Paragraph>
-                      <Button
-                        chromeless
-                        unstyled
-                        icon={<IconX color={'$color12'} size={'$1.5'} />}
-                        onPress={() => setIsOpen(false)}
-                      />
-                    </XStack>
-                  </Sheet.Handle>
-                  <Sheet.ScrollView>
-                    <Adapt.Contents />
-                  </Sheet.ScrollView>
-                </Sheet.Frame>
-                <Sheet.Overlay />
-              </Sheet>
-            </Adapt>
-
-            <Select.Content zIndex={200000}>
-              <Select.Viewport
-                br={'$3'}
-                style={{
-                  left: '66%',
-                }}
-                w={320}
-                btrr={0}
-                boc="transparent"
-                bc={'$color1'}
-                pt={'$5'}
-              >
-                <Select.Group>
-                  {distributions.map((distribution, i) => (
-                    <DistributionItem
-                      isActive={
-                        distribution.number === distributions[selectedDistributionIndex]?.number
-                      }
-                      value={i.toString()}
-                      index={i}
-                      key={distribution?.number}
-                    >
-                      {distributionDates[i]}
-                    </DistributionItem>
-                  ))}
-                </Select.Group>
-              </Select.Viewport>
-            </Select.Content>
-          </Select>
+            onValueChange={onValueChange}
+          />
         )}
       </XStack>
-      {!distributions[selectedDistributionIndex] ? (
-        <YStack f={1} w={'100%'} gap={'$7'}>
+      <YStack f={1} w={'100%'} gap={'$7'}>
+        {!distributions[selectedDistributionIndex] ? (
           <Paragraph color={'$color10'} size={'$5'}>
             No rewards available
           </Paragraph>
-        </YStack>
-      ) : (
-        <YStack f={1} w={'100%'} gap={'$7'}>
-          <DistributionRequirementsCard distribution={distributions[selectedDistributionIndex]} />
-          <RewardsProgressCard
+        ) : (
+          <DistributionContent
             distribution={distributions[selectedDistributionIndex]}
             previousDistribution={distributions[selectedDistributionIndex - 1]}
+            verificationsQuery={verificationsQuery}
           />
-          <SendPerksCards distribution={distributions[selectedDistributionIndex]} />
-          <MultiplierCards distribution={distributions[selectedDistributionIndex]} />
-          <ClaimableRewardsCard distribution={distributions[selectedDistributionIndex]} />
-        </YStack>
-      )}
+        )}
+      </YStack>
     </YStack>
   )
 }
 
-const DistributionItem = ({
-  isActive,
-  value,
-  index,
-  children,
-  ...props
-}: {
-  isActive: boolean
-} & SelectItemProps) => {
-  return (
-    <Select.Item index={index} value={value} bc="transparent" f={1} w="100%" {...props}>
-      <XStack gap={'$1'} $gtLg={{ gap: '$3.5' }} f={1} ai={'center'} jc={'center'}>
-        <Select.ItemText
-          display="flex"
-          fontSize={'$5'}
-          fontWeight={'500'}
-          textTransform={'uppercase'}
-          color={'$color12'}
-          jc={'center'}
-          ai={'center'}
-        >
-          {children}
-        </Select.ItemText>
-        {isActive && (
-          <Theme name="green_active">
-            <Dot size={'$3'} />
-          </Theme>
-        )}
-      </XStack>
-    </Select.Item>
-  )
-}
+const DistributionContent = memo(
+  ({
+    distribution,
+    previousDistribution,
+    verificationsQuery,
+  }: {
+    distribution: UseDistributionsResultData[number]
+    previousDistribution?: UseDistributionsResultData[number]
+    verificationsQuery: UseQueryResult<Tables<'distribution_verifications_summary'>, PostgrestError>
+  }) => {
+    return (
+      <>
+        <DistributionRequirementsCard
+          distribution={distribution}
+          previousDistribution={previousDistribution}
+          verificationsQuery={verificationsQuery}
+        />
+        <SendPerksCards distribution={distribution} verificationsQuery={verificationsQuery} />
+        <MultiplierCards distribution={distribution} verificationsQuery={verificationsQuery} />
+        <ClaimableRewardsCard distribution={distribution} />
+      </>
+    )
+  }
+)
 
 const Header = () => (
   <Stack w={'100%'} h={224} position="relative" jc={'center'} br={'$6'} overflow="hidden">
@@ -330,22 +204,14 @@ const Header = () => (
 const DistributionRequirementsCard = ({
   distribution,
   previousDistribution,
+  verificationsQuery,
 }: {
   distribution: UseDistributionsResultData[number]
   previousDistribution?: UseDistributionsResultData[number]
+  verificationsQuery: UseQueryResult<Tables<'distribution_verifications_summary'>, PostgrestError>
 }) => {
-  const hasSent =
-    distribution.number < 9 ||
-    Boolean(
-      distribution.distribution_verifications_summary
-        .at(0)
-        ?.verification_values?.find(({ type }) => type === 'send_ceiling')
-    )
-
-  const now = new Date()
-
-  const isQualificationOver = distribution.qualification_end < now
   const { data: sendAccount } = useSendAccount()
+  const verifications = verificationsQuery?.data
   const {
     data: snapshotBalance,
     isLoading: isLoadingSnapshotBalance,
@@ -357,48 +223,128 @@ const DistributionRequirementsCard = ({
       ? BigInt(distribution.snapshot_block_num)
       : undefined,
     query: {
-      enabled: hasSent && Boolean(sendAccount?.address),
+      enabled: Boolean(sendAccount?.address),
     },
   })
+  if (verificationsQuery?.isLoading) {
+    return (
+      <Card br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
+        <Stack ai="center" jc="center" p="$4">
+          <Spinner color="$color12" size="large" />
+        </Stack>
+      </Card>
+    )
+  }
 
   if (snapshotBalanceError) throw snapshotBalanceError
 
-  const sendTagRegistrations = distribution.distribution_verifications_summary
-    .at(0)
-    ?.verification_values?.find(({ type }) => type === 'tag_registration')?.weight
+  const sendTagRegistrations = verifications?.verification_values?.find(
+    ({ type }) => type === 'tag_registration'
+  )?.weight
 
   const sendSlash = distribution.send_slash.at(0)
-  const sendCeiling = distribution.distribution_verifications_summary[0]?.verification_values?.find(
+  const sendCeiling = verifications?.verification_values?.find(
     ({ type }) => type === 'send_ceiling'
   )
+
+  if (!sendCeiling || !sendSlash) {
+    return (
+      <Card br={12} p="$5" gap="$4" $gtMd={{ gap: '$6', p: '$7' }}>
+        <Stack ai="center" jc="space-between" gap="$5" $gtXs={{ flexDirection: 'row' }}>
+          <YStack gap="$2">
+            <XStack jc="space-between" ai="center" gap="$2" miw={120}>
+              <Label fontSize={'$5'} col={'$color10'}>
+                Your SEND Balance
+              </Label>
+            </XStack>
+            {isLoadingSnapshotBalance ? (
+              <Spinner size="small" color={'$color11'} />
+            ) : (
+              <Theme reset>
+                <Paragraph
+                  fontFamily={'$mono'}
+                  fontWeight={'500'}
+                  color={'$color12'}
+                  lh={'$8'}
+                  fontSize={'$9'}
+                  $gtXl={{ fontSize: '$10' }}
+                >
+                  {`${formatAmount(snapshotBalance?.toString() ?? 0, 9, 0)} SEND`}
+                </Paragraph>
+              </Theme>
+            )}
+          </YStack>
+          <YStack gap="$2" ai={'flex-end'}>
+            <XStack ai="center" gap="$2">
+              <Paragraph>Sendtag Registered</Paragraph>
+              {sendTagRegistrations && sendTagRegistrations > 0 ? (
+                <CheckCircle2 $theme-light={{ color: '$color12' }} color="$primary" size={'$1.5'} />
+              ) : (
+                <Theme name="red">
+                  <IconInfoCircle color={'$color8'} size={'$1'} />
+                </Theme>
+              )}
+            </XStack>
+            <XStack ai="center" gap="$2">
+              <Paragraph>
+                Min. Balance {formatAmount(distribution.hodler_min_balance, 9, 0)}
+              </Paragraph>
+              {(() => {
+                switch (true) {
+                  case isLoadingSnapshotBalance:
+                    return <Spinner size="small" />
+                  case distribution.hodler_min_balance === undefined ||
+                    distribution.hodler_min_balance > (snapshotBalance ?? 0):
+                    return (
+                      <Theme name="red">
+                        <IconInfoCircle color={'$color8'} size={'$1'} />
+                      </Theme>
+                    )
+                  default:
+                    return (
+                      <CheckCircle2
+                        $theme-light={{ color: '$color12' }}
+                        color="$primary"
+                        size={'$1.5'}
+                      />
+                    )
+                }
+              })()}
+            </XStack>
+          </YStack>
+        </Stack>
+      </Card>
+    )
+  }
 
   const previousReward =
     previousDistribution?.distribution_shares?.[0]?.amount_after_slash ??
     distribution.hodler_min_balance
 
-  let percent = 0
-  let balanceAfterSlash = 0n
+  const scaledPreviousReward = previousReward / sendSlash.scaling_divisor
 
-  if (sendCeiling?.weight && sendSlash?.scaling_divisor) {
-    const scaledPreviousReward = previousReward / sendSlash.scaling_divisor
-    // Multiply by 10000 to get 4 decimal places of precision
-    percent = Math.min((sendCeiling.weight / scaledPreviousReward) * 10000, 10000)
-    balanceAfterSlash = snapshotBalance
-      ? percent === 10000
-        ? snapshotBalance
-        : (BigInt(snapshotBalance) * BigInt(Math.round(percent))) / BigInt(10000)
-      : 0n
-  } else if (isQualificationOver && distribution.number < 9) {
-    balanceAfterSlash = snapshotBalance ?? 0n
-  }
+  const progress = (sendCeiling.weight / scaledPreviousReward).toFixed(1)
 
   return (
-    <Card br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
+    <Card br={12} p="$5" gap="$4" $gtMd={{ gap: '$6', p: '$7' }}>
       <Stack ai="center" jc="space-between" gap="$5" $gtXs={{ flexDirection: 'row' }}>
         <YStack gap="$2">
-          <Label fontSize={'$5'} col={'$color10'}>
-            Your Qualifying Balance
-          </Label>
+          <XStack jc="space-between" ai="center" gap="$2" miw={120}>
+            <Label fontSize={'$5'} col={'$color10'}>
+              Your SEND Balance
+            </Label>
+            <Paragraph
+              ff={'$mono'}
+              py={'$size.0.5'}
+              px={'$size.0.9'}
+              borderWidth={1}
+              borderColor={'$primary'}
+              $theme-light={{ borderColor: '$color12' }}
+              borderRadius={'$4'}
+            >
+              {progress}%
+            </Paragraph>
+          </XStack>
 
           {isLoadingSnapshotBalance ? (
             <Spinner size="small" color={'$color11'} />
@@ -412,7 +358,7 @@ const DistributionRequirementsCard = ({
                 fontSize={'$9'}
                 $gtXl={{ fontSize: '$10' }}
               >
-                {`${formatAmount(balanceAfterSlash?.toString() ?? 0, 9, 0)} SEND`}
+                {`${formatAmount(snapshotBalance?.toString() ?? 0, 9, 0)} SEND`}
               </Paragraph>
             </Theme>
           )}
@@ -456,13 +402,48 @@ const DistributionRequirementsCard = ({
           </XStack>
         </YStack>
       </Stack>
+      <XStack gap="$4" w="100%" ai="center">
+        <Stack w="100%" h="$1" br="$10" bc="$color3">
+          <Stack
+            w={`${progress}%`}
+            h="100%"
+            br="$10"
+            animation="quick"
+            $theme-light={{
+              bc: '$color12',
+            }}
+            $theme-dark={{
+              bc: '$primary',
+            }}
+          />
+        </Stack>
+      </XStack>
     </Card>
   )
 }
 
-const SendPerksCards = ({ distribution }: { distribution: UseDistributionsResultData[number] }) => {
-  const verificationValues =
-    distribution.distribution_verifications_summary.at(0)?.verification_values
+const SendPerksCards = ({
+  distribution,
+  verificationsQuery,
+}: {
+  distribution: UseDistributionsResultData[number]
+  verificationsQuery?: UseQueryResult<Tables<'distribution_verifications_summary'>, PostgrestError>
+}) => {
+  const verifications = verificationsQuery?.data
+  if (verificationsQuery?.isLoading) {
+    return (
+      <YStack f={1} w={'100%'} gap="$5">
+        <H3 fontWeight={'600'} color={'$color12'}>
+          Perks
+        </H3>
+        <Card br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
+          <Stack ai="center" jc="center" p="$4">
+            <Spinner color="$color12" size="large" />
+          </Stack>
+        </Card>
+      </YStack>
+    )
+  }
 
   const now = new Date()
   const isQualificationOver = distribution.qualification_end < now
@@ -473,7 +454,7 @@ const SendPerksCards = ({ distribution }: { distribution: UseDistributionsResult
         Perks
       </H3>
       <Stack flexWrap="wrap" gap="$5" $gtXs={{ fd: 'row' }}>
-        {verificationValues
+        {verifications?.verification_values
           ?.filter(
             ({ fixed_value, weight }) =>
               (fixed_value > 0 && !isQualificationOver) ||
@@ -565,12 +546,29 @@ const PerkCard = ({
 
 const MultiplierCards = ({
   distribution,
+  verificationsQuery,
 }: {
   distribution: UseDistributionsResultData[number]
+  verificationsQuery?: UseQueryResult<Tables<'distribution_verifications_summary'>, PostgrestError>
 }) => {
+  const verifications = verificationsQuery?.data
+  if (verificationsQuery?.isLoading) {
+    return (
+      <YStack f={1} w={'100%'} gap="$5">
+        <H3 fontWeight={'600'} color={'$color12'}>
+          Multiplier
+        </H3>
+        <Card br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
+          <Stack ai="center" jc="center" p="$4">
+            <Spinner color="$color12" size="large" />
+          </Stack>
+        </Card>
+      </YStack>
+    )
+  }
   const now = new Date()
   const isQualificationOver = distribution.qualification_end < now
-  const multipliers = distribution.distribution_verifications_summary[0]?.multipliers
+  const multipliers = verifications?.multipliers
   const activeMultipliers = multipliers?.filter(
     ({ value, multiplier_step, multiplier_max }) =>
       (!isQualificationOver && multiplier_step > 0.0 && multiplier_max > 1.0) ||
@@ -642,68 +640,6 @@ const MultiplierCard = ({ children }: PropsWithChildren<CardProps>) => {
   )
 }
 
-const RewardsProgressCard = ({
-  distribution,
-  previousDistribution,
-}: {
-  distribution: UseDistributionsResultData[number]
-  previousDistribution?: UseDistributionsResultData[number]
-}) => {
-  const sendSlash = distribution.send_slash.at(0)
-  const sendCeiling = distribution.distribution_verifications_summary[0]?.verification_values?.find(
-    ({ type }) => type === 'send_ceiling'
-  )
-
-  if (!sendCeiling || !sendSlash) return null
-
-  const previousReward =
-    previousDistribution?.distribution_shares?.[0]?.amount_after_slash ??
-    distribution.hodler_min_balance
-
-  const scaledPreviousReward = previousReward / sendSlash.scaling_divisor
-
-  const progress = Math.min(Math.floor((sendCeiling.weight / scaledPreviousReward) * 100), 100)
-
-  return (
-    <YStack f={1} w={'100%'} gap="$5">
-      <H3 fontWeight={'600'} color={'$color12'}>
-        Send Progress
-      </H3>
-      <Card br={'$6'} p="$7" $xs={{ p: '$5' }} w={'100%'} maw={500}>
-        <YStack gap="$4" w="100%">
-          <XStack jc="flex-end">
-            <Paragraph
-              ff={'$mono'}
-              py={'$size.0.5'}
-              px={'$size.0.9'}
-              borderWidth={1}
-              borderColor={'$primary'}
-              $theme-light={{ borderColor: '$color12' }}
-              borderRadius={'$4'}
-            >
-              {progress}%
-            </Paragraph>
-          </XStack>
-          <Stack w="100%" h="$1" br="$10" bc="$color3">
-            <Stack
-              w={`${progress}%`}
-              h="100%"
-              br="$10"
-              animation="quick"
-              $theme-light={{
-                bc: '$color12',
-              }}
-              $theme-dark={{
-                bc: '$primary',
-              }}
-            />
-          </Stack>
-        </YStack>
-      </Card>
-    </YStack>
-  )
-}
-
 const ClaimableRewardsCard = ({
   distribution,
 }: { distribution: UseDistributionsResultData[number] }) => {
@@ -741,3 +677,6 @@ const ClaimableRewardsCard = ({
     </YStack>
   )
 }
+
+ActivityRewardsScreen.displayName = 'ActivityRewardsScreen'
+DistributionContent.displayName = 'DistributionContent'
