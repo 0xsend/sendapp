@@ -9,18 +9,16 @@ type DistributionContextType = {
 const DistributionContext = createContext<DistributionContextType | undefined>(undefined)
 
 export const DistributionProvider = ({ children }: { children: React.ReactNode }) => {
-  const [{ distribution }, setParams] = useRewardsScreenParams()
+  const [{ distribution }] = useRewardsScreenParams()
   const [selectedDistribution, setSelected] = useState(distribution)
 
   // Sync URL with context when needed
-  const setSelectedDistribution = useCallback(
-    (value: number | undefined) => {
-      setSelected(value)
-      // Optionally debounce URL updates
-      setParams({ distribution: value })
-    },
-    [setParams]
-  )
+  const setSelectedDistribution = useCallback((value: number | undefined) => {
+    setSelected(value)
+    // Optionally debounce URL updates
+    //Setting the url causes massive rerenders for some reason
+    // setParams({ distribution: value })
+  }, [])
 
   return (
     <DistributionContext.Provider
