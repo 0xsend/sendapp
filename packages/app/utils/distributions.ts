@@ -98,7 +98,7 @@ export const useMonthlyDistributions = (): UseQueryResult<
         .gt('number', 6)
         .gt('qualification_end', sendAccount?.created_at)
         .order('number', { ascending: false })
-
+      console.log('data: ', data)
       if (error) {
         throw error
       }
