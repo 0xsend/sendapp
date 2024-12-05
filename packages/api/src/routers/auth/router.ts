@@ -14,7 +14,7 @@ export const authRouter = createTRPCRouter({
         phone: z.string().trim(),
         countrycode: z.string(),
         captchaToken: z.string().optional(),
-        bypassOnboardedCheck: z.boolean().optional().default(false),
+        bypassOnboardedCheck: z.boolean().optional().default(true),
       })
     )
     .mutation(async ({ input }) => {

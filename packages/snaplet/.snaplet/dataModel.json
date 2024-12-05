@@ -3698,6 +3698,20 @@
           "maxLength": null
         },
         {
+          "id": "public.profiles.x_username",
+          "name": "x_username",
+          "columnName": "x_username",
+          "type": "text",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
           "name": "users",
           "type": "users",
           "isRequired": true,
