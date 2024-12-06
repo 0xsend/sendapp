@@ -23,7 +23,7 @@ import {
 } from 'app/utils/distributions'
 import formatAmount from 'app/utils/formatAmount'
 import { zeroAddress } from 'viem'
-import { type PropsWithChildren, useState, memo } from 'react'
+import { type PropsWithChildren, memo } from 'react'
 import { DistributionClaimButton } from '../components/DistributionClaimButton'
 import { useSendAccount } from 'app/utils/send-accounts'
 import type { Tables } from '@my/supabase/database-generated.types'
@@ -47,7 +47,6 @@ export function ActivityRewardsScreen() {
   const { distribution, setDistribution } = useDistributionContext()
 
   const { data: distributions, isLoading: isLoadingDistributions } = useMonthlyDistributions()
-  const [isOpen, setIsOpen] = useState(false)
 
   const selectedDistributionIndex =
     distributions !== undefined && distributions.length <= (distribution ?? 0)
@@ -104,8 +103,6 @@ export function ActivityRewardsScreen() {
           <DistributionSelect
             distributions={distributions}
             selectedIndex={selectedDistributionIndex}
-            isOpen={isOpen}
-            onOpenChange={setIsOpen}
             onValueChange={onValueChange}
           />
         )}
@@ -118,7 +115,7 @@ export function ActivityRewardsScreen() {
         ) : (
           <DistributionContent
             distribution={distributions[selectedDistributionIndex]}
-            previousDistribution={distributions[selectedDistributionIndex - 1]}
+            previousDistribution={distributions[selectedDistributionIndex + 1]}
             verificationsQuery={verificationsQuery}
           />
         )}
@@ -210,7 +207,7 @@ const DistributionRequirementsCard = ({
   previousDistribution?: UseDistributionsResultData[number]
   verificationsQuery: UseQueryResult<Tables<'distribution_verifications_summary'>, PostgrestError>
 }) => {
-  const { data: sendAccount } = useSendAccount()
+  const { data: sendAccount, isLoading: isLoadingSendAccount } = useSendAccount()
   const verifications = verificationsQuery?.data
   const {
     data: snapshotBalance,
@@ -224,9 +221,10 @@ const DistributionRequirementsCard = ({
       : undefined,
     query: {
       enabled: Boolean(sendAccount?.address),
+      staleTime: 3000,
     },
   })
-  if (verificationsQuery?.isLoading) {
+  if (verificationsQuery?.isLoading || isLoadingSendAccount) {
     return (
       <Card br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
         <Stack ai="center" jc="center" p="$4">
@@ -247,7 +245,7 @@ const DistributionRequirementsCard = ({
     ({ type }) => type === 'send_ceiling'
   )
 
-  if (!sendCeiling || !sendSlash) {
+  if (!sendSlash) {
     return (
       <Card br={12} p="$5" gap="$4" $gtMd={{ gap: '$6', p: '$7' }}>
         <Stack ai="center" jc="space-between" gap="$5" $gtXs={{ flexDirection: 'row' }}>
@@ -324,9 +322,10 @@ const DistributionRequirementsCard = ({
     ) ?? distribution.hodler_min_balance
 
   const scaledPreviousReward = previousReward / sendSlash.scaling_divisor
+  const sendCeilingWeight = sendCeiling?.weight ?? 0
 
   const progress = (
-    (Math.min(sendCeiling.weight, scaledPreviousReward) / scaledPreviousReward) *
+    (Math.min(sendCeilingWeight, scaledPreviousReward) / scaledPreviousReward) *
     100
   ).toFixed(1)
 

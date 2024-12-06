@@ -1,8 +1,18 @@
 // In a new file: components/DistributionSelect.tsx
-import { Select, type SelectItemProps, Theme, XStack } from '@my/ui'
+import {
+  Adapt,
+  Button,
+  Paragraph,
+  Select,
+  type SelectItemProps,
+  Sheet,
+  Theme,
+  XStack,
+} from '@my/ui'
 import { ChevronDown, ChevronUp, Dot } from '@tamagui/lucide-icons'
-import { memo, useRef } from 'react'
+import { memo, useRef, useState } from 'react'
 import type { UseDistributionsResultData } from 'app/utils/distributions'
+import { IconX } from 'app/components/icons'
 
 const DistributionItem = ({
   isActive,
@@ -40,19 +50,12 @@ const DistributionItem = ({
 interface DistributionSelectProps {
   distributions: UseDistributionsResultData
   selectedIndex: number
-  isOpen: boolean
-  onOpenChange: (open: boolean) => void
   onValueChange: (value: string) => void
 }
 
 export const DistributionSelect = memo(
-  ({
-    distributions,
-    selectedIndex,
-    isOpen,
-    onOpenChange,
-    onValueChange,
-  }: DistributionSelectProps) => {
+  ({ distributions, selectedIndex, onValueChange }: DistributionSelectProps) => {
+    const [isOpen, setIsOpen] = useState(false)
     const selectTriggerRef = useRef<HTMLSelectElement>(null)
 
     const distributionDates = distributions.map(
@@ -67,7 +70,7 @@ export const DistributionSelect = memo(
         native={false}
         value={selectedIndex.toString()}
         onValueChange={onValueChange}
-        onOpenChange={onOpenChange}
+        onOpenChange={setIsOpen}
         open={isOpen}
       >
         <Select.Trigger
@@ -111,6 +114,37 @@ export const DistributionSelect = memo(
             placeholder={distributions[selectedIndex]?.number}
           />
         </Select.Trigger>
+
+        <Adapt when="sm" platform="touch">
+          <Sheet
+            native
+            modal
+            dismissOnSnapToBottom
+            snapPoints={[30]}
+            animation={'quick'}
+            disableDrag
+          >
+            <Sheet.Frame maw={738} bc={'$color1'}>
+              <Sheet.Handle py="$5" f={1} bc="transparent" jc={'space-between'} opacity={1} m={0}>
+                <XStack ai="center" jc="space-between" w="100%" px="$4">
+                  <Paragraph fontSize={'$5'} fontWeight={'700'} color={'$color12'}>
+                    Select Month
+                  </Paragraph>
+                  <Button
+                    chromeless
+                    unstyled
+                    icon={<IconX color={'$color12'} size={'$1.5'} />}
+                    onPress={() => setIsOpen(false)}
+                  />
+                </XStack>
+              </Sheet.Handle>
+              <Sheet.ScrollView>
+                <Adapt.Contents />
+              </Sheet.ScrollView>
+            </Sheet.Frame>
+            <Sheet.Overlay />
+          </Sheet>
+        </Adapt>
 
         <Select.Content zIndex={200000}>
           <Select.Viewport
