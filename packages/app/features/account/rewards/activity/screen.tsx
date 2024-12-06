@@ -118,7 +118,7 @@ export function ActivityRewardsScreen() {
         ) : (
           <DistributionContent
             distribution={distributions[selectedDistributionIndex]}
-            previousDistribution={distributions[selectedDistributionIndex - 1]}
+            previousDistribution={distributions[selectedDistributionIndex + 1]}
             verificationsQuery={verificationsQuery}
           />
         )}
