@@ -52,9 +52,12 @@ export const PersonalInfoScreen = () => {
     setErrorMessage(null)
     const values = form.getValues()
     const shouldUpdateUser = user?.phone !== values.phone
+    const shouldUpdateProfile = profile?.x_username !== values.xUsername
 
     try {
-      await mutateProfileAsync(values)
+      if (shouldUpdateProfile) {
+        await mutateProfileAsync(values)
+      }
 
       if (shouldUpdateUser) {
         await handleUserUpdate()

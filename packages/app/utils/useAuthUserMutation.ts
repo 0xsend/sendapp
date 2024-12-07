@@ -3,6 +3,7 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { formFields } from 'app/utils/SchemaForm'
 import { z } from 'zod'
 import { useToastController } from '@my/ui'
+import { useUser } from 'app/utils/useUser'
 
 export const AuthUserSchema = z.object({
   phone: formFields.text.describe('Phone'),
@@ -15,9 +16,13 @@ export const useAuthUserMutation = () => {
   const supabase = useSupabase()
   const queryClient = useQueryClient()
   const toast = useToastController()
+  const { session } = useUser()
 
   return useMutation({
     async mutationFn(data: z.infer<typeof AuthUserSchema>) {
+      if (!session) {
+        return
+      }
       const { error } = await supabase.auth.updateUser({
         phone: data.phone,
         // email: data.email,
@@ -29,7 +34,16 @@ export const useAuthUserMutation = () => {
       }
     },
     async onSuccess() {
-      await queryClient.invalidateQueries({ queryKey: ['user'] })
+      if (!session) {
+        return
+      }
+      const { error } = await supabase.auth.refreshSession({
+        refresh_token: session.refresh_token,
+      })
+      if (error) {
+        throw new Error(error.message)
+      }
+      await queryClient.invalidateQueries({ queryKey: ['profile'] })
 
       toast.show('Check your phone', {
         message: 'We sent you a confirmation code to your phone.',

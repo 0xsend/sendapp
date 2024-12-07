@@ -4,21 +4,7 @@ import { useSupabase } from './supabase/useSupabase'
 
 export const useUser = () => {
   const { session, isLoading: isLoadingSession } = useSessionContext()
-
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    enabled: !isLoadingSession,
-    queryFn: async () => {
-      const { data, error } = await supabase.auth.getUser()
-
-      if (error) {
-        await supabase.auth.signOut()
-        throw new Error(error.message)
-      }
-
-      return data.user
-    },
-  })
+  const user = session?.user
 
   const supabase = useSupabase()
   const {
