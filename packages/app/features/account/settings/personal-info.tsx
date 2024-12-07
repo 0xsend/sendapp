@@ -17,6 +17,7 @@ import { VerifyCode } from 'app/features/auth/components/VerifyCode'
 import { AuthUserSchema, useAuthUserMutation } from 'app/utils/useAuthUserMutation'
 import { useEffect, useState } from 'react'
 import { useProfileMutation } from 'app/utils/useUserPersonalDataMutation'
+import { useQuery } from '@tanstack/react-query'
 
 enum FormState {
   PersonalInfoForm = 'PersonalInfoForm',
@@ -24,7 +25,21 @@ enum FormState {
 }
 
 export const PersonalInfoScreen = () => {
-  const { user, profile } = useUser()
+  const { profile, session } = useUser()
+  const { data: user } = useQuery({
+    queryKey: ['user'],
+    enabled: !!session?.user,
+    queryFn: async () => {
+      const { data, error } = await supabase.auth.getUser()
+
+      if (error) {
+        await supabase.auth.signOut()
+        throw new Error(error.message)
+      }
+
+      return data.user
+    },
+  })
   const supabase = useSupabase()
   const toast = useToastController()
   const form = useForm<z.infer<typeof AuthUserSchema>>() // Using react-hook-form
