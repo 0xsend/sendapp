@@ -610,7 +610,7 @@ exports[`TokenDetails 1`] = `
                   }
                   suppressHighlighting={true}
                 >
-                  5 mon ago
+                  6 mon ago
                 </Text>
               </View>
             </View>
@@ -877,7 +877,7 @@ exports[`TokenDetails 1`] = `
                   }
                   suppressHighlighting={true}
                 >
-                  5 mon ago
+                  6 mon ago
                 </Text>
               </View>
             </View>
@@ -1150,7 +1150,7 @@ exports[`TokenDetails 1`] = `
                   }
                   suppressHighlighting={true}
                 >
-                  5 mon ago
+                  6 mon ago
                 </Text>
               </View>
             </View>
