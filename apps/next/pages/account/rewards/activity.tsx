@@ -5,7 +5,6 @@ import type { NextPageWithLayout } from 'next-app/pages/_app'
 import { HomeLayout } from 'app/features/home/layout.web'
 import { TopNav } from 'app/components/TopNav'
 import { MobileButtonRowLayout } from 'app/components/MobileButtonRowLayout'
-import { DistributionProvider } from 'app/features/account/rewards/DistributionContext'
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -21,13 +20,11 @@ export const Page: NextPageWithLayout = () => {
 export const getServerSideProps = userProtectedGetSSP()
 
 Page.getLayout = (children) => (
-  <DistributionProvider>
-    <MobileButtonRowLayout.ActivityRewards>
-      <HomeLayout TopNav={<TopNav header="Activity Rewards" backFunction={'pop'} />}>
-        {children}
-      </HomeLayout>
-    </MobileButtonRowLayout.ActivityRewards>
-  </DistributionProvider>
+  <MobileButtonRowLayout.ActivityRewards>
+    <HomeLayout TopNav={<TopNav header="Activity Rewards" backFunction={'pop'} />}>
+      {children}
+    </HomeLayout>
+  </MobileButtonRowLayout.ActivityRewards>
 )
 
 export default Page
