@@ -23,14 +23,14 @@ import {
 } from 'app/utils/distributions'
 import formatAmount from 'app/utils/formatAmount'
 import { zeroAddress } from 'viem'
-import { type PropsWithChildren, memo } from 'react'
+import type { PropsWithChildren } from 'react'
 import { DistributionClaimButton } from '../components/DistributionClaimButton'
 import { useSendAccount } from 'app/utils/send-accounts'
 import type { Tables } from '@my/supabase/database-generated.types'
 import type { UseQueryResult } from '@tanstack/react-query'
 import type { PostgrestError } from '@supabase/postgrest-js'
 import { DistributionSelect } from '../components/DistributionSelect'
-import { useDistributionContext } from '../DistributionContext'
+import { useRewardsScreenParams } from 'app/routers/params'
 
 //@todo get this from the db
 const verificationTypesAndTitles = {
@@ -44,24 +44,22 @@ const verificationTypesAndTitles = {
 } as const
 
 export function ActivityRewardsScreen() {
-  const { distribution, setDistribution } = useDistributionContext()
-
-  const { data: distributions, isLoading: isLoadingDistributions } = useMonthlyDistributions()
-
+  const [queryParams, setRewardsScreenParams] = useRewardsScreenParams()
+  const distribution = queryParams.distribution
+  const { data: distributions, isLoading } = useMonthlyDistributions()
   const selectedDistributionIndex =
     distributions !== undefined && distributions.length <= (distribution ?? 0)
       ? distributions?.findIndex((d) => d.number === distribution)
       : 0
 
+  const verificationsQuery = useDistributionVerifications(distribution ?? distributions?.[0]?.id)
   const onValueChange = (value: string) => {
     const newDistribution = distributions?.[Number(value)]
     if (newDistribution?.number === distribution) return
-    setDistribution(newDistribution?.number)
+    setRewardsScreenParams({ distribution: newDistribution?.number })
   }
 
-  const verificationsQuery = useDistributionVerifications(distribution ?? distributions?.[0]?.id)
-
-  if (isLoadingDistributions) {
+  if (isLoading) {
     return (
       <YStack f={1} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
         <Header />
@@ -113,41 +111,27 @@ export function ActivityRewardsScreen() {
             No rewards available
           </Paragraph>
         ) : (
-          <DistributionContent
-            distribution={distributions[selectedDistributionIndex]}
-            previousDistribution={distributions[selectedDistributionIndex + 1]}
-            verificationsQuery={verificationsQuery}
-          />
+          <>
+            <DistributionRequirementsCard
+              distribution={distributions[selectedDistributionIndex]}
+              previousDistribution={distributions[selectedDistributionIndex + 1]}
+              verificationsQuery={verificationsQuery}
+            />
+            <SendPerksCards
+              distribution={distributions[selectedDistributionIndex]}
+              verificationsQuery={verificationsQuery}
+            />
+            <MultiplierCards
+              distribution={distributions[selectedDistributionIndex]}
+              verificationsQuery={verificationsQuery}
+            />
+            <ClaimableRewardsCard distribution={distributions[selectedDistributionIndex]} />
+          </>
         )}
       </YStack>
     </YStack>
   )
 }
-
-const DistributionContent = memo(
-  ({
-    distribution,
-    previousDistribution,
-    verificationsQuery,
-  }: {
-    distribution: UseDistributionsResultData[number]
-    previousDistribution?: UseDistributionsResultData[number]
-    verificationsQuery: UseQueryResult<Tables<'distribution_verifications_summary'>, PostgrestError>
-  }) => {
-    return (
-      <>
-        <DistributionRequirementsCard
-          distribution={distribution}
-          previousDistribution={previousDistribution}
-          verificationsQuery={verificationsQuery}
-        />
-        <SendPerksCards distribution={distribution} verificationsQuery={verificationsQuery} />
-        <MultiplierCards distribution={distribution} verificationsQuery={verificationsQuery} />
-        <ClaimableRewardsCard distribution={distribution} />
-      </>
-    )
-  }
-)
 
 const Header = () => (
   <Stack w={'100%'} h={224} position="relative" jc={'center'} br={'$6'} overflow="hidden">
@@ -221,7 +205,6 @@ const DistributionRequirementsCard = ({
       : undefined,
     query: {
       enabled: Boolean(sendAccount?.address),
-      staleTime: 3000,
     },
   })
   if (verificationsQuery?.isLoading || isLoadingSendAccount) {
@@ -683,4 +666,3 @@ const ClaimableRewardsCard = ({
 }
 
 ActivityRewardsScreen.displayName = 'ActivityRewardsScreen'
-DistributionContent.displayName = 'DistributionContent'

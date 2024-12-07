@@ -16,6 +16,8 @@ export const useTokenPrices = (): UseQueryResult<z.infer<typeof TokenPricesSchem
   return useQuery({
     queryKey: ['tokenPrices'],
     gcTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
     queryFn: async () => {
       const res = await fetch(
         'https://api.coingecko.com/api/v3/simple/price?ids=ethereum,usd-coin,send-token,spx6900&vs_currencies=usd'
