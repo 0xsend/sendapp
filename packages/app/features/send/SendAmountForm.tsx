@@ -1,6 +1,6 @@
 import { Button, Paragraph, Spinner, Stack, SubmitButton, XStack, YStack } from '@my/ui'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
-import { coinsDict } from 'app/data/coins'
+import { type coins, coinsDict, type coin } from 'app/data/coins'
 import { useSendScreenParams } from 'app/routers/params'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import formatAmount from 'app/utils/formatAmount'
@@ -25,7 +25,7 @@ export function SendAmountForm() {
   const router = useRouter()
 
   const [sendParams, setSendParams] = useSendScreenParams()
-  const token = form.watch('token')
+  const token = form.watch('token') as coins[number]['token']
 
   // need balance to check if user has enough to send
   const {
@@ -34,7 +34,7 @@ export function SendAmountForm() {
     error: balanceError,
   } = useBalance({
     address: sendAccount?.address,
-    token: (token === 'eth' ? undefined : token) as `0x${string}` | undefined,
+    token: token === 'eth' ? undefined : token,
     query: { enabled: !!sendAccount },
     chainId: baseMainnet.id,
   })
@@ -47,7 +47,7 @@ export function SendAmountForm() {
         {
           ...sendParams,
           amount: sanitizedAmount.toString(),
-          sendToken: token,
+          sendToken: token as coins[number]['token'],
         },
         { webBehavior: 'replace' }
       )

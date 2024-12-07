@@ -13,7 +13,7 @@ import {
   type ParagraphProps,
   type YStackProps,
 } from '@my/ui'
-import { baseMainnet } from '@my/wagmi'
+import { baseMainnet, baseMainnetClient, entryPointAddress } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
 import { IconAccount } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
@@ -22,7 +22,6 @@ import { useTokenActivityFeed } from 'app/features/home/utils/useTokenActivityFe
 import { useSendScreenParams } from 'app/routers/params'
 import { assert } from 'app/utils/assert'
 import formatAmount from 'app/utils/formatAmount'
-import { hexToBytea } from 'app/utils/hexToBytea'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { shorten } from 'app/utils/strings'
 import { throwIf } from 'app/utils/throwIf'
@@ -30,20 +29,16 @@ import { useProfileHref } from 'app/utils/useProfileHref'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import { useUSDCFees } from 'app/utils/useUSDCFees'
-import {
-  useGenerateTransferUserOp,
-  useUserOpTransferMutation,
-} from 'app/utils/useUserOpTransferMutation'
+import { useGenerateTransferUserOp } from 'app/utils/useUserOpTransferMutation'
 import { useAccountNonce } from 'app/utils/userop'
-import {
-  isSendAccountReceiveEvent,
-  isSendAccountTransfersEvent,
-  type Activity,
-} from 'app/utils/zod/activity'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'solito/router'
-import { formatUnits, isAddress, type Hex } from 'viem'
+import { formatUnits, isAddress, parseUnits, type Hex } from 'viem'
 import { useEstimateFeesPerGas } from 'wagmi'
+import { api } from 'app/utils/api'
+import { getUserOperationHash } from 'permissionless'
+import { signUserOp } from 'app/utils/signUserOp'
+import { byteaToBase64 } from 'app/utils/byteaToBase64'
 import { localizeAmount } from 'app/utils/formatAmount'
 
 export function SendConfirmScreen() {
@@ -72,8 +67,19 @@ export function SendConfirmScreen() {
 }
 
 export function SendConfirm() {
+  const router = useRouter()
   const [queryParams] = useSendScreenParams()
   const { sendToken, recipient, idType, amount } = queryParams
+
+  const { mutateAsync: transfer } = api.transfer.withUserOp.useMutation()
+
+  const [workflowId, setWorkflowId] = useState<string | undefined>()
+
+  useEffect(() => {
+    if (workflowId) {
+      router.replace({ pathname: '/', query: { token: sendToken } })
+    }
+  }, [workflowId, router, sendToken])
 
   const queryClient = useQueryClient()
   const { data: sendAccount } = useSendAccount()
@@ -91,9 +97,6 @@ export function SendConfirm() {
     sendAccount?.send_account_credentials
       .filter((c) => !!c.webauthn_credentials)
       .map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? []
-  const [sentTxHash, setSentTxHash] = useState<Hex>()
-
-  const router = useRouter()
 
   const {
     data: nonce,
@@ -126,25 +129,8 @@ export function SendConfirm() {
   } = useEstimateFeesPerGas({
     chainId: baseMainnet.id,
   })
-  const {
-    mutateAsync: sendUserOp,
-    isPending: isTransferPending,
-    isError: isTransferError,
-  } = useUserOpTransferMutation()
 
   const [error, setError] = useState<Error>()
-
-  const {
-    data: transfers,
-    error: tokenActivityError,
-    dataUpdatedAt,
-  } = useTokenActivityFeed({
-    address: sendToken === 'eth' ? undefined : hexToBytea(sendToken),
-    refetchInterval: sentTxHash ? 1000 : undefined, // refetch every second if we have sent a tx
-    enabled: !!sentTxHash,
-  })
-
-  const [dataFirstFetch, setDataFirstFetch] = useState<number>()
 
   const hasEnoughGas = usdcFees && (usdcBalance ?? BigInt(0)) >= usdcFees.baseFee + usdcFees.gasFees
 
@@ -164,6 +150,7 @@ export function SendConfirm() {
       assert(nonce !== undefined, 'Nonce is not available')
       throwIf(feesPerGasError)
       assert(!!feesPerGas, 'Fees per gas is not available')
+      assert(!!profile?.address, 'Could not resolve recipients send account')
 
       assert(tokenBalance >= BigInt(amount ?? '0'), 'Insufficient balance')
       const sender = sendAccount?.address as `0x${string}`
@@ -177,48 +164,31 @@ export function SendConfirm() {
       console.log('gasEstimate', usdcFees)
       console.log('feesPerGas', feesPerGas)
       console.log('userOp', _userOp)
-      const receipt = await sendUserOp({
-        userOp: _userOp,
-        webauthnCreds,
+      const chainId = baseMainnetClient.chain.id
+      const entryPoint = entryPointAddress[chainId]
+      const userOpHash = getUserOperationHash({
+        userOperation: userOp,
+        entryPoint,
+        chainId,
       })
-      assert(receipt.success, 'Failed to send user op')
-      setSentTxHash(receipt.receipt.transactionHash)
+      const signature = await signUserOp({
+        userOpHash,
+        allowedCredentials:
+          webauthnCreds?.map((c) => ({
+            id: byteaToBase64(c.raw_credential_id),
+            userHandle: c.name,
+          })) ?? [],
+      })
+      userOp.signature = signature
+
+      const workflowId = await transfer({ userOp, token: sendToken })
+      setWorkflowId(workflowId)
     } catch (e) {
       console.error(e)
       setError(e)
       await queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
     }
   }
-
-  useEffect(() => {
-    if (!dataFirstFetch && dataUpdatedAt) {
-      setDataFirstFetch(dataUpdatedAt)
-    }
-    if (!dataFirstFetch) return
-    if (!dataUpdatedAt) return
-    const hasBeenLongEnough = dataUpdatedAt - dataFirstFetch > 5_000
-    if (sentTxHash) {
-      const tfr = transfers?.pages.some((page) =>
-        page.some((activity: Activity) => {
-          if (isSendAccountTransfersEvent(activity)) {
-            return activity.data.tx_hash === sentTxHash
-          }
-          if (isSendAccountReceiveEvent(activity)) {
-            return activity.data.tx_hash === sentTxHash
-          }
-          return false
-        })
-      )
-
-      if (tokenActivityError) {
-        console.error(tokenActivityError)
-      }
-      // found the transfer or we waited 5 seconds or we got an error 😢
-      if (tfr || tokenActivityError || hasBeenLongEnough) {
-        router.replace({ pathname: '/', query: { token: sendToken } })
-      }
-    }
-  }, [sentTxHash, transfers, router, sendToken, tokenActivityError, dataFirstFetch, dataUpdatedAt])
 
   if (nonceIsLoading || isProfileLoading) return <Spinner size="large" color={'$color'} />
 
@@ -300,7 +270,7 @@ export function SendConfirm() {
           onPress={onSubmit}
           br={12}
           disabledStyle={{ opacity: 0.7, cursor: 'not-allowed', pointerEvents: 'none' }}
-          disabled={!canSubmit || isTransferPending || !!sentTxHash}
+          disabled={!canSubmit || !!workflowId}
           gap={4}
           mx="auto"
           $gtXs={{
