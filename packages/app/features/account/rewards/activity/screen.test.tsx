@@ -1,7 +1,6 @@
 import { Wrapper } from 'app/utils/__mocks__/Wrapper'
 import { ActivityRewardsScreen } from './screen'
 import { act, render, screen } from '@testing-library/react-native'
-import { DistributionProvider } from '../DistributionContext'
 
 jest.mock('app/utils/distributions', () => ({
   useMonthlyDistributions: () => ({
@@ -149,11 +148,9 @@ describe('ActivityRewardsScreen', () => {
     jest.useFakeTimers()
     jest.setSystemTime(Date.UTC(2024, 7, 12))
     render(
-      <DistributionProvider>
-        <Wrapper>
-          <ActivityRewardsScreen />
-        </Wrapper>
-      </DistributionProvider>
+      <Wrapper>
+        <ActivityRewardsScreen />
+      </Wrapper>
     )
 
     await act(async () => {

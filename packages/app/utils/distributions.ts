@@ -106,6 +106,7 @@ export const useMonthlyDistributions = () => {
         claim_end: new Date(distribution.claim_end),
       }))
     },
+    enabled: Boolean(sendAccount?.created_at),
   })
 }
 
