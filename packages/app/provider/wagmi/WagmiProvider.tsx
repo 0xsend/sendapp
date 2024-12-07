@@ -7,7 +7,8 @@ export const WagmiProvider: FC<{ children: ReactNode }> = ({
 }: {
   children: ReactNode
 }) => {
-  return <OGWagmiProvider config={config}>{children}</OGWagmiProvider>
+  const appConfig = { ...config, ssr: true }
+  return <OGWagmiProvider config={appConfig}>{children}</OGWagmiProvider>
 }
 
 declare module 'wagmi' {
