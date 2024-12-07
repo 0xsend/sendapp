@@ -9,6 +9,7 @@ import {
   YStack,
 } from '@my/ui'
 import type { MobileOtpType, Session, User } from '@supabase/supabase-js'
+import { normalizePhoneNumber } from 'app/utils/formatPhoneNumber'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useForm } from 'react-hook-form'
@@ -31,8 +32,9 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
   const supabase = useSupabase()
   const form = useForm<z.infer<typeof ConfirmSchema>>()
   async function confirmCode({ token }: z.infer<typeof ConfirmSchema>) {
+    const normalizedPhone = normalizePhoneNumber(phone)
     const { error, data } = await supabase.auth.verifyOtp({
-      phone,
+      phone: normalizedPhone,
       token,
       type,
     })

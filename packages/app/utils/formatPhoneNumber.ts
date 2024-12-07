@@ -25,3 +25,20 @@ export const formatPhoneNumber = (phoneNumber: string | undefined): string => {
   }
   return number
 }
+
+export function normalizePhoneNumber(phoneInput: string): string {
+  try {
+    // Try US format first
+    let parsed = parsePhoneNumber(phoneInput, 'US')
+    if (!parsed.isValid()) {
+      // Try international format
+      parsed = parsePhoneNumber(phoneInput.startsWith('+') ? phoneInput : `+${phoneInput}`)
+      if (!parsed.isValid()) {
+        throw new Error('Invalid phone number')
+      }
+    }
+    return parsed.format('E.164')
+  } catch (error) {
+    throw new Error('Please enter a valid phone number')
+  }
+}

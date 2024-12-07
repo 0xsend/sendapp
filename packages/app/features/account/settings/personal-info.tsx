@@ -100,6 +100,7 @@ export const PersonalInfoScreen = () => {
           labelProps: {
             color: '$color10',
           },
+          defaultValue: user?.phone,
         },
         xUsername: {
           'aria-label': 'X username',

@@ -4,7 +4,7 @@ import { formFields } from 'app/utils/SchemaForm'
 import { z } from 'zod'
 import { useToastController } from '@my/ui'
 import { useUser } from 'app/utils/useUser'
-import { parsePhoneNumber } from 'libphonenumber-js'
+import { normalizePhoneNumber } from './formatPhoneNumber'
 
 export const AuthUserSchema = z.object({
   phone: formFields.text.describe('Phone'),
@@ -21,23 +21,9 @@ export const useAuthUserMutation = () => {
 
   return useMutation({
     async mutationFn(data: z.infer<typeof AuthUserSchema>) {
-      let phone = data.phone
-      try {
-        // parse US first
-        let parsed = parsePhoneNumber(data.phone, 'US')
-        if (!parsed.isValid()) {
-          parsed = parsePhoneNumber(data.phone.startsWith('+') ? data.phone : `+${data.phone}`)
-          if (!parsed.isValid()) {
-            throw new Error('Invalid phone number')
-          }
-        }
-        phone = parsed.format('E.164')
-      } catch (error) {
-        throw new Error('Please enter a valid phone number')
-      }
-
+      const phone = normalizePhoneNumber(data.phone)
       const { error } = await supabase.auth.updateUser({
-        phone: phone,
+        phone,
         // email: data.email,
         // @TODO: add address
       })
