@@ -1,6 +1,7 @@
 import { Wrapper } from 'app/utils/__mocks__/Wrapper'
 import { ActivityRewardsScreen } from './screen'
 import { act, render, screen } from '@testing-library/react-native'
+import { DistributionProvider } from '../DistributionContext'
 
 jest.mock('app/utils/distributions', () => ({
   useMonthlyDistributions: () => ({
@@ -21,6 +22,37 @@ jest.mock('app/utils/distributions', () => ({
             tag_referrals: 123,
           },
         ],
+        send_slash: [
+          {
+            minimum_sends: 1,
+            scaling_divisor: 1,
+          },
+        ],
+      },
+    ],
+  }),
+  useDistributionVerifications: jest.fn().mockReturnValue({
+    data: [
+      {
+        id: 1,
+        type: 'create_passkey',
+        weight: 1,
+        fixed_value: 0,
+        metadata: {},
+      },
+      {
+        id: 2,
+        type: 'tag_registration',
+        weight: 1,
+        fixed_value: 0,
+        metadata: {},
+      },
+      {
+        id: 3,
+        type: 'send_ceiling',
+        weight: 1,
+        fixed_value: 0,
+        metadata: { value: 0 },
       },
     ],
   }),
@@ -117,9 +149,11 @@ describe('ActivityRewardsScreen', () => {
     jest.useFakeTimers()
     jest.setSystemTime(Date.UTC(2024, 7, 12))
     render(
-      <Wrapper>
-        <ActivityRewardsScreen />
-      </Wrapper>
+      <DistributionProvider>
+        <Wrapper>
+          <ActivityRewardsScreen />
+        </Wrapper>
+      </DistributionProvider>
     )
 
     await act(async () => {
