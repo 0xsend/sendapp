@@ -1,5 +1,5 @@
 import { usePathname } from 'app/utils/usePathname'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
 
 export type ScrollDirectionContextValue = {
@@ -13,7 +13,7 @@ const ScrollDirection = createContext<ScrollDirectionContextValue>(
 
 export const ScrollDirectionProvider = ({ children }: { children: React.ReactNode }) => {
   const [direction, setDirection] = useState<'up' | 'down'>()
-  const [, setScrollY] = useState(0)
+  const lastScrollY = useRef(0)
   const pathName = usePathname()
   const [, setPreviousPath] = useState('')
 
@@ -26,17 +26,19 @@ export const ScrollDirectionProvider = ({ children }: { children: React.ReactNod
 
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent
-    const isEndOfView = layoutMeasurement.height + contentOffset.y >= contentSize.height - 50
-    setScrollY((prev) => {
-      if ((prev > contentOffset.y && !isEndOfView) || contentOffset.y < 50) {
-        setDirection('up')
-      } else if (prev < e.nativeEvent.contentOffset.y || isEndOfView) {
-        setDirection('down')
-      } else {
-        setDirection(undefined)
-      }
-      return e.nativeEvent.contentOffset.y
-    })
+    const currentScrollY = contentOffset.y
+    const isEndOfView = layoutMeasurement.height + currentScrollY >= contentSize.height - 50
+
+    // Only update direction when crossing thresholds
+    if (currentScrollY < 50) {
+      setDirection('up')
+    } else if (lastScrollY.current - currentScrollY > 50 && !isEndOfView) {
+      setDirection('up')
+    } else if (currentScrollY - lastScrollY.current > 50 || isEndOfView) {
+      setDirection('down')
+    }
+
+    lastScrollY.current = currentScrollY
   }
 
   return (
