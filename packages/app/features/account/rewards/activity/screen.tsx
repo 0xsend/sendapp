@@ -319,7 +319,7 @@ const DistributionRequirementsCard = ({
     previousDistribution?.distribution_shares?.reduce(
       (acc, curr) => acc + curr.amount_after_slash,
       0
-    ) ?? distribution.hodler_min_balance
+    ) || distribution.hodler_min_balance
 
   const scaledPreviousReward = previousReward / sendSlash.scaling_divisor
   const sendCeilingWeight = sendCeiling?.weight ?? 0
