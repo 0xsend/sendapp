@@ -2,7 +2,7 @@ SET client_min_messages TO NOTICE;
 
 BEGIN;
 SELECT
-    plan(26);
+    plan(25);
 CREATE EXTENSION "basejump-supabase_test_helpers";
 SELECT
     set_config('role', 'service_role', TRUE);
@@ -408,36 +408,12 @@ SELECT
                         id
                     FROM distributions
                     WHERE
-                        number = 123), tests.get_supabase_uid('bob'), '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 100000, 10000, 5000, 2000, NULL, NULL, NULL)::distribution_shares,(NULL,(
-                    SELECT
-                        id
-                    FROM distributions
-                    WHERE
-                        number = 123), tests.get_supabase_uid('alice'), '0xaB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 100000, 10000, 5000, 2000, NULL, NULL, NULL)::distribution_shares]);
-$$,
-'permission denied for function update_distribution_shares',
-'Only the service role can update distribution shares.');
-SELECT
-    tests.clear_authentication();
-SELECT
-    throws_ok($$
-        SELECT
-            "public"."update_distribution_shares"((
-                SELECT
-                    id
-                FROM distributions
-                WHERE
-                    number = 123), ARRAY[(NULL,(
-                    SELECT
-                        id
-                    FROM distributions
-                    WHERE
-                        number = 123), tests.get_supabase_uid('bob'), '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 100000, 10000, 5000, 2000, NULL, NULL, NULL)::distribution_shares,(NULL,(
-                    SELECT
-                        id
-                    FROM distributions
-                    WHERE
-                        number = 123), tests.get_supabase_uid('alice'), '0xaB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 100000, 10000, 5000, 2000, NULL, NULL, NULL)::distribution_shares]);
+                        number = 123), tests.get_supabase_uid('bob'), '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 1000, 500, 200, 300, NOW(), NOW(), 1, 950)::distribution_shares,(NULL,(
+            SELECT
+                id
+            FROM distributions
+            WHERE
+                number = 123), tests.get_supabase_uid('alice'), '0xaB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 1000, 500, 200, 300, NOW(), NOW(), 1, 950)::distribution_shares]);
 $$,
 'permission denied for function update_distribution_shares',
 'Only the service role can update distribution shares.');
@@ -445,7 +421,7 @@ $$,
 SELECT
     set_config('role', 'service_role', TRUE);
 SELECT
-    public.update_distribution_shares((
+    "public"."update_distribution_shares"((
         SELECT
             id
         FROM distributions
@@ -455,12 +431,12 @@ SELECT
                 id
             FROM distributions
             WHERE
-                number = 123), tests.get_supabase_uid('bob'), '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 100000, 10000, 5000, 2000, NULL, NULL, NULL)::distribution_shares,(NULL,(
-            SELECT
-                id
-            FROM distributions
-            WHERE
-                number = 123), tests.get_supabase_uid('alice'), '0xaB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 100000, 10000, 5000, 2000, NULL, NULL, NULL)::distribution_shares]);
+                number = 123), tests.get_supabase_uid('bob'), '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 1000, 500, 200, 300, NOW(), NOW(), 1, 950)::distribution_shares,(NULL,(
+        SELECT
+            id
+        FROM distributions
+        WHERE
+            number = 123), tests.get_supabase_uid('alice'), '0xaB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 1000, 500, 200, 300, NOW(), NOW(), 1, 950)::distribution_shares]);
 -- Check insert by service_role
 SELECT
     results_eq('SELECT COUNT(*)::integer FROM distribution_shares WHERE distribution_id = (
