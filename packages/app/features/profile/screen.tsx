@@ -1,11 +1,8 @@
 import {
   Button,
   Fade,
-  H1,
-  H2,
   isWeb,
   Paragraph,
-  Separator,
   Spinner,
   Stack,
   Text,
@@ -15,12 +12,13 @@ import {
 } from '@my/ui'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useUser } from 'app/utils/useUser'
-import { AvatarProfile } from './AvatarProfile'
+import { AvatarProfile, type AvatarProfileProps } from './AvatarProfile'
 import { useInterUserActivityFeed } from './utils/useInterUserActivityFeed'
 import type { Activity } from 'app/utils/zod/activity'
 import { amountFromActivity } from 'app/utils/activity'
 import { Fragment } from 'react'
 import { useProfileScreenParams } from 'app/routers/params'
+import { IconArrowRight } from 'app/components/icons'
 import { SendButton } from './ProfileButtons'
 
 interface ProfileScreenProps {
@@ -52,15 +50,25 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
     currentUserId: currentUserProfile?.send_id,
   })
   const { pages } = data ?? {}
-  const formatTags = (tags: string[]) => tags?.map((tag) => `/${tag}`).join(' ')
 
   return (
-    <>
-      <YStack f={1} gap="$6">
-        {error && <Text theme="red">{error.message}</Text>}
+    <YStack f={1} gap={'$2'} $gtLg={{ maxWidth: '50%', overflow: 'hidden', height: '80vh' }}>
+      <YStack
+        f={1}
+        gap="$6"
+        paddingRight={'$2'}
+        flexGrow={1}
+        // @ts-expect-error typescript is complaining about overflowY not available and advising overflow. Overflow will work differently than overflowY here, overflowY is working fine
+        $gtLg={{ overflowY: 'scroll' }}
+      >
+        {error && (
+          <Text theme="red" color={'$color8'}>
+            {error.message}
+          </Text>
+        )}
         {isLoading && (
           <Stack w="100%" h="100%" jc={'center'} ai={'center'} f={1} gap="$6">
-            <Spinner size="large" color="$color10" />
+            <Spinner size="large" color="$primary" />
           </Stack>
         )}
         {otherUserProfile ? (
@@ -68,64 +76,46 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
             h={isWeb ? (media.shorter ? '83vh' : '88vh') : media.shorter ? '83%' : '88%'}
             $gtMd={{ height: 'auto' }}
           >
-            <Stack py="$size.3.5" $gtLg={{ h: 'auto', pt: '$0' }}>
+            <Stack py="$size.3.5" pt={'$0'} $gtLg={{ h: 'auto', pt: '$0' }}>
               <YStack width="100%" gap="$2">
-                <YStack
+                <XStack
                   jc="space-between"
                   ai="center"
-                  mb="$size.3.5"
-                  gap={'$size.1.5'}
-                  $gtMd={{ flexDirection: 'row' }}
+                  bg={'$color1'}
+                  p={'$size.1.5'}
+                  borderRadius={'$6'}
+                  padding={'$5'}
                 >
-                  <YStack
-                    gap="$size.1.5"
-                    ai={'center'}
-                    jc={'center'}
-                    $gtMd={{ width: 'auto', flexDirection: 'row' }}
-                  >
-                    <AvatarProfile profile={otherUserProfile} />
-                    <YStack ai="center" $gtMd={{ ai: 'flex-start' }}>
-                      <H1 nativeID="profileName" size={'$9'}>
-                        {otherUserProfile.name}
-                      </H1>
-                      <H2 theme="green" color={'$color9'} size={'$5'} fontWeight={'600'}>
-                        {formatTags(otherUserProfile.all_tags ?? [])}
-                      </H2>
-                      <Paragraph mt="$1" color={'$color10'}>
-                        {otherUserProfile.about}
-                      </Paragraph>
-                    </YStack>
-                  </YStack>
-
-                  {Boolean(otherUserProfile) && user?.id !== otherUserProfile?.id ? (
-                    <XStack
-                      gap="$size.1.5"
-                      ai={'center'}
-                      display="none"
-                      $gtMd={{ display: 'flex' }}
-                    >
-                      <SendButton
-                        identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
-                        idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
-                      />
-                    </XStack>
-                  ) : null}
-                </YStack>
-
-                <Separator />
-
-                <YStack gap={'$size.0.9'}>
+                  <XStack ai="center" gap={'$size.1.5'} width={'80%'}>
+                    <AvatarProfile profile={otherUserProfile} mx="none" size="$6" />
+                    <Paragraph nativeID="profileName" size={'$8'} width={'80%'}>
+                      {otherUserProfile.name ||
+                        (otherUserProfile.all_tags?.[0]
+                          ? `/${otherUserProfile.all_tags[0]}`
+                          : '??')}
+                    </Paragraph>
+                  </XStack>
+                  <IconArrowRight
+                    size={'$1.5'}
+                    $theme-dark={{ color: '$primary' }}
+                    $theme-light={{ color: '$color12' }}
+                  />
+                </XStack>
+                <YStack gap={'$size.1'}>
                   {(() => {
                     switch (true) {
                       case isLoadingActivities:
-                        return <Spinner size="small" />
+                        return <Spinner size="small" color={'$primary'} mt={'$8'} />
                       case activitiesError !== null:
                         return (
                           <Paragraph
                             maxWidth={'600'}
                             fontFamily={'$mono'}
                             fontSize={'$5'}
-                            color={'$color12'}
+                            theme={'red'}
+                            color={'$color8'}
+                            mt={'$4'}
+                            ta={'center'}
                           >
                             {activitiesError?.message.split('.').at(0) ?? `${activitiesError}`}
                           </Paragraph>
@@ -148,11 +138,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                         let lastDate: string | undefined
                         return pages?.map((activities) => {
                           return activities?.map((activity) => {
-                            const date = activity.created_at.toLocaleDateString(undefined, {
-                              day: 'numeric',
-                              month: 'short',
-                              year: 'numeric',
-                            })
+                            const date = activity.created_at.toLocaleDateString()
                             const isNewDate = !lastDate || date !== lastDate
                             if (isNewDate) {
                               lastDate = date
@@ -166,6 +152,8 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                                   <TransactionEntry
                                     activity={activity}
                                     sent={activity?.to_user?.id !== user?.id}
+                                    otherUserProfile={otherUserProfile}
+                                    currentUserProfile={currentUserProfile}
                                   />
                                 </Fade>
                               </Fragment>
@@ -178,7 +166,9 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                   <Fade>
                     {!isLoadingActivities && (isFetchingNextPageActivities || hasNextPage) ? (
                       <>
-                        {isFetchingNextPageActivities && <Spinner size="small" />}
+                        {isFetchingNextPageActivities && (
+                          <Spinner size="small" color={'$primary'} mb={'$4'} />
+                        )}
                         {hasNextPage && (
                           <Button
                             onPress={() => {
@@ -201,32 +191,58 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
           </YStack>
         ) : null}
       </YStack>
-    </>
+      {Boolean(otherUserProfile) && user?.id !== otherUserProfile?.id ? (
+        <XStack gap="$size.1.5" ai={'center'} display="none" $gtMd={{ display: 'flex' }}>
+          <SendButton
+            identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
+            idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
+          />
+        </XStack>
+      ) : null}
+    </YStack>
   )
 }
 
-const TransactionEntry = ({ activity, sent }: { activity: Activity; sent: boolean }) => {
+const TransactionEntry = ({
+  activity,
+  sent,
+  otherUserProfile,
+  currentUserProfile,
+}: {
+  activity: Activity
+  sent: boolean
+  otherUserProfile?: AvatarProfileProps
+  currentUserProfile?: AvatarProfileProps
+}) => {
   const { created_at } = activity
   const amount = amountFromActivity(activity)
   const date = new Date(created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
 
   return (
     <XStack justifyContent={sent ? 'flex-end' : 'flex-start'} testID="activityTest">
-      <YStack
-        bg={'$color1'}
-        p={'$size.1.5'}
-        borderRadius={'$4'}
-        borderBottomRightRadius={sent ? 0 : '$4'}
-        borderBottomLeftRadius={sent ? '$4' : 0}
-      >
-        <Paragraph fontWeight={'500'} size={'$5'} color={'$color8'} theme={sent ? 'red' : 'green'}>
-          You {sent ? 'Sent' : 'Received'}
-        </Paragraph>
-
-        <Paragraph size={'$10'} $gtMd={{ size: '$12' }} textAlign="right">
-          {amount}
-        </Paragraph>
-        <Paragraph size={'$2'} textAlign="right" color={'$color4'}>
+      <YStack gap={'$2'}>
+        <YStack bg={'$color1'} p={'$4'} borderRadius={'$4'}>
+          <XStack gap={'$3'} alignItems={'center'} flexDirection={sent ? 'row-reverse' : 'row'}>
+            <AvatarProfile
+              profile={sent ? currentUserProfile : otherUserProfile}
+              mx="none"
+              size="$5"
+            />
+            <YStack>
+              <XStack gap={'$2'} alignItems={'center'} flexDirection={sent ? 'row-reverse' : 'row'}>
+                {!sent && <IconArrowRight size={'$size.0.9'} rotate={'90deg'} color={'$olive'} />}
+                <Paragraph size={'$3'} color={'$color8'} theme={sent ? 'red' : 'green'}>
+                  You {sent ? 'Sent' : 'Received'}
+                </Paragraph>
+                {sent && (
+                  <IconArrowRight size={'$size.0.9'} rotate={'-90deg'} color={'$red10Dark'} />
+                )}
+              </XStack>
+              <Paragraph size={'$7'}>{amount}</Paragraph>
+            </YStack>
+          </XStack>
+        </YStack>
+        <Paragraph size={'$2'} textAlign={sent ? 'right' : 'left'} color={'$color4'}>
           {date}
         </Paragraph>
       </YStack>
@@ -236,18 +252,17 @@ const TransactionEntry = ({ activity, sent }: { activity: Activity; sent: boolea
 
 const DatePill = ({ date }: { date: string }) => {
   return (
-    <XStack ai={'center'} py={'$size.0.9'}>
-      <Paragraph
-        ff={'$mono'}
-        size={'$4'}
-        py={'$size.0.25'}
-        bc={'$color1'}
-        color={'$color10'}
-        px={'$size.0.9'}
-        br={'$2'}
-      >
-        {date}
-      </Paragraph>
-    </XStack>
+    <Paragraph
+      ff={'$mono'}
+      textAlign={'center'}
+      size={'$4'}
+      py={'$size.0.25'}
+      bc={'$background'}
+      color={'$color10'}
+      px={'$size.0.9'}
+      br={'$2'}
+    >
+      {date}
+    </Paragraph>
   )
 }

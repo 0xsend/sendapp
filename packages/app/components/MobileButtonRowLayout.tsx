@@ -135,7 +135,7 @@ const Profile = (
       {children}
       <MobileButtonRow isLoading={isLoading} isVisible={isVisible}>
         <Row {...props}>
-          <Stack w={200}>
+          <Stack w={'100%'}>
             <ProfileButtons.SendButton
               identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
               idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
