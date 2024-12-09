@@ -91,3 +91,13 @@ export const formatDateToSupabaseFormat = (date: Date): string => {
 
   return `${year}-${month}-${day}`
 }
+
+export const parseSupabaseDateStringToDate = (dateString: string): Date => {
+  const [year, month, day] = dateString.split('-').map(Number)
+
+  if (year === undefined || month === undefined || day === undefined) {
+    throw new Error('Invalid date string provided.')
+  }
+
+  return new Date(year, month - 1, day)
+}
