@@ -343,6 +343,7 @@ export type Database = {
         Row: {
           about: string | null
           avatar_url: string | null
+          birthday: string | null
           id: string
           is_public: boolean | null
           name: string | null
@@ -353,6 +354,7 @@ export type Database = {
         Insert: {
           about?: string | null
           avatar_url?: string | null
+          birthday?: string | null
           id: string
           is_public?: boolean | null
           name?: string | null
@@ -363,6 +365,7 @@ export type Database = {
         Update: {
           about?: string | null
           avatar_url?: string | null
+          birthday?: string | null
           id?: string
           is_public?: boolean | null
           name?: string | null
