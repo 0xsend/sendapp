@@ -1,10 +1,12 @@
 import { LinkableButton, XStack } from '@my/ui'
-import { IconArrowRight } from 'app/components/icons'
 
 export const SendButton = ({
   identifier,
   idType,
-}: { identifier: string | number; idType: string }) => (
+}: {
+  identifier: string | number
+  idType: string
+}) => (
   <LinkableButton
     href={`/send?idType=${idType}&recipient=${identifier}`}
     br="$4"
@@ -23,9 +25,6 @@ export const SendButton = ({
       >
         SEND
       </LinkableButton.Text>
-      <LinkableButton.Icon>
-        <IconArrowRight size={'$1'} $theme-dark={{ col: '$color0' }} />
-      </LinkableButton.Icon>
     </XStack>
   </LinkableButton>
 )
