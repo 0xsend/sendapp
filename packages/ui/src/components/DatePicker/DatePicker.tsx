@@ -35,7 +35,7 @@ export function DatePicker({ onChange, value, children }: DatePickerProps) {
   const [open, setOpen] = useState(false)
   const [selectorType, setSelectorType] = useState<SelectorType>(SelectorType.Day)
 
-  const handleChange = (value: Date[]) => {
+  const handleChange = (value: Date) => {
     setOpen(false)
     onChange(value)
   }
