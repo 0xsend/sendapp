@@ -40,6 +40,7 @@ const dryRun = process.env.DRY !== '0'
         {
           name: 'Alice',
           avatar_url: pravatar('Alice'),
+          x_username: 'x_alice',
         },
       ],
       tags: [
@@ -62,6 +63,7 @@ const dryRun = process.env.DRY !== '0'
         {
           name: 'Jane',
           avatar_url: pravatar('Jane'),
+          x_username: 'x_jane',
         },
       ],
       tags: [
@@ -84,6 +86,7 @@ const dryRun = process.env.DRY !== '0'
         {
           name: 'John',
           avatarUrl: pravatar('John'),
+          x_username: 'x_john',
         },
       ],
       tags: [
