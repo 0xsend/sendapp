@@ -58,7 +58,7 @@ test('can visit other user profile and send by tag', async ({ page, seed }) => {
   // can visit profile withouth the @ prefix
   await page.goto(`/${tag.name}`)
   expect(await page.title()).toBe('Send | Profile')
-  await expect(page.getByText(tag.name)).toBeVisible()
+  await expect(page.getByText(profile.name)).toBeVisible()
 })
 
 test('can visit my own profile', async ({
@@ -80,7 +80,9 @@ test('can visit my own profile', async ({
 })
 
 test('can visit private profile', async ({ page, seed }) => {
-  const plan = await seed.users([{ ...userOnboarded, profiles: [{ is_public: false }] }])
+  const plan = await seed.users([
+    { ...userOnboarded, profiles: [{ is_public: false, x_username: null }] },
+  ])
   const tag = plan.tags[0]
   const profile = plan.profiles[0]
   assert(!!tag?.name, 'tag not found')
@@ -132,13 +134,13 @@ test('can view activities between another profile', async ({
   log('beforeEach', `url=${page.url()}`)
 
   await expect(profilePage2.sendButton).toBeVisible()
-  await expect(page.getByText('Jul 18, 2024')).toBeVisible()
+  await expect(page.getByText('7/18/2024')).toBeVisible()
   await expect(page.getByText('You Received').nth(1)).toBeVisible()
   await expect(page.getByText('8 USDC')).toBeVisible()
-  await expect(page.getByText('May 27, 2024')).toBeVisible()
+  await expect(page.getByText('5/27/2024')).toBeVisible()
   await expect(page.getByText('You Sent').first()).toBeVisible()
   await expect(page.getByText('0.077777 USDC')).toBeVisible()
-  await expect(page.getByText('May 26, 2024')).toBeVisible()
+  await expect(page.getByText('5/26/2024')).toBeVisible()
   await expect(page.getByText('You Received').first()).toBeVisible()
   await expect(page.getByText('0.019032 USDC')).toBeVisible()
   await expect(page.getByText(anotherUser.name)).toBeVisible()

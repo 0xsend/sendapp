@@ -24,7 +24,7 @@ test('anon user can visit public profile', async ({ page, seed }) => {
   await visitProfile({ page, tag: tag.name })
   const title = await page.title()
   expect(title).toBe('Send | Profile')
-  await expect(page.getByRole('heading', { name: tag.name })).toBeVisible()
+  await expect(page.getByText(profile.name)).toBeVisible()
   const profilePage = new ProfilePage(page, { name: profile.name, about: profile.about })
   await expect(profilePage.sendButton).toBeVisible()
 })

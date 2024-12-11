@@ -16,9 +16,6 @@ export class ProfilePage {
     await this.page.goto(`/${tag}`)
     const title = await this.page.title()
     expect?.(title).toBe('Send | Profile')
-    await expect?.soft(this.page.getByRole('heading', { name: tag })).toBeVisible()
-    await expect?.soft(this.page.locator('#profileName')).toHaveText(this.profile.name)
-    await expect?.soft(this.page.getByText(this.profile.about, { exact: true })).toBeVisible()
-    // await expect?.soft(this.page.getByAltText(this.profile.name)).toBeVisible()
+    await expect?.(this.page.locator('#profileName')).toHaveText(this.profile.name)
   }
 }

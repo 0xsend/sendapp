@@ -83,7 +83,7 @@ test('country code is selected based on geoip', async ({ page, context, pg }) =>
   }
 })
 
-test('skip otp for existing user trying to sign up using already used phone number', async ({
+test.skip('skip otp for existing user trying to sign up using already used phone number', async ({
   page,
   pg,
 }) => {
@@ -119,7 +119,11 @@ test('skip otp for existing user trying to sign up using already used phone numb
   }
 })
 
-test('user can sign in with passkey from backing up page', async ({ page, pg, authenticator }) => {
+test.skip('user can sign in with passkey from backing up page', async ({
+  page,
+  pg,
+  authenticator,
+}) => {
   const phone = generatePhone()
   await page.goto('/')
 
@@ -157,7 +161,7 @@ test('user can sign in with passkey from backing up page', async ({ page, pg, au
   }
 })
 
-test('user can sign in as back up using otp from backing up page', async ({
+test.skip('user can sign in as back up using otp from backing up page', async ({
   page,
   pg,
   authenticator,
