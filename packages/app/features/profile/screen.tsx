@@ -96,6 +96,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                     </Paragraph>
                   </XStack>
                   <IconArrowRight
+                    display="none"
                     size={'$1.5'}
                     $theme-dark={{ color: '$primary' }}
                     $theme-light={{ color: '$color12' }}
