@@ -2,8 +2,8 @@ import type { PopoverProps } from 'tamagui'
 import type { ReactNode } from 'react'
 
 export type DatePickerPopoverProps = PopoverProps & {
-  value: Date[]
-  onChange: (value: Date[]) => void
+  value?: Date
+  onChange: (value: Date) => void
 }
 
 export enum SelectorType {
@@ -13,7 +13,7 @@ export enum SelectorType {
 }
 
 export type DatePickerProps = {
-  value: Date[]
-  onChange: (value: Date[]) => void
+  value?: Date
+  onChange: (value: Date) => void
   children: ReactNode
 }
