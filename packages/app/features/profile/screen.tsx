@@ -1,7 +1,9 @@
 import {
   Button,
   Fade,
+  Image,
   isWeb,
+  LinearGradient,
   Paragraph,
   Spinner,
   Stack,
@@ -16,10 +18,11 @@ import { AvatarProfile, type AvatarProfileProps } from './AvatarProfile'
 import { useInterUserActivityFeed } from './utils/useInterUserActivityFeed'
 import type { Activity } from 'app/utils/zod/activity'
 import { amountFromActivity } from 'app/utils/activity'
-import { Fragment } from 'react'
+import { Fragment, useState } from 'react'
 import { useProfileScreenParams } from 'app/routers/params'
-import { IconArrowRight } from 'app/components/icons'
+import { IconArrowRight, IconX, IconXLogo } from 'app/components/icons'
 import { SendButton } from './ProfileButtons'
+import type { Functions } from '@my/supabase/database.types'
 
 interface ProfileScreenProps {
   sendid?: number | null
@@ -35,6 +38,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   } = useProfileLookup('sendid', otherUserId?.toString() || '')
   const { user, profile: currentUserProfile } = useUser()
   const media = useMedia()
+  const [isProfileInfoVisible, setIsProfileInfoVisible] = useState<boolean>(false)
 
   const {
     data,
@@ -51,156 +55,198 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   })
   const { pages } = data ?? {}
 
+  const toggleIsProfileInfoVisible = () => {
+    setIsProfileInfoVisible((prevState) => !prevState)
+  }
+
   return (
-    <YStack f={1} gap={'$2'} $gtLg={{ maxWidth: '50%', overflow: 'hidden', height: '80vh' }}>
+    <XStack w={'100%'} gap={'$4'}>
       <YStack
         f={1}
-        gap="$6"
-        paddingRight={'$2'}
-        flexGrow={1}
-        // @ts-expect-error typescript is complaining about overflowY not available and advising overflow. Overflow will work differently than overflowY here, overflowY is working fine
-        $gtLg={{ overflowY: 'scroll' }}
+        gap={'$2'}
+        display={isProfileInfoVisible ? 'none' : 'flex'}
+        $gtLg={{
+          display: 'flex',
+          maxWidth: '50%',
+          overflow: 'hidden',
+          height: isWeb ? '80vh' : 'auto',
+        }}
       >
-        {error && (
-          <Text theme="red" color={'$color8'}>
-            {error.message}
-          </Text>
-        )}
-        {isLoading && (
-          <Stack w="100%" h="100%" jc={'center'} ai={'center'} f={1} gap="$6">
-            <Spinner size="large" color="$primary" />
-          </Stack>
-        )}
-        {otherUserProfile ? (
-          <YStack
-            h={isWeb ? (media.shorter ? '83vh' : '88vh') : media.shorter ? '83%' : '88%'}
-            $gtMd={{ height: 'auto' }}
-          >
-            <Stack py="$size.3.5" pt={'$0'} $gtLg={{ h: 'auto', pt: '$0' }}>
-              <YStack width="100%" gap="$2">
-                <XStack
-                  jc="space-between"
-                  ai="center"
-                  bg={'$color1'}
-                  p={'$size.1.5'}
-                  borderRadius={'$6'}
-                  padding={'$5'}
-                >
-                  <XStack ai="center" gap={'$size.1.5'} width={'80%'}>
-                    <AvatarProfile profile={otherUserProfile} mx="none" size="$6" />
-                    <Paragraph nativeID="profileName" size={'$8'} width={'80%'}>
-                      {otherUserProfile.name ||
-                        (otherUserProfile.all_tags?.[0]
-                          ? `/${otherUserProfile.all_tags[0]}`
-                          : '??')}
-                    </Paragraph>
-                  </XStack>
-                  <IconArrowRight
-                    display="none"
-                    size={'$1.5'}
-                    $theme-dark={{ color: '$primary' }}
-                    $theme-light={{ color: '$color12' }}
-                  />
-                </XStack>
-                <YStack gap={'$size.1'}>
-                  {(() => {
-                    switch (true) {
-                      case isLoadingActivities:
-                        return <Spinner size="small" color={'$primary'} mt={'$8'} />
-                      case activitiesError !== null:
-                        return (
-                          <Paragraph
-                            maxWidth={'600'}
-                            fontFamily={'$mono'}
-                            fontSize={'$5'}
-                            theme={'red'}
-                            color={'$color8'}
-                            mt={'$4'}
-                            ta={'center'}
-                          >
-                            {activitiesError?.message.split('.').at(0) ?? `${activitiesError}`}
-                          </Paragraph>
-                        )
-                      case pages?.length === 0 || (pages && pages[0]?.length === 0):
-                        return (
-                          <>
-                            <Paragraph
-                              size={'$8'}
-                              fontWeight={'300'}
-                              color={'$color10'}
-                              textAlign={'center'}
-                              mt={'$size.1.5'}
-                            >
-                              No Activities
-                            </Paragraph>
-                          </>
-                        )
-                      default: {
-                        let lastDate: string | undefined
-                        return pages?.map((activities) => {
-                          return activities?.map((activity) => {
-                            const date = activity.created_at.toLocaleDateString()
-                            const isNewDate = !lastDate || date !== lastDate
-                            if (isNewDate) {
-                              lastDate = date
-                            }
-                            return (
-                              <Fragment
-                                key={`${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`}
-                              >
-                                {isNewDate ? <DatePill date={date} /> : null}
-                                <Fade>
-                                  <TransactionEntry
-                                    activity={activity}
-                                    sent={activity?.to_user?.id !== user?.id}
-                                    otherUserProfile={otherUserProfile}
-                                    currentUserProfile={currentUserProfile}
-                                  />
-                                </Fade>
-                              </Fragment>
-                            )
-                          })
-                        })
-                      }
-                    }
-                  })()}
-                  <Fade>
-                    {!isLoadingActivities && (isFetchingNextPageActivities || hasNextPage) ? (
-                      <>
-                        {isFetchingNextPageActivities && (
-                          <Spinner size="small" color={'$primary'} mb={'$4'} />
-                        )}
-                        {hasNextPage && (
-                          <Button
-                            onPress={() => {
-                              fetchNextPage()
-                            }}
-                            disabled={isFetchingNextPageActivities || isFetchingActivities}
-                            color="$color11"
-                            width={200}
-                            mx="auto"
-                          >
-                            Load More
-                          </Button>
-                        )}
-                      </>
-                    ) : null}
-                  </Fade>
-                </YStack>
-              </YStack>
+        <YStack
+          f={1}
+          gap="$6"
+          flexGrow={1}
+          className={'hide-scroll'}
+          // @ts-expect-error typescript is complaining about overflowY not available and advising overflow. Overflow will work differently than overflowY here, overflowY is working fine
+          $gtLg={{ overflowY: 'scroll' }}
+        >
+          {error && (
+            <Text theme="red" color={'$color8'}>
+              {error.message}
+            </Text>
+          )}
+          {isLoading && (
+            <Stack w="100%" h="100%" jc={'center'} ai={'center'} f={1} gap="$6">
+              <Spinner size="large" color="$primary" />
             </Stack>
-          </YStack>
+          )}
+          {otherUserProfile ? (
+            <YStack
+              h={isWeb ? (media.shorter ? '83vh' : '88vh') : media.shorter ? '83%' : '88%'}
+              $gtMd={{ height: 'auto' }}
+            >
+              <Stack py="$size.3.5" pt={'$0'} $gtLg={{ h: 'auto', pt: '$0' }}>
+                <YStack width="100%" gap="$2">
+                  <XStack
+                    jc="space-between"
+                    ai="center"
+                    bg={'$color1'}
+                    p={'$size.1.5'}
+                    borderRadius={'$6'}
+                    padding={'$5'}
+                    onPress={toggleIsProfileInfoVisible}
+                    cursor={'pointer'}
+                  >
+                    <XStack ai="center" gap={'$size.1.5'} width={'80%'}>
+                      <AvatarProfile profile={otherUserProfile} mx="none" size="$6" />
+                      <Paragraph nativeID="profileName" size={'$8'} width={'80%'}>
+                        {otherUserProfile.name ||
+                          (otherUserProfile.all_tags?.[0]
+                            ? `/${otherUserProfile.all_tags[0]}`
+                            : '??')}
+                      </Paragraph>
+                    </XStack>
+                    <IconArrowRight
+                      size={'$1.5'}
+                      $theme-dark={{ color: '$primary' }}
+                      $theme-light={{ color: '$color12' }}
+                    />
+                  </XStack>
+                  <YStack gap={'$size.1'}>
+                    {(() => {
+                      switch (true) {
+                        case isLoadingActivities:
+                          return <Spinner size="small" color={'$primary'} mt={'$8'} />
+                        case activitiesError !== null:
+                          return (
+                            <Paragraph
+                              maxWidth={'600'}
+                              fontFamily={'$mono'}
+                              fontSize={'$5'}
+                              theme={'red'}
+                              color={'$color8'}
+                              mt={'$4'}
+                              ta={'center'}
+                            >
+                              {activitiesError?.message.split('.').at(0) ?? `${activitiesError}`}
+                            </Paragraph>
+                          )
+                        case pages?.length === 0 || (pages && pages[0]?.length === 0):
+                          return (
+                            <>
+                              <Paragraph
+                                size={'$8'}
+                                fontWeight={'300'}
+                                color={'$color10'}
+                                textAlign={'center'}
+                                mt={'$size.1.5'}
+                              >
+                                No Activities
+                              </Paragraph>
+                            </>
+                          )
+                        default: {
+                          let lastDate: string | undefined
+                          return pages?.map((activities) => {
+                            return activities?.map((activity) => {
+                              const date = activity.created_at.toLocaleDateString()
+                              const isNewDate = !lastDate || date !== lastDate
+                              if (isNewDate) {
+                                lastDate = date
+                              }
+                              return (
+                                <Fragment
+                                  key={`${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`}
+                                >
+                                  {isNewDate ? <DatePill date={date} /> : null}
+                                  <Fade>
+                                    <TransactionEntry
+                                      activity={activity}
+                                      sent={activity?.to_user?.id !== user?.id}
+                                      otherUserProfile={otherUserProfile}
+                                      currentUserProfile={currentUserProfile}
+                                    />
+                                  </Fade>
+                                </Fragment>
+                              )
+                            })
+                          })
+                        }
+                      }
+                    })()}
+                    <Fade>
+                      {!isLoadingActivities && (isFetchingNextPageActivities || hasNextPage) ? (
+                        <>
+                          {isFetchingNextPageActivities && (
+                            <Spinner size="small" color={'$primary'} mb={'$4'} />
+                          )}
+                          {hasNextPage && (
+                            <Button
+                              onPress={() => {
+                                fetchNextPage()
+                              }}
+                              disabled={isFetchingNextPageActivities || isFetchingActivities}
+                              color="$color11"
+                              width={200}
+                              mx="auto"
+                            >
+                              Load More
+                            </Button>
+                          )}
+                        </>
+                      ) : null}
+                    </Fade>
+                  </YStack>
+                </YStack>
+              </Stack>
+            </YStack>
+          ) : null}
+        </YStack>
+        {Boolean(otherUserProfile) && user?.id !== otherUserProfile?.id ? (
+          <XStack gap="$size.1.5" ai={'center'} display="none" $gtLg={{ display: 'flex' }}>
+            <SendButton
+              identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
+              idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
+            />
+          </XStack>
         ) : null}
       </YStack>
-      {Boolean(otherUserProfile) && user?.id !== otherUserProfile?.id ? (
-        <XStack gap="$size.1.5" ai={'center'} display="none" $gtMd={{ display: 'flex' }}>
-          <SendButton
-            identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
-            idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
-          />
-        </XStack>
-      ) : null}
-    </YStack>
+      {isProfileInfoVisible && (
+        <YStack
+          w={'100%'}
+          ai={'center'}
+          $gtLg={{
+            width: '35%',
+            minWidth: 400,
+            height: isWeb ? '81vh' : 'auto',
+            // @ts-expect-error typescript is complaining about overflowY not available and advising overflow. Overflow will work differently than overflowY here, overflowY is working fine
+            overflowY: 'scroll',
+          }}
+          className={'hide-scroll'}
+        >
+          <YStack
+            w={'100%'}
+            maxWidth={500}
+            pb={'$10'}
+            $gtLg={{
+              pb: 0,
+            }}
+          >
+            <ProfileInfo otherUserProfile={otherUserProfile} onClose={toggleIsProfileInfoVisible} />
+          </YStack>
+        </YStack>
+      )}
+    </XStack>
   )
 }
 
@@ -265,5 +311,103 @@ const DatePill = ({ date }: { date: string }) => {
     >
       {date}
     </Paragraph>
+  )
+}
+
+const ProfileInfo = ({
+  otherUserProfile,
+  onClose,
+}: {
+  otherUserProfile?: Functions<'profile_lookup'>[number] | null
+  onClose: () => void
+}) => {
+  const handleOnXRedirect = () => {
+    const twitterUrl = `https://x.com/${otherUserProfile?.x_username}`
+    window.open(twitterUrl, '_blank', 'noopener,noreferrer')
+  }
+
+  return (
+    <Fade>
+      <YStack w={'100%'} gap={'$4'} pb={'$4'}>
+        <YStack w={'100%'} bg={'$color1'} borderRadius={'$6'} padding={'$5'} gap={'$4'}>
+          <XStack ai="center" jc="space-between">
+            <Paragraph size={'$8'}>Profile</Paragraph>
+            <Stack onPress={onClose} cursor={'pointer'}>
+              <IconX
+                size={'$1.5'}
+                $theme-dark={{ color: '$primary' }}
+                $theme-light={{ color: '$color12' }}
+              />
+            </Stack>
+          </XStack>
+          <YStack width="100%" aspectRatio={1} overflow="hidden" position="relative">
+            <Image
+              width={'100%'}
+              height={'100%'}
+              borderRadius={'$6'}
+              objectFit="cover"
+              src={
+                otherUserProfile?.avatar_url ??
+                `https://ui-avatars.com/api.jpg?name=${otherUserProfile?.name ?? '??'}&size=256`
+              }
+            />
+            <LinearGradient
+              start={[0, 0]}
+              end={[0, 1]}
+              fullscreen
+              colors={['transparent', '#000000']}
+              borderRadius="$4"
+            >
+              <YStack
+                position="absolute"
+                top={0}
+                left={0}
+                width="100%"
+                height="100%"
+                p={'$5'}
+                justifyContent="flex-end"
+                gap={'$3'}
+              >
+                <Paragraph size={'$9'} $theme-light={{ color: '$white' }}>
+                  {otherUserProfile?.name ||
+                    (otherUserProfile?.all_tags?.[0] ? `/${otherUserProfile?.all_tags[0]}` : '??')}
+                </Paragraph>
+                <XStack flexWrap="wrap" columnGap={'$2.5'} rowGap={'$2'}>
+                  {otherUserProfile?.all_tags?.map((tag: string) => (
+                    <XStack key={tag} bg={'$gray3Dark'} px={'$2.5'} py={'$1'} borderRadius={'$2'}>
+                      <Paragraph
+                        size={'$2'}
+                        $theme-light={{ color: '$white' }}
+                      >{`/${tag}`}</Paragraph>
+                    </XStack>
+                  ))}
+                </XStack>
+              </YStack>
+            </LinearGradient>
+          </YStack>
+          <Paragraph>{otherUserProfile?.about}</Paragraph>
+        </YStack>
+        {otherUserProfile?.x_username && (
+          <XStack
+            ai="center"
+            jc="center"
+            bg={'$color1'}
+            borderRadius={'$6'}
+            padding={'$5'}
+            w={'100%'}
+            gap={'$2'}
+            cursor={'pointer'}
+            onPress={handleOnXRedirect}
+          >
+            <IconXLogo
+              size={'$1'}
+              $theme-dark={{ color: '$primary' }}
+              $theme-light={{ color: '$color12' }}
+            />
+            <Paragraph size={'$5'}>{otherUserProfile?.x_username}</Paragraph>
+          </XStack>
+        )}
+      </YStack>
+    </Fade>
   )
 }
