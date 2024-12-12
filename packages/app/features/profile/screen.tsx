@@ -364,7 +364,8 @@ const ProfileInfo = ({
                 gap={'$3'}
               >
                 <Paragraph size={'$9'} $theme-light={{ color: '$white' }}>
-                  Big investor
+                  {otherUserProfile?.name ||
+                    (otherUserProfile?.all_tags?.[0] ? `/${otherUserProfile?.all_tags[0]}` : '??')}
                 </Paragraph>
                 <XStack flexWrap="wrap" columnGap={'$2.5'} rowGap={'$2'}>
                   {otherUserProfile?.all_tags?.map((tag: string) => (
