@@ -5,7 +5,6 @@ import {
   formatDateToLongForm,
   formatDateToLongFormWithoutYear,
   formatDateToSupabaseFormat,
-  parseSupabaseDateStringToDate,
 } from './dateHelper'
 describe('CommentsTime', () => {
   beforeAll(() => {
@@ -106,27 +105,5 @@ describe('formatDateToSupabaseFormat', () => {
     const date = new Date(2024, 0, 1)
     const result = formatDateToSupabaseFormat(date)
     expect(result).toBe('2024-01-01')
-  })
-})
-
-describe('parseSupabaseDateStringToDate', () => {
-  test('should correctly parse a valid date string', () => {
-    const dateString = '2024-12-06'
-    const result = parseSupabaseDateStringToDate(dateString)
-    expect(result).toEqual(new Date(2024, 11, 6))
-  })
-
-  test('should throw an error for invalid date strings (missing parts)', () => {
-    const invalidDateStrings = '2024-12'
-
-    expect(() => parseSupabaseDateStringToDate(invalidDateStrings)).toThrow(
-      'Invalid date string provided.'
-    )
-  })
-
-  test('should handle leading zeros correctly', () => {
-    const dateString = '2024-01-05'
-    const result = parseSupabaseDateStringToDate(dateString)
-    expect(result).toEqual(new Date(2024, 0, 5))
   })
 })

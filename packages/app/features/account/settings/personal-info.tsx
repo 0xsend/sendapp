@@ -18,10 +18,7 @@ import { AuthUserSchema, useAuthUserMutation } from 'app/utils/useAuthUserMutati
 import { useEffect, useState } from 'react'
 import { useProfileMutation } from 'app/utils/useUserPersonalDataMutation'
 import { useQuery } from '@tanstack/react-query'
-import {
-  formatDateToLongFormWithoutYear,
-  parseSupabaseDateStringToDate,
-} from 'app/utils/dateHelper'
+import { adjustUTCDateForTimezone, formatDateToLongFormWithoutYear } from 'app/utils/dateHelper'
 
 enum FormState {
   PersonalInfoForm = 'PersonalInfoForm',
@@ -88,7 +85,9 @@ export const PersonalInfoScreen = () => {
   }
 
   useEffect(() => {
-    const birthday = profile?.birthday ? parseSupabaseDateStringToDate(profile.birthday) : undefined
+    const birthday = profile?.birthday
+      ? adjustUTCDateForTimezone(new Date(profile.birthday))
+      : undefined
 
     form.reset({
       phone: user?.phone ?? '',
