@@ -65,7 +65,12 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
         f={1}
         gap={'$2'}
         display={isProfileInfoVisible ? 'none' : 'flex'}
-        $gtLg={{ display: 'flex', maxWidth: '50%', overflow: 'hidden', height: '80vh' }}
+        $gtLg={{
+          display: 'flex',
+          maxWidth: '50%',
+          overflow: 'hidden',
+          height: isWeb ? '80vh' : 'auto',
+        }}
       >
         <YStack
           f={1}
@@ -223,7 +228,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
           $gtLg={{
             width: '35%',
             minWidth: 400,
-            height: '81vh',
+            height: isWeb ? '81vh' : 'auto',
             // @ts-expect-error typescript is complaining about overflowY not available and advising overflow. Overflow will work differently than overflowY here, overflowY is working fine
             overflowY: 'scroll',
           }}
