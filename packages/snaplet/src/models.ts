@@ -65,6 +65,7 @@ export const userOnboarded: usersInputs = {
   profiles: [
     {
       referral_code: (ctx) => crypto.randomBytes(8).toString('hex'),
+      x_username: null,
     },
   ],
   tags: [
