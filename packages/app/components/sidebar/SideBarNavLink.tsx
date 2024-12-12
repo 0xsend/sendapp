@@ -17,8 +17,6 @@ export function SideBarNavLink({
   return (
     <Theme name={isActiveRoute ? 'green' : null}>
       <Link
-        {...props}
-        href={props.disabled ? '' : props.href}
         $theme-dark={{ color: isActiveRoute ? '$color9' : '$color10' }}
         $theme-light={{ color: isActiveRoute ? '$color12' : '$color10' }}
         hoverStyle={{
@@ -33,6 +31,8 @@ export function SideBarNavLink({
         gap="$3"
         display="flex"
         alignItems="center"
+        {...props}
+        href={props.disabled ? '' : props.href}
       >
         {icon}
         {text}

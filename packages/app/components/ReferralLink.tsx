@@ -4,8 +4,9 @@ import {
   ButtonIcon,
   type ButtonProps,
   ButtonText,
+  Paragraph,
   useToastController,
-  Theme,
+  XStack,
 } from '@my/ui'
 import { useUser } from 'app/utils/useUser'
 import { CheckCheck } from '@tamagui/lucide-icons'
@@ -15,10 +16,10 @@ import * as Clipboard from 'expo-clipboard'
 import * as Sharing from 'expo-sharing'
 
 export function ReferralLink(props: ButtonProps) {
-  const { profile } = useUser()
-  const referralCode = profile?.referral_code
+  const { profile, tags } = useUser()
+  const referralCode = tags?.[0]?.name || profile?.referral_code
   const referralHref = `https://send.app?referral=${referralCode}`
-  const referralLinkVisual = `referral=${referralCode}`
+  const referralLinkVisual = `send.app/${referralCode}`
   const toast = useToastController()
   const [hasCopied, setHasCopied] = useState(false)
   const [canShare, setCanShare] = useState(false)
@@ -58,62 +59,68 @@ export function ReferralLink(props: ButtonProps) {
 
   if (!referralCode) return null
   return (
-    <Button
-      chromeless
-      hoverStyle={{
-        backgroundColor: 'transparent',
-        borderColor: '$transparent',
-      }}
-      pressStyle={{
-        backgroundColor: 'transparent',
-      }}
-      focusStyle={{
-        backgroundColor: 'transparent',
-      }}
-      onPress={() => {
-        setHasCopied(true)
-        shareOrCopyOnPress()
-      }}
-      {...props}
-    >
-      <Theme name="green">
+    <XStack ai={'center'} gap={'$2'}>
+      <Paragraph size={'$4'} color={'$color10'}>
+        Referral:
+      </Paragraph>
+      <Button
+        chromeless
+        height={'auto'}
+        hoverStyle={{
+          backgroundColor: 'transparent',
+          borderColor: '$transparent',
+        }}
+        pressStyle={{
+          backgroundColor: 'transparent',
+        }}
+        focusStyle={{
+          backgroundColor: 'transparent',
+        }}
+        onPress={() => {
+          setHasCopied(true)
+          shareOrCopyOnPress()
+        }}
+        {...props}
+      >
         <ButtonText
-          fontSize={'$4'}
+          fontSize={'$5'}
           fontWeight={'500'}
           fontFamily={'$mono'}
-          px="$2"
           bc="$background"
+          hoverStyle={{
+            color: '$primary',
+          }}
         >
           {referralLinkVisual}
         </ButtonText>
-      </Theme>
-      <ButtonIcon>
-        <AnimatePresence exitBeforeEnter>
-          {hasCopied ? (
-            <CheckCheck
-              size={16}
-              $theme-dark={{ color: '$primary' }}
-              $theme-light={{ color: '$color12' }}
-              key="referral-link-icon"
-              animation="bouncy"
-              enterStyle={{
-                opacity: 0,
-                scale: 0.9,
-              }}
-              exitStyle={{
-                opacity: 0,
-                scale: 0.9,
-              }}
-            />
-          ) : (
-            <IconCopy
-              size={16}
-              $theme-dark={{ color: '$primary' }}
-              $theme-light={{ color: '$color12' }}
-            />
-          )}
-        </AnimatePresence>
-      </ButtonIcon>
-    </Button>
+        <ButtonIcon>
+          <AnimatePresence exitBeforeEnter>
+            {hasCopied ? (
+              <CheckCheck
+                size={16}
+                $theme-dark={{ color: '$primary' }}
+                $theme-light={{ color: '$color12' }}
+                key="referral-link-icon"
+                animation="bouncy"
+                enterStyle={{
+                  opacity: 0,
+                  scale: 0.9,
+                }}
+                exitStyle={{
+                  opacity: 0,
+                  scale: 0.9,
+                }}
+              />
+            ) : (
+              <IconCopy
+                size={16}
+                $theme-dark={{ color: '$primary' }}
+                $theme-light={{ color: '$color12' }}
+              />
+            )}
+          </AnimatePresence>
+        </ButtonIcon>
+      </Button>
+    </XStack>
   )
 }
