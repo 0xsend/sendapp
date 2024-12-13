@@ -53,6 +53,13 @@ export const adjustUTCDateForTimezone = (date: Date, offset?: number) => {
   return adjustedDate
 }
 
+export const adjustTimezoneForUTCDate = (date: Date): Date => {
+  const timezoneOffsetMinutes = date.getTimezoneOffset()
+  const timezoneOffsetMillis = timezoneOffsetMinutes * 60 * 1000
+  const adjustedTime = date.getTime() - timezoneOffsetMillis
+  return new Date(adjustedTime)
+}
+
 export const formatDateToLongForm = (date?: Date): string => {
   if (!date) {
     return ''
@@ -82,12 +89,4 @@ export const formatDateToLongFormWithoutYear = (date?: Date): string => {
   const month = date.toLocaleString('en-US', { month: 'long' })
 
   return `${day} ${month}`
-}
-
-export const formatDateToSupabaseFormat = (date: Date): string => {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-
-  return `${year}-${month}-${day}`
 }

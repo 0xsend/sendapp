@@ -1,10 +1,10 @@
 import { describe, expect, it } from '@jest/globals'
 import {
+  adjustTimezoneForUTCDate,
   adjustUTCDateForTimezone,
   CommentsTime,
   formatDateToLongForm,
   formatDateToLongFormWithoutYear,
-  formatDateToSupabaseFormat,
 } from './dateHelper'
 describe('CommentsTime', () => {
   beforeAll(() => {
@@ -88,22 +88,22 @@ describe('formatDateToLongFormWithoutYear', () => {
   })
 })
 
-describe('formatDateToSupabaseFormat', () => {
-  test('should format a standard date correctly', () => {
-    const date = new Date(2024, 11, 6)
-    const result = formatDateToSupabaseFormat(date)
-    expect(result).toBe('2024-12-06')
+describe('adjustTimezoneForUTCDate', () => {
+  it('should handle dates already in UTC', () => {
+    const utcDate = new Date('2024-12-13T00:00:00Z')
+    const adjustedDate = adjustTimezoneForUTCDate(utcDate)
+    expect(adjustedDate.toISOString()).toBe('2024-12-13T00:00:00.000Z')
   })
 
-  test('should format a date with single-digit month and day correctly', () => {
-    const date = new Date(2024, 0, 5)
-    const result = formatDateToSupabaseFormat(date)
-    expect(result).toBe('2024-01-05')
+  it('should correctly adjust a date for a positive timezone offset', () => {
+    const localDate = new Date('2024-12-13T00:00:00+05:00')
+    const adjustedDate = adjustTimezoneForUTCDate(localDate)
+    expect(adjustedDate.toISOString()).toBe('2024-12-12T19:00:00.000Z')
   })
 
-  test('should format a date at the start of the year correctly', () => {
-    const date = new Date(2024, 0, 1)
-    const result = formatDateToSupabaseFormat(date)
-    expect(result).toBe('2024-01-01')
+  it('should correctly adjust a date for a negative timezone offset', () => {
+    const localDate = new Date('2024-12-13T00:00:00-05:00')
+    const adjustedDate = adjustTimezoneForUTCDate(localDate)
+    expect(adjustedDate.toISOString()).toBe('2024-12-13T05:00:00.000Z')
   })
 })
