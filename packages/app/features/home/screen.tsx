@@ -12,7 +12,6 @@ import {
   H1,
   Theme,
 } from '@my/ui'
-import { coins } from 'app/data/coins'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { TokenBalanceCard } from './TokenBalanceCard'
@@ -98,7 +97,7 @@ function HomeBody(props: XStackProps) {
         )}
         <YStack w={'100%'} ai={'center'}>
           <YStack width="100%">
-            <TokenBalanceList coins={coins} />
+            <TokenBalanceList />
           </YStack>
         </YStack>
         {isSendingUnlocked && (

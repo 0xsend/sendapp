@@ -11,11 +11,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { baseMainnet } from '@my/wagmi'
-import type { coins } from 'app/data/coins'
-import { useSendAccount } from 'app/utils/send-accounts'
-import { useBalance, type UseBalanceReturnType } from 'wagmi'
-
+import type { CoinWithBalance } from 'app/data/coins'
 import { ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
 import { IconError } from 'app/components/icons'
 import { useTokenMarketData } from 'app/utils/coin-gecko'
@@ -42,15 +38,7 @@ export function AnimateEnter({ children }: { children: React.ReactNode }) {
     </AnimatePresence>
   )
 }
-export const TokenDetails = ({ coin }: { coin: coins[number] }) => {
-  const { data: sendAccount } = useSendAccount()
-  const balance = useBalance({
-    address: sendAccount?.address,
-    token: coin.token === 'eth' ? undefined : coin.token,
-    query: { enabled: !!sendAccount },
-    chainId: baseMainnet.id,
-  })
-
+export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
   return (
     <YStack f={1} gap="$5" $gtLg={{ w: '45%', pb: '$0' }} pb="$5">
       <YStack gap="$5">
@@ -77,7 +65,7 @@ export const TokenDetails = ({ coin }: { coin: coins[number] }) => {
               </Button.Text>
             </Button>
             <YStack gap={'$4'}>
-              <TokenDetailsBalance balance={balance} coin={coin} />
+              <TokenDetailsBalance coin={coin} />
               {coin.symbol !== 'USDC' && (
                 <>
                   <Stack w={'100%'}>
@@ -113,7 +101,7 @@ export const TokenDetails = ({ coin }: { coin: coins[number] }) => {
   )
 }
 
-export const TokenDetailsMarketData = ({ coin }: { coin: coins[number] }) => {
+export const TokenDetailsMarketData = ({ coin }: { coin: CoinWithBalance }) => {
   const { data: tokenMarketData, status } = useTokenMarketData(coin.coingeckoTokenId)
 
   const price = tokenMarketData?.at(0)?.current_price
@@ -169,28 +157,17 @@ export const TokenDetailsMarketData = ({ coin }: { coin: coins[number] }) => {
   )
 }
 
-const TokenDetailsBalance = ({
-  coin,
-  balance,
-}: { coin: coins[number]; balance: UseBalanceReturnType }) => {
+const TokenDetailsBalance = ({ coin }: { coin: CoinWithBalance }) => {
   const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
-  if (balance?.isError) {
-    return <>---</>
-  }
-  if (balance?.isFetching && balance?.isPending) {
-    return <Spinner size={'small'} color="$color12" />
-  }
-  if (balance?.data?.value === undefined) {
+  const { balance, decimals, coingeckoTokenId } = coin
+
+  if (coin.balance === undefined) {
     return <></>
   }
 
-  const balanceInUSD = convertBalanceToFiat(
-    coin.token,
-    balance.data.value,
-    tokenPrices?.[coin.coingeckoTokenId].usd
-  )
+  const balanceInUSD = convertBalanceToFiat(coin, tokenPrices?.[coingeckoTokenId].usd)
 
-  const balanceWithDecimals = Number(balance.data.value) / 10 ** (balance.data?.decimals ?? 0)
+  const balanceWithDecimals = Number(balance) / 10 ** (decimals ?? 0)
   const balanceWithDecimalsLength = balanceWithDecimals.toString().replace('.', '').length
 
   return (
