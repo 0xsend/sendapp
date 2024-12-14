@@ -3,8 +3,8 @@ import { useBalance, useReadContracts } from 'wagmi'
 import { useSendAccount } from './send-accounts'
 import { useTokenPrices } from './useTokenPrices'
 import { convertBalanceToFiat } from './convertBalanceToUSD'
-import { coins } from '../data/coins'
-import { useEffect } from 'react'
+import { allCoins } from '../data/coins'
+import { useMemo } from 'react'
 
 type BalanceOfResult =
   | {
@@ -23,15 +23,19 @@ export const useSendAccountBalances = () => {
   const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
   const { data: sendAccount } = useSendAccount()
 
-  const tokenContracts = coins
-    .filter((coin) => coin.token !== 'eth')
-    .map((coin) => ({
-      address: coin.token,
-      abi: erc20Abi,
-      chainId: baseMainnet.id,
-      functionName: 'balanceOf',
-      args: sendAccount?.address && [sendAccount?.address],
-    }))
+  const tokenContracts = useMemo(
+    () =>
+      allCoins
+        .filter((coin) => coin.token !== 'eth')
+        .map((coin) => ({
+          address: coin.token,
+          abi: erc20Abi,
+          chainId: baseMainnet.id,
+          functionName: 'balanceOf',
+          args: sendAccount?.address && [sendAccount?.address],
+        })),
+    [sendAccount?.address]
+  )
 
   const { data: tokenBalances, isLoading: isLoadingTokenBalances } = useReadContracts({
     query: { enabled: !!sendAccount },
@@ -53,41 +57,37 @@ export const useSendAccountBalances = () => {
 
   const isLoading = isLoadingTokenBalances || isLoadingEthBalanceOnBase
 
-  const balances = isLoading
-    ? undefined
-    : coins.reduce(
-        (acc, coin) => {
-          if (coin.token === 'eth') {
-            acc[coin.symbol] = ethBalanceOnBase?.value
-            console.log
-            return acc
-          }
-          const idx = tokenContracts.findIndex((c) => c.address === coin.token)
-          if (idx === -1) {
-            console.error('No token contract found for coin', coin)
-            return acc
-          }
-          const tokenBal = tokenBalances?.[idx]
-          acc[coin.symbol] = unpackResult(tokenBal)
+  const balances = useMemo(() => {
+    if (isLoading) return undefined
+
+    return allCoins.reduce(
+      (acc, coin) => {
+        if (coin.token === 'eth') {
+          acc[coin.symbol] = ethBalanceOnBase?.value
           return acc
-        },
-        {} as Record<string, bigint | undefined>
-      )
+        }
+        const idx = tokenContracts.findIndex((c) => c.address === coin.token)
+        if (idx === -1) {
+          console.error('No token contract found for coin', coin)
+          return acc
+        }
+        const tokenBal = tokenBalances?.[idx]
+        acc[coin.token] = unpackResult(tokenBal)
+        return acc
+      },
+      {} as Record<string, bigint | undefined>
+    )
+  }, [isLoading, ethBalanceOnBase?.value, tokenBalances, tokenContracts, unpackResult])
 
-  if (!tokenPrices) {
-    return {
-      balances,
-      isLoading,
-      totalBalance: undefined,
-      isLoadingTotalBalance: isLoadingTokenPrices,
-    }
-  }
+  const totalBalance = useMemo(() => {
+    if (!tokenPrices || !balances) return undefined
 
-  const totalBalance = coins.reduce((total, coin) => {
-    const balance = coin.token === 'eth' ? ethBalanceOnBase?.value : balances?.[coin.symbol]
-    const price = tokenPrices[coin.coingeckoTokenId].usd
-    return total + (convertBalanceToFiat(coin.token, balance ?? 0n, price) ?? 0)
-  }, 0)
+    return allCoins.reduce((total, coin) => {
+      const balance = coin.token === 'eth' ? ethBalanceOnBase?.value : balances[coin.token]
+      const price = tokenPrices[coin.coingeckoTokenId].usd
+      return total + (convertBalanceToFiat(coin.token, balance ?? 0n, price) ?? 0)
+    }, 0)
+  }, [tokenPrices, balances, ethBalanceOnBase?.value])
 
   return { balances, totalBalance, isLoading, isLoadingTotalBalance: isLoadingTokenPrices }
 }

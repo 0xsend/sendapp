@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import type { coins } from 'app/data/coins'
+import type { coins, CoinWithBalance } from 'app/data/coins'
 import { z } from 'zod'
 
 export const MarketDataSchema = z
@@ -65,7 +65,11 @@ export const useSendPrice = () => useTokenPrice('send-token' as const)
 /**
  * Fetch coin market data
  */
-export const useTokenMarketData = <T extends coins[number]['coingeckoTokenId']>(tokenId: T) => {
+export const useTokenMarketData = <
+  T extends coins[number]['coingeckoTokenId'] | CoinWithBalance['coingeckoTokenId'],
+>(
+  tokenId: T
+) => {
   return useQuery({
     queryKey: ['coin-market-data', tokenId],
     queryFn: async () => {
