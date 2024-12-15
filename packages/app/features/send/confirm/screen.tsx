@@ -42,8 +42,9 @@ import { useRouter } from 'solito/router'
 import { formatUnits, isAddress, type Hex } from 'viem'
 import { useEstimateFeesPerGas } from 'wagmi'
 import { localizeAmount } from 'app/utils/formatAmount'
-import { useCoins } from 'app/provider/coins'
+import { useCoin } from 'app/provider/coins'
 import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
+import { allCoinsDict } from 'app/data/coins'
 
 export function SendConfirmScreen() {
   const [queryParams] = useSendScreenParams()
@@ -76,10 +77,8 @@ export function SendConfirm() {
 
   const queryClient = useQueryClient()
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
-  const { coins } = useCoins()
-  const selectedCoin = useCoinFromSendTokenParam()
-  const { balance, token, decimals } = selectedCoin
-  const usdc = coins.find((c) => c.symbol === 'USDC')
+  const { coin: selectedCoin } = useCoinFromSendTokenParam()
+  const { coin: usdc } = useCoin('USDC')
 
   const { data: profile, isLoading: isProfileLoading } = useProfileLookup(
     idType ?? 'tag',
@@ -148,20 +147,20 @@ export function SendConfirm() {
   const hasEnoughGas =
     usdcFees && (usdc?.balance ?? BigInt(0)) >= usdcFees.baseFee + usdcFees.gasFees
 
-  const hasEnoughBalance = balance && balance >= BigInt(amount ?? '0')
+  const hasEnoughBalance = selectedCoin?.balance && selectedCoin.balance >= BigInt(amount ?? '0')
 
   const canSubmit = BigInt(queryParams.amount ?? '0') > 0 && hasEnoughGas && hasEnoughBalance
 
   async function onSubmit() {
     try {
       assert(!!userOp, 'User op is required')
-      assert(!!balance, 'Balance is not available')
+      assert(!!selectedCoin?.balance, 'Balance is not available')
       assert(nonceError === null, `Failed to get nonce: ${nonceError}`)
       assert(nonce !== undefined, 'Nonce is not available')
       throwIf(feesPerGasError)
       assert(!!feesPerGas, 'Fees per gas is not available')
 
-      assert(balance >= BigInt(amount ?? '0'), 'Insufficient balance')
+      assert(selectedCoin?.balance >= BigInt(amount ?? '0'), 'Insufficient balance')
       const sender = sendAccount?.address as `0x${string}`
       assert(isAddress(sender), 'No sender address')
       const _userOp = {
@@ -445,9 +444,12 @@ const SendAmount = () => {
   const [queryParams] = useSendScreenParams()
   const { sendToken, recipient, idType, amount } = queryParams
   const router = useRouter()
-  const selectedCoin = useCoinFromSendTokenParam()
+  const { coin } = useCoinFromSendTokenParam()
   const localizedAmount = localizeAmount(
-    formatUnits(BigInt(queryParams.amount ?? ''), selectedCoin.decimals)
+    formatUnits(
+      BigInt(queryParams.amount ?? ''),
+      coin?.decimals ?? allCoinsDict[sendToken].decimals
+    )
   )
   return (
     <YStack gap="$2.5" f={1} $gtLg={{ maw: 350 }} jc="space-between">
@@ -493,7 +495,7 @@ const SendAmount = () => {
         <Paragraph fontSize="$9" fontWeight="600" color="$color12">
           {localizedAmount}
         </Paragraph>
-        <IconCoin coin={selectedCoin} />
+        <IconCoin coin={coin} />
       </XStack>
     </YStack>
   )
