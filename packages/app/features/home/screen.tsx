@@ -48,7 +48,7 @@ function SendSearchBody() {
 
 function HomeBody(props: XStackProps) {
   const { data: sendAccount } = useSendAccount()
-  const selectedCoin = useCoinFromTokenParam()
+  const { coin: selectedCoin } = useCoinFromTokenParam()
   const { isSendingUnlocked, isLoading } = useIsSendingUnlocked()
 
   if (isLoading)

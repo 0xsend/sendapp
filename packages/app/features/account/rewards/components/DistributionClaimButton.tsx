@@ -2,6 +2,7 @@ import { Button as ButtonOg, Spinner, type ButtonProps, YStack, useToastControll
 import { baseMainnet, type sendMerkleDropAddress } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
 import { IconDollar } from 'app/components/icons'
+import { useCoin } from 'app/provider/coins'
 import { assert } from 'app/utils/assert'
 import {
   type UseDistributionsResultData,
@@ -14,7 +15,6 @@ import {
 import { useSendAccount } from 'app/utils/send-accounts'
 import { throwIf } from 'app/utils/throwIf'
 import { useAccountNonce } from 'app/utils/userop'
-import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import { useUSDCFees } from 'app/utils/useUSDCFees'
 import { useEffect, useState } from 'react'
 import { type Hex, isAddress } from 'viem'
@@ -36,8 +36,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   const [error, setError] = useState<Error>()
   const toast = useToastController()
 
-  const { balances, isLoading: isBalanceLoading } = useSendAccountBalances()
-  const usdcBalance = balances?.USDC
+  const { coin: usdc, isLoading: isUSDCLoading } = useCoin('USDC')
 
   // find out if the tranche is active uasing SendMerkleDrop.trancheActive(uint256 _tranche)
   const {
@@ -102,7 +101,8 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     error: claimError,
   } = useUserOpClaimMutation()
 
-  const hasEnoughGas = usdcFees && (usdcBalance ?? BigInt(0)) >= usdcFees.baseFee + usdcFees.gasFees
+  const hasEnoughGas =
+    usdcFees && (usdc?.balance ?? BigInt(0)) >= usdcFees.baseFee + usdcFees.gasFees
 
   const canClaim = isTrancheActive && isClaimActive && isEligible && hasEnoughGas
   useEffect(() => {
@@ -215,7 +215,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
             case isTrancheActiveLoading ||
               isClaimedLoading ||
               isFeesLoading ||
-              isBalanceLoading ||
+              isUSDCLoading ||
               isNonceLoading ||
               isClaimPending ||
               isLoadingSendAccount ||

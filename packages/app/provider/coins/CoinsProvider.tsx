@@ -1,8 +1,8 @@
 import { createContext, useContext, useMemo } from 'react'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
-import type { CoinWithBalance } from 'app/data/coins'
+import type { allCoins, CoinWithBalance } from 'app/data/coins'
 import { coins as coinsOg, partnerCoins } from 'app/data/coins'
-import { Spinner } from '@my/ui'
+import { isAddress } from 'viem'
 
 type CoinsContextType = {
   coins: CoinWithBalance[]
@@ -43,10 +43,6 @@ export function CoinsProvider({ children }: { children: React.ReactNode }) {
     return [...coinsWithBalances, ...activePartnerCoins]
   }, [balanceData])
 
-  if (balanceData.isLoading) {
-    return <Spinner />
-  }
-
   return <CoinsContext.Provider value={{ ...balanceData, coins }}>{children}</CoinsContext.Provider>
 }
 
@@ -54,4 +50,16 @@ export const useCoins = () => {
   const context = useContext(CoinsContext)
   if (!context) throw new Error('useCoins must be used within a CoinsProvider')
   return context
+}
+
+export const useCoin = (
+  addressOrSymbol: allCoins[number]['symbol'] | allCoins[number]['token'] | undefined
+) => {
+  const { coins, isLoading } = useCoins()
+  if (!addressOrSymbol) return { coin: undefined, isLoading }
+  const coin =
+    isAddress(addressOrSymbol) || addressOrSymbol === 'eth'
+      ? coins.find((coin) => coin.token === addressOrSymbol)
+      : coins.find((coin) => coin.symbol === addressOrSymbol)
+  return { coin, isLoading }
 }
