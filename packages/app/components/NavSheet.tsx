@@ -1,7 +1,6 @@
 import {
   Button,
   isWeb,
-  Paragraph,
   Sheet,
   type SheetProps,
   Stack,
@@ -9,8 +8,9 @@ import {
   useSafeAreaInsets,
   XStack,
 } from '@my/ui'
-import { IconX } from './icons'
+import { IconSendLogo, IconX } from './icons'
 import { type RootParams, useRootScreenParams } from 'app/routers/params'
+import { Link } from 'solito/link'
 
 export function NavSheet({
   children,
@@ -39,7 +39,9 @@ export function NavSheet({
       <Sheet.Overlay />
       <Sheet.Frame zIndex={1} height={isWeb ? '100vh' : '100%'} pt={isPwa && sat}>
         <XStack w="100%" ai="center" jc="space-between" px="$4" pt="$6" pb="$2">
-          <Paragraph size={'$10'}>/send</Paragraph>
+          <Link href="/">
+            <IconSendLogo size={'$2.5'} color={'$color12'} />
+          </Link>
           <Button
             size="$4"
             transparent
