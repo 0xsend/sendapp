@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@jest/globals'
 import {
-  adjustMidnightToTimezone,
+  adjustDatePickerDateToTimezone,
   adjustUTCDateForTimezone,
   CommentsTime,
   formatDateToLongForm,
@@ -91,19 +91,19 @@ describe('formatDateToLongFormWithoutYear', () => {
 describe('adjustMidnightToTimezone', () => {
   it('should handle dates already in UTC', () => {
     const utcDate = new Date('2024-12-13T00:00:00Z')
-    const adjustedDate = adjustMidnightToTimezone(utcDate)
+    const adjustedDate = adjustDatePickerDateToTimezone(utcDate)
     expect(adjustedDate.toISOString()).toBe('2024-12-13T00:00:00.000Z')
   })
 
   it('should correctly adjust a date for a positive timezone offset', () => {
     const localDate = new Date('2024-12-13T00:00:00+05:00')
-    const adjustedDate = adjustMidnightToTimezone(localDate)
+    const adjustedDate = adjustDatePickerDateToTimezone(localDate)
     expect(adjustedDate.toISOString()).toBe('2024-12-12T19:00:00.000Z')
   })
 
   it('should correctly adjust a date for a negative timezone offset', () => {
     const localDate = new Date('2024-12-13T00:00:00-05:00')
-    const adjustedDate = adjustMidnightToTimezone(localDate)
+    const adjustedDate = adjustDatePickerDateToTimezone(localDate)
     expect(adjustedDate.toISOString()).toBe('2024-12-13T05:00:00.000Z')
   })
 })

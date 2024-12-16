@@ -53,7 +53,7 @@ export const adjustUTCDateForTimezone = (date: Date, offset?: number) => {
   return adjustedDate
 }
 
-export const adjustMidnightToTimezone = (date: Date): Date => {
+export const adjustDatePickerDateToTimezone = (date: Date): Date => {
   const timezoneOffsetMinutes = date.getTimezoneOffset()
   const timezoneOffsetMillis = timezoneOffsetMinutes * 60 * 1000
   const adjustedTime = date.getTime() - timezoneOffsetMillis
