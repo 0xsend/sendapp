@@ -1,12 +1,12 @@
 import { Button, Card, Label, Paragraph, Spinner } from '@my/ui'
-import type { coins } from 'app/data/coins'
+import type { CoinWithBalance } from 'app/data/coins'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { Fragment } from 'react'
 import { useTokenActivityFeed } from './utils/useTokenActivityFeed'
 import { AnimateEnter } from './TokenDetails'
 import { TokenActivityRow } from './TokenActivityRow'
 
-export const TokenDetailsHistory = ({ coin }: { coin: coins[number] }) => {
+export const TokenDetailsHistory = ({ coin }: { coin: CoinWithBalance }) => {
   const result = useTokenActivityFeed({
     pageSize: 10,
     address: coin.token === 'eth' ? undefined : hexToBytea(coin.token),

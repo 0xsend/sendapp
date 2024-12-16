@@ -8,6 +8,7 @@ import { UniversalThemeProvider } from './theme'
 import { ToastProvider } from './toast'
 import { WagmiProvider } from './wagmi'
 import { ScrollDirectionProvider } from './scroll'
+import { CoinsProvider } from './coins'
 
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
@@ -48,4 +49,5 @@ const Providers = compose([
   TamaguiProvider,
   ToastProvider,
   ScrollDirectionProvider,
+  CoinsProvider,
 ])
