@@ -2,7 +2,7 @@ import { defineConfig } from '@wagmi/cli'
 import { react, actions, foundry } from '@wagmi/cli/plugins'
 import { pascalCase } from 'change-case'
 import { globby } from 'globby'
-import { erc20Abi } from 'viem'
+import { erc20Abi, multicall3Abi } from 'viem'
 import { base, baseSepolia, mainnet, sepolia } from 'viem/chains'
 import { localhost, baseLocal } from './src/chains'
 import { iEntryPointAbi } from './src'
@@ -136,6 +136,18 @@ export default defineConfig({
         [baseSepolia.id]: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
       },
       abi: iEntryPointAbi,
+    },
+    {
+      name: 'Multicall3',
+      address: {
+        [mainnet.id]: '0xcA11bde05977b3631167028862bE2a173976CA11',
+        [localhost.id]: '0xcA11bde05977b3631167028862bE2a173976CA11',
+        [sepolia.id]: '0xcA11bde05977b3631167028862bE2a173976CA11',
+        [baseLocal.id]: '0xcA11bde05977b3631167028862bE2a173976CA11',
+        [base.id]: '0xcA11bde05977b3631167028862bE2a173976CA11',
+        [baseSepolia.id]: '0xcA11bde05977b3631167028862bE2a173976CA11',
+      },
+      abi: multicall3Abi,
     },
   ],
   plugins: [

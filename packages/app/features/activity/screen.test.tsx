@@ -61,8 +61,7 @@ jest.mock('app/provider/coins', () => ({
         balance: 250000n,
       },
     ],
-    totalBalance: 5000000n,
-    isLoadingBalance: false,
+    totalPrice: 5000000n,
   }),
 }))
 

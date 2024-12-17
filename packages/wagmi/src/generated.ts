@@ -1956,6 +1956,71 @@ export const iEntryPointSimulationsAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Multicall3
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ */
+export const multicall3Abi = [
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'calls',
+        type: 'tuple[]',
+        components: [
+          { name: 'target', type: 'address' },
+          { name: 'allowFailure', type: 'bool' },
+          { name: 'callData', type: 'bytes' },
+        ],
+      },
+    ],
+    name: 'aggregate3',
+    outputs: [
+      {
+        name: 'returnData',
+        type: 'tuple[]',
+        components: [
+          { name: 'success', type: 'bool' },
+          { name: 'returnData', type: 'bytes' },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+] as const
+
+/**
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ */
+export const multicall3Address = {
+  1: '0xcA11bde05977b3631167028862bE2a173976CA11',
+  1337: '0xcA11bde05977b3631167028862bE2a173976CA11',
+  8453: '0xcA11bde05977b3631167028862bE2a173976CA11',
+  84532: '0xcA11bde05977b3631167028862bE2a173976CA11',
+  845337: '0xcA11bde05977b3631167028862bE2a173976CA11',
+  11155111: '0xcA11bde05977b3631167028862bE2a173976CA11',
+} as const
+
+/**
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ */
+export const multicall3Config = { address: multicall3Address, abi: multicall3Abi } as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // SPX6900
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -6013,6 +6078,35 @@ export const watchIEntryPointSimulationsUserOperationRevertReasonEvent =
 export const watchIEntryPointSimulationsWithdrawnEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: iEntryPointSimulationsAbi,
   eventName: 'Withdrawn',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link multicall3Abi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ */
+export const readMulticall3 = /*#__PURE__*/ createReadContract({
+  abi: multicall3Abi,
+  address: multicall3Address,
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link multicall3Abi}__ and `functionName` set to `"aggregate3"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ */
+export const readMulticall3Aggregate3 = /*#__PURE__*/ createReadContract({
+  abi: multicall3Abi,
+  address: multicall3Address,
+  functionName: 'aggregate3',
 })
 
 /**
@@ -10968,6 +11062,35 @@ export const useWatchIEntryPointSimulationsWithdrawnEvent =
     abi: iEntryPointSimulationsAbi,
     eventName: 'Withdrawn',
   })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link multicall3Abi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ */
+export const useReadMulticall3 = /*#__PURE__*/ createUseReadContract({
+  abi: multicall3Abi,
+  address: multicall3Address,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link multicall3Abi}__ and `functionName` set to `"aggregate3"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcA11bde05977b3631167028862bE2a173976CA11)
+ */
+export const useReadMulticall3Aggregate3 = /*#__PURE__*/ createUseReadContract({
+  abi: multicall3Abi,
+  address: multicall3Address,
+  functionName: 'aggregate3',
+})
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link spx6900Abi}__

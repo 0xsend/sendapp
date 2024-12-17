@@ -35,9 +35,9 @@ const HiddenSquare = styled(Stack, {
 
 export const TokenBalanceCard = () => {
   // @todo add an enabled flag for when hidden
-  const { totalBalance, isLoadingTotalBalance } = useCoins()
+  const { totalPrice, pricesQuery } = useCoins()
 
-  const formattedBalance = formatAmount(totalBalance, 9, 0)
+  const formattedBalance = formatAmount(totalPrice, 9, 0)
 
   const { isPriceHidden, toggleIsPriceHidden } = useIsPriceHidden()
   const timer = useStopwatch()
@@ -100,7 +100,7 @@ export const TokenBalanceCard = () => {
                       {'//////'}
                     </BigHeading>
                   )
-                case isLoadingTotalBalance || !totalBalance:
+                case pricesQuery.isLoading || !totalPrice:
                   return <Spinner size={'large'} />
                 default:
                   return (
