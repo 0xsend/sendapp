@@ -50,7 +50,7 @@ export const spx6900Coin = {
 /**
  * The coins (tokens) array that are supported by Send App.
  */
-export const coins = [usdcCoin, ethCoin, spx6900Coin, sendCoin] as const
+export const coins = [usdcCoin, ethCoin, sendCoin] as const
 export type coins = typeof coins
 
 type CoinsDict = { [key in coins[number]['token']]: coins[number] }
@@ -64,3 +64,40 @@ export const coinsDict = coins.reduce((acc, coin) => {
 }, {} as CoinsDict)
 
 export type coinsDict = typeof coinsDict
+
+/**
+ * The coins (tokens) that sendapp supports through partnerships. (Hidden when balance is 0)
+ */
+export const partnerCoins = [spx6900Coin] as const
+export type partnerCoins = typeof partnerCoins
+
+type PartnerCoinsDict = { [key in partnerCoins[number]['token']]: partnerCoins[number] }
+
+export const partnerCoinsDict = partnerCoins.reduce((acc, coin) => {
+  acc[coin.token] = coin
+  return acc
+}, {} as PartnerCoinsDict)
+
+export type partnerCoinsDict = typeof partnerCoinsDict
+
+/**
+ * All coins (tokens) array that are supported by Send App.
+ */
+export const allCoins = [...coins, ...partnerCoins] as const
+export type allCoins = typeof allCoins
+
+type AllCoinsDict = { [key in allCoins[number]['token']]: allCoins[number] }
+
+/**
+ * A dictionary of coins (tokens) by token address.
+ */
+export const allCoinsDict = allCoins.reduce((acc, coin) => {
+  acc[coin.token] = coin
+  return acc
+}, {} as AllCoinsDict)
+
+export type allCoinsDict = typeof allCoinsDict
+
+export type CoinWithBalance = allCoins[number] & {
+  balance: bigint | undefined
+}

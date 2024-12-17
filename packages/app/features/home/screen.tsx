@@ -12,7 +12,6 @@ import {
   H1,
   Theme,
 } from '@my/ui'
-import { coins } from 'app/data/coins'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { TokenBalanceCard } from './TokenBalanceCard'
@@ -49,7 +48,7 @@ function SendSearchBody() {
 
 function HomeBody(props: XStackProps) {
   const { data: sendAccount } = useSendAccount()
-  const selectedCoin = useCoinFromTokenParam()
+  const { coin: selectedCoin } = useCoinFromTokenParam()
   const { isSendingUnlocked, isLoading } = useIsSendingUnlocked()
 
   if (isLoading)
@@ -97,9 +96,9 @@ function HomeBody(props: XStackProps) {
           <TokenBalanceCard />
         )}
         <YStack w={'100%'} ai={'center'}>
-          <YStack width="100%">
-            <TokenBalanceList coins={coins} />
-          </YStack>
+          <Card bc={'$color1'} width="100%" p="$4">
+            <TokenBalanceList />
+          </Card>
         </YStack>
         {isSendingUnlocked && (
           <XStack $lg={{ display: 'none' }} pt={'$4'} jc={'center'} gap={'$4'} w="100%">

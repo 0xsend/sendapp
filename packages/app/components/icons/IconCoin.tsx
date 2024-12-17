@@ -1,4 +1,4 @@
-import type { coin } from 'app/data/coins'
+import type { allCoins, coin } from 'app/data/coins'
 import { IconEthereum } from './IconEthereum'
 import { IconSend } from './IconSend'
 import { IconUSDC } from './IconUSDC'
@@ -11,6 +11,6 @@ const coinSymbolToIcons: Record<coin['symbol'], JSX.Element> = {
   SPX: <IconSPX6900 size={'$2.5'} />,
 }
 
-export const IconCoin = ({ coin }: { coin: coin }) => {
-  return coinSymbolToIcons[coin.symbol]
+export const IconCoin = ({ symbol }: { symbol: allCoins[number]['symbol'] }) => {
+  return coinSymbolToIcons[symbol]
 }

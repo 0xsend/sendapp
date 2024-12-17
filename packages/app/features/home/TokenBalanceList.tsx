@@ -1,25 +1,18 @@
-import {
-  Link,
-  Paragraph,
-  Spinner,
-  Theme,
-  Tooltip,
-  XStack,
-  type LinkProps,
-  type TooltipProps,
-} from '@my/ui'
-import { baseMainnet } from '@my/wagmi'
-import { IconArrowRight, IconError } from 'app/components/icons'
+import { Link, Paragraph, XStack, type LinkProps } from '@my/ui'
+
 import { IconCoin } from 'app/components/icons/IconCoin'
-import type { coin, coins } from 'app/data/coins'
+import type { CoinWithBalance } from 'app/data/coins'
+
+import { useCoins } from 'app/provider/coins'
 import { useRootScreenParams } from 'app/routers/params'
 import formatAmount from 'app/utils/formatAmount'
-import { useSendAccount } from 'app/utils/send-accounts'
 import { Fragment } from 'react'
-import { useBalance, type UseBalanceReturnType } from 'wagmi'
 
-export const TokenBalanceList = ({ coins }: { coins: coins }) => {
+export const TokenBalanceList = () => {
+  const { coins, isLoading } = useCoins()
   const [{ token: tokenParam }] = useRootScreenParams()
+
+  if (isLoading) return null
 
   return coins.map((coin) => (
     <Fragment key={`token-balance-list-${coin.label}`}>
@@ -43,22 +36,11 @@ export const TokenBalanceList = ({ coins }: { coins: coins }) => {
 const TokenBalanceItem = ({
   coin,
   ...props
-}: {
-  coin: coin
-} & Omit<LinkProps, 'children'>) => {
-  const { data: sendAccount } = useSendAccount()
-
-  const balance = useBalance({
-    address: sendAccount?.address,
-    token: coin.token === 'eth' ? undefined : coin.token,
-    query: { enabled: !!sendAccount },
-    chainId: baseMainnet.id,
-  })
-
+}: { coin: CoinWithBalance } & Omit<LinkProps, 'children'>) => {
   return (
     <Link display="flex" {...props}>
       <XStack gap={'$2'} $gtLg={{ gap: '$3.5' }} ai={'center'}>
-        <IconCoin coin={coin} />
+        <IconCoin symbol={coin.symbol} />
         <Paragraph
           fontSize={'$5'}
           fontWeight={'500'}
@@ -69,77 +51,17 @@ const TokenBalanceItem = ({
         </Paragraph>
       </XStack>
       <XStack gap={'$3.5'} ai={'center'}>
-        <TokenBalance balance={balance} />
+        <TokenBalance coin={coin} />
       </XStack>
     </Link>
   )
 }
 
-const TokenBalance = ({ balance }: { balance: UseBalanceReturnType }) => {
-  if (balance) {
-    if (balance.isError) {
-      return (
-        <>
-          <Paragraph fontSize={'$9'} fontWeight={'500'} color={'$color12'}>
-            --
-          </Paragraph>
-          <ErrorTooltip groupId="1" placement="right" Icon={<IconError color={'$redVibrant'} />}>
-            Error occurred while fetching balance. {balance.error.message}
-          </ErrorTooltip>
-        </>
-      )
-    }
-    if (balance.isFetching && balance.isPending) {
-      return <Spinner size={'small'} />
-    }
-    if (balance?.data?.value === undefined) {
-      return <></>
-    }
-    return (
-      <Theme name="green">
-        <Paragraph fontSize={'$9'} fontWeight={'600'}>
-          {formatAmount(
-            (Number(balance.data.value) / 10 ** (balance.data?.decimals ?? 0)).toString(),
-            10,
-            5
-          )}
-        </Paragraph>
-
-        <XStack $lg={{ display: 'none' }} theme="green">
-          <IconArrowRight col={'$background'} />
-        </XStack>
-      </Theme>
-    )
-  }
-}
-
-const ErrorTooltip = ({ Icon, children, ...props }: TooltipProps & { Icon?: JSX.Element }) => {
+const TokenBalance = ({ coin: { decimals, balance } }: { coin: CoinWithBalance }) => {
+  if (!balance) return <></>
   return (
-    <Tooltip {...props}>
-      <Tooltip.Trigger>{Icon}</Tooltip.Trigger>
-      <Tooltip.Content
-        enterStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
-        exitStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
-        scale={1}
-        x={0}
-        y={0}
-        opacity={1}
-        animation={[
-          'quick',
-          {
-            opacity: {
-              overshootClamping: true,
-            },
-          },
-        ]}
-        bc={'transparent'}
-        borderWidth={1}
-        borderColor={'$redVibrant'}
-      >
-        <Paragraph color={'$color12'} fontWeight={'500'}>
-          {children}
-        </Paragraph>
-      </Tooltip.Content>
-    </Tooltip>
+    <Paragraph fontSize={'$9'} fontWeight={'600'} col="$color12">
+      {formatAmount((Number(balance) / 10 ** decimals).toString(), 10, 5)}
+    </Paragraph>
   )
 }

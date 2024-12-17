@@ -9,30 +9,28 @@ import {
   Sheet,
   Spinner,
   Theme,
-  Tooltip,
   XStack,
   YStack,
   getFontSize,
   isWeb,
   useThemeName,
   type SelectProps,
-  type TooltipProps,
 } from '@my/ui'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
 import { ChevronDown, ChevronUp, CheckCircle as IconCheckCircle } from '@tamagui/lucide-icons'
 import { useTsController } from '@ts-react/form'
-import { IconError, IconX } from 'app/components/icons'
-import { coins, type coin } from 'app/data/coins'
+import { IconX } from 'app/components/icons'
 import formatAmount from 'app/utils/formatAmount'
-import { useSendAccount } from 'app/utils/send-accounts'
 import { useId, useState } from 'react'
-import { useBalance, type UseBalanceReturnType } from 'wagmi'
 import { IconCoin } from '../icons/IconCoin'
+import type { CoinWithBalance } from 'app/data/coins'
+import { useCoins } from 'app/provider/coins'
 export const CoinField = ({
   native = false,
   ...props
-}: Pick<SelectProps, 'size' | 'native' | 'defaultValue'>) => {
+}: Pick<SelectProps, 'size' | 'native' | 'defaultValue' | 'onValueChange'>) => {
   const [isOpen, setIsOpen] = useState(false)
+  const { coins } = useCoins()
 
   const {
     field,
@@ -119,11 +117,11 @@ export const CoinField = ({
             <Select.Content zIndex={200000}>
               <Select.Viewport
                 disableScroll
-                backgroundColor={'$color2'}
+                backgroundColor={'$color1'}
                 br={'$3'}
                 btrr={0}
                 boc="transparent"
-                focusStyle={{ bc: '$color2' }}
+                focusStyle={{ bc: '$color0' }}
               >
                 <XStack als="flex-start" w={320} $sm={{ w: '100%' }} boc={'transparent'} f={1}>
                   <Select.Group disabled={disabled} space="$0">
@@ -171,22 +169,13 @@ const CoinFieldItem = ({
   index,
 }: {
   active: boolean
-  coin: coin
+  coin: CoinWithBalance
   index: number
 }) => {
-  const { data: sendAccount } = useSendAccount()
-
-  const balance = useBalance({
-    address: sendAccount?.address,
-    token: coin.token === 'eth' ? undefined : coin.token,
-    query: { enabled: !!sendAccount },
-    chainId: baseMainnet.id,
-  })
-
   return (
     <Select.Item index={index} key={coin.token} value={coin.token} bc="transparent" f={1} w="100%">
       <XStack gap={'$2'} $gtLg={{ gap: '$3.5' }} ai={'center'} jc={'space-between'}>
-        <IconCoin coin={coin} />
+        <IconCoin symbol={coin.symbol} />
         <Select.ItemText
           fontSize={'$5'}
           fontWeight={'500'}
@@ -198,69 +187,24 @@ const CoinFieldItem = ({
         {active && <IconCheckCircle color={'$color12'} size={'$1.5'} />}
       </XStack>
       <XStack gap={'$3.5'} ai={'center'}>
-        <TokenBalance balance={balance} />
+        <TokenBalance coin={coin} />
       </XStack>
     </Select.Item>
   )
 }
 
-const TokenBalance = ({ balance }: { balance: UseBalanceReturnType }) => {
-  if (balance) {
-    if (balance.isError) {
-      return (
-        <>
-          <Paragraph fontSize={'$9'} fontWeight={'500'} color={'$color12'}>
-            --
-          </Paragraph>
-          <ErrorTooltip groupId="1" placement="right" Icon={<IconError color={'$redVibrant'} />}>
-            Error occurred while fetching balance. {balance.error.message}
-          </ErrorTooltip>
-        </>
-      )
-    }
-    if (balance.isFetching && balance.isPending) {
-      return <Spinner size={'small'} />
-    }
-    if (balance?.data?.value === undefined) {
-      return <></>
-    }
-    return (
-      <Paragraph fontFamily={'$mono'} fontSize={'$9'} fontWeight={'500'} color={'$color12'}>
-        {formatAmount(
-          (Number(balance.data.value) / 10 ** (balance.data?.decimals ?? 0)).toString()
-        )}
-      </Paragraph>
-    )
-  }
-}
+const TokenBalance = ({ coin: { balance, decimals } }: { coin: CoinWithBalance }) => {
+  const { isLoading } = useCoins()
 
-const ErrorTooltip = ({ Icon, children, ...props }: TooltipProps & { Icon?: JSX.Element }) => {
+  if (isLoading) {
+    return <Spinner size={'small'} />
+  }
+  if (balance === undefined) {
+    return <></>
+  }
   return (
-    <Tooltip {...props}>
-      <Tooltip.Trigger>{Icon}</Tooltip.Trigger>
-      <Tooltip.Content
-        enterStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
-        exitStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
-        scale={1}
-        x={0}
-        y={0}
-        opacity={1}
-        animation={[
-          'quick',
-          {
-            opacity: {
-              overshootClamping: true,
-            },
-          },
-        ]}
-        bc={'transparent'}
-        borderWidth={1}
-        borderColor={'$redVibrant'}
-      >
-        <Paragraph color={'$color12'} fontWeight={'500'}>
-          {children}
-        </Paragraph>
-      </Tooltip.Content>
-    </Tooltip>
+    <Paragraph fontFamily={'$mono'} fontSize={'$9'} fontWeight={'500'} color={'$color12'}>
+      {formatAmount((Number(balance) / 10 ** decimals).toString())}
+    </Paragraph>
   )
 }

@@ -1,18 +1,20 @@
 import { Button, Paragraph, Spinner, Stack, SubmitButton, XStack, YStack } from '@my/ui'
-import { baseMainnet, usdcAddress } from '@my/wagmi'
-import { coinsDict } from 'app/data/coins'
+import { type allCoins, allCoinsDict } from 'app/data/coins'
 import { useSendScreenParams } from 'app/routers/params'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import formatAmount from 'app/utils/formatAmount'
-import { useSendAccount } from 'app/utils/send-accounts'
+
 import { useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
-import { useBalance } from 'wagmi'
+
 import { z } from 'zod'
 import { SendRecipient } from './confirm/screen'
 import { sanitizeAmount, localizeAmount } from 'app/utils/formatAmount'
+
+import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
+import { useCoins } from 'app/provider/coins'
 
 const SendAmountSchema = z.object({
   amount: formFields.text,
@@ -21,28 +23,19 @@ const SendAmountSchema = z.object({
 
 export function SendAmountForm() {
   const form = useForm<z.infer<typeof SendAmountSchema>>()
-  const { data: sendAccount } = useSendAccount()
   const router = useRouter()
-
   const [sendParams, setSendParams] = useSendScreenParams()
-  const token = form.watch('token')
-
-  // need balance to check if user has enough to send
+  const selectedToken = useCoinFromSendTokenParam()
   const {
-    data: balance,
-    isLoading: balanceIsLoading,
-    error: balanceError,
-  } = useBalance({
-    address: sendAccount?.address,
-    token: (token === 'eth' ? undefined : token) as `0x${string}` | undefined,
-    query: { enabled: !!sendAccount },
-    chainId: baseMainnet.id,
-  })
+    coin: { balance, token, decimals },
+  } = selectedToken
+  const { isLoading: isLoadingCoins } = useCoins()
 
   useEffect(() => {
     const subscription = form.watch(({ amount, token: _token }) => {
-      const token = _token as keyof typeof coinsDict
-      const sanitizedAmount = sanitizeAmount(amount, coinsDict[token].decimals)
+      const token = _token as allCoins[number]['token']
+      // use allCoinsDict because form updates before query params. This feels hacky
+      const sanitizedAmount = sanitizeAmount(amount, allCoinsDict[token].decimals)
       setSendParams(
         {
           ...sendParams,
@@ -55,15 +48,14 @@ export function SendAmountForm() {
     return () => subscription.unsubscribe()
   }, [form, setSendParams, sendParams])
 
-  const sendToken = sendParams.sendToken ?? usdcAddress[baseMainnet.id]
   const parsedAmount = BigInt(sendParams.amount ?? '0')
   const formAmount = form.watch('amount')
 
   const canSubmit =
-    !balanceIsLoading &&
-    balance?.value !== undefined &&
+    !isLoadingCoins &&
+    balance !== undefined &&
     sendParams.amount !== undefined &&
-    balance?.value >= parsedAmount &&
+    balance >= parsedAmount &&
     parsedAmount > BigInt(0)
 
   async function onSubmit() {
@@ -75,7 +67,7 @@ export function SendAmountForm() {
         idType: sendParams.idType,
         recipient: sendParams.recipient,
         amount: sendParams.amount,
-        sendToken: sendToken,
+        sendToken: token,
       },
     })
   }
@@ -140,27 +132,28 @@ export function SendAmountForm() {
             outlineWidth: 1,
             outlineStyle: 'solid',
             fontFamily: '$mono',
-            inputMode: balance?.decimals ? 'decimal' : 'numeric',
+            inputMode: decimals ? 'decimal' : 'numeric',
             onChangeText: (amount) => {
               const localizedAmount = localizeAmount(amount)
               form.setValue('amount', localizedAmount)
             },
           },
           token: {
-            defaultValue: sendToken,
+            defaultValue: token,
           },
         }}
         formProps={{
           testID: 'SendForm',
-          $gtSm: { maxWidth: '100%' },
-          jc: 'flex-start',
+          $gtSm: { maxWidth: '100%', alignSelf: 'flex-start', justifyContent: 'flex-start' },
+          justifyContent: 'flex-start',
           f: 1,
+          alignSelf: 'flex-start',
           height: '100%',
         }}
         defaultValues={{
-          token: sendToken,
+          token: token,
           amount: sendParams.amount
-            ? localizeAmount(formatUnits(BigInt(sendParams.amount), coinsDict[sendToken].decimals))
+            ? localizeAmount(formatUnits(BigInt(sendParams.amount), decimals))
             : undefined,
         }}
         renderAfter={({ submit }) => (
@@ -195,19 +188,14 @@ export function SendAmountForm() {
               >
                 {(() => {
                   switch (true) {
-                    case balanceIsLoading:
+                    case isLoadingCoins:
                       return <Spinner size="small" />
-                    case !balance || balanceError !== null:
-                      return (
-                        <Paragraph testID="SendFormBalance">
-                          {balanceError !== null ? balanceError.message : 'Insufficient balance'}
-                        </Paragraph>
-                      )
+                    case !balance:
+                      return null
                     default:
                       return (
                         <Paragraph testID="SendFormBalance">
-                          BAL:{' '}
-                          {formatAmount(formatUnits(balance.value, balance.decimals), undefined, 4)}
+                          BAL: {formatAmount(formatUnits(balance, decimals), undefined, 4)}
                         </Paragraph>
                       )
                   }

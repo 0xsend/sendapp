@@ -355,8 +355,8 @@ const ProfileInfo = ({
               start={[0, 0]}
               end={[0, 1]}
               fullscreen
-              colors={['transparent', '#000000']}
-              borderRadius="$4"
+              colors={['transparent', '#000000A5']}
+              borderRadius="$6"
             >
               <YStack
                 position="absolute"
