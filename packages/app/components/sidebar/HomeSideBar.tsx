@@ -1,20 +1,19 @@
 import {
   Avatar,
-  H4,
   Link,
+  LinkableAvatar,
   Nav,
   Paragraph,
   ScrollView,
   Separator,
   SideBar,
+  useMedia,
   XStack,
   YStack,
-  useMedia,
-  LinkableAvatar,
   type YStackProps,
 } from '@my/ui'
 import { baseMainnet } from '@my/wagmi/chains'
-import { IconAccount, IconHome, IconSendLogo, IconDeviceReset } from 'app/components/icons'
+import { IconAccount, IconDeviceReset, IconHome, IconSendLogo } from 'app/components/icons'
 import { SideBarNavLink } from 'app/components/sidebar/SideBarNavLink'
 
 import type { ReactElement } from 'react'
@@ -70,42 +69,54 @@ const HomeBottomSheet = () => {
 
   return (
     <NavSheet navId="home">
-      <XStack gap="$4" ai="center">
-        <LinkableAvatar size="$4.5" br={'$3'} href={`/profile/${profile?.send_id}`}>
+      <XStack gap="$4" ai="center" bg={'$color1'} p={'$4'} borderRadius={'$6'} mb={'$4'}>
+        <LinkableAvatar size="$7" br={'$4'} href={`/profile/${profile?.send_id}`}>
           <Avatar.Image src={avatarUrl ?? ''} />
           <Avatar.Fallback jc={'center'} delayMs={200}>
             <IconAccount size="$4.5" color="$olive" />
           </Avatar.Fallback>
         </LinkableAvatar>
-        <YStack>
-          <H4>{profile?.name ?? `#${profile?.send_id}`}</H4>
+        <YStack gap={'$2'}>
+          <Paragraph size={'$7'}>{profile?.name ?? `#${profile?.send_id}`}</Paragraph>
+          <Separator width="100%" borderColor="$decay" />
           <ReferralLink p={0} />
         </YStack>
       </XStack>
       <Nav display="flex" flex={2} height="100%">
-        <ScrollView gap={'$4'} alignItems="stretch" ml="$-5" height="100%">
-          {links.map((link, idx) => (
-            <YStack
-              key={link.href}
-              gap={'$4'}
-              alignItems="stretch"
-              justifyContent="center"
-              f={1}
-              pl={'$5'}
-              h={'$7'}
-            >
-              <SideBarNavLink key={link.href} {...link} />
-              {idx !== links.length - 1 && (
-                <Separator
-                  width="100%"
-                  pos={'absolute'}
-                  left="$-6"
-                  bottom="$0"
-                  borderColor="$decay"
-                />
-              )}
-            </YStack>
-          ))}
+        <ScrollView gap={'$4'} alignItems="stretch" height="100%">
+          {links.map((link, idx) => {
+            const first = idx === 0
+            const last = idx === links.length - 1
+
+            return (
+              <YStack
+                key={link.href}
+                gap={'$4'}
+                alignItems="stretch"
+                justifyContent="center"
+                p={'$2'}
+                w={'100%'}
+                bg={'$color1'}
+                borderTopLeftRadius={first ? '$6' : 0}
+                borderTopRightRadius={first ? '$6' : 0}
+                borderBottomLeftRadius={last ? '$6' : 0}
+                borderBottomRightRadius={last ? '$6' : 0}
+                paddingTop={first ? '$2' : 0}
+                paddingBottom={last ? '$2' : 0}
+              >
+                <YStack
+                  w={'100%'}
+                  p={'$4'}
+                  borderRadius={'$4'}
+                  hoverStyle={{
+                    backgroundColor: '$color2',
+                  }}
+                >
+                  <SideBarNavLink key={link.href} hoverStyle={{}} {...link} />
+                </YStack>
+              </YStack>
+            )
+          })}
         </ScrollView>
       </Nav>
     </NavSheet>

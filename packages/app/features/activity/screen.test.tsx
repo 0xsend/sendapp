@@ -47,6 +47,25 @@ jest.mock('solito/link', () => ({
   useLink: jest.fn().mockReturnValue({ href: '/profile/123', onPress: jest.fn() }),
 }))
 
+jest.mock('app/provider/coins', () => ({
+  useCoins: jest.fn().mockReturnValue({
+    coins: [
+      {
+        label: 'USDC',
+        token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+        balance: 250000n,
+      },
+      {
+        label: 'SEND',
+        token: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
+        balance: 250000n,
+      },
+    ],
+    totalBalance: 5000000n,
+    isLoadingBalance: false,
+  }),
+}))
+
 describe('ActivityScreen', () => {
   beforeEach(() => {
     // @ts-expect-error mock

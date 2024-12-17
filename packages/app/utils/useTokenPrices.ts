@@ -12,19 +12,11 @@ export const TokenPricesSchema = z.object({
   spx6900: TokenPriceSchema,
 })
 
-const MINUTE = 1000 * 60
-
-const PRICE_REFRESH_CONFIG = {
-  staleTime: MINUTE,
-  gcTime: MINUTE * 5,
-  refetchInterval: MINUTE,
-} as const
-
 export const useTokenPrices = (): UseQueryResult<z.infer<typeof TokenPricesSchema>, Error> => {
   return useQuery({
     queryKey: ['tokenPrices'],
     refetchOnWindowFocus: false,
-    ...PRICE_REFRESH_CONFIG,
+    staleTime: 1000 * 60,
     queryFn: async () => {
       const res = await fetch(
         'https://api.coingecko.com/api/v3/simple/price?ids=ethereum,usd-coin,send-token,spx6900&vs_currencies=usd'

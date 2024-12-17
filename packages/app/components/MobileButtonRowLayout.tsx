@@ -81,7 +81,7 @@ const MobileButtonRow = ({
 }
 
 const Home = ({ children, ...props }: XStackProps) => {
-  const selectedCoin = useCoinFromTokenParam()
+  const { coin: selectedCoin } = useCoinFromTokenParam()
   const { isSendingUnlocked, isLoading } = useIsSendingUnlocked()
 
   return (

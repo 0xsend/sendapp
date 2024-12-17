@@ -495,7 +495,7 @@ const SendAmount = () => {
         <Paragraph fontSize="$9" fontWeight="600" color="$color12">
           {localizedAmount}
         </Paragraph>
-        <IconCoin coin={coin} />
+        <IconCoin symbol={coin.symbol} />
       </XStack>
     </YStack>
   )

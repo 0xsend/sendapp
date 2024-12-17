@@ -46,7 +46,7 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
           <YStack gap="$4">
             <Button
               disabled
-              icon={<IconCoin coin={coin} />}
+              icon={<IconCoin symbol={coin.symbol} />}
               bc="transparent"
               chromeless
               jc={'flex-start'}

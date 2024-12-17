@@ -13,10 +13,10 @@ import {
 } from '@my/ui'
 import { EyeOff, Eye } from '@tamagui/lucide-icons'
 import formatAmount from 'app/utils/formatAmount'
-import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useEffect, useState } from 'react'
 import { type Timer, useStopwatch } from 'react-use-precision-timer'
+import { useCoins } from 'app/provider/coins'
 
 const GreenSquare = styled(Stack, {
   name: 'Surface',
@@ -35,7 +35,7 @@ const HiddenSquare = styled(Stack, {
 
 export const TokenBalanceCard = () => {
   // @todo add an enabled flag for when hidden
-  const { totalBalance, isLoadingTotalBalance } = useSendAccountBalances()
+  const { totalBalance, isLoadingTotalBalance } = useCoins()
 
   const formattedBalance = formatAmount(totalBalance, 9, 0)
 

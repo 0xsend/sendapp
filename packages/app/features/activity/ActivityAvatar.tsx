@@ -1,6 +1,6 @@
 import { LinkableAvatar, Avatar } from '@my/ui'
 import { IconCoin } from 'app/components/icons/IconCoin'
-import { coinsDict } from 'app/data/coins'
+import { allCoinsDict } from 'app/data/coins'
 import { counterpart } from 'app/utils/activity'
 import {
   isSendAccountReceiveEvent,
@@ -25,7 +25,11 @@ export function ActivityAvatar({ activity }: { activity: Activity }) {
             case Boolean(to_user?.send_id) && Boolean(from_user?.send_id):
               return <Avatar.Image src={user.avatar_url} />
             case isERC20Transfer || isETHReceive:
-              return <IconCoin coin={coinsDict[data?.coin?.token as keyof typeof coinsDict]} />
+              return (
+                <IconCoin
+                  symbol={allCoinsDict[data?.coin?.token as keyof typeof allCoinsDict].symbol}
+                />
+              )
             default:
               return <Avatar.Image src={user?.avatar_url ?? undefined} />
           }

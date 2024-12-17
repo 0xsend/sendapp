@@ -83,7 +83,7 @@ export function TopNav({
   const parts = path.split('/').filter(Boolean)
   const { push, back } = useRouter()
   const media = useMedia()
-  const selectedCoin = useCoinFromTokenParam()
+  const { coin: selectedCoin } = useCoinFromTokenParam()
   const isPwa = usePwa()
   const { profile } = useUser()
 

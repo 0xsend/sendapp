@@ -117,11 +117,11 @@ export const CoinField = ({
             <Select.Content zIndex={200000}>
               <Select.Viewport
                 disableScroll
-                backgroundColor={'$color2'}
+                backgroundColor={'$color1'}
                 br={'$3'}
                 btrr={0}
                 boc="transparent"
-                focusStyle={{ bc: '$color2' }}
+                focusStyle={{ bc: '$color0' }}
               >
                 <XStack als="flex-start" w={320} $sm={{ w: '100%' }} boc={'transparent'} f={1}>
                   <Select.Group disabled={disabled} space="$0">
@@ -175,7 +175,7 @@ const CoinFieldItem = ({
   return (
     <Select.Item index={index} key={coin.token} value={coin.token} bc="transparent" f={1} w="100%">
       <XStack gap={'$2'} $gtLg={{ gap: '$3.5' }} ai={'center'} jc={'space-between'}>
-        <IconCoin coin={coin} />
+        <IconCoin symbol={coin.symbol} />
         <Select.ItemText
           fontSize={'$5'}
           fontWeight={'500'}
