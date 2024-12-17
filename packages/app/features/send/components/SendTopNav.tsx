@@ -57,7 +57,7 @@ export function SendTopNav() {
                 case Boolean(sendParams.recipient):
                   return 'Enter Amount'
                 default:
-                  return 'Select Recipient'
+                  return 'Send'
               }
             })()}
           </Paragraph>
@@ -79,7 +79,7 @@ export function SendTopNav() {
                 case Boolean(sendParams.recipient):
                   return 'Enter Amount'
                 default:
-                  return 'Select Recipient'
+                  return 'Send'
               }
             })()}
           </H2>

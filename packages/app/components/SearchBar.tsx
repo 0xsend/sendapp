@@ -5,15 +5,17 @@ import {
   ButtonText,
   Card,
   H4,
+  isWeb,
   Paragraph,
   ScrollView,
   Spinner,
+  Stack,
   Text,
+  useMedia,
   View,
   XStack,
+  YGroup,
   YStack,
-  isWeb,
-  useMedia,
 } from '@my/ui'
 import { ExternalLink } from '@tamagui/lucide-icons'
 import { useThemeSetting } from '@tamagui/next-theme'
@@ -23,13 +25,13 @@ import { SchemaForm } from 'app/utils/SchemaForm'
 import { shorten } from 'app/utils/strings'
 import { useSearchResultHref } from 'app/utils/useSearchResultHref'
 import * as Linking from 'expo-linking'
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { FormProvider } from 'react-hook-form'
 import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
 import { Adapt, Dialog, Sheet } from 'tamagui'
 import { type Address, isAddress } from 'viem'
-import { IconAccount, IconSearch } from './icons'
+import { IconAccount, IconArrowRight, IconSearch, IconX } from './icons'
 import { baseMainnet } from '@my/wagmi'
 import { useEnsName } from 'wagmi'
 
@@ -53,7 +55,7 @@ function SearchResults() {
   const [resultsFilter, setResultsFilter] = useState<SearchResultsKeysType | null>(null)
   if (isLoading) {
     return (
-      <YStack key="loading" gap="$4" mt="$4">
+      <YStack key="loading" gap="$4" mt="$4" $gtLg={{ w: 600 }}>
         <Spinner size="large" color="$olive" />
       </YStack>
     )
@@ -110,51 +112,50 @@ function SearchResults() {
         y: -10,
       }}
     >
-      {matchesCount > 1 && (
-        <XStack gap="$size.0.75">
-          <SearchFilterButton
-            title="All"
-            active={!resultsFilter}
-            onPress={() => setResultsFilter(null)}
-          />
+      {query && matchesCount > 1 && (
+        <YStack mb={'$4'}>
+          <XStack gap="$5" mb={'$6'}>
+            <SearchFilterButton
+              title="All"
+              active={!resultsFilter}
+              onPress={() => setResultsFilter(null)}
+            />
+            {SEARCH_RESULTS_KEYS.map((key) =>
+              Array.isArray(results[key]) && results[key].length ? (
+                <SearchFilterButton
+                  key={`filter-${key}`}
+                  title={formatResultsKey(key)}
+                  active={resultsFilter === key}
+                  onPress={() => setResultsFilter(key as SearchResultsKeysType)}
+                />
+              ) : null
+            )}
+          </XStack>
+          <Paragraph size={'$7'}>Search Results</Paragraph>
+        </YStack>
+      )}
+      {query && (
+        <YGroup
+          bc={'$color1'}
+          p={'$3'}
+          $gtLg={{
+            width: '600px',
+          }}
+        >
           {SEARCH_RESULTS_KEYS.map((key) =>
-            Array.isArray(results[key]) && results[key].length ? (
-              <SearchFilterButton
-                key={`filter-${key}`}
-                title={formatResultsKey(key)}
-                active={resultsFilter === key}
-                onPress={() => setResultsFilter(key as SearchResultsKeysType)}
-              />
+            Array.isArray(results[key]) &&
+            results[key].length &&
+            (!resultsFilter || resultsFilter === key) ? (
+              <Fragment key={`results-${key}`}>
+                {results[key].map((item: SearchResultCommonType) => (
+                  <YGroup.Item key={`${key}-${item.tag_name}-${item.send_id}`}>
+                    <SearchResultRow keyField={key as SearchResultsKeysType} profile={item} />
+                  </YGroup.Item>
+                ))}
+              </Fragment>
             ) : null
           )}
-        </XStack>
-      )}
-      {SEARCH_RESULTS_KEYS.map((key) =>
-        Array.isArray(results[key]) &&
-        results[key].length &&
-        (!resultsFilter || resultsFilter === key) ? (
-          <YStack key={`results-${key}`} gap="$3.5">
-            <H4
-              $theme-dark={{ color: '$lightGrayTextField' }}
-              $theme-light={{ color: '$darkGrayTextField' }}
-              fontFamily={'$mono'}
-              fontWeight={'500'}
-              size={'$5'}
-              textTransform="uppercase"
-            >
-              {formatResultsKey(key)}
-            </H4>
-            <XStack gap="$5" flexWrap="wrap">
-              {results[key].map((item: SearchResultCommonType) => (
-                <SearchResultRow
-                  key={`${key}-${item.tag_name}-${item.send_id}`}
-                  keyField={key as SearchResultsKeysType}
-                  profile={item}
-                />
-              ))}
-            </XStack>
-          </YStack>
-        ) : null
+        </YGroup>
       )}
     </ScrollView>
   )
@@ -168,8 +169,7 @@ function HighlightMatchingText({ text, highlight }: { text: string; highlight: s
       fontWeight={'300'}
       $theme-light={{ color: '$darkGrayTextField' }}
       $theme-dark={{ color: '$lightGrayTextField' }}
-      fontSize="$7"
-      $gtSm={{ fontSize: '$5' }}
+      fontSize="$5"
     >
       {parts.map((part, i) =>
         regex.test(part) ? (
@@ -193,22 +193,23 @@ function SearchFilterButton({
   title,
   active,
   onPress,
-}: { title: string; active: boolean; onPress: () => void }) {
+}: {
+  title: string
+  active: boolean
+  onPress: () => void
+}) {
   return (
     <Button
-      height="$size.1.5"
-      borderRadius="$2"
-      $theme-light={{ bc: active ? '$primary' : '$networkDarkEthereum' }}
-      $theme-dark={{ bc: active ? '$primary' : '$decay' }}
       chromeless
+      unstyled
       onPress={onPress}
+      borderBottomColor={'$primary'}
+      borderBottomWidth={active ? 1 : 0}
     >
       <ButtonText
-        fontSize={'$4'}
-        fontWeight={'500'}
-        $theme-light={{ color: active ? '$black' : '$metalTouch' }}
-        $theme-dark={{ color: active ? '$black' : '$white' }}
+        color={active ? '$color12' : '$silverChalice'}
         textTransform="capitalize"
+        size={'$5'}
       >
         {title}
       </ButtonText>
@@ -227,51 +228,66 @@ const AddressSearchResultRow = ({ address }: { address: Address }) => {
   const [sendConfirmDialogIsOpen, setSendConfirmDialogIsOpen] = useState(false)
 
   return (
-    <View br="$5" key={`SearchResultRow-${address}`} width="100%" testID="searchResults">
+    <View
+      br="$5"
+      key={`SearchResultRow-${address}`}
+      width="100%"
+      testID="searchResults"
+      $gtLg={{ width: '600px' }}
+    >
       <Card
         testID={`tag-search-${address}`}
-        ai="center"
-        gap="$4"
         display="flex"
         fd={'row'}
         p="$3"
+        ai="center"
+        jc={'space-between'}
         onPress={() => setSendConfirmDialogIsOpen(true)}
         role="link"
         aria-label={address}
       >
-        <Avatar size="$4.5" br="$3">
-          <Avatar.Fallback
-            f={1}
-            jc={'center'}
-            ai={'center'}
-            backgroundColor={'$decay'}
-            $theme-light={{ backgroundColor: '$white' }}
-          >
-            <IconAccount color="$olive" size={'$4'} />
-          </Avatar.Fallback>
-        </Avatar>
-        <YStack gap="$1">
-          <XStack gap="$3" ai={'center'}>
-            <Paragraph
-              fontWeight={'300'}
-              $theme-light={{ color: '$darkGrayTextField' }}
-              $theme-dark={{ color: '$lightGrayTextField' }}
-              fontSize="$7"
-              $gtSm={{ fontSize: '$5' }}
+        <XStack ai="center" gap="$4">
+          <Avatar size="$4.5" br="$3">
+            <Avatar.Fallback
+              f={1}
+              jc={'center'}
+              ai={'center'}
+              backgroundColor={'$decay'}
+              $theme-light={{ backgroundColor: '$white' }}
             >
-              {ensFromAddress ?? 'External Address'}
-            </Paragraph>
-            {isLoadingEns && <Spinner size="small" color={'$color11'} />}
-          </XStack>
-          <Text
-            fontSize="$4"
-            ff={'$mono'}
-            $theme-light={{ color: '$darkGrayTextField' }}
-            $gtSm={{ fontSize: '$2' }}
-          >
-            {gtMd ? address : shorten(address, 6, 6)}
-          </Text>
-        </YStack>
+              <IconAccount color="$olive" size={'$4'} />
+            </Avatar.Fallback>
+          </Avatar>
+          <YStack gap="$1">
+            <XStack gap="$3" ai={'center'}>
+              <Paragraph
+                fontWeight={'300'}
+                $theme-light={{ color: '$darkGrayTextField' }}
+                $theme-dark={{ color: '$lightGrayTextField' }}
+                fontSize="$7"
+                $gtSm={{ fontSize: '$5' }}
+              >
+                {ensFromAddress ?? 'External Address'}
+              </Paragraph>
+              {isLoadingEns && <Spinner size="small" color={'$color11'} />}
+            </XStack>
+            <Text
+              fontSize="$4"
+              ff={'$mono'}
+              $theme-light={{ color: '$darkGrayTextField' }}
+              $gtSm={{ fontSize: '$2' }}
+            >
+              {gtMd ? address : shorten(address, 6, 6)}
+            </Text>
+          </YStack>
+        </XStack>
+        <IconArrowRight
+          size={'1.5'}
+          color={'$primary'}
+          $theme-light={{
+            color: '$color12',
+          }}
+        />
       </Card>
       <ConfirmSendDialog
         isOpen={sendConfirmDialogIsOpen}
@@ -362,67 +378,73 @@ function SearchResultRow({
   const href = useSearchResultHref(profile)
 
   const { resolvedTheme } = useThemeSetting()
-  const rowBC = resolvedTheme?.startsWith('dark') ? '$metalTouch' : '$gray2Light'
+  const rowHoverBC = resolvedTheme?.startsWith('dark')
+    ? 'rgba(255,255,255, 0.1)'
+    : 'rgba(0,0,0, 0.1)'
 
   if (!query) return null
 
   return (
-    <View
+    <Stack
       br="$5"
       key={`SearchResultRow-${keyField}-${profile.tag_name}-${profile.send_id}`}
       width="100%"
-      $gtLg={{
-        width: isWeb ? 'calc((100% - 48px) / 3)' : '100%',
-        bc: rowBC,
-        p: '$1.5',
-      }}
-      $gtXl={{
-        width: isWeb ? 'calc((100% - 72px) / 4)' : '100%',
+      p={'$4'}
+      hoverStyle={{
+        bc: rowHoverBC,
       }}
     >
       <Link href={href}>
-        <XStack testID={`tag-search-${profile.send_id}`} ai="center" gap="$4">
-          <Avatar size="$4.5" br="$3">
-            <Avatar.Image testID="avatar" src={profile.avatar_url} />
-            <Avatar.Fallback>
-              <Avatar size="$4.5" br="$3">
-                <Avatar.Image
-                  src={`https://ui-avatars.com/api.jpg?name=${profile.tag_name}&size=256`}
-                />
-                <Avatar.Fallback>
-                  <Paragraph>??</Paragraph>
-                </Avatar.Fallback>
-              </Avatar>
-            </Avatar.Fallback>
-          </Avatar>
-          <YStack gap="$1">
-            <HighlightMatchingText
-              text={(() => {
-                switch (keyField) {
-                  case 'phone_matches':
-                    return profile.phone
-                  case 'tag_matches':
-                    return profile.tag_name
-                  case 'send_id_matches':
-                    return `#${profile.send_id}`
-                  default:
-                    return ''
-                }
-              })()}
-              highlight={query}
-            />
-            <Text
-              fontSize="$4"
-              ff={'$mono'}
-              $theme-light={{ color: '$darkGrayTextField' }}
-              $gtSm={{ fontSize: '$2' }}
-            >
-              {profile.tag_name ? `/${profile.tag_name}` : `#${profile.send_id}`}
-            </Text>
-          </YStack>
+        <XStack ai={'center'} jc={'space-between'}>
+          <XStack testID={`tag-search-${profile.send_id}`} ai="center" gap="$4">
+            <Avatar size="$4.5" br="$3">
+              <Avatar.Image testID="avatar" src={profile.avatar_url} />
+              <Avatar.Fallback>
+                <Avatar size="$4.5" br="$3">
+                  <Avatar.Image
+                    src={`https://ui-avatars.com/api.jpg?name=${profile.tag_name}&size=256`}
+                  />
+                  <Avatar.Fallback>
+                    <Paragraph>??</Paragraph>
+                  </Avatar.Fallback>
+                </Avatar>
+              </Avatar.Fallback>
+            </Avatar>
+            <YStack gap="$1">
+              <HighlightMatchingText
+                text={(() => {
+                  switch (keyField) {
+                    case 'phone_matches':
+                      return profile.phone
+                    case 'tag_matches':
+                      return profile.tag_name
+                    case 'send_id_matches':
+                      return `#${profile.send_id}`
+                    default:
+                      return ''
+                  }
+                })()}
+                highlight={query}
+              />
+              <Text
+                fontSize="$3"
+                $theme-light={{ color: '$darkGrayTextField' }}
+                textDecorationLine={'underline'}
+              >
+                {profile.tag_name ? `/${profile.tag_name}` : `#${profile.send_id}`}
+              </Text>
+            </YStack>
+          </XStack>
+          <IconArrowRight
+            size={'1.5'}
+            color={'$primary'}
+            $theme-light={{
+              color: '$color12',
+            }}
+          />
         </XStack>
       </Link>
-    </View>
+    </Stack>
   )
 }
 
@@ -431,10 +453,13 @@ type SearchProps = {
   placeholder?: string
 }
 
-function Search({ label, placeholder = 'Sendtag, Phone, Send ID, Address' }: SearchProps) {
+function Search({ label, placeholder = 'Search' }: SearchProps) {
   const { form } = useTagSearch()
   const [queryParams, setRootParams] = useRootScreenParams()
   const { search: query } = queryParams
+
+  const { resolvedTheme } = useThemeSetting()
+  const borderColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$color12'
 
   useEffect(() => {
     const subscription = form.watch(({ query }) => {
@@ -448,6 +473,10 @@ function Search({ label, placeholder = 'Sendtag, Phone, Send ID, Address' }: Sea
     })
     return () => subscription.unsubscribe()
   }, [form, setRootParams, queryParams])
+
+  const handleClearClick = () => {
+    form.setValue('query', '')
+  }
 
   return (
     <>
@@ -477,16 +506,32 @@ function Search({ label, placeholder = 'Sendtag, Phone, Send ID, Address' }: Sea
                 pl: '$8',
                 accessibilityRole: 'search',
                 placeholder,
-                hoverStyle: {
-                  boc: '$color12',
-                },
-                bw: 1,
+                fontWeight: 'normal',
                 br: '$4',
-                boc: '$color3',
+                bw: 0,
                 $gtLg: {
-                  w: 455,
+                  w: 600,
                 },
-                iconBefore: <IconSearch />,
+                hoverStyle: {
+                  bw: 0,
+                },
+                '$theme-dark': {
+                  placeholderTextColor: '$silverChalice',
+                },
+                '$theme-light': {
+                  placeholderTextColor: '$silverChalice',
+                },
+                focusStyle: {
+                  boc: borderColor,
+                  bw: 1,
+                  outlineWidth: 0,
+                },
+                iconBefore: <IconSearch color={'$silverChalice'} />,
+                iconAfter: query && (
+                  <Stack onPress={handleClearClick} cursor={'pointer'}>
+                    <IconX color={'$silverChalice'} size="$1" />
+                  </Stack>
+                ),
               },
             }}
             formProps={{
@@ -495,6 +540,10 @@ function Search({ label, placeholder = 'Sendtag, Phone, Send ID, Address' }: Sea
               als: 'center',
               $gtSm: {
                 maxWidth: '100%',
+              },
+              $gtLg: {
+                w: 600,
+                als: 'flex-start',
               },
             }}
           >
