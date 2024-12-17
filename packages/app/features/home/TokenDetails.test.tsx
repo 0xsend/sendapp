@@ -18,7 +18,7 @@ test('TokenDetails', async () => {
 
   render(
     <TamaguiProvider defaultTheme={'dark'} config={config}>
-      <TokenDetails coin={usdcCoin} />
+      <TokenDetails coin={{ ...usdcCoin, balance: 1n }} />
     </TamaguiProvider>
   )
 

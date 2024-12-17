@@ -6,7 +6,6 @@ import {
   isWeb,
   Paragraph,
   Stack,
-  Theme,
   usePwa,
   XStack,
   type ButtonProps,
@@ -46,6 +45,7 @@ export function SendTopNav() {
                 size={'$1.5'}
                 $theme-dark={{ color: '$primary' }}
                 $theme-light={{ color: '$color12' }}
+                color={'$color12'}
               />
             </ButtonOg.Icon>
           </Button>
@@ -93,9 +93,9 @@ function Button(props: ButtonProps) {
   return (
     <ButtonOg
       bc="transparent"
-      jc="flex-start"
       chromeless
       circular
+      jc={'flex-start'}
       ai={'center'}
       bw={0}
       hoverStyle={{
@@ -107,7 +107,7 @@ function Button(props: ButtonProps) {
       focusStyle={{
         backgroundColor: 'transparent',
       }}
-      theme="green"
+      theme="green_active"
       {...props}
     />
   )

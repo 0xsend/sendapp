@@ -47,20 +47,37 @@ jest.mock('app/utils/useUserReferralsCount', () => ({
   useUserReferralsCount: jest.fn().mockReturnValue({ data: 123 }),
 }))
 
-jest.mock('app/utils/useSendAccountBalances', () => ({
-  useSendAccountBalances: jest.fn().mockReturnValue({
-    balances: {
-      USDC: 250000n,
-      SEND: 250000n,
+jest.mock('app/provider/coins', () => ({
+  useCoins: jest.fn().mockReturnValue({
+    coins: [
+      {
+        label: 'USDC',
+        token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+        balance: 250000n,
+      },
+      {
+        label: 'SEND',
+        token: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
+        balance: 250000n,
+      },
+    ],
+    totalBalance: 5000000n,
+    isLoadingBalance: false,
+  }),
+  useCoin: jest.fn().mockReturnValue({
+    coin: {
+      label: 'USDC',
+      token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+      balance: 250000n,
     },
-    totalBalance: () => 5000000n,
+    isLoading: false,
   }),
 }))
+
 jest.mock('@tamagui/tooltip', () => ({
   ...jest.requireActual('@tamagui/tooltip'),
   TooltipGroup: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }))
-
 jest.mock('solito', () => ({
   createParam: jest
     .fn()
@@ -117,6 +134,17 @@ jest.mock('app/utils/send-accounts', () => ({
 jest.mock('app/utils/useIsSendingUnlocked', () => ({
   useIsSendingUnlocked: jest.fn().mockReturnValue({
     isSendingUnlocked: true,
+    isLoading: false,
+  }),
+}))
+
+jest.mock('app/utils/useCoinFromTokenParam', () => ({
+  useCoinFromTokenParam: jest.fn().mockReturnValue({
+    coin: {
+      label: 'USDC',
+      token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+      balance: 250000n,
+    },
     isLoading: false,
   }),
 }))

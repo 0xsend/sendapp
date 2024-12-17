@@ -80,10 +80,6 @@ export const partnerCoinsDict = partnerCoins.reduce((acc, coin) => {
 
 export type partnerCoinsDict = typeof partnerCoinsDict
 
-export type CoinWithBalance = coin & {
-  balance: bigint | undefined
-}
-
 /**
  * All coins (tokens) array that are supported by Send App.
  */
@@ -101,3 +97,7 @@ export const allCoinsDict = allCoins.reduce((acc, coin) => {
 }, {} as AllCoinsDict)
 
 export type allCoinsDict = typeof allCoinsDict
+
+export type CoinWithBalance = allCoins[number] & {
+  balance: bigint | undefined
+}

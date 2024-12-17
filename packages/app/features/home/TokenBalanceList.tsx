@@ -1,6 +1,5 @@
-import { Link, Paragraph, Theme, XStack, type LinkProps } from '@my/ui'
+import { Link, Paragraph, XStack, type LinkProps } from '@my/ui'
 
-import { IconArrowRight } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import type { CoinWithBalance } from 'app/data/coins'
 
@@ -41,7 +40,7 @@ const TokenBalanceItem = ({
   return (
     <Link display="flex" {...props}>
       <XStack gap={'$2'} $gtLg={{ gap: '$3.5' }} ai={'center'}>
-        <IconCoin coin={coin} />
+        <IconCoin symbol={coin.symbol} />
         <Paragraph
           fontSize={'$5'}
           fontWeight={'500'}
@@ -61,14 +60,8 @@ const TokenBalanceItem = ({
 const TokenBalance = ({ coin: { decimals, balance } }: { coin: CoinWithBalance }) => {
   if (!balance) return <></>
   return (
-    <Theme name="green">
-      <Paragraph fontSize={'$9'} fontWeight={'600'}>
-        {formatAmount((Number(balance) / 10 ** decimals).toString(), 10, 5)}
-      </Paragraph>
-
-      <XStack $lg={{ display: 'none' }} theme="green">
-        <IconArrowRight col={'$background'} />
-      </XStack>
-    </Theme>
+    <Paragraph fontSize={'$9'} fontWeight={'600'} col="$color12">
+      {formatAmount((Number(balance) / 10 ** decimals).toString(), 10, 5)}
+    </Paragraph>
   )
 }
