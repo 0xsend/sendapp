@@ -96,9 +96,9 @@ function HomeBody(props: XStackProps) {
           <TokenBalanceCard />
         )}
         <YStack w={'100%'} ai={'center'}>
-          <YStack width="100%">
+          <Card bc={'$color1'} width="100%" p="$4">
             <TokenBalanceList />
-          </YStack>
+          </Card>
         </YStack>
         {isSendingUnlocked && (
           <XStack $lg={{ display: 'none' }} pt={'$4'} jc={'center'} gap={'$4'} w="100%">
