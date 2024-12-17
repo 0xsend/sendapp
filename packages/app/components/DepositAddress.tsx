@@ -4,7 +4,6 @@ import {
   Dialog,
   Paragraph,
   Sheet,
-  Theme,
   useToastController,
   XStack,
   YStack,
