@@ -1,5 +1,5 @@
 import { Button, Paragraph, Spinner, Stack, SubmitButton, XStack, YStack } from '@my/ui'
-import { allCoinsDict, type CoinWithBalance } from 'app/data/coins'
+import { type allCoins, allCoinsDict } from 'app/data/coins'
 import { useSendScreenParams } from 'app/routers/params'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import formatAmount from 'app/utils/formatAmount'
@@ -26,12 +26,14 @@ export function SendAmountForm() {
   const router = useRouter()
   const [sendParams, setSendParams] = useSendScreenParams()
   const selectedToken = useCoinFromSendTokenParam()
-  const { balance, token, decimals } = selectedToken
+  const {
+    coin: { balance, token, decimals },
+  } = selectedToken
   const { isLoading: isLoadingCoins } = useCoins()
 
   useEffect(() => {
     const subscription = form.watch(({ amount, token: _token }) => {
-      const token = _token as CoinWithBalance['token']
+      const token = _token as allCoins[number]['token']
       // use allCoinsDict because form updates before query params. This feels hacky
       const sanitizedAmount = sanitizeAmount(amount, allCoinsDict[token].decimals)
       setSendParams(
@@ -142,9 +144,10 @@ export function SendAmountForm() {
         }}
         formProps={{
           testID: 'SendForm',
-          $gtSm: { maxWidth: '100%' },
-          jc: 'flex-start',
+          $gtSm: { maxWidth: '100%', alignSelf: 'flex-start', justifyContent: 'flex-start' },
+          justifyContent: 'flex-start',
           f: 1,
+          alignSelf: 'flex-start',
           height: '100%',
         }}
         defaultValues={{

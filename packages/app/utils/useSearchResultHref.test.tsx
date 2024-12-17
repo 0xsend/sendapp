@@ -12,7 +12,7 @@ const sendParams: SendScreenParams = {
   idType: 'tag',
   recipient: 'alice',
   amount: '0.01',
-  sendToken: '0x123',
+  sendToken: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
 }
 
 jest.mock('app/routers/params', () => ({
@@ -58,13 +58,17 @@ describe('useSearchResultHref', () => {
     // @ts-expect-error mock
     usePathname.mockReturnValue('/send')
     const href = useSearchResultHref(item)
-    expect(href).toBe('/send?idType=tag&recipient=alice&amount=0.01&sendToken=0x123')
+    expect(href).toBe(
+      '/send?idType=tag&recipient=alice&amount=0.01&sendToken=0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A'
+    )
   })
   it('should return the correct href for send screen when user does not have sendtag', () => {
     // @ts-expect-error mock
     usePathname.mockReturnValue('/send')
     const href = useSearchResultHref({ ...item, tag_name: '' })
-    expect(href).toBe('/send?idType=sendid&recipient=12530&amount=0.01&sendToken=0x123')
+    expect(href).toBe(
+      '/send?idType=sendid&recipient=12530&amount=0.01&sendToken=0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A'
+    )
   })
   it('throws an error for unhandled paths', () => {
     // @ts-expect-error mock

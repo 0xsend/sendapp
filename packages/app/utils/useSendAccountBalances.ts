@@ -85,7 +85,7 @@ export const useSendAccountBalances = () => {
     return allCoins.reduce((total, coin) => {
       const balance = coin.token === 'eth' ? ethBalanceOnBase?.value : balances[coin.token]
       const price = tokenPrices[coin.coingeckoTokenId].usd
-      return total + (convertBalanceToFiat(coin.token, balance ?? 0n, price) ?? 0)
+      return total + (convertBalanceToFiat({ ...coin, balance: balance ?? 0n }, price) ?? 0)
     }, 0)
   }, [tokenPrices, balances, ethBalanceOnBase?.value])
 
