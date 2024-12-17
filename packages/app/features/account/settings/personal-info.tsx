@@ -18,7 +18,7 @@ import { AuthUserSchema, useAuthUserMutation } from 'app/utils/useAuthUserMutati
 import { useEffect, useState } from 'react'
 import { useProfileMutation } from 'app/utils/useUserPersonalDataMutation'
 import { useQuery } from '@tanstack/react-query'
-import { adjustUTCDateForTimezone, formatDateToLongFormWithoutYear } from 'app/utils/dateHelper'
+import { adjustUTCDateForTimezone } from 'app/utils/dateHelper'
 
 enum FormState {
   PersonalInfoForm = 'PersonalInfoForm',
@@ -139,7 +139,8 @@ export const PersonalInfoScreen = () => {
             color: '$color10',
           },
           bc: '$color0',
-          customDateFormatter: formatDateToLongFormWithoutYear,
+          customDateFormatter: (date?: Date) =>
+            date?.toLocaleString(undefined, { day: 'numeric', month: 'long' }) || '',
           disabled: Boolean(profile?.birthday),
         },
       }}
