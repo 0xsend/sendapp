@@ -18,6 +18,7 @@ import { AuthUserSchema, useAuthUserMutation } from 'app/utils/useAuthUserMutati
 import { useEffect, useState } from 'react'
 import { useProfileMutation } from 'app/utils/useUserPersonalDataMutation'
 import { useQuery } from '@tanstack/react-query'
+import { adjustUTCDateForTimezone } from 'app/utils/dateHelper'
 
 enum FormState {
   PersonalInfoForm = 'PersonalInfoForm',
@@ -84,8 +85,16 @@ export const PersonalInfoScreen = () => {
   }
 
   useEffect(() => {
-    form.reset({ phone: user?.phone ?? '', xUsername: profile?.x_username ?? '' })
-  }, [profile?.x_username, user?.phone, form.reset])
+    const birthday = profile?.birthday
+      ? adjustUTCDateForTimezone(new Date(profile.birthday))
+      : undefined
+
+    form.reset({
+      phone: user?.phone ?? '',
+      xUsername: profile?.x_username ?? '',
+      birthday,
+    })
+  }, [profile?.x_username, user?.phone, form.reset, profile?.birthday])
 
   const verificationCode = (
     <VerifyCode
@@ -123,6 +132,16 @@ export const PersonalInfoScreen = () => {
               @
             </Text>
           ),
+        },
+        birthday: {
+          'aria-label': 'birthday',
+          labelProps: {
+            color: '$color10',
+          },
+          bc: '$color0',
+          customDateFormatter: (date?: Date) =>
+            date?.toLocaleString(undefined, { day: 'numeric', month: 'long' }) || '',
+          disabled: Boolean(profile?.birthday),
         },
       }}
       renderAfter={({ submit }) => (

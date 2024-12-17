@@ -35,8 +35,11 @@ export const MonthSelector = ({ onChange }: { onChange?: () => void }) => {
               onClick: onChange,
             })
           )}
+          hoverStyle={{
+            backgroundColor: month.active ? '$olive' : '$color2',
+          }}
         >
-          <Button.Text color={month.active ? '$black' : '$white'}>{month.month}</Button.Text>
+          <Button.Text color={month.active ? '$black' : '$color12'}>{month.month}</Button.Text>
         </Button>
       ))}
     </View>

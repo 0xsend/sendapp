@@ -3712,6 +3712,20 @@
           "maxLength": null
         },
         {
+          "id": "public.profiles.birthday",
+          "name": "birthday",
+          "columnName": "birthday",
+          "type": "date",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
           "name": "users",
           "type": "users",
           "isRequired": true,

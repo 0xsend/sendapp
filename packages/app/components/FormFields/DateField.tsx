@@ -18,7 +18,6 @@ import {
   useThemeName,
 } from '@my/ui'
 import { AlertTriangle } from '@tamagui/lucide-icons'
-import { formatDateToLongForm } from 'app/utils/dateHelper'
 
 export const DateField = (
   props: InputProps & {
@@ -46,7 +45,7 @@ export const DateField = (
       return ''
     }
 
-    return formatDateToLongForm(field.value)
+    return field.value.toLocaleString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })
   }, [props.customDateFormatter, field.value])
 
   return (

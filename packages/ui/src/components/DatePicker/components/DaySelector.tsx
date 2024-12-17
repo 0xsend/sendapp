@@ -52,10 +52,13 @@ export const DaySelector = () => {
                   backgroundColor={day.selected ? '$primary' : 'transparent'}
                   themeInverse={day.selected}
                   disabled={!day.inCurrentMonth}
+                  hoverStyle={{
+                    backgroundColor: day.selected ? '$olive' : '$color2',
+                  }}
                 >
                   <Button.Text
                     color={
-                      day.selected ? '$black' : day.inCurrentMonth ? '$white' : '$silverChalice'
+                      day.selected ? '$black' : day.inCurrentMonth ? '$color12' : '$silverChalice'
                     }
                     fontWeight={day.inCurrentMonth ? '500' : '400'}
                   >
