@@ -528,9 +528,13 @@ function Search({ label, placeholder = 'Search' }: SearchProps) {
                 },
                 iconBefore: <IconSearch color={'$silverChalice'} />,
                 iconAfter: query && (
-                  <Stack onPress={handleClearClick} cursor={'pointer'}>
-                    <IconX color={'$silverChalice'} size="$1" />
-                  </Stack>
+                  <Button
+                    chromeless
+                    unstyled
+                    cursor={'pointer'}
+                    icon={<IconX color={'$silverChalice'} size="$1" />}
+                    onPress={handleClearClick}
+                  />
                 ),
               },
             }}
