@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { decimalStrToBigInt } from '../bigint'
 import { byteaToHexEthAddress } from '../bytea'
 import { BaseEventSchema } from './BaseEventSchema'
-import { CoinSchema, coins } from 'app/data/coins'
+import { CoinSchema, allCoins } from 'app/data/coins'
 import { isAddressEqual } from 'viem'
 import { Events } from './events'
 import { OnchainEventDataSchema } from './OnchainDataSchema'
@@ -29,7 +29,7 @@ export const TransferDataSchema = OnchainEventDataSchema.extend({
   })
   .transform((t) => ({
     ...t,
-    coin: coins.find((c) => c.token !== 'eth' && isAddressEqual(c.token, t.log_addr)),
+    coin: allCoins.find((c) => c.token !== 'eth' && isAddressEqual(c.token, t.log_addr)),
   }))
 
 export const SendAccountTransfersEventSchema = BaseEventSchema.extend({

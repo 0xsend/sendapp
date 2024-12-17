@@ -58,7 +58,7 @@ const TokenBalanceItem = ({
 }
 
 const TokenBalance = ({ coin: { decimals, balance } }: { coin: CoinWithBalance }) => {
-  if (!balance) return <></>
+  if (balance === undefined) return <></>
   return (
     <Paragraph fontSize={'$9'} fontWeight={'600'} col="$color12">
       {formatAmount((Number(balance) / 10 ** decimals).toString(), 10, 5)}
