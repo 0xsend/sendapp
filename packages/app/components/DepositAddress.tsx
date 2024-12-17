@@ -49,7 +49,7 @@ function CopyAddressDialog({ isOpen, onClose, onConfirm }) {
             </Paragraph>
 
             <Paragraph>
-              2. I have double checked that the tokens are USDC, SEND, or ETH on Base Network.
+              2. I have double checked that the tokens USDC, SEND, ETH, or SPX are on Base Network.
             </Paragraph>
 
             <Paragraph>
