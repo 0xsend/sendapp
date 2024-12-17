@@ -2,13 +2,19 @@ import { createContext, useContext, useMemo } from 'react'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import type { allCoins, CoinWithBalance } from 'app/data/coins'
 import { coins as coinsOg, partnerCoins } from 'app/data/coins'
-import { isAddress } from 'viem'
+import { isAddress, type zeroAddress } from 'viem'
+import type { TokenPricesSchema } from 'app/utils/useTokenPrices'
+import type { UseQueryResult } from '@tanstack/react-query'
+import type { z } from 'zod'
+import type { UseBalanceReturnType, UseReadContractsReturnType } from 'wagmi'
 
 type CoinsContextType = {
   coins: CoinWithBalance[]
   isLoading: boolean
-  totalBalance: number | undefined
-  isLoadingTotalBalance: boolean
+  totalPrice: number | undefined
+  ethQuery: UseBalanceReturnType
+  tokensQuery: UseReadContractsReturnType
+  pricesQuery: UseQueryResult<z.infer<typeof TokenPricesSchema>, Error>
 }
 
 const CoinsContext = createContext<CoinsContextType | undefined>(undefined)
@@ -55,11 +61,13 @@ export const useCoins = () => {
 export const useCoin = (
   addressOrSymbol: allCoins[number]['symbol'] | allCoins[number]['token'] | undefined
 ) => {
-  const { coins, isLoading } = useCoins()
-  if (!addressOrSymbol) return { coin: undefined, isLoading }
+  const meta = useCoins()
+  const { coins, ...rest } = meta
+  if (!addressOrSymbol) return { coin: undefined, ...rest }
   const coin =
     isAddress(addressOrSymbol) || addressOrSymbol === 'eth'
       ? coins.find((coin) => coin.token === addressOrSymbol)
       : coins.find((coin) => coin.symbol === addressOrSymbol)
-  return { coin, isLoading }
+  if (!coin) throw new Error(`Coin not found for ${addressOrSymbol}`)
+  return { coin, ...rest }
 }

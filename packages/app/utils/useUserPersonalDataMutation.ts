@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useToastController } from '@my/ui'
 import type { z } from 'zod'
 import type { AuthUserSchema } from 'app/utils/useAuthUserMutation'
+import { adjustDatePickerDateToTimezone } from 'app/utils/dateHelper'
 
 export const useProfileMutation = () => {
   const supabase = useSupabase()
@@ -18,10 +19,13 @@ export const useProfileMutation = () => {
       }
 
       const xUsernameToUpdate = data.xUsername || null
+      const birthdayToUpdate = data.birthday
+        ? adjustDatePickerDateToTimezone(data.birthday).toISOString()
+        : null
 
       const { error: profileUpdateError } = await supabase
         .from('profiles')
-        .update({ x_username: xUsernameToUpdate })
+        .update({ x_username: xUsernameToUpdate, birthday: birthdayToUpdate })
         .eq('id', user?.id)
 
       if (profileUpdateError) {

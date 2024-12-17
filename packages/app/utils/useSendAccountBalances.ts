@@ -1,4 +1,4 @@
-import { baseMainnet, erc20Abi } from '@my/wagmi'
+import { baseMainnet, erc20Abi, multicall3Address } from '@my/wagmi'
 import { useBalance, useReadContracts } from 'wagmi'
 import { useSendAccount } from './send-accounts'
 import { useTokenPrices } from './useTokenPrices'
@@ -20,7 +20,7 @@ type BalanceOfResult =
   | undefined
 
 export const useSendAccountBalances = () => {
-  const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
+  const pricesQuery = useTokenPrices()
   const { data: sendAccount } = useSendAccount()
 
   const tokenContracts = useMemo(
@@ -37,9 +37,10 @@ export const useSendAccountBalances = () => {
     [sendAccount?.address]
   )
 
-  const { data: tokenBalances, isLoading: isLoadingTokenBalances } = useReadContracts({
+  const tokensQuery = useReadContracts({
     query: { enabled: !!sendAccount },
     contracts: tokenContracts,
+    multicallAddress: multicall3Address[baseMainnet.id],
   })
 
   const unpackResult = (result: BalanceOfResult): bigint | undefined => {
@@ -49,13 +50,13 @@ export const useSendAccountBalances = () => {
     return undefined
   }
 
-  const { data: ethBalanceOnBase, isLoading: isLoadingEthBalanceOnBase } = useBalance({
+  const ethQuery = useBalance({
     address: sendAccount?.address,
     query: { enabled: !!sendAccount },
     chainId: baseMainnet.id,
   })
 
-  const isLoading = isLoadingTokenBalances || isLoadingEthBalanceOnBase
+  const isLoading = tokensQuery.isLoading || ethQuery.isLoading
 
   const balances = useMemo(() => {
     if (isLoading) return undefined
@@ -63,7 +64,7 @@ export const useSendAccountBalances = () => {
     return allCoins.reduce(
       (acc, coin) => {
         if (coin.token === 'eth') {
-          acc[coin.symbol] = ethBalanceOnBase?.value
+          acc[coin.symbol] = ethQuery.data?.value
           return acc
         }
         const idx = tokenContracts.findIndex((c) => c.address === coin.token)
@@ -71,23 +72,25 @@ export const useSendAccountBalances = () => {
           console.error('No token contract found for coin', coin)
           return acc
         }
-        const tokenBal = tokenBalances?.[idx]
+        const tokenBal = tokensQuery.data?.[idx]
         acc[coin.token] = unpackResult(tokenBal)
         return acc
       },
       {} as Record<string, bigint | undefined>
     )
-  }, [isLoading, ethBalanceOnBase?.value, tokenBalances, tokenContracts, unpackResult])
+  }, [isLoading, ethQuery, tokensQuery, tokenContracts, unpackResult])
 
-  const totalBalance = useMemo(() => {
+  const totalPrice = useMemo(() => {
+    const { data: tokenPrices } = pricesQuery
+    const { data: ethBalance } = ethQuery
     if (!tokenPrices || !balances) return undefined
 
     return allCoins.reduce((total, coin) => {
-      const balance = coin.token === 'eth' ? ethBalanceOnBase?.value : balances[coin.token]
+      const balance = coin.token === 'eth' ? ethBalance?.value : balances[coin.token]
       const price = tokenPrices[coin.coingeckoTokenId].usd
       return total + (convertBalanceToFiat({ ...coin, balance: balance ?? 0n }, price) ?? 0)
     }, 0)
-  }, [tokenPrices, balances, ethBalanceOnBase?.value])
+  }, [pricesQuery, balances, ethQuery])
 
-  return { balances, totalBalance, isLoading, isLoadingTotalBalance: isLoadingTokenPrices }
+  return { balances, isLoading, totalPrice, ethQuery, tokensQuery, pricesQuery }
 }

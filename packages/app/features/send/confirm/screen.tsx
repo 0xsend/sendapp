@@ -77,7 +77,7 @@ export function SendConfirm() {
 
   const queryClient = useQueryClient()
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
-  const { coin: selectedCoin } = useCoinFromSendTokenParam()
+  const { coin: selectedCoin, tokensQuery, ethQuery } = useCoinFromSendTokenParam()
   const { coin: usdc } = useCoin('USDC')
 
   const { data: profile, isLoading: isProfileLoading } = useProfileLookup(
@@ -178,6 +178,11 @@ export function SendConfirm() {
       })
       assert(receipt.success, 'Failed to send user op')
       setSentTxHash(receipt.receipt.transactionHash)
+      if (selectedCoin?.token === 'eth') {
+        await ethQuery.refetch()
+      } else {
+        await tokensQuery.refetch()
+      }
     } catch (e) {
       console.error(e)
       setError(e)

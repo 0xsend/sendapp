@@ -1,9 +1,8 @@
 import { describe, expect, it } from '@jest/globals'
 import {
+  adjustDatePickerDateToTimezone,
   adjustUTCDateForTimezone,
   CommentsTime,
-  formatDateToLongForm,
-  formatDateToLongFormWithoutYear,
 } from './dateHelper'
 describe('CommentsTime', () => {
   beforeAll(() => {
@@ -55,34 +54,22 @@ describe('adjustUTCDateForTimezone', () => {
   })
 })
 
-describe('formatDateToLongForm', () => {
-  it('should handle single-digit days correctly', () => {
-    const date = new Date('2024-02-05')
-    expect(formatDateToLongForm(date)).toBe('5 February 2024')
+describe('adjustDatePickerDateToTimezone', () => {
+  it('should handle dates already in UTC', () => {
+    const utcDate = new Date('2024-12-13T00:00:00Z')
+    const adjustedDate = adjustDatePickerDateToTimezone(utcDate)
+    expect(adjustedDate.toISOString()).toBe('2024-12-13T00:00:00.000Z')
   })
 
-  it('should handle undefined input', () => {
-    expect(formatDateToLongForm()).toBe('')
+  it('should correctly adjust a date for a positive timezone offset', () => {
+    const localDate = new Date('2024-12-13T00:00:00+05:00')
+    const adjustedDate = adjustDatePickerDateToTimezone(localDate)
+    expect(adjustedDate.toISOString()).toBe('2024-12-12T19:00:00.000Z')
   })
 
-  it('should throw an error for an invalid date', () => {
-    const invalidDate = new Date('invalid-date')
-    expect(() => formatDateToLongForm(invalidDate)).toThrow('Invalid date provided.')
-  })
-})
-
-describe('formatDateToLongFormWithoutYear', () => {
-  it('should handle single-digit days correctly', () => {
-    const date = new Date('2024-02-05')
-    expect(formatDateToLongFormWithoutYear(date)).toBe('5 February')
-  })
-
-  it('should handle undefined input', () => {
-    expect(formatDateToLongFormWithoutYear()).toBe('')
-  })
-
-  it('should throw an error for an invalid date', () => {
-    const invalidDate = new Date('invalid-date')
-    expect(() => formatDateToLongFormWithoutYear(invalidDate)).toThrow('Invalid date provided.')
+  it('should correctly adjust a date for a negative timezone offset', () => {
+    const localDate = new Date('2024-12-13T00:00:00-05:00')
+    const adjustedDate = adjustDatePickerDateToTimezone(localDate)
+    expect(adjustedDate.toISOString()).toBe('2024-12-13T05:00:00.000Z')
   })
 })

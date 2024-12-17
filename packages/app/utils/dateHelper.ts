@@ -53,33 +53,9 @@ export const adjustUTCDateForTimezone = (date: Date, offset?: number) => {
   return adjustedDate
 }
 
-export const formatDateToLongForm = (date?: Date): string => {
-  if (!date) {
-    return ''
-  }
-
-  if (Number.isNaN(date.getTime())) {
-    throw new Error('Invalid date provided.')
-  }
-
-  const day = date.getDate()
-  const month = date.toLocaleString('en-US', { month: 'long' })
-  const year = date.getFullYear()
-
-  return `${day} ${month} ${year}`
-}
-
-export const formatDateToLongFormWithoutYear = (date?: Date): string => {
-  if (!date) {
-    return ''
-  }
-
-  if (Number.isNaN(date.getTime())) {
-    throw new Error('Invalid date provided.')
-  }
-
-  const day = date.getDate()
-  const month = date.toLocaleString('en-US', { month: 'long' })
-
-  return `${day} ${month}`
+export const adjustDatePickerDateToTimezone = (date: Date): Date => {
+  const timezoneOffsetMinutes = date.getTimezoneOffset()
+  const timezoneOffsetMillis = timezoneOffsetMinutes * 60 * 1000
+  const adjustedTime = date.getTime() - timezoneOffsetMillis
+  return new Date(adjustedTime)
 }

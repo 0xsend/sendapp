@@ -34,8 +34,11 @@ export const YearSelector = ({ onChange }: { onChange?: () => void }) => {
               onClick: onChange,
             })
           )}
+          hoverStyle={{
+            backgroundColor: year.year === Number(selectedYear) ? '$olive' : '$color2',
+          }}
         >
-          <Button.Text color={year.year === Number(selectedYear) ? '$black' : '$white'}>
+          <Button.Text color={year.year === Number(selectedYear) ? '$black' : '$color12'}>
             {year.year}
           </Button.Text>
         </Button>
