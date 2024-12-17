@@ -43,7 +43,7 @@ export const useSendAccountBalances = () => {
   })
 
   const unpackResult = (result: BalanceOfResult): bigint | undefined => {
-    if (result && result.status === 'success' && BigInt(result.result) > 0n) {
+    if (result && result.status === 'success') {
       return BigInt(result.result)
     }
     return undefined
