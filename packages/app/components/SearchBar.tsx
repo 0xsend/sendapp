@@ -519,20 +519,32 @@ function Search({ label, placeholder = 'Search' }: SearchProps) {
                   placeholderTextColor: '$silverChalice',
                 },
                 '$theme-light': {
-                  placeholderTextColor: '$silverChalice',
+                  placeholderTextColor: '$darkGrayTextField',
                 },
                 focusStyle: {
                   boc: borderColor,
                   bw: 1,
                   outlineWidth: 0,
                 },
-                iconBefore: <IconSearch color={'$silverChalice'} />,
+                fontSize: 17,
+                iconBefore: (
+                  <IconSearch
+                    color={'$silverChalice'}
+                    $theme-light={{ color: '$darkGrayTextField' }}
+                  />
+                ),
                 iconAfter: query && (
                   <Button
                     chromeless
                     unstyled
                     cursor={'pointer'}
-                    icon={<IconX color={'$silverChalice'} size="$1" />}
+                    icon={
+                      <IconX
+                        color={'$silverChalice'}
+                        $theme-light={{ color: '$darkGrayTextField' }}
+                        size="$1"
+                      />
+                    }
                     onPress={handleClearClick}
                   />
                 ),

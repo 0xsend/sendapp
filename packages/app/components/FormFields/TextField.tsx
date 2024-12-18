@@ -117,7 +117,6 @@ export const TextField = (
                   borderWidth={0}
                   borderRadius={'$4'}
                   fontSize={'$5'}
-                  fontStyle={field.value ? 'normal' : 'italic'}
                   fontWeight={field.value ? 'bold' : 'normal'}
                   $theme-dark={{
                     ...(process.env.NODE_ENV !== 'test' ? { placeholderTextColor: '$white' } : {}),
