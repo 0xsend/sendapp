@@ -34,7 +34,7 @@ test('redirect on sign-in', async ({ page, pg }) => {
     const signInButton = page.getByRole('button', { name: 'SIGN-IN' })
     await expect(signInButton).toBeVisible()
     await signInButton.click()
-    const sendSearchInput = page.getByPlaceholder('Sendtag, Phone, Send ID, Address')
+    const sendSearchInput = page.getByPlaceholder('Search')
     await expect(sendSearchInput).toBeVisible()
   } finally {
     await pg.query('DELETE FROM auth.users WHERE phone = $1', [phone]).catch((e) => {
