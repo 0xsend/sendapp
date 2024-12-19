@@ -44,7 +44,10 @@ const SEARCH_RESULTS_KEYS: SearchResultsKeysType[] = [
   'send_id_matches',
 ] as const
 const formatResultsKey = (str: string): string => {
-  return str.replace(/_matches/g, '').replace(/_/g, ' ')
+  return str
+    .replace(/_matches/g, '')
+    .replace(/_/g, ' ')
+    .replace(/ id/g, ' ID')
 }
 
 function SearchResults() {
@@ -205,6 +208,7 @@ function SearchFilterButton({
       onPress={onPress}
       borderBottomColor={'$primary'}
       borderBottomWidth={active ? 1 : 0}
+      $theme-light={{ borderBottomColor: '$color12' }}
     >
       <ButtonText
         color={active ? '$color12' : '$silverChalice'}
