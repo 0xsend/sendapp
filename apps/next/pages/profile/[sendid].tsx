@@ -69,7 +69,7 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
 
 Page.getLayout = (children) => (
   <MobileButtonRowLayout.Profile>
-    <HomeLayout TopNav={<TopNav header="Profile" backFunction="router" />}>{children}</HomeLayout>
+    <HomeLayout TopNav={<TopNav header="History" backFunction="router" />}>{children}</HomeLayout>
   </MobileButtonRowLayout.Profile>
 )
 
