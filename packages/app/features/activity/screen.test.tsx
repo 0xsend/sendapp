@@ -94,7 +94,7 @@ describe('ActivityScreen', () => {
         <ActivityScreen />
       </TamaguiProvider>
     )
-    const searchInput = screen.getByPlaceholderText('Sendtag, Phone, Send ID, Address')
+    const searchInput = screen.getByPlaceholderText('Search')
     fireEvent.changeText(searchInput, 'test')
     await act(async () => {
       jest.advanceTimersByTime(2000)

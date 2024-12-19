@@ -556,7 +556,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                   align="xMidYMid"
                   bbHeight={24}
                   bbWidth={24}
-                  color="#FFFFFF"
+                  color="#B2B2B2"
                   focusable={false}
                   height={24}
                   meetOrSlice={0}
@@ -569,7 +569,9 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                         "backgroundColor": "transparent",
                         "borderWidth": 0,
                       },
-                      {},
+                      {
+                        "color": "#B2B2B2",
+                      },
                       {
                         "flex": 0,
                         "height": 24,
@@ -577,9 +579,9 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                       },
                     ]
                   }
-                  tintColor="#FFFFFF"
-                  vbHeight={24}
-                  vbWidth={24}
+                  tintColor="#B2B2B2"
+                  vbHeight={1024}
+                  vbWidth={1024}
                   width={24}
                 >
                   <RNSVGGroup
@@ -597,7 +599,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                     strokeWidth="2"
                   >
                     <RNSVGPath
-                      d="M18.6293 17.6274L21.4008 20.3975C21.5301 20.5313 21.6016 20.7106 21.6 20.8966C21.5984 21.0827 21.5238 21.2606 21.3922 21.3922C21.2606 21.5238 21.0827 21.5984 20.8966 21.6C20.7106 21.6016 20.5313 21.5301 20.3975 21.4008L17.626 18.6293C15.8148 20.181 13.473 20.9709 11.092 20.8333C8.71103 20.6957 6.47587 19.6412 4.85559 17.8911C3.2353 16.141 2.35583 13.8314 2.40173 11.4468C2.44764 9.06229 3.41533 6.78821 5.10177 5.10177C6.78821 3.41533 9.06229 2.44764 11.4468 2.40173C13.8314 2.35583 16.141 3.2353 17.8911 4.85559C19.6412 6.47587 20.6957 8.71103 20.8333 11.092C20.9709 13.473 20.181 15.8148 18.6293 17.626V17.6274ZM11.6245 19.4297C13.6945 19.4297 15.6798 18.6073 17.1436 17.1436C18.6073 15.6798 19.4297 13.6945 19.4297 11.6245C19.4297 9.5544 18.6073 7.56912 17.1436 6.10536C15.6798 4.6416 13.6945 3.81927 11.6245 3.81927C9.5544 3.81927 7.56912 4.6416 6.10536 6.10536C4.6416 7.56912 3.81927 9.5544 3.81927 11.6245C3.81927 13.6945 4.6416 15.6798 6.10536 17.1436C7.56912 18.6073 9.5544 19.4297 11.6245 19.4297Z"
+                      d="M909.6 854.5L649.9 594.8C690.2 542.7 712 479 712 412c0-80.2-31.3-155.4-87.9-212.1-56.6-56.7-132-87.9-212.1-87.9s-155.5 31.3-212.1 87.9C143.2 256.5 112 331.8 112 412c0 80.1 31.3 155.5 87.9 212.1C256.5 680.8 331.8 712 412 712c67 0 130.6-21.8 182.7-62l259.7 259.6a8.2 8.2 0 0011.6 0l43.6-43.5a8.2 8.2 0 000-11.6zM570.4 570.4C528 612.7 471.8 636 412 636s-116-23.3-158.4-65.6C211.3 528 188 471.8 188 412s23.3-116.1 65.6-158.4C296 211.3 352.2 188 412 188s116.1 23.2 158.4 65.6S636 352.2 636 412s-23.3 116.1-65.6 158.4z"
                       fill={
                         {
                           "type": 2,
@@ -736,36 +738,63 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                 }
                 focusVisibleStyle={{}}
                 focusable={true}
-                iconBefore={<Memo(wrapped) />}
+                iconAfter={
+                  <Themed(Anonymous)
+                    chromeless={true}
+                    cursor="pointer"
+                    icon={
+                      <Memo(wrapped)
+                        $theme-light={
+                          {
+                            "color": "$darkGrayTextField",
+                          }
+                        }
+                        color="$silverChalice"
+                        size="$1"
+                      />
+                    }
+                    onPress={[Function]}
+                    unstyled={true}
+                  />
+                }
+                iconBefore={
+                  <Memo(wrapped)
+                    $theme-light={
+                      {
+                        "color": "$darkGrayTextField",
+                      }
+                    }
+                    color="$silverChalice"
+                  />
+                }
                 id=":r0:"
                 name="query"
                 onBlur={[Function]}
                 onChangeText={[Function]}
                 onFocus={[Function]}
-                placeholder="Sendtag, Phone, Send ID, Address"
-                placeholderTextColor="#081619"
+                placeholder="Search"
+                placeholderTextColor="#B2B2B2"
                 readOnly={false}
                 style={
                   {
                     "backgroundColor": "#111f22",
-                    "borderBottomColor": "#343434",
+                    "borderBottomColor": "#111f22",
                     "borderBottomLeftRadius": 9,
                     "borderBottomRightRadius": 9,
-                    "borderBottomWidth": 1,
-                    "borderLeftColor": "#343434",
-                    "borderLeftWidth": 1,
-                    "borderRightColor": "#343434",
-                    "borderRightWidth": 1,
+                    "borderBottomWidth": 0,
+                    "borderLeftColor": "#111f22",
+                    "borderLeftWidth": 0,
+                    "borderRightColor": "#111f22",
+                    "borderRightWidth": 0,
                     "borderStyle": "solid",
-                    "borderTopColor": "#343434",
+                    "borderTopColor": "#111f22",
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
-                    "borderTopWidth": 1,
+                    "borderTopWidth": 0,
                     "color": "#FFFFFF",
                     "fontFamily": "System",
-                    "fontSize": 19.2,
-                    "fontStyle": "normal",
-                    "fontWeight": "bold",
+                    "fontSize": 17,
+                    "fontWeight": "normal",
                     "height": 44,
                     "minWidth": 0,
                     "paddingLeft": 46,
@@ -775,6 +804,113 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                 }
                 value="test"
               />
+              <View
+                style={
+                  {
+                    "paddingBottom": 13,
+                    "paddingLeft": 13,
+                    "paddingRight": 13,
+                    "paddingTop": 13,
+                    "position": "absolute",
+                    "right": 2,
+                    "top": "50%",
+                    "transform": "translateY(-50%)",
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <View
+                  cancelable={true}
+                  disabled={false}
+                  focusable={[Function]}
+                  minPressDuration={0}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onPress={[Function]}
+                  onPressIn={[Function]}
+                  onPressOut={[Function]}
+                  role="button"
+                  style={
+                    {
+                      "backgroundColor": "transparent",
+                      "borderBottomColor": "transparent",
+                      "borderLeftColor": "transparent",
+                      "borderRightColor": "transparent",
+                      "borderTopColor": "transparent",
+                      "flexDirection": "column",
+                      "shadowColor": "rgb(0,0,0)",
+                      "shadowOffset": {
+                        "height": 0,
+                        "width": 0,
+                      },
+                      "shadowOpacity": 0,
+                      "shadowRadius": 0,
+                    }
+                  }
+                >
+                  <RNSVGSvgView
+                    align="xMidYMid"
+                    bbHeight={20}
+                    bbWidth={20}
+                    color="#B2B2B2"
+                    focusable={false}
+                    height={20}
+                    meetOrSlice={0}
+                    minX={0}
+                    minY={0}
+                    strokeWidth="2"
+                    style={
+                      [
+                        {
+                          "backgroundColor": "transparent",
+                          "borderWidth": 0,
+                        },
+                        {
+                          "color": "#B2B2B2",
+                        },
+                        {
+                          "flex": 0,
+                          "height": 20,
+                          "width": 20,
+                        },
+                      ]
+                    }
+                    tintColor="#B2B2B2"
+                    vbHeight={32}
+                    vbWidth={32}
+                    width={20}
+                  >
+                    <RNSVGGroup
+                      fill={
+                        {
+                          "payload": 4278190080,
+                          "type": 0,
+                        }
+                      }
+                      propList={
+                        [
+                          "strokeWidth",
+                        ]
+                      }
+                      strokeWidth="2"
+                    >
+                      <RNSVGPath
+                        d="M8.30006 25.1004L6.90005 23.7004L14.6001 16.0004L6.90005 8.30039L8.30006 6.90039L16.0001 14.6004L23.7001 6.90039L25.1001 8.30039L17.4001 16.0004L25.1001 23.7004L23.7001 25.1004L16.0001 17.4004L8.30006 25.1004Z"
+                        fill={
+                          {
+                            "type": 2,
+                          }
+                        }
+                        propList={
+                          [
+                            "fill",
+                          ]
+                        }
+                      />
+                    </RNSVGGroup>
+                  </RNSVGSvgView>
+                </View>
+              </View>
             </View>
           </View>
           <View
@@ -894,7 +1030,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                   align="xMidYMid"
                   bbHeight={24}
                   bbWidth={24}
-                  color="#FFFFFF"
+                  color="#B2B2B2"
                   focusable={false}
                   height={24}
                   meetOrSlice={0}
@@ -907,7 +1043,9 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                         "backgroundColor": "transparent",
                         "borderWidth": 0,
                       },
-                      {},
+                      {
+                        "color": "#B2B2B2",
+                      },
                       {
                         "flex": 0,
                         "height": 24,
@@ -915,9 +1053,9 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                       },
                     ]
                   }
-                  tintColor="#FFFFFF"
-                  vbHeight={24}
-                  vbWidth={24}
+                  tintColor="#B2B2B2"
+                  vbHeight={1024}
+                  vbWidth={1024}
                   width={24}
                 >
                   <RNSVGGroup
@@ -935,7 +1073,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                     strokeWidth="2"
                   >
                     <RNSVGPath
-                      d="M18.6293 17.6274L21.4008 20.3975C21.5301 20.5313 21.6016 20.7106 21.6 20.8966C21.5984 21.0827 21.5238 21.2606 21.3922 21.3922C21.2606 21.5238 21.0827 21.5984 20.8966 21.6C20.7106 21.6016 20.5313 21.5301 20.3975 21.4008L17.626 18.6293C15.8148 20.181 13.473 20.9709 11.092 20.8333C8.71103 20.6957 6.47587 19.6412 4.85559 17.8911C3.2353 16.141 2.35583 13.8314 2.40173 11.4468C2.44764 9.06229 3.41533 6.78821 5.10177 5.10177C6.78821 3.41533 9.06229 2.44764 11.4468 2.40173C13.8314 2.35583 16.141 3.2353 17.8911 4.85559C19.6412 6.47587 20.6957 8.71103 20.8333 11.092C20.9709 13.473 20.181 15.8148 18.6293 17.626V17.6274ZM11.6245 19.4297C13.6945 19.4297 15.6798 18.6073 17.1436 17.1436C18.6073 15.6798 19.4297 13.6945 19.4297 11.6245C19.4297 9.5544 18.6073 7.56912 17.1436 6.10536C15.6798 4.6416 13.6945 3.81927 11.6245 3.81927C9.5544 3.81927 7.56912 4.6416 6.10536 6.10536C4.6416 7.56912 3.81927 9.5544 3.81927 11.6245C3.81927 13.6945 4.6416 15.6798 6.10536 17.1436C7.56912 18.6073 9.5544 19.4297 11.6245 19.4297Z"
+                      d="M909.6 854.5L649.9 594.8C690.2 542.7 712 479 712 412c0-80.2-31.3-155.4-87.9-212.1-56.6-56.7-132-87.9-212.1-87.9s-155.5 31.3-212.1 87.9C143.2 256.5 112 331.8 112 412c0 80.1 31.3 155.5 87.9 212.1C256.5 680.8 331.8 712 412 712c67 0 130.6-21.8 182.7-62l259.7 259.6a8.2 8.2 0 0011.6 0l43.6-43.5a8.2 8.2 0 000-11.6zM570.4 570.4C528 612.7 471.8 636 412 636s-116-23.3-158.4-65.6C211.3 528 188 471.8 188 412s23.3-116.1 65.6-158.4C296 211.3 352.2 188 412 188s116.1 23.2 158.4 65.6S636 352.2 636 412s-23.3 116.1-65.6 158.4z"
                       fill={
                         {
                           "type": 2,
@@ -1079,36 +1217,63 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                 }
                 focusVisibleStyle={{}}
                 focusable={true}
-                iconBefore={<Memo(wrapped) />}
+                iconAfter={
+                  <Themed(Anonymous)
+                    chromeless={true}
+                    cursor="pointer"
+                    icon={
+                      <Memo(wrapped)
+                        $theme-light={
+                          {
+                            "color": "$darkGrayTextField",
+                          }
+                        }
+                        color="$silverChalice"
+                        size="$1"
+                      />
+                    }
+                    onPress={[Function]}
+                    unstyled={true}
+                  />
+                }
+                iconBefore={
+                  <Memo(wrapped)
+                    $theme-light={
+                      {
+                        "color": "$darkGrayTextField",
+                      }
+                    }
+                    color="$silverChalice"
+                  />
+                }
                 id=":r0:"
                 name="query"
                 onBlur={[Function]}
                 onChangeText={[Function]}
                 onFocus={[Function]}
-                placeholder="Sendtag, Phone, Send ID, Address"
-                placeholderTextColor="#081619"
+                placeholder="Search"
+                placeholderTextColor="#B2B2B2"
                 readOnly={false}
                 style={
                   {
                     "backgroundColor": "#111f22",
-                    "borderBottomColor": "#343434",
+                    "borderBottomColor": "#111f22",
                     "borderBottomLeftRadius": 9,
                     "borderBottomRightRadius": 9,
-                    "borderBottomWidth": 1,
-                    "borderLeftColor": "#343434",
-                    "borderLeftWidth": 1,
-                    "borderRightColor": "#343434",
-                    "borderRightWidth": 1,
+                    "borderBottomWidth": 0,
+                    "borderLeftColor": "#111f22",
+                    "borderLeftWidth": 0,
+                    "borderRightColor": "#111f22",
+                    "borderRightWidth": 0,
                     "borderStyle": "solid",
-                    "borderTopColor": "#343434",
+                    "borderTopColor": "#111f22",
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
-                    "borderTopWidth": 1,
+                    "borderTopWidth": 0,
                     "color": "#FFFFFF",
                     "fontFamily": "System",
-                    "fontSize": 19.2,
-                    "fontStyle": "normal",
-                    "fontWeight": "bold",
+                    "fontSize": 17,
+                    "fontWeight": "normal",
                     "height": 44,
                     "minWidth": 0,
                     "paddingLeft": 46,
@@ -1118,6 +1283,113 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                 }
                 value="testtest"
               />
+              <View
+                style={
+                  {
+                    "paddingBottom": 13,
+                    "paddingLeft": 13,
+                    "paddingRight": 13,
+                    "paddingTop": 13,
+                    "position": "absolute",
+                    "right": 2,
+                    "top": "50%",
+                    "transform": "translateY(-50%)",
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <View
+                  cancelable={true}
+                  disabled={false}
+                  focusable={[Function]}
+                  minPressDuration={0}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onPress={[Function]}
+                  onPressIn={[Function]}
+                  onPressOut={[Function]}
+                  role="button"
+                  style={
+                    {
+                      "backgroundColor": "transparent",
+                      "borderBottomColor": "transparent",
+                      "borderLeftColor": "transparent",
+                      "borderRightColor": "transparent",
+                      "borderTopColor": "transparent",
+                      "flexDirection": "column",
+                      "shadowColor": "rgb(0,0,0)",
+                      "shadowOffset": {
+                        "height": 0,
+                        "width": 0,
+                      },
+                      "shadowOpacity": 0,
+                      "shadowRadius": 0,
+                    }
+                  }
+                >
+                  <RNSVGSvgView
+                    align="xMidYMid"
+                    bbHeight={20}
+                    bbWidth={20}
+                    color="#B2B2B2"
+                    focusable={false}
+                    height={20}
+                    meetOrSlice={0}
+                    minX={0}
+                    minY={0}
+                    strokeWidth="2"
+                    style={
+                      [
+                        {
+                          "backgroundColor": "transparent",
+                          "borderWidth": 0,
+                        },
+                        {
+                          "color": "#B2B2B2",
+                        },
+                        {
+                          "flex": 0,
+                          "height": 20,
+                          "width": 20,
+                        },
+                      ]
+                    }
+                    tintColor="#B2B2B2"
+                    vbHeight={32}
+                    vbWidth={32}
+                    width={20}
+                  >
+                    <RNSVGGroup
+                      fill={
+                        {
+                          "payload": 4278190080,
+                          "type": 0,
+                        }
+                      }
+                      propList={
+                        [
+                          "strokeWidth",
+                        ]
+                      }
+                      strokeWidth="2"
+                    >
+                      <RNSVGPath
+                        d="M8.30006 25.1004L6.90005 23.7004L14.6001 16.0004L6.90005 8.30039L8.30006 6.90039L16.0001 14.6004L23.7001 6.90039L25.1001 8.30039L17.4001 16.0004L25.1001 23.7004L23.7001 25.1004L16.0001 17.4004L8.30006 25.1004Z"
+                        fill={
+                          {
+                            "type": 2,
+                          }
+                        }
+                        propList={
+                          [
+                            "fill",
+                          ]
+                        }
+                      />
+                    </RNSVGGroup>
+                  </RNSVGSvgView>
+                </View>
+              </View>
             </View>
           </View>
           <View
@@ -1213,55 +1485,47 @@ exports[`SendScreen should render with search when on /send and no recipient in 
       <View
         style={
           {
+            "backgroundColor": "#111f22",
+            "borderBottomLeftRadius": 16,
+            "borderBottomRightRadius": 16,
+            "borderTopLeftRadius": 16,
+            "borderTopRightRadius": 16,
             "flexDirection": "column",
-            "gap": 16,
+            "paddingBottom": 13,
+            "paddingLeft": 13,
+            "paddingRight": 13,
+            "paddingTop": 13,
           }
         }
       >
-        <Text
-          accessibilityRole="header"
-          style={
-            {
-              "color": "#B3B3B3",
-              "fontFamily": "System",
-              "fontSize": 19.2,
-              "fontWeight": "400",
-              "lineHeight": 21,
-              "marginBottom": 0,
-              "marginLeft": 0,
-              "marginRight": 0,
-              "marginTop": 0,
-              "textTransform": "uppercase",
-              "userSelect": "auto",
-            }
-          }
-          suppressHighlighting={true}
-        >
-          tag
-        </Text>
         <View
           style={
             {
-              "flexDirection": "row",
-              "flexWrap": "wrap",
-              "gap": 24,
+              "backgroundColor": "rgba(0,0,0,0)",
+              "borderBottomLeftRadius": 10,
+              "borderBottomRightRadius": 10,
+              "borderTopLeftRadius": 10,
+              "borderTopRightRadius": 10,
+              "paddingBottom": 18,
+              "paddingLeft": 18,
+              "paddingRight": 18,
+              "paddingTop": 18,
+              "width": "100%",
             }
           }
         >
           <View
-            style={
-              {
-                "borderBottomLeftRadius": 10,
-                "borderBottomRightRadius": 10,
-                "borderTopLeftRadius": 10,
-                "borderTopRightRadius": 10,
-                "width": "100%",
-              }
-            }
+            href="/send?idType=tag&recipient=test&amount=test&sendToken=test&note=test"
+            testID="MockSolitoLink"
           >
             <View
-              href="/send?idType=tag&recipient=test&amount=test&sendToken=test&note=test"
-              testID="MockSolitoLink"
+              style={
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                }
+              }
             >
               <View
                 style={
@@ -1434,7 +1698,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                       {
                         "color": "#B3B3B3",
                         "fontFamily": "System",
-                        "fontSize": 24,
+                        "fontSize": 19.2,
                         "fontWeight": "300",
                       }
                     }
@@ -1458,7 +1722,8 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                       {
                         "color": "#FFFFFF",
                         "fontFamily": "System",
-                        "fontSize": 16.8,
+                        "fontSize": 15.6,
+                        "textDecorationLine": "underline",
                       }
                     }
                     suppressHighlighting={true}
@@ -1467,6 +1732,64 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                   </Text>
                 </View>
               </View>
+              <RNSVGSvgView
+                align="xMidYMid"
+                bbHeight={24}
+                bbWidth={24}
+                color="#40FB50"
+                fill="none"
+                focusable={false}
+                height={24}
+                meetOrSlice={0}
+                minX={0}
+                minY={0}
+                strokeWidth="2"
+                style={
+                  [
+                    {
+                      "backgroundColor": "transparent",
+                      "borderWidth": 0,
+                    },
+                    {
+                      "color": "#40FB50",
+                    },
+                    {
+                      "flex": 0,
+                      "height": 24,
+                      "width": 24,
+                    },
+                  ]
+                }
+                tintColor="#40FB50"
+                vbHeight={20}
+                vbWidth={20}
+                width={24}
+              >
+                <RNSVGGroup
+                  fill={null}
+                  propList={
+                    [
+                      "fill",
+                      "strokeWidth",
+                    ]
+                  }
+                  strokeWidth="2"
+                >
+                  <RNSVGPath
+                    d="M14.2917 10.625L9.12508 15.7917L10.0001 16.6667L16.6667 10L10.0001 3.33337L9.12508 4.20837L14.2917 9.37504H3.33341V10.625H14.2917Z"
+                    fill={
+                      {
+                        "type": 2,
+                      }
+                    }
+                    propList={
+                      [
+                        "fill",
+                      ]
+                    }
+                  />
+                </RNSVGGroup>
+              </RNSVGSvgView>
             </View>
           </View>
         </View>
