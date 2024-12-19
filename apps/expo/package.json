@@ -55,7 +55,7 @@
   "devDependencies": {
     "@babel/core": "^7.24.0",
     "@expo/metro-config": "~0.17.1",
-    "@tamagui/babel-plugin": "^1.101.7",
+    "@tamagui/babel-plugin": "^1.116.14",
     "babel-plugin-transform-inline-environment-variables": "^0.4.4",
     "babel-preset-expo": "~11.0.0",
     "cross-env": "^7.0.3",
