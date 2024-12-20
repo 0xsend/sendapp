@@ -5,6 +5,7 @@ import {
   Fieldset,
   getFontSize,
   isWeb,
+  isTouchable,
   Paragraph,
   Select,
   type SelectProps,
@@ -68,6 +69,9 @@ export const CoinField = ({
               scaleIcon={1.5}
               padding={0}
               bc={'transparent'}
+              focusStyle={{
+                bc: 'transparent',
+              }}
               iconAfter={
                 isOpen ? (
                   <ChevronUp color={'$primary'} $theme-light={{ color: '$color12' }} />
@@ -141,7 +145,13 @@ export const CoinField = ({
                   x: 0,
                 }}
               >
-                <XStack als="flex-start" w={320} boc={'transparent'} f={1}>
+                <XStack
+                  als="flex-start"
+                  w={320}
+                  $sm={{ w: isTouchable ? '100%' : 320 }}
+                  boc={'transparent'}
+                  f={1}
+                >
                   <Select.Group disabled={disabled} space="$0">
                     {/* <Select.Label>{label}</Select.Label> */}
                     {coins.map((coin, i) => {
