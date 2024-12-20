@@ -25,10 +25,7 @@ export function SendAmountForm() {
   const form = useForm<z.infer<typeof SendAmountSchema>>()
   const router = useRouter()
   const [sendParams, setSendParams] = useSendScreenParams()
-  const selectedToken = useCoinFromSendTokenParam()
-  const {
-    coin: { balance, token, decimals },
-  } = selectedToken
+  const { coin } = useCoinFromSendTokenParam()
   const { isLoading: isLoadingCoins } = useCoins()
 
   useEffect(() => {
@@ -53,9 +50,9 @@ export function SendAmountForm() {
 
   const canSubmit =
     !isLoadingCoins &&
-    balance !== undefined &&
+    coin?.balance !== undefined &&
     sendParams.amount !== undefined &&
-    balance >= parsedAmount &&
+    coin.balance >= parsedAmount &&
     parsedAmount > BigInt(0)
 
   async function onSubmit() {
@@ -67,7 +64,7 @@ export function SendAmountForm() {
         idType: sendParams.idType,
         recipient: sendParams.recipient,
         amount: sendParams.amount,
-        sendToken: token,
+        sendToken: coin?.token,
       },
     })
   }
@@ -132,29 +129,30 @@ export function SendAmountForm() {
             outlineWidth: 1,
             outlineStyle: 'solid',
             fontFamily: '$mono',
-            inputMode: decimals ? 'decimal' : 'numeric',
+            inputMode: coin?.decimals ? 'decimal' : 'numeric',
             onChangeText: (amount) => {
               const localizedAmount = localizeAmount(amount)
               form.setValue('amount', localizedAmount)
             },
           },
           token: {
-            defaultValue: token,
+            defaultValue: coin?.token,
           },
         }}
         formProps={{
           testID: 'SendForm',
-          $gtSm: { maxWidth: '100%', alignSelf: 'flex-start', justifyContent: 'flex-start' },
-          justifyContent: 'flex-start',
+          $gtSm: { maxWidth: '100%', alignSelf: 'flex-start', jc: 'flex-start' },
+          jc: 'flex-start',
           f: 1,
           alignSelf: 'flex-start',
           height: '100%',
         }}
         defaultValues={{
-          token: token,
-          amount: sendParams.amount
-            ? localizeAmount(formatUnits(BigInt(sendParams.amount), decimals))
-            : undefined,
+          token: coin?.token,
+          amount:
+            sendParams.amount && coin !== undefined
+              ? localizeAmount(formatUnits(BigInt(sendParams.amount), coin.decimals))
+              : undefined,
         }}
         renderAfter={({ submit }) => (
           <YStack gap="$5" $gtSm={{ maw: 500 }} $gtLg={{ mx: 0 }} mx="auto">
@@ -172,7 +170,7 @@ export function SendAmountForm() {
         )}
       >
         {({ amount, token }) => (
-          <YStack gap="$5" $gtSm={{ maw: 500 }} $gtLg={{ mx: 0 }} mx="auto">
+          <YStack gap="$5" $gtSm={{ maw: 500 }} $gtLg={{ mx: 0 }} mx="auto" mb="auto">
             <SendRecipient />
             {amount}
             <XStack jc="center" $gtLg={{ jc: 'flex-end' }} ai="center" gap="$3">
@@ -190,12 +188,13 @@ export function SendAmountForm() {
                   switch (true) {
                     case isLoadingCoins:
                       return <Spinner size="small" />
-                    case !balance:
+                    case !coin?.balance:
                       return null
                     default:
                       return (
                         <Paragraph testID="SendFormBalance">
-                          BAL: {formatAmount(formatUnits(balance, decimals), undefined, 4)}
+                          BAL:{' '}
+                          {formatAmount(formatUnits(coin.balance, coin.decimals), undefined, 4)}
                         </Paragraph>
                       )
                   }
