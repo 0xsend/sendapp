@@ -38,10 +38,7 @@ export function SendAmountForm() {
   const form = useForm<z.infer<typeof SendAmountSchema>>()
   const router = useRouter()
   const [sendParams, setSendParams] = useSendScreenParams()
-  const selectedToken = useCoinFromSendTokenParam()
-  const {
-    coin: { balance, token, decimals },
-  } = selectedToken
+  const { coin } = useCoinFromSendTokenParam()
   const { isLoading: isLoadingCoins } = useCoins()
   const { recipient, idType } = sendParams
   const { data: profile } = useProfileLookup(idType ?? 'tag', recipient ?? '')
@@ -74,13 +71,13 @@ export function SendAmountForm() {
 
   const canSubmit =
     !isLoadingCoins &&
-    balance !== undefined &&
+    coin?.balance !== undefined &&
     sendParams.amount !== undefined &&
-    balance >= parsedAmount &&
+    coin.balance >= parsedAmount &&
     parsedAmount > BigInt(0)
 
   const insufficientAmount =
-    balance !== undefined && sendParams.amount !== undefined && parsedAmount > balance
+    coin?.balance !== undefined && sendParams.amount !== undefined && parsedAmount > coin?.balance
 
   async function onSubmit() {
     if (!canSubmit) return
@@ -91,7 +88,7 @@ export function SendAmountForm() {
         idType: sendParams.idType,
         recipient: sendParams.recipient,
         amount: sendParams.amount,
-        sendToken: token,
+        sendToken: coin?.token,
       },
     })
   }
@@ -179,7 +176,7 @@ export function SendAmountForm() {
                 '$theme-light': {
                   placeholderTextColor: '$darkGrayTextField',
                 },
-                inputMode: decimals ? 'decimal' : 'numeric',
+                inputMode: coin?.decimals ? 'decimal' : 'numeric',
                 onChangeText: (amount) => {
                   const localizedAmount = localizeAmount(amount)
                   form.setValue('amount', localizedAmount)
@@ -191,7 +188,7 @@ export function SendAmountForm() {
                 },
               },
               token: {
-                defaultValue: token,
+                defaultValue: coin?.token,
               },
             }}
             formProps={{
@@ -203,10 +200,11 @@ export function SendAmountForm() {
               },
             }}
             defaultValues={{
-              token: token,
-              amount: sendParams.amount
-                ? localizeAmount(formatUnits(BigInt(sendParams.amount), decimals))
-                : undefined,
+              token: coin?.token,
+              amount:
+                sendParams.amount && coin !== undefined
+                  ? localizeAmount(formatUnits(BigInt(sendParams.amount), coin.decimals))
+                  : undefined,
             }}
             renderAfter={({ submit }) => (
               <SubmitButton
@@ -253,6 +251,8 @@ export function SendAmountForm() {
                       switch (true) {
                         case isLoadingCoins:
                           return <Spinner size="small" />
+                        case !coin?.balance:
+                          return null
                         default:
                           return (
                             <XStack
@@ -276,7 +276,7 @@ export function SendAmountForm() {
                                   size={'$5'}
                                   fontWeight={'600'}
                                 >
-                                  {formatAmount(formatUnits(balance || 0, decimals), 12, 4)}
+                                  {formatAmount(formatUnits(coin.balance, coin.decimals), 12, 4)}
                                 </Paragraph>
                               </XStack>
                               {insufficientAmount && (
@@ -289,24 +289,27 @@ export function SendAmountForm() {
                       }
                     })()}
                   </Stack>
-                  {selectedToken.coin?.token !== usdc?.token && (
+                  {coin !== undefined && coin?.token !== usdc?.token && (
                     <Button
                       chromeless
                       unstyled
                       onPress={() => {
-                        form.setValue('amount', localizeAmount(formatUnits(balance, decimals)))
+                        form.setValue(
+                          'amount',
+                          localizeAmount(formatUnits(coin.balance ?? 0n, coin.decimals))
+                        )
                       }}
                       $theme-light={{ borderBottomColor: '$color12' }}
                     >
                       <ButtonText
-                        color={balance === parsedAmount ? '$primary' : '$silverChalice'}
+                        color={coin.balance === parsedAmount ? '$primary' : '$silverChalice'}
                         size={'$5'}
                         textDecorationLine={'underline'}
                         hoverStyle={{
                           color: isDarkTheme ? '$primary' : '$color12',
                         }}
                         $theme-light={{
-                          color: balance === parsedAmount ? '$color12' : '$darkGrayTextField',
+                          color: coin.balance === parsedAmount ? '$color12' : '$darkGrayTextField',
                         }}
                       >
                         MAX
