@@ -19,7 +19,7 @@ export const ProfileAboutTile = ({
       <YStack w={'100%'} gap={'$4'} pb={'$4'}>
         <YStack w={'100%'} bg={'$color1'} borderRadius={'$6'} padding={'$5'} gap={'$4'}>
           <XStack ai="center" jc="space-between">
-            <Paragraph size={'$8'}>Profile</Paragraph>
+            <Paragraph size={'$8'}>About</Paragraph>
             <Stack onPress={onClose} cursor={'pointer'}>
               <IconX
                 size={'$1.5'}
