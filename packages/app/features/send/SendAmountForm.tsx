@@ -109,9 +109,12 @@ export function SendAmountForm() {
           maxWidth: '50%',
         }}
       >
-        {profile && (
-          <ProfileHeader onPress={toggleIsProfileInfoVisible} otherUserProfile={profile} />
-        )}
+        <ProfileHeader
+          onPress={toggleIsProfileInfoVisible}
+          profile={profile}
+          idType={idType}
+          recipient={recipient}
+        />
         <Paragraph size={'$8'} mt={'$4'}>
           Recipients gets
         </Paragraph>

@@ -96,10 +96,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
             >
               <Stack py="$size.3.5" pt={'$0'} $gtLg={{ h: 'auto', pt: '$0' }}>
                 <YStack width="100%" gap="$2">
-                  <ProfileHeader
-                    onPress={toggleIsProfileInfoVisible}
-                    otherUserProfile={otherUserProfile}
-                  />
+                  <ProfileHeader onPress={toggleIsProfileInfoVisible} profile={otherUserProfile} />
                   <YStack gap={'$size.1'}>
                     {(() => {
                       switch (true) {
