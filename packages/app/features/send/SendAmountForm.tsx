@@ -108,6 +108,7 @@ export function SendAmountForm() {
           display: 'flex',
           maxWidth: '50%',
         }}
+        testID={'SendFormContainer'}
       >
         <ProfileHeader
           onPress={toggleIsProfileInfoVisible}

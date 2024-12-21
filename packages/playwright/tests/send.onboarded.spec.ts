@@ -139,16 +139,14 @@ for (const token of coins) {
         timeout: 5000,
       })
 
-      await expect(page.getByTestId('SendForm')).toHaveText(
+      await expect(page.getByTestId('SendFormContainer')).toHaveText(
         new RegExp(
           (() => {
             switch (idType) {
               case 'address':
                 return shorten(recvAccount.address, 5, 4)
-              case 'sendid':
-                return `#${profile.send_id}`
               default:
-                return `/${tag?.name}`
+                return profile.name
             }
           })()
         )

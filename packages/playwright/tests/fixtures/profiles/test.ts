@@ -9,7 +9,7 @@ export class ProfilePage {
     public readonly page: Page,
     public readonly profile: { name: string; about: string }
   ) {
-    this.sendButton = page.getByRole('link', { name: 'SEND' })
+    this.sendButton = page.getByRole('link', { name: 'SEND', exact: true })
   }
 
   async visit(tag: string, expect?: Expect) {
