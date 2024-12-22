@@ -27,6 +27,7 @@ import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { ProfileHeader } from 'app/features/profile/components/ProfileHeader'
 import { ProfileAboutTile } from 'app/features/profile/components/ProfileAboutTile'
 import { useThemeSetting } from '@tamagui/next-theme'
+import { shorten } from 'app/utils/strings'
 
 const SendAmountSchema = z.object({
   amount: formFields.text,
@@ -117,7 +118,20 @@ export function SendAmountForm() {
           recipient={recipient}
         />
         <Paragraph size={'$8'} mt={'$4'}>
-          Recipients gets
+          Send {(() => {
+            switch (true) {
+              case idType === 'address':
+                return shorten(recipient, 5, 4)
+              case !!profile?.name:
+                return profile?.name
+              case !!profile?.all_tags?.[0]:
+                return `/${profile.all_tags[0]}`
+              case !!profile?.sendid:
+                return `#${profile?.sendid}`
+              default:
+                return '??'
+            }
+          })()}
         </Paragraph>
         <FormProvider {...form}>
           <SchemaForm
@@ -198,7 +212,7 @@ export function SendAmountForm() {
                 theme="green"
                 onPress={submit}
                 py={'$5'}
-                br={'$2'}
+                br={'$3'}
                 mb={'$6'}
                 disabledStyle={{ opacity: 0.5 }}
                 disabled={!canSubmit}
@@ -266,7 +280,7 @@ export function SendAmountForm() {
                               </XStack>
                               {insufficientAmount && (
                                 <Paragraph color={'$error'} size={'$5'}>
-                                  Insufficient tokens
+                                  Insufficient funds
                                 </Paragraph>
                               )}
                             </XStack>
