@@ -16,8 +16,8 @@ import { AvatarProfile, type AvatarProfileProps } from './AvatarProfile'
 import { useInterUserActivityFeed } from './utils/useInterUserActivityFeed'
 import type { Activity } from 'app/utils/zod/activity'
 import { amountFromActivity } from 'app/utils/activity'
-import { Fragment, useState } from 'react'
-import { useProfileScreenParams } from 'app/routers/params'
+import { Fragment } from 'react'
+import { useProfileScreenParams, useRootScreenParams } from 'app/routers/params'
 import { IconArrowRight } from 'app/components/icons'
 import { SendButton } from './ProfileButtons'
 import { ProfileHeader } from 'app/features/profile/components/ProfileHeader'
@@ -37,7 +37,8 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   } = useProfileLookup('sendid', otherUserId?.toString() || '')
   const { user, profile: currentUserProfile } = useUser()
   const media = useMedia()
-  const [isProfileInfoVisible, setIsProfileInfoVisible] = useState<boolean>(false)
+  const [queryParams, setRootParams] = useRootScreenParams()
+  const { isProfileInfoVisible } = queryParams
 
   const {
     data,
@@ -55,7 +56,10 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   const { pages } = data ?? {}
 
   const toggleIsProfileInfoVisible = () => {
-    setIsProfileInfoVisible((prevState) => !prevState)
+    setRootParams(
+      { ...queryParams, isProfileInfoVisible: !isProfileInfoVisible },
+      { webBehavior: 'replace' }
+    )
   }
 
   return (

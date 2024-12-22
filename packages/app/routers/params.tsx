@@ -8,6 +8,7 @@ export type RootParams = {
   nav?: 'home' | 'settings'
   token?: allCoins[number]['token']
   search?: string
+  isProfileInfoVisible?: boolean
 }
 
 const { useParam: useRootParam, useParams: useRootParams } = createParam<RootParams>()
@@ -30,17 +31,28 @@ const useSearch = () => {
   return [search, setSearchParam] as const
 }
 
+const useIsProfileInfoVisible = () => {
+  const [isProfileInfoVisible, setIsProfileInfoVisible] = useRootParam('isProfileInfoVisible', {
+    initial: undefined,
+    parse: (value) => value === 'true',
+  })
+
+  return [isProfileInfoVisible, setIsProfileInfoVisible] as const
+}
+
 export const useRootScreenParams = () => {
   const { setParams } = useRootParams()
   const [nav] = useNav()
   const [token] = useToken()
   const [search] = useSearch()
+  const [isProfileInfoVisible] = useIsProfileInfoVisible()
 
   return [
     {
       nav,
       token,
       search,
+      isProfileInfoVisible,
     },
     setParams,
   ] as const
