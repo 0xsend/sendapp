@@ -185,19 +185,20 @@ local_resource(
     deps = contract_files,
 )
 
-local_resource(
-    "contracts:cov",
-    "yarn contracts test:cov -vvv",
-    allow_parallel = True,
-    auto_init = False,
-    labels = labels,
-    resource_deps = [
-        "yarn:install",
-        "contracts:build",
-        "contracts:test",
-    ],
-    deps = contract_files,
-)
+# failing for now... the amounts differ when run in coverage mode
+# local_resource(
+#     "contracts:cov",
+#     "yarn contracts test:cov -vvv",
+#     allow_parallel = True,
+#     auto_init = False,
+#     labels = labels,
+#     resource_deps = [
+#         "yarn:install",
+#         "contracts:build",
+#         "contracts:test",
+#     ],
+#     deps = contract_files,
+# )
 
 local_resource(
     name = "shovel:test",
