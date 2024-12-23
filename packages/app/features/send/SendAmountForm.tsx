@@ -22,7 +22,7 @@ import { formatUnits } from 'viem'
 import { z } from 'zod'
 
 import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
-import { useCoins } from 'app/provider/coins'
+import { useCoin, useCoins } from 'app/provider/coins'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { ProfileHeader } from 'app/features/profile/components/ProfileHeader'
 import { ProfileAboutTile } from 'app/features/profile/components/ProfileAboutTile'
@@ -48,6 +48,7 @@ export function SendAmountForm() {
   const [isProfileInfoVisible, setIsProfileInfoVisible] = useState<boolean>(false)
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
   const { resolvedTheme } = useThemeSetting()
+  const { coin: usdc } = useCoin('USDC')
 
   const isDarkTheme = resolvedTheme?.startsWith('dark')
 
@@ -112,7 +113,7 @@ export function SendAmountForm() {
         testID={'SendFormContainer'}
       >
         <ProfileHeader
-          onPress={toggleIsProfileInfoVisible}
+          onPressOut={toggleIsProfileInfoVisible}
           profile={profile}
           idType={idType}
           recipient={recipient}
@@ -217,7 +218,7 @@ export function SendAmountForm() {
                 disabledStyle={{ opacity: 0.5 }}
                 disabled={!canSubmit}
               >
-                <Button.Text fontWeight={'600'}>SEND</Button.Text>
+                <Button.Text fontWeight={'600'}>CONTINUE</Button.Text>
               </SubmitButton>
             )}
           >
@@ -288,28 +289,30 @@ export function SendAmountForm() {
                       }
                     })()}
                   </Stack>
-                  <Button
-                    chromeless
-                    unstyled
-                    onPress={() => {
-                      form.setValue('amount', localizeAmount(formatUnits(balance, decimals)))
-                    }}
-                    $theme-light={{ borderBottomColor: '$color12' }}
-                  >
-                    <ButtonText
-                      color={balance === parsedAmount ? '$primary' : '$silverChalice'}
-                      size={'$5'}
-                      textDecorationLine={'underline'}
-                      hoverStyle={{
-                        color: isDarkTheme ? '$primary' : '$color12',
+                  {selectedToken.coin?.token !== usdc?.token && (
+                    <Button
+                      chromeless
+                      unstyled
+                      onPress={() => {
+                        form.setValue('amount', localizeAmount(formatUnits(balance, decimals)))
                       }}
-                      $theme-light={{
-                        color: balance === parsedAmount ? '$color12' : '$darkGrayTextField',
-                      }}
+                      $theme-light={{ borderBottomColor: '$color12' }}
                     >
-                      MAX
-                    </ButtonText>
-                  </Button>
+                      <ButtonText
+                        color={balance === parsedAmount ? '$primary' : '$silverChalice'}
+                        size={'$5'}
+                        textDecorationLine={'underline'}
+                        hoverStyle={{
+                          color: isDarkTheme ? '$primary' : '$color12',
+                        }}
+                        $theme-light={{
+                          color: balance === parsedAmount ? '$color12' : '$darkGrayTextField',
+                        }}
+                      >
+                        MAX
+                      </ButtonText>
+                    </Button>
+                  )}
                 </XStack>
               </YStack>
             )}

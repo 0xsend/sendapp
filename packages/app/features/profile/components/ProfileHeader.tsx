@@ -4,24 +4,24 @@ import { IconArrowRight, IconAccount } from 'app/components/icons'
 import { shorten } from 'app/utils/strings'
 
 export const ProfileHeader = ({
-  onPress,
+  onPressOut,
   recipient,
   idType,
   profile,
 }: {
   profile?: Functions<'profile_lookup'>[number] | null
-  onPress: () => void
+  onPressOut: () => void
   idType?: string
   recipient?: string
 }) => {
   const href = profile ? `/profile/${profile?.sendid}` : ''
 
-  const handlePress = () => {
+  const handlePressOut = () => {
     if (!profile) {
       return
     }
 
-    onPress()
+    onPressOut()
   }
 
   return (
@@ -32,11 +32,18 @@ export const ProfileHeader = ({
       p={'$size.1.5'}
       borderRadius={'$6'}
       padding={'$5'}
-      onPress={handlePress}
+      onPressOut={handlePressOut}
       cursor={idType === 'address' ? 'default' : 'pointer'}
     >
       <XStack ai="center" gap={'$size.1.5'} width={'80%'}>
-        <LinkableAvatar size="$6" br="$4" href={href}>
+        <LinkableAvatar
+          size="$6"
+          br="$4"
+          href={href}
+          onPressOut={(e) => {
+            e.stopPropagation()
+          }}
+        >
           <Avatar.Image src={profile?.avatar_url ?? ''} />
           <Avatar.Fallback jc="center">
             <IconAccount size="$6" color="$olive" />
