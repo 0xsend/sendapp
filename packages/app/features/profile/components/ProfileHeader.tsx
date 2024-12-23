@@ -1,7 +1,6 @@
 import type { Functions } from '@my/supabase/database.types'
-import { Paragraph, XStack } from '@my/ui'
-import { AvatarProfile } from 'app/features/profile/AvatarProfile'
-import { IconArrowRight } from 'app/components/icons'
+import { LinkableAvatar, Paragraph, XStack, Avatar } from '@my/ui'
+import { IconArrowRight, IconAccount } from 'app/components/icons'
 import { shorten } from 'app/utils/strings'
 
 export const ProfileHeader = ({
@@ -15,6 +14,8 @@ export const ProfileHeader = ({
   idType?: string
   recipient?: string
 }) => {
+  const href = profile ? `/profile/${profile?.sendid}` : ''
+
   const handlePress = () => {
     if (!profile) {
       return
@@ -35,7 +36,12 @@ export const ProfileHeader = ({
       cursor={idType === 'address' ? 'default' : 'pointer'}
     >
       <XStack ai="center" gap={'$size.1.5'} width={'80%'}>
-        <AvatarProfile profile={profile} mx="none" size="$6" />
+        <LinkableAvatar size="$6" br="$4" href={href}>
+          <Avatar.Image src={profile?.avatar_url ?? ''} />
+          <Avatar.Fallback jc="center">
+            <IconAccount size="$6" color="$olive" />
+          </Avatar.Fallback>
+        </LinkableAvatar>
         <Paragraph nativeID="profileName" size={'$8'} width={'80%'}>
           {(() => {
             switch (true) {
