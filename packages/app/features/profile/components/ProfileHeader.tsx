@@ -44,7 +44,13 @@ export const ProfileHeader = ({
             e.stopPropagation()
           }}
         >
-          <Avatar.Image src={profile?.avatar_url ?? ''} />
+          <Avatar.Image
+            src={profile?.avatar_url ?? ''}
+            testID="avatarImage"
+            accessibilityLabel={profile?.name ?? '??'}
+            accessibilityRole="image"
+            accessible
+          />
           <Avatar.Fallback jc="center">
             <IconAccount size="$6" color="$olive" />
           </Avatar.Fallback>
