@@ -1,7 +1,7 @@
 -- Tag Search
 begin;
 
-select plan(6);
+select plan(8);
 
 create extension "basejump-supabase_test_helpers"; -- noqa: RF05
 
@@ -98,6 +98,36 @@ select results_eq($$
         null -- phone
       )::tag_search_result]
     ) $$, 'You can search by send_id');
+
+-- Test phone number privacy
+select tests.authenticate_as_service_role();
+-- Make Bob's profile private
+update profiles set is_public = false where id = tests.get_supabase_uid('bob');
+
+select tests.authenticate_as('neo');
+
+-- Verify that private profile phone numbers are not searchable
+select results_eq($$
+  SELECT coalesce(array_length(phone_matches,1), 0) from tag_search( $$ || :bobs_phone_number || $$::text, 1, 0); $$, $$
+    values (0) $$, 'Private profile phone numbers should not be searchable');
+
+-- Make Bob's profile public again
+select tests.authenticate_as_service_role();
+update profiles set is_public = true where id = tests.get_supabase_uid('bob');
+
+select tests.authenticate_as('neo');
+
+-- Verify that public profile phone numbers are searchable
+select results_eq($$
+  SELECT phone_matches from tag_search( $$ || :bobs_phone_number || $$::text, 1, 0); $$, $$
+    values (
+      ARRAY[ROW(
+        'bob_avatar', -- avatar_url
+        null, -- tag_name
+        $$ || :bob_send_id || $$, -- bob's send_id
+        $$ || :bobs_phone_number || $$ -- bob's phone number
+      )::tag_search_result]
+    ) $$, 'Public profile phone numbers should be searchable');
 
 select finish();
 rollback;
