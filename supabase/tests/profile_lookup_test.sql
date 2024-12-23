@@ -1,5 +1,5 @@
 BEGIN;
-SELECT plan(11);
+SELECT plan(13);
 CREATE EXTENSION "basejump-supabase_test_helpers";
 SELECT tests.create_supabase_user('valid_tag_user');
 SELECT tests.authenticate_as_service_role();
@@ -122,6 +122,36 @@ SELECT results_eq($$
     VALUES (NULL::uuid, NULL, NULL, NULL, 'x_valid_tag_user', 'valid_tag'::citext, '0x1234567890abcdef1234567890abcdef12345678'::citext, 1, FALSE,(
         SELECT
           current_setting('vars.send_id')::int),ARRAY['valid_tag']::text[]) $$, 'Test valid tag lookup is case insensitive');
+
+-- Test private profile cannot be found by phone number
+SELECT tests.authenticate_as_service_role();
+UPDATE auth.users
+SET phone = '+15555555555'
+WHERE id = tests.get_supabase_uid('valid_tag_user');
+
+-- Test phone lookup when profile is private
+SELECT tests.clear_authentication();
+SELECT is_empty($$
+    SELECT
+      id::uuid, avatar_url, name, about, x_username, tag, address, chain_id, is_public, sendid, all_tags
+    FROM public.profile_lookup('phone', '+15555555555')
+$$, 'Test private profile cannot be found by phone number');
+
+-- Verify the same profile can be found when public
+SELECT tests.authenticate_as_service_role();
+UPDATE profiles
+SET is_public = TRUE
+WHERE id = tests.get_supabase_uid('valid_tag_user');
+
+SELECT results_eq($$
+    SELECT
+      id::uuid, avatar_url, name, about, x_username, tag, address, chain_id, is_public, sendid, all_tags
+    FROM public.profile_lookup('phone', '+15555555555')
+$$, $$
+    VALUES (NULL::uuid, NULL, NULL, NULL, 'x_valid_tag_user', 'valid_tag'::citext, '0x1234567890abcdef1234567890abcdef12345678'::citext, 1, TRUE,
+        (SELECT current_setting('vars.send_id')::int),
+        ARRAY['valid_tag']::text[])
+$$, 'Test public profile can be found by phone number');
 
 SELECT *
 FROM

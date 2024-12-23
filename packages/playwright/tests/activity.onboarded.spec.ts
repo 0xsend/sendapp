@@ -301,7 +301,7 @@ test('can search on activity page', async ({ page, context }) => {
 
   // Perform the search
   const isLoading = page.getByRole('progressbar', { name: 'Loading' })
-  const searchInput = page.getByPlaceholder('Sendtag, Phone, Send ID, Address')
+  const searchInput = page.getByPlaceholder('Search')
   await searchInput.fill('test')
   await expect(searchInput).toHaveValue('test')
 
@@ -310,7 +310,6 @@ test('can search on activity page', async ({ page, context }) => {
   await isLoading.waitFor({ state: 'detached' })
 
   // Verify search results
-  await expect(page.getByRole('heading', { name: 'TAG' })).toBeVisible()
   for (const tag of testTags) {
     await expect(page.getByRole('link', { name: `${tag} /${tag}` })).toBeVisible()
   }
