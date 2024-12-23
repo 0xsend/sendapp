@@ -38,7 +38,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   const { user, profile: currentUserProfile } = useUser()
   const media = useMedia()
   const [queryParams, setRootParams] = useRootScreenParams()
-  const { isProfileInfoVisible } = queryParams
+  const isProfileInfoVisible = queryParams.modal === 'profile'
 
   const {
     data,
@@ -57,7 +57,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
 
   const toggleIsProfileInfoVisible = () => {
     setRootParams(
-      { ...queryParams, isProfileInfoVisible: !isProfileInfoVisible },
+      { ...queryParams, modal: isProfileInfoVisible ? undefined : 'profile' },
       { webBehavior: 'replace' }
     )
   }

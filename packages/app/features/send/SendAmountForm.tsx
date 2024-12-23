@@ -46,7 +46,7 @@ export function SendAmountForm() {
   const { recipient, idType } = sendParams
   const { data: profile } = useProfileLookup(idType ?? 'tag', recipient ?? '')
   const [queryParams, setRootParams] = useRootScreenParams()
-  const { isProfileInfoVisible } = queryParams
+  const isProfileInfoVisible = queryParams.modal === 'profile'
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
   const { resolvedTheme } = useThemeSetting()
   const { coin: usdc } = useCoin('USDC')
@@ -99,7 +99,7 @@ export function SendAmountForm() {
 
   const toggleIsProfileInfoVisible = () => {
     setRootParams(
-      { ...queryParams, isProfileInfoVisible: !isProfileInfoVisible },
+      { ...queryParams, modal: isProfileInfoVisible ? undefined : 'profile' },
       { webBehavior: 'replace' }
     )
   }
