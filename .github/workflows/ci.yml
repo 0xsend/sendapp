@@ -98,7 +98,9 @@ jobs:
         run: git diff # --exit-code
 
   playwright-tests:
+    # **always** skip if not dev or main to save resources
     name: Playwright Tests
+    if: ${{ github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' || github.head_ref == 'dev' || github.head_ref == 'main' }}
     runs-on: self-hosted
     needs: [cache-deps]
     env:
