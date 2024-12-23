@@ -230,6 +230,7 @@ export function SendConfirm() {
     <YStack
       f={1}
       jc={'space-between'}
+      pb={'$4'}
       $gtLg={{
         display: 'flex',
         maxWidth: '50%',
@@ -354,11 +355,11 @@ export function SendConfirm() {
       <Button
         theme={canSubmit ? 'green' : 'red_alt1'}
         onPress={onSubmit}
-        br={'$3'}
+        br={'$4'}
         disabledStyle={{ opacity: 0.7, cursor: 'not-allowed', pointerEvents: 'none' }}
         disabled={!canSubmit || isTransferPending || !!sentTxHash}
         gap={4}
-        mb={'$8'}
+        mb={'$6'}
         py={'$5'}
         width={'100%'}
       >

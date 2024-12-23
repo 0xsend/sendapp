@@ -211,7 +211,7 @@ export function SendAmountForm() {
                 theme="green"
                 onPress={submit}
                 py={'$5'}
-                br={'$3'}
+                br={'$4'}
                 mb={'$6'}
                 disabledStyle={{ opacity: 0.5 }}
                 disabled={!canSubmit}
