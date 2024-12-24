@@ -1,4 +1,5 @@
-import { Avatar, SizableText, type AvatarProps } from '@my/ui'
+import { Avatar, type AvatarProps } from '@my/ui'
+import { IconAccount } from 'app/components/icons'
 
 export type AvatarProfileProps = { name: string | null; avatar_url: string | null } | null
 
@@ -13,13 +14,10 @@ export function AvatarProfile({
         accessibilityLabel={profile?.name ?? '??'}
         accessibilityRole="image"
         accessible
-        src={
-          profile?.avatar_url ??
-          `https://ui-avatars.com/api.jpg?name=${profile?.name ?? '??'}&size=256`
-        }
+        src={profile?.avatar_url ?? ''}
       />
-      <Avatar.Fallback bc="$backgroundFocus" f={1} justifyContent="center" alignItems="center">
-        <SizableText size="$12">??</SizableText>
+      <Avatar.Fallback jc="center" ai="center">
+        <IconAccount size="$6" color="$olive" />
       </Avatar.Fallback>
     </Avatar>
   )

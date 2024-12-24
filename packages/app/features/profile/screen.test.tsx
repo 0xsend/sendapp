@@ -122,8 +122,8 @@ test('ProfileScreen', async () => {
 
   const h1 = screen.getByText(PROFILE.name)
   expect(h1).toBeOnTheScreen()
-  const avatars = screen.getAllByTestId('avatar')
-  expect(avatars.length).toBe(2)
+  const avatar = screen.getByTestId('avatar')
+  expect(avatar).toBeOnTheScreen()
   const image = screen.getByRole('image', { name: PROFILE.name })
   expect(image).toBeOnTheScreen()
   expect(image.props.source).toStrictEqual({
