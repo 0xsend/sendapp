@@ -43,7 +43,6 @@ import { useEstimateFeesPerGas } from 'wagmi'
 import { useCoin } from 'app/provider/coins'
 import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { allCoinsDict } from 'app/data/coins'
-import { AvatarProfile } from 'app/features/profile/AvatarProfile'
 
 export function SendConfirmScreen() {
   const [queryParams] = useSendScreenParams()
@@ -83,6 +82,8 @@ export function SendConfirm() {
     idType ?? 'tag',
     recipient ?? ''
   )
+
+  const href = profile ? `/profile/${profile?.sendid}` : ''
 
   const webauthnCreds =
     sendAccount?.send_account_credentials
@@ -153,6 +154,18 @@ export function SendConfirm() {
   const localizedAmount = localizeAmount(
     formatUnits(BigInt(amount ?? ''), selectedCoin?.decimals ?? allCoinsDict[sendToken].decimals)
   )
+
+  const onEditAmount = () => {
+    router.push({
+      pathname: '/send',
+      query: {
+        idType,
+        recipient,
+        amount: amount ?? '',
+        sendToken,
+      },
+    })
+  }
 
   async function onSubmit() {
     try {
@@ -236,10 +249,7 @@ export function SendConfirm() {
         maxWidth: '50%',
       }}
     >
-      <YStack gap={'$4'}>
-        <Paragraph size={'$8'} mt={'$4'}>
-          Review transfer
-        </Paragraph>
+      <YStack gap={'$4'} pt={'$4'}>
         <YStack
           bg={'$color1'}
           br={'$6'}
@@ -250,7 +260,18 @@ export function SendConfirm() {
           }}
         >
           <XStack gap={'$4'} ai={'center'}>
-            <AvatarProfile profile={profile} size={'$3'} mx="none" circular />
+            <LinkableAvatar circular size={'$3'} href={href}>
+              <Avatar.Image
+                src={profile?.avatar_url ?? ''}
+                testID="avatarImage"
+                accessibilityLabel={profile?.name ?? '??'}
+                accessibilityRole="image"
+                accessible
+              />
+              <Avatar.Fallback jc="center">
+                <IconAccount size={'$3'} color="$olive" />
+              </Avatar.Fallback>
+            </LinkableAvatar>
             <Paragraph
               nativeID="profileName"
               size={'$6'}
@@ -276,31 +297,23 @@ export function SendConfirm() {
               })()}
             </Paragraph>
           </XStack>
-          <Paragraph
-            fontWeight={'500'}
-            size={localizedAmount.length > 18 ? '$7' : '$9'}
-            $gtSm={{
-              size: localizedAmount.length > 16 ? '$8' : '$10',
-            }}
-          >
-            - {localizedAmount} {selectedCoin?.symbol}
-          </Paragraph>
-          <Separator bc={'$silverChalice'} />
+          <XStack w="100%" jc="space-between" ai="flex-end">
+            <Paragraph
+              fontWeight={'500'}
+              als="center"
+              size={localizedAmount.length > 18 ? '$7' : '$9'}
+              $gtSm={{
+                size: localizedAmount.length > 16 ? '$8' : '$10',
+              }}
+            >
+              {localizedAmount} {selectedCoin?.symbol}
+            </Paragraph>
+            <Button chromeless onPress={onEditAmount} bc={'$color1'} br={'$4'} p={'$4'}>
+              <ButtonText size={'$5'}>edit</ButtonText>
+            </Button>
+          </XStack>
+          <Separator px="$4" bw="$0.75" borderRadius={'$4'} />
           <YStack gap={'$2'}>
-            <XStack ai={'center'} jc={'space-between'} gap={'$4'}>
-              <Paragraph
-                color={'$silverChalice'}
-                size={'$6'}
-                $theme-light={{
-                  color: '$darkGrayTextField',
-                }}
-              >
-                You send
-              </Paragraph>
-              <Paragraph size={'$6'}>
-                {localizedAmount} {selectedCoin?.symbol}
-              </Paragraph>
-            </XStack>
             <XStack ai={'center'} jc={'space-between'} gap={'$4'}>
               <Paragraph
                 color={'$silverChalice'}
@@ -325,26 +338,6 @@ export function SendConfirm() {
               )}
             </XStack>
           </YStack>
-          <Separator
-            bc={'$silverChalice'}
-            $theme-light={{
-              bc: '$lightGrayTextField',
-            }}
-          />
-          <XStack ai={'center'} jc={'space-between'} gap={'4'}>
-            <Paragraph
-              color={'$silverChalice'}
-              size={'$6'}
-              $theme-light={{
-                color: '$darkGrayTextField',
-              }}
-            >
-              Recipient gets
-            </Paragraph>
-            <Paragraph size={'$6'}>
-              {localizedAmount} {selectedCoin?.symbol}
-            </Paragraph>
-          </XStack>
         </YStack>
         {error && (
           <ErrorMessage
@@ -394,7 +387,7 @@ export function SendConfirm() {
             case !hasEnoughGas:
               return <Button.Text fontWeight={'600'}>Insufficient Gas</Button.Text>
             default:
-              return <Button.Text fontWeight={'600'}>/SEND</Button.Text>
+              return <Button.Text fontWeight={'600'}>SEND</Button.Text>
           }
         })()}
       </Button>
@@ -511,67 +504,6 @@ export function SendRecipient({ ...props }: YStackProps) {
             })()}
           </Paragraph>
         </YStack>
-      </XStack>
-    </YStack>
-  )
-}
-
-const SendAmount = () => {
-  const [queryParams] = useSendScreenParams()
-  const { sendToken, recipient, idType, amount } = queryParams
-  const router = useRouter()
-  const { coin } = useCoinFromSendTokenParam()
-  const localizedAmount = localizeAmount(
-    formatUnits(
-      BigInt(queryParams.amount ?? ''),
-      coin?.decimals ?? allCoinsDict[sendToken].decimals
-    )
-  )
-  return (
-    <YStack gap="$2.5" f={1} $gtLg={{ maw: 350 }} jc="space-between">
-      <XStack jc="space-between" ai="center" gap="$3">
-        <Label
-          fontWeight="500"
-          fontSize="$5"
-          textTransform="uppercase"
-          $theme-dark={{ col: '$gray8Light' }}
-        >
-          AMOUNT
-        </Label>
-        <Button
-          bc="transparent"
-          chromeless
-          hoverStyle={{ bc: 'transparent' }}
-          pressStyle={{ bc: 'transparent' }}
-          focusStyle={{ bc: 'transparent' }}
-          onPress={() =>
-            router.push({
-              pathname: '/send',
-              query: {
-                recipient,
-                idType,
-                sendToken,
-                amount,
-              },
-            })
-          }
-        >
-          <ButtonText $theme-dark={{ col: '$primary' }}>edit</ButtonText>
-        </Button>
-      </XStack>
-      <XStack
-        ai="center"
-        gap="$3"
-        bc="$metalTouch"
-        p="$3"
-        br="$3"
-        $theme-light={{ bc: '$gray3Light' }}
-        f={1}
-      >
-        <Paragraph fontSize="$9" fontWeight="600" color="$color12">
-          {localizedAmount}
-        </Paragraph>
-        <IconCoin symbol={coin?.symbol ?? 'USDC'} />
       </XStack>
     </YStack>
   )
