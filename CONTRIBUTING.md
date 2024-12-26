@@ -36,9 +36,13 @@ Here is a quick peek at the send stack. Quickly jump to any of the submodules by
 │   ├── <a href="https://github.com/0xsend/sendapp/tree/main/packages/daimo-expo-passkeys">daimo-expo-passkeys</a>
 │   ├── <a href="https://github.com/0xsend/sendapp/tree/main/packages/eslint-config-custom">eslint-config-customs</a>
 │   ├── <a href="https://github.com/0xsend/sendapp/tree/main/packages/playwright">playwright</a>
+|   ├── <a href="https://github.com/0xsend/sendapp/tree/main/packages/shovel">shovel</a>
+│   ├── <a href="https://github.com/0xsend/sendapp/tree/main/packages/snaplet">snaplet</a>
+|   ├── <a href="https://github.com/0xsend/sendapp/tree/main/packages/temporal">temporal</a>
 │   ├── <a href="https://github.com/0xsend/sendapp/tree/main/packages/ui">ui</a>
 │   ├── <a href="https://github.com/0xsend/sendapp/tree/main/packages/wagmi">wagmi</a>
-│   └── <a href="https://github.com/0xsend/sendapp/tree/main/packages/webauthn-authenticator">webauthn-authenticator</a>
+|   ├── <a href="https://github.com/0xsend/sendapp/tree/main/packages/webauthn-authenticator">webauthn-authenticator</a>
+│   └── <a href="https://github.com/0xsend/sendapp/tree/main/packages/workflows">workflows</a>
 └── <a href="https://github.com/0xsend/sendapp/tree/main/supabase">supabase</a>
 </code>
 </pre>
