@@ -3,7 +3,6 @@ import {
   Stack,
   styled,
   type XStackProps,
-  AnimatePresence,
   LinearGradient,
   usePwa,
   Paragraph,
@@ -30,6 +29,7 @@ const Row = styled(XStack, {
   maw: 768,
   $gtLg: {
     pt: '$4',
+    display: 'none',
   },
   pointerEvents: 'auto',
 })
