@@ -154,16 +154,18 @@ export const CoinField = ({
                 >
                   <Select.Group disabled={disabled} space="$0">
                     {/* <Select.Label>{label}</Select.Label> */}
-                    {coins.map((coin, i) => {
-                      return (
-                        <CoinFieldItem
-                          active={coin.token === field.value}
-                          coin={coin}
-                          index={i}
-                          key={coin.token}
-                        />
-                      )
-                    })}
+                    {coins
+                      .filter((coin) => coin.balance && coin.balance >= 0n)
+                      .map((coin, i) => {
+                        return (
+                          <CoinFieldItem
+                            active={coin.token === field.value}
+                            coin={coin}
+                            index={i}
+                            key={coin.token}
+                          />
+                        )
+                      })}
                   </Select.Group>
                   {/* special icon treatment for native */}
                   {native && isWeb && (
