@@ -1,20 +1,32 @@
-import { Button, Paragraph, Spinner, Stack, SubmitButton, XStack, YStack } from '@my/ui'
+import {
+  Button,
+  ButtonText,
+  isWeb,
+  Paragraph,
+  Spinner,
+  Stack,
+  SubmitButton,
+  XStack,
+  YStack,
+} from '@my/ui'
 import { type allCoins, allCoinsDict } from 'app/data/coins'
 import { useSendScreenParams } from 'app/routers/params'
-import { SchemaForm, formFields } from 'app/utils/SchemaForm'
-import formatAmount from 'app/utils/formatAmount'
+import { formFields, SchemaForm } from 'app/utils/SchemaForm'
+import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
 
 import { z } from 'zod'
-import { SendRecipient } from './confirm/screen'
-import { sanitizeAmount, localizeAmount } from 'app/utils/formatAmount'
 
 import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
-import { useCoins } from 'app/provider/coins'
+import { useCoin, useCoins } from 'app/provider/coins'
+import { useProfileLookup } from 'app/utils/useProfileLookup'
+import { ProfileHeader } from 'app/features/profile/components/ProfileHeader'
+import { ProfileAboutTile } from 'app/features/profile/components/ProfileAboutTile'
+import { useThemeSetting } from '@tamagui/next-theme'
 
 const SendAmountSchema = z.object({
   amount: formFields.text,
@@ -25,11 +37,16 @@ export function SendAmountForm() {
   const form = useForm<z.infer<typeof SendAmountSchema>>()
   const router = useRouter()
   const [sendParams, setSendParams] = useSendScreenParams()
-  const selectedToken = useCoinFromSendTokenParam()
-  const {
-    coin: { balance, token, decimals },
-  } = selectedToken
+  const { coin } = useCoinFromSendTokenParam()
   const { isLoading: isLoadingCoins } = useCoins()
+  const { recipient, idType } = sendParams
+  const { data: profile } = useProfileLookup(idType ?? 'tag', recipient ?? '')
+  const [isProfileInfoVisible, setIsProfileInfoVisible] = useState<boolean>(false)
+  const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
+  const { resolvedTheme } = useThemeSetting()
+  const { coin: usdc } = useCoin('USDC')
+
+  const isDarkTheme = resolvedTheme?.startsWith('dark')
 
   useEffect(() => {
     const subscription = form.watch(({ amount, token: _token }) => {
@@ -53,10 +70,13 @@ export function SendAmountForm() {
 
   const canSubmit =
     !isLoadingCoins &&
-    balance !== undefined &&
+    coin?.balance !== undefined &&
     sendParams.amount !== undefined &&
-    balance >= parsedAmount &&
+    coin.balance >= parsedAmount &&
     parsedAmount > BigInt(0)
+
+  const insufficientAmount =
+    coin?.balance !== undefined && sendParams.amount !== undefined && parsedAmount > coin?.balance
 
   async function onSubmit() {
     if (!canSubmit) return
@@ -67,145 +87,249 @@ export function SendAmountForm() {
         idType: sendParams.idType,
         recipient: sendParams.recipient,
         amount: sendParams.amount,
-        sendToken: token,
+        sendToken: coin?.token,
       },
     })
   }
 
-  return (
-    <FormProvider {...form}>
-      <SchemaForm
-        form={form}
-        schema={SendAmountSchema}
-        onSubmit={onSubmit}
-        props={{
-          amount: {
-            h: '$11',
-            br: '$8',
-            '$theme-dark': {
-              bc: '$darkest',
-            },
-            '$theme-light': {
-              bc: '$gray3Light',
-            },
-            $sm: {
-              bc: 'transparent',
-              w: '100%',
-              fontSize: (() => {
-                switch (true) {
-                  case formAmount === undefined:
-                    return '$14'
-                  case formAmount.length > 6:
-                    return '$11'
-                  case formAmount.length > 9:
-                    return '$9'
-                  default:
-                    return '$14'
-                }
-              })(),
-            },
-            color: '$color12',
-            fontSize: (() => {
-              switch (true) {
-                case formAmount === undefined:
-                  return 112
-                case formAmount.length > 9:
-                  return '$12'
+  const toggleIsProfileInfoVisible = () => {
+    setIsProfileInfoVisible((prevState) => !prevState)
+  }
 
-                case formAmount.length > 6:
-                  return '$13'
-                default:
-                  return 112
-              }
-            })(),
-            fontWeight: '400',
-            lineHeight: '$1',
-            autoFocus: true,
-            hoverStyle: {
-              borderColor: 'transparent',
-              outlineColor: 'transparent',
-            },
-            focusStyle: {
-              borderColor: '$borderColorFocus',
-            },
-            outlineColor: '$outlineColor',
-            outlineWidth: 1,
-            outlineStyle: 'solid',
-            fontFamily: '$mono',
-            inputMode: decimals ? 'decimal' : 'numeric',
-            onChangeText: (amount) => {
-              const localizedAmount = localizeAmount(amount)
-              form.setValue('amount', localizedAmount)
-            },
-          },
-          token: {
-            defaultValue: token,
-          },
+  return (
+    <XStack w={'100%'} gap={'$4'}>
+      <YStack
+        f={1}
+        gap={'$4'}
+        display={isProfileInfoVisible ? 'none' : 'flex'}
+        $gtLg={{
+          display: 'flex',
+          maxWidth: '50%',
         }}
-        formProps={{
-          testID: 'SendForm',
-          $gtSm: { maxWidth: '100%', alignSelf: 'flex-start', justifyContent: 'flex-start' },
-          justifyContent: 'flex-start',
-          f: 1,
-          alignSelf: 'flex-start',
-          height: '100%',
-        }}
-        defaultValues={{
-          token: token,
-          amount: sendParams.amount
-            ? localizeAmount(formatUnits(BigInt(sendParams.amount), decimals))
-            : undefined,
-        }}
-        renderAfter={({ submit }) => (
-          <YStack gap="$5" $gtSm={{ maw: 500 }} $gtLg={{ mx: 0 }} mx="auto">
-            <SubmitButton
-              theme="green"
-              onPress={submit}
-              px="$15"
-              br={12}
-              disabledStyle={{ opacity: 0.5 }}
-              disabled={!canSubmit}
-            >
-              <Button.Text>Continue</Button.Text>
-            </SubmitButton>
-          </YStack>
-        )}
+        testID={'SendFormContainer'}
       >
-        {({ amount, token }) => (
-          <YStack gap="$5" $gtSm={{ maw: 500 }} $gtLg={{ mx: 0 }} mx="auto">
-            <SendRecipient />
-            {amount}
-            <XStack jc="center" $gtLg={{ jc: 'flex-end' }} ai="center" gap="$3">
-              <Stack
-                borderWidth="$0.5"
-                $theme-light={{ boc: '$black' }}
-                boc={'$decay'}
-                p="$3"
-                br="$2"
-                miw={121}
-                jc={'center'}
-                ai="center"
-              >
-                {(() => {
+        <ProfileHeader
+          onPressOut={toggleIsProfileInfoVisible}
+          profile={profile}
+          idType={idType}
+          recipient={recipient}
+        />
+        <FormProvider {...form}>
+          <SchemaForm
+            form={form}
+            schema={SendAmountSchema}
+            onSubmit={onSubmit}
+            props={{
+              amount: {
+                fontSize: (() => {
                   switch (true) {
-                    case isLoadingCoins:
-                      return <Spinner size="small" />
-                    case !balance:
-                      return null
+                    case formAmount?.length <= 9:
+                      return '$8'
+                    case formAmount?.length > 16:
+                      return '$6'
                     default:
-                      return (
-                        <Paragraph testID="SendFormBalance">
-                          BAL: {formatAmount(formatUnits(balance, decimals), undefined, 4)}
-                        </Paragraph>
-                      )
+                      return '$8'
                   }
-                })()}
-              </Stack>
-              {token}
-            </XStack>
+                })(),
+                $gtSm: {
+                  fontSize: (() => {
+                    switch (true) {
+                      case formAmount?.length <= 9:
+                        return '$10'
+                      case formAmount?.length > 16:
+                        return '$8'
+                      default:
+                        return '$10'
+                    }
+                  })(),
+                },
+                color: '$color12',
+                fontWeight: '400',
+                bw: 0,
+                br: 0,
+                p: 0,
+                focusStyle: {
+                  outlineWidth: 0,
+                },
+                placeholder: '0',
+                fontFamily: '$mono',
+                '$theme-dark': {
+                  placeholderTextColor: '$darkGrayTextField',
+                },
+                '$theme-light': {
+                  placeholderTextColor: '$darkGrayTextField',
+                },
+                inputMode: coin?.decimals ? 'decimal' : 'numeric',
+                onChangeText: (amount) => {
+                  const localizedAmount = localizeAmount(amount)
+                  form.setValue('amount', localizedAmount)
+                },
+                onFocus: () => setIsInputFocused(true),
+                onBlur: () => setIsInputFocused(false),
+                fieldsetProps: {
+                  width: '60%',
+                },
+              },
+              token: {
+                defaultValue: coin?.token,
+              },
+            }}
+            formProps={{
+              testID: 'SendForm',
+              justifyContent: 'space-between',
+              $gtSm: {
+                maxWidth: '100%',
+                justifyContent: 'space-between',
+              },
+            }}
+            defaultValues={{
+              token: coin?.token,
+              amount:
+                sendParams.amount && coin !== undefined
+                  ? localizeAmount(formatUnits(BigInt(sendParams.amount), coin.decimals))
+                  : undefined,
+            }}
+            renderAfter={({ submit }) => (
+              <SubmitButton
+                theme="green"
+                onPress={submit}
+                py={'$5'}
+                br={'$4'}
+                mb={'$6'}
+                disabledStyle={{ opacity: 0.5 }}
+                disabled={!canSubmit}
+              >
+                <Button.Text fontWeight={'600'}>CONTINUE</Button.Text>
+              </SubmitButton>
+            )}
+          >
+            {({ amount, token }) => (
+              <YStack
+                gap="$5"
+                $gtSm={{ p: '$7' }}
+                bg={'$color1'}
+                br={'$6'}
+                p={'$5'}
+                borderColor={insufficientAmount ? '$error' : 'transparent'}
+                bw={1}
+              >
+                <XStack ai={'center'} position="relative" jc={'space-between'}>
+                  {amount}
+                  {token}
+                  <XStack
+                    position="absolute"
+                    bottom={-8}
+                    left={0}
+                    right={0}
+                    height={1}
+                    backgroundColor={isInputFocused ? '$primary' : '$silverChalice'}
+                    $theme-light={{
+                      backgroundColor: isInputFocused ? '$color12' : '$silverChalice',
+                    }}
+                  />
+                </XStack>
+                <XStack jc="space-between" ai={'flex-start'}>
+                  <Stack>
+                    {(() => {
+                      switch (true) {
+                        case isLoadingCoins:
+                          return <Spinner size="small" />
+                        case !coin?.balance:
+                          return null
+                        default:
+                          return (
+                            <XStack
+                              gap={'$2'}
+                              flexDirection={'column'}
+                              $gtSm={{ flexDirection: 'row' }}
+                            >
+                              <XStack gap={'$2'}>
+                                <Paragraph
+                                  testID="SendFormBalance"
+                                  color={insufficientAmount ? '$error' : '$silverChalice'}
+                                  size={'$5'}
+                                  $theme-light={{
+                                    color: insufficientAmount ? '$error' : '$darkGrayTextField',
+                                  }}
+                                >
+                                  Balance:
+                                </Paragraph>
+                                <Paragraph
+                                  color={insufficientAmount ? '$error' : '$color12'}
+                                  size={'$5'}
+                                  fontWeight={'600'}
+                                >
+                                  {formatAmount(formatUnits(coin.balance, coin.decimals), 12, 4)}
+                                </Paragraph>
+                              </XStack>
+                              {insufficientAmount && (
+                                <Paragraph color={'$error'} size={'$5'}>
+                                  Insufficient funds
+                                </Paragraph>
+                              )}
+                            </XStack>
+                          )
+                      }
+                    })()}
+                  </Stack>
+                  {coin !== undefined && coin?.token !== usdc?.token && (
+                    <Button
+                      chromeless
+                      unstyled
+                      onPress={() => {
+                        form.setValue(
+                          'amount',
+                          localizeAmount(formatUnits(coin.balance ?? 0n, coin.decimals))
+                        )
+                      }}
+                      $theme-light={{ borderBottomColor: '$color12' }}
+                    >
+                      <ButtonText
+                        color={coin.balance === parsedAmount ? '$primary' : '$silverChalice'}
+                        size={'$5'}
+                        textDecorationLine={'underline'}
+                        hoverStyle={{
+                          color: isDarkTheme ? '$primary' : '$color12',
+                        }}
+                        $theme-light={{
+                          color: coin.balance === parsedAmount ? '$color12' : '$darkGrayTextField',
+                        }}
+                      >
+                        MAX
+                      </ButtonText>
+                    </Button>
+                  )}
+                </XStack>
+              </YStack>
+            )}
+          </SchemaForm>
+        </FormProvider>
+      </YStack>
+      {isProfileInfoVisible && (
+        <YStack
+          w={'100%'}
+          ai={'center'}
+          $gtLg={{
+            width: '35%',
+            minWidth: 400,
+            height: isWeb ? '81vh' : 'auto',
+            // @ts-expect-error typescript is complaining about overflowY not available and advising overflow. Overflow will work differently than overflowY here, overflowY is working fine
+            overflowY: 'scroll',
+          }}
+          className={'hide-scroll'}
+        >
+          <YStack
+            w={'100%'}
+            maxWidth={500}
+            pb={'$10'}
+            $gtLg={{
+              pb: 0,
+            }}
+          >
+            <ProfileAboutTile otherUserProfile={profile} onClose={toggleIsProfileInfoVisible} />
           </YStack>
-        )}
-      </SchemaForm>
-    </FormProvider>
+        </YStack>
+      )}
+    </XStack>
   )
 }

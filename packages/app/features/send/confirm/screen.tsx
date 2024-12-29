@@ -5,22 +5,21 @@ import {
   Label,
   LinkableAvatar,
   Paragraph,
+  type ParagraphProps,
   ScrollView,
+  Separator,
   Spinner,
-  Stack,
   XStack,
   YStack,
-  type ParagraphProps,
   type YStackProps,
 } from '@my/ui'
 import { baseMainnet } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
 import { IconAccount } from 'app/components/icons'
-import { IconCoin } from 'app/components/icons/IconCoin'
 import { useTokenActivityFeed } from 'app/features/home/utils/useTokenActivityFeed'
 import { useSendScreenParams } from 'app/routers/params'
 import { assert } from 'app/utils/assert'
-import formatAmount from 'app/utils/formatAmount'
+import formatAmount, { localizeAmount } from 'app/utils/formatAmount'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { shorten } from 'app/utils/strings'
@@ -33,15 +32,14 @@ import {
 } from 'app/utils/useUserOpTransferMutation'
 import { useAccountNonce } from 'app/utils/userop'
 import {
+  type Activity,
   isSendAccountReceiveEvent,
   isSendAccountTransfersEvent,
-  type Activity,
 } from 'app/utils/zod/activity'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'solito/router'
-import { formatUnits, isAddress, type Hex } from 'viem'
+import { formatUnits, type Hex, isAddress } from 'viem'
 import { useEstimateFeesPerGas } from 'wagmi'
-import { localizeAmount } from 'app/utils/formatAmount'
 import { useCoin } from 'app/provider/coins'
 import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { allCoinsDict } from 'app/data/coins'
@@ -84,6 +82,8 @@ export function SendConfirm() {
     idType ?? 'tag',
     recipient ?? ''
   )
+
+  const href = profile ? `/profile/${profile?.sendid}` : ''
 
   const webauthnCreds =
     sendAccount?.send_account_credentials
@@ -150,6 +150,22 @@ export function SendConfirm() {
   const hasEnoughBalance = selectedCoin?.balance && selectedCoin.balance >= BigInt(amount ?? '0')
 
   const canSubmit = BigInt(queryParams.amount ?? '0') > 0 && hasEnoughGas && hasEnoughBalance
+
+  const localizedAmount = localizeAmount(
+    formatUnits(BigInt(amount ?? ''), selectedCoin?.decimals ?? allCoinsDict[sendToken].decimals)
+  )
+
+  const onEditAmount = () => {
+    router.push({
+      pathname: '/send',
+      query: {
+        idType,
+        recipient,
+        amount: amount ?? '',
+        sendToken,
+      },
+    })
+  }
 
   async function onSubmit() {
     try {
@@ -225,143 +241,191 @@ export function SendConfirm() {
 
   return (
     <YStack
-      $gtLg={{ jc: 'flex-start', ai: 'flex-start' }}
-      flexDirection="column"
-      jc="center"
-      ai="center"
       f={1}
-      pb="$5"
+      jc={'space-between'}
+      pb={'$4'}
+      $gtLg={{
+        display: 'flex',
+        maxWidth: '50%',
+      }}
     >
-      <YStack
-        gap="$6"
-        width="100%"
-        f={1}
-        maw={784}
-        $sm={{
-          jc: 'space-between',
-        }}
-      >
-        <Stack w="100%" gap="$5" ai="flex-end">
-          <Stack $gtLg={{ fd: 'row', gap: '$12', miw: 80 }} w="100%" gap="$5">
-            <SendRecipient $gtLg={{ f: 1, maw: 350 }} />
-            <SendAmount />
-          </Stack>
-          <XStack gap="$5" jc="flex-end">
-            {isFeesLoading && <Spinner size="small" color={'$color11'} />}
-            {usdcFees && (
-              <Paragraph fontFamily={'$mono'} fontWeight={'400'} fontSize={'$5'} col={'$color12'}>
-                + Transaction Fee:{' '}
-                {formatAmount(formatUnits(usdcFees.baseFee + usdcFees.gasFees, usdcFees.decimals))}{' '}
-                USDC
-              </Paragraph>
-            )}
-            {usdcFeesError && (
-              <Paragraph color="$error">{usdcFeesError?.message?.split('.').at(0)}</Paragraph>
-            )}
-          </XStack>
-        </Stack>
-
-        {/*  TODO add this back when backend is ready
-        <YStack gap="$5" f={1}>
-          <Label
-            fontWeight="500"
-            fontSize={'$5'}
-            textTransform="uppercase"
-            $theme-dark={{ col: '$gray8Light' }}
-          >
-            ADD A NOTE
-          </Label>
-          <Input
-            placeholder="(Optional)"
-            placeholderTextColor="$color12"
-            value={note}
-            onChangeText={(text) => setParams({ note: text }, { webBehavior: 'replace' })}
-            fontSize={20}
-            fontWeight="400"
-            lineHeight={1}
-            color="$color12"
-            borderColor="transparent"
-            outlineColor="transparent"
-            $theme-light={{ bc: '$gray3Light' }}
-            br={'$3'}
-            bc="$metalTouch"
-            hoverStyle={{
-              borderColor: 'transparent',
-              outlineColor: 'transparent',
-            }}
-            focusStyle={{
-              borderColor: 'transparent',
-              outlineColor: 'transparent',
-            }}
-            fontFamily="$mono"
-          />
-        </YStack> */}
-        <Button
-          theme={canSubmit ? 'green' : 'red_alt1'}
-          onPress={onSubmit}
-          br={12}
-          disabledStyle={{ opacity: 0.7, cursor: 'not-allowed', pointerEvents: 'none' }}
-          disabled={!canSubmit || isTransferPending || !!sentTxHash}
-          gap={4}
-          mx="auto"
-          $gtXs={{
-            maw: 350,
+      <YStack gap={'$4'} pt={'$4'}>
+        <YStack
+          bg={'$color1'}
+          br={'$6'}
+          p={'$6'}
+          gap={'$4.5'}
+          $gtSm={{
+            gap: '$5',
           }}
-          $gtLg={{
-            mr: '0',
-            ml: 'auto',
-          }}
-          width={'100%'}
         >
-          {(() => {
-            switch (true) {
-              case isFeesLoading || isGasLoading:
-                return (
-                  <Button.Icon>
-                    <Spinner size="small" color="$color12" />
-                  </Button.Icon>
-                )
-              case isTransferPending && !isTransferError:
-                return (
-                  <>
-                    <Button.Icon>
-                      <Spinner size="small" color="$color12" />
-                    </Button.Icon>
-                    <Button.Text>Sending...</Button.Text>
-                  </>
-                )
-              case sentTxHash !== undefined:
-                return (
-                  <>
-                    <Button.Icon>
-                      <Spinner size="small" color="$color12" />
-                    </Button.Icon>
-                    <Button.Text>Confirming...</Button.Text>
-                  </>
-                )
-              case !hasEnoughBalance:
-                return <Button.Text>Insufficient Balance</Button.Text>
-              case !hasEnoughGas:
-                return <Button.Text>Insufficient Gas</Button.Text>
-              default:
-                return <Button.Text fontWeight={'500'}>/SEND</Button.Text>
-            }
-          })()}
-        </Button>
+          <XStack gap={'$4'} ai={'center'}>
+            <LinkableAvatar circular size={'$3'} href={href}>
+              <Avatar.Image
+                src={profile?.avatar_url ?? ''}
+                testID="avatarImage"
+                accessibilityLabel={profile?.name ?? '??'}
+                accessibilityRole="image"
+                accessible
+              />
+              <Avatar.Fallback jc="center">
+                <IconAccount size={'$3'} color="$olive" />
+              </Avatar.Fallback>
+            </LinkableAvatar>
+            <Paragraph
+              nativeID="profileName"
+              size={'$6'}
+              color={'$silverChalice'}
+              fontWeight={'500'}
+              $theme-light={{
+                color: '$darkGrayTextField',
+              }}
+            >
+              {(() => {
+                switch (true) {
+                  case idType === 'address':
+                    return shorten(recipient, 5, 4)
+                  case !!profile?.name:
+                    return profile?.name
+                  case !!profile?.all_tags?.[0]:
+                    return `/${profile.all_tags[0]}`
+                  case !!profile?.sendid:
+                    return `#${profile?.sendid}`
+                  default:
+                    return '??'
+                }
+              })()}
+            </Paragraph>
+          </XStack>
+          <XStack w="100%" jc="space-between" ai="flex-end">
+            <Paragraph
+              fontWeight={'500'}
+              als="center"
+              size={localizedAmount.length > 18 ? '$7' : '$9'}
+              $gtSm={{
+                size: localizedAmount.length > 16 ? '$8' : '$10',
+              }}
+            >
+              {localizedAmount} {selectedCoin?.symbol}
+            </Paragraph>
+            <Button chromeless onPress={onEditAmount} bc={'$color1'} br={'$4'} p={'$4'}>
+              <ButtonText size={'$5'}>edit</ButtonText>
+            </Button>
+          </XStack>
+          <Separator px="$4" bw="$0.75" borderRadius={'$4'} />
+          <YStack gap={'$2'}>
+            <XStack ai={'center'} jc={'space-between'} gap={'$4'}>
+              <Paragraph
+                color={'$silverChalice'}
+                size={'$6'}
+                $theme-light={{
+                  color: '$darkGrayTextField',
+                }}
+              >
+                Fees
+              </Paragraph>
+              {isFeesLoading && <Spinner size="small" color={'$color11'} />}
+              {usdcFees && (
+                <Paragraph size={'$6'}>
+                  {formatAmount(
+                    formatUnits(usdcFees.baseFee + usdcFees.gasFees, usdcFees.decimals)
+                  )}{' '}
+                  USDC
+                </Paragraph>
+              )}
+              {usdcFeesError && (
+                <Paragraph color="$error">{usdcFeesError?.message?.split('.').at(0)}</Paragraph>
+              )}
+            </XStack>
+          </YStack>
+        </YStack>
         {error && (
           <ErrorMessage
-            mx="auto"
-            $gtXs={{
-              maw: 350,
-            }}
-            $gtLg={{
-              mr: '0',
-              ml: 'auto',
-            }}
             error={(error as { details?: string }).details ?? error.message ?? 'Error sending'}
           />
         )}
       </YStack>
+      <Button
+        theme={canSubmit ? 'green' : 'red_alt1'}
+        onPress={onSubmit}
+        br={'$4'}
+        disabledStyle={{ opacity: 0.7, cursor: 'not-allowed', pointerEvents: 'none' }}
+        disabled={!canSubmit || isTransferPending || !!sentTxHash}
+        gap={4}
+        mb={'$6'}
+        py={'$5'}
+        width={'100%'}
+      >
+        {(() => {
+          switch (true) {
+            case isFeesLoading || isGasLoading:
+              return (
+                <Button.Icon>
+                  <Spinner size="small" color="$color12" />
+                </Button.Icon>
+              )
+            case isTransferPending && !isTransferError:
+              return (
+                <>
+                  <Button.Icon>
+                    <Spinner size="small" color="$color12" />
+                  </Button.Icon>
+                  <Button.Text fontWeight={'600'}>Sending...</Button.Text>
+                </>
+              )
+            case sentTxHash !== undefined:
+              return (
+                <>
+                  <Button.Icon>
+                    <Spinner size="small" color="$color12" />
+                  </Button.Icon>
+                  <Button.Text fontWeight={'600'}>Confirming...</Button.Text>
+                </>
+              )
+            case !hasEnoughBalance:
+              return <Button.Text fontWeight={'600'}>Insufficient Balance</Button.Text>
+            case !hasEnoughGas:
+              return <Button.Text fontWeight={'600'}>Insufficient Gas</Button.Text>
+            default:
+              return <Button.Text fontWeight={'600'}>SEND</Button.Text>
+          }
+        })()}
+      </Button>
+      {/*  TODO add this back when backend is ready
+         <YStack gap="$5" f={1}>
+           <Label
+             fontWeight="500"
+             fontSize={'$5'}
+             textTransform="uppercase"
+             $theme-dark={{ col: '$gray8Light' }}
+           >
+             ADD A NOTE
+           </Label>
+           <Input
+             placeholder="(Optional)"
+             placeholderTextColor="$color12"
+             value={note}
+             onChangeText={(text) => setParams({ note: text }, { webBehavior: 'replace' })}
+             fontSize={20}
+             fontWeight="400"
+             lineHeight={1}
+             color="$color12"
+             borderColor="transparent"
+             outlineColor="transparent"
+             $theme-light={{ bc: '$gray3Light' }}
+             br={'$3'}
+             bc="$metalTouch"
+             hoverStyle={{
+               borderColor: 'transparent',
+               outlineColor: 'transparent',
+             }}
+             focusStyle={{
+               borderColor: 'transparent',
+               outlineColor: 'transparent',
+             }}
+             fontFamily="$mono"
+           />
+         </YStack> */}
     </YStack>
   )
 }
@@ -445,80 +509,12 @@ export function SendRecipient({ ...props }: YStackProps) {
   )
 }
 
-const SendAmount = () => {
-  const [queryParams] = useSendScreenParams()
-  const { sendToken, recipient, idType, amount } = queryParams
-  const router = useRouter()
-  const { coin } = useCoinFromSendTokenParam()
-  const localizedAmount = localizeAmount(
-    formatUnits(
-      BigInt(queryParams.amount ?? ''),
-      coin?.decimals ?? allCoinsDict[sendToken].decimals
-    )
-  )
-  return (
-    <YStack gap="$2.5" f={1} $gtLg={{ maw: 350 }} jc="space-between">
-      <XStack jc="space-between" ai="center" gap="$3">
-        <Label
-          fontWeight="500"
-          fontSize="$5"
-          textTransform="uppercase"
-          $theme-dark={{ col: '$gray8Light' }}
-        >
-          AMOUNT
-        </Label>
-        <Button
-          bc="transparent"
-          chromeless
-          hoverStyle={{ bc: 'transparent' }}
-          pressStyle={{ bc: 'transparent' }}
-          focusStyle={{ bc: 'transparent' }}
-          onPress={() =>
-            router.push({
-              pathname: '/send',
-              query: {
-                recipient,
-                idType,
-                sendToken,
-                amount,
-              },
-            })
-          }
-        >
-          <ButtonText $theme-dark={{ col: '$primary' }}>edit</ButtonText>
-        </Button>
-      </XStack>
-      <XStack
-        ai="center"
-        gap="$3"
-        bc="$metalTouch"
-        p="$3"
-        br="$3"
-        $theme-light={{ bc: '$gray3Light' }}
-        f={1}
-      >
-        <Paragraph fontSize="$9" fontWeight="600" color="$color12">
-          {localizedAmount}
-        </Paragraph>
-        <IconCoin symbol={coin.symbol} />
-      </XStack>
-    </YStack>
-  )
-}
-
 function ErrorMessage({ error, ...props }: ParagraphProps & { error?: string }) {
   if (!error) return null
 
   return (
     <ScrollView height="$4">
-      <Paragraph
-        testID="SendConfirmError"
-        size="$2"
-        maw="$20"
-        width="100%"
-        col={'$error'}
-        {...props}
-      >
+      <Paragraph testID="SendConfirmError" size="$2" width="100%" col={'$error'} {...props}>
         {error.split('.').at(0)}
       </Paragraph>
     </ScrollView>

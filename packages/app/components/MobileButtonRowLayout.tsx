@@ -3,7 +3,6 @@ import {
   Stack,
   styled,
   type XStackProps,
-  AnimatePresence,
   LinearGradient,
   usePwa,
   Paragraph,
@@ -30,6 +29,7 @@ const Row = styled(XStack, {
   maw: 768,
   $gtLg: {
     pt: '$4',
+    display: 'none',
   },
   pointerEvents: 'auto',
 })
@@ -43,40 +43,36 @@ const MobileButtonRow = ({
   const isPwa = usePwa()
 
   return (
-    <AnimatePresence>
-      {!isLoading && isVisible && direction !== 'down' && (
-        <Stack
-          w={'100%'}
-          pb={isPwa ? '$1' : '$5'}
-          px="$4"
-          $platform-web={{
-            position: 'fixed',
-            bottom: 0,
-          }}
-          $gtLg={{
-            display: 'none',
-          }}
-          animation="200ms"
-          opacity={1}
-          animateOnly={['scale', 'transform', 'opacity']}
-          enterStyle={{ opacity: 0, scale: 0.9 }}
-          exitStyle={{ opacity: 0, scale: 0.95 }}
-        >
-          <LinearGradient
-            h={'150%'}
-            top={'-50%'}
-            start={{ x: 0, y: 1 }}
-            end={{ x: 0, y: 0 }}
-            locations={[0, 0.33]}
-            fullscreen
-            colors={['transparent', '$background']}
-            $gtLg={{ display: 'none' }}
-            pointerEvents="none"
-          />
-          {children}
-        </Stack>
-      )}
-    </AnimatePresence>
+    <Stack
+      w={'100%'}
+      pb={isPwa ? '$1' : '$5'}
+      px="$4"
+      $platform-web={{
+        position: 'fixed',
+        bottom: 0,
+      }}
+      $gtLg={{
+        display: 'none',
+      }}
+      animation="200ms"
+      opacity={!isLoading && isVisible && direction !== 'down' ? 1 : 0}
+      scale={!isLoading && isVisible && direction !== 'down' ? 1 : 0.95}
+      animateOnly={['scale', 'transform', 'opacity']}
+      pointerEvents={!isLoading && isVisible && direction !== 'down' ? 'auto' : 'none'}
+    >
+      <LinearGradient
+        h={'150%'}
+        top={'-50%'}
+        start={{ x: 0, y: 1 }}
+        end={{ x: 0, y: 0 }}
+        locations={[0, 0.33]}
+        fullscreen
+        colors={['transparent', '$background']}
+        $gtLg={{ display: 'none' }}
+        pointerEvents="none"
+      />
+      {children}
+    </Stack>
   )
 }
 

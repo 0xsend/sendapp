@@ -53,7 +53,7 @@ export function SendTopNav() {
             {(() => {
               switch (true) {
                 case path.includes('/confirm'):
-                  return 'Preview And Send'
+                  return 'Preview and Send'
                 case Boolean(sendParams.recipient):
                   return 'Enter Amount'
                 default:
@@ -75,7 +75,7 @@ export function SendTopNav() {
             {(() => {
               switch (true) {
                 case path.includes('/confirm'):
-                  return 'Preview And Send'
+                  return 'Preview and Send'
                 case Boolean(sendParams.recipient):
                   return 'Enter Amount'
                 default:

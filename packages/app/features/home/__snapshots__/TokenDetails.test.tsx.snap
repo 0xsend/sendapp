@@ -92,11 +92,11 @@ exports[`TokenDetails 1`] = `
         >
           <RNSVGSvgView
             align="xMidYMid"
-            bbHeight={32}
-            bbWidth={32}
+            bbHeight={16.8}
+            bbWidth={16.8}
             color="#FFFFFF"
             focusable={false}
-            height={32}
+            height={16.8}
             meetOrSlice={0}
             minX={0}
             minY={0}
@@ -107,18 +107,20 @@ exports[`TokenDetails 1`] = `
                   "backgroundColor": "transparent",
                   "borderWidth": 0,
                 },
-                {},
+                {
+                  "color": "#FFFFFF",
+                },
                 {
                   "flex": 0,
-                  "height": 32,
-                  "width": 32,
+                  "height": 16,
+                  "width": 16,
                 },
               ]
             }
             tintColor="#FFFFFF"
             vbHeight={32}
             vbWidth={32}
-            width={32}
+            width={16.8}
           >
             <RNSVGGroup
               fill={

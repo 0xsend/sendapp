@@ -3,21 +3,22 @@ import {
   Button,
   FieldError,
   Fieldset,
+  getFontSize,
+  isWeb,
+  isTouchable,
   Paragraph,
   Select,
+  type SelectProps,
   Shake,
   Sheet,
   Spinner,
   Theme,
+  useThemeName,
   XStack,
   YStack,
-  getFontSize,
-  isWeb,
-  useThemeName,
-  type SelectProps,
 } from '@my/ui'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
-import { ChevronDown, ChevronUp, CheckCircle as IconCheckCircle } from '@tamagui/lucide-icons'
+import { CheckCircle as IconCheckCircle, ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
 import { useTsController } from '@ts-react/form'
 import { IconX } from 'app/components/icons'
 import formatAmount from 'app/utils/formatAmount'
@@ -25,6 +26,7 @@ import { useId, useState } from 'react'
 import { IconCoin } from '../icons/IconCoin'
 import type { CoinWithBalance } from 'app/data/coins'
 import { useCoins } from 'app/provider/coins'
+
 export const CoinField = ({
   native = false,
   ...props
@@ -42,6 +44,8 @@ export const CoinField = ({
   const id = useId()
   const disabled = isSubmitting
 
+  const pickedCoinSymbol = coins.find((coin) => coin.token === field.value)?.symbol
+
   return (
     <Theme name={error ? 'red' : themeName} forceClassName>
       <Fieldset>
@@ -58,22 +62,36 @@ export const CoinField = ({
           >
             <Select.Trigger
               testID={'SelectCoinTrigger'}
-              w={106}
-              h={48}
-              br="$3"
+              br={0}
               borderWidth={0}
-              scaleSpace={0}
+              w={'fit-content'}
+              scaleSpace={0.5}
               scaleIcon={1.5}
-              hoverStyle={{ bc: '$primary' }}
-              bc={isOpen ? '$color2' : '$primary'}
-              iconAfter={isOpen ? <ChevronUp color={'$color11'} /> : <ChevronDown color="$black" />}
+              padding={0}
+              bc={'transparent'}
+              focusStyle={{
+                bc: 'transparent',
+              }}
+              iconAfter={
+                isOpen ? (
+                  <ChevronUp color={'$primary'} $theme-light={{ color: '$color12' }} />
+                ) : (
+                  <ChevronDown color="$primary" $theme-light={{ color: '$color12' }} />
+                )
+              }
             >
-              <Select.Value
-                testID={'SelectCoinValue'}
-                fontWeight={'bold'}
-                color={'$black'}
-                placeholder={'Token'}
-              />
+              <XStack gap={'$2'} ai={'center'}>
+                {pickedCoinSymbol && <IconCoin symbol={pickedCoinSymbol} size={'$2'} />}
+                <Select.Value
+                  testID={'SelectCoinValue'}
+                  size={'$5'}
+                  color={'$color12'}
+                  placeholder={'Token'}
+                  $gtSm={{
+                    size: '$8',
+                  }}
+                />
+              </XStack>
             </Select.Trigger>
 
             <Adapt when="sm" platform="touch">
@@ -122,20 +140,32 @@ export const CoinField = ({
                 btrr={0}
                 boc="transparent"
                 focusStyle={{ bc: '$color0' }}
+                x={'-50%'}
+                $gtLg={{
+                  x: 0,
+                }}
               >
-                <XStack als="flex-start" w={320} $sm={{ w: '100%' }} boc={'transparent'} f={1}>
+                <XStack
+                  als="flex-start"
+                  w={320}
+                  $sm={{ w: isTouchable ? '100%' : 320 }}
+                  boc={'transparent'}
+                  f={1}
+                >
                   <Select.Group disabled={disabled} space="$0">
                     {/* <Select.Label>{label}</Select.Label> */}
-                    {coins.map((coin, i) => {
-                      return (
-                        <CoinFieldItem
-                          active={coin.token === field.value}
-                          coin={coin}
-                          index={i}
-                          key={coin.token}
-                        />
-                      )
-                    })}
+                    {coins
+                      .filter((coin) => coin.balance && coin.balance >= 0n)
+                      .map((coin, i) => {
+                        return (
+                          <CoinFieldItem
+                            active={coin.token === field.value}
+                            coin={coin}
+                            index={i}
+                            key={coin.token}
+                          />
+                        )
+                      })}
                   </Select.Group>
                   {/* special icon treatment for native */}
                   {native && isWeb && (
