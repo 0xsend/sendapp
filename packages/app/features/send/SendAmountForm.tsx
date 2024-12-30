@@ -123,10 +123,10 @@ export function SendAmountForm() {
               amount: {
                 fontSize: (() => {
                   switch (true) {
-                    case formAmount?.length <= 9:
-                      return '$8'
+                    case formAmount?.length <= 8:
+                      return '$11'
                     case formAmount?.length > 16:
-                      return '$6'
+                      return '$7'
                     default:
                       return '$8'
                   }
@@ -144,10 +144,10 @@ export function SendAmountForm() {
                   })(),
                 },
                 color: '$color12',
-                fontWeight: '400',
+                fontWeight: '500',
                 bw: 0,
                 br: 0,
-                p: 0,
+                p: 1,
                 focusStyle: {
                   outlineWidth: 0,
                 },
