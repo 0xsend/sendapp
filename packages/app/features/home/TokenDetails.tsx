@@ -44,17 +44,9 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
       <YStack gap="$5">
         <Card p="$4.5" w={'100%'} jc={'space-between'} $gtLg={{ h: 244, p: '$6' }}>
           <YStack gap="$4">
-            <Button
-              disabled
-              icon={<IconCoin symbol={coin.symbol} />}
-              bc="transparent"
-              chromeless
-              jc={'flex-start'}
-              ai={'center'}
-              gap="$2"
-              p={0}
-            >
-              <Button.Text
+            <XStack ai={'center'} gap={'$3'}>
+              <IconCoin size={'$2'} symbol={coin.symbol} />
+              <Paragraph
                 size={'$7'}
                 fontFamily={'$mono'}
                 col={'$color12'}
@@ -62,8 +54,8 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
                 fontWeight={'700'}
               >
                 {coin.label}
-              </Button.Text>
-            </Button>
+              </Paragraph>
+            </XStack>
             <YStack gap={'$4'}>
               <TokenDetailsBalance coin={coin} />
               {coin.symbol !== 'USDC' && (
