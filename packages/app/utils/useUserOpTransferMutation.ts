@@ -40,7 +40,7 @@ export const defaultUserOp: Pick<
   | 'paymasterVerificationGasLimit'
   | 'paymasterPostOpGasLimit'
 > = {
-  callGasLimit: 100000n,
+  callGasLimit: 150000n,
   verificationGasLimit: 550000n,
   preVerificationGas: 70000n,
   maxFeePerGas: 10000000n,
