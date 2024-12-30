@@ -7,6 +7,7 @@ import {
   usePwa,
   Paragraph,
   H3,
+  useMedia,
 } from '@my/ui'
 import { HomeButtons } from '../features/home/HomeButtons'
 import { useScrollDirection } from '../provider/scroll'
@@ -41,6 +42,7 @@ const MobileButtonRow = ({
 }: { children: React.ReactElement; isLoading: boolean; isVisible?: boolean } & XStackProps) => {
   const { direction } = useScrollDirection()
   const isPwa = usePwa()
+  const media = useMedia()
 
   return (
     <Stack
@@ -50,6 +52,7 @@ const MobileButtonRow = ({
       $platform-web={{
         position: 'fixed',
         bottom: 0,
+        display: media.gtLg ? 'none' : 'flex',
       }}
       $gtLg={{
         display: 'none',
@@ -166,7 +169,7 @@ const ActivityRewards = ({ children, ...props }: XStackProps) => {
     <>
       {children}
       <MobileButtonRow isLoading={isLoading} isVisible={isVisible}>
-        <Stack ai="center" jc="space-between" gap="$3" pt="$1">
+        <Stack ai="center" jc="space-between" gap="$3" pt="$1" $gtLg={{ display: 'none' }}>
           <H3 fontWeight={'600'} color={'$color10'}>
             {isQualificationOver
               ? `Total ${distributionMonth} Rewards`

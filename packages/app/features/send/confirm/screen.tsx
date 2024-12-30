@@ -9,7 +9,6 @@ import {
   ScrollView,
   Separator,
   Spinner,
-  Stack,
   XStack,
   YStack,
   type YStackProps,
@@ -78,6 +77,7 @@ export function SendConfirm() {
   const queryClient = useQueryClient()
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
   const { coin: selectedCoin, tokensQuery, ethQuery } = useCoinFromSendTokenParam()
+  const isUSDCSelected = selectedCoin?.label === 'USDC'
   const { coin: usdc } = useCoin('USDC')
 
   const { data: profile, isLoading: isProfileLoading } = useProfileLookup(
@@ -108,7 +108,7 @@ export function SendConfirm() {
     to: profile?.address ?? recipient,
     token: sendToken === 'eth' ? undefined : sendToken,
     amount: BigInt(queryParams.amount ?? '0'),
-    nonce: nonce ?? 0n,
+    nonce: nonce,
   })
 
   const {
@@ -146,10 +146,10 @@ export function SendConfirm() {
 
   const [dataFirstFetch, setDataFirstFetch] = useState<number>()
 
-  const hasEnoughGas =
-    usdcFees && (usdc?.balance ?? BigInt(0)) >= usdcFees.baseFee + usdcFees.gasFees
-
   const hasEnoughBalance = selectedCoin?.balance && selectedCoin.balance >= BigInt(amount ?? '0')
+  const gas = usdcFees ? usdcFees.baseFee + usdcFees.gasFees : BigInt(Number.MAX_SAFE_INTEGER)
+  const hasEnoughGas =
+    (usdc?.balance ?? BigInt(0)) > (isUSDCSelected ? BigInt(amount ?? '0') + gas : gas)
 
   const canSubmit = BigInt(queryParams.amount ?? '0') > 0 && hasEnoughGas && hasEnoughBalance
 
@@ -321,7 +321,6 @@ export function SendConfirm() {
               hoverStyle={{ color: '$primary' }}
               size={'$5'}
               pl={'$2'}
-              f={1}
               textAlign={'right'}
             >
               edit

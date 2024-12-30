@@ -1,8 +1,8 @@
 import type { Enums } from '@my/supabase/database.types'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
-import type { allCoins } from 'app/data/coins'
+import { allCoinsDict, type allCoins } from 'app/data/coins'
 import { createParam } from 'solito'
-import type { Address } from 'viem'
+import { isAddress, type Address } from 'viem'
 
 export type RootParams = {
   nav?: 'home' | 'settings'
@@ -105,6 +105,17 @@ const useAmount = () => {
 export const useSendToken = () => {
   const [sendToken, setSendTokenParam] = useSendParam('sendToken', {
     initial: usdcAddress[baseMainnet.id],
+    parse: (value) => {
+      if (Array.isArray(value)) {
+        return isAddress(value[0] ?? '') || Object.keys(allCoinsDict).includes(value[0] ?? '')
+          ? (value[0] as allCoins[number]['token'])
+          : usdcAddress[baseMainnet.id]
+      }
+
+      return isAddress(value ?? '') || Object.keys(allCoinsDict).includes(value ?? '')
+        ? (value as allCoins[number]['token'])
+        : usdcAddress[baseMainnet.id]
+    },
   })
 
   return [sendToken, setSendTokenParam] as const
