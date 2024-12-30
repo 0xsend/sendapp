@@ -47,56 +47,21 @@ exports[`TokenDetails 1`] = `
         }
       >
         <View
-          focusVisibleStyle={
-            {
-              "borderColor": "$background",
-            }
-          }
-          pointerEvents="none"
-          role="button"
           style={
             {
               "alignItems": "center",
-              "backgroundColor": "transparent",
-              "borderBottomColor": "transparent",
-              "borderBottomLeftRadius": 16,
-              "borderBottomRightRadius": 16,
-              "borderBottomWidth": 1,
-              "borderLeftColor": "transparent",
-              "borderLeftWidth": 1,
-              "borderRightColor": "transparent",
-              "borderRightWidth": 1,
-              "borderStyle": "solid",
-              "borderTopColor": "transparent",
-              "borderTopLeftRadius": 16,
-              "borderTopRightRadius": 16,
-              "borderTopWidth": 1,
               "flexDirection": "row",
-              "flexWrap": "nowrap",
-              "gap": 7,
-              "height": 44,
-              "justifyContent": "flex-start",
-              "paddingBottom": 0,
-              "paddingLeft": 0,
-              "paddingRight": 0,
-              "paddingTop": 0,
-              "shadowColor": "rgb(0,0,0)",
-              "shadowOffset": {
-                "height": 0,
-                "width": 0,
-              },
-              "shadowOpacity": 0,
-              "shadowRadius": 0,
+              "gap": 13,
             }
           }
         >
           <RNSVGSvgView
             align="xMidYMid"
-            bbHeight={16.8}
-            bbWidth={16.8}
+            bbHeight={28}
+            bbWidth={28}
             color="#FFFFFF"
             focusable={false}
-            height={16.8}
+            height={28}
             meetOrSlice={0}
             minX={0}
             minY={0}
@@ -107,20 +72,18 @@ exports[`TokenDetails 1`] = `
                   "backgroundColor": "transparent",
                   "borderWidth": 0,
                 },
-                {
-                  "color": "#FFFFFF",
-                },
+                {},
                 {
                   "flex": 0,
-                  "height": 16,
-                  "width": 16,
+                  "height": 28,
+                  "width": 28,
                 },
               ]
             }
             tintColor="#FFFFFF"
             vbHeight={32}
             vbWidth={32}
-            width={16.8}
+            width={28}
           >
             <RNSVGGroup
               fill={
@@ -213,31 +176,16 @@ exports[`TokenDetails 1`] = `
               </RNSVGDefs>
             </RNSVGGroup>
           </RNSVGSvgView>
-          <View
-            pointerEvents="none"
-            style={
-              {
-                "height": 0,
-                "minHeight": 0,
-                "minWidth": 11.088000000000001,
-                "width": 11.088000000000001,
-              }
-            }
-          />
           <Text
-            lineBreakMode="clip"
-            numberOfLines={1}
             style={
               {
                 "color": "#FFFFFF",
-                "flexGrow": 0,
-                "flexShrink": 1,
                 "fontFamily": "System",
                 "fontSize": 24,
                 "fontWeight": "700",
                 "lineHeight": 25,
                 "textTransform": "uppercase",
-                "userSelect": "none",
+                "userSelect": "auto",
               }
             }
             suppressHighlighting={true}
@@ -614,7 +562,7 @@ exports[`TokenDetails 1`] = `
                   }
                   suppressHighlighting={true}
                 >
-                  6 mon ago
+                  7 mon ago
                 </Text>
               </View>
             </View>
@@ -881,7 +829,7 @@ exports[`TokenDetails 1`] = `
                   }
                   suppressHighlighting={true}
                 >
-                  6 mon ago
+                  7 mon ago
                 </Text>
               </View>
             </View>
@@ -1154,7 +1102,7 @@ exports[`TokenDetails 1`] = `
                   }
                   suppressHighlighting={true}
                 >
-                  6 mon ago
+                  7 mon ago
                 </Text>
               </View>
             </View>

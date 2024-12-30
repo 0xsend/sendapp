@@ -9,6 +9,7 @@ import {
   ScrollView,
   Separator,
   Spinner,
+  Stack,
   XStack,
   YStack,
   type YStackProps,
@@ -43,6 +44,7 @@ import { useEstimateFeesPerGas } from 'wagmi'
 import { useCoin } from 'app/provider/coins'
 import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { allCoinsDict } from 'app/data/coins'
+import { IconCoin } from 'app/components/icons/IconCoin'
 
 export function SendConfirmScreen() {
   const [queryParams] = useSendScreenParams()
@@ -297,20 +299,33 @@ export function SendConfirm() {
               })()}
             </Paragraph>
           </XStack>
-          <XStack w="100%" jc="space-between" ai="flex-end">
+          <XStack w="100%" jc="space-between" ai="flex-end" flexWrap={'wrap'}>
+            <XStack ai={'center'} gap={'$2'}>
+              <Paragraph
+                fontWeight={'700'}
+                size={localizedAmount.length > 18 ? '$7' : '$9'}
+                $gtSm={{
+                  size: localizedAmount.length > 16 ? '$8' : '$10',
+                }}
+              >
+                {localizedAmount} {selectedCoin?.symbol}
+              </Paragraph>
+              <IconCoin
+                symbol={selectedCoin?.symbol ?? 'USDC'}
+                size={localizedAmount.length > 10 ? '$1.5' : '$2.5'}
+              />
+            </XStack>
             <Paragraph
-              fontWeight={'500'}
-              als="center"
-              size={localizedAmount.length > 18 ? '$7' : '$9'}
-              $gtSm={{
-                size: localizedAmount.length > 16 ? '$8' : '$10',
-              }}
+              onPress={onEditAmount}
+              cursor="pointer"
+              hoverStyle={{ color: '$primary' }}
+              size={'$5'}
+              pl={'$2'}
+              f={1}
+              textAlign={'right'}
             >
-              {localizedAmount} {selectedCoin?.symbol}
+              edit
             </Paragraph>
-            <Button chromeless onPress={onEditAmount} bc={'$color1'} br={'$4'} p={'$4'}>
-              <ButtonText size={'$5'}>edit</ButtonText>
-            </Button>
           </XStack>
           <Separator px="$4" bw="$0.75" borderRadius={'$4'} />
           <YStack gap={'$2'}>
