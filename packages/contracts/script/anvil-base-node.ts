@@ -1,6 +1,6 @@
 import 'zx/globals'
 
-// $.verbose = true
+$.verbose = true
 
 if (!$.env.ANVIL_BASE_FORK_URL) {
   console.error(chalk.red('ANVIL_BASE_FORK_URL is not set.'))
@@ -9,6 +9,13 @@ if (!$.env.ANVIL_BASE_FORK_URL) {
 $.env.ANVIL_BASE_BLOCK_TIME ||= '2'
 $.env.ANVIL_BASE_EXTRA_ARGS ||= '--silent'
 $.env.NEXT_PUBLIC_BASE_CHAIN_ID ||= '845337'
+
+console.log(chalk.blue('Running anvil base node'), {
+  ANVIL_BASE_FORK_URL: $.env.ANVIL_BASE_FORK_URL,
+  ANVIL_BASE_BLOCK_TIME: $.env.ANVIL_BASE_BLOCK_TIME,
+  ANVIL_BASE_EXTRA_ARGS: $.env.ANVIL_BASE_EXTRA_ARGS,
+  NEXT_PUBLIC_BASE_CHAIN_ID: $.env.NEXT_PUBLIC_BASE_CHAIN_ID,
+})
 
 const baseBaseFee = await $`cast base-fee --rpc-url $ANVIL_BASE_FORK_URL`
 const baseGasPrice = await $`cast gas-price --rpc-url $ANVIL_BASE_FORK_URL`

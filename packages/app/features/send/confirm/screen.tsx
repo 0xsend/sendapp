@@ -45,6 +45,10 @@ import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { allCoinsDict } from 'app/data/coins'
 import { IconCoin } from 'app/components/icons/IconCoin'
 
+import debug from 'debug'
+
+const log = debug('app:features:send:confirm:screen')
+
 export function SendConfirmScreen() {
   const [queryParams] = useSendScreenParams()
   const { recipient, idType, sendToken, amount } = queryParams
@@ -130,18 +134,15 @@ export function SendConfirm() {
     mutateAsync: sendUserOp,
     isPending: isTransferPending,
     isError: isTransferError,
+    submittedAt,
   } = useUserOpTransferMutation()
 
   const [error, setError] = useState<Error>()
 
-  const {
-    data: transfers,
-    error: tokenActivityError,
-    dataUpdatedAt,
-  } = useTokenActivityFeed({
+  const { data: transfers, error: tokenActivityError } = useTokenActivityFeed({
     address: sendToken === 'eth' ? undefined : hexToBytea(sendToken),
-    refetchInterval: sentTxHash ? 1000 : undefined, // refetch every second if we have sent a tx
-    enabled: !!sentTxHash,
+    refetchInterval: isTransferPending ? 1000 : undefined, // refetch every second if we have sent a tx
+    enabled: !!isTransferPending,
   })
 
   const [dataFirstFetch, setDataFirstFetch] = useState<number>()
@@ -187,9 +188,9 @@ export function SendConfirm() {
         maxPriorityFeePerGas: feesPerGas.maxPriorityFeePerGas,
       }
 
-      console.log('gasEstimate', usdcFees)
-      console.log('feesPerGas', feesPerGas)
-      console.log('userOp', _userOp)
+      log('gasEstimate', usdcFees)
+      log('feesPerGas', feesPerGas)
+      log('userOp', _userOp)
       const receipt = await sendUserOp({
         userOp: _userOp,
         webauthnCreds,
@@ -209,13 +210,11 @@ export function SendConfirm() {
   }
 
   useEffect(() => {
-    if (!dataFirstFetch && dataUpdatedAt) {
-      setDataFirstFetch(dataUpdatedAt)
-    }
-    if (!dataFirstFetch) return
-    if (!dataUpdatedAt) return
-    const hasBeenLongEnough = dataUpdatedAt - dataFirstFetch > 5_000
-    if (sentTxHash) {
+    if (!submittedAt) return
+
+    const hasBeenLongEnough = Date.now() - submittedAt > 5_000
+
+    if (sentTxHash || isTransferPending) {
       const tfr = transfers?.pages.some((page) =>
         page.some((activity: Activity) => {
           if (isSendAccountTransfersEvent(activity)) {
@@ -236,7 +235,7 @@ export function SendConfirm() {
         router.replace({ pathname: '/', query: { token: sendToken } })
       }
     }
-  }, [sentTxHash, transfers, router, sendToken, tokenActivityError, dataFirstFetch, dataUpdatedAt])
+  }, [sentTxHash, transfers, router, sendToken, tokenActivityError, submittedAt, isTransferPending])
 
   if (isSendAccountLoading || nonceIsLoading || isProfileLoading)
     return <Spinner size="large" color={'$color'} />
