@@ -33,7 +33,7 @@ test('can visit other user profile and send by tag', async ({ page, seed }) => {
     recipient: tag.name,
     idType: 'tag',
   })
-  await expect(page.locator('h2', { hasText: 'Recipient' })).toBeVisible()
+  await expect(page.locator('h2', { hasText: 'Enter Amount' })).toBeVisible()
 
   // visit another user but without a sendtag
   const plan2 = await seed.users([{ ...userOnboarded, tags: [] }])
@@ -53,7 +53,7 @@ test('can visit other user profile and send by tag', async ({ page, seed }) => {
     recipient: profile2?.send_id.toString(),
     idType: 'sendid',
   })
-  await expect(page.locator('h2', { hasText: 'Recipient' })).toBeVisible()
+  await expect(page.locator('h2', { hasText: 'Enter Amount' })).toBeVisible()
 
   // can visit profile withouth the @ prefix
   await page.goto(`/${tag.name}`)

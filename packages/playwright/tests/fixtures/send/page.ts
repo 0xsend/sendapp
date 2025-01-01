@@ -13,7 +13,7 @@ export class SendPage {
     this.expect = expect
     this.amountInput = page.getByLabel('amount')
     this.continueButton = page.getByRole('button', { name: 'CONTINUE', exact: true })
-    this.sendButton = page.getByRole('button', { name: '/SEND' })
+    this.sendButton = page.getByRole('button', { name: 'SEND' })
     this.tokenSelect = page.getByTestId('SelectCoinTrigger')
   }
 
@@ -30,7 +30,7 @@ export class SendPage {
   }
 
   async fillAndSubmitForm(amount: string) {
-    await this.expect(this.page.locator('h2', { hasText: 'Recipient' })).toBeVisible()
+    await this.expect(this.page.locator('h2', { hasText: 'Enter Amount' })).toBeVisible()
     await this.expect(this.amountInput).toBeVisible()
     await this.amountInput.fill(amount)
     await this.expect(this.continueButton).toBeVisible()

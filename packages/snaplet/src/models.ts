@@ -27,6 +27,7 @@ export const models: SeedClientOptions['models'] = {
     data: {
       name: (ctx) => copycat.fullName(ctx.seed),
       avatar_url: (ctx) => pravatar(copycat.fullName(ctx.seed)),
+      x_username: (ctx) => copycat.username(ctx.seed, { limit: 64 }),
     },
   },
   tags: {
