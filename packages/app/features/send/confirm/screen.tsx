@@ -145,8 +145,6 @@ export function SendConfirm() {
     enabled: !!isTransferPending,
   })
 
-  const [dataFirstFetch, setDataFirstFetch] = useState<number>()
-
   const hasEnoughBalance = selectedCoin?.balance && selectedCoin.balance >= BigInt(amount ?? '0')
   const gas = usdcFees ? usdcFees.baseFee + usdcFees.gasFees : BigInt(Number.MAX_SAFE_INTEGER)
   const hasEnoughGas =
