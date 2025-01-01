@@ -133,6 +133,7 @@ export function useUSDCFees({
       const requiredUsdcBalance = await fetchRequiredUSDCBalance({
         userOp,
         refundPostopCost,
+        // @ts-expect-error dunno what happened here
         client,
         cachedPriceWithMarkup,
       })
@@ -165,9 +166,10 @@ export async function fetchRequiredUSDCBalance<TTransport extends Transport, TCh
 }: {
   userOp: UserOperation<'v0.7'>
   refundPostopCost: number
-  client: PublicClient<TTransport, TChain>
+  client: PublicClient<TTransport, TChain> | undefined
   cachedPriceWithMarkup: bigint
 }) {
+  assert(!!client?.chain?.id, 'client.chain.id is not set')
   const requiredPreFund = calculatePrefund(userOp)
   const addedPostOpCost = BigInt(refundPostopCost) * userOp.maxFeePerGas
   const preChargeNative = requiredPreFund + addedPostOpCost
