@@ -345,7 +345,7 @@ exports[`TokenDetails 1`] = `
               {
                 "flex": 1,
                 "flexDirection": "row",
-                "gap": 21,
+                "gap": 16,
                 "width": "100%",
               }
             }
@@ -612,7 +612,7 @@ exports[`TokenDetails 1`] = `
               {
                 "flex": 1,
                 "flexDirection": "row",
-                "gap": 21,
+                "gap": 16,
                 "width": "100%",
               }
             }
@@ -879,7 +879,7 @@ exports[`TokenDetails 1`] = `
               {
                 "flex": 1,
                 "flexDirection": "row",
-                "gap": 21,
+                "gap": 16,
                 "width": "100%",
               }
             }

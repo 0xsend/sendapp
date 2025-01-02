@@ -23,7 +23,7 @@ export function TokenActivityRow({ activity }: { activity: Activity }) {
 
   return (
     <XStack width={'100%'} ai="center" jc="space-between" gap="$4" pb="$2">
-      <XStack gap="$4.5" width={'100%'} f={1}>
+      <XStack gap="$3.5" width={'100%'} f={1}>
         <ActivityAvatar activity={activity} />
         <YStack gap="$1.5" width={'100%'} f={1} overflow="hidden">
           <XStack fd="row" jc="space-between" gap="$1.5" f={1} width={'100%'}>
