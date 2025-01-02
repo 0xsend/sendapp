@@ -59,12 +59,14 @@ export function ReferralLink(props: ButtonProps) {
 
   if (!referralCode) return null
   return (
-    <XStack ai={'center'} gap={'$2'}>
+    <XStack ai={'center'} gap={'$2'} width={'100%'}>
       <Paragraph size={'$4'} color={'$color10'}>
         Referral:
       </Paragraph>
       <Button
         chromeless
+        flex={1}
+        jc={'flex-start'}
         height={'auto'}
         hoverStyle={{
           backgroundColor: 'transparent',
@@ -87,6 +89,7 @@ export function ReferralLink(props: ButtonProps) {
           fontWeight={'500'}
           fontFamily={'$mono'}
           bc="$background"
+          maxWidth={'85%'}
           hoverStyle={{
             color: '$primary',
           }}
