@@ -1,10 +1,9 @@
-import type { ColorTokens } from '@my/ui/types'
 import { type IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
-import { Defs, G, Path, Rect, Svg } from 'react-native-svg'
+import { G, Path, Svg } from 'react-native-svg'
 
 const SPX6900 = (props) => {
-  const { size, color, ...rest } = props
+  const { size } = props
   return (
     <Svg
       xmlns="http://www.w3.org/2000/svg"
