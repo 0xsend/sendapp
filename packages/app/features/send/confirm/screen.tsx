@@ -2,6 +2,7 @@ import {
   Avatar,
   Button,
   ButtonText,
+  isWeb,
   Label,
   LinkableAvatar,
   Paragraph,
@@ -141,8 +142,8 @@ export function SendConfirm() {
 
   const { data: transfers, error: tokenActivityError } = useTokenActivityFeed({
     address: sendToken === 'eth' ? undefined : hexToBytea(sendToken),
-    refetchInterval: isTransferPending ? 1000 : undefined, // refetch every second if we have sent a tx
-    enabled: !!isTransferPending,
+    refetchInterval: sentTxHash ? 1000 : undefined, // refetch every second if we have sent a tx
+    enabled: !!sentTxHash,
   })
 
   const hasEnoughBalance = selectedCoin?.balance && selectedCoin.balance >= BigInt(amount ?? '0')
@@ -212,7 +213,15 @@ export function SendConfirm() {
 
     const hasBeenLongEnough = Date.now() - submittedAt > 5_000
 
+    log('check if submitted at is long enough', {
+      submittedAt,
+      sentTxHash,
+      hasBeenLongEnough,
+      isTransferPending,
+    })
+
     if (sentTxHash || isTransferPending) {
+      log('sent tx hash', { sentTxHash })
       const tfr = transfers?.pages.some((page) =>
         page.some((activity: Activity) => {
           if (isSendAccountTransfersEvent(activity)) {
@@ -228,9 +237,30 @@ export function SendConfirm() {
       if (tokenActivityError) {
         console.error(tokenActivityError)
       }
-      // found the transfer or we waited 5 seconds or we got an error 😢
-      if (tfr || tokenActivityError || hasBeenLongEnough) {
+      // found the transfer or we waited too long or we got an error 😢
+      // or we are sending eth since event logs are not always available for eth
+      // (when receipient is not a send account or contract)
+      if (tfr || tokenActivityError || hasBeenLongEnough || (sentTxHash && sendToken === 'eth')) {
         router.replace({ pathname: '/', query: { token: sendToken } })
+      }
+    }
+
+    // create a window unload event on web
+    const eventHandlersToRemove: (() => void)[] = []
+    if (isWeb) {
+      const unloadHandler = (e: BeforeUnloadEvent) => {
+        // prevent unload if we have a tx hash or a submitted at
+        if (submittedAt || sentTxHash) {
+          e.preventDefault()
+        }
+      }
+      window.addEventListener('beforeunload', unloadHandler)
+      eventHandlersToRemove.push(() => window.removeEventListener('beforeunload', unloadHandler))
+    }
+
+    return () => {
+      for (const remove of eventHandlersToRemove) {
+        remove()
       }
     }
   }, [sentTxHash, transfers, router, sendToken, tokenActivityError, submittedAt, isTransferPending])

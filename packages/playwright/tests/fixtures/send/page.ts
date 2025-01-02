@@ -13,7 +13,7 @@ export class SendPage {
     this.expect = expect
     this.amountInput = page.getByLabel('amount')
     this.continueButton = page.getByRole('button', { name: 'CONTINUE', exact: true })
-    this.sendButton = page.getByRole('button', { name: 'SEND' })
+    this.sendButton = page.getByRole('button', { name: 'SEND', exact: true })
     this.tokenSelect = page.getByTestId('SelectCoinTrigger')
   }
 
