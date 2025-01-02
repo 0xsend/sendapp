@@ -243,9 +243,9 @@ VALUES (
     100000,
     1000000,
     1000000,
-    1000000,(
-        SELECT
-            CURRENT_TIMESTAMP AT TIME ZONE 'UTC' + interval '1 hour'),
+    1000000,
+    -- start now
+    (SELECT CURRENT_TIMESTAMP AT TIME ZONE 'UTC'),
 (
         SELECT
             CURRENT_TIMESTAMP AT TIME ZONE 'UTC' + interval '10 days'),
