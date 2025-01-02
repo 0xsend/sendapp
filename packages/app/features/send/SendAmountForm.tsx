@@ -1,14 +1,4 @@
-import {
-  Button,
-  ButtonText,
-  isWeb,
-  Paragraph,
-  Spinner,
-  Stack,
-  SubmitButton,
-  XStack,
-  YStack,
-} from '@my/ui'
+import { Button, isWeb, Paragraph, Spinner, Stack, SubmitButton, XStack, YStack } from '@my/ui'
 import { type allCoins, allCoinsDict } from 'app/data/coins'
 import { useSendScreenParams } from 'app/routers/params'
 import { formFields, SchemaForm } from 'app/utils/SchemaForm'
@@ -22,11 +12,10 @@ import { formatUnits } from 'viem'
 import { z } from 'zod'
 
 import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
-import { useCoin, useCoins } from 'app/provider/coins'
+import { useCoins } from 'app/provider/coins'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { ProfileHeader } from 'app/features/profile/components/ProfileHeader'
 import { ProfileAboutTile } from 'app/features/profile/components/ProfileAboutTile'
-import { useThemeSetting } from '@tamagui/next-theme'
 
 const SendAmountSchema = z.object({
   amount: formFields.text,
@@ -43,10 +32,6 @@ export function SendAmountForm() {
   const { data: profile } = useProfileLookup(idType ?? 'tag', recipient ?? '')
   const [isProfileInfoVisible, setIsProfileInfoVisible] = useState<boolean>(false)
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
-  const { resolvedTheme } = useThemeSetting()
-  const { coin: usdc } = useCoin('USDC')
-
-  const isDarkTheme = resolvedTheme?.startsWith('dark')
 
   useEffect(() => {
     const subscription = form.watch(({ amount, token: _token }) => {
@@ -272,33 +257,6 @@ export function SendAmountForm() {
                       }
                     })()}
                   </Stack>
-                  {coin !== undefined && coin?.token !== usdc?.token && (
-                    <Button
-                      chromeless
-                      unstyled
-                      onPress={() => {
-                        form.setValue(
-                          'amount',
-                          localizeAmount(formatUnits(coin.balance ?? 0n, coin.decimals))
-                        )
-                      }}
-                      $theme-light={{ borderBottomColor: '$color12' }}
-                    >
-                      <ButtonText
-                        color={coin.balance === parsedAmount ? '$primary' : '$silverChalice'}
-                        size={'$5'}
-                        textDecorationLine={'underline'}
-                        hoverStyle={{
-                          color: isDarkTheme ? '$primary' : '$color12',
-                        }}
-                        $theme-light={{
-                          color: coin.balance === parsedAmount ? '$color12' : '$darkGrayTextField',
-                        }}
-                      >
-                        MAX
-                      </ButtonText>
-                    </Button>
-                  )}
                 </XStack>
               </YStack>
             )}
