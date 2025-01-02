@@ -3,6 +3,7 @@ import {
   adjustDatePickerDateToTimezone,
   adjustUTCDateForTimezone,
   CommentsTime,
+  isEqualCalendarDate,
 } from './dateHelper'
 describe('CommentsTime', () => {
   beforeAll(() => {
@@ -71,5 +72,29 @@ describe('adjustDatePickerDateToTimezone', () => {
     const localDate = new Date('2024-12-13T00:00:00-05:00')
     const adjustedDate = adjustDatePickerDateToTimezone(localDate)
     expect(adjustedDate.toISOString()).toBe('2024-12-13T05:00:00.000Z')
+  })
+})
+
+describe('isSameDay', () => {
+  it('should return true if the dates are the same', () => {
+    const date1 = new Date('2024-12-13T00:00:00.000Z')
+    const date2 = new Date('2024-12-13T00:00:00.000Z')
+    expect(isEqualCalendarDate(date1, date2)).toBe(true)
+  })
+
+  it('should return false if the dates are not the same', () => {
+    const date1 = new Date('2024-12-13T00:00:00.000Z')
+    const date2 = new Date('2024-12-14T00:00:00.000Z')
+    expect(isEqualCalendarDate(date1, date2)).toBe(false)
+  })
+  it('should return false if the dates are in different years', () => {
+    const date1 = new Date('2024-12-13T00:00:00.000Z')
+    const date2 = new Date('2025-12-13T00:00:00.000Z')
+    expect(isEqualCalendarDate(date1, date2)).toBe(false)
+  })
+  it('should return false if the dates are in different months', () => {
+    const date1 = new Date('2024-12-13T00:00:00.000Z')
+    const date2 = new Date('2024-11-13T00:00:00.000Z')
+    expect(isEqualCalendarDate(date1, date2)).toBe(false)
   })
 })
