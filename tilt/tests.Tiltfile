@@ -90,6 +90,7 @@ local_resource(
     resource_deps = [
         "next:web",
         "playwright:deps",
+        "webauthn-authenticator:build",
     ],
     trigger_mode = CI and TRIGGER_MODE_AUTO or TRIGGER_MODE_MANUAL,
     deps = files_matching(

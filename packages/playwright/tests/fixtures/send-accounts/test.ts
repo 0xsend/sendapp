@@ -4,7 +4,7 @@ import type { Expect, Page } from '@playwright/test'
 import { assert } from 'app/utils/assert'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 import debug from 'debug'
-import { parseEther, zeroAddress } from 'viem'
+import { parseEther, withRetry, zeroAddress } from 'viem'
 import { test as base } from '../auth'
 import { testBaseClient } from '../viem/base'
 import { OnboardingPage } from './page'
@@ -56,8 +56,16 @@ const sendAccountTest = base.extend<{
       assert(!!sendAccount, 'no send account found')
       assert(sendAccount.address !== zeroAddress, 'send account address is zero')
 
-      await setEthBalance({ address: sendAccount.address, value: parseEther('1') })
-      await setUsdcBalance({ address: sendAccount.address, value: 100n * 10n ** 6n })
+      await Promise.all([
+        withRetry(() => setEthBalance({ address: sendAccount.address, value: parseEther('1') }), {
+          delay: 250,
+          retryCount: 40,
+        }),
+        withRetry(() => setUsdcBalance({ address: sendAccount.address, value: 100n * 10n ** 6n }), {
+          delay: 250,
+          retryCount: 40,
+        }),
+      ])
 
       await onboardingPage.page.close() // close the onboarding page
 
