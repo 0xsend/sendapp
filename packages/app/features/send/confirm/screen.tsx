@@ -220,7 +220,7 @@ export function SendConfirm() {
       isTransferPending,
     })
 
-    if (sentTxHash || isTransferPending) {
+    if (sentTxHash) {
       log('sent tx hash', { sentTxHash })
       const tfr = transfers?.pages.some((page) =>
         page.some((activity: Activity) => {
