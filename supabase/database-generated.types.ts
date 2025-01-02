@@ -1426,6 +1426,7 @@ export type Database = {
         fixed_value: number
         bips_value: number
         metadata: Json
+        created_at: string
       }
     }
   }

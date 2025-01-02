@@ -148,21 +148,7 @@ export default defineConfig({
         return row
       },
       distribution_verifications: ({ row }) => {
-        if (row.metadata === null) {
-          return {}
-        }
-
-        const { metadata } = row as { metadata: { [key: string]: string } }
-
-        // if (metadata.tag !== undefined) {
-        //   metadata.tag = tagName(copycat.username(metadata.tag))
-        // }
-
-        return {
-          metadata: {
-            ...metadata,
-          },
-        }
+        return row
       },
       referrals: ({ row }) => {
         return row

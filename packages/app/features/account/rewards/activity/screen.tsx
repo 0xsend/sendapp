@@ -31,6 +31,7 @@ import type { UseQueryResult } from '@tanstack/react-query'
 import type { PostgrestError } from '@supabase/postgrest-js'
 import { DistributionSelect } from '../components/DistributionSelect'
 import { useRewardsScreenParams } from 'app/routers/params'
+import { isEqualCalendarDate } from 'app/utils/dateHelper'
 
 //@todo get this from the db
 const verificationTypesAndTitles = {
@@ -336,19 +337,14 @@ const TasksCards = ({
             const orderB = Object.keys(verificationTypesAndTitles).indexOf(b.type)
             return orderA - orderB
           })
-          .map(({ type: verificationType, weight, metadata }) => (
+          .map((verification) => (
             <PerkCard
-              key={verificationType}
-              type={verificationType}
-              isCompleted={Boolean(weight)}
-              weight={
-                ['send_ten', 'send_one_hundred'].includes(verificationType)
-                  ? metadata?.[0]?.value ?? 0
-                  : weight
-              }
+              key={verification.type}
+              verification={verification}
+              isQualificationOver={isQualificationOver}
             >
               <H3 fontWeight={'600'} color={'$color12'}>
-                {verificationTypesAndTitles[verificationType]?.title}
+                {verificationTypesAndTitles[verification.type]?.title}
               </H3>
             </PerkCard>
           ))}
@@ -358,11 +354,32 @@ const TasksCards = ({
 }
 
 const PerkCard = ({
-  type,
-  isCompleted,
-  weight,
+  verification,
+  isQualificationOver,
   children,
-}: PropsWithChildren<CardProps> & { type: string; isCompleted: boolean; weight?: number }) => {
+}: PropsWithChildren<CardProps> & {
+  verification: NonNullable<
+    Tables<'distribution_verifications_summary'>['verification_values']
+  >[number]
+  isQualificationOver: boolean
+}) => {
+  const type = verification.type
+  const metadata = verification.metadata
+  const weight = ['send_ten', 'send_one_hundred'].includes(type)
+    ? metadata?.[0]?.value ?? 0
+    : verification.weight
+  const isSendStreak = type === 'send_streak'
+  const isTagRegistration = type === 'tag_registration'
+  const isCompleted = (() => {
+    if (isSendStreak) {
+      // send streak is completed if the `created_at` date is same as today or the distribution is over and a weight is present
+      const createdAt = new Date(verification.created_at)
+      const today = new Date()
+      return isEqualCalendarDate(createdAt, today) || (Boolean(weight) && isQualificationOver)
+    }
+    return Boolean(weight)
+  })()
+
   return (
     <Card br={12} gap="$4" p="$6" jc={'space-between'} $gtSm={{ maw: 331 }} w={'100%'}>
       <XStack ai={'center'} jc="space-between">
@@ -370,9 +387,18 @@ const PerkCard = ({
           <>
             <XStack ai="center" gap="$2">
               <CheckCircle2 $theme-light={{ color: '$color12' }} color="$primary" size={'$1.5'} />
-              <Paragraph color="$color11">Completed</Paragraph>
+              <Paragraph color="$color11">
+                {(() => {
+                  if (isSendStreak && !isQualificationOver) {
+                    // say ongoing instead of completed
+                    return 'Ongoing'
+                  }
+
+                  return 'Completed'
+                })()}
+              </Paragraph>
             </XStack>
-            {(type === 'send_streak' || type === 'tag_registration') && (
+            {(isSendStreak || isTagRegistration) && (
               <Paragraph
                 ff={'$mono'}
                 py={'$size.0.5'}

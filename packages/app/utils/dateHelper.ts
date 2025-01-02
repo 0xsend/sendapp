@@ -59,3 +59,17 @@ export const adjustDatePickerDateToTimezone = (date: Date): Date => {
   const adjustedTime = date.getTime() - timezoneOffsetMillis
   return new Date(adjustedTime)
 }
+
+/**
+ * Checks if two dates are in the same calendar day.
+ * @param date1 - The first date to compare.
+ * @param date2 - The second date to compare.
+ * @returns True if the dates are in the same calendar day, false otherwise.
+ */
+export const isEqualCalendarDate = (date1: Date, date2: Date): boolean => {
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  )
+}
