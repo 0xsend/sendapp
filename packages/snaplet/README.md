@@ -2,6 +2,10 @@
 
 Snaplet is used for seeding our local development environment with production-like data. It is used both as a CLI tool and as a typescript library.
 
+> [!IMPORTANT]
+> The following commands should be run within the snaplet package directory.
+> `cd packages/snaplet`
+
 It seeds our database using two main methods:
 
 ## Seeding
