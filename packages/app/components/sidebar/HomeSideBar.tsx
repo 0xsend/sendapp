@@ -83,11 +83,11 @@ const HomeBottomSheet = () => {
       <XStack gap="$4" ai="center" bg={'$color1'} p={'$4'} borderRadius={'$6'} mb={'$4'}>
         <LinkableAvatar size="$7" br={'$4'} href={`/profile/${profile?.send_id}`}>
           <Avatar.Image src={avatarUrl ?? ''} />
-          <Avatar.Fallback jc={'center'} delayMs={200}>
+          <Avatar.Fallback jc={'center'} ai={'center'} delayMs={200}>
             <IconAccount size="$4.5" color="$olive" />
           </Avatar.Fallback>
         </LinkableAvatar>
-        <YStack gap={'$2'}>
+        <YStack flex={1} gap={'$2'}>
           <Paragraph size={'$7'}>{profile?.name ?? `#${profile?.send_id}`}</Paragraph>
           <Separator width="100%" borderColor="$decay" />
           <ReferralLink p={0} />
