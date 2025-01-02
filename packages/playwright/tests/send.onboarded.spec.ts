@@ -14,7 +14,7 @@ import { isAddress, parseUnits } from 'viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { ProfilePage } from './fixtures/profiles'
 import { SendPage } from './fixtures/send'
-import { testBaseClient } from './fixtures/viem'
+import { lookupBalance, testBaseClient } from './fixtures/viem'
 
 const test = mergeTests(sendAccountTest, snapletTest)
 
@@ -218,7 +218,7 @@ async function handleTokenTransfer({
     return amt
   })()
   const transferAmount = parseUnits(decimalAmount, token.decimals)
-  const balanceBefore = transferAmount * 10n // padding
+  const balanceBefore = transferAmount * 100n // padding
 
   const { data: sendAccount, error } = await supabase.from('send_accounts').select('*').single()
   expect(error).toBeFalsy()
@@ -230,6 +230,9 @@ async function handleTokenTransfer({
       address: sendAccount.address as `0x${string}`,
       value: balanceBefore, // padding
     })
+    expect(await testBaseClient.getBalance({ address: sendAccount.address as `0x${string}` })).toBe(
+      balanceBefore
+    )
   } else {
     await setERC20Balance({
       client: testBaseClient,
@@ -237,7 +240,15 @@ async function handleTokenTransfer({
       tokenAddress: token.token as `0x${string}`,
       value: balanceBefore, // padding
     })
+    expect(
+      await lookupBalance({
+        address: sendAccount.address as `0x${string}`,
+        token: token.token as `0x${string}`,
+      })
+    ).toBe(balanceBefore)
   }
+
+  await page.reload() // ensure balance is updated
 
   const sendPage = new SendPage(page, expect)
   await sendPage.expectTokenSelect(token.symbol)
