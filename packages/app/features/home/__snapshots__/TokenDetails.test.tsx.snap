@@ -498,7 +498,7 @@ exports[`TokenDetails 1`] = `
                     {
                       "color": "#FFFFFF",
                       "fontFamily": "System",
-                      "fontSize": 21.599999999999998,
+                      "fontSize": 19.2,
                     }
                   }
                   suppressHighlighting={true}
@@ -765,7 +765,7 @@ exports[`TokenDetails 1`] = `
                     {
                       "color": "#FFFFFF",
                       "fontFamily": "System",
-                      "fontSize": 21.599999999999998,
+                      "fontSize": 19.2,
                     }
                   }
                   suppressHighlighting={true}
@@ -1032,7 +1032,7 @@ exports[`TokenDetails 1`] = `
                     {
                       "color": "#FFFFFF",
                       "fontFamily": "System",
-                      "fontSize": 21.599999999999998,
+                      "fontSize": 19.2,
                     }
                   }
                   suppressHighlighting={true}
