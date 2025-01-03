@@ -27,7 +27,7 @@ export function TokenActivityRow({ activity }: { activity: Activity }) {
         <ActivityAvatar activity={activity} />
         <YStack gap="$1.5" width={'100%'} f={1} overflow="hidden">
           <XStack fd="row" jc="space-between" gap="$1.5" f={1} width={'100%'}>
-            <Text color="$color12" fontSize="$6" $gtMd={{ fontSize: '$5' }}>
+            <Text color="$color12" fontSize="$5">
               {eventName}
             </Text>
             <Text color="$color12" fontSize="$5" ta="right">

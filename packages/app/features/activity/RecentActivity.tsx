@@ -1,24 +1,16 @@
-import { Button, Paragraph, Spinner, XStack, YStack, Fade } from '@my/ui'
+import { Button, Fade, Paragraph, Spinner, YGroup, YStack } from '@my/ui'
 import { useActivityFeed } from './utils/useActivityFeed'
-import { TableLabel, RowLabel } from './screen'
-import { ActivityRow } from './ActivityRow'
-import { Fragment } from 'react'
+import { RowLabel } from './screen'
 import type { PostgrestError } from '@supabase/postgrest-js'
-import type { UseInfiniteQueryResult, InfiniteData } from '@tanstack/react-query'
+import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
 import type { ZodError } from 'zod'
 import type { Activity } from 'app/utils/zod/activity'
+import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
 
 export function RecentActivity() {
   const result = useActivityFeed()
   return (
-    <YStack gap="$5" mb="$4" width={'100%'} testID={'RecentActivity'}>
-      <XStack ai="center" jc="space-between" display="none" $gtMd={{ display: 'flex' }}>
-        <TableLabel>Transactions</TableLabel>
-        <XStack gap="$4">
-          <TableLabel textAlign="right">Date</TableLabel>
-          <TableLabel textAlign="right">Amount</TableLabel>
-        </XStack>
-      </XStack>
+    <YStack gap="$5" width={'100%'} testID={'RecentActivity'}>
       <ActivityFeed {...result} />
     </YStack>
   )
@@ -36,10 +28,11 @@ function ActivityFeed(
     fetchNextPage,
     hasNextPage,
   } = activityFeedQuery
+
   const { pages } = data ?? {}
+
   return (
     <YStack gap="$5">
-      {/* <> */}
       {(() => {
         switch (true) {
           case isLoadingActivities:
@@ -57,26 +50,42 @@ function ActivityFeed(
               </>
             )
           default: {
-            let lastDate: string | undefined
-            return pages?.map((activities) => {
-              return activities?.map((activity) => {
-                const date = activity.created_at.toLocaleDateString()
-                const isNewDate = !lastDate || date !== lastDate
-                if (isNewDate) {
-                  lastDate = date
+            const groups = (pages || [])
+              .flatMap((activity) => activity)
+              .reduce<Record<string, Activity[]>>((acc, activity) => {
+                const isToday = activity.created_at.toDateString() === new Date().toDateString()
+
+                const dateKey = isToday
+                  ? 'Today'
+                  : activity.created_at.toLocaleDateString(undefined, {
+                      day: 'numeric',
+                      month: 'long',
+                    })
+
+                if (!acc[dateKey]) {
+                  acc[dateKey] = []
                 }
-                return (
-                  <Fragment
-                    key={`${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`}
-                  >
-                    {isNewDate ? <RowLabel>{lastDate}</RowLabel> : null}
-                    <Fade>
-                      <ActivityRow activity={activity} />
-                    </Fade>
-                  </Fragment>
-                )
-              })
-            })
+
+                acc[dateKey].push(activity)
+                return acc
+              }, {})
+
+            return Object.entries(groups).map(([date, activities]) => (
+              <YStack key={date} gap={'$3'}>
+                <RowLabel>{date}</RowLabel>
+                <Fade>
+                  <YGroup bc={'$color1'} p={'$4.5'} gap={'$4'}>
+                    {activities.map((activity) => (
+                      <YGroup.Item
+                        key={`${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`}
+                      >
+                        <TokenActivityRow activity={activity} />
+                      </YGroup.Item>
+                    ))}
+                  </YGroup>
+                </Fade>
+              </YStack>
+            ))
           }
         }
       })()}
@@ -93,6 +102,7 @@ function ActivityFeed(
                 color="$color10"
                 width={200}
                 mx="auto"
+                mt={'$3'}
               >
                 Load More
               </Button>
