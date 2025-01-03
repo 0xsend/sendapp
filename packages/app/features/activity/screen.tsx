@@ -43,6 +43,16 @@ function ActivityBody() {
 
   return (
     <AnimatePresence>
+      {isLoading && (
+        <YStack
+          $gtLg={{
+            maxWidth: '600px',
+          }}
+        >
+          <Spinner size="small" />
+        </YStack>
+      )}
+
       {error && (
         <YStack key="red" gap="$4" mb="$4">
           <H4 theme={'alt2'}>Error</H4>
@@ -54,22 +64,14 @@ function ActivityBody() {
 
       {results === null && !isLoading && !error && (
         <YStack
+          gap={'$4'}
           key="suggestions"
           animation="quick"
-          gap="$size.1.5"
-          mb="$4"
-          mt="$6"
-          $gtSm={{ gap: '$size.2.5' }}
           exitStyle={{
             opacity: 0,
             y: 10,
           }}
         >
-          {/*
-            <Separator $gtMd={{ display: 'none' }} />
-            <Suggestions />
-          */}
-
           <RecentActivity />
         </YStack>
       )}
@@ -144,16 +146,7 @@ export function TableLabel({
 
 export function RowLabel({ children }: PropsWithChildren) {
   return (
-    <H4
-      // @TODO: Update with theme color variable
-      color="hsl(0, 0%, 42.5%)"
-      fontFamily={'$mono'}
-      fontWeight={'500'}
-      size={'$5'}
-      mt="$3"
-      display="none"
-      $gtMd={{ display: 'inline' }}
-    >
+    <H4 fontWeight={'600'} size={'$6'} $gtLg={{ size: '$7' }}>
       {children}
     </H4>
   )

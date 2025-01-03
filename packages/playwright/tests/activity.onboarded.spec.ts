@@ -220,7 +220,7 @@ test('can visit activity page and see correct activity feed', async ({
   await expect(loadMoreButton).toBeHidden()
 
   // Verify each row of the activity feed
-  const activityRows = page.getByTestId('ActivityRow')
+  const activityRows = page.getByTestId('TokenActivityRow')
   expect.soft(await activityRows.count()).toBeGreaterThanOrEqual(10)
 
   // Referral reward

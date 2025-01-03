@@ -81,6 +81,7 @@ export const TagSearchProvider = ({ children }: { children: React.ReactNode }) =
       setIsLoading(false)
       setError(null)
       setResults(null)
+      onSearch.cancel()
     }
   }, [query, onSearch])
 
