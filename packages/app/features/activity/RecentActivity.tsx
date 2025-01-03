@@ -10,7 +10,13 @@ import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
 export function RecentActivity() {
   const result = useActivityFeed()
   return (
-    <YStack gap="$5" width={'100%'} testID={'RecentActivity'}>
+    <YStack
+      gap="$5"
+      testID={'RecentActivity'}
+      $gtLg={{
+        maxWidth: '50%',
+      }}
+    >
       <ActivityFeed {...result} />
     </YStack>
   )
