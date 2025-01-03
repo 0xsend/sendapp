@@ -339,6 +339,7 @@ exports[`TokenDetails 1`] = `
               "width": "100%",
             }
           }
+          testID="TokenActivityRow"
         >
           <View
             style={
@@ -606,6 +607,7 @@ exports[`TokenDetails 1`] = `
               "width": "100%",
             }
           }
+          testID="TokenActivityRow"
         >
           <View
             style={
@@ -873,6 +875,7 @@ exports[`TokenDetails 1`] = `
               "width": "100%",
             }
           }
+          testID="TokenActivityRow"
         >
           <View
             style={
