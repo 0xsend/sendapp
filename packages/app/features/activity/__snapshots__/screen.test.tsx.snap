@@ -863,7 +863,6 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
         {
           "flexDirection": "column",
           "gap": 24,
-          "width": "100%",
         }
       }
       testID="RecentActivity"
@@ -959,6 +958,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                     "width": "100%",
                   }
                 }
+                testID="TokenActivityRow"
               >
                 <View
                   style={
@@ -1199,6 +1199,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                     "width": "100%",
                   }
                 }
+                testID="TokenActivityRow"
               >
                 <View
                   style={
@@ -1444,6 +1445,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                     "width": "100%",
                   }
                 }
+                testID="TokenActivityRow"
               >
                 <View
                   style={
@@ -1694,6 +1696,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                     "width": "100%",
                   }
                 }
+                testID="TokenActivityRow"
               >
                 <View
                   style={
@@ -2009,6 +2012,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                     "width": "100%",
                   }
                 }
+                testID="TokenActivityRow"
               >
                 <View
                   style={
@@ -2245,6 +2249,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                     "width": "100%",
                   }
                 }
+                testID="TokenActivityRow"
               >
                 <View
                   style={
@@ -2556,6 +2561,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                     "width": "100%",
                   }
                 }
+                testID="TokenActivityRow"
               >
                 <View
                   style={
@@ -2886,6 +2892,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                     "width": "100%",
                   }
                 }
+                testID="TokenActivityRow"
               >
                 <View
                   style={
@@ -3211,6 +3218,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                     "width": "100%",
                   }
                 }
+                testID="TokenActivityRow"
               >
                 <View
                   style={
