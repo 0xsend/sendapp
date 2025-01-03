@@ -71,9 +71,6 @@ function ActivityBody() {
             opacity: 0,
             y: 10,
           }}
-          $gtLg={{
-            maxWidth: '50%',
-          }}
         >
           <RecentActivity />
         </YStack>
