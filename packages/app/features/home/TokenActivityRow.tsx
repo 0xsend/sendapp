@@ -22,7 +22,14 @@ export function TokenActivityRow({ activity }: { activity: Activity }) {
   const isETHReceive = isSendAccountReceiveEvent(activity)
 
   return (
-    <XStack width={'100%'} ai="center" jc="space-between" gap="$4" pb="$2">
+    <XStack
+      width={'100%'}
+      ai="center"
+      jc="space-between"
+      gap="$4"
+      pb="$2"
+      testID={'TokenActivityRow'}
+    >
       <XStack gap="$3.5" width={'100%'} f={1}>
         <ActivityAvatar activity={activity} />
         <YStack gap="$1.5" width={'100%'} f={1} overflow="hidden">
