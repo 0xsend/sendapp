@@ -117,7 +117,7 @@ export function ActivityRewardsScreen() {
               distribution={distributions[selectedDistributionIndex]}
               verificationsQuery={verificationsQuery}
             />
-            <TasksCards
+            <TaskCards
               distribution={distributions[selectedDistributionIndex]}
               verificationsQuery={verificationsQuery}
             />
@@ -294,7 +294,7 @@ const DistributionRequirementsCard = ({
   )
 }
 
-const TasksCards = ({
+const TaskCards = ({
   distribution,
   verificationsQuery,
 }: {
@@ -320,25 +320,41 @@ const TasksCards = ({
   const now = new Date()
   const isQualificationOver = distribution.qualification_end < now
 
+  const filteredVerifications = verifications?.verification_values?.filter(
+    ({ fixed_value, weight }) =>
+      (fixed_value > 0 && !isQualificationOver) ||
+      (isQualificationOver && weight !== 0 && fixed_value > 0)
+  )
+
+  if (!filteredVerifications) return null
+
+  const groupedByType = filteredVerifications.reduce<
+    Record<string, (typeof filteredVerifications)[0]>
+  >((acc, verification) => {
+    if (!acc[verification.type]) {
+      acc[verification.type] = { ...verification, weight: 0 }
+    }
+    // @ts-expect-error ts doesn't know that we created the object above
+    acc[verification.type].weight += verification.weight
+    return acc
+  }, {})
+
+  const combinedVerifications = Object.values(groupedByType)
+
   return (
     <YStack f={1} w={'100%'} gap="$5">
       <H3 fontWeight={'600'} color={'$color12'}>
         Tasks
       </H3>
       <Stack flexWrap="wrap" gap="$5" $gtXs={{ fd: 'row' }}>
-        {verifications?.verification_values
-          ?.filter(
-            ({ fixed_value, weight }) =>
-              (fixed_value > 0 && !isQualificationOver) ||
-              (isQualificationOver && weight !== 0 && fixed_value > 0)
-          )
+        {combinedVerifications
           .sort((a, b) => {
             const orderA = Object.keys(verificationTypesAndTitles).indexOf(a.type)
             const orderB = Object.keys(verificationTypesAndTitles).indexOf(b.type)
             return orderA - orderB
           })
           .map((verification) => (
-            <PerkCard
+            <TaskCard
               key={verification.type}
               verification={verification}
               isQualificationOver={isQualificationOver}
@@ -346,14 +362,14 @@ const TasksCards = ({
               <H3 fontWeight={'600'} color={'$color12'}>
                 {verificationTypesAndTitles[verification.type]?.title}
               </H3>
-            </PerkCard>
+            </TaskCard>
           ))}
       </Stack>
     </YStack>
   )
 }
 
-const PerkCard = ({
+const TaskCard = ({
   verification,
   isQualificationOver,
   children,
@@ -365,9 +381,8 @@ const PerkCard = ({
 }) => {
   const type = verification.type
   const metadata = verification.metadata
-  const weight = ['send_ten', 'send_one_hundred'].includes(type)
-    ? metadata?.[0]?.value ?? 0
-    : verification.weight
+  const weight = verification.weight
+  const value = ['send_ten', 'send_one_hundred'].includes(type) ? metadata?.[0]?.value ?? 0 : weight
   const isSendStreak = type === 'send_streak'
   const isTagRegistration = type === 'tag_registration'
   const isCompleted = (() => {
@@ -388,14 +403,7 @@ const PerkCard = ({
             <XStack ai="center" gap="$2">
               <CheckCircle2 $theme-light={{ color: '$color12' }} color="$primary" size={'$1.5'} />
               <Paragraph color="$color11">
-                {(() => {
-                  if (isSendStreak && !isQualificationOver) {
-                    // say ongoing instead of completed
-                    return 'Ongoing'
-                  }
-
-                  return 'Completed'
-                })()}
+                {isSendStreak && !isQualificationOver ? 'Ongoing' : 'Completed'}
               </Paragraph>
             </XStack>
             {(isSendStreak || isTagRegistration) && (
@@ -408,7 +416,7 @@ const PerkCard = ({
                 $theme-light={{ borderColor: '$color12' }}
                 borderRadius={'$4'}
               >
-                {weight ?? 0}
+                {value ?? 0}
               </Paragraph>
             )}
           </>
