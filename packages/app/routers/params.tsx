@@ -8,6 +8,7 @@ export type RootParams = {
   nav?: 'home' | 'settings'
   token?: allCoins[number]['token']
   search?: string
+  modal?: 'profile'
 }
 
 const { useParam: useRootParam, useParams: useRootParams } = createParam<RootParams>()
@@ -30,17 +31,25 @@ const useSearch = () => {
   return [search, setSearchParam] as const
 }
 
+const useModal = () => {
+  const [modal, setModalParam] = useRootParam('modal')
+
+  return [modal, setModalParam] as const
+}
+
 export const useRootScreenParams = () => {
   const { setParams } = useRootParams()
   const [nav] = useNav()
   const [token] = useToken()
   const [search] = useSearch()
+  const [modal] = useModal()
 
   return [
     {
       nav,
       token,
       search,
+      modal,
     },
     setParams,
   ] as const
