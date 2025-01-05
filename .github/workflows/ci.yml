@@ -14,7 +14,7 @@ concurrency:
 jobs:
   # set yarn cache
   cache-deps:
-    runs-on: self-hosted
+    runs-on: arc-runner-set
 
     steps:
       - uses: actions/checkout@v4
@@ -33,7 +33,7 @@ jobs:
 
   unit-tests:
     name: Unit Tests
-    runs-on: self-hosted
+    runs-on: arc-runner-set
     needs: [cache-deps]
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
@@ -100,8 +100,8 @@ jobs:
   playwright-tests:
     # **always** skip if not dev or main to save resources
     name: Playwright Tests
-    if: ${{ github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' || github.head_ref == 'dev' || github.head_ref == 'main' }}
-    runs-on: self-hosted
+    # if: ${{ github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' || github.head_ref == 'dev' || github.head_ref == 'main' }}
+    runs-on: arc-runner-set
     needs: [cache-deps]
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
@@ -244,7 +244,14 @@ jobs:
               exit 1
             fi
           done
-          yarn playwright test
+          # never scheduler more than 4 workers or up to 50% of the available cores
+          # this is due to concurrency issues within the send account sign up and resource contention
+          workers=$(node -e '
+            const os = require("os");
+            const cpus = os.cpus().length;
+            console.log(Math.min(4, Math.max(1, Math.floor(cpus * (parseInt("50%", 10) / 100)))));
+          ')
+          yarn playwright test --workers=$workers
       - name: Playwright Markdown Report
         if: always() && steps.playwright.outcome != 'skipped'
         id: playwright-md-report
@@ -286,7 +293,7 @@ jobs:
   vercel-deploy-preview:
     # **always** skip if on dev and main since it will be deployed with another workflow
     if: ${{ github.ref != 'refs/heads/dev' && github.ref != 'refs/heads/main' && github.head_ref != 'dev' && github.head_ref != 'main'  }}
-    runs-on: ubuntu-latest
+    runs-on: arc-runner-set
     needs: [cache-deps]
 
     permissions:
