@@ -320,34 +320,18 @@ const TaskCards = ({
   const now = new Date()
   const isQualificationOver = distribution.qualification_end < now
 
-  const filteredVerifications = verifications?.verification_values?.filter(
-    ({ fixed_value, weight }) =>
-      (fixed_value > 0 && !isQualificationOver) ||
-      (isQualificationOver && weight !== 0 && fixed_value > 0)
-  )
-
-  if (!filteredVerifications) return null
-
-  const groupedByType = filteredVerifications.reduce<
-    Record<string, (typeof filteredVerifications)[0]>
-  >((acc, verification) => {
-    if (!acc[verification.type]) {
-      acc[verification.type] = { ...verification, weight: 0 }
-    }
-    // @ts-expect-error ts doesn't know that we created the object above
-    acc[verification.type].weight += verification.weight
-    return acc
-  }, {})
-
-  const combinedVerifications = Object.values(groupedByType)
-
   return (
     <YStack f={1} w={'100%'} gap="$5">
       <H3 fontWeight={'600'} color={'$color12'}>
         Tasks
       </H3>
       <Stack flexWrap="wrap" gap="$5" $gtXs={{ fd: 'row' }}>
-        {combinedVerifications
+        {verifications?.verification_values
+          ?.filter(
+            ({ fixed_value, weight }) =>
+              (fixed_value > 0 && !isQualificationOver) ||
+              (isQualificationOver && weight !== 0 && fixed_value > 0)
+          )
           .sort((a, b) => {
             const orderA = Object.keys(verificationTypesAndTitles).indexOf(a.type)
             const orderB = Object.keys(verificationTypesAndTitles).indexOf(b.type)
@@ -437,7 +421,7 @@ const TaskCard = ({
               $theme-light={{ borderColor: '$color12' }}
               borderRadius={'$4'}
             >
-              {weight ?? 0}
+              {value ?? 0}
             </Paragraph>
           </>
         )}
