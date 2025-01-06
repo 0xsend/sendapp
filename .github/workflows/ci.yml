@@ -257,14 +257,12 @@ jobs:
         id: playwright-md-report
         shell: bash
         run: |
-          echo "Markdown report:"
           echo "------------------"
           bun run packages/playwright/bin/report-markdown.ts > playwright-report.md
           cat playwright-report.md
           echo "------------------"
-          echo "Markdown report end"
       - uses: mshick/add-pr-comment@v2
-        if: always() && steps.playwright.outcome != 'skipped'
+        if: always() && steps.playwright.outcome != 'skipped' && steps.playwright-md-report.outcome == 'success'
         with:
           message-id: playwright-report
           refresh-message-position: true
