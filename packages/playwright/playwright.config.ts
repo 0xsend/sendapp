@@ -1,4 +1,10 @@
 import { defineConfig, devices } from '@playwright/test'
+import os from 'node:os'
+
+const cpus = os.cpus().length
+// never scheduler more than 4 workers or up to 50% of the available cores
+// this is due to concurrency issues within the send account sign up and resource contention
+const workers = Math.min(4, Math.max(1, Math.floor(cpus * (Number.parseInt('50%', 10) / 100))))
 
 // @ts-expect-error set __DEV__ for code shared between react-native
 globalThis.__DEV__ = false
@@ -34,7 +40,7 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
-  // workers: process.env.CI ? 1 : undefined,
+  workers,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     process.env.CI ? ['github'] : ['list'],

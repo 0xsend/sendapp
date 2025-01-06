@@ -1,17 +1,19 @@
 name: Docker Build
 on:
-  pull_request:
-    types:
-      - closed
-    branches:
-      - 'releases/**'
-      - 'dev'
-      - 'main'
+  # manual trigger for now
+  # pull_request:
+  #   types:
+  #     - closed
+  #   branches:
+  #     - 'releases/**'
+  #     - 'dev'
+  #     - 'main'
+  workflow_dispatch:
 jobs:
   build-docker:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-#    needs: [cache-deps]
+    #    needs: [cache-deps]
     steps:
       - uses: actions/checkout@v4
         with:
