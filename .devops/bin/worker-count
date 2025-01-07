@@ -1,0 +1,30 @@
+#!/usr/bin/env node
+const fs = require('node:fs')
+const TARGET_PERCENT = process.env.WORKER_PERCENT || '100%'
+const MAX_WORKERS = process.env.MAX_WORKERS || Number.MAX_SAFE_INTEGER
+
+function getCgroupV2CpusOrMax() {
+  try {
+    const data = fs.readFileSync('/sys/fs/cgroup/cpu.max', 'utf8')
+    const [quotaStr, periodStr] = data.trim().split(' ')
+
+    if (quotaStr === 'max') {
+      return require('node:os').cpus().length
+    }
+
+    const quota = Number(quotaStr)
+    const period = Number(periodStr)
+
+    if (Number.isNaN(quota) || Number.isNaN(period)) {
+      return require('node:os').cpus().length
+    }
+
+    return Math.ceil(quota / period)
+  } catch (err) {
+    return require('node:os').cpus().length
+  }
+}
+
+const cpus = getCgroupV2CpusOrMax()
+const percent = Number.parseInt(TARGET_PERCENT, 10) / 100
+console.log(Math.min(MAX_WORKERS, Math.max(1, Math.floor(cpus * percent))))
