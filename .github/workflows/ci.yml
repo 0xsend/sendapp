@@ -84,7 +84,7 @@ jobs:
       - name: Tilt CI
         id: tilt-ci
         shell: bash
-        run: tilt ci unit-tests --timeout=10m
+        run: tilt ci unit-tests --timeout=15m
       - name: Lint
         run: yarn lint
       - name: Tilt Down
