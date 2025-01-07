@@ -10,13 +10,14 @@ max_workers = str(local(
     "./.devops/bin/worker-count",
     dir = config.main_dir,
     echo_off = True,
+    env = {"WORKER_PERCENT": os.environ.get("WORKER_PERCENT", "100%")},
     quiet = True,
 )).strip()
 
 local_resource(
     "app:test",
     """
-    echo "Running with $MAX_WORKERS workers" && yarn workspace app test -- --debug --maxWorkers=$MAX_WORKERS
+    echo "Running with $MAX_WORKERS workers" && yarn workspace app test --maxWorkers=$MAX_WORKERS
     """,
     allow_parallel = True,
     env = {"MAX_WORKERS": max_workers},
