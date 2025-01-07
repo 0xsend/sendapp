@@ -292,11 +292,10 @@ exports[`TokenDetails 1`] = `
           "borderTopLeftRadius": 16,
           "borderTopRightRadius": 16,
           "flexDirection": "column",
-          "gap": 24,
-          "paddingBottom": 24,
-          "paddingLeft": 24,
-          "paddingRight": 24,
-          "paddingTop": 24,
+          "paddingBottom": 7,
+          "paddingLeft": 7,
+          "paddingRight": 7,
+          "paddingTop": 7,
           "position": "relative",
         }
       }
@@ -335,7 +334,10 @@ exports[`TokenDetails 1`] = `
               "flexDirection": "row",
               "gap": 18,
               "justifyContent": "space-between",
-              "paddingBottom": 7,
+              "paddingBottom": 16,
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingTop": 16,
               "width": "100%",
             }
           }
@@ -477,7 +479,6 @@ exports[`TokenDetails 1`] = `
                 {
                   "flex": 1,
                   "flexDirection": "column",
-                  "gap": 4,
                   "overflow": "hidden",
                   "width": "100%",
                 }
@@ -499,7 +500,8 @@ exports[`TokenDetails 1`] = `
                     {
                       "color": "#FFFFFF",
                       "fontFamily": "System",
-                      "fontSize": 19.2,
+                      "fontSize": 21.599999999999998,
+                      "fontWeight": "500",
                     }
                   }
                   suppressHighlighting={true}
@@ -511,7 +513,8 @@ exports[`TokenDetails 1`] = `
                     {
                       "color": "#FFFFFF",
                       "fontFamily": "System",
-                      "fontSize": 19.2,
+                      "fontSize": 21.599999999999998,
+                      "fontWeight": "500",
                       "textAlign": "right",
                     }
                   }
@@ -538,7 +541,7 @@ exports[`TokenDetails 1`] = `
                     {
                       "color": "#B2B2B2",
                       "fontFamily": "System",
-                      "fontSize": 16.8,
+                      "fontSize": 19.2,
                       "fontWeight": "400",
                       "lineHeight": 19,
                       "maxWidth": "100%",
@@ -555,9 +558,10 @@ exports[`TokenDetails 1`] = `
                     {
                       "color": "#B2B2B2",
                       "fontFamily": "System",
-                      "fontSize": 15.6,
-                      "fontWeight": "300",
-                      "lineHeight": 18,
+                      "fontSize": 19.2,
+                      "fontWeight": "400",
+                      "lineHeight": 21,
+                      "textAlign": "right",
                       "userSelect": "auto",
                     }
                   }
@@ -603,7 +607,10 @@ exports[`TokenDetails 1`] = `
               "flexDirection": "row",
               "gap": 18,
               "justifyContent": "space-between",
-              "paddingBottom": 7,
+              "paddingBottom": 16,
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingTop": 16,
               "width": "100%",
             }
           }
@@ -745,7 +752,6 @@ exports[`TokenDetails 1`] = `
                 {
                   "flex": 1,
                   "flexDirection": "column",
-                  "gap": 4,
                   "overflow": "hidden",
                   "width": "100%",
                 }
@@ -767,7 +773,8 @@ exports[`TokenDetails 1`] = `
                     {
                       "color": "#FFFFFF",
                       "fontFamily": "System",
-                      "fontSize": 19.2,
+                      "fontSize": 21.599999999999998,
+                      "fontWeight": "500",
                     }
                   }
                   suppressHighlighting={true}
@@ -779,7 +786,8 @@ exports[`TokenDetails 1`] = `
                     {
                       "color": "#FFFFFF",
                       "fontFamily": "System",
-                      "fontSize": 19.2,
+                      "fontSize": 21.599999999999998,
+                      "fontWeight": "500",
                       "textAlign": "right",
                     }
                   }
@@ -806,7 +814,7 @@ exports[`TokenDetails 1`] = `
                     {
                       "color": "#B2B2B2",
                       "fontFamily": "System",
-                      "fontSize": 16.8,
+                      "fontSize": 19.2,
                       "fontWeight": "400",
                       "lineHeight": 19,
                       "maxWidth": "100%",
@@ -823,9 +831,10 @@ exports[`TokenDetails 1`] = `
                     {
                       "color": "#B2B2B2",
                       "fontFamily": "System",
-                      "fontSize": 15.6,
-                      "fontWeight": "300",
-                      "lineHeight": 18,
+                      "fontSize": 19.2,
+                      "fontWeight": "400",
+                      "lineHeight": 21,
+                      "textAlign": "right",
                       "userSelect": "auto",
                     }
                   }
@@ -871,7 +880,10 @@ exports[`TokenDetails 1`] = `
               "flexDirection": "row",
               "gap": 18,
               "justifyContent": "space-between",
-              "paddingBottom": 7,
+              "paddingBottom": 16,
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingTop": 16,
               "width": "100%",
             }
           }
@@ -1013,7 +1025,6 @@ exports[`TokenDetails 1`] = `
                 {
                   "flex": 1,
                   "flexDirection": "column",
-                  "gap": 4,
                   "overflow": "hidden",
                   "width": "100%",
                 }
@@ -1035,7 +1046,8 @@ exports[`TokenDetails 1`] = `
                     {
                       "color": "#FFFFFF",
                       "fontFamily": "System",
-                      "fontSize": 19.2,
+                      "fontSize": 21.599999999999998,
+                      "fontWeight": "500",
                     }
                   }
                   suppressHighlighting={true}
@@ -1047,7 +1059,8 @@ exports[`TokenDetails 1`] = `
                     {
                       "color": "#FFFFFF",
                       "fontFamily": "System",
-                      "fontSize": 19.2,
+                      "fontSize": 21.599999999999998,
+                      "fontWeight": "500",
                       "textAlign": "right",
                     }
                   }
@@ -1072,17 +1085,22 @@ exports[`TokenDetails 1`] = `
                 <View
                   href="/profile/42"
                   testID="MockSolitoLink"
+                  viewProps={
+                    {
+                      "style": {
+                        "maxWidth": "60%",
+                      },
+                    }
+                  }
                 >
                   <Text
                     style={
                       {
                         "color": "#B2B2B2",
                         "fontFamily": "System",
-                        "fontSize": 16.8,
+                        "fontSize": 19.2,
                         "fontWeight": "400",
                         "lineHeight": 19,
-                        "maxWidth": "100%",
-                        "overflow": "hidden",
                         "textDecorationLine": "underline",
                         "userSelect": "auto",
                       }
@@ -1097,9 +1115,10 @@ exports[`TokenDetails 1`] = `
                     {
                       "color": "#B2B2B2",
                       "fontFamily": "System",
-                      "fontSize": 15.6,
-                      "fontWeight": "300",
-                      "lineHeight": 18,
+                      "fontSize": 19.2,
+                      "fontWeight": "400",
+                      "lineHeight": 21,
+                      "textAlign": "right",
                       "userSelect": "auto",
                     }
                   }

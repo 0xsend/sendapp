@@ -38,6 +38,11 @@ interface TopNavProps {
    * @default "root"
    */
   backFunction?: 'root' | 'pop' | 'router' | 'home'
+  /**
+   * Show header even on greater than large screens
+   * @default false
+   */
+  showOnGtLg?: boolean
 }
 
 export function AvatarMenuButton({ profile }: { profile?: Tables<'profiles'> | null }) {
@@ -77,6 +82,7 @@ export function TopNav({
   showLogo = false,
   noSubroute = false,
   backFunction = 'root',
+  showOnGtLg = false,
 }: TopNavProps) {
   const [queryParams, setRootParams] = useRootScreenParams()
   const path = usePathname()
@@ -145,7 +151,7 @@ export function TopNav({
                   {header}
                 </H2>
               )
-            case media.gtLg:
+            case media.gtLg && !showOnGtLg:
               return null
             case hasSelectedCoin:
               return (

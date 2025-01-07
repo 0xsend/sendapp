@@ -27,17 +27,18 @@ export function TokenActivityRow({ activity }: { activity: Activity }) {
       ai="center"
       jc="space-between"
       gap="$4"
-      pb="$2"
+      p="$3.5"
+      $gtLg={{ p: '$5' }}
       testID={'TokenActivityRow'}
     >
       <XStack gap="$3.5" width={'100%'} f={1}>
         <ActivityAvatar activity={activity} />
-        <YStack gap="$1.5" width={'100%'} f={1} overflow="hidden">
+        <YStack width={'100%'} f={1} overflow="hidden">
           <XStack fd="row" jc="space-between" gap="$1.5" f={1} width={'100%'}>
-            <Text color="$color12" fontSize="$5">
+            <Text color="$color12" fontSize="$6" fontWeight={'500'}>
               {eventName}
             </Text>
-            <Text color="$color12" fontSize="$5" ta="right">
+            <Text color="$color12" fontSize="$6" fontWeight={'500'} ta="right">
               {amount}
             </Text>
           </XStack>
@@ -56,13 +57,14 @@ export function TokenActivityRow({ activity }: { activity: Activity }) {
                 href={`/profile/${
                   profile?.send_id === from_user?.send_id ? to_user?.send_id : from_user?.send_id
                 }`}
+                viewProps={{
+                  style: { maxWidth: '60%' },
+                }}
               >
                 <Paragraph
                   color="$color10"
                   fontFamily={'$mono'}
-                  maxWidth={'100%'}
-                  overflow={'hidden'}
-                  fontSize="$4"
+                  fontSize="$5"
                   textDecorationLine="underline"
                 >
                   {subtext}
@@ -74,12 +76,12 @@ export function TokenActivityRow({ activity }: { activity: Activity }) {
                 fontFamily={'$mono'}
                 maxWidth={'100%'}
                 overflow={'hidden'}
-                fontSize="$4"
+                fontSize="$5"
               >
                 {subtext}
               </Paragraph>
             )}
-            <Paragraph color="$color10" size={'$3'}>
+            <Paragraph color="$color10" size={'$5'} textAlign={'right'}>
               {date}
             </Paragraph>
           </XStack>
