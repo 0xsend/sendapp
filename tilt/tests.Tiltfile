@@ -6,10 +6,21 @@ load("ext://uibutton", "cmd_button", "location")
 
 labels = ["test"]
 
+max_workers = str(local(
+    "./.devops/bin/worker-count",
+    dir = config.main_dir,
+    echo_off = True,
+    env = {"WORKER_PERCENT": os.environ.get("WORKER_PERCENT", "100%")},
+    quiet = True,
+)).strip()
+
 local_resource(
     "app:test",
-    "yarn workspace app test",
+    """
+    echo "Running with $MAX_WORKERS workers" && yarn workspace app test --maxWorkers=$MAX_WORKERS
+    """,
     allow_parallel = True,
+    env = {"MAX_WORKERS": max_workers},
     labels = labels,
     resource_deps = [
         "yarn:install",

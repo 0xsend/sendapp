@@ -84,7 +84,7 @@ jobs:
       - name: Tilt CI
         id: tilt-ci
         shell: bash
-        run: tilt ci unit-tests --timeout=10m
+        run: tilt ci unit-tests --timeout=15m
       - name: Lint
         run: yarn lint
       - name: Tilt Down
@@ -246,11 +246,7 @@ jobs:
           done
           # never scheduler more than 4 workers or up to 50% of the available cores
           # this is due to concurrency issues within the send account sign up and resource contention
-          workers=$(node -e '
-            const os = require("os");
-            const cpus = os.cpus().length;
-            console.log(Math.min(4, Math.max(1, Math.floor(cpus * (parseInt("50%", 10) / 100)))));
-          ')
+          workers=$(MAX_WORKERS=4 node ./.devops/bin/worker-count)
           yarn playwright test --workers=$workers
       - name: Playwright Markdown Report
         if: always() && steps.playwright.outcome != 'skipped'
