@@ -58,7 +58,7 @@ function SearchResults() {
   const [resultsFilter, setResultsFilter] = useState<SearchResultsKeysType | null>(null)
   if (isLoading) {
     return (
-      <YStack key="loading" gap="$4" mt="$4" $gtLg={{ w: 600 }}>
+      <YStack key="loading" gap="$4" mt="$4" $gtLg={{ w: '50%' }}>
         <Spinner size="large" color="$olive" />
       </YStack>
     )
@@ -142,7 +142,7 @@ function SearchResults() {
           bc={'$color1'}
           p={'$3'}
           $gtLg={{
-            width: '600px',
+            width: '50%',
           }}
         >
           {SEARCH_RESULTS_KEYS.map((key) =>
@@ -237,7 +237,7 @@ const AddressSearchResultRow = ({ address }: { address: Address }) => {
       key={`SearchResultRow-${address}`}
       width="100%"
       testID="searchResults"
-      $gtLg={{ width: '600px' }}
+      $gtLg={{ width: '50%' }}
     >
       <Card
         testID={`tag-search-${address}`}
@@ -513,9 +513,6 @@ function Search({ label, placeholder = 'Search' }: SearchProps) {
                 fontWeight: 'normal',
                 br: '$4',
                 bw: 0,
-                $gtLg: {
-                  w: 600,
-                },
                 hoverStyle: {
                   bw: 0,
                 },
@@ -562,7 +559,8 @@ function Search({ label, placeholder = 'Search' }: SearchProps) {
                 maxWidth: '100%',
               },
               $gtLg: {
-                w: 600,
+                width: '50%',
+                maxWidth: '50%',
                 als: 'flex-start',
               },
             }}

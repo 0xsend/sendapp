@@ -40,7 +40,7 @@ export const TokenDetailsHistory = ({ coin }: { coin: CoinWithBalance }) => {
           default: {
             let lastDate: string | undefined
             return (
-              <Card gap="$5" testID="TokenDetailsHistory" p="$5">
+              <Card testID="TokenDetailsHistory" p="$2" $gtLg={{ p: '$3.5' }}>
                 {pages?.map((activities) => {
                   return activities.map((activity) => {
                     const date = activity.created_at.toLocaleDateString()
@@ -62,7 +62,9 @@ export const TokenDetailsHistory = ({ coin }: { coin: CoinWithBalance }) => {
                 <AnimateEnter>
                   {!isLoadingActivities && (isFetchingNextPageActivities || hasNextPage) ? (
                     <>
-                      {isFetchingNextPageActivities && <Spinner size="small" color={'$color12'} />}
+                      {isFetchingNextPageActivities && (
+                        <Spinner size="small" color={'$color12'} mb="$3.5" />
+                      )}
                       {hasNextPage && (
                         <Button
                           onPress={() => {
@@ -72,7 +74,7 @@ export const TokenDetailsHistory = ({ coin }: { coin: CoinWithBalance }) => {
                           color="$color0"
                           width={200}
                           mx="auto"
-                          mb="$6"
+                          mb="$3.5"
                           bc="$color10"
                         >
                           Load More
