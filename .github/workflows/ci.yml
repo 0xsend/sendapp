@@ -112,7 +112,7 @@ jobs:
     permissions:
       pull-requests: write
 
-    timeout-minutes: 40
+    timeout-minutes: 45
 
     steps:
       - name: Install Tilt
@@ -184,7 +184,7 @@ jobs:
           sleep 1
           echo tilt is ready
           max_attempts=60
-          wait_timeout=7
+          wait_timeout=10
           for ((i=1; i<=max_attempts; i++)); do
             echo "Attempt $i: Waiting for tilt with timeout ${wait_timeout}s"
 
