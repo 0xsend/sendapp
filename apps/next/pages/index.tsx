@@ -29,7 +29,7 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
   const [carouselProgress, setCarouselProgress] = useState(0)
   const queryClient = useQueryClient()
 
-  const cancelAndInvalidateAccountsQueries = useCallback(async () => {
+  const cancelAndRemoveAccountsQueries = useCallback(async () => {
     if (!session) {
       const options = { queryKey: [useSendAccount.queryKey] }
       await queryClient.cancelQueries(options)
@@ -42,8 +42,8 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
   }, [carouselImages, images])
 
   useEffect(() => {
-    void cancelAndInvalidateAccountsQueries()
-  }, [cancelAndInvalidateAccountsQueries])
+    void cancelAndRemoveAccountsQueries()
+  }, [cancelAndRemoveAccountsQueries])
 
   return (
     <>
