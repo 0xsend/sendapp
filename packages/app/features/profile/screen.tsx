@@ -16,7 +16,7 @@ import { AvatarProfile, type AvatarProfileProps } from './AvatarProfile'
 import { useInterUserActivityFeed } from './utils/useInterUserActivityFeed'
 import type { Activity } from 'app/utils/zod/activity'
 import { amountFromActivity } from 'app/utils/activity'
-import { Fragment, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { useProfileScreenParams } from 'app/routers/params'
 import { IconArrowRight } from 'app/components/icons'
 import { SendButton } from './ProfileButtons'
@@ -36,8 +36,10 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
     error,
   } = useProfileLookup('sendid', otherUserId?.toString() || '')
   const { user, profile: currentUserProfile } = useUser()
-  const media = useMedia()
   const [isProfileInfoVisible, setIsProfileInfoVisible] = useState<boolean>(false)
+  const [previousScrollHeight, setPreviousScrollHeight] = useState<number>(0)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const media = useMedia()
 
   const {
     data,
@@ -58,26 +60,48 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
     setIsProfileInfoVisible((prevState) => !prevState)
   }
 
+  const handleLoadMore = async () => {
+    if (containerRef.current) {
+      setPreviousScrollHeight(containerRef.current.scrollHeight)
+      void fetchNextPage()
+    }
+  }
+
+  useEffect(() => {
+    if (containerRef.current && pages?.length) {
+      if (pages.length === 1) {
+        containerRef.current.scrollTop = containerRef.current.scrollHeight
+      }
+
+      const container = containerRef.current
+      container.scrollTop = container.scrollHeight - previousScrollHeight
+    }
+  }, [pages?.length, previousScrollHeight])
+
   return (
     <XStack w={'100%'} gap={'$4'}>
       <YStack
         f={1}
         gap={'$2'}
         display={isProfileInfoVisible ? 'none' : 'flex'}
+        height={isWeb ? (media.short ? '75vh' : '80vh') : media.short ? '75%' : '80%'}
+        overflow={'hidden'}
         $gtLg={{
           display: 'flex',
           maxWidth: '50%',
-          overflow: 'hidden',
-          height: isWeb ? '80vh' : 'auto',
         }}
       >
+        {otherUserProfile && (
+          <ProfileHeader onPressOut={toggleIsProfileInfoVisible} profile={otherUserProfile} />
+        )}
         <YStack
+          ref={containerRef}
           f={1}
           gap="$6"
           flexGrow={1}
           className={'hide-scroll'}
           // @ts-expect-error typescript is complaining about overflowY not available and advising overflow. Overflow will work differently than overflowY here, overflowY is working fine
-          $gtLg={{ overflowY: 'scroll' }}
+          overflowY={'scroll'}
         >
           {error && (
             <Text theme="red" color={'$color8'}>
@@ -90,16 +114,38 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
             </Stack>
           )}
           {otherUserProfile ? (
-            <YStack
-              h={isWeb ? (media.shorter ? '83vh' : '88vh') : media.shorter ? '83%' : '88%'}
-              $gtMd={{ height: 'auto' }}
-            >
-              <Stack py="$size.3.5" pt={'$0'} $gtLg={{ h: 'auto', pt: '$0' }}>
-                <YStack width="100%" gap="$2">
-                  <ProfileHeader
-                    onPressOut={toggleIsProfileInfoVisible}
-                    profile={otherUserProfile}
-                  />
+            <YStack h={'100%'}>
+              <Stack>
+                <YStack width="100%" gap="$4">
+                  <Fade>
+                    {!isLoadingActivities && (isFetchingNextPageActivities || hasNextPage) ? (
+                      <>
+                        {(() => {
+                          switch (true) {
+                            case isFetchingNextPageActivities:
+                              return <Spinner size="small" color={'$primary'} mt={'$4'} />
+                            case hasNextPage:
+                              return (
+                                <Button
+                                  onPress={() => {
+                                    void handleLoadMore()
+                                  }}
+                                  disabled={isFetchingNextPageActivities || isFetchingActivities}
+                                  color="$color11"
+                                  width={200}
+                                  mx="auto"
+                                  mt={'$4'}
+                                >
+                                  Load More
+                                </Button>
+                              )
+                            default:
+                              return null
+                          }
+                        })()}
+                      </>
+                    ) : null}
+                  </Fade>
                   <YStack gap={'$size.1'}>
                     {(() => {
                       switch (true) {
@@ -135,55 +181,36 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                           )
                         default: {
                           let lastDate: string | undefined
-                          return pages?.map((activities) => {
-                            return activities?.map((activity) => {
-                              const date = activity.created_at.toLocaleDateString()
-                              const isNewDate = !lastDate || date !== lastDate
-                              if (isNewDate) {
-                                lastDate = date
-                              }
-                              return (
-                                <Fragment
-                                  key={`${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`}
-                                >
-                                  {isNewDate ? <DatePill date={date} /> : null}
-                                  <Fade>
-                                    <TransactionEntry
-                                      activity={activity}
-                                      sent={activity?.to_user?.id !== user?.id}
-                                      otherUserProfile={otherUserProfile}
-                                      currentUserProfile={currentUserProfile}
-                                    />
-                                  </Fade>
-                                </Fragment>
-                              )
-                            })
+
+                          const activities = (pages || [])
+                            .flatMap((activity) => activity)
+                            .sort((a, b) => a.created_at.getTime() - b.created_at.getTime())
+
+                          return activities?.map((activity) => {
+                            const date = activity.created_at.toLocaleDateString()
+                            const isNewDate = !lastDate || date !== lastDate
+                            if (isNewDate) {
+                              lastDate = date
+                            }
+                            return (
+                              <Fragment
+                                key={`${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`}
+                              >
+                                {isNewDate ? <DatePill date={date} /> : null}
+                                <Fade>
+                                  <TransactionEntry
+                                    activity={activity}
+                                    sent={activity?.to_user?.id !== user?.id}
+                                    otherUserProfile={otherUserProfile}
+                                    currentUserProfile={currentUserProfile}
+                                  />
+                                </Fade>
+                              </Fragment>
+                            )
                           })
                         }
                       }
                     })()}
-                    <Fade>
-                      {!isLoadingActivities && (isFetchingNextPageActivities || hasNextPage) ? (
-                        <>
-                          {isFetchingNextPageActivities && (
-                            <Spinner size="small" color={'$primary'} mb={'$4'} />
-                          )}
-                          {hasNextPage && (
-                            <Button
-                              onPress={() => {
-                                fetchNextPage()
-                              }}
-                              disabled={isFetchingNextPageActivities || isFetchingActivities}
-                              color="$color11"
-                              width={200}
-                              mx="auto"
-                            >
-                              Load More
-                            </Button>
-                          )}
-                        </>
-                      ) : null}
-                    </Fade>
                   </YStack>
                 </YStack>
               </Stack>
