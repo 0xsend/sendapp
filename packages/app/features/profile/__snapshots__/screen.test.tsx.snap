@@ -17,7 +17,7 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
         "flex": 1,
         "flexDirection": "column",
         "gap": 7,
-        "height": "80%",
+        "height": "85%",
         "overflow": "hidden",
       }
     }
@@ -280,7 +280,6 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
         {
           "flex": 1,
           "flexDirection": "column",
-          "flexGrow": 1,
           "gap": 32,
         }
       }
@@ -706,9 +705,9 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
       style={
         {
           "alignItems": "center",
-          "display": "none",
           "flexDirection": "row",
           "gap": 24,
+          "marginBottom": 18,
         }
       }
     >

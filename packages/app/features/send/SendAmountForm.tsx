@@ -180,7 +180,6 @@ export function SendAmountForm() {
                 onPress={submit}
                 py={'$5'}
                 br={'$4'}
-                mb={'$6'}
                 disabledStyle={{ opacity: 0.5 }}
                 disabled={!canSubmit}
               >

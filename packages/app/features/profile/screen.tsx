@@ -6,9 +6,9 @@ import {
   Spinner,
   Stack,
   Text,
-  useMedia,
   XStack,
   YStack,
+  useMedia,
 } from '@my/ui'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useUser } from 'app/utils/useUser'
@@ -16,7 +16,7 @@ import { AvatarProfile, type AvatarProfileProps } from './AvatarProfile'
 import { useInterUserActivityFeed } from './utils/useInterUserActivityFeed'
 import type { Activity } from 'app/utils/zod/activity'
 import { amountFromActivity } from 'app/utils/activity'
-import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { useProfileScreenParams } from 'app/routers/params'
 import { IconArrowRight } from 'app/components/icons'
 import { SendButton } from './ProfileButtons'
@@ -78,25 +78,13 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
     }
   }, [pages?.length, previousScrollHeight])
 
-  const containerHeight = useMemo(() => {
-    if (media.shorter) {
-      return isWeb ? '67vh' : '67%'
-    }
-
-    if (media.short) {
-      return isWeb ? '70vh' : '70%'
-    }
-
-    return isWeb ? '80vh' : '80%'
-  }, [media.short, media.shorter])
-
   return (
     <XStack w={'100%'} gap={'$4'}>
       <YStack
         f={1}
+        height={media.short ? (isWeb ? '78vh' : '78%') : isWeb ? '85vh' : '85%'}
         gap={'$2'}
         display={isProfileInfoVisible ? 'none' : 'flex'}
-        height={containerHeight}
         overflow={'hidden'}
         $gtLg={{
           display: 'flex',
@@ -110,7 +98,6 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
           ref={containerRef}
           f={1}
           gap="$6"
-          flexGrow={1}
           className={'hide-scroll'}
           // @ts-expect-error typescript is complaining about overflowY not available and advising overflow. Overflow will work differently than overflowY here, overflowY is working fine
           overflowY={'scroll'}
@@ -230,7 +217,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
           ) : null}
         </YStack>
         {Boolean(otherUserProfile) && user?.id !== otherUserProfile?.id ? (
-          <XStack gap="$size.1.5" ai={'center'} display="none" $gtLg={{ display: 'flex' }}>
+          <XStack gap="$size.1.5" ai={'center'} mb={'$4'}>
             <SendButton
               identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
               idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
@@ -309,7 +296,12 @@ const TransactionEntry = ({
             </YStack>
           </XStack>
         </YStack>
-        <Paragraph size={'$2'} textAlign={sent ? 'right' : 'left'} color={'$color4'}>
+        <Paragraph
+          size={'$2'}
+          textAlign={sent ? 'right' : 'left'}
+          color={'$color4'}
+          $theme-light={{ color: '$silverChalice' }}
+        >
           {date}
         </Paragraph>
       </YStack>
