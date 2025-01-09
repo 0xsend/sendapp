@@ -16,7 +16,7 @@ import { AvatarProfile, type AvatarProfileProps } from './AvatarProfile'
 import { useInterUserActivityFeed } from './utils/useInterUserActivityFeed'
 import type { Activity } from 'app/utils/zod/activity'
 import { amountFromActivity } from 'app/utils/activity'
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import { useProfileScreenParams } from 'app/routers/params'
 import { IconArrowRight } from 'app/components/icons'
 import { SendButton } from './ProfileButtons'
@@ -78,13 +78,25 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
     }
   }, [pages?.length, previousScrollHeight])
 
+  const containerHeight = useMemo(() => {
+    if (media.shorter) {
+      return isWeb ? '67vh' : '67%'
+    }
+
+    if (media.short) {
+      return isWeb ? '70vh' : '70%'
+    }
+
+    return isWeb ? '80vh' : '80%'
+  }, [media.short, media.shorter])
+
   return (
     <XStack w={'100%'} gap={'$4'}>
       <YStack
         f={1}
         gap={'$2'}
         display={isProfileInfoVisible ? 'none' : 'flex'}
-        height={isWeb ? (media.short ? '75vh' : '80vh') : media.short ? '75%' : '80%'}
+        height={containerHeight}
         overflow={'hidden'}
         $gtLg={{
           display: 'flex',
