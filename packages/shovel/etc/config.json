@@ -157,12 +157,11 @@
           "filter_arg": [
             "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
             "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
-            "0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A",
             "0x50dA645f148798F68EF2d7dB7C1CB22A6819bb2C",
-            "0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680",
             "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
             "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-            "0xE0f63A424a4439cBE457D80E4f4b51aD25b2c56C"
+            "0xE0f63A424a4439cBE457D80E4f4b51aD25b2c56C",
+            "0xEab49138BA2Ea6dd776220fE26b7b8E446638956"
           ]
         }
       ],
@@ -253,7 +252,8 @@
           "filter_op": "contains",
           "filter_arg": [
             "0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A",
-            "0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680"
+            "0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680",
+            "0xEab49138BA2Ea6dd776220fE26b7b8E446638956"
           ]
         }
       ],

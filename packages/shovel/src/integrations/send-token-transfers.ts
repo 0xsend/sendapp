@@ -1,5 +1,5 @@
 import type { BlockData, Column, Integration, Table } from '@indexsupply/shovel-config'
-import { sendTokenAddress } from '@my/wagmi'
+import { sendTokenAddress, sendTokenV0Address } from '@my/wagmi'
 
 export const transfersTable: Table = {
   name: 'send_token_transfers',
@@ -35,7 +35,10 @@ export const integration: Omit<Integration, 'sources'> = {
       name: 'log_addr',
       column: 'log_addr',
       filter_op: 'contains',
-      filter_arg: [...new Set(Object.values(sendTokenAddress))].sort(),
+      filter_arg: [
+        ...new Set(Object.values(sendTokenV0Address)),
+        ...new Set(Object.values(sendTokenAddress)),
+      ].sort(),
     },
   ] as BlockData[],
   event: {
