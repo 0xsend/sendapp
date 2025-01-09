@@ -7,6 +7,21 @@ import { base, baseSepolia, mainnet, sepolia } from 'viem/chains'
 import { localhost, baseLocal } from './src/chains'
 import { iEntryPointAbi } from './src'
 
+import sendTokenUpgradeBaseLocalAddresses from '@0xsend/send-token-upgrade/ignition/deployments/chain-845337/deployed_addresses.json' with {
+  type: 'json',
+}
+
+import sendTokenUpgradeBaseSepoliaAddresses from '@0xsend/send-token-upgrade/ignition/deployments/chain-84532/deployed_addresses.json' with {
+  type: 'json',
+}
+
+import sendTokenV0LockboxArtifact from '@0xsend/send-token-upgrade/artifacts/contracts/SendToken.sol/SendToken.json' with {
+  type: 'json',
+}
+import sendTokenV1Artifact from '@0xsend/send-token-upgrade/artifacts/contracts/SendToken.sol/SendToken.json' with {
+  type: 'json',
+}
+
 const broadcasts = (
   await globby([`${process.cwd()}/../contracts/broadcast/**/run-latest.json`])
 ).filter((f) => !f.includes('dry-run'))
@@ -149,12 +164,52 @@ export default defineConfig({
       },
       abi: multicall3Abi,
     },
+    {
+      // SendTokenModule#SendToken
+      name: 'SendTokenV0Lockbox',
+      // @ts-expect-error doesn't like the artifact
+      abi: sendTokenV0LockboxArtifact.abi,
+      address: {
+        [base.id]: sendTokenUpgradeBaseLocalAddresses[
+          'SendTokenModule#SendLockbox'
+        ] as `0x${string}`,
+        [baseLocal.id]: sendTokenUpgradeBaseLocalAddresses[
+          'SendTokenModule#SendLockbox'
+        ] as `0x${string}`,
+        [baseSepolia.id]: sendTokenUpgradeBaseSepoliaAddresses[
+          'SendTokenModule#SendLockbox'
+        ] as `0x${string}`,
+
+        // we probably don't need these
+        // [localhost.id]: sendTokenUpgradeAddresses['SendTokenModule#SendLockbox'] as `0x${string}`,
+        // [sepolia.id]: sendTokenUpgradeAddresses['SendTokenModule#SendLockbox'] as `0x${string}`,
+      },
+    },
+    {
+      // SendTokenModule#SendLockbox
+      name: 'SendToken',
+      // @ts-expect-error doesn't like the artifact
+      abi: sendTokenV1Artifact.abi,
+      address: {
+        [base.id]: sendTokenUpgradeBaseLocalAddresses['SendTokenModule#SendToken'] as `0x${string}`,
+        [baseLocal.id]: sendTokenUpgradeBaseSepoliaAddresses[
+          'SendTokenModule#SendToken'
+        ] as `0x${string}`,
+        [baseSepolia.id]: sendTokenUpgradeBaseSepoliaAddresses[
+          'SendTokenModule#SendToken'
+        ] as `0x${string}`,
+
+        // we probably don't need these
+        // [localhost.id]: sendTokenUpgradeAddresses['SendTokenModule#SendToken'] as `0x${string}`,
+        // [sepolia.id]: sendTokenUpgradeAddresses['SendTokenModule#SendToken'] as `0x${string}`,
+      },
+    },
   ],
   plugins: [
     foundry({
       project: '../contracts',
       deployments: {
-        SendToken: {
+        SendTokenV0: {
           1: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
           [sepolia.id]: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
           1337: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',

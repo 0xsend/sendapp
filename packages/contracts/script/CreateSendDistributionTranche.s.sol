@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import {Script, console2} from "forge-std/Script.sol";
 import {SendMerkleDrop} from "../src/SendMerkleDrop.sol";
-import {SendToken} from "../src/SendToken.sol";
+import {SendTokenV0} from "../src/SendTokenV0.sol";
 import {Helper} from "../src/Helper.sol";
 
 contract CreateSendDistributionTrancheScript is Script, Helper {
@@ -20,7 +20,7 @@ contract CreateSendDistributionTrancheScript is Script, Helper {
         require(amount > 0, "AMOUNT not set");
         vm.startBroadcast();
         SendMerkleDrop sendMerkleDrop = SendMerkleDrop(smdAddr);
-        SendToken send = SendToken(SEND_TOKEN);
+        SendTokenV0 send = SendTokenV0(SEND_TOKEN);
         send.approve(smdAddr, amount);
         sendMerkleDrop.addTranche(merkleRoot, amount);
         vm.stopBroadcast();
