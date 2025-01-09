@@ -15,7 +15,7 @@ import sendTokenUpgradeBaseSepoliaAddresses from '@0xsend/send-token-upgrade/ign
   type: 'json',
 }
 
-import sendTokenV0LockboxArtifact from '@0xsend/send-token-upgrade/artifacts/contracts/SendToken.sol/SendToken.json' with {
+import sendTokenV0LockboxArtifact from '@0xsend/send-token-upgrade/artifacts/contracts/SendLockbox.sol/SendLockbox.json' with {
   type: 'json',
 }
 import sendTokenV1Artifact from '@0xsend/send-token-upgrade/artifacts/contracts/SendToken.sol/SendToken.json' with {

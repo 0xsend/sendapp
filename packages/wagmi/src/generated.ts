@@ -3349,127 +3349,45 @@ export const sendTokenV0LockboxAbi = [
   {
     type: 'constructor',
     inputs: [
-      { name: '_name', internalType: 'string', type: 'string' },
-      { name: '_symbol', internalType: 'string', type: 'string' },
-      { name: '_lockbox', internalType: 'address', type: 'address' },
+      { name: 'sendv0', internalType: 'address', type: 'address' },
+      { name: 'sendv1', internalType: 'address', type: 'address' },
     ],
     stateMutability: 'nonpayable',
   },
   {
     type: 'error',
-    inputs: [
-      { name: 'spender', internalType: 'address', type: 'address' },
-      { name: 'allowance', internalType: 'uint256', type: 'uint256' },
-      { name: 'needed', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'ERC20InsufficientAllowance',
-  },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'sender', internalType: 'address', type: 'address' },
-      { name: 'balance', internalType: 'uint256', type: 'uint256' },
-      { name: 'needed', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'ERC20InsufficientBalance',
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'approver', internalType: 'address', type: 'address' }],
-    name: 'ERC20InvalidApprover',
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'receiver', internalType: 'address', type: 'address' }],
-    name: 'ERC20InvalidReceiver',
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'sender', internalType: 'address', type: 'address' }],
-    name: 'ERC20InvalidSender',
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'spender', internalType: 'address', type: 'address' }],
-    name: 'ERC20InvalidSpender',
+    inputs: [{ name: 'token', internalType: 'address', type: 'address' }],
+    name: 'SafeERC20FailedOperation',
   },
   {
     type: 'event',
     anonymous: false,
     inputs: [
-      { name: 'owner', internalType: 'address', type: 'address', indexed: true },
-      { name: 'spender', internalType: 'address', type: 'address', indexed: true },
-      { name: 'value', internalType: 'uint256', type: 'uint256', indexed: false },
-    ],
-    name: 'Approval',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'from', internalType: 'address', type: 'address', indexed: true },
       { name: 'to', internalType: 'address', type: 'address', indexed: true },
-      { name: 'value', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'amount', internalType: 'uint256', type: 'uint256', indexed: false },
     ],
-    name: 'Transfer',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'owner', internalType: 'address', type: 'address' },
-      { name: 'spender', internalType: 'address', type: 'address' },
-    ],
-    name: 'allowance',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'spender', internalType: 'address', type: 'address' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'approve',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
-    name: 'balanceOf',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'value', internalType: 'uint256', type: 'uint256' }],
-    name: 'burn',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'account', internalType: 'address', type: 'address' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'burnFrom',
-    outputs: [],
-    stateMutability: 'nonpayable',
+    name: 'Deposit',
   },
   {
     type: 'function',
     inputs: [],
-    name: 'decimals',
-    outputs: [{ name: '', internalType: 'uint8', type: 'uint8' }],
+    name: 'SEND_V0',
+    outputs: [{ name: '', internalType: 'contract IERC20', type: 'address' }],
     stateMutability: 'view',
   },
   {
     type: 'function',
     inputs: [],
-    name: 'lockbox',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    name: 'SEND_V1',
+    outputs: [{ name: '', internalType: 'contract ISendToken', type: 'address' }],
     stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'amount', internalType: 'uint256', type: 'uint256' }],
+    name: 'deposit',
+    outputs: [],
+    stateMutability: 'nonpayable',
   },
   {
     type: 'function',
@@ -3477,50 +3395,8 @@ export const sendTokenV0LockboxAbi = [
       { name: 'to', internalType: 'address', type: 'address' },
       { name: 'amount', internalType: 'uint256', type: 'uint256' },
     ],
-    name: 'mint',
+    name: 'depositTo',
     outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'name',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'symbol',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'totalSupply',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'transfer',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'from', internalType: 'address', type: 'address' },
-      { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'transferFrom',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
     stateMutability: 'nonpayable',
   },
 ] as const
@@ -8353,87 +8229,27 @@ export const readSendTokenV0Lockbox = /*#__PURE__*/ createReadContract({
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"allowance"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"SEND_V0"`
  *
  * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  */
-export const readSendTokenV0LockboxAllowance = /*#__PURE__*/ createReadContract({
+export const readSendTokenV0LockboxSendV0 = /*#__PURE__*/ createReadContract({
   abi: sendTokenV0LockboxAbi,
   address: sendTokenV0LockboxAddress,
-  functionName: 'allowance',
+  functionName: 'SEND_V0',
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"balanceOf"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"SEND_V1"`
  *
  * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  */
-export const readSendTokenV0LockboxBalanceOf = /*#__PURE__*/ createReadContract({
+export const readSendTokenV0LockboxSendV1 = /*#__PURE__*/ createReadContract({
   abi: sendTokenV0LockboxAbi,
   address: sendTokenV0LockboxAddress,
-  functionName: 'balanceOf',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"decimals"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const readSendTokenV0LockboxDecimals = /*#__PURE__*/ createReadContract({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  functionName: 'decimals',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"lockbox"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const readSendTokenV0LockboxLockbox = /*#__PURE__*/ createReadContract({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  functionName: 'lockbox',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"name"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const readSendTokenV0LockboxName = /*#__PURE__*/ createReadContract({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  functionName: 'name',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"symbol"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const readSendTokenV0LockboxSymbol = /*#__PURE__*/ createReadContract({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  functionName: 'symbol',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"totalSupply"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const readSendTokenV0LockboxTotalSupply = /*#__PURE__*/ createReadContract({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  functionName: 'totalSupply',
+  functionName: 'SEND_V1',
 })
 
 /**
@@ -8448,75 +8264,27 @@ export const writeSendTokenV0Lockbox = /*#__PURE__*/ createWriteContract({
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"approve"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"deposit"`
  *
  * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  */
-export const writeSendTokenV0LockboxApprove = /*#__PURE__*/ createWriteContract({
+export const writeSendTokenV0LockboxDeposit = /*#__PURE__*/ createWriteContract({
   abi: sendTokenV0LockboxAbi,
   address: sendTokenV0LockboxAddress,
-  functionName: 'approve',
+  functionName: 'deposit',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"burn"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"depositTo"`
  *
  * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  */
-export const writeSendTokenV0LockboxBurn = /*#__PURE__*/ createWriteContract({
+export const writeSendTokenV0LockboxDepositTo = /*#__PURE__*/ createWriteContract({
   abi: sendTokenV0LockboxAbi,
   address: sendTokenV0LockboxAddress,
-  functionName: 'burn',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"burnFrom"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const writeSendTokenV0LockboxBurnFrom = /*#__PURE__*/ createWriteContract({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  functionName: 'burnFrom',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"mint"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const writeSendTokenV0LockboxMint = /*#__PURE__*/ createWriteContract({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  functionName: 'mint',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"transfer"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const writeSendTokenV0LockboxTransfer = /*#__PURE__*/ createWriteContract({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  functionName: 'transfer',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"transferFrom"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const writeSendTokenV0LockboxTransferFrom = /*#__PURE__*/ createWriteContract({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  functionName: 'transferFrom',
+  functionName: 'depositTo',
 })
 
 /**
@@ -8531,75 +8299,27 @@ export const prepareWriteSendTokenV0Lockbox = /*#__PURE__*/ createSimulateContra
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"approve"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"deposit"`
  *
  * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  */
-export const prepareWriteSendTokenV0LockboxApprove = /*#__PURE__*/ createSimulateContract({
+export const prepareWriteSendTokenV0LockboxDeposit = /*#__PURE__*/ createSimulateContract({
   abi: sendTokenV0LockboxAbi,
   address: sendTokenV0LockboxAddress,
-  functionName: 'approve',
+  functionName: 'deposit',
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"burn"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"depositTo"`
  *
  * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  */
-export const prepareWriteSendTokenV0LockboxBurn = /*#__PURE__*/ createSimulateContract({
+export const prepareWriteSendTokenV0LockboxDepositTo = /*#__PURE__*/ createSimulateContract({
   abi: sendTokenV0LockboxAbi,
   address: sendTokenV0LockboxAddress,
-  functionName: 'burn',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"burnFrom"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const prepareWriteSendTokenV0LockboxBurnFrom = /*#__PURE__*/ createSimulateContract({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  functionName: 'burnFrom',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"mint"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const prepareWriteSendTokenV0LockboxMint = /*#__PURE__*/ createSimulateContract({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  functionName: 'mint',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"transfer"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const prepareWriteSendTokenV0LockboxTransfer = /*#__PURE__*/ createSimulateContract({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  functionName: 'transfer',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"transferFrom"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const prepareWriteSendTokenV0LockboxTransferFrom = /*#__PURE__*/ createSimulateContract({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  functionName: 'transferFrom',
+  functionName: 'depositTo',
 })
 
 /**
@@ -8614,27 +8334,15 @@ export const watchSendTokenV0LockboxEvent = /*#__PURE__*/ createWatchContractEve
 })
 
 /**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `eventName` set to `"Approval"`
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `eventName` set to `"Deposit"`
  *
  * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  */
-export const watchSendTokenV0LockboxApprovalEvent = /*#__PURE__*/ createWatchContractEvent({
+export const watchSendTokenV0LockboxDepositEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: sendTokenV0LockboxAbi,
   address: sendTokenV0LockboxAddress,
-  eventName: 'Approval',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `eventName` set to `"Transfer"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const watchSendTokenV0LockboxTransferEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  eventName: 'Transfer',
+  eventName: 'Deposit',
 })
 
 /**
@@ -13935,87 +13643,27 @@ export const useReadSendTokenV0Lockbox = /*#__PURE__*/ createUseReadContract({
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"allowance"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"SEND_V0"`
  *
  * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  */
-export const useReadSendTokenV0LockboxAllowance = /*#__PURE__*/ createUseReadContract({
+export const useReadSendTokenV0LockboxSendV0 = /*#__PURE__*/ createUseReadContract({
   abi: sendTokenV0LockboxAbi,
   address: sendTokenV0LockboxAddress,
-  functionName: 'allowance',
+  functionName: 'SEND_V0',
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"balanceOf"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"SEND_V1"`
  *
  * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  */
-export const useReadSendTokenV0LockboxBalanceOf = /*#__PURE__*/ createUseReadContract({
+export const useReadSendTokenV0LockboxSendV1 = /*#__PURE__*/ createUseReadContract({
   abi: sendTokenV0LockboxAbi,
   address: sendTokenV0LockboxAddress,
-  functionName: 'balanceOf',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"decimals"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const useReadSendTokenV0LockboxDecimals = /*#__PURE__*/ createUseReadContract({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  functionName: 'decimals',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"lockbox"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const useReadSendTokenV0LockboxLockbox = /*#__PURE__*/ createUseReadContract({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  functionName: 'lockbox',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"name"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const useReadSendTokenV0LockboxName = /*#__PURE__*/ createUseReadContract({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  functionName: 'name',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"symbol"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const useReadSendTokenV0LockboxSymbol = /*#__PURE__*/ createUseReadContract({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  functionName: 'symbol',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"totalSupply"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const useReadSendTokenV0LockboxTotalSupply = /*#__PURE__*/ createUseReadContract({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  functionName: 'totalSupply',
+  functionName: 'SEND_V1',
 })
 
 /**
@@ -14030,75 +13678,27 @@ export const useWriteSendTokenV0Lockbox = /*#__PURE__*/ createUseWriteContract({
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"approve"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"deposit"`
  *
  * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  */
-export const useWriteSendTokenV0LockboxApprove = /*#__PURE__*/ createUseWriteContract({
+export const useWriteSendTokenV0LockboxDeposit = /*#__PURE__*/ createUseWriteContract({
   abi: sendTokenV0LockboxAbi,
   address: sendTokenV0LockboxAddress,
-  functionName: 'approve',
+  functionName: 'deposit',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"burn"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"depositTo"`
  *
  * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  */
-export const useWriteSendTokenV0LockboxBurn = /*#__PURE__*/ createUseWriteContract({
+export const useWriteSendTokenV0LockboxDepositTo = /*#__PURE__*/ createUseWriteContract({
   abi: sendTokenV0LockboxAbi,
   address: sendTokenV0LockboxAddress,
-  functionName: 'burn',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"burnFrom"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const useWriteSendTokenV0LockboxBurnFrom = /*#__PURE__*/ createUseWriteContract({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  functionName: 'burnFrom',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"mint"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const useWriteSendTokenV0LockboxMint = /*#__PURE__*/ createUseWriteContract({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  functionName: 'mint',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"transfer"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const useWriteSendTokenV0LockboxTransfer = /*#__PURE__*/ createUseWriteContract({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  functionName: 'transfer',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"transferFrom"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const useWriteSendTokenV0LockboxTransferFrom = /*#__PURE__*/ createUseWriteContract({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  functionName: 'transferFrom',
+  functionName: 'depositTo',
 })
 
 /**
@@ -14113,75 +13713,27 @@ export const useSimulateSendTokenV0Lockbox = /*#__PURE__*/ createUseSimulateCont
 })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"approve"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"deposit"`
  *
  * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  */
-export const useSimulateSendTokenV0LockboxApprove = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateSendTokenV0LockboxDeposit = /*#__PURE__*/ createUseSimulateContract({
   abi: sendTokenV0LockboxAbi,
   address: sendTokenV0LockboxAddress,
-  functionName: 'approve',
+  functionName: 'deposit',
 })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"burn"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"depositTo"`
  *
  * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  */
-export const useSimulateSendTokenV0LockboxBurn = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateSendTokenV0LockboxDepositTo = /*#__PURE__*/ createUseSimulateContract({
   abi: sendTokenV0LockboxAbi,
   address: sendTokenV0LockboxAddress,
-  functionName: 'burn',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"burnFrom"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const useSimulateSendTokenV0LockboxBurnFrom = /*#__PURE__*/ createUseSimulateContract({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  functionName: 'burnFrom',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"mint"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const useSimulateSendTokenV0LockboxMint = /*#__PURE__*/ createUseSimulateContract({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  functionName: 'mint',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"transfer"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const useSimulateSendTokenV0LockboxTransfer = /*#__PURE__*/ createUseSimulateContract({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  functionName: 'transfer',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"transferFrom"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const useSimulateSendTokenV0LockboxTransferFrom = /*#__PURE__*/ createUseSimulateContract({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  functionName: 'transferFrom',
+  functionName: 'depositTo',
 })
 
 /**
@@ -14196,27 +13748,15 @@ export const useWatchSendTokenV0LockboxEvent = /*#__PURE__*/ createUseWatchContr
 })
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `eventName` set to `"Approval"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `eventName` set to `"Deposit"`
  *
  * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
  */
-export const useWatchSendTokenV0LockboxApprovalEvent = /*#__PURE__*/ createUseWatchContractEvent({
+export const useWatchSendTokenV0LockboxDepositEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: sendTokenV0LockboxAbi,
   address: sendTokenV0LockboxAddress,
-  eventName: 'Approval',
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `eventName` set to `"Transfer"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
- */
-export const useWatchSendTokenV0LockboxTransferEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: sendTokenV0LockboxAbi,
-  address: sendTokenV0LockboxAddress,
-  eventName: 'Transfer',
+  eventName: 'Deposit',
 })
 
 /**
