@@ -536,7 +536,6 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
         <View
           style={
             {
-              "backgroundColor": "rgba(0,0,0,0)",
               "borderBottomLeftRadius": 10,
               "borderBottomRightRadius": 10,
               "borderTopLeftRadius": 10,
