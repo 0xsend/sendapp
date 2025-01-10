@@ -71,6 +71,7 @@ export type UseUserOpTransferMutationArgs = {
 /**
  * Given a Send Account, token, and amount, returns a mutation to send a user op ERC20 or native transfer.
  *
+ * @deprecated use useSendUserOpMutation
  * @param userOp The user operation to send.
  * @param validUntil The valid until timestamp for the user op.
  */
@@ -80,6 +81,9 @@ export function useUserOpTransferMutation() {
   })
 }
 
+/**
+ * @deprecated use sendUserOp
+ */
 export async function sendUserOpTransfer({
   userOp,
   version,
