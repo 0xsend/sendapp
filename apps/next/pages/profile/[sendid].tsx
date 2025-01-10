@@ -67,7 +67,9 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
 }) satisfies GetServerSideProps
 
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="History" backFunction="router" />}>{children}</HomeLayout>
+  <HomeLayout TopNav={<TopNav header="History" backFunction="router" />} fullHeight>
+    {children}
+  </HomeLayout>
 )
 
 export default Page

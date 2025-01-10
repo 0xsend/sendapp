@@ -1,15 +1,4 @@
-import {
-  Button,
-  Fade,
-  isWeb,
-  Paragraph,
-  Spinner,
-  Stack,
-  Text,
-  XStack,
-  YStack,
-  useMedia,
-} from '@my/ui'
+import { Button, Fade, isWeb, Paragraph, Spinner, Stack, Text, XStack, YStack } from '@my/ui'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useUser } from 'app/utils/useUser'
 import { AvatarProfile, type AvatarProfileProps } from './AvatarProfile'
@@ -39,7 +28,6 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   const [isProfileInfoVisible, setIsProfileInfoVisible] = useState<boolean>(false)
   const [previousScrollHeight, setPreviousScrollHeight] = useState<number>(0)
   const containerRef = useRef<HTMLDivElement>(null)
-  const media = useMedia()
 
   const {
     data,
@@ -53,6 +41,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
     pageSize: 10,
     otherUserId,
     currentUserId: currentUserProfile?.send_id,
+    ascending: true,
   })
   const { pages } = data ?? {}
 
@@ -79,10 +68,10 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   }, [pages?.length, previousScrollHeight])
 
   return (
-    <XStack w={'100%'} gap={'$4'}>
+    <XStack w={'100%'} gap={'$4'} height={'100%'}>
       <YStack
         f={1}
-        height={media.short ? (isWeb ? '78vh' : '78%') : isWeb ? '85vh' : '85%'}
+        height={'100%'}
         gap={'$2'}
         display={isProfileInfoVisible ? 'none' : 'flex'}
         overflow={'hidden'}
@@ -181,32 +170,30 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                         default: {
                           let lastDate: string | undefined
 
-                          const activities = (pages || [])
-                            .flatMap((activity) => activity)
-                            .sort((a, b) => a.created_at.getTime() - b.created_at.getTime())
-
-                          return activities?.map((activity) => {
-                            const date = activity.created_at.toLocaleDateString()
-                            const isNewDate = !lastDate || date !== lastDate
-                            if (isNewDate) {
-                              lastDate = date
-                            }
-                            return (
-                              <Fragment
-                                key={`${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`}
-                              >
-                                {isNewDate ? <DatePill date={date} /> : null}
-                                <Fade>
-                                  <TransactionEntry
-                                    activity={activity}
-                                    sent={activity?.to_user?.id !== user?.id}
-                                    otherUserProfile={otherUserProfile}
-                                    currentUserProfile={currentUserProfile}
-                                  />
-                                </Fade>
-                              </Fragment>
-                            )
-                          })
+                          return pages?.map((activities) =>
+                            activities?.map((activity) => {
+                              const date = activity.created_at.toLocaleDateString()
+                              const isNewDate = !lastDate || date !== lastDate
+                              if (isNewDate) {
+                                lastDate = date
+                              }
+                              return (
+                                <Fragment
+                                  key={`${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`}
+                                >
+                                  {isNewDate ? <DatePill date={date} /> : null}
+                                  <Fade>
+                                    <TransactionEntry
+                                      activity={activity}
+                                      sent={activity?.to_user?.id !== user?.id}
+                                      otherUserProfile={otherUserProfile}
+                                      currentUserProfile={currentUserProfile}
+                                    />
+                                  </Fade>
+                                </Fragment>
+                              )
+                            })
+                          )
                         }
                       }
                     })()}

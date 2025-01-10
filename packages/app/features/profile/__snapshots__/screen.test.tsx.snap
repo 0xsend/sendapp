@@ -6,6 +6,7 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
     {
       "flexDirection": "row",
       "gap": 18,
+      "height": "100%",
       "width": "100%",
     }
   }
@@ -17,7 +18,7 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
         "flex": 1,
         "flexDirection": "column",
         "gap": 7,
-        "height": "85%",
+        "height": "100%",
         "overflow": "hidden",
       }
     }
