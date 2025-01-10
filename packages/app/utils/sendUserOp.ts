@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query'
+import { type QueryClient, useMutation, type UseMutationOptions } from '@tanstack/react-query'
 import { getUserOperationHash, type UserOperation } from 'permissionless'
 import { baseMainnetClient, entryPointAddress, baseMainnetBundlerClient } from '@my/wagmi'
 import type { CallExecutionError } from 'viem'
@@ -6,17 +6,6 @@ import { byteaToBase64 } from './byteaToBase64'
 import { signUserOp } from './signUserOp'
 import { throwNiceError } from './userop'
 
-/**
- * Returns a mutation hook for sending a user op. The user op is signed and sent to the SendTokenUpgrade contract.
- *
- * @param userOp The user operation to send.
- * @param validUntil The valid until timestamp for the user op.
- */
-export function useSendUserOpMutation() {
-  return useMutation({
-    mutationFn: sendUserOp,
-  })
-}
 export interface SendUserOpArgs {
   /**
    * The user operation to send.

@@ -14,6 +14,7 @@ import type { SolitoAppProps } from 'solito'
 import { Provider } from 'app/provider'
 import { YStack, H1, H2 } from '@my/ui'
 import { IconSendLogo } from 'app/components/icons'
+import { SendV0TokenUpgradeScreen } from 'app/features/send-token-upgrade/screen'
 
 if (process.env.NODE_ENV === 'production') {
   require('../public/tamagui.css')
@@ -65,7 +66,9 @@ function MyApp({
           {process.env.NEXT_PUBLIC_MAINTENANCE_MODE === 'true' ? (
             <MaintenanceMode />
           ) : (
-            getLayout(<Component {...pageProps} />)
+            <SendV0TokenUpgradeScreen>
+              {getLayout(<Component {...pageProps} />)}
+            </SendV0TokenUpgradeScreen>
           )}
         </Provider>
       </NextThemeProvider>

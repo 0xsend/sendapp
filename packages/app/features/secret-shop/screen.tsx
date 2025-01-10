@@ -136,7 +136,7 @@ export function SecretShopScreen() {
                         client: testClient,
                         address: sendAcct.address,
                         tokenAddress: sendTokenV0Address[baseMainnetClient.chain.id],
-                        value: BigInt(1000000),
+                        value: BigInt(1_000_000),
                       })
                       toast.show('Funded with 1M Send V0')
                     }}
