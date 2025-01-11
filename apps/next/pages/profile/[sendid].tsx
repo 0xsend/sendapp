@@ -8,7 +8,6 @@ import type { Database } from '@my/supabase/database.types'
 import { userOnboarded } from 'utils/userOnboarded'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import { TopNav } from 'app/components/TopNav'
-import { MobileButtonRowLayout } from 'app/components/MobileButtonRowLayout'
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -68,9 +67,9 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
 }) satisfies GetServerSideProps
 
 Page.getLayout = (children) => (
-  <MobileButtonRowLayout.Profile>
-    <HomeLayout TopNav={<TopNav header="History" backFunction="router" />}>{children}</HomeLayout>
-  </MobileButtonRowLayout.Profile>
+  <HomeLayout TopNav={<TopNav header="History" backFunction="router" />} fullHeight>
+    {children}
+  </HomeLayout>
 )
 
 export default Page

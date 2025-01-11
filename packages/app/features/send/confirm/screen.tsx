@@ -393,7 +393,6 @@ export function SendConfirm() {
         disabledStyle={{ opacity: 0.7, cursor: 'not-allowed', pointerEvents: 'none' }}
         disabled={!canSubmit || isTransferPending || !!sentTxHash}
         gap={4}
-        mb={'$6'}
         py={'$5'}
         width={'100%'}
       >

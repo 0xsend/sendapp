@@ -23,14 +23,23 @@ export function useInterUserActivityFeed(params: {
   refetchInterval?: number
   currentUserId?: number
   otherUserId?: number
+  ascending?: boolean
 }): UseInfiniteQueryResult<InfiniteData<Activity[]>, PostgrestError | ZodError> {
-  const { pageSize = 3, refetchInterval = 30_000, otherUserId, currentUserId } = params
+  const {
+    pageSize = 3,
+    refetchInterval = 30_000,
+    otherUserId,
+    currentUserId,
+    ascending = false,
+  } = params
 
   const supabase = useSupabase()
 
   async function fetchInterUserActivityFeed({
     pageParam,
-  }: { pageParam: number }): Promise<Activity[]> {
+  }: {
+    pageParam: number
+  }): Promise<Activity[]> {
     const from = pageParam * pageSize
     const to = (pageParam + 1) * pageSize - 1
     const request = supabase
@@ -40,7 +49,7 @@ export function useInterUserActivityFeed(params: {
         `and(from_user->send_id.eq.${currentUserId},to_user->send_id.eq.${otherUserId}), and(from_user->send_id.eq.${otherUserId},to_user->send_id.eq.${currentUserId})`
       )
       .in('event_name', ['send_account_transfers', 'send_account_receives'])
-      .order('created_at', { ascending: false })
+      .order('created_at', { ascending })
       .range(from, to)
     const { data, error } = await request
     throwIf(error)
