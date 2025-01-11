@@ -194,8 +194,6 @@ exports[`shovel config 1`] = `
         {
           "column": "log_addr",
           "filter_arg": [
-            "0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A",
-            "0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680",
             "0xEab49138BA2Ea6dd776220fE26b7b8E446638956",
           ],
           "filter_op": "contains",

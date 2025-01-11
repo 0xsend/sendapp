@@ -1,23 +1,22 @@
 import type { BlockData, Column, Integration, Table } from '@indexsupply/shovel-config'
-import { sendTokenAddress, sendTokenV0Address } from '@my/wagmi'
+import { sendTokenV0LockboxAddress } from '@my/wagmi'
 
-export const transfersTable: Table = {
-  name: 'send_token_transfers',
+export const table: Table = {
+  name: 'send_token_v0_lockbox',
   columns: [
     { name: 'chain_id', type: 'numeric' },
     { name: 'log_addr', type: 'bytea' },
     { name: 'block_time', type: 'numeric' },
     { name: 'tx_hash', type: 'bytea' },
-    { name: 'f', type: 'bytea' },
-    { name: 't', type: 'bytea' },
-    { name: 'v', type: 'numeric' },
+    { name: 'to', type: 'bytea' },
+    { name: 'amount', type: 'numeric' },
   ] as Column[],
 } as const
 
 export const integration: Omit<Integration, 'sources'> = {
-  name: 'send_token_transfers',
+  name: 'send_token_v0_lockbox',
   enabled: true,
-  table: transfersTable,
+  table,
   block: [
     {
       name: 'chain_id',
@@ -35,32 +34,22 @@ export const integration: Omit<Integration, 'sources'> = {
       name: 'log_addr',
       column: 'log_addr',
       filter_op: 'contains',
-      filter_arg: [...new Set(Object.values(sendTokenAddress))].sort(),
+      filter_arg: [...new Set(Object.values(sendTokenV0LockboxAddress))],
     },
   ] as BlockData[],
   event: {
     type: 'event',
-    name: 'Transfer',
     anonymous: false,
     inputs: [
+      { name: 'to', column: 'to', internalType: 'address', type: 'address', indexed: true },
       {
-        indexed: true,
-        name: 'from',
-        type: 'address',
-        column: 'f',
-      },
-      {
-        indexed: true,
-        name: 'to',
-        type: 'address',
-        column: 't',
-      },
-      {
-        indexed: false,
-        name: 'value',
+        name: 'amount',
+        column: 'amount',
+        internalType: 'uint256',
         type: 'uint256',
-        column: 'v',
+        indexed: false,
       },
     ],
+    name: 'Deposit',
   },
 } as const
