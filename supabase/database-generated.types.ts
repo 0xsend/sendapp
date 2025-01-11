@@ -948,6 +948,60 @@ export type Database = {
         }
         Relationships: []
       }
+      send_token_v0_transfers: {
+        Row: {
+          abi_idx: number
+          block_num: number
+          block_time: number
+          chain_id: number
+          event_id: string
+          f: string
+          id: number
+          ig_name: string
+          log_addr: string
+          log_idx: number
+          src_name: string
+          t: string
+          tx_hash: string
+          tx_idx: number
+          v: number
+        }
+        Insert: {
+          abi_idx: number
+          block_num: number
+          block_time: number
+          chain_id: number
+          event_id?: string
+          f: string
+          id?: number
+          ig_name: string
+          log_addr: string
+          log_idx: number
+          src_name: string
+          t: string
+          tx_hash: string
+          tx_idx: number
+          v: number
+        }
+        Update: {
+          abi_idx?: number
+          block_num?: number
+          block_time?: number
+          chain_id?: number
+          event_id?: string
+          f?: string
+          id?: number
+          ig_name?: string
+          log_addr?: string
+          log_idx?: number
+          src_name?: string
+          t?: string
+          tx_hash?: string
+          tx_idx?: number
+          v?: number
+        }
+        Relationships: []
+      }
       sendtag_checkout_receipts: {
         Row: {
           abi_idx: number
