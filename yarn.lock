@@ -29,16 +29,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@0xsend/send-token-upgrade@https://github.com/0xBigBoss/send-token-upgrade#ad80d661757b49c29c2bfb51782015306adece86":
+"@0xsend/send-token-upgrade@https://github.com/0xsend/send-token-upgrade#9bc328f8880b76e8e00656c5cc9cfcc49e3e2871":
   version: 0.0.1
-  resolution: "@0xsend/send-token-upgrade@https://github.com/0xBigBoss/send-token-upgrade.git#commit=ad80d661757b49c29c2bfb51782015306adece86"
+  resolution: "@0xsend/send-token-upgrade@https://github.com/0xsend/send-token-upgrade.git#commit=9bc328f8880b76e8e00656c5cc9cfcc49e3e2871"
   dependencies:
     "@openzeppelin/contracts": "npm:^5.1.0"
     dotenv: "npm:^16.4.7"
     zx: "npm:^8.3.0"
   peerDependencies:
     typescript: ^5.0.0
-  checksum: 10/d95a99efa3dc914dc0d7a5c736baa4bc5bb6dfb316a4e0af42ae1ecc5fdf24b0ffa4c9a5f3f24b4a5aac3cbb675ed2ce97e15129df4b4fb163e31ffc82532e12
+  checksum: 10/11a99cbfe25a5dd3a86514b1e440c79c60daadbcc06e75ab4ac382794dceeec61dc4535b0092c381e00e941532dc68e0e5254282d8c35ed713301e040cf4f3f9
   languageName: node
   linkType: hard
 
@@ -6351,7 +6351,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@my/wagmi@workspace:packages/wagmi"
   dependencies:
-    "@0xsend/send-token-upgrade": "https://github.com/0xBigBoss/send-token-upgrade#ad80d661757b49c29c2bfb51782015306adece86"
+    "@0xsend/send-token-upgrade": "https://github.com/0xsend/send-token-upgrade#9bc328f8880b76e8e00656c5cc9cfcc49e3e2871"
     "@my/contracts": "workspace:*"
     "@wagmi/cli": "npm:^2.1.15"
     "@wagmi/core": "npm:^2.13.1"
