@@ -31,6 +31,7 @@ import { useUserOp } from 'app/utils/userop'
 import { sendUserOp } from 'app/utils/sendUserOp'
 import { useEffect, useMemo, useState } from 'react'
 import { encodeFunctionData, erc20Abi, isHex } from 'viem'
+import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 
 interface TokenBalanceRowProps {
   label: string
@@ -139,6 +140,7 @@ function UpgradeTokenButton() {
     args: [sender ?? '0x'],
     query: { enabled: !!sender },
   })
+  const { tokensQuery } = useSendAccountBalances()
 
   const calls = useMemo(
     () => [
@@ -193,11 +195,13 @@ function UpgradeTokenButton() {
     if (uopReceipt.isSuccess) {
       setIsUpgraded(true)
       toast.show('Upgraded successfully')
+      queryClient.invalidateQueries({ queryKey: tokensQuery.queryKey })
       queryClient.invalidateQueries({ queryKey: sendTokenV0Bal.queryKey })
     }
-  }, [toast, sendTokenV0Bal, queryClient, uopReceipt.isSuccess])
+  }, [toast, sendTokenV0Bal.queryKey, tokensQuery.queryKey, queryClient, uopReceipt.isSuccess])
 
-  const canSendUserOp = uop.isSuccess && sendUop.isIdle && !uopReceipt.isLoading && !isUpgraded
+  const canSendUserOp =
+    uop.isSuccess && (sendUop.isIdle || sendUop.isError) && !uopReceipt.isLoading && !isUpgraded
   const anyError = uop.error || sendUop.error || uopReceipt.error
 
   return (
@@ -233,16 +237,14 @@ function UpgradeTokenButton() {
             })
           }}
           disabled={!canSendUserOp}
+          icon={<IconUpgrade size="$1" />}
           iconAfter={
             sendUop.isPending || uopReceipt.isLoading ? <Spinner size="small" /> : undefined
           }
         >
-          <XStack gap="$2" ai="center">
-            <IconUpgrade size="$1" color="$color0" />
-            <Paragraph color="$color0" fontWeight="500">
-              {sendUop.isPending || uopReceipt.isLoading ? 'UPGRADING...' : 'UPGRADE'}
-            </Paragraph>
-          </XStack>
+          <Button.Text>
+            {sendUop.isPending || uopReceipt.isLoading ? 'UPGRADING...' : 'UPGRADE'}
+          </Button.Text>
         </Button>
       ) : null}
       {[uop.error, sendUop.error].filter(Boolean).map((e) =>
