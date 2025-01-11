@@ -1,6 +1,6 @@
 import { Button, isWeb, Paragraph, Spinner, Stack, SubmitButton, XStack, YStack } from '@my/ui'
 import { type allCoins, allCoinsDict } from 'app/data/coins'
-import { useSendScreenParams } from 'app/routers/params'
+import { useRootScreenParams, useSendScreenParams } from 'app/routers/params'
 import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
 
@@ -30,7 +30,8 @@ export function SendAmountForm() {
   const { isLoading: isLoadingCoins } = useCoins()
   const { recipient, idType } = sendParams
   const { data: profile } = useProfileLookup(idType ?? 'tag', recipient ?? '')
-  const [isProfileInfoVisible, setIsProfileInfoVisible] = useState<boolean>(false)
+  const [queryParams, setRootParams] = useRootScreenParams()
+  const isProfileInfoVisible = queryParams.modal === 'profile'
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
 
   useEffect(() => {
@@ -78,7 +79,10 @@ export function SendAmountForm() {
   }
 
   const toggleIsProfileInfoVisible = () => {
-    setIsProfileInfoVisible((prevState) => !prevState)
+    setRootParams(
+      { ...queryParams, modal: isProfileInfoVisible ? undefined : 'profile' },
+      { webBehavior: 'replace' }
+    )
   }
 
   return (
