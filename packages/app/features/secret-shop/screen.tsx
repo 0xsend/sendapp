@@ -122,7 +122,7 @@ export function SecretShopScreen() {
                         client: testClient,
                         address: sendAcct.address,
                         tokenAddress: sendTokenAddress[baseMainnetClient.chain.id],
-                        value: BigInt(formatUnits(BigInt(10_000), 18)),
+                        value: BigInt(parseEther('10000')),
                       })
                       toast.show('Funded with 10K Send')
                     }}
