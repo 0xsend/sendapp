@@ -1,4 +1,4 @@
-import { Link, Paragraph, XStack, type LinkProps } from '@my/ui'
+import { Link, type LinkProps, Paragraph, XStack } from '@my/ui'
 
 import { IconCoin } from 'app/components/icons/IconCoin'
 import type { CoinWithBalance } from 'app/data/coins'
@@ -7,10 +7,12 @@ import { useCoins } from 'app/provider/coins'
 import { useRootScreenParams } from 'app/routers/params'
 import formatAmount from 'app/utils/formatAmount'
 import { Fragment } from 'react'
+import { useHoverStyles } from 'app/utils/useHoverStyles'
 
 export const TokenBalanceList = () => {
   const { coins, isLoading } = useCoins()
   const [{ token: tokenParam }] = useRootScreenParams()
+  const hoverStyles = useHoverStyles()
 
   if (isLoading) return null
 
@@ -22,12 +24,14 @@ export const TokenBalanceList = () => {
         ai={'center'}
         py={'$3.5'}
         px={'$3'}
+        br={'$4'}
         disabled={tokenParam !== undefined && tokenParam !== coin.token}
         disabledStyle={{ opacity: 0.5 }}
         href={{
           pathname: '/',
           query: { token: coin.token },
         }}
+        hoverStyle={hoverStyles}
       />
     </Fragment>
   ))
