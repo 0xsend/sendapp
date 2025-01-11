@@ -1,7 +1,7 @@
 import { test } from '@jest/globals'
 import { ProfileScreen } from './screen'
 import { TamaguiProvider, config } from '@my/ui'
-import { render, screen, act, waitFor } from '@testing-library/react-native'
+import { render, screen, waitFor } from '@testing-library/react-native'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 const queryClient = new QueryClient()
@@ -113,10 +113,6 @@ test('ProfileScreen', async () => {
       </TamaguiProvider>
     </QueryClientProvider>
   )
-
-  act(() => {
-    jest.runAllTimers()
-  })
 
   await waitFor(() => expect(screen.getByText(PROFILE.name)).toBeVisible())
 

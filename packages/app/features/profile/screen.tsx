@@ -1,16 +1,17 @@
-import { Button, Fade, isWeb, Paragraph, Spinner, Stack, Text, XStack, YStack } from '@my/ui'
+import { Fade, isWeb, Paragraph, Spinner, Stack, Text, XStack, YStack } from '@my/ui'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useUser } from 'app/utils/useUser'
 import { AvatarProfile, type AvatarProfileProps } from './AvatarProfile'
 import { useInterUserActivityFeed } from './utils/useInterUserActivityFeed'
 import type { Activity } from 'app/utils/zod/activity'
 import { amountFromActivity } from 'app/utils/activity'
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { useProfileScreenParams } from 'app/routers/params'
 import { IconArrowRight } from 'app/components/icons'
 import { SendButton } from './ProfileButtons'
 import { ProfileHeader } from 'app/features/profile/components/ProfileHeader'
 import { ProfileAboutTile } from 'app/features/profile/components/ProfileAboutTile'
+import { FlatList } from 'react-native-web'
 
 interface ProfileScreenProps {
   sendid?: number | null
@@ -26,46 +27,23 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   } = useProfileLookup('sendid', otherUserId?.toString() || '')
   const { user, profile: currentUserProfile } = useUser()
   const [isProfileInfoVisible, setIsProfileInfoVisible] = useState<boolean>(false)
-  const [previousScrollHeight, setPreviousScrollHeight] = useState<number>(0)
-  const containerRef = useRef<HTMLDivElement>(null)
 
   const {
     data,
     isLoading: isLoadingActivities,
     error: activitiesError,
-    isFetching: isFetchingActivities,
     isFetchingNextPage: isFetchingNextPageActivities,
     fetchNextPage,
-    hasNextPage,
   } = useInterUserActivityFeed({
     pageSize: 10,
     otherUserId,
     currentUserId: currentUserProfile?.send_id,
-    ascending: true,
   })
   const { pages } = data ?? {}
 
   const toggleIsProfileInfoVisible = () => {
     setIsProfileInfoVisible((prevState) => !prevState)
   }
-
-  const handleLoadMore = async () => {
-    if (containerRef.current) {
-      setPreviousScrollHeight(containerRef.current.scrollHeight)
-      void fetchNextPage()
-    }
-  }
-
-  useEffect(() => {
-    if (containerRef.current && pages?.length) {
-      if (pages.length === 1) {
-        containerRef.current.scrollTop = containerRef.current.scrollHeight
-      }
-
-      const container = containerRef.current
-      container.scrollTop = container.scrollHeight - previousScrollHeight
-    }
-  }, [pages?.length, previousScrollHeight])
 
   return (
     <XStack w={'100%'} gap={'$4'} height={'100%'}>
@@ -83,126 +61,99 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
         {otherUserProfile && (
           <ProfileHeader onPressOut={toggleIsProfileInfoVisible} profile={otherUserProfile} />
         )}
-        <YStack
-          ref={containerRef}
-          f={1}
-          gap="$6"
-          className={'hide-scroll'}
-          // @ts-expect-error typescript is complaining about overflowY not available and advising overflow. Overflow will work differently than overflowY here, overflowY is working fine
-          overflowY={'scroll'}
-        >
-          {error && (
-            <Text theme="red" color={'$color8'}>
-              {error.message}
-            </Text>
-          )}
-          {isLoading && (
-            <Stack w="100%" h="100%" jc={'center'} ai={'center'} f={1} gap="$6">
-              <Spinner size="large" color="$primary" />
-            </Stack>
-          )}
-          {otherUserProfile ? (
-            <YStack h={'100%'}>
-              <Stack>
-                <YStack width="100%" gap="$4">
-                  <Fade>
-                    {!isLoadingActivities && (isFetchingNextPageActivities || hasNextPage) ? (
-                      <>
-                        {(() => {
-                          switch (true) {
-                            case isFetchingNextPageActivities:
-                              return <Spinner size="small" color={'$primary'} mt={'$4'} />
-                            case hasNextPage:
-                              return (
-                                <Button
-                                  onPress={() => {
-                                    void handleLoadMore()
-                                  }}
-                                  disabled={isFetchingNextPageActivities || isFetchingActivities}
-                                  color="$color11"
-                                  width={200}
-                                  mx="auto"
-                                  mt={'$4'}
-                                >
-                                  Load More
-                                </Button>
-                              )
-                            default:
-                              return null
-                          }
-                        })()}
-                      </>
-                    ) : null}
-                  </Fade>
-                  <YStack gap={'$size.1'}>
-                    {(() => {
-                      switch (true) {
-                        case isLoadingActivities:
-                          return <Spinner size="small" color={'$primary'} mt={'$8'} />
-                        case activitiesError !== null:
-                          return (
-                            <Paragraph
-                              maxWidth={'600'}
-                              fontFamily={'$mono'}
-                              fontSize={'$5'}
-                              theme={'red'}
-                              color={'$color8'}
-                              mt={'$4'}
-                              ta={'center'}
-                            >
-                              {activitiesError?.message.split('.').at(0) ?? `${activitiesError}`}
-                            </Paragraph>
-                          )
-                        case pages?.length === 0 || (pages && pages[0]?.length === 0):
-                          return (
-                            <>
-                              <Paragraph
-                                size={'$8'}
-                                fontWeight={'300'}
-                                color={'$color10'}
-                                textAlign={'center'}
-                                mt={'$size.1.5'}
-                              >
-                                No Activities
-                              </Paragraph>
-                            </>
-                          )
-                        default: {
-                          let lastDate: string | undefined
+        {error && (
+          <Text theme="red" color={'$color8'}>
+            {error.message}
+          </Text>
+        )}
+        {isLoading && (
+          <Stack w="100%" h="100%" jc={'center'} ai={'center'} f={1} gap="$6">
+            <Spinner size="large" color="$primary" />
+          </Stack>
+        )}
+        {otherUserProfile ? (
+          <>
+            {(() => {
+              switch (true) {
+                case isLoadingActivities:
+                  return (
+                    <YStack f={1}>
+                      <Spinner size="small" color={'$primary'} mt={'$8'} />
+                    </YStack>
+                  )
+                case activitiesError !== null:
+                  return (
+                    <YStack f={1}>
+                      <Paragraph
+                        maxWidth={'600'}
+                        fontFamily={'$mono'}
+                        fontSize={'$5'}
+                        theme={'red'}
+                        color={'$color8'}
+                        mt={'$4'}
+                        ta={'center'}
+                      >
+                        {activitiesError?.message.split('.').at(0) ?? `${activitiesError}`}
+                      </Paragraph>
+                    </YStack>
+                  )
+                case pages?.length === 0 || (pages && pages[0]?.length === 0):
+                  return (
+                    <YStack f={1}>
+                      <Paragraph
+                        size={'$8'}
+                        fontWeight={'300'}
+                        color={'$color10'}
+                        textAlign={'center'}
+                        mt={'$size.1.5'}
+                      >
+                        No Activities
+                      </Paragraph>
+                    </YStack>
+                  )
+                default: {
+                  const activities = pages?.flat() || []
 
-                          return pages?.map((activities) =>
-                            activities?.map((activity) => {
-                              const date = activity.created_at.toLocaleDateString()
-                              const isNewDate = !lastDate || date !== lastDate
-                              if (isNewDate) {
-                                lastDate = date
-                              }
-                              return (
-                                <Fragment
-                                  key={`${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`}
-                                >
-                                  {isNewDate ? <DatePill date={date} /> : null}
-                                  <Fade>
-                                    <TransactionEntry
-                                      activity={activity}
-                                      sent={activity?.to_user?.id !== user?.id}
-                                      otherUserProfile={otherUserProfile}
-                                      currentUserProfile={currentUserProfile}
-                                    />
-                                  </Fade>
-                                </Fragment>
-                              )
-                            })
-                          )
-                        }
+                  return (
+                    <FlatList
+                      data={activities}
+                      keyExtractor={(activity) =>
+                        `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`
                       }
-                    })()}
-                  </YStack>
-                </YStack>
-              </Stack>
-            </YStack>
-          ) : null}
-        </YStack>
+                      renderItem={({ item: activity, index }) => {
+                        const date = activity.created_at.toLocaleDateString()
+                        const nextDate = activities[index + 1]?.created_at.toLocaleDateString()
+                        const shouldShowDatePill = !nextDate || date !== nextDate
+
+                        return (
+                          <>
+                            <Fade>
+                              <TransactionEntry
+                                activity={activity}
+                                sent={activity?.to_user?.id !== user?.id}
+                                otherUserProfile={otherUserProfile}
+                                currentUserProfile={currentUserProfile}
+                              />
+                            </Fade>
+                            {shouldShowDatePill ? <DatePill date={date} /> : null}
+                          </>
+                        )
+                      }}
+                      onEndReached={fetchNextPage}
+                      ListFooterComponent={
+                        !isLoadingActivities && isFetchingNextPageActivities ? (
+                          <Spinner size="small" color={'$primary'} my={'$4'} />
+                        ) : null
+                      }
+                      inverted={true}
+                      showsVerticalScrollIndicator={false}
+                    />
+                  )
+                }
+              }
+            })()}
+          </>
+        ) : null}
         {Boolean(otherUserProfile) && user?.id !== otherUserProfile?.id ? (
           <XStack gap="$size.1.5" ai={'center'} mb={'$4'}>
             <SendButton
@@ -260,8 +211,8 @@ const TransactionEntry = ({
   const date = new Date(created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
 
   return (
-    <XStack justifyContent={sent ? 'flex-end' : 'flex-start'} testID="activityTest">
-      <YStack gap={'$2'}>
+    <XStack justifyContent={sent ? 'flex-end' : 'flex-start'} testID="activityTest" my={'$2.5'}>
+      <YStack gap={'$1'}>
         <YStack bg={'$color1'} p={'$4'} borderRadius={'$4'}>
           <XStack gap={'$3'} alignItems={'center'} flexDirection={sent ? 'row-reverse' : 'row'}>
             <AvatarProfile
