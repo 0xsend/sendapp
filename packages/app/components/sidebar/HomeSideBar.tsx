@@ -27,6 +27,7 @@ import { NavSheet } from '../NavSheet'
 
 import { useUser } from 'app/utils/useUser'
 import { ReferralLink } from '../ReferralLink'
+import { useHoverStyles } from 'app/utils/useHoverStyles'
 
 const links = [
   {
@@ -76,6 +77,7 @@ const HomeSideBar = ({ ...props }: YStackProps) => {
 
 const HomeBottomSheet = () => {
   const { profile } = useUser()
+  const hoverStyles = useHoverStyles()
   const avatarUrl = profile?.avatar_url
 
   return (
@@ -115,14 +117,7 @@ const HomeBottomSheet = () => {
                 paddingTop={first ? '$2' : 0}
                 paddingBottom={last ? '$2' : 0}
               >
-                <YStack
-                  w={'100%'}
-                  p={'$4'}
-                  borderRadius={'$4'}
-                  hoverStyle={{
-                    backgroundColor: '$color2',
-                  }}
-                >
+                <YStack w={'100%'} p={'$4'} borderRadius={'$4'} hoverStyle={hoverStyles}>
                   <SideBarNavLink key={link.href} hoverStyle={{}} {...link} />
                 </YStack>
               </YStack>

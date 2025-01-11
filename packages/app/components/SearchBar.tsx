@@ -34,6 +34,7 @@ import { type Address, isAddress } from 'viem'
 import { IconAccount, IconArrowRight, IconSearch, IconX } from './icons'
 import { baseMainnet } from '@my/wagmi'
 import { useEnsName } from 'wagmi'
+import { useHoverStyles } from 'app/utils/useHoverStyles'
 
 type SearchResultsType = Functions<'tag_search'>[number]
 type SearchResultsKeysType = keyof SearchResultsType
@@ -380,11 +381,7 @@ function SearchResultRow({
   const [queryParams] = useRootScreenParams()
   const { search: query } = queryParams
   const href = useSearchResultHref(profile)
-
-  const { resolvedTheme } = useThemeSetting()
-  const rowHoverBC = resolvedTheme?.startsWith('dark')
-    ? 'rgba(255,255,255, 0.1)'
-    : 'rgba(0,0,0, 0.1)'
+  const hoverStyles = useHoverStyles()
 
   if (!query) return null
 
@@ -394,9 +391,7 @@ function SearchResultRow({
       key={`SearchResultRow-${keyField}-${profile.tag_name}-${profile.send_id}`}
       width="100%"
       p={'$4'}
-      hoverStyle={{
-        bc: rowHoverBC,
-      }}
+      hoverStyle={hoverStyles}
     >
       <Link href={href}>
         <XStack ai={'center'} jc={'space-between'}>
