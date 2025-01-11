@@ -32,6 +32,9 @@ const mockMyWagmi = {
     845337: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
   },
   sendTokenAddress: {
+    845337: '0xEab49138BA2Ea6dd776220fE26b7b8E446638956',
+  },
+  sendTokenV0Address: {
     845337: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
   },
   spx6900Address: {
@@ -76,6 +79,7 @@ export const baseMainnetClient = mockMyWagmi.baseMainnetClient
 export const baseMainnet = mockMyWagmi.baseMainnet
 export const usdcAddress = mockMyWagmi.usdcAddress
 export const sendTokenAddress = mockMyWagmi.sendTokenAddress
+export const sendTokenV0Address = mockMyWagmi.sendTokenV0Address
 export const spx6900Address = mockMyWagmi.spx6900Address
 export const tokenPaymasterAddress = mockMyWagmi.tokenPaymasterAddress
 export const entryPointAddress = mockMyWagmi.entryPointAddress

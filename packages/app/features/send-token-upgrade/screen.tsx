@@ -245,9 +245,13 @@ function UpgradeTokenButton() {
           </XStack>
         </Button>
       ) : null}
-      {[uop.error, sendUop.error]
-        .filter(Boolean)
-        .map((e) => (e ? <Paragraph color="$error">{toNiceError(e)}</Paragraph> : null))}
+      {[uop.error, sendUop.error].filter(Boolean).map((e) =>
+        e ? (
+          <Paragraph key={`${e.name}-${e.message}`} color="$error">
+            {toNiceError(e)}
+          </Paragraph>
+        ) : null
+      )}
     </YStack>
   )
 }

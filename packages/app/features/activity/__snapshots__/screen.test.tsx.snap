@@ -471,6 +471,25 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
       </View>
     </View>
   </View>
+  <View
+    style={
+      {
+        "flexDirection": "column",
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "flexDirection": "column",
+        }
+      }
+    >
+      <ActivityIndicator
+        size="small"
+      />
+    </View>
+  </View>
   <RCTScrollView
     scrollEnabled={true}
     style={
