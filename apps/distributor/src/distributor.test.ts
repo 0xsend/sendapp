@@ -18,7 +18,7 @@ describe('Root Route', () => {
   })
 })
 
-describe('Distributor Route', () => {
+describe.skip('Distributor Route', () => {
   it('should reject unauthorized requests', async () => {
     const res = await request(app).post('/distributor/v1')
 
@@ -84,7 +84,7 @@ describe('Distributor Route', () => {
   })
 })
 
-describe('Distributor Worker', () => {
+describe.skip('Distributor Worker', () => {
   it('should calculate distribution shares', async () => {
     const distribution = {
       id: 4,

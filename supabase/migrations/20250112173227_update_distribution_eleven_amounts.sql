@@ -27,6 +27,7 @@ WHERE distribution_id = (SELECT id FROM distributions WHERE number = 11)
 -- update distribution_shares
 UPDATE public.distribution_shares
 SET amount             = amount * 1e16
+  , amount_after_slash = amount_after_slash * 1e16
   , hodler_pool_amount = hodler_pool_amount * 1e16
   , bonus_pool_amount  = bonus_pool_amount * 1e16
   , fixed_pool_amount  = fixed_pool_amount * 1e16
