@@ -11,10 +11,9 @@ export const useIsSendingUnlocked = () => {
   const isLoading = isCoinLoading || isLoadingSendAccount
   const isUnlocked =
     !isLoading &&
-    usdc &&
+    usdc !== undefined &&
     Boolean(sendAccount) &&
-    usdc.balance &&
-    usdc.decimals &&
+    usdc.balance !== undefined &&
     usdc.balance >= parseUnits(minGasBalance, usdc.decimals)
   return { isSendingUnlocked: isUnlocked, isLoading }
 }
