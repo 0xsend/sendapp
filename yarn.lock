@@ -6239,6 +6239,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@my/contracts@workspace:packages/contracts"
   dependencies:
+    "@0xsend/send-token-upgrade": "https://github.com/0xsend/send-token-upgrade#9bc328f8880b76e8e00656c5cc9cfcc49e3e2871"
     "@my/supabase": "workspace:*"
     "@openzeppelin/merkle-tree": "npm:1.0.5"
     "@supabase/supabase-js": "npm:2.44.2"

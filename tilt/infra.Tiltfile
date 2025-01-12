@@ -172,6 +172,19 @@ local_resource(
 )
 
 local_resource(
+    "anvil:anvil-deploy-send-merkle-drop-fixtures",
+    "yarn contracts dev:deploy-send-merkle-drop",
+    auto_init = False,
+    dir = _prj_root,
+    labels = labels,
+    resource_deps = _infra_resource_deps + [
+        "anvil:base",
+        "contracts:build",
+    ],
+    trigger_mode = TRIGGER_MODE_MANUAL,
+)
+
+local_resource(
     "anvil:anvil-add-send-merkle-drop-fixtures",
     "yarn contracts dev:anvil-add-send-merkle-drop-fixtures",
     auto_init = False,
@@ -180,6 +193,7 @@ local_resource(
     resource_deps = _infra_resource_deps + [
         "anvil:base",
         "contracts:build",
+        "anvil:anvil-deploy-send-merkle-drop-fixtures",
     ],
     trigger_mode = TRIGGER_MODE_MANUAL,
 )

@@ -44,7 +44,8 @@
     "openzeppelin-contracts/=packages/contracts/lib/openzeppelin-contracts/",
     "@openzeppelin/contracts/=packages/contracts/lib/openzeppelin-contracts/contracts/",
     "openzeppelin-contracts-upgradeable/=packages/contracts/lib/openzeppelin-contracts-upgradeable/",
-    "p256-verifier/=packages/contracts/lib/p256-verifier/src/"
+    "p256-verifier/=packages/contracts/lib/p256-verifier/src/",
+    "@uniswap/=./node_modules/@uniswap/"
   ],
   "sqlfluff.config": "supabase/sqlfluff.cfg"
 }

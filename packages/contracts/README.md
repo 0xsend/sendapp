@@ -125,14 +125,14 @@ forge script ./script/DeploySendMerkleDropScript.s.sol:DeploySendMerkleDropScrip
   -vvv \
   --rpc-url base-sepolia \
   --sender 0x647eb43401e13e995D89Cf26cD87e68890EE3f89 \
-  --keystores ~/.foundry/keystores/send_deployer 
+  --keystores ~/.foundry/keystores/send_deployer
   # --broadcast --verify
 ```
 
 #### Deploying SendMerkleDrop
 
 ```shell
-forge script ./script/DeploySendMerkleDrop.s.sol:DeploySendMerkleDropScript \ 
+forge script ./script/DeploySendMerkleDrop.s.sol:DeploySendMerkleDropScript \
   -vvv \
   --rpc-url base-sepolia \
   --sender 0x647eb43401e13e995D89Cf26cD87e68890EE3f89 \
@@ -154,7 +154,7 @@ forge script ./script/UpdateTokenPaymasterCachedPrice.s.sol:UpdateTokenPaymaster
 
 ```shell
 OPERATOR=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
-SEND_TOKEN=0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A
+SEND_TOKEN_V0=0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A
 AIRDROP_MULTISIG_SAFE=0x6204Bc0662ccd8a9A762d59fe7906733f251E3b7
 SEND_AIRDROP=0xB9310daE45E71c7a160A13D64204623071a8E347
 TRANCHE_MERKLE_ROOT=0x83c580aeb9546d9144688a39f479473fd7917b708b113bfbd4d62947d62cddff
@@ -162,7 +162,7 @@ TRANCHE_AMOUNT=717100769
 
 cast send --from 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 --unlocked $AIRDROP_MULTISIG_SAFE --value 10ether
 cast rpc anvil_impersonateAccount $AIRDROP_MULTISIG_SAFE
-cast send $SEND_TOKEN \
+cast send $SEND_TOKEN_V0 \
     --unlocked \
     --from $AIRDROP_MULTISIG_SAFE \
     "approve(address,uint256)" \
