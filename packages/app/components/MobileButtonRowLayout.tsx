@@ -38,9 +38,8 @@ const Row = styled(XStack, {
 const MobileButtonRow = ({
   children,
   isLoading,
-  isVisible = true,
-}: { children: React.ReactElement; isLoading: boolean; isVisible?: boolean } & XStackProps) => {
-  const { direction } = useScrollDirection()
+  isVisible,
+}: { children: React.ReactElement; isLoading: boolean; isVisible: boolean } & XStackProps) => {
   const isPwa = usePwa()
   const media = useMedia()
 
@@ -58,10 +57,10 @@ const MobileButtonRow = ({
         display: 'none',
       }}
       animation="200ms"
-      opacity={!isLoading && isVisible && direction !== 'down' ? 1 : 0}
-      scale={!isLoading && isVisible && direction !== 'down' ? 1 : 0.95}
+      opacity={!isLoading && isVisible ? 1 : 0}
+      scale={!isLoading && isVisible ? 1 : 0.95}
       animateOnly={['scale', 'transform', 'opacity']}
-      pointerEvents={!isLoading && isVisible && direction !== 'down' ? 'auto' : 'none'}
+      pointerEvents={!isLoading && isVisible ? 'auto' : 'none'}
     >
       <LinearGradient
         h={'150%'}
@@ -82,11 +81,13 @@ const MobileButtonRow = ({
 const Home = ({ children, ...props }: XStackProps) => {
   const { coin: selectedCoin } = useCoinFromTokenParam()
   const { isSendingUnlocked, isLoading } = useIsSendingUnlocked()
+  const { direction } = useScrollDirection()
+  const isVisible = isSendingUnlocked && Boolean(selectedCoin !== undefined) && direction !== 'down'
 
   return (
     <>
       {children}
-      <MobileButtonRow isLoading={isLoading}>
+      <MobileButtonRow isLoading={isLoading} isVisible={isVisible}>
         <Row {...props}>
           {(() => {
             switch (true) {
@@ -126,8 +127,12 @@ const Profile = (
   const identifierType = tag ? 'tag' : 'sendid'
   const { profile, isLoading } = useUser()
   const { data: otherUserProfile } = useProfileLookup(identifierType, identifier?.toString() || '')
+  const { direction } = useScrollDirection()
 
-  const isVisible = Boolean(otherUserProfile) && profile?.send_id !== otherUserProfile?.sendid
+  const isVisible =
+    Boolean(otherUserProfile) &&
+    profile?.send_id !== otherUserProfile?.sendid &&
+    direction !== 'down'
 
   return (
     <>
@@ -152,8 +157,13 @@ const ActivityRewards = ({ children, ...props }: XStackProps) => {
   const distribution =
     distributions?.find((d) => d.number === queryParams.distribution) ?? distributions?.[0]
   const shareAmount = distribution?.distribution_shares?.[0]?.amount_after_slash
+  const { direction } = useScrollDirection()
 
-  const isVisible = distribution !== undefined && shareAmount !== undefined && shareAmount > 0
+  const isVisible =
+    distribution !== undefined &&
+    shareAmount !== undefined &&
+    shareAmount > 0 &&
+    direction !== 'down'
   const distributionMonth = distribution?.timezone_adjusted_qualification_end.toLocaleString(
     'default',
     {
