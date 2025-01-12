@@ -40,6 +40,14 @@ export const GhostDepositButton = (props: Omit<LinkableButtonProps, 'href' | 'ch
       bc={'$backgroundTransparent'}
       $theme-light={{ boc: '$color12' }}
       $theme-dark={{ boc: '$primary' }}
+      key="home-ghost-deposit-button"
+      animation="200ms"
+      enterStyle={{
+        opacity: 0,
+      }}
+      exitStyle={{
+        opacity: 0,
+      }}
       {...props}
     >
       <XStack w={'100%'} gap={'$2.5'} ai={'center'} jc="center">
@@ -71,6 +79,14 @@ export const SendButton = (props: Omit<LinkableButtonProps, 'href' | 'children'>
       h={'$4.5'}
       w="100%"
       testID="homeSendButton"
+      key="home-send-button"
+      animation="200ms"
+      enterStyle={{
+        opacity: 0,
+      }}
+      exitStyle={{
+        opacity: 0,
+      }}
       {...props}
     >
       <XStack w={'100%'} ai={'center'} jc="center" h="100%">

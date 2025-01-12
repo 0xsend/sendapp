@@ -8,6 +8,7 @@ import {
   Paragraph,
   H3,
   useMedia,
+  AnimatePresence,
 } from '@my/ui'
 import { HomeButtons } from '../features/home/HomeButtons'
 import { useScrollDirection } from '../provider/scroll'
@@ -38,9 +39,8 @@ const Row = styled(XStack, {
 const MobileButtonRow = ({
   children,
   isLoading,
-  isVisible = true,
-}: { children: React.ReactElement; isLoading: boolean; isVisible?: boolean } & XStackProps) => {
-  const { direction } = useScrollDirection()
+  isVisible,
+}: { children: React.ReactElement; isLoading: boolean; isVisible: boolean } & XStackProps) => {
   const isPwa = usePwa()
   const media = useMedia()
 
@@ -58,10 +58,10 @@ const MobileButtonRow = ({
         display: 'none',
       }}
       animation="200ms"
-      opacity={!isLoading && isVisible && direction !== 'down' ? 1 : 0}
-      scale={!isLoading && isVisible && direction !== 'down' ? 1 : 0.95}
+      opacity={!isLoading && isVisible ? 1 : 0}
+      scale={!isLoading && isVisible ? 1 : 0.95}
       animateOnly={['scale', 'transform', 'opacity']}
-      pointerEvents={!isLoading && isVisible && direction !== 'down' ? 'auto' : 'none'}
+      pointerEvents={!isLoading && isVisible ? 'auto' : 'none'}
     >
       <LinearGradient
         h={'150%'}
@@ -82,36 +82,40 @@ const MobileButtonRow = ({
 const Home = ({ children, ...props }: XStackProps) => {
   const { coin: selectedCoin } = useCoinFromTokenParam()
   const { isSendingUnlocked, isLoading } = useIsSendingUnlocked()
+  const { direction } = useScrollDirection()
+  const isVisible = isSendingUnlocked && Boolean(selectedCoin !== undefined) && direction !== 'down'
 
   return (
     <>
       {children}
-      <MobileButtonRow isLoading={isLoading}>
+      <MobileButtonRow isLoading={isLoading} isVisible={isVisible}>
         <Row {...props}>
-          {(() => {
-            switch (true) {
-              case !isSendingUnlocked:
-                return null
-              case selectedCoin !== undefined:
-                return (
-                  <Stack f={1} $gtSm={{ w: '50%' }} flexDirection="row-reverse" maw={350}>
-                    <HomeButtons.SendButton />
-                  </Stack>
-                )
-              default:
-                return (
-                  <>
-                    <Stack f={1} w="50%" flexDirection="row-reverse" maw={350}>
-                      <HomeButtons.GhostDepositButton />
-                    </Stack>
-
-                    <Stack f={1} w="50%" jc={'center'} maw={350}>
+          <AnimatePresence>
+            {(() => {
+              switch (true) {
+                case !isSendingUnlocked || !isVisible:
+                  return null
+                case selectedCoin !== undefined:
+                  return (
+                    <Stack f={1} $gtSm={{ w: '50%' }} flexDirection="row-reverse" maw={350}>
                       <HomeButtons.SendButton />
                     </Stack>
-                  </>
-                )
-            }
-          })()}
+                  )
+                default:
+                  return (
+                    <>
+                      <Stack f={1} w="50%" flexDirection="row-reverse" maw={350}>
+                        <HomeButtons.GhostDepositButton />
+                      </Stack>
+
+                      <Stack f={1} w="50%" jc={'center'} maw={350}>
+                        <HomeButtons.SendButton />
+                      </Stack>
+                    </>
+                  )
+              }
+            })()}
+          </AnimatePresence>
         </Row>
       </MobileButtonRow>
     </>
@@ -126,8 +130,12 @@ const Profile = (
   const identifierType = tag ? 'tag' : 'sendid'
   const { profile, isLoading } = useUser()
   const { data: otherUserProfile } = useProfileLookup(identifierType, identifier?.toString() || '')
+  const { direction } = useScrollDirection()
 
-  const isVisible = Boolean(otherUserProfile) && profile?.send_id !== otherUserProfile?.sendid
+  const isVisible =
+    Boolean(otherUserProfile) &&
+    profile?.send_id !== otherUserProfile?.sendid &&
+    direction !== 'down'
 
   return (
     <>
@@ -135,10 +143,14 @@ const Profile = (
       <MobileButtonRow isLoading={isLoading} isVisible={isVisible}>
         <Row {...props}>
           <Stack w={'100%'}>
-            <ProfileButtons.SendButton
-              identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
-              idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
-            />
+            <AnimatePresence>
+              {isVisible && (
+                <ProfileButtons.SendButton
+                  identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
+                  idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
+                />
+              )}
+            </AnimatePresence>
           </Stack>
         </Row>
       </MobileButtonRow>
@@ -152,8 +164,13 @@ const ActivityRewards = ({ children, ...props }: XStackProps) => {
   const distribution =
     distributions?.find((d) => d.number === queryParams.distribution) ?? distributions?.[0]
   const shareAmount = distribution?.distribution_shares?.[0]?.amount_after_slash
+  const { direction } = useScrollDirection()
 
-  const isVisible = distribution !== undefined && shareAmount !== undefined && shareAmount > 0
+  const isVisible =
+    distribution !== undefined &&
+    shareAmount !== undefined &&
+    shareAmount > 0 &&
+    direction !== 'down'
   const distributionMonth = distribution?.timezone_adjusted_qualification_end.toLocaleString(
     'default',
     {

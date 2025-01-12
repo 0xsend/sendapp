@@ -28,7 +28,7 @@ const suggestions = [
 export function ActivityScreen() {
   return (
     <TagSearchProvider>
-      <YStack f={1} width={'100%'} pb="$4" gap="$6" $lg={{ pt: '$3' }}>
+      <YStack f={1} width={'100%'} pb="$3" pt="$3" gap="$6" $gtLg={{ pt: 0, gap: '$7' }}>
         <YStack width={'100%'} gap="$size.1.5" $gtSm={{ gap: '$size.2.5' }}>
           <Search />
         </YStack>
@@ -146,7 +146,7 @@ export function TableLabel({
 
 export function RowLabel({ children }: PropsWithChildren) {
   return (
-    <H4 fontWeight={'600'} size={'$6'} $gtLg={{ size: '$7' }}>
+    <H4 fontWeight={'600'} size={'$7'}>
       {children}
     </H4>
   )

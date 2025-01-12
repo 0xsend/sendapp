@@ -34,6 +34,7 @@ import { type Address, isAddress } from 'viem'
 import { IconAccount, IconArrowRight, IconSearch, IconX } from './icons'
 import { baseMainnet } from '@my/wagmi'
 import { useEnsName } from 'wagmi'
+import { useHoverStyles } from 'app/utils/useHoverStyles'
 
 type SearchResultsType = Functions<'tag_search'>[number]
 type SearchResultsKeysType = keyof SearchResultsType
@@ -58,7 +59,7 @@ function SearchResults() {
   const [resultsFilter, setResultsFilter] = useState<SearchResultsKeysType | null>(null)
   if (isLoading) {
     return (
-      <YStack key="loading" gap="$4" mt="$4" $gtLg={{ w: 600 }}>
+      <YStack key="loading" gap="$4" mt="$4" $gtLg={{ w: '50%' }}>
         <Spinner size="large" color="$olive" />
       </YStack>
     )
@@ -142,7 +143,7 @@ function SearchResults() {
           bc={'$color1'}
           p={'$3'}
           $gtLg={{
-            width: '600px',
+            width: '50%',
           }}
         >
           {SEARCH_RESULTS_KEYS.map((key) =>
@@ -237,7 +238,7 @@ const AddressSearchResultRow = ({ address }: { address: Address }) => {
       key={`SearchResultRow-${address}`}
       width="100%"
       testID="searchResults"
-      $gtLg={{ width: '600px' }}
+      $gtLg={{ width: '50%' }}
     >
       <Card
         testID={`tag-search-${address}`}
@@ -380,11 +381,7 @@ function SearchResultRow({
   const [queryParams] = useRootScreenParams()
   const { search: query } = queryParams
   const href = useSearchResultHref(profile)
-
-  const { resolvedTheme } = useThemeSetting()
-  const rowHoverBC = resolvedTheme?.startsWith('dark')
-    ? 'rgba(255,255,255, 0.1)'
-    : 'rgba(0,0,0, 0.1)'
+  const hoverStyles = useHoverStyles()
 
   if (!query) return null
 
@@ -394,9 +391,7 @@ function SearchResultRow({
       key={`SearchResultRow-${keyField}-${profile.tag_name}-${profile.send_id}`}
       width="100%"
       p={'$4'}
-      hoverStyle={{
-        bc: rowHoverBC,
-      }}
+      hoverStyle={hoverStyles}
     >
       <Link href={href}>
         <XStack ai={'center'} jc={'space-between'}>
@@ -513,9 +508,6 @@ function Search({ label, placeholder = 'Search' }: SearchProps) {
                 fontWeight: 'normal',
                 br: '$4',
                 bw: 0,
-                $gtLg: {
-                  w: 600,
-                },
                 hoverStyle: {
                   bw: 0,
                 },
@@ -562,7 +554,8 @@ function Search({ label, placeholder = 'Search' }: SearchProps) {
                 maxWidth: '100%',
               },
               $gtLg: {
-                w: 600,
+                width: '50%',
+                maxWidth: '50%',
                 als: 'flex-start',
               },
             }}

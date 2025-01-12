@@ -77,10 +77,10 @@ function ActivityFeed(
               }, {})
 
             return Object.entries(groups).map(([date, activities]) => (
-              <YStack key={date} gap={'$3'}>
+              <YStack key={date} gap={'$3.5'}>
                 <RowLabel>{date}</RowLabel>
                 <Fade>
-                  <YGroup bc={'$color1'} p={'$4.5'} gap={'$4'}>
+                  <YGroup bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }}>
                     {activities.map((activity) => (
                       <YGroup.Item
                         key={`${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`}

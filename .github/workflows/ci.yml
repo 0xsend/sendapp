@@ -14,7 +14,7 @@ concurrency:
 jobs:
   # set yarn cache
   cache-deps:
-    runs-on: self-hosted
+    runs-on: arc-runner-set
 
     steps:
       - uses: actions/checkout@v4
@@ -33,7 +33,7 @@ jobs:
 
   unit-tests:
     name: Unit Tests
-    runs-on: self-hosted
+    runs-on: arc-runner-set
     needs: [cache-deps]
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
@@ -84,7 +84,7 @@ jobs:
       - name: Tilt CI
         id: tilt-ci
         shell: bash
-        run: tilt ci unit-tests --timeout=10m
+        run: tilt ci unit-tests --timeout=15m
       - name: Lint
         run: yarn lint
       - name: Tilt Down
@@ -100,8 +100,8 @@ jobs:
   playwright-tests:
     # **always** skip if not dev or main to save resources
     name: Playwright Tests
-    if: ${{ github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' || github.head_ref == 'dev' || github.head_ref == 'main' }}
-    runs-on: self-hosted
+    # if: ${{ github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' || github.head_ref == 'dev' || github.head_ref == 'main' }}
+    runs-on: arc-runner-set
     needs: [cache-deps]
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
@@ -112,7 +112,7 @@ jobs:
     permissions:
       pull-requests: write
 
-    timeout-minutes: 40
+    timeout-minutes: 45
 
     steps:
       - name: Install Tilt
@@ -184,7 +184,7 @@ jobs:
           sleep 1
           echo tilt is ready
           max_attempts=60
-          wait_timeout=7
+          wait_timeout=10
           for ((i=1; i<=max_attempts; i++)); do
             echo "Attempt $i: Waiting for tilt with timeout ${wait_timeout}s"
 
@@ -244,20 +244,21 @@ jobs:
               exit 1
             fi
           done
-          yarn playwright test
+          # never scheduler more than 4 workers or up to 50% of the available cores
+          # this is due to concurrency issues within the send account sign up and resource contention
+          workers=$(MAX_WORKERS=4 node ./.devops/bin/worker-count)
+          yarn playwright test --workers=$workers
       - name: Playwright Markdown Report
         if: always() && steps.playwright.outcome != 'skipped'
         id: playwright-md-report
         shell: bash
         run: |
-          echo "Markdown report:"
           echo "------------------"
           bun run packages/playwright/bin/report-markdown.ts > playwright-report.md
           cat playwright-report.md
           echo "------------------"
-          echo "Markdown report end"
       - uses: mshick/add-pr-comment@v2
-        if: always() && steps.playwright.outcome != 'skipped'
+        if: always() && steps.playwright.outcome != 'skipped' && steps.playwright-md-report.outcome == 'success'
         with:
           message-id: playwright-report
           refresh-message-position: true
@@ -286,7 +287,7 @@ jobs:
   vercel-deploy-preview:
     # **always** skip if on dev and main since it will be deployed with another workflow
     if: ${{ github.ref != 'refs/heads/dev' && github.ref != 'refs/heads/main' && github.head_ref != 'dev' && github.head_ref != 'main'  }}
-    runs-on: ubuntu-latest
+    runs-on: arc-runner-set
     needs: [cache-deps]
 
     permissions:

@@ -7,7 +7,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
       "flex": 1,
       "flexDirection": "column",
       "gap": 32,
-      "paddingBottom": 18,
+      "paddingBottom": 13,
       "paddingTop": 13,
       "width": "100%",
     }
@@ -536,7 +536,6 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
         <View
           style={
             {
-              "backgroundColor": "rgba(0,0,0,0)",
               "borderBottomLeftRadius": 10,
               "borderBottomRightRadius": 10,
               "borderTopLeftRadius": 10,
@@ -879,7 +878,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
           style={
             {
               "flexDirection": "column",
-              "gap": 13,
+              "gap": 16,
             }
           }
         >
@@ -889,14 +888,14 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               {
                 "color": "#FFFFFF",
                 "fontFamily": "System",
-                "fontSize": 18,
+                "fontSize": 20,
                 "fontWeight": "700",
-                "lineHeight": 22,
+                "lineHeight": 24,
                 "marginBottom": 0,
                 "marginLeft": 0,
                 "marginRight": 0,
                 "marginTop": 0,
-                "textTransform": "uppercase",
+                "textTransform": "none",
                 "userSelect": "auto",
               }
             }
@@ -939,11 +938,10 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   "borderTopLeftRadius": 16,
                   "borderTopRightRadius": 16,
                   "flexDirection": "column",
-                  "gap": 18,
-                  "paddingBottom": 21,
-                  "paddingLeft": 21,
-                  "paddingRight": 21,
-                  "paddingTop": 21,
+                  "paddingBottom": 7,
+                  "paddingLeft": 7,
+                  "paddingRight": 7,
+                  "paddingTop": 7,
                 }
               }
             >
@@ -954,7 +952,10 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                     "flexDirection": "row",
                     "gap": 18,
                     "justifyContent": "space-between",
-                    "paddingBottom": 7,
+                    "paddingBottom": 16,
+                    "paddingLeft": 16,
+                    "paddingRight": 16,
+                    "paddingTop": 16,
                     "width": "100%",
                   }
                 }
@@ -1096,7 +1097,6 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                       {
                         "flex": 1,
                         "flexDirection": "column",
-                        "gap": 4,
                         "overflow": "hidden",
                         "width": "100%",
                       }
@@ -1118,7 +1118,8 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#FFFFFF",
                             "fontFamily": "System",
-                            "fontSize": 19.2,
+                            "fontSize": 21.599999999999998,
+                            "fontWeight": "500",
                           }
                         }
                         suppressHighlighting={true}
@@ -1130,7 +1131,8 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#FFFFFF",
                             "fontFamily": "System",
-                            "fontSize": 19.2,
+                            "fontSize": 21.599999999999998,
+                            "fontWeight": "500",
                             "textAlign": "right",
                           }
                         }
@@ -1157,7 +1159,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#B2B2B2",
                             "fontFamily": "System",
-                            "fontSize": 16.8,
+                            "fontSize": 19.2,
                             "fontWeight": "400",
                             "lineHeight": 19,
                             "maxWidth": "100%",
@@ -1174,9 +1176,10 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#B2B2B2",
                             "fontFamily": "System",
-                            "fontSize": 15.6,
-                            "fontWeight": "300",
-                            "lineHeight": 18,
+                            "fontSize": 19.2,
+                            "fontWeight": "400",
+                            "lineHeight": 21,
+                            "textAlign": "right",
                             "userSelect": "auto",
                           }
                         }
@@ -1195,7 +1198,10 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                     "flexDirection": "row",
                     "gap": 18,
                     "justifyContent": "space-between",
-                    "paddingBottom": 7,
+                    "paddingBottom": 16,
+                    "paddingLeft": 16,
+                    "paddingRight": 16,
+                    "paddingTop": 16,
                     "width": "100%",
                   }
                 }
@@ -1342,7 +1348,6 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                       {
                         "flex": 1,
                         "flexDirection": "column",
-                        "gap": 4,
                         "overflow": "hidden",
                         "width": "100%",
                       }
@@ -1364,7 +1369,8 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#FFFFFF",
                             "fontFamily": "System",
-                            "fontSize": 19.2,
+                            "fontSize": 21.599999999999998,
+                            "fontWeight": "500",
                           }
                         }
                         suppressHighlighting={true}
@@ -1376,7 +1382,8 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#FFFFFF",
                             "fontFamily": "System",
-                            "fontSize": 19.2,
+                            "fontSize": 21.599999999999998,
+                            "fontWeight": "500",
                             "textAlign": "right",
                           }
                         }
@@ -1403,7 +1410,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#B2B2B2",
                             "fontFamily": "System",
-                            "fontSize": 16.8,
+                            "fontSize": 19.2,
                             "fontWeight": "400",
                             "lineHeight": 19,
                             "maxWidth": "100%",
@@ -1420,9 +1427,10 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#B2B2B2",
                             "fontFamily": "System",
-                            "fontSize": 15.6,
-                            "fontWeight": "300",
-                            "lineHeight": 18,
+                            "fontSize": 19.2,
+                            "fontWeight": "400",
+                            "lineHeight": 21,
+                            "textAlign": "right",
                             "userSelect": "auto",
                           }
                         }
@@ -1441,7 +1449,10 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                     "flexDirection": "row",
                     "gap": 18,
                     "justifyContent": "space-between",
-                    "paddingBottom": 7,
+                    "paddingBottom": 16,
+                    "paddingLeft": 16,
+                    "paddingRight": 16,
+                    "paddingTop": 16,
                     "width": "100%",
                   }
                 }
@@ -1593,7 +1604,6 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                       {
                         "flex": 1,
                         "flexDirection": "column",
-                        "gap": 4,
                         "overflow": "hidden",
                         "width": "100%",
                       }
@@ -1615,7 +1625,8 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#FFFFFF",
                             "fontFamily": "System",
-                            "fontSize": 19.2,
+                            "fontSize": 21.599999999999998,
+                            "fontWeight": "500",
                           }
                         }
                         suppressHighlighting={true}
@@ -1627,7 +1638,8 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#FFFFFF",
                             "fontFamily": "System",
-                            "fontSize": 19.2,
+                            "fontSize": 21.599999999999998,
+                            "fontWeight": "500",
                             "textAlign": "right",
                           }
                         }
@@ -1654,7 +1666,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#B2B2B2",
                             "fontFamily": "System",
-                            "fontSize": 16.8,
+                            "fontSize": 19.2,
                             "fontWeight": "400",
                             "lineHeight": 19,
                             "maxWidth": "100%",
@@ -1671,9 +1683,10 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#B2B2B2",
                             "fontFamily": "System",
-                            "fontSize": 15.6,
-                            "fontWeight": "300",
-                            "lineHeight": 18,
+                            "fontSize": 19.2,
+                            "fontWeight": "400",
+                            "lineHeight": 21,
+                            "textAlign": "right",
                             "userSelect": "auto",
                           }
                         }
@@ -1692,7 +1705,10 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                     "flexDirection": "row",
                     "gap": 18,
                     "justifyContent": "space-between",
-                    "paddingBottom": 7,
+                    "paddingBottom": 16,
+                    "paddingLeft": 16,
+                    "paddingRight": 16,
+                    "paddingTop": 16,
                     "width": "100%",
                   }
                 }
@@ -1834,7 +1850,6 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                       {
                         "flex": 1,
                         "flexDirection": "column",
-                        "gap": 4,
                         "overflow": "hidden",
                         "width": "100%",
                       }
@@ -1856,7 +1871,8 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#FFFFFF",
                             "fontFamily": "System",
-                            "fontSize": 19.2,
+                            "fontSize": 21.599999999999998,
+                            "fontWeight": "500",
                           }
                         }
                         suppressHighlighting={true}
@@ -1868,7 +1884,8 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#FFFFFF",
                             "fontFamily": "System",
-                            "fontSize": 19.2,
+                            "fontSize": 21.599999999999998,
+                            "fontWeight": "500",
                             "textAlign": "right",
                           }
                         }
@@ -1895,7 +1912,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#B2B2B2",
                             "fontFamily": "System",
-                            "fontSize": 16.8,
+                            "fontSize": 19.2,
                             "fontWeight": "400",
                             "lineHeight": 19,
                             "maxWidth": "100%",
@@ -1912,9 +1929,10 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#B2B2B2",
                             "fontFamily": "System",
-                            "fontSize": 15.6,
-                            "fontWeight": "300",
-                            "lineHeight": 18,
+                            "fontSize": 19.2,
+                            "fontWeight": "400",
+                            "lineHeight": 21,
+                            "textAlign": "right",
                             "userSelect": "auto",
                           }
                         }
@@ -1933,7 +1951,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
           style={
             {
               "flexDirection": "column",
-              "gap": 13,
+              "gap": 16,
             }
           }
         >
@@ -1943,14 +1961,14 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               {
                 "color": "#FFFFFF",
                 "fontFamily": "System",
-                "fontSize": 18,
+                "fontSize": 20,
                 "fontWeight": "700",
-                "lineHeight": 22,
+                "lineHeight": 24,
                 "marginBottom": 0,
                 "marginLeft": 0,
                 "marginRight": 0,
                 "marginTop": 0,
-                "textTransform": "uppercase",
+                "textTransform": "none",
                 "userSelect": "auto",
               }
             }
@@ -1993,11 +2011,10 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   "borderTopLeftRadius": 16,
                   "borderTopRightRadius": 16,
                   "flexDirection": "column",
-                  "gap": 18,
-                  "paddingBottom": 21,
-                  "paddingLeft": 21,
-                  "paddingRight": 21,
-                  "paddingTop": 21,
+                  "paddingBottom": 7,
+                  "paddingLeft": 7,
+                  "paddingRight": 7,
+                  "paddingTop": 7,
                 }
               }
             >
@@ -2008,7 +2025,10 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                     "flexDirection": "row",
                     "gap": 18,
                     "justifyContent": "space-between",
-                    "paddingBottom": 7,
+                    "paddingBottom": 16,
+                    "paddingLeft": 16,
+                    "paddingRight": 16,
+                    "paddingTop": 16,
                     "width": "100%",
                   }
                 }
@@ -2150,7 +2170,6 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                       {
                         "flex": 1,
                         "flexDirection": "column",
-                        "gap": 4,
                         "overflow": "hidden",
                         "width": "100%",
                       }
@@ -2172,7 +2191,8 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#FFFFFF",
                             "fontFamily": "System",
-                            "fontSize": 19.2,
+                            "fontSize": 21.599999999999998,
+                            "fontWeight": "500",
                           }
                         }
                         suppressHighlighting={true}
@@ -2184,7 +2204,8 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#FFFFFF",
                             "fontFamily": "System",
-                            "fontSize": 19.2,
+                            "fontSize": 21.599999999999998,
+                            "fontWeight": "500",
                             "textAlign": "right",
                           }
                         }
@@ -2209,7 +2230,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#B2B2B2",
                             "fontFamily": "System",
-                            "fontSize": 16.8,
+                            "fontSize": 19.2,
                             "fontWeight": "400",
                             "lineHeight": 19,
                             "maxWidth": "100%",
@@ -2224,9 +2245,10 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#B2B2B2",
                             "fontFamily": "System",
-                            "fontSize": 15.6,
-                            "fontWeight": "300",
-                            "lineHeight": 18,
+                            "fontSize": 19.2,
+                            "fontWeight": "400",
+                            "lineHeight": 21,
+                            "textAlign": "right",
                             "userSelect": "auto",
                           }
                         }
@@ -2245,7 +2267,10 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                     "flexDirection": "row",
                     "gap": 18,
                     "justifyContent": "space-between",
-                    "paddingBottom": 7,
+                    "paddingBottom": 16,
+                    "paddingLeft": 16,
+                    "paddingRight": 16,
+                    "paddingTop": 16,
                     "width": "100%",
                   }
                 }
@@ -2387,7 +2412,6 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                       {
                         "flex": 1,
                         "flexDirection": "column",
-                        "gap": 4,
                         "overflow": "hidden",
                         "width": "100%",
                       }
@@ -2409,7 +2433,8 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#FFFFFF",
                             "fontFamily": "System",
-                            "fontSize": 19.2,
+                            "fontSize": 21.599999999999998,
+                            "fontWeight": "500",
                           }
                         }
                         suppressHighlighting={true}
@@ -2421,7 +2446,8 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#FFFFFF",
                             "fontFamily": "System",
-                            "fontSize": 19.2,
+                            "fontSize": 21.599999999999998,
+                            "fontWeight": "500",
                             "textAlign": "right",
                           }
                         }
@@ -2446,7 +2472,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#B2B2B2",
                             "fontFamily": "System",
-                            "fontSize": 16.8,
+                            "fontSize": 19.2,
                             "fontWeight": "400",
                             "lineHeight": 19,
                             "maxWidth": "100%",
@@ -2461,9 +2487,10 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#B2B2B2",
                             "fontFamily": "System",
-                            "fontSize": 15.6,
-                            "fontWeight": "300",
-                            "lineHeight": 18,
+                            "fontSize": 19.2,
+                            "fontWeight": "400",
+                            "lineHeight": 21,
+                            "textAlign": "right",
                             "userSelect": "auto",
                           }
                         }
@@ -2482,7 +2509,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
           style={
             {
               "flexDirection": "column",
-              "gap": 13,
+              "gap": 16,
             }
           }
         >
@@ -2492,14 +2519,14 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               {
                 "color": "#FFFFFF",
                 "fontFamily": "System",
-                "fontSize": 18,
+                "fontSize": 20,
                 "fontWeight": "700",
-                "lineHeight": 22,
+                "lineHeight": 24,
                 "marginBottom": 0,
                 "marginLeft": 0,
                 "marginRight": 0,
                 "marginTop": 0,
-                "textTransform": "uppercase",
+                "textTransform": "none",
                 "userSelect": "auto",
               }
             }
@@ -2542,11 +2569,10 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   "borderTopLeftRadius": 16,
                   "borderTopRightRadius": 16,
                   "flexDirection": "column",
-                  "gap": 18,
-                  "paddingBottom": 21,
-                  "paddingLeft": 21,
-                  "paddingRight": 21,
-                  "paddingTop": 21,
+                  "paddingBottom": 7,
+                  "paddingLeft": 7,
+                  "paddingRight": 7,
+                  "paddingTop": 7,
                 }
               }
             >
@@ -2557,7 +2583,10 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                     "flexDirection": "row",
                     "gap": 18,
                     "justifyContent": "space-between",
-                    "paddingBottom": 7,
+                    "paddingBottom": 16,
+                    "paddingLeft": 16,
+                    "paddingRight": 16,
+                    "paddingTop": 16,
                     "width": "100%",
                   }
                 }
@@ -2709,7 +2738,6 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                       {
                         "flex": 1,
                         "flexDirection": "column",
-                        "gap": 4,
                         "overflow": "hidden",
                         "width": "100%",
                       }
@@ -2731,7 +2759,8 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#FFFFFF",
                             "fontFamily": "System",
-                            "fontSize": 19.2,
+                            "fontSize": 21.599999999999998,
+                            "fontWeight": "500",
                           }
                         }
                         suppressHighlighting={true}
@@ -2743,7 +2772,8 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#FFFFFF",
                             "fontFamily": "System",
-                            "fontSize": 19.2,
+                            "fontSize": 21.599999999999998,
+                            "fontWeight": "500",
                             "textAlign": "right",
                           }
                         }
@@ -2773,11 +2803,9 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                             {
                               "color": "#B2B2B2",
                               "fontFamily": "System",
-                              "fontSize": 16.8,
+                              "fontSize": 19.2,
                               "fontWeight": "400",
                               "lineHeight": 19,
-                              "maxWidth": "100%",
-                              "overflow": "hidden",
                               "textDecorationLine": "underline",
                               "userSelect": "auto",
                             }
@@ -2792,9 +2820,10 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#B2B2B2",
                             "fontFamily": "System",
-                            "fontSize": 15.6,
-                            "fontWeight": "300",
-                            "lineHeight": 18,
+                            "fontSize": 19.2,
+                            "fontWeight": "400",
+                            "lineHeight": 21,
+                            "textAlign": "right",
                             "userSelect": "auto",
                           }
                         }
@@ -2813,7 +2842,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
           style={
             {
               "flexDirection": "column",
-              "gap": 13,
+              "gap": 16,
             }
           }
         >
@@ -2823,14 +2852,14 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               {
                 "color": "#FFFFFF",
                 "fontFamily": "System",
-                "fontSize": 18,
+                "fontSize": 20,
                 "fontWeight": "700",
-                "lineHeight": 22,
+                "lineHeight": 24,
                 "marginBottom": 0,
                 "marginLeft": 0,
                 "marginRight": 0,
                 "marginTop": 0,
-                "textTransform": "uppercase",
+                "textTransform": "none",
                 "userSelect": "auto",
               }
             }
@@ -2873,11 +2902,10 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   "borderTopLeftRadius": 16,
                   "borderTopRightRadius": 16,
                   "flexDirection": "column",
-                  "gap": 18,
-                  "paddingBottom": 21,
-                  "paddingLeft": 21,
-                  "paddingRight": 21,
-                  "paddingTop": 21,
+                  "paddingBottom": 7,
+                  "paddingLeft": 7,
+                  "paddingRight": 7,
+                  "paddingTop": 7,
                 }
               }
             >
@@ -2888,7 +2916,10 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                     "flexDirection": "row",
                     "gap": 18,
                     "justifyContent": "space-between",
-                    "paddingBottom": 7,
+                    "paddingBottom": 16,
+                    "paddingLeft": 16,
+                    "paddingRight": 16,
+                    "paddingTop": 16,
                     "width": "100%",
                   }
                 }
@@ -3035,7 +3066,6 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                       {
                         "flex": 1,
                         "flexDirection": "column",
-                        "gap": 4,
                         "overflow": "hidden",
                         "width": "100%",
                       }
@@ -3057,7 +3087,8 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#FFFFFF",
                             "fontFamily": "System",
-                            "fontSize": 19.2,
+                            "fontSize": 21.599999999999998,
+                            "fontWeight": "500",
                           }
                         }
                         suppressHighlighting={true}
@@ -3069,7 +3100,8 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#FFFFFF",
                             "fontFamily": "System",
-                            "fontSize": 19.2,
+                            "fontSize": 21.599999999999998,
+                            "fontWeight": "500",
                             "textAlign": "right",
                           }
                         }
@@ -3099,11 +3131,9 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                             {
                               "color": "#B2B2B2",
                               "fontFamily": "System",
-                              "fontSize": 16.8,
+                              "fontSize": 19.2,
                               "fontWeight": "400",
                               "lineHeight": 19,
-                              "maxWidth": "100%",
-                              "overflow": "hidden",
                               "textDecorationLine": "underline",
                               "userSelect": "auto",
                             }
@@ -3118,15 +3148,16 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#B2B2B2",
                             "fontFamily": "System",
-                            "fontSize": 15.6,
-                            "fontWeight": "300",
-                            "lineHeight": 18,
+                            "fontSize": 19.2,
+                            "fontWeight": "400",
+                            "lineHeight": 21,
+                            "textAlign": "right",
                             "userSelect": "auto",
                           }
                         }
                         suppressHighlighting={true}
                       >
-                        6 mon ago
+                        7 mon ago
                       </Text>
                     </View>
                   </View>
@@ -3139,7 +3170,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
           style={
             {
               "flexDirection": "column",
-              "gap": 13,
+              "gap": 16,
             }
           }
         >
@@ -3149,14 +3180,14 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               {
                 "color": "#FFFFFF",
                 "fontFamily": "System",
-                "fontSize": 18,
+                "fontSize": 20,
                 "fontWeight": "700",
-                "lineHeight": 22,
+                "lineHeight": 24,
                 "marginBottom": 0,
                 "marginLeft": 0,
                 "marginRight": 0,
                 "marginTop": 0,
-                "textTransform": "uppercase",
+                "textTransform": "none",
                 "userSelect": "auto",
               }
             }
@@ -3199,11 +3230,10 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   "borderTopLeftRadius": 16,
                   "borderTopRightRadius": 16,
                   "flexDirection": "column",
-                  "gap": 18,
-                  "paddingBottom": 21,
-                  "paddingLeft": 21,
-                  "paddingRight": 21,
-                  "paddingTop": 21,
+                  "paddingBottom": 7,
+                  "paddingLeft": 7,
+                  "paddingRight": 7,
+                  "paddingTop": 7,
                 }
               }
             >
@@ -3214,7 +3244,10 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                     "flexDirection": "row",
                     "gap": 18,
                     "justifyContent": "space-between",
-                    "paddingBottom": 7,
+                    "paddingBottom": 16,
+                    "paddingLeft": 16,
+                    "paddingRight": 16,
+                    "paddingTop": 16,
                     "width": "100%",
                   }
                 }
@@ -3356,7 +3389,6 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                       {
                         "flex": 1,
                         "flexDirection": "column",
-                        "gap": 4,
                         "overflow": "hidden",
                         "width": "100%",
                       }
@@ -3378,7 +3410,8 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#FFFFFF",
                             "fontFamily": "System",
-                            "fontSize": 19.2,
+                            "fontSize": 21.599999999999998,
+                            "fontWeight": "500",
                           }
                         }
                         suppressHighlighting={true}
@@ -3390,7 +3423,8 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#FFFFFF",
                             "fontFamily": "System",
-                            "fontSize": 19.2,
+                            "fontSize": 21.599999999999998,
+                            "fontWeight": "500",
                             "textAlign": "right",
                           }
                         }
@@ -3417,7 +3451,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#B2B2B2",
                             "fontFamily": "System",
-                            "fontSize": 16.8,
+                            "fontSize": 19.2,
                             "fontWeight": "400",
                             "lineHeight": 19,
                             "maxWidth": "100%",
@@ -3434,9 +3468,10 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                           {
                             "color": "#B2B2B2",
                             "fontFamily": "System",
-                            "fontSize": 15.6,
-                            "fontWeight": "300",
-                            "lineHeight": 18,
+                            "fontSize": 19.2,
+                            "fontWeight": "400",
+                            "lineHeight": 21,
+                            "textAlign": "right",
                             "userSelect": "auto",
                           }
                         }

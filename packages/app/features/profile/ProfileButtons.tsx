@@ -16,6 +16,14 @@ export const SendButton = ({
     miw={150}
     theme={'green'}
     testID={'profileSendButton'}
+    key="profile-send-button"
+    animation="200ms"
+    enterStyle={{
+      opacity: 0,
+    }}
+    exitStyle={{
+      opacity: 0,
+    }}
   >
     <XStack w={'100%'} jc={'center'} ai={'center'} gap={'$2'} h="100%">
       <LinkableButton.Text

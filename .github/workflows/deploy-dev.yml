@@ -1,11 +1,13 @@
 name: Deploy Dev
 
 on:
-  workflow_run:
-    workflows: ["Docker Build"]
-    branches: [dev]
-    types:
-      - completed
+  # manual trigger for now
+  # workflow_run:
+  #   workflows: ["Docker Build"]
+  #   branches: [dev]
+  #   types:
+  #     - completed
+  workflow_dispatch:
 jobs:
   deploy-docker-dev:
     runs-on: self-hosted

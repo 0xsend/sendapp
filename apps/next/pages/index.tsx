@@ -11,11 +11,13 @@ import Head from 'next/head'
 import { userOnboarded } from 'utils/userOnboarded'
 import type { NextPageWithLayout } from './_app'
 import { AuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { getRemoteAssets } from 'utils/getRemoteAssets'
 import type { GetPlaiceholderImage } from 'app/utils/getPlaiceholderImage'
 
 import { MobileButtonRowLayout } from 'app/components/MobileButtonRowLayout'
+import { useQueryClient } from '@tanstack/react-query'
+import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
 
 const log = debug('app:pages:index')
 
@@ -25,10 +27,23 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
   const { session } = useUser()
   const [carouselImages, setCarouselImages] = useState<GetPlaiceholderImage[]>([])
   const [carouselProgress, setCarouselProgress] = useState(0)
+  const queryClient = useQueryClient()
+
+  const cancelAndRemoveAccountsQueries = useCallback(async () => {
+    if (!session) {
+      const options = { queryKey: [useSendAccount.queryKey] }
+      await queryClient.cancelQueries(options)
+      queryClient.removeQueries(options)
+    }
+  }, [session, queryClient])
 
   useEffect(() => {
     if (carouselImages.length === 0) setCarouselImages(images)
   }, [carouselImages, images])
+
+  useEffect(() => {
+    void cancelAndRemoveAccountsQueries()
+  }, [cancelAndRemoveAccountsQueries])
 
   return (
     <>

@@ -30,6 +30,13 @@ runs:
       with:
         node-version-file: .node-version
         cache: "yarn"
+    - name: Print a CPU report
+      shell: bash
+      run: |
+        echo "=== CPU report ==="
+        lscpu
+        echo "=== Memory report ==="
+        free -h -t
     - name: Setup Bun
       if: ${{ inputs.install-bun == 'true' }}
       uses: oven-sh/setup-bun@v1

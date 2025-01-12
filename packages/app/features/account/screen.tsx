@@ -18,8 +18,8 @@ import {
   IconStarOutline,
   IconGear,
   IconShare,
-  IconBadgeCheck,
   IconArrowRight,
+  IconSlash,
 } from 'app/components/icons'
 import { getReferralHref } from 'app/utils/getReferralLink'
 import { useUser } from 'app/utils/useUser'
@@ -30,6 +30,7 @@ import { type PropsWithChildren, type ReactNode, useEffect, useState } from 'rea
 import { useConfirmedTags } from 'app/utils/tags'
 import { useUserReferralsCount } from 'app/utils/useUserReferralsCount'
 import { IconRocket } from 'app/components/icons/IconRocket'
+import { useHoverStyles } from 'app/utils/useHoverStyles'
 
 export function AccountScreen() {
   const media = useMedia()
@@ -99,7 +100,7 @@ export function AccountScreen() {
     {
       label: 'Sendtags',
       href: '/account/sendtag',
-      icon: <IconBadgeCheck size={22} $theme-light={{ color: '$color12' }} />,
+      icon: <IconSlash size={22} $theme-light={{ color: '$color12' }} />,
     },
     {
       label: 'Rewards',
@@ -312,15 +313,9 @@ export function AccountScreen() {
   )
 }
 
-const StackButton = ({
-  href,
-  label,
-  icon,
-}: {
-  href: string
-  label: string
-  icon: ReactNode
-}) => {
+const StackButton = ({ href, label, icon }: { href: string; label: string; icon: ReactNode }) => {
+  const hoverStyles = useHoverStyles()
+
   return (
     <LinkableButton
       href={href}
@@ -331,10 +326,7 @@ const StackButton = ({
       $gtXs={{ p: '$size.3.5' }}
       borderWidth={1}
       borderColor={'$color1'}
-      hoverStyle={{
-        borderColor: '$primary',
-      }}
-      $theme-light={{ hoverStyle: { borderColor: '$color12' } }}
+      hoverStyle={hoverStyles}
     >
       <XStack jc={'space-between'} ai={'center'}>
         <XStack gap={'$size.0.9'} ai={'center'}>
