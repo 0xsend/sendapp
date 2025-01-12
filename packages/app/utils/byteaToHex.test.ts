@@ -22,5 +22,9 @@ describe('test byteaToHex', () => {
 
     // @ts-expect-error Testing with null or empty string
     expect(() => byteaToHex('')).toThrow('Hex string must start with \\x')
+    // @ts-expect-error Testing with null or empty string
+    expect(() => byteaToHex(undefined)).toThrow('Hex string must start with \\x')
+    // @ts-expect-error Testing with null or empty string
+    expect(() => byteaToHex(null)).toThrow('Hex string must start with \\x')
   })
 })
