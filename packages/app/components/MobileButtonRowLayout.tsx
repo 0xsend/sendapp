@@ -83,7 +83,7 @@ const Home = ({ children, ...props }: XStackProps) => {
   const { coin: selectedCoin } = useCoinFromTokenParam()
   const { isSendingUnlocked, isLoading } = useIsSendingUnlocked()
   const { direction } = useScrollDirection()
-  const isVisible = isSendingUnlocked && Boolean(selectedCoin !== undefined) && direction !== 'down'
+  const isVisible = isSendingUnlocked && direction !== 'down'
 
   return (
     <>
