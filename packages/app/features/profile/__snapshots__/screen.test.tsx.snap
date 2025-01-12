@@ -669,9 +669,33 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
     >
       <View
         cancelable={true}
+        collapsable={false}
         disabled={false}
         focusVisibleStyle={{}}
         focusable={[Function]}
+        forwardedRef={[Function]}
+        jestAnimatedStyle={
+          {
+            "value": {
+              "backgroundColor": "#081619",
+              "borderBottomColor": "transparent",
+              "borderBottomLeftRadius": 9,
+              "borderBottomRightRadius": 9,
+              "borderBottomWidth": 1,
+              "borderLeftColor": "transparent",
+              "borderLeftWidth": 1,
+              "borderRightColor": "transparent",
+              "borderRightWidth": 1,
+              "borderTopColor": "transparent",
+              "borderTopLeftRadius": 9,
+              "borderTopRightRadius": 9,
+              "borderTopWidth": 1,
+              "height": 48,
+              "opacity": 0,
+              "width": "100%",
+            },
+          }
+        }
         minPressDuration={0}
         onBlur={[Function]}
         onFocus={[Function]}
@@ -704,6 +728,7 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
             "height": 48,
             "justifyContent": "center",
             "minWidth": 150,
+            "opacity": 0,
             "paddingLeft": 16,
             "paddingRight": 16,
             "width": "100%",
