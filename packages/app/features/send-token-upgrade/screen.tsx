@@ -112,7 +112,11 @@ export function SendV0TokenUpgradeScreen({ children }: { children?: React.ReactN
           <UpgradeTokenButton />
 
           <Theme name="green">
-            <Link href="https://info.send.it/send-token-upgrade" target="_blank" color="$color10">
+            <Link
+              href="https://info.send.it/send-docs/send-token/send-v1-tokenomics"
+              target="_blank"
+              color="$color10"
+            >
               <Paragraph fontSize="$4" textDecorationLine="underline" color="$primary">
                 Read more about the Upgrade
               </Paragraph>
