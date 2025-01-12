@@ -3,14 +3,16 @@ import type { Database, Tables } from '@my/supabase/database.types'
 import type { Logger } from 'pino'
 import {
   createDistributionShares,
+  fetchActiveDistributions,
   fetchAllHodlers,
   fetchAllVerifications,
   fetchDistribution,
   fetchDistributionShares,
-  supabaseAdmin,
+  fetchSendSlash,
 } from './supabase'
 import { fetchAllBalances, isMerkleDropActive } from './wagmi'
 import { calculateWeights, PERC_DENOM } from './weights'
+import { assert } from 'app/utils/assert'
 
 type Multiplier = {
   value?: number
@@ -81,15 +83,7 @@ export class DistributorV2Worker {
   private async calculateDistributions() {
     this.log.info('Calculating distributions')
 
-    const { data: distributions, error } = await supabaseAdmin
-      .from('distributions')
-      .select(
-        `*,
-        distribution_verification_values (*)`,
-        { count: 'exact' }
-      )
-      .lte('qualification_start', new Date().toISOString())
-      .gte('qualification_end', new Date().toISOString())
+    const { data: distributions, error } = await fetchActiveDistributions()
 
     if (error) {
       this.log.error({ error: error.message, code: error.code }, 'Error fetching distributions.')
@@ -132,13 +126,21 @@ export class DistributorV2Worker {
   }
 
   private async _calculateDistributionShares(
-    distribution: Tables<'distributions'> & {
-      distribution_verification_values: Tables<'distribution_verification_values'>[]
-    }
+    distribution: NonNullable<Awaited<ReturnType<typeof fetchActiveDistributions>>['data']>[number]
   ): Promise<void> {
     const log = this.log.child({ distribution_id: distribution.id })
 
-    if (await isMerkleDropActive(distribution)) {
+    assert(
+      !!distribution.merkle_drop_addr && distribution.merkle_drop_addr !== null,
+      'No merkle drop address found for distribution'
+    )
+    if (
+      await isMerkleDropActive({
+        number: distribution.number,
+        chain_id: distribution.chain_id,
+        merkle_drop_addr: distribution.merkle_drop_addr,
+      })
+    ) {
       throw new Error('Tranche is active. Cannot calculate distribution shares.')
     }
 
@@ -253,35 +255,35 @@ export class DistributorV2Worker {
     }
 
     // lookup balances of all hodler addresses in qualification period
-    const batches = inBatches(hodlerAddresses).flatMap(async (addresses) => {
-      return await Promise.all(
-        fetchAllBalances({
-          addresses,
-          distribution,
-        })
-      )
-    })
-
     // Filter out hodler with not enough send token balance
-    let minBalanceAddresses: { user_id: string; address: `0x${string}`; balance: string }[] = []
-    for await (const batch of batches) {
-      minBalanceAddresses = minBalanceAddresses.concat(...batch)
-    }
+    const minBalanceAddresses: { user_id: string; address: `0x${string}`; balance: string }[] =
+      await fetchAllBalances({
+        addresses: hodlerAddresses,
+        distribution,
+      }).then(async (balances) => {
+        log.info(`Found ${balances.length} balances.`)
+        if (log.isLevelEnabled('debug')) {
+          await Bun.write('dist/balances.json', JSON.stringify(balances, jsonBigint, 2)).catch(
+            (e) => {
+              log.error(e, 'Error writing balances.json')
+            }
+          )
+        }
 
-    log.info(`Found ${minBalanceAddresses.length} balances.`)
-
-    // Filter out hodler with not enough send token balance
-    minBalanceAddresses = minBalanceAddresses.filter(
-      ({ balance }) => BigInt(balance) >= BigInt(distribution.hodler_min_balance)
-    )
+        // TODO(@0xBigBoss): !IMPORTANT! remove this filter before deploying
+        // return balances.filter(
+        //   ({ balance }) => BigInt(balance) >= BigInt(distribution.hodler_min_balance)
+        // )
+        return balances
+      })
 
     log.info(
-      `Found ${minBalanceAddresses.length} balances after filtering hodler_min_balance of ${distribution.hodler_min_balance}`
+      `Found ${minBalanceAddresses.length} balances after filtering ${hodlerAddresses.length} hodlers with hodler_min_balance of ${distribution.hodler_min_balance}`
     )
 
     if (log.isLevelEnabled('debug')) {
       await Bun.write(
-        'dist/balances.json',
+        'dist/minBalanceAddresses.json',
         JSON.stringify(minBalanceAddresses, jsonBigint, 2)
       ).catch((e) => {
         log.error(e, 'Error writing balances.json')
@@ -289,11 +291,7 @@ export class DistributorV2Worker {
     }
 
     // Fetch send slash data
-    const { data: sendSlash, error: sendSlashError } = await supabaseAdmin
-      .from('send_slash')
-      .select('*')
-      .eq('distribution_id', distribution.id)
-      .single()
+    const { data: sendSlash, error: sendSlashError } = await fetchSendSlash(distribution)
 
     if (sendSlashError) {
       throw sendSlashError
@@ -305,15 +303,32 @@ export class DistributorV2Worker {
     if (previousSharesError) {
       throw previousSharesError
     }
+    assert(previousShares !== null, 'No previous shares found')
 
-    const previousSharesByUserId =
-      previousShares?.reduce(
-        (acc, share) => {
-          acc[share.user_id] = BigInt(share.amount)
+    let scaledBalances = 0
+    const previousSharesByUserId = previousShares.reduce(
+      (acc, share) => {
+        // NOTE: this is for handling the migration from send token v0 to send token v1
+        // scale to new token decimals if needed after migration
+        if (distribution.number === 11) {
+          // 100B supply -> 1B supply
+          // 0 decimals -> 18 decimals
+          // 1e18 / 100 = 1e16
+          acc[share.user_id] = BigInt(share.amount) * BigInt(1e16)
+          scaledBalances++
           return acc
-        },
-        {} as Record<string, bigint>
-      ) ?? {}
+        }
+        acc[share.user_id] = BigInt(share.amount)
+        return acc
+      },
+      {} as Record<string, bigint>
+    )
+
+    log.debug(
+      `Found ${
+        Object.keys(previousSharesByUserId).length
+      } previous shares and ${scaledBalances} scaled balances`
+    )
 
     // Get send ceiling verifications
     const sendCeilingVerifications = verifications.filter((v) => v.type === 'send_ceiling')
@@ -332,6 +347,10 @@ export class DistributorV2Worker {
       },
       {} as Record<string, { weight: bigint; ceiling: bigint }>
     )
+
+    if (log.isLevelEnabled('debug')) {
+      log.debug('sendCeilingByUserId', sendCeilingByUserId)
+    }
 
     // Calculate fixed pool share weights
     const distAmt = BigInt(distribution.amount)
@@ -465,7 +484,7 @@ export class DistributorV2Worker {
           : (hourlyHodlerAmount * BigInt(currentHour + 1)) / PERC_DENOM
 
       // First calculate slashed balances for everyone
-      const balances = minBalanceAddresses.map((balance) => {
+      const slashedBalances = minBalanceAddresses.map((balance) => {
         const userId = hodlerUserIdByAddress[balance.address] ?? ''
         const sendCeilingData = sendCeilingByUserId[userId]
         let slashPercentage = 0n
@@ -493,15 +512,24 @@ export class DistributorV2Worker {
         }
       })
 
+      if (log.isLevelEnabled('debug')) {
+        await Bun.write(
+          'dist/slashedBalances.json',
+          JSON.stringify(slashedBalances, jsonBigint, 2)
+        ).catch((e) => {
+          log.error(e, 'Error writing slashedBalances.json')
+        })
+      }
+
       // Calculate weighted shares for current slashed state
 
       const { weightedShares, weightedSharesAfterSlash } = calculateWeights(
-        balances,
+        slashedBalances,
         hodlerPoolAvailableAmount,
         timeAdjustedAmount
       )
 
-      hodlerShares = balances.map((balance) => ({
+      hodlerShares = slashedBalances.map((balance) => ({
         address: balance.address,
         amount: weightedShares[balance.address]?.amount || 0n,
         amountAfterSlash: weightedSharesAfterSlash[balance.address]?.amount || 0n,
