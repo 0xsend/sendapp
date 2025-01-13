@@ -294,11 +294,13 @@ export type Database = {
           hodler_min_balance: number
           hodler_pool_bips: number
           id: number
+          merkle_drop_addr: string | null
           name: string
           number: number
           qualification_end: string
           qualification_start: string
           snapshot_block_num: number | null
+          token_decimals: number | null
           updated_at: string
         }
         Insert: {
@@ -312,11 +314,13 @@ export type Database = {
           hodler_min_balance: number
           hodler_pool_bips: number
           id?: number
+          merkle_drop_addr?: string | null
           name: string
           number: number
           qualification_end: string
           qualification_start: string
           snapshot_block_num?: number | null
+          token_decimals?: number | null
           updated_at?: string
         }
         Update: {
@@ -330,11 +334,13 @@ export type Database = {
           hodler_min_balance?: number
           hodler_pool_bips?: number
           id?: number
+          merkle_drop_addr?: string | null
           name?: string
           number?: number
           qualification_end?: string
           qualification_start?: string
           snapshot_block_num?: number | null
+          token_decimals?: number | null
           updated_at?: string
         }
         Relationships: []
