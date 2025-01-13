@@ -273,8 +273,26 @@ describe('Distributor V2 Worker', () => {
               },
               weight: 5,
             },
+
+            // Example send_ceiling verification
+            {
+              user_id,
+              type: 'send_ceiling',
+              weight: 500, // Example weight for send ceiling
+              metadata: {
+                value: 1000, // Example ceiling value
+              },
+            },
+            {
+              user_id: user_id2,
+              type: 'send_ceiling',
+              weight: 200, // Lower weight for second user
+              metadata: {
+                value: 500,
+              },
+            },
           ],
-          count: 10,
+          count: 12,
           error: null,
         })
       }),
@@ -310,13 +328,14 @@ describe('Distributor V2 Worker', () => {
           data: [
             {
               user_id: user_id,
-              amount: '1000',
+              amount: '1000000', // Larger amount for more realistic slashing
             },
             {
               user_id: user_id2,
-              amount: '1000',
+              amount: '500000',
             },
           ],
+          count: 2,
           error: null,
         })
       }),
@@ -324,19 +343,19 @@ describe('Distributor V2 Worker', () => {
 
     mock.module('./wagmi', () => ({
       fetchAllBalances: mock(({ addresses, distribution }) => {
-        return [
-          Promise.resolve({
+        return Promise.resolve([
+          {
             user_id,
             address: bobAddr,
             balance: '1000000',
-          }),
+          },
           // alice has half of the balance of bob
-          Promise.resolve({
+          {
             user_id: user_id2,
             address: aliceAddr,
             balance: '500000',
-          }),
-        ]
+          },
+        ])
       }),
       isMerkleDropActive: mock((distribution) => {
         return Promise.resolve(false)
@@ -356,19 +375,21 @@ describe('Distributor V2 Worker', () => {
         address: bobAddr,
         distribution_id: 4,
         user_id,
-        amount: '6856',
+        amount: '10000',
         bonus_pool_amount: '0', // Always 0 in V2
-        fixed_pool_amount: '984',
-        hodler_pool_amount: '5872',
+        amount_after_slash: '4772', // 75% of original (example slash)
+        fixed_pool_amount: '2', // 75% of 984
+        hodler_pool_amount: '4770', // 75% of 5872
       },
       {
         address: aliceAddr,
         distribution_id: 4,
         user_id: user_id2,
-        amount: '3144',
+        amount: '10000',
         bonus_pool_amount: '0', // Always 0 in V2
-        fixed_pool_amount: '208',
-        hodler_pool_amount: '2936',
+        amount_after_slash: '1908', // 50% of original (example slash)
+        fixed_pool_amount: '0', // 50% of 208
+        hodler_pool_amount: '1908', // 50% of 2936
       },
     ]
     expect(createDistributionShares).toHaveBeenCalled()
@@ -378,7 +399,10 @@ describe('Distributor V2 Worker', () => {
 
     // expected share amounts cannot exceed the total distribution amount
     const totalDistributionAmount = BigInt(distribution.amount)
-    const totalShareAmounts = expectedShares.reduce((acc, share) => acc + BigInt(share.amount), 0n)
+    const totalShareAmounts = expectedShares.reduce(
+      (acc, share) => acc + BigInt(share.amount_after_slash),
+      0n
+    )
     expect(totalShareAmounts).toBeLessThanOrEqual(totalDistributionAmount)
   })
 })

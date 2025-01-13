@@ -1,12 +1,26 @@
 import { describe, expect, it } from 'bun:test'
+import { calculateWeights, Mode } from './weights'
 
-import { calculateWeights } from './weights'
 const balances = [
-  { address: '0x1', balance: '1000' },
-  { address: '0x2', balance: '2000' },
-  { address: '0x3', balance: '3000' },
+  {
+    address: '0x1' as `0x${string}`,
+    balance: '1000',
+    balanceAfterSlash: '800', // Example: 20% slash
+  },
+  {
+    address: '0x2' as `0x${string}`,
+    balance: '2000',
+    balanceAfterSlash: '1600', // Example: 20% slash
+  },
+  {
+    address: '0x3' as `0x${string}`,
+    balance: '3000',
+    balanceAfterSlash: '2400', // Example: 20% slash
+  },
 ] as const
+
 const amount = 100000n
+const timeAdjustedAmount = 80000n // Example: 80% of original amount
 
 const testCases = [
   {
@@ -136,4 +150,45 @@ describe('calculateWeights', () => {
       expect(weightedShares).toEqual(expected.weightedShares)
     })
   }
+
+  it('should calculate linear weights with slashing', () => {
+    const { weightedShares, weightedSharesAfterSlash } = calculateWeights(
+      balances,
+      amount,
+      timeAdjustedAmount,
+      Mode.Linear
+    )
+
+    // Test weightedShares (potential amounts without slash)
+    expect(weightedShares).toEqual({
+      '0x1': {
+        address: '0x1',
+        amount: 20000n,
+      },
+      '0x2': {
+        address: '0x2',
+        amount: 38461n,
+      },
+      '0x3': {
+        address: '0x3',
+        amount: 55555n,
+      },
+    })
+
+    // Test weightedSharesAfterSlash (actual distribution with slash)
+    expect(weightedSharesAfterSlash).toEqual({
+      '0x1': {
+        address: '0x1',
+        amount: 13333n, // ~16.67% of 80000
+      },
+      '0x2': {
+        address: '0x2',
+        amount: 26666n, // ~33.33% of 80000
+      },
+      '0x3': {
+        address: '0x3',
+        amount: 40000n, // ~50% of 80000
+      },
+    })
+  })
 })
