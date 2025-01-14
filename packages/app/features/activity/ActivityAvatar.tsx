@@ -8,16 +8,36 @@ import {
   type Activity,
 } from 'app/utils/zod/activity'
 
-export function ActivityAvatar({ activity }: { activity: Activity }) {
+export function ActivityAvatar({
+  activity,
+  isDetailsView = false,
+}: {
+  activity: Activity
+  isDetailsView?: boolean
+}) {
   const user = counterpart(activity)
   const { from_user, to_user, data } = activity
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
 
   const isETHReceive = isSendAccountReceiveEvent(activity)
 
+  const avatarShapeProps = isDetailsView
+    ? { circular: true, size: '$3.5' as const }
+    : {
+        size: '$4.5' as const,
+        br: '$4' as const,
+      }
+
   if (user) {
     return (
-      <LinkableAvatar size="$4.5" br="$4" gap="$2" href={`/profile/${user.send_id}`}>
+      <LinkableAvatar
+        {...avatarShapeProps}
+        gap="$2"
+        href={`/profile/${user.send_id}`}
+        onPressOut={(e) => {
+          e.stopPropagation()
+        }}
+      >
         {(() => {
           switch (true) {
             case !user.avatar_url:
@@ -36,7 +56,7 @@ export function ActivityAvatar({ activity }: { activity: Activity }) {
         })()}
 
         <Avatar.Fallback jc="center" bc="$olive">
-          <Avatar size="$4.5" br="$4">
+          <Avatar {...avatarShapeProps}>
             <Avatar.Image
               src={`https://ui-avatars.com/api/?name=${
                 user?.name ?? user?.tags?.[0] ?? user?.send_id
@@ -53,12 +73,12 @@ export function ActivityAvatar({ activity }: { activity: Activity }) {
     const address = from_user?.id ? activity.data.t : activity.data.f
 
     return (
-      <Avatar size="$4.5" br="$4" gap="$2">
+      <Avatar {...avatarShapeProps} gap="$2">
         <Avatar.Image
           src={`https://ui-avatars.com/api/?name=${address}&size=256&format=png&background=86ad7f`}
         />
         <Avatar.Fallback jc="center" bc="$olive">
-          <Avatar size="$4.5" br="$4">
+          <Avatar {...avatarShapeProps}>
             <Avatar.Image
               src={`https://ui-avatars.com/api/?name=${address}&size=256&format=png&background=86ad7f`}
             />
@@ -69,12 +89,12 @@ export function ActivityAvatar({ activity }: { activity: Activity }) {
   }
   // @todo make this an icon instead of a fallback TODO
   return (
-    <Avatar size="$4.5" br="$4" gap="$2">
+    <Avatar {...avatarShapeProps} gap="$2">
       <Avatar.Image
         src={'https://ui-avatars.com/api/?name=TODO&size=256&format=png&background=86ad7f'}
       />
       <Avatar.Fallback jc="center" bc="$olive">
-        <Avatar size="$4.5" br="$4">
+        <Avatar {...avatarShapeProps}>
           <Avatar.Image
             src={'https://ui-avatars.com/api/?name=TODO&size=256&format=png&background=86ad7f'}
           />

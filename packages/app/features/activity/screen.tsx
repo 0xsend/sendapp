@@ -71,6 +71,7 @@ function ActivityBody() {
             opacity: 0,
             y: 10,
           }}
+          f={1}
         >
           <RecentActivity />
         </YStack>
