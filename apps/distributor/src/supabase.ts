@@ -80,3 +80,12 @@ export async function createDistributionShares(
     shares,
   })
 }
+
+export async function fetchDistributionShares(distributionId: number) {
+  return selectAll(
+    supabaseAdmin
+      .from('distribution_shares')
+      .select('user_id, amount', { count: 'exact' })
+      .eq('distribution_id', distributionId)
+  )
+}
