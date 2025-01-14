@@ -26,6 +26,7 @@ export function useSendAccounts() {
       }
       return data
     },
+    refetchOnWindowFocus: true,
   })
 }
 
@@ -56,6 +57,7 @@ function sendAccountQueryOptions({
       }
       return data
     },
+    refetchOnWindowFocus: true,
   })
 }
 
