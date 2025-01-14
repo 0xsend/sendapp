@@ -6,6 +6,7 @@ import {
   fetchAllHodlers,
   fetchAllVerifications,
   fetchDistribution,
+  fetchDistributionShares,
   supabaseAdmin,
 } from './supabase'
 import { fetchAllBalances, isMerkleDropActive } from './wagmi'
@@ -298,22 +299,21 @@ export class DistributorV2Worker {
       throw sendSlashError
     }
 
-    const { data: previousShares, error: previousSharesError } = await supabaseAdmin
-      .from('distribution_shares')
-      .select('user_id, amount')
-      .eq('distribution_id', distribution.id - 1)
-
+    const { data: previousShares, error: previousSharesError } = await fetchDistributionShares(
+      distribution.id - 1
+    )
     if (previousSharesError) {
       throw previousSharesError
     }
 
-    const previousSharesByUserId = previousShares.reduce(
-      (acc, share) => {
-        acc[share.user_id] = BigInt(share.amount)
-        return acc
-      },
-      {} as Record<string, bigint>
-    )
+    const previousSharesByUserId =
+      previousShares?.reduce(
+        (acc, share) => {
+          acc[share.user_id] = BigInt(share.amount)
+          return acc
+        },
+        {} as Record<string, bigint>
+      ) ?? {}
 
     // Get send ceiling verifications
     const sendCeilingVerifications = verifications.filter((v) => v.type === 'send_ceiling')
