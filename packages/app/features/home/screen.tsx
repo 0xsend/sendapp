@@ -85,10 +85,6 @@ function HomeBody(props: XStackProps) {
                 <XStack w="100%">
                   <HomeButtons.DepositButton mah={40} />
                 </XStack>
-                <YStack ai="center">
-                  <Paragraph color="$color10">Or direct deposit on Base</Paragraph>
-                  <DepositAddress address={sendAccount?.address} />
-                </YStack>
               </YStack>
             </Card>
           </>
