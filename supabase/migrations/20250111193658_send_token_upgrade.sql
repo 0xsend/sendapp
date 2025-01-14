@@ -19,6 +19,10 @@ ALTER TABLE send_token_v0_transfers
     ALTER COLUMN id
         SET DEFAULT nextval('send_token_v0_transfers_id_seq'::regclass);
 
+-- drop old triggers
+DROP TRIGGER IF EXISTS after_transfer_update_affiliate_stats ON public.send_token_v0_transfers;
+DROP TRIGGER IF EXISTS insert_verification_send_ceiling_trigger ON public.send_token_v0_transfers;
+
 -- create new send_token_transfers table which is pretty much the same as the old one but the log_addr will be the new address
 create table send_token_transfers
 (
@@ -70,3 +74,14 @@ create policy "Users can see their own token transfers"
                                                                           lower(concat('0x', encode(send_token_transfers.f, 'hex')))::citext
                                                                        or "address" =
                                                                           lower(concat('0x', encode(send_token_transfers.t, 'hex')))::citext));
+
+-- create triggers for new table
+CREATE TRIGGER after_transfer_update_affiliate_stats
+  AFTER INSERT ON send_token_transfers
+  FOR EACH ROW
+  EXECUTE FUNCTION update_affiliate_stats_on_transfer();
+
+CREATE TRIGGER insert_verification_send_ceiling_trigger
+  AFTER INSERT ON send_token_transfers
+  FOR EACH ROW
+  EXECUTE FUNCTION insert_verification_send_ceiling();
