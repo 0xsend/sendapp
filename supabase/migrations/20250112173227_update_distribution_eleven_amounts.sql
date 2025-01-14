@@ -6,7 +6,8 @@
 -- update the distributions table for send token v0 and send token v0 merkle drop
 update distributions
 set merkle_drop_addr = '\x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6',
-    token_decimals   = 0
+    token_decimals   = 0,
+    token_addr       = '\x3f14920c99BEB920Afa163031c4e47a3e03B3e4A'
 where number < 11;
 
 -- update the distributions table for send token v1 and send token v1 merkle drop
@@ -14,6 +15,7 @@ where number < 11;
 update distributions
 set merkle_drop_addr   = '\xC8b80B16c40AaE14d8fCBBda94FfA5041089D048'
   , token_decimals     = 18
+  , token_addr         = '\xEab49138BA2Ea6dd776220fE26b7b8E446638956'
   , amount             = (amount * 1e16)             -- 300M -> 3M tokens with 18 decimals
   , hodler_min_balance = (hodler_min_balance * 1e16) -- 750K -> 7.5k tokens with 18 decimals
 where number = 11;

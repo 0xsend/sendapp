@@ -5,6 +5,7 @@
 -- update amount, and hodler_min_balance to use numeric format
 alter table distributions
     add column merkle_drop_addr bytea,
+    add column token_addr bytea,
     add column token_decimals   numeric,
     alter column amount type numeric,
     alter column hodler_min_balance type numeric;
@@ -96,13 +97,15 @@ create policy "Users can see their own distribution verifications"
     on public.distribution_verifications
     for select using ((select auth.uid()) = distribution_verifications.user_id);
 
+-- Authenticated users can see distribution_verification_values
+create policy "Authenticated users can see distribution_verification_values"
+    on public.distribution_verification_values
+    for select using ((select auth.uid()) is not null) ;
+
 -- Add foreign key constraints to distribution verifications to pull in verification values
 alter table distribution_verifications
     add constraint distribution_verification_values_fk foreign key (type, distribution_id)
         references distribution_verification_values (type, distribution_id);
-
-alter table distribution_verifications
-    drop constraint distribution_verification_values_fk;
 
 -- update distribution shares to use numeric format
 alter table distribution_shares
