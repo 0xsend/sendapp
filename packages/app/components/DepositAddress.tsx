@@ -2,19 +2,23 @@ import {
   AnimatePresence,
   Button,
   Dialog,
+  H4,
   Paragraph,
   Sheet,
+  Text,
   useToastController,
   XStack,
   YStack,
   type ButtonProps,
 } from '@my/ui'
 import { CheckCheck } from '@tamagui/lucide-icons'
+import { QRCode } from 'antd'
 import { shorten } from 'app/utils/strings'
 import * as Clipboard from 'expo-clipboard'
 import { useState } from 'react'
 import type { Address } from 'viem'
 import { IconCopy } from './icons'
+import { isWeb } from '@tamagui/core'
 
 function CopyAddressDialog({ isOpen, onClose, onConfirm }) {
   return (
@@ -34,7 +38,7 @@ function CopyAddressDialog({ isOpen, onClose, onConfirm }) {
           <YStack gap="$4">
             <Dialog.Title>Confirm External Deposit</Dialog.Title>
             <Dialog.Description>
-              Please confirm you agree to the following before copying your address:
+              Please confirm you agree to the following before proceeding:
             </Dialog.Description>
             <Paragraph>
               1. The external address is on the Base Network and{' '}
@@ -60,7 +64,7 @@ function CopyAddressDialog({ isOpen, onClose, onConfirm }) {
                 <Button br={'$2'}>Cancel</Button>
               </Dialog.Close>
               <Button theme="yellow_active" onPress={onConfirm} br={'$2'}>
-                <Button.Text col={'$color12'}>I Agree & Copy</Button.Text>
+                <Button.Text col={'$color12'}>I Agree & Proceed</Button.Text>
               </Button>
             </XStack>
           </YStack>
@@ -73,11 +77,17 @@ function CopyAddressDialog({ isOpen, onClose, onConfirm }) {
 export function DepositAddress({ address, ...props }: { address?: Address } & ButtonProps) {
   const toast = useToastController()
   const [hasCopied, setHasCopied] = useState(false)
+  const [isConfirmed, setIsConfirmed] = useState(false)
   const [copyAddressDialogIsOpen, setCopyAddressDialogIsOpen] = useState(false)
 
   if (!address) return null
 
   const copyOnPress = async () => {
+    if (!isConfirmed) {
+      setCopyAddressDialogIsOpen(true)
+      return
+    }
+
     await Clipboard.setStringAsync(address).catch(() =>
       toast.show('Something went wrong', {
         message: 'We were unable to copy your referral link to the clipboard',
@@ -86,70 +96,107 @@ export function DepositAddress({ address, ...props }: { address?: Address } & Bu
         },
       })
     )
+    setHasCopied(true)
   }
 
   return (
-    <>
-      <Button
-        chromeless
-        hoverStyle={{
-          backgroundColor: 'transparent',
-          borderColor: '$transparent',
-        }}
-        pressStyle={{
-          backgroundColor: 'transparent',
-        }}
-        focusStyle={{
-          backgroundColor: 'transparent',
-        }}
-        onPress={() => {
-          setCopyAddressDialogIsOpen(true)
-        }}
-        {...props}
+    <YStack ai="center" gap="$4" width="100%">
+      <YStack
+        position="relative"
+        {...(isWeb && {
+          style: {
+            cursor: isConfirmed ? 'default' : 'pointer',
+          },
+        })}
+        onPress={() => !isConfirmed && setCopyAddressDialogIsOpen(true)}
       >
-        <Button.Text fontSize={'$4'} fontWeight={'500'} px="$2">
-          {shorten(address, 6, 5)}
-        </Button.Text>
+        <YStack
+          style={{
+            filter: isConfirmed ? 'none' : 'blur(6px)',
+            transition: 'filter 0.2s ease-in-out',
+          }}
+        >
+          <QRCode
+            errorLevel="H"
+            value={address}
+            icon="/logos/base.svg"
+            size={240}
+            style={{ margin: 16 }}
+          />
+        </YStack>
+        {!isConfirmed && (
+          <YStack position="absolute" top={0} left={0} right={0} bottom={0} ai="center" jc="center">
+            <Text color="$color" fontSize="$4">
+              Click to reveal QR code
+            </Text>
+          </YStack>
+        )}
+      </YStack>
 
-        <Button.Icon>
-          <AnimatePresence exitBeforeEnter>
-            {hasCopied ? (
-              <CheckCheck
-                size={16}
-                $theme-dark={{ color: '$primary' }}
-                $theme-light={{ color: '$color12' }}
-                key="referral-link-icon"
-                animation="bouncy"
-                enterStyle={{
-                  opacity: 0,
-                  scale: 0.9,
-                }}
-                exitStyle={{
-                  opacity: 0,
-                  scale: 0.9,
-                }}
-              />
-            ) : (
-              <IconCopy
-                size={16}
-                $theme-dark={{ color: '$primary' }}
-                $theme-light={{ color: '$color12' }}
-              />
-            )}
-          </AnimatePresence>
-        </Button.Icon>
-      </Button>
+      <H4 fontWeight="400">Deposit on Base</H4>
+
+      <XStack width="100%" ai="center" jc="center">
+        <Button
+          chromeless
+          hoverStyle={{
+            backgroundColor: 'transparent',
+            borderColor: '$transparent',
+          }}
+          pressStyle={{
+            backgroundColor: 'transparent',
+          }}
+          focusStyle={{
+            backgroundColor: 'transparent',
+          }}
+          onPress={copyOnPress}
+          {...props}
+        >
+          <Button.Text fontSize={'$4'} fontWeight={'500'} px="$2">
+            {shorten(address, 6, 5)}
+          </Button.Text>
+
+          <Button.Icon>
+            <AnimatePresence exitBeforeEnter>
+              {hasCopied ? (
+                <CheckCheck
+                  size={16}
+                  $theme-dark={{ color: '$primary' }}
+                  $theme-light={{ color: '$color12' }}
+                  key="referral-link-icon"
+                  animation="bouncy"
+                  enterStyle={{
+                    opacity: 0,
+                    scale: 0.9,
+                  }}
+                  exitStyle={{
+                    opacity: 0,
+                    scale: 0.9,
+                  }}
+                />
+              ) : (
+                <IconCopy
+                  size={16}
+                  $theme-dark={{ color: '$primary' }}
+                  $theme-light={{ color: '$color12' }}
+                />
+              )}
+            </AnimatePresence>
+          </Button.Icon>
+        </Button>
+      </XStack>
+
       <CopyAddressDialog
         isOpen={copyAddressDialogIsOpen}
         onClose={() => {
           setCopyAddressDialogIsOpen(false)
         }}
         onConfirm={() => {
-          copyOnPress()
+          setIsConfirmed(true)
           setCopyAddressDialogIsOpen(false)
-          setHasCopied(true)
+          if (!isConfirmed) return
+          copyOnPress()
         }}
       />
-    </>
+    </YStack>
   )
 }
