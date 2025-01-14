@@ -6,6 +6,8 @@ import {
   useSendMerkleDropIsClaimed,
   useSendMerkleDropTrancheActive,
 } from 'app/utils/distributions'
+import formatAmount from 'app/utils/formatAmount'
+import { formatUnits } from 'viem'
 
 export function RewardsScreen() {
   const { data: distributions, isLoading: isLoadingDistributions } = useMonthlyDistributions()
@@ -53,10 +55,14 @@ export function RewardsScreen() {
             title="Activity Rewards"
             href="/account/rewards/activity"
             isLoading={isLoadingDistributions || isTrancheActiveLoading || isClaimedLoading}
-            reward={
-              currentDistribution?.distribution_shares?.[0]?.amount_after_slash.toLocaleString() ??
-              ''
-            }
+            reward={formatAmount(
+              formatUnits(
+                BigInt(currentDistribution?.distribution_shares?.[0]?.amount_after_slash ?? 0n),
+                currentDistribution?.token_decimals ?? 18
+              ),
+              10,
+              0
+            )}
             claimStatus={(() => {
               switch (true) {
                 case !share || !share.amount_after_slash:

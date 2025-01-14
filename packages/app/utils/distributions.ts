@@ -1,4 +1,4 @@
-import type { Tables, Views } from '@my/supabase/database.types'
+import type { Database, Tables } from '@my/supabase/database.types'
 import {
   mainnet,
   sendTokenAddress,
@@ -14,7 +14,7 @@ import {
   tokenPaymasterAddress,
   baseMainnetBundlerClient,
 } from '@my/wagmi'
-import type { PostgrestError } from '@supabase/supabase-js'
+import type { PostgrestError, SupabaseClient } from '@supabase/supabase-js'
 import { type UseQueryResult, useMutation, useQuery } from '@tanstack/react-query'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useBalance, useSimulateContract } from 'wagmi'
@@ -28,32 +28,78 @@ import { signUserOp } from './signUserOp'
 import { byteaToBase64 } from './byteaToBase64'
 import { throwNiceError } from './userop'
 import { adjustUTCDateForTimezone } from './dateHelper'
+import type { MergeDeep } from 'type-fest'
+import { selectAll } from './supabase/selectAll'
 
 export const DISTRIBUTION_INITIAL_POOL_AMOUNT = BigInt(20e9)
 
-type UseDistributionResultDistribution = Omit<
-  Tables<'distributions'>,
-  'qualification_end' | 'qualification_start' | 'claim_end'
->
+export type UseDistributionsResultData = MergeDeep<
+  NonNullable<Awaited<ReturnType<typeof fetchDistributions>>['data']>[number],
+  {
+    qualification_end: Date
+    timezone_adjusted_qualification_end: Date
+    qualification_start: Date
+    claim_end: Date
+  }
+>[]
 
-export type UseDistributionsResultData = (UseDistributionResultDistribution & {
-  qualification_end: Date
-  timezone_adjusted_qualification_end: Date
-  qualification_start: Date
-  claim_end: Date
-  distribution_shares: Tables<'distribution_shares'>[]
-  send_slash: Tables<'send_slash'>[]
-})[]
+function fetchDistributions(supabase: SupabaseClient<Database>) {
+  return supabase.from('distributions').select(`
+      amount::text,
+      bonus_pool_bips,
+      chain_id,
+      claim_end,
+      created_at,
+      description,
+      fixed_pool_bips,
+      hodler_min_balance::text,
+      hodler_pool_bips,
+      id,
+      merkle_drop_addr,
+      name,
+      number,
+      qualification_end,
+      qualification_start,
+      snapshot_block_num,
+      token_decimals,
+      updated_at,
+      distribution_shares(
+        address,
+        amount::text,
+        amount_after_slash::text,
+        bonus_pool_amount::text,
+        created_at,
+        distribution_id,
+        fixed_pool_amount::text,
+        hodler_pool_amount::text,
+        id,
+        index,
+        updated_at,
+        user_id
+      ),
+      distribution_verification_values (
+        bips_value,
+        created_at,
+        distribution_id,
+        fixed_value::text,
+        multiplier_max,
+        multiplier_min,
+        multiplier_step,
+        type,
+        updated_at
+      ),
+      send_slash(*)
+    `)
+}
 
 export const useDistributions = (): UseQueryResult<UseDistributionsResultData, PostgrestError> => {
   const supabase = useSupabase()
   return useQuery({
-    queryKey: ['distributions'],
+    queryKey: ['distributions', supabase],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('distributions')
-        .select('*, distribution_shares(*), distribution_verifications_summary(*)')
-        .order('number', { ascending: false })
+      const { data, error } = await fetchDistributions(supabase).order('number', {
+        ascending: false,
+      })
       if (error) {
         throw error
       }
@@ -81,15 +127,9 @@ export const useMonthlyDistributions = () => {
   const { data: sendAccount } = useSendAccount()
 
   return useQuery({
-    queryKey: ['monthly_distributions', sendAccount?.created_at],
+    queryKey: ['monthly_distributions', supabase, sendAccount?.created_at],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('distributions')
-        .select(`
-          *,
-          distribution_shares(*),
-          send_slash(*)
-        `)
+      const { data, error } = await fetchDistributions(supabase)
         .gt('number', 6)
         .gt('qualification_end', sendAccount?.created_at)
         .order('number', { ascending: false })
@@ -110,23 +150,75 @@ export const useMonthlyDistributions = () => {
   })
 }
 
-export const useDistributionVerifications = (
-  distributionId?: number
-): UseQueryResult<Views<'distribution_verifications_summary'>, PostgrestError> => {
+function fetchDistributionVerifications(
+  supabase: SupabaseClient<Database>,
+  distributionId: number
+) {
+  return selectAll(
+    supabase
+      .from('distribution_verifications')
+      .select(
+        `
+          distribution_id,
+          user_id,
+          type,
+          weight::text,
+          metadata,
+          created_at,
+          distribution_verification_values(
+            bips_value::text,
+            fixed_value::text,
+            multiplier_max,
+            multiplier_min,
+            multiplier_step
+          )
+        `,
+        { count: 'exact' }
+      )
+      .eq('distribution_id', distributionId)
+  )
+}
+
+export type DistributionsVerificationsQuery = ReturnType<typeof useDistributionVerifications>
+export const useDistributionVerifications = (distributionId?: number) => {
   const supabase = useSupabase()
 
   return useQuery({
-    queryKey: ['distribution_verifications', distributionId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('distribution_verifications_summary')
-        .select('*')
-        // @ts-expect-error disabled if no distributionNumber
-        .eq('distribution_id', distributionId)
-        .single()
+    queryKey: ['distribution_verifications', { distributionId, supabase }] as const,
+    queryFn: async ({ queryKey: [, { distributionId, supabase }] }) => {
+      assert(!!distributionId, 'distributionId is required')
 
-      if (error) throw error
-      return data
+      const { data: verifications, error: verificationError } =
+        await fetchDistributionVerifications(supabase, distributionId)
+
+      if (verificationError) throw verificationError
+      if (verifications === null || verifications.length === 0) return null
+
+      // previously this was grouped and transformed to match the distribution_verifications_summary view
+      // but now we are just returning the data as from postgrest
+      // transform the data to match the view's shape to avoid breaking the views
+      const transformedData = {
+        distribution_id: distributionId,
+        user_id: verifications[0]?.user_id,
+        verification_values: verifications.map((v) => ({
+          type: v.type,
+          weight: BigInt(v.weight ?? 0),
+          fixed_value: BigInt(v.distribution_verification_values?.fixed_value ?? 0n),
+          bips_value: BigInt(v.distribution_verification_values?.bips_value ?? 0n),
+          metadata: v.metadata,
+          created_at: v.created_at,
+        })),
+        multipliers: verifications.map((v) => ({
+          type: v.type,
+          value: BigInt(v.distribution_verification_values?.multiplier_max ?? 0n),
+          multiplier_max: v.distribution_verification_values?.multiplier_max ?? 0,
+          multiplier_min: v.distribution_verification_values?.multiplier_min ?? 0,
+          multiplier_step: v.distribution_verification_values?.multiplier_step ?? 0,
+          metadata: v.metadata,
+        })),
+      }
+
+      return transformedData
     },
     enabled: Boolean(distributionId),
   })
