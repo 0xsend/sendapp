@@ -1,3 +1,8 @@
+interface ErrorWithDetails {
+  message?: string
+  details?: string
+}
+
 /**
  * Simple function to convert an unknown into a error string suitable for showing to a user.
  * If the error is an instance of Error, it will return the message of the error.
@@ -8,10 +13,11 @@
  *
  * @param e - The error to convert to a nice error message.
  * @returns The nice error message.
+ * biome-ignore lint/suspicious/noExplicitAny: this is a generic function
  */
-export function toNiceError(e: unknown): string {
+export function toNiceError(e: ErrorWithDetails | any): string {
   if (!e) return 'Unknown error'
-  if (e instanceof Error) return e.message.split('.').at(0) ?? e.name
+  if (e instanceof Error || e.message) return e.message.split('.').at(0) ?? e.name
   if (typeof e === 'string') return e.split('.').at(0) ?? e
 
   const errWithDetails = e as { details?: string }
