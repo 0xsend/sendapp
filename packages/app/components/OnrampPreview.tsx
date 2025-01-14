@@ -43,13 +43,10 @@ export function OnrampPreview({ quote, isLoading }: OnrampPreviewProps) {
       </XStack>
 
       <XStack jc="space-between">
-        <Text color="$gray11">Network fee</Text>
-        <Text fontWeight="500">${Number(quote.network_fee.value).toFixed(2)}</Text>
-      </XStack>
-
-      <XStack jc="space-between">
-        <Text color="$gray11">Coinbase fee</Text>
-        <Text fontWeight="500">${Number(quote.coinbase_fee.value).toFixed(2)}</Text>
+        <Text color="$gray11">Fees</Text>
+        <Text fontWeight="500">
+          ${(Number(quote.network_fee.value) + Number(quote.coinbase_fee.value)).toFixed(2)}
+        </Text>
       </XStack>
     </YStack>
   )
