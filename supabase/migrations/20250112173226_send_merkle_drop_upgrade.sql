@@ -10,8 +10,12 @@ alter table distributions
     alter column amount type numeric,
     alter column hodler_min_balance type numeric;
 
--- drop the distribution_verifications_summary view (will be recreated)
+-- drop the distribution_verifications_summary view,
+-- instead we will add a new RLS policy to allow authenticated users to see
+-- their own verifications
 drop view distribution_verifications_summary;
+drop type verification_value_info;
+drop type multiplier_info;
 
 -- update distribution verification values to use numeric format
 alter table distribution_verification_values
@@ -29,68 +33,6 @@ alter table affiliate_stats
 update affiliate_stats
 set send_plus_minus = send_plus_minus * 1e16
 where send_plus_minus > 0;
-
--- TODO(@0xBigBoss): decide if we still need this view after enabling RLS policies on distribution verifications
--- Recreate the distribution verification summary view using numeric format for weight
-alter type verification_value_info alter attribute weight type numeric;
--- add text type for numeric values to avoid overflow errors on client
-alter type verification_value_info add attribute weight_text text;
-
--- TODO(@0xBigBoss): decide if we still need this view after enabling RLS policies on distribution verifications
--- Same for multiplier_info
-alter type multiplier_info alter attribute value type numeric;
-alter type multiplier_info add attribute value_text text;
-
--- TODO(@0xBigBoss): decide if we still need this view after enabling RLS policies on distribution verifications
-CREATE OR REPLACE VIEW "public"."distribution_verifications_summary" WITH ( security_barrier ) AS
-WITH base_counts AS (SELECT dv.distribution_id,
-                            dv.user_id,
-                            dv.type,
-                            max(dv.created_at)     AS created_at,
-                            sum(dv.weight)         AS total_weight,
-                            jsonb_agg(dv.metadata) AS combined_metadata
-                     FROM distribution_verifications dv
-                              LEFT JOIN distribution_verification_values dvv_1
-                                        ON dvv_1.distribution_id = dv.distribution_id AND dvv_1.type = dv.type
-                     WHERE dv.user_id = auth.uid()
-                     GROUP BY dv.distribution_id, dv.user_id, dv.type)
-SELECT dvv.distribution_id,
-       COALESCE(bc.user_id, auth.uid())                                              AS user_id,
-       array_agg(DISTINCT
-                 ROW (dvv.type::text
-                     , COALESCE(bc.total_weight, 0)::numeric
-                     , dvv.fixed_value::text
-                     , dvv.bips_value::text
-                     , COALESCE(bc.combined_metadata, '[]'::jsonb)
-                     , bc.created_at
-                     , COALESCE(bc.total_weight, 0)::text)::verification_value_info) AS verification_values
-        ,
-       array_agg(DISTINCT ROW (dvv.type::text
-           , (CASE
-                  WHEN COALESCE(dvv.multiplier_min, 1.0) = 1.0 AND
-                       COALESCE(dvv.multiplier_max, 1.0) = 1.0 AND
-                       COALESCE(dvv.multiplier_step, 0.0) = 0.0 OR
-                       COALESCE(bc.total_weight, 0::numeric) = 0 THEN NULL
-                  ELSE LEAST(dvv.multiplier_min +
-                             (COALESCE(bc.total_weight, 1::numeric) - 1::numeric) *
-                             dvv.multiplier_step,
-                             dvv.multiplier_max) END)::numeric
-           , dvv.multiplier_min::numeric
-           , dvv.multiplier_max::numeric
-           , dvv.multiplier_step::numeric
-           , COALESCE(bc.combined_metadata, '[]'::jsonb)
-           , (CASE
-                  WHEN COALESCE(dvv.multiplier_min, 1.0) = 1.0 AND
-                       COALESCE(dvv.multiplier_max, 1.0) = 1.0 AND
-                       COALESCE(dvv.multiplier_step, 0.0) = 0.0 OR
-                       COALESCE(bc.total_weight, 0::numeric) = 0 THEN NULL
-                  ELSE LEAST(dvv.multiplier_min +
-                             (COALESCE(bc.total_weight, 1::numeric) - 1::numeric) *
-                             dvv.multiplier_step,
-                             dvv.multiplier_max) END)::text)::multiplier_info)       AS multipliers
-FROM distribution_verification_values dvv
-         LEFT JOIN base_counts bc ON bc.distribution_id = dvv.distribution_id AND bc.type = dvv.type
-GROUP BY dvv.distribution_id, (COALESCE(bc.user_id, auth.uid()));
 
 -- Add RLS policies to distribution verifications to simplify summary
 create policy "Users can see their own distribution verifications"
