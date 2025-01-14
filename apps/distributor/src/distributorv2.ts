@@ -23,14 +23,6 @@ type Multiplier = {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
-const cpuCount = cpus().length
-
-const inBatches = <T>(array: T[], batchSize = Math.max(8, cpuCount - 1)) => {
-  return Array.from({ length: Math.ceil(array.length / batchSize) }, (_, i) =>
-    array.slice(i * batchSize, (i + 1) * batchSize)
-  )
-}
-
 const jsonBigint = (key, value) => {
   if (typeof value === 'bigint') {
     return value.toString()
@@ -270,11 +262,9 @@ export class DistributorV2Worker {
           )
         }
 
-        // TODO(@0xBigBoss): !IMPORTANT! remove this filter before deploying
-        // return balances.filter(
-        //   ({ balance }) => BigInt(balance) >= BigInt(distribution.hodler_min_balance)
-        // )
-        return balances
+        return balances.filter(
+          ({ balance }) => BigInt(balance) >= BigInt(distribution.hodler_min_balance)
+        )
       })
 
     log.info(
@@ -349,7 +339,12 @@ export class DistributorV2Worker {
     )
 
     if (log.isLevelEnabled('debug')) {
-      log.debug('sendCeilingByUserId', sendCeilingByUserId)
+      await Bun.write(
+        'dist/sendCeilingByUserId.json',
+        JSON.stringify(sendCeilingByUserId, jsonBigint, 2)
+      ).catch((e) => {
+        log.error(e, 'Error writing sendCeilingByUserId.json')
+      })
     }
 
     // Calculate fixed pool share weights
@@ -486,6 +481,7 @@ export class DistributorV2Worker {
       // First calculate slashed balances for everyone
       const slashedBalances = minBalanceAddresses.map((balance) => {
         const userId = hodlerUserIdByAddress[balance.address] ?? ''
+        const address = balance.address
         const sendCeilingData = sendCeilingByUserId[userId]
         let slashPercentage = 0n
 
@@ -506,7 +502,7 @@ export class DistributorV2Worker {
         ).toString()
 
         return {
-          address: balance.address,
+          address,
           balance: balance.balance,
           balanceAfterSlash,
         }
@@ -545,6 +541,8 @@ export class DistributorV2Worker {
         },
         'Time-based hodler pool calculations'
       )
+    } else {
+      log.warn('No hodler pool available amount')
     }
 
     // Track unslashed totals
