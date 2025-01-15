@@ -259,9 +259,9 @@ local_resource(
 )
 
 local_resource(
-    name="workflows:bundle",
+    name="workflows:build",
     allow_parallel = True,
-    cmd = "yarn workspace @my/workflows bundle",
+    cmd = "yarn workspace @my/workflows build",
     labels = labels,
     resource_deps = [
         "yarn:install",
