@@ -192,7 +192,7 @@ export default defineConfig({
       abi: sendTokenV1Artifact.abi,
       address: {
         [base.id]: sendTokenUpgradeBaseLocalAddresses['SendTokenModule#SendToken'] as `0x${string}`,
-        [baseLocal.id]: sendTokenUpgradeBaseSepoliaAddresses[
+        [baseLocal.id]: sendTokenUpgradeBaseLocalAddresses[
           'SendTokenModule#SendToken'
         ] as `0x${string}`,
         [baseSepolia.id]: sendTokenUpgradeBaseSepoliaAddresses[

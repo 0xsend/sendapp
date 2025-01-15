@@ -11,7 +11,7 @@
     "generate": "wagmi generate"
   },
   "devDependencies": {
-    "@0xsend/send-token-upgrade": "https://github.com/0xsend/send-token-upgrade#9bc328f8880b76e8e00656c5cc9cfcc49e3e2871",
+    "@0xsend/send-token-upgrade": "0.0.1",
     "@wagmi/cli": "^2.1.15",
     "debug": "^4.3.6",
     "globby": "^14.0.0",
