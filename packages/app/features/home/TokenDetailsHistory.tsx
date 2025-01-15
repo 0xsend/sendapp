@@ -18,7 +18,6 @@ export const TokenDetailsHistory = ({ coin }: { coin: CoinWithBalance }) => {
       (hasPendingTransfers === undefined || hasPendingTransfers) &&
       sendAccount?.address !== undefined,
   })
-  console.log('pendingTransfers: ', pendingTransfers)
 
   const { data: pendingTransfersData, isError: pendingTransfersError } = pendingTransfers
 

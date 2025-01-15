@@ -35,9 +35,7 @@ import { useCoin } from 'app/provider/coins'
 import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { allCoinsDict } from 'app/data/coins'
 import { api } from 'app/utils/api'
-import { getUserOperationHash } from 'permissionless'
 import { signUserOp } from 'app/utils/signUserOp'
-import { byteaToBase64 } from 'app/utils/byteaToBase64'
 import { usePendingTransfers } from 'app/features/home/utils/usePendingTransfers'
 
 export function SendConfirmScreen() {
@@ -171,7 +169,6 @@ export function SendConfirm() {
       assert(nonce !== undefined, 'Nonce is not available')
       throwIf(feesPerGasError)
       assert(!!feesPerGas, 'Fees per gas is not available')
-      assert(!!profile?.address, 'Could not resolve recipients send account')
 
       assert(selectedCoin?.balance >= BigInt(amount ?? '0'), 'Insufficient balance')
       const sender = sendAccount?.address as `0x${string}`
@@ -186,19 +183,12 @@ export function SendConfirm() {
       console.log('feesPerGas', feesPerGas)
       console.log('userOp', _userOp)
       const chainId = baseMainnetClient.chain.id
-      const entryPoint = entryPointAddress[chainId]
-      const userOpHash = getUserOperationHash({
-        userOperation: userOp,
-        entryPoint,
-        chainId,
-      })
+
       const signature = await signUserOp({
-        userOpHash,
-        allowedCredentials:
-          webauthnCreds?.map((c) => ({
-            id: byteaToBase64(c.raw_credential_id),
-            userHandle: c.name,
-          })) ?? [],
+        userOp,
+        chainId,
+        webauthnCreds,
+        entryPoint: entryPointAddress[chainId],
       })
       userOp.signature = signature
 
