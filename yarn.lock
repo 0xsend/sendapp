@@ -6571,6 +6571,7 @@ __metadata:
     "@temporalio/workflow": "npm:^1.10.1"
     "@types/source-map-support": "npm:^0"
     app: "workspace:*"
+    dotenv-cli: "npm:^7.3.0"
     jest: "npm:^29.7.0"
     nyc: "npm:^17.0.0"
     source-map-support: "npm:^0.5.21"
