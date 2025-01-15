@@ -29,16 +29,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@0xsend/send-token-upgrade@npm:0.0.1":
-  version: 0.0.1
-  resolution: "@0xsend/send-token-upgrade@npm:0.0.1"
-  dependencies:
-    "@openzeppelin/contracts": "npm:^5.1.0"
-    dotenv: "npm:^16.4.7"
-    zx: "npm:^8.3.0"
+"@0xsend/send-token-upgrade@npm:0.0.2":
+  version: 0.0.2
+  resolution: "@0xsend/send-token-upgrade@npm:0.0.2"
   peerDependencies:
     typescript: ^5.0.0
-  checksum: 10/06e1af509ed6e5112ca1ed1fe20b6ddaab07edf28d2fd1372dd7b6beab78694767bbeb7b06b602ba9c4ab3557f4c30288fb048d89f325fdee27bd11e22982963
+  checksum: 10/a6011cff459ba2d84b05ae5bb7c9ccfb5e6f6ea0ba0d29ee5141387ae97d8f1a80622312640203b47f7ba457f6e6ff220c43beeefbfa4442dbbdbc141740d469
   languageName: node
   linkType: hard
 
@@ -6351,7 +6347,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@my/wagmi@workspace:packages/wagmi"
   dependencies:
-    "@0xsend/send-token-upgrade": "npm:0.0.1"
+    "@0xsend/send-token-upgrade": "npm:0.0.2"
     "@my/contracts": "workspace:*"
     "@wagmi/cli": "npm:^2.1.15"
     "@wagmi/core": "npm:^2.13.1"
@@ -6640,13 +6636,6 @@ __metadata:
   version: 3.4.2-solc-0.7
   resolution: "@openzeppelin/contracts@npm:3.4.2-solc-0.7"
   checksum: 10/a21aa0a623f020cb32cd3c6b7903d806ec458b2a750feb86f5e3bcf0b7ae124d844b9d1c029f9e0707d6263b561f35a694bafc1b0bff30c3e95541124f8fd41c
-  languageName: node
-  linkType: hard
-
-"@openzeppelin/contracts@npm:^5.1.0":
-  version: 5.2.0
-  resolution: "@openzeppelin/contracts@npm:5.2.0"
-  checksum: 10/d77e1bdfca6fa1c40b5a32bb92220ec633ef86cc0bf43a011ad218c26c9e763c70ace3fc1e148a0462394a3aed8c5d7445935ebfeb146ba1454abec66625e420
   languageName: node
   linkType: hard
 
@@ -11417,7 +11406,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/fs-extra@npm:>=11, @types/fs-extra@npm:^11.0.4":
+"@types/fs-extra@npm:^11.0.4":
   version: 11.0.4
   resolution: "@types/fs-extra@npm:11.0.4"
   dependencies:
@@ -11652,15 +11641,6 @@ __metadata:
   dependencies:
     undici-types: "npm:~5.26.4"
   checksum: 10/f313b06c79be92f5d3541159ef813b9fc606941f951ecf826e940658c6d4952755ca2f06277b746326cef0697ed79a04676ecde053d32e1121b3352c8168d2e9
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:>=20":
-  version: 22.10.5
-  resolution: "@types/node@npm:22.10.5"
-  dependencies:
-    undici-types: "npm:~6.20.0"
-  checksum: 10/a5366961ffa9921e8f15435bc18ea9f8b7a7bb6b3d92dd5e93ebcd25e8af65708872bd8e6fee274b4655bab9ca80fbff9f0e42b5b53857790f13cf68cf4cbbfc
   languageName: node
   linkType: hard
 
@@ -17751,13 +17731,6 @@ __metadata:
   version: 16.4.1
   resolution: "dotenv@npm:16.4.1"
   checksum: 10/8da20250633703686961004df3ea81b1f81e16fbe873372050676f54ca4053172d0589aae902e683eb575884d56b6bc89fe48bbac5e1e0bef606a061389ca33c
-  languageName: node
-  linkType: hard
-
-"dotenv@npm:^16.4.7":
-  version: 16.4.7
-  resolution: "dotenv@npm:16.4.7"
-  checksum: 10/f13bfe97db88f0df4ec505eeffb8925ec51f2d56a3d0b6d916964d8b4af494e6fb1633ba5d09089b552e77ab2a25de58d70259b2c5ed45ec148221835fc99a0c
   languageName: node
   linkType: hard
 
@@ -34055,13 +34028,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici-types@npm:~6.20.0":
-  version: 6.20.0
-  resolution: "undici-types@npm:6.20.0"
-  checksum: 10/583ac7bbf4ff69931d3985f4762cde2690bb607844c16a5e2fbb92ed312fe4fa1b365e953032d469fa28ba8b224e88a595f0b10a449332f83fa77c695e567dbe
-  languageName: node
-  linkType: hard
-
 "undici@npm:5.26.5":
   version: 5.26.5
   resolution: "undici@npm:5.26.5"
@@ -36018,22 +35984,5 @@ __metadata:
   bin:
     zx: build/cli.js
   checksum: 10/6e965bf651759ea778ad8b8ad56dfc7c072fc546563abc2f189de1be305994c82d3f228ed99aa9b4992d839f119158f2ddc0d7e00dc87a216ffc16ed87d57813
-  languageName: node
-  linkType: hard
-
-"zx@npm:^8.3.0":
-  version: 8.3.0
-  resolution: "zx@npm:8.3.0"
-  dependencies:
-    "@types/fs-extra": "npm:>=11"
-    "@types/node": "npm:>=20"
-  dependenciesMeta:
-    "@types/fs-extra":
-      optional: true
-    "@types/node":
-      optional: true
-  bin:
-    zx: build/cli.js
-  checksum: 10/1397ab20cf0043ff7a630ecedc77accbb8756f554db82dc5b32bfd0853230cae4507ab9857a4143204970e3fe56ebea2d06ee533000e0f297322b4747b3dfba7
   languageName: node
   linkType: hard
