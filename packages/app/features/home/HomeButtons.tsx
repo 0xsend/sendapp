@@ -71,35 +71,36 @@ export const SendButton = (props: Omit<LinkableButtonProps, 'href' | 'children'>
   const [{ token }] = useRootScreenParams()
   const href = token ? `/send?sendToken=${token}` : '/send'
   return (
-    <LinkableButton
-      href={href}
-      theme={'green'}
-      br="$4"
-      px={'$3.5'}
-      h={'$4.5'}
-      w="100%"
-      testID="homeSendButton"
-      key="home-send-button"
-      animation="200ms"
-      enterStyle={{
-        opacity: 0,
-      }}
-      exitStyle={{
-        opacity: 0,
-      }}
-      {...props}
-    >
-      <XStack w={'100%'} ai={'center'} jc="center" h="100%">
-        <LinkableButton.Text
-          fontWeight={'400'}
-          $theme-dark={{ col: '$color0' }}
-          tt="uppercase"
-          size={'$5'}
-        >
-          Send
-        </LinkableButton.Text>
-      </XStack>
-    </LinkableButton>
+    <XStack testID="homeSendButton">
+      <LinkableButton
+        href={href}
+        theme={'green'}
+        br="$4"
+        px={'$3.5'}
+        h={'$4.5'}
+        w="100%"
+        key="home-send-button"
+        animation="200ms"
+        enterStyle={{
+          opacity: 0,
+        }}
+        exitStyle={{
+          opacity: 0,
+        }}
+        {...props}
+      >
+        <XStack w={'100%'} ai={'center'} jc="center" h="100%">
+          <LinkableButton.Text
+            fontWeight={'400'}
+            $theme-dark={{ col: '$color0' }}
+            tt="uppercase"
+            size={'$5'}
+          >
+            Send
+          </LinkableButton.Text>
+        </XStack>
+      </LinkableButton>
+    </XStack>
   )
 }
 
