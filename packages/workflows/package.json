@@ -26,13 +26,16 @@
   "scripts": {
     "lint": "tsc",
     "test": "jest",
-    "bundle": "node --loader ts-node/esm --experimental-specifier-resolution=node src/scripts/build-workflow-bundle.ts"
+    "build": "yarn bundle",
+    "bundle": "yarn with-env node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' src/scripts/build-workflow-bundle.ts",
+    "with-env": "dotenv -e ../../.env -c --"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
     "@temporalio/nyc-test-coverage": "^1.10.1",
     "@temporalio/testing": "^1.10.1",
     "@types/source-map-support": "^0",
+    "dotenv-cli": "^7.3.0",
     "jest": "^29.7.0",
     "nyc": "^17.0.0",
     "source-map-support": "^0.5.21",
