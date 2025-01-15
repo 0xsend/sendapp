@@ -1,11 +1,9 @@
 import { Client, Connection } from '@temporalio/client'
-import { payloadConverter } from './payload-converter'
-import { createRequire } from 'node:module'
-const require = createRequire(import.meta.url)
 import debug from 'debug'
 import fs from 'node:fs/promises'
 const { NODE_ENV = 'development' } = process.env
 const isDeployed = ['production', 'staging'].includes(NODE_ENV)
+import payloadConverter from '../build/payload-converter.cjs'
 
 const log = debug('api:temporal')
 log(`connecting to temporal: ${process.env.TEMPORAL_NAMESPACE} with NODE_ENV: ${NODE_ENV}`)
@@ -38,7 +36,7 @@ export async function getTemporalClient(): Promise<Client> {
       connection,
       namespace: process.env.TEMPORAL_NAMESPACE ?? 'default',
       dataConverter: {
-        payloadConverterPath: require.resolve('../build/payload-converter.cjs'),
+        payloadConverterPath: payloadConverter,
       },
     })
   }
