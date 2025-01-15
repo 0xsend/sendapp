@@ -1,4 +1,4 @@
-import { Worker, NativeConnection, bundleWorkflowCode } from '@temporalio/worker'
+import { Worker, NativeConnection } from '@temporalio/worker'
 import { createTransferActivities } from '@my/workflows/all-activities'
 import fs from 'node:fs/promises'
 import { createRequire } from 'node:module'

@@ -25,7 +25,8 @@
       "./supabase/.temp/**",
       "./packages/contracts/var/*.json",
       "**/tsconfig.json",
-      "**/*.tsconfig.json"
+      "**/*.tsconfig.json",
+      "./packages/workflows/workflow-bundle.js"
     ]
   },
   "organizeImports": {
