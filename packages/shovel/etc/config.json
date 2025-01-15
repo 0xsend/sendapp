@@ -157,9 +157,12 @@
           "filter_arg": [
             "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
             "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
+            "0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A",
             "0x50dA645f148798F68EF2d7dB7C1CB22A6819bb2C",
+            "0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680",
             "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
             "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+            "0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb",
             "0xE0f63A424a4439cBE457D80E4f4b51aD25b2c56C",
             "0xEab49138BA2Ea6dd776220fE26b7b8E446638956"
           ]
@@ -251,7 +254,99 @@
           "column": "log_addr",
           "filter_op": "contains",
           "filter_arg": [
+            "0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb",
             "0xEab49138BA2Ea6dd776220fE26b7b8E446638956"
+          ]
+        }
+      ],
+      "event": {
+        "type": "event",
+        "name": "Transfer",
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "name": "from",
+            "type": "address",
+            "column": "f"
+          },
+          {
+            "indexed": true,
+            "name": "to",
+            "type": "address",
+            "column": "t"
+          },
+          {
+            "indexed": false,
+            "name": "value",
+            "type": "uint256",
+            "column": "v"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START"
+        }
+      ]
+    },
+    {
+      "name": "send_token_v0_transfers",
+      "enabled": true,
+      "table": {
+        "name": "send_token_v0_transfers",
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric"
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea"
+          },
+          {
+            "name": "block_time",
+            "type": "numeric"
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea"
+          },
+          {
+            "name": "f",
+            "type": "bytea"
+          },
+          {
+            "name": "t",
+            "type": "bytea"
+          },
+          {
+            "name": "v",
+            "type": "numeric"
+          }
+        ]
+      },
+      "block": [
+        {
+          "name": "chain_id",
+          "column": "chain_id"
+        },
+        {
+          "name": "block_time",
+          "column": "block_time"
+        },
+        {
+          "name": "tx_hash",
+          "column": "tx_hash"
+        },
+        {
+          "name": "log_addr",
+          "column": "log_addr",
+          "filter_op": "contains",
+          "filter_arg": [
+            "0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A",
+            "0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680"
           ]
         }
       ],
