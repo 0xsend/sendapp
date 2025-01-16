@@ -285,7 +285,7 @@ const DistributionRequirementsCard = ({
             <Paragraph>
               Min. Balance{' '}
               {formatAmount(
-                formatUnits(BigInt(distribution.hodler_min_balance) ?? 0n, 18) ?? 0,
+                formatUnits(BigInt(distribution.hodler_min_balance ?? 0n), 18) ?? 0,
                 9,
                 0
               )}
@@ -295,7 +295,7 @@ const DistributionRequirementsCard = ({
                 case isLoadingSnapshotBalance:
                   return <Spinner size="small" />
                 case distribution.hodler_min_balance === undefined ||
-                  BigInt(distribution.hodler_min_balance) > (snapshotBalance ?? 0):
+                  BigInt(distribution.hodler_min_balance ?? 0n) > (snapshotBalance ?? 0):
                   return (
                     <Theme name="red">
                       <IconInfoCircle color={'$color8'} size={'$1'} />
