@@ -52,6 +52,6 @@ export const SendAccountCallSchema = z.object({
 
 export type SendAccountCall = z.infer<typeof SendAccountCallSchema>
 
-export const SendAccountCallsSchema = z.array(SendAccountCallSchema)
+export const SendAccountCallsSchema = z.array(SendAccountCallSchema).refine((v) => v.length > 0)
 
 export type SendAccountCalls = z.infer<typeof SendAccountCallsSchema>
