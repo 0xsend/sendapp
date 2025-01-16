@@ -1,10 +1,13 @@
 import {
   baseMainnet,
   baseMainnetClient,
+  entryPointAbi,
   entryPointAddress,
   sendAccountFactoryAbi,
   sendAccountFactoryAddress,
   sendTokenAbi,
+  sendTokenV0Address,
+  sendTokenV0LockboxAddress,
   tokenPaymasterAddress,
   usdcAddress,
 } from '@my/wagmi'
@@ -18,21 +21,27 @@ import { throwIf } from 'app/utils/throwIf'
 import { USEROP_SALT, getSendAccountCreateArgs } from 'app/utils/userop'
 import debug from 'debug'
 import PQueue from 'p-queue'
-import { getSenderAddress } from 'permissionless'
+import { getSenderAddress, type UserOperation } from 'permissionless'
 import {
+  type Address,
   concat,
   createWalletClient,
   encodeFunctionData,
   getAbiItem,
+  type Hex,
   http,
   maxUint256,
+  pad,
   publicActions,
+  toHex,
   withRetry,
   zeroAddress,
 } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
+import { address } from 'app/utils/zod'
+import { SendAccountCallsSchema, UserOperationSchema } from 'app/utils/zod/evm'
 
 const SEND_ACCOUNT_FACTORY_PRIVATE_KEY = process.env
   .SEND_ACCOUNT_FACTORY_PRIVATE_KEY as `0x${string}`
@@ -148,7 +157,7 @@ export const sendAccountRouter = createTRPCRouter({
           })
         }
 
-        const contractDeployed = await sendAccountFactoryClient.getBytecode({
+        const contractDeployed = await sendAccountFactoryClient.getCode({
           address: senderAddress,
         })
         log('createAccount', 'contractDeployed', contractDeployed)
@@ -320,4 +329,257 @@ export const sendAccountRouter = createTRPCRouter({
         return { success: true }
       }
     ),
+  /**
+   * Executes a send account user op for upgrading a send token.
+   *
+   * Requires the user send the userop, plus the send account calls to prove
+   * it's for upgrading the send token. This is so we don't inadvertently
+   * sponsor userops for other methods.
+   */
+  upgradeSendToken: protectedProcedure
+    .input(
+      z.object({
+        /**
+         * The signed user op to execute on the entry point.
+         */
+        userop: UserOperationSchema,
+        /**
+         * The send account calls to prove the userop is for upgrading the send token.
+         */
+        sendAccountCalls: SendAccountCallsSchema,
+        entryPoint: address,
+      })
+    )
+    .mutation(
+      async ({ ctx: { session, supabase }, input: { userop, sendAccountCalls, entryPoint } }) => {
+        const log = debug(`api:routers:sendTokenUpgrade:${session.user.id}`)
+
+        log('Received send token upgrade userop', { userop, sendAccountCalls, entryPoint })
+
+        // ensure send account is valid
+        const { data: sendAccount, error: sendAccountError } = await supabase
+          .from('send_accounts')
+          .select('*')
+          .single()
+        if (sendAccountError) {
+          log('no send account found')
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'No send account found',
+          })
+        }
+        // ensure send account calls are for send token upgrade
+        // 1. approve send token v0 to lockbox
+        // 2. call lockbox.deposit
+        const [approval, deposit] = sendAccountCalls
+
+        if (!approval || !deposit) {
+          log('send account calls are not valid')
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Send account calls are not valid',
+          })
+        }
+
+        if (
+          approval.dest !== sendTokenV0Address[sendAccount.chain_id] ||
+          !approval.data.startsWith('0x095ea7b3') // approve(address,uint256)
+        ) {
+          log('approval.dest is not send token v0')
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Approval call is not for send token v0',
+          })
+        }
+        if (
+          deposit.dest !== sendTokenV0LockboxAddress[sendAccount.chain_id] ||
+          !deposit.data.startsWith('0xb6b55f25') // deposit(uint256)
+        ) {
+          log('deposit.dest is not send token v0 lockbox')
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Deposit call is not for send token v0 lockbox',
+          })
+        }
+
+        // TODO: deploy verifiying paymaster and provide the signed paymasterAndData
+
+        // execute userop
+        const { request } = await sendAccountFactoryClient
+          .simulateContract({
+            address: entryPointAddress[sendAccount.chain_id],
+            abi: entryPointAbi,
+            functionName: 'handleOps',
+            args: [[packUserOp(userop)], account.address],
+          })
+          .catch((e) => {
+            log('createAccount', 'simulateContract', e)
+            throw e
+          })
+        const hash = await withRetry(
+          async function sendTokenUpgrade() {
+            const hash = await nonceQueue.add(async () => {
+              log('sendTokenUpgrade queue', 'start')
+              const nonce = await sendAccountFactoryClient
+                .getTransactionCount({
+                  address: account.address,
+                  blockTag: 'pending',
+                })
+                .catch((e) => {
+                  log('sendTokenUpgrade queue', 'getTransactionCount', e)
+                  throw e
+                })
+              log('sendTokenUpgrade queue', 'tx request', `nonce=${nonce}`)
+              const hash = await sendAccountFactoryClient
+                .writeContract({
+                  ...request,
+                  nonce: nonce,
+                })
+                .catch((e) => {
+                  log('sendTokenUpgrade queue', 'writeContract', e)
+                  throw e
+                })
+
+              log('sendTokenUpgrade queue', `hash=${hash}`)
+              return hash
+            })
+
+            log('sendTokenUpgrade', `hash=${hash}`)
+
+            return hash
+          },
+          {
+            retryCount: 20,
+            delay: ({ count, error }) => {
+              const backoff = 500 + Math.random() * 100 // add some randomness to the backoff
+              log(`sendTokenUpgrade delay count=${count} backoff=${backoff} error=${error}`)
+              return backoff
+            },
+            shouldRetry({ count, error }) {
+              // @todo handle other errors like balance not enough, invalid nonce, etc
+              console.error('sendTokenUpgrade failed', count, error)
+              if (error.message.includes('Failed to create send account')) {
+                return false
+              }
+              return true
+            },
+          }
+        ).catch((e) => {
+          log('sendTokenUpgrade failed', e)
+          console.error('sendTokenUpgrade failed', e)
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: e.message })
+        })
+
+        if (!hash) {
+          log('sendTokenUpgrade', 'hash is null')
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Failed to create send account',
+          })
+        }
+
+        log('sendTokenUpgrade', `hash=${hash}`)
+
+        await withRetry(
+          async function waitForTransactionReceipt() {
+            const { count, error } = await supabaseAdmin
+              .from('send_token_v0_transfers')
+              .select('*', { count: 'exact', head: true })
+              .eq('tx_hash', hexToBytea(hash as `0x${string}`))
+              .single()
+            throwIf(error)
+            log('waitForTransactionReceipt', `hash=${hash}`, `count=${count}`)
+            return count
+          },
+          {
+            retryCount: 20,
+            delay: ({ count, error }) => {
+              const backoff = 500 + Math.random() * 100 // add some randomness to the backoff
+              log(`waitForTransactionReceipt delay count=${count} backoff=${backoff}`, error)
+              return backoff
+            },
+            shouldRetry({ count, error }) {
+              // @todo handle other errors like balance not enough, invalid nonce, etc
+              console.error('waitForTransactionReceipt failed', { count, error, hash })
+              if (error.message.includes('Failed to create send account')) {
+                return false
+              }
+              return true
+            },
+          }
+        ).catch((e) => {
+          log('waitForTransactionReceipt failed', e)
+          console.error('waitForTransactionReceipt failed', e)
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: e.message ? e.message : 'Failed waiting for transaction receipt',
+          })
+        })
+      }
+    ),
 })
+
+function packUserOp(op: UserOperation<'v0.7'>): {
+  sender: Address
+  nonce: bigint
+  initCode: Hex
+  callData: Hex
+  accountGasLimits: Hex
+  preVerificationGas: bigint
+  gasFees: Hex
+  paymasterAndData: Hex
+  signature: Hex
+} {
+  let paymasterAndData: Hex
+  if (!op.paymaster) {
+    paymasterAndData = '0x'
+  } else {
+    if (!op.paymasterVerificationGasLimit || !op.paymasterPostOpGasLimit) {
+      throw new Error('paymaster with no gas limits')
+    }
+    paymasterAndData = packPaymasterData({
+      paymaster: op.paymaster,
+      paymasterVerificationGasLimit: op.paymasterVerificationGasLimit,
+      paymasterPostOpGasLimit: op.paymasterPostOpGasLimit,
+      paymasterData: op.paymasterData,
+    })
+  }
+  return {
+    sender: op.sender,
+    nonce: BigInt(op.nonce),
+    initCode: op.factory ?? '0x',
+    callData: op.callData,
+    accountGasLimits: concat([
+      pad(toHex(op.verificationGasLimit), { size: 16 }),
+      pad(toHex(op.callGasLimit), { size: 16 }),
+    ]),
+    preVerificationGas: BigInt(op.preVerificationGas),
+    gasFees: concat([
+      pad(toHex(op.maxPriorityFeePerGas), { size: 16 }),
+      pad(toHex(op.maxFeePerGas), { size: 16 }),
+    ]),
+    paymasterAndData,
+    signature: op.signature,
+  }
+}
+
+function packPaymasterData({
+  paymaster,
+  paymasterVerificationGasLimit,
+  paymasterPostOpGasLimit,
+  paymasterData,
+}: {
+  paymaster: Hex
+  paymasterVerificationGasLimit: bigint
+  paymasterPostOpGasLimit: bigint
+  paymasterData?: Hex
+}): Hex {
+  return paymaster
+    ? concat([
+        paymaster,
+        pad(toHex(paymasterVerificationGasLimit || 0n), { size: 16 }),
+        pad(toHex(paymasterPostOpGasLimit || 0n), { size: 16 }),
+        paymasterData ?? '0x',
+      ])
+    : '0x'
+}

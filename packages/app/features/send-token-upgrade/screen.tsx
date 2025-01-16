@@ -14,24 +14,25 @@ import {
   Fade,
 } from '@my/ui'
 import {
-  baseMainnetBundlerClient,
   baseMainnetClient,
+  entryPointAddress,
   sendTokenV0Address,
   sendTokenV0LockboxAbi,
   sendTokenV0LockboxAddress,
   useReadSendTokenV0BalanceOf,
 } from '@my/wagmi'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { IconUpgrade } from 'app/components/icons'
-import { assert } from 'app/utils/assert'
 import formatAmount from 'app/utils/formatAmount'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { toNiceError } from 'app/utils/toNiceError'
 import { useUserOp } from 'app/utils/userop'
-import { sendUserOp } from 'app/utils/sendUserOp'
-import { useEffect, useMemo, useState } from 'react'
-import { encodeFunctionData, erc20Abi, isHex } from 'viem'
+import { useMemo } from 'react'
+import { encodeFunctionData, erc20Abi } from 'viem'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
+import { api } from 'app/utils/api'
+import { signUserOp } from 'app/utils/signUserOp'
+import type { UserOperation } from 'permissionless'
 
 interface TokenBalanceRowProps {
   label: string
@@ -170,52 +171,52 @@ function UpgradeTokenButton() {
     [sendTokenV0Bal.data, chainId]
   )
   const uop = useUserOp({
+    paymaster: null,
+    paymasterVerificationGasLimit: null,
+    paymasterPostOpGasLimit: null,
+    paymasterData: null,
+    callGasLimit: 150000n,
     sender,
     calls,
   })
 
-  const sendUop = useMutation({
-    mutationFn: sendUserOp,
-  })
-
-  const uopReceipt = useQuery({
-    queryKey: ['userOpReceipt', sendUop.data],
-    queryFn: async ({ queryKey: [, hash] }) => {
-      assert(isHex(hash), 'Invalid receipt hash')
-      const receipt = await baseMainnetBundlerClient.waitForUserOperationReceipt({
-        hash,
+  const sendUop = api.sendAccount.upgradeSendToken.useMutation({
+    onMutate: async ({ userop }) => {
+      console.log('onMutate', userop)
+      userop.signature = await signUserOp({
+        userOp: userop as UserOperation<'v0.7'>,
+        webauthnCreds,
+        chainId: baseMainnetClient.chain.id,
+        entryPoint: entryPointAddress[baseMainnetClient.chain.id],
       })
-      assert(receipt.success === true, 'Failed to send userOp')
-      return receipt
     },
-    enabled: !!sendUop.submittedAt && Boolean(sendUop.data),
-  })
-
-  const toast = useToastController()
-  const queryClient = useQueryClient()
-  const [isUpgraded, setIsUpgraded] = useState(false)
-
-  useEffect(() => {
-    if (uopReceipt.isSuccess) {
-      setIsUpgraded(true)
+    onSettled(data, error, variables) {
+      console.log('onSettled', data, error, variables)
+    },
+    onSuccess(data, variables) {
+      console.log('onSuccess', data, variables)
       toast.show('Upgraded successfully')
       queryClient.invalidateQueries({ queryKey: tokensQuery.queryKey })
       queryClient.invalidateQueries({ queryKey: sendTokenV0Bal.queryKey })
-    }
-  }, [toast, sendTokenV0Bal.queryKey, tokensQuery.queryKey, queryClient, uopReceipt.isSuccess])
+    },
+    onError(error, variables) {
+      console.log('onError', error, variables)
+    },
+  })
+  console.log('sendUop', sendUop)
 
-  const canSendUserOp =
-    uop.isSuccess && (sendUop.isIdle || sendUop.isError) && !uopReceipt.isLoading && !isUpgraded
-  const anyError = uop.error || sendUop.error || uopReceipt.error
+  const toast = useToastController()
+  const queryClient = useQueryClient()
+
+  const canSendUserOp = uop.isSuccess && !uop.isPending
+  const anyError = uop.error || sendUop.error
 
   return (
     <YStack gap="$4" w="100%" maw={500}>
       <Paragraph color="$color10" ta="center">
         {(() => {
           switch (true) {
-            case isUpgraded:
-              return 'Upgrade complete.'
-            case uopReceipt.isLoading:
+            case sendUop.isPending:
               return 'Waiting for confirmation...'
             default:
               return `Click "Upgrade" to proceed.${anyError ? ' Please try again.' : ''}`
@@ -223,37 +224,31 @@ function UpgradeTokenButton() {
         })()}
       </Paragraph>
 
-      {!isUpgraded ? (
-        <Button
-          size="$4"
-          theme="green"
-          br="$4"
-          w="100%"
-          h={56}
-          pressStyle={{ opacity: 0.8 }}
-          onPress={(e) => {
-            e.preventDefault()
-            if (sendUop.isError) sendUop.reset() // reset if there is an error
-            if (!canSendUserOp) return
-            sendUop.mutate({
-              userOp: uop.data,
-              webauthnCreds,
-            })
-          }}
-          disabled={!canSendUserOp}
-          icon={<IconUpgrade size="$1" />}
-          iconAfter={
-            sendUop.isPending || uopReceipt.isLoading ? <Spinner size="small" /> : undefined
-          }
-        >
-          <Button.Text>
-            {sendUop.isPending || uopReceipt.isLoading ? 'UPGRADING...' : 'UPGRADE'}
-          </Button.Text>
-        </Button>
-      ) : null}
+      <Button
+        size="$4"
+        theme="green"
+        br="$4"
+        w="100%"
+        h={56}
+        pressStyle={{ opacity: 0.8 }}
+        onPress={(e) => {
+          e.preventDefault()
+          if (!canSendUserOp) return
+          sendUop.mutate({
+            userop: uop.data,
+            sendAccountCalls: calls,
+            entryPoint: entryPointAddress[chainId],
+          })
+        }}
+        disabled={!canSendUserOp}
+        icon={<IconUpgrade size="$1" />}
+        iconAfter={sendUop.isPending ? <Spinner size="small" /> : undefined}
+      >
+        <Button.Text>{sendUop.isPending ? 'UPGRADING...' : 'UPGRADE'}</Button.Text>
+      </Button>
       {[uop.error, sendUop.error].filter(Boolean).map((e) =>
         e ? (
-          <Paragraph key={`${e.name}-${e.message}`} color="$error">
+          <Paragraph key={e.message} color="$error">
             {toNiceError(e)}
           </Paragraph>
         ) : null
