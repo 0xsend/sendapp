@@ -267,6 +267,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "distribution_verification_values_fk"
+            columns: ["type", "distribution_id"]
+            isOneToOne: false
+            referencedRelation: "distribution_verification_values"
+            referencedColumns: ["type", "distribution_id"]
+          },
+          {
             foreignKeyName: "distribution_verifications_distribution_id_fkey"
             columns: ["distribution_id"]
             isOneToOne: false
@@ -300,6 +307,7 @@ export type Database = {
           qualification_end: string
           qualification_start: string
           snapshot_block_num: number | null
+          token_addr: string | null
           token_decimals: number | null
           updated_at: string
         }
@@ -320,6 +328,7 @@ export type Database = {
           qualification_end: string
           qualification_start: string
           snapshot_block_num?: number | null
+          token_addr?: string | null
           token_decimals?: number | null
           updated_at?: string
         }
@@ -340,6 +349,7 @@ export type Database = {
           qualification_end?: string
           qualification_start?: string
           snapshot_block_num?: number | null
+          token_addr?: string | null
           token_decimals?: number | null
           updated_at?: string
         }
@@ -1213,27 +1223,6 @@ export type Database = {
         }
         Relationships: []
       }
-      distribution_verifications_summary: {
-        Row: {
-          distribution_id: number | null
-          multipliers:
-            | Database["public"]["CompositeTypes"]["multiplier_info"][]
-            | null
-          user_id: string | null
-          verification_values:
-            | Database["public"]["CompositeTypes"]["verification_value_info"][]
-            | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "distribution_verification_values_distribution_id_fkey"
-            columns: ["distribution_id"]
-            isOneToOne: false
-            referencedRelation: "distributions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
     }
     Functions: {
       calculate_and_insert_send_ceiling_verification: {
@@ -1466,27 +1455,11 @@ export type Database = {
         send_id: number
         tags: unknown
       }
-      multiplier_info: {
-        type: string
-        value: number
-        multiplier_min: number
-        multiplier_max: number
-        multiplier_step: number
-        metadata: Json
-      }
       tag_search_result: {
         avatar_url: string
         tag_name: string
         send_id: number
         phone: string
-      }
-      verification_value_info: {
-        type: string
-        weight: number
-        fixed_value: number
-        bips_value: number
-        metadata: Json
-        created_at: string
       }
     }
   }

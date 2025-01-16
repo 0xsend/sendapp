@@ -347,7 +347,7 @@
           "id": "public.affiliate_stats.send_plus_minus",
           "name": "send_plus_minus",
           "columnName": "send_plus_minus",
-          "type": "int8",
+          "type": "numeric",
           "isRequired": true,
           "kind": "scalar",
           "isList": false,
@@ -1232,6 +1232,20 @@
           "isGenerated": false,
           "sequence": false,
           "hasDefaultValue": false
+        },
+        {
+          "name": "distribution_verifications",
+          "type": "distribution_verifications",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "distribution_verificationsTodistribution_verification_values",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
         }
       ],
       "uniqueConstraints": [
@@ -1342,7 +1356,7 @@
           "id": "public.distribution_verifications.weight",
           "name": "weight",
           "columnName": "weight",
-          "type": "int8",
+          "type": "numeric",
           "isRequired": true,
           "kind": "scalar",
           "isList": false,
@@ -1363,6 +1377,26 @@
           ],
           "relationToFields": [
             "id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "distribution_verification_values",
+          "type": "distribution_verification_values",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "distribution_verificationsTodistribution_verification_values",
+          "relationFromFields": [
+            "distribution_id",
+            "type"
+          ],
+          "relationToFields": [
+            "distribution_id",
+            "type"
           ],
           "isList": false,
           "isId": false,
@@ -1636,6 +1670,20 @@
           "id": "public.distributions.merkle_drop_addr",
           "name": "merkle_drop_addr",
           "columnName": "merkle_drop_addr",
+          "type": "bytea",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.distributions.token_addr",
+          "name": "token_addr",
+          "columnName": "token_addr",
           "type": "bytea",
           "isRequired": false,
           "kind": "scalar",
