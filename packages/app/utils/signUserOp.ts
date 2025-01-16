@@ -1,13 +1,46 @@
-import { type Hex, concat, numberToBytes, hexToBytes, bytesToHex } from 'viem'
+import { type Hex, concat, numberToBytes, hexToBytes, bytesToHex, type Address } from 'viem'
 import { assert } from './assert'
 import { signChallenge } from './signChallenge'
 import { USEROP_VERSION, generateChallenge } from './userop'
+import { getUserOperationHash, type UserOperation } from 'permissionless'
+import type { EntryPoint } from 'permissionless/types/entrypoint'
+import { byteaToBase64 } from './byteaToBase64'
+
+/**
+ * Signs a user operation and returns the signature in a format for the SendVerifier contract.
+ */
+export async function signUserOp({
+  userOp,
+  version,
+  validUntil,
+  webauthnCreds,
+  chainId,
+  entryPoint,
+}: {
+  userOp: UserOperation<'v0.7'>
+  version?: number
+  validUntil?: number
+  webauthnCreds?: { raw_credential_id: `\\x${string}`; name: string }[]
+  chainId: number
+  entryPoint: EntryPoint
+}): Promise<Hex> {
+  const userOpHash = getUserOperationHash({
+    userOperation: userOp,
+    entryPoint,
+    chainId,
+  })
+  return await signUserOpHash({
+    userOpHash,
+    version,
+    validUntil,
+    allowedCredentials: webauthnCredToAllowedCredentials(webauthnCreds ?? []),
+  })
+}
 
 /**
  * Signs a user operation hash and returns the signature in a format for the SendVerifier contract.
  */
-
-export async function signUserOp({
+export async function signUserOpHash({
   userOpHash,
   version,
   validUntil,
@@ -40,4 +73,18 @@ export async function signUserOp({
     hexToBytes(encodedWebAuthnSig),
   ])
   return bytesToHex(signature)
+}
+
+/**
+ * Converts webauthn credentials from postgres (supabase) to the format expected by signUserOp.
+ */
+export function webauthnCredToAllowedCredentials(
+  webauthnCreds: { raw_credential_id: `\\x${string}`; name: string }[]
+) {
+  return (
+    webauthnCreds?.map((c) => ({
+      id: byteaToBase64(c.raw_credential_id),
+      userHandle: c.name,
+    })) ?? []
+  )
 }

@@ -152,24 +152,61 @@ function userOpQueryOptions({
   sender,
   nonce,
   calls,
+  callGasLimit,
   chainId,
   maxFeePerGas,
   maxPriorityFeePerGas,
+  paymaster,
+  paymasterVerificationGasLimit,
+  paymasterPostOpGasLimit,
+  paymasterData,
 }: {
   sender: Hex | undefined
   nonce: bigint | undefined
   calls: SendAccountCall[] | undefined
+  callGasLimit: bigint | undefined
   chainId: number | undefined
   maxFeePerGas: bigint | undefined
   maxPriorityFeePerGas: bigint | undefined
+  paymaster?: Hex | null
+  paymasterVerificationGasLimit?: bigint | null
+  paymasterPostOpGasLimit?: bigint | null
+  paymasterData?: Hex | null
 }) {
   return queryOptions({
     queryKey: [
       'userop',
-      { sender, nonce, calls, chainId, maxFeePerGas, maxPriorityFeePerGas },
+      {
+        sender,
+        nonce,
+        calls,
+        callGasLimit,
+        chainId,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        paymaster,
+        paymasterVerificationGasLimit,
+        paymasterPostOpGasLimit,
+        paymasterData,
+      },
     ] as const,
     queryFn: async ({
-      queryKey: [, { sender, nonce, calls, chainId, maxFeePerGas, maxPriorityFeePerGas }],
+      queryKey: [
+        ,
+        {
+          sender,
+          nonce,
+          calls,
+          callGasLimit,
+          chainId,
+          maxFeePerGas,
+          maxPriorityFeePerGas,
+          paymaster,
+          paymasterVerificationGasLimit,
+          paymasterPostOpGasLimit,
+          paymasterData,
+        },
+      ],
     }) => {
       assert(sender !== undefined, 'No sender found')
       assert(nonce !== undefined, 'No nonce found')
@@ -184,31 +221,42 @@ function userOpQueryOptions({
         args: [calls],
       })
 
-      const paymaster = tokenPaymasterAddress[chainId]
-      const _userOp: UserOperation<'v0.7'> = {
+      const paymasterDefaults = {
+        paymaster: paymaster !== undefined ? undefined : tokenPaymasterAddress[chainId],
+        paymasterVerificationGasLimit:
+          paymasterVerificationGasLimit !== undefined
+            ? undefined
+            : defaultUserOp.paymasterVerificationGasLimit,
+        paymasterPostOpGasLimit:
+          paymasterPostOpGasLimit !== undefined ? undefined : defaultUserOp.paymasterPostOpGasLimit,
+        paymasterData: paymasterData !== undefined ? undefined : defaultUserOp.paymasterData,
+      }
+      const userOp: UserOperation<'v0.7'> = {
         ...defaultUserOp,
+        ...paymasterDefaults,
         maxFeePerGas,
         maxPriorityFeePerGas,
         sender,
         nonce,
         callData,
-        paymaster,
-        paymasterData: '0x',
         signature: '0x',
       }
 
-      // only estimate the gas for the call
-      const { callGasLimit } = await baseMainnetBundlerClient
-        .estimateUserOperationGas({
-          userOperation: _userOp,
-        })
-        .catch((e) => {
-          throwNiceError(e)
-        })
+      if (!callGasLimit) {
+        // only estimate the gas for the call
+        await baseMainnetBundlerClient
+          .estimateUserOperationGas({
+            userOperation: userOp,
+          })
+          .catch((e) => {
+            throwNiceError(e)
+          })
+          .then(({ callGasLimit: cgl }) => {
+            userOp.callGasLimit = cgl
+          })
+      }
 
-      const userOp = { ..._userOp, callGasLimit }
-
-      debug('useUserOpGasEstimate', { userOp, callGasLimit })
+      debug('useUserOpGasEstimate', { userOp })
 
       return userOp
     },
@@ -223,10 +271,20 @@ function userOpQueryOptions({
 export function useUserOp({
   sender,
   calls,
-}: { sender: Address | undefined; calls?: SendAccountCall[] | undefined }): UseQueryReturnType<
-  UserOperation<'v0.7'>,
-  Error
-> {
+  callGasLimit,
+  paymaster,
+  paymasterVerificationGasLimit,
+  paymasterPostOpGasLimit,
+  paymasterData,
+}: {
+  sender: Address | undefined
+  callGasLimit?: bigint | undefined
+  calls?: SendAccountCall[] | undefined
+  paymaster?: Hex | null
+  paymasterVerificationGasLimit?: bigint | null
+  paymasterPostOpGasLimit?: bigint | null
+  paymasterData?: Hex | null
+}): UseQueryReturnType<UserOperation<'v0.7'>, Error> {
   const chainId = baseMainnetClient.chain.id
   const { data: nonce, error: nonceError, isLoading: isLoadingNonce } = useAccountNonce({ sender })
   const {
@@ -248,8 +306,33 @@ export function useUserOp({
     !isLoadingFeesPerGas
   const { maxFeePerGas, maxPriorityFeePerGas } = feesPerGas ?? {}
   const uopQo = useMemo(
-    () => userOpQueryOptions({ sender, nonce, calls, maxFeePerGas, maxPriorityFeePerGas, chainId }),
-    [sender, nonce, calls, maxFeePerGas, maxPriorityFeePerGas, chainId]
+    () =>
+      userOpQueryOptions({
+        sender,
+        nonce,
+        calls,
+        callGasLimit,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        chainId,
+        paymaster,
+        paymasterVerificationGasLimit,
+        paymasterPostOpGasLimit,
+        paymasterData,
+      }),
+    [
+      sender,
+      nonce,
+      calls,
+      callGasLimit,
+      maxFeePerGas,
+      maxPriorityFeePerGas,
+      chainId,
+      paymaster,
+      paymasterVerificationGasLimit,
+      paymasterPostOpGasLimit,
+      paymasterData,
+    ]
   )
   const queryFn: typeof uopQo.queryFn = useMemo(
     () => async (args) => {

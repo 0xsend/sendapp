@@ -1,8 +1,6 @@
-import { type QueryClient, useMutation, type UseMutationOptions } from '@tanstack/react-query'
-import { getUserOperationHash, type UserOperation } from 'permissionless'
+import type { UserOperation } from 'permissionless'
 import { baseMainnetClient, entryPointAddress, baseMainnetBundlerClient } from '@my/wagmi'
 import type { CallExecutionError } from 'viem'
-import { byteaToBase64 } from './byteaToBase64'
 import { signUserOp } from './signUserOp'
 import { throwNiceError } from './userop'
 
@@ -31,16 +29,10 @@ export interface SendUserOpArgs {
 export async function sendUserOp({ userOp, version, validUntil, webauthnCreds }: SendUserOpArgs) {
   const chainId = baseMainnetClient.chain.id
   const entryPoint = entryPointAddress[chainId]
-  const userOpHash = getUserOperationHash({
-    userOperation: userOp,
-    entryPoint,
-    chainId,
-  })
-
   // simulate
   await baseMainnetClient
     .call({
-      account: entryPointAddress[baseMainnetClient.chain.id],
+      account: entryPoint,
       to: userOp.sender,
       data: userOp.callData,
     })
@@ -52,14 +44,12 @@ export async function sendUserOp({ userOp, version, validUntil, webauthnCreds }:
     })
 
   userOp.signature = await signUserOp({
-    userOpHash,
+    userOp,
     version,
     validUntil,
-    allowedCredentials:
-      webauthnCreds?.map((c) => ({
-        id: byteaToBase64(c.raw_credential_id),
-        userHandle: c.name,
-      })) ?? [],
+    webauthnCreds,
+    chainId,
+    entryPoint,
   })
 
   return await baseMainnetBundlerClient

@@ -24,7 +24,7 @@ import { getUserOperationHash, type UserOperation } from 'permissionless'
 import { assert } from './assert'
 import { type CallExecutionError, encodeFunctionData, isAddress } from 'viem'
 import { defaultUserOp } from './useUserOpTransferMutation'
-import { signUserOp } from './signUserOp'
+import { signUserOpHash } from './signUserOp'
 import { byteaToBase64 } from './byteaToBase64'
 import { throwNiceError } from './userop'
 import { adjustUTCDateForTimezone } from './dateHelper'
@@ -395,7 +395,7 @@ export async function sendUserOpClaim({
       throw e
     })
 
-  userOp.signature = await signUserOp({
+  userOp.signature = await signUserOpHash({
     userOpHash,
     version,
     validUntil,
