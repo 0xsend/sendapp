@@ -6,8 +6,6 @@ import {
   sendMerkleDropAbi,
   sendMerkleDropAddress,
   sendUniswapV3PoolAddress,
-  useReadSendMerkleDropTrancheActive,
-  useReadSendMerkleDropIsClaimed,
   baseMainnetClient,
   entryPointAddress,
   sendAccountAbi,
@@ -17,7 +15,7 @@ import {
 import type { PostgrestError, SupabaseClient } from '@supabase/supabase-js'
 import { type UseQueryResult, useMutation, useQuery } from '@tanstack/react-query'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
-import { useBalance, useSimulateContract } from 'wagmi'
+import { useBalance, useReadContract, useSimulateContract } from 'wagmi'
 import { api } from './api'
 import { useSendAccount } from './send-accounts'
 import { getUserOperationHash, type UserOperation } from 'permissionless'
@@ -30,6 +28,7 @@ import { throwNiceError } from './userop'
 import { adjustUTCDateForTimezone } from './dateHelper'
 import type { MergeDeep } from 'type-fest'
 import { selectAll } from './supabase/selectAll'
+import { byteaToHex } from './byteaToHex'
 
 export const DISTRIBUTION_INITIAL_POOL_AMOUNT = BigInt(20e9)
 
@@ -61,6 +60,7 @@ function fetchDistributions(supabase: SupabaseClient<Database>) {
       qualification_end,
       qualification_start,
       snapshot_block_num,
+      token_addr,
       token_decimals,
       updated_at,
       distribution_shares(
@@ -294,14 +294,19 @@ export function useSendMerkleDropTrancheActive({
   chainId,
   tranche,
   query,
+  address,
 }: {
   chainId: keyof typeof sendMerkleDropAddress
   tranche: bigint
   query?: { enabled?: boolean }
+  address: `0x${string}` | undefined
 }) {
-  return useReadSendMerkleDropTrancheActive({
+  return useReadContract({
+    abi: sendMerkleDropAbi,
+    address,
     chainId,
     args: [tranche],
+    functionName: 'trancheActive',
     query,
   })
 }
@@ -317,16 +322,20 @@ export function useSendMerkleDropIsClaimed({
   tranche,
   index,
   query,
+  address,
 }: {
   chainId: keyof typeof sendMerkleDropAddress
   tranche: bigint
   index?: bigint
   query?: { enabled?: boolean }
+  address: `0x${string}` | undefined
 }) {
-  return useReadSendMerkleDropIsClaimed({
+  return useReadContract({
+    abi: sendMerkleDropAbi,
+    address: address,
+    functionName: 'isClaimed',
     chainId,
-    // @ts-expect-error index is undefined if not provided
-    args: [tranche, index],
+    args: [tranche, index ?? -1n],
     query,
   })
 }
@@ -428,6 +437,8 @@ export function useGenerateClaimUserOp({
 }): UseQueryResult<UserOperation<'v0.7'>> {
   const trancheId = BigInt(distribution.number - 1) // tranches are 0-indexed
   const chainId = distribution.chain_id as keyof typeof sendMerkleDropAddress
+  const merkleDropAddress = byteaToHex(distribution.merkle_drop_addr as `\\x${string}`)
+
   // get the merkle proof from the database
   const {
     data: merkleProof,
@@ -444,15 +455,18 @@ export function useGenerateClaimUserOp({
     chainId,
     tranche: trancheId,
     index: share?.index !== undefined ? BigInt(share.index) : undefined,
+    address: merkleDropAddress,
   })
 
   const {
     data: trancheActive,
     isLoading: isLoadingTrancheActive,
     error: errorTrancheActive,
-  } = useReadSendMerkleDropTrancheActive({
+  } = useSendMerkleDropTrancheActive({
+    address: merkleDropAddress,
     chainId,
-    args: [trancheId],
+    tranche: trancheId,
+    query: { enabled: Boolean(trancheId && chainId) },
   })
 
   const enabled =
@@ -539,6 +553,7 @@ export const usePrepareSendMerkleDropClaimTrancheWrite = ({
 }: SendMerkleDropClaimTrancheArgs) => {
   const trancheId = BigInt(distribution.number - 1) // tranches are 0-indexed
   const chainId = distribution.chain_id as keyof typeof sendMerkleDropAddress
+  const merkleDropAddress = byteaToHex(distribution.merkle_drop_addr as `\\x${string}`)
   // get the merkle proof from the database
   const {
     data: merkleProof,
@@ -555,13 +570,17 @@ export const usePrepareSendMerkleDropClaimTrancheWrite = ({
     chainId,
     tranche: trancheId,
     index: share?.index !== undefined ? BigInt(share.index) : undefined,
+    address: merkleDropAddress,
   })
 
   const {
     data: trancheActive,
     isLoading: isLoadingTrancheActive,
     error: errorTrancheActive,
-  } = useReadSendMerkleDropTrancheActive({
+  } = useReadContract({
+    abi: sendMerkleDropAbi,
+    address: merkleDropAddress,
+    functionName: 'trancheActive',
     chainId,
     args: [trancheId],
   })

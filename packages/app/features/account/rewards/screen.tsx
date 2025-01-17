@@ -1,13 +1,11 @@
 import { YStack, H1, Paragraph, XStack, LinkableButton, Button, Image, Stack } from '@my/ui'
-import type { sendMerkleDropAddress } from '@my/wagmi'
+import { sendMerkleDropAbi, type sendMerkleDropAddress } from '@my/wagmi'
 import { IconArrowRight, IconSend } from 'app/components/icons'
-import {
-  useMonthlyDistributions,
-  useSendMerkleDropIsClaimed,
-  useSendMerkleDropTrancheActive,
-} from 'app/utils/distributions'
+import { byteaToHex } from 'app/utils/byteaToHex'
+import { useMonthlyDistributions } from 'app/utils/distributions'
 import formatAmount from 'app/utils/formatAmount'
 import { formatUnits } from 'viem'
+import { useReadContract } from 'wagmi'
 
 export function RewardsScreen() {
   const { data: distributions, isLoading: isLoadingDistributions } = useMonthlyDistributions()
@@ -15,19 +13,27 @@ export function RewardsScreen() {
   const trancheId = BigInt((currentDistribution?.number ?? 0) - 1) // tranches are 0-indexed
   const chainId = currentDistribution?.chain_id as keyof typeof sendMerkleDropAddress
   const share = currentDistribution?.distribution_shares?.[0]
+  const merkleDropAddress = currentDistribution?.merkle_drop_addr
+    ? byteaToHex(currentDistribution?.merkle_drop_addr as `\\x${string}`)
+    : undefined
 
   // find out if the tranche is active using SendMerkleDrop.trancheActive(uint256 _tranche)
-  const { data: isTrancheActive, isLoading: isTrancheActiveLoading } =
-    useSendMerkleDropTrancheActive({
-      tranche: trancheId,
-      chainId: chainId,
-      query: { enabled: Boolean(trancheId && chainId) },
-    })
-  // find out if user is eligible onchain using SendMerkleDrop.isClaimed(uint256 _tranche, uint256 _index)
-  const { data: isClaimed, isLoading: isClaimedLoading } = useSendMerkleDropIsClaimed({
+  const { data: isTrancheActive, isLoading: isTrancheActiveLoading } = useReadContract({
     chainId,
-    tranche: trancheId,
-    index: share?.index !== undefined ? BigInt(share.index) : undefined,
+    abi: sendMerkleDropAbi,
+    address: merkleDropAddress,
+    functionName: 'trancheActive',
+    args: [trancheId],
+    query: { enabled: Boolean(trancheId && chainId) },
+  })
+
+  // find out if user is eligible onchain using SendMerkleDrop.isClaimed(uint256 _tranche, uint256 _index)
+  const { data: isClaimed, isLoading: isClaimedLoading } = useReadContract({
+    chainId,
+    address: merkleDropAddress,
+    functionName: 'isClaimed',
+    abi: sendMerkleDropAbi,
+    args: [trancheId, BigInt(share?.index ?? -1n)],
     query: { enabled: Boolean(trancheId && chainId && share?.index !== undefined) },
   })
 

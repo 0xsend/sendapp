@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { IconDollar } from 'app/components/icons'
 import { useCoin } from 'app/provider/coins'
 import { assert } from 'app/utils/assert'
+import { byteaToHex } from 'app/utils/byteaToHex'
 import {
   type UseDistributionsResultData,
   useGenerateClaimUserOp,
@@ -32,6 +33,9 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   const isClaimActive = distribution.qualification_end < new Date()
   const trancheId = BigInt(distribution.number - 1) // tranches are 0-indexed
   const chainId = distribution.chain_id as keyof typeof sendMerkleDropAddress
+  const merkleDropAddress = distribution.merkle_drop_addr
+    ? byteaToHex(distribution.merkle_drop_addr as `\\x${string}`)
+    : undefined
   const [sentTxHash, setSentTxHash] = useState<Hex>()
   const [error, setError] = useState<Error>()
   const toast = useToastController()
@@ -44,6 +48,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     isLoading: isTrancheActiveLoading,
     error: isTrancheActiveError,
   } = useSendMerkleDropTrancheActive({
+    address: merkleDropAddress,
     tranche: trancheId,
     chainId: chainId,
   })
@@ -54,6 +59,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     error: isClaimedError,
     refetch: refetchIsClaimed,
   } = useSendMerkleDropIsClaimed({
+    address: merkleDropAddress,
     chainId,
     tranche: trancheId,
     index: share?.index !== undefined ? BigInt(share.index) : undefined,
@@ -169,9 +175,6 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
         maxPriorityFeePerGas: feesPerGas.maxPriorityFeePerGas,
       }
 
-      console.log('gasEstimate', usdcFees)
-      console.log('feesPerGas', feesPerGas)
-      console.log('userOp', _userOp)
       const receipt = await sendUserOp({
         userOp: _userOp,
         webauthnCreds,

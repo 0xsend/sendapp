@@ -3832,6 +3832,17 @@ export const sendVerifyingPaymasterAbi = [
     ],
     name: 'OwnershipTransferred',
   },
+  { type: 'error', inputs: [], name: 'ECDSAInvalidSignature' },
+  {
+    type: 'error',
+    inputs: [{ name: 'length', internalType: 'uint256', type: 'uint256' }],
+    name: 'ECDSAInvalidSignatureLength',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 's', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'ECDSAInvalidSignatureS',
+  },
   {
     type: 'error',
     inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],

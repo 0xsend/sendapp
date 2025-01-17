@@ -13,7 +13,7 @@ import {
   Theme,
   type CardProps,
 } from '@my/ui'
-import { type sendTokenAddress, useReadSendTokenBalanceOf } from '@my/wagmi'
+import { sendTokenAbi, type sendTokenAddress } from '@my/wagmi'
 import { CheckCircle2 } from '@tamagui/lucide-icons'
 import { IconAccount, IconInfoCircle } from 'app/components/icons'
 import {
@@ -32,6 +32,8 @@ import { useRewardsScreenParams } from 'app/routers/params'
 import { isEqualCalendarDate } from 'app/utils/dateHelper'
 import { toNiceError } from 'app/utils/toNiceError'
 import { min } from 'app/utils/bigint'
+import { useReadContract } from 'wagmi'
+import { byteaToHex } from 'app/utils/byteaToHex'
 
 //@todo get this from the db
 const verificationTypesAndTitles = {
@@ -215,12 +217,17 @@ const DistributionRequirementsCard = ({
     data: snapshotBalance,
     isLoading: isLoadingSnapshotBalance,
     error: snapshotBalanceError,
-  } = useReadSendTokenBalanceOf({
+  } = useReadContract({
+    abi: sendTokenAbi,
     chainId: distribution.chain_id as keyof typeof sendTokenAddress,
+    address: distribution.token_addr
+      ? byteaToHex(distribution.token_addr as `\\x${string}`)
+      : undefined,
     args: [sendAccount?.address ?? zeroAddress],
     blockNumber: distribution.snapshot_block_num
       ? BigInt(distribution.snapshot_block_num)
       : undefined,
+    functionName: 'balanceOf',
     query: {
       enabled: Boolean(sendAccount?.address),
     },
