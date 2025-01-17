@@ -436,34 +436,13 @@ export const sendAccountRouter = createTRPCRouter({
               message: 'Failed to get paymaster hash',
             })
           })
-        log('paymasterUserOpHash', paymasterUserOpHash)
-        const sig = await account.sign({ hash: paymasterUserOpHash })
-        log('sig', sig)
+        const sig = await account.signMessage({ message: { raw: paymasterUserOpHash } })
+
         const paymasterData = concat([
           encodeAbiParameters([{ type: 'uint48' }, { type: 'uint48' }], [validUntil, validAfter]),
           sig,
         ])
-        log('paymasterData', paymasterData)
         userop.paymasterData = paymasterData
-
-        // debugging paymasterAndData
-        // const paymasterAndData = packUserOp(userop).paymasterAndData
-        // const parsedPaymasterData = await sendAccountFactoryClient
-        //   .readContract({
-        //     address: paymasterAddress,
-        //     abi: sendVerifyingPaymasterAbi,
-        //     functionName: 'parsePaymasterAndData',
-        //     args: [paymasterAndData],
-        //   })
-        //   .catch((e) => {
-        //     log('parsePaymasterData error', e)
-        //     throw new TRPCError({
-        //       code: 'INTERNAL_SERVER_ERROR',
-        //       message: 'Failed to parse paymaster data',
-        //       cause: e.message,
-        //     })
-        //   })
-        // log('parsedPaymasterData', parsedPaymasterData)
 
         // return the paymaster data
         return {
