@@ -1,9 +1,9 @@
-import { type Hex, concat, numberToBytes, hexToBytes, bytesToHex, type Address } from 'viem'
+import { type Hex, concat, numberToBytes, hexToBytes, bytesToHex } from 'viem'
 import { assert } from './assert'
 import { signChallenge } from './signChallenge'
 import { USEROP_VERSION, generateChallenge } from './userop'
 import { getUserOperationHash, type UserOperation } from 'permissionless'
-import type { EntryPoint } from 'permissionless/types/entrypoint'
+import type { EntryPoint } from 'permissionless/types'
 import { byteaToBase64 } from './byteaToBase64'
 
 /**
