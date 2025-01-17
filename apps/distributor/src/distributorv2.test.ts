@@ -377,19 +377,19 @@ describe('Distributor V2 Worker', () => {
         user_id,
         amount: '10000',
         bonus_pool_amount: '0', // Always 0 in V2
-        amount_after_slash: '4772', // 75% of original (example slash)
-        fixed_pool_amount: '2', // 75% of 984
-        hodler_pool_amount: '4770', // 75% of 5872
+        amount_after_slash: '5578', // 75% of original (example slash)
+        fixed_pool_amount: '28', // 75% of 984
+        hodler_pool_amount: '5550', // 75% of 5872
       },
       {
         address: aliceAddr,
         distribution_id: 4,
         user_id: user_id2,
-        amount: '10000',
+        amount: '9888',
         bonus_pool_amount: '0', // Always 0 in V2
-        amount_after_slash: '1908', // 50% of original (example slash)
-        fixed_pool_amount: '0', // 50% of 208
-        hodler_pool_amount: '1908', // 50% of 2936
+        amount_after_slash: '1111', // 50% of original (example slash)
+        fixed_pool_amount: '1', // 50% of 208
+        hodler_pool_amount: '1110', // 50% of 2936
       },
     ]
     expect(createDistributionShares).toHaveBeenCalled()

@@ -14,7 +14,7 @@ import { assert } from 'app/utils/assert'
  *
  * @returns An array of promises that resolve to the balances of each address
  */
-export function fetchAllBalances({
+export async function fetchAllBalances({
   addresses,
   distribution,
 }: {
@@ -27,39 +27,36 @@ export function fetchAllBalances({
     balance: string
   }[]
 > {
-  return baseMainnetClient
-    .multicall({
-      multicallAddress: multicall3Address[baseMainnet.id],
-      allowFailure: false,
-      contracts: addresses.map(({ user_id, address }) => ({
-        address: sendTokenAddress[baseMainnet.id],
-        abi: erc20Abi,
-        functionName: 'balanceOf',
-        args: [address],
-      })),
-      blockNumber: distribution.snapshot_block_num
-        ? BigInt(distribution.snapshot_block_num)
-        : undefined,
-    })
-    .then((results) => {
-      assert(results.length === addresses.length, 'Invalid results length')
-      return results.map((result, i) => {
-        const { user_id, address } = addresses[i] ?? {}
-        if (!user_id || !address) throw new Error('Invalid user_id or address')
-        const balance = String(result)
-        return {
-          user_id,
-          address,
-          balance,
-        }
-      })
-    })
+  const results = await baseMainnetClient.multicall({
+    multicallAddress: multicall3Address[baseMainnet.id],
+    allowFailure: false,
+    contracts: addresses.map(({ user_id, address }) => ({
+      address: sendTokenAddress[baseMainnet.id],
+      abi: erc20Abi,
+      functionName: 'balanceOf',
+      args: [address],
+    })),
+    blockNumber: distribution.snapshot_block_num
+      ? BigInt(distribution.snapshot_block_num)
+      : undefined,
+  })
+  assert(results.length === addresses.length, 'Invalid results length')
+  return results.map((result, i) => {
+    const { user_id, address } = addresses[i] ?? {}
+    if (!user_id || !address) throw new Error('Invalid user_id or address')
+    const balance = String(result)
+    return {
+      user_id,
+      address,
+      balance,
+    }
+  })
 }
 
 export async function isMerkleDropActive(distribution: {
   number: number
   chain_id: number
-  merkle_drop_addr: string
+  merkle_drop_addr: string | null
 }) {
   const address = byteaToHex(distribution.merkle_drop_addr as `\\x${string}`)
   return baseMainnetClient.readContract({
