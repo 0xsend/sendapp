@@ -1,17 +1,17 @@
 import {
-  YStack,
-  XStack,
-  Stack,
+  Button,
+  Card,
+  Fade,
   H1,
   H4,
-  Card,
-  Paragraph,
-  Button,
-  Theme,
   Link,
+  Paragraph,
   Spinner,
+  Stack,
+  Theme,
   useToastController,
-  Fade,
+  XStack,
+  YStack,
 } from '@my/ui'
 import {
   baseMainnetBundlerClient,
@@ -25,17 +25,16 @@ import {
 } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
 import { IconUpgrade } from 'app/components/icons'
+import { api } from 'app/utils/api'
+import { assert } from 'app/utils/assert'
 import formatAmount from 'app/utils/formatAmount'
 import { useSendAccount } from 'app/utils/send-accounts'
+import { signUserOp } from 'app/utils/signUserOp'
 import { toNiceError } from 'app/utils/toNiceError'
 import { useUserOp } from 'app/utils/userop'
-import { useMemo } from 'react'
-import { encodeFunctionData, erc20Abi } from 'viem'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
-import { api } from 'app/utils/api'
-import { signUserOp } from 'app/utils/signUserOp'
-import type { UserOperation } from 'permissionless'
-import { assert } from 'app/utils/assert'
+import { useMemo, useState } from 'react'
+import { encodeFunctionData, erc20Abi, withRetry } from 'viem'
 
 interface TokenBalanceRowProps {
   label: string
@@ -68,6 +67,9 @@ function TokenBalanceRow({ label, amount }: TokenBalanceRowProps) {
  *
  * This should always be shown to the user if they have Send V0 Tokens.
  *
+ * @note we refetch the balance not too often but at least once when the user opens the screen
+ * and when the user opens the screen again. Consider adding a refetchInterval if we find users are able to
+ * use the app and they have Send V0 Tokens.
  * @param children - The children to render when the upgrade is not required.
  * @returns The children if the upgrade is required, otherwise it render the upgrade button.
  */
@@ -81,7 +83,12 @@ export function SendV0TokenUpgradeScreen({ children }: { children?: React.ReactN
   } = useReadSendTokenV0BalanceOf({
     chainId,
     args: [sendAccount?.address ?? '0x'],
-    query: { enabled: !!sendAccount?.address },
+    query: {
+      enabled: !!sendAccount?.address,
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+      refetchOnMount: true,
+    },
   })
   const isUpgradeRequired = !isPending && !isError && balance > BigInt(0)
 
@@ -149,6 +156,7 @@ function UpgradeTokenButton() {
     query: { enabled: !!sender },
   })
   const { tokensQuery } = useSendAccountBalances()
+  const [userOpState, setUserOpState] = useState('')
 
   const calls = useMemo(
     () => [
@@ -175,21 +183,46 @@ function UpgradeTokenButton() {
   )
 
   const paymasterSign = api.sendAccount.paymasterSign.useMutation({
-    onMutate: async ({ userop }) => {
-      console.log('onMutate', userop)
-      userop.signature = await signUserOp({
-        userOp: userop as UserOperation<'v0.7'>,
+    onMutate: () => setUserOpState('Requesting signature...'),
+    onSuccess: async (data) => {
+      assert(uop.isSuccess, 'uop is not success')
+
+      // assign paymasterData to the userOp
+      uop.data.paymasterData = data.paymasterData
+
+      // sign the userOp
+      uop.data.signature = await signUserOp({
+        userOp: uop.data,
         webauthnCreds,
         chainId: baseMainnetClient.chain.id,
         entryPoint: entryPointAddress[baseMainnetClient.chain.id],
       })
+
+      setUserOpState('Sending transaction...')
+
+      const userOpHash = await baseMainnetBundlerClient.sendUserOperation({
+        userOperation: uop.data,
+      })
+
+      setUserOpState('Waiting for confirmation...')
+
+      await withRetry(
+        () =>
+          baseMainnetBundlerClient.waitForUserOperationReceipt({
+            hash: userOpHash,
+            timeout: 10_000,
+          }),
+        {
+          delay: 100,
+          retryCount: 3,
+        }
+      )
+
+      toast.show('Upgraded successfully')
     },
-    onSettled(data, error, variables) {
-      console.log('onSettled', data, error, variables)
-    },
-    onSuccess,
-    onError(error, variables) {
-      console.log('onError', error, variables)
+    onSettled() {
+      queryClient.invalidateQueries({ queryKey: tokensQuery.queryKey })
+      queryClient.invalidateQueries({ queryKey: sendTokenV0Bal.queryKey })
     },
   })
 
@@ -203,36 +236,19 @@ function UpgradeTokenButton() {
     calls,
   })
 
-  console.log('sendUop', paymasterSign)
-
   const toast = useToastController()
   const queryClient = useQueryClient()
 
   const canSendUserOp = uop.isSuccess && !uop.isPending && !paymasterSign.isPending
   const anyError = uop.error || paymasterSign.error
 
-  async function onSuccess(data, variables) {
-    console.log('onSuccess', data, variables, uop.data)
-    assert(uop.isSuccess, 'uop is not success')
-
-    const userOpHash = await baseMainnetBundlerClient.sendUserOperation({
-      userOperation: uop.data,
-    })
-    console.log('userOpHash', userOpHash)
-    await baseMainnetBundlerClient.waitForUserOperationReceipt({
-      hash: userOpHash,
-    })
-
-    toast.show('Upgraded successfully')
-    queryClient.invalidateQueries({ queryKey: tokensQuery.queryKey })
-    queryClient.invalidateQueries({ queryKey: sendTokenV0Bal.queryKey })
-  }
-
   return (
     <YStack gap="$4" w="100%" maw={500}>
       <Paragraph color="$color10" ta="center">
         {(() => {
           switch (true) {
+            case paymasterSign.isPending && userOpState !== '':
+              return userOpState
             case paymasterSign.isPending:
               return 'Waiting for confirmation...'
             default:

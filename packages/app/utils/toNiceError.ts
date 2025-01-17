@@ -16,13 +16,12 @@ interface ErrorWithDetails {
  * biome-ignore lint/suspicious/noExplicitAny: this is a generic function
  */
 export function toNiceError(e: ErrorWithDetails | any): string {
+  console.error(e)
   if (!e) return 'Unknown error'
+  // prioritzie details over message
+  if (e.details !== undefined) return e.details.split('.').at(0) ?? e.details
   if (e instanceof Error || e.message) return e.message.split('.').at(0) ?? e.name
   if (typeof e === 'string') return e.split('.').at(0) ?? e
-
-  const errWithDetails = e as { details?: string }
-  if (errWithDetails.details !== undefined)
-    return errWithDetails.details.split('.').at(0) ?? errWithDetails.details
 
   // we don't know what this is
   console.error('Unknown error', e)

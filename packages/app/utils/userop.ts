@@ -397,7 +397,7 @@ export function throwNiceError(e: Error & { cause?: Error }): never {
   }
 }
 
-export function packUserOp(op: UserOperation<'v0.7'>): {
+export function packUserOp(uop: UserOperation<'v0.7'>): {
   sender: Address
   nonce: bigint
   initCode: Hex
@@ -409,36 +409,35 @@ export function packUserOp(op: UserOperation<'v0.7'>): {
   signature: Hex
 } {
   let paymasterAndData: Hex
-  if (!op.paymaster) {
+  if (!uop.paymaster) {
     paymasterAndData = '0x'
   } else {
-    if (!op.paymasterVerificationGasLimit || !op.paymasterPostOpGasLimit) {
+    if (!uop.paymasterVerificationGasLimit || !uop.paymasterPostOpGasLimit) {
       throw new Error('paymaster with no gas limits')
     }
     paymasterAndData = packPaymasterData({
-      paymaster: op.paymaster,
-      paymasterVerificationGasLimit: op.paymasterVerificationGasLimit,
-      paymasterPostOpGasLimit: op.paymasterPostOpGasLimit,
-      paymasterData: op.paymasterData,
+      paymaster: uop.paymaster,
+      paymasterVerificationGasLimit: uop.paymasterVerificationGasLimit,
+      paymasterPostOpGasLimit: uop.paymasterPostOpGasLimit,
+      paymasterData: uop.paymasterData,
     })
   }
-  console.log('packUserOp', op)
   return {
-    sender: op.sender,
-    nonce: BigInt(op.nonce),
-    initCode: op.factory ?? '0x',
-    callData: op.callData,
+    sender: uop.sender,
+    nonce: BigInt(uop.nonce),
+    initCode: uop.factory && uop.factoryData ? concat([uop.factory, uop.factoryData]) : '0x',
+    callData: uop.callData,
     accountGasLimits: concat([
-      pad(toHex(op.verificationGasLimit), { size: 16 }),
-      pad(toHex(op.callGasLimit), { size: 16 }),
+      pad(toHex(uop.verificationGasLimit), { size: 16 }),
+      pad(toHex(uop.callGasLimit), { size: 16 }),
     ]),
-    preVerificationGas: BigInt(op.preVerificationGas),
+    preVerificationGas: BigInt(uop.preVerificationGas),
     gasFees: concat([
-      pad(toHex(op.maxPriorityFeePerGas), { size: 16 }),
-      pad(toHex(op.maxFeePerGas), { size: 16 }),
+      pad(toHex(uop.maxPriorityFeePerGas), { size: 16 }),
+      pad(toHex(uop.maxFeePerGas), { size: 16 }),
     ]),
     paymasterAndData,
-    signature: op.signature,
+    signature: uop.signature,
   }
 }
 
