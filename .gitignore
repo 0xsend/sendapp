@@ -65,3 +65,5 @@ Brewfile.lock.json
 
 # asdf
 .tool-versions
+
+var/**

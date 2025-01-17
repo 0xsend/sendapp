@@ -140,7 +140,7 @@ export function HomeScreen() {
                   <Paragraph theme="red_alt1">No send account found</Paragraph>
                 </Stack>
               )
-            case search !== undefined:
+            case search !== undefined: //@todo remove this
               return <SendSearchBody />
             default:
               return (
