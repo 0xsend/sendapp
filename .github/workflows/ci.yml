@@ -51,11 +51,6 @@ jobs:
         uses: ./.github/actions/setup-env
         env:
           YARN_ENABLE_HARDENED_MODE: 0
-      - name: Load Next.js Build Cache
-        uses: actions/download-artifact@v4
-        with:
-          name: nextjs-build
-          path: ${{ github.workspace }}/apps/next/.next
       # - name: Snaplet Login
       #   shell: bash
       #   run: bunx snaplet auth login ${{ secrets.CI_SNAPLET_AUTH_TOKEN }}
