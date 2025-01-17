@@ -6,17 +6,25 @@ import {Helper} from "../src/Helper.sol";
 import "../src/SendVerifyingPaymaster.sol";
 
 contract DeploySendVerifyingPaymasterScript is Script, Helper {
+    bytes32 salt = bytes32(uint256(1));
+
     function setUp() public {
         this.labels();
     }
 
     function run() public {
-        bytes32 salt = bytes32(uint256(1));
-        vm.startBroadcast();
-
         address verifier = vm.envAddress("VERIFIER");
         address owner = vm.envAddress("OWNER");
+        vm.startBroadcast();
+        SendVerifyingPaymaster paymaster = SendVerifyingPaymaster(deploy(owner, verifier));
 
+        IEntryPoint entryPoint = IEntryPoint(AA_ENTRY_POINT_V0_7);
+        IEntryPoint(entryPoint).depositTo{value: 0.025 ether}(address(paymaster));
+        paymaster.addStake{value: 0.025 ether}(1);
+        vm.stopBroadcast();
+    }
+
+    function deploy(address owner, address verifier) public returns (address) {
         IEntryPoint entryPoint = IEntryPoint(AA_ENTRY_POINT_V0_7);
         SendVerifyingPaymaster paymaster = new SendVerifyingPaymaster{salt: salt}(entryPoint, verifier, owner);
 
@@ -25,8 +33,6 @@ contract DeploySendVerifyingPaymasterScript is Script, Helper {
         console2.log("Deployed SendVerifyingPaymaster verifier: ", verifier);
         console2.log("Deployed SendVerifyingPaymaster owner: ", owner);
 
-        IEntryPoint(entryPoint).depositTo{value: 0.025 ether}(address(paymaster));
-        paymaster.addStake{value: 0.025 ether}(1);
-        vm.stopBroadcast();
+        return address(paymaster);
     }
 }

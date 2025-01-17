@@ -31,7 +31,11 @@
     "source.organizeImports.biome": "never"
   },
   "[solidity]": {
-    "editor.defaultFormatter": "JuanBlanco.solidity"
+    "editor.defaultFormatter": "JuanBlanco.solidity",
+    // solidity format is way too slow or sometimes doesn't work
+    // format using the command line for now.
+    "editor.formatOnSave": false,
+    "editor.formatOnPaste": false
   },
   "solidity.linter": "solhint",
   "solidity.compileUsingRemoteVersion": "v0.8.23+commit.f704f362",

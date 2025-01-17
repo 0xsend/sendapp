@@ -21,10 +21,13 @@ import {
   encodeFunctionData,
   getContract,
   hexToBytes,
+  isAddress,
   isHex,
   maxUint256,
   numberToBytes,
+  pad,
   RpcRequestError,
+  toHex,
   type Address,
   type Hex,
 } from 'viem'
@@ -168,10 +171,10 @@ function userOpQueryOptions({
   chainId: number | undefined
   maxFeePerGas: bigint | undefined
   maxPriorityFeePerGas: bigint | undefined
-  paymaster?: Hex | null
-  paymasterVerificationGasLimit?: bigint | null
-  paymasterPostOpGasLimit?: bigint | null
-  paymasterData?: Hex | null
+  paymaster?: Hex
+  paymasterVerificationGasLimit?: bigint
+  paymasterPostOpGasLimit?: bigint
+  paymasterData?: Hex
 }) {
   return queryOptions({
     queryKey: [
@@ -222,14 +225,16 @@ function userOpQueryOptions({
       })
 
       const paymasterDefaults = {
-        paymaster: paymaster !== undefined ? undefined : tokenPaymasterAddress[chainId],
+        paymaster: paymaster !== undefined ? paymaster : tokenPaymasterAddress[chainId],
         paymasterVerificationGasLimit:
           paymasterVerificationGasLimit !== undefined
-            ? undefined
+            ? paymasterVerificationGasLimit
             : defaultUserOp.paymasterVerificationGasLimit,
         paymasterPostOpGasLimit:
-          paymasterPostOpGasLimit !== undefined ? undefined : defaultUserOp.paymasterPostOpGasLimit,
-        paymasterData: paymasterData !== undefined ? undefined : defaultUserOp.paymasterData,
+          paymasterPostOpGasLimit !== undefined
+            ? paymasterPostOpGasLimit
+            : defaultUserOp.paymasterPostOpGasLimit,
+        paymasterData: paymasterData !== undefined ? paymasterData : defaultUserOp.paymasterData,
       }
       const userOp: UserOperation<'v0.7'> = {
         ...defaultUserOp,
@@ -280,10 +285,10 @@ export function useUserOp({
   sender: Address | undefined
   callGasLimit?: bigint | undefined
   calls?: SendAccountCall[] | undefined
-  paymaster?: Hex | null
-  paymasterVerificationGasLimit?: bigint | null
-  paymasterPostOpGasLimit?: bigint | null
-  paymasterData?: Hex | null
+  paymaster?: Hex
+  paymasterVerificationGasLimit?: bigint
+  paymasterPostOpGasLimit?: bigint
+  paymasterData?: Hex
 }): UseQueryReturnType<UserOperation<'v0.7'>, Error> {
   const chainId = baseMainnetClient.chain.id
   const { data: nonce, error: nonceError, isLoading: isLoadingNonce } = useAccountNonce({ sender })
@@ -350,6 +355,7 @@ export function useUserOp({
     queryFn,
   })
 }
+
 /**
  * User operation errors are not very helpful and confusing. This function converts them to something more helpful.
  */
@@ -389,4 +395,71 @@ export function throwNiceError(e: Error & { cause?: Error }): never {
     default:
       throw e
   }
+}
+
+export function packUserOp(op: UserOperation<'v0.7'>): {
+  sender: Address
+  nonce: bigint
+  initCode: Hex
+  callData: Hex
+  accountGasLimits: Hex
+  preVerificationGas: bigint
+  gasFees: Hex
+  paymasterAndData: Hex
+  signature: Hex
+} {
+  let paymasterAndData: Hex
+  if (!op.paymaster) {
+    paymasterAndData = '0x'
+  } else {
+    if (!op.paymasterVerificationGasLimit || !op.paymasterPostOpGasLimit) {
+      throw new Error('paymaster with no gas limits')
+    }
+    paymasterAndData = packPaymasterData({
+      paymaster: op.paymaster,
+      paymasterVerificationGasLimit: op.paymasterVerificationGasLimit,
+      paymasterPostOpGasLimit: op.paymasterPostOpGasLimit,
+      paymasterData: op.paymasterData,
+    })
+  }
+  console.log('packUserOp', op)
+  return {
+    sender: op.sender,
+    nonce: BigInt(op.nonce),
+    initCode: op.factory ?? '0x',
+    callData: op.callData,
+    accountGasLimits: concat([
+      pad(toHex(op.verificationGasLimit), { size: 16 }),
+      pad(toHex(op.callGasLimit), { size: 16 }),
+    ]),
+    preVerificationGas: BigInt(op.preVerificationGas),
+    gasFees: concat([
+      pad(toHex(op.maxPriorityFeePerGas), { size: 16 }),
+      pad(toHex(op.maxFeePerGas), { size: 16 }),
+    ]),
+    paymasterAndData,
+    signature: op.signature,
+  }
+}
+
+export function packPaymasterData({
+  paymaster,
+  paymasterVerificationGasLimit,
+  paymasterPostOpGasLimit,
+  paymasterData,
+}: {
+  paymaster: Hex
+  paymasterVerificationGasLimit: bigint
+  paymasterPostOpGasLimit: bigint
+  paymasterData?: Hex
+}): Hex {
+  assert(isHex(paymaster), 'paymaster is not a valid hex string')
+  return isAddress(paymaster)
+    ? concat([
+        paymaster,
+        pad(toHex(paymasterVerificationGasLimit || 0n), { size: 16 }),
+        pad(toHex(paymasterPostOpGasLimit || 0n), { size: 16 }),
+        paymasterData ?? '0x',
+      ])
+    : '0x'
 }

@@ -6,7 +6,7 @@ import { z } from 'zod'
  */
 export const hex = z
   .string()
-  .regex(/^0x[0-9a-fA-F]+$/i)
+  .regex(/^0x[0-9a-fA-F]*$/i)
   .refine((v): v is `0x${string}` => true)
 
 /**

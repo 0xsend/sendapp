@@ -7,12 +7,12 @@ describe('hex', () => {
     expect(hex.parse('0x1234')).toEqual('0x1234')
     expect(hex.parse('0xabcd')).toEqual('0xabcd')
     expect(hex.parse('0xABCD')).toEqual('0xABCD')
+    expect(hex.parse('0x'))
   })
 
   it('should return an error for invalid hex strings', () => {
     const cases = [
       '1234', // missing 0x prefix
-      '0x', // empty hex
       '0xghijk', // invalid hex characters
       'asdf', // not hex at all
       '0x123g', // invalid hex character
