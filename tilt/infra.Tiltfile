@@ -227,6 +227,7 @@ local_resource(
     resource_deps = [
         "anvil:base",
         "anvil:anvil-token-paymaster-deposit",
+        "anvil:anvil-deploy-verifying-paymaster-fixtures",
     ],
 )
 
