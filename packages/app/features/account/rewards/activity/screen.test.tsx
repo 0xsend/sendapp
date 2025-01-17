@@ -1,7 +1,6 @@
 import { Wrapper } from 'app/utils/__mocks__/Wrapper'
 import { ActivityRewardsScreen } from './screen'
 import { act, render, screen } from '@testing-library/react-native'
-import { useSnapshotBalance } from 'app/utils/distributions'
 
 jest.mock('app/utils/distributions', () => ({
   useMonthlyDistributions: () => ({
