@@ -1,6 +1,7 @@
 import { Text, YStack, XStack, Spinner } from '@my/ui'
+import formatAmount from 'app/utils/formatAmount'
 
-export interface QuoteResponse {
+interface QuoteResponse {
   payment_total: { value: string; currency: string }
   payment_subtotal: { value: string; currency: string }
   purchase_amount: { value: string; currency: string }
@@ -45,7 +46,7 @@ export function OnrampPreview({ quote, isLoading }: OnrampPreviewProps) {
       <XStack jc="space-between">
         <Text color="$gray11">Fees</Text>
         <Text fontWeight="500">
-          ${(Number(quote.network_fee.value) + Number(quote.coinbase_fee.value)).toFixed(2)}
+          ${formatAmount(Number(quote.network_fee.value) + Number(quote.coinbase_fee.value))}
         </Text>
       </XStack>
     </YStack>

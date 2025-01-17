@@ -3,7 +3,6 @@ import { createTRPCRouter, protectedProcedure } from '../trpc'
 import { z } from 'zod'
 import { CDP_API_URL, CDP_PAY_URL, generateCoinbaseJWT } from '../helpers/coinbase'
 import debug from 'debug'
-import fetch from 'node-fetch'
 
 const log = debug('api:routers:coinbase')
 

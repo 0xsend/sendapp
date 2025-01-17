@@ -1,5 +1,4 @@
 import { api } from 'app/utils/api'
-import { useState } from 'react'
 
 interface OnrampParams {
   quoteId?: string
@@ -10,35 +9,28 @@ interface OnrampParams {
 }
 
 export function useCoinbaseOnramp() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
   const getOnrampUrl = api.coinbase.getOnrampUrl.useMutation()
   const getQuote = api.coinbase.getQuote.useMutation()
 
-  const openOnramp = async (address: string, params?: OnrampParams) => {
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      const { url } = await getOnrampUrl.mutateAsync({
+  const openOnramp = (address: string, params?: OnrampParams) => {
+    getOnrampUrl.mutate(
+      {
         address,
         blockchains: ['base'],
         ...params,
-      })
-
-      window.open(url, '_blank')
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to open Coinbase Onramp')
-    } finally {
-      setIsLoading(false)
-    }
+      },
+      {
+        onSuccess: ({ url }) => {
+          window.open(url, '_blank')
+        },
+      }
+    )
   }
 
   return {
     openOnramp,
-    isLoading,
-    error,
+    isLoading: getOnrampUrl.isPending || getQuote.isPending,
+    error: getOnrampUrl.error?.message || getQuote.error?.message || null,
     getQuote,
   }
 }
