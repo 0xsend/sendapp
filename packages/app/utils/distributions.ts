@@ -11,6 +11,7 @@ import {
   sendAccountAbi,
   tokenPaymasterAddress,
   baseMainnetBundlerClient,
+  sendTokenAbi,
 } from '@my/wagmi'
 import type { PostgrestError, SupabaseClient } from '@supabase/supabase-js'
 import { type UseQueryResult, useMutation, useQuery } from '@tanstack/react-query'
@@ -20,7 +21,7 @@ import { api } from './api'
 import { useSendAccount } from './send-accounts'
 import { getUserOperationHash, type UserOperation } from 'permissionless'
 import { assert } from './assert'
-import { type CallExecutionError, encodeFunctionData, isAddress } from 'viem'
+import { type CallExecutionError, encodeFunctionData, isAddress, zeroAddress } from 'viem'
 import { defaultUserOp } from './useUserOpTransferMutation'
 import { signUserOpHash } from './signUserOp'
 import { byteaToBase64 } from './byteaToBase64'
@@ -621,5 +622,117 @@ export const usePrepareSendMerkleDropClaimTrancheWrite = ({
       ? // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount_after_slash, and merkleProof are defined when enabled is true
         [address!, trancheId, BigInt(index!), BigInt(amount_after_slash!), merkleProof!]
       : undefined,
+  })
+}
+export function useSnapshotBalance(
+  distribution: {
+    amount: string
+    bonus_pool_bips: number
+    chain_id: number
+    created_at: string
+    description: string | null
+    fixed_pool_bips: number
+    hodler_min_balance: string
+    hodler_pool_bips: number
+    id: number
+    merkle_drop_addr: string | null
+    name: string
+    number: number
+    snapshot_block_num: number | null
+    token_addr: string | null
+    token_decimals: number | null
+    updated_at: string
+    distribution_shares: {
+      address: `0x${string}`
+      amount: string
+      amount_after_slash: string
+      bonus_pool_amount: string
+      created_at: string
+      distribution_id: number
+      fixed_pool_amount: string
+      hodler_pool_amount: string
+      id: number
+      index: number
+      updated_at: string
+      user_id: string
+    }[]
+    distribution_verification_values: {
+      bips_value: number
+      created_at: string
+      distribution_id: number
+      fixed_value: string
+      multiplier_max: number
+      multiplier_min: number
+      multiplier_step: number
+      type:
+        | 'tag_registration'
+        | 'tag_referral'
+        | 'create_passkey'
+        | 'send_ten'
+        | 'send_one_hundred'
+        | 'total_tag_referrals'
+        | 'send_streak'
+        | 'send_ceiling'
+      updated_at: string
+    }[]
+    send_slash: {
+      distribution_id: number
+      distribution_number: number
+      minimum_sends: number
+      scaling_divisor: number
+    }[]
+    timezone_adjusted_qualification_end: Date
+    qualification_end: Date
+    qualification_start: Date
+    claim_end: Date
+  },
+  sendAccount:
+    | {
+        chain_id: number
+        created_at: string
+        deleted_at: string | null
+        id: string
+        updated_at: string
+        user_id: string
+        address: `0x${string}`
+        init_code: import('/Users/allen/0xbigboss/0xsend/sendapp/supabase/database.types').PgBytea
+        send_account_credentials: {
+          account_id: string
+          created_at: string | null
+          credential_id: string
+          key_slot: number
+          webauthn_credentials: {
+            created_at: string
+            deleted_at: string | null
+            display_name: string
+            id: string
+            key_type: import('/Users/allen/0xbigboss/0xsend/sendapp/supabase/database-generated.types').Database['public']['Enums']['key_type_enum']
+            name: string
+            sign_count: number
+            updated_at: string
+            user_id: string
+            raw_credential_id: import('/Users/allen/0xbigboss/0xsend/sendapp/supabase/database.types').PgBytea
+            public_key: import('/Users/allen/0xbigboss/0xsend/sendapp/supabase/database.types').PgBytea
+            attestation_object: import('/Users/allen/0xbigboss/0xsend/sendapp/supabase/database.types').PgBytea
+          } | null
+        }[]
+      }
+    | null
+    | undefined
+) {
+  return useReadContract({
+    abi: sendTokenAbi,
+    chainId: distribution.chain_id as keyof typeof sendTokenAddress,
+    address: distribution.token_addr
+      ? byteaToHex(distribution.token_addr as `\\x${string}`)
+      : undefined,
+    args: [sendAccount?.address ?? zeroAddress],
+    blockNumber: distribution.snapshot_block_num
+      ? BigInt(distribution.snapshot_block_num)
+      : undefined,
+    functionName: 'balanceOf',
+    query: {
+      enabled: Boolean(sendAccount?.address),
+    },
   })
 }

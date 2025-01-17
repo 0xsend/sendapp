@@ -1,6 +1,7 @@
 import { Wrapper } from 'app/utils/__mocks__/Wrapper'
 import { ActivityRewardsScreen } from './screen'
 import { act, render, screen } from '@testing-library/react-native'
+import { useSnapshotBalance } from 'app/utils/distributions'
 
 jest.mock('app/utils/distributions', () => ({
   useMonthlyDistributions: () => ({
@@ -53,6 +54,13 @@ jest.mock('app/utils/distributions', () => ({
   }),
   useUserOpClaimMutation: jest.fn().mockReturnValue({
     mutateAsync: jest.fn().mockReturnValue(Promise.resolve()),
+  }),
+  useSnapshotBalance: jest.fn().mockReturnValue({
+    data: {
+      balance: 100n,
+    },
+    isSuccess: true,
+    error: null,
   }),
 }))
 
