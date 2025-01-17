@@ -254,7 +254,8 @@ local_resource(
         -e "DEBUG={bundler_debug}" \
         -e "DEBUG_COLORS=true" \
         -m 200m \
-        docker.io/0xbigboss/bundler:0.7.1-9ae4952 \
+        --pull always \
+        docker.io/0xbigboss/bundler:latest \
         --port 3030 \
         --config /app/etc/aabundler/aabundler.config.json \
         --mnemonic /app/keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
