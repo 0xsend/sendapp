@@ -1,4 +1,4 @@
-import { type Address, checksumAddress, isAddress } from 'viem'
+import { checksumAddress, isAddress } from 'viem'
 import { z } from 'zod'
 
 /**

@@ -23,7 +23,6 @@ import {
 import { api } from 'app/utils/api'
 import {
   createTestClient,
-  formatUnits,
   http,
   parseEther,
   publicActions,
