@@ -54,7 +54,7 @@ const sendAccountFactoryClient = createWalletClient({
   chain: baseMainnet,
   transport: http(baseMainnetClient.transport.url),
 }).extend(publicActions)
-console.log('sendAccountAddress', account.address)
+
 // nonce storage to avoid nonce conflicts
 const nonceQueue = new PQueue({ concurrency: 1 })
 
@@ -420,7 +420,7 @@ export const sendAccountRouter = createTRPCRouter({
         }
 
         const validUntil = Math.floor((Date.now() + 1000 * 120) / 1000)
-        const validAfter = Math.floor(Date.now() / 1000)
+        const validAfter = 0
         const paymasterAddress = sendVerifyingPaymasterAddress[sendAccount.chain_id]
         const paymasterUserOpHash = await sendAccountFactoryClient
           .readContract({
