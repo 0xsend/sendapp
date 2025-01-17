@@ -48,8 +48,7 @@ runs:
     - name: Yarn Install
       if: ${{ inputs.yarn-install == 'true' }}
       shell: bash
-      # debugging: TODO: REMOVE ME
-      run: sleep 3600 && yarn install --immutable
+      run: yarn install --immutable  --inline-builds
     - name: Build Next.js
       if: ${{ inputs.build-nextjs == 'true' }}
       shell: bash
