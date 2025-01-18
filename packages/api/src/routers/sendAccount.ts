@@ -343,7 +343,7 @@ export const sendAccountRouter = createTRPCRouter({
     .input(
       z.object({
         /**
-         * The signed user op to execute on the entry point.
+         * The user op to execute on the entry point.
          */
         userop: UserOperationSchema,
         /**
@@ -442,9 +442,7 @@ export const sendAccountRouter = createTRPCRouter({
           encodeAbiParameters([{ type: 'uint48' }, { type: 'uint48' }], [validUntil, validAfter]),
           sig,
         ])
-        userop.paymasterData = paymasterData
 
-        // return the paymaster data
         return {
           paymasterData,
         }
