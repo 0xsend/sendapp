@@ -114,6 +114,8 @@ jobs:
           brew cleanup
       - name: Setup Environment
         uses: ./.github/actions/setup-env
+        with:
+          yarn-install: false
         env:
           YARN_ENABLE_HARDENED_MODE: 0
       # - name: Snaplet Login
@@ -128,7 +130,9 @@ jobs:
       # this is on purpose so we get github annotations
       - name: Build Next.js
         shell: bash
-        run: yarn web:docker:build # build nextjs docker image
+        run: |
+          tilt ci yarn:install # install and setup env
+          yarn web:docker:build # build nextjs docker image
       - name: Playwright Tests
         id: playwright
         shell: bash
