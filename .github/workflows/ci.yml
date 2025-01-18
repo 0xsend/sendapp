@@ -115,14 +115,10 @@ jobs:
       - name: Setup Environment
         uses: ./.github/actions/setup-env
         with:
+          # will do it in the Build Next.js step
           yarn-install: false
         env:
           YARN_ENABLE_HARDENED_MODE: 0
-      # - name: Snaplet Login
-      #   shell: bash
-      #   run: bunx snaplet auth login ${{ secrets.CI_SNAPLET_AUTH_TOKEN }}
-      - name: Install Playwright Dependencies
-        run: yarn playwright playwright install --with-deps
       # @todo anvil fixtures cause dirty repo, but only in github actions 😢
       # - name: All Changes Committed
       #   shell: bash
@@ -133,6 +129,8 @@ jobs:
         run: |
           tilt ci yarn:install # install and setup env
           yarn web:docker:build # build nextjs docker image
+      - name: Install Playwright Dependencies
+        run: yarn playwright playwright install --with-deps
       - name: Playwright Tests
         id: playwright
         shell: bash
