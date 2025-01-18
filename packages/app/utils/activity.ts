@@ -143,7 +143,7 @@ export function eventNameFromActivity(activity: Activity) {
  * @param activity
  * @returns
  */
-export function activityDetailsEventNameFromActivity(activity: Activity) {
+export function phraseFromActivity(activity: Activity) {
   const { event_name, from_user, to_user, data } = activity
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)

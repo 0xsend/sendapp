@@ -1,10 +1,6 @@
 import { Fade, Paragraph, Separator, Stack, XStack, YStack, Text } from '@my/ui'
 import { RowLabel } from 'app/features/activity/screen'
-import {
-  activityDetailsEventNameFromActivity,
-  amountFromActivity,
-  subtextFromActivity,
-} from 'app/utils/activity'
+import { phraseFromActivity, amountFromActivity, subtextFromActivity } from 'app/utils/activity'
 import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
 import { IconX } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
@@ -17,7 +13,7 @@ export const ActivityDetails = ({
   activity: Activity
   onClose: () => void
 }) => {
-  const activityText = activityDetailsEventNameFromActivity(activity)
+  const activityText = phraseFromActivity(activity)
   const counterPartText = subtextFromActivity(activity)
   const amount = amountFromActivity(activity)
 

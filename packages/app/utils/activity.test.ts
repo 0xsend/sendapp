@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@jest/globals'
 import {
-  activityDetailsEventNameFromActivity,
+  phraseFromActivity,
   amountFromActivity,
   counterpart,
   eventNameFromActivity,
@@ -73,17 +73,13 @@ describe('test eventNameFromActivity', () => {
   })
 })
 
-describe('activityDetailsEventNameFromActivity', () => {
+describe('phraseFromActivity', () => {
   it('should return "Deposited" when transfer and to user ID is present', () => {
-    expect(activityDetailsEventNameFromActivity(EventSchema.parse(mockReceivedTransfer))).toBe(
-      'Deposited'
-    )
+    expect(phraseFromActivity(EventSchema.parse(mockReceivedTransfer))).toBe('Deposited')
   })
 
   it('should return "Sent" when received eth and to user ID is present', () => {
-    expect(activityDetailsEventNameFromActivity(EventSchema.parse(mockSendAccountReceive))).toBe(
-      'Sent you'
-    )
+    expect(phraseFromActivity(EventSchema.parse(mockSendAccountReceive))).toBe('Sent you')
   })
 
   it('should return "Received" when received eth and from user ID is present', () => {
@@ -92,29 +88,25 @@ describe('activityDetailsEventNameFromActivity', () => {
     activity.from_user = { ...activity.from_user, id: '1234' }
     // @ts-expect-error mock
     activity.to_user = { ...activity.to_user, id: null }
-    expect(activityDetailsEventNameFromActivity(EventSchema.parse(activity))).toBe('Received')
+    expect(phraseFromActivity(EventSchema.parse(activity))).toBe('Received')
   })
 
   it('should return "Received" when transfer and from user ID is present', () => {
-    expect(activityDetailsEventNameFromActivity(EventSchema.parse(mockSentTransfer))).toBe(
-      'Received'
-    )
+    expect(phraseFromActivity(EventSchema.parse(mockSentTransfer))).toBe('Received')
   })
 
   it('should return "Sendtag created" when tag receipts event', () => {
-    expect(activityDetailsEventNameFromActivity(EventSchema.parse(mockTagReceipt))).toBe(
-      'Sendtag created'
-    )
+    expect(phraseFromActivity(EventSchema.parse(mockTagReceipt))).toBe('Sendtag created')
   })
 
   it('should return "Referred" when referrals event', () => {
-    expect(activityDetailsEventNameFromActivity(EventSchema.parse(mockReferral))).toBe('Referred')
+    expect(phraseFromActivity(EventSchema.parse(mockReferral))).toBe('Referred')
   })
 
   it('should return "I am rick james" when unknown event name equals i_am_rick_james', () => {
     const activity = MockActivityFeed[4]
     expect(
-      activityDetailsEventNameFromActivity({
+      phraseFromActivity({
         ...EventSchema.parse(activity),
         event_name: 'i_am_rick_james',
       })
@@ -123,7 +115,7 @@ describe('activityDetailsEventNameFromActivity', () => {
 
   it('should return "Earned referral reward" when send_account_transfer from SendtagCheckout contract', () => {
     const _activity = EventSchema.parse(mockSendtagReferralRewardUSDC)
-    expect(activityDetailsEventNameFromActivity(_activity)).toBe('Earned referral reward')
+    expect(phraseFromActivity(_activity)).toBe('Earned referral reward')
   })
 })
 
