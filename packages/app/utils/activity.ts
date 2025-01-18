@@ -85,7 +85,7 @@ export function amountFromActivity(activity: Activity): string {
     case isReferralsEvent(activity) && !!activity.from_user?.id: {
       // only show if the user is the referrer
       const data = activity.data
-      return `${data.tags.length} Referrals`
+      return `${data.tags.length} ${data.tags.length > 1 ? 'Referrals' : 'Referral'}`
     }
     case isReferralsEvent(activity) && !!activity.to_user?.id: {
       // only show if the user is the referred
@@ -135,6 +135,42 @@ export function eventNameFromActivity(activity: Activity) {
         .split('_')
         .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
         .join(' ')
+  }
+}
+
+/**
+ * Returns the human-readable phrase for event name of the activity for activity details.
+ * @param activity
+ * @returns
+ */
+export function phraseFromActivity(activity: Activity) {
+  const { event_name, from_user, to_user, data } = activity
+  const isERC20Transfer = isSendAccountTransfersEvent(activity)
+  const isETHReceive = isSendAccountReceiveEvent(activity)
+  const isTransferOrReceive = isERC20Transfer || isETHReceive
+
+  switch (true) {
+    case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
+      return 'Earned referral reward'
+    case isERC20Transfer && to_user?.send_id === undefined:
+      return 'Withdrew'
+    case isTransferOrReceive && from_user === null:
+      return 'Deposited'
+    case isTransferOrReceive && !!to_user?.id:
+      return 'Sent you'
+    case isTransferOrReceive && !!from_user?.id:
+      return 'Received'
+    case isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity):
+      return data.tags?.length > 1 ? 'Sendtags created' : 'Sendtag created'
+    case isReferralsEvent(activity) && !!from_user?.id:
+      return 'Referred'
+    case isReferralsEvent(activity) && !!to_user?.id:
+      return 'Referred you'
+    default:
+      return event_name
+        .split('_')
+        .join(' ')
+        .replace(/^./, (char) => char.toUpperCase())
   }
 }
 

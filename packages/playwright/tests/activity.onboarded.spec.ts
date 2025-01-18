@@ -240,7 +240,7 @@ test('can visit activity page and see correct activity feed', async ({
 
   // Referral (as referrer)
   await expect.soft(activityRows.nth(4)).toContainText('Referral')
-  await expect.soft(activityRows.nth(4)).toContainText('1 Referrals')
+  await expect.soft(activityRows.nth(4)).toContainText('1 Referral')
   await expect.soft(activityRows.nth(4)).toContainText(anotherUser.name ?? '')
 
   // Tag receipt (USDC)

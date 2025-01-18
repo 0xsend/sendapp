@@ -1,4 +1,4 @@
-import { Button, Fade, Paragraph, Spinner, YGroup, YStack } from '@my/ui'
+import { Button, Fade, Paragraph, ScrollView, Spinner, XStack, YGroup, YStack } from '@my/ui'
 import { useActivityFeed } from './utils/useActivityFeed'
 import { RowLabel } from './screen'
 import type { PostgrestError } from '@supabase/postgrest-js'
@@ -6,25 +6,48 @@ import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query
 import type { ZodError } from 'zod'
 import type { Activity } from 'app/utils/zod/activity'
 import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
+import { useState } from 'react'
+import { ActivityDetails } from 'app/features/activity/ActivityDetails'
 
 export function RecentActivity() {
   const result = useActivityFeed()
+  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
+
+  const handleActivityPress = (activity: Activity) => {
+    setSelectedActivity(activity)
+  }
+
+  const handleCloseActivityDetails = () => {
+    setSelectedActivity(null)
+  }
+
   return (
-    <YStack
-      gap="$5"
-      testID={'RecentActivity'}
-      $gtLg={{
-        maxWidth: '50%',
-      }}
-    >
-      <ActivityFeed {...result} />
-    </YStack>
+    <XStack w={'100%'} height={0} gap={'$5'} f={1}>
+      <ScrollView
+        testID={'RecentActivity'}
+        showsVerticalScrollIndicator={false}
+        display={selectedActivity ? 'none' : 'flex'}
+        $gtLg={{
+          display: 'flex',
+          maxWidth: '50%',
+        }}
+      >
+        <ActivityFeed activityFeedQuery={result} onActivityPress={handleActivityPress} />
+      </ScrollView>
+      {selectedActivity && (
+        <ActivityDetails activity={selectedActivity} onClose={handleCloseActivityDetails} />
+      )}
+    </XStack>
   )
 }
 
-function ActivityFeed(
+function ActivityFeed({
+  activityFeedQuery,
+  onActivityPress,
+}: {
   activityFeedQuery: UseInfiniteQueryResult<InfiniteData<Activity[]>, PostgrestError | ZodError>
-) {
+  onActivityPress: (activity: Activity) => void
+}) {
   const {
     data,
     isLoading: isLoadingActivities,
@@ -85,7 +108,7 @@ function ActivityFeed(
                       <YGroup.Item
                         key={`${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`}
                       >
-                        <TokenActivityRow activity={activity} />
+                        <TokenActivityRow activity={activity} onPress={onActivityPress} />
                       </YGroup.Item>
                     ))}
                   </YGroup>
