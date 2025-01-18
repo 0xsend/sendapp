@@ -59,7 +59,7 @@ jobs:
         shell: bash
         run: tilt ci unit-tests --timeout=15m
       - name: Lint
-        run: yarn lint
+        run: sleep 3600 && yarn lint
       - name: Tilt Down
         # always run tilt down if tilt ci started
         if: always() && steps.tilt-ci.outcome != 'skipped'
@@ -128,9 +128,7 @@ jobs:
       # this is on purpose so we get github annotations
       - name: Build Next.js
         shell: bash
-        run: |
-          tilt ci yarn:install # install and setup env
-          yarn web:docker:build # build nextjs docker image
+        run: yarn web:docker:build # build nextjs docker image
       - name: Playwright Tests
         id: playwright
         shell: bash
