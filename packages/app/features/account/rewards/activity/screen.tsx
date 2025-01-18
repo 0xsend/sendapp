@@ -276,7 +276,10 @@ const DistributionRequirementsCard = ({
             <Paragraph>
               Min. Balance{' '}
               {formatAmount(
-                formatUnits(BigInt(distribution.hodler_min_balance ?? 0n), 18) ?? 0,
+                formatUnits(
+                  BigInt(distribution.hodler_min_balance ?? 0n),
+                  distribution.token_decimals ?? 18
+                ) ?? 0,
                 9,
                 0
               )}
@@ -513,7 +516,7 @@ const MultiplierCards = ({
               color={'$color12'}
               mx="auto"
             >
-              X {BigInt(value ?? 1).toString()}
+              X {(value ?? 1).toString()}
             </Paragraph>
           </MultiplierCard>
         ))}
@@ -585,7 +588,7 @@ const ProgressCard = ({
       0n
     ) ?? BigInt(distribution.hodler_min_balance)
 
-  const scaledPreviousReward = BigInt(BigInt(previousReward) / BigInt(sendSlash?.scaling_divisor))
+  const scaledPreviousReward = BigInt(previousReward) / BigInt(sendSlash?.scaling_divisor)
   const sendCeilingWeight = sendCeiling?.weight ?? BigInt(0)
   // up to 2 decimals for the progress bar
   const progress =
