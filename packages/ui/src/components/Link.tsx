@@ -26,11 +26,12 @@ export const Link = ({
   prefetch,
   locale,
   children,
+  target,
   ...props
 }: LinkProps) => {
   const linkProps = useLink({ href, replace, scroll, shallow })
   return (
-    <StyledLink {...linkProps}>
+    <StyledLink target={target} {...linkProps}>
       <SizableText tag="span" {...props}>
         {children}
       </SizableText>
