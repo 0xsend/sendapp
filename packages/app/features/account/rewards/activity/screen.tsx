@@ -215,7 +215,7 @@ const DistributionRequirementsCard = ({
     data: snapshotBalance,
     isLoading: isLoadingSnapshotBalance,
     error: snapshotBalanceError,
-  } = useSnapshotBalance(distribution, sendAccount)
+  } = useSnapshotBalance({ distribution, sendAccount })
   if (verificationsQuery.isLoading || isLoadingSendAccount) {
     return (
       <Card br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
