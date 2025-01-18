@@ -40,6 +40,7 @@ export const sendCoin = {
   coingeckoTokenId: 'send-token',
 } as const
 
+// can probably remove this
 export const sendV0Coin = {
   label: 'Send (v0)',
   symbol: 'SEND',
