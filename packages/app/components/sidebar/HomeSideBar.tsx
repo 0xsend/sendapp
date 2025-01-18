@@ -28,6 +28,7 @@ import { NavSheet } from '../NavSheet'
 import { useUser } from 'app/utils/useUser'
 import { ReferralLink } from '../ReferralLink'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { useIsSendingUnlocked } from 'app/utils/useIsSendingUnlocked'
 
 const links = [
   {
@@ -60,6 +61,8 @@ const links = [
 ].filter(Boolean) as { icon: ReactElement; text: string; href: string }[]
 
 const HomeSideBar = ({ ...props }: YStackProps) => {
+  const isSendingUnlocked = useIsSendingUnlocked()
+
   return (
     <SideBar {...props} ai={'flex-start'} pl="$7">
       <Link href={'/'}>
@@ -67,9 +70,11 @@ const HomeSideBar = ({ ...props }: YStackProps) => {
       </Link>
 
       <YStack gap={'$7'} pt={'$10'} jc={'space-between'}>
-        {links.map((link) => (
-          <SideBarNavLink key={link.href} {...link} />
-        ))}
+        {links
+          .filter((link) => (isSendingUnlocked ? true : link.href !== '/send'))
+          .map((link) => (
+            <SideBarNavLink key={link.href} {...link} />
+          ))}
       </YStack>
     </SideBar>
   )

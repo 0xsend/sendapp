@@ -146,7 +146,7 @@ export const TokenDetailsMarketData = ({ coin }: { coin: CoinWithBalance }) => {
         <Spinner size="small" color={'$color12'} />
       ) : (
         <XStack gap={'$1.5'} ai="center" jc={'space-around'}>
-          {changePercent24h === undefined ? (
+          {!changePercent24h ? (
             <XStack gap="$2" ai="center">
               <Paragraph color="$color10">Failed to load market data</Paragraph>
               <IconError size="$1.75" color={'$redVibrant'} />

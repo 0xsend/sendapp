@@ -15,6 +15,7 @@ import { Provider } from 'app/provider'
 import { YStack, H1, H2 } from '@my/ui'
 import { IconSendLogo } from 'app/components/icons'
 import { SendV0TokenUpgradeScreen } from 'app/features/send-token-upgrade/screen'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 if (process.env.NODE_ENV === 'production') {
   require('../public/tamagui.css')
@@ -65,9 +66,11 @@ function MyApp({
         <Provider initialSession={pageProps.initialSession}>
           {/* TODO: create a concerns screen or move to provider instead of wrapping here in next app */}
           <MaintenanceMode>
-            <SendV0TokenUpgradeScreen>
-              {getLayout(<Component {...pageProps} />)}
-            </SendV0TokenUpgradeScreen>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+              <SendV0TokenUpgradeScreen>
+                {getLayout(<Component {...pageProps} />)}
+              </SendV0TokenUpgradeScreen>
+            </GestureHandlerRootView>
           </MaintenanceMode>
         </Provider>
       </NextThemeProvider>
