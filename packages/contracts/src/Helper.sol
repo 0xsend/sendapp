@@ -51,6 +51,11 @@ abstract contract Helper is Script {
      * https://basescan.org/address/0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
      */
     address constant USDC_BASE = 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913;
+    /**
+     * Send Rewards Safe on Base
+     * https://basescan.org/address/0xD3DCFf1823714a4399AD2927A3800686D4CEB53A
+     */
+    address constant SEND_REWARDS_SAFE = 0xD3DCFf1823714a4399AD2927A3800686D4CEB53A;
 
     function labels() public {
         vm.label(SEND_TOKEN_V0, "SEND_TOKEN_V0");
@@ -62,5 +67,6 @@ abstract contract Helper is Script {
         vm.label(AA_ENTRY_POINT_V0_6, "AA_ENTRY_POINT_V0_6");
         vm.label(AA_ENTRY_POINT_V0_7, "AA_ENTRY_POINT_V0_7");
         vm.label(USDC_BASE, "USDC_BASE");
+        vm.label(SEND_REWARDS_SAFE, "SEND_REWARDS_SAFE");
     }
 }

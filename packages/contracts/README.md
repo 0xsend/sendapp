@@ -18,11 +18,12 @@ Foundry consists of:
 ### Deploy Send Merkle Drop
 
 ```shell
-forge script ./packages/contracts/script/DeploySendMerkleDrop.s.sol:DeploySendMerkleDropScript \
+SEND_REWARDS_SAFE=0x436454a68bef94901014e2af90f86e7355a029f3 \
+forge script ./script/DeploySendMerkleDrop.s.sol:DeploySendMerkleDropScript \
   -vvvv \
-  --rpc-url http://localhost:8545 \
-  --sender 0x647eb43401e13e995d89cf26cd87e68890ee3f89 \
-  --froms 0x647eb43401e13e995d89cf26cd87e68890ee3f89 \
+  --rpc-url base-sepolia \
+  --sender 0x436454a68bef94901014e2af90f86e7355a029f3 \
+  --froms 0x436454a68bef94901014e2af90f86e7355a029f3 \
   --keystores ~/.foundry/keystores/send_deployer
   # --broadcast --verify
 ```
