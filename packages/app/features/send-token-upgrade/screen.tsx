@@ -24,7 +24,7 @@ import {
   useReadSendTokenV0BalanceOf,
 } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
-import { IconUpgrade } from 'app/components/icons'
+import { IconSendLogo, IconUpgrade } from 'app/components/icons'
 import { api } from 'app/utils/api'
 import { assert } from 'app/utils/assert'
 import formatAmount from 'app/utils/formatAmount'
@@ -97,45 +97,56 @@ export function SendV0TokenUpgradeScreen({ children }: { children?: React.ReactN
   }
 
   return (
-    <Fade f={1} ai="center" jc="center" px="$4" gap="$6">
-      <YStack f={1} ai="center" jc="center" px="$4" gap="$6">
-        <Theme name="green">
+    <YStack f={1} ai="center" jc="center" px="$4" gap="$6">
+      <IconSendLogo size="$8" color="$color12" pt="$6" />
+
+      <Fade f={1} ai="center" jc="center" px="$4" gap="$6">
+        <YStack f={1} ai="center" jc="center" px="$4" gap="$6">
           <Stack mb="$2">
-            <IconUpgrade size="$4" color="$primary" />
+            <IconUpgrade
+              size="$4"
+              $theme-dark={{ color: '$primary' }}
+              $theme-light={{ color: '$color12' }}
+            />
           </Stack>
-        </Theme>
 
-        <YStack ai="center" gap="$2">
-          <H1 fontWeight="800" tt="uppercase">
-            TOKEN UPGRADE
-          </H1>
-          <Paragraph color="$color10" ta="center" fontSize="$6" maw={400}>
-            Upgrade required to continue using Send. New total supply: 100B → 1B
-          </Paragraph>
-        </YStack>
+          <YStack ai="center" gap="$2">
+            <H1 fontWeight="800" tt="uppercase">
+              TOKEN UPGRADE
+            </H1>
+            <Paragraph color="$color10" ta="center" fontSize="$6" maw={400}>
+              Upgrade required to continue using Send. New total supply: 100B → 1B
+            </Paragraph>
+          </YStack>
 
-        <Card w="100%" maw={500} p="$5" gap="$4">
-          <TokenBalanceRow label="CURRENT" amount={formatAmount(balance.toString(), 9, 0)} />
-          <TokenBalanceRow label="AFTER" amount={formatAmount((balance / 100n).toString(), 9, 0)} />
-        </Card>
+          <Card w="100%" maw={500} p="$5" gap="$4">
+            <TokenBalanceRow label="CURRENT" amount={formatAmount(balance.toString(), 9, 0)} />
+            <TokenBalanceRow
+              label="AFTER"
+              amount={formatAmount((balance / 100n).toString(), 9, 0)}
+            />
+          </Card>
 
-        <YStack gap="$4" w="100%" maw={500} ai="center">
-          <UpgradeTokenButton />
+          <YStack gap="$4" w="100%" maw={500} ai="center">
+            <UpgradeTokenButton />
 
-          <Theme name="green">
             <Link
               href="https://info.send.it/send-docs/send-token/send-v1-tokenomics"
               target="_blank"
-              color="$color10"
             >
-              <Paragraph fontSize="$4" textDecorationLine="underline" color="$primary">
+              <Paragraph
+                fontSize="$4"
+                textDecorationLine="underline"
+                $theme-dark={{ color: '$primary' }}
+                $theme-light={{ color: '$color12' }}
+              >
                 Read more about the Upgrade
               </Paragraph>
             </Link>
-          </Theme>
+          </YStack>
         </YStack>
-      </YStack>
-    </Fade>
+      </Fade>
+    </YStack>
   )
 }
 
