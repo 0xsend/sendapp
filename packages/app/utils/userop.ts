@@ -224,6 +224,7 @@ function userOpQueryOptions({
         args: [calls],
       })
 
+      // allow for customizing the paymaster, otherwise use the default token (USDC) paymaster
       const paymasterDefaults = {
         paymaster: paymaster !== undefined ? paymaster : tokenPaymasterAddress[chainId],
         paymasterVerificationGasLimit:
