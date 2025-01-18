@@ -63,6 +63,6 @@ export async function isMerkleDropActive(distribution: {
     abi: sendMerkleDropAbi,
     address,
     functionName: 'trancheActive',
-    args: [BigInt(distribution.number - 1)],
+    args: [BigInt(distribution.number - 1)], // tranche is 0-indexed
   })
 }
