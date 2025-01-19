@@ -24,8 +24,8 @@ forge script ./script/DeploySendMerkleDrop.s.sol:DeploySendMerkleDropScript \
   --rpc-url base-sepolia \
   --sender 0x436454a68bef94901014e2af90f86e7355a029f3 \
   --froms 0x436454a68bef94901014e2af90f86e7355a029f3 \
-  --keystores ~/.foundry/keystores/send_deployer
-  # --broadcast --verify
+  --keystores ~/.foundry/keystores/send_deployer \
+  --broadcast --verify --verifier etherscan
 ```
 
 ### Verify Send Merkle Drop
@@ -35,10 +35,10 @@ forge script ./script/DeploySendMerkleDrop.s.sol:DeploySendMerkleDropScript \
 
 ```shell
 forge verify-contract \
-  --watch \
-  --constructor-args-path ./constructor-args.txt \
-  0xB9310daE45E71c7a160A13D64204623071a8E347 \
-  ./packages/contracts/src/SendMerkleDrop.sol:SendMerkleDrop
+  --constructor-args 000000000000000000000000eab49138ba2ea6dd776220fe26b7b8e446638956000000000000000000000000d3dcff1823714a4399ad2927a3800686d4ceb53a 0x2c1630Cd8f40D0458b7B5849E6Cc2904A7d18A57 \
+  --verifier etherscan \
+  --chain base \
+  ./src/SendMerkleDrop.sol:SendMerkleDrop
 ```
 
 ### Create Send Snapshot

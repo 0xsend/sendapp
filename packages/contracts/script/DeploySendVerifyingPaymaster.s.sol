@@ -20,7 +20,7 @@ contract DeploySendVerifyingPaymasterScript is Script, Helper {
 
         IEntryPoint entryPoint = IEntryPoint(AA_ENTRY_POINT_V0_7);
         IEntryPoint(entryPoint).depositTo{value: 0.025 ether}(address(paymaster));
-        paymaster.addStake{value: 0.025 ether}(1);
+        paymaster.addStake{value: 0.0005 ether}(1);
         vm.stopBroadcast();
     }
 
