@@ -13,7 +13,7 @@ where number < 11;
 -- update the distributions table for send token v1 and send token v1 merkle drop
 -- amount and minimum balance
 update distributions
-set merkle_drop_addr   = '\xC8b80B16c40AaE14d8fCBBda94FfA5041089D048'
+set merkle_drop_addr   = '\xF36577E30F36aa822F6571845206ED0d8ef81D15'
   , token_decimals     = 18
   , token_addr         = '\xEab49138BA2Ea6dd776220fE26b7b8E446638956'
   , amount             = (amount * 1e16)             -- 300M -> 3M tokens with 18 decimals
