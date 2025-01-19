@@ -91,7 +91,7 @@ describe('ActivityRow', () => {
     )
     expect(screen.getByText('Referral')).toBeOnTheScreen()
     expect(screen.getByText('/disconnect_whorl7351')).toBeOnTheScreen()
-    expect(screen.getByTestId('ActivityRowAmount')).toHaveTextContent('1 Referrals')
+    expect(screen.getByTestId('ActivityRowAmount')).toHaveTextContent('1 Referral')
   })
 
   it('should render referred by event', () => {

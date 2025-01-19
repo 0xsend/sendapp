@@ -7,7 +7,7 @@ import { MockActivityFeed } from 'app/features/activity/utils/__mocks__/mock-act
 import type { ReferralsEvent } from './ReferralsEventSchema'
 import type { SendAccountReceiveEvent } from './SendAccountReceiveEventSchema'
 import type { TagReceiptUSDCEvent } from './TagReceiptUSDCEventSchema'
-import { ethCoin, usdcCoin } from 'app/data/coins'
+import { ethCoin, sendCoin, usdcCoin } from 'app/data/coins'
 
 describe('EventArraySchema', () => {
   let parsedData: BaseEvent[]
@@ -22,7 +22,7 @@ describe('EventArraySchema', () => {
 
   it('should parse a valid event array', () => {
     expect(parsedData).toMatchSnapshot()
-    expect(parsedData).toHaveLength(9)
+    expect(parsedData).toHaveLength(10)
   })
 
   describe('SendAccountTransfersEvent', () => {
@@ -213,6 +213,38 @@ describe('EventArraySchema', () => {
     it('should have correct receive data', () => {
       expect(sendAccountReceive.data.sender).toBe('0xa0Ee7A142d267C1f36714E4a8F75612F20a79720')
       expect(sendAccountReceive.data.value).toBe(10000000000000000n)
+    })
+  })
+
+  describe('SendTokenUpgradeEvent', () => {
+    let upgrade: SendAccountTransfersEvent
+
+    beforeAll(() => {
+      upgrade = parsedData[9] as SendAccountTransfersEvent
+      assert(!!upgrade)
+    })
+
+    it('should have correct event name and timestamps', () => {
+      expect(upgrade.event_name).toBe('send_account_transfers')
+      expect(upgrade.created_at).toBeInstanceOf(Date)
+    })
+
+    it('should have correct user data', () => {
+      expect(upgrade.from_user).toBeNull()
+      expect(upgrade.to_user).not.toBeNull()
+    })
+
+    it('should have correct upgrade data', () => {
+      expect(upgrade.data.f).toBe('0x0000000000000000000000000000000000000000')
+      expect(upgrade.data.t).toBe('0x649667EfCcf6497290616e7A669024ffEAF75968')
+      expect(upgrade.data.v).toBe(10000000000000000000000n)
+      expect(upgrade.data.block_num).toBe(25254355n)
+      expect(upgrade.data.tx_idx).toBe(0n)
+      expect(upgrade.data.log_idx).toBe(5n)
+      expect(upgrade.data.tx_hash).toBe(
+        '0xc8e94001e225e3d4570c352a3811de04586c1cfabc8b7c9367d477fcf003424d'
+      )
+      expect(upgrade.data.coin).toEqual(sendCoin)
     })
   })
 })

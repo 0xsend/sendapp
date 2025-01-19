@@ -19,7 +19,7 @@ import {
 import { assert } from './assert'
 import { byteaToBase64 } from './byteaToBase64'
 import { throwNiceError } from './userop'
-import { signUserOp } from './signUserOp'
+import { signUserOpHash } from './signUserOp'
 
 /**
  * default user op with preset gas values that work will probably need to move this to the database.
@@ -39,6 +39,7 @@ export const defaultUserOp: Pick<
   | 'maxPriorityFeePerGas'
   | 'paymasterVerificationGasLimit'
   | 'paymasterPostOpGasLimit'
+  | 'paymasterData'
 > = {
   callGasLimit: 150000n,
   verificationGasLimit: 550000n,
@@ -47,6 +48,7 @@ export const defaultUserOp: Pick<
   maxPriorityFeePerGas: 10000000n,
   paymasterVerificationGasLimit: 150000n,
   paymasterPostOpGasLimit: 100000n,
+  paymasterData: '0x',
 }
 
 export type UseUserOpTransferMutationArgs = {
@@ -71,6 +73,7 @@ export type UseUserOpTransferMutationArgs = {
 /**
  * Given a Send Account, token, and amount, returns a mutation to send a user op ERC20 or native transfer.
  *
+ * @deprecated use useSendUserOpMutation
  * @param userOp The user operation to send.
  * @param validUntil The valid until timestamp for the user op.
  */
@@ -80,6 +83,9 @@ export function useUserOpTransferMutation() {
   })
 }
 
+/**
+ * @deprecated use sendUserOp
+ */
 export async function sendUserOpTransfer({
   userOp,
   version,
@@ -108,7 +114,7 @@ export async function sendUserOpTransfer({
       throw e
     })
 
-  userOp.signature = await signUserOp({
+  userOp.signature = await signUserOpHash({
     userOpHash,
     version,
     validUntil,

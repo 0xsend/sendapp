@@ -8,12 +8,36 @@ labels = ["deps"]
 
 local_resource(
     "yarn:install",
-    "yarn install" if not CI else "yarn install --immutable",
+    "yarn install --inline-builds" if not CI else "yarn install --immutable",
     labels = labels,
     deps = [
         "package.json",
         "yarn.lock",
     ],
+)
+
+local_resource(
+    "yarn:check-deps",
+    "yarn check-deps",
+    labels = labels,
+    resource_deps = ["yarn:install"],
+    deps = [
+        "package.json",
+        "yarn.lock",
+    ],
+)
+
+cmd_button(
+    "yarn:check-deps:fix",
+    argv = [
+        "yarn",
+        "check-deps",
+        "--fix",
+    ],
+    icon_name = "check_circle",
+    location = location.RESOURCE,
+    resource = "yarn:check-deps",
+    text = "yarn check-deps --fix",
 )
 
 local_resource(

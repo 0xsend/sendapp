@@ -1,15 +1,16 @@
+import { baseMainnet, sendtagCheckoutAddress, tokenPaymasterAddress } from '@my/wagmi'
+import type { Activity } from 'app/utils/zod/activity'
 import { formatUnits, isAddressEqual } from 'viem'
 import formatAmount, { localizeAmount } from './formatAmount'
+import { shorten } from './strings'
 import {
-  isTagReceiptsEvent,
   isReferralsEvent,
   isSendAccountTransfersEvent,
+  isTagReceiptsEvent,
   isTagReceiptUSDCEvent,
 } from './zod/activity'
-import type { Activity } from 'app/utils/zod/activity'
 import { isSendAccountReceiveEvent } from './zod/activity/SendAccountReceiveEventSchema'
-import { baseMainnet, sendtagCheckoutAddress, tokenPaymasterAddress } from '@my/wagmi'
-import { shorten } from './strings'
+import { isSendTokenUpgradeEvent } from './zod/activity/SendAccountTransfersEventSchema'
 
 const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
   Object.values(addresses).map((a) => [a, label])
@@ -85,7 +86,7 @@ export function amountFromActivity(activity: Activity): string {
     case isReferralsEvent(activity) && !!activity.from_user?.id: {
       // only show if the user is the referrer
       const data = activity.data
-      return `${data.tags.length} Referrals`
+      return `${data.tags.length} ${data.tags.length > 1 ? 'Referrals' : 'Referral'}`
     }
     case isReferralsEvent(activity) && !!activity.to_user?.id: {
       // only show if the user is the referred
@@ -116,6 +117,8 @@ export function eventNameFromActivity(activity: Activity) {
   switch (true) {
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Referral Reward'
+    case isSendTokenUpgradeEvent(activity):
+      return 'Send Token Upgrade'
     case isERC20Transfer && to_user?.send_id === undefined:
       return 'Withdraw'
     case isTransferOrReceive && from_user === null:
@@ -135,6 +138,44 @@ export function eventNameFromActivity(activity: Activity) {
         .split('_')
         .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
         .join(' ')
+  }
+}
+
+/**
+ * Returns the human-readable phrase for event name of the activity for activity details.
+ * @param activity
+ * @returns
+ */
+export function phraseFromActivity(activity: Activity) {
+  const { event_name, from_user, to_user, data } = activity
+  const isERC20Transfer = isSendAccountTransfersEvent(activity)
+  const isETHReceive = isSendAccountReceiveEvent(activity)
+  const isTransferOrReceive = isERC20Transfer || isETHReceive
+
+  switch (true) {
+    case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
+      return 'Earned referral reward'
+    case isSendTokenUpgradeEvent(activity):
+      return 'Upgraded'
+    case isERC20Transfer && to_user?.send_id === undefined:
+      return 'Withdrew'
+    case isTransferOrReceive && from_user === null:
+      return 'Deposited'
+    case isTransferOrReceive && !!to_user?.id:
+      return 'Sent you'
+    case isTransferOrReceive && !!from_user?.id:
+      return 'Received'
+    case isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity):
+      return data.tags?.length > 1 ? 'Sendtags created' : 'Sendtag created'
+    case isReferralsEvent(activity) && !!from_user?.id:
+      return 'Referred'
+    case isReferralsEvent(activity) && !!to_user?.id:
+      return 'Referred you'
+    default:
+      return event_name
+        .split('_')
+        .join(' ')
+        .replace(/^./, (char) => char.toUpperCase())
   }
 }
 
@@ -159,6 +200,21 @@ export function subtextFromActivity(activity: Activity): string | null {
   }
   if (_user) {
     return userNameFromActivityUser(_user)
+  }
+  if (isSendTokenUpgradeEvent(activity)) {
+    // 1B supply -> 100B supply
+    // 0 decimals -> 18 decimals
+    // 1e16 == 10^18/100
+    // show previous amount = (current amount / 1e16)
+    const {
+      data: { v: currentAmount },
+    } = activity
+    const prevAmount = currentAmount / BigInt(1e16)
+    return `${formatAmount(String(prevAmount), 5, 0)} -> ${formatAmount(
+      formatUnits(currentAmount, data.coin.decimals),
+      5,
+      0
+    )}`
   }
   if (isERC20Transfer && from_user?.id) {
     return labelAddress(data.t)

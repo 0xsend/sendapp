@@ -21,7 +21,7 @@ import { useSendAccount } from 'app/utils/send-accounts'
 import { useIsClient } from 'app/utils/useIsClient'
 import { useUser } from 'app/utils/useUser'
 import * as Device from 'expo-device'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { z } from 'zod'
@@ -34,7 +34,7 @@ export const OnboardingForm = () => {
   const sendAccountCreate = api.sendAccount.create.useMutation()
   const { user } = useUser()
   const form = useForm<z.infer<typeof OnboardingSchema>>()
-  const { refetch: refetchSendAccount } = useSendAccount()
+  const sendAccount = useSendAccount()
   const { replace } = useRouter()
   const deviceName = Device.deviceName
     ? Device.deviceName
@@ -47,7 +47,7 @@ export const OnboardingForm = () => {
       assert(!!user?.id, 'No user id')
 
       // double check that the user has not already created a send account before creating a passkey
-      const { data: sendAcct, error: refetchError } = await refetchSendAccount()
+      const { data: sendAcct, error: refetchError } = await sendAccount.refetch()
       if (refetchError) throw refetchError
       if (sendAcct) {
         throw new Error(`Account already created: ${sendAcct.address}`)
@@ -73,7 +73,7 @@ export const OnboardingForm = () => {
         })
         .then(async () => {
           // success refetch accounts to check if account was created
-          const { data: sendAcct, error: refetchError } = await refetchSendAccount()
+          const { data: sendAcct, error: refetchError } = await sendAccount.refetch()
           if (refetchError) throw refetchError
           if (sendAcct) {
             replace('/')
@@ -90,6 +90,13 @@ export const OnboardingForm = () => {
     }
   }
   const isClient = useIsClient()
+
+  useEffect(() => {
+    if (sendAccount.data?.address) {
+      replace('/') // redirect to home page if account already exists
+    }
+  }, [sendAccount.data?.address, replace])
+
   if (!isClient) return null
 
   return (

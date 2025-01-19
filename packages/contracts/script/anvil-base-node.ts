@@ -40,8 +40,6 @@ await $`docker run --rm \
             --block-time=$ANVIL_BASE_BLOCK_TIME  \
             --base-fee=${baseBaseFee} \
             --gas-price=${baseGasPrice} \
-            --no-storage-caching \
-            --prune-history \
             --fork-block-number=${blockHeight} \
             $ANVIL_BASE_EXTRA_ARGS"
 `

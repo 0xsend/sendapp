@@ -289,5 +289,36 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
       "tags": null,
     },
   },
+  {
+    "created_at": 2024-05-29T14:47:36.000Z,
+    "data": {
+      "block_num": 25254355n,
+      "coin": {
+        "coingeckoTokenId": "send-token",
+        "decimals": 18,
+        "label": "Send",
+        "symbol": "SEND",
+        "token": "0xEab49138BA2Ea6dd776220fE26b7b8E446638956",
+      },
+      "f": "0x0000000000000000000000000000000000000000",
+      "log_addr": "0xEab49138BA2Ea6dd776220fE26b7b8E446638956",
+      "log_idx": 5n,
+      "t": "0x649667EfCcf6497290616e7A669024ffEAF75968",
+      "tx_hash": "0xc8e94001e225e3d4570c352a3811de04586c1cfabc8b7c9367d477fcf003424d",
+      "tx_idx": 0n,
+      "v": 10000000000000000000000n,
+    },
+    "event_name": "send_account_transfers",
+    "from_user": null,
+    "to_user": {
+      "avatar_url": null,
+      "id": "5c833c74-5a6c-461d-8612-b4982d7a7b51",
+      "name": null,
+      "send_id": 48,
+      "tags": [
+        "asfd",
+      ],
+    },
+  },
 ]
 `;

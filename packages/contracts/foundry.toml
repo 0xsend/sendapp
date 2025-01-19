@@ -25,8 +25,3 @@ mainnet = "${FOUNDRY_MAINNET_RPC_URL}"
 base = "${FOUNDRY_BASE_RPC_URL}"
 base-sepolia = "${FOUNDRY_BASE_SEPOLIA_RPC_URL}"
 base-local = "http://127.0.0.1:8546"
-
-# [etherscan]
-# mainnet = { key = "${ETHERSCAN_API_KEY}" }
-# base = { key = "${BASESCAN_API_KEY}" }
-# base-sepolia = { key = "${BASESCAN_API_KEY}" }

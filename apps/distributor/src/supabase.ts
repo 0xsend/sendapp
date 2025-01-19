@@ -1,7 +1,6 @@
 import type { Database, Tables } from '@my/supabase/database.types'
 import { createClient } from '@supabase/supabase-js'
 import { selectAll } from 'app/utils/supabase/selectAll'
-import type { Address } from 'viem'
 
 if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
   throw new Error(
@@ -20,34 +19,52 @@ export const supabaseAdmin = createClient<Database>(
   { auth: { persistSession: false } }
 )
 
+function fetchDistributionQuery() {
+  return supabaseAdmin.from('distributions').select(
+    `
+      amount::text,
+      bonus_pool_bips,
+      chain_id,
+      claim_end,
+      created_at,
+      description,
+      fixed_pool_bips,
+      hodler_min_balance::text,
+      hodler_pool_bips,
+      id,
+      merkle_drop_addr,
+      name,
+      number,
+      qualification_end,
+      qualification_start,
+      snapshot_block_num,
+      token_decimals,
+      updated_at,
+      distribution_verification_values (
+        bips_value,
+        created_at,
+        distribution_id,
+        fixed_value::text,
+        multiplier_max,
+        multiplier_min,
+        multiplier_step,
+        type,
+        updated_at
+      )`,
+    { count: 'exact' }
+  )
+}
+
+export async function fetchActiveDistributions() {
+  return fetchDistributionQuery()
+    .lte('qualification_start', new Date().toISOString())
+    .gte('qualification_end', new Date().toISOString())
+}
+
 export async function fetchDistribution(id: string) {
-  return supabaseAdmin
-    .from('distributions')
-    .select(
-      `*,
-        distribution_verification_values (*)`
-    )
-    .eq('id', id)
-    .single()
+  return fetchDistributionQuery().eq('id', id).single()
 }
 
-export async function fetchSendSlashData(distributionNumber: number) {
-  // Get settings
-  const { data: settings } = await supabaseAdmin
-    .from('send_slash')
-    .select('*')
-    .eq('distribution_number', distributionNumber)
-    .single()
-
-  // Get verifications
-  const { data: verifications } = await supabaseAdmin
-    .from('distribution_verifications')
-    .select('*')
-    .eq('distribution_id', distributionNumber)
-    .eq('type', 'send_ceiling')
-
-  return { settings, verifications }
-}
 export async function fetchAllVerifications(distributionId: number) {
   return selectAll(
     supabaseAdmin
@@ -79,4 +96,23 @@ export async function createDistributionShares(
     distribution_id: distributionId,
     shares,
   })
+}
+
+export async function fetchDistributionShares(distributionId: number) {
+  return selectAll(
+    supabaseAdmin
+      .from('distribution_shares')
+      .select('user_id, amount::text', { count: 'exact' })
+      .eq('distribution_id', distributionId)
+  )
+}
+
+export async function fetchSendSlash(distribution: {
+  id: number
+}) {
+  return await supabaseAdmin
+    .from('send_slash')
+    .select('*')
+    .eq('distribution_id', distribution.id)
+    .single()
 }

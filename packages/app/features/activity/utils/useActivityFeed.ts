@@ -1,26 +1,16 @@
-import { sendtagCheckoutAddress, tokenPaymasterAddress } from '@my/wagmi'
+import { sendtagCheckoutAddress, sendTokenV0LockboxAddress, tokenPaymasterAddress } from '@my/wagmi'
 import type { PostgrestError } from '@supabase/postgrest-js'
 import {
   useInfiniteQuery,
   type InfiniteData,
   type UseInfiniteQueryResult,
 } from '@tanstack/react-query'
-import { hexToBytea } from 'app/utils/hexToBytea'
+import { pgAddrCondValues } from 'app/utils/pgAddrCondValues'
+import { squish } from 'app/utils/strings'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import { EventArraySchema, type Activity } from 'app/utils/zod/activity'
 import type { ZodError } from 'zod'
-
-/**
- * Returns a string of values to be used in a postgrest WHERE IN clause.
- */
-export function pgAddrCondValues(values: `0x${string}`[]) {
-  return values.map((a) => `${hexToBytea(a)}`).join(',')
-}
-
-function squish(s: string) {
-  return s.replace(/\s+/g, ' ').trim()
-}
 
 /**
  * Infinite query to fetch activity feed. Filters out activities with no from or to user (not a send app user).
@@ -36,11 +26,13 @@ export function useActivityFeed({
   async function fetchActivityFeed({ pageParam }: { pageParam: number }): Promise<Activity[]> {
     const paymasterAddresses = Object.values(tokenPaymasterAddress)
     const sendtagCheckoutAddresses = Object.values(sendtagCheckoutAddress)
+    const sendTokenV0LockboxAddresses = Object.values(sendTokenV0LockboxAddress)
     // ignore certain addresses in the activity feed
-    const fromTransferIgnoreValues = pgAddrCondValues(Object.values(tokenPaymasterAddress)) // show fees on send screen instead
+    const fromTransferIgnoreValues = pgAddrCondValues(paymasterAddresses) // show fees on send screen instead
     const toTransferIgnoreValues = pgAddrCondValues([
       ...paymasterAddresses, // show fees on send screen instead
       ...sendtagCheckoutAddresses, // shows as Sendtag Registered using a different activity row
+      ...sendTokenV0LockboxAddresses, // will instead show the "mint"
     ])
 
     const from = pageParam * pageSize
@@ -50,7 +42,6 @@ export function useActivityFeed({
       .select('*')
       .or('from_user.not.is.null, to_user.not.is.null') // only show activities with a send app user
       .or(
-        // filter out paymaster fees for gas
         squish(`
           data->t.is.null,
           data->f.is.null,
