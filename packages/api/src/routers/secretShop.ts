@@ -15,7 +15,7 @@ import { baseMainnet } from '@my/wagmi/chains'
 import { baseMainnetClient } from 'app/utils/viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { assert } from 'app/utils/assert'
-import { erc20Abi, sendTokenAddress, usdcAddress } from '@my/wagmi'
+import { erc20Abi, sendTokenAddress, sendTokenV0Address, usdcAddress } from '@my/wagmi'
 import { waitForTransactionReceipt } from 'viem/actions'
 
 export const secretShopRouter = createTRPCRouter({
@@ -57,20 +57,28 @@ export const secretShopRouter = createTRPCRouter({
         address: sendTokenAddress[baseMainnet.id],
         client: secretShopClient,
       })
+      const sendV0Token = getContract({
+        abi: erc20Abi,
+        address: sendTokenV0Address[baseMainnet.id],
+        client: secretShopClient,
+      })
       const usdcToken = getContract({
         abi: erc20Abi,
         address: usdcAddress[baseMainnet.id],
         client: secretShopClient,
       })
 
-      const [ethBal, sendBal, usdcBal, ssEthBal, ssUsdcBal, ssSendBal] = await Promise.all([
-        secretShopClient.getBalance({ address }),
-        sendToken.read.balanceOf([address]),
-        usdcToken.read.balanceOf([address]),
-        secretShopClient.getBalance({ address: secretShopAccount.address }),
-        usdcToken.read.balanceOf([secretShopAccount.address]),
-        sendToken.read.balanceOf([secretShopAccount.address]),
-      ] as const)
+      const [ethBal, sendBal, sendV0Bal, usdcBal, ssEthBal, ssUsdcBal, ssSendBal, ssSendV0Bal] =
+        await Promise.all([
+          secretShopClient.getBalance({ address }),
+          sendToken.read.balanceOf([address]),
+          sendV0Token.read.balanceOf([address]),
+          usdcToken.read.balanceOf([address]),
+          secretShopClient.getBalance({ address: secretShopAccount.address }),
+          usdcToken.read.balanceOf([secretShopAccount.address]),
+          sendToken.read.balanceOf([secretShopAccount.address]),
+          sendV0Token.read.balanceOf([secretShopAccount.address]),
+        ] as const)
 
       // fund account where balances are low
 
@@ -151,10 +159,37 @@ export const secretShopRouter = createTRPCRouter({
         }
       }
 
+      // sendV0
+      let sendV0TxHash: string | null = null
+      const sendV0 = BigInt(15e5 * 1e16) // 150K SENDV0 * 1e16 decimals = 1.5K SEND
+      if (sendV0Bal < sendV0) {
+        if (ssSendV0Bal < sendV0) {
+          sendV0TxHash = 'Error: Insufficient SENDV0 in secret shop'
+        } else {
+          await sendV0Token.write
+            // only transfer the difference
+            .transfer([address, sendV0 - sendV0Bal], {
+              chain: baseMainnet,
+            })
+            .then((hash) => {
+              return waitForTransactionReceipt(secretShopClient, {
+                hash,
+              })
+            })
+            .then((receipt) => {
+              sendV0TxHash = receipt.transactionHash
+            })
+            .catch((e) => {
+              sendV0TxHash = e.message
+            })
+        }
+      }
+
       return {
         ethTxHash,
         usdcTxHash,
         sendTxHash,
+        sendV0TxHash,
       }
     }),
 })
