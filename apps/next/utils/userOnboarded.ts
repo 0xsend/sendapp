@@ -26,11 +26,11 @@ export async function userOnboarded<
     throw error
   }
 
-  const noSendAcct = sendAcctCount === null || sendAcctCount === 0
+  const hasSendAcct = sendAcctCount !== null && sendAcctCount > 0
   const isOnboardingRoute =
     (ctx.req.url?.startsWith('/_next') && ctx.req.url?.endsWith('onboarding.json')) ||
     (!ctx.req.url?.startsWith('/_next') && ctx.req.url?.endsWith('onboarding'))
-  if (noSendAcct && !isOnboardingRoute) {
+  if (!hasSendAcct && !isOnboardingRoute) {
     log('no send accounts')
     return {
       //@todo: redirect param isn't working because this link is redirected twice. Need to investigate
@@ -41,9 +41,7 @@ export async function userOnboarded<
     }
   }
 
-  log('isOnboardingRoute', isOnboardingRoute)
-
-  if (isOnboardingRoute && !noSendAcct) {
+  if (isOnboardingRoute && hasSendAcct) {
     // redirect to / if visiting onboarding page
     // and already onboarded
     log('redirect to onboarding page')
