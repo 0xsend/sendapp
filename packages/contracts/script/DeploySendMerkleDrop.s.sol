@@ -14,13 +14,13 @@ contract DeploySendMerkleDropScript is Script, Helper {
 
     function run() public {
         vm.startBroadcast();
-        deploy(vm.envAddress("SEND_MERKLE_DROP_OWNER"));
+        deploy(vm.envAddress("SEND_TOKEN"), vm.envAddress("SEND_MERKLE_DROP_OWNER"));
         vm.stopBroadcast();
     }
 
-    function deploy(address owner) public returns (address) {
+    function deploy(address token, address owner) public returns (address) {
         bytes32 salt = bytes32(uint256(31415));
-        SendMerkleDrop smd = new SendMerkleDrop{salt: salt}(IERC20(SEND_TOKEN), owner);
+        SendMerkleDrop smd = new SendMerkleDrop{salt: salt}(IERC20(token), owner);
         // solhint-disable-next-line no-console
         console2.log("Deployed SendMerkleDrop at address: ", address(smd));
         return address(smd);
