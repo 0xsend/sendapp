@@ -7704,7 +7704,7 @@
           "nullNotDistinct": false
         },
         {
-          "name": "send_token_v0_transfers_u",
+          "name": "u_send_token_v0_transfers",
           "fields": [
             "abi_idx",
             "block_num",
