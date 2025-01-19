@@ -86,9 +86,6 @@ export function SendV0TokenUpgradeScreen({ children }: { children?: React.ReactN
     args: [sendAccount?.address ?? '0x'],
     query: {
       enabled: !!sendAccount?.address,
-      refetchOnWindowFocus: true,
-      refetchOnReconnect: true,
-      refetchOnMount: true,
     },
   })
   const isUpgradeRequired = !isPending && !isError && balance > BigInt(0)
