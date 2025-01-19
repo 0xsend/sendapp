@@ -59,12 +59,15 @@ const deployments = await broadcasts.reduce(async (accP, file) => {
 }, Promise.resolve({}))
 
 // if deployment has base.id set, use for the baseLocal.id chain
+const ignoreHardcodeContracts = [
+  'SendVerifyingPaymaster', // need to override since we use a test private key for the verifier
+]
 for (const [contract, addresses] of Object.entries(deployments) as [
   string,
   Record<number, string>,
 ][]) {
   const baseAddress = addresses[base.id]
-  if (baseAddress) {
+  if (baseAddress && !ignoreHardcodeContracts.includes(contract)) {
     console.log('using', base.id, 'for', contract, 'as local fork')
     addresses[baseLocal.id] = baseAddress
     deployments[contract] = addresses
