@@ -9,7 +9,7 @@ alter table send_token_transfers
 alter index send_token_transfers_pkey rename to send_token_v0_transfers_pkey;
 alter index send_token_transfers_f rename to send_token_v0_transfers_f;
 alter index send_token_transfers_t rename to send_token_v0_transfers_t;
-alter index u_send_token_transfers rename to send_token_v0_transfers_u;
+alter index u_send_token_transfers rename to u_send_token_v0_transfers;
 alter index send_token_transfers_block_num rename to send_token_v0_transfers_block_num;
 alter index send_token_transfers_block_time rename to send_token_v0_transfers_block_time;
 alter index idx_transfers_composite rename to send_token_v0_transfers_composite;
