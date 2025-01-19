@@ -69,15 +69,6 @@ export function ActivityAvatar({
     return <IconUpgrade size="$4.5" br="$4" gap="$2" />
   }
 
-  // is send token upgrade
-  if (
-    isSendAccountTransfersEvent(activity) &&
-    isAddressEqual(data?.coin?.token, sendTokenAddress[baseMainnetClient.chain.id]) &&
-    isAddressEqual(data?.f, zeroAddress)
-  ) {
-    return <IconUpgrade size="$4.5" br="$4" gap="$2" />
-  }
-
   if (isSendAccountTransfersEvent(activity)) {
     // is transfer, but an unknown user
     const address = from_user?.id ? activity.data.t : activity.data.f
