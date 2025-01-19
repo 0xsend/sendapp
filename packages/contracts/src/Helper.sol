@@ -58,6 +58,7 @@ abstract contract Helper is Script {
     address constant SEND_REWARDS_SAFE = 0xD3DCFf1823714a4399AD2927A3800686D4CEB53A;
 
     function labels() public {
+        vm.label(SEND_TOKEN, "SEND_TOKEN");
         vm.label(SEND_TOKEN_V0, "SEND_TOKEN_V0");
         vm.label(OG_SEND_DEPLOYER, "OG_SEND_DEPLOYER");
         vm.label(BASE_SEND_MVP_DEPLOYER, "BASE_SEND_MVP_DEPLOYER");
