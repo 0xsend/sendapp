@@ -1,5 +1,6 @@
 import path from 'node:path'
 import type { Expect, Locator, Page } from '@playwright/test'
+import { expect } from '@playwright/test'
 import debug from 'debug'
 import type { Web3ProviderBackend } from '@0xbigboss/headless-web3-provider'
 
@@ -27,7 +28,12 @@ export class CheckoutPage {
   }
 
   async fillTagName(tag: string) {
-    await this.page.getByPlaceholder('Enter Sendtag name').fill(tag)
+    await expect(async () => {
+      await this.page.getByPlaceholder('Enter Sendtag name').fill(tag)
+      expect(await this.page.getByPlaceholder('Enter Sendtag name').inputValue()).toEqual(tag)
+    }).toPass({
+      timeout: 10_000,
+    })
   }
 
   async submitTagName() {
