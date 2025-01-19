@@ -135,7 +135,7 @@ export const secretShopRouter = createTRPCRouter({
 
       // send
       let sendTxHash: string | null = null
-      const send = BigInt(15e5) // 150K SEND
+      const send = BigInt(15e5 * 1e16) // 150K SENDV0 * 1e16 = 1.5k SEND V1
       if (sendBal < send) {
         if (ssSendBal < send) {
           sendTxHash = 'Error: Insufficient SEND in secret shop'
@@ -161,7 +161,7 @@ export const secretShopRouter = createTRPCRouter({
 
       // sendV0
       let sendV0TxHash: string | null = null
-      const sendV0 = BigInt(15e5 * 1e16) // 150K SENDV0 * 1e16 decimals = 1.5K SEND
+      const sendV0 = BigInt(15e5) // 150K SENDV0
       if (sendV0Bal < sendV0) {
         if (ssSendV0Bal < sendV0) {
           sendV0TxHash = 'Error: Insufficient SENDV0 in secret shop'
