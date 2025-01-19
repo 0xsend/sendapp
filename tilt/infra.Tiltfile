@@ -254,7 +254,7 @@ local_resource(
         -v ./apps/aabundler/etc:/app/etc/aabundler \
         -e "DEBUG={bundler_debug}" \
         -e "DEBUG_COLORS=true" \
-        -m 200m \
+        -m 250m \
         --pull always \
         docker.io/0xbigboss/bundler:latest \
         --port 3030 \
