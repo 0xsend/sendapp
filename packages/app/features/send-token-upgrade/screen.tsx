@@ -6,6 +6,7 @@ import {
   H4,
   Link,
   Paragraph,
+  ScrollView,
   Spinner,
   Stack,
   Theme,
@@ -97,14 +98,13 @@ export function SendV0TokenUpgradeScreen({ children }: { children?: React.ReactN
   }
 
   return (
-    <YStack f={1} ai="center" jc="center" px="$4" gap="$6">
-      <IconSendLogo size="$8" color="$color12" pt="$6" />
-
-      <Fade f={1} ai="center" jc="center" px="$4" gap="$6">
-        <YStack f={1} ai="center" jc="center" px="$4" gap="$6">
+    <ScrollView ai="center" gap="$6" w="100%" maw="100%" mih={600} f={1} py="$8">
+      <IconSendLogo size="$8" color="$color12" mx="auto" />
+      <Fade f={1} ai="center" jc="center" gap="$6" w="100%" maw="100%" h="100%" mt="$12">
+        <YStack f={1} ai="center" jc="center" px="$4" gap="$6" w="100%" maw="100%">
           <Stack mb="$2">
             <IconUpgrade
-              size="$4"
+              size="$6"
               $theme-dark={{ color: '$primary' }}
               $theme-light={{ color: '$color12' }}
             />
@@ -146,7 +146,7 @@ export function SendV0TokenUpgradeScreen({ children }: { children?: React.ReactN
           </YStack>
         </YStack>
       </Fade>
-    </YStack>
+    </ScrollView>
   )
 }
 
