@@ -3665,7 +3665,8 @@ export const sendVerifierProxyConfig = {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const sendVerifyingPaymasterAbi = [
   {
@@ -3856,14 +3857,18 @@ export const sendVerifyingPaymasterAbi = [
 ] as const
 
 /**
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const sendVerifyingPaymasterAddress = {
-  845337: '0xA78b09e93462c630272CF4ddc006A484c3E96beB',
+  8453: '0x8A77aE0c07047c5b307B2319A8F4Bd9d3604DdD8',
+  84532: '0x3CA2b4DAE6cFA762a690EbC4C45cA2f6b896dB80',
+  845337: '0x8A77aE0c07047c5b307B2319A8F4Bd9d3604DdD8',
 } as const
 
 /**
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const sendVerifyingPaymasterConfig = {
   address: sendVerifyingPaymasterAddress,
@@ -8841,7 +8846,8 @@ export const watchSendVerifierProxyUpgradedEvent = /*#__PURE__*/ createWatchCont
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const readSendVerifyingPaymaster = /*#__PURE__*/ createReadContract({
   abi: sendVerifyingPaymasterAbi,
@@ -8851,7 +8857,8 @@ export const readSendVerifyingPaymaster = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"entryPoint"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const readSendVerifyingPaymasterEntryPoint = /*#__PURE__*/ createReadContract({
   abi: sendVerifyingPaymasterAbi,
@@ -8862,7 +8869,8 @@ export const readSendVerifyingPaymasterEntryPoint = /*#__PURE__*/ createReadCont
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"getDeposit"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const readSendVerifyingPaymasterGetDeposit = /*#__PURE__*/ createReadContract({
   abi: sendVerifyingPaymasterAbi,
@@ -8873,7 +8881,8 @@ export const readSendVerifyingPaymasterGetDeposit = /*#__PURE__*/ createReadCont
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"getHash"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const readSendVerifyingPaymasterGetHash = /*#__PURE__*/ createReadContract({
   abi: sendVerifyingPaymasterAbi,
@@ -8884,7 +8893,8 @@ export const readSendVerifyingPaymasterGetHash = /*#__PURE__*/ createReadContrac
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"owner"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const readSendVerifyingPaymasterOwner = /*#__PURE__*/ createReadContract({
   abi: sendVerifyingPaymasterAbi,
@@ -8895,7 +8905,8 @@ export const readSendVerifyingPaymasterOwner = /*#__PURE__*/ createReadContract(
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"parsePaymasterAndData"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const readSendVerifyingPaymasterParsePaymasterAndData = /*#__PURE__*/ createReadContract({
   abi: sendVerifyingPaymasterAbi,
@@ -8906,7 +8917,8 @@ export const readSendVerifyingPaymasterParsePaymasterAndData = /*#__PURE__*/ cre
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"verifyingSigner"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const readSendVerifyingPaymasterVerifyingSigner = /*#__PURE__*/ createReadContract({
   abi: sendVerifyingPaymasterAbi,
@@ -8917,7 +8929,8 @@ export const readSendVerifyingPaymasterVerifyingSigner = /*#__PURE__*/ createRea
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const writeSendVerifyingPaymaster = /*#__PURE__*/ createWriteContract({
   abi: sendVerifyingPaymasterAbi,
@@ -8927,7 +8940,8 @@ export const writeSendVerifyingPaymaster = /*#__PURE__*/ createWriteContract({
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"addStake"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const writeSendVerifyingPaymasterAddStake = /*#__PURE__*/ createWriteContract({
   abi: sendVerifyingPaymasterAbi,
@@ -8938,7 +8952,8 @@ export const writeSendVerifyingPaymasterAddStake = /*#__PURE__*/ createWriteCont
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"deposit"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const writeSendVerifyingPaymasterDeposit = /*#__PURE__*/ createWriteContract({
   abi: sendVerifyingPaymasterAbi,
@@ -8949,7 +8964,8 @@ export const writeSendVerifyingPaymasterDeposit = /*#__PURE__*/ createWriteContr
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"postOp"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const writeSendVerifyingPaymasterPostOp = /*#__PURE__*/ createWriteContract({
   abi: sendVerifyingPaymasterAbi,
@@ -8960,7 +8976,8 @@ export const writeSendVerifyingPaymasterPostOp = /*#__PURE__*/ createWriteContra
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"renounceOwnership"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const writeSendVerifyingPaymasterRenounceOwnership = /*#__PURE__*/ createWriteContract({
   abi: sendVerifyingPaymasterAbi,
@@ -8971,7 +8988,8 @@ export const writeSendVerifyingPaymasterRenounceOwnership = /*#__PURE__*/ create
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"transferOwnership"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const writeSendVerifyingPaymasterTransferOwnership = /*#__PURE__*/ createWriteContract({
   abi: sendVerifyingPaymasterAbi,
@@ -8982,7 +9000,8 @@ export const writeSendVerifyingPaymasterTransferOwnership = /*#__PURE__*/ create
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"unlockStake"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const writeSendVerifyingPaymasterUnlockStake = /*#__PURE__*/ createWriteContract({
   abi: sendVerifyingPaymasterAbi,
@@ -8993,7 +9012,8 @@ export const writeSendVerifyingPaymasterUnlockStake = /*#__PURE__*/ createWriteC
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"validatePaymasterUserOp"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const writeSendVerifyingPaymasterValidatePaymasterUserOp = /*#__PURE__*/ createWriteContract(
   {
@@ -9006,7 +9026,8 @@ export const writeSendVerifyingPaymasterValidatePaymasterUserOp = /*#__PURE__*/ 
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"withdrawStake"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const writeSendVerifyingPaymasterWithdrawStake = /*#__PURE__*/ createWriteContract({
   abi: sendVerifyingPaymasterAbi,
@@ -9017,7 +9038,8 @@ export const writeSendVerifyingPaymasterWithdrawStake = /*#__PURE__*/ createWrit
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"withdrawTo"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const writeSendVerifyingPaymasterWithdrawTo = /*#__PURE__*/ createWriteContract({
   abi: sendVerifyingPaymasterAbi,
@@ -9028,7 +9050,8 @@ export const writeSendVerifyingPaymasterWithdrawTo = /*#__PURE__*/ createWriteCo
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const prepareWriteSendVerifyingPaymaster = /*#__PURE__*/ createSimulateContract({
   abi: sendVerifyingPaymasterAbi,
@@ -9038,7 +9061,8 @@ export const prepareWriteSendVerifyingPaymaster = /*#__PURE__*/ createSimulateCo
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"addStake"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const prepareWriteSendVerifyingPaymasterAddStake = /*#__PURE__*/ createSimulateContract({
   abi: sendVerifyingPaymasterAbi,
@@ -9049,7 +9073,8 @@ export const prepareWriteSendVerifyingPaymasterAddStake = /*#__PURE__*/ createSi
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"deposit"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const prepareWriteSendVerifyingPaymasterDeposit = /*#__PURE__*/ createSimulateContract({
   abi: sendVerifyingPaymasterAbi,
@@ -9060,7 +9085,8 @@ export const prepareWriteSendVerifyingPaymasterDeposit = /*#__PURE__*/ createSim
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"postOp"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const prepareWriteSendVerifyingPaymasterPostOp = /*#__PURE__*/ createSimulateContract({
   abi: sendVerifyingPaymasterAbi,
@@ -9071,7 +9097,8 @@ export const prepareWriteSendVerifyingPaymasterPostOp = /*#__PURE__*/ createSimu
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"renounceOwnership"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const prepareWriteSendVerifyingPaymasterRenounceOwnership =
   /*#__PURE__*/ createSimulateContract({
@@ -9083,7 +9110,8 @@ export const prepareWriteSendVerifyingPaymasterRenounceOwnership =
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"transferOwnership"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const prepareWriteSendVerifyingPaymasterTransferOwnership =
   /*#__PURE__*/ createSimulateContract({
@@ -9095,7 +9123,8 @@ export const prepareWriteSendVerifyingPaymasterTransferOwnership =
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"unlockStake"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const prepareWriteSendVerifyingPaymasterUnlockStake = /*#__PURE__*/ createSimulateContract({
   abi: sendVerifyingPaymasterAbi,
@@ -9106,7 +9135,8 @@ export const prepareWriteSendVerifyingPaymasterUnlockStake = /*#__PURE__*/ creat
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"validatePaymasterUserOp"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const prepareWriteSendVerifyingPaymasterValidatePaymasterUserOp =
   /*#__PURE__*/ createSimulateContract({
@@ -9118,7 +9148,8 @@ export const prepareWriteSendVerifyingPaymasterValidatePaymasterUserOp =
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"withdrawStake"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const prepareWriteSendVerifyingPaymasterWithdrawStake = /*#__PURE__*/ createSimulateContract(
   {
@@ -9131,7 +9162,8 @@ export const prepareWriteSendVerifyingPaymasterWithdrawStake = /*#__PURE__*/ cre
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"withdrawTo"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const prepareWriteSendVerifyingPaymasterWithdrawTo = /*#__PURE__*/ createSimulateContract({
   abi: sendVerifyingPaymasterAbi,
@@ -9142,7 +9174,8 @@ export const prepareWriteSendVerifyingPaymasterWithdrawTo = /*#__PURE__*/ create
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const watchSendVerifyingPaymasterEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: sendVerifyingPaymasterAbi,
@@ -9152,7 +9185,8 @@ export const watchSendVerifyingPaymasterEvent = /*#__PURE__*/ createWatchContrac
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `eventName` set to `"OwnershipTransferred"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const watchSendVerifyingPaymasterOwnershipTransferredEvent =
   /*#__PURE__*/ createWatchContractEvent({
@@ -14579,7 +14613,8 @@ export const useWatchSendVerifierProxyUpgradedEvent = /*#__PURE__*/ createUseWat
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useReadSendVerifyingPaymaster = /*#__PURE__*/ createUseReadContract({
   abi: sendVerifyingPaymasterAbi,
@@ -14589,7 +14624,8 @@ export const useReadSendVerifyingPaymaster = /*#__PURE__*/ createUseReadContract
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"entryPoint"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useReadSendVerifyingPaymasterEntryPoint = /*#__PURE__*/ createUseReadContract({
   abi: sendVerifyingPaymasterAbi,
@@ -14600,7 +14636,8 @@ export const useReadSendVerifyingPaymasterEntryPoint = /*#__PURE__*/ createUseRe
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"getDeposit"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useReadSendVerifyingPaymasterGetDeposit = /*#__PURE__*/ createUseReadContract({
   abi: sendVerifyingPaymasterAbi,
@@ -14611,7 +14648,8 @@ export const useReadSendVerifyingPaymasterGetDeposit = /*#__PURE__*/ createUseRe
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"getHash"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useReadSendVerifyingPaymasterGetHash = /*#__PURE__*/ createUseReadContract({
   abi: sendVerifyingPaymasterAbi,
@@ -14622,7 +14660,8 @@ export const useReadSendVerifyingPaymasterGetHash = /*#__PURE__*/ createUseReadC
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"owner"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useReadSendVerifyingPaymasterOwner = /*#__PURE__*/ createUseReadContract({
   abi: sendVerifyingPaymasterAbi,
@@ -14633,7 +14672,8 @@ export const useReadSendVerifyingPaymasterOwner = /*#__PURE__*/ createUseReadCon
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"parsePaymasterAndData"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useReadSendVerifyingPaymasterParsePaymasterAndData =
   /*#__PURE__*/ createUseReadContract({
@@ -14645,7 +14685,8 @@ export const useReadSendVerifyingPaymasterParsePaymasterAndData =
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"verifyingSigner"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useReadSendVerifyingPaymasterVerifyingSigner = /*#__PURE__*/ createUseReadContract({
   abi: sendVerifyingPaymasterAbi,
@@ -14656,7 +14697,8 @@ export const useReadSendVerifyingPaymasterVerifyingSigner = /*#__PURE__*/ create
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useWriteSendVerifyingPaymaster = /*#__PURE__*/ createUseWriteContract({
   abi: sendVerifyingPaymasterAbi,
@@ -14666,7 +14708,8 @@ export const useWriteSendVerifyingPaymaster = /*#__PURE__*/ createUseWriteContra
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"addStake"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useWriteSendVerifyingPaymasterAddStake = /*#__PURE__*/ createUseWriteContract({
   abi: sendVerifyingPaymasterAbi,
@@ -14677,7 +14720,8 @@ export const useWriteSendVerifyingPaymasterAddStake = /*#__PURE__*/ createUseWri
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"deposit"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useWriteSendVerifyingPaymasterDeposit = /*#__PURE__*/ createUseWriteContract({
   abi: sendVerifyingPaymasterAbi,
@@ -14688,7 +14732,8 @@ export const useWriteSendVerifyingPaymasterDeposit = /*#__PURE__*/ createUseWrit
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"postOp"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useWriteSendVerifyingPaymasterPostOp = /*#__PURE__*/ createUseWriteContract({
   abi: sendVerifyingPaymasterAbi,
@@ -14699,7 +14744,8 @@ export const useWriteSendVerifyingPaymasterPostOp = /*#__PURE__*/ createUseWrite
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"renounceOwnership"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useWriteSendVerifyingPaymasterRenounceOwnership = /*#__PURE__*/ createUseWriteContract(
   {
@@ -14712,7 +14758,8 @@ export const useWriteSendVerifyingPaymasterRenounceOwnership = /*#__PURE__*/ cre
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"transferOwnership"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useWriteSendVerifyingPaymasterTransferOwnership = /*#__PURE__*/ createUseWriteContract(
   {
@@ -14725,7 +14772,8 @@ export const useWriteSendVerifyingPaymasterTransferOwnership = /*#__PURE__*/ cre
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"unlockStake"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useWriteSendVerifyingPaymasterUnlockStake = /*#__PURE__*/ createUseWriteContract({
   abi: sendVerifyingPaymasterAbi,
@@ -14736,7 +14784,8 @@ export const useWriteSendVerifyingPaymasterUnlockStake = /*#__PURE__*/ createUse
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"validatePaymasterUserOp"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useWriteSendVerifyingPaymasterValidatePaymasterUserOp =
   /*#__PURE__*/ createUseWriteContract({
@@ -14748,7 +14797,8 @@ export const useWriteSendVerifyingPaymasterValidatePaymasterUserOp =
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"withdrawStake"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useWriteSendVerifyingPaymasterWithdrawStake = /*#__PURE__*/ createUseWriteContract({
   abi: sendVerifyingPaymasterAbi,
@@ -14759,7 +14809,8 @@ export const useWriteSendVerifyingPaymasterWithdrawStake = /*#__PURE__*/ createU
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"withdrawTo"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useWriteSendVerifyingPaymasterWithdrawTo = /*#__PURE__*/ createUseWriteContract({
   abi: sendVerifyingPaymasterAbi,
@@ -14770,7 +14821,8 @@ export const useWriteSendVerifyingPaymasterWithdrawTo = /*#__PURE__*/ createUseW
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useSimulateSendVerifyingPaymaster = /*#__PURE__*/ createUseSimulateContract({
   abi: sendVerifyingPaymasterAbi,
@@ -14780,7 +14832,8 @@ export const useSimulateSendVerifyingPaymaster = /*#__PURE__*/ createUseSimulate
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"addStake"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useSimulateSendVerifyingPaymasterAddStake = /*#__PURE__*/ createUseSimulateContract({
   abi: sendVerifyingPaymasterAbi,
@@ -14791,7 +14844,8 @@ export const useSimulateSendVerifyingPaymasterAddStake = /*#__PURE__*/ createUse
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"deposit"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useSimulateSendVerifyingPaymasterDeposit = /*#__PURE__*/ createUseSimulateContract({
   abi: sendVerifyingPaymasterAbi,
@@ -14802,7 +14856,8 @@ export const useSimulateSendVerifyingPaymasterDeposit = /*#__PURE__*/ createUseS
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"postOp"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useSimulateSendVerifyingPaymasterPostOp = /*#__PURE__*/ createUseSimulateContract({
   abi: sendVerifyingPaymasterAbi,
@@ -14813,7 +14868,8 @@ export const useSimulateSendVerifyingPaymasterPostOp = /*#__PURE__*/ createUseSi
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"renounceOwnership"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useSimulateSendVerifyingPaymasterRenounceOwnership =
   /*#__PURE__*/ createUseSimulateContract({
@@ -14825,7 +14881,8 @@ export const useSimulateSendVerifyingPaymasterRenounceOwnership =
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"transferOwnership"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useSimulateSendVerifyingPaymasterTransferOwnership =
   /*#__PURE__*/ createUseSimulateContract({
@@ -14837,7 +14894,8 @@ export const useSimulateSendVerifyingPaymasterTransferOwnership =
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"unlockStake"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useSimulateSendVerifyingPaymasterUnlockStake = /*#__PURE__*/ createUseSimulateContract(
   {
@@ -14850,7 +14908,8 @@ export const useSimulateSendVerifyingPaymasterUnlockStake = /*#__PURE__*/ create
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"validatePaymasterUserOp"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useSimulateSendVerifyingPaymasterValidatePaymasterUserOp =
   /*#__PURE__*/ createUseSimulateContract({
@@ -14862,7 +14921,8 @@ export const useSimulateSendVerifyingPaymasterValidatePaymasterUserOp =
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"withdrawStake"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useSimulateSendVerifyingPaymasterWithdrawStake =
   /*#__PURE__*/ createUseSimulateContract({
@@ -14874,7 +14934,8 @@ export const useSimulateSendVerifyingPaymasterWithdrawStake =
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"withdrawTo"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useSimulateSendVerifyingPaymasterWithdrawTo = /*#__PURE__*/ createUseSimulateContract({
   abi: sendVerifyingPaymasterAbi,
@@ -14885,7 +14946,8 @@ export const useSimulateSendVerifyingPaymasterWithdrawTo = /*#__PURE__*/ createU
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useWatchSendVerifyingPaymasterEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: sendVerifyingPaymasterAbi,
@@ -14895,7 +14957,8 @@ export const useWatchSendVerifyingPaymasterEvent = /*#__PURE__*/ createUseWatchC
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `eventName` set to `"OwnershipTransferred"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
  */
 export const useWatchSendVerifyingPaymasterOwnershipTransferredEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
