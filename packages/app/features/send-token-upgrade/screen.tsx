@@ -214,7 +214,7 @@ function UpgradeTokenButton() {
 
       setUserOpState('Waiting for confirmation...')
 
-      await withRetry(
+      const receipt = await withRetry(
         () =>
           baseMainnetBundlerClient.waitForUserOperationReceipt({
             hash: userOpHash,
@@ -225,6 +225,8 @@ function UpgradeTokenButton() {
           retryCount: 3,
         }
       )
+
+      assert(receipt.success, 'receipt status is not success')
 
       toast.show('Upgraded successfully')
     },
