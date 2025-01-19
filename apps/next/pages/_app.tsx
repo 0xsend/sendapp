@@ -63,13 +63,12 @@ function MyApp({
         }}
       >
         <Provider initialSession={pageProps.initialSession}>
-          {process.env.NEXT_PUBLIC_MAINTENANCE_MODE === 'true' ? (
-            <MaintenanceMode />
-          ) : (
+          {/* TODO: create a concerns screen or move to provider instead of wrapping here in next app */}
+          <MaintenanceMode>
             <SendV0TokenUpgradeScreen>
               {getLayout(<Component {...pageProps} />)}
             </SendV0TokenUpgradeScreen>
-          )}
+          </MaintenanceMode>
         </Provider>
       </NextThemeProvider>
     </>
@@ -78,27 +77,30 @@ function MyApp({
 
 export default api.withTRPC(MyApp)
 
-function MaintenanceMode() {
-  return (
-    <YStack
-      p="$4"
-      ai="center"
-      jc="center"
-      w="100%"
-      h="100%"
-      $gtMd={{
-        p: '$6',
-        ai: 'flex-start',
-        jc: 'flex-start',
-      }}
-    >
-      <IconSendLogo size={'$2.5'} color="$color12" />
-      <H1 $gtMd={{ size: '$8' }} size="$4" fontWeight={'300'} color="$color12">
-        currently undergoing maintenance
-      </H1>
-      <H2 $gtMd={{ size: '$6' }} size="$4" fontWeight={'300'} color="$color12">
-        We will be back shortly!
-      </H2>
-    </YStack>
-  )
+function MaintenanceMode({ children }: { children: ReactNode }) {
+  if (process.env.NEXT_PUBLIC_MAINTENANCE_MODE === 'true') {
+    return (
+      <YStack
+        p="$4"
+        ai="center"
+        jc="center"
+        w="100%"
+        h="100%"
+        $gtMd={{
+          p: '$6',
+          ai: 'flex-start',
+          jc: 'flex-start',
+        }}
+      >
+        <IconSendLogo size={'$2.5'} color="$color12" />
+        <H1 $gtMd={{ size: '$8' }} size="$4" fontWeight={'300'} color="$color12">
+          currently undergoing maintenance
+        </H1>
+        <H2 $gtMd={{ size: '$6' }} size="$4" fontWeight={'300'} color="$color12">
+          We will be back shortly!
+        </H2>
+      </YStack>
+    )
+  }
+  return children
 }
