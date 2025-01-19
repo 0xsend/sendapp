@@ -1,5 +1,5 @@
 import { describe, it } from '@jest/globals'
-import { shorten } from './strings'
+import { shorten, squish } from './strings'
 describe('test app', () => {
   it('test shorten', () => {
     // Testing with default parameters
@@ -18,5 +18,14 @@ describe('test app', () => {
 
     // Testing with null or empty string
     expect(shorten('')).toBe('') // empty string
+  })
+})
+
+describe('squish', () => {
+  it('should remove duplicate spaces', () => {
+    expect(squish('a b c')).toBe('a b c')
+    expect(squish('a  b  c')).toBe('a b c')
+    expect(squish(' a  b  c ')).toBe('a b c')
+    expect(squish(' a b c ')).toBe('a b c')
   })
 })

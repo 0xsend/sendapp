@@ -5,3 +5,4 @@ export {
   byteaToHexTxHash,
 } from './bytea'
 export { decimalStrToBigInt } from './bigint'
+export { hex, address } from './evm'

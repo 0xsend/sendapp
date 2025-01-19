@@ -15,12 +15,14 @@ import {
   mockSendtagReferralRewardUSDC,
   mockSentTransfer,
   mockTagReceipt,
+  mockSendTokenUpgradeEvent,
 } from 'app/features/activity/utils/__mocks__/mock-activity-feed'
 import { byteaToHexEthAddress } from './zod'
 import { EventSchema } from './zod/activity'
 import { tokenPaymasterAddress } from '@my/wagmi'
 import { assert } from './assert'
 import { shorten } from './strings'
+import { hexToBytea } from './hexToBytea'
 
 jest.mock('@my/wagmi')
 
@@ -33,41 +35,39 @@ describe('test amountFromActivity', () => {
 
 describe('test eventNameFromActivity', () => {
   it('should return the received when transfer and to user ID is present', () => {
-    const activity = mockReceivedTransfer
+    const activity = JSON.parse(JSON.stringify(mockReceivedTransfer))
     expect(eventNameFromActivity(EventSchema.parse(activity))).toBe('Deposit')
   })
   it('should return the received when received eth and to user ID is present', () => {
-    const activity = mockSendAccountReceive
+    const activity = JSON.parse(JSON.stringify(mockSendAccountReceive))
     expect(eventNameFromActivity(EventSchema.parse(activity))).toBe('Received')
   })
   it('should return the sent when received eth and from user ID is present', () => {
-    const activity = { ...mockSendAccountReceive }
-    // @ts-expect-error mock
+    const activity = JSON.parse(JSON.stringify({ ...mockSendAccountReceive }))
     activity.from_user = { ...activity.from_user, id: '1234' }
-    // @ts-expect-error mock
     activity.to_user = { ...activity.to_user, id: null }
     expect(eventNameFromActivity(EventSchema.parse(activity))).toBe('Sent')
   })
   it('should return the sent when transfer and from user ID is present', () => {
-    const activity = mockSentTransfer
+    const activity = JSON.parse(JSON.stringify(mockSentTransfer))
     expect(eventNameFromActivity(EventSchema.parse(activity))).toBe('Sent')
   })
   it('should return the sendtag registered when tag receipts event', () => {
-    const activity = mockTagReceipt
+    const activity = JSON.parse(JSON.stringify(mockTagReceipt))
     expect(eventNameFromActivity(EventSchema.parse(activity))).toBe('Sendtag Registered')
   })
   it('should return the referral when referrals event', () => {
-    const activity = mockReferral
+    const activity = JSON.parse(JSON.stringify(mockReferral))
     expect(eventNameFromActivity(EventSchema.parse(activity))).toBe('Referral')
   })
   it('should return I Am Rick James when unknown event name equals i_am_rick_james', () => {
-    const activity = MockActivityFeed[4]
+    const activity = JSON.parse(JSON.stringify(MockActivityFeed[4]))
     expect(
       eventNameFromActivity({ ...EventSchema.parse(activity), event_name: 'i_am_rick_james' })
     ).toBe('I Am Rick James')
   })
   it('should return Referral Reward when send_account_transfer from SendtagCheckout contract', () => {
-    const activity = mockSendtagReferralRewardUSDC
+    const activity = JSON.parse(JSON.stringify(mockSendtagReferralRewardUSDC))
     const _activity = EventSchema.parse(activity)
     expect(eventNameFromActivity(_activity)).toBe('Referral Reward')
   })
@@ -83,10 +83,8 @@ describe('phraseFromActivity', () => {
   })
 
   it('should return "Received" when received eth and from user ID is present', () => {
-    const activity = { ...mockSendAccountReceive }
-    // @ts-expect-error mock
+    const activity = JSON.parse(JSON.stringify({ ...mockSendAccountReceive }))
     activity.from_user = { ...activity.from_user, id: '1234' }
-    // @ts-expect-error mock
     activity.to_user = { ...activity.to_user, id: null }
     expect(phraseFromActivity(EventSchema.parse(activity))).toBe('Received')
   })
@@ -104,7 +102,7 @@ describe('phraseFromActivity', () => {
   })
 
   it('should return "I am rick james" when unknown event name equals i_am_rick_james', () => {
-    const activity = MockActivityFeed[4]
+    const activity = JSON.parse(JSON.stringify(MockActivityFeed[4]))
     expect(
       phraseFromActivity({
         ...EventSchema.parse(activity),
@@ -136,29 +134,33 @@ describe('test subtextFromActivity', () => {
     )
   })
   it('should return the referrals when referrals event', () => {
-    const activity = mockReferral
+    const activity = JSON.parse(JSON.stringify(mockReferral))
     expect(subtextFromActivity(EventSchema.parse(activity))).toBe('/disconnect_whorl7351')
   })
   it('should return Paymaster when sent to paymaster', () => {
-    const activity = mockSentTransfer
-    // @ts-expect-error mock
+    const activity = JSON.parse(JSON.stringify(mockSentTransfer))
     activity.to_user = null
     const anyPaymaster = Object.values(tokenPaymasterAddress)[0]
     assert(!!anyPaymaster, 'anyPaymaster not found')
-    activity.data.t = anyPaymaster
+    activity.data.t = hexToBytea(anyPaymaster)
+    console.log(EventSchema.parse(activity))
     expect(subtextFromActivity(EventSchema.parse(activity))).toBe('Paymaster')
   })
   it('should return Paymaster when received from paymaster', () => {
-    const activity = mockReceivedTransfer
+    const activity = JSON.parse(JSON.stringify(mockReceivedTransfer))
     activity.from_user = null
     const anyPaymaster = Object.values(tokenPaymasterAddress)[0]
     assert(!!anyPaymaster, 'anyPaymaster not found')
-    activity.data.f = anyPaymaster
+    activity.data.f = hexToBytea(anyPaymaster)
     expect(subtextFromActivity(EventSchema.parse(activity))).toBe('Paymaster')
   })
   it('should return Sendtag Checkout when received from SendtagCheckout contract', () => {
-    const activity = mockSendtagReferralRewardUSDC
+    const activity = JSON.parse(JSON.stringify(mockSendtagReferralRewardUSDC))
     expect(subtextFromActivity(EventSchema.parse(activity))).toBe('Sendtag Checkout')
+  })
+  it('should return upgraded amount when mint of new Send Token V1', () => {
+    const activity = JSON.parse(JSON.stringify(mockSendTokenUpgradeEvent))
+    expect(subtextFromActivity(EventSchema.parse(activity))).toBe('1M -> 10,000')
   })
 })
 

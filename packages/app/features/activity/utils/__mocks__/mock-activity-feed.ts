@@ -220,6 +220,29 @@ const mockSigningKeyRemoved = {
   },
 }
 
+export const mockSendTokenUpgradeEvent = {
+  created_at: '2024-05-29T14:47:36+00:00',
+  event_name: 'send_account_transfers',
+  from_user: null,
+  to_user: {
+    id: '5c833c74-5a6c-461d-8612-b4982d7a7b51',
+    name: null,
+    avatar_url: null,
+    send_id: 48,
+    tags: ['asfd'],
+  },
+  data: {
+    f: '\\x0000000000000000000000000000000000000000',
+    t: '\\x649667efccf6497290616e7a669024ffeaf75968',
+    v: '10000000000000000000000',
+    tx_idx: '0',
+    log_idx: '5',
+    tx_hash: '\\xc8e94001e225e3d4570c352a3811de04586c1cfabc8b7c9367d477fcf003424d',
+    log_addr: '\\xeab49138ba2ea6dd776220fe26b7b8e446638956',
+    block_num: '25254355',
+  },
+}
+
 // make it easier on yourself and add the events to the end of the array
 export const MockActivityFeed = [
   mockReceivedTransfer,
@@ -231,6 +254,7 @@ export const MockActivityFeed = [
   mockSendAccountReceive,
   mockTagReceiptUSDC,
   mockSendtagReferralRewardUSDC,
+  mockSendTokenUpgradeEvent,
 ] as const
 
 // you can use this to mock the activity feed by overriding the network request in the developer console

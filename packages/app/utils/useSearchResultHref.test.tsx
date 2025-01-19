@@ -12,7 +12,7 @@ const sendParams: SendScreenParams = {
   idType: 'tag',
   recipient: 'alice',
   amount: '0.01',
-  sendToken: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
+  sendToken: '0xEab49138BA2Ea6dd776220fE26b7b8E446638956',
 }
 
 jest.mock('app/routers/params', () => ({
@@ -59,7 +59,7 @@ describe('useSearchResultHref', () => {
     usePathname.mockReturnValue('/send')
     const href = useSearchResultHref(item)
     expect(href).toBe(
-      '/send?idType=tag&recipient=alice&amount=0.01&sendToken=0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A'
+      '/send?idType=tag&recipient=alice&amount=0.01&sendToken=0xEab49138BA2Ea6dd776220fE26b7b8E446638956'
     )
   })
   it('should return the correct href for send screen when user does not have sendtag', () => {
@@ -67,7 +67,7 @@ describe('useSearchResultHref', () => {
     usePathname.mockReturnValue('/send')
     const href = useSearchResultHref({ ...item, tag_name: '' })
     expect(href).toBe(
-      '/send?idType=sendid&recipient=12530&amount=0.01&sendToken=0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A'
+      '/send?idType=sendid&recipient=12530&amount=0.01&sendToken=0xEab49138BA2Ea6dd776220fE26b7b8E446638956'
     )
   })
   it('throws an error for unhandled paths', () => {

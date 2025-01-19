@@ -38,7 +38,10 @@ export const useSendAccountBalances = () => {
   )
 
   const tokensQuery = useReadContracts({
-    query: { enabled: !!sendAccount },
+    query: {
+      enabled: !!sendAccount,
+      refetchInterval: 10 * 1000,
+    },
     contracts: tokenContracts,
     multicallAddress: multicall3Address[baseMainnet.id],
   })

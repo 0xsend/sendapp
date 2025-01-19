@@ -2662,8 +2662,8 @@ export const sendCheckAbi = [
 /**
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const sendMerkleDropAbi = [
@@ -2905,24 +2905,24 @@ export const sendMerkleDropAbi = [
 /**
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const sendMerkleDropAddress = {
   1: '0xB9310daE45E71c7a160A13D64204623071a8E347',
   1337: '0xB9310daE45E71c7a160A13D64204623071a8E347',
-  8453: '0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6',
-  84532: '0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE',
-  845337: '0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6',
+  8453: '0x2c1630Cd8f40D0458b7B5849E6Cc2904A7d18A57',
+  84532: '0xB6194DBB185b2551FE2F66DeD6b648b9F758CA30',
+  845337: '0x2c1630Cd8f40D0458b7B5849E6Cc2904A7d18A57',
   11155111: '0xB9310daE45E71c7a160A13D64204623071a8E347',
 } as const
 
 /**
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const sendMerkleDropConfig = {
@@ -2964,13 +2964,217 @@ export const sendRevenueSafeConfig = {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
+ */
+export const sendTokenAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      { name: '_name', internalType: 'string', type: 'string' },
+      { name: '_symbol', internalType: 'string', type: 'string' },
+      { name: '_lockbox', internalType: 'address', type: 'address' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'spender', internalType: 'address', type: 'address' },
+      { name: 'allowance', internalType: 'uint256', type: 'uint256' },
+      { name: 'needed', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'ERC20InsufficientAllowance',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'sender', internalType: 'address', type: 'address' },
+      { name: 'balance', internalType: 'uint256', type: 'uint256' },
+      { name: 'needed', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'ERC20InsufficientBalance',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'approver', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidApprover',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'receiver', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidReceiver',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'sender', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidSender',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'spender', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidSpender',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'owner', internalType: 'address', type: 'address', indexed: true },
+      { name: 'spender', internalType: 'address', type: 'address', indexed: true },
+      { name: 'value', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'Approval',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'from', internalType: 'address', type: 'address', indexed: true },
+      { name: 'to', internalType: 'address', type: 'address', indexed: true },
+      { name: 'value', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'Transfer',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'owner', internalType: 'address', type: 'address' },
+      { name: 'spender', internalType: 'address', type: 'address' },
+    ],
+    name: 'allowance',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'spender', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'approve',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'value', internalType: 'uint256', type: 'uint256' }],
+    name: 'burn',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'account', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'burnFrom',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'decimals',
+    outputs: [{ name: '', internalType: 'uint8', type: 'uint8' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'lockbox',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'to', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'mint',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'name',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'symbol',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'totalSupply',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'to', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'transfer',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'from', internalType: 'address', type: 'address' },
+      { name: 'to', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'transferFrom',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+] as const
+
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
+ */
+export const sendTokenAddress = {
+  8453: '0xEab49138BA2Ea6dd776220fE26b7b8E446638956',
+  84532: '0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb',
+  845337: '0xEab49138BA2Ea6dd776220fE26b7b8E446638956',
+} as const
+
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
+ */
+export const sendTokenConfig = { address: sendTokenAddress, abi: sendTokenAbi } as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// SendTokenV0
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
  * -
  * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
  * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
  */
-export const sendTokenAbi = [
+export const sendTokenV0Abi = [
   { type: 'constructor', inputs: [], stateMutability: 'nonpayable' },
   {
     type: 'function',
@@ -3115,7 +3319,7 @@ export const sendTokenAbi = [
  * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
  */
-export const sendTokenAddress = {
+export const sendTokenV0Address = {
   1: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
   1337: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
   8453: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
@@ -3131,7 +3335,90 @@ export const sendTokenAddress = {
  * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
  */
-export const sendTokenConfig = { address: sendTokenAddress, abi: sendTokenAbi } as const
+export const sendTokenV0Config = { address: sendTokenV0Address, abi: sendTokenV0Abi } as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// SendTokenV0Lockbox
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xd2B521847B59f88579634044Cb599D59a1B92d81)
+ */
+export const sendTokenV0LockboxAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      { name: 'sendv0', internalType: 'address', type: 'address' },
+      { name: 'sendv1', internalType: 'address', type: 'address' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'token', internalType: 'address', type: 'address' }],
+    name: 'SafeERC20FailedOperation',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'to', internalType: 'address', type: 'address', indexed: true },
+      { name: 'amount', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'Deposit',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'SEND_V0',
+    outputs: [{ name: '', internalType: 'contract IERC20', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'SEND_V1',
+    outputs: [{ name: '', internalType: 'contract ISendToken', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'amount', internalType: 'uint256', type: 'uint256' }],
+    name: 'deposit',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'to', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'depositTo',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+] as const
+
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xd2B521847B59f88579634044Cb599D59a1B92d81)
+ */
+export const sendTokenV0LockboxAddress = {
+  8453: '0x60E5445EDc1A469CFc0181861c88BD4B6895F615',
+  84532: '0xd2B521847B59f88579634044Cb599D59a1B92d81',
+  845337: '0x60E5445EDc1A469CFc0181861c88BD4B6895F615',
+} as const
+
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xd2B521847B59f88579634044Cb599D59a1B92d81)
+ */
+export const sendTokenV0LockboxConfig = {
+  address: sendTokenV0LockboxAddress,
+  abi: sendTokenV0LockboxAbi,
+} as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // SendTreasurySafe
@@ -3371,6 +3658,221 @@ export const sendVerifierProxyAddress = {
 export const sendVerifierProxyConfig = {
   address: sendVerifierProxyAddress,
   abi: sendVerifierProxyAbi,
+} as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// SendVerifyingPaymaster
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const sendVerifyingPaymasterAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      { name: '_entryPoint', internalType: 'contract IEntryPoint', type: 'address' },
+      { name: '_verifier', internalType: 'address', type: 'address' },
+      { name: '_owner', internalType: 'address', type: 'address' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'unstakeDelaySec', internalType: 'uint32', type: 'uint32' }],
+    name: 'addStake',
+    outputs: [],
+    stateMutability: 'payable',
+  },
+  { type: 'function', inputs: [], name: 'deposit', outputs: [], stateMutability: 'payable' },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'entryPoint',
+    outputs: [{ name: '', internalType: 'contract IEntryPoint', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getDeposit',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'userOp',
+        internalType: 'struct PackedUserOperation',
+        type: 'tuple',
+        components: [
+          { name: 'sender', internalType: 'address', type: 'address' },
+          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+          { name: 'initCode', internalType: 'bytes', type: 'bytes' },
+          { name: 'callData', internalType: 'bytes', type: 'bytes' },
+          { name: 'accountGasLimits', internalType: 'bytes32', type: 'bytes32' },
+          { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'gasFees', internalType: 'bytes32', type: 'bytes32' },
+          { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
+          { name: 'signature', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+      { name: 'validUntil', internalType: 'uint48', type: 'uint48' },
+      { name: 'validAfter', internalType: 'uint48', type: 'uint48' },
+    ],
+    name: 'getHash',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'owner',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' }],
+    name: 'parsePaymasterAndData',
+    outputs: [
+      { name: 'validUntil', internalType: 'uint48', type: 'uint48' },
+      { name: 'validAfter', internalType: 'uint48', type: 'uint48' },
+      { name: 'signature', internalType: 'bytes', type: 'bytes' },
+    ],
+    stateMutability: 'pure',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'mode', internalType: 'enum IPaymaster.PostOpMode', type: 'uint8' },
+      { name: 'context', internalType: 'bytes', type: 'bytes' },
+      { name: 'actualGasCost', internalType: 'uint256', type: 'uint256' },
+      { name: 'actualUserOpFeePerGas', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'postOp',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'renounceOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'newOwner', internalType: 'address', type: 'address' }],
+    name: 'transferOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  { type: 'function', inputs: [], name: 'unlockStake', outputs: [], stateMutability: 'nonpayable' },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'userOp',
+        internalType: 'struct PackedUserOperation',
+        type: 'tuple',
+        components: [
+          { name: 'sender', internalType: 'address', type: 'address' },
+          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+          { name: 'initCode', internalType: 'bytes', type: 'bytes' },
+          { name: 'callData', internalType: 'bytes', type: 'bytes' },
+          { name: 'accountGasLimits', internalType: 'bytes32', type: 'bytes32' },
+          { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'gasFees', internalType: 'bytes32', type: 'bytes32' },
+          { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
+          { name: 'signature', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'maxCost', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'validatePaymasterUserOp',
+    outputs: [
+      { name: 'context', internalType: 'bytes', type: 'bytes' },
+      { name: 'validationData', internalType: 'uint256', type: 'uint256' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'verifyingSigner',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'withdrawAddress', internalType: 'address payable', type: 'address' }],
+    name: 'withdrawStake',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'withdrawAddress', internalType: 'address payable', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'withdrawTo',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'previousOwner', internalType: 'address', type: 'address', indexed: true },
+      { name: 'newOwner', internalType: 'address', type: 'address', indexed: true },
+    ],
+    name: 'OwnershipTransferred',
+  },
+  { type: 'error', inputs: [], name: 'ECDSAInvalidSignature' },
+  {
+    type: 'error',
+    inputs: [{ name: 'length', internalType: 'uint256', type: 'uint256' }],
+    name: 'ECDSAInvalidSignatureLength',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 's', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'ECDSAInvalidSignatureS',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
+    name: 'OwnableInvalidOwner',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'OwnableUnauthorizedAccount',
+  },
+] as const
+
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const sendVerifyingPaymasterAddress = {
+  8453: '0x8A77aE0c07047c5b307B2319A8F4Bd9d3604DdD8',
+  84532: '0x3CA2b4DAE6cFA762a690EbC4C45cA2f6b896dB80',
+  845337: '0xA78b09e93462c630272CF4ddc006A484c3E96beB',
+} as const
+
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const sendVerifyingPaymasterConfig = {
+  address: sendVerifyingPaymasterAddress,
+  abi: sendVerifyingPaymasterAbi,
 } as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -6852,8 +7354,8 @@ export const watchSendCheckCheckCreatedEvent = /*#__PURE__*/ createWatchContract
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const readSendMerkleDrop = /*#__PURE__*/ createReadContract({
@@ -6866,8 +7368,8 @@ export const readSendMerkleDrop = /*#__PURE__*/ createReadContract({
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const readSendMerkleDropIsClaimed = /*#__PURE__*/ createReadContract({
@@ -6881,8 +7383,8 @@ export const readSendMerkleDropIsClaimed = /*#__PURE__*/ createReadContract({
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const readSendMerkleDropMerkleRoots = /*#__PURE__*/ createReadContract({
@@ -6896,8 +7398,8 @@ export const readSendMerkleDropMerkleRoots = /*#__PURE__*/ createReadContract({
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const readSendMerkleDropOwner = /*#__PURE__*/ createReadContract({
@@ -6911,8 +7413,8 @@ export const readSendMerkleDropOwner = /*#__PURE__*/ createReadContract({
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const readSendMerkleDropToken = /*#__PURE__*/ createReadContract({
@@ -6926,8 +7428,8 @@ export const readSendMerkleDropToken = /*#__PURE__*/ createReadContract({
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const readSendMerkleDropTrancheActive = /*#__PURE__*/ createReadContract({
@@ -6941,8 +7443,8 @@ export const readSendMerkleDropTrancheActive = /*#__PURE__*/ createReadContract(
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const readSendMerkleDropTrancheAmount = /*#__PURE__*/ createReadContract({
@@ -6956,8 +7458,8 @@ export const readSendMerkleDropTrancheAmount = /*#__PURE__*/ createReadContract(
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const readSendMerkleDropTrancheAmountClaimed = /*#__PURE__*/ createReadContract({
@@ -6971,8 +7473,8 @@ export const readSendMerkleDropTrancheAmountClaimed = /*#__PURE__*/ createReadCo
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const readSendMerkleDropTrancheAmounts = /*#__PURE__*/ createReadContract({
@@ -6986,8 +7488,8 @@ export const readSendMerkleDropTrancheAmounts = /*#__PURE__*/ createReadContract
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const readSendMerkleDropTrancheAmountsClaimed = /*#__PURE__*/ createReadContract({
@@ -7001,8 +7503,8 @@ export const readSendMerkleDropTrancheAmountsClaimed = /*#__PURE__*/ createReadC
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const readSendMerkleDropTrancheCursor = /*#__PURE__*/ createReadContract({
@@ -7016,8 +7518,8 @@ export const readSendMerkleDropTrancheCursor = /*#__PURE__*/ createReadContract(
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const readSendMerkleDropVerifyClaim = /*#__PURE__*/ createReadContract({
@@ -7031,8 +7533,8 @@ export const readSendMerkleDropVerifyClaim = /*#__PURE__*/ createReadContract({
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const writeSendMerkleDrop = /*#__PURE__*/ createWriteContract({
@@ -7045,8 +7547,8 @@ export const writeSendMerkleDrop = /*#__PURE__*/ createWriteContract({
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const writeSendMerkleDropAddTranche = /*#__PURE__*/ createWriteContract({
@@ -7060,8 +7562,8 @@ export const writeSendMerkleDropAddTranche = /*#__PURE__*/ createWriteContract({
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const writeSendMerkleDropClaimTranche = /*#__PURE__*/ createWriteContract({
@@ -7075,8 +7577,8 @@ export const writeSendMerkleDropClaimTranche = /*#__PURE__*/ createWriteContract
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const writeSendMerkleDropClaimTranches = /*#__PURE__*/ createWriteContract({
@@ -7090,8 +7592,8 @@ export const writeSendMerkleDropClaimTranches = /*#__PURE__*/ createWriteContrac
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const writeSendMerkleDropExpireTranche = /*#__PURE__*/ createWriteContract({
@@ -7105,8 +7607,8 @@ export const writeSendMerkleDropExpireTranche = /*#__PURE__*/ createWriteContrac
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const writeSendMerkleDropRenounceOwnership = /*#__PURE__*/ createWriteContract({
@@ -7120,8 +7622,8 @@ export const writeSendMerkleDropRenounceOwnership = /*#__PURE__*/ createWriteCon
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const writeSendMerkleDropTransferOwnership = /*#__PURE__*/ createWriteContract({
@@ -7135,8 +7637,8 @@ export const writeSendMerkleDropTransferOwnership = /*#__PURE__*/ createWriteCon
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const writeSendMerkleDropTransferToken = /*#__PURE__*/ createWriteContract({
@@ -7150,8 +7652,8 @@ export const writeSendMerkleDropTransferToken = /*#__PURE__*/ createWriteContrac
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const writeSendMerkleDropWithdraw = /*#__PURE__*/ createWriteContract({
@@ -7165,8 +7667,8 @@ export const writeSendMerkleDropWithdraw = /*#__PURE__*/ createWriteContract({
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const prepareWriteSendMerkleDrop = /*#__PURE__*/ createSimulateContract({
@@ -7179,8 +7681,8 @@ export const prepareWriteSendMerkleDrop = /*#__PURE__*/ createSimulateContract({
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const prepareWriteSendMerkleDropAddTranche = /*#__PURE__*/ createSimulateContract({
@@ -7194,8 +7696,8 @@ export const prepareWriteSendMerkleDropAddTranche = /*#__PURE__*/ createSimulate
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const prepareWriteSendMerkleDropClaimTranche = /*#__PURE__*/ createSimulateContract({
@@ -7209,8 +7711,8 @@ export const prepareWriteSendMerkleDropClaimTranche = /*#__PURE__*/ createSimula
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const prepareWriteSendMerkleDropClaimTranches = /*#__PURE__*/ createSimulateContract({
@@ -7224,8 +7726,8 @@ export const prepareWriteSendMerkleDropClaimTranches = /*#__PURE__*/ createSimul
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const prepareWriteSendMerkleDropExpireTranche = /*#__PURE__*/ createSimulateContract({
@@ -7239,8 +7741,8 @@ export const prepareWriteSendMerkleDropExpireTranche = /*#__PURE__*/ createSimul
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const prepareWriteSendMerkleDropRenounceOwnership = /*#__PURE__*/ createSimulateContract({
@@ -7254,8 +7756,8 @@ export const prepareWriteSendMerkleDropRenounceOwnership = /*#__PURE__*/ createS
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const prepareWriteSendMerkleDropTransferOwnership = /*#__PURE__*/ createSimulateContract({
@@ -7269,8 +7771,8 @@ export const prepareWriteSendMerkleDropTransferOwnership = /*#__PURE__*/ createS
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const prepareWriteSendMerkleDropTransferToken = /*#__PURE__*/ createSimulateContract({
@@ -7284,8 +7786,8 @@ export const prepareWriteSendMerkleDropTransferToken = /*#__PURE__*/ createSimul
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const prepareWriteSendMerkleDropWithdraw = /*#__PURE__*/ createSimulateContract({
@@ -7299,8 +7801,8 @@ export const prepareWriteSendMerkleDropWithdraw = /*#__PURE__*/ createSimulateCo
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const watchSendMerkleDropEvent = /*#__PURE__*/ createWatchContractEvent({
@@ -7313,8 +7815,8 @@ export const watchSendMerkleDropEvent = /*#__PURE__*/ createWatchContractEvent({
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const watchSendMerkleDropClaimedEvent = /*#__PURE__*/ createWatchContractEvent({
@@ -7328,8 +7830,8 @@ export const watchSendMerkleDropClaimedEvent = /*#__PURE__*/ createWatchContract
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const watchSendMerkleDropOwnershipTransferredEvent = /*#__PURE__*/ createWatchContractEvent({
@@ -7343,8 +7845,8 @@ export const watchSendMerkleDropOwnershipTransferredEvent = /*#__PURE__*/ create
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const watchSendMerkleDropTrancheAddedEvent = /*#__PURE__*/ createWatchContractEvent({
@@ -7358,8 +7860,8 @@ export const watchSendMerkleDropTrancheAddedEvent = /*#__PURE__*/ createWatchCon
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const watchSendMerkleDropTrancheExpiredEvent = /*#__PURE__*/ createWatchContractEvent({
@@ -7371,11 +7873,8 @@ export const watchSendMerkleDropTrancheExpiredEvent = /*#__PURE__*/ createWatchC
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenAbi}__
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const readSendToken = /*#__PURE__*/ createReadContract({
   abi: sendTokenAbi,
@@ -7385,11 +7884,8 @@ export const readSendToken = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"allowance"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const readSendTokenAllowance = /*#__PURE__*/ createReadContract({
   abi: sendTokenAbi,
@@ -7400,11 +7896,8 @@ export const readSendTokenAllowance = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"balanceOf"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const readSendTokenBalanceOf = /*#__PURE__*/ createReadContract({
   abi: sendTokenAbi,
@@ -7415,11 +7908,8 @@ export const readSendTokenBalanceOf = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"decimals"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const readSendTokenDecimals = /*#__PURE__*/ createReadContract({
   abi: sendTokenAbi,
@@ -7428,13 +7918,22 @@ export const readSendTokenDecimals = /*#__PURE__*/ createReadContract({
 })
 
 /**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"lockbox"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
+ */
+export const readSendTokenLockbox = /*#__PURE__*/ createReadContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'lockbox',
+})
+
+/**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"name"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const readSendTokenName = /*#__PURE__*/ createReadContract({
   abi: sendTokenAbi,
@@ -7445,11 +7944,8 @@ export const readSendTokenName = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"symbol"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const readSendTokenSymbol = /*#__PURE__*/ createReadContract({
   abi: sendTokenAbi,
@@ -7460,11 +7956,8 @@ export const readSendTokenSymbol = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"totalSupply"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const readSendTokenTotalSupply = /*#__PURE__*/ createReadContract({
   abi: sendTokenAbi,
@@ -7475,11 +7968,8 @@ export const readSendTokenTotalSupply = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendTokenAbi}__
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const writeSendToken = /*#__PURE__*/ createWriteContract({
   abi: sendTokenAbi,
@@ -7489,11 +7979,8 @@ export const writeSendToken = /*#__PURE__*/ createWriteContract({
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"approve"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const writeSendTokenApprove = /*#__PURE__*/ createWriteContract({
   abi: sendTokenAbi,
@@ -7502,13 +7989,46 @@ export const writeSendTokenApprove = /*#__PURE__*/ createWriteContract({
 })
 
 /**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"burn"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
+ */
+export const writeSendTokenBurn = /*#__PURE__*/ createWriteContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'burn',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"burnFrom"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
+ */
+export const writeSendTokenBurnFrom = /*#__PURE__*/ createWriteContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'burnFrom',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"mint"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
+ */
+export const writeSendTokenMint = /*#__PURE__*/ createWriteContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'mint',
+})
+
+/**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"transfer"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const writeSendTokenTransfer = /*#__PURE__*/ createWriteContract({
   abi: sendTokenAbi,
@@ -7519,11 +8039,8 @@ export const writeSendTokenTransfer = /*#__PURE__*/ createWriteContract({
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"transferFrom"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const writeSendTokenTransferFrom = /*#__PURE__*/ createWriteContract({
   abi: sendTokenAbi,
@@ -7534,11 +8051,8 @@ export const writeSendTokenTransferFrom = /*#__PURE__*/ createWriteContract({
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendTokenAbi}__
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const prepareWriteSendToken = /*#__PURE__*/ createSimulateContract({
   abi: sendTokenAbi,
@@ -7548,11 +8062,8 @@ export const prepareWriteSendToken = /*#__PURE__*/ createSimulateContract({
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"approve"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const prepareWriteSendTokenApprove = /*#__PURE__*/ createSimulateContract({
   abi: sendTokenAbi,
@@ -7561,13 +8072,46 @@ export const prepareWriteSendTokenApprove = /*#__PURE__*/ createSimulateContract
 })
 
 /**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"burn"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
+ */
+export const prepareWriteSendTokenBurn = /*#__PURE__*/ createSimulateContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'burn',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"burnFrom"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
+ */
+export const prepareWriteSendTokenBurnFrom = /*#__PURE__*/ createSimulateContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'burnFrom',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"mint"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
+ */
+export const prepareWriteSendTokenMint = /*#__PURE__*/ createSimulateContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'mint',
+})
+
+/**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"transfer"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const prepareWriteSendTokenTransfer = /*#__PURE__*/ createSimulateContract({
   abi: sendTokenAbi,
@@ -7578,11 +8122,8 @@ export const prepareWriteSendTokenTransfer = /*#__PURE__*/ createSimulateContrac
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"transferFrom"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const prepareWriteSendTokenTransferFrom = /*#__PURE__*/ createSimulateContract({
   abi: sendTokenAbi,
@@ -7593,11 +8134,8 @@ export const prepareWriteSendTokenTransferFrom = /*#__PURE__*/ createSimulateCon
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendTokenAbi}__
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const watchSendTokenEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: sendTokenAbi,
@@ -7607,11 +8145,8 @@ export const watchSendTokenEvent = /*#__PURE__*/ createWatchContractEvent({
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendTokenAbi}__ and `eventName` set to `"Approval"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const watchSendTokenApprovalEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: sendTokenAbi,
@@ -7622,16 +8157,407 @@ export const watchSendTokenApprovalEvent = /*#__PURE__*/ createWatchContractEven
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendTokenAbi}__ and `eventName` set to `"Transfer"`
  *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
+ */
+export const watchSendTokenTransferEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  eventName: 'Transfer',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenV0Abi}__
+ *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
  * -
  * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
  * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
  */
-export const watchSendTokenTransferEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: sendTokenAbi,
-  address: sendTokenAddress,
+export const readSendTokenV0 = /*#__PURE__*/ createReadContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenV0Abi}__ and `functionName` set to `"allowance"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const readSendTokenV0Allowance = /*#__PURE__*/ createReadContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+  functionName: 'allowance',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenV0Abi}__ and `functionName` set to `"balanceOf"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const readSendTokenV0BalanceOf = /*#__PURE__*/ createReadContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+  functionName: 'balanceOf',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenV0Abi}__ and `functionName` set to `"decimals"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const readSendTokenV0Decimals = /*#__PURE__*/ createReadContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+  functionName: 'decimals',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenV0Abi}__ and `functionName` set to `"name"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const readSendTokenV0Name = /*#__PURE__*/ createReadContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+  functionName: 'name',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenV0Abi}__ and `functionName` set to `"symbol"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const readSendTokenV0Symbol = /*#__PURE__*/ createReadContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+  functionName: 'symbol',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenV0Abi}__ and `functionName` set to `"totalSupply"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const readSendTokenV0TotalSupply = /*#__PURE__*/ createReadContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+  functionName: 'totalSupply',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendTokenV0Abi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const writeSendTokenV0 = /*#__PURE__*/ createWriteContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendTokenV0Abi}__ and `functionName` set to `"approve"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const writeSendTokenV0Approve = /*#__PURE__*/ createWriteContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendTokenV0Abi}__ and `functionName` set to `"transfer"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const writeSendTokenV0Transfer = /*#__PURE__*/ createWriteContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendTokenV0Abi}__ and `functionName` set to `"transferFrom"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const writeSendTokenV0TransferFrom = /*#__PURE__*/ createWriteContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendTokenV0Abi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const prepareWriteSendTokenV0 = /*#__PURE__*/ createSimulateContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendTokenV0Abi}__ and `functionName` set to `"approve"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const prepareWriteSendTokenV0Approve = /*#__PURE__*/ createSimulateContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendTokenV0Abi}__ and `functionName` set to `"transfer"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const prepareWriteSendTokenV0Transfer = /*#__PURE__*/ createSimulateContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendTokenV0Abi}__ and `functionName` set to `"transferFrom"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const prepareWriteSendTokenV0TransferFrom = /*#__PURE__*/ createSimulateContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendTokenV0Abi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const watchSendTokenV0Event = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendTokenV0Abi}__ and `eventName` set to `"Approval"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const watchSendTokenV0ApprovalEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+  eventName: 'Approval',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendTokenV0Abi}__ and `eventName` set to `"Transfer"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const watchSendTokenV0TransferEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
   eventName: 'Transfer',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xd2B521847B59f88579634044Cb599D59a1B92d81)
+ */
+export const readSendTokenV0Lockbox = /*#__PURE__*/ createReadContract({
+  abi: sendTokenV0LockboxAbi,
+  address: sendTokenV0LockboxAddress,
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"SEND_V0"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xd2B521847B59f88579634044Cb599D59a1B92d81)
+ */
+export const readSendTokenV0LockboxSendV0 = /*#__PURE__*/ createReadContract({
+  abi: sendTokenV0LockboxAbi,
+  address: sendTokenV0LockboxAddress,
+  functionName: 'SEND_V0',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"SEND_V1"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xd2B521847B59f88579634044Cb599D59a1B92d81)
+ */
+export const readSendTokenV0LockboxSendV1 = /*#__PURE__*/ createReadContract({
+  abi: sendTokenV0LockboxAbi,
+  address: sendTokenV0LockboxAddress,
+  functionName: 'SEND_V1',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xd2B521847B59f88579634044Cb599D59a1B92d81)
+ */
+export const writeSendTokenV0Lockbox = /*#__PURE__*/ createWriteContract({
+  abi: sendTokenV0LockboxAbi,
+  address: sendTokenV0LockboxAddress,
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"deposit"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xd2B521847B59f88579634044Cb599D59a1B92d81)
+ */
+export const writeSendTokenV0LockboxDeposit = /*#__PURE__*/ createWriteContract({
+  abi: sendTokenV0LockboxAbi,
+  address: sendTokenV0LockboxAddress,
+  functionName: 'deposit',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"depositTo"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xd2B521847B59f88579634044Cb599D59a1B92d81)
+ */
+export const writeSendTokenV0LockboxDepositTo = /*#__PURE__*/ createWriteContract({
+  abi: sendTokenV0LockboxAbi,
+  address: sendTokenV0LockboxAddress,
+  functionName: 'depositTo',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xd2B521847B59f88579634044Cb599D59a1B92d81)
+ */
+export const prepareWriteSendTokenV0Lockbox = /*#__PURE__*/ createSimulateContract({
+  abi: sendTokenV0LockboxAbi,
+  address: sendTokenV0LockboxAddress,
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"deposit"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xd2B521847B59f88579634044Cb599D59a1B92d81)
+ */
+export const prepareWriteSendTokenV0LockboxDeposit = /*#__PURE__*/ createSimulateContract({
+  abi: sendTokenV0LockboxAbi,
+  address: sendTokenV0LockboxAddress,
+  functionName: 'deposit',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"depositTo"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xd2B521847B59f88579634044Cb599D59a1B92d81)
+ */
+export const prepareWriteSendTokenV0LockboxDepositTo = /*#__PURE__*/ createSimulateContract({
+  abi: sendTokenV0LockboxAbi,
+  address: sendTokenV0LockboxAddress,
+  functionName: 'depositTo',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xd2B521847B59f88579634044Cb599D59a1B92d81)
+ */
+export const watchSendTokenV0LockboxEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendTokenV0LockboxAbi,
+  address: sendTokenV0LockboxAddress,
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `eventName` set to `"Deposit"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xd2B521847B59f88579634044Cb599D59a1B92d81)
+ */
+export const watchSendTokenV0LockboxDepositEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendTokenV0LockboxAbi,
+  address: sendTokenV0LockboxAddress,
+  eventName: 'Deposit',
 })
 
 /**
@@ -7916,6 +8842,358 @@ export const watchSendVerifierProxyUpgradedEvent = /*#__PURE__*/ createWatchCont
   address: sendVerifierProxyAddress,
   eventName: 'Upgraded',
 })
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const readSendVerifyingPaymaster = /*#__PURE__*/ createReadContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"entryPoint"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const readSendVerifyingPaymasterEntryPoint = /*#__PURE__*/ createReadContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'entryPoint',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"getDeposit"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const readSendVerifyingPaymasterGetDeposit = /*#__PURE__*/ createReadContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'getDeposit',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"getHash"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const readSendVerifyingPaymasterGetHash = /*#__PURE__*/ createReadContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'getHash',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"owner"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const readSendVerifyingPaymasterOwner = /*#__PURE__*/ createReadContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'owner',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"parsePaymasterAndData"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const readSendVerifyingPaymasterParsePaymasterAndData = /*#__PURE__*/ createReadContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'parsePaymasterAndData',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"verifyingSigner"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const readSendVerifyingPaymasterVerifyingSigner = /*#__PURE__*/ createReadContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'verifyingSigner',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const writeSendVerifyingPaymaster = /*#__PURE__*/ createWriteContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"addStake"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const writeSendVerifyingPaymasterAddStake = /*#__PURE__*/ createWriteContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'addStake',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"deposit"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const writeSendVerifyingPaymasterDeposit = /*#__PURE__*/ createWriteContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'deposit',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"postOp"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const writeSendVerifyingPaymasterPostOp = /*#__PURE__*/ createWriteContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'postOp',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"renounceOwnership"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const writeSendVerifyingPaymasterRenounceOwnership = /*#__PURE__*/ createWriteContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'renounceOwnership',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"transferOwnership"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const writeSendVerifyingPaymasterTransferOwnership = /*#__PURE__*/ createWriteContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'transferOwnership',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"unlockStake"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const writeSendVerifyingPaymasterUnlockStake = /*#__PURE__*/ createWriteContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'unlockStake',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"validatePaymasterUserOp"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const writeSendVerifyingPaymasterValidatePaymasterUserOp = /*#__PURE__*/ createWriteContract(
+  {
+    abi: sendVerifyingPaymasterAbi,
+    address: sendVerifyingPaymasterAddress,
+    functionName: 'validatePaymasterUserOp',
+  }
+)
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"withdrawStake"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const writeSendVerifyingPaymasterWithdrawStake = /*#__PURE__*/ createWriteContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'withdrawStake',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"withdrawTo"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const writeSendVerifyingPaymasterWithdrawTo = /*#__PURE__*/ createWriteContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'withdrawTo',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const prepareWriteSendVerifyingPaymaster = /*#__PURE__*/ createSimulateContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"addStake"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const prepareWriteSendVerifyingPaymasterAddStake = /*#__PURE__*/ createSimulateContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'addStake',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"deposit"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const prepareWriteSendVerifyingPaymasterDeposit = /*#__PURE__*/ createSimulateContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'deposit',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"postOp"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const prepareWriteSendVerifyingPaymasterPostOp = /*#__PURE__*/ createSimulateContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'postOp',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"renounceOwnership"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const prepareWriteSendVerifyingPaymasterRenounceOwnership =
+  /*#__PURE__*/ createSimulateContract({
+    abi: sendVerifyingPaymasterAbi,
+    address: sendVerifyingPaymasterAddress,
+    functionName: 'renounceOwnership',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"transferOwnership"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const prepareWriteSendVerifyingPaymasterTransferOwnership =
+  /*#__PURE__*/ createSimulateContract({
+    abi: sendVerifyingPaymasterAbi,
+    address: sendVerifyingPaymasterAddress,
+    functionName: 'transferOwnership',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"unlockStake"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const prepareWriteSendVerifyingPaymasterUnlockStake = /*#__PURE__*/ createSimulateContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'unlockStake',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"validatePaymasterUserOp"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const prepareWriteSendVerifyingPaymasterValidatePaymasterUserOp =
+  /*#__PURE__*/ createSimulateContract({
+    abi: sendVerifyingPaymasterAbi,
+    address: sendVerifyingPaymasterAddress,
+    functionName: 'validatePaymasterUserOp',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"withdrawStake"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const prepareWriteSendVerifyingPaymasterWithdrawStake = /*#__PURE__*/ createSimulateContract(
+  {
+    abi: sendVerifyingPaymasterAbi,
+    address: sendVerifyingPaymasterAddress,
+    functionName: 'withdrawStake',
+  }
+)
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"withdrawTo"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const prepareWriteSendVerifyingPaymasterWithdrawTo = /*#__PURE__*/ createSimulateContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'withdrawTo',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const watchSendVerifyingPaymasterEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `eventName` set to `"OwnershipTransferred"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const watchSendVerifyingPaymasterOwnershipTransferredEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: sendVerifyingPaymasterAbi,
+    address: sendVerifyingPaymasterAddress,
+    eventName: 'OwnershipTransferred',
+  })
 
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link senderCreatorAbi}__
@@ -11841,8 +13119,8 @@ export const useWatchSendCheckCheckCreatedEvent = /*#__PURE__*/ createUseWatchCo
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useReadSendMerkleDrop = /*#__PURE__*/ createUseReadContract({
@@ -11855,8 +13133,8 @@ export const useReadSendMerkleDrop = /*#__PURE__*/ createUseReadContract({
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useReadSendMerkleDropIsClaimed = /*#__PURE__*/ createUseReadContract({
@@ -11870,8 +13148,8 @@ export const useReadSendMerkleDropIsClaimed = /*#__PURE__*/ createUseReadContrac
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useReadSendMerkleDropMerkleRoots = /*#__PURE__*/ createUseReadContract({
@@ -11885,8 +13163,8 @@ export const useReadSendMerkleDropMerkleRoots = /*#__PURE__*/ createUseReadContr
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useReadSendMerkleDropOwner = /*#__PURE__*/ createUseReadContract({
@@ -11900,8 +13178,8 @@ export const useReadSendMerkleDropOwner = /*#__PURE__*/ createUseReadContract({
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useReadSendMerkleDropToken = /*#__PURE__*/ createUseReadContract({
@@ -11915,8 +13193,8 @@ export const useReadSendMerkleDropToken = /*#__PURE__*/ createUseReadContract({
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useReadSendMerkleDropTrancheActive = /*#__PURE__*/ createUseReadContract({
@@ -11930,8 +13208,8 @@ export const useReadSendMerkleDropTrancheActive = /*#__PURE__*/ createUseReadCon
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useReadSendMerkleDropTrancheAmount = /*#__PURE__*/ createUseReadContract({
@@ -11945,8 +13223,8 @@ export const useReadSendMerkleDropTrancheAmount = /*#__PURE__*/ createUseReadCon
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useReadSendMerkleDropTrancheAmountClaimed = /*#__PURE__*/ createUseReadContract({
@@ -11960,8 +13238,8 @@ export const useReadSendMerkleDropTrancheAmountClaimed = /*#__PURE__*/ createUse
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useReadSendMerkleDropTrancheAmounts = /*#__PURE__*/ createUseReadContract({
@@ -11975,8 +13253,8 @@ export const useReadSendMerkleDropTrancheAmounts = /*#__PURE__*/ createUseReadCo
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useReadSendMerkleDropTrancheAmountsClaimed = /*#__PURE__*/ createUseReadContract({
@@ -11990,8 +13268,8 @@ export const useReadSendMerkleDropTrancheAmountsClaimed = /*#__PURE__*/ createUs
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useReadSendMerkleDropTrancheCursor = /*#__PURE__*/ createUseReadContract({
@@ -12005,8 +13283,8 @@ export const useReadSendMerkleDropTrancheCursor = /*#__PURE__*/ createUseReadCon
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useReadSendMerkleDropVerifyClaim = /*#__PURE__*/ createUseReadContract({
@@ -12020,8 +13298,8 @@ export const useReadSendMerkleDropVerifyClaim = /*#__PURE__*/ createUseReadContr
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useWriteSendMerkleDrop = /*#__PURE__*/ createUseWriteContract({
@@ -12034,8 +13312,8 @@ export const useWriteSendMerkleDrop = /*#__PURE__*/ createUseWriteContract({
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useWriteSendMerkleDropAddTranche = /*#__PURE__*/ createUseWriteContract({
@@ -12049,8 +13327,8 @@ export const useWriteSendMerkleDropAddTranche = /*#__PURE__*/ createUseWriteCont
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useWriteSendMerkleDropClaimTranche = /*#__PURE__*/ createUseWriteContract({
@@ -12064,8 +13342,8 @@ export const useWriteSendMerkleDropClaimTranche = /*#__PURE__*/ createUseWriteCo
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useWriteSendMerkleDropClaimTranches = /*#__PURE__*/ createUseWriteContract({
@@ -12079,8 +13357,8 @@ export const useWriteSendMerkleDropClaimTranches = /*#__PURE__*/ createUseWriteC
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useWriteSendMerkleDropExpireTranche = /*#__PURE__*/ createUseWriteContract({
@@ -12094,8 +13372,8 @@ export const useWriteSendMerkleDropExpireTranche = /*#__PURE__*/ createUseWriteC
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useWriteSendMerkleDropRenounceOwnership = /*#__PURE__*/ createUseWriteContract({
@@ -12109,8 +13387,8 @@ export const useWriteSendMerkleDropRenounceOwnership = /*#__PURE__*/ createUseWr
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useWriteSendMerkleDropTransferOwnership = /*#__PURE__*/ createUseWriteContract({
@@ -12124,8 +13402,8 @@ export const useWriteSendMerkleDropTransferOwnership = /*#__PURE__*/ createUseWr
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useWriteSendMerkleDropTransferToken = /*#__PURE__*/ createUseWriteContract({
@@ -12139,8 +13417,8 @@ export const useWriteSendMerkleDropTransferToken = /*#__PURE__*/ createUseWriteC
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useWriteSendMerkleDropWithdraw = /*#__PURE__*/ createUseWriteContract({
@@ -12154,8 +13432,8 @@ export const useWriteSendMerkleDropWithdraw = /*#__PURE__*/ createUseWriteContra
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useSimulateSendMerkleDrop = /*#__PURE__*/ createUseSimulateContract({
@@ -12168,8 +13446,8 @@ export const useSimulateSendMerkleDrop = /*#__PURE__*/ createUseSimulateContract
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useSimulateSendMerkleDropAddTranche = /*#__PURE__*/ createUseSimulateContract({
@@ -12183,8 +13461,8 @@ export const useSimulateSendMerkleDropAddTranche = /*#__PURE__*/ createUseSimula
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useSimulateSendMerkleDropClaimTranche = /*#__PURE__*/ createUseSimulateContract({
@@ -12198,8 +13476,8 @@ export const useSimulateSendMerkleDropClaimTranche = /*#__PURE__*/ createUseSimu
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useSimulateSendMerkleDropClaimTranches = /*#__PURE__*/ createUseSimulateContract({
@@ -12213,8 +13491,8 @@ export const useSimulateSendMerkleDropClaimTranches = /*#__PURE__*/ createUseSim
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useSimulateSendMerkleDropExpireTranche = /*#__PURE__*/ createUseSimulateContract({
@@ -12228,8 +13506,8 @@ export const useSimulateSendMerkleDropExpireTranche = /*#__PURE__*/ createUseSim
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useSimulateSendMerkleDropRenounceOwnership = /*#__PURE__*/ createUseSimulateContract({
@@ -12243,8 +13521,8 @@ export const useSimulateSendMerkleDropRenounceOwnership = /*#__PURE__*/ createUs
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useSimulateSendMerkleDropTransferOwnership = /*#__PURE__*/ createUseSimulateContract({
@@ -12258,8 +13536,8 @@ export const useSimulateSendMerkleDropTransferOwnership = /*#__PURE__*/ createUs
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useSimulateSendMerkleDropTransferToken = /*#__PURE__*/ createUseSimulateContract({
@@ -12273,8 +13551,8 @@ export const useSimulateSendMerkleDropTransferToken = /*#__PURE__*/ createUseSim
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useSimulateSendMerkleDropWithdraw = /*#__PURE__*/ createUseSimulateContract({
@@ -12288,8 +13566,8 @@ export const useSimulateSendMerkleDropWithdraw = /*#__PURE__*/ createUseSimulate
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useWatchSendMerkleDropEvent = /*#__PURE__*/ createUseWatchContractEvent({
@@ -12302,8 +13580,8 @@ export const useWatchSendMerkleDropEvent = /*#__PURE__*/ createUseWatchContractE
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useWatchSendMerkleDropClaimedEvent = /*#__PURE__*/ createUseWatchContractEvent({
@@ -12317,8 +13595,8 @@ export const useWatchSendMerkleDropClaimedEvent = /*#__PURE__*/ createUseWatchCo
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useWatchSendMerkleDropOwnershipTransferredEvent =
@@ -12333,8 +13611,8 @@ export const useWatchSendMerkleDropOwnershipTransferredEvent =
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useWatchSendMerkleDropTrancheAddedEvent = /*#__PURE__*/ createUseWatchContractEvent({
@@ -12348,8 +13626,8 @@ export const useWatchSendMerkleDropTrancheAddedEvent = /*#__PURE__*/ createUseWa
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xb6194dbb185b2551fe2f66ded6b648b9f758ca30)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
  */
 export const useWatchSendMerkleDropTrancheExpiredEvent = /*#__PURE__*/ createUseWatchContractEvent({
@@ -12361,11 +13639,8 @@ export const useWatchSendMerkleDropTrancheExpiredEvent = /*#__PURE__*/ createUse
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenAbi}__
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const useReadSendToken = /*#__PURE__*/ createUseReadContract({
   abi: sendTokenAbi,
@@ -12375,11 +13650,8 @@ export const useReadSendToken = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"allowance"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const useReadSendTokenAllowance = /*#__PURE__*/ createUseReadContract({
   abi: sendTokenAbi,
@@ -12390,11 +13662,8 @@ export const useReadSendTokenAllowance = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"balanceOf"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const useReadSendTokenBalanceOf = /*#__PURE__*/ createUseReadContract({
   abi: sendTokenAbi,
@@ -12405,11 +13674,8 @@ export const useReadSendTokenBalanceOf = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"decimals"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const useReadSendTokenDecimals = /*#__PURE__*/ createUseReadContract({
   abi: sendTokenAbi,
@@ -12418,13 +13684,22 @@ export const useReadSendTokenDecimals = /*#__PURE__*/ createUseReadContract({
 })
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"lockbox"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
+ */
+export const useReadSendTokenLockbox = /*#__PURE__*/ createUseReadContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'lockbox',
+})
+
+/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"name"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const useReadSendTokenName = /*#__PURE__*/ createUseReadContract({
   abi: sendTokenAbi,
@@ -12435,11 +13710,8 @@ export const useReadSendTokenName = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"symbol"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const useReadSendTokenSymbol = /*#__PURE__*/ createUseReadContract({
   abi: sendTokenAbi,
@@ -12450,11 +13722,8 @@ export const useReadSendTokenSymbol = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"totalSupply"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const useReadSendTokenTotalSupply = /*#__PURE__*/ createUseReadContract({
   abi: sendTokenAbi,
@@ -12465,11 +13734,8 @@ export const useReadSendTokenTotalSupply = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendTokenAbi}__
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const useWriteSendToken = /*#__PURE__*/ createUseWriteContract({
   abi: sendTokenAbi,
@@ -12479,11 +13745,8 @@ export const useWriteSendToken = /*#__PURE__*/ createUseWriteContract({
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"approve"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const useWriteSendTokenApprove = /*#__PURE__*/ createUseWriteContract({
   abi: sendTokenAbi,
@@ -12492,13 +13755,46 @@ export const useWriteSendTokenApprove = /*#__PURE__*/ createUseWriteContract({
 })
 
 /**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"burn"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
+ */
+export const useWriteSendTokenBurn = /*#__PURE__*/ createUseWriteContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'burn',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"burnFrom"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
+ */
+export const useWriteSendTokenBurnFrom = /*#__PURE__*/ createUseWriteContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'burnFrom',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"mint"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
+ */
+export const useWriteSendTokenMint = /*#__PURE__*/ createUseWriteContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'mint',
+})
+
+/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"transfer"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const useWriteSendTokenTransfer = /*#__PURE__*/ createUseWriteContract({
   abi: sendTokenAbi,
@@ -12509,11 +13805,8 @@ export const useWriteSendTokenTransfer = /*#__PURE__*/ createUseWriteContract({
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"transferFrom"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const useWriteSendTokenTransferFrom = /*#__PURE__*/ createUseWriteContract({
   abi: sendTokenAbi,
@@ -12524,11 +13817,8 @@ export const useWriteSendTokenTransferFrom = /*#__PURE__*/ createUseWriteContrac
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendTokenAbi}__
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const useSimulateSendToken = /*#__PURE__*/ createUseSimulateContract({
   abi: sendTokenAbi,
@@ -12538,11 +13828,8 @@ export const useSimulateSendToken = /*#__PURE__*/ createUseSimulateContract({
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"approve"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const useSimulateSendTokenApprove = /*#__PURE__*/ createUseSimulateContract({
   abi: sendTokenAbi,
@@ -12551,13 +13838,46 @@ export const useSimulateSendTokenApprove = /*#__PURE__*/ createUseSimulateContra
 })
 
 /**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"burn"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
+ */
+export const useSimulateSendTokenBurn = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'burn',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"burnFrom"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
+ */
+export const useSimulateSendTokenBurnFrom = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'burnFrom',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"mint"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
+ */
+export const useSimulateSendTokenMint = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'mint',
+})
+
+/**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"transfer"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const useSimulateSendTokenTransfer = /*#__PURE__*/ createUseSimulateContract({
   abi: sendTokenAbi,
@@ -12568,11 +13888,8 @@ export const useSimulateSendTokenTransfer = /*#__PURE__*/ createUseSimulateContr
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"transferFrom"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const useSimulateSendTokenTransferFrom = /*#__PURE__*/ createUseSimulateContract({
   abi: sendTokenAbi,
@@ -12583,11 +13900,8 @@ export const useSimulateSendTokenTransferFrom = /*#__PURE__*/ createUseSimulateC
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendTokenAbi}__
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const useWatchSendTokenEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: sendTokenAbi,
@@ -12597,11 +13911,8 @@ export const useWatchSendTokenEvent = /*#__PURE__*/ createUseWatchContractEvent(
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendTokenAbi}__ and `eventName` set to `"Approval"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
  */
 export const useWatchSendTokenApprovalEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: sendTokenAbi,
@@ -12612,16 +13923,407 @@ export const useWatchSendTokenApprovalEvent = /*#__PURE__*/ createUseWatchContra
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendTokenAbi}__ and `eventName` set to `"Transfer"`
  *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xEab49138BA2Ea6dd776220fE26b7b8E446638956)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xB5Ac39587df1B5CE6252b3Ea0510Eb460Cbf4aDb)
+ */
+export const useWatchSendTokenTransferEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  eventName: 'Transfer',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenV0Abi}__
+ *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
  * -
  * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
  * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
  */
-export const useWatchSendTokenTransferEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: sendTokenAbi,
-  address: sendTokenAddress,
+export const useReadSendTokenV0 = /*#__PURE__*/ createUseReadContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenV0Abi}__ and `functionName` set to `"allowance"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useReadSendTokenV0Allowance = /*#__PURE__*/ createUseReadContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+  functionName: 'allowance',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenV0Abi}__ and `functionName` set to `"balanceOf"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useReadSendTokenV0BalanceOf = /*#__PURE__*/ createUseReadContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+  functionName: 'balanceOf',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenV0Abi}__ and `functionName` set to `"decimals"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useReadSendTokenV0Decimals = /*#__PURE__*/ createUseReadContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+  functionName: 'decimals',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenV0Abi}__ and `functionName` set to `"name"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useReadSendTokenV0Name = /*#__PURE__*/ createUseReadContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+  functionName: 'name',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenV0Abi}__ and `functionName` set to `"symbol"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useReadSendTokenV0Symbol = /*#__PURE__*/ createUseReadContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+  functionName: 'symbol',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenV0Abi}__ and `functionName` set to `"totalSupply"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useReadSendTokenV0TotalSupply = /*#__PURE__*/ createUseReadContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+  functionName: 'totalSupply',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendTokenV0Abi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useWriteSendTokenV0 = /*#__PURE__*/ createUseWriteContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendTokenV0Abi}__ and `functionName` set to `"approve"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useWriteSendTokenV0Approve = /*#__PURE__*/ createUseWriteContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendTokenV0Abi}__ and `functionName` set to `"transfer"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useWriteSendTokenV0Transfer = /*#__PURE__*/ createUseWriteContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendTokenV0Abi}__ and `functionName` set to `"transferFrom"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useWriteSendTokenV0TransferFrom = /*#__PURE__*/ createUseWriteContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendTokenV0Abi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useSimulateSendTokenV0 = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendTokenV0Abi}__ and `functionName` set to `"approve"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useSimulateSendTokenV0Approve = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendTokenV0Abi}__ and `functionName` set to `"transfer"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useSimulateSendTokenV0Transfer = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendTokenV0Abi}__ and `functionName` set to `"transferFrom"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useSimulateSendTokenV0TransferFrom = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendTokenV0Abi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useWatchSendTokenV0Event = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendTokenV0Abi}__ and `eventName` set to `"Approval"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useWatchSendTokenV0ApprovalEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
+  eventName: 'Approval',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendTokenV0Abi}__ and `eventName` set to `"Transfer"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useWatchSendTokenV0TransferEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendTokenV0Abi,
+  address: sendTokenV0Address,
   eventName: 'Transfer',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xd2B521847B59f88579634044Cb599D59a1B92d81)
+ */
+export const useReadSendTokenV0Lockbox = /*#__PURE__*/ createUseReadContract({
+  abi: sendTokenV0LockboxAbi,
+  address: sendTokenV0LockboxAddress,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"SEND_V0"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xd2B521847B59f88579634044Cb599D59a1B92d81)
+ */
+export const useReadSendTokenV0LockboxSendV0 = /*#__PURE__*/ createUseReadContract({
+  abi: sendTokenV0LockboxAbi,
+  address: sendTokenV0LockboxAddress,
+  functionName: 'SEND_V0',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"SEND_V1"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xd2B521847B59f88579634044Cb599D59a1B92d81)
+ */
+export const useReadSendTokenV0LockboxSendV1 = /*#__PURE__*/ createUseReadContract({
+  abi: sendTokenV0LockboxAbi,
+  address: sendTokenV0LockboxAddress,
+  functionName: 'SEND_V1',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xd2B521847B59f88579634044Cb599D59a1B92d81)
+ */
+export const useWriteSendTokenV0Lockbox = /*#__PURE__*/ createUseWriteContract({
+  abi: sendTokenV0LockboxAbi,
+  address: sendTokenV0LockboxAddress,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"deposit"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xd2B521847B59f88579634044Cb599D59a1B92d81)
+ */
+export const useWriteSendTokenV0LockboxDeposit = /*#__PURE__*/ createUseWriteContract({
+  abi: sendTokenV0LockboxAbi,
+  address: sendTokenV0LockboxAddress,
+  functionName: 'deposit',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"depositTo"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xd2B521847B59f88579634044Cb599D59a1B92d81)
+ */
+export const useWriteSendTokenV0LockboxDepositTo = /*#__PURE__*/ createUseWriteContract({
+  abi: sendTokenV0LockboxAbi,
+  address: sendTokenV0LockboxAddress,
+  functionName: 'depositTo',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xd2B521847B59f88579634044Cb599D59a1B92d81)
+ */
+export const useSimulateSendTokenV0Lockbox = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendTokenV0LockboxAbi,
+  address: sendTokenV0LockboxAddress,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"deposit"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xd2B521847B59f88579634044Cb599D59a1B92d81)
+ */
+export const useSimulateSendTokenV0LockboxDeposit = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendTokenV0LockboxAbi,
+  address: sendTokenV0LockboxAddress,
+  functionName: 'deposit',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `functionName` set to `"depositTo"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xd2B521847B59f88579634044Cb599D59a1B92d81)
+ */
+export const useSimulateSendTokenV0LockboxDepositTo = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendTokenV0LockboxAbi,
+  address: sendTokenV0LockboxAddress,
+  functionName: 'depositTo',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xd2B521847B59f88579634044Cb599D59a1B92d81)
+ */
+export const useWatchSendTokenV0LockboxEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendTokenV0LockboxAbi,
+  address: sendTokenV0LockboxAddress,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendTokenV0LockboxAbi}__ and `eventName` set to `"Deposit"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x60E5445EDc1A469CFc0181861c88BD4B6895F615)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xd2B521847B59f88579634044Cb599D59a1B92d81)
+ */
+export const useWatchSendTokenV0LockboxDepositEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendTokenV0LockboxAbi,
+  address: sendTokenV0LockboxAddress,
+  eventName: 'Deposit',
 })
 
 /**
@@ -12907,6 +14609,363 @@ export const useWatchSendVerifierProxyUpgradedEvent = /*#__PURE__*/ createUseWat
   address: sendVerifierProxyAddress,
   eventName: 'Upgraded',
 })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useReadSendVerifyingPaymaster = /*#__PURE__*/ createUseReadContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"entryPoint"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useReadSendVerifyingPaymasterEntryPoint = /*#__PURE__*/ createUseReadContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'entryPoint',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"getDeposit"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useReadSendVerifyingPaymasterGetDeposit = /*#__PURE__*/ createUseReadContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'getDeposit',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"getHash"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useReadSendVerifyingPaymasterGetHash = /*#__PURE__*/ createUseReadContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'getHash',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"owner"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useReadSendVerifyingPaymasterOwner = /*#__PURE__*/ createUseReadContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'owner',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"parsePaymasterAndData"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useReadSendVerifyingPaymasterParsePaymasterAndData =
+  /*#__PURE__*/ createUseReadContract({
+    abi: sendVerifyingPaymasterAbi,
+    address: sendVerifyingPaymasterAddress,
+    functionName: 'parsePaymasterAndData',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"verifyingSigner"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useReadSendVerifyingPaymasterVerifyingSigner = /*#__PURE__*/ createUseReadContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'verifyingSigner',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useWriteSendVerifyingPaymaster = /*#__PURE__*/ createUseWriteContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"addStake"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useWriteSendVerifyingPaymasterAddStake = /*#__PURE__*/ createUseWriteContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'addStake',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"deposit"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useWriteSendVerifyingPaymasterDeposit = /*#__PURE__*/ createUseWriteContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'deposit',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"postOp"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useWriteSendVerifyingPaymasterPostOp = /*#__PURE__*/ createUseWriteContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'postOp',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"renounceOwnership"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useWriteSendVerifyingPaymasterRenounceOwnership = /*#__PURE__*/ createUseWriteContract(
+  {
+    abi: sendVerifyingPaymasterAbi,
+    address: sendVerifyingPaymasterAddress,
+    functionName: 'renounceOwnership',
+  }
+)
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"transferOwnership"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useWriteSendVerifyingPaymasterTransferOwnership = /*#__PURE__*/ createUseWriteContract(
+  {
+    abi: sendVerifyingPaymasterAbi,
+    address: sendVerifyingPaymasterAddress,
+    functionName: 'transferOwnership',
+  }
+)
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"unlockStake"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useWriteSendVerifyingPaymasterUnlockStake = /*#__PURE__*/ createUseWriteContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'unlockStake',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"validatePaymasterUserOp"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useWriteSendVerifyingPaymasterValidatePaymasterUserOp =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: sendVerifyingPaymasterAbi,
+    address: sendVerifyingPaymasterAddress,
+    functionName: 'validatePaymasterUserOp',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"withdrawStake"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useWriteSendVerifyingPaymasterWithdrawStake = /*#__PURE__*/ createUseWriteContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'withdrawStake',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"withdrawTo"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useWriteSendVerifyingPaymasterWithdrawTo = /*#__PURE__*/ createUseWriteContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'withdrawTo',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useSimulateSendVerifyingPaymaster = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"addStake"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useSimulateSendVerifyingPaymasterAddStake = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'addStake',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"deposit"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useSimulateSendVerifyingPaymasterDeposit = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'deposit',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"postOp"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useSimulateSendVerifyingPaymasterPostOp = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'postOp',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"renounceOwnership"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useSimulateSendVerifyingPaymasterRenounceOwnership =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: sendVerifyingPaymasterAbi,
+    address: sendVerifyingPaymasterAddress,
+    functionName: 'renounceOwnership',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"transferOwnership"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useSimulateSendVerifyingPaymasterTransferOwnership =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: sendVerifyingPaymasterAbi,
+    address: sendVerifyingPaymasterAddress,
+    functionName: 'transferOwnership',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"unlockStake"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useSimulateSendVerifyingPaymasterUnlockStake = /*#__PURE__*/ createUseSimulateContract(
+  {
+    abi: sendVerifyingPaymasterAbi,
+    address: sendVerifyingPaymasterAddress,
+    functionName: 'unlockStake',
+  }
+)
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"validatePaymasterUserOp"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useSimulateSendVerifyingPaymasterValidatePaymasterUserOp =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: sendVerifyingPaymasterAbi,
+    address: sendVerifyingPaymasterAddress,
+    functionName: 'validatePaymasterUserOp',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"withdrawStake"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useSimulateSendVerifyingPaymasterWithdrawStake =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: sendVerifyingPaymasterAbi,
+    address: sendVerifyingPaymasterAddress,
+    functionName: 'withdrawStake',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `functionName` set to `"withdrawTo"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useSimulateSendVerifyingPaymasterWithdrawTo = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+  functionName: 'withdrawTo',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useWatchSendVerifyingPaymasterEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendVerifyingPaymasterAbi,
+  address: sendVerifyingPaymasterAddress,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendVerifyingPaymasterAbi}__ and `eventName` set to `"OwnershipTransferred"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8a77ae0c07047c5b307b2319a8f4bd9d3604ddd8)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3ca2b4dae6cfa762a690ebc4c45ca2f6b896db80)
+ */
+export const useWatchSendVerifyingPaymasterOwnershipTransferredEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: sendVerifyingPaymasterAbi,
+    address: sendVerifyingPaymasterAddress,
+    eventName: 'OwnershipTransferred',
+  })
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link senderCreatorAbi}__

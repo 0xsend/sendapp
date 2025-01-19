@@ -1,7 +1,7 @@
 import { describe, test } from '@jest/globals'
 import { act, renderHook, waitFor } from '@testing-library/react-native'
 import { baseMainnetBundlerClient, sendAccountAbi } from '@my/wagmi'
-import { signUserOp } from './signUserOp'
+import { signUserOpHash } from './signUserOp'
 import { encodeFunctionData, erc20Abi } from 'viem'
 import { useUserOpTransferMutation, useGenerateTransferUserOp } from './useUserOpTransferMutation'
 import { Wrapper } from './__mocks__/Wrapper'
@@ -77,7 +77,7 @@ describe('useUserOpTransferMutation', () => {
     // @ts-expect-error mock
     baseMainnetBundlerClient.waitForUserOperationReceipt.mockReset()
     // @ts-expect-error mock
-    signUserOp.mockReset()
+    signUserOpHash.mockReset()
   })
 
   test('should send user op transfer', async () => {
@@ -96,7 +96,7 @@ describe('useUserOpTransferMutation', () => {
     // @ts-expect-error mock
     baseMainnetBundlerClient.waitForUserOperationReceipt.mockResolvedValue({ success: true })
     // @ts-expect-error mock
-    signUserOp.mockResolvedValue('0x123')
+    signUserOpHash.mockResolvedValue('0x123')
 
     const { result } = renderHook(() => useUserOpTransferMutation(), {
       wrapper: Wrapper,
@@ -107,7 +107,7 @@ describe('useUserOpTransferMutation', () => {
       await result.current.mutateAsync({ userOp, validUntil: 0, webauthnCreds: [] })
       jest.runAllTimers()
     })
-    expect(signUserOp).toHaveBeenCalledTimes(1)
+    expect(signUserOpHash).toHaveBeenCalledTimes(1)
     expect(baseMainnetBundlerClient.sendUserOperation).toHaveBeenCalledTimes(1)
     expect(baseMainnetBundlerClient.waitForUserOperationReceipt).toHaveBeenCalledTimes(1)
   })

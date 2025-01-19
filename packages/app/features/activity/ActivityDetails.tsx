@@ -5,6 +5,10 @@ import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
 import { IconX } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import type { Activity } from 'app/utils/zod/activity'
+import {
+  isSendtagCheckoutEvent,
+  isSendTokenUpgradeEvent,
+} from 'app/utils/zod/activity/SendAccountTransfersEventSchema'
 
 export const ActivityDetails = ({
   activity,
@@ -14,7 +18,7 @@ export const ActivityDetails = ({
   onClose: () => void
 }) => {
   const activityText = phraseFromActivity(activity)
-  const counterPartText = subtextFromActivity(activity)
+  const subText = subtextFromActivity(activity)
   const amount = amountFromActivity(activity)
 
   return (
@@ -47,11 +51,13 @@ export const ActivityDetails = ({
                     size: '$7',
                   }}
                 >
-                  <Text>{counterPartText}</Text> {(() => {
+                  <Text>{subText}</Text> {(() => {
                     switch (true) {
-                      case counterPartText === 'Sendtag Checkout':
+                      case isSendtagCheckoutEvent(activity):
                         return null
-                      case counterPartText === null:
+                      case isSendTokenUpgradeEvent(activity):
+                        return null
+                      case subText === null:
                         return <Text>{activityText}</Text>
                       default:
                         return (

@@ -172,6 +172,19 @@ local_resource(
 )
 
 local_resource(
+    "anvil:anvil-deploy-send-merkle-drop-fixtures",
+    "yarn contracts dev:deploy-send-merkle-drop",
+    auto_init = False,
+    dir = _prj_root,
+    labels = labels,
+    resource_deps = _infra_resource_deps + [
+        "anvil:base",
+        "contracts:build",
+    ],
+    trigger_mode = TRIGGER_MODE_MANUAL,
+)
+
+local_resource(
     "anvil:anvil-add-send-merkle-drop-fixtures",
     "yarn contracts dev:anvil-add-send-merkle-drop-fixtures",
     auto_init = False,
@@ -180,6 +193,7 @@ local_resource(
     resource_deps = _infra_resource_deps + [
         "anvil:base",
         "contracts:build",
+        "anvil:anvil-deploy-send-merkle-drop-fixtures",
     ],
     trigger_mode = TRIGGER_MODE_MANUAL,
 )
@@ -196,12 +210,24 @@ local_resource(
 )
 
 local_resource(
+    "anvil:anvil-deploy-verifying-paymaster-fixtures",
+    "yarn contracts dev:anvil-deploy-verifying-paymaster-fixtures",
+    dir = _prj_root,
+    labels = labels,
+    resource_deps = _infra_resource_deps + [
+        "anvil:base",
+        "contracts:build",
+    ],
+)
+
+local_resource(
     "anvil:fixtures",
     "echo 🥳",
     labels = labels,
     resource_deps = [
         "anvil:base",
         "anvil:anvil-token-paymaster-deposit",
+        "anvil:anvil-deploy-verifying-paymaster-fixtures",
     ],
 )
 
@@ -228,7 +254,9 @@ local_resource(
         -v ./apps/aabundler/etc:/app/etc/aabundler \
         -e "DEBUG={bundler_debug}" \
         -e "DEBUG_COLORS=true" \
-        0xbigboss/bundler:0.7.1 \
+        -m 250m \
+        --pull always \
+        docker.io/0xbigboss/bundler:latest \
         --port 3030 \
         --config /app/etc/aabundler/aabundler.config.json \
         --mnemonic /app/keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \

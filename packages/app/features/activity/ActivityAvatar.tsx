@@ -1,4 +1,5 @@
-import { LinkableAvatar, Avatar, XStack, type LinkableAvatarProps } from '@my/ui'
+import { Avatar, LinkableAvatar, XStack, type LinkableAvatarProps } from '@my/ui'
+import { IconUpgrade } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { allCoinsDict } from 'app/data/coins'
 import { counterpart } from 'app/utils/activity'
@@ -7,6 +8,7 @@ import {
   isSendAccountTransfersEvent,
   type Activity,
 } from 'app/utils/zod/activity'
+import { isSendTokenUpgradeEvent } from 'app/utils/zod/activity/SendAccountTransfersEventSchema'
 
 export function ActivityAvatar({
   activity,
@@ -55,6 +57,10 @@ export function ActivityAvatar({
         </LinkableAvatar>
       </XStack>
     )
+  }
+
+  if (isSendTokenUpgradeEvent(activity)) {
+    return <IconUpgrade size="$4.5" br="$4" gap="$2" />
   }
 
   if (isSendAccountTransfersEvent(activity)) {

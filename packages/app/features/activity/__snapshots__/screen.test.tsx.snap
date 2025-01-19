@@ -471,6 +471,25 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
       </View>
     </View>
   </View>
+  <View
+    style={
+      {
+        "flexDirection": "column",
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "flexDirection": "column",
+        }
+      }
+    >
+      <ActivityIndicator
+        size="small"
+      />
+    </View>
+  </View>
   <RCTScrollView
     scrollEnabled={true}
     style={
@@ -2608,6 +2627,221 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                             }
                             suppressHighlighting={true}
                           />
+                          <Text
+                            style={
+                              {
+                                "color": "#B2B2B2",
+                                "fontFamily": "System",
+                                "fontSize": 19.2,
+                                "fontWeight": "400",
+                                "lineHeight": 21,
+                                "textAlign": "right",
+                                "userSelect": "auto",
+                              }
+                            }
+                            suppressHighlighting={true}
+                          >
+                            7 mon ago
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                  <View
+                    cancelable={true}
+                    disabled={false}
+                    focusable={true}
+                    minPressDuration={0}
+                    onMouseEnter={[Function]}
+                    onMouseLeave={[Function]}
+                    onPress={[Function]}
+                    onPressIn={[Function]}
+                    onPressOut={[Function]}
+                    style={
+                      {
+                        "alignItems": "center",
+                        "borderBottomLeftRadius": 9,
+                        "borderBottomRightRadius": 9,
+                        "borderTopLeftRadius": 9,
+                        "borderTopRightRadius": 9,
+                        "flexDirection": "row",
+                        "gap": 18,
+                        "justifyContent": "space-between",
+                        "paddingBottom": 16,
+                        "paddingLeft": 16,
+                        "paddingRight": 16,
+                        "paddingTop": 16,
+                        "width": "100%",
+                      }
+                    }
+                    testID="TokenActivityRow"
+                  >
+                    <View
+                      style={
+                        {
+                          "flex": 1,
+                          "flexDirection": "row",
+                          "gap": 16,
+                          "width": "100%",
+                        }
+                      }
+                    >
+                      <RNSVGSvgView
+                        align="xMidYMid"
+                        bbHeight={48}
+                        bbWidth={48}
+                        color="#FFFFFF"
+                        fill="none"
+                        focusable={false}
+                        height={48}
+                        meetOrSlice={0}
+                        minX={0}
+                        minY={0}
+                        size={48}
+                        strokeWidth="2"
+                        style={
+                          [
+                            {
+                              "backgroundColor": "transparent",
+                              "borderWidth": 0,
+                            },
+                            {
+                              "borderBottomLeftRadius": 9,
+                              "borderBottomRightRadius": 9,
+                              "borderTopLeftRadius": 9,
+                              "borderTopRightRadius": 9,
+                              "gap": 7,
+                            },
+                            {
+                              "flex": 0,
+                              "height": 48,
+                              "width": 48,
+                            },
+                          ]
+                        }
+                        tintColor="#FFFFFF"
+                        vbHeight={40}
+                        vbWidth={40}
+                        width={48}
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <RNSVGGroup
+                          fill={null}
+                          propList={
+                            [
+                              "fill",
+                              "strokeWidth",
+                            ]
+                          }
+                          strokeWidth="2"
+                        >
+                          <RNSVGPath
+                            d="M33.714 28l-1.6 1.6-2.971-2.972v9.371h-2.286v-9.371l-2.971 2.971-1.6-1.6L28 22.285 33.714 28z"
+                            fill={
+                              {
+                                "type": 2,
+                              }
+                            }
+                            propList={
+                              [
+                                "fill",
+                              ]
+                            }
+                          />
+                          <RNSVGPath
+                            d="M19.314 36L7.428 28.914c-.685-.457-1.142-1.143-1.142-1.943V13.03c0-.8.457-1.6 1.143-1.943l11.428-6.743A1.93 1.93 0 0120 4c.457 0 .8.114 1.143.343l11.428 6.743c.686.457 1.143 1.143 1.143 1.943V20H31.43v-6.971l-11.43-6.743-11.428 6.743V26.97l12 7.086L19.314 36z"
+                            fill={
+                              {
+                                "type": 2,
+                              }
+                            }
+                            propList={
+                              [
+                                "fill",
+                              ]
+                            }
+                          />
+                        </RNSVGGroup>
+                      </RNSVGSvgView>
+                      <View
+                        style={
+                          {
+                            "flex": 1,
+                            "flexDirection": "column",
+                            "overflow": "hidden",
+                            "width": "100%",
+                          }
+                        }
+                      >
+                        <View
+                          style={
+                            {
+                              "flex": 1,
+                              "flexDirection": "row",
+                              "gap": 4,
+                              "justifyContent": "space-between",
+                              "width": "100%",
+                            }
+                          }
+                        >
+                          <Text
+                            style={
+                              {
+                                "color": "#FFFFFF",
+                                "fontFamily": "System",
+                                "fontSize": 21.599999999999998,
+                                "fontWeight": "500",
+                              }
+                            }
+                            suppressHighlighting={true}
+                          >
+                            Send Token Upgrade
+                          </Text>
+                          <Text
+                            style={
+                              {
+                                "color": "#FFFFFF",
+                                "fontFamily": "System",
+                                "fontSize": 21.599999999999998,
+                                "fontWeight": "500",
+                                "textAlign": "right",
+                              }
+                            }
+                            suppressHighlighting={true}
+                          >
+                            10,000 SEND
+                          </Text>
+                        </View>
+                        <View
+                          style={
+                            {
+                              "alignItems": "flex-start",
+                              "flex": 1,
+                              "flexDirection": "row",
+                              "gap": 4,
+                              "justifyContent": "space-between",
+                              "overflow": "hidden",
+                              "width": "100%",
+                            }
+                          }
+                        >
+                          <Text
+                            style={
+                              {
+                                "color": "#B2B2B2",
+                                "fontFamily": "System",
+                                "fontSize": 19.2,
+                                "fontWeight": "400",
+                                "lineHeight": 19,
+                                "maxWidth": "100%",
+                                "overflow": "hidden",
+                                "userSelect": "auto",
+                              }
+                            }
+                            suppressHighlighting={true}
+                          >
+                            1M -&gt; 10,000
+                          </Text>
                           <Text
                             style={
                               {

@@ -17,7 +17,7 @@ jest.mock('app/provider/coins', () => ({
       },
       {
         label: 'SEND',
-        token: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
+        token: '0xEab49138BA2Ea6dd776220fE26b7b8E446638956',
         balance: 250000n,
       },
     ],

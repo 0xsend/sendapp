@@ -21,6 +21,7 @@ import { DistributionClaimButton } from 'app/features/account/rewards/components
 import formatAmount from 'app/utils/formatAmount'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { useIsSendingUnlocked } from 'app/utils/useIsSendingUnlocked'
+import { formatUnits } from 'viem'
 
 const Row = styled(XStack, {
   w: '100%',
@@ -163,7 +164,7 @@ const ActivityRewards = ({ children, ...props }: XStackProps) => {
   const { data: distributions, isLoading } = useMonthlyDistributions()
   const distribution =
     distributions?.find((d) => d.number === queryParams.distribution) ?? distributions?.[0]
-  const shareAmount = distribution?.distribution_shares?.[0]?.amount_after_slash
+  const shareAmount = BigInt(distribution?.distribution_shares?.[0]?.amount_after_slash || 0)
   const { direction } = useScrollDirection()
 
   const isVisible =
@@ -201,7 +202,13 @@ const ActivityRewards = ({ children, ...props }: XStackProps) => {
               fontWeight={'500'}
               lh={40}
             >
-              {shareAmount === undefined ? '' : `${formatAmount(shareAmount, 10, 0)} SEND`}
+              {shareAmount === undefined
+                ? ''
+                : `${formatAmount(
+                    formatUnits(shareAmount ?? 0n, distribution?.token_decimals ?? 18) ?? 0n,
+                    10,
+                    0
+                  )} SEND`}
             </Paragraph>
             {isVisible && <DistributionClaimButton distribution={distribution} />}
           </Row>

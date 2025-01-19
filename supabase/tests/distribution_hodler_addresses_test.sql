@@ -47,6 +47,24 @@ VALUES (
     1e6::bigint,
     '2023-02-28T00:00:00.000Z',
     8453);
+-- ensure verification values are not created
+INSERT INTO distribution_verification_values(
+    type,
+    fixed_value,
+    bips_value,
+    distribution_id,
+    multiplier_min,
+    multiplier_max,
+    multiplier_step)
+select type,
+       fixed_value,
+       bips_value,
+       (select id from distributions where number = 123),
+       multiplier_min,
+       multiplier_max,
+       multiplier_step
+       from distribution_verification_values
+       where distribution_id = (select id from distributions where number <> 123 order by number desc limit 1);
 -- 2. Test when there are eligible hodler addresses
 INSERT INTO public.send_token_transfers(
     "f",

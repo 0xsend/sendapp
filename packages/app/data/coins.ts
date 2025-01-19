@@ -3,6 +3,7 @@ import {
   usdcAddress as usdcAddresses,
   sendTokenAddress as sendAddresses,
   spx6900Address as spx6900Addresses,
+  sendTokenV0Address,
 } from '@my/wagmi'
 import { z } from 'zod'
 
@@ -35,6 +36,15 @@ export const sendCoin = {
   label: 'Send',
   symbol: 'SEND',
   token: sendAddresses[baseMainnet.id],
+  decimals: 18,
+  coingeckoTokenId: 'send-token',
+} as const
+
+// can probably remove this
+export const sendV0Coin = {
+  label: 'Send (v0)',
+  symbol: 'SEND',
+  token: sendTokenV0Address[baseMainnet.id],
   decimals: 0,
   coingeckoTokenId: 'send-token',
 } as const

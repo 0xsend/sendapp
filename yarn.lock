@@ -29,6 +29,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@0xsend/send-token-upgrade@npm:0.0.2":
+  version: 0.0.2
+  resolution: "@0xsend/send-token-upgrade@npm:0.0.2"
+  peerDependencies:
+    typescript: ^5.0.0
+  checksum: 10/a6011cff459ba2d84b05ae5bb7c9ccfb5e6f6ea0ba0d29ee5141387ae97d8f1a80622312640203b47f7ba457f6e6ff220c43beeefbfa4442dbbdbc141740d469
+  languageName: node
+  linkType: hard
+
 "@0xsend/webauthn-authenticator@workspace:*, @0xsend/webauthn-authenticator@workspace:packages/webauthn-authenticator":
   version: 0.0.0-use.local
   resolution: "@0xsend/webauthn-authenticator@workspace:packages/webauthn-authenticator"
@@ -6216,6 +6225,7 @@ __metadata:
     debug: "npm:^4.3.6"
     ms: "npm:^2.1.3"
     p-queue: "npm:^8.0.1"
+    permissionless: "npm:^0.1.14"
     superjson: "npm:^1.13.1"
     viem: "npm:^2.18.2"
     zod: "npm:^3.23.8"
@@ -6302,7 +6312,7 @@ __metadata:
   dependencies:
     dotenv-cli: "npm:^7.3.0"
     supabase: "npm:1.145.4"
-    type-fest: "npm:^4.18.3"
+    type-fest: "npm:^4.32.0"
   languageName: unknown
   linkType: soft
 
@@ -6338,6 +6348,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@my/wagmi@workspace:packages/wagmi"
   dependencies:
+    "@0xsend/send-token-upgrade": "npm:0.0.2"
     "@my/contracts": "workspace:*"
     "@wagmi/cli": "npm:^2.1.15"
     "@wagmi/core": "npm:^2.13.1"
@@ -14004,7 +14015,6 @@ __metadata:
     burnt: "npm:^0.12.1"
     cbor: "npm:^9.0.1"
     debug: "npm:^4.3.6"
-    dnum: "npm:^2.9.0"
     eslint: "npm:^8.46.0"
     eslint-config-custom: "workspace:*"
     eslint-plugin-testing-library: "npm:^6.2.2"
@@ -14029,6 +14039,7 @@ __metadata:
     react-use-precision-timer: "npm:^3.5.5"
     solito: "npm:^4.0.1"
     superjson: "npm:^1.13.1"
+    type-fest: "npm:^4.32.0"
     typescript: "npm:^5.5.3"
     viem: "npm:^2.18.2"
     wagmi: "npm:^2.12.1"
@@ -17565,15 +17576,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"dnum@npm:^2.9.0":
-  version: 2.9.0
-  resolution: "dnum@npm:2.9.0"
-  dependencies:
-    from-exponential: "npm:^1.1.1"
-  checksum: 10/15e48a7346cb37928bda3264a75b3bedff52d7b9902b338b36b8a92c874a41e4b144e38fa0d95d66f1a892b58e2022f9a3fe48e918c6f16b9cb560e7794570f2
-  languageName: node
-  linkType: hard
-
 "doctrine@npm:^2.1.0":
   version: 2.1.0
   resolution: "doctrine@npm:2.1.0"
@@ -21080,13 +21082,6 @@ __metadata:
   version: 1.2.0
   resolution: "friendly-words@npm:1.2.0"
   checksum: 10/10128906463a897da29b8c685f4e214fac493c9a4fb65e675d46c7bc31b80be2d8867f7fb54e328d3b88cfef81e7be7523845e2a2c8be1dacc003230adcf8ee5
-  languageName: node
-  linkType: hard
-
-"from-exponential@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "from-exponential@npm:1.1.1"
-  checksum: 10/af2765bd4f78836153c46cf4aff51ba9f2d1ac6b7d9568d69901d2045ba5b80a47de4f2a693bcc2006a7516cef71f636a4e42596cdd77a0addcc739539eb0f48
   languageName: node
   linkType: hard
 
@@ -33742,10 +33737,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"type-fest@npm:^4.18.3":
-  version: 4.18.3
-  resolution: "type-fest@npm:4.18.3"
-  checksum: 10/eb750920d0ef3639177f581edd6489d972c5c5827abb602a9c9662889aad148a7d558257e36c563f1beb81a2e417faec52ecec9799b28531d8335856f91e6dff
+"type-fest@npm:^4.32.0":
+  version: 4.32.0
+  resolution: "type-fest@npm:4.32.0"
+  checksum: 10/7cee33a2d82c992e97e85eca4016a7dd62239fc6f95a7f86d46671900cad594eda832d97a1d4231d3bb2ed7ff5144c5f3cf4644e1f722faa4e6decef0c5276ca
   languageName: node
   linkType: hard
 

@@ -48,7 +48,7 @@ runs:
     - name: Yarn Install
       if: ${{ inputs.yarn-install == 'true' }}
       shell: bash
-      run: yarn install --immutable
+      run: yarn install --immutable  --inline-builds
     - name: Build Next.js
       if: ${{ inputs.build-nextjs == 'true' }}
       shell: bash

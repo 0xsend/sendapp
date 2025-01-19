@@ -31,29 +31,12 @@ jest.mock('app/utils/distributions', () => ({
     ],
   }),
   useDistributionVerifications: jest.fn().mockReturnValue({
-    data: [
-      {
-        id: 1,
-        type: 'create_passkey',
-        weight: 1,
-        fixed_value: 0,
-        metadata: {},
-      },
-      {
-        id: 2,
-        type: 'tag_registration',
-        weight: 1,
-        fixed_value: 0,
-        metadata: {},
-      },
-      {
-        id: 3,
-        type: 'send_ceiling',
-        weight: 1,
-        fixed_value: 0,
-        metadata: { value: 0 },
-      },
-    ],
+    data: {
+      distribution_id: 1,
+      user_id: null,
+      verification_values: [],
+      multipliers: [],
+    },
   }),
   useSendMerkleDropTrancheActive: jest.fn().mockReturnValue({
     data: true,
@@ -70,6 +53,13 @@ jest.mock('app/utils/distributions', () => ({
   }),
   useUserOpClaimMutation: jest.fn().mockReturnValue({
     mutateAsync: jest.fn().mockReturnValue(Promise.resolve()),
+  }),
+  useSnapshotBalance: jest.fn().mockReturnValue({
+    data: {
+      balance: 100n,
+    },
+    isSuccess: true,
+    error: null,
   }),
 }))
 
@@ -143,7 +133,7 @@ jest.mock('app/provider/coins', () => ({
       },
       {
         label: 'SEND',
-        token: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
+        token: '0xEab49138BA2Ea6dd776220fE26b7b8E446638956',
         balance: 250000n,
       },
     ],
