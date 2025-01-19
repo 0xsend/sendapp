@@ -8,7 +8,13 @@ import {
 } from './zod/activity'
 import type { Activity } from 'app/utils/zod/activity'
 import { isSendAccountReceiveEvent } from './zod/activity/SendAccountReceiveEventSchema'
-import { baseMainnet, sendtagCheckoutAddress, tokenPaymasterAddress } from '@my/wagmi'
+import {
+  baseMainnet,
+  baseMainnetClient,
+  sendtagCheckoutAddress,
+  sendTokenAddress,
+  tokenPaymasterAddress,
+} from '@my/wagmi'
 import { shorten } from './strings'
 
 const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
@@ -116,7 +122,9 @@ export function eventNameFromActivity(activity: Activity) {
   switch (true) {
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Referral Reward'
-    case isERC20Transfer && isAddressEqual(data.f, zeroAddress):
+    case isERC20Transfer &&
+      isAddressEqual(data.f, zeroAddress) &&
+      isAddressEqual(data.coin?.token, sendTokenAddress[baseMainnetClient.chain.id]):
       return 'Send Token Upgrade'
     case isERC20Transfer && to_user?.send_id === undefined:
       return 'Withdraw'
