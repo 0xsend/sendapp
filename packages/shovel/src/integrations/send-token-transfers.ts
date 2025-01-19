@@ -1,5 +1,5 @@
 import type { BlockData, Column, Integration, Table } from '@indexsupply/shovel-config'
-import { sendTokenAddress, sendTokenV0Address } from '@my/wagmi'
+import { sendTokenAddress } from '@my/wagmi'
 
 export const transfersTable: Table = {
   name: 'send_token_transfers',
