@@ -229,8 +229,8 @@ const DistributionRequirementsCard = ({
   if (snapshotBalanceError) throw snapshotBalanceError
 
   const sendTagRegistrations = verifications?.verification_values?.reduce(
-    (acc, curr) => acc + (curr.type === 'tag_registration' ? curr.weight : 0n),
-    0n
+    (acc, curr) => acc + (curr.type === 'tag_registration' ? Number(curr.weight) : 0),
+    0
   )
 
   return (
@@ -385,10 +385,10 @@ const TaskCard = ({
   isQualificationOver: boolean
 }) => {
   const type = verification.type
-  const metadata = verification.metadata
+  const metadata = (verification.metadata ?? {}) as Record<string, number | string>
   const weight = verification.weight
   const value = ['send_ten', 'send_one_hundred'].includes(type)
-    ? BigInt(metadata?.[0]?.value ?? 0)
+    ? BigInt(metadata?.value ?? 0)
     : weight
   const isSendStreak = type === 'send_streak'
   const isTagRegistration = type === 'tag_registration'
@@ -482,7 +482,7 @@ const MultiplierCards = ({
   const activeMultipliers = multipliers?.filter(
     ({ value, multiplier_step, multiplier_max }) =>
       (!isQualificationOver && multiplier_step > 0.0 && multiplier_max > 1.0) ||
-      (isQualificationOver && Boolean(value) && value > 1.0)
+      (isQualificationOver && Boolean(value) && (value ?? 0) > 1.0)
   )
 
   const distributionMonth = distribution.timezone_adjusted_qualification_end.toLocaleString(

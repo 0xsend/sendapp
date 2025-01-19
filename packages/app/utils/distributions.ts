@@ -1,4 +1,4 @@
-import type { Database, Tables } from '@my/supabase/database.types'
+import type { Database, Json, Tables } from '@my/supabase/database.types'
 import {
   mainnet,
   sendTokenAddress,
@@ -181,6 +181,7 @@ function fetchDistributionVerifications(
 }
 
 export type DistributionsVerificationsQuery = ReturnType<typeof useDistributionVerifications>
+
 export const useDistributionVerifications = (distributionId?: number) => {
   const supabase = useSupabase()
 
@@ -198,25 +199,53 @@ export const useDistributionVerifications = (distributionId?: number) => {
       // previously this was grouped and transformed to match the distribution_verifications_summary view
       // but now we are just returning the data as from postgrest
       // transform the data to match the view's shape to avoid breaking the views
+
+      const verification_values = verifications.map((v) => ({
+        type: v.type,
+        weight: BigInt(v.weight ?? 0),
+        fixed_value: BigInt(v.distribution_verification_values?.fixed_value ?? 0n),
+        bips_value: BigInt(v.distribution_verification_values?.bips_value ?? 0n),
+        metadata: v.metadata,
+        created_at: v.created_at,
+      }))
+
+      const multipliers: {
+        type: Database['public']['Enums']['verification_type']
+        value?: number | null
+        multiplier_max: number
+        multiplier_min: number
+        multiplier_step: number
+        metadata?: Json
+      }[] = []
+
+      for (const dv of verifications) {
+        if (!dv.distribution_verification_values) return null
+        const { multiplier_max, multiplier_min, multiplier_step } =
+          dv.distribution_verification_values
+        const value =
+          multiplier_min === 1.0 && multiplier_max === 1.0 && multiplier_step === 0.0
+            ? null
+            : Math.min(
+                Number(multiplier_min) +
+                  (Number(dv.weight ?? 0) - 1) * Number(multiplier_step ?? 0),
+                Number(multiplier_max)
+              )
+
+        multipliers.push({
+          type: dv.type,
+          value,
+          multiplier_max: multiplier_max,
+          multiplier_min: multiplier_min,
+          multiplier_step: multiplier_step,
+          metadata: dv.metadata,
+        })
+      }
+
       const transformedData = {
         distribution_id: distributionId,
         user_id: verifications[0]?.user_id,
-        verification_values: verifications.map((v) => ({
-          type: v.type,
-          weight: BigInt(v.weight ?? 0),
-          fixed_value: BigInt(v.distribution_verification_values?.fixed_value ?? 0n),
-          bips_value: BigInt(v.distribution_verification_values?.bips_value ?? 0n),
-          metadata: v.metadata,
-          created_at: v.created_at,
-        })),
-        multipliers: verifications.map((v) => ({
-          type: v.type,
-          value: BigInt(v.distribution_verification_values?.multiplier_max ?? 0n),
-          multiplier_max: v.distribution_verification_values?.multiplier_max ?? 0,
-          multiplier_min: v.distribution_verification_values?.multiplier_min ?? 0,
-          multiplier_step: v.distribution_verification_values?.multiplier_step ?? 0,
-          metadata: v.metadata,
-        })),
+        verification_values,
+        multipliers,
       }
 
       return transformedData
