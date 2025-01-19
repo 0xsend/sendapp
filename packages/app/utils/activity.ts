@@ -1,21 +1,16 @@
-import { formatUnits, isAddressEqual, zeroAddress } from 'viem'
+import { baseMainnet, sendtagCheckoutAddress, tokenPaymasterAddress } from '@my/wagmi'
+import type { Activity } from 'app/utils/zod/activity'
+import { formatUnits, isAddressEqual } from 'viem'
 import formatAmount, { localizeAmount } from './formatAmount'
+import { shorten } from './strings'
 import {
-  isTagReceiptsEvent,
   isReferralsEvent,
   isSendAccountTransfersEvent,
+  isTagReceiptsEvent,
   isTagReceiptUSDCEvent,
 } from './zod/activity'
-import type { Activity } from 'app/utils/zod/activity'
 import { isSendAccountReceiveEvent } from './zod/activity/SendAccountReceiveEventSchema'
-import {
-  baseMainnet,
-  baseMainnetClient,
-  sendtagCheckoutAddress,
-  sendTokenAddress,
-  tokenPaymasterAddress,
-} from '@my/wagmi'
-import { shorten } from './strings'
+import { isSendTokenUpgradeEvent } from './zod/activity/SendAccountTransfersEventSchema'
 
 const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
   Object.values(addresses).map((a) => [a, label])
@@ -122,9 +117,7 @@ export function eventNameFromActivity(activity: Activity) {
   switch (true) {
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Referral Reward'
-    case isERC20Transfer &&
-      isAddressEqual(data.f, zeroAddress) &&
-      isAddressEqual(data.coin?.token, sendTokenAddress[baseMainnetClient.chain.id]):
+    case isSendTokenUpgradeEvent(activity):
       return 'Send Token Upgrade'
     case isERC20Transfer && to_user?.send_id === undefined:
       return 'Withdraw'
@@ -162,6 +155,8 @@ export function phraseFromActivity(activity: Activity) {
   switch (true) {
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Earned referral reward'
+    case isSendTokenUpgradeEvent(activity):
+      return 'Upgraded'
     case isERC20Transfer && to_user?.send_id === undefined:
       return 'Withdrew'
     case isTransferOrReceive && from_user === null:
@@ -205,6 +200,21 @@ export function subtextFromActivity(activity: Activity): string | null {
   }
   if (_user) {
     return userNameFromActivityUser(_user)
+  }
+  if (isSendTokenUpgradeEvent(activity)) {
+    // 1B supply -> 100B supply
+    // 0 decimals -> 18 decimals
+    // 1e16 == 10^18/100
+    // show previous amount = (current amount / 1e16)
+    const {
+      data: { v: currentAmount },
+    } = activity
+    const prevAmount = currentAmount / BigInt(1e16)
+    return `${formatAmount(String(prevAmount), 5, 0)} -> ${formatAmount(
+      formatUnits(currentAmount, data.coin.decimals),
+      5,
+      0
+    )}`
   }
   if (isERC20Transfer && from_user?.id) {
     return labelAddress(data.t)

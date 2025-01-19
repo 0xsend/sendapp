@@ -1,5 +1,4 @@
 import { Avatar, LinkableAvatar, XStack, type LinkableAvatarProps } from '@my/ui'
-import { baseMainnetClient, sendTokenAddress } from '@my/wagmi'
 import { IconUpgrade } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { allCoinsDict } from 'app/data/coins'
@@ -9,7 +8,7 @@ import {
   isSendAccountTransfersEvent,
   type Activity,
 } from 'app/utils/zod/activity'
-import { isAddressEqual, zeroAddress } from 'viem'
+import { isSendTokenUpgradeEvent } from 'app/utils/zod/activity/SendAccountTransfersEventSchema'
 
 export function ActivityAvatar({
   activity,
@@ -60,12 +59,7 @@ export function ActivityAvatar({
     )
   }
 
-  // is send token upgrade
-  if (
-    isSendAccountTransfersEvent(activity) &&
-    isAddressEqual(data?.coin?.token, sendTokenAddress[baseMainnetClient.chain.id]) &&
-    isAddressEqual(data?.f, zeroAddress)
-  ) {
+  if (isSendTokenUpgradeEvent(activity)) {
     return <IconUpgrade size="$4.5" br="$4" gap="$2" />
   }
 

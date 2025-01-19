@@ -3,9 +3,10 @@ import { decimalStrToBigInt } from '../bigint'
 import { byteaToHexEthAddress } from '../bytea'
 import { BaseEventSchema } from './BaseEventSchema'
 import { CoinSchema, allCoins } from 'app/data/coins'
-import { isAddressEqual } from 'viem'
+import { isAddressEqual, zeroAddress } from 'viem'
 import { Events } from './events'
 import { OnchainEventDataSchema } from './OnchainDataSchema'
+import { sendTokenAddress, baseMainnet, sendtagCheckoutAddress } from '@my/wagmi'
 
 /**
  * ERC-20 token transfer event data
@@ -42,3 +43,24 @@ export type SendAccountTransfersEvent = z.infer<typeof SendAccountTransfersEvent
 export const isSendAccountTransfersEvent = (event: {
   event_name: string
 }): event is SendAccountTransfersEvent => event.event_name === Events.SendAccountTransfers
+
+export const isSendTokenUpgradeEvent = (event: {
+  data?: unknown
+  event_name: string
+}): event is SendAccountTransfersEvent => {
+  return (
+    isSendAccountTransfersEvent(event) &&
+    isAddressEqual(event.data.f, zeroAddress) &&
+    isAddressEqual(event.data.coin?.token as `0x${string}`, sendTokenAddress[baseMainnet.id])
+  )
+}
+
+export const isSendtagCheckoutEvent = (event: {
+  data?: unknown
+  event_name: string
+}): event is SendAccountTransfersEvent => {
+  return (
+    isSendAccountTransfersEvent(event) &&
+    isAddressEqual(event.data.f, sendtagCheckoutAddress[baseMainnet.id])
+  )
+}
