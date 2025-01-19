@@ -35,9 +35,10 @@ forge script ./script/DeploySendMerkleDrop.s.sol:DeploySendMerkleDropScript \
 
 ```shell
 forge verify-contract \
-  --constructor-args 000000000000000000000000eab49138ba2ea6dd776220fe26b7b8e446638956000000000000000000000000d3dcff1823714a4399ad2927a3800686d4ceb53a 0x2c1630Cd8f40D0458b7B5849E6Cc2904A7d18A57 \
+  --constructor-args 000000000000000000000000b5ac39587df1b5ce6252b3ea0510eb460cbf4adb000000000000000000000000647eb43401e13e995d89cf26cd87e68890ee3f89 \
+  0xB6194DBB185b2551FE2F66DeD6b648b9F758CA30 \
   --verifier etherscan \
-  --chain base \
+  --chain base-sepolia \
   ./src/SendMerkleDrop.sol:SendMerkleDrop
 ```
 
