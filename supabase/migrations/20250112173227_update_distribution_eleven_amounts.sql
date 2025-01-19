@@ -33,3 +33,30 @@ SET amount             = amount * 1e16
   , bonus_pool_amount  = bonus_pool_amount * 1e16
   , fixed_pool_amount  = fixed_pool_amount * 1e16
 WHERE distribution_id = (SELECT id FROM distributions WHERE number = 11);
+
+-- this was a miss from a previous migration. add the verification back
+INSERT INTO public.distribution_verification_values (
+    type,
+    fixed_value,
+    bips_value,
+    distribution_id,
+    multiplier_min,
+    multiplier_max,
+    multiplier_step
+)
+select type,
+       fixed_value,
+       bips_value,
+       (select id from public.distributions where number = 11),
+       multiplier_min,
+       multiplier_max,
+       multiplier_step
+from public.distribution_verification_values
+where distribution_id = 10 and type = 'create_passkey' and false = (
+    select exists(
+        select *
+        from public.distribution_verification_values
+        where distribution_id = 11
+          and type = 'create_passkey'
+    )
+);
