@@ -1,4 +1,4 @@
-import { formatUnits, isAddressEqual } from 'viem'
+import { formatUnits, isAddressEqual, zeroAddress } from 'viem'
 import formatAmount, { localizeAmount } from './formatAmount'
 import {
   isTagReceiptsEvent,
@@ -116,6 +116,8 @@ export function eventNameFromActivity(activity: Activity) {
   switch (true) {
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Referral Reward'
+    case isERC20Transfer && isAddressEqual(data.f, zeroAddress):
+      return 'Send Token Upgrade'
     case isERC20Transfer && to_user?.send_id === undefined:
       return 'Withdraw'
     case isTransferOrReceive && from_user === null:

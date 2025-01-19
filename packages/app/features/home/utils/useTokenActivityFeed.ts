@@ -1,12 +1,13 @@
 import type { PgBytea } from '@my/supabase/database.types'
-import { tokenPaymasterAddress } from '@my/wagmi'
+import { sendTokenV0LockboxAddress, tokenPaymasterAddress } from '@my/wagmi'
 import type { PostgrestError } from '@supabase/postgrest-js'
 import {
   useInfiniteQuery,
   type InfiniteData,
   type UseInfiniteQueryResult,
 } from '@tanstack/react-query'
-import { hexToBytea } from 'app/utils/hexToBytea'
+import { pgAddrCondValues } from 'app/utils/pgAddrCondValues'
+import { squish } from 'app/utils/strings'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import { EventArraySchema, Events, type Activity } from 'app/utils/zod/activity'
@@ -39,15 +40,25 @@ export function useTokenActivityFeed(params: {
       query = query.eq('event_name', Events.SendAccountReceive)
     }
 
-    const pgPaymasterCondValues = Object.values(tokenPaymasterAddress)
-      .map((a) => `${hexToBytea(a)}`)
-      .join(',')
+    const paymasterAddresses = Object.values(tokenPaymasterAddress)
+    const sendTokenV0LockboxAddresses = Object.values(sendTokenV0LockboxAddress)
+    // ignore certain addresses in the activity feed
+    const fromTransferIgnoreValues = pgAddrCondValues(paymasterAddresses) // show fees on send screen instead
+    const toTransferIgnoreValues = pgAddrCondValues([
+      ...paymasterAddresses, // show fees on send screen instead
+      ...sendTokenV0LockboxAddresses, // will instead show the "mint"
+    ])
 
     const { data, error } = await query
       .or('from_user.not.is.null, to_user.not.is.null') // only show activities with a send app user
       .or(
-        // Filter out paymaster fees for gas
-        `data->t.is.null, data->f.is.null, and(data->>t.not.in.(${pgPaymasterCondValues}), data->>f.not.in.(${pgPaymasterCondValues}))`
+        squish(`
+          data->t.is.null,
+          data->f.is.null,
+          and(
+            data->>t.not.in.(${toTransferIgnoreValues}),
+            data->>f.not.in.(${fromTransferIgnoreValues})
+          )`)
       )
       .order('created_at', { ascending: false })
       .range(from, to)

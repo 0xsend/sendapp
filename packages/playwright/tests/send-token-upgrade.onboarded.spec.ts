@@ -58,4 +58,13 @@ test('can upgrade their Send Token V0 to Send Token V1', async ({ page, sendAcco
     token: sendCoin.token,
   })
   expect(sendTokenV1Balance).toEqual(parseUnits((balance / 100n).toString(), sendCoin.decimals))
+
+  // should see send token upgrade activity
+  await page.goto('/activity')
+  await expect(async () => {
+    const sendTokenUpgradeActivity = page.getByText('Send Token Upgrade')
+    await expect(sendTokenUpgradeActivity).toBeVisible()
+  }).toPass({
+    timeout: 10_000,
+  })
 })
