@@ -45,7 +45,7 @@ export const sendCoin: coin = {
 // can probably remove this
 export const sendV0Coin: coin = {
   label: 'Send (v0)',
-  symbol: 'SEND',
+  symbol: 'SEND (v0)',
   token: sendTokenV0Address[baseMainnet.id],
   decimals: 0,
   coingeckoTokenId: 'send-token',
