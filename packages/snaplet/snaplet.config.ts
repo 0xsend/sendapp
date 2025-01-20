@@ -74,6 +74,7 @@ export default defineConfig({
         table: 'public.activity',
         orderBy: `"activity"."created_at" desc`,
         where: `"activity"."created_at" > current_date - interval '3 day'`,
+        percent: 2,
       },
       {
         table: 'public.send_account_transfers',
