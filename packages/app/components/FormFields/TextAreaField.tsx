@@ -1,6 +1,6 @@
 import { useThemeSetting } from '@tamagui/next-theme'
 import { useStringFieldInfo, useTsController } from '@ts-react/form'
-import { useId } from 'react'
+import { forwardRef, type ReactNode, useId } from 'react'
 import {
   Fieldset,
   Label,
@@ -12,25 +12,27 @@ import {
   FieldError,
   Shake,
   type LabelProps,
+  Stack,
+  useComposedRefs,
+  type TamaguiElement,
 } from '@my/ui'
 
-export const TextAreaField = (
-  props: Pick<
-    TextAreaProps,
-    'size' | 'autoFocus' | 'aria-label' | 'placeholder' | 'fontStyle' | 'backgroundColor' | 'rows'
-  > & { labelProps?: LabelProps }
-) => {
+export const TextAreaField = forwardRef<
+  TamaguiElement,
+  TextAreaProps & { labelProps?: LabelProps; iconBefore?: ReactNode; iconAfter?: ReactNode }
+>((props, forwardedRef) => {
   const {
     field,
     error,
     formState: { isSubmitting },
   } = useTsController<string>()
-  const { label, isOptional, placeholder } = useStringFieldInfo()
+  const { label, placeholder } = useStringFieldInfo()
   const id = useId()
   const disabled = isSubmitting
   const defaultTheme = useThemeName() as string
   const { resolvedTheme } = useThemeSetting()
   const themeName = (resolvedTheme ?? defaultTheme) as ThemeName
+  const composedRefs = useComposedRefs(forwardedRef, field.ref)
 
   return (
     <Theme name={error ? 'red' : themeName} forceClassName>
@@ -45,10 +47,22 @@ export const TextAreaField = (
             color={props.labelProps?.color ?? '$olive'}
             {...props.labelProps}
           >
-            {label} {isOptional && '(Optional)'}
+            {label}
           </Label>
         )}
         <Shake shakeKey={error?.errorMessage}>
+          {props.iconBefore && (
+            <Stack
+              pos={'absolute'}
+              top="50%"
+              p={'$3'}
+              left={2}
+              transform={'translateY(-50%)'}
+              zIndex={1}
+            >
+              {props.iconBefore}
+            </Stack>
+          )}
           <TextArea
             disabled={disabled}
             borderWidth={0}
@@ -68,7 +82,7 @@ export const TextAreaField = (
             value={field.value}
             onChangeText={(text) => field.onChange(text)}
             onBlur={field.onBlur}
-            ref={field.ref}
+            ref={composedRefs}
             placeholder={placeholder}
             id={id}
             focusStyle={{
@@ -77,9 +91,23 @@ export const TextAreaField = (
             }}
             {...props}
           />
+          {props.iconAfter && (
+            <Stack
+              pos={'absolute'}
+              top="50%"
+              p={'$5'}
+              right={2}
+              transform={'translateY(-50%)'}
+              zIndex={1}
+            >
+              {props.iconAfter}
+            </Stack>
+          )}
         </Shake>
         <FieldError message={error?.errorMessage} />
       </Fieldset>
     </Theme>
   )
-}
+})
+
+TextAreaField.displayName = 'TextAreaField'
