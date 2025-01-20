@@ -204,8 +204,6 @@ BEGIN
     -- Create index for performance
     CREATE INDEX ON first_sends(user_id);
 
-    raise notice 'Calculating sum_qualification_sends for number %', distribution_number;
-
     -- Create send_ceiling_settings table
     CREATE TEMPORARY TABLE send_ceiling_settings AS
     WITH previous_distribution AS(
