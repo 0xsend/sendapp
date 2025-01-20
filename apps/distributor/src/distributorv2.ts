@@ -54,6 +54,11 @@ function sendV1Converstion(v0Amount: bigint) {
 }
 
 /**
+ * The distribution number of the pre-sendv0 migration distribution
+ */
+const PRE_SENDV0_MIGRATION_DISTRIBUTION = 11
+
+/**
  * Changes from V1:
  * Fixed Pool Calculation: In V2, fixed pool amounts are calculated first from the total distribution amount, whereas V1 calculated hodler, bonus, and fixed pools separately.
  * Removal of Bips: V2 no longer uses holder and bonus bips (basis points) for calculations, simplifying the distribution logic.
@@ -312,7 +317,7 @@ export class DistributorV2Worker {
       (acc, share) => {
         // NOTE: this is for handling the migration from send token v0 to send token v1
         // scale to new token decimals if needed after migration
-        if (distribution.number === 11) {
+        if (distribution.number === PRE_SENDV0_MIGRATION_DISTRIBUTION) {
           acc[share.user_id] = sendV1Converstion(BigInt(share.amount))
           scaledBalances++
           return acc
@@ -343,7 +348,7 @@ export class DistributorV2Worker {
           ceiling: BigInt(v.metadata?.value || 0),
         }
 
-        if (distribution.number === 11) {
+        if (distribution.number === PRE_SENDV0_MIGRATION_DISTRIBUTION) {
           ceiling.weight = sendV1Converstion(ceiling.weight)
           ceiling.ceiling = sendV1Converstion(ceiling.ceiling)
         }
