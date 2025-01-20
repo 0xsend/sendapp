@@ -56,6 +56,13 @@ export default defineConfig({
       activity: false,
       send_account_transfers: false,
       send_token_transfers: false,
+      send_token_v0_transfers: false,
+      send_account_created: false,
+      send_account_credentials: false,
+      send_account_receives: false,
+      send_account_signing_key_added: false,
+      send_account_signing_key_removed: false,
+      webauthn_credentials: false,
       receipts: false,
       tag_receipts: false,
     },
@@ -66,7 +73,7 @@ export default defineConfig({
   //     {
   //       table: 'public.activity',
   //       orderBy: `"activity"."created_at" desc`,
-  //       where: `"activity"."created_at" > current_date - interval '31 day'`,
+  //       where: `"activity"."created_at" > current_date - interval '45 day'`,
   //     },
   //     {
   //       table: 'public.send_account_transfers',
