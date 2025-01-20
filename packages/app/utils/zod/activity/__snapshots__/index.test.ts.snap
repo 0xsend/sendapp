@@ -296,6 +296,7 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
       "coin": {
         "coingeckoTokenId": "send-token",
         "decimals": 18,
+        "formatDecimals": 0,
         "label": "Send",
         "symbol": "SEND",
         "token": "0xEab49138BA2Ea6dd776220fE26b7b8E446638956",

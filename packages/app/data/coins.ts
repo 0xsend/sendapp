@@ -12,11 +12,12 @@ export const CoinSchema = z.object({
   symbol: z.string(),
   token: z.custom<`0x${string}` | 'eth'>(),
   decimals: z.number().min(0).max(18),
+  formatDecimals: z.number().min(0).optional(),
   coingeckoTokenId: z.string(),
 })
 export type coin = z.infer<typeof CoinSchema>
 
-export const usdcCoin = {
+export const usdcCoin: coin = {
   label: 'USDC',
   symbol: 'USDC',
   token: usdcAddresses[baseMainnet.id],
@@ -24,7 +25,7 @@ export const usdcCoin = {
   coingeckoTokenId: 'usd-coin',
 } as const
 
-export const ethCoin = {
+export const ethCoin: coin = {
   label: 'Ethereum',
   symbol: 'ETH',
   token: 'eth',
@@ -32,24 +33,25 @@ export const ethCoin = {
   coingeckoTokenId: 'ethereum',
 } as const
 
-export const sendCoin = {
+export const sendCoin: coin = {
   label: 'Send',
   symbol: 'SEND',
   token: sendAddresses[baseMainnet.id],
   decimals: 18,
+  formatDecimals: 0,
   coingeckoTokenId: 'send-token',
 } as const
 
 // can probably remove this
-export const sendV0Coin = {
+export const sendV0Coin: coin = {
   label: 'Send (v0)',
-  symbol: 'SEND',
+  symbol: 'SEND (v0)',
   token: sendTokenV0Address[baseMainnet.id],
   decimals: 0,
   coingeckoTokenId: 'send-token',
 } as const
 
-export const spx6900Coin = {
+export const spx6900Coin: coin = {
   label: 'SPX',
   symbol: 'SPX',
   token: spx6900Addresses[baseMainnet.id],
@@ -111,3 +113,8 @@ export type allCoinsDict = typeof allCoinsDict
 export type CoinWithBalance = allCoins[number] & {
   balance: bigint | undefined
 }
+
+/**
+ * Known coins are a list of coins that Send app knows about but not necessarily supports.
+ */
+export const knownCoins = [...allCoins, sendV0Coin] as const
