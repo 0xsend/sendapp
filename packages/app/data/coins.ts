@@ -111,3 +111,8 @@ export type allCoinsDict = typeof allCoinsDict
 export type CoinWithBalance = allCoins[number] & {
   balance: bigint | undefined
 }
+
+/**
+ * Known coins are a list of coins that Send app knows about but not necessarily supports.
+ */
+export const knownCoins = [...allCoins, sendV0Coin] as const
