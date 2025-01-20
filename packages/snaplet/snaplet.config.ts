@@ -53,13 +53,13 @@ export default defineConfig({
     pgtap: false,
     public: {
       challenges: false,
-      activity: false,
-      send_account_transfers: false,
-      send_token_transfers: false,
-      send_token_v0_transfers: false,
+      activity: true,
+      send_account_transfers: true,
+      send_token_transfers: true,
+      send_token_v0_transfers: true,
       send_account_created: false,
       send_account_credentials: false,
-      send_account_receives: false,
+      send_account_receives: true,
       send_account_signing_key_added: false,
       send_account_signing_key_removed: false,
       webauthn_credentials: false,
@@ -67,23 +67,44 @@ export default defineConfig({
       tag_receipts: false,
     },
   },
-  // TODO: figure out how much data we need to snapshot
-  // subset: {
-  //   targets: [
-  //     {
-  //       table: 'public.activity',
-  //       orderBy: `"activity"."created_at" desc`,
-  //       where: `"activity"."created_at" > current_date - interval '45 day'`,
-  //     },
-  //     {
-  //       table: 'public.send_account_transfers',
-  //       orderBy: `"send_account_transfers"."block_num" desc`,
-  //       // 30 days of transfers
-  //       // avg 2 sec block time means 86400 / 2 = 43200 blocks per day
-  //       where: `"send_account_transfers"."block_time" > (43200 * 31)`,
-  //     },
-  //   ],
-  // },
+  subset: {
+    keepDisconnectedTables: true,
+    targets: [
+      {
+        table: 'public.activity',
+        orderBy: `"activity"."created_at" desc`,
+        where: `"activity"."created_at" > current_date - interval '3 day'`,
+      },
+      {
+        table: 'public.send_account_transfers',
+        orderBy: `"send_account_transfers"."block_num" desc`,
+        // 30 days of transfers
+        // avg 2 sec block time means 86400 / 2 = 43200 blocks per day
+        where: `"send_account_transfers"."block_time" > (43200 * 31)`,
+      },
+      {
+        table: 'public.send_token_transfers',
+        orderBy: `"send_token_transfers"."block_num" desc`,
+        // 30 days of transfers
+        // avg 2 sec block time means 86400 / 2 = 43200 blocks per day
+        where: `"send_token_transfers"."block_time" > (43200 * 31)`,
+      },
+      {
+        table: 'public.send_token_v0_transfers',
+        orderBy: `"send_token_v0_transfers"."block_num" desc`,
+        // 30 days of transfers
+        // avg 2 sec block time means 86400 / 2 = 43200 blocks per day
+        where: `"send_token_v0_transfers"."block_time" > (43200 * 31)`,
+      },
+      {
+        table: 'public.send_account_receives',
+        orderBy: `"send_account_receives"."block_num" desc`,
+        // 30 days of transfers
+        // avg 2 sec block time means 86400 / 2 = 43200 blocks per day
+        where: `"send_account_receives"."block_time" > (43200 * 31)`,
+      },
+    ],
+  },
   transform: {
     $mode: 'auto',
     auth: {
@@ -122,6 +143,9 @@ export default defineConfig({
     },
 
     public: {
+      activity: ({ row }) => {
+        return row
+      },
       profiles: ({ row }) => {
         return {
           ...row,
