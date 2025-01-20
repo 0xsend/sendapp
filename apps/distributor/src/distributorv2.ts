@@ -42,6 +42,18 @@ const getCurrentHourInMonth = (date: Date) => {
 }
 
 /**
+ * 100B supply -> 1B supply
+ * 0 decimals -> 18 decimals
+ * 1e18 / 100 = 1e16
+ * v0Amount * 1e16
+ * @param v0Amount
+ * @returns converted v1Amount
+ */
+function sendV1Converstion(v0Amount: bigint) {
+  return v0Amount * BigInt(1e16)
+}
+
+/**
  * Changes from V1:
  * Fixed Pool Calculation: In V2, fixed pool amounts are calculated first from the total distribution amount, whereas V1 calculated hodler, bonus, and fixed pools separately.
  * Removal of Bips: V2 no longer uses holder and bonus bips (basis points) for calculations, simplifying the distribution logic.
@@ -301,10 +313,7 @@ export class DistributorV2Worker {
         // NOTE: this is for handling the migration from send token v0 to send token v1
         // scale to new token decimals if needed after migration
         if (distribution.number === 11) {
-          // 100B supply -> 1B supply
-          // 0 decimals -> 18 decimals
-          // 1e18 / 100 = 1e16
-          acc[share.user_id] = BigInt(share.amount) * BigInt(1e16)
+          acc[share.user_id] = sendV1Converstion(BigInt(share.amount))
           scaledBalances++
           return acc
         }
@@ -327,12 +336,19 @@ export class DistributorV2Worker {
         const previousReward =
           previousSharesByUserId[v.user_id] || BigInt(distribution.hodler_min_balance)
         const maxWeight = previousReward / BigInt(sendSlash.scaling_divisor)
-        acc[v.user_id] = {
+        const ceiling = {
           // Cap the weight to maxWeight
           weight: BigInt(v.weight || 0) > maxWeight ? maxWeight : BigInt(v.weight || 0),
           // @ts-expect-error @todo metadata is untyped but value is the convention
           ceiling: BigInt(v.metadata?.value || 0),
         }
+
+        if (distribution.number === 11) {
+          ceiling.weight = sendV1Converstion(ceiling.weight)
+          ceiling.ceiling = sendV1Converstion(ceiling.ceiling)
+        }
+
+        acc[v.user_id] = ceiling
         return acc
       },
       {} as Record<string, { weight: bigint; ceiling: bigint }>
