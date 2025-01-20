@@ -52,7 +52,7 @@ const log = debug('app:features:send:confirm:screen')
 
 export function SendConfirmScreen() {
   const [queryParams] = useSendScreenParams()
-  const { recipient, idType, sendToken, amount } = queryParams
+  const { recipient, idType, sendToken, amount, note } = queryParams
   const { data: profile, isLoading, error } = useProfileLookup(idType ?? 'tag', recipient ?? '')
 
   const router = useRouter()
@@ -66,9 +66,10 @@ export function SendConfirmScreen() {
           recipient: recipient,
           sendToken: sendToken,
           amount: amount,
+          note,
         },
       })
-  }, [recipient, idType, router, sendToken, amount])
+  }, [recipient, idType, router, sendToken, amount, note])
 
   if (error) throw new Error(error.message)
   if (isLoading && !profile) return <Spinner size="large" />
@@ -77,7 +78,7 @@ export function SendConfirmScreen() {
 
 export function SendConfirm() {
   const [queryParams] = useSendScreenParams()
-  const { sendToken, recipient, idType, amount } = queryParams
+  const { sendToken, recipient, idType, amount, note } = queryParams
 
   const queryClient = useQueryClient()
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
@@ -157,7 +158,7 @@ export function SendConfirm() {
     formatUnits(BigInt(amount ?? ''), selectedCoin?.decimals ?? allCoinsDict[sendToken].decimals)
   )
 
-  const onEditAmount = () => {
+  const onEdit = () => {
     router.push({
       pathname: '/send',
       query: {
@@ -165,6 +166,7 @@ export function SendConfirm() {
         recipient,
         amount: amount ?? '',
         sendToken,
+        note,
       },
     })
   }
@@ -343,7 +345,7 @@ export function SendConfirm() {
               />
             </XStack>
             <Paragraph
-              onPress={onEditAmount}
+              onPress={onEdit}
               cursor="pointer"
               hoverStyle={{ color: '$primary' }}
               size={'$5'}
@@ -379,6 +381,38 @@ export function SendConfirm() {
               )}
             </XStack>
           </YStack>
+        </YStack>
+        <YStack
+          bg={'$color1'}
+          br={'$6'}
+          p={'$6'}
+          gap={'$4.5'}
+          $gtSm={{
+            gap: '$5',
+          }}
+        >
+          <XStack gap={'$2'} ai={'center'} jc={'space-between'}>
+            <Paragraph
+              color={'$silverChalice'}
+              size={'$6'}
+              $theme-light={{
+                color: '$darkGrayTextField',
+              }}
+            >
+              Your note
+            </Paragraph>
+            <Paragraph
+              onPress={onEdit}
+              cursor="pointer"
+              hoverStyle={{ color: '$primary' }}
+              size={'$5'}
+              pl={'$2'}
+              textAlign={'right'}
+            >
+              edit
+            </Paragraph>
+          </XStack>
+          <Paragraph size={'$5'}>{note || '-'}</Paragraph>
         </YStack>
         {error && (
           <ErrorMessage
@@ -431,41 +465,6 @@ export function SendConfirm() {
           }
         })()}
       </Button>
-      {/*  TODO add this back when backend is ready
-         <YStack gap="$5" f={1}>
-           <Label
-             fontWeight="500"
-             fontSize={'$5'}
-             textTransform="uppercase"
-             $theme-dark={{ col: '$gray8Light' }}
-           >
-             ADD A NOTE
-           </Label>
-           <Input
-             placeholder="(Optional)"
-             placeholderTextColor="$color12"
-             value={note}
-             onChangeText={(text) => setParams({ note: text }, { webBehavior: 'replace' })}
-             fontSize={20}
-             fontWeight="400"
-             lineHeight={1}
-             color="$color12"
-             borderColor="transparent"
-             outlineColor="transparent"
-             $theme-light={{ bc: '$gray3Light' }}
-             br={'$3'}
-             bc="$metalTouch"
-             hoverStyle={{
-               borderColor: 'transparent',
-               outlineColor: 'transparent',
-             }}
-             focusStyle={{
-               borderColor: 'transparent',
-               outlineColor: 'transparent',
-             }}
-             fontFamily="$mono"
-           />
-         </YStack> */}
     </YStack>
   )
 }
