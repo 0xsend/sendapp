@@ -21,7 +21,7 @@ type BalanceOfResult =
   | undefined
 
 export const useSendAccountBalances = () => {
-  const pricesQuery = useTokenPrices()
+  const pricesQuery = useTokenPrices('dexscreener')
   const { data: sendAccount } = useSendAccount()
 
   const tokenContracts = useMemo(
@@ -91,7 +91,7 @@ export const useSendAccountBalances = () => {
 
     return allCoins.reduce((total, coin) => {
       const balance = coin.token === 'eth' ? ethBalance?.value : balances[coin.token]
-      const price = tokenPrices[coin.coingeckoTokenId].usd
+      const price = tokenPrices[coin.token]
       return total + (convertBalanceToFiat({ ...coin, balance: balance ?? 0n }, price) ?? 0)
     }, 0)
   }, [pricesQuery, balances, ethQuery])

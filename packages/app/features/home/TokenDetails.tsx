@@ -94,8 +94,9 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
 
 export const TokenDetailsMarketData = ({ coin }: { coin: CoinWithBalance }) => {
   const { data: tokenMarketData, status } = useTokenMarketData(coin.coingeckoTokenId)
+  const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices('dexscreener')
 
-  const price = tokenMarketData?.at(0)?.current_price
+  const price = tokenPrices?.[coin.token]
 
   const changePercent24h = tokenMarketData?.at(0)?.price_change_percentage_24h
 
@@ -139,24 +140,28 @@ export const TokenDetailsMarketData = ({ coin }: { coin: CoinWithBalance }) => {
         $theme-dark={{ color: '$gray8Light' }}
         color={'$color12'}
       >
-        {`1 ${coin.symbol} = ${formatPrice(price)} USD`}
+        {isLoadingTokenPrices || price === undefined
+          ? ''
+          : `1 ${coin.symbol} = ${formatPrice(price)} USD`}
       </Paragraph>
-      <XStack gap={'$1.5'} ai="center" jc={'space-around'}>
-        {formatPriceChange(changePercent24h)}
-      </XStack>
+      {coin.symbol !== 'SEND' && (
+        <XStack gap={'$1.5'} ai="center" jc={'space-around'}>
+          {formatPriceChange(changePercent24h)}
+        </XStack>
+      )}
     </XStack>
   )
 }
 
 const TokenDetailsBalance = ({ coin }: { coin: CoinWithBalance }) => {
-  const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
-  const { balance, decimals, coingeckoTokenId, formatDecimals = 5 } = coin
+  const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices('dexscreener')
+  const { balance, decimals, formatDecimals = 5 } = coin
 
   if (coin.balance === undefined) {
     return <></>
   }
 
-  const balanceInUSD = convertBalanceToFiat(coin, tokenPrices?.[coingeckoTokenId].usd)
+  const balanceInUSD = convertBalanceToFiat(coin, tokenPrices?.[coin.token])
 
   const balanceWithDecimals = Number(balance) / 10 ** (decimals ?? 0)
   const balanceWithDecimalsLength = balanceWithDecimals.toString().replace('.', '').length
@@ -175,7 +180,9 @@ const TokenDetailsBalance = ({ coin }: { coin: CoinWithBalance }) => {
       </Paragraph>
 
       <Paragraph color={'$color10'} fontSize={'$3'} fontFamily={'$mono'}>
-        {isLoadingTokenPrices || balanceInUSD ? `($${formatAmount(balanceInUSD, 4, 2)})` : ''}
+        {isLoadingTokenPrices || balanceInUSD === undefined
+          ? ''
+          : `($${formatAmount(balanceInUSD, 4, 2)})`}
       </Paragraph>
     </XStack>
   )
