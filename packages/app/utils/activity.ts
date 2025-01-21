@@ -1,4 +1,9 @@
-import { baseMainnet, sendtagCheckoutAddress, tokenPaymasterAddress } from '@my/wagmi'
+import {
+  baseMainnet,
+  sendtagCheckoutAddress,
+  sendTokenV0Address,
+  tokenPaymasterAddress,
+} from '@my/wagmi'
 import type { Activity } from 'app/utils/zod/activity'
 import { formatUnits, isAddressEqual } from 'viem'
 import formatAmount, { localizeAmount } from './formatAmount'
@@ -11,6 +16,7 @@ import {
 } from './zod/activity'
 import { isSendAccountReceiveEvent } from './zod/activity/SendAccountReceiveEventSchema'
 import { isSendTokenUpgradeEvent } from './zod/activity/SendAccountTransfersEventSchema'
+import { sendCoin } from 'app/data/coins'
 
 const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
   Object.values(addresses).map((a) => [a, label])
@@ -65,6 +71,17 @@ export function amountFromActivity(activity: Activity): string {
     case isSendAccountTransfersEvent(activity): {
       const { v, coin } = activity.data
       if (coin) {
+        // scale the send v0 amount to send v1 amount
+        if (
+          isAddressEqual(
+            activity.data.coin?.token as `0x${string}`,
+            sendTokenV0Address[baseMainnet.id]
+          )
+        ) {
+          const amount = localizeAmount(formatUnits(v * BigInt(1e16), sendCoin.decimals))
+          return `${amount} ${coin.symbol}`
+        }
+
         const amount = localizeAmount(formatUnits(v, coin.decimals))
         return `${amount} ${coin.symbol}`
       }

@@ -61,11 +61,13 @@ const TokenBalanceItem = ({
   )
 }
 
-const TokenBalance = ({ coin: { decimals, balance } }: { coin: CoinWithBalance }) => {
+const TokenBalance = ({
+  coin: { decimals, balance, formatDecimals },
+}: { coin: CoinWithBalance }) => {
   if (balance === undefined) return <></>
   return (
     <Paragraph fontSize={'$9'} fontWeight={'600'} col="$color12">
-      {formatAmount((Number(balance) / 10 ** decimals).toString(), 10, 5)}
+      {formatAmount((Number(balance) / 10 ** decimals).toString(), 10, formatDecimals ?? 5)}
     </Paragraph>
   )
 }

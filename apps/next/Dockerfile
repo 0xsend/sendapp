@@ -42,7 +42,7 @@ RUN --mount=type=cache,target=/root/.yarn/berry \
   --mount=type=cache,target=/tmp/yarn-cache \
   SKIP_YARN_POST_INSTALL=1 \
   NODE_ENV=development \
-  yarn install --immutable
+  yarn install --immutable --inline-builds
 
 FROM base AS builder
 WORKDIR /sendapp
