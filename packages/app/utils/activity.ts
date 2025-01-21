@@ -16,6 +16,7 @@ import {
 } from './zod/activity'
 import { isSendAccountReceiveEvent } from './zod/activity/SendAccountReceiveEventSchema'
 import { isSendTokenUpgradeEvent } from './zod/activity/SendAccountTransfersEventSchema'
+import { sendCoin } from 'app/data/coins'
 
 const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
   Object.values(addresses).map((a) => [a, label])
@@ -77,7 +78,7 @@ export function amountFromActivity(activity: Activity): string {
             sendTokenV0Address[baseMainnet.id]
           )
         ) {
-          const amount = localizeAmount(formatUnits(v * BigInt(1e16), coin.decimals))
+          const amount = localizeAmount(formatUnits(v * BigInt(1e16), sendCoin.decimals))
           return `${amount} ${coin.symbol}`
         }
 
