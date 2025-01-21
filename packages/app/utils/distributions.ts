@@ -199,15 +199,43 @@ export const useDistributionVerifications = (distributionId?: number) => {
       // previously this was grouped and transformed to match the distribution_verifications_summary view
       // but now we are just returning the data as from postgrest
       // transform the data to match the view's shape to avoid breaking the views
-
-      const verification_values = verifications.map((v) => ({
-        type: v.type,
-        weight: BigInt(v.weight ?? 0),
-        fixed_value: BigInt(v.distribution_verification_values?.fixed_value ?? 0n),
-        bips_value: BigInt(v.distribution_verification_values?.bips_value ?? 0n),
-        metadata: v.metadata,
-        created_at: v.created_at,
-      }))
+      const verification_values: {
+        type: Database['public']['Enums']['verification_type']
+        weight: bigint
+        fixed_value: bigint
+        bips_value: bigint
+        metadata?: Json
+        created_at: string
+      }[] = Object.values(
+        verifications.reduce(
+          (acc, v) => {
+            const value = acc[v.type] ?? {
+              type: v.type,
+              weight: 0n,
+              fixed_value: BigInt(v.distribution_verification_values?.fixed_value ?? 0n),
+              bips_value: BigInt(v.distribution_verification_values?.bips_value ?? 0n),
+              metadata: v.metadata,
+              created_at: v.created_at,
+            }
+            acc[v.type] = {
+              ...value,
+              weight: value.weight + BigInt(v.weight ?? 0),
+            }
+            return acc
+          },
+          {} as Record<
+            Database['public']['Enums']['verification_type'],
+            {
+              type: Database['public']['Enums']['verification_type']
+              weight: bigint
+              fixed_value: bigint
+              bips_value: bigint
+              metadata?: Json
+              created_at: string
+            }
+          >
+        )
+      )
 
       const multipliers: {
         type: Database['public']['Enums']['verification_type']
