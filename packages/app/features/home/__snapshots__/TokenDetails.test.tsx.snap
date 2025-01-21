@@ -237,9 +237,7 @@ exports[`TokenDetails 1`] = `
                 }
               }
               suppressHighlighting={true}
-            >
-              ($&gt;0.0)
-            </Text>
+            />
           </View>
         </View>
       </View>
