@@ -73,8 +73,12 @@ describe('ActivityScreen', () => {
     })
   })
 
+  afterAll(() => jest.useRealTimers())
+
   it('renders activity screen', async () => {
     jest.useFakeTimers()
+    jest.setSystemTime(new Date('2025-01-19T12:00:00Z'))
+
     render(
       <TamaguiProvider defaultTheme={'dark'} config={config}>
         <ActivityScreen />
