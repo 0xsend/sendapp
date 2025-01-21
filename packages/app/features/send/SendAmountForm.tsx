@@ -37,7 +37,7 @@ export function SendAmountForm() {
     const subscription = form.watch(({ amount, token: _token }) => {
       const token = _token as allCoins[number]['token']
       // use allCoinsDict because form updates before query params. This feels hacky
-      const sanitizedAmount = sanitizeAmount(amount, allCoinsDict[token].decimals)
+      const sanitizedAmount = sanitizeAmount(amount, allCoinsDict[token]?.decimals)
       setSendParams(
         {
           ...sendParams,

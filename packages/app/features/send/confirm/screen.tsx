@@ -154,7 +154,10 @@ export function SendConfirm() {
   const canSubmit = BigInt(queryParams.amount ?? '0') > 0 && hasEnoughGas && hasEnoughBalance
 
   const localizedAmount = localizeAmount(
-    formatUnits(BigInt(amount ?? ''), selectedCoin?.decimals ?? allCoinsDict[sendToken].decimals)
+    formatUnits(
+      BigInt(amount ?? ''),
+      selectedCoin?.decimals ?? allCoinsDict[sendToken]?.decimals ?? 0
+    )
   )
 
   const onEditAmount = () => {
