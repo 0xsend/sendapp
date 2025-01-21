@@ -5,6 +5,7 @@ import { useTokenPrices } from './useTokenPrices'
 import { convertBalanceToFiat } from './convertBalanceToUSD'
 import { allCoins } from '../data/coins'
 import { useMemo } from 'react'
+import type { Hex } from 'viem'
 
 type BalanceOfResult =
   | {
@@ -28,7 +29,7 @@ export const useSendAccountBalances = () => {
       allCoins
         .filter((coin) => coin.token !== 'eth')
         .map((coin) => ({
-          address: coin.token,
+          address: coin.token as Hex,
           abi: erc20Abi,
           chainId: baseMainnet.id,
           functionName: 'balanceOf',
