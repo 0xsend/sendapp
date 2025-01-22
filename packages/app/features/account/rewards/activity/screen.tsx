@@ -584,9 +584,13 @@ const ProgressCard = ({
   }
   const previousReward =
     previousDistribution?.distribution_shares?.reduce(
-      (acc, curr) => acc + BigInt(curr.amount_after_slash),
+      (acc, curr) =>
+        acc +
+        (verifications.distribution_id === 11
+          ? BigInt(curr.amount_after_slash) * BigInt(1e16)
+          : BigInt(curr.amount_after_slash)),
       0n
-    ) ?? BigInt(distribution.hodler_min_balance)
+    ) || BigInt(distribution.hodler_min_balance)
 
   const scaledPreviousReward = BigInt(previousReward) / BigInt(sendSlash?.scaling_divisor)
   const sendCeilingWeight = sendCeiling?.weight ?? BigInt(0)

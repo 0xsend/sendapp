@@ -1,7 +1,6 @@
 export const CommentsTime = (date: Date) => {
   const currentDate: Date = new Date()
-  // @ts-expect-error -> TS doesn't allow arithematic operation on 'date' type
-  const timeDifference = currentDate - date
+  const timeDifference = currentDate.getTime() - date.getTime()
   const secondsAgo = Math.floor(timeDifference / 1000)
   const minutesAgo = Math.floor(secondsAgo / 60)
   const hoursAgo = Math.floor(minutesAgo / 60)

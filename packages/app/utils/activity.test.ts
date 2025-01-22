@@ -143,7 +143,6 @@ describe('test subtextFromActivity', () => {
     const anyPaymaster = Object.values(tokenPaymasterAddress)[0]
     assert(!!anyPaymaster, 'anyPaymaster not found')
     activity.data.t = hexToBytea(anyPaymaster)
-    console.log(EventSchema.parse(activity))
     expect(subtextFromActivity(EventSchema.parse(activity))).toBe('Paymaster')
   })
   it('should return Paymaster when received from paymaster', () => {
