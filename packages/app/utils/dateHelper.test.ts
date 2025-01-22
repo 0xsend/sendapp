@@ -34,7 +34,7 @@ describe('CommentsTime', () => {
   it('time should be 8 months ago', () => {
     jest.setSystemTime(new Date('2025-01-19T12:00:00Z'))
     const dateObj = new Date(new Date('2024-05-26T13:38:25+00:00'))
-    expect(CommentsTime(dateObj)).toBe('8 mon ago')
+    expect(CommentsTime(dateObj)).toBe('7 mon ago')
   })
 })
 

@@ -45,8 +45,8 @@ jobs:
       - name: Brew Bundle
         id: brew-bundle
         run: |
-          brew bundle
-          brew cleanup
+          /home/linuxbrew/.linuxbrew/bin/brew bundle
+          /home/linuxbrew/.linuxbrew/bin/brew cleanup
       - name: Setup Environment
         uses: ./.github/actions/setup-env
         env:
@@ -54,9 +54,6 @@ jobs:
       # - name: Snaplet Login
       #   shell: bash
       #   run: bunx snaplet auth login ${{ secrets.CI_SNAPLET_AUTH_TOKEN }}
-      - name: Debug
-        run: sleep 3600
-        shell: bash
       - name: Tilt CI
         id: tilt-ci
         shell: bash

@@ -67,18 +67,17 @@ jest.mock('app/provider/coins', () => ({
 
 describe('ActivityScreen', () => {
   beforeEach(() => {
+    jest.useFakeTimers()
+    jest.setSystemTime(new Date('2025-01-19T12:00:00Z'))
     // @ts-expect-error mock
     useSearchResultHref.mockImplementation((item) => {
       return `/profile/${item.send_id}`
     })
   })
 
-  afterAll(() => jest.useRealTimers())
+  afterEach(() => jest.useRealTimers())
 
   it('renders activity screen', async () => {
-    jest.useFakeTimers()
-    jest.setSystemTime(new Date('2025-01-19T12:00:00Z'))
-
     render(
       <TamaguiProvider defaultTheme={'dark'} config={config}>
         <ActivityScreen />
@@ -92,7 +91,6 @@ describe('ActivityScreen', () => {
   })
 
   it('returns the correct search results', async () => {
-    jest.useFakeTimers()
     render(
       <TamaguiProvider defaultTheme={'dark'} config={config}>
         <ActivityScreen />
