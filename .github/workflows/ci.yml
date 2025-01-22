@@ -54,6 +54,9 @@ jobs:
       # - name: Snaplet Login
       #   shell: bash
       #   run: bunx snaplet auth login ${{ secrets.CI_SNAPLET_AUTH_TOKEN }}
+      - name: Debug
+        run: sleep 3600
+        shell: bash
       - name: Tilt CI
         id: tilt-ci
         shell: bash
