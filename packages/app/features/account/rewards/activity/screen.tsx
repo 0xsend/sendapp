@@ -13,25 +13,25 @@ import {
   Theme,
   type CardProps,
 } from '@my/ui'
-import { type sendTokenAddress, useReadSendTokenBalanceOf } from '@my/wagmi'
 import { CheckCircle2 } from '@tamagui/lucide-icons'
 import { IconAccount, IconInfoCircle } from 'app/components/icons'
 import {
+  type DistributionsVerificationsQuery,
   useDistributionVerifications,
   useMonthlyDistributions,
   type UseDistributionsResultData,
+  useSnapshotBalance,
 } from 'app/utils/distributions'
 import formatAmount from 'app/utils/formatAmount'
-import { zeroAddress } from 'viem'
+import { formatUnits } from 'viem'
 import type { PropsWithChildren } from 'react'
 import { DistributionClaimButton } from '../components/DistributionClaimButton'
 import { useSendAccount } from 'app/utils/send-accounts'
-import type { Tables } from '@my/supabase/database-generated.types'
-import type { UseQueryResult } from '@tanstack/react-query'
-import type { PostgrestError } from '@supabase/postgrest-js'
 import { DistributionSelect } from '../components/DistributionSelect'
 import { useRewardsScreenParams } from 'app/routers/params'
 import { isEqualCalendarDate } from 'app/utils/dateHelper'
+import { toNiceError } from 'app/utils/toNiceError'
+import { min } from 'app/utils/bigint'
 
 //@todo get this from the db
 const verificationTypesAndTitles = {
@@ -107,32 +107,47 @@ export function ActivityRewardsScreen() {
         )}
       </XStack>
       <YStack f={1} w={'100%'} gap={'$7'}>
-        {!distributions[selectedDistributionIndex] ? (
-          <Paragraph color={'$color10'} size={'$5'}>
-            No rewards available
-          </Paragraph>
-        ) : (
-          <>
-            <DistributionRequirementsCard
-              distribution={distributions[selectedDistributionIndex]}
-              verificationsQuery={verificationsQuery}
-            />
-            <TaskCards
-              distribution={distributions[selectedDistributionIndex]}
-              verificationsQuery={verificationsQuery}
-            />
-            <MultiplierCards
-              distribution={distributions[selectedDistributionIndex]}
-              verificationsQuery={verificationsQuery}
-            />
-            <ProgressCard
-              distribution={distributions[selectedDistributionIndex]}
-              previousDistribution={distributions[selectedDistributionIndex + 1]}
-              verificationsQuery={verificationsQuery}
-            />
-            <ClaimableRewardsCard distribution={distributions[selectedDistributionIndex]} />
-          </>
-        )}
+        {(() => {
+          switch (true) {
+            case verificationsQuery.isLoading:
+              return <Spinner size="small" color={'$color12'} />
+            case verificationsQuery.isError:
+              return (
+                <Paragraph color={'$color10'} size={'$5'}>
+                  Error fetching verifications. {toNiceError(verificationsQuery.error)}
+                </Paragraph>
+              )
+            case !distributions[selectedDistributionIndex]:
+              return (
+                <Paragraph color={'$color10'} size={'$5'}>
+                  No rewards available
+                </Paragraph>
+              )
+            default:
+              return (
+                <>
+                  <DistributionRequirementsCard
+                    distribution={distributions[selectedDistributionIndex]}
+                    verificationsQuery={verificationsQuery}
+                  />
+                  <TaskCards
+                    distribution={distributions[selectedDistributionIndex]}
+                    verificationsQuery={verificationsQuery}
+                  />
+                  <MultiplierCards
+                    distribution={distributions[selectedDistributionIndex]}
+                    verificationsQuery={verificationsQuery}
+                  />
+                  <ProgressCard
+                    distribution={distributions[selectedDistributionIndex]}
+                    previousDistribution={distributions[selectedDistributionIndex + 1]}
+                    verificationsQuery={verificationsQuery}
+                  />
+                  <ClaimableRewardsCard distribution={distributions[selectedDistributionIndex]} />
+                </>
+              )
+          }
+        })()}
       </YStack>
     </YStack>
   )
@@ -192,7 +207,7 @@ const DistributionRequirementsCard = ({
   verificationsQuery,
 }: {
   distribution: UseDistributionsResultData[number]
-  verificationsQuery: UseQueryResult<Tables<'distribution_verifications_summary'>, PostgrestError>
+  verificationsQuery: DistributionsVerificationsQuery
 }) => {
   const { data: sendAccount, isLoading: isLoadingSendAccount } = useSendAccount()
   const verifications = verificationsQuery.data
@@ -200,16 +215,7 @@ const DistributionRequirementsCard = ({
     data: snapshotBalance,
     isLoading: isLoadingSnapshotBalance,
     error: snapshotBalanceError,
-  } = useReadSendTokenBalanceOf({
-    chainId: distribution.chain_id as keyof typeof sendTokenAddress,
-    args: [sendAccount?.address ?? zeroAddress],
-    blockNumber: distribution.snapshot_block_num
-      ? BigInt(distribution.snapshot_block_num)
-      : undefined,
-    query: {
-      enabled: Boolean(sendAccount?.address),
-    },
-  })
+  } = useSnapshotBalance({ distribution, sendAccount })
   if (verificationsQuery.isLoading || isLoadingSendAccount) {
     return (
       <Card br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
@@ -223,7 +229,7 @@ const DistributionRequirementsCard = ({
   if (snapshotBalanceError) throw snapshotBalanceError
 
   const sendTagRegistrations = verifications?.verification_values?.reduce(
-    (acc, curr) => acc + (curr.type === 'tag_registration' ? curr.weight : 0),
+    (acc, curr) => acc + (curr.type === 'tag_registration' ? Number(curr.weight) : 0),
     0
   )
 
@@ -246,7 +252,11 @@ const DistributionRequirementsCard = ({
                 fontSize={'$9'}
                 $gtXl={{ fontSize: '$10' }}
               >
-                {`${formatAmount(snapshotBalance?.toString() ?? 0, 9, 0)} SEND`}
+                {`${formatAmount(
+                  formatUnits(snapshotBalance ?? 0n, distribution.token_decimals ?? 18) ?? 0,
+                  9,
+                  0
+                )} SEND`}
               </Paragraph>
             </Theme>
           )}
@@ -264,14 +274,22 @@ const DistributionRequirementsCard = ({
           </XStack>
           <XStack ai="center" gap="$2">
             <Paragraph>
-              Min. Balance {formatAmount(distribution.hodler_min_balance, 9, 0)}
+              Min. Balance{' '}
+              {formatAmount(
+                formatUnits(
+                  BigInt(distribution.hodler_min_balance ?? 0n),
+                  distribution.token_decimals ?? 18
+                ) ?? 0,
+                9,
+                0
+              )}
             </Paragraph>
             {(() => {
               switch (true) {
                 case isLoadingSnapshotBalance:
                   return <Spinner size="small" />
                 case distribution.hodler_min_balance === undefined ||
-                  distribution.hodler_min_balance > (snapshotBalance ?? 0):
+                  BigInt(distribution.hodler_min_balance ?? 0n) > (snapshotBalance ?? 0):
                   return (
                     <Theme name="red">
                       <IconInfoCircle color={'$color8'} size={'$1'} />
@@ -299,7 +317,7 @@ const TaskCards = ({
   verificationsQuery,
 }: {
   distribution: UseDistributionsResultData[number]
-  verificationsQuery: UseQueryResult<Tables<'distribution_verifications_summary'>, PostgrestError>
+  verificationsQuery: DistributionsVerificationsQuery
 }) => {
   const verifications = verificationsQuery.data
   if (verificationsQuery.isLoading) {
@@ -327,10 +345,15 @@ const TaskCards = ({
       </H3>
       <Stack flexWrap="wrap" gap="$5" $gtXs={{ fd: 'row' }}>
         {verifications?.verification_values
+          ?.map((verification) => ({
+            ...verification,
+            weight: BigInt(verification.weight ?? 0),
+            fixed_value: BigInt(verification.fixed_value ?? 0),
+          }))
           ?.filter(
             ({ fixed_value, weight }) =>
               (fixed_value > 0 && !isQualificationOver) ||
-              (isQualificationOver && weight !== 0 && fixed_value > 0)
+              (isQualificationOver && weight !== 0n && fixed_value > 0n)
           )
           .sort((a, b) => {
             const orderA = Object.keys(verificationTypesAndTitles).indexOf(a.type)
@@ -358,15 +381,15 @@ const TaskCard = ({
   isQualificationOver,
   children,
 }: PropsWithChildren<CardProps> & {
-  verification: NonNullable<
-    Tables<'distribution_verifications_summary'>['verification_values']
-  >[number]
+  verification: NonNullable<DistributionsVerificationsQuery['data']>['verification_values'][number]
   isQualificationOver: boolean
 }) => {
   const type = verification.type
-  const metadata = verification.metadata
+  const metadata = (verification.metadata ?? {}) as Record<string, number | string>
   const weight = verification.weight
-  const value = ['send_ten', 'send_one_hundred'].includes(type) ? metadata?.[0]?.value ?? 0 : weight
+  const value = ['send_ten', 'send_one_hundred'].includes(type)
+    ? BigInt(metadata?.value ?? 0)
+    : weight
   const isSendStreak = type === 'send_streak'
   const isTagRegistration = type === 'tag_registration'
   const isCompleted = (() => {
@@ -400,7 +423,7 @@ const TaskCard = ({
                 $theme-light={{ borderColor: '$color12' }}
                 borderRadius={'$4'}
               >
-                {value ?? 0}
+                {(value ?? 0).toString()}
               </Paragraph>
             )}
           </>
@@ -421,7 +444,7 @@ const TaskCard = ({
               $theme-light={{ borderColor: '$color12' }}
               borderRadius={'$4'}
             >
-              {value ?? 0}
+              {(value ?? 0).toString()}
             </Paragraph>
           </>
         )}
@@ -436,7 +459,7 @@ const MultiplierCards = ({
   verificationsQuery,
 }: {
   distribution: UseDistributionsResultData[number]
-  verificationsQuery: UseQueryResult<Tables<'distribution_verifications_summary'>, PostgrestError>
+  verificationsQuery: DistributionsVerificationsQuery
 }) => {
   const verifications = verificationsQuery.data
   if (verificationsQuery.isLoading) {
@@ -459,7 +482,7 @@ const MultiplierCards = ({
   const activeMultipliers = multipliers?.filter(
     ({ value, multiplier_step, multiplier_max }) =>
       (!isQualificationOver && multiplier_step > 0.0 && multiplier_max > 1.0) ||
-      (isQualificationOver && Boolean(value) && value > 1.0)
+      (isQualificationOver && Boolean(value) && (value ?? 0) > 1.0)
   )
 
   const distributionMonth = distribution.timezone_adjusted_qualification_end.toLocaleString(
@@ -493,7 +516,7 @@ const MultiplierCards = ({
               color={'$color12'}
               mx="auto"
             >
-              X {value ?? 1}
+              X {(value ?? 1).toString()}
             </Paragraph>
           </MultiplierCard>
         ))}
@@ -526,7 +549,7 @@ const ProgressCard = ({
 }: {
   distribution: UseDistributionsResultData[number]
   previousDistribution?: UseDistributionsResultData[number]
-  verificationsQuery: UseQueryResult<Tables<'distribution_verifications_summary'>, PostgrestError>
+  verificationsQuery: DistributionsVerificationsQuery
 }) => {
   const verifications = verificationsQuery.data
 
@@ -540,10 +563,12 @@ const ProgressCard = ({
     )
   }
 
+  if (verificationsQuery.isError || !verifications) {
+    return null
+  }
+
   const sendSlash = distribution.send_slash.at(0)
-  const sendCeiling = verifications?.verification_values?.find(
-    ({ type }) => type === 'send_ceiling'
-  )
+  const sendCeiling = verifications.verification_values.find(({ type }) => type === 'send_ceiling')
 
   if (!sendSlash || !sendCeiling) {
     return (
@@ -559,14 +584,24 @@ const ProgressCard = ({
   }
   const previousReward =
     previousDistribution?.distribution_shares?.reduce(
-      (acc, curr) => acc + curr.amount_after_slash,
-      0
-    ) || distribution.hodler_min_balance
+      (acc, curr) =>
+        acc +
+        (verifications.distribution_id === 11
+          ? BigInt(curr.amount_after_slash) * BigInt(1e16)
+          : BigInt(curr.amount_after_slash)),
+      0n
+    ) || BigInt(distribution.hodler_min_balance)
 
-  const scaledPreviousReward = previousReward / sendSlash?.scaling_divisor
-  const sendCeilingWeight = sendCeiling?.weight ?? 0
+  const scaledPreviousReward = BigInt(previousReward) / BigInt(sendSlash?.scaling_divisor)
+  const sendCeilingWeight = sendCeiling?.weight ?? BigInt(0)
+  // up to 2 decimals for the progress bar
+  const progress =
+    scaledPreviousReward === 0n
+      ? 0
+      : Number(
+          (min(sendCeilingWeight, scaledPreviousReward) * BigInt(10000)) / scaledPreviousReward
+        ) / 100
 
-  const progress = (Math.min(sendCeilingWeight, scaledPreviousReward) / scaledPreviousReward) * 100
   return (
     <YStack f={1} w={'100%'} gap="$5">
       <H3 fontWeight={'600'} color={'$color12'}>
@@ -620,8 +655,8 @@ const Progress = ({
 const ClaimableRewardsCard = ({
   distribution,
 }: { distribution: UseDistributionsResultData[number] }) => {
-  const shareAmount = distribution.distribution_shares?.[0]?.amount_after_slash
-  if (shareAmount === undefined || shareAmount === 0) return null
+  const shareAmount = BigInt(distribution.distribution_shares?.[0]?.amount_after_slash ?? 0n)
+  if (shareAmount === undefined || shareAmount === 0n) return null
   const now = new Date()
   const isQualificationOver = distribution.qualification_end < now
 
@@ -646,7 +681,13 @@ const ClaimableRewardsCard = ({
             fontWeight={'500'}
             lh={40}
           >
-            {shareAmount === undefined ? 'N/A' : `${formatAmount(shareAmount, 10, 0)} SEND`}
+            {shareAmount === undefined
+              ? 'N/A'
+              : `${formatAmount(
+                  formatUnits(shareAmount ?? 0n, distribution.token_decimals ?? 18) ?? 0n,
+                  10,
+                  0
+                )} SEND`}
           </Paragraph>
           <DistributionClaimButton distribution={distribution} />
         </Stack>

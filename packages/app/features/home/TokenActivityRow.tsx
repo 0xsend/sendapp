@@ -10,8 +10,15 @@ import { CommentsTime } from 'app/utils/dateHelper'
 import { Link } from 'solito/link'
 
 import { useUser } from 'app/utils/useUser'
+import { useHoverStyles } from 'app/utils/useHoverStyles'
 
-export function TokenActivityRow({ activity }: { activity: Activity }) {
+export function TokenActivityRow({
+  activity,
+  onPress,
+}: {
+  activity: Activity
+  onPress?: (activity: Activity) => void
+}) {
   const { profile } = useUser()
   const { created_at, from_user, to_user } = activity
   const amount = amountFromActivity(activity)
@@ -20,6 +27,7 @@ export function TokenActivityRow({ activity }: { activity: Activity }) {
   const subtext = subtextFromActivity(activity)
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
+  const hoverStyles = useHoverStyles()
 
   return (
     <XStack
@@ -28,8 +36,12 @@ export function TokenActivityRow({ activity }: { activity: Activity }) {
       jc="space-between"
       gap="$4"
       p="$3.5"
+      br={'$4'}
+      cursor={onPress ? 'pointer' : 'default'}
       $gtLg={{ p: '$5' }}
       testID={'TokenActivityRow'}
+      hoverStyle={onPress ? hoverStyles : null}
+      onPress={() => onPress?.(activity)}
     >
       <XStack gap="$3.5" width={'100%'} f={1}>
         <ActivityAvatar activity={activity} />
@@ -53,23 +65,30 @@ export function TokenActivityRow({ activity }: { activity: Activity }) {
             {(isERC20Transfer || isETHReceive) &&
             Boolean(to_user?.send_id) &&
             Boolean(from_user?.send_id) ? (
-              <Link
-                href={`/profile/${
-                  profile?.send_id === from_user?.send_id ? to_user?.send_id : from_user?.send_id
-                }`}
-                viewProps={{
-                  style: { maxWidth: '60%' },
+              <XStack
+                onPress={(e) => {
+                  e.stopPropagation()
                 }}
+                maxWidth={'60%'}
               >
-                <Paragraph
-                  color="$color10"
-                  fontFamily={'$mono'}
-                  fontSize="$5"
-                  textDecorationLine="underline"
+                <Link
+                  href={`/profile/${
+                    profile?.send_id === from_user?.send_id ? to_user?.send_id : from_user?.send_id
+                  }`}
+                  viewProps={{
+                    style: { maxWidth: '100%' },
+                  }}
                 >
-                  {subtext}
-                </Paragraph>
-              </Link>
+                  <Paragraph
+                    color="$color10"
+                    fontFamily={'$mono'}
+                    fontSize="$5"
+                    textDecorationLine="underline"
+                  >
+                    {subtext}
+                  </Paragraph>
+                </Link>
+              </XStack>
             ) : (
               <Paragraph
                 color="$color10"

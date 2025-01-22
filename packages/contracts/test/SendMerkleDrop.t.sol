@@ -2,7 +2,7 @@
 pragma solidity ^0.8.10;
 
 import "forge-std/Test.sol";
-import {SendToken} from "../src/SendToken.sol";
+import {SendTokenV0} from "../src/SendTokenV0.sol";
 import {SendMerkleDrop} from "../src/SendMerkleDrop.sol";
 import {Helper} from "../src/Helper.sol";
 
@@ -16,13 +16,13 @@ contract SendMerkleDropTest is Test, Helper {
     uint256 constant TRANCHE_AMOUNT = 653359200;
     bytes32 constant TRANCHE_MERKLE_ROOT = 0x8f9787b27bc7ebe82a8ba2ebe0bd7a85a941c1ff90f1969e0d9ce7125b0cfbf8;
 
-    SendToken private sendToken;
+    SendTokenV0 private sendToken;
     SendMerkleDrop private sendMerkleDrop;
 
     function setUp() public {
         address[] memory knownBots = new address[](1);
         knownBots[0] = KNOWN_BOT;
-        sendToken = new SendToken();
+        sendToken = new SendTokenV0();
         sendMerkleDrop = new SendMerkleDrop(sendToken, address(this));
 
         assertEq(sendToken.balanceOf(address(this)), 100e9);

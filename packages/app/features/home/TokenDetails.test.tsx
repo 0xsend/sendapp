@@ -9,7 +9,9 @@ jest.mock('app/features/home/utils/useTokenActivityFeed')
 
 jest.mock('app/utils/useTokenPrices', () => ({
   useTokenPrices: jest.fn().mockReturnValue({
-    data: { 'usd-coin': { usd: 1 }, ethereum: { usd: 1 }, 'send-token': { usd: 1 } },
+    '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48': 1,
+    eth: 1,
+    '0xEab49138BA2Ea6dd776220fE26b7b8E446638956': 1,
   }),
 }))
 

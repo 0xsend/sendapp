@@ -267,6 +267,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "distribution_verification_values_fk"
+            columns: ["type", "distribution_id"]
+            isOneToOne: false
+            referencedRelation: "distribution_verification_values"
+            referencedColumns: ["type", "distribution_id"]
+          },
+          {
             foreignKeyName: "distribution_verifications_distribution_id_fkey"
             columns: ["distribution_id"]
             isOneToOne: false
@@ -294,11 +301,14 @@ export type Database = {
           hodler_min_balance: number
           hodler_pool_bips: number
           id: number
+          merkle_drop_addr: string | null
           name: string
           number: number
           qualification_end: string
           qualification_start: string
           snapshot_block_num: number | null
+          token_addr: string | null
+          token_decimals: number | null
           updated_at: string
         }
         Insert: {
@@ -312,11 +322,14 @@ export type Database = {
           hodler_min_balance: number
           hodler_pool_bips: number
           id?: number
+          merkle_drop_addr?: string | null
           name: string
           number: number
           qualification_end: string
           qualification_start: string
           snapshot_block_num?: number | null
+          token_addr?: string | null
+          token_decimals?: number | null
           updated_at?: string
         }
         Update: {
@@ -330,11 +343,14 @@ export type Database = {
           hodler_min_balance?: number
           hodler_pool_bips?: number
           id?: number
+          merkle_drop_addr?: string | null
           name?: string
           number?: number
           qualification_end?: string
           qualification_start?: string
           snapshot_block_num?: number | null
+          token_addr?: string | null
+          token_decimals?: number | null
           updated_at?: string
         }
         Relationships: []
@@ -948,6 +964,60 @@ export type Database = {
         }
         Relationships: []
       }
+      send_token_v0_transfers: {
+        Row: {
+          abi_idx: number
+          block_num: number
+          block_time: number
+          chain_id: number
+          event_id: string
+          f: string
+          id: number
+          ig_name: string
+          log_addr: string
+          log_idx: number
+          src_name: string
+          t: string
+          tx_hash: string
+          tx_idx: number
+          v: number
+        }
+        Insert: {
+          abi_idx: number
+          block_num: number
+          block_time: number
+          chain_id: number
+          event_id?: string
+          f: string
+          id?: number
+          ig_name: string
+          log_addr: string
+          log_idx: number
+          src_name: string
+          t: string
+          tx_hash: string
+          tx_idx: number
+          v: number
+        }
+        Update: {
+          abi_idx?: number
+          block_num?: number
+          block_time?: number
+          chain_id?: number
+          event_id?: string
+          f?: string
+          id?: number
+          ig_name?: string
+          log_addr?: string
+          log_idx?: number
+          src_name?: string
+          t?: string
+          tx_hash?: string
+          tx_idx?: number
+          v?: number
+        }
+        Relationships: []
+      }
       sendtag_checkout_receipts: {
         Row: {
           abi_idx: number
@@ -1152,27 +1222,6 @@ export type Database = {
             | null
         }
         Relationships: []
-      }
-      distribution_verifications_summary: {
-        Row: {
-          distribution_id: number | null
-          multipliers:
-            | Database["public"]["CompositeTypes"]["multiplier_info"][]
-            | null
-          user_id: string | null
-          verification_values:
-            | Database["public"]["CompositeTypes"]["verification_value_info"][]
-            | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "distribution_verification_values_distribution_id_fkey"
-            columns: ["distribution_id"]
-            isOneToOne: false
-            referencedRelation: "distributions"
-            referencedColumns: ["id"]
-          },
-        ]
       }
     }
     Functions: {
@@ -1406,27 +1455,11 @@ export type Database = {
         send_id: number
         tags: unknown
       }
-      multiplier_info: {
-        type: string
-        value: number
-        multiplier_min: number
-        multiplier_max: number
-        multiplier_step: number
-        metadata: Json
-      }
       tag_search_result: {
         avatar_url: string
         tag_name: string
         send_id: number
         phone: string
-      }
-      verification_value_info: {
-        type: string
-        weight: number
-        fixed_value: number
-        bips_value: number
-        metadata: Json
-        created_at: string
       }
     }
   }

@@ -44,7 +44,6 @@
     "base64-arraybuffer": "^1.0.2",
     "burnt": "^0.12.1",
     "cbor": "^9.0.1",
-    "dnum": "^2.9.0",
     "expo-clipboard": "^5.0.1",
     "expo-constants": "~15.4.5",
     "expo-device": "~5.9.3",
@@ -82,6 +81,7 @@
     "jest-expo": "^50.0.0",
     "nock": "^14.0.0-beta.2",
     "react-test-renderer": "^18.3.1",
+    "type-fest": "^4.32.0",
     "typescript": "^5.5.3"
   }
 }

@@ -3,9 +3,7 @@ import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import type { allCoins, CoinWithBalance } from 'app/data/coins'
 import { coins as coinsOg, partnerCoins } from 'app/data/coins'
 import { isAddress } from 'viem'
-import type { TokenPricesSchema } from 'app/utils/useTokenPrices'
 import type { UseQueryResult } from '@tanstack/react-query'
-import type { z } from 'zod'
 import type { UseBalanceReturnType, UseReadContractsReturnType } from 'wagmi'
 
 type CoinsContextType = {
@@ -14,7 +12,7 @@ type CoinsContextType = {
   totalPrice: number | undefined
   ethQuery: UseBalanceReturnType
   tokensQuery: UseReadContractsReturnType
-  pricesQuery: UseQueryResult<z.infer<typeof TokenPricesSchema>, Error>
+  pricesQuery: UseQueryResult<Record<allCoins[number]['token'], number>, Error>
 }
 
 const CoinsContext = createContext<CoinsContextType | undefined>(undefined)

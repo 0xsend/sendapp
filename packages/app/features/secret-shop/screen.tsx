@@ -16,6 +16,7 @@ import {
   baseMainnet,
   baseMainnetClient,
   sendTokenAddress,
+  sendTokenV0Address,
   spx6900Address,
   usdcAddress,
 } from '@my/wagmi'
@@ -113,18 +114,33 @@ export function SecretShopScreen() {
                   >
                     Fund with 100 USDC
                   </Button>
+                  {/* send v1 has 18 decimals and 1B supply */}
                   <Button
                     onPress={async () => {
                       await setERC20Balance({
                         client: testClient,
                         address: sendAcct.address,
                         tokenAddress: sendTokenAddress[baseMainnetClient.chain.id],
-                        value: BigInt(1000000),
+                        value: BigInt(parseEther('10000')),
                       })
-                      toast.show('Funded with 1M Send')
+                      toast.show('Funded with 10K Send')
                     }}
                   >
-                    Fund with 1M Send
+                    Fund with 100K Send
+                  </Button>
+                  {/* send v0 has 0 decimals and 100B supply */}
+                  <Button
+                    onPress={async () => {
+                      await setERC20Balance({
+                        client: testClient,
+                        address: sendAcct.address,
+                        tokenAddress: sendTokenV0Address[baseMainnetClient.chain.id],
+                        value: BigInt(1_000_000),
+                      })
+                      toast.show('Funded with 1M Send V0')
+                    }}
+                  >
+                    Fund with 1M Send V0 - 100B supply
                   </Button>
                   <Button
                     onPress={async () => {

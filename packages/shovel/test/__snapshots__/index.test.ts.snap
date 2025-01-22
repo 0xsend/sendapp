@@ -105,7 +105,9 @@ exports[`shovel config 1`] = `
             "0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680",
             "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
             "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+            "0xBbB542c66a7DD7BA6893C9630B30358D610FF3ee",
             "0xE0f63A424a4439cBE457D80E4f4b51aD25b2c56C",
+            "0xEab49138BA2Ea6dd776220fE26b7b8E446638956",
           ],
           "filter_op": "contains",
           "name": "log_addr",
@@ -195,8 +197,8 @@ exports[`shovel config 1`] = `
         {
           "column": "log_addr",
           "filter_arg": [
-            "0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A",
-            "0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680",
+            "0xBbB542c66a7DD7BA6893C9630B30358D610FF3ee",
+            "0xEab49138BA2Ea6dd776220fE26b7b8E446638956",
           ],
           "filter_op": "contains",
           "name": "log_addr",
@@ -267,6 +269,97 @@ exports[`shovel config 1`] = `
           },
         ],
         "name": "send_token_transfers",
+      },
+    },
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "tx_hash",
+          "name": "tx_hash",
+        },
+        {
+          "column": "log_addr",
+          "filter_arg": [
+            "0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A",
+            "0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680",
+          ],
+          "filter_op": "contains",
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "column": "f",
+            "indexed": true,
+            "name": "from",
+            "type": "address",
+          },
+          {
+            "column": "t",
+            "indexed": true,
+            "name": "to",
+            "type": "address",
+          },
+          {
+            "column": "v",
+            "indexed": false,
+            "name": "value",
+            "type": "uint256",
+          },
+        ],
+        "name": "Transfer",
+        "type": "event",
+      },
+      "name": "send_token_v0_transfers",
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "f",
+            "type": "bytea",
+          },
+          {
+            "name": "t",
+            "type": "bytea",
+          },
+          {
+            "name": "v",
+            "type": "numeric",
+          },
+        ],
+        "name": "send_token_v0_transfers",
       },
     },
     {

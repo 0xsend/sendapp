@@ -4,7 +4,7 @@ globalThis.__DEV__ = true
 import { describe, expect, it, mock } from 'bun:test'
 import request from 'supertest'
 import app from './app'
-import { supabaseAdmin } from './supabase'
+import { type fetchActiveDistributions, supabaseAdmin } from './supabase'
 import pino from 'pino'
 import { DistributorV2Worker } from './distributorv2'
 import type { Tables } from '@my/supabase/database.types'
@@ -89,7 +89,7 @@ describe('Distributor V2 Worker', () => {
     const distribution = {
       id: 4,
       number: 4,
-      amount: 10000,
+      amount: '10000',
       hodler_pool_bips: 10000,
       bonus_pool_bips: 0,
       fixed_pool_bips: 10000,
@@ -98,16 +98,18 @@ describe('Distributor V2 Worker', () => {
       qualification_start: '2024-04-08T00:00:00+00:00',
       qualification_end: '2024-04-21T00:00:00+00:00',
       claim_end: '2024-05-31T23:59:59+00:00',
-      hodler_min_balance: 100000,
+      hodler_min_balance: '100000',
       created_at: '2024-04-06T16:49:02.569245+00:00',
       updated_at: '2024-04-06T16:49:02.569245+00:00',
       snapshot_block_num: 13261327,
       chain_id: 845337,
       send_slash_divisor: 150,
+      merkle_drop_addr: '\\xC8B80B16C40AAE14D8FCBBDA94FFA5041089D048',
+      token_decimals: 0,
       distribution_verification_values: [
         {
           type: 'tag_referral',
-          fixed_value: 50,
+          fixed_value: '50',
           bips_value: 0,
           multiplier_min: 1.5,
           multiplier_max: 2.5,
@@ -116,7 +118,7 @@ describe('Distributor V2 Worker', () => {
         },
         {
           type: 'total_tag_referrals',
-          fixed_value: 0,
+          fixed_value: '0',
           bips_value: 0,
           multiplier_min: 1.0,
           multiplier_max: 2.0,
@@ -128,13 +130,13 @@ describe('Distributor V2 Worker', () => {
         },
         {
           type: 'create_passkey',
-          fixed_value: 200,
+          fixed_value: '200',
           bips_value: 0,
           distribution_id: 4,
         },
         {
           type: 'tag_registration',
-          fixed_value: 100,
+          fixed_value: '100',
           bips_value: 0,
           distribution_id: 4,
           created_at: '2024-04-06T16:49:02.569245+00:00',
@@ -142,7 +144,7 @@ describe('Distributor V2 Worker', () => {
         },
         {
           type: 'send_ten',
-          fixed_value: 100,
+          fixed_value: '100',
           bips_value: 0,
           distribution_id: 4,
           created_at: '2024-04-06T16:49:02.569245+00:00',
@@ -150,7 +152,7 @@ describe('Distributor V2 Worker', () => {
         },
         {
           type: 'send_one_hundred',
-          fixed_value: 200,
+          fixed_value: '200',
           bips_value: 0,
           distribution_id: 4,
           created_at: '2024-04-06T16:49:02.569245+00:00',
@@ -158,7 +160,7 @@ describe('Distributor V2 Worker', () => {
         },
         {
           type: 'send_streak',
-          fixed_value: 10,
+          fixed_value: '10',
           bips_value: 0,
           distribution_id: 4,
           multiplier_min: 1.0,
@@ -168,9 +170,7 @@ describe('Distributor V2 Worker', () => {
           updated_at: '2024-04-06T16:49:02.569245+00:00',
         },
       ],
-    } as Tables<'distributions'> & {
-      distribution_verification_values: Tables<'distribution_verification_values'>[]
-    }
+    } as NonNullable<Awaited<ReturnType<typeof fetchActiveDistributions>>['data']>[number]
     const user_id = crypto.randomUUID()
     const user_id2 = crypto.randomUUID()
     const bobAddr = '0xb0b0000000000000000000000000000000000000'
@@ -186,6 +186,13 @@ describe('Distributor V2 Worker', () => {
     )
 
     mock.module('./supabase', () => ({
+      fetchActiveDistributions: mock(() => {
+        return Promise.resolve({
+          data: [distribution],
+          error: null,
+        })
+      }),
+
       fetchDistribution: mock((id: string) => {
         return Promise.resolve({
           data: distribution,
@@ -205,7 +212,11 @@ describe('Distributor V2 Worker', () => {
       fetchAllVerifications: mock((distributionId: number) => {
         return Promise.resolve({
           data: [
-            { user_id, type: 'create_passkey' },
+            {
+              user_id,
+              type: 'create_passkey',
+              weight: 1,
+            },
             {
               user_id,
               type: 'tag_referral',
@@ -262,8 +273,26 @@ describe('Distributor V2 Worker', () => {
               },
               weight: 5,
             },
+
+            // Example send_ceiling verification
+            {
+              user_id,
+              type: 'send_ceiling',
+              weight: 500, // Example weight for send ceiling
+              metadata: {
+                value: 1000, // Example ceiling value
+              },
+            },
+            {
+              user_id: user_id2,
+              type: 'send_ceiling',
+              weight: 200, // Lower weight for second user
+              metadata: {
+                value: 500,
+              },
+            },
           ],
-          count: 10,
+          count: 12,
           error: null,
         })
       }),
@@ -285,23 +314,48 @@ describe('Distributor V2 Worker', () => {
         })
       }),
       createDistributionShares,
+      fetchSendSlash: mock((distribution) => {
+        return Promise.resolve({
+          data: {
+            minimum_sends: 1,
+            scaling_divisor: 3,
+          },
+          error: null,
+        })
+      }),
+      fetchPreviousShares: mock((distribution) => {
+        return Promise.resolve({
+          data: [
+            {
+              user_id: user_id,
+              amount: '1000000', // Larger amount for more realistic slashing
+            },
+            {
+              user_id: user_id2,
+              amount: '500000',
+            },
+          ],
+          count: 2,
+          error: null,
+        })
+      }),
     }))
 
     mock.module('./wagmi', () => ({
       fetchAllBalances: mock(({ addresses, distribution }) => {
-        return [
-          Promise.resolve({
+        return Promise.resolve([
+          {
             user_id,
             address: bobAddr,
             balance: '1000000',
-          }),
+          },
           // alice has half of the balance of bob
-          Promise.resolve({
+          {
             user_id: user_id2,
             address: aliceAddr,
             balance: '500000',
-          }),
-        ]
+          },
+        ])
       }),
       isMerkleDropActive: mock((distribution) => {
         return Promise.resolve(false)
@@ -321,19 +375,21 @@ describe('Distributor V2 Worker', () => {
         address: bobAddr,
         distribution_id: 4,
         user_id,
-        amount: '6856',
+        amount: '10000',
         bonus_pool_amount: '0', // Always 0 in V2
-        fixed_pool_amount: '984',
-        hodler_pool_amount: '5872',
+        amount_after_slash: '5578', // 75% of original (example slash)
+        fixed_pool_amount: '28', // 75% of 984
+        hodler_pool_amount: '5550', // 75% of 5872
       },
       {
         address: aliceAddr,
         distribution_id: 4,
         user_id: user_id2,
-        amount: '3144',
+        amount: '9888',
         bonus_pool_amount: '0', // Always 0 in V2
-        fixed_pool_amount: '208',
-        hodler_pool_amount: '2936',
+        amount_after_slash: '1111', // 50% of original (example slash)
+        fixed_pool_amount: '1', // 50% of 208
+        hodler_pool_amount: '1110', // 50% of 2936
       },
     ]
     expect(createDistributionShares).toHaveBeenCalled()
@@ -343,7 +399,10 @@ describe('Distributor V2 Worker', () => {
 
     // expected share amounts cannot exceed the total distribution amount
     const totalDistributionAmount = BigInt(distribution.amount)
-    const totalShareAmounts = expectedShares.reduce((acc, share) => acc + BigInt(share.amount), 0n)
+    const totalShareAmounts = expectedShares.reduce(
+      (acc, share) => acc + BigInt(share.amount_after_slash),
+      0n
+    )
     expect(totalShareAmounts).toBeLessThanOrEqual(totalDistributionAmount)
   })
 })

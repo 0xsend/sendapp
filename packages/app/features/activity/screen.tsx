@@ -45,6 +45,7 @@ function ActivityBody() {
     <AnimatePresence>
       {isLoading && (
         <YStack
+          key="loading"
           $gtLg={{
             maxWidth: '600px',
           }}
@@ -60,7 +61,7 @@ function ActivityBody() {
         </YStack>
       )}
 
-      <Search.Results />
+      <Search.Results key="results" />
 
       {results === null && !isLoading && !error && (
         <YStack
@@ -71,6 +72,7 @@ function ActivityBody() {
             opacity: 0,
             y: 10,
           }}
+          f={1}
         >
           <RecentActivity />
         </YStack>

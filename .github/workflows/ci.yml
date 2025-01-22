@@ -12,29 +12,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # set yarn cache
-  cache-deps:
-    runs-on: arc-runner-set
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Setup Environment
-        uses: ./.github/actions/setup-env
-        with:
-          build-nextjs: true
-        env:
-          YARN_ENABLE_HARDENED_MODE: 0
-      - name: Show github refs
-        run: |
-          echo github.ref=${{ github.ref }}
-          echo github.head_ref=${{ github.head_ref }}
-
   unit-tests:
     name: Unit Tests
     runs-on: arc-runner-set
-    needs: [cache-deps]
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
@@ -65,19 +45,12 @@ jobs:
       - name: Brew Bundle
         id: brew-bundle
         run: |
-          brew bundle
-          brew cleanup
+          /home/linuxbrew/.linuxbrew/bin/brew bundle
+          /home/linuxbrew/.linuxbrew/bin/brew cleanup
       - name: Setup Environment
         uses: ./.github/actions/setup-env
         env:
           YARN_ENABLE_HARDENED_MODE: 0
-        with:
-          yarn-install: false
-      - name: Load Next.js Build Cache
-        uses: actions/download-artifact@v4
-        with:
-          name: nextjs-build
-          path: ${{ github.workspace }}/apps/next/.next
       # - name: Snaplet Login
       #   shell: bash
       #   run: bunx snaplet auth login ${{ secrets.CI_SNAPLET_AUTH_TOKEN }}
@@ -102,7 +75,6 @@ jobs:
     name: Playwright Tests
     # if: ${{ github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' || github.head_ref == 'dev' || github.head_ref == 'main' }}
     runs-on: arc-runner-set
-    needs: [cache-deps]
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
@@ -142,18 +114,11 @@ jobs:
           brew cleanup
       - name: Setup Environment
         uses: ./.github/actions/setup-env
+        with:
+          # will do it in the Build Next.js step
+          yarn-install: false
         env:
           YARN_ENABLE_HARDENED_MODE: 0
-      - name: Load Next.js Build Cache
-        uses: actions/download-artifact@v4
-        with:
-          name: nextjs-build
-          path: ${{ github.workspace }}/apps/next/.next
-      # - name: Snaplet Login
-      #   shell: bash
-      #   run: bunx snaplet auth login ${{ secrets.CI_SNAPLET_AUTH_TOKEN }}
-      - name: Install Playwright Dependencies
-        run: yarn playwright playwright install --with-deps
       # @todo anvil fixtures cause dirty repo, but only in github actions 😢
       # - name: All Changes Committed
       #   shell: bash
@@ -164,6 +129,8 @@ jobs:
         run: |
           tilt ci yarn:install # install and setup env
           yarn web:docker:build # build nextjs docker image
+      - name: Install Playwright Dependencies
+        run: yarn playwright playwright install --with-deps
       - name: Playwright Tests
         id: playwright
         shell: bash
@@ -288,7 +255,6 @@ jobs:
     # **always** skip if on dev and main since it will be deployed with another workflow
     if: ${{ github.ref != 'refs/heads/dev' && github.ref != 'refs/heads/main' && github.head_ref != 'dev' && github.head_ref != 'main'  }}
     runs-on: arc-runner-set
-    needs: [cache-deps]
 
     permissions:
       pull-requests: write
@@ -303,15 +269,8 @@ jobs:
           submodules: recursive
       - name: Setup Environment
         uses: ./.github/actions/setup-env
-        with:
-          yarn-install: false
         env:
           YARN_ENABLE_HARDENED_MODE: 0
-      - name: Load Next.js Build Cache
-        uses: actions/download-artifact@v4
-        with:
-          name: nextjs-build
-          path: ${{ github.workspace }}/apps/next/.next
 
       - name: Extract branch name
         id: extract-branch
