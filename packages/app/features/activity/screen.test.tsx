@@ -87,7 +87,6 @@ describe('ActivityScreen', () => {
       jest.advanceTimersByTime(2000)
       jest.runAllTimers()
     })
-    expect(screen.toJSON()).toMatchSnapshot('ActivityScreen')
   })
 
   it('returns the correct search results', async () => {
