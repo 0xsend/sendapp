@@ -31,6 +31,11 @@ describe('CommentsTime', () => {
     dateObj.setDate(dateObj.getDate() - 365)
     expect(CommentsTime(dateObj)).toBe('1 year ago')
   })
+  it('time should be 8 months ago', () => {
+    jest.setSystemTime(new Date('2025-01-19T12:00:00Z'))
+    const dateObj = new Date(new Date('2024-05-26T13:38:25+00:00'))
+    expect(CommentsTime(dateObj)).toBe('8 mon ago')
+  })
 })
 
 describe('adjustUTCDateForTimezone', () => {
