@@ -54,7 +54,7 @@ export default defineConfig({
     pgtap: false,
     public: {
       challenges: false,
-      // activity: false,
+      activity: false,
       receipts: false,
       tag_receipts: false,
     },
@@ -70,11 +70,11 @@ export default defineConfig({
         table: 'public.send_accounts',
         percent: 100,
       },
-      {
-        table: 'public.activity',
-        orderBy: 'activity.created_at desc',
-        where: `activity.created_at > current_date - interval '2 day'`,
-      },
+      // {
+      //   table: 'public.activity',
+      //   orderBy: 'activity.created_at desc',
+      //   rowLimit: 100_000,
+      // },
     ],
   },
   transform: {
