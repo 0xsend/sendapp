@@ -6,11 +6,11 @@ import {
   isEqualCalendarDate,
 } from './dateHelper'
 describe('CommentsTime', () => {
-  beforeAll(() => {
+  beforeEach(() => {
     jest.useFakeTimers()
     jest.setSystemTime(new Date('2021-08-01').getTime())
   })
-  afterAll(() => {
+  afterEach(() => {
     jest.useRealTimers()
   })
   it('time should be 0 sec ago', () => {
@@ -31,7 +31,7 @@ describe('CommentsTime', () => {
     dateObj.setDate(dateObj.getDate() - 365)
     expect(CommentsTime(dateObj)).toBe('1 year ago')
   })
-  it('time should be 8 months ago', () => {
+  it('time should be 7 months ago', () => {
     jest.setSystemTime(new Date('2025-01-19T12:00:00Z'))
     const dateObj = new Date(new Date('2024-05-26T13:38:25+00:00'))
     expect(CommentsTime(dateObj)).toBe('7 mon ago')
@@ -42,12 +42,12 @@ describe('adjustUTCDateForTimezone', () => {
   // UTC+1
   const baseDate = new Date(1688137919000 + 60 * 60 * 1000)
 
-  beforeAll(() => {
+  beforeEach(() => {
     jest.useFakeTimers()
     jest.setSystemTime(baseDate)
   })
 
-  afterAll(() => {
+  afterEach(() => {
     jest.useRealTimers()
   })
 
