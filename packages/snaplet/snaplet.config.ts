@@ -6,6 +6,7 @@ import {
   // faker
 } from '@snaplet/copycat'
 import { defineConfig } from 'snaplet'
+
 // import { tagName } from '@my/snaplet'
 
 if (!process.env.SNAPLET_HASH_KEY) {
@@ -53,16 +54,7 @@ export default defineConfig({
     pgtap: false,
     public: {
       challenges: false,
-      activity: true,
-      send_account_transfers: true,
-      send_token_transfers: true,
-      send_token_v0_transfers: true,
-      send_account_created: false,
-      send_account_credentials: false,
-      send_account_receives: true,
-      send_account_signing_key_added: false,
-      send_account_signing_key_removed: false,
-      webauthn_credentials: false,
+      activity: false,
       receipts: false,
       tag_receipts: false,
     },
@@ -71,39 +63,18 @@ export default defineConfig({
     keepDisconnectedTables: true,
     targets: [
       {
-        table: 'public.activity',
-        orderBy: `"activity"."created_at" desc`,
-        where: `"activity"."created_at" > current_date - interval '3 day'`,
-        percent: 2,
+        table: 'auth.users',
+        percent: 100,
       },
       {
-        table: 'public.send_account_transfers',
-        orderBy: `"send_account_transfers"."block_num" desc`,
-        // 30 days of transfers
-        // avg 2 sec block time means 86400 / 2 = 43200 blocks per day
-        where: `"send_account_transfers"."block_time" > (43200 * 31)`,
+        table: 'public.send_accounts',
+        percent: 100,
       },
-      {
-        table: 'public.send_token_transfers',
-        orderBy: `"send_token_transfers"."block_num" desc`,
-        // 30 days of transfers
-        // avg 2 sec block time means 86400 / 2 = 43200 blocks per day
-        where: `"send_token_transfers"."block_time" > (43200 * 31)`,
-      },
-      {
-        table: 'public.send_token_v0_transfers',
-        orderBy: `"send_token_v0_transfers"."block_num" desc`,
-        // 30 days of transfers
-        // avg 2 sec block time means 86400 / 2 = 43200 blocks per day
-        where: `"send_token_v0_transfers"."block_time" > (43200 * 31)`,
-      },
-      {
-        table: 'public.send_account_receives',
-        orderBy: `"send_account_receives"."block_num" desc`,
-        // 30 days of transfers
-        // avg 2 sec block time means 86400 / 2 = 43200 blocks per day
-        where: `"send_account_receives"."block_time" > (43200 * 31)`,
-      },
+      // {
+      //   table: 'public.activity',
+      //   orderBy: 'activity.created_at desc',
+      //   rowLimit: 100_000,
+      // },
     ],
   },
   transform: {
@@ -165,6 +136,9 @@ export default defineConfig({
         return row
       },
       send_token_transfers: ({ row }) => {
+        return row
+      },
+      send_token_v0_transfers: ({ row }) => {
         return row
       },
       tags: ({ row }) => {
