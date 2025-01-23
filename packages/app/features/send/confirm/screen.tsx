@@ -47,6 +47,7 @@ import { allCoinsDict } from 'app/data/coins'
 import { IconCoin } from 'app/components/icons/IconCoin'
 
 import debug from 'debug'
+import { useTokenPrices } from 'app/utils/useTokenPrices'
 
 const log = debug('app:features:send:confirm:screen')
 
@@ -84,6 +85,7 @@ export function SendConfirm() {
   const { coin: selectedCoin, tokensQuery, ethQuery } = useCoinFromSendTokenParam()
   const isUSDCSelected = selectedCoin?.label === 'USDC'
   const { coin: usdc } = useCoin('USDC')
+  const { data: prices, isLoading: isPricesLoading } = useTokenPrices('dexscreener')
 
   const { data: profile, isLoading: isProfileLoading } = useProfileLookup(
     idType ?? 'tag',
@@ -159,6 +161,16 @@ export function SendConfirm() {
       selectedCoin?.decimals ?? allCoinsDict[sendToken]?.decimals ?? 0
     )
   )
+
+  const price = prices?.[sendToken] ?? 0
+  const amountInUSD =
+    price *
+    Number(
+      formatUnits(
+        BigInt(amount ?? ''),
+        selectedCoin?.decimals ?? allCoinsDict[sendToken]?.decimals ?? 0
+      )
+    )
 
   const onEditAmount = () => {
     router.push({
@@ -330,21 +342,36 @@ export function SendConfirm() {
             </Paragraph>
           </XStack>
           <XStack w="100%" jc="space-between" ai="flex-end" flexWrap={'wrap'}>
-            <XStack ai={'center'} gap={'$2'}>
-              <Paragraph
-                fontWeight={'700'}
-                size={localizedAmount.length > 18 ? '$7' : '$9'}
-                $gtSm={{
-                  size: localizedAmount.length > 16 ? '$8' : '$10',
-                }}
-              >
-                {localizedAmount} {selectedCoin?.symbol}
-              </Paragraph>
-              <IconCoin
-                symbol={selectedCoin?.symbol ?? 'USDC'}
-                size={localizedAmount.length > 10 ? '$1.5' : '$2.5'}
-              />
-            </XStack>
+            <YStack gap={'$2'}>
+              <XStack ai={'center'} gap={'$2'}>
+                <Paragraph
+                  fontWeight={'700'}
+                  size={localizedAmount.length > 18 ? '$7' : '$9'}
+                  $gtSm={{
+                    size: localizedAmount.length > 16 ? '$8' : '$10',
+                  }}
+                >
+                  {localizedAmount} {selectedCoin?.symbol}
+                </Paragraph>
+                <IconCoin
+                  symbol={selectedCoin?.symbol ?? 'USDC'}
+                  size={localizedAmount.length > 10 ? '$1.5' : '$2.5'}
+                />
+              </XStack>
+              {isPricesLoading ? (
+                <Spinner size="small" color={'$color12'} />
+              ) : (
+                <Paragraph color={'$color10'} fontSize={'$3'} fontFamily={'$mono'} mt={-1}>
+                  (
+                  {amountInUSD.toLocaleString('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    maximumFractionDigits: 2,
+                  })}
+                  )
+                </Paragraph>
+              )}
+            </YStack>
             <Paragraph
               onPress={onEditAmount}
               cursor="pointer"
