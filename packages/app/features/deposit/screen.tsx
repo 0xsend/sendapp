@@ -1,7 +1,7 @@
 import { Button, Text, XStack, YStack } from '@my/ui'
 import { Wallet, Banknote, Check } from '@tamagui/lucide-icons'
 import { useState, useEffect } from 'react'
-import { DepositAddress } from 'app/components/DepositAddress'
+import { DepositAddress } from './components/DepositAddress'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinbaseOnramp } from 'app/utils/useCoinbaseOnramp'
 
@@ -17,7 +17,6 @@ export function DepositScreen() {
     sendAccount?.address ?? ''
   )
 
-  // Reset UI states when the onramp status changes
   useEffect(() => {
     if (status === 'idle') {
       setSelectedOption(null)
