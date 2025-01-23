@@ -9,7 +9,9 @@ import {
   useToastController,
   XStack,
   YStack,
+  Image,
   type ButtonProps,
+  isWeb,
 } from '@my/ui'
 import { CheckCheck } from '@tamagui/lucide-icons'
 import { shorten } from 'app/utils/strings'
@@ -17,7 +19,6 @@ import * as Clipboard from 'expo-clipboard'
 import { useState, useEffect, useRef } from 'react'
 import type { Address } from 'viem'
 import { IconCopy } from '../../../components/icons'
-import { isWeb } from '@tamagui/core'
 import QRCode from 'qrcode'
 
 function CopyAddressDialog({ isOpen, onClose, onConfirm }) {
@@ -79,14 +80,46 @@ export function DepositAddress({ address, ...props }: { address?: Address } & Bu
   const [hasCopied, setHasCopied] = useState(false)
   const [isConfirmed, setIsConfirmed] = useState(false)
   const [copyAddressDialogIsOpen, setCopyAddressDialogIsOpen] = useState(false)
+  const [qrCodeUrl, setQrCodeUrl] = useState<string>('')
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
-    if (address && canvasRef.current) {
-      const canvas = canvasRef.current
-      const ctx = canvas.getContext('2d')
+    if (!address) return
 
-      QRCode.toCanvas(canvas, address, {
+    if (isWeb) {
+      if (canvasRef.current) {
+        const canvas = canvasRef.current
+        const ctx = canvas.getContext('2d')
+
+        QRCode.toCanvas(canvas, address, {
+          width: 240,
+          margin: 1,
+          errorCorrectionLevel: 'H',
+          color: {
+            dark: '#000000',
+            light: '#ffffff',
+          },
+        })
+          .then(() => {
+            const logo = new window.Image()
+            logo.onload = () => {
+              if (ctx) {
+                const logoSize = canvas.width * 0.15
+                const logoX = (canvas.width - logoSize) / 2
+                const logoY = (canvas.height - logoSize) / 2
+
+                ctx.fillStyle = '#FFFFFF'
+                ctx.fillRect(logoX - 1, logoY - 1, logoSize + 2, logoSize + 2)
+                ctx.drawImage(logo, logoX, logoY, logoSize, logoSize)
+              }
+            }
+            logo.src = '/logos/base.svg'
+          })
+          .catch(handleError)
+      }
+    } else {
+      // Native implementation using data URL
+      QRCode.toDataURL(address, {
         width: 240,
         margin: 1,
         errorCorrectionLevel: 'H',
@@ -95,33 +128,22 @@ export function DepositAddress({ address, ...props }: { address?: Address } & Bu
           light: '#ffffff',
         },
       })
-        .then(() => {
-          const logo = new Image()
-          logo.onload = () => {
-            if (ctx) {
-              const logoSize = canvas.width * 0.15
-              const logoX = (canvas.width - logoSize) / 2
-              const logoY = (canvas.height - logoSize) / 2
-
-              ctx.fillStyle = '#FFFFFF'
-              ctx.fillRect(logoX - 1, logoY - 1, logoSize + 2, logoSize + 2)
-
-              ctx.drawImage(logo, logoX, logoY, logoSize, logoSize)
-            }
-          }
-          logo.src = '/logos/base.svg'
+        .then((url) => {
+          setQrCodeUrl(url)
         })
-        .catch((err) => {
-          console.error(err)
-          toast.show('Failed to generate QR code', {
-            message: 'Please try again later',
-            customData: {
-              theme: 'red',
-            },
-          })
-        })
+        .catch(handleError)
     }
-  }, [address, toast])
+  }, [address])
+
+  const handleError = (err: Error) => {
+    console.error(err)
+    toast.show('Failed to generate QR code', {
+      message: 'Please try again later',
+      customData: {
+        theme: 'red',
+      },
+    })
+  }
 
   if (!address) return null
 
@@ -146,11 +168,16 @@ export function DepositAddress({ address, ...props }: { address?: Address } & Bu
     <YStack ai="center" gap="$4" width="100%">
       <YStack
         position="relative"
-        {...(isWeb && {
-          style: {
-            cursor: isConfirmed ? 'default' : 'pointer',
-          },
-        })}
+        style={(() => {
+          switch (true) {
+            case isWeb:
+              return {
+                cursor: isConfirmed ? 'default' : 'pointer',
+              }
+            default:
+              return undefined
+          }
+        })()}
         onPress={() => !isConfirmed && setCopyAddressDialogIsOpen(true)}
       >
         <YStack
@@ -162,7 +189,52 @@ export function DepositAddress({ address, ...props }: { address?: Address } & Bu
             borderRadius: 8,
           }}
         >
-          <canvas ref={canvasRef} width={240} height={240} />
+          {(() => {
+            switch (true) {
+              case isWeb:
+                return <canvas ref={canvasRef} width={240} height={240} />
+              case Boolean(qrCodeUrl):
+                return (
+                  <YStack
+                    position="relative"
+                    backgroundColor="white"
+                    padding={16}
+                    borderRadius={8}
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <Image
+                      source={{ uri: qrCodeUrl }}
+                      width={240}
+                      height={240}
+                      objectFit="contain"
+                      alt="QR Code"
+                    />
+                    <YStack
+                      position="absolute"
+                      backgroundColor="white"
+                      padding={4}
+                      borderRadius={4}
+                      top="50%"
+                      left="50%"
+                      style={{
+                        transform: 'translate(-18px, -18px)',
+                      }}
+                    >
+                      <Image
+                        source={{ uri: '/logos/base.svg' }}
+                        width={28}
+                        height={28}
+                        objectFit="contain"
+                        alt="Base Logo"
+                      />
+                    </YStack>
+                  </YStack>
+                )
+              default:
+                return null
+            }
+          })()}
         </YStack>
         {!isConfirmed && (
           <YStack
