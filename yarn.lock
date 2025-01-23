@@ -3079,6 +3079,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@coinbase/cbpay-js@npm:^2.4.0":
+  version: 2.4.0
+  resolution: "@coinbase/cbpay-js@npm:2.4.0"
+  peerDependencies:
+    regenerator-runtime: ^0.13.9
+  peerDependenciesMeta:
+    regenerator-runtime:
+      optional: true
+  checksum: 10/afb40657083724e51fcd7c5957dead3ab439d45139cc9c41d1dadd13671687cea49be8343cdc3d0800abb7a7b574cd71d178347c5f8c6d483259a865a3c971a8
+  languageName: node
+  linkType: hard
+
 "@coinbase/wallet-sdk@npm:4.0.4":
   version: 4.0.4
   resolution: "@coinbase/wallet-sdk@npm:4.0.4"
@@ -6331,7 +6343,7 @@ __metadata:
     "@trpc/next": "npm:11.0.0-next-beta.264"
     "@trpc/react-query": "npm:11.0.0-next-beta.264"
     "@trpc/server": "npm:11.0.0-next-beta.264"
-    "@types/jsonwebtoken": "npm:^9.0.7"
+    "@types/jsonwebtoken": "npm:^9.0.2"
     "@wagmi/core": "npm:^2.13.1"
     app: "workspace:*"
     debug: "npm:^4.3.6"
@@ -11798,15 +11810,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jsonwebtoken@npm:^9.0.7":
-  version: 9.0.7
-  resolution: "@types/jsonwebtoken@npm:9.0.7"
-  dependencies:
-    "@types/node": "npm:*"
-  checksum: 10/4c0cffc488ba200765b50004de5e046c55360121a91ad9520d904e303cdd217b3f77b51b6ba8b9cbdd03d73876d546cbd0d9992d6e205d97decba918aee5b395
-  languageName: node
-  linkType: hard
-
 "@types/keyv@npm:^3.1.1":
   version: 3.1.4
   resolution: "@types/keyv@npm:3.1.4"
@@ -14282,6 +14285,7 @@ __metadata:
   resolution: "app@workspace:packages/app"
   dependencies:
     "@babel/plugin-syntax-import-attributes": "npm:^7.24.7"
+    "@coinbase/cbpay-js": "npm:^2.4.0"
     "@daimo/expo-passkeys": "workspace:*"
     "@jest/globals": "npm:^29.7.0"
     "@marsidev/react-turnstile": "npm:^0.7.1"
