@@ -2,10 +2,11 @@ import { z } from 'zod'
 import { decimalStrToBigInt } from '../bigint'
 import { byteaToHexEthAddress } from '../bytea'
 import { BaseEventSchema } from './BaseEventSchema'
-import { CoinSchema, allCoins } from 'app/data/coins'
-import { isAddressEqual } from 'viem'
+import { CoinSchema, knownCoins } from 'app/data/coins'
+import { isAddressEqual, zeroAddress } from 'viem'
 import { Events } from './events'
 import { OnchainEventDataSchema } from './OnchainDataSchema'
+import { sendTokenAddress, baseMainnet, sendtagCheckoutAddress } from '@my/wagmi'
 
 /**
  * ERC-20 token transfer event data
@@ -29,7 +30,7 @@ export const TransferDataSchema = OnchainEventDataSchema.extend({
   })
   .transform((t) => ({
     ...t,
-    coin: allCoins.find((c) => c.token !== 'eth' && isAddressEqual(c.token, t.log_addr)),
+    coin: knownCoins.find((c) => c.token !== 'eth' && isAddressEqual(c.token, t.log_addr)),
   }))
 
 export const SendAccountTransfersEventSchema = BaseEventSchema.extend({
@@ -42,3 +43,24 @@ export type SendAccountTransfersEvent = z.infer<typeof SendAccountTransfersEvent
 export const isSendAccountTransfersEvent = (event: {
   event_name: string
 }): event is SendAccountTransfersEvent => event.event_name === Events.SendAccountTransfers
+
+export const isSendTokenUpgradeEvent = (event: {
+  data?: unknown
+  event_name: string
+}): event is SendAccountTransfersEvent => {
+  return (
+    isSendAccountTransfersEvent(event) &&
+    isAddressEqual(event.data.f, zeroAddress) &&
+    isAddressEqual(event.data.coin?.token as `0x${string}`, sendTokenAddress[baseMainnet.id])
+  )
+}
+
+export const isSendtagCheckoutEvent = (event: {
+  data?: unknown
+  event_name: string
+}): event is SendAccountTransfersEvent => {
+  return (
+    isSendAccountTransfersEvent(event) &&
+    isAddressEqual(event.data.f, sendtagCheckoutAddress[baseMainnet.id])
+  )
+}

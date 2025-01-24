@@ -6,6 +6,7 @@ import {
   // faker
 } from '@snaplet/copycat'
 import { defineConfig } from 'snaplet'
+
 // import { tagName } from '@my/snaplet'
 
 if (!process.env.SNAPLET_HASH_KEY) {
@@ -54,29 +55,28 @@ export default defineConfig({
     public: {
       challenges: false,
       activity: false,
-      send_account_transfers: false,
-      send_token_transfers: false,
       receipts: false,
       tag_receipts: false,
     },
   },
-  // TODO: figure out how much data we need to snapshot
-  // subset: {
-  //   targets: [
-  //     {
-  //       table: 'public.activity',
-  //       orderBy: `"activity"."created_at" desc`,
-  //       where: `"activity"."created_at" > current_date - interval '31 day'`,
-  //     },
-  //     {
-  //       table: 'public.send_account_transfers',
-  //       orderBy: `"send_account_transfers"."block_num" desc`,
-  //       // 30 days of transfers
-  //       // avg 2 sec block time means 86400 / 2 = 43200 blocks per day
-  //       where: `"send_account_transfers"."block_time" > (43200 * 31)`,
-  //     },
-  //   ],
-  // },
+  subset: {
+    keepDisconnectedTables: true,
+    targets: [
+      {
+        table: 'auth.users',
+        percent: 100,
+      },
+      {
+        table: 'public.send_accounts',
+        percent: 100,
+      },
+      // {
+      //   table: 'public.activity',
+      //   orderBy: 'activity.created_at desc',
+      //   rowLimit: 100_000,
+      // },
+    ],
+  },
   transform: {
     $mode: 'auto',
     auth: {
@@ -115,6 +115,9 @@ export default defineConfig({
     },
 
     public: {
+      activity: ({ row }) => {
+        return row
+      },
       profiles: ({ row }) => {
         return {
           ...row,
@@ -133,6 +136,9 @@ export default defineConfig({
         return row
       },
       send_token_transfers: ({ row }) => {
+        return row
+      },
+      send_token_v0_transfers: ({ row }) => {
         return row
       },
       tags: ({ row }) => {
@@ -157,6 +163,9 @@ export default defineConfig({
         return row
       },
       tag_reservations: ({ row }) => {
+        return row
+      },
+      send_slash: ({ row }) => {
         return row
       },
     },

@@ -5,9 +5,13 @@ import {Script, console2} from "forge-std/Script.sol";
 
 abstract contract Helper is Script {
     /**
-     * The address of Send token deployed to mainnet and base.
+     * The address of Send token (1B supply and 18 decimals) deployed to base.
      */
-    address constant SEND_TOKEN = 0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A;
+    address constant SEND_TOKEN = 0xEab49138BA2Ea6dd776220fE26b7b8E446638956;
+    /**
+     * The address of Send token V0 (100B supply and 0 decimals) deployed to mainnet and base.
+     */
+    address constant SEND_TOKEN_V0 = 0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A;
     /**
      * The address of the Send manager and deployer on mainnet.
      */
@@ -47,9 +51,15 @@ abstract contract Helper is Script {
      * https://basescan.org/address/0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
      */
     address constant USDC_BASE = 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913;
+    /**
+     * Send Rewards Safe on Base
+     * https://basescan.org/address/0xD3DCFf1823714a4399AD2927A3800686D4CEB53A
+     */
+    address constant SEND_REWARDS_SAFE = 0xD3DCFf1823714a4399AD2927A3800686D4CEB53A;
 
     function labels() public {
         vm.label(SEND_TOKEN, "SEND_TOKEN");
+        vm.label(SEND_TOKEN_V0, "SEND_TOKEN_V0");
         vm.label(OG_SEND_DEPLOYER, "OG_SEND_DEPLOYER");
         vm.label(BASE_SEND_MVP_DEPLOYER, "BASE_SEND_MVP_DEPLOYER");
         vm.label(SEND_TREASURY_SAFE, "SEND_TREASURY_SAFE");
@@ -58,5 +68,6 @@ abstract contract Helper is Script {
         vm.label(AA_ENTRY_POINT_V0_6, "AA_ENTRY_POINT_V0_6");
         vm.label(AA_ENTRY_POINT_V0_7, "AA_ENTRY_POINT_V0_7");
         vm.label(USDC_BASE, "USDC_BASE");
+        vm.label(SEND_REWARDS_SAFE, "SEND_REWARDS_SAFE");
     }
 }

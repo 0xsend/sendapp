@@ -110,14 +110,14 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
 }
 
 const TokenDetailsBalance = ({ coin }: { coin: CoinWithBalance }) => {
-  const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
-  const { balance, decimals, coingeckoTokenId } = coin
+  const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices('dexscreener')
+  const { balance, decimals, formatDecimals = 5 } = coin
 
   if (coin.balance === undefined) {
     return <></>
   }
 
-  const balanceInUSD = convertBalanceToFiat(coin, tokenPrices?.[coingeckoTokenId].usd)
+  const balanceInUSD = convertBalanceToFiat(coin, tokenPrices?.[coin.token])
 
   const balanceWithDecimals = Number(balance) / 10 ** (decimals ?? 0)
   const balanceWithDecimalsLength = balanceWithDecimals.toString().replace('.', '').length
@@ -132,11 +132,13 @@ const TokenDetailsBalance = ({ coin }: { coin: CoinWithBalance }) => {
         lineHeight={57}
         color={'$color12'}
       >
-        {formatAmount(balanceWithDecimals.toString(), 10, 5)}
+        {formatAmount(balanceWithDecimals.toString(), 10, formatDecimals)}
       </Paragraph>
 
       <Paragraph color={'$color10'} fontSize={'$3'} fontFamily={'$mono'}>
-        {isLoadingTokenPrices || balanceInUSD ? `($${formatAmount(balanceInUSD, 4, 2)})` : ''}
+        {isLoadingTokenPrices || balanceInUSD === undefined
+          ? ''
+          : `($${formatAmount(balanceInUSD, 4, 2)})`}
       </Paragraph>
     </XStack>
   )

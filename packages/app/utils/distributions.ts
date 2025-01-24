@@ -1,59 +1,106 @@
-import type { Tables, Views } from '@my/supabase/database.types'
+import type { Database, Json, Tables } from '@my/supabase/database.types'
 import {
+  baseMainnetBundlerClient,
+  baseMainnetClient,
+  entryPointAddress,
   mainnet,
-  sendTokenAddress,
+  sendAccountAbi,
   sendAirdropsSafeAddress,
   sendMerkleDropAbi,
   sendMerkleDropAddress,
+  sendTokenAbi,
+  sendTokenAddress,
   sendUniswapV3PoolAddress,
-  useReadSendMerkleDropTrancheActive,
-  useReadSendMerkleDropIsClaimed,
-  baseMainnetClient,
-  entryPointAddress,
-  sendAccountAbi,
   tokenPaymasterAddress,
-  baseMainnetBundlerClient,
 } from '@my/wagmi'
-import type { PostgrestError } from '@supabase/supabase-js'
-import { type UseQueryResult, useMutation, useQuery } from '@tanstack/react-query'
+import type { PostgrestError, SupabaseClient } from '@supabase/supabase-js'
+import { useMutation, useQuery, type UseQueryResult } from '@tanstack/react-query'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
-import { useBalance, useSimulateContract } from 'wagmi'
-import { api } from './api'
-import { useSendAccount } from './send-accounts'
 import { getUserOperationHash, type UserOperation } from 'permissionless'
+import type { MergeDeep } from 'type-fest'
+import { type CallExecutionError, encodeFunctionData, isAddress, zeroAddress } from 'viem'
+import { useBalance, useReadContract, useSimulateContract } from 'wagmi'
+import { api } from './api'
 import { assert } from './assert'
-import { type CallExecutionError, encodeFunctionData, isAddress } from 'viem'
-import { defaultUserOp } from './useUserOpTransferMutation'
-import { signUserOp } from './signUserOp'
 import { byteaToBase64 } from './byteaToBase64'
-import { throwNiceError } from './userop'
+import { byteaToHex } from './byteaToHex'
 import { adjustUTCDateForTimezone } from './dateHelper'
+import { useSendAccount } from './send-accounts'
+import { signUserOpHash } from './signUserOp'
+import { selectAll } from './supabase/selectAll'
+import { throwNiceError } from './userop'
+import { defaultUserOp } from './useUserOpTransferMutation'
 
 export const DISTRIBUTION_INITIAL_POOL_AMOUNT = BigInt(20e9)
 
-type UseDistributionResultDistribution = Omit<
-  Tables<'distributions'>,
-  'qualification_end' | 'qualification_start' | 'claim_end'
->
+export type UseDistributionsResultData = MergeDeep<
+  NonNullable<Awaited<ReturnType<typeof fetchDistributions>>['data']>[number],
+  {
+    qualification_end: Date
+    timezone_adjusted_qualification_end: Date
+    qualification_start: Date
+    claim_end: Date
+  }
+>[]
 
-export type UseDistributionsResultData = (UseDistributionResultDistribution & {
-  qualification_end: Date
-  timezone_adjusted_qualification_end: Date
-  qualification_start: Date
-  claim_end: Date
-  distribution_shares: Tables<'distribution_shares'>[]
-  send_slash: Tables<'send_slash'>[]
-})[]
+function fetchDistributions(supabase: SupabaseClient<Database>) {
+  return supabase.from('distributions').select(`
+      amount::text,
+      bonus_pool_bips,
+      chain_id,
+      claim_end,
+      created_at,
+      description,
+      fixed_pool_bips,
+      hodler_min_balance::text,
+      hodler_pool_bips,
+      id,
+      merkle_drop_addr,
+      name,
+      number,
+      qualification_end,
+      qualification_start,
+      snapshot_block_num,
+      token_addr,
+      token_decimals,
+      updated_at,
+      distribution_shares(
+        address,
+        amount::text,
+        amount_after_slash::text,
+        bonus_pool_amount::text,
+        created_at,
+        distribution_id,
+        fixed_pool_amount::text,
+        hodler_pool_amount::text,
+        id,
+        index,
+        updated_at,
+        user_id
+      ),
+      distribution_verification_values (
+        bips_value,
+        created_at,
+        distribution_id,
+        fixed_value::text,
+        multiplier_max,
+        multiplier_min,
+        multiplier_step,
+        type,
+        updated_at
+      ),
+      send_slash(*)
+    `)
+}
 
 export const useDistributions = (): UseQueryResult<UseDistributionsResultData, PostgrestError> => {
   const supabase = useSupabase()
   return useQuery({
-    queryKey: ['distributions'],
+    queryKey: ['distributions', supabase],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('distributions')
-        .select('*, distribution_shares(*), distribution_verifications_summary(*)')
-        .order('number', { ascending: false })
+      const { data, error } = await fetchDistributions(supabase).order('number', {
+        ascending: false,
+      })
       if (error) {
         throw error
       }
@@ -81,15 +128,9 @@ export const useMonthlyDistributions = () => {
   const { data: sendAccount } = useSendAccount()
 
   return useQuery({
-    queryKey: ['monthly_distributions', sendAccount?.created_at],
+    queryKey: ['monthly_distributions', supabase, sendAccount?.created_at],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('distributions')
-        .select(`
-          *,
-          distribution_shares(*),
-          send_slash(*)
-        `)
+      const { data, error } = await fetchDistributions(supabase)
         .gt('number', 6)
         .gt('qualification_end', sendAccount?.created_at)
         .order('number', { ascending: false })
@@ -110,23 +151,132 @@ export const useMonthlyDistributions = () => {
   })
 }
 
-export const useDistributionVerifications = (
-  distributionId?: number
-): UseQueryResult<Views<'distribution_verifications_summary'>, PostgrestError> => {
+function fetchDistributionVerifications(
+  supabase: SupabaseClient<Database>,
+  distributionId: number
+) {
+  return selectAll(
+    supabase
+      .from('distribution_verifications')
+      .select(
+        `
+          distribution_id,
+          user_id,
+          type,
+          weight::text,
+          metadata,
+          created_at,
+          distribution_verification_values(
+            bips_value::text,
+            fixed_value::text,
+            multiplier_max,
+            multiplier_min,
+            multiplier_step
+          )
+        `,
+        { count: 'exact' }
+      )
+      .eq('distribution_id', distributionId)
+  )
+}
+
+export type DistributionsVerificationsQuery = ReturnType<typeof useDistributionVerifications>
+
+export const useDistributionVerifications = (distributionId?: number) => {
   const supabase = useSupabase()
 
   return useQuery({
-    queryKey: ['distribution_verifications', distributionId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('distribution_verifications_summary')
-        .select('*')
-        // @ts-expect-error disabled if no distributionNumber
-        .eq('distribution_id', distributionId)
-        .single()
+    queryKey: ['distribution_verifications', { distributionId, supabase }] as const,
+    queryFn: async ({ queryKey: [, { distributionId, supabase }] }) => {
+      assert(!!distributionId, 'distributionId is required')
 
-      if (error) throw error
-      return data
+      const { data: verifications, error: verificationError } =
+        await fetchDistributionVerifications(supabase, distributionId)
+
+      if (verificationError) throw verificationError
+      if (verifications === null || verifications.length === 0) return null
+
+      // previously this was grouped and transformed to match the distribution_verifications_summary view
+      // but now we are just returning the data as from postgrest
+      // transform the data to match the view's shape to avoid breaking the views
+      const verification_values: {
+        type: Database['public']['Enums']['verification_type']
+        weight: bigint
+        fixed_value: bigint
+        bips_value: bigint
+        metadata?: Json
+        created_at: string
+      }[] = Object.values(
+        verifications.reduce(
+          (acc, v) => {
+            const value = acc[v.type] ?? {
+              type: v.type,
+              weight: 0n,
+              fixed_value: BigInt(v.distribution_verification_values?.fixed_value ?? 0n),
+              bips_value: BigInt(v.distribution_verification_values?.bips_value ?? 0n),
+              metadata: v.metadata,
+              created_at: v.created_at,
+            }
+            acc[v.type] = {
+              ...value,
+              weight: value.weight + BigInt(v.weight ?? 0),
+            }
+            return acc
+          },
+          {} as Record<
+            Database['public']['Enums']['verification_type'],
+            {
+              type: Database['public']['Enums']['verification_type']
+              weight: bigint
+              fixed_value: bigint
+              bips_value: bigint
+              metadata?: Json
+              created_at: string
+            }
+          >
+        )
+      )
+
+      const multipliers: {
+        type: Database['public']['Enums']['verification_type']
+        value?: number | null
+        multiplier_max: number
+        multiplier_min: number
+        multiplier_step: number
+        metadata?: Json
+      }[] = []
+
+      for (const dv of verifications) {
+        if (!dv.distribution_verification_values) return null
+        const { multiplier_max, multiplier_min, multiplier_step } =
+          dv.distribution_verification_values
+        const value =
+          multiplier_min === 1.0 && multiplier_max === 1.0 && multiplier_step === 0.0
+            ? null
+            : Math.min(
+                Number(multiplier_min) +
+                  (Number(dv.weight ?? 0) - 1) * Number(multiplier_step ?? 0),
+                Number(multiplier_max)
+              )
+
+        multipliers.push({
+          type: dv.type,
+          value,
+          multiplier_max: multiplier_max,
+          multiplier_min: multiplier_min,
+          multiplier_step: multiplier_step,
+          metadata: dv.metadata,
+        })
+      }
+
+      const transformedData = {
+        distribution_id: distributionId,
+        user_id: verifications[0]?.user_id,
+        verification_values,
+        multipliers,
+      }
+
+      return transformedData
     },
     enabled: Boolean(distributionId),
   })
@@ -202,14 +352,19 @@ export function useSendMerkleDropTrancheActive({
   chainId,
   tranche,
   query,
+  address,
 }: {
   chainId: keyof typeof sendMerkleDropAddress
   tranche: bigint
   query?: { enabled?: boolean }
+  address: `0x${string}` | undefined
 }) {
-  return useReadSendMerkleDropTrancheActive({
+  return useReadContract({
+    abi: sendMerkleDropAbi,
+    address,
     chainId,
     args: [tranche],
+    functionName: 'trancheActive',
     query,
   })
 }
@@ -225,16 +380,20 @@ export function useSendMerkleDropIsClaimed({
   tranche,
   index,
   query,
+  address,
 }: {
   chainId: keyof typeof sendMerkleDropAddress
   tranche: bigint
   index?: bigint
   query?: { enabled?: boolean }
+  address: `0x${string}` | undefined
 }) {
-  return useReadSendMerkleDropIsClaimed({
+  return useReadContract({
+    abi: sendMerkleDropAbi,
+    address: address,
+    functionName: 'isClaimed',
     chainId,
-    // @ts-expect-error index is undefined if not provided
-    args: [tranche, index],
+    args: [tranche, index ?? -1n],
     query,
   })
 }
@@ -303,7 +462,7 @@ export async function sendUserOpClaim({
       throw e
     })
 
-  userOp.signature = await signUserOp({
+  userOp.signature = await signUserOpHash({
     userOpHash,
     version,
     validUntil,
@@ -336,6 +495,8 @@ export function useGenerateClaimUserOp({
 }): UseQueryResult<UserOperation<'v0.7'>> {
   const trancheId = BigInt(distribution.number - 1) // tranches are 0-indexed
   const chainId = distribution.chain_id as keyof typeof sendMerkleDropAddress
+  const merkleDropAddress = byteaToHex(distribution.merkle_drop_addr as `\\x${string}`)
+
   // get the merkle proof from the database
   const {
     data: merkleProof,
@@ -352,15 +513,18 @@ export function useGenerateClaimUserOp({
     chainId,
     tranche: trancheId,
     index: share?.index !== undefined ? BigInt(share.index) : undefined,
+    address: merkleDropAddress,
   })
 
   const {
     data: trancheActive,
     isLoading: isLoadingTrancheActive,
     error: errorTrancheActive,
-  } = useReadSendMerkleDropTrancheActive({
+  } = useSendMerkleDropTrancheActive({
+    address: merkleDropAddress,
     chainId,
-    args: [trancheId],
+    tranche: trancheId,
+    query: { enabled: Boolean(trancheId && chainId) },
   })
 
   const enabled =
@@ -447,6 +611,7 @@ export const usePrepareSendMerkleDropClaimTrancheWrite = ({
 }: SendMerkleDropClaimTrancheArgs) => {
   const trancheId = BigInt(distribution.number - 1) // tranches are 0-indexed
   const chainId = distribution.chain_id as keyof typeof sendMerkleDropAddress
+  const merkleDropAddress = byteaToHex(distribution.merkle_drop_addr as `\\x${string}`)
   // get the merkle proof from the database
   const {
     data: merkleProof,
@@ -463,13 +628,17 @@ export const usePrepareSendMerkleDropClaimTrancheWrite = ({
     chainId,
     tranche: trancheId,
     index: share?.index !== undefined ? BigInt(share.index) : undefined,
+    address: merkleDropAddress,
   })
 
   const {
     data: trancheActive,
     isLoading: isLoadingTrancheActive,
     error: errorTrancheActive,
-  } = useReadSendMerkleDropTrancheActive({
+  } = useReadContract({
+    abi: sendMerkleDropAbi,
+    address: merkleDropAddress,
+    functionName: 'trancheActive',
     chainId,
     args: [trancheId],
   })
@@ -510,5 +679,29 @@ export const usePrepareSendMerkleDropClaimTrancheWrite = ({
       ? // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount_after_slash, and merkleProof are defined when enabled is true
         [address!, trancheId, BigInt(index!), BigInt(amount_after_slash!), merkleProof!]
       : undefined,
+  })
+}
+
+export function useSnapshotBalance({
+  distribution,
+  sendAccount,
+}: {
+  distribution: UseDistributionsResultData[number]
+  sendAccount: Tables<'send_accounts'> | null | undefined
+}) {
+  return useReadContract({
+    abi: sendTokenAbi,
+    chainId: distribution.chain_id as keyof typeof sendTokenAddress,
+    address: distribution.token_addr
+      ? byteaToHex(distribution.token_addr as `\\x${string}`)
+      : undefined,
+    args: [sendAccount?.address ?? zeroAddress],
+    blockNumber: distribution.snapshot_block_num
+      ? BigInt(distribution.snapshot_block_num)
+      : undefined,
+    functionName: 'balanceOf',
+    query: {
+      enabled: Boolean(sendAccount?.address),
+    },
   })
 }

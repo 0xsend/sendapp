@@ -1,22 +1,4 @@
 type WeightedShare = { address: `0x${string}`; amount: bigint }
-type Weights = {
-  /**
-   * The total weight of all balances.
-   */
-  totalWeight: bigint
-  /**
-   * The weight of each send token in the distribution.
-   */
-  weightPerSend: bigint
-  /**
-   * The weight of each balance in the distribution.
-   */
-  poolWeights: Record<`0x${string}`, bigint>
-  /**
-   * The weighted share amounts of each balance in the distribution.
-   */
-  weightedShares: Record<`0x${string}`, WeightedShare>
-}
 
 export enum Mode {
   Linear = 'linear',

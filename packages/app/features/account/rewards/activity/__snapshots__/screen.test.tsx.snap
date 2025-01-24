@@ -459,7 +459,9 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
               }
               suppressHighlighting={true}
             >
-              Min. Balance 
+              Min. Balance
+               
+              0
             </Text>
             <RNSVGSvgView
               align="xMidYMid"

@@ -71,7 +71,7 @@ export const SendButton = (props: Omit<LinkableButtonProps, 'href' | 'children'>
   const [{ token }] = useRootScreenParams()
   const href = token ? `/send?sendToken=${token}` : '/send'
   return (
-    <XStack testID="homeSendButton">
+    <XStack testID="homeSendButton" f={1}>
       <LinkableButton
         href={href}
         theme={'green'}

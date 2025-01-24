@@ -128,9 +128,14 @@ test('can remove a signer', async ({ page, supabase, authenticator, user: { prof
   await removeBtn.click()
   await bundlerReq
   await bundlerRes // wait for bundler response
-  await expect.soft(removeBtn).toBeHidden() // page navigates after successful mutation
-  await expect.soft(page.getByTestId('RemovePasskeyButton')).toBeHidden() // page navigates after successful mutation
-  await expect(page.getByTestId('RemovePasskeyError')).toBeHidden() // no err
+
+  await expect(async () => {
+    await expect.soft(removeBtn).toBeHidden() // page navigates after successful mutation
+    await expect.soft(page.getByTestId('RemovePasskeyButton')).toBeHidden() // page navigates after successful mutation
+    await expect(page.getByTestId('RemovePasskeyError')).toBeHidden() // no err
+  }).toPass({
+    timeout: 10_000,
+  })
 
   // retry until signing key is removed from the account
   const keyRemoved = await withRetry(

@@ -333,6 +333,36 @@ VALUES (
         FROM distributions
         WHERE
             number = 123));
+-- ensure verification values are not created
+INSERT INTO distribution_verification_values(
+    type,
+    fixed_value,
+    bips_value,
+    distribution_id,
+    multiplier_min,
+    multiplier_max,
+    multiplier_step)
+select type,
+       fixed_value,
+       bips_value,
+       (select id from distributions where number = 123),
+       multiplier_min,
+       multiplier_max,
+       multiplier_step
+from distribution_verification_values
+where distribution_id = (
+    select id
+    from distributions
+    where number <> 123
+    order by number desc
+    limit 1
+)
+    and type not in (
+        select type
+        from distribution_verification_values
+        where distribution_id = (select id from distributions where number = 123
+    )
+);
 SELECT
     results_eq('SELECT COUNT(*)::integer FROM distributions WHERE number = 123', $$
     VALUES (1) $$, 'Service role should be able to create distributions');

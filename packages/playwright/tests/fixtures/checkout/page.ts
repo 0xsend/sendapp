@@ -1,5 +1,6 @@
 import path from 'node:path'
 import type { Expect, Locator, Page } from '@playwright/test'
+import { expect } from '@playwright/test'
 import debug from 'debug'
 import type { Web3ProviderBackend } from '@0xbigboss/headless-web3-provider'
 
@@ -27,33 +28,42 @@ export class CheckoutPage {
   }
 
   async fillTagName(tag: string) {
-    await this.page.getByPlaceholder('Enter Sendtag name').fill(tag)
+    await expect(async () => {
+      await this.page.getByPlaceholder('Enter Sendtag name').fill(tag)
+      expect(await this.page.getByPlaceholder('Enter Sendtag name').inputValue()).toEqual(tag)
+    }).toPass({
+      timeout: 5_000,
+    })
   }
 
   async submitTagName() {
-    const request = this.page.waitForRequest(
-      (request) => {
-        if (request.url().includes('/rest/v1/tags') && request.method() === 'POST') {
-          log('submitTagName request', request.url(), request.method(), request.postDataJSON())
-          return true
-        }
-        return false
-      },
-      { timeout: 5_000 }
-    )
-    const response = this.page.waitForEvent('response', {
-      predicate: async (response) => {
-        if (response.url().includes('/rest/v1/tags')) {
-          log('submitTagName response', response.url(), response.status(), await response.text())
-          return true
-        }
-        return false
-      },
-      timeout: 5_000,
+    await expect(async () => {
+      const request = this.page.waitForRequest(
+        (request) => {
+          if (request.url().includes('/rest/v1/tags') && request.method() === 'POST') {
+            log('submitTagName request', request.url(), request.method(), request.postDataJSON())
+            return true
+          }
+          return false
+        },
+        { timeout: 5_000 }
+      )
+      const response = this.page.waitForEvent('response', {
+        predicate: async (response) => {
+          if (response.url().includes('/rest/v1/tags')) {
+            log('submitTagName response', response.url(), response.status(), await response.text())
+            return true
+          }
+          return false
+        },
+        timeout: 5_000,
+      })
+      await this.submitTagButton.click()
+      await request
+      await response
+    }).toPass({
+      timeout: 20_000,
     })
-    await this.submitTagButton.click()
-    await request
-    await response
   }
 
   async addPendingTag(tag: string) {
@@ -67,7 +77,9 @@ export class CheckoutPage {
   }
 
   async openPricingTooltip() {
-    await this.page.getByRole('button', { name: 'Pricing' }).hover()
+    await expect(() => this.page.getByRole('button', { name: 'Pricing' }).hover()).toPass({
+      timeout: 5_000,
+    })
   }
 
   async confirmTags(expect: Expect) {

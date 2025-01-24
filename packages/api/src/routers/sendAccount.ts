@@ -2,9 +2,14 @@ import {
   baseMainnet,
   baseMainnetClient,
   entryPointAddress,
+  sendAccountAbi,
   sendAccountFactoryAbi,
   sendAccountFactoryAddress,
   sendTokenAbi,
+  sendTokenV0Address,
+  sendTokenV0LockboxAddress,
+  sendVerifyingPaymasterAbi,
+  sendVerifyingPaymasterAddress,
   tokenPaymasterAddress,
   usdcAddress,
 } from '@my/wagmi'
@@ -15,15 +20,17 @@ import { hexToBytea } from 'app/utils/hexToBytea'
 import { COSEECDHAtoXY } from 'app/utils/passkeys'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import { throwIf } from 'app/utils/throwIf'
-import { USEROP_SALT, getSendAccountCreateArgs } from 'app/utils/userop'
+import { USEROP_SALT, getSendAccountCreateArgs, packUserOp } from 'app/utils/userop'
 import debug from 'debug'
 import PQueue from 'p-queue'
 import { getSenderAddress } from 'permissionless'
 import {
   concat,
   createWalletClient,
+  encodeAbiParameters,
   encodeFunctionData,
   getAbiItem,
+  type Hex,
   http,
   maxUint256,
   publicActions,
@@ -33,6 +40,8 @@ import {
 import { privateKeyToAccount } from 'viem/accounts'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
+import { address } from 'app/utils/zod'
+import { SendAccountCallsSchema, UserOperationSchema } from 'app/utils/zod/evm'
 
 const SEND_ACCOUNT_FACTORY_PRIVATE_KEY = process.env
   .SEND_ACCOUNT_FACTORY_PRIVATE_KEY as `0x${string}`
@@ -148,7 +157,7 @@ export const sendAccountRouter = createTRPCRouter({
           })
         }
 
-        const contractDeployed = await sendAccountFactoryClient.getBytecode({
+        const contractDeployed = await sendAccountFactoryClient.getCode({
           address: senderAddress,
         })
         log('createAccount', 'contractDeployed', contractDeployed)
@@ -318,6 +327,125 @@ export const sendAccountRouter = createTRPCRouter({
         }
 
         return { success: true }
+      }
+    ),
+  /**
+   * Requests a signature for a user op from the paymaster.
+   *
+   * Requires the user send the userop, plus the send account calls to ensure
+   * the userop is for a whitelisted user ops.
+   *
+   * This is so we don't inadvertently sponsor userops..
+   *
+   * TODO: move this into it's own paymaster router and leverage it's own EOA or share with the send account factory
+   */
+  paymasterSign: protectedProcedure
+    .input(
+      z.object({
+        /**
+         * The user op to execute on the entry point.
+         */
+        userop: UserOperationSchema,
+        /**
+         * The send account calls to prove the userop is for upgrading the send token.
+         */
+        sendAccountCalls: SendAccountCallsSchema,
+        entryPoint: address,
+      })
+    )
+    .mutation(
+      async ({ ctx: { session, supabase }, input: { userop, sendAccountCalls, entryPoint } }) => {
+        const log = debug(`api:routers:sendTokenUpgrade:${session.user.id}`)
+
+        log('Received send token upgrade userop', { userop, sendAccountCalls, entryPoint })
+
+        // ensure send account is valid
+        const { data: sendAccount, error: sendAccountError } = await supabase
+          .from('send_accounts')
+          .select('*')
+          .single()
+        if (sendAccountError) {
+          log('no send account found')
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'No send account found',
+          })
+        }
+
+        // ensure send account calls are for send token upgrade
+        // 1. approve send token v0 to lockbox
+        // 2. call lockbox.deposit
+        // TODO: move to another function before adding more send account calls
+        const [approval, deposit] = sendAccountCalls
+
+        if (!approval || !deposit) {
+          log('send account calls are not valid')
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Send account calls are not valid',
+          })
+        }
+
+        if (
+          approval.dest !== sendTokenV0Address[sendAccount.chain_id] ||
+          !approval.data.startsWith('0x095ea7b3') // approve(address,uint256)
+        ) {
+          log('approval.dest is not send token v0')
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Approval call is not for send token v0',
+          })
+        }
+        if (
+          deposit.dest !== sendTokenV0LockboxAddress[sendAccount.chain_id] ||
+          !deposit.data.startsWith('0xb6b55f25') // deposit(uint256)
+        ) {
+          log('deposit.dest is not send token v0 lockbox')
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Deposit call is not for send token v0 lockbox',
+          })
+        }
+        const _calldata = encodeFunctionData({
+          abi: sendAccountAbi,
+          functionName: 'executeBatch',
+          args: [sendAccountCalls],
+        })
+        if (userop.callData !== _calldata) {
+          log('callData mismatch', userop.callData, _calldata)
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Call data mismatch',
+          })
+        }
+
+        const validUntil = Math.floor((Date.now() + 1000 * 120) / 1000)
+        const validAfter = 0
+        const paymasterAddress = sendVerifyingPaymasterAddress[sendAccount.chain_id]
+        const paymasterUserOpHash = await sendAccountFactoryClient
+          .readContract({
+            address: paymasterAddress,
+            abi: sendVerifyingPaymasterAbi,
+            functionName: 'getHash',
+            args: [packUserOp(userop), validUntil, validAfter],
+          })
+          .catch((e) => {
+            log('getHash error', e)
+            throw new TRPCError({
+              code: 'INTERNAL_SERVER_ERROR',
+              message: 'Failed to get paymaster hash',
+            })
+          })
+        const sig = await account.signMessage({ message: { raw: paymasterUserOpHash } })
+
+        const paymasterData = concat([
+          encodeAbiParameters([{ type: 'uint48' }, { type: 'uint48' }], [validUntil, validAfter]),
+          sig,
+        ])
+
+        return {
+          paymasterData,
+        }
       }
     ),
 })

@@ -5,6 +5,7 @@ import {
   sendAccountTransfersIntegration,
   sendAccountReceivesIntegration,
   sendTokenTransfersIntegration,
+  sendTokenV0TransfersIntegration,
   sendRevenuesSafeReceives,
   sendAccountSigningKeyAdded,
   sendAccountSigningKeyRemoved,
@@ -44,6 +45,10 @@ export const integrations: Integration[] = [
   },
   {
     ...sendTokenTransfersIntegration,
+    sources: [{ name: baseSrcLogs.name, start: '$BASE_BLOCK_START' }],
+  },
+  {
+    ...sendTokenV0TransfersIntegration,
     sources: [{ name: baseSrcLogs.name, start: '$BASE_BLOCK_START' }],
   },
   {
