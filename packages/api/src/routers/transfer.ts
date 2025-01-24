@@ -15,16 +15,17 @@ export const transferRouter = createTRPCRouter({
       z.object({
         userOp: z.custom<UserOperation<'v0.7'>>(),
         token: z.custom<allCoins[number]['token']>(), //@ todo: might be safer to decode the token from the userOp, to ensure we don't apply the wrong token
+        note: z.string().optional(),
       })
     )
-    .mutation(async ({ input: { token, userOp } }) => {
+    .mutation(async ({ input: { token, userOp, note } }) => {
       const { sender, nonce } = userOp
       try {
         const client = await getTemporalClient()
         const handle = await client.workflow.start(TransferWorkflow, {
           taskQueue: 'monorepo',
           workflowId: `transfer-workflow-${token}-${sender}-${nonce}`,
-          args: [userOp],
+          args: [userOp, note],
         })
         log(`Workflow Created: ${handle.workflowId}`)
         return handle.workflowId
