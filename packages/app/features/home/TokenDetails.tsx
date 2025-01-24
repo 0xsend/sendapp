@@ -1,6 +1,8 @@
 import {
   AnimatePresence,
+  Button,
   Card,
+  LinkableButton,
   Paragraph,
   Separator,
   Spinner,
@@ -11,13 +13,14 @@ import {
 } from '@my/ui'
 import type { CoinWithBalance } from 'app/data/coins'
 import { ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
-import { IconError } from 'app/components/icons'
+import { IconError, IconPlus, IconSwap } from 'app/components/icons'
 import { useTokenMarketData } from 'app/utils/coin-gecko'
 import formatAmount from 'app/utils/formatAmount'
 import { TokenActivity } from './TokenActivity'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { convertBalanceToFiat } from 'app/utils/convertBalanceToUSD'
 import { IconCoin } from 'app/components/icons/IconCoin'
+import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 
 export function AnimateEnter({ children }: { children: React.ReactNode }) {
   return (
@@ -35,7 +38,9 @@ export function AnimateEnter({ children }: { children: React.ReactNode }) {
     </AnimatePresence>
   )
 }
+
 export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
+  const { coin: selectedCoin } = useCoinFromTokenParam()
   return (
     <YStack f={1} gap="$5" $gtLg={{ w: '45%', pb: '$0' }} pb="$5">
       <YStack gap="$5">
@@ -66,8 +71,8 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
             </YStack>
           </YStack>
         </Card>
-        {/* <XStack w={'100%'}>
-          <LinkableButton href="/deposit" p="$7" mih={88} w="30%">
+        <XStack w={'100%'} gap={25}>
+          <LinkableButton href="/deposit" f={1} p="$7" mih={88} w="30%">
             <YStack gap="$2" jc={'space-between'} ai="center">
               <Theme name="green">
                 <IconPlus
@@ -81,7 +86,21 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
               </Button.Text>
             </YStack>
           </LinkableButton>
-        </XStack> */}
+          <LinkableButton href={`/swap?token=${selectedCoin?.token}`} f={1} p="$7" mih={88} w="30%">
+            <YStack gap="$2" jc={'space-between'} ai="center">
+              <Theme name="green">
+                <IconSwap
+                  size={'$1'}
+                  $theme-dark={{ color: '$color4' }}
+                  $theme-light={{ color: '$color12' }}
+                />
+              </Theme>
+              <Button.Text fontSize={'$4'} px="$2">
+                Swap
+              </Button.Text>
+            </YStack>
+          </LinkableButton>
+        </XStack>
       </YStack>
       <YStack gap={'$3'}>
         <TokenActivity coin={coin} />
