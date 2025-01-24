@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import type { coins, CoinWithBalance } from 'app/data/coins'
+import type { allCoins, coins, CoinWithBalance } from 'app/data/coins'
 import { z } from 'zod'
 
 export const MarketDataSchema = z
@@ -41,7 +41,7 @@ export const MarketDataSchema = z
 /**
  * React query function to fetch current token price for a given token id
  */
-export const useTokenPrice = <T extends coins[number]['coingeckoTokenId']>(tokenId: T) => {
+export const useTokenPrice = <T extends allCoins[number]['coingeckoTokenId']>(tokenId: T) => {
   return useQuery({
     queryKey: ['tokenPrice', tokenId],
     queryFn: async () => {
