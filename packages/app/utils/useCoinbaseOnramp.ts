@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { type CBPayInstanceType, initOnRamp } from '@coinbase/cbpay-js'
 import { api } from 'app/utils/api'
 
-export function useCoinbaseOnramp(appId: string, address: string) {
+export function useCoinbaseOnramp(appId: string, destinationAddress: string, amount?: number) {
   const [status, setStatus] = useState<'idle' | 'pending' | 'success'>('idle')
   const [error, setError] = useState<Error | null>(null)
   const utils = api.useUtils()
@@ -25,7 +25,7 @@ export function useCoinbaseOnramp(appId: string, address: string) {
   }, [])
 
   useEffect(() => {
-    if (!address || !appId) {
+    if (!destinationAddress || !appId) {
       return undefined
     }
 
@@ -34,12 +34,12 @@ export function useCoinbaseOnramp(appId: string, address: string) {
         {
           appId,
           widgetParameters: {
-            addresses: { [address]: ['base'] },
+            addresses: { '0xCF6D79F936f50B6a8257733047308664151B2510': ['base'] },
             assets: ['USDC'],
-            presetCryptoAmount: 10,
+            presetCryptoAmount: amount || 10,
             defaultNetwork: 'base',
             defaultExperience: 'buy',
-            partnerUserId: address,
+            partnerUserId: destinationAddress,
           },
           onSuccess: handleSuccess,
           onExit: handleExit,
@@ -48,8 +48,6 @@ export function useCoinbaseOnramp(appId: string, address: string) {
           },
           experienceLoggedIn: 'popup',
           experienceLoggedOut: 'popup',
-          closeOnExit: true,
-          closeOnSuccess: true,
         },
         (initError, instance) => {
           if (initError || !instance) {
@@ -71,13 +69,50 @@ export function useCoinbaseOnramp(appId: string, address: string) {
       setError(err instanceof Error ? err : new Error('Unexpected initialization error'))
       return undefined
     }
-  }, [appId, address, handleSuccess, handleExit])
+  }, [appId, destinationAddress, amount, handleSuccess, handleExit])
 
-  const openOnramp = useCallback(() => {
-    if (!instanceRef.current) return
-    setStatus('pending')
-    instanceRef.current.open()
-  }, [])
+  const openOnramp = useCallback(
+    (amount: number) => {
+      if (!instanceRef.current) return
+
+      if (amount) {
+        instanceRef.current.destroy()
+        initOnRamp(
+          {
+            appId,
+            widgetParameters: {
+              addresses: { '0xCF6D79F936f50B6a8257733047308664151B2510': ['base'] },
+              assets: ['USDC'],
+              presetCryptoAmount: amount,
+              defaultNetwork: 'base',
+              defaultExperience: 'buy',
+              partnerUserId: destinationAddress,
+            },
+            onSuccess: handleSuccess,
+            onExit: handleExit,
+            onEvent: (event) => {
+              console.log('Coinbase event:', event)
+            },
+            experienceLoggedIn: 'popup',
+            experienceLoggedOut: 'popup',
+          },
+          (initError, instance) => {
+            if (initError || !instance) {
+              setError(initError || new Error('Failed to initialize Coinbase Onramp'))
+              return
+            }
+            instanceRef.current = instance
+            setStatus('pending')
+            instance.open()
+          }
+        )
+      } else {
+        setStatus('pending')
+        instanceRef.current.open()
+      }
+    },
+    [appId, destinationAddress, handleSuccess, handleExit]
+  )
 
   const closeOnramp = useCallback(() => {
     if (!instanceRef.current) return

@@ -133,6 +133,53 @@ export type Database = {
         }
         Relationships: []
       }
+      coinbase_transactions: {
+        Row: {
+          created_at: string
+          id: number
+          payment_currency: string
+          payment_method: string
+          payment_total: number
+          purchase_amount: number
+          purchase_currency: string
+          transaction_id: string
+          user_id: string
+          wallet_address: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          payment_currency: string
+          payment_method: string
+          payment_total: number
+          purchase_amount: number
+          purchase_currency: string
+          transaction_id: string
+          user_id: string
+          wallet_address: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          payment_currency?: string
+          payment_method?: string
+          payment_total?: number
+          purchase_amount?: number
+          purchase_currency?: string
+          transaction_id?: string
+          user_id?: string
+          wallet_address?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coinbase_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       distribution_shares: {
         Row: {
           address: string
