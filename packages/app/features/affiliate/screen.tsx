@@ -62,36 +62,6 @@ const StatsCards = () => {
             </>
           )}
         </Card>
-        {/*
-        Need to rework this
-        <Card $gtLg={{ flexShrink: 0, flexBasis: '32%' }} w="100%" mih={152}>
-          <CardHeader>
-            <Label color={'$color10'}>Network Rewards Share</Label>
-          </CardHeader>
-          {isLoading ? (
-            <Spinner alignSelf="flex-start" size="large" color="$color12" mt="auto" p="$4" />
-          ) : (
-            <>
-              <Paragraph pl="$4" pb="$3" fontWeight="600" size={'$12'} lineHeight={'$11'}>
-                {formatAmount(affiliateStats?.affiliate_send_score || 0, 10, 0)}
-              </Paragraph>
-            </>
-          )}
-        </Card>
-        <Card $gtLg={{ flexShrink: 0, flexBasis: '32%' }} w="100%" mih={152}>
-          <CardHeader>
-            <Label color={'$color10'}>Network +/-</Label>
-          </CardHeader>
-          {isLoading ? (
-            <Spinner alignSelf="flex-start" size="large" color="$color12" mt="auto" p="$4" />
-          ) : (
-            <>
-              <Paragraph pl="$4" pb="$3" fontWeight="600" size={'$12'} lineHeight={'$11'}>
-                {formatAmount(affiliateStats?.network_plus_minus || 0, 10, 0)}
-              </Paragraph>
-            </>
-          )}
-        </Card> */}
       </Stack>
       {affiliateStatsError && (
         <Paragraph theme={'red_active'}>{affiliateStatsError?.message}</Paragraph>
@@ -209,15 +179,6 @@ const ReferralsListRow = ({
               </Stack>
             </YStack>
           </XStack>
-          {/* <Stack als="flex-start">
-            <Paragraph
-              theme={referral.send_plus_minus >= 0 ? 'green_active' : 'red_active'}
-              size={'$8'}
-              lh={'$1'}
-            >
-              {referral.send_plus_minus >= 0 ? '+' : '-'}
-            </Paragraph>
-          </Stack> */}
         </XStack>
       </Link>
     </Card>
