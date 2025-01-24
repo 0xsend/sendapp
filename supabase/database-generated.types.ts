@@ -830,6 +830,30 @@ export type Database = {
         }
         Relationships: []
       }
+      send_notes: {
+        Row: {
+          f: string
+          id: number
+          note: string
+          t: string
+          tx_hash: string
+        }
+        Insert: {
+          f: string
+          id?: number
+          note: string
+          t: string
+          tx_hash: string
+        }
+        Update: {
+          f?: string
+          id?: number
+          note?: string
+          t?: string
+          tx_hash?: string
+        }
+        Relationships: []
+      }
       send_revenues_safe_receives: {
         Row: {
           abi_idx: number

@@ -28,6 +28,7 @@ import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { ProfileHeader } from 'app/features/profile/components/ProfileHeader'
 import { ProfileAboutTile } from 'app/features/profile/components/ProfileAboutTile'
 import { IconX } from 'app/components/icons'
+import { useThemeSetting } from '@tamagui/next-theme'
 
 const SendAmountSchema = z.object({
   amount: formFields.text,
@@ -59,6 +60,7 @@ export function SendAmountForm() {
   const [isAmountInputFocused, setIsAmountInputFocused] = useState<boolean>(false)
   const [isNoteInputFocused, setIsNoteInputFocused] = useState<boolean>(false)
   const noteFieldRef = useRef<TamaguiElement>(null)
+  const { resolvedTheme } = useThemeSetting()
 
   const formNote = form.watch('note')
 
@@ -74,7 +76,7 @@ export function SendAmountForm() {
             ...sendParams,
             amount: sanitizedAmount.toString(),
             sendToken: token,
-            note: note, // TODO sanitize
+            note: encodeURIComponent(note.trim()),
           },
           { webBehavior: 'replace' }
         )
@@ -99,7 +101,13 @@ export function SendAmountForm() {
 
   useEffect(() => {
     if (noteFieldRef.current && isWeb && formNote !== undefined) {
-      adjustNoteFieldHeightForWeb(noteFieldRef.current as unknown as HTMLTextAreaElement)
+      const textAreaElement = noteFieldRef.current as unknown as HTMLTextAreaElement
+
+      if (textAreaElement.value !== formNote) {
+        textAreaElement.value = formNote
+      }
+
+      adjustNoteFieldHeightForWeb(textAreaElement)
     }
   }, [formNote])
 
@@ -141,6 +149,12 @@ export function SendAmountForm() {
   const handleNoteClearClick = () => {
     form.setValue('note', '' as string & BRAND<'textarea'>)
   }
+
+  const noteBorderActiveColor = isNoteTooLong
+    ? '$error'
+    : resolvedTheme?.startsWith('dark')
+      ? '$primary'
+      : '$color12'
 
   return (
     <XStack w={'100%'} gap={'$4'}>
@@ -238,13 +252,13 @@ export function SendAmountForm() {
                   placeholderTextColor: '$darkGrayTextField',
                 },
                 focusStyle: {
-                  boc: isNoteTooLong ? '$error' : '$primary',
+                  boc: noteBorderActiveColor,
                   bw: 1,
                   outlineWidth: 0,
                   fontStyle: 'normal',
                 },
                 hoverStyle: {
-                  boc: isNoteTooLong ? '$error' : '$primary',
+                  boc: noteBorderActiveColor,
                 },
                 iconAfter: (
                   <Button
@@ -279,7 +293,7 @@ export function SendAmountForm() {
                 sendParams.amount && coin !== undefined
                   ? localizeAmount(formatUnits(BigInt(sendParams.amount), coin.decimals))
                   : undefined,
-              note: sendParams.note ?? '',
+              note: sendParams.note ? decodeURIComponent(sendParams.note) : '',
             }}
             renderAfter={({ submit }) => (
               <SubmitButton

@@ -1,7 +1,7 @@
-import { log, ApplicationFailure } from '@temporalio/activity'
-import { isTransferIndexed } from './supabase'
-import { simulateUserOperation, sendUserOperation, waitForTransactionReceipt } from './wagmi'
-import type { UserOperation } from 'permissionless'
+import { ApplicationFailure, log } from '@temporalio/activity'
+import { isTransferIndexed, saveNote } from './supabase'
+import { sendUserOperation, simulateUserOperation, waitForTransactionReceipt } from './wagmi'
+import type { GetUserOperationReceiptReturnType, UserOperation } from 'permissionless'
 import { bootstrap } from '@my/workflows/utils'
 import superjson from 'superjson'
 
@@ -44,6 +44,10 @@ export const createTransferActivities = (env: Record<string, string | undefined>
       const isIndexed = await isTransferIndexed(hash)
       log.info('isTransferIndexedActivity', { isIndexed })
       return isIndexed
+    },
+
+    async saveNote(receipt: GetUserOperationReceiptReturnType, noteToSave: string) {
+      return await saveNote(receipt, noteToSave)
     },
   }
 }

@@ -206,7 +206,10 @@ const TransactionEntry = ({
   otherUserProfile?: AvatarProfileProps
   currentUserProfile?: AvatarProfileProps
 }) => {
-  const { created_at } = activity
+  const {
+    created_at,
+    data: { note },
+  } = activity
   const amount = amountFromActivity(activity)
   const date = new Date(created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
 
@@ -240,16 +243,19 @@ const TransactionEntry = ({
               <Paragraph size={'$7'}>{amount}</Paragraph>
             </YStack>
           </XStack>
-          <Paragraph
-            size={'$5'}
-            color={'$silverChalice'}
-            w={'100%'}
-            $theme-light={{
-              color: '$darkGrayTextField',
-            }}
-          >
-            TODO Thank for the dinner man! Lets get together and do something next weekend. :)
-          </Paragraph>
+          {note && (
+            <Paragraph
+              size={'$5'}
+              color={'$silverChalice'}
+              w={'100%'}
+              whiteSpace={'pre-wrap'}
+              $theme-light={{
+                color: '$darkGrayTextField',
+              }}
+            >
+              {decodeURIComponent(note)}
+            </Paragraph>
+          )}
         </YStack>
         <Paragraph
           size={'$2'}

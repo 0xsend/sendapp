@@ -194,7 +194,11 @@ export function SendConfirm() {
       })
       userOp.signature = signature
 
-      const workflowId = await transfer({ userOp, token: sendToken })
+      const workflowId = await transfer({
+        userOp,
+        token: sendToken,
+        note,
+      })
       setWorkflowId(workflowId)
       if (selectedCoin?.token === 'eth') {
         await ethQuery.refetch()
@@ -353,7 +357,9 @@ export function SendConfirm() {
               edit
             </Paragraph>
           </XStack>
-          <Paragraph size={'$5'}>{note || '-'}</Paragraph>
+          <Paragraph size={'$5'} whiteSpace={'pre-wrap'}>
+            {note ? decodeURIComponent(note) : '-'}
+          </Paragraph>
         </YStack>
         {error && (
           <ErrorMessage
