@@ -196,87 +196,92 @@ export const useDistributionVerifications = (distributionId?: number) => {
       if (verificationError) throw verificationError
       if (verifications === null || verifications.length === 0) return null
 
-      // previously this was grouped and transformed to match the distribution_verifications_summary view
-      // but now we are just returning the data as from postgrest
-      // transform the data to match the view's shape to avoid breaking the views
-      const verification_values: {
-        type: Database['public']['Enums']['verification_type']
-        weight: bigint
-        fixed_value: bigint
-        bips_value: bigint
-        metadata?: Json
-        created_at: string
-      }[] = Object.values(
-        verifications.reduce(
-          (acc, v) => {
-            const value = acc[v.type] ?? {
-              type: v.type,
-              weight: 0n,
-              fixed_value: BigInt(v.distribution_verification_values?.fixed_value ?? 0n),
-              bips_value: BigInt(v.distribution_verification_values?.bips_value ?? 0n),
-              metadata: v.metadata,
-              created_at: v.created_at,
-            }
-            acc[v.type] = {
-              ...value,
-              weight: value.weight + BigInt(v.weight ?? 0),
-            }
-            return acc
-          },
-          {} as Record<
-            Database['public']['Enums']['verification_type'],
-            {
-              type: Database['public']['Enums']['verification_type']
-              weight: bigint
-              fixed_value: bigint
-              bips_value: bigint
-              metadata?: Json
-              created_at: string
-            }
-          >
-        )
+      // Group verifications by type (similar to base_counts CTE)
+      const baseCounts = verifications.reduce(
+        (acc, v) => {
+          const existing = acc[v.type] ?? {
+            distribution_id: v.distribution_id,
+            user_id: v.user_id,
+            type: v.type,
+            created_at: null,
+            total_weight: 0n,
+            combined_metadata: [] as Json[],
+          }
+
+          acc[v.type] = {
+            ...existing,
+            created_at:
+              !existing.created_at || v.created_at > existing.created_at
+                ? v.created_at
+                : existing.created_at,
+            total_weight: existing.total_weight + BigInt(v.weight ?? 0),
+            combined_metadata: [...existing.combined_metadata, v.metadata].filter(Boolean),
+          }
+
+          return acc
+        },
+        {} as Record<
+          string,
+          {
+            distribution_id: number
+            user_id: string
+            type: Database['public']['Enums']['verification_type']
+            created_at: string | null
+            total_weight: bigint
+            combined_metadata: Json[]
+          }
+        >
       )
 
-      const multipliers: {
-        type: Database['public']['Enums']['verification_type']
-        value?: number | null
-        multiplier_max: number
-        multiplier_min: number
-        multiplier_step: number
-        metadata?: Json
-      }[] = []
+      // Transform to verification_values and multipliers
+      const verification_values = Object.entries(baseCounts).map(([type, baseCount]) => ({
+        type: type as Database['public']['Enums']['verification_type'],
+        weight: baseCount.total_weight,
+        fixed_value: BigInt(
+          verifications.find((v) => v.type === type)?.distribution_verification_values
+            ?.fixed_value ?? 0
+        ),
+        bips_value: BigInt(
+          verifications.find((v) => v.type === type)?.distribution_verification_values
+            ?.bips_value ?? 0
+        ),
+        metadata: baseCount.combined_metadata,
+        created_at: baseCount.created_at ?? '',
+      }))
 
-      for (const dv of verifications) {
-        if (!dv.distribution_verification_values) return null
-        const { multiplier_max, multiplier_min, multiplier_step } =
-          dv.distribution_verification_values
-        const value =
-          multiplier_min === 1.0 && multiplier_max === 1.0 && multiplier_step === 0.0
-            ? null
-            : Math.min(
-                Number(multiplier_min) +
-                  (Number(dv.weight ?? 0) - 1) * Number(multiplier_step ?? 0),
-                Number(multiplier_max)
-              )
+      const multipliers = Object.entries(baseCounts)
+        .map(([type, baseCount]) => {
+          const dvv = verifications.find((v) => v.type === type)?.distribution_verification_values
+          if (!dvv) return null
 
-        multipliers.push({
-          type: dv.type,
-          value,
-          multiplier_max: multiplier_max,
-          multiplier_min: multiplier_min,
-          multiplier_step: multiplier_step,
-          metadata: dv.metadata,
+          const { multiplier_max, multiplier_min, multiplier_step } = dvv
+
+          const value =
+            (multiplier_min === 1.0 && multiplier_max === 1.0 && multiplier_step === 0.0) ||
+            baseCount.total_weight === 0n
+              ? null
+              : Math.min(
+                  multiplier_min + Number(baseCount.total_weight - 1n) * multiplier_step,
+                  multiplier_max
+                )
+
+          return {
+            type: type as Database['public']['Enums']['verification_type'],
+            value,
+            multiplier_min,
+            multiplier_max,
+            multiplier_step,
+            metadata: baseCount.combined_metadata,
+          }
         })
-      }
+        .filter(Boolean)
 
-      const transformedData = {
+      return {
         distribution_id: distributionId,
         user_id: verifications[0]?.user_id,
         verification_values,
         multipliers,
       }
-
-      return transformedData
     },
     enabled: Boolean(distributionId),
   })
