@@ -93,21 +93,15 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
 }
 
 export const TokenDetailsMarketData = ({ coin }: { coin: CoinWithBalance }) => {
-  const { data: tokenMarketData, status } = useTokenMarketData(coin.coingeckoTokenId)
-  const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices('dexscreener')
+  const { data: tokenMarketData, isLoading: isLoadingMarketData } = useTokenMarketData(
+    coin.coingeckoTokenId
+  )
 
-  const price = tokenPrices?.[coin.token]
+  const { data: prices, isLoading: isLoadingPrices } = useTokenPrices()
+
+  const price = tokenMarketData?.at(0)?.current_price ?? prices?.[coin.token]
 
   const changePercent24h = tokenMarketData?.at(0)?.price_change_percentage_24h
-
-  if (status === 'pending') return <Spinner size="small" color="$color12" />
-  if (status === 'error' || price === undefined || changePercent24h === undefined)
-    return (
-      <XStack gap="$2" ai="center">
-        <Paragraph color="$color10">Failed to load market data</Paragraph>
-        <IconError size="$1.75" color={'$redVibrant'} />
-      </XStack>
-    )
 
   // Coingecko API returns a formatted price already. For now, we just want to make sure it doesn't have more than 8 digits
   // so the text doesn't get cut off.
@@ -132,21 +126,34 @@ export const TokenDetailsMarketData = ({ coin }: { coin: CoinWithBalance }) => {
     return <Paragraph fontSize="$4" fontWeight="500">{`${fixedChange}%`}</Paragraph>
   }
 
+  if (isLoadingMarketData && isLoadingPrices) return <Spinner size="small" color={'$color12'} />
+
   return (
     <XStack gap="$3">
-      <Paragraph
-        fontSize={14}
-        fontWeight="500"
-        $theme-dark={{ color: '$gray8Light' }}
-        color={'$color12'}
-      >
-        {isLoadingTokenPrices || price === undefined
-          ? ''
-          : `1 ${coin.symbol} = ${formatPrice(price)} USD`}
-      </Paragraph>
-      {coin.symbol !== 'SEND' && (
+      {isLoadingPrices ? (
+        <Spinner size="small" color={'$color12'} />
+      ) : (
+        <Paragraph
+          fontSize={14}
+          fontWeight="500"
+          $theme-dark={{ color: '$gray8Light' }}
+          color={'$color12'}
+        >
+          {price === undefined ? '' : `1 ${coin.symbol} = ${formatPrice(price)} USD`}
+        </Paragraph>
+      )}
+      {isLoadingMarketData ? (
+        <Spinner size="small" color={'$color12'} />
+      ) : (
         <XStack gap={'$1.5'} ai="center" jc={'space-around'}>
-          {formatPriceChange(changePercent24h)}
+          {changePercent24h === undefined ? (
+            <XStack gap="$2" ai="center">
+              <Paragraph color="$color10">Failed to load market data</Paragraph>
+              <IconError size="$1.75" color={'$redVibrant'} />
+            </XStack>
+          ) : (
+            formatPriceChange(changePercent24h)
+          )}
         </XStack>
       )}
     </XStack>
@@ -154,7 +161,7 @@ export const TokenDetailsMarketData = ({ coin }: { coin: CoinWithBalance }) => {
 }
 
 const TokenDetailsBalance = ({ coin }: { coin: CoinWithBalance }) => {
-  const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices('dexscreener')
+  const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
   const { balance, decimals, formatDecimals = 5 } = coin
 
   if (coin.balance === undefined) {
