@@ -1,7 +1,7 @@
 import { baseMainnet, sendTokenAddress, spx6900Address, usdcAddress } from '@my/wagmi'
 import { z } from 'zod'
 import { type UseQueryResult, useQuery } from '@tanstack/react-query'
-import type { allCoins } from 'app/data/coins'
+import { allCoins } from 'app/data/coins'
 
 const CoingeckoTokenPriceSchema = z.object({
   usd: z.number(),
@@ -9,7 +9,7 @@ const CoingeckoTokenPriceSchema = z.object({
 
 export const CoingeckoTokenPricesSchema = z.object({
   ethereum: CoingeckoTokenPriceSchema,
-  'send-token': CoingeckoTokenPriceSchema,
+  'send-token-2': CoingeckoTokenPriceSchema,
   'usd-coin': CoingeckoTokenPriceSchema,
   spx6900: CoingeckoTokenPriceSchema,
 })
@@ -26,9 +26,18 @@ const DexScreenerTokenPriceSchema = z.object({
 export const DexScreenerTokenPricesSchema = z.array(DexScreenerTokenPriceSchema)
 
 const fetchCoingeckoPrices = async () => {
+  const coingeckoIds = allCoins.map((coin) => coin.coingeckoTokenId).toString()
+
   const res = await fetch(
-    'https://api.coingecko.com/api/v3/simple/price?ids=ethereum,usd-coin,send-token,spx6900&vs_currencies=usd'
+    `https://api.coingecko.com/api/v3/simple/price?ids=${coingeckoIds}&vs_currencies=usd`,
+    {
+      headers: {
+        Accept: 'application/json',
+      },
+      mode: 'cors',
+    }
   )
+
   if (!res.ok) {
     throw new Error(`Failed to fetch Coingecko prices. Status: ${res.status}`)
   }
@@ -39,12 +48,13 @@ const fetchCoingeckoPrices = async () => {
 }
 
 const normalizeCoingeckoPrices = (prices: z.infer<typeof CoingeckoTokenPricesSchema>) => {
-  return {
-    [sendTokenAddress[baseMainnet.id]]: prices['send-token'].usd,
-    [spx6900Address[baseMainnet.id]]: prices.spx6900.usd,
-    eth: prices.ethereum.usd,
-    [usdcAddress[baseMainnet.id]]: prices['usd-coin'].usd,
-  }
+  return allCoins.reduce(
+    (acc, coin) => {
+      acc[coin.token] = prices[coin.coingeckoTokenId].usd
+      return acc
+    },
+    {} as Record<string, number>
+  )
 }
 
 const fetchDexScreenerPrices = async () => {
@@ -89,11 +99,8 @@ const fetchWithFallback = async () => {
   try {
     return await fetchCoingeckoPrices()
   } catch (error) {
-    if (error instanceof Error && error.message === 'RATE_LIMITED') {
-      console.warn('Coingecko rate limited, falling back to DexScreener')
-      return await fetchDexScreenerPrices()
-    }
-    throw error
+    console.warn('Coingecko request failed, falling back to DexScreener')
+    return await fetchDexScreenerPrices()
   }
 }
 

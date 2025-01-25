@@ -21,7 +21,7 @@ type BalanceOfResult =
   | undefined
 
 export const useSendAccountBalances = () => {
-  const pricesQuery = useTokenPrices('dexscreener')
+  const pricesQuery = useTokenPrices()
   const { data: sendAccount } = useSendAccount()
 
   const tokenContracts = useMemo(

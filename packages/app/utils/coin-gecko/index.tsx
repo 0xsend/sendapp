@@ -10,15 +10,15 @@ export const MarketDataSchema = z
     image: z.string(),
     current_price: z.number(),
     market_cap: z.number(),
-    market_cap_rank: z.number(),
+    market_cap_rank: z.number().nullable(),
     fully_diluted_valuation: z.number(),
     total_volume: z.number(),
-    high_24h: z.number(),
-    low_24h: z.number(),
-    price_change_24h: z.number(),
-    price_change_percentage_24h: z.number(),
-    market_cap_change_24h: z.number(),
-    market_cap_change_percentage_24h: z.number(),
+    high_24h: z.number().nullable(),
+    low_24h: z.number().nullable(),
+    price_change_24h: z.number().nullable(),
+    price_change_percentage_24h: z.number().nullable(),
+    market_cap_change_24h: z.number().nullable(),
+    market_cap_change_percentage_24h: z.number().nullable(),
     circulating_supply: z.number(),
     total_supply: z.number(),
     max_supply: z.number().nullable(),
@@ -60,7 +60,7 @@ export const useTokenPrice = <T extends coins[number]['coingeckoTokenId']>(token
 /**
  * Fetch current Send token price
  */
-export const useSendPrice = () => useTokenPrice('send-token' as const)
+export const useSendPrice = () => useTokenPrice('send-token-2' as const)
 
 /**
  * Fetch coin market data
@@ -74,13 +74,21 @@ export const useTokenMarketData = <
     queryKey: ['coin-market-data', tokenId],
     queryFn: async () => {
       const response = await fetch(
-        `https://api.coingecko.com/api/v3/coins/markets?ids=${tokenId}&vs_currency=usd`
+        `https://api.coingecko.com/api/v3/coins/markets?ids=${tokenId}&vs_currency=usd`,
+        {
+          headers: {
+            Accept: 'application/json',
+          },
+          mode: 'cors',
+        }
       )
 
       if (!response.ok) throw new Error(`Failed to fetch coin ${tokenId} ${response.status}`)
       const data = await response.json()
 
-      return MarketDataSchema.parse(data)
+      const d = MarketDataSchema.parse(data)
+
+      return d
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
   })
