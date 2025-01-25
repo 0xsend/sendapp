@@ -19,6 +19,7 @@ import {
   IconDeviceReset,
   IconHome,
   IconSendLogo,
+  IconStacks,
 } from 'app/components/icons'
 import { SideBarNavLink } from 'app/components/sidebar/SideBarNavLink'
 
@@ -39,6 +40,11 @@ const links = [
     icon: <IconActivity size={'$1'} color={'inherit'} />,
     text: 'Send',
     href: '/send',
+  },
+  {
+    icon: <IconStacks size={'$1'} color={'inherit'} />,
+    text: 'Earn',
+    href: '/earn',
   },
   {
     icon: <IconDeviceReset size={'$1'} color={'inherit'} />,
