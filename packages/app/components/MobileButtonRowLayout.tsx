@@ -170,8 +170,9 @@ const ActivityRewards = ({ children, ...props }: XStackProps) => {
   const isVisible =
     distribution !== undefined &&
     shareAmount !== undefined &&
-    shareAmount > 0 &&
+    shareAmount > 0n &&
     direction !== 'down'
+
   const distributionMonth = distribution?.timezone_adjusted_qualification_end.toLocaleString(
     'default',
     {

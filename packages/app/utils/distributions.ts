@@ -58,6 +58,7 @@ function fetchDistributions(supabase: SupabaseClient<Database>) {
       merkle_drop_addr,
       name,
       number,
+      tranche_id,
       qualification_end,
       qualification_start,
       snapshot_block_num,
@@ -457,7 +458,7 @@ export function useGenerateClaimUserOp({
   share?: UseDistributionsResultData[number]['distribution_shares'][number]
   nonce?: bigint
 }): UseQueryResult<UserOperation<'v0.7'>> {
-  const trancheId = BigInt(distribution.number - 1) // tranches are 0-indexed
+  const trancheId = BigInt(distribution.tranche_id) // tranches are 0-indexed
   const chainId = distribution.chain_id as keyof typeof sendMerkleDropAddress
   const merkleDropAddress = byteaToHex(distribution.merkle_drop_addr as `\\x${string}`)
 
@@ -522,7 +523,10 @@ export function useGenerateClaimUserOp({
     enabled: enabled,
     queryFn: () => {
       assert(!!sender && isAddress(sender), 'Invalid send account address')
-      assert(typeof amount_after_slash === 'number' && amount_after_slash > 0, 'Invalid amount')
+      assert(
+        typeof amount_after_slash === 'string' && BigInt(amount_after_slash) > 0n,
+        'Invalid amount'
+      )
       assert(typeof nonce === 'bigint' && nonce >= 0n, 'Invalid nonce')
 
       const callData = encodeFunctionData({
@@ -573,7 +577,7 @@ export const usePrepareSendMerkleDropClaimTrancheWrite = ({
   distribution,
   share,
 }: SendMerkleDropClaimTrancheArgs) => {
-  const trancheId = BigInt(distribution.number - 1) // tranches are 0-indexed
+  const trancheId = BigInt(distribution.tranche_id) // tranches are 0-indexed
   const chainId = distribution.chain_id as keyof typeof sendMerkleDropAddress
   const merkleDropAddress = byteaToHex(distribution.merkle_drop_addr as `\\x${string}`)
   // get the merkle proof from the database

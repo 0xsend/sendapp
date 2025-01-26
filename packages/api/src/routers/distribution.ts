@@ -4,6 +4,9 @@ import { supabaseAdmin } from 'app/utils/supabase/admin'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
 import { selectAll } from 'app/utils/supabase/selectAll'
+import debugBase from 'debug'
+
+const debug = debugBase('api:distribution')
 
 export const distributionRouter = createTRPCRouter({
   proof: protectedProcedure
@@ -17,7 +20,7 @@ export const distributionRouter = createTRPCRouter({
       const { data: shares, error: sharesError } = await selectAll(
         supabaseAdmin
           .from('distribution_shares')
-          .select('index, address, amount_after_slash, user_id', { count: 'exact' })
+          .select('index, address, amount_after_slash::text, user_id', { count: 'exact' })
           .eq('distribution_id', distributionId)
           .order('index', { ascending: true })
       )
@@ -51,16 +54,18 @@ export const distributionRouter = createTRPCRouter({
         shares.map(({ index, address, amount_after_slash }) => [
           index,
           address,
-          amount_after_slash,
+          BigInt(amount_after_slash),
         ]),
         ['uint256', 'address', 'uint256']
       )
+
+      debug('Generated merkle tree', tree.root)
 
       // this is what the user will need to submit to claim their tokens
       return tree.getProof([
         myShare.index,
         myShare.address,
-        myShare.amount_after_slash,
+        BigInt(myShare.amount_after_slash),
       ]) as `0x${string}`[]
     }),
 })

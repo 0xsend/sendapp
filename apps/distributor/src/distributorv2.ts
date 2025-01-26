@@ -145,7 +145,7 @@ export class DistributorV2Worker {
     )
     if (
       await isMerkleDropActive({
-        number: distribution.number,
+        tranche_id: distribution.tranche_id,
         chain_id: distribution.chain_id,
         merkle_drop_addr: distribution.merkle_drop_addr,
       })

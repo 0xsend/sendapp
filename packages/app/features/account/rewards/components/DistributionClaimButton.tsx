@@ -15,6 +15,7 @@ import {
 
 import { useSendAccount } from 'app/utils/send-accounts'
 import { throwIf } from 'app/utils/throwIf'
+import { toNiceError } from 'app/utils/toNiceError'
 import { useAccountNonce } from 'app/utils/userop'
 import { useUSDCFees } from 'app/utils/useUSDCFees'
 import { useEffect, useState } from 'react'
@@ -31,7 +32,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   const share = distribution.distribution_shares?.[0]
   const isEligible = !!share && BigInt(share.amount_after_slash) > 0
   const isClaimActive = distribution.qualification_end < new Date()
-  const trancheId = BigInt(distribution.number - 1) // tranches are 0-indexed
+  const trancheId = BigInt(distribution.tranche_id)
   const chainId = distribution.chain_id as keyof typeof sendMerkleDropAddress
   const merkleDropAddress = distribution.merkle_drop_addr
     ? byteaToHex(distribution.merkle_drop_addr as `\\x${string}`)
@@ -78,7 +79,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
       .filter((c) => !!c.webauthn_credentials)
       .map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? []
 
-  const { data: userOp } = useGenerateClaimUserOp({
+  const { data: userOp, error: userOpError } = useGenerateClaimUserOp({
     distribution,
     share,
     nonce,
@@ -109,11 +110,13 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
 
   const hasEnoughGas =
     usdcFees && (usdc?.balance ?? BigInt(0)) >= usdcFees.baseFee + usdcFees.gasFees
-
   const canClaim = isTrancheActive && isClaimActive && isEligible && hasEnoughGas
   useEffect(() => {
     if (usdcFeesError) {
       setError(usdcFeesError)
+    }
+    if (userOpError) {
+      setError(userOpError)
     }
     if (feesPerGasError) {
       setError(feesPerGasError)
@@ -138,24 +141,17 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     isTrancheActiveError,
     isClaimedError,
     isClaimError,
+    userOpError,
   ])
 
   useEffect(() => {
     if (error) {
       console.log(error)
-      if (!error.message) {
-        toast.show(error.name, {
-          preset: 'error',
-          isUrgent: true,
-          duration: 10000000,
-        })
-      } else {
-        toast.show(error.message.split('.').at(0) ?? error.name, {
-          preset: 'error',
-          isUrgent: true,
-          duration: 10000000,
-        })
-      }
+      toast.show(toNiceError(error), {
+        preset: 'error',
+        isUrgent: true,
+        duration: 10000000,
+      })
     }
   }, [error, toast])
 

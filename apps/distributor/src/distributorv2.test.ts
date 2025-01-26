@@ -89,6 +89,7 @@ describe('Distributor V2 Worker', () => {
     const distribution = {
       id: 4,
       number: 4,
+      tranche_id: 4,
       amount: '10000',
       hodler_pool_bips: 10000,
       bonus_pool_bips: 0,
