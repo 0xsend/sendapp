@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Button, Text, XStack, YStack, Input, Card } from '@my/ui'
+import { LinkableButton } from '@my/ui'
 
 interface OnrampFlowProps {
   defaultAmount?: number
@@ -61,14 +62,20 @@ export function OnrampFlow({
       </Card>
 
       <Button
-        backgroundColor="$primary"
-        color="$colorInverse"
-        size="$5"
-        onPress={() => onConfirmTransaction(amount)}
+        theme="green"
+        px="$3.5"
+        h="$4.5"
+        borderRadius="$4"
+        f={1}
         disabled={isLoading || amount < 10 || amount > 500}
         opacity={amount >= 10 && amount <= 500 && !isLoading ? 1 : 0.5}
+        onPress={() => onConfirmTransaction(amount)}
       >
-        {isLoading ? 'Processing...' : 'BUY NOW'}
+        <XStack w="100%" gap="$2.5" ai="center" jc="center">
+          <LinkableButton.Text fontWeight="500" tt="uppercase" $theme-dark={{ col: '$color0' }}>
+            {isLoading ? 'PROCESSING...' : 'BUY NOW'}
+          </LinkableButton.Text>
+        </XStack>
       </Button>
     </YStack>
   )

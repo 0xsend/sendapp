@@ -6,6 +6,7 @@ import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinbaseOnramp } from 'app/utils/useCoinbaseOnramp'
 import { OnrampFlow } from './components/OnrampFlow'
 import { Spinner } from '@my/ui'
+import { LinkableButton } from '@my/ui'
 
 const COINBASE_APP_ID = process.env.NEXT_PUBLIC_CDP_APP_ID ?? ''
 
@@ -173,15 +174,24 @@ export function DepositScreen() {
             </Button>
 
             <Button
-              backgroundColor="$primary"
-              color="$color"
-              size="$5"
-              mt="$3"
+              theme="green"
+              px="$3.5"
+              h="$4.5"
+              borderRadius="$4"
+              f={1}
               disabled={!selectedOption || isLoading}
               opacity={selectedOption && !isLoading ? 1 : 0.5}
               onPress={handleContinue}
             >
-              {isLoading ? 'LOADING...' : 'CONTINUE'}
+              <XStack w="100%" gap="$2.5" ai="center" jc="center">
+                <LinkableButton.Text
+                  fontWeight="500"
+                  tt="uppercase"
+                  $theme-dark={{ col: '$color0' }}
+                >
+                  {isLoading ? 'LOADING...' : 'CONTINUE'}
+                </LinkableButton.Text>
+              </XStack>
             </Button>
           </YStack>
         )
