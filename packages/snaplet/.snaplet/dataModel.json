@@ -926,7 +926,7 @@
           "id": "public.coinbase_transactions.payment_method",
           "name": "payment_method",
           "columnName": "payment_method",
-          "type": "text",
+          "type": "payment_method",
           "isRequired": true,
           "kind": "scalar",
           "isList": false,
@@ -9749,6 +9749,26 @@
         },
         {
           "name": "tag"
+        }
+      ]
+    },
+    "payment_method": {
+      "schemaName": "public",
+      "values": [
+        {
+          "name": "ACH_BANK_ACCOUNT"
+        },
+        {
+          "name": "APPLE_PAY"
+        },
+        {
+          "name": "CARD"
+        },
+        {
+          "name": "CRYPTO_WALLET"
+        },
+        {
+          "name": "FIAT_WALLET"
         }
       ]
     },

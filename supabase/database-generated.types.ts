@@ -138,7 +138,7 @@ export type Database = {
           created_at: string
           id: number
           payment_currency: string
-          payment_method: string
+          payment_method: Database["public"]["Enums"]["payment_method"]
           payment_total: number
           purchase_amount: number
           purchase_currency: string
@@ -150,7 +150,7 @@ export type Database = {
           created_at?: string
           id?: number
           payment_currency: string
-          payment_method: string
+          payment_method: Database["public"]["Enums"]["payment_method"]
           payment_total: number
           purchase_amount: number
           purchase_currency: string
@@ -162,7 +162,7 @@ export type Database = {
           created_at?: string
           id?: number
           payment_currency?: string
-          payment_method?: string
+          payment_method?: Database["public"]["Enums"]["payment_method"]
           payment_total?: number
           purchase_amount?: number
           purchase_currency?: string
@@ -1482,6 +1482,12 @@ export type Database = {
     Enums: {
       key_type_enum: "ES256"
       lookup_type_enum: "sendid" | "tag" | "refcode" | "address" | "phone"
+      payment_method:
+        | "CARD"
+        | "ACH_BANK_ACCOUNT"
+        | "APPLE_PAY"
+        | "FIAT_WALLET"
+        | "CRYPTO_WALLET"
       tag_status: "pending" | "confirmed"
       verification_type:
         | "tag_registration"

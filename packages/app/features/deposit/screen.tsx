@@ -4,18 +4,15 @@ import { useState, useEffect } from 'react'
 import { DepositAddress } from './components/DepositAddress'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinbaseOnramp } from 'app/utils/useCoinbaseOnramp'
-import { OnrampAmountSelector } from './components/OnrampAmountSelector'
-import { OnrampSummary } from './components/OnrampSummary'
+import { OnrampFlow } from './components/OnrampFlow'
 import { Spinner } from '@my/ui'
-import { api } from 'app/utils/api'
 
 const COINBASE_APP_ID = process.env.NEXT_PUBLIC_CDP_APP_ID ?? ''
 
 export function DepositScreen() {
   const [selectedOption, setSelectedOption] = useState<'crypto' | 'apple' | null>(null)
   const [showAddress, setShowAddress] = useState(false)
-  const [showAmountSelector, setShowAmountSelector] = useState(false)
-  const [showPreview, setShowPreview] = useState(false)
+  const [showAmountFlow, setShowAmountFlow] = useState(false)
   const [selectedAmount, setSelectedAmount] = useState<number>(0)
 
   const { data: sendAccount } = useSendAccount()
@@ -25,28 +22,13 @@ export function DepositScreen() {
     selectedAmount
   )
 
-  const getQuote = api.coinbase.getQuote.useMutation({
-    onSuccess: () => {
-      setShowPreview(true)
-    },
-    onError: (error) => {
-      console.error('Failed to fetch quote:', error)
-    },
-  })
-
   useEffect(() => {
     if (status === 'idle') {
       setSelectedOption(null)
       setShowAddress(false)
+      setShowAmountFlow(false)
     }
   }, [status])
-
-  useEffect(() => {
-    const reset = getQuote.reset
-    return () => {
-      reset()
-    }
-  }, [getQuote.reset])
 
   const handleContinue = () => {
     if (!sendAccount?.address) return
@@ -54,29 +36,13 @@ export function DepositScreen() {
     if (selectedOption === 'crypto') {
       setShowAddress(true)
     } else if (selectedOption === 'apple') {
-      setShowAmountSelector(true)
+      setShowAmountFlow(true)
     }
   }
 
-  const handleAmountConfirm = (amount: number) => {
+  const handleConfirmTransaction = (amount: number) => {
     setSelectedAmount(amount)
-
-    getQuote.mutate({
-      purchase_currency: 'USDC',
-      payment_amount: amount.toString(),
-      payment_currency: 'USD',
-      payment_method: 'APPLE_PAY',
-      country: 'US',
-    })
-  }
-
-  const handleConfirmTransaction = () => {
-    setShowPreview(false)
-    openOnramp(selectedAmount)
-  }
-
-  const handleCancel = () => {
-    closeOnramp()
+    openOnramp(amount)
   }
 
   const renderContent = () => {
@@ -90,7 +56,7 @@ export function DepositScreen() {
             <Text color="$gray11" ta="center">
               {error.message}
             </Text>
-            <Button backgroundColor="$primary" color="$color" size="$4" onPress={handleCancel}>
+            <Button backgroundColor="$primary" color="$color" size="$4" onPress={closeOnramp}>
               Try Again
             </Button>
           </YStack>
@@ -106,7 +72,7 @@ export function DepositScreen() {
             <Text color="$gray11" ta="center">
               Your funds are on the way. They will appear in your wallet shortly.
             </Text>
-            <Button backgroundColor="$primary" color="$color" size="$4" onPress={handleCancel}>
+            <Button backgroundColor="$primary" color="$color" size="$4" onPress={closeOnramp}>
               Make Another Deposit
             </Button>
           </YStack>
@@ -122,14 +88,14 @@ export function DepositScreen() {
             <Text color="$gray11" ta="center">
               Please complete your transaction in the Coinbase window.
             </Text>
-            <Button variant="outlined" color="$color" size="$4" onPress={handleCancel}>
+            <Button variant="outlined" color="$color" size="$4" onPress={closeOnramp}>
               Cancel
             </Button>
           </YStack>
         )
 
-      case showAmountSelector:
-        return <OnrampAmountSelector onConfirm={handleAmountConfirm} />
+      case showAmountFlow:
+        return <OnrampFlow onConfirmTransaction={handleConfirmTransaction} isLoading={isLoading} />
 
       case showAddress:
         return (
@@ -226,21 +192,6 @@ export function DepositScreen() {
           {renderContent()}
         </YStack>
       </YStack>
-
-      <OnrampSummary
-        open={showPreview}
-        onOpenChange={(open) => {
-          setShowPreview(open)
-          if (!open) {
-            getQuote.reset()
-          }
-        }}
-        amount={selectedAmount}
-        onConfirm={handleConfirmTransaction}
-        isLoading={isLoading || getQuote.isPending}
-        quote={getQuote.data || null}
-        error={getQuote.error?.message}
-      />
     </YStack>
   )
 }

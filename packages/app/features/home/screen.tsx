@@ -19,7 +19,6 @@ import { TokenBalanceList } from './TokenBalanceList'
 import { TokenDetails } from './TokenDetails'
 import Search from 'app/components/SearchBar'
 import { useTagSearch } from 'app/provider/tag-search'
-import { DepositAddress } from 'app/components/DepositAddress'
 import { useRootScreenParams } from 'app/routers/params'
 import { HomeButtons } from './HomeButtons'
 import { AlertCircle } from '@tamagui/lucide-icons'
@@ -47,7 +46,6 @@ function SendSearchBody() {
 }
 
 function HomeBody(props: XStackProps) {
-  const { data: sendAccount } = useSendAccount()
   const { coin: selectedCoin } = useCoinFromTokenParam()
   const { isSendingUnlocked, isLoading } = useIsSendingUnlocked()
 
