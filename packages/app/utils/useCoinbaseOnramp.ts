@@ -14,112 +14,93 @@ export function useCoinbaseOnramp(appId: string, destinationAddress: string, amo
     },
   })
 
-  const handleSuccess = useCallback(() => {
-    setStatus('success')
-    utils.coinbase.invalidate()
-  }, [utils.coinbase])
-
-  const handleExit = useCallback(() => {
-    setStatus('idle')
-    console.log('handleExit')
+  const closeOnramp = useCallback(() => {
+    if (instanceRef.current) {
+      instanceRef.current.destroy()
+      instanceRef.current = null
+    }
+    setError(null)
   }, [])
 
-  useEffect(() => {
-    if (!destinationAddress || !appId) {
-      return undefined
-    }
-
-    try {
-      initOnRamp(
-        {
-          appId,
-          widgetParameters: {
-            addresses: { '0xCF6D79F936f50B6a8257733047308664151B2510': ['base'] },
-            assets: ['USDC'],
-            presetCryptoAmount: amount || 10,
-            defaultNetwork: 'base',
-            defaultExperience: 'buy',
-            partnerUserId: destinationAddress,
-          },
-          onSuccess: handleSuccess,
-          onExit: handleExit,
-          onEvent: (event) => {
-            console.log('Coinbase event:', event)
-          },
-          experienceLoggedIn: 'popup',
-          experienceLoggedOut: 'popup',
-        },
-        (initError, instance) => {
-          if (initError || !instance) {
-            setError(initError || new Error('Failed to initialize Coinbase Onramp'))
-            return
-          }
-          instanceRef.current = instance
-        }
-      )
-
-      return () => {
-        if (instanceRef.current) {
-          instanceRef.current.destroy()
-          instanceRef.current = null
-          setError(null)
-        }
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Unexpected initialization error'))
-      return undefined
-    }
-  }, [appId, destinationAddress, amount, handleSuccess, handleExit])
-
-  const openOnramp = useCallback(
-    (amount: number) => {
-      if (!instanceRef.current) return
-
-      if (amount) {
-        instanceRef.current.destroy()
+  const initializeOnramp = useCallback(
+    (customAmount?: number) => {
+      return new Promise<CBPayInstanceType>((resolve, reject) => {
         initOnRamp(
           {
             appId,
             widgetParameters: {
               addresses: { '0xCF6D79F936f50B6a8257733047308664151B2510': ['base'] },
               assets: ['USDC'],
-              presetCryptoAmount: amount,
+              presetCryptoAmount: customAmount || amount || 10,
               defaultNetwork: 'base',
               defaultExperience: 'buy',
               partnerUserId: destinationAddress,
             },
-            onSuccess: handleSuccess,
-            onExit: handleExit,
+            onSuccess: () => {
+              console.log('Success called')
+              setStatus('success')
+              utils.coinbase.invalidate()
+            },
+            onExit: () => {
+              console.log('Exit called')
+              closeOnramp()
+              setStatus('idle')
+            },
             onEvent: (event) => {
               console.log('Coinbase event:', event)
+              if (event.eventName === 'open' || event.eventName === 'transition_view') {
+                console.log('Setting status to pending')
+                setStatus('pending')
+              }
             },
             experienceLoggedIn: 'popup',
             experienceLoggedOut: 'popup',
           },
           (initError, instance) => {
             if (initError || !instance) {
-              setError(initError || new Error('Failed to initialize Coinbase Onramp'))
+              const error = initError || new Error('Failed to initialize Coinbase Onramp')
+              setError(error)
+              setStatus('idle')
+              reject(error)
               return
             }
             instanceRef.current = instance
-            setStatus('pending')
-            instance.open()
+            resolve(instance)
           }
         )
-      } else {
-        setStatus('pending')
-        instanceRef.current.open()
-      }
+      })
     },
-    [appId, destinationAddress, handleSuccess, handleExit]
+    [appId, destinationAddress, amount, utils.coinbase, closeOnramp]
   )
 
-  const closeOnramp = useCallback(() => {
-    if (!instanceRef.current) return
-    setStatus('idle')
-    instanceRef.current.destroy()
-    instanceRef.current = null
-  }, [])
+  const openOnramp = useCallback(
+    async (customAmount: number) => {
+      try {
+        console.log('Opening onramp with amount:', customAmount)
+        if (instanceRef.current) {
+          instanceRef.current.destroy()
+        }
+
+        const instance = await initializeOnramp(customAmount)
+        console.log('Instance initialized, opening...')
+        instance.open()
+      } catch (err) {
+        console.error('Failed to open onramp:', err)
+        setStatus('idle')
+      }
+    },
+    [initializeOnramp]
+  )
+
+  useEffect(() => {
+    if (!destinationAddress || !appId) return
+
+    initializeOnramp()
+
+    return () => {
+      closeOnramp()
+    }
+  }, [appId, destinationAddress, initializeOnramp, closeOnramp])
 
   return {
     openOnramp,

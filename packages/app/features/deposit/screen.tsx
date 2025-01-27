@@ -16,11 +16,12 @@ export function DepositScreen() {
   const [selectedAmount, setSelectedAmount] = useState<number>(0)
 
   const { data: sendAccount } = useSendAccount()
-  const { openOnramp, status, isLoading, error, closeOnramp } = useCoinbaseOnramp(
+  const { openOnramp, status, error, isLoading, closeOnramp } = useCoinbaseOnramp(
     COINBASE_APP_ID,
     sendAccount?.address ?? '',
     selectedAmount
   )
+  console.log('Hook returned status:', status)
 
   useEffect(() => {
     if (status === 'idle') {
@@ -46,6 +47,7 @@ export function DepositScreen() {
   }
 
   const renderContent = () => {
+    console.log('Current status:', status)
     switch (true) {
       case !!error:
         return (
@@ -62,6 +64,23 @@ export function DepositScreen() {
           </YStack>
         )
 
+      case status === 'pending':
+        console.log('Rendering pending state')
+        return (
+          <YStack ai="center" gap="$4" py="$8">
+            <Spinner size="large" color="$primary" />
+            <Text fontSize="$6" fontWeight="500" ta="center">
+              Complete Your Transaction
+            </Text>
+            <Text color="$gray11" ta="center">
+              Please complete your transaction in the Coinbase window.
+            </Text>
+            <Button variant="outlined" color="$color" size="$4" onPress={closeOnramp}>
+              Cancel
+            </Button>
+          </YStack>
+        )
+
       case status === 'success':
         return (
           <YStack ai="center" gap="$4" py="$8">
@@ -74,22 +93,6 @@ export function DepositScreen() {
             </Text>
             <Button backgroundColor="$primary" color="$color" size="$4" onPress={closeOnramp}>
               Make Another Deposit
-            </Button>
-          </YStack>
-        )
-
-      case status === 'pending':
-        return (
-          <YStack ai="center" gap="$4" py="$8">
-            <Spinner size="large" color="$primary" />
-            <Text fontSize="$6" fontWeight="500" ta="center">
-              Complete Your Transaction
-            </Text>
-            <Text color="$gray11" ta="center">
-              Please complete your transaction in the Coinbase window.
-            </Text>
-            <Button variant="outlined" color="$color" size="$4" onPress={closeOnramp}>
-              Cancel
             </Button>
           </YStack>
         )
