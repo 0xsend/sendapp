@@ -103,12 +103,19 @@ function ActivityFeed({
               <YStack key={date} gap={'$3.5'}>
                 <RowLabel>{date}</RowLabel>
                 <Fade>
-                  <YGroup bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }}>
-                    {activities.map((activity) => (
+                  <YGroup bc={'$color0'} $gtLg={{ p: '$3.5' }}>
+                    {activities.map((activity, activityIndex) => (
                       <YGroup.Item
                         key={`${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`}
                       >
-                        <TokenActivityRow activity={activity} onPress={onActivityPress} />
+                        <TokenActivityRow
+                          activity={activity}
+                          onPress={() => onActivityPress(activity)}
+                          btrr={activityIndex === 0 ? '$4' : 0}
+                          btlr={activityIndex === 0 ? '$4' : 0}
+                          bbrr={activityIndex === activities.length - 1 ? '$4' : 0}
+                          bblr={activityIndex === activities.length - 1 ? '$4' : 0}
+                        />
                       </YGroup.Item>
                     ))}
                   </YGroup>

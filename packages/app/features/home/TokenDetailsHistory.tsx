@@ -7,8 +7,9 @@ import { AnimateEnter } from './TokenDetails'
 import { TokenActivityRow } from './TokenActivityRow'
 
 export const TokenDetailsHistory = ({ coin }: { coin: CoinWithBalance }) => {
+  const pageSize = 10
   const result = useTokenActivityFeed({
-    pageSize: 10,
+    pageSize,
     address: coin.token === 'eth' ? undefined : hexToBytea(coin.token),
   })
   const {
@@ -40,9 +41,12 @@ export const TokenDetailsHistory = ({ coin }: { coin: CoinWithBalance }) => {
           default: {
             let lastDate: string | undefined
             return (
-              <Card testID="TokenDetailsHistory" p="$2" $gtLg={{ p: '$3.5' }}>
-                {pages?.map((activities) => {
-                  return activities.map((activity) => {
+              <Card testID="TokenDetailsHistory" $gtLg={{ p: '$3.5' }} bc="$color0">
+                {pages?.map((activities, pageIndex) => {
+                  return activities.map((activity, activityIndex) => {
+                    const isFirst = pageIndex === 0 && activityIndex === 0
+                    const isLastPage = pageIndex === pages.length - 1
+                    const isLast = isLastPage && activityIndex === activities.length - 1
                     const date = activity.created_at.toLocaleDateString()
                     const isNewDate = !lastDate || date !== lastDate
                     if (isNewDate) {
@@ -53,7 +57,13 @@ export const TokenDetailsHistory = ({ coin }: { coin: CoinWithBalance }) => {
                         key={`${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`}
                       >
                         <AnimateEnter>
-                          <TokenActivityRow activity={activity} />
+                          <TokenActivityRow
+                            activity={activity}
+                            btrr={isFirst ? '$4' : 0}
+                            btlr={isFirst ? '$4' : 0}
+                            bbrr={isLast ? '$4' : 0}
+                            bblr={isLast ? '$4' : 0}
+                          />
                         </AnimateEnter>
                       </Fragment>
                     )

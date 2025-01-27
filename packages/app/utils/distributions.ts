@@ -1,4 +1,4 @@
-import type { Database, Json, Tables } from '@my/supabase/database.types'
+import type { Database, Tables } from '@my/supabase/database.types'
 import {
   baseMainnetBundlerClient,
   baseMainnetClient,
