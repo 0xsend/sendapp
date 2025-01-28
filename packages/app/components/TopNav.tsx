@@ -132,6 +132,7 @@ export function TopNav({
     (!noSubroute && parts.length > 1) ||
     path.includes('/secret-shop') ||
     path.includes('/deposit') ||
+    path.includes('/swap') ||
     path.includes('/leaderboard')
 
   return (
