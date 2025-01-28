@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`TokenDetails 1`] = `
+exports[`TokenDetails renders correctly 1`] = `
 <View
   style={
     {
