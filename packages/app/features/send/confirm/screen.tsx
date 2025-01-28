@@ -85,7 +85,7 @@ export function SendConfirm() {
   const { coin: selectedCoin, tokensQuery, ethQuery } = useCoinFromSendTokenParam()
   const isUSDCSelected = selectedCoin?.label === 'USDC'
   const { coin: usdc } = useCoin('USDC')
-  const { data: prices, isLoading: isPricesLoading } = useTokenPrices('dexscreener')
+  const { data: prices, isLoading: isPricesLoading } = useTokenPrices()
 
   const { data: profile, isLoading: isProfileLoading } = useProfileLookup(
     idType ?? 'tag',

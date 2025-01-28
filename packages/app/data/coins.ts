@@ -39,7 +39,7 @@ export const sendCoin: coin = {
   token: sendAddresses[baseMainnet.id],
   decimals: 18,
   formatDecimals: 0,
-  coingeckoTokenId: 'send-token',
+  coingeckoTokenId: 'send-token-2',
 } as const
 
 // can probably remove this

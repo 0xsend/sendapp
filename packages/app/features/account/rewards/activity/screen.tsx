@@ -32,6 +32,7 @@ import { useRewardsScreenParams } from 'app/routers/params'
 import { isEqualCalendarDate } from 'app/utils/dateHelper'
 import { toNiceError } from 'app/utils/toNiceError'
 import { min } from 'app/utils/bigint'
+import type { Json } from '@my/supabase/database.types'
 
 //@todo get this from the db
 const verificationTypesAndTitles = {
@@ -385,10 +386,11 @@ const TaskCard = ({
   isQualificationOver: boolean
 }) => {
   const type = verification.type
-  const metadata = (verification.metadata ?? {}) as Record<string, number | string>
+  const metadata = (verification.metadata ?? []) as Json[]
   const weight = verification.weight
   const value = ['send_ten', 'send_one_hundred'].includes(type)
-    ? BigInt(metadata?.value ?? 0)
+    ? //@ts-expect-error these two verfiications will always have "value" in the metadata
+      BigInt(metadata?.[0]?.value ?? 0)
     : weight
   const isSendStreak = type === 'send_streak'
   const isTagRegistration = type === 'tag_registration'

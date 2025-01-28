@@ -110,7 +110,7 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
 }
 
 const TokenDetailsBalance = ({ coin }: { coin: CoinWithBalance }) => {
-  const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices('dexscreener')
+  const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
   const { balance, decimals, formatDecimals = 5 } = coin
 
   if (coin.balance === undefined) {
