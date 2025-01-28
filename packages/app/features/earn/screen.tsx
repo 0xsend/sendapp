@@ -1,14 +1,19 @@
-import { Button, Card, Fade, Paragraph, Separator, XStack, YStack, LinearGradient } from '@my/ui'
+import { Card, Fade, LinearGradient, Paragraph, Separator, XStack, YStack } from '@my/ui'
 import type { ReactNode } from 'react'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { IconArrowRight, IconStacks } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
+import { useRouter } from 'solito/router'
+import { Row } from 'app/features/earn/components/Row'
+import { SectionButton } from 'app/features/earn/components/SectionButton'
 
 export const EarnScreen = () => {
   return (
     <YStack w={'100%'} gap={'$4'} py={'$3'} $gtLg={{ w: '50%' }}>
       <LearnSection />
       <DetailsSection />
+      {/*// TODO remove this line*/}
+      <EarningsSummary />
     </YStack>
   )
 }
@@ -54,37 +59,6 @@ const Badge = ({ text }: { text: string }) => {
       <IconStacks size={'$2'} color="$primary" $theme-light={{ color: '$color12' }} />
       <Paragraph size={'$5'}>{text}</Paragraph>
     </XStack>
-  )
-}
-
-const Row = ({ label, value }: { label: string; value: string }) => {
-  return (
-    <XStack gap={'$2.5'} jc={'space-between'}>
-      <Paragraph
-        size={'$5'}
-        color={'$lightGrayTextField'}
-        $theme-light={{ color: '$darkGrayTextField' }}
-      >
-        {label}
-      </Paragraph>
-      <Paragraph size={'$5'}>{value}</Paragraph>
-    </XStack>
-  )
-}
-
-const SectionButton = ({ text }: { text: string }) => {
-  return (
-    <Button
-      theme={'green'}
-      br={'$4'}
-      fontFamily={'$mono'}
-      fontSize={'$5'}
-      p={'$5'}
-      fontWeight={'500'}
-      color={'$black'}
-    >
-      {text}
-    </Button>
   )
 }
 
@@ -148,6 +122,8 @@ const LearnSection = () => {
 
 // TODO plug on press handler
 const EarningsCallToAction = () => {
+  const { push } = useRouter()
+
   return (
     <Fade>
       <Card w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>
@@ -163,7 +139,7 @@ const EarningsCallToAction = () => {
             <ListItem>Rewards: Bonus SEND tokens</ListItem>
           </YStack>
         </YStack>
-        <SectionButton text={'START EARNING'} />
+        <SectionButton text={'START EARNING'} onPress={() => push('/earn/earning-form')} />
       </Card>
     </Fade>
   )
@@ -172,7 +148,7 @@ const EarningsCallToAction = () => {
 // TODO plug real values
 // TODO plug on press handler
 const EarningsSummary = () => {
-  const totalValue = '123,123,123,233,123'
+  const totalValue = '2,267.50'
 
   return (
     <Fade>
@@ -228,7 +204,7 @@ const EarningsSummary = () => {
             <Row label={'Rewards'} value={'15,000 SEND'} />
           </YStack>
         </YStack>
-        <SectionButton text={'VIEW DETAILS'} />
+        <SectionButton text={'VIEW DETAILS'} onPress={() => {}} />
       </Card>
     </Fade>
   )
