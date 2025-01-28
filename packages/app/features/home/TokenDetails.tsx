@@ -101,7 +101,7 @@ export const TokenDetailsMarketData = ({ coin }: { coin: CoinWithBalance }) => {
 
   const price = tokenMarketData?.at(0)?.current_price ?? prices?.[coin.token]
 
-  const changePercent24h = tokenMarketData?.at(0)?.price_change_percentage_24h
+  const changePercent24h = tokenMarketData?.at(0)?.price_change_percentage_24h ?? null
 
   // Coingecko API returns a formatted price already. For now, we just want to make sure it doesn't have more than 8 digits
   // so the text doesn't get cut off.
@@ -146,7 +146,7 @@ export const TokenDetailsMarketData = ({ coin }: { coin: CoinWithBalance }) => {
         <Spinner size="small" color={'$color12'} />
       ) : (
         <XStack gap={'$1.5'} ai="center" jc={'space-around'}>
-          {changePercent24h === undefined ? (
+          {changePercent24h === null ? (
             <XStack gap="$2" ai="center">
               <Paragraph color="$color10">Failed to load market data</Paragraph>
               <IconError size="$1.75" color={'$redVibrant'} />

@@ -15,29 +15,36 @@ jest.mock('app/utils/useTokenPrices', () => ({
   }),
 }))
 
-test('TokenDetails', async () => {
-  jest.useFakeTimers()
-
-  render(
-    <TamaguiProvider defaultTheme={'dark'} config={config}>
-      <TokenDetails coin={{ ...usdcCoin, balance: 1n }} />
-    </TamaguiProvider>
-  )
-
-  await act(async () => {
-    jest.advanceTimersByTime(2000)
-    jest.runAllTimers()
+describe('TokenDetails', () => {
+  beforeEach(() => {
+    jest.useFakeTimers()
+    jest.setSystemTime(new Date('2025-01-28'))
   })
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+  test('renders correctly', async () => {
+    render(
+      <TamaguiProvider defaultTheme={'dark'} config={config}>
+        <TokenDetails coin={{ ...usdcCoin, balance: 1n }} />
+      </TamaguiProvider>
+    )
 
-  expect(screen.toJSON()).toMatchSnapshot()
+    await act(async () => {
+      jest.advanceTimersByTime(2000)
+      jest.runAllTimers()
+    })
 
-  expect(screen.getByText('Withdraw')).toBeOnTheScreen()
-  expect(screen.getByText('Deposit')).toBeOnTheScreen()
-  expect(screen.getByText('Received')).toBeOnTheScreen()
-  expect(screen.getByText('/alice')).toBeOnTheScreen()
-  expect(screen.getByText('0xa71...0000')).toBeOnTheScreen()
-  expect(screen.getByText('0x93F...761a')).toBeOnTheScreen()
-  expect(screen.getByText('10 USDC')).toBeOnTheScreen()
-  expect(screen.getByText('20 USDC')).toBeOnTheScreen()
-  expect(screen.getByText('30 USDC')).toBeOnTheScreen()
+    expect(screen.toJSON()).toMatchSnapshot()
+
+    expect(screen.getByText('Withdraw')).toBeOnTheScreen()
+    expect(screen.getByText('Deposit')).toBeOnTheScreen()
+    expect(screen.getByText('Received')).toBeOnTheScreen()
+    expect(screen.getByText('/alice')).toBeOnTheScreen()
+    expect(screen.getByText('0xa71...0000')).toBeOnTheScreen()
+    expect(screen.getByText('0x93F...761a')).toBeOnTheScreen()
+    expect(screen.getByText('10 USDC')).toBeOnTheScreen()
+    expect(screen.getByText('20 USDC')).toBeOnTheScreen()
+    expect(screen.getByText('30 USDC')).toBeOnTheScreen()
+  })
 })

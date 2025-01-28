@@ -68,13 +68,10 @@ export function AccountScreen() {
       )
   }
 
-  const shareOrCopyOnPress = async () => {
-    if (canShare) {
-      return await Sharing.shareAsync(referralHref)
-    }
-
+  const copyAndMaybeShareOnPress = async () => {
     await Clipboard.setStringAsync(referralHref)
       .then(() => toast.show('Copied your referral link to the clipboard'))
+      .then(() => (canShare ? Sharing.shareAsync(referralHref).catch(() => null) : null))
       .catch(() =>
         toast.show('Something went wrong', {
           message: 'We were unable to copy your referral link to the clipboard',
@@ -220,7 +217,7 @@ export function AccountScreen() {
                 </XStack>
               </LinkableButton>
               <Button
-                onPress={shareOrCopyOnPress}
+                onPress={copyAndMaybeShareOnPress}
                 theme="green"
                 variant={'outlined'}
                 borderRadius={'$3'}
