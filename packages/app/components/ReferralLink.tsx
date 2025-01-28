@@ -32,13 +32,10 @@ export function ReferralLink(props: ButtonProps) {
     canShare()
   }, [])
 
-  const shareOrCopyOnPress = async () => {
-    if (canShare) {
-      return await Sharing.shareAsync(referralHref)
-    }
-
+  const copyAndMaybeShareOnPress = async () => {
     await Clipboard.setStringAsync(referralHref)
       .then(() => toast.show('Copied your referral link to the clipboard'))
+      .then(() => (canShare ? Sharing.shareAsync(referralHref).catch(() => null) : null))
       .catch(() =>
         toast.show('Something went wrong', {
           message: 'We were unable to copy your referral link to the clipboard',
@@ -80,7 +77,7 @@ export function ReferralLink(props: ButtonProps) {
         }}
         onPress={() => {
           setHasCopied(true)
-          shareOrCopyOnPress()
+          copyAndMaybeShareOnPress()
         }}
         {...props}
       >
