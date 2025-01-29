@@ -1,7 +1,6 @@
-import { Button, Card, type CardProps, Label, Paragraph, Spinner, YStack } from '@my/ui'
+import { Button, Card, type CardProps, H4, Paragraph, Spinner, YStack } from '@my/ui'
 import type { CoinWithBalance } from 'app/data/coins'
 import { hexToBytea } from 'app/utils/hexToBytea'
-import { useState } from 'react'
 import { useTokenActivityFeed } from './utils/useTokenActivityFeed'
 import { AnimateEnter } from './TokenDetails'
 import { TokenActivityRow } from './TokenActivityRow'
@@ -9,6 +8,7 @@ import type { Activity } from 'app/utils/zod/activity'
 import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
 import type { ZodError } from 'zod'
 import type { PostgrestError } from '@supabase/postgrest-js'
+import { toNiceError } from 'app/utils/toNiceError'
 
 export const TokenActivity = ({ coin }: { coin: CoinWithBalance }) => {
   const tokenActivityFeedQuery = useTokenActivityFeed({
@@ -16,22 +16,22 @@ export const TokenActivity = ({ coin }: { coin: CoinWithBalance }) => {
     address: coin.token === 'eth' ? undefined : hexToBytea(coin.token),
   })
 
-  const { data, isLoading: isLoadingActivities, error: activitiesError } = tokenActivityFeedQuery
+  const { data, isLoading, error } = tokenActivityFeedQuery
 
   const { pages } = data ?? {}
 
-  if (isLoadingActivities) return <Spinner size="small" />
+  if (isLoading) return <Spinner size="small" />
   return (
     <>
-      {activitiesError !== null ? (
+      {error !== null ? (
         <Paragraph maxWidth={'600'} fontFamily={'$mono'} fontSize={'$5'} color={'$color12'}>
-          {activitiesError?.message.split('.').at(0) ?? `${activitiesError}`}
+          {toNiceError(error)}
         </Paragraph>
       ) : (
-        <YStack>
-          <Label fontSize={'$6'} fontWeight={'500'} color="$color12">
+        <YStack gap={'$3'}>
+          <H4 fontWeight={'600'} size={'$7'}>
             {!pages || !pages[0]?.length ? 'No Activity' : 'Activity'}
-          </Label>
+          </H4>
           <TokenActivityFeed
             testID="TokenActivityFeed"
             tokenActivityFeedQuery={tokenActivityFeedQuery}
@@ -46,9 +46,9 @@ export const TokenActivity = ({ coin }: { coin: CoinWithBalance }) => {
   )
 }
 
-const TokenActivityItem = ({ activity, onActivityPress }: { activity: Activity }) => (
+const TokenActivityItem = ({ activity }: { activity: Activity }) => (
   <AnimateEnter>
-    <TokenActivityRow activity={activity} onPress={onActivityPress} />
+    <TokenActivityRow activity={activity} />
   </AnimateEnter>
 )
 
@@ -78,19 +78,12 @@ const TokenActivityFeed = ({
   return (
     <Card {...props}>
       {pages?.map((activities) => {
-        return activities.map((activity) => {
-          const date = activity.created_at.toLocaleDateString()
-          const isNewDate = !lastDate || date !== lastDate
-          if (isNewDate) {
-            lastDate = date
-          }
-          return (
-            <TokenActivityItem
-              key={`${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`}
-              activity={activity}
-            />
-          )
-        })
+        return activities.map((activity) => (
+          <TokenActivityItem
+            key={`${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`}
+            activity={activity}
+          />
+        ))
       })}
       <AnimateEnter>
         {!isLoadingActivities && (isFetchingNextPageActivities || hasNextPage) ? (
