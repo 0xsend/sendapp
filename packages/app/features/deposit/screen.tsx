@@ -9,7 +9,7 @@ import { Spinner } from '@my/ui'
 import { LinkableButton } from '@my/ui'
 
 const COINBASE_APP_ID = process.env.NEXT_PUBLIC_CDP_APP_ID ?? ''
-const APPLE_PAY_ENABLED_USERS = (process.env.NEXT_PUBLIC_ONRAMP_ALLOWLIST ?? '').split(',')
+// const APPLE_PAY_ENABLED_USERS = (process.env.NEXT_PUBLIC_ONRAMP_ALLOWLIST ?? '').split(',')
 
 export function DepositScreen() {
   const [selectedOption, setSelectedOption] = useState<'crypto' | 'apple' | null>(null)
@@ -18,8 +18,9 @@ export function DepositScreen() {
   const [selectedAmount, setSelectedAmount] = useState<number>(0)
 
   const { data: sendAccount } = useSendAccount()
-  const isApplePayEnabled =
-    sendAccount?.user_id && APPLE_PAY_ENABLED_USERS.includes(sendAccount.user_id)
+  const isApplePayEnabled = true
+  // const isApplePayEnabled =
+  //   sendAccount?.user_id && APPLE_PAY_ENABLED_USERS.includes(sendAccount.user_id)
   const { openOnramp, status, error, isLoading, closeOnramp } = useCoinbaseOnramp(
     COINBASE_APP_ID,
     sendAccount?.address ?? '',
