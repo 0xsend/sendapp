@@ -33,6 +33,8 @@ export function useCoinbaseOnramp(appId: string, destinationAddress: string, amo
           return
         }
 
+        const isIOS = /iPad|iPhone|iPod/.test(window.navigator.userAgent)
+
         initOnRamp(
           {
             appId,
@@ -43,6 +45,7 @@ export function useCoinbaseOnramp(appId: string, destinationAddress: string, amo
               presetCryptoAmount: customAmount || amount || 10,
               defaultNetwork: 'base',
               defaultExperience: 'buy',
+              defaultPaymentMethod: isIOS ? 'APPLE_PAY' : 'CARD',
               partnerUserId: destinationAddress,
             },
             onSuccess: () => {
