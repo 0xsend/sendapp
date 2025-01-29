@@ -34,7 +34,7 @@ async function genMerkleTree() {
   // lookup active distributions
   const { data: shares, error } = await supabaseAdmin
     .from('distribution_shares')
-    .select('index, address, amount_after_slash')
+    .select('index, address, amount')
     .eq('distribution_id', distributionId)
     .order('index', { ascending: true })
 
@@ -49,7 +49,7 @@ async function genMerkleTree() {
   log(`Found ${shares.length} shares for distribution ${distributionId}`)
 
   const tree = StandardMerkleTree.of(
-    shares.map(({ index, address, amount_after_slash }, i) => [index, address, amount_after_slash]),
+    shares.map(({ index, address, amount }, i) => [index, address, amount]),
     ['uint256', 'address', 'uint256']
   )
 
@@ -72,7 +72,7 @@ async function genMerkleTree() {
       {
         distributionId,
         root: tree.root,
-        total: shares.reduce((acc, { amount_after_slash }) => acc + amount_after_slash, 0),
+        total: shares.reduce((acc, { amount }) => acc + amount, 0),
         proofs,
         shares,
         tree: tree.dump(),
