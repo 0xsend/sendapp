@@ -96,8 +96,16 @@ export function DepositScreen() {
             <Text color="$gray11" ta="center">
               Your funds are on the way. They will appear in your wallet shortly.
             </Text>
-            <Button backgroundColor="$primary" color="$color" size="$4" onPress={closeOnramp}>
-              Make Another Deposit
+            <Button theme="green" px="$3.5" h="$4.5" borderRadius="$4" f={1} onPress={closeOnramp}>
+              <XStack w="100%" gap="$2.5" ai="center" jc="center">
+                <LinkableButton.Text
+                  fontWeight="500"
+                  tt="uppercase"
+                  $theme-dark={{ col: '$color0' }}
+                >
+                  MAKE ANOTHER DEPOSIT
+                </LinkableButton.Text>
+              </XStack>
             </Button>
           </YStack>
         )
