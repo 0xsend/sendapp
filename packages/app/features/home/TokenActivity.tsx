@@ -1,16 +1,26 @@
 import { Button, Card, type CardProps, H4, Paragraph, Spinner, YStack } from '@my/ui'
 import type { CoinWithBalance } from 'app/data/coins'
 import { hexToBytea } from 'app/utils/hexToBytea'
+import { useState } from 'react'
 import { useTokenActivityFeed } from './utils/useTokenActivityFeed'
 import { AnimateEnter } from './TokenDetails'
 import { TokenActivityRow } from './TokenActivityRow'
 import type { Activity } from 'app/utils/zod/activity'
+import { ActivityDetails } from '../activity/ActivityDetails'
 import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
 import type { ZodError } from 'zod'
 import type { PostgrestError } from '@supabase/postgrest-js'
 import { toNiceError } from 'app/utils/toNiceError'
 
 export const TokenActivity = ({ coin }: { coin: CoinWithBalance }) => {
+  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
+
+  const handleActivityPress = (activity: Activity) => {
+    setSelectedActivity(activity)
+  }
+  const handleCloseActivityDetails = () => {
+    setSelectedActivity(null)
+  }
   const tokenActivityFeedQuery = useTokenActivityFeed({
     pageSize: 10,
     address: coin.token === 'eth' ? undefined : hexToBytea(coin.token),
@@ -28,13 +38,14 @@ export const TokenActivity = ({ coin }: { coin: CoinWithBalance }) => {
           {toNiceError(error)}
         </Paragraph>
       ) : (
-        <YStack gap={'$3'}>
+        <YStack display={selectedActivity ? 'none' : 'flex'} gap={'$3'}>
           <H4 fontWeight={'600'} size={'$7'}>
             {!pages || !pages[0]?.length ? 'No Activity' : 'Activity'}
           </H4>
           <TokenActivityFeed
             testID="TokenActivityFeed"
             tokenActivityFeedQuery={tokenActivityFeedQuery}
+            onActivityPress={handleActivityPress}
             $gtLg={{
               p: '$3.5',
             }}
@@ -42,24 +53,32 @@ export const TokenActivity = ({ coin }: { coin: CoinWithBalance }) => {
           />
         </YStack>
       )}
+      {selectedActivity && (
+        <ActivityDetails activity={selectedActivity} onClose={handleCloseActivityDetails} />
+      )}
     </>
   )
 }
 
-const TokenActivityItem = ({ activity }: { activity: Activity }) => (
+const TokenActivityItem = ({
+  activity,
+  onActivityPress,
+}: { activity: Activity; onActivityPress: (activity: Activity) => void }) => (
   <AnimateEnter>
-    <TokenActivityRow activity={activity} />
+    <TokenActivityRow activity={activity} onPress={onActivityPress} />
   </AnimateEnter>
 )
 
 const TokenActivityFeed = ({
   tokenActivityFeedQuery,
+  onActivityPress,
   ...props
 }: {
   tokenActivityFeedQuery: UseInfiniteQueryResult<
     InfiniteData<Activity[]>,
     PostgrestError | ZodError
   >
+  onActivityPress: (activity: Activity) => void
 } & CardProps) => {
   const {
     data,
@@ -82,6 +101,7 @@ const TokenActivityFeed = ({
           <TokenActivityItem
             key={`${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`}
             activity={activity}
+            onActivityPress={onActivityPress}
           />
         ))
       })}
