@@ -979,20 +979,6 @@
           "maxLength": null
         },
         {
-          "id": "public.distribution_shares.amount_after_slash",
-          "name": "amount_after_slash",
-          "columnName": "amount_after_slash",
-          "type": "numeric",
-          "isRequired": true,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false,
-          "isId": false,
-          "maxLength": null
-        },
-        {
           "name": "users",
           "type": "users",
           "isRequired": true,
@@ -8432,6 +8418,173 @@
         }
       ]
     },
+    "temporal_transfers": {
+      "id": "public.temporal_transfers",
+      "schemaName": "public",
+      "tableName": "temporal_transfers",
+      "fields": [
+        {
+          "id": "public.temporal_transfers.id",
+          "name": "id",
+          "columnName": "id",
+          "type": "int8",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": {
+            "identifier": "\"public\".\"temporal_transfers_id_seq\"",
+            "increment": 1,
+            "start": 1
+          },
+          "hasDefaultValue": false,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.temporal_transfers.workflow_id",
+          "name": "workflow_id",
+          "columnName": "workflow_id",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.temporal_transfers.user_op_hash",
+          "name": "user_op_hash",
+          "columnName": "user_op_hash",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.temporal_transfers.user_id",
+          "name": "user_id",
+          "columnName": "user_id",
+          "type": "uuid",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.temporal_transfers.f",
+          "name": "f",
+          "columnName": "f",
+          "type": "bytea",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.temporal_transfers.t",
+          "name": "t",
+          "columnName": "t",
+          "type": "bytea",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.temporal_transfers.status",
+          "name": "status",
+          "columnName": "status",
+          "type": "temporal_transfer_status",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.temporal_transfers.data",
+          "name": "data",
+          "columnName": "data",
+          "type": "jsonb",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.temporal_transfers.created_at",
+          "name": "created_at",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.temporal_transfers.updated_at",
+          "name": "updated_at",
+          "columnName": "updated_at",
+          "type": "timestamptz",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "temporal_transfers_pkey",
+          "fields": [
+            "id"
+          ],
+          "nullNotDistinct": false
+        },
+        {
+          "name": "temporal_transfers_workflow_id_idx",
+          "fields": [
+            "workflow_id"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
     "users": {
       "id": "auth.users",
       "schemaName": "auth",
@@ -9576,6 +9729,29 @@
         },
         {
           "name": "pending"
+        }
+      ]
+    },
+    "temporal_transfer_status": {
+      "schemaName": "public",
+      "values": [
+        {
+          "name": "fail"
+        },
+        {
+          "name": "indexing"
+        },
+        {
+          "name": "sending"
+        },
+        {
+          "name": "simulating"
+        },
+        {
+          "name": "success"
+        },
+        {
+          "name": "waiting"
         }
       ]
     },

@@ -42,6 +42,7 @@ const log = debug('app:features:send:confirm:screen')
 import { api } from 'app/utils/api'
 import { signUserOp } from 'app/utils/signUserOp'
 import { usePendingTransfers } from 'app/features/home/utils/usePendingTransfers'
+import { getUserOperationHash } from 'permissionless/utils'
 
 export function SendConfirmScreen() {
   const [queryParams] = useSendScreenParams()
@@ -199,16 +200,23 @@ export function SendConfirm() {
       console.log('feesPerGas', feesPerGas)
       console.log('userOp', _userOp)
       const chainId = baseMainnetClient.chain.id
+      const entryPoint = entryPointAddress[chainId]
 
       const signature = await signUserOp({
         userOp,
         chainId,
         webauthnCreds,
-        entryPoint: entryPointAddress[chainId],
+        entryPoint,
       })
       userOp.signature = signature
 
-      const workflowId = await transfer({ userOp, token: sendToken })
+      const userOpHash = getUserOperationHash({
+        userOperation: userOp,
+        entryPoint,
+        chainId,
+      })
+
+      const workflowId = await transfer({ userOpHash })
       setWorkflowId(workflowId)
       if (selectedCoin?.token === 'eth') {
         await ethQuery.refetch()

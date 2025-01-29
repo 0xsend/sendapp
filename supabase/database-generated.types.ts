@@ -1154,6 +1154,45 @@ export type Database = {
           },
         ]
       }
+      temporal_transfers: {
+        Row: {
+          created_at: string | null
+          data: Json
+          f: string
+          id: number
+          status: Database["public"]["Enums"]["temporal_transfer_status"]
+          t: string
+          updated_at: string | null
+          user_id: string
+          user_op_hash: string
+          workflow_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          data: Json
+          f: string
+          id?: number
+          status: Database["public"]["Enums"]["temporal_transfer_status"]
+          t: string
+          updated_at?: string | null
+          user_id: string
+          user_op_hash: string
+          workflow_id: string
+        }
+        Update: {
+          created_at?: string | null
+          data?: Json
+          f?: string
+          id?: number
+          status?: Database["public"]["Enums"]["temporal_transfer_status"]
+          t?: string
+          updated_at?: string | null
+          user_id?: string
+          user_op_hash?: string
+          workflow_id?: string
+        }
+        Relationships: []
+      }
       webauthn_credentials: {
         Row: {
           attestation_object: string
@@ -1348,6 +1387,16 @@ export type Database = {
           id: number
         }
       }
+      insert_temporal_transfer: {
+        Args: {
+          _user_op_hash: string
+          _t: string
+          _f: string
+          _status: Database["public"]["Enums"]["temporal_transfer_status"]
+          _data: Json
+        }
+        Returns: undefined
+      }
       leaderboard_referrals_all_time: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -1435,6 +1484,13 @@ export type Database = {
       key_type_enum: "ES256"
       lookup_type_enum: "sendid" | "tag" | "refcode" | "address" | "phone"
       tag_status: "pending" | "confirmed"
+      temporal_transfer_status:
+        | "simulating"
+        | "sending"
+        | "waiting"
+        | "indexing"
+        | "success"
+        | "fail"
       verification_type:
         | "tag_registration"
         | "tag_referral"
