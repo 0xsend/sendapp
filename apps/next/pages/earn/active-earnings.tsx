@@ -2,21 +2,21 @@ import type { NextPageWithLayout } from '../_app'
 import Head from 'next/head'
 import { HomeLayout } from 'app/features/home/layout.web'
 import { TopNav } from 'app/components/TopNav'
-import { EarningForm } from 'app/features/earn/EarningForm'
+import { ActiveEarnings } from 'app/features/earn/ActiveEarnings'
 
 export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Start Earning</title>
+        <title>Send | Active Earnings</title>
       </Head>
-      <EarningForm />
+      <ActiveEarnings />
     </>
   )
 }
 
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Start Earning" backFunction="router" />}>
+  <HomeLayout TopNav={<TopNav header="Active Earnings" backFunction="root" />}>
     {children}
   </HomeLayout>
 )
