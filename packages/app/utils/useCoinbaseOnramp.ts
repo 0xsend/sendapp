@@ -1,18 +1,10 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { type CBPayInstanceType, initOnRamp } from '@coinbase/cbpay-js'
-import { api } from 'app/utils/api'
 
 export function useCoinbaseOnramp(appId: string, destinationAddress: string, amount?: number) {
-  const [status, setStatus] = useState<'idle' | 'pending' | 'success'>('idle')
+  const [status, setStatus] = useState<'idle' | 'pending' | 'success' | 'failed'>('idle')
   const [error, setError] = useState<Error | null>(null)
-  const utils = api.useUtils()
   const instanceRef = useRef<CBPayInstanceType | null>(null)
-
-  const createTransaction = api.coinbase.createTransaction.useMutation({
-    onSuccess: () => {
-      utils.coinbase.invalidate()
-    },
-  })
 
   const closeOnramp = useCallback(() => {
     if (instanceRef.current) {
@@ -50,7 +42,6 @@ export function useCoinbaseOnramp(appId: string, destinationAddress: string, amo
             },
             onSuccess: () => {
               setStatus('success')
-              utils.coinbase.invalidate()
             },
             onExit: () => {
               closeOnramp()
@@ -58,6 +49,9 @@ export function useCoinbaseOnramp(appId: string, destinationAddress: string, amo
             onEvent: (event) => {
               if (event.eventName === 'open' || event.eventName === 'transition_view') {
                 setStatus('pending')
+              }
+              if (event.eventName === 'error') {
+                setStatus('failed')
               }
             },
             experienceLoggedIn: 'popup',
@@ -77,7 +71,7 @@ export function useCoinbaseOnramp(appId: string, destinationAddress: string, amo
         )
       })
     },
-    [appId, destinationAddress, amount, utils.coinbase, closeOnramp]
+    [appId, destinationAddress, amount, closeOnramp]
   )
 
   const openOnramp = useCallback(
@@ -108,6 +102,6 @@ export function useCoinbaseOnramp(appId: string, destinationAddress: string, amo
     closeOnramp,
     status,
     error,
-    isLoading: createTransaction.isPending,
+    isLoading: status === 'pending',
   }
 }

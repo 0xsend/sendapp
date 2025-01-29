@@ -9,18 +9,18 @@ import { Spinner } from '@my/ui'
 import { LinkableButton } from '@my/ui'
 
 const COINBASE_APP_ID = process.env.NEXT_PUBLIC_CDP_APP_ID ?? ''
-// const APPLE_PAY_ENABLED_USERS = (process.env.NEXT_PUBLIC_ONRAMP_ALLOWLIST ?? '').split(',')
+// const ONRAMP_ENABLED_USERS = (process.env.NEXT_PUBLIC_ONRAMP_ALLOWLIST ?? '').split(',')
 
 export function DepositScreen() {
-  const [selectedOption, setSelectedOption] = useState<'crypto' | 'apple' | null>(null)
+  const [selectedOption, setSelectedOption] = useState<'crypto' | 'card' | 'apple' | null>(null)
   const [showAddress, setShowAddress] = useState(false)
   const [showAmountFlow, setShowAmountFlow] = useState(false)
   const [selectedAmount, setSelectedAmount] = useState<number>(0)
 
   const { data: sendAccount } = useSendAccount()
-  const isApplePayEnabled = true
-  // const isApplePayEnabled =
-  //   sendAccount?.user_id && APPLE_PAY_ENABLED_USERS.includes(sendAccount.user_id)
+  const isOnrampEnabled = true
+  // const isOnrampEnabled = sendAccount?.user_id && ONRAMP_ENABLED_USERS.includes(sendAccount.user_id)
+  const isIOS = /iPad|iPhone|iPod/.test(window.navigator.userAgent)
   const { openOnramp, status, error, isLoading, closeOnramp } = useCoinbaseOnramp(
     COINBASE_APP_ID,
     sendAccount?.address ?? '',
@@ -41,7 +41,7 @@ export function DepositScreen() {
 
     if (selectedOption === 'crypto') {
       setShowAddress(true)
-    } else if (selectedOption === 'apple') {
+    } else if (selectedOption === 'card' || selectedOption === 'apple') {
       setShowAmountFlow(true)
     }
   }
@@ -110,6 +110,21 @@ export function DepositScreen() {
           </YStack>
         )
 
+      case status === 'failed':
+        return (
+          <YStack ai="center" gap="$4" py="$8">
+            <Text fontSize="$6" fontWeight="500" color="$red10" ta="center">
+              Transaction Failed
+            </Text>
+            <Text color="$gray11" ta="center">
+              Your payment could not be processed. Please try again.
+            </Text>
+            <Button backgroundColor="$primary" color="$color" size="$4" onPress={closeOnramp}>
+              Try Again
+            </Button>
+          </YStack>
+        )
+
       case showAmountFlow:
         return <OnrampFlow onConfirmTransaction={handleConfirmTransaction} isLoading={isLoading} />
 
@@ -154,37 +169,77 @@ export function DepositScreen() {
               </XStack>
             </Button>
 
-            {isApplePayEnabled && (
-              <Button
-                height={80}
-                borderRadius="$4"
-                backgroundColor={selectedOption === 'apple' ? '$backgroundHover' : '$background'}
-                position="relative"
-                borderWidth={selectedOption === 'apple' ? 1 : 0}
-                borderColor="$primary"
-                onPress={() => setSelectedOption('apple')}
-              >
-                <YStack
-                  position="absolute"
-                  left={0}
-                  top="50%"
-                  height={40}
-                  transform={[{ translateY: -20 }]}
-                  width={4}
-                  backgroundColor="$primary"
-                />
-                <XStack ai="center" jc="space-between" width="100%" px="$4">
-                  <XStack ai="center" gap="$3">
-                    <Banknote size={24} color={selectedOption === 'apple' ? '#16a34a' : '#888'} />
-                    <YStack>
-                      <Text fontWeight="500">Apple Pay</Text>
-                      <Text color="$gray10" fontSize="$3">
-                        Up to $500 per week
-                      </Text>
-                    </YStack>
+            {isOnrampEnabled && (
+              <>
+                <Button
+                  height={80}
+                  borderRadius="$4"
+                  backgroundColor={selectedOption === 'card' ? '$backgroundHover' : '$background'}
+                  position="relative"
+                  borderWidth={selectedOption === 'card' ? 1 : 0}
+                  borderColor="$primary"
+                  onPress={() => setSelectedOption('card')}
+                >
+                  <YStack
+                    position="absolute"
+                    left={0}
+                    top="50%"
+                    height={40}
+                    transform={[{ translateY: -20 }]}
+                    width={4}
+                    backgroundColor="$primary"
+                  />
+                  <XStack ai="center" jc="space-between" width="100%" px="$4">
+                    <XStack ai="center" gap="$3">
+                      <Banknote size={24} color={selectedOption === 'card' ? '#16a34a' : '#888'} />
+                      <YStack>
+                        <Text fontWeight="500">Via Card</Text>
+                        <Text color="$gray10" fontSize="$3">
+                          Up to $500 per week
+                        </Text>
+                      </YStack>
+                    </XStack>
                   </XStack>
-                </XStack>
-              </Button>
+                </Button>
+
+                {isIOS && (
+                  <Button
+                    height={80}
+                    borderRadius="$4"
+                    backgroundColor={
+                      selectedOption === 'apple' ? '$backgroundHover' : '$background'
+                    }
+                    position="relative"
+                    borderWidth={selectedOption === 'apple' ? 1 : 0}
+                    borderColor="$primary"
+                    onPress={() => setSelectedOption('apple')}
+                  >
+                    <YStack
+                      position="absolute"
+                      left={0}
+                      top="50%"
+                      height={40}
+                      transform={[{ translateY: -20 }]}
+                      width={4}
+                      backgroundColor="$primary"
+                    />
+                    <XStack ai="center" jc="space-between" width="100%" px="$4">
+                      <XStack ai="center" gap="$3">
+                        <Banknote
+                          size={24}
+                          color={selectedOption === 'apple' ? '#16a34a' : '#888'}
+                        />
+                        <YStack>
+                          <Text fontWeight="500">Apple Pay</Text>
+                          <Text color="$gray10" fontSize="$3">
+                            Up to $500 per week
+                          </Text>
+                        </YStack>
+                      </XStack>
+                    </XStack>
+                  </Button>
+                )}
+              </>
             )}
 
             <Button

@@ -8,7 +8,6 @@ import { secretShopRouter } from './secretShop'
 import { sendAccountRouter } from './sendAccount'
 import { accountRecoveryRouter } from './account-recovery/router'
 import { referralsRouter } from './referrals'
-import { coinbaseRouter } from './coinbase'
 
 export const appRouter = createTRPCRouter({
   chainAddress: chainAddressRouter,
@@ -19,7 +18,6 @@ export const appRouter = createTRPCRouter({
   secretShop: secretShopRouter,
   sendAccount: sendAccountRouter,
   referrals: referralsRouter,
-  coinbase: coinbaseRouter,
 })
 
 export type AppRouter = typeof appRouter
