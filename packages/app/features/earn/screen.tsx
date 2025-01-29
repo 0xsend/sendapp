@@ -12,7 +12,7 @@ export const EarnScreen = () => {
     <YStack w={'100%'} gap={'$4'} py={'$3'} $gtLg={{ w: '50%' }}>
       <LearnSection />
       <DetailsSection />
-      {/*// TODO remove this line*/}
+      {/*// TODO remove this line when pluging in real data*/}
       <EarningsSummary />
     </YStack>
   )
@@ -148,6 +148,7 @@ const EarningsCallToAction = () => {
 // TODO plug real values
 // TODO plug on press handler
 const EarningsSummary = () => {
+  const { push } = useRouter()
   const totalValue = '2,267.50'
 
   return (
@@ -204,7 +205,7 @@ const EarningsSummary = () => {
             <Row label={'Rewards'} value={'15,000 SEND'} />
           </YStack>
         </YStack>
-        <SectionButton text={'VIEW DETAILS'} onPress={() => {}} />
+        <SectionButton text={'VIEW DETAILS'} onPress={() => push('/earn/active-earnings')} />
       </Card>
     </Fade>
   )
