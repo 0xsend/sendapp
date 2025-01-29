@@ -146,14 +146,6 @@ export function TableLabel({
   )
 }
 
-export function RowLabel({ children }: PropsWithChildren) {
-  return (
-    <H4 fontWeight={'600'} size={'$7'}>
-      {children}
-    </H4>
-  )
-}
-
 export function MobileSectionLabel({ children }: PropsWithChildren) {
   return (
     <H4

@@ -280,7 +280,7 @@ async function handleTokenTransfer({
 
   if (!isETH) {
     // no history for eth since no send_account_receives event is emitted
-    const history = page.getByTestId('TokenDetailsHistory')
+    const history = page.getByTestId('TokenActivityFeed')
     await expect(history).toBeVisible()
     await expect(history.getByText(`${decimalAmount} ${token.symbol}`)).toBeVisible()
     await expect(
