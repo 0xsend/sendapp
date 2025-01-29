@@ -29,7 +29,7 @@ import { useGenerateTransferUserOp } from 'app/utils/useUserOpTransferMutation'
 import { useAccountNonce } from 'app/utils/userop'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'solito/router'
-import { formatUnits, isAddress, zeroAddress } from 'viem'
+import { formatUnits, isAddress } from 'viem'
 import { useEstimateFeesPerGas } from 'wagmi'
 import { useCoin } from 'app/provider/coins'
 import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
@@ -41,7 +41,7 @@ import { useTokenPrices } from 'app/utils/useTokenPrices'
 const log = debug('app:features:send:confirm:screen')
 import { api } from 'app/utils/api'
 import { signUserOp } from 'app/utils/signUserOp'
-import { usePendingTransfers } from 'app/features/home/utils/usePendingTransfers'
+import { getUserOperationHash } from 'permissionless/utils'
 
 export function SendConfirmScreen() {
   const [queryParams] = useSendScreenParams()
@@ -75,11 +75,7 @@ export function SendConfirm() {
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
   const { coin: selectedCoin, tokensQuery, ethQuery } = useCoinFromSendTokenParam()
 
-  const { mutateAsync: transfer } = api.transfer.withUserOp.useMutation()
-  const { data: pendingTransfers, isLoading: isPendingTransfersLoading } = usePendingTransfers({
-    address: sendAccount?.address ?? zeroAddress,
-    token: sendToken,
-  })
+  const { mutateAsync: transfer } = api.temporal.transfer.useMutation()
 
   const [workflowId, setWorkflowId] = useState<string | undefined>()
 
@@ -119,8 +115,7 @@ export function SendConfirm() {
     to: profile?.address ?? recipient,
     token: sendToken === 'eth' ? undefined : sendToken,
     amount: BigInt(queryParams.amount ?? '0'),
-    nonce:
-      nonce && pendingTransfers !== undefined ? nonce + BigInt(pendingTransfers.length) : nonce,
+    nonce,
   })
 
   const {
@@ -199,16 +194,23 @@ export function SendConfirm() {
       console.log('feesPerGas', feesPerGas)
       console.log('userOp', _userOp)
       const chainId = baseMainnetClient.chain.id
+      const entryPoint = entryPointAddress[chainId]
 
       const signature = await signUserOp({
         userOp,
         chainId,
         webauthnCreds,
-        entryPoint: entryPointAddress[chainId],
+        entryPoint,
       })
       userOp.signature = signature
 
-      const workflowId = await transfer({ userOp, token: sendToken })
+      const userOpHash = getUserOperationHash({
+        userOperation: userOp,
+        entryPoint,
+        chainId,
+      })
+
+      const workflowId = await transfer({ userOpHash })
       setWorkflowId(workflowId)
       if (selectedCoin?.token === 'eth') {
         await ethQuery.refetch()
@@ -222,7 +224,7 @@ export function SendConfirm() {
     }
   }
 
-  if (nonceIsLoading || isProfileLoading || isSendAccountLoading || isPendingTransfersLoading)
+  if (nonceIsLoading || isProfileLoading || isSendAccountLoading)
     return <Spinner size="large" color={'$color'} />
 
   return (
