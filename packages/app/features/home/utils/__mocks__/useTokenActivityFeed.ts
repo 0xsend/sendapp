@@ -13,18 +13,11 @@ const mockUseTokenActivityFeed = jest.fn(({ token }) => {
   const pages = tokenTransfersByLogAddr[logAddress]
   if (!pages) throw new Error('No pages found')
   return {
-    pendingTransfers: {
-      data: [], //@todo maybe writes some mock data for temporal?
-      isLoading: false,
-      error: null,
+    data: {
+      pages: [tokenTransfersByLogAddr[logAddress]],
     },
-    activityFeed: {
-      data: {
-        pages: [tokenTransfersByLogAddr[logAddress]],
-      },
-      isLoading: false,
-      error: null,
-    },
+    isLoading: false,
+    error: null,
   }
 })
 export const useTokenActivityFeed = mockUseTokenActivityFeed

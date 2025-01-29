@@ -1488,6 +1488,85 @@ export type Database = {
       }
     }
   }
+  temporal: {
+    Tables: {
+      send_account_transfers: {
+        Row: {
+          created_at: string | null
+          data: Json
+          id: number
+          status: Database["temporal"]["Enums"]["transfer_status"]
+          updated_at: string | null
+          user_id: string
+          workflow_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          data: Json
+          id?: number
+          status: Database["temporal"]["Enums"]["transfer_status"]
+          updated_at?: string | null
+          user_id: string
+          workflow_id: string
+        }
+        Update: {
+          created_at?: string | null
+          data?: Json
+          id?: number
+          status?: Database["temporal"]["Enums"]["transfer_status"]
+          updated_at?: string | null
+          user_id?: string
+          workflow_id?: string
+        }
+        Relationships: []
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      insert_temporal_eth_send_account_transfer: {
+        Args: {
+          workflow_id: string
+          status: Database["temporal"]["Enums"]["transfer_status"]
+          sender: string
+          log_addr: string
+          value: string
+        }
+        Returns: undefined
+      }
+      insert_temporal_token_send_account_transfer: {
+        Args: {
+          workflow_id: string
+          status: Database["temporal"]["Enums"]["transfer_status"]
+          f: string
+          t: string
+          v: string
+          log_addr: string
+        }
+        Returns: undefined
+      }
+      update_temporal_send_account_transfer: {
+        Args: {
+          workflow_id: string
+          status: Database["temporal"]["Enums"]["transfer_status"]
+          data?: Json
+        }
+        Returns: undefined
+      }
+    }
+    Enums: {
+      transfer_status:
+        | "initialized"
+        | "sent"
+        | "confirmed"
+        | "indexed"
+        | "failed"
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
 }
 
 export type Tables<
