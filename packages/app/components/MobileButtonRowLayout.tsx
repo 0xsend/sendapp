@@ -164,7 +164,7 @@ const ActivityRewards = ({ children, ...props }: XStackProps) => {
   const { data: distributions, isLoading } = useMonthlyDistributions()
   const distribution =
     distributions?.find((d) => d.number === queryParams.distribution) ?? distributions?.[0]
-  const shareAmount = BigInt(distribution?.distribution_shares?.[0]?.amount_after_slash || 0)
+  const shareAmount = BigInt(distribution?.distribution_shares?.[0]?.amount || 0)
   const { direction } = useScrollDirection()
 
   const isVisible =

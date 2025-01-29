@@ -63,7 +63,7 @@ export function RewardsScreen() {
             isLoading={isLoadingDistributions || isTrancheActiveLoading || isClaimedLoading}
             reward={formatAmount(
               formatUnits(
-                BigInt(currentDistribution?.distribution_shares?.[0]?.amount_after_slash ?? 0n),
+                BigInt(currentDistribution?.distribution_shares?.[0]?.amount ?? 0n),
                 currentDistribution?.token_decimals ?? 18
               ),
               10,
@@ -71,7 +71,7 @@ export function RewardsScreen() {
             )}
             claimStatus={(() => {
               switch (true) {
-                case !share || !share.amount_after_slash:
+                case !share || !share.amount:
                   return undefined
                 case !isTrancheActive:
                   return 'Upcoming Reward'

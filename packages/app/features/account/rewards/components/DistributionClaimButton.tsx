@@ -30,7 +30,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   const queryClient = useQueryClient()
   // Check if the user is eligible
   const share = distribution.distribution_shares?.[0]
-  const isEligible = !!share && BigInt(share.amount_after_slash) > 0
+  const isEligible = !!share && BigInt(share.amount) > 0
   const isClaimActive = distribution.qualification_end < new Date()
   const trancheId = BigInt(distribution.tranche_id)
   const chainId = distribution.chain_id as keyof typeof sendMerkleDropAddress
