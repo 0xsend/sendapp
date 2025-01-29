@@ -35,6 +35,7 @@ function fetchDistributionQuery() {
       merkle_drop_addr,
       name,
       number,
+      tranche_id,
       qualification_end,
       qualification_start,
       snapshot_block_num,

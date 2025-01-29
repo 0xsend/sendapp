@@ -23,6 +23,7 @@ VALUES (
     8453);
 INSERT INTO distributions(
     number,
+    tranche_id,
     name,
     description,
     amount,
@@ -35,6 +36,7 @@ INSERT INTO distributions(
     claim_end,
     chain_id)
 VALUES (
+    123,
     123,
     'distribution #123',
     'Description',
