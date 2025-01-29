@@ -139,6 +139,15 @@ jest.mock('app/provider/coins', () => ({
     ],
     totalPrice: 5000000n,
   }),
+  useCoin: jest.fn().mockReturnValue({
+    coin: {
+      label: 'USDC',
+      token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+      balance: 250000n,
+    },
+    isLoading: false,
+    error: null,
+  }),
 }))
 
 describe('ActivityRewardsScreen', () => {
