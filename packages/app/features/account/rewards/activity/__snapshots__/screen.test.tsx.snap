@@ -952,6 +952,146 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
         </View>
       </View>
     </View>
+    <View
+      style={
+        {
+          "display": "none",
+          "flex": 1,
+          "flexDirection": "column",
+          "gap": 24,
+          "width": "100%",
+        }
+      }
+    >
+      <Text
+        accessibilityRole="header"
+        style={
+          {
+            "color": "#FFFFFF",
+            "fontFamily": "System",
+            "fontSize": 23,
+            "fontWeight": "600",
+            "lineHeight": 27,
+            "marginBottom": 0,
+            "marginLeft": 0,
+            "marginRight": 0,
+            "marginTop": 0,
+            "textTransform": "none",
+            "userSelect": "auto",
+          }
+        }
+        suppressHighlighting={true}
+      >
+        Total July
+      </Text>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#111f22",
+            "borderBottomLeftRadius": 16,
+            "borderBottomRightRadius": 16,
+            "borderTopLeftRadius": 16,
+            "borderTopRightRadius": 16,
+            "flexDirection": "column",
+            "paddingBottom": 39,
+            "paddingLeft": 39,
+            "paddingRight": 39,
+            "paddingTop": 39,
+            "position": "relative",
+            "width": "100%",
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "width": "100%",
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "color": "#FFFFFF",
+                "fontFamily": "System",
+                "fontSize": 55.199999999999996,
+                "fontWeight": "500",
+                "lineHeight": 40,
+                "userSelect": "auto",
+              }
+            }
+            suppressHighlighting={true}
+          >
+            &gt;0 SEND
+          </Text>
+          <View
+            style={
+              {
+                "flexDirection": "column",
+              }
+            }
+          >
+            <View
+              focusVisibleStyle={
+                {
+                  "borderColor": "$background",
+                }
+              }
+              role="button"
+              style={
+                {
+                  "alignItems": "center",
+                  "backgroundColor": "#40FB50",
+                  "borderBottomColor": "transparent",
+                  "borderBottomLeftRadius": 12,
+                  "borderBottomRightRadius": 12,
+                  "borderBottomWidth": 1,
+                  "borderLeftColor": "transparent",
+                  "borderLeftWidth": 1,
+                  "borderRightColor": "transparent",
+                  "borderRightWidth": 1,
+                  "borderStyle": "solid",
+                  "borderTopColor": "transparent",
+                  "borderTopLeftRadius": 12,
+                  "borderTopRightRadius": 12,
+                  "borderTopWidth": 1,
+                  "flexDirection": "row",
+                  "flexWrap": "nowrap",
+                  "gap": 4,
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxWidth": 194,
+                  "opacity": 0.7,
+                  "paddingBottom": 16,
+                  "paddingLeft": 18,
+                  "paddingRight": 18,
+                  "paddingTop": 16,
+                  "pointerEvents": "none",
+                  "width": "100%",
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "flexDirection": "column",
+                  }
+                }
+              >
+                <ActivityIndicator
+                  color="#FFFFFF"
+                  size="small"
+                />
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
   </View>
 </View>
 `;
