@@ -247,7 +247,9 @@ VALUES (
     1000000,
     1000000,
     -- start now
-    (SELECT CURRENT_TIMESTAMP AT TIME ZONE 'UTC'),
+    (
+        SELECT
+            CURRENT_TIMESTAMP AT TIME ZONE 'UTC'),
 (
         SELECT
             CURRENT_TIMESTAMP AT TIME ZONE 'UTC' + interval '10 days'),
@@ -344,27 +346,43 @@ INSERT INTO distribution_verification_values(
     multiplier_min,
     multiplier_max,
     multiplier_step)
-select type,
-       fixed_value,
-       bips_value,
-       (select id from distributions where number = 123),
-       multiplier_min,
-       multiplier_max,
-       multiplier_step
-from distribution_verification_values
-where distribution_id = (
-    select id
-    from distributions
-    where number <> 123
-    order by number desc
-    limit 1
-)
-    and type not in (
-        select type
-        from distribution_verification_values
-        where distribution_id = (select id from distributions where number = 123
-    )
-);
+SELECT
+    type,
+    fixed_value,
+    bips_value,
+(
+        SELECT
+            id
+        FROM
+            distributions
+        WHERE
+            number = 123), multiplier_min, multiplier_max, multiplier_step
+FROM
+    distribution_verification_values
+WHERE
+    distribution_id =(
+        SELECT
+            id
+        FROM
+            distributions
+        WHERE
+            number <> 123
+        ORDER BY
+            number DESC
+        LIMIT 1)
+    AND type NOT IN (
+        SELECT
+            type
+        FROM
+            distribution_verification_values
+        WHERE
+            distribution_id =(
+                SELECT
+                    id
+                FROM
+                    distributions
+                WHERE
+                    number = 123));
 SELECT
     results_eq('SELECT COUNT(*)::integer FROM distributions WHERE number = 123', $$
     VALUES (1) $$, 'Service role should be able to create distributions');
@@ -440,12 +458,12 @@ SELECT
                         id
                     FROM distributions
                     WHERE
-                        number = 123), tests.get_supabase_uid('bob'), '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 1000, 500, 200, 300, NOW(), NOW(), 1, 950)::distribution_shares,(NULL,(
+                        number = 123), tests.get_supabase_uid('bob'), '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 950, 500, 200, 300, NOW(), NOW(), 1)::distribution_shares,(NULL,(
             SELECT
                 id
             FROM distributions
             WHERE
-                number = 123), tests.get_supabase_uid('alice'), '0xaB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 1000, 500, 200, 300, NOW(), NOW(), 1, 950)::distribution_shares]);
+                number = 123), tests.get_supabase_uid('alice'), '0xaB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 950, 500, 200, 300, NOW(), NOW(), 1)::distribution_shares]);
 $$,
 'permission denied for function update_distribution_shares',
 'Only the service role can update distribution shares.');
@@ -463,12 +481,12 @@ SELECT
                 id
             FROM distributions
             WHERE
-                number = 123), tests.get_supabase_uid('bob'), '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 1000, 500, 200, 300, NOW(), NOW(), 1, 950)::distribution_shares,(NULL,(
+                number = 123), tests.get_supabase_uid('bob'), '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 950, 500, 200, 300, NOW(), NOW(), 1)::distribution_shares,(NULL,(
         SELECT
             id
         FROM distributions
         WHERE
-            number = 123), tests.get_supabase_uid('alice'), '0xaB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 1000, 500, 200, 300, NOW(), NOW(), 1, 950)::distribution_shares]);
+            number = 123), tests.get_supabase_uid('alice'), '0xaB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 950, 500, 200, 300, NOW(), NOW(), 1)::distribution_shares]);
 -- Check insert by service_role
 SELECT
     results_eq('SELECT COUNT(*)::integer FROM distribution_shares WHERE distribution_id = (
