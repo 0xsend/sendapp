@@ -2,20 +2,26 @@ import { Card, Fade, Paragraph, Separator, Stack, XStack, YStack } from '@my/ui'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { SectionButton } from 'app/features/earn/components/SectionButton'
 import { useRouter } from 'solito/router'
-import type { ReactNode } from 'react'
+import type { NamedExoticComponent } from 'react'
 import { ArrowDown } from '@tamagui/lucide-icons'
 import { IconSendSingleLetter, IconStacks } from 'app/components/icons'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import type { IconProps } from '@tamagui/helpers-icon'
 
 export const ActiveEarnings = () => {
   const { push } = useRouter()
+
+  // TODO loader when deposit balances are loading
+  // if (false) {
+  //   return <Spinner size="large" color={'$color12'} />
+  // }
 
   return (
     <YStack w={'100%'} gap={'$4'} py={'$3'} jc={'space-between'} $gtLg={{ w: '50%' }}>
       <YStack w={'100%'} gap={'$4'}>
         <TotalValue />
-        <XStack flexGrow={true} gap={'$3.5'}>
-          <EarningButton Icon={ArrowDown} label={'Withdraw'} href={''} />
+        <XStack flexGrow={1} gap={'$3.5'}>
+          <EarningButton Icon={ArrowDown} label={'Withdraw'} href={'/earn/withdraw-form'} />
           <EarningButton Icon={IconStacks} label={'Earnings'} href={''} />
           <EarningButton Icon={IconSendSingleLetter} label={'Rewards'} href={''} />
         </XStack>
@@ -118,10 +124,15 @@ export const EarningButton = ({
   href,
 }: {
   label: string
-  Icon: () => ReactNode
+  Icon: NamedExoticComponent<IconProps>
   href: string
 }) => {
+  const router = useRouter()
   const hoverStyles = useHoverStyles()
+
+  const handleOnPress = () => {
+    router.push(href)
+  }
 
   return (
     <Fade flexGrow={1} flexShrink={1}>
@@ -131,6 +142,7 @@ export const EarningButton = ({
         py={'$3.5'}
         br={'$6'}
         backgroundColor={'$color1'}
+        onPress={handleOnPress}
         hoverStyle={hoverStyles}
       >
         <Stack
