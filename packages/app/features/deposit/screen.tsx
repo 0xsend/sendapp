@@ -1,5 +1,5 @@
 import { Button, Text, XStack, YStack } from '@my/ui'
-import { Wallet, Banknote, Check } from '@tamagui/lucide-icons'
+import { Check } from '@tamagui/lucide-icons'
 import { useState, useEffect } from 'react'
 import { DepositAddress } from './components/DepositAddress'
 import { useSendAccount } from 'app/utils/send-accounts'
@@ -7,6 +7,8 @@ import { useCoinbaseOnramp } from 'app/utils/useCoinbaseOnramp'
 import { OnrampFlow } from './components/OnrampFlow'
 import { Spinner } from '@my/ui'
 import { LinkableButton } from '@my/ui'
+import { toNiceError } from 'app/utils/toNiceError'
+import { DepositOptionButton } from './components/DepositOptionButton'
 
 const COINBASE_APP_ID = process.env.NEXT_PUBLIC_CDP_APP_ID ?? ''
 // const ONRAMP_ENABLED_USERS = (process.env.NEXT_PUBLIC_ONRAMP_ALLOWLIST ?? '').split(',')
@@ -61,7 +63,7 @@ export function DepositScreen() {
               Unable to Initialize Payment
             </Text>
             <Text color="$gray11" ta="center">
-              {error.message}
+              {toNiceError(error)}
             </Text>
             <Button backgroundColor="$primary" color="$color" size="$4" onPress={closeOnramp}>
               Try Again
@@ -138,106 +140,32 @@ export function DepositScreen() {
       default:
         return (
           <YStack gap="$3" width="100%">
-            <Button
-              height={80}
-              borderRadius="$4"
-              backgroundColor={selectedOption === 'crypto' ? '$backgroundHover' : '$background'}
-              position="relative"
-              borderWidth={selectedOption === 'crypto' ? 1 : 0}
-              borderColor="$primary"
+            <DepositOptionButton
+              option="crypto"
+              selectedOption={selectedOption}
               onPress={() => setSelectedOption('crypto')}
-            >
-              <YStack
-                position="absolute"
-                left={0}
-                top="50%"
-                height={40}
-                transform={[{ translateY: -20 }]}
-                width={4}
-                backgroundColor="$primary"
-              />
-              <XStack ai="center" jc="space-between" width="100%" px="$4">
-                <XStack ai="center" gap="$3">
-                  <Wallet size={24} color={selectedOption === 'crypto' ? '#16a34a' : '#888'} />
-                  <YStack>
-                    <Text fontWeight="500">Via Crypto</Text>
-                    <Text color="$gray10" fontSize="$3">
-                      Direct deposit via External Wallet
-                    </Text>
-                  </YStack>
-                </XStack>
-              </XStack>
-            </Button>
+              title="Via Crypto"
+              description="Direct deposit via External Wallet"
+            />
 
             {isOnrampEnabled && (
               <>
-                <Button
-                  height={80}
-                  borderRadius="$4"
-                  backgroundColor={selectedOption === 'card' ? '$backgroundHover' : '$background'}
-                  position="relative"
-                  borderWidth={selectedOption === 'card' ? 1 : 0}
-                  borderColor="$primary"
+                <DepositOptionButton
+                  option="card"
+                  selectedOption={selectedOption}
                   onPress={() => setSelectedOption('card')}
-                >
-                  <YStack
-                    position="absolute"
-                    left={0}
-                    top="50%"
-                    height={40}
-                    transform={[{ translateY: -20 }]}
-                    width={4}
-                    backgroundColor="$primary"
-                  />
-                  <XStack ai="center" jc="space-between" width="100%" px="$4">
-                    <XStack ai="center" gap="$3">
-                      <Banknote size={24} color={selectedOption === 'card' ? '#16a34a' : '#888'} />
-                      <YStack>
-                        <Text fontWeight="500">Via Card</Text>
-                        <Text color="$gray10" fontSize="$3">
-                          Up to $500 per week
-                        </Text>
-                      </YStack>
-                    </XStack>
-                  </XStack>
-                </Button>
+                  title="Via Card"
+                  description="Up to $500 per week"
+                />
 
                 {isIOS && (
-                  <Button
-                    height={80}
-                    borderRadius="$4"
-                    backgroundColor={
-                      selectedOption === 'apple' ? '$backgroundHover' : '$background'
-                    }
-                    position="relative"
-                    borderWidth={selectedOption === 'apple' ? 1 : 0}
-                    borderColor="$primary"
+                  <DepositOptionButton
+                    option="apple"
+                    selectedOption={selectedOption}
                     onPress={() => setSelectedOption('apple')}
-                  >
-                    <YStack
-                      position="absolute"
-                      left={0}
-                      top="50%"
-                      height={40}
-                      transform={[{ translateY: -20 }]}
-                      width={4}
-                      backgroundColor="$primary"
-                    />
-                    <XStack ai="center" jc="space-between" width="100%" px="$4">
-                      <XStack ai="center" gap="$3">
-                        <Banknote
-                          size={24}
-                          color={selectedOption === 'apple' ? '#16a34a' : '#888'}
-                        />
-                        <YStack>
-                          <Text fontWeight="500">Apple Pay</Text>
-                          <Text color="$gray10" fontSize="$3">
-                            Up to $500 per week
-                          </Text>
-                        </YStack>
-                      </XStack>
-                    </XStack>
-                  </Button>
+                    title="Apple Pay"
+                    description="Up to $500 per week"
+                  />
                 )}
               </>
             )}
