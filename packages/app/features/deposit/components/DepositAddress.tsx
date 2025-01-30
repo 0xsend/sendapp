@@ -18,8 +18,8 @@ import { shorten } from 'app/utils/strings'
 import * as Clipboard from 'expo-clipboard'
 import { useState, useEffect } from 'react'
 import type { Address } from 'viem'
-import { IconCopy } from '../../../components/icons'
-import { useQRCode } from '../../../utils/useQRCode'
+import { IconCopy } from 'app/components/icons'
+import { useQRCode } from 'app/utils/useQRCode'
 
 function CopyAddressDialog({ isOpen, onClose, onConfirm }) {
   return (
