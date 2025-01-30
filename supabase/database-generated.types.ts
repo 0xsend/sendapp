@@ -309,6 +309,7 @@ export type Database = {
           snapshot_block_num: number | null
           token_addr: string | null
           token_decimals: number | null
+          tranche_id: number
           updated_at: string
         }
         Insert: {
@@ -330,6 +331,7 @@ export type Database = {
           snapshot_block_num?: number | null
           token_addr?: string | null
           token_decimals?: number | null
+          tranche_id: number
           updated_at?: string
         }
         Update: {
@@ -351,6 +353,7 @@ export type Database = {
           snapshot_block_num?: number | null
           token_addr?: string | null
           token_decimals?: number | null
+          tranche_id?: number
           updated_at?: string
         }
         Relationships: []

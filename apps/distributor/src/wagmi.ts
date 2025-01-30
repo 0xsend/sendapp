@@ -54,7 +54,7 @@ export async function fetchAllBalances({
 }
 
 export async function isMerkleDropActive(distribution: {
-  number: number
+  tranche_id: number
   chain_id: number
   merkle_drop_addr: string | null
 }) {
@@ -63,6 +63,6 @@ export async function isMerkleDropActive(distribution: {
     abi: sendMerkleDropAbi,
     address,
     functionName: 'trancheActive',
-    args: [BigInt(distribution.number - 1)], // tranche is 0-indexed
+    args: [BigInt(distribution.tranche_id)], // tranche is 0-indexed
   })
 }
