@@ -1,4 +1,4 @@
-import type { Database, Json, Tables } from '@my/supabase/database.types'
+import type { Database, Tables } from '@my/supabase/database.types'
 import {
   baseMainnetBundlerClient,
   baseMainnetClient,
@@ -7,7 +7,7 @@ import {
   sendAccountAbi,
   sendAirdropsSafeAddress,
   sendMerkleDropAbi,
-  sendMerkleDropAddress,
+  type sendMerkleDropAddress,
   sendTokenAbi,
   sendTokenAddress,
   sendUniswapV3PoolAddress,
@@ -512,6 +512,7 @@ export function useGenerateClaimUserOp({
     queryKey: [
       'generateClaimUserOp',
       sender,
+      merkleDropAddress,
       String(amount_after_slash),
       String(index),
       String(nonce),
@@ -535,7 +536,7 @@ export function useGenerateClaimUserOp({
         args: [
           [
             {
-              dest: sendMerkleDropAddress[chainId],
+              dest: merkleDropAddress,
               value: 0n,
               data: encodeFunctionData({
                 abi: sendMerkleDropAbi,
@@ -631,7 +632,7 @@ export const usePrepareSendMerkleDropClaimTrancheWrite = ({
     abi: sendMerkleDropAbi,
     functionName: 'claimTranche',
     chainId: chainId,
-    address: sendMerkleDropAddress[chainId],
+    address: merkleDropAddress,
     account: address,
     query: {
       enabled,
