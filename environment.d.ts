@@ -39,6 +39,11 @@ declare global {
        * Cloudflare Turnstile site key
        */
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: string
+
+      /**
+       * Coinbase Developer Portal App ID
+       */
+      NEXT_PUBLIC_CDP_APP_ID: string
     }
   }
   /**
