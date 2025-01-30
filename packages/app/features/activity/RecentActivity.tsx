@@ -1,12 +1,11 @@
-import { Button, Fade, Paragraph, ScrollView, Spinner, XStack, YGroup, YStack } from '@my/ui'
+import { Button, Fade, H4, Paragraph, ScrollView, Spinner, XStack, YGroup, YStack } from '@my/ui'
 import { useActivityFeed } from './utils/useActivityFeed'
-import { RowLabel } from './screen'
 import type { PostgrestError } from '@supabase/postgrest-js'
 import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
 import type { ZodError } from 'zod'
 import type { Activity } from 'app/utils/zod/activity'
 import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
-import { useState } from 'react'
+import { type PropsWithChildren, useState } from 'react'
 import { ActivityDetails } from 'app/features/activity/ActivityDetails'
 
 export function RecentActivity() {
@@ -35,7 +34,14 @@ export function RecentActivity() {
         <ActivityFeed activityFeedQuery={result} onActivityPress={handleActivityPress} />
       </ScrollView>
       {selectedActivity && (
-        <ActivityDetails activity={selectedActivity} onClose={handleCloseActivityDetails} />
+        <ActivityDetails
+          activity={selectedActivity}
+          onClose={handleCloseActivityDetails}
+          w={'100%'}
+          $gtLg={{
+            maxWidth: '47%',
+          }}
+        />
       )}
     </XStack>
   )
@@ -140,5 +146,13 @@ function ActivityFeed({
         ) : null}
       </Fade>
     </YStack>
+  )
+}
+
+function RowLabel({ children }: PropsWithChildren) {
+  return (
+    <H4 fontWeight={'600'} size={'$7'}>
+      {children}
+    </H4>
   )
 }
