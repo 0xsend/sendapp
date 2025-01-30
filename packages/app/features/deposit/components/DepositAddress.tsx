@@ -81,7 +81,7 @@ export function DepositAddress({ address, ...props }: { address?: Address } & Bu
   const [isConfirmed, setIsConfirmed] = useState(false)
   const [copyAddressDialogIsOpen, setCopyAddressDialogIsOpen] = useState(false)
 
-  const { qrCodeUrl, error, logoOverlay } = useQRCode(address, {
+  const { data: qrData, error } = useQRCode(address, {
     width: 240,
     logo: {
       path: '/logos/base.svg',
@@ -144,31 +144,31 @@ export function DepositAddress({ address, ...props }: { address?: Address } & Bu
             borderRadius: 8,
           }}
         >
-          {qrCodeUrl && (
+          {qrData?.qrCodeUrl && (
             <YStack position="relative">
               <Image
-                source={{ uri: qrCodeUrl }}
+                source={{ uri: qrData.qrCodeUrl }}
                 width={240}
                 height={240}
                 objectFit="contain"
                 alt="QR Code"
               />
-              {logoOverlay && (
+              {qrData.logoOverlay && (
                 <YStack
                   position="absolute"
                   backgroundColor="white"
                   padding={4}
                   borderRadius={4}
-                  top={logoOverlay.position.top}
-                  left={logoOverlay.position.left}
+                  top={qrData.logoOverlay.position.top}
+                  left={qrData.logoOverlay.position.left}
                   style={{
-                    transform: logoOverlay.position.transform,
+                    transform: qrData.logoOverlay.position.transform,
                   }}
                 >
                   <Image
-                    source={{ uri: logoOverlay.uri }}
-                    width={logoOverlay.size}
-                    height={logoOverlay.size}
+                    source={{ uri: qrData.logoOverlay.uri }}
+                    width={qrData.logoOverlay.size}
+                    height={qrData.logoOverlay.size}
                     objectFit="contain"
                     alt="Base Logo"
                   />

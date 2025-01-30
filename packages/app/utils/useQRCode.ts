@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { type UseQueryResult, useQuery } from '@tanstack/react-query'
 import QRCode, { type QRCodeToStringOptions as QRCodeOptions } from 'qrcode'
 
 interface UseQRCodeResult {
@@ -18,55 +18,45 @@ interface UseQRCodeResult {
 export function useQRCode(
   text: string | undefined,
   options: QRCodeOptions & { logo?: { path: string; size?: number } }
-): UseQRCodeResult {
-  const [qrCodeUrl, setQrCodeUrl] = useState('')
-  const [error, setError] = useState<Error | null>(null)
-
-  useEffect(() => {
-    if (!text) return
-
-    const generateQRCode = async () => {
-      try {
-        const svgString = await QRCode.toString(text, {
-          type: 'svg',
-          width: options.width ?? 240,
-          margin: options.margin ?? 1,
-          errorCorrectionLevel: options.errorCorrectionLevel ?? 'H',
-          color: {
-            dark: options.color?.dark ?? '#000000',
-            light: options.color?.light ?? '#ffffff',
-          },
-        })
-
-        setQrCodeUrl(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgString)}`)
-        setError(null)
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Failed to generate QR code'))
-        console.error('QR code generation error:', err)
+): UseQueryResult<UseQRCodeResult> {
+  return useQuery({
+    queryKey: ['qrcode', text, JSON.stringify(options)],
+    queryFn: async () => {
+      if (!text) {
+        throw new Error('Text is required for QR code generation')
       }
-    }
 
-    generateQRCode()
-  }, [
-    text,
-    options.width,
-    options.margin,
-    options.errorCorrectionLevel,
-    options.color?.dark,
-    options.color?.light,
-  ])
-
-  const logoOverlay = options.logo
-    ? {
-        uri: options.logo.path,
-        size: options.logo.size ?? 36,
-        position: {
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-18px, -18px)',
+      const svgString = await QRCode.toString(text, {
+        type: 'svg',
+        width: options.width ?? 240,
+        margin: options.margin ?? 1,
+        errorCorrectionLevel: options.errorCorrectionLevel ?? 'H',
+        color: {
+          dark: options.color?.dark ?? '#000000',
+          light: options.color?.light ?? '#ffffff',
         },
-      }
-    : undefined
+      })
 
-  return { qrCodeUrl, error, logoOverlay }
+      const qrCodeUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgString)}`
+
+      const logoOverlay = options.logo
+        ? {
+            uri: options.logo.path,
+            size: options.logo.size ?? 36,
+            position: {
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-18px, -18px)',
+            },
+          }
+        : undefined
+
+      return {
+        qrCodeUrl,
+        error: null,
+        logoOverlay,
+      }
+    },
+    enabled: !!text,
+  })
 }
