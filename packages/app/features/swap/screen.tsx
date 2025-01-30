@@ -3,7 +3,7 @@ import { TokenDetailsMarketData } from 'app/components/TokenDetailsMarketData'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 import SwapForm from './components/SwapForm'
 
-export function SwapScreen() {
+export default function SwapScreen() {
   const { coin } = useCoinFromTokenParam()
 
   return (
