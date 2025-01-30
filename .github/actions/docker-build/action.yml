@@ -31,7 +31,7 @@ runs:
       if: ${{ inputs.build-nextjs-docker == 'true' }}
       uses: foundry-rs/foundry-toolchain@v1
       with:
-        version: nightly
+        version: stable
     - name: Yarn Install
       if: ${{ inputs.build-nextjs-docker == 'true' }}
       shell: bash
