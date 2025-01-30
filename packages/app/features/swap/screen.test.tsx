@@ -1,9 +1,9 @@
-import { render, screen, userEvent, waitFor } from '@testing-library/react-native'
+import { act, render, screen, userEvent, waitFor } from '@testing-library/react-native'
 import { Provider } from 'app/__mocks__/app/provider'
 import { TamaguiProvider, config } from '@my/ui'
-import { SwapScreen } from './screen'
 import { useRouter } from 'app/__mocks__/expo-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import SwapScreen from './screen'
 
 jest.mock('app/utils/useCoinFromTokenParam', () => ({
   useCoinFromTokenParam: jest.fn().mockReturnValue({
@@ -11,10 +11,11 @@ jest.mock('app/utils/useCoinFromTokenParam', () => ({
       label: 'USDC',
       symbol: 'USDC',
       token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
-      balance: BigInt(1000000),
+      balance: 1_000_000n,
       decimals: 6,
       coingeckoTokenId: 'usd-coin',
     },
+    isLoading: false,
   }),
 }))
 
@@ -37,25 +38,36 @@ jest.mock('app/utils/coin-gecko', () => ({
   useTokenMarketData: jest.fn().mockReturnValue({
     data: [
       {
+        id: 'usd-coin',
+        symbol: 'usdc',
+        name: 'USDC',
+        image: 'https://coin-images.coingecko.com/coins/images/6319/large/usdc.png?1696506694',
         current_price: 1.5,
+        market_cap: 52512229982,
         price_change_percentage_24h: 2.5,
       },
     ],
-    status: 'success',
+    isLoading: false,
   }),
 
   useTokenPrice: jest.fn().mockImplementation((tokenId) => {
-    if (tokenId === 'usd-coin') {
-      return { data: { usd: 1 }, isLoading: false }
+    const prices = {
+      'usd-coin': { usd: 1.5 },
     }
-    if (tokenId === 'send-token') {
-      return { data: { usd: 0.00012139 }, isLoading: false }
-    }
-    return { data: null, isLoading: true }
+    return { data: prices[tokenId] || { usd: 0 }, isLoading: false }
   }),
 }))
 
-jest.mock('app/utils/get-quote', () => ({
+jest.mock('app/utils/useTokenPrices', () => ({
+  useTokenPrices: jest.fn().mockReturnValue({
+    data: {
+      '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913': 1.5,
+    },
+    isLoading: false,
+  }),
+}))
+
+jest.mock('app/utils/swap-token', () => ({
   useSwapToken: jest.fn().mockImplementation(() => ({
     data: {
       outputAmount: '72232173016371',
@@ -108,8 +120,8 @@ describe('SwapScreen', () => {
   })
 
   // skipping for now: has timeout issue but passing on single test
-  it.skip('should allow input of send amount and display calculated receive amount', async () => {
-    jest.mock('app/utils/get-quote', () => ({
+  it('should allow input of send amount and display calculated receive amount', async () => {
+    jest.mock('app/utils/swap-token', () => ({
       useSwapToken: jest.fn().mockImplementation(() => ({
         data: { outputAmount: '72232173016371' },
         isLoading: false,
@@ -123,11 +135,17 @@ describe('SwapScreen', () => {
 
     expect(sendInput).toHaveDisplayValue('1')
 
+    await act(async () => {
+      jest.runOnlyPendingTimers()
+      jest.advanceTimersByTime(500)
+      jest.runAllTimers()
+    })
+
     await waitFor(() => {
       const receiveInput = screen.getByTestId('receive-amount-output')
       expect(receiveInput).toHaveDisplayValue('72.232173')
     })
-  })
+  }, 10000)
 
   it('should swap tokens when swap button is clicked', async () => {
     renderWithProviders()
@@ -143,17 +161,17 @@ describe('SwapScreen', () => {
   })
 
   // to be fix: balance wont show on sendInput
-  // passing on single test,
   it.skip('should set max send amount when MAX button is clicked', async () => {
     renderWithProviders()
 
     const maxButton = screen.getByTestId('max-button')
-    await userEvent.press(maxButton)
-
     const sendInput = await screen.findByTestId('send-amount-input')
+
+    await userEvent.press(maxButton)
     expect(sendInput.props.value).toBe('1')
   })
 
+  // bugged out due to an extra line on usdc - TokenDetailsMarketData
   it('should match snapshot', async () => {
     const tree = render(
       <Provider>

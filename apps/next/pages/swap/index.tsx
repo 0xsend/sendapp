@@ -1,4 +1,4 @@
-import { SwapScreen } from 'app/features/swap/screen'
+import SwapScreen from 'app/features/swap/screen'
 import { HomeLayout } from 'app/features/home/layout.web'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'

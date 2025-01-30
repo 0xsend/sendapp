@@ -2,26 +2,20 @@ import { useEffect, useState } from 'react'
 import { YStack, Card, XStack, Paragraph, Input, Button } from '@my/ui'
 import { ArrowUp, ArrowDown } from '@tamagui/lucide-icons'
 import { IconSwap } from 'app/components/icons'
-import type { CoinWithBalance } from 'app/data/coins'
+import { coins as tokens, type CoinWithBalance } from 'app/data/coins'
 import formatAmount from 'app/utils/formatAmount'
 import PopoverItem from './PopoverItem'
 import { useCoins } from 'app/provider/coins'
 import { useTokenPrice } from 'app/utils/coin-gecko'
-import { useSwapToken } from 'app/utils/get-quote'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { FormProvider, useForm } from 'react-hook-form'
+import { useSwapToken } from 'app/utils/swap-token'
 
 export type SwapFormFields = {
   sendAmount: string
   receiveAmount: string
   fromToken: CoinWithBalance & { contractAddress: string }
   toToken: CoinWithBalance & { contractAddress: string }
-}
-
-export const tokenContractAddressMap: Record<string, string> = {
-  usdCoin: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
-  ethereum: '0xC02aaA39b223FE8D0A0E5C4F27eAD9083C756Cc2',
-  sendToken: '0xEab49138BA2Ea6dd776220fE26b7b8E446638956',
 }
 
 const calculateUsdValue = (basePrice: number, tokenAmount: string): string => {
@@ -70,17 +64,27 @@ export default function SwapForm() {
     if (fromToken && !fromToken.contractAddress) {
       form.setValue('fromToken', {
         ...fromToken,
-        contractAddress: tokenContractAddressMap[fromToken.coingeckoTokenId] || '',
+        contractAddress:
+          tokens.find((t) => t.coingeckoTokenId === fromToken.coingeckoTokenId)?.token || '',
       })
     }
 
     if (toToken && !toToken.contractAddress) {
       form.setValue('toToken', {
         ...toToken,
-        contractAddress: tokenContractAddressMap[toToken.coingeckoTokenId] || '',
+        contractAddress:
+          tokens.find((t) => t.coingeckoTokenId === toToken.coingeckoTokenId)?.token || '',
       })
     }
-  }, [fromToken, toToken, form])
+  }, [
+    fromToken,
+    fromToken.coingeckoTokenId,
+    fromToken.contractAddress,
+    toToken,
+    toToken.coingeckoTokenId,
+    toToken.contractAddress,
+    form,
+  ])
 
   useEffect(() => {
     if (!fromToken || !toToken) return
@@ -117,7 +121,8 @@ export default function SwapForm() {
     toTokenMarketPrice,
     amount,
     receiveAmount,
-    form,
+    form.getValues,
+    form.setValue,
   ])
 
   const handleSwap = () => {
@@ -129,13 +134,13 @@ export default function SwapForm() {
 
   const handleMaxPress = () => {
     if (!fromToken.balance || fromToken.balance === BigInt(0)) return
-
-    const formattedBalance = (Number(fromToken.balance) / 10 ** fromToken.decimals).toFixed(6)
-    form.setValue('sendAmount', formattedBalance)
+    const formattedBalance = formatAmount(Number(fromToken.balance) / 10 ** fromToken.decimals)
+    form.setValue('sendAmount', formattedBalance, { shouldValidate: true, shouldDirty: true })
   }
 
   const handleTokenChange = (token: CoinWithBalance, isFrom: boolean) => {
-    const contractAddress = tokenContractAddressMap[token.coingeckoTokenId] || ''
+    const contractAddress =
+      tokens.find((t) => t.coingeckoTokenId === token.coingeckoTokenId)?.token || ''
 
     if (!contractAddress) {
       console.error(`Contract address not found for token: ${token.coingeckoTokenId}`)
@@ -147,10 +152,12 @@ export default function SwapForm() {
       // prevent selecting the same token for both fields
       if (selectedToken.token === toToken.token) {
         const newToToken = coins.find((item) => item.token !== selectedToken.token)
+        const contractAddress =
+          tokens.find((t) => t.coingeckoTokenId === newToToken?.coingeckoTokenId)?.token || ''
         if (newToToken) {
           form.setValue('toToken', {
             ...newToToken,
-            contractAddress: tokenContractAddressMap[newToToken.coingeckoTokenId] || '',
+            contractAddress,
           })
         }
       }
@@ -159,10 +166,12 @@ export default function SwapForm() {
     } else {
       if (selectedToken.token === fromToken.token) {
         const newFromToken = coins.find((item) => item.token !== selectedToken.token)
+        const contractAddress =
+          tokens.find((t) => t.coingeckoTokenId === newFromToken?.coingeckoTokenId)?.token || ''
         if (newFromToken) {
           form.setValue('fromToken', {
             ...newFromToken,
-            contractAddress: tokenContractAddressMap[newFromToken.coingeckoTokenId] || '',
+            contractAddress,
           })
         }
       }

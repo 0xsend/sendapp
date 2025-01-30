@@ -745,7 +745,6 @@ exports[`SwapScreen should match snapshot 1`] = `
             >
               1
                
-               
               USDC
             </Text>
             <View

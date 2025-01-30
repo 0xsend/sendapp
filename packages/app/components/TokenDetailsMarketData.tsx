@@ -3,26 +3,21 @@ import { ArrowUp, ArrowDown } from '@tamagui/lucide-icons'
 import type { CoinWithBalance } from 'app/data/coins'
 import { useTokenMarketData } from 'app/utils/coin-gecko'
 import { IconError } from './icons'
+import { useTokenPrices } from 'app/utils/useTokenPrices'
+import formatAmount from 'app/utils/formatAmount'
 
 export const TokenDetailsMarketData = ({ coin }: { coin: CoinWithBalance }) => {
-  const { data: tokenMarketData, status } = useTokenMarketData(coin.coingeckoTokenId)
+  const { data: tokenMarketData, isLoading: isLoadingMarketData } = useTokenMarketData(
+    coin.coingeckoTokenId
+  )
 
-  const price = tokenMarketData?.at(0)?.current_price
+  const { data: prices, isLoading: isLoadingPrices } = useTokenPrices()
 
-  const changePercent24h = tokenMarketData?.at(0)?.price_change_percentage_24h
-
-  if (status === 'pending') return <Spinner size="small" color="$color12" />
-  if (status === 'error' || price === undefined || changePercent24h === undefined)
-    return (
-      <XStack gap="$2" ai="center">
-        <Paragraph color="$color10">Failed to load market data</Paragraph>
-        <IconError size="$1.75" color={'$redVibrant'} />
-      </XStack>
-    )
+  const price = tokenMarketData?.at(0)?.current_price ?? prices?.[coin.token]
+  const changePercent24h = tokenMarketData?.at(0)?.price_change_percentage_24h ?? null
 
   // Coingecko API returns a formatted price already. For now, we just want to make sure it doesn't have more than 8 digits
   // so the text doesn't get cut off.
-  const formatPrice = (price: number) => price.toString().slice(0, 7)
 
   const formatPriceChange = (change: number) => {
     const fixedChange = change.toFixed(2)
@@ -43,19 +38,36 @@ export const TokenDetailsMarketData = ({ coin }: { coin: CoinWithBalance }) => {
     return <Paragraph fontSize="$4" fontWeight="500">{`${fixedChange}%`}</Paragraph>
   }
 
+  if (isLoadingMarketData && isLoadingPrices) return <Spinner size="small" color={'$color12'} />
+
   return (
     <XStack gap="$3">
-      <Paragraph
-        fontSize={14}
-        fontWeight="500"
-        $theme-dark={{ color: '$gray8Light' }}
-        color={'$color12'}
-      >
-        {`1 ${coin.symbol} = ${formatPrice(price)} USD`}
-      </Paragraph>
-      <XStack gap={'$1.5'} ai="center" jc={'space-around'}>
-        {formatPriceChange(changePercent24h)}
-      </XStack>
+      {isLoadingPrices ? (
+        <Spinner size="small" color={'$color12'} />
+      ) : (
+        <Paragraph
+          fontSize={14}
+          fontWeight="500"
+          $theme-dark={{ color: '$gray8Light' }}
+          color={'$color12'}
+        >
+          {`1 ${coin.symbol} = ${formatAmount(price, 4, 2)} USD`.replace(/\s+/g, ' ')}
+        </Paragraph>
+      )}
+      {isLoadingMarketData ? (
+        <Spinner size="small" color={'$color12'} />
+      ) : (
+        <XStack gap={'$1.5'} ai="center" jc={'space-around'}>
+          {changePercent24h === null ? (
+            <XStack gap="$2" ai="center">
+              <Paragraph color="$color10">Failed to load market data</Paragraph>
+              <IconError size="$1.75" color={'$redVibrant'} />
+            </XStack>
+          ) : (
+            formatPriceChange(changePercent24h)
+          )}
+        </XStack>
+      )}
     </XStack>
   )
 }
