@@ -43,7 +43,6 @@
     "base64-arraybuffer": "^1.0.2",
     "burnt": "^0.12.1",
     "cbor": "^9.0.1",
-    "dnum": "^2.9.0",
     "ethers": "^6.13.5",
     "expo-clipboard": "^5.0.1",
     "expo-constants": "~15.4.5",

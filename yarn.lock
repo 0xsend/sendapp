@@ -14038,7 +14038,6 @@ __metadata:
     burnt: "npm:^0.12.1"
     cbor: "npm:^9.0.1"
     debug: "npm:^4.3.6"
-    dnum: "npm:^2.9.0"
     eslint: "npm:^8.46.0"
     eslint-config-custom: "workspace:*"
     eslint-plugin-testing-library: "npm:^6.2.2"
@@ -17601,15 +17600,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"dnum@npm:^2.9.0":
-  version: 2.14.0
-  resolution: "dnum@npm:2.14.0"
-  dependencies:
-    from-exponential: "npm:^1.1.1"
-  checksum: 10/0d5a06874a00e6fb06a3d7ba14b0840a07a2728f83d7a2c7df5b184adc1d505bbcfe7d823a89313d32c16da08b01552faff0304b6283458bb22bbbdbef2e89c7
-  languageName: node
-  linkType: hard
-
 "doctrine@npm:^2.1.0":
   version: 2.1.0
   resolution: "doctrine@npm:2.1.0"
@@ -21131,13 +21121,6 @@ __metadata:
   version: 1.2.0
   resolution: "friendly-words@npm:1.2.0"
   checksum: 10/10128906463a897da29b8c685f4e214fac493c9a4fb65e675d46c7bc31b80be2d8867f7fb54e328d3b88cfef81e7be7523845e2a2c8be1dacc003230adcf8ee5
-  languageName: node
-  linkType: hard
-
-"from-exponential@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "from-exponential@npm:1.1.1"
-  checksum: 10/af2765bd4f78836153c46cf4aff51ba9f2d1ac6b7d9568d69901d2045ba5b80a47de4f2a693bcc2006a7516cef71f636a4e42596cdd77a0addcc739539eb0f48
   languageName: node
   linkType: hard
 
