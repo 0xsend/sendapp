@@ -1,30 +1,35 @@
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { type CBPayInstanceType, initOnRamp } from '@coinbase/cbpay-js'
+import { useMutation } from '@tanstack/react-query'
+
+type OnrampStatus = 'idle' | 'pending' | 'success' | 'failed'
 
 export function useCoinbaseOnramp(appId: string, destinationAddress: string, amount?: number) {
-  const [status, setStatus] = useState<'idle' | 'pending' | 'success' | 'failed'>('idle')
-  const [error, setError] = useState<Error | null>(null)
   const instanceRef = useRef<CBPayInstanceType | null>(null)
+  const [widgetStatus, setWidgetStatus] = useState<OnrampStatus>('idle')
 
-  const closeOnramp = useCallback(() => {
+  const cleanupInstance = () => {
     if (instanceRef.current) {
       instanceRef.current.destroy()
       instanceRef.current = null
     }
-    setStatus('idle')
-    setError(null)
-  }, [])
+    setWidgetStatus('idle')
+  }
 
-  const initializeOnramp = useCallback(
-    (customAmount?: number) => {
-      return new Promise<CBPayInstanceType>((resolve, reject) => {
-        if (!destinationAddress) {
-          const error = new Error('Destination address is required')
-          setError(error)
-          reject(error)
-          return
-        }
+  useEffect(() => {
+    return () => cleanupInstance()
+  }, [cleanupInstance])
 
+  const mutation = useMutation({
+    mutationKey: ['coinbase-onramp', destinationAddress],
+    mutationFn: async (customAmount: number) => {
+      if (!destinationAddress) {
+        throw new Error('Destination address is required')
+      }
+
+      cleanupInstance()
+
+      return new Promise<void>((resolve, reject) => {
         const isIOS = /iPad|iPhone|iPod/.test(window.navigator.userAgent)
 
         initOnRamp(
@@ -41,17 +46,20 @@ export function useCoinbaseOnramp(appId: string, destinationAddress: string, amo
               partnerUserId: destinationAddress,
             },
             onSuccess: () => {
-              setStatus('success')
+              setWidgetStatus('success')
+              resolve()
             },
             onExit: () => {
-              closeOnramp()
+              cleanupInstance()
+              mutation.reset()
             },
             onEvent: (event) => {
               if (event.eventName === 'open' || event.eventName === 'transition_view') {
-                setStatus('pending')
+                setWidgetStatus('pending')
               }
               if (event.eventName === 'error') {
-                setStatus('failed')
+                setWidgetStatus('failed')
+                reject(new Error('Transaction failed'))
               }
             },
             experienceLoggedIn: 'popup',
@@ -59,49 +67,38 @@ export function useCoinbaseOnramp(appId: string, destinationAddress: string, amo
           },
           (initError, instance) => {
             if (initError || !instance) {
-              const error = initError || new Error('Failed to initialize Coinbase Onramp')
-              setError(error)
-              setStatus('idle')
-              reject(error)
+              setWidgetStatus('failed')
+              reject(initError || new Error('Failed to initialize Coinbase Onramp'))
               return
             }
             instanceRef.current = instance
-            resolve(instance)
+            instance.open()
           }
         )
       })
     },
-    [appId, destinationAddress, amount, closeOnramp]
-  )
+  })
 
-  const openOnramp = useCallback(
-    async (customAmount: number) => {
-      try {
-        setStatus('pending')
-        if (instanceRef.current) {
-          instanceRef.current.destroy()
-        }
+  const closeOnramp = () => {
+    cleanupInstance()
+    mutation.reset()
+  }
 
-        const instance = await initializeOnramp(customAmount)
-        instance.open()
-      } catch (err) {
-        setStatus('idle')
-      }
-    },
-    [initializeOnramp]
-  )
-
-  useEffect(() => {
-    return () => {
-      closeOnramp()
-    }
-  }, [closeOnramp])
+  const status: OnrampStatus =
+    widgetStatus === 'idle'
+      ? (() => {
+          if (mutation.isPending) return 'pending'
+          if (mutation.isSuccess) return 'success'
+          if (mutation.isError) return 'failed'
+          return 'idle'
+        })()
+      : widgetStatus
 
   return {
-    openOnramp,
+    openOnramp: mutation.mutate,
     closeOnramp,
     status,
-    error,
-    isLoading: status === 'pending',
+    error: mutation.error,
+    isLoading: mutation.isPending || widgetStatus === 'pending',
   }
 }

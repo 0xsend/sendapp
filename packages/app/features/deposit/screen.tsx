@@ -18,11 +18,16 @@ export function DepositScreen() {
   const [showAddress, setShowAddress] = useState(false)
   const [showAmountFlow, setShowAmountFlow] = useState(false)
   const [selectedAmount, setSelectedAmount] = useState<number>(0)
+  const [isIOS, setIsIOS] = useState(false)
+
+  // Move iOS check to useEffect to avoid SSR issues
+  useEffect(() => {
+    setIsIOS(/iPad|iPhone|iPod/.test(window.navigator.userAgent))
+  }, [])
 
   const { data: sendAccount } = useSendAccount()
   const isOnrampEnabled = true
   // const isOnrampEnabled = sendAccount?.user_id && ONRAMP_ENABLED_USERS.includes(sendAccount.user_id)
-  const isIOS = /iPad|iPhone|iPod/.test(window.navigator.userAgent)
   const { openOnramp, status, error, isLoading, closeOnramp } = useCoinbaseOnramp(
     COINBASE_APP_ID,
     sendAccount?.address ?? '',
