@@ -82,7 +82,7 @@ export const EarningForm = () => {
   }
 
   return (
-    <YStack w={'100%'} gap={'$4'} py={'$3'} $gtLg={{ w: '50%' }}>
+    <YStack w={'100%'} gap={'$4'} pb={'$3'} $gtLg={{ w: '50%' }}>
       <Paragraph size={'$7'} fontWeight={'500'}>
         Deposit Amount
       </Paragraph>
