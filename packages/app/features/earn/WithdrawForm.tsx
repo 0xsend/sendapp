@@ -1,4 +1,4 @@
-import { Button, Fade, Paragraph, Spinner, Stack, SubmitButton, XStack, YStack } from '@my/ui'
+import { Button, Fade, Paragraph, Stack, SubmitButton, XStack, YStack } from '@my/ui'
 import { z } from 'zod'
 import { FormProvider, useForm } from 'react-hook-form'
 import { formFields, SchemaForm } from 'app/utils/SchemaForm'
@@ -76,7 +76,7 @@ export const WithdrawForm = () => {
   // }
 
   return (
-    <YStack w={'100%'} gap={'$4'} py={'$3'} $gtLg={{ w: '50%' }}>
+    <YStack w={'100%'} gap={'$4'} pb={'$3'} $gtLg={{ w: '50%' }}>
       <Paragraph size={'$7'} fontWeight={'500'}>
         Withdraw Amount
       </Paragraph>
