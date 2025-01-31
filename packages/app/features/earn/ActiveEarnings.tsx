@@ -17,13 +17,17 @@ export const ActiveEarnings = () => {
   // }
 
   return (
-    <YStack w={'100%'} gap={'$4'} py={'$3'} jc={'space-between'} $gtLg={{ w: '50%' }}>
+    <YStack w={'100%'} gap={'$4'} pb={'$3'} jc={'space-between'} $gtLg={{ w: '50%' }}>
       <YStack w={'100%'} gap={'$4'}>
         <TotalValue />
         <XStack flexGrow={1} gap={'$3.5'}>
           <EarningButton Icon={ArrowDown} label={'Withdraw'} href={'/earn/withdraw-form'} />
-          <EarningButton Icon={IconStacks} label={'Earnings'} href={''} />
-          <EarningButton Icon={IconSendSingleLetter} label={'Rewards'} href={''} />
+          <EarningButton Icon={IconStacks} label={'Earnings'} href={'/earn/earnings-balance'} />
+          <EarningButton
+            Icon={IconSendSingleLetter}
+            label={'Rewards'}
+            href={'/earn/rewards-balance'}
+          />
         </XStack>
         <ActiveEarningBreakdown />
       </YStack>
@@ -33,7 +37,7 @@ export const ActiveEarnings = () => {
 }
 
 // TODO plug real total value
-export const TotalValue = () => {
+const TotalValue = () => {
   const totalValue = '2,780.50'
 
   return (
@@ -86,7 +90,7 @@ export const TotalValue = () => {
 }
 
 // TODO plug real values
-export const ActiveEarningBreakdown = () => {
+const ActiveEarningBreakdown = () => {
   return (
     <Fade>
       <Card w={'100%'} p={'$5'} gap={'$6'} $gtLg={{ p: '$7' }}>
@@ -98,7 +102,7 @@ export const ActiveEarningBreakdown = () => {
   )
 }
 
-export const BreakdownRow = ({
+const BreakdownRow = ({
   symbol,
   value,
   label,
@@ -118,7 +122,7 @@ export const BreakdownRow = ({
   )
 }
 
-export const EarningButton = ({
+const EarningButton = ({
   Icon,
   label,
   href,
