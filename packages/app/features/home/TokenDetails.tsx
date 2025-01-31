@@ -11,7 +11,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { type CoinWithBalance, sendCoin, usdcCoin } from 'app/data/coins'
+import { type allCoins, type CoinWithBalance, sendCoin, usdcCoin } from 'app/data/coins'
 import { ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
 import { IconError, IconPlus, IconSwap } from 'app/components/icons'
 import { useTokenMarketData } from 'app/utils/coin-gecko'
@@ -137,7 +137,7 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
   )
 }
 
-export const TokenDetailsMarketData = ({ coin }: { coin: CoinWithBalance }) => {
+export const TokenDetailsMarketData = ({ coin }: { coin: allCoins[number] }) => {
   const { data: tokenMarketData, isLoading: isLoadingMarketData } = useTokenMarketData(
     coin.coingeckoTokenId
   )
