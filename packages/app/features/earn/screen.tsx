@@ -8,8 +8,13 @@ import { Row } from 'app/features/earn/components/Row'
 import { SectionButton } from 'app/features/earn/components/SectionButton'
 
 export const EarnScreen = () => {
+  // TODO loader when deposit balances are loading
+  // if (false) {
+  //   return <Spinner size="large" color={'$color12'} />
+  // }
+
   return (
-    <YStack w={'100%'} gap={'$4'} py={'$3'} $gtLg={{ w: '50%' }}>
+    <YStack w={'100%'} gap={'$4'} pb={'$3'} $gtLg={{ w: '50%' }}>
       <LearnSection />
       <DetailsSection />
       {/*// TODO remove this line when pluging in real data*/}
