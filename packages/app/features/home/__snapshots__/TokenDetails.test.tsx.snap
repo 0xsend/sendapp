@@ -254,6 +254,7 @@ exports[`TokenDetails renders correctly 1`] = `
     <View
       style={
         {
+          "display": "flex",
           "flexDirection": "column",
           "gap": 13,
         }
@@ -577,7 +578,7 @@ exports[`TokenDetails renders correctly 1`] = `
                     }
                     suppressHighlighting={true}
                   >
-                    8 mon ago
+                    7 mon ago
                   </Text>
                 </View>
               </View>
@@ -863,7 +864,7 @@ exports[`TokenDetails renders correctly 1`] = `
                     }
                     suppressHighlighting={true}
                   >
-                    8 mon ago
+                    7 mon ago
                   </Text>
                 </View>
               </View>
@@ -1195,7 +1196,7 @@ exports[`TokenDetails renders correctly 1`] = `
                     }
                     suppressHighlighting={true}
                   >
-                    8 mon ago
+                    7 mon ago
                   </Text>
                 </View>
               </View>
