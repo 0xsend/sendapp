@@ -1,26 +1,27 @@
 import { useEffect, useState } from 'react'
-import { YStack, Card, XStack, Paragraph, Input, Button } from '@my/ui'
+import { YStack, Card, XStack, Paragraph, Button, SubmitButton } from '@my/ui'
 import { ArrowUp, ArrowDown } from '@tamagui/lucide-icons'
 import { IconSwap } from 'app/components/icons'
-import { coins as tokens, type CoinWithBalance } from 'app/data/coins'
-import formatAmount from 'app/utils/formatAmount'
+import type { CoinWithBalance } from 'app/data/coins'
+import formatAmount, { localizeAmount } from 'app/utils/formatAmount'
 import PopoverItem from './PopoverItem'
 import { useCoins } from 'app/provider/coins'
 import { useTokenPrice } from 'app/utils/coin-gecko'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useSwapToken } from 'app/utils/swap-token'
+import { formatUnits } from 'viem'
+import { formFields, SchemaForm } from 'app/utils/SchemaForm'
+import { z } from 'zod'
 
-export type SwapFormFields = {
-  sendAmount: string
-  receiveAmount: string
-  fromToken: CoinWithBalance & { contractAddress: string }
-  toToken: CoinWithBalance & { contractAddress: string }
-}
+const SwapFormSchema = z.object({
+  sendAmount: formFields.text,
+  receiveAmount: formFields.text,
+})
 
 const calculateUsdValue = (basePrice: number, tokenAmount: string): string => {
-  const value = basePrice * Number(tokenAmount)
-  return value.toString()
+  const value = basePrice * Number.parseFloat(tokenAmount)
+  return value.toFixed(6)
 }
 
 export default function SwapForm() {
@@ -36,301 +37,372 @@ export default function SwapForm() {
   const [toDropdownOpen, setToDropdownOpen] = useState(false)
   const [inputUsdValue, setInputUsdValue] = useState<string | null>(null)
   const [outputUsdValue, setOutputUsdValue] = useState<string | null>(null)
+  const [fromToken, setFromToken] = useState<CoinWithBalance | undefined>(coin)
+  const [toToken, setToToken] = useState<CoinWithBalance | undefined>(defaultToToken)
 
-  const form = useForm<SwapFormFields>({
+  const [isInputFocus, setInputFocus] = useState(false)
+
+  const form = useForm<z.infer<typeof SwapFormSchema>>({
     defaultValues: {
       sendAmount: '',
       receiveAmount: '',
-      fromToken: coin,
-      toToken: defaultToToken,
     },
   })
 
-  const fromToken = form.watch('fromToken')
-  const toToken = form.watch('toToken')
   const amount = form.watch('sendAmount')
   const receiveAmount = form.watch('receiveAmount')
+  const sanitizedAmount = amount.replace(/,/g, '').trim()
+  const parsedAmount = sanitizedAmount === '' ? BigInt(0) : BigInt(sanitizedAmount)
+  const insufficientAmount = coin?.balance !== undefined && parsedAmount > coin?.balance
 
   const { data } = useSwapToken({
-    tokenIn: fromToken.contractAddress,
-    tokenOut: toToken.contractAddress,
-    amountIn: amount,
+    tokenIn: fromToken?.token,
+    tokenOut: toToken?.token,
+    amountIn: sanitizedAmount,
   })
 
   const { data: fromTokenMarketPrice } = useTokenPrice(fromToken?.coingeckoTokenId ?? '')
   const { data: toTokenMarketPrice } = useTokenPrice(toToken?.coingeckoTokenId ?? '')
 
+  // Calculates and updates the received amount and USD values based on the latest swap data
   useEffect(() => {
-    if (fromToken && !fromToken.contractAddress) {
-      form.setValue('fromToken', {
-        ...fromToken,
-        contractAddress:
-          tokens.find((t) => t.coingeckoTokenId === fromToken.coingeckoTokenId)?.token || '',
-      })
-    }
-
-    if (toToken && !toToken.contractAddress) {
-      form.setValue('toToken', {
-        ...toToken,
-        contractAddress:
-          tokens.find((t) => t.coingeckoTokenId === toToken.coingeckoTokenId)?.token || '',
-      })
-    }
-  }, [
-    fromToken,
-    fromToken.coingeckoTokenId,
-    fromToken.contractAddress,
-    toToken,
-    toToken.coingeckoTokenId,
-    toToken.contractAddress,
-    form,
-  ])
-
-  useEffect(() => {
-    if (!fromToken || !toToken) return
-
-    const inputBaseMarketPrice = fromTokenMarketPrice?.[fromToken.coingeckoTokenId]?.usd || 0
-    const outputBaseMarketPrice = toTokenMarketPrice?.[toToken.coingeckoTokenId]?.usd || 0
-
-    if (amount && Number(amount) > 0 && data?.outputAmount) {
-      const outputAmountInWei = BigInt(data.outputAmount)
-      const fromTokenDecimals = fromToken.decimals
-      const toTokenDecimals = toToken.decimals
-
-      const receivedAmount = Number(outputAmountInWei) / 10 ** toTokenDecimals
-      const normalizedAmount = receivedAmount * 10 ** fromTokenDecimals
-
-      if (receiveAmount !== normalizedAmount.toFixed(6)) {
-        form.setValue('receiveAmount', normalizedAmount.toFixed(6))
-      }
-
-      setInputUsdValue(calculateUsdValue(inputBaseMarketPrice, amount))
-      setOutputUsdValue(calculateUsdValue(outputBaseMarketPrice, normalizedAmount.toString()))
-    } else {
-      if (form.getValues('receiveAmount') !== '') {
-        form.setValue('receiveAmount', '')
-      }
+    if (!fromToken || !toToken) {
       setInputUsdValue(null)
       setOutputUsdValue(null)
+      form.setValue('receiveAmount', '', { shouldValidate: true })
+      return
     }
+
+    const inputBaseMarketPrice = fromTokenMarketPrice?.[fromToken?.coingeckoTokenId ?? '']?.usd || 0
+    const outputBaseMarketPrice = toTokenMarketPrice?.[toToken?.coingeckoTokenId ?? '']?.usd || 0
+
+    if (!data?.outputAmount || !sanitizedAmount || Number(sanitizedAmount) === 0) {
+      setInputUsdValue(null)
+      setOutputUsdValue(null)
+      form.setValue('receiveAmount', '', { shouldValidate: true })
+      return
+    }
+
+    const outputAmountInWei = BigInt(data.outputAmount)
+    const toTokenDecimals = toToken.decimals
+    const receivedAmount = Number.parseFloat(formatUnits(outputAmountInWei, toTokenDecimals))
+    const normalizedAmount = receivedAmount.toFixed(6)
+
+    if (form.getValues('receiveAmount') !== normalizedAmount) {
+      form.setValue('receiveAmount', normalizedAmount, { shouldValidate: true })
+    }
+
+    setInputUsdValue(calculateUsdValue(inputBaseMarketPrice, sanitizedAmount))
+    setOutputUsdValue(calculateUsdValue(outputBaseMarketPrice, normalizedAmount))
   }, [
-    data,
+    data?.outputAmount,
     fromToken,
-    toToken,
+    fromToken?.coingeckoTokenId,
     fromTokenMarketPrice,
+    toToken,
+    toToken?.coingeckoTokenId,
     toTokenMarketPrice,
-    amount,
-    receiveAmount,
-    form.getValues,
+    toToken?.decimals,
+    sanitizedAmount,
     form.setValue,
+    form.getValues,
   ])
 
-  const handleSwap = () => {
-    const fromToken = form.getValues('fromToken')
-    const toToken = form.getValues('toToken')
-    form.setValue('fromToken', toToken)
-    form.setValue('toToken', fromToken)
+  const switchFromTo = () => {
+    setFromToken(toToken)
+    setToToken(fromToken)
   }
 
-  const handleMaxPress = () => {
-    if (!fromToken.balance || fromToken.balance === BigInt(0)) return
-    const formattedBalance = formatAmount(Number(fromToken.balance) / 10 ** fromToken.decimals)
+  const maxoutBalance = () => {
+    if (!fromToken || !fromToken.balance || fromToken.balance === BigInt(0)) return
+    const formattedBalance = formatAmount(formatUnits(fromToken.balance, fromToken.decimals))
     form.setValue('sendAmount', formattedBalance, { shouldValidate: true, shouldDirty: true })
   }
 
   const handleTokenChange = (token: CoinWithBalance, isFrom: boolean) => {
-    const contractAddress =
-      tokens.find((t) => t.coingeckoTokenId === token.coingeckoTokenId)?.token || ''
-
-    if (!contractAddress) {
-      console.error(`Contract address not found for token: ${token.coingeckoTokenId}`)
-    }
-
-    const selectedToken = { ...token, contractAddress }
-
     if (isFrom) {
-      // prevent selecting the same token for both fields
-      if (selectedToken.token === toToken.token) {
-        const newToToken = coins.find((item) => item.token !== selectedToken.token)
-        const contractAddress =
-          tokens.find((t) => t.coingeckoTokenId === newToToken?.coingeckoTokenId)?.token || ''
-        if (newToToken) {
-          form.setValue('toToken', {
-            ...newToToken,
-            contractAddress,
-          })
-        }
+      // Prevent selecting the same token in both fields
+      if (token.token === toToken?.token) {
+        const newToToken = coins.find((item) => item.token !== token.token)
+        setToToken(newToToken)
       }
-      form.setValue('fromToken', selectedToken)
+      setFromToken(token)
       setFromDropdownOpen(false)
     } else {
-      if (selectedToken.token === fromToken.token) {
-        const newFromToken = coins.find((item) => item.token !== selectedToken.token)
-        const contractAddress =
-          tokens.find((t) => t.coingeckoTokenId === newFromToken?.coingeckoTokenId)?.token || ''
-        if (newFromToken) {
-          form.setValue('fromToken', {
-            ...newFromToken,
-            contractAddress,
-          })
-        }
+      if (token.token === fromToken?.token) {
+        const newFromToken = coins.find((item) => item.token !== token.token)
+        setFromToken(newFromToken)
       }
-      form.setValue('toToken', selectedToken)
+      setToToken(token)
       setToDropdownOpen(false)
     }
   }
 
-  const onSubmit = (data: SwapFormFields) => {
-    console.log({ data })
+  const onSubmit = async () => {
+    console.log('submit')
   }
 
   return (
     <FormProvider {...form}>
-      <YStack position="relative" w="100%" gap="$4">
-        <Card p="$4.5" w="100%" h={188} jc="space-between" borderRadius="$6" position="relative">
-          <YStack gap="$3">
-            <XStack jc="space-between" ai="center">
-              <XStack ai="center" gap="$2">
-                <ArrowUp size={14} />
-                <Paragraph fontSize={14} fontWeight="500" color="$color12">
-                  You pay
-                </Paragraph>
-              </XStack>
-            </XStack>
-
-            <XStack ai="center" position="relative" jc="space-between" w="100%">
-              <Input
-                {...sharedInputStyles}
-                testID="send-amount-input"
-                placeholder="0"
-                value={form.watch('sendAmount')}
-                onChangeText={(text) => form.setValue('sendAmount', text)}
-              />
-              <PopoverItem
-                testID="fromdropdown-button"
-                isOpen={fromDropdownOpen}
-                onOpenChange={setFromDropdownOpen}
-                selectedToken={fromToken}
-                coins={coins}
-                onTokenChange={(token) => handleTokenChange(token, true)}
-              />
-            </XStack>
-            <XStack jc="space-between" ai="center">
-              <Paragraph fontSize={14} color="$gray8">
-                ${inputUsdValue || fromTokenMarketPrice?.[fromToken.coingeckoTokenId]?.usd || '0'}
-              </Paragraph>
-              <XStack ai="center" gap="$2">
-                <Paragraph fontSize={14} color="$gray8">
-                  {formatAmount((Number(fromToken.balance) / 10 ** fromToken.decimals).toString())}{' '}
-                  {fromToken.label}
-                </Paragraph>
-                <Button
-                  testID="max-button"
-                  onPress={handleMaxPress}
-                  chromeless
-                  p={0}
-                  backgroundColor="transparent"
-                  borderWidth={0}
-                  hoverStyle={{ backgroundColor: 'transparent' }}
-                >
-                  <Paragraph color="$green5" fontWeight="600">
-                    MAX
+      <SchemaForm
+        form={form}
+        schema={SwapFormSchema}
+        onSubmit={onSubmit}
+        props={{
+          sendAmount: {
+            testID: 'send-amount-input',
+            fontSize: (() => {
+              switch (true) {
+                case amount?.length <= 8:
+                  return '$11'
+                case amount?.length > 16:
+                  return '$7'
+                default:
+                  return '$8'
+              }
+            })(),
+            $gtSm: {
+              fontSize: (() => {
+                switch (true) {
+                  case amount?.length <= 9:
+                    return '$10'
+                  case amount?.length > 16:
+                    return '$8'
+                  default:
+                    return '$10'
+                }
+              })(),
+            },
+            color: '$color12',
+            fontWeight: '500',
+            bw: 0,
+            br: 0,
+            p: 1,
+            focusStyle: {
+              outlineWidth: 0,
+            },
+            placeholder: '0',
+            fontFamily: '$mono',
+            '$theme-dark': {
+              placeholderTextColor: '$darkGrayTextField',
+            },
+            '$theme-light': {
+              placeholderTextColor: '$darkGrayTextField',
+            },
+            inputMode: coin?.decimals ? 'decimal' : 'numeric',
+            onChangeText: (amount) => {
+              const localizedAmount = localizeAmount(amount)
+              form.setValue('sendAmount', localizedAmount)
+            },
+            onFocus: () => setInputFocus(true),
+            onBlur: () => setInputFocus(false),
+            fieldsetProps: {
+              width: '60%',
+            },
+          },
+          receiveAmount: {
+            testID: 'receive-amount-output',
+            disabled: true,
+            fontSize: (() => {
+              switch (true) {
+                case amount?.length <= 8:
+                  return '$11'
+                case amount?.length > 16:
+                  return '$7'
+                default:
+                  return '$8'
+              }
+            })(),
+            $gtSm: {
+              fontSize: (() => {
+                switch (true) {
+                  case amount?.length <= 9:
+                    return '$10'
+                  case amount?.length > 16:
+                    return '$8'
+                  default:
+                    return '$10'
+                }
+              })(),
+            },
+            color: '$color12',
+            fontWeight: '500',
+            bw: 0,
+            br: 0,
+            p: 1,
+            focusStyle: {
+              outlineWidth: 0,
+            },
+            placeholder: '0',
+            fontFamily: '$mono',
+            '$theme-dark': {
+              placeholderTextColor: '$darkGrayTextField',
+            },
+            '$theme-light': {
+              placeholderTextColor: '$darkGrayTextField',
+            },
+            fieldsetProps: {
+              width: '60%',
+            },
+            defaultValue: receiveAmount,
+          },
+        }}
+        formProps={{
+          testID: 'SendForm',
+          justifyContent: 'space-between',
+          $gtSm: {
+            maxWidth: '100%',
+            justifyContent: 'space-between',
+          },
+        }}
+        renderAfter={({ submit }) => (
+          <SubmitButton theme="green" py={'$5'} br={'$4'} disabledStyle={{ opacity: 0.5 }}>
+            <Button.Text fontWeight={'600'}>SWAP</Button.Text>
+          </SubmitButton>
+        )}
+      >
+        {({ sendAmount, receiveAmount }) => (
+          <YStack gap="$5">
+            <Card p="$4.5" w="100%" h={188} borderRadius="$6">
+              <YStack gap="$3">
+                <XStack jc="space-between" ai="center">
+                  <XStack w="100%" jc="space-between">
+                    <XStack ai="center" gap="$2">
+                      <ArrowUp size={14} />
+                      <Paragraph fontSize={14} fontWeight="500" color="$color12">
+                        You Pay
+                      </Paragraph>
+                    </XStack>
+                    {insufficientAmount && (
+                      <Paragraph color={'$error'} size={'$5'}>
+                        Insufficient funds
+                      </Paragraph>
+                    )}
+                  </XStack>
+                </XStack>
+                <XStack ai="center" jc="space-between">
+                  {sendAmount}
+                  <XStack
+                    position="absolute"
+                    bottom={-8}
+                    left={0}
+                    right={0}
+                    height={1}
+                    backgroundColor={isInputFocus ? '$primary' : '$silverChalice'}
+                    $theme-light={{
+                      backgroundColor: isInputFocus ? '$color12' : '$silverChalice',
+                    }}
+                  />
+                  <PopoverItem
+                    testID="fromdropdown-button"
+                    isOpen={fromDropdownOpen}
+                    onOpenChange={setFromDropdownOpen}
+                    selectedToken={fromToken}
+                    coins={coins}
+                    onTokenChange={(token) => handleTokenChange(token, true)}
+                  />
+                </XStack>
+                <XStack jc="space-between" ai="center">
+                  <Paragraph fontSize={14} color="$gray8">
+                    $
+                    {inputUsdValue ||
+                      fromTokenMarketPrice?.[fromToken?.coingeckoTokenId ?? '']?.usd ||
+                      '0'}
                   </Paragraph>
-                </Button>
-              </XStack>
-            </XStack>
-          </YStack>
-        </Card>
+                  <XStack ai="center" gap="$2">
+                    <Paragraph fontSize={14} color="$gray8">
+                      {fromToken
+                        ? formatAmount(
+                            formatUnits(fromToken.balance ?? BigInt(0), fromToken.decimals)
+                          )
+                        : '0'}{' '}
+                      {fromToken?.label ?? ''}
+                    </Paragraph>
+                    <Button
+                      testID="max-button"
+                      onPress={maxoutBalance}
+                      chromeless
+                      p={0}
+                      backgroundColor="transparent"
+                      borderWidth={0}
+                      hoverStyle={{ backgroundColor: 'transparent' }}
+                    >
+                      <Paragraph color="$green5" fontWeight="600">
+                        MAX
+                      </Paragraph>
+                    </Button>
+                  </XStack>
+                </XStack>
+              </YStack>
+            </Card>
 
-        <YStack
-          position="absolute"
-          top="50%"
-          left="50%"
-          zIndex={2}
-          transform="translate(-50%, -50%)"
-        >
-          <Button
-            testID="swap-button"
-            size="$5"
-            circular
-            w={60}
-            h={60}
-            elevate
-            $theme-dark={{ bc: '$darkest' }}
-            br="$10"
-            onPress={handleSwap}
-          >
-            <Button.Icon>
-              <IconSwap size={'$1'} color="$green11Dark" />
-            </Button.Icon>
-          </Button>
-        </YStack>
+            <YStack
+              position="absolute"
+              top="50%"
+              left="50%"
+              zIndex={2}
+              transform="translate(-50%, -50%)"
+            >
+              <Button
+                testID="swap-button"
+                size="$5"
+                circular
+                w={60}
+                h={60}
+                elevate
+                $theme-dark={{ bc: '$darkest' }}
+                br="$10"
+                onPress={switchFromTo}
+              >
+                <Button.Icon>
+                  <IconSwap size={'$1'} color="$green11Dark" />
+                </Button.Icon>
+              </Button>
+            </YStack>
 
-        <Card p="$4.5" w="100%" h={188} jc="space-between" borderRadius="$6" position="relative">
-          <YStack gap="$3">
-            <XStack jc="space-between" ai="center">
-              <XStack ai="center" gap="$2">
-                <ArrowDown size={14} />
-                <Paragraph fontSize={14} fontWeight="500" color="$color12">
-                  You Receive
+            <Card p="$4.5" w="100%" h={188} borderRadius="$6">
+              <YStack gap="$3">
+                <XStack jc="space-between" ai="center">
+                  <XStack ai="center" gap="$2">
+                    <ArrowDown size={14} />
+                    <Paragraph fontSize={14} fontWeight="500" color="$color12">
+                      You Receive
+                    </Paragraph>
+                  </XStack>
+                </XStack>
+                <XStack ai="center" jc="space-between">
+                  {receiveAmount}
+                  <XStack
+                    position="absolute"
+                    bottom={-8}
+                    left={0}
+                    right={0}
+                    height={1}
+                    backgroundColor={'$silverChalice'}
+                    $theme-light={{
+                      backgroundColor: '$silverChalice',
+                    }}
+                  />
+                  <PopoverItem
+                    testID="todropdown-button"
+                    isOpen={toDropdownOpen}
+                    onOpenChange={setToDropdownOpen}
+                    selectedToken={toToken}
+                    coins={coins.filter((c) => c.token !== fromToken?.token)}
+                    onTokenChange={(token) => handleTokenChange(token, false)}
+                  />
+                </XStack>
+                <Paragraph fontSize={14} color="$gray8">
+                  $
+                  {outputUsdValue ||
+                    toTokenMarketPrice?.[toToken?.coingeckoTokenId ?? '']?.usd ||
+                    '0'}
                 </Paragraph>
-              </XStack>
-            </XStack>
-            <XStack ai="center" position="relative" jc="space-between" w="100%">
-              <Input
-                {...sharedInputStyles}
-                testID="receive-amount-output"
-                value={receiveAmount}
-                disabled
-                placeholder="0"
-              />
-              <PopoverItem
-                testID="todropdown-button"
-                isOpen={toDropdownOpen}
-                onOpenChange={setToDropdownOpen}
-                selectedToken={toToken}
-                coins={coins.filter((item) => item.token !== fromToken.token)}
-                onTokenChange={(token) => handleTokenChange(token, false)}
-              />
-            </XStack>
-            <XStack jc="space-between" ai="center">
-              <Paragraph fontSize={14} color="$gray8">
-                ${outputUsdValue || toTokenMarketPrice?.[toToken.coingeckoTokenId]?.usd || '0'}
-              </Paragraph>
-            </XStack>
+              </YStack>
+            </Card>
           </YStack>
-        </Card>
-      </YStack>
-
-      <Button theme="green" py={'$5'} br={'$4'} onPress={form.handleSubmit(onSubmit)}>
-        <Paragraph fontWeight={'600'}>SEND</Paragraph>
-      </Button>
+        )}
+      </SchemaForm>
     </FormProvider>
   )
-}
-
-const sharedInputStyles = {
-  placeholderTextColor: '$gray10Dark',
-  fontSize: 34,
-  fontWeight: '600' as '400' | '500' | '600',
-  color: '$color12',
-  borderWidth: 0,
-  borderBottomWidth: 1,
-  borderBottomColor: '$gray10Dark',
-  borderRadius: 0,
-  outlineStyle: 'none',
-  hoverStyle: {
-    borderBottomWidth: 1,
-    borderBottomColor: '$gray10Dark',
-  },
-  focusStyle: {
-    outlineWidth: 0,
-    borderBottomWidth: 1,
-    borderBottomColor: '$green11Dark',
-  },
-  paddingLeft: 0,
-  backgroundColor: 'transparent',
-  flexGrow: 1,
-  maxWidth: '100%',
-  maxLength: 16,
 }

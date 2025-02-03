@@ -3,8 +3,8 @@ import { useQuery, queryOptions } from '@tanstack/react-query'
 const KYBER_SWAP_BASE_URL = 'https://aggregator-api.kyberswap.com'
 
 interface SwapRouteParams {
-  tokenIn: string
-  tokenOut: string
+  tokenIn?: string
+  tokenOut?: string
   amountIn: string
   chain?: string
   to?: string
@@ -62,6 +62,10 @@ const fetchSwapRoute = async ({
   to = '0x6cA571D9F6cF441Eb59810977CBfe95F1aA6a63B',
   clientId = 'SendApp',
 }: SwapRouteParams): Promise<SwapRouteResponse> => {
+  if (!tokenIn || !tokenOut) {
+    throw new Error('tokenIn and tokenOut are required')
+  }
+
   const url = new URL(`${KYBER_SWAP_BASE_URL}/${chain}/route/encode`)
   url.searchParams.append('tokenIn', tokenIn)
   url.searchParams.append('tokenOut', tokenOut)
@@ -88,11 +92,11 @@ export function useSwapToken({ tokenIn, tokenOut, amountIn }: SwapRouteParams) {
   return useQuery(
     queryOptions({
       queryKey: [useSwapRouteQueryKey, tokenIn, tokenOut, amountIn],
-      enabled: !!tokenIn && !!tokenOut && !!amountIn,
+      enabled: Boolean(tokenIn && tokenOut && amountIn),
       queryFn: () =>
         fetchSwapRoute({
-          tokenIn,
-          tokenOut,
+          tokenIn: tokenIn,
+          tokenOut: tokenOut,
           amountIn,
         }),
     })
