@@ -1,5 +1,5 @@
 import { Button, Text, XStack, YStack } from '@my/ui'
-import { Check } from '@tamagui/lucide-icons'
+import { Check, Apple } from '@tamagui/lucide-icons'
 import { useState, useEffect } from 'react'
 import { DepositAddress } from './components/DepositAddress'
 import { useSendAccount } from 'app/utils/send-accounts'
@@ -43,12 +43,13 @@ export function DepositScreen() {
     }
   }, [status])
 
-  const handleContinue = () => {
+  const handleOptionSelect = (option: 'crypto' | 'card' | 'apple') => {
+    setSelectedOption(option)
     if (!sendAccount?.address) return
 
-    if (selectedOption === 'crypto') {
+    if (option === 'crypto') {
       setShowAddress(true)
-    } else if (selectedOption === 'card' || selectedOption === 'apple') {
+    } else {
       setShowAmountFlow(true)
     }
   }
@@ -148,7 +149,7 @@ export function DepositScreen() {
             <DepositOptionButton
               option="crypto"
               selectedOption={selectedOption}
-              onPress={() => setSelectedOption('crypto')}
+              onPress={() => handleOptionSelect('crypto')}
               title="Via Crypto"
               description="Direct deposit via External Wallet"
             />
@@ -158,8 +159,8 @@ export function DepositScreen() {
                 <DepositOptionButton
                   option="card"
                   selectedOption={selectedOption}
-                  onPress={() => setSelectedOption('card')}
-                  title="Via Card"
+                  onPress={() => handleOptionSelect('card')}
+                  title="Debit Card"
                   description="Up to $500 per week"
                 />
 
@@ -167,34 +168,14 @@ export function DepositScreen() {
                   <DepositOptionButton
                     option="apple"
                     selectedOption={selectedOption}
-                    onPress={() => setSelectedOption('apple')}
+                    onPress={() => handleOptionSelect('apple')}
                     title="Apple Pay"
-                    description="Up to $500 per week"
+                    description="Up to $500 per week (Debit Card only)"
+                    icon={<Apple size={20} />}
                   />
                 )}
               </>
             )}
-
-            <Button
-              theme="green"
-              px="$3.5"
-              h="$4.5"
-              borderRadius="$4"
-              f={1}
-              disabled={!selectedOption || isLoading}
-              opacity={selectedOption && !isLoading ? 1 : 0.5}
-              onPress={handleContinue}
-            >
-              <XStack w="100%" gap="$2.5" ai="center" jc="center">
-                <LinkableButton.Text
-                  fontWeight="500"
-                  tt="uppercase"
-                  $theme-dark={{ col: '$color0' }}
-                >
-                  {isLoading ? 'LOADING...' : 'CONTINUE'}
-                </LinkableButton.Text>
-              </XStack>
-            </Button>
           </YStack>
         )
     }

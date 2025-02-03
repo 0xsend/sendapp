@@ -7,6 +7,7 @@ interface DepositOptionButtonProps {
   onPress: () => void
   title: string
   description: string
+  icon?: React.ReactNode
 }
 
 export function DepositOptionButton({
