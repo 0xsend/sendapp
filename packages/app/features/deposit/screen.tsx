@@ -1,5 +1,5 @@
 import { Button, Text, XStack, YStack } from '@my/ui'
-import { Check, Apple } from '@tamagui/lucide-icons'
+import { Check } from '@tamagui/lucide-icons'
 import { useState, useEffect } from 'react'
 import { DepositAddress } from './components/DepositAddress'
 import { useSendAccount } from 'app/utils/send-accounts'
@@ -14,15 +14,9 @@ const COINBASE_APP_ID = process.env.NEXT_PUBLIC_CDP_APP_ID ?? ''
 // const ONRAMP_ENABLED_USERS = (process.env.NEXT_PUBLIC_ONRAMP_ALLOWLIST ?? '').split(',')
 
 export function DepositScreen() {
-  const [selectedOption, setSelectedOption] = useState<'crypto' | 'card' | 'apple' | null>(null)
+  const [selectedOption, setSelectedOption] = useState<'crypto' | 'card' | null>(null)
   const [showAddress, setShowAddress] = useState(false)
   const [showAmountFlow, setShowAmountFlow] = useState(false)
-  const [isIOS, setIsIOS] = useState(false)
-
-  // Move iOS check to useEffect to avoid SSR issues
-  useEffect(() => {
-    setIsIOS(/iPad|iPhone|iPod/.test(window.navigator.userAgent))
-  }, [])
 
   const { data: sendAccount } = useSendAccount()
   const isOnrampEnabled = true
@@ -41,7 +35,7 @@ export function DepositScreen() {
     }
   }, [status])
 
-  const handleOptionSelect = (option: 'crypto' | 'card' | 'apple') => {
+  const handleOptionSelect = (option: 'crypto' | 'card') => {
     setSelectedOption(option)
     if (!sendAccount?.address) return
 
@@ -128,26 +122,13 @@ export function DepositScreen() {
             />
 
             {isOnrampEnabled && (
-              <>
-                <DepositOptionButton
-                  option="card"
-                  selectedOption={selectedOption}
-                  onPress={() => handleOptionSelect('card')}
-                  title="Debit Card"
-                  description="Up to $500 per week"
-                />
-
-                {isIOS && (
-                  <DepositOptionButton
-                    option="apple"
-                    selectedOption={selectedOption}
-                    onPress={() => handleOptionSelect('apple')}
-                    title="Apple Pay"
-                    description="Up to $500 per week (Debit Card only)"
-                    icon={<Apple size={20} />}
-                  />
-                )}
-              </>
+              <DepositOptionButton
+                option="card"
+                selectedOption={selectedOption}
+                onPress={() => handleOptionSelect('card')}
+                title="Debit Card"
+                description="Up to $500 per week"
+              />
             )}
           </YStack>
         )
