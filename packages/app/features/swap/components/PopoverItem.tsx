@@ -6,7 +6,7 @@ import TokenItem from './TokenItem'
 interface PopoverItemProps {
   isOpen: boolean
   onOpenChange: (isOpen: boolean) => void
-  selectedToken: CoinWithBalance
+  selectedToken?: CoinWithBalance
   coins: CoinWithBalance[]
   onTokenChange: (token: CoinWithBalance) => void
   testID: string
@@ -34,7 +34,7 @@ export default function PopoverItem({
           borderWidth={0}
           hoverStyle={{ backgroundColor: 'transparent' }}
         >
-          <TokenItem coin={selectedToken} />
+          {selectedToken && <TokenItem coin={selectedToken} />}
           <ChevronDown size={16} color="$green5" />
         </Button>
       </Popover.Trigger>
