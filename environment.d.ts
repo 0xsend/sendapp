@@ -44,6 +44,11 @@ declare global {
        * Coinbase Developer Portal App ID
        */
       NEXT_PUBLIC_CDP_APP_ID: string
+
+      /**
+       * Onchain Kit API Key
+       */
+      NEXT_PUBLIC_ONCHAIN_KIT_API_KEY: string
     }
   }
   /**
