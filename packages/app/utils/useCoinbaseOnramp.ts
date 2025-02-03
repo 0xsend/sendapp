@@ -1,104 +1,104 @@
-import { useRef, useState, useEffect } from 'react'
-import { type CBPayInstanceType, initOnRamp } from '@coinbase/cbpay-js'
+import { useState, useCallback } from 'react'
+// @ts-expect-error - onchainkit types aren't loading
+import { getOnrampBuyUrl } from '@coinbase/onchainkit/fund'
 import { useMutation } from '@tanstack/react-query'
 
 type OnrampStatus = 'idle' | 'pending' | 'success' | 'failed'
 
-export function useCoinbaseOnramp(appId: string, destinationAddress: string, amount?: number) {
-  const instanceRef = useRef<CBPayInstanceType | null>(null)
-  const [widgetStatus, setWidgetStatus] = useState<OnrampStatus>('idle')
+interface OnrampConfig {
+  projectId: string
+  address: string
+}
 
-  const cleanupInstance = () => {
-    if (instanceRef.current) {
-      instanceRef.current.destroy()
-      instanceRef.current = null
+interface OnrampParams {
+  amount: number
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function useCoinbaseOnramp({ projectId, address }: OnrampConfig) {
+  const [popup, setPopup] = useState<Window | null>(null)
+  const [popupChecker, setPopupChecker] = useState<NodeJS.Timeout | null>(null)
+
+  const cleanup = useCallback(() => {
+    if (popup) {
+      popup.close()
     }
-    setWidgetStatus('idle')
-  }
+    if (popupChecker) {
+      clearInterval(popupChecker)
+    }
+    setPopup(null)
+    setPopupChecker(null)
+  }, [popup, popupChecker])
 
-  useEffect(() => {
-    return () => cleanupInstance()
-  }, [cleanupInstance])
+  const mutation = useMutation<void, Error, OnrampParams>({
+    mutationFn: async ({ amount }) => {
+      const onrampUrl = getOnrampBuyUrl({
+        projectId,
+        addresses: {
+          '0xCF6D79F936f50B6a8257733047308664151B2510': ['base'],
+        },
+        assets: ['USDC'],
+        presetFiatAmount: amount,
+        fiatCurrency: 'USD',
+        redirectUrl: `${window.location.origin}/deposit/success`,
+      })
 
-  const mutation = useMutation({
-    mutationKey: ['coinbase-onramp', destinationAddress],
-    mutationFn: async (customAmount: number) => {
-      if (!destinationAddress) {
-        throw new Error('Destination address is required')
+      cleanup()
+
+      const newPopup = window.open(onrampUrl, 'Coinbase Onramp', 'width=600,height=800')
+
+      if (!newPopup) {
+        throw new Error('Popup was blocked. Please enable popups and try again.')
       }
 
-      cleanupInstance()
+      setPopup(newPopup)
 
       return new Promise<void>((resolve, reject) => {
-        const isIOS = /iPad|iPhone|iPod/.test(window.navigator.userAgent)
-
-        initOnRamp(
-          {
-            appId,
-            widgetParameters: {
-              // Hardcoded address for testing
-              addresses: { '0xCF6D79F936f50B6a8257733047308664151B2510': ['base'] },
-              assets: ['USDC'],
-              presetCryptoAmount: customAmount || amount || 10,
-              defaultNetwork: 'base',
-              defaultExperience: 'buy',
-              defaultPaymentMethod: isIOS ? 'APPLE_PAY' : 'CARD',
-              partnerUserId: destinationAddress,
-            },
-            onSuccess: () => {
-              setWidgetStatus('success')
-              resolve()
-            },
-            onExit: () => {
-              cleanupInstance()
-              mutation.reset()
-            },
-            onEvent: (event) => {
-              if (event.eventName === 'open' || event.eventName === 'transition_view') {
-                setWidgetStatus('pending')
-              }
-              if (event.eventName === 'error') {
-                setWidgetStatus('failed')
-                reject(new Error('Transaction failed'))
-              }
-            },
-            experienceLoggedIn: 'popup',
-            experienceLoggedOut: 'popup',
-          },
-          (initError, instance) => {
-            if (initError || !instance) {
-              setWidgetStatus('failed')
-              reject(initError || new Error('Failed to initialize Coinbase Onramp'))
-              return
-            }
-            instanceRef.current = instance
-            instance.open()
+        const checker = setInterval(() => {
+          if (newPopup.closed) {
+            clearInterval(checker)
+            setPopup(null)
+            reject(new Error('Transaction cancelled'))
           }
-        )
+        }, 1000)
+        setPopupChecker(checker)
       })
+    },
+    onError: (error) => {
+      cleanup()
+      return error instanceof Error ? error : new Error('Unknown error occurred')
+    },
+    onSettled: () => {
+      cleanup()
     },
   })
 
-  const closeOnramp = () => {
-    cleanupInstance()
-    mutation.reset()
-  }
+  const openOnramp = useCallback(
+    (amount: number) => {
+      mutation.mutate({ amount })
+    },
+    [mutation]
+  )
 
-  const status: OnrampStatus =
-    widgetStatus === 'idle'
-      ? (() => {
-          if (mutation.isPending) return 'pending'
-          if (mutation.isSuccess) return 'success'
-          if (mutation.isError) return 'failed'
-          return 'idle'
-        })()
-      : widgetStatus
+  const closeOnramp = useCallback(() => {
+    mutation.reset()
+    cleanup()
+  }, [mutation, cleanup])
+
+  // Map mutation status to our OnrampStatus type
+  const status: OnrampStatus = mutation.isPending
+    ? 'pending'
+    : mutation.isError
+      ? 'failed'
+      : mutation.isSuccess
+        ? 'success'
+        : 'idle'
 
   return {
-    openOnramp: mutation.mutate,
+    openOnramp,
     closeOnramp,
     status,
-    error: mutation.error,
-    isLoading: mutation.isPending || widgetStatus === 'pending',
+    error: mutation.error as Error | null,
+    isLoading: mutation.isPending,
   }
 }

@@ -1,7 +1,7 @@
 import type { Session } from '@supabase/supabase-js'
 import type React from 'react'
 import { AuthProvider } from './auth'
-import { QueryClientProvider } from './react-query'
+import { QueryClient } from '@tanstack/react-query'
 import { SafeAreaProvider } from './safe-area'
 import { TamaguiProvider } from './tamagui'
 import { UniversalThemeProvider } from './theme'
@@ -9,8 +9,10 @@ import { ToastProvider } from './toast'
 import { WagmiProvider } from './wagmi'
 import { ScrollDirectionProvider } from './scroll'
 import { CoinsProvider } from './coins'
-
+import { OnchainKitProvider } from './onchainkit'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+
+const queryClient = new QueryClient()
 
 export function Provider({
   initialSession,
@@ -43,7 +45,7 @@ const compose = (providers: React.FC<{ children: React.ReactNode }>[]) =>
 
 const Providers = compose([
   WagmiProvider,
-  QueryClientProvider,
+  OnchainKitProvider,
   UniversalThemeProvider,
   SafeAreaProvider,
   TamaguiProvider,

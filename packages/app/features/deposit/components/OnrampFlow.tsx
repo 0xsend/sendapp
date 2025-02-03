@@ -32,7 +32,7 @@ export function OnrampFlow({
   }
 
   return (
-    <YStack width="100%" space="$4">
+    <YStack width="100%" $gtSm={{ width: 600 }} gap="$4">
       <FormProvider {...form}>
         <SchemaForm
           form={form}

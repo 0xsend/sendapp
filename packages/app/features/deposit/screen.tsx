@@ -17,7 +17,6 @@ export function DepositScreen() {
   const [selectedOption, setSelectedOption] = useState<'crypto' | 'card' | 'apple' | null>(null)
   const [showAddress, setShowAddress] = useState(false)
   const [showAmountFlow, setShowAmountFlow] = useState(false)
-  const [selectedAmount, setSelectedAmount] = useState<number>(0)
   const [isIOS, setIsIOS] = useState(false)
 
   // Move iOS check to useEffect to avoid SSR issues
@@ -28,11 +27,10 @@ export function DepositScreen() {
   const { data: sendAccount } = useSendAccount()
   const isOnrampEnabled = true
   // const isOnrampEnabled = sendAccount?.user_id && ONRAMP_ENABLED_USERS.includes(sendAccount.user_id)
-  const { openOnramp, status, error, isLoading, closeOnramp } = useCoinbaseOnramp(
-    COINBASE_APP_ID,
-    sendAccount?.address ?? '',
-    selectedAmount
-  )
+  const { openOnramp, closeOnramp, status, error, isLoading } = useCoinbaseOnramp({
+    projectId: COINBASE_APP_ID,
+    address: sendAccount?.address ?? '',
+  })
   console.log('Hook returned status:', status)
 
   useEffect(() => {
@@ -55,7 +53,6 @@ export function DepositScreen() {
   }
 
   const handleConfirmTransaction = (amount: number) => {
-    setSelectedAmount(amount)
     openOnramp(amount)
   }
 
@@ -90,30 +87,6 @@ export function DepositScreen() {
             </Text>
             <Button variant="outlined" color="$color" size="$4" onPress={closeOnramp}>
               Cancel
-            </Button>
-          </YStack>
-        )
-
-      case status === 'success':
-        return (
-          <YStack ai="center" gap="$4" py="$8">
-            <Check size={48} color="#16a34a" />
-            <Text fontSize="$6" fontWeight="500" ta="center">
-              Deposit Successful
-            </Text>
-            <Text color="$gray11" ta="center">
-              Your funds are on the way. They will appear in your wallet shortly.
-            </Text>
-            <Button theme="green" px="$3.5" h="$4.5" borderRadius="$4" f={1} onPress={closeOnramp}>
-              <XStack w="100%" gap="$2.5" ai="center" jc="center">
-                <LinkableButton.Text
-                  fontWeight="500"
-                  tt="uppercase"
-                  $theme-dark={{ col: '$color0' }}
-                >
-                  MAKE ANOTHER DEPOSIT
-                </LinkableButton.Text>
-              </XStack>
             </Button>
           </YStack>
         )
