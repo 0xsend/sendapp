@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-// @ts-expect-error - onchainkit types aren't loading
+// @ts-expect-error - could not be resolved under your current 'moduleResolution' setting. Consider updating to 'node16', 'nodenext', or 'bundler'
 import { getOnrampBuyUrl } from '@coinbase/onchainkit/fund'
 import { useMutation } from '@tanstack/react-query'
 
@@ -14,7 +14,6 @@ interface OnrampParams {
   amount: number
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function useCoinbaseOnramp({ projectId, address }: OnrampConfig) {
   const [popup, setPopup] = useState<Window | null>(null)
   const [popupChecker, setPopupChecker] = useState<NodeJS.Timeout | null>(null)
