@@ -49,6 +49,11 @@ declare global {
        * Onchain Kit API Key
        */
       NEXT_PUBLIC_ONCHAIN_KIT_API_KEY: string
+
+      /**
+       * Onramp Allowlist (comma separated list of user ids that can see the debit card option)
+       */
+      NEXT_PUBLIC_ONRAMP_ALLOWLIST: string
     }
   }
   /**
