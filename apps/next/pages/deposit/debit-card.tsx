@@ -1,0 +1,100 @@
+import { OnrampFlow } from 'app/features/deposit/components/OnrampFlow'
+import { HomeLayout } from 'app/features/home/layout.web'
+import { useSendAccount } from 'app/utils/send-accounts'
+import { TopNav } from 'app/components/TopNav'
+import { YStack, Text, Button, Spinner } from '@my/ui'
+import Head from 'next/head'
+import { userProtectedGetSSP } from 'utils/userProtected'
+import type { NextPageWithLayout } from '../_app'
+import { useCoinbaseOnramp } from 'app/utils/useCoinbaseOnramp'
+import { toNiceError } from 'app/utils/toNiceError'
+
+const COINBASE_APP_ID = process.env.NEXT_PUBLIC_CDP_APP_ID ?? ''
+
+export const Page: NextPageWithLayout = () => {
+  const { data: sendAccount } = useSendAccount()
+  const { openOnramp, closeOnramp, status, error, isLoading } = useCoinbaseOnramp({
+    projectId: COINBASE_APP_ID,
+    address: sendAccount?.address ?? '',
+  })
+
+  const handleConfirmTransaction = (amount: number) => {
+    openOnramp(amount)
+  }
+
+  const renderContent = () => {
+    switch (true) {
+      case !!error:
+        return (
+          <YStack ai="center" gap="$4" py="$8">
+            <Text fontSize="$6" fontWeight="500" color="$red10" ta="center">
+              Unable to Initialize Payment
+            </Text>
+            <Text color="$gray11" ta="center">
+              {toNiceError(error)}
+            </Text>
+            <Button backgroundColor="$primary" color="$color" size="$4" onPress={closeOnramp}>
+              Try Again
+            </Button>
+          </YStack>
+        )
+
+      case status === 'pending':
+        return (
+          <YStack ai="center" gap="$4" py="$8">
+            <Spinner size="large" color="$primary" />
+            <Text fontSize="$6" fontWeight="500" ta="center">
+              Complete Your Transaction
+            </Text>
+            <Text color="$gray11" ta="center">
+              Please complete your transaction in the Coinbase window.
+            </Text>
+            <Button variant="outlined" color="$color" size="$4" onPress={closeOnramp}>
+              Cancel
+            </Button>
+          </YStack>
+        )
+
+      case status === 'failed':
+        return (
+          <YStack ai="center" gap="$4" py="$8">
+            <Text fontSize="$6" fontWeight="500" color="$red10" ta="center">
+              Transaction Failed
+            </Text>
+            <Text color="$gray11" ta="center">
+              Your payment could not be processed. Please try again.
+            </Text>
+            <Button backgroundColor="$primary" color="$color" size="$4" onPress={closeOnramp}>
+              Try Again
+            </Button>
+          </YStack>
+        )
+
+      default:
+        return <OnrampFlow onConfirmTransaction={handleConfirmTransaction} isLoading={isLoading} />
+    }
+  }
+
+  return (
+    <>
+      <Head>
+        <title>Send | Card Deposit</title>
+      </Head>
+      <YStack mt="$4" mx="auto" width={'100%'} $sm={{ maxWidth: 600 }}>
+        <YStack w={'100%'}>
+          <YStack f={1} px="$4" jc="space-between" pb="$4">
+            {renderContent()}
+          </YStack>
+        </YStack>
+      </YStack>
+    </>
+  )
+}
+
+export const getServerSideProps = userProtectedGetSSP()
+
+Page.getLayout = (children) => (
+  <HomeLayout TopNav={<TopNav header="Deposit" backFunction="pop" />}>{children}</HomeLayout>
+)
+
+export default Page
