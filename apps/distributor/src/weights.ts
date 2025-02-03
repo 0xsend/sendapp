@@ -22,40 +22,19 @@ export function calculateWeights(
   balances: readonly {
     address: `0x${string}`
     balance: string
-    balanceAfterSlash: string
   }[],
-  amount: bigint,
   timeAdjustedAmount: bigint,
   mode: Mode = Mode.Linear
-): {
-  weightedShares: Record<string, WeightedShare>
-  weightedSharesAfterSlash: Record<string, WeightedShare>
-} {
+): Record<string, WeightedShare> {
   const poolWeights: Record<`0x${string}`, bigint> = {}
-  const poolWeightsAfterSlash: Record<`0x${string}`, bigint> = {}
 
   // First calculate all slashed weights
-  const totalBalanceAfterSlash = balances.reduce(
-    (acc, { balanceAfterSlash }) => acc + BigInt(balanceAfterSlash),
-    0n
-  )
+  const totalBalance = balances.reduce((acc, { balance }) => acc + BigInt(balance), 0n)
 
-  for (const { address, balanceAfterSlash } of balances) {
-    poolWeightsAfterSlash[address] = calculateWeightByMode(
-      BigInt(balanceAfterSlash),
-      totalBalanceAfterSlash,
-      balances.length,
-      mode
-    )
-  }
-
-  // Now calculate potential weights using slashed weights for all except current
-  for (const current of balances) {
-    const totalWeight =
-      totalBalanceAfterSlash - BigInt(current.balanceAfterSlash) + BigInt(current.balance)
-    poolWeights[current.address] = calculateWeightByMode(
-      BigInt(current.balance),
-      totalWeight,
+  for (const { address, balance } of balances) {
+    poolWeights[address] = calculateWeightByMode(
+      BigInt(balance),
+      totalBalance,
       balances.length,
       mode
     )
@@ -63,41 +42,25 @@ export function calculateWeights(
 
   // Calculate shares using the two sets of weights
   const weightedShares: Record<string, WeightedShare> = {}
-  const weightedSharesAfterSlash: Record<string, WeightedShare> = {}
 
-  const totalWeightAfterSlash = Object.values(poolWeightsAfterSlash).reduce((acc, w) => acc + w, 0n)
+  const totalWeight = Object.values(poolWeights).reduce((acc, w) => acc + w, 0n)
 
   for (const { address } of balances) {
     const poolWeight = poolWeights[address] ?? 0n
-    const poolWeightAfterSlash = poolWeightsAfterSlash[address] ?? 0n
-    const totalWeight = totalWeightAfterSlash - poolWeightAfterSlash + poolWeight
 
-    // with capped slashed balances:
-    // totalWeightAfterSlash = sum of all capped slashed balances
-    // -poolWeightAfterSlash = remove this user's capped slashed balance
-    // +poolWeight = add their full unslashed balance
+    const amount = (poolWeight * timeAdjustedAmount) / totalWeight
 
-    const potentialAmount = (poolWeight * amount) / totalWeight
-    const slashedAmount = (poolWeightAfterSlash * timeAdjustedAmount) / totalWeightAfterSlash
-
-    if (potentialAmount > 0n) {
+    if (amount > 0n) {
       weightedShares[address] = {
-        amount: potentialAmount > amount ? amount : potentialAmount,
-        address,
-      }
-    }
-
-    if (slashedAmount > 0n) {
-      weightedSharesAfterSlash[address] = {
-        amount: slashedAmount,
+        amount,
         address,
       }
     }
   }
 
-  handleRoundingErrors(weightedSharesAfterSlash, timeAdjustedAmount)
+  handleRoundingErrors(weightedShares, timeAdjustedAmount)
 
-  return { weightedShares, weightedSharesAfterSlash }
+  return weightedShares
 }
 
 // Helper function to handle rounding errors

@@ -1,5 +1,14 @@
-import { Fade, Paragraph, Separator, Stack, XStack, YStack, Text } from '@my/ui'
-import { RowLabel } from 'app/features/activity/screen'
+import {
+  Fade,
+  Paragraph,
+  Separator,
+  Stack,
+  XStack,
+  YStack,
+  Text,
+  H4,
+  type StackProps,
+} from '@my/ui'
 import { phraseFromActivity, amountFromActivity, subtextFromActivity } from 'app/utils/activity'
 import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
 import { IconX } from 'app/components/icons'
@@ -13,23 +22,21 @@ import {
 export const ActivityDetails = ({
   activity,
   onClose,
+  ...props
 }: {
   activity: Activity
   onClose: () => void
-}) => {
+} & StackProps) => {
   const activityText = phraseFromActivity(activity)
   const subText = subtextFromActivity(activity)
   const amount = amountFromActivity(activity)
 
   return (
-    <Fade
-      w={'100%'}
-      $gtLg={{
-        maxWidth: '47%',
-      }}
-    >
+    <Fade {...props}>
       <YStack w={'100%'} gap={'$3.5'}>
-        <RowLabel>Transaction details</RowLabel>
+        <H4 fontWeight={'600'} size={'$7'}>
+          Transaction details
+        </H4>
         <YStack
           w={'100%'}
           bg={'$color1'}

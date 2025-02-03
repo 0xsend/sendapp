@@ -34,7 +34,7 @@ test('can visit token detail page', async ({ context, page }) => {
   // @todo: Heading checks need to be refactored to mobile only
   // await expect(heading(page)).toBeVisible()
 
-  const history = page.getByTestId('TokenDetailsHistory')
+  const history = page.getByTestId('TokenActivityFeed')
 
   await expect.soft(history.getByText('Withdraw')).toBeVisible()
   await expect
@@ -56,11 +56,11 @@ test('can visit token detail page', async ({ context, page }) => {
     .soft(history.getByText(shorten('0x93F2FA7A16a7365e3895b0F6E6Ac7a832d6c761a', 5, 4)))
     .toBeVisible()
 
-  expect(page.getByTestId('TokenDetailsHistory')).toBeVisible()
-  // expect(await page.getByTestId('TokenDetailsHistory').textContent()).toMatchSnapshot(
+  expect(page.getByTestId('TokenActivityFeed')).toBeVisible()
+  // expect(await page.getByTestId('TokenActivityFeed').textContent()).toMatchSnapshot(
   //   'token-details-history.txt'
   // )
-  // await expect(page.getByTestId('TokenDetailsHistory')).toHaveScreenshot(
+  // await expect(page.getByTestId('TokenActivityFeed')).toHaveScreenshot(
   //   'token-details-history.png',
   //   {
   //     timeout: 5_000,

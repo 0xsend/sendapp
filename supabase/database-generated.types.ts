@@ -137,7 +137,6 @@ export type Database = {
         Row: {
           address: string
           amount: number
-          amount_after_slash: number
           bonus_pool_amount: number
           created_at: string
           distribution_id: number
@@ -151,7 +150,6 @@ export type Database = {
         Insert: {
           address: string
           amount: number
-          amount_after_slash: number
           bonus_pool_amount: number
           created_at?: string
           distribution_id: number
@@ -165,7 +163,6 @@ export type Database = {
         Update: {
           address?: string
           amount?: number
-          amount_after_slash?: number
           bonus_pool_amount?: number
           created_at?: string
           distribution_id?: number
@@ -309,6 +306,7 @@ export type Database = {
           snapshot_block_num: number | null
           token_addr: string | null
           token_decimals: number | null
+          tranche_id: number
           updated_at: string
         }
         Insert: {
@@ -330,6 +328,7 @@ export type Database = {
           snapshot_block_num?: number | null
           token_addr?: string | null
           token_decimals?: number | null
+          tranche_id: number
           updated_at?: string
         }
         Update: {
@@ -351,6 +350,7 @@ export type Database = {
           snapshot_block_num?: number | null
           token_addr?: string | null
           token_decimals?: number | null
+          tranche_id?: number
           updated_at?: string
         }
         Relationships: []

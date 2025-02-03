@@ -589,8 +589,8 @@ const ProgressCard = ({
       (acc, curr) =>
         acc +
         (verifications.distribution_id === 11
-          ? BigInt(curr.amount_after_slash) * BigInt(1e16)
-          : BigInt(curr.amount_after_slash)),
+          ? BigInt(curr.amount) * BigInt(1e16)
+          : BigInt(curr.amount)),
       0n
     ) || BigInt(distribution.hodler_min_balance)
 
@@ -657,7 +657,7 @@ const Progress = ({
 const ClaimableRewardsCard = ({
   distribution,
 }: { distribution: UseDistributionsResultData[number] }) => {
-  const shareAmount = BigInt(distribution.distribution_shares?.[0]?.amount_after_slash ?? 0n)
+  const shareAmount = BigInt(distribution.distribution_shares?.[0]?.amount ?? 0n)
   if (shareAmount === undefined || shareAmount === 0n) return null
   const now = new Date()
   const isQualificationOver = distribution.qualification_end < now

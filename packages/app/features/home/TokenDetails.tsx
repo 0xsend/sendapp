@@ -14,8 +14,7 @@ import {
 import type { CoinWithBalance } from 'app/data/coins'
 import { IconPlus, IconSwap } from 'app/components/icons'
 import formatAmount from 'app/utils/formatAmount'
-import type { PropsWithChildren } from 'react'
-import { TokenDetailsHistory } from './TokenDetailsHistory'
+import { TokenActivity } from './TokenActivity'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { convertBalanceToFiat } from 'app/utils/convertBalanceToUSD'
 import { IconCoin } from 'app/components/icons/IconCoin'
@@ -103,7 +102,7 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
         </XStack>
       </YStack>
       <YStack gap={'$3'}>
-        <TokenDetailsHistory coin={coin} />
+        <TokenActivity coin={coin} />
       </YStack>
     </YStack>
   )
@@ -141,21 +140,5 @@ const TokenDetailsBalance = ({ coin }: { coin: CoinWithBalance }) => {
           : `($${formatAmount(balanceInUSD, 4, 2)})`}
       </Paragraph>
     </XStack>
-  )
-}
-
-export function RowLabel({ children }: PropsWithChildren) {
-  return (
-    <H4
-      // @TODO: Update with theme color variable
-      color="$color12"
-      fontFamily={'$mono'}
-      fontWeight={'500'}
-      size={'$5'}
-      mt="$3"
-      $gtMd={{ display: 'inline' }}
-    >
-      {children}
-    </H4>
   )
 }
