@@ -42,6 +42,23 @@ const getCurrentHourInMonth = (date: Date) => {
 }
 
 /**
+ * 100B supply -> 1B supply
+ * 0 decimals -> 18 decimals
+ * 1e18 / 100 = 1e16
+ * v0Amount * 1e16
+ * @param v0Amount
+ * @returns converted v1Amount
+ */
+function sendV1Converstion(v0Amount: bigint) {
+  return v0Amount * BigInt(1e16)
+}
+
+/**
+ * The distribution number of the pre-sendv0 migration distribution
+ */
+const PRE_SENDV0_MIGRATION_DISTRIBUTION = 11
+
+/**
  * Changes from V1:
  * Fixed Pool Calculation: In V2, fixed pool amounts are calculated first from the total distribution amount, whereas V1 calculated hodler, bonus, and fixed pools separately.
  * Removal of Bips: V2 no longer uses holder and bonus bips (basis points) for calculations, simplifying the distribution logic.
@@ -128,7 +145,7 @@ export class DistributorV2Worker {
     )
     if (
       await isMerkleDropActive({
-        number: distribution.number,
+        tranche_id: distribution.tranche_id,
         chain_id: distribution.chain_id,
         merkle_drop_addr: distribution.merkle_drop_addr,
       })
@@ -300,11 +317,8 @@ export class DistributorV2Worker {
       (acc, share) => {
         // NOTE: this is for handling the migration from send token v0 to send token v1
         // scale to new token decimals if needed after migration
-        if (distribution.number === 11) {
-          // 100B supply -> 1B supply
-          // 0 decimals -> 18 decimals
-          // 1e18 / 100 = 1e16
-          acc[share.user_id] = BigInt(share.amount) * BigInt(1e16)
+        if (distribution.number === PRE_SENDV0_MIGRATION_DISTRIBUTION) {
+          acc[share.user_id] = sendV1Converstion(BigInt(share.amount))
           scaledBalances++
           return acc
         }
@@ -327,12 +341,19 @@ export class DistributorV2Worker {
         const previousReward =
           previousSharesByUserId[v.user_id] || BigInt(distribution.hodler_min_balance)
         const maxWeight = previousReward / BigInt(sendSlash.scaling_divisor)
-        acc[v.user_id] = {
+        const ceiling = {
           // Cap the weight to maxWeight
           weight: BigInt(v.weight || 0) > maxWeight ? maxWeight : BigInt(v.weight || 0),
           // @ts-expect-error @todo metadata is untyped but value is the convention
           ceiling: BigInt(v.metadata?.value || 0),
         }
+
+        if (distribution.number === PRE_SENDV0_MIGRATION_DISTRIBUTION) {
+          ceiling.weight = sendV1Converstion(ceiling.weight)
+          ceiling.ceiling = sendV1Converstion(ceiling.ceiling)
+        }
+
+        acc[v.user_id] = ceiling
         return acc
       },
       {} as Record<string, { weight: bigint; ceiling: bigint }>
@@ -360,8 +381,7 @@ export class DistributorV2Worker {
     )
 
     let fixedPoolAllocatedAmount = 0n // This tracks slashed amount
-    const fixedPoolAmountsByAddress: Record<string, { amount: bigint; amountAfterSlash: bigint }> =
-      {}
+    const fixedPoolAmountsByAddress: Record<string, bigint> = {}
 
     // Calculate fixed pool amounts
     for (const [userId, verifications] of Object.entries(verificationsByUserId)) {
@@ -422,11 +442,10 @@ export class DistributorV2Worker {
         1.0
       )
 
-      const amount =
+      let amount =
         (userFixedAmount * BigInt(Math.round(finalMultiplier * Number(PERC_DENOM)))) / PERC_DENOM
 
       // Calculate slashed amount
-      let amountAfterSlash = amount
       const sendCeilingData = sendCeilingByUserId[userId]
       const previousReward =
         previousSharesByUserId[userId] || BigInt(distribution.hodler_min_balance)
@@ -439,20 +458,17 @@ export class DistributorV2Worker {
             : sendCeilingData.weight
         if (scaledPreviousReward > 0n) {
           const slashPercentage = (cappedSendScore * PERC_DENOM) / scaledPreviousReward
-          amountAfterSlash = (amount * slashPercentage) / PERC_DENOM
+          amount = (amount * slashPercentage) / PERC_DENOM
         } else {
-          amountAfterSlash = 0n
+          amount = 0n
         }
       } else {
-        amountAfterSlash = 0n
+        amount = 0n
       }
 
-      if (fixedPoolAllocatedAmount + amountAfterSlash <= fixedPoolAvailableAmount) {
-        fixedPoolAmountsByAddress[address] = {
-          amount,
-          amountAfterSlash,
-        }
-        fixedPoolAllocatedAmount += amountAfterSlash
+      if (fixedPoolAllocatedAmount + amount <= fixedPoolAvailableAmount) {
+        fixedPoolAmountsByAddress[address] = amount
+        fixedPoolAllocatedAmount += amount
       }
     }
 
@@ -461,8 +477,7 @@ export class DistributorV2Worker {
 
     let hodlerShares: {
       address: string
-      amount: bigint // unslashed amount
-      amountAfterSlash: bigint // slashed amount
+      amount: bigint
     }[] = []
 
     if (hodlerPoolAvailableAmount > 0n) {
@@ -496,15 +511,11 @@ export class DistributorV2Worker {
           slashPercentage = (cappedWeight * PERC_DENOM) / scaledPreviousReward
         }
 
-        const balanceAfterSlash = (
-          (BigInt(balance.balance) * slashPercentage) /
-          PERC_DENOM
-        ).toString()
+        const slashedBalance = ((BigInt(balance.balance) * slashPercentage) / PERC_DENOM).toString()
 
         return {
           address,
-          balance: balance.balance,
-          balanceAfterSlash,
+          balance: slashedBalance,
         }
       })
 
@@ -519,16 +530,11 @@ export class DistributorV2Worker {
 
       // Calculate weighted shares for current slashed state
 
-      const { weightedShares, weightedSharesAfterSlash } = calculateWeights(
-        slashedBalances,
-        hodlerPoolAvailableAmount,
-        timeAdjustedAmount
-      )
+      const weightedShares = calculateWeights(slashedBalances, timeAdjustedAmount)
 
       hodlerShares = slashedBalances.map((balance) => ({
         address: balance.address,
         amount: weightedShares[balance.address]?.amount || 0n,
-        amountAfterSlash: weightedSharesAfterSlash[balance.address]?.amount || 0n,
       }))
 
       log.info(
@@ -551,11 +557,6 @@ export class DistributorV2Worker {
     const totalBonusPoolAmount = 0n
     let totalFixedPoolAmount = 0n
 
-    // Track slashed totals
-    let totalAmountAfterSlash = 0n
-    let totalHodlerPoolAmountAfterSlash = 0n
-    let totalFixedPoolAmountAfterSlash = 0n
-
     // In the shares mapping section, update the map function:
     const shares = hodlerShares
       .map((share) => {
@@ -565,22 +566,13 @@ export class DistributorV2Worker {
           return null
         }
 
-        // Non-slashed amounts
-        const hodlerPoolAmount = share.amount
-        const fixedPoolAmount = fixedPoolAmountsByAddress[share.address]?.amount || 0n
-        const amount =
-          hodlerPoolAmount + fixedPoolAmount > distAmt
-            ? distAmt
-            : hodlerPoolAmount + fixedPoolAmount
+        //amount - ensure we always have a value
+        const hodlerPoolAmount = share.amount || 0n
+        const fixedPoolAmount = fixedPoolAmountsByAddress[share.address] || 0n
+        const amount = hodlerPoolAmount + fixedPoolAmount
 
-        // Slashed amounts - ensure we always have a value
-        const hodlerPoolAmountAfterSlash = share.amountAfterSlash || 0n
-        const fixedPoolAmountAfterSlash =
-          fixedPoolAmountsByAddress[share.address]?.amountAfterSlash || 0n
-        const amountAfterSlash = hodlerPoolAmountAfterSlash + fixedPoolAmountAfterSlash
-
-        // Skip if amountAfterSlash is 0
-        if (amountAfterSlash <= 0n) {
+        // Skip if amount is 0
+        if (amount <= 0n) {
           return null
         }
 
@@ -588,9 +580,6 @@ export class DistributorV2Worker {
         totalAmount += amount
         totalHodlerPoolAmount += hodlerPoolAmount
         totalFixedPoolAmount += fixedPoolAmount
-        totalAmountAfterSlash += amountAfterSlash
-        totalHodlerPoolAmountAfterSlash += hodlerPoolAmountAfterSlash
-        totalFixedPoolAmountAfterSlash += fixedPoolAmountAfterSlash
 
         // @ts-expect-error supabase-js does not support bigint
         return {
@@ -598,9 +587,8 @@ export class DistributorV2Worker {
           distribution_id: distribution.id,
           user_id: userId,
           amount: amount.toString(),
-          amount_after_slash: amountAfterSlash.toString(),
-          fixed_pool_amount: fixedPoolAmountAfterSlash.toString(),
-          hodler_pool_amount: hodlerPoolAmountAfterSlash.toString(),
+          fixed_pool_amount: fixedPoolAmount.toString(),
+          hodler_pool_amount: hodlerPoolAmount.toString(),
           bonus_pool_amount: '0',
         } as Tables<'distribution_shares'>
       })
@@ -609,13 +597,10 @@ export class DistributorV2Worker {
     log.info(
       {
         totalAmount,
-        totalAmountAfterSlash,
         totalHodlerPoolAmount,
-        totalHodlerPoolAmountAfterSlash,
         hodlerPoolAvailableAmount,
         totalBonusPoolAmount,
         totalFixedPoolAmount,
-        totalFixedPoolAmountAfterSlash,
         fixedPoolAllocatedAmount,
         fixedPoolAvailableAmount,
         name: distribution.name,
@@ -624,25 +609,22 @@ export class DistributorV2Worker {
       'Distribution totals'
     )
 
-    if (totalFixedPoolAmountAfterSlash > fixedPoolAvailableAmount) {
+    if (totalFixedPoolAmount > fixedPoolAvailableAmount) {
       log.warn(
-        'Fixed pool slashed amount is greater than available amount. This is not a problem, but it means the fixed pool is exhausted.'
+        'Fixed pool amount is greater than available amount. This is not a problem, but it means the fixed pool is exhausted.'
       )
     }
 
-    // Check total slashed amounts against distribution amount
-    const totalShareAmountsAfterSlash = shares.reduce(
-      (acc, share) => acc + BigInt(share.amount_after_slash),
-      0n
-    )
-    if (totalShareAmountsAfterSlash > distAmt) {
-      throw new Error('Share amounts after slash exceed total distribution amount')
+    // Check total amounts against distribution amount
+    const totalShareAmounts = shares.reduce((acc, share) => acc + BigInt(share.amount), 0n)
+    if (totalShareAmounts > distAmt) {
+      throw new Error('Share amounts exceed total distribution amount')
     }
 
     for (const share of shares) {
-      if (!share.amount_after_slash) {
-        log.error({ share }, 'Share missing amount_after_slash')
-        throw new Error(`Share for user ${share.user_id} missing amount_after_slash`)
+      if (!share.amount) {
+        log.error({ share }, 'Share missing amount')
+        throw new Error(`Share for user ${share.user_id} missing amount`)
       }
     }
 
@@ -664,7 +646,7 @@ export class DistributorV2Worker {
         const targetTime = new Date(nextHour.getTime() - 60000) // 1 minute before next hour
         const waitTime = Math.max(0, targetTime.getTime() - now.getTime())
 
-        process.env.NODE_ENV === 'development' ? await sleep(10_000) : await sleep(waitTime)
+        process.env.NODE_ENV === 'development' ? await sleep(50_000) : await sleep(waitTime)
         await this.calculateDistributions()
       } catch (error) {
         this.log.error(error, `Error processing block. ${(error as Error).message}`)

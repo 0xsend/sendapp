@@ -15,8 +15,7 @@ import { ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
 import { IconError } from 'app/components/icons'
 import { useTokenMarketData } from 'app/utils/coin-gecko'
 import formatAmount from 'app/utils/formatAmount'
-import type { PropsWithChildren } from 'react'
-import { TokenDetailsHistory } from './TokenDetailsHistory'
+import { TokenActivity } from './TokenActivity'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { convertBalanceToFiat } from 'app/utils/convertBalanceToUSD'
 import { IconCoin } from 'app/components/icons/IconCoin'
@@ -86,27 +85,22 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
         </XStack> */}
       </YStack>
       <YStack gap={'$3'}>
-        <TokenDetailsHistory coin={coin} />
+        <TokenActivity coin={coin} />
       </YStack>
     </YStack>
   )
 }
 
 export const TokenDetailsMarketData = ({ coin }: { coin: CoinWithBalance }) => {
-  const { data: tokenMarketData, status } = useTokenMarketData(coin.coingeckoTokenId)
+  const { data: tokenMarketData, isLoading: isLoadingMarketData } = useTokenMarketData(
+    coin.coingeckoTokenId
+  )
 
-  const price = tokenMarketData?.at(0)?.current_price
+  const { data: prices, isLoading: isLoadingPrices } = useTokenPrices()
 
-  const changePercent24h = tokenMarketData?.at(0)?.price_change_percentage_24h
+  const price = tokenMarketData?.at(0)?.current_price ?? prices?.[coin.token]
 
-  if (status === 'pending') return <Spinner size="small" color="$color12" />
-  if (status === 'error' || price === undefined || changePercent24h === undefined)
-    return (
-      <XStack gap="$2" ai="center">
-        <Paragraph color="$color10">Failed to load market data</Paragraph>
-        <IconError size="$1.75" color={'$redVibrant'} />
-      </XStack>
-    )
+  const changePercent24h = tokenMarketData?.at(0)?.price_change_percentage_24h ?? null
 
   // Coingecko API returns a formatted price already. For now, we just want to make sure it doesn't have more than 8 digits
   // so the text doesn't get cut off.
@@ -131,32 +125,49 @@ export const TokenDetailsMarketData = ({ coin }: { coin: CoinWithBalance }) => {
     return <Paragraph fontSize="$4" fontWeight="500">{`${fixedChange}%`}</Paragraph>
   }
 
+  if (isLoadingMarketData && isLoadingPrices) return <Spinner size="small" color={'$color12'} />
+
   return (
     <XStack gap="$3">
-      <Paragraph
-        fontSize={14}
-        fontWeight="500"
-        $theme-dark={{ color: '$gray8Light' }}
-        color={'$color12'}
-      >
-        {`1 ${coin.symbol} = ${formatPrice(price)} USD`}
-      </Paragraph>
-      <XStack gap={'$1.5'} ai="center" jc={'space-around'}>
-        {formatPriceChange(changePercent24h)}
-      </XStack>
+      {isLoadingPrices ? (
+        <Spinner size="small" color={'$color12'} />
+      ) : (
+        <Paragraph
+          fontSize={14}
+          fontWeight="500"
+          $theme-dark={{ color: '$gray8Light' }}
+          color={'$color12'}
+        >
+          {price === undefined ? '' : `1 ${coin.symbol} = ${formatPrice(price)} USD`}
+        </Paragraph>
+      )}
+      {isLoadingMarketData ? (
+        <Spinner size="small" color={'$color12'} />
+      ) : (
+        <XStack gap={'$1.5'} ai="center" jc={'space-around'}>
+          {changePercent24h === null ? (
+            <XStack gap="$2" ai="center">
+              <Paragraph color="$color10">Failed to load market data</Paragraph>
+              <IconError size="$1.75" color={'$redVibrant'} />
+            </XStack>
+          ) : (
+            formatPriceChange(changePercent24h)
+          )}
+        </XStack>
+      )}
     </XStack>
   )
 }
 
 const TokenDetailsBalance = ({ coin }: { coin: CoinWithBalance }) => {
   const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
-  const { balance, decimals, coingeckoTokenId } = coin
+  const { balance, decimals, formatDecimals = 5 } = coin
 
   if (coin.balance === undefined) {
     return <></>
   }
 
-  const balanceInUSD = convertBalanceToFiat(coin, tokenPrices?.[coingeckoTokenId].usd)
+  const balanceInUSD = convertBalanceToFiat(coin, tokenPrices?.[coin.token])
 
   const balanceWithDecimals = Number(balance) / 10 ** (decimals ?? 0)
   const balanceWithDecimalsLength = balanceWithDecimals.toString().replace('.', '').length
@@ -171,28 +182,14 @@ const TokenDetailsBalance = ({ coin }: { coin: CoinWithBalance }) => {
         lineHeight={57}
         color={'$color12'}
       >
-        {formatAmount(balanceWithDecimals.toString(), 10, 5)}
+        {formatAmount(balanceWithDecimals.toString(), 10, formatDecimals)}
       </Paragraph>
 
       <Paragraph color={'$color10'} fontSize={'$3'} fontFamily={'$mono'}>
-        {isLoadingTokenPrices || balanceInUSD ? `($${formatAmount(balanceInUSD, 4, 2)})` : ''}
+        {isLoadingTokenPrices || balanceInUSD === undefined
+          ? ''
+          : `($${formatAmount(balanceInUSD, 4, 2)})`}
       </Paragraph>
     </XStack>
-  )
-}
-
-export function RowLabel({ children }: PropsWithChildren) {
-  return (
-    <H4
-      // @TODO: Update with theme color variable
-      color="$color12"
-      fontFamily={'$mono'}
-      fontWeight={'500'}
-      size={'$5'}
-      mt="$3"
-      $gtMd={{ display: 'inline' }}
-    >
-      {children}
-    </H4>
   )
 }

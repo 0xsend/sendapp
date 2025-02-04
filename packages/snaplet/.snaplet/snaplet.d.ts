@@ -15,7 +15,7 @@ type Enum_pgtle_pg_tle_features = 'clientauth' | 'passcheck';
 type Enum_public_key_type_enum = 'ES256';
 type Enum_public_lookup_type_enum = 'address' | 'phone' | 'refcode' | 'sendid' | 'tag';
 type Enum_public_tag_status = 'confirmed' | 'pending';
-type Enum_public_verification_type = 'create_passkey' | 'send_one_hundred' | 'send_streak' | 'send_ten' | 'tag_referral' | 'tag_registration' | 'total_tag_referrals';
+type Enum_public_verification_type = 'create_passkey' | 'send_ceiling' | 'send_one_hundred' | 'send_streak' | 'send_ten' | 'tag_referral' | 'tag_registration' | 'total_tag_referrals';
 type Enum_public_verification_value_mode = 'aggregate' | 'individual';
 type Enum_realtime_action = 'DELETE' | 'ERROR' | 'INSERT' | 'TRUNCATE' | 'UPDATE';
 type Enum_realtime_equality_op = 'eq' | 'gt' | 'gte' | 'in' | 'lt' | 'lte' | 'neq';
@@ -39,11 +39,11 @@ interface Table_public_activity {
   created_at: string;
 }
 interface Table_public_affiliate_stats {
-  paymaster_tx_count: number;
   user_id: string | null;
   id: string;
   created_at: string;
   updated_at: string;
+  send_plus_minus: number;
 }
 interface Table_auth_audit_log_entries {
   instance_id: string | null;
@@ -87,6 +87,7 @@ interface Table_public_distribution_shares {
   created_at: string;
   updated_at: string;
   index: number;
+  amount_after_slash: number;
 }
 interface Table_public_distribution_verification_values {
   type: Enum_public_verification_type;
@@ -125,6 +126,9 @@ interface Table_public_distributions {
   updated_at: string;
   snapshot_block_num: number | null;
   chain_id: number;
+  merkle_drop_addr: string | null;
+  token_addr: string | null;
+  token_decimals: number | null;
 }
 interface Table_pgtle_feature_info {
   feature: Enum_pgtle_pg_tle_features;
@@ -214,11 +218,14 @@ interface Table_private_leaderboard_referrals_all_time {
   updated_at: string | null;
 }
 interface Table_realtime_messages {
-  id: number;
   topic: string;
   extension: string;
-  inserted_at: string;
+  payload: Json | null;
+  event: string | null;
+  private: boolean | null;
   updated_at: string;
+  inserted_at: string;
+  id: string;
 }
 interface Table_auth_mfa_amr_claims {
   session_id: string;
@@ -290,6 +297,8 @@ interface Table_public_profiles {
   referral_code: string | null;
   is_public: boolean | null;
   send_id: number;
+  x_username: string | null;
+  birthday: string | null;
 }
 interface Table_public_receipts {
   hash: string | null;
@@ -498,7 +507,29 @@ interface Table_public_send_revenues_safe_receives {
   abi_idx: number;
   id: number;
 }
+interface Table_public_send_slash {
+  distribution_number: number;
+  minimum_sends: number;
+  scaling_divisor: number;
+  distribution_id: number;
+}
 interface Table_public_send_token_transfers {
+  id: number;
+  chain_id: number;
+  log_addr: string;
+  block_time: number;
+  tx_hash: string;
+  f: string;
+  t: string;
+  v: number;
+  ig_name: string;
+  src_name: string;
+  block_num: number;
+  tx_idx: number;
+  log_idx: number;
+  abi_idx: number;
+}
+interface Table_public_send_token_v_0_transfers {
   id: number;
   chain_id: number;
   log_addr: string;
@@ -739,7 +770,9 @@ interface Schema_public {
   send_accounts: Table_public_send_accounts;
   send_liquidity_pools: Table_public_send_liquidity_pools;
   send_revenues_safe_receives: Table_public_send_revenues_safe_receives;
+  send_slash: Table_public_send_slash;
   send_token_transfers: Table_public_send_token_transfers;
+  send_token_v0_transfers: Table_public_send_token_v_0_transfers;
   sendtag_checkout_receipts: Table_public_sendtag_checkout_receipts;
   tag_receipts: Table_public_tag_receipts;
   tag_reservations: Table_public_tag_reservations;
@@ -867,21 +900,22 @@ interface Tables_relationships {
        distribution_verification_values_distribution_id_fkey: "public.distributions";
     };
     children: {
-
+       distribution_verification_values_fk: "public.distribution_verifications";
     };
     parentDestinationsTables: "public.distributions" | {};
-    childDestinationsTables:  | {};
+    childDestinationsTables: "public.distribution_verifications" | {};
     
   };
   "public.distribution_verifications": {
     parent: {
        distribution_verifications_user_id_fkey: "auth.users";
+       distribution_verification_values_fk: "public.distribution_verification_values";
        distribution_verifications_distribution_id_fkey: "public.distributions";
     };
     children: {
 
     };
-    parentDestinationsTables: "auth.users" | "public.distributions" | {};
+    parentDestinationsTables: "auth.users" | "public.distribution_verification_values" | "public.distributions" | {};
     childDestinationsTables:  | {};
     
   };
@@ -893,9 +927,10 @@ interface Tables_relationships {
        distribution_shares_distribution_id_fkey: "public.distribution_shares";
        distribution_verification_values_distribution_id_fkey: "public.distribution_verification_values";
        distribution_verifications_distribution_id_fkey: "public.distribution_verifications";
+       send_slash_distribution_id_fkey: "public.send_slash";
     };
     parentDestinationsTables:  | {};
-    childDestinationsTables: "public.distribution_shares" | "public.distribution_verification_values" | "public.distribution_verifications" | {};
+    childDestinationsTables: "public.distribution_shares" | "public.distribution_verification_values" | "public.distribution_verifications" | "public.send_slash" | {};
     
   };
   "auth.flow_state": {
@@ -1124,6 +1159,17 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "auth.users" | {};
     childDestinationsTables: "public.send_account_credentials" | {};
+    
+  };
+  "public.send_slash": {
+    parent: {
+       send_slash_distribution_id_fkey: "public.distributions";
+    };
+    children: {
+
+    };
+    parentDestinationsTables: "public.distributions" | {};
+    childDestinationsTables:  | {};
     
   };
   "auth.sessions": {

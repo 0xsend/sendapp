@@ -37,7 +37,9 @@ export function ActivityAvatar({
               case isERC20Transfer || isETHReceive:
                 return (
                   <IconCoin
-                    symbol={allCoinsDict[data?.coin?.token as keyof typeof allCoinsDict].symbol}
+                    symbol={
+                      allCoinsDict[data?.coin?.token as keyof typeof allCoinsDict]?.symbol ?? ''
+                    }
                   />
                 )
               default:

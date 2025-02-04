@@ -38,6 +38,6 @@ export function fetchAllBalances({
 export async function isMerkleDropActive(distribution: Tables<'distributions'>) {
   return readSendMerkleDropTrancheActive(config, {
     chainId: distribution.chain_id as keyof typeof sendMerkleDropAddress,
-    args: [BigInt(distribution.number - 1)], // number is 1-indexed
+    args: [BigInt(distribution.tranche_id)], // number is 1-indexed
   })
 }

@@ -4,7 +4,7 @@ import { mergeTests } from '@playwright/test'
 import { sendCoin, sendV0Coin } from 'app/data/coins'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 import debug from 'debug'
-import { parseUnits } from 'viem'
+import { type Hex, parseUnits } from 'viem'
 import { lookupBalance, testBaseClient } from './fixtures/viem'
 
 const test = mergeTests(sendAccountTest, snapletTest)
@@ -21,8 +21,8 @@ test('can upgrade their Send Token V0 to Send Token V1', async ({ page, sendAcco
   // set a Send Token V0 balance
   await setERC20Balance({
     client: testBaseClient,
-    address: sendAccount.address as `0x${string}`,
-    tokenAddress: sendV0Coin.token,
+    address: sendAccount.address as Hex,
+    tokenAddress: sendV0Coin.token as Hex,
     value: BigInt(balance),
   })
 
@@ -44,8 +44,8 @@ test('can upgrade their Send Token V0 to Send Token V1', async ({ page, sendAcco
 
     // send token v0 balance should be 0
     const sendTokenV0Balance = await lookupBalance({
-      address: sendAccount.address as `0x${string}`,
-      token: sendV0Coin.token,
+      address: sendAccount.address as Hex,
+      token: sendV0Coin.token as Hex,
     })
     expect(sendTokenV0Balance).toEqual(0n)
   }).toPass({
@@ -54,8 +54,8 @@ test('can upgrade their Send Token V0 to Send Token V1', async ({ page, sendAcco
 
   // should see the Send Token V1 balance
   const sendTokenV1Balance = await lookupBalance({
-    address: sendAccount.address as `0x${string}`,
-    token: sendCoin.token,
+    address: sendAccount.address as Hex,
+    token: sendCoin.token as Hex,
   })
   expect(sendTokenV1Balance).toEqual(parseUnits((balance / 100n).toString(), sendCoin.decimals))
 

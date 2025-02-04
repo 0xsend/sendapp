@@ -5,6 +5,7 @@ import { useTokenPrices } from './useTokenPrices'
 import { convertBalanceToFiat } from './convertBalanceToUSD'
 import { allCoins } from '../data/coins'
 import { useMemo } from 'react'
+import type { Hex } from 'viem'
 
 type BalanceOfResult =
   | {
@@ -28,7 +29,7 @@ export const useSendAccountBalances = () => {
       allCoins
         .filter((coin) => coin.token !== 'eth')
         .map((coin) => ({
-          address: coin.token,
+          address: coin.token as Hex,
           abi: erc20Abi,
           chainId: baseMainnet.id,
           functionName: 'balanceOf',
@@ -90,7 +91,7 @@ export const useSendAccountBalances = () => {
 
     return allCoins.reduce((total, coin) => {
       const balance = coin.token === 'eth' ? ethBalance?.value : balances[coin.token]
-      const price = tokenPrices[coin.coingeckoTokenId].usd
+      const price = tokenPrices[coin.token]
       return total + (convertBalanceToFiat({ ...coin, balance: balance ?? 0n }, price) ?? 0)
     }, 0)
   }, [pricesQuery, balances, ethQuery])

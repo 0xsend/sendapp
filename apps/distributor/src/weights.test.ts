@@ -4,22 +4,18 @@ import { calculateWeights, Mode } from './weights'
 const balances = [
   {
     address: '0x1' as `0x${string}`,
-    balance: '1000',
-    balanceAfterSlash: '800', // Example: 20% slash
+    balance: '800',
   },
   {
     address: '0x2' as `0x${string}`,
-    balance: '2000',
-    balanceAfterSlash: '1600', // Example: 20% slash
+    balance: '1600',
   },
   {
     address: '0x3' as `0x${string}`,
-    balance: '3000',
-    balanceAfterSlash: '2400', // Example: 20% slash
+    balance: '2400',
   },
 ] as const
 
-const amount = 100000n
 const timeAdjustedAmount = 80000n // Example: 80% of original amount
 
 const testCases = [
@@ -136,47 +132,17 @@ const testCases = [
 describe('calculateWeights', () => {
   for (const { name, mode, expected } of testCases) {
     it.skip(`should calculate ${name} weights using ${mode} mode`, () => {
-      // @ts-expect-error broken
-      const snapshot = calculateWeights(balances, amount, mode)
+      const weightedShares = calculateWeights(balances, timeAdjustedAmount, mode as Mode)
 
-      expect(snapshot).toMatchSnapshot(mode)
-
-      // @ts-expect-error broken
-      const { totalWeight, weightPerSend, poolWeights, weightedShares } = snapshot
-
-      expect(totalWeight).toBe(expected.totalWeight)
-      expect(weightPerSend).toBe(expected.weightPerSend)
-      expect(poolWeights).toEqual(expected.poolWeights)
       expect(weightedShares).toEqual(expected.weightedShares)
     })
   }
 
   it('should calculate linear weights with slashing', () => {
-    const { weightedShares, weightedSharesAfterSlash } = calculateWeights(
-      balances,
-      amount,
-      timeAdjustedAmount,
-      Mode.Linear
-    )
-
-    // Test weightedShares (potential amounts without slash)
-    expect(weightedShares).toEqual({
-      '0x1': {
-        address: '0x1',
-        amount: 20000n,
-      },
-      '0x2': {
-        address: '0x2',
-        amount: 38461n,
-      },
-      '0x3': {
-        address: '0x3',
-        amount: 55555n,
-      },
-    })
+    const weightedShares = calculateWeights(balances, timeAdjustedAmount, Mode.Linear)
 
     // Test weightedSharesAfterSlash (actual distribution with slash)
-    expect(weightedSharesAfterSlash).toEqual({
+    expect(weightedShares).toEqual({
       '0x1': {
         address: '0x1',
         amount: 13333n, // ~16.67% of 80000

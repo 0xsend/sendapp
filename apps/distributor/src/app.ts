@@ -54,7 +54,7 @@ distributorRouter.post('/merkle', checkAuthorization, async (req: Request, res: 
   const { data: shares, error: sharesError } = await selectAll(
     supabaseAdmin
       .from('distribution_shares')
-      .select('index, address, amount', { count: 'exact' })
+      .select('index, address, amount_after_slash::text', { count: 'exact' })
       .eq('distribution_id', id)
       .order('index', { ascending: true })
   )
@@ -69,32 +69,47 @@ distributorRouter.post('/merkle', checkAuthorization, async (req: Request, res: 
     res.status(500).json({ error: 'No shares found for distribution' })
     return
   }
+  try {
+    logger.info(`Found ${shares.length} shares for distribution ${id}`)
 
-  logger.info(`Found ${shares.length} shares for distribution ${id}`)
+    const tree = StandardMerkleTree.of(
+      shares.map(({ index, address, amount_after_slash }, i) => [
+        index,
+        address,
+        BigInt(amount_after_slash),
+      ]),
+      ['uint256', 'address', 'uint256']
+    )
 
-  const tree = StandardMerkleTree.of(
-    shares.map(({ index, address, amount }, i) => [index, address, amount]),
-    ['uint256', 'address', 'uint256']
-  )
+    // this is what the user will need to submit to claim their tokens
+    const proofs: string[][] = []
+    for (const [i] of tree.entries()) {
+      const proof = tree.getProof(i)
+      proofs[i] = proof
+    }
 
-  // this is what the user will need to submit to claim their tokens
-  const proofs: string[][] = []
-  for (const [i] of tree.entries()) {
-    const proof = tree.getProof(i)
-    proofs[i] = proof
+    const total = shares.reduce(
+      (acc, { amount_after_slash }) => acc + BigInt(amount_after_slash),
+      0n
+    )
+    const result = {
+      id,
+      root: tree.root,
+      total: total.toString(),
+      proofs,
+      shares,
+      tree: tree.dump(),
+    }
+
+    const response = JSON.parse(
+      JSON.stringify(result, (key, value) => (typeof value === 'bigint' ? value.toString() : value))
+    )
+
+    res.json(response)
+  } catch (err) {
+    logger.error(err, 'Error while fetching shares')
+    res.status(500).json({ error: 'Error while fetching shares' })
   }
-
-  const total = shares.reduce((acc, { amount }) => acc + amount, 0)
-  const result = {
-    id,
-    root: tree.root,
-    total,
-    proofs,
-    shares,
-    tree: tree.dump(),
-  }
-
-  res.json(result)
 })
 
 distributorRouter.post('/v2', checkAuthorization, async (req, res) => {

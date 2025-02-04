@@ -45,8 +45,8 @@ jobs:
       - name: Brew Bundle
         id: brew-bundle
         run: |
-          brew bundle
-          brew cleanup
+          /home/linuxbrew/.linuxbrew/bin/brew bundle
+          /home/linuxbrew/.linuxbrew/bin/brew cleanup
       - name: Setup Environment
         uses: ./.github/actions/setup-env
         env:

@@ -44,6 +44,7 @@ if (argv.restore) {
       console.log(e.stdout)
       process.exit(1)
     })
+    .then(() => $`git fetch origin main`)
     .then(
       () =>
         $`git diff --name-only --diff-filter=A origin/main..HEAD -- ${prjRoot}/supabase/migrations`
@@ -95,7 +96,6 @@ if (argv.restore) {
     console.log(chalk.green('Done migrating database'))
     process.exit(0)
   }
-  console.log(chalk.green('Done restoring database'))
   process.exit(0)
 }
 

@@ -10,15 +10,11 @@ jest.mock('app/utils/distributions', () => ({
         chain_id: 845337,
         qualification_end: new Date(2024, 6, 30, 11, 59, 59),
         timezone_adjusted_qualification_end: new Date(2024, 6, 30, 11, 59, 59),
+        tranche_id: 3,
         distribution_shares: [
           {
             amount: 1,
             index: 1,
-          },
-        ],
-        distribution_verifications_summary: [
-          {
-            tag_referrals: 123,
           },
         ],
         send_slash: [
@@ -138,6 +134,15 @@ jest.mock('app/provider/coins', () => ({
       },
     ],
     totalPrice: 5000000n,
+  }),
+  useCoin: jest.fn().mockReturnValue({
+    coin: {
+      label: 'USDC',
+      token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+      balance: 250000n,
+    },
+    isLoading: false,
+    error: null,
   }),
 }))
 

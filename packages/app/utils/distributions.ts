@@ -1,4 +1,4 @@
-import type { Database, Json, Tables } from '@my/supabase/database.types'
+import type { Database, Tables } from '@my/supabase/database.types'
 import {
   baseMainnetBundlerClient,
   baseMainnetClient,
@@ -7,7 +7,7 @@ import {
   sendAccountAbi,
   sendAirdropsSafeAddress,
   sendMerkleDropAbi,
-  sendMerkleDropAddress,
+  type sendMerkleDropAddress,
   sendTokenAbi,
   sendTokenAddress,
   sendUniswapV3PoolAddress,
@@ -58,6 +58,7 @@ function fetchDistributions(supabase: SupabaseClient<Database>) {
       merkle_drop_addr,
       name,
       number,
+      tranche_id,
       qualification_end,
       qualification_start,
       snapshot_block_num,
@@ -67,7 +68,6 @@ function fetchDistributions(supabase: SupabaseClient<Database>) {
       distribution_shares(
         address,
         amount::text,
-        amount_after_slash::text,
         bonus_pool_amount::text,
         created_at,
         distribution_id,
@@ -157,22 +157,23 @@ function fetchDistributionVerifications(
 ) {
   return selectAll(
     supabase
-      .from('distribution_verifications')
+      .from('distribution_verification_values')
       .select(
         `
+        distribution_id,
+        type,
+        fixed_value::text,
+        multiplier_max,
+        multiplier_min,
+        multiplier_step,
+        distribution_verifications(
           distribution_id,
           user_id,
           type,
           weight::text,
           metadata,
-          created_at,
-          distribution_verification_values(
-            bips_value::text,
-            fixed_value::text,
-            multiplier_max,
-            multiplier_min,
-            multiplier_step
-          )
+          created_at
+        )
         `,
         { count: 'exact' }
       )
@@ -190,65 +191,56 @@ export const useDistributionVerifications = (distributionId?: number) => {
     queryFn: async ({ queryKey: [, { distributionId, supabase }] }) => {
       assert(!!distributionId, 'distributionId is required')
 
-      const { data: verifications, error: verificationError } =
-        await fetchDistributionVerifications(supabase, distributionId)
+      const { data, error } = await fetchDistributionVerifications(supabase, distributionId)
 
-      if (verificationError) throw verificationError
-      if (verifications === null || verifications.length === 0) return null
+      if (error) throw error
+      if (data === null || data.length === 0) return null
 
-      // previously this was grouped and transformed to match the distribution_verifications_summary view
-      // but now we are just returning the data as from postgrest
-      // transform the data to match the view's shape to avoid breaking the views
+      const verification_values = data.map((item) => {
+        const verifications = item.distribution_verifications ?? []
+        const totalWeight = verifications.reduce((sum, v) => sum + BigInt(v.weight ?? 0), 0n)
+        const latestCreatedAt = verifications.reduce(
+          (maxDate, v) => (!maxDate || v.created_at > maxDate ? v.created_at : maxDate),
+          ''
+        )
 
-      const verification_values = verifications.map((v) => ({
-        type: v.type,
-        weight: BigInt(v.weight ?? 0),
-        fixed_value: BigInt(v.distribution_verification_values?.fixed_value ?? 0n),
-        bips_value: BigInt(v.distribution_verification_values?.bips_value ?? 0n),
-        metadata: v.metadata,
-        created_at: v.created_at,
-      }))
+        return {
+          type: item.type as Database['public']['Enums']['verification_type'],
+          weight: totalWeight,
+          fixed_value: BigInt(item.fixed_value ?? 0),
+          metadata: verifications.map((v) => v.metadata).filter(Boolean),
+          created_at: latestCreatedAt,
+        }
+      })
 
-      const multipliers: {
-        type: Database['public']['Enums']['verification_type']
-        value?: number | null
-        multiplier_max: number
-        multiplier_min: number
-        multiplier_step: number
-        metadata?: Json
-      }[] = []
+      const multipliers = data.map((item) => {
+        const verifications = item.distribution_verifications ?? []
+        const totalWeight = verifications.reduce((sum, v) => sum + BigInt(v.weight ?? 0), 0n)
 
-      for (const dv of verifications) {
-        if (!dv.distribution_verification_values) return null
-        const { multiplier_max, multiplier_min, multiplier_step } =
-          dv.distribution_verification_values
-        const value =
-          multiplier_min === 1.0 && multiplier_max === 1.0 && multiplier_step === 0.0
-            ? null
-            : Math.min(
-                Number(multiplier_min) +
-                  (Number(dv.weight ?? 0) - 1) * Number(multiplier_step ?? 0),
-                Number(multiplier_max)
-              )
+        return {
+          type: item.type as Database['public']['Enums']['verification_type'],
+          value:
+            (item.multiplier_min === 1.0 &&
+              item.multiplier_max === 1.0 &&
+              item.multiplier_step === 0.0) ||
+            totalWeight === 0n
+              ? null
+              : Math.min(
+                  item.multiplier_min + Number(totalWeight - 1n) * item.multiplier_step,
+                  item.multiplier_max
+                ),
+          multiplier_min: item.multiplier_min ?? 1.0,
+          multiplier_max: item.multiplier_max ?? 1.0,
+          multiplier_step: item.multiplier_step ?? 0.0,
+          metadata: verifications.map((v) => v.metadata).filter(Boolean),
+        }
+      })
 
-        multipliers.push({
-          type: dv.type,
-          value,
-          multiplier_max: multiplier_max,
-          multiplier_min: multiplier_min,
-          multiplier_step: multiplier_step,
-          metadata: dv.metadata,
-        })
-      }
-
-      const transformedData = {
+      return {
         distribution_id: distributionId,
-        user_id: verifications[0]?.user_id,
         verification_values,
         multipliers,
       }
-
-      return transformedData
     },
     enabled: Boolean(distributionId),
   })
@@ -465,7 +457,7 @@ export function useGenerateClaimUserOp({
   share?: UseDistributionsResultData[number]['distribution_shares'][number]
   nonce?: bigint
 }): UseQueryResult<UserOperation<'v0.7'>> {
-  const trancheId = BigInt(distribution.number - 1) // tranches are 0-indexed
+  const trancheId = BigInt(distribution.tranche_id) // tranches are 0-indexed
   const chainId = distribution.chain_id as keyof typeof sendMerkleDropAddress
   const merkleDropAddress = byteaToHex(distribution.merkle_drop_addr as `\\x${string}`)
 
@@ -475,7 +467,7 @@ export function useGenerateClaimUserOp({
     isLoading: isLoadingProof,
     error: errorProof,
   } = api.distribution.proof.useQuery({ distributionId: distribution.id })
-  const { address: sender, amount_after_slash, index } = share ?? {}
+  const { address: sender, amount, index } = share ?? {}
 
   const {
     data: isClaimed,
@@ -504,7 +496,7 @@ export function useGenerateClaimUserOp({
     !errorProof &&
     merkleProof !== undefined &&
     index !== undefined &&
-    amount_after_slash !== undefined &&
+    amount !== undefined &&
     sender !== undefined &&
     !isClaimedLoading &&
     !isClaimedError &&
@@ -519,7 +511,8 @@ export function useGenerateClaimUserOp({
     queryKey: [
       'generateClaimUserOp',
       sender,
-      String(amount_after_slash),
+      merkleDropAddress,
+      String(amount),
       String(index),
       String(nonce),
       String(chainId),
@@ -530,7 +523,7 @@ export function useGenerateClaimUserOp({
     enabled: enabled,
     queryFn: () => {
       assert(!!sender && isAddress(sender), 'Invalid send account address')
-      assert(typeof amount_after_slash === 'number' && amount_after_slash > 0, 'Invalid amount')
+      assert(typeof amount === 'string' && BigInt(amount) > 0n, 'Invalid amount')
       assert(typeof nonce === 'bigint' && nonce >= 0n, 'Invalid nonce')
 
       const callData = encodeFunctionData({
@@ -539,20 +532,20 @@ export function useGenerateClaimUserOp({
         args: [
           [
             {
-              dest: sendMerkleDropAddress[chainId],
+              dest: merkleDropAddress,
               value: 0n,
               data: encodeFunctionData({
                 abi: sendMerkleDropAbi,
                 functionName: 'claimTranche',
                 args: [
-                  // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount_after_slash, and merkleProof are defined when enabled is true
+                  // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount, and merkleProof are defined when enabled is true
                   sender!,
                   trancheId,
-                  // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount_after_slash, and merkleProof are defined when enabled is true
+                  // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount, and merkleProof are defined when enabled is true
                   BigInt(index!),
-                  // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount_after_slash, and merkleProof are defined when enabled is true
-                  BigInt(amount_after_slash!),
-                  // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount_after_slash, and merkleProof are defined when enabled is true
+                  // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount, and merkleProof are defined when enabled is true
+                  BigInt(amount!),
+                  // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount, and merkleProof are defined when enabled is true
                   merkleProof!,
                 ],
               }),
@@ -581,7 +574,7 @@ export const usePrepareSendMerkleDropClaimTrancheWrite = ({
   distribution,
   share,
 }: SendMerkleDropClaimTrancheArgs) => {
-  const trancheId = BigInt(distribution.number - 1) // tranches are 0-indexed
+  const trancheId = BigInt(distribution.tranche_id) // tranches are 0-indexed
   const chainId = distribution.chain_id as keyof typeof sendMerkleDropAddress
   const merkleDropAddress = byteaToHex(distribution.merkle_drop_addr as `\\x${string}`)
   // get the merkle proof from the database
@@ -590,7 +583,7 @@ export const usePrepareSendMerkleDropClaimTrancheWrite = ({
     isLoading: isLoadingProof,
     error: errorProof,
   } = api.distribution.proof.useQuery({ distributionId: distribution.id })
-  const { address, amount_after_slash, index } = share ?? {}
+  const { address, amount, index } = share ?? {}
 
   const {
     data: isClaimed,
@@ -620,7 +613,7 @@ export const usePrepareSendMerkleDropClaimTrancheWrite = ({
     !errorProof &&
     merkleProof !== undefined &&
     index !== undefined &&
-    amount_after_slash !== undefined &&
+    amount !== undefined &&
     address !== undefined &&
     !isClaimedLoading &&
     !isClaimedError &&
@@ -635,7 +628,7 @@ export const usePrepareSendMerkleDropClaimTrancheWrite = ({
     abi: sendMerkleDropAbi,
     functionName: 'claimTranche',
     chainId: chainId,
-    address: sendMerkleDropAddress[chainId],
+    address: merkleDropAddress,
     account: address,
     query: {
       enabled,
@@ -648,8 +641,8 @@ export const usePrepareSendMerkleDropClaimTrancheWrite = ({
     //     bytes32[] memory _merkleProof
     // )
     args: enabled
-      ? // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount_after_slash, and merkleProof are defined when enabled is true
-        [address!, trancheId, BigInt(index!), BigInt(amount_after_slash!), merkleProof!]
+      ? // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount, and merkleProof are defined when enabled is true
+        [address!, trancheId, BigInt(index!), BigInt(amount!), merkleProof!]
       : undefined,
   })
 }

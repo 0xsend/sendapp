@@ -89,6 +89,7 @@ describe('Distributor V2 Worker', () => {
     const distribution = {
       id: 4,
       number: 4,
+      tranche_id: 4,
       amount: '10000',
       hodler_pool_bips: 10000,
       bonus_pool_bips: 0,
@@ -375,9 +376,8 @@ describe('Distributor V2 Worker', () => {
         address: bobAddr,
         distribution_id: 4,
         user_id,
-        amount: '10000',
         bonus_pool_amount: '0', // Always 0 in V2
-        amount_after_slash: '5578', // 75% of original (example slash)
+        amount: '5578', // 75% of original (example slash)
         fixed_pool_amount: '28', // 75% of 984
         hodler_pool_amount: '5550', // 75% of 5872
       },
@@ -385,9 +385,8 @@ describe('Distributor V2 Worker', () => {
         address: aliceAddr,
         distribution_id: 4,
         user_id: user_id2,
-        amount: '9888',
         bonus_pool_amount: '0', // Always 0 in V2
-        amount_after_slash: '1111', // 50% of original (example slash)
+        amount: '1111', // 50% of original (example slash)
         fixed_pool_amount: '1', // 50% of 208
         hodler_pool_amount: '1110', // 50% of 2936
       },
@@ -399,10 +398,7 @@ describe('Distributor V2 Worker', () => {
 
     // expected share amounts cannot exceed the total distribution amount
     const totalDistributionAmount = BigInt(distribution.amount)
-    const totalShareAmounts = expectedShares.reduce(
-      (acc, share) => acc + BigInt(share.amount_after_slash),
-      0n
-    )
+    const totalShareAmounts = expectedShares.reduce((acc, share) => acc + BigInt(share.amount), 0n)
     expect(totalShareAmounts).toBeLessThanOrEqual(totalDistributionAmount)
   })
 })
