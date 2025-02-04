@@ -1,7 +1,9 @@
 import { join } from 'node:path'
 import type { Database } from '@my/supabase/database.types'
 import { StandardMerkleTree } from '@openzeppelin/merkle-tree'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { selectAll } from 'app/utils/supabase/selectAll'
+
 import debug from 'debug'
 
 const log = debug('contracts:script:gen-merkle-tree')
@@ -19,6 +21,16 @@ if (!SUPABASE_SERVICE_ROLE) {
   )
 }
 
+async function fetchDistributionShares(supabase: SupabaseClient<Database>, distributionId: number) {
+  return selectAll(
+    supabase
+      .from('distribution_shares')
+      .select('index, address, amount::text', { count: 'exact' })
+      .eq('distribution_id', distributionId)
+      .order('index', { ascending: true })
+  )
+}
+
 async function genMerkleTree() {
   // read distribution id from command line
   const distributionId = Number(process.argv[2])
@@ -32,11 +44,7 @@ async function genMerkleTree() {
   const supabaseAdmin = createClient<Database>(NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE)
 
   // lookup active distributions
-  const { data: shares, error } = await supabaseAdmin
-    .from('distribution_shares')
-    .select('index, address, amount')
-    .eq('distribution_id', distributionId)
-    .order('index', { ascending: true })
+  const { data: shares, error } = await fetchDistributionShares(supabaseAdmin, distributionId)
 
   if (error) {
     throw new Error(error.message)
@@ -72,7 +80,7 @@ async function genMerkleTree() {
       {
         distributionId,
         root: tree.root,
-        total: shares.reduce((acc, { amount }) => acc + amount, 0),
+        total: shares.reduce((acc, { amount }) => acc + BigInt(amount), 0n).toString(),
         proofs,
         shares,
         tree: tree.dump(),
