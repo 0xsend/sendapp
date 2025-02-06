@@ -168,11 +168,8 @@ const ActivityRewards = ({ children, ...props }: XStackProps) => {
   const shareAmount = BigInt(distribution?.distribution_shares?.[0]?.amount || 0)
   const { direction } = useScrollDirection()
 
-  const isVisible =
-    distribution !== undefined &&
-    shareAmount !== undefined &&
-    shareAmount > 0n &&
-    direction !== 'down'
+  const isClaimable = distribution !== undefined && shareAmount !== undefined && shareAmount > 0n
+  const isVisible = isClaimable && direction !== 'down'
 
   const distributionMonth = distribution?.timezone_adjusted_qualification_end.toLocaleString(
     'default',
@@ -212,7 +209,7 @@ const ActivityRewards = ({ children, ...props }: XStackProps) => {
                     sendCoin.formatDecimals
                   )} SEND`}
             </Paragraph>
-            {isVisible && <DistributionClaimButton distribution={distribution} />}
+            {isClaimable && <DistributionClaimButton distribution={distribution} />}
           </Row>
         </Stack>
       </MobileButtonRow>
