@@ -22,6 +22,7 @@ import formatAmount from 'app/utils/formatAmount'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { useIsSendingUnlocked } from 'app/utils/useIsSendingUnlocked'
 import { formatUnits } from 'viem'
+import { sendCoin } from 'app/data/coins'
 
 const Row = styled(XStack, {
   w: '100%',
@@ -208,7 +209,7 @@ const ActivityRewards = ({ children, ...props }: XStackProps) => {
                 : `${formatAmount(
                     formatUnits(shareAmount ?? 0n, distribution?.token_decimals ?? 18) ?? 0n,
                     10,
-                    0
+                    sendCoin.formatDecimals
                   )} SEND`}
             </Paragraph>
             {isVisible && <DistributionClaimButton distribution={distribution} />}
