@@ -553,6 +553,12 @@ const ProgressCard = ({
   previousDistribution?: UseDistributionsResultData[number]
   verificationsQuery: DistributionsVerificationsQuery
 }) => {
+  const sendSlash = distribution.send_slash.at(0)
+
+  if (!sendSlash) {
+    return null
+  }
+
   const verifications = verificationsQuery.data
 
   if (verificationsQuery.isLoading) {
@@ -569,10 +575,9 @@ const ProgressCard = ({
     return null
   }
 
-  const sendSlash = distribution.send_slash.at(0)
   const sendCeiling = verifications.verification_values.find(({ type }) => type === 'send_ceiling')
 
-  if (!sendSlash || !sendCeiling) {
+  if (!sendCeiling) {
     return (
       <YStack f={1} w={'100%'} gap="$5">
         <H3 fontWeight={'600'} color={'$color12'}>
