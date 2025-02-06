@@ -33,6 +33,7 @@ import { isEqualCalendarDate } from 'app/utils/dateHelper'
 import { toNiceError } from 'app/utils/toNiceError'
 import { min } from 'app/utils/bigint'
 import type { Json } from '@my/supabase/database.types'
+import { sendCoin } from 'app/data/coins'
 
 //@todo get this from the db
 const verificationTypesAndTitles = {
@@ -282,7 +283,7 @@ const DistributionRequirementsCard = ({
                   distribution.token_decimals ?? 18
                 ) ?? 0,
                 9,
-                0
+                sendCoin.formatDecimals
               )}
             </Paragraph>
             {(() => {
@@ -688,7 +689,7 @@ const ClaimableRewardsCard = ({
               : `${formatAmount(
                   formatUnits(shareAmount ?? 0n, distribution.token_decimals ?? 18) ?? 0n,
                   10,
-                  0
+                  sendCoin.formatDecimals
                 )} SEND`}
           </Paragraph>
           <DistributionClaimButton distribution={distribution} />
