@@ -120,7 +120,7 @@ export default function formatAmount(
 
   return (
     (lessThanMin ? '>' : '') +
-    Number(Number(amount).toFixed(maxDecimals)).toLocaleString('en-US', {
+    floor(Number(amount), maxDecimals).toLocaleString('en-US', {
       useGrouping: true,
       minimumFractionDigits: (decimals || 0) < maxDecimals ? decimals : maxDecimals,
       maximumFractionDigits: maxDecimals,
