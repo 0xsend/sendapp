@@ -487,11 +487,16 @@ export class DistributorV2Worker {
       const currentHour = getCurrentHourInMonth(currentDate)
 
       // Calculate time adjustment for slashed amounts
-      const hourlyHodlerAmount = (hodlerPoolAvailableAmount * PERC_DENOM) / BigInt(hoursInMonth)
-      const timeAdjustedAmount =
-        (hourlyHodlerAmount * BigInt(currentHour + 1)) / PERC_DENOM > hodlerPoolAvailableAmount
-          ? hodlerPoolAvailableAmount
-          : (hourlyHodlerAmount * BigInt(currentHour + 1)) / PERC_DENOM
+      const preciseHourlyHodlerPoolIncrement =
+        (hodlerPoolAvailableAmount * PERC_DENOM) / BigInt(hoursInMonth)
+      const preciseTimeSlashedHodlerPool =
+        preciseHourlyHodlerPoolIncrement * BigInt(currentHour + 1) >
+        hodlerPoolAvailableAmount * PERC_DENOM
+          ? hodlerPoolAvailableAmount * PERC_DENOM
+          : preciseHourlyHodlerPoolIncrement * BigInt(currentHour + 1)
+
+      const hourlyHodlerPoolIncrement = preciseHourlyHodlerPoolIncrement / PERC_DENOM
+      const timeSlashedHodlerPool = preciseTimeSlashedHodlerPool / PERC_DENOM
 
       // First calculate slashed balances for everyone
       const slashedBalances = minBalanceAddresses.map((balance) => {
@@ -503,12 +508,14 @@ export class DistributorV2Worker {
         if (sendCeilingData && sendCeilingData.weight > 0n) {
           const previousReward =
             previousSharesByUserId[userId] || BigInt(distribution.hodler_min_balance)
-          const scaledPreviousReward = previousReward / BigInt(sendSlash.scaling_divisor)
-          const cappedWeight =
-            sendCeilingData.weight > scaledPreviousReward
-              ? scaledPreviousReward
-              : sendCeilingData.weight
-          slashPercentage = (cappedWeight * PERC_DENOM) / scaledPreviousReward
+          const preciseScaledPreviousReward =
+            (previousReward * PERC_DENOM) / BigInt(sendSlash.scaling_divisor)
+          const preciseWeight = sendCeilingData.weight * PERC_DENOM
+          const preciseCappedWeight =
+            preciseWeight > preciseScaledPreviousReward
+              ? preciseScaledPreviousReward
+              : preciseWeight
+          slashPercentage = preciseCappedWeight / preciseScaledPreviousReward
         }
 
         const slashedBalance = ((BigInt(balance.balance) * slashPercentage) / PERC_DENOM).toString()
@@ -530,7 +537,7 @@ export class DistributorV2Worker {
 
       // Calculate weighted shares for current slashed state
 
-      const weightedShares = calculateWeights(slashedBalances, timeAdjustedAmount)
+      const weightedShares = calculateWeights(slashedBalances, timeSlashedHodlerPool)
 
       hodlerShares = slashedBalances.map((balance) => ({
         address: balance.address,
@@ -541,8 +548,8 @@ export class DistributorV2Worker {
         {
           hoursInMonth,
           currentHour,
-          hourlyHodlerAmount,
-          timeAdjustedAmount,
+          hourlyHodlerPoolIncrement,
+          timeSlashedHodlerPool,
           fullAmount: hodlerPoolAvailableAmount,
         },
         'Time-based hodler pool calculations'
