@@ -9,7 +9,6 @@ import {
   H3,
   useMedia,
   AnimatePresence,
-  useSafeAreaInsets,
 } from '@my/ui'
 import { HomeButtons } from '../features/home/HomeButtons'
 import { useScrollDirection } from '../provider/scroll'
@@ -44,14 +43,12 @@ const MobileButtonRow = ({
   isLoading,
   isVisible,
 }: { children: React.ReactElement; isLoading: boolean; isVisible: boolean } & XStackProps) => {
-  const isPwa = usePwa()
   const media = useMedia()
-  const { sab } = useSafeAreaInsets()
 
   return (
     <Stack
       w={'100%'}
-      pb={isPwa ? sab : '$5'}
+      pb={'$3'}
       px="$4"
       $platform-web={{
         position: 'fixed',
