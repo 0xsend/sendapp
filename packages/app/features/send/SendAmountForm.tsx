@@ -243,7 +243,11 @@ export function SendAmountForm() {
                                   size={'$5'}
                                   fontWeight={'600'}
                                 >
-                                  {formatAmount(formatUnits(coin.balance, coin.decimals), 12, 4)}
+                                  {formatAmount(
+                                    formatUnits(coin.balance, coin.decimals),
+                                    12,
+                                    coin.formatDecimals
+                                  )}
                                 </Paragraph>
                               </XStack>
                               {insufficientAmount && (
