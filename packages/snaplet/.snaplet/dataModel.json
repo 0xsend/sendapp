@@ -2139,11 +2139,55 @@
           "maxLength": null
         },
         {
-          "id": "auth.flow_state.auth_code_issued_at",
-          "name": "auth_code_issued_at",
-          "columnName": "auth_code_issued_at",
-          "type": "timestamptz",
+          "name": "saml_relay_states",
+          "type": "saml_relay_states",
           "isRequired": false,
+          "kind": "object",
+          "relationName": "saml_relay_statesToflow_state",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "flow_state_pkey",
+          "fields": [
+            "id"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
+    "historical_tag_associations": {
+      "id": "public.historical_tag_associations",
+      "schemaName": "public",
+      "tableName": "historical_tag_associations",
+      "fields": [
+        {
+          "id": "public.historical_tag_associations.id",
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.historical_tag_associations.tag_name",
+          "name": "tag_name",
+          "columnName": "tag_name",
+          "type": "citext",
+          "isRequired": true,
           "kind": "scalar",
           "isList": false,
           "isGenerated": false,
@@ -2153,14 +2197,74 @@
           "maxLength": null
         },
         {
-          "name": "saml_relay_states",
-          "type": "saml_relay_states",
-          "isRequired": false,
+          "id": "public.historical_tag_associations.tag_id",
+          "name": "tag_id",
+          "columnName": "tag_id",
+          "type": "int8",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.historical_tag_associations.user_id",
+          "name": "user_id",
+          "columnName": "user_id",
+          "type": "uuid",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.historical_tag_associations.status",
+          "name": "status",
+          "columnName": "status",
+          "type": "tag_status",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.historical_tag_associations.captured_at",
+          "name": "captured_at",
+          "columnName": "captured_at",
+          "type": "timestamptz",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "users",
+          "type": "users",
+          "isRequired": true,
           "kind": "object",
-          "relationName": "saml_relay_statesToflow_state",
-          "relationFromFields": [],
-          "relationToFields": [],
-          "isList": true,
+          "relationName": "historical_tag_associationsTousers",
+          "relationFromFields": [
+            "user_id"
+          ],
+          "relationToFields": [
+            "id"
+          ],
+          "isList": false,
           "isId": false,
           "isGenerated": false,
           "sequence": false,
@@ -5173,20 +5277,6 @@
           "maxLength": null
         },
         {
-          "id": "auth.saml_providers.name_id_format",
-          "name": "name_id_format",
-          "columnName": "name_id_format",
-          "type": "text",
-          "isRequired": false,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false,
-          "isId": false,
-          "maxLength": null
-        },
-        {
           "name": "sso_providers",
           "type": "sso_providers",
           "isRequired": true,
@@ -5281,6 +5371,20 @@
           "name": "redirect_to",
           "columnName": "redirect_to",
           "type": "text",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "auth.saml_relay_states.from_ip_address",
+          "name": "from_ip_address",
+          "columnName": "from_ip_address",
+          "type": "inet",
           "isRequired": false,
           "kind": "scalar",
           "isList": false,
@@ -7264,6 +7368,20 @@
           "maxLength": null
         },
         {
+          "id": "public.send_accounts.main_tag_id",
+          "name": "main_tag_id",
+          "columnName": "main_tag_id",
+          "type": "int8",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
           "name": "users",
           "type": "users",
           "isRequired": true,
@@ -7282,11 +7400,43 @@
           "hasDefaultValue": false
         },
         {
+          "name": "tags",
+          "type": "tags",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "send_accountsTotags",
+          "relationFromFields": [
+            "main_tag_id"
+          ],
+          "relationToFields": [
+            "id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
           "name": "send_account_credentials",
           "type": "send_account_credentials",
           "isRequired": false,
           "kind": "object",
           "relationName": "send_account_credentialsTosend_accounts",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "send_account_tags",
+          "type": "send_account_tags",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "send_account_tagsTosend_accounts",
           "relationFromFields": [],
           "relationToFields": [],
           "isList": true,
@@ -10907,16 +11057,30 @@
           "maxLength": null
         },
         {
+          "id": "public.tag_receipts.tag_id",
+          "name": "tag_id",
+          "columnName": "tag_id",
+          "type": "int8",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
           "name": "tags",
           "type": "tags",
           "isRequired": true,
           "kind": "object",
           "relationName": "tag_receiptsTotags",
           "relationFromFields": [
-            "tag_name"
+            "tag_id"
           ],
           "relationToFields": [
-            "name"
+            "id"
           ],
           "isList": false,
           "isId": false,
@@ -10959,14 +11123,14 @@
           "isGenerated": false,
           "sequence": false,
           "hasDefaultValue": false,
-          "isId": true,
+          "isId": false,
           "maxLength": null
         },
         {
-          "id": "public.tags.status",
-          "name": "status",
-          "columnName": "status",
-          "type": "tag_status",
+          "id": "public.tags.created_at",
+          "name": "created_at",
+          "columnName": "created_at",
+          "type": "timestamptz",
           "isRequired": true,
           "kind": "scalar",
           "isList": false,
@@ -10991,11 +11155,11 @@
           "maxLength": null
         },
         {
-          "id": "public.tags.created_at",
-          "name": "created_at",
-          "columnName": "created_at",
+          "id": "public.tags.updated_at",
+          "name": "updated_at",
+          "columnName": "updated_at",
           "type": "timestamptz",
-          "isRequired": true,
+          "isRequired": false,
           "kind": "scalar",
           "isList": false,
           "isGenerated": false,
@@ -11007,7 +11171,7 @@
         {
           "name": "users",
           "type": "users",
-          "isRequired": true,
+          "isRequired": false,
           "kind": "object",
           "relationName": "tagsTousers",
           "relationFromFields": [
@@ -11039,9 +11203,16 @@
       ],
       "uniqueConstraints": [
         {
-          "name": "tags_pkey",
+          "name": "tags_name_unique",
           "fields": [
             "name"
+          ],
+          "nullNotDistinct": false
+        },
+        {
+          "name": "tags_pkey",
+          "fields": [
+            "id"
           ],
           "nullNotDistinct": false
         }
@@ -11983,20 +12154,6 @@
           "maxLength": null
         },
         {
-          "id": "auth.users.is_anonymous",
-          "name": "is_anonymous",
-          "columnName": "is_anonymous",
-          "type": "bool",
-          "isRequired": true,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": true,
-          "isId": false,
-          "maxLength": null
-        },
-        {
           "name": "identities",
           "type": "identities",
           "isRequired": false,
@@ -12016,20 +12173,6 @@
           "isRequired": false,
           "kind": "object",
           "relationName": "mfa_factorsTousers",
-          "relationFromFields": [],
-          "relationToFields": [],
-          "isList": true,
-          "isId": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false
-        },
-        {
-          "name": "one_time_tokens",
-          "type": "one_time_tokens",
-          "isRequired": false,
-          "kind": "object",
-          "relationName": "one_time_tokensTousers",
           "relationFromFields": [],
           "relationToFields": [],
           "isList": true,
@@ -12128,6 +12271,20 @@
           "isRequired": false,
           "kind": "object",
           "relationName": "distribution_verificationsTousers",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "historical_tag_associations",
+          "type": "historical_tag_associations",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "historical_tag_associationsTousers",
           "relationFromFields": [],
           "relationToFields": [],
           "isList": true,
@@ -12542,29 +12699,6 @@
         }
       ]
     },
-    "one_time_token_type": {
-      "schemaName": "auth",
-      "values": [
-        {
-          "name": "confirmation_token"
-        },
-        {
-          "name": "email_change_token_current"
-        },
-        {
-          "name": "email_change_token_new"
-        },
-        {
-          "name": "phone_change_token"
-        },
-        {
-          "name": "reauthentication_token"
-        },
-        {
-          "name": "recovery_token"
-        }
-      ]
-    },
     "request_status": {
       "schemaName": "net",
       "values": [
@@ -12596,9 +12730,6 @@
     "pg_tle_features": {
       "schemaName": "pgtle",
       "values": [
-        {
-          "name": "clientauth"
-        },
         {
           "name": "passcheck"
         }
@@ -12635,6 +12766,9 @@
     "tag_status": {
       "schemaName": "public",
       "values": [
+        {
+          "name": "available"
+        },
         {
           "name": "confirmed"
         },
