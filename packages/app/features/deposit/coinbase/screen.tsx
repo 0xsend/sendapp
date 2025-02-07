@@ -34,7 +34,7 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
             <Text color="$gray11" ta="center">
               {toNiceError(error)}
             </Text>
-            <Button backgroundColor="$primary" color="$color" size="$4" onPress={closeOnramp}>
+            <Button variant="outlined" color="$color" size="$4" onPress={closeOnramp}>
               Try Again
             </Button>
           </YStack>
@@ -65,7 +65,7 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
             <Text color="$gray11" ta="center">
               Your payment could not be processed. Please try again.
             </Text>
-            <Button backgroundColor="$primary" color="$color" size="$4" onPress={closeOnramp}>
+            <Button variant="outlined" color="$color" size="$4" onPress={closeOnramp}>
               Try Again
             </Button>
           </YStack>
