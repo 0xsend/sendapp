@@ -34,7 +34,19 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
             <Text color="$gray11" ta="center">
               {toNiceError(error)}
             </Text>
-            <Button variant="outlined" color="$color" size="$4" onPress={closeOnramp}>
+            <Button
+              variant="outlined"
+              color="$color"
+              size="$4"
+              hoverStyle={{
+                backgroundColor: '$color1',
+                borderColor: '$color8',
+              }}
+              pressStyle={{
+                backgroundColor: '$color2',
+              }}
+              onPress={closeOnramp}
+            >
               Try Again
             </Button>
           </YStack>
@@ -50,7 +62,19 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
             <Text color="$gray11" ta="center">
               Please complete your transaction in the Coinbase window.
             </Text>
-            <Button variant="outlined" color="$color" size="$4" onPress={closeOnramp}>
+            <Button
+              variant="outlined"
+              color="$color"
+              size="$4"
+              hoverStyle={{
+                backgroundColor: '$color1',
+                borderColor: '$color8',
+              }}
+              pressStyle={{
+                backgroundColor: '$color2',
+              }}
+              onPress={closeOnramp}
+            >
               Cancel
             </Button>
           </YStack>
