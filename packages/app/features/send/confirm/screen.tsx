@@ -13,6 +13,7 @@ import {
   XStack,
   YStack,
   type YStackProps,
+  useToastController,
 } from '@my/ui'
 import { baseMainnet } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
@@ -226,15 +227,6 @@ export function SendConfirm() {
   useEffect(() => {
     if (!submittedAt) return
 
-    const hasBeenLongEnough = Date.now() - submittedAt > 5_000
-
-    log('check if submitted at is long enough', {
-      submittedAt,
-      sentTxHash,
-      hasBeenLongEnough,
-      isTransferPending,
-    })
-
     if (sentTxHash) {
       log('sent tx hash', { sentTxHash })
       const tfr = transfers?.pages.some((page) =>
@@ -252,10 +244,11 @@ export function SendConfirm() {
       if (tokenActivityError) {
         console.error(tokenActivityError)
       }
+
       // found the transfer or we waited too long or we got an error 😢
       // or we are sending eth since event logs are not always available for eth
       // (when receipient is not a send account or contract)
-      if (tfr || tokenActivityError || hasBeenLongEnough || (sentTxHash && sendToken === 'eth')) {
+      if (tfr || tokenActivityError || (sentTxHash && sendToken === 'eth')) {
         router.replace({ pathname: '/', query: { token: sendToken } })
       }
     }
@@ -278,7 +271,7 @@ export function SendConfirm() {
         remove()
       }
     }
-  }, [sentTxHash, transfers, router, sendToken, tokenActivityError, submittedAt, isTransferPending])
+  }, [sentTxHash, transfers, router, sendToken, tokenActivityError, submittedAt])
 
   if (isSendAccountLoading || nonceIsLoading || isProfileLoading)
     return <Spinner size="large" color={'$color'} />

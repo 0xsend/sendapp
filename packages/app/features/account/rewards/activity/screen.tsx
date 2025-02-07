@@ -33,6 +33,7 @@ import { isEqualCalendarDate } from 'app/utils/dateHelper'
 import { toNiceError } from 'app/utils/toNiceError'
 import { min } from 'app/utils/bigint'
 import type { Json } from '@my/supabase/database.types'
+import { sendCoin } from 'app/data/coins'
 
 //@todo get this from the db
 const verificationTypesAndTitles = {
@@ -282,7 +283,7 @@ const DistributionRequirementsCard = ({
                   distribution.token_decimals ?? 18
                 ) ?? 0,
                 9,
-                0
+                sendCoin.formatDecimals
               )}
             </Paragraph>
             {(() => {
@@ -553,6 +554,12 @@ const ProgressCard = ({
   previousDistribution?: UseDistributionsResultData[number]
   verificationsQuery: DistributionsVerificationsQuery
 }) => {
+  const sendSlash = distribution.send_slash.at(0)
+
+  if (!sendSlash) {
+    return null
+  }
+
   const verifications = verificationsQuery.data
 
   if (verificationsQuery.isLoading) {
@@ -569,10 +576,9 @@ const ProgressCard = ({
     return null
   }
 
-  const sendSlash = distribution.send_slash.at(0)
   const sendCeiling = verifications.verification_values.find(({ type }) => type === 'send_ceiling')
 
-  if (!sendSlash || !sendCeiling) {
+  if (!sendCeiling) {
     return (
       <YStack f={1} w={'100%'} gap="$5">
         <H3 fontWeight={'600'} color={'$color12'}>
@@ -688,7 +694,7 @@ const ClaimableRewardsCard = ({
               : `${formatAmount(
                   formatUnits(shareAmount ?? 0n, distribution.token_decimals ?? 18) ?? 0n,
                   10,
-                  0
+                  sendCoin.formatDecimals
                 )} SEND`}
           </Paragraph>
           <DistributionClaimButton distribution={distribution} />
