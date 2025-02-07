@@ -103,15 +103,17 @@ CREATE POLICY "select_policy" ON public.tag_receipts
 
 -- Create helper functions first
 CREATE OR REPLACE FUNCTION public.create_tag(tag_name citext, send_account_id uuid)
-    RETURNS void
+    RETURNS bigint
     LANGUAGE plpgsql
     SECURITY DEFINER
     SET search_path TO 'public'
     AS $$
+DECLARE
+    _tag_id bigint;
 BEGIN
     BEGIN
         -- Verify user owns the send_account
-        IF NOT EXISTS(
+        IF NOT EXISTS (
             SELECT
                 1
             FROM
@@ -122,7 +124,7 @@ BEGIN
         RAISE EXCEPTION 'User does not own this send_account';
     END IF;
     -- Check tag count before insert
-    IF(
+    IF (
         SELECT
             COUNT(*)
         FROM
@@ -133,22 +135,53 @@ BEGIN
             sa.user_id = auth.uid()) >= 5 THEN
         RAISE EXCEPTION 'User can have at most 5 tags';
     END IF;
-    -- Insert tag and create association in one transaction
-    WITH new_tag AS(
+    -- Check if tag exists and is available
+    WITH available_tag AS (
+        UPDATE
+            tags
+        SET
+            status = 'pending',
+            updated_at = NOW()
+        WHERE
+            name = tag_name
+            AND status = 'available'
+        RETURNING
+            id
+),
+new_tag AS (
 INSERT INTO tags(name, status)
-            VALUES(tag_name, 'pending')
+    SELECT
+        tag_name,
+        'pending'
+    WHERE
+        NOT EXISTS (
+            SELECT
+                1
+            FROM
+                available_tag)
         RETURNING
             id)
-        INSERT INTO send_account_tags(send_account_id, tag_id)
+    INSERT INTO send_account_tags(send_account_id, tag_id)
+    SELECT
+        send_account_id,
+        id
+    FROM (
         SELECT
-            send_account_id,
             id
         FROM
-            new_tag;
+            available_tag
+        UNION ALL
+        SELECT
+            id
+        FROM
+            new_tag) tags
+RETURNING
+    tag_id INTO _tag_id;
     EXCEPTION
         WHEN OTHERS THEN
             RAISE EXCEPTION '%', SQLERRM;
     END;
+    RETURN _tag_id;
 END;
 
 $$;
@@ -432,6 +465,8 @@ CREATE POLICY "delete_policy" ON send_account_tags
 -- Grant permissions
 GRANT EXECUTE ON FUNCTION create_tag(citext, uuid) TO authenticated;
 
+DROP FUNCTION IF EXISTS public.confirm_tags(tag_names citext[], event_id text, referral_code_input text);
+
 -- Add confirm_tags function
 CREATE OR REPLACE FUNCTION public.confirm_tags(tag_names citext[], send_account_id uuid, _event_id text, _referral_code text)
     RETURNS void
@@ -583,4 +618,10 @@ BEGIN
     RETURN NEW;
 END;
 $$;
+
+-- Add policy to allow updating main_tag_id
+CREATE POLICY "Users can update their own send account main_tag_id" ON send_accounts
+    FOR UPDATE
+        USING (user_id = auth.uid())
+        WITH CHECK (user_id = auth.uid());
 
