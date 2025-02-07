@@ -13,6 +13,7 @@ import { isAddressEqual, withRetry, zeroAddress } from 'viem'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
 import { byteaToHex } from 'app/utils/byteaToHex'
+import type { Database } from '@my/supabase/database.types'
 
 const log = debug('api:routers:tag')
 
@@ -153,15 +154,30 @@ export const tagRouter = createTRPCRouter({
         })
       }
 
-      log('confirming tags', `event_id=${event_id}`)
+      // Get the send account directly from the database
+      const { data: sendAccount, error: sendAccountError } = await supabase
+        .from('send_accounts')
+        .select('id')
+        .eq('user_id', profile.id)
+        .single()
+
+      if (sendAccountError || !sendAccount) {
+        log('no send account found', sendAccountError)
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'No send account found',
+        })
+      }
+
+      log('confirming tags', `event_id=${event_id} send_account_id=${sendAccount.id}`)
 
       // confirm all pending tags and save the transaction receipt
       const { error: confirmTagsErr } = await supabaseAdmin.rpc('confirm_tags', {
         tag_names: pendingTags.map((t) => t.name),
-        event_id,
-        referral_code_input: referrerProfile?.refcode ?? '',
+        send_account_id: sendAccount.id,
+        _event_id: event_id,
+        _referral_code: referrerProfile?.refcode ?? '',
       })
-
       if (confirmTagsErr) {
         console.error('confirm tags error', confirmTagsErr)
         throw new TRPCError({
@@ -175,5 +191,61 @@ export const tagRouter = createTRPCRouter({
         pendingTags.map((t) => t.name)
       )
       return ''
+    }),
+  delete: protectedProcedure
+    .input(
+      z.object({
+        tagId: z.number(),
+      })
+    )
+    .mutation(async ({ ctx: { supabase }, input: { tagId } }) => {
+      const { data: profile } = await supabase.auth.getUser()
+      if (!profile.user) throw new TRPCError({ code: 'UNAUTHORIZED' })
+
+      // Get the user's send account
+      const { data: sendAccount, error: sendAccountError } = await supabase
+        .from('send_accounts')
+        .select('id')
+        .eq('user_id', profile.user.id)
+        .single()
+
+      if (sendAccountError || !sendAccount) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Send account not found',
+        })
+      }
+
+      // Check if the tag belongs to the user's send account
+      const { data: sendAccountTag, error: tagError } = await supabase
+        .from('send_account_tags')
+        .select('*')
+        .eq('tag_id', tagId)
+        .eq('send_account_id', sendAccount.id)
+        .single()
+
+      if (tagError || !sendAccountTag) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Tag not found',
+        })
+      }
+
+      // Delete the send_account_tag association
+      const { error } = await supabase
+        .from('send_account_tags')
+        .delete()
+        .eq('tag_id', tagId)
+        .eq('send_account_id', sendAccount.id)
+
+      if (error) {
+        console.error('Error deleting tag:', error)
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: error.message,
+        })
+      }
+
+      return { success: true }
     }),
 })

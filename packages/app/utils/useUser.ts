@@ -15,24 +15,38 @@ export const useUser = () => {
     queryKey: ['profile', user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user?.id ?? '')
         .single()
-      if (error) {
-        // no rows - edge case of user being deleted
-        if (error.code === 'PGRST116') {
+
+      if (profileError) {
+        if (profileError.code === 'PGRST116') {
           await supabase.auth.signOut()
           return null
         }
-        // check unauthorized or jwt error
-        if (error.code === 'PGRST301') {
+        if (profileError.code === 'PGRST301') {
           await supabase.auth.signOut()
         }
-        throw new Error(error.message)
+        throw new Error(profileError.message)
       }
-      return data
+
+      const { data: sendAccountData } = await supabase
+        .from('send_accounts')
+        .select(`
+          main_tag_id,
+          tags (
+            name
+          )
+        `)
+        .eq('user_id', user?.id ?? '')
+        .single()
+
+      return {
+        ...profileData,
+        main_tag_name: sendAccountData?.tags?.name,
+      }
     },
   })
 

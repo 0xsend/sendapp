@@ -1,5 +1,10 @@
 import { Stack, Text, XStack, YStack, useMedia } from '@my/ui'
-import { amountFromActivity, eventNameFromActivity, subtextFromActivity } from 'app/utils/activity'
+import {
+  amountFromActivity,
+  eventNameFromActivity,
+  subtextFromActivity,
+  isMainTag,
+} from 'app/utils/activity'
 import type { Activity } from 'app/utils/zod/activity'
 import { ActivityAvatar } from './ActivityAvatar'
 
@@ -10,6 +15,7 @@ export function ActivityRow({ activity }: { activity: Activity }) {
   const date = new Date(created_at).toLocaleString()
   const eventName = eventNameFromActivity(activity)
   const subtext = subtextFromActivity(activity)
+  const isMainTagText = isMainTag(activity.from_user || activity.to_user)
 
   return (
     <XStack
@@ -48,7 +54,7 @@ export function ActivityRow({ activity }: { activity: Activity }) {
           >
             <Text
               theme="alt2"
-              color="$olive"
+              color={isMainTagText ? '$primary' : '$olive'}
               fontFamily={'$mono'}
               $gtMd={{ fontSize: '$2' }}
               maxWidth={'100%'}

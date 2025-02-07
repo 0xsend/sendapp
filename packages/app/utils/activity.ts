@@ -251,15 +251,18 @@ export function subtextFromActivity(activity: Activity): string | null {
 /**
  * Returns the name of the user from the activity user.
  * The cascading fallback is to:
- * 1. First, sendtag
- * 2. 2nd, profile name
- * 3. 3rd, Send ID
+ * 1. First, Main sendtag
+ * 2. tag name
+ * 3. profile name
+ * 4. Send ID
  */
 export function userNameFromActivityUser(
   user: Activity['from_user'] | Activity['to_user']
 ): string {
   switch (true) {
-    case !!user?.tags?.[0]:
+    case !!user?.main_tag_name:
+      return `/${user.main_tag_name}`
+    case !!user?.tags:
       return `/${user.tags[0]}`
     case !!user?.name:
       return user.name
@@ -274,4 +277,9 @@ export function userNameFromActivityUser(
       }
       return ''
   }
+}
+
+// Add a new function to check if it's a main tag
+export function isMainTag(user: Activity['from_user'] | Activity['to_user']): boolean {
+  return !!user?.main_tag_name
 }

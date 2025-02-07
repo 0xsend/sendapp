@@ -46,6 +46,7 @@ export function AccountScreen() {
   const referralHref = getReferralHref(refCode)
   const [queryParams, setRootParams] = useRootScreenParams()
   const [canShare, setCanShare] = useState(false)
+  const mainTagName = profile?.main_tag_name
 
   useEffect(() => {
     const canShare = async () => {
@@ -179,7 +180,9 @@ export function AccountScreen() {
                 mt={'$size.0.9'}
               >
                 {tags?.map((tag) => (
-                  <TagPill key={tag.name}>{tag.name}</TagPill>
+                  <TagPill key={tag.name} tag={tag.name} mainTagName={mainTagName}>
+                    {tag.name}
+                  </TagPill>
                 ))}
               </YStack>
             </YStack>
@@ -342,7 +345,14 @@ const StackButton = ({ href, label, icon }: { href: string; label: string; icon:
   )
 }
 
-const TagPill = ({ children }: PropsWithChildren) => {
+const TagPill = ({
+  children,
+  tag,
+  mainTagName,
+}: PropsWithChildren<{
+  tag: string
+  mainTagName?: string
+}>) => {
   return (
     <Paragraph
       fontSize={'$2'}
@@ -351,6 +361,10 @@ const TagPill = ({ children }: PropsWithChildren) => {
       px={'$size.0.75'}
       py={'$size.0.1'}
       borderRadius={'$1'}
+      {...(tag === mainTagName && {
+        borderWidth: 1,
+        borderColor: '$primary',
+      })}
     >
       /{children}
     </Paragraph>

@@ -355,6 +355,41 @@ export type Database = {
         }
         Relationships: []
       }
+      historical_tag_associations: {
+        Row: {
+          captured_at: string
+          id: string
+          status: Database["public"]["Enums"]["tag_status"]
+          tag_id: number
+          tag_name: string
+          user_id: string
+        }
+        Insert: {
+          captured_at?: string
+          id?: string
+          status: Database["public"]["Enums"]["tag_status"]
+          tag_id: number
+          tag_name: string
+          user_id: string
+        }
+        Update: {
+          captured_at?: string
+          id?: string
+          status?: Database["public"]["Enums"]["tag_status"]
+          tag_id?: number
+          tag_name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "historical_tag_associations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           about: string | null
@@ -437,18 +472,21 @@ export type Database = {
           referred_id: string
           referrer_id: string
           tag: string
+          tag_id: number
         }
         Insert: {
           id?: number
           referred_id: string
           referrer_id: string
           tag: string
+          tag_id: number
         }
         Update: {
           id?: number
           referred_id?: string
           referrer_id?: string
           tag?: string
+          tag_id?: number
         }
         Relationships: [
           {
@@ -466,11 +504,18 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "referrals_tag_fkey"
-            columns: ["tag"]
+            foreignKeyName: "referrals_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tag_history"
+            referencedColumns: ["tag_id"]
+          },
+          {
+            foreignKeyName: "referrals_tag_id_fkey"
+            columns: ["tag_id"]
             isOneToOne: false
             referencedRelation: "tags"
-            referencedColumns: ["name"]
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -717,6 +762,52 @@ export type Database = {
         }
         Relationships: []
       }
+      send_account_tags: {
+        Row: {
+          created_at: string
+          id: number
+          send_account_id: string
+          tag_id: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          send_account_id: string
+          tag_id: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          send_account_id?: string
+          tag_id?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "send_account_tags_send_account_id_fkey"
+            columns: ["send_account_id"]
+            isOneToOne: false
+            referencedRelation: "send_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "send_account_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tag_history"
+            referencedColumns: ["tag_id"]
+          },
+          {
+            foreignKeyName: "send_account_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       send_account_transfers: {
         Row: {
           abi_idx: number
@@ -779,6 +870,7 @@ export type Database = {
           deleted_at: string | null
           id: string
           init_code: string
+          main_tag_id: number | null
           updated_at: string
           user_id: string
         }
@@ -789,6 +881,7 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           init_code: string
+          main_tag_id?: number | null
           updated_at?: string
           user_id?: string
         }
@@ -799,10 +892,25 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           init_code?: string
+          main_tag_id?: number | null
           updated_at?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "send_accounts_main_tag_id_fkey"
+            columns: ["main_tag_id"]
+            isOneToOne: false
+            referencedRelation: "tag_history"
+            referencedColumns: ["tag_id"]
+          },
+          {
+            foreignKeyName: "send_accounts_main_tag_id_fkey"
+            columns: ["main_tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "send_accounts_user_id_fkey"
             columns: ["user_id"]
@@ -1081,6 +1189,7 @@ export type Database = {
           event_id: string | null
           hash: string | null
           id: number
+          tag_id: number
           tag_name: string
         }
         Insert: {
@@ -1088,6 +1197,7 @@ export type Database = {
           event_id?: string | null
           hash?: string | null
           id?: number
+          tag_id: number
           tag_name: string
         }
         Update: {
@@ -1095,15 +1205,23 @@ export type Database = {
           event_id?: string | null
           hash?: string | null
           id?: number
+          tag_id?: number
           tag_name?: string
         }
         Relationships: [
           {
-            foreignKeyName: "tag_receipts_tag_name_fkey"
-            columns: ["tag_name"]
+            foreignKeyName: "tag_receipts_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tag_history"
+            referencedColumns: ["tag_id"]
+          },
+          {
+            foreignKeyName: "tag_receipts_tag_id_fkey"
+            columns: ["tag_id"]
             isOneToOne: false
             referencedRelation: "tags"
-            referencedColumns: ["name"]
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1128,21 +1246,27 @@ export type Database = {
       tags: {
         Row: {
           created_at: string
+          id: number
           name: string
           status: Database["public"]["Enums"]["tag_status"]
-          user_id: string
+          updated_at: string | null
+          user_id: string | null
         }
         Insert: {
           created_at?: string
+          id?: number
           name: string
           status?: Database["public"]["Enums"]["tag_status"]
-          user_id?: string
+          updated_at?: string | null
+          user_id?: string | null
         }
         Update: {
           created_at?: string
+          id?: number
           name?: string
           status?: Database["public"]["Enums"]["tag_status"]
-          user_id?: string
+          updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -1223,6 +1347,16 @@ export type Database = {
         }
         Relationships: []
       }
+      tag_history: {
+        Row: {
+          created_at: string | null
+          name: string | null
+          send_id: number | null
+          status: Database["public"]["Enums"]["tag_status"] | null
+          tag_id: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       calculate_and_insert_send_ceiling_verification: {
@@ -1283,8 +1417,9 @@ export type Database = {
       confirm_tags: {
         Args: {
           tag_names: string[]
-          event_id: string
-          referral_code_input: string
+          send_account_id: string
+          _event_id: string
+          _referral_code: string
         }
         Returns: undefined
       }
@@ -1295,6 +1430,13 @@ export type Database = {
           key_slot: number
         }
         Returns: Json
+      }
+      create_tag: {
+        Args: {
+          tag_name: string
+          send_account_id: string
+        }
+        Returns: number
       }
       distribution_hodler_addresses: {
         Args: {
@@ -1307,6 +1449,7 @@ export type Database = {
           deleted_at: string | null
           id: string
           init_code: string
+          main_tag_id: number | null
           updated_at: string
           user_id: string
         }[]
@@ -1374,6 +1517,8 @@ export type Database = {
           is_public: boolean
           sendid: number
           all_tags: string[]
+          main_tag_id: number
+          main_tag_name: string
         }[]
       }
       send_accounts_add_webauthn_credential: {
@@ -1434,7 +1579,7 @@ export type Database = {
     Enums: {
       key_type_enum: "ES256"
       lookup_type_enum: "sendid" | "tag" | "refcode" | "address" | "phone"
-      tag_status: "pending" | "confirmed"
+      tag_status: "pending" | "confirmed" | "available"
       verification_type:
         | "tag_registration"
         | "tag_referral"
@@ -1452,6 +1597,8 @@ export type Database = {
         name: string
         avatar_url: string
         send_id: number
+        main_tag_id: number
+        main_tag_name: string
         tags: unknown
       }
       tag_search_result: {

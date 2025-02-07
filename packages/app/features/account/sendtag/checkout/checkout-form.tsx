@@ -45,12 +45,14 @@ import { ConfirmButton } from './components/checkout-confirm-button'
 import { SendTagPricingDialog, SendTagPricingTooltip } from './SendTagPricingDialog'
 import formatAmount from 'app/utils/formatAmount'
 import { api } from 'app/utils/api'
+import { useSendAccount } from 'app/utils/send-accounts'
 
 export const CheckoutForm = () => {
   const user = useUser()
   const pendingTags = usePendingTags()
   const confirmedTags = useConfirmedTags()
   const hasPendingTags = pendingTags && pendingTags.length > 0
+  const { data: sendAccount } = useSendAccount()
   const form = useForm<z.infer<typeof CheckoutTagSchema>>()
   const supabase = useSupabase()
   const toast = useToastController()
@@ -61,7 +63,22 @@ export const CheckoutForm = () => {
 
   async function createSendTag({ name }: z.infer<typeof CheckoutTagSchema>) {
     if (!user.user) return console.error('No user')
-    const { error } = await supabase.from('tags').insert({ name })
+    if (!sendAccount?.id) return console.error('No send account')
+
+    // Verify the send account belongs to the current user
+    if (sendAccount.user_id !== user.user.id) {
+      console.error('Send account does not belong to current user')
+      form.setError('name', {
+        type: 'custom',
+        message: 'Invalid send account',
+      })
+      return
+    }
+
+    const { error } = await supabase.rpc('create_tag', {
+      tag_name: name,
+      send_account_id: sendAccount.id,
+    })
 
     if (error) {
       console.error("Couldn't create Sendtag", error)
