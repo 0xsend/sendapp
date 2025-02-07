@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react'
-// @ts-expect-error - could not be resolved under your current 'moduleResolution' setting. Consider updating to 'node16', 'nodenext', or 'bundler'
 import { getOnrampBuyUrl } from '@coinbase/onchainkit/fund'
 import { useMutation } from '@tanstack/react-query'
 
@@ -34,7 +33,7 @@ export function useCoinbaseOnramp({ projectId, address }: OnrampConfig) {
       const onrampUrl = getOnrampBuyUrl({
         projectId,
         addresses: {
-          '0xCF6D79F936f50B6a8257733047308664151B2510': ['base'],
+          [address]: ['base'],
         },
         assets: ['USDC'],
         presetFiatAmount: amount,

@@ -8,7 +8,9 @@ const ONRAMP_ENABLED_USERS = (process.env.NEXT_PUBLIC_ONRAMP_ALLOWLIST ?? '').sp
 export function DepositScreen() {
   const router = useRouter()
   const { data: sendAccount } = useSendAccount()
-  const isOnrampEnabled = sendAccount?.user_id && ONRAMP_ENABLED_USERS.includes(sendAccount.user_id)
+  const isOnrampEnabled =
+    !ONRAMP_ENABLED_USERS ||
+    (sendAccount?.user_id && ONRAMP_ENABLED_USERS.includes(sendAccount.user_id))
 
   return (
     <YStack mt="$4" mx="auto" width={'100%'} $sm={{ maxWidth: 600 }}>

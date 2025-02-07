@@ -110,7 +110,7 @@ export function DepositAddress({ address, ...props }: { address?: Address } & Bu
 
     await Clipboard.setStringAsync(address).catch(() =>
       toast.show('Something went wrong', {
-        message: 'We were unable to copy your referral link to the clipboard',
+        message: 'We were unable to copy your address to the clipboard',
         customData: {
           theme: 'red',
         },
