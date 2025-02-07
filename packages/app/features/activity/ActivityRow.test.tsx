@@ -37,7 +37,7 @@ describe('ActivityRow', () => {
       </TamaguiProvider>
     )
     expect(screen.getByText('Deposit')).toBeOnTheScreen()
-    expect(screen.getByText('0.019032 USDC')).toBeOnTheScreen()
+    expect(screen.getByText('0.01 USDC')).toBeOnTheScreen()
     expect(screen.getByText('0x760...27cf')).toBeOnTheScreen() // show senders address if not a send app user
   })
 
@@ -52,7 +52,7 @@ describe('ActivityRow', () => {
     )
     // expect(screen.getByText('Alice')).toBeOnTheScreen() // should we show the user's name?
     expect(screen.getByText('Sent')).toBeOnTheScreen()
-    expect(screen.getByText('0.019032 USDC')).toBeOnTheScreen()
+    expect(screen.getByText('0.01 USDC')).toBeOnTheScreen()
     expect(screen.getByText('/alice')).toBeOnTheScreen() // shows receivers first tag
   })
 
@@ -66,7 +66,7 @@ describe('ActivityRow', () => {
       </TamaguiProvider>
     )
     expect(screen.getByText('Received')).toBeOnTheScreen()
-    expect(screen.getByText('0.019032 USDC')).toBeOnTheScreen() // show senders address if not a send app user
+    expect(screen.getByText('0.01 USDC')).toBeOnTheScreen() // show senders address if not a send app user
     expect(screen.getByText('/alice')).toBeOnTheScreen() // shows senders first tag
   })
 

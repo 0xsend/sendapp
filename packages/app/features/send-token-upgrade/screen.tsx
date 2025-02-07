@@ -26,6 +26,7 @@ import {
 } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
 import { IconSendLogo, IconUpgrade } from 'app/components/icons'
+import { sendCoin } from 'app/data/coins'
 import { api } from 'app/utils/api'
 import { assert } from 'app/utils/assert'
 import formatAmount from 'app/utils/formatAmount'
@@ -117,10 +118,13 @@ export function SendV0TokenUpgradeScreen({ children }: { children?: React.ReactN
           </YStack>
 
           <Card w="100%" maw={500} p="$5" gap="$4">
-            <TokenBalanceRow label="CURRENT" amount={formatAmount(balance.toString(), 9, 0)} />
+            <TokenBalanceRow
+              label="CURRENT"
+              amount={formatAmount(balance.toString(), 9, sendCoin.formatDecimals)}
+            />
             <TokenBalanceRow
               label="AFTER"
-              amount={formatAmount((balance / 100n).toString(), 9, 0)}
+              amount={formatAmount((balance / 100n).toString(), 9, sendCoin.formatDecimals)}
             />
           </Card>
 

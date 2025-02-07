@@ -16,7 +16,7 @@ import {
 } from './zod/activity'
 import { isSendAccountReceiveEvent } from './zod/activity/SendAccountReceiveEventSchema'
 import { isSendTokenUpgradeEvent } from './zod/activity/SendAccountTransfersEventSchema'
-import { sendCoin } from 'app/data/coins'
+import { sendCoin, sendV0Coin } from 'app/data/coins'
 
 const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
   Object.values(addresses).map((a) => [a, label])
@@ -78,11 +78,17 @@ export function amountFromActivity(activity: Activity): string {
             sendTokenV0Address[baseMainnet.id]
           )
         ) {
-          const amount = localizeAmount(formatUnits(v * BigInt(1e16), sendCoin.decimals))
+          const amount = formatAmount(
+            formatUnits(v * BigInt(1e16), sendCoin.decimals),
+            5,
+            coin.formatDecimals
+          )
+
           return `${amount} ${coin.symbol}`
         }
 
-        const amount = localizeAmount(formatUnits(v, coin.decimals))
+        const amount = formatAmount(formatUnits(v, coin.decimals), 5, coin.formatDecimals)
+
         return `${amount} ${coin.symbol}`
       }
       return formatAmount(`${v}`, 5, 0)
@@ -90,14 +96,24 @@ export function amountFromActivity(activity: Activity): string {
     case isSendAccountReceiveEvent(activity): {
       const { coin } = activity.data
       if (coin) {
-        const amount = localizeAmount(formatUnits(activity.data.value, coin.decimals))
+        const amount = formatAmount(
+          formatUnits(activity.data.value, coin.decimals),
+          5,
+          coin.formatDecimals
+        )
+
         return `${amount} ${coin.symbol}`
       }
       return formatAmount(`${activity.data.value}`, 5, 0)
     }
     case isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity): {
       const data = activity.data
-      const amount = localizeAmount(formatUnits(data.value, data.coin.decimals))
+      const amount = formatAmount(
+        formatUnits(data.value, data.coin.decimals),
+        5,
+        data.coin.formatDecimals
+      )
+
       return `${amount} ${data.coin.symbol}`
     }
     case isReferralsEvent(activity) && !!activity.from_user?.id: {
@@ -227,10 +243,10 @@ export function subtextFromActivity(activity: Activity): string | null {
       data: { v: currentAmount },
     } = activity
     const prevAmount = currentAmount / BigInt(1e16)
-    return `${formatAmount(String(prevAmount), 5, 0)} -> ${formatAmount(
+    return `${formatAmount(String(prevAmount), 5, sendV0Coin.formatDecimals)} -> ${formatAmount(
       formatUnits(currentAmount, data.coin.decimals),
       5,
-      0
+      sendCoin.formatDecimals
     )}`
   }
   if (isERC20Transfer && from_user?.id) {

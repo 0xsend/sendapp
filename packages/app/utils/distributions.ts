@@ -226,7 +226,9 @@ export const useDistributionVerifications = (distributionId?: number) => {
             totalWeight === 0n
               ? null
               : Math.min(
-                  item.multiplier_min + Number(totalWeight - 1n) * item.multiplier_step,
+                  (Math.round(item.multiplier_min * 10) +
+                    Math.round(Number(totalWeight - 1n) * item.multiplier_step * 10)) /
+                    10,
                   item.multiplier_max
                 ),
           multiplier_min: item.multiplier_min ?? 1.0,

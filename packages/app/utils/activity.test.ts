@@ -28,8 +28,8 @@ jest.mock('@my/wagmi')
 
 describe('test amountFromActivity', () => {
   it('should return the amount of the activity', () => {
-    expect(amountFromActivity(EventSchema.parse(mockReceivedTransfer))).toBe('0.019032 USDC')
-    expect(amountFromActivity(EventSchema.parse(mockSentTransfer))).toBe('0.077777 USDC')
+    expect(amountFromActivity(EventSchema.parse(mockReceivedTransfer))).toBe('0.01 USDC')
+    expect(amountFromActivity(EventSchema.parse(mockSentTransfer))).toBe('0.07 USDC')
   })
 })
 

@@ -26,6 +26,7 @@ describe('TagReceiptUSDCDataSchema', () => {
           coin: {
             coingeckoTokenId: 'usd-coin',
             decimals: 6,
+            formatDecimals: 2,
             label: 'USDC',
             symbol: 'USDC',
             token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',

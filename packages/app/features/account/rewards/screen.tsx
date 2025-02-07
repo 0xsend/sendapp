@@ -1,6 +1,7 @@
 import { YStack, H1, Paragraph, XStack, LinkableButton, Button, Image, Stack } from '@my/ui'
 import { sendMerkleDropAbi, type sendMerkleDropAddress } from '@my/wagmi'
 import { IconArrowRight, IconSend } from 'app/components/icons'
+import { sendCoin } from 'app/data/coins'
 import { byteaToHex } from 'app/utils/byteaToHex'
 import { useMonthlyDistributions } from 'app/utils/distributions'
 import formatAmount from 'app/utils/formatAmount'
@@ -67,7 +68,7 @@ export function RewardsScreen() {
                 currentDistribution?.token_decimals ?? 18
               ),
               10,
-              0
+              sendCoin.formatDecimals
             )}
             claimStatus={(() => {
               switch (true) {
