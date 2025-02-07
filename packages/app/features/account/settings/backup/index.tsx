@@ -1,19 +1,15 @@
 import type { Tables } from '@my/supabase/database.types'
 import {
   Button,
-  H1,
-  H4,
-  H5,
   Link,
   Paragraph,
   Separator,
   Spinner,
   SubmitButton,
   Text,
+  useToastController,
   XStack,
   YStack,
-  isWeb,
-  useToastController,
 } from '@my/ui'
 import {
   baseMainnetClient,
@@ -42,6 +38,8 @@ import { useLink } from 'solito/link'
 import { encodeFunctionData } from 'viem'
 import { useBalance, useEstimateFeesPerGas } from 'wagmi'
 import { z } from 'zod'
+import { SettingsHeader } from 'app/features/account/settings/components/SettingsHeader'
+import { Section } from 'app/features/account/settings/components/Section'
 
 export const BackupScreen = () => {
   const { data: sendAcct, error, isLoading } = useSendAccount()
@@ -68,24 +66,14 @@ export const BackupScreen = () => {
     },
   })
   const hasSendAccount = !!sendAcct
+
   return (
     <YStack w={'100%'} als={'center'} gap={'$size.3.5'}>
-      <YStack w={'100%'} gap={'$size.2.5'}>
-        <H1 size={'$9'} fontWeight={'600'} color="$color12">
-          Add Passkey as Signer
-        </H1>
-        <Paragraph size={'$5'} color={'$color10'}>
-          Secure your Send Account by adding up to 20 passkeys. Passkeys are trusted devices
-          authorized to sign your account&apos;s transactions.
-        </Paragraph>
-      </YStack>
-
       {(() => {
         switch (true) {
           case error !== null || webAuthnCredsError !== null:
             return (
-              <YStack w={'100%'} gap={'$6'}>
-                <Separator w={'100%'} $theme-dark={{ borderColor: '$decay' }} />
+              <YStack w={'100%'}>
                 <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
                   {error?.message}
                   {webAuthnCredsError?.message}
@@ -97,7 +85,6 @@ export const BackupScreen = () => {
           case !webAuthnCreds:
             return (
               <YStack w={'100%'} gap={'$6'}>
-                <Separator w={'100%'} $theme-dark={{ borderColor: '$decay' }} />
                 <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
                   You have no WebAuthn credentials. This should never happen. Please reach out to
                   <Link href="/account/settings/support" target="_blank">
@@ -124,7 +111,6 @@ export const BackupScreen = () => {
           case !hasSendAccount:
             return (
               <YStack w={'100%'} gap={'$6'}>
-                <Separator w={'100%'} $theme-dark={{ borderColor: '$decay' }} />
                 <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
                   You have no Send Account.
                 </Paragraph>
@@ -163,23 +149,20 @@ const WebauthnCreds = ({
   const addPasskeyLink = useLink({
     href: '/account/settings/backup/create',
   })
-  return (
-    <YStack w={'100%'} gap={'$size.3.5'}>
-      <XStack w={'100%'} gap={'$2'} jc="space-between" ai="center">
-        <YStack>
-          <Button theme="green" borderRadius={'$3'} px={'$size.1.5'} {...addPasskeyLink}>
-            <Button.Text ff={'$mono'} fontWeight={'600'} tt="uppercase" size={'$5'}>
-              Add Passkey as signer
-            </Button.Text>
-          </Button>
-        </YStack>
-      </XStack>
 
-      <XStack gap="$5" flexWrap="wrap" ai="flex-start">
+  return (
+    <YStack w={'100%'} gap={'$5'}>
+      <YStack gap={'$3.5'}>
+        <SettingsHeader>Passkeys</SettingsHeader>
         {webAuthnCreds.map((cred) => (
           <WebAuthnCred key={`${sendAcct.id}-${cred.id}`} sendAcct={sendAcct} cred={cred} />
         ))}
-      </XStack>
+      </YStack>
+      <Button theme="green" borderRadius={'$4'} p={'$4'} {...addPasskeyLink}>
+        <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
+          Add a Passkey
+        </Button.Text>
+      </Button>
     </YStack>
   )
 }
@@ -216,23 +199,11 @@ const WebAuthnCred = ({
   })
 
   return (
-    <YStack
-      w={'100%'}
-      gap={'$size.1.5'}
-      p={'$size.1.5'}
-      bc={'$color0'}
-      borderRadius={'$5'}
-      $gtLg={{
-        width: isWeb ? 'calc((100% - 24px) / 2)' : '100%',
-      }}
-      $gtXl={{
-        width: isWeb ? 'calc((100% - 48px) / 3)' : '100%',
-      }}
-    >
+    <Section>
       <XStack jc="space-between" ai="center">
-        <H4 fontWeight={'700'} color={cardStatus === 'remove' ? '$error' : '$color12'}>
+        <Paragraph size={'$5'} color={cardStatus === 'remove' ? '$error' : '$color12'}>
           {cardStatus === 'remove' ? 'Remove Passkey?' : cred.display_name}
-        </H4>
+        </Paragraph>
         {cardStatus !== 'remove' && (
           <Button
             chromeless
@@ -242,10 +213,15 @@ const WebAuthnCred = ({
             width={'$size.1.5'}
             onPress={() => setCardStatus(cardStatus === 'default' ? 'settings' : 'default')}
           >
-            {cardStatus === 'default' ? <IconDots color={'$primary'} /> : <IconX />}
+            {cardStatus === 'default' ? (
+              <IconDots color={'$primary'} $theme-light={{ color: '$color12' }} />
+            ) : (
+              <IconX />
+            )}
           </Button>
         )}
       </XStack>
+      <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
 
       {(() => {
         switch (cardStatus) {
@@ -274,15 +250,19 @@ const WebAuthnCred = ({
           default:
             return (
               <>
-                {cred.created_at && (
-                  <CardTextBlock label="Created At" text={formatTimeDate(cred.created_at)} />
-                )}
-
-                {keySlot ? (
-                  <CardTextBlock label="Key Slot" text={keySlot.toString().padStart(2, '0')} />
-                ) : activeIndex !== -1 ? (
-                  <CardTextBlock label="Key Slot" text={activeIndex.toString().padStart(2, '0')} />
-                ) : null}
+                <YStack gap={'$3.5'} $gtLg={{ flexDirection: 'row' }}>
+                  {cred.created_at && (
+                    <CardTextBlock label="Created At" text={formatTimeDate(cred.created_at)} />
+                  )}
+                  {keySlot ? (
+                    <CardTextBlock label="Key Slot" text={keySlot.toString().padStart(2, '0')} />
+                  ) : activeIndex !== -1 ? (
+                    <CardTextBlock
+                      label="Key Slot"
+                      text={activeIndex.toString().padStart(2, '0')}
+                    />
+                  ) : null}
+                </YStack>
 
                 {(() => {
                   switch (true) {
@@ -290,12 +270,7 @@ const WebAuthnCred = ({
                       return <Spinner size="small" />
                     case activeSigningKeysError !== null:
                       return (
-                        <Paragraph
-                          maxWidth={'600'}
-                          fontFamily={'$mono'}
-                          fontSize={'$5'}
-                          color={'$color12'}
-                        >
+                        <Paragraph maxWidth={'600'} fontSize={'$5'} color={'$color12'}>
                           {activeSigningKeysError?.message ??
                             `Something went wrong: ${
                               activeSigningKeysError?.message.split('.').at(0) ??
@@ -311,8 +286,21 @@ const WebAuthnCred = ({
                             text="Passkey is not confirmed onchain. Finish confirming the passkey onchain."
                             warningText
                           />
-                          <Button theme={'green'} color="$primary" variant="outlined" {...link}>
-                            CONFIRM
+                          <Button
+                            theme={'green'}
+                            variant="outlined"
+                            borderColor={'$primary'}
+                            hoverStyle={{ borderColor: '$primary' }}
+                            {...link}
+                          >
+                            <Button.Text
+                              color="$primary"
+                              $theme-light={{
+                                color: '$color12',
+                              }}
+                            >
+                              CONFIRM
+                            </Button.Text>
                           </Button>
                         </YStack>
                       )
@@ -333,7 +321,7 @@ const WebAuthnCred = ({
             )
         }
       })()}
-    </YStack>
+    </Section>
   )
 }
 
@@ -341,20 +329,21 @@ const CardTextBlock = ({
   label,
   text,
   warningText = false,
-}: { label: string; text: string; warningText?: boolean }) => {
+}: {
+  label: string
+  text: string
+  warningText?: boolean
+}) => {
   return (
-    <YStack gap={'$size.0.5'}>
-      <H5
+    <YStack gap={'$2'} flexGrow={1}>
+      <Paragraph
         size={'$5'}
-        ff={'$mono'}
-        color={'$color9'}
-        $theme-light={{ color: '$color10' }}
-        fontWeight={'500'}
-        tt={'uppercase'}
+        color={'$lightGrayTextField'}
+        $theme-light={{ color: '$darkGrayTextField' }}
       >
         {label}
-      </H5>
-      <Paragraph fontWeight={'600'} size={'$5'} color={warningText ? '$error' : 'color12'}>
+      </Paragraph>
+      <Paragraph size={'$5'} color={warningText ? '$error' : 'color12'}>
         {text}
       </Paragraph>
     </YStack>
@@ -538,7 +527,7 @@ const RemovePasskeyConfirmation = ({
             boc: 'transparent',
             borderRadius: '$4',
             color: '$color11',
-            ff: '$mono',
+            bc: '$color0',
             autoFocus: true,
           },
         }}
@@ -548,18 +537,23 @@ const RemovePasskeyConfirmation = ({
           <XStack gap="$size.1" jc="space-between" w={'100%'} pt={'$size.0.9'}>
             <Button
               borderColor={'$primary'}
-              color={'$primary'}
               variant="outlined"
               flex={1}
               hoverStyle={{ borderColor: '$primary' }}
               onPress={onCancel}
             >
-              CANCEL
+              <Button.Text
+                color="$primary"
+                $theme-light={{
+                  color: '$color12',
+                }}
+              >
+                CANCEL
+              </Button.Text>
             </Button>
             <SubmitButton
               testID={'RemovePasskeyButton'}
               theme={'red'}
-              color={'$error'}
               variant="outlined"
               flex={1}
               hoverStyle={{ borderColor: '$error' }}
@@ -567,21 +561,27 @@ const RemovePasskeyConfirmation = ({
               onPress={submit}
               {...(isLoading || displayName !== inputVal ? { disabled: true } : {})}
             >
-              REMOVE
+              <Button.Text
+                color={'$error'}
+                $theme-light={{
+                  color: '$color12',
+                }}
+              >
+                REMOVE
+              </Button.Text>
             </SubmitButton>
           </XStack>
         )}
       >
         {({ name: nameCheck }) => (
           <YStack gap={'$size.3.5'}>
-            <Text fontWeight={'400'} fontSize={'$5'} color="$color12" fontFamily={'$mono'}>
+            <Text fontWeight={'400'} fontSize={'$5'} color="$color12">
               Removing &quot;{displayName}&quot; as a signer on your Send account.{' '}
               <Text
                 fontWeight={'400'}
                 fontSize={'$5'}
                 $theme-dark={{ color: '$warning' }}
-                $theme-light={{ color: '$yellow300' }}
-                fontFamily={'$mono'}
+                $theme-light={{ color: '$networkBnb' }}
               >
                 This cannot be undone.
               </Text>
@@ -593,7 +593,6 @@ const RemovePasskeyConfirmation = ({
                 fontSize={'$5'}
                 $theme-dark={{ color: '$white' }}
                 $theme-light={{ color: '$black' }}
-                fontFamily={'$mono'}
               >
                 Please enter &quot;{displayName}&quot; below
               </Text>
@@ -605,7 +604,7 @@ const RemovePasskeyConfirmation = ({
                   size={'$6'}
                   fontWeight={'300'}
                   $theme-dark={{ color: '$warning' }}
-                  $theme-light={{ color: '$yellow300' }}
+                  $theme-light={{ color: '$networkBnb' }}
                 >
                   {form.formState.errors?.root?.message}
                 </Paragraph>
@@ -676,7 +675,7 @@ const UpdateKeySlotButton = ({
   const isDisabled = isSuccess || isPending
   return (
     <>
-      <Paragraph fontWeight={'300'} color={'$yellowVibrant'} fontFamily={'$mono'}>
+      <Paragraph fontWeight={'300'} color={'$yellowVibrant'}>
         Onchain Slot, {onchainSlot}, does not match Webauthn Slot {sendAcctCred?.key_slot ?? 'N/A'}.
         This should never happen. Please update the key slot below.
       </Paragraph>
