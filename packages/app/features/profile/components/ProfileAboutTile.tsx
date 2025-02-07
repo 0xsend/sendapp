@@ -80,11 +80,21 @@ export const ProfileAboutTile = ({
                 gap={'$3'}
               >
                 <Paragraph size={'$9'} $theme-light={{ color: '$white' }}>
-                  {profile.name || (profile.all_tags?.[0] ? `/${profile.all_tags[0]}` : '??')}
+                  {profile?.name || (profile?.main_tag_name ? `/${profile?.main_tag_name}` : '??')}
                 </Paragraph>
                 <XStack flexWrap="wrap" columnGap={'$2.5'} rowGap={'$2'}>
-                  {profile.all_tags?.map((tag: string) => (
-                    <XStack key={tag} bg={'$gray3Dark'} px={'$2.5'} py={'$1'} borderRadius={'$2'}>
+                  {profile?.all_tags?.map((tag: string) => (
+                    <XStack
+                      key={tag}
+                      bg={'$gray3Dark'}
+                      px={'$2.5'}
+                      py={'$1'}
+                      borderRadius={'$2'}
+                      {...(tag === profile?.main_tag_name && {
+                        borderWidth: 1,
+                        borderColor: '$primary',
+                      })}
+                    >
                       <Paragraph
                         size={'$2'}
                         $theme-light={{ color: '$white' }}

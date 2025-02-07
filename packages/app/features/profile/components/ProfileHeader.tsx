@@ -63,6 +63,8 @@ export const ProfileHeader = ({
                 return shorten(recipient, 5, 4)
               case !!profile?.name:
                 return profile?.name
+              case !!profile?.main_tag_name:
+                return `/${profile.main_tag_name}`
               case !!profile?.all_tags?.[0]:
                 return `/${profile.all_tags[0]}`
               case !!profile?.sendid:
