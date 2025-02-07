@@ -1,5 +1,6 @@
 import { Button, Text, XStack, YStack } from '@my/ui'
 import { Wallet, Banknote } from '@tamagui/lucide-icons'
+import { ApplePayIcon } from './ApplePayIcon'
 
 interface DepositOptionButtonProps {
   option: 'crypto' | 'card' | 'apple'
@@ -42,6 +43,8 @@ export function DepositOptionButton({
         <XStack ai="center" gap="$3">
           {option === 'crypto' ? (
             <Wallet size={24} color={isSelected ? '#16a34a' : '#888'} />
+          ) : option === 'apple' ? (
+            <ApplePayIcon size={24} color={isSelected ? '#16a34a' : '#888'} />
           ) : (
             <Banknote size={24} color={isSelected ? '#16a34a' : '#888'} />
           )}

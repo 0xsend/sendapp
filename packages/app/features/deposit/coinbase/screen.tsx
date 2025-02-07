@@ -6,11 +6,17 @@ import { YStack, Text, Button, Spinner } from '@my/ui'
 
 const COINBASE_APP_ID = process.env.NEXT_PUBLIC_CDP_APP_ID ?? ''
 
-export function DepositCoinbaseScreen() {
+interface DepositCoinbaseScreenProps {
+  defaultPaymentMethod?: 'APPLE_PAY' | 'CARD'
+}
+
+export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseScreenProps) {
   const { data: sendAccount } = useSendAccount()
   const { openOnramp, closeOnramp, status, error, isLoading } = useCoinbaseOnramp({
     projectId: COINBASE_APP_ID,
     address: sendAccount?.address ?? '',
+    partnerUserId: sendAccount?.user_id ?? '',
+    defaultPaymentMethod,
   })
 
   const handleConfirmTransaction = (amount: number) => {

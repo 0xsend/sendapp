@@ -9,9 +9,9 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Card Deposit</title>
+        <title>Send | Apple Pay Deposit</title>
       </Head>
-      <DepositCoinbaseScreen defaultPaymentMethod="CARD" />
+      <DepositCoinbaseScreen defaultPaymentMethod="APPLE_PAY" />
     </>
   )
 }

@@ -7,13 +7,20 @@ type OnrampStatus = 'idle' | 'pending' | 'success' | 'failed'
 interface OnrampConfig {
   projectId: string
   address: string
+  partnerUserId: string
+  defaultPaymentMethod?: 'APPLE_PAY' | 'CARD'
 }
 
 interface OnrampParams {
   amount: number
 }
 
-export function useCoinbaseOnramp({ projectId, address }: OnrampConfig) {
+export function useCoinbaseOnramp({
+  projectId,
+  address,
+  partnerUserId,
+  defaultPaymentMethod = 'CARD',
+}: OnrampConfig) {
   const [popup, setPopup] = useState<Window | null>(null)
   const [popupChecker, setPopupChecker] = useState<NodeJS.Timeout | null>(null)
 
@@ -33,8 +40,10 @@ export function useCoinbaseOnramp({ projectId, address }: OnrampConfig) {
       const onrampUrl = getOnrampBuyUrl({
         projectId,
         addresses: {
-          [address]: ['base'],
+          '0xCF6D79F936f50B6a8257733047308664151B2510': ['base'],
         },
+        partnerUserId,
+        defaultPaymentMethod,
         assets: ['USDC'],
         presetFiatAmount: amount,
         fiatCurrency: 'USD',
