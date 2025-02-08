@@ -52,6 +52,7 @@ function CopyAddressDialog({ isOpen, onClose, onConfirm }) {
               </a>
             </Paragraph>
 
+            {/* TODO: make these tokens dynamic from the supported coins list */}
             <Paragraph>
               2. I have double checked that the tokens USDC, SEND, ETH, or SPX are on Base Network.
             </Paragraph>
