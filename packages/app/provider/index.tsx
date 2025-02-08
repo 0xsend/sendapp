@@ -9,7 +9,7 @@ import { ToastProvider } from './toast'
 import { WagmiProvider } from './wagmi'
 import { ScrollDirectionProvider } from './scroll'
 import { CoinsProvider } from './coins'
-
+import { OnchainKitProvider } from './onchainkit'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 export function Provider({
@@ -43,6 +43,7 @@ const compose = (providers: React.FC<{ children: React.ReactNode }>[]) =>
 
 const Providers = compose([
   WagmiProvider,
+  OnchainKitProvider,
   QueryClientProvider,
   UniversalThemeProvider,
   SafeAreaProvider,

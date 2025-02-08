@@ -43,13 +43,12 @@ const MobileButtonRow = ({
   isLoading,
   isVisible,
 }: { children: React.ReactElement; isLoading: boolean; isVisible: boolean } & XStackProps) => {
-  const isPwa = usePwa()
   const media = useMedia()
 
   return (
     <Stack
       w={'100%'}
-      pb={isPwa ? '$1' : '$5'}
+      pb={'$3'}
       px="$4"
       $platform-web={{
         position: 'fixed',
