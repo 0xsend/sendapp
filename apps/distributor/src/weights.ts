@@ -1,3 +1,5 @@
+import { parseUnits } from 'viem'
+
 type WeightedShare = { address: `0x${string}`; amount: bigint }
 
 export enum Mode {
@@ -23,7 +25,7 @@ export function calculateWeights(
     address: `0x${string}`
     balance: string
   }[],
-  timeAdjustedAmount: bigint,
+  poolAmount: bigint,
   mode: Mode = Mode.Linear
 ): Record<string, WeightedShare> {
   const poolWeights: Record<`0x${string}`, bigint> = {}
@@ -48,7 +50,7 @@ export function calculateWeights(
   for (const { address } of balances) {
     const poolWeight = poolWeights[address] ?? 0n
 
-    const amount = (poolWeight * timeAdjustedAmount) / totalWeight
+    const amount = (poolWeight * poolAmount) / totalWeight
 
     if (amount > 0n) {
       weightedShares[address] = {
@@ -58,22 +60,23 @@ export function calculateWeights(
     }
   }
 
-  handleRoundingErrors(weightedShares, timeAdjustedAmount)
+  handleRoundingErrors(weightedShares, poolAmount)
 
   return weightedShares
 }
 
 // Helper function to handle rounding errors
 function handleRoundingErrors(shares: Record<string, WeightedShare>, targetAmount: bigint) {
-  let totalDistributed = 0n
-  for (const share of Object.values(shares)) {
-    totalDistributed += share.amount
-  }
+  const totalDistributed = Object.values(shares).reduce((a, b) => a + b.amount, 0n)
+  const largestShare = Object.values(shares).reduce((a, b) => (a.amount > b.amount ? a : b))
+  const difference = targetAmount - totalDistributed
+  const oneSend = parseUnits('1', 18)
 
   if (totalDistributed > targetAmount) {
-    const difference = targetAmount - totalDistributed
-    const largestShare = Object.values(shares).reduce((a, b) => (a.amount > b.amount ? a : b))
     largestShare.amount += difference
+  }
+  if (totalDistributed < targetAmount && difference < oneSend) {
+    largestShare.amount -= difference
   }
 }
 
