@@ -42,7 +42,6 @@ import { useTokenPrices } from 'app/utils/useTokenPrices'
 const log = debug('app:features:send:confirm:screen')
 import { api } from 'app/utils/api'
 import { signUserOp } from 'app/utils/signUserOp'
-import { getUserOperationHash } from 'permissionless/utils'
 
 export function SendConfirmScreen() {
   const [queryParams] = useSendScreenParams()
@@ -206,13 +205,7 @@ export function SendConfirm() {
       })
       userOp.signature = signature
 
-      const userOpHash = getUserOperationHash({
-        userOperation: userOp,
-        entryPoint,
-        chainId,
-      })
-
-      const workflowId = await transfer({ userOpHash })
+      const workflowId = await transfer({ userOp })
       setWorkflowId(workflowId)
       if (selectedCoin?.token === 'eth') {
         await ethQuery.refetch()
