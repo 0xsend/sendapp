@@ -5,6 +5,7 @@ import {
   insertTemporalTokenSendAccountTransfer,
   updateTemporalSendAccountTransfer,
   insertTemporalEthSendAccountTransfer,
+  deleteTemporalTransferFromActivityTable,
 } from './supabase'
 import { simulateUserOperation, sendUserOperation, waitForTransactionReceipt } from './wagmi'
 import type { UserOperation } from 'permissionless'
@@ -76,7 +77,7 @@ export const createTransferActivities = (env: Record<string, string | undefined>
         return hash
       } catch (error) {
         log.error('Error sending user operation', { error })
-        throw ApplicationFailure.retryable('Error sending user operation', error.code)
+        throw ApplicationFailure.nonRetryable('Error sending user operation', error.code)
       }
     },
     async updateTemporalTransferSentStatusActivity(workflowId: string, hash: `0x${string}`) {
@@ -108,14 +109,13 @@ export const createTransferActivities = (env: Record<string, string | undefined>
         }
         log.info('waitForTransactionReceiptActivity', { tx_hash: res.receipt.transactionHash })
         const { receipt } = res
+
         await updateTemporalSendAccountTransfer({
           workflow_id: workflowId,
           status: 'confirmed',
           data: {
             tx_hash: receipt.transactionHash,
             block_num: receipt.blockNumber.toString(),
-            tx_idx: receipt.transactionIndex.toString(),
-            // log_idx: logs[0].logIndex.toString(), -- Need to look into how to get this
           },
         })
         return receipt
@@ -152,6 +152,19 @@ export const createTransferActivities = (env: Record<string, string | undefined>
       }
       log.info('isTransferIndexedActivity', { isIndexed })
       return isIndexed
+    },
+    async deleteTemporalTransferActivity(workflowId: string) {
+      const { error } = await deleteTemporalTransferFromActivityTable(workflowId)
+      if (error) {
+        throw ApplicationFailure.retryable(
+          'Error deleting temporal_tranfer entry in activity',
+          error.code,
+          {
+            error,
+            workflowId,
+          }
+        )
+      }
     },
   }
 }

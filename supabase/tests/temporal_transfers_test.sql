@@ -1,5 +1,5 @@
 BEGIN;
-SELECT plan(6);
+SELECT plan(7);
 
 -- Create the necessary extensions
 CREATE EXTENSION "basejump-supabase_test_helpers";
@@ -98,8 +98,7 @@ SELECT temporal.update_temporal_send_account_transfer(
         'user_op_hash', '\x1234'::bytea,
         'tx_hash', '\x5678'::bytea,
         'block_num', '123',
-        'tx_idx', '1',
-        'log_idx', '0'
+        'tx_idx', '1'
     )::jsonb
 );
 
@@ -110,8 +109,7 @@ SELECT results_eq(
         (data->>'user_op_hash')::bytea,
         (data->>'tx_hash')::bytea,
         data->>'block_num',
-        data->>'tx_idx',
-        data->>'log_idx'
+        data->>'tx_idx'
     FROM temporal.send_account_transfers
     WHERE workflow_id = 'test-workflow-1'
     $$,
@@ -121,8 +119,7 @@ SELECT results_eq(
         '\x1234'::bytea,
         '\x5678'::bytea,
         '123'::text,
-        '1'::text,
-        '0'::text
+        '1'::text
     )
     $$,
     'Test transfer update'
@@ -143,7 +140,7 @@ SELECT results_eq(
     $$,
     $$
     VALUES (
-        'temporal_send_account_transfer'::text,
+        'temporal_send_account_transfers'::text,
         tests.get_supabase_uid('test_user_from'),
         tests.get_supabase_uid('test_user_to'),
         '\x1234567890ABCDEF1234567890ABCDEF12345678'::bytea,
@@ -168,7 +165,7 @@ SELECT results_eq(
     $$,
     $$
     VALUES (
-        'temporal_send_account_transfer'::text,
+        'temporal_send_account_transfers'::text,
         tests.get_supabase_uid('test_user_from'),
         NULL::uuid,
         '\x1234567890ABCDEF1234567890ABCDEF12345678'::bytea,
@@ -196,6 +193,18 @@ SELECT results_eq(
     )
     $$,
     'Test activity update'
+);
+
+SELECT temporal.delete_temporal_transfer_activity('test-workflow-1');
+
+SELECT is_empty(
+    $$
+    SELECT *
+    FROM activity
+    WHERE event_name = 'temporal_send_account_transfers'
+    AND event_id = 'test-workflow-1'
+    $$,
+    'Test temporal transfer activity was deleted'
 );
 
 SELECT * FROM finish();

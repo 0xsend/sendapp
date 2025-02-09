@@ -25,8 +25,8 @@ CREATE TABLE temporal.send_account_transfers(
     user_id uuid NOT NULL,
     status temporal.transfer_status NOT NULL,
     data jsonb NOT NULL,
-    created_at timestamp with time zone DEFAULT NOW(),
-    updated_at timestamp with time zone DEFAULT NOW()
+    created_at timestamptz DEFAULT (NOW() AT TIME ZONE 'UTC'),
+    updated_at timestamptz DEFAULT (NOW() AT TIME ZONE 'UTC')
 );
 
 alter table "temporal"."send_account_transfers"
@@ -76,7 +76,7 @@ BEGIN
     json_build_object(
       'f', f,
       't', t,
-      'v', v,
+      'v', v::text,
       'log_addr', log_addr
     )
   );
@@ -114,7 +114,7 @@ BEGIN
     json_build_object(
       'log_addr', log_addr,
       'sender', sender,
-      'value', value
+      'value', value::text
     )
   );
 END;
@@ -135,11 +135,10 @@ BEGIN
   -- Only construct _data if input data is not null
   IF data IS NOT NULL THEN
     _data := json_build_object(
-      'user_op_hash', (data->>'user_op_hash')::bytea,
-      'tx_hash', (data->>'tx_hash')::bytea,
-      'block_num', data->>'block_num',
-      'tx_idx', data->>'tx_idx',
-      'log_idx', data->>'log_idx'
+      'user_op_hash', (data->>'user_op_hash'),
+      'tx_hash', (data->>'tx_hash'),
+      'block_num', data->>'block_num'::text,
+      'tx_idx', data->>'tx_idx'::text
     );
   ELSE
     _data := '{}'::jsonb;
@@ -152,7 +151,7 @@ BEGIN
       WHEN _data = '{}'::jsonb THEN temporal.send_account_transfers.data
       ELSE temporal.send_account_transfers.data || _data
     END,
-    updated_at = NOW()
+    updated_at = (NOW() AT TIME ZONE 'UTC')
   WHERE
     temporal.send_account_transfers.workflow_id = update_temporal_send_account_transfer.workflow_id;
 END;
@@ -185,21 +184,20 @@ BEGIN
     created_at
   )
   VALUES (
-    'temporal_send_account_transfer',
+    'temporal_send_account_transfers',
     NEW.workflow_id,
     _f_user_id,
     _t_user_id,
     json_build_object(
       'status', NEW.status,
-      'user_op_hash', (NEW.data->>'user_op_hash')::bytea,
-      'log_addr', (NEW.data->>'log_addr')::bytea,
-      'f', (NEW.data->>'f')::bytea,
-      't', (NEW.data->>'t')::bytea,
-      'v', NEW.data->>'v',
-      'tx_hash', (NEW.data->>'tx_hash')::bytea,
-      'block_num', NEW.data->>'block_num',
-      'tx_idx', NEW.data->>'tx_idx',
-      'log_idx', NEW.data->>'log_idx'
+      'user_op_hash', (NEW.data->>'user_op_hash'),
+      'log_addr', (NEW.data->>'log_addr'),
+      'f', (NEW.data->>'f'),
+      't', (NEW.data->>'t'),
+      'v', NEW.data->>'v'::text,
+      'tx_hash', (NEW.data->>'tx_hash'),
+      'block_num', NEW.data->>'block_num'::text,
+      'tx_idx', NEW.data->>'tx_idx'::text
     ),
     NEW.created_at
   );
@@ -234,20 +232,19 @@ BEGIN
     created_at
   )
   VALUES (
-    'temporal_send_account_transfer',
+    'temporal_send_account_transfers',
     NEW.workflow_id,
     _from_user_id,
     _to_user_id,
     json_build_object(
       'status', NEW.status,
-      'user_op_hash', (NEW.data->>'user_op_hash')::bytea,
-      'log_addr', (NEW.data->>'log_addr')::bytea,
-      'sender', (NEW.data->>'sender')::bytea,
-      'value', NEW.data->>'value',
-      'tx_hash', (NEW.data->>'tx_hash')::bytea,
-      'block_num', NEW.data->>'block_num',
-      'tx_idx', NEW.data->>'tx_idx',
-      'log_idx', NEW.data->>'log_idx'
+      'user_op_hash', (NEW.data->>'user_op_hash'),
+      'log_addr', (NEW.data->>'log_addr'),
+      'sender', (NEW.data->>'sender'),
+      'value', NEW.data->>'value'::text,
+      'tx_hash', (NEW.data->>'tx_hash'),
+      'block_num', NEW.data->>'block_num'::text,
+      'tx_idx', NEW.data->>'tx_idx'::text
     ),
     NEW.created_at
   );
@@ -276,7 +273,7 @@ CREATE OR REPLACE FUNCTION temporal.temporal_send_account_transfers_trigger_upda
 BEGIN
   UPDATE activity
   SET data = NEW.data
-  WHERE event_name = 'temporal_send_account_transfer'
+  WHERE event_name = 'temporal_send_account_transfers'
     AND event_id = NEW.workflow_id;
   RETURN NEW;
 END;
@@ -286,3 +283,15 @@ CREATE TRIGGER temporal_send_account_transfers_trigger_update_activity
   AFTER UPDATE ON temporal.send_account_transfers
   FOR EACH ROW
   EXECUTE FUNCTION temporal.temporal_send_account_transfers_trigger_update_activity();
+
+CREATE OR REPLACE FUNCTION temporal.delete_temporal_transfer_activity(workflow_id text)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+    DELETE FROM activity
+    WHERE event_name = 'temporal_send_account_transfers'
+      AND event_id = workflow_id;
+END;
+$$;
