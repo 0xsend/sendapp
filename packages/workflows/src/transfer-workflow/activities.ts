@@ -6,12 +6,7 @@ import {
   updateTemporalSendAccountTransfer,
   insertTemporalEthSendAccountTransfer,
 } from './supabase'
-import {
-  simulateUserOperation,
-  sendUserOperation,
-  waitForTransactionReceipt,
-  getUserOperationByHash,
-} from './wagmi'
+import { simulateUserOperation, sendUserOperation, waitForTransactionReceipt } from './wagmi'
 import type { UserOperation } from 'permissionless'
 import { bootstrap } from '@my/workflows/utils'
 import { decodeTransferUserOp } from 'app/utils/decodeTransferUserOp'
@@ -22,14 +17,7 @@ export const createTransferActivities = (env: Record<string, string | undefined>
   bootstrap(env)
 
   return {
-    async initializeTransferActivity(workflowId: string, userOpHash: `0x${string}`) {
-      const userOpData = await getUserOperationByHash(userOpHash)
-      if (!userOpData) {
-        throw ApplicationFailure.nonRetryable('User Operation hash is not a valid user op')
-      }
-
-      const userOp = userOpData.userOperation
-
+    async initializeTransferActivity(workflowId: string, userOp: UserOperation<'v0.7'>) {
       const { from, to, token, amount } = decodeTransferUserOp({ userOp })
       if (!from || !to || !amount || !token) {
         throw ApplicationFailure.nonRetryable('User Operation is not a valid transfer')
@@ -54,7 +42,6 @@ export const createTransferActivities = (env: Record<string, string | undefined>
         token === 'eth'
           ? await insertTemporalEthSendAccountTransfer({
               workflow_id: workflowId,
-              user_op_hash: userOpHash,
               status: 'initialized',
               sender: fromBytea,
               value: amount,
@@ -62,7 +49,6 @@ export const createTransferActivities = (env: Record<string, string | undefined>
             })
           : await insertTemporalTokenSendAccountTransfer({
               workflow_id: workflowId,
-              user_op_hash: userOpHash,
               status: 'initialized',
               f: fromBytea,
               t: toBytea,
@@ -71,8 +57,8 @@ export const createTransferActivities = (env: Record<string, string | undefined>
             })
 
       if (error) {
-        throw ApplicationFailure.retryable(
-          'Error inserting transfer into temporal_send_account_transfers',
+        throw ApplicationFailure.nonRetryable(
+          'Error inserting transfer into temporal.send_account_transfers',
           error.code,
           {
             error,
@@ -81,7 +67,7 @@ export const createTransferActivities = (env: Record<string, string | undefined>
         )
       }
 
-      return { userOp, from, to, amount, token }
+      return { from, to, amount, token }
     },
     async sendUserOpActivity(userOp: UserOperation<'v0.7'>) {
       try {
@@ -89,13 +75,15 @@ export const createTransferActivities = (env: Record<string, string | undefined>
         log.info('UserOperation sent successfully', { hash })
         return hash
       } catch (error) {
-        throw ApplicationFailure.retryable('Error sending user operation', error.code, error)
+        log.error('Error sending user operation', { error })
+        throw ApplicationFailure.retryable('Error sending user operation', error.code)
       }
     },
-    async updateTemporalTransferSentStatusActivity(workflowId: string) {
+    async updateTemporalTransferSentStatusActivity(workflowId: string, hash: `0x${string}`) {
       const { error } = await updateTemporalSendAccountTransfer({
         workflow_id: workflowId,
         status: 'sent',
+        data: { user_op_hash: hash },
       })
       if (error) {
         throw ApplicationFailure.retryable(
@@ -107,7 +95,7 @@ export const createTransferActivities = (env: Record<string, string | undefined>
           }
         )
       }
-      return
+      return null
     },
     async waitForTransactionReceiptActivity(workflowId: string, hash: `0x${string}`) {
       try {

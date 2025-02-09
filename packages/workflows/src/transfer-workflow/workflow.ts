@@ -1,5 +1,6 @@
 import { proxyActivities, workflowInfo } from '@temporalio/workflow'
 import type { createTransferActivities } from './activities'
+import type { UserOperation } from 'permissionless'
 
 import debug from 'debug'
 
@@ -16,16 +17,16 @@ const {
   startToCloseTimeout: '45 seconds',
 })
 
-export async function TransferWorkflow(userOpHash: `0x${string}`) {
+export async function TransferWorkflow(userOp: UserOperation<'v0.7'>) {
   const workflowId = workflowInfo().workflowId
-  log('SendTransferWorkflow started with hash:', userOpHash)
-  const { userOp, token } = await initializeTransferActivity(workflowId, userOpHash)
+  log('SendTransferWorkflow started with userOp:', workflowId)
+  const { token } = await initializeTransferActivity(workflowId, userOp)
   log('Sending UserOperation')
   const hash = await sendUserOpActivity(userOp)
   log('UserOperation sent, hash:', hash)
-  await updateTemporalTransferSentStatusActivity(workflowId)
+  await updateTemporalTransferSentStatusActivity(workflowId, hash)
   const receipt = await waitForTransactionReceiptActivity(workflowId, hash)
-  log('Receipt received:', { tx_hash: receipt.transactionHash, user_op_hash: userOpHash })
+  log('Receipt received:', { tx_hash: receipt.transactionHash })
   const transfer = await isTransferIndexedActivity(workflowId, receipt.transactionHash, token)
   log('Transfer indexed')
   return transfer

@@ -1,11 +1,10 @@
-import type { Database, Json } from '@my/supabase/database-generated.types'
+import type { Database } from '@my/supabase/database-generated.types'
 import { log } from '@temporalio/activity'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 
 export async function insertTemporalTokenSendAccountTransfer({
   workflow_id,
-  user_op_hash,
   status,
   f,
   t,
@@ -13,16 +12,14 @@ export async function insertTemporalTokenSendAccountTransfer({
   log_addr,
 }: {
   workflow_id: string
-  user_op_hash: string
-  status: Database['public']['Enums']['temporal_transfer_status']
+  status: Database['temporal']['Enums']['transfer_status']
   f: `\\x${string}`
   t: `\\x${string}`
   v: bigint
   log_addr: `\\x${string}`
 }) {
-  return await supabaseAdmin.rpc('insert_temporal_token_send_account_transfer', {
+  return await supabaseAdmin.schema('temporal').rpc('insert_temporal_token_send_account_transfer', {
     workflow_id,
-    user_op_hash,
     status,
     f,
     t,
@@ -33,22 +30,19 @@ export async function insertTemporalTokenSendAccountTransfer({
 
 export async function insertTemporalEthSendAccountTransfer({
   workflow_id,
-  user_op_hash,
   status,
   sender,
   log_addr,
   value,
 }: {
   workflow_id: string
-  user_op_hash: string
-  status: Database['public']['Enums']['temporal_transfer_status']
+  status: Database['temporal']['Enums']['transfer_status']
   sender: `\\x${string}`
   log_addr: `\\x${string}`
   value: bigint
 }) {
-  return await supabaseAdmin.rpc('insert_temporal_eth_send_account_transfer', {
+  return await supabaseAdmin.schema('temporal').rpc('insert_temporal_eth_send_account_transfer', {
     workflow_id,
-    user_op_hash,
     status,
     sender,
     log_addr,
@@ -62,10 +56,10 @@ export async function updateTemporalSendAccountTransfer({
   data,
 }: {
   workflow_id: string
-  status: Database['public']['Enums']['temporal_transfer_status']
-  data?: Json
+  status: Database['temporal']['Enums']['transfer_status']
+  data?: Database['temporal']['Tables']['send_account_transfers']['Row']['data']
 }) {
-  return await supabaseAdmin.rpc('update_temporal_send_account_transfer', {
+  return await supabaseAdmin.schema('temporal').rpc('update_temporal_send_account_transfer', {
     workflow_id,
     status,
     data,
