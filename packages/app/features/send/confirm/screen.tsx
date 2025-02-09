@@ -78,14 +78,6 @@ export function SendConfirm() {
 
   const { mutateAsync: transfer } = api.temporal.transfer.useMutation()
 
-  const [workflowId, setWorkflowId] = useState<string | undefined>()
-
-  useEffect(() => {
-    if (workflowId) {
-      router.replace({ pathname: '/', query: { token: sendToken } })
-    }
-  }, [workflowId, router, sendToken])
-
   const queryClient = useQueryClient()
   const isUSDCSelected = selectedCoin?.label === 'USDC'
   const { coin: usdc } = useCoin('USDC')
@@ -205,13 +197,21 @@ export function SendConfirm() {
       })
       userOp.signature = signature
 
-      const workflowId = await transfer({ userOp })
-      setWorkflowId(workflowId)
+      await transfer({ userOp })
+
+      // Invalidate token activity feed before navigation
+      await queryClient.invalidateQueries({
+        queryKey: ['token_activity_feed', selectedCoin?.token],
+      })
+
       if (selectedCoin?.token === 'eth') {
         await ethQuery.refetch()
       } else {
         await tokensQuery.refetch()
       }
+
+      // Navigate after invalidating
+      router.replace({ pathname: '/', query: { token: sendToken } })
     } catch (e) {
       console.error(e)
       setError(e)
@@ -367,7 +367,7 @@ export function SendConfirm() {
         onPress={onSubmit}
         br={'$4'}
         disabledStyle={{ opacity: 0.7, cursor: 'not-allowed', pointerEvents: 'none' }}
-        disabled={!canSubmit || !!workflowId}
+        disabled={!canSubmit}
         gap={4}
         py={'$5'}
         width={'100%'}

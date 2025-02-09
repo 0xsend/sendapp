@@ -34,10 +34,16 @@ export function useTokenActivityFeed(params: {
     const to = (pageParam + 1) * pageSize - 1
     let query = supabase.from('activity_feed').select('*')
 
+    // First, handle event_name conditions
     if (address) {
-      query = query.eq('event_name', Events.SendAccountTransfers).eq('data->>log_addr', address)
+      query = query
+        .in('event_name', [Events.SendAccountTransfers, Events.TemporalSendAccountTransfers])
+        .eq('data->>log_addr', address)
     } else {
-      query = query.eq('event_name', Events.SendAccountReceive)
+      query = query.in('event_name', [
+        Events.SendAccountReceive,
+        Events.TemporalSendAccountTransfers,
+      ])
     }
 
     const paymasterAddresses = Object.values(tokenPaymasterAddress)
@@ -53,15 +59,16 @@ export function useTokenActivityFeed(params: {
       .or('from_user.not.is.null, to_user.not.is.null') // only show activities with a send app user
       .or(
         squish(`
-          data->t.is.null,
-          data->f.is.null,
-          and(
-            data->>t.not.in.(${toTransferIgnoreValues}),
-            data->>f.not.in.(${fromTransferIgnoreValues})
-          )`)
+        data->t.is.null,
+        data->f.is.null,
+        and(
+          data->>t.not.in.(${toTransferIgnoreValues}),
+          data->>f.not.in.(${fromTransferIgnoreValues})
+        )`)
       )
       .order('created_at', { ascending: false })
       .range(from, to)
+
     throwIf(error)
     return EventArraySchema.parse(data)
   }

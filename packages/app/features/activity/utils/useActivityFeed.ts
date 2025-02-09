@@ -53,6 +53,7 @@ export function useActivityFeed({
       .order('created_at', { ascending: false })
       .range(from, to)
     const { data, error } = await request
+    console.log('data: ', data)
     throwIf(error)
     return EventArraySchema.parse(data)
   }
