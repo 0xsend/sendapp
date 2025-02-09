@@ -12,6 +12,7 @@ const {
   updateTemporalTransferSentStatusActivity,
   waitForTransactionReceiptActivity,
   isTransferIndexedActivity,
+  deleteTemporalTransferActivity,
 } = proxyActivities<ReturnType<typeof createTransferActivities>>({
   // TODO: make this configurable
   startToCloseTimeout: '45 seconds',
@@ -29,5 +30,6 @@ export async function TransferWorkflow(userOp: UserOperation<'v0.7'>) {
   log('Receipt received:', { tx_hash: receipt.transactionHash })
   const transfer = await isTransferIndexedActivity(workflowId, receipt.transactionHash, token)
   log('Transfer indexed')
+  await deleteTemporalTransferActivity(workflowId)
   return transfer
 }
