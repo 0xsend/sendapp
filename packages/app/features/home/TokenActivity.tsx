@@ -27,6 +27,7 @@ export const TokenActivity = ({ coin }: { coin: CoinWithBalance }) => {
   })
 
   const { data, isLoading, error } = tokenActivityFeedQuery
+  console.log('data: ', data)
 
   const { pages } = data ?? {}
 

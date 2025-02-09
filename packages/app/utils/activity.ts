@@ -17,6 +17,12 @@ import {
 import { isSendAccountReceiveEvent } from './zod/activity/SendAccountReceiveEventSchema'
 import { isSendTokenUpgradeEvent } from './zod/activity/SendAccountTransfersEventSchema'
 import { sendCoin, sendV0Coin } from 'app/data/coins'
+import {
+  isTemporalEthTransfers,
+  isTemporalTokenTransfers,
+  isTemporalTransfersEvent,
+  temporalEventNameFromStatus,
+} from './zod/activity/TemporalTransfersEventSchema'
 
 const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
   Object.values(addresses).map((a) => [a, label])
@@ -38,6 +44,7 @@ const labelAddress = (address: `0x${string}`): string =>
  *   if sent, the counterpart is the user who received the token.
  * If the activity is a tag receipt, the actor is the user who created the tag.
  * If the activity is a referral, the actor is the user who referred the user.
+ * If the activity is a temporal transfer, the actor is the user who sent the token.
  */
 export function counterpart(activity: Activity): Activity['from_user'] | Activity['to_user'] {
   const { from_user, to_user } = activity
@@ -60,6 +67,9 @@ export function counterpart(activity: Activity): Activity['from_user'] | Activit
       return from_user
     }
   }
+  if (isTemporalTransfersEvent(activity)) {
+    return to_user
+  }
   return null // not a send or receive event
 }
 
@@ -67,7 +77,35 @@ export function counterpart(activity: Activity): Activity['from_user'] | Activit
  * Returns the amount of the activity if there is one.
  */
 export function amountFromActivity(activity: Activity): string {
+  console.log('activity: ', activity)
   switch (true) {
+    case isTemporalTransfersEvent(activity): {
+      const { data } = activity
+
+      if (isTemporalTokenTransfers(activity)) {
+        if (data.coin) {
+          const amount = formatAmount(
+            formatUnits(data.v, data.coin.decimals),
+            5,
+            data.coin.formatDecimals
+          )
+          return `${amount} ${data.coin.symbol}`
+        }
+        return formatAmount(`${data.v}`, 5, 0)
+      }
+      if (isTemporalEthTransfers(activity)) {
+        if (data.coin) {
+          const amount = formatAmount(
+            formatUnits(data.value, data.coin.decimals),
+            5,
+            data.coin.formatDecimals
+          )
+          return `${amount} ${data.coin.symbol}`
+        }
+        return formatAmount(`${data.value}`, 5, 0)
+      }
+      return ''
+    }
     case isSendAccountTransfersEvent(activity): {
       const { v, coin } = activity.data
       if (coin) {
@@ -148,6 +186,8 @@ export function eventNameFromActivity(activity: Activity) {
   const isETHReceive = isSendAccountReceiveEvent(activity)
   const isTransferOrReceive = isERC20Transfer || isETHReceive
   switch (true) {
+    case isTemporalTransfersEvent(activity):
+      return temporalEventNameFromStatus(data.status)
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Referral Reward'
     case isSendTokenUpgradeEvent(activity):
@@ -166,6 +206,7 @@ export function eventNameFromActivity(activity: Activity) {
       return 'Referral'
     case isReferralsEvent(activity) && !!to_user?.id:
       return 'Referred By'
+
     default:
       return event_name // catch-all i_am_rick_james -> I Am Rick James
         .split('_')
@@ -184,8 +225,11 @@ export function phraseFromActivity(activity: Activity) {
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
   const isTransferOrReceive = isERC20Transfer || isETHReceive
+  const isTemporalTransfers = isTemporalTransfersEvent(activity)
 
   switch (true) {
+    case isTemporalTransfers:
+      return 'Pending'
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Earned referral reward'
     case isSendTokenUpgradeEvent(activity):
@@ -220,6 +264,7 @@ export function subtextFromActivity(activity: Activity): string | null {
   const { from_user, to_user, data } = activity
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
+
   if (isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity)) {
     return activity.data.tags.map((t) => `/${t}`).join(', ')
   }
@@ -260,6 +305,14 @@ export function subtextFromActivity(activity: Activity): string | null {
   }
   if (isETHReceive && to_user?.id) {
     return labelAddress(data.log_addr)
+  }
+  if (isTemporalTransfersEvent(activity)) {
+    if (isTemporalTokenTransfers(activity)) {
+      return labelAddress(activity.data.t)
+    }
+    if (isTemporalEthTransfers(activity)) {
+      return labelAddress(activity.data.sender)
+    }
   }
   return null
 }
