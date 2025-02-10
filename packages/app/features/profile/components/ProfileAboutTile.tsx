@@ -3,24 +3,29 @@ import { Fade, Image, LinearGradient, Paragraph, Stack, XStack, YStack } from '@
 import { IconX, IconXLogo } from 'app/components/icons'
 
 export const ProfileAboutTile = ({
-  otherUserProfile,
+  profile,
   onClose,
 }: {
-  otherUserProfile?: Functions<'profile_lookup'>[number] | null
+  profile: Functions<'profile_lookup'>[number]
   onClose: () => void
 }) => {
   const handleOnXRedirect = () => {
-    const twitterUrl = `https://x.com/${otherUserProfile?.x_username}`
+    const twitterUrl = `https://x.com/${profile.x_username}`
     window.open(twitterUrl, '_blank', 'noopener,noreferrer')
   }
 
   return (
     <Fade>
-      <YStack w={'100%'} gap={'$4'} pb={'$4'}>
+      <YStack w={'100%'} gap={'$4'} pb={'$4'} testID={'profile-about-tile'}>
         <YStack w={'100%'} bg={'$color1'} borderRadius={'$6'} padding={'$5'} gap={'$4'}>
           <XStack ai="center" jc="space-between">
             <Paragraph size={'$8'}>About</Paragraph>
-            <Stack onPress={onClose} cursor={'pointer'}>
+            <Stack
+              onPress={onClose}
+              cursor={'pointer'}
+              display={'none'}
+              $gtLg={{ display: 'flex' }}
+            >
               <IconX
                 size={'$1.5'}
                 $theme-dark={{ color: '$primary' }}
@@ -35,8 +40,8 @@ export const ProfileAboutTile = ({
               borderRadius={'$6'}
               objectFit="cover"
               src={
-                otherUserProfile?.avatar_url ??
-                `https://ui-avatars.com/api.jpg?name=${otherUserProfile?.name ?? '??'}&size=256`
+                profile.avatar_url ??
+                `https://ui-avatars.com/api.jpg?name=${profile.name ?? '??'}&size=256`
               }
             />
             <LinearGradient
@@ -57,11 +62,10 @@ export const ProfileAboutTile = ({
                 gap={'$3'}
               >
                 <Paragraph size={'$9'} $theme-light={{ color: '$white' }}>
-                  {otherUserProfile?.name ||
-                    (otherUserProfile?.all_tags?.[0] ? `/${otherUserProfile?.all_tags[0]}` : '??')}
+                  {profile.name || (profile.all_tags?.[0] ? `/${profile.all_tags[0]}` : '??')}
                 </Paragraph>
                 <XStack flexWrap="wrap" columnGap={'$2.5'} rowGap={'$2'}>
-                  {otherUserProfile?.all_tags?.map((tag: string) => (
+                  {profile.all_tags?.map((tag: string) => (
                     <XStack key={tag} bg={'$gray3Dark'} px={'$2.5'} py={'$1'} borderRadius={'$2'}>
                       <Paragraph
                         size={'$2'}
@@ -73,9 +77,9 @@ export const ProfileAboutTile = ({
               </YStack>
             </LinearGradient>
           </YStack>
-          <Paragraph>{otherUserProfile?.about}</Paragraph>
+          <Paragraph>{profile.about}</Paragraph>
         </YStack>
-        {otherUserProfile?.x_username && (
+        {profile.x_username && (
           <XStack
             ai="center"
             jc="center"
@@ -92,7 +96,7 @@ export const ProfileAboutTile = ({
               $theme-dark={{ color: '$primary' }}
               $theme-light={{ color: '$color12' }}
             />
-            <Paragraph size={'$5'}>{otherUserProfile?.x_username}</Paragraph>
+            <Paragraph size={'$5'}>{profile.x_username}</Paragraph>
           </XStack>
         )}
       </YStack>

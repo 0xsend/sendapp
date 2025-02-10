@@ -1,17 +1,16 @@
-import { Fade, isWeb, Paragraph, Spinner, Stack, Text, XStack, YStack } from '@my/ui'
+import { Fade, Paragraph, Spinner, Stack, Text, XStack, YStack } from '@my/ui'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useUser } from 'app/utils/useUser'
 import { AvatarProfile, type AvatarProfileProps } from './AvatarProfile'
 import { useInterUserActivityFeed } from './utils/useInterUserActivityFeed'
 import type { Activity } from 'app/utils/zod/activity'
 import { amountFromActivity } from 'app/utils/activity'
-import { useState } from 'react'
-import { useProfileScreenParams } from 'app/routers/params'
+import { useProfileScreenParams, useRootScreenParams } from 'app/routers/params'
 import { IconArrowRight } from 'app/components/icons'
 import { SendButton } from './ProfileButtons'
 import { ProfileHeader } from 'app/features/profile/components/ProfileHeader'
-import { ProfileAboutTile } from 'app/features/profile/components/ProfileAboutTile'
 import { FlatList } from 'react-native-web'
+import { ProfilesDetailsModal } from 'app/features/profile/components/ProfileDetailsModal'
 
 interface ProfileScreenProps {
   sendid?: number | null
@@ -26,7 +25,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
     error,
   } = useProfileLookup('sendid', otherUserId?.toString() || '')
   const { user, profile: currentUserProfile } = useUser()
-  const [isProfileInfoVisible, setIsProfileInfoVisible] = useState<boolean>(false)
+  const [{ profile: profileParam }] = useRootScreenParams()
 
   const {
     data,
@@ -41,26 +40,20 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   })
   const { pages } = data ?? {}
 
-  const toggleIsProfileInfoVisible = () => {
-    setIsProfileInfoVisible((prevState) => !prevState)
-  }
-
   return (
     <XStack w={'100%'} gap={'$4'} height={'100%'}>
       <YStack
         f={1}
         height={'100%'}
         gap={'$2'}
-        display={isProfileInfoVisible ? 'none' : 'flex'}
+        display={profileParam ? 'none' : 'flex'}
         overflow={'hidden'}
         $gtLg={{
           display: 'flex',
           maxWidth: '50%',
         }}
       >
-        {otherUserProfile && (
-          <ProfileHeader onPressOut={toggleIsProfileInfoVisible} profile={otherUserProfile} />
-        )}
+        {otherUserProfile && <ProfileHeader profile={otherUserProfile} />}
         {error && (
           <Text theme="red" color={'$color8'}>
             {error.message}
@@ -163,34 +156,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
           </XStack>
         ) : null}
       </YStack>
-      {isProfileInfoVisible && (
-        <YStack
-          w={'100%'}
-          ai={'center'}
-          $gtLg={{
-            width: '35%',
-            minWidth: 400,
-            height: isWeb ? '81vh' : 'auto',
-            // @ts-expect-error typescript is complaining about overflowY not available and advising overflow. Overflow will work differently than overflowY here, overflowY is working fine
-            overflowY: 'scroll',
-          }}
-          className={'hide-scroll'}
-        >
-          <YStack
-            w={'100%'}
-            maxWidth={500}
-            pb={'$10'}
-            $gtLg={{
-              pb: 0,
-            }}
-          >
-            <ProfileAboutTile
-              otherUserProfile={otherUserProfile}
-              onClose={toggleIsProfileInfoVisible}
-            />
-          </YStack>
-        </YStack>
-      )}
+      <ProfilesDetailsModal />
     </XStack>
   )
 }

@@ -3,6 +3,9 @@ import { ProfileScreen } from './screen'
 import { TamaguiProvider, config } from '@my/ui'
 import { render, screen, waitFor } from '@testing-library/react-native'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { useRootScreenParams } from 'app/routers/params'
+
+const useRootScreenParamsMock = useRootScreenParams as jest.Mock
 
 const queryClient = new QueryClient()
 const TAG_NAME = 'pip_test44677'
@@ -99,8 +102,16 @@ jest.mock('solito/router', () => ({
   }),
 }))
 
+jest.mock('next/router', () => ({
+  useRouter: jest.fn().mockReturnValue({
+    query: {},
+    pathname: '/profile/0',
+  }),
+}))
+
 jest.mock('app/routers/params', () => ({
   useProfileScreenParams: jest.fn().mockReturnValue([{ sendid: 0 }, jest.fn()]),
+  useRootScreenParams: jest.fn().mockReturnValue([{}, jest.fn()]),
 }))
 
 test('ProfileScreen', async () => {
@@ -132,4 +143,18 @@ test('ProfileScreen', async () => {
   expect(activityLabel).toBeOnTheScreen()
 
   expect(screen.toJSON()).toMatchSnapshot('ProfileScreen')
+})
+
+test('ProfileScreen with opened modal', () => {
+  useRootScreenParamsMock.mockReturnValue([{ profile: 0 }, jest.fn()])
+
+  render(
+    <QueryClientProvider client={queryClient}>
+      <TamaguiProvider defaultTheme={'dark'} config={config}>
+        <ProfileScreen />
+      </TamaguiProvider>
+    </QueryClientProvider>
+  )
+
+  expect(screen.getByTestId('profile-about-tile')).toBeOnTheScreen()
 })
