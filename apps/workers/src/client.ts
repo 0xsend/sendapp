@@ -1,5 +1,8 @@
 import { Connection, Client } from '@temporalio/client'
 import { TransferWorkflow } from '@my/workflows/all-workflows'
+import type { UserOperation } from 'permissionless'
+import { baseMainnetClient, entryPointAddress } from '@my/wagmi'
+import { getUserOperationHash } from 'permissionless/utils'
 
 // async function runDistributionWorkflow() {
 //   const connection = await Connection.connect() // Connect to localhost with default ConnectionOptions.
@@ -24,16 +27,23 @@ import { TransferWorkflow } from '@my/workflows/all-workflows'
 //   return result
 // }
 
-export async function runTransferWorkflow(userId: string, userOpHash: `0x${string}`) {
+export async function runTransferWorkflow(userId: string, userOp: UserOperation<'v0.7'>) {
   const connection = await Connection.connect()
   const client = new Client({
     connection,
+  })
+  const chainId = baseMainnetClient.chain.id
+  const entryPoint = entryPointAddress[chainId]
+  const userOpHash = getUserOperationHash({
+    userOperation: userOp,
+    entryPoint,
+    chainId,
   })
 
   const handle = await client.workflow.start(TransferWorkflow, {
     taskQueue: 'monorepo',
     workflowId: `transfers-workflow-${userId}-${userOpHash}`, // TODO: remember to replace this with a meaningful business ID
-    args: [userOpHash],
+    args: [userOp],
   })
   console.log('Started handle', handle.workflowId)
   // optional: wait for client result
