@@ -10,9 +10,10 @@ import { useTokenPrice } from 'app/utils/coin-gecko'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useSwapToken } from 'app/utils/swap-token'
-import { formatUnits } from 'viem'
+import { formatUnits, parseUnits } from 'viem'
 import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import { z } from 'zod'
+import SlippageSelector from './SlippageSelector'
 
 const SwapFormSchema = z.object({
   sendAmount: formFields.text,
@@ -39,6 +40,7 @@ export default function SwapForm() {
   const [outputUsdValue, setOutputUsdValue] = useState<string | null>(null)
   const [fromToken, setFromToken] = useState<CoinWithBalance | undefined>(coin)
   const [toToken, setToToken] = useState<CoinWithBalance | undefined>(defaultToToken)
+  const [slippage, setSlippage] = useState(0.5)
 
   const [isInputFocus, setInputFocus] = useState(false)
 
@@ -83,10 +85,18 @@ export default function SwapForm() {
       return
     }
 
-    const outputAmountInWei = BigInt(data.outputAmount)
-    const toTokenDecimals = toToken.decimals
-    const receivedAmount = Number.parseFloat(formatUnits(outputAmountInWei, toTokenDecimals))
-    const normalizedAmount = receivedAmount.toFixed(6)
+    const outputAmountRaw = BigInt(data.outputAmount)
+    const inputAmountRaw = Number(sanitizedAmount)
+
+    const outputTokenDecimals = toToken.decimals
+    const inputTokenDecimals = fromToken.decimals
+
+    const outputAmountNormalized = Number(formatUnits(outputAmountRaw, outputTokenDecimals)) // outputAmount / 10^outputTokenDecimals
+    const inputAmountNormalized = Number(parseUnits(inputAmountRaw.toString(), inputTokenDecimals)) // inputAmount / 10^inputTokenDecimals
+    const exchangeRate = outputAmountNormalized / inputAmountNormalized
+
+    const totalOutputTokens = exchangeRate * inputAmountRaw
+    const normalizedAmount = totalOutputTokens.toFixed(6)
 
     if (form.getValues('receiveAmount') !== normalizedAmount) {
       form.setValue('receiveAmount', normalizedAmount, { shouldValidate: true })
@@ -262,144 +272,147 @@ export default function SwapForm() {
         )}
       >
         {({ sendAmount, receiveAmount }) => (
-          <YStack gap="$5">
-            <Card p="$4.5" w="100%" h={188} borderRadius="$6">
-              <YStack gap="$3">
-                <XStack jc="space-between" ai="center">
-                  <XStack w="100%" jc="space-between">
+          <YStack gap="$3">
+            <YStack gap="$5">
+              <Card p="$4.5" w="100%" h={188} borderRadius="$6">
+                <YStack gap="$3">
+                  <XStack jc="space-between" ai="center">
+                    <XStack w="100%" jc="space-between">
+                      <XStack ai="center" gap="$2">
+                        <ArrowUp size={14} />
+                        <Paragraph fontSize={14} fontWeight="500" color="$color12">
+                          You Pay
+                        </Paragraph>
+                      </XStack>
+                      {insufficientAmount && (
+                        <Paragraph color={'$error'} size={'$5'}>
+                          Insufficient funds
+                        </Paragraph>
+                      )}
+                    </XStack>
+                  </XStack>
+                  <XStack ai="center" jc="space-between">
+                    {sendAmount}
+                    <XStack
+                      position="absolute"
+                      bottom={-8}
+                      left={0}
+                      right={0}
+                      height={1}
+                      backgroundColor={isInputFocus ? '$primary' : '$silverChalice'}
+                      $theme-light={{
+                        backgroundColor: isInputFocus ? '$color12' : '$silverChalice',
+                      }}
+                    />
+                    <PopoverItem
+                      testID="fromdropdown-button"
+                      isOpen={fromDropdownOpen}
+                      onOpenChange={setFromDropdownOpen}
+                      selectedToken={fromToken}
+                      coins={coins}
+                      onTokenChange={(token) => handleTokenChange(token, true)}
+                    />
+                  </XStack>
+                  <XStack jc="space-between" ai="center">
+                    <Paragraph fontSize={14} color="$gray8">
+                      $
+                      {inputUsdValue ||
+                        fromTokenMarketPrice?.[fromToken?.coingeckoTokenId ?? '']?.usd ||
+                        '0'}
+                    </Paragraph>
                     <XStack ai="center" gap="$2">
-                      <ArrowUp size={14} />
+                      <Paragraph fontSize={14} color="$gray8">
+                        {fromToken
+                          ? formatAmount(
+                              formatUnits(fromToken.balance ?? BigInt(0), fromToken.decimals)
+                            )
+                          : '0'}{' '}
+                        {fromToken?.label ?? ''}
+                      </Paragraph>
+                      <Button
+                        testID="max-button"
+                        onPress={maxoutBalance}
+                        chromeless
+                        p={0}
+                        backgroundColor="transparent"
+                        borderWidth={0}
+                        hoverStyle={{ backgroundColor: 'transparent' }}
+                      >
+                        <Paragraph color="$green5" fontWeight="600">
+                          MAX
+                        </Paragraph>
+                      </Button>
+                    </XStack>
+                  </XStack>
+                </YStack>
+              </Card>
+
+              <YStack
+                position="absolute"
+                top="50%"
+                left="50%"
+                zIndex={2}
+                transform="translate(-50%, -50%)"
+              >
+                <Button
+                  testID="swap-button"
+                  size="$5"
+                  circular
+                  w={60}
+                  h={60}
+                  elevate
+                  $theme-dark={{ bc: '$darkest' }}
+                  br="$10"
+                  onPress={switchFromTo}
+                >
+                  <Button.Icon>
+                    <IconSwap size={'$1'} color="$green11Dark" />
+                  </Button.Icon>
+                </Button>
+              </YStack>
+
+              <Card p="$4.5" w="100%" h={188} borderRadius="$6">
+                <YStack gap="$3">
+                  <XStack jc="space-between" ai="center">
+                    <XStack ai="center" gap="$2">
+                      <ArrowDown size={14} />
                       <Paragraph fontSize={14} fontWeight="500" color="$color12">
-                        You Pay
+                        You Receive
                       </Paragraph>
                     </XStack>
-                    {insufficientAmount && (
-                      <Paragraph color={'$error'} size={'$5'}>
-                        Insufficient funds
-                      </Paragraph>
-                    )}
                   </XStack>
-                </XStack>
-                <XStack ai="center" jc="space-between">
-                  {sendAmount}
-                  <XStack
-                    position="absolute"
-                    bottom={-8}
-                    left={0}
-                    right={0}
-                    height={1}
-                    backgroundColor={isInputFocus ? '$primary' : '$silverChalice'}
-                    $theme-light={{
-                      backgroundColor: isInputFocus ? '$color12' : '$silverChalice',
-                    }}
-                  />
-                  <PopoverItem
-                    testID="fromdropdown-button"
-                    isOpen={fromDropdownOpen}
-                    onOpenChange={setFromDropdownOpen}
-                    selectedToken={fromToken}
-                    coins={coins}
-                    onTokenChange={(token) => handleTokenChange(token, true)}
-                  />
-                </XStack>
-                <XStack jc="space-between" ai="center">
+                  <XStack ai="center" jc="space-between">
+                    {receiveAmount}
+                    <XStack
+                      position="absolute"
+                      bottom={-8}
+                      left={0}
+                      right={0}
+                      height={1}
+                      backgroundColor={'$silverChalice'}
+                      $theme-light={{
+                        backgroundColor: '$silverChalice',
+                      }}
+                    />
+                    <PopoverItem
+                      testID="todropdown-button"
+                      isOpen={toDropdownOpen}
+                      onOpenChange={setToDropdownOpen}
+                      selectedToken={toToken}
+                      coins={coins.filter((c) => c.token !== fromToken?.token)}
+                      onTokenChange={(token) => handleTokenChange(token, false)}
+                    />
+                  </XStack>
                   <Paragraph fontSize={14} color="$gray8">
                     $
-                    {inputUsdValue ||
-                      fromTokenMarketPrice?.[fromToken?.coingeckoTokenId ?? '']?.usd ||
+                    {outputUsdValue ||
+                      toTokenMarketPrice?.[toToken?.coingeckoTokenId ?? '']?.usd ||
                       '0'}
                   </Paragraph>
-                  <XStack ai="center" gap="$2">
-                    <Paragraph fontSize={14} color="$gray8">
-                      {fromToken
-                        ? formatAmount(
-                            formatUnits(fromToken.balance ?? BigInt(0), fromToken.decimals)
-                          )
-                        : '0'}{' '}
-                      {fromToken?.label ?? ''}
-                    </Paragraph>
-                    <Button
-                      testID="max-button"
-                      onPress={maxoutBalance}
-                      chromeless
-                      p={0}
-                      backgroundColor="transparent"
-                      borderWidth={0}
-                      hoverStyle={{ backgroundColor: 'transparent' }}
-                    >
-                      <Paragraph color="$green5" fontWeight="600">
-                        MAX
-                      </Paragraph>
-                    </Button>
-                  </XStack>
-                </XStack>
-              </YStack>
-            </Card>
-
-            <YStack
-              position="absolute"
-              top="50%"
-              left="50%"
-              zIndex={2}
-              transform="translate(-50%, -50%)"
-            >
-              <Button
-                testID="swap-button"
-                size="$5"
-                circular
-                w={60}
-                h={60}
-                elevate
-                $theme-dark={{ bc: '$darkest' }}
-                br="$10"
-                onPress={switchFromTo}
-              >
-                <Button.Icon>
-                  <IconSwap size={'$1'} color="$green11Dark" />
-                </Button.Icon>
-              </Button>
+                </YStack>
+              </Card>
             </YStack>
-
-            <Card p="$4.5" w="100%" h={188} borderRadius="$6">
-              <YStack gap="$3">
-                <XStack jc="space-between" ai="center">
-                  <XStack ai="center" gap="$2">
-                    <ArrowDown size={14} />
-                    <Paragraph fontSize={14} fontWeight="500" color="$color12">
-                      You Receive
-                    </Paragraph>
-                  </XStack>
-                </XStack>
-                <XStack ai="center" jc="space-between">
-                  {receiveAmount}
-                  <XStack
-                    position="absolute"
-                    bottom={-8}
-                    left={0}
-                    right={0}
-                    height={1}
-                    backgroundColor={'$silverChalice'}
-                    $theme-light={{
-                      backgroundColor: '$silverChalice',
-                    }}
-                  />
-                  <PopoverItem
-                    testID="todropdown-button"
-                    isOpen={toDropdownOpen}
-                    onOpenChange={setToDropdownOpen}
-                    selectedToken={toToken}
-                    coins={coins.filter((c) => c.token !== fromToken?.token)}
-                    onTokenChange={(token) => handleTokenChange(token, false)}
-                  />
-                </XStack>
-                <Paragraph fontSize={14} color="$gray8">
-                  $
-                  {outputUsdValue ||
-                    toTokenMarketPrice?.[toToken?.coingeckoTokenId ?? '']?.usd ||
-                    '0'}
-                </Paragraph>
-              </YStack>
-            </Card>
+            <SlippageSelector value={slippage} onSlippageChange={setSlippage} />
           </YStack>
         )}
       </SchemaForm>
