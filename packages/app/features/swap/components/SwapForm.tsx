@@ -92,7 +92,7 @@ export default function SwapForm() {
     const inputTokenDecimals = fromToken.decimals
 
     const outputAmountNormalized = Number(formatUnits(outputAmountRaw, outputTokenDecimals)) // outputAmount / 10^outputTokenDecimals
-    const inputAmountNormalized = Number(parseUnits(inputAmountRaw.toString(), inputTokenDecimals)) // inputAmount / 10^inputTokenDecimals
+    const inputAmountNormalized = Number(formatUnits(BigInt(inputAmountRaw), inputTokenDecimals)) //
     const exchangeRate = outputAmountNormalized / inputAmountNormalized
 
     const totalOutputTokens = exchangeRate * inputAmountRaw
