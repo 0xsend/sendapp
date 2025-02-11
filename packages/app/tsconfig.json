@@ -28,6 +28,7 @@
     "noEmit": true,
     "composite": true,
     "baseUrl": ".",
+    "moduleResolution": "bundler",
     "paths": {
       "app/*": ["./*"],
       "@my/api": ["../api/src"],

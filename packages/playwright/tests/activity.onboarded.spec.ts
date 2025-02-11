@@ -1,6 +1,5 @@
 import { userOnboarded } from '@my/snaplet'
 import { sendtagCheckoutAddress, usdcAddress } from '@my/wagmi'
-import type { Page } from '@playwright/test'
 import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { SUPABASE_URL } from 'app/utils/supabase/admin'
@@ -260,12 +259,12 @@ test('can visit activity page and see correct activity feed', async ({
 
   // Send
   await expect.soft(activityRows.nth(8)).toContainText('Sent')
-  await expect.soft(activityRows.nth(8)).toContainText('0.077777 USDC')
+  await expect.soft(activityRows.nth(8)).toContainText('0.07 USDC')
   await expect.soft(activityRows.nth(8)).toContainText(anotherUser.name ?? '')
 
   // Deposit
   await expect.soft(activityRows.nth(9)).toContainText('Deposit')
-  await expect.soft(activityRows.nth(9)).toContainText('0.019032 USDC')
+  await expect.soft(activityRows.nth(9)).toContainText('0.01 USDC')
   await expect.soft(activityRows.nth(9)).toContainText(shorten(anotherSendAccount.address, 5, 4))
 })
 

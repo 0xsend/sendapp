@@ -10,6 +10,12 @@ jest.mock('@my/ui', () => ({
   Fade: ({ children }) => children,
 }))
 
+jest.mock('next/router', () => ({
+  useRouter: jest.fn().mockReturnValue({
+    push: jest.fn(),
+  }),
+}))
+
 describe('DepositScreen', () => {
   it('renders the deposit screen', async () => {
     render(
@@ -18,8 +24,7 @@ describe('DepositScreen', () => {
       </Provider>
     )
 
-    // screen.debug({ message: 'DepositScreen: render' })
-    await waitFor(() => expect(screen.getByText('Deposit on Base')).toBeVisible())
+    await waitFor(() => expect(screen.getByText('Via Crypto')).toBeVisible())
     expect(screen).toMatchSnapshot()
   })
 })

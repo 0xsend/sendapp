@@ -3,6 +3,7 @@
   "compilerOptions": {
     "noEmit": true,
     "composite": true,
+    "moduleResolution": "bundler",
     "baseUrl": ".",
     "paths": {
       "@my/supabase/*": ["../../supabase/*"],

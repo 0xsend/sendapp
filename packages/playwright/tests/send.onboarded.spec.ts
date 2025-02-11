@@ -20,7 +20,7 @@ const test = mergeTests(sendAccountTest, snapletTest)
 
 let log: debug.Debugger
 
-test.beforeEach(async ({ user: { profile }, supabase }) => {
+test.beforeEach(async ({ user: { profile } }) => {
   log = debug(`test:send:${profile.id}:${test.info().parallelIndex}`)
 })
 
@@ -282,9 +282,31 @@ async function handleTokenTransfer({
     // no history for eth since no send_account_receives event is emitted
     const history = page.getByTestId('TokenActivityFeed')
     await expect(history).toBeVisible()
-    await expect(history.getByText(`${decimalAmount} ${token.symbol}`)).toBeVisible()
+
+    const historyAmount = (() => {
+      switch (token.symbol) {
+        case 'USDC':
+          return truncateDecimals(decimalAmount, 2)
+        case 'SEND':
+          return truncateDecimals(decimalAmount, 0)
+        default:
+          return decimalAmount
+      }
+    })()
+
+    await expect(history.getByText(`${historyAmount} ${token.symbol}`)).toBeVisible()
     await expect(
       history.getByText(isAddress(counterparty) ? shorten(counterparty ?? '', 5, 4) : counterparty)
     ).toBeVisible()
   }
+}
+
+const truncateDecimals = (amount: string, decimals: number) => {
+  const index = amount.indexOf('.')
+
+  if (index === -1) {
+    return amount
+  }
+
+  return decimals === 0 ? amount.slice(0, index) : amount.slice(0, index + decimals + 1)
 }
