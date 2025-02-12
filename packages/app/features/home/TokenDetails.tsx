@@ -137,7 +137,7 @@ const TokenDetailsBalance = ({ coin }: { coin: CoinWithBalance }) => {
       <Paragraph color={'$color10'} fontSize={'$3'} fontFamily={'$mono'}>
         {isLoadingTokenPrices || balanceInUSD === undefined
           ? ''
-          : `($${formatAmount(balanceInUSD, 4, 2)})`}
+          : `($${formatAmount(balanceInUSD)})`}
       </Paragraph>
     </XStack>
   )

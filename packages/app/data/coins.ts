@@ -22,6 +22,7 @@ export const usdcCoin: coin = {
   symbol: 'USDC',
   token: usdcAddresses[baseMainnet.id],
   decimals: 6,
+  formatDecimals: 2,
   coingeckoTokenId: 'usd-coin',
 } as const
 
