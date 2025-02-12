@@ -41,7 +41,7 @@ using (
 
 
 CREATE INDEX temporal_send_account_transfers_user_id_idx ON temporal.send_account_transfers(user_id);
-CREATE INDEX temporal_send_account_transfers_status_idx ON temporal.send_account_transfers(status);
+CREATE INDEX temporal_send_account_transfers_created_at_idx ON temporal.send_account_transfers(created_at);
 CREATE UNIQUE INDEX temporal_send_account_transfers_workflow_id_idx ON temporal.send_account_transfers(workflow_id);
 
 CREATE OR REPLACE FUNCTION temporal.insert_temporal_token_send_account_transfer(
