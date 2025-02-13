@@ -1,4 +1,4 @@
-import { Stack, XStack } from '@my/ui'
+import { Button, XStack } from '@my/ui'
 import { IconX } from 'app/components/icons'
 import { RowLabel } from 'app/features/account/settings/components/RowLabel'
 import type { PropsWithChildren } from 'react'
@@ -14,18 +14,29 @@ export const SettingsHeader = ({ children }: PropsWithChildren) => {
   return (
     <XStack jc={'space-between'} ai={'center'}>
       <RowLabel>{children}</RowLabel>
-      <Stack
+      <Button
         onPress={handleClosePress}
-        cursor={'pointer'}
+        chromeless
+        hoverStyle={{
+          backgroundColor: 'transparent',
+        }}
+        pressStyle={{
+          backgroundColor: 'transparent',
+        }}
+        focusStyle={{
+          backgroundColor: 'transparent',
+        }}
         display={'none'}
         $gtLg={{ display: 'flex' }}
       >
-        <IconX
-          size={'$1.5'}
-          $theme-dark={{ color: '$primary' }}
-          $theme-light={{ color: '$color12' }}
-        />
-      </Stack>
+        <Button.Icon>
+          <IconX
+            size={'$1.5'}
+            $theme-dark={{ color: '$primary' }}
+            $theme-light={{ color: '$color12' }}
+          />
+        </Button.Icon>
+      </Button>
     </XStack>
   )
 }

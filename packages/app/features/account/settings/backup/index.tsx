@@ -40,6 +40,7 @@ import { useBalance, useEstimateFeesPerGas } from 'wagmi'
 import { z } from 'zod'
 import { SettingsHeader } from 'app/features/account/settings/components/SettingsHeader'
 import { Section } from 'app/features/account/settings/components/Section'
+import { useThemeSetting } from '@tamagui/next-theme'
 
 export const BackupScreen = () => {
   const { data: sendAcct, error, isLoading } = useSendAccount()
@@ -467,6 +468,8 @@ const RemovePasskeyConfirmation = ({
   })
   const { mutateAsync: sendUserOp } = useUserOpTransferMutation()
   const queryClient = useQueryClient()
+  const { resolvedTheme } = useThemeSetting()
+  const isDarkTheme = resolvedTheme?.startsWith('dark')
   const onSubmit = async () => {
     try {
       if (isActiveOnchain) {
@@ -539,7 +542,10 @@ const RemovePasskeyConfirmation = ({
               borderColor={'$primary'}
               variant="outlined"
               flex={1}
-              hoverStyle={{ borderColor: '$primary' }}
+              hoverStyle={{ borderColor: isDarkTheme ? '$primary' : '$color12' }}
+              $theme-light={{
+                borderColor: '$color12',
+              }}
               onPress={onCancel}
             >
               <Button.Text
