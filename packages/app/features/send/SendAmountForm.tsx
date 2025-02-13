@@ -1,6 +1,6 @@
-import { Button, isWeb, Paragraph, Spinner, Stack, SubmitButton, XStack, YStack } from '@my/ui'
+import { Button, Paragraph, Spinner, Stack, SubmitButton, XStack, YStack } from '@my/ui'
 import { type allCoins, allCoinsDict } from 'app/data/coins'
-import { useSendScreenParams } from 'app/routers/params'
+import { useRootScreenParams, useSendScreenParams } from 'app/routers/params'
 import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
 
@@ -15,7 +15,7 @@ import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { useCoins } from 'app/provider/coins'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { ProfileHeader } from 'app/features/profile/components/ProfileHeader'
-import { ProfileAboutTile } from 'app/features/profile/components/ProfileAboutTile'
+import { ProfilesDetailsModal } from 'app/features/profile/components/ProfileDetailsModal'
 
 const SendAmountSchema = z.object({
   amount: formFields.text,
@@ -30,7 +30,7 @@ export function SendAmountForm() {
   const { isLoading: isLoadingCoins } = useCoins()
   const { recipient, idType } = sendParams
   const { data: profile } = useProfileLookup(idType ?? 'tag', recipient ?? '')
-  const [isProfileInfoVisible, setIsProfileInfoVisible] = useState<boolean>(false)
+  const [{ profile: profileParam }] = useRootScreenParams()
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
 
   useEffect(() => {
@@ -77,28 +77,19 @@ export function SendAmountForm() {
     })
   }
 
-  const toggleIsProfileInfoVisible = () => {
-    setIsProfileInfoVisible((prevState) => !prevState)
-  }
-
   return (
     <XStack w={'100%'} gap={'$4'}>
       <YStack
         f={1}
         gap={'$4'}
-        display={isProfileInfoVisible ? 'none' : 'flex'}
+        display={profileParam ? 'none' : 'flex'}
         $gtLg={{
           display: 'flex',
           maxWidth: '50%',
         }}
         testID={'SendFormContainer'}
       >
-        <ProfileHeader
-          onPressOut={toggleIsProfileInfoVisible}
-          profile={profile}
-          idType={idType}
-          recipient={recipient}
-        />
+        <ProfileHeader profile={profile} idType={idType} recipient={recipient} />
         <FormProvider {...form}>
           <SchemaForm
             form={form}
@@ -266,31 +257,7 @@ export function SendAmountForm() {
           </SchemaForm>
         </FormProvider>
       </YStack>
-      {isProfileInfoVisible && (
-        <YStack
-          w={'100%'}
-          ai={'center'}
-          $gtLg={{
-            width: '35%',
-            minWidth: 400,
-            height: isWeb ? '81vh' : 'auto',
-            // @ts-expect-error typescript is complaining about overflowY not available and advising overflow. Overflow will work differently than overflowY here, overflowY is working fine
-            overflowY: 'scroll',
-          }}
-          className={'hide-scroll'}
-        >
-          <YStack
-            w={'100%'}
-            maxWidth={500}
-            pb={'$10'}
-            $gtLg={{
-              pb: 0,
-            }}
-          >
-            <ProfileAboutTile otherUserProfile={profile} onClose={toggleIsProfileInfoVisible} />
-          </YStack>
-        </YStack>
-      )}
+      <ProfilesDetailsModal />
     </XStack>
   )
 }

@@ -1,45 +1,41 @@
 import type { Functions } from '@my/supabase/database.types'
-import { LinkableAvatar, Paragraph, XStack, Avatar } from '@my/ui'
-import { IconArrowRight, IconAccount } from 'app/components/icons'
+import { Avatar, Card, LinkableAvatar, Paragraph, XStack } from '@my/ui'
+import { IconAccount, IconArrowRight } from 'app/components/icons'
 import { shorten } from 'app/utils/strings'
+import { useRootScreenParams } from 'app/routers/params'
 
 export const ProfileHeader = ({
-  onPressOut,
   recipient,
   idType,
   profile,
 }: {
   profile?: Functions<'profile_lookup'>[number] | null
-  onPressOut: () => void
   idType?: string
   recipient?: string
 }) => {
-  const href = profile ? `/profile/${profile?.sendid}` : ''
+  const profileHref = profile ? `/profile/${profile?.sendid}` : ''
+  const [rootParams, setRootParams] = useRootScreenParams()
 
   const handlePressOut = () => {
-    if (!profile) {
-      return
-    }
-
-    onPressOut()
+    setRootParams({
+      ...rootParams,
+      profile: rootParams.profile ? undefined : profile?.sendid?.toString(),
+    })
   }
 
   return (
-    <XStack
+    <Card
+      flexDirection={'row'}
       jc="space-between"
       ai="center"
-      bg={'$color1'}
-      p={'$size.1.5'}
-      borderRadius={'$6'}
       padding={'$5'}
       onPressOut={handlePressOut}
-      cursor={idType === 'address' ? 'default' : 'pointer'}
     >
       <XStack ai="center" gap={'$size.1.5'} width={'80%'}>
         <LinkableAvatar
           size="$6"
           br="$4"
-          href={href}
+          href={profileHref}
           onPressOut={(e) => {
             e.stopPropagation()
           }}
@@ -79,6 +75,6 @@ export const ProfileHeader = ({
           $theme-light={{ color: '$color12' }}
         />
       )}
-    </XStack>
+    </Card>
   )
 }

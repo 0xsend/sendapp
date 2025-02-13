@@ -47,6 +47,7 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
           "paddingLeft": 24,
           "paddingRight": 24,
           "paddingTop": 24,
+          "position": "relative",
         }
       }
     >
