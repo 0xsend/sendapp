@@ -6,6 +6,7 @@ import {
   updateTemporalSendAccountTransfer,
   insertTemporalEthSendAccountTransfer,
   deleteTemporalTransferFromActivityTable,
+  deleteTemporalTransfer,
 } from './supabase'
 import { simulateUserOperation, sendUserOperation, waitForTransactionReceipt } from './wagmi'
 import type { UserOperation } from 'permissionless'
@@ -30,9 +31,13 @@ type TransferActivities = {
     token: PgBytea | null
   ) => Promise<void>
   sendUserOpActivity: (
+    workflowId: string,
     userOp: UserOperation<'v0.7'>
   ) => Promise<{ hash: `0x${string}`; hashBytea: PgBytea }>
-  waitForTransactionReceiptActivity: (hash: `0x${string}`) => Promise<{
+  waitForTransactionReceiptActivity: (
+    workflowId: string,
+    hash: `0x${string}`
+  ) => Promise<{
     transactionHash: `0x${string}`
     blockNumber: bigint
   }>
@@ -121,23 +126,49 @@ export const createTransferActivities = (
         )
       }
     },
-    async sendUserOpActivity(userOp: UserOperation<'v0.7'>) {
-      const hash = await sendUserOperation(userOp)
-      const hashBytea = hexToBytea(hash)
-      return { hash, hashBytea }
+    async sendUserOpActivity(workflowId, userOp) {
+      try {
+        const hash = await sendUserOperation(userOp)
+        const hashBytea = hexToBytea(hash)
+        return { hash, hashBytea }
+      } catch (error) {
+        log.error('sendUserOpActivity failed', { error })
+        const { error: deleteError } = await deleteTemporalTransfer(workflowId)
+        if (deleteError) {
+          throw ApplicationFailure.retryable(
+            'Error deleting transfer from temporal.send_account_transfers',
+            deleteError.code,
+            {
+              deleteError,
+              workflowId,
+            }
+          )
+        }
+
+        throw ApplicationFailure.nonRetryable('Error sending user operation', error.code, error)
+      }
     },
-    async waitForTransactionReceiptActivity(hash) {
-      const bundlerReceipt = await waitForTransactionReceipt(hash)
-      if (!bundlerReceipt) {
-        throw ApplicationFailure.retryable('No receipt returned from waitForTransactionReceipt')
+    async waitForTransactionReceiptActivity(workflowId, hash) {
+      try {
+        const bundlerReceipt = await waitForTransactionReceipt(hash)
+        if (!bundlerReceipt) {
+          throw ApplicationFailure.retryable('No receipt returned from waitForTransactionReceipt')
+        }
+        log.info('waitForTransactionReceiptActivity', {
+          bundlerReceipt: superjson.stringify(bundlerReceipt),
+        })
+        if (!bundlerReceipt.success) {
+          throw new Error('Transaction failed')
+        }
+        return bundlerReceipt.receipt
+      } catch (error) {
+        log.error('waitForTransactionReceiptActivity failed', { error })
+        const { error: updateError } = await updateTemporalSendAccountTransfer({
+          workflow_id: workflowId,
+          status: 'failed',
+        })
+        throw ApplicationFailure.nonRetryable(updateError?.message)
       }
-      log.info('waitForTransactionReceiptActivity', {
-        bundlerReceipt: superjson.stringify(bundlerReceipt),
-      })
-      if (!bundlerReceipt.success) {
-        throw new Error('Transaction failed')
-      }
-      return bundlerReceipt.receipt
     },
     async isTransferIndexedActivity(tx_hash, token) {
       const isIndexed = token
