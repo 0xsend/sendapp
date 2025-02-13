@@ -6,7 +6,9 @@ import {
   type InfiniteData,
   type UseInfiniteQueryResult,
 } from '@tanstack/react-query'
+import { hexToBytea } from 'app/utils/hexToBytea'
 import { pgAddrCondValues } from 'app/utils/pgAddrCondValues'
+import { useSendAccount } from 'app/utils/send-accounts'
 import { squish } from 'app/utils/strings'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
@@ -28,22 +30,24 @@ export function useTokenActivityFeed(params: {
 }): UseInfiniteQueryResult<InfiniteData<Activity[]>, PostgrestError | ZodError> {
   const { pageSize = 10, address, refetchInterval = 30_000, enabled = true } = params
   const supabase = useSupabase()
+  const { data: sendAccount } = useSendAccount()
+  const senderBytea = sendAccount?.address ? hexToBytea(sendAccount.address) : null
 
   async function fetchTokenActivityFeed({ pageParam }: { pageParam: number }): Promise<Activity[]> {
     const from = pageParam * pageSize
     const to = (pageParam + 1) * pageSize - 1
     let query = supabase.from('activity_feed').select('*')
 
-    // First, handle event_name conditions
     if (address) {
       query = query
-        .in('event_name', [Events.SendAccountTransfers, Events.TemporalSendAccountTransfers])
         .eq('data->>log_addr', address)
+        .or(
+          `event_name.eq.${Events.SendAccountTransfers},and(event_name.eq.${Events.TemporalSendAccountTransfers},data->>f.eq.${senderBytea})`
+        )
     } else {
-      query = query.in('event_name', [
-        Events.SendAccountReceive,
-        Events.TemporalSendAccountTransfers,
-      ])
+      query = query.or(
+        `event_name.eq.${Events.SendAccountReceive},and(event_name.eq.${Events.TemporalSendAccountTransfers},data->>sender.eq.${senderBytea})`
+      )
     }
 
     const paymasterAddresses = Object.values(tokenPaymasterAddress)
