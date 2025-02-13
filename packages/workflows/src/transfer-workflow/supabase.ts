@@ -66,6 +66,14 @@ export async function updateTemporalSendAccountTransfer({
   })
 }
 
+export async function deleteTemporalTransfer(workflow_id: string) {
+  return await supabaseAdmin
+    .schema('temporal')
+    .rpc('delete_temporal_transfer', { workflow_id })
+    .select('workflow_id')
+    .single()
+}
+
 export async function deleteTemporalTransferFromActivityTable(workflow_id: string) {
   return await supabaseAdmin
     .from('activity')
