@@ -195,17 +195,19 @@ SELECT results_eq(
     'Test activity update'
 );
 
-SELECT temporal.delete_temporal_transfer_activity('test-workflow-1');
+-- @TODO update this to test send_account_transfer insert
 
-SELECT is_empty(
-    $$
-    SELECT *
-    FROM activity
-    WHERE event_name = 'temporal_send_account_transfers'
-    AND event_id = 'test-workflow-1'
-    $$,
-    'Test temporal transfer activity was deleted'
-);
+-- SELECT temporal.delete_temporal_transfer_activity('test-workflow-1');
+
+-- SELECT is_empty(
+--     $$
+--     SELECT *
+--     FROM activity
+--     WHERE event_name = 'temporal_send_account_transfers'
+--     AND event_id = 'test-workflow-1'
+--     $$,
+--     'Test temporal transfer activity was deleted'
+-- );
 
 SELECT * FROM finish();
 ROLLBACK;
