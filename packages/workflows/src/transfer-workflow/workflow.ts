@@ -1,9 +1,9 @@
-import { ApplicationFailure, proxyActivities, workflowInfo } from '@temporalio/workflow'
+import { proxyActivities, workflowInfo } from '@temporalio/workflow'
 import type { createTransferActivities } from './activities'
 import type { UserOperation } from 'permissionless'
 import superjson from 'superjson'
-
 import debug from 'debug'
+import { hexToBytea } from 'app/utils/hexToBytea'
 
 const log = debug('workflows:transfer')
 
@@ -14,7 +14,6 @@ const {
   updateTemporalTransferActivity,
   waitForTransactionReceiptActivity,
   isTransferIndexedActivity,
-  deleteTemporalTransferActivity,
 } = proxyActivities<ReturnType<typeof createTransferActivities>>({
   // TODO: make this configurable
   startToCloseTimeout: '10 minutes',
@@ -44,18 +43,9 @@ export async function TransferWorkflow(userOp: UserOperation<'v0.7'>) {
     workflowId,
     status: 'confirmed',
     data: {
-      tx_hash: receipt.transactionHash,
+      tx_hash: hexToBytea(receipt.transactionHash),
       block_num: receipt.blockNumber.toString(),
     },
   })
-
-  await isTransferIndexedActivity(receipt.transactionHash, token)
-  await updateTemporalTransferActivity({
-    workflowId,
-    status: 'indexed',
-  })
-
-  log('Transfer indexed')
-  await deleteTemporalTransferActivity(workflowId)
-  return workflowId
+  return hash
 }

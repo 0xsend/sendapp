@@ -12,7 +12,6 @@ export const temporalTransferStatus = z.enum([
   'initialized',
   'sent',
   'confirmed',
-  'indexed',
   'failed',
   'cancelled',
 ] as const satisfies readonly Database['temporal']['Enums']['transfer_status'][])
@@ -25,7 +24,6 @@ const BaseTemporalTransfersDataSchema = z.object({
   user_op_hash: byteaToHexTxHash.nullable(),
   tx_hash: byteaToHexTxHash.nullable(),
   block_num: decimalStrToBigInt.nullable(),
-  tx_idx: decimalStrToBigInt.nullable(),
   log_addr: byteaToHexEthAddress,
 })
 
@@ -104,7 +102,6 @@ export const temporalEventNameFromStatus = (
     case 'sent':
       return 'Confirming...'
     case 'confirmed':
-    case 'indexed':
       return 'Sent'
     case 'failed':
     case 'cancelled':
