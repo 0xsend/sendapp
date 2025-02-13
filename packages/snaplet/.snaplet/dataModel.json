@@ -9743,9 +9743,6 @@
           "name": "failed"
         },
         {
-          "name": "indexed"
-        },
-        {
           "name": "initialized"
         },
         {

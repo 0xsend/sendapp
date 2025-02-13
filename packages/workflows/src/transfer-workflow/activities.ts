@@ -52,7 +52,6 @@ type TransferActivities = {
       details?: unknown[]
     }
   }) => Promise<void>
-  deleteTemporalTransferActivity: (workflowId: string) => Promise<{ event_id: string }>
 }
 
 export const createTransferActivities = (
@@ -204,20 +203,6 @@ export const createTransferActivities = (
           ...(failureError?.details ?? [])
         )
       }
-    },
-    async deleteTemporalTransferActivity(workflowId) {
-      const { data, error } = await deleteTemporalTransferFromActivityTable(workflowId)
-      if (error) {
-        throw ApplicationFailure.retryable(
-          'Error deleting temporal_transfer entry in activity table',
-          error.code,
-          {
-            error,
-            workflowId,
-          }
-        )
-      }
-      return data
     },
   }
 }
