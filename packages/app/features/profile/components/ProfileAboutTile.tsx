@@ -22,10 +22,11 @@ export const ProfileAboutTile = ({
             <Paragraph size={'$8'}>About</Paragraph>
             <Button
               onPress={onClose}
-              display={'none'}
-              cursor={'pointer'}
               chromeless
-              unstyled
+              hoverStyle={{ backgroundColor: 'transparent' }}
+              pressStyle={{ backgroundColor: 'transparent', borderColor: 'transparent' }}
+              focusStyle={{ backgroundColor: 'transparent' }}
+              display={'none'}
               $gtLg={{ display: 'flex' }}
             >
               <Button.Icon>
