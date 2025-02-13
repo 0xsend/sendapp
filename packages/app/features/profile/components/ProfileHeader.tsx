@@ -16,7 +16,7 @@ export const ProfileHeader = ({
   const profileHref = profile ? `/profile/${profile?.sendid}` : ''
   const [rootParams, setRootParams] = useRootScreenParams()
 
-  const handlePress = () => {
+  const handlePressOut = () => {
     setRootParams({
       ...rootParams,
       profile: rootParams.profile ? undefined : profile?.sendid?.toString(),
@@ -24,9 +24,22 @@ export const ProfileHeader = ({
   }
 
   return (
-    <Card flexDirection={'row'} jc="space-between" ai="center" padding={'$5'} onPress={handlePress}>
+    <Card
+      flexDirection={'row'}
+      jc="space-between"
+      ai="center"
+      padding={'$5'}
+      onPressOut={handlePressOut}
+    >
       <XStack ai="center" gap={'$size.1.5'} width={'80%'}>
-        <LinkableAvatar size="$6" br="$4" href={profileHref}>
+        <LinkableAvatar
+          size="$6"
+          br="$4"
+          href={profileHref}
+          onPressOut={(e) => {
+            e.stopPropagation()
+          }}
+        >
           <Avatar.Image
             src={profile?.avatar_url ?? ''}
             testID="avatarImage"

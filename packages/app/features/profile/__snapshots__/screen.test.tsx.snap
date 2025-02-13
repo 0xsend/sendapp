@@ -62,6 +62,15 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
         }
       >
         <View
+          cancelable={[Function]}
+          disabled={false}
+          focusable={[Function]}
+          minPressDuration={0}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onPress={[Function]}
+          onPressIn={[Function]}
+          onPressOut={[Function]}
           style={
             {
               "alignItems": "center",
