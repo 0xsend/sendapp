@@ -16,7 +16,8 @@ CREATE TYPE temporal.transfer_status AS ENUM(
     'sent',
     'confirmed',
     'indexed',
-    'failed'
+    'failed',
+    'cancelled'
 );
 
 CREATE TABLE temporal.send_account_transfers(
@@ -57,11 +58,20 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 DECLARE
-  f_user_id uuid;
+  _user_id uuid;
+  _data jsonb;
 BEGIN
-  SELECT user_id INTO f_user_id
+  SELECT user_id INTO _user_id
   FROM send_accounts
   WHERE address = concat('0x', encode(f, 'hex'))::citext;
+
+  -- cast v to text to avoid losing precision when converting to json when sending to clients
+  _data := json_build_object(
+      'f', f,
+      't', t,
+      'v', v::text,
+      'log_addr', log_addr
+  );
 
   INSERT INTO temporal.send_account_transfers(
     workflow_id,
@@ -71,14 +81,9 @@ BEGIN
   )
   VALUES (
     workflow_id,
-    f_user_id,
+    _user_id,
     status,
-    json_build_object(
-      'f', f,
-      't', t,
-      'v', v::text,
-      'log_addr', log_addr
-    )
+    _data
   );
 END;
 $$;
@@ -95,11 +100,19 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 DECLARE
-  sender_user_id uuid;
+  _user_id uuid;
+  _data jsonb;
 BEGIN
-  SELECT user_id INTO sender_user_id
+  SELECT user_id INTO _user_id
   FROM send_accounts
   WHERE address = concat('0x', encode(sender, 'hex'))::citext;
+
+  -- cast v to text to avoid losing precision when converting to json when sending to clients
+  _data := json_build_object(
+      'log_addr', log_addr,
+      'sender', sender,
+      'value', value::text
+  );
 
   INSERT INTO temporal.send_account_transfers(
     workflow_id,
@@ -109,13 +122,9 @@ BEGIN
   )
   VALUES (
     workflow_id,
-    sender_user_id,
+    _user_id,
     status,
-    json_build_object(
-      'log_addr', log_addr,
-      'sender', sender,
-      'value', value::text
-    )
+    _data
   );
 END;
 $$;
@@ -166,6 +175,7 @@ CREATE OR REPLACE FUNCTION temporal.temporal_token_send_account_transfers_trigge
 DECLARE
   _f_user_id uuid;
   _t_user_id uuid;
+  _data jsonb;
 BEGIN
   SELECT user_id INTO _f_user_id
   FROM send_accounts
@@ -174,6 +184,19 @@ BEGIN
   SELECT user_id INTO _t_user_id
   FROM send_accounts
   WHERE address = concat('0x', encode((NEW.data->>'t')::bytea, 'hex'))::citext;
+
+  -- cast v to text to avoid losing precision when converting to json when sending to clients
+  _data := json_build_object(
+      'status', NEW.status,
+      'user_op_hash', (NEW.data->>'user_op_hash'),
+      'log_addr', (NEW.data->>'log_addr'),
+      'f', (NEW.data->>'f'),
+      't', (NEW.data->>'t'),
+      'v', NEW.data->>'v'::text,
+      'tx_hash', (NEW.data->>'tx_hash'),
+      'block_num', NEW.data->>'block_num'::text,
+      'tx_idx', NEW.data->>'tx_idx'::text
+  );
 
   INSERT INTO activity(
     event_name,
@@ -188,17 +211,7 @@ BEGIN
     NEW.workflow_id,
     _f_user_id,
     _t_user_id,
-    json_build_object(
-      'status', NEW.status,
-      'user_op_hash', (NEW.data->>'user_op_hash'),
-      'log_addr', (NEW.data->>'log_addr'),
-      'f', (NEW.data->>'f'),
-      't', (NEW.data->>'t'),
-      'v', NEW.data->>'v'::text,
-      'tx_hash', (NEW.data->>'tx_hash'),
-      'block_num', NEW.data->>'block_num'::text,
-      'tx_idx', NEW.data->>'tx_idx'::text
-    ),
+    _data,
     NEW.created_at
   );
   RETURN NEW;
@@ -214,6 +227,7 @@ CREATE OR REPLACE FUNCTION temporal.temporal_eth_send_account_transfers_trigger_
 DECLARE
   _from_user_id uuid;
   _to_user_id uuid;
+  _data jsonb;
 BEGIN
   SELECT user_id INTO _from_user_id
   FROM send_accounts
@@ -222,6 +236,18 @@ BEGIN
   SELECT user_id INTO _to_user_id
   FROM send_accounts
   WHERE address = concat('0x', encode((NEW.data->>'log_addr')::bytea, 'hex'))::citext;
+
+      -- cast v to text to avoid losing precision when converting to json when sending to clients
+  _data := json_build_object(
+      'status', NEW.status,
+      'user_op_hash', (NEW.data->>'user_op_hash'),
+      'log_addr', (NEW.data->>'log_addr'),
+      'sender', (NEW.data->>'sender'),
+      'value', NEW.data->>'value'::text,
+      'tx_hash', (NEW.data->>'tx_hash'),
+      'block_num', NEW.data->>'block_num'::text,
+      'tx_idx', NEW.data->>'tx_idx'::text
+  );
 
   INSERT INTO activity(
     event_name,
@@ -236,16 +262,7 @@ BEGIN
     NEW.workflow_id,
     _from_user_id,
     _to_user_id,
-    json_build_object(
-      'status', NEW.status,
-      'user_op_hash', (NEW.data->>'user_op_hash'),
-      'log_addr', (NEW.data->>'log_addr'),
-      'sender', (NEW.data->>'sender'),
-      'value', NEW.data->>'value'::text,
-      'tx_hash', (NEW.data->>'tx_hash'),
-      'block_num', NEW.data->>'block_num'::text,
-      'tx_idx', NEW.data->>'tx_idx'::text
-    ),
+    _data,
     NEW.created_at
   );
   RETURN NEW;

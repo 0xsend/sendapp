@@ -6,17 +6,22 @@ import { CoinSchema, knownCoins } from 'app/data/coins'
 import { isAddressEqual } from 'viem'
 import { Events } from './events'
 import type { Database } from '@my/supabase/database-generated.types'
+
+/** Temporal transfers status */
+export const temporalTransferStatus = z.enum([
+  'initialized',
+  'sent',
+  'confirmed',
+  'indexed',
+  'failed',
+  'cancelled',
+] as const satisfies readonly Database['temporal']['Enums']['transfer_status'][])
+
 /**
  * Base temporal transfers data
  */
 const BaseTemporalTransfersDataSchema = z.object({
-  status: z.enum([
-    'initialized',
-    'sent',
-    'confirmed',
-    'indexed',
-    'failed',
-  ] as const satisfies readonly Database['temporal']['Enums']['transfer_status'][]),
+  status: temporalTransferStatus,
   user_op_hash: byteaToHexTxHash.optional(),
   tx_hash: byteaToHexTxHash.optional(),
   block_num: decimalStrToBigInt.optional(),

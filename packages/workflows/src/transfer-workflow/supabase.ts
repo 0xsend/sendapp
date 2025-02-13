@@ -1,4 +1,4 @@
-import type { Database } from '@my/supabase/database-generated.types'
+import type { PgBytea, Database } from '@my/supabase/database.types'
 import { log } from '@temporalio/activity'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
@@ -13,10 +13,10 @@ export async function insertTemporalTokenSendAccountTransfer({
 }: {
   workflow_id: string
   status: Database['temporal']['Enums']['transfer_status']
-  f: `\\x${string}`
-  t: `\\x${string}`
+  f: PgBytea
+  t: PgBytea
   v: bigint
-  log_addr: `\\x${string}`
+  log_addr: PgBytea
 }) {
   return await supabaseAdmin.schema('temporal').rpc('insert_temporal_token_send_account_transfer', {
     workflow_id,
@@ -37,8 +37,8 @@ export async function insertTemporalEthSendAccountTransfer({
 }: {
   workflow_id: string
   status: Database['temporal']['Enums']['transfer_status']
-  sender: `\\x${string}`
-  log_addr: `\\x${string}`
+  sender: PgBytea
+  log_addr: PgBytea
   value: bigint
 }) {
   return await supabaseAdmin.schema('temporal').rpc('insert_temporal_eth_send_account_transfer', {

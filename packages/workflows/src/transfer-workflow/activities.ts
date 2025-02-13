@@ -12,7 +12,8 @@ import type { UserOperation } from 'permissionless'
 import { bootstrap } from '@my/workflows/utils'
 import { decodeTransferUserOp } from 'app/utils/decodeTransferUserOp'
 import { hexToBytea } from 'app/utils/hexToBytea'
-import type { allCoinsDict } from 'app/data/coins'
+import type { Json, Database, PgBytea } from '@my/supabase/database.types'
+import superjson from 'superjson'
 
 export const createTransferActivities = (env: Record<string, string | undefined>) => {
   bootstrap(env)
@@ -26,39 +27,54 @@ export const createTransferActivities = (env: Record<string, string | undefined>
       if (amount <= 0n) {
         throw ApplicationFailure.nonRetryable('User Operation has amount <= 0')
       }
-
       if (!userOp.signature) {
         throw ApplicationFailure.nonRetryable('UserOp signature is required')
       }
-      try {
-        await simulateUserOperation(userOp)
-      } catch (error) {
+
+      await simulateUserOperation(userOp).catch((error) => {
         throw ApplicationFailure.nonRetryable('Error simulating user operation', error.code, error)
+      })
+
+      let fromBytea: PgBytea
+      let toBytea: PgBytea
+      let tokenBytea: PgBytea | null
+
+      try {
+        fromBytea = hexToBytea(from)
+        toBytea = hexToBytea(to)
+        tokenBytea = token === 'eth' ? null : hexToBytea(token)
+      } catch (error) {
+        throw ApplicationFailure.nonRetryable('Invalid hex address format')
       }
 
-      // Convert hex addresses to bytea for database
-      const fromBytea = hexToBytea(from)
-      const toBytea = hexToBytea(to)
-      const { error } =
-        token === 'eth'
-          ? await insertTemporalEthSendAccountTransfer({
-              workflow_id: workflowId,
-              status: 'initialized',
-              sender: fromBytea,
-              value: amount,
-              log_addr: toBytea,
-            })
-          : await insertTemporalTokenSendAccountTransfer({
-              workflow_id: workflowId,
-              status: 'initialized',
-              f: fromBytea,
-              t: toBytea,
-              v: amount,
-              log_addr: hexToBytea(token),
-            })
+      return { from: fromBytea, to: toBytea, amount, token: tokenBytea }
+    },
+    async insertTemporalSendAccountTransfer(
+      workflowId: string,
+      from: PgBytea,
+      to: PgBytea,
+      amount: bigint,
+      token: PgBytea | null
+    ) {
+      const { error } = token
+        ? await insertTemporalTokenSendAccountTransfer({
+            workflow_id: workflowId,
+            status: 'initialized',
+            f: from,
+            t: to,
+            v: amount,
+            log_addr: token,
+          })
+        : await insertTemporalEthSendAccountTransfer({
+            workflow_id: workflowId,
+            status: 'initialized',
+            sender: from,
+            value: amount,
+            log_addr: to,
+          })
 
       if (error) {
-        throw ApplicationFailure.nonRetryable(
+        throw ApplicationFailure.retryable(
           'Error inserting transfer into temporal.send_account_transfers',
           error.code,
           {
@@ -67,8 +83,6 @@ export const createTransferActivities = (env: Record<string, string | undefined>
           }
         )
       }
-
-      return { from, to, amount, token }
     },
     async sendUserOpActivity(userOp: UserOperation<'v0.7'>) {
       try {
@@ -77,72 +91,62 @@ export const createTransferActivities = (env: Record<string, string | undefined>
         return hash
       } catch (error) {
         log.error('Error sending user operation', { error })
-        throw ApplicationFailure.nonRetryable('Error sending user operation', error.code)
+        throw error
       }
     },
-    async updateTemporalTransferSentStatusActivity(workflowId: string, hash: `0x${string}`) {
-      const { error } = await updateTemporalSendAccountTransfer({
-        workflow_id: workflowId,
-        status: 'sent',
-        data: { user_op_hash: hash },
-      })
-      if (error) {
-        throw ApplicationFailure.retryable(
-          'Error updating entry in temporal_send_account_transfers with sent status',
-          error.code,
-          {
-            error,
-            workflowId,
-          }
-        )
-      }
-      return null
-    },
-    async waitForTransactionReceiptActivity(workflowId: string, hash: `0x${string}`) {
+    async waitForTransactionReceiptActivity(hash: `0x${string}`) {
       try {
-        const res = await waitForTransactionReceipt(hash)
-        if (!res) {
+        const bundlerReceipt = await waitForTransactionReceipt(hash)
+        if (!bundlerReceipt) {
           throw ApplicationFailure.retryable('No receipt returned from waitForTransactionReceipt')
         }
-        if (!res.success) {
-          throw ApplicationFailure.nonRetryable('Tx failed', res.sender, res.userOpHash)
-        }
-        log.info('waitForTransactionReceiptActivity', { tx_hash: res.receipt.transactionHash })
-        const { receipt } = res
-
-        await updateTemporalSendAccountTransfer({
-          workflow_id: workflowId,
-          status: 'confirmed',
-          data: {
-            tx_hash: receipt.transactionHash,
-            block_num: receipt.blockNumber.toString(),
-          },
+        log.info('waitForTransactionReceiptActivity', {
+          bundlerReceipt: superjson.stringify(bundlerReceipt),
         })
-        return receipt
+        if (!bundlerReceipt.success) {
+          throw new Error('Transaction failed')
+        }
+        return bundlerReceipt.receipt
       } catch (error) {
-        throw ApplicationFailure.retryable('Error waiting for tx receipt', error.code, error)
+        log.error('Error waiting for transaction receipt', { error })
+        throw error
       }
     },
-    async isTransferIndexedActivity(
-      workflowId: string,
-      tx_hash: `0x${string}`,
-      token: keyof allCoinsDict
-    ) {
-      const isIndexed =
-        token === 'eth'
-          ? await isEthTransferIndexed(tx_hash)
-          : await isTokenTransferIndexed(tx_hash)
+
+    async isTransferIndexedActivity(tx_hash: `0x${string}`, token: PgBytea | null) {
+      const isIndexed = token
+        ? await isTokenTransferIndexed(tx_hash)
+        : await isEthTransferIndexed(tx_hash)
 
       if (!isIndexed) {
         throw ApplicationFailure.retryable('Transfer not indexed in db')
       }
+      log.info('isTransferIndexedActivity', { isIndexed })
+      return isIndexed
+    },
+    async updateTemporalTransferActivity({
+      workflowId,
+      status,
+      data,
+      failureError,
+    }: {
+      workflowId: string
+      status: Database['temporal']['Enums']['transfer_status']
+      data?: Json
+      failureError?: {
+        message?: string | null
+        type?: string | null
+        details: unknown[]
+      }
+    }) {
       const { error } = await updateTemporalSendAccountTransfer({
         workflow_id: workflowId,
-        status: 'indexed',
+        status,
+        data,
       })
       if (error) {
         throw ApplicationFailure.retryable(
-          'Error updating entry in temporal_send_account_transfers with indexed status',
+          `Error updating entry in temporal_send_account_transfers with ${status} status`,
           error.code,
           {
             error,
@@ -150,14 +154,19 @@ export const createTransferActivities = (env: Record<string, string | undefined>
           }
         )
       }
-      log.info('isTransferIndexedActivity', { isIndexed })
-      return isIndexed
+      if (status === 'failed') {
+        throw ApplicationFailure.nonRetryable(
+          failureError?.message ?? null,
+          failureError?.type ?? null,
+          ...(failureError?.details ?? [])
+        )
+      }
     },
     async deleteTemporalTransferActivity(workflowId: string) {
       const { error } = await deleteTemporalTransferFromActivityTable(workflowId)
       if (error) {
         throw ApplicationFailure.retryable(
-          'Error deleting temporal_tranfer entry in activity',
+          'Error deleting temporal_transfer entry in activity table',
           error.code,
           {
             error,

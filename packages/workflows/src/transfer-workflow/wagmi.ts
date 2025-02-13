@@ -1,6 +1,5 @@
-import type { UserOperation } from 'permissionless'
+import type { UserOperation, GetUserOperationReceiptReturnType } from 'permissionless'
 import { baseMainnetBundlerClient, baseMainnetClient, entryPointAddress } from '@my/wagmi'
-import type { Hex } from 'viem'
 
 export async function simulateUserOperation(userOp: UserOperation<'v0.7'>) {
   return await baseMainnetClient.call({
@@ -16,6 +15,8 @@ export async function sendUserOperation(userOp: UserOperation<'v0.7'>) {
   })
 }
 
-export async function waitForTransactionReceipt(hash: `0x${string}`) {
+export async function waitForTransactionReceipt(
+  hash: `0x${string}`
+): Promise<GetUserOperationReceiptReturnType> {
   return await baseMainnetBundlerClient.waitForUserOperationReceipt({ hash })
 }
