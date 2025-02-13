@@ -102,13 +102,6 @@ jest.mock('solito/router', () => ({
   }),
 }))
 
-jest.mock('next/router', () => ({
-  useRouter: jest.fn().mockReturnValue({
-    query: {},
-    pathname: '/profile/0',
-  }),
-}))
-
 jest.mock('app/routers/params', () => ({
   useProfileScreenParams: jest.fn().mockReturnValue([{ sendid: 0 }, jest.fn()]),
   useRootScreenParams: jest.fn().mockReturnValue([{}, jest.fn()]),

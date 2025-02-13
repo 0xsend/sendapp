@@ -1,5 +1,5 @@
 import type { Functions } from '@my/supabase/database.types'
-import { Fade, Image, LinearGradient, Paragraph, Stack, XStack, YStack } from '@my/ui'
+import { Button, Fade, Image, LinearGradient, Paragraph, XStack, YStack } from '@my/ui'
 import { IconX, IconXLogo } from 'app/components/icons'
 
 export const ProfileAboutTile = ({
@@ -20,18 +20,22 @@ export const ProfileAboutTile = ({
         <YStack w={'100%'} bg={'$color1'} borderRadius={'$6'} padding={'$5'} gap={'$4'}>
           <XStack ai="center" jc="space-between">
             <Paragraph size={'$8'}>About</Paragraph>
-            <Stack
+            <Button
               onPress={onClose}
-              cursor={'pointer'}
               display={'none'}
+              cursor={'pointer'}
+              chromeless
+              unstyled
               $gtLg={{ display: 'flex' }}
             >
-              <IconX
-                size={'$1.5'}
-                $theme-dark={{ color: '$primary' }}
-                $theme-light={{ color: '$color12' }}
-              />
-            </Stack>
+              <Button.Icon>
+                <IconX
+                  size={'$1.5'}
+                  $theme-dark={{ color: '$primary' }}
+                  $theme-light={{ color: '$color12' }}
+                />
+              </Button.Icon>
+            </Button>
           </XStack>
           <YStack width="100%" aspectRatio={1} overflow="hidden" position="relative">
             <Image
