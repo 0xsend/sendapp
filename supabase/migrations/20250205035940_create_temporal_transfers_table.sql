@@ -4,7 +4,8 @@ SET check_function_bodies = OFF;
 CREATE SCHEMA IF NOT EXISTS temporal;
 
 -- Grant permissions for temporal schema
-GRANT USAGE ON SCHEMA temporal TO authenticated, service_role;
+GRANT USAGE ON SCHEMA temporal TO authenticated;
+GRANT USAGE ON SCHEMA temporal TO service_role;
 
 -- Grant execute on functions to service_role
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA temporal TO service_role;
@@ -28,6 +29,8 @@ CREATE TABLE temporal.send_account_transfers(
     created_at timestamptz DEFAULT (NOW() AT TIME ZONE 'UTC'),
     updated_at timestamptz DEFAULT (NOW() AT TIME ZONE 'UTC')
 );
+
+GRANT ALL ON TABLE temporal.send_account_transfers TO service_role;
 
 alter table "temporal"."send_account_transfers"
     enable row level security;
@@ -342,8 +345,7 @@ begin
     -- Delete any temporal transfers with matching tx_hash
     DELETE FROM activity a
     WHERE event_name = 'temporal_send_account_transfers'
-      AND a.data->>'tx_hash' = NEW.tx_hash
-
+      AND extract(epoch from a.created_at)::numeric < NEW.block_time;
     -- select send app info for from address
     select user_id into _f_user_id from send_accounts where address = concat('0x', encode(NEW.f, 'hex'))::citext;
     select user_id into _t_user_id from send_accounts where address = concat('0x', encode(NEW.t, 'hex'))::citext;
