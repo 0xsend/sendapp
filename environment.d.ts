@@ -21,7 +21,7 @@ declare global {
        */
       BUNDLER_RPC_URL: string
       /**
-       * The URL of the ERC 4337 Account Abstraction Bundler RPC endpoint
+       * The URL of the Base network RPC endpoint
        */
       NEXT_PUBLIC_BASE_RPC_URL: string
       NEXT_PUBLIC_BUNDLER_RPC_URL: string
@@ -46,21 +46,6 @@ declare global {
        * Cloudflare Turnstile site key
        */
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: string
-
-      /**
-       * Coinbase Developer Portal App ID
-       */
-      NEXT_PUBLIC_CDP_APP_ID: string
-
-      /**
-       * Onchain Kit API Key
-       */
-      NEXT_PUBLIC_ONCHAIN_KIT_API_KEY: string
-
-      /**
-       * Onramp Allowlist (comma separated list of user ids that can see the debit card option)
-       */
-      NEXT_PUBLIC_ONRAMP_ALLOWLIST: string
     }
   }
   /**
