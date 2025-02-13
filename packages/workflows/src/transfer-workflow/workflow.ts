@@ -1,4 +1,4 @@
-import { CancelledFailure, proxyActivities, workflowInfo } from '@temporalio/workflow'
+import { ApplicationFailure, proxyActivities, workflowInfo } from '@temporalio/workflow'
 import type { createTransferActivities } from './activities'
 import type { UserOperation } from 'permissionless'
 import superjson from 'superjson'
@@ -22,81 +22,65 @@ const {
 
 export async function TransferWorkflow(userOp: UserOperation<'v0.7'>) {
   const workflowId = workflowInfo().workflowId
-  try {
-    log('SendTransferWorkflow Initializing with userOp:', workflowId)
-    const { token, from, to, amount } = await initializeTransferActivity(workflowId, userOp)
+  log('SendTransferWorkflow Initializing with userOp:', workflowId)
+  const { token, from, to, amount } = await initializeTransferActivity(userOp)
 
-    log('Inserting temporal transfer into temporal.send_account_transfers', workflowId)
-    await insertTemporalSendAccountTransfer(workflowId, from, to, amount, token)
+  log('Inserting temporal transfer into temporal.send_account_transfers', workflowId)
+  await insertTemporalSendAccountTransfer(workflowId, from, to, amount, token)
 
-    log('Sending UserOperation', superjson.stringify(userOp))
-    const hash = await sendUserOpActivity(userOp).catch(async (error) => {
-      log('sendUserOpActivity failed', { error })
-      await updateTemporalTransferActivity({
-        workflowId,
-        status: 'failed',
-        failureError: {
-          message: error.message,
-          type: error.code,
-          details: error.details,
-        },
-      })
-      throw null
-    })
-
-    log('UserOperation sent, hash:', hash)
+  log('Sending UserOperation', superjson.stringify(userOp))
+  const { hash, hashBytea } = await sendUserOpActivity(userOp).catch(async (error) => {
+    log('sendUserOpActivity failed', { error })
+    // Ensure cleanup happens before throwing
+    await deleteTemporalTransferActivity(workflowId)
     await updateTemporalTransferActivity({
       workflowId,
-      status: 'sent',
-      data: { user_op_hash: hash },
-    })
-
-    const receipt = await waitForTransactionReceiptActivity(hash).catch(async (error) => {
-      log('waitForTransactionReceiptActivity failed', { error })
-      await updateTemporalTransferActivity({
-        workflowId,
-        status: 'failed',
-        failureError: {
-          message: error.message,
-          type: error.code,
-          details: error.details,
-        },
-      })
-      throw null
-    })
-    log('Receipt received:', { tx_hash: receipt.transactionHash })
-
-    await updateTemporalTransferActivity({
-      workflowId,
-      status: 'confirmed',
-      data: {
-        tx_hash: receipt.transactionHash,
-        block_num: receipt.blockNumber.toString(),
+      status: 'failed',
+      failureError: {
+        message: error.message,
+        type: error.code,
       },
     })
+    throw ApplicationFailure.nonRetryable('Error sending user operation', error.code, error)
+  })
 
-    await isTransferIndexedActivity(receipt.transactionHash, token)
+  log('UserOperation sent, hash:', hash)
+  await updateTemporalTransferActivity({
+    workflowId,
+    status: 'sent',
+    data: { user_op_hash: hashBytea },
+  })
+
+  const receipt = await waitForTransactionReceiptActivity(hash).catch(async (error) => {
+    log('waitForTransactionReceiptActivity failed', { error })
     await updateTemporalTransferActivity({
       workflowId,
-      status: 'indexed',
+      status: 'failed',
+      failureError: {
+        message: error.message,
+        type: error.code,
+      },
     })
-
-    log('Transfer indexed')
-    await deleteTemporalTransferActivity(workflowId)
-    return workflowId
-  } catch (error) {
-    // Handle workflow cancellation
-    if (error instanceof CancelledFailure) {
-      await updateTemporalTransferActivity({
-        workflowId,
-        status: 'cancelled',
-        failureError: {
-          message: 'Workflow Manually Terminated',
-          type: 'CANCELLED',
-          details: [],
-        },
-      })
-    }
     throw error
-  }
+  })
+  log('Receipt received:', { tx_hash: receipt.transactionHash })
+
+  await updateTemporalTransferActivity({
+    workflowId,
+    status: 'confirmed',
+    data: {
+      tx_hash: receipt.transactionHash,
+      block_num: receipt.blockNumber.toString(),
+    },
+  })
+
+  await isTransferIndexedActivity(receipt.transactionHash, token)
+  await updateTemporalTransferActivity({
+    workflowId,
+    status: 'indexed',
+  })
+
+  log('Transfer indexed')
+  await deleteTemporalTransferActivity(workflowId)
+  return workflowId
 }
