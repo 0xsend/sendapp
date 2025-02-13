@@ -1,31 +1,24 @@
-import type { IconProps } from '@tamagui/helpers-icon'
-import { themed } from '@tamagui/helpers-icon'
-import React, { memo } from 'react'
-import { Line, Path, Polyline, Svg } from 'react-native-svg'
 import type { ColorTokens } from '@my/ui/types'
+import { type IconProps, themed } from '@tamagui/helpers-icon'
+import { memo } from 'react'
+import { Path, Svg } from 'react-native-svg'
 
-const Icon = (props) => {
-  const { color, size, ...otherProps } = props
+const Logout = (props) => {
+  const { size, color, ...rest } = props
   return (
     <Svg
-      width={size ?? 16}
-      height={size ?? 28}
       color={color as ColorTokens | undefined}
+      width={size}
+      height={size}
       viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      {...otherProps}
+      {...rest}
     >
-      <Path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" fill="currentColor" />
-      <Polyline points="16 17 21 12 16 7" fill="currentColor" />
-      <Line x1="21" x2="9" y1="12" y2="12" fill="currentColor" />
+      <Path
+        fill="currentColor"
+        d="M3 21V3H12V5H5V19H12V21H3ZM16 17L14.625 15.55L17.175 13H9V11H17.175L14.625 8.45L16 7L21 12L16 17Z"
+      />
     </Svg>
   )
 }
-
-Icon.displayName = 'LogOut'
-
-export const IconLogout = memo<IconProps>(themed(Icon))
+const IconLogout = memo<IconProps>(themed(Logout))
+export { IconLogout }

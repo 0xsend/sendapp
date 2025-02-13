@@ -1,56 +1,36 @@
-import { Link, Paragraph, type LinkProps, Separator, useSheet } from '@my/ui'
-import { usePathname } from 'app/utils/usePathname'
-import type { ReactElement } from 'react'
-import { useThemeSetting } from '@tamagui/next-theme'
+import { Link, type LinkProps, Paragraph, XStack } from '@my/ui'
+import type { ReactElement, ReactNode } from 'react'
+import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { ChevronRight } from '@tamagui/lucide-icons'
 
 export function SettingsNavLink({
   text,
+  icon,
   ...props
-}: { text: string } & Omit<LinkProps, 'children'>): ReactElement {
-  const location = usePathname()
-  const sheet = useSheet()
-  const href = props.href.toString().split('?')[0]
-  const isActiveRoute = href
-    ? href === '/account'
-      ? location === href
-      : location.includes(href as string)
-    : false // no href is never active
-
-  const { resolvedTheme } = useThemeSetting()
-  const iconActiveColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$color12'
+}: { text: string; icon: ReactNode } & Omit<LinkProps, 'children'>): ReactElement {
+  const hoverStyles = useHoverStyles()
 
   return (
-    <Link
-      hoverStyle={
-        props.disabled ? {} : { opacity: 1, backgroundColor: 'transparent', borderWidth: 0 }
-      }
-      cursor={props.disabled ? 'not-allowed' : 'pointer'}
-      disabled={props.disabled}
-      {...props}
-      href={props.disabled ? '' : props.href}
-    >
-      <Paragraph
-        f={1}
-        fontWeight={isActiveRoute ? '600' : '400'}
-        color={isActiveRoute ? iconActiveColor : '$color10'}
-        pl="$4"
-        fontSize={'$5'}
+    <Link {...props}>
+      <XStack
+        ai="center"
+        jc="space-between"
+        gap="$4"
+        p="$3.5"
+        br={'$4'}
+        $gtLg={{ p: '$5' }}
+        hoverStyle={hoverStyles}
       >
-        {text}
-      </Paragraph>
-      {isActiveRoute && !sheet.open && (
-        <Separator
-          vertical
-          borderColor="$primary"
-          $theme-light={{ borderColor: '$color12' }}
-          pos="absolute"
-          right={-1.5}
-          top={-2}
-          bottom={0}
-          height="$2"
-          borderWidth={1}
+        <XStack gap="$3.5" ai="center">
+          {icon}
+          <Paragraph size={'$6'}>{text}</Paragraph>
+        </XStack>
+        <ChevronRight
+          size={'$1'}
+          color={'$lightGrayTextField'}
+          $theme-light={{ color: '$darkGrayTextField' }}
         />
-      )}
+      </XStack>
     </Link>
   )
 }

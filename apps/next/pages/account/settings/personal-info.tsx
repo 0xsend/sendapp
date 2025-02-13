@@ -20,7 +20,7 @@ export const Page: NextPageWithLayout = () => {
 
 export const getServerSideProps = userProtectedGetSSP()
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Settings" />}>
+  <HomeLayout TopNav={<TopNav header="Settings" backFunction={'router'} />} fullHeight>
     <SettingsLayout>{children}</SettingsLayout>
   </HomeLayout>
 )

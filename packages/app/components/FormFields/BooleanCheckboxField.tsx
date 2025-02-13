@@ -64,10 +64,12 @@ export const BooleanCheckboxField = (
             ref={field.ref}
             id={id}
             borderWidth={0}
+            backgroundColor={isChecked ? '$primary' : '$background'}
+            circular={true}
             {...props}
           >
             <Checkbox.Indicator>
-              <Check />
+              <Check color={'$black'} />
             </Checkbox.Indicator>
           </Checkbox>
         </XStack>

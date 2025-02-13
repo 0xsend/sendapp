@@ -2,10 +2,10 @@ import {
   Button,
   isWeb,
   Paragraph,
+  Separator,
   SubmitButton,
   Text,
   useToastController,
-  XStack,
   YStack,
 } from '@my/ui'
 import { SchemaForm } from 'app/utils/SchemaForm'
@@ -15,12 +15,17 @@ import type { z } from 'zod'
 import { FormProvider, useForm } from 'react-hook-form'
 import { VerifyCode } from 'app/features/auth/components/VerifyCode'
 import { AuthUserSchema, useAuthUserMutation } from 'app/utils/useAuthUserMutation'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useProfileMutation } from 'app/utils/useUserPersonalDataMutation'
 import { useQuery } from '@tanstack/react-query'
 import { adjustUTCDateForTimezone } from 'app/utils/dateHelper'
+import { SettingsHeader } from 'app/features/account/settings/components/SettingsHeader'
+import { FieldWithLabel } from 'app/features/account/settings/components/FieldWithLabel'
+import { ReadOnlyFieldWithLabel } from 'app/features/account/settings/components/ReadOnlyFieldWithLabel'
+import { Section } from 'app/features/account/settings/components/Section'
 
 enum FormState {
+  Overview = 'Overview',
   PersonalInfoForm = 'PersonalInfoForm',
   VerificationCode = 'VerificationCode',
 }
@@ -46,11 +51,11 @@ export const PersonalInfoScreen = () => {
   const form = useForm<z.infer<typeof AuthUserSchema>>() // Using react-hook-form
   const { mutateAsync: mutateAuthAsync } = useAuthUserMutation()
   const { mutateAsync: mutateProfileAsync } = useProfileMutation()
-  const [formState, setFormState] = useState<FormState>(FormState.PersonalInfoForm)
+  const [formState, setFormState] = useState<FormState>(FormState.Overview)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   async function handleSuccessCodeVerification() {
-    setFormState(FormState.PersonalInfoForm)
+    setFormState(FormState.Overview)
     toast.show('Phone number updated')
 
     if (!isWeb) {
@@ -74,6 +79,8 @@ export const PersonalInfoScreen = () => {
 
       if (shouldUpdateUser) {
         await handleUserUpdate()
+      } else {
+        setFormState(FormState.Overview)
       }
     } catch (error) {
       console.error(error)
@@ -84,24 +91,30 @@ export const PersonalInfoScreen = () => {
     }
   }
 
-  useEffect(() => {
-    const birthday = profile?.birthday
-      ? adjustUTCDateForTimezone(new Date(profile.birthday))
-      : undefined
+  const birthday = useMemo(
+    () => (profile?.birthday ? adjustUTCDateForTimezone(new Date(profile.birthday)) : undefined),
+    [profile?.birthday]
+  )
 
+  const formatDate = (date?: Date) =>
+    date?.toLocaleString(undefined, { day: 'numeric', month: 'long' }) || ''
+
+  useEffect(() => {
     form.reset({
       phone: user?.phone ?? '',
       xUsername: profile?.x_username ?? '',
       birthday,
     })
-  }, [profile?.x_username, user?.phone, form.reset, profile?.birthday])
+  }, [profile?.x_username, user?.phone, form.reset, birthday])
 
   const verificationCode = (
-    <VerifyCode
-      type={'phone_change'}
-      phone={form.getValues().phone}
-      onSuccess={handleSuccessCodeVerification}
-    />
+    <Section>
+      <VerifyCode
+        type={'phone_change'}
+        phone={form.getValues().phone}
+        onSuccess={handleSuccessCodeVerification}
+      />
+    </Section>
   )
 
   const personalInfoForm = (
@@ -116,15 +129,9 @@ export const PersonalInfoScreen = () => {
           keyboardType: 'phone-pad',
           autoCapitalize: 'none',
           bc: '$color0',
-          labelProps: {
-            color: '$color10',
-          },
         },
         xUsername: {
           'aria-label': 'X username',
-          labelProps: {
-            color: '$color10',
-          },
           bc: '$color0',
           pl: '$8',
           iconBefore: (
@@ -135,28 +142,28 @@ export const PersonalInfoScreen = () => {
         },
         birthday: {
           'aria-label': 'birthday',
-          labelProps: {
-            color: '$color10',
-          },
           bc: '$color0',
-          customDateFormatter: (date?: Date) =>
-            date?.toLocaleString(undefined, { day: 'numeric', month: 'long' }) || '',
+          customDateFormatter: formatDate,
           disabled: Boolean(profile?.birthday),
         },
       }}
       renderAfter={({ submit }) => (
-        <YStack ai={'flex-start'}>
+        <YStack>
           <SubmitButton
-            f={1}
-            marginTop={'$5'}
-            fontWeight={'500'}
-            onPress={() => submit()}
             theme="green"
-            borderRadius={'$3'}
-            px={'$size.1.5'}
+            borderRadius={'$4'}
+            p={'$4'}
+            mt={'$1'}
+            onPress={() => submit()}
           >
-            <Button.Text ff={'$mono'} fontWeight={'600'} tt="uppercase" size={'$5'}>
-              SAVE
+            <Button.Text
+              ff={'$mono'}
+              fontWeight={'500'}
+              tt="uppercase"
+              size={'$5'}
+              color={'$black'}
+            >
+              SAVE CHANGES
             </Button.Text>
           </SubmitButton>
           {errorMessage && (
@@ -167,24 +174,72 @@ export const PersonalInfoScreen = () => {
         </YStack>
       )}
     >
-      {(fields) => <>{Object.values(fields)}</>}
+      {({ phone, birthday, xUsername }) => (
+        <Section>
+          <FieldWithLabel label={'Phone'} gap={'$2'}>
+            {phone}
+          </FieldWithLabel>
+          <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
+          <FieldWithLabel label={'Date of Birth'} additionalInfo={'(non-editable)'} gap={'$2'}>
+            {birthday}
+          </FieldWithLabel>
+          <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
+          <FieldWithLabel label={'X Handle'} gap={'$2'}>
+            {xUsername}
+          </FieldWithLabel>
+        </Section>
+      )}
     </SchemaForm>
   )
 
+  const overview = (
+    <YStack gap={'$5'}>
+      <Section>
+        <ReadOnlyFieldWithLabel label={'Phone'} text={user?.phone || '-'} />
+        <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
+        <ReadOnlyFieldWithLabel
+          label={'Date of Birth'}
+          text={formatDate(birthday) || '-'}
+          additionalInfo={'(non-editable)'}
+        />
+        <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
+        <ReadOnlyFieldWithLabel
+          label={'X Handle'}
+          text={profile?.x_username ? `@ ${profile?.x_username}` : '-'}
+        />
+      </Section>
+      <SubmitButton
+        theme="green"
+        borderRadius={'$4'}
+        p={'$4'}
+        onPress={() => setFormState(FormState.PersonalInfoForm)}
+      >
+        <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
+          edit personal information
+        </Button.Text>
+      </SubmitButton>
+    </YStack>
+  )
+
   return (
-    <YStack w={'100%'} als={'center'}>
-      <XStack w={'100%'} $gtLg={{ paddingTop: '$6' }} $lg={{ jc: 'center' }}>
+    <YStack w={'100%'}>
+      <YStack gap={'$3.5'}>
+        <SettingsHeader>Personal Information</SettingsHeader>
         <FormProvider {...form}>
           {(() => {
             switch (formState) {
+              case FormState.Overview:
+                return overview
               case FormState.PersonalInfoForm:
                 return personalInfoForm
               case FormState.VerificationCode:
                 return verificationCode
+              default:
+                return overview
             }
           })()}
         </FormProvider>
-      </XStack>
+      </YStack>
     </YStack>
   )
 }

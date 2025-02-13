@@ -22,8 +22,8 @@ test.beforeEach(async ({ page, user: { user } }) => {
   await nextContainer.getByRole('link', { name: 'account' }).click()
   await page.waitForURL('/account')
   await nextContainer.getByRole('link', { name: 'Settings' }).click()
-  await page.waitForURL('/account/settings/edit-profile')
-  await nextContainer.getByRole('link', { name: 'Backup' }).click()
+  await page.waitForURL('/account/settings')
+  await nextContainer.getByRole('link', { name: 'Passkeys' }).click()
   await expect(page).toHaveURL('/account/settings/backup')
 })
 
@@ -45,7 +45,7 @@ const backupAccountTest = async ({
   expect(cred).toBeTruthy()
   expect(page.getByText(cred.display_name)).toBeVisible()
 
-  await page.getByRole('link', { name: 'Add Passkey' }).click()
+  await page.getByRole('link', { name: 'add a passkey' }).click()
   await page.waitForURL('/account/settings/backup/create')
 
   const acctName = `test-${Math.floor(Math.random() * 1000000)}`
@@ -53,7 +53,7 @@ const backupAccountTest = async ({
   await expect(page.getByLabel('Passkey name')).toHaveValue(acctName)
   const request = page.waitForRequest('**/rest/v1/rpc/send_accounts_add_webauthn_credential')
   const response = page.waitForResponse('**/rest/v1/rpc/send_accounts_add_webauthn_credential')
-  await page.getByRole('button', { name: 'Create Passkey' }).click()
+  await page.getByRole('button', { name: 'add a passkey' }).click()
   await request
   await response
 

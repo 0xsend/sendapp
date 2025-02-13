@@ -18,7 +18,6 @@ import { IconAccount, IconArrowLeft, IconSendLogo } from 'app/components/icons'
 import { usePathname } from 'app/utils/usePathname'
 import { useRouter } from 'solito/router'
 
-import { SettingsBottomSheet } from 'app/features/account/settings/SettingsBottomSheet'
 import { useCoinFromTokenParam } from '../utils/useCoinFromTokenParam'
 import { Link } from 'solito/link'
 import { useUser } from 'app/utils/useUser'
@@ -118,11 +117,6 @@ export function TopNav({
         default:
           return parts.slice(0, parts.length - 1).join('/')
       }
-    }
-
-    if (path.includes('/settings')) {
-      push(`/${newPath()}?nav=settings`)
-      return
     }
 
     push(`/${newPath()}`)
@@ -245,7 +239,6 @@ export function TopNav({
           <Separator w={'100%'} borderColor="$jet" $lg={{ display: 'none' }} />
         </Container>
       )}
-      <SettingsBottomSheet />
     </Header>
   )
 }
