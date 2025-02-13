@@ -15,7 +15,6 @@ CREATE TYPE temporal.transfer_status AS ENUM(
     'initialized',
     'sent',
     'confirmed',
-    'indexed',
     'failed',
     'cancelled'
 );
@@ -146,8 +145,7 @@ BEGIN
     _data := json_build_object(
       'user_op_hash', (data->>'user_op_hash'),
       'tx_hash', (data->>'tx_hash'),
-      'block_num', data->>'block_num'::text,
-      'tx_idx', data->>'tx_idx'::text
+      'block_num', data->>'block_num'::text
     );
   ELSE
     _data := '{}'::jsonb;
@@ -194,8 +192,7 @@ BEGIN
       't', (NEW.data->>'t'),
       'v', NEW.data->>'v'::text,
       'tx_hash', (NEW.data->>'tx_hash'),
-      'block_num', NEW.data->>'block_num'::text,
-      'tx_idx', NEW.data->>'tx_idx'::text
+      'block_num', NEW.data->>'block_num'::text
   );
 
   INSERT INTO activity(
@@ -245,8 +242,7 @@ BEGIN
       'sender', (NEW.data->>'sender'),
       'value', NEW.data->>'value'::text,
       'tx_hash', (NEW.data->>'tx_hash'),
-      'block_num', NEW.data->>'block_num'::text,
-      'tx_idx', NEW.data->>'tx_idx'::text
+      'block_num', NEW.data->>'block_num'::text
   );
 
   INSERT INTO activity(
@@ -290,12 +286,19 @@ CREATE OR REPLACE FUNCTION temporal.temporal_send_account_transfers_trigger_upda
 DECLARE
   _data jsonb;
 BEGIN
-  _data := NEW.data || json_build_object('status', NEW.status::text)::jsonb;
+  IF EXISTS (
+    SELECT 1 FROM activity
+    WHERE event_name = 'temporal_send_account_transfers'
+      AND event_id = NEW.workflow_id
+  ) THEN
+    _data := NEW.data || json_build_object('status', NEW.status::text)::jsonb;
 
-  UPDATE activity
-  SET data = _data
-  WHERE event_name = 'temporal_send_account_transfers'
-    AND event_id = NEW.workflow_id;
+    UPDATE activity
+    SET data = _data
+    WHERE event_name = 'temporal_send_account_transfers'
+      AND event_id = NEW.workflow_id;
+  END IF;
+
   RETURN NEW;
 END;
 $$;
@@ -304,33 +307,6 @@ CREATE TRIGGER temporal_send_account_transfers_trigger_update_activity
   AFTER UPDATE ON temporal.send_account_transfers
   FOR EACH ROW
   EXECUTE FUNCTION temporal.temporal_send_account_transfers_trigger_update_activity();
-
-CREATE OR REPLACE FUNCTION temporal.delete_temporal_transfer_activity(workflow_id text)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-BEGIN
-    DELETE FROM activity
-    WHERE event_name = 'temporal_send_account_transfers'
-      AND event_id = workflow_id;
-END;
-$$;
-
-CREATE OR REPLACE FUNCTION temporal.delete_temporal_transfer(workflow_id text)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-BEGIN
-    DELETE FROM temporal.send_account_transfers
-    WHERE workflow_id = workflow_id
-      AND EXISTS (
-        SELECT 1 FROM temporal.send_account_transfers
-        WHERE workflow_id = workflow_id
-      );
-END;
-$$;
 
 CREATE OR REPLACE FUNCTION temporal.temporal_send_account_transfers_trigger_delete_activity()
   RETURNS TRIGGER
@@ -349,3 +325,54 @@ CREATE TRIGGER temporal_send_account_transfers_trigger_delete_activity
   BEFORE DELETE ON temporal.send_account_transfers
   FOR EACH ROW
   EXECUTE FUNCTION temporal.temporal_send_account_transfers_trigger_delete_activity();
+
+
+-- When a send_account_transfer activity is inserted, delete any temporal_send_account_transfers
+-- with the same tx_hash from activity table.
+-- This prevents duplicate activities once a transfer is completed.
+create or replace function send_account_transfers_trigger_insert_activity() returns trigger
+language plpgsql
+security definer as
+$$
+declare
+    _f_user_id uuid;
+    _t_user_id uuid;
+    _data jsonb;
+begin
+    -- Delete any temporal transfers with matching tx_hash
+    DELETE FROM activity a
+    WHERE event_name = 'temporal_send_account_transfers'
+      AND a.data->>'tx_hash' = NEW.tx_hash
+
+    -- select send app info for from address
+    select user_id into _f_user_id from send_accounts where address = concat('0x', encode(NEW.f, 'hex'))::citext;
+    select user_id into _t_user_id from send_accounts where address = concat('0x', encode(NEW.t, 'hex'))::citext;
+
+    -- cast v to text to avoid losing precision when converting to json when sending to clients
+    _data := json_build_object(
+        'log_addr', NEW.log_addr,
+        'f', NEW.f,
+        't', NEW.t,
+        'v', NEW.v::text,
+        'tx_hash', NEW.tx_hash,
+        'block_num', NEW.block_num::text,
+        'tx_idx', NEW.tx_idx::text,
+        'log_idx', NEW.log_idx::text
+    );
+
+    insert into activity (event_name, event_id, from_user_id, to_user_id, data, created_at)
+    values ('send_account_transfers',
+            NEW.event_id,
+            _f_user_id,
+            _t_user_id,
+            _data,
+            to_timestamp(NEW.block_time) at time zone 'UTC')
+    on conflict (event_name, event_id) do update set
+        from_user_id = _f_user_id,
+        to_user_id = _t_user_id,
+        data = _data,
+        created_at = to_timestamp(NEW.block_time) at time zone 'UTC';
+
+    return NEW;
+end;
+$$;
