@@ -43,7 +43,6 @@ export const TokenActivity = ({ coin }: { coin: CoinWithBalance }) => {
       ? setRefetchInterval(1000)
       : setRefetchInterval(30_000)
   }, [pages])
-  console.log('pages: ', pages)
 
   if (isLoading) return <Spinner size="small" />
   return (
