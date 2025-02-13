@@ -1542,6 +1542,7 @@ export type Database = {
         | "confirmed"
         | "indexed"
         | "failed"
+        | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
