@@ -15,11 +15,48 @@ import { hexToBytea } from 'app/utils/hexToBytea'
 import type { Json, Database, PgBytea } from '@my/supabase/database.types'
 import superjson from 'superjson'
 
-export const createTransferActivities = (env: Record<string, string | undefined>) => {
+type TransferActivities = {
+  initializeTransferActivity: (userOp: UserOperation<'v0.7'>) => Promise<{
+    from: PgBytea
+    to: PgBytea
+    amount: bigint
+    token: PgBytea | null
+  }>
+  insertTemporalSendAccountTransfer: (
+    workflowId: string,
+    from: PgBytea,
+    to: PgBytea,
+    amount: bigint,
+    token: PgBytea | null
+  ) => Promise<void>
+  sendUserOpActivity: (
+    userOp: UserOperation<'v0.7'>
+  ) => Promise<{ hash: `0x${string}`; hashBytea: PgBytea }>
+  waitForTransactionReceiptActivity: (hash: `0x${string}`) => Promise<{
+    transactionHash: `0x${string}`
+    blockNumber: bigint
+  }>
+  isTransferIndexedActivity: (tx_hash: `0x${string}`, token: PgBytea | null) => Promise<boolean>
+  updateTemporalTransferActivity: (params: {
+    workflowId: string
+    status: Database['temporal']['Enums']['transfer_status']
+    data?: Json
+    failureError?: {
+      message?: string | null
+      type?: string | null
+      details?: unknown[]
+    }
+  }) => Promise<void>
+  deleteTemporalTransferActivity: (workflowId: string) => Promise<{ event_id: string }>
+}
+
+export const createTransferActivities = (
+  env: Record<string, string | undefined>
+): TransferActivities => {
   bootstrap(env)
 
   return {
-    async initializeTransferActivity(workflowId: string, userOp: UserOperation<'v0.7'>) {
+    async initializeTransferActivity(userOp) {
       const { from, to, token, amount } = decodeTransferUserOp({ userOp })
       if (!from || !to || !amount || !token) {
         throw ApplicationFailure.nonRetryable('User Operation is not a valid transfer')
@@ -49,13 +86,7 @@ export const createTransferActivities = (env: Record<string, string | undefined>
 
       return { from: fromBytea, to: toBytea, amount, token: tokenBytea }
     },
-    async insertTemporalSendAccountTransfer(
-      workflowId: string,
-      from: PgBytea,
-      to: PgBytea,
-      amount: bigint,
-      token: PgBytea | null
-    ) {
+    async insertTemporalSendAccountTransfer(workflowId, from, to, amount, token) {
       const { error } = token
         ? await insertTemporalTokenSendAccountTransfer({
             workflow_id: workflowId,
@@ -74,6 +105,12 @@ export const createTransferActivities = (env: Record<string, string | undefined>
           })
 
       if (error) {
+        if (error.code === '23505') {
+          throw ApplicationFailure.nonRetryable(
+            'Duplicate entry for temporal.send_account_transfers',
+            error.code
+          )
+        }
         throw ApplicationFailure.retryable(
           'Error inserting transfer into temporal.send_account_transfers',
           error.code,
@@ -85,35 +122,24 @@ export const createTransferActivities = (env: Record<string, string | undefined>
       }
     },
     async sendUserOpActivity(userOp: UserOperation<'v0.7'>) {
-      try {
-        const hash = await sendUserOperation(userOp)
-        log.info('UserOperation sent successfully', { hash })
-        return hash
-      } catch (error) {
-        log.error('Error sending user operation', { error })
-        throw error
-      }
+      const hash = await sendUserOperation(userOp)
+      const hashBytea = hexToBytea(hash)
+      return { hash, hashBytea }
     },
-    async waitForTransactionReceiptActivity(hash: `0x${string}`) {
-      try {
-        const bundlerReceipt = await waitForTransactionReceipt(hash)
-        if (!bundlerReceipt) {
-          throw ApplicationFailure.retryable('No receipt returned from waitForTransactionReceipt')
-        }
-        log.info('waitForTransactionReceiptActivity', {
-          bundlerReceipt: superjson.stringify(bundlerReceipt),
-        })
-        if (!bundlerReceipt.success) {
-          throw new Error('Transaction failed')
-        }
-        return bundlerReceipt.receipt
-      } catch (error) {
-        log.error('Error waiting for transaction receipt', { error })
-        throw error
+    async waitForTransactionReceiptActivity(hash) {
+      const bundlerReceipt = await waitForTransactionReceipt(hash)
+      if (!bundlerReceipt) {
+        throw ApplicationFailure.retryable('No receipt returned from waitForTransactionReceipt')
       }
+      log.info('waitForTransactionReceiptActivity', {
+        bundlerReceipt: superjson.stringify(bundlerReceipt),
+      })
+      if (!bundlerReceipt.success) {
+        throw new Error('Transaction failed')
+      }
+      return bundlerReceipt.receipt
     },
-
-    async isTransferIndexedActivity(tx_hash: `0x${string}`, token: PgBytea | null) {
+    async isTransferIndexedActivity(tx_hash, token) {
       const isIndexed = token
         ? await isTokenTransferIndexed(tx_hash)
         : await isEthTransferIndexed(tx_hash)
@@ -124,21 +150,7 @@ export const createTransferActivities = (env: Record<string, string | undefined>
       log.info('isTransferIndexedActivity', { isIndexed })
       return isIndexed
     },
-    async updateTemporalTransferActivity({
-      workflowId,
-      status,
-      data,
-      failureError,
-    }: {
-      workflowId: string
-      status: Database['temporal']['Enums']['transfer_status']
-      data?: Json
-      failureError?: {
-        message?: string | null
-        type?: string | null
-        details: unknown[]
-      }
-    }) {
+    async updateTemporalTransferActivity({ workflowId, status, data, failureError }) {
       const { error } = await updateTemporalSendAccountTransfer({
         workflow_id: workflowId,
         status,
@@ -162,8 +174,8 @@ export const createTransferActivities = (env: Record<string, string | undefined>
         )
       }
     },
-    async deleteTemporalTransferActivity(workflowId: string) {
-      const { error } = await deleteTemporalTransferFromActivityTable(workflowId)
+    async deleteTemporalTransferActivity(workflowId) {
+      const { data, error } = await deleteTemporalTransferFromActivityTable(workflowId)
       if (error) {
         throw ApplicationFailure.retryable(
           'Error deleting temporal_transfer entry in activity table',
@@ -174,6 +186,7 @@ export const createTransferActivities = (env: Record<string, string | undefined>
           }
         )
       }
+      return data
     },
   }
 }

@@ -9807,6 +9807,9 @@
       "schemaName": "temporal",
       "values": [
         {
+          "name": "cancelled"
+        },
+        {
           "name": "confirmed"
         },
         {

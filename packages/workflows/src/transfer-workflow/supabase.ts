@@ -67,7 +67,12 @@ export async function updateTemporalSendAccountTransfer({
 }
 
 export async function deleteTemporalTransferFromActivityTable(workflow_id: string) {
-  return await supabaseAdmin.from('activity').delete().eq('event_id', workflow_id)
+  return await supabaseAdmin
+    .from('activity')
+    .delete()
+    .eq('event_id', workflow_id)
+    .select('event_id')
+    .single()
 }
 
 export async function isTokenTransferIndexed(tx_hash: `0x${string}`) {

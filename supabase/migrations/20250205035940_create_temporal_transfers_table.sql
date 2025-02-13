@@ -187,7 +187,7 @@ BEGIN
 
   -- cast v to text to avoid losing precision when converting to json when sending to clients
   _data := json_build_object(
-      'status', NEW.status,
+      'status', NEW.status::text,
       'user_op_hash', (NEW.data->>'user_op_hash'),
       'log_addr', (NEW.data->>'log_addr'),
       'f', (NEW.data->>'f'),
@@ -239,7 +239,7 @@ BEGIN
 
       -- cast v to text to avoid losing precision when converting to json when sending to clients
   _data := json_build_object(
-      'status', NEW.status,
+      'status', NEW.status::text,
       'user_op_hash', (NEW.data->>'user_op_hash'),
       'log_addr', (NEW.data->>'log_addr'),
       'sender', (NEW.data->>'sender'),
@@ -287,9 +287,13 @@ CREATE OR REPLACE FUNCTION temporal.temporal_send_account_transfers_trigger_upda
   LANGUAGE plpgsql
   SECURITY DEFINER
   AS $$
+DECLARE
+  _data jsonb;
 BEGIN
+  _data := NEW.data || json_build_object('status', NEW.status::text)::jsonb;
+
   UPDATE activity
-  SET data = NEW.data
+  SET data = _data
   WHERE event_name = 'temporal_send_account_transfers'
     AND event_id = NEW.workflow_id;
   RETURN NEW;
