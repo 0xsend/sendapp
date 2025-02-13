@@ -316,3 +316,36 @@ BEGIN
       AND event_id = workflow_id;
 END;
 $$;
+
+CREATE OR REPLACE FUNCTION temporal.delete_temporal_transfer(workflow_id text)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+    DELETE FROM temporal.send_account_transfers
+    WHERE workflow_id = workflow_id
+      AND EXISTS (
+        SELECT 1 FROM temporal.send_account_transfers
+        WHERE workflow_id = workflow_id
+      );
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION temporal.temporal_send_account_transfers_trigger_delete_activity()
+  RETURNS TRIGGER
+  LANGUAGE plpgsql
+  SECURITY DEFINER
+  AS $$
+BEGIN
+    DELETE FROM activity
+    WHERE event_name = 'temporal_send_account_transfers'
+      AND event_id = OLD.workflow_id;
+    RETURN OLD;
+END;
+$$;
+
+CREATE TRIGGER temporal_send_account_transfers_trigger_delete_activity
+  BEFORE DELETE ON temporal.send_account_transfers
+  FOR EACH ROW
+  EXECUTE FUNCTION temporal.temporal_send_account_transfers_trigger_delete_activity();

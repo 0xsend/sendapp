@@ -1525,6 +1525,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      delete_temporal_transfer: {
+        Args: {
+          workflow_id: string
+        }
+        Returns: undefined
+      }
       delete_temporal_transfer_activity: {
         Args: {
           workflow_id: string

@@ -29,21 +29,7 @@ export async function TransferWorkflow(userOp: UserOperation<'v0.7'>) {
   await insertTemporalSendAccountTransfer(workflowId, from, to, amount, token)
 
   log('Sending UserOperation', superjson.stringify(userOp))
-  const { hash, hashBytea } = await sendUserOpActivity(userOp).catch(async (error) => {
-    log('sendUserOpActivity failed', { error })
-    // Ensure cleanup happens before throwing
-    await deleteTemporalTransferActivity(workflowId)
-    await updateTemporalTransferActivity({
-      workflowId,
-      status: 'failed',
-      failureError: {
-        message: error.message,
-        type: error.code,
-      },
-    })
-    throw ApplicationFailure.nonRetryable('Error sending user operation', error.code, error)
-  })
-
+  const { hash, hashBytea } = await sendUserOpActivity(workflowId, userOp)
   log('UserOperation sent, hash:', hash)
   await updateTemporalTransferActivity({
     workflowId,
@@ -51,18 +37,7 @@ export async function TransferWorkflow(userOp: UserOperation<'v0.7'>) {
     data: { user_op_hash: hashBytea },
   })
 
-  const receipt = await waitForTransactionReceiptActivity(hash).catch(async (error) => {
-    log('waitForTransactionReceiptActivity failed', { error })
-    await updateTemporalTransferActivity({
-      workflowId,
-      status: 'failed',
-      failureError: {
-        message: error.message,
-        type: error.code,
-      },
-    })
-    throw error
-  })
+  const receipt = await waitForTransactionReceiptActivity(workflowId, hash)
   log('Receipt received:', { tx_hash: receipt.transactionHash })
 
   await updateTemporalTransferActivity({
