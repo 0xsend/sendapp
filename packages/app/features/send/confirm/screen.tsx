@@ -70,15 +70,19 @@ export function SendConfirmScreen() {
 
 export function SendConfirm() {
   const submitButtonRef = useRef<TamaguiElement | null>(null)
+  const queryClient = useQueryClient()
   const router = useRouter()
   const [queryParams] = useSendScreenParams()
   const { sendToken, recipient, idType, amount } = queryParams
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
   const { coin: selectedCoin, tokensQuery, ethQuery } = useCoinFromSendTokenParam()
 
-  const { mutateAsync: transfer } = api.temporal.transfer.useMutation()
+  const {
+    mutateAsync: transfer,
+    isPending: isTransferPending,
+    isSuccess: isTransferInitialized,
+  } = api.temporal.transfer.useMutation()
 
-  const queryClient = useQueryClient()
   const isUSDCSelected = selectedCoin?.label === 'USDC'
   const { coin: usdc } = useCoin('USDC')
   const { data: prices, isLoading: isPricesLoading } = useTokenPrices()
@@ -197,21 +201,16 @@ export function SendConfirm() {
       })
       userOp.signature = signature
 
-      await transfer({ userOp })
-
-      // Invalidate token activity feed before navigation
-      await queryClient.invalidateQueries({
-        queryKey: ['token_activity_feed', selectedCoin?.token],
-      })
+      const workflowId = await transfer({ userOp })
 
       if (selectedCoin?.token === 'eth') {
         await ethQuery.refetch()
       } else {
         await tokensQuery.refetch()
       }
-
-      // Navigate after invalidating
-      router.replace({ pathname: '/', query: { token: sendToken } })
+      if (workflowId) {
+        router.replace({ pathname: '/', query: { token: sendToken } })
+      }
     } catch (e) {
       console.error(e)
       setError(e)
@@ -225,7 +224,13 @@ export function SendConfirm() {
     }
   }, [])
 
-  if (nonceIsLoading || isProfileLoading || isSendAccountLoading)
+  if (
+    nonceIsLoading ||
+    isProfileLoading ||
+    isSendAccountLoading ||
+    isTransferPending ||
+    isTransferInitialized
+  )
     return <Spinner size="large" color={'$color'} />
 
   return (
