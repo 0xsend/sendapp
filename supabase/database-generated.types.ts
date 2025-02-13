@@ -1505,12 +1505,6 @@ export type Database = {
         }
         Returns: undefined
       }
-      delete_temporal_transfer_activity: {
-        Args: {
-          workflow_id: string
-        }
-        Returns: undefined
-      }
       insert_temporal_eth_send_account_transfer: {
         Args: {
           workflow_id: string
@@ -1546,7 +1540,6 @@ export type Database = {
         | "initialized"
         | "sent"
         | "confirmed"
-        | "indexed"
         | "failed"
         | "cancelled"
     }
