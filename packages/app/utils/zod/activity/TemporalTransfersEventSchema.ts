@@ -22,10 +22,10 @@ export const temporalTransferStatus = z.enum([
  */
 const BaseTemporalTransfersDataSchema = z.object({
   status: temporalTransferStatus,
-  user_op_hash: byteaToHexTxHash.optional(),
-  tx_hash: byteaToHexTxHash.optional(),
-  block_num: decimalStrToBigInt.optional(),
-  tx_idx: decimalStrToBigInt.optional(),
+  user_op_hash: byteaToHexTxHash.nullable(),
+  tx_hash: byteaToHexTxHash.nullable(),
+  block_num: decimalStrToBigInt.nullable(),
+  tx_idx: decimalStrToBigInt.nullable(),
   log_addr: byteaToHexEthAddress,
 })
 
@@ -60,31 +60,39 @@ export const EthTemporalTransfersDataSchema = BaseTemporalTransfersDataSchema.ex
     coin: knownCoins.find((c) => c.token === 'eth'),
   }))
 
+const TemporalTranfersDataSchema = z.union([
+  TokenTemporalTransfersDataSchema,
+  EthTemporalTransfersDataSchema,
+])
+
 export const TemporalTransfersEventSchema = BaseEventSchema.extend({
   event_name: z.literal(Events.TemporalSendAccountTransfers),
-  data: z.union([TokenTemporalTransfersDataSchema, EthTemporalTransfersDataSchema]),
+  data: TemporalTranfersDataSchema,
 })
 
 export type TemporalTransfersEvent = z.infer<typeof TemporalTransfersEventSchema>
 
-export const isTemporalTransfersEvent = (event: {
+const isTemporalTransfersEvent = (event: {
   event_name: string
 }): event is TemporalTransfersEvent => event.event_name === Events.TemporalSendAccountTransfers
 
-export const isTemporalTokenTransfers = (event: {
+export const isTemporalTokenTransfersEvent = (event: {
   data?: unknown
   event_name: string
 }): event is TemporalTransfersEvent & {
   data: z.infer<typeof TokenTemporalTransfersDataSchema>
 } => {
-  return isTemporalTransfersEvent(event) && event.data.coin?.token !== 'eth'
+  return (
+    isTemporalTransfersEvent(event) &&
+    Boolean(knownCoins.find((c) => c.token === event.data.log_addr))
+  )
 }
 
-export const isTemporalEthTransfers = (event: {
+export const isTemporalEthTransfersEvent = (event: {
   data?: unknown
   event_name: string
 }): event is TemporalTransfersEvent & { data: z.infer<typeof EthTemporalTransfersDataSchema> } => {
-  return isTemporalTransfersEvent(event) && event.data.coin?.token === 'eth'
+  return isTemporalTransfersEvent(event) && !knownCoins.some((c) => c.token === event.data.log_addr)
 }
 
 export const temporalEventNameFromStatus = (
@@ -92,16 +100,16 @@ export const temporalEventNameFromStatus = (
 ) => {
   switch (status) {
     case 'initialized':
-      return 'Sending'
+      return 'Sending...'
     case 'sent':
-      return 'Confirming'
+      return 'Confirming...'
     case 'confirmed':
-      return ''
     case 'indexed':
       return 'Sent'
     case 'failed':
+    case 'cancelled':
       return 'Failed'
     default:
-      return ''
+      return 'Initializing...'
   }
 }

@@ -18,9 +18,8 @@ import { isSendAccountReceiveEvent } from './zod/activity/SendAccountReceiveEven
 import { isSendTokenUpgradeEvent } from './zod/activity/SendAccountTransfersEventSchema'
 import { sendCoin, sendV0Coin } from 'app/data/coins'
 import {
-  isTemporalEthTransfers,
-  isTemporalTokenTransfers,
-  isTemporalTransfersEvent,
+  isTemporalEthTransfersEvent,
+  isTemporalTokenTransfersEvent,
   temporalEventNameFromStatus,
 } from './zod/activity/TemporalTransfersEventSchema'
 
@@ -67,7 +66,7 @@ export function counterpart(activity: Activity): Activity['from_user'] | Activit
       return from_user
     }
   }
-  if (isTemporalTransfersEvent(activity)) {
+  if (isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)) {
     return to_user
   }
   return null // not a send or receive event
@@ -77,34 +76,23 @@ export function counterpart(activity: Activity): Activity['from_user'] | Activit
  * Returns the amount of the activity if there is one.
  */
 export function amountFromActivity(activity: Activity): string {
-  console.log('activity: ', activity)
   switch (true) {
-    case isTemporalTransfersEvent(activity): {
-      const { data } = activity
-
-      if (isTemporalTokenTransfers(activity)) {
-        if (data.coin) {
-          const amount = formatAmount(
-            formatUnits(data.v, data.coin.decimals),
-            5,
-            data.coin.formatDecimals
-          )
-          return `${amount} ${data.coin.symbol}`
-        }
-        return formatAmount(`${data.v}`, 5, 0)
+    case isTemporalTokenTransfersEvent(activity): {
+      console.log('activity: ', activity)
+      const { v, coin } = activity.data
+      if (coin) {
+        const amount = formatAmount(formatUnits(v, coin.decimals), 5, coin.formatDecimals)
+        return `${amount} ${coin.symbol}`
       }
-      if (isTemporalEthTransfers(activity)) {
-        if (data.coin) {
-          const amount = formatAmount(
-            formatUnits(data.value, data.coin.decimals),
-            5,
-            data.coin.formatDecimals
-          )
-          return `${amount} ${data.coin.symbol}`
-        }
-        return formatAmount(`${data.value}`, 5, 0)
+      return formatAmount(`${v}`, 5, 0)
+    }
+    case isTemporalEthTransfersEvent(activity): {
+      const { value, coin } = activity.data
+      if (coin) {
+        const amount = formatAmount(formatUnits(value, coin.decimals), 5, coin.formatDecimals)
+        return `${amount} ${coin.symbol}`
       }
-      return ''
+      return formatAmount(`${value}`, 5, 0)
     }
     case isSendAccountTransfersEvent(activity): {
       const { v, coin } = activity.data
@@ -185,8 +173,10 @@ export function eventNameFromActivity(activity: Activity) {
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
   const isTransferOrReceive = isERC20Transfer || isETHReceive
+  const isTemporalTransfer =
+    isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
   switch (true) {
-    case isTemporalTransfersEvent(activity):
+    case isTemporalTransfer:
       return temporalEventNameFromStatus(data.status)
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Referral Reward'
@@ -225,11 +215,12 @@ export function phraseFromActivity(activity: Activity) {
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
   const isTransferOrReceive = isERC20Transfer || isETHReceive
-  const isTemporalTransfers = isTemporalTransfersEvent(activity)
+  const isTemporalTransfer =
+    isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
 
   switch (true) {
-    case isTemporalTransfers:
-      return 'Pending'
+    case isTemporalTransfer:
+      return temporalEventNameFromStatus(data.status)
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Earned referral reward'
     case isSendTokenUpgradeEvent(activity):
@@ -306,13 +297,11 @@ export function subtextFromActivity(activity: Activity): string | null {
   if (isETHReceive && to_user?.id) {
     return labelAddress(data.log_addr)
   }
-  if (isTemporalTransfersEvent(activity)) {
-    if (isTemporalTokenTransfers(activity)) {
-      return labelAddress(activity.data.t)
-    }
-    if (isTemporalEthTransfers(activity)) {
-      return labelAddress(activity.data.sender)
-    }
+  if (isTemporalTokenTransfersEvent(activity)) {
+    return labelAddress(activity.data.t)
+  }
+  if (isTemporalEthTransfersEvent(activity)) {
+    return labelAddress(activity.data.log_addr)
   }
   return null
 }
