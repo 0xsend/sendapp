@@ -5,7 +5,7 @@ import { createParam } from 'solito'
 import { isAddress, type Address } from 'viem'
 
 export type RootParams = {
-  nav?: 'home' | 'settings'
+  nav?: 'home'
   token?: allCoins[number]['token']
   search?: string
   profile?: string

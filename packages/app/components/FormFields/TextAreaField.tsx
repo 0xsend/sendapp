@@ -1,36 +1,37 @@
 import { useThemeSetting } from '@tamagui/next-theme'
 import { useStringFieldInfo, useTsController } from '@ts-react/form'
-import { useId } from 'react'
+import { forwardRef, type ReactNode, useId } from 'react'
 import {
+  FieldError,
   Fieldset,
   Label,
+  type LabelProps,
+  Shake,
+  type TamaguiElement,
   TextArea,
   type TextAreaProps,
   Theme,
   type ThemeName,
+  useComposedRefs,
   useThemeName,
-  FieldError,
-  Shake,
-  type LabelProps,
 } from '@my/ui'
 
-export const TextAreaField = (
-  props: Pick<
-    TextAreaProps,
-    'size' | 'autoFocus' | 'aria-label' | 'placeholder' | 'fontStyle' | 'backgroundColor' | 'rows'
-  > & { labelProps?: LabelProps }
-) => {
+export const TextAreaField = forwardRef<
+  TamaguiElement,
+  TextAreaProps & { labelProps?: LabelProps; iconBefore?: ReactNode; iconAfter?: ReactNode }
+>((props, forwardedRef) => {
   const {
     field,
     error,
     formState: { isSubmitting },
   } = useTsController<string>()
-  const { label, isOptional, placeholder } = useStringFieldInfo()
+  const { label, placeholder } = useStringFieldInfo()
   const id = useId()
   const disabled = isSubmitting
   const defaultTheme = useThemeName() as string
   const { resolvedTheme } = useThemeSetting()
   const themeName = (resolvedTheme ?? defaultTheme) as ThemeName
+  const composedRefs = useComposedRefs(forwardedRef, field.ref)
 
   return (
     <Theme name={error ? 'red' : themeName} forceClassName>
@@ -45,7 +46,7 @@ export const TextAreaField = (
             color={props.labelProps?.color ?? '$olive'}
             {...props.labelProps}
           >
-            {label} {isOptional && '(Optional)'}
+            {label}
           </Label>
         )}
         <Shake shakeKey={error?.errorMessage}>
@@ -68,7 +69,7 @@ export const TextAreaField = (
             value={field.value}
             onChangeText={(text) => field.onChange(text)}
             onBlur={field.onBlur}
-            ref={field.ref}
+            ref={composedRefs}
             placeholder={placeholder}
             id={id}
             focusStyle={{
@@ -82,4 +83,6 @@ export const TextAreaField = (
       </Fieldset>
     </Theme>
   )
-}
+})
+
+TextAreaField.displayName = 'TextAreaField'

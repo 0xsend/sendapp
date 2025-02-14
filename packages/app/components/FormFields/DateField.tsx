@@ -50,7 +50,7 @@ export const DateField = (
 
   return (
     <Theme name={error ? 'red' : themeName} forceClassName>
-      <Fieldset {...props.fieldsetProps}>
+      <Fieldset {...props.fieldsetProps} opacity={props.disabled ? 0.5 : 1}>
         {!!label && (
           <Label
             size={props.size || '$5'}
