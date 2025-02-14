@@ -1,24 +1,32 @@
-import { useLayoutEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
+
+const DEFAULT_INSETS = { sat: 0, sar: 0, sab: 0, sal: 0 }
 
 const sanitizeSafeAreaInset = (value: string) => {
+  if (value.includes('env')) return 0
   const sanitizedInset = value.endsWith('px') ? Number(value.slice(0, -2)) : Number(value)
   return Number.isNaN(sanitizedInset) ? 0 : sanitizedInset
 }
 
+let initialized = false
+let cachedInsets = DEFAULT_INSETS
+
 export const useSafeAreaInsets = () => {
-  if (typeof window === 'undefined') return { sat: 0, sar: 0, sab: 0, sal: 0 }
+  const [ready, setReady] = useState(initialized)
 
-  const [insets, setInsets] = useState({ sat: 0, sar: 0, sab: 0, sal: 0 })
-
-  useLayoutEffect(() => {
-    const styles = getComputedStyle(document.documentElement)
-    const sat = sanitizeSafeAreaInset(styles.getPropertyValue('--sat')) || 24
-    const sab = sanitizeSafeAreaInset(styles.getPropertyValue('--sab')) || 40
-    const sar = sanitizeSafeAreaInset(styles.getPropertyValue('--sar'))
-    const sal = sanitizeSafeAreaInset(styles.getPropertyValue('--sal'))
-
-    setInsets({ sat, sab, sar, sal })
+  useEffect(() => {
+    if (!initialized && typeof window !== 'undefined') {
+      const styles = getComputedStyle(document.documentElement)
+      cachedInsets = {
+        sat: sanitizeSafeAreaInset(styles.getPropertyValue('--sat')),
+        sab: sanitizeSafeAreaInset(styles.getPropertyValue('--sab')),
+        sar: sanitizeSafeAreaInset(styles.getPropertyValue('--sar')),
+        sal: sanitizeSafeAreaInset(styles.getPropertyValue('--sal')),
+      }
+      initialized = true
+      setReady(true)
+    }
   }, [])
 
-  return insets
+  return { ...cachedInsets, ready }
 }

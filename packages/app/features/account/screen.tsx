@@ -25,7 +25,6 @@ import { getReferralHref } from 'app/utils/getReferralLink'
 import { useUser } from 'app/utils/useUser'
 import * as Clipboard from 'expo-clipboard'
 import * as Sharing from 'expo-sharing'
-import { useRootScreenParams } from 'app/routers/params'
 import { type PropsWithChildren, type ReactNode, useEffect, useState } from 'react'
 import { useConfirmedTags } from 'app/utils/tags'
 import { useUserReferralsCount } from 'app/utils/useUserReferralsCount'
@@ -44,7 +43,6 @@ export function AccountScreen() {
   const tags = useConfirmedTags()
   const refCode = profile?.referral_code ?? ''
   const referralHref = getReferralHref(refCode)
-  const [queryParams, setRootParams] = useRootScreenParams()
   const [canShare, setCanShare] = useState(false)
 
   useEffect(() => {
@@ -186,21 +184,7 @@ export function AccountScreen() {
 
             <XStack gap="$size.0.9" mt={'$size.1.5'}>
               <LinkableButton
-                href={media.lg ? '/account?nav=settings' : '/account/settings/edit-profile'}
-                // on smaller screens, we don't want to navigate to the settings screen but open bottom sheet
-                {...(media.lg
-                  ? {
-                      onPress: (e) => {
-                        if (media.lg) {
-                          e.preventDefault()
-                          setRootParams(
-                            { ...queryParams, nav: 'settings' },
-                            { webBehavior: 'replace' }
-                          )
-                        }
-                      },
-                    }
-                  : {})}
+                href={'/account/settings'}
                 theme={'green'}
                 borderRadius={'$3'}
                 flexBasis={'50%'}
