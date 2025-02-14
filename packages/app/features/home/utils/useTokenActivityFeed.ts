@@ -6,7 +6,9 @@ import {
   type InfiniteData,
   type UseInfiniteQueryResult,
 } from '@tanstack/react-query'
+import { hexToBytea } from 'app/utils/hexToBytea'
 import { pgAddrCondValues } from 'app/utils/pgAddrCondValues'
+import { useSendAccount } from 'app/utils/send-accounts'
 import { squish } from 'app/utils/strings'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
@@ -28,6 +30,8 @@ export function useTokenActivityFeed(params: {
 }): UseInfiniteQueryResult<InfiniteData<Activity[]>, PostgrestError | ZodError> {
   const { pageSize = 10, address, refetchInterval = 30_000, enabled = true } = params
   const supabase = useSupabase()
+  const { data: sendAccount } = useSendAccount()
+  const senderBytea = sendAccount?.address ? hexToBytea(sendAccount.address) : null
 
   async function fetchTokenActivityFeed({ pageParam }: { pageParam: number }): Promise<Activity[]> {
     const from = pageParam * pageSize
@@ -35,9 +39,15 @@ export function useTokenActivityFeed(params: {
     let query = supabase.from('activity_feed').select('*')
 
     if (address) {
-      query = query.eq('event_name', Events.SendAccountTransfers).eq('data->>log_addr', address)
+      query = query
+        .eq('data->>log_addr', address)
+        .or(
+          `event_name.eq.${Events.SendAccountTransfers},and(event_name.eq.${Events.TemporalSendAccountTransfers},data->>f.eq.${senderBytea})`
+        )
     } else {
-      query = query.eq('event_name', Events.SendAccountReceive)
+      query = query.or(
+        `event_name.eq.${Events.SendAccountReceive},and(event_name.eq.${Events.TemporalSendAccountTransfers},data->>sender.eq.${senderBytea})`
+      )
     }
 
     const paymasterAddresses = Object.values(tokenPaymasterAddress)
@@ -53,15 +63,16 @@ export function useTokenActivityFeed(params: {
       .or('from_user.not.is.null, to_user.not.is.null') // only show activities with a send app user
       .or(
         squish(`
-          data->t.is.null,
-          data->f.is.null,
-          and(
-            data->>t.not.in.(${toTransferIgnoreValues}),
-            data->>f.not.in.(${fromTransferIgnoreValues})
-          )`)
+        data->t.is.null,
+        data->f.is.null,
+        and(
+          data->>t.not.in.(${toTransferIgnoreValues}),
+          data->>f.not.in.(${fromTransferIgnoreValues})
+        )`)
       )
       .order('created_at', { ascending: false })
       .range(from, to)
+
     throwIf(error)
     return EventArraySchema.parse(data)
   }

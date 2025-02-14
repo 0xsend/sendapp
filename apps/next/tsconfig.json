@@ -30,7 +30,8 @@
         "pathToApp": "."
       }
     ],
-    "types": ["node"]
+    "types": ["node"],
+    "sourceMap": true
   },
   "include": [
     "next-env.d.ts",
