@@ -144,7 +144,7 @@ const EarningsCallToAction = () => {
             <ListItem>Rewards: Bonus SEND tokens</ListItem>
           </YStack>
         </YStack>
-        <SectionButton text={'START EARNING'} onPress={() => push('/earn/earning-form')} />
+        <SectionButton text={'START EARNING'} onPress={() => push('/earn/deposit')} />
       </Card>
     </Fade>
   )

@@ -31,7 +31,7 @@ export const ActiveEarnings = () => {
         </XStack>
         <ActiveEarningBreakdown />
       </YStack>
-      <SectionButton text={'ADD MORE DEPOSITS'} onPress={() => push('/earn/earning-form')} />
+      <SectionButton text={'ADD MORE DEPOSITS'} onPress={() => push('/earn/deposit')} />
     </YStack>
   )
 }
