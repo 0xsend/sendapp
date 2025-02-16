@@ -94,7 +94,7 @@ const LearnSection = () => {
         </LinearGradient>
         <XStack
           width={'max-content'}
-          backgroundColor={'#97b759'} // TODO WTF is this color
+          backgroundColor={'$oliveDrab'}
           px={'$3.5'}
           py={'$2'}
           br={'$4'}
