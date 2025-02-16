@@ -1,30 +1,31 @@
-import { Anchor, Paragraph } from '@my/ui'
+import { Anchor, type AnchorProps, Paragraph, Shake, Theme } from '@my/ui'
 
-export const EarnTerms = () => {
+export const EarnTerms = ({ hasError }: { hasError?: boolean }) => {
+  const colorProps = {
+    color: hasError ? '$lightGrayTextField' : '$lightGrayTextField',
+    '$theme-light': {
+      color: hasError ? '$error' : '$darkGrayTextField',
+    },
+  }
+
   return (
-    <Paragraph color={'$lightGrayTextField'} $theme-light={{ color: '$darkGrayTextField' }}>
+    <Paragraph flexShrink={1} maxWidth={'100%'} {...colorProps}>
       I accept{' '}
-      <TermsLink
-        // TODO plug real hrefs
-        text={'Terms of Service'}
-        href="/terms"
-      />
-      , <TermsLink href="/privacy" text={'Privacy Policy'} /> &{' '}
-      <TermsLink href="/disclaimer" text={'Disclaimer of the Send Earn Program'} />
+      <TermsLink href="https://info.send.it/send-docs/legal/terms-of-service" {...colorProps}>
+        Terms of Service
+      </TermsLink>
+      ,{' '}
+      <TermsLink href="https://info.send.it/send-docs/legal/privacy-policy" {...colorProps}>
+        Privacy Policy
+      </TermsLink>{' '}
+      &{' '}
+      <TermsLink href="https://info.send.it/send-docs/legal/disclaimer" {...colorProps}>
+        Disclaimer of the Send Earn Program
+      </TermsLink>
     </Paragraph>
   )
 }
 
-const TermsLink = ({ text, href }: { text: string; href: string }) => {
-  return (
-    <Anchor
-      href={href}
-      target="_blank"
-      textDecorationLine="underline"
-      color={'$lightGrayTextField'}
-      $theme-light={{ color: '$darkGrayTextField' }}
-    >
-      {text}
-    </Anchor>
-  )
+const TermsLink = (props: AnchorProps) => {
+  return <Anchor target="_blank" textDecorationLine="underline" {...props} />
 }
