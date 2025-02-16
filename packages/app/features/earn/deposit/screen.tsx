@@ -8,25 +8,41 @@ import {
   Spinner,
   Stack,
   SubmitButton,
+  useToastController,
   XStack,
   YStack,
 } from '@my/ui'
-import { z } from 'zod'
-import { FormProvider, useForm } from 'react-hook-form'
-import { formFields, SchemaForm } from 'app/utils/SchemaForm'
-import { useRouter } from 'solito/router'
-import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
-import { formatUnits } from 'viem'
-import { useCoin, useCoins } from 'app/provider/coins'
-import { useEffect, useState } from 'react'
+import {
+  baseMainnetBundlerClient,
+  entryPointAddress,
+  sendEarnAbi,
+  sendEarnAddress,
+  usdcAddress,
+  useReadSendEarnBalanceOf,
+  useReadSendEarnDecimals,
+} from '@my/wagmi'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
-import { useEarnScreenParams } from 'app/routers/params'
-import { Row } from 'app/features/earn/components/Row'
 import { CalculatedBenefits } from 'app/features/earn/components/CalculatedBenefits'
 import { EarnTerms } from 'app/features/earn/components/EarnTerms'
-import { useMutation } from '@tanstack/react-query'
-
+import { Row } from 'app/features/earn/components/Row'
+import { useCoin, useCoins } from 'app/provider/coins'
+import { useEarnScreenParams } from 'app/routers/params'
+import { assert } from 'app/utils/assert'
+import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
+import { formFields, SchemaForm } from 'app/utils/SchemaForm'
+import { useSendAccount } from 'app/utils/send-accounts'
+import { signUserOp } from 'app/utils/signUserOp'
+import { toNiceError } from 'app/utils/toNiceError'
+import { useUserOp } from 'app/utils/userop'
+import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import debug from 'debug'
+import { useEffect, useMemo, useState } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
+import { useRouter } from 'solito/router'
+import { encodeFunctionData, erc20Abi, formatUnits, withRetry, zeroAddress } from 'viem'
+import { useChainId } from 'wagmi'
+import { z } from 'zod'
 
 const log = debug('app:earn:deposit')
 
@@ -40,9 +56,51 @@ export function DepositScreen() {
   return <DepositForm />
 }
 
+const useSendEarnDepositUserOp = ({ asset, amount, vault }) => {
+  const sendAccount = useSendAccount()
+  const sender = useMemo(
+    () => sendAccount?.data?.address ?? zeroAddress,
+    [sendAccount?.data?.address]
+  )
+
+  // TODO: validate asset
+  // TODO: referrer logic and setting correct send earn vault address
+  const calls = useMemo(
+    () => [
+      {
+        dest: asset,
+        value: 0n,
+        data: encodeFunctionData({
+          abi: erc20Abi,
+          functionName: 'approve',
+          args: [vault, amount],
+        }),
+      },
+      {
+        dest: vault,
+        value: 0n,
+        data: encodeFunctionData({
+          abi: sendEarnAbi,
+          functionName: 'deposit',
+          args: [amount, sender],
+        }),
+      },
+    ],
+    [asset, vault, amount, sender]
+  )
+
+  const uop = useUserOp({
+    sender,
+    calls,
+  })
+
+  return uop
+}
+
 export const DepositForm = () => {
   const form = useForm<DepositFormSchema>()
   const router = useRouter()
+  const { tokensQuery } = useSendAccountBalances()
   const { coin, isLoading: isUSDCLoading } = useCoin('USDC')
   const { isLoading: isLoadingCoins } = useCoins()
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
@@ -52,29 +110,74 @@ export const DepositForm = () => {
   const formAmount = form.watch('amount')
   const areTermsAccepted = form.watch('areTermsAccepted')
 
-  if (areTermsAccepted && form.formState.errors.areTermsAccepted) {
-    form.clearErrors('areTermsAccepted')
-  }
+  // RESET FORM ERRORS
+  useEffect(() => {
+    if (areTermsAccepted && form.formState.errors.areTermsAccepted) {
+      form.clearErrors('areTermsAccepted')
+    }
+  }, [form.clearErrors, areTermsAccepted, form.formState.errors.areTermsAccepted])
 
-  const canSubmit =
-    !isUSDCLoading &&
-    coin?.balance !== undefined &&
-    coin.balance >= parsedAmount &&
-    parsedAmount > BigInt(0)
+  // QUERY DEPOSIT USEROP
+  const chainId = useChainId()
+  const asset = usdcAddress[chainId]
+  const vault = sendEarnAddress[chainId]
+  const uop = useSendEarnDepositUserOp({ asset, amount: parsedAmount, vault })
+  const sendAccount = useSendAccount()
+  const webauthnCreds = useMemo(
+    () =>
+      sendAccount?.data?.send_account_credentials
+        .filter((c) => !!c.webauthn_credentials)
+        .map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? [],
+    [sendAccount?.data?.send_account_credentials]
+  )
 
-  const insufficientAmount =
-    coin?.balance !== undefined && earnParams.amount !== undefined && parsedAmount > coin?.balance
-
-  // MUTATION DEPOSIT
+  // MUTATION DEPOSIT USEROP
+  const [useropState, setUseropState] = useState('')
+  const toast = useToastController()
+  const queryClient = useQueryClient()
   const mutation = useMutation({
-    mutationFn: async ({ amount, areTermsAccepted }: DepositFormSchema) => {
-      log('mutationFn', { amount, areTermsAccepted })
-      return true
+    mutationFn: async () => {
+      assert(form.formState.isValid, 'form is not valid')
+      assert(uop.isSuccess, 'uop is not success')
+
+      uop.data.signature = await signUserOp({
+        userOp: uop.data,
+        webauthnCreds,
+        chainId: chainId,
+        entryPoint: entryPointAddress[chainId],
+      })
+
+      setUseropState('Sending transaction...')
+
+      const userOpHash = await baseMainnetBundlerClient.sendUserOperation({
+        userOperation: uop.data,
+      })
+
+      setUseropState('Waiting for confirmation...')
+
+      const receipt = await withRetry(
+        () =>
+          baseMainnetBundlerClient.waitForUserOperationReceipt({
+            hash: userOpHash,
+            timeout: 10_000,
+          }),
+        {
+          delay: 100,
+          retryCount: 3,
+        }
+      )
+
+      log('receipt', receipt)
+
+      assert(receipt.success, 'receipt status is not success')
+
+      log('mutationFn', { uop })
+      return
     },
     onMutate: (variables) => {
       // A mutation is about to happen!
       log('onMutate', variables)
-
+      setUseropState('Requesting signature...')
       // Optionally return a context containing data to use when for example rolling back
       // return { id: 1 }
     },
@@ -85,15 +188,45 @@ export const DepositForm = () => {
     onSuccess: (data, variables, context) => {
       // Boom baby!
       log('onSuccess', data, variables, context)
-      // router.push({
-      //   pathname: '/earn',
-      // })
+
+      toast.show('Deposited successfully')
+
+      router.push({
+        pathname: '/earn',
+      })
     },
     onSettled: (data, error, variables, context) => {
       // Error or success... doesn't matter!
       log('onSettled', data, error, variables, context)
+      queryClient.invalidateQueries({ queryKey: tokensQuery.queryKey })
     },
   })
+
+  // TODO: move somewhere else
+  const earnDecimals = useReadSendEarnDecimals({
+    chainId,
+  })
+  const earnBalance = useReadSendEarnBalanceOf({
+    chainId,
+    args: [sendAccount?.data?.address ?? '0x'],
+    query: { enabled: !!sendAccount?.data?.address },
+  })
+
+  // DEBUG
+  log('uop', uop)
+  log('mutation', mutation)
+  log('earnDecimals', earnDecimals)
+  log('earnBalance', earnBalance)
+
+  const canSubmit =
+    !isUSDCLoading &&
+    coin?.balance !== undefined &&
+    coin.balance >= parsedAmount &&
+    parsedAmount > BigInt(0) &&
+    uop.isSuccess
+
+  const insufficientAmount =
+    coin?.balance !== undefined && earnParams.amount !== undefined && parsedAmount > coin?.balance
 
   useEffect(() => {
     const subscription = form.watch(({ amount: _amount }) => {
@@ -124,7 +257,7 @@ export const DepositForm = () => {
         <SchemaForm
           form={form}
           schema={DepositFormSchema}
-          onSubmit={mutation.mutate}
+          onSubmit={() => mutation.mutate()}
           props={{
             amount: {
               fontSize: (() => {
@@ -189,6 +322,13 @@ export const DepositForm = () => {
           }}
           renderAfter={({ submit }) => (
             <YStack>
+              {mutation.isPending ? (
+                <Fade key="userop-state">
+                  <Paragraph color={'$color10'} ta="center" size="$3">
+                    {useropState}
+                  </Paragraph>
+                </Fade>
+              ) : null}
               <SubmitButton
                 theme="green"
                 onPress={() => {
@@ -210,11 +350,19 @@ export const DepositForm = () => {
                 br={'$4'}
                 disabledStyle={{ opacity: 0.5 }}
                 disabled={!canSubmit}
+                iconAfter={mutation.isPending ? <Spinner size="small" /> : undefined}
               >
                 <Button.Text size={'$5'} fontWeight={'500'} fontFamily={'$mono'} color={'$black'}>
                   CONFIRM DEPOSIT
                 </Button.Text>
               </SubmitButton>
+              {[uop.error, mutation.error].filter(Boolean).map((e) =>
+                e ? (
+                  <Paragraph key={e.message} color="$error">
+                    {toNiceError(e)}
+                  </Paragraph>
+                ) : null
+              )}
             </YStack>
           )}
         >
