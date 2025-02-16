@@ -154,7 +154,7 @@ export const HomeSideBarWrapper = ({ children }: { children?: React.ReactNode })
     <XStack overflow="hidden" height={'100%'}>
       {media.gtLg && <HomeSideBar width={234} minWidth={234} pt={80} jc="flex-start" />}
       {children}
-      <HomeBottomSheet />
+      {!media.gtLg && <HomeBottomSheet />}
     </XStack>
   )
 }
