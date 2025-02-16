@@ -2,7 +2,7 @@ import type { NextPageWithLayout } from '../_app'
 import Head from 'next/head'
 import { HomeLayout } from 'app/features/home/layout.web'
 import { TopNav } from 'app/components/TopNav'
-import { EarningForm } from 'app/features/earn/EarningForm'
+import { DepositScreen } from 'app/features/earn/deposit/screen'
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -10,7 +10,7 @@ export const Page: NextPageWithLayout = () => {
       <Head>
         <title>Send | Start Earning</title>
       </Head>
-      <EarningForm />
+      <DepositScreen />
     </>
   )
 }

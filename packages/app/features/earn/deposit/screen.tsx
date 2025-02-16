@@ -24,13 +24,13 @@ import { Row } from 'app/features/earn/components/Row'
 import { CalculatedBenefits } from 'app/features/earn/components/CalculatedBenefits'
 import { EarnTerms } from 'app/features/earn/components/EarnTerms'
 
-const StartEarningSchema = z.object({
+const DepositSchema = z.object({
   amount: formFields.text,
   areTermsAccepted: formFields.boolean_checkbox,
 })
 
-export const EarningForm = () => {
-  const form = useForm<z.infer<typeof StartEarningSchema>>()
+export const DepositScreen = () => {
+  const form = useForm<z.infer<typeof DepositSchema>>()
   const router = useRouter()
   const { coin, isLoading: isUSDCLoading } = useCoin('USDC')
   const { isLoading: isLoadingCoins } = useCoins()
@@ -89,7 +89,7 @@ export const EarningForm = () => {
       <FormProvider {...form}>
         <SchemaForm
           form={form}
-          schema={StartEarningSchema}
+          schema={DepositSchema}
           onSubmit={onSubmit}
           props={{
             amount: {
