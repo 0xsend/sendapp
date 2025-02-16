@@ -227,6 +227,20 @@ function userOpQueryOptions({
       assert(maxFeePerGas !== undefined, 'No max fee per gas found')
       assert(maxPriorityFeePerGas !== undefined, 'No max priority fee per gas found')
 
+      debug('useUserOpGasEstimate', {
+        sender,
+        nonce,
+        calls,
+        callGasLimit,
+        chainId,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        paymaster,
+        paymasterVerificationGasLimit,
+        paymasterPostOpGasLimit,
+        paymasterData,
+      })
+
       const callData = encodeFunctionData({
         abi: sendAccountAbi,
         functionName: 'executeBatch',
@@ -249,6 +263,7 @@ function userOpQueryOptions({
       const userOp: UserOperation<'v0.7'> = {
         ...defaultUserOp,
         ...paymasterDefaults,
+        callGasLimit: callGasLimit ?? defaultUserOp.callGasLimit,
         maxFeePerGas,
         maxPriorityFeePerGas,
         sender,
@@ -301,6 +316,7 @@ export function useUserOp({
   paymasterVerificationGasLimit,
   paymasterPostOpGasLimit,
   paymasterData,
+  chainId = baseMainnetClient.chain.id,
 }: {
   sender: Address | undefined
   callGasLimit?: bigint | undefined
@@ -309,8 +325,8 @@ export function useUserOp({
   paymasterVerificationGasLimit?: bigint
   paymasterPostOpGasLimit?: bigint
   paymasterData?: Hex
+  chainId?: keyof typeof entryPointAddress
 }): UseQueryReturnType<UserOperation<'v0.7'>, Error> {
-  const chainId = baseMainnetClient.chain.id
   const { data: nonce, error: nonceError, isLoading: isLoadingNonce } = useAccountNonce({ sender })
   const {
     data: feesPerGas,
