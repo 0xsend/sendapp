@@ -218,10 +218,11 @@ export default defineConfig({
     {
       name: 'SendEarnFactory',
       address: {
+        [mainnet.id]: '0x8cc3629b445746be413c121a7385925b23226197',
         [localhost.id]: '0x8cc3629b445746be413c121a7385925b23226197',
         [sepolia.id]: '0x8cc3629b445746be413c121a7385925b23226197',
-        [base.id]: '0x8cc3629b445746be413c121a7385925b23226197',
         [baseLocal.id]: '0x8cc3629b445746be413c121a7385925b23226197',
+        [base.id]: '0x8cc3629b445746be413c121a7385925b23226197',
         [baseSepolia.id]: '0x8cc3629b445746be413c121a7385925b23226197',
       },
       // @ts-expect-error doesn't like the artifact
@@ -230,10 +231,11 @@ export default defineConfig({
     {
       name: 'SendEarn',
       address: {
+        [mainnet.id]: '0xbe7ad55a62873c89319324e7a3c43383b7ae2f67',
         [localhost.id]: '0xbe7ad55a62873c89319324e7a3c43383b7ae2f67',
         [sepolia.id]: '0xbe7ad55a62873c89319324e7a3c43383b7ae2f67',
-        [base.id]: '0xbe7ad55a62873c89319324e7a3c43383b7ae2f67',
         [baseLocal.id]: '0xbe7ad55a62873c89319324e7a3c43383b7ae2f67',
+        [base.id]: '0xbe7ad55a62873c89319324e7a3c43383b7ae2f67',
         [baseSepolia.id]: '0xbe7ad55a62873c89319324e7a3c43383b7ae2f67',
       },
       // @ts-expect-error doesn't like the artifact
