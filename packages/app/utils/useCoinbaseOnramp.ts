@@ -1,6 +1,7 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { getOnrampBuyUrl } from '@coinbase/onchainkit/fund'
 import { useMutation } from '@tanstack/react-query'
+import { useRouter } from 'solito/router'
 
 type OnrampStatus = 'idle' | 'pending' | 'success' | 'failed'
 
@@ -23,6 +24,7 @@ export function useCoinbaseOnramp({
 }: OnrampConfig) {
   const [popup, setPopup] = useState<Window | null>(null)
   const [popupChecker, setPopupChecker] = useState<NodeJS.Timeout | null>(null)
+  const router = useRouter()
 
   const cleanup = useCallback(() => {
     if (popup) {
@@ -35,19 +37,34 @@ export function useCoinbaseOnramp({
     setPopupChecker(null)
   }, [popup, popupChecker])
 
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return
+
+      if (event.data?.type === 'COINBASE_ONRAMP_SUCCESS') {
+        cleanup()
+        mutation.reset()
+        router.push('/deposit/success')
+      }
+    }
+
+    window.addEventListener('message', handleMessage)
+    return () => window.removeEventListener('message', handleMessage)
+  }, [cleanup, router])
+
   const mutation = useMutation<void, Error, OnrampParams>({
     mutationFn: async ({ amount }) => {
       const onrampUrl = getOnrampBuyUrl({
         projectId,
         addresses: {
-          [address]: ['base'],
+          '0xCF6D79F936f50B6a8257733047308664151B2510': ['base'],
         },
         partnerUserId,
         defaultPaymentMethod,
         assets: ['USDC'],
         presetFiatAmount: amount,
         fiatCurrency: 'USD',
-        redirectUrl: `${window.location.origin}/deposit/success`,
+        redirectUrl: `${window.location.origin}/deposit/callback`,
       })
 
       cleanup()
