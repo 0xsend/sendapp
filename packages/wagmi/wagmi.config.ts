@@ -22,6 +22,14 @@ import sendTokenV1Artifact from '@0xsend/send-token-upgrade/artifacts/contracts/
   type: 'json',
 }
 
+import sendEarnFactoryArtifact from '@0xsend/send-earn-contracts/artifacts/SendEarnFactory.sol/SendEarnFactory.json' with {
+  type: 'json',
+}
+
+import sendEarnArtifact from '@0xsend/send-earn-contracts/artifacts/ISendEarn.sol/ISendEarn.json' with {
+  type: 'json',
+}
+
 const broadcasts = (
   await globby([`${process.cwd()}/../contracts/broadcast/**/run-latest.json`])
 ).filter((f) => !f.includes('dry-run'))
@@ -271,6 +279,30 @@ export default defineConfig({
         // [localhost.id]: sendTokenUpgradeAddresses['SendTokenModule#SendToken'] as `0x${string}`,
         // [sepolia.id]: sendTokenUpgradeAddresses['SendTokenModule#SendToken'] as `0x${string}`,
       },
+    },
+    {
+      name: 'SendEarnFactory',
+      address: {
+        [localhost.id]: '0x8cc3629b445746be413c121a7385925b23226197',
+        [sepolia.id]: '0x8cc3629b445746be413c121a7385925b23226197',
+        [base.id]: '0x8cc3629b445746be413c121a7385925b23226197',
+        [baseLocal.id]: '0x8cc3629b445746be413c121a7385925b23226197',
+        [baseSepolia.id]: '0x8cc3629b445746be413c121a7385925b23226197',
+      },
+      // @ts-expect-error doesn't like the artifact
+      abi: sendEarnFactoryArtifact.abi,
+    },
+    {
+      name: 'SendEarn',
+      address: {
+        [localhost.id]: '0xbe7ad55a62873c89319324e7a3c43383b7ae2f67',
+        [sepolia.id]: '0xbe7ad55a62873c89319324e7a3c43383b7ae2f67',
+        [base.id]: '0xbe7ad55a62873c89319324e7a3c43383b7ae2f67',
+        [baseLocal.id]: '0xbe7ad55a62873c89319324e7a3c43383b7ae2f67',
+        [baseSepolia.id]: '0xbe7ad55a62873c89319324e7a3c43383b7ae2f67',
+      },
+      // @ts-expect-error doesn't like the artifact
+      abi: sendEarnArtifact.abi,
     },
   ],
   plugins: [
