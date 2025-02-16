@@ -4,6 +4,7 @@ import {
   Fade,
   Paragraph,
   Separator,
+  Shake,
   Spinner,
   Stack,
   SubmitButton,
@@ -23,18 +24,24 @@ import { useEarnScreenParams } from 'app/routers/params'
 import { Row } from 'app/features/earn/components/Row'
 import { CalculatedBenefits } from 'app/features/earn/components/CalculatedBenefits'
 import { EarnTerms } from 'app/features/earn/components/EarnTerms'
+import { useMutation } from '@tanstack/react-query'
 
-const DepositSchema = z.object({
+import debug from 'debug'
+
+const log = debug('app:earn:deposit')
+
+const DepositFormSchema = z.object({
   amount: formFields.text,
   areTermsAccepted: formFields.boolean_checkbox,
 })
+type DepositFormSchema = z.infer<typeof DepositFormSchema>
 
 export function DepositScreen() {
   return <DepositForm />
 }
 
 export const DepositForm = () => {
-  const form = useForm<z.infer<typeof DepositSchema>>()
+  const form = useForm<DepositFormSchema>()
   const router = useRouter()
   const { coin, isLoading: isUSDCLoading } = useCoin('USDC')
   const { isLoading: isLoadingCoins } = useCoins()
@@ -45,25 +52,48 @@ export const DepositForm = () => {
   const formAmount = form.watch('amount')
   const areTermsAccepted = form.watch('areTermsAccepted')
 
+  if (areTermsAccepted && form.formState.errors.areTermsAccepted) {
+    form.clearErrors('areTermsAccepted')
+  }
+
   const canSubmit =
     !isUSDCLoading &&
     coin?.balance !== undefined &&
     coin.balance >= parsedAmount &&
-    parsedAmount > BigInt(0) &&
-    areTermsAccepted
+    parsedAmount > BigInt(0)
 
   const insufficientAmount =
     coin?.balance !== undefined && earnParams.amount !== undefined && parsedAmount > coin?.balance
 
-  const onSubmit = async () => {
-    if (!canSubmit) return
+  // MUTATION DEPOSIT
+  const mutation = useMutation({
+    mutationFn: async ({ amount, areTermsAccepted }: DepositFormSchema) => {
+      log('mutationFn', { amount, areTermsAccepted })
+      return true
+    },
+    onMutate: (variables) => {
+      // A mutation is about to happen!
+      log('onMutate', variables)
 
-    // TODO logic for creating vault
-
-    router.push({
-      pathname: '/earn',
-    })
-  }
+      // Optionally return a context containing data to use when for example rolling back
+      // return { id: 1 }
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      log('onError', error, variables, context)
+    },
+    onSuccess: (data, variables, context) => {
+      // Boom baby!
+      log('onSuccess', data, variables, context)
+      // router.push({
+      //   pathname: '/earn',
+      // })
+    },
+    onSettled: (data, error, variables, context) => {
+      // Error or success... doesn't matter!
+      log('onSettled', data, error, variables, context)
+    },
+  })
 
   useEffect(() => {
     const subscription = form.watch(({ amount: _amount }) => {
@@ -93,8 +123,8 @@ export const DepositForm = () => {
       <FormProvider {...form}>
         <SchemaForm
           form={form}
-          schema={DepositSchema}
-          onSubmit={onSubmit}
+          schema={DepositFormSchema}
+          onSubmit={mutation.mutate}
           props={{
             amount: {
               fontSize: (() => {
@@ -161,7 +191,21 @@ export const DepositForm = () => {
             <YStack>
               <SubmitButton
                 theme="green"
-                onPress={submit}
+                onPress={() => {
+                  if (!areTermsAccepted) {
+                    form.setError(
+                      'areTermsAccepted',
+                      {
+                        type: 'required',
+                      },
+                      {
+                        shouldFocus: true,
+                      }
+                    )
+                    return
+                  }
+                  submit()
+                }}
                 py={'$5'}
                 br={'$4'}
                 disabledStyle={{ opacity: 0.5 }}
@@ -175,7 +219,7 @@ export const DepositForm = () => {
           )}
         >
           {({ amount, areTermsAccepted }) => (
-            <YStack gap={'$5'}>
+            <YStack width={'100%'} gap={'$5'}>
               <Fade>
                 <YStack
                   gap="$5"
@@ -259,7 +303,13 @@ export const DepositForm = () => {
               )}
               <XStack gap={'$3'} ai={'center'}>
                 {areTermsAccepted}
-                <EarnTerms />
+                {form.formState.errors.areTermsAccepted ? (
+                  <Shake shakeKey="areTermsAccepted" baseStyle={{ width: '100%' }}>
+                    <EarnTerms hasError={true} />
+                  </Shake>
+                ) : (
+                  <EarnTerms />
+                )}
               </XStack>
             </YStack>
           )}
