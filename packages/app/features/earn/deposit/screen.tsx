@@ -19,6 +19,7 @@ import {
   sendEarnAddress,
   usdcAddress,
   useReadSendEarnBalanceOf,
+  useReadSendEarnConvertToAssets,
   useReadSendEarnDecimals,
 } from '@my/wagmi'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -206,17 +207,23 @@ export const DepositForm = () => {
   const earnDecimals = useReadSendEarnDecimals({
     chainId,
   })
-  const earnBalance = useReadSendEarnBalanceOf({
+  const earnShares = useReadSendEarnBalanceOf({
     chainId,
     args: [sendAccount?.data?.address ?? '0x'],
     query: { enabled: !!sendAccount?.data?.address },
+  })
+  const earnAssets = useReadSendEarnConvertToAssets({
+    chainId,
+    args: [earnShares?.data ?? 0n],
+    query: { enabled: !!earnShares?.data },
   })
 
   // DEBUG
   log('uop', uop)
   log('mutation', mutation)
   log('earnDecimals', earnDecimals)
-  log('earnBalance', earnBalance)
+  log('earnShares', earnShares)
+  log('earnAssets', earnAssets)
 
   const canSubmit =
     !isUSDCLoading &&
