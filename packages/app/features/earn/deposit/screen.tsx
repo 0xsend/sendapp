@@ -29,7 +29,11 @@ const DepositSchema = z.object({
   areTermsAccepted: formFields.boolean_checkbox,
 })
 
-export const DepositScreen = () => {
+export function DepositScreen() {
+  return <DepositForm />
+}
+
+export const DepositForm = () => {
   const form = useForm<z.infer<typeof DepositSchema>>()
   const router = useRouter()
   const { coin, isLoading: isUSDCLoading } = useCoin('USDC')
