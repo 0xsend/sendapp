@@ -15,7 +15,6 @@ import {
 import {
   baseMainnetBundlerClient,
   entryPointAddress,
-  sendEarnAbi,
   sendEarnAddress,
   usdcAddress,
   useReadSendEarnBalanceOf,
@@ -35,15 +34,15 @@ import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { signUserOp } from 'app/utils/signUserOp'
 import { toNiceError } from 'app/utils/toNiceError'
-import { useUserOp } from 'app/utils/userop'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import debug from 'debug'
 import { useEffect, useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
-import { encodeFunctionData, erc20Abi, formatUnits, withRetry } from 'viem'
+import { formatUnits, withRetry } from 'viem'
 import { useChainId } from 'wagmi'
 import { z } from 'zod'
+import { useSendEarnDepositUserOp } from './hooks'
 
 const log = debug('app:earn:deposit')
 
@@ -55,44 +54,6 @@ type DepositFormSchema = z.infer<typeof DepositFormSchema>
 
 export function DepositScreen() {
   return <DepositForm />
-}
-
-const useSendEarnDepositUserOp = ({ asset, amount, vault }) => {
-  const sendAccount = useSendAccount()
-  const sender = useMemo(() => sendAccount?.data?.address, [sendAccount?.data?.address])
-
-  // TODO: validate asset
-  // TODO: referrer logic and setting correct send earn vault address
-  const calls = useMemo(
-    () => [
-      {
-        dest: asset,
-        value: 0n,
-        data: encodeFunctionData({
-          abi: erc20Abi,
-          functionName: 'approve',
-          args: [vault, amount],
-        }),
-      },
-      {
-        dest: vault,
-        value: 0n,
-        data: encodeFunctionData({
-          abi: sendEarnAbi,
-          functionName: 'deposit',
-          args: [amount, sender ?? '0x'],
-        }),
-      },
-    ],
-    [asset, vault, amount, sender]
-  )
-
-  const uop = useUserOp({
-    sender,
-    calls,
-  })
-
-  return uop
 }
 
 export const DepositForm = () => {
@@ -227,11 +188,13 @@ export const DepositForm = () => {
     coin?.balance !== undefined &&
     coin.balance >= parsedAmount &&
     parsedAmount > BigInt(0) &&
-    uop.isSuccess
+    uop.isSuccess &&
+    mutation.isIdle
 
   const insufficientAmount =
     coin?.balance !== undefined && earnParams.amount !== undefined && parsedAmount > coin?.balance
 
+  // validate and sanitize amount
   useEffect(() => {
     const subscription = form.watch(({ amount: _amount }) => {
       const sanitizedAmount = sanitizeAmount(_amount, coin?.decimals)
