@@ -78,7 +78,7 @@ function SendtagList({ tags }: { tags?: Tables<'tags'>[] }) {
 
   return (
     <Fade>
-      <YGroup bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }}>
+      <YGroup bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }} testID={'sendtags-list'}>
         {tags.map((tag) => (
           <YGroup.Item key={tag.name}>
             <TagItem tag={tag} />
