@@ -3,6 +3,7 @@ import type {
   leaderboard_referrals_all_timeInputs,
   SeedClientOptions,
   usersInputs,
+  Store,
 } from '@snaplet/seed'
 import crypto from 'node:crypto'
 import { hexToBytes } from 'viem'
@@ -17,7 +18,7 @@ export const models: SeedClientOptions['models'] = {
           .phoneNumber(ctx.seed, {
             length: {
               min: 7,
-              max: 14, // max 15 including prefix
+              max: 14,
             },
           })
           .replace('+', '')
@@ -29,17 +30,42 @@ export const models: SeedClientOptions['models'] = {
       name: (ctx) => copycat.fullName(ctx.seed),
       avatar_url: (ctx) => pravatar(copycat.fullName(ctx.seed)),
       x_username: (ctx) => copycat.username(ctx.seed, { limit: 64 }),
+      send_id: (ctx) => copycat.int(ctx.seed, { min: 10000, max: 99999 }),
     },
   },
   tags: {
     data: {
-      name: (ctx) => tagName(copycat.username(ctx.seed)),
+      id: (ctx) => {
+        const parallelIndex = process.env.TEST_PARALLEL_INDEX || '0'
+        return (
+          1000 + Number.parseInt(parallelIndex) * 1000 + copycat.int(ctx.seed, { min: 0, max: 999 })
+        )
+      },
+      name: (ctx) => {
+        const uniqueId = crypto.randomBytes(2).toString('hex')
+        return `tag${uniqueId}`.toLowerCase()
+      },
+      status: 'confirmed',
     },
   },
   send_accounts: {
     data: {
       address: () => privateKeyToAddress(generatePrivateKey()),
       chain_id: 845337,
+    },
+  },
+  send_account_tags: {
+    data: {
+      tag_id: (ctx) => {
+        const tag = ctx.store.tags[0]
+        if (!tag?.id) throw new Error('No tag found')
+        return tag.id
+      },
+      send_account_id: (ctx) => {
+        const account = ctx.store.send_accounts[0]
+        if (!account?.id) throw new Error('No send_account found')
+        return account.id
+      },
     },
   },
   chain_addresses: {
@@ -76,25 +102,25 @@ export const userOnboarded: usersInputs = {
     const phone = copycat.phoneNumber(ctx.seed, {
       length: {
         min: 7,
-        max: 15, // max 15 including prefix
+        max: 15,
       },
     })
     return phone.replace('+', '')
   },
+  send_accounts: [
+    {
+      chain_id: 845337,
+    },
+  ],
+  tags: [{}],
   profiles: [
     {
       referral_code: (ctx) => crypto.randomBytes(8).toString('hex'),
       x_username: null,
-    },
-  ],
-  tags: [
-    {
-      status: 'confirmed',
-    },
-  ],
-  send_accounts: [
-    {
-      chain_id: 845337,
+      is_public: true,
+      name: (ctx) => copycat.fullName(ctx.seed),
+      about: (ctx) => copycat.sentence(ctx.seed),
+      send_id: (ctx) => copycat.int(ctx.seed, { min: 10000, max: 99999 }),
     },
   ],
   chain_addresses: [{}],

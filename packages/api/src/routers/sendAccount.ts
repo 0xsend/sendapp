@@ -42,7 +42,7 @@ import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
 import { address } from 'app/utils/zod'
 import { SendAccountCallsSchema, UserOperationSchema } from 'app/utils/zod/evm'
-import type { Tables } from 'app/utils/supabase/types'
+import type { Database } from '@my/supabase/database.types'
 
 const SEND_ACCOUNT_FACTORY_PRIVATE_KEY = process.env
   .SEND_ACCOUNT_FACTORY_PRIVATE_KEY as `0x${string}`
@@ -466,7 +466,7 @@ export const sendAccountRouter = createTRPCRouter({
         .from('send_accounts')
         .update({
           main_tag_id: tagId,
-        } as Partial<Tables<'send_accounts'>>)
+        })
         .eq('user_id', profile.user.id)
 
       if (error) {

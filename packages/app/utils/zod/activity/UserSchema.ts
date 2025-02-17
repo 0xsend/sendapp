@@ -4,7 +4,7 @@ export const UserSchema = z.object({
   /**
    * Only set if it matches the currently authenticated user
    */
-  id: z.string().uuid().nullable(),
+  id: z.string().nullable(),
   /**
    * Profile name
    */
@@ -20,7 +20,7 @@ export const UserSchema = z.object({
   /**
    * Confirmed main tag id
    */
-  main_tag_id: z.number(),
+  main_tag_id: z.number().nullable(),
   /**
    * Confirmed main tag name
    */
@@ -28,7 +28,7 @@ export const UserSchema = z.object({
   /**
    * Confirmed sendtags
    */
-  tags: z.array(z.string()),
+  tags: z.array(z.string()).nullable().default([]),
 })
 
 export type User = z.infer<typeof UserSchema>
