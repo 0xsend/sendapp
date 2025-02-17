@@ -4,6 +4,7 @@ import {
   H1,
   LinearGradient,
   Paragraph,
+  SafeArea,
   Spinner,
   Stack,
   XStack,
@@ -11,7 +12,6 @@ import {
   isWeb,
   useMedia,
   usePwa,
-  useSafeAreaInsets,
 } from '@my/ui'
 import { IconSendLogo } from 'app/components/icons'
 import { useAuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
@@ -114,7 +114,6 @@ function Hero() {
   const carouselImage = carouselImages[carouselProgress]
   const mobileImagePosition = carouselImagePositions[carouselProgress]
   const isPwa = usePwa()
-  const insets = useSafeAreaInsets()
 
   const containerHeight = (() => {
     switch (true) {
@@ -135,10 +134,9 @@ function Hero() {
       position="relative"
       f={1}
     >
-      <YStack
+      <SafeArea
+        f={1}
         h={isPwa ? '100vh' : 'unset'}
-        pt={isPwa && insets?.top}
-        pb={isPwa && insets?.bottom}
         overflow="hidden"
         $gtMd={{ borderRadius: '$8' }}
         w="100%"
@@ -241,7 +239,7 @@ function Hero() {
             <AuthButtons />
           </YStack>
         </YStack>
-      </YStack>
+      </SafeArea>
     </XStack>
   )
 }
