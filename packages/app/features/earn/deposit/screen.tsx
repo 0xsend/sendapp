@@ -256,7 +256,7 @@ export const DepositForm = () => {
   }
 
   return (
-    <YStack w={'100%'} gap={'$4'} pb={'$3'} $gtLg={{ w: '50%' }}>
+    <YStack testID="DepositForm" w={'100%'} gap={'$4'} pb={'$3'} $gtLg={{ w: '50%' }}>
       <Paragraph size={'$7'} fontWeight={'500'}>
         Deposit Amount
       </Paragraph>
