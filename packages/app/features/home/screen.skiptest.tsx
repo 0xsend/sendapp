@@ -103,6 +103,8 @@ jest.mock('app/utils/supabase/useSupabase', () => ({
                 send_id: 3665,
                 tag_name: 'test',
                 avatar_url: 'https://avatars.githubusercontent.com/u/123',
+                main_tag_id: 1,
+                main_tag_name: 'test',
               },
             ],
             phone_matches: [],

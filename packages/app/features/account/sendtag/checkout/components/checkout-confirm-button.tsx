@@ -9,6 +9,7 @@ import {
   useMedia,
   YStack,
   type YStackProps,
+  LinkableButton,
 } from '@my/ui'
 import { AlertTriangle } from '@tamagui/lucide-icons'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -323,7 +324,19 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
                 </>
               )
             case !canAffordTags && (!txWaitLoading || !submitting):
-              return <ButtonText>insufficient funds</ButtonText>
+              return (
+                <LinkableButton
+                  theme="red"
+                  href="/deposit"
+                  px="$3.5"
+                  h="$4.5"
+                  borderRadius="$4"
+                  testID="checkout-deposit-button"
+                  gap="$1.5"
+                >
+                  <ButtonText>Deposit USDC</ButtonText>
+                </LinkableButton>
+              )
             case sendTransactionIsPending:
               return (
                 <>

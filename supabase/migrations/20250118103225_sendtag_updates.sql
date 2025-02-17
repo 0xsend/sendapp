@@ -1,7 +1,7 @@
 -- Core schema changes
 CREATE TABLE IF NOT EXISTS send_account_tags(
   id serial PRIMARY KEY,
-  send_account_id uuid NOT NULL REFERENCES send_accounts(id),
+  send_account_id uuid NOT NULL REFERENCES send_accounts(id) ON DELETE CASCADE,
   tag_id bigint NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
   created_at timestamp with time zone NOT NULL DEFAULT NOW(),
   updated_at timestamp with time zone NOT NULL DEFAULT NOW()

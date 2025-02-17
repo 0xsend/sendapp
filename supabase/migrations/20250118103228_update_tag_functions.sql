@@ -110,6 +110,8 @@ CREATE OR REPLACE FUNCTION public.create_tag(tag_name citext, send_account_id uu
     AS $$
 DECLARE
     _tag_id bigint;
+    _original_error_code text;
+    _original_error_message text;
 BEGIN
     BEGIN
         -- Verify user owns the send_account
@@ -179,7 +181,12 @@ RETURNING
     tag_id INTO _tag_id;
     EXCEPTION
         WHEN OTHERS THEN
-            RAISE EXCEPTION '%', SQLERRM;
+            GET STACKED DIAGNOSTICS
+                _original_error_code = RETURNED_SQLSTATE,
+                _original_error_message = MESSAGE_TEXT;
+            RAISE EXCEPTION USING 
+                ERRCODE = _original_error_code,
+                MESSAGE = _original_error_message;
     END;
     RETURN _tag_id;
 END;
@@ -199,7 +206,8 @@ BEGIN
         tags t
     SET
         status = 'available',
-        user_id = NULL
+        user_id = NULL,
+        updated_at = NOW()
     WHERE
         t.id = OLD.tag_id
         AND NOT EXISTS(

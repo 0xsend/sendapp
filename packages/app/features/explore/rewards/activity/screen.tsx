@@ -31,6 +31,7 @@ import { toNiceError } from 'app/utils/toNiceError'
 import { min } from 'app/utils/bigint'
 import type { Json } from '@my/supabase/database.types'
 import { sendCoin } from 'app/data/coins'
+import { useTheme } from '@tamagui/core'
 
 //@todo get this from the db
 const verificationTypesAndTitles = {
@@ -61,11 +62,13 @@ export function ActivityRewardsScreen() {
     setRewardsScreenParams({ distribution: newDistribution?.number })
   }
 
+  const theme = useTheme()
+
   if (isLoading) {
     return (
       <YStack f={1} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
         <Stack w="100%" f={1} jc={'center'} ai={'center'}>
-          <Spinner color="$color12" size="large" />
+          <Spinner color={theme.color12.get()} size="large" />
         </Stack>
       </YStack>
     )
@@ -75,7 +78,7 @@ export function ActivityRewardsScreen() {
     return (
       <YStack f={1} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
         <Stack w="100%" f={1} jc={'center'} ai={'center'}>
-          <Paragraph color={'$color10'} size={'$5'}>
+          <Paragraph color={theme.color10.get()} size={'$5'}>
             No rewards available
           </Paragraph>
         </Stack>
@@ -93,7 +96,7 @@ export function ActivityRewardsScreen() {
   return (
     <YStack f={1} pb={'$12'} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
       <XStack w={'100%'} jc={'space-between'} ai={'center'}>
-        <H3 fontWeight={'600'} color={'$color12'} pr={'$2'}>
+        <H3 fontWeight={'600'} color={theme.color12.get()} pr={'$2'}>
           {`${distributionDates[selectedDistributionIndex]?.split(' ')[0] ?? 'Monthly'} Rewards`}
         </H3>
         {distributions.length > 1 && (
@@ -108,7 +111,7 @@ export function ActivityRewardsScreen() {
         {(() => {
           switch (true) {
             case verificationsQuery.isLoading:
-              return <Spinner size="small" color={'$color12'} />
+              return <Spinner size="small" color={theme.color12.get()} />
             case verificationsQuery.isError:
               return (
                 <Paragraph color={'$error'} size={'$5'}>
@@ -117,7 +120,7 @@ export function ActivityRewardsScreen() {
               )
             case !distributions[selectedDistributionIndex]:
               return (
-                <Paragraph color={'$color10'} size={'$5'}>
+                <Paragraph color={theme.color10.get()} size={'$5'}>
                   No rewards available
                 </Paragraph>
               )
@@ -159,6 +162,7 @@ const DistributionRequirementsCard = ({
   verificationsQuery: DistributionsVerificationsQuery
 }) => {
   const { data: sendAccount, isLoading: isLoadingSendAccount } = useSendAccount()
+  const theme = useTheme()
   const verifications = verificationsQuery.data
   const {
     data: snapshotBalance,
@@ -169,7 +173,7 @@ const DistributionRequirementsCard = ({
     return (
       <FadeCard br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
         <Stack ai="center" jc="center" p="$4">
-          <Spinner color="$color12" size="large" />
+          <Spinner color={theme.color12.get()} size="large" />
         </Stack>
       </FadeCard>
     )
@@ -190,13 +194,13 @@ const DistributionRequirementsCard = ({
             Your SEND Balance
           </Label>
           {isLoadingSnapshotBalance ? (
-            <Spinner size="small" color={'$color11'} />
+            <Spinner size="small" color={theme.color11.get()} />
           ) : (
             <Theme reset>
               <Paragraph
                 fontFamily={'$mono'}
                 fontWeight={'500'}
-                color={'$color12'}
+                color={theme.color12.get()}
                 lh={'$8'}
                 fontSize={'$9'}
                 $gtXl={{ fontSize: '$10' }}
@@ -214,7 +218,11 @@ const DistributionRequirementsCard = ({
           <XStack ai="center" gap="$2">
             <Paragraph>Sendtag Registered</Paragraph>
             {sendTagRegistrations ? (
-              <CheckCircle2 $theme-light={{ color: '$color12' }} color="$primary" size={'$1.5'} />
+              <CheckCircle2
+                $theme-light={{ color: theme.color12.get() }}
+                color="$primary"
+                size={'$1.5'}
+              />
             ) : (
               <Theme name="red">
                 <IconInfoCircle color={'$color8'} size={'$2'} />
@@ -247,7 +255,7 @@ const DistributionRequirementsCard = ({
                 default:
                   return (
                     <CheckCircle2
-                      $theme-light={{ color: '$color12' }}
+                      $theme-light={{ color: theme.color12.get() }}
                       color="$primary"
                       size={'$1.5'}
                     />
@@ -268,16 +276,17 @@ const TaskCards = ({
   distribution: UseDistributionsResultData[number]
   verificationsQuery: DistributionsVerificationsQuery
 }) => {
+  const theme = useTheme()
   const verifications = verificationsQuery.data
   if (verificationsQuery.isLoading) {
     return (
       <YStack f={1} w={'100%'} gap="$5">
-        <H3 fontWeight={'600'} color={'$color12'}>
+        <H3 fontWeight={'600'} color={theme.color12.get()}>
           Tasks
         </H3>
         <FadeCard br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
           <Stack ai="center" jc="center" p="$4">
-            <Spinner color="$color12" size="large" />
+            <Spinner color={theme.color12.get()} size="large" />
           </Stack>
         </FadeCard>
       </YStack>
@@ -289,7 +298,7 @@ const TaskCards = ({
 
   return (
     <YStack f={1} w={'100%'} gap="$5">
-      <H3 fontWeight={'600'} color={'$color12'}>
+      <H3 fontWeight={'600'} color={theme.color12.get()}>
         Tasks
       </H3>
       <Stack flexWrap="wrap" gap="$5" $gtXs={{ fd: 'row' }}>
@@ -315,7 +324,7 @@ const TaskCards = ({
               verification={verification}
               isQualificationOver={isQualificationOver}
             >
-              <H3 fontWeight={'600'} color={'$color12'}>
+              <H3 fontWeight={'600'} color={theme.color12.get()}>
                 {verificationTypesAndTitles[verification.type]?.title}
               </H3>
             </TaskCard>
@@ -333,6 +342,7 @@ const TaskCard = ({
   verification: NonNullable<DistributionsVerificationsQuery['data']>['verification_values'][number]
   isQualificationOver: boolean
 }) => {
+  const theme = useTheme()
   const type = verification.type
   const metadata = (verification.metadata ?? []) as Json[]
   const weight = verification.weight
@@ -410,16 +420,17 @@ const MultiplierCards = ({
   distribution: UseDistributionsResultData[number]
   verificationsQuery: DistributionsVerificationsQuery
 }) => {
+  const theme = useTheme()
   const verifications = verificationsQuery.data
   if (verificationsQuery.isLoading) {
     return (
       <YStack f={1} w={'100%'} gap="$5">
-        <H3 fontWeight={'600'} color={'$color12'}>
+        <H3 fontWeight={'600'} color={theme.color12.get()}>
           Multiplier
         </H3>
         <FadeCard br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
           <Stack ai="center" jc="center" p="$4">
-            <Spinner color="$color12" size="large" />
+            <Spinner color={theme.color12.get()} size="large" />
           </Stack>
         </FadeCard>
       </YStack>
@@ -445,7 +456,7 @@ const MultiplierCards = ({
 
   return (
     <YStack f={1} w={'100%'} gap="$5">
-      <H3 fontWeight={'600'} color={'$color12'}>
+      <H3 fontWeight={'600'} color={theme.color12.get()}>
         Multiplier
       </H3>
       <Stack flexWrap="wrap" gap="$5" $gtXs={{ fd: 'row' }}>
@@ -462,7 +473,7 @@ const MultiplierCards = ({
               fontSize={'$9'}
               $sm={{ fontSize: '$8' }}
               fontWeight={'600'}
-              color={'$color12'}
+              color={theme.color12.get()}
               mx="auto"
             >
               X {(value ?? 1).toString()}
@@ -507,6 +518,7 @@ const ProgressCard = ({
   previousDistribution?: UseDistributionsResultData[number]
   verificationsQuery: DistributionsVerificationsQuery
 }) => {
+  const theme = useTheme()
   const sendSlash = distribution.send_slash.at(0)
 
   if (!sendSlash) {
@@ -519,7 +531,7 @@ const ProgressCard = ({
     return (
       <FadeCard br={12} $gtMd={{ gap: '$4' }} p="$6">
         <Stack ai="center" jc="center" p="$4">
-          <Spinner color="$color12" size="large" />
+          <Spinner color={theme.color12.get()} size="large" />
         </Stack>
       </FadeCard>
     )
@@ -534,7 +546,7 @@ const ProgressCard = ({
   if (!sendCeiling) {
     return (
       <YStack f={1} w={'100%'} gap="$5">
-        <H3 fontWeight={'600'} color={'$color12'}>
+        <H3 fontWeight={'600'} color={theme.color12.get()}>
           Progress
         </H3>
         <FadeCard br={'$6'} p="$7" $xs={{ p: '$5' }} w={'100%'} maw={500}>
@@ -565,7 +577,7 @@ const ProgressCard = ({
 
   return (
     <YStack f={1} w={'100%'} gap="$5">
-      <H3 fontWeight={'600'} color={'$color12'}>
+      <H3 fontWeight={'600'} color={theme.color12.get()}>
         Progress
       </H3>
       <FadeCard br={'$6'} p="$6" w={'100%'} maw={500}>
@@ -585,23 +597,23 @@ const Progress = ({ progress }: { progress: number }) => {
           px={'$0.9'}
           borderWidth={1}
           borderColor={'$primary'}
-          $theme-light={{ borderColor: '$color12' }}
+          $theme-light={{ borderColor: theme.color12.get() }}
           borderRadius={'$4'}
         >
           {progress.toFixed(1)}%
         </Paragraph>
       </XStack>
-      <Stack w="100%" h="$1" br="$10" bc="$color3">
+      <Stack w="100%" h="$1" br="$10" bc={theme.color3.get()}>
         <Stack
           w={`${progress.toFixed(1)}%`}
           h="100%"
           br="$10"
           animation="quick"
           $theme-light={{
-            bc: '$color12',
+            bc: theme.color12.get(),
           }}
           $theme-dark={{
-            bc: '$primary',
+            bc: theme.primary.get(),
           }}
         />
       </Stack>
@@ -628,7 +640,7 @@ const ClaimableRewardsCard = ({
 
   return (
     <YStack f={1} w={'100%'} gap="$5" $sm={{ display: 'none' }}>
-      <H3 fontWeight={'600'} color={'$color12'}>
+      <H3 fontWeight={'600'} color={theme.color12.get()}>
         {isQualificationOver ? `Total ${distributionMonth}` : ` ${distributionMonth} Rewards`}
       </H3>
       <FadeCard br={'$6'} p="$7" ai={'center'} w={'100%'}>
