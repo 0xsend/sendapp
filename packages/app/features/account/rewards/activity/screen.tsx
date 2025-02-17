@@ -280,7 +280,7 @@ const DistributionRequirementsCard = ({
               />
             ) : (
               <Theme name="red">
-                <IconInfoCircle color={theme.color8.get()} size={'$1'} />
+                <IconInfoCircle color={'$color8'} size={'$2'} />
               </Theme>
             )}
           </XStack>
@@ -304,7 +304,7 @@ const DistributionRequirementsCard = ({
                   BigInt(distribution.hodler_min_balance ?? 0n) > (snapshotBalance ?? 0):
                   return (
                     <Theme name="red">
-                      <IconInfoCircle color={theme.color8.get()} size={'$1'} />
+                      <IconInfoCircle color={'$color8'} size={'$2'} />
                     </Theme>
                   )
                 default:
@@ -449,8 +449,10 @@ const TaskCard = ({
         ) : (
           <>
             <XStack ai="center" gap="$2">
-              <IconInfoCircle color={theme.color8.get()} size={'$1'} />
-              <Paragraph color={theme.color11.get()}>Pending</Paragraph>
+              <Theme name="red">
+                <IconInfoCircle color={'$color8'} size={'$2'} />
+              </Theme>
+              <Paragraph color="$color11">Pending</Paragraph>
             </XStack>
             <Paragraph
               ff={'$mono'}
@@ -638,12 +640,7 @@ const ProgressCard = ({
   )
 }
 
-const Progress = ({
-  progress,
-}: {
-  progress: number
-}) => {
-  const theme = useTheme()
+const Progress = ({ progress }: { progress: number }) => {
   return (
     <YStack gap="$4" w="100%">
       <XStack jc="flex-end">
@@ -679,8 +676,9 @@ const Progress = ({
 
 const ClaimableRewardsCard = ({
   distribution,
-}: { distribution: UseDistributionsResultData[number] }) => {
-  const theme = useTheme()
+}: {
+  distribution: UseDistributionsResultData[number]
+}) => {
   const shareAmount = BigInt(distribution.distribution_shares?.[0]?.amount ?? 0n)
   if (shareAmount === undefined || shareAmount === 0n) return null
   const now = new Date()

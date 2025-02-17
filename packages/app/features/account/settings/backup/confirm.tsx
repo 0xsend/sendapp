@@ -1,13 +1,14 @@
 import type { Tables } from '@my/supabase/database-generated.types'
 import {
   Button,
+  Fade,
   FormWrapper,
   H1,
   Paragraph,
   Spinner,
   SubmitButton,
-  YStack,
   useToastController,
+  YStack,
 } from '@my/ui'
 import { baseMainnetClient, sendAccountAbi, tokenPaymasterAddress } from '@my/wagmi'
 import { useQuery } from '@tanstack/react-query'
@@ -27,6 +28,7 @@ import { useRouter } from 'solito/router'
 import { encodeFunctionData } from 'viem'
 import { useEstimateFeesPerGas } from 'wagmi'
 import { z } from 'zod'
+import { SettingsHeader } from 'app/features/account/settings/components/SettingsHeader'
 
 type Params = {
   cred_id: string
@@ -53,14 +55,15 @@ export const ConfirmPasskeyScreen = () => {
   })
 
   return (
-    <YStack w={'100%'} gap={'$6'}>
+    <YStack w={'100%'} gap={'$3.5'}>
+      <SettingsHeader>Passkeys</SettingsHeader>
       {(() => {
         switch (true) {
           case isLoading:
             return <Spinner size="large" color={'$color'} />
           case error !== null:
             return (
-              <Paragraph maxWidth={'600'} fontFamily={'$mono'} fontSize={'$5'} color={'$color12'}>
+              <Paragraph maxWidth={'600'} fontSize={'$5'} color={'$color12'}>
                 {error?.message ?? `Something went wrong: ${error}`}
               </Paragraph>
             )
@@ -76,13 +79,15 @@ export const ConfirmPasskeyScreen = () => {
 
 const AddPasskeySigner = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_credentials'> }) => {
   return (
-    <FormWrapper
-      $gtLg={{
-        als: 'flex-start',
-      }}
-      gap={'$2'}
-    >
-      <YStack gap={'$size.3.5'}>
+    <Fade>
+      <FormWrapper
+        w={'100%'}
+        gap={'$3.5'}
+        bc={'$color1'}
+        borderRadius={'$5'}
+        p={'$5'}
+        $gtLg={{ p: '$7', gap: '$5', als: 'flex-start', maxWidth: 'none' }}
+      >
         <H1 size={'$9'} fontWeight={'600'} color="$color12">
           Add Passkey as Signer
         </H1>
@@ -94,11 +99,9 @@ const AddPasskeySigner = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cre
           has been saved. Add your new passkey as a signer. This will allow you to sign transactions
           on your account with your new passkey.
         </Paragraph>
-        <YStack gap={'$2'} jc="center">
-          <AddSignerButton webauthnCred={webauthnCred} />
-        </YStack>
-      </YStack>
-    </FormWrapper>
+        <AddSignerButton webauthnCred={webauthnCred} />
+      </FormWrapper>
+    </Fade>
   )
 }
 
@@ -231,6 +234,7 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
         form={form}
         formProps={{
           $gtLg: {
+            maxWidth: 'none',
             als: 'flex-start',
           },
           px: '$0',
@@ -239,14 +243,20 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
         onSubmit={onSubmit}
         renderAfter={({ submit }) => (
           <SubmitButton
-            mr="auto"
             onPress={submit}
             theme="green"
-            borderRadius={'$3'}
-            px={'$size.1.5'}
+            borderRadius={'$4'}
+            p={'$4'}
+            mt={'$size.1.5'}
             {...(isLoading ? { disabled: true } : {})}
           >
-            <Button.Text ff={'$mono'} fontWeight={'600'} tt="uppercase" size={'$5'}>
+            <Button.Text
+              ff={'$mono'}
+              fontWeight={'600'}
+              tt="uppercase"
+              size={'$5'}
+              color={'$black'}
+            >
               Add Passkey as Signer
             </Button.Text>
           </SubmitButton>

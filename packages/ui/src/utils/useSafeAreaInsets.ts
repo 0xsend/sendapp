@@ -1,39 +1,55 @@
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const sanitizeSafeAreaInset = (value: string) => {
-  // Handle env() function values
-  if (value.includes('env')) return 0
+  if (value === '') return undefined
+  if (value.includes('env')) return undefined
   const sanitizedInset = value.endsWith('px') ? Number(value.slice(0, -2)) : Number(value)
-  return Number.isNaN(sanitizedInset) ? 0 : sanitizedInset
+  if (Number.isNaN(sanitizedInset)) return undefined
+  return sanitizedInset
 }
 
 export const useSafeAreaInsets = () => {
-  const [insets, setInsets] = useState({ sat: 0, sar: 0, sab: 0, sal: 0 })
+  const [insets, setInsets] = useState<{
+    top: number
+    right: number
+    bottom: number
+    left: number
+  } | null>()
 
   useEffect(() => {
     if (typeof window === 'undefined') return
 
     const updateInsets = () => {
-      // Force a repaint to ensure env() values are calculated
-      document.documentElement.style.display = 'none'
-      document.documentElement.offsetHeight // Force reflow
-      document.documentElement.style.display = ''
-
       const styles = getComputedStyle(document.documentElement)
-      const sat = sanitizeSafeAreaInset(styles.getPropertyValue('--sat')) || 24
-      const sab = sanitizeSafeAreaInset(styles.getPropertyValue('--sab')) || 40
-      const sar = sanitizeSafeAreaInset(styles.getPropertyValue('--sar'))
-      const sal = sanitizeSafeAreaInset(styles.getPropertyValue('--sal'))
+      const newInsets = {
+        top: sanitizeSafeAreaInset(styles.getPropertyValue('--sat')),
+        right: sanitizeSafeAreaInset(styles.getPropertyValue('--sar')),
+        bottom: sanitizeSafeAreaInset(styles.getPropertyValue('--sab')),
+        left: sanitizeSafeAreaInset(styles.getPropertyValue('--sal')),
+      }
+      const hasInsets = Object.values(newInsets).some((inset) => inset !== undefined)
 
-      setInsets({ sat, sab, sar, sal })
+      //@ts-expect-error We check for undefined above
+      setInsets(hasInsets ? newInsets : null)
     }
 
-    // Initial update with a slight delay to ensure CSS is loaded
-    setTimeout(updateInsets, 100)
+    // Initial update
+    updateInsets()
 
-    // Update on resize
+    // Update on resize as env() values might change
     window.addEventListener('resize', updateInsets)
-    return () => window.removeEventListener('resize', updateInsets)
+
+    // Create a MutationObserver to watch for CSS variable changes
+    const observer = new MutationObserver(updateInsets)
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['style'],
+    })
+
+    return () => {
+      window.removeEventListener('resize', updateInsets)
+      observer.disconnect()
+    }
   }, [])
 
   return insets

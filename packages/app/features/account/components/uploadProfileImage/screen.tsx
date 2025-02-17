@@ -117,7 +117,7 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
           zIndex={100}
         >
           <YStack
-            backgroundColor="$black"
+            backgroundColor="$color0"
             opacity={0.66}
             borderRadius={'$3'}
             position="absolute"
@@ -125,6 +125,9 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
             right={0}
             top={0}
             bottom={0}
+            $theme-light={{
+              backgroundColor: '$black',
+            }}
           />
           <YStack position="absolute" left={0} right={0} top={0} bottom={0} jc="center" ai="center">
             {(() => {
