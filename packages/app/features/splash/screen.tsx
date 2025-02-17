@@ -134,83 +134,84 @@ function Hero() {
       position="relative"
       f={1}
     >
-      <SafeArea
-        f={1}
-        h={isPwa ? '100vh' : 'unset'}
-        overflow="hidden"
-        $gtMd={{ borderRadius: '$8' }}
-        w="100%"
-      >
-        {carouselImage && (
-          <Stack
-            pos="absolute"
-            top={0}
-            left={0}
-            right={0}
-            bottom={0}
-            height={isWeb ? '100dvh' : '100%'}
-          >
+      <SafeArea>
+        <YStack
+          f={1}
+          h={isPwa ? '100vh' : 'unset'}
+          overflow="hidden"
+          $gtMd={{ borderRadius: '$8' }}
+          w="100%"
+        >
+          {carouselImage && (
             <Stack
-              bc="$color1"
               pos="absolute"
               top={0}
               left={0}
               right={0}
               bottom={0}
               height={isWeb ? '100dvh' : '100%'}
-            />
-            <AnimationLayout
-              currentKey={carouselImage.base64 || 'none'}
-              direction={1}
-              fullscreen={true}
             >
               <Stack
+                bc="$color1"
                 pos="absolute"
                 top={0}
                 left={0}
                 right={0}
                 bottom={0}
                 height={isWeb ? '100dvh' : '100%'}
+              />
+              <AnimationLayout
+                currentKey={carouselImage.base64 || 'none'}
+                direction={1}
+                fullscreen={true}
               >
-                <SolitoImage
-                  placeholder="blur"
-                  blurDataURL={carouselImage.base64}
-                  src={carouselImage.img.src}
-                  fill={true}
-                  contentPosition={media.gtMd ? undefined : mobileImagePosition}
-                  style={{ objectFit: 'cover' }}
-                  alt="splash-screen-carousel"
-                />
-                <LinearGradient
+                <Stack
                   pos="absolute"
-                  w="100%"
-                  h="100%"
-                  locations={media.gtMd ? [0.3, 1] : [0, 0.5, 1]}
-                  colors={
-                    media.gtMd ? ['transparent', '$black'] : ['$black', 'transparent', '$black']
-                  }
-                />
-              </Stack>
-            </AnimationLayout>
-          </Stack>
-        )}
+                  top={0}
+                  left={0}
+                  right={0}
+                  bottom={0}
+                  height={isWeb ? '100dvh' : '100%'}
+                >
+                  <SolitoImage
+                    placeholder="blur"
+                    blurDataURL={carouselImage.base64}
+                    src={carouselImage.img.src}
+                    fill={true}
+                    contentPosition={media.gtMd ? undefined : mobileImagePosition}
+                    style={{ objectFit: 'cover' }}
+                    alt="splash-screen-carousel"
+                  />
+                  <LinearGradient
+                    pos="absolute"
+                    w="100%"
+                    h="100%"
+                    locations={media.gtMd ? [0.3, 1] : [0, 0.5, 1]}
+                    colors={
+                      media.gtMd ? ['transparent', '$black'] : ['$black', 'transparent', '$black']
+                    }
+                  />
+                </Stack>
+              </AnimationLayout>
+            </Stack>
+          )}
 
-        <YStack
-          f={1}
-          display="flex"
-          fd="column"
-          jc="flex-end"
-          p="$size.3.5"
-          pb={0}
-          maw={738}
-          mx="auto"
-          w="100%"
-        >
-          <YStack w="100%">
-            <YStack jc="flex-end" f={1} gap="$2" pb="$size.7" $gtMd={{ pb: '$size.0.9' }}>
-              <Carousel currentKey={carouselProgress.toString()} fullscreen={false} />
-            </YStack>
-            {/* <XStack gap="$4" ai="center" jc="center">
+          <YStack
+            f={1}
+            display="flex"
+            fd="column"
+            jc="flex-end"
+            p="$size.3.5"
+            pb={0}
+            maw={738}
+            mx="auto"
+            w="100%"
+          >
+            <YStack w="100%">
+              <YStack jc="flex-end" f={1} gap="$2" pb="$size.7" $gtMd={{ pb: '$size.0.9' }}>
+                <Carousel currentKey={carouselProgress.toString()} fullscreen={false} />
+              </YStack>
+              {/* <XStack gap="$4" ai="center" jc="center">
               <SignInButton display={media.gtMd ? 'none' : 'flex'} />
               <Anchor color="$white" href="https://info.send.it">
                 About
@@ -222,21 +223,22 @@ function Hero() {
                 Terms
               </Anchor>
             </XStack> */}
-          </YStack>
-          <YStack
-            pos="absolute"
-            height={'100%'}
-            jc="space-between"
-            $gtMd={{ display: 'none' }}
-            ai="flex-start"
-            pt="$size.4"
-            pb="$size.0.5"
-            f={1}
-            l={0}
-            w="100%"
-          >
-            <IconSendLogo size="$size.2" color="$white" ml={'$size.3.5'} />
-            <AuthButtons />
+            </YStack>
+            <YStack
+              pos="absolute"
+              height={'100%'}
+              jc="space-between"
+              $gtMd={{ display: 'none' }}
+              ai="flex-start"
+              pt="$size.4"
+              pb="$size.0.5"
+              f={1}
+              l={0}
+              w="100%"
+            >
+              <IconSendLogo size="$size.2" color="$white" ml={'$size.3.5'} />
+              <AuthButtons />
+            </YStack>
           </YStack>
         </YStack>
       </SafeArea>
