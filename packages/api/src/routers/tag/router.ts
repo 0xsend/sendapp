@@ -20,6 +20,49 @@ import type { Database } from '@my/supabase/database.types'
 const log = debug('api:routers:tag')
 
 export const tagRouter = createTRPCRouter({
+  create: protectedProcedure
+    .input(
+      z.object({
+        name: z.string(),
+      })
+    )
+    .mutation(async ({ ctx: { supabase }, input }) => {
+      // Get the user's send account
+      const { data: sendAccount, error: sendAccountError } = await supabase
+        .from('send_accounts')
+        .select('id')
+        .single()
+
+      if (sendAccountError || !sendAccount) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Send account not found',
+        })
+      }
+
+      const { error } = await supabase.rpc('create_tag', {
+        tag_name: input.name,
+        send_account_id: sendAccount.id,
+      })
+
+      if (error) {
+        console.error("Couldn't create Sendtag", error)
+        switch (error.code) {
+          case '23505':
+            throw new TRPCError({
+              code: 'CONFLICT',
+              message: 'This Sendtag is already taken',
+            })
+          default:
+            throw new TRPCError({
+              code: 'INTERNAL_SERVER_ERROR',
+              message: error.message ?? 'Something went wrong',
+            })
+        }
+      }
+
+      return { success: true }
+    }),
   checkAvailability: publicProcedure.input(SendtagSchema).mutation(async ({ input: { name } }) => {
     log('checking sendtag availability: ', { name })
 
@@ -335,17 +378,31 @@ export const tagRouter = createTRPCRouter({
       }
 
       // Delete the send_account_tag association
-      const { error } = await supabase
+      const { error: deleteError } = await supabase
         .from('send_account_tags')
         .delete()
         .eq('tag_id', tagId)
         .eq('send_account_id', sendAccount.id)
 
-      if (error) {
-        console.error('Error deleting tag:', error)
+      if (deleteError) {
+        console.error('Error deleting tag:', deleteError)
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message: error.message,
+          message: deleteError.message,
+        })
+      }
+
+      // Update tag status to 'available'
+      const { error: updateError } = await supabase
+        .from('tags')
+        .update({ status: 'available' })
+        .eq('id', tagId)
+
+      if (updateError) {
+        console.error('Error updating tag status:', updateError)
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: updateError.message,
         })
       }
 

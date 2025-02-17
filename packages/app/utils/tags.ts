@@ -7,5 +7,5 @@ export function usePendingTags() {
 
 export function useConfirmedTags() {
   const { tags } = useUser()
-  return tags?.filter((t) => t.status === 'confirmed')
+  return tags?.filter((t) => t.status === 'confirmed') ?? []
 }
