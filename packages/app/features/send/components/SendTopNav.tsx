@@ -6,7 +6,6 @@ import {
   isWeb,
   Paragraph,
   Stack,
-  usePwa,
   XStack,
   type ButtonProps,
 } from '@my/ui'
@@ -21,8 +20,6 @@ export function SendTopNav() {
 
   const path = usePathname()
 
-  const isPwa = usePwa()
-
   const handleBack = () => {
     if (isWeb || window.history.length > 1) {
       back()
@@ -30,13 +27,11 @@ export function SendTopNav() {
   }
 
   return (
-    <Header w="100%">
+    <Header w="100%" $lg={{ pt: '$3' }}>
       <Container
         $gtLg={{ jc: 'flex-start', pb: '$2', ai: 'flex-start' }}
         ai="center"
         jc="space-between"
-        safeAreaPadding={isPwa && 't'}
-        $lg={{ pt: !isPwa && '$5', pb: '$3' }}
       >
         <XStack ai="center" $lg={{ f: 1 }} w="20%" $gtLg={{ display: 'none' }}>
           <Button onPress={handleBack}>
