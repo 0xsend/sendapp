@@ -32,6 +32,7 @@ export function SendTopNav() {
         $gtLg={{ jc: 'flex-start', pb: '$2', ai: 'flex-start' }}
         ai="center"
         jc="space-between"
+        safeArea={'t'}
       >
         <XStack ai="center" $lg={{ f: 1 }} w="20%" $gtLg={{ display: 'none' }}>
           <Button onPress={handleBack}>

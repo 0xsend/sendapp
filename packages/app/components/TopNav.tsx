@@ -134,7 +134,7 @@ export function TopNav({
         $gtLg={{ jc: 'flex-start', pb: '$2', ai: 'flex-start' }}
         ai="center"
         jc="space-between"
-        safeAreaPadding={isPwa && 't'}
+        safeArea={'t'}
       >
         {(() => {
           switch (true) {
