@@ -202,6 +202,15 @@ function userOpQueryOptions({
         paymasterData,
       },
     ] as const,
+    retry(failureCount, error) {
+      debug('userOpQueryOptions retry', `failureCount=${failureCount}`, error)
+      if (error) {
+        if (error.message === ERR_MSG_NOT_ENOUGH_USDC) {
+          return false
+        }
+      }
+      return failureCount < 3
+    },
     queryFn: async ({
       queryKey: [
         ,
@@ -392,6 +401,8 @@ export function useUserOp({
   })
 }
 
+const ERR_MSG_NOT_ENOUGH_USDC = 'Not enough USDC to cover transaction fees'
+
 /**
  * User operation errors are not very helpful and confusing. This function converts them to something more helpful.
  */
@@ -411,7 +422,7 @@ export function throwNiceError(e: Error & { cause?: Error }): never {
     case cause instanceof PaymasterValidationRevertedError: {
       switch (cause.details) {
         case `FailedOpWithRevert(0,"AA33 reverted",Error(ERC20: transfer amount exceeds balance))`:
-          throw new Error('Not enough USDC to cover transaction fees')
+          throw new Error(ERR_MSG_NOT_ENOUGH_USDC)
         default:
           throw e
       }
