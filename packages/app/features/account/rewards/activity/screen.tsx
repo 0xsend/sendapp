@@ -34,6 +34,7 @@ import { toNiceError } from 'app/utils/toNiceError'
 import { min } from 'app/utils/bigint'
 import type { Json } from '@my/supabase/database.types'
 import { sendCoin } from 'app/data/coins'
+import { useTheme } from '@tamagui/core'
 
 //@todo get this from the db
 const verificationTypesAndTitles = {
@@ -62,12 +63,14 @@ export function ActivityRewardsScreen() {
     setRewardsScreenParams({ distribution: newDistribution?.number })
   }
 
+  const theme = useTheme()
+
   if (isLoading) {
     return (
       <YStack f={1} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
         <Header />
         <Stack w="100%" f={1} jc={'center'} ai={'center'}>
-          <Spinner color="$color12" size="large" />
+          <Spinner color={theme.color12.get()} size="large" />
         </Stack>
       </YStack>
     )
@@ -78,7 +81,7 @@ export function ActivityRewardsScreen() {
       <YStack f={1} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
         <Header />
         <Stack w="100%" f={1} jc={'center'} ai={'center'}>
-          <Paragraph color={'$color10'} size={'$5'}>
+          <Paragraph color={theme.color10.get()} size={'$5'}>
             No rewards available
           </Paragraph>
         </Stack>
@@ -97,7 +100,7 @@ export function ActivityRewardsScreen() {
     <YStack f={1} pb={'$12'} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
       <Header />
       <XStack w={'100%'} jc={'space-between'} ai={'center'}>
-        <H3 fontWeight={'600'} color={'$color12'} pr={'$2'}>
+        <H3 fontWeight={'600'} color={theme.color12.get()} pr={'$2'}>
           {`${distributionDates[selectedDistributionIndex]?.split(' ')[0] ?? 'Monthly'} Rewards`}
         </H3>
         {distributions.length > 1 && (
@@ -112,16 +115,16 @@ export function ActivityRewardsScreen() {
         {(() => {
           switch (true) {
             case verificationsQuery.isLoading:
-              return <Spinner size="small" color={'$color12'} />
+              return <Spinner size="small" color={theme.color12.get()} />
             case verificationsQuery.isError:
               return (
-                <Paragraph color={'$color10'} size={'$5'}>
+                <Paragraph color={theme.color10.get()} size={'$5'}>
                   Error fetching verifications. {toNiceError(verificationsQuery.error)}
                 </Paragraph>
               )
             case !distributions[selectedDistributionIndex]:
               return (
-                <Paragraph color={'$color10'} size={'$5'}>
+                <Paragraph color={theme.color10.get()} size={'$5'}>
                   No rewards available
                 </Paragraph>
               )
@@ -155,54 +158,56 @@ export function ActivityRewardsScreen() {
   )
 }
 
-const Header = () => (
-  <Stack w={'100%'} h={224} position="relative" jc={'center'} br={'$6'} overflow="hidden">
-    <Image
-      pos={'absolute'}
-      br={'$6'}
-      t={0}
-      zIndex={0}
-      bc="$black"
-      source={{
-        height: 1024,
-        width: 1024,
-        uri: 'https://ghassets.send.app/app_images/flower.jpg',
-      }}
-      h={'100%'}
-      w={'100%'}
-      $sm={{
-        scale: 1.5,
-      }}
-      objectFit="cover"
-    />
-    <LinearGradient
-      pos={'absolute'}
-      br={'$6'}
-      t={0}
-      start={[0, 0]}
-      end={[0, 1]}
-      fullscreen
-      colors={['$darkest', 'transparent', '$darkest']}
-    />
-
-    <YStack p="$4" pt={'$3'} position="absolute" zIndex={1}>
-      <H1 tt={'uppercase'} color={'white'} size={'$9'} $gtMd={{ size: '$10' }}>
-        Unlock <br />
-        Extra Rewards
-      </H1>
-      <Paragraph
-        color="$darkAlabaster"
-        size={'$2'}
-        $gtMd={{
-          size: '$5',
+const Header = () => {
+  return (
+    <Stack w={'100%'} h={224} position="relative" jc={'center'} br={'$6'} overflow="hidden">
+      <Image
+        pos={'absolute'}
+        br={'$6'}
+        t={0}
+        zIndex={0}
+        bc="$black"
+        source={{
+          height: 1024,
+          width: 1024,
+          uri: 'https://ghassets.send.app/app_images/flower.jpg',
         }}
-      >
-        Register at least 1 Sendtag, maintain the minimum balance,
-        <br /> avoid selling, and refer others for a bonus multiplier.
-      </Paragraph>
-    </YStack>
-  </Stack>
-)
+        h={'100%'}
+        w={'100%'}
+        $sm={{
+          scale: 1.5,
+        }}
+        objectFit="cover"
+      />
+      <LinearGradient
+        pos={'absolute'}
+        br={'$6'}
+        t={0}
+        start={[0, 0]}
+        end={[0, 1]}
+        fullscreen
+        colors={['$darkest', 'transparent', '$darkest']}
+      />
+
+      <YStack p="$4" pt={'$3'} position="absolute" zIndex={1}>
+        <H1 tt={'uppercase'} color={'white'} size={'$9'} $gtMd={{ size: '$10' }}>
+          Unlock <br />
+          Extra Rewards
+        </H1>
+        <Paragraph
+          color="$darkAlabaster"
+          size={'$2'}
+          $gtMd={{
+            size: '$5',
+          }}
+        >
+          Register at least 1 Sendtag, maintain the minimum balance,
+          <br /> avoid selling, and refer others for a bonus multiplier.
+        </Paragraph>
+      </YStack>
+    </Stack>
+  )
+}
 
 const DistributionRequirementsCard = ({
   distribution,
@@ -212,6 +217,7 @@ const DistributionRequirementsCard = ({
   verificationsQuery: DistributionsVerificationsQuery
 }) => {
   const { data: sendAccount, isLoading: isLoadingSendAccount } = useSendAccount()
+  const theme = useTheme()
   const verifications = verificationsQuery.data
   const {
     data: snapshotBalance,
@@ -222,7 +228,7 @@ const DistributionRequirementsCard = ({
     return (
       <Card br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
         <Stack ai="center" jc="center" p="$4">
-          <Spinner color="$color12" size="large" />
+          <Spinner color={theme.color12.get()} size="large" />
         </Stack>
       </Card>
     )
@@ -243,13 +249,13 @@ const DistributionRequirementsCard = ({
             Your SEND Balance
           </Label>
           {isLoadingSnapshotBalance ? (
-            <Spinner size="small" color={'$color11'} />
+            <Spinner size="small" color={theme.color11.get()} />
           ) : (
             <Theme reset>
               <Paragraph
                 fontFamily={'$mono'}
                 fontWeight={'500'}
-                color={'$color12'}
+                color={theme.color12.get()}
                 lh={'$8'}
                 fontSize={'$9'}
                 $gtXl={{ fontSize: '$10' }}
@@ -267,10 +273,14 @@ const DistributionRequirementsCard = ({
           <XStack ai="center" gap="$2">
             <Paragraph>Sendtag Registered</Paragraph>
             {sendTagRegistrations ? (
-              <CheckCircle2 $theme-light={{ color: '$color12' }} color="$primary" size={'$1.5'} />
+              <CheckCircle2
+                $theme-light={{ color: theme.color12.get() }}
+                color="$primary"
+                size={'$1.5'}
+              />
             ) : (
               <Theme name="red">
-                <IconInfoCircle color={'$color8'} size={'$1'} />
+                <IconInfoCircle color={theme.color8.get()} size={'$1'} />
               </Theme>
             )}
           </XStack>
@@ -294,13 +304,13 @@ const DistributionRequirementsCard = ({
                   BigInt(distribution.hodler_min_balance ?? 0n) > (snapshotBalance ?? 0):
                   return (
                     <Theme name="red">
-                      <IconInfoCircle color={'$color8'} size={'$1'} />
+                      <IconInfoCircle color={theme.color8.get()} size={'$1'} />
                     </Theme>
                   )
                 default:
                   return (
                     <CheckCircle2
-                      $theme-light={{ color: '$color12' }}
+                      $theme-light={{ color: theme.color12.get() }}
                       color="$primary"
                       size={'$1.5'}
                     />
@@ -321,16 +331,17 @@ const TaskCards = ({
   distribution: UseDistributionsResultData[number]
   verificationsQuery: DistributionsVerificationsQuery
 }) => {
+  const theme = useTheme()
   const verifications = verificationsQuery.data
   if (verificationsQuery.isLoading) {
     return (
       <YStack f={1} w={'100%'} gap="$5">
-        <H3 fontWeight={'600'} color={'$color12'}>
+        <H3 fontWeight={'600'} color={theme.color12.get()}>
           Tasks
         </H3>
         <Card br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
           <Stack ai="center" jc="center" p="$4">
-            <Spinner color="$color12" size="large" />
+            <Spinner color={theme.color12.get()} size="large" />
           </Stack>
         </Card>
       </YStack>
@@ -342,7 +353,7 @@ const TaskCards = ({
 
   return (
     <YStack f={1} w={'100%'} gap="$5">
-      <H3 fontWeight={'600'} color={'$color12'}>
+      <H3 fontWeight={'600'} color={theme.color12.get()}>
         Tasks
       </H3>
       <Stack flexWrap="wrap" gap="$5" $gtXs={{ fd: 'row' }}>
@@ -368,7 +379,7 @@ const TaskCards = ({
               verification={verification}
               isQualificationOver={isQualificationOver}
             >
-              <H3 fontWeight={'600'} color={'$color12'}>
+              <H3 fontWeight={'600'} color={theme.color12.get()}>
                 {verificationTypesAndTitles[verification.type]?.title}
               </H3>
             </TaskCard>
@@ -386,6 +397,7 @@ const TaskCard = ({
   verification: NonNullable<DistributionsVerificationsQuery['data']>['verification_values'][number]
   isQualificationOver: boolean
 }) => {
+  const theme = useTheme()
   const type = verification.type
   const metadata = (verification.metadata ?? []) as Json[]
   const weight = verification.weight
@@ -411,8 +423,12 @@ const TaskCard = ({
         {isCompleted ? (
           <>
             <XStack ai="center" gap="$2">
-              <CheckCircle2 $theme-light={{ color: '$color12' }} color="$primary" size={'$1.5'} />
-              <Paragraph color="$color11">
+              <CheckCircle2
+                $theme-light={{ color: theme.color12.get() }}
+                color="$primary"
+                size={'$1.5'}
+              />
+              <Paragraph color={theme.color11.get()}>
                 {isSendStreak && !isQualificationOver ? 'Ongoing' : 'Completed'}
               </Paragraph>
             </XStack>
@@ -423,7 +439,7 @@ const TaskCard = ({
                 px={'$size.0.9'}
                 borderWidth={1}
                 borderColor={'$primary'}
-                $theme-light={{ borderColor: '$color12' }}
+                $theme-light={{ borderColor: theme.color12.get() }}
                 borderRadius={'$4'}
               >
                 {(value ?? 0).toString()}
@@ -433,10 +449,8 @@ const TaskCard = ({
         ) : (
           <>
             <XStack ai="center" gap="$2">
-              <Theme name="red">
-                <IconInfoCircle color={'$color8'} size={'$1'} />
-              </Theme>
-              <Paragraph color="$color11">Pending</Paragraph>
+              <IconInfoCircle color={theme.color8.get()} size={'$1'} />
+              <Paragraph color={theme.color11.get()}>Pending</Paragraph>
             </XStack>
             <Paragraph
               ff={'$mono'}
@@ -444,7 +458,7 @@ const TaskCard = ({
               px={'$size.0.9'}
               borderWidth={1}
               borderColor={'$primary'}
-              $theme-light={{ borderColor: '$color12' }}
+              $theme-light={{ borderColor: theme.color12.get() }}
               borderRadius={'$4'}
             >
               {(value ?? 0).toString()}
@@ -464,16 +478,17 @@ const MultiplierCards = ({
   distribution: UseDistributionsResultData[number]
   verificationsQuery: DistributionsVerificationsQuery
 }) => {
+  const theme = useTheme()
   const verifications = verificationsQuery.data
   if (verificationsQuery.isLoading) {
     return (
       <YStack f={1} w={'100%'} gap="$5">
-        <H3 fontWeight={'600'} color={'$color12'}>
+        <H3 fontWeight={'600'} color={theme.color12.get()}>
           Multiplier
         </H3>
         <Card br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
           <Stack ai="center" jc="center" p="$4">
-            <Spinner color="$color12" size="large" />
+            <Spinner color={theme.color12.get()} size="large" />
           </Stack>
         </Card>
       </YStack>
@@ -499,15 +514,15 @@ const MultiplierCards = ({
 
   return (
     <YStack f={1} w={'100%'} gap="$5">
-      <H3 fontWeight={'600'} color={'$color12'}>
+      <H3 fontWeight={'600'} color={theme.color12.get()}>
         Multiplier
       </H3>
       <Stack flexWrap="wrap" gap="$5" $gtXs={{ fd: 'row' }}>
         {activeMultipliers.map(({ type: verificationType, value }) => (
           <MultiplierCard key={verificationType}>
             <XStack ai="center" gap="$2" jc="center">
-              <IconAccount size={'2'} color={'$color10'} />
-              <H3 fontWeight={'500'} color={'$color10'}>
+              <IconAccount size={'2'} color={theme.color10.get()} />
+              <H3 fontWeight={'500'} color={theme.color10.get()}>
                 {verificationType === 'tag_referral' ? distributionMonth ?? 'Monthly' : ''}{' '}
                 {verificationTypesAndTitles[verificationType]?.title}
               </H3>
@@ -516,7 +531,7 @@ const MultiplierCards = ({
               fontSize={'$9'}
               $sm={{ fontSize: '$8' }}
               fontWeight={'600'}
-              color={'$color12'}
+              color={theme.color12.get()}
               mx="auto"
             >
               X {(value ?? 1).toString()}
@@ -554,6 +569,7 @@ const ProgressCard = ({
   previousDistribution?: UseDistributionsResultData[number]
   verificationsQuery: DistributionsVerificationsQuery
 }) => {
+  const theme = useTheme()
   const sendSlash = distribution.send_slash.at(0)
 
   if (!sendSlash) {
@@ -566,7 +582,7 @@ const ProgressCard = ({
     return (
       <Card br={12} $gtMd={{ gap: '$4' }} p="$6">
         <Stack ai="center" jc="center" p="$4">
-          <Spinner color="$color12" size="large" />
+          <Spinner color={theme.color12.get()} size="large" />
         </Stack>
       </Card>
     )
@@ -581,7 +597,7 @@ const ProgressCard = ({
   if (!sendCeiling) {
     return (
       <YStack f={1} w={'100%'} gap="$5">
-        <H3 fontWeight={'600'} color={'$color12'}>
+        <H3 fontWeight={'600'} color={theme.color12.get()}>
           Progress
         </H3>
         <Card br={'$6'} p="$7" $xs={{ p: '$5' }} w={'100%'} maw={500}>
@@ -612,7 +628,7 @@ const ProgressCard = ({
 
   return (
     <YStack f={1} w={'100%'} gap="$5">
-      <H3 fontWeight={'600'} color={'$color12'}>
+      <H3 fontWeight={'600'} color={theme.color12.get()}>
         Progress
       </H3>
       <Card br={'$6'} p="$6" w={'100%'} maw={500}>
@@ -627,6 +643,7 @@ const Progress = ({
 }: {
   progress: number
 }) => {
+  const theme = useTheme()
   return (
     <YStack gap="$4" w="100%">
       <XStack jc="flex-end">
@@ -636,23 +653,23 @@ const Progress = ({
           px={'$size.0.9'}
           borderWidth={1}
           borderColor={'$primary'}
-          $theme-light={{ borderColor: '$color12' }}
+          $theme-light={{ borderColor: theme.color12.get() }}
           borderRadius={'$4'}
         >
           {progress.toFixed(1)}%
         </Paragraph>
       </XStack>
-      <Stack w="100%" h="$1" br="$10" bc="$color3">
+      <Stack w="100%" h="$1" br="$10" bc={theme.color3.get()}>
         <Stack
           w={`${progress.toFixed(1)}%`}
           h="100%"
           br="$10"
           animation="quick"
           $theme-light={{
-            bc: '$color12',
+            bc: theme.color12.get(),
           }}
           $theme-dark={{
-            bc: '$primary',
+            bc: theme.primary.get(),
           }}
         />
       </Stack>
@@ -663,6 +680,7 @@ const Progress = ({
 const ClaimableRewardsCard = ({
   distribution,
 }: { distribution: UseDistributionsResultData[number] }) => {
+  const theme = useTheme()
   const shareAmount = BigInt(distribution.distribution_shares?.[0]?.amount ?? 0n)
   if (shareAmount === undefined || shareAmount === 0n) return null
   const now = new Date()
@@ -677,7 +695,7 @@ const ClaimableRewardsCard = ({
 
   return (
     <YStack f={1} w={'100%'} gap="$5" $sm={{ display: 'none' }}>
-      <H3 fontWeight={'600'} color={'$color12'}>
+      <H3 fontWeight={'600'} color={theme.color12.get()}>
         {isQualificationOver ? `Total ${distributionMonth}` : ` ${distributionMonth} Rewards`}
       </H3>
       <Card br={'$6'} p="$7" ai={'center'} w={'100%'}>

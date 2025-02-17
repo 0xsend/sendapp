@@ -46,6 +46,7 @@ import { SendTagPricingDialog, SendTagPricingTooltip } from './SendTagPricingDia
 import formatAmount from 'app/utils/formatAmount'
 import { api } from 'app/utils/api'
 import { useSendAccount } from 'app/utils/send-accounts'
+import { TRPCClientError } from '@trpc/client'
 
 export const CheckoutForm = () => {
   const user = useUser()
@@ -60,43 +61,33 @@ export const CheckoutForm = () => {
   const media = useMedia()
   const router = useRouter()
   const { data: referred, isLoading: isLoadingReferred } = api.referrals.getReferred.useQuery()
+  const queryClient = useQueryClient()
+  const createTag = api.tag.create.useMutation({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user'] })
+    },
+  })
 
   async function createSendTag({ name }: z.infer<typeof CheckoutTagSchema>) {
     if (!user.user) return console.error('No user')
-    if (!sendAccount?.id) return console.error('No send account')
 
-    // Verify the send account belongs to the current user
-    if (sendAccount.user_id !== user.user.id) {
-      console.error('Send account does not belong to current user')
-      form.setError('name', {
-        type: 'custom',
-        message: 'Invalid send account',
-      })
-      return
-    }
-
-    const { error } = await supabase.rpc('create_tag', {
-      tag_name: name,
-      send_account_id: sendAccount.id,
-    })
-
-    if (error) {
-      console.error("Couldn't create Sendtag", error)
-      switch (error.code) {
-        case '23505':
-          form.setError('name', { type: 'custom', message: 'This Sendtag is already taken' })
-          break
-        default:
-          form.setError('name', {
-            type: 'custom',
-            message: error.message ?? 'Something went wrong',
-          })
-          break
-      }
-    } else {
-      // form state is successfully submitted, show the purchase confirmation screen
+    try {
+      await createTag.mutateAsync({ name })
       form.reset()
       user?.updateProfile()
+    } catch (error) {
+      if (error instanceof TRPCClientError) {
+        form.setError('name', {
+          type: 'custom',
+          message: error.message,
+        })
+      } else {
+        console.error("Couldn't create Sendtag", error)
+        form.setError('name', {
+          type: 'custom',
+          message: 'Something went wrong',
+        })
+      }
     }
   }
 

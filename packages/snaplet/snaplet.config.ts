@@ -129,6 +129,9 @@ export default defineConfig({
       send_accounts: ({ row }) => {
         return row
       },
+      send_account_tags: ({ row }) => {
+        return row
+      },
       send_account_transfers: ({ row }) => {
         return row
       },

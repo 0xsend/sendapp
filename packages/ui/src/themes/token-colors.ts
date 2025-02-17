@@ -70,6 +70,7 @@ export const lightColors = {
 }
 
 export const color = {
+  color12: '#1a1a1a', // Dark theme
   ...postfixObjKeys(lightColors, 'Light'),
   ...postfixObjKeys(darkColors, 'Dark'),
   ...brandColors,

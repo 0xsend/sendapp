@@ -329,7 +329,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
               meetOrSlice={0}
               minX={0}
               minY={0}
-              stroke="hsl(358, 85.3%, 64.0%)"
+              stroke="#081619"
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth="2"
@@ -340,7 +340,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
                     "borderWidth": 0,
                   },
                   {
-                    "color": "hsl(358, 85.3%, 64.0%)",
+                    "color": "#081619",
                   },
                   {
                     "flex": 0,
@@ -349,7 +349,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
                   },
                 ]
               }
-              tintColor="hsl(358, 85.3%, 64.0%)"
+              tintColor="#081619"
               vbHeight={24}
               vbWidth={24}
               width={20}
@@ -367,7 +367,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
                 }
                 stroke={
                   {
-                    "payload": 4294071642,
+                    "payload": 4278720025,
                     "type": 0,
                   }
                 }
@@ -473,7 +473,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
               meetOrSlice={0}
               minX={0}
               minY={0}
-              stroke="hsl(358, 85.3%, 64.0%)"
+              stroke="#081619"
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth="2"
@@ -484,7 +484,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
                     "borderWidth": 0,
                   },
                   {
-                    "color": "hsl(358, 85.3%, 64.0%)",
+                    "color": "#081619",
                   },
                   {
                     "flex": 0,
@@ -493,7 +493,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
                   },
                 ]
               }
-              tintColor="hsl(358, 85.3%, 64.0%)"
+              tintColor="#081619"
               vbHeight={24}
               vbWidth={24}
               width={20}
@@ -511,7 +511,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
                 }
                 stroke={
                   {
-                    "payload": 4294071642,
+                    "payload": 4278720025,
                     "type": 0,
                   }
                 }

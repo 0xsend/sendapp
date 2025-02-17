@@ -36,12 +36,13 @@ export class CheckoutPage {
     })
   }
 
-  async submitTagName() {
+  async addPendingTag(tag: string) {
+    await this.fillTagName(tag)
     await expect(async () => {
       const request = this.page.waitForRequest(
         (request) => {
-          if (request.url().includes('/rest/v1/tags') && request.method() === 'POST') {
-            log('submitTagName request', request.url(), request.method(), request.postDataJSON())
+          if (request.url().includes('/api/trpc/tag.create') && request.method() === 'POST') {
+            log('createTag request', request.url(), request.method(), request.postDataJSON())
             return true
           }
           return false
@@ -50,8 +51,8 @@ export class CheckoutPage {
       )
       const response = this.page.waitForEvent('response', {
         predicate: async (response) => {
-          if (response.url().includes('/rest/v1/tags')) {
-            log('submitTagName response', response.url(), response.status(), await response.text())
+          if (response.url().includes('/api/trpc/tag.create')) {
+            log('createTag response', response.url(), response.status(), await response.text())
             return true
           }
           return false
@@ -64,11 +65,6 @@ export class CheckoutPage {
     }).toPass({
       timeout: 20_000,
     })
-  }
-
-  async addPendingTag(tag: string) {
-    await this.fillTagName(tag)
-    await this.submitTagName()
   }
 
   async openPricingDialog() {

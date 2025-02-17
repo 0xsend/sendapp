@@ -3,16 +3,60 @@ import { act, render, screen } from '@testing-library/react-native'
 import { Wrapper } from 'app/utils/__mocks__/Wrapper'
 import { SendTagScreen } from './screen'
 
+// Add mock for getLocalhost
+jest.mock('app/utils/getLocalhost.native', () => ({
+  getLocalhost: () => 'localhost',
+}))
+
+// Mock the query client to prevent refetch intervals
+jest.mock('@tanstack/react-query', () => ({
+  ...jest.requireActual('@tanstack/react-query'),
+  useQueryClient: () => ({
+    invalidateQueries: jest.fn(),
+    setQueryData: jest.fn(),
+    getQueryData: jest.fn(),
+    refetchQueries: jest.fn(),
+  }),
+}))
+
+// Add mock for api
+jest.mock('app/utils/api', () => ({
+  api: {
+    sendAccount: {
+      updateMainTag: {
+        useMutation: () => ({
+          mutateAsync: jest.fn(),
+          isPending: false,
+        }),
+      },
+    },
+    tag: {
+      delete: {
+        useMutation: () => ({
+          mutateAsync: jest.fn(),
+          isPending: false,
+        }),
+      },
+    },
+  },
+}))
+
 const mockTags = [
   {
+    id: 1,
     name: 'tag1',
     status: 'confirmed',
   },
   {
+    id: 2,
     name: 'tag2',
     status: 'confirmed',
   },
-  { name: 'tag3', status: 'pending' },
+  {
+    id: 3,
+    name: 'tag3',
+    status: 'pending',
+  },
 ]
 
 jest.mock('solito/router', () => ({
@@ -21,41 +65,70 @@ jest.mock('solito/router', () => ({
   }),
 }))
 
-jest.mock('app/utils/useUser', () => {
-  return {
-    useUser: () => ({
-      profile: {
-        name: 'No Name',
-        avatar_url: 'https://example.com',
-      },
-      user: {
-        id: '123',
-      },
-      tags: mockTags,
-    }),
-  }
-})
+jest.mock('app/utils/useUser', () => ({
+  useUser: () => ({
+    profile: {
+      name: 'No Name',
+      avatar_url: 'https://example.com',
+    },
+    user: {
+      id: '123',
+    },
+    tags: mockTags,
+    isLoading: false,
+  }),
+}))
+
+jest.mock('app/utils/send-accounts', () => ({
+  useSendAccount: () => ({
+    data: {
+      id: 1,
+      main_tag_id: 1,
+    },
+    isLoading: false,
+  }),
+}))
 
 describe('SendTagScreen', () => {
-  it('should render', async () => {
+  beforeEach(() => {
     jest.useFakeTimers()
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  it('should render', async () => {
     render(
       <Wrapper>
         <SendTagScreen />
       </Wrapper>
     )
+
+    // Use a single act to handle initial render and any immediate effects
     await act(async () => {
-      jest.advanceTimersByTime(1000)
-      jest.runAllTimers()
+      jest.advanceTimersByTime(0)
     })
+
     expect(screen.getByText(/REGISTERED SENDTAGS/)).toBeVisible()
-    for (const tag of mockTags) {
-      if (tag.status === 'pending') {
-        expect(screen.queryByText(tag.name)).toBeFalsy()
-        return
+
+    // Check only confirmed tags are visible
+    const confirmedTags = mockTags.filter((tag) => tag.status === 'confirmed')
+    for (const tag of confirmedTags) {
+      if (tag.id === 1) {
+        // Main tag has a different label
+        expect(screen.getByLabelText(`Tag ${tag.name} (Main)`)).toBeVisible()
+      } else {
+        expect(screen.getByLabelText(`Tag ${tag.name}`)).toBeVisible()
       }
-      expect(screen.getByText(tag.name)).toBeVisible()
     }
-    expect(screen.getByRole('button', { name: 'Add Tag' })).toBeVisible()
+
+    // Check pending tags are not visible
+    const pendingTags = mockTags.filter((tag) => tag.status === 'pending')
+    for (const tag of pendingTags) {
+      expect(screen.queryByLabelText(`Tag ${tag.name}`)).toBeFalsy()
+    }
+
+    expect(screen.getByText('New Tag')).toBeVisible()
   })
 })

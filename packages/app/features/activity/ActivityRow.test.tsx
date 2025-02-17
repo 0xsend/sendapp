@@ -17,6 +17,8 @@ const bigboss = {
   avatar_url: 'https://avatars.githubusercontent.com/u/95193764?v=4',
   send_id: 1337,
   tags: ['bigboss'],
+  main_tag_id: 1,
+  main_tag_name: 'bigboss',
 }
 
 const alice = {
@@ -26,6 +28,8 @@ const alice = {
   avatar_url: 'https://i.pravatar.cc/500?u=alice',
   send_id: 42,
   tags: ['alice'],
+  main_tag_id: 1,
+  main_tag_name: 'alice',
 }
 
 describe('ActivityRow', () => {

@@ -13,7 +13,6 @@ import {
   XStack,
   YStack,
   type YStackProps,
-  useToastController,
 } from '@my/ui'
 import { baseMainnet } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'

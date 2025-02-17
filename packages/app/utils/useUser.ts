@@ -57,7 +57,7 @@ export const useUser = () => {
   } = useQuery({
     queryKey: ['tags'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('tags').select('*')
+      const { data, error } = await supabase.from('tags').select('*').neq('status', 'available')
 
       if (error) {
         // no rows

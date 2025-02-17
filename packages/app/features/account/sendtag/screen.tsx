@@ -14,11 +14,11 @@ import {
   useToastController,
   Text,
 } from '@my/ui'
-import { Check, Trash2, Plus } from '@tamagui/lucide-icons'
+import { Trash2, Plus } from '@tamagui/lucide-icons'
 import { maxNumSendTags } from 'app/data/sendtags'
 import { useUser } from 'app/utils/useUser'
 import { useRouter } from 'solito/router'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useState, useMemo } from 'react'
 import { api } from 'app/utils/api'
@@ -61,13 +61,10 @@ export function SendTagScreen() {
     await updateMainTag.mutateAsync({ tagId })
   }
 
-  const allTags = useMemo(() => {
-    if (!confirmedTags) return new Array(maxNumSendTags).fill(undefined)
-
-    // Only add undefined placeholder if we have room for more tags
-    const remainingSlots = maxNumSendTags - confirmedTags.length
-    return remainingSlots > 0 ? [...confirmedTags, undefined] : confirmedTags
-  }, [confirmedTags])
+  const allTags: (Tables<'tags'> | undefined)[] =
+    confirmedTags === undefined
+      ? new Array(maxNumSendTags).fill(undefined)
+      : [...confirmedTags, ...Array.from({ length: maxNumSendTags - confirmedTags.length })]
 
   if (isLoading)
     return (
