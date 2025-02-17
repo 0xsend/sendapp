@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
 
 const sanitizeSafeAreaInset = (value: string) => {
-  if (value === '') return undefined
-  if (value.includes('env')) return undefined
+  if (value === '') return null
+  if (value.includes('env')) return null
   const sanitizedInset = value.endsWith('px') ? Number(value.slice(0, -2)) : Number(value)
-  if (Number.isNaN(sanitizedInset)) return undefined
+  if (Number.isNaN(sanitizedInset)) return null
   return sanitizedInset
 }
 
@@ -27,7 +27,7 @@ export const useSafeAreaInsets = () => {
         bottom: sanitizeSafeAreaInset(styles.getPropertyValue('--sab')),
         left: sanitizeSafeAreaInset(styles.getPropertyValue('--sal')),
       }
-      const hasInsets = Object.values(newInsets).some((inset) => inset !== undefined)
+      const hasInsets = Object.values(newInsets).some((inset) => inset !== null)
 
       //@ts-expect-error We check for undefined above
       setInsets(hasInsets ? newInsets : null)

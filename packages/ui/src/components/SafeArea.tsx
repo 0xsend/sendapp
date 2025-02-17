@@ -1,6 +1,8 @@
 import { type XStackProps, XStack } from 'tamagui'
 import { useSafeAreaInsets, usePwa } from '../utils'
 
+import dynamic from 'next/dynamic'
+
 type SafeAreaValue = 't' | 'b' | 'r' | 'l' | 'x' | 'y'
 type SafeAreaPadding = boolean | SafeAreaValue | SafeAreaValue[]
 
@@ -24,7 +26,7 @@ const INSET_MAP = {
   pl: 'left',
 } as const
 
-export const SafeArea = ({ children, safeArea = true, ...props }: SafeAreaProps) => {
+export const SafeAreaComponent = ({ children, safeArea = true, ...props }: SafeAreaProps) => {
   const insets = useSafeAreaInsets()
   const isPwa = usePwa()
 
@@ -65,3 +67,6 @@ export const SafeArea = ({ children, safeArea = true, ...props }: SafeAreaProps)
     </XStack>
   )
 }
+
+// Export conditional dynamic import
+export const SafeArea = dynamic(() => Promise.resolve(SafeAreaComponent), { ssr: false })
