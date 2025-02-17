@@ -11,6 +11,22 @@ import { AppRegistry } from 'react-native'
 
 import { config } from '@my/ui'
 
+const SAFE_AREA_SCRIPT = `
+  (function() {
+    const root = document.documentElement;
+    const safeAreas = {
+      '--sat': 'env(safe-area-inset-top)',
+      '--sar': 'env(safe-area-inset-right)',
+      '--sab': 'env(safe-area-inset-bottom)',
+      '--sal': 'env(safe-area-inset-left)',
+    };
+
+    Object.entries(safeAreas).forEach(([key, value]) => {
+      root.style.setProperty(key, value);
+    });
+  })();
+`
+
 export default class Document extends NextDocument {
   static async getInitialProps(ctx: DocumentContext): Promise<DocumentInitialProps> {
     AppRegistry.registerComponent('Main', () => Main)
@@ -44,6 +60,10 @@ export default class Document extends NextDocument {
       <Html style={{ height: 'calc(100vh - (100vh - 100%))', backgroundColor: 'transparent' }}>
         <Head>
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+          <script
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: safe area script is static
+            dangerouslySetInnerHTML={{ __html: SAFE_AREA_SCRIPT }}
+          />
         </Head>
         <body
           style={{
