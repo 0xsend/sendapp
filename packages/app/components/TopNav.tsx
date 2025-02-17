@@ -11,7 +11,6 @@ import {
   Separator,
   type ButtonProps,
   Avatar,
-  SafeArea,
 } from '@my/ui'
 import { useRootScreenParams } from 'app/routers/params'
 import { IconAccount, IconArrowLeft, IconSendLogo } from 'app/components/icons'
