@@ -4,6 +4,7 @@ import {
   H1,
   LinearGradient,
   Paragraph,
+  SafeArea,
   Spinner,
   Stack,
   XStack,
@@ -11,7 +12,6 @@ import {
   isWeb,
   useMedia,
   usePwa,
-  useSafeAreaInsets,
 } from '@my/ui'
 import { IconSendLogo } from 'app/components/icons'
 import { useAuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
@@ -30,6 +30,7 @@ import { bytesToHex, hexToBytes } from 'viem'
 import { useAuthScreenParams } from 'app/routers/params'
 import { useQuery } from '@tanstack/react-query'
 import { assert } from 'app/utils/assert'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 export function SplashScreen() {
   return (
@@ -114,7 +115,7 @@ function Hero() {
   const carouselImage = carouselImages[carouselProgress]
   const mobileImagePosition = carouselImagePositions[carouselProgress]
   const isPwa = usePwa()
-  const { sat, sab } = useSafeAreaInsets()
+  const { bottom, top } = useSafeAreaInsets()
 
   const containerHeight = (() => {
     switch (true) {
@@ -136,9 +137,10 @@ function Hero() {
       f={1}
     >
       <YStack
-        h={isPwa && '100vh'}
-        pt={isPwa && sat}
-        pb={isPwa && sab}
+        f={1}
+        h={isPwa ? '100vh' : 'unset'}
+        pt={Math.max(top, 24)}
+        pb={Math.max(bottom, 16)}
         overflow="hidden"
         $gtMd={{ borderRadius: '$8' }}
         w="100%"

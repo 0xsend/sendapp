@@ -4,7 +4,6 @@ import {
   styled,
   type XStackProps,
   LinearGradient,
-  usePwa,
   Paragraph,
   H3,
   useMedia,
@@ -23,6 +22,7 @@ import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { useIsSendingUnlocked } from 'app/utils/useIsSendingUnlocked'
 import { formatUnits } from 'viem'
 import { sendCoin } from 'app/data/coins'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const Row = styled(XStack, {
   w: '100%',
@@ -32,7 +32,6 @@ const Row = styled(XStack, {
   gap: '$4',
   maw: 768,
   $gtLg: {
-    pt: '$4',
     display: 'none',
   },
   pointerEvents: 'auto',
@@ -44,15 +43,15 @@ const MobileButtonRow = ({
   isVisible,
 }: { children: React.ReactElement; isLoading: boolean; isVisible: boolean } & XStackProps) => {
   const media = useMedia()
+  const { bottom } = useSafeAreaInsets()
 
   return (
     <Stack
       w={'100%'}
-      pb={'$3'}
       px="$4"
       $platform-web={{
         position: 'fixed',
-        bottom: 0,
+        bottom: Math.max(bottom, 16),
         display: media.gtLg ? 'none' : 'flex',
       }}
       $gtLg={{

@@ -29,7 +29,11 @@ export function HomeLayout({
           <YStack gap="$3" $gtLg={{ pt: 80 }} w={'100%'}>
             {TopNav}
           </YStack>
-          <Container $gtLg={{ pt: '$5', pb: '$0' }} height={fullHeight ? '100%' : 'auto'}>
+          <Container
+            safeAreaProps={{ edges: ['bottom', 'left', 'right'] }}
+            $gtLg={{ pt: '$5', pb: '$0' }}
+            height={fullHeight ? '100%' : 'auto'}
+          >
             {children}
           </Container>
         </ScrollView>
