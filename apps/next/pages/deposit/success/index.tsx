@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { HomeLayout } from 'app/features/home/layout.web'
 import { TopNav } from 'app/components/TopNav'
 import { userProtectedGetSSP } from 'utils/userProtected'
-import type { NextPageWithLayout } from '../_app'
+import type { NextPageWithLayout } from '../../_app'
 
 export const Page: NextPageWithLayout = () => {
   const router = useRouter()
