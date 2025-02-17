@@ -17,6 +17,7 @@ import {
 import type { ComponentProps } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { z } from 'zod'
+import type { YStackProps } from 'tamagui'
 
 export const formFields = {
   text: z.string(),
@@ -64,7 +65,7 @@ const mapping = [
   [formFields.date, DateField] as const,
 ] as const
 
-const FormComponent = (props: FormProps) => {
+const FormComponent = (props: FormProps & { footerProps?: YStackProps }) => {
   return (
     <Form asChild {...props}>
       <FormWrapper tag="form">{props.children}</FormWrapper>
@@ -78,7 +79,11 @@ const _SchemaForm = createTsForm(mapping, {
 
 export const SchemaForm: typeof _SchemaForm = ({ ...props }) => {
   const renderAfter: ComponentProps<typeof _SchemaForm>['renderAfter'] = props.renderAfter
-    ? (vars) => <FormWrapper.Footer>{props.renderAfter?.(vars)}</FormWrapper.Footer>
+    ? (vars) => (
+        <FormWrapper.Footer {...props.formProps?.footerProps}>
+          {props.renderAfter?.(vars)}
+        </FormWrapper.Footer>
+      )
     : undefined
 
   return (

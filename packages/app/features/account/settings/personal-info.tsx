@@ -22,7 +22,7 @@ import { adjustUTCDateForTimezone } from 'app/utils/dateHelper'
 import { SettingsHeader } from 'app/features/account/settings/components/SettingsHeader'
 import { FieldWithLabel } from 'app/features/account/settings/components/FieldWithLabel'
 import { ReadOnlyFieldWithLabel } from 'app/features/account/settings/components/ReadOnlyFieldWithLabel'
-import { Section } from 'app/features/account/settings/components/Section'
+import { Section } from 'app/components/layout/Section'
 
 enum FormState {
   Overview = 'Overview',
