@@ -25,6 +25,7 @@ import { SendTagPricingDialog, SendTagPricingTooltip } from '../checkout/SendTag
 import { RowLabel } from 'app/components/layout/RowLabel'
 import { Section } from 'app/components/layout/Section'
 import { useThemeSetting } from '@tamagui/next-theme'
+import { usdcCoin } from 'app/data/coins'
 
 export const AddSendtagsForm = () => {
   const user = useUser()
@@ -284,7 +285,7 @@ export const AddSendtagsForm = () => {
 
 function ConfirmTagPrice({ tag }: { tag: { name: string } }) {
   const _price = useMemo(() => price(tag.name.length), [tag])
-  return `${formatUnits(_price, 6)} USDC`
+  return `${formatUnits(_price, usdcCoin.decimals)} USDC`
 }
 
 function TotalPrice() {
@@ -301,7 +302,7 @@ function TotalPrice() {
         Total
       </Paragraph>
       <Paragraph fontWeight={'500'} fontSize={'$8'}>
-        {formatUnits(_total, 6)} USDC
+        {formatUnits(_total, usdcCoin.decimals)} USDC
       </Paragraph>
     </XStack>
   )

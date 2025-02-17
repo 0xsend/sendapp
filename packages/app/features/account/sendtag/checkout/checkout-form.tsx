@@ -25,6 +25,7 @@ import { useBalance } from 'wagmi'
 import { baseMainnetClient, usdcAddress } from '@my/wagmi'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { IconCoin } from 'app/components/icons/IconCoin'
+import { usdcCoin } from 'app/data/coins'
 
 export const CheckoutForm = () => {
   const user = useUser()
@@ -200,7 +201,7 @@ function TotalPrice() {
         </Paragraph>
         <XStack jc={'space-between'} ai={'center'}>
           <Paragraph size={'$11'} fontWeight={'500'}>
-            {formatUnits(_total, 6)}
+            {formatUnits(_total, usdcCoin.decimals)}
           </Paragraph>
           <XStack ai={'center'} gap={'$2'}>
             <IconCoin symbol={'USDC'} size={'$2'} />
@@ -218,7 +219,7 @@ function TotalPrice() {
           >
             Price
           </Paragraph>
-          <Paragraph size={'$5'}>{formatUnits(_total, 6)} USDC</Paragraph>
+          <Paragraph size={'$5'}>{formatUnits(_total, usdcCoin.decimals)} USDC</Paragraph>
         </XStack>
         <XStack jc={'space-between'} ai={'center'} gap={'$3'}>
           <Paragraph
@@ -283,7 +284,12 @@ function TotalPrice() {
             default:
               return (
                 <Paragraph size={'$5'} fontWeight={'500'}>
-                  {formatUnits(balance.value, 6)} USDC
+                  {formatAmount(
+                    formatUnits(balance.value, usdcCoin.decimals),
+                    12,
+                    usdcCoin.formatDecimals
+                  )}{' '}
+                  USDC
                 </Paragraph>
               )
           }

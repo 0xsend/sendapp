@@ -20,6 +20,7 @@ import { IconInfoGreenCircle } from 'app/components/icons'
 import { total, pricing } from 'app/data/sendtags'
 import React, { useMemo, useState } from 'react'
 import { formatUnits } from 'viem'
+import { usdcCoin } from 'app/data/coins'
 
 export function SendTagPricingDialog({ name = '' }: { name: Tables<'tags'>['name'] }) {
   const price = useMemo(() => total([{ name }]), [name])
@@ -254,7 +255,7 @@ const SendTagPricingButton = ({
             case name.length > 0 && price === BigInt(0):
               return 'Free'
             default:
-              return `${formatUnits(price, 6)} USDC`
+              return `${formatUnits(price, usdcCoin.decimals)} USDC`
           }
         })()}
       </ButtonText>
