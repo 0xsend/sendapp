@@ -21,7 +21,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { z } from 'zod'
 import { SettingsHeader } from 'app/features/account/settings/components/SettingsHeader'
-import { Section } from 'app/features/account/settings/components/Section'
+import { Section } from 'app/components/layout/Section'
 
 const CreatePasskeySchema = z.object({
   accountName: z.string().min(1).trim().describe('Passkey name'),

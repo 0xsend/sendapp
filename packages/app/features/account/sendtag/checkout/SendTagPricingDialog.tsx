@@ -20,6 +20,7 @@ import { IconInfoGreenCircle } from 'app/components/icons'
 import { total, pricing } from 'app/data/sendtags'
 import React, { useMemo, useState } from 'react'
 import { formatUnits } from 'viem'
+import { usdcCoin } from 'app/data/coins'
 
 export function SendTagPricingDialog({ name = '' }: { name: Tables<'tags'>['name'] }) {
   const price = useMemo(() => total([{ name }]), [name])
@@ -222,28 +223,31 @@ const SendTagPricingButton = ({
   isOpen,
   name,
   price,
-}: { isOpen: boolean; name: string; price: bigint }) => {
+}: {
+  isOpen: boolean
+  name: string
+  price: bigint
+}) => {
   return (
     <Button
-      als="flex-end"
-      maw="$20"
       chromeless
+      p={0}
       $theme-dark={{
         iconAfter: isOpen ? (
-          <XCircle color="$primary" size={'$2'} />
+          <XCircle color="$primary" size={'$1'} />
         ) : (
-          <IconInfoGreenCircle color="$white" size={'$2'} />
+          <IconInfoGreenCircle color="$primary" size={'$1'} />
         ),
       }}
       $theme-light={{
-        iconAfter: isOpen ? <XCircle color="$black" size={'$2'} /> : <Info size={'$2'} />,
+        iconAfter: isOpen ? <XCircle color="$black" size={'$1'} /> : <Info size={'$1'} />,
       }}
       hoverStyle={{ bc: 'transparent' }}
-      pressStyle={{ bc: 'transparent' }}
+      pressStyle={{ bc: 'transparent', borderColor: 'transparent' }}
       // @ts-expect-error tamagui doesn't support this yet
       type="button"
     >
-      <ButtonText fontFamily={'$mono'} col={'$color12'} fontSize={'$5'}>
+      <ButtonText col={'$color12'} fontSize={'$5'}>
         {(() => {
           switch (true) {
             case name.length === 0:
@@ -251,7 +255,7 @@ const SendTagPricingButton = ({
             case name.length > 0 && price === BigInt(0):
               return 'Free'
             default:
-              return `${formatUnits(price, 6)} USDC`
+              return `${formatUnits(price, usdcCoin.decimals)} USDC`
           }
         })()}
       </ButtonText>

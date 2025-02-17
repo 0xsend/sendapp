@@ -17,11 +17,11 @@ import { useRef, useState } from 'react'
 import type { Tables } from '@my/supabase/database.types'
 import { Check } from '@tamagui/lucide-icons'
 import { SettingsHeader } from 'app/features/account/settings/components/SettingsHeader'
-import { Section } from 'app/features/account/settings/components/Section'
 import { ReadOnlyFieldWithLabel } from 'app/features/account/settings/components/ReadOnlyFieldWithLabel'
 import { FieldWithLabel } from 'app/features/account/settings/components/FieldWithLabel'
 import { useForm } from 'react-hook-form'
 import type { z } from 'zod'
+import { Section } from 'app/components/layout/Section'
 
 enum FormState {
   Overview = 'Overview',

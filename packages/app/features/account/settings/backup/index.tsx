@@ -39,8 +39,8 @@ import { encodeFunctionData } from 'viem'
 import { useBalance, useEstimateFeesPerGas } from 'wagmi'
 import { z } from 'zod'
 import { SettingsHeader } from 'app/features/account/settings/components/SettingsHeader'
-import { Section } from 'app/features/account/settings/components/Section'
 import { useThemeSetting } from '@tamagui/next-theme'
+import { Section } from 'app/components/layout/Section'
 
 export const BackupScreen = () => {
   const { data: sendAcct, error, isLoading } = useSendAccount()

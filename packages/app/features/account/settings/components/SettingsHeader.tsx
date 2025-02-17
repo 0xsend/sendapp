@@ -1,8 +1,8 @@
 import { Button, XStack } from '@my/ui'
 import { IconX } from 'app/components/icons'
-import { RowLabel } from 'app/features/account/settings/components/RowLabel'
 import type { PropsWithChildren } from 'react'
 import { useRouter } from 'solito/router'
+import { RowLabel } from 'app/components/layout/RowLabel'
 
 export const SettingsHeader = ({ children }: PropsWithChildren) => {
   const { push } = useRouter()
@@ -27,6 +27,8 @@ export const SettingsHeader = ({ children }: PropsWithChildren) => {
           backgroundColor: 'transparent',
         }}
         display={'none'}
+        height={'auto'}
+        p={0}
         $gtLg={{ display: 'flex' }}
       >
         <Button.Icon>
