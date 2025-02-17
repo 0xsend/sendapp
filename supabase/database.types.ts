@@ -69,8 +69,9 @@ export type Database = MergeDeep<
             init_code: PgBytea
           }
           Update: {
-            address: Hex
-            init_code: PgBytea
+            address?: Hex
+            init_code?: PgBytea
+            main_tag_id?: number
           }
         }
         sendtag_checkout_receipts: {
