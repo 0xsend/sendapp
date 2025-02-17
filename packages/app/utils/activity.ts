@@ -6,7 +6,7 @@ import {
 } from '@my/wagmi'
 import type { Activity } from 'app/utils/zod/activity'
 import { formatUnits, isAddressEqual } from 'viem'
-import formatAmount, { localizeAmount } from './formatAmount'
+import formatAmount from './formatAmount'
 import { shorten } from './strings'
 import {
   isReferralsEvent,
