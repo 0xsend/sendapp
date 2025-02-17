@@ -1,4 +1,4 @@
-import type { Tables } from '@my/supabase/database-generated.types'
+import type { Tables } from '@my/supabase/database.types'
 import { usdcAddress } from '@my/wagmi'
 import type { Expect, Page } from '@playwright/test'
 import { assert } from 'app/utils/assert'
