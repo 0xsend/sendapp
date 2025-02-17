@@ -10,7 +10,6 @@ import {
   Container,
   Separator,
   type ButtonProps,
-  usePwa,
   Avatar,
 } from '@my/ui'
 import { useRootScreenParams } from 'app/routers/params'
@@ -89,7 +88,6 @@ export function TopNav({
   const { push, back } = useRouter()
   const media = useMedia()
   const { coin: selectedCoin } = useCoinFromTokenParam()
-  const isPwa = usePwa()
   const { profile } = useUser()
 
   const hasSelectedCoin = Boolean(selectedCoin)
@@ -129,7 +127,7 @@ export function TopNav({
     path.includes('/leaderboard')
 
   return (
-    <Header w="100%" $lg={{ pt: '$3' }}>
+    <Header w="100%" $lg={{ py: '$3' }}>
       <Container
         $gtLg={{ jc: 'flex-start', pb: '$2', ai: 'flex-start' }}
         ai="center"

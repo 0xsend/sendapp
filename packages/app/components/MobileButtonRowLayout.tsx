@@ -8,6 +8,7 @@ import {
   H3,
   useMedia,
   AnimatePresence,
+  SafeArea,
 } from '@my/ui'
 import { HomeButtons } from '../features/home/HomeButtons'
 import { useScrollDirection } from '../provider/scroll'
@@ -31,7 +32,6 @@ const Row = styled(XStack, {
   gap: '$4',
   maw: 768,
   $gtLg: {
-    pt: '$4',
     display: 'none',
   },
   pointerEvents: 'auto',
@@ -45,13 +45,12 @@ const MobileButtonRow = ({
   const media = useMedia()
 
   return (
-    <Stack
+    <SafeArea
       w={'100%'}
-      pb={'$3'}
       px="$4"
       $platform-web={{
         position: 'fixed',
-        bottom: 0,
+        bottom: 10,
         display: media.gtLg ? 'none' : 'flex',
       }}
       $gtLg={{
@@ -75,7 +74,7 @@ const MobileButtonRow = ({
         pointerEvents="none"
       />
       {children}
-    </Stack>
+    </SafeArea>
   )
 }
 
