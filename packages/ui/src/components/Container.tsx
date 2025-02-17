@@ -1,44 +1,12 @@
-import { XStack, type XStackProps } from 'tamagui'
-import { useSafeAreaInsets } from '../utils'
+import { SafeArea, type SafeAreaProps } from './SafeArea'
 
-type Props = {
-  safeAreaPadding?: boolean | 'y' | 'x' | 't' | 'b' | 'r' | 'l'
-}
-
-export const Container: React.FC<XStackProps & Props> = ({
-  safeAreaPadding = false,
-  ...props
-}: XStackProps & Props) => {
-  const insets = useSafeAreaInsets()
-
-  const calcSafeAreaPadding = () => {
-    switch (safeAreaPadding) {
-      case true:
-        return { pr: insets?.right, pl: insets?.left, pb: insets?.bottom, pt: insets?.top }
-      case 'y':
-        return { pb: insets?.bottom, pt: insets?.top }
-      case 'x':
-        return { pr: insets?.right, pl: insets?.left }
-      case 't':
-        return { pt: insets?.top }
-      case 'b':
-        return { pb: insets?.bottom }
-      case 'r':
-        return { pr: insets?.right }
-      case 'l':
-        return { pl: insets?.left }
-      default:
-        return undefined
-    }
-  }
-
+export const Container: React.FC<SafeAreaProps> = ({ children, ...props }: SafeAreaProps) => {
   return (
-    <XStack
-      px="$4"
-      als="center"
-      f={1}
-      width={'100%'}
-      {...calcSafeAreaPadding()}
+    <SafeArea
+      px={props.px ?? props.paddingHorizontal ?? '$4'}
+      als={props.als ?? props.alignSelf ?? 'center'}
+      f={props.f ?? props.flex ?? 1}
+      width={props.w ?? props.width ?? '100%'}
       {...props}
       $gtSm={{
         maxWidth: 768,
@@ -59,7 +27,7 @@ export const Container: React.FC<XStackProps & Props> = ({
         ...(props.$gtXl ?? {}),
       }}
     >
-      {props.children}
-    </XStack>
+      {children}
+    </SafeArea>
   )
 }

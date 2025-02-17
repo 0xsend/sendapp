@@ -4,7 +4,6 @@ import {
   styled,
   type XStackProps,
   LinearGradient,
-  usePwa,
   Paragraph,
   H3,
   useMedia,
