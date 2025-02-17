@@ -52,15 +52,28 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
           </YStack>
         )
 
+      case status === 'success':
+        return (
+          <YStack ai="center" gap="$4" py="$8">
+            <Spinner size="large" color="$primary" />
+            <Text fontSize="$6" fontWeight="500" ta="center">
+              Transaction Complete
+            </Text>
+            <Text color="$gray11" ta="center">
+              Finishing up...
+            </Text>
+          </YStack>
+        )
+
       case status === 'pending':
         return (
           <YStack ai="center" gap="$4" py="$8">
             <Spinner size="large" color="$primary" />
             <Text fontSize="$6" fontWeight="500" ta="center">
-              Complete Your Transaction
+              Processing Transaction
             </Text>
             <Text color="$gray11" ta="center">
-              Please complete your transaction in the Coinbase window.
+              Complete in Coinbase window
             </Text>
             <Button
               variant="outlined"
