@@ -8,7 +8,6 @@ import {
   H3,
   useMedia,
   AnimatePresence,
-  SafeArea,
 } from '@my/ui'
 import { HomeButtons } from '../features/home/HomeButtons'
 import { useScrollDirection } from '../provider/scroll'
@@ -23,6 +22,7 @@ import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { useIsSendingUnlocked } from 'app/utils/useIsSendingUnlocked'
 import { formatUnits } from 'viem'
 import { sendCoin } from 'app/data/coins'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const Row = styled(XStack, {
   w: '100%',
@@ -43,14 +43,15 @@ const MobileButtonRow = ({
   isVisible,
 }: { children: React.ReactElement; isLoading: boolean; isVisible: boolean } & XStackProps) => {
   const media = useMedia()
+  const { bottom } = useSafeAreaInsets()
 
   return (
-    <SafeArea
+    <Stack
       w={'100%'}
       px="$4"
       $platform-web={{
         position: 'fixed',
-        bottom: 10,
+        bottom: Math.max(bottom, 16),
         display: media.gtLg ? 'none' : 'flex',
       }}
       $gtLg={{
@@ -74,7 +75,7 @@ const MobileButtonRow = ({
         pointerEvents="none"
       />
       {children}
-    </SafeArea>
+    </Stack>
   )
 }
 

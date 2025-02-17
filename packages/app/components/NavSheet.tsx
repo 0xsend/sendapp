@@ -26,8 +26,16 @@ export function NavSheet({
       {...props}
     >
       <Sheet.Overlay />
-      <Sheet.Frame zIndex={1} pt="$6" pb="$2">
-        <Container safeArea="t" w="100%" ai="center" jc="space-between" f={'unset'}>
+      <Sheet.Frame zIndex={1}>
+        <Container
+          safeAreaProps={{ edges: ['top'] }}
+          w="100%"
+          ai="center"
+          jc="space-between"
+          f={'unset'}
+          pt="$6"
+          pb="$2"
+        >
           <Link href="/">
             <IconSendLogo size={'$2.5'} color={'$color12'} />
           </Link>

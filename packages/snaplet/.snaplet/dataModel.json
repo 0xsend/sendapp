@@ -979,20 +979,6 @@
           "maxLength": null
         },
         {
-          "id": "public.distribution_shares.amount_after_slash",
-          "name": "amount_after_slash",
-          "columnName": "amount_after_slash",
-          "type": "numeric",
-          "isRequired": true,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false,
-          "isId": false,
-          "maxLength": null
-        },
-        {
           "name": "users",
           "type": "users",
           "isRequired": true,
