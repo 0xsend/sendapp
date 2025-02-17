@@ -41,7 +41,7 @@ import debug from 'debug'
 import { useEffect, useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
-import { encodeFunctionData, erc20Abi, formatUnits, withRetry, zeroAddress } from 'viem'
+import { encodeFunctionData, erc20Abi, formatUnits, withRetry } from 'viem'
 import { useChainId } from 'wagmi'
 import { z } from 'zod'
 
@@ -59,10 +59,7 @@ export function DepositScreen() {
 
 const useSendEarnDepositUserOp = ({ asset, amount, vault }) => {
   const sendAccount = useSendAccount()
-  const sender = useMemo(
-    () => sendAccount?.data?.address ?? zeroAddress,
-    [sendAccount?.data?.address]
-  )
+  const sender = useMemo(() => sendAccount?.data?.address, [sendAccount?.data?.address])
 
   // TODO: validate asset
   // TODO: referrer logic and setting correct send earn vault address
@@ -83,7 +80,7 @@ const useSendEarnDepositUserOp = ({ asset, amount, vault }) => {
         data: encodeFunctionData({
           abi: sendEarnAbi,
           functionName: 'deposit',
-          args: [amount, sender],
+          args: [amount, sender ?? '0x'],
         }),
       },
     ],
@@ -336,6 +333,15 @@ export const DepositForm = () => {
                   </Paragraph>
                 </Fade>
               ) : null}
+              <XStack alignItems="center" jc="center" gap={'$2'}>
+                {[uop.error, mutation.error].filter(Boolean).map((e) =>
+                  e ? (
+                    <Paragraph key={e.message} color="$error">
+                      {toNiceError(e)}
+                    </Paragraph>
+                  ) : null
+                )}
+              </XStack>
               <SubmitButton
                 theme="green"
                 onPress={() => {
@@ -363,13 +369,6 @@ export const DepositForm = () => {
                   CONFIRM DEPOSIT
                 </Button.Text>
               </SubmitButton>
-              {[uop.error, mutation.error].filter(Boolean).map((e) =>
-                e ? (
-                  <Paragraph key={e.message} color="$error">
-                    {toNiceError(e)}
-                  </Paragraph>
-                ) : null
-              )}
             </YStack>
           )}
         >
