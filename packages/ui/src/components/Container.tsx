@@ -9,24 +9,24 @@ export const Container: React.FC<XStackProps & Props> = ({
   safeAreaPadding = false,
   ...props
 }: XStackProps & Props) => {
-  const { sat, sab, sar, sal } = useSafeAreaInsets()
+  const insets = useSafeAreaInsets()
 
   const calcSafeAreaPadding = () => {
     switch (safeAreaPadding) {
       case true:
-        return { pr: sar, pl: sal, pb: sab, pt: sat }
+        return { pr: insets?.right, pl: insets?.left, pb: insets?.bottom, pt: insets?.top }
       case 'y':
-        return { pb: sab, pt: sat }
+        return { pb: insets?.bottom, pt: insets?.top }
       case 'x':
-        return { pr: sar, pl: sal }
+        return { pr: insets?.right, pl: insets?.left }
       case 't':
-        return { pt: sat }
+        return { pt: insets?.top }
       case 'b':
-        return { pb: sab }
+        return { pb: insets?.bottom }
       case 'r':
-        return { pr: sar }
+        return { pr: insets?.right }
       case 'l':
-        return { pl: sal }
+        return { pl: insets?.left }
       default:
         return undefined
     }

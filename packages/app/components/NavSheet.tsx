@@ -20,7 +20,7 @@ export function NavSheet({
 }: SheetProps & { navId: RootParams['nav'] }) {
   const [queryParams, setRootParams] = useRootScreenParams()
   const isPwa = usePwa()
-  const { sat } = useSafeAreaInsets()
+  const insets = useSafeAreaInsets()
   const onOpenChange = () => {
     if (open) setRootParams({ ...queryParams, nav: navId }, { webBehavior: 'replace' })
     else setRootParams({ ...queryParams, nav: undefined }, { webBehavior: 'replace' })
@@ -37,7 +37,7 @@ export function NavSheet({
       {...props}
     >
       <Sheet.Overlay />
-      <Sheet.Frame zIndex={1} height={isWeb ? '100vh' : '100%'} pt={isPwa && sat}>
+      <Sheet.Frame zIndex={1} height={isWeb ? '100vh' : '100%'} pt={isPwa && insets?.top}>
         <XStack w="100%" ai="center" jc="space-between" px="$4" pt="$6" pb="$2">
           <Link href="/">
             <IconSendLogo size={'$2.5'} color={'$color12'} />
