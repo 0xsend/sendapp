@@ -30,7 +30,7 @@ export function HomeLayout({
             {TopNav}
           </YStack>
           <Container
-            safeArea={'x'}
+            safeAreaProps={{ edges: ['bottom', 'left', 'right'] }}
             $gtLg={{ pt: '$5', pb: '$0' }}
             height={fullHeight ? '100%' : 'auto'}
           >
