@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
 
 const sanitizeSafeAreaInset = (value: string) => {
-  if (value === '') return undefined
-  if (value.includes('env')) return undefined
+  if (typeof window === 'undefined') return null
+  if (value === '') return null
+  if (value.includes('env')) return null
   const sanitizedInset = value.endsWith('px') ? Number(value.slice(0, -2)) : Number(value)
-  if (Number.isNaN(sanitizedInset)) return undefined
+  if (Number.isNaN(sanitizedInset)) return null
   return sanitizedInset
 }
 
@@ -14,10 +15,18 @@ export const useSafeAreaInsets = () => {
     right: number
     bottom: number
     left: number
-  } | null>()
+  } | null>(null)
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    // Force a fresh read by temporarily removing and re-adding the CSS variables
+    const root = document.documentElement
+    const originalStyle = root.style.cssText
+
+    // Clear and immediately reset CSS variables to force a fresh read
+    root.style.setProperty('--sat', 'env(safe-area-inset-top)')
+    root.style.setProperty('--sar', 'env(safe-area-inset-right)')
+    root.style.setProperty('--sab', 'env(safe-area-inset-bottom)')
+    root.style.setProperty('--sal', 'env(safe-area-inset-left)')
 
     const updateInsets = () => {
       const styles = getComputedStyle(document.documentElement)
@@ -28,18 +37,14 @@ export const useSafeAreaInsets = () => {
         left: sanitizeSafeAreaInset(styles.getPropertyValue('--sal')),
       }
       const hasInsets = Object.values(newInsets).some((inset) => inset !== undefined)
-
       //@ts-expect-error We check for undefined above
       setInsets(hasInsets ? newInsets : null)
     }
 
-    // Initial update
     updateInsets()
 
-    // Update on resize as env() values might change
     window.addEventListener('resize', updateInsets)
 
-    // Create a MutationObserver to watch for CSS variable changes
     const observer = new MutationObserver(updateInsets)
     observer.observe(document.documentElement, {
       attributes: true,
@@ -49,6 +54,7 @@ export const useSafeAreaInsets = () => {
     return () => {
       window.removeEventListener('resize', updateInsets)
       observer.disconnect()
+      root.style.cssText = originalStyle
     }
   }, [])
 
