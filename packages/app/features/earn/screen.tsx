@@ -1,22 +1,26 @@
-import { Card, Fade, LinearGradient, Paragraph, Separator, XStack, YStack } from '@my/ui'
-import type { ReactNode } from 'react'
+import { Card, Fade, LinearGradient, Paragraph, Separator, Spinner, XStack, YStack } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { IconArrowRight, IconStacks } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
-import { useRouter } from 'solito/router'
 import { Row } from 'app/features/earn/components/Row'
 import { SectionButton } from 'app/features/earn/components/SectionButton'
+import { useSendAccount } from 'app/utils/send-accounts'
+import type { ReactNode } from 'react'
+import { Link } from 'solito/link'
+import { useRouter } from 'solito/router'
 
 export const EarnScreen = () => {
-  // TODO loader when deposit balances are loading
-  // if (false) {
-  //   return <Spinner size="large" color={'$color12'} />
-  // }
+  // TODO: add more hooks
+  const sendAccount = useSendAccount()
+  if (sendAccount.isLoading) {
+    return <Spinner size="large" color={'$color12'} />
+  }
 
   return (
     <YStack w={'100%'} gap={'$4'} pb={'$3'} $gtLg={{ w: '50%' }}>
       <LearnSection />
       <DetailsSection />
+
       {/*// TODO remove this line when pluging in real data*/}
       <EarningsSummary />
     </YStack>
@@ -67,65 +71,65 @@ const Badge = ({ text }: { text: string }) => {
   )
 }
 
-// TODO plug on press handler
 const LearnSection = () => {
   return (
     <Fade>
-      <Card
-        w={'100%'}
-        h={'300px'}
-        p={'$5'}
-        gap={'$7'}
-        jc={'space-between'}
-        $gtLg={{ p: '$7' }}
-        backgroundImage={'url(https://ghassets.send.app/app_images/deposit.jpg)'}
-        backgroundPosition={'center 15%'}
-        backgroundRepeat={'no-repeat'}
-        backgroundSize={'cover'}
-        overflow={'hidden'}
-      >
-        <LinearGradient
-          start={[0, 0]}
-          end={[0, 1]}
-          fullscreen
-          colors={['transparent', 'rgba(0,0,0,0.4)']}
+      <Link href="https://info.send.it/send-docs/features-and-products/send-earn">
+        <Card
+          w={'100%'}
+          h={'300px'}
+          p={'$5'}
+          gap={'$7'}
+          jc={'space-between'}
+          $gtLg={{ p: '$7' }}
+          backgroundImage={'url(https://ghassets.send.app/app_images/deposit.jpg)'}
+          backgroundPosition={'center 15%'}
+          backgroundRepeat={'no-repeat'}
+          backgroundSize={'cover'}
+          overflow={'hidden'}
         >
-          <YStack position="absolute" top={0} left={0} bottom={0} right={0} />
-        </LinearGradient>
-        <XStack
-          width={'max-content'}
-          backgroundColor={'$oliveDrab'}
-          px={'$3.5'}
-          py={'$2'}
-          br={'$4'}
-          gap={'$2'}
-          ai={'center'}
-        >
-          <IconCoin symbol={'USDC'} size={'$2'} />
-          <Paragraph color={'$white'} size={'$5'}>
-            Deposits
-          </Paragraph>
-        </XStack>
-        <YStack>
-          <Paragraph color={'$white'} size={'$9'}>
-            Start Growing
-          </Paragraph>
-          <Paragraph color={'$white'} size={'$9'}>
-            Your USDC Saving
-          </Paragraph>
-          <XStack mt={'$3'} ai={'center'} jc={'space-between'}>
+          <LinearGradient
+            start={[0, 0]}
+            end={[0, 1]}
+            fullscreen
+            colors={['transparent', 'rgba(0,0,0,0.4)']}
+          >
+            <YStack position="absolute" top={0} left={0} bottom={0} right={0} />
+          </LinearGradient>
+          <XStack
+            width={'max-content'}
+            backgroundColor={'$oliveDrab'}
+            px={'$3.5'}
+            py={'$2'}
+            br={'$4'}
+            gap={'$2'}
+            ai={'center'}
+          >
+            <IconCoin symbol={'USDC'} size={'$2'} />
             <Paragraph color={'$white'} size={'$5'}>
-              Learn How It Works
+              Deposits
             </Paragraph>
-            <IconArrowRight size={'2'} color={'$primary'} />
           </XStack>
-        </YStack>
-      </Card>
+          <YStack>
+            <Paragraph color={'$white'} size={'$9'}>
+              Start Growing
+            </Paragraph>
+            <Paragraph color={'$white'} size={'$9'}>
+              Your USDC Saving
+            </Paragraph>
+            <XStack mt={'$3'} ai={'center'} jc={'space-between'}>
+              <Paragraph color={'$white'} size={'$5'}>
+                Learn How It Works
+              </Paragraph>
+              <IconArrowRight size={'2'} color={'$primary'} />
+            </XStack>
+          </YStack>
+        </Card>
+      </Link>
     </Fade>
   )
 }
 
-// TODO plug on press handler
 const EarningsCallToAction = () => {
   const { push } = useRouter()
 
