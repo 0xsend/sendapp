@@ -129,13 +129,12 @@ export function TopNav({
     path.includes('/leaderboard')
 
   return (
-    <Header w="100%">
+    <Header w="100%" $lg={{ pt: '$3' }}>
       <Container
         $gtLg={{ jc: 'flex-start', pb: '$2', ai: 'flex-start' }}
         ai="center"
         jc="space-between"
         safeAreaPadding={isPwa && 't'}
-        $lg={{ pt: !isPwa && '$5', pb: '$3' }}
       >
         {(() => {
           switch (true) {
