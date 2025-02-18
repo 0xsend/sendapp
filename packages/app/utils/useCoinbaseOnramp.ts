@@ -51,7 +51,7 @@ export function useCoinbaseOnramp({
         assets: ['USDC'],
         presetFiatAmount: amount,
         fiatCurrency: 'USD',
-        redirectUrl: `${window.location.origin}/deposit/callback`,
+        redirectUrl: `${window.location.origin}/deposit/success/callback`,
       })
 
       cleanup()
@@ -94,7 +94,7 @@ export function useCoinbaseOnramp({
         console.log('[Onramp] Transaction successful - processing completion')
         try {
           setIsSuccess(true)
-          await router.push('/deposit/success')
+          router.push('/deposit/success')
           cleanup()
           mutation.reset()
         } catch (error) {
