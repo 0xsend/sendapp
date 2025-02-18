@@ -200,6 +200,7 @@ export const AddSendtagsForm = () => {
                             }
                             borderRadius={'$3'}
                             maxWidth={'80%'}
+                            testID={`pending-tag-${tag.name}`}
                           >
                             <Paragraph size={'$5'} width={'90%'}>
                               {tag.name}

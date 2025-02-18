@@ -93,7 +93,7 @@ function TagItem({ tag }: { tag: Tables<'tags'> }) {
   return (
     <XStack ai="center" gap="$3" p="$3.5" br={'$4'} $gtLg={{ p: '$5' }}>
       <IconSlash size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
-      <Paragraph size={'$8'} fontWeight={'500'} width={'80%'}>
+      <Paragraph size={'$8'} fontWeight={'500'} width={'80%'} testID={`confirmed-tag-${tag.name}`}>
         {tag.name}
       </Paragraph>
     </XStack>

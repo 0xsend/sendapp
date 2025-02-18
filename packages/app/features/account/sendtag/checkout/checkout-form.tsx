@@ -103,6 +103,7 @@ function ReferredBy() {
               fontSize={'$5'}
               onFocus={() => setIsInputFocused(true)}
               onBlur={() => setIsInputFocused(false)}
+              testID={'referral-code-input'}
             />
             {(() => {
               switch (true) {

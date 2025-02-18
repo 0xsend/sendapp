@@ -1,6 +1,4 @@
-import path from 'node:path'
 import type { Expect, Locator, Page } from '@playwright/test'
-import { expect } from '@playwright/test'
 import debug from 'debug'
 import type { Web3ProviderBackend } from '@0xbigboss/headless-web3-provider'
 
@@ -25,61 +23,6 @@ export class CheckoutPage {
     log('goto /account/sendtag/checkout')
     await this.page.goto('/account/sendtag/checkout')
     await this.page.waitForURL('/account/sendtag/checkout')
-  }
-
-  async fillTagName(tag: string) {
-    await expect(async () => {
-      await this.page.getByPlaceholder('Enter Sendtag name').fill(tag)
-      expect(await this.page.getByPlaceholder('Enter Sendtag name').inputValue()).toEqual(tag)
-    }).toPass({
-      timeout: 5_000,
-    })
-  }
-
-  async submitTagName() {
-    await expect(async () => {
-      const request = this.page.waitForRequest(
-        (request) => {
-          if (request.url().includes('/rest/v1/tags') && request.method() === 'POST') {
-            log('submitTagName request', request.url(), request.method(), request.postDataJSON())
-            return true
-          }
-          return false
-        },
-        { timeout: 5_000 }
-      )
-      const response = this.page.waitForEvent('response', {
-        predicate: async (response) => {
-          if (response.url().includes('/rest/v1/tags')) {
-            log('submitTagName response', response.url(), response.status(), await response.text())
-            return true
-          }
-          return false
-        },
-        timeout: 5_000,
-      })
-      await this.submitTagButton.click()
-      await request
-      await response
-    }).toPass({
-      timeout: 20_000,
-    })
-  }
-
-  async addPendingTag(tag: string) {
-    await this.fillTagName(tag)
-    await this.submitTagName()
-  }
-
-  async openPricingDialog() {
-    await this.page.getByRole('button', { name: 'Pricing', exact: true }).first().click()
-    await this.pricingDialog.isVisible()
-  }
-
-  async openPricingTooltip() {
-    await expect(() => this.page.getByRole('button', { name: 'Pricing' }).hover()).toPass({
-      timeout: 5_000,
-    })
   }
 
   async confirmTags(expect: Expect) {
@@ -113,7 +56,7 @@ export class CheckoutPage {
       },
       timeout: 10_000,
     })
-    const signTransactionButton = this.page.getByRole('button', { name: 'Confirm' })
+    const signTransactionButton = this.page.getByRole('button', { name: 'Complete purchase' })
     expect?.(signTransactionButton).toBeEnabled({ timeout: 10_000 }) // blockchain stuff is a bit slow
     await this.page.bringToFront()
     const errorButton = this.page.getByRole('button', { name: 'Error' })
@@ -125,27 +68,5 @@ export class CheckoutPage {
     await confirmTagsRequest
     await confirmTagsResponse
     await this.page.waitForURL('/account/sendtag')
-  }
-
-  async waitForConfirmation() {
-    await this.page.getByText('Sent transaction...').waitFor({
-      state: 'detached',
-      timeout: 30_000, // block time is 10s + 2 block confirmations
-    })
-  }
-
-  async takeScreenshot() {
-    const screenshot = path.join(
-      'screenshots',
-      `./account/sendtag/checkout-${Date.now()}-${Math.random() * 100}.png`
-    )
-    log('takeScreenshot', screenshot)
-    await this.page
-      .screenshot({
-        path: screenshot,
-      })
-      .catch((e) => {
-        log('takeScreenshot failed', e)
-      })
   }
 }
