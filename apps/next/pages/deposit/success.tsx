@@ -1,5 +1,5 @@
 import { Check } from '@tamagui/lucide-icons'
-import { Button, Text, YStack, Card } from '@my/ui'
+import { Button, Text, YStack, Card, XStack, LinkableButton } from '@my/ui'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { HomeLayout } from 'app/features/home/layout.web'
@@ -25,8 +25,23 @@ export const Page: NextPageWithLayout = () => {
             <Text color="$gray11" ta="center">
               Your funds are on the way. They will appear in your wallet shortly.
             </Text>
-            <Button theme="green" width="100%" size="$4" onPress={() => router.push('/deposit')}>
-              Make Another Deposit
+            <Button
+              theme="green"
+              px="$3.5"
+              h="$4.5"
+              borderRadius="$4"
+              f={1}
+              onPress={() => router.push('/deposit')}
+            >
+              <XStack w="100%" gap="$2.5" ai="center" jc="center">
+                <LinkableButton.Text
+                  fontWeight="500"
+                  tt="uppercase"
+                  $theme-dark={{ col: '$color0' }}
+                >
+                  Make Another Deposit
+                </LinkableButton.Text>
+              </XStack>
             </Button>
           </YStack>
         </Card>
