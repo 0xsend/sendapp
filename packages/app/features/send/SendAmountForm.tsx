@@ -74,7 +74,7 @@ export function SendAmountForm() {
         setSendParams(
           {
             ...sendParams,
-            amount: sanitizedAmount,
+            amount: sanitizedAmount ? sanitizedAmount : undefined,
             sendToken,
             note: sanitizedNote,
           },
