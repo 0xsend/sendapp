@@ -27,6 +27,8 @@ describe('useCoinbaseOnramp', () => {
 
   beforeEach(() => {
     window.open = jest.fn()
+    window.addEventListener = jest.fn()
+    window.removeEventListener = jest.fn()
     Object.defineProperty(window, 'location', {
       configurable: true,
       value: {
@@ -55,7 +57,7 @@ describe('useCoinbaseOnramp', () => {
       partnerUserId: mockPartnerUserId,
       presetFiatAmount: 100,
       projectId: mockProjectId,
-      redirectUrl: `${mockOrigin}/deposit/success`,
+      redirectUrl: `${mockOrigin}/deposit/success/callback`,
     })
     expect(window.open).toHaveBeenCalledWith(mockUrl, 'Coinbase Onramp', 'width=600,height=800')
   })
