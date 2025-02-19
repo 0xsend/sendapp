@@ -45,6 +45,7 @@ import { z } from 'zod'
 import { useSendEarnDepositUserOp } from './hooks'
 
 const log = debug('app:earn:deposit')
+const MINIMUM_DEPOSIT = BigInt(50 * 1e6) // 50 USDC
 
 const DepositFormSchema = z.object({
   amount: formFields.text,
@@ -197,8 +198,19 @@ export const DepositForm = () => {
   // validate and sanitize amount
   useEffect(() => {
     const subscription = form.watch(({ amount: _amount }) => {
+      if (!coin?.decimals) return
       const sanitizedAmount = sanitizeAmount(_amount, coin?.decimals)
+      if (!sanitizedAmount) return
 
+      if (sanitizedAmount < MINIMUM_DEPOSIT) {
+        form.setError('amount', {
+          type: 'required',
+          message: `Minimum deposit is ${formatUnits(MINIMUM_DEPOSIT, coin?.decimals)} USDC`,
+        })
+        return
+      }
+
+      form.clearErrors('amount')
       setEarnParams(
         {
           ...earnParams,
@@ -209,7 +221,7 @@ export const DepositForm = () => {
     })
 
     return () => subscription.unsubscribe()
-  }, [form.watch, setEarnParams, earnParams, coin?.decimals])
+  }, [form.watch, setEarnParams, earnParams, coin?.decimals, form.clearErrors, form.setError])
 
   if (isLoadingCoins || !coin || (!coin.balance && coin.balance !== BigInt(0))) {
     return <Spinner size="large" color={'$color12'} />
@@ -239,7 +251,7 @@ export const DepositForm = () => {
               fontWeight: '500',
               bw: 0,
               br: 0,
-              p: 1,
+              p: '$1',
               focusStyle: {
                 outlineWidth: 0,
               },
@@ -259,7 +271,8 @@ export const DepositForm = () => {
               onFocus: () => setIsInputFocused(true),
               onBlur: () => setIsInputFocused(false),
               fieldsetProps: {
-                width: '70%',
+                flex: 1,
+                mr: '$1',
               },
               $gtSm: {
                 fontSize: (() => {
@@ -349,6 +362,7 @@ export const DepositForm = () => {
                 >
                   <XStack ai={'center'} position="relative" jc={'space-between'}>
                     {amount}
+                    {/* TODO: make an coin selector */}
                     <XStack ai={'center'} gap={'$2'}>
                       <IconCoin symbol={'USDC'} size={'$2'} />
                       <Paragraph size={'$6'}>USDC</Paragraph>

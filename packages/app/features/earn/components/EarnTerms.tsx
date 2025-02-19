@@ -1,4 +1,4 @@
-import { Anchor, type AnchorProps, Paragraph, Shake, Theme } from '@my/ui'
+import { Anchor, type AnchorProps, Paragraph } from '@my/ui'
 
 export const EarnTerms = ({ hasError }: { hasError?: boolean }) => {
   const colorProps = {
