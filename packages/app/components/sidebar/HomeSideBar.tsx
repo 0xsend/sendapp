@@ -7,6 +7,7 @@ import {
   ScrollView,
   Separator,
   SideBar,
+  Spinner,
   useMedia,
   XStack,
   YStack,
@@ -28,6 +29,7 @@ import { NavSheet } from '../NavSheet'
 import { useUser } from 'app/utils/useUser'
 import { ReferralLink } from '../ReferralLink'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { useIsSendingUnlocked } from 'app/utils/useIsSendingUnlocked'
 
 const links = [
   {
@@ -60,6 +62,8 @@ const links = [
 ].filter(Boolean) as { icon: ReactElement; text: string; href: string }[]
 
 const HomeSideBar = ({ ...props }: YStackProps) => {
+  const { isSendingUnlocked, isLoading } = useIsSendingUnlocked()
+
   return (
     <SideBar {...props} ai={'flex-start'} pl="$7">
       <Link href={'/'}>
@@ -67,9 +71,14 @@ const HomeSideBar = ({ ...props }: YStackProps) => {
       </Link>
 
       <YStack gap={'$7'} pt={'$10'} jc={'space-between'}>
-        {links.map((link) => (
-          <SideBarNavLink key={link.href} {...link} />
-        ))}
+        {!isLoading &&
+          links.map((link) => (
+            <SideBarNavLink
+              key={link.href}
+              disabled={link.href === '/send' && !isSendingUnlocked}
+              {...link}
+            />
+          ))}
       </YStack>
     </SideBar>
   )
@@ -79,6 +88,7 @@ const HomeBottomSheet = () => {
   const { profile } = useUser()
   const hoverStyles = useHoverStyles()
   const avatarUrl = profile?.avatar_url
+  const { isSendingUnlocked, isLoading } = useIsSendingUnlocked()
 
   return (
     <NavSheet navId="home">
@@ -96,34 +106,43 @@ const HomeBottomSheet = () => {
         </YStack>
       </XStack>
       <Nav display="flex" flex={2} height="100%">
-        <ScrollView gap={'$4'} alignItems="stretch" height="100%">
-          {links.map((link, idx) => {
-            const first = idx === 0
-            const last = idx === links.length - 1
+        {isLoading ? (
+          <Spinner size="large" color="$color12" />
+        ) : (
+          <ScrollView gap={'$4'} alignItems="stretch" height="100%">
+            {links.map((link, idx) => {
+              const first = idx === 0
+              const last = idx === links.length - 1
 
-            return (
-              <YStack
-                key={link.href}
-                gap={'$4'}
-                alignItems="stretch"
-                justifyContent="center"
-                p={'$2'}
-                w={'100%'}
-                bg={'$color1'}
-                borderTopLeftRadius={first ? '$6' : 0}
-                borderTopRightRadius={first ? '$6' : 0}
-                borderBottomLeftRadius={last ? '$6' : 0}
-                borderBottomRightRadius={last ? '$6' : 0}
-                paddingTop={first ? '$2' : 0}
-                paddingBottom={last ? '$2' : 0}
-              >
-                <YStack w={'100%'} p={'$4'} borderRadius={'$4'} hoverStyle={hoverStyles}>
-                  <SideBarNavLink key={link.href} hoverStyle={{}} {...link} />
+              return (
+                <YStack
+                  key={link.href}
+                  gap={'$4'}
+                  alignItems="stretch"
+                  justifyContent="center"
+                  p={'$2'}
+                  w={'100%'}
+                  bg={'$color1'}
+                  borderTopLeftRadius={first ? '$6' : 0}
+                  borderTopRightRadius={first ? '$6' : 0}
+                  borderBottomLeftRadius={last ? '$6' : 0}
+                  borderBottomRightRadius={last ? '$6' : 0}
+                  paddingTop={first ? '$2' : 0}
+                  paddingBottom={last ? '$2' : 0}
+                >
+                  <YStack w={'100%'} p={'$4'} borderRadius={'$4'} hoverStyle={hoverStyles}>
+                    <SideBarNavLink
+                      key={link.href}
+                      hoverStyle={{}}
+                      disabled={link.href === '/send' && !isSendingUnlocked}
+                      {...link}
+                    />
+                  </YStack>
                 </YStack>
-              </YStack>
-            )
-          })}
-        </ScrollView>
+              )
+            })}
+          </ScrollView>
+        )}
       </Nav>
     </NavSheet>
   )

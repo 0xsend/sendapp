@@ -91,6 +91,19 @@ jest.mock('app/utils/useCoinFromTokenParam', () => ({
   }),
 }))
 
+jest.mock('app/utils/useIsSendingUnlocked', () => ({
+  useIsSendingUnlocked: jest.fn().mockReturnValue({
+    isSendingUnlocked: true,
+    isLoading: false,
+  }),
+}))
+
+jest.mock('solito/router', () => ({
+  useRouter: jest.fn().mockReturnValue({
+    replace: jest.fn(),
+  }),
+}))
+
 import { SendScreen } from './screen'
 import { usePathname } from 'expo-router'
 import { useProfileLookup } from 'app/utils/useProfileLookup'

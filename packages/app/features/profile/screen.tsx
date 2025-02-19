@@ -1,4 +1,4 @@
-import { Fade, Paragraph, Spinner, Stack, Text, XStack, YStack } from '@my/ui'
+import { Button, Fade, Paragraph, Spinner, Stack, Text, XStack, YStack } from '@my/ui'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useUser } from 'app/utils/useUser'
 import { AvatarProfile, type AvatarProfileProps } from './AvatarProfile'
@@ -11,6 +11,7 @@ import { SendButton } from './ProfileButtons'
 import { ProfileHeader } from 'app/features/profile/components/ProfileHeader'
 import { FlatList } from 'react-native-web'
 import { ProfilesDetailsModal } from 'app/features/profile/components/ProfileDetailsModal'
+import { useIsSendingUnlocked } from 'app/utils/useIsSendingUnlocked'
 
 interface ProfileScreenProps {
   sendid?: number | null
@@ -26,6 +27,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   } = useProfileLookup('sendid', otherUserId?.toString() || '')
   const { user, profile: currentUserProfile } = useUser()
   const [{ profile: profileParam }] = useRootScreenParams()
+  const { isSendingUnlocked, isLoading: isLoadingSendingUnlocked } = useIsSendingUnlocked()
 
   const {
     data,
@@ -143,7 +145,23 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                     <SendButton
                       identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
                       idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
-                    />
+                      disabled={!isSendingUnlocked && !isLoadingSendingUnlocked}
+                    >
+                      {isLoadingSendingUnlocked && (
+                        <Button.Icon>
+                          <Spinner size="small" color="$color12" />
+                        </Button.Icon>
+                      )}
+                      {isSendingUnlocked && (
+                        <Button.Text
+                          fontWeight={'600'}
+                          textTransform={'uppercase'}
+                          $theme-dark={{ col: '$color0' }}
+                        >
+                          SEND
+                        </Button.Text>
+                      )}
+                    </SendButton>
                   )
                 }
                 inverted={true}

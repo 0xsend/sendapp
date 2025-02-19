@@ -19,12 +19,22 @@ import { useState } from 'react'
 import { SendAmountForm } from './SendAmountForm'
 import { SendRecipient } from './confirm/screen'
 import { type Address, isAddress } from 'viem'
+import { useIsSendingUnlocked } from 'app/utils/useIsSendingUnlocked'
+import { useRouter } from 'solito/router'
 
 export const SendScreen = () => {
+  const router = useRouter()
+  const toast = useToastController()
+  const { isSendingUnlocked, isLoading: isLoadingSendingUnlocked } = useIsSendingUnlocked()
   const [{ recipient, idType }] = useSendScreenParams()
   const { data: profile, isLoading, error } = useProfileLookup(idType ?? 'tag', recipient ?? '')
-  if (isLoading) return <Spinner size="large" color={'$color12'} />
+  if (isLoading || isLoadingSendingUnlocked) return <Spinner size="large" color={'$color12'} />
   if (error) throw new Error(error.message)
+  if (!isSendingUnlocked) {
+    router.replace('/')
+    toast.show('Deposit USDC to unlock send')
+    return null
+  }
 
   if (idType === 'address' && isAddress(recipient as Address)) {
     return <SendAmountForm />
