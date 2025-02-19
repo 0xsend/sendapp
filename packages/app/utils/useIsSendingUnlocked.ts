@@ -3,7 +3,7 @@ import { parseUnits } from 'viem'
 import { useCoin } from 'app/provider/coins'
 
 export const useIsSendingUnlocked = () => {
-  const minGasBalance = '0.05'
+  const minGasBalance = '10000'
   const { data: sendAccount, isLoading: isLoadingSendAccount } = useSendAccount()
 
   const { coin: usdc, isLoading: isCoinLoading } = useCoin('USDC')
