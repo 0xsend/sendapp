@@ -148,6 +148,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                 }
                 inverted={true}
                 showsVerticalScrollIndicator={false}
+                stickyHeaderIndices={[0]}
               />
             </Stack>
           </>

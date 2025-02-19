@@ -306,19 +306,54 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
           dir={null}
         >
           <div
-            className="css-view-175oi2r r-transform-173mzie"
+            className="css-view-175oi2r r-position-gtdqiz r-top-ipm5af r-zIndex-mhe3cw"
             dir={null}
           >
-            <View
-              cancelable={true}
-              collapsable={false}
-              disabled={false}
-              focusVisibleStyle={{}}
-              focusable={[Function]}
-              forwardedRef={[Function]}
-              jestAnimatedStyle={
-                {
-                  "value": {
+            <div
+              className="css-view-175oi2r r-transform-173mzie"
+              dir={null}
+            >
+              <View
+                cancelable={true}
+                collapsable={false}
+                disabled={false}
+                focusVisibleStyle={{}}
+                focusable={[Function]}
+                forwardedRef={[Function]}
+                jestAnimatedStyle={
+                  {
+                    "value": {
+                      "backgroundColor": "#081619",
+                      "borderBottomColor": "transparent",
+                      "borderBottomLeftRadius": 9,
+                      "borderBottomRightRadius": 9,
+                      "borderBottomWidth": 1,
+                      "borderLeftColor": "transparent",
+                      "borderLeftWidth": 1,
+                      "borderRightColor": "transparent",
+                      "borderRightWidth": 1,
+                      "borderTopColor": "transparent",
+                      "borderTopLeftRadius": 9,
+                      "borderTopRightRadius": 9,
+                      "borderTopWidth": 1,
+                      "height": 48,
+                      "opacity": 0,
+                      "width": "100%",
+                    },
+                  }
+                }
+                minPressDuration={0}
+                onBlur={[Function]}
+                onFocus={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onPress={[Function]}
+                onPressIn={[Function]}
+                onPressOut={[Function]}
+                role="button"
+                style={
+                  {
+                    "alignItems": "center",
                     "backgroundColor": "#081619",
                     "borderBottomColor": "transparent",
                     "borderBottomLeftRadius": 9,
@@ -328,90 +363,60 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
                     "borderLeftWidth": 1,
                     "borderRightColor": "transparent",
                     "borderRightWidth": 1,
+                    "borderStyle": "solid",
                     "borderTopColor": "transparent",
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
                     "borderTopWidth": 1,
-                    "height": 48,
-                    "opacity": 0,
-                    "width": "100%",
-                  },
-                }
-              }
-              minPressDuration={0}
-              onBlur={[Function]}
-              onFocus={[Function]}
-              onMouseEnter={[Function]}
-              onMouseLeave={[Function]}
-              onPress={[Function]}
-              onPressIn={[Function]}
-              onPressOut={[Function]}
-              role="button"
-              style={
-                {
-                  "alignItems": "center",
-                  "backgroundColor": "#081619",
-                  "borderBottomColor": "transparent",
-                  "borderBottomLeftRadius": 9,
-                  "borderBottomRightRadius": 9,
-                  "borderBottomWidth": 1,
-                  "borderLeftColor": "transparent",
-                  "borderLeftWidth": 1,
-                  "borderRightColor": "transparent",
-                  "borderRightWidth": 1,
-                  "borderStyle": "solid",
-                  "borderTopColor": "transparent",
-                  "borderTopLeftRadius": 9,
-                  "borderTopRightRadius": 9,
-                  "borderTopWidth": 1,
-                  "display": "flex",
-                  "flexDirection": "row",
-                  "flexWrap": "nowrap",
-                  "height": 48,
-                  "justifyContent": "center",
-                  "minWidth": 150,
-                  "opacity": 0,
-                  "paddingLeft": 16,
-                  "paddingRight": 16,
-                  "width": "100%",
-                }
-              }
-              testID="profileSendButton"
-            >
-              <View
-                style={
-                  {
-                    "alignItems": "center",
+                    "display": "flex",
                     "flexDirection": "row",
-                    "gap": 7,
-                    "height": "100%",
+                    "flexWrap": "nowrap",
+                    "height": 48,
                     "justifyContent": "center",
+                    "minWidth": 150,
+                    "opacity": 0,
+                    "paddingLeft": 16,
+                    "paddingRight": 16,
                     "width": "100%",
                   }
                 }
+                testID="profileSendButton"
               >
-                <Text
-                  lineBreakMode="clip"
-                  numberOfLines={1}
+                <View
                   style={
                     {
-                      "color": "#081619",
-                      "flexGrow": 0,
-                      "flexShrink": 1,
-                      "fontFamily": "System",
-                      "fontSize": 16.8,
-                      "fontWeight": "600",
-                      "lineHeight": 19,
-                      "textTransform": "uppercase",
-                      "userSelect": "none",
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                      "gap": 7,
+                      "height": "100%",
+                      "justifyContent": "center",
+                      "width": "100%",
                     }
                   }
-                  suppressHighlighting={true}
                 >
-                  SEND
-                </Text>
+                  <Text
+                    lineBreakMode="clip"
+                    numberOfLines={1}
+                    style={
+                      {
+                        "color": "#081619",
+                        "flexGrow": 0,
+                        "flexShrink": 1,
+                        "fontFamily": "System",
+                        "fontSize": 16.8,
+                        "fontWeight": "600",
+                        "lineHeight": 19,
+                        "textTransform": "uppercase",
+                        "userSelect": "none",
+                      }
+                    }
+                    suppressHighlighting={true}
+                  >
+                    SEND
+                  </Text>
+                </View>
               </View>
-            </View>
+            </div>
           </div>
           <div
             className="css-view-175oi2r r-flexDirection-1d5kdc7 r-transform-173mzie"
