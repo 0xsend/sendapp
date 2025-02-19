@@ -6,7 +6,6 @@ import {
   LinearGradient,
   Paragraph,
   H3,
-  useMedia,
   AnimatePresence,
 } from '@my/ui'
 import { HomeButtons } from '../features/home/HomeButtons'
@@ -42,17 +41,16 @@ const MobileButtonRow = ({
   isLoading,
   isVisible,
 }: { children: React.ReactElement; isLoading: boolean; isVisible: boolean } & XStackProps) => {
-  const media = useMedia()
   const { bottom } = useSafeAreaInsets()
 
   return (
     <Stack
       w={'100%'}
       px="$4"
+      pb={Math.max(bottom, 24)}
       $platform-web={{
         position: 'fixed',
-        bottom: Math.max(bottom, 16),
-        display: media.gtLg ? 'none' : 'flex',
+        bottom: 0,
       }}
       $gtLg={{
         display: 'none',

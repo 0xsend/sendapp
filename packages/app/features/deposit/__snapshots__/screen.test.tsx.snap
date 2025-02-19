@@ -286,6 +286,492 @@ exports[`DepositScreen renders the deposit screen 1`] = `
             </View>
           </View>
         </View>
+        <View
+          cancelable={true}
+          disabled={false}
+          focusVisibleStyle={{}}
+          focusable={[Function]}
+          minPressDuration={0}
+          onBlur={[Function]}
+          onFocus={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onPress={[Function]}
+          onPressIn={[Function]}
+          onPressOut={[Function]}
+          role="button"
+          style={
+            {
+              "alignItems": "center",
+              "backgroundColor": "#111f22",
+              "borderBottomColor": "#40FB50",
+              "borderBottomLeftRadius": 9,
+              "borderBottomRightRadius": 9,
+              "borderBottomWidth": 0,
+              "borderLeftColor": "#40FB50",
+              "borderLeftWidth": 0,
+              "borderRightColor": "#40FB50",
+              "borderRightWidth": 0,
+              "borderStyle": "solid",
+              "borderTopColor": "#40FB50",
+              "borderTopLeftRadius": 9,
+              "borderTopRightRadius": 9,
+              "borderTopWidth": 0,
+              "flexDirection": "row",
+              "flexWrap": "nowrap",
+              "height": 80,
+              "justifyContent": "center",
+              "paddingLeft": 18,
+              "paddingRight": 18,
+              "position": "relative",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "backgroundColor": "#40FB50",
+                "flexDirection": "column",
+                "height": 40,
+                "left": 0,
+                "position": "absolute",
+                "top": "50%",
+                "transform": [
+                  {
+                    "translateY": -20,
+                  },
+                ],
+                "width": 4,
+              }
+            }
+          />
+          <View
+            pointerEvents="none"
+            style={
+              {
+                "height": 0,
+                "minHeight": 0,
+                "minWidth": 11.088000000000001,
+                "width": 11.088000000000001,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "paddingLeft": 18,
+                "paddingRight": 18,
+                "width": "100%",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "gap": 13,
+                }
+              }
+            >
+              <RNSVGSvgView
+                align="xMidYMid"
+                bbHeight={24}
+                bbWidth={24}
+                color="#888"
+                fill="none"
+                focusable={false}
+                height={24}
+                meetOrSlice={0}
+                minX={0}
+                minY={-34.55}
+                strokeWidth="2"
+                style={
+                  [
+                    {
+                      "backgroundColor": "transparent",
+                      "borderWidth": 0,
+                    },
+                    {
+                      "color": "#888",
+                    },
+                    {
+                      "flex": 0,
+                      "height": 24,
+                      "width": 24,
+                    },
+                  ]
+                }
+                tintColor="#888"
+                vbHeight={120.3}
+                vbWidth={120.3}
+                width={24}
+              >
+                <RNSVGGroup
+                  fill={null}
+                  propList={
+                    [
+                      "fill",
+                      "strokeWidth",
+                    ]
+                  }
+                  strokeWidth="2"
+                >
+                  <RNSVGMask
+                    fill={
+                      {
+                        "payload": 4278190080,
+                        "type": 0,
+                      }
+                    }
+                    height={24}
+                    maskContentUnits={1}
+                    maskUnits={1}
+                    width={24}
+                    x={0}
+                    y={0}
+                  >
+                    <RNSVGPath
+                      d="M0 0h20v20H0z"
+                      fill={
+                        {
+                          "payload": 4292467161,
+                          "type": 0,
+                        }
+                      }
+                      propList={
+                        [
+                          "fill",
+                        ]
+                      }
+                    />
+                  </RNSVGMask>
+                  <RNSVGGroup
+                    fill={
+                      {
+                        "payload": 4278190080,
+                        "type": 0,
+                      }
+                    }
+                    mask="a"
+                  >
+                    <RNSVGPath
+                      d="M22.8 6.6c1.4-1.8 2.4-4.2 2.1-6.6-2.1.1-4.6 1.4-6.1 3.1-1.3 1.5-2.5 4-2.2 6.3 2.4.3 4.7-1 6.2-2.8M24.9 10c-3.4-.2-6.3 1.9-7.9 1.9-1.6 0-4.1-1.8-6.8-1.8-3.5.1-6.7 2-8.5 5.2-3.6 6.3-1 15.6 2.6 20.7 1.7 2.5 3.8 5.3 6.5 5.2 2.6-.1 3.6-1.7 6.7-1.7s4 1.7 6.8 1.6 4.6-2.5 6.3-5.1c2-2.9 2.8-5.7 2.8-5.8-.1-.1-5.5-2.1-5.5-8.3-.1-5.2 4.2-7.7 4.4-7.8-2.3-3.6-6.1-4-7.4-4.1"
+                      fill={
+                        {
+                          "type": 2,
+                        }
+                      }
+                      propList={
+                        [
+                          "fill",
+                        ]
+                      }
+                    />
+                    <RNSVGPath
+                      d="M54.3 2.9c7.4 0 12.5 5.1 12.5 12.4 0 7.4-5.2 12.5-12.7 12.5H46v12.9h-5.9V2.9h14.2zm-8.3 20h6.7c5.1 0 8-2.8 8-7.5 0-4.8-2.9-7.5-8-7.5h-6.8v15h.1zM68.3 33c0-4.8 3.7-7.8 10.3-8.2l7.6-.4v-2.1c0-3.1-2.1-4.9-5.5-4.9-3.3 0-5.3 1.6-5.8 4h-5.4c.3-5 4.6-8.7 11.4-8.7 6.7 0 11 3.5 11 9.1v19h-5.4v-4.5h-.1c-1.6 3.1-5.1 5-8.7 5-5.6 0-9.4-3.4-9.4-8.3zm17.9-2.5v-2.2l-6.8.4c-3.4.2-5.3 1.7-5.3 4.1 0 2.4 2 4 5 4 4 0 7.1-2.7 7.1-6.3zM96.9 51v-4.6c.4.1 1.4.1 1.8.1 2.6 0 4-1.1 4.9-3.9 0-.1.5-1.7.5-1.7l-10-27.6h6.1l7 22.5h.1l7-22.5h6L110 42.4c-2.4 6.7-5.1 8.8-10.8 8.8-.4-.1-1.8-.1-2.3-.2z"
+                      fill={
+                        {
+                          "type": 2,
+                        }
+                      }
+                      propList={
+                        [
+                          "fill",
+                        ]
+                      }
+                    />
+                  </RNSVGGroup>
+                </RNSVGGroup>
+              </RNSVGSvgView>
+              <View
+                style={
+                  {
+                    "flexDirection": "column",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "#FFFFFF",
+                      "fontFamily": "System",
+                      "fontWeight": "500",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  Apple Pay
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "#FFFFFF",
+                      "fontFamily": "System",
+                      "fontSize": 15.6,
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  Debit card only
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+        <View
+          cancelable={true}
+          disabled={false}
+          focusVisibleStyle={{}}
+          focusable={[Function]}
+          minPressDuration={0}
+          onBlur={[Function]}
+          onFocus={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onPress={[Function]}
+          onPressIn={[Function]}
+          onPressOut={[Function]}
+          role="button"
+          style={
+            {
+              "alignItems": "center",
+              "backgroundColor": "#111f22",
+              "borderBottomColor": "#40FB50",
+              "borderBottomLeftRadius": 9,
+              "borderBottomRightRadius": 9,
+              "borderBottomWidth": 0,
+              "borderLeftColor": "#40FB50",
+              "borderLeftWidth": 0,
+              "borderRightColor": "#40FB50",
+              "borderRightWidth": 0,
+              "borderStyle": "solid",
+              "borderTopColor": "#40FB50",
+              "borderTopLeftRadius": 9,
+              "borderTopRightRadius": 9,
+              "borderTopWidth": 0,
+              "flexDirection": "row",
+              "flexWrap": "nowrap",
+              "height": 80,
+              "justifyContent": "center",
+              "paddingLeft": 18,
+              "paddingRight": 18,
+              "position": "relative",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "backgroundColor": "#40FB50",
+                "flexDirection": "column",
+                "height": 40,
+                "left": 0,
+                "position": "absolute",
+                "top": "50%",
+                "transform": [
+                  {
+                    "translateY": -20,
+                  },
+                ],
+                "width": 4,
+              }
+            }
+          />
+          <View
+            pointerEvents="none"
+            style={
+              {
+                "height": 0,
+                "minHeight": 0,
+                "minWidth": 11.088000000000001,
+                "width": 11.088000000000001,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "paddingLeft": 18,
+                "paddingRight": 18,
+                "width": "100%",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "gap": 13,
+                }
+              }
+            >
+              <RNSVGSvgView
+                align="xMidYMid"
+                bbHeight={24}
+                bbWidth={24}
+                fill="none"
+                focusable={false}
+                height={24}
+                meetOrSlice={0}
+                minX={0}
+                minY={0}
+                stroke="#888"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                style={
+                  [
+                    {
+                      "backgroundColor": "transparent",
+                      "borderWidth": 0,
+                    },
+                    {
+                      "color": "#888",
+                    },
+                    {
+                      "flex": 0,
+                      "height": 24,
+                      "width": 24,
+                    },
+                  ]
+                }
+                tintColor="#888"
+                vbHeight={24}
+                vbWidth={24}
+                width={24}
+              >
+                <RNSVGGroup
+                  fill={null}
+                  propList={
+                    [
+                      "fill",
+                      "stroke",
+                      "strokeWidth",
+                      "strokeLinecap",
+                      "strokeLinejoin",
+                    ]
+                  }
+                  stroke={
+                    {
+                      "payload": 4287137928,
+                      "type": 0,
+                    }
+                  }
+                  strokeLinecap={1}
+                  strokeLinejoin={1}
+                  strokeWidth="2"
+                >
+                  <RNSVGRect
+                    fill={
+                      {
+                        "payload": 4278190080,
+                        "type": 0,
+                      }
+                    }
+                    height="12"
+                    propList={
+                      [
+                        "stroke",
+                      ]
+                    }
+                    rx="2"
+                    stroke={
+                      {
+                        "payload": 4287137928,
+                        "type": 0,
+                      }
+                    }
+                    width="20"
+                    x="2"
+                    y="6"
+                  />
+                  <RNSVGCircle
+                    cx="12"
+                    cy="12"
+                    fill={
+                      {
+                        "payload": 4278190080,
+                        "type": 0,
+                      }
+                    }
+                    propList={
+                      [
+                        "stroke",
+                      ]
+                    }
+                    r="2"
+                    stroke={
+                      {
+                        "payload": 4287137928,
+                        "type": 0,
+                      }
+                    }
+                  />
+                  <RNSVGPath
+                    d="M6 12h.01M18 12h.01"
+                    fill={
+                      {
+                        "payload": 4278190080,
+                        "type": 0,
+                      }
+                    }
+                    propList={
+                      [
+                        "stroke",
+                      ]
+                    }
+                    stroke={
+                      {
+                        "payload": 4287137928,
+                        "type": 0,
+                      }
+                    }
+                  />
+                </RNSVGGroup>
+              </RNSVGSvgView>
+              <View
+                style={
+                  {
+                    "flexDirection": "column",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "#FFFFFF",
+                      "fontFamily": "System",
+                      "fontWeight": "500",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  Debit Card
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "#FFFFFF",
+                      "fontFamily": "System",
+                      "fontSize": 15.6,
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  Up to $500 per week
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
       </View>
     </View>
   </View>
