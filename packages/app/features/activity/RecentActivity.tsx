@@ -112,7 +112,7 @@ function ActivityFeed({
                   <YGroup bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }}>
                     {activities.map((activity) => (
                       <YGroup.Item
-                        key={`${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`}
+                        key={`activity_feed_${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`}
                       >
                         <TokenActivityRow activity={activity} onPress={onActivityPress} />
                       </YGroup.Item>
@@ -127,17 +127,18 @@ function ActivityFeed({
       <Fade>
         {!isLoadingActivities && (isFetchingNextPageActivities || hasNextPage) ? (
           <>
-            {isFetchingNextPageActivities && <Spinner size="small" />}
+            {isFetchingNextPageActivities && <Spinner size="small" color={'$color12'} mb="$3.5" />}
             {hasNextPage && (
               <Button
                 onPress={() => {
                   fetchNextPage()
                 }}
                 disabled={isFetchingNextPageActivities || isFetchingActivities}
-                color="$color10"
+                color="$color0"
                 width={200}
                 mx="auto"
-                mt={'$3'}
+                mb="$3.5"
+                bc="$color10"
               >
                 Load More
               </Button>

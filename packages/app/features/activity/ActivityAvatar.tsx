@@ -1,4 +1,4 @@
-import { Avatar, LinkableAvatar, XStack, type LinkableAvatarProps } from '@my/ui'
+import { Avatar, LinkableAvatar, type LinkableAvatarProps } from '@my/ui'
 import { IconUpgrade } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { allCoinsDict } from 'app/data/coins'
@@ -20,44 +20,45 @@ export function ActivityAvatar({
 
   const isETHReceive = isSendAccountReceiveEvent(activity)
 
-  if (user) {
+  if (user !== null) {
     return (
-      <XStack
+      <LinkableAvatar
+        size="$4.5"
+        br="$4"
+        gap="$2"
+        href={`/profile/${user.send_id}`}
         onPress={(e) => {
           e.stopPropagation()
         }}
+        {...props}
       >
-        <LinkableAvatar size="$4.5" br="$4" gap="$2" href={`/profile/${user.send_id}`} {...props}>
-          {(() => {
-            switch (true) {
-              case !user.avatar_url:
-                return <Avatar.Image src={undefined} />
-              case Boolean(to_user?.send_id) && Boolean(from_user?.send_id):
-                return <Avatar.Image src={user.avatar_url} />
-              case isERC20Transfer || isETHReceive:
-                return (
-                  <IconCoin
-                    symbol={
-                      allCoinsDict[data?.coin?.token as keyof typeof allCoinsDict]?.symbol ?? ''
-                    }
-                  />
-                )
-              default:
-                return <Avatar.Image src={user?.avatar_url ?? undefined} />
-            }
-          })()}
+        {(() => {
+          switch (true) {
+            case !user.avatar_url:
+              return <Avatar.Image src={undefined} />
+            case to_user?.send_id !== undefined && from_user?.send_id !== undefined:
+              return <Avatar.Image src={user.avatar_url} />
+            case isERC20Transfer || isETHReceive:
+              return (
+                <IconCoin
+                  symbol={
+                    allCoinsDict[data?.coin?.token as keyof typeof allCoinsDict]?.symbol ?? ''
+                  }
+                />
+              )
+            default:
+              return <Avatar.Image src={user.avatar_url ?? undefined} />
+          }
+        })()}
 
-          <Avatar.Fallback jc="center" bc="$olive">
-            <Avatar size="$4.5" br="$4" {...props}>
-              <Avatar.Image
-                src={`https://ui-avatars.com/api/?name=${
-                  user?.name ?? user?.tags?.[0] ?? user?.send_id
-                }&size=256&format=png&background=86ad7f`}
-              />
-            </Avatar>
-          </Avatar.Fallback>
-        </LinkableAvatar>
-      </XStack>
+        <Avatar.Fallback jc="center" bc="$olive">
+          <Avatar.Image
+            src={`https://ui-avatars.com/api/?name=${
+              user?.name ?? user?.tags?.[0] ?? user?.send_id
+            }&size=256&format=png&background=86ad7f`}
+          />
+        </Avatar.Fallback>
+      </LinkableAvatar>
     )
   }
 

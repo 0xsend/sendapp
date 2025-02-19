@@ -2,11 +2,13 @@
   min-height: 100%;
 }
 
-:root {
+html {
   height: 100%;
-  background-color: transparent;
-  overflow: hidden;
   overscroll-behavior: none;
+}
+
+body {
+  height: 100%;
 }
 
 body {

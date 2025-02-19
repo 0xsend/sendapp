@@ -161,11 +161,10 @@ const Header = () => (
       pos={'absolute'}
       br={'$6'}
       t={0}
-      zIndex={0}
       bc="$black"
       source={{
-        height: 1024,
-        width: 1024,
+        height: 224,
+        width: 224,
         uri: 'https://ghassets.send.app/app_images/flower.jpg',
       }}
       h={'100%'}
