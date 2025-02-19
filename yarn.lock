@@ -6452,6 +6452,7 @@ __metadata:
     expo-linear-gradient: "npm:~12.7.1"
     moti: "npm:^0.25.3"
     react-hook-form: "npm:^7.48.2"
+    react-native-safe-area-context: "npm:4.8.2"
     solito: "npm:^4.0.1"
     tamagui: "npm:^1.101.7"
     typescript: "npm:^5.5.3"
