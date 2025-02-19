@@ -3,7 +3,7 @@ import { useSendAccount } from 'app/utils/send-accounts'
 import { useUserOp } from 'app/utils/userop'
 import type { UserOperation } from 'permissionless'
 import { useMemo } from 'react'
-import { encodeFunctionData, erc20Abi } from 'viem'
+import { encodeFunctionData, erc20Abi, zeroAddress } from 'viem'
 import type { UseQueryReturnType } from 'wagmi/query'
 
 /**
@@ -50,7 +50,7 @@ export const useSendEarnDepositUserOp = ({
         data: encodeFunctionData({
           abi: sendEarnAbi,
           functionName: 'deposit',
-          args: [amount, sender ?? '0x'],
+          args: [amount, sender ?? zeroAddress],
         }),
       },
     ],
