@@ -21,19 +21,14 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
         "borderTopRightRadius": 16,
         "height": 224,
         "justifyContent": "center",
-        "overflow": "hidden",
-        "position": "relative",
         "width": "100%",
       }
     }
   >
     <Image
-      objectFit="cover"
       source={
         {
-          "height": 1024,
           "uri": "https://ghassets.send.app/app_images/flower.jpg",
-          "width": 1024,
         }
       }
       style={
@@ -46,13 +41,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
           "height": "100%",
           "position": "absolute",
           "top": 0,
-          "transform": [
-            {
-              "scale": 1.5,
-            },
-          ],
           "width": "100%",
-          "zIndex": 0,
         }
       }
     />
