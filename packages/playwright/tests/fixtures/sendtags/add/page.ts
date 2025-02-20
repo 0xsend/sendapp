@@ -3,7 +3,7 @@ import { expect } from '@playwright/test'
 import debug from 'debug'
 import type { Web3ProviderBackend } from '@0xbigboss/headless-web3-provider'
 
-const log = debug('test:fixtures:add-sendtags:page')
+const log = debug('test:fixtures:sendtags-add:page')
 
 export class AddSendtagsPage {
   public readonly pricingDialog: Locator
@@ -19,9 +19,9 @@ export class AddSendtagsPage {
   }
 
   async goto() {
-    log('goto /account/sendtag/add-sendtags')
-    await this.page.goto('/account/sendtag/add-sendtags')
-    await this.page.waitForURL('/account/sendtag/add-sendtags')
+    log('goto /account/sendtag/add')
+    await this.page.goto('/account/sendtag/add')
+    await this.page.waitForURL('/account/sendtag/add')
   }
 
   async fillTagName(tag: string) {

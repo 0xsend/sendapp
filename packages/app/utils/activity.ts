@@ -16,7 +16,7 @@ import {
 } from './zod/activity'
 import { isSendAccountReceiveEvent } from './zod/activity/SendAccountReceiveEventSchema'
 import { isSendTokenUpgradeEvent } from './zod/activity/SendAccountTransfersEventSchema'
-import { sendCoin } from 'app/data/coins'
+import { sendCoin, sendV0Coin } from 'app/data/coins'
 
 const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
   Object.values(addresses).map((a) => [a, label])
@@ -243,7 +243,7 @@ export function subtextFromActivity(activity: Activity): string | null {
       data: { v: currentAmount },
     } = activity
     const prevAmount = currentAmount / BigInt(1e16)
-    return `${formatAmount(String(prevAmount), 5, undefined)} -> ${formatAmount(
+    return `${formatAmount(String(prevAmount), 5, sendV0Coin.formatDecimals)} -> ${formatAmount(
       formatUnits(currentAmount, data.coin.decimals),
       5,
       sendCoin.formatDecimals

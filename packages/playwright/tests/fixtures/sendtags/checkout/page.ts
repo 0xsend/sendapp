@@ -16,7 +16,7 @@ export class CheckoutPage {
     this.pricingDialog = page.getByLabel('Sendtag Pricing')
     this.pricingTooltip = page.getByTestId('SendTagPricingTooltipContent')
     this.confirmDialog = page.getByLabel('Confirming Sendtags')
-    this.submitTagButton = page.getByRole('button', { name: 'Add Tag' })
+    this.submitTagButton = page.getByRole('button', { name: 'add tag' })
   }
 
   async goto() {
@@ -56,13 +56,13 @@ export class CheckoutPage {
       },
       timeout: 10_000,
     })
-    const signTransactionButton = this.page.getByRole('button', { name: 'Complete purchase' })
+    const signTransactionButton = this.page.getByRole('button', { name: 'complete purchase' })
     expect?.(signTransactionButton).toBeEnabled({ timeout: 10_000 }) // blockchain stuff is a bit slow
     await this.page.bringToFront()
-    const errorButton = this.page.getByRole('button', { name: 'Error' })
+    const errorButton = this.page.getByRole('button', { name: 'error' })
     expect?.(errorButton).toBeHidden()
     await this.page
-      .getByRole('button', { name: 'Loading' })
+      .getByRole('button', { name: 'loading' })
       .waitFor({ state: 'detached', timeout: 10_000 })
     await signTransactionButton.click()
     await confirmTagsRequest

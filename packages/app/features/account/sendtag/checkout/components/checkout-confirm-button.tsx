@@ -36,7 +36,6 @@ import {
 } from '../checkout-utils'
 
 export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
-  const media = useMedia()
   const { updateProfile } = useUser()
   const { data: sendAccount } = useSendAccount()
   const sender = useMemo(() => sendAccount?.address, [sendAccount?.address])
@@ -312,30 +311,30 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
               return (
                 <>
                   <Spinner color="$color11" />
-                  <ConfirmButtonText>Loading...</ConfirmButtonText>
+                  <ConfirmButtonText>loading...</ConfirmButtonText>
                 </>
               )
             case !canAffordTags && (!txWaitLoading || !submitting):
-              return <ButtonText>Insufficient funds</ButtonText>
+              return <ButtonText>insufficient funds</ButtonText>
             case sendTransactionIsPending:
               return (
                 <>
                   <Spinner color="$color11" />
-                  <ConfirmButtonText>Requesting...</ConfirmButtonText>
+                  <ConfirmButtonText>requesting...</ConfirmButtonText>
                 </>
               )
             case txWaitLoading:
               return (
                 <>
                   <Spinner color="$color11" />
-                  <ConfirmButtonText>Processing...</ConfirmButtonText>
+                  <ConfirmButtonText>processing...</ConfirmButtonText>
                 </>
               )
             case submitting:
               return (
                 <>
                   <Spinner color="$color11" />
-                  <ConfirmButtonText>Registering...</ConfirmButtonText>
+                  <ConfirmButtonText>registering...</ConfirmButtonText>
                 </>
               )
             default:
@@ -383,7 +382,7 @@ const ConfirmButtonError = ({
       </Tooltip.Content>
       <Tooltip.Trigger>
         <Button theme="green" borderRadius={'$4'} p={'$4'} onPress={onPress} {...props}>
-          <ConfirmButtonText>{buttonText || 'Error'}</ConfirmButtonText>
+          <ConfirmButtonText>{buttonText || 'error'}</ConfirmButtonText>
           <ButtonIcon>
             <AlertTriangle color={'$error'} size={'$1'} />
           </ButtonIcon>

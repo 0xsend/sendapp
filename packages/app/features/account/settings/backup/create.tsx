@@ -1,6 +1,6 @@
 import { createPasskey } from '@daimo/expo-passkeys'
 import type { Tables } from '@my/supabase/database-generated.types'
-import { Button, H1, Paragraph, Shake, Spinner, SubmitButton, YStack } from '@my/ui'
+import { Button, FadeCard, H1, Paragraph, Shake, Spinner, SubmitButton, YStack } from '@my/ui'
 import {
   baseMainnetClient,
   useReadSendAccountGetActiveSigningKeys,
@@ -21,7 +21,6 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { z } from 'zod'
 import { SettingsHeader } from 'app/features/account/settings/components/SettingsHeader'
-import { Section } from 'app/components/layout/Section'
 
 const CreatePasskeySchema = z.object({
   accountName: z.string().min(1).trim().describe('Passkey name'),
@@ -133,7 +132,7 @@ const CreatePasskeyForm = ({
     : `My ${Device.modelName ?? 'Send Account'}`
 
   return (
-    <Section>
+    <FadeCard>
       <FormProvider {...form}>
         <SchemaForm
           form={form}
@@ -204,7 +203,7 @@ const CreatePasskeyForm = ({
           {(fields) => <>{Object.values(fields)}</>}
         </SchemaForm>
       </FormProvider>
-    </Section>
+    </FadeCard>
   )
 }
 

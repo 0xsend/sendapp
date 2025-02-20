@@ -1,12 +1,12 @@
 import {
   Button,
   ButtonText,
+  FadeCard,
   LinkableButton,
   Paragraph,
   Separator,
   SubmitButton,
   useMedia,
-  useToastController,
   XStack,
   YStack,
 } from '@my/ui'
@@ -23,9 +23,9 @@ import type { z } from 'zod'
 import { CheckoutTagSchema } from '../checkout/CheckoutTagSchema'
 import { SendTagPricingDialog, SendTagPricingTooltip } from '../checkout/SendTagPricingDialog'
 import { RowLabel } from 'app/components/layout/RowLabel'
-import { Section } from 'app/components/layout/Section'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { usdcCoin } from 'app/data/coins'
+import { useReleaseTag } from 'app/features/account/sendtag/checkout/checkout-utils'
 
 export const AddSendtagsForm = () => {
   const user = useUser()
@@ -34,11 +34,11 @@ export const AddSendtagsForm = () => {
   const hasPendingTags = pendingTags && pendingTags.length > 0
   const form = useForm<z.infer<typeof CheckoutTagSchema>>()
   const supabase = useSupabase()
-  const toast = useToastController()
   const has5Tags = user?.tags?.length === 5
   const media = useMedia()
   const { resolvedTheme } = useThemeSetting()
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
+  const { mutateAsync: releaseTagMutateAsync } = useReleaseTag()
 
   const isDarkTheme = resolvedTheme?.startsWith('dark')
 
@@ -73,7 +73,7 @@ export const AddSendtagsForm = () => {
           {!has5Tags && (
             <YStack gap={'$3.5'}>
               <RowLabel>{hasPendingTags ? 'Add Another Sendtag' : 'Create a New Sendtag'}</RowLabel>
-              <Section>
+              <FadeCard>
                 <SchemaForm
                   form={form}
                   onSubmit={createSendTag}
@@ -165,7 +165,7 @@ export const AddSendtagsForm = () => {
                     )
                   }}
                 </SchemaForm>
-              </Section>
+              </FadeCard>
             </YStack>
           )}
           {hasPendingTags && (
@@ -175,7 +175,7 @@ export const AddSendtagsForm = () => {
                   Sendtags [ {pendingTags?.length || 0}/
                   {maxNumSendTags - (confirmedTags?.length || 0)} ]
                 </RowLabel>
-                <Section>
+                <FadeCard>
                   <XStack jc={'space-between'}>
                     <Paragraph size={'$6'}>Name</Paragraph>
                     <Paragraph size={'$6'}>Price</Paragraph>
@@ -216,20 +216,7 @@ export const AddSendtagsForm = () => {
                               focusStyle={{ backgroundColor: 'transparent' }}
                               padding={0}
                               height={'auto'}
-                              onPress={() => {
-                                supabase
-                                  .from('tags')
-                                  .delete()
-                                  .eq('name', tag.name)
-                                  .then(({ data, error }) => {
-                                    if (error) {
-                                      throw error
-                                    }
-                                    return data
-                                  })
-                                  .then(() => toast.show('Released'))
-                                  .then(() => user?.updateProfile())
-                              }}
+                              onPress={() => releaseTagMutateAsync(tag.name)}
                             >
                               <Button.Icon>
                                 <IconX size={'$0.9'} color="$error" />
@@ -248,7 +235,7 @@ export const AddSendtagsForm = () => {
                   </YStack>
                   <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
                   <TotalPrice />
-                </Section>
+                </FadeCard>
               </YStack>
             </>
           )}

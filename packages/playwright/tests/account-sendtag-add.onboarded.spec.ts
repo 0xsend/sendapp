@@ -4,11 +4,7 @@ import { devices, mergeTests, type Page } from '@playwright/test'
 import { pricing } from 'app/data/sendtags'
 import debug from 'debug'
 import { getAuthSessionFromContext } from './fixtures/auth'
-import {
-  type AddSendtagsPage,
-  expect,
-  test as addSendtagsTest,
-} from './fixtures/sendtags/add-sendtags'
+import { type AddSendtagsPage, expect, test as addSendtagsTest } from './fixtures/sendtags/add'
 
 let log: debug.Debugger
 
@@ -22,7 +18,7 @@ const debugAuthSession = async (page: Page) => {
 const pricingText = pricing.flatMap((p) => [p.length, p.price])
 
 test.beforeEach(async ({ addSendtagsPage }) => {
-  log = debug(`test:account-sendtag-add-sendtags:logged-in:${test.info().parallelIndex}`)
+  log = debug(`test:account-sendtag-add:logged-in:${test.info().parallelIndex}`)
   log('beforeEach', `url=${addSendtagsPage.page.url()}`)
   await debugAuthSession(addSendtagsPage.page)
 })

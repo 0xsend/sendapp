@@ -1,5 +1,6 @@
 import {
   Button,
+  FadeCard,
   isWeb,
   Paragraph,
   Separator,
@@ -22,7 +23,6 @@ import { adjustUTCDateForTimezone } from 'app/utils/dateHelper'
 import { SettingsHeader } from 'app/features/account/settings/components/SettingsHeader'
 import { FieldWithLabel } from 'app/features/account/settings/components/FieldWithLabel'
 import { ReadOnlyFieldWithLabel } from 'app/features/account/settings/components/ReadOnlyFieldWithLabel'
-import { Section } from 'app/components/layout/Section'
 
 enum FormState {
   Overview = 'Overview',
@@ -108,13 +108,13 @@ export const PersonalInfoScreen = () => {
   }, [profile?.x_username, user?.phone, form.reset, birthday])
 
   const verificationCode = (
-    <Section>
+    <FadeCard>
       <VerifyCode
         type={'phone_change'}
         phone={form.getValues().phone}
         onSuccess={handleSuccessCodeVerification}
       />
-    </Section>
+    </FadeCard>
   )
 
   const personalInfoForm = (
@@ -175,7 +175,7 @@ export const PersonalInfoScreen = () => {
       )}
     >
       {({ phone, birthday, xUsername }) => (
-        <Section>
+        <FadeCard>
           <FieldWithLabel label={'Phone'} gap={'$2'}>
             {phone}
           </FieldWithLabel>
@@ -187,14 +187,14 @@ export const PersonalInfoScreen = () => {
           <FieldWithLabel label={'X Handle'} gap={'$2'}>
             {xUsername}
           </FieldWithLabel>
-        </Section>
+        </FadeCard>
       )}
     </SchemaForm>
   )
 
   const overview = (
     <YStack gap={'$5'}>
-      <Section>
+      <FadeCard>
         <ReadOnlyFieldWithLabel label={'Phone'} text={user?.phone || '-'} />
         <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
         <ReadOnlyFieldWithLabel
@@ -207,7 +207,7 @@ export const PersonalInfoScreen = () => {
           label={'X Handle'}
           text={profile?.x_username ? `@ ${profile?.x_username}` : '-'}
         />
-      </Section>
+      </FadeCard>
       <SubmitButton
         theme="green"
         borderRadius={'$4'}

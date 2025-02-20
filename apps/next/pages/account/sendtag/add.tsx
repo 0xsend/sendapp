@@ -1,4 +1,4 @@
-import { AddSendtagsScreen } from 'app/features/account/sendtag/addSendtags/AddSendtagsScreen'
+import { AddSendtagsScreen } from 'app/features/account/sendtag/add/AddSendtagsScreen'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from '../../_app'

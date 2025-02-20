@@ -10,6 +10,7 @@ import {
   useToastController,
   XStack,
   YStack,
+  FadeCard,
 } from '@my/ui'
 import {
   baseMainnetClient,
@@ -40,7 +41,6 @@ import { useBalance, useEstimateFeesPerGas } from 'wagmi'
 import { z } from 'zod'
 import { SettingsHeader } from 'app/features/account/settings/components/SettingsHeader'
 import { useThemeSetting } from '@tamagui/next-theme'
-import { Section } from 'app/components/layout/Section'
 
 export const BackupScreen = () => {
   const { data: sendAcct, error, isLoading } = useSendAccount()
@@ -200,7 +200,7 @@ const WebAuthnCred = ({
   })
 
   return (
-    <Section>
+    <FadeCard>
       <XStack jc="space-between" ai="center">
         <Paragraph size={'$5'} color={cardStatus === 'remove' ? '$error' : '$color12'}>
           {cardStatus === 'remove' ? 'Remove Passkey?' : cred.display_name}
@@ -322,7 +322,7 @@ const WebAuthnCred = ({
             )
         }
       })()}
-    </Section>
+    </FadeCard>
   )
 }
 

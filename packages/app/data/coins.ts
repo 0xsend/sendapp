@@ -50,6 +50,7 @@ export const sendV0Coin = {
   token: sendTokenV0Address[baseMainnet.id],
   decimals: 0,
   coingeckoTokenId: 'send-token',
+  formatDecimals: 0,
 } as const satisfies coin
 
 export const spx6900Coin = {

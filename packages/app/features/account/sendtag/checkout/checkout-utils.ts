@@ -21,6 +21,8 @@ import { useUser } from 'app/utils/useUser'
 import { useMemo } from 'react'
 import { encodeFunctionData, erc20Abi, zeroAddress } from 'viem'
 import { fetchSendtagCheckoutReceipts } from './checkout-utils.fetchSendtagCheckoutReceipts'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useToastController } from '@my/ui'
 
 export const verifyAddressMsg = (a: string | `0x${string}`) =>
   `I am the owner of the address: ${a}.
@@ -158,6 +160,29 @@ function sendtagCheckoutReceiptsQueryOptions(supabase: SupabaseClient<Database>)
 export function useSendtagCheckoutReceipts() {
   const supabase = useSupabase()
   return useQuery(sendtagCheckoutReceiptsQueryOptions(supabase))
+}
+
+export const useReleaseTag = () => {
+  const supabase = useSupabase()
+  const queryClient = useQueryClient()
+  const toast = useToastController()
+
+  return useMutation({
+    mutationFn: async (tagName: string) => {
+      const { error } = await supabase.from('tags').delete().eq('name', tagName)
+
+      if (error) {
+        throw error
+      }
+    },
+    onSuccess: async () => {
+      toast.show('Released')
+      await queryClient.invalidateQueries({ queryKey: ['tags'] })
+    },
+    onError: (error) => {
+      toast.show(`Error: ${error.message}`)
+    },
+  })
 }
 
 export function useSendtagCheckout() {

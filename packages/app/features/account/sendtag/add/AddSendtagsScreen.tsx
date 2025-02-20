@@ -1,7 +1,7 @@
 import { useConfirmedTags } from 'app/utils/tags'
 import { useEffect } from 'react'
 import { useRouter } from 'solito/router'
-import { AddSendtagsForm } from 'app/features/account/sendtag/addSendtags/AddSendtagsForm'
+import { AddSendtagsForm } from 'app/features/account/sendtag/add/AddSendtagsForm'
 import { YStack } from '@my/ui'
 
 export const AddSendtagsScreen = () => {

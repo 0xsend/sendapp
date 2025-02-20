@@ -1,6 +1,7 @@
 import {
   Button,
   Checkbox,
+  FadeCard,
   Paragraph,
   ProfileAvatar,
   Separator,
@@ -21,7 +22,6 @@ import { ReadOnlyFieldWithLabel } from 'app/features/account/settings/components
 import { FieldWithLabel } from 'app/features/account/settings/components/FieldWithLabel'
 import { useForm } from 'react-hook-form'
 import type { z } from 'zod'
-import { Section } from 'app/components/layout/Section'
 
 enum FormState {
   Overview = 'Overview',
@@ -64,7 +64,7 @@ const Overview = ({ profile, onPress }: { profile: Tables<'profiles'>; onPress: 
 
   return (
     <YStack gap={'$5'}>
-      <Section>
+      <FadeCard>
         <XStack gap={'$5'} width={'100%'}>
           <UploadAvatar ref={avatarRef}>
             <ProfileAvatar
@@ -118,7 +118,7 @@ const Overview = ({ profile, onPress }: { profile: Tables<'profiles'>; onPress: 
           </Checkbox>
           <Paragraph size={'$5'}>{`${is_public ? 'Public' : 'Private'}`} Profile</Paragraph>
         </XStack>
-      </Section>
+      </FadeCard>
       <SubmitButton theme="green" borderRadius={'$4'} p={'$4'} onPress={onPress}>
         <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
           edit profile
@@ -195,7 +195,7 @@ function EditProfileForm({ profile, onSave }: { profile: Tables<'profiles'>; onS
       )}
     >
       {({ name, about, isPublic }) => (
-        <Section>
+        <FadeCard>
           <FieldWithLabel label={'Name'} gap={'$2'}>
             {name}
           </FieldWithLabel>
@@ -208,7 +208,7 @@ function EditProfileForm({ profile, onSave }: { profile: Tables<'profiles'>; onS
             {isPublic}
             <Paragraph size={'$5'}>Make Profile Public</Paragraph>
           </XStack>
-        </Section>
+        </FadeCard>
       )}
     </SchemaForm>
   )

@@ -49,12 +49,7 @@ function AddNewTagButton({ tags }: { tags?: Tables<'tags'>[] }) {
   }
 
   return (
-    <LinkableButton
-      theme="green"
-      borderRadius={'$4'}
-      p={'$4'}
-      href={'/account/sendtag/add-sendtags'}
-    >
+    <LinkableButton theme="green" borderRadius={'$4'} p={'$4'} href={'/account/sendtag/add'}>
       <LinkableButton.Icon>
         <IconPlus size={'$1'} color={'$black'} />
       </LinkableButton.Icon>
