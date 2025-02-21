@@ -42,6 +42,7 @@ import { useRouter } from 'solito/router'
 import { formatUnits, withRetry } from 'viem'
 import { useChainId } from 'wagmi'
 import { z } from 'zod'
+import { useSendEarnAPY } from '../hooks'
 import { useSendEarnDepositUserOp } from './hooks'
 
 const log = debug('app:earn:deposit')
@@ -80,6 +81,10 @@ export const DepositForm = () => {
   // QUERY DEPOSIT USEROP
   const chainId = useChainId()
   const asset = usdcAddress[chainId]
+  /**
+   * The vault we are depositing into.
+   * TODO: lookup the correct vault based on referral
+   */
   const vault = sendEarnAddress[chainId]
   const uop = useSendEarnDepositUserOp({ asset, amount: parsedAmount, vault })
   const sendAccount = useSendAccount()
@@ -222,6 +227,17 @@ export const DepositForm = () => {
 
     return () => subscription.unsubscribe()
   }, [form.watch, setEarnParams, earnParams, coin?.decimals, form.clearErrors, form.setError])
+
+  const baseApy = useSendEarnAPY({
+    vault,
+  })
+
+  const monthlyEarning = useMemo(() => {
+    if (!baseApy.data) return
+    if (!coin?.decimals) return
+    const decimalAmount = Number(formatUnits(parsedAmount, coin?.decimals))
+    return formatAmount((Number(decimalAmount ?? 0) * (baseApy.data.baseApy / 100)) / 12)
+  }, [baseApy.data, parsedAmount, coin?.decimals])
 
   if (isLoadingCoins || !coin || (!coin.balance && coin.balance !== BigInt(0))) {
     return <Spinner size="large" color={'$color12'} />
@@ -426,12 +442,41 @@ export const DepositForm = () => {
                   </XStack>
                 </YStack>
               </Fade>
-              {parsedAmount > 0 ? (
+              {(() => {
+                switch (true) {
+                  case baseApy.isLoading:
+                    return <Spinner size="small" color={'$color12'} />
+                  case baseApy.isError:
+                    return <Paragraph color="$error">{toNiceError(baseApy.error)}</Paragraph>
+                  case baseApy.isSuccess:
+                    return (
+                      <CalculatedBenefits
+                        apy={formatAmount(baseApy.data.baseApy, undefined, 2)}
+                        monthlyEarning={monthlyEarning ?? ''}
+                        rewards={''}
+                        // overrideApy="11"
+                        // overrideMonthlyEarning="12"
+                        // overrideRewards="4,000"
+                      />
+                    )
+                  default:
+                    return <StaticBenefits />
+                }
+              })()}
+              {/*
+              {baseApy.data ? (
                 // TODO calculate real values
-                <CalculatedBenefits apy={'10'} monthlyEarning={'10'} rewards={'3,000'} />
+                <CalculatedBenefits
+                  apy={formatAmount(baseApy.data.baseApy, undefined, 2)}
+                  monthlyEarning={monthlyEarning ?? ''}
+                  rewards={''}
+                  // overrideApy="11"
+                  // overrideMonthlyEarning="12"
+                  // overrideRewards="4,000"
+                />
               ) : (
-                <StaticBenefits />
-              )}
+
+              )} */}
               <XStack gap={'$3'} ai={'center'}>
                 {areTermsAccepted}
                 {form.formState.errors.areTermsAccepted ? (
