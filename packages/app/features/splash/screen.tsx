@@ -30,6 +30,7 @@ import { bytesToHex, hexToBytes } from 'viem'
 import { useAuthScreenParams } from 'app/routers/params'
 import { useQuery } from '@tanstack/react-query'
 import { assert } from 'app/utils/assert'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 export function SplashScreen() {
   return (
@@ -114,6 +115,7 @@ function Hero() {
   const carouselImage = carouselImages[carouselProgress]
   const mobileImagePosition = carouselImagePositions[carouselProgress]
   const isPwa = usePwa()
+  const { bottom, top } = useSafeAreaInsets()
 
   const containerHeight = (() => {
     switch (true) {
@@ -134,9 +136,11 @@ function Hero() {
       position="relative"
       f={1}
     >
-      <SafeArea
+      <YStack
         f={1}
         h={isPwa ? '100vh' : 'unset'}
+        pt={Math.max(top, 24)}
+        pb={Math.max(bottom, 16)}
         overflow="hidden"
         $gtMd={{ borderRadius: '$8' }}
         w="100%"
@@ -239,7 +243,7 @@ function Hero() {
             <AuthButtons />
           </YStack>
         </YStack>
-      </SafeArea>
+      </YStack>
     </XStack>
   )
 }

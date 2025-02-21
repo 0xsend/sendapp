@@ -57,6 +57,7 @@
     "qrcode": "^1.5.3",
     "react-hook-form": "^7.48.2",
     "react-native": "0.74.1",
+    "react-native-safe-area-context": "4.8.2",
     "react-native-svg": "15.2.0",
     "react-use-precision-timer": "^3.5.5",
     "solito": "^4.0.1",

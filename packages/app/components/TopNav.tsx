@@ -129,10 +129,12 @@ export function TopNav({
   return (
     <Header w="100%" $lg={{ py: '$3' }}>
       <Container
+        safeAreaProps={{
+          edges: ['top', 'left', 'right'],
+        }}
         $gtLg={{ jc: 'flex-start', pb: '$2', ai: 'flex-start' }}
         ai="center"
         jc="space-between"
-        safeArea={'t'}
       >
         {(() => {
           switch (true) {
@@ -220,7 +222,7 @@ export function TopNav({
         })()}
       </Container>
       {subheader && (
-        <Container fd="column">
+        <Container fd="column" safeAreaProps={{ edges: ['left', 'right'] }}>
           <Paragraph
             fontWeight={'400'}
             fontSize={'$5'}

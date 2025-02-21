@@ -39,6 +39,25 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
     currentUserId: currentUserProfile?.send_id,
   })
   const { pages } = data ?? {}
+  const activities = pages?.flat() || []
+
+  if (isLoading) {
+    return (
+      <Stack w="100%" h="100%" jc={'center'} ai={'center'} f={1} gap="$6">
+        <Spinner size="large" color="$primary" />
+      </Stack>
+    )
+  }
+
+  if (error) {
+    return (
+      <Stack w="100%" h="100%" jc={'center'} ai={'center'} f={1} gap="$6">
+        <Text theme="red" color={'$color8'}>
+          {error.message}
+        </Text>
+      </Stack>
+    )
+  }
 
   return (
     <XStack w={'100%'} gap={'$4'} height={'100%'}>
@@ -53,108 +72,87 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
           maxWidth: '50%',
         }}
       >
-        {otherUserProfile && <ProfileHeader profile={otherUserProfile} />}
-        {error && (
-          <Text theme="red" color={'$color8'}>
-            {error.message}
-          </Text>
+        {activitiesError !== null && (
+          <YStack f={1}>
+            <Paragraph
+              maxWidth={'600'}
+              fontFamily={'$mono'}
+              fontSize={'$5'}
+              theme={'red'}
+              color={'$color8'}
+              mt={'$4'}
+              ta={'center'}
+            >
+              {activitiesError?.message.split('.').at(0) ?? `${activitiesError}`}
+            </Paragraph>
+          </YStack>
         )}
-        {isLoading && (
-          <Stack w="100%" h="100%" jc={'center'} ai={'center'} f={1} gap="$6">
-            <Spinner size="large" color="$primary" />
-          </Stack>
-        )}
-        {otherUserProfile ? (
+
+        {Boolean(otherUserProfile) && (
           <>
-            {(() => {
-              switch (true) {
-                case isLoadingActivities:
-                  return (
-                    <YStack f={1}>
-                      <Spinner size="small" color={'$primary'} mt={'$8'} />
-                    </YStack>
-                  )
-                case activitiesError !== null:
-                  return (
-                    <YStack f={1}>
-                      <Paragraph
-                        maxWidth={'600'}
-                        fontFamily={'$mono'}
-                        fontSize={'$5'}
-                        theme={'red'}
-                        color={'$color8'}
-                        mt={'$4'}
-                        ta={'center'}
-                      >
-                        {activitiesError?.message.split('.').at(0) ?? `${activitiesError}`}
-                      </Paragraph>
-                    </YStack>
-                  )
-                case pages?.length === 0 || (pages && pages[0]?.length === 0):
-                  return (
-                    <YStack f={1}>
-                      <Paragraph
-                        size={'$8'}
-                        fontWeight={'300'}
-                        color={'$color10'}
-                        textAlign={'center'}
-                        mt={'$size.1.5'}
-                      >
-                        No Activities
-                      </Paragraph>
-                    </YStack>
-                  )
-                default: {
-                  const activities = pages?.flat() || []
+            <ProfileHeader profile={otherUserProfile} />
+            <Stack pb={'$4'} f={1}>
+              {Boolean(!activities?.length) && (
+                <YStack f={1}>
+                  <Paragraph
+                    size={'$8'}
+                    fontWeight={'300'}
+                    color={'$color10'}
+                    textAlign={'center'}
+                    pt={'$size.1.5'}
+                  >
+                    No Activities
+                  </Paragraph>
+                </YStack>
+              )}
+              <FlatList
+                style={{ flex: 1 }}
+                data={activities}
+                keyExtractor={(activity) =>
+                  `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`
+                }
+                renderItem={({ item: activity, index }) => {
+                  const date = activity.created_at.toLocaleDateString()
+                  const nextDate = activities[index + 1]?.created_at.toLocaleDateString()
+                  const shouldShowDatePill = !nextDate || date !== nextDate
 
                   return (
-                    <FlatList
-                      data={activities}
-                      keyExtractor={(activity) =>
-                        `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`
-                      }
-                      renderItem={({ item: activity, index }) => {
-                        const date = activity.created_at.toLocaleDateString()
-                        const nextDate = activities[index + 1]?.created_at.toLocaleDateString()
-                        const shouldShowDatePill = !nextDate || date !== nextDate
-
-                        return (
-                          <>
-                            <Fade>
-                              <TransactionEntry
-                                activity={activity}
-                                sent={activity?.to_user?.id !== user?.id}
-                                otherUserProfile={otherUserProfile}
-                                currentUserProfile={currentUserProfile}
-                              />
-                            </Fade>
-                            {shouldShowDatePill ? <DatePill date={date} /> : null}
-                          </>
-                        )
-                      }}
-                      onEndReached={fetchNextPage}
-                      ListFooterComponent={
-                        !isLoadingActivities && isFetchingNextPageActivities ? (
-                          <Spinner size="small" color={'$primary'} my={'$4'} />
-                        ) : null
-                      }
-                      inverted={true}
-                      showsVerticalScrollIndicator={false}
+                    <>
+                      <Fade>
+                        <TransactionEntry
+                          activity={activity}
+                          sent={activity?.to_user?.id !== user?.id}
+                          otherUserProfile={otherUserProfile}
+                          currentUserProfile={currentUserProfile}
+                        />
+                      </Fade>
+                      {shouldShowDatePill ? <DatePill date={date} /> : null}
+                    </>
+                  )
+                }}
+                onEndReached={fetchNextPage}
+                ListEmptyComponent={
+                  !isLoadingActivities &&
+                  isFetchingNextPageActivities && (
+                    <Spinner size="small" color={'$color12'} my={'$4'} />
+                  )
+                }
+                ListHeaderComponent={
+                  Boolean(otherUserProfile) &&
+                  user?.id !== otherUserProfile?.id && (
+                    <SendButton
+                      identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
+                      idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
                     />
                   )
                 }
-              }
-            })()}
+                inverted={true}
+                showsVerticalScrollIndicator={false}
+                stickyHeaderIndices={[0]}
+              />
+            </Stack>
           </>
-        ) : null}
-        {Boolean(otherUserProfile) && user?.id !== otherUserProfile?.id ? (
-          <XStack gap="$size.1.5" ai={'center'} mb={'$4'}>
-            <SendButton
-              identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
-              idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
-            />
-          </XStack>
-        ) : null}
+        )}
       </YStack>
       <ProfilesDetailsModal />
     </XStack>
