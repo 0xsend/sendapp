@@ -29,6 +29,7 @@ import { type PropsWithChildren, useCallback, useEffect, useMemo, useState } fro
 import { isAddressEqual, zeroAddress } from 'viem'
 import { useBalance, useWaitForTransactionReceipt } from 'wagmi'
 import {
+  useReferralCode,
   useReferralReward,
   useReferrer,
   useSendtagCheckout,
@@ -43,8 +44,9 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
   const chainId = baseMainnetClient.chain.id
   const pendingTags = usePendingTags() ?? []
   const amountDue = useMemo(() => total(pendingTags ?? []), [pendingTags])
-  const { data: referrerProfile } = useReferrer()
+  const { data: referrerProfile, isLoading: isLoadingReferrer } = useReferrer()
   const { data: rewardDue } = useReferralReward({ tags: pendingTags })
+  const { data: referralCode } = useReferralCode()
 
   const webauthnCreds =
     sendAccount?.send_account_credentials
@@ -283,7 +285,9 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
     !submitting &&
     !txWaitLoading &&
     !usdcFeesError &&
-    !isLoadingUSDCFees
+    !isLoadingUSDCFees &&
+    !isLoadingReferrer &&
+    (referrerProfile || !referralCode)
 
   return (
     <ConfirmButtonStack w={'100%'} gap="$2">

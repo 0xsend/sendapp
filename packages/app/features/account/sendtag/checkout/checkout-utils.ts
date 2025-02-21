@@ -6,7 +6,7 @@ import {
   usdcAddress,
 } from '@my/wagmi'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { queryOptions, useQuery } from '@tanstack/react-query'
+import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { reward, total } from 'app/data/sendtags'
 import { api } from 'app/utils/api'
 import { assert } from 'app/utils/assert'
@@ -21,8 +21,6 @@ import { useUser } from 'app/utils/useUser'
 import { useMemo } from 'react'
 import { encodeFunctionData, erc20Abi, zeroAddress } from 'viem'
 import { fetchSendtagCheckoutReceipts } from './checkout-utils.fetchSendtagCheckoutReceipts'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useToastController } from '@my/ui'
 
 export const verifyAddressMsg = (a: string | `0x${string}`) =>
   `I am the owner of the address: ${a}.
@@ -165,7 +163,6 @@ export function useSendtagCheckoutReceipts() {
 export const useReleaseTag = () => {
   const supabase = useSupabase()
   const queryClient = useQueryClient()
-  const toast = useToastController()
 
   return useMutation({
     mutationFn: async (tagName: string) => {
@@ -176,11 +173,7 @@ export const useReleaseTag = () => {
       }
     },
     onSuccess: async () => {
-      toast.show('Released')
       await queryClient.invalidateQueries({ queryKey: ['tags'] })
-    },
-    onError: (error) => {
-      toast.show(`Error: ${error.message}`)
     },
   })
 }
