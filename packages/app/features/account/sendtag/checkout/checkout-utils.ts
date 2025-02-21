@@ -6,7 +6,7 @@ import {
   usdcAddress,
 } from '@my/wagmi'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { queryOptions, useQuery } from '@tanstack/react-query'
+import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { reward, total } from 'app/data/sendtags'
 import { api } from 'app/utils/api'
 import { assert } from 'app/utils/assert'
@@ -158,6 +158,24 @@ function sendtagCheckoutReceiptsQueryOptions(supabase: SupabaseClient<Database>)
 export function useSendtagCheckoutReceipts() {
   const supabase = useSupabase()
   return useQuery(sendtagCheckoutReceiptsQueryOptions(supabase))
+}
+
+export const useReleaseTag = () => {
+  const supabase = useSupabase()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (tagName: string) => {
+      const { error } = await supabase.from('tags').delete().eq('name', tagName)
+
+      if (error) {
+        throw error
+      }
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['tags'] })
+    },
+  })
 }
 
 export function useSendtagCheckout() {

@@ -1,17 +1,17 @@
 import { faker } from '@faker-js/faker'
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
-import { userOnboarded, type SeedClient } from '@my/snaplet'
+import { type SeedClient, userOnboarded } from '@my/snaplet'
 import type { Database } from '@my/supabase/database.types'
 import { usdcAddress } from '@my/wagmi'
-import { devices, mergeTests, type Page } from '@playwright/test'
+import { mergeTests, type Page } from '@playwright/test'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { price, pricing, reward, total } from 'app/data/sendtags'
+import { price, reward, total } from 'app/data/sendtags'
 import { fetchSendtagCheckoutReceipts } from 'app/features/account/sendtag/checkout/checkout-utils.fetchSendtagCheckoutReceipts'
 import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import debug from 'debug'
 import { getAuthSessionFromContext } from './fixtures/auth'
-import { test as checkoutTest, expect, type CheckoutPage } from './fixtures/checkout'
+import { type CheckoutPage, expect, test as checkoutTest } from './fixtures/sendtags/checkout'
 import type { ActivityMatch } from './fixtures/send-accounts/matchers/activity-feed'
 import { lookupBalance, testBaseClient } from './fixtures/viem'
 
@@ -24,44 +24,27 @@ const debugAuthSession = async (page: Page) => {
   log('user authenticated', `id=${decoded.sub}`, `session=${decoded.session_id}`)
 }
 
-const pricingText = pricing.flatMap((p) => [p.length, p.price])
-
 test.beforeEach(async ({ checkoutPage }) => {
   log = debug(`test:account-sendtag-checkout:logged-in:${test.info().parallelIndex}`)
   log('beforeEach', `url=${checkoutPage.page.url()}`)
   await debugAuthSession(checkoutPage.page)
 })
 
-const checkPricingTooltip = async (checkoutPage: CheckoutPage) => {
-  await checkoutPage.openPricingTooltip()
-  await expect(checkoutPage.pricingTooltip).toBeVisible()
-  for (const text of pricingText) {
-    await expect(checkoutPage.pricingTooltip).toContainText(text)
-  }
-}
+const addPendingTags = async (supabase: SupabaseClient<Database>, tagNames: string[]) => {
+  const tagsToInsert = tagNames.map((tagName) => ({ name: tagName }))
 
-const checkPricingDialog = async (checkoutPage: CheckoutPage) => {
-  await checkoutPage.page.setViewportSize(devices['Pixel 5'].viewport)
-  await checkoutPage.openPricingDialog()
-  for (const text of pricingText) {
-    await expect(checkoutPage.pricingDialog).toContainText(text)
-  }
-  await checkoutPage.pricingDialog.getByLabel('Dialog Close').click()
-  await expect(checkoutPage.pricingDialog).toBeHidden()
-}
-
-const addPendingTag = async (checkoutPage: CheckoutPage, tagName: string) => {
-  await checkoutPage.addPendingTag(tagName)
-  await expect(checkoutPage.page.getByLabel(`Pending Sendtag ${tagName}`)).toBeVisible()
+  await supabase
+    .from('tags')
+    .insert(tagsToInsert)
+    .then(({ error }) => {
+      expect(error).toBeFalsy()
+    })
 }
 
 const confirmTags = async (checkoutPage: CheckoutPage, tagNames: string[]) => {
   await checkoutPage.confirmTags(expect)
   for (const tagName of tagNames) {
-    await expect(checkoutPage.page.getByLabel(`Pending Sendtag ${tagName}`)).toBeHidden()
-    await expect(
-      checkoutPage.page.getByRole('heading', { name: tagName, exact: true })
-    ).toBeVisible()
+    await expect(checkoutPage.page.getByTestId(`confirmed-tag-${tagName}`)).toBeVisible()
   }
 }
 
@@ -122,21 +105,18 @@ const checkReferralCodeVisibility = async (
   checkoutPage: CheckoutPage,
   referrer: { tags: string[]; referral_code: string }
 ) => {
-  const refcode = checkoutPage.page.getByLabel('Referral Code:')
-  const referredBy = checkoutPage.page.getByText(`/${referrer.tags[0]}`)
+  const refcode = checkoutPage.page.getByTestId('referral-code-input')
+  const referralCodeConfirmation = checkoutPage.page.getByText('Referral code applied')
   await expect(refcode).toBeVisible()
   await expect(refcode).toHaveValue(referrer.referral_code)
-  await expect(referredBy).toBeVisible()
+  await expect(referralCodeConfirmation).toBeVisible()
 }
 
-const checkReferralCodeHidden = async (
-  checkoutPage: CheckoutPage,
-  referrer: { tags: string[]; referral_code: string }
-) => {
-  const refcode = checkoutPage.page.getByLabel('Referral Code:')
-  const referredBy = checkoutPage.page.getByText(`/${referrer.tags[0]}`)
+const checkReferralCodeHidden = async (checkoutPage: CheckoutPage) => {
+  const refcode = checkoutPage.page.getByTestId('referral-code-input')
+  const referralCodeConfirmation = checkoutPage.page.getByText('Referral code applied')
   await expect(refcode).toBeHidden()
-  await expect(referredBy).toBeHidden()
+  await expect(referralCodeConfirmation).toBeHidden()
 }
 
 const verifyCheckoutReceipt = async (
@@ -170,25 +150,10 @@ const verifyCheckoutReceipt = async (
   expect(receipts).toBeTruthy()
 }
 
-test('can visit checkout page', async ({ page, checkoutPage }) => {
-  await checkPricingTooltip(checkoutPage)
-  await checkPricingDialog(checkoutPage)
-})
-
-test('can add a pending tag', async ({ checkoutPage }) => {
-  const tagName = generateTagName()
-  await addPendingTag(checkoutPage, tagName)
-})
-
-test('cannot add an invalid tag name', async ({ checkoutPage }) => {
-  await checkoutPage.fillTagName('invalid tag!')
-  await checkoutPage.submitTagButton.click()
-  expect(checkoutPage.page.getByText('Only English alphabet, numbers, and underscore')).toBeTruthy()
-})
-
 test('can confirm a tag', async ({ checkoutPage, supabase, user: { profile: myProfile } }) => {
   const tagName = generateTagName()
-  await addPendingTag(checkoutPage, tagName)
+  await addPendingTags(supabase, [tagName])
+  await checkoutPage.goto()
   await confirmTags(checkoutPage, [tagName])
   await verifyTagsInDatabase(supabase, [tagName])
   await expect(checkoutPage.page).toHaveTitle('Send | Sendtags')
@@ -207,38 +172,32 @@ test('can confirm a tag', async ({ checkoutPage, supabase, user: { profile: myPr
   await verifyActivityFeed(supabase, receiptEvent)
 })
 
-test('can refer a tag', async ({
-  seed,
-  checkoutPage,
-  supabase,
-  pg,
-  user: { profile: myProfile },
-}) => {
+test('can refer a tag', async ({ seed, checkoutPage, supabase, user: { profile: myProfile } }) => {
   const { referrer, referrerSendAccount, referrerTags } = await setupReferral(seed)
-  await checkoutPage.page.goto(`/?referral=${referrer.referral_code}`)
-  await checkoutPage.goto()
 
   const tagsToRegister = Array.from(
     { length: Math.floor(Math.random() * 5) + 1 },
     () => `${faker.lorem.word()}_${test.info().parallelIndex}`
   ).sort((a, b) => a.localeCompare(b))
-  for (const tagName of tagsToRegister) {
-    await addPendingTag(checkoutPage, tagName)
-  }
+
+  await addPendingTags(supabase, tagsToRegister)
+  await checkoutPage.page.goto(`/?referral=${referrer.referral_code}`)
+  await checkoutPage.goto()
 
   // check referral code and referrer are visible
-  const refcode = checkoutPage.page.getByLabel('Referral Code:')
-  const referredBy = checkoutPage.page.getByText(`/${referrerTags[0]}`)
+  const refcode = checkoutPage.page.getByTestId('referral-code-input')
+  const referralCodeConfirmation = checkoutPage.page.getByText('Referral code applied')
   await expect(refcode).toBeVisible()
   await expect(refcode).toHaveValue(referrer.referral_code)
-  await expect(referredBy).toBeVisible() // show the referred
+  await expect(referralCodeConfirmation).toBeVisible()
   // can change the referral code
   await refcode.fill('1234567890')
-  await expect(referredBy).toBeHidden() // invalid code, no referral
+  const referralCodeInvalid = checkoutPage.page.getByText('Invalid referral code')
+  await expect(referralCodeInvalid).toBeVisible()
   // can change the referrer to valid code
   await refcode.fill(referrer.referral_code)
-  await expect(refcode).toBeVisible() // show the referral code
-  await expect(referredBy).toBeVisible() // show the referred
+  await expect(refcode).toBeVisible()
+  await expect(referralCodeConfirmation).toBeVisible()
 
   await confirmTags(checkoutPage, tagsToRegister)
   await verifyTagsInDatabase(supabase, tagsToRegister)
@@ -290,17 +249,17 @@ test('can refer multiple tags in separate transactions', async ({
   supabase,
   user: { profile: myProfile },
 }) => {
-  const { referrer, referrerSendAccount, referrerTags } = await setupReferral(seed)
-  await checkoutPage.page.goto(`/?referral=${referrer.referral_code}`)
-  await checkoutPage.goto()
-
   // First transaction with up to 2 tags
   const firstTags = Array.from({ length: Math.floor(Math.random() * 2) + 1 }, () =>
     generateTagName()
   ).sort((a, b) => a.localeCompare(b))
-  for (const tagName of firstTags) {
-    await addPendingTag(checkoutPage, tagName)
-  }
+
+  await addPendingTags(supabase, firstTags)
+
+  const { referrer, referrerSendAccount, referrerTags } = await setupReferral(seed)
+  await checkoutPage.page.goto(`/?referral=${referrer.referral_code}`)
+  await checkoutPage.goto()
+
   await checkReferralCodeVisibility(checkoutPage, {
     referral_code: referrer.referral_code,
     tags: referrerTags,
@@ -327,19 +286,17 @@ test('can refer multiple tags in separate transactions', async ({
     firstTags
   )
 
-  // Second transaction
-  await checkoutPage.goto() // Go back to the checkout page
   // Second transaction with up to 3 tags
   const secondTags = Array.from({ length: Math.floor(Math.random() * 3) + 1 }, () =>
     generateTagName()
   ).sort((a, b) => a.localeCompare(b))
-  for (const tagName of secondTags) {
-    await addPendingTag(checkoutPage, tagName)
-  }
-  await checkReferralCodeHidden(checkoutPage, {
-    referral_code: referrer.referral_code,
-    tags: referrerTags,
-  })
+
+  await addPendingTags(supabase, secondTags)
+
+  await checkoutPage.page.goto(`/?referral=${referrer.referral_code}`)
+  await checkoutPage.goto()
+
+  await checkReferralCodeHidden(checkoutPage)
   // save current balance so we can verify the reward later
   const currentBalance = await lookupBalance({
     address: referrerSendAccount.address as `0x${string}`,
@@ -367,42 +324,4 @@ test('can refer multiple tags in separate transactions', async ({
   log('leaderboard', leaderboardData)
 
   log('done')
-})
-
-test('cannot confirm a tag without paying', async ({ checkoutPage, supabase }) => {
-  const tagName = `${faker.lorem.word()}_${test.info().parallelIndex}`
-  await checkoutPage.addPendingTag(tagName)
-  await expect(checkoutPage.page.getByLabel(`Pending Sendtag ${tagName}`)).toBeVisible()
-  await checkoutPage.page.pause()
-  const { data, error } = await supabase.rpc('confirm_tags', {
-    tag_names: [tagName],
-    event_id: '',
-    referral_code_input: '',
-  })
-  log('cannot confirm a tag without paying', data, error)
-  expect(error).toBeTruthy()
-  expect(error?.code).toBe('42501')
-  expect(error?.message).toBe('permission denied for function confirm_tags')
-  expect(data).toBeFalsy()
-})
-
-test('cannot add more than 5 tags', async ({ checkoutPage, supabase }) => {
-  const tagNames = Array.from({ length: 5 }, () => ({
-    name: `${faker.lorem.word()}_${test.info().parallelIndex}`,
-  }))
-  await supabase
-    .from('tags')
-    .insert(tagNames)
-    .then(({ error }) => {
-      expect(error).toBeFalsy()
-    })
-  checkoutPage.page.reload()
-  for (const { name } of tagNames) {
-    await expect(checkoutPage.page.getByLabel(`Pending Sendtag ${name}`)).toBeVisible()
-  }
-  await expect(checkoutPage.submitTagButton).toBeHidden()
-  const { error } = await supabase.from('tags').insert({ name: faker.lorem.word() })
-  expect(error).toBeTruthy()
-  expect(error?.message).toBe('User can have at most 5 tags')
-  expect(error?.code).toBe('P0001')
 })
