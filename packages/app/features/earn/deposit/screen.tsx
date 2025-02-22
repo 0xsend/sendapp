@@ -23,6 +23,7 @@ import {
 } from '@my/wagmi'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
+import { usdcCoin } from 'app/data/coins'
 import { CalculatedBenefits } from 'app/features/earn/components/CalculatedBenefits'
 import { EarnTerms } from 'app/features/earn/components/EarnTerms'
 import { Row } from 'app/features/earn/components/Row'
@@ -46,7 +47,7 @@ import { useSendEarnAPY } from '../hooks'
 import { useSendEarnDepositUserOp } from './hooks'
 
 const log = debug('app:earn:deposit')
-const MINIMUM_DEPOSIT = BigInt(50 * 1e6) // 50 USDC
+const MINIMUM_DEPOSIT = BigInt(10 * 1e6) // 10 USDC
 
 const DepositFormSchema = z.object({
   amount: formFields.text,
@@ -62,6 +63,7 @@ export const DepositForm = () => {
   const form = useForm<DepositFormSchema>()
   const router = useRouter()
   const { tokensQuery } = useSendAccountBalances()
+  // TODO: use dynamic asset
   const { coin, isLoading: isUSDCLoading } = useCoin('USDC')
   const { isLoading: isLoadingCoins } = useCoins()
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
@@ -70,13 +72,6 @@ export const DepositForm = () => {
   const parsedAmount = BigInt(earnParams.amount ?? '0')
   const formAmount = form.watch('amount')
   const areTermsAccepted = form.watch('areTermsAccepted')
-
-  // RESET FORM ERRORS
-  useEffect(() => {
-    if (areTermsAccepted && form.formState.errors.areTermsAccepted) {
-      form.clearErrors('areTermsAccepted')
-    }
-  }, [form.clearErrors, areTermsAccepted, form.formState.errors.areTermsAccepted])
 
   // QUERY DEPOSIT USEROP
   const chainId = useChainId()
@@ -205,21 +200,20 @@ export const DepositForm = () => {
     const subscription = form.watch(({ amount: _amount }) => {
       if (!coin?.decimals) return
       const sanitizedAmount = sanitizeAmount(_amount, coin?.decimals)
-      if (!sanitizedAmount) return
 
-      if (sanitizedAmount < MINIMUM_DEPOSIT) {
+      if (sanitizedAmount !== null && sanitizedAmount < MINIMUM_DEPOSIT) {
         form.setError('amount', {
           type: 'required',
           message: `Minimum deposit is ${formatUnits(MINIMUM_DEPOSIT, coin?.decimals)} USDC`,
         })
-        return
+      } else {
+        form.clearErrors('amount')
       }
 
-      form.clearErrors('amount')
       setEarnParams(
         {
           ...earnParams,
-          amount: sanitizedAmount.toString(),
+          amount: sanitizedAmount ? sanitizedAmount.toString() : undefined,
         },
         { webBehavior: 'replace' }
       )
@@ -227,6 +221,13 @@ export const DepositForm = () => {
 
     return () => subscription.unsubscribe()
   }, [form.watch, setEarnParams, earnParams, coin?.decimals, form.clearErrors, form.setError])
+
+  // RESET FORM ERRORS
+  useEffect(() => {
+    if (areTermsAccepted && form.formState.errors.areTermsAccepted) {
+      form.clearErrors('areTermsAccepted')
+    }
+  }, [form.clearErrors, areTermsAccepted, form.formState.errors.areTermsAccepted])
 
   const baseApy = useSendEarnAPY({
     vault,
@@ -448,7 +449,7 @@ export const DepositForm = () => {
                     return <Spinner size="small" color={'$color12'} />
                   case baseApy.isError:
                     return <Paragraph color="$error">{toNiceError(baseApy.error)}</Paragraph>
-                  case baseApy.isSuccess:
+                  case baseApy.isSuccess && parsedAmount > 0n:
                     return (
                       <CalculatedBenefits
                         apy={formatAmount(baseApy.data.baseApy, undefined, 2)}
@@ -463,20 +464,6 @@ export const DepositForm = () => {
                     return <StaticBenefits />
                 }
               })()}
-              {/*
-              {baseApy.data ? (
-                // TODO calculate real values
-                <CalculatedBenefits
-                  apy={formatAmount(baseApy.data.baseApy, undefined, 2)}
-                  monthlyEarning={monthlyEarning ?? ''}
-                  rewards={''}
-                  // overrideApy="11"
-                  // overrideMonthlyEarning="12"
-                  // overrideRewards="4,000"
-                />
-              ) : (
-
-              )} */}
               <XStack gap={'$3'} ai={'center'}>
                 {areTermsAccepted}
                 {form.formState.errors.areTermsAccepted ? (
@@ -496,6 +483,7 @@ export const DepositForm = () => {
 }
 
 const StaticBenefits = () => {
+  // TODO: use dynamic asset
   return (
     <Fade>
       <YStack gap={'$3.5'}>
@@ -510,7 +498,10 @@ const StaticBenefits = () => {
             </XStack>
             <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
             <YStack gap={'$2'}>
-              <Row label={'Minimum Deposit'} value={'50 USDC'} />
+              <Row
+                label={'Minimum Deposit'}
+                value={formatAmount(formatUnits(MINIMUM_DEPOSIT, usdcCoin.decimals), undefined, 2)}
+              />
               <Row label={'Withdraw Anytime'} value={'Full flexibility'} />
               <Row label={'Rewards'} value={'Bonus SEND tokens'} />
             </YStack>
