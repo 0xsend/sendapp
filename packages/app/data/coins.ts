@@ -17,53 +17,54 @@ export const CoinSchema = z.object({
 })
 export type coin = z.infer<typeof CoinSchema>
 
-export const usdcCoin: coin = {
+export const usdcCoin = {
   label: 'USDC',
   symbol: 'USDC',
   token: usdcAddresses[baseMainnet.id],
   decimals: 6,
   formatDecimals: 2,
   coingeckoTokenId: 'usd-coin',
-} as const
+} as const satisfies coin
 
-export const ethCoin: coin = {
+export const ethCoin = {
   label: 'Ethereum',
   symbol: 'ETH',
   token: 'eth',
   decimals: 18,
   coingeckoTokenId: 'ethereum',
-} as const
+} as const satisfies coin
 
-export const sendCoin: coin = {
+export const sendCoin = {
   label: 'Send',
   symbol: 'SEND',
   token: sendAddresses[baseMainnet.id],
   decimals: 18,
   formatDecimals: 0,
   coingeckoTokenId: 'send-token-2',
-} as const
+} as const satisfies coin
 
 // can probably remove this
-export const sendV0Coin: coin = {
+export const sendV0Coin = {
   label: 'Send',
   symbol: 'SEND',
   token: sendTokenV0Address[baseMainnet.id],
   decimals: 0,
   coingeckoTokenId: 'send-token',
-} as const
+  formatDecimals: 0,
+} as const satisfies coin
 
-export const spx6900Coin: coin = {
+export const spx6900Coin = {
   label: 'SPX',
   symbol: 'SPX',
   token: spx6900Addresses[baseMainnet.id],
   decimals: 8,
   coingeckoTokenId: 'spx6900',
-} as const
+} as const satisfies coin
 
 /**
  * The coins (tokens) array that are supported by Send App.
  */
-export const coins = [usdcCoin, ethCoin, sendCoin] as const
+export const coins: coin[] = [usdcCoin, ethCoin, sendCoin] as const
 export type coins = typeof coins
 
 type CoinsDict = { [key in coins[number]['token']]: coins[number] }
@@ -81,7 +82,7 @@ export type coinsDict = typeof coinsDict
 /**
  * The coins (tokens) that sendapp supports through partnerships. (Hidden when balance is 0)
  */
-export const partnerCoins = [spx6900Coin] as const
+export const partnerCoins: coin[] = [spx6900Coin] as const
 export type partnerCoins = typeof partnerCoins
 
 type PartnerCoinsDict = { [key in partnerCoins[number]['token']]: partnerCoins[number] }
@@ -96,7 +97,7 @@ export type partnerCoinsDict = typeof partnerCoinsDict
 /**
  * All coins (tokens) array that are supported by Send App.
  */
-export const allCoins = [...coins, ...partnerCoins] as const
+export const allCoins: coin[] = [...coins, ...partnerCoins] as const
 export type allCoins = typeof allCoins
 
 type AllCoinsDict = { [key in allCoins[number]['token']]: allCoins[number] }
@@ -118,4 +119,4 @@ export type CoinWithBalance = allCoins[number] & {
 /**
  * Known coins are a list of coins that Send app knows about but not necessarily supports.
  */
-export const knownCoins = [...allCoins, sendV0Coin] as const
+export const knownCoins: coin[] = [...allCoins, sendV0Coin] as const
