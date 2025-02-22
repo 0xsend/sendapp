@@ -131,7 +131,7 @@ const morphoViewAbi = [
 ] as const
 
 /**
- * Hook to calculate the Send Earn APY.
+ * Hook to calculate the Send Earn APY for a specific vault and underlying Metamorpho vault.
  *
  * @param params.vault - The vault address the user wants to deposit into
  * @returns The Send Earn APY
@@ -182,7 +182,7 @@ export function useSendEarnAPY({
 /**
  * Hook to fetch the Send Earn vault details.
  *
- * Returns the underlying vault address and the Send Earn fee.
+ * Returns the underlying Metamorpho vault address and the Send Earn fee.
  *
  * @param params.vault - The vault address the user wants to deposit into
  */
