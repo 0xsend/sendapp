@@ -16,6 +16,7 @@
   "dependencies": {
     "@coinbase/onchainkit": "^0.36.9",
     "@daimo/expo-passkeys": "workspace:*",
+    "@jmondi/oauth2-server": "^3.4.1",
     "@marsidev/react-turnstile": "^0.7.1",
     "@my/supabase": "workspace:*",
     "@my/ui": "workspace:*",
