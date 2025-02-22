@@ -143,7 +143,6 @@ export function useSendEarnAPY({
 }): UseQueryResult<{ baseApy: number }, Error> {
   // first fetch details about the send earn vault
   const sendEarnVault = useSendEarnVault(vault)
-  type SendEarnVault = typeof sendEarnVault
 
   const underlyingVaultAddress = sendEarnVault.data?.[0]
 
@@ -159,7 +158,10 @@ export function useSendEarnAPY({
     }: {
       queryKey: [
         string,
-        { sendEarnVault: SendEarnVault; underlyingVault: ReturnType<typeof useUnderlyingVault> },
+        {
+          sendEarnVault: ReturnType<typeof useSendEarnVault>
+          underlyingVault: ReturnType<typeof useUnderlyingVault>
+        },
       ]
     }): { baseApy: number } => {
       throwIf(sendEarnVault.error)
