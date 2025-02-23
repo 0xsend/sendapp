@@ -256,7 +256,7 @@ export const AddSendtagsForm = () => {
             size={'$5'}
             color={'$black'}
           >
-            confirm
+            continue
           </LinkableButton.Text>
         </LinkableButton>
         <Paragraph
