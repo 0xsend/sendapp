@@ -12,14 +12,17 @@
     "composite": true,
     "baseUrl": ".",
     "paths": {
-      "@my/workflows": ["../../packages/workflows/src/*"],
-      "@my/workflows/*": ["../../packages/workflows/src/*"]
+      "@my/workflows": ["../../packages/workflows/src/all-workflows.ts"],
+      "@my/workflows/*": ["../../packages/workflows/src/*"],
+      "@my/temporal": ["../../packages/temporal/src"],
+      "@my/temporal/*": ["../../packages/temporal/src/*"]
     }
   },
   "references": [],
   "include": [
     "./src",
     "../../packages/workflows/src",
+    "../../packages/temporal/src",
     "../../globals.d.ts",
     "../../environment.d.ts"
   ]

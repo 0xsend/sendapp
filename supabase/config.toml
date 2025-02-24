@@ -5,8 +5,8 @@ project_id = "send"
 [api]
 enabled = true
 port = 54321
-schemas = ["public", "storage", "graphql_public"]
-extra_search_path = ["public", "extensions"]
+schemas = ["public", "storage", "graphql_public", "temporal"]
+extra_search_path = ["public", "extensions", "temporal"]
 max_rows = 100
 
 [db]

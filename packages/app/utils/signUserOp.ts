@@ -52,7 +52,7 @@ export async function signUserOpHash({
   allowedCredentials?: { id: string; userHandle: string }[]
 }) {
   version = version ?? USEROP_VERSION
-  validUntil = validUntil ?? Math.floor((Date.now() + 1000 * 120) / 1000) // default 120 seconds (2 minutes)
+  validUntil = validUntil ?? Math.floor((Date.now() + 1000 * 35) / 1000) // default 35 seconds)
   allowedCredentials = allowedCredentials ?? []
   assert(version === USEROP_VERSION, 'version must be 1')
   assert(typeof validUntil === 'number', 'validUntil must be a number')

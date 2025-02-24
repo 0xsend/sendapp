@@ -1,11 +1,11 @@
 import { Button, Card, type CardProps, H4, Paragraph, Spinner, YStack } from '@my/ui'
 import type { CoinWithBalance } from 'app/data/coins'
 import { hexToBytea } from 'app/utils/hexToBytea'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTokenActivityFeed } from './utils/useTokenActivityFeed'
 import { AnimateEnter } from './TokenDetails'
 import { TokenActivityRow } from './TokenActivityRow'
-import type { Activity } from 'app/utils/zod/activity'
+import { Events, type Activity } from 'app/utils/zod/activity'
 import { ActivityDetails } from '../activity/ActivityDetails'
 import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
 import type { ZodError } from 'zod'
@@ -14,6 +14,7 @@ import { toNiceError } from 'app/utils/toNiceError'
 
 export const TokenActivity = ({ coin }: { coin: CoinWithBalance }) => {
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
+  const [refetchInterval, setRefetchInterval] = useState(30_000)
 
   const handleActivityPress = (activity: Activity) => {
     setSelectedActivity(activity)
@@ -24,11 +25,24 @@ export const TokenActivity = ({ coin }: { coin: CoinWithBalance }) => {
   const tokenActivityFeedQuery = useTokenActivityFeed({
     pageSize: 10,
     address: coin.token === 'eth' ? undefined : hexToBytea(coin.token),
+    refetchInterval,
   })
 
   const { data, isLoading, error } = tokenActivityFeedQuery
 
   const { pages } = data ?? {}
+
+  useEffect(() => {
+    if (!pages || !pages[0]) return
+
+    pages[0].find(
+      (a) =>
+        a.event_name === Events.TemporalSendAccountTransfers &&
+        !['cancelled', 'failed'].includes(a.data.status)
+    )
+      ? setRefetchInterval(1000)
+      : setRefetchInterval(30_000)
+  }, [pages])
 
   if (isLoading) return <Spinner size="small" />
   return (
