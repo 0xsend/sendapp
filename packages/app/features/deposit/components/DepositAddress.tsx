@@ -61,14 +61,25 @@ function CopyAddressDialog({ isOpen, onClose, onConfirm }) { const [dontShowAgai
               3. I understand that if I make any mistakes, there is no way to recover the funds.
             </Paragraph>
 
-            <XStack justifyContent="flex-end" marginTop="$4" gap="$4">
-              <Dialog.Close asChild>
-                <Button br={'$2'}>Cancel</Button>
-              </Dialog.Close>
-              <Button theme="yellow_active" onPress={onConfirm} br={'$2'}>
-                <Button.Text col={'$color12'}>I Agree & Proceed</Button.Text>
-              </Button>
-            </XStack>
+            <XStack justifyContent="flex-end" marginTop="$4" gap="$4" ai="center">
+  {/* Checkbox on the left */}
+  <XStack ai="center" gap="$2">
+    <input
+      type="checkbox"
+      checked={dontShowAgain}
+      onChange={() => setDontShowAgain(!dontShowAgain)}
+    />
+    <Text fontSize="$3">Don't show again</Text>
+  </XStack>
+
+  {/* Buttons on the right */}
+  <Dialog.Close asChild>
+    <Button br={'$2'}>Cancel</Button>
+  </Dialog.Close>
+  <Button theme="yellow_active" onPress={onConfirm} br={'$2'}>
+    <Button.Text col={'$color12'}>I Agree & Proceed</Button.Text>
+  </Button>
+</XStack>
           </YStack>
         </Dialog.Content>
       </Dialog.Portal>
@@ -109,7 +120,7 @@ export function DepositAddress({ address, ...props }: { address?: Address } & Bu
       return
     }
 
-    await Clipboard.setStringAsync(address).catch(() =>
+    await Clipboard.setString(address).catch(() =>
       toast.show('Something went wrong', {
         message: 'We were unable to copy your address to the clipboard',
         customData: {
