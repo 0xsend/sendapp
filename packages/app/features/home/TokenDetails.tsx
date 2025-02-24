@@ -39,7 +39,7 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
   return (
     <YStack f={1} gap="$5" $gtLg={{ w: '45%', pb: '$0' }} pb="$5">
       <YStack gap="$5">
-        <Card p="$4.5" w={'100%'} jc={'space-between'} $gtLg={{ h: 244, p: '$6' }}>
+        <Card p="$4.5" w={'100%'} jc={'space-between'} $gtLg={{ p: '$6' }}>
           <YStack gap="$4">
             <XStack ai={'center'} gap={'$3'}>
               <IconCoin size={'$2'} symbol={coin.symbol} />
