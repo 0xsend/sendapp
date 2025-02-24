@@ -96,7 +96,7 @@ const TokenActivityFeed = ({
 
   return (
     <Card {...props}>
-      {pages?.map((activities) => {
+      {pages.map((activities) => {
         return activities.map((activity) => (
           <TokenActivityItem
             key={`${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`}

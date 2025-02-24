@@ -24,10 +24,10 @@ export function AnimateEnter({ children }: { children: React.ReactNode }) {
     <AnimatePresence>
       <Stack
         key="enter"
-        animateOnly={['transform', 'opacity']}
-        animation="200ms"
-        enterStyle={{ opacity: 0, scale: 0.9 }}
-        exitStyle={{ opacity: 0, scale: 0.95 }}
+        animateOnly={['transform']}
+        animation="quick"
+        enterStyle={{ scale: 0.9 }}
+        exitStyle={{ scale: 0.95 }}
         opacity={1}
       >
         {children}

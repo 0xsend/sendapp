@@ -937,22 +937,18 @@ exports[`TokenDetails renders correctly 1`] = `
               }
             >
               <View
-                cancelable={true}
-                disabled={false}
-                focusable={true}
-                minPressDuration={0}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                onPress={[Function]}
-                onPressIn={[Function]}
-                onPressOut={[Function]}
-                style={
-                  {
-                    "flexDirection": "row",
-                  }
-                }
+                testID="MockSolitoLink"
               >
                 <View
+                  cancelable={true}
+                  disabled={false}
+                  focusable={true}
+                  minPressDuration={0}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onPress={[Function]}
+                  onPressIn={[Function]}
+                  onPressOut={[Function]}
                   style={
                     {
                       "alignItems": "center",
@@ -1022,54 +1018,32 @@ exports[`TokenDetails renders correctly 1`] = `
                     <View
                       style={
                         {
-                          "alignItems": "center",
-                          "borderBottomLeftRadius": 9,
-                          "borderBottomRightRadius": 9,
-                          "borderTopLeftRadius": 9,
-                          "borderTopRightRadius": 9,
+                          "bottom": 0,
                           "flexDirection": "column",
-                          "height": 48,
-                          "justifyContent": "center",
-                          "maxHeight": 48,
-                          "maxWidth": 48,
-                          "minHeight": 48,
-                          "minWidth": 48,
-                          "overflow": "hidden",
-                          "position": "relative",
-                          "width": 48,
+                          "left": 0,
+                          "position": "absolute",
+                          "right": 0,
+                          "top": 0,
+                          "zIndex": 1,
                         }
                       }
                     >
-                      <View
-                        style={
+                      <Image
+                        fullscreen={true}
+                        onError={[Function]}
+                        onLoad={[Function]}
+                        source={
                           {
-                            "bottom": 0,
-                            "flexDirection": "column",
-                            "left": 0,
-                            "position": "absolute",
-                            "right": 0,
-                            "top": 0,
-                            "zIndex": 1,
+                            "uri": "https://ui-avatars.com/api/?name=Alice&size=256&format=png&background=86ad7f",
                           }
                         }
-                      >
-                        <Image
-                          fullscreen={true}
-                          onError={[Function]}
-                          onLoad={[Function]}
-                          source={
-                            {
-                              "uri": "https://ui-avatars.com/api/?name=Alice&size=256&format=png&background=86ad7f",
-                            }
+                        style={
+                          {
+                            "height": 48,
+                            "width": 48,
                           }
-                          style={
-                            {
-                              "height": 48,
-                              "width": 48,
-                            }
-                          }
-                        />
-                      </View>
+                        }
+                      />
                     </View>
                   </View>
                 </View>
