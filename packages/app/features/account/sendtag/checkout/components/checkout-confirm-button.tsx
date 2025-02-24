@@ -10,6 +10,8 @@ import {
   type ButtonProps,
   type YStackProps,
   LinkableButton,
+  Text,
+  Input,
 } from '@my/ui'
 import { baseMainnetClient, usdcAddress } from '@my/wagmi'
 import { AlertTriangle, CheckCircle } from '@tamagui/lucide-icons'
@@ -35,6 +37,7 @@ import {
   useSendtagCheckout,
   useSendtagCheckoutReceipts,
 } from '../checkout-utils'
+import { useRouter } from 'next/router'
 
 export function ConfirmButton({
   onConfirmed,
@@ -152,8 +155,10 @@ export function ConfirmButton({
   const [attempts, setAttempts] = useState(0)
   const { userOp, userOpError, isLoadingUserOp, usdcFees, usdcFeesError, isLoadingUSDCFees } =
     useSendtagCheckout()
-  const canAffordTags =
-    balance && usdcFees && balance.value + usdcFees.baseFee + usdcFees.gasFees >= amountDue
+  const canAffordTags = useMemo(() => {
+    if (!balance || !usdcFees) return false
+    return balance.value + usdcFees.baseFee + usdcFees.gasFees >= amountDue
+  }, [balance, usdcFees, amountDue])
 
   const queryClient = useQueryClient()
   const { mutateAsync: sendUserOp, isPending: sendTransactionIsPending } = useMutation({
@@ -169,6 +174,18 @@ export function ConfirmButton({
       queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
       queryClient.invalidateQueries({ queryKey: [balanceQueryKey] })
     },
+  })
+
+  console.log('Debug states:', {
+    canAffordTags,
+    balance: balance?.value.toString(),
+    usdcFees: usdcFees
+      ? {
+          baseFee: usdcFees.baseFee.toString(),
+          gasFees: usdcFees.gasFees.toString(),
+        }
+      : null,
+    amountDue: amountDue.toString(),
   })
 
   async function handleCheckoutTx() {
@@ -240,9 +257,16 @@ export function ConfirmButton({
     for (const err of possibleErrors) {
       if (err) console.error('encountered error', err.message, err)
     }
+
+    const isInsufficientFunds = possibleErrors.some((e) => e?.message?.includes('Not enough USDC'))
+
     return (
       <ConfirmButtonStack>
-        <ConfirmButtonError>
+        <ConfirmButtonError
+          buttonText={isInsufficientFunds ? 'Deposit USDC' : 'Error'}
+          onPress={isInsufficientFunds ? undefined : undefined}
+          href={isInsufficientFunds ? '/deposit' : undefined}
+        >
           <YStack gap="$2" ai="center">
             <Paragraph $theme-dark={{ col: '$white' }} $theme-light={{ col: '$black' }}>
               {possibleErrors
@@ -327,6 +351,16 @@ export function ConfirmButton({
     !usdcFeesError &&
     !isLoadingUSDCFees
 
+  const router = useRouter()
+  const { data: referralCode } = api.referral.get.useQuery(
+    { code: router.query.referral as string },
+    {
+      enabled: !!router.query.referral,
+      retry: 3,
+      retryDelay: 1000,
+    }
+  )
+
   return (
     <ConfirmButtonStack ai="center" $gtMd={{ ai: 'flex-start' }} mx="auto" gap="$2">
       {balanceError && (
@@ -344,6 +378,19 @@ export function ConfirmButton({
         >
           Your balance: {formatUnits(balance.value, 6)} USDC
         </Paragraph>
+      )}
+      {referralCode && (
+        <>
+          <Input
+            data-testid="referral-code-input"
+            value={referralCode.tag}
+            placeholder="Referral Code"
+            readOnly
+          />
+          <YStack data-testid="referral-display">
+            <Text>Referred by: /{referralCode.tag}</Text>
+          </YStack>
+        </>
       )}
       <Button
         width={'$16'}
@@ -423,8 +470,9 @@ const ConfirmButtonError = ({
   children,
   onPress,
   buttonText,
+  href,
   ...props
-}: ButtonProps & { buttonText?: string }) => {
+}: ButtonProps & { buttonText?: string; href?: string }) => {
   const media = useMedia()
   return (
     <Tooltip open={true} placement={media.gtMd ? 'right' : 'bottom'}>
@@ -453,12 +501,21 @@ const ConfirmButtonError = ({
         {children}
       </Tooltip.Content>
       <Tooltip.Trigger>
-        <Button gap="$1.5" onPress={onPress} br={12} f={1} {...props}>
-          <ButtonText gap="$1.5">{buttonText || 'Error'}</ButtonText>
-          <ButtonIcon>
-            <AlertTriangle color={'$red500'} />
-          </ButtonIcon>
-        </Button>
+        {href ? (
+          <LinkableButton theme="red" href={href} gap="$1.5" br={12} f={1} testID={props.testID}>
+            <ButtonText gap="$1.5">{buttonText || 'Error'}</ButtonText>
+            <ButtonIcon>
+              <AlertTriangle color={'$red500'} />
+            </ButtonIcon>
+          </LinkableButton>
+        ) : (
+          <Button gap="$1.5" onPress={onPress} br={12} f={1} {...props}>
+            <ButtonText gap="$1.5">{buttonText || 'Error'}</ButtonText>
+            <ButtonIcon>
+              <AlertTriangle color={'$red500'} />
+            </ButtonIcon>
+          </Button>
+        )}
       </Tooltip.Trigger>
     </Tooltip>
   )

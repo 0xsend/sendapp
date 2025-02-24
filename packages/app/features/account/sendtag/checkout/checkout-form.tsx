@@ -1,22 +1,20 @@
+import { Fade, SubmitButton, useToastController } from '@my/ui'
 import {
   AnimatePresence,
   Avatar,
   Button,
   ButtonIcon,
   ButtonText,
-  Fade,
   Input,
   Label,
   Paragraph,
   Spinner,
   Stack,
-  SubmitButton,
   Theme,
   XStack,
   YStack,
   useMedia,
-  useToastController,
-} from '@my/ui'
+} from '@tamagui/core'
 import { Check, X } from '@tamagui/lucide-icons'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconAccount, IconPlus } from 'app/components/icons'
@@ -26,7 +24,7 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useConfirmedTags, usePendingTags } from 'app/utils/tags'
 import { useTimeRemaining } from 'app/utils/useTimeRemaining'
 import { useUser } from 'app/utils/useUser'
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
@@ -110,7 +108,6 @@ export const CheckoutForm = () => {
             autoFocus: true,
             'aria-label': 'Sendtag name',
             placeholder: 'Enter Sendtag name',
-
             fieldsetProps: {
               f: 1,
             },
@@ -236,7 +233,6 @@ export const CheckoutForm = () => {
                           <ConfirmTagPrice tag={tag} />
                         </Paragraph>
                         <Button
-                          // @ts-expect-error tamagui doesn't support this yet
                           type="button"
                           bg="transparent"
                           maw="100%"
@@ -359,6 +355,7 @@ export const CheckoutForm = () => {
  * Shows the referral code and the user's profile if they have one
  */
 function ReferredBy() {
+  const router = useRouter()
   const { data: referralCode } = useReferralCode()
   const queryClient = useQueryClient()
   const mutation = useMutation({
@@ -371,6 +368,15 @@ function ReferredBy() {
     },
   })
   const { data: referrer, error: referrerError } = useReferrer()
+
+  // Add effect to set referral code from URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const referralCode = params.get('referral')
+    if (referralCode) {
+      mutation.mutate(referralCode)
+    }
+  }, [mutation])
 
   return (
     <YStack w="100%" mt="$4" gap="$2" borderBottomWidth={1} pb="$6" borderColor="$decay">
@@ -393,7 +399,7 @@ function ReferredBy() {
           <XStack gap="$2" jc="flex-start" ai="flex-start">
             <Input
               id={'refcode'}
-              defaultValue={referralCode ?? ''}
+              value={referralCode ?? ''}
               onChangeText={(text) => mutation.mutate(text)}
               col={'$color12'}
             />
