@@ -25,6 +25,13 @@ export function SideBarNavLink({
           scale: '105%',
           color: '$color12',
         }}
+        disabledStyle={{
+          opacity: 0.5,
+          cursor: 'not-allowed',
+          left: '0%',
+          scale: '100%',
+          color: '$color10',
+        }}
         fontSize={'$7'}
         f={1}
         fontWeight={isActiveRoute ? '400' : '300'}
@@ -32,7 +39,7 @@ export function SideBarNavLink({
         display="flex"
         alignItems="center"
         {...props}
-        href={props.disabled ? '' : props.href}
+        href={props.disabled ? '#' : props.href}
       >
         {icon}
         {text}
