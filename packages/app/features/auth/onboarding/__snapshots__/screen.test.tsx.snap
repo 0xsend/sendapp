@@ -39,7 +39,7 @@ exports[`OnboardingScreen 1`] = `
           {
             "color": "#FFFFFF",
             "fontFamily": "System",
-            "fontSize": 64,
+            "fontSize": 62,
             "fontWeight": "700",
             "lineHeight": 57,
             "marginBottom": 0,

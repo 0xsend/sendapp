@@ -5,7 +5,6 @@ import {
   XStack,
   YStack,
   Stack,
-  BigHeading,
   styled,
   AnimatePresence,
   type XStackProps,
@@ -37,7 +36,6 @@ export const TokenBalanceCard = () => {
   const { totalPrice, pricesQuery } = useCoins()
 
   const formattedBalance = formatAmount(totalPrice, 9, 0)
-
   const { isPriceHidden, toggleIsPriceHidden } = useIsPriceHidden()
   const timer = useStopwatch()
   const { isGameVisible, presses, increaseScore } = useShowHideGame(timer)
@@ -48,7 +46,7 @@ export const TokenBalanceCard = () => {
   }
 
   return (
-    <Card p={'$5'} w={'100%'} jc="space-between" mih={147}>
+    <Card py={'$5'} pl="$5" w={'100%'} jc="space-between" mih={147}>
       <XStack w={'100%'} zIndex={4} h="100%">
         <YStack jc={'center'} gap={'$2'} w={'100%'}>
           <YStack w="fit-content" gap={'$2.5'} jc="space-between">
@@ -84,52 +82,52 @@ export const TokenBalanceCard = () => {
             mt="auto"
             onPress={onShowHidePress}
             cursor="pointer"
+            overflow-x="scroll"
+            pr="$5"
           >
             {(() => {
               switch (true) {
                 case isPriceHidden:
                   return (
-                    <BigHeading
-                      $platform-web={{ width: 'fit-content' }}
-                      fontSize={96}
-                      lineHeight={'$15'}
-                      fontWeight={'600'}
+                    <Paragraph
+                      fontSize={'$12'}
                       color={'$color12'}
-                      zIndex={1}
+                      fontWeight={'500'}
+                      lineHeight={'$10'}
                     >
                       {'//////'}
-                    </BigHeading>
+                    </Paragraph>
                   )
                 case pricesQuery.isLoading || !totalPrice:
                   return <Spinner size={'large'} />
                 default:
                   return (
-                    <>
-                      <BigHeading
-                        $platform-web={{ width: 'fit-content' }}
+                    <XStack ai={'flex-end'} gap={'$1'}>
+                      <Paragraph
                         $sm={{
-                          fontSize: (() => {
-                            switch (true) {
-                              case formattedBalance.length > 8:
-                                return '$10'
-                              case formattedBalance.length > 5:
-                                return '$11'
-                              default:
-                                return 86
-                            }
-                          })(),
+                          fontSize: '$10',
                         }}
-                        fontSize={96}
-                        lineHeight={'$15'}
+                        fontSize={'$11'}
                         color={'$color12'}
-                        zIndex={1}
+                        fontWeight={'500'}
+                        lineHeight={'$10'}
+                      >
+                        $
+                      </Paragraph>
+                      <Paragraph
+                        fontFamily={'$mono'}
+                        $sm={{
+                          fontSize: formattedBalance.length > 6 ? '$10' : '$13',
+                        }}
+                        fontSize={'$12'}
+                        lineHeight={'$10'}
+                        fontWeight={'500'}
+                        color={'$color12'}
+                        letterSpacing={4}
                       >
                         {formattedBalance}
-                      </BigHeading>
-                      <Paragraph fontSize={'$6'} fontWeight={'500'} zIndex={1}>
-                        {'USD'}
                       </Paragraph>
-                    </>
+                    </XStack>
                   )
               }
             })()}
