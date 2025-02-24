@@ -10,7 +10,7 @@ import {
   IconLogout,
   IconQuestionCircle,
 } from 'app/components/icons'
-import { RowLabel } from 'app/features/account/settings/components/RowLabel'
+import { RowLabel } from 'app/components/layout/RowLabel'
 
 const iconProps = {
   size: '$1.5',

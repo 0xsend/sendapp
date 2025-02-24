@@ -1,4 +1,5 @@
-import { describe, expect, it } from '@jest/globals'
+import '@testing-library/jest-native/extend-expect'
+import { describe, expect, it, beforeEach, afterEach, jest } from '@jest/globals'
 import { act, render, screen } from '@testing-library/react-native'
 import { Wrapper } from 'app/utils/__mocks__/Wrapper'
 import { SendTagScreen } from './screen'
@@ -9,15 +10,18 @@ jest.mock('app/utils/getLocalhost.native', () => ({
 }))
 
 // Mock the query client to prevent refetch intervals
-jest.mock('@tanstack/react-query', () => ({
-  ...jest.requireActual('@tanstack/react-query'),
-  useQueryClient: () => ({
-    invalidateQueries: jest.fn(),
-    setQueryData: jest.fn(),
-    getQueryData: jest.fn(),
-    refetchQueries: jest.fn(),
-  }),
-}))
+jest.mock('@tanstack/react-query', () => {
+  const actual = jest.requireActual('@tanstack/react-query') as object
+  return {
+    ...actual,
+    useQueryClient: () => ({
+      invalidateQueries: jest.fn(),
+      setQueryData: jest.fn(),
+      getQueryData: jest.fn(),
+      refetchQueries: jest.fn(),
+    }),
+  }
+})
 
 // Add mock for api
 jest.mock('app/utils/api', () => ({
@@ -109,26 +113,14 @@ describe('SendTagScreen', () => {
     await act(async () => {
       jest.advanceTimersByTime(0)
     })
-
-    expect(screen.getByText(/REGISTERED SENDTAGS/)).toBeVisible()
-
-    // Check only confirmed tags are visible
-    const confirmedTags = mockTags.filter((tag) => tag.status === 'confirmed')
-    for (const tag of confirmedTags) {
-      if (tag.id === 1) {
-        // Main tag has a different label
-        expect(screen.getByLabelText(`Tag ${tag.name} (Main)`)).toBeVisible()
-      } else {
-        expect(screen.getByLabelText(`Tag ${tag.name}`)).toBeVisible()
+    expect(screen.getByText(/Registered/)).toBeOnTheScreen()
+    for (const tag of mockTags) {
+      if (tag.status === 'pending') {
+        expect(screen.queryByText(tag.name)).not.toBeOnTheScreen()
+        return
       }
+      expect(screen.getByText(tag.name)).toBeOnTheScreen()
     }
-
-    // Check pending tags are not visible
-    const pendingTags = mockTags.filter((tag) => tag.status === 'pending')
-    for (const tag of pendingTags) {
-      expect(screen.queryByLabelText(`Tag ${tag.name}`)).toBeFalsy()
-    }
-
-    expect(screen.getByText('New Tag')).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Add Tag' })).toBeOnTheScreen()
   })
 })

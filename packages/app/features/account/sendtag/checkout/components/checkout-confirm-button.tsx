@@ -1,20 +1,20 @@
 import {
   Button,
   ButtonIcon,
+  type ButtonProps,
   ButtonText,
   Paragraph,
   Spinner,
   Tooltip,
-  YStack,
   useMedia,
-  type ButtonProps,
+  YStack,
   type YStackProps,
   LinkableButton,
   Text,
   Input,
 } from '@my/ui'
 import { baseMainnetClient, usdcAddress } from '@my/wagmi'
-import { AlertTriangle, CheckCircle } from '@tamagui/lucide-icons'
+import { AlertTriangle } from '@tamagui/lucide-icons'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { TRPCClientError } from '@trpc/client'
 import { total } from 'app/data/sendtags'
@@ -28,23 +28,18 @@ import { useReceipts } from 'app/utils/useReceipts'
 import { useUser } from 'app/utils/useUser'
 import { sendUserOpTransfer } from 'app/utils/useUserOpTransferMutation'
 import { useAccountNonce } from 'app/utils/userop'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { formatUnits, isAddressEqual, zeroAddress } from 'viem'
+import { type PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react'
+import { isAddressEqual, zeroAddress } from 'viem'
 import { useBalance, useWaitForTransactionReceipt } from 'wagmi'
 import {
+  useReferralCode,
   useReferralReward,
   useReferrer,
   useSendtagCheckout,
   useSendtagCheckoutReceipts,
 } from '../checkout-utils'
-import { useRouter } from 'next/router'
 
-export function ConfirmButton({
-  onConfirmed,
-}: {
-  onConfirmed: () => void
-}) {
-  const media = useMedia()
+export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
   const { updateProfile } = useUser()
   const { data: sendAccount } = useSendAccount()
   const sender = useMemo(() => sendAccount?.address, [sendAccount?.address])
@@ -52,8 +47,9 @@ export function ConfirmButton({
   const chainId = baseMainnetClient.chain.id
   const pendingTags = usePendingTags() ?? []
   const amountDue = useMemo(() => total(pendingTags ?? []), [pendingTags])
-  const { data: referrerProfile } = useReferrer()
+  const { data: referrerProfile, isLoading: isLoadingReferrer } = useReferrer()
   const { data: rewardDue } = useReferralReward({ tags: pendingTags })
+  const { data: referralCode } = useReferralCode()
 
   const webauthnCreds =
     sendAccount?.send_account_credentials
@@ -151,7 +147,6 @@ export function ConfirmButton({
   })
 
   const [error, setError] = useState<string>()
-  const [confirmed, setConfirmed] = useState(false)
   const [attempts, setAttempts] = useState(0)
   const { userOp, userOpError, isLoadingUserOp, usdcFees, usdcFeesError, isLoadingUSDCFees } =
     useSendtagCheckout()
@@ -206,7 +201,6 @@ export function ConfirmButton({
     confirm
       .mutateAsync({ transaction: tx })
       .then(async () => {
-        setConfirmed(true)
         setSubmitting(false)
         await updateProfile().then(() => {
           refetchReceipts()
@@ -307,40 +301,6 @@ export function ConfirmButton({
     )
   }
 
-  if (!hasPendingTags && !confirmed) {
-    return (
-      <ConfirmButtonStack>
-        <Tooltip open={true} placement={media.gtMd ? 'right' : 'bottom'}>
-          <Tooltip.Content
-            enterStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
-            exitStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
-            scale={1}
-            x={0}
-            y={0}
-            opacity={1}
-            animation={[
-              'quick',
-              {
-                opacity: {
-                  overshootClamping: true,
-                },
-              },
-            ]}
-            boc={'$red500'}
-            borderWidth={1}
-            $theme-dark={{ bc: '$black' }}
-            $theme-light={{ bc: '$white' }}
-          >
-            <Tooltip.Arrow borderColor={'$red500'} bw={4} />
-            <Paragraph $theme-dark={{ col: '$white' }} $theme-light={{ col: '$black' }}>
-              You have no Send Tags to confirm. Please add some Send Tags.
-            </Paragraph>
-          </Tooltip.Content>
-        </Tooltip>
-      </ConfirmButtonStack>
-    )
-  }
-
   const canSubmit =
     hasPendingTags &&
     canAffordTags &&
@@ -349,61 +309,42 @@ export function ConfirmButton({
     !submitting &&
     !txWaitLoading &&
     !usdcFeesError &&
-    !isLoadingUSDCFees
-
-  const router = useRouter()
-  const { data: referralCode } = api.referral.get.useQuery(
-    { code: router.query.referral as string },
-    {
-      enabled: !!router.query.referral,
-      retry: 3,
-      retryDelay: 1000,
-    }
-  )
+    !isLoadingUSDCFees &&
+    !isLoadingReferrer &&
+    (referrerProfile || !referralCode)
 
   return (
-    <ConfirmButtonStack ai="center" $gtMd={{ ai: 'flex-start' }} mx="auto" gap="$2">
+    <ConfirmButtonStack w={'100%'} gap="$2">
       {balanceError && (
         <Paragraph color="$error">{balanceError?.message?.split('.').at(0)}</Paragraph>
       )}
       {usdcFeesError && (
         <Paragraph color="$error">{usdcFeesError?.message?.split('.').at(0)}</Paragraph>
       )}
-      {balance && (
-        <Paragraph
-          $theme-dark={{ col: '$gray9Light' }}
-          $theme-light={{ col: '$gray9Dark' }}
-          fontWeight={'500'}
-          fontSize={'$5'}
-        >
-          Your balance: {formatUnits(balance.value, 6)} USDC
-        </Paragraph>
-      )}
       {referralCode && (
         <>
           <Input
             data-testid="referral-code-input"
-            value={referralCode.tag}
+            value={referralCode}
             placeholder="Referral Code"
             readOnly
           />
           <YStack data-testid="referral-display">
-            <Text>Referred by: /{referralCode.tag}</Text>
+            <Text>Referred by: /{referralCode}</Text>
           </YStack>
         </>
       )}
       <Button
-        width={'$16'}
         disabled={!canSubmit}
         disabledStyle={{
-          bc: '$gray5Light',
           pointerEvents: 'none',
           opacity: 0.5,
         }}
         gap="$1.5"
         onPress={handleCheckoutTx}
-        br={12}
-        f={1}
+        theme="green"
+        borderRadius={'$4'}
+        p={'$4'}
       >
         {(() => {
           switch (true) {
@@ -411,7 +352,7 @@ export function ConfirmButton({
               return (
                 <>
                   <Spinner color="$color11" />
-                  <ButtonText p="$2">Loading...</ButtonText>
+                  <ConfirmButtonText>loading...</ConfirmButtonText>
                 </>
               )
             case !canAffordTags && (!txWaitLoading || !submitting):
@@ -432,32 +373,25 @@ export function ConfirmButton({
               return (
                 <>
                   <Spinner color="$color11" />
-                  <ButtonText p="$2">Requesting...</ButtonText>
+                  <ConfirmButtonText>requesting...</ConfirmButtonText>
                 </>
               )
             case txWaitLoading:
               return (
                 <>
                   <Spinner color="$color11" />
-                  <ButtonText p="$2">Processing...</ButtonText>
+                  <ConfirmButtonText>processing...</ConfirmButtonText>
                 </>
               )
             case submitting:
               return (
                 <>
                   <Spinner color="$color11" />
-                  <ButtonText p="$2">Registering...</ButtonText>
+                  <ConfirmButtonText>registering...</ConfirmButtonText>
                 </>
               )
             default:
-              return (
-                <>
-                  <ButtonIcon>
-                    <CheckCircle />
-                  </ButtonIcon>
-                  <ButtonText p="$2">Confirm</ButtonText>
-                </>
-              )
+              return <ConfirmButtonText>complete purchase</ConfirmButtonText>
           }
         })()}
       </Button>
@@ -518,6 +452,14 @@ const ConfirmButtonError = ({
         )}
       </Tooltip.Trigger>
     </Tooltip>
+  )
+}
+
+function ConfirmButtonText({ children }: PropsWithChildren) {
+  return (
+    <ButtonText ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
+      {children}
+    </ButtonText>
   )
 }
 

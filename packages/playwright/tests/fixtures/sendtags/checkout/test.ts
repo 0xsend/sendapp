@@ -1,5 +1,5 @@
 import debug from 'debug'
-import { test as base } from '../send-accounts'
+import { test as base } from '../../send-accounts'
 import { CheckoutPage } from './page'
 
 export const test = base.extend<{
@@ -11,7 +11,6 @@ export const test = base.extend<{
     log('creating checkoutPage')
     const wallet = await injectWeb3Provider()
     const checkoutPage = new CheckoutPage(page, wallet)
-    await checkoutPage.goto()
     await use(checkoutPage)
   },
 })

@@ -2,8 +2,8 @@ import type { Tables, Database } from '@my/supabase/database.types'
 import {
   Button,
   ButtonText,
+  H2,
   H3,
-  Label,
   ListItem,
   Paragraph,
   Spinner,
@@ -13,8 +13,12 @@ import {
   AlertDialog,
   useToastController,
   Text,
+  Fade,
+  LinkableButton,
+  YGroup,
 } from '@my/ui'
 import { Trash2, Plus } from '@tamagui/lucide-icons'
+import { IconPlus, IconSlash } from 'app/components/icons'
 import { maxNumSendTags } from 'app/data/sendtags'
 import { useUser } from 'app/utils/useUser'
 import { useRouter } from 'solito/router'
@@ -61,11 +65,6 @@ export function SendTagScreen() {
     await updateMainTag.mutateAsync({ tagId })
   }
 
-  const allTags: (Tables<'tags'> | undefined)[] =
-    confirmedTags === undefined
-      ? new Array(maxNumSendTags).fill(undefined)
-      : [...confirmedTags, ...Array.from({ length: maxNumSendTags - confirmedTags.length })]
-
   if (isLoading)
     return (
       <Stack w="100%" h="100%" jc={'center'} ai={'center'}>
@@ -75,27 +74,34 @@ export function SendTagScreen() {
 
   return (
     <YStack
-      f={1}
-      $lg={{ gap: '$2', ai: 'center' }}
-      $theme-dark={{ btc: '$gray7Dark' }}
-      $theme-light={{ btc: '$gray4Light' }}
+      width={'100%'}
+      gap="$5"
+      pb={'$3.5'}
+      $gtLg={{
+        width: '50%',
+      }}
     >
-      <YStack gap="$2" py="$3" $gtSm={{ gap: '$6', py: '$6' }}>
-        <Label fontFamily={'$mono'} fontSize={'$5'} $theme-dark={{ col: '$olive' }}>
-          REGISTERED SENDTAGS [
-          <Paragraph fontFamily={'$mono'} fontSize={'$5'} $theme-dark={{ col: '$primary' }}>
-            {`${confirmedTags?.length || 0} / ${maxNumSendTags}`}
-          </Paragraph>
-          ]
-        </Label>
+      <YStack gap="$3">
+        <H2 tt={'uppercase'}>Your verified tags</H2>
+        <Paragraph
+          fontSize={'$5'}
+          color={'$lightGrayTextField'}
+          $theme-light={{ color: '$darkGrayTextField' }}
+        >
+          Own your identity on Send. Register up to 5 verified tags and make them yours.
+        </Paragraph>
       </YStack>
       <SendtagList
-        allTags={allTags}
+        allTags={confirmedTags}
         confirmedTags={confirmedTags}
         onUpdateMainTag={handleUpdateMainTag}
         isUpdating={updateMainTag.isPending}
         mainTagId={sendAccount?.main_tag_id ?? undefined}
       />
+      <Paragraph fontSize={'$7'} fontWeight={'500'}>
+        Registered [ {`${confirmedTags?.length || 0}/${maxNumSendTags}`} ]
+      </Paragraph>
+      <AddNewTagButton tags={confirmedTags} />
     </YStack>
   )
 }
@@ -106,19 +112,42 @@ function SendtagList({
   isUpdating,
   mainTagId,
 }: {
-  allTags: (Tables<'tags'> | undefined)[]
+  allTags: Tables<'tags'>[] | undefined
   confirmedTags?: Tables<'tags'>[]
   onUpdateMainTag: (tagId: number) => void
   isUpdating?: boolean
   mainTagId?: number
 }) {
-  const nextTagIndex = allTags?.findIndex((tag) => tag === undefined)
+  const { push } = useRouter()
+  const nextTagIndex = allTags?.findIndex((tag) => !tag)
+
+  if (!allTags?.length) {
+    return null
+  }
 
   return (
     <YStack gap="$5">
       {allTags.map((tag, i) => {
         if (!tag && i === nextTagIndex) {
-          return <AddTagButton key="%add_tag_button" />
+          return (
+            <Button
+              key="%add_tag_button"
+              onPress={() => push('/account/sendtag/checkout')}
+              w={200}
+              h={54}
+              br={12}
+              bc={'$primary'}
+              p={0}
+              display="flex"
+              jc="center"
+              ai="center"
+              icon={<IconPlus color={'black'} />}
+            >
+              <ButtonText fontSize={'$4'} fontWeight={'500'} fontFamily={'$mono'} theme="green">
+                Add Tag
+              </ButtonText>
+            </Button>
+          )
         }
         if (!tag) return null
 
@@ -133,28 +162,6 @@ function SendtagList({
         )
       })}
     </YStack>
-  )
-}
-
-function AddTagButton() {
-  const { push } = useRouter()
-  return (
-    <Button
-      onPress={() => push({ pathname: '/account/sendtag/checkout' })}
-      w={200}
-      h={54}
-      br={12}
-      bc={'$primary'}
-      p={0}
-      display="flex"
-      jc="center"
-      ai="center"
-      icon={<Plus size={20} color={'black'} />}
-    >
-      <ButtonText fontSize={'$4'} fontWeight={'500'} fontFamily={'$mono'} theme="green">
-        New Tag
-      </ButtonText>
-    </Button>
   )
 }
 
@@ -422,5 +429,32 @@ function TagItem({
         </AlertDialog.Portal>
       </AlertDialog>
     </>
+  )
+}
+
+function AddNewTagButton({ tags }: { tags?: Tables<'tags'>[] }) {
+  const { push } = useRouter()
+
+  if (tags && tags.length >= maxNumSendTags) {
+    return null
+  }
+
+  return (
+    <Button
+      onPress={() => push('/account/sendtag/checkout')}
+      w={200}
+      h={54}
+      br={12}
+      bc={'$primary'}
+      p={0}
+      display="flex"
+      jc="center"
+      ai="center"
+      icon={<IconPlus color={'black'} />}
+    >
+      <ButtonText fontSize={'$4'} fontWeight={'500'} fontFamily={'$mono'} theme="green">
+        Add Tag
+      </ButtonText>
+    </Button>
   )
 }
