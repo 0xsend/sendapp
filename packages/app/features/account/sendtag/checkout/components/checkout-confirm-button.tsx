@@ -10,6 +10,8 @@ import {
   YStack,
   type YStackProps,
   LinkableButton,
+  Text,
+  Input,
 } from '@my/ui'
 import { AlertTriangle } from '@tamagui/lucide-icons'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -36,6 +38,7 @@ import {
   useSendtagCheckout,
   useSendtagCheckoutReceipts,
 } from '../checkout-utils'
+import { useRouter } from 'next/router'
 
 export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
   const { updateProfile } = useUser()
@@ -143,6 +146,10 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
   const [attempts, setAttempts] = useState(0)
   const { userOp, userOpError, isLoadingUserOp, usdcFees, usdcFeesError, isLoadingUSDCFees } =
     useSendtagCheckout()
+  const canAffordTags = useMemo(() => {
+    if (!balance || !usdcFees) return false
+    return balance.value + usdcFees.baseFee + usdcFees.gasFees >= amountDue
+  }, [balance, usdcFees, amountDue])
   const canAffordTags =
     usdc?.balance && usdcFees && usdc.balance + usdcFees.baseFee + usdcFees.gasFees >= amountDue
 
@@ -160,6 +167,18 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
       queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
       queryClient.invalidateQueries({ queryKey: [tokensQuery.queryKey] })
     },
+  })
+
+  console.log('Debug states:', {
+    canAffordTags,
+    balance: balance?.value.toString(),
+    usdcFees: usdcFees
+      ? {
+          baseFee: usdcFees.baseFee.toString(),
+          gasFees: usdcFees.gasFees.toString(),
+        }
+      : null,
+    amountDue: amountDue.toString(),
   })
 
   async function handleCheckoutTx() {
@@ -234,9 +253,16 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
     for (const err of possibleErrors) {
       if (err) console.error('encountered error', err.message, err)
     }
+
+    const isInsufficientFunds = possibleErrors.some((e) => e?.message?.includes('Not enough USDC'))
+
     return (
       <ConfirmButtonStack>
-        <ConfirmButtonError>
+        <ConfirmButtonError
+          buttonText={isInsufficientFunds ? 'Deposit USDC' : 'Error'}
+          onPress={isInsufficientFunds ? undefined : undefined}
+          href={isInsufficientFunds ? '/deposit' : undefined}
+        >
           <YStack gap="$2" ai="center">
             <Paragraph $theme-dark={{ col: '$white' }} $theme-light={{ col: '$black' }}>
               {possibleErrors
@@ -372,8 +398,9 @@ const ConfirmButtonError = ({
   children,
   onPress,
   buttonText,
+  href,
   ...props
-}: ButtonProps & { buttonText?: string }) => {
+}: ButtonProps & { buttonText?: string; href?: string }) => {
   const media = useMedia()
   return (
     <Tooltip open={true} placement={media.gtMd ? 'right' : 'bottom'}>
