@@ -11,7 +11,6 @@ import {
   type XStackProps,
   Card,
 } from '@my/ui'
-import { EyeOff, Eye } from '@tamagui/lucide-icons'
 import formatAmount from 'app/utils/formatAmount'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useEffect, useState } from 'react'
@@ -53,7 +52,7 @@ export const TokenBalanceCard = () => {
       <XStack w={'100%'} zIndex={4} h="100%">
         <YStack jc={'center'} gap={'$2'} w={'100%'}>
           <YStack w="fit-content" gap={'$2.5'} jc="space-between">
-            <XStack ai={'center'} gap="$2.5" width={'100%'} onPress={onShowHidePress}>
+            <XStack ai={'center'} gap="$2.5" width={'100%'}>
               <XStack ai={'center'} gap="$2.5">
                 <AnimatePresence exitBeforeEnter>
                   {isPriceHidden ? <HiddenSquare /> : <GreenSquare />}
@@ -69,11 +68,6 @@ export const TokenBalanceCard = () => {
                   Total Balance
                 </Label>
               </XStack>
-              {isPriceHidden ? (
-                <EyeOff color={'$color9'} size={'$1'} />
-              ) : (
-                <Eye color={'$color11'} size={'$1'} />
-              )}
             </XStack>
             {isGameVisible && (
               <XStack w="100%" gap={'$2'} jc={'space-between'} ai={'center'} my="auto">
@@ -84,7 +78,7 @@ export const TokenBalanceCard = () => {
               </XStack>
             )}
           </YStack>
-          <XStack style={{ color: 'white' }} gap={'$2.5'} mt="auto">
+          <XStack style={{ color: 'white' }} gap={'$2.5'} mt="auto" onPress={onShowHidePress}>
             {(() => {
               switch (true) {
                 case isPriceHidden:
