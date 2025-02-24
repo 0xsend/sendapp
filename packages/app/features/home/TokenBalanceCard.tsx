@@ -48,7 +48,7 @@ export const TokenBalanceCard = () => {
   }
 
   return (
-    <Card p={'$5'} w={'100%'} jc="space-between" $gtLg={{ p: '$6', h: 244, mih: 244 }} mih={184}>
+    <Card p={'$5'} w={'100%'} jc="space-between" mih={147}>
       <XStack w={'100%'} zIndex={4} h="100%">
         <YStack jc={'center'} gap={'$2'} w={'100%'}>
           <YStack w="fit-content" gap={'$2.5'} jc="space-between">
@@ -78,7 +78,13 @@ export const TokenBalanceCard = () => {
               </XStack>
             )}
           </YStack>
-          <XStack style={{ color: 'white' }} gap={'$2.5'} mt="auto" onPress={onShowHidePress}>
+          <XStack
+            style={{ color: 'white' }}
+            gap={'$2.5'}
+            mt="auto"
+            onPress={onShowHidePress}
+            cursor="pointer"
+          >
             {(() => {
               switch (true) {
                 case isPriceHidden:
