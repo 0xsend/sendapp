@@ -161,7 +161,7 @@ export const localizeAmount = (amount?: string) => {
 }
 
 export const sanitizeAmount = (amount?: string, decimals?: number) => {
-  if (!amount) return ''
+  if (!amount) return null
   const formattedAmount = removeDuplicateInString(amount, '.').replace(/[^0-9.]/g, '') //remove duplicate "." then filter out any letters
   return parseUnits(formattedAmount, decimals ?? 18)
 }

@@ -39,18 +39,22 @@ export const CalculatedBenefits = ({
             </XStack>
             <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
             <YStack gap={'$2'}>
-              <Row
-                label={'Estimated Monthly Earning'}
-                value={`${monthlyEarning}${overrideMonthlyEarning ? '' : ' USDC'}`}
-                overrideValue={
-                  overrideMonthlyEarning ? `${overrideMonthlyEarning} USDC` : undefined
-                }
-              />
-              <Row
-                label={'Rewards'}
-                value={`${rewards}${overrideRewards ? '' : ' SEND'}`}
-                overrideValue={overrideRewards ? `${overrideRewards} SEND` : undefined}
-              />
+              {monthlyEarning ? (
+                <Row
+                  label={'Estimated Monthly Earning'}
+                  value={`${monthlyEarning}${overrideMonthlyEarning ? '' : ' USDC'}`}
+                  overrideValue={
+                    overrideMonthlyEarning ? `${overrideMonthlyEarning} USDC` : undefined
+                  }
+                />
+              ) : null}
+              {rewards ? (
+                <Row
+                  label={'Rewards'}
+                  value={`${rewards}${overrideRewards ? '' : ' SEND'}`}
+                  overrideValue={overrideRewards ? `${overrideRewards} SEND` : undefined}
+                />
+              ) : null}
             </YStack>
           </YStack>
         </Card>

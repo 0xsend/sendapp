@@ -38,10 +38,11 @@ export function SendAmountForm() {
       const token = _token as allCoins[number]['token']
       // use allCoinsDict because form updates before query params. This feels hacky
       const sanitizedAmount = sanitizeAmount(amount, allCoinsDict[token]?.decimals)
+
       setSendParams(
         {
           ...sendParams,
-          amount: sanitizedAmount.toString(),
+          amount: sanitizedAmount ? sanitizedAmount.toString() : undefined,
           sendToken: token,
         },
         { webBehavior: 'replace' }
