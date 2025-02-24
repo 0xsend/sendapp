@@ -17,12 +17,11 @@ import { CheckCheck } from '@tamagui/lucide-icons'
 import { shorten } from 'app/utils/strings'
 import * as Clipboard from 'expo-clipboard'
 import { useState, useEffect } from 'react'
-const [dontShowAgain, setDontShowAgain] = useState(false)
 import type { Address } from 'viem'
 import { IconCopy } from 'app/components/icons'
 import { useQRCode } from 'app/utils/useQRCode'
 
-function CopyAddressDialog({ isOpen, onClose, onConfirm }) {
+function CopyAddressDialog({ isOpen, onClose, onConfirm }) { const [dontShowAgain, setDontShowAgain] = useState(false)
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <Dialog.Adapt when="sm" platform="touch">
