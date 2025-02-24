@@ -17,6 +17,7 @@ import { CheckCheck } from '@tamagui/lucide-icons'
 import { shorten } from 'app/utils/strings'
 import * as Clipboard from 'expo-clipboard'
 import { useState, useEffect } from 'react'
+const [dontShowAgain, setDontShowAgain] = useState(false)
 import type { Address } from 'viem'
 import { IconCopy } from 'app/components/icons'
 import { useQRCode } from 'app/utils/useQRCode'
