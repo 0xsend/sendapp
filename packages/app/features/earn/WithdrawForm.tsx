@@ -46,7 +46,7 @@ export const WithdrawForm = () => {
   useEffect(() => {
     const subscription = form.watch(({ amount: _amount }) => {
       const sanitizedAmount = sanitizeAmount(_amount, usdcCoin.decimals)
-
+      if (!sanitizedAmount) return
       setEarnParams(
         {
           ...earnParams,
