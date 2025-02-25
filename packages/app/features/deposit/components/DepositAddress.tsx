@@ -68,7 +68,15 @@ function CopyAddressDialog({ isOpen, onClose, onConfirm }) { const [dontShowAgai
     <input
       type="checkbox"
       checked={dontShowAgain}
-      onChange={() => setDontShowAgain(!dontShowAgain)}
+      onChange={async () => {
+  const newValue = !dontShowAgain;
+  setDontShowAgain(newValue);
+  try {
+    await AsyncStorage.setItem('dontShowAgain', JSON.stringify(newValue));
+  } catch (error) {
+    console.error('Failed to save checkbox state:', error);
+  }
+}}
     />
     <Text fontSize="$3">Don't show again</Text>
   </XStack>
