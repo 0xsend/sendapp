@@ -9,3 +9,4 @@ export { integration as sendAccountReceivesIntegration } from './send-account-re
 export { integration as sendtagCheckoutReceiptsIntegration } from './sendtag-checkout-receipts'
 export { userTicketPurchaseIntegration as sendPotUserTicketPurchaseIntegration } from './send-pot-events'
 export { jackpotRunIntegration as sendPotJackpotRunIntegration } from './send-pot-events'
+export { integration as sendEarnNewAffiliate } from './send-earn-new-affiliate'
