@@ -1139,7 +1139,147 @@ exports[`shovel config 1`] = `
         {
           "column": "log_addr",
           "filter_arg": [
-            "0x8cc3629b445746Be413C121a7385925B23226197",
+            "0xe22Edc692E9b4Af786Acb369d591163F1379803F",
+          ],
+          "filter_op": "contains",
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "column": "send_earn",
+            "indexed": true,
+            "name": "sendEarn",
+            "type": "address",
+          },
+          {
+            "column": "caller",
+            "indexed": true,
+            "name": "caller",
+            "type": "address",
+          },
+          {
+            "column": "initial_owner",
+            "indexed": false,
+            "name": "initialOwner",
+            "type": "address",
+          },
+          {
+            "column": "vault",
+            "indexed": true,
+            "name": "vault",
+            "type": "address",
+          },
+          {
+            "column": "fee_recipient",
+            "indexed": false,
+            "name": "feeRecipient",
+            "type": "address",
+          },
+          {
+            "column": "collections",
+            "indexed": false,
+            "name": "collections",
+            "type": "address",
+          },
+          {
+            "column": "fee",
+            "indexed": false,
+            "name": "fee",
+            "type": "uint96",
+          },
+          {
+            "column": "salt",
+            "indexed": false,
+            "name": "salt",
+            "type": "bytes32",
+          },
+        ],
+        "name": "CreateSendEarn",
+        "type": "event",
+      },
+      "name": "send_earn_create",
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "send_earn",
+            "type": "bytea",
+          },
+          {
+            "name": "caller",
+            "type": "bytea",
+          },
+          {
+            "name": "initial_owner",
+            "type": "bytea",
+          },
+          {
+            "name": "vault",
+            "type": "bytea",
+          },
+          {
+            "name": "fee_recipient",
+            "type": "bytea",
+          },
+          {
+            "name": "collections",
+            "type": "bytea",
+          },
+          {
+            "name": "fee",
+            "type": "numeric",
+          },
+          {
+            "name": "salt",
+            "type": "bytea",
+          },
+        ],
+        "name": "send_earn_create",
+      },
+    },
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "tx_hash",
+          "name": "tx_hash",
+        },
+        {
+          "column": "log_addr",
+          "filter_arg": [
+            "0xe22Edc692E9b4Af786Acb369d591163F1379803F",
           ],
           "filter_op": "contains",
           "name": "log_addr",
@@ -1185,10 +1325,6 @@ exports[`shovel config 1`] = `
           {
             "name": "block_time",
             "type": "numeric",
-          },
-          {
-            "name": "user_op_hash",
-            "type": "bytea",
           },
           {
             "name": "tx_hash",

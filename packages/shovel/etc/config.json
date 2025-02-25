@@ -1143,6 +1143,146 @@
       ]
     },
     {
+      "name": "send_earn_create",
+      "enabled": true,
+      "block": [
+        {
+          "name": "chain_id",
+          "column": "chain_id"
+        },
+        {
+          "name": "block_time",
+          "column": "block_time"
+        },
+        {
+          "name": "tx_hash",
+          "column": "tx_hash"
+        },
+        {
+          "name": "log_addr",
+          "column": "log_addr",
+          "filter_op": "contains",
+          "filter_arg": [
+            "0xe22Edc692E9b4Af786Acb369d591163F1379803F"
+          ]
+        }
+      ],
+      "event": {
+        "type": "event",
+        "anonymous": false,
+        "inputs": [
+          {
+            "name": "sendEarn",
+            "type": "address",
+            "indexed": true,
+            "column": "send_earn"
+          },
+          {
+            "name": "caller",
+            "type": "address",
+            "indexed": true,
+            "column": "caller"
+          },
+          {
+            "name": "initialOwner",
+            "type": "address",
+            "indexed": false,
+            "column": "initial_owner"
+          },
+          {
+            "name": "vault",
+            "type": "address",
+            "indexed": true,
+            "column": "vault"
+          },
+          {
+            "name": "feeRecipient",
+            "type": "address",
+            "indexed": false,
+            "column": "fee_recipient"
+          },
+          {
+            "name": "collections",
+            "type": "address",
+            "indexed": false,
+            "column": "collections"
+          },
+          {
+            "name": "fee",
+            "type": "uint96",
+            "indexed": false,
+            "column": "fee"
+          },
+          {
+            "name": "salt",
+            "type": "bytes32",
+            "indexed": false,
+            "column": "salt"
+          }
+        ],
+        "name": "CreateSendEarn"
+      },
+      "table": {
+        "name": "send_earn_create",
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric"
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea"
+          },
+          {
+            "name": "block_time",
+            "type": "numeric"
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea"
+          },
+          {
+            "name": "send_earn",
+            "type": "bytea"
+          },
+          {
+            "name": "caller",
+            "type": "bytea"
+          },
+          {
+            "name": "initial_owner",
+            "type": "bytea"
+          },
+          {
+            "name": "vault",
+            "type": "bytea"
+          },
+          {
+            "name": "fee_recipient",
+            "type": "bytea"
+          },
+          {
+            "name": "collections",
+            "type": "bytea"
+          },
+          {
+            "name": "fee",
+            "type": "numeric"
+          },
+          {
+            "name": "salt",
+            "type": "bytea"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START"
+        }
+      ]
+    },
+    {
       "name": "send_earn_new_affiliate",
       "enabled": true,
       "block": [
@@ -1163,7 +1303,7 @@
           "column": "log_addr",
           "filter_op": "contains",
           "filter_arg": [
-            "0x8cc3629b445746Be413C121a7385925B23226197"
+            "0xe22Edc692E9b4Af786Acb369d591163F1379803F"
           ]
         }
       ],
@@ -1200,10 +1340,6 @@
           {
             "name": "block_time",
             "type": "numeric"
-          },
-          {
-            "name": "user_op_hash",
-            "type": "bytea"
           },
           {
             "name": "tx_hash",

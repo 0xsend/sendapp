@@ -12,6 +12,7 @@ import {
   sendtagCheckoutReceiptsIntegration,
   sendPotUserTicketPurchaseIntegration,
   sendPotJackpotRunIntegration,
+  sendEarnCreate,
   sendEarnNewAffiliate,
 } from './integrations'
 
@@ -80,6 +81,10 @@ export const integrations: Integration[] = [
   },
   {
     ...sendPotJackpotRunIntegration,
+    sources: [{ name: baseSrcLogs.name, start: '$BASE_BLOCK_START' }],
+  },
+  {
+    ...sendEarnCreate,
     sources: [{ name: baseSrcLogs.name, start: '$BASE_BLOCK_START' }],
   },
   {

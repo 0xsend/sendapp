@@ -13,7 +13,6 @@ export const sendEarnNewAffiliate: Table = {
     { name: 'chain_id', type: 'numeric' },
     { name: 'log_addr', type: 'bytea' },
     { name: 'block_time', type: 'numeric' },
-    { name: 'user_op_hash', type: 'bytea' },
     { name: 'tx_hash', type: 'bytea' },
     { name: 'affiliate', type: 'bytea' },
     { name: 'send_earn_affiliate', type: 'bytea' },
