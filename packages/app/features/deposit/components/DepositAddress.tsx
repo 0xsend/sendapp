@@ -149,7 +149,9 @@ useEffect(() => {
         console.error('Failed to save dontShowAgain:', error)
       }
     }
-    setCopyAddressDialogIsOpen(true)
+    if (!dontShowAgain) {
+  setCopyAddressDialogIsOpen(true);
+    }
     return
   }
 
