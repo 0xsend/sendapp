@@ -20,6 +20,7 @@ import { useState, useEffect } from 'react'
 import type { Address } from 'viem'
 import { IconCopy } from 'app/components/icons'
 import { useQRCode } from 'app/utils/useQRCode'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 function CopyAddressDialog({ isOpen, onClose, onConfirm }) { const [dontShowAgain, setDontShowAgain] = useState(false)
   return (
@@ -92,6 +93,23 @@ export function DepositAddress({ address, ...props }: { address?: Address } & Bu
   const [hasCopied, setHasCopied] = useState(false)
   const [isConfirmed, setIsConfirmed] = useState(false)
   const [copyAddressDialogIsOpen, setCopyAddressDialogIsOpen] = useState(false)
+  const [dontShowAgain, setDontShowAgain] = useState(false)
+
+useEffect(() => {
+  const loadDontShowAgain = async () => {
+    try {
+      const savedValue = await AsyncStorage.getItem('dontShowAgain')
+      if (savedValue === 'true') {
+        setDontShowAgain(true)
+        setIsConfirmed(true) // Auto-confirm if "Don't show again" was checked
+      }
+    } catch (error) {
+      console.error('Failed to load dontShowAgain:', error)
+    }
+  }
+
+  loadDontShowAgain()
+}, [])
 
   const { data: qrData, error } = useQRCode(address, {
     width: 240,
