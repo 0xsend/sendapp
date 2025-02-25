@@ -46,11 +46,13 @@ export const CheckoutForm = () => {
 
   return (
     <>
-      <YStack gap={'$3.5'}>
-        <RowLabel>Review purchase</RowLabel>
-        <TotalPrice />
+      <YStack gap="$5">
+        <YStack gap={'$3.5'}>
+          <RowLabel>Review purchase</RowLabel>
+          <TotalPrice />
+        </YStack>
+        <ReferredBy />
       </YStack>
-      <ReferredBy />
       <ConfirmButton onConfirmed={onConfirmed} />
     </>
   )
