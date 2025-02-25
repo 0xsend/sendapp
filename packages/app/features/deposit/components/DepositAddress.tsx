@@ -93,23 +93,23 @@ export function DepositAddress({ address, ...props }: { address?: Address } & Bu
   const [hasCopied, setHasCopied] = useState(false)
   const [isConfirmed, setIsConfirmed] = useState(false)
   const [copyAddressDialogIsOpen, setCopyAddressDialogIsOpen] = useState(false)
-  const [dontShowAgain, setDontShowAgain] = useState(false)
+  const [dontShowAgain, setDontShowAgain] = useState(false);
 
 useEffect(() => {
   const loadDontShowAgain = async () => {
     try {
-      const savedValue = await AsyncStorage.getItem('dontShowAgain')
-      if (savedValue === 'true') {
-        setDontShowAgain(true)
-        setIsConfirmed(true) // Auto-confirm if "Don't show again" was checked
+      const savedValue = await AsyncStorage.getItem('dontShowAgain');
+      if (savedValue !== null) {
+        setDontShowAgain(JSON.parse(savedValue));
+        setIsConfirmed(JSON.parse(savedValue)); // Auto-confirm if "Don't show again" was checked
       }
     } catch (error) {
-      console.error('Failed to load dontShowAgain:', error)
+      console.error('Failed to load dontShowAgain:', error);
     }
-  }
+  };
 
-  loadDontShowAgain()
-}, [])
+  loadDontShowAgain();
+}, []);
 
   const { data: qrData, error } = useQRCode(address, {
     width: 240,
