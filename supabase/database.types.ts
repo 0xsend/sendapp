@@ -80,6 +80,27 @@ export type Database = MergeDeep<
             referrer: PgBytea
           }
         }
+        send_earn_new_affiliate: {
+          Row: {
+            log_addr: PgBytea
+            tx_hash: PgBytea
+            affiliate: PgBytea
+            send_earn_affiliate: PgBytea
+          }
+        }
+        send_earn_create: {
+          Row: {
+            log_addr: PgBytea
+            tx_hash: PgBytea
+            send_earn: PgBytea
+            caller: PgBytea
+            initial_owner: PgBytea
+            vault: PgBytea
+            fee_recipient: PgBytea
+            collections: PgBytea
+            salt: PgBytea
+          }
+        }
       }
       Functions: {
         distribution_hodler_addresses: {
