@@ -839,6 +839,114 @@ export type Database = {
           },
         ]
       }
+      send_earn_create: {
+        Row: {
+          abi_idx: number | null
+          block_num: number | null
+          block_time: number | null
+          caller: string | null
+          chain_id: number | null
+          collections: string | null
+          fee: number | null
+          fee_recipient: string | null
+          ig_name: string | null
+          initial_owner: string | null
+          log_addr: string | null
+          log_idx: number | null
+          salt: string | null
+          send_earn: string | null
+          src_name: string | null
+          tx_hash: string | null
+          tx_idx: number | null
+          vault: string | null
+        }
+        Insert: {
+          abi_idx?: number | null
+          block_num?: number | null
+          block_time?: number | null
+          caller?: string | null
+          chain_id?: number | null
+          collections?: string | null
+          fee?: number | null
+          fee_recipient?: string | null
+          ig_name?: string | null
+          initial_owner?: string | null
+          log_addr?: string | null
+          log_idx?: number | null
+          salt?: string | null
+          send_earn?: string | null
+          src_name?: string | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+          vault?: string | null
+        }
+        Update: {
+          abi_idx?: number | null
+          block_num?: number | null
+          block_time?: number | null
+          caller?: string | null
+          chain_id?: number | null
+          collections?: string | null
+          fee?: number | null
+          fee_recipient?: string | null
+          ig_name?: string | null
+          initial_owner?: string | null
+          log_addr?: string | null
+          log_idx?: number | null
+          salt?: string | null
+          send_earn?: string | null
+          src_name?: string | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+          vault?: string | null
+        }
+        Relationships: []
+      }
+      send_earn_new_affiliate: {
+        Row: {
+          abi_idx: number | null
+          affiliate: string | null
+          block_num: number | null
+          block_time: number | null
+          chain_id: number | null
+          ig_name: string | null
+          log_addr: string | null
+          log_idx: number | null
+          send_earn_affiliate: string | null
+          src_name: string | null
+          tx_hash: string | null
+          tx_idx: number | null
+        }
+        Insert: {
+          abi_idx?: number | null
+          affiliate?: string | null
+          block_num?: number | null
+          block_time?: number | null
+          chain_id?: number | null
+          ig_name?: string | null
+          log_addr?: string | null
+          log_idx?: number | null
+          send_earn_affiliate?: string | null
+          src_name?: string | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+        }
+        Update: {
+          abi_idx?: number | null
+          affiliate?: string | null
+          block_num?: number | null
+          block_time?: number | null
+          chain_id?: number | null
+          ig_name?: string | null
+          log_addr?: string | null
+          log_idx?: number | null
+          send_earn_affiliate?: string | null
+          src_name?: string | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+        }
+        Relationships: []
+      }
       send_liquidity_pools: {
         Row: {
           address: string
