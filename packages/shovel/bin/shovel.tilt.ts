@@ -35,7 +35,7 @@ await $`docker run --rm \
     -v ${import.meta.dir}/../etc:/etc/shovel \
     --entrypoint /usr/local/bin/shovel \
     -w /usr/local/bin \
-    docker.io/indexsupply/shovel:3410 \
+    docker.io/indexsupply/shovel:af07 \
       -l :80 \
       ${$.env.SHOVEL_DEBUG === '1' ? '-v' : ''} \
       ${$.env.SHOVEL_MIGRATE === '1' ? '' : '-skip-migrate'} \
