@@ -77,7 +77,7 @@ const LinkableButtonFrame = styled(Button, {
     disabled: {
       true: {
         pointerEvents: 'none',
-        opacity: 0.7,
+        opacity: 0.5,
       },
     },
   } as const,
