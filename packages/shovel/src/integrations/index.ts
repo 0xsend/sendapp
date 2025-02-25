@@ -7,3 +7,4 @@ export { integration as sendAccountSigningKeyAdded } from './send-account-signin
 export { integration as sendAccountSigningKeyRemoved } from './send-account-signing-key-removed'
 export { integration as sendAccountReceivesIntegration } from './send-account-receives'
 export { integration as sendtagCheckoutReceiptsIntegration } from './sendtag-checkout-receipts'
+export { integration as sendEarnNewAffiliate } from './send-earn-new-affiliate'
