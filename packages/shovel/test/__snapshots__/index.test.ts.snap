@@ -842,6 +842,90 @@ exports[`shovel config 1`] = `
         "name": "sendtag_checkout_receipts",
       },
     },
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "tx_hash",
+          "name": "tx_hash",
+        },
+        {
+          "column": "log_addr",
+          "filter_arg": [
+            "0xe22Edc692E9b4Af786Acb369d591163F1379803F",
+          ],
+          "filter_op": "contains",
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "column": "affiliate",
+            "indexed": false,
+            "name": "affiliate",
+            "type": "address",
+          },
+          {
+            "column": "send_earn_affiliate",
+            "indexed": false,
+            "name": "send_earn_affiliate",
+            "type": "address",
+          },
+        ],
+        "name": "NewAffiliate",
+        "type": "event",
+      },
+      "name": "send_earn_new_affiliate",
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "user_op_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "affiliate",
+            "type": "bytea",
+          },
+          {
+            "name": "send_earn_affiliate",
+            "type": "bytea",
+          },
+        ],
+        "name": "send_earn_new_affiliate",
+      },
+    },
   ],
   "pg_url": "$DATABASE_URL",
   "sources": [
