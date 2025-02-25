@@ -133,6 +133,28 @@ useEffect(() => {
   if (!address) return null
 
   const copyOnPress = async () => {
+  if (!isConfirmed) {
+    if (dontShowAgain) {
+      try {
+        await AsyncStorage.setItem('dontShowAgain', 'true')
+      } catch (error) {
+        console.error('Failed to save dontShowAgain:', error)
+      }
+    }
+    setCopyAddressDialogIsOpen(true)
+    return
+  }
+
+  await Clipboard.setString(address).catch(() =>
+    toast.show('Something went wrong', {
+      message: 'We were unable to copy your address to the clipboard',
+      customData: {
+        theme: 'red',
+      },
+    })
+  )
+  setHasCopied(true)
+  }
     if (!isConfirmed) {
       setCopyAddressDialogIsOpen(true)
       return
