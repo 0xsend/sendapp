@@ -114,6 +114,18 @@ export default defineConfig({
       },
       abi: [],
     },
+    /**
+     * [Send: Earn Revenue](https://basescan.org/address/0x65049C4B8e970F5bcCDAE8E141AA06346833CeC4)
+     **/
+    {
+      name: 'SendEarnRevenueSafe',
+      address: {
+        [baseLocal.id]: '0x65049C4B8e970F5bcCDAE8E141AA06346833CeC4',
+        [base.id]: '0x65049C4B8e970F5bcCDAE8E141AA06346833CeC4',
+        [baseSepolia.id]: '0x269cD0a2afd1BAbdA7A74ab1dC853869a37aa4a7',
+      },
+      abi: [],
+    },
     {
       /**
        * [Send: Treasury](https://basescan.org/address/0x05CEa6C36f3a44944A4F4bA39B1820677AcB97EE)
@@ -283,12 +295,12 @@ export default defineConfig({
     {
       name: 'SendEarnFactory',
       address: {
-        [mainnet.id]: '0x8cc3629b445746be413c121a7385925b23226197',
-        [localhost.id]: '0x8cc3629b445746be413c121a7385925b23226197',
-        [sepolia.id]: '0x8cc3629b445746be413c121a7385925b23226197',
-        [baseLocal.id]: '0x8cc3629b445746be413c121a7385925b23226197',
-        [base.id]: '0x8cc3629b445746be413c121a7385925b23226197',
-        [baseSepolia.id]: '0x8cc3629b445746be413c121a7385925b23226197',
+        [mainnet.id]: '0xe22edc692e9b4af786acb369d591163f1379803f',
+        [localhost.id]: '0xe22edc692e9b4af786acb369d591163f1379803f',
+        [sepolia.id]: '0xe22edc692e9b4af786acb369d591163f1379803f',
+        [baseLocal.id]: '0xe22edc692e9b4af786acb369d591163f1379803f',
+        [base.id]: '0xe22edc692e9b4af786acb369d591163f1379803f',
+        [baseSepolia.id]: '0xe22edc692e9b4af786acb369d591163f1379803f',
       },
       // @ts-expect-error doesn't like the artifact
       abi: sendEarnFactoryArtifact.abi,
