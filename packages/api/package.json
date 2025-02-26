@@ -5,7 +5,9 @@
   "private": true,
   "dependencies": {
     "@my/supabase": "workspace:*",
+    "@my/temporal": "workspace:*",
     "@my/wagmi": "workspace:*",
+    "@my/workflows": "workspace:*",
     "@supabase/supabase-js": "2.44.2",
     "@tanstack/react-query": "^5.18.1",
     "@trpc/client": "11.0.0-next-beta.264",
@@ -19,7 +21,7 @@
     "ms": "^2.1.3",
     "p-queue": "^8.0.1",
     "permissionless": "^0.1.14",
-    "superjson": "^1.13.1",
+    "superjson": "^2.2.1",
     "viem": "^2.19.0",
     "zod": "^3.23.8"
   },

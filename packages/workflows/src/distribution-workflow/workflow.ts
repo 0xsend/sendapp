@@ -1,12 +1,12 @@
 // workflows.ts
 import { proxyActivities, log, ApplicationFailure } from '@temporalio/workflow'
-import type { createActivities } from './activities'
+import type { createDistributionActivities } from './activities'
 
 const {
   calculateDistributionSharesActivity,
   fetchDistributionActivity,
   fetchAllOpenDistributionsActivity,
-} = proxyActivities<ReturnType<typeof createActivities>>({
+} = proxyActivities<ReturnType<typeof createDistributionActivities>>({
   startToCloseTimeout: '30 seconds',
 })
 

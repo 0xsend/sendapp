@@ -8,11 +8,13 @@
   ],
   "scripts": {
     "lint": "tsc",
-    "start": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' src/worker.ts",
-    "workflow": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' src/client.ts"
+    "start": "yarn with-env node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' src/worker.ts",
+    "workflow": "yarn with-env node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' src/client.ts",
+    "with-env": "dotenv -e ../../.env -c --"
   },
   "devDependencies": {
     "@types/bun": "^1.1.6",
+    "dotenv-cli": "^7.3.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.3"
   },
