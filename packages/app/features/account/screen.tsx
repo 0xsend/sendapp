@@ -1,25 +1,23 @@
 import {
   Avatar,
+  Button,
+  LinearGradient,
+  LinkableButton,
   Paragraph,
+  Separator,
+  Theme,
+  useToastController,
   XStack,
   YStack,
-  Button,
-  useToastController,
-  TooltipSimple,
-  useMedia,
-  Theme,
-  Heading,
-  LinkableButton,
-  LinearGradient,
 } from '@my/ui'
 import {
   IconAccount,
   IconCopy,
-  IconStarOutline,
   IconGear,
-  IconShare,
-  IconArrowRight,
+  IconGroup,
+  IconQRFull,
   IconSlash,
+  IconStarOutline,
 } from 'app/components/icons'
 import { getReferralHref } from 'app/utils/getReferralLink'
 import { useUser } from 'app/utils/useUser'
@@ -30,12 +28,30 @@ import { useConfirmedTags } from 'app/utils/tags'
 import { useUserReferralsCount } from 'app/utils/useUserReferralsCount'
 import { IconRocket } from 'app/components/icons/IconRocket'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { IconCoin } from 'app/components/icons/IconCoin'
+import { ChevronRight } from '@tamagui/lucide-icons'
+
+const links = [
+  {
+    label: 'Sendtags',
+    href: '/account/sendtag',
+    icon: <IconSlash size={'$1.5'} $theme-light={{ color: '$color12' }} />,
+  },
+  {
+    label: 'Rewards',
+    href: '/account/rewards',
+    icon: <IconStarOutline size={'$1.5'} $theme-light={{ color: '$color12' }} />,
+  },
+  {
+    label: 'Affiliate',
+    href: '/account/affiliate',
+    icon: <IconRocket size={'$1.5'} $theme-light={{ color: '$color12' }} />,
+  },
+]
 
 export function AccountScreen() {
-  const media = useMedia()
   const toast = useToastController()
   const { profile } = useUser()
-  const { data: referralsCount } = useUserReferralsCount()
 
   const name = profile?.name
   const send_id = profile?.send_id
@@ -53,19 +69,6 @@ export function AccountScreen() {
     canShare()
   }, [])
 
-  const copyOnPress = async () => {
-    await Clipboard.setStringAsync(referralHref)
-      .then(() => toast.show('Copied your referral link to the clipboard'))
-      .catch(() =>
-        toast.show('Something went wrong', {
-          message: 'We were unable to copy your referral link to the clipboard',
-          customData: {
-            theme: 'red',
-          },
-        })
-      )
-  }
-
   const copyAndMaybeShareOnPress = async () => {
     await Clipboard.setStringAsync(referralHref)
       .then(() => toast.show('Copied your referral link to the clipboard'))
@@ -80,215 +83,152 @@ export function AccountScreen() {
       )
   }
 
-  const avatarWidth = (() => {
-    switch (true) {
-      case media.xxs:
-        return 325
-      case media.xs:
-        return 360
-      default:
-        return 400
-    }
-  })()
-
-  const links = [
-    {
-      label: 'Sendtags',
-      href: '/account/sendtag',
-      icon: <IconSlash size={22} $theme-light={{ color: '$color12' }} />,
-    },
-    {
-      label: 'Rewards',
-      href: '/account/rewards',
-      icon: <IconStarOutline size={20} $theme-light={{ color: '$color12' }} />,
-    },
-    {
-      label: 'Affiliate',
-      href: '/account/affiliate',
-      icon: <IconRocket size={24} $theme-light={{ color: '$color12' }} />,
-    },
-  ]
-
   return (
     <YStack
-      gap={'$size.1.5'}
-      width={'100%'}
-      pb={'$size.1.5'}
-      pt={'$3'}
-      $gtMd={{ flexDirection: 'row', ai: 'stretch', alignSelf: 'flex-start' }}
-      $gtLg={{ pt: 0 }}
-      ai="center"
+      gap={'$3.5'}
+      w={'100%'}
+      pb={'$3.5'}
+      maxWidth={'500px'}
+      marginHorizontal={'auto'}
+      $gtLg={{
+        gap: '$5',
+        flexDirection: 'row',
+        maxWidth: '1100px',
+        marginHorizontal: 0,
+        height: 'min-content',
+      }}
     >
-      <YStack bg={'$color1'} br={'$6'} maxWidth={avatarWidth}>
-        <YStack ai={'flex-start'} h="100%">
-          <YStack pos={'relative'}>
-            <Avatar size={avatarWidth} btlr={'$6'} btrr={'$6'} bc="$color2">
-              <Avatar.Image accessibilityLabel="" src={avatar_url ?? ''} />
-              <Avatar.Fallback f={1} ai={'center'} theme="green_active">
-                <IconAccount size={avatarWidth * 0.9} $theme-light={{ color: '$color12' }} />
-              </Avatar.Fallback>
-            </Avatar>
-            <LinearGradient
-              start={[0, 1]}
-              end={[0, 0]}
-              width={'100%'}
-              height={'$9'}
-              colors={['$color1', '$color1', 'transparent']}
-              pos={'absolute'}
-              pointerEvents={'none'}
-              b={0}
-              zIndex={2}
-            />
-            <XStack
-              zIndex={3}
-              pos={'absolute'}
-              bottom={'0'}
-              px={'$size.1'}
-              ai={'center'}
-              jc={'space-between'}
-              w={'100%'}
-              $gtXs={{ px: '$size.3.5' }}
-            >
-              <Heading fontSize={'$10'} fontWeight={'900'} color={'$color12'}>
-                {name ? name.toUpperCase() : '---'}
-              </Heading>
-            </XStack>
-          </YStack>
-          <YStack
-            $gtXs={{ p: '$size.3.5' }}
-            p={'$size.1'}
-            pt={'$size.0.9'}
-            jc={'space-between'}
-            f={1}
-            width={'100%'}
+      <YStack
+        w="100%"
+        height={'75%'}
+        overflow="hidden"
+        br="$6"
+        position="relative"
+        $gtLg={{
+          gap: '$5',
+          width: '50%',
+          height: 'auto',
+        }}
+      >
+        <Avatar
+          w={'100%'}
+          h={'100%'}
+          maxWidth={'100%'}
+          maxHeight={'100%'}
+          bc="$color2"
+          br="$6"
+          borderWidth={1}
+          borderColor={'$background'}
+        >
+          <Avatar.Image width={'100%'} height={'100%'} src={avatar_url ?? ''} />
+          <Avatar.Fallback f={1} ai={'center'} theme="green_active">
+            <IconAccount $theme-light={{ color: '$color12' }} />
+          </Avatar.Fallback>
+        </Avatar>
+        <LinearGradient
+          start={[0, 0]}
+          end={[0, 1]}
+          fullscreen
+          colors={['transparent', 'transparent', 'rgba(0,0,0,0.5)', 'rgba(0,0,0,0.8)']}
+          zIndex={2}
+          br="$6"
+        >
+          <XStack
+            position="absolute"
+            gap="$2"
+            ai={'center'}
+            top={'$5'}
+            left={'$5'}
+            p={'$2'}
+            paddingRight={'$3'}
+            br={'$4'}
+            bc={'rgba(0,0,0, 0.25)'}
+            backdropFilter={'blur(5px)'}
           >
-            <YStack>
-              <XStack gap="$size.0.75">
-                <Paragraph color={'$color10'} size="$6">
-                  Send ID:
-                </Paragraph>
-                <Paragraph size="$6">{send_id}</Paragraph>
-              </XStack>
-              <YStack
-                flexDirection="row"
-                gap={'$size.0.75'}
-                flexWrap="wrap"
-                flexGrow={1}
-                mt={'$size.0.9'}
-              >
-                {tags?.map((tag) => (
-                  <TagPill key={tag.name}>{tag.name}</TagPill>
-                ))}
-              </YStack>
-            </YStack>
-
-            <XStack gap="$size.0.9" mt={'$size.1.5'}>
+            <IconCoin symbol={'SEND'} />
+            <Paragraph size={'$5'} color={'$white'}>
+              Send ID: {send_id}
+            </Paragraph>
+          </XStack>
+          <YStack
+            position="absolute"
+            top={0}
+            left={0}
+            width="100%"
+            height="100%"
+            p={'$5'}
+            justifyContent="flex-end"
+            gap={'$3.5'}
+          >
+            <Paragraph size={'$9'} $theme-light={{ color: '$white' }} fontWeight={600}>
+              {name || '---'}
+            </Paragraph>
+            <XStack flexWrap="wrap" columnGap={'$2.5'} rowGap={'$2'}>
+              {tags?.map((tag) => (
+                <TagPill key={tag.name}>{tag.name}</TagPill>
+              ))}
+            </XStack>
+            <XStack gap="$3.5">
               <LinkableButton
                 href={'/account/settings'}
                 theme={'green'}
-                borderRadius={'$3'}
+                br={'$4'}
                 flexBasis={'50%'}
                 flexShrink={1}
-                ai={'center'}
+                p={'$4'}
               >
-                <XStack jc={'space-between'} ai={'center'} gap={'$size.0.75'}>
-                  <Button.Text fontWeight={600} tt={'uppercase'}>
-                    Settings
-                  </Button.Text>
+                <XStack ai={'center'} gap={'$2'}>
                   <Button.Icon>
-                    <IconGear size={20} />
+                    <IconGear size={'$1'} color={'$black'} />
                   </Button.Icon>
+                  <Button.Text
+                    ff={'$mono'}
+                    fontWeight={'500'}
+                    tt="uppercase"
+                    size={'$5'}
+                    color={'$black'}
+                  >
+                    settings
+                  </Button.Text>
                 </XStack>
               </LinkableButton>
               <Button
                 onPress={copyAndMaybeShareOnPress}
                 theme="green"
                 variant={'outlined'}
-                borderRadius={'$3'}
-                flexBasis={'50%'}
-                flexShrink={1}
+                br={'$4'}
                 borderColor={'$primary'}
                 ai={'center'}
+                flexBasis={'50%'}
+                flexShrink={1}
+                p={'$4'}
               >
                 <XStack jc={'space-between'} gap={'$size.0.75'} ai={'center'}>
-                  <Button.Text color="$color12" fontWeight={600} tt={'uppercase'}>
-                    Share
-                  </Button.Text>
                   <Button.Icon>
-                    <IconShare
-                      size="$1"
-                      col={'$background'}
-                      $theme-light={{ color: '$color12' }}
-                      $platform-web={{ cursor: 'pointer' }}
-                    />
+                    <IconQRFull size={16} color={'$white'} $platform-web={{ cursor: 'pointer' }} />
                   </Button.Icon>
+                  <Button.Text
+                    ff={'$mono'}
+                    fontWeight={'500'}
+                    tt="uppercase"
+                    size={'$5'}
+                    color={'$white'}
+                  >
+                    share
+                  </Button.Text>
                 </XStack>
               </Button>
             </XStack>
           </YStack>
-        </YStack>
+        </LinearGradient>
       </YStack>
-
-      <YStack gap={'$size.1.5'} maxWidth={480} f={1} width="100%">
-        {links.map((linkProps) => (
-          <StackButton key={linkProps.label} {...linkProps} />
-        ))}
-
-        <YStack
-          backgroundColor={'$color1'}
-          jc={'space-between'}
-          borderRadius={'$6'}
-          p={'$size.1'}
-          $gtXs={{ p: '$size.3.5' }}
-          f={1}
-        >
-          <XStack ai={'center'} jc="space-between">
-            <Paragraph size={'$9'} color="$color12" fontWeight={600}>
-              Referrals
-            </Paragraph>
-            <Paragraph
-              ff={'$mono'}
-              py={'$size.0.5'}
-              px={'$size.0.9'}
-              borderWidth={1}
-              borderColor={'$primary'}
-              $theme-light={{ borderColor: '$color12' }}
-              borderRadius={'$4'}
-            >
-              {referralsCount ?? 0}
-            </Paragraph>
-          </XStack>
-          <YStack>
-            <Paragraph color="$color10">Referral Code</Paragraph>
-            <XStack py={'$2.5'} borderRadius={'$4'}>
-              <TooltipSimple label={<Paragraph color="$white">{'Copy'}</Paragraph>}>
-                <Button
-                  bc={'$color0'}
-                  br="$2"
-                  aria-label={'Copy'}
-                  f={1}
-                  fd="row"
-                  chromeless
-                  onPress={copyOnPress}
-                  color="$color12"
-                  justifyContent="space-between"
-                  iconAfter={
-                    <Theme name="green_Button">
-                      <IconCopy
-                        size="$1"
-                        col={'$background'}
-                        $theme-light={{ color: '$color12' }}
-                        $platform-web={{ cursor: 'pointer' }}
-                      />
-                    </Theme>
-                  }
-                >
-                  <Button.Text size={'$6'}>SEND.APP/{refCode}</Button.Text>
-                </Button>
-              </TooltipSimple>
-            </XStack>
-          </YStack>
-        </YStack>
+      <YStack gap={'$3.5'} width="100%" $gtLg={{ gap: '$5', width: '50%', height: 'fit-content' }}>
+        <XStack gap={'$3.5'} $gtLg={{ gap: '$5', flexDirection: 'column' }}>
+          {links.map((linkProps) => (
+            <StackButton key={linkProps.label} {...linkProps} />
+          ))}
+        </XStack>
+        <ReferralCode />
       </YStack>
     </YStack>
   )
@@ -301,26 +241,29 @@ const StackButton = ({ href, label, icon }: { href: string; label: string; icon:
     <LinkableButton
       href={href}
       unstyled
+      flexGrow={1}
       backgroundColor={'$color1'}
       borderRadius={'$6'}
-      p={'$size.1'}
-      $gtXs={{ p: '$size.3.5' }}
-      borderWidth={1}
-      borderColor={'$color1'}
+      p={'$5'}
       hoverStyle={hoverStyles}
+      $gtLg={{ p: '$7' }}
     >
-      <XStack jc={'space-between'} ai={'center'}>
-        <XStack gap={'$size.0.9'} ai={'center'}>
+      <XStack jc={'space-between'} ai={'center'} gap={'$2'}>
+        <YStack f={1} gap={'$3.5'} ai={'center'} $gtLg={{ flexDirection: 'row' }}>
           <Theme name="green_active">
             <Button.Icon>{icon}</Button.Icon>
           </Theme>
-          <Button.Text size={'$9'} color="$color12" fontWeight={600}>
+          <Button.Text size={'$5'} color="$color12" $gtLg={{ size: '$9', fontWeight: 500 }}>
             {label}
           </Button.Text>
-        </XStack>
-        <Theme name="green_active">
-          <IconArrowRight size={24} $theme-light={{ color: '$color' }} />
-        </Theme>
+        </YStack>
+        <ChevronRight
+          size={'$1'}
+          color={'$lightGrayTextField'}
+          $theme-light={{ color: '$darkGrayTextField' }}
+          display={'none'}
+          $gtLg={{ display: 'block' }}
+        />
       </XStack>
     </LinkableButton>
   )
@@ -328,15 +271,105 @@ const StackButton = ({ href, label, icon }: { href: string; label: string; icon:
 
 const TagPill = ({ children }: PropsWithChildren) => {
   return (
-    <Paragraph
-      fontSize={'$2'}
-      bg="rgba(255,255,255,.1)"
-      $theme-light={{ bg: '$color2' }}
-      px={'$size.0.75'}
-      py={'$size.0.1'}
-      borderRadius={'$1'}
+    <XStack
+      px={'$2.5'}
+      py={'$1'}
+      br={'$2'}
+      bc={'rgba(255,255,255, 0.1)'}
+      backdropFilter={'blur(5px)'}
     >
-      /{children}
-    </Paragraph>
+      <Paragraph fontSize={'$2'} color={'$white'}>
+        /{children}
+      </Paragraph>
+    </XStack>
+  )
+}
+
+const ReferralCode = () => {
+  const { data: referralsCount } = useUserReferralsCount()
+  const { profile } = useUser()
+  const toast = useToastController()
+  const refCode = profile?.referral_code ?? ''
+  const referralHref = getReferralHref(refCode)
+
+  const copyOnPress = async () => {
+    await Clipboard.setStringAsync(referralHref)
+      .then(() => toast.show('Copied your referral link to the clipboard'))
+      .catch(() =>
+        toast.show('Something went wrong', {
+          message: 'We were unable to copy your referral link to the clipboard',
+          customData: {
+            theme: 'red',
+          },
+        })
+      )
+  }
+
+  return (
+    <YStack
+      w={'100%'}
+      bc={'$color1'}
+      jc={'space-between'}
+      br={'$6'}
+      p={'$5'}
+      gap={'$5'}
+      mb={'$3.5'}
+      $gtLg={{ p: '$7', gap: '$9', mb: 0 }}
+    >
+      <XStack ai={'center'} jc="space-between">
+        <XStack gap={'$3.5'} ai={'center'}>
+          <IconGroup
+            size={'$1.5'}
+            $theme-dark={{ color: '$primary' }}
+            $theme-light={{ color: '$color12' }}
+          />
+          <Paragraph size={'$7'} color="$color12" fontWeight={500} $gtLg={{ size: '$9' }}>
+            Referrals
+          </Paragraph>
+        </XStack>
+        <Paragraph
+          ff={'$mono'}
+          py={'$size.0.5'}
+          px={'$size.0.9'}
+          borderWidth={1}
+          borderColor={'$primary'}
+          $theme-light={{ borderColor: '$color12' }}
+          borderRadius={'$4'}
+          size={'$5'}
+        >
+          {referralsCount ?? 0}
+        </Paragraph>
+      </XStack>
+      <YStack gap={'$2'}>
+        <XStack jc={'space-between'} ai={'center'}>
+          <Paragraph size={'$5'}>SEND.APP/{refCode}</Paragraph>
+          <Button
+            chromeless
+            backgroundColor="transparent"
+            hoverStyle={{ backgroundColor: 'transparent' }}
+            pressStyle={{
+              backgroundColor: 'transparent',
+              borderColor: 'transparent',
+            }}
+            focusStyle={{ backgroundColor: 'transparent' }}
+            p={0}
+            height={'auto'}
+            onPress={copyOnPress}
+          >
+            <Button.Icon>
+              <IconCopy color={'$primary'} $theme-light={{ color: '$color12' }} size="$1" />
+            </Button.Icon>
+          </Button>
+        </XStack>
+        <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
+        <Paragraph
+          size={'$5'}
+          color={'$lightGrayTextField'}
+          $theme-light={{ color: '$darkGrayTextField' }}
+        >
+          Referral Code
+        </Paragraph>
+      </YStack>
+    </YStack>
   )
 }
