@@ -8,6 +8,8 @@ import {
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { reward, total } from 'app/data/sendtags'
+import { api } from 'app/utils/api'
+import { useReferrer } from 'app/utils/referrer'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { usePendingTags } from 'app/utils/tags'
@@ -17,7 +19,6 @@ import { useUSDCFees } from 'app/utils/useUSDCFees'
 import { useMemo } from 'react'
 import { encodeFunctionData, erc20Abi, zeroAddress } from 'viem'
 import { fetchSendtagCheckoutReceipts } from './checkout-utils.fetchSendtagCheckoutReceipts'
-import { useReferrer } from 'app/utils/useReferrer'
 
 export const verifyAddressMsg = (a: string | `0x${string}`) =>
   `I am the owner of the address: ${a}.
