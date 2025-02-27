@@ -1,4 +1,4 @@
-import { Button, Card, type CardProps, H4, Paragraph, Spinner, YStack } from '@my/ui'
+import { Card, type CardProps, H4, Paragraph, Spinner, YStack } from '@my/ui'
 import type { CoinWithBalance } from 'app/data/coins'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { useState } from 'react'
