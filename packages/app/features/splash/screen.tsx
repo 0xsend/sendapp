@@ -114,7 +114,7 @@ function Hero() {
   const carouselImage = carouselImages[carouselProgress]
   const mobileImagePosition = carouselImagePositions[carouselProgress]
   const isPwa = usePwa()
-  const { sat, sab } = useSafeAreaInsets()
+  const { bottom, top } = useSafeAreaInsets()
 
   const containerHeight = (() => {
     switch (true) {
@@ -136,9 +136,10 @@ function Hero() {
       f={1}
     >
       <YStack
-        h={isPwa && '100vh'}
-        pt={isPwa && sat}
-        pb={isPwa && sab}
+        f={1}
+        h={isPwa ? '100vh' : 'unset'}
+        pt={Math.max(top, 24)}
+        pb={Math.max(bottom, 16)}
         overflow="hidden"
         $gtMd={{ borderRadius: '$8' }}
         w="100%"

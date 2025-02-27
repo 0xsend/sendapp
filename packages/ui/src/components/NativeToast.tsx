@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from '../utils'
 
 export const NativeToast = () => {
   const currentToast = useToastState()
-  const { sat } = useSafeAreaInsets()
+  const { top } = useSafeAreaInsets()
 
   if (!currentToast || currentToast.isHandledNatively) {
     return null
@@ -26,7 +26,7 @@ export const NativeToast = () => {
         boc="color12"
         $theme-dark={{ boc: '$primary' }}
         maxWidth="$size.22"
-        mt={sat}
+        mt={top}
       >
         <YStack py="$1.5" px="$2">
           <Toast.Title>{currentToast.title}</Toast.Title>

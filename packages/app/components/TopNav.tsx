@@ -10,7 +10,6 @@ import {
   Container,
   Separator,
   type ButtonProps,
-  usePwa,
   Avatar,
 } from '@my/ui'
 import { useRootScreenParams } from 'app/routers/params'
@@ -18,7 +17,6 @@ import { IconAccount, IconArrowLeft, IconSendLogo } from 'app/components/icons'
 import { usePathname } from 'app/utils/usePathname'
 import { useRouter } from 'solito/router'
 
-import { SettingsBottomSheet } from 'app/features/account/settings/SettingsBottomSheet'
 import { useCoinFromTokenParam } from '../utils/useCoinFromTokenParam'
 import { Link } from 'solito/link'
 import { useUser } from 'app/utils/useUser'
@@ -90,7 +88,6 @@ export function TopNav({
   const { push, back } = useRouter()
   const media = useMedia()
   const { coin: selectedCoin } = useCoinFromTokenParam()
-  const isPwa = usePwa()
   const { profile } = useUser()
 
   const hasSelectedCoin = Boolean(selectedCoin)
@@ -120,11 +117,6 @@ export function TopNav({
       }
     }
 
-    if (path.includes('/settings')) {
-      push(`/${newPath()}?nav=settings`)
-      return
-    }
-
     push(`/${newPath()}`)
   }
   //@todo Refactor this so we can put back arrows on screens that need it
@@ -136,13 +128,14 @@ export function TopNav({
     path.includes('/leaderboard')
 
   return (
-    <Header w="100%">
+    <Header w="100%" $lg={{ py: '$3' }}>
       <Container
+        safeAreaProps={{
+          edges: ['top', 'left', 'right'],
+        }}
         $gtLg={{ jc: 'flex-start', pb: '$2', ai: 'flex-start' }}
         ai="center"
         jc="space-between"
-        safeAreaPadding={isPwa && 't'}
-        $lg={{ pt: !isPwa && '$5', pb: '$3' }}
       >
         {(() => {
           switch (true) {
@@ -230,7 +223,7 @@ export function TopNav({
         })()}
       </Container>
       {subheader && (
-        <Container fd="column">
+        <Container fd="column" safeAreaProps={{ edges: ['left', 'right'] }}>
           <Paragraph
             fontWeight={'400'}
             fontSize={'$5'}
@@ -246,7 +239,6 @@ export function TopNav({
           <Separator w={'100%'} borderColor="$jet" $lg={{ display: 'none' }} />
         </Container>
       )}
-      <SettingsBottomSheet />
     </Header>
   )
 }

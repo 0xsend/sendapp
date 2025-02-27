@@ -4,11 +4,10 @@ import {
   styled,
   type XStackProps,
   LinearGradient,
-  usePwa,
   Paragraph,
   H3,
-  useMedia,
   AnimatePresence,
+  useSafeAreaInsets,
 } from '@my/ui'
 import { HomeButtons } from '../features/home/HomeButtons'
 import { useScrollDirection } from '../provider/scroll'
@@ -32,7 +31,6 @@ const Row = styled(XStack, {
   gap: '$4',
   maw: 768,
   $gtLg: {
-    pt: '$4',
     display: 'none',
   },
   pointerEvents: 'auto',
@@ -43,17 +41,16 @@ const MobileButtonRow = ({
   isLoading,
   isVisible,
 }: { children: React.ReactElement; isLoading: boolean; isVisible: boolean } & XStackProps) => {
-  const media = useMedia()
+  const { bottom } = useSafeAreaInsets()
 
   return (
     <Stack
       w={'100%'}
-      pb={'$3'}
       px="$4"
+      pb={Math.max(bottom, 24)}
       $platform-web={{
         position: 'fixed',
         bottom: 0,
-        display: media.gtLg ? 'none' : 'flex',
       }}
       $gtLg={{
         display: 'none',

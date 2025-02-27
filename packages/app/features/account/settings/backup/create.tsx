@@ -1,6 +1,6 @@
 import { createPasskey } from '@daimo/expo-passkeys'
 import type { Tables } from '@my/supabase/database-generated.types'
-import { Button, H1, Paragraph, Shake, Spinner, SubmitButton, YStack } from '@my/ui'
+import { Button, FadeCard, H1, Paragraph, Shake, Spinner, SubmitButton, YStack } from '@my/ui'
 import {
   baseMainnetClient,
   useReadSendAccountGetActiveSigningKeys,
@@ -20,6 +20,7 @@ import * as Device from 'expo-device'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { z } from 'zod'
+import { SettingsHeader } from 'app/features/account/settings/components/SettingsHeader'
 
 const CreatePasskeySchema = z.object({
   accountName: z.string().min(1).trim().describe('Passkey name'),
@@ -31,7 +32,8 @@ export const CreatePasskeyScreen = () => {
   const router = useRouter()
 
   return (
-    <YStack w={'100%'} gap={'$6'}>
+    <YStack w={'100%'} gap={'$3.5'}>
+      <SettingsHeader>Passkeys</SettingsHeader>
       <CreatePasskeyForm
         onPasskeySaved={(cred) => router.push(`/account/settings/backup/confirm/${cred.id}`)}
       />
@@ -130,70 +132,78 @@ const CreatePasskeyForm = ({
     : `My ${Device.modelName ?? 'Send Account'}`
 
   return (
-    <FormProvider {...form}>
-      <SchemaForm
-        form={form}
-        formProps={{
-          $gtLg: {
-            als: 'flex-start',
-          },
-          px: '$0',
-        }}
-        defaultValues={{
-          accountName: deviceName,
-        }}
-        schema={CreatePasskeySchema}
-        onSubmit={onSubmit}
-        props={{
-          accountName: {
-            bc: '$color0',
-            labelProps: {
-              color: '$color10',
+    <FadeCard>
+      <FormProvider {...form}>
+        <SchemaForm
+          form={form}
+          formProps={{
+            $gtLg: {
+              maxWidth: 'none',
+              als: 'flex-start',
             },
-          },
-        }}
-        renderBefore={() => (
-          <YStack w={'100%'} gap={'$size.3.5'}>
-            <H1 size={'$9'} fontWeight={'600'} color="$color12">
-              Add Passkey as Signer
-            </H1>
-            <Paragraph size={'$5'} color={'$color10'}>
-              Secure your Send Account by adding up to 20 passkeys. Passkeys are trusted devices
-              authorized to sign your account&apos;s transactions.
-            </Paragraph>
-          </YStack>
-        )}
-        renderAfter={({ submit }) => (
-          <>
-            {form.formState.errors?.root?.message ? (
-              <Shake>
-                <Paragraph color="red" testID="AccountSendTagScreen">
-                  {form.formState.errors?.root?.message}
-                </Paragraph>
-              </Shake>
-            ) : null}
-            {isLoading ? (
-              <Spinner size="small" color={'$color'} />
-            ) : (
-              <SubmitButton
-                mr="auto"
-                onPress={submit}
-                theme="green"
-                borderRadius={'$3'}
-                px={'$size.1.5'}
-                mt={'$size.1.5'}
-              >
-                <Button.Text ff={'$mono'} fontWeight={'600'} tt="uppercase" size={'$5'}>
-                  Create Passkey
-                </Button.Text>
-              </SubmitButton>
-            )}
-          </>
-        )}
-      >
-        {(fields) => <>{Object.values(fields)}</>}
-      </SchemaForm>
-    </FormProvider>
+            px: '$0',
+          }}
+          defaultValues={{
+            accountName: deviceName,
+          }}
+          schema={CreatePasskeySchema}
+          onSubmit={onSubmit}
+          props={{
+            accountName: {
+              bc: '$color0',
+              labelProps: {
+                color: '$color10',
+              },
+            },
+          }}
+          renderBefore={() => (
+            <>
+              <H1 size={'$8'} fontWeight={'600'} color="$color12">
+                Secure Your Account with Passkeys
+              </H1>
+              <Paragraph size={'$5'} color={'$color10'}>
+                Secure your Send Account by adding up to 20 passkeys. Passkeys are trusted devices
+                authorized to sign your account&apos;s transactions.
+              </Paragraph>
+            </>
+          )}
+          renderAfter={({ submit }) => (
+            <>
+              {form.formState.errors?.root?.message ? (
+                <Shake>
+                  <Paragraph color="red" testID="AccountSendTagScreen">
+                    {form.formState.errors?.root?.message}
+                  </Paragraph>
+                </Shake>
+              ) : null}
+              {isLoading ? (
+                <Spinner size="small" color={'$color'} />
+              ) : (
+                <SubmitButton
+                  onPress={submit}
+                  theme="green"
+                  borderRadius={'$4'}
+                  p={'$4'}
+                  mt={'$size.1.5'}
+                >
+                  <Button.Text
+                    ff={'$mono'}
+                    fontWeight={'600'}
+                    tt="uppercase"
+                    size={'$5'}
+                    color={'$black'}
+                  >
+                    Add a Passkey
+                  </Button.Text>
+                </SubmitButton>
+              )}
+            </>
+          )}
+        >
+          {(fields) => <>{Object.values(fields)}</>}
+        </SchemaForm>
+      </FormProvider>
+    </FadeCard>
   )
 }
 

@@ -4,7 +4,6 @@ import { useLink } from 'solito/link'
 
 import { getButtonSized } from '@tamagui/get-button-sized'
 import type { LinkProps } from './Link'
-import type { ReactElement } from 'react'
 
 const BUTTON_NAME = 'Button'
 
@@ -78,6 +77,7 @@ const LinkableButtonFrame = styled(Button, {
     disabled: {
       true: {
         pointerEvents: 'none',
+        opacity: 0.5,
       },
     },
   } as const,

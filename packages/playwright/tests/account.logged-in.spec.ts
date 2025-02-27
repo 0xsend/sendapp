@@ -12,7 +12,7 @@ test.beforeEach(async ({ page, user: { user } }) => {
   await page.waitForURL('/account')
 })
 
-test('can visit account page', async ({ page, context, user: { profile } }) => {
+test('can visit account page', async ({ page, user: { profile } }) => {
   assert(!!profile, 'profile not found')
   assert(!!profile.referral_code, 'referral code not found')
   await expect(page).toHaveURL('/account')
@@ -34,12 +34,14 @@ test('can update profile', async ({ page, supabase }) => {
   const editProfileButton = page.getByRole('link', { name: 'Settings' })
   await editProfileButton.click()
 
-  await page.waitForURL('/account/settings/edit-profile')
+  await page.waitForURL('/account/settings')
+  await page.getByRole('link', { name: 'profile' }).click()
   await expect(page).toHaveTitle('Send | Edit Profile')
 
+  await page.getByRole('button', { name: 'edit profile' }).click()
   await page.getByLabel('Name').fill('LeO')
   await page.getByLabel('Bio').fill('Sender')
-  await page.getByLabel('Public?').setChecked(true)
+  await page.getByRole('checkbox').setChecked(true)
 
   await page.getByRole('button', { name: 'Save' }).click()
 

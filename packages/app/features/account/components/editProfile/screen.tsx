@@ -1,80 +1,164 @@
 import {
-  ProfileAvatar,
+  Button,
+  Checkbox,
+  FadeCard,
   Paragraph,
-  XStack,
-  YStack,
-  SubmitButton,
+  ProfileAvatar,
   Separator,
   Spinner,
-  ButtonIcon,
-  AnimatePresence,
-  ButtonText,
-  Button,
-  H1,
+  SubmitButton,
+  XStack,
+  YStack,
 } from '@my/ui'
 import { SchemaForm } from 'app/utils/SchemaForm'
-import { useProfileMutation, ProfileSchema } from 'app/utils/useProfileMutation'
+import { ProfileSchema, useProfileMutation } from 'app/utils/useProfileMutation'
 import { useUser } from 'app/utils/useUser'
 import { UploadAvatar, type UploadAvatarRefObject } from '../uploadProfileImage/screen'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import type { Tables } from '@my/supabase/database.types'
-import { CheckCheck } from '@tamagui/lucide-icons'
+import { Check } from '@tamagui/lucide-icons'
+import { SettingsHeader } from 'app/features/account/settings/components/SettingsHeader'
+import { ReadOnlyFieldWithLabel } from 'app/features/account/settings/components/ReadOnlyFieldWithLabel'
+import { FieldWithLabel } from 'app/features/account/settings/components/FieldWithLabel'
+import { useForm } from 'react-hook-form'
+import type { z } from 'zod'
+
+enum FormState {
+  Overview = 'Overview',
+  ProfileForm = 'ProfileForm',
+}
 
 export const EditProfile = () => {
+  const [formState, setFormState] = useState<FormState>(FormState.Overview)
   const { profile } = useUser()
 
   return (
-    <YStack w={'100%'} als={'center'}>
-      <XStack $lg={{ maw: 600 }} mx="auto" w={'100%'} mb={'$size.2'} $gtLg={{ mb: '$size.3.5' }}>
-        <H1 size={'$9'} fontWeight={'600'} color="$color12">
-          My Profile
-        </H1>
-      </XStack>
-      <XStack w={'100%'} $lg={{ jc: 'center' }}>
-        {profile ? <EditProfileForm profile={profile} /> : <Spinner size="large" />}
-      </XStack>
+    <YStack w={'100%'}>
+      <YStack gap={'$3.5'}>
+        <SettingsHeader>Profile</SettingsHeader>
+        {(() => {
+          switch (true) {
+            case !profile:
+              return <Spinner size="large" />
+            case formState === FormState.Overview:
+              return (
+                <Overview profile={profile} onPress={() => setFormState(FormState.ProfileForm)} />
+              )
+            case formState === FormState.ProfileForm:
+              return (
+                <EditProfileForm
+                  profile={profile}
+                  onSave={() => setFormState(FormState.Overview)}
+                />
+              )
+          }
+        })()}
+      </YStack>
     </YStack>
   )
 }
-function EditProfileForm({ profile }: { profile: Tables<'profiles'> }) {
-  const { id, name, about, is_public, avatar_url } = profile
-  const { mutate, isSuccess, error } = useProfileMutation(id)
+
+const Overview = ({ profile, onPress }: { profile: Tables<'profiles'>; onPress: () => void }) => {
+  const { name, about, is_public, avatar_url } = profile
   const avatarRef = useRef<UploadAvatarRefObject>(null)
 
-  const [hasSaved, setHasSaved] = useState(false)
+  return (
+    <YStack gap={'$5'}>
+      <FadeCard>
+        <XStack gap={'$5'} width={'100%'}>
+          <UploadAvatar ref={avatarRef}>
+            <ProfileAvatar
+              avatarUrl={avatar_url ? avatar_url : undefined}
+              $gtMd={{ size: 88 }}
+              size={88}
+            />
+          </UploadAvatar>
+          <YStack gap={'$2'} ai={'flex-start'}>
+            <YStack>
+              <Paragraph
+                size={'$5'}
+                fontWeight={500}
+                color={'$lightGrayTextField'}
+                $theme-light={{ color: '$darkGrayTextField' }}
+              >
+                Profile Picture
+              </Paragraph>
+            </YStack>
+            <Button unstyled onPress={() => avatarRef.current?.pickImage()}>
+              <Button.Text
+                textDecorationLine="underline"
+                color="$primary"
+                $theme-light={{ color: '$color12' }}
+                size={'$5'}
+              >
+                Update
+              </Button.Text>
+            </Button>
+          </YStack>
+        </XStack>
+        <FieldWithLabel label={'Name'}>
+          <Paragraph size={'$8'} fontWeight={'500'}>
+            {name || '-'}
+          </Paragraph>
+        </FieldWithLabel>
+        <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
+        <ReadOnlyFieldWithLabel label={'About'} text={about || '-'} />
+        <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
+        <XStack gap={'$3'} ai={'center'}>
+          <Checkbox
+            disabled={true}
+            checked={!!is_public}
+            borderWidth={0}
+            backgroundColor={is_public ? '$primary' : '$background'}
+            circular={true}
+          >
+            <Checkbox.Indicator>
+              <Check color={'$black'} />
+            </Checkbox.Indicator>
+          </Checkbox>
+          <Paragraph size={'$5'}>{`${is_public ? 'Public' : 'Private'}`} Profile</Paragraph>
+        </XStack>
+      </FadeCard>
+      <SubmitButton theme="green" borderRadius={'$4'} p={'$4'} onPress={onPress}>
+        <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
+          edit profile
+        </Button.Text>
+      </SubmitButton>
+    </YStack>
+  )
+}
 
-  useEffect(() => {
-    if (isSuccess) setHasSaved(true)
-    setTimeout(() => {
-      setHasSaved(false)
-    }, 2000)
-  }, [isSuccess])
+function EditProfileForm({ profile, onSave }: { profile: Tables<'profiles'>; onSave: () => void }) {
+  const { id, name, about, is_public } = profile
+  const { mutateAsync, error } = useProfileMutation(id)
+  const form = useForm<z.infer<typeof ProfileSchema>>()
+
+  const handleSubmit = async () => {
+    const values = form.getValues()
+    await mutateAsync(values)
+    onSave()
+  }
 
   return (
     <SchemaForm
+      form={form}
       schema={ProfileSchema}
       props={{
         name: {
           'aria-label': 'Name',
           bc: '$color0',
-          labelProps: {
-            color: '$color10',
-          },
         },
         about: {
           'aria-label': 'Bio',
           placeholder: 'Tell us about yourself',
           backgroundColor: '$color0',
-          rows: 1,
-          labelProps: {
-            color: '$color10',
+          rows: 2,
+          focusStyle: {
+            fontStyle: 'normal',
           },
         },
         isPublic: {
           defaultChecked: is_public !== null ? is_public : true,
-          labelProps: {
-            color: '$color10',
-          },
         },
       }}
       defaultValues={{
@@ -82,94 +166,49 @@ function EditProfileForm({ profile }: { profile: Tables<'profiles'> }) {
         about: about ? about : '',
         isPublic: is_public !== null ? is_public : true,
       }}
-      onSubmit={(values) => mutate(values)}
+      onSubmit={handleSubmit}
       renderAfter={({ submit }) => (
-        <YStack ai={'flex-start'}>
-          {error && <Paragraph theme="red">{error.message}</Paragraph>}
-          <AnimatePresence exitBeforeEnter>
-            {hasSaved ? (
-              <Button
-                theme={'green'}
-                circular={true}
-                h="$5"
-                w="$5"
-                mt={'$5'}
-                disabled={true}
-                key="enter"
-                animateOnly={['scale']}
-                animation="bouncy"
-                enterStyle={{ scale: 1 }}
-                exitStyle={{ scale: 0.95 }}
-              >
-                <ButtonIcon>
-                  <CheckCheck size={'$2'} />
-                </ButtonIcon>
-              </Button>
-            ) : (
-              <SubmitButton
-                f={1}
-                marginTop={'$5'}
-                borderRadius={'$3'}
-                px={'$size.1.5'}
-                onPress={() => submit()}
-                theme="green"
-              >
-                {hasSaved ? (
-                  <ButtonIcon>
-                    <CheckCheck size={'$2'} />
-                  </ButtonIcon>
-                ) : (
-                  <ButtonText size={'$5'} fontWeight={500} ff={'$mono'}>
-                    SAVE
-                  </ButtonText>
-                )}
-              </SubmitButton>
-            )}
-          </AnimatePresence>
+        <YStack>
+          <SubmitButton
+            theme="green"
+            borderRadius={'$4'}
+            p={'$4'}
+            mt={'$1'}
+            onPress={() => submit()}
+          >
+            <Button.Text
+              ff={'$mono'}
+              fontWeight={'500'}
+              tt="uppercase"
+              size={'$5'}
+              color={'$black'}
+            >
+              SAVE CHANGES
+            </Button.Text>
+          </SubmitButton>
+          {error && (
+            <Paragraph marginTop={'$3'} theme="red" color="$color9">
+              {error.message}
+            </Paragraph>
+          )}
         </YStack>
       )}
     >
-      {(fields) => (
-        <>
-          <XStack gap={'$6'} width={'100%'}>
-            <UploadAvatar ref={avatarRef}>
-              <ProfileAvatar
-                avatarUrl={avatar_url ? avatar_url : undefined}
-                $gtMd={{ size: 88 }}
-                size={88}
-              />
-            </UploadAvatar>
-            <YStack jc={'space-between'} ai={'flex-start'}>
-              <YStack>
-                <Paragraph
-                  ff={'$mono'}
-                  size={'$5'}
-                  tt={'uppercase'}
-                  fontWeight={500}
-                  color={'$color10'}
-                >
-                  Profile Picture
-                </Paragraph>
-                <Paragraph color={'$color9'} $theme-light={{ color: '$color10' }} size={'$5'}>
-                  (Upload an image of your choice)
-                </Paragraph>
-              </YStack>
-
-              <Button unstyled onPress={() => avatarRef.current?.pickImage()}>
-                <Button.Text
-                  textDecorationLine="underline"
-                  color="$primary"
-                  $theme-light={{ color: '$color12' }}
-                  size={'$5'}
-                >
-                  Change
-                </Button.Text>
-              </Button>
-            </YStack>
+      {({ name, about, isPublic }) => (
+        <FadeCard>
+          <FieldWithLabel label={'Name'} gap={'$2'}>
+            {name}
+          </FieldWithLabel>
+          <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
+          <FieldWithLabel label={'About'} gap={'$2'}>
+            {about}
+          </FieldWithLabel>
+          <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
+          <XStack gap={'$3'} ai={'center'}>
+            {isPublic}
+            <Paragraph size={'$5'}>Make Profile Public</Paragraph>
           </XStack>
-          <Separator my={'$7'} $gtLg={{ display: 'none' }} />
-          {Object.values(fields)}
-        </>
+        </FadeCard>
       )}
     </SchemaForm>
   )

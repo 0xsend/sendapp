@@ -23,10 +23,8 @@ export const Page: NextPageWithLayout = () => {
 
 export const getServerSideProps = userProtectedGetSSP()
 
-const subheader = 'Sendtags are usernames within the Send platform. You may register up to 5.'
-
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Sendtag" subheader={subheader} />}>{children}</HomeLayout>
+  <HomeLayout TopNav={<TopNav header="Sendtags" backFunction={'router'} />}>{children}</HomeLayout>
 )
 
 export default Page

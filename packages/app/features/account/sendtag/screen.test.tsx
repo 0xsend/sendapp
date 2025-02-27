@@ -48,14 +48,14 @@ describe('SendTagScreen', () => {
       jest.advanceTimersByTime(1000)
       jest.runAllTimers()
     })
-    expect(screen.getByText(/REGISTERED SENDTAGS/)).toBeVisible()
+    expect(screen.getByText(/Registered/)).toBeOnTheScreen()
     for (const tag of mockTags) {
       if (tag.status === 'pending') {
-        expect(screen.queryByText(tag.name)).toBeFalsy()
+        expect(screen.queryByText(tag.name)).not.toBeOnTheScreen()
         return
       }
-      expect(screen.getByText(tag.name)).toBeVisible()
+      expect(screen.getByText(tag.name)).toBeOnTheScreen()
     }
-    expect(screen.getByRole('button', { name: 'Add Tag' })).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Add Tag' })).toBeOnTheScreen()
   })
 })

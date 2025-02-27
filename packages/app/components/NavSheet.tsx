@@ -1,13 +1,4 @@
-import {
-  Button,
-  isWeb,
-  Sheet,
-  type SheetProps,
-  Stack,
-  usePwa,
-  useSafeAreaInsets,
-  XStack,
-} from '@my/ui'
+import { Button, Container, Sheet, type SheetProps, Stack } from '@my/ui'
 import { IconSendLogo, IconX } from './icons'
 import { type RootParams, useRootScreenParams } from 'app/routers/params'
 import { Link } from 'solito/link'
@@ -19,8 +10,6 @@ export function NavSheet({
   ...props
 }: SheetProps & { navId: RootParams['nav'] }) {
   const [queryParams, setRootParams] = useRootScreenParams()
-  const isPwa = usePwa()
-  const { sat } = useSafeAreaInsets()
   const onOpenChange = () => {
     if (open) setRootParams({ ...queryParams, nav: navId }, { webBehavior: 'replace' })
     else setRootParams({ ...queryParams, nav: undefined }, { webBehavior: 'replace' })
@@ -29,16 +18,24 @@ export function NavSheet({
     <Sheet
       disableDrag
       modal
-      animation={'quick'}
+      animation={'200ms'}
       dismissOnSnapToBottom
-      snapPointsMode="fit"
+      snapPoints={[100]}
       open={queryParams.nav === navId}
       onOpenChange={onOpenChange}
       {...props}
     >
       <Sheet.Overlay />
-      <Sheet.Frame zIndex={1} height={isWeb ? '100vh' : '100%'} pt={isPwa && sat}>
-        <XStack w="100%" ai="center" jc="space-between" px="$4" pt="$6" pb="$2">
+      <Sheet.Frame zIndex={1}>
+        <Container
+          safeAreaProps={{ edges: ['top'] }}
+          w="100%"
+          ai="center"
+          jc="space-between"
+          f={'unset'}
+          pt="$6"
+          pb="$2"
+        >
           <Link href="/">
             <IconSendLogo size={'$2.5'} color={'$color12'} />
           </Link>
@@ -55,7 +52,7 @@ export function NavSheet({
             onPress={() => onOpenChange()}
             theme="green"
           />
-        </XStack>
+        </Container>
         <Stack p="$4" f={1} justifyContent="space-around">
           {children}
         </Stack>

@@ -1,28 +1,33 @@
-import { Stack } from '@my/ui'
-import { useConfirmedTags } from 'app/utils/tags'
+import { YStack } from '@my/ui'
+import { useConfirmedTags, usePendingTags } from 'app/utils/tags'
 import { useEffect } from 'react'
 import { useRouter } from 'solito/router'
 import { CheckoutForm } from './checkout-form'
+import { useUser } from 'app/utils/useUser'
 
 export const CheckoutScreen = () => {
+  const { isLoadingTags } = useUser()
   const confirmedTags = useConfirmedTags()
   const router = useRouter()
+  const pendingTags = usePendingTags() ?? []
 
   useEffect(() => {
-    if (confirmedTags?.length === 5) {
+    if (confirmedTags?.length === 5 || (!isLoadingTags && pendingTags.length === 0)) {
       router.replace('/account/sendtag')
     }
-  }, [confirmedTags, router])
+  }, [confirmedTags, router, pendingTags, isLoadingTags])
 
   return (
-    <Stack
-      f={1}
-      maw={481}
-      $lg={{ gap: '$2', ai: 'center', pt: '$3' }}
-      $theme-dark={{ btc: '$gray7Dark' }}
-      $theme-light={{ btc: '$gray4Light' }}
+    <YStack
+      width={'100%'}
+      gap="$5"
+      pb={'$3.5'}
+      jc={'space-between'}
+      $gtLg={{
+        width: '50%',
+      }}
     >
       <CheckoutForm />
-    </Stack>
+    </YStack>
   )
 }
