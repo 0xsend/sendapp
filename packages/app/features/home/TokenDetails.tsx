@@ -39,7 +39,7 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
   return (
     <YStack f={1} gap="$5" $gtLg={{ w: '45%', pb: '$0' }} pb="$5">
       <YStack gap="$5">
-        <Card p="$5" w={'100%'} jc={'space-between'}>
+        <Card p="$4.5" w={'100%'} jc={'space-between'} $gtLg={{ h: 244, p: '$6' }}>
           <YStack gap="$4">
             <XStack ai={'center'} gap={'$3'}>
               <IconCoin size={'$2'} symbol={coin.symbol} />
@@ -48,7 +48,7 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
                 fontFamily={'$mono'}
                 col={'$color12'}
                 textTransform="uppercase"
-                fontWeight={'500'}
+                fontWeight={'700'}
               >
                 {coin.label}
               </Paragraph>
@@ -169,22 +169,21 @@ const TokenDetailsBalance = ({ coin }: { coin: CoinWithBalance }) => {
   const balanceInUSD = convertBalanceToFiat(coin, tokenPrices?.[coin.token])
 
   const balanceWithDecimals = Number(balance) / 10 ** (decimals ?? 0)
-  const formattedBalance = formatAmount(balanceWithDecimals.toString(), 10, formatDecimals)
+  const balanceWithDecimalsLength = balanceWithDecimals.toString().replace('.', '').length
 
   return (
     <XStack ai="flex-end" gap="$2">
       <Paragraph
-        fontFamily={'$mono'}
-        $sm={{
-          fontSize: formattedBalance.length > 6 ? '$10' : '$11',
-        }}
-        fontSize={'$12'}
-        lineHeight={'$10'}
-        fontWeight={'500'}
+        $platform-web={{ width: 'fit-content' }}
+        $sm={{ fontSize: balanceWithDecimalsLength ? '$10' : 68, lineHeight: 38 }}
+        fontSize={60}
+        fontWeight={'900'}
+        lineHeight={57}
         color={'$color12'}
       >
-        {formattedBalance}
+        {formatAmount(balanceWithDecimals.toString(), 10, formatDecimals)}
       </Paragraph>
+
       <Paragraph color={'$color10'} fontSize={'$3'} fontFamily={'$mono'}>
         {isLoadingTokenPrices || balanceInUSD === undefined
           ? ''
