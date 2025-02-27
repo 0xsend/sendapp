@@ -2,7 +2,7 @@ SET client_min_messages TO NOTICE;
 
 BEGIN;
 SELECT
-    plan(25);
+    plan(29);
 CREATE EXTENSION "basejump-supabase_test_helpers";
 SELECT
     set_config('role', 'service_role', TRUE);
@@ -258,6 +258,18 @@ VALUES (
             SELECT
                 CURRENT_TIMESTAMP AT TIME ZONE 'UTC' + interval '11 days'),
             8453);
+
+-- Add send slash settings for current distribution
+INSERT INTO send_slash(
+    distribution_id,
+    distribution_number,
+    minimum_sends,
+    scaling_divisor)
+VALUES (
+    (SELECT id FROM distributions WHERE number = 123),
+    123,
+    50,
+    3);
 INSERT INTO public.distribution_verification_values(
     type,
     fixed_value,
@@ -337,6 +349,16 @@ VALUES (
         FROM distributions
         WHERE
             number = 123));
+INSERT INTO public.distribution_verification_values(
+    type,
+    fixed_value,
+    bips_value,
+    distribution_id)
+VALUES (
+    'send_ceiling',
+    0,
+    0,
+    (SELECT id FROM distributions WHERE number = 123));
 -- ensure verification values are not created
 INSERT INTO distribution_verification_values(
     type,
@@ -960,9 +982,236 @@ SELECT
                 user_id = tests.get_supabase_uid('bob')
                 AND type = 'send_ten' $$, $$
             VALUES ('8') $$, 'Should only count the recipient with a send account');
+
+-- Test send_ceiling verification with repeated sends to same recipient
+INSERT INTO send_account_transfers(
+    f,
+    t,
+    block_time,
+    chain_id,
+    tx_hash,
+    ig_name,
+    src_name,
+    block_num,
+    tx_idx,
+    log_idx,
+    abi_idx,
+    v,
+    log_addr)
+VALUES (
+    '\xB0B0000000000000000000000000000000000000'::bytea,
+    '\xa71ce00000000000000000000000000000000007'::bytea,
+    EXTRACT(EPOCH FROM ((
+        SELECT qualification_start
+        FROM distributions
+        WHERE number = 123) + interval '1 hour')),
+    8453,
+    '\x123456789012345678901234567890123456789012345678901234567890123c'::bytea,
+    'send_account_transfers',
+    'send_account_transfers',
+    10,
+    0,
+    0,
+    0,
+    1000000000000000000,
+    '\x5afe000000000000000000000000000000000000'::bytea);
+
+-- Insert second transfer to same recipient
+INSERT INTO send_account_transfers(
+    f,
+    t,
+    block_time,
+    chain_id,
+    tx_hash,
+    ig_name,
+    src_name,
+    block_num,
+    tx_idx,
+    log_idx,
+    abi_idx,
+    v,
+    log_addr)
+VALUES (
+    '\xB0B0000000000000000000000000000000000000'::bytea,
+    '\xa71ce00000000000000000000000000000000007'::bytea,
+    EXTRACT(EPOCH FROM ((
+        SELECT qualification_start
+        FROM distributions
+        WHERE number = 123) + interval '2 hours')),
+    8453,
+    '\x123456789012345678901234567890123456789012345678901234567890123d'::bytea,
+    'send_account_transfers',
+    'send_account_transfers',
+    11,
+    0,
+    0,
+    0,
+    1000000000000000000,
+    '\x5afe000000000000000000000000000000000000'::bytea);
+
+-- Test for send_ceiling verification
+SELECT
+    results_eq($$
+        SELECT
+            COUNT(*)::integer
+        FROM distribution_verifications
+        WHERE
+            user_id = tests.get_supabase_uid('bob')
+            AND type = 'send_ceiling'
+            AND distribution_id = (
+                SELECT
+                    id
+                FROM distributions
+                WHERE
+                    number = 123)
+    $$,
+    $$VALUES (0)$$,
+    'No send_ceiling verification should exist initially');
+
+-- Test 1: Send amount less than ceiling is added to weight
+INSERT INTO send_token_transfers(
+    f,
+    t,
+    v,
+    block_time,
+    chain_id,
+    tx_hash,
+    ig_name,
+    src_name,
+    block_num,
+    tx_idx,
+    log_idx,
+    abi_idx,
+    log_addr)
+VALUES (
+    '\xB0B0000000000000000000000000000000000000'::bytea,
+    '\xa71ce00000000000000000000000000000000000'::bytea,
+    100000000000000000000::numeric,
+    EXTRACT(
+        EPOCH FROM ((
+            SELECT
+                qualification_start
+            FROM distributions
+            WHERE
+                number = 123) + interval '1 hour')),
+    8453,
+    '\x1234567890123456789012345678901234567890123456789012345678901234'::bytea,
+    'send_token_transfers',
+    'send_token_transfers',
+    1, 0, 0, 0,
+    '\x3f3c27fb3609151a54bf3cff33e13d1b28847eef'::bytea);
+
+-- Test 2: Send amount greater than ceiling only adds ceiling value
+INSERT INTO send_token_transfers(
+    f,
+    t,
+    v,
+    block_time,
+    chain_id,
+    tx_hash,
+    ig_name,
+    src_name,
+    block_num,
+    tx_idx,
+    log_idx,
+    abi_idx,
+    log_addr)
+VALUES (
+    '\xB0B0000000000000000000000000000000000000'::bytea,
+    '\xa71ce00000000000000000000000000000000001'::bytea,
+    200000000000000000000::numeric,
+    EXTRACT(
+        EPOCH FROM ((
+            SELECT
+                qualification_start
+            FROM distributions
+            WHERE
+                number = 123) + interval '1 hour')),
+    8453,
+    '\x1234567890123456789012345678901234567890123456789012345678901235'::bytea,
+    'send_token_transfers',
+    'send_token_transfers',
+    2, 0, 0, 0,
+    '\x3f3c27fb3609151a54bf3cff33e13d1b28847eef'::bytea);
+
+SELECT
+    results_eq($$
+        SELECT
+            weight::numeric,
+            (metadata->>'value')::numeric
+        FROM distribution_verifications
+        WHERE
+            type = 'send_ceiling'
+            AND distribution_id = (
+                SELECT
+                    id
+                FROM distributions
+                WHERE
+                    number = 123)
+    $$,
+    $$VALUES (13334::numeric, 6667::numeric)$$,
+    'Weight should increase by ceiling value (6667) when send amount (10000) exceeds ceiling');
+
+
+    -- Test 3: Repeated send to first recipient doesn't increase weight
+    INSERT INTO send_token_transfers(
+        f,
+        t,
+        v,
+        block_time,
+        chain_id,
+        tx_hash,
+        ig_name,
+        src_name,
+        block_num,
+        tx_idx,
+        log_idx,
+        abi_idx,
+        log_addr)
+    VALUES (
+        '\xB0B0000000000000000000000000000000000000'::bytea,
+        '\xa71ce00000000000000000000000000000000000'::bytea,
+        7000000000000000000::numeric,
+        EXTRACT(
+            EPOCH FROM ((
+                SELECT
+                    qualification_start
+                FROM distributions
+                WHERE
+                    number = 123) + interval '1 hour')),
+        8453,
+        '\x1234567890123456789012345678901234567890123456789012345678901236'::bytea,
+        'send_token_transfers',
+        'send_token_transfers',
+        3, 0, 0, 0,
+        '\x3f3c27fb3609151a54bf3cff33e13d1b28847eef'::bytea);
+
+    SELECT
+        results_eq($$
+            SELECT
+                weight::numeric
+            FROM distribution_verifications
+            WHERE
+                type = 'send_ceiling'
+                AND distribution_id = (
+                    SELECT
+                        id
+                    FROM distributions
+                    WHERE
+                        number = 123)
+        $$,
+        $$VALUES (13334::numeric)$$,
+        'Weight should not increase for repeated recipient');
+
+    -- Test 4: Verify sent_to array contains correct number of recipients
+    SELECT results_eq($$
+        SELECT jsonb_array_length(metadata->'sent_to')::integer
+        FROM distribution_verifications
+        WHERE type = 'send_ceiling'
+    $$, $$VALUES (2)$$, 'Should have exactly 2 unique recipients');
+
 SELECT
     finish();
 ROLLBACK;
 
 RESET client_min_messages;
-
