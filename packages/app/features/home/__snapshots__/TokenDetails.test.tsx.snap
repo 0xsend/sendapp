@@ -29,10 +29,10 @@ exports[`TokenDetails renders correctly 1`] = `
           "borderTopRightRadius": 16,
           "flexDirection": "column",
           "justifyContent": "space-between",
-          "paddingBottom": 24,
-          "paddingLeft": 24,
-          "paddingRight": 24,
-          "paddingTop": 24,
+          "paddingBottom": 21,
+          "paddingLeft": 21,
+          "paddingRight": 21,
+          "paddingTop": 21,
           "position": "relative",
           "width": "100%",
         }
@@ -182,7 +182,7 @@ exports[`TokenDetails renders correctly 1`] = `
                 "color": "#FFFFFF",
                 "fontFamily": "System",
                 "fontSize": 24,
-                "fontWeight": "500",
+                "fontWeight": "700",
                 "lineHeight": 25,
                 "textTransform": "uppercase",
                 "userSelect": "auto",
@@ -215,9 +215,9 @@ exports[`TokenDetails renders correctly 1`] = `
                 {
                   "color": "#FFFFFF",
                   "fontFamily": "System",
-                  "fontSize": 66,
-                  "fontWeight": "500",
-                  "lineHeight": 51,
+                  "fontSize": 55.199999999999996,
+                  "fontWeight": "900",
+                  "lineHeight": 38,
                   "userSelect": "auto",
                 }
               }
