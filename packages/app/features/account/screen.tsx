@@ -1,6 +1,7 @@
 import {
   Avatar,
   Button,
+  isWeb,
   LinearGradient,
   LinkableButton,
   Paragraph,
@@ -15,6 +16,7 @@ import {
   IconCopy,
   IconGear,
   IconGroup,
+  IconLeaderboard,
   IconQRFull,
   IconSlash,
   IconStarOutline,
@@ -26,7 +28,6 @@ import * as Sharing from 'expo-sharing'
 import { type PropsWithChildren, type ReactNode, useEffect, useState } from 'react'
 import { useConfirmedTags } from 'app/utils/tags'
 import { useUserReferralsCount } from 'app/utils/useUserReferralsCount'
-import { IconRocket } from 'app/components/icons/IconRocket'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { ChevronRight } from '@tamagui/lucide-icons'
@@ -45,7 +46,7 @@ const links = [
   {
     label: 'Affiliate',
     href: '/account/affiliate',
-    icon: <IconRocket size={'$1.5'} $theme-light={{ color: '$color12' }} />,
+    icon: <IconLeaderboard size={'$1.5'} $theme-light={{ color: '$color12' }} />,
   },
 ]
 
@@ -95,13 +96,12 @@ export function AccountScreen() {
         flexDirection: 'row',
         maxWidth: '1100px',
         marginHorizontal: 0,
-        height: 'min-content',
+        height: isWeb ? 'min-content' : 'auto',
       }}
     >
       <YStack
         w="100%"
         height={'75%'}
-        overflow="hidden"
         br="$6"
         position="relative"
         $gtLg={{
@@ -110,16 +110,7 @@ export function AccountScreen() {
           height: 'auto',
         }}
       >
-        <Avatar
-          w={'100%'}
-          h={'100%'}
-          maxWidth={'100%'}
-          maxHeight={'100%'}
-          bc="$color2"
-          br="$6"
-          borderWidth={1}
-          borderColor={'$background'}
-        >
+        <Avatar w={'100%'} h={'100%'} maxWidth={'100%'} maxHeight={'100%'} bc="$color2" br="$6">
           <Avatar.Image width={'100%'} height={'100%'} src={avatar_url ?? ''} />
           <Avatar.Fallback f={1} ai={'center'} theme="green_active">
             <IconAccount $theme-light={{ color: '$color12' }} />
@@ -143,7 +134,7 @@ export function AccountScreen() {
             paddingRight={'$3'}
             br={'$4'}
             bc={'rgba(0,0,0, 0.25)'}
-            backdropFilter={'blur(5px)'}
+            $platform-web={{ backdropFilter: 'blur(5px)' }}
           >
             <IconCoin symbol={'SEND'} />
             <Paragraph size={'$5'} color={'$white'}>
@@ -222,7 +213,7 @@ export function AccountScreen() {
           </YStack>
         </LinearGradient>
       </YStack>
-      <YStack gap={'$3.5'} width="100%" $gtLg={{ gap: '$5', width: '50%', height: 'fit-content' }}>
+      <YStack gap={'$3.5'} width="100%" $gtLg={{ gap: '$5', width: '50%' }}>
         <XStack gap={'$3.5'} $gtLg={{ gap: '$5', flexDirection: 'column' }}>
           {links.map((linkProps) => (
             <StackButton key={linkProps.label} {...linkProps} />
@@ -276,7 +267,7 @@ const TagPill = ({ children }: PropsWithChildren) => {
       py={'$1'}
       br={'$2'}
       bc={'rgba(255,255,255, 0.1)'}
-      backdropFilter={'blur(5px)'}
+      $platform-web={{ backdropFilter: 'blur(5px)' }}
     >
       <Paragraph fontSize={'$2'} color={'$white'}>
         /{children}
@@ -287,10 +278,10 @@ const TagPill = ({ children }: PropsWithChildren) => {
 
 const ReferralCode = () => {
   const { data: referralsCount } = useUserReferralsCount()
-  const { profile } = useUser()
+  const { profile, tags } = useUser()
   const toast = useToastController()
-  const refCode = profile?.referral_code ?? ''
-  const referralHref = getReferralHref(refCode)
+  const referralCode = (tags?.[0]?.name || profile?.referral_code) ?? ''
+  const referralHref = getReferralHref(referralCode)
 
   const copyOnPress = async () => {
     await Clipboard.setStringAsync(referralHref)
@@ -342,7 +333,7 @@ const ReferralCode = () => {
       </XStack>
       <YStack gap={'$2'}>
         <XStack jc={'space-between'} ai={'center'}>
-          <Paragraph size={'$5'}>SEND.APP/{refCode}</Paragraph>
+          <Paragraph size={'$5'}>{referralCode}</Paragraph>
           <Button
             chromeless
             backgroundColor="transparent"
