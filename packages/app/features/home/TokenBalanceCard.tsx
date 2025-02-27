@@ -1,5 +1,4 @@
 import {
-  Label,
   Paragraph,
   Spinner,
   XStack,
@@ -40,32 +39,20 @@ export const TokenBalanceCard = () => {
   const timer = useStopwatch()
   const { isGameVisible, presses, increaseScore } = useShowHideGame(timer)
 
-  const onShowHidePress = () => {
+  const onShowHidePress = (e) => {
     toggleIsPriceHidden()
     increaseScore()
   }
 
   return (
-    <Card py={'$5'} pl="$5" w={'100%'} jc="space-between" mih={147}>
-      <XStack w={'100%'} zIndex={4} h="100%">
-        <YStack jc={'center'} gap={'$2'} w={'100%'}>
-          <YStack w="fit-content" gap={'$2.5'} jc="space-between">
+    <Card py={'$4'} pl="$5" w={'100%'} jc="space-between" mah={147} $gtSm={{ mih: 147, py: '$5' }}>
+      <XStack w={'100%'} zIndex={4} h="100%" onPress={onShowHidePress} cursor="pointer">
+        <YStack jc={'center'} gap={'$4'} w={'100%'}>
+          <YStack $platform-web={{ w: 'fit-content' }} gap={'$2.5'} jc="space-between">
             <XStack ai={'center'} gap="$2.5" width={'100%'}>
-              <XStack ai={'center'} gap="$2.5">
-                <AnimatePresence exitBeforeEnter>
-                  {isPriceHidden ? <HiddenSquare /> : <GreenSquare />}
-                </AnimatePresence>
-                <Label
-                  fontSize={'$4'}
-                  zIndex={1}
-                  fontWeight={'500'}
-                  textTransform={'uppercase'}
-                  lineHeight={0}
-                  col={'$color10'}
-                >
-                  Total Balance
-                </Label>
-              </XStack>
+              <AnimatePresence exitBeforeEnter>
+                {isPriceHidden ? <HiddenSquare /> : <GreenSquare />}
+              </AnimatePresence>
             </XStack>
             {isGameVisible && (
               <XStack w="100%" gap={'$2'} jc={'space-between'} ai={'center'} my="auto">
@@ -79,18 +66,21 @@ export const TokenBalanceCard = () => {
           <XStack
             style={{ color: 'white' }}
             gap={'$2.5'}
-            mt="auto"
-            onPress={onShowHidePress}
-            cursor="pointer"
             overflow-x="scroll"
             pr="$5"
+            jc="center"
+            $gtSm={{
+              mt: 'auto',
+              jc: 'flex-start',
+            }}
           >
             {(() => {
               switch (true) {
                 case isPriceHidden:
                   return (
                     <Paragraph
-                      fontSize={'$12'}
+                      fontSize={'$13'}
+                      $sm={{ fontSize: '$12' }}
                       color={'$color12'}
                       fontWeight={'500'}
                       lineHeight={'$10'}
@@ -109,19 +99,18 @@ export const TokenBalanceCard = () => {
                         }}
                         fontSize={'$11'}
                         color={'$color12'}
-                        fontWeight={'500'}
+                        fontWeight={'700'}
                         lineHeight={'$10'}
                       >
                         $
                       </Paragraph>
                       <Paragraph
-                        fontFamily={'$mono'}
                         $sm={{
                           fontSize: formattedBalance.length > 6 ? '$10' : '$13',
                         }}
-                        fontSize={'$12'}
+                        fontSize={'$13'}
                         lineHeight={'$10'}
-                        fontWeight={'500'}
+                        fontWeight={'700'}
                         color={'$color12'}
                         letterSpacing={4}
                       >

@@ -174,13 +174,12 @@ const TokenDetailsBalance = ({ coin }: { coin: CoinWithBalance }) => {
   return (
     <XStack ai="flex-end" gap="$2">
       <Paragraph
-        fontFamily={'$mono'}
         $sm={{
           fontSize: formattedBalance.length > 6 ? '$10' : '$11',
         }}
         fontSize={'$12'}
         lineHeight={'$10'}
-        fontWeight={'500'}
+        fontWeight={'700'}
         color={'$color12'}
       >
         {formattedBalance}
