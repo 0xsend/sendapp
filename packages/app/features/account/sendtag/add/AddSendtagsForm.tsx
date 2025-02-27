@@ -242,6 +242,13 @@ export const AddSendtagsForm = () => {
         </FormProvider>
       </YStack>
       <YStack gap={'$3.5'}>
+        <Paragraph
+          color={'$lightGrayTextField'}
+          $theme-light={{ color: '$darkGrayTextField' }}
+          ta={'center'}
+        >
+          Your Sendtag will be secured after payment confirmation
+        </Paragraph>
         <LinkableButton
           theme="green"
           borderRadius={'$4'}
@@ -259,13 +266,6 @@ export const AddSendtagsForm = () => {
             continue
           </LinkableButton.Text>
         </LinkableButton>
-        <Paragraph
-          color={'$lightGrayTextField'}
-          $theme-light={{ color: '$darkGrayTextField' }}
-          ta={'center'}
-        >
-          Your Sendtag will be secured after payment confirmation
-        </Paragraph>
       </YStack>
     </>
   )
