@@ -16,7 +16,7 @@ const THRESHOLD = 50
 
 export const ScrollDirectionProvider = ({ children }: { children: React.ReactNode }) => {
   const [direction, setDirection] = useState<ScrollDirectionContextValue['direction']>(null)
-  const [isAtEnd, setIsAtEnd] = useState<ScrollDirectionContextValue['isAtEnd']>(true)
+  const [isAtEnd, setIsAtEnd] = useState<ScrollDirectionContextValue['isAtEnd']>(false)
   const lastScrollY = useRef(0)
   const pathName = usePathname()
   const [, setPreviousPath] = useState('')
@@ -25,7 +25,7 @@ export const ScrollDirectionProvider = ({ children }: { children: React.ReactNod
     setPreviousPath((previousPath) => {
       if (previousPath !== pathName) {
         setDirection(null)
-        setIsAtEnd(true)
+        setIsAtEnd(false)
       }
       return pathName
     })
