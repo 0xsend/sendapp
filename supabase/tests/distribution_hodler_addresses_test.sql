@@ -67,6 +67,17 @@ select type,
        multiplier_step
        from distribution_verification_values
        where distribution_id = (select id from distributions where number <> 123 order by number desc limit 1);
+-- Add send slash settings for current distribution
+INSERT INTO send_slash(
+    distribution_id,
+    distribution_number,
+    minimum_sends,
+    scaling_divisor)
+VALUES (
+    (SELECT id FROM distributions WHERE number = 123),
+    123,
+    50,
+    3);
 -- 2. Test when there are eligible hodler addresses
 INSERT INTO public.send_token_transfers(
     "f",
