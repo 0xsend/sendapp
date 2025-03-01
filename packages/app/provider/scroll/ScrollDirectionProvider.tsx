@@ -3,7 +3,8 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
 
 export type ScrollDirectionContextValue = {
-  direction?: 'up' | 'down'
+  direction: 'up' | 'down' | null
+  isAtEnd: boolean
   onScroll: (e: NativeSyntheticEvent<NativeScrollEvent>) => void
 }
 
@@ -11,15 +12,21 @@ const ScrollDirection = createContext<ScrollDirectionContextValue>(
   undefined as unknown as ScrollDirectionContextValue
 )
 
+const THRESHOLD = 50
+
 export const ScrollDirectionProvider = ({ children }: { children: React.ReactNode }) => {
-  const [direction, setDirection] = useState<'up' | 'down'>()
+  const [direction, setDirection] = useState<ScrollDirectionContextValue['direction']>(null)
+  const [isAtEnd, setIsAtEnd] = useState<ScrollDirectionContextValue['isAtEnd']>(true)
   const lastScrollY = useRef(0)
   const pathName = usePathname()
   const [, setPreviousPath] = useState('')
 
   useEffect(() => {
     setPreviousPath((previousPath) => {
-      previousPath !== pathName && setDirection(undefined)
+      if (previousPath !== pathName) {
+        setDirection(null)
+        setIsAtEnd(true)
+      }
       return pathName
     })
   }, [pathName])
@@ -27,14 +34,15 @@ export const ScrollDirectionProvider = ({ children }: { children: React.ReactNod
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent
     const currentScrollY = contentOffset.y
-    const isEndOfView = layoutMeasurement.height + currentScrollY >= contentSize.height - 50
+    const isEndOfView = layoutMeasurement.height + currentScrollY >= contentSize.height - THRESHOLD
+    setIsAtEnd(isEndOfView)
 
-    // Only update direction when crossing thresholds
-    if (currentScrollY < 50) {
+    // Update direction
+    if (currentScrollY < THRESHOLD) {
       setDirection('up')
-    } else if (lastScrollY.current - currentScrollY > 50 && !isEndOfView) {
+    } else if (lastScrollY.current - currentScrollY > THRESHOLD && !isEndOfView) {
       setDirection('up')
-    } else if (currentScrollY - lastScrollY.current > 50 || isEndOfView) {
+    } else if (currentScrollY - lastScrollY.current > THRESHOLD || isEndOfView) {
       setDirection('down')
     }
 
@@ -42,7 +50,9 @@ export const ScrollDirectionProvider = ({ children }: { children: React.ReactNod
   }
 
   return (
-    <ScrollDirection.Provider value={{ direction, onScroll }}>{children}</ScrollDirection.Provider>
+    <ScrollDirection.Provider value={{ direction, isAtEnd, onScroll }}>
+      {children}
+    </ScrollDirection.Provider>
   )
 }
 
