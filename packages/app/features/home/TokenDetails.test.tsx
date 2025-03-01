@@ -3,6 +3,7 @@ import { TamaguiProvider, config } from '@my/ui'
 import { usdcCoin } from 'app/data/coins'
 import { TokenDetails } from './TokenDetails'
 import { act, render, screen } from '@testing-library/react-native'
+import { ScrollDirectionProvider } from 'app/provider/scroll'
 
 jest.mock('app/features/home/utils/useTokenActivityFeed')
 
@@ -28,7 +29,9 @@ describe('TokenDetails', () => {
   test('renders correctly', async () => {
     render(
       <TamaguiProvider defaultTheme={'dark'} config={config}>
-        <TokenDetails coin={{ ...usdcCoin, balance: 1n }} />
+        <ScrollDirectionProvider>
+          <TokenDetails coin={{ ...usdcCoin, balance: 1n }} />
+        </ScrollDirectionProvider>
       </TamaguiProvider>
     )
 
