@@ -1,9 +1,9 @@
 import '@jest/globals'
-
 import { TamaguiProvider, config } from '@my/ui'
 import { usdcCoin } from 'app/data/coins'
 import { TokenDetails } from './TokenDetails'
 import { act, render, screen } from '@testing-library/react-native'
+import { ScrollDirectionProvider } from 'app/provider/scroll'
 
 jest.mock('app/features/home/utils/useTokenActivityFeed')
 
@@ -20,23 +20,36 @@ describe('TokenDetails', () => {
     jest.useFakeTimers()
     jest.setSystemTime(new Date('2025-01-28'))
   })
+
   afterEach(() => {
+    jest.clearAllTimers()
     jest.useRealTimers()
   })
+
   test('renders correctly', async () => {
     render(
       <TamaguiProvider defaultTheme={'dark'} config={config}>
-        <TokenDetails coin={{ ...usdcCoin, balance: 1n }} />
+        <ScrollDirectionProvider>
+          <TokenDetails coin={{ ...usdcCoin, balance: 1n }} />
+        </ScrollDirectionProvider>
       </TamaguiProvider>
     )
 
+    // Handle initial renders and animations
     await act(async () => {
-      jest.advanceTimersByTime(2000)
-      jest.runAllTimers()
+      jest.advanceTimersByTime(100) // Small initial advance
+      jest.runOnlyPendingTimers()
+    })
+
+    // Handle any remaining animations
+    await act(async () => {
+      jest.advanceTimersByTime(1000)
+      jest.runOnlyPendingTimers()
     })
 
     expect(screen.toJSON()).toMatchSnapshot()
 
+    // Assertions
     expect(screen.getByText('Withdraw')).toBeOnTheScreen()
     expect(screen.getByText('Deposit')).toBeOnTheScreen()
     expect(screen.getByText('Received')).toBeOnTheScreen()

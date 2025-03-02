@@ -156,23 +156,26 @@ export function ActivityRewardsScreen() {
 }
 
 const Header = () => (
-  <Stack w={'100%'} h={224} position="relative" jc={'center'} br={'$6'} overflow="hidden">
+  <Stack w={'100%'} h={224} jc={'center'} br={'$6'} overflow="hidden">
     <Image
       pos={'absolute'}
       br={'$6'}
       t={0}
-      zIndex={0}
       bc="$black"
+      zIndex={0}
       source={{
         height: 1024,
         width: 1024,
         uri: 'https://ghassets.send.app/app_images/flower.jpg',
       }}
+      $sm={{
+        h: '150%',
+        w: '150%',
+        t: '-25%',
+        l: '-25%',
+      }}
       h={'100%'}
       w={'100%'}
-      $sm={{
-        scale: 1.5,
-      }}
       objectFit="cover"
     />
     <LinearGradient

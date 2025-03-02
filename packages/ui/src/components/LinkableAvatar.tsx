@@ -1,11 +1,6 @@
-import { type AvatarProps, Avatar as AvatarOg, styled } from 'tamagui'
+import { type AvatarProps, Avatar } from 'tamagui'
 import type { LinkProps } from './Link'
-import { useLink } from 'solito/link'
-
-const LinkableAvatarFrame = styled(AvatarOg, {
-  name: 'Avatar',
-  tag: 'a',
-})
+import { Link, useLink } from 'solito/link'
 
 export type LinkableAvatarProps = AvatarProps & LinkProps
 
@@ -19,8 +14,8 @@ export const LinkableAvatar = ({
 }: { children: React.ReactNode } & LinkProps & AvatarProps) => {
   const linkProps = useLink({ href, replace, scroll, shallow })
   return (
-    <LinkableAvatarFrame {...props} {...linkProps}>
-      {children}
-    </LinkableAvatarFrame>
+    <Link {...linkProps}>
+      <Avatar {...props}>{children}</Avatar>
+    </Link>
   )
 }
