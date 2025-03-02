@@ -36,7 +36,7 @@ VALUES (
   '\x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57',
   18,
   '\xEab49138BA2Ea6dd776220fE26b7b8E446638956',
-  4);
+  6);
 
 INSERT INTO public.distribution_verification_values(
   type,
