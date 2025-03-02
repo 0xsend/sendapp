@@ -26,9 +26,14 @@ await $`docker run --rm \
     --name shovel \
     --add-host=host.docker.internal:host-gateway \
     -p 8383:80 \
+    --memory=100m \
+    --cpus=0.5 \
     --env DATABASE_URL=postgresql://postgres:postgres@host.docker.internal:54322/postgres \
     --env BASE_NAME=base \
-    --env BASE_RPC_URL=http://host.docker.internal:8546 \
+    --env BASE_RPC_URL_PRIMARY=http://host.docker.internal:8546 \
+    --env BASE_RPC_URL_BACKUP1=http://host.docker.internal:8546 \
+    --env BASE_RPC_URL_BACKUP2=http://host.docker.internal:8546 \
+    --env BASE_RPC_URL_BACKUP3=http://host.docker.internal:8546 \
     --env BASE_CHAIN_ID=${chainId} \
     --env BASE_BLOCK_START="${blockNumber}" \
     --env DASHBOARD_ROOT_PASSWORD=shoveladmin \
