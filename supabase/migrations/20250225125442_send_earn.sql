@@ -1,5 +1,5 @@
 create table "public"."send_earn_create" (
-    "id" generated always as identity not null,
+    "id" bigint not null generated always as identity,
     "chain_id" numeric not null,
     "log_addr" bytea not null,
     "block_time" numeric not null,
@@ -42,7 +42,7 @@ CREATE INDEX send_earn_create_block_num ON public.send_earn_create USING btree (
 CREATE INDEX send_earn_create_block_time ON public.send_earn_create USING btree (block_time);
 
 create table "public"."send_earn_new_affiliate" (
-    "id" not null generated always as identity,
+    "id" bigint not null generated always as identity,
     "chain_id" numeric not null,
     "log_addr" bytea not null,
     "block_time" numeric not null,
