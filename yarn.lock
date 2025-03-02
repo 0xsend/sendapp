@@ -29,6 +29,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@0xsend/send-earn-contracts@npm:0.0.6":
+  version: 0.0.6
+  resolution: "@0xsend/send-earn-contracts@npm:0.0.6"
+  checksum: 10/8288403db17c0c5f6133bc99325dc0155949367e0b2dd82ce733a5f2d1326907b75860ebc819b59b5a9e91a563961187800ecc77d336dfa7ceb8fbc152f86be5
+  languageName: node
+  linkType: hard
+
 "@0xsend/send-token-upgrade@npm:0.0.3":
   version: 0.0.3
   resolution: "@0xsend/send-token-upgrade@npm:0.0.3"
@@ -5316,10 +5323,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@indexsupply/shovel-config@npm:^0.0.17":
-  version: 0.0.17
-  resolution: "@indexsupply/shovel-config@npm:0.0.17"
-  checksum: 10/c9c60e81832e73ddf85fa00d8ce779fd2cb23d81395fd3131b240c0b92fa9dbe7d26133557005da6714eb2d347e02f2656782698deb3f7fb1bbc7b928a9524ef
+"@indexsupply/shovel-config@npm:^0.0.18":
+  version: 0.0.18
+  resolution: "@indexsupply/shovel-config@npm:0.0.18"
+  checksum: 10/b1fd794772ec8d0c236ab3006489af12846927df9b9a03d0751276081abe4d6a2ab30e98eed613fabe02e49004bfefc50c946c83be884bb70ecf416af42a7648
   languageName: node
   linkType: hard
 
@@ -6678,7 +6685,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@my/shovel@workspace:packages/shovel"
   dependencies:
-    "@indexsupply/shovel-config": "npm:^0.0.17"
+    "@indexsupply/shovel-config": "npm:^0.0.18"
     "@my/wagmi": "workspace:*"
     "@types/bun": "npm:^1.1.6"
     permissionless: "npm:^0.1.14"
@@ -6763,6 +6770,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@my/wagmi@workspace:packages/wagmi"
   dependencies:
+    "@0xsend/send-earn-contracts": "npm:0.0.6"
     "@0xsend/send-token-upgrade": "npm:0.0.3"
     "@my/contracts": "workspace:*"
     "@wagmi/cli": "npm:^2.1.15"
