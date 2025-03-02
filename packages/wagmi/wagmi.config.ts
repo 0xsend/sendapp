@@ -295,12 +295,12 @@ export default defineConfig({
     {
       name: 'SendEarnFactory',
       address: {
-        [mainnet.id]: '0xE6864A5bBf2c178a214aFBBE2a7ce0c6F43F0D08',
-        [localhost.id]: '0xE6864A5bBf2c178a214aFBBE2a7ce0c6F43F0D08',
-        [sepolia.id]: '0xE6864A5bBf2c178a214aFBBE2a7ce0c6F43F0D08',
-        [baseLocal.id]: '0xE6864A5bBf2c178a214aFBBE2a7ce0c6F43F0D08',
-        [base.id]: '0xE6864A5bBf2c178a214aFBBE2a7ce0c6F43F0D08',
-        [baseSepolia.id]: '0xE6864A5bBf2c178a214aFBBE2a7ce0c6F43F0D08',
+        [mainnet.id]: '0xf6b303f234b0843739f95beeb8555f3a1e50bac1',
+        [localhost.id]: '0xf6b303f234b0843739f95beeb8555f3a1e50bac1',
+        [sepolia.id]: '0xf6b303f234b0843739f95beeb8555f3a1e50bac1',
+        [baseLocal.id]: '0xf6b303f234b0843739f95beeb8555f3a1e50bac1',
+        [base.id]: '0xf6b303f234b0843739f95beeb8555f3a1e50bac1',
+        [baseSepolia.id]: '0xf6b303f234b0843739f95beeb8555f3a1e50bac1',
       },
       // @ts-expect-error doesn't like the artifact
       abi: sendEarnFactoryArtifact.abi,
@@ -308,12 +308,12 @@ export default defineConfig({
     {
       name: 'SendEarn',
       address: {
-        [mainnet.id]: '0xDa71bB69dee2136752925bb13a2a033514934D8D',
-        [localhost.id]: '0xDa71bB69dee2136752925bb13a2a033514934D8D',
-        [sepolia.id]: '0xDa71bB69dee2136752925bb13a2a033514934D8D',
-        [baseLocal.id]: '0xDa71bB69dee2136752925bb13a2a033514934D8D',
-        [base.id]: '0xDa71bB69dee2136752925bb13a2a033514934D8D',
-        [baseSepolia.id]: '0xDa71bB69dee2136752925bb13a2a033514934D8D',
+        [mainnet.id]: '0x02e27b9deae5d76e3d7696447c771b03c0cc3f42',
+        [localhost.id]: '0x02e27b9deae5d76e3d7696447c771b03c0cc3f42',
+        [sepolia.id]: '0x02e27b9deae5d76e3d7696447c771b03c0cc3f42',
+        [baseLocal.id]: '0x02e27b9deae5d76e3d7696447c771b03c0cc3f42',
+        [base.id]: '0x02e27b9deae5d76e3d7696447c771b03c0cc3f42',
+        [baseSepolia.id]: '0x02e27b9deae5d76e3d7696447c771b03c0cc3f42',
       },
       // @ts-expect-error doesn't like the artifact
       abi: sendEarnArtifact.abi,

@@ -6,23 +6,33 @@
   "eth_sources": [
     {
       "name": "base_block_headers",
-      "url": "$BASE_RPC_URL",
-      "urls": [
-        "$BASE_RPC_URL"
-      ],
-      "chain_id": "$BASE_CHAIN_ID",
       "batch_size": 100,
-      "concurrency": 1
+      "concurrency": 1,
+      "chain_id": "$BASE_CHAIN_ID",
+      "url": "$BASE_RPC_URL_PRIMARY",
+      "urls": [
+        "$BASE_RPC_URL_PRIMARY",
+        "$BASE_RPC_URL_BACKUP1",
+        "$BASE_RPC_URL_PRIMARY",
+        "$BASE_RPC_URL_BACKUP2",
+        "$BASE_RPC_URL_PRIMARY",
+        "$BASE_RPC_URL_BACKUP3"
+      ]
     },
     {
       "name": "base_logs",
-      "url": "$BASE_RPC_URL",
-      "urls": [
-        "$BASE_RPC_URL"
-      ],
-      "chain_id": "$BASE_CHAIN_ID",
       "batch_size": 2000,
-      "concurrency": 2
+      "concurrency": 2,
+      "chain_id": "$BASE_CHAIN_ID",
+      "url": "$BASE_RPC_URL_PRIMARY",
+      "urls": [
+        "$BASE_RPC_URL_PRIMARY",
+        "$BASE_RPC_URL_BACKUP1",
+        "$BASE_RPC_URL_PRIMARY",
+        "$BASE_RPC_URL_BACKUP2",
+        "$BASE_RPC_URL_PRIMARY",
+        "$BASE_RPC_URL_BACKUP3"
+      ]
     }
   ],
   "integrations": [
@@ -1163,7 +1173,7 @@
           "column": "log_addr",
           "filter_op": "contains",
           "filter_arg": [
-            "0xe22Edc692E9b4Af786Acb369d591163F1379803F"
+            "0xf6B303f234b0843739f95bEEb8555f3a1e50bac1"
           ]
         }
       ],
@@ -1303,7 +1313,7 @@
           "column": "log_addr",
           "filter_op": "contains",
           "filter_arg": [
-            "0xe22Edc692E9b4Af786Acb369d591163F1379803F"
+            "0xf6B303f234b0843739f95bEEb8555f3a1e50bac1"
           ]
         }
       ],
