@@ -841,109 +841,121 @@ export type Database = {
       }
       send_earn_create: {
         Row: {
-          abi_idx: number | null
-          block_num: number | null
-          block_time: number | null
-          caller: string | null
-          chain_id: number | null
-          collections: string | null
-          fee: number | null
-          fee_recipient: string | null
-          ig_name: string | null
-          initial_owner: string | null
-          log_addr: string | null
-          log_idx: number | null
-          salt: string | null
-          send_earn: string | null
-          src_name: string | null
-          tx_hash: string | null
-          tx_idx: number | null
-          vault: string | null
+          abi_idx: number
+          block_num: number
+          block_time: number
+          caller: string
+          chain_id: number
+          collections: string
+          event_id: string
+          fee: number
+          fee_recipient: string
+          id: number
+          ig_name: string
+          initial_owner: string
+          log_addr: string
+          log_idx: number
+          salt: string
+          send_earn: string
+          src_name: string
+          tx_hash: string
+          tx_idx: number
+          vault: string
         }
         Insert: {
-          abi_idx?: number | null
-          block_num?: number | null
-          block_time?: number | null
-          caller?: string | null
-          chain_id?: number | null
-          collections?: string | null
-          fee?: number | null
-          fee_recipient?: string | null
-          ig_name?: string | null
-          initial_owner?: string | null
-          log_addr?: string | null
-          log_idx?: number | null
-          salt?: string | null
-          send_earn?: string | null
-          src_name?: string | null
-          tx_hash?: string | null
-          tx_idx?: number | null
-          vault?: string | null
+          abi_idx: number
+          block_num: number
+          block_time: number
+          caller: string
+          chain_id: number
+          collections: string
+          event_id?: string
+          fee: number
+          fee_recipient: string
+          id?: never
+          ig_name: string
+          initial_owner: string
+          log_addr: string
+          log_idx: number
+          salt: string
+          send_earn: string
+          src_name: string
+          tx_hash: string
+          tx_idx: number
+          vault: string
         }
         Update: {
-          abi_idx?: number | null
-          block_num?: number | null
-          block_time?: number | null
-          caller?: string | null
-          chain_id?: number | null
-          collections?: string | null
-          fee?: number | null
-          fee_recipient?: string | null
-          ig_name?: string | null
-          initial_owner?: string | null
-          log_addr?: string | null
-          log_idx?: number | null
-          salt?: string | null
-          send_earn?: string | null
-          src_name?: string | null
-          tx_hash?: string | null
-          tx_idx?: number | null
-          vault?: string | null
+          abi_idx?: number
+          block_num?: number
+          block_time?: number
+          caller?: string
+          chain_id?: number
+          collections?: string
+          event_id?: string
+          fee?: number
+          fee_recipient?: string
+          id?: never
+          ig_name?: string
+          initial_owner?: string
+          log_addr?: string
+          log_idx?: number
+          salt?: string
+          send_earn?: string
+          src_name?: string
+          tx_hash?: string
+          tx_idx?: number
+          vault?: string
         }
         Relationships: []
       }
       send_earn_new_affiliate: {
         Row: {
-          abi_idx: number | null
-          affiliate: string | null
-          block_num: number | null
-          block_time: number | null
-          chain_id: number | null
-          ig_name: string | null
-          log_addr: string | null
-          log_idx: number | null
-          send_earn_affiliate: string | null
-          src_name: string | null
-          tx_hash: string | null
-          tx_idx: number | null
+          abi_idx: number
+          affiliate: string
+          block_num: number
+          block_time: number
+          chain_id: number
+          event_id: string
+          id: number
+          ig_name: string
+          log_addr: string
+          log_idx: number
+          send_earn_affiliate: string
+          src_name: string
+          tx_hash: string
+          tx_idx: number
         }
         Insert: {
-          abi_idx?: number | null
-          affiliate?: string | null
-          block_num?: number | null
-          block_time?: number | null
-          chain_id?: number | null
-          ig_name?: string | null
-          log_addr?: string | null
-          log_idx?: number | null
-          send_earn_affiliate?: string | null
-          src_name?: string | null
-          tx_hash?: string | null
-          tx_idx?: number | null
+          abi_idx: number
+          affiliate: string
+          block_num: number
+          block_time: number
+          chain_id: number
+          event_id?: string
+          id?: never
+          ig_name: string
+          log_addr: string
+          log_idx: number
+          send_earn_affiliate: string
+          src_name: string
+          tx_hash: string
+          tx_idx: number
         }
         Update: {
-          abi_idx?: number | null
-          affiliate?: string | null
-          block_num?: number | null
-          block_time?: number | null
-          chain_id?: number | null
-          ig_name?: string | null
-          log_addr?: string | null
-          log_idx?: number | null
-          send_earn_affiliate?: string | null
-          src_name?: string | null
-          tx_hash?: string | null
-          tx_idx?: number | null
+          abi_idx?: number
+          affiliate?: string
+          block_num?: number
+          block_time?: number
+          chain_id?: number
+          event_id?: string
+          id?: never
+          ig_name?: string
+          log_addr?: string
+          log_idx?: number
+          send_earn_affiliate?: string
+          src_name?: string
+          tx_hash?: string
+          tx_idx?: number
         }
         Relationships: []
       }
