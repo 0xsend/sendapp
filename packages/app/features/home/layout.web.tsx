@@ -12,7 +12,7 @@ export function HomeLayout({
   children: React.ReactNode
   TopNav?: React.ReactNode
 } & ScrollViewProps & { fullHeight?: boolean }) {
-  const { onScroll } = useScrollDirection()
+  const { onScroll, onLayout, onContentSizeChange } = useScrollDirection()
   return (
     <HomeSideBarWrapper>
       <TagSearchProvider>
@@ -24,6 +24,8 @@ export function HomeLayout({
           }}
           scrollEventThrottle={128}
           onScroll={onScroll}
+          onLayout={onLayout}
+          onContentSizeChange={onContentSizeChange}
           {...props}
         >
           <YStack gap="$3" $gtLg={{ pt: 80 }} w={'100%'}>
