@@ -26,7 +26,7 @@ test('logged in user needs onboarding before visiting profile', async ({ page, s
   assert(!!profile.about, 'profile about not found')
 
   await page.goto(`${tag.name}`)
-  await page.waitForURL(`${tag.name}`)
+  await page.waitForURL('/auth/onboarding')
 
   await expect(async () => {
     expect(await page.title()).toBe('Send | Onboarding')
