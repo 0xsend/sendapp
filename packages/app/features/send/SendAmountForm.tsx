@@ -145,6 +145,7 @@ export function SendAmountForm() {
                 fieldsetProps: {
                   width: '60%',
                 },
+                autoFocus: true,
               },
               token: {
                 defaultValue: coin?.token,
