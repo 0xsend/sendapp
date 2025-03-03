@@ -91,7 +91,10 @@ export const useSendAccountBalances = () => {
 
     return allCoins.reduce((total, coin) => {
       const balance = coin.token === 'eth' ? ethBalance?.value : balances[coin.token]
-      const price = tokenPrices[coin.token]
+
+      // Always use $1 for USDC regardless of market price
+      const price = coin.symbol === 'USDC' ? 1 : tokenPrices[coin.token]
+
       return total + (convertBalanceToFiat({ ...coin, balance: balance ?? 0n }, price) ?? 0)
     }, 0)
   }, [pricesQuery, balances, ethQuery])

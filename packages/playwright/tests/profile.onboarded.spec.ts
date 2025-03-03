@@ -57,7 +57,11 @@ test('can visit other user profile and send by tag', async ({ page, seed }) => {
 
   // can visit profile withouth the @ prefix
   await page.goto(`/${tag.name}`)
-  expect(await page.title()).toBe('Send | Profile')
+  await page.waitForURL(`/${tag.name}`)
+  await expect(async () => {
+    const title = await page.title()
+    expect(title).toBe('Send | Profile')
+  }).toPass()
   await expect(page.getByText(profile.name)).toBeVisible()
 })
 
