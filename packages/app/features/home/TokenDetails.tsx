@@ -184,11 +184,13 @@ const TokenDetailsBalance = ({ coin }: { coin: CoinWithBalance }) => {
         {formatAmount(balanceWithDecimals.toString(), 10, formatDecimals)}
       </Paragraph>
 
-      <Paragraph color={'$color10'} fontSize={'$3'} fontFamily={'$mono'}>
-        {isLoadingTokenPrices || balanceInUSD === undefined
-          ? ''
-          : `($${formatAmount(balanceInUSD)})`}
-      </Paragraph>
+      {coin.symbol !== 'USDC' ? (
+        <Paragraph color={'$color10'} fontSize={'$3'} fontFamily={'$mono'}>
+          {isLoadingTokenPrices || balanceInUSD === undefined
+            ? ''
+            : `($${formatAmount(balanceInUSD)})`}
+        </Paragraph>
+      ) : null}
     </XStack>
   )
 }

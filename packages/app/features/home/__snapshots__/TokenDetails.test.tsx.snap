@@ -225,19 +225,6 @@ exports[`TokenDetails renders correctly 1`] = `
             >
               &gt;0.0
             </Text>
-            <Text
-              style={
-                {
-                  "color": "#B2B2B2",
-                  "fontFamily": "System",
-                  "fontSize": 16.8,
-                  "fontWeight": "400",
-                  "lineHeight": 19,
-                  "userSelect": "auto",
-                }
-              }
-              suppressHighlighting={true}
-            />
           </View>
         </View>
       </View>
