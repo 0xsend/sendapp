@@ -12,6 +12,7 @@ import {
   Spinner,
   XStack,
   YStack,
+  type TamaguiElement,
   type YStackProps,
 } from '@my/ui'
 import { baseMainnet } from '@my/wagmi'
@@ -37,7 +38,7 @@ import {
   isSendAccountReceiveEvent,
   isSendAccountTransfersEvent,
 } from 'app/utils/zod/activity'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'solito/router'
 import { formatUnits, type Hex, isAddress } from 'viem'
 import { useEstimateFeesPerGas } from 'wagmi'
@@ -77,6 +78,7 @@ export function SendConfirmScreen() {
 }
 
 export function SendConfirm() {
+  const submitButtonRef = useRef<TamaguiElement | null>(null)
   const [queryParams] = useSendScreenParams()
   const { sendToken, recipient, idType, amount } = queryParams
 
@@ -272,6 +274,12 @@ export function SendConfirm() {
     }
   }, [sentTxHash, transfers, router, sendToken, tokenActivityError, submittedAt])
 
+  useEffect(() => {
+    if (submitButtonRef.current) {
+      submitButtonRef.current.focus()
+    }
+  }, [])
+
   if (isSendAccountLoading || nonceIsLoading || isProfileLoading)
     return <Spinner size="large" color={'$color'} />
 
@@ -409,6 +417,7 @@ export function SendConfirm() {
         )}
       </YStack>
       <Button
+        ref={submitButtonRef}
         theme={canSubmit ? 'green' : 'red_alt1'}
         onPress={onSubmit}
         br={'$4'}
