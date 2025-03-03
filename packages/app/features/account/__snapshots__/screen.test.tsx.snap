@@ -740,6 +740,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
     }
   >
     <View
+      overflowX="scroll"
       style={
         {
           "flexDirection": "row",
@@ -1523,7 +1524,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
             }
             suppressHighlighting={true}
           >
-            tag1
+            test
           </Text>
           <View
             cancelable={true}

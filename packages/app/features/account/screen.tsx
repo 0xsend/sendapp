@@ -58,8 +58,8 @@ export function AccountScreen() {
   const send_id = profile?.send_id
   const avatar_url = profile?.avatar_url
   const tags = useConfirmedTags()
-  const refCode = profile?.referral_code ?? ''
-  const referralHref = getReferralHref(refCode)
+  const referralCode = (tags?.[0]?.name || profile?.referral_code) ?? ''
+  const referralHref = getReferralHref(referralCode)
   const [canShare, setCanShare] = useState(false)
 
   useEffect(() => {
@@ -214,7 +214,13 @@ export function AccountScreen() {
         </LinearGradient>
       </YStack>
       <YStack gap={'$3.5'} width="100%" $gtLg={{ gap: '$5', width: '50%' }}>
-        <XStack gap={'$3.5'} $gtLg={{ gap: '$5', flexDirection: 'column' }}>
+        <XStack
+          gap={'$3.5'}
+          // @ts-expect-error typescript is complaining about overflowX not available and advising overflow. Overflow will work differently than overflowX here, overflowY is working fine
+          overflowX={'scroll'}
+          className={'hide-scroll'}
+          $gtLg={{ gap: '$5', flexDirection: 'column' }}
+        >
           {links.map((linkProps) => (
             <StackButton key={linkProps.label} {...linkProps} />
           ))}
@@ -278,7 +284,8 @@ const TagPill = ({ children }: PropsWithChildren) => {
 
 const ReferralCode = () => {
   const { data: referralsCount } = useUserReferralsCount()
-  const { profile, tags } = useUser()
+  const { profile } = useUser()
+  const tags = useConfirmedTags()
   const toast = useToastController()
   const referralCode = (tags?.[0]?.name || profile?.referral_code) ?? ''
   const referralHref = getReferralHref(referralCode)
