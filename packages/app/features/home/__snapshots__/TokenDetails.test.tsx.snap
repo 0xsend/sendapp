@@ -287,53 +287,53 @@ exports[`TokenDetails renders correctly 1`] = `
         }
         testID="TokenActivityFeed"
       >
-        <div
-          className="css-view-175oi2r r-WebkitOverflowScrolling-150rngu r-flexDirection-eqz5dr r-flexGrow-16y2uox r-flexShrink-1wbh5a2 r-overflowX-11yh6sk r-overflowY-1rnoaur r-transform-agouwx r-scrollbarWidth-2eszeu"
-          dir={null}
-          onScroll={[Function]}
-          onTouchEnd={[Function]}
-          onTouchMove={[Function]}
-          onTouchStart={[Function]}
-          onWheel={[Function]}
+        <View
+          collapsable={false}
+          forwardedRef={[Function]}
+          jestAnimatedStyle={
+            {
+              "value": {
+                "opacity": 1,
+                "transform": [
+                  {
+                    "scale": 1,
+                  },
+                ],
+              },
+            }
+          }
           style={
             {
-              "flex": 1,
+              "opacity": 0,
+              "transform": [
+                {
+                  "scale": 0.9,
+                },
+              ],
             }
           }
         >
           <div
-            className="css-view-175oi2r"
+            className="css-view-175oi2r r-WebkitOverflowScrolling-150rngu r-flexDirection-eqz5dr r-flexGrow-16y2uox r-flexShrink-1wbh5a2 r-overflowX-11yh6sk r-overflowY-1rnoaur r-transform-agouwx r-scrollbarWidth-2eszeu"
             dir={null}
+            onScroll={[Function]}
+            onTouchEnd={[Function]}
+            onTouchMove={[Function]}
+            onTouchStart={[Function]}
+            onWheel={[Function]}
+            style={
+              {
+                "flex": 1,
+              }
+            }
           >
             <div
               className="css-view-175oi2r"
               dir={null}
             >
-              <View
-                collapsable={false}
-                forwardedRef={[Function]}
-                jestAnimatedStyle={
-                  {
-                    "value": {
-                      "opacity": 1,
-                      "transform": [
-                        {
-                          "scale": 1,
-                        },
-                      ],
-                    },
-                  }
-                }
-                style={
-                  {
-                    "opacity": 0,
-                    "transform": [
-                      {
-                        "scale": 0.9,
-                      },
-                    ],
-                  }
-                }
+              <div
+                className="css-view-175oi2r"
+                dir={null}
               >
                 <View
                   cancelable={true}
@@ -594,37 +594,10 @@ exports[`TokenDetails renders correctly 1`] = `
                     </View>
                   </View>
                 </View>
-              </View>
-            </div>
-            <div
-              className="css-view-175oi2r"
-              dir={null}
-            >
-              <View
-                collapsable={false}
-                forwardedRef={[Function]}
-                jestAnimatedStyle={
-                  {
-                    "value": {
-                      "opacity": 1,
-                      "transform": [
-                        {
-                          "scale": 1,
-                        },
-                      ],
-                    },
-                  }
-                }
-                style={
-                  {
-                    "opacity": 0,
-                    "transform": [
-                      {
-                        "scale": 0.9,
-                      },
-                    ],
-                  }
-                }
+              </div>
+              <div
+                className="css-view-175oi2r"
+                dir={null}
               >
                 <View
                   cancelable={true}
@@ -885,37 +858,10 @@ exports[`TokenDetails renders correctly 1`] = `
                     </View>
                   </View>
                 </View>
-              </View>
-            </div>
-            <div
-              className="css-view-175oi2r"
-              dir={null}
-            >
-              <View
-                collapsable={false}
-                forwardedRef={[Function]}
-                jestAnimatedStyle={
-                  {
-                    "value": {
-                      "opacity": 1,
-                      "transform": [
-                        {
-                          "scale": 1,
-                        },
-                      ],
-                    },
-                  }
-                }
-                style={
-                  {
-                    "opacity": 0,
-                    "transform": [
-                      {
-                        "scale": 0.9,
-                      },
-                    ],
-                  }
-                }
+              </div>
+              <div
+                className="css-view-175oi2r"
+                dir={null}
               >
                 <View
                   cancelable={true}
@@ -1226,10 +1172,10 @@ exports[`TokenDetails renders correctly 1`] = `
                     </View>
                   </View>
                 </View>
-              </View>
+              </div>
             </div>
           </div>
-        </div>
+        </View>
       </View>
     </View>
   </View>
