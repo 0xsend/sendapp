@@ -94,23 +94,23 @@ const TokenActivityFeed = ({
   }
   return (
     <Card {...props} f={1}>
-      <FlatList
-        style={{ flex: 1 }}
-        data={activities}
-        keyExtractor={(activity) =>
-          `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`
-        }
-        renderItem={({ item: activity }) => (
-          <Fade>
+      <Fade>
+        <FlatList
+          style={{ flex: 1 }}
+          data={activities}
+          keyExtractor={(activity) =>
+            `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`
+          }
+          renderItem={({ item: activity }) => (
             <TokenActivityRow activity={activity} onPress={onActivityPress} />
-          </Fade>
-        )}
-        ListFooterComponent={
-          !isLoadingActivities &&
-          isFetchingNextPageActivities && <Spinner size="small" color={'$color12'} mb="$3.5" />
-        }
-        showsVerticalScrollIndicator={false}
-      />
+          )}
+          ListFooterComponent={
+            !isLoadingActivities &&
+            isFetchingNextPageActivities && <Spinner size="small" color={'$color12'} mb="$3.5" />
+          }
+          showsVerticalScrollIndicator={false}
+        />
+      </Fade>
     </Card>
   )
 }
