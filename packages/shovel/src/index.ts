@@ -12,6 +12,8 @@ import {
   sendtagCheckoutReceiptsIntegration,
   sendEarnCreate,
   sendEarnNewAffiliate,
+  sendEarnDeposit,
+  sendEarnWithdraw,
 } from './integrations'
 
 const baseRpcUrls = {
@@ -88,6 +90,14 @@ export const integrations: Integration[] = [
   },
   {
     ...sendEarnNewAffiliate,
+    sources: [{ name: baseSrcLogs.name, start: '$BASE_BLOCK_START' }],
+  },
+  {
+    ...sendEarnDeposit,
+    sources: [{ name: baseSrcLogs.name, start: '$BASE_BLOCK_START' }],
+  },
+  {
+    ...sendEarnWithdraw,
     sources: [{ name: baseSrcLogs.name, start: '$BASE_BLOCK_START' }],
   },
 ]
