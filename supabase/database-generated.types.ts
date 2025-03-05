@@ -908,6 +908,63 @@ export type Database = {
         }
         Relationships: []
       }
+      send_earn_deposits: {
+        Row: {
+          abi_idx: number
+          assets: number
+          block_num: number
+          block_time: number
+          chain_id: number
+          event_id: string
+          id: number
+          ig_name: string
+          log_addr: string
+          log_idx: number
+          owner: string
+          sender: string
+          shares: number
+          src_name: string
+          tx_hash: string
+          tx_idx: number
+        }
+        Insert: {
+          abi_idx: number
+          assets: number
+          block_num: number
+          block_time: number
+          chain_id: number
+          event_id?: string
+          id?: never
+          ig_name: string
+          log_addr: string
+          log_idx: number
+          owner: string
+          sender: string
+          shares: number
+          src_name: string
+          tx_hash: string
+          tx_idx: number
+        }
+        Update: {
+          abi_idx?: number
+          assets?: number
+          block_num?: number
+          block_time?: number
+          chain_id?: number
+          event_id?: string
+          id?: never
+          ig_name?: string
+          log_addr?: string
+          log_idx?: number
+          owner?: string
+          sender?: string
+          shares?: number
+          src_name?: string
+          tx_hash?: string
+          tx_idx?: number
+        }
+        Relationships: []
+      }
       send_earn_new_affiliate: {
         Row: {
           abi_idx: number
@@ -953,6 +1010,66 @@ export type Database = {
           log_addr?: string
           log_idx?: number
           send_earn_affiliate?: string
+          src_name?: string
+          tx_hash?: string
+          tx_idx?: number
+        }
+        Relationships: []
+      }
+      send_earn_withdraws: {
+        Row: {
+          abi_idx: number
+          assets: number
+          block_num: number
+          block_time: number
+          chain_id: number
+          event_id: string
+          id: number
+          ig_name: string
+          log_addr: string
+          log_idx: number
+          owner: string
+          receiver: string
+          sender: string
+          shares: number
+          src_name: string
+          tx_hash: string
+          tx_idx: number
+        }
+        Insert: {
+          abi_idx: number
+          assets: number
+          block_num: number
+          block_time: number
+          chain_id: number
+          event_id?: string
+          id?: never
+          ig_name: string
+          log_addr: string
+          log_idx: number
+          owner: string
+          receiver: string
+          sender: string
+          shares: number
+          src_name: string
+          tx_hash: string
+          tx_idx: number
+        }
+        Update: {
+          abi_idx?: number
+          assets?: number
+          block_num?: number
+          block_time?: number
+          chain_id?: number
+          event_id?: string
+          id?: never
+          ig_name?: string
+          log_addr?: string
+          log_idx?: number
+          owner?: string
+          receiver?: string
+          sender?: string
+          shares?: number
           src_name?: string
           tx_hash?: string
           tx_idx?: number
@@ -1499,6 +1616,15 @@ export type Database = {
           to_user:
             | Database["public"]["CompositeTypes"]["activity_feed_user"]
             | null
+        }
+        Relationships: []
+      }
+      send_earn_balances: {
+        Row: {
+          assets: number | null
+          log_addr: string | null
+          owner: string | null
+          shares: number | null
         }
         Relationships: []
       }

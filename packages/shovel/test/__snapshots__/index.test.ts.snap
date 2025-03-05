@@ -1139,7 +1139,7 @@ exports[`shovel config 1`] = `
         {
           "column": "log_addr",
           "filter_arg": [
-            "0xe22Edc692E9b4Af786Acb369d591163F1379803F",
+            "0xf6B303f234b0843739f95bEEb8555f3a1e50bac1",
           ],
           "filter_op": "contains",
           "name": "log_addr",
@@ -1279,7 +1279,7 @@ exports[`shovel config 1`] = `
         {
           "column": "log_addr",
           "filter_arg": [
-            "0xe22Edc692E9b4Af786Acb369d591163F1379803F",
+            "0xf6B303f234b0843739f95bEEb8555f3a1e50bac1",
           ],
           "filter_op": "contains",
           "name": "log_addr",
@@ -1340,6 +1340,208 @@ exports[`shovel config 1`] = `
           },
         ],
         "name": "send_earn_new_affiliate",
+      },
+    },
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "tx_hash",
+          "name": "tx_hash",
+        },
+        {
+          "column": "log_addr",
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "column": "sender",
+            "indexed": true,
+            "name": "sender",
+            "type": "address",
+          },
+          {
+            "column": "owner",
+            "indexed": true,
+            "name": "owner",
+            "type": "address",
+          },
+          {
+            "column": "assets",
+            "indexed": false,
+            "name": "assets",
+            "type": "uint256",
+          },
+          {
+            "column": "shares",
+            "indexed": false,
+            "name": "shares",
+            "type": "uint256",
+          },
+        ],
+        "name": "Deposit",
+        "type": "event",
+      },
+      "name": "send_earn_deposits",
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "sender",
+            "type": "bytea",
+          },
+          {
+            "name": "owner",
+            "type": "bytea",
+          },
+          {
+            "name": "assets",
+            "type": "numeric",
+          },
+          {
+            "name": "shares",
+            "type": "numeric",
+          },
+        ],
+        "name": "send_earn_deposits",
+      },
+    },
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "tx_hash",
+          "name": "tx_hash",
+        },
+        {
+          "column": "log_addr",
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "column": "sender",
+            "indexed": true,
+            "name": "sender",
+            "type": "address",
+          },
+          {
+            "column": "receiver",
+            "indexed": true,
+            "name": "receiver",
+            "type": "address",
+          },
+          {
+            "column": "owner",
+            "indexed": true,
+            "name": "owner",
+            "type": "address",
+          },
+          {
+            "column": "assets",
+            "indexed": false,
+            "name": "assets",
+            "type": "uint256",
+          },
+          {
+            "column": "shares",
+            "indexed": false,
+            "name": "shares",
+            "type": "uint256",
+          },
+        ],
+        "name": "Withdraw",
+        "type": "event",
+      },
+      "name": "send_earn_withdraws",
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "sender",
+            "type": "bytea",
+          },
+          {
+            "name": "receiver",
+            "type": "bytea",
+          },
+          {
+            "name": "owner",
+            "type": "bytea",
+          },
+          {
+            "name": "assets",
+            "type": "numeric",
+          },
+          {
+            "name": "shares",
+            "type": "numeric",
+          },
+        ],
+        "name": "send_earn_withdraws",
       },
     },
   ],
