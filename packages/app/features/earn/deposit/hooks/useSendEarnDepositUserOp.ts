@@ -1,16 +1,76 @@
 import { sendEarnAbi } from '@my/wagmi'
+import { useReferrer } from 'app/utils/referrer'
 import { useSendAccount } from 'app/utils/send-accounts'
+import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useUserOp } from 'app/utils/userop'
 import type { UserOperation } from 'permissionless'
 import { useMemo } from 'react'
 import { encodeFunctionData, erc20Abi, zeroAddress } from 'viem'
-import type { UseQueryReturnType } from 'wagmi/query'
+import { useQuery, type UseQueryReturnType } from 'wagmi/query'
+
+/**
+ * Fetches the user's send earn deposits.
+ */
+function useSendEarnDeposits() {
+  const supabase = useSupabase()
+  return useQuery({
+    queryKey: ['send_earn_deposits'],
+    queryFn: async () => {
+      return await supabase.from('send_earn_deposits').select('*')
+    },
+  })
+}
+
+/**
+ * Fetches the user's send earn withdraws.
+ */
+function useSendEarnWithdraws() {
+  const supabase = useSupabase()
+  return useQuery({
+    queryKey: ['send_earn_withdraws'],
+    queryFn: async () => {
+      return await supabase
+        .from('send_earn_withdraws')
+        .select('*')
+        .order('assets', { ascending: false })
+    },
+  })
+}
+
+/**
+ * Fetches the user's send earn balances.
+ */
+function useSendEarnBalances() {
+  const supabase = useSupabase()
+  return useQuery({
+    queryKey: ['sendEarnBalances'],
+    queryFn: async () => {
+      return await supabase.from('send_earn_balances').select('*')
+    },
+  })
+}
+
+/**
+ * Determine the vault to deposit into.
+ *
+ * If ther user already has a deposit balance, then use that vault.
+ * Otherwise, use the referrer vault.
+ * If there is no referrer, then create a new affilaite vault and deposit into that.
+ * Otherwise, deposit into the referrer vault.
+ * Finally, if there is no referrer, and no existing deposits, then create a new vault and deposit into that.
+ */
+export function useSendEarnDepositVault() {
+  const referrer = useReferrer()
+  const deposits = useSendEarnDeposits()
+  const withdraws = useSendEarnWithdraws()
+  const balances = useSendEarnBalances()
+  // TODO: vault lookup by address
+}
 
 /**
  * Hook to create a UserOperation for depositing Send Account assets into
  * Send Earn vaults.
  *
- * TODO: add support for referrals. MUST use the last referral and only one upline.
  * TODO: ensure the asset and vault are valid
  *
  * @param {Object} params - The deposit parameters
@@ -30,9 +90,9 @@ export const useSendEarnDepositUserOp = ({
 }): UseQueryReturnType<UserOperation<'v0.7'>, Error> => {
   const sendAccount = useSendAccount()
   const sender = useMemo(() => sendAccount?.data?.address, [sendAccount?.data?.address])
-
+  useSendEarnDepositVault()
   // TODO: validate asset
-  // TODO: referrer logic and setting correct send earn vault address
+
   const calls = useMemo(
     () => [
       {
@@ -63,4 +123,8 @@ export const useSendEarnDepositUserOp = ({
   })
 
   return uop
+}
+
+export function useSendEarnReferrer() {
+  const referrer = useReferrer() // first lookup the referrer
 }
