@@ -32,7 +32,7 @@ await $`docker run --rm \
           --network=supabase_network_send \
           -p=0.0.0.0:8546:8546 \
           --name=sendapp-anvil-base \
-          --memory=100m \
+          --memory=200m \
           ghcr.io/foundry-rs/foundry:stable "anvil \
             --host=0.0.0.0 \
             --port=8546 \
