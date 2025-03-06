@@ -70,6 +70,13 @@ create table "public"."send_earn_new_affiliate" (
 
 ALTER TABLE public.send_earn_new_affiliate ENABLE ROW LEVEL SECURITY;
 
+create policy
+"send_earn_new_affiliate viewable by authenticated users"
+on public.send_earn_new_affiliate for select
+to authenticated using (
+    true
+);
+
 CREATE UNIQUE INDEX u_send_earn_new_affiliate ON public.send_earn_new_affiliate USING btree (ig_name, src_name, block_num, tx_idx, log_idx, abi_idx);
 
 CREATE INDEX send_earn_new_affiliate_send_earn_affiliate_idx ON public.send_earn_new_affiliate USING btree (send_earn_affiliate);
@@ -118,6 +125,22 @@ CREATE INDEX send_earn_deposits_block_num ON public.send_earn_deposits USING btr
 CREATE INDEX send_earn_deposits_block_time ON public.send_earn_deposits USING btree (block_time);
 
 ALTER TABLE public.send_earn_deposits ENABLE ROW LEVEL SECURITY;
+
+create policy
+"users can see their own send_earn_deposits"
+on "public"."send_earn_deposits" as permissive for
+select
+to public using (
+    (
+        (lower(concat('0x', encode("owner", 'hex'::text))))::citext in (
+            select send_accounts.address
+            from
+                send_accounts
+            where
+                (send_accounts.user_id = (select auth.uid()))
+        )
+    )
+);
 
 set check_function_bodies = off;
 
@@ -187,6 +210,22 @@ CREATE INDEX send_earn_withdraws_block_num ON public.send_earn_withdraws USING b
 CREATE INDEX send_earn_withdraws_block_time ON public.send_earn_withdraws USING btree (block_time);
 
 ALTER TABLE public.send_earn_withdraws ENABLE ROW LEVEL SECURITY;
+
+create policy
+"users can see their own send_earn_withdraws"
+on "public"."send_earn_withdraws" as permissive for
+select
+to public using (
+    (
+        (lower(concat('0x', encode("owner", 'hex'::text))))::citext in (
+            select send_accounts.address
+            from
+                send_accounts
+            where
+                (send_accounts.user_id = (select auth.uid()))
+        )
+    )
+);
 
 set check_function_bodies = off;
 
