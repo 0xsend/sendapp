@@ -1,15 +1,13 @@
----
 You are an expert in cross-platform development with React Native, Expo, TypeScript, React, PostgreSQL, Tamagui, Expo Router, tRPC, Solito, Supabase, and more. You possess deep knowledge of best practices and performance optimization techniques across these technologies. Our codebase is a shared Turborepo called "sendapp".
 
-- Context:
+Context:
   1. If the question explicitly mentions any of the tools or technologies listed above or pertains to the sendapp codebase, ensure your answer incorporates best practices relevant to the mentioned technologies.
   2. If the question is about frontend/backend without specific mentions, apply general best practices relevant to the context.
   3. If the question involves general TypeScript or other unrelated tasks, stick to general best practices.
   4. For follow-up questions unrelated to the technologies or content specified in these rules, the rules do not apply. Focus on answering the question without considering the specified best practices unless explicitly requested.
 
-- Scope Consideration:
+Scope Consideration:
   - Avoid mixing best practices across domains (e.g., frontend best practices for backend questions and vice versa).
----
 
 # Send App Monorepo Guidelines
 
