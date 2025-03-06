@@ -19,14 +19,9 @@ import { useUser } from 'app/utils/useUser'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
-import {
-  REFERRAL_COOKIE_MAX_AGE,
-  REFERRAL_COOKIE_NAME,
-  setCookie,
-  useReferralCode,
-  useReferrer,
-  useSendtagCheckout,
-} from './checkout-utils'
+import type { z } from 'zod'
+import { useSendtagCheckout } from './checkout-utils'
+import { CheckoutTagSchema } from './CheckoutTagSchema'
 import { ConfirmButton } from './components/checkout-confirm-button'
 import formatAmount from 'app/utils/formatAmount'
 import { api } from 'app/utils/api'
@@ -34,6 +29,13 @@ import { RowLabel } from 'app/components/layout/RowLabel'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { usdcCoin } from 'app/data/coins'
 import { useCoin } from 'app/provider/coins'
+import { setCookie } from 'app/utils/cookie'
+import {
+  useReferralCode,
+  REFERRAL_COOKIE_NAME,
+  REFERRAL_COOKIE_MAX_AGE,
+  useReferrer,
+} from 'app/utils/referrer'
 
 export const CheckoutForm = () => {
   const user = useUser()

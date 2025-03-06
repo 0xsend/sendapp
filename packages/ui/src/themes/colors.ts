@@ -14,6 +14,7 @@ export const brandColors = {
   khaki900: '#9f7750',
   khaki: '#C3B29E',
   cinereous: '#1D1D20',
+  oliveDrab: '#97b759',
   olive: '#86AE80',
   decay: '#3E4A3C',
   darkest: '#081619',

@@ -49,7 +49,7 @@ export const defaultUserOp: Pick<
   paymasterVerificationGasLimit: 150000n,
   paymasterPostOpGasLimit: 100000n,
   paymasterData: '0x',
-}
+} as const
 
 export type UseUserOpTransferMutationArgs = {
   /**
