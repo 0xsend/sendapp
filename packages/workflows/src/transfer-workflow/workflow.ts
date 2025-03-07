@@ -13,7 +13,6 @@ const {
   sendUserOpActivity,
   updateTemporalTransferActivity,
   waitForTransactionReceiptActivity,
-  isTransferIndexedActivity,
 } = proxyActivities<ReturnType<typeof createTransferActivities>>({
   // TODO: make this configurable
   startToCloseTimeout: '10 minutes',

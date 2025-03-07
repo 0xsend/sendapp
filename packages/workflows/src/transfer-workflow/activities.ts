@@ -41,7 +41,6 @@ type TransferActivities = {
     transactionHash: `0x${string}`
     blockNumber: bigint
   }>
-  isTransferIndexedActivity: (tx_hash: `0x${string}`, token: PgBytea | null) => Promise<boolean>
   updateTemporalTransferActivity: (params: {
     workflowId: string
     status: Database['temporal']['Enums']['transfer_status']
@@ -168,17 +167,6 @@ export const createTransferActivities = (
         })
         throw ApplicationFailure.nonRetryable(updateError?.message)
       }
-    },
-    async isTransferIndexedActivity(tx_hash, token) {
-      const isIndexed = token
-        ? await isTokenTransferIndexed(tx_hash)
-        : await isEthTransferIndexed(tx_hash)
-
-      if (!isIndexed) {
-        throw ApplicationFailure.retryable('Transfer not indexed in db')
-      }
-      log.info('isTransferIndexedActivity', { isIndexed })
-      return isIndexed
     },
     async updateTemporalTransferActivity({ workflowId, status, data, failureError }) {
       const { error } = await updateTemporalSendAccountTransfer({

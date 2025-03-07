@@ -12,7 +12,7 @@ async function bundle() {
   const { code } = await bundleWorkflowCode({
     workflowsPath: require.resolve('../all-workflows.ts'),
   })
-  const codePath = path.join(__dirname, '../../workflow-bundle.js')
+  const codePath = path.join(__dirname, '../../dist/workflow-bundle.js')
 
   await writeFile(codePath, code)
   console.log(`Bundle written to ${codePath}`)
