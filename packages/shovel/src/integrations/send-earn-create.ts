@@ -5,7 +5,7 @@ import type {
   Integration,
   Table,
 } from '@indexsupply/shovel-config'
-import { sendEarnFactoryAddress } from '@my/wagmi'
+import { sendEarnUsdcFactoryAddress } from '@my/wagmi'
 
 export const sendEarnCreate: Table = {
   name: 'send_earn_create',
@@ -50,7 +50,7 @@ export const integration: Omit<Integration, 'sources'> = {
       name: 'log_addr',
       column: 'log_addr',
       filter_op: 'contains',
-      filter_arg: [...new Set(Object.values(sendEarnFactoryAddress))].sort() as `0x${string}`[],
+      filter_arg: [...new Set(Object.values(sendEarnUsdcFactoryAddress))].sort() as `0x${string}`[],
     },
   ] as BlockData[],
   event: {
