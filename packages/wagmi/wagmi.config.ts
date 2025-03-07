@@ -293,7 +293,7 @@ export default defineConfig({
       },
     },
     {
-      name: 'SendEarnFactory',
+      name: 'SendEarnUSDCFactory',
       address: {
         [mainnet.id]: '0xf6b303f234b0843739f95beeb8555f3a1e50bac1',
         [localhost.id]: '0xf6b303f234b0843739f95beeb8555f3a1e50bac1',
