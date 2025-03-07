@@ -62,17 +62,17 @@ export function PendingScreen({
   // Set up a timer to track elapsed time and handle timeout
   useEffect(() => {
     const interval = setInterval(() => {
-      setElapsedTime((prev) => {
-        const newElapsed = prev + 1000
-        if (newElapsed >= maxWaitTime) {
-          clearInterval(interval)
-          // TODO: Redirect to failure
-        }
-        return newElapsed
-      })
+      setElapsedTime((prev) => prev + 1000)
     }, 1000)
 
-    return () => clearInterval(interval)
+    const timeout = setTimeout(() => {
+      clearInterval(interval)
+    }, maxWaitTime)
+
+    return () => {
+      clearInterval(interval)
+      clearTimeout(timeout)
+    }
   }, [maxWaitTime])
 
   // Calculate remaining time
