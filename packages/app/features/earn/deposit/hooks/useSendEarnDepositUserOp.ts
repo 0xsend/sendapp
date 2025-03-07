@@ -113,13 +113,12 @@ function useSendEarnBalances(): UseQueryReturnType<SendEarnBalance[] | null> {
 /**
  * Determine the vault to deposit into.
  *
- * If the user already has a deposit balance, then use that vault.
- * Otherwise, use the referrer vault.
- * If there is no referrer, then create a new affiliate vault and deposit into that.
- * Otherwise, deposit into the referrer vault.
- * Finally, if there is no referrer, and no existing deposits, then create a new vault and deposit into that.
+ * Priority order:
+ * 1. If the user has existing deposits, use their current vault
+ * 2. If there's a referrer vault, use that
+ * 3. Otherwise, use the default vault for the current chain
  *
- * @returns The vault address to deposit into or null if a new vault needs to be created
+ * @returns A query result containing the vault address to deposit into
  */
 export function useSendEarnDepositVault() {
   const referrerVault = useReferrerVault()
