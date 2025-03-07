@@ -129,6 +129,12 @@ export type Database = MergeDeep<
             > | null
           }
         }
+        send_earn_balances: {
+          Row: {
+            log_addr: PgBytea
+            owner: PgBytea
+          }
+        }
       }
     }
   }
