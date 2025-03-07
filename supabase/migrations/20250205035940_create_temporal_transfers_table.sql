@@ -330,51 +330,28 @@ CREATE TRIGGER temporal_send_account_transfers_trigger_delete_activity
   EXECUTE FUNCTION temporal.temporal_send_account_transfers_trigger_delete_activity();
 
 
--- When a send_account_transfer activity is inserted, delete any temporal_send_account_transfers
--- with the same tx_hash from activity table.
+-- When a send_account_transfer is inserted, delete older temporal_send_account_transfers
+-- We know they are indexed if its inserting newer blocks.
 -- This prevents duplicate activities once a transfer is completed.
-create or replace function send_account_transfers_trigger_insert_activity() returns trigger
+-- keep failed so we can show it to the user, we can garbage collect later
+create or replace function send_account_transfers_delete_temporal_activity() returns trigger
 language plpgsql
 security definer as
 $$
-declare
-    _f_user_id uuid;
-    _t_user_id uuid;
-    _data jsonb;
+
 begin
-    -- Delete any temporal transfers with matching tx_hash
-    DELETE FROM activity a
-    WHERE event_name = 'temporal_send_account_transfers'
-      AND extract(epoch from a.created_at)::numeric < NEW.block_time;
-    -- select send app info for from address
-    select user_id into _f_user_id from send_accounts where address = concat('0x', encode(NEW.f, 'hex'))::citext;
-    select user_id into _t_user_id from send_accounts where address = concat('0x', encode(NEW.t, 'hex'))::citext;
-
-    -- cast v to text to avoid losing precision when converting to json when sending to clients
-    _data := json_build_object(
-        'log_addr', NEW.log_addr,
-        'f', NEW.f,
-        't', NEW.t,
-        'v', NEW.v::text,
-        'tx_hash', NEW.tx_hash,
-        'block_num', NEW.block_num::text,
-        'tx_idx', NEW.tx_idx::text,
-        'log_idx', NEW.log_idx::text
+    delete from activity a
+    where event_name = 'temporal_send_account_transfers' and event_id in (
+      select sat.workflow_id from temporal.send_account_transfers sat
+      where extract(epoch from sat.created_at)::numeric < NEW.block_time
+      and sat.status != 'failed'
     );
-
-    insert into activity (event_name, event_id, from_user_id, to_user_id, data, created_at)
-    values ('send_account_transfers',
-            NEW.event_id,
-            _f_user_id,
-            _t_user_id,
-            _data,
-            to_timestamp(NEW.block_time) at time zone 'UTC')
-    on conflict (event_name, event_id) do update set
-        from_user_id = _f_user_id,
-        to_user_id = _t_user_id,
-        data = _data,
-        created_at = to_timestamp(NEW.block_time) at time zone 'UTC';
-
     return NEW;
 end;
+end;
 $$;
+
+CREATE TRIGGER send_account_transfers_trigger_delete_temporal_activity
+  BEFORE INSERT ON send_account_transfers
+  FOR EACH ROW
+  EXECUTE FUNCTION send_account_transfers_delete_temporal_activity();
