@@ -3,6 +3,7 @@ import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinbaseOnramp } from 'app/utils/useCoinbaseOnramp'
 import { toNiceError } from 'app/utils/toNiceError'
 import { YStack, Text, Button, Spinner } from '@my/ui'
+import { PendingScreen } from '../components/PendingScreen'
 
 const COINBASE_APP_ID = process.env.NEXT_PUBLIC_CDP_APP_ID ?? ''
 
@@ -65,7 +66,10 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
           </YStack>
         )
 
-      case status === 'pending':
+      case status === 'payment_submitted':
+        return <PendingScreen maxWaitTime={60000} />
+
+      case status === 'pending_payment':
         return (
           <YStack ai="center" gap="$4" py="$8">
             <Spinner size="large" color="$primary" />

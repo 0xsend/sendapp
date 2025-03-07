@@ -3,7 +3,7 @@ import { getOnrampBuyUrl } from '@coinbase/onchainkit/fund'
 import { useMutation } from '@tanstack/react-query'
 import { useRouter } from 'solito/router'
 
-type OnrampStatus = 'idle' | 'pending' | 'success' | 'failed'
+type OnrampStatus = 'idle' | 'pending_payment' | 'success' | 'failed' | 'payment_submitted'
 
 interface OnrampConfig {
   projectId: string
@@ -25,6 +25,7 @@ export function useCoinbaseOnramp({
   const [popup, setPopup] = useState<Window | null>(null)
   const [popupChecker, setPopupChecker] = useState<NodeJS.Timeout | null>(null)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [paymentSubmitted, setPaymentSubmitted] = useState(false)
   const router = useRouter()
 
   const cleanup = useCallback(() => {
@@ -41,6 +42,7 @@ export function useCoinbaseOnramp({
   const mutation = useMutation<void, Error, OnrampParams>({
     mutationFn: async ({ amount }) => {
       console.log('[Onramp] Starting transaction for:', amount, 'USD')
+
       const onrampUrl = getOnrampBuyUrl({
         projectId,
         addresses: {
@@ -66,18 +68,20 @@ export function useCoinbaseOnramp({
 
       return new Promise<void>((resolve, reject) => {
         const checker = setInterval(() => {
-          if (newPopup.closed) {
-            console.log('[Onramp] Transaction cancelled - popup closed by user')
-            clearInterval(checker)
-            setPopup(null)
-            reject(new Error('Transaction cancelled'))
+          if (!newPopup.closed) {
+            return
           }
+          console.log('[Onramp] Popup closed by user.')
+          clearInterval(checker)
+          setPopup(null)
+          reject(new Error('Transaction cancelled'))
         }, 1000)
         setPopupChecker(checker)
       })
     },
     onError: (error) => {
       console.log('[Onramp] Transaction failed:', error.message)
+      setPaymentSubmitted(false)
       cleanup()
       return error instanceof Error ? error : new Error('Unknown error occurred')
     },
@@ -94,18 +98,21 @@ export function useCoinbaseOnramp({
         console.log('[Onramp] Transaction successful - processing completion')
         try {
           setIsSuccess(true)
+          setPaymentSubmitted(false)
           router.push('/deposit/success')
           cleanup()
           mutation.reset()
         } catch (error) {
           console.error('[Onramp] Navigation failed after success:', error)
           setIsSuccess(false)
+          setPaymentSubmitted(false)
           mutation.reset()
           cleanup()
         }
+      } else if (event.data?.type === 'COINBASE_ONRAMP_PENDING') {
+        setPaymentSubmitted(true)
       }
     }
-
     window.addEventListener('message', handleMessage)
     return () => window.removeEventListener('message', handleMessage)
   }, [cleanup, router, mutation])
@@ -113,6 +120,7 @@ export function useCoinbaseOnramp({
   const openOnramp = useCallback(
     (amount: number) => {
       setIsSuccess(false)
+      setPaymentSubmitted(false)
       mutation.mutate({ amount })
     },
     [mutation]
@@ -120,6 +128,7 @@ export function useCoinbaseOnramp({
 
   const closeOnramp = useCallback(() => {
     setIsSuccess(false)
+    setPaymentSubmitted(false)
     mutation.reset()
     cleanup()
   }, [mutation, cleanup])
@@ -127,17 +136,19 @@ export function useCoinbaseOnramp({
   const status: OnrampStatus = isSuccess
     ? 'success'
     : mutation.isPending
-      ? 'pending'
-      : mutation.isError
-        ? 'failed'
-        : 'idle'
+      ? 'pending_payment'
+      : paymentSubmitted
+        ? 'payment_submitted'
+        : mutation.isError
+          ? 'failed'
+          : 'idle'
 
   return {
     openOnramp,
     closeOnramp,
     status,
     error: mutation.error as Error | null,
-    isLoading: mutation.isPending || isSuccess,
+    isLoading: mutation.isPending || isSuccess || paymentSubmitted,
     isRedirecting: isSuccess,
   }
 }
