@@ -1,4 +1,4 @@
-import { Spinner, Text, YStack, Button } from '@my/ui'
+import { Spinner, Text, YStack } from '@my/ui'
 import { useEffect, useState } from 'react'
 import { useTokenActivityFeed } from 'app/features/home/utils/useTokenActivityFeed'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
