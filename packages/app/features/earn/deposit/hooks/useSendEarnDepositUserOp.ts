@@ -1,19 +1,58 @@
 import type { Database } from '@my/supabase/database.types'
-import { sendEarnAbi } from '@my/wagmi'
+import { sendEarnAbi, sendEarnAddress } from '@my/wagmi'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { byteaToHex } from 'app/utils/byteaToHex'
+import { hexToBytea } from 'app/utils/hexToBytea'
 import { useReferrer } from 'app/utils/referrer'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import { useUserOp } from 'app/utils/userop'
+import debug from 'debug'
 import type { UserOperation } from 'permissionless'
 import { useMemo } from 'react'
 import { encodeFunctionData, erc20Abi, zeroAddress } from 'viem'
+import { useChainId } from 'wagmi'
 import { useQuery, type UseQueryReturnType } from 'wagmi/query'
-import debug from 'debug'
 
 const log = debug('app:features:earn')
+
+/**
+ * Fetches the referrer's vault address from the send_earn_new_affiliate table.
+ */
+export function useReferrerVault(): UseQueryReturnType<`0x${string}` | null> {
+  const supabase = useSupabase()
+  const referrer = useReferrer()
+
+  return useQuery({
+    queryKey: ['referrerVault', { supabase, referrer }] as const,
+    queryFn: async ({ queryKey: [, { supabase, referrer }] }) => {
+      throwIf(referrer.isError)
+      const address = referrer.data?.address
+      if (!address) return null
+      const { data, error } = await supabase
+        .from('send_earn_new_affiliate')
+        .select('send_earn_affiliate')
+        .eq('affiliate', hexToBytea(address))
+        .limit(1)
+        .maybeSingle()
+
+      if (error) {
+        log('Error fetching referrer vault:', error)
+        throw error
+      }
+
+      if (!data || !data?.send_earn_affiliate) {
+        log('No vault found for referrer:', address)
+        return null
+      }
+
+      const vaultBytea = data.send_earn_affiliate
+      return byteaToHex(vaultBytea)
+    },
+    enabled: !referrer.isLoading,
+  })
+}
 
 /**
  * Fetches the user's send earn deposits.
@@ -83,18 +122,18 @@ function useSendEarnBalances(): UseQueryReturnType<SendEarnBalance[] | null> {
  * @returns The vault address to deposit into or null if a new vault needs to be created
  */
 export function useSendEarnDepositVault() {
-  const referrer = useReferrer()
+  const referrerVault = useReferrerVault()
   const balances = useSendEarnBalances()
   const sendAccount = useSendAccount()
+  const chainId = useChainId()
+
   return useQuery({
-    // Include the dependencies directly in the queryKey
-    queryKey: ['sendEarnDepositVault', { referrer, balances, sendAccount }] as const,
-    enabled: !balances.isLoading && !referrer.isLoading && !sendAccount.isLoading,
-    queryFn: async ({ queryKey: [, { referrer, balances, sendAccount }] }) => {
-      throwIf(referrer.isError)
+    queryKey: ['sendEarnDepositVault', { referrerVault, balances, sendAccount }] as const,
+    enabled: !balances.isLoading && !referrerVault.isLoading && !sendAccount.isLoading,
+    queryFn: async ({ queryKey: [, { referrerVault, balances, sendAccount }] }) => {
+      throwIf(referrerVault.isError)
       throwIf(balances.isError)
       throwIf(sendAccount.isError)
-      // If user has existing deposit balances, use that vault
       const userBalances = Array.isArray(balances.data)
         ? balances.data.filter(
             (balance: SendEarnBalance) =>
@@ -103,20 +142,21 @@ export function useSendEarnDepositVault() {
         : []
 
       if (userBalances.length > 0 && userBalances[0]) {
-        const addr = userBalances[0].log_addr
-        return byteaToHex(addr)
+        const addr = byteaToHex(userBalances[0].log_addr)
+        log('Found existing deposit. Using existing vault:', addr)
+        return addr
       }
 
-      // If user has no existing deposits but has a referrer, use referrer's vault
-      if (referrer.data) {
-        // Here we would need to look up the referrer's vault address
-        // For now, we'll return null to indicate we need to create a new vault
-        log("referrer has no deposits, but has a referrer. TODO: lookup referrer's vault")
-        return null
+      if (referrerVault.data) {
+        log(
+          'referrer has no deposits, but has a referrer. Using referrer vault:',
+          referrerVault.data
+        )
+        return referrerVault.data
       }
 
-      // If no existing deposits and no referrer, return null to create a new vault
-      return null
+      log('No existing deposits and no referrer. Using default vault.', sendEarnAddress[chainId])
+      return sendEarnAddress[chainId]
     },
   })
 }
@@ -177,8 +217,4 @@ export const useSendEarnDepositUserOp = ({
   })
 
   return uop
-}
-
-export function useSendEarnReferrer() {
-  const referrer = useReferrer() // first lookup the referrer
 }
