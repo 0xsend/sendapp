@@ -7,15 +7,11 @@ export function SuccessCallback() {
 
   useEffect(() => {
     // Get session ID from URL query parameters
-    const urlParams = new URLSearchParams(window.location.search)
-    const sessionId = urlParams.get('sessionId')
-
     if (window.opener) {
       // Send success message back to parent window
       window.opener.postMessage(
         {
           type: 'COINBASE_ONRAMP_SUCCESS',
-          sessionId: sessionId,
         },
         window.location.origin
       )
