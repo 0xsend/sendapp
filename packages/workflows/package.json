@@ -19,8 +19,7 @@
       "default": "./src/all-workflows.ts"
     },
     "./workflow-bundle": {
-      "types": "./workflow-bundle.d.ts",
-      "default": "./workflow-bundle.js"
+      "default": "./dist/workflow-bundle.js"
     }
   },
   "scripts": {

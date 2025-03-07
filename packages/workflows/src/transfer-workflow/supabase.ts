@@ -1,6 +1,4 @@
 import type { PgBytea, Database } from '@my/supabase/database.types'
-import { log } from '@temporalio/activity'
-import { hexToBytea } from 'app/utils/hexToBytea'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 
 export async function insertTemporalTokenSendAccountTransfer({
@@ -83,26 +81,4 @@ export async function deleteTemporalTransferFromActivityTable(workflow_id: strin
     .eq('event_id', workflow_id)
     .select('event_id')
     .single()
-}
-
-export async function isTokenTransferIndexed(tx_hash: `0x${string}`) {
-  const { count, error, status, statusText } = await supabaseAdmin
-    .from('send_account_transfers')
-    .select('*', { count: 'exact', head: true })
-    .eq('tx_hash', hexToBytea(tx_hash))
-
-  log.info('isTokenTransferIndexed', { count, error, status, statusText })
-
-  return count !== null && count > 0
-}
-
-export async function isEthTransferIndexed(tx_hash: `0x${string}`) {
-  const { count, error, status, statusText } = await supabaseAdmin
-    .from('send_account_receives')
-    .select('*', { count: 'exact', head: true })
-    .eq('tx_hash', hexToBytea(tx_hash))
-
-  log.info('isEthTransferIndexed', { count, error, status, statusText })
-
-  return count !== null && count > 0
 }
