@@ -1,1 +1,5 @@
-export { useSendEarnDepositUserOp, useSendEarnDepositVault } from './useSendEarnDepositUserOp'
+export {
+  useSendEarnDepositUserOp,
+  useSendEarnDepositVault,
+  useReferrerVault,
+} from './useSendEarnDepositUserOp'
