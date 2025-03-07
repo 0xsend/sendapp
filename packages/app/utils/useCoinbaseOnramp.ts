@@ -35,6 +35,7 @@ export function useCoinbaseOnramp({
     if (popupChecker) {
       clearInterval(popupChecker)
     }
+    setPaymentSubmitted(false)
     setPopup(null)
     setPopupChecker(null)
   }, [popup, popupChecker])
@@ -81,7 +82,6 @@ export function useCoinbaseOnramp({
     },
     onError: (error) => {
       console.log('[Onramp] Transaction failed:', error.message)
-      setPaymentSubmitted(false)
       cleanup()
       return error instanceof Error ? error : new Error('Unknown error occurred')
     },
@@ -98,14 +98,12 @@ export function useCoinbaseOnramp({
         console.log('[Onramp] Transaction successful - processing completion')
         try {
           setIsSuccess(true)
-          setPaymentSubmitted(false)
           router.push('/deposit/success')
           cleanup()
           mutation.reset()
         } catch (error) {
           console.error('[Onramp] Navigation failed after success:', error)
           setIsSuccess(false)
-          setPaymentSubmitted(false)
           mutation.reset()
           cleanup()
         }
