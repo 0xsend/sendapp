@@ -6,6 +6,8 @@ import { assert } from './assert'
 import { useSupabase } from './supabase/useSupabase'
 import { fetchProfile } from './useProfileLookup'
 import { getCookie } from './cookie'
+import type { Functions } from '@my/supabase/database.types'
+import type { Merge } from 'type-fest'
 
 export const REFERRAL_COOKIE_NAME = 'referral'
 export const REFERRAL_COOKIE_MAX_AGE = 30 * 24 * 60 * 60 * 1000 // 30 days
@@ -16,6 +18,9 @@ export function useReferralCode() {
     queryFn: () => getCookie(REFERRAL_COOKIE_NAME) || null,
   })
 }
+
+type ReferrerProfile = Merge<Functions<'profile_lookup'>[number], { address: `0x${string}` }>
+
 /**
  * Fetches the referrer profile by referral code or tag.
  * If the referrer is the same as the profile, returns null. The referrer should also have a send account and sendtag.
@@ -35,7 +40,7 @@ export async function fetchReferrer({
   profile: Tables<'profiles'>
   referralCode: string
   signal?: AbortSignal
-}) {
+}): Promise<ReferrerProfile | null> {
   if (profile?.referral_code === referralCode) return null // no self referrals
   const signalToUse = signal ?? new AbortController().signal
   const [
@@ -66,7 +71,7 @@ export async function fetchReferrer({
   })
 
   if (referrer) {
-    return referrer
+    return referrer as ReferrerProfile // safe because we filter out referrers with no address and tag
   }
 
   if (errorByReferralCode) {
