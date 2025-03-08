@@ -14,6 +14,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@0xsend/send-earn-contracts": "0.0.8",
     "@coinbase/onchainkit": "^0.38.1",
     "@daimo/expo-passkeys": "workspace:*",
     "@marsidev/react-turnstile": "^0.7.1",
@@ -46,6 +47,7 @@
     "cbor": "^9.0.1",
     "expo-clipboard": "^5.0.1",
     "expo-constants": "~15.4.5",
+    "expo-crypto": "~14.0.2",
     "expo-device": "~5.9.3",
     "expo-image-picker": "~14.7.1",
     "expo-linking": "~6.2.2",

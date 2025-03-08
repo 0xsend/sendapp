@@ -22,13 +22,7 @@ import sendTokenV1Artifact from '@0xsend/send-token-upgrade/artifacts/contracts/
   type: 'json',
 }
 
-import sendEarnFactoryArtifact from '@0xsend/send-earn-contracts/artifacts/SendEarnFactory.sol/SendEarnFactory.json' with {
-  type: 'json',
-}
-
-import sendEarnArtifact from '@0xsend/send-earn-contracts/artifacts/ISendEarn.sol/ISendEarn.json' with {
-  type: 'json',
-}
+import { sendEarnAbi, sendEarnFactoryAbi } from '@0xsend/send-earn-contracts'
 
 const broadcasts = (
   await globby([`${process.cwd()}/../contracts/broadcast/**/run-latest.json`])
@@ -295,28 +289,26 @@ export default defineConfig({
     {
       name: 'SendEarnUSDCFactory',
       address: {
-        [mainnet.id]: '0xf6b303f234b0843739f95beeb8555f3a1e50bac1',
-        [localhost.id]: '0xf6b303f234b0843739f95beeb8555f3a1e50bac1',
-        [sepolia.id]: '0xf6b303f234b0843739f95beeb8555f3a1e50bac1',
-        [baseLocal.id]: '0xf6b303f234b0843739f95beeb8555f3a1e50bac1',
-        [base.id]: '0xf6b303f234b0843739f95beeb8555f3a1e50bac1',
-        [baseSepolia.id]: '0xf6b303f234b0843739f95beeb8555f3a1e50bac1',
+        [mainnet.id]: '0x1941f2a9b83b2fdc36e53f934f54fb0decb3b61a',
+        [localhost.id]: '0x1941f2a9b83b2fdc36e53f934f54fb0decb3b61a',
+        [sepolia.id]: '0x1941f2a9b83b2fdc36e53f934f54fb0decb3b61a',
+        [baseLocal.id]: '0x1941f2a9b83b2fdc36e53f934f54fb0decb3b61a',
+        [base.id]: '0x1941f2a9b83b2fdc36e53f934f54fb0decb3b61a',
+        [baseSepolia.id]: '0x1941f2a9b83b2fdc36e53f934f54fb0decb3b61a',
       },
-      // @ts-expect-error doesn't like the artifact
-      abi: sendEarnFactoryArtifact.abi,
+      abi: sendEarnFactoryAbi,
     },
     {
       name: 'SendEarn',
       address: {
-        [mainnet.id]: '0x02e27b9deae5d76e3d7696447c771b03c0cc3f42',
-        [localhost.id]: '0x02e27b9deae5d76e3d7696447c771b03c0cc3f42',
-        [sepolia.id]: '0x02e27b9deae5d76e3d7696447c771b03c0cc3f42',
-        [baseLocal.id]: '0x02e27b9deae5d76e3d7696447c771b03c0cc3f42',
-        [base.id]: '0x02e27b9deae5d76e3d7696447c771b03c0cc3f42',
-        [baseSepolia.id]: '0x02e27b9deae5d76e3d7696447c771b03c0cc3f42',
+        [mainnet.id]: '0x993356237061d9B1663Ac4Caa8F93F90e6F6c645',
+        [localhost.id]: '0x993356237061d9B1663Ac4Caa8F93F90e6F6c645',
+        [sepolia.id]: '0x993356237061d9B1663Ac4Caa8F93F90e6F6c645',
+        [baseLocal.id]: '0x993356237061d9B1663Ac4Caa8F93F90e6F6c645',
+        [base.id]: '0x993356237061d9B1663Ac4Caa8F93F90e6F6c645',
+        [baseSepolia.id]: '0x993356237061d9B1663Ac4Caa8F93F90e6F6c645',
       },
-      // @ts-expect-error doesn't like the artifact
-      abi: sendEarnArtifact.abi,
+      abi: sendEarnAbi,
     },
   ],
   plugins: [

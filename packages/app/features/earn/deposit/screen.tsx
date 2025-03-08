@@ -15,7 +15,6 @@ import {
 import {
   baseMainnetBundlerClient,
   entryPointAddress,
-  sendEarnAddress,
   usdcAddress,
   useReadSendEarnBalanceOf,
   useReadSendEarnConvertToAssets,
@@ -35,6 +34,7 @@ import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { signUserOp } from 'app/utils/signUserOp'
 import { toNiceError } from 'app/utils/toNiceError'
+import { useUserOp } from 'app/utils/userop'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import debug from 'debug'
 import { useEffect, useMemo, useState } from 'react'
@@ -44,7 +44,7 @@ import { formatUnits, withRetry } from 'viem'
 import { useChainId } from 'wagmi'
 import { z } from 'zod'
 import { useSendEarnAPY } from '../hooks'
-import { useSendEarnDepositUserOp } from './hooks'
+import { useSendEarnDepositCalls, useSendEarnDepositVault } from './hooks'
 
 const log = debug('app:earn:deposit')
 const MINIMUM_DEPOSIT = BigInt(10 * 1e6) // 10 USDC
@@ -76,13 +76,14 @@ export const DepositForm = () => {
   // QUERY DEPOSIT USEROP
   const chainId = useChainId()
   const asset = usdcAddress[chainId]
-  /**
-   * The vault we are depositing into.
-   * TODO: lookup the correct vault based on referral
-   */
-  const vault = sendEarnAddress[chainId]
-  const uop = useSendEarnDepositUserOp({ asset, amount: parsedAmount, vault })
+  const vault = useSendEarnDepositVault({ asset })
   const sendAccount = useSendAccount()
+  const sender = useMemo(() => sendAccount?.data?.address, [sendAccount?.data?.address])
+  const calls = useSendEarnDepositCalls({ sender, asset, amount: parsedAmount })
+  const uop = useUserOp({
+    sender,
+    calls: calls.data ?? undefined,
+  })
   const webauthnCreds = useMemo(
     () =>
       sendAccount?.data?.send_account_credentials
@@ -162,33 +163,19 @@ export const DepositForm = () => {
     },
   })
 
-  // TODO: move somewhere else
-  const earnDecimals = useReadSendEarnDecimals({
-    chainId,
-  })
-  const earnShares = useReadSendEarnBalanceOf({
-    chainId,
-    args: [sendAccount?.data?.address ?? '0x'],
-    query: { enabled: !!sendAccount?.data?.address },
-  })
-  const earnAssets = useReadSendEarnConvertToAssets({
-    chainId,
-    args: [earnShares?.data ?? 0n],
-    query: { enabled: !!earnShares?.data },
-  })
-
   // DEBUG
+  log('vault', vault)
   log('uop', uop)
+  log('calls', calls)
   log('mutation', mutation)
-  log('earnDecimals', earnDecimals)
-  log('earnShares', earnShares)
-  log('earnAssets', earnAssets)
 
   const canSubmit =
     !isUSDCLoading &&
     coin?.balance !== undefined &&
     coin.balance >= parsedAmount &&
     parsedAmount > BigInt(0) &&
+    vault.isSuccess &&
+    calls.isSuccess &&
     uop.isSuccess &&
     mutation.isIdle
 
@@ -230,14 +217,15 @@ export const DepositForm = () => {
   }, [form.clearErrors, areTermsAccepted, form.formState.errors.areTermsAccepted])
 
   const baseApy = useSendEarnAPY({
-    vault,
+    vault: vault.data ?? undefined,
   })
 
   const monthlyEarning = useMemo(() => {
     if (!baseApy.data) return
     if (!coin?.decimals) return
     const decimalAmount = Number(formatUnits(parsedAmount, coin?.decimals))
-    return formatAmount((Number(decimalAmount ?? 0) * (baseApy.data.baseApy / 100)) / 12)
+    const monthlyRate = (1 + baseApy.data.baseApy / 100) ** (1 / 12) - 1
+    return formatAmount(Number(decimalAmount ?? 0) * monthlyRate)
   }, [baseApy.data, parsedAmount, coin?.decimals])
 
   if (isLoadingCoins || !coin || (!coin.balance && coin.balance !== BigInt(0))) {
@@ -327,13 +315,15 @@ export const DepositForm = () => {
                 </Fade>
               ) : null}
               <XStack alignItems="center" jc="center" gap={'$2'}>
-                {[uop.error, mutation.error].filter(Boolean).map((e) =>
-                  e ? (
-                    <Paragraph key={e.message} color="$error">
-                      {toNiceError(e)}
-                    </Paragraph>
-                  ) : null
-                )}
+                {[calls.error, sendAccount.error, uop.error, mutation.error]
+                  .filter(Boolean)
+                  .map((e) =>
+                    e ? (
+                      <Paragraph key={e.message} color="$error">
+                        {toNiceError(e)}
+                      </Paragraph>
+                    ) : null
+                  )}
               </XStack>
               <SubmitButton
                 theme="green"
@@ -358,9 +348,13 @@ export const DepositForm = () => {
                 disabled={!canSubmit}
                 iconAfter={mutation.isPending ? <Spinner size="small" /> : undefined}
               >
-                <Button.Text size={'$5'} fontWeight={'500'} fontFamily={'$mono'} color={'$black'}>
-                  CONFIRM DEPOSIT
-                </Button.Text>
+                {[calls.isLoading, sendAccount.isLoading, uop.isLoading].some((p) => p) ? (
+                  <Spinner size="small" />
+                ) : (
+                  <Button.Text size={'$5'} fontWeight={'500'} fontFamily={'$mono'} color={'$black'}>
+                    CONFIRM DEPOSIT
+                  </Button.Text>
+                )}
               </SubmitButton>
             </YStack>
           )}
@@ -510,4 +504,24 @@ const StaticBenefits = () => {
       </YStack>
     </Fade>
   )
+}
+
+/**
+ * TODO: move somewhere else
+ */
+function useSendEarnAssets(sendAccount) {
+  const chainId = useChainId()
+  const earnDecimals = useReadSendEarnDecimals({
+    chainId,
+  })
+  const earnShares = useReadSendEarnBalanceOf({
+    chainId,
+    args: [sendAccount?.data?.address ?? '0x'],
+    query: { enabled: !!sendAccount?.data?.address },
+  })
+  const earnAssets = useReadSendEarnConvertToAssets({
+    chainId,
+    args: [earnShares?.data ?? 0n],
+    query: { enabled: !!earnShares?.data },
+  })
 }

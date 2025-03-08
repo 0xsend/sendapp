@@ -1139,7 +1139,7 @@ exports[`shovel config 1`] = `
         {
           "column": "log_addr",
           "filter_arg": [
-            "0xf6B303f234b0843739f95bEEb8555f3a1e50bac1",
+            "0x1941F2a9b83B2fdC36E53F934f54fB0Decb3b61A",
           ],
           "filter_op": "contains",
           "name": "log_addr",
@@ -1279,7 +1279,7 @@ exports[`shovel config 1`] = `
         {
           "column": "log_addr",
           "filter_arg": [
-            "0xf6B303f234b0843739f95bEEb8555f3a1e50bac1",
+            "0x1941F2a9b83B2fdC36E53F934f54fB0Decb3b61A",
           ],
           "filter_op": "contains",
           "name": "log_addr",
