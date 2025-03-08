@@ -28,6 +28,7 @@ export const localhost = defineChain({
     default: {
       name: 'Otterscan',
       url: 'http://localhost:5100',
+      apiUrl: 'http://localhost:5100',
     },
   },
 })
@@ -52,6 +53,7 @@ export const baseLocal = defineChain({
     default: {
       name: 'Otterscan',
       url: 'http://localhost:5101',
+      apiUrl: 'http://localhost:5100',
     },
   },
 })

@@ -18,7 +18,7 @@ import { total } from 'app/data/sendtags'
 import { api } from 'app/utils/api'
 import { assert } from 'app/utils/assert'
 import { byteaToHex } from 'app/utils/byteaToHex'
-import { useReferrer } from 'app/utils/referrer'
+import { useReferralCode, useReferrer } from 'app/utils/referrer'
 import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
 import { usePendingTags } from 'app/utils/tags'
 import { throwIf } from 'app/utils/throwIf'
@@ -30,7 +30,6 @@ import { type PropsWithChildren, useCallback, useEffect, useMemo, useState } fro
 import { isAddressEqual, zeroAddress } from 'viem'
 import { useBalance, useWaitForTransactionReceipt } from 'wagmi'
 import {
-  useReferralCode,
   useReferralReward,
   useSendtagCheckout,
   useSendtagCheckoutReceipts,
