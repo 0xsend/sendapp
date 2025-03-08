@@ -139,7 +139,7 @@ const morphoViewAbi = [
 export function useSendEarnAPY({
   vault,
 }: {
-  vault?: (typeof sendEarnAddress)[keyof typeof sendEarnAddress]
+  vault: `0x${string}` | undefined
 }): UseQueryResult<{ baseApy: number }, Error> {
   // first fetch details about the send earn vault
   const sendEarnVault = useSendEarnVault(vault)
