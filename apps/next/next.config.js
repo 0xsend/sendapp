@@ -138,6 +138,7 @@ export default () => {
       'expo-modules-core',
       'expo-device',
       'expo-image-picker',
+      'expo-crypto',
     ],
     experimental: {
       scrollRestoration: true,
