@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { getOnrampBuyUrl } from '@coinbase/onchainkit/fund'
 import { useMutation } from '@tanstack/react-query'
 import { useRouter } from 'solito/router'
@@ -22,23 +22,23 @@ export function useCoinbaseOnramp({
   partnerUserId,
   defaultPaymentMethod = 'CARD',
 }: OnrampConfig) {
-  const [popup, setPopup] = useState<Window | null>(null)
+  const popupRef = useRef<Window | null>(null)
   const [popupChecker, setPopupChecker] = useState<NodeJS.Timeout | null>(null)
   const [isSuccess, setIsSuccess] = useState(false)
   const [paymentSubmitted, setPaymentSubmitted] = useState(false)
   const router = useRouter()
 
   const cleanup = useCallback(() => {
-    if (popup) {
-      popup.close()
+    if (popupRef.current) {
+      popupRef.current.close()
+      popupRef.current = null
     }
     if (popupChecker) {
       clearInterval(popupChecker)
+      setPopupChecker(null)
     }
     setPaymentSubmitted(false)
-    setPopup(null)
-    setPopupChecker(null)
-  }, [popup, popupChecker])
+  }, [popupChecker])
 
   const mutation = useMutation<void, Error, OnrampParams>({
     mutationFn: async ({ amount }) => {
@@ -65,7 +65,7 @@ export function useCoinbaseOnramp({
         throw new Error('Popup was blocked. Please enable popups and try again.')
       }
 
-      setPopup(newPopup)
+      popupRef.current = newPopup
 
       return new Promise<void>((resolve, reject) => {
         const checker = setInterval(() => {
@@ -74,7 +74,7 @@ export function useCoinbaseOnramp({
           }
           console.log('[Onramp] Popup closed by user.')
           clearInterval(checker)
-          setPopup(null)
+          popupRef.current = null
           reject(new Error('Transaction cancelled'))
         }, 1000)
         setPopupChecker(checker)
@@ -126,7 +126,6 @@ export function useCoinbaseOnramp({
 
   const closeOnramp = useCallback(() => {
     setIsSuccess(false)
-    setPaymentSubmitted(false)
     mutation.reset()
     cleanup()
   }, [mutation, cleanup])
