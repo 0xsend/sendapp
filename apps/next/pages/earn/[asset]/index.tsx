@@ -1,5 +1,5 @@
 import { TopNav } from 'app/components/TopNav'
-import { ActiveEarnings } from 'app/features/earn/ActiveEarnings'
+import { ActiveEarnings } from 'app/features/earn/active/screen'
 import { HomeLayout } from 'app/features/home/layout.web'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
@@ -9,7 +9,7 @@ import type { GetServerSideProps } from 'next'
 import type { ParsedUrlQuery } from 'node:querystring'
 import debug from 'debug'
 
-const log = debug('app:pages:earn:deposit')
+const log = debug('app:pages:earn:active')
 
 export const Page: NextPageWithLayout = () => {
   return (
