@@ -1,5 +1,5 @@
 import { TopNav } from 'app/components/TopNav'
-import { RewardsBalance } from 'app/features/earn/RewardsBalance'
+import { RewardsBalance } from 'app/features/earn/rewards-balance/screen'
 import { HomeLayout } from 'app/features/home/layout.web'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'

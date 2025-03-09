@@ -1,5 +1,5 @@
 import { TopNav } from 'app/components/TopNav'
-import { EarningsBalance } from 'app/features/earn/EarningsBalance'
+import { EarningsBalance } from 'app/features/earn/earnings/screen'
 import { HomeLayout } from 'app/features/home/layout.web'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'

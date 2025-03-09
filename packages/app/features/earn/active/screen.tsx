@@ -8,7 +8,7 @@ import { IconSendSingleLetter, IconStacks } from 'app/components/icons'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import type { IconProps } from '@tamagui/helpers-icon'
 import debug from 'debug'
-import { useAsset } from './params'
+import { useAsset } from '../params'
 import { useCoin } from 'app/provider/coins'
 
 const log = debug('app:pages:earn:active')
@@ -34,13 +34,9 @@ export const ActiveEarnings = () => {
       <YStack w={'100%'} gap={'$4'}>
         <TotalValue />
         <XStack flexGrow={1} gap={'$3.5'}>
-          <EarningButton Icon={ArrowDown} label={'Withdraw'} href={'/earn/withdraw-form'} />
-          <EarningButton Icon={IconStacks} label={'Earnings'} href={'/earn/earnings-balance'} />
-          <EarningButton
-            Icon={IconSendSingleLetter}
-            label={'Rewards'}
-            href={'/earn/rewards-balance'}
-          />
+          <EarningButton Icon={ArrowDown} label={'Withdraw'} href={'/earn/withdraw'} />
+          <EarningButton Icon={IconStacks} label={'Earnings'} href={'/earn/balance'} />
+          <EarningButton Icon={IconSendSingleLetter} label={'Rewards'} href={'/earn/rewards'} />
         </XStack>
         <ActiveEarningBreakdown />
       </YStack>

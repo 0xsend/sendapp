@@ -1,5 +1,5 @@
 import { TopNav } from 'app/components/TopNav'
-import { WithdrawForm } from 'app/features/earn/WithdrawForm'
+import { WithdrawForm } from 'app/features/earn/withdraw/screen'
 import { HomeLayout } from 'app/features/home/layout.web'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'

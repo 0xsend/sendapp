@@ -29,7 +29,7 @@ export const RewardsBalance = () => {
   const handleClaimPress = () => {
     // TODO plug claim rewards logic
 
-    push('/earn/active-earnings')
+    push('/earn')
   }
 
   return (
@@ -82,7 +82,7 @@ const RewardsFeed = () => {
               </>
             )
           default: {
-            const activities = (pages || []).flatMap((activity) => activity)
+            const activities = (pages || []).flat()
 
             return (
               <Fade>
