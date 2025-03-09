@@ -44,7 +44,7 @@ import { formatUnits, withRetry } from 'viem'
 import { useChainId } from 'wagmi'
 import { z } from 'zod'
 import { useSendEarnAPY } from '../hooks'
-import { useSendEarnDepositCalls, useSendEarnDepositVault } from './hooks'
+import { assetsToEarnFactory, useSendEarnDepositCalls, useSendEarnDepositVault } from './hooks'
 
 const log = debug('app:earn:deposit')
 const MINIMUM_DEPOSIT = BigInt(10 * 1e6) // 10 USDC
@@ -59,11 +59,10 @@ export function DepositScreen() {
   return <DepositForm />
 }
 
-export const DepositForm = () => {
+export function DepositForm() {
   const form = useForm<DepositFormSchema>()
   const router = useRouter()
   const { tokensQuery } = useSendAccountBalances()
-  // TODO: use dynamic asset
   const { coin, isLoading: isUSDCLoading } = useCoin('USDC')
   const { isLoading: isLoadingCoins } = useCoins()
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
@@ -120,7 +119,7 @@ export const DepositForm = () => {
         () =>
           baseMainnetBundlerClient.waitForUserOperationReceipt({
             hash: userOpHash,
-            timeout: 10_000,
+            timeout: 10000,
           }),
         {
           delay: 100,
@@ -216,13 +215,14 @@ export const DepositForm = () => {
     }
   }, [form.clearErrors, areTermsAccepted, form.formState.errors.areTermsAccepted])
 
+  // use deposit vault if it exists, or the default vault for the asset
   const baseApy = useSendEarnAPY({
-    vault: vault.data ?? undefined,
+    vault: vault.data ?? assetsToEarnFactory[asset],
   })
 
   const monthlyEarning = useMemo(() => {
-    if (!baseApy.data) return
     if (!coin?.decimals) return
+    if (!baseApy.data) return
     const decimalAmount = Number(formatUnits(parsedAmount, coin?.decimals))
     const monthlyRate = (1 + baseApy.data.baseApy / 100) ** (1 / 12) - 1
     return formatAmount(Number(decimalAmount ?? 0) * monthlyRate)
@@ -269,7 +269,7 @@ export const DepositForm = () => {
                 placeholderTextColor: '$darkGrayTextField',
               },
               inputMode: coin?.decimals ? 'decimal' : 'numeric',
-              onChangeText: (amount) => {
+              onChangeText: (amount: string) => {
                 const localizedAmount = localizeAmount(amount)
                 form.setValue('amount', localizedAmount)
               },
@@ -373,7 +373,6 @@ export const DepositForm = () => {
                 >
                   <XStack ai={'center'} position="relative" jc={'space-between'}>
                     {amount}
-                    {/* TODO: make an coin selector */}
                     <XStack ai={'center'} gap={'$2'}>
                       <IconCoin symbol={'USDC'} size={'$2'} />
                       <Paragraph size={'$6'}>USDC</Paragraph>
@@ -449,9 +448,6 @@ export const DepositForm = () => {
                         apy={formatAmount(baseApy.data.baseApy, undefined, 2)}
                         monthlyEarning={monthlyEarning ?? ''}
                         rewards={''}
-                        // overrideApy="11"
-                        // overrideMonthlyEarning="12"
-                        // overrideRewards="4,000"
                       />
                     )
                   default:
@@ -477,7 +473,6 @@ export const DepositForm = () => {
 }
 
 const StaticBenefits = () => {
-  // TODO: use dynamic asset
   return (
     <Fade>
       <YStack gap={'$3.5'}>
