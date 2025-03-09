@@ -1,11 +1,14 @@
+import type { Database } from '@my/supabase/database-generated.types'
 import { sendEarnAbi } from '@my/wagmi'
-import { useQuery, type UseQueryResult } from '@tanstack/react-query'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { assert } from 'app/utils/assert'
+import { mulDivDown, WAD, wMulDown } from 'app/utils/math'
+import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
-import { formatUnits, parseUnits, zeroAddress } from 'viem'
-import { useChainId, useReadContract, useReadContracts } from 'wagmi'
-import { hashFn } from 'wagmi/query'
 import debug from 'debug'
+import { formatUnits, zeroAddress } from 'viem'
+import { useChainId, useReadContract, useReadContracts } from 'wagmi'
+import { hashFn, useQuery, type UseQueryReturnType } from 'wagmi/query'
 
 const log = debug('app:earn:hooks')
 
@@ -19,11 +22,6 @@ export function useVaultInfo(vaultAddress: `0x${string}`) {
     args: [vaultAddress],
   })
 }
-
-export const WAD = parseUnits('1', 18)
-export const wMulDown = (x: bigint, y: bigint): bigint => mulDivDown(x, y, WAD)
-export const mulDivDown = (x: bigint, y: bigint, d: bigint): bigint =>
-  (BigInt(x) * BigInt(y)) / BigInt(d)
 
 // TODO: add more addresses to other chains or think of a workaround
 const morphoViews = '0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B'
@@ -143,7 +141,7 @@ export function useSendEarnAPY({
   vault,
 }: {
   vault: `0x${string}` | undefined
-}): UseQueryResult<{ baseApy: number }, Error> {
+}): UseQueryReturnType<{ baseApy: number }, Error> {
   // first fetch details about the send earn vault
   const sendEarnVault = useSendEarnVault(vault)
 
@@ -257,4 +255,68 @@ function calculateBaseApy({
   )
   const baseApy = Number(formatUnits(avgSupplyApy, 18)) * 100
   return baseApy
+}
+
+/**
+ * Fetches the user's send earn deposits.
+ */
+function useSendEarnDeposits() {
+  const supabase = useSupabase()
+  return useQuery({
+    queryKey: ['send_earn_deposits'],
+    queryFn: async () => {
+      return await supabase.from('send_earn_deposits').select('*')
+    },
+  })
+}
+
+/**
+ * Fetches the user's send earn withdraws.
+ */
+function useSendEarnWithdraws() {
+  const supabase = useSupabase()
+  return useQuery({
+    queryKey: ['send_earn_withdraws'],
+    queryFn: async () => {
+      return await supabase
+        .from('send_earn_withdraws')
+        .select('*')
+        .order('assets', { ascending: false })
+    },
+  })
+}
+
+export type SendEarnBalance = NonNullable<Awaited<ReturnType<typeof fetchSendEarnBalances>>>[number]
+
+async function fetchSendEarnBalances(supabase: SupabaseClient<Database>) {
+  const { data, error } = await supabase
+    .from('send_earn_balances')
+    .select('assets::text,log_addr,owner,shares::text')
+  if (error) throw error
+  if (!data) return null
+  return data.map(
+    (d) =>
+      ({
+        ...d,
+        assets: BigInt(d.assets ?? 0n),
+        shares: BigInt(d.shares ?? 0n),
+      }) as {
+        assets: bigint
+        shares: bigint
+        log_addr: `\\x${string}`
+        owner: `\\x${string}`
+      }
+  )
+}
+
+/**
+ * Fetches the user's send earn balances.
+ */
+export function useSendEarnBalances(): UseQueryReturnType<SendEarnBalance[] | null> {
+  const supabase = useSupabase()
+  return useQuery({
+    queryKey: ['sendEarnBalances', supabase] as const,
+    queryFn: async ({ queryKey: [, supabase] }): Promise<SendEarnBalance[] | null> =>
+      fetchSendEarnBalances(supabase),
+  })
 }
