@@ -1,10 +1,13 @@
-import { sendEarnAbi, type sendEarnAddress } from '@my/wagmi'
+import { sendEarnAbi } from '@my/wagmi'
 import { useQuery, type UseQueryResult } from '@tanstack/react-query'
 import { assert } from 'app/utils/assert'
 import { throwIf } from 'app/utils/throwIf'
 import { formatUnits, parseUnits, zeroAddress } from 'viem'
 import { useChainId, useReadContract, useReadContracts } from 'wagmi'
 import { hashFn } from 'wagmi/query'
+import debug from 'debug'
+
+const log = debug('app:earn:hooks')
 
 export function useVaultInfo(vaultAddress: `0x${string}`) {
   const chainId = useChainId()
@@ -188,6 +191,7 @@ export function useSendEarnAPY({
  */
 function useSendEarnVault(vault: `0x${string}` | undefined) {
   const chainId = useChainId()
+  log('useSendEarnVault', { vault })
   return useReadContracts({
     allowFailure: false,
     query: { enabled: !!vault },
