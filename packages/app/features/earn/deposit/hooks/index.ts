@@ -84,7 +84,7 @@ function useSendEarnWithdraws() {
   })
 }
 
-type SendEarnBalance = NonNullable<Awaited<ReturnType<typeof fetchSendEarnBalances>>>[number]
+export type SendEarnBalance = NonNullable<Awaited<ReturnType<typeof fetchSendEarnBalances>>>[number]
 
 async function fetchSendEarnBalances(supabase: SupabaseClient<Database>) {
   const { data, error } = await supabase
@@ -102,7 +102,7 @@ async function fetchSendEarnBalances(supabase: SupabaseClient<Database>) {
 /**
  * Fetches the user's send earn balances.
  */
-function useSendEarnBalances(): UseQueryReturnType<SendEarnBalance[] | null> {
+export function useSendEarnBalances(): UseQueryReturnType<SendEarnBalance[] | null> {
   const supabase = useSupabase()
   return useQuery({
     queryKey: ['sendEarnBalances', supabase] as const,

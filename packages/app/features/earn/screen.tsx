@@ -1,28 +1,43 @@
 import { Card, Fade, LinearGradient, Paragraph, Separator, Spinner, XStack, YStack } from '@my/ui'
+import { sendEarnAbi } from '@my/wagmi'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { IconArrowRight, IconStacks } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { Row } from 'app/features/earn/components/Row'
 import { SectionButton } from 'app/features/earn/components/SectionButton'
+import { useSendEarnBalances, type SendEarnBalance } from 'app/features/earn/deposit/hooks'
+import { byteaToHex } from 'app/utils/byteaToHex'
+import formatAmount from 'app/utils/formatAmount'
 import { useSendAccount } from 'app/utils/send-accounts'
-import type { ReactNode } from 'react'
+import debug from 'debug'
+import { useMemo, type ReactNode } from 'react'
 import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
+import { formatUnits } from 'viem'
+import { useReadContracts } from 'wagmi'
+
+const log = debug('app:earn:screen')
 
 export const EarnScreen = () => {
-  // TODO: add more hooks
   const sendAccount = useSendAccount()
-  if (sendAccount.isLoading) {
+  const balances = useSendEarnBalances()
+
+  if (sendAccount.isLoading || balances.isLoading) {
     return <Spinner size="large" color={'$color12'} />
   }
+
+  // Check if user has active deposits
+  const hasActiveDeposits =
+    Array.isArray(balances.data) &&
+    balances.data.some((balance) => balance.assets > 0n && balance.log_addr !== null)
+
+  // Convert undefined to null for type safety
+  const balancesData = balances.data ?? null
 
   return (
     <YStack w={'100%'} gap={'$4'} pb={'$3'} $gtLg={{ w: '50%' }}>
       <LearnSection />
-      <DetailsSection />
-
-      {/*// TODO remove this line when pluging in real data*/}
-      <EarningsSummary />
+      <DetailsSection hasActiveDeposits={hasActiveDeposits} balances={balancesData} />
     </YStack>
   )
 }
@@ -154,11 +169,64 @@ const EarningsCallToAction = () => {
   )
 }
 
-// TODO plug real values
-// TODO plug on press handler
-const EarningsSummary = () => {
+/**
+ * Hook to convert user's shares to assets using convertToAssets function from ERC-4626
+ *
+ * TODO: need to handle different assets
+ */
+function useEstimatedBalances(balances: SendEarnBalance[] | null) {
+  const contractCalls: {
+    address: `0x${string}`
+    abi: typeof sendEarnAbi
+    functionName: 'convertToAssets'
+    args: [bigint]
+  }[] = useMemo(() => {
+    return (
+      balances
+        ?.filter((balance) => balance.shares > 0n && balance.log_addr !== null)
+        .map((balance) => {
+          const vaultAddress = byteaToHex(balance.log_addr)
+          return {
+            address: vaultAddress,
+            abi: sendEarnAbi,
+            functionName: 'convertToAssets',
+            args: [balance.shares],
+          }
+        }) || []
+    )
+  }, [balances])
+
+  return useReadContracts({
+    contracts: contractCalls,
+    allowFailure: false,
+    query: {
+      enabled: contractCalls.length > 0,
+    },
+  })
+}
+
+const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) => {
   const { push } = useRouter()
-  const totalValue = '2,267.50'
+  const estimatedBalances = useEstimatedBalances(balances)
+
+  log('convertSharesToAssets results', {
+    data: estimatedBalances.data,
+    isLoading: estimatedBalances.isLoading,
+    isError: estimatedBalances.isError,
+  })
+
+  // Calculate total assets - if contract calls succeeded use the converted values,
+  // otherwise use the assets from the balances as fallback
+  const totalAssets =
+    !estimatedBalances.isLoading && estimatedBalances.data
+      ? estimatedBalances.data.reduce((sum, assets) => sum + assets, 0n)
+      : balances?.reduce((sum, balance) => sum + balance.assets, 0n) ?? 0n
+
+  const totalDeposits = balances?.reduce((sum, balance) => sum + balance.assets, 0n) ?? 0n
+
+  // Format values for display
+  const formattedTotalValue = formatUSDCValue(totalAssets)
+  const formattedDeposits = formatUSDCValue(totalDeposits)
 
   return (
     <Fade>
@@ -178,9 +246,9 @@ const EarningsSummary = () => {
                 fontWeight={'500'}
                 size={(() => {
                   switch (true) {
-                    case totalValue.length > 14:
+                    case formattedTotalValue.length > 14:
                       return '$8'
-                    case totalValue.length > 8:
+                    case formattedTotalValue.length > 8:
                       return '$9'
                     default:
                       return '$11'
@@ -189,9 +257,9 @@ const EarningsSummary = () => {
                 $gtLg={{
                   size: (() => {
                     switch (true) {
-                      case totalValue.length > 16:
+                      case formattedTotalValue.length > 16:
                         return '$9'
-                      case totalValue.length > 8:
+                      case formattedTotalValue.length > 8:
                         return '$10'
                       default:
                         return '$11'
@@ -199,19 +267,24 @@ const EarningsSummary = () => {
                   })(),
                 }}
               >
-                {totalValue}
+                {formattedTotalValue}
               </Paragraph>
               <XStack ai={'center'} gap={'$2'}>
-                <IconCoin symbol={'USDC'} size={totalValue.length > 16 ? '$1.5' : '$2.5'} />
+                <IconCoin
+                  symbol={'USDC'}
+                  size={formattedTotalValue.length > 16 ? '$1.5' : '$2.5'}
+                />
                 <Paragraph size={'$7'}>USDC</Paragraph>
               </XStack>
             </XStack>
           </YStack>
           <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
           <YStack gap={'$2'}>
-            <Row label={'Deposits'} value={'1,200 USDC'} />
-            <Row label={'Earnings'} value={'484,50 USDC'} />
-            <Row label={'Rewards'} value={'15,000 SEND'} />
+            <Row label={'Deposits'} value={`${formattedDeposits} USDC`} />
+            {/* Rewards section commented out since it won't be live on launch
+            <Row label={'Earnings'} value={`+${formatUSDCValue(0n)} USDC`} />
+            <Row label={'Rewards'} value={`+0 SEND`} />
+            */}
           </YStack>
         </YStack>
         <SectionButton text={'VIEW DETAILS'} onPress={() => push('/earn/active-earnings')} />
@@ -220,9 +293,17 @@ const EarningsSummary = () => {
   )
 }
 
-const DetailsSection = () => {
-  // TODO fetch real data
-  const areEarningsActive = false
+const DetailsSection = ({
+  hasActiveDeposits,
+  balances,
+}: {
+  hasActiveDeposits: boolean
+  balances: SendEarnBalance[] | null
+}) => {
+  return hasActiveDeposits ? <EarningsSummary balances={balances} /> : <EarningsCallToAction />
+}
 
-  return areEarningsActive ? <EarningsSummary /> : <EarningsCallToAction />
+const formatUSDCValue = (value: bigint): string => {
+  const valueInUSDC = Number(formatUnits(value, 6))
+  return formatAmount(valueInUSDC, 10, 2)
 }
