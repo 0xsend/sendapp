@@ -1,14 +1,18 @@
 import type { Database } from '@my/supabase/database-generated.types'
 import { sendEarnAbi } from '@my/wagmi'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { ERC20CoinSchema, type erc20Coin } from 'app/data/coins'
 import { assert } from 'app/utils/assert'
 import { mulDivDown, WAD, wMulDown } from 'app/utils/math'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
+import { byteaToHexEthAddress, decimalStrToBigInt } from 'app/utils/zod'
 import debug from 'debug'
-import { formatUnits, zeroAddress } from 'viem'
+import { useMemo } from 'react'
+import { formatUnits, isAddressEqual, zeroAddress } from 'viem'
 import { useChainId, useReadContract, useReadContracts } from 'wagmi'
 import { hashFn, useQuery, type UseQueryReturnType } from 'wagmi/query'
+import { z } from 'zod'
 
 const log = debug('app:earn:hooks')
 
@@ -286,37 +290,180 @@ function useSendEarnWithdraws() {
   })
 }
 
-export type SendEarnBalance = NonNullable<Awaited<ReturnType<typeof fetchSendEarnBalances>>>[number]
+const SendEarnBalanceSchema = z.object({
+  log_addr: byteaToHexEthAddress,
+  owner: byteaToHexEthAddress,
+  assets: decimalStrToBigInt,
+  shares: decimalStrToBigInt,
+})
+const SendEarnBalancesSchema = z.array(SendEarnBalanceSchema)
+export type SendEarnBalance = z.infer<typeof SendEarnBalanceSchema>
 
 async function fetchSendEarnBalances(supabase: SupabaseClient<Database>) {
   const { data, error } = await supabase
     .from('send_earn_balances')
     .select('assets::text,log_addr,owner,shares::text')
   if (error) throw error
-  if (!data) return null
-  return data.map(
-    (d) =>
-      ({
-        ...d,
-        assets: BigInt(d.assets ?? 0n),
-        shares: BigInt(d.shares ?? 0n),
-      }) as {
-        assets: bigint
-        shares: bigint
-        log_addr: `\\x${string}`
-        owner: `\\x${string}`
-      }
-  )
+  return SendEarnBalancesSchema.parse(data)
 }
 
 /**
  * Fetches the user's send earn balances.
  */
-export function useSendEarnBalances(): UseQueryReturnType<SendEarnBalance[] | null> {
+export function useSendEarnBalances(): UseQueryReturnType<SendEarnBalance[]> {
   const supabase = useSupabase()
   return useQuery({
     queryKey: ['sendEarnBalances', supabase] as const,
-    queryFn: async ({ queryKey: [, supabase] }): Promise<SendEarnBalance[] | null> =>
+    queryFn: async ({ queryKey: [, supabase] }): Promise<SendEarnBalance[]> =>
       fetchSendEarnBalances(supabase),
+  })
+}
+
+/**
+ * Given a list of vault addresses, fetches the underlying asset for each vault.
+ */
+export function useUnderlyingVaultsAsset(
+  vaults: `0x${string}`[] | undefined
+): UseQueryReturnType<`0x${string}`[] | undefined> {
+  return useReadContracts({
+    allowFailure: false,
+    contracts: vaults?.map((vault) => ({
+      address: vault,
+      abi: sendEarnAbi,
+      functionName: 'asset',
+    })),
+    query: { enabled: vaults !== undefined, gcTime: Number.POSITIVE_INFINITY },
+  })
+}
+
+/**
+ * Given a list of vaults and shares, fetches the assets amount at current rate.
+ *
+ * @dev vaults list must be the same length as shares list
+ */
+export function useVaultConvertSharesToAssets({
+  vaults,
+  shares,
+}: {
+  vaults: `0x${string}`[] | undefined
+  shares: bigint[] | undefined
+}): UseQueryReturnType<bigint[] | undefined> {
+  const assets: UseQueryReturnType<bigint[] | undefined> = useReadContracts({
+    allowFailure: false,
+    contracts: vaults?.map((vault, i) => ({
+      address: vault,
+      abi: sendEarnAbi,
+      functionName: 'convertToAssets',
+      args: [shares?.[i] ?? 0n],
+    })),
+    query: { enabled: vaults !== undefined && shares !== undefined },
+  })
+  return useQuery({
+    queryKey: ['vaultConvertSharesToAssets', { assets, vaults, shares }] as const,
+    enabled: !assets.isLoading,
+    queryFn: async ({ queryKey: [, { assets, vaults, shares }] }) => {
+      throwIf(assets.error)
+      assert(!!assets.data, 'Fetching assets failed')
+      assert(!!vaults, 'Vaults list is undefined')
+      assert(!!shares, 'Shares list is undefined')
+      assert(vaults.length === shares.length, 'Vaults and shares length mismatch')
+      return assets.data
+    },
+  })
+}
+
+const SendEarnCoinBalanceSchema = z.object({
+  log_addr: byteaToHexEthAddress,
+  owner: byteaToHexEthAddress,
+  assets: z.bigint(),
+  shares: z.bigint(),
+  coin: ERC20CoinSchema,
+  currentAssets: z.bigint(),
+})
+const SendEarnCoinBalancesSchema = z.array(SendEarnCoinBalanceSchema)
+type SendEarnCoinBalance = z.infer<typeof SendEarnCoinBalanceSchema>
+
+/**
+ * Given a coin, fetches the user's send earn balances for that coin.
+ */
+export function useSendEarnCoinBalances(
+  coin: erc20Coin
+): UseQueryReturnType<SendEarnCoinBalance[]> {
+  const allBalances = useSendEarnBalances()
+  const balances = useMemo(() => {
+    return allBalances?.data
+      ?.filter((b) => b.shares > 0n)
+      .filter((b) => isAddressEqual(b.log_addr, coin.token))
+  }, [allBalances?.data, coin.token])
+  const vaults = useMemo(() => {
+    return balances?.map((b) => b.log_addr)
+  }, [balances])
+  const shares = useMemo(() => {
+    return balances?.map((b) => b.shares)
+  }, [balances])
+  const vaultAssets = useUnderlyingVaultsAsset(vaults)
+  const assets = useVaultConvertSharesToAssets({
+    vaults,
+    shares,
+  })
+  return useQuery({
+    queryKey: [
+      'sendEarnCoinBalances',
+      { coin, allBalances, vaultAssets, assets, balances },
+    ] as const,
+    enabled: !allBalances.isLoading && !vaultAssets.isLoading && !assets.isLoading,
+    queryFn: async ({ queryKey: [, { coin, allBalances, vaultAssets, assets, balances }] }) => {
+      throwIf(allBalances.error)
+      throwIf(vaultAssets.error)
+      throwIf(assets.error)
+      assert(!!allBalances.data, 'Fetching send earn balances failed')
+      assert(!!vaultAssets.data, 'Fetching underlying vault assets failed')
+      assert(!!assets.data, 'Fetching vault assets failed')
+
+      return SendEarnCoinBalancesSchema.parse(
+        balances?.map((b, i) => {
+          return {
+            ...b,
+            coin,
+            currentAssets: assets.data?.[i] ?? 0n,
+          }
+        })
+      )
+    },
+  })
+}
+
+/**
+ * Hook to convert user's shares to assets using convertToAssets function from ERC-4626
+ *
+ * TODO: need to handle different assets
+ */
+export function useEstimatedBalances(balances: SendEarnBalance[] | null) {
+  const contractCalls: {
+    address: `0x${string}`
+    abi: typeof sendEarnAbi
+    functionName: 'convertToAssets'
+    args: [bigint]
+  }[] = useMemo(() => {
+    return (
+      balances
+        ?.filter((balance) => balance.shares > 0n && balance.log_addr !== null)
+        .map((balance) => {
+          return {
+            address: balance.log_addr,
+            abi: sendEarnAbi,
+            functionName: 'convertToAssets',
+            args: [balance.shares],
+          }
+        }) || []
+    )
+  }, [balances])
+
+  return useReadContracts({
+    contracts: contractCalls,
+    allowFailure: false,
+    query: {
+      enabled: contractCalls.length > 0,
+    },
   })
 }
