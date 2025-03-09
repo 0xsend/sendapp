@@ -5,7 +5,6 @@ import { IconArrowRight, IconStacks } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { Row } from 'app/features/earn/components/Row'
 import { SectionButton } from 'app/features/earn/components/SectionButton'
-import { useSendEarnBalances, type SendEarnBalance } from 'app/features/earn/deposit/hooks'
 import { byteaToHex } from 'app/utils/byteaToHex'
 import formatAmount from 'app/utils/formatAmount'
 import { useSendAccount } from 'app/utils/send-accounts'
@@ -15,6 +14,7 @@ import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
 import { useReadContracts } from 'wagmi'
+import { useSendEarnBalances, type SendEarnBalance } from './hooks'
 
 const log = debug('app:earn:screen')
 
@@ -163,7 +163,7 @@ const EarningsCallToAction = () => {
             <ListItem>Rewards: Bonus SEND tokens</ListItem>
           </YStack>
         </YStack>
-        <SectionButton text={'START EARNING'} onPress={() => push('/earn/deposit')} />
+        <SectionButton text={'START EARNING'} onPress={() => push('/earn/usdc/deposit')} />
       </Card>
     </Fade>
   )
@@ -220,7 +220,7 @@ const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) =
   const totalAssets =
     !estimatedBalances.isLoading && estimatedBalances.data
       ? estimatedBalances.data.reduce((sum, assets) => sum + assets, 0n)
-      : balances?.reduce((sum, balance) => sum + balance.assets, 0n) ?? 0n
+      : (balances?.reduce((sum, balance) => sum + balance.assets, 0n) ?? 0n)
 
   const totalDeposits = balances?.reduce((sum, balance) => sum + balance.assets, 0n) ?? 0n
 
@@ -287,7 +287,7 @@ const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) =
             */}
           </YStack>
         </YStack>
-        <SectionButton text={'VIEW DETAILS'} onPress={() => push('/earn/active-earnings')} />
+        <SectionButton text={'VIEW DETAILS'} onPress={() => push('/earn/usdc')} />
       </Card>
     </Fade>
   )
