@@ -143,3 +143,8 @@ export type CoinWithBalance = allCoins[number] & {
  * Known coins are a list of coins that Send app knows about but not necessarily supports.
  */
 export const knownCoins: coin[] = [...allCoins, sendV0Coin] as const
+
+/**
+ * List of erc20 coins
+ */
+export const erc20Coins: erc20Coin[] = [usdcCoin, sendCoin, spx6900Coin] as const
