@@ -7,6 +7,7 @@ import {
 } from '@my/wagmi'
 import { z } from 'zod'
 
+// Base coin schema with common properties
 const BaseCoinSchema = z.object({
   label: z.string(),
   symbol: z.string(),
@@ -38,7 +39,7 @@ export const usdcCoin = {
   decimals: 6,
   formatDecimals: 2,
   coingeckoTokenId: 'usd-coin',
-} as const satisfies coin
+} as const satisfies erc20Coin
 
 export const ethCoin = {
   label: 'Ethereum',
@@ -46,7 +47,7 @@ export const ethCoin = {
   token: 'eth',
   decimals: 18,
   coingeckoTokenId: 'ethereum',
-} as const satisfies coin
+} as const satisfies ethCoin
 
 export const sendCoin = {
   label: 'Send',
@@ -55,7 +56,7 @@ export const sendCoin = {
   decimals: 18,
   formatDecimals: 0,
   coingeckoTokenId: 'send-token-2',
-} as const satisfies coin
+} as const satisfies erc20Coin
 
 // can probably remove this
 export const sendV0Coin = {
@@ -65,7 +66,7 @@ export const sendV0Coin = {
   decimals: 0,
   coingeckoTokenId: 'send-token',
   formatDecimals: 0,
-} as const satisfies coin
+} as const satisfies erc20Coin
 
 export const spx6900Coin = {
   label: 'SPX',
@@ -73,7 +74,7 @@ export const spx6900Coin = {
   token: spx6900Addresses[baseMainnet.id],
   decimals: 8,
   coingeckoTokenId: 'spx6900',
-} as const satisfies coin
+} as const satisfies erc20Coin
 
 /**
  * The coins (tokens) array that are supported by Send App.
