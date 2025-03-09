@@ -7,13 +7,26 @@ import { ArrowDown } from '@tamagui/lucide-icons'
 import { IconSendSingleLetter, IconStacks } from 'app/components/icons'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import type { IconProps } from '@tamagui/helpers-icon'
+import debug from 'debug'
+import { useAsset } from './params'
+import { useCoin } from 'app/provider/coins'
+
+const log = debug('app:pages:earn:active')
 
 export const ActiveEarnings = () => {
   const { push } = useRouter()
+  const asset = useAsset()
+  const coin = useCoin(asset?.toUpperCase() ?? '')
+
+  if (!coin) {
+    push('/earn')
+    return null
+  }
+
+  log('ActiveEarnings', { coin })
 
   // TODO loader when deposit balances are loading
   // if (false) {
-  //   return <Spinner size="large" color={'$color12'} />
   // }
 
   return (

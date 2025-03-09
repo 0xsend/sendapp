@@ -1,8 +1,9 @@
-import type { NextPageWithLayout } from '../_app'
-import Head from 'next/head'
-import { HomeLayout } from 'app/features/home/layout.web'
 import { TopNav } from 'app/components/TopNav'
 import { EarningsBalance } from 'app/features/earn/EarningsBalance'
+import { HomeLayout } from 'app/features/home/layout.web'
+import Head from 'next/head'
+import { userProtectedGetSSP } from 'utils/userProtected'
+import type { NextPageWithLayout } from '../../_app'
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -14,6 +15,8 @@ export const Page: NextPageWithLayout = () => {
     </>
   )
 }
+
+export const getServerSideProps = userProtectedGetSSP()
 
 Page.getLayout = (children) => (
   <HomeLayout TopNav={<TopNav header="Earnings Balance" backFunction="router" />} fullHeight>

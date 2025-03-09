@@ -148,6 +148,14 @@ export const coinsDict = coins.reduce((acc, coin) => {
 
 export type coinsDict = typeof coinsDict
 
+type CoinsBySymbolDict = { [key in coins[number]['symbol']]: coins[number] }
+export const coinsBySymbol = coins.reduce((acc, coin) => {
+  acc[coin.symbol] = coin
+  return acc
+}, {} as CoinsBySymbolDict)
+
+export type coinsBySymbol = typeof coinsBySymbol
+
 /**
  * The coins (tokens) that sendapp supports through partnerships. (Hidden when balance is 0)
  */

@@ -101,6 +101,13 @@ export type Database = MergeDeep<
             salt: PgBytea
           }
         }
+        send_earn_deposits: {
+          Row: {
+            log_addr: PgBytea
+            owner: PgBytea
+            sender: PgBytea
+          }
+        }
       }
       Functions: {
         distribution_hodler_addresses: {

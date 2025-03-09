@@ -97,6 +97,7 @@ export function DepositForm() {
   const queryClient = useQueryClient()
   const mutation = useMutation({
     mutationFn: async () => {
+      log('formState', form.formState)
       assert(form.formState.isValid, 'form is not valid')
       assert(uop.isSuccess, 'uop is not success')
 
@@ -152,7 +153,7 @@ export function DepositForm() {
       toast.show('Deposited successfully')
 
       router.push({
-        pathname: '/earn',
+        pathname: `/earn/${coin?.symbol?.toLowerCase()}`,
       })
     },
     onSettled: (data, error, variables, context) => {
