@@ -257,11 +257,8 @@ for each row
 execute function private.filter_send_earn_withdraws_with_no_send_account_created();
 
 
--- TODO: decide if this is needed
-
-create view send_earn_balances with (security_barrier = ON) as
+create or replace view send_earn_balances with (security_invoker = ON, security_barrier = ON) as
 (
-
 with txs as (select log_addr,
                     owner,
                     assets,
@@ -279,4 +276,5 @@ select t.log_addr,
        sum(t.shares) as shares
 from txs t
 group by t.log_addr, t.owner
-    )
+);
+
