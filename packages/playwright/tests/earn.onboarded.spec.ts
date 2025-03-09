@@ -59,7 +59,7 @@ test('can deposit USDC into SendEarn', async ({
   log('diff', randomAmount - assets)
   expect(MIN_DEPOSIT_AMOUNT).toBeGreaterThanOrEqual(randomAmount - assets)
 
-  let deposit: { owner: string; shares: string; assets: string; sender: string }
+  let deposit: { owner: `\\x${string}`; shares: string; assets: string; log_addr: `\\x${string}` }
 
   // Wait and retry a few times as there might be a delay in the deposit being recorded
   await expect
@@ -67,7 +67,7 @@ test('can deposit USDC into SendEarn', async ({
       async () => {
         const { data, error } = await supabase
           .from('send_earn_deposits')
-          .select('owner, shares::text, assets::text, sender')
+          .select('log_addr, owner, shares::text, assets::text')
           .order('block_num', { ascending: false })
           .single()
 
@@ -91,16 +91,11 @@ test('can deposit USDC into SendEarn', async ({
   // @ts-expect-error - we know deposit is not null
   assert(deposit, 'Expected to find a send_earn_deposits record in Supabase')
 
-  // Convert assets from database to a number for comparison
-  const dbAssets = Number(formatUnits(BigInt(deposit.assets), 6))
-  // Convert our expected amount from bigint string to a number
+  const dbAssets = BigInt(deposit.assets)
   const expectedAssets = Number(formatUnits(randomAmount, 6))
 
-  // Assets should be close to the deposited amount (allowing for some precision loss)
-  expect(dbAssets).toBeCloseTo(expectedAssets, -2) // Looser precision due to potential rounding
+  expect(Number(formatUnits(dbAssets, 6))).toBeCloseTo(expectedAssets, -2) // Looser precision due to potential rounding
 
-  // Verify other important fields
-  expect(deposit.sender).toBeDefined()
   expect(deposit.shares).toBeDefined()
-  expect(deposit.shares).toBeGreaterThan(0)
+  expect(BigInt(deposit.shares)).toBeGreaterThan(BigInt(0))
 })

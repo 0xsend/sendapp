@@ -1,8 +1,8 @@
+import { TopNav } from 'app/components/TopNav'
 import { EarnScreen } from 'app/features/earn/screen'
+import { HomeLayout } from 'app/features/home/layout.web'
 import Head from 'next/head'
 import type { NextPageWithLayout } from '../_app'
-import { HomeLayout } from 'app/features/home/layout.web'
-import { TopNav } from 'app/components/TopNav'
 
 export const Page: NextPageWithLayout = () => {
   return (

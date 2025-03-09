@@ -42,7 +42,7 @@ class EarnDepositPage {
     await this.page.waitForURL('/earn')
     await expect(this.startEarningButton).toBeVisible()
     await this.startEarningButton.click()
-    await this.page.waitForURL('/earn/deposit')
+    await this.page.waitForURL('/earn/usdc/deposit')
     await expect(this.page.getByText('Start Earning', { exact: true })).toBeVisible()
     await expect(this.amountInput).toBeVisible()
     await expect(this.termsCheckbox).toBeVisible()
@@ -70,7 +70,7 @@ class EarnDepositPage {
     await expect(async () => {
       await this.page.getByRole('button', { name: 'Confirm Deposit' }).click()
       await expect(this.page.getByText('Deposited successfully', { exact: true })).toBeVisible()
-      await this.page.waitForURL('/earn')
+      await this.page.waitForURL('/earn/usdc')
     }).toPass({
       timeout: 15_000,
     })

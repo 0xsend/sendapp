@@ -1,7 +1,6 @@
 import { sendEarnFactoryAbi } from '@0xsend/send-earn-contracts'
-import type { Database } from '@my/supabase/database.types'
 import { sendEarnAbi, sendEarnUsdcFactoryAddress, usdcAddress } from '@my/wagmi'
-import type { SupabaseClient } from '@supabase/supabase-js'
+import { useSendEarnBalances } from 'app/features/earn/hooks'
 import { assert } from 'app/utils/assert'
 import { byteaToHex } from 'app/utils/byteaToHex'
 import { hexToBytea } from 'app/utils/hexToBytea'
@@ -56,62 +55,6 @@ export function useReferrerVault(): UseQueryReturnType<`0x${string}` | null> {
 }
 
 /**
- * Fetches the user's send earn deposits.
- */
-function useSendEarnDeposits() {
-  const supabase = useSupabase()
-  return useQuery({
-    queryKey: ['send_earn_deposits'],
-    queryFn: async () => {
-      return await supabase.from('send_earn_deposits').select('*')
-    },
-  })
-}
-
-/**
- * Fetches the user's send earn withdraws.
- */
-function useSendEarnWithdraws() {
-  const supabase = useSupabase()
-  return useQuery({
-    queryKey: ['send_earn_withdraws'],
-    queryFn: async () => {
-      return await supabase
-        .from('send_earn_withdraws')
-        .select('*')
-        .order('assets', { ascending: false })
-    },
-  })
-}
-
-export type SendEarnBalance = NonNullable<Awaited<ReturnType<typeof fetchSendEarnBalances>>>[number]
-
-async function fetchSendEarnBalances(supabase: SupabaseClient<Database>) {
-  const { data, error } = await supabase
-    .from('send_earn_balances')
-    .select('assets::text,log_addr,owner,shares::text')
-  if (error) throw error
-  if (!data) return null
-  return data.map((d) => ({
-    ...d,
-    assets: BigInt(d.assets ?? 0n),
-    shares: BigInt(d.shares ?? 0n),
-  }))
-}
-
-/**
- * Fetches the user's send earn balances.
- */
-export function useSendEarnBalances(): UseQueryReturnType<SendEarnBalance[] | null> {
-  const supabase = useSupabase()
-  return useQuery({
-    queryKey: ['sendEarnBalances', supabase] as const,
-    queryFn: async ({ queryKey: [, supabase] }): Promise<SendEarnBalance[] | null> =>
-      fetchSendEarnBalances(supabase),
-  })
-}
-
-/**
  * Determine the vault to deposit into.
  *
  * Priority order:
@@ -138,8 +81,7 @@ export function useSendEarnDepositVault({
 
       const userBalances = Array.isArray(balances.data)
         ? balances.data.filter(
-            (balance: SendEarnBalance) =>
-              balance.assets !== null && balance.assets > 0 && balance.log_addr !== null
+            (balance) => balance.assets !== null && balance.assets > 0 && balance.log_addr !== null
           )
         : []
 

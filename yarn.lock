@@ -6657,7 +6657,6 @@ __metadata:
   dependencies:
     "@0xbigboss/headless-web3-provider": "npm:0.2.6"
     "@0xsend/webauthn-authenticator": "workspace:*"
-    "@biomejs/biome": "npm:^1.6.3"
     "@faker-js/faker": "npm:^8.1.0"
     "@my/snaplet": "workspace:*"
     "@my/supabase": "workspace:*"
