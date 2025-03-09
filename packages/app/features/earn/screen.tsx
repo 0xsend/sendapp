@@ -1,20 +1,17 @@
 import { Card, Fade, LinearGradient, Paragraph, Separator, Spinner, XStack, YStack } from '@my/ui'
-import { sendEarnAbi } from '@my/wagmi'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { IconArrowRight, IconStacks } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { Row } from 'app/features/earn/components/Row'
 import { SectionButton } from 'app/features/earn/components/SectionButton'
-import { byteaToHex } from 'app/utils/byteaToHex'
 import formatAmount from 'app/utils/formatAmount'
 import { useSendAccount } from 'app/utils/send-accounts'
 import debug from 'debug'
-import { useMemo, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
-import { useReadContracts } from 'wagmi'
-import { useSendEarnBalances, type SendEarnBalance } from './hooks'
+import { useSendEarnBalances, useVaultConvertSharesToAssets, type SendEarnBalance } from './hooks'
 
 const log = debug('app:earn:screen')
 
@@ -169,57 +166,34 @@ const EarningsCallToAction = () => {
   )
 }
 
-/**
- * Hook to convert user's shares to assets using convertToAssets function from ERC-4626
- *
- * TODO: need to handle different assets
- */
-function useEstimatedBalances(balances: SendEarnBalance[] | null) {
-  const contractCalls: {
-    address: `0x${string}`
-    abi: typeof sendEarnAbi
-    functionName: 'convertToAssets'
-    args: [bigint]
-  }[] = useMemo(() => {
-    return (
-      balances
-        ?.filter((balance) => balance.shares > 0n && balance.log_addr !== null)
-        .map((balance) => {
-          const vaultAddress = byteaToHex(balance.log_addr)
-          return {
-            address: vaultAddress,
-            abi: sendEarnAbi,
-            functionName: 'convertToAssets',
-            args: [balance.shares],
-          }
-        }) || []
-    )
-  }, [balances])
-
-  return useReadContracts({
-    contracts: contractCalls,
-    allowFailure: false,
-    query: {
-      enabled: contractCalls.length > 0,
-    },
-  })
-}
-
 const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) => {
   const { push } = useRouter()
-  const estimatedBalances = useEstimatedBalances(balances)
+
+  // Extract vaults and shares from balances for conversion
+  const vaults =
+    balances
+      ?.filter((balance) => balance.shares > 0n && balance.log_addr !== null)
+      .map((balance) => balance.log_addr) || []
+
+  const shares =
+    balances
+      ?.filter((balance) => balance.shares > 0n && balance.log_addr !== null)
+      .map((balance) => balance.shares) || []
+
+  // Use the hook to get current asset values based on onchain rate
+  const currentAssets = useVaultConvertSharesToAssets({ vaults, shares })
 
   log('convertSharesToAssets results', {
-    data: estimatedBalances.data,
-    isLoading: estimatedBalances.isLoading,
-    isError: estimatedBalances.isError,
+    data: currentAssets.data,
+    isLoading: currentAssets.isLoading,
+    isError: currentAssets.isError,
   })
 
   // Calculate total assets - if contract calls succeeded use the converted values,
   // otherwise use the assets from the balances as fallback
   const totalAssets =
-    !estimatedBalances.isLoading && estimatedBalances.data
-      ? estimatedBalances.data.reduce((sum, assets) => sum + assets, 0n)
+    !currentAssets.isLoading && currentAssets.data
+      ? currentAssets.data.reduce((sum, assets) => sum + assets, 0n)
       : (balances?.reduce((sum, balance) => sum + balance.assets, 0n) ?? 0n)
 
   const totalDeposits = balances?.reduce((sum, balance) => sum + balance.assets, 0n) ?? 0n
