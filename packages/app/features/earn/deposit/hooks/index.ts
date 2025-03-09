@@ -176,7 +176,6 @@ export function useSendEarnDepositVault({
  * @param {bigint} params.amount - The amount of tokens to deposit
  * @returns {UseQueryReturnType<UserOperation<'v0.7'>, Error>} The UserOperation
  */
-
 export function useSendEarnDepositCalls({
   sender,
   asset,
@@ -276,7 +275,7 @@ type SendEarnAssets = keyof typeof assetsToEarnFactory
 /**
  * Maps asset addresses to the Send Earn Factory chainId -> addresses.
  */
-const assetsToEarnFactory = Object.fromEntries([
+export const assetsToEarnFactory = Object.fromEntries([
   ...Object.entries(usdcAddress).map(([chainId, addr]) => [
     addr,
     sendEarnUsdcFactoryAddress[chainId],
