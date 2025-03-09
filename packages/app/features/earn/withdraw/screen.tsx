@@ -40,7 +40,7 @@ export const WithdrawForm = () => {
 
     // TODO logic for withdrawing from vault
 
-    router.push('/earn/active-earnings')
+    router.push('/earn')
   }
 
   useEffect(() => {

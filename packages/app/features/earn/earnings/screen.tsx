@@ -10,11 +10,11 @@ import {
   YGroup,
   YStack,
 } from '@my/ui'
-import { useRouter } from 'solito/router'
-import { SectionButton } from 'app/features/earn/components/SectionButton'
 import { IconCoin } from 'app/components/icons/IconCoin'
-import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
 import { useActivityFeed } from 'app/features/activity/utils/useActivityFeed'
+import { SectionButton } from 'app/features/earn/components/SectionButton'
+import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
+import { useRouter } from 'solito/router'
 
 export const EarningsBalance = () => {
   const { push } = useRouter()
@@ -27,7 +27,7 @@ export const EarningsBalance = () => {
   const handleClaimPress = () => {
     // TODO plug claim rewards logic
 
-    push('/earn/active-earnings')
+    push('/earn')
   }
 
   return (
@@ -80,7 +80,7 @@ const EarningsFeed = () => {
               </>
             )
           default: {
-            const activities = (pages || []).flatMap((activity) => activity)
+            const activities = (pages || []).flat()
 
             return (
               <Fade>
