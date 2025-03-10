@@ -35,7 +35,7 @@ export const temporalRouter = createTRPCRouter({
           })
           const { workflowId } = await client.workflow.start(TransferWorkflow, {
             taskQueue: 'monorepo',
-            workflowId: `transfer-workflow-${user.id}-${userOpHash}`,
+            workflowId: `temporal/transfer/${user.id}/${userOpHash}`,
             args: [userOp],
           })
           log(`Workflow Created: ${workflowId}`)
