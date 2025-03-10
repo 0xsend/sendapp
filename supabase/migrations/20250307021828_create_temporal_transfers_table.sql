@@ -22,12 +22,13 @@ CREATE TYPE temporal.transfer_status AS ENUM(
 
 CREATE TABLE temporal.send_account_transfers(
     id serial primary key,
-    workflow_id text NOT NULL,
-    user_id uuid NOT NULL,
-    status temporal.transfer_status NOT NULL,
-    data jsonb NOT NULL,
-    created_at timestamptz DEFAULT (NOW() AT TIME ZONE 'UTC'),
-    updated_at timestamptz DEFAULT (NOW() AT TIME ZONE 'UTC')
+    workflow_id text not null,
+    user_id uuid not null,
+    status temporal.transfer_status not null,
+    data jsonb not null,
+    created_at_block_num numeric not null,
+    created_at timestamp with time zone not null default (now() AT TIME ZONE 'utc'::text),
+    updated_at timestamp with time zone not null default (now() AT TIME ZONE 'utc'::text)
 );
 
 GRANT ALL ON TABLE temporal.send_account_transfers TO service_role;
@@ -39,9 +40,16 @@ create policy "users can see their own temporal transfers"
 on "temporal"."send_account_transfers" as permissive
 for select to authenticated
 using (
-    user_id = auth.uid()
+    auth.uid() = user_id
 );
 
+create policy "users can only see temporal transfers they initiated"
+on "public"."activity" as permissive
+for select to authenticated
+using (
+    (event_name != 'temporal_send_account_transfers') OR
+    (from_user_id = auth.uid())
+);
 
 CREATE INDEX temporal_send_account_transfers_user_id_idx ON temporal.send_account_transfers(user_id);
 CREATE INDEX temporal_send_account_transfers_created_at_idx ON temporal.send_account_transfers(created_at);
@@ -50,6 +58,7 @@ CREATE UNIQUE INDEX temporal_send_account_transfers_workflow_id_idx ON temporal.
 CREATE OR REPLACE FUNCTION temporal.insert_temporal_token_send_account_transfer(
   workflow_id text,
   status temporal.transfer_status,
+  block_num text,
   f bytea,
   t bytea,
   v text,
@@ -79,12 +88,14 @@ BEGIN
     workflow_id,
     user_id,
     status,
+    created_at_block_num,
     data
   )
   VALUES (
     workflow_id,
     _user_id,
     status,
+    block_num::numeric,
     _data
   );
 END;
@@ -93,6 +104,7 @@ $$;
 CREATE OR REPLACE FUNCTION temporal.insert_temporal_eth_send_account_transfer(
   workflow_id text,
   status temporal.transfer_status,
+  block_num text,
   sender bytea,
   log_addr bytea,
   value text
@@ -120,12 +132,14 @@ BEGIN
     workflow_id,
     user_id,
     status,
+    created_at_block_num,
     data
   )
   VALUES (
     workflow_id,
     _user_id,
     status,
+    block_num::numeric,
     _data
   );
 END;
@@ -146,7 +160,7 @@ BEGIN
   -- Only construct _data if input data is not null
   IF data IS NOT NULL THEN
     _data := json_build_object(
-      'user_op_hash', (data->>'user_op_hash'),
+      'user_op_hash', (data->'user_op_hash'),
       'tx_hash', (data->>'tx_hash'),
       'block_num', data->>'block_num'::text
     );
@@ -189,7 +203,7 @@ BEGIN
   -- cast v to text to avoid losing precision when converting to json when sending to clients
   _data := json_build_object(
       'status', NEW.status::text,
-      'user_op_hash', (NEW.data->>'user_op_hash'),
+      'user_op_hash', (NEW.data->'user_op_hash'),
       'log_addr', (NEW.data->>'log_addr'),
       'f', (NEW.data->>'f'),
       't', (NEW.data->>'t'),
@@ -203,16 +217,14 @@ BEGIN
     event_id,
     from_user_id,
     to_user_id,
-    data,
-    created_at
+    data
   )
   VALUES (
     'temporal_send_account_transfers',
     NEW.workflow_id,
     _f_user_id,
     _t_user_id,
-    _data,
-    NEW.created_at
+    _data
   );
   RETURN NEW;
 END;
@@ -237,10 +249,10 @@ BEGIN
   FROM send_accounts
   WHERE address = concat('0x', encode((NEW.data->>'log_addr')::bytea, 'hex'))::citext;
 
-      -- cast v to text to avoid losing precision when converting to json when sending to clients
+  -- cast v to text to avoid losing precision when converting to json when sending to clients
   _data := json_build_object(
       'status', NEW.status::text,
-      'user_op_hash', (NEW.data->>'user_op_hash'),
+      'user_op_hash', (NEW.data->'user_op_hash'),
       'log_addr', (NEW.data->>'log_addr'),
       'sender', (NEW.data->>'sender'),
       'value', NEW.data->>'value'::text,
@@ -253,16 +265,14 @@ BEGIN
     event_id,
     from_user_id,
     to_user_id,
-    data,
-    created_at
+    data
   )
   VALUES (
     'temporal_send_account_transfers',
     NEW.workflow_id,
     _from_user_id,
     _to_user_id,
-    _data,
-    NEW.created_at
+    _data
   );
   RETURN NEW;
 END;
@@ -289,18 +299,12 @@ CREATE OR REPLACE FUNCTION temporal.temporal_send_account_transfers_trigger_upda
 DECLARE
   _data jsonb;
 BEGIN
-  IF EXISTS (
-    SELECT 1 FROM activity
-    WHERE event_name = 'temporal_send_account_transfers'
-      AND event_id = NEW.workflow_id
-  ) THEN
-    _data := NEW.data || json_build_object('status', NEW.status::text)::jsonb;
+  _data := NEW.data || json_build_object('status', NEW.status::text)::jsonb;
 
-    UPDATE activity
-    SET data = _data
-    WHERE event_name = 'temporal_send_account_transfers'
-      AND event_id = NEW.workflow_id;
-  END IF;
+  UPDATE activity
+  SET data = _data
+  WHERE event_name = 'temporal_send_account_transfers'
+    AND event_id = NEW.workflow_id;
 
   RETURN NEW;
 END;
@@ -338,22 +342,23 @@ create or replace function send_account_transfers_delete_temporal_activity() ret
 language plpgsql
 security definer as
 $$
-
 begin
-    delete from activity a
-    where event_name = 'temporal_send_account_transfers' and event_id in (
-      select sat.workflow_id from temporal.send_account_transfers sat
-      where extract(epoch from sat.created_at)::numeric < NEW.block_time
-      and sat.status != 'failed'
+    delete from public.activity a
+    where a.event_name = 'temporal_send_account_transfers' and a.event_id in (
+      select t_sat.workflow_id
+      from temporal.send_account_transfers t_sat
+      where t_sat.created_at_block_num <= NEW.block_num
+      and t_sat.status != 'failed'
     );
     return NEW;
 end;
 $$;
 
 CREATE TRIGGER send_account_transfers_trigger_delete_temporal_activity
-  BEFORE INSERT ON send_account_transfers
+  BEFORE INSERT ON public.send_account_transfers
   FOR EACH ROW
   EXECUTE FUNCTION send_account_transfers_delete_temporal_activity();
+
 -- Add temporal filter (a.to_user_id = ( select auth.uid() ) and a.event_name not like 'temporal_%')
 create or replace view activity_feed with (security_barrier = on) as
 select a.created_at                  as created_at,
