@@ -1,18 +1,23 @@
 import type { Database } from '@my/supabase/database-generated.types'
 import { sendEarnAbi } from '@my/wagmi'
-import type { SupabaseClient } from '@supabase/supabase-js'
+import type { PostgrestError, SupabaseClient } from '@supabase/supabase-js'
+import {
+  useInfiniteQuery,
+  type InfiniteData,
+  type UseInfiniteQueryResult,
+} from '@tanstack/react-query'
 import { ERC20CoinSchema, type erc20Coin } from 'app/data/coins'
 import { assert } from 'app/utils/assert'
 import { mulDivDown, WAD, wMulDown } from 'app/utils/math'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
-import { address, byteaToHexEthAddress, decimalStrToBigInt } from 'app/utils/zod'
+import { address, byteaToHexEthAddress, byteaToHexTxHash, decimalStrToBigInt } from 'app/utils/zod'
 import debug from 'debug'
 import { useMemo } from 'react'
 import { formatUnits, isAddressEqual, zeroAddress } from 'viem'
 import { useChainId, useReadContract, useReadContracts } from 'wagmi'
 import { hashFn, useQuery, type UseQueryReturnType } from 'wagmi/query'
-import { z } from 'zod'
+import { z, type ZodError } from 'zod'
 
 const log = debug('app:earn:hooks')
 
@@ -261,32 +266,69 @@ function calculateBaseApy({
   return baseApy
 }
 
+// TODO: move to app/utils/activity
+const SendEarnActivitySchema = z.object({
+  type: z.enum(['deposit', 'withdraw']),
+  block_num: z.number(),
+  block_time: z.number(),
+  log_addr: byteaToHexEthAddress,
+  owner: byteaToHexEthAddress,
+  assets: decimalStrToBigInt,
+  shares: decimalStrToBigInt,
+  tx_hash: byteaToHexTxHash,
+})
+const SendEarnActivitySchemaArray = z.array(SendEarnActivitySchema)
+export type SendEarnActivity = z.infer<typeof SendEarnActivitySchema>
 /**
  * Fetches the user's send earn deposits.
  */
-function useSendEarnDeposits() {
-  const supabase = useSupabase()
-  return useQuery({
-    queryKey: ['send_earn_deposits'],
-    queryFn: async () => {
-      return await supabase.from('send_earn_deposits').select('*')
-    },
-  })
-}
-
 /**
- * Fetches the user's send earn withdraws.
+ * Infinite query to fetch Send Earn activity.
+ *
+ * @param params.pageSize - Number of items to fetch per page
+ * @param params.refetchInterval - Interval in ms to refetch data
+ * @param params.enabled - Whether the query is enabled
  */
-function useSendEarnWithdraws() {
+export function useSendEarnActivity(params?: {
+  pageSize?: number
+  refetchInterval?: number
+  enabled?: boolean
+}): UseInfiniteQueryResult<InfiniteData<SendEarnActivity[]>, PostgrestError | ZodError> {
+  const { pageSize = 10, refetchInterval = 30_000, enabled = true } = params ?? {}
   const supabase = useSupabase()
-  return useQuery({
-    queryKey: ['send_earn_withdraws'],
-    queryFn: async () => {
-      return await supabase
-        .from('send_earn_withdraws')
-        .select('*')
-        .order('assets', { ascending: false })
+
+  async function fetchSendEarnActivity({
+    pageParam,
+  }: { pageParam: number }): Promise<SendEarnActivity[]> {
+    const from = pageParam * pageSize
+    const to = (pageParam + 1) * pageSize - 1
+
+    const { data, error } = await supabase
+      .from('send_earn_activity')
+      .select('type,block_num,block_time,log_addr,owner,assets::text,shares::text,tx_hash')
+      .order('block_time', { ascending: false })
+      .range(from, to)
+
+    if (error) throw error
+    return SendEarnActivitySchemaArray.parse(data)
+  }
+
+  return useInfiniteQuery({
+    queryKey: ['send_earn_activity'],
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, _allPages, lastPageParam) => {
+      if (lastPage !== null && lastPage.length < pageSize) return undefined
+      return lastPageParam + 1
     },
+    getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => {
+      if (firstPageParam <= 1) {
+        return undefined
+      }
+      return firstPageParam - 1
+    },
+    queryFn: fetchSendEarnActivity,
+    refetchInterval,
+    enabled,
   })
 }
 
