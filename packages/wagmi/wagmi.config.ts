@@ -22,6 +22,8 @@ import sendTokenV1Artifact from '@0xsend/send-token-upgrade/artifacts/contracts/
   type: 'json',
 }
 
+import { sendEarnAbi, sendEarnFactoryAbi } from '@0xsend/send-earn-contracts'
+
 const broadcasts = (
   await globby([`${process.cwd()}/../contracts/broadcast/**/run-latest.json`])
 ).filter((f) => !f.includes('dry-run'))
@@ -91,6 +93,18 @@ export default defineConfig({
       address: {
         [baseLocal.id]: '0x71fa02bb11e4b119bEDbeeD2f119F62048245301',
         [base.id]: '0x71fa02bb11e4b119bEDbeeD2f119F62048245301',
+        [baseSepolia.id]: '0x269cD0a2afd1BAbdA7A74ab1dC853869a37aa4a7',
+      },
+      abi: [],
+    },
+    /**
+     * [Send: Earn Revenue](https://basescan.org/address/0x65049C4B8e970F5bcCDAE8E141AA06346833CeC4)
+     **/
+    {
+      name: 'SendEarnRevenueSafe',
+      address: {
+        [baseLocal.id]: '0x65049C4B8e970F5bcCDAE8E141AA06346833CeC4',
+        [base.id]: '0x65049C4B8e970F5bcCDAE8E141AA06346833CeC4',
         [baseSepolia.id]: '0x269cD0a2afd1BAbdA7A74ab1dC853869a37aa4a7',
       },
       abi: [],
@@ -206,6 +220,30 @@ export default defineConfig({
         // [localhost.id]: sendTokenUpgradeAddresses['SendTokenModule#SendToken'] as `0x${string}`,
         // [sepolia.id]: sendTokenUpgradeAddresses['SendTokenModule#SendToken'] as `0x${string}`,
       },
+    },
+    {
+      name: 'SendEarnUSDCFactory',
+      address: {
+        [mainnet.id]: '0x1941f2a9b83b2fdc36e53f934f54fb0decb3b61a',
+        [localhost.id]: '0x1941f2a9b83b2fdc36e53f934f54fb0decb3b61a',
+        [sepolia.id]: '0x1941f2a9b83b2fdc36e53f934f54fb0decb3b61a',
+        [baseLocal.id]: '0x1941f2a9b83b2fdc36e53f934f54fb0decb3b61a',
+        [base.id]: '0x1941f2a9b83b2fdc36e53f934f54fb0decb3b61a',
+        [baseSepolia.id]: '0x1941f2a9b83b2fdc36e53f934f54fb0decb3b61a',
+      },
+      abi: sendEarnFactoryAbi,
+    },
+    {
+      name: 'SendEarn',
+      address: {
+        [mainnet.id]: '0x993356237061d9B1663Ac4Caa8F93F90e6F6c645',
+        [localhost.id]: '0x993356237061d9B1663Ac4Caa8F93F90e6F6c645',
+        [sepolia.id]: '0x993356237061d9B1663Ac4Caa8F93F90e6F6c645',
+        [baseLocal.id]: '0x993356237061d9B1663Ac4Caa8F93F90e6F6c645',
+        [base.id]: '0x993356237061d9B1663Ac4Caa8F93F90e6F6c645',
+        [baseSepolia.id]: '0x993356237061d9B1663Ac4Caa8F93F90e6F6c645',
+      },
+      abi: sendEarnAbi,
     },
   ],
   plugins: [
