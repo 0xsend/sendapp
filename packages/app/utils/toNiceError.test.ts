@@ -47,8 +47,14 @@ describe('toNiceError', () => {
   })
 
   it('should handle unknown error types', () => {
-    expect(toNiceError({})).toBe('Unknown error')
-    expect(toNiceError(123)).toBe('Unknown error')
+    const originalConsoleError = console.error
+    try {
+      console.error = jest.fn()
+      expect(toNiceError({})).toBe('Unknown error')
+      expect(toNiceError(123)).toBe('Unknown error')
+    } finally {
+      console.error = originalConsoleError
+    }
   })
 
   it('should handle Zod errors', () => {
