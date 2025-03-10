@@ -1,11 +1,8 @@
 import { log, ApplicationFailure } from '@temporalio/activity'
 import {
-  isTokenTransferIndexed,
-  isEthTransferIndexed,
   insertTemporalTokenSendAccountTransfer,
   updateTemporalSendAccountTransfer,
   insertTemporalEthSendAccountTransfer,
-  deleteTemporalTransferFromActivityTable,
   deleteTemporalTransfer,
 } from './supabase'
 import { simulateUserOperation, sendUserOperation, waitForTransactionReceipt } from './wagmi'
