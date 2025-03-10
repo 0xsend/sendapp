@@ -1,5 +1,5 @@
 BEGIN;
-SELECT plan(7);
+SELECT plan(6);
 
 -- Create the necessary extensions
 CREATE EXTENSION "basejump-supabase_test_helpers";
@@ -97,8 +97,7 @@ SELECT temporal.update_temporal_send_account_transfer(
     json_build_object(
         'user_op_hash', '\x1234'::bytea,
         'tx_hash', '\x5678'::bytea,
-        'block_num', '123',
-        'tx_idx', '1'
+        'block_num', '123'
     )::jsonb
 );
 
@@ -108,8 +107,7 @@ SELECT results_eq(
         status,
         (data->>'user_op_hash')::bytea,
         (data->>'tx_hash')::bytea,
-        data->>'block_num',
-        data->>'tx_idx'
+        data->>'block_num'
     FROM temporal.send_account_transfers
     WHERE workflow_id = 'test-workflow-1'
     $$,
@@ -118,8 +116,7 @@ SELECT results_eq(
         'sent'::temporal.transfer_status,
         '\x1234'::bytea,
         '\x5678'::bytea,
-        '123'::text,
-        '1'::text
+        '123'::text
     )
     $$,
     'Test transfer update'
