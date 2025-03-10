@@ -30,9 +30,6 @@ export function useTokenActivityFeed(params: {
 }): UseInfiniteQueryResult<InfiniteData<Activity[]>, PostgrestError | ZodError> {
   const { pageSize = 10, address, refetchInterval = 30_000, enabled = true } = params
   const supabase = useSupabase()
-  const { data: sendAccount } = useSendAccount()
-  const senderBytea = sendAccount?.address ? hexToBytea(sendAccount.address) : null
-
   async function fetchTokenActivityFeed({ pageParam }: { pageParam: number }): Promise<Activity[]> {
     const from = pageParam * pageSize
     const to = (pageParam + 1) * pageSize - 1
@@ -42,13 +39,14 @@ export function useTokenActivityFeed(params: {
       query = query
         .eq('data->>log_addr', address)
         .or(
-          `event_name.eq.${Events.SendAccountTransfers},and(event_name.eq.${Events.TemporalSendAccountTransfers},data->>f.eq.${senderBytea})`
+          `event_name.eq.${Events.SendAccountTransfers},event_name.eq.${Events.TemporalSendAccountTransfers}`
         )
     } else {
       query = query.or(
-        `event_name.eq.${Events.SendAccountReceive},and(event_name.eq.${Events.TemporalSendAccountTransfers},data->>sender.eq.${senderBytea})`
+        `event_name.eq.${Events.SendAccountReceive},event_name.eq.${Events.TemporalSendAccountTransfers}`
       )
     }
+    9
 
     const paymasterAddresses = Object.values(tokenPaymasterAddress)
     const sendTokenV0LockboxAddresses = Object.values(sendTokenV0LockboxAddress)
