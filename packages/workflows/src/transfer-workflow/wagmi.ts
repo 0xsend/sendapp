@@ -21,6 +21,6 @@ export async function waitForTransactionReceipt(
   return await baseMainnetBundlerClient.waitForUserOperationReceipt({ hash })
 }
 
-export async function getBlockNumber() {
+export async function getBaseBlockNumber() {
   return await baseMainnetClient.getBlockNumber()
 }
