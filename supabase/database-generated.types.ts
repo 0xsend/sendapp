@@ -1492,29 +1492,32 @@ export type Database = {
     Tables: {
       send_account_transfers: {
         Row: {
-          created_at: string | null
+          created_at: string
+          created_at_block_num: number
           data: Json
           id: number
           status: Database["temporal"]["Enums"]["transfer_status"]
-          updated_at: string | null
+          updated_at: string
           user_id: string
           workflow_id: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
+          created_at_block_num: number
           data: Json
           id?: number
           status: Database["temporal"]["Enums"]["transfer_status"]
-          updated_at?: string | null
+          updated_at?: string
           user_id: string
           workflow_id: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
+          created_at_block_num?: number
           data?: Json
           id?: number
           status?: Database["temporal"]["Enums"]["transfer_status"]
-          updated_at?: string | null
+          updated_at?: string
           user_id?: string
           workflow_id?: string
         }
@@ -1529,6 +1532,7 @@ export type Database = {
         Args: {
           workflow_id: string
           status: Database["temporal"]["Enums"]["transfer_status"]
+          block_num: string
           sender: string
           log_addr: string
           value: string
@@ -1539,6 +1543,7 @@ export type Database = {
         Args: {
           workflow_id: string
           status: Database["temporal"]["Enums"]["transfer_status"]
+          block_num: string
           f: string
           t: string
           v: string

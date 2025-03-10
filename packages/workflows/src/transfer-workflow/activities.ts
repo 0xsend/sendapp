@@ -1,17 +1,22 @@
 import { log, ApplicationFailure } from '@temporalio/activity'
 import {
   insertTemporalTokenSendAccountTransfer,
-  updateTemporalSendAccountTransfer,
   insertTemporalEthSendAccountTransfer,
-  deleteTemporalTransfer,
+  updateTemporalSendAccountTransfer,
 } from './supabase'
-import { simulateUserOperation, sendUserOperation, waitForTransactionReceipt } from './wagmi'
+import {
+  simulateUserOperation,
+  sendUserOperation,
+  waitForTransactionReceipt,
+  getBlockNumber,
+} from './wagmi'
 import type { UserOperation } from 'permissionless'
 import { bootstrap } from '@my/workflows/utils'
 import { decodeTransferUserOp } from 'app/utils/decodeTransferUserOp'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import type { Json, Database, PgBytea } from '@my/supabase/database.types'
 import superjson from 'superjson'
+import { byteaToHex } from 'app/utils/byteaToHex'
 
 type TransferActivities = {
   initializeTransferActivity: (userOp: UserOperation<'v0.7'>) => Promise<{
@@ -19,21 +24,20 @@ type TransferActivities = {
     to: PgBytea
     amount: bigint
     token: PgBytea | null
+    blockNumber: bigint
   }>
   insertTemporalSendAccountTransfer: (
     workflowId: string,
     from: PgBytea,
     to: PgBytea,
     amount: bigint,
-    token: PgBytea | null
+    token: PgBytea | null,
+    blockNumber: bigint
   ) => Promise<void>
-  sendUserOpActivity: (
-    workflowId: string,
-    userOp: UserOperation<'v0.7'>
-  ) => Promise<{ hash: `0x${string}`; hashBytea: PgBytea }>
+  sendUserOpActivity: (workflowId: string, userOp: UserOperation<'v0.7'>) => Promise<PgBytea>
   waitForTransactionReceiptActivity: (
     workflowId: string,
-    hash: `0x${string}`
+    hash: PgBytea
   ) => Promise<{
     transactionHash: `0x${string}`
     blockNumber: bigint
@@ -41,7 +45,7 @@ type TransferActivities = {
   updateTemporalTransferActivity: (params: {
     workflowId: string
     status: Database['temporal']['Enums']['transfer_status']
-    data?: Json
+    data: Json
     failureError?: {
       message?: string | null
       type?: string | null
@@ -84,13 +88,16 @@ export const createTransferActivities = (
         throw ApplicationFailure.nonRetryable('Invalid hex address format')
       }
 
-      return { from: fromBytea, to: toBytea, amount, token: tokenBytea }
+      const blockNumber = await getBlockNumber()
+
+      return { from: fromBytea, to: toBytea, amount, token: tokenBytea, blockNumber }
     },
-    async insertTemporalSendAccountTransfer(workflowId, from, to, amount, token) {
+    async insertTemporalSendAccountTransfer(workflowId, from, to, amount, token, blockNumber) {
       const { error } = token
         ? await insertTemporalTokenSendAccountTransfer({
             workflow_id: workflowId,
             status: 'initialized',
+            block_num: blockNumber,
             f: from,
             t: to,
             v: amount,
@@ -99,6 +106,7 @@ export const createTransferActivities = (
         : await insertTemporalEthSendAccountTransfer({
             workflow_id: workflowId,
             status: 'initialized',
+            block_num: blockNumber,
             sender: from,
             value: amount,
             log_addr: to,
@@ -125,16 +133,19 @@ export const createTransferActivities = (
       try {
         const hash = await sendUserOperation(userOp)
         const hashBytea = hexToBytea(hash)
-        return { hash, hashBytea }
+        return hashBytea
       } catch (error) {
         log.error('sendUserOpActivity failed', { error })
-        const { error: deleteError } = await deleteTemporalTransfer(workflowId)
-        if (deleteError) {
+        const { error: updateError } = await updateTemporalSendAccountTransfer({
+          workflow_id: workflowId,
+          status: 'failed',
+        })
+        if (updateError) {
           throw ApplicationFailure.retryable(
             'Error deleting transfer from temporal.send_account_transfers',
-            deleteError.code,
+            updateError.code,
             {
-              deleteError,
+              error: updateError,
               workflowId,
             }
           )
@@ -144,8 +155,9 @@ export const createTransferActivities = (
       }
     },
     async waitForTransactionReceiptActivity(workflowId, hash) {
+      const hexHash = byteaToHex(hash)
       try {
-        const bundlerReceipt = await waitForTransactionReceipt(hash)
+        const bundlerReceipt = await waitForTransactionReceipt(hexHash)
         if (!bundlerReceipt) {
           throw ApplicationFailure.retryable('No receipt returned from waitForTransactionReceipt')
         }

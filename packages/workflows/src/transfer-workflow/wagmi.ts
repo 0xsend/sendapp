@@ -20,3 +20,7 @@ export async function waitForTransactionReceipt(
 ): Promise<GetUserOperationReceiptReturnType> {
   return await baseMainnetBundlerClient.waitForUserOperationReceipt({ hash })
 }
+
+export async function getBlockNumber() {
+  return await baseMainnetClient.getBlockNumber()
+}

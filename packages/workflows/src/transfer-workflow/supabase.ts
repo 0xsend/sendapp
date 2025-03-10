@@ -4,6 +4,7 @@ import { supabaseAdmin } from 'app/utils/supabase/admin'
 export async function insertTemporalTokenSendAccountTransfer({
   workflow_id,
   status,
+  block_num,
   f,
   t,
   v,
@@ -11,6 +12,7 @@ export async function insertTemporalTokenSendAccountTransfer({
 }: {
   workflow_id: string
   status: Database['temporal']['Enums']['transfer_status']
+  block_num: bigint
   f: PgBytea
   t: PgBytea
   v: bigint
@@ -19,6 +21,7 @@ export async function insertTemporalTokenSendAccountTransfer({
   return await supabaseAdmin.schema('temporal').rpc('insert_temporal_token_send_account_transfer', {
     workflow_id,
     status,
+    block_num: block_num.toString(),
     f,
     t,
     v: v.toString(),
@@ -29,12 +32,14 @@ export async function insertTemporalTokenSendAccountTransfer({
 export async function insertTemporalEthSendAccountTransfer({
   workflow_id,
   status,
+  block_num,
   sender,
   log_addr,
   value,
 }: {
   workflow_id: string
   status: Database['temporal']['Enums']['transfer_status']
+  block_num: bigint
   sender: PgBytea
   log_addr: PgBytea
   value: bigint
@@ -42,6 +47,7 @@ export async function insertTemporalEthSendAccountTransfer({
   return await supabaseAdmin.schema('temporal').rpc('insert_temporal_eth_send_account_transfer', {
     workflow_id,
     status,
+    block_num: block_num.toString(),
     sender,
     log_addr,
     value: value.toString(),
@@ -62,23 +68,4 @@ export async function updateTemporalSendAccountTransfer({
     status,
     data,
   })
-}
-
-export async function deleteTemporalTransfer(workflow_id: string) {
-  return await supabaseAdmin
-    .schema('temporal')
-    .from('send_account_transfers')
-    .delete()
-    .eq('workflow_id', workflow_id)
-    .select('workflow_id')
-    .single()
-}
-
-export async function deleteTemporalTransferFromActivityTable(workflow_id: string) {
-  return await supabaseAdmin
-    .from('activity')
-    .delete()
-    .eq('event_id', workflow_id)
-    .select('event_id')
-    .single()
 }

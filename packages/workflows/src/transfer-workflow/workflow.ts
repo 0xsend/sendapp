@@ -21,18 +21,18 @@ const {
 export async function TransferWorkflow(userOp: UserOperation<'v0.7'>) {
   const workflowId = workflowInfo().workflowId
   log('SendTransferWorkflow Initializing with userOp:', workflowId)
-  const { token, from, to, amount } = await initializeTransferActivity(userOp)
+  const { token, from, to, amount, blockNumber } = await initializeTransferActivity(userOp)
 
   log('Inserting temporal transfer into temporal.send_account_transfers', workflowId)
-  await insertTemporalSendAccountTransfer(workflowId, from, to, amount, token)
+  await insertTemporalSendAccountTransfer(workflowId, from, to, amount, token, blockNumber)
 
   log('Sending UserOperation', superjson.stringify(userOp))
-  const { hash, hashBytea } = await sendUserOpActivity(workflowId, userOp)
+  const hash = await sendUserOpActivity(workflowId, userOp)
   log('UserOperation sent, hash:', hash)
   await updateTemporalTransferActivity({
     workflowId,
     status: 'sent',
-    data: { user_op_hash: hashBytea },
+    data: { user_op_hash: hash },
   })
 
   const receipt = await waitForTransactionReceiptActivity(workflowId, hash)
