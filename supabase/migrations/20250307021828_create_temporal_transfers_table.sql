@@ -348,7 +348,6 @@ begin
     );
     return NEW;
 end;
-end;
 $$;
 
 CREATE TRIGGER send_account_transfers_trigger_delete_temporal_activity
