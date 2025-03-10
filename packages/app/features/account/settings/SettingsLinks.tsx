@@ -4,9 +4,9 @@ import type { PropsWithChildren } from 'react'
 import { Fade, YGroup, YStack } from '@my/ui'
 import {
   IconAccount,
+  IconFingerprint,
   IconIdCard,
   IconInfoCircle,
-  IconKey,
   IconLogout,
   IconQuestionCircle,
 } from 'app/components/icons'
@@ -35,7 +35,7 @@ const SETTINGS_LINKS = {
     {
       text: 'Passkeys',
       href: '/account/settings/backup',
-      icon: <IconKey {...iconProps} />,
+      icon: <IconFingerprint {...iconProps} />,
     },
   ],
   Support: [
