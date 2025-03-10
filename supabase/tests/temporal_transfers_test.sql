@@ -27,6 +27,7 @@ VALUES (
 SELECT temporal.insert_temporal_token_send_account_transfer(
     'test-workflow-1'::text,
     'initialized'::temporal.transfer_status,
+    '123',
     '\x1234567890ABCDEF1234567890ABCDEF12345678'::bytea,
     '\xB0B7D5E8A4B6D534B3F608E9D27871F85A4E98DA'::bytea,
     '100'::text,
@@ -62,6 +63,7 @@ SELECT results_eq(
 SELECT temporal.insert_temporal_eth_send_account_transfer(
     'test-workflow-2'::text,
     'initialized'::temporal.transfer_status,
+    '123',
     '\x1234567890ABCDEF1234567890ABCDEF12345678'::bytea,
     '\xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'::bytea,
     '1000000000000000000'::text
