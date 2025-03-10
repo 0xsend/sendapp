@@ -187,9 +187,9 @@ export function SendConfirm() {
         maxPriorityFeePerGas: feesPerGas.maxPriorityFeePerGas,
       }
 
-      console.log('gasEstimate', usdcFees)
-      console.log('feesPerGas', feesPerGas)
-      console.log('userOp', _userOp)
+      log('gasEstimate', usdcFees)
+      log('feesPerGas', feesPerGas)
+      log('userOp', _userOp)
       const chainId = baseMainnetClient.chain.id
       const entryPoint = entryPointAddress[chainId]
 
