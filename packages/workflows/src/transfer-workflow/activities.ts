@@ -8,7 +8,7 @@ import {
   simulateUserOperation,
   sendUserOperation,
   waitForTransactionReceipt,
-  getBlockNumber,
+  getBaseBlockNumber,
 } from './wagmi'
 import type { UserOperation } from 'permissionless'
 import { bootstrap } from '@my/workflows/utils'
@@ -19,14 +19,15 @@ import superjson from 'superjson'
 import { byteaToHex } from 'app/utils/byteaToHex'
 
 type TransferActivities = {
-  initializeTransferActivity: (userOp: UserOperation<'v0.7'>) => Promise<{
+  simulateTransferActivity: (userOp: UserOperation<'v0.7'>) => Promise<void>
+  getBaseBlockNumberActivity: () => Promise<bigint>
+  decodeTransferUserOpActivity: (userOp: UserOperation<'v0.7'>) => Promise<{
     from: PgBytea
     to: PgBytea
     amount: bigint
     token: PgBytea | null
-    blockNumber: bigint
   }>
-  insertTemporalSendAccountTransfer: (
+  insertTemporalSendAccountTransferActivity: (
     workflowId: string,
     from: PgBytea,
     to: PgBytea,
@@ -60,39 +61,51 @@ export const createTransferActivities = (
   bootstrap(env)
 
   return {
-    async initializeTransferActivity(userOp) {
-      const { from, to, token, amount } = decodeTransferUserOp({ userOp })
-      if (!from || !to || !amount || !token) {
-        throw ApplicationFailure.nonRetryable('User Operation is not a valid transfer')
-      }
-      if (amount <= 0n) {
-        throw ApplicationFailure.nonRetryable('User Operation has amount <= 0')
-      }
-      if (!userOp.signature) {
-        throw ApplicationFailure.nonRetryable('UserOp signature is required')
-      }
-
+    async simulateTransferActivity(userOp) {
       await simulateUserOperation(userOp).catch((error) => {
         throw ApplicationFailure.nonRetryable('Error simulating user operation', error.code, error)
       })
-
-      let fromBytea: PgBytea
-      let toBytea: PgBytea
-      let tokenBytea: PgBytea | null
+    },
+    async getBaseBlockNumberActivity() {
+      try {
+        return await getBaseBlockNumber()
+      } catch (error) {
+        log.error('Failed to get block number', { code: error.code, error })
+        throw ApplicationFailure.retryable('Failed to get block number')
+      }
+    },
+    async decodeTransferUserOpActivity(userOp) {
+      const { from, to, token, amount } = decodeTransferUserOp({ userOp })
+      if (!from || !to || !amount || !token) {
+        log.error('User Operation is not a valid transfer', { from, to, amount, token })
+        throw ApplicationFailure.nonRetryable('User Operation is not a valid transfer')
+      }
+      if (amount <= 0n) {
+        log.error('User Operation has amount <= 0', { amount })
+        throw ApplicationFailure.nonRetryable('User Operation has amount <= 0')
+      }
+      if (!userOp.signature) {
+        log.error('UserOp signature is required')
+        throw ApplicationFailure.nonRetryable('UserOp signature is required')
+      }
 
       try {
-        fromBytea = hexToBytea(from)
-        toBytea = hexToBytea(to)
-        tokenBytea = token === 'eth' ? null : hexToBytea(token)
+        const fromBytea = hexToBytea(from)
+        const toBytea = hexToBytea(to)
+        const tokenBytea = token === 'eth' ? null : hexToBytea(token)
+        return { from: fromBytea, to: toBytea, amount, token: tokenBytea }
       } catch (error) {
         throw ApplicationFailure.nonRetryable('Invalid hex address format')
       }
-
-      const blockNumber = await getBlockNumber()
-
-      return { from: fromBytea, to: toBytea, amount, token: tokenBytea, blockNumber }
     },
-    async insertTemporalSendAccountTransfer(workflowId, from, to, amount, token, blockNumber) {
+    async insertTemporalSendAccountTransferActivity(
+      workflowId,
+      from,
+      to,
+      amount,
+      token,
+      blockNumber
+    ) {
       const { error } = token
         ? await insertTemporalTokenSendAccountTransfer({
             workflow_id: workflowId,
