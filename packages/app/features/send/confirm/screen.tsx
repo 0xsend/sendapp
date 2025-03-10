@@ -203,11 +203,6 @@ export function SendConfirm() {
 
       const workflowId = await transfer({ userOp })
 
-      if (selectedCoin?.token === 'eth') {
-        await ethQuery.refetch()
-      } else {
-        await tokensQuery.refetch()
-      }
       if (workflowId) {
         router.replace({ pathname: '/', query: { token: sendToken } })
       }
