@@ -153,50 +153,55 @@ export const useMonthlyDistributions = () => {
 
 function fetchDistributionVerifications(
   supabase: SupabaseClient<Database>,
-  distributionId: number
+  distributionNumber: number
 ) {
   return selectAll(
     supabase
-      .from('distribution_verification_values')
+      .from('distributions')
       .select(
         `
-        distribution_id,
-        type,
-        fixed_value::text,
-        multiplier_max,
-        multiplier_min,
-        multiplier_step,
-        distribution_verifications(
-          distribution_id,
-          user_id,
+        id,
+        number,
+        distribution_verification_values(
           type,
-          weight::text,
-          metadata,
-          created_at
+          fixed_value::text,
+          multiplier_max,
+          multiplier_min,
+          multiplier_step,
+          distribution_verifications(
+            user_id,
+            type,
+            weight::text,
+            metadata,
+            created_at
+          )
         )
         `,
         { count: 'exact' }
       )
-      .eq('distribution_id', distributionId)
+      .eq('number', distributionNumber)
   )
 }
 
 export type DistributionsVerificationsQuery = ReturnType<typeof useDistributionVerifications>
 
-export const useDistributionVerifications = (distributionId?: number) => {
+export const useDistributionVerifications = (distributionNumber?: number) => {
   const supabase = useSupabase()
 
   return useQuery({
-    queryKey: ['distribution_verifications', { distributionId, supabase }] as const,
-    queryFn: async ({ queryKey: [, { distributionId, supabase }] }) => {
-      assert(!!distributionId, 'distributionId is required')
+    queryKey: ['distribution_verifications', { distributionNumber, supabase }] as const,
+    queryFn: async ({ queryKey: [, { distributionNumber, supabase }] }) => {
+      assert(!!distributionNumber, 'distributionNumber is required')
 
-      const { data, error } = await fetchDistributionVerifications(supabase, distributionId)
+      const { data, error } = await fetchDistributionVerifications(supabase, distributionNumber)
 
       if (error) throw error
-      if (data === null || data.length === 0) return null
+      if (!data?.[0]) return null
 
-      const verification_values = data.map((item) => {
+      // Get the first (and should be only) distribution
+      const distribution = data[0]
+
+      const verification_values = distribution.distribution_verification_values.map((item) => {
         const verifications = item.distribution_verifications ?? []
         const totalWeight = verifications.reduce((sum, v) => sum + BigInt(v.weight ?? 0), 0n)
         const latestCreatedAt = verifications.reduce(
@@ -213,7 +218,7 @@ export const useDistributionVerifications = (distributionId?: number) => {
         }
       })
 
-      const multipliers = data.map((item) => {
+      const multipliers = (distribution.distribution_verification_values ?? []).map((item) => {
         const verifications = item.distribution_verifications ?? []
         const totalWeight = verifications.reduce((sum, v) => sum + BigInt(v.weight ?? 0), 0n)
 
@@ -239,12 +244,12 @@ export const useDistributionVerifications = (distributionId?: number) => {
       })
 
       return {
-        distribution_id: distributionId,
+        distributionNumber,
         verification_values,
         multipliers,
       }
     },
-    enabled: Boolean(distributionId),
+    enabled: Boolean(distributionNumber),
   })
 }
 
