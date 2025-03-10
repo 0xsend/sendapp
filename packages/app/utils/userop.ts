@@ -109,7 +109,11 @@ export function generateChallenge({
   userOpHash,
   version = USEROP_VERSION,
   validUntil,
-}: { userOpHash: Hex; version?: number; validUntil: number }): {
+}: {
+  userOpHash: Hex
+  version?: number
+  validUntil: number
+}): {
   challenge: Hex
   versionBytes: Uint8Array
   validUntilBytes: Uint8Array
@@ -131,7 +135,9 @@ const useAccountNonceQueryKey = 'accountNonce'
 
 export function useAccountNonce({
   sender,
-}: { sender: Address | undefined }): UseQueryReturnType<bigint, Error> {
+}: {
+  sender: Address | undefined
+}): UseQueryReturnType<bigint, Error> {
   return useWagmiQuery({
     queryKey: [useAccountNonceQueryKey, sender],
     queryFn: async () => {
