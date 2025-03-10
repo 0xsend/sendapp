@@ -11,9 +11,11 @@ import { squish } from 'app/utils/strings'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import { EventArraySchema, Events, type Activity } from 'app/utils/zod/activity'
+import { useRef } from 'react'
 import type { ZodError } from 'zod'
 
 const PENDING_TRANSFERS_INTERVAL = 1_000
+const MAX_REFETCHES = 10 // 10 seconds
 
 /**
  * Infinite query to fetch ERC-20 token activity feed.
@@ -30,6 +32,7 @@ export function useTokenActivityFeed(params: {
 }): UseInfiniteQueryResult<InfiniteData<Activity[]>, PostgrestError | ZodError> {
   const { pageSize = 10, address, refetchInterval = 30_000, enabled = true } = params
   const supabase = useSupabase()
+  const refetchCount = useRef(0)
   async function fetchTokenActivityFeed({ pageParam }: { pageParam: number }): Promise<Activity[]> {
     const from = pageParam * pageSize
     const to = (pageParam + 1) * pageSize - 1
@@ -97,7 +100,18 @@ export function useTokenActivityFeed(params: {
           a.event_name === Events.TemporalSendAccountTransfers &&
           !['cancelled', 'failed'].includes(a.data.status)
       )
-      return hasPendingTransfer ? PENDING_TRANSFERS_INTERVAL : refetchInterval
+
+      if (hasPendingTransfer) {
+        if (refetchCount.current >= MAX_REFETCHES) {
+          return refetchInterval // Return to normal interval after max refetches
+        }
+        refetchCount.current += 1
+        return PENDING_TRANSFERS_INTERVAL
+      }
+
+      // Reset refetch count when there are no pending transfers
+      refetchCount.current = 0
+      return refetchInterval
     },
     enabled,
   })
