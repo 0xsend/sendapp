@@ -6,14 +6,14 @@ import {
   type InfiniteData,
   type UseInfiniteQueryResult,
 } from '@tanstack/react-query'
-import { hexToBytea } from 'app/utils/hexToBytea'
 import { pgAddrCondValues } from 'app/utils/pgAddrCondValues'
-import { useSendAccount } from 'app/utils/send-accounts'
 import { squish } from 'app/utils/strings'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import { EventArraySchema, Events, type Activity } from 'app/utils/zod/activity'
 import type { ZodError } from 'zod'
+
+const PENDING_TRANSFERS_INTERVAL = 1_000
 
 /**
  * Infinite query to fetch ERC-20 token activity feed.
@@ -46,7 +46,6 @@ export function useTokenActivityFeed(params: {
         `event_name.eq.${Events.SendAccountReceive},event_name.eq.${Events.TemporalSendAccountTransfers}`
       )
     }
-    9
 
     const paymasterAddresses = Object.values(tokenPaymasterAddress)
     const sendTokenV0LockboxAddresses = Object.values(sendTokenV0LockboxAddress)
@@ -89,7 +88,17 @@ export function useTokenActivityFeed(params: {
       return firstPageParam - 1
     },
     queryFn: fetchTokenActivityFeed,
-    refetchInterval,
+    refetchInterval: ({ state: { data } }) => {
+      const { pages } = data ?? {}
+      if (!pages || !pages[0]) return refetchInterval
+      const activities = pages.flat()
+      const hasPendingTransfer = activities.some(
+        (a) =>
+          a.event_name === Events.TemporalSendAccountTransfers &&
+          !['cancelled', 'failed'].includes(a.data.status)
+      )
+      return hasPendingTransfer ? PENDING_TRANSFERS_INTERVAL : refetchInterval
+    },
     enabled,
   })
 }

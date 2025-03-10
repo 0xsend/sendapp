@@ -4,7 +4,7 @@ import { hexToBytea } from 'app/utils/hexToBytea'
 import { useEffect, useState } from 'react'
 import { useTokenActivityFeed } from './utils/useTokenActivityFeed'
 import { TokenActivityRow } from './TokenActivityRow'
-import { Events, type Activity } from 'app/utils/zod/activity'
+import type { Activity } from 'app/utils/zod/activity'
 import { ActivityDetails } from '../activity/ActivityDetails'
 import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
 import type { ZodError } from 'zod'
@@ -16,7 +16,6 @@ import { useScrollDirection } from 'app/provider/scroll'
 
 export const TokenActivity = ({ coin }: { coin: CoinWithBalance }) => {
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
-  const [refetchInterval, setRefetchInterval] = useState(30_000)
 
   const handleActivityPress = (activity: Activity) => {
     setSelectedActivity(activity)
@@ -27,24 +26,11 @@ export const TokenActivity = ({ coin }: { coin: CoinWithBalance }) => {
   const tokenActivityFeedQuery = useTokenActivityFeed({
     pageSize: 10,
     address: coin.token === 'eth' ? undefined : hexToBytea(coin.token),
-    refetchInterval,
   })
 
   const { data, isLoading, error } = tokenActivityFeedQuery
 
   const { pages } = data ?? {}
-
-  useEffect(() => {
-    if (!pages || !pages[0]) return
-
-    pages[0].find(
-      (a) =>
-        a.event_name === Events.TemporalSendAccountTransfers &&
-        !['cancelled', 'failed'].includes(a.data.status)
-    )
-      ? setRefetchInterval(1000)
-      : setRefetchInterval(30_000)
-  }, [pages])
 
   if (isLoading) return <Spinner size="small" />
   return (
