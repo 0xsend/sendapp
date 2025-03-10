@@ -1,4 +1,4 @@
-import { SwapForm } from 'app/features/swap/SwapForm'
+import { SwapSummary } from 'app/features/swap/SwapSummary'
 import { HomeLayout } from 'app/features/home/layout.web'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
@@ -9,9 +9,9 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Swap Form</title>
+        <title>Send | Swap Summary</title>
       </Head>
-      <SwapForm />
+      <SwapSummary />
     </>
   )
 }
@@ -19,7 +19,9 @@ export const Page: NextPageWithLayout = () => {
 export const getServerSideProps = userProtectedGetSSP()
 
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Swap" backFunction="home" />}>{children}</HomeLayout>
+  <HomeLayout TopNav={<TopNav header="Swap Summary" backFunction="router" />}>
+    {children}
+  </HomeLayout>
 )
 
 export default Page

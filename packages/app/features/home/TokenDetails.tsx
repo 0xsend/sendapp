@@ -11,7 +11,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import type { CoinWithBalance } from 'app/data/coins'
+import type { CoinWithBalance, sendCoin, usdcCoin } from 'app/data/coins'
 import { ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
 import { IconError, IconPlus, IconSwap } from 'app/components/icons'
 import { useTokenMarketData } from 'app/utils/coin-gecko'
@@ -21,6 +21,7 @@ import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { convertBalanceToFiat } from 'app/utils/convertBalanceToUSD'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
+import { useHoverStyles } from 'app/utils/useHoverStyles'
 
 export function AnimateEnter({ children }: { children: React.ReactNode }) {
   return (
@@ -41,6 +42,16 @@ export function AnimateEnter({ children }: { children: React.ReactNode }) {
 
 export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
   const { coin: selectedCoin } = useCoinFromTokenParam()
+  const hoverStyles = useHoverStyles()
+
+  const getSwapUrl = () => {
+    if (selectedCoin?.symbol === sendCoin.symbol) {
+      return `/swap?inToken=${selectedCoin?.token}&outToken=${usdcCoin.token}`
+    }
+
+    return `/swap?inToken=${selectedCoin?.token}`
+  }
+
   return (
     <YStack f={1} gap="$5" $gtLg={{ w: '45%', pb: '$0' }} pb="$5">
       <YStack gap="$5">
@@ -71,27 +82,37 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
             </YStack>
           </YStack>
         </Card>
-        <XStack w={'100%'} gap={25}>
-          <LinkableButton href="/deposit" f={1} p="$7" mih={88} w="30%">
-            <YStack gap="$2" jc={'space-between'} ai="center">
-              <Theme name="green">
-                <IconPlus
-                  size={'$1.5'}
-                  $theme-dark={{ color: '$color4' }}
-                  $theme-light={{ color: '$color12' }}
-                />
-              </Theme>
+        <XStack w={'100%'} gap={'$5'}>
+          <LinkableButton
+            href="/deposit"
+            f={1}
+            height={'auto'}
+            hoverStyle={hoverStyles}
+            focusStyle={hoverStyles}
+          >
+            <YStack gap="$2" jc={'space-between'} ai="center" p="$4">
+              <IconPlus
+                size={'$1.5'}
+                $theme-dark={{ color: '$primary' }}
+                $theme-light={{ color: '$color12' }}
+              />
               <Button.Text fontSize={'$4'} px="$2">
                 Deposit
               </Button.Text>
             </YStack>
           </LinkableButton>
-          <LinkableButton href={`/swap?token=${selectedCoin?.token}`} f={1} p="$7" mih={88} w="30%">
-            <YStack gap="$2" jc={'space-between'} ai="center">
+          <LinkableButton
+            href={getSwapUrl()}
+            f={1}
+            height={'auto'}
+            hoverStyle={hoverStyles}
+            focusStyle={hoverStyles}
+          >
+            <YStack gap="$2" jc={'space-between'} ai="center" p="$4" height={'auto'}>
               <Theme name="green">
                 <IconSwap
                   size={'$1'}
-                  $theme-dark={{ color: '$color4' }}
+                  $theme-dark={{ color: '$primary' }}
                   $theme-light={{ color: '$color12' }}
                 />
               </Theme>
