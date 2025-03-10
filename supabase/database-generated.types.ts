@@ -1619,6 +1619,19 @@ export type Database = {
         }
         Relationships: []
       }
+      send_earn_activity: {
+        Row: {
+          assets: number | null
+          block_num: number | null
+          block_time: number | null
+          log_addr: string | null
+          owner: string | null
+          shares: number | null
+          tx_hash: string | null
+          type: string | null
+        }
+        Relationships: []
+      }
       send_earn_balances: {
         Row: {
           assets: number | null

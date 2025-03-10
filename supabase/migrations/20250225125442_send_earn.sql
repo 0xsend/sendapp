@@ -278,3 +278,28 @@ from txs t
 group by t.log_addr, t.owner
 );
 
+create or replace view send_earn_activity with (security_invoker = ON, security_barrier = ON) as
+(
+  select
+    'deposit' as type,
+    d.block_num,
+    d.block_time,
+    d.log_addr,
+    d.owner,
+    d.assets,
+    d.shares,
+    d.tx_hash
+  from send_earn_deposits d
+  union all
+  select
+    'withdraw' as type,
+    w.block_num,
+    w.block_time,
+    w.log_addr,
+    w.owner,
+    w.assets,
+    w.shares,
+    w.tx_hash
+  from send_earn_withdraws w
+  order by block_time desc
+);

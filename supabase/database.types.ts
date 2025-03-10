@@ -142,6 +142,13 @@ export type Database = MergeDeep<
             owner: PgBytea
           }
         }
+        send_earn_activity: {
+          Row: {
+            log_addr: PgBytea
+            owner: PgBytea
+            tx_hash: PgBytea
+          }
+        }
       }
     }
   }
