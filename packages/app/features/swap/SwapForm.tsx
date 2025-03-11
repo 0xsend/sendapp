@@ -28,17 +28,6 @@ import { useThemeSetting } from '@tamagui/next-theme'
 import { useQueryClient } from '@tanstack/react-query'
 import { DEFAULT_SLIPPAGE, SWAP_ROUTE_SUMMARY_QUERY_KEY } from 'app/features/swap/constants'
 
-// todo mobile
-// todo white
-
-// TODO bug z pojawiającym sie tekstem po usunieciu
-
-// TODO komponent wyboru tokena potrzebuje zmian,
-//  1. nie widac na nim nie posiadanych tokenów co jest złe dla docelowego,
-//  2. nie powinno być można tych samych ustawić,
-//  3. jego wyglad sie zmienił,
-//  4. czasem moneta sie zle pokazuje
-
 const SwapFormSchema = z.object({
   outToken: formFields.coin,
   inToken: formFields.coin,
@@ -157,9 +146,8 @@ export const SwapForm = () => {
     }
   }, [form.watch, onFormChange])
 
-  // TODO
   useEffect(() => {
-    if (!swapRoute) {
+    if (!swapRoute || !formInAmount) {
       return
     }
 
@@ -167,7 +155,7 @@ export const SwapForm = () => {
       'outAmount',
       localizeAmount(formatUnits(BigInt(swapRoute.routeSummary.amountOut), outCoin?.decimals || 0))
     )
-  }, [swapRoute, outCoin?.decimals, form.setValue])
+  }, [swapRoute, outCoin?.decimals, form.setValue, formInAmount])
 
   useEffect(() => {
     queryClient.removeQueries({ queryKey: [SWAP_ROUTE_SUMMARY_QUERY_KEY] })
@@ -192,12 +180,12 @@ export const SwapForm = () => {
             inAmount: {
               fontSize: (() => {
                 switch (true) {
-                  case formInAmount?.length <= 8:
-                    return '$11'
                   case formInAmount?.length > 16:
                     return '$7'
-                  default:
+                  case formInAmount?.length > 8:
                     return '$8'
+                  default:
+                    return '$9'
                 }
               })(),
               $gtSm: {
@@ -240,18 +228,18 @@ export const SwapForm = () => {
               onFocus: () => setIsInputFocused(true),
               onBlur: () => setIsInputFocused(false),
               fieldsetProps: {
-                width: '65%',
+                width: '60%',
               },
             },
             outAmount: {
               fontSize: (() => {
                 switch (true) {
-                  case formOutAmount?.length <= 8:
-                    return '$11'
                   case formOutAmount?.length > 16:
                     return '$7'
-                  default:
+                  case formOutAmount?.length > 8:
                     return '$8'
+                  default:
+                    return '$9'
                 }
               })(),
               $gtSm: {
@@ -283,18 +271,42 @@ export const SwapForm = () => {
                 placeholderTextColor: '$darkGrayTextField',
               },
               fieldsetProps: {
-                width: '65%',
+                width: '60%',
               },
               pointerEvents: 'none',
+              textOverflow: 'ellipsis',
+            },
+            inToken: {
+              defaultValue: inToken,
+              showAllCoins: true,
+              onValueChange: (value) => {
+                if (value === outToken) {
+                  handleFlipTokens()
+                  return
+                }
+
+                form.setValue('inToken', value)
+              },
+            },
+            outToken: {
+              defaultValue: outToken,
+              showAllCoins: true,
+              onValueChange: (value) => {
+                if (value === inToken) {
+                  handleFlipTokens()
+                  return
+                }
+
+                form.setValue('outToken', value)
+              },
             },
           }}
           formProps={{
             footerProps: { pb: 0 },
-            justifyContent: 'space-between',
             $gtSm: {
               maxWidth: '100%',
-              justifyContent: 'space-between',
             },
+            style: { justifyContent: 'space-between' },
           }}
           defaultValues={{
             inToken: inCoin?.token,
@@ -346,7 +358,7 @@ export const SwapForm = () => {
                           You Pay
                         </Paragraph>
                       </XStack>
-                      <XStack ai={'center'} position="relative" jc={'space-between'}>
+                      <XStack gap={'$2'} ai={'center'} position="relative" jc={'space-between'}>
                         {inAmount}
                         {inToken}
                         <XStack
@@ -405,16 +417,11 @@ export const SwapForm = () => {
                             <Button
                               chromeless
                               backgroundColor={'transparent'}
-                              hoverStyle={{
-                                backgroundColor: 'transparent',
-                              }}
-                              pressStyle={{
-                                backgroundColor: 'transparent',
-                              }}
-                              focusStyle={{
-                                backgroundColor: 'transparent',
-                              }}
+                              hoverStyle={{ backgroundColor: 'transparent' }}
+                              pressStyle={{ backgroundColor: 'transparent' }}
+                              focusStyle={{ backgroundColor: 'transparent' }}
                               p={0}
+                              bw={0}
                               height={'auto'}
                               onPress={() => {
                                 form.setValue(
@@ -463,7 +470,7 @@ export const SwapForm = () => {
                           You Receive
                         </Paragraph>
                       </XStack>
-                      <XStack ai={'center'} position="relative" jc={'space-between'}>
+                      <XStack gap={'$2'} ai={'center'} position="relative" jc={'space-between'}>
                         {outAmount}
                         {outToken}
                         <XStack
@@ -639,24 +646,22 @@ export const Slippage = ({
         </XStack>
       </XStack>
       {isOpen && (
-        <XStack ai={'center'} jc={'space-between'}>
-          <XStack gap={'$2'}>
-            {SLIPPAGE_OPTIONS.map((slippageOption) => (
-              <Button
-                key={`slippage-${slippageOption}`}
-                onPress={() => handleOnPress(slippageOption)}
-                hoverStyle={hoverStyles}
-                bw={0}
-                p={'$2'}
-                w={'$6'}
-                br={'$4'}
-                bc={slippageOption === slippage ? hoverStyles.background : '$color1'}
-              >
-                <Button.Text>{slippageOption / 100}%</Button.Text>
-              </Button>
-            ))}
-          </XStack>
-          <XStack pos={'relative'}>
+        <XStack gap={'$2'} columnGap={'$2'} flexWrap={'wrap'} flex={1}>
+          {SLIPPAGE_OPTIONS.map((slippageOption) => (
+            <Button
+              key={`slippage-${slippageOption}`}
+              onPress={() => handleOnPress(slippageOption)}
+              hoverStyle={hoverStyles}
+              bw={0}
+              p={'$2'}
+              width={'$6'}
+              br={'$4'}
+              bc={slippageOption === slippage ? hoverStyles.background : '$color1'}
+            >
+              <Button.Text>{slippageOption / 100}%</Button.Text>
+            </Button>
+          ))}
+          <XStack pos={'relative'} $gtSm={{ marginLeft: 'auto' }}>
             <Input
               inputMode={'decimal'}
               bw={0}

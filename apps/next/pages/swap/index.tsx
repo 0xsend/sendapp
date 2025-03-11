@@ -19,7 +19,7 @@ export const Page: NextPageWithLayout = () => {
 export const getServerSideProps = userProtectedGetSSP()
 
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Swap" backFunction="home" />}>{children}</HomeLayout>
+  <HomeLayout TopNav={<TopNav header="Swap" backFunction="router" />}>{children}</HomeLayout>
 )
 
 export default Page
