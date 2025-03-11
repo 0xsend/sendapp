@@ -1,5 +1,5 @@
 import { Button, FadeCard, Paragraph, Spinner, XStack, YStack } from '@my/ui'
-import { ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
+import { ArrowDown } from '@tamagui/lucide-icons'
 import type { KyberRouteSummary } from '@my/api/routers/swap/types'
 import formatAmount, { localizeAmount } from 'app/utils/formatAmount'
 import { formatUnits } from 'viem'
@@ -15,11 +15,6 @@ import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { useRouter } from 'solito/router'
 import { useQueryClient } from '@tanstack/react-query'
 import { DEFAULT_SLIPPAGE, SWAP_ROUTE_SUMMARY_QUERY_KEY } from 'app/features/swap/constants'
-
-// TODO edit
-// todo jakis kurwa problem z senderem
-// todo mobile
-// todo white
 
 export const SwapSummary = () => {
   const router = useRouter()
@@ -48,8 +43,11 @@ export const SwapSummary = () => {
       swapCallData: encodedRoute?.data,
     })
 
-  const { mutateAsync: sendUserOpMutateAsync, isPending: isSendUserOpPending } =
-    useSendUserOpMutation()
+  const {
+    mutateAsync: sendUserOpMutateAsync,
+    isPending: isSendUserOpPending,
+    error: sendUserOpError,
+  } = useSendUserOpMutation()
 
   const webauthnCreds =
     sendAccount?.send_account_credentials
@@ -105,18 +103,26 @@ export const SwapSummary = () => {
   }, [sendAccount, routeSummary, encodeRouteMutateAsync, slippage, sendAccount?.address])
 
   const submit = async () => {
-    await sendUserOpMutateAsync({
-      userOp: {
-        ...userOp,
-        callGasLimit: 3000000n, // TODO
-        preVerificationGas: 100000n, // TODO
-      },
-      webauthnCreds,
-    })
+    if (!userOp) {
+      return
+    }
 
-    await tokensQuery.refetch()
-    await ethQuery.refetch()
-    router.push(`/?token=${outCoin?.token}`)
+    try {
+      await sendUserOpMutateAsync({
+        userOp: {
+          ...userOp,
+          callGasLimit: 3000000n, // TODO
+          preVerificationGas: 100000n, // TODO
+        },
+        webauthnCreds,
+      })
+
+      await tokensQuery.refetch()
+      await ethQuery.refetch()
+      router.push(`/?token=${outCoin?.token}`)
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   useEffect(() => {
@@ -145,53 +151,64 @@ export const SwapSummary = () => {
     >
       <YStack gap="$3.5">
         <YStack gap="$5">
-          <Paragraph size={'$7'}>Swap Summary</Paragraph>
           <YStack gap={'$5'} position={'relative'}>
             <FadeCard>
-              <XStack ai="center" gap="$2">
-                <ArrowUp
-                  size={'$1'}
-                  color={'$lightGrayTextField'}
-                  $theme-light={{ color: '$darkGrayTextField' }}
-                />
-                <Paragraph
-                  fontSize={'$4'}
-                  color={'$lightGrayTextField'}
-                  $theme-light={{ color: '$darkGrayTextField' }}
-                >
-                  You Pay
-                </Paragraph>
-              </XStack>
               <XStack ai={'center'} jc={'space-between'}>
-                <Paragraph size={'$9'}>{amountIn}</Paragraph>
                 <XStack gap={'$2'} ai={'center'}>
                   <IconCoin symbol={inCoin?.symbol || ''} />
                   <Paragraph size={'$5'}>{inCoin?.symbol}</Paragraph>
                 </XStack>
+                <EditButton />
               </XStack>
+              <Paragraph
+                width={'100%'}
+                ff={'$mono'}
+                whiteSpace={'nowrap'}
+                overflow={'hidden'}
+                textOverflow={'ellipsis'}
+                size={(() => {
+                  switch (true) {
+                    case amountIn?.length > 16:
+                      return '$7'
+                    case amountIn?.length > 8:
+                      return '$8'
+                    default:
+                      return '$9'
+                  }
+                })()}
+                $gtSm={{ size: '$9' }}
+              >
+                {amountIn}
+              </Paragraph>
             </FadeCard>
             <FadeCard>
-              <XStack ai="center" gap="$2">
-                <ArrowDown
-                  size={'$1'}
-                  color={'$lightGrayTextField'}
-                  $theme-light={{ color: '$darkGrayTextField' }}
-                />
-                <Paragraph
-                  fontSize={'$4'}
-                  color={'$lightGrayTextField'}
-                  $theme-light={{ color: '$darkGrayTextField' }}
-                >
-                  You Receive
-                </Paragraph>
-              </XStack>
               <XStack ai={'center'} jc={'space-between'}>
-                <Paragraph size={'$9'}>{amountOut}</Paragraph>
                 <XStack gap={'$2'} ai={'center'}>
                   <IconCoin symbol={outCoin?.symbol || ''} />
                   <Paragraph size={'$5'}>{outCoin?.symbol}</Paragraph>
                 </XStack>
+                <EditButton />
               </XStack>
+              <Paragraph
+                width={'100%'}
+                ff={'$mono'}
+                whiteSpace={'nowrap'}
+                overflow={'hidden'}
+                textOverflow={'ellipsis'}
+                size={(() => {
+                  switch (true) {
+                    case amountOut?.length > 16:
+                      return '$7'
+                    case amountOut?.length > 8:
+                      return '$8'
+                    default:
+                      return '$9'
+                  }
+                })()}
+                $gtSm={{ size: '$9' }}
+              >
+                {amountOut}
+              </Paragraph>
             </FadeCard>
             <YStack
               bc={'$color0'}
@@ -232,6 +249,8 @@ export const SwapSummary = () => {
                 return userOpError?.message?.split('.').at(0)
               case !!usdcFeesError:
                 return usdcFeesError?.message?.split('.').at(0)
+              case !!sendUserOpError:
+                return sendUserOpError?.message?.split('.').at(0)
               default:
                 return ''
             }
@@ -268,5 +287,32 @@ export const Row = ({ label, value }: { label: string; value: string }) => {
         <Paragraph size={'$5'}>{value}</Paragraph>
       </XStack>
     </XStack>
+  )
+}
+
+export const EditButton = () => {
+  const router = useRouter()
+
+  const handlePress = () => {
+    router.back()
+  }
+
+  return (
+    <Button
+      transparent
+      chromeless
+      backgroundColor="transparent"
+      hoverStyle={{ backgroundColor: 'transparent' }}
+      pressStyle={{ backgroundColor: 'transparent' }}
+      focusStyle={{ backgroundColor: 'transparent' }}
+      p={0}
+      bw={0}
+      height={'auto'}
+      onPress={handlePress}
+    >
+      <Button.Text size={'$5'} hoverStyle={{ color: '$primary' }}>
+        edit
+      </Button.Text>
+    </Button>
   )
 }
