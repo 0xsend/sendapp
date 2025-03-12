@@ -14,15 +14,6 @@ test('logged in user needs onboarding before visiting profile', async ({ page, s
   const account = plan.send_accounts[0]
   assert(!!tag, 'tag not found')
 
-  // Set up the send_account_tag and activate account
-  await pg.query(
-    `
-    INSERT INTO send_account_tags (tag_id, send_account_id)
-    VALUES ($1, $2)
-  `,
-    [tag.id, account.id]
-  )
-
   const profile = plan.profiles[0]
   assert(!!profile, 'profile not found')
   assert(!!profile.name, 'profile name not found')

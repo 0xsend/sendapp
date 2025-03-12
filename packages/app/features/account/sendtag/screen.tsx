@@ -11,20 +11,18 @@ import {
   YStack,
   XStack,
   AlertDialog,
-  useToastController,
   Text,
-  Fade,
-  LinkableButton,
-  YGroup,
+  useToastController,
 } from '@my/ui'
-import { Trash2, Plus } from '@tamagui/lucide-icons'
-import { IconPlus, IconSlash } from 'app/components/icons'
+
+import { Trash2 } from '@tamagui/lucide-icons'
+import { IconPlus } from 'app/components/icons'
 import { maxNumSendTags } from 'app/data/sendtags'
 import { useUser } from 'app/utils/useUser'
 import { useRouter } from 'solito/router'
 import { useQueryClient } from '@tanstack/react-query'
 import { useSendAccount } from 'app/utils/send-accounts'
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import { api } from 'app/utils/api'
 
 type SendAccount = Database['public']['Tables']['send_accounts']['Row']
@@ -67,7 +65,7 @@ export function SendTagScreen() {
 
   if (isLoading)
     return (
-      <Stack w="100%" h="100%" jc={'center'} ai={'center'}>
+      <Stack width="100%" height="100%" justifyContent="center" alignItems="center">
         <Spinner color="$primary" size="large" />
       </Stack>
     )
@@ -441,7 +439,7 @@ function AddNewTagButton({ tags }: { tags?: Tables<'tags'>[] }) {
 
   return (
     <Button
-      onPress={() => push('/account/sendtag/checkout')}
+      onPress={() => push('/account/sendtag/add')}
       w={200}
       h={54}
       br={12}

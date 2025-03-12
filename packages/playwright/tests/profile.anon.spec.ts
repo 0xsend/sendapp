@@ -12,15 +12,6 @@ test('anon user can visit public profile', async ({ page, seed, pg }) => {
   const account = plan.send_accounts[0]
   assert(!!tag, 'tag not found')
 
-  // Manually create the send_account_tag
-  await pg.query(
-    `
-    INSERT INTO send_account_tags (tag_id, send_account_id)
-    VALUES ($1, $2)
-  `,
-    [tag.id, account.id]
-  )
-
   const profile = plan.profiles[0]
   assert(!!profile, 'profile not found')
   assert(!!profile.name, 'profile name not found')
@@ -44,25 +35,6 @@ test('anon user cannot visit private profile', async ({ page, seed, pg }) => {
   const tag = plan.tags[0]
   const account = plan.send_accounts[0]
   assert(!!tag, 'tag not found')
-
-  // Manually create the send_account_tag
-  await pg.query(
-    `
-    INSERT INTO send_account_tags (tag_id, send_account_id)
-    VALUES ($1, $2)
-  `,
-    [tag.id, account.id]
-  )
-
-  // Also ensure send_account is active
-  await pg.query(
-    `
-    UPDATE send_accounts 
-    SET deleted_at = NULL, init_code = 'a'
-    WHERE id = $1
-  `,
-    [account.id]
-  )
 
   await visitProfile({ page, tag: tag.name })
   const title = await page.title()

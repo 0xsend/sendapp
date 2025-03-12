@@ -12,10 +12,30 @@ export const CheckoutScreen = () => {
   const pendingTags = usePendingTags() ?? []
 
   useEffect(() => {
-    if (confirmedTags?.length === 5 || (!isLoadingTags && pendingTags.length === 0)) {
+    console.log('Checkout Screen State:', {
+      isLoadingTags,
+      confirmedTagsLength: confirmedTags?.length,
+      pendingTagsLength: pendingTags.length,
+      pathname: window.location.pathname,
+    })
+
+    // Only redirect if:
+    // 1. We have max confirmed tags OR
+    // 2. We have pending tags but the form was submitted (handled by checkout form)
+    if (confirmedTags?.length === 5) {
+      console.log('Redirecting back - max tags reached')
       router.replace('/account/sendtag')
     }
   }, [confirmedTags, router, pendingTags, isLoadingTags])
+
+  // Show loading state while checking tags
+  if (isLoadingTags) {
+    return (
+      <YStack width={'100%'} gap="$5" pb={'$3.5'} $gtLg={{ width: '50%' }}>
+        <div>Loading tags...</div>
+      </YStack>
+    )
+  }
 
   return (
     <YStack

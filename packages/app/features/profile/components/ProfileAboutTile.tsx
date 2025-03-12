@@ -67,20 +67,17 @@ export const ProfileAboutTile = ({
                 gap={'$3'}
               >
                 <Paragraph size={'$9'} $theme-light={{ color: '$white' }}>
-                  {otherUserProfile?.name ||
-                    (otherUserProfile?.main_tag_name
-                      ? `/${otherUserProfile?.main_tag_name}`
-                      : '??')}
+                  {profile?.name || (profile?.main_tag_name ? `/${profile?.main_tag_name}` : '??')}
                 </Paragraph>
                 <XStack flexWrap="wrap" columnGap={'$2.5'} rowGap={'$2'}>
-                  {otherUserProfile?.all_tags?.map((tag: string) => (
+                  {profile?.all_tags?.map((tag: string) => (
                     <XStack
                       key={tag}
                       bg={'$gray3Dark'}
                       px={'$2.5'}
                       py={'$1'}
                       borderRadius={'$2'}
-                      {...(tag === otherUserProfile?.main_tag_name && {
+                      {...(tag === profile?.main_tag_name && {
                         borderWidth: 1,
                         borderColor: '$primary',
                       })}

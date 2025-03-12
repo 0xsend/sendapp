@@ -38,6 +38,7 @@ import {
   useSendtagCheckout,
   useSendtagCheckoutReceipts,
 } from '../checkout-utils'
+import { useRouter } from 'solito/router'
 
 export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
   const { updateProfile } = useUser()
@@ -183,6 +184,19 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
     amountDue: amountDue.toString(),
   })
 
+  useEffect(() => {
+    console.log('Confirm Button State:', {
+      sender,
+      pendingTagsLength: pendingTags?.length,
+      amountDue: amountDue.toString(),
+      hasWebauthnCreds: !!webauthnCreds.length,
+      balance: balance?.value.toString(),
+      error,
+      submitting,
+      canAffordTags,
+    })
+  }, [sender, pendingTags, amountDue, webauthnCreds, balance, error, submitting, canAffordTags])
+
   async function handleCheckoutTx() {
     try {
       throwIf(userOpError)
@@ -247,31 +261,31 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
     details?: string
   })[]
 
+  const router = useRouter()
+
+  // Check for insufficient funds error
   if (possibleErrors.some((e) => e?.message)) {
-    for (const err of possibleErrors) {
-      if (err) console.error('encountered error', err.message, err)
-    }
-
-    const isInsufficientFunds = possibleErrors.some((e) => e?.message?.includes('Not enough USDC'))
-
-    return (
-      <ConfirmButtonStack>
-        <ConfirmButtonError
-          buttonText={isInsufficientFunds ? 'Deposit USDC' : 'Error'}
-          onPress={isInsufficientFunds ? undefined : undefined}
-          href={isInsufficientFunds ? '/deposit' : undefined}
-        >
-          <YStack gap="$2" ai="center">
-            <Paragraph $theme-dark={{ col: '$white' }} $theme-light={{ col: '$black' }}>
-              {possibleErrors
-                .map((e) => (e?.details ?? e?.message ?? '').split('.').at(0))
-                .filter(Boolean)
-                .join(', ')}
-            </Paragraph>
-          </YStack>
-        </ConfirmButtonError>
-      </ConfirmButtonStack>
+    const isInsufficientFunds = possibleErrors.some(
+      (e) => e?.message?.includes('Not enough USDC') || e?.message?.includes('insufficient funds')
     )
+
+    // Show error message for non-balance errors
+    if (!isInsufficientFunds) {
+      return (
+        <ConfirmButtonStack>
+          <ConfirmButtonError buttonText="Error">
+            <YStack gap="$2" ai="center">
+              <Paragraph $theme-dark={{ col: '$white' }} $theme-light={{ col: '$black' }}>
+                {possibleErrors
+                  .map((e) => (e?.details ?? e?.message ?? '').split('.').at(0))
+                  .filter(Boolean)
+                  .join(', ')}
+              </Paragraph>
+            </YStack>
+          </ConfirmButtonError>
+        </ConfirmButtonStack>
+      )
+    }
   }
 
   const canRetry = error && !(submitting || sendTransactionIsPending || txWaitLoading)
@@ -318,9 +332,6 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
       {balanceError && (
         <Paragraph color="$error">{balanceError?.message?.split('.').at(0)}</Paragraph>
       )}
-      {usdcFeesError && (
-        <Paragraph color="$error">{usdcFeesError?.message?.split('.').at(0)}</Paragraph>
-      )}
       {referralCode && (
         <>
           <Input
@@ -334,67 +345,74 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
           </YStack>
         </>
       )}
-      <Button
-        disabled={!canSubmit}
-        disabledStyle={{
-          pointerEvents: 'none',
-          opacity: 0.5,
-        }}
-        gap="$1.5"
-        onPress={handleCheckoutTx}
-        theme="green"
-        borderRadius={'$4'}
-        p={'$4'}
-      >
-        {(() => {
-          switch (true) {
-            case isLoadingUserOp || isLoadingBalance || isLoadingUSDCFees || isLoadingReceipts:
-              return (
-                <>
-                  <Spinner color="$color11" />
-                  <ConfirmButtonText>loading...</ConfirmButtonText>
-                </>
-              )
-            case !canAffordTags && (!txWaitLoading || !submitting):
-              return (
-                <LinkableButton
-                  theme="red"
-                  href="/deposit"
-                  px="$3.5"
-                  h="$4.5"
-                  borderRadius="$4"
-                  testID="checkout-deposit-button"
-                  gap="$1.5"
-                >
-                  <ButtonText>Deposit USDC</ButtonText>
-                </LinkableButton>
-              )
-            case sendTransactionIsPending:
-              return (
-                <>
-                  <Spinner color="$color11" />
-                  <ConfirmButtonText>requesting...</ConfirmButtonText>
-                </>
-              )
-            case txWaitLoading:
-              return (
-                <>
-                  <Spinner color="$color11" />
-                  <ConfirmButtonText>processing...</ConfirmButtonText>
-                </>
-              )
-            case submitting:
-              return (
-                <>
-                  <Spinner color="$color11" />
-                  <ConfirmButtonText>registering...</ConfirmButtonText>
-                </>
-              )
-            default:
-              return <ConfirmButtonText>complete purchase</ConfirmButtonText>
-          }
-        })()}
-      </Button>
+      {!canAffordTags ? (
+        <>
+          {/* Show error message above deposit button */}
+          <Paragraph color="$error" size="$3" textAlign="center">
+            Insufficient USDC balance for purchase
+          </Paragraph>
+          <Button
+            theme="red"
+            px="$3.5"
+            h="$4.5"
+            borderRadius="$4"
+            testID="checkout-deposit-button"
+            w="100%"
+            onPress={() => router.push('/deposit')}
+          >
+            <ButtonText color="$white">Deposit USDC</ButtonText>
+          </Button>
+        </>
+      ) : (
+        <Button
+          disabled={!canSubmit}
+          disabledStyle={{
+            pointerEvents: 'none',
+            opacity: 0.5,
+          }}
+          gap="$1.5"
+          onPress={handleCheckoutTx}
+          theme="green"
+          borderRadius={'$4'}
+          p={'$4'}
+          w="100%"
+        >
+          {(() => {
+            switch (true) {
+              case isLoadingUserOp || isLoadingBalance || isLoadingUSDCFees || isLoadingReceipts:
+                return (
+                  <>
+                    <Spinner color="$color11" />
+                    <ConfirmButtonText>loading...</ConfirmButtonText>
+                  </>
+                )
+              case sendTransactionIsPending:
+                return (
+                  <>
+                    <Spinner color="$color11" />
+                    <ConfirmButtonText>requesting...</ConfirmButtonText>
+                  </>
+                )
+              case txWaitLoading:
+                return (
+                  <>
+                    <Spinner color="$color11" />
+                    <ConfirmButtonText>processing...</ConfirmButtonText>
+                  </>
+                )
+              case submitting:
+                return (
+                  <>
+                    <Spinner color="$color11" />
+                    <ConfirmButtonText>registering...</ConfirmButtonText>
+                  </>
+                )
+              default:
+                return <ConfirmButtonText>complete purchase</ConfirmButtonText>
+            }
+          })()}
+        </Button>
+      )}
     </ConfirmButtonStack>
   )
 }

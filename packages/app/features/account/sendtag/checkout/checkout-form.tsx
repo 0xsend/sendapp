@@ -1,29 +1,24 @@
 import {
   Button,
-  ButtonText,
-  Fade,
-  FadeCard,
-  ButtonIcon,
   Input,
   Paragraph,
   Separator,
   Spinner,
-  useDebounce,
-  Stack,
-  Theme,
   XStack,
   YStack,
-  useMedia,
-  useToastController,
-  SubmitButton,
+  useDebounce,
+  Fade,
+  FadeCard,
+  ButtonText,
 } from '@my/ui'
-import { Check, X } from '@tamagui/lucide-icons'
+
+import { Check } from '@tamagui/lucide-icons'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconX } from 'app/components/icons'
 import { total } from 'app/data/sendtags'
 import { usePendingTags } from 'app/utils/tags'
 import { useUser } from 'app/utils/useUser'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
 import {
@@ -41,57 +36,111 @@ import { RowLabel } from 'app/components/layout/RowLabel'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { usdcCoin } from 'app/data/coins'
 import { useCoin } from 'app/provider/coins'
-import { useSendAccount } from 'app/utils/send-accounts'
-import { TRPCClientError } from '@trpc/client'
+import { CheckoutTagSchema } from './CheckoutTagSchema'
 
 export const CheckoutForm = () => {
   const user = useUser()
-  const pendingTags = usePendingTags()
-  const confirmedTags = useConfirmedTags()
-  const hasPendingTags = pendingTags && pendingTags.length > 0
-  const { data: sendAccount } = useSendAccount()
-  const form = useForm<z.infer<typeof CheckoutTagSchema>>()
-  const supabase = useSupabase()
-  const toast = useToastController()
-  const has5Tags = user?.tags?.length === 5
-  const media = useMedia()
   const router = useRouter()
-  const { data: referred, isLoading: isLoadingReferred } = api.referrals.getReferred.useQuery()
+  const pendingTags = usePendingTags()
+  const [tagName, setTagName] = useState('')
+  const [error, setError] = useState<string>()
   const queryClient = useQueryClient()
+
   const createTag = api.tag.create.useMutation({
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user'] })
+    onSuccess: async () => {
+      // Clear the input after successful creation
+      setTagName('')
+      setError(undefined)
+
+      // Invalidate and refetch relevant queries
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['user'] }),
+        queryClient.invalidateQueries({ queryKey: ['tags'] }),
+        user?.updateProfile(),
+      ])
+
+      console.log('Tag created successfully, queries invalidated')
+    },
+    onError: (err) => {
+      console.error('Error creating tag:', err)
+      setError(err.message)
     },
   })
 
-  async function createSendTag({ name }: z.infer<typeof CheckoutTagSchema>) {
-    if (!user.user) return console.error('No user')
+  // Add some debug logs
+  useEffect(() => {
+    console.log('Form State:', {
+      tagName,
+      error,
+      pendingTags,
+      isCreatingTag: createTag.isPending,
+      createTagError: createTag.error,
+    })
+  }, [tagName, error, pendingTags, createTag.isPending, createTag.error])
 
+  const handleCreateTag = async () => {
     try {
-      await createTag.mutateAsync({ name })
-      form.reset()
-      user?.updateProfile()
-    } catch (error) {
-      if (error instanceof TRPCClientError) {
-        form.setError('name', {
-          type: 'custom',
-          message: error.message,
-        })
-      } else {
-        console.error("Couldn't create Sendtag", error)
-        form.setError('name', {
-          type: 'custom',
-          message: 'Something went wrong',
-        })
+      console.log('Creating tag:', tagName)
+      const result = CheckoutTagSchema.safeParse({ name: tagName })
+      if (!result.success) {
+        setError(result.error.errors[0]?.message || 'Invalid tag name')
+        return
       }
+
+      await createTag.mutateAsync({ name: tagName })
+    } catch (err) {
+      console.error('Failed to create tag:', err)
+      setError(err.message)
     }
   }
 
   function onConfirmed() {
+    console.log('Checkout confirmed, updating profile')
     user?.updateProfile()
     router.replace('/account/sendtag')
   }
 
+  // If no pending tags, show the tag creation form
+  if (!pendingTags?.length) {
+    return (
+      <YStack gap="$4">
+        <RowLabel>Create New Tag</RowLabel>
+        <YStack gap="$2">
+          <Input
+            value={tagName}
+            onChangeText={(text) => {
+              setTagName(text)
+              setError(undefined)
+            }}
+            placeholder="Enter tag name"
+          />
+          {error && (
+            <Paragraph color="$error" size="$2">
+              {error}
+            </Paragraph>
+          )}
+        </YStack>
+        <XStack jc="flex-end">
+          <Button theme="active" onPress={handleCreateTag} disabled={createTag.isPending}>
+            {createTag.isPending ? (
+              <XStack gap="$2" ai="center">
+                <Spinner />
+                <ButtonText fontSize={'$4'} fontWeight={'500'}>
+                  Creating...
+                </ButtonText>
+              </XStack>
+            ) : (
+              <ButtonText fontSize={'$4'} fontWeight={'500'}>
+                Create Tag
+              </ButtonText>
+            )}
+          </Button>
+        </XStack>
+      </YStack>
+    )
+  }
+
+  // Show checkout UI when we have pending tags
   return (
     <>
       <YStack gap={'$3.5'}>
@@ -259,8 +308,6 @@ function TotalPrice() {
   const { usdcFees, usdcFeesError, isLoadingUSDCFees, isLoadingReferred, referredError } =
     useSendtagCheckout()
   const _total = useMemo(() => total(pendingTags ?? []), [pendingTags])
-  const { coin: usdc, isLoading: isCoinLoading } = useCoin('USDC')
-
   return (
     <FadeCard>
       <YStack gap={'$2'}>
@@ -273,7 +320,7 @@ function TotalPrice() {
         </Paragraph>
         <XStack jc={'space-between'} ai={'center'}>
           <Paragraph size={'$11'} fontWeight={'500'}>
-            {formatUnits(_total, usdcCoin.decimals)}
+            {formatAmount(formatUnits(_total, usdcCoin.decimals))}
           </Paragraph>
           <XStack ai={'center'} gap={'$2'}>
             <IconCoin symbol={'USDC'} size={'$2'} />
@@ -291,7 +338,9 @@ function TotalPrice() {
           >
             Price
           </Paragraph>
-          <Paragraph size={'$5'}>{formatUnits(_total, usdcCoin.decimals)} USDC</Paragraph>
+          <Paragraph size={'$5'}>
+            {formatAmount(formatUnits(_total, usdcCoin.decimals))} USDC
+          </Paragraph>
         </XStack>
         <XStack jc={'space-between'} ai={'center'} gap={'$3'}>
           <Paragraph
@@ -332,41 +381,6 @@ function TotalPrice() {
           })()}
         </XStack>
       </YStack>
-      <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
-      <XStack gap={'$2'} ai={'center'}>
-        <Paragraph
-          size={'$5'}
-          color={'$lightGrayTextField'}
-          $theme-light={{ color: '$darkGrayTextField' }}
-        >
-          Balance:
-        </Paragraph>
-        {(() => {
-          switch (true) {
-            case isCoinLoading:
-              return <Spinner color="$color11" />
-            case !isCoinLoading && !usdc:
-              return <Paragraph color="$error">Error fetching balance info</Paragraph>
-            case !usdc?.balance:
-              return (
-                <Paragraph size={'$5'} fontWeight={'500'}>
-                  -
-                </Paragraph>
-              )
-            default:
-              return (
-                <Paragraph size={'$5'} fontWeight={'500'}>
-                  {formatAmount(
-                    formatUnits(usdc.balance, usdcCoin.decimals),
-                    12,
-                    usdcCoin.formatDecimals
-                  )}{' '}
-                  USDC
-                </Paragraph>
-              )
-          }
-        })()}
-      </XStack>
     </FadeCard>
   )
 }
