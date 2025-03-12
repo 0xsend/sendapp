@@ -11,7 +11,7 @@ const {
   simulateTransferActivity,
   getBaseBlockNumberActivity,
   decodeTransferUserOpActivity,
-  insertTemporalSendAccountTransferActivity,
+  upsertTemporalSendAccountTransferActivity,
   sendUserOpActivity,
   updateTemporalTransferActivity,
   waitForTransactionReceiptActivity,
@@ -37,7 +37,7 @@ export async function TransferWorkflow(userOp: UserOperation<'v0.7'>) {
   log('Decoded transfer userOp', { workflowId, token, from, to, amount: amount.toString() })
 
   log('Inserting temporal transfer into temporal.send_account_transfers', workflowId)
-  const initialTransfer = await insertTemporalSendAccountTransferActivity(
+  const initialTransfer = await upsertTemporalSendAccountTransferActivity(
     workflowId,
     from,
     to,
