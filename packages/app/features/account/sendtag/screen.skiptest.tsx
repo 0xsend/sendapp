@@ -105,18 +105,20 @@ describe('SendTagScreen', () => {
       </Wrapper>
     )
 
-    // Use a single act to handle initial render and any immediate effects
     await act(async () => {
       jest.advanceTimersByTime(0)
     })
-    expect(screen.getByText(/Registered/)).toBeOnTheScreen()
+
+    expect(screen.getByText(/Registered/)).toBeTruthy()
+
     for (const tag of mockTags) {
       if (tag.status === 'pending') {
-        expect(screen.queryByText(tag.name)).not.toBeOnTheScreen()
+        expect(screen.queryByLabelText(`Tag ${tag.name}`)).toBeNull()
         return
       }
-      expect(screen.getByText(tag.name)).toBeOnTheScreen()
+      expect(screen.getByLabelText(`Tag ${tag.name}${tag.id === 1 ? ' (Main)' : ''}`)).toBeTruthy()
     }
-    expect(screen.getByRole('button', { name: 'Add Tag' })).toBeOnTheScreen()
+
+    expect(screen.getByRole('button', { name: 'Add Tag' })).toBeTruthy()
   })
 })
