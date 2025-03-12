@@ -92,7 +92,11 @@ export const SwapForm = () => {
   const handleSubmit = () => {
     if (!canSubmit || !swapRoute) return
 
+    queryClient.setQueryDefaults([SWAP_ROUTE_SUMMARY_QUERY_KEY], {
+      gcTime: 20 * 60_000, // 20 minutes
+    })
     queryClient.setQueryData([SWAP_ROUTE_SUMMARY_QUERY_KEY], swapRoute.routeSummary)
+
     router.push({ pathname: '/swap/summary', query: swapParams })
   }
 

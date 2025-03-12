@@ -33,6 +33,7 @@ export const SwapSummary = () => {
     data: encodedRoute,
     error: encodeRouteError,
     isPending: isEncodeRouteLoading,
+    status: encodeRouteStatus,
   } = api.swap.encodeSwapRoute.useMutation()
 
   const { userOp, userOpError, isLoadingUserOp, usdcFees, usdcFeesError, isLoadingUSDCFees } =
@@ -130,10 +131,10 @@ export const SwapSummary = () => {
       router.push({ pathname: '/swap', query: swapParams })
     }
 
-    if (!isEncodeRouteLoading && !encodedRoute) {
+    if (encodeRouteStatus === 'idle') {
       void encodeRoute()
     }
-  }, [routeSummary, swapParams, router.push, encodeRoute, isEncodeRouteLoading, encodedRoute])
+  }, [routeSummary, swapParams, router.push, encodeRoute, encodeRouteStatus])
 
   if (initLoading) {
     return <Spinner size="large" color="$olive" />
@@ -258,16 +259,58 @@ export const SwapSummary = () => {
         </Paragraph>
       </YStack>
       <Button
-        theme="green"
+        theme={!hasEnoughGas || !hasEnoughBalance ? 'red_alt1' : 'green'}
         onPress={submit}
         py={'$5'}
         br={'$4'}
         disabledStyle={{ opacity: 0.5 }}
         disabled={!canSubmit}
       >
-        <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
-          {isSendUserOpPending ? 'swapping...' : 'confirm swap'}
-        </Button.Text>
+        {(() => {
+          switch (true) {
+            case !hasEnoughBalance:
+              return (
+                <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'}>
+                  insufficient balance
+                </Button.Text>
+              )
+            case !hasEnoughGas:
+              return (
+                <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'}>
+                  insufficient gas
+                </Button.Text>
+              )
+            case isSendUserOpPending:
+              return (
+                <>
+                  <Button.Icon>
+                    <Spinner size="small" color="$color12" mr={'$2'} />
+                  </Button.Icon>
+                  <Button.Text
+                    ff={'$mono'}
+                    fontWeight={'500'}
+                    tt="uppercase"
+                    size={'$5'}
+                    color={'$black'}
+                  >
+                    swapping...
+                  </Button.Text>
+                </>
+              )
+            default:
+              return (
+                <Button.Text
+                  ff={'$mono'}
+                  fontWeight={'500'}
+                  tt="uppercase"
+                  size={'$5'}
+                  color={'$black'}
+                >
+                  confirm swap
+                </Button.Text>
+              )
+          }
+        })()}
       </Button>
     </YStack>
   )
