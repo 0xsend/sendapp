@@ -6,7 +6,7 @@ alter table referrals
 UPDATE referrals refs
 SET created_at = r.created_at
 FROM receipts r
-JOIN tag_receipts tr ON tr.event_id = r.event_id
+JOIN tag_receipts tr ON coalesce(tr.hash, tr.event_id) = r.event_id
 WHERE refs.referred_id = r.user_id
   AND refs.tag = tr.tag_name;
 
