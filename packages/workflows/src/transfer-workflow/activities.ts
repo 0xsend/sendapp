@@ -3,6 +3,7 @@ import {
   insertTemporalTokenSendAccountTransfer,
   insertTemporalEthSendAccountTransfer,
   updateTemporalSendAccountTransfer,
+  isRetryableDBError,
 } from './supabase'
 import {
   simulateUserOperation,
@@ -17,6 +18,9 @@ import { hexToBytea } from 'app/utils/hexToBytea'
 import type { Json, Database, PgBytea } from '@my/supabase/database.types'
 import superjson from 'superjson'
 import { byteaToHex } from 'app/utils/byteaToHex'
+import { allCoins } from 'app/data/coins'
+
+type TemporalTransfer = Database['temporal']['Tables']['send_account_transfers']['Row']
 
 type TransferActivities = {
   simulateTransferActivity: (userOp: UserOperation<'v0.7'>) => Promise<void>
@@ -34,7 +38,7 @@ type TransferActivities = {
     amount: bigint,
     token: PgBytea | null,
     blockNumber: bigint
-  ) => Promise<void>
+  ) => Promise<TemporalTransfer>
   sendUserOpActivity: (workflowId: string, userOp: UserOperation<'v0.7'>) => Promise<PgBytea>
   waitForTransactionReceiptActivity: (
     workflowId: string,
@@ -52,7 +56,7 @@ type TransferActivities = {
       type?: string | null
       details?: unknown[]
     }
-  }) => Promise<void>
+  }) => Promise<TemporalTransfer>
 }
 
 export const createTransferActivities = (
@@ -75,27 +79,47 @@ export const createTransferActivities = (
       }
     },
     async decodeTransferUserOpActivity(userOp) {
-      const { from, to, token, amount } = decodeTransferUserOp({ userOp })
-      if (!from || !to || !amount || !token) {
-        log.error('User Operation is not a valid transfer', { from, to, amount, token })
-        throw ApplicationFailure.nonRetryable('User Operation is not a valid transfer')
-      }
-      if (amount <= 0n) {
-        log.error('User Operation has amount <= 0', { amount })
-        throw ApplicationFailure.nonRetryable('User Operation has amount <= 0')
-      }
-      if (!userOp.signature) {
-        log.error('UserOp signature is required')
-        throw ApplicationFailure.nonRetryable('UserOp signature is required')
-      }
-
       try {
+        const { from, to, token, amount } = decodeTransferUserOp({ userOp })
+        if (!from || !to || !amount || !token) {
+          log.error('Failed to decode transfer user op', { from, to, amount, token })
+          throw ApplicationFailure.nonRetryable('User Operation is not a valid transfer')
+        }
+        if (!allCoins.find((c) => c.token === token)) {
+          log.error('Token ${token} is not a supported', { token })
+          throw ApplicationFailure.nonRetryable('Token ${token} is not a supported')
+        }
+        if (amount <= 0n) {
+          log.error('User Operation has amount <= 0', { amount })
+          throw ApplicationFailure.nonRetryable('User Operation has amount <= 0')
+        }
+        if (!userOp.signature) {
+          log.error('UserOp signature is required')
+          throw ApplicationFailure.nonRetryable('UserOp signature is required')
+        }
+
         const fromBytea = hexToBytea(from)
         const toBytea = hexToBytea(to)
         const tokenBytea = token === 'eth' ? null : hexToBytea(token)
         return { from: fromBytea, to: toBytea, amount, token: tokenBytea }
       } catch (error) {
-        throw ApplicationFailure.nonRetryable('Invalid hex address format')
+        // Handle viem decode errors
+        if (
+          error.name === 'AbiFunctionSignatureNotFoundError' ||
+          error.name === 'DecodeAbiParametersError' ||
+          error.name === 'FormatAbiItemError' ||
+          error.name === 'ToFunctionSelectorError' ||
+          error.name === 'SliceError'
+        ) {
+          log.error('Failed to decode function data', { error })
+          throw ApplicationFailure.nonRetryable('Invalid transfer function data', error.name, error)
+        }
+        // Handle hex conversion errors
+        if (error.message === 'Hex string must start with 0x') {
+          log.error('Invalid hex address format', { error })
+          throw ApplicationFailure.nonRetryable('Invalid hex address format')
+        }
+        throw error
       }
     },
     async insertTemporalSendAccountTransferActivity(
@@ -106,7 +130,7 @@ export const createTransferActivities = (
       token,
       blockNumber
     ) {
-      const { error } = token
+      const { data, error } = token
         ? await insertTemporalTokenSendAccountTransfer({
             workflow_id: workflowId,
             status: 'initialized',
@@ -126,21 +150,20 @@ export const createTransferActivities = (
           })
 
       if (error) {
-        if (error.code === '23505') {
-          throw ApplicationFailure.nonRetryable(
-            'Duplicate entry for temporal.send_account_transfers',
-            error.code
-          )
-        }
-        throw ApplicationFailure.retryable(
-          'Error inserting transfer into temporal.send_account_transfers',
-          error.code,
-          {
+        if (isRetryableDBError(error)) {
+          throw ApplicationFailure.retryable('Database connection error, retrying...', error.code, {
             error,
             workflowId,
-          }
-        )
+          })
+        }
+
+        throw ApplicationFailure.nonRetryable('Database error occurred', error.code, {
+          error,
+          workflowId,
+        })
       }
+
+      return data
     },
     async sendUserOpActivity(workflowId, userOp) {
       try {
@@ -191,28 +214,24 @@ export const createTransferActivities = (
       }
     },
     async updateTemporalTransferActivity({ workflowId, status, data, failureError }) {
-      const { error } = await updateTemporalSendAccountTransfer({
+      const { data: updatedData, error } = await updateTemporalSendAccountTransfer({
         workflow_id: workflowId,
         status,
         data,
       })
       if (error) {
-        throw ApplicationFailure.retryable(
-          `Error updating entry in temporal_send_account_transfers with ${status} status`,
-          error.code,
-          {
+        if (isRetryableDBError(error)) {
+          throw ApplicationFailure.retryable('Database connection error, retrying...', error.code, {
             error,
             workflowId,
-          }
-        )
+          })
+        }
+        throw ApplicationFailure.nonRetryable('Database error occurred', error.code, {
+          error,
+          workflowId,
+        })
       }
-      if (status === 'failed') {
-        throw ApplicationFailure.nonRetryable(
-          failureError?.message ?? null,
-          failureError?.type ?? null,
-          ...(failureError?.details ?? [])
-        )
-      }
+      return updatedData
     },
   }
 }

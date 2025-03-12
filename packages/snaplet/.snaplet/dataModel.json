@@ -6249,7 +6249,7 @@
           "isList": false,
           "isGenerated": false,
           "sequence": false,
-          "hasDefaultValue": false,
+          "hasDefaultValue": true,
           "isId": false,
           "maxLength": null
         },
@@ -6268,10 +6268,10 @@
           "maxLength": null
         },
         {
-          "id": "temporal.send_account_transfers.data",
-          "name": "data",
-          "columnName": "data",
-          "type": "jsonb",
+          "id": "temporal.send_account_transfers.created_at_block_num",
+          "name": "created_at_block_num",
+          "columnName": "created_at_block_num",
+          "type": "int8",
           "isRequired": true,
           "kind": "scalar",
           "isList": false,
@@ -6282,10 +6282,10 @@
           "maxLength": null
         },
         {
-          "id": "temporal.send_account_transfers.created_at_block_num",
-          "name": "created_at_block_num",
-          "columnName": "created_at_block_num",
-          "type": "numeric",
+          "id": "temporal.send_account_transfers.data",
+          "name": "data",
+          "columnName": "data",
+          "type": "jsonb",
           "isRequired": true,
           "kind": "scalar",
           "isList": false,

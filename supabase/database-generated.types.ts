@@ -1508,7 +1508,7 @@ export type Database = {
           id?: number
           status: Database["temporal"]["Enums"]["transfer_status"]
           updated_at?: string
-          user_id: string
+          user_id?: string
           workflow_id: string
         }
         Update: {
@@ -1528,37 +1528,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      insert_temporal_eth_send_account_transfer: {
-        Args: {
-          workflow_id: string
-          status: Database["temporal"]["Enums"]["transfer_status"]
-          block_num: string
-          sender: string
-          log_addr: string
-          value: string
-        }
-        Returns: undefined
-      }
-      insert_temporal_token_send_account_transfer: {
-        Args: {
-          workflow_id: string
-          status: Database["temporal"]["Enums"]["transfer_status"]
-          block_num: string
-          f: string
-          t: string
-          v: string
-          log_addr: string
-        }
-        Returns: undefined
-      }
-      update_temporal_send_account_transfer: {
-        Args: {
-          workflow_id: string
-          status: Database["temporal"]["Enums"]["transfer_status"]
-          data?: Json
-        }
-        Returns: undefined
-      }
+      [_ in never]: never
     }
     Enums: {
       transfer_status:

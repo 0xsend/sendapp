@@ -23,15 +23,17 @@ CREATE TYPE temporal.transfer_status AS ENUM(
 CREATE TABLE temporal.send_account_transfers(
     id serial primary key,
     workflow_id text not null,
-    user_id uuid not null,
+    user_id uuid not null DEFAULT uuid_nil(), -- rely on trigger to set user_id
     status temporal.transfer_status not null,
+    created_at_block_num bigint not null,
     data jsonb not null,
-    created_at_block_num numeric not null,
     created_at timestamp with time zone not null default (now() AT TIME ZONE 'utc'::text),
     updated_at timestamp with time zone not null default (now() AT TIME ZONE 'utc'::text)
 );
 
 GRANT ALL ON TABLE temporal.send_account_transfers TO service_role;
+GRANT USAGE, SELECT ON SEQUENCE temporal.send_account_transfers_id_seq TO service_role;
+
 
 alter table "temporal"."send_account_transfers"
     enable row level security;
@@ -55,131 +57,45 @@ CREATE INDEX temporal_send_account_transfers_user_id_idx ON temporal.send_accoun
 CREATE INDEX temporal_send_account_transfers_created_at_idx ON temporal.send_account_transfers(created_at);
 CREATE UNIQUE INDEX temporal_send_account_transfers_workflow_id_idx ON temporal.send_account_transfers(workflow_id);
 
-CREATE OR REPLACE FUNCTION temporal.insert_temporal_token_send_account_transfer(
-  workflow_id text,
-  status temporal.transfer_status,
-  block_num text,
-  f bytea,
-  t bytea,
-  v text,
-  log_addr bytea
-)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
+-- Temporal transfer insert user_id trigger
+CREATE OR REPLACE FUNCTION temporal.temporal_send_account_transfers_trigger_insert_user_id()
+  RETURNS TRIGGER
+  LANGUAGE plpgsql
+  SECURITY DEFINER
+  AS $$
 DECLARE
   _user_id uuid;
-  _data jsonb;
 BEGIN
-  SELECT user_id INTO _user_id
-  FROM send_accounts
-  WHERE address = concat('0x', encode(f, 'hex'))::citext;
+  -- Handle token transfers (has 'f' field)
+  IF NEW.data ? 'f' THEN
+    SELECT user_id INTO _user_id
+    FROM send_accounts
+    WHERE address = concat('0x', encode((NEW.data->>'f')::bytea, 'hex'))::citext;
 
-  -- cast v to text to avoid losing precision when converting to json when sending to clients
-  _data := json_build_object(
-      'f', f,
-      't', t,
-      'v', v::text,
-      'log_addr', log_addr
-  );
-
-  INSERT INTO temporal.send_account_transfers(
-    workflow_id,
-    user_id,
-    status,
-    created_at_block_num,
-    data
-  )
-  VALUES (
-    workflow_id,
-    _user_id,
-    status,
-    block_num::numeric,
-    _data
-  );
-END;
-$$;
-
-CREATE OR REPLACE FUNCTION temporal.insert_temporal_eth_send_account_transfer(
-  workflow_id text,
-  status temporal.transfer_status,
-  block_num text,
-  sender bytea,
-  log_addr bytea,
-  value text
-)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-DECLARE
-  _user_id uuid;
-  _data jsonb;
-BEGIN
-  SELECT user_id INTO _user_id
-  FROM send_accounts
-  WHERE address = concat('0x', encode(sender, 'hex'))::citext;
-
-  -- cast v to text to avoid losing precision when converting to json when sending to clients
-  _data := json_build_object(
-      'log_addr', log_addr,
-      'sender', sender,
-      'value', value::text
-  );
-
-  INSERT INTO temporal.send_account_transfers(
-    workflow_id,
-    user_id,
-    status,
-    created_at_block_num,
-    data
-  )
-  VALUES (
-    workflow_id,
-    _user_id,
-    status,
-    block_num::numeric,
-    _data
-  );
-END;
-$$;
-
-CREATE OR REPLACE FUNCTION temporal.update_temporal_send_account_transfer(
-  workflow_id text,
-  status temporal.transfer_status,
-  data jsonb DEFAULT NULL
-)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-DECLARE
-  _data jsonb;
-BEGIN
-  -- Only construct _data if input data is not null
-  IF data IS NOT NULL THEN
-    _data := json_build_object(
-      'user_op_hash', (data->'user_op_hash'),
-      'tx_hash', (data->>'tx_hash'),
-      'block_num', data->>'block_num'::text
-    );
-  ELSE
-    _data := '{}'::jsonb;
+  -- Handle ETH transfers (has 'sender' field)
+  ELSIF NEW.data ? 'sender' THEN
+    SELECT user_id INTO _user_id
+    FROM send_accounts
+    WHERE address = concat('0x', encode((NEW.data->>'sender')::bytea, 'hex'))::citext;
   END IF;
 
-  UPDATE temporal.send_account_transfers
-  SET
-    status = update_temporal_send_account_transfer.status,
-    data = CASE
-      WHEN _data = '{}'::jsonb THEN temporal.send_account_transfers.data
-      ELSE temporal.send_account_transfers.data || _data
-    END,
-    updated_at = (NOW() AT TIME ZONE 'UTC')
-  WHERE
-    temporal.send_account_transfers.workflow_id = update_temporal_send_account_transfer.workflow_id;
+  -- If no user_id found, prevent insert and raise error
+  IF _user_id IS NULL THEN
+    RAISE EXCEPTION 'No user found for the given address';
+  END IF;
+
+  -- Set the user_id before insert
+  NEW.user_id := _user_id;
+
+  RETURN NEW;
 END;
 $$;
+
+-- Create trigger
+CREATE TRIGGER temporal_send_account_transfers_trigger_insert_user_id
+  AFTER INSERT ON temporal.send_account_transfers
+  FOR EACH ROW
+  EXECUTE FUNCTION temporal.temporal_send_account_transfers_trigger_insert_user_id();
 
 -- Token transfer triggers
 CREATE OR REPLACE FUNCTION temporal.temporal_token_send_account_transfers_trigger_insert_activity()
@@ -320,7 +236,7 @@ CREATE OR REPLACE FUNCTION temporal.temporal_send_account_transfers_trigger_dele
   LANGUAGE plpgsql
   SECURITY DEFINER
   AS $$
-BEGIN
+BEGINa
     DELETE FROM activity
     WHERE event_name = 'temporal_send_account_transfers'
       AND event_id = OLD.workflow_id;

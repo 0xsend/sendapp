@@ -24,14 +24,21 @@ VALUES (
 );
 
 -- Test 1: Test token transfer insertion
-SELECT temporal.insert_temporal_token_send_account_transfer(
-    'test-workflow-1'::text,
-    'initialized'::temporal.transfer_status,
-    '123',
-    '\x1234567890ABCDEF1234567890ABCDEF12345678'::bytea,
-    '\xB0B7D5E8A4B6D534B3F608E9D27871F85A4E98DA'::bytea,
-    '100'::text,
-    '\xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'::bytea
+INSERT INTO temporal.send_account_transfers (
+    workflow_id,
+    status,
+    created_at_block_num,
+    data
+) VALUES (
+    'test-workflow-1',
+    'initialized',
+    123,
+    json_build_object(
+        'f', '\x1234567890ABCDEF1234567890ABCDEF12345678'::bytea,
+        't', '\xB0B7D5E8A4B6D534B3F608E9D27871F85A4E98DA'::bytea,
+        'v', '100',
+        'log_addr', '\xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'::bytea
+    )
 );
 
 SELECT results_eq(
@@ -60,13 +67,20 @@ SELECT results_eq(
 );
 
 -- Test 2: Test ETH transfer insertion
-SELECT temporal.insert_temporal_eth_send_account_transfer(
-    'test-workflow-2'::text,
-    'initialized'::temporal.transfer_status,
-    '123',
-    '\x1234567890ABCDEF1234567890ABCDEF12345678'::bytea,
-    '\xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'::bytea,
-    '1000000000000000000'::text
+INSERT INTO temporal.send_account_transfers (
+    workflow_id,
+    status,
+    created_at_block_num,
+    data
+) VALUES (
+    'test-workflow-2',
+    'initialized',
+    123,
+    json_build_object(
+        'sender', '\x1234567890ABCDEF1234567890ABCDEF12345678'::bytea,
+        'log_addr', '\xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'::bytea,
+        'value', '1000000000000000000'
+    )
 );
 
 SELECT results_eq(
@@ -92,16 +106,16 @@ SELECT results_eq(
     'Test ETH transfer insertion'
 );
 
--- Test 3: Test update function
-SELECT temporal.update_temporal_send_account_transfer(
-    'test-workflow-1'::text,
-    'sent'::temporal.transfer_status,
-    json_build_object(
+-- Test 3: Test update
+UPDATE temporal.send_account_transfers
+SET
+    status = 'sent',
+    data = data || json_build_object(
         'user_op_hash', '\x1234'::bytea,
         'tx_hash', '\x5678'::bytea,
         'block_num', '123'
     )::jsonb
-);
+WHERE workflow_id = 'test-workflow-1';
 
 SELECT results_eq(
     $$
@@ -193,20 +207,6 @@ SELECT results_eq(
     $$,
     'Test activity update'
 );
-
--- @TODO update this to test send_account_transfer insert
-
--- SELECT temporal.delete_temporal_transfer_activity('test-workflow-1');
-
--- SELECT is_empty(
---     $$
---     SELECT *
---     FROM activity
---     WHERE event_name = 'temporal_send_account_transfers'
---     AND event_id = 'test-workflow-1'
---     $$,
---     'Test temporal transfer activity was deleted'
--- );
 
 SELECT * FROM finish();
 ROLLBACK;
