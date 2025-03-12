@@ -2,7 +2,7 @@ import type { PgBytea, Database } from '@my/supabase/database.types'
 import type { PostgrestError } from '@supabase/supabase-js'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 
-export async function insertTemporalTokenSendAccountTransfer({
+export async function upsertTemporalTokenSendAccountTransfer({
   workflow_id,
   status,
   block_num,
@@ -22,7 +22,7 @@ export async function insertTemporalTokenSendAccountTransfer({
   return await supabaseAdmin
     .schema('temporal')
     .from('send_account_transfers')
-    .insert({
+    .upsert({
       workflow_id,
       status,
       created_at_block_num: Number(block_num),
@@ -37,7 +37,7 @@ export async function insertTemporalTokenSendAccountTransfer({
     .single()
 }
 
-export async function insertTemporalEthSendAccountTransfer({
+export async function upsertTemporalEthSendAccountTransfer({
   workflow_id,
   status,
   block_num,
@@ -55,7 +55,7 @@ export async function insertTemporalEthSendAccountTransfer({
   return await supabaseAdmin
     .schema('temporal')
     .from('send_account_transfers')
-    .insert({
+    .upsert({
       workflow_id,
       status,
       created_at_block_num: Number(block_num),

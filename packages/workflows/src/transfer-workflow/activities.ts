@@ -1,7 +1,7 @@
 import { log, ApplicationFailure } from '@temporalio/activity'
 import {
-  insertTemporalTokenSendAccountTransfer,
-  insertTemporalEthSendAccountTransfer,
+  upsertTemporalTokenSendAccountTransfer,
+  upsertTemporalEthSendAccountTransfer,
   updateTemporalSendAccountTransfer,
   isRetryableDBError,
 } from './supabase'
@@ -31,7 +31,7 @@ type TransferActivities = {
     amount: bigint
     token: PgBytea | null
   }>
-  insertTemporalSendAccountTransferActivity: (
+  upsertTemporalSendAccountTransferActivity: (
     workflowId: string,
     from: PgBytea,
     to: PgBytea,
@@ -122,7 +122,7 @@ export const createTransferActivities = (
         throw error
       }
     },
-    async insertTemporalSendAccountTransferActivity(
+    async upsertTemporalSendAccountTransferActivity(
       workflowId,
       from,
       to,
@@ -131,7 +131,7 @@ export const createTransferActivities = (
       blockNumber
     ) {
       const { data, error } = token
-        ? await insertTemporalTokenSendAccountTransfer({
+        ? await upsertTemporalTokenSendAccountTransfer({
             workflow_id: workflowId,
             status: 'initialized',
             block_num: blockNumber,
@@ -140,7 +140,7 @@ export const createTransferActivities = (
             v: amount,
             log_addr: token,
           })
-        : await insertTemporalEthSendAccountTransfer({
+        : await upsertTemporalEthSendAccountTransfer({
             workflow_id: workflowId,
             status: 'initialized',
             block_num: blockNumber,

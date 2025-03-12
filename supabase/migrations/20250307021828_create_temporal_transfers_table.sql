@@ -42,112 +42,79 @@ create policy "users can see their own temporal transfers"
 on "temporal"."send_account_transfers" as permissive
 for select to authenticated
 using (
-    auth.uid() = user_id
-);
-
-create policy "users can only see temporal transfers they initiated"
-on "public"."activity" as permissive
-for select to authenticated
-using (
-    (event_name != 'temporal_send_account_transfers') OR
-    (from_user_id = auth.uid())
+ (select auth.uid()) = user_id
 );
 
 CREATE INDEX temporal_send_account_transfers_user_id_idx ON temporal.send_account_transfers(user_id);
 CREATE INDEX temporal_send_account_transfers_created_at_idx ON temporal.send_account_transfers(created_at);
 CREATE UNIQUE INDEX temporal_send_account_transfers_workflow_id_idx ON temporal.send_account_transfers(workflow_id);
 
--- Temporal transfer insert user_id trigger
-CREATE OR REPLACE FUNCTION temporal.temporal_send_account_transfers_trigger_insert_user_id()
-  RETURNS TRIGGER
-  LANGUAGE plpgsql
-  SECURITY DEFINER
-  AS $$
+CREATE OR REPLACE FUNCTION temporal.handle_transfer_upsert()
+RETURNS TRIGGER AS $$
 DECLARE
   _user_id uuid;
 BEGIN
-  -- Handle token transfers (has 'f' field)
+  -- Get user_id based on transfer type
   IF NEW.data ? 'f' THEN
+    -- Token transfer
     SELECT user_id INTO _user_id
     FROM send_accounts
     WHERE address = concat('0x', encode((NEW.data->>'f')::bytea, 'hex'))::citext;
-
-  -- Handle ETH transfers (has 'sender' field)
   ELSIF NEW.data ? 'sender' THEN
+    -- ETH transfer
     SELECT user_id INTO _user_id
     FROM send_accounts
     WHERE address = concat('0x', encode((NEW.data->>'sender')::bytea, 'hex'))::citext;
   END IF;
 
-  -- If no user_id found, prevent insert and raise error
+  -- Validate user_id
   IF _user_id IS NULL THEN
     RAISE EXCEPTION 'No user found for the given address';
   END IF;
 
-  -- Set the user_id before insert
+  -- Handle conflicts for INSERT operations
+  IF TG_OP = 'INSERT' THEN
+    -- Check if conflicting row exists with non-failed/cancelled status
+    IF EXISTS (
+      SELECT 1
+      FROM temporal.send_account_transfers
+      WHERE workflow_id = NEW.workflow_id
+      AND status NOT IN ('failed', 'cancelled')
+    ) THEN
+      RAISE EXCEPTION 'Workflow ID % already exists with status not failed/cancelled', NEW.workflow_id;
+    END IF;
+
+    -- For existing failed/cancelled transfers, update instead of insert
+    IF EXISTS (
+      SELECT 1
+      FROM temporal.send_account_transfers
+      WHERE workflow_id = NEW.workflow_id
+    ) THEN
+      UPDATE temporal.send_account_transfers
+      SET status = NEW.status,
+          created_at_block_num = NEW.created_at_block_num,
+          data = NEW.data,
+          user_id = _user_id,
+          updated_at = now()
+      WHERE workflow_id = NEW.workflow_id;
+
+      RETURN NULL;
+    END IF;
+  END IF;
+
+  -- Set user_id for new inserts or updates
   NEW.user_id := _user_id;
 
   RETURN NEW;
 END;
-$$;
+$$ LANGUAGE plpgsql;
 
--- Create trigger
-CREATE TRIGGER temporal_send_account_transfers_trigger_insert_user_id
-  AFTER INSERT ON temporal.send_account_transfers
+CREATE TRIGGER handle_transfer_upsert_trigger
+  BEFORE INSERT OR UPDATE ON temporal.send_account_transfers
   FOR EACH ROW
-  EXECUTE FUNCTION temporal.temporal_send_account_transfers_trigger_insert_user_id();
+  EXECUTE FUNCTION temporal.handle_transfer_upsert();
 
--- Token transfer triggers
-CREATE OR REPLACE FUNCTION temporal.temporal_token_send_account_transfers_trigger_insert_activity()
-  RETURNS TRIGGER
-  LANGUAGE plpgsql
-  SECURITY DEFINER
-  AS $$
-DECLARE
-  _f_user_id uuid;
-  _t_user_id uuid;
-  _data jsonb;
-BEGIN
-  SELECT user_id INTO _f_user_id
-  FROM send_accounts
-  WHERE address = concat('0x', encode((NEW.data->>'f')::bytea, 'hex'))::citext;
-
-  SELECT user_id INTO _t_user_id
-  FROM send_accounts
-  WHERE address = concat('0x', encode((NEW.data->>'t')::bytea, 'hex'))::citext;
-
-  -- cast v to text to avoid losing precision when converting to json when sending to clients
-  _data := json_build_object(
-      'status', NEW.status::text,
-      'user_op_hash', (NEW.data->'user_op_hash'),
-      'log_addr', (NEW.data->>'log_addr'),
-      'f', (NEW.data->>'f'),
-      't', (NEW.data->>'t'),
-      'v', NEW.data->>'v'::text,
-      'tx_hash', (NEW.data->>'tx_hash'),
-      'block_num', NEW.data->>'block_num'::text
-  );
-
-  INSERT INTO activity(
-    event_name,
-    event_id,
-    from_user_id,
-    to_user_id,
-    data
-  )
-  VALUES (
-    'temporal_send_account_transfers',
-    NEW.workflow_id,
-    _f_user_id,
-    _t_user_id,
-    _data
-  );
-  RETURN NEW;
-END;
-$$;
-
--- ETH transfer triggers
-CREATE OR REPLACE FUNCTION temporal.temporal_eth_send_account_transfers_trigger_insert_activity()
+CREATE OR REPLACE FUNCTION temporal.temporal_send_account_transfers_trigger_activity()
   RETURNS TRIGGER
   LANGUAGE plpgsql
   SECURITY DEFINER
@@ -157,79 +124,81 @@ DECLARE
   _to_user_id uuid;
   _data jsonb;
 BEGIN
-  SELECT user_id INTO _from_user_id
-  FROM send_accounts
-  WHERE address = concat('0x', encode((NEW.data->>'sender')::bytea, 'hex'))::citext;
+  -- Set user IDs based on whether it's a token or ETH transfer
+  IF NEW.data ? 'f' THEN
+    -- Token transfer
+    SELECT user_id INTO _from_user_id
+    FROM send_accounts
+    WHERE address = concat('0x', encode((NEW.data->>'f')::bytea, 'hex'))::citext;
 
-  SELECT user_id INTO _to_user_id
-  FROM send_accounts
-  WHERE address = concat('0x', encode((NEW.data->>'log_addr')::bytea, 'hex'))::citext;
+    SELECT user_id INTO _to_user_id
+    FROM send_accounts
+    WHERE address = concat('0x', encode((NEW.data->>'t')::bytea, 'hex'))::citext;
 
-  -- cast v to text to avoid losing precision when converting to json when sending to clients
-  _data := json_build_object(
-      'status', NEW.status::text,
-      'user_op_hash', (NEW.data->'user_op_hash'),
-      'log_addr', (NEW.data->>'log_addr'),
-      'sender', (NEW.data->>'sender'),
-      'value', NEW.data->>'value'::text,
-      'tx_hash', (NEW.data->>'tx_hash'),
-      'block_num', NEW.data->>'block_num'::text
-  );
+    _data := json_build_object(
+        'status', NEW.status::text,
+        'user_op_hash', (NEW.data->'user_op_hash'),
+        'log_addr', (NEW.data->>'log_addr'),
+        'f', (NEW.data->>'f'),
+        't', (NEW.data->>'t'),
+        'v', NEW.data->>'v'::text,
+        'tx_hash', (NEW.data->>'tx_hash'),
+        'block_num', NEW.data->>'block_num'::text
+    );
+  ELSE
+    -- ETH transfer
+    SELECT user_id INTO _from_user_id
+    FROM send_accounts
+    WHERE address = concat('0x', encode((NEW.data->>'sender')::bytea, 'hex'))::citext;
 
-  INSERT INTO activity(
-    event_name,
-    event_id,
-    from_user_id,
-    to_user_id,
-    data
-  )
-  VALUES (
-    'temporal_send_account_transfers',
-    NEW.workflow_id,
-    _from_user_id,
-    _to_user_id,
-    _data
-  );
+    SELECT user_id INTO _to_user_id
+    FROM send_accounts
+    WHERE address = concat('0x', encode((NEW.data->>'log_addr')::bytea, 'hex'))::citext;
+
+    _data := json_build_object(
+        'status', NEW.status::text,
+        'user_op_hash', (NEW.data->'user_op_hash'),
+        'log_addr', (NEW.data->>'log_addr'),
+        'sender', (NEW.data->>'sender'),
+        'value', NEW.data->>'value'::text,
+        'tx_hash', (NEW.data->>'tx_hash'),
+        'block_num', NEW.data->>'block_num'::text
+    );
+  END IF;
+
+  -- For INSERT operations
+  IF TG_OP = 'INSERT' THEN
+    INSERT INTO activity(
+      event_name,
+      event_id,
+      from_user_id,
+      to_user_id,
+      data
+    )
+    VALUES (
+      'temporal_send_account_transfers',
+      NEW.workflow_id,
+      _from_user_id,
+      _to_user_id,
+      _data
+    );
+  -- For UPDATE operations
+  ELSIF TG_OP = 'UPDATE' THEN
+    UPDATE activity
+    SET data = _data
+    WHERE event_name = 'temporal_send_account_transfers'
+      AND event_id = NEW.workflow_id;
+  END IF;
+
   RETURN NEW;
 END;
 $$;
 
--- Create triggers with conditions
-CREATE TRIGGER temporal_token_send_account_transfers_trigger_insert_activity
-  AFTER INSERT ON temporal.send_account_transfers
+-- Single trigger for both token and ETH transfers, handling both INSERT and UPDATE
+CREATE TRIGGER temporal_send_account_transfers_trigger_activity
+  AFTER INSERT OR UPDATE ON temporal.send_account_transfers
   FOR EACH ROW
-  WHEN (NEW.data ? 'f')
-  EXECUTE FUNCTION temporal.temporal_token_send_account_transfers_trigger_insert_activity();
-
-CREATE TRIGGER temporal_eth_send_account_transfers_trigger_insert_activity
-  AFTER INSERT ON temporal.send_account_transfers
-  FOR EACH ROW
-  WHEN (NEW.data ? 'sender')
-  EXECUTE FUNCTION temporal.temporal_eth_send_account_transfers_trigger_insert_activity();
-
-CREATE OR REPLACE FUNCTION temporal.temporal_send_account_transfers_trigger_update_activity()
-  RETURNS TRIGGER
-  LANGUAGE plpgsql
-  SECURITY DEFINER
-  AS $$
-DECLARE
-  _data jsonb;
-BEGIN
-  _data := NEW.data || json_build_object('status', NEW.status::text)::jsonb;
-
-  UPDATE activity
-  SET data = _data
-  WHERE event_name = 'temporal_send_account_transfers'
-    AND event_id = NEW.workflow_id;
-
-  RETURN NEW;
-END;
-$$;
-
-CREATE TRIGGER temporal_send_account_transfers_trigger_update_activity
-  AFTER UPDATE ON temporal.send_account_transfers
-  FOR EACH ROW
-  EXECUTE FUNCTION temporal.temporal_send_account_transfers_trigger_update_activity();
+  EXECUTE FUNCTION temporal.temporal_send_account_transfers_trigger_activity();
 
 CREATE OR REPLACE FUNCTION temporal.temporal_send_account_transfers_trigger_delete_activity()
   RETURNS TRIGGER
