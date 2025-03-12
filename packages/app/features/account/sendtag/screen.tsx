@@ -60,6 +60,13 @@ function AddNewTagButton({
     return null
   }
 
+  // Sort tags to put main tag first
+  const sortedTags = [...(allTags || [])].sort((a, b) => {
+    if (a?.id === mainTagId) return -1
+    if (b?.id === mainTagId) return 1
+    return 0
+  })
+
   return (
     <LinkableButton
       elevation={5}
