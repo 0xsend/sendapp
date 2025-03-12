@@ -1,5 +1,5 @@
 import { bundleWorkflowCode } from '@temporalio/worker'
-import { writeFile } from 'node:fs/promises'
+import { mkdir, writeFile } from 'node:fs/promises'
 import path, { dirname } from 'node:path'
 import { createRequire } from 'node:module'
 const require = createRequire(import.meta.url)
@@ -13,6 +13,8 @@ async function bundle() {
     workflowsPath: require.resolve('../all-workflows.ts'),
   })
   const codePath = path.join(__dirname, '../../dist/workflow-bundle.js')
+
+  await mkdir(dirname(codePath), { recursive: true })
 
   await writeFile(codePath, code)
   console.log(`Bundle written to ${codePath}`)
