@@ -1,4 +1,5 @@
 import type { PgBytea, Database } from '@my/supabase/database.types'
+import type { PostgrestError } from '@supabase/supabase-js'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 
 export async function insertTemporalTokenSendAccountTransfer({
@@ -18,15 +19,22 @@ export async function insertTemporalTokenSendAccountTransfer({
   v: bigint
   log_addr: PgBytea
 }) {
-  return await supabaseAdmin.schema('temporal').rpc('insert_temporal_token_send_account_transfer', {
-    workflow_id,
-    status,
-    block_num: block_num.toString(),
-    f,
-    t,
-    v: v.toString(),
-    log_addr,
-  })
+  return await supabaseAdmin
+    .schema('temporal')
+    .from('send_account_transfers')
+    .insert({
+      workflow_id,
+      status,
+      created_at_block_num: Number(block_num),
+      data: {
+        f,
+        t,
+        v: v.toString(),
+        log_addr,
+      },
+    })
+    .select('*')
+    .single()
 }
 
 export async function insertTemporalEthSendAccountTransfer({
@@ -44,14 +52,21 @@ export async function insertTemporalEthSendAccountTransfer({
   log_addr: PgBytea
   value: bigint
 }) {
-  return await supabaseAdmin.schema('temporal').rpc('insert_temporal_eth_send_account_transfer', {
-    workflow_id,
-    status,
-    block_num: block_num.toString(),
-    sender,
-    log_addr,
-    value: value.toString(),
-  })
+  return await supabaseAdmin
+    .schema('temporal')
+    .from('send_account_transfers')
+    .insert({
+      workflow_id,
+      status,
+      created_at_block_num: Number(block_num),
+      data: {
+        sender,
+        value: value.toString(),
+        log_addr,
+      },
+    })
+    .select('*')
+    .single()
 }
 
 export async function updateTemporalSendAccountTransfer({
@@ -63,9 +78,30 @@ export async function updateTemporalSendAccountTransfer({
   status: Database['temporal']['Enums']['transfer_status']
   data?: Database['temporal']['Tables']['send_account_transfers']['Row']['data']
 }) {
-  return await supabaseAdmin.schema('temporal').rpc('update_temporal_send_account_transfer', {
-    workflow_id,
-    status,
-    data,
-  })
+  return await supabaseAdmin
+    .schema('temporal')
+    .from('send_account_transfers')
+    .update({
+      status,
+      data,
+    })
+    .eq('workflow_id', workflow_id)
+    .select('*')
+    .single()
+}
+
+export function isRetryableDBError(error: PostgrestError) {
+  // Network related errors should be retried
+  const retryableCodes = [
+    '08000', // Connection error
+    '08006', // Connection failure
+    '08001', // SQL client unable to establish connection
+    '08004', // Rejected by server
+    '57P01', // Admin shutdown
+    '57P02', // Crash shutdown
+    '40001', // Serialization failure
+    '40P01', // Deadlock detected
+  ]
+
+  return retryableCodes.includes(error.code)
 }

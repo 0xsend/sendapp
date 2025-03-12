@@ -37,16 +37,26 @@ export async function TransferWorkflow(userOp: UserOperation<'v0.7'>) {
   log('Decoded transfer userOp', { workflowId, token, from, to, amount: amount.toString() })
 
   log('Inserting temporal transfer into temporal.send_account_transfers', workflowId)
-  await insertTemporalSendAccountTransferActivity(workflowId, from, to, amount, token, blockNumber)
+  const initialTransfer = await insertTemporalSendAccountTransferActivity(
+    workflowId,
+    from,
+    to,
+    amount,
+    token,
+    blockNumber
+  )
   log('Inserted temporal transfer into temporal.send_account_transfers', workflowId)
 
   log('Sending UserOperation', superjson.stringify(userOp))
   const hash = await sendUserOpActivity(workflowId, userOp)
   log('UserOperation sent, hash:', hash)
-  await updateTemporalTransferActivity({
+  const sentTransfer = await updateTemporalTransferActivity({
     workflowId,
     status: 'sent',
-    data: { user_op_hash: hash },
+    data: {
+      ...(initialTransfer.data as Record<string, unknown>),
+      user_op_hash: hash,
+    },
   })
 
   const receipt = await waitForTransactionReceiptActivity(workflowId, hash)
@@ -56,6 +66,7 @@ export async function TransferWorkflow(userOp: UserOperation<'v0.7'>) {
     workflowId,
     status: 'confirmed',
     data: {
+      ...(sentTransfer.data as Record<string, unknown>),
       tx_hash: hexToBytea(receipt.transactionHash),
       block_num: receipt.blockNumber.toString(),
     },
