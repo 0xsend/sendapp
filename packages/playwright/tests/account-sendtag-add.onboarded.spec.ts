@@ -92,15 +92,16 @@ test('cannot add more than 5 tags', async ({ addSendtagsPage, supabase }) => {
 test('cannot confirm a tag without paying', async ({ addSendtagsPage, supabase }) => {
   const tagName = `${faker.lorem.word()}_${test.info().parallelIndex}`
   await addPendingTag(addSendtagsPage, tagName)
-  await addSendtagsPage.page.pause()
-  const { data, error } = await supabase.rpc('confirm_tags', {
+
+  const { error } = await supabase.rpc('confirm_tags', {
     tag_names: [tagName],
-    event_id: '',
-    referral_code_input: '',
+    _event_id: '',
+    _referral_code: '',
+    send_account_id: '123',
   })
-  log('cannot confirm a tag without paying', data, error)
+
+  log('cannot confirm a tag without paying', { tagName }, error)
   expect(error).toBeTruthy()
   expect(error?.code).toBe('42501')
   expect(error?.message).toBe('permission denied for function confirm_tags')
-  expect(data).toBeFalsy()
 })
