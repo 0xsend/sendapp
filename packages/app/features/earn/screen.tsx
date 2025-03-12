@@ -7,7 +7,7 @@ import { SectionButton } from 'app/features/earn/components/SectionButton'
 import formatAmount from 'app/utils/formatAmount'
 import { useSendAccount } from 'app/utils/send-accounts'
 import debug from 'debug'
-import type { ReactNode } from 'react'
+import { useMemo, type ReactNode } from 'react'
 import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
@@ -189,18 +189,14 @@ const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) =
     isError: currentAssets.isError,
   })
 
-  // Calculate total assets - if contract calls succeeded use the converted values,
-  // otherwise use the assets from the balances as fallback
-  const totalAssets =
-    !currentAssets.isLoading && currentAssets.data
-      ? currentAssets.data.reduce((sum, assets) => sum + assets, 0n)
-      : (balances?.reduce((sum, balance) => sum + balance.assets, 0n) ?? 0n)
-
-  const totalDeposits = balances?.reduce((sum, balance) => sum + balance.assets, 0n) ?? 0n
-
-  // Format values for display
-  const formattedTotalValue = formatUSDCValue(totalAssets)
-  const formattedDeposits = formatUSDCValue(totalDeposits)
+  const totalAssets = useMemo(
+    () => formatUSDCValue(currentAssets.data?.reduce((sum, assets) => sum + assets, 0n) ?? 0n),
+    [currentAssets.data]
+  )
+  const totalDeposits = useMemo(
+    () => formatUSDCValue(balances?.reduce((sum, balance) => sum + balance.assets, 0n) ?? 0n),
+    [balances]
+  )
 
   return (
     <Fade>
@@ -220,9 +216,9 @@ const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) =
                 fontWeight={'500'}
                 size={(() => {
                   switch (true) {
-                    case formattedTotalValue.length > 14:
+                    case totalAssets.length > 14:
                       return '$8'
-                    case formattedTotalValue.length > 8:
+                    case totalAssets.length > 8:
                       return '$9'
                     default:
                       return '$11'
@@ -231,9 +227,9 @@ const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) =
                 $gtLg={{
                   size: (() => {
                     switch (true) {
-                      case formattedTotalValue.length > 16:
+                      case totalAssets.length > 16:
                         return '$9'
-                      case formattedTotalValue.length > 8:
+                      case totalAssets.length > 8:
                         return '$10'
                       default:
                         return '$11'
@@ -241,20 +237,17 @@ const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) =
                   })(),
                 }}
               >
-                {formattedTotalValue}
+                {totalAssets}
               </Paragraph>
               <XStack ai={'center'} gap={'$2'}>
-                <IconCoin
-                  symbol={'USDC'}
-                  size={formattedTotalValue.length > 16 ? '$1.5' : '$2.5'}
-                />
+                <IconCoin symbol={'USDC'} size={totalAssets.length > 16 ? '$1.5' : '$2.5'} />
                 <Paragraph size={'$7'}>USDC</Paragraph>
               </XStack>
             </XStack>
           </YStack>
           <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
           <YStack gap={'$2'}>
-            <Row label={'Deposits'} value={`${formattedDeposits} USDC`} />
+            <Row label={'Deposits'} value={`${totalDeposits} USDC`} />
             {/* Rewards section commented out since it won't be live on launch
             <Row label={'Earnings'} value={`+${formatUSDCValue(0n)} USDC`} />
             <Row label={'Rewards'} value={`+0 SEND`} />
