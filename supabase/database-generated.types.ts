@@ -433,18 +433,21 @@ export type Database = {
       }
       referrals: {
         Row: {
+          created_at: string
           id: number
           referred_id: string
           referrer_id: string
           tag: string
         }
         Insert: {
+          created_at?: string
           id?: number
           referred_id: string
           referrer_id: string
           tag: string
         }
         Update: {
+          created_at?: string
           id?: number
           referred_id?: string
           referrer_id?: string
