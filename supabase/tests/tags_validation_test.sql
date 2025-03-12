@@ -41,7 +41,7 @@ SELECT
                             id
                         FROM send_accounts
                         WHERE
-                            user_id = tests.get_supabase_uid('tag_creator'))) $$, invalid_char), 'P0001', 'new row for relation "tags" violates check constraint "tags_name_check"')
+                            user_id = tests.get_supabase_uid('tag_creator'))) $$, invalid_char), '23514', 'new row for relation "tags" violates check constraint "tags_name_check"')
 FROM
     unnest(ARRAY['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '+', '=', '{', '}', '[', ']', '|', '\', ' : ', ';
 ', ' " ', ' \\', ' < ', ' > ', ',
