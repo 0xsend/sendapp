@@ -63,12 +63,15 @@ export function TokenActivityRow({
 
   return (
     <XStack
-      width={'100%'}
       ai="center"
-      jc="space-between"
-      gap="$4"
+      w="100%"
+      mx={0}
+      my={0}
       p="$3.5"
-      br={'$4'}
+      br="$4"
+      position="relative"
+      left={0}
+      right={0}
       cursor={onPress ? 'pointer' : 'default'}
       $gtLg={{ p: '$5' }}
       testID={'TokenActivityRow'}
