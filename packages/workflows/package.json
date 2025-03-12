@@ -26,7 +26,7 @@
     "lint": "tsc",
     "test": "jest",
     "build": "yarn bundle",
-    "bundle": "yarn --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' src/scripts/build-workflow-bundle.ts"
+    "bundle": "yarn src/scripts/build-workflow-bundle.ts"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
