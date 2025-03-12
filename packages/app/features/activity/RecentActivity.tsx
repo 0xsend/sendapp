@@ -112,36 +112,57 @@ function ActivityFeed({
       sections={sections}
       testID={'RecentActivity'}
       showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ width: '100%' }}
+      style={{ width: '100%' }}
       keyExtractor={(activity) =>
         `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`
       }
-      renderItem={({ item: activity, index, section }) => (
-        <YStack
-          bc="$color1"
-          px="$2"
-          $gtLg={{
-            px: '$3.5',
-          }}
-          {...(index === 0 && {
-            pt: '$2',
-            $gtLg: {
-              pt: '$3.5',
-            },
-            borderTopLeftRadius: '$4',
-            borderTopRightRadius: '$4',
-          })}
-          {...(index === section.data.length - 1 && {
-            pb: '$2',
-            $gtLg: {
-              pb: '$3.5',
-            },
-            borderBottomLeftRadius: '$4',
-            borderBottomRightRadius: '$4',
-          })}
-        >
-          <TokenActivityRow activity={activity} onPress={onActivityPress} />
-        </YStack>
-      )}
+      renderItem={({ item: activity, index, section }) => {
+        // Calculate conditional styles
+        const isFirst = index === 0
+        const isLast = index === section.data.length - 1
+
+        // Calculate border radius
+        const borderTopRadius = isFirst ? '$4' : 0
+        const borderBottomRadius = isLast ? '$4' : 0
+
+        // Calculate padding
+        const paddingTop = isFirst ? '$2' : '$0'
+        const paddingBottom = isLast ? '$2' : '$0'
+
+        // Calculate responsive padding
+        const gtLgPaddingTop = isFirst ? '$3.5' : '$0'
+        const gtLgPaddingBottom = isLast ? '$3.5' : '$0'
+
+        return (
+          <YStack
+            bc="$color1"
+            px="$2"
+            pt={paddingTop}
+            pb={paddingBottom}
+            mx="$0"
+            my="$0"
+            w="100%"
+            minWidth="100%"
+            maxWidth="100%"
+            position="relative"
+            left={0}
+            right={0}
+            overflow="visible"
+            $gtLg={{
+              px: '$3.5',
+              pt: gtLgPaddingTop,
+              pb: gtLgPaddingBottom,
+            }}
+            borderTopLeftRadius={borderTopRadius}
+            borderTopRightRadius={borderTopRadius}
+            borderBottomLeftRadius={borderBottomRadius}
+            borderBottomRightRadius={borderBottomRadius}
+          >
+            <TokenActivityRow activity={activity} onPress={onActivityPress} />
+          </YStack>
+        )
+      }}
       renderSectionHeader={({ section: { title, index } }) => (
         <RowLabel first={index === 0}>{title}</RowLabel>
       )}

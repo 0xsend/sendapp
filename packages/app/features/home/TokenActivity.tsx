@@ -93,16 +93,19 @@ const TokenActivityFeed = ({
     return null
   }
   return (
-    <Card {...props} f={1}>
+    <Card {...props} f={1} overflow="hidden" width="100%">
       <Fade>
         <FlatList
-          style={{ flex: 1 }}
+          style={{ flex: 1, width: '100%' }}
+          contentContainerStyle={{ width: '100%' }}
           data={activities}
           keyExtractor={(activity) =>
             `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`
           }
           renderItem={({ item: activity }) => (
-            <TokenActivityRow activity={activity} onPress={onActivityPress} />
+            <YStack w="100%" overflow="visible" position="relative" left={0} right={0}>
+              <TokenActivityRow activity={activity} onPress={onActivityPress} />
+            </YStack>
           )}
           ListFooterComponent={
             !isLoadingActivities &&

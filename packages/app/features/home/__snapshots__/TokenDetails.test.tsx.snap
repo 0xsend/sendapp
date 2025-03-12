@@ -278,11 +278,13 @@ exports[`TokenDetails renders correctly 1`] = `
             "borderTopRightRadius": 16,
             "flex": 1,
             "flexDirection": "column",
+            "overflow": "hidden",
             "paddingBottom": 7,
             "paddingLeft": 7,
             "paddingRight": 7,
             "paddingTop": 7,
             "position": "relative",
+            "width": "100%",
           }
         }
         testID="TokenActivityFeed"
@@ -324,602 +326,94 @@ exports[`TokenDetails renders correctly 1`] = `
             style={
               {
                 "flex": 1,
+                "width": "100%",
               }
             }
           >
             <div
               className="css-view-175oi2r"
               dir={null}
+              style={
+                {
+                  "width": "100%",
+                }
+              }
             >
               <div
                 className="css-view-175oi2r"
                 dir={null}
               >
                 <View
-                  cancelable={true}
-                  disabled={false}
-                  focusable={true}
-                  minPressDuration={0}
-                  onMouseEnter={[Function]}
-                  onMouseLeave={[Function]}
-                  onPress={[Function]}
-                  onPressIn={[Function]}
-                  onPressOut={[Function]}
                   style={
                     {
-                      "alignItems": "center",
-                      "borderBottomLeftRadius": 9,
-                      "borderBottomRightRadius": 9,
-                      "borderTopLeftRadius": 9,
-                      "borderTopRightRadius": 9,
-                      "flexDirection": "row",
-                      "gap": 18,
-                      "justifyContent": "space-between",
-                      "paddingBottom": 16,
-                      "paddingLeft": 16,
-                      "paddingRight": 16,
-                      "paddingTop": 16,
+                      "flexDirection": "column",
+                      "left": 0,
+                      "overflow": "visible",
+                      "position": "relative",
+                      "right": 0,
                       "width": "100%",
                     }
                   }
-                  testID="TokenActivityRow"
                 >
                   <View
+                    cancelable={true}
+                    disabled={false}
+                    focusable={true}
+                    minPressDuration={0}
+                    onMouseEnter={[Function]}
+                    onMouseLeave={[Function]}
+                    onPress={[Function]}
+                    onPressIn={[Function]}
+                    onPressOut={[Function]}
                     style={
                       {
-                        "flex": 1,
+                        "alignItems": "center",
+                        "borderBottomLeftRadius": 9,
+                        "borderBottomRightRadius": 9,
+                        "borderTopLeftRadius": 9,
+                        "borderTopRightRadius": 9,
+                        "boxSizing": "border-box",
                         "flexDirection": "row",
-                        "gap": 16,
+                        "left": 0,
+                        "marginBottom": 0,
+                        "marginLeft": 0,
+                        "marginRight": 0,
+                        "marginTop": 0,
+                        "maxWidth": "100%",
+                        "paddingBottom": 16,
+                        "paddingLeft": 16,
+                        "paddingRight": 16,
+                        "paddingTop": 16,
+                        "position": "relative",
+                        "right": 0,
                         "width": "100%",
                       }
                     }
+                    testID="TokenActivityRow"
                   >
                     <View
                       style={
                         {
                           "alignItems": "center",
-                          "borderBottomLeftRadius": 9,
-                          "borderBottomRightRadius": 9,
-                          "borderTopLeftRadius": 9,
-                          "borderTopRightRadius": 9,
-                          "flexDirection": "column",
-                          "gap": 7,
-                          "height": 48,
-                          "justifyContent": "center",
-                          "maxHeight": 48,
-                          "maxWidth": 48,
-                          "minHeight": 48,
-                          "minWidth": 48,
-                          "overflow": "hidden",
-                          "position": "relative",
-                          "width": 48,
-                        }
-                      }
-                    >
-                      <View
-                        style={
-                          {
-                            "bottom": 0,
-                            "flexDirection": "column",
-                            "left": 0,
-                            "position": "absolute",
-                            "right": 0,
-                            "top": 0,
-                            "zIndex": 1,
-                          }
-                        }
-                      >
-                        <Image
-                          fullscreen={true}
-                          onError={[Function]}
-                          onLoad={[Function]}
-                          source={
-                            {
-                              "uri": "https://ui-avatars.com/api/?name=0x93F2FA7A16a7365e3895b0F6E6Ac7a832d6c761a&size=256&format=png&background=86ad7f",
-                            }
-                          }
-                          style={
-                            {
-                              "height": 48,
-                              "width": 48,
-                            }
-                          }
-                        />
-                      </View>
-                      <View
-                        style={
-                          {
-                            "backgroundColor": "#86AE80",
-                            "bottom": 0,
-                            "flexDirection": "column",
-                            "justifyContent": "center",
-                            "left": 0,
-                            "position": "absolute",
-                            "right": 0,
-                            "top": 0,
-                            "zIndex": 0,
-                          }
-                        }
-                      >
-                        <View
-                          style={
-                            {
-                              "alignItems": "center",
-                              "borderBottomLeftRadius": 9,
-                              "borderBottomRightRadius": 9,
-                              "borderTopLeftRadius": 9,
-                              "borderTopRightRadius": 9,
-                              "flexDirection": "column",
-                              "height": 48,
-                              "justifyContent": "center",
-                              "maxHeight": 48,
-                              "maxWidth": 48,
-                              "minHeight": 48,
-                              "minWidth": 48,
-                              "overflow": "hidden",
-                              "position": "relative",
-                              "width": 48,
-                            }
-                          }
-                        >
-                          <View
-                            style={
-                              {
-                                "bottom": 0,
-                                "flexDirection": "column",
-                                "left": 0,
-                                "position": "absolute",
-                                "right": 0,
-                                "top": 0,
-                                "zIndex": 1,
-                              }
-                            }
-                          >
-                            <Image
-                              fullscreen={true}
-                              onError={[Function]}
-                              onLoad={[Function]}
-                              source={
-                                {
-                                  "uri": "https://ui-avatars.com/api/?name=0x93F2FA7A16a7365e3895b0F6E6Ac7a832d6c761a&size=256&format=png&background=86ad7f",
-                                }
-                              }
-                              style={
-                                {
-                                  "height": 48,
-                                  "width": 48,
-                                }
-                              }
-                            />
-                          </View>
-                        </View>
-                      </View>
-                    </View>
-                    <View
-                      style={
-                        {
                           "flex": 1,
-                          "flexDirection": "column",
-                          "overflow": "hidden",
-                          "width": "100%",
-                        }
-                      }
-                    >
-                      <View
-                        style={
-                          {
-                            "flex": 1,
-                            "flexDirection": "row",
-                            "gap": 4,
-                            "justifyContent": "space-between",
-                            "width": "100%",
-                          }
-                        }
-                      >
-                        <Text
-                          style={
-                            {
-                              "color": "#FFFFFF",
-                              "fontFamily": "System",
-                              "fontSize": 21.599999999999998,
-                              "fontWeight": "500",
-                            }
-                          }
-                          suppressHighlighting={true}
-                        >
-                          Withdraw
-                        </Text>
-                        <Text
-                          style={
-                            {
-                              "color": "#FFFFFF",
-                              "fontFamily": "System",
-                              "fontSize": 21.599999999999998,
-                              "fontWeight": "500",
-                              "textAlign": "right",
-                            }
-                          }
-                          suppressHighlighting={true}
-                        >
-                          10 USDC
-                        </Text>
-                      </View>
-                      <View
-                        style={
-                          {
-                            "alignItems": "flex-start",
-                            "flex": 1,
-                            "flexDirection": "row",
-                            "gap": 4,
-                            "justifyContent": "space-between",
-                            "overflow": "hidden",
-                            "width": "100%",
-                          }
-                        }
-                      >
-                        <Text
-                          style={
-                            {
-                              "color": "#B2B2B2",
-                              "fontFamily": "System",
-                              "fontSize": 19.2,
-                              "fontWeight": "400",
-                              "lineHeight": 19,
-                              "maxWidth": "100%",
-                              "overflow": "hidden",
-                              "userSelect": "auto",
-                            }
-                          }
-                          suppressHighlighting={true}
-                        >
-                          0x93F...761a
-                        </Text>
-                        <Text
-                          style={
-                            {
-                              "color": "#B2B2B2",
-                              "fontFamily": "System",
-                              "fontSize": 19.2,
-                              "fontWeight": "400",
-                              "lineHeight": 21,
-                              "textAlign": "right",
-                              "userSelect": "auto",
-                            }
-                          }
-                          suppressHighlighting={true}
-                        >
-                          7 mon ago
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-              </div>
-              <div
-                className="css-view-175oi2r"
-                dir={null}
-              >
-                <View
-                  cancelable={true}
-                  disabled={false}
-                  focusable={true}
-                  minPressDuration={0}
-                  onMouseEnter={[Function]}
-                  onMouseLeave={[Function]}
-                  onPress={[Function]}
-                  onPressIn={[Function]}
-                  onPressOut={[Function]}
-                  style={
-                    {
-                      "alignItems": "center",
-                      "borderBottomLeftRadius": 9,
-                      "borderBottomRightRadius": 9,
-                      "borderTopLeftRadius": 9,
-                      "borderTopRightRadius": 9,
-                      "flexDirection": "row",
-                      "gap": 18,
-                      "justifyContent": "space-between",
-                      "paddingBottom": 16,
-                      "paddingLeft": 16,
-                      "paddingRight": 16,
-                      "paddingTop": 16,
-                      "width": "100%",
-                    }
-                  }
-                  testID="TokenActivityRow"
-                >
-                  <View
-                    style={
-                      {
-                        "flex": 1,
-                        "flexDirection": "row",
-                        "gap": 16,
-                        "width": "100%",
-                      }
-                    }
-                  >
-                    <View
-                      style={
-                        {
-                          "alignItems": "center",
-                          "borderBottomLeftRadius": 9,
-                          "borderBottomRightRadius": 9,
-                          "borderTopLeftRadius": 9,
-                          "borderTopRightRadius": 9,
-                          "flexDirection": "column",
-                          "gap": 7,
-                          "height": 48,
-                          "justifyContent": "center",
-                          "maxHeight": 48,
-                          "maxWidth": 48,
-                          "minHeight": 48,
-                          "minWidth": 48,
-                          "overflow": "hidden",
-                          "position": "relative",
-                          "width": 48,
-                        }
-                      }
-                    >
-                      <View
-                        style={
-                          {
-                            "bottom": 0,
-                            "flexDirection": "column",
-                            "left": 0,
-                            "position": "absolute",
-                            "right": 0,
-                            "top": 0,
-                            "zIndex": 1,
-                          }
-                        }
-                      >
-                        <Image
-                          fullscreen={true}
-                          onError={[Function]}
-                          onLoad={[Function]}
-                          source={
-                            {
-                              "uri": "https://ui-avatars.com/api/?name=0xa71CE00000000000000000000000000000000000&size=256&format=png&background=86ad7f",
-                            }
-                          }
-                          style={
-                            {
-                              "height": 48,
-                              "width": 48,
-                            }
-                          }
-                        />
-                      </View>
-                      <View
-                        style={
-                          {
-                            "backgroundColor": "#86AE80",
-                            "bottom": 0,
-                            "flexDirection": "column",
-                            "justifyContent": "center",
-                            "left": 0,
-                            "position": "absolute",
-                            "right": 0,
-                            "top": 0,
-                            "zIndex": 0,
-                          }
-                        }
-                      >
-                        <View
-                          style={
-                            {
-                              "alignItems": "center",
-                              "borderBottomLeftRadius": 9,
-                              "borderBottomRightRadius": 9,
-                              "borderTopLeftRadius": 9,
-                              "borderTopRightRadius": 9,
-                              "flexDirection": "column",
-                              "height": 48,
-                              "justifyContent": "center",
-                              "maxHeight": 48,
-                              "maxWidth": 48,
-                              "minHeight": 48,
-                              "minWidth": 48,
-                              "overflow": "hidden",
-                              "position": "relative",
-                              "width": 48,
-                            }
-                          }
-                        >
-                          <View
-                            style={
-                              {
-                                "bottom": 0,
-                                "flexDirection": "column",
-                                "left": 0,
-                                "position": "absolute",
-                                "right": 0,
-                                "top": 0,
-                                "zIndex": 1,
-                              }
-                            }
-                          >
-                            <Image
-                              fullscreen={true}
-                              onError={[Function]}
-                              onLoad={[Function]}
-                              source={
-                                {
-                                  "uri": "https://ui-avatars.com/api/?name=0xa71CE00000000000000000000000000000000000&size=256&format=png&background=86ad7f",
-                                }
-                              }
-                              style={
-                                {
-                                  "height": 48,
-                                  "width": 48,
-                                }
-                              }
-                            />
-                          </View>
-                        </View>
-                      </View>
-                    </View>
-                    <View
-                      style={
-                        {
-                          "flex": 1,
-                          "flexDirection": "column",
-                          "overflow": "hidden",
-                          "width": "100%",
-                        }
-                      }
-                    >
-                      <View
-                        style={
-                          {
-                            "flex": 1,
-                            "flexDirection": "row",
-                            "gap": 4,
-                            "justifyContent": "space-between",
-                            "width": "100%",
-                          }
-                        }
-                      >
-                        <Text
-                          style={
-                            {
-                              "color": "#FFFFFF",
-                              "fontFamily": "System",
-                              "fontSize": 21.599999999999998,
-                              "fontWeight": "500",
-                            }
-                          }
-                          suppressHighlighting={true}
-                        >
-                          Deposit
-                        </Text>
-                        <Text
-                          style={
-                            {
-                              "color": "#FFFFFF",
-                              "fontFamily": "System",
-                              "fontSize": 21.599999999999998,
-                              "fontWeight": "500",
-                              "textAlign": "right",
-                            }
-                          }
-                          suppressHighlighting={true}
-                        >
-                          20 USDC
-                        </Text>
-                      </View>
-                      <View
-                        style={
-                          {
-                            "alignItems": "flex-start",
-                            "flex": 1,
-                            "flexDirection": "row",
-                            "gap": 4,
-                            "justifyContent": "space-between",
-                            "overflow": "hidden",
-                            "width": "100%",
-                          }
-                        }
-                      >
-                        <Text
-                          style={
-                            {
-                              "color": "#B2B2B2",
-                              "fontFamily": "System",
-                              "fontSize": 19.2,
-                              "fontWeight": "400",
-                              "lineHeight": 19,
-                              "maxWidth": "100%",
-                              "overflow": "hidden",
-                              "userSelect": "auto",
-                            }
-                          }
-                          suppressHighlighting={true}
-                        >
-                          0xa71...0000
-                        </Text>
-                        <Text
-                          style={
-                            {
-                              "color": "#B2B2B2",
-                              "fontFamily": "System",
-                              "fontSize": 19.2,
-                              "fontWeight": "400",
-                              "lineHeight": 21,
-                              "textAlign": "right",
-                              "userSelect": "auto",
-                            }
-                          }
-                          suppressHighlighting={true}
-                        >
-                          7 mon ago
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-              </div>
-              <div
-                className="css-view-175oi2r"
-                dir={null}
-              >
-                <View
-                  cancelable={true}
-                  disabled={false}
-                  focusable={true}
-                  minPressDuration={0}
-                  onMouseEnter={[Function]}
-                  onMouseLeave={[Function]}
-                  onPress={[Function]}
-                  onPressIn={[Function]}
-                  onPressOut={[Function]}
-                  style={
-                    {
-                      "alignItems": "center",
-                      "borderBottomLeftRadius": 9,
-                      "borderBottomRightRadius": 9,
-                      "borderTopLeftRadius": 9,
-                      "borderTopRightRadius": 9,
-                      "flexDirection": "row",
-                      "gap": 18,
-                      "justifyContent": "space-between",
-                      "paddingBottom": 16,
-                      "paddingLeft": 16,
-                      "paddingRight": 16,
-                      "paddingTop": 16,
-                      "width": "100%",
-                    }
-                  }
-                  testID="TokenActivityRow"
-                >
-                  <View
-                    style={
-                      {
-                        "flex": 1,
-                        "flexDirection": "row",
-                        "gap": 16,
-                        "width": "100%",
-                      }
-                    }
-                  >
-                    <View
-                      cancelable={true}
-                      disabled={false}
-                      focusable={true}
-                      minPressDuration={0}
-                      onMouseEnter={[Function]}
-                      onMouseLeave={[Function]}
-                      onPress={[Function]}
-                      onPressIn={[Function]}
-                      onPressOut={[Function]}
-                      style={
-                        {
                           "flexDirection": "row",
+                          "maxWidth": "100%",
+                          "position": "relative",
+                          "width": "100%",
                         }
                       }
                     >
                       <View
-                        testID="MockSolitoLink"
+                        style={
+                          {
+                            "alignItems": "center",
+                            "flexDirection": "row",
+                            "justifyContent": "center",
+                            "marginRight": 14,
+                            "minWidth": 40,
+                            "width": 40,
+                          }
+                        }
                       >
                         <View
                           style={
@@ -962,7 +456,7 @@ exports[`TokenDetails renders correctly 1`] = `
                               onLoad={[Function]}
                               source={
                                 {
-                                  "uri": "https://i.pravatar.cc/500?u=alice",
+                                  "uri": "https://ui-avatars.com/api/?name=0x93F2FA7A16a7365e3895b0F6E6Ac7a832d6c761a&size=256&format=png&background=86ad7f",
                                 }
                               }
                               style={
@@ -1028,7 +522,7 @@ exports[`TokenDetails renders correctly 1`] = `
                                   onLoad={[Function]}
                                   source={
                                     {
-                                      "uri": "https://ui-avatars.com/api/?name=Alice&size=256&format=png&background=86ad7f",
+                                      "uri": "https://ui-avatars.com/api/?name=0x93F2FA7A16a7365e3895b0F6E6Ac7a832d6c761a&size=256&format=png&background=86ad7f",
                                     }
                                   }
                                   style={
@@ -1043,13 +537,176 @@ exports[`TokenDetails renders correctly 1`] = `
                           </View>
                         </View>
                       </View>
+                      <View
+                        style={
+                          {
+                            "flex": 1,
+                            "flexDirection": "column",
+                            "gap": 4,
+                            "maxWidth": "calc(100% - 54px)",
+                            "width": "calc(100% - 54px)",
+                          }
+                        }
+                      >
+                        <View
+                          style={
+                            {
+                              "alignItems": "center",
+                              "flexDirection": "row",
+                              "justifyContent": "space-between",
+                              "width": "100%",
+                            }
+                          }
+                        >
+                          <Text
+                            numberOfLines={1}
+                            style={
+                              {
+                                "color": "#FFFFFF",
+                                "flex": 1,
+                                "fontFamily": "System",
+                                "fontSize": 21.599999999999998,
+                                "fontWeight": "500",
+                                "maxWidth": "calc(100% - 78px)",
+                                "minWidth": 0,
+                              }
+                            }
+                            suppressHighlighting={true}
+                          >
+                            Withdraw
+                          </Text>
+                          <Text
+                            style={
+                              {
+                                "color": "#FFFFFF",
+                                "flexShrink": 0,
+                                "fontFamily": "System",
+                                "fontSize": 21.599999999999998,
+                                "fontWeight": "500",
+                                "marginLeft": 7,
+                                "minWidth": 70,
+                                "textAlign": "right",
+                              }
+                            }
+                            suppressHighlighting={true}
+                          >
+                            10 USDC
+                          </Text>
+                        </View>
+                        <View
+                          style={
+                            {
+                              "alignItems": "center",
+                              "flexDirection": "row",
+                              "justifyContent": "space-between",
+                              "width": "100%",
+                            }
+                          }
+                        >
+                          <Text
+                            numberOfLines={1}
+                            style={
+                              {
+                                "color": "#B2B2B2",
+                                "flex": 1,
+                                "fontFamily": "System",
+                                "fontSize": 19.2,
+                                "fontWeight": "400",
+                                "lineHeight": 19,
+                                "maxWidth": "calc(100% - 78px)",
+                                "minWidth": 0,
+                                "userSelect": "auto",
+                              }
+                            }
+                            suppressHighlighting={true}
+                          >
+                            0x93F...761a
+                          </Text>
+                          <Text
+                            style={
+                              {
+                                "color": "#B2B2B2",
+                                "flexShrink": 0,
+                                "fontFamily": "System",
+                                "fontSize": 19.2,
+                                "fontWeight": "400",
+                                "lineHeight": 21,
+                                "marginLeft": 7,
+                                "minWidth": 70,
+                                "textAlign": "right",
+                                "userSelect": "auto",
+                              }
+                            }
+                            suppressHighlighting={true}
+                          >
+                            7 mon ago
+                          </Text>
+                        </View>
+                      </View>
                     </View>
+                  </View>
+                </View>
+              </div>
+              <div
+                className="css-view-175oi2r"
+                dir={null}
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                      "left": 0,
+                      "overflow": "visible",
+                      "position": "relative",
+                      "right": 0,
+                      "width": "100%",
+                    }
+                  }
+                >
+                  <View
+                    cancelable={true}
+                    disabled={false}
+                    focusable={true}
+                    minPressDuration={0}
+                    onMouseEnter={[Function]}
+                    onMouseLeave={[Function]}
+                    onPress={[Function]}
+                    onPressIn={[Function]}
+                    onPressOut={[Function]}
+                    style={
+                      {
+                        "alignItems": "center",
+                        "borderBottomLeftRadius": 9,
+                        "borderBottomRightRadius": 9,
+                        "borderTopLeftRadius": 9,
+                        "borderTopRightRadius": 9,
+                        "boxSizing": "border-box",
+                        "flexDirection": "row",
+                        "left": 0,
+                        "marginBottom": 0,
+                        "marginLeft": 0,
+                        "marginRight": 0,
+                        "marginTop": 0,
+                        "maxWidth": "100%",
+                        "paddingBottom": 16,
+                        "paddingLeft": 16,
+                        "paddingRight": 16,
+                        "paddingTop": 16,
+                        "position": "relative",
+                        "right": 0,
+                        "width": "100%",
+                      }
+                    }
+                    testID="TokenActivityRow"
+                  >
                     <View
                       style={
                         {
+                          "alignItems": "center",
                           "flex": 1,
-                          "flexDirection": "column",
-                          "overflow": "hidden",
+                          "flexDirection": "row",
+                          "maxWidth": "100%",
+                          "position": "relative",
                           "width": "100%",
                         }
                       }
@@ -1057,52 +714,320 @@ exports[`TokenDetails renders correctly 1`] = `
                       <View
                         style={
                           {
-                            "flex": 1,
+                            "alignItems": "center",
                             "flexDirection": "row",
-                            "gap": 4,
-                            "justifyContent": "space-between",
-                            "width": "100%",
+                            "justifyContent": "center",
+                            "marginRight": 14,
+                            "minWidth": 40,
+                            "width": 40,
                           }
                         }
                       >
-                        <Text
+                        <View
                           style={
                             {
-                              "color": "#FFFFFF",
-                              "fontFamily": "System",
-                              "fontSize": 21.599999999999998,
-                              "fontWeight": "500",
+                              "alignItems": "center",
+                              "borderBottomLeftRadius": 9,
+                              "borderBottomRightRadius": 9,
+                              "borderTopLeftRadius": 9,
+                              "borderTopRightRadius": 9,
+                              "flexDirection": "column",
+                              "gap": 7,
+                              "height": 48,
+                              "justifyContent": "center",
+                              "maxHeight": 48,
+                              "maxWidth": 48,
+                              "minHeight": 48,
+                              "minWidth": 48,
+                              "overflow": "hidden",
+                              "position": "relative",
+                              "width": 48,
                             }
                           }
-                          suppressHighlighting={true}
                         >
-                          Received
-                        </Text>
-                        <Text
-                          style={
-                            {
-                              "color": "#FFFFFF",
-                              "fontFamily": "System",
-                              "fontSize": 21.599999999999998,
-                              "fontWeight": "500",
-                              "textAlign": "right",
+                          <View
+                            style={
+                              {
+                                "bottom": 0,
+                                "flexDirection": "column",
+                                "left": 0,
+                                "position": "absolute",
+                                "right": 0,
+                                "top": 0,
+                                "zIndex": 1,
+                              }
                             }
-                          }
-                          suppressHighlighting={true}
-                        >
-                          30 USDC
-                        </Text>
+                          >
+                            <Image
+                              fullscreen={true}
+                              onError={[Function]}
+                              onLoad={[Function]}
+                              source={
+                                {
+                                  "uri": "https://ui-avatars.com/api/?name=0xa71CE00000000000000000000000000000000000&size=256&format=png&background=86ad7f",
+                                }
+                              }
+                              style={
+                                {
+                                  "height": 48,
+                                  "width": 48,
+                                }
+                              }
+                            />
+                          </View>
+                          <View
+                            style={
+                              {
+                                "backgroundColor": "#86AE80",
+                                "bottom": 0,
+                                "flexDirection": "column",
+                                "justifyContent": "center",
+                                "left": 0,
+                                "position": "absolute",
+                                "right": 0,
+                                "top": 0,
+                                "zIndex": 0,
+                              }
+                            }
+                          >
+                            <View
+                              style={
+                                {
+                                  "alignItems": "center",
+                                  "borderBottomLeftRadius": 9,
+                                  "borderBottomRightRadius": 9,
+                                  "borderTopLeftRadius": 9,
+                                  "borderTopRightRadius": 9,
+                                  "flexDirection": "column",
+                                  "height": 48,
+                                  "justifyContent": "center",
+                                  "maxHeight": 48,
+                                  "maxWidth": 48,
+                                  "minHeight": 48,
+                                  "minWidth": 48,
+                                  "overflow": "hidden",
+                                  "position": "relative",
+                                  "width": 48,
+                                }
+                              }
+                            >
+                              <View
+                                style={
+                                  {
+                                    "bottom": 0,
+                                    "flexDirection": "column",
+                                    "left": 0,
+                                    "position": "absolute",
+                                    "right": 0,
+                                    "top": 0,
+                                    "zIndex": 1,
+                                  }
+                                }
+                              >
+                                <Image
+                                  fullscreen={true}
+                                  onError={[Function]}
+                                  onLoad={[Function]}
+                                  source={
+                                    {
+                                      "uri": "https://ui-avatars.com/api/?name=0xa71CE00000000000000000000000000000000000&size=256&format=png&background=86ad7f",
+                                    }
+                                  }
+                                  style={
+                                    {
+                                      "height": 48,
+                                      "width": 48,
+                                    }
+                                  }
+                                />
+                              </View>
+                            </View>
+                          </View>
+                        </View>
                       </View>
                       <View
                         style={
                           {
-                            "alignItems": "flex-start",
                             "flex": 1,
-                            "flexDirection": "row",
+                            "flexDirection": "column",
                             "gap": 4,
-                            "justifyContent": "space-between",
-                            "overflow": "hidden",
-                            "width": "100%",
+                            "maxWidth": "calc(100% - 54px)",
+                            "width": "calc(100% - 54px)",
+                          }
+                        }
+                      >
+                        <View
+                          style={
+                            {
+                              "alignItems": "center",
+                              "flexDirection": "row",
+                              "justifyContent": "space-between",
+                              "width": "100%",
+                            }
+                          }
+                        >
+                          <Text
+                            numberOfLines={1}
+                            style={
+                              {
+                                "color": "#FFFFFF",
+                                "flex": 1,
+                                "fontFamily": "System",
+                                "fontSize": 21.599999999999998,
+                                "fontWeight": "500",
+                                "maxWidth": "calc(100% - 78px)",
+                                "minWidth": 0,
+                              }
+                            }
+                            suppressHighlighting={true}
+                          >
+                            Deposit
+                          </Text>
+                          <Text
+                            style={
+                              {
+                                "color": "#FFFFFF",
+                                "flexShrink": 0,
+                                "fontFamily": "System",
+                                "fontSize": 21.599999999999998,
+                                "fontWeight": "500",
+                                "marginLeft": 7,
+                                "minWidth": 70,
+                                "textAlign": "right",
+                              }
+                            }
+                            suppressHighlighting={true}
+                          >
+                            20 USDC
+                          </Text>
+                        </View>
+                        <View
+                          style={
+                            {
+                              "alignItems": "center",
+                              "flexDirection": "row",
+                              "justifyContent": "space-between",
+                              "width": "100%",
+                            }
+                          }
+                        >
+                          <Text
+                            numberOfLines={1}
+                            style={
+                              {
+                                "color": "#B2B2B2",
+                                "flex": 1,
+                                "fontFamily": "System",
+                                "fontSize": 19.2,
+                                "fontWeight": "400",
+                                "lineHeight": 19,
+                                "maxWidth": "calc(100% - 78px)",
+                                "minWidth": 0,
+                                "userSelect": "auto",
+                              }
+                            }
+                            suppressHighlighting={true}
+                          >
+                            0xa71...0000
+                          </Text>
+                          <Text
+                            style={
+                              {
+                                "color": "#B2B2B2",
+                                "flexShrink": 0,
+                                "fontFamily": "System",
+                                "fontSize": 19.2,
+                                "fontWeight": "400",
+                                "lineHeight": 21,
+                                "marginLeft": 7,
+                                "minWidth": 70,
+                                "textAlign": "right",
+                                "userSelect": "auto",
+                              }
+                            }
+                            suppressHighlighting={true}
+                          >
+                            7 mon ago
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </div>
+              <div
+                className="css-view-175oi2r"
+                dir={null}
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                      "left": 0,
+                      "overflow": "visible",
+                      "position": "relative",
+                      "right": 0,
+                      "width": "100%",
+                    }
+                  }
+                >
+                  <View
+                    cancelable={true}
+                    disabled={false}
+                    focusable={true}
+                    minPressDuration={0}
+                    onMouseEnter={[Function]}
+                    onMouseLeave={[Function]}
+                    onPress={[Function]}
+                    onPressIn={[Function]}
+                    onPressOut={[Function]}
+                    style={
+                      {
+                        "alignItems": "center",
+                        "borderBottomLeftRadius": 9,
+                        "borderBottomRightRadius": 9,
+                        "borderTopLeftRadius": 9,
+                        "borderTopRightRadius": 9,
+                        "boxSizing": "border-box",
+                        "flexDirection": "row",
+                        "left": 0,
+                        "marginBottom": 0,
+                        "marginLeft": 0,
+                        "marginRight": 0,
+                        "marginTop": 0,
+                        "maxWidth": "100%",
+                        "paddingBottom": 16,
+                        "paddingLeft": 16,
+                        "paddingRight": 16,
+                        "paddingTop": 16,
+                        "position": "relative",
+                        "right": 0,
+                        "width": "100%",
+                      }
+                    }
+                    testID="TokenActivityRow"
+                  >
+                    <View
+                      style={
+                        {
+                          "alignItems": "center",
+                          "flex": 1,
+                          "flexDirection": "row",
+                          "maxWidth": "100%",
+                          "position": "relative",
+                          "width": "100%",
+                        }
+                      }
+                    >
+                      <View
+                        style={
+                          {
+                            "alignItems": "center",
+                            "flexDirection": "row",
+                            "justifyContent": "center",
+                            "marginRight": 14,
+                            "minWidth": 40,
+                            "width": 40,
                           }
                         }
                       >
@@ -1119,22 +1044,215 @@ exports[`TokenDetails renders correctly 1`] = `
                           style={
                             {
                               "flexDirection": "row",
-                              "maxWidth": "60%",
+                            }
+                          }
+                        >
+                          <View
+                            testID="MockSolitoLink"
+                          >
+                            <View
+                              style={
+                                {
+                                  "alignItems": "center",
+                                  "borderBottomLeftRadius": 9,
+                                  "borderBottomRightRadius": 9,
+                                  "borderTopLeftRadius": 9,
+                                  "borderTopRightRadius": 9,
+                                  "flexDirection": "column",
+                                  "gap": 7,
+                                  "height": 48,
+                                  "justifyContent": "center",
+                                  "maxHeight": 48,
+                                  "maxWidth": 48,
+                                  "minHeight": 48,
+                                  "minWidth": 48,
+                                  "overflow": "hidden",
+                                  "position": "relative",
+                                  "width": 48,
+                                }
+                              }
+                            >
+                              <View
+                                style={
+                                  {
+                                    "bottom": 0,
+                                    "flexDirection": "column",
+                                    "left": 0,
+                                    "position": "absolute",
+                                    "right": 0,
+                                    "top": 0,
+                                    "zIndex": 1,
+                                  }
+                                }
+                              >
+                                <Image
+                                  fullscreen={true}
+                                  onError={[Function]}
+                                  onLoad={[Function]}
+                                  source={
+                                    {
+                                      "uri": "https://i.pravatar.cc/500?u=alice",
+                                    }
+                                  }
+                                  style={
+                                    {
+                                      "height": 48,
+                                      "width": 48,
+                                    }
+                                  }
+                                />
+                              </View>
+                              <View
+                                style={
+                                  {
+                                    "backgroundColor": "#86AE80",
+                                    "bottom": 0,
+                                    "flexDirection": "column",
+                                    "justifyContent": "center",
+                                    "left": 0,
+                                    "position": "absolute",
+                                    "right": 0,
+                                    "top": 0,
+                                    "zIndex": 0,
+                                  }
+                                }
+                              >
+                                <View
+                                  style={
+                                    {
+                                      "alignItems": "center",
+                                      "borderBottomLeftRadius": 9,
+                                      "borderBottomRightRadius": 9,
+                                      "borderTopLeftRadius": 9,
+                                      "borderTopRightRadius": 9,
+                                      "flexDirection": "column",
+                                      "height": 48,
+                                      "justifyContent": "center",
+                                      "maxHeight": 48,
+                                      "maxWidth": 48,
+                                      "minHeight": 48,
+                                      "minWidth": 48,
+                                      "overflow": "hidden",
+                                      "position": "relative",
+                                      "width": 48,
+                                    }
+                                  }
+                                >
+                                  <View
+                                    style={
+                                      {
+                                        "bottom": 0,
+                                        "flexDirection": "column",
+                                        "left": 0,
+                                        "position": "absolute",
+                                        "right": 0,
+                                        "top": 0,
+                                        "zIndex": 1,
+                                      }
+                                    }
+                                  >
+                                    <Image
+                                      fullscreen={true}
+                                      onError={[Function]}
+                                      onLoad={[Function]}
+                                      source={
+                                        {
+                                          "uri": "https://ui-avatars.com/api/?name=Alice&size=256&format=png&background=86ad7f",
+                                        }
+                                      }
+                                      style={
+                                        {
+                                          "height": 48,
+                                          "width": 48,
+                                        }
+                                      }
+                                    />
+                                  </View>
+                                </View>
+                              </View>
+                            </View>
+                          </View>
+                        </View>
+                      </View>
+                      <View
+                        style={
+                          {
+                            "flex": 1,
+                            "flexDirection": "column",
+                            "gap": 4,
+                            "maxWidth": "calc(100% - 54px)",
+                            "width": "calc(100% - 54px)",
+                          }
+                        }
+                      >
+                        <View
+                          style={
+                            {
+                              "alignItems": "center",
+                              "flexDirection": "row",
+                              "justifyContent": "space-between",
+                              "width": "100%",
+                            }
+                          }
+                        >
+                          <Text
+                            numberOfLines={1}
+                            style={
+                              {
+                                "color": "#FFFFFF",
+                                "flex": 1,
+                                "fontFamily": "System",
+                                "fontSize": 21.599999999999998,
+                                "fontWeight": "500",
+                                "maxWidth": "calc(100% - 78px)",
+                                "minWidth": 0,
+                              }
+                            }
+                            suppressHighlighting={true}
+                          >
+                            Received
+                          </Text>
+                          <Text
+                            style={
+                              {
+                                "color": "#FFFFFF",
+                                "flexShrink": 0,
+                                "fontFamily": "System",
+                                "fontSize": 21.599999999999998,
+                                "fontWeight": "500",
+                                "marginLeft": 7,
+                                "minWidth": 70,
+                                "textAlign": "right",
+                              }
+                            }
+                            suppressHighlighting={true}
+                          >
+                            30 USDC
+                          </Text>
+                        </View>
+                        <View
+                          style={
+                            {
+                              "alignItems": "center",
+                              "flexDirection": "row",
+                              "justifyContent": "space-between",
+                              "width": "100%",
                             }
                           }
                         >
                           <View
                             href="/profile/42"
-                            testID="MockSolitoLink"
-                            viewProps={
+                            style={
                               {
-                                "style": {
-                                  "maxWidth": "100%",
-                                },
+                                "flex": 1,
+                                "maxWidth": "calc(100% - 78px)",
+                                "minWidth": 0,
                               }
                             }
+                            testID="MockSolitoLink"
                           >
                             <Text
+                              numberOfLines={1}
                               style={
                                 {
                                   "color": "#B2B2B2",
@@ -1151,23 +1269,26 @@ exports[`TokenDetails renders correctly 1`] = `
                               /alice
                             </Text>
                           </View>
-                        </View>
-                        <Text
-                          style={
-                            {
-                              "color": "#B2B2B2",
-                              "fontFamily": "System",
-                              "fontSize": 19.2,
-                              "fontWeight": "400",
-                              "lineHeight": 21,
-                              "textAlign": "right",
-                              "userSelect": "auto",
+                          <Text
+                            style={
+                              {
+                                "color": "#B2B2B2",
+                                "flexShrink": 0,
+                                "fontFamily": "System",
+                                "fontSize": 19.2,
+                                "fontWeight": "400",
+                                "lineHeight": 21,
+                                "marginLeft": 7,
+                                "minWidth": 70,
+                                "textAlign": "right",
+                                "userSelect": "auto",
+                              }
                             }
-                          }
-                          suppressHighlighting={true}
-                        >
-                          7 mon ago
-                        </Text>
+                            suppressHighlighting={true}
+                          >
+                            7 mon ago
+                          </Text>
+                        </View>
                       </View>
                     </View>
                   </View>
