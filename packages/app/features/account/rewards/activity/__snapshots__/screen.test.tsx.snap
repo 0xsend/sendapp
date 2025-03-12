@@ -332,7 +332,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
                     "borderWidth": 0,
                   },
                   {
-                    "color": "#081619",
+                    "color": "hsl(358, 85.3%, 64.0%)",
                   },
                   {
                     "flex": 0,
@@ -341,7 +341,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
                   },
                 ]
               }
-              tintColor="#081619"
+              tintColor="hsl(358, 85.3%, 64.0%)"
               vbHeight={24}
               vbWidth={24}
               width={28}
@@ -420,7 +420,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
                     "borderWidth": 0,
                   },
                   {
-                    "color": "#081619",
+                    "color": "hsl(358, 85.3%, 64.0%)",
                   },
                   {
                     "flex": 0,
@@ -429,7 +429,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
                   },
                 ]
               }
-              tintColor="#081619"
+              tintColor="hsl(358, 85.3%, 64.0%)"
               vbHeight={24}
               vbWidth={24}
               width={28}

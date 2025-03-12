@@ -25,7 +25,7 @@ import { getReferralHref } from 'app/utils/getReferralLink'
 import { useUser } from 'app/utils/useUser'
 import * as Clipboard from 'expo-clipboard'
 import * as Sharing from 'expo-sharing'
-import { type PropsWithChildren, type ReactNode, useEffect, useState } from 'react'
+import { type ReactNode, useEffect, useState } from 'react'
 import { useConfirmedTags } from 'app/utils/tags'
 import { useUserReferralsCount } from 'app/utils/useUserReferralsCount'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
@@ -58,10 +58,10 @@ export function AccountScreen() {
   const send_id = profile?.send_id
   const avatar_url = profile?.avatar_url
   const tags = useConfirmedTags()
-  const referralCode = (tags?.[0]?.name || profile?.referral_code) ?? ''
+  const mainTagName = profile?.main_tag_name
+  const referralCode = (mainTagName ? mainTagName : tags?.[0]?.name || profile?.referral_code) ?? ''
   const referralHref = getReferralHref(referralCode)
   const [canShare, setCanShare] = useState(false)
-  const mainTagName = profile?.main_tag_name
 
   useEffect(() => {
     const canShare = async () => {
@@ -142,6 +142,25 @@ export function AccountScreen() {
               Send ID: {send_id}
             </Paragraph>
           </XStack>
+          {mainTagName && (
+            <XStack
+              position="absolute"
+              gap="$2"
+              ai={'center'}
+              top={'$5'}
+              right={'$5'}
+              p={'$2'}
+              paddingRight={'$3'}
+              br={'$4'}
+              bc={'rgba(0,0,0, 0.25)'}
+              $platform-web={{ backdropFilter: 'blur(5px)' }}
+            >
+              <IconSlash size={'$1.5'} color={'$white'} />
+              <Paragraph size={'$5'} color={'$white'}>
+                Main Tag: {mainTagName}
+              </Paragraph>
+            </XStack>
+          )}
           <YStack
             position="absolute"
             top={0}
@@ -157,9 +176,7 @@ export function AccountScreen() {
             </Paragraph>
             <XStack flexWrap="wrap" columnGap={'$2.5'} rowGap={'$2'}>
               {tags?.map((tag) => (
-                <TagPill key={tag.name} tag={tag.name} mainTagName={mainTagName}>
-                  {tag.name}
-                </TagPill>
+                <TagPill key={tag.name} tag={tag.name} />
               ))}
             </XStack>
             <XStack gap="$3.5">
@@ -269,33 +286,18 @@ const StackButton = ({ href, label, icon }: { href: string; label: string; icon:
   )
 }
 
-const TagPill = ({
-  children,
-  tag,
-  mainTagName,
-}: PropsWithChildren<{
-  tag: string
-  mainTagName?: string
-}>) => {
+const TagPill = ({ tag }: { tag: string }) => {
   return (
-    <XStack
-      px={'$2.5'}
-      py={'$1'}
-      br={'$2'}
-      bc={'rgba(255,255,255, 0.1)'}
-      $platform-web={{ backdropFilter: 'blur(5px)' }}
+    <Paragraph
+      fontSize={'$2'}
+      bg="rgba(255,255,255,.1)"
+      $theme-light={{ bg: '$color2' }}
+      px={'$size.0.75'}
+      py={'$size.0.1'}
+      borderRadius={'$1'}
     >
-      <Paragraph
-        fontSize={'$2'}
-        color={'$white'}
-        {...(tag === mainTagName && {
-          borderWidth: 1,
-          borderColor: '$primary',
-        })}
-      >
-        {children}
-      </Paragraph>
-    </XStack>
+      /{tag}
+    </Paragraph>
   )
 }
 
@@ -303,8 +305,9 @@ const ReferralCode = () => {
   const { data: referralsCount } = useUserReferralsCount()
   const { profile } = useUser()
   const tags = useConfirmedTags()
+  const mainTagName = profile?.main_tag_name
   const toast = useToastController()
-  const referralCode = (tags?.[0]?.name || profile?.referral_code) ?? ''
+  const referralCode = (mainTagName ? mainTagName : tags?.[0]?.name || profile?.referral_code) ?? ''
   const referralHref = getReferralHref(referralCode)
 
   const copyOnPress = async () => {

@@ -126,9 +126,16 @@ function SendtagList({
     return null
   }
 
+  // Sort tags to put main tag first
+  const sortedTags = [...(allTags || [])].sort((a, b) => {
+    if (a?.id === mainTagId) return -1
+    if (b?.id === mainTagId) return 1
+    return 0
+  })
+
   return (
     <YStack gap="$5">
-      {allTags.map((tag, i) => {
+      {sortedTags.map((tag, i) => {
         if (!tag && i === nextTagIndex) {
           return (
             <Button
@@ -231,16 +238,19 @@ function TagItem({
     <>
       <ListItem
         h={54}
-        br={8}
+        br={12}
         w="fit-content"
         bc="$color2"
+        px="$4"
         pressStyle={{
-          scale: 0.99,
+          scale: 0.98,
           opacity: 0.95,
+          backgroundColor: '$color3',
         }}
         animation="quick"
         hoverStyle={{
           cursor: !isMainTag && !isUpdating ? 'pointer' : undefined,
+          backgroundColor: '$color3',
         }}
         onPress={async () => {
           if (!isMainTag && !isUpdating && !deleteTag.isPending) {
@@ -249,37 +259,49 @@ function TagItem({
         }}
         aria-label={`Tag ${tag.name}${isMainTag ? ' (Main)' : ''}`}
       >
-        <XStack ai="center" jc="space-between" f={1} px="$3" gap="$2">
-          <H3
-            fontSize={32}
-            fontWeight={'500'}
-            fontFamily={'$mono'}
-            $theme-dark={{ col: '$primary' }}
-            textDecorationLine={isMainTag ? 'underline' : undefined}
-            textDecorationColor={isMainTag ? '$primary' : undefined}
-          >
-            {isMainTag ? '/' : ''}
-            {tag.name}
-            {isUpdating && <Spinner ml="$2" size="small" color="$primary" />}
-          </H3>
-
+        <XStack gap="$4" ai="center" jc="space-between">
+          <YStack>
+            <Text
+              color="$color12"
+              ff="$mono"
+              fontSize="$6"
+              fontWeight="400"
+              opacity={isMainTag ? 1 : 0.9}
+              pb="$1"
+            >
+              /{tag.name}
+            </Text>
+            {isMainTag && (
+              <XStack
+                position="absolute"
+                bottom={-2}
+                left={0}
+                right={0}
+                height={2}
+                backgroundColor="$primary"
+                opacity={0.9}
+                br="$1"
+              />
+            )}
+          </YStack>
           {!isMainTag && (
             <Button
               size="$2"
-              theme="green"
-              icon={<Trash2 size={14} color="$primary" />}
+              theme="red_Button"
+              icon={<Trash2 size={14} color="$red10Light" />}
               onPress={(e) => {
                 e.stopPropagation()
                 setOpenDeleteDialog(true)
               }}
               disabled={isUpdating || deleteTag.isPending}
-              aria-label={`Delete tag ${tag.name}`}
-              p="$1.5"
-              bc="transparent"
-              hoverStyle={{
-                bc: 'transparent',
-                opacity: 0.8,
+              pressStyle={{
+                scale: 0.95,
+                opacity: 0.9,
               }}
+              hoverStyle={{
+                backgroundColor: '$red2Light',
+              }}
+              backgroundColor="transparent"
             />
           )}
         </XStack>
@@ -333,6 +355,7 @@ function TagItem({
                 </Button>
                 <Button
                   theme="active"
+                  backgroundColor="$primary"
                   onPress={async () => {
                     if (tag.id) {
                       await onUpdateMainTag(tag.id)
