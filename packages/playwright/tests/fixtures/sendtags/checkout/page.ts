@@ -69,4 +69,11 @@ export class CheckoutPage {
     await confirmTagsResponse
     await this.page.waitForURL('/account/sendtag')
   }
+
+  async addPendingTag(tagName: string) {
+    log('add pending tag', tagName)
+    await this.page.getByLabel('Tag name').fill(tagName)
+    await this.submitTagButton.click()
+    await this.page.getByTestId(`pending-tag-${tagName}`).waitFor({ state: 'visible' })
+  }
 }

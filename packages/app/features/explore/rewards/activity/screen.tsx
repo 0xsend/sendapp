@@ -255,7 +255,7 @@ const DistributionRequirementsCard = ({
                 default:
                   return (
                     <CheckCircle2
-                      $theme-light={{ color: theme.color12.get() }}
+                      $theme-light={{ color: '$color12' }}
                       color="$primary"
                       size={'$1.5'}
                     />
@@ -420,17 +420,16 @@ const MultiplierCards = ({
   distribution: UseDistributionsResultData[number]
   verificationsQuery: DistributionsVerificationsQuery
 }) => {
-  const theme = useTheme()
   const verifications = verificationsQuery.data
   if (verificationsQuery.isLoading) {
     return (
       <YStack f={1} w={'100%'} gap="$5">
-        <H3 fontWeight={'600'} color={theme.color12.get()}>
+        <H3 fontWeight={'600'} color={'$color12'}>
           Multiplier
         </H3>
         <FadeCard br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
           <Stack ai="center" jc="center" p="$4">
-            <Spinner color={theme.color12.get()} size="large" />
+            <Spinner color={'$color12'} size="large" />
           </Stack>
         </FadeCard>
       </YStack>
@@ -456,7 +455,7 @@ const MultiplierCards = ({
 
   return (
     <YStack f={1} w={'100%'} gap="$5">
-      <H3 fontWeight={'600'} color={theme.color12.get()}>
+      <H3 fontWeight={'600'} color={'$color12'}>
         Multiplier
       </H3>
       <Stack flexWrap="wrap" gap="$5" $gtXs={{ fd: 'row' }}>
@@ -473,7 +472,7 @@ const MultiplierCards = ({
               fontSize={'$9'}
               $sm={{ fontSize: '$8' }}
               fontWeight={'600'}
-              color={theme.color12.get()}
+              color={'$color12'}
               mx="auto"
             >
               X {(value ?? 1).toString()}
@@ -518,7 +517,6 @@ const ProgressCard = ({
   previousDistribution?: UseDistributionsResultData[number]
   verificationsQuery: DistributionsVerificationsQuery
 }) => {
-  const theme = useTheme()
   const sendSlash = distribution.send_slash.at(0)
 
   if (!sendSlash) {
@@ -531,7 +529,7 @@ const ProgressCard = ({
     return (
       <FadeCard br={12} $gtMd={{ gap: '$4' }} p="$6">
         <Stack ai="center" jc="center" p="$4">
-          <Spinner color={theme.color12.get()} size="large" />
+          <Spinner color={'$color12'} size="large" />
         </Stack>
       </FadeCard>
     )
@@ -546,7 +544,7 @@ const ProgressCard = ({
   if (!sendCeiling) {
     return (
       <YStack f={1} w={'100%'} gap="$5">
-        <H3 fontWeight={'600'} color={theme.color12.get()}>
+        <H3 fontWeight={'600'} color={'$color12'}>
           Progress
         </H3>
         <FadeCard br={'$6'} p="$7" $xs={{ p: '$5' }} w={'100%'} maw={500}>
@@ -577,7 +575,7 @@ const ProgressCard = ({
 
   return (
     <YStack f={1} w={'100%'} gap="$5">
-      <H3 fontWeight={'600'} color={theme.color12.get()}>
+      <H3 fontWeight={'600'} color={'$color12'}>
         Progress
       </H3>
       <FadeCard br={'$6'} p="$6" w={'100%'} maw={500}>
@@ -597,23 +595,23 @@ const Progress = ({ progress }: { progress: number }) => {
           px={'$0.9'}
           borderWidth={1}
           borderColor={'$primary'}
-          $theme-light={{ borderColor: theme.color12.get() }}
+          $theme-light={{ borderColor: '$color12' }}
           borderRadius={'$4'}
         >
           {progress.toFixed(1)}%
         </Paragraph>
       </XStack>
-      <Stack w="100%" h="$1" br="$10" bc={theme.color3.get()}>
+      <Stack w="100%" h="$1" br="$10" bc={'$color3'}>
         <Stack
           w={`${progress.toFixed(1)}%`}
           h="100%"
           br="$10"
           animation="quick"
           $theme-light={{
-            bc: theme.color12.get(),
+            bc: '$color12',
           }}
           $theme-dark={{
-            bc: theme.primary.get(),
+            bc: '$primary',
           }}
         />
       </Stack>
@@ -640,7 +638,7 @@ const ClaimableRewardsCard = ({
 
   return (
     <YStack f={1} w={'100%'} gap="$5" $sm={{ display: 'none' }}>
-      <H3 fontWeight={'600'} color={theme.color12.get()}>
+      <H3 fontWeight={'600'} color={'$color12'}>
         {isQualificationOver ? `Total ${distributionMonth}` : ` ${distributionMonth} Rewards`}
       </H3>
       <FadeCard br={'$6'} p="$7" ai={'center'} w={'100%'}>
