@@ -1,48 +1,102 @@
 import { usePathname } from 'app/utils/usePathname'
-import { createContext, useContext, useEffect, useRef, useState } from 'react'
-import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
+import type { LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
+import { Dimensions } from 'react-native'
 
 export type ScrollDirectionContextValue = {
-  direction?: 'up' | 'down'
+  direction: 'up' | 'down' | null
+  isAtEnd: boolean
   onScroll: (e: NativeSyntheticEvent<NativeScrollEvent>) => void
+  onContentSizeChange: (width: number, height: number) => void
+  onLayout: (e: LayoutChangeEvent) => void
 }
 
 const ScrollDirection = createContext<ScrollDirectionContextValue>(
   undefined as unknown as ScrollDirectionContextValue
 )
 
+const THRESHOLD = 50
+
 export const ScrollDirectionProvider = ({ children }: { children: React.ReactNode }) => {
-  const [direction, setDirection] = useState<'up' | 'down'>()
+  const [direction, setDirection] = useState<ScrollDirectionContextValue['direction']>(null)
+  const [isAtEnd, setIsAtEnd] = useState<ScrollDirectionContextValue['isAtEnd']>(false)
   const lastScrollY = useRef(0)
   const pathName = usePathname()
   const [, setPreviousPath] = useState('')
 
+  // Use window dimensions for initial values
+  const initialHeight =
+    typeof window !== 'undefined' ? window.innerHeight : Dimensions.get('window').height
+  const [viewportHeight, setViewportHeight] = useState(initialHeight)
+  const [contentHeight, setContentHeight] = useState(0)
+
   useEffect(() => {
     setPreviousPath((previousPath) => {
-      previousPath !== pathName && setDirection(undefined)
+      if (previousPath !== pathName) {
+        setDirection(null)
+        setIsAtEnd(false)
+        setContentHeight(0)
+        setViewportHeight(initialHeight)
+      }
       return pathName
     })
-  }, [pathName])
+  }, [pathName, initialHeight])
 
-  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent
-    const currentScrollY = contentOffset.y
-    const isEndOfView = layoutMeasurement.height + currentScrollY >= contentSize.height - 50
-
-    // Only update direction when crossing thresholds
-    if (currentScrollY < 50) {
-      setDirection('up')
-    } else if (lastScrollY.current - currentScrollY > 50 && !isEndOfView) {
-      setDirection('up')
-    } else if (currentScrollY - lastScrollY.current > 50 || isEndOfView) {
-      setDirection('down')
+  const checkIsAtEnd = useCallback((contentHeight: number, viewportHeight: number, scrollY = 0) => {
+    if (contentHeight === 0 || viewportHeight === 0) {
+      return
     }
 
-    lastScrollY.current = currentScrollY
-  }
+    const isContentShorterThanViewport = contentHeight <= viewportHeight
+    const isEndOfView =
+      isContentShorterThanViewport || viewportHeight + scrollY >= contentHeight - THRESHOLD
+
+    setIsAtEnd(isEndOfView)
+  }, [])
+
+  const onContentSizeChange = useCallback(
+    (_: number, height: number) => {
+      setContentHeight(height)
+      checkIsAtEnd(height, viewportHeight)
+    },
+    [viewportHeight, checkIsAtEnd]
+  )
+
+  const onLayout = useCallback(
+    (e: LayoutChangeEvent) => {
+      const height = e.nativeEvent.layout.height
+      setViewportHeight(height)
+      checkIsAtEnd(contentHeight, height)
+    },
+    [contentHeight, checkIsAtEnd]
+  )
+
+  const onScroll = useCallback(
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const { contentOffset } = e.nativeEvent
+      const currentScrollY = contentOffset.y
+      checkIsAtEnd(contentHeight, viewportHeight, currentScrollY)
+
+      // Update direction
+      if (currentScrollY < THRESHOLD) {
+        setDirection('up')
+      } else if (lastScrollY.current - currentScrollY > THRESHOLD && !isAtEnd) {
+        setDirection('up')
+      } else if (currentScrollY - lastScrollY.current > THRESHOLD || isAtEnd) {
+        setDirection('down')
+      }
+
+      lastScrollY.current = currentScrollY
+    },
+    [contentHeight, viewportHeight, isAtEnd, checkIsAtEnd]
+  )
 
   return (
-    <ScrollDirection.Provider value={{ direction, onScroll }}>{children}</ScrollDirection.Provider>
+    <ScrollDirection.Provider
+      value={{ direction, isAtEnd, onScroll, onLayout, onContentSizeChange }}
+    >
+      {children}
+    </ScrollDirection.Provider>
   )
 }
 

@@ -75,30 +75,33 @@ export function SendTagScreen() {
       width={'100%'}
       gap="$5"
       pb={'$3.5'}
+      jc={'space-between'}
       $gtLg={{
         width: '50%',
       }}
     >
-      <YStack gap="$3">
-        <H2 tt={'uppercase'}>Your verified tags</H2>
-        <Paragraph
-          fontSize={'$5'}
-          color={'$lightGrayTextField'}
-          $theme-light={{ color: '$darkGrayTextField' }}
-        >
-          Own your identity on Send. Register up to 5 verified tags and make them yours.
+      <YStack gap="$5">
+        <YStack gap="$3">
+          <H2 tt={'uppercase'}>Your verified tags</H2>
+          <Paragraph
+            fontSize={'$5'}
+            color={'$lightGrayTextField'}
+            $theme-light={{ color: '$darkGrayTextField' }}
+          >
+            Own your identity on Send. Register up to 5 verified tags and make them yours.
+          </Paragraph>
+        </YStack>
+        <SendtagList
+          allTags={confirmedTags}
+          confirmedTags={confirmedTags}
+          onUpdateMainTag={handleUpdateMainTag}
+          isUpdating={updateMainTag.isPending}
+          mainTagId={sendAccount?.main_tag_id ?? undefined}
+        />
+        <Paragraph fontSize={'$7'} fontWeight={'500'}>
+          Registered [ {`${confirmedTags?.length || 0}/${maxNumSendTags}`} ]
         </Paragraph>
       </YStack>
-      <SendtagList
-        allTags={confirmedTags}
-        confirmedTags={confirmedTags}
-        onUpdateMainTag={handleUpdateMainTag}
-        isUpdating={updateMainTag.isPending}
-        mainTagId={sendAccount?.main_tag_id ?? undefined}
-      />
-      <Paragraph fontSize={'$7'} fontWeight={'500'}>
-        Registered [ {`${confirmedTags?.length || 0}/${maxNumSendTags}`} ]
-      </Paragraph>
       <AddNewTagButton tags={confirmedTags} />
     </YStack>
   )

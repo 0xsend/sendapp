@@ -1,12 +1,11 @@
-import type { SafeAreaViewProps } from 'react-native-safe-area-context'
-import { SafeArea } from './SafeArea'
+import { SafeArea, type SafeAreaProps } from './SafeArea'
 import { XStack, type XStackProps } from 'tamagui'
 
 export const Container = ({
   children,
   safeAreaProps,
   ...props
-}: XStackProps & { safeAreaProps?: SafeAreaViewProps }) => {
+}: XStackProps & { safeAreaProps?: SafeAreaProps }) => {
   return (
     <SafeArea {...safeAreaProps}>
       <XStack

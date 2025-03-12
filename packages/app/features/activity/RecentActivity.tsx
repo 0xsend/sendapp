@@ -1,12 +1,13 @@
-import { Button, Fade, H4, Paragraph, ScrollView, Spinner, XStack, YGroup, YStack } from '@my/ui'
+import { H4, Paragraph, Spinner, XStack, YStack } from '@my/ui'
 import { useActivityFeed } from './utils/useActivityFeed'
 import type { PostgrestError } from '@supabase/postgrest-js'
 import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
 import type { ZodError } from 'zod'
 import type { Activity } from 'app/utils/zod/activity'
 import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
-import { type PropsWithChildren, useState } from 'react'
+import { type PropsWithChildren, useState, useMemo } from 'react'
 import { ActivityDetails } from 'app/features/activity/ActivityDetails'
+import { SectionList } from 'react-native'
 
 export function RecentActivity() {
   const result = useActivityFeed()
@@ -22,9 +23,8 @@ export function RecentActivity() {
 
   return (
     <XStack w={'100%'} height={0} gap={'$5'} f={1}>
-      <ScrollView
-        testID={'RecentActivity'}
-        showsVerticalScrollIndicator={false}
+      <YStack
+        f={1}
         display={selectedActivity ? 'none' : 'flex'}
         $gtLg={{
           display: 'flex',
@@ -32,7 +32,7 @@ export function RecentActivity() {
         }}
       >
         <ActivityFeed activityFeedQuery={result} onActivityPress={handleActivityPress} />
-      </ScrollView>
+      </YStack>
       {selectedActivity && (
         <ActivityDetails
           activity={selectedActivity}
@@ -58,100 +58,105 @@ function ActivityFeed({
     data,
     isLoading: isLoadingActivities,
     error: activitiesError,
-    isFetching: isFetchingActivities,
     isFetchingNextPage: isFetchingNextPageActivities,
     fetchNextPage,
     hasNextPage,
   } = activityFeedQuery
 
-  const { pages } = data ?? {}
+  const sections = useMemo(() => {
+    if (!data?.pages) return []
+
+    const activities = data.pages.flat()
+    const groups = activities.reduce<Record<string, Activity[]>>((acc, activity) => {
+      const isToday = activity.created_at.toDateString() === new Date().toDateString()
+      const dateKey = isToday
+        ? 'Today'
+        : activity.created_at.toLocaleDateString(undefined, {
+            day: 'numeric',
+            month: 'long',
+          })
+
+      if (!acc[dateKey]) {
+        acc[dateKey] = []
+      }
+
+      acc[dateKey].push(activity)
+      return acc
+    }, {})
+
+    return Object.entries(groups).map(([title, data], index) => ({
+      title,
+      data,
+      index,
+    }))
+  }, [data?.pages])
+
+  if (isLoadingActivities) {
+    return <Spinner size="small" />
+  }
+
+  if (activitiesError) {
+    return (
+      <Paragraph maxWidth={'600'} fontFamily={'$mono'} fontSize={'$5'} color={'$color12'}>
+        {activitiesError?.message.split('.').at(0) ?? `${activitiesError}`}
+      </Paragraph>
+    )
+  }
+
+  if (!sections.length) {
+    return <RowLabel>No activities</RowLabel>
+  }
 
   return (
-    <YStack gap="$5">
-      {(() => {
-        switch (true) {
-          case isLoadingActivities:
-            return <Spinner size="small" />
-          case activitiesError !== null:
-            return (
-              <Paragraph maxWidth={'600'} fontFamily={'$mono'} fontSize={'$5'} color={'$color12'}>
-                {activitiesError?.message.split('.').at(0) ?? `${activitiesError}`}
-              </Paragraph>
-            )
-          case pages?.length === 0:
-            return (
-              <>
-                <RowLabel>No activities</RowLabel>
-              </>
-            )
-          default: {
-            const groups = (pages || [])
-              .flatMap((activity) => activity)
-              .reduce<Record<string, Activity[]>>((acc, activity) => {
-                const isToday = activity.created_at.toDateString() === new Date().toDateString()
-
-                const dateKey = isToday
-                  ? 'Today'
-                  : activity.created_at.toLocaleDateString(undefined, {
-                      day: 'numeric',
-                      month: 'long',
-                    })
-
-                if (!acc[dateKey]) {
-                  acc[dateKey] = []
-                }
-
-                acc[dateKey].push(activity)
-                return acc
-              }, {})
-
-            return Object.entries(groups).map(([date, activities]) => (
-              <YStack key={date} gap={'$3.5'}>
-                <RowLabel>{date}</RowLabel>
-                <Fade>
-                  <YGroup bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }}>
-                    {activities.map((activity) => (
-                      <YGroup.Item
-                        key={`${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`}
-                      >
-                        <TokenActivityRow activity={activity} onPress={onActivityPress} />
-                      </YGroup.Item>
-                    ))}
-                  </YGroup>
-                </Fade>
-              </YStack>
-            ))
-          }
-        }
-      })()}
-      <Fade>
-        {!isLoadingActivities && (isFetchingNextPageActivities || hasNextPage) ? (
-          <>
-            {isFetchingNextPageActivities && <Spinner size="small" />}
-            {hasNextPage && (
-              <Button
-                onPress={() => {
-                  fetchNextPage()
-                }}
-                disabled={isFetchingNextPageActivities || isFetchingActivities}
-                color="$color10"
-                width={200}
-                mx="auto"
-                mt={'$3'}
-              >
-                Load More
-              </Button>
-            )}
-          </>
-        ) : null}
-      </Fade>
-    </YStack>
+    <SectionList
+      sections={sections}
+      testID={'RecentActivity'}
+      showsVerticalScrollIndicator={false}
+      keyExtractor={(activity) =>
+        `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`
+      }
+      renderItem={({ item: activity, index, section }) => (
+        <YStack
+          bc="$color1"
+          px="$2"
+          $gtLg={{
+            px: '$3.5',
+          }}
+          {...(index === 0 && {
+            pt: '$2',
+            $gtLg: {
+              pt: '$3.5',
+            },
+            borderTopLeftRadius: '$4',
+            borderTopRightRadius: '$4',
+          })}
+          {...(index === section.data.length - 1 && {
+            pb: '$2',
+            $gtLg: {
+              pb: '$3.5',
+            },
+            borderBottomLeftRadius: '$4',
+            borderBottomRightRadius: '$4',
+          })}
+        >
+          <TokenActivityRow activity={activity} onPress={onActivityPress} />
+        </YStack>
+      )}
+      renderSectionHeader={({ section: { title, index } }) => (
+        <RowLabel first={index === 0}>{title}</RowLabel>
+      )}
+      onEndReached={() => hasNextPage && fetchNextPage()}
+      ListFooterComponent={
+        !isLoadingActivities && isFetchingNextPageActivities ? <Spinner size="small" /> : null
+      }
+      stickySectionHeadersEnabled={true}
+    />
   )
 }
 
-function RowLabel({ children }: PropsWithChildren) {
+function RowLabel({ children, first }: PropsWithChildren & { first?: boolean }) {
   return (
-    <H4 fontWeight={'600'} size={'$7'}>
+    <H4 fontWeight={'600'} size={'$7'} pt={first ? 0 : '$3.5'} pb="$3.5" bc="$background">
       {children}
     </H4>
   )

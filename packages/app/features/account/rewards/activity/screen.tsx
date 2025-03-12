@@ -56,7 +56,9 @@ export function ActivityRewardsScreen() {
       ? distributions?.findIndex((d) => d.number === distribution)
       : 0
 
-  const verificationsQuery = useDistributionVerifications(distribution ?? distributions?.[0]?.id)
+  const verificationsQuery = useDistributionVerifications(
+    distribution ?? distributions?.[0]?.number
+  )
   const onValueChange = (value: string) => {
     const newDistribution = distributions?.[Number(value)]
     if (newDistribution?.number === distribution) return
@@ -158,56 +160,57 @@ export function ActivityRewardsScreen() {
   )
 }
 
-const Header = () => {
-  return (
-    <Stack w={'100%'} h={224} position="relative" jc={'center'} br={'$6'} overflow="hidden">
-      <Image
-        pos={'absolute'}
-        br={'$6'}
-        t={0}
-        zIndex={0}
-        bc="$black"
-        source={{
-          height: 1024,
-          width: 1024,
-          uri: 'https://ghassets.send.app/app_images/flower.jpg',
-        }}
-        h={'100%'}
-        w={'100%'}
-        $sm={{
-          scale: 1.5,
-        }}
-        objectFit="cover"
-      />
-      <LinearGradient
-        pos={'absolute'}
-        br={'$6'}
-        t={0}
-        start={[0, 0]}
-        end={[0, 1]}
-        fullscreen
-        colors={['$darkest', 'transparent', '$darkest']}
-      />
+const Header = () => (
+  <Stack w={'100%'} h={224} jc={'center'} br={'$6'} overflow="hidden">
+    <Image
+      pos={'absolute'}
+      br={'$6'}
+      t={0}
+      bc="$black"
+      zIndex={0}
+      source={{
+        height: 1024,
+        width: 1024,
+        uri: 'https://ghassets.send.app/app_images/flower.jpg',
+      }}
+      $sm={{
+        h: '150%',
+        w: '150%',
+        t: '-25%',
+        l: '-25%',
+      }}
+      h={'100%'}
+      w={'100%'}
+      objectFit="cover"
+    />
+    <LinearGradient
+      pos={'absolute'}
+      br={'$6'}
+      t={0}
+      start={[0, 0]}
+      end={[0, 1]}
+      fullscreen
+      colors={['$darkest', 'transparent', '$darkest']}
+    />
 
-      <YStack p="$4" pt={'$3'} position="absolute" zIndex={1}>
-        <H1 tt={'uppercase'} color={'white'} size={'$9'} $gtMd={{ size: '$10' }}>
-          Unlock <br />
-          Extra Rewards
-        </H1>
-        <Paragraph
-          color="$darkAlabaster"
-          size={'$2'}
-          $gtMd={{
-            size: '$5',
-          }}
-        >
-          Register at least 1 Sendtag, maintain the minimum balance,
-          <br /> avoid selling, and refer others for a bonus multiplier.
-        </Paragraph>
-      </YStack>
-    </Stack>
-  )
-}
+    <YStack p="$4" pt={'$3'} position="absolute" zIndex={1}>
+      <H1 tt={'uppercase'} color={'white'} size={'$9'} $gtMd={{ size: '$10' }}>
+        Unlock <br />
+        Extra Rewards
+      </H1>
+      <Paragraph
+        color="$darkAlabaster"
+        size={'$2'}
+        $gtMd={{
+          size: '$5',
+        }}
+      >
+        Register at least 1 Sendtag, maintain the minimum balance,
+        <br /> avoid selling, and refer others for a bonus multiplier.
+      </Paragraph>
+    </YStack>
+  </Stack>
+)
 
 const DistributionRequirementsCard = ({
   distribution,
@@ -606,7 +609,7 @@ const ProgressCard = ({
     previousDistribution?.distribution_shares?.reduce(
       (acc, curr) =>
         acc +
-        (verifications.distribution_id === 11
+        (verifications.distributionNumber === 11
           ? BigInt(curr.amount) * BigInt(1e16)
           : BigInt(curr.amount)),
       0n

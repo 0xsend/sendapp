@@ -4,7 +4,6 @@ import {
   H1,
   LinearGradient,
   Paragraph,
-  SafeArea,
   Spinner,
   Stack,
   XStack,
@@ -12,6 +11,7 @@ import {
   isWeb,
   useMedia,
   usePwa,
+  useSafeAreaInsets,
 } from '@my/ui'
 import { IconSendLogo } from 'app/components/icons'
 import { useAuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
@@ -30,7 +30,6 @@ import { bytesToHex, hexToBytes } from 'viem'
 import { useAuthScreenParams } from 'app/routers/params'
 import { useQuery } from '@tanstack/react-query'
 import { assert } from 'app/utils/assert'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 export function SplashScreen() {
   return (

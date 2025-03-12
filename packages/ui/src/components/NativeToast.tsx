@@ -1,6 +1,6 @@
 import { Toast, useToastState } from '@tamagui/toast'
 import { YStack, Theme } from 'tamagui'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useSafeAreaInsets } from '../utils'
 
 export const NativeToast = () => {
   const currentToast = useToastState()

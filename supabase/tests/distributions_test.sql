@@ -70,6 +70,7 @@ INSERT INTO distributions(number, tranche_id, name, description, amount, hodler_
                 CURRENT_TIMESTAMP AT TIME ZONE 'UTC'),
 (
             SELECT
+<<<<<<< HEAD
                 CURRENT_TIMESTAMP AT TIME ZONE 'UTC' + interval '10 days'),
             1e6::bigint,
 (
@@ -114,6 +115,113 @@ INSERT INTO public.distribution_verification_values(type, fixed_value, bips_valu
             FROM distributions
             WHERE
                 number = 123));
+=======
+                CURRENT_TIMESTAMP AT TIME ZONE 'UTC' + interval '11 days'),
+            8453);
+
+-- Add send slash settings for current distribution
+-- 10 send with divisor of 1 means send ceiling is hodler_min_balancec/10 = 1e5
+INSERT INTO send_slash(
+    distribution_id,
+    distribution_number,
+    minimum_sends,
+    scaling_divisor)
+VALUES (
+    (SELECT id FROM distributions WHERE number = 123),
+    123,
+    10,
+    1);
+
+INSERT INTO public.distribution_verification_values(
+    type,
+    fixed_value,
+    bips_value,
+    distribution_id)
+VALUES (
+    'tag_referral',
+    0,
+    500,(
+        SELECT
+            id
+        FROM distributions
+        WHERE
+            number = 123));
+INSERT INTO public.distribution_verification_values(
+    type,
+    fixed_value,
+    bips_value,
+    distribution_id)
+VALUES (
+    'tag_registration',
+    10000,
+    0,
+(
+        SELECT
+            id
+        FROM
+            distributions
+        WHERE
+            number = 123));
+INSERT INTO public.distribution_verification_values(
+    type,
+    fixed_value,
+    bips_value,
+    multiplier_max,
+    multiplier_step,
+    distribution_id)
+VALUES (
+    'total_tag_referrals' ::public.verification_type,
+    0,
+    0,
+    2.0,
+    0.02,
+(
+        SELECT
+            id
+        FROM
+            distributions
+        WHERE
+            "number" = 123
+        LIMIT 1));
+INSERT INTO public.distribution_verification_values(
+    type,
+    fixed_value,
+    bips_value,
+    distribution_id)
+VALUES (
+    'send_streak',
+    0,
+    500,(
+        SELECT
+            id
+        FROM distributions
+        WHERE
+            number = 123));
+INSERT INTO public.distribution_verification_values(
+    type,
+    fixed_value,
+    bips_value,
+    distribution_id)
+VALUES (
+    'send_ten',
+    0,
+    500,(
+        SELECT
+            id
+        FROM distributions
+        WHERE
+            number = 123));
+INSERT INTO public.distribution_verification_values(
+    type,
+    fixed_value,
+    bips_value,
+    distribution_id)
+VALUES (
+    'send_ceiling',
+    0,
+    0,
+    (SELECT id FROM distributions WHERE number = 123));
+>>>>>>> b35ef1287a5b60ebc1cd481a3424e0f4f5f6f2fd
 -- ensure verification values are not created
 INSERT INTO distribution_verification_values(type, fixed_value, bips_value, distribution_id, multiplier_min, multiplier_max, multiplier_step)
 SELECT
@@ -603,9 +711,9 @@ SELECT
                 user_id = tests.get_supabase_uid('bob')
                 AND type = 'send_ten' $$, $$
             VALUES ('8') $$, 'Should only count the recipient with a send account');
+
 SELECT
     finish();
 ROLLBACK;
 
 RESET client_min_messages;
-
