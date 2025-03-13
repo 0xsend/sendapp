@@ -1,4 +1,4 @@
-import type { Database } from '@my/supabase/database-generated.types'
+import type { Database } from '@my/supabase/database.types'
 import { sendEarnAbi } from '@my/wagmi'
 import type { PostgrestError, SupabaseClient } from '@supabase/supabase-js'
 import {

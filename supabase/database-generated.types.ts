@@ -981,6 +981,7 @@ export type Database = {
           src_name: string
           tx_hash: string
           tx_idx: number
+          send_earn_affiliate_vault: unknown | null
         }
         Insert: {
           abi_idx: number
@@ -1858,6 +1859,33 @@ export type Database = {
           updated_at: string
           user_id: string
         }
+      }
+      send_earn_affiliate_vault: {
+        Args: {
+          "": unknown
+        }
+        Returns: {
+          abi_idx: number
+          block_num: number
+          block_time: number
+          caller: string
+          chain_id: number
+          collections: string
+          event_id: string
+          fee: number
+          fee_recipient: string
+          id: number
+          ig_name: string
+          initial_owner: string
+          log_addr: string
+          log_idx: number
+          salt: string
+          send_earn: string
+          src_name: string
+          tx_hash: string
+          tx_idx: number
+          vault: string
+        }[]
       }
       sum_qualification_sends: {
         Args: {
