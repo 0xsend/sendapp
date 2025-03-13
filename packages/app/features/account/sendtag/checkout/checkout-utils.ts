@@ -9,7 +9,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { reward, total } from 'app/data/sendtags'
 import { api } from 'app/utils/api'
-import { useReferrer } from 'app/utils/referrer'
+import { useReferredBy, useReferrer } from 'app/utils/referrer'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { usePendingTags } from 'app/utils/tags'
@@ -80,12 +80,12 @@ export function useSendtagCheckout() {
   const amountDue = useMemo(() => total(pendingTags ?? []), [pendingTags])
   const { data: referrer } = useReferrer()
   const {
-    data: referred,
-    isLoading: isLoadingReferred,
-    error: referredError,
-  } = api.referrals.getReferred.useQuery()
+    data: referredBy,
+    isLoading: isLoadingReferredBy,
+    error: referredByError,
+  } = useReferredBy()
   const { data: reward } = useReferralReward({ tags: pendingTags })
-  const referrerAddress = referred?.referrerSendAccount?.address ?? referrer?.address ?? zeroAddress
+  const referrerAddress = referredBy?.address ?? referrer?.address ?? zeroAddress
 
   const checkoutArgs = useMemo(
     () => [amountDue, referrerAddress ?? zeroAddress, reward ?? 0n] as const,
@@ -136,7 +136,7 @@ export function useSendtagCheckout() {
     usdcFees,
     usdcFeesError,
     isLoadingUSDCFees,
-    isLoadingReferred,
-    referredError,
+    isLoadingReferred: isLoadingReferredBy,
+    referredError: referredByError,
   }
 }

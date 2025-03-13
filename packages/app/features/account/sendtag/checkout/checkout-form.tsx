@@ -35,6 +35,7 @@ import {
   REFERRAL_COOKIE_NAME,
   REFERRAL_COOKIE_MAX_AGE,
   useReferrer,
+  useReferredBy,
 } from 'app/utils/referrer'
 
 export const CheckoutForm = () => {
@@ -77,7 +78,7 @@ function ReferredBy() {
     },
   })
   const { data: referrer, error: referrerError, isLoading: isLoadingReferrer } = useReferrer()
-  const { data: referred, isLoading: isLoadingReferred } = api.referrals.getReferred.useQuery()
+  const { data: referredBy, isLoading: isLoadingReferredBy } = useReferredBy()
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
   const [referralCode, setReferralCode] = useState<string>('')
 
@@ -103,11 +104,11 @@ function ReferredBy() {
     }
   }, [isLoadingReferralCodeFromCookie, referralCodeFromCookie])
 
-  if (isLoadingReferred) {
+  if (isLoadingReferredBy) {
     return <Spinner color="$color11" />
   }
 
-  if (referred) {
+  if (referredBy) {
     return null
   }
 
