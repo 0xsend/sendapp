@@ -22,6 +22,7 @@ import {
 } from '@my/wagmi'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
+import { ReferredBy } from 'app/components/ReferredBy'
 import { usdcCoin } from 'app/data/coins'
 import { CalculatedBenefits } from 'app/features/earn/components/CalculatedBenefits'
 import { EarnTerms } from 'app/features/earn/components/EarnTerms'
@@ -455,6 +456,7 @@ export function DepositForm() {
                     return <StaticBenefits />
                 }
               })()}
+              <ReferredBy />
               <XStack gap={'$3'} ai={'center'}>
                 {areTermsAccepted}
                 {form.formState.errors.areTermsAccepted ? (
