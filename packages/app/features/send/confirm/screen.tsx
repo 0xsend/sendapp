@@ -1,8 +1,6 @@
 import {
   Avatar,
   Button,
-  ButtonText,
-  Label,
   LinkableAvatar,
   Paragraph,
   type ParagraphProps,
@@ -12,10 +10,9 @@ import {
   XStack,
   YStack,
   type TamaguiElement,
-  type YStackProps,
 } from '@my/ui'
 import { baseMainnet, baseMainnetClient, entryPointAddress } from '@my/wagmi'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQueryClient, useMutation } from '@tanstack/react-query'
 import { IconAccount } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { useSendScreenParams } from 'app/routers/params'
@@ -34,7 +31,7 @@ import { formatUnits, isAddress } from 'viem'
 import { useEstimateFeesPerGas } from 'wagmi'
 import { useCoin } from 'app/provider/coins'
 import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
-import { allCoinsDict } from 'app/data/coins'
+import { allCoins, allCoinsDict } from 'app/data/coins'
 
 import debug from 'debug'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
@@ -42,6 +39,9 @@ import { useTokenPrices } from 'app/utils/useTokenPrices'
 const log = debug('app:features:send:confirm:screen')
 import { api } from 'app/utils/api'
 import { signUserOp } from 'app/utils/signUserOp'
+import { decodeTransferUserOp } from 'app/utils/decodeTransferUserOp'
+import type { UserOperation } from 'permissionless'
+import { TEMPORAL_STATUS_INTERVAL, useTemporalStatus } from 'app/utils/useTemporalStatus'
 
 export function SendConfirmScreen() {
   const [queryParams] = useSendScreenParams()
@@ -75,8 +75,11 @@ export function SendConfirm() {
   const [queryParams] = useSendScreenParams()
   const { sendToken, recipient, idType, amount } = queryParams
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
-  const { coin: selectedCoin, tokensQuery, ethQuery } = useCoinFromSendTokenParam()
+  const { coin: selectedCoin } = useCoinFromSendTokenParam()
+  const [workflowId, setWorkflowId] = useState<string | null>(null)
 
+  // states for auth flow
+  const [error, setError] = useState<Error | null>(null)
   const {
     mutateAsync: transfer,
     isPending: isTransferPending,
@@ -106,13 +109,24 @@ export function SendConfirm() {
   } = useAccountNonce({
     sender: sendAccount?.address,
   })
-  const { data: userOp } = useGenerateTransferUserOp({
+
+  // Only generate UserOp when signing starts
+  const { data: userOp, isLoading: isGeneratingUserOp } = useGenerateTransferUserOp({
     sender: sendAccount?.address,
     // @ts-expect-error some work to` do here
     to: profile?.address ?? recipient,
     token: sendToken === 'eth' ? undefined : sendToken,
     amount: BigInt(queryParams.amount ?? '0'),
     nonce,
+  })
+
+  const { mutateAsync: validateUserOp, isPending: isValidatePending } = useValidateTransferUserOp()
+
+  const { data: transferStatus, isLoading: isTransferStatusLoading } = useTemporalStatus({
+    workflowId: workflowId,
+    table: 'send_account_transfers',
+    enabled: workflowId !== null,
+    refetchInterval: TEMPORAL_STATUS_INTERVAL,
   })
 
   const {
@@ -131,14 +145,24 @@ export function SendConfirm() {
     chainId: baseMainnet.id,
   })
 
-  const [error, setError] = useState<Error>()
-
   const hasEnoughBalance = selectedCoin?.balance && selectedCoin.balance >= BigInt(amount ?? '0')
   const gas = usdcFees ? usdcFees.baseFee + usdcFees.gasFees : BigInt(Number.MAX_SAFE_INTEGER)
   const hasEnoughGas =
     (usdc?.balance ?? BigInt(0)) > (isUSDCSelected ? BigInt(amount ?? '0') + gas : gas)
 
-  const canSubmit = BigInt(queryParams.amount ?? '0') > 0 && hasEnoughGas && hasEnoughBalance
+  const isLoading =
+    nonceIsLoading ||
+    isProfileLoading ||
+    isSendAccountLoading ||
+    isGeneratingUserOp ||
+    isValidatePending ||
+    isGasLoading ||
+    isFeesLoading ||
+    isTransferPending ||
+    isTransferInitialized ||
+    isTransferStatusLoading
+
+  const canSubmit = !isLoading && hasEnoughBalance && hasEnoughGas && feesPerGas
 
   const localizedAmount = localizeAmount(
     formatUnits(
@@ -201,17 +225,27 @@ export function SendConfirm() {
       })
       userOp.signature = signature
 
-      const workflowId = await transfer({ userOp })
+      const validatedUserOp = await validateUserOp(userOp)
+      assert(!!validatedUserOp, 'Operation expected to fail')
 
-      if (workflowId) {
+      const { workflowId, status } = await transfer({ userOp: validatedUserOp })
+
+      if (workflowId && status !== 'initialized') {
         router.replace({ pathname: '/', query: { token: sendToken } })
       }
+      setWorkflowId(workflowId)
     } catch (e) {
       console.error(e)
       setError(e)
+      setWorkflowId(null)
       await queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
     }
   }
+
+  useEffect(() => {
+    if (!transferStatus || transferStatus === 'initialized') return
+    router.replace({ pathname: '/', query: { token: sendToken } })
+  }, [transferStatus, router, sendToken])
 
   useEffect(() => {
     if (submitButtonRef.current) {
@@ -223,8 +257,10 @@ export function SendConfirm() {
     nonceIsLoading ||
     isProfileLoading ||
     isSendAccountLoading ||
+    isValidatePending ||
     isTransferPending ||
-    isTransferInitialized
+    isTransferInitialized ||
+    isTransferStatusLoading
   )
     return <Spinner size="large" color={'$color'} />
 
@@ -365,9 +401,9 @@ export function SendConfirm() {
         ref={submitButtonRef}
         theme={canSubmit ? 'green' : 'red_alt1'}
         onPress={onSubmit}
-        br={'$4'}
         disabledStyle={{ opacity: 0.7, cursor: 'not-allowed', pointerEvents: 'none' }}
         disabled={!canSubmit}
+        br={'$4'}
         gap={4}
         py={'$5'}
         width={'100%'}
@@ -389,122 +425,42 @@ export function SendConfirm() {
           }
         })()}
       </Button>
-      {/*  TODO add this back when backend is ready
-         <YStack gap="$5" f={1}>
-           <Label
-             fontWeight="500"
-             fontSize={'$5'}
-             textTransform="uppercase"
-             $theme-dark={{ col: '$gray8Light' }}
-           >
-             ADD A NOTE
-           </Label>
-           <Input
-             placeholder="(Optional)"
-             placeholderTextColor="$color12"
-             value={note}
-             onChangeText={(text) => setParams({ note: text }, { webBehavior: 'replace' })}
-             fontSize={20}
-             fontWeight="400"
-             lineHeight={1}
-             color="$color12"
-             borderColor="transparent"
-             outlineColor="transparent"
-             $theme-light={{ bc: '$gray3Light' }}
-             br={'$3'}
-             bc="$metalTouch"
-             hoverStyle={{
-               borderColor: 'transparent',
-               outlineColor: 'transparent',
-             }}
-             focusStyle={{
-               borderColor: 'transparent',
-               outlineColor: 'transparent',
-             }}
-             fontFamily="$mono"
-           />
-         </YStack> */}
     </YStack>
   )
 }
 
-export function SendRecipient({ ...props }: YStackProps) {
-  const [queryParams] = useSendScreenParams()
-  const { recipient, idType } = queryParams
-  const router = useRouter()
-  const { data: profile, isLoading, error } = useProfileLookup(idType ?? 'tag', recipient ?? '')
-  const href = profile ? `/profile/${profile?.sendid}` : ''
+function useValidateTransferUserOp() {
+  return useMutation({
+    mutationFn: async (userOp?: UserOperation<'v0.7'>) => {
+      if (!userOp?.signature) return null
 
-  if (isLoading) return <Spinner size="large" />
-  if (error) throw new Error(error.message)
+      try {
+        await baseMainnetClient.call({
+          account: entryPointAddress[baseMainnetClient.chain.id],
+          to: userOp.sender,
+          data: userOp.callData,
+        })
 
-  return (
-    <YStack gap="$2.5" {...props}>
-      <XStack jc="space-between" ai="center" gap="$3">
-        <Label
-          fontWeight="500"
-          fontSize={'$5'}
-          textTransform="uppercase"
-          $theme-dark={{ col: '$gray8Light' }}
-        >
-          TO
-        </Label>
-        <Button
-          bc="transparent"
-          chromeless
-          hoverStyle={{ bc: 'transparent' }}
-          pressStyle={{ bc: 'transparent' }}
-          focusStyle={{ bc: 'transparent' }}
-          onPress={() =>
-            router.push({
-              pathname: '/send',
-              query: { sendToken: queryParams.sendToken, amount: queryParams.amount },
-            })
-          }
-        >
-          <ButtonText $theme-dark={{ col: '$primary' }}>edit</ButtonText>
-        </Button>
-      </XStack>
-      <XStack
-        ai="center"
-        gap="$3"
-        bc="$metalTouch"
-        p="$2"
-        br="$3"
-        $theme-light={{ bc: '$gray3Light' }}
-      >
-        <LinkableAvatar size="$4.5" br="$3" href={href}>
-          <Avatar.Image src={profile?.avatar_url ?? ''} />
-          <Avatar.Fallback jc="center">
-            <IconAccount size="$4.5" color="$olive" />
-          </Avatar.Fallback>
-        </LinkableAvatar>
-        <YStack gap="$1.5">
-          <Paragraph fontSize="$4" fontWeight="500" color="$color12">
-            {profile?.name}
-          </Paragraph>
-          <Paragraph
-            fontFamily="$mono"
-            fontSize="$4"
-            fontWeight="400"
-            lineHeight="$1"
-            color="$color11"
-          >
-            {(() => {
-              switch (true) {
-                case idType === 'address':
-                  return shorten(recipient, 5, 4)
-                case !!profile?.tag:
-                  return `/${profile?.tag}`
-                default:
-                  return `#${profile?.sendid}`
-              }
-            })()}
-          </Paragraph>
-        </YStack>
-      </XStack>
-    </YStack>
-  )
+        const { from, to, token, amount } = decodeTransferUserOp({ userOp })
+        if (!from || !to || !amount || !token) {
+          log('Failed to decode transfer user op', { from, to, amount, token })
+          throw new Error('Not a valid transfer')
+        }
+        if (!allCoins.find((c) => c.token === token)) {
+          log('Token ${token} is not a supported', { token })
+          throw new Error(`Token ${token} is not a supported`)
+        }
+        if (amount < 0n) {
+          log('User Operation has amount < 0', { amount })
+          throw new Error('User Operation has amount < 0')
+        }
+        return userOp
+      } catch (e) {
+        const error = e instanceof Error ? e : new Error('Validation failed')
+        throw error
+      }
+    },
+  })
 }
 
 function ErrorMessage({ error, ...props }: ParagraphProps & { error?: string }) {

@@ -2,13 +2,18 @@ import type { Functions } from '@my/supabase/database.types'
 import {
   Anchor,
   AnimatePresence,
+  Avatar,
   Button,
   Fade,
   H4,
+  Label,
+  LinkableAvatar,
   Paragraph,
   Spinner,
   Text,
+  XStack,
   YStack,
+  type YStackProps,
   useToastController,
 } from '@my/ui'
 import Search from 'app/components/SearchBar'
@@ -17,8 +22,10 @@ import { useSendScreenParams } from 'app/routers/params'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useState } from 'react'
 import { SendAmountForm } from './SendAmountForm'
-import { SendRecipient } from './confirm/screen'
 import { type Address, isAddress } from 'viem'
+import { useRouter } from 'solito/router'
+import { IconAccount } from 'app/components/icons'
+import { shorten } from 'app/utils/strings'
 
 export const SendScreen = () => {
   const [{ recipient, idType }] = useSendScreenParams()
@@ -66,6 +73,85 @@ function SendSearchBody() {
       )}
       <Search.Results />
     </AnimatePresence>
+  )
+}
+
+export function SendRecipient({ ...props }: YStackProps) {
+  const [queryParams] = useSendScreenParams()
+  const { recipient, idType } = queryParams
+  const router = useRouter()
+  const { data: profile, isLoading, error } = useProfileLookup(idType ?? 'tag', recipient ?? '')
+  const href = profile ? `/profile/${profile?.sendid}` : ''
+
+  if (isLoading) return <Spinner size="large" />
+  if (error) throw new Error(error.message)
+
+  return (
+    <YStack gap="$2.5" {...props}>
+      <XStack jc="space-between" ai="center" gap="$3">
+        <Label
+          fontWeight="500"
+          fontSize={'$5'}
+          textTransform="uppercase"
+          $theme-dark={{ col: '$gray8Light' }}
+        >
+          TO
+        </Label>
+        <Button
+          bc="transparent"
+          chromeless
+          hoverStyle={{ bc: 'transparent' }}
+          pressStyle={{ bc: 'transparent' }}
+          focusStyle={{ bc: 'transparent' }}
+          onPress={() =>
+            router.push({
+              pathname: '/send',
+              query: { sendToken: queryParams.sendToken, amount: queryParams.amount },
+            })
+          }
+        >
+          <Button.Text $theme-dark={{ col: '$primary' }}>edit</Button.Text>
+        </Button>
+      </XStack>
+      <XStack
+        ai="center"
+        gap="$3"
+        bc="$metalTouch"
+        p="$2"
+        br="$3"
+        $theme-light={{ bc: '$gray3Light' }}
+      >
+        <LinkableAvatar size="$4.5" br="$3" href={href}>
+          <Avatar.Image src={profile?.avatar_url ?? ''} />
+          <Avatar.Fallback jc="center">
+            <IconAccount size="$4.5" color="$olive" />
+          </Avatar.Fallback>
+        </LinkableAvatar>
+        <YStack gap="$1.5">
+          <Paragraph fontSize="$4" fontWeight="500" color="$color12">
+            {profile?.name}
+          </Paragraph>
+          <Paragraph
+            fontFamily="$mono"
+            fontSize="$4"
+            fontWeight="400"
+            lineHeight="$1"
+            color="$color11"
+          >
+            {(() => {
+              switch (true) {
+                case idType === 'address':
+                  return shorten(recipient, 5, 4)
+                case !!profile?.tag:
+                  return `/${profile?.tag}`
+                default:
+                  return `#${profile?.sendid}`
+              }
+            })()}
+          </Paragraph>
+        </YStack>
+      </XStack>
+    </YStack>
   )
 }
 
