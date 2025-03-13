@@ -1,10 +1,11 @@
 import { sendEarnFactoryAbi } from '@0xsend/send-earn-contracts'
 import { sendEarnAbi, sendEarnUsdcFactoryAddress, usdcAddress } from '@my/wagmi'
 import { useSendEarnBalances } from 'app/features/earn/hooks'
+import { api } from 'app/utils/api'
 import { assert } from 'app/utils/assert'
 import { byteaToHex } from 'app/utils/byteaToHex'
 import { hexToBytea } from 'app/utils/hexToBytea'
-import { useReferrer } from 'app/utils/referrer'
+import { useReferredBy, useReferrer } from 'app/utils/referrer'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
@@ -23,17 +24,21 @@ const log = debug('app:features:earn')
 export function useReferrerVault(): UseQueryReturnType<`0x${string}` | null> {
   const supabase = useSupabase()
   const referrer = useReferrer()
+  const referredBy = useReferredBy()
 
   return useQuery({
-    queryKey: ['referrerVault', { supabase, referrer }] as const,
-    queryFn: async ({ queryKey: [, { supabase, referrer }] }) => {
+    queryKey: ['referrerVault', { supabase, referredBy, referrer }] as const,
+    queryFn: async ({ queryKey: [, { supabase, referredBy, referrer }], signal }) => {
+      throwIf(referredBy.isError)
       throwIf(referrer.isError)
-      const address = referrer.data?.address
+      // use referredBy ahead of referrer
+      const address = ([referredBy.data?.address, referrer.data?.address] as const).find((a) => a)
       if (!address) return null
       const { data, error } = await supabase
         .from('send_earn_new_affiliate')
         .select('send_earn_affiliate')
         .eq('affiliate', hexToBytea(address))
+        .abortSignal(signal)
         .limit(1)
         .maybeSingle()
 
@@ -50,7 +55,7 @@ export function useReferrerVault(): UseQueryReturnType<`0x${string}` | null> {
       const vaultBytea = data.send_earn_affiliate
       return byteaToHex(vaultBytea)
     },
-    enabled: !referrer.isLoading,
+    enabled: !referredBy.isLoading,
   })
 }
 
@@ -86,7 +91,7 @@ export function useSendEarnDepositVault({
         : []
 
       if (userBalances.length > 0 && userBalances[0]) {
-        const addr = byteaToHex(userBalances[0].log_addr)
+        const addr = userBalances[0].log_addr
         log('Found existing deposit. Using existing vault:', addr)
         return addr
       }

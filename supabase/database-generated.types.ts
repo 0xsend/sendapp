@@ -1619,6 +1619,24 @@ export type Database = {
         }
         Relationships: []
       }
+      referrer: {
+        Row: {
+          about: string | null
+          address: string | null
+          all_tags: string[] | null
+          avatar_url: string | null
+          chain_id: number | null
+          id: string | null
+          is_public: boolean | null
+          name: string | null
+          refcode: string | null
+          send_id: number | null
+          sendid: number | null
+          tag: string | null
+          x_username: string | null
+        }
+        Relationships: []
+      }
       send_earn_activity: {
         Row: {
           assets: number | null

@@ -136,6 +136,9 @@ export type Database = MergeDeep<
             > | null
           }
         }
+        referrer: {
+          Row: ProfileLookup
+        }
         send_earn_balances: {
           Row: {
             log_addr: PgBytea
