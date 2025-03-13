@@ -6,7 +6,7 @@ import { assert } from './assert'
 import { useSupabase } from './supabase/useSupabase'
 import { fetchProfile } from './useProfileLookup'
 import { getCookie } from './cookie'
-import type { Functions } from '@my/supabase/database.types'
+import type { Database, Functions } from '@my/supabase/database.types'
 import type { Merge } from 'type-fest'
 
 export const REFERRAL_COOKIE_NAME = 'referral'
@@ -101,5 +101,34 @@ export function useReferrer() {
       return fetchReferrer({ supabase, profile, referralCode, signal })
     },
     enabled: !!referralCode && !!profile,
+  })
+}
+
+/**
+ * Returns profile information about who referred the current user
+ */
+export function fetchReferredBy({ supabase }: { supabase: SupabaseClient<Database> }) {
+  return supabase.from('referrer').select('*')
+}
+
+/**
+ * Returns profile information about who referred the current user
+ */
+export function useReferredBy() {
+  const supabase = useSupabase()
+  return useQuery({
+    queryKey: ['referredBy', { supabase }] as const,
+    queryFn: async ({ queryKey: [, { supabase }], signal }) => {
+      assert(!!supabase, 'supabase is required')
+      const { data, error } = await fetchReferredBy({ supabase }).abortSignal(signal).maybeSingle()
+      if (error) {
+        if (error.code === 'PGRST116') {
+          // no rows found
+          return null
+        }
+        throw error
+      }
+      return data
+    },
   })
 }
