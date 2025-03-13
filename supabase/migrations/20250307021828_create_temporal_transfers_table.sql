@@ -14,6 +14,7 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA temporal
 
 CREATE TYPE temporal.transfer_status AS ENUM(
     'initialized',
+    'submitted',
     'sent',
     'confirmed',
     'failed',
@@ -23,10 +24,10 @@ CREATE TYPE temporal.transfer_status AS ENUM(
 CREATE TABLE temporal.send_account_transfers(
     id serial primary key,
     workflow_id text not null,
-    user_id uuid not null DEFAULT uuid_nil(), -- rely on trigger to set user_id
-    status temporal.transfer_status not null,
-    created_at_block_num bigint not null,
-    data jsonb not null,
+    status temporal.transfer_status not null default 'initialized',
+    user_id uuid, -- rely on trigger to set user_id
+    created_at_block_num bigint,
+    data jsonb,
     created_at timestamp with time zone not null default (now() AT TIME ZONE 'utc'::text),
     updated_at timestamp with time zone not null default (now() AT TIME ZONE 'utc'::text)
 );
@@ -49,88 +50,52 @@ CREATE INDEX temporal_send_account_transfers_user_id_idx ON temporal.send_accoun
 CREATE INDEX temporal_send_account_transfers_created_at_idx ON temporal.send_account_transfers(created_at);
 CREATE UNIQUE INDEX temporal_send_account_transfers_workflow_id_idx ON temporal.send_account_transfers(workflow_id);
 
-CREATE OR REPLACE FUNCTION temporal.handle_transfer_upsert()
+CREATE OR REPLACE FUNCTION temporal.temporal_transfer_before_insert()
 RETURNS TRIGGER AS $$
 DECLARE
   _user_id uuid;
+  _address text;
 BEGIN
-  -- Get user_id based on transfer type
   IF NEW.data ? 'f' THEN
-    -- Token transfer
-    SELECT user_id INTO _user_id
-    FROM send_accounts
-    WHERE address = concat('0x', encode((NEW.data->>'f')::bytea, 'hex'))::citext;
+    _address := concat('0x', encode((NEW.data->>'f')::bytea, 'hex'));
   ELSIF NEW.data ? 'sender' THEN
-    -- ETH transfer
-    SELECT user_id INTO _user_id
-    FROM send_accounts
-    WHERE address = concat('0x', encode((NEW.data->>'sender')::bytea, 'hex'))::citext;
+    _address := concat('0x', encode((NEW.data->>'sender')::bytea, 'hex'));
+  ELSE
+    RAISE NOTICE 'No address given';
+    RETURN NEW;
   END IF;
+
+  SELECT user_id INTO _user_id
+  FROM send_accounts
+  WHERE address = _address::citext;
 
   -- Validate user_id
   IF _user_id IS NULL THEN
-    RAISE EXCEPTION 'No user found for the given address';
+    RAISE NOTICE 'No user found for address: %', _address;
+    RETURN NEW;
   END IF;
 
-  -- Handle conflicts for INSERT operations
-  IF TG_OP = 'INSERT' THEN
-    -- Check if conflicting row exists with non-failed/cancelled status
-    IF EXISTS (
-      SELECT 1
-      FROM temporal.send_account_transfers
-      WHERE workflow_id = NEW.workflow_id
-      AND status NOT IN ('failed', 'cancelled')
-    ) THEN
-      RAISE EXCEPTION 'Workflow ID % already exists with status not failed/cancelled', NEW.workflow_id;
-    END IF;
-
-    -- For existing failed/cancelled transfers, update instead of insert
-    IF EXISTS (
-      SELECT 1
-      FROM temporal.send_account_transfers
-      WHERE workflow_id = NEW.workflow_id
-    ) THEN
-      UPDATE temporal.send_account_transfers
-      SET status = NEW.status,
-          created_at_block_num = NEW.created_at_block_num,
-          data = NEW.data,
-          user_id = _user_id,
-          updated_at = now()
-      WHERE workflow_id = NEW.workflow_id;
-
-      RETURN NULL;
-    END IF;
-  END IF;
-
-  -- Set user_id for new inserts or updates
-  NEW.user_id := _user_id;
+  NEW.user_id = _user_id;
 
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER handle_transfer_upsert_trigger
-  BEFORE INSERT OR UPDATE ON temporal.send_account_transfers
+CREATE TRIGGER temporal_send_account_transfers_trigger_before_insert
+  BEFORE INSERT ON temporal.send_account_transfers
   FOR EACH ROW
-  EXECUTE FUNCTION temporal.handle_transfer_upsert();
+  EXECUTE FUNCTION temporal.temporal_transfer_before_insert();
 
-CREATE OR REPLACE FUNCTION temporal.temporal_send_account_transfers_trigger_activity()
+CREATE OR REPLACE FUNCTION temporal.temporal_transfer_after_update()
   RETURNS TRIGGER
   LANGUAGE plpgsql
   SECURITY DEFINER
   AS $$
 DECLARE
-  _from_user_id uuid;
   _to_user_id uuid;
   _data jsonb;
 BEGIN
-  -- Set user IDs based on whether it's a token or ETH transfer
-  IF NEW.data ? 'f' THEN
-    -- Token transfer
-    SELECT user_id INTO _from_user_id
-    FROM send_accounts
-    WHERE address = concat('0x', encode((NEW.data->>'f')::bytea, 'hex'))::citext;
-
+  IF NEW.data ? 't' THEN
     SELECT user_id INTO _to_user_id
     FROM send_accounts
     WHERE address = concat('0x', encode((NEW.data->>'t')::bytea, 'hex'))::citext;
@@ -146,11 +111,6 @@ BEGIN
         'block_num', NEW.data->>'block_num'::text
     );
   ELSE
-    -- ETH transfer
-    SELECT user_id INTO _from_user_id
-    FROM send_accounts
-    WHERE address = concat('0x', encode((NEW.data->>'sender')::bytea, 'hex'))::citext;
-
     SELECT user_id INTO _to_user_id
     FROM send_accounts
     WHERE address = concat('0x', encode((NEW.data->>'log_addr')::bytea, 'hex'))::citext;
@@ -166,46 +126,38 @@ BEGIN
     );
   END IF;
 
-  -- For INSERT operations
-  IF TG_OP = 'INSERT' THEN
-    INSERT INTO activity(
-      event_name,
-      event_id,
-      from_user_id,
-      to_user_id,
-      data
-    )
-    VALUES (
-      'temporal_send_account_transfers',
-      NEW.workflow_id,
-      _from_user_id,
-      _to_user_id,
-      _data
-    );
-  -- For UPDATE operations
-  ELSIF TG_OP = 'UPDATE' THEN
-    UPDATE activity
-    SET data = _data
-    WHERE event_name = 'temporal_send_account_transfers'
-      AND event_id = NEW.workflow_id;
-  END IF;
-
+  INSERT INTO activity(
+    event_name,
+    event_id,
+    from_user_id,
+    to_user_id,
+    data
+  )
+  VALUES (
+    'temporal_send_account_transfers',
+    NEW.workflow_id,
+    NEW.user_id,
+    _to_user_id,
+    _data
+  )
+  ON CONFLICT (event_name, event_id)
+  DO UPDATE SET
+    data = EXCLUDED.data;
   RETURN NEW;
 END;
 $$;
 
--- Single trigger for both token and ETH transfers, handling both INSERT and UPDATE
-CREATE TRIGGER temporal_send_account_transfers_trigger_activity
-  AFTER INSERT OR UPDATE ON temporal.send_account_transfers
+CREATE TRIGGER temporal_send_account_transfers_trigger_after_update
+  AFTER UPDATE ON temporal.send_account_transfers
   FOR EACH ROW
-  EXECUTE FUNCTION temporal.temporal_send_account_transfers_trigger_activity();
+  EXECUTE FUNCTION temporal.temporal_transfer_after_update();
 
 CREATE OR REPLACE FUNCTION temporal.temporal_send_account_transfers_trigger_delete_activity()
   RETURNS TRIGGER
   LANGUAGE plpgsql
   SECURITY DEFINER
   AS $$
-BEGINa
+BEGIN
     DELETE FROM activity
     WHERE event_name = 'temporal_send_account_transfers'
       AND event_id = OLD.workflow_id;
