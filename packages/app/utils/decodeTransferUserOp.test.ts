@@ -1,5 +1,5 @@
 import { describe } from '@jest/globals'
-import { sendAccountAbi } from '@my/wagmi'
+import { baseMainnet, sendAccountAbi, sendTokenAddress } from '@my/wagmi'
 import { decodeTransferUserOp } from './decodeTransferUserOp'
 import { encodeFunctionData, erc20Abi } from 'viem'
 
@@ -74,7 +74,7 @@ describe('decodeTransferUserOp', () => {
   it('should decode ERC20 transfer user operation', () => {
     const sender = `0x${'1'.repeat(40)}` as `0x${string}`
     const to = `0x${'2'.repeat(40)}` as `0x${string}`
-    const token = `0x${'3'.repeat(40)}` as `0x${string}`
+    const token = sendTokenAddress[baseMainnet.id]
     const amount = 1n
     const nonce = 0n
     const callData = encodeFunctionData({
