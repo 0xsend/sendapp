@@ -7,6 +7,7 @@ import type { UserOperation } from 'permissionless'
 import { TransferWorkflow } from '@my/workflows/all-workflows'
 import { baseMainnetClient, entryPointAddress } from '@my/wagmi'
 import { getUserOperationHash } from 'permissionless/utils'
+import { supabaseAdmin } from 'app/utils/supabase/admin'
 
 const log = debug('api:temporal')
 
@@ -38,8 +39,29 @@ export const temporalRouter = createTRPCRouter({
             workflowId: `temporal/transfer/${user.id}/${userOpHash}`,
             args: [userOp],
           })
+          await baseMainnetClient.call({
+            account: entryPointAddress[baseMainnetClient.chain.id],
+            to: userOp.sender,
+            data: userOp.callData,
+          })
           log(`Workflow Created: ${workflowId}`)
-          return workflowId
+          const { data: transfer, error: transferError } = await supabaseAdmin
+            .schema('temporal')
+            .from('send_account_transfers')
+            .select('status')
+            .eq('workflow_id', workflowId)
+            .single()
+
+          if (transferError) {
+            log('Error fetching transfer status', transferError)
+            return { workflowId, status: null }
+          }
+
+          if (!transfer) {
+            return { workflowId, status: null }
+          }
+
+          return { workflowId, status: transfer.status }
         } catch (error) {
           throw new TRPCError({
             code: 'INTERNAL_SERVER_ERROR',
