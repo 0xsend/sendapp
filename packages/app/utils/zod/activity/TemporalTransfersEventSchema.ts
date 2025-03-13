@@ -10,6 +10,7 @@ import type { Database } from '@my/supabase/database-generated.types'
 /** Temporal transfers status */
 export const temporalTransferStatus = z.enum([
   'initialized',
+  'submitted',
   'sent',
   'confirmed',
   'failed',
@@ -21,10 +22,10 @@ export const temporalTransferStatus = z.enum([
  */
 const BaseTemporalTransfersDataSchema = z.object({
   status: temporalTransferStatus,
+  log_addr: byteaToHexEthAddress,
   user_op_hash: byteaToHexTxHash.nullable(),
   tx_hash: byteaToHexTxHash.nullable(),
   block_num: decimalStrToBigInt.nullable(),
-  log_addr: byteaToHexEthAddress,
 })
 
 /**
@@ -98,6 +99,7 @@ export const temporalEventNameFromStatus = (
 ) => {
   switch (status) {
     case 'initialized':
+    case 'submitted':
       return 'Sending...'
     case 'sent':
       return 'Confirming...'

@@ -6240,10 +6240,10 @@
           "maxLength": null
         },
         {
-          "id": "temporal.send_account_transfers.user_id",
-          "name": "user_id",
-          "columnName": "user_id",
-          "type": "uuid",
+          "id": "temporal.send_account_transfers.status",
+          "name": "status",
+          "columnName": "status",
+          "type": "transfer_status",
           "isRequired": true,
           "kind": "scalar",
           "isList": false,
@@ -6254,11 +6254,11 @@
           "maxLength": null
         },
         {
-          "id": "temporal.send_account_transfers.status",
-          "name": "status",
-          "columnName": "status",
-          "type": "transfer_status",
-          "isRequired": true,
+          "id": "temporal.send_account_transfers.user_id",
+          "name": "user_id",
+          "columnName": "user_id",
+          "type": "uuid",
+          "isRequired": false,
           "kind": "scalar",
           "isList": false,
           "isGenerated": false,
@@ -6272,7 +6272,7 @@
           "name": "created_at_block_num",
           "columnName": "created_at_block_num",
           "type": "int8",
-          "isRequired": true,
+          "isRequired": false,
           "kind": "scalar",
           "isList": false,
           "isGenerated": false,
@@ -6286,7 +6286,7 @@
           "name": "data",
           "columnName": "data",
           "type": "jsonb",
-          "isRequired": true,
+          "isRequired": false,
           "kind": "scalar",
           "isList": false,
           "isGenerated": false,
@@ -9834,6 +9834,9 @@
         },
         {
           "name": "sent"
+        },
+        {
+          "name": "submitted"
         }
       ]
     }

@@ -1,70 +1,28 @@
-import type { PgBytea, Database } from '@my/supabase/database.types'
+import type { Database } from '@my/supabase/database.types'
 import type { PostgrestError } from '@supabase/supabase-js'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 
-export async function upsertTemporalTokenSendAccountTransfer({
-  workflow_id,
-  status,
-  block_num,
-  f,
-  t,
-  v,
-  log_addr,
-}: {
-  workflow_id: string
-  status: Database['temporal']['Enums']['transfer_status']
-  block_num: bigint
-  f: PgBytea
-  t: PgBytea
-  v: bigint
-  log_addr: PgBytea
-}) {
-  return await supabaseAdmin
-    .schema('temporal')
-    .from('send_account_transfers')
-    .upsert({
-      workflow_id,
-      status,
-      created_at_block_num: Number(block_num),
-      data: {
-        f,
-        t,
-        v: v.toString(),
-        log_addr,
-      },
-    })
-    .select('*')
-    .single()
-}
+export type TemporalTransfer = Database['temporal']['Tables']['send_account_transfers']['Row']
+export type TemporalTransferInsert =
+  Database['temporal']['Tables']['send_account_transfers']['Insert']
+export type TemporalTransferUpdate =
+  Database['temporal']['Tables']['send_account_transfers']['Update']
 
-export async function upsertTemporalEthSendAccountTransfer({
+export async function upsertTemporalSendAccountTransfer({
   workflow_id,
   status,
-  block_num,
-  sender,
-  log_addr,
-  value,
-}: {
-  workflow_id: string
-  status: Database['temporal']['Enums']['transfer_status']
-  block_num: bigint
-  sender: PgBytea
-  log_addr: PgBytea
-  value: bigint
-}) {
+  data,
+}: TemporalTransferInsert) {
   return await supabaseAdmin
     .schema('temporal')
     .from('send_account_transfers')
-    .upsert({
-      workflow_id,
-      status,
-      created_at_block_num: Number(block_num),
-      data: {
-        sender,
-        value: value.toString(),
-        log_addr,
-      },
-    })
+    .upsert(
+      { workflow_id, status, data },
+      {
+        onConflict: 'workflow_id',
+        ignoreDuplicates: false, // false means do update on conflict
+      }
+    )
     .select('*')
     .single()
 }
@@ -72,19 +30,19 @@ export async function upsertTemporalEthSendAccountTransfer({
 export async function updateTemporalSendAccountTransfer({
   workflow_id,
   status,
+  created_at_block_num,
   data,
-}: {
-  workflow_id: string
-  status: Database['temporal']['Enums']['transfer_status']
-  data?: Database['temporal']['Tables']['send_account_transfers']['Row']['data']
-}) {
+}: TemporalTransferUpdate) {
+  if (!workflow_id) throw new Error('Workflow ID is required to update temporal transfer')
+  const payload = {
+    status,
+  } as TemporalTransferUpdate
+  if (created_at_block_num) payload.created_at_block_num = created_at_block_num
+  if (data) payload.data = data
   return await supabaseAdmin
     .schema('temporal')
     .from('send_account_transfers')
-    .update({
-      status,
-      data,
-    })
+    .update(payload)
     .eq('workflow_id', workflow_id)
     .select('*')
     .single()

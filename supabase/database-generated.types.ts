@@ -1493,32 +1493,32 @@ export type Database = {
       send_account_transfers: {
         Row: {
           created_at: string
-          created_at_block_num: number
-          data: Json
+          created_at_block_num: number | null
+          data: Json | null
           id: number
           status: Database["temporal"]["Enums"]["transfer_status"]
           updated_at: string
-          user_id: string
+          user_id: string | null
           workflow_id: string
         }
         Insert: {
           created_at?: string
-          created_at_block_num: number
-          data: Json
+          created_at_block_num?: number | null
+          data?: Json | null
           id?: number
-          status: Database["temporal"]["Enums"]["transfer_status"]
+          status?: Database["temporal"]["Enums"]["transfer_status"]
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
           workflow_id: string
         }
         Update: {
           created_at?: string
-          created_at_block_num?: number
-          data?: Json
+          created_at_block_num?: number | null
+          data?: Json | null
           id?: number
           status?: Database["temporal"]["Enums"]["transfer_status"]
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
           workflow_id?: string
         }
         Relationships: []
@@ -1533,6 +1533,7 @@ export type Database = {
     Enums: {
       transfer_status:
         | "initialized"
+        | "submitted"
         | "sent"
         | "confirmed"
         | "failed"
