@@ -1,22 +1,33 @@
 import { sendEarnFactoryAbi } from '@0xsend/send-earn-contracts'
 import { sendEarnAbi, sendEarnUsdcFactoryAddress, usdcAddress } from '@my/wagmi'
 import { useSendEarnBalances } from 'app/features/earn/hooks'
-import { api } from 'app/utils/api'
 import { assert } from 'app/utils/assert'
-import { byteaToHex } from 'app/utils/byteaToHex'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { useReferredBy, useReferrer } from 'app/utils/referrer'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import type { SendAccountCall } from 'app/utils/userop'
+import { byteaToHexEthAddress } from 'app/utils/zod'
 import debug from 'debug'
 import { getRandomBytes } from 'expo-crypto'
 import { bytesToHex, encodeFunctionData, erc20Abi, zeroAddress } from 'viem'
 import { useChainId } from 'wagmi'
 import { useQuery, type UseQueryReturnType } from 'wagmi/query'
+import { z } from 'zod'
 
 const log = debug('app:features:earn')
+
+const AffiliateVaultSchema = z
+  .object({
+    affiliate: byteaToHexEthAddress,
+    send_earn_affiliate_vault: z
+      .object({
+        send_earn: byteaToHexEthAddress,
+      })
+      .nullable(),
+  })
+  .nullable()
 
 /**
  * Fetches the referrer's vault address from the send_earn_new_affiliate table.
@@ -36,8 +47,9 @@ export function useReferrerVault(): UseQueryReturnType<`0x${string}` | null> {
       if (!address) return null
       const { data, error } = await supabase
         .from('send_earn_new_affiliate')
-        .select('send_earn_affiliate')
+        .select('affiliate, send_earn_affiliate_vault(send_earn)')
         .eq('affiliate', hexToBytea(address))
+        .not('send_earn_affiliate_vault', 'is', null)
         .abortSignal(signal)
         .limit(1)
         .maybeSingle()
@@ -47,13 +59,9 @@ export function useReferrerVault(): UseQueryReturnType<`0x${string}` | null> {
         throw error
       }
 
-      if (!data || !data?.send_earn_affiliate) {
-        log('No vault found for referrer:', address)
-        return null
-      }
+      const affiliateVault = AffiliateVaultSchema.parse(data)
 
-      const vaultBytea = data.send_earn_affiliate
-      return byteaToHex(vaultBytea)
+      return affiliateVault?.send_earn_affiliate_vault ?? null
     },
     enabled: !referredBy.isLoading,
   })

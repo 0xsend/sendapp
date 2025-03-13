@@ -33,6 +33,13 @@ create table "public"."send_earn_create" (
 
 ALTER TABLE public.send_earn_create ENABLE ROW LEVEL SECURITY;
 
+create policy
+"send_earn_create viewable by authenticated users"
+on public.send_earn_create for select
+to authenticated using (
+    true
+);
+
 CREATE UNIQUE INDEX u_send_earn_create ON public.send_earn_create USING btree (ig_name, src_name, block_num, tx_idx, log_idx, abi_idx);
 
 CREATE INDEX send_earn_create_send_earn ON public.send_earn_create USING btree (send_earn);
@@ -257,6 +264,7 @@ for each row
 execute function private.filter_send_earn_withdraws_with_no_send_account_created();
 
 
+-- view so users can see their earn balances by vault
 create or replace view send_earn_balances with (security_invoker = ON, security_barrier = ON) as
 (
 with txs as (select log_addr,
@@ -278,6 +286,7 @@ from txs t
 group by t.log_addr, t.owner
 );
 
+-- view so users can see their earn activity by vault
 create or replace view send_earn_activity with (security_invoker = ON, security_barrier = ON) as
 (
   select
@@ -303,3 +312,8 @@ create or replace view send_earn_activity with (security_invoker = ON, security_
   from send_earn_withdraws w
   order by block_time desc
 );
+
+-- function to create a computed relationship between send_earn_create and send_earn_new_affiliate to find affiliate vault
+create or replace function send_earn_affiliate_vault(send_earn_new_affiliate) returns setof send_earn_create rows 1 as $$
+select * from send_earn_create where fee_recipient = $1.send_earn_affiliate
+$$ stable language sql;
