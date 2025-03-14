@@ -50,6 +50,7 @@ CREATE INDEX temporal_send_account_transfers_user_id_idx ON temporal.send_accoun
 CREATE INDEX temporal_send_account_transfers_created_at_idx ON temporal.send_account_transfers(created_at);
 CREATE UNIQUE INDEX temporal_send_account_transfers_workflow_id_idx ON temporal.send_account_transfers(workflow_id);
 
+-- Insert user_id attached to workflow
 CREATE OR REPLACE FUNCTION temporal.temporal_transfer_before_insert()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -61,7 +62,7 @@ BEGIN
   ELSIF NEW.data ? 'sender' THEN
     _address := concat('0x', encode((NEW.data->>'sender')::bytea, 'hex'));
   ELSE
-    RAISE NOTICE 'No address given';
+    RAISE NOTICE 'No address given. workflow_id: %', NEW.workflow_id;
     RETURN NEW;
   END IF;
 
@@ -69,9 +70,8 @@ BEGIN
   FROM send_accounts
   WHERE address = _address::citext;
 
-  -- Validate user_id
   IF _user_id IS NULL THEN
-    RAISE NOTICE 'No user found for address: %', _address;
+    RAISE NOTICE 'No user found for address: %', _address || ', workflow_id: %', NEW.workflow_id;
     RETURN NEW;
   END IF;
 
