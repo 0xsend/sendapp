@@ -45,7 +45,7 @@ export const ActiveEarnings = () => {
     ]
   }, [coin])
 
-  if (!coin || !coin.data) {
+  if (!coin.isLoading && !coin.data) {
     push('/earn')
     return null
   }

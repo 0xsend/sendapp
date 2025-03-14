@@ -79,18 +79,23 @@ export function useReferrerVault(): UseQueryReturnType<`0x${string}` | null> {
  */
 export function useSendEarnDepositVault({
   asset,
-}: { asset: `0x${string}` }): UseQueryReturnType<`0x${string}` | null> {
+}: { asset: `0x${string}` | undefined }): UseQueryReturnType<`0x${string}` | null> {
   const referrerVault = useReferrerVault()
   const balances = useSendEarnBalances()
   const sendAccount = useSendAccount()
 
   return useQuery({
     queryKey: ['sendEarnDepositVault', { referrerVault, balances, sendAccount, asset }] as const,
-    enabled: !balances.isLoading && !referrerVault.isLoading && !sendAccount.isLoading,
-    queryFn: async ({ queryKey: [, { referrerVault, balances, sendAccount }] }) => {
+    enabled:
+      asset !== undefined &&
+      !balances.isLoading &&
+      !referrerVault.isLoading &&
+      !sendAccount.isLoading,
+    queryFn: async ({ queryKey: [, { referrerVault, balances, sendAccount, asset }] }) => {
       throwIf(referrerVault.error)
       throwIf(balances.error)
       throwIf(sendAccount.error)
+      assert(asset !== undefined, 'Asset is not defined')
 
       const userBalances = Array.isArray(balances.data)
         ? balances.data.filter(
@@ -135,9 +140,11 @@ export function useSendEarnDepositCalls({
   sender,
   asset,
   amount,
-}: { sender: `0x${string}` | undefined; asset: `0x${string}`; amount: bigint }): UseQueryReturnType<
-  SendAccountCall[] | null
-> {
+}: {
+  sender: `0x${string}` | undefined
+  asset: `0x${string}` | undefined
+  amount: bigint
+}): UseQueryReturnType<SendAccountCall[] | null> {
   const vault = useSendEarnDepositVault({ asset })
   const referrer = useReferrer()
   const factory = useSendEarnFactory({ asset })
@@ -147,12 +154,13 @@ export function useSendEarnDepositCalls({
       'sendEarnDepositCalls',
       { sender, asset, amount, vault, referrer, factory },
     ] as const,
-    enabled: !vault.isLoading && !referrer.isLoading && !factory.isLoading,
+    enabled: !vault.isLoading && !referrer.isLoading && !factory.isLoading && asset !== undefined,
     queryFn: async (): Promise<SendAccountCall[] | null> => {
       throwIf(vault.error)
       throwIf(referrer.error)
       throwIf(factory.error)
       assert(!!factory.data, 'Factory data is not defined')
+      assert(asset !== undefined, 'Asset is not defined')
       if (vault.isPending) return null
 
       if (vault.data) {
@@ -213,11 +221,13 @@ export function useSendEarnDepositCalls({
  */
 function useSendEarnFactory({
   asset,
-}: { asset: `0x${string}` }): UseQueryReturnType<`0x${string}`> {
+}: { asset: `0x${string}` | undefined }): UseQueryReturnType<`0x${string}`> {
   const chainId = useChainId()
   return useQuery({
+    enabled: asset !== undefined,
     queryKey: ['sendEarnFactory', { asset, chainId }] as const,
     queryFn: async ({ queryKey: [, { asset }] }): Promise<`0x${string}`> => {
+      assert(asset !== undefined, 'Asset is not defined')
       assert(isSupportedAsset(asset), 'Asset is not supported')
       const factory = assetsToEarnFactory[asset]
       assert(!!factory, 'Asset is not supported')
