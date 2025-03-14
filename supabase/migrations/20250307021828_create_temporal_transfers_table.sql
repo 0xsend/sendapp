@@ -86,7 +86,7 @@ CREATE TRIGGER temporal_send_account_transfers_trigger_before_insert
   FOR EACH ROW
   EXECUTE FUNCTION temporal.temporal_transfer_before_insert();
 
-CREATE OR REPLACE FUNCTION temporal.temporal_transfer_after_update()
+CREATE OR REPLACE FUNCTION temporal.temporal_transfer_after_upsert()
   RETURNS TRIGGER
   LANGUAGE plpgsql
   SECURITY DEFINER
@@ -95,6 +95,10 @@ DECLARE
   _to_user_id uuid;
   _data jsonb;
 BEGIN
+  IF NOT NEW.data ? 'log_addr' THEN
+    RETURN NEW;
+  END IF;
+
   IF NEW.data ? 't' THEN
     SELECT user_id INTO _to_user_id
     FROM send_accounts
@@ -147,10 +151,10 @@ BEGIN
 END;
 $$;
 
-CREATE TRIGGER temporal_send_account_transfers_trigger_after_update
-  AFTER UPDATE ON temporal.send_account_transfers
+CREATE TRIGGER temporal_send_account_transfers_trigger_after_upsert
+  AFTER INSERT OR UPDATE ON temporal.send_account_transfers
   FOR EACH ROW
-  EXECUTE FUNCTION temporal.temporal_transfer_after_update();
+  EXECUTE FUNCTION temporal.temporal_transfer_after_upsert();
 
 CREATE OR REPLACE FUNCTION temporal.temporal_send_account_transfers_trigger_delete_activity()
   RETURNS TRIGGER
