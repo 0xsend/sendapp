@@ -15,7 +15,7 @@ import {
 import {
   baseMainnetBundlerClient,
   entryPointAddress,
-  usdcAddress,
+  sendEarnAddress,
   useReadSendEarnBalanceOf,
   useReadSendEarnConvertToAssets,
   useReadSendEarnDecimals,
@@ -27,7 +27,7 @@ import { usdcCoin } from 'app/data/coins'
 import { CalculatedBenefits } from 'app/features/earn/components/CalculatedBenefits'
 import { EarnTerms } from 'app/features/earn/components/EarnTerms'
 import { Row } from 'app/features/earn/components/Row'
-import { useCoin, useCoins } from 'app/provider/coins'
+import { useCoin } from 'app/provider/coins'
 import { useEarnScreenParams } from 'app/routers/params'
 import { assert } from 'app/utils/assert'
 import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
@@ -45,7 +45,8 @@ import { formatUnits, withRetry } from 'viem'
 import { useChainId } from 'wagmi'
 import { z } from 'zod'
 import { useSendEarnAPY } from '../hooks'
-import { assetsToEarnFactory, useSendEarnDepositCalls, useSendEarnDepositVault } from './hooks'
+import { useERC20CoinAsset } from '../params'
+import { useSendEarnDepositCalls, useSendEarnDepositVault } from './hooks'
 
 const log = debug('app:earn:deposit')
 const MINIMUM_DEPOSIT = BigInt(10 * 1e6) // 10 USDC
@@ -64,8 +65,9 @@ export function DepositForm() {
   const form = useForm<DepositFormSchema>()
   const router = useRouter()
   const { tokensQuery } = useSendAccountBalances()
-  const { coin, isLoading: isUSDCLoading } = useCoin('USDC')
-  const { isLoading: isLoadingCoins } = useCoins()
+  const coin = useERC20CoinAsset()
+  const coinBalance = useCoin(coin.data?.symbol)
+  const asset = useMemo(() => coin.data?.token, [coin.data?.token])
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
   const [earnParams, setEarnParams] = useEarnScreenParams()
 
@@ -75,8 +77,8 @@ export function DepositForm() {
 
   // QUERY DEPOSIT USEROP
   const chainId = useChainId()
-  const asset = usdcAddress[chainId]
   const vault = useSendEarnDepositVault({ asset })
+  const platformVault = sendEarnAddress[chainId]
   const sendAccount = useSendAccount()
   const sender = useMemo(() => sendAccount?.data?.address, [sendAccount?.data?.address])
   const calls = useSendEarnDepositCalls({ sender, asset, amount: parsedAmount })
@@ -154,7 +156,7 @@ export function DepositForm() {
       toast.show('Deposited successfully')
 
       router.push({
-        pathname: `/earn/${coin?.symbol?.toLowerCase()}`,
+        pathname: `/earn/${coin.data?.symbol.toLowerCase()}`,
       })
     },
     onSettled: (data, error, variables, context) => {
@@ -165,34 +167,36 @@ export function DepositForm() {
   })
 
   // DEBUG
-  log('vault', vault)
   log('uop', uop)
   log('calls', calls)
   log('mutation', mutation)
 
   const canSubmit =
-    !isUSDCLoading &&
-    coin?.balance !== undefined &&
-    coin.balance >= parsedAmount &&
+    !coin.isLoading &&
+    coinBalance.coin?.balance !== undefined &&
+    coinBalance.coin.balance >= parsedAmount &&
     parsedAmount > BigInt(0) &&
-    vault.isSuccess &&
     calls.isSuccess &&
     uop.isSuccess &&
+    !calls.isPending &&
+    !uop.isPending &&
     mutation.isIdle
 
   const insufficientAmount =
-    coin?.balance !== undefined && earnParams.amount !== undefined && parsedAmount > coin?.balance
+    coinBalance.coin?.balance !== undefined &&
+    earnParams.amount !== undefined &&
+    parsedAmount > coinBalance.coin?.balance
 
   // validate and sanitize amount
   useEffect(() => {
     const subscription = form.watch(({ amount: _amount }) => {
-      if (!coin?.decimals) return
-      const sanitizedAmount = sanitizeAmount(_amount, coin?.decimals)
+      if (!coin.data?.decimals) return
+      const sanitizedAmount = sanitizeAmount(_amount, coin.data?.decimals)
 
       if (sanitizedAmount !== null && sanitizedAmount < MINIMUM_DEPOSIT) {
         form.setError('amount', {
           type: 'required',
-          message: `Minimum deposit is ${formatUnits(MINIMUM_DEPOSIT, coin?.decimals)} USDC`,
+          message: `Minimum deposit is ${formatUnits(MINIMUM_DEPOSIT, coin.data?.decimals)} USDC`,
         })
       } else {
         form.clearErrors('amount')
@@ -208,7 +212,7 @@ export function DepositForm() {
     })
 
     return () => subscription.unsubscribe()
-  }, [form.watch, setEarnParams, earnParams, coin?.decimals, form.clearErrors, form.setError])
+  }, [form.watch, setEarnParams, earnParams, coin.data?.decimals, form.clearErrors, form.setError])
 
   // RESET FORM ERRORS
   useEffect(() => {
@@ -219,19 +223,20 @@ export function DepositForm() {
 
   // use deposit vault if it exists, or the default vault for the asset
   const baseApy = useSendEarnAPY({
-    vault: vault.data ?? assetsToEarnFactory[asset],
+    vault: vault.data ?? platformVault,
   })
 
   const monthlyEarning = useMemo(() => {
-    if (!coin?.decimals) return
+    if (!coin.data?.decimals) return
     if (!baseApy.data) return
-    const decimalAmount = Number(formatUnits(parsedAmount, coin?.decimals))
+    const decimalAmount = Number(formatUnits(parsedAmount, coin.data?.decimals))
     const monthlyRate = (1 + baseApy.data.baseApy / 100) ** (1 / 12) - 1
     return formatAmount(Number(decimalAmount ?? 0) * monthlyRate)
-  }, [baseApy.data, parsedAmount, coin?.decimals])
+  }, [baseApy.data, parsedAmount, coin.data?.decimals])
 
-  if (isLoadingCoins || !coin || (!coin.balance && coin.balance !== BigInt(0))) {
-    return <Spinner size="large" color={'$color12'} />
+  if (!coin.isLoading && !coin.data) {
+    router.push('/earn')
+    return null
   }
 
   return (
@@ -270,7 +275,7 @@ export function DepositForm() {
               '$theme-light': {
                 placeholderTextColor: '$darkGrayTextField',
               },
-              inputMode: coin?.decimals ? 'decimal' : 'numeric',
+              inputMode: coin.data?.decimals ? 'decimal' : 'numeric',
               onChangeText: (amount: string) => {
                 const localizedAmount = localizeAmount(amount)
                 form.setValue('amount', localizedAmount)
@@ -302,9 +307,10 @@ export function DepositForm() {
             style: { justifyContent: 'space-between' },
           }}
           defaultValues={{
-            amount: earnParams.amount
-              ? localizeAmount(formatUnits(BigInt(earnParams.amount), coin?.decimals))
-              : undefined,
+            amount:
+              earnParams.amount && coin.data?.decimals
+                ? localizeAmount(formatUnits(BigInt(earnParams.amount), coin.data?.decimals))
+                : undefined,
             areTermsAccepted: false,
           }}
           renderAfter={({ submit }) => (
@@ -321,7 +327,7 @@ export function DepositForm() {
                   .filter(Boolean)
                   .map((e) =>
                     e ? (
-                      <Paragraph key={e.message} color="$error">
+                      <Paragraph key={e.message} color="$error" role="alert">
                         {toNiceError(e)}
                       </Paragraph>
                     ) : null
@@ -350,7 +356,8 @@ export function DepositForm() {
                 disabled={!canSubmit}
                 iconAfter={mutation.isPending ? <Spinner size="small" /> : undefined}
               >
-                {[calls.isLoading, sendAccount.isLoading, uop.isLoading].some((p) => p) ? (
+                {[calls.isLoading, sendAccount.isLoading, uop.isLoading].some((p) => p) &&
+                !mutation.isPending ? (
                   <Spinner size="small" />
                 ) : (
                   <Button.Text size={'$5'} fontWeight={'500'} fontFamily={'$mono'} color={'$black'}>
@@ -377,7 +384,7 @@ export function DepositForm() {
                     {amount}
                     <XStack ai={'center'} gap={'$2'}>
                       <IconCoin symbol={'USDC'} size={'$2'} />
-                      <Paragraph size={'$6'}>USDC</Paragraph>
+                      <Paragraph size={'$6'}>{coin.data?.symbol}</Paragraph>
                     </XStack>
                     <XStack
                       position="absolute"
@@ -395,9 +402,10 @@ export function DepositForm() {
                     <Stack>
                       {(() => {
                         switch (true) {
-                          case isUSDCLoading:
+                          case coin.isLoading || coinBalance.isLoading:
                             return <Spinner size="small" />
-                          case !coin?.balance && coin?.balance !== BigInt(0):
+                          case !coinBalance.coin?.balance &&
+                            coinBalance.coin?.balance !== BigInt(0):
                             return null
                           default:
                             return (
@@ -422,7 +430,16 @@ export function DepositForm() {
                                     size={'$5'}
                                     fontWeight={'600'}
                                   >
-                                    {formatAmount(formatUnits(coin.balance, coin?.decimals), 12, 2)}
+                                    {coin.data?.decimals
+                                      ? formatAmount(
+                                          formatUnits(
+                                            coinBalance.coin.balance,
+                                            coin.data?.decimals
+                                          ),
+                                          12,
+                                          2
+                                        )
+                                      : '-'}
                                   </Paragraph>
                                 </XStack>
                                 {insufficientAmount && (

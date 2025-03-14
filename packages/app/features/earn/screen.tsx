@@ -15,7 +15,7 @@ import { useSendEarnBalances, useVaultConvertSharesToAssets, type SendEarnBalanc
 
 const log = debug('app:earn:screen')
 
-export const EarnScreen = () => {
+export function EarnScreen() {
   const sendAccount = useSendAccount()
   const balances = useSendEarnBalances()
 
