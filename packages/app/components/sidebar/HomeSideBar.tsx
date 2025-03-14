@@ -29,6 +29,8 @@ import { NavSheet } from '../NavSheet'
 import { useUser } from 'app/utils/useUser'
 import { ReferralLink } from '../ReferralLink'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { useSendAccount } from 'app/utils/send-accounts'
+import { SWAP_ENABLED_USERS } from 'app/features/swap/constants'
 
 const links = [
   {
@@ -66,6 +68,10 @@ const links = [
 ].filter(Boolean) as { icon: ReactElement; text: string; href: string }[]
 
 const HomeSideBar = ({ ...props }: YStackProps) => {
+  const { data: sendAccount } = useSendAccount()
+  const isSwapEnabled = sendAccount?.id && SWAP_ENABLED_USERS.includes(sendAccount.id)
+  const _links = isSwapEnabled ? links : links.filter((link) => link.href !== '/swap')
+
   return (
     <SideBar {...props} ai={'flex-start'} pl="$7">
       <Link href={'/'}>
@@ -73,7 +79,7 @@ const HomeSideBar = ({ ...props }: YStackProps) => {
       </Link>
 
       <YStack gap={'$7'} pt={'$10'} jc={'space-between'}>
-        {links.map((link) => (
+        {_links.map((link) => (
           <SideBarNavLink key={link.href} {...link} />
         ))}
       </YStack>
