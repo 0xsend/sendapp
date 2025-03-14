@@ -11,6 +11,7 @@ import { Link } from 'solito/link'
 
 import { useUser } from 'app/utils/useUser'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { isSendSwapEvent } from 'app/utils/zod/activity/SendSwapEventSchema'
 
 export function TokenActivityRow({
   activity,
@@ -25,7 +26,7 @@ export function TokenActivityRow({
   const date = CommentsTime(new Date(created_at))
   const eventName = eventNameFromActivity(activity)
   const subtext = subtextFromActivity(activity)
-  const isERC20Transfer = isSendAccountTransfersEvent(activity)
+  const isERC20Transfer = isSendAccountTransfersEvent(activity) || isSendSwapEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
   const hoverStyles = useHoverStyles()
 

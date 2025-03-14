@@ -22,6 +22,7 @@ import {
   isTemporalTokenTransfersEvent,
   temporalEventNameFromStatus,
 } from './zod/activity/TemporalTransfersEventSchema'
+import { isSendSwapEvent } from 'app/utils/zod/activity/SendSwapEventSchema'
 
 const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
   Object.values(addresses).map((a) => [a, label])
@@ -77,6 +78,15 @@ export function counterpart(activity: Activity): Activity['from_user'] | Activit
  */
 export function amountFromActivity(activity: Activity): string {
   switch (true) {
+    case isSendSwapEvent(activity): {
+      const { coin, v } = activity.data
+      if (coin) {
+        const amount = formatAmount(formatUnits(v, coin.decimals), 5, coin.formatDecimals)
+
+        return `${amount} ${coin.symbol}`
+      }
+      return formatAmount(`${v}`, 5, 0)
+    }
     case isTemporalTokenTransfersEvent(activity): {
       const { v, coin } = activity.data
       if (coin) {
@@ -181,6 +191,8 @@ export function eventNameFromActivity(activity: Activity) {
       return 'Referral Reward'
     case isSendTokenUpgradeEvent(activity):
       return 'Send Token Upgrade'
+    case isSendSwapEvent(activity):
+      return 'Swap'
     case isERC20Transfer && to_user?.send_id === undefined:
       return 'Withdraw'
     case isTransferOrReceive && from_user === null:
@@ -224,6 +236,8 @@ export function phraseFromActivity(activity: Activity) {
       return 'Earned referral reward'
     case isSendTokenUpgradeEvent(activity):
       return 'Upgraded'
+    case isSendSwapEvent(activity):
+      return 'Swapped'
     case isERC20Transfer && to_user?.send_id === undefined:
       return 'Withdrew'
     case isTransferOrReceive && from_user === null:
@@ -283,6 +297,9 @@ export function subtextFromActivity(activity: Activity): string | null {
       5,
       sendCoin.formatDecimals
     )}`
+  }
+  if (isSendSwapEvent(activity)) {
+    return `Received ${activity.data.coin?.symbol}`
   }
   if (isERC20Transfer && from_user?.id) {
     return labelAddress(data.t)

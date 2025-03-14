@@ -6,6 +6,7 @@ import { TagReceiptsEventSchema } from './TagReceiptsEventSchema'
 import { TagReceiptUSDCEventSchema } from './TagReceiptUSDCEventSchema'
 import { SendAccountReceiveEventSchema } from './SendAccountReceiveEventSchema'
 import { TemporalTransfersEventSchema } from './TemporalTransfersEventSchema'
+import { SendSwapEventSchema } from './SendSwapEventSchema'
 
 export type { BaseEvent } from './BaseEventSchema'
 export { ReferralsEventSchema, isReferralsEvent } from './ReferralsEventSchema'
@@ -30,6 +31,7 @@ export const EventSchema = z
     ReferralsEventSchema,
     SendAccountReceiveEventSchema,
     TemporalTransfersEventSchema,
+    SendSwapEventSchema,
   ])
   .or(BaseEventSchema)
   .catch((ctx) => {

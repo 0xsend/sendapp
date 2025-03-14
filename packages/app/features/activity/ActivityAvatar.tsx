@@ -1,14 +1,15 @@
-import { Avatar, LinkableAvatar, XStack, type LinkableAvatarProps } from '@my/ui'
-import { IconUpgrade } from 'app/components/icons'
+import { Avatar, LinkableAvatar, type LinkableAvatarProps, XStack } from '@my/ui'
+import { IconSwap, IconUpgrade } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { allCoinsDict } from 'app/data/coins'
 import { counterpart } from 'app/utils/activity'
 import {
+  type Activity,
   isSendAccountReceiveEvent,
   isSendAccountTransfersEvent,
-  type Activity,
 } from 'app/utils/zod/activity'
 import { isSendTokenUpgradeEvent } from 'app/utils/zod/activity/SendAccountTransfersEventSchema'
+import { isSendSwapEvent } from 'app/utils/zod/activity/SendSwapEventSchema'
 
 export function ActivityAvatar({
   activity,
@@ -19,6 +20,14 @@ export function ActivityAvatar({
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
 
   const isETHReceive = isSendAccountReceiveEvent(activity)
+
+  if (isSendSwapEvent(activity)) {
+    return (
+      <XStack w="$4.5" h={'$4.5'} ai={'center'} jc={'center'}>
+        <IconSwap size="$2.5" />
+      </XStack>
+    )
+  }
 
   if (user) {
     return (
