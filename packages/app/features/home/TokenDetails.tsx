@@ -22,6 +22,8 @@ import { convertBalanceToFiat } from 'app/utils/convertBalanceToUSD'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { useSendAccount } from 'app/utils/send-accounts'
+import { SWAP_ENABLED_USERS } from 'app/features/swap/constants'
 
 export function AnimateEnter({ children }: { children: React.ReactNode }) {
   return (
@@ -43,6 +45,8 @@ export function AnimateEnter({ children }: { children: React.ReactNode }) {
 export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
   const { coin: selectedCoin } = useCoinFromTokenParam()
   const hoverStyles = useHoverStyles()
+  const { data: sendAccount } = useSendAccount()
+  const isSwapEnabled = sendAccount?.id && SWAP_ENABLED_USERS.includes(sendAccount.id)
 
   const getSwapUrl = () => {
     if (selectedCoin?.symbol === sendCoin.symbol) {
@@ -82,46 +86,48 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
             </YStack>
           </YStack>
         </Card>
-        <XStack w={'100%'} gap={'$5'}>
-          <LinkableButton
-            href="/deposit"
-            f={1}
-            height={'auto'}
-            hoverStyle={hoverStyles}
-            focusStyle={hoverStyles}
-          >
-            <YStack gap="$2" jc={'space-between'} ai="center" p="$4">
-              <IconPlus
-                size={'$1.5'}
-                $theme-dark={{ color: '$primary' }}
-                $theme-light={{ color: '$color12' }}
-              />
-              <Button.Text fontSize={'$4'} px="$2">
-                Deposit
-              </Button.Text>
-            </YStack>
-          </LinkableButton>
-          <LinkableButton
-            href={getSwapUrl()}
-            f={1}
-            height={'auto'}
-            hoverStyle={hoverStyles}
-            focusStyle={hoverStyles}
-          >
-            <YStack gap="$2" jc={'space-between'} ai="center" p="$4" height={'auto'}>
-              <Theme name="green">
-                <IconSwap
-                  size={'$1'}
+        {isSwapEnabled && (
+          <XStack w={'100%'} gap={'$5'}>
+            <LinkableButton
+              href="/deposit"
+              f={1}
+              height={'auto'}
+              hoverStyle={hoverStyles}
+              focusStyle={hoverStyles}
+            >
+              <YStack gap="$2" jc={'space-between'} ai="center" p="$4">
+                <IconPlus
+                  size={'$1.5'}
                   $theme-dark={{ color: '$primary' }}
                   $theme-light={{ color: '$color12' }}
                 />
-              </Theme>
-              <Button.Text fontSize={'$4'} px="$2">
-                Swap
-              </Button.Text>
-            </YStack>
-          </LinkableButton>
-        </XStack>
+                <Button.Text fontSize={'$4'} px="$2">
+                  Deposit
+                </Button.Text>
+              </YStack>
+            </LinkableButton>
+            <LinkableButton
+              href={getSwapUrl()}
+              f={1}
+              height={'auto'}
+              hoverStyle={hoverStyles}
+              focusStyle={hoverStyles}
+            >
+              <YStack gap="$2" jc={'space-between'} ai="center" p="$4" height={'auto'}>
+                <Theme name="green">
+                  <IconSwap
+                    size={'$1'}
+                    $theme-dark={{ color: '$primary' }}
+                    $theme-light={{ color: '$color12' }}
+                  />
+                </Theme>
+                <Button.Text fontSize={'$4'} px="$2">
+                  Swap
+                </Button.Text>
+              </YStack>
+            </LinkableButton>
+          </XStack>
+        )}
       </YStack>
       <YStack gap={'$3'}>
         <TokenActivity coin={coin} />
