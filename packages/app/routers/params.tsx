@@ -1,5 +1,5 @@
 import type { Enums } from '@my/supabase/database.types'
-import { baseMainnet, usdcAddress } from '@my/wagmi'
+import { baseMainnet, sendTokenAddress, usdcAddress } from '@my/wagmi'
 import { allCoinsDict, type allCoins } from 'app/data/coins'
 import { createParam } from 'solito'
 import { isAddress, type Address } from 'viem'
@@ -111,20 +111,22 @@ const useAmount = () => {
   return [amount, setAmountParam] as const
 }
 
+const parseTokenParam = (value) => {
+  if (Array.isArray(value)) {
+    return isAddress(value[0] ?? '') || Object.keys(allCoinsDict).includes(value[0] ?? '')
+      ? (value[0] as allCoins[number]['token'])
+      : usdcAddress[baseMainnet.id]
+  }
+
+  return isAddress(value ?? '') || Object.keys(allCoinsDict).includes(value ?? '')
+    ? (value as allCoins[number]['token'])
+    : usdcAddress[baseMainnet.id]
+}
+
 export const useSendToken = () => {
   const [sendToken, setSendTokenParam] = useSendParam('sendToken', {
     initial: usdcAddress[baseMainnet.id],
-    parse: (value) => {
-      if (Array.isArray(value)) {
-        return isAddress(value[0] ?? '') || Object.keys(allCoinsDict).includes(value[0] ?? '')
-          ? (value[0] as allCoins[number]['token'])
-          : usdcAddress[baseMainnet.id]
-      }
-
-      return isAddress(value ?? '') || Object.keys(allCoinsDict).includes(value ?? '')
-        ? (value as allCoins[number]['token'])
-        : usdcAddress[baseMainnet.id]
-    },
+    parse: parseTokenParam,
   })
 
   return [sendToken, setSendTokenParam] as const
@@ -208,6 +210,63 @@ export const useAuthScreenParams = () => {
   return [
     {
       redirectUri,
+    },
+    setParams,
+  ] as const
+}
+
+export type SwapScreenParams = {
+  outToken: allCoins[number]['token']
+  inToken: allCoins[number]['token']
+  inAmount?: string
+  slippage?: string
+}
+
+const { useParam: useSwapParam, useParams: useSwapParams } = createParam<SwapScreenParams>()
+
+const useInToken = () => {
+  const [inToken, setInToken] = useSwapParam('inToken', {
+    initial: usdcAddress[baseMainnet.id],
+    parse: parseTokenParam,
+  })
+
+  return [inToken, setInToken] as const
+}
+
+const useOutToken = () => {
+  const [outToken, setOutToken] = useSwapParam('outToken', {
+    initial: sendTokenAddress[baseMainnet.id],
+    parse: parseTokenParam,
+  })
+
+  return [outToken, setOutToken] as const
+}
+
+const useInAmount = () => {
+  const [inAmount, setInAmount] = useSwapParam('inAmount')
+
+  return [inAmount, setInAmount] as const
+}
+
+const useSlippage = () => {
+  const [slippage, setSlippage] = useSwapParam('slippage')
+
+  return [slippage, setSlippage] as const
+}
+
+export const useSwapScreenParams = () => {
+  const { setParams } = useSwapParams()
+  const [outToken] = useOutToken()
+  const [inToken] = useInToken()
+  const [inAmount] = useInAmount()
+  const [slippage] = useSlippage()
+
+  return [
+    {
+      outToken,
+      inToken,
+      inAmount,
+      slippage,
     },
     setParams,
   ] as const

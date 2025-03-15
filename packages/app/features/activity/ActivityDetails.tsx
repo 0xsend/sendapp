@@ -18,6 +18,7 @@ import {
   isSendtagCheckoutEvent,
   isSendTokenUpgradeEvent,
 } from 'app/utils/zod/activity/SendAccountTransfersEventSchema'
+import { isSendSwapEvent } from 'app/utils/zod/activity/SendSwapEventSchema'
 
 export const ActivityDetails = ({
   activity,
@@ -64,6 +65,17 @@ export const ActivityDetails = ({
                         return null
                       case isSendTokenUpgradeEvent(activity):
                         return null
+                      case isSendSwapEvent(activity):
+                        return (
+                          <Text
+                            color={'$silverChalice'}
+                            $theme-light={{
+                              color: '$darkGrayTextField',
+                            }}
+                          >
+                            from swap
+                          </Text>
+                        )
                       case subText === null:
                         return <Text>{activityText}</Text>
                       default:

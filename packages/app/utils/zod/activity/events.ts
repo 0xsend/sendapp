@@ -23,4 +23,8 @@ export enum Events {
    * Send account receives ETH
    */
   SendAccountReceive = 'send_account_receives',
+  /**
+   * Send swap ERC-20 token transfer from router
+   */
+  SendSwap = 'send_swap',
 }
