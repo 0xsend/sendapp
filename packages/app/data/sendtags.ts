@@ -44,7 +44,7 @@ export function reward(length: number) {
     case 5:
       return parseUnits('1', usdcCoin.decimals) // 1 USDC
     case 4:
-      return parseUnits('2', usdcCoin.decimals) // 8 USDC
+      return parseUnits('2', usdcCoin.decimals) // 2 USDC
     case 3:
     case 2:
     case 1:
