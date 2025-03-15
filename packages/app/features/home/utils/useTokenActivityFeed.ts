@@ -11,7 +11,11 @@ import { squish } from 'app/utils/strings'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import { EventArraySchema, Events, type Activity } from 'app/utils/zod/activity'
+import { useRef } from 'react'
 import type { ZodError } from 'zod'
+
+const PENDING_TRANSFERS_INTERVAL = 1_000
+const MAX_REFETCHES = 10 // 10 seconds
 
 /**
  * Infinite query to fetch ERC-20 token activity feed.
@@ -28,16 +32,22 @@ export function useTokenActivityFeed(params: {
 }): UseInfiniteQueryResult<InfiniteData<Activity[]>, PostgrestError | ZodError> {
   const { pageSize = 10, address, refetchInterval = 30_000, enabled = true } = params
   const supabase = useSupabase()
-
+  const refetchCount = useRef(0)
   async function fetchTokenActivityFeed({ pageParam }: { pageParam: number }): Promise<Activity[]> {
     const from = pageParam * pageSize
     const to = (pageParam + 1) * pageSize - 1
     let query = supabase.from('activity_feed').select('*')
 
     if (address) {
-      query = query.eq('event_name', Events.SendAccountTransfers).eq('data->>log_addr', address)
+      query = query
+        .eq('data->>log_addr', address)
+        .or(
+          `event_name.eq.${Events.SendAccountTransfers},event_name.eq.${Events.TemporalSendAccountTransfers}`
+        )
     } else {
-      query = query.eq('event_name', Events.SendAccountReceive)
+      query = query.or(
+        `event_name.eq.${Events.SendAccountReceive},event_name.eq.${Events.TemporalSendAccountTransfers}`
+      )
     }
 
     const paymasterAddresses = Object.values(tokenPaymasterAddress)
@@ -53,15 +63,16 @@ export function useTokenActivityFeed(params: {
       .or('from_user.not.is.null, to_user.not.is.null') // only show activities with a send app user
       .or(
         squish(`
-          data->t.is.null,
-          data->f.is.null,
-          and(
-            data->>t.not.in.(${toTransferIgnoreValues}),
-            data->>f.not.in.(${fromTransferIgnoreValues})
-          )`)
+        data->t.is.null,
+        data->f.is.null,
+        and(
+          data->>t.not.in.(${toTransferIgnoreValues}),
+          data->>f.not.in.(${fromTransferIgnoreValues})
+        )`)
       )
       .order('created_at', { ascending: false })
       .range(from, to)
+
     throwIf(error)
     return EventArraySchema.parse(data)
   }
@@ -80,7 +91,28 @@ export function useTokenActivityFeed(params: {
       return firstPageParam - 1
     },
     queryFn: fetchTokenActivityFeed,
-    refetchInterval,
+    refetchInterval: ({ state: { data } }) => {
+      const { pages } = data ?? {}
+      if (!pages || !pages[0]) return refetchInterval
+      const activities = pages.flat()
+      const hasPendingTransfer = activities.some(
+        (a) =>
+          a.event_name === Events.TemporalSendAccountTransfers &&
+          !['cancelled', 'failed'].includes(a.data.status)
+      )
+
+      if (hasPendingTransfer) {
+        if (refetchCount.current >= MAX_REFETCHES) {
+          return refetchInterval // Return to normal interval after max refetches
+        }
+        refetchCount.current += 1
+        return PENDING_TRANSFERS_INTERVAL
+      }
+
+      // Reset refetch count when there are no pending transfers
+      refetchCount.current = 0
+      return refetchInterval
+    },
     enabled,
   })
 }
