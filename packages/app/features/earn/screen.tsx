@@ -31,10 +31,18 @@ export function EarnScreen() {
   // Convert undefined to null for type safety
   const balancesData = balances.data ?? null
 
+  const detailsSection = (
+    <DetailsSection hasActiveDeposits={hasActiveDeposits} balances={balancesData} />
+  )
+  const learnSection = <LearnSection />
+
+  const sections = hasActiveDeposits
+    ? [detailsSection, learnSection]
+    : [learnSection, detailsSection]
+
   return (
     <YStack w={'100%'} gap={'$4'} pb={'$3'} $gtLg={{ w: '50%' }}>
-      <LearnSection />
-      <DetailsSection hasActiveDeposits={hasActiveDeposits} balances={balancesData} />
+      {sections}
     </YStack>
   )
 }
