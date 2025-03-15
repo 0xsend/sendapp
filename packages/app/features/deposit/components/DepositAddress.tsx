@@ -20,8 +20,9 @@ import { useState, useEffect } from 'react'
 import type { Address } from 'viem'
 import { IconCopy } from 'app/components/icons'
 import { useQRCode } from 'app/utils/useQRCode'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
-function CopyAddressDialog({ isOpen, onClose, onConfirm }) {
+function CopyAddressDialog({ isOpen, onClose, onConfirm }) { const [dontShowAgain, setDontShowAgain] = useState(false)
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <Dialog.Adapt when="sm" platform="touch">
@@ -61,14 +62,33 @@ function CopyAddressDialog({ isOpen, onClose, onConfirm }) {
               3. I understand that if I make any mistakes, there is no way to recover the funds.
             </Paragraph>
 
-            <XStack justifyContent="flex-end" marginTop="$4" gap="$4">
-              <Dialog.Close asChild>
-                <Button br={'$2'}>Cancel</Button>
-              </Dialog.Close>
-              <Button theme="yellow_active" onPress={onConfirm} br={'$2'}>
-                <Button.Text col={'$color12'}>I Agree & Proceed</Button.Text>
-              </Button>
-            </XStack>
+            <XStack justifyContent="flex-end" marginTop="$4" gap="$4" ai="center">
+  {/* Checkbox on the left */}
+  <XStack ai="center" gap="$2">
+    <input
+      type="checkbox"
+      checked={dontShowAgain}
+      onChange={async () => {
+  const newValue = !dontShowAgain;
+  setDontShowAgain(newValue);
+  try {
+    await AsyncStorage.setItem('dontShowAgain', JSON.stringify(newValue));
+  } catch (error) {
+    console.error('Failed to save checkbox state:', error);
+  }
+}}
+    />
+    <Text fontSize="$3">Don't show again</Text>
+  </XStack>
+
+  {/* Buttons on the right */}
+  <Dialog.Close asChild>
+    <Button br={'$2'}>Cancel</Button>
+  </Dialog.Close>
+  <Button theme="yellow_active" onPress={onConfirm} br={'$2'}>
+    <Button.Text col={'$color12'}>I Agree & Proceed</Button.Text>
+  </Button>
+</XStack>
           </YStack>
         </Dialog.Content>
       </Dialog.Portal>
@@ -81,6 +101,23 @@ export function DepositAddress({ address, ...props }: { address?: Address } & Bu
   const [hasCopied, setHasCopied] = useState(false)
   const [isConfirmed, setIsConfirmed] = useState(false)
   const [copyAddressDialogIsOpen, setCopyAddressDialogIsOpen] = useState(false)
+  const [dontShowAgain, setDontShowAgain] = useState(false);
+
+useEffect(() => {
+  const loadDontShowAgain = async () => {
+    try {
+      const savedValue = await AsyncStorage.getItem('dontShowAgain');
+      if (savedValue !== null) {
+        setDontShowAgain(JSON.parse(savedValue));
+        setIsConfirmed(JSON.parse(savedValue)); // Auto-confirm if "Don't show again" was checked
+      }
+    } catch (error) {
+      console.error('Failed to load dontShowAgain:', error);
+    }
+  };
+
+  loadDontShowAgain();
+}, []);
 
   const { data: qrData, error } = useQRCode(address, {
     width: 240,
@@ -104,12 +141,36 @@ export function DepositAddress({ address, ...props }: { address?: Address } & Bu
   if (!address) return null
 
   const copyOnPress = async () => {
+  if (!isConfirmed) {
+    if (dontShowAgain) {
+      try {
+        await AsyncStorage.setItem('dontShowAgain', 'true')
+      } catch (error) {
+        console.error('Failed to save dontShowAgain:', error)
+      }
+    }
+    if (!dontShowAgain) {
+  setCopyAddressDialogIsOpen(true);
+    }
+    return
+  }
+
+  await Clipboard.setString(address).catch(() =>
+    toast.show('Something went wrong', {
+      message: 'We were unable to copy your address to the clipboard',
+      customData: {
+        theme: 'red',
+      },
+    })
+  )
+  setHasCopied(true)
+  }
     if (!isConfirmed) {
       setCopyAddressDialogIsOpen(true)
       return
     }
 
-    await Clipboard.setStringAsync(address).catch(() =>
+    await Clipboard.setString(address).catch(() =>
       toast.show('Something went wrong', {
         message: 'We were unable to copy your address to the clipboard',
         customData: {
