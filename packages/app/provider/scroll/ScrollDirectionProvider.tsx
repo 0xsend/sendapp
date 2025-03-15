@@ -1,6 +1,7 @@
 import { usePathname } from 'app/utils/usePathname'
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import type { LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
+import { Dimensions } from 'react-native'
 
 export type ScrollDirectionContextValue = {
   direction: 'up' | 'down' | null
@@ -22,7 +23,11 @@ export const ScrollDirectionProvider = ({ children }: { children: React.ReactNod
   const lastScrollY = useRef(0)
   const pathName = usePathname()
   const [, setPreviousPath] = useState('')
-  const [viewportHeight, setViewportHeight] = useState(0)
+
+  // Use window dimensions for initial values
+  const initialHeight =
+    typeof window !== 'undefined' ? window.innerHeight : Dimensions.get('window').height
+  const [viewportHeight, setViewportHeight] = useState(initialHeight)
   const [contentHeight, setContentHeight] = useState(0)
 
   useEffect(() => {
@@ -31,13 +36,17 @@ export const ScrollDirectionProvider = ({ children }: { children: React.ReactNod
         setDirection(null)
         setIsAtEnd(false)
         setContentHeight(0)
-        setViewportHeight(0)
+        setViewportHeight(initialHeight)
       }
       return pathName
     })
-  }, [pathName])
+  }, [pathName, initialHeight])
 
   const checkIsAtEnd = useCallback((contentHeight: number, viewportHeight: number, scrollY = 0) => {
+    if (contentHeight === 0 || viewportHeight === 0) {
+      return
+    }
+
     const isContentShorterThanViewport = contentHeight <= viewportHeight
     const isEndOfView =
       isContentShorterThanViewport || viewportHeight + scrollY >= contentHeight - THRESHOLD

@@ -34,21 +34,23 @@ export function price(length: number) {
 
 /**
  * Returns the referral reward for a Sendtag of the given length.
+ * The reward is 25% of the sendtag price.
+ *
  * @param length The length of the Sendtag.
  * @returns The referral reward for the Sendtag.
  */
 export function reward(length: number) {
   switch (length) {
     case 5:
-      return parseUnits('3', usdcCoin.decimals) // 3 USDC
+      return parseUnits('1', usdcCoin.decimals) // 1 USDC
     case 4:
-      return parseUnits('6', usdcCoin.decimals) // 6 USDC
+      return parseUnits('2', usdcCoin.decimals) // 2 USDC
     case 3:
     case 2:
     case 1:
-      return parseUnits('12', usdcCoin.decimals) // 12 USDC
+      return parseUnits('4', usdcCoin.decimals) // 4 USDC
     default:
-      return parseUnits('1.5', usdcCoin.decimals) // 1.5 USDC for 6+ characters
+      return parseUnits('.5', usdcCoin.decimals) // .50 USDC for 6+ characters
   }
 }
 
