@@ -26,7 +26,7 @@ export const useERC20CoinAsset = (): UseQueryReturnType<erc20Coin | null | undef
   })
 }
 
-export function coinToParam(coin: coin): string {
+export function coinToParam(coin: { symbol: string }): string {
   return coin.symbol.toLowerCase()
 }
 

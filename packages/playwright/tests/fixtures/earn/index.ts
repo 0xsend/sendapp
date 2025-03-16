@@ -1,9 +1,10 @@
-import { type Locator, mergeTests, type Page } from '@playwright/test'
 import { test as sendAccountTest } from '@my/playwright/fixtures/send-accounts'
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
-import debug from 'debug'
-import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@my/supabase/database.types'
+import { type Locator, mergeTests, type Page } from '@playwright/test'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import { coinToParam } from 'app/features/earn/params'
+import debug from 'debug'
 
 const baseTest = mergeTests(sendAccountTest, snapletTest)
 
@@ -45,7 +46,7 @@ export class EarnDepositPage {
     await this.page.waitForURL('/earn')
     await expect(this.startEarningButton).toBeVisible()
     await this.startEarningButton.click()
-    await this.page.waitForURL(`/earn/${coin.symbol.toLowerCase()}/deposit`)
+    await this.page.waitForURL(`/earn/${coinToParam(coin)}/deposit`)
     await expect(this.page.getByText('Start Earning', { exact: true })).toBeVisible()
     await expect(this.amountInput).toBeVisible()
     await expect(this.termsCheckbox).toBeVisible()
@@ -91,8 +92,6 @@ export class EarnDepositPage {
     amount,
   }: {
     coin: {
-      token: `0x${string}`
-      decimals: number
       symbol: string
     }
     supabase: SupabaseClient<Database>
@@ -108,7 +107,7 @@ export class EarnDepositPage {
     await this.fillAmount(amount)
     await this.acceptTerms()
     await this.submit()
-    await this.page.waitForURL(`/earn/${coin.symbol.toLowerCase()}`)
+    await this.page.waitForURL(`/earn/${coinToParam(coin)}`)
 
     let deposit: { owner: `\\x${string}`; shares: string; assets: string; log_addr: `\\x${string}` }
 
