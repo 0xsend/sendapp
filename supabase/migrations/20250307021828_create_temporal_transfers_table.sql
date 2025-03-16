@@ -62,7 +62,7 @@ BEGIN
   ELSIF NEW.data ? 'sender' THEN
     _address := concat('0x', encode((NEW.data->>'sender')::bytea, 'hex'));
   ELSE
-    RAISE NOTICE 'No address given. workflow_id: %', NEW.workflow_id;
+    RAISE NOTICE E'No sender address. workflow_id: %\n', NEW.workflow_id;
     RETURN NEW;
   END IF;
 
@@ -71,7 +71,7 @@ BEGIN
   WHERE address = _address::citext;
 
   IF _user_id IS NULL THEN
-    RAISE NOTICE 'No user found for address: %', _address || ', workflow_id: %', NEW.workflow_id;
+    RAISE NOTICE E'No user found for address: %, workflow_id: %\n', _address, NEW.workflow_id;
     RETURN NEW;
   END IF;
 
