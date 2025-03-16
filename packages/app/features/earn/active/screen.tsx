@@ -1,7 +1,7 @@
 import { Card, Fade, Paragraph, Separator, Spinner, Stack, XStack, YStack } from '@my/ui'
 import type { IconProps } from '@tamagui/helpers-icon'
 import { ArrowDown } from '@tamagui/lucide-icons'
-import { IconSendSingleLetter, IconStacks } from 'app/components/icons'
+import { IconStacks } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { SectionButton } from 'app/features/earn/components/SectionButton'
 import { formatCoinAmount } from 'app/utils/formatCoinAmount'
@@ -11,7 +11,7 @@ import debug from 'debug'
 import { useMemo, type NamedExoticComponent } from 'react'
 import { useRouter } from 'solito/router'
 import { useSendEarnCoinBalances } from '../hooks'
-import { useERC20CoinAsset } from '../params'
+import { coinToParam, useERC20CoinAsset } from '../params'
 
 const log = debug('app:earn:active')
 
@@ -65,7 +65,7 @@ export const ActiveEarnings = () => {
       </YStack>
       <SectionButton
         text={'ADD MORE DEPOSITS'}
-        onPress={() => push(`/earn/${coin.data?.symbol?.toLowerCase()}/deposit`)}
+        onPress={() => (!coin.data ? undefined : push(`/earn/${coinToParam(coin.data)}/deposit`))}
       />
     </YStack>
   )
