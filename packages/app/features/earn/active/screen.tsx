@@ -65,7 +65,7 @@ export const ActiveEarnings = () => {
       </YStack>
       <SectionButton
         text={'ADD MORE DEPOSITS'}
-        onPress={() => push(`/earn/${coin.data?.symbol}/deposit`)}
+        onPress={() => push(`/earn/${coin.data?.symbol?.toLowerCase()}/deposit`)}
       />
     </YStack>
   )
