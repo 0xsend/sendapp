@@ -12,7 +12,8 @@ import { assetsToEarnFactory } from 'app/utils/sendEarn'
 import debug from 'debug'
 import { checksumAddress, formatUnits } from 'viem'
 import { readContract } from 'viem/actions'
-import { test as depositTest, type EarnDepositPage } from './fixtures/deposit'
+import { test as earnTest } from './fixtures/earn'
+import { checkReferralCodeVisibility } from './fixtures/referrals'
 import { fund, testBaseClient } from './fixtures/viem'
 
 let log: debug.Debugger
@@ -20,22 +21,7 @@ let log: debug.Debugger
 // $10
 const GAS_FEES = BigInt(10 * 10 ** usdcCoin.decimals)
 
-const test = mergeTests(depositTest, snapletTest)
-
-/**
- * Checks if the referral code is visible and applied correctly
- */
-const checkReferralCodeVisibility = async (
-  earnDepositPage: EarnDepositPage,
-  referralCode: string
-) => {
-  const refcodeInput = earnDepositPage.page.getByTestId('referral-code-input')
-  const referralCodeConfirmation = earnDepositPage.page.getByText('Referral code applied')
-
-  await expect(refcodeInput).toBeVisible()
-  await expect(refcodeInput).toHaveValue(referralCode)
-  await expect(referralCodeConfirmation).toBeVisible()
-}
+const test = mergeTests(earnTest, snapletTest)
 
 const readSendEarnBalanceOf = async ({
   vault,
@@ -182,7 +168,7 @@ for (const coin of [usdcCoin]) {
     await page.goto(coin)
 
     // Check if the referral code is visible and applied
-    await checkReferralCodeVisibility(page, referrer.referral_code)
+    await checkReferralCodeVisibility({ page: page.page, referralCode: referrer.referral_code })
 
     log('depositing', amountDecimals, `${coin.symbol} with referral code`, referrer.referral_code)
 
