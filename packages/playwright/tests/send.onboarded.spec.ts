@@ -8,13 +8,12 @@ import { coins, type coin, ethCoin } from 'app/data/coins'
 import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { shorten } from 'app/utils/strings'
-import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 import debug from 'debug'
 import { isAddress, parseUnits } from 'viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { ProfilePage } from './fixtures/profiles'
 import { SendPage } from './fixtures/send'
-import { lookupBalance, testBaseClient } from './fixtures/viem'
+import { fund, testBaseClient } from './fixtures/viem'
 
 const test = mergeTests(sendAccountTest, snapletTest)
 
@@ -225,30 +224,9 @@ async function handleTokenTransfer({
   assert(!!sendAccount, 'no send account found')
 
   // fund account
-  if (isETH) {
-    await testBaseClient.setBalance({
-      address: sendAccount.address as `0x${string}`,
-      value: balanceBefore, // padding
-    })
-    expect(await testBaseClient.getBalance({ address: sendAccount.address as `0x${string}` })).toBe(
-      balanceBefore
-    )
-  } else {
-    await setERC20Balance({
-      client: testBaseClient,
-      address: sendAccount.address as `0x${string}`,
-      tokenAddress: token.token as `0x${string}`,
-      value: balanceBefore, // padding
-    })
-    expect(
-      await lookupBalance({
-        address: sendAccount.address as `0x${string}`,
-        token: token.token as `0x${string}`,
-      })
-    ).toBe(balanceBefore)
-  }
+  await fund({ address: sendAccount.address, amount: balanceBefore, coin: token })
 
-  await page.reload() // ensure balance is updated
+  await page.reload() // ensure balance is updated on the page
 
   const sendPage = new SendPage(page, expect)
   await sendPage.expectTokenSelect(token.symbol)

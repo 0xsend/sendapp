@@ -1,33 +1,22 @@
 import { sendEarnFactoryAbi } from '@0xsend/send-earn-contracts'
-import { sendEarnAbi, sendEarnUsdcFactoryAddress, usdcAddress } from '@my/wagmi'
+import { sendEarnAbi } from '@my/wagmi'
 import { useSendEarnBalances } from 'app/features/earn/hooks'
+import { AffiliateVaultSchema } from 'app/features/earn/zod'
 import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { useReferredBy, useReferrer } from 'app/utils/referrer'
 import { useSendAccount } from 'app/utils/send-accounts'
+import { assetsToEarnFactory, isSupportedAsset } from 'app/utils/sendEarn'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import type { SendAccountCall } from 'app/utils/userop'
-import { byteaToHexEthAddress } from 'app/utils/zod'
 import debug from 'debug'
 import { getRandomBytes } from 'expo-crypto'
 import { bytesToHex, encodeFunctionData, erc20Abi, zeroAddress } from 'viem'
 import { useChainId } from 'wagmi'
 import { useQuery, type UseQueryReturnType } from 'wagmi/query'
-import { z } from 'zod'
 
 const log = debug('app:features:earn')
-
-const AffiliateVaultSchema = z
-  .object({
-    affiliate: byteaToHexEthAddress,
-    send_earn_affiliate_vault: z
-      .object({
-        send_earn: byteaToHexEthAddress,
-      })
-      .nullable(),
-  })
-  .nullable()
 
 /**
  * Fetches the referrer's vault address from the send_earn_new_affiliate table.
@@ -234,19 +223,4 @@ function useSendEarnFactory({
       return factory
     },
   })
-}
-
-type SendEarnAssets = keyof typeof assetsToEarnFactory
-/**
- * Maps asset addresses to the Send Earn Factory chainId -> addresses.
- */
-export const assetsToEarnFactory = Object.fromEntries([
-  ...Object.entries(usdcAddress).map(([chainId, addr]) => [
-    addr,
-    sendEarnUsdcFactoryAddress[chainId],
-  ]),
-]) as Record<`0x${string}`, `0x${string}`>
-
-export function isSupportedAsset(asset: `0x${string}`): asset is SendEarnAssets {
-  return assetsToEarnFactory[asset] !== undefined
 }

@@ -1,56 +1,26 @@
 import { faker } from '@faker-js/faker'
 import { expect } from '@my/playwright/fixtures/send-accounts'
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
-import { type SeedClient, userOnboarded } from '@my/snaplet'
-import { config, sendEarnAbi, sendEarnAddress, usdcAddress } from '@my/wagmi'
+import { sendEarnAbi, sendEarnAddress } from '@my/wagmi'
 import { mergeTests } from '@playwright/test'
+import { usdcCoin } from 'app/data/coins'
+import { AffiliateVaultSchema } from 'app/features/earn/zod'
 import { assert } from 'app/utils/assert'
+import { byteaToHex } from 'app/utils/byteaToHex'
 import { hexToBytea } from 'app/utils/hexToBytea'
+import { assetsToEarnFactory } from 'app/utils/sendEarn'
 import debug from 'debug'
-import { formatUnits } from 'viem'
+import { checksumAddress, formatUnits } from 'viem'
 import { readContract } from 'viem/actions'
 import { test as depositTest, type EarnDepositPage } from './fixtures/deposit'
-import { lookupBalance, testBaseClient } from './fixtures/viem'
-
-const DECIMALS = 6
-// $10
-const GAS_FEES = BigInt(10 * 10 ** DECIMALS)
-// $100K
-const MAX_DEPOSIT_AMOUNT = BigInt(100_000 * 10 ** DECIMALS)
-// ¢1
-const MIN_DEPOSIT_AMOUNT = BigInt(1 * 10 ** (DECIMALS - 2))
+import { fund, testBaseClient } from './fixtures/viem'
 
 let log: debug.Debugger
 
+// $10
+const GAS_FEES = BigInt(10 * 10 ** usdcCoin.decimals)
+
 const test = mergeTests(depositTest, snapletTest)
-
-test.beforeEach(async ({ user: { profile } }) => {
-  log = debug(`test:earn:deposit:${profile.id}:${test.info().parallelIndex}`)
-})
-
-/**
- * Sets up a referrer user with a valid referral code and send account
- */
-const setupReferrer = async (
-  seed: SeedClient
-): Promise<{
-  referrer: { referral_code: string; send_id: number; id: string }
-  referrerSendAccount: { address: `0x${string}` }
-  referrerTags: string[]
-}> => {
-  const plan = await seed.users([userOnboarded])
-  const referrer = plan.profiles[0]
-  const referrerSendAccount = plan.send_accounts[0] as { address: `0x${string}` }
-  const referrerTags = plan.tags.map((t) => t.name)
-  assert(!!referrer, 'profile not found')
-  assert(!!referrer.referral_code, 'referral code not found')
-  assert(!!referrerSendAccount, 'referrer send account not found')
-  return { referrer, referrerSendAccount, referrerTags } as {
-    referrer: { referral_code: string; send_id: number; id: string }
-    referrerSendAccount: { address: `0x${string}` }
-    referrerTags: string[]
-  }
-}
 
 /**
  * Checks if the referral code is visible and applied correctly
@@ -113,12 +83,13 @@ const readSendEarnDecimals = async ({
 const verifyDeposit = async ({
   owner,
   vault,
+  minDepositedAssets,
   depositedAssets,
-
   deposit,
 }: {
   owner: `0x${string}`
   vault: `0x${string}`
+  minDepositedAssets: bigint
   depositedAssets: bigint
   deposit: {
     owner: `\\x${string}`
@@ -148,7 +119,7 @@ const verifyDeposit = async ({
   const dbSharesDecimals = Number(formatUnits(dbShares, decimals))
 
   expect(Number(formatUnits(assets, 6))).toBeCloseTo(depositedAssetsDecimals, 2)
-  expect(MIN_DEPOSIT_AMOUNT).toBeGreaterThanOrEqual(depositedAssets - assets)
+  expect(minDepositedAssets).toBeGreaterThanOrEqual(depositedAssets - assets)
   expect(Number(formatUnits(dbAssets, 6))).toBeCloseTo(depositedAssetsDecimals, -2) // Looser precision due to potential rounding
 
   expect(deposit.shares).toBeDefined()
@@ -156,176 +127,105 @@ const verifyDeposit = async ({
   expect(Number(formatUnits(dbShares, decimals))).toBeCloseTo(dbSharesDecimals, -2) // Looser precision due to potential rounding
 }
 
-test('can deposit USDC into Platform SendEarn', async ({
-  earnDepositPage: page,
-  sendAccount,
-  setUsdcBalance,
-  supabase,
-}) => {
-  const randomAmount = faker.number.bigInt({ min: MIN_DEPOSIT_AMOUNT, max: MAX_DEPOSIT_AMOUNT })
-  const amountDecimals = formatUnits(randomAmount, DECIMALS)
+for (const coin of [usdcCoin]) {
+  // $100K
+  const MAX_DEPOSIT_AMOUNT = BigInt(100_000 * 10 ** coin.decimals)
+  // ¢1
+  const MIN_DEPOSIT_AMOUNT = BigInt(1 * 10 ** (coin.decimals - 2))
+  let randomAmount: bigint
 
-  await setUsdcBalance({
-    address: sendAccount.address,
-    value: randomAmount + GAS_FEES,
+  test.beforeEach(async ({ user: { profile }, earnDepositPage: page, sendAccount }) => {
+    log = debug(`test:earn:deposit:${profile.id}:${test.info().parallelIndex}`)
+    randomAmount = faker.number.bigInt({ min: MIN_DEPOSIT_AMOUNT, max: MAX_DEPOSIT_AMOUNT })
+    await fund({ address: sendAccount.address, amount: randomAmount + GAS_FEES, coin })
+    await page.goto(coin)
   })
 
-  await page.page.reload()
-
-  const deposit = await page.deposit({
-    page,
+  test(`can deposit ${coin.symbol} into Platform SendEarn`, async ({
+    earnDepositPage: page,
     sendAccount,
     supabase,
-    amount: amountDecimals,
+  }) => {
+    const amountDecimals = formatUnits(randomAmount, coin.decimals)
+
+    const deposit = await page.deposit({
+      coin,
+      supabase,
+      amount: amountDecimals,
+    })
+
+    await verifyDeposit({
+      owner: sendAccount.address,
+      vault: sendEarnAddress[testBaseClient.chain.id],
+      minDepositedAssets: MIN_DEPOSIT_AMOUNT,
+      depositedAssets: randomAmount,
+      deposit,
+    })
   })
 
-  await verifyDeposit({
-    owner: sendAccount.address,
-    vault: sendEarnAddress[testBaseClient.chain.id],
-    depositedAssets: randomAmount,
-    deposit,
+  test(`can deposit ${coin.symbol} into SendEarn with a referral code`, async ({
+    earnDepositPage: page,
+    sendAccount,
+    supabase,
+    referrer: { referrer, referrerSendAccount },
+  }) => {
+    // Generate a random deposit amount
+    const randomAmount = faker.number.bigInt({ min: MIN_DEPOSIT_AMOUNT, max: MAX_DEPOSIT_AMOUNT })
+    const amountDecimals = formatUnits(randomAmount, coin.decimals)
+
+    // Set USDC balance for the test user
+    await fund({ address: sendAccount.address, amount: randomAmount + GAS_FEES, coin })
+
+    // Navigate to the earn page with the referral code
+    await page.page.goto(`/?referral=${referrer.referral_code}`)
+    await page.page.waitForURL(`/?referral=${referrer.referral_code}`)
+    await page.goto(coin)
+
+    // Check if the referral code is visible and applied
+    await checkReferralCodeVisibility(page, referrer.referral_code)
+
+    log('depositing', amountDecimals, `${coin.symbol} with referral code`, referrer.referral_code)
+
+    // Complete the deposit
+    const deposit = await page.deposit({
+      coin,
+      supabase,
+      amount: amountDecimals,
+    })
+
+    // vault is the log_addr which should be the Send Earn address where the
+    // fee recipient is the send earn affiliate
+    const vault = checksumAddress(byteaToHex(deposit.log_addr))
+
+    await verifyDeposit({
+      owner: sendAccount.address,
+      vault,
+      minDepositedAssets: MIN_DEPOSIT_AMOUNT,
+      depositedAssets: randomAmount,
+      deposit,
+    })
+
+    const factory = assetsToEarnFactory[coin.token]
+    assert(!!factory, 'Asset is not supported')
+
+    // Verify the deposit was into the referrer affiliate vault
+    const { data, error } = await supabase
+      .from('send_earn_new_affiliate')
+      .select('affiliate, send_earn_affiliate_vault(send_earn)')
+      .eq('affiliate', hexToBytea(referrerSendAccount.address))
+      .eq('log_addr', hexToBytea(factory)) // each asset has its own factory
+      .not('send_earn_affiliate_vault', 'is', null)
+      .single()
+    expect(error).toBeFalsy()
+    assert(!!data, 'No affiliate vault found')
+    const affiliateVault = AffiliateVaultSchema.parse(data)
+    assert(!!affiliateVault, 'Affiliate vault is not defined')
+    expect(affiliateVault.send_earn_affiliate_vault).toBeDefined()
+    expect(affiliateVault.send_earn_affiliate_vault?.send_earn).toBe(vault)
   })
-})
+}
+
 /*
-test('can deposit USDC into SendEarn with a referral code', async ({
-  earnDepositPage,
-  sendAccount,
-  setUsdcBalance,
-  supabase,
-  seed,
-  user: { profile },
-}) => {
-  // Set up a referrer
-  const { referrer, referrerSendAccount, referrerTags } = await setupReferrer(seed)
-
-  // Generate a random deposit amount
-  const randomAmount = faker.number.bigInt({ min: MIN_DEPOSIT_AMOUNT, max: MAX_DEPOSIT_AMOUNT })
-  const amountDecimals = formatUnits(randomAmount, DECIMALS)
-
-  // Set USDC balance for the test user
-  await setUsdcBalance({
-    address: sendAccount.address,
-    value: randomAmount + GAS_FEES,
-  })
-
-  // Get the initial balance of the referrer to calculate reward later
-  const initialReferrerBalance = await lookupBalance({
-    address: referrerSendAccount.address,
-    token: usdcAddress[testBaseClient.chain.id],
-  })
-
-  // Navigate to the earn page with the referral code
-  await earnDepositPage.page.goto(`/?referral=${referrer.referral_code}`)
-  await earnDepositPage.goto()
-
-  // Check if the referral code is visible and applied
-  await checkReferralCodeVisibility(earnDepositPage, referrer.referral_code)
-
-  log('depositing', amountDecimals, 'USDC with referral code', referrer.referral_code)
-
-  // Complete the deposit
-  await earnDepositPage.fillAmount(amountDecimals)
-  await earnDepositPage.acceptTerms()
-  await earnDepositPage.submit()
-
-  // Verify the deposit was successful by checking shares and assets
-  const shares = await readSendEarnBalanceOf(config, {
-    args: [sendAccount.address],
-    chainId: testBaseClient.chain.id,
-  })
-
-  const assets = await readSendEarnConvertToAssets(config, {
-    args: [shares],
-    chainId: testBaseClient.chain.id,
-  })
-
-  // Assets must equal to the amount deposited
-  log('assets', assets)
-  expect(Number(formatUnits(assets, 6))).toBeCloseTo(Number(amountDecimals), 2)
-  log('diff', randomAmount - assets)
-  expect(MIN_DEPOSIT_AMOUNT).toBeGreaterThanOrEqual(randomAmount - assets)
-
-  // Verify the deposit was recorded in the database
-  // biome-ignore lint/suspicious/noExplicitAny: This is a test file
-  let deposit: any = null
-
-  // Wait and retry a few times as there might be a delay in the deposit being recorded
-  await expect
-    .poll(
-      async () => {
-        try {
-          const { data, error } = await supabase
-            .from('send_earn_deposits')
-            .select('log_addr, owner, shares::text, assets::text, referrer')
-            .order('block_num', { ascending: false })
-            .single()
-
-          if (error) {
-            log('error fetching send_earn_deposits', error)
-            return false
-          }
-
-          log('send_earn_deposits query result', data)
-          deposit = data
-          return true
-        } catch (e) {
-          log('error in poll function', e)
-          return false
-        }
-      },
-      {
-        timeout: 15000,
-        intervals: [1000, 2000, 3000, 5000],
-        message: 'Expected to find a send_earn_deposits record in Supabase',
-      }
-    )
-    .toBeTruthy()
-
-  // Check if deposit exists
-  expect(deposit).not.toBeNull()
-  if (!deposit) {
-    throw new Error('Expected to find a send_earn_deposits record in Supabase')
-  }
-
-  // @ts-ignore - TypeScript doesn't understand that deposit is not null at this point
-  const dbAssets = BigInt(deposit.assets)
-  const expectedAssets = Number(formatUnits(randomAmount, 6))
-
-  // @ts-ignore - TypeScript doesn't understand that deposit is not null at this point
-  expect(Number(formatUnits(dbAssets, 6))).toBeCloseTo(expectedAssets, -2) // Looser precision due to potential rounding
-
-  // @ts-ignore - TypeScript doesn't understand that deposit is not null at this point
-  expect(deposit.shares).toBeDefined()
-  // @ts-ignore - TypeScript doesn't understand that deposit is not null at this point
-  expect(BigInt(deposit.shares)).toBeGreaterThan(BigInt(0))
-
-  // Verify the referrer is recorded correctly
-  // @ts-ignore - TypeScript doesn't understand that deposit is not null at this point
-  expect(deposit.referrer).toBeDefined()
-  // @ts-ignore - TypeScript doesn't understand that deposit is not null at this point
-  expect(deposit.referrer).toBe(hexToBytea(referrerSendAccount.address))
-
-  // Verify the referrer received the reward
-  await verifyReferralReward(referrerSendAccount.address, randomAmount, initialReferrerBalance)
-
-  // Verify the referral is recorded in the activity feed
-  await expect(supabase).toHaveEventInActivityFeed({
-    event_name: 'referrals',
-    from_user: {
-      send_id: referrer.send_id,
-      tags: referrerTags,
-    },
-    to_user: {
-      id: profile.id,
-      send_id: profile.send_id,
-    },
-    data: {
-      type: 'earn',
-      amount: randomAmount.toString(),
-    },
-  })
-})
-
 test('handles invalid referral code when depositing to SendEarn', async ({
   earnDepositPage,
   sendAccount,

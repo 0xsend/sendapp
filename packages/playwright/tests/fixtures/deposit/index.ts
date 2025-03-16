@@ -16,7 +16,6 @@ export const test = baseTest.extend<{
     log = debug(`test:earn:deposit:${test.info().parallelIndex}`)
     log('creating sendEarnDepositPage')
     const sendEarnDepositPage = new EarnDepositPage(page)
-    await sendEarnDepositPage.goto()
     await use(sendEarnDepositPage)
   },
 })
@@ -39,14 +38,14 @@ export class EarnDepositPage {
     this.submitButton = this.page.getByRole('button', { name: 'Confirm Deposit' })
   }
 
-  async goto() {
+  async goto(coin: { symbol: string }) {
     log('goto /earn')
     await this.page.goto('/')
     await this.page.getByRole('link', { name: 'Earn', exact: true }).click()
     await this.page.waitForURL('/earn')
     await expect(this.startEarningButton).toBeVisible()
     await this.startEarningButton.click()
-    await this.page.waitForURL('/earn/usdc/deposit')
+    await this.page.waitForURL(`/earn/${coin.symbol.toLowerCase()}/deposit`)
     await expect(this.page.getByText('Start Earning', { exact: true })).toBeVisible()
     await expect(this.amountInput).toBeVisible()
     await expect(this.termsCheckbox).toBeVisible()
@@ -74,7 +73,6 @@ export class EarnDepositPage {
     await expect(async () => {
       await this.page.getByRole('button', { name: 'Confirm Deposit' }).click()
       await expect(this.page.getByText('Deposited successfully', { exact: true })).toBeVisible()
-      await this.page.waitForURL('/earn/usdc')
     }).toPass({
       timeout: 15_000,
     })
@@ -82,17 +80,20 @@ export class EarnDepositPage {
 
   /**
    * Deposits the given amount of USDC into SendEarn. Assumes the deposit page is already open.
-   * @param amount - The amount of USDC to deposit
+   * @param coin - The coin to deposit
+   * @supabase - The Supabase client instance for database interactions
+   * @param amount - The amount of USDC to deposit in the decimal format (e.g. 1.23)
    * @returns The deposit record
    */
   async deposit({
-    page,
+    coin,
     supabase,
     amount,
   }: {
-    page: EarnDepositPage
-    sendAccount: {
-      address: `0x${string}`
+    coin: {
+      token: `0x${string}`
+      decimals: number
+      symbol: string
     }
     supabase: SupabaseClient<Database>
     amount: string
@@ -102,11 +103,12 @@ export class EarnDepositPage {
     assets: string
     log_addr: `\\x${string}`
   }> {
-    log('depositing', amount, 'USDC')
+    log('depositing', amount, coin.symbol)
 
-    await page.fillAmount(amount)
-    await page.acceptTerms()
-    await page.submit()
+    await this.fillAmount(amount)
+    await this.acceptTerms()
+    await this.submit()
+    await this.page.waitForURL(`/earn/${coin.symbol.toLowerCase()}`)
 
     let deposit: { owner: `\\x${string}`; shares: string; assets: string; log_addr: `\\x${string}` }
 
