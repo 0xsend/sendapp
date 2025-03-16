@@ -148,3 +148,5 @@ export const knownCoins: coin[] = [...allCoins, sendV0Coin] as const
  * List of erc20 coins
  */
 export const erc20Coins: erc20Coin[] = [usdcCoin, sendCoin, spx6900Coin] as const
+
+export const isEthCoin = (coin: coin): coin is ethCoin => coin.symbol === 'ETH'
