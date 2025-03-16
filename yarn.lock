@@ -6622,6 +6622,8 @@ __metadata:
     temporal: "npm:^0.7.1"
     typescript: "npm:^5.5.3"
   peerDependencies:
+    "@bufbuild/protobuf": ^2.2.3
+    "@temporalio/common": ^1.11.1
     typescript: ^5.5.3
   languageName: unknown
   linkType: soft

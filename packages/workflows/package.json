@@ -26,7 +26,7 @@
     "lint": "tsc",
     "test": "jest",
     "build": "yarn bundle",
-    "bundle": "yarn src/scripts/build-workflow-bundle.ts"
+    "bundle": "node --loader ts-node/esm src/scripts/build-workflow-bundle.ts"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
