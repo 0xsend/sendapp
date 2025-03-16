@@ -1,15 +1,11 @@
 import { TopNav } from 'app/components/TopNav'
 import { ActiveEarnings } from 'app/features/earn/active/screen'
+import { assetParam } from '../../../utils/assetParam'
 import { HomeLayout } from 'app/features/home/layout.web'
+import type { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from '../../_app'
-import { coinsBySymbol } from 'app/data/coins'
-import type { GetServerSideProps } from 'next'
-import type { ParsedUrlQuery } from 'node:querystring'
-import debug from 'debug'
-
-const log = debug('app:pages:earn:active')
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -22,32 +18,8 @@ export const Page: NextPageWithLayout = () => {
   )
 }
 
-interface Params extends ParsedUrlQuery {
-  asset?: string
-}
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { asset } = context.params as Params
-
-  if (!asset) {
-    log('no asset')
-    return {
-      redirect: {
-        destination: '/earn',
-        permanent: false,
-      },
-    }
-  }
-
-  if (!coinsBySymbol[asset.toUpperCase()]) {
-    log('coin not supported', asset)
-    // 404 if coin is not supported
-    return {
-      notFound: true,
-    }
-  }
-
-  return userProtectedGetSSP()(context)
+export const getServerSideProps: GetServerSideProps = (context) => {
+  return assetParam(context, userProtectedGetSSP)
 }
 
 Page.getLayout = (children) => (
