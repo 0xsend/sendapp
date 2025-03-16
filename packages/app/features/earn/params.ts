@@ -1,4 +1,4 @@
-import { type erc20Coin, erc20Coins } from 'app/data/coins'
+import { type coin, coinsBySymbol, type erc20Coin, erc20Coins } from 'app/data/coins'
 import { createParam } from 'solito'
 import { useQuery, type UseQueryReturnType } from 'wagmi/query'
 
@@ -24,4 +24,13 @@ export const useERC20CoinAsset = (): UseQueryReturnType<erc20Coin | null | undef
       return coin
     },
   })
+}
+
+export function coinToParam(coin: coin): string {
+  return coin.symbol.toLowerCase()
+}
+
+export function paramToCoin(param: string): coin | null {
+  const coin = coinsBySymbol[param.toUpperCase()]
+  return coin ?? null
 }
