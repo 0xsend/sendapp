@@ -15,7 +15,7 @@ import { formatCoinAmount } from 'app/utils/formatCoinAmount'
 import { useMemo } from 'react'
 import { SectionList } from 'react-native'
 import { type SendEarnActivity, useSendEarnActivity, useSendEarnCoinBalances } from '../hooks'
-import { useERC20CoinAsset } from '../params'
+import { useERC20AssetCoin } from '../params'
 
 export const EarningsBalance = () => {
   // const { push } = useRouter()
@@ -48,7 +48,7 @@ export const EarningsBalance = () => {
 }
 
 export const EarningsFeed = () => {
-  const coin = useERC20CoinAsset()
+  const coin = useERC20AssetCoin()
   const { data, isLoading, error, isFetchingNextPage, fetchNextPage, hasNextPage } =
     useSendEarnActivity({
       pageSize: 10,
@@ -155,7 +155,7 @@ export const EarningsFeed = () => {
 }
 
 function TotalEarning() {
-  const coin = useERC20CoinAsset()
+  const coin = useERC20AssetCoin()
   const balances = useSendEarnCoinBalances(coin.data || undefined)
   const totalDeposits = useMemo(() => {
     if (!balances.data) return 0n

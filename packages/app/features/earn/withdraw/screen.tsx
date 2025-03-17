@@ -1,90 +1,249 @@
-import { Button, Fade, Paragraph, Stack, SubmitButton, XStack, YStack } from '@my/ui'
-import { z } from 'zod'
-import { FormProvider, useForm } from 'react-hook-form'
-import { formFields, SchemaForm } from 'app/utils/SchemaForm'
-import { useRouter } from 'solito/router'
-import { useEffect, useState } from 'react'
-import { useEarnScreenParams } from 'app/routers/params'
-import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
-import { usdcCoin } from 'app/data/coins'
-import { formatUnits } from 'viem'
+import {
+  Button,
+  Fade,
+  Paragraph,
+  Spinner,
+  Stack,
+  SubmitButton,
+  useToastController,
+  XStack,
+  YStack,
+} from '@my/ui'
+import { baseMainnetBundlerClient, entryPointAddress } from '@my/wagmi'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { CalculatedBenefits } from 'app/features/earn/components/CalculatedBenefits'
-import { EarnTerms } from 'app/features/earn/components/EarnTerms'
+import { useSendEarnAPY, useSendEarnCoinBalances } from 'app/features/earn/hooks'
+import { assert } from 'app/utils/assert'
+import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
+import { formFields, SchemaForm } from 'app/utils/SchemaForm'
+import { useSendAccount } from 'app/utils/send-accounts'
+import { signUserOp } from 'app/utils/signUserOp'
+import { toNiceError } from 'app/utils/toNiceError'
+import { useUserOp } from 'app/utils/userop'
+import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
+import debug from 'debug'
+import { useEffect, useMemo, useState } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
+import { useRouter } from 'solito/router'
+import { formatUnits, withRetry } from 'viem'
+import { useChainId } from 'wagmi'
+import { z } from 'zod'
+import {
+  coinToParam,
+  useAmount,
+  useERC20AssetCoin,
+  useInitializeFormAmount,
+  useParams,
+} from '../params'
+import { useSendEarnWithdrawCalls, useSendEarnWithdrawVault } from './hooks'
 
-const WithdrawDepositForm = z.object({
+export const log = debug('app:earn:withdraw')
+
+const WithdrawFormSchema = z.object({
   amount: formFields.text,
-  areTermsAccepted: formFields.boolean_checkbox,
 })
+type WithdrawFormSchema = z.infer<typeof WithdrawFormSchema>
 
-export const WithdrawForm = () => {
-  const form = useForm<z.infer<typeof WithdrawDepositForm>>()
+export function WithdrawScreen() {
+  return <WithdrawForm />
+}
+
+export function WithdrawForm() {
+  const form = useForm<WithdrawFormSchema>()
   const router = useRouter()
+  const { tokensQuery } = useSendAccountBalances()
+  const coin = useERC20AssetCoin()
+  const coinData = useMemo(() => coin.data ?? undefined, [coin.data])
+  const asset = useMemo(() => coin.data?.token ?? undefined, [coin.data?.token])
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
-  const [earnParams, setEarnParams] = useEarnScreenParams()
-  const [isFormInitializedFromParams, setIsFormInitializedFromParams] = useState<boolean>(false)
-
-  // TODO fetch real balance
-  const depositBalance = BigInt(2780500000)
-
-  const parsedAmount = BigInt(earnParams.amount ?? '0')
+  const { params, setParams } = useParams()
+  const [parsedAmount] = useAmount()
   const formAmount = form.watch('amount')
-  const areTermsAccepted = form.watch('areTermsAccepted')
 
-  const canSubmit = depositBalance >= parsedAmount && parsedAmount > BigInt(0) && areTermsAccepted
+  // QUERY WITHDRAW USEROP
+  const chainId = useChainId()
+  const vault = useSendEarnWithdrawVault({ asset, coin: coinData })
+  const sendAccount = useSendAccount()
+  const sender = useMemo(() => sendAccount?.data?.address, [sendAccount?.data?.address])
+  const calls = useSendEarnWithdrawCalls({ sender, asset, amount: parsedAmount, coin: coinData })
+  const uop = useUserOp({
+    sender,
+    calls: calls.data ?? undefined,
+  })
+  const webauthnCreds = useMemo(
+    () =>
+      sendAccount?.data?.send_account_credentials
+        .filter((c) => !!c.webauthn_credentials)
+        .map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? [],
+    [sendAccount?.data?.send_account_credentials]
+  )
 
-  const insufficientAmount = earnParams.amount !== undefined && parsedAmount > depositBalance
+  // MUTATION WITHDRAW USEROP
+  const [useropState, setUseropState] = useState('')
+  const toast = useToastController()
+  const queryClient = useQueryClient()
+  const mutation = useMutation({
+    mutationFn: async () => {
+      log('formState', form.formState)
+      assert(form.formState.isValid, 'form is not valid')
+      assert(uop.isSuccess, 'uop is not success')
 
-  const onSubmit = async () => {
-    if (!canSubmit) return
+      uop.data.signature = await signUserOp({
+        userOp: uop.data,
+        webauthnCreds,
+        chainId: chainId,
+        entryPoint: entryPointAddress[chainId],
+      })
 
-    // TODO logic for withdrawing from vault
+      setUseropState('Sending transaction...')
 
-    router.push('/earn')
-  }
+      const userOpHash = await baseMainnetBundlerClient.sendUserOperation({
+        userOperation: uop.data,
+      })
 
+      setUseropState('Waiting for confirmation...')
+
+      const receipt = await withRetry(
+        () =>
+          baseMainnetBundlerClient.waitForUserOperationReceipt({
+            hash: userOpHash,
+            timeout: 10000,
+          }),
+        {
+          delay: 100,
+          retryCount: 3,
+        }
+      )
+
+      log('receipt', receipt)
+
+      assert(receipt.success, 'receipt status is not success')
+
+      log('mutationFn', { uop })
+      return
+    },
+    onMutate: (variables) => {
+      // A mutation is about to happen!
+      log('onMutate', variables)
+      setUseropState('Requesting signature...')
+      // Optionally return a context containing data to use when for example rolling back
+      // return { id: 1 }
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      log('onError', error, variables, context)
+    },
+    onSuccess: (data, variables, context) => {
+      // Boom baby!
+      log('onSuccess', data, variables, context)
+
+      toast.show('Withdrawn successfully')
+
+      if (coinData) {
+        router.push({
+          pathname: `/earn/${coinToParam(coinData)}`,
+        })
+      }
+    },
+    onSettled: (data, error, variables, context) => {
+      // Error or success... doesn't matter!
+      log('onSettled', data, error, variables, context)
+      queryClient.invalidateQueries({ queryKey: tokensQuery.queryKey })
+    },
+  })
+
+  // DEBUG
+  log('uop', uop)
+  log('calls', calls)
+  log('mutation', mutation)
+
+  // Fetch the user's deposit balance from Send Earn vaults
+  const earnCoinBalances = useSendEarnCoinBalances(coinData)
+  const isBalanceLoading = earnCoinBalances.isLoading
+
+  // Calculate the total deposit balance for this coin
+  const depositBalance = useMemo(() => {
+    if (earnCoinBalances.isLoading || !earnCoinBalances.data) return BigInt(0)
+
+    // Sum up all assets from the balances
+    return earnCoinBalances.data.reduce((total, balance) => total + balance.assets, BigInt(0))
+  }, [earnCoinBalances.data, earnCoinBalances.isLoading])
+
+  const canSubmit =
+    !coin.isLoading &&
+    depositBalance !== undefined &&
+    depositBalance >= parsedAmount &&
+    parsedAmount > BigInt(0) &&
+    calls.isSuccess &&
+    uop.isSuccess &&
+    !calls.isPending &&
+    !uop.isPending &&
+    mutation.isIdle
+
+  const insufficientAmount = depositBalance !== undefined && parsedAmount > depositBalance
+
+  useInitializeFormAmount(form)
+
+  // validate and sanitize amount
   useEffect(() => {
     const subscription = form.watch(({ amount: _amount }) => {
-      const sanitizedAmount = sanitizeAmount(_amount, usdcCoin.decimals)
-      if (!sanitizedAmount) return
-      setEarnParams(
+      if (!coin.data?.decimals) return
+      const sanitizedAmount = sanitizeAmount(_amount, coin.data?.decimals)
+
+      setParams(
         {
-          ...earnParams,
-          amount: sanitizedAmount.toString(),
+          ...params,
+          amount: sanitizedAmount ? sanitizedAmount.toString() : undefined,
         },
         { webBehavior: 'replace' }
       )
     })
 
     return () => subscription.unsubscribe()
-  }, [form.watch, setEarnParams, earnParams])
+  }, [form.watch, setParams, params, coin.data?.decimals])
 
-  useEffect(() => {
-    if (!isFormInitializedFromParams && earnParams.amount) {
-      form.setValue(
-        'amount',
-        localizeAmount(formatUnits(BigInt(earnParams.amount), usdcCoin.decimals))
-      )
+  // use deposit vault if it exists, or the default vault for the asset
+  const baseApy = useSendEarnAPY({
+    vault: vault.data ?? undefined,
+  })
 
-      setIsFormInitializedFromParams(true)
-    }
-  }, [earnParams.amount, isFormInitializedFromParams, form.setValue])
+  // Calculate current monthly earning (before withdrawal)
+  const currentMonthlyEarning = useMemo(() => {
+    if (!coin.data?.decimals) return
+    if (!baseApy.data) return
+    const decimalAmount = Number(formatUnits(depositBalance, coin.data?.decimals))
+    const monthlyRate = (1 + baseApy.data.baseApy / 100) ** (1 / 12) - 1
+    return formatAmount(Number(decimalAmount ?? 0) * monthlyRate)
+  }, [baseApy.data, depositBalance, coin.data?.decimals])
 
-  // TODO loader when deposit balance is loading
-  // if (false) {
-  //   return <Spinner size="large" color={'$color12'} />
-  // }
+  // Calculate reduced monthly earning (after withdrawal)
+  const reducedMonthlyEarning = useMemo(() => {
+    if (!coin.data?.decimals) return
+    if (!baseApy.data) return
+    const decimalAmount = Number(formatUnits(depositBalance - parsedAmount, coin.data?.decimals))
+    const monthlyRate = (1 + baseApy.data.baseApy / 100) ** (1 / 12) - 1
+    return formatAmount(Number(decimalAmount ?? 0) * monthlyRate)
+  }, [baseApy.data, parsedAmount, depositBalance, coin.data?.decimals])
 
+  if (!coin.isLoading && !coin.data) {
+    router.push('/earn')
+    return null
+  }
+
+  if (isBalanceLoading) {
+    return <Spinner size="large" color={'$color12'} />
+  }
   return (
-    <YStack w={'100%'} gap={'$4'} pb={'$3'} $gtLg={{ w: '50%' }}>
+    <YStack testID="WithdrawForm" w={'100%'} gap={'$4'} pb={'$3'} $gtLg={{ w: '50%' }}>
       <Paragraph size={'$7'} fontWeight={'500'}>
         Withdraw Amount
       </Paragraph>
       <FormProvider {...form}>
         <SchemaForm
           form={form}
-          schema={WithdrawDepositForm}
-          onSubmit={onSubmit}
+          schema={WithdrawFormSchema}
+          onSubmit={() => mutation.mutate()}
           props={{
             amount: {
               fontSize: (() => {
@@ -143,26 +302,49 @@ export const WithdrawForm = () => {
           }}
           defaultValues={{
             amount: undefined,
-            areTermsAccepted: false,
           }}
           renderAfter={({ submit }) => (
             <YStack>
+              {mutation.isPending ? (
+                <Fade key="userop-state">
+                  <Paragraph color={'$color10'} ta="center" size="$3">
+                    {useropState}
+                  </Paragraph>
+                </Fade>
+              ) : null}
+              <XStack alignItems="center" jc="center" gap={'$2'}>
+                {[calls.error, sendAccount.error, uop.error, mutation.error]
+                  .filter(Boolean)
+                  .map((e) =>
+                    e ? (
+                      <Paragraph key={e.message} color="$error" role="alert">
+                        {toNiceError(e)}
+                      </Paragraph>
+                    ) : null
+                  )}
+              </XStack>
               <SubmitButton
                 theme="green"
-                onPress={submit}
+                onPress={() => submit()}
                 py={'$5'}
                 br={'$4'}
                 disabledStyle={{ opacity: 0.5 }}
                 disabled={!canSubmit}
+                iconAfter={mutation.isPending ? <Spinner size="small" /> : undefined}
               >
-                <Button.Text size={'$5'} fontWeight={'500'} fontFamily={'$mono'} color={'$black'}>
-                  CONFIRM WITHDRAW
-                </Button.Text>
+                {[calls.isLoading, sendAccount.isLoading, uop.isLoading].some((p) => p) &&
+                !mutation.isPending ? (
+                  <Spinner size="small" />
+                ) : (
+                  <Button.Text size={'$5'} fontWeight={'500'} fontFamily={'$mono'} color={'$black'}>
+                    CONFIRM WITHDRAW
+                  </Button.Text>
+                )}
               </SubmitButton>
             </YStack>
           )}
         >
-          {({ amount, areTermsAccepted }) => (
+          {({ amount }) => (
             <YStack gap={'$5'}>
               <Fade>
                 <YStack
@@ -211,7 +393,13 @@ export const WithdrawForm = () => {
                             size={'$5'}
                             fontWeight={'600'}
                           >
-                            {formatAmount(formatUnits(depositBalance, usdcCoin.decimals), 12, 2)}
+                            {coin.data?.decimals
+                              ? formatAmount(
+                                  formatUnits(depositBalance, coin.data?.decimals),
+                                  12,
+                                  2
+                                )
+                              : '-'}
                           </Paragraph>
                           <Paragraph
                             color={insufficientAmount ? '$error' : '$silverChalice'}
@@ -220,7 +408,7 @@ export const WithdrawForm = () => {
                               color: insufficientAmount ? '$error' : '$darkGrayTextField',
                             }}
                           >
-                            USDC
+                            {coin.data?.symbol}
                           </Paragraph>
                         </XStack>
                         {insufficientAmount && (
@@ -233,19 +421,33 @@ export const WithdrawForm = () => {
                   </XStack>
                 </YStack>
               </Fade>
-              {/*TODO plug real current and override values*/}
-              <CalculatedBenefits
-                apy={'10'}
-                monthlyEarning={'10'}
-                rewards={'3,000'}
-                overrideApy={parsedAmount > BigInt(0) ? '8' : undefined}
-                overrideMonthlyEarning={parsedAmount > BigInt(0) ? '7' : undefined}
-                overrideRewards={parsedAmount > BigInt(0) ? '2,100' : undefined}
-              />
-              <XStack gap={'$3'} ai={'center'}>
-                {areTermsAccepted}
-                <EarnTerms />
-              </XStack>
+              {(() => {
+                switch (true) {
+                  case baseApy.isLoading:
+                    return <Spinner size="small" color={'$color12'} />
+                  case baseApy.isError:
+                    return <Paragraph color="$error">{toNiceError(baseApy.error)}</Paragraph>
+                  case baseApy.isSuccess && parsedAmount > 0n:
+                    return (
+                      <CalculatedBenefits
+                        apy={formatAmount(baseApy.data.baseApy, undefined, 2)}
+                        monthlyEarning={currentMonthlyEarning ?? ''}
+                        rewards={''}
+                        overrideMonthlyEarning={
+                          parsedAmount > BigInt(0) ? reducedMonthlyEarning : undefined
+                        }
+                      />
+                    )
+                  default:
+                    return (
+                      <CalculatedBenefits
+                        apy={formatAmount(baseApy.data?.baseApy ?? 0, undefined, 2)}
+                        monthlyEarning={currentMonthlyEarning ?? ''}
+                        rewards={''}
+                      />
+                    )
+                }
+              })()}
             </YStack>
           )}
         </SchemaForm>
