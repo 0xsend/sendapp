@@ -38,7 +38,7 @@ const SwapFormSchema = z.object({
     .max(2000, 'Max slippage value is 20%'),
 })
 
-export const SwapForm = () => {
+export const SwapFormScreen = () => {
   const form = useForm<z.infer<typeof SwapFormSchema>>()
   const router = useRouter()
   const [swapParams, setSwapParams] = useSwapScreenParams()
