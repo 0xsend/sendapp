@@ -261,7 +261,11 @@ export const SwapSummary = () => {
         </Paragraph>
       </YStack>
       <Button
-        theme={!hasEnoughGas || !hasEnoughBalance ? 'red_alt1' : 'green'}
+        theme={
+          (!hasEnoughGas || !hasEnoughBalance) && !encodeRouteError && !userOpError
+            ? 'red_alt1'
+            : 'green'
+        }
         onPress={submit}
         py={'$5'}
         br={'$4'}
@@ -270,13 +274,13 @@ export const SwapSummary = () => {
       >
         {(() => {
           switch (true) {
-            case !hasEnoughBalance:
+            case !hasEnoughBalance && !encodeRouteError && !userOpError:
               return (
                 <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'}>
                   insufficient balance
                 </Button.Text>
               )
-            case !hasEnoughGas:
+            case !hasEnoughGas && !encodeRouteError && !userOpError:
               return (
                 <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'}>
                   insufficient gas
