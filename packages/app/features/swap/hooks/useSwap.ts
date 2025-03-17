@@ -58,7 +58,6 @@ export const useSwap = ({
   } = useUserOp({
     sender,
     calls,
-    callGasLimit: 2000000n,
   })
 
   const {

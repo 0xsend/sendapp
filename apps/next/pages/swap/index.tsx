@@ -1,4 +1,4 @@
-import { SwapForm } from 'app/features/swap/SwapForm'
+import { SwapFormScreen } from '../../../../packages/app/features/swap/screen'
 import { HomeLayout } from 'app/features/home/layout.web'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
@@ -9,9 +9,9 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Swap Form</title>
+        <title>Send | Swap</title>
       </Head>
-      <SwapForm />
+      <SwapFormScreen />
     </>
   )
 }
