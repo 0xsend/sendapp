@@ -187,6 +187,20 @@ export function DepositForm() {
     earnParams.amount !== undefined &&
     parsedAmount > coinBalance.coin?.balance
 
+  // set amount to earnParams.amount if it's not set
+  useEffect(() => {
+    if (!coin.data?.decimals) return
+    try {
+      if (formAmount === undefined && earnParams.amount !== undefined) {
+        form.setValue('amount', formatUnits(BigInt(earnParams.amount), coin.data?.decimals))
+      }
+    } catch (e) {
+      log('error setting amount', e)
+      // reset param amount if error
+      setEarnParams({ ...earnParams, amount: undefined }, { webBehavior: 'replace' })
+    }
+  }, [form.setValue, formAmount, earnParams, setEarnParams, coin.data?.decimals])
+
   // validate and sanitize amount
   useEffect(() => {
     const subscription = form.watch(({ amount: _amount }) => {
