@@ -10,7 +10,7 @@ import { useHoverStyles } from 'app/utils/useHoverStyles'
 import debug from 'debug'
 import { useMemo, type NamedExoticComponent } from 'react'
 import { useRouter } from 'solito/router'
-import { useSendEarnCoinBalances } from '../hooks'
+import { useMyAffiliateVault, useMyEarnRewards, useSendEarnCoinBalances } from '../hooks'
 import { coinToParam, useERC20CoinAsset } from '../params'
 
 const log = debug('app:earn:active')
@@ -86,6 +86,10 @@ function TotalValue() {
     }, 0n)
     return formatCoinAmount({ amount: totalAssets, coin: coin.data })
   }, [balances.data, coin.data])
+  const myAffiliateVault = useMyAffiliateVault()
+  log('myAffiliateVault', myAffiliateVault)
+  const myEarnRewards = useMyEarnRewards()
+  log('myEarnRewards', myEarnRewards)
 
   const isLoading = balances.isPending || coin.isPending
 
