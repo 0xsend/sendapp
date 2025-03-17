@@ -6631,6 +6631,7 @@ __metadata:
     p-queue: "npm:^8.0.1"
     permissionless: "npm:^0.1.14"
     superjson: "npm:^2.2.1"
+    typescript: "npm:^5.5.3"
     viem: "npm:^2.19.0"
     zod: "npm:^3.23.8"
   languageName: unknown

@@ -174,9 +174,11 @@ test('can refer a tag', async ({ seed, checkoutPage, supabase, user: { profile: 
 
   // check referral code and referrer are visible
   const refcode = checkoutPage.page.getByTestId('referral-code-input')
-  await checkReferralCodeVisibility(checkoutPage, {
-    referral_code: referrer.referral_code,
-    tags: referrerTags,
+  const referrerTag = referrerTags[0]
+  assert(!!referrerTag, 'referrer tags not found')
+  await checkReferralCodeVisibility({
+    page: checkoutPage.page,
+    referralCode: referrerTag,
   })
   // can change the referral code
   await refcode.fill('1234567890')
@@ -184,9 +186,9 @@ test('can refer a tag', async ({ seed, checkoutPage, supabase, user: { profile: 
   await expect(referralCodeInvalid).toBeVisible()
   // can change the referrer to valid code
   await refcode.fill(referrer.referral_code)
-  await checkReferralCodeVisibility(checkoutPage, {
-    referral_code: referrer.referral_code,
-    tags: referrerTags,
+  await checkReferralCodeVisibility({
+    page: checkoutPage.page,
+    referralCode: referrer.referral_code,
   })
 
   await confirmTags(checkoutPage, tagsToRegister)
@@ -286,7 +288,7 @@ test('can refer multiple tags in separate transactions', async ({
   await checkoutPage.page.goto(`/?referral=${referrer.referral_code}`)
   await checkoutPage.goto()
 
-  await checkReferralCodeHidden(checkoutPage)
+  await checkReferralCodeHidden(checkoutPage.page)
   // save current balance so we can verify the reward later
   const currentBalance = await lookupBalance({
     address: referrerSendAccount.address as `0x${string}`,

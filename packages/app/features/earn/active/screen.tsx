@@ -1,4 +1,4 @@
-import { Card, Fade, Paragraph, Separator, Spinner, Stack, XStack, YStack } from '@my/ui'
+import { Button, Card, Fade, Paragraph, Separator, Spinner, Stack, XStack, YStack } from '@my/ui'
 import type { IconProps } from '@tamagui/helpers-icon'
 import { ArrowDown } from '@tamagui/lucide-icons'
 import { IconStacks } from 'app/components/icons'
@@ -11,13 +11,14 @@ import debug from 'debug'
 import { useMemo, type NamedExoticComponent } from 'react'
 import { useRouter } from 'solito/router'
 import { useMyAffiliateVault, useMyEarnRewards, useSendEarnCoinBalances } from '../hooks'
-import { coinToParam, useERC20CoinAsset } from '../params'
+import { coinToParam, useERC20AssetCoin } from '../params'
+import { Link, useLink } from 'solito/link'
 
 const log = debug('app:earn:active')
 
 export const ActiveEarnings = () => {
   const { push } = useRouter()
-  const coin = useERC20CoinAsset()
+  const coin = useERC20AssetCoin()
   const balances = useSendEarnCoinBalances(coin.data || undefined)
 
   const buttons: {
@@ -76,7 +77,7 @@ export const ActiveEarnings = () => {
  * TODO: use token price if not USDC
  */
 function TotalValue() {
-  const coin = useERC20CoinAsset()
+  const coin = useERC20AssetCoin()
   const balances = useSendEarnCoinBalances(coin.data || undefined)
   const totalValue = useMemo(() => {
     if (!balances.data) return '0'
@@ -157,7 +158,7 @@ function TotalValue() {
  * The breakdown of Send Earn deposits and earnings.
  */
 function ActiveEarningBreakdown() {
-  const coin = useERC20CoinAsset()
+  const coin = useERC20AssetCoin()
   const balances = useSendEarnCoinBalances(coin.data || undefined)
   const totalDeposits = useMemo(() => {
     if (!balances.data) return 0n
@@ -224,42 +225,29 @@ const EarningButton = ({
   Icon: NamedExoticComponent<IconProps>
   href: string
 }) => {
-  const router = useRouter()
-  const hoverStyles = useHoverStyles()
-
-  const handleOnPress = () => {
-    router.push(href)
-  }
-
   return (
     <Fade flexGrow={1} flexShrink={1}>
-      <XStack
-        jc={'center'}
-        px={'$5'}
-        py={'$3.5'}
-        br={'$6'}
-        backgroundColor={'$color1'}
-        onPress={handleOnPress}
-        hoverStyle={hoverStyles}
-      >
-        <Stack
-          flexDirection={'column'}
-          gap={'$2'}
-          jc={'center'}
-          ai={'center'}
-          width={'100%'}
-          flexWrap={'wrap'}
-          $gtSm={{
-            flexDirection: 'row',
-            gap: '$3',
-          }}
-        >
-          <Icon size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
-          <Paragraph size={'$5'} $gtSm={{ size: '$6' }}>
-            {label}
-          </Paragraph>
-        </Stack>
-      </XStack>
+      <Link href={href}>
+        <XStack jc={'center'} px={'$5'} py={'$3.5'} br={'$6'} backgroundColor={'$color1'}>
+          <Stack
+            flexDirection={'column'}
+            gap={'$2'}
+            jc={'center'}
+            ai={'center'}
+            width={'100%'}
+            flexWrap={'wrap'}
+            $gtSm={{
+              flexDirection: 'row',
+              gap: '$3',
+            }}
+          >
+            <Icon size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
+            <Paragraph size={'$5'} $gtSm={{ size: '$6' }}>
+              {label}
+            </Paragraph>
+          </Stack>
+        </XStack>
+      </Link>
     </Fade>
   )
 }

@@ -3,6 +3,9 @@
   "name": "@my/api",
   "main": "src/index.ts",
   "private": true,
+  "scripts": {
+    "lint": "tsc --noEmit"
+  },
   "dependencies": {
     "@my/supabase": "workspace:*",
     "@my/temporal": "workspace:*",
@@ -26,6 +29,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/jsonwebtoken": "^9.0.2"
+    "@types/jsonwebtoken": "^9.0.2",
+    "typescript": "^5.5.3"
   }
 }

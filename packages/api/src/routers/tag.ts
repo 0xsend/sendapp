@@ -61,7 +61,7 @@ export const tagRouter = createTRPCRouter({
         ? await fetchReferrer({
             supabase,
             profile,
-            referral_code: referralCode,
+            referralCode,
           }).catch((e) => {
             const error = e as unknown as PostgrestError
             if (error.code === 'PGRST116') {

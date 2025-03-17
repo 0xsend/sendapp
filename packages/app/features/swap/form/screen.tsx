@@ -121,7 +121,7 @@ export const SwapFormScreen = () => {
         setSwapParams(
           {
             ...swapParams,
-            inAmount: sanitizedInAmount.toString(),
+            inAmount: sanitizedInAmount ? sanitizedInAmount.toString() : undefined,
             inToken,
             outToken,
             slippage,

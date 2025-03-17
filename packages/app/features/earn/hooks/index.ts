@@ -479,6 +479,7 @@ export function useMyEarnRewards() {
     queryFn: async ({ queryKey: [, { supabase, sendAccount, myAffiliateVault }], signal }) => {
       throwIf(sendAccount.error)
       assert(!!sendAccount.data, 'No send account found')
+      return null
     },
   })
 }

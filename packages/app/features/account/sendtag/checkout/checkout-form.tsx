@@ -28,7 +28,7 @@ import {
 } from 'app/utils/useReferralCodeCookie'
 import { useReferrer } from 'app/utils/useReferrer'
 import { useUser } from 'app/utils/useUser'
-import { useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
 import { useSendtagCheckout } from './checkout-utils'
