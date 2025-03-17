@@ -1,5 +1,5 @@
 import type { Database } from '@my/supabase/database.types'
-import { sendEarnAbi, useReadMorphoViewGetVaultInfo } from '@my/wagmi'
+import { sendEarnAbi, useReadErc20BalanceOf, useReadMorphoViewGetVaultInfo } from '@my/wagmi'
 import type { PostgrestError, SupabaseClient } from '@supabase/supabase-js'
 import {
   useInfiniteQuery,
@@ -18,6 +18,9 @@ import { formatUnits, isAddressEqual, zeroAddress } from 'viem'
 import { useChainId, useReadContracts } from 'wagmi'
 import { hashFn, useQuery, type UseQueryReturnType } from 'wagmi/query'
 import { z, type ZodError } from 'zod'
+import { type AffiliateVault, AffiliateVaultSchema } from '../zod'
+import { useSendAccount } from 'app/utils/send-accounts'
+import { hexToBytea } from 'app/utils/hexToBytea'
 
 const log = debug('app:earn:hooks')
 
@@ -414,6 +417,68 @@ export function useSendEarnCoinBalances(
           }
         })
       )
+    },
+  })
+}
+
+/**
+ * Fetches the user's affiliate vault information.
+ */
+export function useMyAffiliateVault(): UseQueryReturnType<AffiliateVault | null> {
+  const supabase = useSupabase()
+  const sendAccount = useSendAccount()
+  return useQuery({
+    queryKey: ['myAffiliateVault', { supabase, sendAccount }] as const,
+    enabled: !sendAccount.isLoading,
+    queryFn: async ({
+      queryKey: [, { supabase, sendAccount }],
+      signal,
+    }): Promise<AffiliateVault | null> => {
+      throwIf(sendAccount.error)
+      assert(!!sendAccount.data, 'No send account found')
+      const { data, error } = await supabase
+        .from('send_earn_new_affiliate')
+        .select('affiliate, send_earn_affiliate, send_earn_affiliate_vault(send_earn, log_addr)')
+        .eq('affiliate', hexToBytea(sendAccount.data?.address))
+        .not('send_earn_affiliate_vault', 'is', null)
+        .abortSignal(signal)
+        .limit(1)
+        .maybeSingle()
+
+      if (error) {
+        log('Error fetching referrer vault:', error)
+        throw error
+      }
+      log('myAffiliateVault', { data, error })
+      return AffiliateVaultSchema.parse(data)
+    },
+  })
+}
+
+/**
+ * Fetches the user's affiliate earn rewards. Similar to a cast call such as:
+ *
+ * ```shell
+ * cast balance --erc20 <vault> <send_earn_affiliate>
+ * ```
+ */
+export function useMyEarnRewards() {
+  const supabase = useSupabase()
+  const sendAccount = useSendAccount()
+  const myAffiliateVault = useMyAffiliateVault()
+  const balance = useReadErc20BalanceOf({
+    address: myAffiliateVault.data?.send_earn_affiliate_vault?.send_earn,
+    args: [myAffiliateVault.data?.send_earn_affiliate ?? zeroAddress],
+    query: { enabled: !!myAffiliateVault.data?.send_earn_affiliate_vault?.send_earn },
+  })
+  log('useMyEarnRewards', { balance, myAffiliateVault })
+  // TODO: convert balance to assets using the `send_earn` vault address
+  return useQuery({
+    queryKey: ['myEarnRewards', { supabase, sendAccount, myAffiliateVault }] as const,
+    enabled: !sendAccount.isLoading,
+    queryFn: async ({ queryKey: [, { supabase, sendAccount, myAffiliateVault }], signal }) => {
+      throwIf(sendAccount.error)
+      assert(!!sendAccount.data, 'No send account found')
     },
   })
 }

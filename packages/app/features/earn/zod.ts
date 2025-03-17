@@ -9,10 +9,14 @@ import { z } from 'zod'
 export const AffiliateVaultSchema = z
   .object({
     affiliate: byteaToHexEthAddress,
+    send_earn_affiliate: byteaToHexEthAddress,
     send_earn_affiliate_vault: z
       .object({
         send_earn: byteaToHexEthAddress,
+        log_addr: byteaToHexEthAddress,
       })
       .nullable(),
   })
   .nullable()
+
+export type AffiliateVault = z.infer<typeof AffiliateVaultSchema>

@@ -11,17 +11,14 @@ import {
   YStack,
 } from '@my/ui'
 import { IconCoin } from 'app/components/icons/IconCoin'
-import { SectionButton } from 'app/features/earn/components/SectionButton'
 import { formatCoinAmount } from 'app/utils/formatCoinAmount'
 import { useMemo } from 'react'
 import { SectionList } from 'react-native'
-import { useRouter } from 'solito/router'
-import { formatUnits } from 'viem'
 import { type SendEarnActivity, useSendEarnActivity, useSendEarnCoinBalances } from '../hooks'
 import { useERC20CoinAsset } from '../params'
 
 export const EarningsBalance = () => {
-  const { push } = useRouter()
+  // const { push } = useRouter()
 
   // TODO loader when deposit balances are loading
   // if (false) {
