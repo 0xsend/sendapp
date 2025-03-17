@@ -2603,6 +2603,82 @@ export const morphoAddress = {
 export const morphoConfig = { address: morphoAddress, abi: morphoAbi } as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// MorphoView
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ */
+export const morphoViewAbi = [
+  {
+    type: 'function',
+    inputs: [{ name: '_vault', internalType: 'contract IMetaMorpho', type: 'address' }],
+    name: 'getVaultInfo',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct MorphoViews.MorphoVault',
+        type: 'tuple',
+        components: [
+          { name: 'vault', internalType: 'address', type: 'address' },
+          { name: 'totalSupply', internalType: 'uint256', type: 'uint256' },
+          { name: 'totalAssets', internalType: 'uint256', type: 'uint256' },
+          { name: 'underlyingPrice', internalType: 'uint256', type: 'uint256' },
+          { name: 'fee', internalType: 'uint256', type: 'uint256' },
+          { name: 'timelock', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'markets',
+            internalType: 'struct MorphoViews.MorphoVaultMarketsInfo[]',
+            type: 'tuple[]',
+            components: [
+              { name: 'marketId', internalType: 'Id', type: 'bytes32' },
+              { name: 'marketCollateral', internalType: 'address', type: 'address' },
+              { name: 'marketCollateralName', internalType: 'string', type: 'string' },
+              { name: 'marketCollateralSymbol', internalType: 'string', type: 'string' },
+              { name: 'marketLiquidity', internalType: 'uint256', type: 'uint256' },
+              { name: 'marketLltv', internalType: 'uint256', type: 'uint256' },
+              { name: 'marketApy', internalType: 'uint256', type: 'uint256' },
+              { name: 'vaultAllocation', internalType: 'uint256', type: 'uint256' },
+              { name: 'vaultSupplied', internalType: 'uint256', type: 'uint256' },
+            ],
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+] as const
+
+/**
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ */
+export const morphoViewAddress = {
+  1: '0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B',
+  1337: '0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B',
+  8453: '0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B',
+  84532: '0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B',
+  845337: '0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B',
+  11155111: '0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B',
+} as const
+
+/**
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ */
+export const morphoViewConfig = { address: morphoViewAddress, abi: morphoViewAbi } as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Multicall3
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -9461,6 +9537,35 @@ export const watchMorphoTransferEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: morphoAbi,
   address: morphoAddress,
   eventName: 'Transfer',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link morphoViewAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ */
+export const readMorphoView = /*#__PURE__*/ createReadContract({
+  abi: morphoViewAbi,
+  address: morphoViewAddress,
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link morphoViewAbi}__ and `functionName` set to `"getVaultInfo"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ */
+export const readMorphoViewGetVaultInfo = /*#__PURE__*/ createReadContract({
+  abi: morphoViewAbi,
+  address: morphoViewAddress,
+  functionName: 'getVaultInfo',
 })
 
 /**
@@ -18300,6 +18405,35 @@ export const useWatchMorphoTransferEvent = /*#__PURE__*/ createUseWatchContractE
   abi: morphoAbi,
   address: morphoAddress,
   eventName: 'Transfer',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link morphoViewAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ */
+export const useReadMorphoView = /*#__PURE__*/ createUseReadContract({
+  abi: morphoViewAbi,
+  address: morphoViewAddress,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link morphoViewAbi}__ and `functionName` set to `"getVaultInfo"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B)
+ */
+export const useReadMorphoViewGetVaultInfo = /*#__PURE__*/ createUseReadContract({
+  abi: morphoViewAbi,
+  address: morphoViewAddress,
+  functionName: 'getVaultInfo',
 })
 
 /**

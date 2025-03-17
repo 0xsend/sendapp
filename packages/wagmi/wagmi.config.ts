@@ -310,6 +310,122 @@ export default defineConfig({
       },
       abi: sendEarnAbi,
     },
+    {
+      name: 'MorphoView',
+      address: {
+        [mainnet.id]: '0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B',
+        [localhost.id]: '0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B',
+        [sepolia.id]: '0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B',
+        [baseLocal.id]: '0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B',
+        [base.id]: '0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B',
+        [baseSepolia.id]: '0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B',
+      },
+      abi: [
+        {
+          type: 'function',
+          name: 'getVaultInfo',
+          inputs: [
+            {
+              name: '_vault',
+              type: 'address',
+              internalType: 'contract IMetaMorpho',
+            },
+          ],
+          outputs: [
+            {
+              name: '',
+              type: 'tuple',
+              internalType: 'struct MorphoViews.MorphoVault',
+              components: [
+                {
+                  name: 'vault',
+                  type: 'address',
+                  internalType: 'address',
+                },
+                {
+                  name: 'totalSupply',
+                  type: 'uint256',
+                  internalType: 'uint256',
+                },
+                {
+                  name: 'totalAssets',
+                  type: 'uint256',
+                  internalType: 'uint256',
+                },
+                {
+                  name: 'underlyingPrice',
+                  type: 'uint256',
+                  internalType: 'uint256',
+                },
+                {
+                  name: 'fee',
+                  type: 'uint256',
+                  internalType: 'uint256',
+                },
+                {
+                  name: 'timelock',
+                  type: 'uint256',
+                  internalType: 'uint256',
+                },
+                {
+                  name: 'markets',
+                  type: 'tuple[]',
+                  internalType: 'struct MorphoViews.MorphoVaultMarketsInfo[]',
+                  components: [
+                    {
+                      name: 'marketId',
+                      type: 'bytes32',
+                      internalType: 'Id',
+                    },
+                    {
+                      name: 'marketCollateral',
+                      type: 'address',
+                      internalType: 'address',
+                    },
+                    {
+                      name: 'marketCollateralName',
+                      type: 'string',
+                      internalType: 'string',
+                    },
+                    {
+                      name: 'marketCollateralSymbol',
+                      type: 'string',
+                      internalType: 'string',
+                    },
+                    {
+                      name: 'marketLiquidity',
+                      type: 'uint256',
+                      internalType: 'uint256',
+                    },
+                    {
+                      name: 'marketLltv',
+                      type: 'uint256',
+                      internalType: 'uint256',
+                    },
+                    {
+                      name: 'marketApy',
+                      type: 'uint256',
+                      internalType: 'uint256',
+                    },
+                    {
+                      name: 'vaultAllocation',
+                      type: 'uint256',
+                      internalType: 'uint256',
+                    },
+                    {
+                      name: 'vaultSupplied',
+                      type: 'uint256',
+                      internalType: 'uint256',
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          stateMutability: 'view',
+        },
+      ] as const,
+    },
   ],
   plugins: [
     foundry({

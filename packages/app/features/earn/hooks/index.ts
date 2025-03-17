@@ -1,5 +1,5 @@
 import type { Database } from '@my/supabase/database.types'
-import { sendEarnAbi } from '@my/wagmi'
+import { sendEarnAbi, useReadMorphoViewGetVaultInfo } from '@my/wagmi'
 import type { PostgrestError, SupabaseClient } from '@supabase/supabase-js'
 import {
   useInfiniteQuery,
@@ -15,130 +15,11 @@ import { address, byteaToHexEthAddress, byteaToHexTxHash, decimalStrToBigInt } f
 import debug from 'debug'
 import { useMemo } from 'react'
 import { formatUnits, isAddressEqual, zeroAddress } from 'viem'
-import { useChainId, useReadContract, useReadContracts } from 'wagmi'
+import { useChainId, useReadContracts } from 'wagmi'
 import { hashFn, useQuery, type UseQueryReturnType } from 'wagmi/query'
 import { z, type ZodError } from 'zod'
 
 const log = debug('app:earn:hooks')
-
-export function useVaultInfo(vaultAddress: `0x${string}`) {
-  const chainId = useChainId()
-  return useReadContract({
-    address: morphoViews,
-    abi: morphoViewAbi,
-    chainId: chainId,
-    functionName: 'getVaultInfo',
-    args: [vaultAddress],
-  })
-}
-
-// TODO: add more addresses to other chains or think of a workaround
-const morphoViews = '0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B'
-const morphoViewAbi = [
-  {
-    type: 'function',
-    name: 'getVaultInfo',
-    inputs: [
-      {
-        name: '_vault',
-        type: 'address',
-        internalType: 'contract IMetaMorpho',
-      },
-    ],
-    outputs: [
-      {
-        name: '',
-        type: 'tuple',
-        internalType: 'struct MorphoViews.MorphoVault',
-        components: [
-          {
-            name: 'vault',
-            type: 'address',
-            internalType: 'address',
-          },
-          {
-            name: 'totalSupply',
-            type: 'uint256',
-            internalType: 'uint256',
-          },
-          {
-            name: 'totalAssets',
-            type: 'uint256',
-            internalType: 'uint256',
-          },
-          {
-            name: 'underlyingPrice',
-            type: 'uint256',
-            internalType: 'uint256',
-          },
-          {
-            name: 'fee',
-            type: 'uint256',
-            internalType: 'uint256',
-          },
-          {
-            name: 'timelock',
-            type: 'uint256',
-            internalType: 'uint256',
-          },
-          {
-            name: 'markets',
-            type: 'tuple[]',
-            internalType: 'struct MorphoViews.MorphoVaultMarketsInfo[]',
-            components: [
-              {
-                name: 'marketId',
-                type: 'bytes32',
-                internalType: 'Id',
-              },
-              {
-                name: 'marketCollateral',
-                type: 'address',
-                internalType: 'address',
-              },
-              {
-                name: 'marketCollateralName',
-                type: 'string',
-                internalType: 'string',
-              },
-              {
-                name: 'marketCollateralSymbol',
-                type: 'string',
-                internalType: 'string',
-              },
-              {
-                name: 'marketLiquidity',
-                type: 'uint256',
-                internalType: 'uint256',
-              },
-              {
-                name: 'marketLltv',
-                type: 'uint256',
-                internalType: 'uint256',
-              },
-              {
-                name: 'marketApy',
-                type: 'uint256',
-                internalType: 'uint256',
-              },
-              {
-                name: 'vaultAllocation',
-                type: 'uint256',
-                internalType: 'uint256',
-              },
-              {
-                name: 'vaultSupplied',
-                type: 'uint256',
-                internalType: 'uint256',
-              },
-            ],
-          },
-        ],
-      },
-    ],
-    stateMutability: 'view',
-  },
-] as const
 
 /**
  * Hook to calculate the Send Earn APY for a specific vault and underlying Metamorpho vault.
@@ -228,10 +109,7 @@ type UnderlyingVault = NonNullable<ReturnType<typeof useUnderlyingVault>['data']
  * @param params.underlyingVaultAddress - The underlying vault address
  */
 function useUnderlyingVault(underlyingVaultAddress: `0x${string}` | undefined) {
-  return useReadContract({
-    address: morphoViews,
-    abi: morphoViewAbi,
-    functionName: 'getVaultInfo',
+  return useReadMorphoViewGetVaultInfo({
     args: [underlyingVaultAddress ?? zeroAddress],
     query: { enabled: !!underlyingVaultAddress },
   })
