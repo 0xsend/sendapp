@@ -15,6 +15,7 @@ import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { useRouter } from 'solito/router'
 import { useQueryClient } from '@tanstack/react-query'
 import { DEFAULT_SLIPPAGE, SWAP_ROUTE_SUMMARY_QUERY_KEY } from 'app/features/swap/constants'
+import { baseMainnet } from '@my/wagmi'
 
 export const SwapSummary = () => {
   const router = useRouter()
@@ -108,13 +109,14 @@ export const SwapSummary = () => {
       return
     }
 
+    if (__DEV__ || baseMainnet.id === 84532) {
+      userOp.callGasLimit = userOp.callGasLimit * 3n
+      userOp.preVerificationGas = userOp.preVerificationGas * 2n
+    }
+
     try {
       await sendUserOpMutateAsync({
-        userOp: {
-          ...userOp,
-          callGasLimit: 3000000n, // TODO
-          preVerificationGas: 100000n, // TODO
-        },
+        userOp,
         webauthnCreds,
       })
 
