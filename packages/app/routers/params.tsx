@@ -212,16 +212,3 @@ export const useAuthScreenParams = () => {
     setParams,
   ] as const
 }
-
-export type EarnScreenParams = {
-  amount?: string
-}
-
-const { useParam: useEarnParam, useParams: useEarnParams } = createParam<EarnScreenParams>()
-
-export const useEarnScreenParams = () => {
-  const { setParams } = useEarnParams()
-  const [amount] = useEarnParam('amount')
-
-  return [{ amount }, setParams] as const
-}

@@ -12,14 +12,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import {
-  baseMainnetBundlerClient,
-  entryPointAddress,
-  sendEarnAddress,
-  useReadSendEarnBalanceOf,
-  useReadSendEarnConvertToAssets,
-  useReadSendEarnDecimals,
-} from '@my/wagmi'
+import { baseMainnetBundlerClient, entryPointAddress, sendEarnAddress } from '@my/wagmi'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { ReferredBy } from 'app/components/ReferredBy'
@@ -28,7 +21,6 @@ import { CalculatedBenefits } from 'app/features/earn/components/CalculatedBenef
 import { EarnTerms } from 'app/features/earn/components/EarnTerms'
 import { Row } from 'app/features/earn/components/Row'
 import { useCoin } from 'app/provider/coins'
-import { useEarnScreenParams } from 'app/routers/params'
 import { assert } from 'app/utils/assert'
 import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
 import { formFields, SchemaForm } from 'app/utils/SchemaForm'
@@ -38,17 +30,24 @@ import { toNiceError } from 'app/utils/toNiceError'
 import { useUserOp } from 'app/utils/userop'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import debug from 'debug'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { formatUnits, withRetry } from 'viem'
 import { useChainId } from 'wagmi'
 import { z } from 'zod'
 import { useSendEarnAPY } from '../hooks'
-import { useERC20CoinAsset } from '../params'
+import {
+  coinToParam,
+  useAmount,
+  useERC20AssetCoin,
+  useInitializeFormAmount,
+  useParam,
+  useParams,
+} from '../params'
 import { useSendEarnDepositCalls, useSendEarnDepositVault } from './hooks'
 
-const log = debug('app:earn:deposit')
+export const log = debug('app:earn:deposit')
 const MINIMUM_DEPOSIT = BigInt(10 * 1e6) // 10 USDC
 
 const DepositFormSchema = z.object({
@@ -65,13 +64,12 @@ export function DepositForm() {
   const form = useForm<DepositFormSchema>()
   const router = useRouter()
   const { tokensQuery } = useSendAccountBalances()
-  const coin = useERC20CoinAsset()
+  const coin = useERC20AssetCoin()
   const coinBalance = useCoin(coin.data?.symbol)
   const asset = useMemo(() => coin.data?.token, [coin.data?.token])
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
-  const [earnParams, setEarnParams] = useEarnScreenParams()
-
-  const parsedAmount = BigInt(earnParams.amount ?? '0')
+  const { params, setParams } = useParams()
+  const [parsedAmount] = useAmount()
   const formAmount = form.watch('amount')
   const areTermsAccepted = form.watch('areTermsAccepted')
 
@@ -154,9 +152,9 @@ export function DepositForm() {
       log('onSuccess', data, variables, context)
 
       toast.show('Deposited successfully')
-
+      if (!coin.data) return
       router.push({
-        pathname: `/earn/${coin.data?.symbol.toLowerCase()}`,
+        pathname: `/earn/${coinToParam(coin.data)}`,
       })
     },
     onSettled: (data, error, variables, context) => {
@@ -171,6 +169,9 @@ export function DepositForm() {
   log('calls', calls)
   log('mutation', mutation)
 
+  const insufficientAmount =
+    coinBalance.coin?.balance !== undefined && parsedAmount > coinBalance.coin?.balance
+
   const canSubmit =
     !coin.isLoading &&
     coinBalance.coin?.balance !== undefined &&
@@ -180,33 +181,17 @@ export function DepositForm() {
     uop.isSuccess &&
     !calls.isPending &&
     !uop.isPending &&
-    mutation.isIdle
+    mutation.isIdle &&
+    !mutation.isSuccess &&
+    !mutation.isError &&
+    !insufficientAmount &&
+    form.formState.isValid
 
-  const insufficientAmount =
-    coinBalance.coin?.balance !== undefined &&
-    earnParams.amount !== undefined &&
-    parsedAmount > coinBalance.coin?.balance
-
-  // set amount to earnParams.amount if it's not set
-  useEffect(() => {
-    if (!coin.data?.decimals) return
-    try {
-      if (formAmount === undefined && earnParams.amount !== undefined) {
-        form.setValue('amount', formatUnits(BigInt(earnParams.amount), coin.data?.decimals))
-      }
-    } catch (e) {
-      log('error setting amount', e)
-      // reset param amount if error
-      setEarnParams({ ...earnParams, amount: undefined }, { webBehavior: 'replace' })
-    }
-  }, [form.setValue, formAmount, earnParams, setEarnParams, coin.data?.decimals])
-
-  // validate and sanitize amount
-  useEffect(() => {
-    const subscription = form.watch(({ amount: _amount }) => {
+  const validateAndSanitizeAmount = useCallback(
+    ({ amount: _amount }: { amount: string | undefined }) => {
       if (!coin.data?.decimals) return
       const sanitizedAmount = sanitizeAmount(_amount, coin.data?.decimals)
-
+      log('sanitizedAmount', sanitizedAmount)
       if (sanitizedAmount !== null && sanitizedAmount < MINIMUM_DEPOSIT) {
         form.setError('amount', {
           type: 'required',
@@ -216,17 +201,26 @@ export function DepositForm() {
         form.clearErrors('amount')
       }
 
-      setEarnParams(
+      setParams(
         {
-          ...earnParams,
+          ...params,
           amount: sanitizedAmount ? sanitizedAmount.toString() : undefined,
         },
         { webBehavior: 'replace' }
       )
-    })
+    },
+    [form.clearErrors, form.setError, setParams, coin.data?.decimals, params]
+  )
 
+  // validate and sanitize amount
+  useEffect(() => {
+    const subscription = form.watch(({ amount: _amount }) => {
+      validateAndSanitizeAmount({ amount: _amount })
+    })
     return () => subscription.unsubscribe()
-  }, [form.watch, setEarnParams, earnParams, coin.data?.decimals, form.clearErrors, form.setError])
+  }, [form.watch, validateAndSanitizeAmount])
+
+  useInitializeFormAmount(form)
 
   // RESET FORM ERRORS
   useEffect(() => {
@@ -252,6 +246,8 @@ export function DepositForm() {
     router.push('/earn')
     return null
   }
+
+  log('DepositForm', { coin, coinBalance, formState: form.formState, parsedAmount })
 
   return (
     <YStack testID="DepositForm" w={'100%'} gap={'$4'} pb={'$3'} $gtLg={{ w: '50%' }}>
@@ -322,8 +318,8 @@ export function DepositForm() {
           }}
           defaultValues={{
             amount:
-              earnParams.amount && coin.data?.decimals
-                ? localizeAmount(formatUnits(BigInt(earnParams.amount), coin.data?.decimals))
+              params.amount && coin.data?.decimals
+                ? localizeAmount(formatUnits(BigInt(params.amount), coin.data?.decimals))
                 : undefined,
             areTermsAccepted: false,
           }}
@@ -533,24 +529,4 @@ const StaticBenefits = () => {
       </YStack>
     </Fade>
   )
-}
-
-/**
- * TODO: move somewhere else
- */
-function useSendEarnAssets(sendAccount) {
-  const chainId = useChainId()
-  const earnDecimals = useReadSendEarnDecimals({
-    chainId,
-  })
-  const earnShares = useReadSendEarnBalanceOf({
-    chainId,
-    args: [sendAccount?.data?.address ?? '0x'],
-    query: { enabled: !!sendAccount?.data?.address },
-  })
-  const earnAssets = useReadSendEarnConvertToAssets({
-    chainId,
-    args: [earnShares?.data ?? 0n],
-    query: { enabled: !!earnShares?.data },
-  })
 }
