@@ -36,9 +36,9 @@ export function useReferrerVault(): UseQueryReturnType<`0x${string}` | null> {
       if (!address) return null
       const { data, error } = await supabase
         .from('send_earn_new_affiliate')
-        .select('affiliate, send_earn_affiliate_vault(send_earn)')
-        .eq('affiliate', hexToBytea(address))
+        .select('affiliate, send_earn_affiliate, send_earn_affiliate_vault(send_earn, log_addr)')
         .not('send_earn_affiliate_vault', 'is', null)
+        .eq('affiliate', hexToBytea(address))
         .abortSignal(signal)
         .limit(1)
         .maybeSingle()
