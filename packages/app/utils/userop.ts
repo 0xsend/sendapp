@@ -395,6 +395,8 @@ export function throwNiceError(e: Error & { cause?: Error }): never {
           throw new Error('Not enough funds')
         case 'FailedOp(0,"AA25 invalid account nonce")':
           throw new Error('Invalid nonce, please try again')
+        case 'execution reverted: revert: Return amount is not enough':
+          throw new Error('Slippage exceeded, please try again or increase max slippage')
         default:
           throw e
       }
