@@ -10,7 +10,7 @@ import { useSendAccount } from 'app/utils/send-accounts'
 import { api } from 'app/utils/api'
 import { useSwap } from 'app/features/swap/hooks/useSwap'
 import { useSendUserOpMutation } from 'app/utils/sendUserOp'
-import { useCallback, useEffect } from 'react'
+import { type ReactNode, useCallback, useEffect } from 'react'
 import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { useRouter } from 'solito/router'
 import { useQueryClient } from '@tanstack/react-query'
@@ -72,11 +72,7 @@ export const SwapSummary = () => {
   const exchangeRate = Number(amountOut.replace(/,/g, '')) / Number(amountIn.replace(/,/g, ''))
 
   const initLoading =
-    isLoadingCoins ||
-    isSendAccountLoading ||
-    isEncodeRouteLoading ||
-    isLoadingUserOp ||
-    isLoadingUSDCFees
+    isLoadingCoins || isSendAccountLoading || isEncodeRouteLoading || isLoadingUserOp
 
   const canSubmit =
     !initLoading &&
@@ -233,7 +229,16 @@ export const SwapSummary = () => {
               />
               <Row
                 label={'Transaction Fee'}
-                value={`${usdcFees ? formatAmount(formatUnits(gas, usdcFees.decimals)) : '-'} USDC`}
+                value={(() => {
+                  switch (true) {
+                    case isLoadingUSDCFees:
+                      return <Spinner size="small" color="$color12" />
+                    case !!usdcFeesError || !usdcFees:
+                      return '-'
+                    default:
+                      return `${formatAmount(formatUnits(gas, usdcFees.decimals))} USDC`
+                  }
+                })()}
               />
               <Row label={'Send Fee'} value={'0.75%'} />
               <Row
@@ -322,7 +327,7 @@ export const SwapSummary = () => {
   )
 }
 
-export const Row = ({ label, value }: { label: string; value: string }) => {
+export const Row = ({ label, value }: { label: string; value: ReactNode }) => {
   return (
     <XStack gap={'$2.5'} jc={'space-between'} flexWrap={'wrap'}>
       <Paragraph
