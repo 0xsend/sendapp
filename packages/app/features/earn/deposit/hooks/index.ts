@@ -132,7 +132,7 @@ export function useSendEarnDepositCalls({
 }: {
   sender: `0x${string}` | undefined
   asset: `0x${string}` | undefined
-  amount: bigint
+  amount: bigint | undefined
 }): UseQueryReturnType<SendAccountCall[] | null> {
   const vault = useSendEarnDepositVault({ asset })
   const referrer = useReferrer()
@@ -143,13 +143,19 @@ export function useSendEarnDepositCalls({
       'sendEarnDepositCalls',
       { sender, asset, amount, vault, referrer, factory },
     ] as const,
-    enabled: !vault.isLoading && !referrer.isLoading && !factory.isLoading && asset !== undefined,
+    enabled:
+      !vault.isLoading &&
+      !referrer.isLoading &&
+      !factory.isLoading &&
+      asset !== undefined &&
+      amount !== undefined,
     queryFn: async (): Promise<SendAccountCall[] | null> => {
       throwIf(vault.error)
       throwIf(referrer.error)
       throwIf(factory.error)
       assert(!!factory.data, 'Factory data is not defined')
       assert(asset !== undefined, 'Asset is not defined')
+      assert(amount !== undefined, 'Amount is not defined')
       if (vault.isPending) return null
 
       if (vault.data) {
