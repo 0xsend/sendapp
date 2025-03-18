@@ -461,21 +461,18 @@ export type Database = {
           id: number
           referred_id: string
           referrer_id: string
-          tag: string
         }
         Insert: {
           created_at?: string
           id?: number
           referred_id: string
           referrer_id: string
-          tag: string
         }
         Update: {
           created_at?: string
           id?: number
           referred_id?: string
           referrer_id?: string
-          tag?: string
         }
         Relationships: [
           {
@@ -491,13 +488,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "referrals_tag_fkey"
-            columns: ["tag"]
-            isOneToOne: false
-            referencedRelation: "tags"
-            referencedColumns: ["name"]
           },
         ]
       }

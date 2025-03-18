@@ -317,3 +317,55 @@ create or replace view send_earn_activity with (security_invoker = ON, security_
 create or replace function send_earn_affiliate_vault(send_earn_new_affiliate) returns setof send_earn_create rows 1 as $$
 select * from send_earn_create where fee_recipient = $1.send_earn_affiliate
 $$ stable language sql;
+
+-- Create trigger function to insert referral relationship when a new deposit is made
+CREATE OR REPLACE FUNCTION private.insert_referral_on_deposit()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_referred_id UUID;
+  v_referrer_id UUID;
+BEGIN
+  -- Find the referred_id (user who made the deposit)
+  SELECT user_id INTO v_referred_id
+  FROM send_accounts
+  WHERE address = lower(concat('0x', encode(NEW.owner, 'hex'::text)))::citext;
+
+  -- Skip if we can't find the referred user
+  IF v_referred_id IS NULL THEN
+    RETURN NEW;
+  END IF;
+
+  -- Find the referrer_id by joining through the tables
+  SELECT sa.user_id INTO v_referrer_id
+  FROM send_earn_create c
+  JOIN send_earn_new_affiliate a ON c.fee_recipient = a.send_earn_affiliate
+  JOIN send_accounts sa ON lower(concat('0x', encode(a.affiliate, 'hex'::text)))::citext = sa.address
+  WHERE c.send_earn = NEW.log_addr;
+
+  -- Skip if we can't find the referrer
+  IF v_referrer_id IS NULL THEN
+    RETURN NEW;
+  END IF;
+
+  -- Check if this referral relationship already exists
+  IF NOT EXISTS (
+    SELECT 1 FROM referrals
+    WHERE referrer_id = v_referrer_id AND referred_id = v_referred_id
+  ) THEN
+    -- Insert the new referral relationship
+    INSERT INTO referrals (referrer_id, referred_id, created_at)
+    VALUES (v_referrer_id, v_referred_id, NOW());
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+-- Create trigger on send_earn_deposits table
+CREATE TRIGGER insert_referral_on_deposit
+AFTER INSERT ON public.send_earn_deposits
+FOR EACH ROW
+EXECUTE FUNCTION private.insert_referral_on_deposit();
