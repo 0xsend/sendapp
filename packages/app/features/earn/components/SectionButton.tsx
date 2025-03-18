@@ -1,6 +1,6 @@
-import { Button } from '@my/ui'
+import { Button, type ButtonProps } from '@my/ui'
 
-export const SectionButton = ({ text, onPress }: { text: string; onPress: () => void }) => {
+export const SectionButton = ({ children, ...props }: ButtonProps) => {
   return (
     <Button
       theme={'green'}
@@ -10,9 +10,10 @@ export const SectionButton = ({ text, onPress }: { text: string; onPress: () => 
       p={'$5'}
       fontWeight={'500'}
       color={'$black'}
-      onPress={onPress}
+      disabledStyle={{ opacity: 0.5 }}
+      {...props}
     >
-      {text}
+      {children}
     </Button>
   )
 }
