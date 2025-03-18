@@ -1,9 +1,5 @@
-/*
-
-TODO: add when rewards are live
-
 import { TopNav } from 'app/components/TopNav'
-import { RewardsBalance } from 'app/features/earn/rewards-balance/screen'
+import { RewardsBalanceScreen } from 'app/features/earn/rewards/screen'
 import { HomeLayout } from 'app/features/home/layout.web'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
@@ -17,7 +13,7 @@ export const Page: NextPageWithLayout = () => {
       <Head>
         <title>Send | Rewards Balance</title>
       </Head>
-      <RewardsBalance />
+      <RewardsBalanceScreen />
     </>
   )
 }
@@ -33,5 +29,3 @@ Page.getLayout = (children) => (
 )
 
 export default Page
-
-*/
