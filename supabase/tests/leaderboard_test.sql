@@ -75,10 +75,9 @@ insert into public.tags (name, status, user_id)
 values ('bob', 'confirmed', tests.get_supabase_uid('bob'));
 
 -- alice refers bob
-insert into public.referrals (referrer_id, referred_id, tag)
+insert into public.referrals (referrer_id, referred_id)
 values (tests.get_supabase_uid('alice'),
-        tests.get_supabase_uid('bob'),
-        'bob');
+        tests.get_supabase_uid('bob'));
 
 -- bob creates a sendtag_checkout_receipts rewards alice
 insert into public.sendtag_checkout_receipts ("chain_id",
@@ -178,10 +177,9 @@ values (1,
         0,
         0);
 
-insert into public.referrals (referrer_id, referred_id, tag)
+insert into public.referrals (referrer_id, referred_id)
 values (tests.get_supabase_uid('bob'),
-        tests.get_supabase_uid('belle'),
-        'belle');
+        tests.get_supabase_uid('belle'));
 
 select tests.authenticate_as('belle');
 
