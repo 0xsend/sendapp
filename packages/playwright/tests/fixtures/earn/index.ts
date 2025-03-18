@@ -157,7 +157,7 @@ export class EarnWithdrawPage {
   public readonly submitButton: Locator
 
   constructor(public page: Page) {
-    this.withdrawButton = this.page.getByRole('button', { name: 'Withdraw' })
+    this.withdrawButton = this.page.getByRole('link', { name: 'Withdraw' })
     this.amountInput = this.page.getByPlaceholder('0')
     this.submitButton = this.page.getByRole('button', { name: 'Confirm Withdraw' })
   }

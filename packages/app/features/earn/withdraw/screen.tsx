@@ -23,7 +23,7 @@ import { toNiceError } from 'app/utils/toNiceError'
 import { useUserOp } from 'app/utils/userop'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import debug from 'debug'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { formatUnits, withRetry } from 'viem'
@@ -183,13 +183,24 @@ export function WithdrawForm() {
 
   const insufficientAmount = depositBalance !== undefined && parsedAmount > depositBalance
 
-  useInitializeFormAmount(form)
-
-  // validate and sanitize amount
-  useEffect(() => {
-    const subscription = form.watch(({ amount: _amount }) => {
+  const validateAndSanitizeAmount = useCallback(
+    ({ amount: _amount }: { amount: string | undefined }) => {
       if (!coin.data?.decimals) return
       const sanitizedAmount = sanitizeAmount(_amount, coin.data?.decimals)
+      log('sanitizedAmount', sanitizedAmount)
+
+      if (
+        sanitizedAmount !== null &&
+        depositBalance !== undefined &&
+        sanitizedAmount > depositBalance
+      ) {
+        form.setError('amount', {
+          type: 'required',
+          message: 'Insufficient funds',
+        })
+      } else {
+        form.clearErrors('amount')
+      }
 
       setParams(
         {
@@ -198,10 +209,19 @@ export function WithdrawForm() {
         },
         { webBehavior: 'replace' }
       )
-    })
+    },
+    [form.clearErrors, form.setError, setParams, coin.data?.decimals, params, depositBalance]
+  )
 
+  // validate and sanitize amount
+  useEffect(() => {
+    const subscription = form.watch(({ amount: _amount }) => {
+      validateAndSanitizeAmount({ amount: _amount })
+    })
     return () => subscription.unsubscribe()
-  }, [form.watch, setParams, params, coin.data?.decimals])
+  }, [form.watch, validateAndSanitizeAmount])
+
+  useInitializeFormAmount(form)
 
   // use deposit vault if it exists, or the default vault for the asset
   const baseApy = useSendEarnAPY({
@@ -301,7 +321,10 @@ export function WithdrawForm() {
             style: { justifyContent: 'space-between' },
           }}
           defaultValues={{
-            amount: undefined,
+            amount:
+              params.amount && coin.data?.decimals
+                ? localizeAmount(formatUnits(BigInt(params.amount), coin.data?.decimals))
+                : undefined,
           }}
           renderAfter={({ submit }) => (
             <YStack>
