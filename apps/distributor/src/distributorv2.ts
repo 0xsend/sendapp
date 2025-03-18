@@ -226,7 +226,7 @@ export class DistributorV2Worker {
       })
     }
 
-    const { data: hodlerAddresses, error: hodlerAddressesError } = await fetchAllHodlers(
+    const { data: rawHodlerAddresses, error: hodlerAddressesError } = await fetchAllHodlers(
       distribution.id
     )
 
@@ -234,9 +234,18 @@ export class DistributorV2Worker {
       throw hodlerAddressesError
     }
 
-    if (hodlerAddresses === null || hodlerAddresses.length === 0) {
+    if (rawHodlerAddresses === null || rawHodlerAddresses.length === 0) {
       throw new Error('No hodler addresses found')
     }
+
+    // Deduplicate hodler addresses
+    const hodlerAddresses = [
+      ...new Map(rawHodlerAddresses.map((item) => [item.address, item])).values(),
+    ]
+
+    log.info(
+      `Deduplicated hodler addresses from ${rawHodlerAddresses.length} to ${hodlerAddresses.length}`
+    )
 
     const hodlerAddressesByUserId = hodlerAddresses.reduce(
       (acc, address) => {
