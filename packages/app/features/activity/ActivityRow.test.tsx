@@ -7,6 +7,7 @@ import { ActivityRow } from './ActivityRow'
 import {
   mockReceivedTransfer,
   mockReferral,
+  mockSwap,
   mockTagReceipt,
 } from './utils/__mocks__/mock-activity-feed'
 
@@ -106,5 +107,17 @@ describe('ActivityRow', () => {
     expect(screen.getByText('Referred By')).toBeOnTheScreen()
     expect(screen.getByText('/disconnect_whorl7351')).toBeOnTheScreen()
     expect(screen.getByTestId('ActivityRowAmount')).toBeEmptyElement()
+  })
+
+  it('should render swap event', () => {
+    const activity = EventSchema.parse(mockSwap)
+    render(
+      <TamaguiProvider defaultTheme={'dark'} config={config}>
+        <ActivityRow activity={activity} />
+      </TamaguiProvider>
+    )
+    expect(screen.getByText('Swap')).toBeOnTheScreen()
+    expect(screen.getByText('Received USDC')).toBeOnTheScreen()
+    expect(screen.getByTestId('ActivityRowAmount')).toHaveTextContent('0.55 USDC')
   })
 })
