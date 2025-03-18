@@ -8,7 +8,9 @@ import {
 } from '@tanstack/react-query'
 import { ERC20CoinSchema, type erc20Coin } from 'app/data/coins'
 import { assert } from 'app/utils/assert'
+import { hexToBytea } from 'app/utils/hexToBytea'
 import { mulDivDown, WAD, wMulDown } from 'app/utils/math'
+import { useSendAccount } from 'app/utils/send-accounts'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import { address, byteaToHexEthAddress, byteaToHexTxHash, decimalStrToBigInt } from 'app/utils/zod'
@@ -18,9 +20,7 @@ import { formatUnits, isAddressEqual, zeroAddress } from 'viem'
 import { useChainId, useReadContracts } from 'wagmi'
 import { hashFn, useQuery, type UseQueryReturnType } from 'wagmi/query'
 import { z, type ZodError } from 'zod'
-import { type AffiliateVault, AffiliateVaultSchema } from '../zod'
-import { useSendAccount } from 'app/utils/send-accounts'
-import { hexToBytea } from 'app/utils/hexToBytea'
+import { AffiliateVaultSchema, type AffiliateVault } from '../zod'
 
 const log = debug('app:earn:hooks')
 
@@ -462,25 +462,69 @@ export function useMyAffiliateVault(): UseQueryReturnType<AffiliateVault | null>
  * ```shell
  * cast balance --erc20 <vault> <send_earn_affiliate>
  * ```
+ *
+ * @returns The user's affiliate earn rewards, including the balance and vault information
  */
-export function useMyEarnRewards() {
-  const supabase = useSupabase()
+export function useMyAffiliateRewards(): UseQueryReturnType<
+  { shares: bigint; assets: bigint; vault: AffiliateVault } | null | undefined
+> {
   const sendAccount = useSendAccount()
   const myAffiliateVault = useMyAffiliateVault()
-  const balance = useReadErc20BalanceOf({
+  const balance: UseQueryReturnType<bigint | null | undefined> = useReadErc20BalanceOf({
     address: myAffiliateVault.data?.send_earn_affiliate_vault?.send_earn,
     args: [myAffiliateVault.data?.send_earn_affiliate ?? zeroAddress],
     query: { enabled: !!myAffiliateVault.data?.send_earn_affiliate_vault?.send_earn },
   })
+
+  const vaultShares = useMemo(() => {
+    return {
+      shares: balance.data ? [balance.data] : undefined,
+      vaults: myAffiliateVault.data?.send_earn_affiliate_vault?.send_earn
+        ? [myAffiliateVault.data.send_earn_affiliate_vault.send_earn]
+        : undefined,
+    }
+  }, [myAffiliateVault.data?.send_earn_affiliate_vault?.send_earn, balance.data])
+
+  const assets = useVaultConvertSharesToAssets(vaultShares)
   log('useMyEarnRewards', { balance, myAffiliateVault })
-  // TODO: convert balance to assets using the `send_earn` vault address
+
   return useQuery({
-    queryKey: ['myEarnRewards', { supabase, sendAccount, myAffiliateVault }] as const,
-    enabled: !sendAccount.isLoading,
-    queryFn: async ({ queryKey: [, { supabase, sendAccount, myAffiliateVault }], signal }) => {
+    queryKey: ['myEarnRewards', { sendAccount, myAffiliateVault, balance, assets }] as const,
+    queryKeyHashFn: hashFn,
+    enabled:
+      !sendAccount.isLoading &&
+      !myAffiliateVault.isLoading &&
+      !balance.isLoading &&
+      !assets.isLoading,
+    queryFn: async ({
+      queryKey: [, { sendAccount, myAffiliateVault, balance, assets }],
+    }: {
+      queryKey: [
+        string,
+        {
+          sendAccount: ReturnType<typeof useSendAccount>
+          myAffiliateVault: ReturnType<typeof useMyAffiliateVault>
+          balance: UseQueryReturnType<bigint | null | undefined>
+          assets: ReturnType<typeof useVaultConvertSharesToAssets>
+        },
+      ]
+    }): Promise<{ shares: bigint; assets: bigint; vault: AffiliateVault } | null> => {
       throwIf(sendAccount.error)
+      throwIf(myAffiliateVault.error)
+      throwIf(balance.error)
+      throwIf(assets.error)
+
       assert(!!sendAccount.data, 'No send account found')
-      return null
+
+      if (!myAffiliateVault.data) return null
+      if (!balance.data) return null
+      if (!assets.data) return null
+
+      return {
+        shares: balance.data ?? 0n,
+        assets: assets.data[0] ?? 0n,
+        vault: myAffiliateVault.data,
+      }
     },
   })
 }

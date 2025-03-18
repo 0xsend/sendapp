@@ -18,17 +18,19 @@ import { sendCoin } from 'app/data/coins'
 import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
 import { useActivityFeed } from 'app/features/activity/utils/useActivityFeed'
 
-export const RewardsBalance = () => {
+export function RewardsBalanceScreen() {
+  return <RewardsBalance />
+}
+
+function RewardsBalance() {
   const { push } = useRouter()
 
   // TODO loader when deposit balances are loading
   // if (false) {
   //   return <Spinner size="large" color={'$color12'} />
   // }
-
   const handleClaimPress = () => {
     // TODO plug claim rewards logic
-
     push('/earn')
   }
 

@@ -1,5 +1,5 @@
 import { TopNav } from 'app/components/TopNav'
-import { ActiveEarnings } from 'app/features/earn/active/screen'
+import { ActiveEarningsScreen } from 'app/features/earn/active/screen'
 import { assetParam } from '../../../utils/assetParam'
 import { HomeLayout } from 'app/features/home/layout.web'
 import type { GetServerSideProps } from 'next'
@@ -13,7 +13,7 @@ export const Page: NextPageWithLayout = () => {
       <Head>
         <title>Send | Active Earnings</title>
       </Head>
-      <ActiveEarnings />
+      <ActiveEarningsScreen />
     </>
   )
 }

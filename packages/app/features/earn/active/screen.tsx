@@ -1,22 +1,24 @@
-import { Button, Card, Fade, Paragraph, Separator, Spinner, Stack, XStack, YStack } from '@my/ui'
+import { Card, Fade, Paragraph, Separator, Spinner, Stack, XStack, YStack } from '@my/ui'
 import type { IconProps } from '@tamagui/helpers-icon'
 import { ArrowDown } from '@tamagui/lucide-icons'
-import { IconStacks } from 'app/components/icons'
+import { IconSendSingleLetter, IconStacks } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { SectionButton } from 'app/features/earn/components/SectionButton'
 import { formatCoinAmount } from 'app/utils/formatCoinAmount'
 import { toNiceError } from 'app/utils/toNiceError'
-import { useHoverStyles } from 'app/utils/useHoverStyles'
 import debug from 'debug'
 import { useMemo, type NamedExoticComponent } from 'react'
+import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
-import { useMyAffiliateVault, useMyEarnRewards, useSendEarnCoinBalances } from '../hooks'
+import { useMyAffiliateRewards, useSendEarnCoinBalances } from '../hooks'
 import { coinToParam, useERC20AssetCoin } from '../params'
-import { Link, useLink } from 'solito/link'
 
 const log = debug('app:earn:active')
 
-export const ActiveEarnings = () => {
+export function ActiveEarningsScreen() {
+  return <ActiveEarnings />
+}
+function ActiveEarnings() {
   const { push } = useRouter()
   const coin = useERC20AssetCoin()
   const balances = useSendEarnCoinBalances(coin.data || undefined)
@@ -31,18 +33,18 @@ export const ActiveEarnings = () => {
       {
         Icon: ArrowDown,
         label: 'Withdraw',
-        href: `/earn/${coin.data.symbol.toLowerCase()}/withdraw`,
+        href: `/earn/${coinToParam(coin.data)}/withdraw`,
       },
       {
         Icon: IconStacks,
         label: 'Earnings',
-        href: `/earn/${coin.data.symbol.toLowerCase()}/balance`,
+        href: `/earn/${coinToParam(coin.data)}/balance`,
       },
-      // {
-      //   Icon: IconSendSingleLetter,
-      //   label: 'Rewards',
-      //   href: `/earn/${coin.data.symbol}/rewards`,
-      // },
+      {
+        Icon: IconSendSingleLetter,
+        label: 'Rewards',
+        href: `/earn/${coinToParam(coin.data)}/rewards`,
+      },
     ]
   }, [coin])
 
@@ -79,19 +81,20 @@ export const ActiveEarnings = () => {
 function TotalValue() {
   const coin = useERC20AssetCoin()
   const balances = useSendEarnCoinBalances(coin.data || undefined)
+  const myEarnRewards = useMyAffiliateRewards()
   const totalValue = useMemo(() => {
     if (!balances.data) return '0'
     if (!coin.data) return '0'
-    const totalAssets = balances.data.reduce((acc, balance) => {
+    let totalAssets = balances.data.reduce((acc, balance) => {
       return acc + balance.currentAssets
     }, 0n)
-    return formatCoinAmount({ amount: totalAssets, coin: coin.data })
-  }, [balances.data, coin.data])
-  const myAffiliateVault = useMyAffiliateVault()
-  log('myAffiliateVault', myAffiliateVault)
-  const myEarnRewards = useMyEarnRewards()
-  log('myEarnRewards', myEarnRewards)
 
+    if (myEarnRewards.data) {
+      totalAssets += myEarnRewards.data.assets
+    }
+
+    return formatCoinAmount({ amount: totalAssets, coin: coin.data })
+  }, [balances.data, coin.data, myEarnRewards.data])
   const isLoading = balances.isPending || coin.isPending
 
   log('TotalValue', { totalValue, coin, balances, isLoading })
@@ -160,6 +163,7 @@ function TotalValue() {
 function ActiveEarningBreakdown() {
   const coin = useERC20AssetCoin()
   const balances = useSendEarnCoinBalances(coin.data || undefined)
+  const myEarnRewards = useMyAffiliateRewards()
   const totalDeposits = useMemo(() => {
     if (!balances.data) return 0n
     const totalCurrentAssets = balances.data.reduce((acc, balance) => {
@@ -190,6 +194,14 @@ function ActiveEarningBreakdown() {
           label={'Earnings'}
           value={formatCoinAmount({ amount: totalEarnings, coin: coin.data })}
         />
+        {myEarnRewards.data && myEarnRewards.data.assets > 0n ? (
+          <BreakdownRow
+            symbol={coin.data.symbol}
+            label={'Rewards'}
+            value={formatCoinAmount({ amount: myEarnRewards.data.assets, coin: coin.data })}
+          />
+        ) : null}
+        {/* TODO: add SEND rewards if we ever want to track them here */}
         {/* <BreakdownRow symbol={'SEND'} label={'Rewards'} value={'15,000'} /> */}
       </Card>
     </Fade>
