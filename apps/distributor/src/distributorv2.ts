@@ -647,18 +647,27 @@ export class DistributorV2Worker {
   private async worker() {
     this.log.info('Starting distributor...', { id: this.id })
 
+    // Run immediately on startup
+    try {
+      await this.calculateDistributions()
+    } catch (error) {
+      this.log.error(error, `Error processing initial distribution. ${(error as Error).message}`)
+    }
+
     while (this.running) {
       try {
+        // Calculate time until next hour
         const now = new Date()
         const nextHour = new Date(now)
         nextHour.setHours(nextHour.getHours() + 1, 0, 0, 0)
-        const targetTime = new Date(nextHour.getTime() - 60000) // 1 minute before next hour
-        const waitTime = Math.max(0, targetTime.getTime() - now.getTime())
+        const waitTime = nextHour.getTime() - now.getTime()
 
+        // Wait until next hour
         process.env.NODE_ENV === 'development' ? await sleep(50_000) : await sleep(waitTime)
+
         await this.calculateDistributions()
       } catch (error) {
-        this.log.error(error, `Error processing block. ${(error as Error).message}`)
+        this.log.error(error, `Error processing distribution. ${(error as Error).message}`)
       }
     }
 
