@@ -1,6 +1,6 @@
 import { Button, FadeCard, Paragraph, Spinner, XStack, YStack } from '@my/ui'
 import { ArrowDown } from '@tamagui/lucide-icons'
-import type { KyberRouteSummary } from '@my/api/routers/swap/types'
+import type { KyberRouteSummary } from '@my/api/src/routers/swap/types'
 import formatAmount, { localizeAmount } from 'app/utils/formatAmount'
 import { formatUnits } from 'viem'
 import { useCoin, useCoins } from 'app/provider/coins'
