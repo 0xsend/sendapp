@@ -4298,20 +4298,6 @@
           "maxLength": null
         },
         {
-          "id": "public.referrals.tag",
-          "name": "tag",
-          "columnName": "tag",
-          "type": "citext",
-          "isRequired": true,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false,
-          "isId": false,
-          "maxLength": null
-        },
-        {
           "id": "public.referrals.id",
           "name": "id",
           "columnName": "id",
@@ -4372,24 +4358,6 @@
           ],
           "relationToFields": [
             "id"
-          ],
-          "isList": false,
-          "isId": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false
-        },
-        {
-          "name": "tags",
-          "type": "tags",
-          "isRequired": true,
-          "kind": "object",
-          "relationName": "referralsTotags",
-          "relationFromFields": [
-            "tag"
-          ],
-          "relationToFields": [
-            "name"
           ],
           "isList": false,
           "isId": false,
@@ -10575,20 +10543,6 @@
             "id"
           ],
           "isList": false,
-          "isId": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false
-        },
-        {
-          "name": "referrals",
-          "type": "referrals",
-          "isRequired": false,
-          "kind": "object",
-          "relationName": "referralsTotags",
-          "relationFromFields": [],
-          "relationToFields": [],
-          "isList": true,
           "isId": false,
           "isGenerated": false,
           "sequence": false,
