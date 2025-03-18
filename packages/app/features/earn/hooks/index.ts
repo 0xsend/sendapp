@@ -231,7 +231,8 @@ async function fetchSendEarnBalances(supabase: SupabaseClient<Database>) {
 }
 
 /**
- * Fetches the user's send earn balances.
+ * Fetches the user's send earn balances from supabase. This includes all
+ * send earn vaults the user has deposited into.
  */
 export function useSendEarnBalances(): UseQueryReturnType<SendEarnBalance[]> {
   const supabase = useSupabase()

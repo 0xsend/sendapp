@@ -154,8 +154,10 @@ for (const coin of [usdcCoin]) {
       earnDepositPage: page,
       sendAccount,
       supabase,
-      referrer: { referrer, referrerSendAccount },
+      user: { profile },
+      referrer: { referrer, referrerTags, referrerSendAccount },
     }) => {
+      log = debug(`test:earn:deposit:referrer:${profile.id}:${test.info().parallelIndex}`)
       // Generate a random deposit amount
       const randomAmount = faker.number.bigInt({ min: MIN_DEPOSIT_AMOUNT, max: MAX_DEPOSIT_AMOUNT })
       const amountDecimals = formatUnits(randomAmount, coin.decimals)
@@ -209,6 +211,19 @@ for (const coin of [usdcCoin]) {
       assert(!!affiliateVault, 'Affiliate vault is not defined')
       expect(affiliateVault.send_earn_affiliate_vault).toBeDefined()
       expect(affiliateVault.send_earn_affiliate_vault?.send_earn).toBe(vault)
+
+      await expect(supabase).toHaveEventInActivityFeed({
+        event_name: 'referrals',
+        from_user: {
+          send_id: referrer.send_id,
+          tags: referrerTags,
+        },
+        to_user: {
+          id: profile.id,
+          send_id: profile.send_id,
+        },
+        data: {},
+      })
     })
   })
 

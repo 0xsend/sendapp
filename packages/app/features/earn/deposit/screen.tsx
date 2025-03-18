@@ -35,8 +35,8 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { formatUnits, withRetry } from 'viem'
 import { useChainId } from 'wagmi'
-import { z } from 'zod'
-import { useSendEarnAPY } from '../hooks'
+import { type BRAND, z } from 'zod'
+import { useSendEarnAPY, useSendEarnBalances, useSendEarnCoinBalances } from '../hooks'
 import {
   coinToParam,
   useAmount,
@@ -71,6 +71,11 @@ export function DepositForm() {
   const { params, setParams } = useParams()
   const [parsedAmount] = useAmount()
   const formAmount = form.watch('amount')
+  const balances = useSendEarnCoinBalances(coin.data ?? undefined)
+  const hasExistingDeposit = useMemo(
+    () => (balances.data ?? []).some((b) => b.assets > 0n) ?? false,
+    [balances.data]
+  )
   const areTermsAccepted = form.watch('areTermsAccepted')
 
   // QUERY DEPOSIT USEROP
@@ -222,12 +227,21 @@ export function DepositForm() {
 
   useInitializeFormAmount(form)
 
-  // RESET FORM ERRORS
+  // RESET FORM ERRORS for terms or auto accept if user has existing deposit
   useEffect(() => {
+    if (hasExistingDeposit) {
+      form.setValue('areTermsAccepted', true as boolean & BRAND<'boolean_checkbox'>)
+    }
     if (areTermsAccepted && form.formState.errors.areTermsAccepted) {
       form.clearErrors('areTermsAccepted')
     }
-  }, [form.clearErrors, areTermsAccepted, form.formState.errors.areTermsAccepted])
+  }, [
+    form.clearErrors,
+    areTermsAccepted,
+    form.formState.errors.areTermsAccepted,
+    hasExistingDeposit,
+    form.setValue,
+  ])
 
   // use deposit vault if it exists, or the default vault for the asset
   const baseApy = useSendEarnAPY({
@@ -321,7 +335,7 @@ export function DepositForm() {
               params.amount && coin.data?.decimals
                 ? localizeAmount(formatUnits(BigInt(params.amount), coin.data?.decimals))
                 : undefined,
-            areTermsAccepted: false,
+            areTermsAccepted: hasExistingDeposit,
           }}
           renderAfter={({ submit }) => (
             <YStack>
@@ -484,16 +498,18 @@ export function DepositForm() {
                 }
               })()}
               <ReferredBy />
-              <XStack gap={'$3'} ai={'center'}>
-                {areTermsAccepted}
-                {form.formState.errors.areTermsAccepted ? (
-                  <Shake shakeKey="areTermsAccepted" baseStyle={{ width: '100%' }}>
-                    <EarnTerms hasError={true} />
-                  </Shake>
-                ) : (
-                  <EarnTerms />
-                )}
-              </XStack>
+              {hasExistingDeposit ? null : (
+                <XStack gap={'$3'} ai={'center'}>
+                  {areTermsAccepted}
+                  {form.formState.errors.areTermsAccepted ? (
+                    <Shake shakeKey="areTermsAccepted" baseStyle={{ width: '100%', flex: 1 }}>
+                      <EarnTerms hasError={true} />
+                    </Shake>
+                  ) : (
+                    <EarnTerms />
+                  )}
+                </XStack>
+              )}
             </YStack>
           )}
         </SchemaForm>
