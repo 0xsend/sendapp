@@ -18,7 +18,6 @@ import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { convertBalanceToFiat } from 'app/utils/convertBalanceToUSD'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { TokenDetailsMarketData } from 'app/components/TokenDetailsMarketData'
-import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { SWAP_ENABLED_USERS } from 'app/features/swap/constants'
@@ -41,17 +40,18 @@ export function AnimateEnter({ children }: { children: React.ReactNode }) {
 }
 
 export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
-  const { coin: selectedCoin } = useCoinFromTokenParam()
   const hoverStyles = useHoverStyles()
+
+  // this code can be removed as swaps are no longer behind white list
   const { data: sendAccount } = useSendAccount()
   const isSwapEnabled = sendAccount?.id && SWAP_ENABLED_USERS.includes(sendAccount.id)
 
   const getSwapUrl = () => {
-    if (selectedCoin?.symbol === sendCoin.symbol) {
-      return `/swap?inToken=${selectedCoin?.token}&outToken=${usdcCoin.token}`
+    if (coin?.symbol === sendCoin.symbol) {
+      return `/swap?inToken=${coin?.token}&outToken=${usdcCoin.token}`
     }
 
-    return `/swap?inToken=${selectedCoin?.token}`
+    return `/swap?inToken=${coin?.token}`
   }
 
   return (

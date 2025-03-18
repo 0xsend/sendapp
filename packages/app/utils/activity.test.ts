@@ -16,6 +16,7 @@ import {
   mockSentTransfer,
   mockTagReceipt,
   mockSendTokenUpgradeEvent,
+  mockSwap,
 } from 'app/features/activity/utils/__mocks__/mock-activity-feed'
 import { byteaToHexEthAddress } from './zod'
 import { EventSchema } from './zod/activity'
@@ -30,6 +31,7 @@ describe('test amountFromActivity', () => {
   it('should return the amount of the activity', () => {
     expect(amountFromActivity(EventSchema.parse(mockReceivedTransfer))).toBe('0.01 USDC')
     expect(amountFromActivity(EventSchema.parse(mockSentTransfer))).toBe('0.07 USDC')
+    expect(amountFromActivity(EventSchema.parse(mockSwap))).toBe('0.55 USDC')
   })
 })
 
@@ -70,6 +72,10 @@ describe('test eventNameFromActivity', () => {
     const activity = JSON.parse(JSON.stringify(mockSendtagReferralRewardUSDC))
     const _activity = EventSchema.parse(activity)
     expect(eventNameFromActivity(_activity)).toBe('Referral Reward')
+  })
+  it('should return "Swap" when swap event', () => {
+    const activity = JSON.parse(JSON.stringify(mockSwap))
+    expect(eventNameFromActivity(EventSchema.parse(activity))).toBe('Swap')
   })
 })
 
@@ -114,6 +120,10 @@ describe('phraseFromActivity', () => {
   it('should return "Earned referral reward" when send_account_transfer from SendtagCheckout contract', () => {
     const _activity = EventSchema.parse(mockSendtagReferralRewardUSDC)
     expect(phraseFromActivity(_activity)).toBe('Earned referral reward')
+  })
+
+  it('should return "Swapped" when referrals event', () => {
+    expect(phraseFromActivity(EventSchema.parse(mockSwap))).toBe('Swapped')
   })
 })
 
@@ -161,6 +171,10 @@ describe('test subtextFromActivity', () => {
     const activity = JSON.parse(JSON.stringify(mockSendTokenUpgradeEvent))
     expect(subtextFromActivity(EventSchema.parse(activity))).toBe('1M -> 10,000')
   })
+  it('should return "Received $token" when swap event', () => {
+    const activity = JSON.parse(JSON.stringify(mockSwap))
+    expect(subtextFromActivity(EventSchema.parse(activity))).toBe('Received USDC')
+  })
 })
 
 describe('test userFromActivity', () => {
@@ -177,5 +191,8 @@ describe('test userFromActivity', () => {
   })
   it('should return the to user when referrals event', () => {
     expect(counterpart(EventSchema.parse(mockReferral))).toEqual(mockReferral.to_user)
+  })
+  it('should return null when swap event', () => {
+    expect(counterpart(EventSchema.parse(mockSwap))).toEqual(null)
   })
 })
