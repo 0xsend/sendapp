@@ -168,7 +168,7 @@ const EarningsCallToAction = () => {
             <ListItem>Rewards: Bonus SEND tokens</ListItem>
           </YStack>
         </YStack>
-        <SectionButton text={'START EARNING'} onPress={() => push('/earn/usdc/deposit')} />
+        <SectionButton onPress={() => push('/earn/usdc/deposit')}>START EARNING</SectionButton>
       </Card>
     </Fade>
   )
@@ -262,7 +262,7 @@ const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) =
             */}
           </YStack>
         </YStack>
-        <SectionButton text={'VIEW DETAILS'} onPress={() => push('/earn/usdc')} />
+        <SectionButton onPress={() => push('/earn/usdc')}>VIEW DETAILS</SectionButton>
       </Card>
     </Fade>
   )

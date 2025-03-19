@@ -22,31 +22,39 @@ function ActiveEarnings() {
   const { push } = useRouter()
   const coin = useERC20AssetCoin()
   const balances = useSendEarnCoinBalances(coin.data || undefined)
-
+  const myEarnRewards = useMyAffiliateRewards()
+  const hasEarnRewards = useMemo(() => {
+    if (!myEarnRewards.data) return false
+    return myEarnRewards.data.assets > 0n
+  }, [myEarnRewards.data])
   const buttons: {
     Icon: NamedExoticComponent<IconProps>
     label: string
     href: string
   }[] = useMemo(() => {
     if (!coin || !coin.data) return []
-    return [
-      {
-        Icon: ArrowDown,
-        label: 'Withdraw',
-        href: `/earn/${coinToParam(coin.data)}/withdraw`,
-      },
-      {
-        Icon: IconStacks,
-        label: 'Earnings',
-        href: `/earn/${coinToParam(coin.data)}/balance`,
-      },
-      {
-        Icon: IconSendSingleLetter,
-        label: 'Rewards',
-        href: `/earn/${coinToParam(coin.data)}/rewards`,
-      },
-    ]
-  }, [coin])
+    return (
+      [
+        {
+          Icon: ArrowDown,
+          label: 'Withdraw',
+          href: `/earn/${coinToParam(coin.data)}/withdraw`,
+        },
+        {
+          Icon: IconStacks,
+          label: 'Earnings',
+          href: `/earn/${coinToParam(coin.data)}/balance`,
+        },
+        hasEarnRewards
+          ? {
+              Icon: IconSendSingleLetter,
+              label: 'Rewards',
+              href: `/earn/${coinToParam(coin.data)}/rewards`,
+            }
+          : null,
+      ] as const
+    ).filter((b): b is NonNullable<typeof b> => b !== null)
+  }, [coin, hasEarnRewards])
 
   if (!coin.isLoading && !coin.data) {
     push('/earn')
@@ -67,9 +75,10 @@ function ActiveEarnings() {
         <ActiveEarningBreakdown />
       </YStack>
       <SectionButton
-        text={'ADD MORE DEPOSITS'}
         onPress={() => (!coin.data ? undefined : push(`/earn/${coinToParam(coin.data)}/deposit`))}
-      />
+      >
+        ADD MORE DEPOSITS
+      </SectionButton>
     </YStack>
   )
 }
@@ -95,9 +104,8 @@ function TotalValue() {
 
     return formatCoinAmount({ amount: totalAssets, coin: coin.data })
   }, [balances.data, coin.data, myEarnRewards.data])
-  const isLoading = balances.isPending || coin.isPending
+  const isLoading = balances.isLoading || coin.isLoading
 
-  log('TotalValue', { totalValue, coin, balances, isLoading })
   return (
     <Fade>
       <Card w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>
@@ -178,9 +186,15 @@ function ActiveEarningBreakdown() {
     }, 0n)
     return totalAssets - totalDeposits
   }, [balances.data, totalDeposits])
+  log('ActiveEarningBreakdown', { balances, coin, totalDeposits, totalEarnings, myEarnRewards })
 
-  if (!balances.isSuccess || !coin.isSuccess || !coin.data) return null
-  log('ActiveEarningBreakdown', { balances, coin, totalDeposits, totalEarnings })
+  if ([coin.error, balances.error, myEarnRewards.error].some((e) => e))
+    return [coin.error, balances.error, myEarnRewards.error].map((e) =>
+      e ? <ErrorMessage key={e.message} error={e} /> : null
+    )
+
+  if (!coin.isSuccess || !coin.data) return null
+
   return (
     <Fade>
       <Card w={'100%'} p={'$5'} gap={'$6'} $gtLg={{ p: '$7' }}>
@@ -205,6 +219,14 @@ function ActiveEarningBreakdown() {
         {/* <BreakdownRow symbol={'SEND'} label={'Rewards'} value={'15,000'} /> */}
       </Card>
     </Fade>
+  )
+}
+
+const ErrorMessage = ({ error }: { error: Error | undefined }) => {
+  return (
+    <Paragraph size={'$5'} color={'$error'}>
+      {toNiceError(error)}
+    </Paragraph>
   )
 }
 
