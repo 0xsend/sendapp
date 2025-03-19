@@ -41,15 +41,20 @@ export function useSendEarnClaimRewardsCalls({
         return null
       }
 
-      const { shares, vault } = affiliateRewards.data
+      const { assets, vault } = affiliateRewards.data
 
       // If there are no shares to claim or vault is null, return null
-      if (shares <= 0n || !vault || !vault.send_earn_affiliate_vault) {
-        log('No affiliate rewards to claim or invalid vault', { shares, vault })
+      if (!vault || !vault.send_earn_affiliate_vault) {
+        log('invalid affiliate vault', { assets, vault })
         return null
       }
 
-      log('Claiming affiliate rewards', { shares, vault })
+      if (assets <= 0n) {
+        log('no affiliate rewards to claim', { assets, vault })
+        return null
+      }
+
+      log('Claiming affiliate rewards', { assets, vault })
 
       // For claiming rewards, we need to call the pay function on the send earn affilate contract
       // This will split the fees between the Platform and Affiliate, depositing it into

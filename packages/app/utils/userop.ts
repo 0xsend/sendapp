@@ -143,6 +143,7 @@ export function useAccountNonce({
 }): UseQueryReturnType<bigint, Error> {
   return useWagmiQuery({
     queryKey: [useAccountNonceQueryKey, sender],
+    enabled: sender !== undefined,
     queryFn: async () => {
       assert(sender !== undefined, 'No sender found')
       const nonce = await getAccountNonce(baseMainnetClient, {
@@ -316,6 +317,8 @@ function userOpQueryOptions({
  * Generates and prepares a UserOperation encoding the calls into the calldata. If no sender or calls are provided, it will
  * pause the query. It relies on the useAccountNonce hook to get the nonce and the useEstimateFeesPerGas hook to get the
  * gas fees.
+ *
+ * TODO: add nonce to the userop params, until then you must manually invalidate the nonce query
  */
 export function useUserOp({
   sender,
@@ -329,7 +332,7 @@ export function useUserOp({
 }: {
   sender: Address | undefined
   callGasLimit?: bigint | undefined
-  calls?: SendAccountCall[] | undefined
+  calls: SendAccountCall[] | undefined
   paymaster?: Hex
   paymasterVerificationGasLimit?: bigint
   paymasterPostOpGasLimit?: bigint

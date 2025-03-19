@@ -1,5 +1,10 @@
 import type { Database } from '@my/supabase/database.types'
-import { sendEarnAbi, useReadErc20BalanceOf, useReadMorphoViewGetVaultInfo } from '@my/wagmi'
+import {
+  sendEarnAbi,
+  useReadErc20BalanceOf,
+  useReadMorphoViewGetVaultInfo,
+  useReadSendEarnUsdcFactorySplit,
+} from '@my/wagmi'
 import type { PostgrestError, SupabaseClient } from '@supabase/supabase-js'
 import {
   useInfiniteQuery,
@@ -456,12 +461,12 @@ export function useMyAffiliateVault(): UseQueryReturnType<AffiliateVault | null>
 }
 
 /**
- * Fetches the user's affiliate earn rewards. Similar to a cast call such as:
+ * Fetches the affiliate split of the Send Earn rewards. Similar to a cast call such as:
  *
  * ```shell
  * cast balance --erc20 <vault> <send_earn_affiliate>
  * ```
- *
+ * @link https://github.com/0xsend/send-earn-contracts/blob/6b2a1225008903f2ba4cb745369d2d7c32837533/src/SendEarnAffiliate.sol#L61-L64
  * @returns The user's affiliate earn rewards, including the balance and vault information
  */
 export function useMyAffiliateRewards(): UseQueryReturnType<
@@ -469,30 +474,32 @@ export function useMyAffiliateRewards(): UseQueryReturnType<
 > {
   const sendAccount = useSendAccount()
   const myAffiliateVault = useMyAffiliateVault()
-  const balance: UseQueryReturnType<bigint | null | undefined> = useReadErc20BalanceOf({
-    address: myAffiliateVault.data?.send_earn_affiliate_vault?.send_earn,
-    args: [myAffiliateVault.data?.send_earn_affiliate ?? zeroAddress],
-    query: { enabled: !!myAffiliateVault.data?.send_earn_affiliate_vault?.send_earn },
-  })
-
+  const balance: UseQueryReturnType<bigint | null | undefined> = useMyAffiliateRewardsBalance()
+  const split: UseQueryReturnType<bigint | null | undefined> = useReadSendEarnUsdcFactorySplit()
+  // vault shares are the balance of the send earn affiliate contract minus the split
   const vaultShares = useMemo(() => {
+    if (!balance.data || !split.data) return { shares: undefined, vaults: undefined }
+    if (!myAffiliateVault.data?.send_earn_affiliate_vault?.send_earn)
+      return { shares: undefined, vaults: undefined }
+    const affiliateShares = wMulDown(balance.data ?? 0n, WAD - split.data ?? 0n)
     return {
-      shares: balance.data ? [balance.data] : undefined,
-      vaults: myAffiliateVault.data?.send_earn_affiliate_vault?.send_earn
-        ? [myAffiliateVault.data.send_earn_affiliate_vault.send_earn]
-        : undefined,
+      shares: [affiliateShares],
+      vaults: [myAffiliateVault.data.send_earn_affiliate_vault.send_earn],
     }
-  }, [myAffiliateVault.data?.send_earn_affiliate_vault?.send_earn, balance.data])
+  }, [myAffiliateVault.data?.send_earn_affiliate_vault?.send_earn, balance.data, split.data])
 
   const assets = useVaultConvertSharesToAssets(vaultShares)
-  log('useMyEarnRewards', { balance, myAffiliateVault })
+  log('useMyAffiliateRewards', { balance, myAffiliateVault, split, vaultShares, assets })
 
   return useQuery({
-    queryKey: ['myEarnRewards', { sendAccount, myAffiliateVault, balance, assets }] as const,
+    queryKey: [
+      'myEarnRewards',
+      { sendAccount, myAffiliateVault, balance, assets, vaultShares },
+    ] as const,
     queryKeyHashFn: hashFn,
     enabled: sendAccount.isFetched && myAffiliateVault.isFetched,
     queryFn: async ({
-      queryKey: [, { sendAccount, myAffiliateVault, balance, assets }],
+      queryKey: [, { sendAccount, myAffiliateVault, balance, assets, vaultShares }],
     }: {
       queryKey: [
         string,
@@ -501,6 +508,7 @@ export function useMyAffiliateRewards(): UseQueryReturnType<
           myAffiliateVault: ReturnType<typeof useMyAffiliateVault>
           balance: UseQueryReturnType<bigint | null | undefined>
           assets: ReturnType<typeof useVaultConvertSharesToAssets>
+          vaultShares: { shares: bigint[] | undefined; vaults: `0x${string}`[] | undefined }
         },
       ]
     }): Promise<{ shares: bigint; assets: bigint; vault: AffiliateVault } | null> => {
@@ -514,12 +522,21 @@ export function useMyAffiliateRewards(): UseQueryReturnType<
       if (!myAffiliateVault.data) return null
       if (!balance.data) return null
       if (!assets.data) return null
+      if (!vaultShares.shares) return null
 
       return {
-        shares: balance.data ?? 0n,
+        shares: vaultShares.shares[0] ?? 0n,
         assets: assets.data[0] ?? 0n,
         vault: myAffiliateVault.data,
       }
     },
+  })
+}
+export function useMyAffiliateRewardsBalance(): UseQueryReturnType<bigint | null | undefined> {
+  const myAffiliateVault = useMyAffiliateVault()
+  return useReadErc20BalanceOf({
+    address: myAffiliateVault.data?.send_earn_affiliate_vault?.send_earn,
+    args: [myAffiliateVault.data?.send_earn_affiliate ?? zeroAddress],
+    query: { enabled: !!myAffiliateVault.data?.send_earn_affiliate_vault?.send_earn },
   })
 }
