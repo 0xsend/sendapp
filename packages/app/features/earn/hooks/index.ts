@@ -46,7 +46,7 @@ export function useSendEarnAPY({
   return useQuery({
     queryKey: ['sendEarnAPY', { sendEarnVault, underlyingVault }] as const,
     queryKeyHashFn: hashFn,
-    enabled: !sendEarnVault.isLoading && !underlyingVault.isLoading,
+    enabled: sendEarnVault.isFetched && underlyingVault.isFetched,
     queryFn: ({
       queryKey: [, { sendEarnVault, underlyingVault }],
     }: {
@@ -285,10 +285,9 @@ export function useVaultConvertSharesToAssets({
   log('useVaultConvertSharesToAssets', { assets, vaults, shares })
   return useQuery({
     queryKey: ['vaultConvertSharesToAssets', { assets, vaults, shares }] as const,
-    enabled: !assets.isLoading,
+    enabled: assets.isFetched,
     queryFn: async ({ queryKey: [, { assets, vaults, shares }] }) => {
       throwIf(assets.error)
-      assert(!!assets.data, 'Fetching assets failed')
       assert(!!vaults, 'Vaults list is undefined')
       assert(!!shares, 'Shares list is undefined')
       assert(vaults.length === shares.length, 'Vaults and shares length mismatch')
@@ -379,7 +378,7 @@ export function useSendEarnCoinBalances(
         vaultsWithBalance,
       },
     ] as const,
-    enabled: !allBalances.isLoading && !vaultAssets.isLoading && !assets.isLoading && !!coin?.token,
+    enabled: allBalances.isFetched && vaultAssets.isFetched && assets.isFetched && !!coin?.token,
     queryFn: async ({
       queryKey: [
         ,
@@ -430,7 +429,7 @@ export function useMyAffiliateVault(): UseQueryReturnType<AffiliateVault | null>
   const sendAccount = useSendAccount()
   return useQuery({
     queryKey: ['myAffiliateVault', { supabase, sendAccount }] as const,
-    enabled: !sendAccount.isLoading,
+    enabled: sendAccount.isFetched,
     queryFn: async ({
       queryKey: [, { supabase, sendAccount }],
       signal,
@@ -491,11 +490,7 @@ export function useMyAffiliateRewards(): UseQueryReturnType<
   return useQuery({
     queryKey: ['myEarnRewards', { sendAccount, myAffiliateVault, balance, assets }] as const,
     queryKeyHashFn: hashFn,
-    enabled:
-      !sendAccount.isLoading &&
-      !myAffiliateVault.isLoading &&
-      !balance.isLoading &&
-      !assets.isLoading,
+    enabled: sendAccount.isFetched && myAffiliateVault.isFetched,
     queryFn: async ({
       queryKey: [, { sendAccount, myAffiliateVault, balance, assets }],
     }: {

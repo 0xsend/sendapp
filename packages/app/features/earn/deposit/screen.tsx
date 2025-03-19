@@ -261,7 +261,14 @@ export function DepositForm() {
     return null
   }
 
-  log('DepositForm', { coin, coinBalance, formState: form.formState, parsedAmount })
+  log('DepositForm', {
+    coin,
+    coinBalance,
+    formState: form.formState,
+    parsedAmount,
+    hasExistingDeposit,
+    areTermsAccepted,
+  })
 
   return (
     <YStack testID="DepositForm" w={'100%'} gap={'$4'} pb={'$3'} $gtLg={{ w: '50%' }}>

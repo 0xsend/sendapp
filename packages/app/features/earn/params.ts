@@ -41,7 +41,7 @@ export const useAmount = () => {
 /**
  * Hook to fetch the ERC20 coin asset for the current route.
  */
-export const useERC20AssetCoin = (): UseQueryReturnType<erc20Coin | null | undefined> => {
+export const useERC20AssetCoin = (): UseQueryReturnType<erc20Coin | null | undefined, Error> => {
   const [asset] = useAsset()
   return useQuery({
     queryKey: ['coinAsset', asset] as const,
