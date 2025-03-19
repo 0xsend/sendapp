@@ -13,6 +13,7 @@ import {
 } from '@my/ui'
 import { baseMainnetBundlerClient, entryPointAddress } from '@my/wagmi'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { IconDeposit, IconQuestionCircle, IconWithdraw } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import type { erc20Coin } from 'app/data/coins'
 import { SectionButton } from 'app/features/earn/components/SectionButton'
@@ -313,6 +314,17 @@ const RewardsFeed = () => {
           >
             <YGroup.Item>
               <XStack p="$3" justifyContent="space-between">
+                {(() => {
+                  switch (true) {
+                    case activity.type === 'deposit':
+                      return <IconDeposit size="$3" color="$gray10" />
+                    case activity.type === 'withdraw':
+                      return <IconWithdraw size="$3" color="$gray10" />
+                    default:
+                      // should never happen
+                      return <IconQuestionCircle size="$3" color="$gray10" />
+                  }
+                })()}
                 <YStack>
                   <Paragraph>{activity.type === 'deposit' ? 'Deposit' : 'Withdraw'}</Paragraph>
                   <Paragraph size="$3" color="$gray10">

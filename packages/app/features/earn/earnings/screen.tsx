@@ -10,6 +10,7 @@ import {
   YGroup,
   YStack,
 } from '@my/ui'
+import { IconDeposit, IconQuestionCircle, IconWithdraw } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { formatCoinAmount } from 'app/utils/formatCoinAmount'
 import { useMemo } from 'react'
@@ -108,6 +109,17 @@ export const EarningsFeed = () => {
           >
             <YGroup.Item>
               <XStack p="$3" justifyContent="space-between">
+                {(() => {
+                  switch (true) {
+                    case activity.type === 'deposit':
+                      return <IconDeposit size="$3" color="$gray10" />
+                    case activity.type === 'withdraw':
+                      return <IconWithdraw size="$3" color="$gray10" />
+                    default:
+                      // should never happen
+                      return <IconQuestionCircle size="$3" color="$gray10" />
+                  }
+                })()}
                 <YStack>
                   <Paragraph>{activity.type === 'deposit' ? 'Deposit' : 'Withdraw'}</Paragraph>
                   <Paragraph size="$3" color="$gray10">
