@@ -27,7 +27,7 @@ import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { signUserOp } from 'app/utils/signUserOp'
 import { toNiceError } from 'app/utils/toNiceError'
-import { useUserOp } from 'app/utils/userop'
+import { useAccountNonce, useUserOp } from 'app/utils/userop'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import debug from 'debug'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -83,6 +83,7 @@ export function DepositForm() {
   const platformVault = sendEarnAddress[chainId]
   const sendAccount = useSendAccount()
   const sender = useMemo(() => sendAccount?.data?.address, [sendAccount?.data?.address])
+  const nonce = useAccountNonce({ sender })
   const calls = useSendEarnDepositCalls({ sender, asset, amount: parsedAmount })
   const uop = useUserOp({
     sender,
@@ -164,7 +165,9 @@ export function DepositForm() {
     onSettled: (data, error, variables, context) => {
       // Error or success... doesn't matter!
       log('onSettled', data, error, variables, context)
-      queryClient.invalidateQueries({ queryKey: tokensQuery.queryKey })
+      queryClient.invalidateQueries({ queryKey: uop.queryKey })
+      queryClient.invalidateQueries({ queryKey: nonce.queryKey })
+      queryClient.invalidateQueries({ queryKey: calls.queryKey })
     },
   })
 
