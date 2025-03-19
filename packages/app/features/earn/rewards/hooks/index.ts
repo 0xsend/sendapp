@@ -24,19 +24,19 @@ export function useSendEarnClaimRewardsCalls({
   sender,
 }: {
   sender: `0x${string}` | undefined
-}): UseQueryReturnType<SendAccountCall[] | null> {
+}): UseQueryReturnType<SendAccountCall[] | null, Error> {
   const affiliateRewards = useMyAffiliateRewards()
   const sendAccount = useSendAccount()
 
   return useQuery({
     queryKey: ['sendEarnClaimRewardsCalls', { sender, affiliateRewards, sendAccount }] as const,
-    enabled: !affiliateRewards.isLoading && !sendAccount.isLoading && sender !== undefined,
+    enabled: affiliateRewards.isFetched && sendAccount.isFetched && sender !== undefined,
     queryFn: async (): Promise<SendAccountCall[] | null> => {
       throwIf(affiliateRewards.error)
       throwIf(sendAccount.error)
       assert(sender !== undefined, 'Sender is not defined')
 
-      if (affiliateRewards.isPending || !affiliateRewards.data) {
+      if (!affiliateRewards.data) {
         log('No affiliate rewards found to claim')
         return null
       }

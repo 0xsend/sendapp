@@ -36,13 +36,12 @@ import { useRouter } from 'solito/router'
 import { formatUnits, withRetry } from 'viem'
 import { useChainId } from 'wagmi'
 import { type BRAND, z } from 'zod'
-import { useSendEarnAPY, useSendEarnBalances, useSendEarnCoinBalances } from '../hooks'
+import { useSendEarnAPY, useSendEarnCoinBalances } from '../hooks'
 import {
   coinToParam,
   useAmount,
   useERC20AssetCoin,
   useInitializeFormAmount,
-  useParam,
   useParams,
 } from '../params'
 import { useSendEarnDepositCalls, useSendEarnDepositVault } from './hooks'
@@ -175,7 +174,9 @@ export function DepositForm() {
   log('mutation', mutation)
 
   const insufficientAmount =
-    coinBalance.coin?.balance !== undefined && parsedAmount > coinBalance.coin?.balance
+    coinBalance.coin?.balance !== undefined &&
+    parsedAmount > coinBalance.coin?.balance &&
+    !mutation.isSuccess
 
   const canSubmit =
     !coin.isLoading &&
@@ -204,6 +205,7 @@ export function DepositForm() {
         })
       } else {
         form.clearErrors('amount')
+        form.trigger('amount')
       }
 
       setParams(
@@ -214,7 +216,7 @@ export function DepositForm() {
         { webBehavior: 'replace' }
       )
     },
-    [form.clearErrors, form.setError, setParams, coin.data?.decimals, params]
+    [form.clearErrors, form.setError, setParams, coin.data?.decimals, params, form.trigger]
   )
 
   // validate and sanitize amount
@@ -231,6 +233,7 @@ export function DepositForm() {
   useEffect(() => {
     if (hasExistingDeposit) {
       form.setValue('areTermsAccepted', true as boolean & BRAND<'boolean_checkbox'>)
+      form.trigger('areTermsAccepted')
     }
     if (areTermsAccepted && form.formState.errors.areTermsAccepted) {
       form.clearErrors('areTermsAccepted')
@@ -241,6 +244,7 @@ export function DepositForm() {
     form.formState.errors.areTermsAccepted,
     hasExistingDeposit,
     form.setValue,
+    form.trigger,
   ])
 
   // use deposit vault if it exists, or the default vault for the asset
@@ -268,6 +272,7 @@ export function DepositForm() {
     parsedAmount,
     hasExistingDeposit,
     areTermsAccepted,
+    insufficientAmount,
   })
 
   return (

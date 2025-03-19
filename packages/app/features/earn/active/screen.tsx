@@ -10,7 +10,7 @@ import debug from 'debug'
 import { useMemo, type NamedExoticComponent } from 'react'
 import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
-import { useMyAffiliateRewards, useSendEarnCoinBalances } from '../hooks'
+import { useMyAffiliateRewards, useMyAffiliateVault, useSendEarnCoinBalances } from '../hooks'
 import { coinToParam, useERC20AssetCoin } from '../params'
 
 const log = debug('app:earn:active')
@@ -22,11 +22,11 @@ function ActiveEarnings() {
   const { push } = useRouter()
   const coin = useERC20AssetCoin()
   const balances = useSendEarnCoinBalances(coin.data || undefined)
-  const myEarnRewards = useMyAffiliateRewards()
-  const hasEarnRewards = useMemo(() => {
-    if (!myEarnRewards.data) return false
-    return myEarnRewards.data.assets > 0n
-  }, [myEarnRewards.data])
+  const myAffiliateVault = useMyAffiliateVault()
+  const isAffiliate = useMemo(
+    () => !!myAffiliateVault.data?.send_earn_affiliate,
+    [myAffiliateVault.data]
+  )
   const buttons: {
     Icon: NamedExoticComponent<IconProps>
     label: string
@@ -45,7 +45,7 @@ function ActiveEarnings() {
           label: 'Earnings',
           href: `/earn/${coinToParam(coin.data)}/balance`,
         },
-        hasEarnRewards
+        isAffiliate
           ? {
               Icon: IconSendSingleLetter,
               label: 'Rewards',
@@ -54,7 +54,7 @@ function ActiveEarnings() {
           : null,
       ] as const
     ).filter((b): b is NonNullable<typeof b> => b !== null)
-  }, [coin, hasEarnRewards])
+  }, [coin, isAffiliate])
 
   if (!coin.isLoading && !coin.data) {
     push('/earn')
@@ -104,6 +104,7 @@ function TotalValue() {
 
     return formatCoinAmount({ amount: totalAssets, coin: coin.data })
   }, [balances.data, coin.data, myEarnRewards.data])
+
   const isLoading = balances.isLoading || coin.isLoading
 
   return (
