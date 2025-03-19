@@ -1,7 +1,7 @@
 import {
-  Button,
   Card,
   Fade,
+  H4,
   Paragraph,
   ScrollView,
   Separator,
@@ -15,12 +15,13 @@ import { baseMainnetBundlerClient, entryPointAddress } from '@my/wagmi'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import type { erc20Coin } from 'app/data/coins'
-import { useActivityFeed } from 'app/features/activity/utils/useActivityFeed'
 import { SectionButton } from 'app/features/earn/components/SectionButton'
 import { useMyAffiliateRewards, useMyAffiliateRewardsBalance } from 'app/features/earn/hooks'
 import { useERC20AssetCoin } from 'app/features/earn/params'
-import { useSendEarnClaimRewardsCalls } from 'app/features/earn/rewards/hooks'
-import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
+import {
+  useSendEarnClaimRewardsCalls,
+  useSendEarnRewardsActivity,
+} from 'app/features/earn/rewards/hooks'
 import { TokenDetailsMarketData } from 'app/features/home/TokenDetails'
 import { assert } from 'app/utils/assert'
 import { formatCoinAmount } from 'app/utils/formatCoinAmount'
@@ -30,8 +31,10 @@ import { toNiceError } from 'app/utils/toNiceError'
 import { useAccountNonce, useUserOp } from 'app/utils/userop'
 import debug from 'debug'
 import { useMemo, useState } from 'react'
+import { SectionList } from 'react-native'
 import { formatUnits, withRetry } from 'viem'
 import { useChainId } from 'wagmi'
+import type { SendEarnActivity } from '../zod'
 
 const log = debug('app:features:earn:rewards')
 
@@ -237,78 +240,110 @@ function RewardsBalance() {
   )
 }
 
-// TODO fetch activities that are rewards related, here are all ATM
-// TODO add support for activity row and details for rewqrds related activities
 const RewardsFeed = () => {
-  const {
-    data,
-    isLoading: isLoadingActivities,
-    error: activitiesError,
-    isFetching: isFetchingActivities,
-    isFetchingNextPage: isFetchingNextPageActivities,
-    fetchNextPage,
-    hasNextPage,
-  } = useActivityFeed()
+  const coin = useERC20AssetCoin()
+  const { data, isLoading, error, isFetchingNextPage, fetchNextPage, hasNextPage } =
+    useSendEarnRewardsActivity({
+      pageSize: 10,
+    })
 
-  const { pages } = data ?? {}
+  const sections = useMemo(() => {
+    if (!data?.pages) return []
+
+    const activities = data.pages.flat()
+    const groups = activities.reduce<Record<string, SendEarnActivity[]>>((acc, activity) => {
+      const isToday =
+        new Date(activity.block_time * 1000).toDateString() === new Date().toDateString()
+      const dateKey = isToday
+        ? 'Today'
+        : new Date(activity.block_time * 1000).toLocaleDateString(undefined, {
+            day: 'numeric',
+            month: 'long',
+          })
+
+      if (!acc[dateKey]) {
+        acc[dateKey] = []
+      }
+
+      acc[dateKey].push(activity)
+      return acc
+    }, {})
+
+    return Object.entries(groups).map(([title, data], index) => ({
+      title,
+      data,
+      index,
+    }))
+  }, [data?.pages])
+
+  if (!coin.isSuccess || !coin.data) return null
+  if (isLoading) return <Spinner size="small" />
+  if (error) return <Paragraph>{error.message}</Paragraph>
+  if (!sections.length) return <Paragraph>No earnings activity</Paragraph>
 
   return (
-    <>
-      {(() => {
-        switch (true) {
-          case isLoadingActivities:
-            return <Spinner size="small" />
-          case activitiesError !== null:
-            return (
-              <Paragraph maxWidth={'600'} fontFamily={'$mono'} fontSize={'$5'} color={'$color12'}>
-                {activitiesError?.message.split('.').at(0) ?? `${activitiesError}`}
-              </Paragraph>
-            )
-          case pages?.length === 0:
-            return (
-              <>
-                <Paragraph fontSize={'$5'}>No rewards activities</Paragraph>
-              </>
-            )
-          default: {
-            const activities = (pages || []).flat()
-
-            return (
-              <Fade>
-                <YGroup bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }}>
-                  {activities.map((activity) => (
-                    <YGroup.Item key={`${activity.event_name}-${activity.created_at}`}>
-                      <TokenActivityRow activity={activity} />
-                    </YGroup.Item>
-                  ))}
-                </YGroup>
-              </Fade>
-            )
-          }
-        }
-      })()}
-      <Fade>
-        {!isLoadingActivities && (isFetchingNextPageActivities || hasNextPage) ? (
-          <>
-            {isFetchingNextPageActivities && <Spinner size="small" />}
-            {hasNextPage && (
-              <Button
-                onPress={() => {
-                  void fetchNextPage()
-                }}
-                disabled={isFetchingNextPageActivities || isFetchingActivities}
-                color="$color10"
-                width={200}
-                mx="auto"
-                mt={'$3'}
-              >
-                Load More
-              </Button>
-            )}
-          </>
-        ) : null}
-      </Fade>
-    </>
+    <Fade>
+      <SectionList
+        sections={sections}
+        showsVerticalScrollIndicator={false}
+        keyExtractor={(activity) => activity.tx_hash}
+        renderItem={({ item: activity, index, section }) => (
+          <YGroup
+            bc="$color1"
+            px="$2"
+            $gtLg={{
+              px: '$3.5',
+            }}
+            {...(index === 0 && {
+              pt: '$2',
+              $gtLg: {
+                pt: '$3.5',
+              },
+              borderTopLeftRadius: '$4',
+              borderTopRightRadius: '$4',
+            })}
+            {...(index === section.data.length - 1 && {
+              pb: '$2',
+              $gtLg: {
+                pb: '$3.5',
+              },
+              borderBottomLeftRadius: '$4',
+              borderBottomRightRadius: '$4',
+            })}
+          >
+            <YGroup.Item>
+              <XStack p="$3" justifyContent="space-between">
+                <YStack>
+                  <Paragraph>{activity.type === 'deposit' ? 'Deposit' : 'Withdraw'}</Paragraph>
+                  <Paragraph size="$3" color="$gray10">
+                    {coin.data
+                      ? formatCoinAmount({ amount: activity.assets, coin: coin.data })
+                      : ''}
+                  </Paragraph>
+                </YStack>
+                <Paragraph size="$3" color="$gray10">
+                  {new Date(activity.block_time * 1000).toLocaleDateString()}
+                </Paragraph>
+              </XStack>
+            </YGroup.Item>
+          </YGroup>
+        )}
+        renderSectionHeader={({ section: { title, index } }) => (
+          <H4
+            fontWeight={'600'}
+            size={'$7'}
+            pt={index === 0 ? 0 : '$3.5'}
+            pb="$3.5"
+            bc="$background"
+          >
+            {title}
+          </H4>
+        )}
+        onEndReached={() => hasNextPage && fetchNextPage()}
+        ListFooterComponent={!isLoading && isFetchingNextPage ? <Spinner size="small" /> : null}
+        stickySectionHeadersEnabled={true}
+      />
+    </Fade>
   )
 }
 
