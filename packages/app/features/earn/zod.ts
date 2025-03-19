@@ -1,4 +1,4 @@
-import { byteaToHexEthAddress } from 'app/utils/zod'
+import { byteaToHexEthAddress, byteaToHexTxHash, decimalStrToBigInt } from 'app/utils/zod'
 import { z } from 'zod'
 
 /**
@@ -20,3 +20,16 @@ export const AffiliateVaultSchema = z
   .nullable()
 
 export type AffiliateVault = z.infer<typeof AffiliateVaultSchema>
+export const SendEarnActivitySchema = z.object({
+  type: z.enum(['deposit', 'withdraw']),
+  block_num: z.number(),
+  block_time: z.number(),
+  log_addr: byteaToHexEthAddress,
+  owner: byteaToHexEthAddress,
+  sender: byteaToHexEthAddress,
+  assets: decimalStrToBigInt,
+  shares: decimalStrToBigInt,
+  tx_hash: byteaToHexTxHash,
+})
+export const SendEarnActivitySchemaArray = z.array(SendEarnActivitySchema)
+export type SendEarnActivity = z.infer<typeof SendEarnActivitySchema>

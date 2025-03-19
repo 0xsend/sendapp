@@ -14,23 +14,11 @@ import { IconCoin } from 'app/components/icons/IconCoin'
 import { formatCoinAmount } from 'app/utils/formatCoinAmount'
 import { useMemo } from 'react'
 import { SectionList } from 'react-native'
-import { type SendEarnActivity, useSendEarnActivity, useSendEarnCoinBalances } from '../hooks'
+import { useSendEarnActivity, useSendEarnCoinBalances } from '../hooks'
 import { useERC20AssetCoin } from '../params'
+import type { SendEarnActivity } from '../zod'
 
 export const EarningsBalance = () => {
-  // const { push } = useRouter()
-
-  // TODO loader when deposit balances are loading
-  // if (false) {
-  //   return <Spinner size="large" color={'$color12'} />
-  // }
-
-  // const handleClaimPress = () => {
-  //   // TODO plug claim rewards logic
-
-  //   push('/earn')
-  // }
-
   return (
     <YStack w={'100%'} gap={'$4'} pb={'$3'} $gtLg={{ w: '50%' }}>
       <ScrollView showsVerticalScrollIndicator={false}>

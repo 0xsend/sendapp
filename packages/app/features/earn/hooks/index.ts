@@ -18,14 +18,19 @@ import { mulDivDown, WAD, wMulDown } from 'app/utils/math'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
-import { address, byteaToHexEthAddress, byteaToHexTxHash, decimalStrToBigInt } from 'app/utils/zod'
+import { address, byteaToHexEthAddress, decimalStrToBigInt } from 'app/utils/zod'
 import debug from 'debug'
 import { useMemo } from 'react'
 import { formatUnits, isAddressEqual, zeroAddress } from 'viem'
 import { useChainId, useReadContracts } from 'wagmi'
 import { hashFn, useQuery, type UseQueryReturnType } from 'wagmi/query'
 import { z, type ZodError } from 'zod'
-import { AffiliateVaultSchema, type AffiliateVault } from '../zod'
+import {
+  AffiliateVaultSchema,
+  SendEarnActivitySchemaArray,
+  type AffiliateVault,
+  type SendEarnActivity,
+} from '../zod'
 
 const log = debug('app:earn:hooks')
 
@@ -152,19 +157,6 @@ function calculateBaseApy({
   return baseApy
 }
 
-// TODO: move to app/utils/activity
-const SendEarnActivitySchema = z.object({
-  type: z.enum(['deposit', 'withdraw']),
-  block_num: z.number(),
-  block_time: z.number(),
-  log_addr: byteaToHexEthAddress,
-  owner: byteaToHexEthAddress,
-  assets: decimalStrToBigInt,
-  shares: decimalStrToBigInt,
-  tx_hash: byteaToHexTxHash,
-})
-const SendEarnActivitySchemaArray = z.array(SendEarnActivitySchema)
-export type SendEarnActivity = z.infer<typeof SendEarnActivitySchema>
 /**
  * Fetches the user's send earn deposits.
  */
@@ -191,7 +183,7 @@ export function useSendEarnActivity(params?: {
 
     const { data, error } = await supabase
       .from('send_earn_activity')
-      .select('type,block_num,block_time,log_addr,owner,assets::text,shares::text,tx_hash')
+      .select('type,block_num,block_time,log_addr,owner,sender,assets::text,shares::text,tx_hash')
       .order('block_time', { ascending: false })
       .range(from, to)
 
