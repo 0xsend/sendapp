@@ -14,35 +14,34 @@ import {
 import { baseMainnetBundlerClient, entryPointAddress } from '@my/wagmi'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
-import { sendCoin, type erc20Coin } from 'app/data/coins'
+import type { erc20Coin } from 'app/data/coins'
 import { useActivityFeed } from 'app/features/activity/utils/useActivityFeed'
 import { SectionButton } from 'app/features/earn/components/SectionButton'
-import { useMyAffiliateRewards } from 'app/features/earn/hooks'
+import { useMyAffiliateRewards, useMyAffiliateRewardsBalance } from 'app/features/earn/hooks'
 import { useERC20AssetCoin } from 'app/features/earn/params'
 import { useSendEarnClaimRewardsCalls } from 'app/features/earn/rewards/hooks'
 import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
 import { TokenDetailsMarketData } from 'app/features/home/TokenDetails'
 import { assert } from 'app/utils/assert'
+import { formatCoinAmount } from 'app/utils/formatCoinAmount'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { signUserOp } from 'app/utils/signUserOp'
 import { toNiceError } from 'app/utils/toNiceError'
-import { useUserOp } from 'app/utils/userop'
-import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
+import { useAccountNonce, useUserOp } from 'app/utils/userop'
 import debug from 'debug'
 import { useMemo, useState } from 'react'
-import { useRouter } from 'solito/router'
 import { formatUnits, withRetry } from 'viem'
 import { useChainId } from 'wagmi'
 
 const log = debug('app:features:earn:rewards')
+
+const MIN_REWARD_CLAIM = BigInt(5 * 1e4) // ¢5 USDC
 
 export function RewardsBalanceScreen() {
   return <RewardsBalance />
 }
 
 function RewardsBalance() {
-  const { push } = useRouter()
-  const { tokensQuery } = useSendAccountBalances()
   const [useropState, setUseropState] = useState('')
   const toast = useToastController()
   const queryClient = useQueryClient()
@@ -52,8 +51,10 @@ function RewardsBalance() {
   // Get the user's send account
   const sendAccount = useSendAccount()
   const sender = useMemo(() => sendAccount?.data?.address, [sendAccount?.data?.address])
+  const nonce = useAccountNonce({ sender })
 
   // Get the user's affiliate rewards
+  const balance = useMyAffiliateRewardsBalance()
   const affiliateRewards = useMyAffiliateRewards()
 
   // Get the webauthn credentials for signing
@@ -79,9 +80,13 @@ function RewardsBalance() {
   log('calls', calls)
 
   // Check if the user has rewards to claim
-  const hasRewards = useMemo(() => {
+  const hasAnyRewards = useMemo(() => {
     if (!affiliateRewards.data) return false
     return affiliateRewards.data.assets > 0n
+  }, [affiliateRewards.data])
+  const hasEnoughRewards = useMemo(() => {
+    if (!affiliateRewards.data) return false
+    return affiliateRewards.data.assets > MIN_REWARD_CLAIM
   }, [affiliateRewards.data])
 
   // Format the rewards amount for display
@@ -143,13 +148,15 @@ function RewardsBalance() {
       // Boom baby!
       log('onSuccess', data, variables, context)
 
-      toast.show('Rewards claimed successfully')
-      push('/earn')
+      toast.show('Rewards claimed')
     },
     onSettled: (data, error, variables, context) => {
       // Error or success... doesn't matter!
       log('onSettled', data, error, variables, context)
-      queryClient.invalidateQueries({ queryKey: tokensQuery.queryKey })
+      queryClient.invalidateQueries({ queryKey: nonce.queryKey })
+      queryClient.invalidateQueries({ queryKey: calls.queryKey })
+      queryClient.invalidateQueries({ queryKey: balance.queryKey })
+      queryClient.invalidateQueries({ queryKey: affiliateRewards.queryKey })
     },
   })
 
@@ -158,7 +165,7 @@ function RewardsBalance() {
     !affiliateRewards.isLoading &&
     !calls.isLoading &&
     !uop.isLoading &&
-    hasRewards &&
+    hasEnoughRewards &&
     calls.isSuccess &&
     uop.isSuccess &&
     !calls.isPending &&
@@ -189,33 +196,43 @@ function RewardsBalance() {
         </YStack>
       </ScrollView>
 
-      {mutation.isPending ? (
-        <Fade key="userop-state">
+      <YStack>
+        {hasAnyRewards && !hasEnoughRewards && coin.data ? (
           <Paragraph color={'$color10'} ta="center" size="$3">
-            {useropState}
+            You need to have at least{' '}
+            {formatCoinAmount({ amount: MIN_REWARD_CLAIM, coin: coin.data })} {coin.data.symbol} to
+            claim rewards
           </Paragraph>
-        </Fade>
-      ) : null}
+        ) : null}
 
-      <XStack alignItems="center" jc="center" gap={'$2'}>
-        {[calls.error, sendAccount.error, uop.error, mutation.error, affiliateRewards.error]
-          .filter(Boolean)
-          .map((e) =>
-            e ? (
-              <Paragraph key={e.message} color="$error" role="alert">
-                {toNiceError(e)}
-              </Paragraph>
-            ) : null
-          )}
-      </XStack>
+        {mutation.isPending ? (
+          <Fade key="userop-state">
+            <Paragraph color={'$color10'} ta="center" size="$3">
+              {useropState}
+            </Paragraph>
+          </Fade>
+        ) : null}
 
-      <SectionButton
-        onPress={handleClaimPress}
-        disabled={!canClaim || mutation.isPending}
-        iconAfter={mutation.isPending ? <Spinner size="small" /> : undefined}
-      >
-        CLAIM REWARDS
-      </SectionButton>
+        <XStack alignItems="center" jc="center" gap={'$2'}>
+          {[calls.error, sendAccount.error, uop.error, mutation.error, affiliateRewards.error]
+            .filter(Boolean)
+            .map((e) =>
+              e ? (
+                <Paragraph key={e.message} color="$error" role="alert">
+                  {toNiceError(e)}
+                </Paragraph>
+              ) : null
+            )}
+        </XStack>
+
+        <SectionButton
+          onPress={handleClaimPress}
+          disabled={!canClaim || mutation.isPending}
+          iconAfter={mutation.isPending ? <Spinner size="small" /> : undefined}
+        >
+          CLAIM REWARDS
+        </SectionButton>
+      </YStack>
     </YStack>
   )
 }
