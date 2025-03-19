@@ -75,7 +75,13 @@ export function useCoinbaseOnramp({
           console.log('[Onramp] Popup closed by user.')
           clearInterval(checker)
           popupRef.current = null
-          reject(new Error('Transaction cancelled'))
+          // A user can close the tab and be in two states
+          // where the payment was made or not made.
+          if (!paymentSubmitted) {
+            reject(new Error('Transaction cancelled'))
+          } else {
+            resolve()
+          }
         }, 1000)
         setPopupChecker(checker)
       })

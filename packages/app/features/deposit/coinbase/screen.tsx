@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { OnrampFlow } from 'app/features/deposit/components/OnrampFlow'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinbaseOnramp } from 'app/utils/useCoinbaseOnramp'
@@ -13,12 +14,21 @@ interface DepositCoinbaseScreenProps {
 
 export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseScreenProps) {
   const { data: sendAccount } = useSendAccount()
-  const { openOnramp, closeOnramp, status, error, isLoading } = useCoinbaseOnramp({
+  const {
+    openOnramp,
+    closeOnramp,
+    status: coinbaseStatus,
+    error,
+    isLoading,
+  } = useCoinbaseOnramp({
     projectId: COINBASE_APP_ID,
     address: sendAccount?.address ?? '',
     partnerUserId: sendAccount?.user_id ?? '',
     defaultPaymentMethod,
   })
+
+  // Track transaction status
+  const [status, setStatus] = useState<'idle' | 'failure'>('idle')
 
   const handleConfirmTransaction = (amount: number) => {
     openOnramp(amount)
@@ -30,7 +40,7 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
         return (
           <YStack ai="center" gap="$4" py="$8">
             <Text fontSize="$6" fontWeight="500" color="$red10" ta="center">
-              Unable to Initialize Payment
+              Onramp page closed
             </Text>
             <Text color="$gray11" ta="center">
               {toNiceError(error)}
@@ -53,7 +63,7 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
           </YStack>
         )
 
-      case status === 'success':
+      case coinbaseStatus === 'success':
         return (
           <YStack ai="center" gap="$4" py="$8">
             <Spinner size="large" color="$primary" />
@@ -66,10 +76,10 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
           </YStack>
         )
 
-      case status === 'payment_submitted':
-        return <PendingScreen maxWaitTime={60000} />
+      case coinbaseStatus === 'payment_submitted':
+        return <PendingScreen maxWaitTime={60000} onFailure={() => setStatus('failure')} />
 
-      case status === 'pending_payment':
+      case coinbaseStatus === 'pending_payment':
         return (
           <YStack ai="center" gap="$4" py="$8">
             <Spinner size="large" color="$primary" />
@@ -97,7 +107,22 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
           </YStack>
         )
 
-      case status === 'failed':
+      case status === 'failure':
+        return (
+          <YStack ai="center" gap="$4" py="$8">
+            <Text fontSize="$6" fontWeight="500" color="$red10" ta="center">
+              Transaction Timed Out
+            </Text>
+            <Text color="$gray11" ta="center">
+              Your payment took too long to process. Please try again.
+            </Text>
+            <Button variant="outlined" color="$color" size="$4" onPress={closeOnramp}>
+              Try Again
+            </Button>
+          </YStack>
+        )
+
+      case coinbaseStatus === 'failed':
         return (
           <YStack ai="center" gap="$4" py="$8">
             <Text fontSize="$6" fontWeight="500" color="$red10" ta="center">
