@@ -118,8 +118,7 @@ export function amountFromActivity(activity: Activity): string {
     }
     case isReferralsEvent(activity) && !!activity.from_user?.id: {
       // only show if the user is the referrer
-      const data = activity.data
-      return `${data.tags.length} ${data.tags.length > 1 ? 'Referrals' : 'Referral'}`
+      return '' // no amount
     }
     case isReferralsEvent(activity) && !!activity.to_user?.id: {
       // only show if the user is the referred
