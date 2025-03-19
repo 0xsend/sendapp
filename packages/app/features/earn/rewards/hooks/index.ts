@@ -1,12 +1,22 @@
 import { sendEarnAffiliateAbi } from '@0xsend/send-earn-contracts'
-import { useMyAffiliateRewards } from 'app/features/earn/hooks'
+import type { Database } from '@my/supabase/database.types'
+import type { PostgrestError } from '@supabase/postgrest-js'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { useMyAffiliateRewards, useMyAffiliateVault } from 'app/features/earn/hooks'
 import { assert } from 'app/utils/assert'
+import { hexToBytea } from 'app/utils/hexToBytea'
 import { useSendAccount } from 'app/utils/send-accounts'
+import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import type { SendAccountCall } from 'app/utils/userop'
 import debug from 'debug'
+import { useCallback } from 'react'
 import { encodeFunctionData } from 'viem'
 import { useQuery, type UseQueryReturnType } from 'wagmi/query'
+import type { ZodError } from 'zod'
+import { SendEarnActivitySchemaArray, type SendEarnActivity } from '../../zod'
 
 const log = debug('app:features:earn:rewards')
 
@@ -71,5 +81,89 @@ export function useSendEarnClaimRewardsCalls({
         },
       ]
     },
+  })
+}
+
+/**
+ * Infinite query to fetch Send Earn Affiliate rewards activity.
+ *
+ * @param params.pageSize - Number of items to fetch per page
+ * @param params.refetchInterval - Interval in ms to refetch data
+ * @param params.enabled - Whether the query is enabled
+ */
+export function useSendEarnRewardsActivity(params?: {
+  pageSize?: number
+  refetchInterval?: number
+  enabled?: boolean
+}): UseInfiniteQueryResult<InfiniteData<SendEarnActivity[]>, PostgrestError | ZodError> {
+  const { pageSize = 10, refetchInterval = 30_000, enabled = true } = params ?? {}
+  const supabase = useSupabase()
+  const myAffiliateVault = useMyAffiliateVault()
+
+  const fetchSendEarnActivity = useCallback(
+    async ({
+      pageParam,
+      supabase,
+      pageSize,
+      sender,
+    }: {
+      pageParam: number
+      supabase: SupabaseClient<Database>
+      pageSize: number
+      sender: `0x${string}`
+    }): Promise<SendEarnActivity[]> => {
+      const from = pageParam * pageSize
+      const to = (pageParam + 1) * pageSize - 1
+
+      const { data, error } = await supabase
+        .from('send_earn_activity')
+        .select('type,block_num,block_time,log_addr,owner,sender,assets::text,shares::text,tx_hash')
+        .eq('sender', hexToBytea(sender))
+        .order('block_time', { ascending: false })
+        .range(from, to)
+
+      if (error) throw error
+      return SendEarnActivitySchemaArray.parse(data)
+    },
+    []
+  )
+
+  const queryKey = [
+    'send_earn_affiliate_rewards_activity',
+    { supabase, pageSize, myAffiliateVault },
+  ] as const
+  return useInfiniteQuery<
+    SendEarnActivity[],
+    PostgrestError | ZodError,
+    InfiniteData<SendEarnActivity[], number>,
+    typeof queryKey,
+    number
+  >({
+    queryKey,
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, _allPages, lastPageParam) => {
+      if (lastPage !== null && lastPage.length < pageSize) return undefined
+      return lastPageParam + 1
+    },
+    getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => {
+      if (firstPageParam <= 1) {
+        return undefined
+      }
+      return firstPageParam - 1
+    },
+    queryFn: ({
+      pageParam,
+      queryKey: [, { supabase, pageSize, myAffiliateVault }],
+    }): Promise<SendEarnActivity[]> => {
+      assert(!!myAffiliateVault.data?.send_earn_affiliate, 'No affiliate vault found')
+      return fetchSendEarnActivity({
+        supabase,
+        pageSize,
+        sender: myAffiliateVault.data.send_earn_affiliate,
+        pageParam,
+      })
+    },
+    refetchInterval,
+    enabled: enabled && (myAffiliateVault.isSuccess || myAffiliateVault.isError),
   })
 }

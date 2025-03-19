@@ -295,6 +295,7 @@ create or replace view send_earn_activity with (security_invoker = ON, security_
     d.block_time,
     d.log_addr,
     d.owner,
+    d.sender,
     d.assets,
     d.shares,
     d.tx_hash
@@ -306,6 +307,7 @@ create or replace view send_earn_activity with (security_invoker = ON, security_
     w.block_time,
     w.log_addr,
     w.owner,
+    w.sender,
     w.assets,
     w.shares,
     w.tx_hash
