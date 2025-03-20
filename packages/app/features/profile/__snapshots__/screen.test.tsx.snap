@@ -291,140 +291,205 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
         }
       }
     >
-      <div
-        className="css-view-175oi2r r-WebkitOverflowScrolling-150rngu r-flexDirection-eqz5dr r-flexGrow-16y2uox r-flexShrink-1wbh5a2 r-overflowX-11yh6sk r-overflowY-1rnoaur r-transform-173mzie r-scrollbarWidth-2eszeu"
-        dir={null}
-        onScroll={[Function]}
-        onTouchEnd={[Function]}
-        onTouchMove={[Function]}
-        onTouchStart={[Function]}
-        onWheel={[Function]}
-        style={
-          {
-            "flex": 1,
-          }
+      <RCTScrollView
+        ListEmptyComponent={null}
+        ListHeaderComponent={
+          <SendButton
+            idType="sendid"
+            identifier=""
+          />
         }
+        data={
+          [
+            {
+              "created_at": 2024-05-19T00:00:00.000Z,
+              "data": {
+                "v": 10000n,
+              },
+              "event_name": "send_account_transfers",
+              "from_user": {
+                "id": 1,
+              },
+              "to_user": {
+                "id": 2,
+              },
+            },
+          ]
+        }
+        getItem={[Function]}
+        getItemCount={[Function]}
+        invertStickyHeaders={true}
+        inverted={true}
+        isInvertedVirtualizedList={true}
+        keyExtractor={[Function]}
+        onContentSizeChange={[Function]}
+        onEndReached={[Function]}
+        onLayout={[Function]}
+        onMomentumScrollBegin={[Function]}
+        onMomentumScrollEnd={[Function]}
+        onScroll={[Function]}
+        onScrollBeginDrag={[Function]}
+        onScrollEndDrag={[Function]}
+        removeClippedSubviews={false}
+        renderItem={[Function]}
+        scrollEventThrottle={0.0001}
+        showsVerticalScrollIndicator={false}
+        stickyHeaderIndices={
+          [
+            0,
+          ]
+        }
+        style={
+          [
+            {
+              "transform": [
+                {
+                  "scaleY": -1,
+                },
+              ],
+            },
+            {
+              "flex": 1,
+            },
+          ]
+        }
+        viewabilityConfigCallbackPairs={[]}
       >
-        <div
-          className="css-view-175oi2r"
-          dir={null}
-        >
-          <div
-            className="css-view-175oi2r r-position-gtdqiz r-top-ipm5af r-zIndex-mhe3cw"
-            dir={null}
+        <View>
+          <View
+            collapsable={false}
+            onLayout={[Function]}
+            style={
+              {
+                "transform": [
+                  {
+                    "scaleY": -1,
+                  },
+                ],
+              }
+            }
           >
-            <div
-              className="css-view-175oi2r r-transform-173mzie"
-              dir={null}
-            >
-              <View
-                cancelable={true}
-                collapsable={false}
-                disabled={false}
-                focusVisibleStyle={{}}
-                focusable={[Function]}
-                forwardedRef={[Function]}
-                jestAnimatedStyle={
-                  {
-                    "value": {
-                      "backgroundColor": "#081619",
-                      "borderBottomColor": "transparent",
-                      "borderBottomLeftRadius": 9,
-                      "borderBottomRightRadius": 9,
-                      "borderBottomWidth": 1,
-                      "borderLeftColor": "transparent",
-                      "borderLeftWidth": 1,
-                      "borderRightColor": "transparent",
-                      "borderRightWidth": 1,
-                      "borderTopColor": "transparent",
-                      "borderTopLeftRadius": 9,
-                      "borderTopRightRadius": 9,
-                      "borderTopWidth": 1,
-                      "height": 48,
-                      "opacity": 0,
-                      "width": "100%",
-                    },
-                  }
-                }
-                minPressDuration={0}
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                onPress={[Function]}
-                onPressIn={[Function]}
-                onPressOut={[Function]}
-                role="button"
-                style={
-                  {
-                    "alignItems": "center",
-                    "backgroundColor": "#081619",
-                    "borderBottomColor": "transparent",
+            <View
+              cancelable={true}
+              collapsable={false}
+              disabled={false}
+              focusVisibleStyle={{}}
+              focusable={[Function]}
+              forwardedRef={[Function]}
+              jestAnimatedStyle={
+                {
+                  "value": {
+                    "backgroundColor": "rgba(8, 22, 25, 1)",
+                    "borderBottomColor": "rgba(0, 0, 0, 0)",
                     "borderBottomLeftRadius": 9,
                     "borderBottomRightRadius": 9,
                     "borderBottomWidth": 1,
-                    "borderLeftColor": "transparent",
+                    "borderLeftColor": "rgba(0, 0, 0, 0)",
                     "borderLeftWidth": 1,
-                    "borderRightColor": "transparent",
+                    "borderRightColor": "rgba(0, 0, 0, 0)",
                     "borderRightWidth": 1,
-                    "borderStyle": "solid",
-                    "borderTopColor": "transparent",
+                    "borderTopColor": "rgba(0, 0, 0, 0)",
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
                     "borderTopWidth": 1,
-                    "display": "flex",
-                    "flexDirection": "row",
-                    "flexWrap": "nowrap",
                     "height": 48,
+                    "opacity": 1,
+                    "width": "100%",
+                  },
+                }
+              }
+              minPressDuration={0}
+              onBlur={[Function]}
+              onFocus={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onPress={[Function]}
+              onPressIn={[Function]}
+              onPressOut={[Function]}
+              role="button"
+              style={
+                {
+                  "alignItems": "center",
+                  "backgroundColor": "#081619",
+                  "borderBottomColor": "transparent",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderBottomWidth": 1,
+                  "borderLeftColor": "transparent",
+                  "borderLeftWidth": 1,
+                  "borderRightColor": "transparent",
+                  "borderRightWidth": 1,
+                  "borderStyle": "solid",
+                  "borderTopColor": "transparent",
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
+                  "borderTopWidth": 1,
+                  "display": "flex",
+                  "flexDirection": "row",
+                  "flexWrap": "nowrap",
+                  "height": 48,
+                  "justifyContent": "center",
+                  "minWidth": 150,
+                  "opacity": 0,
+                  "paddingLeft": 16,
+                  "paddingRight": 16,
+                  "width": "100%",
+                }
+              }
+              testID="profileSendButton"
+            >
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "gap": 7,
+                    "height": "100%",
                     "justifyContent": "center",
-                    "minWidth": 150,
-                    "opacity": 0,
-                    "paddingLeft": 16,
-                    "paddingRight": 16,
                     "width": "100%",
                   }
                 }
-                testID="profileSendButton"
               >
-                <View
+                <Text
+                  lineBreakMode="clip"
+                  numberOfLines={1}
                   style={
                     {
-                      "alignItems": "center",
-                      "flexDirection": "row",
-                      "gap": 7,
-                      "height": "100%",
-                      "justifyContent": "center",
-                      "width": "100%",
+                      "color": "#081619",
+                      "flexGrow": 0,
+                      "flexShrink": 1,
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "fontWeight": "600",
+                      "lineHeight": 19,
+                      "textTransform": "uppercase",
+                      "userSelect": "none",
                     }
                   }
+                  suppressHighlighting={true}
                 >
-                  <Text
-                    lineBreakMode="clip"
-                    numberOfLines={1}
-                    style={
-                      {
-                        "color": "#081619",
-                        "flexGrow": 0,
-                        "flexShrink": 1,
-                        "fontFamily": "System",
-                        "fontSize": 16.8,
-                        "fontWeight": "600",
-                        "lineHeight": 19,
-                        "textTransform": "uppercase",
-                        "userSelect": "none",
-                      }
-                    }
-                    suppressHighlighting={true}
-                  >
-                    SEND
-                  </Text>
-                </View>
+                  SEND
+                </Text>
               </View>
-            </div>
-          </div>
-          <div
-            className="css-view-175oi2r r-flexDirection-1d5kdc7 r-transform-173mzie"
-            dir={null}
+            </View>
+          </View>
+          <View
+            onFocusCapture={[Function]}
+            onLayout={[Function]}
+            style={
+              [
+                {
+                  "flexDirection": "column-reverse",
+                },
+                {
+                  "transform": [
+                    {
+                      "scaleY": -1,
+                    },
+                  ],
+                },
+              ]
+            }
           >
             <View
               collapsable={false}
@@ -432,10 +497,10 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
               jestAnimatedStyle={
                 {
                   "value": {
-                    "opacity": 0,
+                    "opacity": 1,
                     "transform": [
                       {
-                        "scale": 0.9,
+                        "scale": 1,
                       },
                     ],
                   },
@@ -812,9 +877,9 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
             >
               5/19/2024
             </Text>
-          </div>
-        </div>
-      </div>
+          </View>
+        </View>
+      </RCTScrollView>
     </View>
   </View>
 </View>

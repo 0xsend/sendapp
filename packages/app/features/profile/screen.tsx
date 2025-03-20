@@ -9,7 +9,7 @@ import { useProfileScreenParams, useRootScreenParams } from 'app/routers/params'
 import { IconArrowRight } from 'app/components/icons'
 import { SendButton } from './ProfileButtons'
 import { ProfileHeader } from 'app/features/profile/components/ProfileHeader'
-import { FlatList } from 'react-native-web'
+import { FlatList } from 'react-native'
 import { ProfilesDetailsModal } from 'app/features/profile/components/ProfileDetailsModal'
 
 interface ProfileScreenProps {
@@ -130,21 +130,19 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                     </>
                   )
                 }}
-                onEndReached={fetchNextPage}
+                onEndReached={() => fetchNextPage()}
                 ListEmptyComponent={
-                  !isLoadingActivities &&
-                  isFetchingNextPageActivities && (
+                  !isLoadingActivities && isFetchingNextPageActivities ? (
                     <Spinner size="small" color={'$color12'} my={'$4'} />
-                  )
+                  ) : null
                 }
                 ListHeaderComponent={
-                  Boolean(otherUserProfile) &&
-                  user?.id !== otherUserProfile?.id && (
+                  Boolean(otherUserProfile) && user?.id !== otherUserProfile?.id ? (
                     <SendButton
                       identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
                       idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
                     />
-                  )
+                  ) : null
                 }
                 inverted={true}
                 showsVerticalScrollIndicator={false}

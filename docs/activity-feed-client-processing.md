@@ -63,37 +63,148 @@ export function processActivity(activity: Activity, addressBook: AddressBook): A
   if (
     isSendAccountTransfersEvent(activity) &&
     activity.to_user?.send_id === undefined && // Currently identified as a "Withdraw"
-    addressBook[activity.data.t] === 'Send Earn' // Destination is a Send Earn vault
+    addressBook[activity.data.t] === ContractLabels.SendEarn // Destination is a Send Earn vault
   ) {
     // Override the event_name to our virtual event type
-    processedActivity.event_name = Events.SendEarnDeposit;
+    processedActivity.event_name = VirtualEvents.SendEarnDeposit;
   }
 
-  // Add more rules here as needed
+  // Rule 2: Send Account Transfer from Send Earn Vault should be a Send Earn Withdraw
+  if (
+    isSendAccountTransfersEvent(activity) &&
+    addressBook[activity.data.f] === ContractLabels.SendEarn // Source is a Send Earn vault
+  ) {
+    // Override the event_name to our virtual event type
+    processedActivity.event_name = VirtualEvents.SendEarnWithdraw;
+  }
 
   return processedActivity;
 }
 ```
 
-This function is called after fetching activities from the database but before displaying them to the user. It uses the `addressBook` to identify known addresses, such as Send Earn vaults.
+This function is called after fetching activities from the database but before displaying them to the user. It uses the `addressBook` to identify known addresses, such as Send Earn vaults, using type-safe contract labels.
+
+The `ContractLabels` are defined as a branded type to ensure type safety:
+
+```typescript
+/**
+ * Branded type for contract labels in the address book.
+ * This ensures type safety when using contract labels throughout the app.
+ */
+export type ContractLabel = string & { __brand: 'ContractLabel' }
+
+/**
+ * Constants for contract labels used in the address book.
+ * Using these constants ensures consistency across the codebase.
+ */
+export const ContractLabels = {
+  SendEarn: 'Send Earn' as ContractLabel,
+  Paymaster: 'Paymaster' as ContractLabel,
+  SendtagCheckout: 'Sendtag Checkout' as ContractLabel,
+}
+```
+
+Additionally, a centralized function `parseAndProcessActivities` has been implemented to combine parsing and processing:
+
+```typescript
+/**
+ * Centralized function to parse and process activity data from the database.
+ * This function handles both the parsing of raw data and the contextual processing
+ * to identify special cases like Send Earn deposits and withdrawals.
+ *
+ * @param data Raw data from the database
+ * @param options Processing options
+ * @param options.addressBook Address book for contextual processing
+ * @returns Processed activities with potentially modified event types
+ */
+export function parseAndProcessActivities(
+  data: unknown,
+  options: {
+    addressBook?: AddressBook
+    // Future parameters can be added here
+  } = {}
+): Activity[] {
+  // Parse the raw data using the Zod schema
+  const activities = EventArraySchema.parse(data);
+
+  // Process activities if addressBook is available
+  if (options.addressBook) {
+    return processActivities(activities, options.addressBook);
+  }
+
+  return activities;
+}
+```
 
 ## Virtual Event Types
 
-Virtual event types are event types that don't exist in the database but are created client-side to represent specific contexts or scenarios. They are defined in the `Events` enum in `packages/app/utils/zod/activity/events.ts`:
+Virtual event types are event types that don't exist in the database but are created client-side to represent specific contexts or scenarios. They are defined in separate enums in `packages/app/utils/zod/activity/events.ts`:
 
 ```typescript
-export enum Events {
-  // Database events (actual event_name values from the database)
+/**
+ * Database events that can be found in the activity feed.
+ * These are the actual event_name values from the database.
+ */
+export enum DatabaseEvents {
+  /**
+   * ERC-20 token transfer for a send account
+   */
   SendAccountTransfers = 'send_account_transfers',
+  /**
+   * Sendtag receipt for a send account in ETH.
+   * @see TagReceiptUSDC instead, we do not accept ETH for sendtags anymore
+   */
   TagReceipts = 'tag_receipts',
+  /**
+   * Sendtag receipt for a send account in USDC
+   */
   TagReceiptUSDC = 'tag_receipt_usdc',
+  /**
+   * Sendtag referrals for a send account
+   */
   Referrals = 'referrals',
+  /**
+   * Send account receives ETH
+   */
   SendAccountReceive = 'send_account_receives',
-
-  // Virtual events (client-side only)
-  SendEarnDeposit = 'send_earn_deposit', // Virtual event for Send Earn deposits
 }
+
+/**
+ * Virtual events used for client-side processing.
+ * These are not actual events in the database, but are created client-side
+ * to represent specific contexts or scenarios.
+ */
+export enum VirtualEvents {
+  /**
+   * Virtual event for Send Earn deposits
+   * Represents a send_account_transfer to a Send Earn vault
+   */
+  SendEarnDeposit = 'send_earn_deposit',
+
+  /**
+   * Virtual event for Send Earn withdrawals
+   * Represents a send_account_transfer from a Send Earn vault
+   */
+  SendEarnWithdraw = 'send_earn_withdraw',
+}
+
+/**
+ * Union type of all events that can be found in the activity feed.
+ * This includes both database events and virtual events.
+ */
+export type Events = DatabaseEvents | VirtualEvents
+
+/**
+ * Legacy enum for backward compatibility.
+ * @deprecated Use DatabaseEvents or VirtualEvents directly, or the Events type.
+ */
+export const Events = {
+  ...DatabaseEvents,
+  ...VirtualEvents,
+} as const
 ```
+
+This separation provides better type safety and organization, making it clear which events come from the database and which are created client-side.
 
 Virtual events are handled in the display functions (`eventNameFromActivity` and `phraseFromActivity`) just like regular events:
 
@@ -103,12 +214,28 @@ export function eventNameFromActivity(activity: Activity) {
 
   switch (true) {
     // Virtual events (client-side processed)
-    case event_name === Events.SendEarnDeposit:
+    case event_name === VirtualEvents.SendEarnDeposit:
       return 'Send Earn Deposit';
+    case event_name === VirtualEvents.SendEarnWithdraw:
+      return 'Send Earn Withdraw';
 
     // Database events
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Referral Reward';
+    // ... other cases
+  }
+}
+
+export function phraseFromActivity(activity: Activity) {
+  const { event_name, from_user, to_user, data } = activity;
+
+  switch (true) {
+    // Virtual events (client-side processed)
+    case event_name === VirtualEvents.SendEarnDeposit:
+      return 'Deposited to Send Earn';
+    case event_name === VirtualEvents.SendEarnWithdraw:
+      return 'Withdrew from Send Earn';
+
     // ... other cases
   }
 }
@@ -120,31 +247,27 @@ Here's the complete flow of activity data through the system:
 
 1. **Database Query**: The `useActivityFeed` or `useTokenActivityFeed` hook queries the `activity_feed` view in Supabase.
 
-2. **Data Parsing**: The raw data is parsed using Zod schemas to ensure type safety:
+2. **Data Parsing and Processing**: The raw data is parsed and processed using the centralized function:
    ```typescript
-   const activities = EventArraySchema.parse(data);
+   return parseAndProcessActivities(data, {
+     addressBook: addressBook.data,
+   });
    ```
 
-3. **Client-Side Processing**: The parsed activities are processed to identify special cases:
-   ```typescript
-   if (addressBook.data) {
-     return processActivities(activities, addressBook.data);
-   }
-   ```
+3. **Display**: The processed activities are rendered by React components, which use functions like `eventNameFromActivity` to determine how to display each activity.
 
-4. **Display**: The processed activities are rendered by React components, which use functions like `eventNameFromActivity` to determine how to display each activity.
+This centralized approach simplifies the code flow and makes it easier to extend the system with new processing rules in the future.
 
 ## Extending the System
 
 To add support for a new virtual event type:
 
-1. **Add the Event Type**: Add a new entry to the `Events` enum in `packages/app/utils/zod/activity/events.ts`:
+1. **Add the Event Type**: Add a new entry to the `VirtualEvents` enum in `packages/app/utils/zod/activity/events.ts`:
    ```typescript
-   export enum Events {
+   export enum VirtualEvents {
      // ... existing events
-
-     // Virtual events
      SendEarnDeposit = 'send_earn_deposit',
+     SendEarnWithdraw = 'send_earn_withdraw',
      NewVirtualEvent = 'new_virtual_event', // Add your new virtual event here
    }
    ```
@@ -158,7 +281,7 @@ To add support for a new virtual event type:
 
      // New rule for your virtual event
      if (/* condition for identifying the new virtual event */) {
-       processedActivity.event_name = Events.NewVirtualEvent;
+       processedActivity.event_name = VirtualEvents.NewVirtualEvent;
      }
 
      return processedActivity;
@@ -171,7 +294,7 @@ To add support for a new virtual event type:
      switch (true) {
        // ... existing cases
 
-       case event_name === Events.NewVirtualEvent:
+       case event_name === VirtualEvents.NewVirtualEvent:
          return 'User-Friendly Event Name';
 
        // ... other cases
@@ -182,7 +305,7 @@ To add support for a new virtual event type:
      switch (true) {
        // ... existing cases
 
-       case event_name === Events.NewVirtualEvent:
+       case event_name === VirtualEvents.NewVirtualEvent:
          return 'Action phrase for the event';
 
        // ... other cases
@@ -190,24 +313,38 @@ To add support for a new virtual event type:
    }
    ```
 
+4. **Add Unit Tests**: Create tests for your new virtual event in `packages/app/utils/__tests__/activity.test.ts`:
+   ```typescript
+   it('should identify New Virtual Event', () => {
+     const mockActivity = {
+       // Create a mock activity that should trigger your new rule
+     };
+     const result = processActivity(mockActivity, mockAddressBook);
+     expect(result.event_name).toBe(VirtualEvents.NewVirtualEvent);
+   });
+   ```
+
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Virtual Event Not Displaying Correctly**: Ensure that the virtual event is properly defined in the `Events` enum and that there are cases for it in both `eventNameFromActivity` and `phraseFromActivity`.
+1. **Virtual Event Not Displaying Correctly**: Ensure that the virtual event is properly defined in the `VirtualEvents` enum and that there are cases for it in both `eventNameFromActivity` and `phraseFromActivity`.
 
 2. **Processing Rule Not Working**: Check that the condition in the `processActivity` function correctly identifies the events that should be processed. You may need to log the activity data to debug the condition.
 
 3. **AddressBook Not Available**: The processing depends on the `addressBook` being available. If it's not, the processing will be skipped. Ensure that the `useAddressBook` hook is working correctly.
+
+4. **Type Errors with Contract Labels**: Make sure you're using the `ContractLabels` constants when comparing address book values, as they provide type safety.
 
 ### Debugging Tips
 
 - Use the browser console to log activities at different stages of the processing pipeline.
 - Add temporary logging to the `processActivity` function to see which rules are being triggered.
 - Check the network tab to ensure that the activity data is being fetched correctly from the database.
+- Use the unit tests to verify that your processing rules work as expected.
 
 ## Conclusion
 
-The client-side processing layer provides a flexible way to enhance the activity feed without requiring database changes. By using virtual event types, we can accurately represent complex activities like Send Earn deposits while maintaining a clean separation between the database schema and the user interface.
+The client-side processing layer provides a flexible way to enhance the activity feed without requiring database changes. By using virtual event types, we can accurately represent complex activities like Send Earn deposits and withdrawals while maintaining a clean separation between the database schema and the user interface.
 
-This approach is extensible and can be adapted to handle new types of activities as the Send App evolves.
+This approach is extensible and can be adapted to handle new types of activities as the Send App evolves. The separation of database and virtual events, along with the branded type for contract labels, improves type safety and makes the code more maintainable.

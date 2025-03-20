@@ -4,11 +4,14 @@ import {
   Paragraph,
   Separator,
   Stack,
-  type StackProps,
   Text,
   XStack,
   YStack,
+  type StackProps,
 } from '@my/ui'
+import { IconX } from 'app/components/icons'
+import { IconCoin } from 'app/components/icons/IconCoin'
+import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
 import {
   amountFromActivity,
   eventNameFromActivity,
@@ -17,16 +20,14 @@ import {
   phraseFromActivity,
   subtextFromActivity,
 } from 'app/utils/activity'
-import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
-import { IconX } from 'app/components/icons'
-import { IconCoin } from 'app/components/icons/IconCoin'
+import { useLiquidityPools } from 'app/utils/useLiquidityPools'
+import { useSwapRouters } from 'app/utils/useSwapRouters'
 import type { Activity } from 'app/utils/zod/activity'
 import {
   isSendtagCheckoutEvent,
   isSendTokenUpgradeEvent,
 } from 'app/utils/zod/activity/SendAccountTransfersEventSchema'
-import { useSwapRouters } from 'app/utils/useSwapRouters'
-import { useLiquidityPools } from 'app/utils/useLiquidityPools'
+import { isSendEarnEvent } from 'app/utils/zod/activity/SendEarnEventSchema'
 
 export const ActivityDetails = ({
   activity,
@@ -95,6 +96,8 @@ export const ActivityDetails = ({
                       case isSendTokenUpgradeEvent(activity):
                         return null
                       case isActivitySwapTransfer(activity, swapRouters, liquidityPools):
+                        return null
+                      case isSendEarnEvent(activity):
                         return null
                       case subText === null:
                         return <Text>{activityPhrase}</Text>

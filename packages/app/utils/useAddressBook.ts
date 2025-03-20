@@ -1,12 +1,27 @@
+import {
+  sendEarnAddress,
+  sendEarnUsdcFactoryAddress,
+  sendtagCheckoutAddress,
+  tokenPaymasterAddress,
+} from '@my/wagmi'
+import { useQuery } from '@tanstack/react-query'
 import { useSendEarnBalances } from 'app/features/earn/hooks'
 import { useMemo } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { throwIf } from './throwIf'
 import SuperJSON from 'superjson'
-import { address } from './zod'
 import { z } from 'zod'
+import { throwIf } from './throwIf'
+import { address } from './zod'
 
-const AddressBookSchema = z.record(address, z.string())
+/**
+ * Constants for contract labels used in the address book.
+ * Using these constants ensures consistency across the codebase.
+ */
+export enum ContractLabels {
+  SendEarn = 'Send Earn',
+  Paymaster = 'Paymaster',
+  SendtagCheckout = 'Sendtags',
+}
+const AddressBookSchema = z.record(address, z.string().or(z.nativeEnum(ContractLabels)))
 export type AddressBook = z.infer<typeof AddressBookSchema>
 
 /**
@@ -15,7 +30,10 @@ export type AddressBook = z.infer<typeof AddressBookSchema>
  * Potentially there is a solution that can be solved by joining a computed table with the activity feed view.
  */
 export function useAddressBook() {
-  const queries = [useSendEarnBalances()] as const
+  const queries = [
+    useSendEarnBalances(),
+    // add more queries here
+  ] as const
   const errors = useMemo(() => queries.map((q) => q.error), [queries])
   const enabled = useMemo(() => queries.every((q) => q.isSuccess || q.isError), [queries])
   const queryKey = ['addressBook', { queries, errors }] as const
@@ -27,9 +45,16 @@ export function useAddressBook() {
       for (const error of errors) {
         throwIf(error)
       }
-      return {
-        ...Object.fromEntries(queries[0].data?.map((b) => [b.log_addr, 'Send Earn']) || []),
-      }
+      return AddressBookSchema.parse({
+        ...Object.fromEntries([
+          ...(queries[0].data?.map((b) => [b.log_addr, ContractLabels.SendEarn]) || []),
+          // add more entries here
+          ...Object.values(sendEarnAddress).map((p) => [p, ContractLabels.SendEarn]),
+          ...Object.values(sendEarnUsdcFactoryAddress).map((p) => [p, ContractLabels.SendEarn]),
+          ...Object.values(tokenPaymasterAddress).map((p) => [p, ContractLabels.Paymaster]),
+          ...Object.values(sendtagCheckoutAddress).map((p) => [p, ContractLabels.SendtagCheckout]),
+        ]),
+      })
     },
   })
 }
