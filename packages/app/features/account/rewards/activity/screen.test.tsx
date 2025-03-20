@@ -157,7 +157,11 @@ describe('ActivityRewardsScreen', () => {
     )
 
     await act(async () => {
-      jest.advanceTimersByTime(5000)
+      jest.advanceTimersByTime(1000)
+    })
+
+    await act(async () => {
+      await Promise.resolve()
     })
 
     expect(screen.toJSON()).toMatchSnapshot('ActivityRewardsScreen')

@@ -1,5 +1,5 @@
 import { Avatar, LinkableAvatar, XStack, type LinkableAvatarProps } from '@my/ui'
-import { IconUpgrade } from 'app/components/icons'
+import { IconDeposit, IconUpgrade, IconWithdraw } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { allCoinsDict } from 'app/data/coins'
 import { counterpart } from 'app/utils/activity'
@@ -9,6 +9,11 @@ import {
   type Activity,
 } from 'app/utils/zod/activity'
 import { isSendTokenUpgradeEvent } from 'app/utils/zod/activity/SendAccountTransfersEventSchema'
+import {
+  isSendEarnDepositEvent,
+  isSendEarnEvent,
+  isSendEarnWithdrawEvent,
+} from 'app/utils/zod/activity/SendEarnEventSchema'
 
 export function ActivityAvatar({
   activity,
@@ -16,8 +21,7 @@ export function ActivityAvatar({
 }: { activity: Activity } & Omit<LinkableAvatarProps, 'children' | 'href'>) {
   const user = counterpart(activity)
   const { from_user, to_user, data } = activity
-  const isERC20Transfer = isSendAccountTransfersEvent(activity)
-
+  const isERC20Transfer = isSendAccountTransfersEvent(activity) || isSendEarnEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
 
   if (user) {
@@ -62,10 +66,30 @@ export function ActivityAvatar({
   }
 
   if (isSendTokenUpgradeEvent(activity)) {
-    return <IconUpgrade size="$4.5" br="$4" gap="$2" />
+    return (
+      <Avatar size="$4.5" br="$4" gap="$2" {...props}>
+        <IconUpgrade size="$4.5" br="$4" gap="$2" />
+      </Avatar>
+    )
   }
 
-  if (isSendAccountTransfersEvent(activity)) {
+  if (isSendEarnEvent(activity)) {
+    if (isSendEarnDepositEvent(activity)) {
+      return (
+        <Avatar size="$4.5" br="$4" gap="$2" {...props}>
+          <IconDeposit size="$5" />
+        </Avatar>
+      )
+    }
+    if (isSendEarnWithdrawEvent(activity)) {
+      return (
+        <Avatar size="$4.5" br="$4" gap="$2" {...props}>
+          <IconWithdraw size="$5" />
+        </Avatar>
+      )
+    }
+  }
+  if (isERC20Transfer) {
     // is transfer, but an unknown user
     const address = from_user?.id ? activity.data.t : activity.data.f
 

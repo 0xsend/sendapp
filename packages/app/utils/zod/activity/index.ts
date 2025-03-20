@@ -19,7 +19,7 @@ export {
   SendAccountReceiveEventSchema,
   isSendAccountReceiveEvent,
 } from './SendAccountReceiveEventSchema'
-export { Events } from './events'
+export { DatabaseEvents, Events, VirtualEvents } from './events'
 
 export const EventSchema = z
   .discriminatedUnion('event_name', [
@@ -39,6 +39,7 @@ export const EventSchema = z
         return BaseEventSchema.parse(ctx.input)
       }
     }
+    // If we can't handle the error, just return a generic event
     return BaseEventSchema.parse(ctx.input)
   })
 

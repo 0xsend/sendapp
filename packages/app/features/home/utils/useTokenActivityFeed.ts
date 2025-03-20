@@ -1,18 +1,21 @@
-import type { PgBytea } from '@my/supabase/database.types'
+import type { Database, PgBytea } from '@my/supabase/database.types'
 import { sendTokenV0LockboxAddress, tokenPaymasterAddress } from '@my/wagmi'
 import type { PostgrestError } from '@supabase/postgrest-js'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import {
   useInfiniteQuery,
   type InfiniteData,
   type UseInfiniteQueryResult,
 } from '@tanstack/react-query'
-import { processActivities } from 'app/utils/activity'
+import { parseAndProcessActivities } from 'app/utils/activity'
+import { assert } from 'app/utils/assert'
 import { pgAddrCondValues } from 'app/utils/pgAddrCondValues'
 import { squish } from 'app/utils/strings'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
-import { useAddressBook } from 'app/utils/useAddressBook'
-import { EventArraySchema, Events, type Activity } from 'app/utils/zod/activity'
+import { useAddressBook, type AddressBook } from 'app/utils/useAddressBook'
+import { DatabaseEvents, type Activity } from 'app/utils/zod/activity'
+import { useMemo } from 'react'
 import type { ZodError } from 'zod'
 
 /**
@@ -29,58 +32,27 @@ export function useTokenActivityFeed(params: {
   refetchInterval?: number
   enabled?: boolean
 }): UseInfiniteQueryResult<InfiniteData<Activity[]>, PostgrestError | ZodError> {
-  const { pageSize = 10, address, refetchInterval = 30_000, enabled = true } = params
+  const { pageSize = 10, address, refetchInterval = 30_000, enabled: enabledProp = true } = params
   const supabase = useSupabase()
   const addressBook = useAddressBook()
-
-  async function fetchTokenActivityFeed({ pageParam }: { pageParam: number }): Promise<Activity[]> {
-    const from = pageParam * pageSize
-    const to = (pageParam + 1) * pageSize - 1
-    let query = supabase.from('activity_feed').select('*')
-
-    if (address) {
-      query = query.eq('event_name', Events.SendAccountTransfers).eq('data->>log_addr', address)
-    } else {
-      query = query.eq('event_name', Events.SendAccountReceive)
-    }
-
-    const paymasterAddresses = Object.values(tokenPaymasterAddress)
-    const sendTokenV0LockboxAddresses = Object.values(sendTokenV0LockboxAddress)
-    // ignore certain addresses in the activity feed
-    const fromTransferIgnoreValues = pgAddrCondValues(paymasterAddresses) // show fees on send screen instead
-    const toTransferIgnoreValues = pgAddrCondValues([
-      ...paymasterAddresses, // show fees on send screen instead
-      ...sendTokenV0LockboxAddresses, // will instead show the "mint"
-    ])
-
-    const { data, error } = await query
-      .or('from_user.not.is.null, to_user.not.is.null') // only show activities with a send app user
-      .or(
-        squish(`
-          data->t.is.null,
-          data->f.is.null,
-          and(
-            data->>t.not.in.(${toTransferIgnoreValues}),
-            data->>f.not.in.(${fromTransferIgnoreValues})
-          )`)
-      )
-      .order('created_at', { ascending: false })
-      .range(from, to)
-    throwIf(error)
-
-    // Parse the raw data
-    const activities = EventArraySchema.parse(data)
-
-    // Process activities if addressBook is available
-    if (addressBook.data) {
-      return processActivities(activities, addressBook.data)
-    }
-
-    return activities
-  }
-
-  return useInfiniteQuery({
-    queryKey: ['token_activity_feed', address],
+  const enabled = useMemo(
+    () => enabledProp && (addressBook.isError || addressBook.isSuccess),
+    [enabledProp, addressBook]
+  )
+  const queryKey = useMemo(
+    () => ['token_activity_feed', { addressBook, supabase, pageSize, address }] as const,
+    [addressBook, supabase, pageSize, address]
+  )
+  return useInfiniteQuery<
+    Activity[],
+    PostgrestError | ZodError,
+    InfiniteData<Activity[], number>,
+    typeof queryKey,
+    number
+  >({
+    enabled,
+    queryKey,
+    refetchInterval,
     initialPageParam: 0,
     getNextPageParam: (lastPage, _allPages, lastPageParam) => {
       if (lastPage !== null && lastPage.length < pageSize) return undefined
@@ -92,8 +64,80 @@ export function useTokenActivityFeed(params: {
       }
       return firstPageParam - 1
     },
-    queryFn: fetchTokenActivityFeed,
-    refetchInterval,
-    enabled,
+    queryFn: async ({ queryKey: [, { addressBook, supabase, pageSize, address }], pageParam }) => {
+      throwIf(addressBook.error)
+      assert(!!addressBook.data, 'Fetching address book failed')
+      return await fetchTokenActivityFeed({
+        address,
+        pageParam,
+        supabase,
+        pageSize,
+        addressBook: addressBook.data,
+      })
+    },
+  })
+}
+
+/**
+ * Fetches the activity feed for a specific token address.
+ *
+ * @param params.pageParam - The page number to fetch
+ * @param params.addressBook - The address book containing known addresses and their labels
+ * @param params.supabase - The Supabase client
+ * @param params.pageSize - The number of items to fetch per page
+ * @param params.address - The token address to fetch activities for
+ */
+export async function fetchTokenActivityFeed({
+  pageParam,
+  addressBook,
+  supabase,
+  pageSize,
+  address,
+}: {
+  pageParam: number
+  addressBook: AddressBook
+  supabase: SupabaseClient<Database>
+  pageSize: number
+  address?: PgBytea
+}): Promise<Activity[]> {
+  const from = pageParam * pageSize
+  const to = (pageParam + 1) * pageSize - 1
+  let query = supabase.from('activity_feed').select('*')
+
+  if (address) {
+    query = query
+      .eq('event_name', DatabaseEvents.SendAccountTransfers)
+      .eq('data->>log_addr', address)
+  } else {
+    query = query.eq('event_name', DatabaseEvents.SendAccountReceive)
+  }
+
+  const paymasterAddresses = Object.values(tokenPaymasterAddress)
+  const sendTokenV0LockboxAddresses = Object.values(sendTokenV0LockboxAddress)
+  // ignore certain addresses in the activity feed
+  const fromTransferIgnoreValues = pgAddrCondValues(paymasterAddresses) // show fees on send screen instead
+  const toTransferIgnoreValues = pgAddrCondValues([
+    ...paymasterAddresses, // show fees on send screen instead
+    ...sendTokenV0LockboxAddresses, // will instead show the "mint"
+  ])
+
+  const { data, error } = await query
+    .or('from_user.not.is.null, to_user.not.is.null') // only show activities with a send app user
+    .or(
+      squish(`
+          data->t.is.null,
+          data->f.is.null,
+          and(
+            data->>t.not.in.(${toTransferIgnoreValues}),
+            data->>f.not.in.(${fromTransferIgnoreValues})
+          )`)
+    )
+    .order('created_at', { ascending: false })
+    .range(from, to)
+  throwIf(error)
+
+  // Parse and process the raw data
+  return parseAndProcessActivities(data, {
+    addressBook,
   })
 }

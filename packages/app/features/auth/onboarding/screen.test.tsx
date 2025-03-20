@@ -89,9 +89,9 @@ afterEach(() => {
   jest.restoreAllMocks()
 })
 
-jest.useFakeTimers()
-jest.setSystemTime(new Date('2023-01-01T00:00:00.000Z'))
 test(OnboardingScreen.name, async () => {
+  jest.useFakeTimers()
+  jest.setSystemTime(new Date('2023-01-01T00:00:00.000Z'))
   jest.spyOn(Date.prototype, 'toLocaleString').mockReturnValue('foobar')
   const tree = render(
     <TamaguiProvider defaultTheme={'dark'} config={config}>

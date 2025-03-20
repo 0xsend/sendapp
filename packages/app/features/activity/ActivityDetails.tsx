@@ -1,23 +1,24 @@
 import {
   Fade,
+  H4,
   Paragraph,
   Separator,
   Stack,
+  Text,
   XStack,
   YStack,
-  Text,
-  H4,
   type StackProps,
 } from '@my/ui'
-import { phraseFromActivity, amountFromActivity, subtextFromActivity } from 'app/utils/activity'
-import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
 import { IconX } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
+import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
+import { amountFromActivity, phraseFromActivity, subtextFromActivity } from 'app/utils/activity'
 import type { Activity } from 'app/utils/zod/activity'
 import {
   isSendtagCheckoutEvent,
   isSendTokenUpgradeEvent,
 } from 'app/utils/zod/activity/SendAccountTransfersEventSchema'
+import { isSendEarnEvent } from 'app/utils/zod/activity/SendEarnEventSchema'
 
 export const ActivityDetails = ({
   activity,
@@ -63,6 +64,8 @@ export const ActivityDetails = ({
                       case isSendtagCheckoutEvent(activity):
                         return null
                       case isSendTokenUpgradeEvent(activity):
+                        return null
+                      case isSendEarnEvent(activity):
                         return null
                       case subText === null:
                         return <Text>{activityText}</Text>

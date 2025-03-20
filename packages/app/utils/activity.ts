@@ -4,29 +4,38 @@ import {
   sendTokenV0Address,
   tokenPaymasterAddress,
 } from '@my/wagmi'
+import { sendCoin, sendV0Coin } from 'app/data/coins'
 import type { Activity } from 'app/utils/zod/activity'
+import { EventArraySchema } from 'app/utils/zod/activity'
 import { formatUnits, isAddressEqual } from 'viem'
 import formatAmount from './formatAmount'
 import { shorten } from './strings'
+import type { AddressBook } from './useAddressBook'
+import { ContractLabels } from './useAddressBook'
 import {
-  Events,
   isReferralsEvent,
   isSendAccountTransfersEvent,
   isTagReceiptsEvent,
   isTagReceiptUSDCEvent,
+  VirtualEvents,
 } from './zod/activity'
 import { isSendAccountReceiveEvent } from './zod/activity/SendAccountReceiveEventSchema'
 import { isSendTokenUpgradeEvent } from './zod/activity/SendAccountTransfersEventSchema'
-import { sendCoin, sendV0Coin } from 'app/data/coins'
-import type { AddressBook } from './useAddressBook'
+import { isSendEarnEvent } from './zod/activity/SendEarnEventSchema'
 
 const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
   Object.values(addresses).map((a) => [a, label])
 
+/**
+ * @see useAddressBook
+ * @deprecated
+ */
 const AddressLabels = {
-  ...Object.fromEntries(wagmiAddresWithLabel(Object.values(tokenPaymasterAddress), 'Paymaster')),
   ...Object.fromEntries(
-    wagmiAddresWithLabel(Object.values(sendtagCheckoutAddress), 'Sendtag Checkout')
+    wagmiAddresWithLabel(Object.values(tokenPaymasterAddress), ContractLabels.Paymaster)
+  ),
+  ...Object.fromEntries(
+    wagmiAddresWithLabel(Object.values(sendtagCheckoutAddress), ContractLabels.SendtagCheckout)
   ),
 }
 
@@ -70,7 +79,7 @@ export function counterpart(activity: Activity): Activity['from_user'] | Activit
  */
 export function amountFromActivity(activity: Activity): string {
   switch (true) {
-    case isSendAccountTransfersEvent(activity): {
+    case isSendAccountTransfersEvent(activity) || isSendEarnEvent(activity): {
       const { v, coin } = activity.data
       if (coin) {
         // scale the send v0 amount to send v1 amount
@@ -150,8 +159,10 @@ export function eventNameFromActivity(activity: Activity) {
   const isTransferOrReceive = isERC20Transfer || isETHReceive
   switch (true) {
     // Virtual events (client-side processed)
-    case event_name === Events.SendEarnDeposit:
+    case event_name === VirtualEvents.SendEarnDeposit:
       return 'Send Earn Deposit'
+    case event_name === VirtualEvents.SendEarnWithdraw:
+      return 'Send Earn Withdraw'
 
     // Database events
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
@@ -193,8 +204,10 @@ export function phraseFromActivity(activity: Activity) {
 
   switch (true) {
     // Virtual events (client-side processed)
-    case event_name === Events.SendEarnDeposit:
+    case event_name === VirtualEvents.SendEarnDeposit:
       return 'Deposited to Send Earn'
+    case event_name === VirtualEvents.SendEarnWithdraw:
+      return 'Withdrew from Send Earn'
 
     // Database events
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
@@ -319,13 +332,20 @@ export function processActivity(activity: Activity, addressBook: AddressBook): A
   if (
     isSendAccountTransfersEvent(activity) &&
     activity.to_user?.send_id === undefined && // Currently identified as a "Withdraw"
-    addressBook[activity.data.t] === 'Send Earn' // Destination is a Send Earn vault
+    addressBook[activity.data.t] === ContractLabels.SendEarn // Destination is a Send Earn vault
   ) {
     // Override the event_name to our virtual event type
-    processedActivity.event_name = Events.SendEarnDeposit
+    processedActivity.event_name = VirtualEvents.SendEarnDeposit
   }
 
-  // Add more rules here as needed
+  // Rule 2: Send Account Transfer from Send Earn Vault should be a Send Earn Withdraw
+  if (
+    isSendAccountTransfersEvent(activity) &&
+    addressBook[activity.data.f] === ContractLabels.SendEarn // Source is a Send Earn vault
+  ) {
+    // Override the event_name to our virtual event type
+    processedActivity.event_name = VirtualEvents.SendEarnWithdraw
+  }
 
   return processedActivity
 }
@@ -339,4 +359,33 @@ export function processActivity(activity: Activity, addressBook: AddressBook): A
  */
 export function processActivities(activities: Activity[], addressBook: AddressBook): Activity[] {
   return activities.map((activity) => processActivity(activity, addressBook))
+}
+
+/**
+ * Centralized function to parse and process activity data from the database.
+ * This function handles both the parsing of raw data and the contextual processing
+ * to identify special cases like Send Earn deposits and withdrawals.
+ *
+ * @param data Raw data from the database
+ * @param options Processing options
+ * @param options.addressBook Address book for contextual processing
+ * @returns Processed activities with potentially modified event types
+ */
+export function parseAndProcessActivities(
+  data: unknown,
+  options: {
+    addressBook?: AddressBook
+    // Future parameters can be added here
+  } = {}
+): Activity[] {
+  // Parse the raw data using the Zod schema
+  const activities = EventArraySchema.parse(data)
+
+  // Process activities if addressBook is available
+  if (options.addressBook) {
+    const processed = processActivities(activities, options.addressBook)
+    return processed
+  }
+
+  return activities
 }
