@@ -6,15 +6,18 @@ import {
   type InfiniteData,
   type UseInfiniteQueryResult,
 } from '@tanstack/react-query'
+import { processActivities } from 'app/utils/activity'
 import { pgAddrCondValues } from 'app/utils/pgAddrCondValues'
 import { squish } from 'app/utils/strings'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
+import { useAddressBook } from 'app/utils/useAddressBook'
 import { EventArraySchema, Events, type Activity } from 'app/utils/zod/activity'
 import type { ZodError } from 'zod'
 
 /**
  * Infinite query to fetch ERC-20 token activity feed.
+ * Processes activities to handle special cases like Send Earn deposits.
  *
  * @note does not support ETH transfers. Need to add another shovel integration to handle ETH receives, and another one for ETH sends
  *
@@ -28,6 +31,7 @@ export function useTokenActivityFeed(params: {
 }): UseInfiniteQueryResult<InfiniteData<Activity[]>, PostgrestError | ZodError> {
   const { pageSize = 10, address, refetchInterval = 30_000, enabled = true } = params
   const supabase = useSupabase()
+  const addressBook = useAddressBook()
 
   async function fetchTokenActivityFeed({ pageParam }: { pageParam: number }): Promise<Activity[]> {
     const from = pageParam * pageSize
@@ -63,7 +67,16 @@ export function useTokenActivityFeed(params: {
       .order('created_at', { ascending: false })
       .range(from, to)
     throwIf(error)
-    return EventArraySchema.parse(data)
+
+    // Parse the raw data
+    const activities = EventArraySchema.parse(data)
+
+    // Process activities if addressBook is available
+    if (addressBook.data) {
+      return processActivities(activities, addressBook.data)
+    }
+
+    return activities
   }
 
   return useInfiniteQuery({

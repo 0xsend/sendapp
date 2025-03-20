@@ -3,6 +3,10 @@ import { amountFromActivity, eventNameFromActivity, subtextFromActivity } from '
 import type { Activity } from 'app/utils/zod/activity'
 import { ActivityAvatar } from './ActivityAvatar'
 
+/**
+ * @see TokenActivityRow
+ * @deprecated
+ */
 export function ActivityRow({ activity }: { activity: Activity }) {
   const media = useMedia()
   const { created_at } = activity
