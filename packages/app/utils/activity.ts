@@ -9,6 +9,7 @@ import { formatUnits, isAddressEqual } from 'viem'
 import formatAmount from './formatAmount'
 import { shorten } from './strings'
 import {
+  Events,
   isReferralsEvent,
   isSendAccountTransfersEvent,
   isTagReceiptsEvent,
@@ -24,6 +25,7 @@ import {
 } from './zod/activity/TemporalTransfersEventSchema'
 import type { SwapRouter } from 'app/utils/zod/SwapRouterSchema'
 import type { LiquidityPool } from 'app/utils/zod/LiquidityPoolSchema'
+import type { AddressBook } from './useAddressBook'
 
 const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
   Object.values(addresses).map((a) => [a, label])
@@ -248,8 +250,6 @@ export function eventNameFromActivity(
   const isSwapTransfer = isActivitySwapTransfer(activity, swapRouters, liquidityPools)
 
   switch (true) {
-    case isTemporalTransfer:
-      return temporalEventNameFromStatus(data.status)
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Referral Reward'
     case isSendTokenUpgradeEvent(activity):
@@ -304,8 +304,6 @@ export function phraseFromActivity(
   const isSwapTransfer = isActivitySwapTransfer(activity, swapRouters, liquidityPools)
 
   switch (true) {
-    case isTemporalTransfer:
-      return temporalEventNameFromStatus(data.status)
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Earned referral reward'
     case isSendTokenUpgradeEvent(activity):
@@ -431,4 +429,42 @@ export function userNameFromActivityUser(
       }
       return ''
   }
+}
+
+/**
+ * Processes an activity to determine if its event_name should be overridden based on contextual data.
+ * This allows for more accurate event classification without changing the database schema.
+ *
+ * @param activity The original activity from the database
+ * @param addressBook The address book containing known addresses and their labels
+ * @returns A processed activity with potentially modified event_name
+ */
+export function processActivity(activity: Activity, addressBook: AddressBook): Activity {
+  // Clone the activity to avoid mutating the original
+  const processedActivity = { ...activity }
+
+  // Rule 1: Send Account Transfer to Send Earn Vault should be a Send Earn Deposit
+  if (
+    isSendAccountTransfersEvent(activity) &&
+    activity.to_user?.send_id === undefined && // Currently identified as a "Withdraw"
+    addressBook[activity.data.t] === 'Send Earn' // Destination is a Send Earn vault
+  ) {
+    // Override the event_name to our virtual event type
+    processedActivity.event_name = Events.SendEarnDeposit
+  }
+
+  // Add more rules here as needed
+
+  return processedActivity
+}
+
+/**
+ * Processes an array of activities using the processActivity function.
+ *
+ * @param activities Array of activities from the database
+ * @param addressBook The address book containing known addresses and their labels
+ * @returns Array of processed activities
+ */
+export function processActivities(activities: Activity[], addressBook: AddressBook): Activity[] {
+  return activities.map((activity) => processActivity(activity, addressBook))
 }
