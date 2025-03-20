@@ -95,10 +95,11 @@ function ReferredBy() {
   }, [referralCode, updateReferralCodeCookie])
 
   useEffect(() => {
-    if (!isReferrerLoading && referrer && !referrer.isNew) {
-      setReferralCode(referrer.tag)
+    if (!isReferrerLoading && referrer) {
+      const ref = referrer.tag && referrer.tag !== '' ? referrer.tag : referrer.refcode
+      setReferralCode(ref)
     }
-  }, [isReferrerLoading, referrer])
+  }, [referrer, isReferrerLoading])
 
   return (
     <FadeCard
