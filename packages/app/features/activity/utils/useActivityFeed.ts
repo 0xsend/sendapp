@@ -5,15 +5,19 @@ import {
   type InfiniteData,
   type UseInfiniteQueryResult,
 } from '@tanstack/react-query'
+import { processActivities } from 'app/utils/activity'
 import { pgAddrCondValues } from 'app/utils/pgAddrCondValues'
 import { squish } from 'app/utils/strings'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
+import { useAddressBook } from 'app/utils/useAddressBook'
 import { EventArraySchema, type Activity } from 'app/utils/zod/activity'
 import type { ZodError } from 'zod'
 
 /**
  * Infinite query to fetch activity feed. Filters out activities with no from or to user (not a send app user).
+ * Processes activities to handle special cases like Send Earn deposits.
+ *
  * @param pageSize - number of items to fetch per page
  */
 export function useActivityFeed({
@@ -23,6 +27,8 @@ export function useActivityFeed({
   PostgrestError | ZodError
 > {
   const supabase = useSupabase()
+  const addressBook = useAddressBook()
+
   async function fetchActivityFeed({ pageParam }: { pageParam: number }): Promise<Activity[]> {
     const paymasterAddresses = Object.values(tokenPaymasterAddress)
     const sendtagCheckoutAddresses = Object.values(sendtagCheckoutAddress)
@@ -54,7 +60,16 @@ export function useActivityFeed({
       .range(from, to)
     const { data, error } = await request
     throwIf(error)
-    return EventArraySchema.parse(data)
+
+    // Parse the raw data
+    const activities = EventArraySchema.parse(data)
+
+    // Process activities if addressBook is available
+    if (addressBook.data) {
+      return processActivities(activities, addressBook.data)
+    }
+
+    return activities
   }
 
   return useInfiniteQuery({
