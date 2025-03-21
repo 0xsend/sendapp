@@ -109,7 +109,11 @@ export function generateChallenge({
   userOpHash,
   version = USEROP_VERSION,
   validUntil,
-}: { userOpHash: Hex; version?: number; validUntil: number }): {
+}: {
+  userOpHash: Hex
+  version?: number
+  validUntil: number
+}): {
   challenge: Hex
   versionBytes: Uint8Array
   validUntilBytes: Uint8Array
@@ -131,7 +135,9 @@ const useAccountNonceQueryKey = 'accountNonce'
 
 export function useAccountNonce({
   sender,
-}: { sender: Address | undefined }): UseQueryReturnType<bigint, Error> {
+}: {
+  sender: Address | undefined
+}): UseQueryReturnType<bigint, Error> {
   return useWagmiQuery({
     queryKey: [useAccountNonceQueryKey, sender],
     queryFn: async () => {
@@ -389,6 +395,8 @@ export function throwNiceError(e: Error & { cause?: Error }): never {
           throw new Error('Not enough funds')
         case 'FailedOp(0,"AA25 invalid account nonce")':
           throw new Error('Invalid nonce, please try again')
+        case 'execution reverted: revert: Return amount is not enough':
+          throw new Error('Slippage exceeded, please try again or increase max slippage')
         default:
           throw e
       }

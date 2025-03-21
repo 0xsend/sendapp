@@ -19,6 +19,7 @@ import {
   IconDeviceReset,
   IconHome,
   IconSendLogo,
+  IconSwap,
 } from 'app/components/icons'
 import { SideBarNavLink } from 'app/components/sidebar/SideBarNavLink'
 
@@ -28,6 +29,7 @@ import { NavSheet } from '../NavSheet'
 import { useUser } from 'app/utils/useUser'
 import { ReferralLink } from '../ReferralLink'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { useSendAccount } from 'app/utils/send-accounts'
 
 const links = [
   {
@@ -39,6 +41,11 @@ const links = [
     icon: <IconActivity size={'$1'} color={'inherit'} />,
     text: 'Send',
     href: '/send',
+  },
+  {
+    icon: <IconSwap size={'$1'} color={'inherit'} />,
+    text: 'Swap',
+    href: '/swap',
   },
   {
     icon: <IconDeviceReset size={'$1'} color={'inherit'} />,
@@ -60,6 +67,13 @@ const links = [
 ].filter(Boolean) as { icon: ReactElement; text: string; href: string }[]
 
 const HomeSideBar = ({ ...props }: YStackProps) => {
+  const { data: sendAccount } = useSendAccount()
+
+  // this code can be removed then swaps are no longer behind whitelist
+  const swapEnabledUsers = (process.env.NEXT_PUBLIC_SWAP_ALLOWLIST ?? '').split(',')
+  const isSwapEnabled = sendAccount?.id && swapEnabledUsers.includes(sendAccount.id)
+  const _links = isSwapEnabled ? links : links.filter((link) => link.href !== '/swap')
+
   return (
     <SideBar {...props} ai={'flex-start'} pl="$7">
       <Link href={'/'}>
@@ -67,7 +81,7 @@ const HomeSideBar = ({ ...props }: YStackProps) => {
       </Link>
 
       <YStack gap={'$7'} pt={'$10'} jc={'space-between'}>
-        {links.map((link) => (
+        {_links.map((link) => (
           <SideBarNavLink key={link.href} {...link} />
         ))}
       </YStack>

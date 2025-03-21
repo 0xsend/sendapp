@@ -65,6 +65,14 @@ jest.mock('app/provider/coins', () => ({
   }),
 }))
 
+jest.mock('app/utils/useSwapRouters', () => ({
+  useSwapRouters: jest.fn().mockReturnValue({ data: [] }),
+}))
+
+jest.mock('app/utils/useLiquidityPools', () => ({
+  useLiquidityPools: jest.fn().mockReturnValue({ data: [] }),
+}))
+
 describe('ActivityScreen', () => {
   beforeEach(() => {
     jest.useFakeTimers()

@@ -1,9 +1,12 @@
 import { describe, expect, it } from '@jest/globals'
 import {
-  phraseFromActivity,
   amountFromActivity,
   counterpart,
   eventNameFromActivity,
+  isActivitySwapTransfer,
+  isSwapBuyTransfer,
+  isSwapSellTransfer,
+  phraseFromActivity,
   subtextFromActivity,
 } from './activity'
 
@@ -13,18 +16,39 @@ import {
   mockReferral,
   mockSendAccountReceive,
   mockSendtagReferralRewardUSDC,
-  mockSentTransfer,
-  mockTagReceipt,
   mockSendTokenUpgradeEvent,
+  mockSentTransfer,
+  mockSwapBuyErc20Transfer,
+  mockSwapBuyEthTransfer,
+  mockSwapSellErc20Transfer,
+  mockTagReceipt,
 } from 'app/features/activity/utils/__mocks__/mock-activity-feed'
 import { byteaToHexEthAddress } from './zod'
-import { EventSchema } from './zod/activity'
+import { type Activity, EventSchema } from './zod/activity'
 import { tokenPaymasterAddress } from '@my/wagmi'
 import { assert } from './assert'
 import { shorten } from './strings'
 import { hexToBytea } from './hexToBytea'
+import type { SwapRouter } from 'app/utils/zod/SwapRouterSchema'
+import type { LiquidityPool } from 'app/utils/zod/LiquidityPoolSchema'
 
 jest.mock('@my/wagmi')
+
+const mockSwapRouters = [
+  {
+    router_addr: '0x6131b5fae19ea4f9d964eac0408e4408b66337b5' as const,
+    created_at: new Date(),
+  },
+]
+
+const mockLiquidityPools = [
+  {
+    created_at: new Date(),
+    pool_name: 'aerodrome',
+    pool_type: 'velodrome',
+    pool_addr: '0x69bc1d350fe13f499c6aeded2c5ea9471b2a599a' as const,
+  },
+]
 
 describe('test amountFromActivity', () => {
   it('should return the amount of the activity', () => {
@@ -71,6 +95,24 @@ describe('test eventNameFromActivity', () => {
     const _activity = EventSchema.parse(activity)
     expect(eventNameFromActivity(_activity)).toBe('Referral Reward')
   })
+  it('should return "Sold" when withdrawal address is swap router or liquidity pool', () => {
+    const activity = JSON.parse(JSON.stringify(mockSwapSellErc20Transfer))
+    expect(
+      eventNameFromActivity(EventSchema.parse(activity), mockSwapRouters, mockLiquidityPools)
+    ).toBe('Sold')
+  })
+  it('should return "Bought" when erc20 deposit address is swap router or liquidity pool', () => {
+    const activity = JSON.parse(JSON.stringify(mockSwapBuyErc20Transfer))
+    expect(
+      eventNameFromActivity(EventSchema.parse(activity), mockSwapRouters, mockLiquidityPools)
+    ).toBe('Bought')
+  })
+  it('should return "Bought" when eth deposit address is swap router or liquidity pool', () => {
+    const activity = JSON.parse(JSON.stringify(mockSwapBuyEthTransfer))
+    expect(
+      eventNameFromActivity(EventSchema.parse(activity), mockSwapRouters, mockLiquidityPools)
+    ).toBe('Bought')
+  })
 })
 
 describe('phraseFromActivity', () => {
@@ -114,6 +156,30 @@ describe('phraseFromActivity', () => {
   it('should return "Earned referral reward" when send_account_transfer from SendtagCheckout contract', () => {
     const _activity = EventSchema.parse(mockSendtagReferralRewardUSDC)
     expect(phraseFromActivity(_activity)).toBe('Earned referral reward')
+  })
+
+  it('should return "Sold" when withdrawal address is swap router or liquidity pool', () => {
+    expect(
+      phraseFromActivity(
+        EventSchema.parse(mockSwapSellErc20Transfer),
+        mockSwapRouters,
+        mockLiquidityPools
+      )
+    ).toBe('Sold')
+  })
+
+  it('should return "Bought" when erc20 deposit address is swap router or liquidity pool', () => {
+    const activity = JSON.parse(JSON.stringify(mockSwapBuyErc20Transfer))
+    expect(
+      phraseFromActivity(EventSchema.parse(activity), mockSwapRouters, mockLiquidityPools)
+    ).toBe('Bought')
+  })
+
+  it('should return "Bought" when eth deposit address is swap router or liquidity pool', () => {
+    const activity = JSON.parse(JSON.stringify(mockSwapBuyEthTransfer))
+    expect(
+      phraseFromActivity(EventSchema.parse(activity), mockSwapRouters, mockLiquidityPools)
+    ).toBe('Bought')
   })
 })
 
@@ -161,6 +227,27 @@ describe('test subtextFromActivity', () => {
     const activity = JSON.parse(JSON.stringify(mockSendTokenUpgradeEvent))
     expect(subtextFromActivity(EventSchema.parse(activity))).toBe('1M -> 10,000')
   })
+  it('should return coin when withdrawal address is swap router or liquidity pool', () => {
+    expect(
+      subtextFromActivity(
+        EventSchema.parse(mockSwapSellErc20Transfer),
+        mockSwapRouters,
+        mockLiquidityPools
+      )
+    ).toBe('USDC')
+  })
+  it('should return coin when erc20 deposit address is swap router or liquidity pool', () => {
+    const activity = JSON.parse(JSON.stringify(mockSwapBuyErc20Transfer))
+    expect(
+      subtextFromActivity(EventSchema.parse(activity), mockSwapRouters, mockLiquidityPools)
+    ).toBe('USDC')
+  })
+  it('should return coin when eth deposit address is swap router or liquidity pool', () => {
+    const activity = JSON.parse(JSON.stringify(mockSwapBuyEthTransfer))
+    expect(
+      subtextFromActivity(EventSchema.parse(activity), mockSwapRouters, mockLiquidityPools)
+    ).toBe('ETH')
+  })
 })
 
 describe('test userFromActivity', () => {
@@ -177,5 +264,248 @@ describe('test userFromActivity', () => {
   })
   it('should return the to user when referrals event', () => {
     expect(counterpart(EventSchema.parse(mockReferral))).toEqual(mockReferral.to_user)
+  })
+})
+
+describe('isSwapBuyTransfer', () => {
+  const swapRouters = [
+    { router_addr: '0x5b8B88f0A15c27B7C1ecf78aFfD6e7f4C54b96F0' },
+    { router_addr: '0x9e64D7edFd8B1b1eBDf20e4e60d070A6A4d0e3A6' },
+  ] as unknown as SwapRouter[]
+
+  let activity: Activity
+
+  it('should return true if sender address matches a swap router address (ETH)', () => {
+    activity = {
+      data: {
+        sender: '0x5b8B88f0A15c27B7C1ecf78aFfD6e7f4C54b96F0',
+        f: '0x0000000000000000000000000000000000000000',
+      },
+    } as Activity
+
+    const result = isSwapBuyTransfer(activity, swapRouters)
+    expect(result).toBe(true)
+  })
+
+  it('should return true if f address matches a swap router address (ERC-20)', () => {
+    activity = {
+      data: {
+        sender: '0x0000000000000000000000000000000000000000',
+        f: '0x9e64D7edFd8B1b1eBDf20e4e60d070A6A4d0e3A6',
+      },
+    } as Activity
+
+    const result = isSwapBuyTransfer(activity, swapRouters)
+    expect(result).toBe(true)
+  })
+
+  it('should return false if neither sender nor f address matches a swap router address', () => {
+    activity = {
+      data: {
+        sender: '0x0000000000000000000000000000000000000000',
+        f: '0x0000000000000000000000000000000000000000',
+      },
+    } as Activity
+
+    const result = isSwapBuyTransfer(activity, swapRouters)
+    expect(result).toBe(false)
+  })
+
+  it('should return false if activity has no sender or f address', () => {
+    activity = {
+      data: {
+        sender: undefined,
+        f: undefined,
+      },
+    } as Activity
+
+    const result = isSwapBuyTransfer(activity, swapRouters)
+    expect(result).toBe(false)
+  })
+
+  it('should return false if no swapRouters are provided', () => {
+    activity = {
+      data: {
+        sender: '0x5b8B88f0A15c27B7C1ecf78aFfD6e7f4C54b96F0',
+        f: '0x0000000000000000000000000000000000000000',
+      },
+    } as Activity
+
+    const result = isSwapBuyTransfer(activity, [])
+    expect(result).toBe(false)
+  })
+
+  it('should return true if sender address matches a swap router address even when no f address is provided', () => {
+    activity = {
+      data: {
+        sender: '0x5b8B88f0A15c27B7C1ecf78aFfD6e7f4C54b96F0',
+        f: undefined,
+      },
+    } as Activity
+
+    const result = isSwapBuyTransfer(activity, swapRouters)
+    expect(result).toBe(true)
+  })
+})
+
+describe('isSwapSellTransfer', () => {
+  const swapRouters = [
+    { router_addr: '0x5b8B88f0A15c27B7C1ecf78aFfD6e7f4C54b96F0' },
+    { router_addr: '0x9e64D7edFd8B1b1eBDf20e4e60d070A6A4d0e3A6' },
+  ] as unknown as SwapRouter[]
+
+  const liquidityPools = [
+    { pool_addr: '0x3dC60B7fF5F4E4B4462A2B755B96eB8a12A3d2B8' },
+    { pool_addr: '0x4b89D6b4592B828Fd000fC489Bc6D7fDf4b72227' },
+  ] as unknown as LiquidityPool[]
+
+  let activity: Activity
+
+  it('should return true if t address matches a liquidity pool address', () => {
+    activity = {
+      data: {
+        t: '0x3dC60B7fF5F4E4B4462A2B755B96eB8a12A3d2B8',
+      },
+    } as Activity
+
+    const result = isSwapSellTransfer(activity, swapRouters, liquidityPools)
+    expect(result).toBe(true)
+  })
+
+  it('should return true if t address matches a swap router address', () => {
+    activity = {
+      data: {
+        t: '0x5b8B88f0A15c27B7C1ecf78aFfD6e7f4C54b96F0',
+      },
+    } as Activity
+
+    const result = isSwapSellTransfer(activity, swapRouters, liquidityPools)
+    expect(result).toBe(true)
+  })
+
+  it('should return false if t address does not match any liquidity pool or swap router address', () => {
+    activity = {
+      data: {
+        t: '0x0000000000000000000000000000000000000000',
+      },
+    } as Activity
+
+    const result = isSwapSellTransfer(activity, swapRouters, liquidityPools)
+    expect(result).toBe(false)
+  })
+
+  it('should return false if t address is not provided', () => {
+    activity = {
+      data: {
+        t: undefined,
+      },
+    } as Activity
+
+    const result = isSwapSellTransfer(activity, swapRouters, liquidityPools)
+    expect(result).toBe(false)
+  })
+
+  it('should return false if no swapRouters and no liquidityPools are provided', () => {
+    activity = {
+      data: {
+        t: '0x5b8B88f0A15c27B7C1ecf78aFfD6e7f4C54b96F0',
+      },
+    } as Activity
+
+    const result = isSwapSellTransfer(activity, [], [])
+    expect(result).toBe(false)
+  })
+
+  it('should return true if t address matches a liquidity pool address even if no swap routers are provided', () => {
+    activity = {
+      data: {
+        t: '0x3dC60B7fF5F4E4B4462A2B755B96eB8a12A3d2B8',
+      },
+    } as Activity
+
+    const result = isSwapSellTransfer(activity, [], liquidityPools)
+    expect(result).toBe(true)
+  })
+
+  it('should return true if t address matches a swap router address even if no liquidity pools are provided', () => {
+    activity = {
+      data: {
+        t: '0x9e64D7edFd8B1b1eBDf20e4e60d070A6A4d0e3A6',
+      },
+    } as Activity
+
+    const result = isSwapSellTransfer(activity, swapRouters, [])
+    expect(result).toBe(true)
+  })
+})
+
+describe('isActivitySwapTransfer', () => {
+  const swapRouters = [
+    { router_addr: '0x5b8B88f0A15c27B7C1ecf78aFfD6e7f4C54b96F0' },
+    { router_addr: '0x9e64D7edFd8B1b1eBDf20e4e60d070A6A4d0e3A6' },
+  ] as unknown as SwapRouter[]
+
+  const liquidityPools = [
+    { pool_addr: '0x3dC60B7fF5F4E4B4462A2B755B96eB8a12A3d2B8' },
+    { pool_addr: '0x4b89D6b4592B828Fd000fC489Bc6D7fDf4b72227' },
+  ] as unknown as LiquidityPool[]
+
+  let activity: Activity
+
+  it('should return true if isSwapBuyTransfer returns true', () => {
+    activity = {
+      data: {
+        sender: '0x5b8B88f0A15c27B7C1ecf78aFfD6e7f4C54b96F0',
+      },
+    } as Activity
+
+    const result = isActivitySwapTransfer(activity, swapRouters, liquidityPools)
+    expect(result).toBe(true)
+  })
+
+  it('should return true if isSwapSellTransfer returns true', () => {
+    activity = {
+      data: {
+        t: '0x3dC60B7fF5F4E4B4462A2B755B96eB8a12A3d2B8',
+      },
+    } as Activity
+
+    const result = isActivitySwapTransfer(activity, swapRouters, liquidityPools)
+    expect(result).toBe(true)
+  })
+
+  it('should return false if neither isSwapBuyTransfer nor isSwapSellTransfer return true', () => {
+    activity = {
+      data: {
+        sender: '0x0000000000000000000000000000000000000000',
+        t: '0x0000000000000000000000000000000000000000',
+      },
+    } as Activity
+
+    const result = isActivitySwapTransfer(activity, swapRouters, liquidityPools)
+    expect(result).toBe(false)
+  })
+
+  it('should return false if no swapRouters or liquidityPools are provided', () => {
+    activity = {
+      data: {
+        sender: '0x5b8B88f0A15c27B7C1ecf78aFfD6e7f4C54b96F0',
+      },
+    } as Activity
+
+    const result = isActivitySwapTransfer(activity, [], [])
+    expect(result).toBe(false)
+  })
+
+  it('should return false if neither isSwapBuyTransfer nor isSwapSellTransfer is true (no t or sender address)', () => {
+    activity = {
+      data: {
+        sender: undefined,
+        t: undefined,
+      },
+    } as Activity
+
+    const result = isActivitySwapTransfer(activity, swapRouters, liquidityPools)
+    expect(result).toBe(false)
   })
 })
