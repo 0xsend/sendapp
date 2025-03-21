@@ -1364,20 +1364,7 @@ export type Database = {
           lookup_type: Database["public"]["Enums"]["lookup_type_enum"]
           identifier: string
         }
-        Returns: {
-          id: string
-          avatar_url: string
-          name: string
-          about: string
-          refcode: string
-          x_username: string
-          tag: string
-          address: string
-          chain_id: number
-          is_public: boolean
-          sendid: number
-          all_tags: string[]
-        }[]
+        Returns: Database["public"]["CompositeTypes"]["profile_lookup_result"]
       }
       referrer_lookup: {
         Args: {
