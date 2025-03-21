@@ -10,14 +10,14 @@ import {
   YGroup,
   YStack,
 } from '@my/ui'
-import { IconDeposit, IconQuestionCircle, IconWithdraw } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
+import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
 import { formatCoinAmount } from 'app/utils/formatCoinAmount'
 import { useMemo } from 'react'
 import { SectionList } from 'react-native'
-import { useSendEarnActivity, useSendEarnCoinBalances } from '../hooks'
+import { useSendEarnCoinBalances } from '../hooks'
 import { useERC20AssetCoin } from '../params'
-import type { SendEarnActivity } from '../zod'
+import { useEarnActivityFeed } from '../utils/useEarnActivityFeed'
 
 export const EarningsBalance = () => {
   return (
@@ -31,7 +31,6 @@ export const EarningsBalance = () => {
           <EarningsFeed />
         </YStack>
       </ScrollView>
-      {/* <SectionButton text={'CLAIM EARNINGS'} onPress={handleClaimPress} /> */}
     </YStack>
   )
 }
@@ -39,7 +38,7 @@ export const EarningsBalance = () => {
 export const EarningsFeed = () => {
   const coin = useERC20AssetCoin()
   const { data, isLoading, error, isFetchingNextPage, fetchNextPage, hasNextPage } =
-    useSendEarnActivity({
+    useEarnActivityFeed({
       pageSize: 10,
     })
 
@@ -47,12 +46,11 @@ export const EarningsFeed = () => {
     if (!data?.pages) return []
 
     const activities = data.pages.flat()
-    const groups = activities.reduce<Record<string, SendEarnActivity[]>>((acc, activity) => {
-      const isToday =
-        new Date(activity.block_time * 1000).toDateString() === new Date().toDateString()
+    const groups = activities.reduce<Record<string, typeof activities>>((acc, activity) => {
+      const isToday = new Date(activity.created_at).toDateString() === new Date().toDateString()
       const dateKey = isToday
         ? 'Today'
-        : new Date(activity.block_time * 1000).toLocaleDateString(undefined, {
+        : new Date(activity.created_at).toLocaleDateString(undefined, {
             day: 'numeric',
             month: 'long',
           })
@@ -82,7 +80,7 @@ export const EarningsFeed = () => {
       <SectionList
         sections={sections}
         showsVerticalScrollIndicator={false}
-        keyExtractor={(activity) => activity.tx_hash}
+        keyExtractor={(activity) => `${activity.event_name}-${activity.created_at.getTime()}`}
         renderItem={({ item: activity, index, section }) => (
           <YGroup
             bc="$color1"
@@ -108,30 +106,7 @@ export const EarningsFeed = () => {
             })}
           >
             <YGroup.Item>
-              <XStack p="$3" justifyContent="space-between">
-                {(() => {
-                  switch (true) {
-                    case activity.type === 'deposit':
-                      return <IconDeposit size="$3" color="$gray10" />
-                    case activity.type === 'withdraw':
-                      return <IconWithdraw size="$3" color="$gray10" />
-                    default:
-                      // should never happen
-                      return <IconQuestionCircle size="$3" color="$gray10" />
-                  }
-                })()}
-                <YStack>
-                  <Paragraph>{activity.type === 'deposit' ? 'Deposit' : 'Withdraw'}</Paragraph>
-                  <Paragraph size="$3" color="$gray10">
-                    {coin.data
-                      ? formatCoinAmount({ amount: activity.assets, coin: coin.data })
-                      : ''}
-                  </Paragraph>
-                </YStack>
-                <Paragraph size="$3" color="$gray10">
-                  {new Date(activity.block_time * 1000).toLocaleDateString()}
-                </Paragraph>
-              </XStack>
+              <TokenActivityRow activity={activity} />
             </YGroup.Item>
           </YGroup>
         )}

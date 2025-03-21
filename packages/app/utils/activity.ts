@@ -2,6 +2,7 @@ import {
   baseMainnet,
   sendtagCheckoutAddress,
   sendTokenV0Address,
+  sendTokenV0LockboxAddress,
   tokenPaymasterAddress,
 } from '@my/wagmi'
 import { sendCoin, sendV0Coin } from 'app/data/coins'
@@ -9,7 +10,8 @@ import type { Activity } from 'app/utils/zod/activity'
 import { EventArraySchema } from 'app/utils/zod/activity'
 import { formatUnits, isAddressEqual } from 'viem'
 import formatAmount from './formatAmount'
-import { shorten } from './strings'
+import { pgAddrCondValues } from './pgAddrCondValues'
+import { shorten, squish } from './strings'
 import type { AddressBook } from './useAddressBook'
 import { ContractLabels } from './useAddressBook'
 import {
@@ -577,4 +579,46 @@ export function parseAndProcessActivities(
   }
 
   return activities
+}
+
+/**
+ * Creates base filtering conditions for activity feed queries to exclude system addresses
+ * like paymasters that should be filtered from activity displays.
+ *
+ * @param customFromIgnore - Additional addresses to ignore in 'from' field
+ * @param customToIgnore - Additional addresses to ignore in 'to' field
+ * @returns SQL condition string for use in Supabase queries
+ */
+
+export function getBaseAddressFilterCondition(
+  customFromIgnore: `0x${string}`[] = [],
+  customToIgnore: `0x${string}`[] = []
+): string {
+  const paymasterAddresses = Object.values(tokenPaymasterAddress)
+  const sendTokenV0LockboxAddresses = Object.values(sendTokenV0LockboxAddress)
+
+  // Base addresses to ignore in 'from' field
+  const fromIgnoreAddresses = [
+    ...paymasterAddresses, // show fees on send screen instead
+    ...customFromIgnore,
+  ]
+
+  // Base addresses to ignore in 'to' field
+  const toIgnoreAddresses = [
+    ...paymasterAddresses, // show fees on send screen instead
+    ...sendTokenV0LockboxAddresses, // will instead show the "mint"
+    ...customToIgnore,
+  ]
+
+  const fromTransferIgnoreValues = pgAddrCondValues(fromIgnoreAddresses)
+  const toTransferIgnoreValues = pgAddrCondValues(toIgnoreAddresses)
+
+  return squish(`
+    data->t.is.null,
+    data->f.is.null,
+    and(
+      data->>t.not.in.(${toTransferIgnoreValues}),
+      data->>f.not.in.(${fromTransferIgnoreValues})
+    )
+  `)
 }

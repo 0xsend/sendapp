@@ -1635,6 +1635,7 @@ export type Database = {
           block_time: number | null
           log_addr: string | null
           owner: string | null
+          sender: string | null
           shares: number | null
           tx_hash: string | null
           type: string | null

@@ -1,5 +1,4 @@
 import type { Database, PgBytea } from '@my/supabase/database.types'
-import { sendTokenV0LockboxAddress, tokenPaymasterAddress } from '@my/wagmi'
 import type { PostgrestError } from '@supabase/postgrest-js'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import {
@@ -7,10 +6,9 @@ import {
   type InfiniteData,
   type UseInfiniteQueryResult,
 } from '@tanstack/react-query'
+import { getBaseAddressFilterCondition } from 'app/utils/activity'
 import { parseAndProcessActivities } from 'app/utils/activity'
 import { assert } from 'app/utils/assert'
-import { pgAddrCondValues } from 'app/utils/pgAddrCondValues'
-import { squish } from 'app/utils/strings'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import { useAddressBook, type AddressBook } from 'app/utils/useAddressBook'
@@ -146,26 +144,9 @@ export async function fetchTokenActivityFeed({
       )
   }
 
-  const paymasterAddresses = Object.values(tokenPaymasterAddress)
-  const sendTokenV0LockboxAddresses = Object.values(sendTokenV0LockboxAddress)
-  // ignore certain addresses in the activity feed
-  const fromTransferIgnoreValues = pgAddrCondValues(paymasterAddresses) // show fees on send screen instead
-  const toTransferIgnoreValues = pgAddrCondValues([
-    ...paymasterAddresses, // show fees on send screen instead
-    ...sendTokenV0LockboxAddresses, // will instead show the "mint"
-  ])
-
   const { data, error } = await query
     .or('from_user.not.is.null, to_user.not.is.null') // only show activities with a send app user
-    .or(
-      squish(`
-        data->t.is.null,
-        data->f.is.null,
-        and(
-          data->>t.not.in.(${toTransferIgnoreValues}),
-          data->>f.not.in.(${fromTransferIgnoreValues})
-        )`)
-    )
+    .or(getBaseAddressFilterCondition())
     .order('created_at', { ascending: false })
     .range(from, to)
 

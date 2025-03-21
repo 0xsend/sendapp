@@ -13,16 +13,13 @@ import {
 } from '@my/ui'
 import { baseMainnetBundlerClient, entryPointAddress } from '@my/wagmi'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { IconDeposit, IconQuestionCircle, IconWithdraw } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import type { erc20Coin } from 'app/data/coins'
 import { SectionButton } from 'app/features/earn/components/SectionButton'
 import { useMyAffiliateRewards, useMyAffiliateRewardsBalance } from 'app/features/earn/hooks'
 import { useERC20AssetCoin } from 'app/features/earn/params'
-import {
-  useSendEarnClaimRewardsCalls,
-  useSendEarnRewardsActivity,
-} from 'app/features/earn/rewards/hooks'
+import { useSendEarnClaimRewardsCalls } from 'app/features/earn/rewards/hooks'
+import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
 import { TokenDetailsMarketData } from 'app/features/home/TokenDetails'
 import { assert } from 'app/utils/assert'
 import { formatCoinAmount } from 'app/utils/formatCoinAmount'
@@ -35,7 +32,7 @@ import { useMemo, useState } from 'react'
 import { SectionList } from 'react-native'
 import { formatUnits, withRetry } from 'viem'
 import { useChainId } from 'wagmi'
-import type { SendEarnActivity } from '../zod'
+import { useEarnRewardsActivityFeed } from './hooks'
 
 const log = debug('app:features:earn:rewards')
 
@@ -244,7 +241,7 @@ function RewardsBalance() {
 const RewardsFeed = () => {
   const coin = useERC20AssetCoin()
   const { data, isLoading, error, isFetchingNextPage, fetchNextPage, hasNextPage } =
-    useSendEarnRewardsActivity({
+    useEarnRewardsActivityFeed({
       pageSize: 10,
     })
 
@@ -252,12 +249,11 @@ const RewardsFeed = () => {
     if (!data?.pages) return []
 
     const activities = data.pages.flat()
-    const groups = activities.reduce<Record<string, SendEarnActivity[]>>((acc, activity) => {
-      const isToday =
-        new Date(activity.block_time * 1000).toDateString() === new Date().toDateString()
+    const groups = activities.reduce<Record<string, typeof activities>>((acc, activity) => {
+      const isToday = new Date(activity.created_at).toDateString() === new Date().toDateString()
       const dateKey = isToday
         ? 'Today'
-        : new Date(activity.block_time * 1000).toLocaleDateString(undefined, {
+        : new Date(activity.created_at).toLocaleDateString(undefined, {
             day: 'numeric',
             month: 'long',
           })
@@ -280,14 +276,14 @@ const RewardsFeed = () => {
   if (!coin.isSuccess || !coin.data) return null
   if (isLoading) return <Spinner size="small" />
   if (error) return <Paragraph>{error.message}</Paragraph>
-  if (!sections.length) return <Paragraph>No earnings activity</Paragraph>
+  if (!sections.length) return <Paragraph>No rewards activity</Paragraph>
 
   return (
     <Fade>
       <SectionList
         sections={sections}
         showsVerticalScrollIndicator={false}
-        keyExtractor={(activity) => activity.tx_hash}
+        keyExtractor={(activity) => `${activity.event_name}-${activity.created_at.getTime()}`}
         renderItem={({ item: activity, index, section }) => (
           <YGroup
             bc="$color1"
@@ -313,30 +309,7 @@ const RewardsFeed = () => {
             })}
           >
             <YGroup.Item>
-              <XStack p="$3" justifyContent="space-between">
-                {(() => {
-                  switch (true) {
-                    case activity.type === 'deposit':
-                      return <IconDeposit size="$3" color="$gray10" />
-                    case activity.type === 'withdraw':
-                      return <IconWithdraw size="$3" color="$gray10" />
-                    default:
-                      // should never happen
-                      return <IconQuestionCircle size="$3" color="$gray10" />
-                  }
-                })()}
-                <YStack>
-                  <Paragraph>{activity.type === 'deposit' ? 'Deposit' : 'Withdraw'}</Paragraph>
-                  <Paragraph size="$3" color="$gray10">
-                    {coin.data
-                      ? formatCoinAmount({ amount: activity.assets, coin: coin.data })
-                      : ''}
-                  </Paragraph>
-                </YStack>
-                <Paragraph size="$3" color="$gray10">
-                  {new Date(activity.block_time * 1000).toLocaleDateString()}
-                </Paragraph>
-              </XStack>
+              <TokenActivityRow activity={activity} />
             </YGroup.Item>
           </YGroup>
         )}
