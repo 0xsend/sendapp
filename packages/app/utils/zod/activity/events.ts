@@ -27,8 +27,4 @@ export enum Events {
    * Temporal send account transfers
    */
   TemporalSendAccountTransfers = 'temporal_send_account_transfers',
-  /**
-   * Send swap ERC-20 token transfer from router
-   */
-  SendSwap = 'send_swap',
 }

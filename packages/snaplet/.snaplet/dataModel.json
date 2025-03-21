@@ -2964,6 +2964,78 @@
         }
       ]
     },
+    "liquidity_pools": {
+      "id": "public.liquidity_pools",
+      "schemaName": "public",
+      "tableName": "liquidity_pools",
+      "fields": [
+        {
+          "id": "public.liquidity_pools.pool_name",
+          "name": "pool_name",
+          "columnName": "pool_name",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.liquidity_pools.pool_type",
+          "name": "pool_type",
+          "columnName": "pool_type",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.liquidity_pools.pool_addr",
+          "name": "pool_addr",
+          "columnName": "pool_addr",
+          "type": "bytea",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.liquidity_pools.created_at",
+          "name": "created_at",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "liquidity_pools_pkey",
+          "fields": [
+            "pool_addr"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
     "mfa_amr_claims": {
       "id": "auth.mfa_amr_claims",
       "schemaName": "auth",
@@ -8088,6 +8160,50 @@
           "name": "sso_providers_pkey",
           "fields": [
             "id"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
+    "swap_routers": {
+      "id": "public.swap_routers",
+      "schemaName": "public",
+      "tableName": "swap_routers",
+      "fields": [
+        {
+          "id": "public.swap_routers.router_addr",
+          "name": "router_addr",
+          "columnName": "router_addr",
+          "type": "bytea",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.swap_routers.created_at",
+          "name": "created_at",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "swap_routers_pkey",
+          "fields": [
+            "router_addr"
           ],
           "nullNotDistinct": false
         }

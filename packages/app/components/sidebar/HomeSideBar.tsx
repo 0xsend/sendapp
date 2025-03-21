@@ -30,7 +30,6 @@ import { useUser } from 'app/utils/useUser'
 import { ReferralLink } from '../ReferralLink'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { useSendAccount } from 'app/utils/send-accounts'
-import { SWAP_ENABLED_USERS } from 'app/features/swap/constants'
 
 const links = [
   {
@@ -69,7 +68,10 @@ const links = [
 
 const HomeSideBar = ({ ...props }: YStackProps) => {
   const { data: sendAccount } = useSendAccount()
-  const isSwapEnabled = sendAccount?.id && SWAP_ENABLED_USERS.includes(sendAccount.id)
+
+  // this code can be removed then swaps are no longer behind whitelist
+  const swapEnabledUsers = (process.env.NEXT_PUBLIC_SWAP_ALLOWLIST ?? '').split(',')
+  const isSwapEnabled = sendAccount?.id && swapEnabledUsers.includes(sendAccount.id)
   const _links = isSwapEnabled ? links : links.filter((link) => link.href !== '/swap')
 
   return (

@@ -1,4 +1,4 @@
-import { SwapSummary } from 'app/features/swap/SwapSummary'
+import { SwapSummaryScreen } from '../../../../packages/app/features/swap/summary/screen'
 import { HomeLayout } from 'app/features/home/layout.web'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
@@ -11,7 +11,7 @@ export const Page: NextPageWithLayout = () => {
       <Head>
         <title>Send | Swap Summary</title>
       </Head>
-      <SwapSummary />
+      <SwapSummaryScreen />
     </>
   )
 }

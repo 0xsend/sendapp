@@ -22,7 +22,6 @@ import { convertBalanceToFiat } from 'app/utils/convertBalanceToUSD'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { useSendAccount } from 'app/utils/send-accounts'
-import { SWAP_ENABLED_USERS } from 'app/features/swap/constants'
 
 export function AnimateEnter({ children }: { children: React.ReactNode }) {
   return (
@@ -44,9 +43,10 @@ export function AnimateEnter({ children }: { children: React.ReactNode }) {
 export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
   const hoverStyles = useHoverStyles()
 
-  // this code can be removed as swaps are no longer behind white list
+  // this code can be removed as swaps are no longer behind whitelist
+  const swapEnabledUsers = (process.env.NEXT_PUBLIC_SWAP_ALLOWLIST ?? '').split(',')
   const { data: sendAccount } = useSendAccount()
-  const isSwapEnabled = sendAccount?.id && SWAP_ENABLED_USERS.includes(sendAccount.id)
+  const isSwapEnabled = sendAccount?.id && swapEnabledUsers.includes(sendAccount.id)
 
   const getSwapUrl = () => {
     if (coin?.symbol === sendCoin.symbol) {

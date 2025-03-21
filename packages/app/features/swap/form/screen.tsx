@@ -182,6 +182,7 @@ export const SwapFormScreen = () => {
           onSubmit={handleSubmit}
           props={{
             inAmount: {
+              testID: 'inAmountInput',
               fontSize: (() => {
                 switch (true) {
                   case formInAmount?.length > 16:
@@ -236,6 +237,7 @@ export const SwapFormScreen = () => {
               },
             },
             outAmount: {
+              testID: 'outAmountInput',
               fontSize: (() => {
                 switch (true) {
                   case formOutAmount?.length > 16:
@@ -277,6 +279,7 @@ export const SwapFormScreen = () => {
               fieldsetProps: {
                 width: '60%',
               },
+              disabled: true,
               pointerEvents: 'none',
               textOverflow: 'ellipsis',
             },
@@ -565,7 +568,7 @@ export const SwapFormScreen = () => {
   )
 }
 
-const SLIPPAGE_OPTIONS = [5, 10, 50, 100, 200]
+const SLIPPAGE_OPTIONS = [50, 100, 300]
 
 export const Slippage = ({
   slippage,
