@@ -13,6 +13,7 @@
       "@my/wagmi": ["./packages/wagmi/src"],
       "@my/wagmi/*": ["./packages/wagmi/src/*"],
       "@my/workflows/*": ["./packages/workflows/src/*"],
+      "@my/temporal/*": ["./packages/temporal/src/*"],
       "app/*": ["packages/app/*"]
     },
     "importHelpers": true,

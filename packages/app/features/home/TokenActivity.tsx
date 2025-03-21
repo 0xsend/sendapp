@@ -29,6 +29,7 @@ export const TokenActivity = ({ coin }: { coin: CoinWithBalance }) => {
   })
 
   const { data, isLoading, error } = tokenActivityFeedQuery
+
   const { pages } = data ?? {}
 
   if (isLoading) return <Spinner size="small" />

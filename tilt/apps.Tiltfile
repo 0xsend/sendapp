@@ -115,7 +115,9 @@ local_resource(
         "supabase",
         "supabase:generate",
         "wagmi:generate",
+        "temporal:build",
         "temporal",
+        "workflows:build",
     ],
     serve_cmd = "yarn workspace workers start",
     deps = ts_files(
