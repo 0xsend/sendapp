@@ -371,3 +371,65 @@ CREATE TRIGGER insert_referral_on_deposit
 AFTER INSERT ON public.send_earn_deposits
 FOR EACH ROW
 EXECUTE FUNCTION private.insert_referral_on_deposit();
+
+-- Create trigger function to insert referral relationship when a new affiliate is created
+CREATE OR REPLACE FUNCTION private.insert_referral_on_new_affiliate()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_referred_id UUID;
+  v_referrer_id UUID;
+  v_deposit_owner bytea;
+BEGIN
+  -- Find the referrer_id (the affiliate)
+  SELECT user_id INTO v_referrer_id
+  FROM send_accounts
+  WHERE address = lower(concat('0x', encode(NEW.affiliate, 'hex'::text)))::citext;
+
+  -- Skip if we can't find the referrer user
+  IF v_referrer_id IS NULL THEN
+    RETURN NEW;
+  END IF;
+
+  -- Find a deposit with the same transaction hash
+  SELECT owner INTO v_deposit_owner
+  FROM send_earn_deposits
+  WHERE tx_hash = NEW.tx_hash
+  LIMIT 1;
+
+  -- Skip if we can't find a deposit with the same transaction hash
+  IF v_deposit_owner IS NULL THEN
+    RETURN NEW;
+  END IF;
+
+  -- Find the referred_id (user who made the deposit)
+  SELECT user_id INTO v_referred_id
+  FROM send_accounts
+  WHERE address = lower(concat('0x', encode(v_deposit_owner, 'hex'::text)))::citext;
+
+  -- Skip if we can't find the referred user
+  IF v_referred_id IS NULL THEN
+    RETURN NEW;
+  END IF;
+
+  -- Check if this referral relationship already exists
+  IF NOT EXISTS (
+    SELECT 1 FROM referrals
+    WHERE referrer_id = v_referrer_id AND referred_id = v_referred_id
+  ) THEN
+    -- Insert the new referral relationship
+    INSERT INTO referrals (referrer_id, referred_id, created_at)
+    VALUES (v_referrer_id, v_referred_id, NOW());
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+-- Create trigger on send_earn_new_affiliate table
+CREATE TRIGGER insert_referral_on_new_affiliate
+AFTER INSERT ON public.send_earn_new_affiliate
+FOR EACH ROW
+EXECUTE FUNCTION private.insert_referral_on_new_affiliate();
