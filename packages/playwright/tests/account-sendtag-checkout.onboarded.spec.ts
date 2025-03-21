@@ -108,15 +108,13 @@ const checkReferralCodeVisibility = async (
   const refcode = checkoutPage.page.getByTestId('referral-code-input')
   const referralCodeConfirmation = checkoutPage.page.getByText('Referral code applied')
   await expect(refcode).toBeVisible()
-  await expect(refcode).toHaveValue(referrer.referral_code)
+  await expect(refcode).toHaveValue(referrer.tags[0] ?? referrer.referral_code)
   await expect(referralCodeConfirmation).toBeVisible()
 }
 
-const checkReferralCodeHidden = async (checkoutPage: CheckoutPage) => {
+const checkReferralCodeDisabled = async (checkoutPage: CheckoutPage) => {
   const refcode = checkoutPage.page.getByTestId('referral-code-input')
-  const referralCodeConfirmation = checkoutPage.page.getByText('Referral code applied')
-  await expect(refcode).toBeHidden()
-  await expect(referralCodeConfirmation).toBeHidden()
+  await expect(refcode).toBeDisabled()
 }
 
 const verifyCheckoutReceipt = async (
@@ -186,18 +184,20 @@ test('can refer a tag', async ({ seed, checkoutPage, supabase, user: { profile: 
 
   // check referral code and referrer are visible
   const refcode = checkoutPage.page.getByTestId('referral-code-input')
-  const referralCodeConfirmation = checkoutPage.page.getByText('Referral code applied')
-  await expect(refcode).toBeVisible()
-  await expect(refcode).toHaveValue(referrer.referral_code)
-  await expect(referralCodeConfirmation).toBeVisible()
+  await checkReferralCodeVisibility(checkoutPage, {
+    referral_code: referrer.referral_code,
+    tags: referrerTags,
+  })
   // can change the referral code
   await refcode.fill('1234567890')
   const referralCodeInvalid = checkoutPage.page.getByText('Invalid referral code')
   await expect(referralCodeInvalid).toBeVisible()
   // can change the referrer to valid code
   await refcode.fill(referrer.referral_code)
-  await expect(refcode).toBeVisible()
-  await expect(referralCodeConfirmation).toBeVisible()
+  await checkReferralCodeVisibility(checkoutPage, {
+    referral_code: referrer.referral_code,
+    tags: referrerTags,
+  })
 
   await confirmTags(checkoutPage, tagsToRegister)
   await verifyTagsInDatabase(supabase, tagsToRegister)
@@ -296,7 +296,7 @@ test('can refer multiple tags in separate transactions', async ({
   await checkoutPage.page.goto(`/?referral=${referrer.referral_code}`)
   await checkoutPage.goto()
 
-  await checkReferralCodeHidden(checkoutPage)
+  await checkReferralCodeDisabled(checkoutPage)
   // save current balance so we can verify the reward later
   const currentBalance = await lookupBalance({
     address: referrerSendAccount.address as `0x${string}`,

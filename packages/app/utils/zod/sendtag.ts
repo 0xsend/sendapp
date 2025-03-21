@@ -1,7 +1,7 @@
-import { formFields } from 'app/utils/SchemaForm'
 import { z } from 'zod'
+import { formFields } from '../SchemaForm'
 
-export const CheckoutTagSchema = z.object({
+export const SendtagSchema = z.object({
   name: formFields.text
     .min(1)
     .max(20)
