@@ -7,9 +7,16 @@ import type { ReactNode } from 'react'
 const queryClient = new QueryClient()
 
 const mockGetOnrampBuyUrl = getOnrampBuyUrl as jest.Mock
+const mockRouterPush = jest.fn()
 
 jest.mock('@coinbase/onchainkit/fund', () => ({
   getOnrampBuyUrl: jest.fn().mockReturnValue('https://example.com'),
+}))
+
+jest.mock('solito/router', () => ({
+  useRouter: () => ({
+    push: mockRouterPush,
+  }),
 }))
 
 describe('useCoinbaseOnramp', () => {
@@ -26,7 +33,8 @@ describe('useCoinbaseOnramp', () => {
   }
 
   beforeEach(() => {
-    window.open = jest.fn()
+    jest.clearAllMocks()
+    window.open = jest.fn().mockReturnValue({ closed: false })
     window.addEventListener = jest.fn()
     window.removeEventListener = jest.fn()
     Object.defineProperty(window, 'location', {
@@ -75,5 +83,62 @@ describe('useCoinbaseOnramp', () => {
     })
 
     expect(window.open).not.toHaveBeenCalled()
+  })
+
+  it('handles payment submitted status correctly', async () => {
+    // Mock window.open to return a popup that's not closed
+    const mockPopup = { closed: false }
+    window.open = jest.fn().mockReturnValue(mockPopup)
+
+    const { result } = renderHook(() => useCoinbaseOnramp(mockOnrampParams), { wrapper })
+
+    // Open the onramp
+    await act(async () => {
+      result.current.openOnramp(100)
+    })
+
+    // Simulate payment submitted message
+    await act(async () => {
+      // Get the event listener callback
+      const eventListenerCallback = (window.addEventListener as jest.Mock).mock.calls.find(
+        (call) => call[0] === 'message'
+      )[1]
+
+      // Call the event listener with a payment submitted message
+      eventListenerCallback({
+        origin: mockOrigin,
+        data: { type: 'COINBASE_ONRAMP_PENDING' },
+      })
+    })
+
+    // Status should now be payment_submitted
+    expect(result.current.status).toBe('payment_submitted')
+  })
+
+  it('handles successful transaction completion', async () => {
+    const { result } = renderHook(() => useCoinbaseOnramp(mockOnrampParams), { wrapper })
+
+    // Open the onramp
+    await act(async () => {
+      result.current.openOnramp(100)
+    })
+
+    // Simulate success message
+    await act(async () => {
+      // Get the event listener callback
+      const eventListenerCallback = (window.addEventListener as jest.Mock).mock.calls.find(
+        (call) => call[0] === 'message'
+      )[1]
+
+      // Call the event listener with a success message
+      eventListenerCallback({
+        origin: mockOrigin,
+        data: { type: 'COINBASE_ONRAMP_SUCCESS' },
+      })
+    })
+
+    // Status should now be success
+    expect(result.current.status).toBe('success')
+    expect(mockRouterPush).toHaveBeenCalledWith('/deposit/success')
   })
 })

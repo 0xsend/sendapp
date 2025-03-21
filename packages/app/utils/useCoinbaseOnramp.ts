@@ -1,9 +1,9 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { getOnrampBuyUrl } from '@coinbase/onchainkit/fund'
 import { useMutation } from '@tanstack/react-query'
 import { useRouter } from 'solito/router'
 
-type OnrampStatus = 'idle' | 'pending' | 'success' | 'failed'
+type OnrampStatus = 'idle' | 'pending_payment' | 'success' | 'failed' | 'payment_submitted'
 
 interface OnrampConfig {
   projectId: string
@@ -22,25 +22,28 @@ export function useCoinbaseOnramp({
   partnerUserId,
   defaultPaymentMethod = 'CARD',
 }: OnrampConfig) {
-  const [popup, setPopup] = useState<Window | null>(null)
+  const popupRef = useRef<Window | null>(null)
   const [popupChecker, setPopupChecker] = useState<NodeJS.Timeout | null>(null)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [paymentSubmitted, setPaymentSubmitted] = useState(false)
   const router = useRouter()
 
   const cleanup = useCallback(() => {
-    if (popup) {
-      popup.close()
+    if (popupRef.current) {
+      popupRef.current.close()
+      popupRef.current = null
     }
     if (popupChecker) {
       clearInterval(popupChecker)
+      setPopupChecker(null)
     }
-    setPopup(null)
-    setPopupChecker(null)
-  }, [popup, popupChecker])
+    setPaymentSubmitted(false)
+  }, [popupChecker])
 
   const mutation = useMutation<void, Error, OnrampParams>({
     mutationFn: async ({ amount }) => {
       console.log('[Onramp] Starting transaction for:', amount, 'USD')
+
       const onrampUrl = getOnrampBuyUrl({
         projectId,
         addresses: {
@@ -62,15 +65,22 @@ export function useCoinbaseOnramp({
         throw new Error('Popup was blocked. Please enable popups and try again.')
       }
 
-      setPopup(newPopup)
+      popupRef.current = newPopup
 
       return new Promise<void>((resolve, reject) => {
         const checker = setInterval(() => {
-          if (newPopup.closed) {
-            console.log('[Onramp] Transaction cancelled - popup closed by user')
-            clearInterval(checker)
-            setPopup(null)
+          if (!newPopup.closed) {
+            return
+          }
+          console.log('[Onramp] Popup closed by user.')
+          clearInterval(checker)
+          popupRef.current = null
+          // A user can close the tab and be in two states
+          // where the payment was made or not made.
+          if (!paymentSubmitted) {
             reject(new Error('Transaction cancelled'))
+          } else {
+            resolve()
           }
         }, 1000)
         setPopupChecker(checker)
@@ -103,9 +113,10 @@ export function useCoinbaseOnramp({
           mutation.reset()
           cleanup()
         }
+      } else if (event.data?.type === 'COINBASE_ONRAMP_PENDING') {
+        setPaymentSubmitted(true)
       }
     }
-
     window.addEventListener('message', handleMessage)
     return () => window.removeEventListener('message', handleMessage)
   }, [cleanup, router, mutation])
@@ -113,6 +124,7 @@ export function useCoinbaseOnramp({
   const openOnramp = useCallback(
     (amount: number) => {
       setIsSuccess(false)
+      setPaymentSubmitted(false)
       mutation.mutate({ amount })
     },
     [mutation]
@@ -127,17 +139,19 @@ export function useCoinbaseOnramp({
   const status: OnrampStatus = isSuccess
     ? 'success'
     : mutation.isPending
-      ? 'pending'
-      : mutation.isError
-        ? 'failed'
-        : 'idle'
+      ? 'pending_payment'
+      : paymentSubmitted
+        ? 'payment_submitted'
+        : mutation.isError
+          ? 'failed'
+          : 'idle'
 
   return {
     openOnramp,
     closeOnramp,
     status,
     error: mutation.error as Error | null,
-    isLoading: mutation.isPending || isSuccess,
+    isLoading: mutation.isPending || isSuccess || paymentSubmitted,
     isRedirecting: isSuccess,
   }
 }
