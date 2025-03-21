@@ -1,5 +1,5 @@
 BEGIN;
-SELECT plan(19);
+SELECT plan(21);
 
 -- Create the necessary extensions
 CREATE EXTENSION "basejump-supabase_test_helpers";
@@ -480,6 +480,95 @@ SELECT results_eq(
       AND referred_id = tests.get_supabase_uid('earn_user2')$$,
     $$VALUES (1)$$,
     'Only one referral should exist even after multiple deposits'
+);
+
+-- Test 14: Test the new trigger function insert_referral_on_new_affiliate
+-- First, delete any existing referrals and related activity for the test users
+DELETE FROM activity
+WHERE event_name = 'referrals'
+AND from_user_id = tests.get_supabase_uid('earn_affiliate');
+
+DELETE FROM referrals
+WHERE referrer_id = tests.get_supabase_uid('earn_affiliate')
+OR referred_id = tests.get_supabase_uid('earn_user1');
+
+-- Verify no referral exists
+SELECT is_empty(
+    $$SELECT * FROM referrals WHERE referrer_id = tests.get_supabase_uid('earn_affiliate')
+      AND referred_id = tests.get_supabase_uid('earn_user1')$$,
+    'No referral should exist initially for the new test'
+);
+
+-- Create a deposit with a unique transaction hash
+SELECT tests.authenticate_as_service_role();
+INSERT INTO send_earn_deposits (
+    chain_id,
+    log_addr,
+    block_time,
+    tx_hash,
+    sender,
+    owner,
+    assets,
+    shares,
+    ig_name,
+    src_name,
+    block_num,
+    tx_idx,
+    log_idx,
+    abi_idx
+) VALUES (
+    8453,
+    '\xEA5E000000000000000000000000000000000099',
+    floor(extract(EPOCH FROM timestamptz '2024-01-01 12:00:00')),
+    '\xABCDEF1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890', -- Unique tx_hash
+    '\x0000000000000000000000000000000000000000',
+    '\xEA5E000000000000000000000000000000000001', -- earn_user1
+    1000000,
+    1000000,
+    'send_earn_deposits',
+    'send_earn_deposits',
+    7,
+    0,
+    0,
+    0
+);
+
+-- Now create a new affiliate with the same transaction hash
+-- This should trigger insert_referral_on_new_affiliate and create a referral
+INSERT INTO send_earn_new_affiliate (
+    chain_id,
+    log_addr,
+    block_time,
+    tx_hash,
+    affiliate,
+    send_earn_affiliate,
+    ig_name,
+    src_name,
+    block_num,
+    tx_idx,
+    log_idx,
+    abi_idx
+) VALUES (
+    8453,
+    '\xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+    floor(extract(EPOCH FROM timestamptz '2024-01-01 12:00:00')),
+    '\xABCDEF1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890', -- Same tx_hash as the deposit
+    '\xAFF1000000000000000000000000000000000001', -- earn_affiliate
+    '\xAFF1000000000000000000000000000000000099',
+    'send_earn_new_affiliate',
+    'send_earn_new_affiliate',
+    7,
+    0,
+    0,
+    0
+);
+
+-- Verify the referral was created by the new trigger
+SELECT isnt_empty(
+    $$SELECT * FROM referrals
+      WHERE referrer_id = tests.get_supabase_uid('earn_affiliate')
+      AND referred_id = tests.get_supabase_uid('earn_user1')$$,
+    'A referral should be created when a new affiliate is created with the same transaction hash as a deposit'
 );
 
 SELECT * FROM finish();
