@@ -4,6 +4,7 @@ import type { Database } from '@my/supabase/database.types'
 import { type Locator, mergeTests, type Page } from '@playwright/test'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import debug from 'debug'
+import { EarnClaimPage } from './claim-page'
 
 const baseTest = mergeTests(sendAccountTest, snapletTest)
 
@@ -12,6 +13,7 @@ let log: debug.Debugger
 export const test = baseTest.extend<{
   earnDepositPage: EarnDepositPage
   earnWithdrawPage: EarnWithdrawPage
+  earnClaimPage: EarnClaimPage
 }>({
   earnDepositPage: async ({ page }, use) => {
     log = debug(`test:earn:deposit:${test.info().parallelIndex}`)
@@ -24,6 +26,12 @@ export const test = baseTest.extend<{
     log('creating sendEarnWithdrawPage')
     const sendEarnWithdrawPage = new EarnWithdrawPage(page)
     await use(sendEarnWithdrawPage)
+  },
+  earnClaimPage: async ({ page }, use) => {
+    log = debug(`test:earn:claim:${test.info().parallelIndex}`)
+    log('creating sendEarnClaimPage')
+    const sendEarnClaimPage = new EarnClaimPage(page)
+    await use(sendEarnClaimPage)
   },
 })
 
@@ -238,6 +246,7 @@ export class EarnWithdrawPage {
             .select('log_addr, owner, shares::text, assets::text')
             .eq('type', 'withdraw')
             .order('block_time', { ascending: false })
+            .limit(1)
             .single()
 
           if (error) {
@@ -264,6 +273,9 @@ export class EarnWithdrawPage {
 /**
  * @dev copy-pasted from 'app/features/earn/params.ts' since playwright can't handle importing solito correctly
  */
-function coinToParam(coin: { symbol: string }): string {
+export function coinToParam(coin: { symbol: string }): string {
   return coin.symbol.toLowerCase()
 }
+
+// Export the EarnClaimPage for use in tests
+export { EarnClaimPage }

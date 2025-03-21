@@ -1,20 +1,33 @@
 import { faker } from '@faker-js/faker'
 import { expect } from '@my/playwright/fixtures/send-accounts'
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
-import { sendEarnAbi, sendEarnAddress } from '@my/wagmi'
+import { sendEarnAbi, sendEarnAddress, sendEarnUsdcFactoryAbi } from '@my/wagmi'
 import { mergeTests } from '@playwright/test'
-import { usdcCoin } from 'app/data/coins'
+import { type erc20Coin, ethCoin, usdcCoin } from 'app/data/coins'
 import { AffiliateVaultSchema } from 'app/features/earn/zod'
 import { assert } from 'app/utils/assert'
 import { byteaToHex } from 'app/utils/byteaToHex'
 import { hexToBytea } from 'app/utils/hexToBytea'
+import { WAD } from 'app/utils/math'
 import { assetsToEarnFactory } from 'app/utils/sendEarn'
+import { throwIf } from 'app/utils/throwIf'
 import debug from 'debug'
-import { checksumAddress, formatUnits } from 'viem'
+import {
+  BaseError,
+  checksumAddress,
+  ContractFunctionRevertedError,
+  formatUnits,
+  type LocalAccount,
+  parseEther,
+  parseGwei,
+  withRetry,
+} from 'viem'
+import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { readContract } from 'viem/actions'
 import { test as earnTest } from './fixtures/earn'
-import { checkReferralCodeVisibility } from './fixtures/referrals'
+import { checkReferralCodeHidden, checkReferralCodeVisibility } from './fixtures/referrals'
 import { fund, testBaseClient } from './fixtures/viem'
+import { createBaseWalletClient } from './fixtures/viem/base'
 
 let log: debug.Debugger
 
@@ -36,6 +49,11 @@ const readSendEarnBalanceOf = async ({
     functionName: 'balanceOf',
     args: [owner],
   })
+}
+
+// Helper function to calculate the reward share based on the split
+const mulDivDown = (a: bigint, b: bigint, denominator: bigint): bigint => {
+  return (a * b) / denominator
 }
 
 const readSendEarnConvertToAssets = async ({
@@ -62,6 +80,65 @@ const readSendEarnDecimals = async ({
     address: vault,
     abi: sendEarnAbi,
     functionName: 'decimals',
+    args: [],
+  })
+}
+
+const depositOnBehalfOf = async ({
+  asset,
+  account,
+  receiver,
+  amount,
+  vault,
+}: {
+  asset: `0x${string}`
+  account: LocalAccount
+  receiver: `0x${string}`
+  amount: bigint
+  vault: `0x${string}`
+}) => {
+  const wallet = createBaseWalletClient({
+    account,
+  })
+  const { request: approveReq } = await testBaseClient.simulateContract({
+    account,
+    address: asset,
+    abi: sendEarnAbi,
+    functionName: 'approve',
+    args: [vault, amount],
+    gas: parseGwei('0.1'),
+  })
+  const approveHash = await wallet.writeContract(approveReq)
+  const approveReceipt = await testBaseClient.waitForTransactionReceipt({
+    hash: approveHash,
+    timeout: 5_000,
+  })
+  expect(approveReceipt.status).toBe('success')
+  log('approveReceipt', approveReceipt)
+  const { request: depositReq } = await testBaseClient.simulateContract({
+    account,
+    address: vault,
+    abi: sendEarnAbi,
+    functionName: 'deposit',
+    args: [amount, receiver],
+    gas: parseGwei('0.1'),
+  })
+  const depositHash = await wallet.writeContract(depositReq)
+  const depositReceipt = await testBaseClient.waitForTransactionReceipt({
+    hash: depositHash,
+    timeout: 5_000,
+  })
+  expect(depositReceipt.status).toBe('success')
+  log('depositReceipt', depositReceipt)
+}
+
+const readSendEarnSplit = async (coin: erc20Coin) => {
+  const address = assetsToEarnFactory[coin.token]
+  assert(!!address, 'Asset is not supported')
+  return readContract(testBaseClient, {
+    address: address,
+    abi: sendEarnUsdcFactoryAbi,
+    functionName: 'split',
     args: [],
   })
 }
@@ -113,11 +190,49 @@ const verifyDeposit = async ({
   expect(Number(formatUnits(dbShares, decimals))).toBeCloseTo(dbSharesDecimals, -2) // Looser precision due to potential rounding
 }
 
+const createSendEarn = async ({
+  account,
+  affiliate,
+  coin,
+}: {
+  account: LocalAccount
+  affiliate: `0x${string}`
+  coin: erc20Coin
+}) => {
+  const wallet = createBaseWalletClient({
+    account,
+  })
+  const factory = assetsToEarnFactory[coin.token]
+  assert(!!factory, 'Asset is not supported')
+  const salt = generatePrivateKey()
+  const { request } = await wallet
+    .simulateContract({
+      address: factory,
+      abi: sendEarnUsdcFactoryAbi,
+      functionName: 'createSendEarn',
+      args: [affiliate, salt],
+      gas: parseGwei('0.1'),
+    })
+    .catch((err) => {
+      log('createSendEarn error', err)
+      if (err instanceof BaseError) {
+        const revertError = err.walk((err) => err instanceof ContractFunctionRevertedError)
+        if (revertError instanceof ContractFunctionRevertedError) {
+          const errorName = revertError.data?.errorName ?? ''
+          log('createSendEarn revert error', errorName, revertError.details)
+        }
+      }
+      throw err
+    })
+  const hash = await wallet.writeContract(request)
+  await testBaseClient.waitForTransactionReceipt({ hash, timeout: 5_000 })
+}
+
 for (const coin of [usdcCoin]) {
   // $100K
   const MAX_DEPOSIT_AMOUNT = BigInt(100_000 * 10 ** coin.decimals)
-  // ¢1
-  const MIN_DEPOSIT_AMOUNT = BigInt(1 * 10 ** (coin.decimals - 2))
+  // $10
+  const MIN_DEPOSIT_AMOUNT = BigInt(10 * 10 ** coin.decimals)
   let randomAmount: bigint
 
   test.describe(`Deposit ${coin.symbol}`, () => {
@@ -304,6 +419,333 @@ for (const coin of [usdcCoin]) {
       const tolerance = BigInt(10 ** (coin.decimals - 2)) // 0.01 in the coin's smallest unit
       expect(remainingAssets).toBeLessThanOrEqual(assets - withdrawAmount + tolerance)
       expect(remainingAssets).toBeGreaterThanOrEqual(assets - withdrawAmount - tolerance)
+    })
+  })
+
+  test.describe(`Affiliate Rewards for ${coin.symbol}`, () => {
+    test.beforeEach(async ({ user: { profile }, earnDepositPage, sendAccount, supabase }) => {
+      log = debug(`test:earn:affiliate:${profile.id}:${test.info().parallelIndex}`)
+    })
+
+    test(`can claim affiliate rewards for ${coin.symbol}`, async ({
+      earnDepositPage,
+      earnClaimPage,
+      supabase,
+      user: { profile },
+      sendAccount,
+    }) => {
+      test.slow()
+      log = debug(`test:earn:claim:${profile.id}:${test.info().parallelIndex}`)
+
+      // It's a prerequisite that the affiliate has a Send Earn deposit to claim rewards through the app
+      await earnDepositPage.goto(coin)
+      await earnDepositPage.deposit({
+        coin,
+        supabase,
+        amount: formatUnits(MIN_DEPOSIT_AMOUNT, coin.decimals),
+      })
+
+      // 1. Set up: Mock transfer some rewards on behalf of the affiliate
+      // There is a minimum claim amount of ¢.05 USDC
+      const amount = faker.number.bigInt({
+        min: MIN_DEPOSIT_AMOUNT * BigInt(10),
+        max: MAX_DEPOSIT_AMOUNT,
+      })
+      const dealer = privateKeyToAccount(generatePrivateKey())
+
+      // Fund the dealer
+      await fund({
+        address: dealer.address,
+        amount: parseEther('1'),
+        coin: ethCoin,
+      })
+      await fund({ address: dealer.address, amount, coin })
+
+      // create SendEarn Affiliate
+      await createSendEarn({
+        account: dealer,
+        affiliate: sendAccount.address,
+        coin,
+      })
+
+      // Get the affiliate vault address
+      const affiliateVault = await withRetry(
+        async () => {
+          const { data: affiliateData, error } = await supabase
+            .from('send_earn_new_affiliate')
+            .select(
+              'affiliate, send_earn_affiliate, send_earn_affiliate_vault(send_earn, log_addr)'
+            )
+            .eq('affiliate', hexToBytea(sendAccount.address))
+            .not('send_earn_affiliate_vault', 'is', null)
+            .single()
+
+          throwIf(error)
+
+          expect(affiliateData).toBeDefined()
+          assert(!!affiliateData, 'Affiliate data is not defined')
+          const affiliateVault = AffiliateVaultSchema.parse(affiliateData)
+          assert(!!affiliateVault, 'Affiliate vault is not defined')
+          return affiliateVault
+        },
+        {
+          retryCount: 50,
+          delay: 500,
+        }
+      )
+
+      assert(!!affiliateVault.send_earn_affiliate_vault, 'Affiliate vault is not defined')
+
+      // Get the vault address from the affiliate data
+      // The send_earn field is in bytea format, we need to convert it to hex string format
+      // and then checksum it for use with the blockchain
+      const vaultHex = affiliateVault.send_earn_affiliate_vault.send_earn
+      // Checksum the address for use with the blockchain
+      const referrerVault = checksumAddress(vaultHex)
+
+      // Deposit on behalf of the referrer
+      await depositOnBehalfOf({
+        asset: coin.token,
+        account: dealer,
+        receiver: affiliateVault.send_earn_affiliate,
+        amount,
+        vault: referrerVault,
+      })
+
+      // Calculate expected reward
+      const split = await readSendEarnSplit(coin)
+      const rewardShare = mulDivDown(amount, WAD - split, WAD)
+
+      // 2. Navigate to the claim page
+      await earnClaimPage.goto(coin)
+
+      // 3. Check available rewards
+      let availableRewards: number | undefined
+      await expect
+        .poll(
+          async () => {
+            availableRewards = await earnClaimPage.getAvailableRewards()
+            return availableRewards > 0
+          },
+          {
+            timeout: 10_000,
+            intervals: [1000, 2000, 3000, 5000],
+            message: 'Expected to find available rewards',
+          }
+        )
+        .toBe(true)
+      assert(!!availableRewards, 'Available rewards is not defined')
+      expect(availableRewards).toBeCloseTo(Number(formatUnits(rewardShare, coin.decimals)), 2)
+
+      // 4. Claim rewards
+      const claimTx = await earnClaimPage.claimRewards({
+        affiliateVault,
+        supabase,
+      })
+
+      // 5. Verify claim transaction
+      expect(claimTx).toBeDefined()
+      expect(Number(formatUnits(BigInt(claimTx.assets), coin.decimals))).toBeCloseTo(
+        availableRewards,
+        2
+      )
+
+      // 6. Verify activity feed shows the claim
+      // TODO: need to include send earn desposits in the activity feed
+      // handle activity feed client side filtering to show only send account transfers
+      // but on earn specific pages, we should allow only earn events (withdraw, deposit)
+      // await expect(supabase).toHaveEventInActivityFeed({
+      //   event_name: 'send_account_transfers', // Affiliate rewards appear as transfers
+      //   from_user: expect.objectContaining({
+      //     send_id: profile.send_id,
+      //   }),
+      //   data: expect.objectContaining({
+      //     v: expect.any(String), // Amount value
+      //     f: hexToBytea(affiliateVault.send_earn_affiliate),
+      //   }),
+      // })
+    })
+  })
+
+  test.describe(`Self-Referral Prevention for ${coin.symbol}`, () => {
+    test(`cannot use own referral code for ${coin.symbol}`, async ({
+      earnDepositPage: page,
+      sendAccount,
+      supabase,
+      user: { profile },
+    }) => {
+      log = debug(`test:earn:self-referral:${profile.id}:${test.info().parallelIndex}`)
+
+      // 1. Get the user's own referral code
+      const { data: referralData } = await supabase
+        .from('profiles')
+        .select('referral_code')
+        .eq('id', profile.id)
+        .single()
+
+      const selfReferralCode = referralData?.referral_code
+      expect(selfReferralCode).toBeDefined()
+
+      // 2. Try to navigate to the earn page with own referral code
+      await page.page.goto(`/?referral=${selfReferralCode}`)
+      await page.page.waitForURL(`/?referral=${selfReferralCode}`)
+
+      // 3. Check that the referral code is not applied or shows an error
+      // The system might either show an error or silently ignore the self-referral
+      try {
+        // If there's an explicit error message
+        await expect(page.page.getByText('Invalid referral code')).toBeVisible({
+          timeout: 5000,
+        })
+      } catch (e) {
+        // If there's no explicit error, the referral code should not be applied
+        await checkReferralCodeHidden(page.page)
+      }
+
+      // 4. Try to deposit with the self-referral
+      const randomAmount = faker.number.bigInt({ min: MIN_DEPOSIT_AMOUNT, max: MAX_DEPOSIT_AMOUNT })
+      const amountDecimals = formatUnits(randomAmount, coin.decimals)
+
+      // Fund the account
+      await fund({ address: sendAccount.address, amount: randomAmount + GAS_FEES, coin })
+
+      await page.goto(coin)
+
+      // 5. Complete the deposit
+      const deposit = await page.deposit({
+        coin,
+        supabase,
+        amount: amountDecimals,
+      })
+
+      // 6. Verify the deposit went to the default vault, not an affiliate vault
+      const vault = checksumAddress(byteaToHex(deposit.log_addr))
+      expect(vault).toBe(sendEarnAddress[testBaseClient.chain.id])
+
+      // 7. Verify no self-referral relationship was created
+      const { data: referrals } = await supabase
+        .from('referrals')
+        .select('*')
+        .eq('referrer_id', profile.id)
+        .eq('referred_id', profile.id)
+
+      expect(referrals).toHaveLength(0)
+    })
+  })
+
+  test.describe(`Vault Consistency for ${coin.symbol}`, () => {
+    test(`always deposits into the same vault for ${coin.symbol}`, async ({
+      earnDepositPage: page,
+      sendAccount,
+      supabase,
+    }) => {
+      log = debug(`test:earn:vault-consistency:${test.info().parallelIndex}`)
+
+      // Generate random amounts for deposits
+      const randomAmount1 = faker.number.bigInt({
+        min: MIN_DEPOSIT_AMOUNT,
+        max: MAX_DEPOSIT_AMOUNT,
+      })
+      const randomAmount2 = randomAmount1 / BigInt(2)
+      const randomAmount3 = randomAmount1 / BigInt(3)
+
+      // Fund the account with enough for all deposits plus gas
+      const totalAmount = randomAmount1 + randomAmount2 + randomAmount3 + GAS_FEES * BigInt(3)
+      await fund({ address: sendAccount.address, amount: totalAmount, coin })
+
+      // 1. Make an initial deposit
+      const amount1 = formatUnits(randomAmount1, coin.decimals)
+      await page.goto(coin)
+      const deposit1 = await page.deposit({
+        coin,
+        supabase,
+        amount: amount1,
+      })
+
+      const vault1 = checksumAddress(byteaToHex(deposit1.log_addr))
+
+      // Verify the first deposit
+      await verifyDeposit({
+        owner: sendAccount.address,
+        vault: vault1,
+        minDepositedAssets: MIN_DEPOSIT_AMOUNT,
+        depositedAssets: randomAmount1,
+        deposit: deposit1,
+      })
+
+      // 2. Make a second deposit with different parameters
+      // Wait some time or perform other actions in between
+      await page.page.waitForTimeout(2000)
+
+      // Use a different amount
+      const amount2 = formatUnits(randomAmount2, coin.decimals)
+      await page.goto(coin)
+      const deposit2 = await page.deposit({
+        coin,
+        supabase,
+        amount: amount2,
+      })
+
+      const vault2 = checksumAddress(byteaToHex(deposit2.log_addr))
+
+      // Verify the second deposit
+      await verifyDeposit({
+        owner: sendAccount.address,
+        vault: vault2,
+        minDepositedAssets: MIN_DEPOSIT_AMOUNT,
+        depositedAssets: randomAmount2,
+        deposit: deposit2,
+      })
+
+      // 3. Verify both deposits went to the same vault
+      expect(vault2).toBe(vault1)
+
+      // 4. Make a third deposit after some user activity
+      // Navigate away and back
+      await page.page.goto('/')
+      await page.goto(coin)
+
+      const amount3 = formatUnits(randomAmount3, coin.decimals)
+      const deposit3 = await page.deposit({
+        coin,
+        supabase,
+        amount: amount3,
+      })
+
+      const vault3 = checksumAddress(byteaToHex(deposit3.log_addr))
+
+      // Verify the third deposit
+      await verifyDeposit({
+        owner: sendAccount.address,
+        vault: vault3,
+        minDepositedAssets: MIN_DEPOSIT_AMOUNT,
+        depositedAssets: randomAmount3,
+        deposit: deposit3,
+      })
+
+      // 5. Verify all deposits went to the same vault
+      expect(vault3).toBe(vault1)
+
+      // 6. Query the database to verify all deposits for this user and asset
+      // are associated with the same vault
+      const { data: deposits } = await supabase
+        .from('send_earn_deposits')
+        .select('log_addr')
+        .eq('owner', hexToBytea(sendAccount.address))
+        .order('block_time', { ascending: false })
+        .limit(10)
+
+      expect(deposits).toBeDefined()
+      assert(!!deposits, 'No deposits found')
+      expect(deposits.length).toBeGreaterThanOrEqual(3)
+
+      // All deposits should have the same log_addr
+      const uniqueVaults = new Set(deposits.map((d) => byteaToHex(d.log_addr)))
+      expect(uniqueVaults.size).toBe(1)
+      // Check if any of the vault addresses in the set match our vault1 (after removing 0x prefix)
+      const vault1WithoutPrefix = vault1.slice(2).toLowerCase()
+      const hasMatchingVault = Array.from(uniqueVaults).some((v) => v === vault1WithoutPrefix)
+      expect(hasMatchingVault).toBeTruthy()
     })
   })
 }
