@@ -1,13 +1,15 @@
 import { baseMainnet } from '@my/wagmi/chains'
 import {
-  http,
   createPublicClient,
   createTestClient,
+  createWalletClient,
+  http,
   publicActions,
-  type PublicClient,
-  type PublicActions,
-  type TestClient,
   type HttpTransport,
+  type PublicActions,
+  type PublicClient,
+  type TestClient,
+  type LocalAccount,
 } from 'viem'
 
 if (!process.env.NEXT_PUBLIC_BASE_RPC_URL) {
@@ -26,3 +28,11 @@ export const baseMainnetClient = createPublicClient({
   chain: baseMainnet,
   transport: http(NEXT_PUBLIC_BASE_RPC_URL),
 }) as PublicClient<HttpTransport, typeof baseMainnet>
+
+export function createBaseWalletClient({ account }: { account: LocalAccount }) {
+  return createWalletClient({
+    account,
+    chain: baseMainnet,
+    transport: http(NEXT_PUBLIC_BASE_RPC_URL),
+  }).extend(publicActions)
+}

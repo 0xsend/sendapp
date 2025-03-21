@@ -364,6 +364,7 @@ const TotalRewards = ({ rewards, isLoading, coin }: TotalRewardsProps = {}) => {
           </XStack>
           <YStack gap={'$2'}>
             <Paragraph
+              testID={'availableRewards'}
               fontWeight={'500'}
               size={(() => {
                 switch (true) {

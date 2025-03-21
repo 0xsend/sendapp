@@ -3,7 +3,10 @@ export { testMainnetClient } from './mainnet'
 import { expect } from '@playwright/test'
 import { isEthCoin, type coin } from 'app/data/coins'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
+import debug from 'debug'
 import { testBaseClient } from './base'
+
+const log = debug('sendapp:tests:viem')
 
 /**
  * Lookup the balance of the given address for the given token
@@ -48,7 +51,7 @@ export async function fund({
       address: address,
       value: amount,
     })
-    expect(await testBaseClient.getBalance({ address: address })).toBe(amount)
+    expect(await testBaseClient.getBalance({ address })).toBe(amount)
   } else {
     await setERC20Balance({
       client: testBaseClient,
