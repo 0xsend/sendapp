@@ -35,18 +35,9 @@ export function useTokenActivityFeed(params: {
     let query = supabase.from('activity_feed').select('*')
 
     if (address) {
-      query = query
-        .in('event_name', [Events.SendAccountTransfers, Events.SendSwap])
-        .eq('data->>log_addr', address)
+      query = query.eq('event_name', Events.SendAccountTransfers).eq('data->>log_addr', address)
     } else {
-      query = query.or(
-        squish(`
-          event_name.eq.${Events.SendAccountReceive},
-          and(
-              event_name.eq.${Events.SendSwap},
-              data->>log_addr.eq.eth)
-          `)
-      )
+      query = query.eq('event_name', Events.SendAccountReceive)
     }
 
     const paymasterAddresses = Object.values(tokenPaymasterAddress)

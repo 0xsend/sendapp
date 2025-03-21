@@ -33,6 +33,12 @@ const dryRun = process.env.DRY !== '0'
 
   console.log('Snaplet seeding database.')
 
+  await seed.swap_routers([
+    {
+      router_addr: Buffer.from('0xc7d3ab410d49b664d03fe5b1038852ac852b1b29'),
+    },
+  ])
+
   await seed.users([
     {
       phone: '17777777777',

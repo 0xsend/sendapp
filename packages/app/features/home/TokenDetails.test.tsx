@@ -6,14 +6,17 @@ import { act, render, screen } from '@testing-library/react-native'
 
 jest.mock('app/features/home/utils/useTokenActivityFeed')
 
-// this mock can be removed as swaps are no longer behind white list
+// this mock can be removed when swaps are no longer behind white list
 jest.mock('app/utils/send-accounts', () => ({
   useSendAccount: jest.fn().mockReturnValue({ data: { id: 'mock-user-id' } }),
 }))
 
-// this mock can be removed as swaps are no longer behind white list
-jest.mock('app/features/swap/constants', () => ({
-  SWAP_ENABLED_USERS: ['mock-user-id'],
+jest.mock('app/utils/useSwapRouters', () => ({
+  useSwapRouters: jest.fn().mockReturnValue({ data: [] }),
+}))
+
+jest.mock('app/utils/useLiquidityPools', () => ({
+  useLiquidityPools: jest.fn().mockReturnValue({ data: [] }),
 }))
 
 jest.mock('app/utils/useTokenPrices', () => ({
@@ -25,6 +28,20 @@ jest.mock('app/utils/useTokenPrices', () => ({
 }))
 
 describe('TokenDetails', () => {
+  let originalSwapAllowlist: string
+
+  // can be removed when swaps are no longer behind white list
+  beforeAll(() => {
+    originalSwapAllowlist = process.env.NEXT_PUBLIC_SWAP_ALLOWLIST
+
+    process.env.NEXT_PUBLIC_SWAP_ALLOWLIST = 'mock-user-id'
+  })
+
+  // can be removed when swaps are no longer behind white list
+  afterAll(() => {
+    process.env.NEXT_PUBLIC_SWAP_ALLOWLIST = originalSwapAllowlist
+  })
+
   beforeEach(() => {
     jest.useFakeTimers()
     jest.setSystemTime(new Date('2025-01-28'))

@@ -22,29 +22,6 @@ export const mockReceivedTransfer = {
   },
 }
 
-export const mockSwap = {
-  created_at: '2025-03-18T13:36:07.15651+00:00',
-  event_name: 'send_swap',
-  from_user: null,
-  to_user: {
-    id: '97476407-bf7f-4ebe-86aa-c9d18a0b388a',
-    name: null,
-    avatar_url: null,
-    send_id: 65244,
-    tags: ['asdf', 'teq', 'yuw'],
-  },
-  data: {
-    f: '\\x6131b5fae19ea4f9d964eac0408e4408b66337b5',
-    t: '\\x760e2928c3aa3af87897be52eb4833d42bbb27cf',
-    v: 555555,
-    tx_hash: '\\xf1443b5abd14e6212dda2d9f5ff1d1d691599de3e8fa019ccc19b909d9bb46a4',
-    log_addr: '\\x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
-    block_num: '15164541',
-    tx_idx: '0',
-    log_idx: '2',
-  },
-}
-
 export const mockSentTransfer = {
   created_at: '2024-05-27T13:36:07.15651+00:00',
   event_name: 'send_account_transfers',
@@ -73,6 +50,74 @@ export const mockSentTransfer = {
     log_idx: '2',
   },
 }
+
+export const mockSwapSellErc20Transfer = {
+  created_at: '2025-03-21T13:36:07.15651+00:00',
+  event_name: 'send_account_transfers',
+  from_user: {
+    id: '97476407-bf7f-4ebe-86aa-c9d18a0b388a',
+    name: null,
+    avatar_url: null,
+    send_id: 65244,
+    tags: ['asdf', 'teq', 'yuw'],
+  },
+  to_user: null,
+  data: {
+    f: '\\x760e2928c3aa3af87897be52eb4833d42bbb27cf',
+    t: '\\x69bc1d350fe13f499c6aeded2c5ea9471b2a599a',
+    v: 55555,
+    tx_hash: '\\xf1443b5abd14e6212dda2d9f5ff1d1d691599de3e8fa019ccc19b909d9bb46a4',
+    log_addr: '\\x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+    block_num: '15164541',
+    tx_idx: '0',
+    log_idx: '2',
+  },
+}
+
+export const mockSwapBuyErc20Transfer = {
+  created_at: '2025-03-21T14:36:07.15651+00:00',
+  event_name: 'send_account_transfers',
+  from_user: null,
+  to_user: {
+    id: '97476407-bf7f-4ebe-86aa-c9d18a0b388a',
+    name: null,
+    avatar_url: null,
+    send_id: 65244,
+    tags: ['asdf', 'teq', 'yuw'],
+  },
+  data: {
+    f: '\\x6131b5fae19ea4f9d964eac0408e4408b66337b5',
+    t: '\\x760e2928c3aa3af87897be52eb4833d42bbb27cf',
+    v: 66666,
+    tx_hash: '\\xf1443b5abd14e6212dda2d9f5ff1d1d691599de3e8fa019ccc19b909d9bb46a4',
+    log_addr: '\\x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+    block_num: '15164541',
+    tx_idx: '0',
+    log_idx: '2',
+  },
+}
+
+export const mockSwapBuyEthTransfer = {
+  created_at: '2024-06-12T00:31:48+00:00',
+  event_name: 'send_account_receives',
+  from_user: null,
+  to_user: {
+    id: '97476407-bf7f-4ebe-86aa-c9d18a0b388a',
+    name: null,
+    avatar_url: null,
+    send_id: 65244,
+    tags: ['asdf', 'teq', 'yuw'],
+  },
+  data: {
+    value: '10000000000000000',
+    sender: '\\x6131b5fae19ea4f9d964eac0408e4408b66337b5',
+    tx_idx: '0',
+    log_idx: '0',
+    tx_hash: '\\xeec33cc50042cbba53fc1de714bd99b206635f890dbe29771c7986df6da0f6af',
+    log_addr: '\\xb2c21f54653531aa4affa80f63593913f0c70628',
+    block_num: '15681483',
+  },
+} as const
 
 export const mockTagReceipt = {
   created_at: '2024-05-26T19:41:05.370+00:00',

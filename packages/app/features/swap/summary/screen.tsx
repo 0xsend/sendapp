@@ -16,14 +16,16 @@ import { useRouter } from 'solito/router'
 import { useQueryClient } from '@tanstack/react-query'
 import { DEFAULT_SLIPPAGE, SWAP_ROUTE_SUMMARY_QUERY_KEY } from 'app/features/swap/constants'
 import { baseMainnet } from '@my/wagmi'
+import { useLiquidityPools } from 'app/utils/useLiquidityPools'
+import { useSwapRouters } from 'app/utils/useSwapRouters'
 
-export const SwapSummary = () => {
+export const SwapSummaryScreen = () => {
   const router = useRouter()
   const [swapParams] = useSwapScreenParams()
   const { isLoading: isLoadingCoins } = useCoins()
   const { outToken, inToken, inAmount, slippage } = swapParams
-  const { coin: inCoin } = useCoin(inToken)
   const { coin: outCoin } = useCoin(outToken)
+  const { coin: inCoin } = useCoin(inToken)
   const { coin: usdc } = useCoin('USDC')
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
   const { tokensQuery, ethQuery } = useCoinFromSendTokenParam()
@@ -116,8 +118,13 @@ export const SwapSummary = () => {
         webauthnCreds,
       })
 
-      await tokensQuery.refetch()
-      await ethQuery.refetch()
+      await Promise.all([
+        tokensQuery.refetch(),
+        ethQuery.refetch(),
+        queryClient.refetchQueries({ queryKey: [useLiquidityPools.queryKey] }),
+        queryClient.refetchQueries({ queryKey: [useSwapRouters.queryKey] }),
+      ])
+
       router.push(`/?token=${outCoin?.token}`)
     } catch (e) {
       console.error(e)
@@ -160,6 +167,7 @@ export const SwapSummary = () => {
                 <EditButton />
               </XStack>
               <Paragraph
+                testID={'swapInAmount'}
                 width={'100%'}
                 ff={'$mono'}
                 whiteSpace={'nowrap'}
@@ -189,6 +197,7 @@ export const SwapSummary = () => {
                 <EditButton />
               </XStack>
               <Paragraph
+                testID={'swapOutAmount'}
                 width={'100%'}
                 ff={'$mono'}
                 whiteSpace={'nowrap'}
@@ -267,7 +276,11 @@ export const SwapSummary = () => {
       </YStack>
       <Button
         theme={
-          (!hasEnoughGas || !hasEnoughBalance) && !encodeRouteError && !userOpError
+          (!hasEnoughGas || !hasEnoughBalance) &&
+          !isEncodeRouteLoading &&
+          !isLoadingUserOp &&
+          !encodeRouteError &&
+          !userOpError
             ? 'red_alt1'
             : 'green'
         }
@@ -279,7 +292,11 @@ export const SwapSummary = () => {
       >
         {(() => {
           switch (true) {
-            case !hasEnoughBalance && !encodeRouteError && !userOpError:
+            case !hasEnoughBalance &&
+              !isEncodeRouteLoading &&
+              !isLoadingUserOp &&
+              !encodeRouteError &&
+              !userOpError:
               return (
                 <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'}>
                   insufficient balance

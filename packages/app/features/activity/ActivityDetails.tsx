@@ -9,7 +9,12 @@ import {
   H4,
   type StackProps,
 } from '@my/ui'
-import { phraseFromActivity, amountFromActivity, subtextFromActivity } from 'app/utils/activity'
+import {
+  phraseFromActivity,
+  amountFromActivity,
+  subtextFromActivity,
+  isActivitySwapTransfer,
+} from 'app/utils/activity'
 import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
 import { IconX } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
@@ -18,7 +23,8 @@ import {
   isSendtagCheckoutEvent,
   isSendTokenUpgradeEvent,
 } from 'app/utils/zod/activity/SendAccountTransfersEventSchema'
-import { isSendSwapEvent } from 'app/utils/zod/activity/SendSwapEventSchema'
+import { useSwapRouters } from 'app/utils/useSwapRouters'
+import { useLiquidityPools } from 'app/utils/useLiquidityPools'
 
 export const ActivityDetails = ({
   activity,
@@ -28,8 +34,10 @@ export const ActivityDetails = ({
   activity: Activity
   onClose: () => void
 } & StackProps) => {
-  const activityText = phraseFromActivity(activity)
-  const subText = subtextFromActivity(activity)
+  const { data: swapRouters } = useSwapRouters()
+  const { data: liquidityPools } = useLiquidityPools()
+  const activityText = phraseFromActivity(activity, swapRouters, liquidityPools)
+  const subText = subtextFromActivity(activity, swapRouters, liquidityPools)
   const amount = amountFromActivity(activity)
 
   return (
@@ -59,23 +67,21 @@ export const ActivityDetails = ({
                     size: '$7',
                   }}
                 >
-                  <Text>{subText}</Text> {(() => {
+                  {(() => {
+                    switch (true) {
+                      case isActivitySwapTransfer(activity, swapRouters, liquidityPools):
+                        return <Text>{activityText}</Text>
+                      default:
+                        return <Text>{subText}</Text>
+                    }
+                  })()} {(() => {
                     switch (true) {
                       case isSendtagCheckoutEvent(activity):
                         return null
                       case isSendTokenUpgradeEvent(activity):
                         return null
-                      case isSendSwapEvent(activity):
-                        return (
-                          <Text
-                            color={'$silverChalice'}
-                            $theme-light={{
-                              color: '$darkGrayTextField',
-                            }}
-                          >
-                            from swap
-                          </Text>
-                        )
+                      case isActivitySwapTransfer(activity, swapRouters, liquidityPools):
+                        return null
                       case subText === null:
                         return <Text>{activityText}</Text>
                       default:

@@ -2,14 +2,16 @@ import { createTRPCRouter, protectedProcedure } from '../../trpc'
 import {
   type KyberEncodeRouteRequest,
   KyberEncodeRouteRequestSchema,
-  type KyberEncodeRouteResponse,
+  KyberEncodeRouteResponseSchema,
   type KyberGetSwapRouteRequest,
   KyberGetSwapRouteRequestSchema,
-  type KyberGetSwapRouteResponse,
+  KyberGetSwapRouteResponseSchema,
 } from './types'
 import debug from 'debug'
 import { baseMainnetClient, sendSwapsRevenueSafeAddress } from '@my/wagmi'
 import { TRPCError } from '@trpc/server'
+import { supabaseAdmin } from 'app/utils/supabase/admin'
+import { isAddressEqual } from 'viem'
 
 const log = debug('api:routers:swap')
 
@@ -40,20 +42,21 @@ const fetchKyberSwapRoute = async ({ tokenIn, tokenOut, amountIn }: KyberGetSwap
     url.searchParams.append('isInBps', 'true')
     url.searchParams.append('feeReceiver', sendSwapsRevenueSafeAddress[baseMainnetClient.chain.id])
 
-    const response = (await fetch(url.toString(), {
+    const response = await fetch(url.toString(), {
       method: 'GET',
       headers: getHeaders(),
-    }).then((res) => res.json())) as KyberGetSwapRouteResponse
+    }).then((res) => res.json())
 
-    if (response.code !== 0) {
-      throw new Error(response.message)
+    const kyberGetSwapRouteResponse = KyberGetSwapRouteResponseSchema.parse(response)
+
+    if (kyberGetSwapRouteResponse.code !== 0) {
+      throw new Error(kyberGetSwapRouteResponse.message)
     }
 
-    const {
-      data: { routeSummary, routerAddress },
-    } = response
-
-    return { routeSummary, routerAddress }
+    return {
+      routeSummary: kyberGetSwapRouteResponse.data.routeSummary,
+      routerAddress: kyberGetSwapRouteResponse.data.routerAddress,
+    }
   } catch (error) {
     log('Error calling fetchKyberSwapRoute', error)
     throw new TRPCError({
@@ -72,7 +75,34 @@ const encodeKyberSwapRoute = async ({
   try {
     const url = `${process.env.NEXT_PUBLIC_KYBER_SWAP_BASE_URL}/${CHAIN}/api/v1/route/build`
 
-    const response = (await fetch(url, {
+    const liquidityPools = routeSummary.route
+      .map((routeLiquidityPools) => {
+        const [tokenInLiquidityPool] = routeLiquidityPools
+
+        if (
+          !tokenInLiquidityPool ||
+          isAddressEqual(routeSummary.tokenIn, KYBER_NATIVE_TOKEN_ADDRESS)
+        ) {
+          return null
+        }
+
+        return {
+          pool_addr: tokenInLiquidityPool.pool,
+          pool_name: tokenInLiquidityPool.exchange,
+          pool_type: tokenInLiquidityPool.poolType,
+        }
+      })
+      .filter((item) => item !== null)
+
+    const { error: liquidityPoolsError } = await supabaseAdmin
+      .from('liquidity_pools')
+      .upsert(liquidityPools, { ignoreDuplicates: true })
+
+    if (liquidityPoolsError) {
+      throw new Error(liquidityPoolsError.message)
+    }
+
+    const response = await fetch(url, {
       method: 'POST',
       headers: getHeaders(),
       body: JSON.stringify({
@@ -81,13 +111,26 @@ const encodeKyberSwapRoute = async ({
         slippageTolerance,
         routeSummary,
       }),
-    }).then((res) => res.json())) as KyberEncodeRouteResponse
+    }).then((res) => res.json())
 
-    if (response.code !== 0) {
-      throw new Error(response.message)
+    const kyberEncodeRouteResponse = KyberEncodeRouteResponseSchema.parse(response)
+
+    if (kyberEncodeRouteResponse.code !== 0) {
+      throw new Error(kyberEncodeRouteResponse.message)
     }
 
-    return response.data
+    const { error: swapRoutersError } = await supabaseAdmin
+      .from('swap_routers')
+      .upsert(
+        { router_addr: kyberEncodeRouteResponse.data.routerAddress },
+        { ignoreDuplicates: true }
+      )
+
+    if (swapRoutersError) {
+      throw new Error(swapRoutersError.message)
+    }
+
+    return kyberEncodeRouteResponse.data
   } catch (error) {
     log('Error calling encodeKyberSwapRoute', error)
     throw new TRPCError({
