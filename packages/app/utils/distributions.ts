@@ -3,13 +3,11 @@ import {
   baseMainnetBundlerClient,
   baseMainnetClient,
   entryPointAddress,
-  mainnet,
   sendAccountAbi,
-  sendAirdropsSafeAddress,
   sendMerkleDropAbi,
   type sendMerkleDropAddress,
   sendTokenAbi,
-  sendTokenAddress,
+  type sendTokenAddress,
   sendUniswapV3PoolAddress,
   tokenPaymasterAddress,
 } from '@my/wagmi'
@@ -19,7 +17,7 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { getUserOperationHash, type UserOperation } from 'permissionless'
 import type { MergeDeep } from 'type-fest'
 import { type CallExecutionError, encodeFunctionData, isAddress, zeroAddress } from 'viem'
-import { useBalance, useReadContract, useSimulateContract } from 'wagmi'
+import { useReadContract, useSimulateContract } from 'wagmi'
 import { api } from './api'
 import { assert } from './assert'
 import { byteaToBase64 } from './byteaToBase64'
@@ -275,19 +273,6 @@ export const useActiveDistribution = () => {
     error,
   }
 }
-
-export const useSendTokenBalance = (address?: `0x${string}`) => {
-  return useBalance({
-    address,
-    token: sendTokenAddress[mainnet.id],
-    query: {
-      enabled: !!address,
-    },
-  })
-}
-
-export const useSendDistributionCurrentPoolTotal = () =>
-  useSendTokenBalance(sendAirdropsSafeAddress)
 
 export const useSendSellCountDuringDistribution = (
   distribution: UseDistributionsResultData[number]
