@@ -184,18 +184,20 @@ test('can refer a tag', async ({ seed, checkoutPage, supabase, user: { profile: 
 
   // check referral code and referrer are visible
   const refcode = checkoutPage.page.getByTestId('referral-code-input')
-  const referralCodeConfirmation = checkoutPage.page.getByText('Referral code applied')
-  await expect(refcode).toBeVisible()
-  await expect(refcode).toHaveValue(referrer.referral_code)
-  await expect(referralCodeConfirmation).toBeVisible()
+  await checkReferralCodeVisibility(checkoutPage, {
+    referral_code: referrer.referral_code,
+    tags: referrerTags,
+  })
   // can change the referral code
   await refcode.fill('1234567890')
   const referralCodeInvalid = checkoutPage.page.getByText('Invalid referral code')
   await expect(referralCodeInvalid).toBeVisible()
   // can change the referrer to valid code
   await refcode.fill(referrer.referral_code)
-  await expect(refcode).toBeVisible()
-  await expect(referralCodeConfirmation).toBeVisible()
+  await checkReferralCodeVisibility(checkoutPage, {
+    referral_code: referrer.referral_code,
+    tags: referrerTags,
+  })
 
   await confirmTags(checkoutPage, tagsToRegister)
   await verifyTagsInDatabase(supabase, tagsToRegister)
