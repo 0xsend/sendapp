@@ -1,7 +1,6 @@
 import type { PostgrestError } from '@supabase/supabase-js'
 import { TRPCError } from '@trpc/server'
 import { reward, total } from 'app/data/sendtags'
-import { fetchReferrer } from 'app/features/account/sendtag/checkout/checkout-utils'
 import { fetchSendtagCheckoutReceipts } from 'app/features/account/sendtag/checkout/checkout-utils.fetchSendtagCheckoutReceipts'
 import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
@@ -13,6 +12,7 @@ import { isAddressEqual, withRetry, zeroAddress } from 'viem'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
 import { byteaToHex } from 'app/utils/byteaToHex'
+import { fetchReferrer } from 'app/utils/useReferrer'
 
 const log = debug('api:routers:tag')
 
@@ -61,7 +61,7 @@ export const tagRouter = createTRPCRouter({
         ? await fetchReferrer({
             supabase,
             profile,
-            referralCode,
+            referral_code: referralCode,
           }).catch((e) => {
             const error = e as unknown as PostgrestError
             if (error.code === 'PGRST116') {
@@ -130,11 +130,12 @@ export const tagRouter = createTRPCRouter({
       const { event_id, amount, referrer: referrerBytea, reward: rewardSentStr } = data
       const rewardSent = rewardSentStr ? BigInt(rewardSentStr) : 0n
       const referrer = byteaToHex(referrerBytea as `\\x${string}`)
+      const referrerProfileAddress = (referrerProfile?.address ?? zeroAddress) as `0x${string}`
       const invalidAmount = !amount || BigInt(amount) !== amountDue
       const invalidReferrer =
         (!referrerProfile && rewardSent !== 0n) || // no referrer and reward is sent
         (referrerProfile && rewardSent !== rewardDue) || // referrer and invalid reward
-        (rewardSent > 0n && !isAddressEqual(referrerProfile?.address ?? zeroAddress, referrer)) // referrer and reward sent is not the correct referrer
+        (rewardSent > 0n && !isAddressEqual(referrerProfileAddress, referrer)) // referrer and reward sent is not the correct referrers
 
       if (invalidAmount || invalidReferrer) {
         log('transaction is not a payment for tags or incorrect amount', `txHash=${txHash}`, {

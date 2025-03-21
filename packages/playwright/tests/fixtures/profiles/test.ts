@@ -14,8 +14,10 @@ export class ProfilePage {
 
   async visit(tag: string, expect?: Expect) {
     await this.page.goto(`/${tag}`)
-    const title = await this.page.title()
-    expect?.(title).toBe('Send | Profile')
+    await expect?.(async () => {
+      const title = await this.page.title()
+      expect?.(title).toBe('Send | Profile')
+    }).toPass()
     await expect?.(this.page.locator('#profileName')).toHaveText(this.profile.name)
   }
 }

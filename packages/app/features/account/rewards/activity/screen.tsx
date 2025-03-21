@@ -55,7 +55,9 @@ export function ActivityRewardsScreen() {
       ? distributions?.findIndex((d) => d.number === distribution)
       : 0
 
-  const verificationsQuery = useDistributionVerifications(distribution ?? distributions?.[0]?.id)
+  const verificationsQuery = useDistributionVerifications(
+    distribution ?? distributions?.[0]?.number
+  )
   const onValueChange = (value: string) => {
     const newDistribution = distributions?.[Number(value)]
     if (newDistribution?.number === distribution) return
@@ -597,7 +599,7 @@ const ProgressCard = ({
     previousDistribution?.distribution_shares?.reduce(
       (acc, curr) =>
         acc +
-        (verifications.distribution_id === 11
+        (verifications.distributionNumber === 11
           ? BigInt(curr.amount) * BigInt(1e16)
           : BigInt(curr.amount)),
       0n

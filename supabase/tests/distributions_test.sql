@@ -258,6 +258,20 @@ VALUES (
             SELECT
                 CURRENT_TIMESTAMP AT TIME ZONE 'UTC' + interval '11 days'),
             8453);
+
+-- Add send slash settings for current distribution
+-- 10 send with divisor of 1 means send ceiling is hodler_min_balancec/10 = 1e5
+INSERT INTO send_slash(
+    distribution_id,
+    distribution_number,
+    minimum_sends,
+    scaling_divisor)
+VALUES (
+    (SELECT id FROM distributions WHERE number = 123),
+    123,
+    10,
+    1);
+
 INSERT INTO public.distribution_verification_values(
     type,
     fixed_value,
@@ -337,6 +351,16 @@ VALUES (
         FROM distributions
         WHERE
             number = 123));
+INSERT INTO public.distribution_verification_values(
+    type,
+    fixed_value,
+    bips_value,
+    distribution_id)
+VALUES (
+    'send_ceiling',
+    0,
+    0,
+    (SELECT id FROM distributions WHERE number = 123));
 -- ensure verification values are not created
 INSERT INTO distribution_verification_values(
     type,
@@ -960,9 +984,9 @@ SELECT
                 user_id = tests.get_supabase_uid('bob')
                 AND type = 'send_ten' $$, $$
             VALUES ('8') $$, 'Should only count the recipient with a send account');
+
 SELECT
     finish();
 ROLLBACK;
 
 RESET client_min_messages;
-

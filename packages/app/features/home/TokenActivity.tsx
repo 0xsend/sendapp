@@ -1,7 +1,7 @@
 import { Card, type CardProps, H4, Paragraph, Spinner, YStack } from '@my/ui'
 import type { CoinWithBalance } from 'app/data/coins'
 import { hexToBytea } from 'app/utils/hexToBytea'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTokenActivityFeed } from './utils/useTokenActivityFeed'
 import { TokenActivityRow } from './TokenActivityRow'
 import type { Activity } from 'app/utils/zod/activity'
@@ -12,6 +12,7 @@ import type { PostgrestError } from '@supabase/postgrest-js'
 import { toNiceError } from 'app/utils/toNiceError'
 import { FlatList } from 'react-native-web'
 import { Fade } from '@my/ui'
+import { useScrollDirection } from 'app/provider/scroll'
 
 export const TokenActivity = ({ coin }: { coin: CoinWithBalance }) => {
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
@@ -71,6 +72,8 @@ const TokenActivityFeed = ({
   >
   onActivityPress: (activity: Activity) => void
 } & CardProps) => {
+  const { isAtEnd } = useScrollDirection()
+
   const {
     data,
     isLoading: isLoadingActivities,
@@ -80,30 +83,34 @@ const TokenActivityFeed = ({
   } = tokenActivityFeedQuery
   const activities = data?.pages?.flat() || []
 
+  useEffect(() => {
+    if (isAtEnd && hasNextPage && !isFetchingNextPageActivities) {
+      fetchNextPage()
+    }
+  }, [isAtEnd, hasNextPage, fetchNextPage, isFetchingNextPageActivities])
+
   if (!activities.length) {
     return null
   }
-
   return (
     <Card {...props} f={1}>
-      <FlatList
-        style={{ flex: 1 }}
-        data={activities}
-        keyExtractor={(activity) =>
-          `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`
-        }
-        renderItem={({ item: activity }) => (
-          <Fade>
+      <Fade>
+        <FlatList
+          style={{ flex: 1 }}
+          data={activities}
+          keyExtractor={(activity) =>
+            `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`
+          }
+          renderItem={({ item: activity }) => (
             <TokenActivityRow activity={activity} onPress={onActivityPress} />
-          </Fade>
-        )}
-        onEndReached={() => hasNextPage && fetchNextPage()}
-        ListFooterComponent={
-          !isLoadingActivities &&
-          isFetchingNextPageActivities && <Spinner size="small" color={'$color12'} mb="$3.5" />
-        }
-        showsVerticalScrollIndicator={false}
-      />
+          )}
+          ListFooterComponent={
+            !isLoadingActivities &&
+            isFetchingNextPageActivities && <Spinner size="small" color={'$color12'} mb="$3.5" />
+          }
+          showsVerticalScrollIndicator={false}
+        />
+      </Fade>
     </Card>
   )
 }

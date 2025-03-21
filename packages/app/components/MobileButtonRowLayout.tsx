@@ -184,9 +184,7 @@ const ActivityRewards = ({ children, ...props }: XStackProps) => {
       <MobileButtonRow isLoading={isLoading} isVisible={isVisible}>
         <Stack ai="center" jc="space-between" gap="$3" pt="$1" $gtLg={{ display: 'none' }}>
           <H3 fontWeight={'600'} color={'$color10'}>
-            {isQualificationOver
-              ? `Total ${distributionMonth} Rewards`
-              : `Estimated ${distributionMonth} Rewards`}
+            {isQualificationOver ? `${distributionMonth} Rewards` : `${distributionMonth} Rewards`}
           </H3>
 
           <Row {...props} $xs={{ fd: 'column' }}>

@@ -28,10 +28,10 @@ import { useAccountNonce } from 'app/utils/userop'
 import { type PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react'
 import { isAddressEqual, zeroAddress } from 'viem'
 import { useBalance, useWaitForTransactionReceipt } from 'wagmi'
+import { useReferralCodeCookie } from 'app/utils/useReferralCodeCookie'
+import { useReferrer } from 'app/utils/useReferrer'
 import {
-  useReferralCode,
   useReferralReward,
-  useReferrer,
   useSendtagCheckout,
   useSendtagCheckoutReceipts,
 } from '../checkout-utils'
@@ -44,9 +44,13 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
   const chainId = baseMainnetClient.chain.id
   const pendingTags = usePendingTags() ?? []
   const amountDue = useMemo(() => total(pendingTags ?? []), [pendingTags])
-  const { data: referrerProfile, isLoading: isLoadingReferrer } = useReferrer()
+  const {
+    data: referrerProfile,
+    isLoading: isLoadingReferrer,
+    error: referrerError,
+  } = useReferrer()
   const { data: rewardDue } = useReferralReward({ tags: pendingTags })
-  const { data: referralCode } = useReferralCode()
+  const { data: referralCodeCookie } = useReferralCodeCookie()
 
   const webauthnCreds =
     sendAccount?.send_account_credentials
@@ -89,10 +93,11 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
         const referrer = byteaToHex(e.referrer as `\\x${string}`)
         const amount = BigInt(e.amount)
         const rewardSent = BigInt(e.reward)
+        const referrerAddress = (referrerProfile?.address ?? zeroAddress) as `0x${string}`
         const invalidReferrer =
           (!referrerProfile && rewardSent !== 0n) || // no referrer and reward is sent
           (referrerProfile && rewardSent !== rewardDue) || // referrer and invalid reward
-          (rewardSent > 0n && !isAddressEqual(referrerProfile?.address ?? zeroAddress, referrer)) // referrer and reward sent is not the correct referrer
+          (rewardSent > 0n && !isAddressEqual(referrerAddress, referrer)) // referrer and reward sent is not the correct referrer
 
         const isPurchase =
           amount === amountDue && // check the correct amount
@@ -226,7 +231,7 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
     }
   }, [txWaitError])
 
-  const possibleErrors = [checkoutErrors, userOpError, usdcFeesError] as (Error & {
+  const possibleErrors = [checkoutErrors, userOpError, usdcFeesError, referrerError] as (Error & {
     details?: string
   })[]
 
@@ -287,7 +292,7 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
     !usdcFeesError &&
     !isLoadingUSDCFees &&
     !isLoadingReferrer &&
-    (referrerProfile || !referralCode)
+    (referrerProfile?.address || !referralCodeCookie)
 
   return (
     <ConfirmButtonStack w={'100%'} gap="$2">
@@ -311,7 +316,11 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
       >
         {(() => {
           switch (true) {
-            case isLoadingUserOp || isLoadingBalance || isLoadingUSDCFees || isLoadingReceipts:
+            case isLoadingUserOp ||
+              isLoadingBalance ||
+              isLoadingUSDCFees ||
+              isLoadingReceipts ||
+              isLoadingReferrer:
               return (
                 <>
                   <Spinner color="$color11" />

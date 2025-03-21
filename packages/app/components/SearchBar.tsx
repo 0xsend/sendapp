@@ -450,9 +450,10 @@ function SearchResultRow({
 type SearchProps = {
   label?: string
   placeholder?: string
+  autoFocus?: boolean
 }
 
-function Search({ label, placeholder = 'Search' }: SearchProps) {
+function Search({ label, placeholder = 'Search', autoFocus = false }: SearchProps) {
   const { form } = useTagSearch()
   const [queryParams, setRootParams] = useRootScreenParams()
   const { search: query } = queryParams
@@ -544,6 +545,7 @@ function Search({ label, placeholder = 'Search' }: SearchProps) {
                     onPress={handleClearClick}
                   />
                 ),
+                autoFocus: autoFocus,
               },
             }}
             formProps={{
