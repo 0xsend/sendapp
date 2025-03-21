@@ -136,41 +136,6 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
   )
 }
 
-const TokenDetailsBalance = ({ coin }: { coin: CoinWithBalance }) => {
-  const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
-  const { balance, decimals, formatDecimals = 5 } = coin
-
-  if (coin.balance === undefined) {
-    return <></>
-  }
-
-  const balanceInUSD = convertBalanceToFiat(coin, tokenPrices?.[coin.token])
-
-  const balanceWithDecimals = Number(balance) / 10 ** (decimals ?? 0)
-  const balanceWithDecimalsLength = balanceWithDecimals.toString().replace('.', '').length
-
-  return (
-    <XStack ai="flex-end" gap="$2">
-      <Paragraph
-        $platform-web={{ width: 'fit-content' }}
-        $sm={{ fontSize: balanceWithDecimalsLength ? '$10' : 68, lineHeight: 38 }}
-        fontSize={60}
-        fontWeight={'900'}
-        lineHeight={57}
-        color={'$color12'}
-      >
-        {formatAmount(balanceWithDecimals.toString(), 10, formatDecimals)}
-      </Paragraph>
-
-      <Paragraph color={'$color10'} fontSize={'$3'} fontFamily={'$mono'}>
-        {isLoadingTokenPrices || balanceInUSD === undefined
-          ? ''
-          : `($${formatAmount(balanceInUSD)})`}
-      </Paragraph>
-    </XStack>
-  )
-}
-
 export const TokenDetailsMarketData = ({ coin }: { coin: CoinWithBalance }) => {
   const { data: tokenMarketData, isLoading: isLoadingMarketData } = useTokenMarketData(
     coin.coingeckoTokenId
@@ -179,10 +144,12 @@ export const TokenDetailsMarketData = ({ coin }: { coin: CoinWithBalance }) => {
   const { data: prices, isLoading: isLoadingPrices } = useTokenPrices()
 
   const price = tokenMarketData?.at(0)?.current_price ?? prices?.[coin.token]
+
   const changePercent24h = tokenMarketData?.at(0)?.price_change_percentage_24h ?? null
 
   // Coingecko API returns a formatted price already. For now, we just want to make sure it doesn't have more than 8 digits
   // so the text doesn't get cut off.
+  const formatPrice = (price: number) => price.toString().slice(0, 7)
 
   const formatPriceChange = (change: number) => {
     const fixedChange = change.toFixed(2)
@@ -216,7 +183,7 @@ export const TokenDetailsMarketData = ({ coin }: { coin: CoinWithBalance }) => {
           $theme-dark={{ color: '$gray8Light' }}
           color={'$color12'}
         >
-          {`1 ${coin.symbol} = ${formatAmount(price, 4, 2)} USD`.replace(/\s+/g, ' ')}
+          {price === undefined ? '' : `1 ${coin.symbol} = ${formatPrice(price)} USD`}
         </Paragraph>
       )}
       {isLoadingMarketData ? (
@@ -233,6 +200,41 @@ export const TokenDetailsMarketData = ({ coin }: { coin: CoinWithBalance }) => {
           )}
         </XStack>
       )}
+    </XStack>
+  )
+}
+
+const TokenDetailsBalance = ({ coin }: { coin: CoinWithBalance }) => {
+  const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
+  const { balance, decimals, formatDecimals = 5 } = coin
+
+  if (coin.balance === undefined) {
+    return <></>
+  }
+
+  const balanceInUSD = convertBalanceToFiat(coin, tokenPrices?.[coin.token])
+
+  const balanceWithDecimals = Number(balance) / 10 ** (decimals ?? 0)
+  const balanceWithDecimalsLength = balanceWithDecimals.toString().replace('.', '').length
+
+  return (
+    <XStack ai="flex-end" gap="$2">
+      <Paragraph
+        $platform-web={{ width: 'fit-content' }}
+        $sm={{ fontSize: balanceWithDecimalsLength ? '$10' : 68, lineHeight: 38 }}
+        fontSize={60}
+        fontWeight={'900'}
+        lineHeight={57}
+        color={'$color12'}
+      >
+        {formatAmount(balanceWithDecimals.toString(), 10, formatDecimals)}
+      </Paragraph>
+
+      <Paragraph color={'$color10'} fontSize={'$3'} fontFamily={'$mono'}>
+        {isLoadingTokenPrices || balanceInUSD === undefined
+          ? ''
+          : `($${formatAmount(balanceInUSD)})`}
+      </Paragraph>
     </XStack>
   )
 }
