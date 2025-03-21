@@ -66,12 +66,13 @@ export async function fetchDistribution(id: string) {
   return fetchDistributionQuery().eq('id', id).single()
 }
 
-export async function fetchAllVerifications(distributionId: number) {
+export async function fetchAllVerifications(distributionId: number, checkpointTime: string) {
   return selectAll(
     supabaseAdmin
       .from('distribution_verifications')
       .select('*', { count: 'exact' })
       .eq('distribution_id', distributionId)
+      .lt('created_at', checkpointTime)
   )
 }
 
