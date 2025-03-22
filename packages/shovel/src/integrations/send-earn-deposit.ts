@@ -1,7 +1,7 @@
 import type { BlockData, Column, Integration, Table } from '@indexsupply/shovel-config'
 
 export const sendEarnDeposit: Table = {
-  name: 'send_earn_deposits',
+  name: 'send_earn_deposit',
   columns: [
     { name: 'chain_id', type: 'numeric' },
     { name: 'log_addr', type: 'bytea' },

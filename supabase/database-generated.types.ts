@@ -874,7 +874,7 @@ export type Database = {
         }
         Relationships: []
       }
-      send_earn_deposits: {
+      send_earn_deposit: {
         Row: {
           abi_idx: number
           assets: number
@@ -983,7 +983,7 @@ export type Database = {
         }
         Relationships: []
       }
-      send_earn_withdraws: {
+      send_earn_withdraw: {
         Row: {
           abi_idx: number
           assets: number
