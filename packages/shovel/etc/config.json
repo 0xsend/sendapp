@@ -1093,7 +1093,7 @@
       ]
     },
     {
-      "name": "send_earn_deposits",
+      "name": "send_earn_deposit",
       "enabled": true,
       "block": [
         {
@@ -1145,7 +1145,7 @@
         "name": "Deposit"
       },
       "table": {
-        "name": "send_earn_deposits",
+        "name": "send_earn_deposit",
         "columns": [
           {
             "name": "chain_id",
@@ -1189,7 +1189,7 @@
       ]
     },
     {
-      "name": "send_earn_withdraws",
+      "name": "send_earn_withdraw",
       "enabled": true,
       "block": [
         {
@@ -1247,7 +1247,7 @@
         "name": "Withdraw"
       },
       "table": {
-        "name": "send_earn_withdraws",
+        "name": "send_earn_withdraw",
         "columns": [
           {
             "name": "chain_id",

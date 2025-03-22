@@ -94,7 +94,7 @@ CREATE INDEX send_earn_new_affiliate_block_num ON public.send_earn_new_affiliate
 
 CREATE INDEX send_earn_new_affiliate_block_time ON public.send_earn_new_affiliate USING btree (block_time);
 
-create table "public"."send_earn_deposits" (
+create table "public"."send_earn_deposit" (
     "id" bigint not null generated always as identity,
     "chain_id" numeric not null,
     "log_addr" bytea not null,
@@ -123,19 +123,19 @@ create table "public"."send_earn_deposits" (
     ) stored
 );
 
-CREATE UNIQUE INDEX u_send_earn_deposits ON public.send_earn_deposits USING btree (ig_name, src_name, block_num, tx_idx, log_idx, abi_idx);
+CREATE UNIQUE INDEX u_send_earn_deposit ON public.send_earn_deposit USING btree (ig_name, src_name, block_num, tx_idx, log_idx, abi_idx);
 
-CREATE INDEX send_earn_deposits_owner_idx ON public.send_earn_deposits USING btree (owner, log_addr);
+CREATE INDEX send_earn_deposit_owner_idx ON public.send_earn_deposit USING btree (owner, log_addr);
 
-CREATE INDEX send_earn_deposits_block_num ON public.send_earn_deposits USING btree (block_num);
+CREATE INDEX send_earn_deposit_block_num ON public.send_earn_deposit USING btree (block_num);
 
-CREATE INDEX send_earn_deposits_block_time ON public.send_earn_deposits USING btree (block_time);
+CREATE INDEX send_earn_deposit_block_time ON public.send_earn_deposit USING btree (block_time);
 
-ALTER TABLE public.send_earn_deposits ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.send_earn_deposit ENABLE ROW LEVEL SECURITY;
 
 create policy
-"users can see their own send_earn_deposits"
-on "public"."send_earn_deposits" as permissive for
+"users can see their own send_earn_deposit"
+on "public"."send_earn_deposit" as permissive for
 select
 to public using (
     (
@@ -151,17 +151,17 @@ to public using (
 
 set check_function_bodies = off;
 
--- create trigger function for filtering send_earn_deposits with no send_account_created
-create or replace function private.filter_send_earn_deposits_with_no_send_account_created()
+-- create trigger function for filtering send_earn_deposit with no send_account_created
+create or replace function private.filter_send_earn_deposit_with_no_send_account_created()
  returns trigger
  language plpgsql
  security definer
  as $$
 begin
--- Deletes send_earn_deposits with no send_account_created.
+-- Deletes send_earn_deposit with no send_account_created.
 -- This is due to performance issues in our shovel indexer and using filter_ref to limit indexing to only
--- send_earn_deposits with send_account_created.
--- For now, we index all USDC and SEND token transfers, and use this function filter any send_earn_deposits with no send_account_created.
+-- send_earn_deposit with send_account_created.
+-- For now, we index all USDC and SEND token transfers, and use this function filter any send_earn_deposit with no send_account_created.
 -- See https://github.com/orgs/indexsupply/discussions/268
   if exists ( select 1 from send_account_created where account = new.owner )
   then
@@ -172,13 +172,13 @@ begin
 end;
 $$;
 
--- create trigger on send_earn_deposits table
-create trigger filter_send_earn_deposits_with_no_send_account_created
-before insert on public.send_earn_deposits
+-- create trigger on send_earn_deposit table
+create trigger filter_send_earn_deposit_with_no_send_account_created
+before insert on public.send_earn_deposit
 for each row
-execute function private.filter_send_earn_deposits_with_no_send_account_created();
+execute function private.filter_send_earn_deposit_with_no_send_account_created();
 
-create table "public"."send_earn_withdraws" (
+create table "public"."send_earn_withdraw" (
     "id" bigint not null generated always as identity,
     "chain_id" numeric not null,
     "log_addr" bytea not null,
@@ -208,19 +208,19 @@ create table "public"."send_earn_withdraws" (
   ) stored
 );
 
-CREATE UNIQUE INDEX u_send_earn_withdraws ON public.send_earn_withdraws USING btree (ig_name, src_name, block_num, tx_idx, log_idx, abi_idx);
+CREATE UNIQUE INDEX u_send_earn_withdraw ON public.send_earn_withdraw USING btree (ig_name, src_name, block_num, tx_idx, log_idx, abi_idx);
 
-CREATE INDEX send_earn_withdraws_owner_idx ON public.send_earn_withdraws USING btree (owner, log_addr);
+CREATE INDEX send_earn_withdraw_owner_idx ON public.send_earn_withdraw USING btree (owner, log_addr);
 
-CREATE INDEX send_earn_withdraws_block_num ON public.send_earn_withdraws USING btree (block_num);
+CREATE INDEX send_earn_withdraw_block_num ON public.send_earn_withdraw USING btree (block_num);
 
-CREATE INDEX send_earn_withdraws_block_time ON public.send_earn_withdraws USING btree (block_time);
+CREATE INDEX send_earn_withdraw_block_time ON public.send_earn_withdraw USING btree (block_time);
 
-ALTER TABLE public.send_earn_withdraws ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.send_earn_withdraw ENABLE ROW LEVEL SECURITY;
 
 create policy
-"users can see their own send_earn_withdraws"
-on "public"."send_earn_withdraws" as permissive for
+"users can see their own send_earn_withdraw"
+on "public"."send_earn_withdraw" as permissive for
 select
 to public using (
     (
@@ -236,17 +236,17 @@ to public using (
 
 set check_function_bodies = off;
 
--- create trigger function for filtering send_earn_withdraws with no send_account_created
-create or replace function private.filter_send_earn_withdraws_with_no_send_account_created()
+-- create trigger function for filtering send_earn_withdraw with no send_account_created
+create or replace function private.filter_send_earn_withdraw_with_no_send_account_created()
  returns trigger
  language plpgsql
  security definer
  as $$
 begin
--- Deletes send_earn_withdraws with no send_account_created.
+-- Deletes send_earn_withdraw with no send_account_created.
 -- This is due to performance issues in our shovel indexer and using filter_ref to limit indexing to only
--- send_earn_withdraws with send_account_created.
--- For now, we index all USDC and SEND token transfers, and use this function filter any send_earn_withdraws with no send_account_created.
+-- send_earn_withdraw with send_account_created.
+-- For now, we index all USDC and SEND token transfers, and use this function filter any send_earn_withdraw with no send_account_created.
 -- See https://github.com/orgs/indexsupply/discussions/268
   if exists ( select 1 from send_account_created where account = new.owner )
   then
@@ -257,11 +257,11 @@ begin
 end;
 $$;
 
--- create trigger on send_earn_withdraws table
-create trigger filter_send_earn_withdraws_with_no_send_account_created
-before insert on public.send_earn_withdraws
+-- create trigger on send_earn_withdraw table
+create trigger filter_send_earn_withdraw_with_no_send_account_created
+before insert on public.send_earn_withdraw
 for each row
-execute function private.filter_send_earn_withdraws_with_no_send_account_created();
+execute function private.filter_send_earn_withdraw_with_no_send_account_created();
 
 
 -- view so users can see their earn balances by vault
@@ -271,13 +271,13 @@ with txs as (select log_addr,
                     owner,
                     assets,
                     shares
-             from send_earn_deposits
+             from send_earn_deposit
              union
              select log_addr,
                     owner,
                     assets * -1,
                     shares * -1
-             from send_earn_withdraws)
+             from send_earn_withdraw)
 select t.log_addr,
        t.owner,
        sum(t.assets) as assets,
@@ -299,7 +299,7 @@ create or replace view send_earn_activity with (security_invoker = ON, security_
     d.assets,
     d.shares,
     d.tx_hash
-  from send_earn_deposits d
+  from send_earn_deposit d
   union all
   select
     'withdraw' as type,
@@ -311,7 +311,7 @@ create or replace view send_earn_activity with (security_invoker = ON, security_
     w.assets,
     w.shares,
     w.tx_hash
-  from send_earn_withdraws w
+  from send_earn_withdraw w
   order by block_time desc
 );
 
@@ -366,9 +366,9 @@ BEGIN
 END;
 $$;
 
--- Create trigger on send_earn_deposits table
+-- Create trigger on send_earn_deposit table
 CREATE TRIGGER insert_referral_on_deposit
-AFTER INSERT ON public.send_earn_deposits
+AFTER INSERT ON public.send_earn_deposit
 FOR EACH ROW
 EXECUTE FUNCTION private.insert_referral_on_deposit();
 
@@ -395,7 +395,7 @@ BEGIN
 
   -- Find a deposit with the same transaction hash
   SELECT owner INTO v_deposit_owner
-  FROM send_earn_deposits
+  FROM send_earn_deposit
   WHERE tx_hash = NEW.tx_hash
   LIMIT 1;
 
