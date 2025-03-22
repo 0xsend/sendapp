@@ -1393,7 +1393,7 @@ exports[`shovel config 1`] = `
         "name": "Deposit",
         "type": "event",
       },
-      "name": "send_earn_deposits",
+      "name": "send_earn_deposit",
       "sources": [
         {
           "name": "base_logs",
@@ -1435,7 +1435,7 @@ exports[`shovel config 1`] = `
             "type": "numeric",
           },
         ],
-        "name": "send_earn_deposits",
+        "name": "send_earn_deposit",
       },
     },
     {
@@ -1495,7 +1495,7 @@ exports[`shovel config 1`] = `
         "name": "Withdraw",
         "type": "event",
       },
-      "name": "send_earn_withdraws",
+      "name": "send_earn_withdraw",
       "sources": [
         {
           "name": "base_logs",
@@ -1541,7 +1541,7 @@ exports[`shovel config 1`] = `
             "type": "numeric",
           },
         ],
-        "name": "send_earn_withdraws",
+        "name": "send_earn_withdraw",
       },
     },
   ],

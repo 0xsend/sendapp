@@ -7395,13 +7395,13 @@
         }
       ]
     },
-    "send_earn_deposits": {
-      "id": "public.send_earn_deposits",
+    "send_earn_deposit": {
+      "id": "public.send_earn_deposit",
       "schemaName": "public",
-      "tableName": "send_earn_deposits",
+      "tableName": "send_earn_deposit",
       "fields": [
         {
-          "id": "public.send_earn_deposits.id",
+          "id": "public.send_earn_deposit.id",
           "name": "id",
           "columnName": "id",
           "type": "int8",
@@ -7410,7 +7410,7 @@
           "isList": false,
           "isGenerated": true,
           "sequence": {
-            "identifier": "\"public\".\"send_earn_deposits_id_seq\"",
+            "identifier": "\"public\".\"send_earn_deposit_id_seq\"",
             "increment": 1,
             "start": 1
           },
@@ -7419,7 +7419,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_deposits.chain_id",
+          "id": "public.send_earn_deposit.chain_id",
           "name": "chain_id",
           "columnName": "chain_id",
           "type": "numeric",
@@ -7433,7 +7433,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_deposits.log_addr",
+          "id": "public.send_earn_deposit.log_addr",
           "name": "log_addr",
           "columnName": "log_addr",
           "type": "bytea",
@@ -7447,7 +7447,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_deposits.block_time",
+          "id": "public.send_earn_deposit.block_time",
           "name": "block_time",
           "columnName": "block_time",
           "type": "numeric",
@@ -7461,7 +7461,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_deposits.tx_hash",
+          "id": "public.send_earn_deposit.tx_hash",
           "name": "tx_hash",
           "columnName": "tx_hash",
           "type": "bytea",
@@ -7475,7 +7475,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_deposits.sender",
+          "id": "public.send_earn_deposit.sender",
           "name": "sender",
           "columnName": "sender",
           "type": "bytea",
@@ -7489,7 +7489,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_deposits.owner",
+          "id": "public.send_earn_deposit.owner",
           "name": "owner",
           "columnName": "owner",
           "type": "bytea",
@@ -7503,7 +7503,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_deposits.assets",
+          "id": "public.send_earn_deposit.assets",
           "name": "assets",
           "columnName": "assets",
           "type": "numeric",
@@ -7517,7 +7517,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_deposits.shares",
+          "id": "public.send_earn_deposit.shares",
           "name": "shares",
           "columnName": "shares",
           "type": "numeric",
@@ -7531,7 +7531,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_deposits.ig_name",
+          "id": "public.send_earn_deposit.ig_name",
           "name": "ig_name",
           "columnName": "ig_name",
           "type": "text",
@@ -7545,7 +7545,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_deposits.src_name",
+          "id": "public.send_earn_deposit.src_name",
           "name": "src_name",
           "columnName": "src_name",
           "type": "text",
@@ -7559,7 +7559,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_deposits.block_num",
+          "id": "public.send_earn_deposit.block_num",
           "name": "block_num",
           "columnName": "block_num",
           "type": "numeric",
@@ -7573,7 +7573,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_deposits.tx_idx",
+          "id": "public.send_earn_deposit.tx_idx",
           "name": "tx_idx",
           "columnName": "tx_idx",
           "type": "int4",
@@ -7587,7 +7587,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_deposits.log_idx",
+          "id": "public.send_earn_deposit.log_idx",
           "name": "log_idx",
           "columnName": "log_idx",
           "type": "int4",
@@ -7601,7 +7601,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_deposits.abi_idx",
+          "id": "public.send_earn_deposit.abi_idx",
           "name": "abi_idx",
           "columnName": "abi_idx",
           "type": "int2",
@@ -7615,7 +7615,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_deposits.event_id",
+          "id": "public.send_earn_deposit.event_id",
           "name": "event_id",
           "columnName": "event_id",
           "type": "text",
@@ -7631,7 +7631,7 @@
       ],
       "uniqueConstraints": [
         {
-          "name": "u_send_earn_deposits",
+          "name": "u_send_earn_deposit",
           "fields": [
             "abi_idx",
             "block_num",
@@ -7865,13 +7865,13 @@
         }
       ]
     },
-    "send_earn_withdraws": {
-      "id": "public.send_earn_withdraws",
+    "send_earn_withdraw": {
+      "id": "public.send_earn_withdraw",
       "schemaName": "public",
-      "tableName": "send_earn_withdraws",
+      "tableName": "send_earn_withdraw",
       "fields": [
         {
-          "id": "public.send_earn_withdraws.id",
+          "id": "public.send_earn_withdraw.id",
           "name": "id",
           "columnName": "id",
           "type": "int8",
@@ -7880,7 +7880,7 @@
           "isList": false,
           "isGenerated": true,
           "sequence": {
-            "identifier": "\"public\".\"send_earn_withdraws_id_seq\"",
+            "identifier": "\"public\".\"send_earn_withdraw_id_seq\"",
             "increment": 1,
             "start": 1
           },
@@ -7889,7 +7889,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_withdraws.chain_id",
+          "id": "public.send_earn_withdraw.chain_id",
           "name": "chain_id",
           "columnName": "chain_id",
           "type": "numeric",
@@ -7903,7 +7903,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_withdraws.log_addr",
+          "id": "public.send_earn_withdraw.log_addr",
           "name": "log_addr",
           "columnName": "log_addr",
           "type": "bytea",
@@ -7917,7 +7917,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_withdraws.block_time",
+          "id": "public.send_earn_withdraw.block_time",
           "name": "block_time",
           "columnName": "block_time",
           "type": "numeric",
@@ -7931,7 +7931,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_withdraws.tx_hash",
+          "id": "public.send_earn_withdraw.tx_hash",
           "name": "tx_hash",
           "columnName": "tx_hash",
           "type": "bytea",
@@ -7945,7 +7945,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_withdraws.sender",
+          "id": "public.send_earn_withdraw.sender",
           "name": "sender",
           "columnName": "sender",
           "type": "bytea",
@@ -7959,7 +7959,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_withdraws.receiver",
+          "id": "public.send_earn_withdraw.receiver",
           "name": "receiver",
           "columnName": "receiver",
           "type": "bytea",
@@ -7973,7 +7973,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_withdraws.owner",
+          "id": "public.send_earn_withdraw.owner",
           "name": "owner",
           "columnName": "owner",
           "type": "bytea",
@@ -7987,7 +7987,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_withdraws.assets",
+          "id": "public.send_earn_withdraw.assets",
           "name": "assets",
           "columnName": "assets",
           "type": "numeric",
@@ -8001,7 +8001,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_withdraws.shares",
+          "id": "public.send_earn_withdraw.shares",
           "name": "shares",
           "columnName": "shares",
           "type": "numeric",
@@ -8015,7 +8015,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_withdraws.ig_name",
+          "id": "public.send_earn_withdraw.ig_name",
           "name": "ig_name",
           "columnName": "ig_name",
           "type": "text",
@@ -8029,7 +8029,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_withdraws.src_name",
+          "id": "public.send_earn_withdraw.src_name",
           "name": "src_name",
           "columnName": "src_name",
           "type": "text",
@@ -8043,7 +8043,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_withdraws.block_num",
+          "id": "public.send_earn_withdraw.block_num",
           "name": "block_num",
           "columnName": "block_num",
           "type": "numeric",
@@ -8057,7 +8057,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_withdraws.tx_idx",
+          "id": "public.send_earn_withdraw.tx_idx",
           "name": "tx_idx",
           "columnName": "tx_idx",
           "type": "int4",
@@ -8071,7 +8071,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_withdraws.log_idx",
+          "id": "public.send_earn_withdraw.log_idx",
           "name": "log_idx",
           "columnName": "log_idx",
           "type": "int4",
@@ -8085,7 +8085,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_withdraws.abi_idx",
+          "id": "public.send_earn_withdraw.abi_idx",
           "name": "abi_idx",
           "columnName": "abi_idx",
           "type": "int2",
@@ -8099,7 +8099,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_earn_withdraws.event_id",
+          "id": "public.send_earn_withdraw.event_id",
           "name": "event_id",
           "columnName": "event_id",
           "type": "text",
@@ -8115,7 +8115,7 @@
       ],
       "uniqueConstraints": [
         {
-          "name": "u_send_earn_withdraws",
+          "name": "u_send_earn_withdraw",
           "fields": [
             "abi_idx",
             "block_num",

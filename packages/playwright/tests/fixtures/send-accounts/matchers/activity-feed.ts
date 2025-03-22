@@ -33,7 +33,7 @@ expect.extend({
     for (const event of activityFeed) {
       if (event.event_name === activity.event_name) {
         try {
-          expect(event.data).toMatchObject(activity.data)
+          expect(event.data as object).toEqual(expect.objectContaining(activity.data))
         } catch (e) {
           if ((e as unknown as { matcherResult: { message: string } }).matcherResult) {
             errors.push(e.matcherResult.message)

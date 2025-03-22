@@ -169,7 +169,7 @@ SELECT results_eq(
 -- Test 4: Test deposits and withdrawals
 -- First, add a deposit for earn_user1
 SELECT tests.authenticate_as_service_role();
-INSERT INTO send_earn_deposits (
+INSERT INTO send_earn_deposit (
     chain_id,
     log_addr,
     block_time,
@@ -193,36 +193,36 @@ INSERT INTO send_earn_deposits (
     '\xEA5E000000000000000000000000000000000001',
     1000000,
     1000000,
-    'send_earn_deposits',
-    'send_earn_deposits',
+    'send_earn_deposit',
+    'send_earn_deposit',
     1,
     0,
     0,
     0
 );
 
--- Test 5: Verify RLS policies for send_earn_deposits
+-- Test 5: Verify RLS policies for send_earn_deposit
 SELECT tests.clear_authentication();
 SELECT is_empty(
-    $$SELECT * FROM send_earn_deposits$$,
-    'Unauthenticated users should not see send_earn_deposits records'
+    $$SELECT * FROM send_earn_deposit$$,
+    'Unauthenticated users should not see send_earn_deposit records'
 );
 
 SELECT tests.authenticate_as('earn_user1');
 SELECT isnt_empty(
-    $$SELECT * FROM send_earn_deposits$$,
-    'Authenticated users should see their own send_earn_deposits records'
+    $$SELECT * FROM send_earn_deposit$$,
+    'Authenticated users should see their own send_earn_deposit records'
 );
 
 SELECT tests.authenticate_as('earn_user2');
 SELECT is_empty(
-    $$SELECT * FROM send_earn_deposits$$,
-    'Authenticated users should not see other users send_earn_deposits records'
+    $$SELECT * FROM send_earn_deposit$$,
+    'Authenticated users should not see other users send_earn_deposit records'
 );
 
 -- Test 6: Add a withdrawal for earn_user1
 SELECT tests.authenticate_as_service_role();
-INSERT INTO send_earn_withdraws (
+INSERT INTO send_earn_withdraw (
     chain_id,
     log_addr,
     block_time,
@@ -248,31 +248,31 @@ INSERT INTO send_earn_withdraws (
     '\xEA5E000000000000000000000000000000000001',
     500000,
     500000,
-    'send_earn_withdraws',
-    'send_earn_withdraws',
+    'send_earn_withdraw',
+    'send_earn_withdraw',
     2,
     0,
     0,
     0
 );
 
--- Test 7: Verify RLS policies for send_earn_withdraws
+-- Test 7: Verify RLS policies for send_earn_withdraw
 SELECT tests.clear_authentication();
 SELECT is_empty(
-    $$SELECT * FROM send_earn_withdraws$$,
-    'Unauthenticated users should not see send_earn_withdraws records'
+    $$SELECT * FROM send_earn_withdraw$$,
+    'Unauthenticated users should not see send_earn_withdraw records'
 );
 
 SELECT tests.authenticate_as('earn_user1');
 SELECT isnt_empty(
-    $$SELECT * FROM send_earn_withdraws$$,
-    'Authenticated users should see their own send_earn_withdraws records'
+    $$SELECT * FROM send_earn_withdraw$$,
+    'Authenticated users should see their own send_earn_withdraw records'
 );
 
 SELECT tests.authenticate_as('earn_user2');
 SELECT is_empty(
-    $$SELECT * FROM send_earn_withdraws$$,
-    'Authenticated users should not see other users send_earn_withdraws records'
+    $$SELECT * FROM send_earn_withdraw$$,
+    'Authenticated users should not see other users send_earn_withdraw records'
 );
 
 -- Test 8: Test the send_earn_balances view
@@ -303,7 +303,7 @@ SELECT results_eq(
 -- Test 10: Test the filter trigger for deposits
 -- Try to insert a deposit for an account that doesn't exist in send_account_created
 SELECT tests.authenticate_as_service_role();
-INSERT INTO send_earn_deposits (
+INSERT INTO send_earn_deposit (
     chain_id,
     log_addr,
     block_time,
@@ -327,8 +327,8 @@ INSERT INTO send_earn_deposits (
     '\xEA5E000000000000000000000000000000000099', -- This account doesn't exist
     1000000,
     1000000,
-    'send_earn_deposits',
-    'send_earn_deposits',
+    'send_earn_deposit',
+    'send_earn_deposit',
     3,
     0,
     0,
@@ -336,14 +336,14 @@ INSERT INTO send_earn_deposits (
 );
 
 SELECT is_empty(
-    $$SELECT * FROM send_earn_deposits WHERE owner = '\xEA5E000000000000000000000000000000000099'$$,
+    $$SELECT * FROM send_earn_deposit WHERE owner = '\xEA5E000000000000000000000000000000000099'$$,
     'Deposits for non-existent accounts should be filtered out'
 );
 
 -- Test 11: Test the filter trigger for withdrawals
 -- Try to insert a withdrawal for an account that doesn't exist in send_account_created
 SELECT tests.authenticate_as_service_role();
-INSERT INTO send_earn_withdraws (
+INSERT INTO send_earn_withdraw (
     chain_id,
     log_addr,
     block_time,
@@ -369,8 +369,8 @@ INSERT INTO send_earn_withdraws (
     '\xEA5E000000000000000000000000000000000099', -- This account doesn't exist
     500000,
     500000,
-    'send_earn_withdraws',
-    'send_earn_withdraws',
+    'send_earn_withdraw',
+    'send_earn_withdraw',
     4,
     0,
     0,
@@ -378,7 +378,7 @@ INSERT INTO send_earn_withdraws (
 );
 
 SELECT is_empty(
-    $$SELECT * FROM send_earn_withdraws WHERE owner = '\xEA5E000000000000000000000000000000000099'$$,
+    $$SELECT * FROM send_earn_withdraw WHERE owner = '\xEA5E000000000000000000000000000000000099'$$,
     'Withdrawals for non-existent accounts should be filtered out'
 );
 
@@ -401,7 +401,7 @@ SELECT is_empty(
 -- The insert_referral_on_deposit trigger is already created in the migrations
 
 -- Now add a deposit that should trigger a referral
-INSERT INTO send_earn_deposits (
+INSERT INTO send_earn_deposit (
     chain_id,
     log_addr,
     block_time,
@@ -425,8 +425,8 @@ INSERT INTO send_earn_deposits (
     '\xEA5E000000000000000000000000000000000002', -- earn_user2
     1000000,
     1000000,
-    'send_earn_deposits',
-    'send_earn_deposits',
+    'send_earn_deposit',
+    'send_earn_deposit',
     5,
     0,
     0,
@@ -442,7 +442,7 @@ SELECT isnt_empty(
 );
 
 -- Test 13: Verify that a second deposit doesn't create another referral
-INSERT INTO send_earn_deposits (
+INSERT INTO send_earn_deposit (
     chain_id,
     log_addr,
     block_time,
@@ -466,8 +466,8 @@ INSERT INTO send_earn_deposits (
     '\xEA5E000000000000000000000000000000000002', -- earn_user2
     2000000,
     2000000,
-    'send_earn_deposits',
-    'send_earn_deposits',
+    'send_earn_deposit',
+    'send_earn_deposit',
     6,
     0,
     0,
@@ -501,7 +501,7 @@ SELECT is_empty(
 
 -- Create a deposit with a unique transaction hash
 SELECT tests.authenticate_as_service_role();
-INSERT INTO send_earn_deposits (
+INSERT INTO send_earn_deposit (
     chain_id,
     log_addr,
     block_time,
@@ -525,8 +525,8 @@ INSERT INTO send_earn_deposits (
     '\xEA5E000000000000000000000000000000000001', -- earn_user1
     1000000,
     1000000,
-    'send_earn_deposits',
-    'send_earn_deposits',
+    'send_earn_deposit',
+    'send_earn_deposit',
     7,
     0,
     0,

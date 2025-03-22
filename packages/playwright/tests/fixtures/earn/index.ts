@@ -53,18 +53,28 @@ export class EarnDepositPage {
     this.submitButton = this.page.getByRole('button', { name: 'Confirm Deposit' })
   }
 
-  async goto(coin: { symbol: string }) {
+  async navigate(coin: { symbol: string }) {
     log('goto /earn')
     await this.page.goto('/')
     await this.page.getByRole('link', { name: 'Earn', exact: true }).click()
     await this.page.waitForURL('/earn')
     await expect(this.startEarningButton).toBeVisible()
     await this.startEarningButton.click()
-    await this.page.waitForURL(`/earn/${coinToParam(coin)}/deposit`)
+    await this.page.waitForURL(this.depositUrl(coin))
     await expect(this.page.getByText('Start Earning', { exact: true })).toBeVisible()
     await expect(this.amountInput).toBeVisible()
     await expect(this.termsCheckbox).toBeVisible()
     await expect(this.submitButton).toBeVisible()
+  }
+
+  depositUrl(coin: { symbol: string }) {
+    return `/earn/${coinToParam(coin)}/deposit`
+  }
+
+  async goto(coin: { symbol: string }) {
+    log(`goto ${this.depositUrl(coin)}`)
+    await this.page.goto(this.depositUrl(coin))
+    await this.page.waitForURL(this.depositUrl(coin))
   }
 
   async fillAmount(amount: string) {
@@ -119,7 +129,9 @@ export class EarnDepositPage {
     log('depositing', amount, coin.symbol)
 
     await this.fillAmount(amount)
-    await this.acceptTerms()
+    if (await this.termsCheckbox.isVisible()) {
+      await this.acceptTerms()
+    }
     await this.submit()
     await this.page.waitForURL(`/earn/${coinToParam(coin)}`)
 
@@ -130,24 +142,24 @@ export class EarnDepositPage {
       .poll(
         async () => {
           const { data, error } = await supabase
-            .from('send_earn_deposits')
+            .from('send_earn_deposit')
             .select('log_addr, owner, shares::text, assets::text')
             .order('block_num', { ascending: false })
             .single()
 
           if (error) {
-            log('error fetching send_earn_deposits', error)
+            log('error fetching send_earn_deposit', error)
             return false
           }
 
-          log('send_earn_deposits query result', data)
+          log('send_earn_deposit query result', data)
           deposit = data
           return true
         },
         {
           timeout: 15000,
           intervals: [1000, 2000, 3000, 5000],
-          message: 'Expected to find a send_earn_deposits record in Supabase',
+          message: 'Expected to find a send_earn_deposit record in Supabase',
         }
       )
       .toBeTruthy()

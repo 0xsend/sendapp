@@ -240,7 +240,7 @@ for (const coin of [usdcCoin]) {
       log = debug(`test:earn:deposit:${profile.id}:${test.info().parallelIndex}`)
       randomAmount = faker.number.bigInt({ min: MIN_DEPOSIT_AMOUNT, max: MAX_DEPOSIT_AMOUNT })
       await fund({ address: sendAccount.address, amount: randomAmount + GAS_FEES, coin })
-      await page.goto(coin)
+      await page.navigate(coin)
     })
 
     test(`can deposit ${coin.symbol} into Platform SendEarn`, async ({
@@ -283,7 +283,7 @@ for (const coin of [usdcCoin]) {
       // Navigate to the earn page with the referral code
       await page.page.goto(`/?referral=${referrer.referral_code}`)
       await page.page.waitForURL(`/?referral=${referrer.referral_code}`)
-      await page.goto(coin)
+      await page.navigate(coin)
 
       // Check if the referral code is visible and applied
       await checkReferralCodeVisibility({ page: page.page, referralCode: referrer.referral_code })
@@ -354,7 +354,7 @@ for (const coin of [usdcCoin]) {
       await fund({ address: sendAccount.address, amount: depositAmount + GAS_FEES, coin })
 
       // Deposit funds
-      await earnDepositPage.goto(coin)
+      await earnDepositPage.navigate(coin)
       const amountDecimals = formatUnits(depositAmount, coin.decimals)
       await earnDepositPage.deposit({
         coin,
@@ -438,7 +438,7 @@ for (const coin of [usdcCoin]) {
       log = debug(`test:earn:claim:${profile.id}:${test.info().parallelIndex}`)
 
       // It's a prerequisite that the affiliate has a Send Earn deposit to claim rewards through the app
-      await earnDepositPage.goto(coin)
+      await earnDepositPage.navigate(coin)
       await earnDepositPage.deposit({
         coin,
         supabase,
@@ -609,7 +609,7 @@ for (const coin of [usdcCoin]) {
       // Fund the account
       await fund({ address: sendAccount.address, amount: randomAmount + GAS_FEES, coin })
 
-      await page.goto(coin)
+      await page.navigate(coin)
 
       // 5. Complete the deposit
       const deposit = await page.deposit({
@@ -639,6 +639,7 @@ for (const coin of [usdcCoin]) {
       sendAccount,
       supabase,
     }) => {
+      test.slow()
       log = debug(`test:earn:vault-consistency:${test.info().parallelIndex}`)
 
       // Generate random amounts for deposits
@@ -655,7 +656,7 @@ for (const coin of [usdcCoin]) {
 
       // 1. Make an initial deposit
       const amount1 = formatUnits(randomAmount1, coin.decimals)
-      await page.goto(coin)
+      await page.navigate(coin)
       const deposit1 = await page.deposit({
         coin,
         supabase,
@@ -729,7 +730,7 @@ for (const coin of [usdcCoin]) {
       // 6. Query the database to verify all deposits for this user and asset
       // are associated with the same vault
       const { data: deposits } = await supabase
-        .from('send_earn_deposits')
+        .from('send_earn_deposit')
         .select('log_addr')
         .eq('owner', hexToBytea(sendAccount.address))
         .order('block_time', { ascending: false })

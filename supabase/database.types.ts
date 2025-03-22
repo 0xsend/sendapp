@@ -101,7 +101,7 @@ export type Database = MergeDeep<
             salt: PgBytea
           }
         }
-        send_earn_deposits: {
+        send_earn_deposit: {
           Row: {
             log_addr: PgBytea
             owner: PgBytea
