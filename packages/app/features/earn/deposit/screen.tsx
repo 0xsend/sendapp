@@ -168,6 +168,7 @@ export function DepositForm() {
       queryClient.invalidateQueries({ queryKey: uop.queryKey })
       queryClient.invalidateQueries({ queryKey: nonce.queryKey })
       queryClient.invalidateQueries({ queryKey: calls.queryKey })
+      queryClient.invalidateQueries({ queryKey: tokensQuery.queryKey })
     },
   })
 
@@ -240,6 +241,7 @@ export function DepositForm() {
     }
     if (areTermsAccepted && form.formState.errors.areTermsAccepted) {
       form.clearErrors('areTermsAccepted')
+      form.trigger('areTermsAccepted')
     }
   }, [
     form.clearErrors,
