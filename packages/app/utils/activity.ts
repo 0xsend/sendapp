@@ -8,22 +8,30 @@ import {
 import { sendCoin, sendV0Coin } from 'app/data/coins'
 import type { Activity } from 'app/utils/zod/activity'
 import { EventArraySchema } from 'app/utils/zod/activity'
+import debug from 'debug'
+import { useMemo } from 'react'
 import { formatUnits, isAddressEqual } from 'viem'
 import formatAmount from './formatAmount'
 import { pgAddrCondValues } from './pgAddrCondValues'
 import { shorten, squish } from './strings'
 import type { AddressBook } from './useAddressBook'
-import { ContractLabels } from './useAddressBook'
+import { ContractLabels, useAddressBook } from './useAddressBook'
 import {
+  DatabaseEvents,
   isReferralsEvent,
   isSendAccountTransfersEvent,
   isTagReceiptsEvent,
   isTagReceiptUSDCEvent,
-  VirtualEvents,
 } from './zod/activity'
 import { isSendAccountReceiveEvent } from './zod/activity/SendAccountReceiveEventSchema'
 import { isSendTokenUpgradeEvent } from './zod/activity/SendAccountTransfersEventSchema'
-import { isSendEarnEvent } from './zod/activity/SendEarnEventSchema'
+import {
+  isSendEarnDepositEvent,
+  isSendEarnEvent,
+  isSendEarnWithdrawEvent,
+} from './zod/activity/SendEarnEventSchema'
+
+const log = debug('app:activity')
 
 const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
   Object.values(addresses).map((a) => [a, label])
@@ -81,7 +89,13 @@ export function counterpart(activity: Activity): Activity['from_user'] | Activit
  */
 export function amountFromActivity(activity: Activity): string {
   switch (true) {
-    case isSendAccountTransfersEvent(activity) || isSendEarnEvent(activity): {
+    case isSendEarnEvent(activity): {
+      console.warn(
+        'TODO: need to handle this differently since we do not know the coin just by the activity alone need to look up the asset by the log_addr'
+      )
+      return ''
+    }
+    case isSendAccountTransfersEvent(activity): {
       const { v, coin } = activity.data
       if (coin) {
         // scale the send v0 amount to send v1 amount
@@ -152,21 +166,19 @@ export function amountFromActivity(activity: Activity): string {
 /**
  * Returns the human readable event name of the activity.
  * @param activity
- * @returns
+ * @deprecated use useEventNameFromActivity instead
+ * @returns the human readable event name of the activity
  */
-export function eventNameFromActivity(activity: Activity) {
+export function eventNameFromActivity(activity: Activity): string {
   const { event_name, from_user, to_user, data } = activity
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
   const isTransferOrReceive = isERC20Transfer || isETHReceive
   switch (true) {
-    // Virtual events (client-side processed)
-    case event_name === VirtualEvents.SendEarnDeposit:
+    case isSendEarnDepositEvent(activity):
       return 'Send Earn Deposit'
-    case event_name === VirtualEvents.SendEarnWithdraw:
+    case isSendEarnWithdrawEvent(activity):
       return 'Send Earn Withdraw'
-
-    // Database events
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Referral Reward'
     case isSendTokenUpgradeEvent(activity):
@@ -194,6 +206,26 @@ export function eventNameFromActivity(activity: Activity) {
 }
 
 /**
+ * Returns the human readable event name of the activity.
+ * @param activity
+ * @returns the human readable event name of the activity
+ */
+export function useEventNameFromActivity(activity: Activity) {
+  const isERC20Transfer = isSendAccountTransfersEvent(activity)
+  const { data: addressBook } = useAddressBook()
+  return useMemo(() => {
+    if (isERC20Transfer && addressBook?.[activity.data.t] === ContractLabels.SendEarn) {
+      return 'Deposit'
+    }
+    if (isERC20Transfer && addressBook?.[activity.data.f] === ContractLabels.SendEarn) {
+      return 'Withdraw'
+    }
+    // this should have always been a hook
+    return eventNameFromActivity(activity)
+  }, [activity, addressBook, isERC20Transfer])
+}
+
+/**
  * Returns the human-readable phrase for event name of the activity for activity details.
  * @param activity
  * @returns
@@ -205,13 +237,10 @@ export function phraseFromActivity(activity: Activity) {
   const isTransferOrReceive = isERC20Transfer || isETHReceive
 
   switch (true) {
-    // Virtual events (client-side processed)
-    case event_name === VirtualEvents.SendEarnDeposit:
+    case isSendEarnDepositEvent(activity):
       return 'Deposited to Send Earn'
-    case event_name === VirtualEvents.SendEarnWithdraw:
+    case isSendEarnWithdrawEvent(activity):
       return 'Withdrew from Send Earn'
-
-    // Database events
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Earned referral reward'
     case isSendTokenUpgradeEvent(activity):
@@ -236,6 +265,26 @@ export function phraseFromActivity(activity: Activity) {
         .join(' ')
         .replace(/^./, (char) => char.toUpperCase())
   }
+}
+
+/**
+ * Returns the phrase for event name of the activity for activity details.
+ * @param activity
+ * @returns the phrase for event name of the activity for activity details
+ */
+export function usePhraseFromActivity(activity: Activity): string {
+  const isERC20Transfer = isSendAccountTransfersEvent(activity)
+  const { data: addressBook } = useAddressBook()
+  return useMemo(() => {
+    if (isERC20Transfer && addressBook?.[activity.data.t] === ContractLabels.SendEarn) {
+      return 'Deposited to Send Earn'
+    }
+    if (isERC20Transfer && addressBook?.[activity.data.f] === ContractLabels.SendEarn) {
+      return 'Withdrew from Send Earn'
+    }
+    // this should have always been a hook
+    return phraseFromActivity(activity)
+  }, [activity, addressBook, isERC20Transfer])
 }
 
 /**
@@ -290,6 +339,23 @@ export function subtextFromActivity(activity: Activity): string | null {
   return null
 }
 
+export function useSubtextFromActivity(activity: Activity): string | null {
+  const isERC20Transfer = isSendAccountTransfersEvent(activity)
+  const { data: addressBook } = useAddressBook()
+  return useMemo(() => {
+    if (isERC20Transfer) {
+      if (addressBook?.[activity.data.t] === ContractLabels.SendEarn) {
+        return 'Send Earn'
+      }
+      if (addressBook?.[activity.data.f] === ContractLabels.SendEarn) {
+        return 'Send Earn'
+      }
+    }
+    // this should have always been a hook
+    return subtextFromActivity(activity)
+  }, [activity, addressBook, isERC20Transfer])
+}
+
 /**
  * Returns the name of the user from the activity user.
  * The cascading fallback is to:
@@ -327,29 +393,32 @@ export function userNameFromActivityUser(
  * @returns A processed activity with potentially modified event_name
  */
 export function processActivity(activity: Activity, addressBook: AddressBook): Activity {
+  log('processActivity', { activity, addressBook })
   // Clone the activity to avoid mutating the original
-  const processedActivity = { ...activity }
+  // const processedActivity = { ...activity }
 
-  // Rule 1: Send Account Transfer to Send Earn Vault should be a Send Earn Deposit
-  if (
-    isSendAccountTransfersEvent(activity) &&
-    activity.to_user?.send_id === undefined && // Currently identified as a "Withdraw"
-    addressBook[activity.data.t] === ContractLabels.SendEarn // Destination is a Send Earn vault
-  ) {
-    // Override the event_name to our virtual event type
-    processedActivity.event_name = VirtualEvents.SendEarnDeposit
-  }
+  // // Rule 1: Send Account Transfer to Send Earn Vault should be a Send Earn Deposit
+  // if (
+  //   isSendAccountTransfersEvent(activity) &&
+  //   activity.to_user?.send_id === undefined && // Currently identified as a "Withdraw"
+  //   addressBook[activity.data.t] === ContractLabels.SendEarn // Destination is a Send Earn vault
+  // ) {
+  //   // Override the event_name to our virtual event type
+  //   processedActivity.event_name = VirtualEvents.SendEarnDeposit
+  // }
 
-  // Rule 2: Send Account Transfer from Send Earn Vault should be a Send Earn Withdraw
-  if (
-    isSendAccountTransfersEvent(activity) &&
-    addressBook[activity.data.f] === ContractLabels.SendEarn // Source is a Send Earn vault
-  ) {
-    // Override the event_name to our virtual event type
-    processedActivity.event_name = VirtualEvents.SendEarnWithdraw
-  }
+  // // Rule 2: Send Account Transfer from Send Earn Vault should be a Send Earn Withdraw
+  // if (
+  //   isSendAccountTransfersEvent(activity) &&
+  //   addressBook[activity.data.f] === ContractLabels.SendEarn // Source is a Send Earn vault
+  // ) {
+  //   // Override the event_name to our virtual event type
+  //   processedActivity.event_name = VirtualEvents.SendEarnWithdraw
+  // }
 
-  return processedActivity
+  // return processedActivity
+
+  return activity
 }
 
 /**

@@ -24,6 +24,14 @@ export enum DatabaseEvents {
    * Send account receives ETH
    */
   SendAccountReceive = 'send_account_receives',
+  /**
+   * Send Earn deposit
+   */
+  SendEarnDeposit = 'send_earn_deposit',
+  /**
+   * Send Earn withdraw
+   */
+  SendEarnWithdraw = 'send_earn_withdraw',
 }
 
 /**
@@ -31,19 +39,7 @@ export enum DatabaseEvents {
  * These are not actual events in the database, but are created client-side
  * to represent specific contexts or scenarios.
  */
-export enum VirtualEvents {
-  /**
-   * Virtual event for Send Earn deposits
-   * Represents a send_account_transfer to a Send Earn vault
-   */
-  SendEarnDeposit = 'send_earn_deposit',
-
-  /**
-   * Virtual event for Send Earn withdrawals
-   * Represents a send_account_transfer from a Send Earn vault
-   */
-  SendEarnWithdraw = 'send_earn_withdraw',
-}
+export enum VirtualEvents {}
 
 /**
  * Union type of all events that can be found in the activity feed.

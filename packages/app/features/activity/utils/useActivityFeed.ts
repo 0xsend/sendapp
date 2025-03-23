@@ -9,10 +9,11 @@ import {
 } from '@tanstack/react-query'
 import { getBaseAddressFilterCondition, parseAndProcessActivities } from 'app/utils/activity'
 import { assert } from 'app/utils/assert'
+import { hexToBytea } from 'app/utils/hexToBytea'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import { useAddressBook, type AddressBook } from 'app/utils/useAddressBook'
-import type { Activity } from 'app/utils/zod/activity'
+import { DatabaseEvents, type Activity } from 'app/utils/zod/activity'
 import { useMemo } from 'react'
 import type { ZodError } from 'zod'
 
@@ -91,11 +92,18 @@ async function fetchActivityFeed({
 }): Promise<Activity[]> {
   const from = pageParam * pageSize
   const to = (pageParam + 1) * pageSize - 1
+
   const request = supabase
     .from('activity_feed')
     .select('*')
     .or('from_user.not.is.null, to_user.not.is.null') // only show activities with a send app user
     .or(getBaseAddressFilterCondition(sendtagCheckoutAddresses)) // shows as Sendtag Registered using a different activity row
+    .not(
+      'event_name',
+      'in',
+      // exclude Send Earn deposits and withdrawals from the feed (they show up as SendAccountTransfers)
+      `(${[DatabaseEvents.SendEarnDeposit, DatabaseEvents.SendEarnWithdraw].join(',')})`
+    )
     .order('created_at', { ascending: false })
     .range(from, to)
   const { data, error } = await request
