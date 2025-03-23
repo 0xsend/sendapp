@@ -13,14 +13,18 @@ import { baseMainnetBundlerClient, entryPointAddress } from '@my/wagmi'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { CalculatedBenefits } from 'app/features/earn/components/CalculatedBenefits'
-import { useSendEarnAPY, useSendEarnCoinBalances } from 'app/features/earn/hooks'
+import {
+  useSendEarnAPY,
+  useSendEarnBalances,
+  useSendEarnCoinBalances,
+} from 'app/features/earn/hooks'
 import { assert } from 'app/utils/assert'
 import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
 import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { signUserOp } from 'app/utils/signUserOp'
 import { toNiceError } from 'app/utils/toNiceError'
-import { useUserOp } from 'app/utils/userop'
+import { useAccountNonce, useUserOp } from 'app/utils/userop'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import debug from 'debug'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -60,12 +64,14 @@ export function WithdrawForm() {
   const { params, setParams } = useParams()
   const [parsedAmount] = useAmount()
   const formAmount = form.watch('amount')
+  const allBalances = useSendEarnBalances()
 
   // QUERY WITHDRAW USEROP
   const chainId = useChainId()
   const vault = useSendEarnWithdrawVault({ asset, coin: coinData })
   const sendAccount = useSendAccount()
   const sender = useMemo(() => sendAccount?.data?.address, [sendAccount?.data?.address])
+  const nonce = useAccountNonce({ sender })
   const calls = useSendEarnWithdrawCalls({ sender, asset, amount: parsedAmount, coin: coinData })
   const uop = useUserOp({
     sender,
@@ -149,7 +155,9 @@ export function WithdrawForm() {
     onSettled: (data, error, variables, context) => {
       // Error or success... doesn't matter!
       log('onSettled', data, error, variables, context)
+      queryClient.invalidateQueries({ queryKey: nonce.queryKey })
       queryClient.invalidateQueries({ queryKey: tokensQuery.queryKey })
+      queryClient.invalidateQueries({ queryKey: allBalances.queryKey })
     },
   })
 

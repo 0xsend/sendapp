@@ -36,7 +36,7 @@ import { useRouter } from 'solito/router'
 import { formatUnits, withRetry } from 'viem'
 import { useChainId } from 'wagmi'
 import { type BRAND, z } from 'zod'
-import { useSendEarnAPY, useSendEarnCoinBalances } from '../hooks'
+import { useSendEarnAPY, useSendEarnBalances, useSendEarnCoinBalances } from '../hooks'
 import {
   coinToParam,
   useAmount,
@@ -70,6 +70,7 @@ export function DepositForm() {
   const { params, setParams } = useParams()
   const [parsedAmount] = useAmount()
   const formAmount = form.watch('amount')
+  const allBalances = useSendEarnBalances()
   const balances = useSendEarnCoinBalances(coin.data ?? undefined)
   const hasExistingDeposit = useMemo(
     () => (balances.data ?? []).some((b) => b.assets > 0n) ?? false,
@@ -165,10 +166,9 @@ export function DepositForm() {
     onSettled: (data, error, variables, context) => {
       // Error or success... doesn't matter!
       log('onSettled', data, error, variables, context)
-      queryClient.invalidateQueries({ queryKey: uop.queryKey })
       queryClient.invalidateQueries({ queryKey: nonce.queryKey })
-      queryClient.invalidateQueries({ queryKey: calls.queryKey })
       queryClient.invalidateQueries({ queryKey: tokensQuery.queryKey })
+      queryClient.invalidateQueries({ queryKey: allBalances.queryKey })
     },
   })
 
@@ -209,9 +209,8 @@ export function DepositForm() {
         })
       } else {
         form.clearErrors('amount')
-        form.trigger('amount')
       }
-
+      form.trigger('amount')
       setParams(
         {
           ...params,
@@ -237,12 +236,11 @@ export function DepositForm() {
   useEffect(() => {
     if (hasExistingDeposit) {
       form.setValue('areTermsAccepted', true as boolean & BRAND<'boolean_checkbox'>)
-      form.trigger('areTermsAccepted')
     }
     if (areTermsAccepted && form.formState.errors.areTermsAccepted) {
       form.clearErrors('areTermsAccepted')
-      form.trigger('areTermsAccepted')
     }
+    form.trigger('areTermsAccepted')
   }, [
     form.clearErrors,
     areTermsAccepted,

@@ -152,7 +152,7 @@ to public using (
 set check_function_bodies = off;
 
 -- create trigger function for filtering send_earn_deposit with no send_account_created
-create or replace function private.filter_send_earn_deposit_with_no_send_account_created()
+create or replace function private.aaa_filter_send_earn_deposit_with_no_send_account_created()
  returns trigger
  language plpgsql
  security definer
@@ -173,10 +173,83 @@ end;
 $$;
 
 -- create trigger on send_earn_deposit table
-create trigger filter_send_earn_deposit_with_no_send_account_created
+create trigger aaa_filter_send_earn_deposit_with_no_send_account_created
 before insert on public.send_earn_deposit
 for each row
-execute function private.filter_send_earn_deposit_with_no_send_account_created();
+execute function private.aaa_filter_send_earn_deposit_with_no_send_account_created();
+
+-- Trigger function for send_earn_deposit
+CREATE OR REPLACE FUNCTION private.aab_send_earn_deposit_trigger_insert_activity()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+    _owner_user_id uuid;
+    _data jsonb;
+BEGIN
+    -- Select send app info for owner address (the Send account owner)
+    SELECT user_id INTO _owner_user_id
+    FROM send_accounts
+    WHERE address = concat('0x', encode(NEW.owner, 'hex'))::citext;
+
+    -- Build data object with the same pattern as send_account_transfers
+    -- Cast numeric values to text to avoid losing precision
+    _data := json_build_object(
+        'log_addr', NEW.log_addr,
+        'sender', NEW.sender,
+        'owner', NEW.owner,
+        'assets', NEW.assets::text,
+        'shares', NEW.shares::text,
+        'tx_hash', NEW.tx_hash,
+        'block_num', NEW.block_num::text,
+        'tx_idx', NEW.tx_idx::text,
+        'log_idx', NEW.log_idx::text
+    );
+
+    -- Insert into activity table - notice the similar pattern to send_account_transfers
+    INSERT INTO activity (event_name, event_id, from_user_id, to_user_id, data, created_at)
+    VALUES (
+        'send_earn_deposit',
+        NEW.event_id,
+        _owner_user_id,  -- In this case from_user is the owner
+        NULL,            -- No to_user for deposits
+        _data,
+        to_timestamp(NEW.block_time) at time zone 'UTC'
+    )
+    ON CONFLICT (event_name, event_id) DO UPDATE SET
+        from_user_id = _owner_user_id,
+        data = _data,
+        created_at = to_timestamp(NEW.block_time) at time zone 'UTC';
+
+    RETURN NEW;
+END;
+$$;
+
+-- Create trigger on send_earn_deposit table
+CREATE TRIGGER aab_send_earn_deposit_trigger_insert_activity
+AFTER INSERT ON public.send_earn_deposit
+FOR EACH ROW
+EXECUTE FUNCTION private.aab_send_earn_deposit_trigger_insert_activity();
+
+-- Also add delete triggers to maintain consistency
+CREATE OR REPLACE FUNCTION private.aaa_send_earn_deposit_trigger_delete_activity()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+    DELETE FROM activity
+    WHERE event_id = OLD.event_id
+        AND event_name = 'send_earn_deposit';
+    RETURN OLD;
+END;
+$$;
+
+CREATE TRIGGER aaa_send_earn_deposit_trigger_delete_activity
+AFTER DELETE ON public.send_earn_deposit
+FOR EACH ROW
+EXECUTE FUNCTION private.aaa_send_earn_deposit_trigger_delete_activity();
 
 create table "public"."send_earn_withdraw" (
     "id" bigint not null generated always as identity,
@@ -237,7 +310,7 @@ to public using (
 set check_function_bodies = off;
 
 -- create trigger function for filtering send_earn_withdraw with no send_account_created
-create or replace function private.filter_send_earn_withdraw_with_no_send_account_created()
+create or replace function private.aaa_filter_send_earn_withdraw_with_no_send_account_created()
  returns trigger
  language plpgsql
  security definer
@@ -258,10 +331,83 @@ end;
 $$;
 
 -- create trigger on send_earn_withdraw table
-create trigger filter_send_earn_withdraw_with_no_send_account_created
+create trigger aaa_filter_send_earn_withdraw_with_no_send_account_created
 before insert on public.send_earn_withdraw
 for each row
-execute function private.filter_send_earn_withdraw_with_no_send_account_created();
+execute function private.aaa_filter_send_earn_withdraw_with_no_send_account_created();
+
+
+-- Trigger function for send_earn_withdraw
+CREATE OR REPLACE FUNCTION private.aab_send_earn_withdraw_trigger_insert_activity()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+    _owner_user_id uuid;
+    _data jsonb;
+BEGIN
+    -- Select send app info for owner address
+    SELECT user_id INTO _owner_user_id
+    FROM send_accounts
+    WHERE address = concat('0x', encode(NEW.owner, 'hex'))::citext;
+
+    -- Build data object with the same pattern as send_account_transfers
+    _data := json_build_object(
+        'log_addr', NEW.log_addr,
+        'sender', NEW.sender,
+        'receiver', NEW.receiver,
+        'owner', NEW.owner,
+        'assets', NEW.assets::text,
+        'shares', NEW.shares::text,
+        'tx_hash', NEW.tx_hash,
+        'block_num', NEW.block_num::text,
+        'tx_idx', NEW.tx_idx::text,
+        'log_idx', NEW.log_idx::text
+    );
+
+    -- Insert into activity table with the same pattern
+    INSERT INTO activity (event_name, event_id, from_user_id, to_user_id, data, created_at)
+    VALUES (
+        'send_earn_withdraw',
+        NEW.event_id,
+        _owner_user_id,  -- In this case from_user is the owner
+        NULL,            -- No to_user for withdrawals
+        _data,
+        to_timestamp(NEW.block_time) at time zone 'UTC'
+    )
+    ON CONFLICT (event_name, event_id) DO UPDATE SET
+        from_user_id = _owner_user_id,
+        data = _data,
+        created_at = to_timestamp(NEW.block_time) at time zone 'UTC';
+
+    RETURN NEW;
+END;
+$$;
+
+-- Create trigger on send_earn_withdraw table
+CREATE TRIGGER aab_send_earn_withdraw_trigger_insert_activity
+AFTER INSERT ON public.send_earn_withdraw
+FOR EACH ROW
+EXECUTE FUNCTION private.aab_send_earn_withdraw_trigger_insert_activity();
+
+CREATE OR REPLACE FUNCTION private.aaa_send_earn_withdraw_trigger_delete_activity()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+    DELETE FROM activity
+    WHERE event_id = OLD.event_id
+        AND event_name = 'send_earn_withdraw';
+    RETURN OLD;
+END;
+$$;
+
+CREATE TRIGGER aaa_send_earn_withdraw_trigger_delete_activity
+AFTER DELETE ON public.send_earn_withdraw
+FOR EACH ROW
+EXECUTE FUNCTION private.aaa_send_earn_withdraw_trigger_delete_activity();
 
 
 -- view so users can see their earn balances by vault

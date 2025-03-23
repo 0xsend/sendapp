@@ -1,26 +1,37 @@
 import { z } from 'zod'
 import { BaseEventSchema } from './BaseEventSchema'
 import { ReferralsEventSchema } from './ReferralsEventSchema'
+import { SendAccountReceiveEventSchema } from './SendAccountReceiveEventSchema'
 import { SendAccountTransfersEventSchema } from './SendAccountTransfersEventSchema'
 import { TagReceiptsEventSchema } from './TagReceiptsEventSchema'
 import { TagReceiptUSDCEventSchema } from './TagReceiptUSDCEventSchema'
-import { SendAccountReceiveEventSchema } from './SendAccountReceiveEventSchema'
 import { TemporalTransfersEventSchema } from './TemporalTransfersEventSchema'
 
 export type { BaseEvent } from './BaseEventSchema'
-export { ReferralsEventSchema, isReferralsEvent } from './ReferralsEventSchema'
+export { DatabaseEvents, Events, VirtualEvents } from './events'
+export { isReferralsEvent, ReferralsEventSchema } from './ReferralsEventSchema'
 export {
-  SendAccountTransfersEventSchema,
+  isSendAccountReceiveEvent,
+  SendAccountReceiveEventSchema,
+} from './SendAccountReceiveEventSchema'
+export {
   isSendAccountTransfersEvent,
+  isSendtagCheckoutEvent,
+  isSendTokenUpgradeEvent,
+  SendAccountTransfersEventSchema,
   type SendAccountTransfersEvent,
 } from './SendAccountTransfersEventSchema'
-export { TagReceiptsEventSchema, isTagReceiptsEvent } from './TagReceiptsEventSchema'
-export { TagReceiptUSDCEventSchema, isTagReceiptUSDCEvent } from './TagReceiptUSDCEventSchema'
 export {
-  SendAccountReceiveEventSchema,
-  isSendAccountReceiveEvent,
-} from './SendAccountReceiveEventSchema'
-export { DatabaseEvents, Events, VirtualEvents } from './events'
+  isSendEarnDepositEvent,
+  isSendEarnEvent,
+  isSendEarnWithdrawEvent,
+  SendEarnDepositEventSchema,
+  SendEarnWithdrawEventSchema,
+  type SendEarnDepositEvent,
+  type SendEarnWithdrawEvent,
+} from './SendEarnEventSchema'
+export { isTagReceiptsEvent, TagReceiptsEventSchema } from './TagReceiptsEventSchema'
+export { isTagReceiptUSDCEvent, TagReceiptUSDCEventSchema } from './TagReceiptUSDCEventSchema'
 
 export const EventSchema = z
   .discriminatedUnion('event_name', [

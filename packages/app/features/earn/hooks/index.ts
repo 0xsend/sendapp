@@ -20,7 +20,7 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import { address, byteaToHexEthAddress, decimalStrToBigInt } from 'app/utils/zod'
 import debug from 'debug'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { formatUnits, isAddressEqual, zeroAddress } from 'viem'
 import { useChainId, useReadContracts } from 'wagmi'
 import { hashFn, useQuery, type UseQueryReturnType } from 'wagmi/query'
@@ -233,10 +233,14 @@ async function fetchSendEarnBalances(supabase: SupabaseClient<Database>) {
  */
 export function useSendEarnBalances(): UseQueryReturnType<SendEarnBalance[]> {
   const supabase = useSupabase()
+  const queryFn = useCallback(
+    async (): Promise<SendEarnBalance[]> => fetchSendEarnBalances(supabase),
+    [supabase]
+  )
   return useQuery({
-    queryKey: ['sendEarnBalances', supabase] as const,
-    queryFn: async ({ queryKey: [, supabase] }): Promise<SendEarnBalance[]> =>
-      fetchSendEarnBalances(supabase),
+    queryKey: ['send_earn_balances'] as const,
+    queryFn,
+    staleTime: Number.POSITIVE_INFINITY,
   })
 }
 
@@ -253,7 +257,10 @@ export function useUnderlyingVaultsAsset(
       abi: sendEarnAbi,
       functionName: 'asset',
     })),
-    query: { enabled: vaults !== undefined, gcTime: Number.POSITIVE_INFINITY },
+    query: {
+      enabled: vaults !== undefined,
+      gcTime: Number.POSITIVE_INFINITY,
+    },
   })
 }
 

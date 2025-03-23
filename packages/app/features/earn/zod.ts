@@ -1,4 +1,9 @@
-import { byteaToHexEthAddress, byteaToHexTxHash, decimalStrToBigInt } from 'app/utils/zod'
+import {
+  byteaToHexEthAddress,
+  byteaToHexTxHash,
+  decimalStrToBigInt,
+  epochToDate,
+} from 'app/utils/zod'
 import { z } from 'zod'
 
 /**
@@ -20,10 +25,14 @@ export const AffiliateVaultSchema = z
   .nullable()
 
 export type AffiliateVault = z.infer<typeof AffiliateVaultSchema>
+
+/**
+ * Send Earn maintains an activity feed that includes deposits and withdrawals outside of the main activity feed.
+ */
 export const SendEarnActivitySchema = z.object({
   type: z.enum(['deposit', 'withdraw']),
   block_num: z.number(),
-  block_time: z.number(),
+  block_time: epochToDate,
   log_addr: byteaToHexEthAddress,
   owner: byteaToHexEthAddress,
   sender: byteaToHexEthAddress,

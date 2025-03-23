@@ -1,4 +1,6 @@
-import { Avatar, LinkableAvatar, type LinkableAvatarProps, XStack } from '@my/ui'
+import { Avatar, LinkableAvatar, Spinner, type LinkableAvatarProps, XStack } from '@my/ui'
+import { AvatarSendEarnDeposit } from 'app/components/avatars'
+import { AvatarSendEarnWithdraw } from 'app/components/avatars/AvatarSendEarnWithdraw'
 import { IconDeposit, IconUpgrade, IconWithdraw } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { allCoinsDict } from 'app/data/coins'
@@ -9,21 +11,20 @@ import {
   isSendPotWin,
   isSwapBuyTransfer,
 } from 'app/utils/activity'
-import {
-  type Activity,
-  isSendAccountReceiveEvent,
-  isSendAccountTransfersEvent,
-} from 'app/utils/zod/activity'
-import { isSendTokenUpgradeEvent } from 'app/utils/zod/activity/SendAccountTransfersEventSchema'
+import { ContractLabels, useAddressBook } from 'app/utils/useAddressBook'
 import { useSwapRouters } from 'app/utils/useSwapRouters'
 import { useLiquidityPools } from 'app/utils/useLiquidityPools'
 import { Minus, Plus } from '@tamagui/lucide-icons'
 import { IconSendPotTicket } from 'app/components/icons/IconSendPotTicket'
 import {
+  type Activity,
+  isSendAccountReceiveEvent,
+  isSendAccountTransfersEvent,
   isSendEarnDepositEvent,
   isSendEarnEvent,
   isSendEarnWithdrawEvent,
-} from 'app/utils/zod/activity/SendEarnEventSchema'
+  isSendTokenUpgradeEvent,
+} from 'app/utils/zod/activity'
 
 export function ActivityAvatar({
   activity,
@@ -33,8 +34,9 @@ export function ActivityAvatar({
   const { data: swapRouters } = useSwapRouters()
   const { data: liquidityPools } = useLiquidityPools()
   const { from_user, to_user, data } = activity
-  const isERC20Transfer = isSendAccountTransfersEvent(activity) || isSendEarnEvent(activity)
+  const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
+  const addressBook = useAddressBook()
 
   if (isSendPotTicketPurchase(activity) || isSendPotWin(activity)) {
     return (
@@ -99,39 +101,51 @@ export function ActivityAvatar({
 
   if (isSendEarnEvent(activity)) {
     if (isSendEarnDepositEvent(activity)) {
-      return (
-        <Avatar size="$4.5" br="$4" gap="$2" {...props}>
-          <IconDeposit size="$5" />
-        </Avatar>
-      )
+      return <AvatarSendEarnDeposit {...props} />
     }
     if (isSendEarnWithdrawEvent(activity)) {
-      return (
-        <Avatar size="$4.5" br="$4" gap="$2" {...props}>
-          <IconWithdraw size="$5" />
-        </Avatar>
-      )
+      return <AvatarSendEarnWithdraw {...props} />
     }
   }
+
   if (isERC20Transfer) {
     // is transfer, but an unknown user
     const address = from_user?.id ? activity.data.t : activity.data.f
+    const name = addressBook?.data?.[address] ?? address
+
+    if (name === ContractLabels.SendEarn) {
+      if (from_user?.id) {
+        return <AvatarSendEarnDeposit {...props} />
+      }
+      if (to_user?.id) {
+        return <AvatarSendEarnWithdraw {...props} />
+      }
+    }
+
+    if (addressBook.isLoading) {
+      return (
+        <Avatar size="$4.5" br="$4" gap="$2" {...props}>
+          <Spinner size="small" />
+        </Avatar>
+      )
+    }
 
     return (
       <Avatar size="$4.5" br="$4" gap="$2" {...props}>
         <Avatar.Image
-          src={`https://ui-avatars.com/api/?name=${address}&size=256&format=png&background=86ad7f`}
+          src={`https://ui-avatars.com/api/?name=${name}&size=256&format=png&background=86ad7f`}
         />
         <Avatar.Fallback jc="center" bc="$olive">
           <Avatar size="$4.5" br="$4" {...props}>
             <Avatar.Image
-              src={`https://ui-avatars.com/api/?name=${address}&size=256&format=png&background=86ad7f`}
+              src={`https://ui-avatars.com/api/?name=${name}&size=256&format=png&background=86ad7f`}
             />
           </Avatar>
         </Avatar.Fallback>
       </Avatar>
     )
   }
+
   // @todo make this an icon instead of a fallback TODO
   return (
     <Avatar size="$4.5" br="$4" gap="$2" {...props}>
