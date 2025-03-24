@@ -12,10 +12,9 @@ const defaultMaxWaitTime = 60000 * 2 // Default to 1 minute
  * PendingScreen component that displays while waiting for a transaction to be confirmed.
  * It polls for new USDC transactions and redirects to success page when a new transaction is detected.
  *
- * @param props - Component properties
  * @param props.onSuccess - Callback function when transaction is successful
  * @param props.onFailure - Callback function when transaction fails
- * @param props.maxWaitTime - Maximum time to wait in milliseconds (defaults to 60000ms = 1 minute)
+ * @param props.maxWaitTime - Maximum time to wait in milliseconds (defaults to 60000ms = 2 minute)
  *
  * @businessLogic
  * - Polls for new USDC transactions every 5 seconds
@@ -26,11 +25,12 @@ const defaultMaxWaitTime = 60000 * 2 // Default to 1 minute
 export function PendingScreen({
   maxWaitTime = defaultMaxWaitTime,
   onFailure,
+  onSuccess,
 }: {
   maxWaitTime?: number
   onFailure: () => void
+  onSuccess: () => void
 }) {
-  const router = useRouter()
   const { data: sendAccount } = useSendAccount()
   const [elapsedTime, setElapsedTime] = useState(0)
   const [initialActivityCount, setInitialActivityCount] = useState<number | null>(null)
@@ -61,9 +61,9 @@ export function PendingScreen({
 
     // If we have new transactions, consider it a success
     if (currentCount > initialActivityCount) {
-      router.push('/deposit/success')
+      onSuccess()
     }
-  }, [activityData, initialActivityCount, sendAccount?.user_id, router.push])
+  }, [activityData, initialActivityCount, sendAccount?.user_id, onSuccess])
 
   // Set up a timer to track elapsed time and handle timeout
   useEffect(() => {

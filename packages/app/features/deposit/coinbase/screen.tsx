@@ -5,6 +5,7 @@ import { useCoinbaseOnramp } from 'app/utils/useCoinbaseOnramp'
 import { toNiceError } from 'app/utils/toNiceError'
 import { YStack, Text, Button, Spinner } from '@my/ui'
 import { PendingScreen } from '../components/PendingScreen'
+import { useRouter } from 'solito/router'
 
 const COINBASE_APP_ID = process.env.NEXT_PUBLIC_CDP_APP_ID ?? ''
 
@@ -13,6 +14,7 @@ interface DepositCoinbaseScreenProps {
 }
 
 export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseScreenProps) {
+  const router = useRouter()
   const { data: sendAccount } = useSendAccount()
   const {
     openOnramp,
@@ -77,7 +79,13 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
         )
 
       case coinbaseStatus === 'payment_submitted':
-        return <PendingScreen maxWaitTime={60000} onFailure={() => setStatus('failure')} />
+        return (
+          <PendingScreen
+            maxWaitTime={60000}
+            onFailure={() => setStatus('failure')}
+            onSuccess={() => router.push('/deposit/success')}
+          />
+        )
 
       case coinbaseStatus === 'pending_payment':
         return (
