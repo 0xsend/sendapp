@@ -6,6 +6,7 @@ import { useSendAccount } from 'app/utils/send-accounts'
 import type { PgBytea } from '@my/supabase/database.types'
 import { useRouter } from 'solito/router'
 
+const defaultMaxWaitTime = 60000 * 2 // Default to 1 minute
 /**
  * PendingScreen component that displays while waiting for a transaction to be confirmed.
  * It polls for new USDC transactions and redirects to success page when a new transaction is detected.
@@ -17,12 +18,12 @@ import { useRouter } from 'solito/router'
  *
  * @businessLogic
  * - Polls for new USDC transactions every 5 seconds
- * - Times out after maxWaitTime (default 1 minute)
+ * - Times out after maxWaitTime (default 2 minute)
  * - Calls onSuccess callback if a new transaction is detected
  * - Calls onFailure callback if transaction times out
  */
 export function PendingScreen({
-  maxWaitTime = 60000, // Default to 1 minute
+  maxWaitTime = defaultMaxWaitTime,
   onFailure,
 }: {
   maxWaitTime?: number
