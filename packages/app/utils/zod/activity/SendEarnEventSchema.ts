@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { decimalStrToBigInt } from '../bigint'
 import { byteaToHexEthAddress } from '../bytea'
 import { BaseEventSchema } from './BaseEventSchema'
-import { DatabaseEvents } from './events'
+import { Events } from './events'
 import { OnchainEventDataSchema } from './OnchainDataSchema'
 
 /**
@@ -36,7 +36,7 @@ export const SendEarnBaseDataSchema = SendEarnBaseDataSchemaRaw
 export const SendEarnDepositDataSchema = SendEarnBaseDataSchemaRaw.extend({})
 
 export const SendEarnDepositEventSchema = BaseEventSchema.extend({
-  event_name: z.literal(DatabaseEvents.SendEarnDeposit),
+  event_name: z.literal(Events.SendEarnDeposit),
   data: SendEarnDepositDataSchema,
 })
 
@@ -53,7 +53,7 @@ export const SendEarnWithdrawDataSchema = SendEarnBaseDataSchemaRaw.extend({
 })
 
 export const SendEarnWithdrawEventSchema = BaseEventSchema.extend({
-  event_name: z.literal(DatabaseEvents.SendEarnWithdraw),
+  event_name: z.literal(Events.SendEarnWithdraw),
   data: SendEarnWithdrawDataSchema,
 })
 
@@ -62,11 +62,11 @@ export type SendEarnWithdrawEvent = z.infer<typeof SendEarnWithdrawEventSchema>
 export type SendEarnEvent = SendEarnDepositEvent | SendEarnWithdrawEvent
 export const isSendEarnDepositEvent = (event: {
   event_name: string
-}): event is SendEarnDepositEvent => event.event_name === DatabaseEvents.SendEarnDeposit
+}): event is SendEarnDepositEvent => event.event_name === Events.SendEarnDeposit
 
 export const isSendEarnWithdrawEvent = (event: {
   event_name: string
-}): event is SendEarnWithdrawEvent => event.event_name === DatabaseEvents.SendEarnWithdraw
+}): event is SendEarnWithdrawEvent => event.event_name === Events.SendEarnWithdraw
 
 export const isSendEarnEvent = (event: {
   event_name: string
