@@ -108,7 +108,9 @@ export const JackpotCard = () => {
           <XStack style={{ color: 'white' }} gap={'$2.5'} mt="auto">
             <BigHeading
               $platform-web={{ width: 'fit-content' }}
-              fontSize={96}
+              fontSize={64}
+              $gtSm={{ fontSize: 80 }}
+              $gtMd={{ fontSize: 96 }}
               lineHeight={'$15'}
               fontWeight={'600'}
               color={'$color12'}
@@ -132,11 +134,6 @@ export const JackpotCard = () => {
             <XStack ai="center" jc="center">
               <Paragraph color="$color10" fontSize="$4" ta="center">
                 Next draw: {getNextDrawDate()} (daily at 8:00 PM)
-              </Paragraph>
-            </XStack>
-            <XStack ai="center" jc="center" mt="$1">
-              <Paragraph color="$color10" fontSize="$4" ta="center" fontWeight="500">
-                30 SEND per /ticket
               </Paragraph>
             </XStack>
           </YStack>
