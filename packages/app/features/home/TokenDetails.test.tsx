@@ -33,7 +33,7 @@ describe('TokenDetails', () => {
 
   // can be removed when swaps are no longer behind white list
   beforeAll(() => {
-    originalSwapAllowlist = process.env.NEXT_PUBLIC_SWAP_ALLOWLIST
+    originalSwapAllowlist = process.env.NEXT_PUBLIC_SWAP_ALLOWLIST || ''
 
     process.env.NEXT_PUBLIC_SWAP_ALLOWLIST = 'mock-user-id'
   })
