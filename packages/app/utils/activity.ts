@@ -7,16 +7,13 @@ import {
 } from '@my/wagmi'
 import { sendCoin, sendV0Coin } from 'app/data/coins'
 import { SendEarnAmount } from 'app/features/earn/components/SendEarnAmount'
+import { ContractLabels, useAddressBook } from 'app/utils/useAddressBook'
 import type { Activity } from 'app/utils/zod/activity'
-import { EventArraySchema } from 'app/utils/zod/activity'
-import debug from 'debug'
 import { type ReactNode, useMemo } from 'react'
 import { formatUnits, isAddressEqual } from 'viem'
 import formatAmount from './formatAmount'
 import { pgAddrCondValues } from './pgAddrCondValues'
 import { shorten, squish } from './strings'
-import type { AddressBook } from './useAddressBook'
-import { ContractLabels, useAddressBook } from './useAddressBook'
 import {
   isReferralsEvent,
   isSendAccountTransfersEvent,
@@ -38,8 +35,6 @@ import {
   isSendEarnEvent,
   isSendEarnWithdrawEvent,
 } from './zod/activity/SendEarnEventSchema'
-
-const log = debug('app:activity')
 
 const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
   Object.values(addresses).map((a) => [a, label])
@@ -590,109 +585,31 @@ export function userNameFromActivityUser(
 }
 
 /**
- * Processes an activity to determine if its event_name should be overridden based on contextual data.
- * This allows for more accurate event classification without changing the database schema.
- *
- * @param activity The original activity from the database
- * @param addressBook The address book containing known addresses and their labels
- * @returns A processed activity with potentially modified event_name
- */
-export function processActivity(activity: Activity, addressBook: AddressBook): Activity {
-  log('processActivity', { activity, addressBook })
-  // Clone the activity to avoid mutating the original
-  // const processedActivity = { ...activity }
-
-  // // Rule 1: Send Account Transfer to Send Earn Vault should be a Send Earn Deposit
-  // if (
-  //   isSendAccountTransfersEvent(activity) &&
-  //   activity.to_user?.send_id === undefined && // Currently identified as a "Withdraw"
-  //   addressBook[activity.data.t] === ContractLabels.SendEarn // Destination is a Send Earn vault
-  // ) {
-  //   // Override the event_name to our virtual event type
-  //   processedActivity.event_name = VirtualEvents.SendEarnDeposit
-  // }
-
-  // // Rule 2: Send Account Transfer from Send Earn Vault should be a Send Earn Withdraw
-  // if (
-  //   isSendAccountTransfersEvent(activity) &&
-  //   addressBook[activity.data.f] === ContractLabels.SendEarn // Source is a Send Earn vault
-  // ) {
-  //   // Override the event_name to our virtual event type
-  //   processedActivity.event_name = VirtualEvents.SendEarnWithdraw
-  // }
-
-  // return processedActivity
-
-  return activity
-}
-
-/**
- * Processes an array of activities using the processActivity function.
- *
- * @param activities Array of activities from the database
- * @param addressBook The address book containing known addresses and their labels
- * @returns Array of processed activities
- */
-export function processActivities(activities: Activity[], addressBook: AddressBook): Activity[] {
-  return activities.map((activity) => processActivity(activity, addressBook))
-}
-
-/**
- * Centralized function to parse and process activity data from the database.
- * This function handles both the parsing of raw data and the contextual processing
- * to identify special cases like Send Earn deposits and withdrawals.
- *
- * @param data Raw data from the database
- * @param options Processing options
- * @param options.addressBook Address book for contextual processing
- * @returns Processed activities with potentially modified event types
- */
-export function parseAndProcessActivities(
-  data: unknown,
-  options: {
-    addressBook?: AddressBook
-    // Future parameters can be added here
-  } = {}
-): Activity[] {
-  // Parse the raw data using the Zod schema
-  const activities = EventArraySchema.parse(data)
-
-  // Process activities if addressBook is available
-  if (options.addressBook) {
-    const processed = processActivities(activities, options.addressBook)
-    return processed
-  }
-
-  return activities
-}
-
-/**
  * Creates base filtering conditions for activity feed queries to exclude system addresses
  * like paymasters that should be filtered from activity displays.
  *
- * @param customFromIgnore - Additional addresses to ignore in 'from' field
- * @param customToIgnore - Additional addresses to ignore in 'to' field
+ * @param extraFrom - Additional addresses to ignore in 'from' field
+ * @param extraTo - Additional addresses to ignore in 'to' field
  * @returns SQL condition string for use in Supabase queries
  */
-
-export function getBaseAddressFilterCondition(
-  customFromIgnore: `0x${string}`[] = [],
-  customToIgnore: `0x${string}`[] = []
-): string {
+export function getBaseAddressFilterCondition({
+  extraFrom = [],
+  extraTo = [],
+}: { extraFrom?: `0x${string}`[]; extraTo?: `0x${string}`[] } = {}): string {
   const paymasterAddresses = Object.values(tokenPaymasterAddress)
   const sendTokenV0LockboxAddresses = Object.values(sendTokenV0LockboxAddress)
 
   // Base addresses to ignore in 'from' field
   const fromIgnoreAddresses = [
     ...paymasterAddresses, // show fees on send screen instead
-    ...customFromIgnore,
+    ...extraFrom,
   ]
 
   // Base addresses to ignore in 'to' field
   const toIgnoreAddresses = [
     ...paymasterAddresses, // show fees on send screen instead
     ...sendTokenV0LockboxAddresses, // will instead show the "mint"
-    ...customToIgnore,
+    ...extraTo,
   ]
 
   const fromTransferIgnoreValues = pgAddrCondValues(fromIgnoreAddresses)

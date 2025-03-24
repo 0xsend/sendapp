@@ -6,13 +6,13 @@ import {
   type InfiniteData,
   type UseInfiniteQueryResult,
 } from '@tanstack/react-query'
-import { getBaseAddressFilterCondition, parseAndProcessActivities } from 'app/utils/activity'
+import { getBaseAddressFilterCondition } from 'app/utils/activity'
 import { assert } from 'app/utils/assert'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import { useAddressBook, type AddressBook } from 'app/utils/useAddressBook'
-import { DatabaseEvents, type Activity } from 'app/utils/zod/activity'
+import { DatabaseEvents, EventArraySchema, type Activity } from 'app/utils/zod/activity'
 import { useMemo } from 'react'
 import type { ZodError } from 'zod'
 
@@ -90,7 +90,6 @@ export function useEarnActivityFeed(params?: {
  */
 async function fetchEarnActivityFeed({
   pageParam,
-  addressBook,
   supabase,
   pageSize,
 }: {
@@ -118,7 +117,5 @@ async function fetchEarnActivityFeed({
   throwIf(error)
 
   // Parse and process the raw data
-  return parseAndProcessActivities(data, {
-    addressBook,
-  })
+  return EventArraySchema.parse(data)
 }

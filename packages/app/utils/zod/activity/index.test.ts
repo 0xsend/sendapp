@@ -1,6 +1,11 @@
 import { describe, expect, it } from '@jest/globals'
 import { assert } from 'app/utils/assert'
-import { EventArraySchema, type BaseEvent } from '.'
+import {
+  EventArraySchema,
+  type SendEarnDepositEvent,
+  type SendEarnWithdrawEvent,
+  type BaseEvent,
+} from '.'
 import type { SendAccountTransfersEvent } from './SendAccountTransfersEventSchema'
 import type { TagReceiptsEvent } from './TagReceiptsEventSchema'
 import { MockActivityFeed } from 'app/features/activity/utils/__mocks__/mock-activity-feed'
@@ -22,7 +27,7 @@ describe('EventArraySchema', () => {
 
   it('should parse a valid event array', () => {
     expect(parsedData).toMatchSnapshot()
-    expect(parsedData).toHaveLength(10)
+    expect(parsedData).toHaveLength(12)
   })
 
   describe('SendAccountTransfersEvent', () => {
@@ -245,6 +250,71 @@ describe('EventArraySchema', () => {
         '0xc8e94001e225e3d4570c352a3811de04586c1cfabc8b7c9367d477fcf003424d'
       )
       expect(upgrade.data.coin).toEqual(sendCoin)
+    })
+  })
+
+  describe('SendEarnDepositEvent', () => {
+    let deposit: SendEarnDepositEvent
+
+    beforeAll(() => {
+      deposit = parsedData[10] as SendEarnDepositEvent
+      console.log(deposit)
+      assert(!!deposit)
+    })
+
+    it('should have correct event name and timestamps', () => {
+      expect(deposit.event_name).toBe('send_earn_deposit')
+      expect(deposit.created_at).toBeInstanceOf(Date)
+    })
+
+    it('should have correct user data', () => {
+      expect(deposit.from_user).not.toBeNull()
+      expect(deposit.to_user).toBeNull()
+    })
+
+    it('should have correct deposit data', () => {
+      expect(deposit.data.log_addr).toBe('0x5AFE000000000000000000000000000000000000')
+      expect(deposit.data.owner).toBe('0xB0b0000000000000000000000000000000000000')
+      expect(deposit.data.assets).toBe(1000000000000000000n)
+      expect(deposit.data.shares).toBe(950000000000000000n)
+      expect(deposit.data.tx_hash).toBe(
+        '0x1234567890123456789012345678901234567890123456789012345678901234'
+      )
+      expect(deposit.data.block_num).toBe(12345n)
+      expect(deposit.data.tx_idx).toBe(0n)
+      expect(deposit.data.log_idx).toBe(0n)
+    })
+  })
+
+  describe('SendEarnWithdrawEvent', () => {
+    let withdraw: SendEarnWithdrawEvent
+
+    beforeAll(() => {
+      withdraw = parsedData[11] as SendEarnWithdrawEvent
+      assert(!!withdraw)
+    })
+
+    it('should have correct event name and timestamps', () => {
+      expect(withdraw.event_name).toBe('send_earn_withdraw')
+      expect(withdraw.created_at).toBeInstanceOf(Date)
+    })
+
+    it('should have correct user data', () => {
+      expect(withdraw.from_user).toBeNull()
+      expect(withdraw.to_user).not.toBeNull()
+    })
+
+    it('should have correct withdraw data', () => {
+      expect(withdraw.data.log_addr).toBe('0x5AFE000000000000000000000000000000000000')
+      expect(withdraw.data.owner).toBe('0xB0b0000000000000000000000000000000000000')
+      expect(withdraw.data.assets).toBe(5000000000000000000n)
+      expect(withdraw.data.shares).toBe(475000000000000000n)
+      expect(withdraw.data.tx_hash).toBe(
+        '0x1234567890123456789012345678901234567890123456789012345678901234'
+      )
+      expect(withdraw.data.block_num).toBe(12345n)
+      expect(withdraw.data.tx_idx).toBe(0n)
+      expect(withdraw.data.log_idx).toBe(0n)
     })
   })
 })
