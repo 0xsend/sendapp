@@ -457,21 +457,18 @@ export type Database = {
       }
       referrals: {
         Row: {
-          created_at: string
           id: number
           referred_id: string
           referrer_id: string
           tag: string
         }
         Insert: {
-          created_at?: string
           id?: number
           referred_id: string
           referrer_id: string
           tag: string
         }
         Update: {
-          created_at?: string
           id?: number
           referred_id?: string
           referrer_id?: string
@@ -1421,15 +1418,6 @@ export type Database = {
           all_tags: string[]
         }[]
       }
-      referrer_lookup: {
-        Args: {
-          referral_code?: string
-        }
-        Returns: {
-          referrer: Database["public"]["CompositeTypes"]["profile_lookup_result"]
-          new_referrer: Database["public"]["CompositeTypes"]["profile_lookup_result"]
-        }[]
-      }
       send_accounts_add_webauthn_credential: {
         Args: {
           send_account_id: string
@@ -1507,20 +1495,6 @@ export type Database = {
         avatar_url: string
         send_id: number
         tags: unknown
-      }
-      profile_lookup_result: {
-        id: string
-        avatar_url: string
-        name: string
-        about: string
-        refcode: string
-        x_username: string
-        tag: string
-        address: string
-        chain_id: number
-        is_public: boolean
-        sendid: number
-        all_tags: unknown
       }
       tag_search_result: {
         avatar_url: string
