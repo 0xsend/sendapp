@@ -73,9 +73,7 @@ export function PendingScreen({
 
     const timeout = setTimeout(() => {
       clearInterval(interval)
-      if (onFailure) {
-        onFailure()
-      }
+      onFailure()
     }, maxWaitTime)
 
     return () => {
