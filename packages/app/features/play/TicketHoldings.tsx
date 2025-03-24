@@ -98,7 +98,7 @@ export const TicketHoldings = () => {
   return (
     <YStack gap="$4" w="100%">
       <XStack ai="center" jc="space-between">
-        <H2 fontWeight="600">Active /Tickets</H2>
+        <H2 fontWeight="600">Active Tickets</H2>
         <XStack ai="center" gap="$2">
           <Ticket size="$1.5" color="$color10" />
           <H3 color="$color12">{totalActiveTickets}</H3>
@@ -127,7 +127,7 @@ export const TicketHoldings = () => {
       )}
 
       <XStack ai="center" jc="space-between" mt="$4">
-        <H2 fontWeight="600">/Ticket History</H2>
+        <H2 fontWeight="600">Ticket History</H2>
         <Button
           size="$2"
           chromeless
