@@ -1,6 +1,6 @@
 import { Paragraph, Text, XStack, YStack } from '@my/ui'
 import {
-  amountFromActivity,
+  useAmountFromActivity,
   useEventNameFromActivity,
   useSubtextFromActivity,
 } from 'app/utils/activity'
@@ -29,7 +29,7 @@ export function TokenActivityRow({
   const { data: swapRouters } = useSwapRouters()
   const { data: liquidityPools } = useLiquidityPools()
   const { created_at, from_user, to_user } = activity
-  const amount = amountFromActivity(activity, swapRouters, liquidityPools)
+  const amount = useAmountFromActivity(activity, swapRouters, liquidityPools)
   const date = CommentsTime(new Date(created_at))
   const eventName = useEventNameFromActivity(activity)
   const subtext = useSubtextFromActivity(activity)

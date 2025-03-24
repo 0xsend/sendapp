@@ -9,18 +9,16 @@ import { getBaseAddressFilterCondition, parseAndProcessActivities } from 'app/ut
 import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { useSendAccount } from 'app/utils/send-accounts'
-import { squish } from 'app/utils/strings'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import { useAddressBook, type AddressBook } from 'app/utils/useAddressBook'
 import type { SendAccountCall } from 'app/utils/userop'
 import { DatabaseEvents, type Activity } from 'app/utils/zod/activity'
 import debug from 'debug'
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 import { encodeFunctionData } from 'viem'
 import { useQuery, type UseQueryReturnType } from 'wagmi/query'
 import type { ZodError } from 'zod'
-import { SendEarnActivitySchemaArray, type SendEarnActivity } from '../../zod'
 
 const log = debug('app:features:earn:rewards')
 
@@ -89,61 +87,48 @@ export function useSendEarnClaimRewardsCalls({
 }
 
 /**
- * Infinite query to fetch Send Earn Affiliate rewards activity.
- *
- * @param params.pageSize - Number of items to fetch per page
- * @param params.refetchInterval - Interval in ms to refetch data
- * @param params.enabled - Whether the query is enabled
+ * Fetches the Send Earn Affiliate rewards activity feed for the current user.
  */
-export function useSendEarnRewardsActivity(params?: {
+export function useEarnRewardsActivityFeed(params?: {
   pageSize?: number
   refetchInterval?: number
   enabled?: boolean
-}): UseInfiniteQueryResult<InfiniteData<SendEarnActivity[]>, PostgrestError | ZodError> {
-  const { pageSize = 10, refetchInterval = 30_000, enabled = true } = params ?? {}
+}): UseInfiniteQueryResult<InfiniteData<Activity[]>, PostgrestError | ZodError> {
+  const { pageSize = 10, refetchInterval = 30000, enabled: enabledProp = true } = params ?? {}
   const supabase = useSupabase()
+  const addressBook = useAddressBook()
+  const sendAccount = useSendAccount()
+  const { data: sendAccountData } = sendAccount
   const myAffiliateVault = useMyAffiliateVault()
 
-  const fetchSendEarnActivity = useCallback(
-    async ({
-      pageParam,
-      supabase,
-      pageSize,
-      sender,
-    }: {
-      pageParam: number
-      supabase: SupabaseClient<Database>
-      pageSize: number
-      sender: `0x${string}`
-    }): Promise<SendEarnActivity[]> => {
-      const from = pageParam * pageSize
-      const to = (pageParam + 1) * pageSize - 1
-
-      const { data, error } = await supabase
-        .from('send_earn_activity')
-        .select('type,block_num,block_time,log_addr,owner,sender,assets::text,shares::text,tx_hash')
-        .eq('sender', hexToBytea(sender))
-        .order('block_time', { ascending: false })
-        .range(from, to)
-
-      if (error) throw error
-      return SendEarnActivitySchemaArray.parse(data)
-    },
-    []
+  const enabled = useMemo(
+    () =>
+      enabledProp &&
+      (addressBook.isError || addressBook.isSuccess) &&
+      (sendAccount.isSuccess || sendAccount.isError) &&
+      (myAffiliateVault.isSuccess || myAffiliateVault.isError),
+    [enabledProp, addressBook, sendAccount, myAffiliateVault]
   )
 
-  const queryKey = [
-    'send_earn_affiliate_rewards_activity',
-    { supabase, pageSize, myAffiliateVault },
-  ] as const
+  const queryKey = useMemo(
+    () =>
+      [
+        'earn_rewards_activity_feed',
+        { addressBook, supabase, pageSize, sendAccount, sendAccountData, myAffiliateVault },
+      ] as const,
+    [addressBook, supabase, pageSize, sendAccount, sendAccountData, myAffiliateVault]
+  )
+
   return useInfiniteQuery<
-    SendEarnActivity[],
+    Activity[],
     PostgrestError | ZodError,
-    InfiniteData<SendEarnActivity[], number>,
+    InfiniteData<Activity[], number>,
     typeof queryKey,
     number
   >({
+    enabled,
     queryKey,
+    refetchInterval,
     initialPageParam: 0,
     getNextPageParam: (lastPage, _allPages, lastPageParam) => {
       if (lastPage !== null && lastPage.length < pageSize) return undefined
@@ -155,19 +140,70 @@ export function useSendEarnRewardsActivity(params?: {
       }
       return firstPageParam - 1
     },
-    queryFn: ({
+    queryFn: async ({
+      queryKey: [
+        ,
+        { addressBook, supabase, pageSize, sendAccount, sendAccountData, myAffiliateVault },
+      ],
       pageParam,
-      queryKey: [, { supabase, pageSize, myAffiliateVault }],
-    }): Promise<SendEarnActivity[]> => {
-      assert(!!myAffiliateVault.data?.send_earn_affiliate, 'No affiliate vault found')
-      return fetchSendEarnActivity({
+    }) => {
+      throwIf(addressBook.error)
+      throwIf(sendAccount.error)
+      throwIf(myAffiliateVault.error)
+      assert(!!addressBook.data, 'Fetching address book failed')
+      assert(!!sendAccountData, 'Fetching send account failed')
+
+      // Only proceed if we have an affiliate vault
+      if (!myAffiliateVault.data?.send_earn_affiliate) {
+        return [] // Return empty array if no affiliate vault found
+      }
+
+      return await fetchEarnRewardsActivityFeed({
+        pageParam,
         supabase,
         pageSize,
-        sender: myAffiliateVault.data.send_earn_affiliate,
-        pageParam,
+        addressBook: addressBook.data,
+        userAddress: sendAccountData.address,
+        sendEarnAffiliate: myAffiliateVault.data.send_earn_affiliate, // Pass the affiliate address
       })
     },
-    refetchInterval,
-    enabled: enabled && (myAffiliateVault.isSuccess || myAffiliateVault.isError),
+  })
+} /**
+ * Fetches the Send Earn rewards activity feed for the current user.
+ * This queries the activity_feed view with filters to identify Send Earn rewards related activities.
+ */
+
+export async function fetchEarnRewardsActivityFeed({
+  pageParam,
+  addressBook,
+  supabase,
+  pageSize,
+  sendEarnAffiliate,
+}: {
+  pageParam: number
+  addressBook: AddressBook
+  supabase: SupabaseClient<Database>
+  pageSize: number
+  userAddress: `0x${string}`
+  sendEarnAffiliate: `0x${string}`
+}): Promise<Activity[]> {
+  const from = pageParam * pageSize
+  const to = (pageParam + 1) * pageSize - 1
+
+  const query = supabase
+    .from('activity_feed')
+    .select('*')
+    .in('event_name', [DatabaseEvents.SendEarnDeposit])
+    .eq('data->>sender', hexToBytea(sendEarnAffiliate))
+    .or(getBaseAddressFilterCondition())
+    .order('created_at', { ascending: false })
+    .range(from, to)
+
+  const { data, error } = await query
+  throwIf(error)
+
+  // Parse and process the raw data
+  return parseAndProcessActivities(data, {
+    addressBook,
   })
 }

@@ -6,10 +6,11 @@ import {
   tokenPaymasterAddress,
 } from '@my/wagmi'
 import { sendCoin, sendV0Coin } from 'app/data/coins'
+import { SendEarnAmount } from 'app/features/earn/components/SendEarnAmount'
 import type { Activity } from 'app/utils/zod/activity'
 import { EventArraySchema } from 'app/utils/zod/activity'
 import debug from 'debug'
-import { useMemo } from 'react'
+import { type ReactNode, useMemo } from 'react'
 import { formatUnits, isAddressEqual } from 'viem'
 import formatAmount from './formatAmount'
 import { pgAddrCondValues } from './pgAddrCondValues'
@@ -17,7 +18,6 @@ import { shorten, squish } from './strings'
 import type { AddressBook } from './useAddressBook'
 import { ContractLabels, useAddressBook } from './useAddressBook'
 import {
-  DatabaseEvents,
   isReferralsEvent,
   isSendAccountTransfersEvent,
   isTagReceiptsEvent,
@@ -103,7 +103,7 @@ export function amountFromActivity(
   activity: Activity,
   swapRouters: SwapRouter[] = [],
   liquidityPools: LiquidityPool[] = []
-): string {
+): ReactNode {
   switch (true) {
     case isTemporalTokenTransfersEvent(activity): {
       const { v, coin } = activity.data
@@ -122,10 +122,7 @@ export function amountFromActivity(
       return formatAmount(`${value}`, 5, 0)
     }
     case isSendEarnEvent(activity): {
-      console.warn(
-        'TODO: need to handle this differently since we do not know the coin just by the activity alone need to look up the asset by the log_addr'
-      )
-      return ''
+      return SendEarnAmount({ activity })
     }
     case isSendAccountTransfersEvent(activity): {
       const { v, coin } = activity.data
@@ -290,6 +287,17 @@ export const isActivitySwapTransfer = (
     isSwapBuyTransfer(activity, swapRouters) ||
     isSwapSellTransfer(activity, swapRouters, liquidityPools)
   )
+}
+
+/**
+ * Returns the amount of the activity if there is one.
+ */
+export function useAmountFromActivity(
+  activity: Activity,
+  swapRouters?: SwapRouter[],
+  liquidityPools?: LiquidityPool[]
+): ReactNode {
+  return amountFromActivity(activity, swapRouters, liquidityPools)
 }
 
 /**

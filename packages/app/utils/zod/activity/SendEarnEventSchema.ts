@@ -59,6 +59,7 @@ export const SendEarnWithdrawEventSchema = BaseEventSchema.extend({
 
 export type SendEarnWithdrawEvent = z.infer<typeof SendEarnWithdrawEventSchema>
 
+export type SendEarnEvent = SendEarnDepositEvent | SendEarnWithdrawEvent
 export const isSendEarnDepositEvent = (event: {
   event_name: string
 }): event is SendEarnDepositEvent => event.event_name === DatabaseEvents.SendEarnDeposit
