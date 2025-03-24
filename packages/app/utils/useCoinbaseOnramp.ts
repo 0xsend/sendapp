@@ -136,15 +136,23 @@ export function useCoinbaseOnramp({
     cleanup()
   }, [mutation, cleanup])
 
-  const status: OnrampStatus = isSuccess
-    ? 'success'
-    : mutation.isPending
-      ? 'pending_payment'
-      : paymentSubmitted
-        ? 'payment_submitted'
-        : mutation.isError
-          ? 'failed'
-          : 'idle'
+  let status: OnrampStatus
+  switch (true) {
+    case isSuccess:
+      status = 'success'
+      break
+    case mutation.isPending:
+      status = 'pending_payment'
+      break
+    case paymentSubmitted:
+      status = 'payment_submitted'
+      break
+    case mutation.isError:
+      status = 'failed'
+      break
+    default:
+      status = 'idle'
+  }
 
   return {
     openOnramp,
