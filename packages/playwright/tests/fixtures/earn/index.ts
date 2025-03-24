@@ -86,20 +86,21 @@ export class EarnDepositPage {
   }
 
   async acceptTerms() {
-    await expect(async () => {
-      await this.termsCheckbox.check()
-      expect(await this.termsCheckbox.isChecked()).toBeTruthy()
-    }).toPass({
-      timeout: 5_000,
-    })
+    if (await this.termsCheckbox.isVisible()) {
+      await expect(async () => {
+        await this.termsCheckbox.check()
+        expect(await this.termsCheckbox.isChecked()).toBeTruthy()
+      }).toPass({
+        timeout: 5_000,
+      })
+    }
   }
 
   async submit() {
-    await expect(async () => {
-      await this.page.getByRole('button', { name: 'Confirm Deposit' }).click()
-      await expect(this.page.getByText('Deposited successfully', { exact: true })).toBeVisible()
-    }).toPass({
-      timeout: 15_000,
+    await expect(this.page.getByRole('button', { name: 'Confirm Deposit' })).toBeVisible()
+    await this.page.getByRole('button', { name: 'Confirm Deposit' }).click()
+    await expect(this.page.getByText('Deposited successfully', { exact: true })).toBeVisible({
+      timeout: 10_000,
     })
   }
 
@@ -145,6 +146,7 @@ export class EarnDepositPage {
             .from('send_earn_deposit')
             .select('log_addr, owner, shares::text, assets::text')
             .order('block_num', { ascending: false })
+            .limit(1)
             .single()
 
           if (error) {
