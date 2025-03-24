@@ -73,11 +73,6 @@ function PlayBody(props: XStackProps) {
                 <TicketHoldings />
               </Card>
             </YStack>
-            <XStack $lg={{ display: 'none' }} pt={'$4'} jc={'center'} gap={'$4'} w="100%">
-              <Stack f={1} w="100%" jc={'center'} maw={350}>
-                <PlayButtons.BuyTicketsButton />
-              </Stack>
-            </XStack>
           </>
         )}
       </YStack>
