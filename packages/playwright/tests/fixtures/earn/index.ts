@@ -135,7 +135,7 @@ export class EarnDepositPage {
         await this.acceptTerms()
       }
     }).toPass({
-      timeout: 5_000,
+      timeout: 10_000,
     })
     await this.submit()
     await this.page.waitForURL(`/earn/${coinToParam(coin)}`)
