@@ -5,7 +5,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { useMyAffiliateRewards, useMyAffiliateVault } from 'app/features/earn/hooks'
-import { getBaseAddressFilterCondition, parseAndProcessActivities } from 'app/utils/activity'
+import { getBaseAddressFilterCondition } from 'app/utils/activity'
 import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { useSendAccount } from 'app/utils/send-accounts'
@@ -13,7 +13,7 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import { useAddressBook, type AddressBook } from 'app/utils/useAddressBook'
 import type { SendAccountCall } from 'app/utils/userop'
-import { DatabaseEvents, type Activity } from 'app/utils/zod/activity'
+import { DatabaseEvents, EventArraySchema, type Activity } from 'app/utils/zod/activity'
 import debug from 'debug'
 import { useMemo } from 'react'
 import { encodeFunctionData } from 'viem'
@@ -168,14 +168,14 @@ export function useEarnRewardsActivityFeed(params?: {
       })
     },
   })
-} /**
+}
+
+/**
  * Fetches the Send Earn rewards activity feed for the current user.
  * This queries the activity_feed view with filters to identify Send Earn rewards related activities.
  */
-
 export async function fetchEarnRewardsActivityFeed({
   pageParam,
-  addressBook,
   supabase,
   pageSize,
   sendEarnAffiliate,
@@ -203,7 +203,5 @@ export async function fetchEarnRewardsActivityFeed({
   throwIf(error)
 
   // Parse and process the raw data
-  return parseAndProcessActivities(data, {
-    addressBook,
-  })
+  return EventArraySchema.parse(data)
 }

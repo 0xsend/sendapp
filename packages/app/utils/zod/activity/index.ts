@@ -2,6 +2,8 @@ import { z } from 'zod'
 import { BaseEventSchema } from './BaseEventSchema'
 import { ReferralsEventSchema } from './ReferralsEventSchema'
 import { SendAccountReceiveEventSchema } from './SendAccountReceiveEventSchema'
+import { SendAccountSigningKeyAddedEventSchema } from './SendAccountSigningKeyAddedEventSchema'
+import { SendAccountSigningKeyRemovedEventSchema } from './SendAccountSigningKeyRemovedEventSchema'
 import { SendAccountTransfersEventSchema } from './SendAccountTransfersEventSchema'
 import { SendEarnDepositEventSchema, SendEarnWithdrawEventSchema } from './SendEarnEventSchema'
 import { TagReceiptsEventSchema } from './TagReceiptsEventSchema'
@@ -44,10 +46,12 @@ export const EventSchema = z
     TemporalTransfersEventSchema,
     SendEarnDepositEventSchema,
     SendEarnWithdrawEventSchema,
+    SendAccountSigningKeyAddedEventSchema,
+    SendAccountSigningKeyRemovedEventSchema,
   ])
   .or(BaseEventSchema)
   .catch((ctx) => {
-    console.warn('Error parsing activity', ctx)
+    console.warn('Error parsing event', ctx, ctx.error)
     // this is only required since the discrimnated union hard errors when a non-matching event is passed
     // if an unknown event is found, we should return a generic event
     if (ctx.error.name === 'ZodError') {

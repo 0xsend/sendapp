@@ -1,7 +1,7 @@
 import { Avatar, LinkableAvatar, Spinner, type LinkableAvatarProps, XStack } from '@my/ui'
 import { AvatarSendEarnDeposit } from 'app/components/avatars'
 import { AvatarSendEarnWithdraw } from 'app/components/avatars/AvatarSendEarnWithdraw'
-import { IconDeposit, IconUpgrade, IconWithdraw } from 'app/components/icons'
+import { IconUpgrade } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { allCoinsDict } from 'app/data/coins'
 import { counterpart, isSwapBuyTransfer, isSwapSellTransfer } from 'app/utils/activity'
@@ -46,7 +46,6 @@ export function ActivityAvatar({
       </XStack>
     )
   }
-
   if (user) {
     return (
       <XStack
