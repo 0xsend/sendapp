@@ -5,6 +5,7 @@ import { baseMainnet, usdcAddress } from '@my/wagmi'
 import { useSendAccount } from 'app/utils/send-accounts'
 import type { PgBytea } from '@my/supabase/database.types'
 import { useRouter } from 'solito/router'
+import { hexToBytea } from 'app/utils/hexToBytea'
 
 const defaultMaxWaitTime = 60000 * 2 // Default to 1 minute
 /**
@@ -35,7 +36,7 @@ export function PendingScreen({
   const [initialActivityCount, setInitialActivityCount] = useState<number | null>(null)
   // Query to check for new USDC transactions
   const { data: activityData } = useTokenActivityFeed({
-    address: usdcAddress[baseMainnet.id] as PgBytea,
+    address: hexToBytea(usdcAddress[baseMainnet.id]),
     refetchInterval: 5000, // Poll every 5 seconds
     enabled: !!sendAccount?.address,
     pageSize: 1,
@@ -93,7 +94,7 @@ export function PendingScreen({
         Transaction Pending
       </Text>
       <Text ta="center" fos="$4">
-        Waiting for Coinbase to confirm payment: {remainingTime} seconds before redirecting
+        Waiting for Coinbase to verify payment: {remainingTime} seconds before redirecting
       </Text>
     </YStack>
   )
