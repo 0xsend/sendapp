@@ -8,8 +8,8 @@ import { ScrollDirectionProvider } from 'app/provider/scroll'
 jest.mock('app/features/home/utils/useTokenActivityFeed')
 
 // this mock can be removed when swaps are no longer behind white list
-jest.mock('app/utils/send-accounts', () => ({
-  useSendAccount: jest.fn().mockReturnValue({ data: { id: 'mock-user-id' } }),
+jest.mock('app/utils/useUser', () => ({
+  useUser: jest.fn().mockReturnValue({ user: { id: 'mock-user-id' } }),
 }))
 
 jest.mock('app/utils/useSwapRouters', () => ({
