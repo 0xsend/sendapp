@@ -1,14 +1,15 @@
 /**
- * the names of the events that can be found in the activity feed and are parsed by the EventSchema.
+ * Database events that can be found in the activity feed.
+ * These are the actual event_name values from the database.
  */
-export enum Events {
+export enum DatabaseEvents {
   /**
    * ERC-20 token transfer for a send account
    */
   SendAccountTransfers = 'send_account_transfers',
   /**
    * Sendtag receipt for a send account in ETH.
-   * @notice use TagReceiptUSDC instead, we do not accept ETH for sendtags anymore
+   * @see TagReceiptUSDC instead, we do not accept ETH for sendtags anymore
    */
   TagReceipts = 'tag_receipts',
   /**
@@ -23,4 +24,34 @@ export enum Events {
    * Send account receives ETH
    */
   SendAccountReceive = 'send_account_receives',
+  /**
+   * Send Earn deposit
+   */
+  SendEarnDeposit = 'send_earn_deposit',
+  /**
+   * Send Earn withdraw
+   */
+  SendEarnWithdraw = 'send_earn_withdraw',
 }
+
+/**
+ * Virtual events used for client-side processing.
+ * These are not actual events in the database, but are created client-side
+ * to represent specific contexts or scenarios.
+ */
+export enum VirtualEvents {}
+
+/**
+ * Union type of all events that can be found in the activity feed.
+ * This includes both database events and virtual events.
+ */
+export type Events = DatabaseEvents | VirtualEvents
+
+/**
+ * Legacy enum for backward compatibility.
+ * @deprecated Use DatabaseEvents or VirtualEvents directly, or the Events type.
+ */
+export const Events = {
+  ...DatabaseEvents,
+  ...VirtualEvents,
+} as const

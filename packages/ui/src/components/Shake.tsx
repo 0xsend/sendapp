@@ -1,3 +1,4 @@
+import type { ViewProps, ViewStyle } from '@tamagui/core'
 import { useConfiguration } from '@tamagui/web'
 import { useEffect } from 'react'
 
@@ -6,6 +7,7 @@ export const Shake = ({
   shakeTimes = 4,
   shakeDistance = 3,
   children,
+  baseStyle = {},
 }: {
   /**
    * animated the container when this value changes and reset when it's undefined
@@ -21,6 +23,7 @@ export const Shake = ({
    */
   shakeDistance?: number
   children: React.ReactNode
+  baseStyle?: Omit<ViewStyle, 'transform'>
 }) => {
   const { animationDriver } = useConfiguration()
   if (!animationDriver) throw new Error('No animation driver found.')
@@ -51,6 +54,7 @@ export const Shake = ({
   const animatedStyle = useAnimatedNumberStyle(animatedNumber, (val) => {
     'worklet'
     return {
+      ...baseStyle,
       transform: [{ translateX: val }],
     }
   })

@@ -7,6 +7,8 @@ Activities such as registering a sendtag, sending some tokens, receiving tokens,
 
 The feed should be enriched with user profile information and sendtag information where possible.
 
+> **Note**: This document focuses on the database design for the activity feed. For information on the client-side processing layer that enables virtual event types and contextual processing, see [Activity Feed Client-Side Processing](./activity-feed-client-processing.md).
+
 ## Unified Activity Table
 
 A more generic table that can be used to capture all events, onchain and offchain, for the user. For example, there may be a user referral tracked inside the database that should show up in the activity table. The table should be generic enough to be used for any event that is emitted by the send account contract or to represent any other event that a user may want to track and see in their activity feed.
@@ -60,7 +62,7 @@ create or replace function activity_feed()
 as
 $$
 begin
-    return query 
+    return query
     select a.id,
         a.created_at,
         a.event_name,
@@ -114,7 +116,7 @@ begin
     -- select send app info for from address
     select user_id into _f_user_id from send_accounts where address = concat('0x', encode(NEW.f, 'hex'))::citext;
     select user_id into _t_user_id from send_accounts where address = concat('0x', encode(NEW.t, 'hex'))::citext;
-    
+
     insert into activity (event_name, event_id, from_user_id, to_user_id, data)
     values ('send_account_transfers',
             NEW.id,
@@ -164,7 +166,7 @@ SELECT tests.create_supabase_user('test_user_to');
 
 INSERT INTO send_accounts (user_id, address, chain_id, init_code)
 VALUES (tests.get_supabase_uid('test_user_from'), '0x1234567890ABCDEF1234567890ABCDEF12345678', 1, '\\x00112233445566778899AABBCCDDEEFF'),
-       (tests.get_supabase_uid('test_user_to'), '0xB0B7D5E8A4B6D534B3F608E9D27871F85A4E98DA', 1, '\\x00112233445566778899AABBCCDDEEFF'); 
+       (tests.get_supabase_uid('test_user_to'), '0xB0B7D5E8A4B6D534B3F608E9D27871F85A4E98DA', 1, '\\x00112233445566778899AABBCCDDEEFF');
 
 -- Insert a test row into send_account_transfers table
 INSERT INTO send_account_transfers (f, t, v)
@@ -173,10 +175,10 @@ VALUES ('\x1234567890ABCDEF1234567890ABCDEF12345678'::bytea, '\xB0B7D5E8A4B6D534
 -- Test if the trigger function populated the additional columns correctly
 SELECT results_eq(
     $$
-        SELECT 
-          f, 
-          t, 
-          v, 
+        SELECT
+          f,
+          t,
+          v,
           tests.get_supabase_uid('test_user_from'),
           tests.get_supabase_uid('test_user_to')
         FROM send_account_transfers
@@ -189,19 +191,19 @@ SELECT results_eq(
     'Test if the trigger function populated the additional columns correctly'
 );
 
-DELETE FROM send_account_transfers 
+DELETE FROM send_account_transfers
 WHERE id = (
-    SELECT id 
-    FROM send_account_transfers 
+    SELECT id
+    FROM send_account_transfers
     WHERE f = '\x1234567890ABCDEF1234567890ABCDEF12345678'::bytea AND t = '\xB0B7D5E8A4B6D534B3F608E9D27871F85A4E98DA'::bytea);
 
 -- Test if the trigger function removes the activity row
 SELECT is_empty(
     $$
-        SELECT 
-          f, 
-          t, 
-          v, 
+        SELECT
+          f,
+          t,
+          v,
           tests.get_supabase_uid('test_user_from'),
           tests.get_supabase_uid('test_user_to')
         FROM send_account_transfers

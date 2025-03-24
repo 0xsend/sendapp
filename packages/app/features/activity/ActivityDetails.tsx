@@ -1,23 +1,30 @@
 import {
   Fade,
+  H4,
   Paragraph,
   Separator,
   Stack,
+  Text,
   XStack,
   YStack,
-  Text,
-  H4,
   type StackProps,
 } from '@my/ui'
-import { phraseFromActivity, amountFromActivity, subtextFromActivity } from 'app/utils/activity'
-import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
 import { IconX } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
+import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
+import {
+  amountFromActivity,
+  usePhraseFromActivity,
+  useSubtextFromActivity,
+} from 'app/utils/activity'
+import { ContractLabels, useAddressBook } from 'app/utils/useAddressBook'
 import type { Activity } from 'app/utils/zod/activity'
 import {
+  isSendAccountTransfersEvent,
+  isSendEarnEvent,
   isSendtagCheckoutEvent,
   isSendTokenUpgradeEvent,
-} from 'app/utils/zod/activity/SendAccountTransfersEventSchema'
+} from 'app/utils/zod/activity'
 
 export const ActivityDetails = ({
   activity,
@@ -27,9 +34,15 @@ export const ActivityDetails = ({
   activity: Activity
   onClose: () => void
 } & StackProps) => {
-  const activityText = phraseFromActivity(activity)
-  const subText = subtextFromActivity(activity)
+  const activityText = usePhraseFromActivity(activity)
+  const subText = useSubtextFromActivity(activity)
   const amount = amountFromActivity(activity)
+  const isERC20Transfer = isSendAccountTransfersEvent(activity)
+  const addressBook = useAddressBook()
+  const isERC20TransferToSendEarn =
+    isERC20Transfer && addressBook?.data?.[activity.data.t] === ContractLabels.SendEarn
+  const isERC20TransferFromSendEarn =
+    isERC20Transfer && addressBook?.data?.[activity.data.f] === ContractLabels.SendEarn
 
   return (
     <Fade {...props}>
@@ -64,8 +77,14 @@ export const ActivityDetails = ({
                         return null
                       case isSendTokenUpgradeEvent(activity):
                         return null
+                      case isSendEarnEvent(activity):
+                        return null
                       case subText === null:
                         return <Text>{activityText}</Text>
+                      case isERC20TransferToSendEarn || isERC20TransferFromSendEarn:
+                        return null
+                      case !activityText:
+                        return null
                       default:
                         return (
                           <Text
