@@ -83,11 +83,6 @@ export function BuyTicketsScreen() {
             mx: 'auto',
           }}
         >
-          <XStack ai="center" gap="$2">
-            <IconGame size="$3" color="$color12" />
-            <H3 fontWeight="600">Buy Send Tickets</H3>
-          </XStack>
-
           <Card w="100%" p="$5">
             <YStack gap="$5">
               <YStack gap="$2" ai="center">
