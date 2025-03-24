@@ -12,7 +12,7 @@ import { useSendAccount } from 'app/utils/send-accounts'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import { useAddressBook, type AddressBook } from 'app/utils/useAddressBook'
-import { DatabaseEvents, EventArraySchema, type Activity } from 'app/utils/zod/activity'
+import { EventArraySchema, Events, type Activity } from 'app/utils/zod/activity'
 import { useMemo } from 'react'
 import type { ZodError } from 'zod'
 
@@ -105,9 +105,7 @@ async function fetchEarnActivityFeed({
   const query = supabase
     .from('activity_feed')
     .select('*')
-    .or(
-      `event_name.eq.${DatabaseEvents.SendEarnDeposit},event_name.eq.${DatabaseEvents.SendEarnWithdraw}`
-    )
+    .or(`event_name.eq.${Events.SendEarnDeposit},event_name.eq.${Events.SendEarnWithdraw}`)
     // Apply base address filtering
     .or(getBaseAddressFilterCondition())
     .order('created_at', { ascending: false })

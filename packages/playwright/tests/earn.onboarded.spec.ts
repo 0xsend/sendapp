@@ -16,6 +16,7 @@ import { hexToBytea } from 'app/utils/hexToBytea'
 import { WAD } from 'app/utils/math'
 import { assetsToEarnFactory } from 'app/utils/sendEarn'
 import { throwIf } from 'app/utils/throwIf'
+import { Events } from 'app/utils/zod/activity'
 import debug from 'debug'
 import {
   BaseError,
@@ -33,7 +34,6 @@ import { test as earnTest } from './fixtures/earn'
 import { checkReferralCodeHidden, checkReferralCodeVisibility } from './fixtures/referrals'
 import { fund, testBaseClient } from './fixtures/viem'
 import { createBaseWalletClient } from './fixtures/viem/base'
-import { DatabaseEvents } from 'app/utils/zod/activity'
 
 let log: debug.Debugger
 
@@ -352,7 +352,7 @@ for (const coin of [usdcCoin]) {
       })
       await expect(async () => {
         await expect(supabase).toHaveEventInActivityFeed({
-          event_name: DatabaseEvents.SendAccountTransfers,
+          event_name: Events.SendAccountTransfers,
           from_user: {
             send_id: profile.send_id,
           },
@@ -369,7 +369,7 @@ for (const coin of [usdcCoin]) {
       })
       await expect(async () => {
         await expect(supabase).toHaveEventInActivityFeed({
-          event_name: DatabaseEvents.SendEarnDeposit,
+          event_name: Events.SendEarnDeposit,
           from_user: {
             send_id: profile.send_id,
           },

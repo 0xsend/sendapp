@@ -13,7 +13,7 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import { useAddressBook, type AddressBook } from 'app/utils/useAddressBook'
 import type { SendAccountCall } from 'app/utils/userop'
-import { DatabaseEvents, EventArraySchema, type Activity } from 'app/utils/zod/activity'
+import { EventArraySchema, Events, type Activity } from 'app/utils/zod/activity'
 import debug from 'debug'
 import { useMemo } from 'react'
 import { encodeFunctionData } from 'viem'
@@ -193,7 +193,7 @@ export async function fetchEarnRewardsActivityFeed({
   const query = supabase
     .from('activity_feed')
     .select('*')
-    .in('event_name', [DatabaseEvents.SendEarnDeposit])
+    .in('event_name', [Events.SendEarnDeposit])
     .eq('data->>sender', hexToBytea(sendEarnAffiliate))
     .or(getBaseAddressFilterCondition())
     .order('created_at', { ascending: false })

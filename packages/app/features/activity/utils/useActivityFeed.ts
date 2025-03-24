@@ -12,7 +12,7 @@ import { assert } from 'app/utils/assert'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import { useAddressBook, type AddressBook } from 'app/utils/useAddressBook'
-import { DatabaseEvents, EventArraySchema, type Activity } from 'app/utils/zod/activity'
+import { EventArraySchema, Events, type Activity } from 'app/utils/zod/activity'
 import { useMemo } from 'react'
 import type { ZodError } from 'zod'
 
@@ -105,7 +105,7 @@ async function fetchActivityFeed({
       'event_name',
       'in',
       // exclude Send Earn deposits and withdrawals from the feed (they show up as SendAccountTransfers)
-      `(${[DatabaseEvents.SendEarnDeposit, DatabaseEvents.SendEarnWithdraw].join(',')})`
+      `(${[Events.SendEarnDeposit, Events.SendEarnWithdraw].join(',')})`
     )
     .order('created_at', { ascending: false })
     .range(from, to)
