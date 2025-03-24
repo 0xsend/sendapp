@@ -5,6 +5,8 @@ import { useRouter } from 'solito/router'
 
 type OnrampStatus = 'idle' | 'pending_payment' | 'success' | 'failed' | 'payment_submitted'
 
+const COINBASE_PAY_ORIGIN = 'https://pay.coinbase.com'
+const COINBASE_PAYMENT_SUBMITTED_PAGE_ROUTE = '/v2/guest/onramp/order-submitted'
 interface OnrampConfig {
   projectId: string
   address: string
@@ -48,6 +50,7 @@ export function useCoinbaseOnramp({
         projectId,
         addresses: {
           '0x2A92Cf5727E575E8954b854aD480BA7bEf1EDaaA': ['base'],
+          // [address]: ['base'],
         },
         partnerUserId,
         defaultPaymentMethod,
@@ -98,9 +101,9 @@ export function useCoinbaseOnramp({
 
   useEffect(() => {
     const handleMessage = async (event: MessageEvent) => {
-      if (event.origin !== window.location.origin) return
-
-      if (event.data?.type === 'COINBASE_ONRAMP_SUCCESS') {
+      if (event.origin !== COINBASE_PAY_ORIGIN) return
+      const eventData = JSON.parse(event.data)
+      if (eventData?.data?.eventName === 'success') {
         console.log('[Onramp] Transaction successful - processing completion')
         try {
           setIsSuccess(true)
@@ -113,7 +116,8 @@ export function useCoinbaseOnramp({
           mutation.reset()
           cleanup()
         }
-      } else if (event.data?.type === 'COINBASE_ONRAMP_PENDING') {
+      } else if (eventData?.data?.pageRoute === COINBASE_PAYMENT_SUBMITTED_PAGE_ROUTE) {
+        console.log('[Onramp] Transaction pending - waiting for Coinbase approval')
         setPaymentSubmitted(true)
       }
     }
