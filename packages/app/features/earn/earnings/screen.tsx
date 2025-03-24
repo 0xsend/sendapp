@@ -1,15 +1,4 @@
-import {
-  Card,
-  Fade,
-  H4,
-  Paragraph,
-  ScrollView,
-  Separator,
-  Spinner,
-  XStack,
-  YGroup,
-  YStack,
-} from '@my/ui'
+import { Card, Fade, H4, Paragraph, ScrollView, Separator, Spinner, XStack, YStack } from '@my/ui'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
 import { formatCoinAmount } from 'app/utils/formatCoinAmount'
@@ -82,7 +71,7 @@ export const EarningsFeed = () => {
         showsVerticalScrollIndicator={false}
         keyExtractor={(activity) => `${activity.event_name}-${activity.created_at.getTime()}`}
         renderItem={({ item: activity, index, section }) => (
-          <YGroup
+          <YStack
             bc="$color1"
             px="$2"
             $gtLg={{
@@ -105,10 +94,8 @@ export const EarningsFeed = () => {
               borderBottomRightRadius: '$4',
             })}
           >
-            <YGroup.Item>
-              <TokenActivityRow activity={activity} />
-            </YGroup.Item>
-          </YGroup>
+            <TokenActivityRow activity={activity} />
+          </YStack>
         )}
         renderSectionHeader={({ section: { title, index } }) => (
           <H4

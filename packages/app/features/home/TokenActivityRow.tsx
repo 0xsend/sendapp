@@ -1,6 +1,6 @@
 import { Paragraph, Text, XStack, YStack } from '@my/ui'
 import {
-  amountFromActivity,
+  useAmountFromActivity,
   useEventNameFromActivity,
   useSubtextFromActivity,
 } from 'app/utils/activity'
@@ -25,7 +25,7 @@ export function TokenActivityRow({
 }) {
   const { profile } = useUser()
   const { created_at, from_user, to_user } = activity
-  const amount = amountFromActivity(activity)
+  const amount = useAmountFromActivity(activity)
   const date = CommentsTime(new Date(created_at))
   const eventName = useEventNameFromActivity(activity)
   const subtext = useSubtextFromActivity(activity)

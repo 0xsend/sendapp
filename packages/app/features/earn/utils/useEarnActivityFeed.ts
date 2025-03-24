@@ -6,19 +6,15 @@ import {
   type InfiniteData,
   type UseInfiniteQueryResult,
 } from '@tanstack/react-query'
-import { parseAndProcessActivities } from 'app/utils/activity'
+import { getBaseAddressFilterCondition, parseAndProcessActivities } from 'app/utils/activity'
 import { assert } from 'app/utils/assert'
-import { hexToBytea } from 'app/utils/hexToBytea'
-import { pgAddrCondValues } from 'app/utils/pgAddrCondValues'
 import { useSendAccount } from 'app/utils/send-accounts'
-import { squish } from 'app/utils/strings'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import { useAddressBook, type AddressBook } from 'app/utils/useAddressBook'
 import { DatabaseEvents, type Activity } from 'app/utils/zod/activity'
 import { useMemo } from 'react'
 import type { ZodError } from 'zod'
-import { getBaseAddressFilterCondition } from 'app/utils/activity'
 
 /**
  * Infinite query to fetch Send Earn activity feed.
@@ -83,7 +79,6 @@ export function useEarnActivityFeed(params?: {
         supabase,
         pageSize,
         addressBook: addressBook.data,
-        userAddress: sendAccount.data.address,
       })
     },
   })
@@ -98,36 +93,21 @@ async function fetchEarnActivityFeed({
   addressBook,
   supabase,
   pageSize,
-  userAddress,
 }: {
   pageParam: number
   addressBook: AddressBook
   supabase: SupabaseClient<Database>
   pageSize: number
-  userAddress: `0x${string}`
 }): Promise<Activity[]> {
   const from = pageParam * pageSize
   const to = (pageParam + 1) * pageSize - 1
 
-  // Find all Send Earn vaults in the address book
-  const sendEarnVaults = Object.entries(addressBook)
-    .filter(([_, label]) => label === 'Send Earn')
-    .map(([address]) => address as `0x${string}`)
-
-  // Convert addresses to bytea format for PostgreSQL
-  const vaultAddressesValues = pgAddrCondValues(sendEarnVaults)
-  const userAddressBytea = hexToBytea(userAddress)
-
-  // Query for transfers to/from Send Earn vaults involving the user
+  // Query for Send Earn activity
   const query = supabase
     .from('activity_feed')
     .select('*')
-    .eq('event_name', DatabaseEvents.SendAccountTransfers)
     .or(
-      squish(`
-        data->>f.eq.${userAddressBytea},data->>t.in.(${vaultAddressesValues}),
-        data->>t.eq.${userAddressBytea},data->>f.in.(${vaultAddressesValues})
-      `)
+      `event_name.eq.${DatabaseEvents.SendEarnDeposit},event_name.eq.${DatabaseEvents.SendEarnWithdraw}`
     )
     // Apply base address filtering
     .or(getBaseAddressFilterCondition())
