@@ -27,8 +27,16 @@ export function useCoinbaseOnramp({
   const popupRef = useRef<Window | null>(null)
   const [popupChecker, setPopupChecker] = useState<NodeJS.Timeout | null>(null)
   const [isSuccess, setIsSuccess] = useState(false)
+  // Use a ref to track payment submission status that will be accessible in the Promise closure
+  const paymentSubmittedRef = useRef(false)
+  // Keep state for UI updates, but use the ref for the Promise logic
   const [paymentSubmitted, setPaymentSubmitted] = useState(false)
   const router = useRouter()
+
+  // Simple clean way to update the ref
+  useEffect(() => {
+    paymentSubmittedRef.current = paymentSubmitted
+  }, [paymentSubmitted])
 
   const cleanup = useCallback(() => {
     if (popupRef.current) {
@@ -80,7 +88,7 @@ export function useCoinbaseOnramp({
           popupRef.current = null
           // A user can close the tab and be in two states
           // where the payment was made or not made.
-          if (!paymentSubmitted) {
+          if (!paymentSubmittedRef.current) {
             reject(new Error('Transaction cancelled'))
           } else {
             resolve()
