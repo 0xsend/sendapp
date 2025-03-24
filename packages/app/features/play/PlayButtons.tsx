@@ -52,7 +52,7 @@ export const BuyTicketsButton = (props: Omit<LinkableButtonProps, 'children'>) =
           tt="uppercase"
           size={'$5'}
         >
-          Buy Tickets
+          Buy /ticket
         </LinkableButton.Text>
       </XStack>
     </LinkableButton>
