@@ -11,7 +11,7 @@ import { TagReceiptUSDCEventSchema } from './TagReceiptUSDCEventSchema'
 import { TemporalTransfersEventSchema } from './TemporalTransfersEventSchema'
 
 export type { BaseEvent } from './BaseEventSchema'
-export { DatabaseEvents, Events, VirtualEvents } from './events'
+export { Events } from './events'
 export { isReferralsEvent, ReferralsEventSchema } from './ReferralsEventSchema'
 export {
   isSendAccountReceiveEvent,
