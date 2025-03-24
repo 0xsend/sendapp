@@ -130,9 +130,13 @@ export class EarnDepositPage {
     log('depositing', amount, coin.symbol)
 
     await this.fillAmount(amount)
-    if (await this.termsCheckbox.isVisible()) {
-      await this.acceptTerms()
-    }
+    await expect(async () => {
+      if (await this.termsCheckbox.isVisible()) {
+        await this.acceptTerms()
+      }
+    }).toPass({
+      timeout: 5_000,
+    })
     await this.submit()
     await this.page.waitForURL(`/earn/${coinToParam(coin)}`)
 

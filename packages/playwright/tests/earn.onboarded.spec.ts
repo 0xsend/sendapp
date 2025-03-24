@@ -1,7 +1,12 @@
 import { faker } from '@faker-js/faker'
 import { expect } from '@my/playwright/fixtures/send-accounts'
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
-import { sendEarnAbi, sendEarnAddress, sendEarnUsdcFactoryAbi } from '@my/wagmi'
+import {
+  sendEarnAbi,
+  sendEarnAddress,
+  sendEarnUsdcFactoryAbi,
+  sendEarnUsdcFactoryAddress,
+} from '@my/wagmi'
 import { mergeTests } from '@playwright/test'
 import { type erc20Coin, ethCoin, usdcCoin } from 'app/data/coins'
 import { AffiliateVaultSchema } from 'app/features/earn/zod'
@@ -28,6 +33,7 @@ import { test as earnTest } from './fixtures/earn'
 import { checkReferralCodeHidden, checkReferralCodeVisibility } from './fixtures/referrals'
 import { fund, testBaseClient } from './fixtures/viem'
 import { createBaseWalletClient } from './fixtures/viem/base'
+import { DatabaseEvents } from 'app/utils/zod/activity'
 
 let log: debug.Debugger
 
@@ -339,6 +345,40 @@ for (const coin of [usdcCoin]) {
             send_id: profile.send_id,
           },
           data: {},
+        })
+      }).toPass({
+        timeout: 10_000,
+        intervals: [1000, 2000, 3000, 5000],
+      })
+      await expect(async () => {
+        await expect(supabase).toHaveEventInActivityFeed({
+          event_name: DatabaseEvents.SendAccountTransfers,
+          from_user: {
+            send_id: profile.send_id,
+          },
+          to_user: null,
+          data: {
+            v: deposit.assets.toString(),
+            f: hexToBytea(sendAccount.address as `0x${string}`),
+            t: hexToBytea(sendEarnUsdcFactoryAddress[testBaseClient.chain.id]),
+          },
+        })
+      }).toPass({
+        timeout: 10_000,
+        intervals: [1000, 2000, 3000, 5000],
+      })
+      await expect(async () => {
+        await expect(supabase).toHaveEventInActivityFeed({
+          event_name: DatabaseEvents.SendEarnDeposit,
+          from_user: {
+            send_id: profile.send_id,
+          },
+          to_user: null,
+          data: {
+            log_addr: hexToBytea(vault),
+            owner: hexToBytea(sendAccount.address as `0x${string}`),
+            assets: randomAmount.toString(),
+          },
         })
       }).toPass({
         timeout: 10_000,

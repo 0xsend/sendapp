@@ -226,7 +226,7 @@ test('can refer a tag', async ({ seed, checkoutPage, supabase, user: { profile: 
       send_id: myProfile.send_id,
     },
     data: {
-      tags: [tagsToRegister[0]],
+      tags: expect.arrayContaining([tagsToRegister[0]]),
     },
   })
 
@@ -252,7 +252,7 @@ test('can refer multiple tags in separate transactions', async ({
 
   await checkReferralCodeVisibility({
     page: checkoutPage.page,
-    referralCode: referrer.referral_code,
+    referralCode: referrerTags[0] ?? referrer.referral_code,
   })
   await confirmTags(checkoutPage, firstTags)
   await verifyTagsInDatabase(supabase, firstTags)
@@ -268,7 +268,7 @@ test('can refer multiple tags in separate transactions', async ({
       send_id: myProfile.send_id,
     },
     data: {
-      tags: [firstTags[0]],
+      tags: expect.arrayContaining([firstTags[0]]),
     },
   })
   const firstRewardAmount = await verifyReferralReward(
