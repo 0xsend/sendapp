@@ -5,9 +5,9 @@ import { fetchSendtagCheckoutReceipts } from 'app/features/account/sendtag/check
 import { assert } from 'app/utils/assert'
 import { byteaToHex } from 'app/utils/byteaToHex'
 import { hexToBytea } from 'app/utils/hexToBytea'
-import { fetchReferrer } from 'app/utils/referrer'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import { throwIf } from 'app/utils/throwIf'
+import { fetchReferrer } from 'app/utils/useReferrer'
 import { byteaTxHash } from 'app/utils/zod'
 import debug from 'debug'
 import { isAddressEqual, withRetry, zeroAddress } from 'viem'
@@ -61,7 +61,7 @@ export const tagRouter = createTRPCRouter({
         ? await fetchReferrer({
             supabase,
             profile,
-            referralCode,
+            referral_code: referralCode,
           }).catch((e) => {
             const error = e as unknown as PostgrestError
             if (error.code === 'PGRST116') {

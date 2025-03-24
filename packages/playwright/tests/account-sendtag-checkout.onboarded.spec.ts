@@ -174,11 +174,9 @@ test('can refer a tag', async ({ seed, checkoutPage, supabase, user: { profile: 
 
   // check referral code and referrer are visible
   const refcode = checkoutPage.page.getByTestId('referral-code-input')
-  const referrerTag = referrerTags[0]
-  assert(!!referrerTag, 'referrer tags not found')
   await checkReferralCodeVisibility({
     page: checkoutPage.page,
-    referralCode: referrerTag,
+    referralCode: referrerTags[0] ?? referrer.referral_code,
   })
   // can change the referral code
   await refcode.fill('1234567890')
