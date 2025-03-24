@@ -6,7 +6,7 @@ import type { NextPageWithLayout } from './_app'
 import type { GetServerSideProps, GetServerSidePropsContext } from 'next'
 import type { Database } from '@my/supabase/database.types'
 import { userOnboarded } from 'utils/userOnboarded'
-import { CheckoutTagSchema } from 'app/features/account/sendtag/checkout/CheckoutTagSchema'
+import { SendtagSchema } from 'app/utils/zod/sendtag'
 import { assert } from 'app/utils/assert'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import { TopNav } from 'app/components/TopNav'
@@ -27,7 +27,7 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   const { tag: tagParam } = ctx.params ?? {}
 
   // ensure identifier is valid before proceeding
-  const result = CheckoutTagSchema.safeParse({
+  const result = SendtagSchema.safeParse({
     name: tagParam?.toString().match(/^@/) ? tagParam.toString().slice(1) : tagParam,
   })
 
