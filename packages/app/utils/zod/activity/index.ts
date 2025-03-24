@@ -10,7 +10,7 @@ import { TagReceiptsEventSchema } from './TagReceiptsEventSchema'
 import { TagReceiptUSDCEventSchema } from './TagReceiptUSDCEventSchema'
 
 export type { BaseEvent } from './BaseEventSchema'
-export { DatabaseEvents, Events, VirtualEvents } from './events'
+export { Events } from './events'
 export { isReferralsEvent, ReferralsEventSchema } from './ReferralsEventSchema'
 export {
   isSendAccountReceiveEvent,
