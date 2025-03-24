@@ -21,7 +21,8 @@ import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { convertBalanceToFiat } from 'app/utils/convertBalanceToUSD'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
-import { useSendAccount } from 'app/utils/send-accounts'
+import { ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
+import { useUser } from 'app/utils/useUser'
 
 export function AnimateEnter({ children }: { children: React.ReactNode }) {
   return (
@@ -45,8 +46,8 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
 
   // this code can be removed as swaps are no longer behind whitelist
   const swapEnabledUsers = (process.env.NEXT_PUBLIC_SWAP_ALLOWLIST ?? '').split(',')
-  const { data: sendAccount } = useSendAccount()
-  const isSwapEnabled = sendAccount?.id && swapEnabledUsers.includes(sendAccount.id)
+  const { user } = useUser()
+  const isSwapEnabled = user?.id && swapEnabledUsers.includes(user.id)
 
   const getSwapUrl = () => {
     if (coin?.symbol === sendCoin.symbol) {

@@ -90,6 +90,7 @@ const encodeKyberSwapRoute = async ({
           pool_addr: tokenInLiquidityPool.pool,
           pool_name: tokenInLiquidityPool.exchange,
           pool_type: tokenInLiquidityPool.poolType,
+          chain_id: baseMainnetClient.chain.id,
         }
       })
       .filter((item) => item !== null)
@@ -119,12 +120,13 @@ const encodeKyberSwapRoute = async ({
       throw new Error(kyberEncodeRouteResponse.message)
     }
 
-    const { error: swapRoutersError } = await supabaseAdmin
-      .from('swap_routers')
-      .upsert(
-        { router_addr: kyberEncodeRouteResponse.data.routerAddress },
-        { ignoreDuplicates: true }
-      )
+    const { error: swapRoutersError } = await supabaseAdmin.from('swap_routers').upsert(
+      {
+        router_addr: kyberEncodeRouteResponse.data.routerAddress,
+        chain_id: baseMainnetClient.chain.id,
+      },
+      { ignoreDuplicates: true }
+    )
 
     if (swapRoutersError) {
       throw new Error(swapRoutersError.message)

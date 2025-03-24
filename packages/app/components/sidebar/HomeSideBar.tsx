@@ -29,7 +29,6 @@ import { NavSheet } from '../NavSheet'
 import { useUser } from 'app/utils/useUser'
 import { ReferralLink } from '../ReferralLink'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
-import { useSendAccount } from 'app/utils/send-accounts'
 
 const links = [
   {
@@ -67,11 +66,10 @@ const links = [
 ].filter(Boolean) as { icon: ReactElement; text: string; href: string }[]
 
 const HomeSideBar = ({ ...props }: YStackProps) => {
-  const { data: sendAccount } = useSendAccount()
-
   // this code can be removed then swaps are no longer behind whitelist
+  const { user } = useUser()
   const swapEnabledUsers = (process.env.NEXT_PUBLIC_SWAP_ALLOWLIST ?? '').split(',')
-  const isSwapEnabled = sendAccount?.id && swapEnabledUsers.includes(sendAccount.id)
+  const isSwapEnabled = user?.id && swapEnabledUsers.includes(user.id)
   const _links = isSwapEnabled ? links : links.filter((link) => link.href !== '/swap')
 
   return (
