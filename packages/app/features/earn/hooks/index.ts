@@ -315,6 +315,8 @@ type SendEarnCoinBalance = z.infer<typeof SendEarnCoinBalanceSchema>
 /**
  * React hook to fetch and calculate a user's Send Earn balances for a specific coin/token.
  *
+ * You must invalidate the `useSendEarnBalances` query when the coin changes to fetch the latest balances.
+ *
  * @param coin - The ERC20 coin/token to fetch balances for. Can be undefined.
  * @returns A React Query result containing an array of SendEarnCoinBalance objects, including:
  *  - Share amounts

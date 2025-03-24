@@ -3,6 +3,7 @@ import { BaseEventSchema } from './BaseEventSchema'
 import { ReferralsEventSchema } from './ReferralsEventSchema'
 import { SendAccountReceiveEventSchema } from './SendAccountReceiveEventSchema'
 import { SendAccountTransfersEventSchema } from './SendAccountTransfersEventSchema'
+import { SendEarnDepositEventSchema, SendEarnWithdrawEventSchema } from './SendEarnEventSchema'
 import { TagReceiptsEventSchema } from './TagReceiptsEventSchema'
 import { TagReceiptUSDCEventSchema } from './TagReceiptUSDCEventSchema'
 import { TemporalTransfersEventSchema } from './TemporalTransfersEventSchema'
@@ -41,9 +42,12 @@ export const EventSchema = z
     ReferralsEventSchema,
     SendAccountReceiveEventSchema,
     TemporalTransfersEventSchema,
+    SendEarnDepositEventSchema,
+    SendEarnWithdrawEventSchema,
   ])
   .or(BaseEventSchema)
   .catch((ctx) => {
+    console.warn('Error parsing activity', ctx)
     // this is only required since the discrimnated union hard errors when a non-matching event is passed
     // if an unknown event is found, we should return a generic event
     if (ctx.error.name === 'ZodError') {
