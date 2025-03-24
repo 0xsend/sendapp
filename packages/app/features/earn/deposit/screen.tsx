@@ -211,15 +211,25 @@ export function DepositForm() {
         form.clearErrors('amount')
       }
       form.trigger('amount')
-      setParams(
-        {
-          ...params,
-          amount: sanitizedAmount ? sanitizedAmount.toString() : undefined,
-        },
-        { webBehavior: 'replace' }
-      )
+      if (!mutation.isSuccess) {
+        setParams(
+          {
+            ...params,
+            amount: sanitizedAmount ? sanitizedAmount.toString() : undefined,
+          },
+          { webBehavior: 'replace' }
+        )
+      }
     },
-    [form.clearErrors, form.setError, setParams, coin.data?.decimals, params, form.trigger]
+    [
+      form.clearErrors,
+      form.setError,
+      setParams,
+      coin.data?.decimals,
+      params,
+      form.trigger,
+      mutation.isSuccess,
+    ]
   )
 
   // validate and sanitize amount
@@ -352,60 +362,73 @@ export function DepositForm() {
                 : undefined,
             areTermsAccepted: hasExistingDeposit,
           }}
-          renderAfter={({ submit }) => (
-            <YStack>
-              {mutation.isPending ? (
-                <Fade key="userop-state">
-                  <Paragraph color={'$color10'} ta="center" size="$3">
-                    {useropState}
-                  </Paragraph>
-                </Fade>
-              ) : null}
-              <XStack alignItems="center" jc="center" gap={'$2'}>
-                {[calls.error, sendAccount.error, uop.error, mutation.error]
-                  .filter(Boolean)
-                  .map((e) =>
-                    e ? (
-                      <Paragraph key={e.message} color="$error" role="alert">
-                        {toNiceError(e)}
-                      </Paragraph>
-                    ) : null
+          renderAfter={({ submit }) =>
+            mutation.isSuccess ? (
+              <YStack>
+                <Paragraph color={'$color10'} ta="center" size="$3">
+                  Success. Redirecting...
+                </Paragraph>
+              </YStack>
+            ) : (
+              <YStack>
+                {mutation.isPending ? (
+                  <Fade key="userop-state">
+                    <Paragraph color={'$color10'} ta="center" size="$3">
+                      {useropState}
+                    </Paragraph>
+                  </Fade>
+                ) : null}
+                <XStack alignItems="center" jc="center" gap={'$2'}>
+                  {[calls.error, sendAccount.error, uop.error, mutation.error]
+                    .filter(Boolean)
+                    .map((e) =>
+                      e ? (
+                        <Paragraph key={e.message} color="$error" role="alert">
+                          {toNiceError(e)}
+                        </Paragraph>
+                      ) : null
+                    )}
+                </XStack>
+                <SubmitButton
+                  theme="green"
+                  onPress={() => {
+                    if (!areTermsAccepted) {
+                      form.setError(
+                        'areTermsAccepted',
+                        {
+                          type: 'required',
+                        },
+                        {
+                          shouldFocus: true,
+                        }
+                      )
+                      return
+                    }
+                    submit()
+                  }}
+                  py={'$5'}
+                  br={'$4'}
+                  disabledStyle={{ opacity: 0.5 }}
+                  disabled={!canSubmit}
+                  iconAfter={mutation.isPending ? <Spinner size="small" /> : undefined}
+                >
+                  {[calls.isLoading, sendAccount.isLoading, uop.isLoading].some((p) => p) &&
+                  !mutation.isPending ? (
+                    <Spinner size="small" />
+                  ) : (
+                    <Button.Text
+                      size={'$5'}
+                      fontWeight={'500'}
+                      fontFamily={'$mono'}
+                      color={'$black'}
+                    >
+                      CONFIRM DEPOSIT
+                    </Button.Text>
                   )}
-              </XStack>
-              <SubmitButton
-                theme="green"
-                onPress={() => {
-                  if (!areTermsAccepted) {
-                    form.setError(
-                      'areTermsAccepted',
-                      {
-                        type: 'required',
-                      },
-                      {
-                        shouldFocus: true,
-                      }
-                    )
-                    return
-                  }
-                  submit()
-                }}
-                py={'$5'}
-                br={'$4'}
-                disabledStyle={{ opacity: 0.5 }}
-                disabled={!canSubmit}
-                iconAfter={mutation.isPending ? <Spinner size="small" /> : undefined}
-              >
-                {[calls.isLoading, sendAccount.isLoading, uop.isLoading].some((p) => p) &&
-                !mutation.isPending ? (
-                  <Spinner size="small" />
-                ) : (
-                  <Button.Text size={'$5'} fontWeight={'500'} fontFamily={'$mono'} color={'$black'}>
-                    CONFIRM DEPOSIT
-                  </Button.Text>
-                )}
-              </SubmitButton>
-            </YStack>
-          )}
+                </SubmitButton>
+              </YStack>
+            )
+          }
         >
           {({ amount, areTermsAccepted }) => (
             <YStack width={'100%'} gap={'$5'}>
