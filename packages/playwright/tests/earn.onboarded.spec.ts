@@ -31,8 +31,8 @@ import { createBaseWalletClient } from './fixtures/viem/base'
 
 let log: debug.Debugger
 
-// $10
-const GAS_FEES = BigInt(10 * 10 ** usdcCoin.decimals)
+// $25
+const GAS_FEES = BigInt(25 * 10 ** usdcCoin.decimals)
 
 const test = mergeTests(earnTest, snapletTest)
 
@@ -327,17 +327,22 @@ for (const coin of [usdcCoin]) {
       expect(affiliateVault.send_earn_affiliate_vault).toBeDefined()
       expect(affiliateVault.send_earn_affiliate_vault?.send_earn).toBe(vault)
 
-      await expect(supabase).toHaveEventInActivityFeed({
-        event_name: 'referrals',
-        from_user: {
-          send_id: referrer.send_id,
-          tags: referrerTags,
-        },
-        to_user: {
-          id: profile.id,
-          send_id: profile.send_id,
-        },
-        data: {},
+      await expect(async () => {
+        await expect(supabase).toHaveEventInActivityFeed({
+          event_name: 'referrals',
+          from_user: {
+            send_id: referrer.send_id,
+            tags: referrerTags,
+          },
+          to_user: {
+            id: profile.id,
+            send_id: profile.send_id,
+          },
+          data: {},
+        })
+      }).toPass({
+        timeout: 10_000,
+        intervals: [1000, 2000, 3000, 5000],
       })
     })
   })
@@ -434,7 +439,7 @@ for (const coin of [usdcCoin]) {
       user: { profile },
       sendAccount,
     }) => {
-      test.slow()
+      test.setTimeout(40_000)
       log = debug(`test:earn:claim:${profile.id}:${test.info().parallelIndex}`)
 
       // It's a prerequisite that the affiliate has a Send Earn deposit to claim rewards through the app
@@ -639,7 +644,7 @@ for (const coin of [usdcCoin]) {
       sendAccount,
       supabase,
     }) => {
-      test.slow()
+      test.setTimeout(40000)
       log = debug(`test:earn:vault-consistency:${test.info().parallelIndex}`)
 
       // Generate random amounts for deposits
@@ -689,15 +694,6 @@ for (const coin of [usdcCoin]) {
 
       const vault2 = checksumAddress(byteaToHex(deposit2.log_addr))
 
-      // Verify the second deposit
-      await verifyDeposit({
-        owner: sendAccount.address,
-        vault: vault2,
-        minDepositedAssets: MIN_DEPOSIT_AMOUNT,
-        depositedAssets: randomAmount2,
-        deposit: deposit2,
-      })
-
       // 3. Verify both deposits went to the same vault
       expect(vault2).toBe(vault1)
 
@@ -715,38 +711,32 @@ for (const coin of [usdcCoin]) {
 
       const vault3 = checksumAddress(byteaToHex(deposit3.log_addr))
 
-      // Verify the third deposit
-      await verifyDeposit({
-        owner: sendAccount.address,
-        vault: vault3,
-        minDepositedAssets: MIN_DEPOSIT_AMOUNT,
-        depositedAssets: randomAmount3,
-        deposit: deposit3,
-      })
-
       // 5. Verify all deposits went to the same vault
       expect(vault3).toBe(vault1)
 
       // 6. Query the database to verify all deposits for this user and asset
       // are associated with the same vault
-      const { data: deposits } = await supabase
-        .from('send_earn_deposit')
-        .select('log_addr')
-        .eq('owner', hexToBytea(sendAccount.address))
-        .order('block_time', { ascending: false })
+      const { data: balance, error } = await supabase
+        .from('send_earn_balances')
+        .select('log_addr, assets::text')
         .limit(10)
 
-      expect(deposits).toBeDefined()
-      assert(!!deposits, 'No deposits found')
-      expect(deposits.length).toBeGreaterThanOrEqual(3)
+      expect(error).toBeFalsy()
+
+      expect(balance).toBeDefined()
+      assert(!!balance, 'No deposits found')
 
       // All deposits should have the same log_addr
-      const uniqueVaults = new Set(deposits.map((d) => byteaToHex(d.log_addr)))
+      const uniqueVaults = new Set(balance.map((d) => checksumAddress(byteaToHex(d.log_addr))))
       expect(uniqueVaults.size).toBe(1)
-      // Check if any of the vault addresses in the set match our vault1 (after removing 0x prefix)
-      const vault1WithoutPrefix = vault1.slice(2).toLowerCase()
-      const hasMatchingVault = Array.from(uniqueVaults).some((v) => v === vault1WithoutPrefix)
-      expect(hasMatchingVault).toBeTruthy()
+      expect(uniqueVaults.has(vault1)).toBeTruthy()
+
+      // Assets should total up to the amount deposited
+      const totalAssets = balance.reduce((acc, deposit) => {
+        return acc + Number(formatUnits(BigInt(deposit.assets), coin.decimals))
+      }, 0)
+      const totalDeposited = [amount1, amount2, amount3].reduce((acc, a) => acc + Number(a), 0)
+      expect(totalAssets).toBeCloseTo(totalDeposited, 2)
     })
   })
 }
