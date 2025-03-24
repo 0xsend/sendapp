@@ -1,7 +1,7 @@
 import 'zx/globals'
 import { integrations } from '../src'
 
-// $.verbose = true
+$.verbose = true
 
 console.log(chalk.red('Emptying shovel integration tables'))
 
