@@ -357,18 +357,21 @@ export type Database = {
       }
       liquidity_pools: {
         Row: {
+          chain_id: number
           created_at: string
           pool_addr: string
           pool_name: string
           pool_type: string
         }
         Insert: {
+          chain_id: number
           created_at?: string
           pool_addr: string
           pool_name: string
           pool_type: string
         }
         Update: {
+          chain_id?: number
           created_at?: string
           pool_addr?: string
           pool_name?: string
@@ -1101,14 +1104,17 @@ export type Database = {
       }
       swap_routers: {
         Row: {
+          chain_id: number
           created_at: string
           router_addr: string
         }
         Insert: {
+          chain_id: number
           created_at?: string
           router_addr: string
         }
         Update: {
+          chain_id?: number
           created_at?: string
           router_addr?: string
         }

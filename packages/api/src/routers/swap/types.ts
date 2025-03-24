@@ -63,7 +63,7 @@ export const KyberGetSwapRouteResponseSchema = z.object({
   code: z.number(),
   message: z.string(),
   data: z.object({
-    routerAddress: z.string(),
+    routerAddress: EthAddressSchema,
     routeSummary: KyberRouteSummarySchema,
   }),
 })
