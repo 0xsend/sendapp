@@ -1,11 +1,11 @@
 import { test } from '@jest/globals'
-import { CheckoutTagSchema } from './CheckoutTagSchema'
+import { SendtagSchema } from 'app/utils/zod/sendtag'
 import { assert } from 'app/utils/assert'
 // import debug from 'debug'
 
-// const log = debug('test:CheckoutTagSchema')
+// const log = debug('test:SendtagSchema')
 
-type CheckoutTagSchemaTestCase = {
+type SendtagSchemaTestCase = {
   input: {
     // biome-ignore lint/suspicious/noExplicitAny: this is for testing
     name: any
@@ -40,8 +40,8 @@ jest.mock('app/provider/coins', () => ({
 
 // LENGTH(name) BETWEEN 1 AND 20
 // AND name ~ '^[A-Za-z0-9_]+$'
-test('CheckoutTagSchema', () => {
-  const cases: CheckoutTagSchemaTestCase[] = [
+test('SendtagSchema', () => {
+  const cases: SendtagSchemaTestCase[] = [
     {
       input: {
         name: 'test',
@@ -90,7 +90,7 @@ test('CheckoutTagSchema', () => {
 
   for (const { input, output } of cases) {
     const success = output.success
-    const result = CheckoutTagSchema.safeParse(input)
+    const result = SendtagSchema.safeParse(input)
     expect(result.success).toBe(success)
     if (success) {
       assert(result.success)

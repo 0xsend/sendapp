@@ -20,7 +20,7 @@ import { useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { formatUnits } from 'viem'
 import type { z } from 'zod'
-import { CheckoutTagSchema } from '../checkout/CheckoutTagSchema'
+import { SendtagSchema } from 'app/utils/zod/sendtag'
 import { SendTagPricingDialog, SendTagPricingTooltip } from '../checkout/SendTagPricingDialog'
 import { RowLabel } from 'app/components/layout/RowLabel'
 import { useThemeSetting } from '@tamagui/next-theme'
@@ -32,7 +32,7 @@ export const AddSendtagsForm = () => {
   const pendingTags = usePendingTags()
   const confirmedTags = useConfirmedTags()
   const hasPendingTags = pendingTags && pendingTags.length > 0
-  const form = useForm<z.infer<typeof CheckoutTagSchema>>()
+  const form = useForm<z.infer<typeof SendtagSchema>>()
   const supabase = useSupabase()
   const has5Tags = user?.tags?.length === 5
   const media = useMedia()
@@ -42,7 +42,7 @@ export const AddSendtagsForm = () => {
 
   const isDarkTheme = resolvedTheme?.startsWith('dark')
 
-  async function createSendTag({ name }: z.infer<typeof CheckoutTagSchema>) {
+  async function createSendTag({ name }: z.infer<typeof SendtagSchema>) {
     if (!user.user) return console.error('No user')
     const { error } = await supabase.from('tags').insert({ name })
 
@@ -77,7 +77,7 @@ export const AddSendtagsForm = () => {
                 <SchemaForm
                   form={form}
                   onSubmit={createSendTag}
-                  schema={CheckoutTagSchema}
+                  schema={SendtagSchema}
                   defaultValues={{
                     name: '',
                   }}

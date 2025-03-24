@@ -19,17 +19,16 @@ import { useUser } from 'app/utils/useUser'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
+import { useSendtagCheckout } from './checkout-utils'
+import { useReferrer } from 'app/utils/useReferrer'
 import {
   REFERRAL_COOKIE_MAX_AGE,
   REFERRAL_COOKIE_NAME,
   setCookie,
-  useReferralCode,
-  useReferrer,
-  useSendtagCheckout,
-} from './checkout-utils'
+  useReferralCodeCookie,
+} from 'app/utils/useReferralCodeCookie'
 import { ConfirmButton } from './components/checkout-confirm-button'
 import formatAmount from 'app/utils/formatAmount'
-import { api } from 'app/utils/api'
 import { RowLabel } from 'app/components/layout/RowLabel'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { usdcCoin } from 'app/data/coins'
@@ -62,8 +61,6 @@ export const CheckoutForm = () => {
  * Shows the referral code and the user's profile if they have one
  */
 function ReferredBy() {
-  const { data: referralCodeFromCookie, isLoading: isLoadingReferralCodeFromCookie } =
-    useReferralCode()
   const queryClient = useQueryClient()
   const mutation = useMutation({
     mutationFn: async (newReferralCode: string) => {
@@ -74,8 +71,10 @@ function ReferredBy() {
       queryClient.invalidateQueries({ queryKey: ['referralCode'] })
     },
   })
-  const { data: referrer, error: referrerError, isLoading: isLoadingReferrer } = useReferrer()
-  const { data: referred, isLoading: isLoadingReferred } = api.referrals.getReferred.useQuery()
+  const { data: referrer, error: referrerError, isLoading: isReferrerLoading } = useReferrer()
+  const { data: referralCodeCookie, isLoading: isReferralCodeCookieLoading } =
+    useReferralCodeCookie()
+
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
   const [referralCode, setReferralCode] = useState<string>('')
 
@@ -96,23 +95,16 @@ function ReferredBy() {
   }, [referralCode, updateReferralCodeCookie])
 
   useEffect(() => {
-    if (!isLoadingReferralCodeFromCookie && referralCodeFromCookie) {
-      setReferralCode(referralCodeFromCookie)
+    if (!isReferrerLoading && referrer) {
+      const ref = referrer.tag && referrer.tag !== '' ? referrer.tag : referrer.refcode
+      setReferralCode(ref)
     }
-  }, [isLoadingReferralCodeFromCookie, referralCodeFromCookie])
-
-  if (isLoadingReferred) {
-    return <Spinner color="$color11" />
-  }
-
-  if (referred) {
-    return null
-  }
+  }, [referrer, isReferrerLoading])
 
   return (
     <FadeCard
       borderColor={
-        referrerError || (referralCodeFromCookie && referralCode && !referrer && !isLoadingReferrer)
+        referrerError || Boolean(referrerError) || (!isReferrerLoading && referralCode && !referrer)
           ? '$error'
           : 'transparent'
       }
@@ -121,6 +113,8 @@ function ReferredBy() {
     >
       <XStack gap="$2" position="relative" ai={'center'} jc={'space-between'}>
         <Input
+          disabled={!!referrer && !referrer.isNew}
+          disabledStyle={{ opacity: 0.5 }}
           value={referralCode}
           onChangeText={(text) => setReferralCode(text)}
           placeholder={'Referral Code'}
@@ -145,7 +139,9 @@ function ReferredBy() {
         />
         {(() => {
           switch (true) {
-            case isLoadingReferrer:
+            case isReferrerLoading ||
+              isReferralCodeCookieLoading ||
+              referralCode !== referralCodeCookie:
               return <Spinner color="$color11" />
             case !!referrer:
               return (
@@ -153,7 +149,7 @@ function ReferredBy() {
                   <Check color="$primary" size="1" $theme-light={{ color: '$color12' }} />
                 </Fade>
               )
-            case !!referralCodeFromCookie && !!referralCode:
+            case !!referrer && referrer.isNew && !!referralCode:
               return (
                 <Fade>
                   <Button
@@ -192,11 +188,13 @@ function ReferredBy() {
       </XStack>
       {(() => {
         switch (true) {
-          case isLoadingReferrer:
+          case referralCode === '':
+            return <Paragraph>Got a referral? Enter the code to get rewards!</Paragraph>
+          case isReferrerLoading:
             return <Paragraph>Validating referral code</Paragraph>
           case !!referrerError:
             return <Paragraph color="$error">{referrerError.message}</Paragraph>
-          case !!referralCodeFromCookie && !!referralCode && !referrer:
+          case !isReferrerLoading && !referrer && referralCode === referralCodeCookie:
             return <Paragraph color="$error">Invalid referral code</Paragraph>
           case !!referrer:
             return <Paragraph>Referral code applied</Paragraph>
@@ -210,8 +208,7 @@ function ReferredBy() {
 
 function TotalPrice() {
   const pendingTags = usePendingTags()
-  const { usdcFees, usdcFeesError, isLoadingUSDCFees, isLoadingReferred, referredError } =
-    useSendtagCheckout()
+  const { usdcFees, usdcFeesError, isLoadingUSDCFees } = useSendtagCheckout()
   const _total = useMemo(() => total(pendingTags ?? []), [pendingTags])
   const { coin: usdc, isLoading: isCoinLoading } = useCoin('USDC')
 
@@ -257,18 +254,12 @@ function TotalPrice() {
           </Paragraph>
           {(() => {
             switch (true) {
-              case isLoadingUSDCFees || isLoadingReferred:
+              case isLoadingUSDCFees:
                 return <Spinner color="$color11" />
               case !!usdcFeesError:
                 return (
                   <Paragraph color="$error" textAlign={'right'}>
                     {usdcFeesError?.message?.split('.').at(0)}
-                  </Paragraph>
-                )
-              case !!referredError:
-                return (
-                  <Paragraph color="$error" textAlign={'right'}>
-                    {referredError?.message?.split('.').at(0)}
                   </Paragraph>
                 )
               case !usdcFees:
