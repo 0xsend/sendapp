@@ -1,6 +1,19 @@
-import { Label, Paragraph, XStack, YStack, Stack, BigHeading, styled, Card, H2, H3 } from '@my/ui'
+import {
+  Label,
+  Paragraph,
+  XStack,
+  YStack,
+  Stack,
+  BigHeading,
+  styled,
+  Card,
+  H2,
+  H3,
+  Button,
+} from '@my/ui'
 import { useEffect, useState } from 'react'
 import { Timer } from '@tamagui/lucide-icons'
+import { PlayButtons } from './PlayButtons'
 
 const GreenSquare = styled(Stack, {
   name: 'Surface',
@@ -72,7 +85,7 @@ export const JackpotCard = () => {
   const formatNumber = (num: number) => (num < 10 ? `0${num}` : `${num}`)
 
   return (
-    <Card p={'$5'} w={'100%'} jc="space-between" $gtLg={{ p: '$6', h: 244, mih: 244 }} mih={184}>
+    <Card p={'$5'} w={'100%'} jc="space-between" $gtLg={{ p: '$6', h: 'auto', mih: 244 }} mih={184}>
       <XStack w={'100%'} zIndex={4} h="100%">
         <YStack jc={'center'} gap={'$2'} w={'100%'}>
           <YStack w="fit-content" gap={'$2.5'} jc="space-between">
@@ -121,7 +134,19 @@ export const JackpotCard = () => {
                 Next draw: {getNextDrawDate()} (daily at 8:00 PM)
               </Paragraph>
             </XStack>
+            <XStack ai="center" jc="center" mt="$1">
+              <Paragraph color="$color10" fontSize="$4" ta="center" fontWeight="500">
+                30 SEND per /ticket
+              </Paragraph>
+            </XStack>
           </YStack>
+
+          {/* Buy Ticket Button */}
+          <XStack w="100%" jc="center" mt="$4">
+            <Stack f={1} w="100%" jc={'center'} maw={350}>
+              <PlayButtons.BuyTicketsButton href="/play/buy-tickets" />
+            </Stack>
+          </XStack>
         </YStack>
       </XStack>
     </Card>

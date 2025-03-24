@@ -105,11 +105,6 @@ export const TicketHoldings = () => {
         </XStack>
       </XStack>
 
-      <XStack ai="center" jc="space-between">
-        <Paragraph color="$color10">Price per /ticket</Paragraph>
-        <Paragraph fontWeight="500">30 SEND</Paragraph>
-      </XStack>
-
       <Separator />
 
       {activeTickets.length > 0 ? (
