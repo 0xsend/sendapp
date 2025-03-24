@@ -7,12 +7,11 @@ import {
   type UseInfiniteQueryResult,
 } from '@tanstack/react-query'
 import { getBaseAddressFilterCondition } from 'app/utils/activity'
-import { parseAndProcessActivities } from 'app/utils/activity'
 import { assert } from 'app/utils/assert'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import { useAddressBook, type AddressBook } from 'app/utils/useAddressBook'
-import { DatabaseEvents, type Activity } from 'app/utils/zod/activity'
+import { DatabaseEvents, EventArraySchema, type Activity } from 'app/utils/zod/activity'
 import { useMemo } from 'react'
 import type { ZodError } from 'zod'
 
@@ -87,7 +86,6 @@ export function useTokenActivityFeed(params: {
  */
 export async function fetchTokenActivityFeed({
   pageParam,
-  addressBook,
   supabase,
   pageSize,
   address,
@@ -118,7 +116,5 @@ export async function fetchTokenActivityFeed({
   throwIf(error)
 
   // Parse and process the raw data
-  return parseAndProcessActivities(data, {
-    addressBook,
-  })
+  return EventArraySchema.parse(data)
 }

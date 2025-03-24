@@ -1,7 +1,7 @@
 import { Avatar, LinkableAvatar, Spinner, XStack, type LinkableAvatarProps } from '@my/ui'
 import { AvatarSendEarnDeposit } from 'app/components/avatars'
 import { AvatarSendEarnWithdraw } from 'app/components/avatars/AvatarSendEarnWithdraw'
-import { IconDeposit, IconUpgrade, IconWithdraw } from 'app/components/icons'
+import { IconUpgrade } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { allCoinsDict } from 'app/data/coins'
 import { counterpart } from 'app/utils/activity'
@@ -25,7 +25,6 @@ export function ActivityAvatar({
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
   const addressBook = useAddressBook()
-
   if (user) {
     return (
       <XStack

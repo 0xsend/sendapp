@@ -7,13 +7,12 @@ import {
   type InfiniteData,
   type UseInfiniteQueryResult,
 } from '@tanstack/react-query'
-import { getBaseAddressFilterCondition, parseAndProcessActivities } from 'app/utils/activity'
+import { getBaseAddressFilterCondition } from 'app/utils/activity'
 import { assert } from 'app/utils/assert'
-import { hexToBytea } from 'app/utils/hexToBytea'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import { useAddressBook, type AddressBook } from 'app/utils/useAddressBook'
-import { DatabaseEvents, type Activity } from 'app/utils/zod/activity'
+import { DatabaseEvents, EventArraySchema, type Activity } from 'app/utils/zod/activity'
 import { useMemo } from 'react'
 import type { ZodError } from 'zod'
 
@@ -81,7 +80,6 @@ export function useActivityFeed({
  */
 async function fetchActivityFeed({
   pageParam,
-  addressBook,
   supabase,
   pageSize,
 }: {
@@ -97,7 +95,12 @@ async function fetchActivityFeed({
     .from('activity_feed')
     .select('*')
     .or('from_user.not.is.null, to_user.not.is.null') // only show activities with a send app user
-    .or(getBaseAddressFilterCondition(sendtagCheckoutAddresses)) // shows as Sendtag Registered using a different activity row
+    .or(
+      getBaseAddressFilterCondition({
+        extraFrom: undefined,
+        extraTo: sendtagCheckoutAddresses,
+      })
+    ) // shows as Sendtag Registered using a different activity row
     .not(
       'event_name',
       'in',
@@ -109,7 +112,5 @@ async function fetchActivityFeed({
   const { data, error } = await request
   throwIf(error)
   // Parse and process the raw data
-  return parseAndProcessActivities(data, {
-    addressBook,
-  })
+  return EventArraySchema.parse(data)
 }
