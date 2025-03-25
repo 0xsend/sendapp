@@ -36,7 +36,7 @@ export function CoinbaseOnrampVerifyScreen({
           pageSize: '1',
         })
 
-        if (!transactions || !transactions.transactions) {
+        if (!transactions || !transactions.transactions || transactions.transactions.length === 0) {
           console.log('[COINBASE_VERIFY_SCREEN] No CB Transactions found, trying again..')
           return
         }
