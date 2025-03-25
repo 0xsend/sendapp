@@ -155,7 +155,7 @@ describe('useCoinbaseOnramp', () => {
     expect(mockRouterPush).toHaveBeenCalledWith('/deposit/success')
   })
 
-  it('rejects the transaction if the user closes the window without submitting payment', async () => {
+  it('reject with an error if the user closes the window without submitting payment', async () => {
     const { result } = renderHook(() => useCoinbaseOnramp(mockOnrampParams), { wrapper })
 
     act(() => {
@@ -178,7 +178,7 @@ describe('useCoinbaseOnramp', () => {
     expect(result.current.status).toBe('failed')
   })
 
-  it('resolves the transaction if the payment was submitted and then the user closes the window', async () => {
+  it('set payment_submitted if the user closes the window and payment was submitted', async () => {
     const { result } = renderHook(() => useCoinbaseOnramp(mockOnrampParams), { wrapper })
 
     act(() => {
