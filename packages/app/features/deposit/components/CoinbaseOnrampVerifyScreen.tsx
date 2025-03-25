@@ -4,6 +4,8 @@ import { useEffect } from 'react'
 import { fetchOnrampTransactionStatus } from '@coinbase/onchainkit/fund'
 
 const CHECK_INTERVAL_MS = 5000
+const MAX_TIMEOUT_MS = 180000 // 3 minutes
+
 export function CoinbaseOnrampVerifyScreen({
   onFailure,
   onSuccess,
@@ -14,9 +16,16 @@ export function CoinbaseOnrampVerifyScreen({
   const { data: sendAccount } = useSendAccount()
 
   useEffect(() => {
+    // Set a timer that will trigger onFailure after MAX_TIMEOUT_MS
+    const maxTimer = setTimeout(() => {
+      console.log('[COINBASE_VERIFY_SCREEN] Transaction timed out after 3 minutes')
+      onFailure()
+    }, MAX_TIMEOUT_MS)
+
     const checkTransactionStatus = async () => {
       if (!sendAccount?.user_id) {
         console.log('[COINBASE_VERIFY_SCREEN] No Send Account Found')
+        clearTimeout(maxTimer)
         onFailure()
         return
       }
@@ -28,30 +37,38 @@ export function CoinbaseOnrampVerifyScreen({
         })
 
         if (!transactions || !transactions.transactions) {
-          console.log('[COINBASE_VERIFY_SCREEN] No CB Transactions found')
-          onFailure()
+          console.log('[COINBASE_VERIFY_SCREEN] No CB Transactions found, trying again..')
           return
         }
+
         const latestTxStatus = transactions.transactions[0]?.status
         console.log('[COINBASE_VERIFY_SCREEN] Transaction status:', latestTxStatus)
         if (latestTxStatus === 'ONRAMP_TRANSACTION_STATUS_SUCCESS') {
           console.log('[COINBASE_VERIFY_SCREEN] Successful transaction')
+          clearTimeout(maxTimer)
           onSuccess()
         } else if (latestTxStatus === 'ONRAMP_TRANSACTION_STATUS_FAILED') {
           console.log('[COINBASE_VERIFY_SCREEN] Failed transaction')
+          clearTimeout(maxTimer)
           onFailure()
         } else {
           console.log(
-            `COINBASE_VERIFY_SCREEN] Checking transactions again in ${CHECK_INTERVAL_MS} ms`
+            `[COINBASE_VERIFY_SCREEN] Checking transactions again in ${CHECK_INTERVAL_MS} ms`
           )
           setTimeout(checkTransactionStatus, CHECK_INTERVAL_MS)
         }
       } catch (err) {
         console.error('Error checking transaction status:', err)
+        clearTimeout(maxTimer)
         onFailure()
       }
     }
     checkTransactionStatus()
+
+    // Cleanup timer when component unmounts.
+    return () => {
+      clearTimeout(maxTimer)
+    }
   }, [sendAccount, onSuccess, onFailure])
 
   return (

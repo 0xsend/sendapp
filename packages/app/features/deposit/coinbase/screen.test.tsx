@@ -5,45 +5,11 @@ import { DepositCoinbaseScreen } from './screen'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinbaseOnramp } from 'app/utils/useCoinbaseOnramp'
 import { OnrampFlow } from 'app/features/deposit/components/OnrampFlow'
-import { Text, Button } from '@my/ui'
 
 // Mock dependencies
 jest.mock('app/utils/send-accounts')
 jest.mock('app/utils/useCoinbaseOnramp')
 jest.mock('app/features/deposit/components/OnrampFlow')
-jest.mock('app/features/deposit/components/PendingScreen', () => ({
-  PendingScreen: () => <Text testID="pending-screen">PendingScreen-Mock</Text>,
-}))
-jest.mock('@my/ui', () => {
-  const originalModule = jest.requireActual('@my/ui')
-  return {
-    ...originalModule,
-    YStack: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
-      <div {...props}>{children}</div>
-    ),
-    XStack: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
-      <div {...props}>{children}</div>
-    ),
-    Text: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
-      <div {...props}>{children}</div>
-    ),
-    Button: ({
-      children,
-      onPress,
-      ...props
-    }: React.PropsWithChildren<{ onPress?: () => void } & Record<string, unknown>>) => (
-      <button type="button" onClick={onPress} {...props}>
-        {children}
-      </button>
-    ),
-    Spinner: () => <div data-testid="spinner">Spinner</div>,
-    LinkableButton: {
-      Text: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
-        <span {...props}>{children}</span>
-      ),
-    },
-  }
-})
 
 describe('DepositCoinbaseScreen', () => {
   // Setup mocks
