@@ -138,6 +138,7 @@ export class DistributorV2Worker {
     distribution: NonNullable<Awaited<ReturnType<typeof fetchActiveDistributions>>['data']>[number]
   ): Promise<void> {
     const log = this.log.child({ distribution_id: distribution.id })
+    const checkpointTime = new Date().toISOString()
 
     assert(
       !!distribution.merkle_drop_addr && distribution.merkle_drop_addr !== null,
@@ -153,13 +154,16 @@ export class DistributorV2Worker {
       throw new Error('Tranche is active. Cannot calculate distribution shares.')
     }
 
-    log.info({ distribution_id: distribution.id }, 'Calculating distribution shares.')
+    log.info(
+      { distribution_id: distribution.id, checkpointTime },
+      'Calculating distribution shares.'
+    )
 
     const {
       data: verifications,
       error: verificationsError,
       count,
-    } = await fetchAllVerifications(distribution.id)
+    } = await fetchAllVerifications(distribution.id, checkpointTime)
 
     if (verificationsError) {
       throw verificationsError
