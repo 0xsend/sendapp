@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { OnrampFlow } from 'app/features/deposit/components/OnrampFlow'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinbaseOnramp } from 'app/utils/useCoinbaseOnramp'

@@ -48,8 +48,7 @@ export function useCoinbaseOnramp({
       const onrampUrl = getOnrampBuyUrl({
         projectId,
         addresses: {
-          '0x2A92Cf5727E575E8954b854aD480BA7bEf1EDaaA': ['base'],
-          // [address]: ['base'],
+          [address]: ['base'],
         },
         partnerUserId,
         defaultPaymentMethod,
