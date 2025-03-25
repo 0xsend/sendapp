@@ -59,7 +59,6 @@ export function useCoinbaseOnramp({
         assets: ['USDC'],
         presetFiatAmount: amount,
         fiatCurrency: 'USD',
-        redirectUrl: `${window.location.origin}/deposit/success/callback`,
       })
 
       cleanup()
