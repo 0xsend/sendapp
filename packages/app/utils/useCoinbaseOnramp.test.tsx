@@ -1,5 +1,5 @@
-import { renderHook, act } from '@testing-library/react-hooks'
 import { useCoinbaseOnramp } from './useCoinbaseOnramp'
+import { act, renderHook, waitFor } from '@testing-library/react-native'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { getOnrampBuyUrl } from '@coinbase/onchainkit/fund'
 import type { ReactNode } from 'react'
@@ -21,10 +21,10 @@ jest.mock('solito/router', () => ({
 
 describe('useCoinbaseOnramp', () => {
   const mockAddress = '0x123'
-  const mockUrl = 'https://example.com'
+  const mockUrl = 'https://pay.coinbase.com'
   const mockProjectId = '0000000-0000-0000-0000-000000000000'
   const mockPartnerUserId = '0'
-  const mockOrigin = 'https://send.app'
+  const mockOrigin = 'https://pay.coinbase.com'
 
   const mockOnrampParams = {
     projectId: mockProjectId,
@@ -32,9 +32,18 @@ describe('useCoinbaseOnramp', () => {
     partnerUserId: mockPartnerUserId,
   }
 
+  const popupMock = {
+    closed: false,
+    close: jest.fn(function () {
+      this.closed = true
+    }),
+  }
+
   beforeEach(() => {
     jest.clearAllMocks()
-    window.open = jest.fn().mockReturnValue({ closed: false })
+    jest.useFakeTimers()
+    mockGetOnrampBuyUrl.mockImplementation(() => mockUrl)
+    window.open = jest.fn().mockReturnValue(popupMock)
     window.addEventListener = jest.fn()
     window.removeEventListener = jest.fn()
     Object.defineProperty(window, 'location', {
@@ -44,6 +53,10 @@ describe('useCoinbaseOnramp', () => {
         origin: mockOrigin,
       },
     })
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
   })
 
   const wrapper = ({ children }: { children: ReactNode }) => (
@@ -107,7 +120,7 @@ describe('useCoinbaseOnramp', () => {
       // Call the event listener with a payment submitted message
       eventListenerCallback({
         origin: mockOrigin,
-        data: { type: 'COINBASE_ONRAMP_PENDING' },
+        data: JSON.stringify({ data: { pageRoute: '/v2/guest/onramp/order-submitted' } }),
       })
     })
 
@@ -133,12 +146,70 @@ describe('useCoinbaseOnramp', () => {
       // Call the event listener with a success message
       eventListenerCallback({
         origin: mockOrigin,
-        data: { type: 'COINBASE_ONRAMP_SUCCESS' },
+        data: JSON.stringify({ data: { eventName: 'success' } }),
       })
     })
 
     // Status should now be success
     expect(result.current.status).toBe('success')
     expect(mockRouterPush).toHaveBeenCalledWith('/deposit/success')
+  })
+
+  it('rejects the transaction if the user closes the window without submitting payment', async () => {
+    const { result } = renderHook(() => useCoinbaseOnramp(mockOnrampParams), { wrapper })
+
+    act(() => {
+      result.current.openOnramp(100)
+    })
+
+    // Simulate that the popup is closed without payment submission.
+    act(() => {
+      popupMock.close()
+      jest.runAllTimers()
+    })
+
+    // Wait until the error is updated in the mutation state.
+    await waitFor(
+      () => {
+        expect(result.current.error?.message).toBe('Transaction cancelled')
+      },
+      { timeout: 2000 }
+    )
+    expect(result.current.status).toBe('failed')
+  })
+
+  it('resolves the transaction if the payment was submitted and then the user closes the window', async () => {
+    const { result } = renderHook(() => useCoinbaseOnramp(mockOnrampParams), { wrapper })
+
+    act(() => {
+      result.current.openOnramp(100)
+    })
+
+    // Simulate payment submitted event
+    const eventListenerCallback = (window.addEventListener as jest.Mock).mock.calls.find(
+      (call) => call[0] === 'message'
+    )[1]
+
+    act(() => {
+      eventListenerCallback({
+        origin: mockOrigin,
+        data: JSON.stringify({ data: { pageRoute: '/v2/guest/onramp/order-submitted' } }),
+      })
+    })
+
+    // Simulate user closing the popup
+    act(() => {
+      popupMock.close()
+      jest.runAllTimers()
+    })
+
+    await waitFor(
+      () => {
+        expect(result.current.status).toBe('payment_submitted')
+      },
+      { timeout: 2000 }
+    )
+
+    expect(result.current.error).toBeNull()
   })
 })

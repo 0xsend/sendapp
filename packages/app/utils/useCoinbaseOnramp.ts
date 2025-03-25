@@ -33,11 +33,6 @@ export function useCoinbaseOnramp({
   const [paymentSubmitted, setPaymentSubmitted] = useState(false)
   const router = useRouter()
 
-  // Simple clean way to update the ref
-  useEffect(() => {
-    paymentSubmittedRef.current = paymentSubmitted
-  }, [paymentSubmitted])
-
   const cleanup = useCallback(() => {
     if (popupRef.current) {
       popupRef.current.close()
@@ -47,7 +42,6 @@ export function useCoinbaseOnramp({
       clearInterval(popupChecker)
       setPopupChecker(null)
     }
-    setPaymentSubmitted(false)
   }, [popupChecker])
 
   const mutation = useMutation<void, Error, OnrampParams>({
@@ -57,8 +51,8 @@ export function useCoinbaseOnramp({
       const onrampUrl = getOnrampBuyUrl({
         projectId,
         addresses: {
-          '0x2A92Cf5727E575E8954b854aD480BA7bEf1EDaaA': ['base'],
-          // [address]: ['base'],
+          // '0x2A92Cf5727E575E8954b854aD480BA7bEf1EDaaA': ['base'],
+          [address]: ['base'],
         },
         partnerUserId,
         defaultPaymentMethod,
@@ -69,7 +63,8 @@ export function useCoinbaseOnramp({
       })
 
       cleanup()
-
+      setPaymentSubmitted(false)
+      paymentSubmittedRef.current = false
       const newPopup = window.open(onrampUrl, 'Coinbase Onramp', 'width=600,height=800')
 
       if (!newPopup) {
@@ -127,6 +122,7 @@ export function useCoinbaseOnramp({
       } else if (eventData?.data?.pageRoute === COINBASE_PAYMENT_SUBMITTED_PAGE_ROUTE) {
         console.log('[Onramp] Transaction pending - waiting for Coinbase approval')
         setPaymentSubmitted(true)
+        paymentSubmittedRef.current = true
       }
     }
     window.addEventListener('message', handleMessage)
@@ -153,11 +149,11 @@ export function useCoinbaseOnramp({
     case isSuccess:
       status = 'success'
       break
-    case mutation.isPending:
-      status = 'pending_payment'
-      break
     case paymentSubmitted:
       status = 'payment_submitted'
+      break
+    case mutation.isPending:
+      status = 'pending_payment'
       break
     case mutation.isError:
       status = 'failed'
