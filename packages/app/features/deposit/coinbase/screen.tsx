@@ -36,6 +36,12 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
     openOnramp(amount)
   }
 
+  useEffect(() => {
+    if (coinbaseStatus === 'success') {
+      router.push('/deposit/success')
+    }
+  }, [coinbaseStatus, router.push])
+
   const renderContent = () => {
     switch (true) {
       case !!error:

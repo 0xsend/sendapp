@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { getOnrampBuyUrl } from '@coinbase/onchainkit/fund'
 import { useMutation } from '@tanstack/react-query'
-import { useRouter } from 'solito/router'
 
 type OnrampStatus = 'idle' | 'pending_payment' | 'success' | 'failed' | 'payment_submitted'
 
@@ -31,8 +30,6 @@ export function useCoinbaseOnramp({
   const paymentSubmittedRef = useRef(false)
   // Keep state for UI updates, but use the ref for the Promise logic
   const [paymentSubmitted, setPaymentSubmitted] = useState(false)
-  const router = useRouter()
-
   const cleanup = useCallback(() => {
     if (popupRef.current) {
       popupRef.current.close()
@@ -51,8 +48,8 @@ export function useCoinbaseOnramp({
       const onrampUrl = getOnrampBuyUrl({
         projectId,
         addresses: {
-          // '0x2A92Cf5727E575E8954b854aD480BA7bEf1EDaaA': ['base'],
-          [address]: ['base'],
+          '0x2A92Cf5727E575E8954b854aD480BA7bEf1EDaaA': ['base'],
+          // [address]: ['base'],
         },
         partnerUserId,
         defaultPaymentMethod,
@@ -62,8 +59,6 @@ export function useCoinbaseOnramp({
       })
 
       cleanup()
-      setPaymentSubmitted(false)
-      paymentSubmittedRef.current = false
       const newPopup = window.open(onrampUrl, 'Coinbase Onramp', 'width=600,height=800')
 
       if (!newPopup) {
@@ -74,6 +69,7 @@ export function useCoinbaseOnramp({
 
       return new Promise<void>((resolve, reject) => {
         const checker = setInterval(() => {
+          console.log(paymentSubmittedRef.current)
           if (!newPopup.closed) {
             return
           }
@@ -107,31 +103,24 @@ export function useCoinbaseOnramp({
       const eventData = JSON.parse(event.data)
       if (eventData?.data?.eventName === 'success') {
         console.log('[Onramp] Transaction successful - processing completion')
-        try {
-          setIsSuccess(true)
-          router.push('/deposit/success')
-          cleanup()
-          mutation.reset()
-        } catch (error) {
-          console.error('[Onramp] Navigation failed after success:', error)
-          setIsSuccess(false)
-          mutation.reset()
-          cleanup()
-        }
+        setIsSuccess(true)
+        cleanup()
+        mutation.reset()
       } else if (eventData?.data?.pageRoute === COINBASE_PAYMENT_SUBMITTED_PAGE_ROUTE) {
         console.log('[Onramp] Transaction pending - waiting for Coinbase approval')
-        setPaymentSubmitted(true)
         paymentSubmittedRef.current = true
+        setPaymentSubmitted(true)
       }
     }
     window.addEventListener('message', handleMessage)
     return () => window.removeEventListener('message', handleMessage)
-  }, [cleanup, router, mutation])
+  }, [cleanup, mutation])
 
   const openOnramp = useCallback(
     (amount: number) => {
       setIsSuccess(false)
       setPaymentSubmitted(false)
+      paymentSubmittedRef.current = false
       mutation.mutate({ amount })
     },
     [mutation]
@@ -148,11 +137,11 @@ export function useCoinbaseOnramp({
     case isSuccess:
       status = 'success'
       break
-    case paymentSubmitted:
-      status = 'payment_submitted'
-      break
     case mutation.isPending:
       status = 'pending_payment'
+      break
+    case paymentSubmitted:
+      status = 'payment_submitted'
       break
     case mutation.isError:
       status = 'failed'

@@ -7,16 +7,9 @@ import type { ReactNode } from 'react'
 const queryClient = new QueryClient()
 
 const mockGetOnrampBuyUrl = getOnrampBuyUrl as jest.Mock
-const mockRouterPush = jest.fn()
 
 jest.mock('@coinbase/onchainkit/fund', () => ({
-  getOnrampBuyUrl: jest.fn().mockReturnValue('https://example.com'),
-}))
-
-jest.mock('solito/router', () => ({
-  useRouter: () => ({
-    push: mockRouterPush,
-  }),
+  getOnrampBuyUrl: jest.fn().mockReturnValue('https://pay.coinbase.com'),
 }))
 
 describe('useCoinbaseOnramp', () => {
@@ -78,7 +71,6 @@ describe('useCoinbaseOnramp', () => {
       partnerUserId: mockPartnerUserId,
       presetFiatAmount: 100,
       projectId: mockProjectId,
-      redirectUrl: `${mockOrigin}/deposit/success/callback`,
     })
     expect(window.open).toHaveBeenCalledWith(mockUrl, 'Coinbase Onramp', 'width=600,height=800')
   })
@@ -96,36 +88,6 @@ describe('useCoinbaseOnramp', () => {
     })
 
     expect(window.open).not.toHaveBeenCalled()
-  })
-
-  it('handles payment submitted status correctly', async () => {
-    // Mock window.open to return a popup that's not closed
-    const mockPopup = { closed: false }
-    window.open = jest.fn().mockReturnValue(mockPopup)
-
-    const { result } = renderHook(() => useCoinbaseOnramp(mockOnrampParams), { wrapper })
-
-    // Open the onramp
-    await act(async () => {
-      result.current.openOnramp(100)
-    })
-
-    // Simulate payment submitted message
-    await act(async () => {
-      // Get the event listener callback
-      const eventListenerCallback = (window.addEventListener as jest.Mock).mock.calls.find(
-        (call) => call[0] === 'message'
-      )[1]
-
-      // Call the event listener with a payment submitted message
-      eventListenerCallback({
-        origin: mockOrigin,
-        data: JSON.stringify({ data: { pageRoute: '/v2/guest/onramp/order-submitted' } }),
-      })
-    })
-
-    // Status should now be payment_submitted
-    expect(result.current.status).toBe('payment_submitted')
   })
 
   it('handles successful transaction completion', async () => {
@@ -152,10 +114,9 @@ describe('useCoinbaseOnramp', () => {
 
     // Status should now be success
     expect(result.current.status).toBe('success')
-    expect(mockRouterPush).toHaveBeenCalledWith('/deposit/success')
   })
 
-  it('reject with an error if the user closes the window without submitting payment', async () => {
+  it('reject when user closes tab and no payment', async () => {
     const { result } = renderHook(() => useCoinbaseOnramp(mockOnrampParams), { wrapper })
 
     act(() => {
@@ -178,7 +139,7 @@ describe('useCoinbaseOnramp', () => {
     expect(result.current.status).toBe('failed')
   })
 
-  it('set payment_submitted if the user closes the window and payment was submitted', async () => {
+  it('set payment_submitted', async () => {
     const { result } = renderHook(() => useCoinbaseOnramp(mockOnrampParams), { wrapper })
 
     act(() => {
