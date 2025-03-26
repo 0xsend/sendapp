@@ -4,7 +4,6 @@ import { render, screen, fireEvent } from '@testing-library/react-native'
 import { DepositCoinbaseScreen } from './screen'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinbaseOnramp } from 'app/utils/useCoinbaseOnramp'
-import { OnrampFlow } from 'app/features/deposit/components/OnrampFlow'
 import { Provider } from 'app/__mocks__/app/provider'
 // Mock dependencies
 jest.mock('app/utils/send-accounts', () => ({

@@ -79,7 +79,7 @@ export function useCoinbaseOnramp({
           // A user can close the tab and be in two states
           // where the payment was made or not made.
           if (!paymentSubmittedRef.current) {
-            reject(new Error('Transaction cancelled'))
+            reject(new Error('Transaction canceled'))
           } else {
             resolve()
           }

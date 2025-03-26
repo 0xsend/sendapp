@@ -1,4 +1,4 @@
-import { Spinner, Text, YStack } from '@my/ui'
+import { Spinner, Text, YStack, Card, XStack, Button } from '@my/ui'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useEffect } from 'react'
 import { fetchOnrampTransactionStatus } from '@coinbase/onchainkit/fund'
@@ -72,14 +72,18 @@ export function CoinbaseOnrampVerifyScreen({
   }, [sendAccount, onSuccess, onFailure])
 
   return (
-    <YStack space="$4" ai="center" jc="center" p="$4" f={1}>
-      <Spinner size="large" color="$primary" />
-      <Text ta="center" fow="bold" fos="$6">
-        Transaction Pending
-      </Text>
-      <Text ta="center" fos="$4">
-        Coinbase is verifying your payment. This page will redirect when complete.
-      </Text>
+    <YStack width="100%" $gtSm={{ width: 600 }} gap="$4">
+      <Card bc="$color1" width="100%" p="$6">
+        <YStack ai="center" gap="$4">
+          <Spinner size="large" color="$primary" />
+          <Text fontSize="$8" fontWeight="600" ta="center">
+            Transaction Pending
+          </Text>
+          <Text color="$gray11" ta="center">
+            Coinbase is verifying your payment. This page will redirect when complete.
+          </Text>
+        </YStack>
+      </Card>
     </YStack>
   )
 }

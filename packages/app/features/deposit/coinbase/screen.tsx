@@ -3,7 +3,7 @@ import { OnrampFlow } from 'app/features/deposit/components/OnrampFlow'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinbaseOnramp } from 'app/utils/useCoinbaseOnramp'
 import { toNiceError } from 'app/utils/toNiceError'
-import { YStack, Text, Button, Spinner } from '@my/ui'
+import { YStack, Text, Button, Spinner, Card, XStack, LinkableButton } from '@my/ui'
 import { CoinbaseOnrampVerifyScreen } from '../components/CoinbaseOnrampVerifyScreen'
 import { useRouter } from 'solito/router'
 
@@ -46,41 +46,52 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
     switch (true) {
       case !!error:
         return (
-          <YStack ai="center" gap="$4" py="$8" testID="error">
-            <Text fontSize="$6" fontWeight="500" color="$red10" ta="center">
-              Onramp page closed
-            </Text>
-            <Text color="$gray11" ta="center">
-              {toNiceError(error)}
-            </Text>
-            <Button
-              variant="outlined"
-              color="$color"
-              size="$4"
-              hoverStyle={{
-                backgroundColor: '$color1',
-                borderColor: '$color8',
-              }}
-              pressStyle={{
-                backgroundColor: '$color2',
-              }}
-              onPress={closeOnramp}
-            >
-              Try Again
-            </Button>
+          <YStack width="100%" $gtSm={{ width: 600 }} gap="$4" testID="error">
+            <Card bc="$color1" width="100%" p="$6">
+              <YStack ai="center" gap="$4">
+                <Text fontSize="$8" fontWeight="600" color="$red10" ta="center">
+                  Coinbase window was closed.
+                </Text>
+                <Text color="$gray11" ta="center">
+                  {toNiceError(error)}
+                </Text>
+                <Button
+                  theme="green"
+                  px="$3.5"
+                  h="$4.5"
+                  borderRadius="$4"
+                  f={1}
+                  onPress={closeOnramp}
+                >
+                  <XStack w="100%" gap="$2.5" ai="center" jc="center">
+                    <LinkableButton.Text
+                      fontWeight="500"
+                      tt="uppercase"
+                      $theme-dark={{ col: '$color0' }}
+                    >
+                      Try Again
+                    </LinkableButton.Text>
+                  </XStack>
+                </Button>
+              </YStack>
+            </Card>
           </YStack>
         )
 
       case coinbaseStatus === 'success':
         return (
-          <YStack ai="center" gap="$4" py="$8" testID="success">
-            <Spinner size="large" color="$primary" />
-            <Text fontSize="$6" fontWeight="500" ta="center">
-              Transaction Complete
-            </Text>
-            <Text color="$gray11" ta="center">
-              Finishing up...
-            </Text>
+          <YStack width="100%" $gtSm={{ width: 600 }} gap="$4" testID="success">
+            <Card bc="$color1" width="100%" p="$6">
+              <YStack ai="center" gap="$4">
+                <Spinner size="large" color="$primary" />
+                <Text fontSize="$8" fontWeight="600" ta="center">
+                  Transaction Complete
+                </Text>
+                <Text color="$gray11" ta="center">
+                  Finishing up...
+                </Text>
+              </YStack>
+            </Card>
           </YStack>
         )
 
@@ -94,59 +105,104 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
 
       case coinbaseStatus === 'pending_payment':
         return (
-          <YStack ai="center" gap="$4" py="$8" testID="pending-payment">
-            <Spinner size="large" color="$primary" />
-            <Text fontSize="$6" fontWeight="500" ta="center">
-              Processing Transaction
-            </Text>
-            <Text color="$gray11" ta="center">
-              Complete in Coinbase window
-            </Text>
-            <Button
-              variant="outlined"
-              color="$color"
-              size="$4"
-              hoverStyle={{
-                backgroundColor: '$color1',
-                borderColor: '$color8',
-              }}
-              pressStyle={{
-                backgroundColor: '$color2',
-              }}
-              onPress={closeOnramp}
-            >
-              Cancel
-            </Button>
+          <YStack width="100%" $gtSm={{ width: 600 }} gap="$4" testID="pending-payment">
+            <Card bc="$color1" width="100%" p="$6">
+              <YStack ai="center" gap="$4">
+                <Spinner size="large" color="$primary" />
+                <Text fontSize="$8" fontWeight="600" ta="center">
+                  Processing Transaction
+                </Text>
+                <Text color="$gray11" ta="center">
+                  Complete in Coinbase window
+                </Text>
+                <Button
+                  theme="green"
+                  px="$3.5"
+                  h="$4.5"
+                  borderRadius="$4"
+                  f={1}
+                  onPress={closeOnramp}
+                >
+                  <XStack w="100%" gap="$2.5" ai="center" jc="center">
+                    <LinkableButton.Text
+                      fontWeight="500"
+                      tt="uppercase"
+                      $theme-dark={{ col: '$color0' }}
+                    >
+                      Cancel
+                    </LinkableButton.Text>
+                  </XStack>
+                </Button>
+              </YStack>
+            </Card>
           </YStack>
         )
 
       case status === 'failure':
         return (
-          <YStack ai="center" gap="$4" py="$8" testID="failure">
-            <Text fontSize="$6" fontWeight="500" color="$red10" ta="center">
-              Transaction Timed Out
-            </Text>
-            <Text color="$gray11" ta="center">
-              Your payment took too long to process. Please try again.
-            </Text>
-            <Button variant="outlined" color="$color" size="$4" onPress={closeOnramp}>
-              Try Again
-            </Button>
+          <YStack width="100%" $gtSm={{ width: 600 }} gap="$4" testID="failure">
+            <Card bc="$color1" width="100%" p="$6">
+              <YStack ai="center" gap="$4">
+                <Text fontSize="$8" fontWeight="600" color="$red10" ta="center">
+                  Transaction Timed Out
+                </Text>
+                <Text color="$gray11" ta="center">
+                  Your payment took too long to process. Please try again.
+                </Text>
+                <Button
+                  theme="green"
+                  px="$3.5"
+                  h="$4.5"
+                  borderRadius="$4"
+                  f={1}
+                  onPress={closeOnramp}
+                >
+                  <XStack w="100%" gap="$2.5" ai="center" jc="center">
+                    <LinkableButton.Text
+                      fontWeight="500"
+                      tt="uppercase"
+                      $theme-dark={{ col: '$color0' }}
+                    >
+                      Try Again
+                    </LinkableButton.Text>
+                  </XStack>
+                </Button>
+              </YStack>
+            </Card>
           </YStack>
         )
 
       case coinbaseStatus === 'failed':
         return (
-          <YStack ai="center" gap="$4" py="$8" testID="coinbase-failure">
-            <Text fontSize="$6" fontWeight="500" color="$red10" ta="center">
-              Transaction Failed
-            </Text>
-            <Text color="$gray11" ta="center">
-              Your payment could not be processed. Please try again.
-            </Text>
-            <Button variant="outlined" color="$color" size="$4" onPress={closeOnramp}>
-              Try Again
-            </Button>
+          <YStack width="100%" $gtSm={{ width: 600 }} gap="$4" testID="coinbase-failure">
+            <Card bc="$color1" width="100%" p="$6">
+              <YStack ai="center" gap="$4">
+                <Text fontSize="$8" fontWeight="600" color="$red10" ta="center">
+                  Transaction Failed
+                </Text>
+                <Text color="$gray11" ta="center">
+                  Your payment could not be processed. Please try again.
+                </Text>
+                <Button
+                  theme="green"
+                  px="$3.5"
+                  h="$4.5"
+                  borderRadius="$4"
+                  f={1}
+                  onPress={closeOnramp}
+                >
+                  <XStack w="100%" gap="$2.5" ai="center" jc="center">
+                    <LinkableButton.Text
+                      fontWeight="500"
+                      tt="uppercase"
+                      $theme-dark={{ col: '$color0' }}
+                    >
+                      Try Again
+                    </LinkableButton.Text>
+                  </XStack>
+                </Button>
+              </YStack>
+            </Card>
           </YStack>
         )
 
@@ -156,12 +212,8 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
   }
 
   return (
-    <YStack mt="$4" mx="auto" width={'100%'} $sm={{ maxWidth: 600 }}>
-      <YStack w={'100%'}>
-        <YStack f={1} px="$4" jc="space-between" pb="$4">
-          {renderContent()}
-        </YStack>
-      </YStack>
+    <YStack mt="$4" mx="auto" width="100%">
+      {renderContent()}
     </YStack>
   )
 }

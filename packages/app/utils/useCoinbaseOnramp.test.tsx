@@ -132,7 +132,7 @@ describe('useCoinbaseOnramp', () => {
     // Wait until the error is updated in the mutation state.
     await waitFor(
       () => {
-        expect(result.current.error?.message).toBe('Transaction cancelled')
+        expect(result.current.error?.message).toBe('Transaction canceled')
       },
       { timeout: 2000 }
     )
