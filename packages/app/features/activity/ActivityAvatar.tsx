@@ -4,8 +4,9 @@ import { AvatarSendEarnWithdraw } from 'app/components/avatars/AvatarSendEarnWit
 import { IconUpgrade } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { allCoinsDict } from 'app/data/coins'
+import { ContractLabels } from 'app/data/contract-labels'
 import { counterpart } from 'app/utils/activity'
-import { ContractLabels, useAddressBook } from 'app/utils/useAddressBook'
+import { useAddressBook } from 'app/utils/useAddressBook'
 import {
   isSendAccountReceiveEvent,
   isSendAccountTransfersEvent,

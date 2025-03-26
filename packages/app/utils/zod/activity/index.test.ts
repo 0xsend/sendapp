@@ -258,7 +258,6 @@ describe('EventArraySchema', () => {
 
     beforeAll(() => {
       deposit = parsedData[10] as SendEarnDepositEvent
-      console.log(deposit)
       assert(!!deposit)
     })
 

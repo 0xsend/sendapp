@@ -31,7 +31,7 @@ export function useSendAccounts() {
 
 const useSendAccountQueryKey = 'send_account'
 
-function sendAccountQueryOptions({
+export function sendAccountQueryOptions({
   user,
   supabase,
 }: {
@@ -56,6 +56,7 @@ function sendAccountQueryOptions({
       }
       return data
     },
+    staleTime: Number.POSITIVE_INFINITY,
   })
 }
 
