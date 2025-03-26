@@ -14,6 +14,8 @@ const log = debug('app:features:earn:withdraw')
 /**
  * Determine the vault to withdraw from.
  *
+ * TODO: return all the vaults with a balance for this asset
+ *
  * @param {Object} params - The parameters
  * @param {string} params.asset - The address of the ERC20 token to withdraw
  * @returns A query result containing the vault address to withdraw from
@@ -25,19 +27,13 @@ export function useSendEarnWithdrawVault({
   asset: `0x${string}` | undefined
   coin: erc20Coin | undefined
 }): UseQueryReturnType<`0x${string}` | null> {
-  const balances = useSendEarnBalances()
   const coinBalances = useSendEarnCoinBalances(coin)
   const sendAccount = useSendAccount()
 
   return useQuery({
-    queryKey: ['sendEarnWithdrawVault', { balances, coinBalances, sendAccount, asset }] as const,
-    enabled:
-      asset !== undefined &&
-      !balances.isLoading &&
-      !coinBalances.isLoading &&
-      !sendAccount.isLoading,
-    queryFn: async ({ queryKey: [, { balances, coinBalances, sendAccount, asset }] }) => {
-      throwIf(balances.error)
+    queryKey: ['sendEarnWithdrawVault', { coinBalances, sendAccount, asset }] as const,
+    enabled: asset !== undefined && coinBalances.isFetched && sendAccount.isFetched,
+    queryFn: async ({ queryKey: [, { coinBalances, sendAccount, asset }] }) => {
       throwIf(coinBalances.error)
       throwIf(sendAccount.error)
       assert(asset !== undefined, 'Asset is not defined')
