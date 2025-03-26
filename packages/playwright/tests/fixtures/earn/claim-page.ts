@@ -62,6 +62,8 @@ export class EarnClaimPage {
   }> {
     assert(!!affiliateVault.send_earn_affiliate_vault?.send_earn, 'Affiliate vault is not defined')
     log('claiming rewards')
+    await expect(this.claimButton).toBeVisible()
+    await expect(this.claimButton).toBeEnabled()
     await this.claimButton.click()
     await this.page.getByText('Rewards claimed', { exact: true }).waitFor({ timeout: 10_000 })
 
