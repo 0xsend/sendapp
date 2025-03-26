@@ -98,6 +98,7 @@ export class EarnDepositPage {
 
   async submit() {
     await expect(this.page.getByRole('button', { name: 'Confirm Deposit' })).toBeVisible()
+    await expect(this.page.getByRole('button', { name: 'Confirm Deposit' })).toBeEnabled()
     await this.page.getByRole('button', { name: 'Confirm Deposit' }).click()
     await expect(this.page.getByText('Deposited successfully', { exact: true })).toBeVisible({
       timeout: 10_000,
@@ -211,12 +212,10 @@ export class EarnWithdrawPage {
   }
 
   async submit() {
-    await expect(async () => {
-      await this.page.getByRole('button', { name: 'Confirm Withdraw' }).click()
-      await expect(this.page.getByText('Withdrawn successfully', { exact: true })).toBeVisible()
-    }).toPass({
-      timeout: 15_000,
-    })
+    await expect(this.page.getByRole('button', { name: 'Confirm Withdraw' })).toBeVisible()
+    await expect(this.page.getByRole('button', { name: 'Confirm Withdraw' })).toBeEnabled()
+    await this.page.getByRole('button', { name: 'Confirm Withdraw' }).click()
+    await expect(this.page.getByText('Withdrawn successfully', { exact: true })).toBeVisible()
   }
 
   /**

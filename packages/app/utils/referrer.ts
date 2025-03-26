@@ -91,16 +91,16 @@ export async function fetchReferrer({
 export function useReferrer() {
   const supabase = useSupabase()
   const { profile } = useUser()
-  const { data: referralCode } = useReferralCode()
+  const referralCode = useReferralCode()
   return useQuery({
     queryKey: ['referrer', { referralCode, supabase, profile }] as const,
     queryFn: async ({ queryKey: [, { referralCode, supabase, profile }], signal }) => {
-      assert(!!referralCode, 'referralCode is required')
+      if (!referralCode.data) return null
       assert(!!supabase, 'supabase is required')
       assert(!!profile, 'profile is required')
-      return fetchReferrer({ supabase, profile, referralCode, signal })
+      return fetchReferrer({ supabase, profile, referralCode: referralCode.data, signal })
     },
-    enabled: !!referralCode && !!profile,
+    enabled: !!profile && referralCode.isFetched,
   })
 }
 

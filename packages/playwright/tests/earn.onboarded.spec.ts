@@ -523,14 +523,6 @@ for (const coin of [usdcCoin]) {
       test.setTimeout(40_000)
       log = debug(`test:earn:claim:${profile.id}:${test.info().parallelIndex}`)
 
-      // It's a prerequisite that the affiliate has a Send Earn deposit to claim rewards through the app
-      await earnDepositPage.navigate(coin)
-      await earnDepositPage.deposit({
-        coin,
-        supabase,
-        amount: formatUnits(MIN_DEPOSIT_AMOUNT, coin.decimals),
-      })
-
       // 1. Set up: Mock transfer some rewards on behalf of the affiliate
       // There is a minimum claim amount of ¢.05 USDC
       const amount = faker.number.bigInt({
@@ -539,64 +531,80 @@ for (const coin of [usdcCoin]) {
       })
       const dealer = privateKeyToAccount(generatePrivateKey())
 
-      // Fund the dealer
-      await fund({
-        address: dealer.address,
-        amount: parseEther('1'),
-        coin: ethCoin,
-      })
-      await fund({ address: dealer.address, amount, coin })
+      const claimReady = (async () => {
+        // Fund the dealer
+        await Promise.all([
+          fund({
+            address: dealer.address,
+            amount: parseEther('1'),
+            coin: ethCoin,
+          }),
+          fund({ address: dealer.address, amount, coin }),
+        ])
 
-      // create SendEarn Affiliate
-      await createSendEarn({
-        account: dealer,
-        affiliate: sendAccount.address,
+        // create SendEarn Affiliate
+        await createSendEarn({
+          account: dealer,
+          affiliate: sendAccount.address,
+          coin,
+        })
+
+        // Get the affiliate vault address
+        const affiliateVault = await withRetry(
+          async () => {
+            const { data: affiliateData, error } = await supabase
+              .from('send_earn_new_affiliate')
+              .select(
+                'affiliate, send_earn_affiliate, send_earn_affiliate_vault(send_earn, log_addr)'
+              )
+              .eq('affiliate', hexToBytea(sendAccount.address))
+              .not('send_earn_affiliate_vault', 'is', null)
+              .single()
+
+            throwIf(error)
+
+            expect(affiliateData).toBeDefined()
+            assert(!!affiliateData, 'Affiliate data is not defined')
+            const affiliateVault = AffiliateVaultSchema.parse(affiliateData)
+            assert(!!affiliateVault, 'Affiliate vault is not defined')
+            return affiliateVault
+          },
+          {
+            retryCount: 50,
+            delay: 500,
+          }
+        )
+
+        assert(!!affiliateVault.send_earn_affiliate_vault, 'Affiliate vault is not defined')
+
+        // Get the vault address from the affiliate data
+        // The send_earn field is in bytea format, we need to convert it to hex string format
+        // and then checksum it for use with the blockchain
+        const vaultHex = affiliateVault.send_earn_affiliate_vault.send_earn
+        // Checksum the address for use with the blockchain
+        const referrerVault = checksumAddress(vaultHex)
+
+        // Deposit on behalf of the referrer
+        await depositOnBehalfOf({
+          asset: coin.token,
+          account: dealer,
+          receiver: affiliateVault.send_earn_affiliate,
+          amount,
+          vault: referrerVault,
+        })
+
+        return { affiliateVault }
+      })()
+
+      // It's a prerequisite that the affiliate has a Send Earn deposit to claim rewards through the app
+      await earnDepositPage.navigate(coin)
+      await earnDepositPage.deposit({
         coin,
+        supabase,
+        amount: formatUnits(MIN_DEPOSIT_AMOUNT, coin.decimals),
       })
 
-      // Get the affiliate vault address
-      const affiliateVault = await withRetry(
-        async () => {
-          const { data: affiliateData, error } = await supabase
-            .from('send_earn_new_affiliate')
-            .select(
-              'affiliate, send_earn_affiliate, send_earn_affiliate_vault(send_earn, log_addr)'
-            )
-            .eq('affiliate', hexToBytea(sendAccount.address))
-            .not('send_earn_affiliate_vault', 'is', null)
-            .single()
-
-          throwIf(error)
-
-          expect(affiliateData).toBeDefined()
-          assert(!!affiliateData, 'Affiliate data is not defined')
-          const affiliateVault = AffiliateVaultSchema.parse(affiliateData)
-          assert(!!affiliateVault, 'Affiliate vault is not defined')
-          return affiliateVault
-        },
-        {
-          retryCount: 50,
-          delay: 500,
-        }
-      )
-
-      assert(!!affiliateVault.send_earn_affiliate_vault, 'Affiliate vault is not defined')
-
-      // Get the vault address from the affiliate data
-      // The send_earn field is in bytea format, we need to convert it to hex string format
-      // and then checksum it for use with the blockchain
-      const vaultHex = affiliateVault.send_earn_affiliate_vault.send_earn
-      // Checksum the address for use with the blockchain
-      const referrerVault = checksumAddress(vaultHex)
-
-      // Deposit on behalf of the referrer
-      await depositOnBehalfOf({
-        asset: coin.token,
-        account: dealer,
-        receiver: affiliateVault.send_earn_affiliate,
-        amount,
-        vault: referrerVault,
-      })
+      const { affiliateVault } = await claimReady
 
       // Calculate expected reward
       const split = await readSendEarnSplit(coin)

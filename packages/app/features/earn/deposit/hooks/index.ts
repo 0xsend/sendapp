@@ -72,7 +72,7 @@ export function useSendEarnDepositVault({
   const referrerVault = useReferrerVault()
   const balances = useSendEarnBalances()
   const sendAccount = useSendAccount()
-
+  log('useSendEarnDepositVault', { referrerVault, balances, sendAccount, asset })
   return useQuery({
     queryKey: ['sendEarnDepositVault', { referrerVault, balances, sendAccount, asset }] as const,
     enabled:
@@ -134,6 +134,8 @@ export function useSendEarnDepositCalls({
   const vault = useSendEarnDepositVault({ asset })
   const referrer = useReferrer()
   const factory = useSendEarnFactory({ asset })
+
+  log('useSendEarnDepositCalls', { sender, asset, amount, vault, referrer, factory })
 
   return useQuery({
     queryKey: [
