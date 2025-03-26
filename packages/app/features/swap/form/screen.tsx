@@ -530,6 +530,7 @@ export const SwapFormScreen = () => {
                       transform={'translate(-50%, -50%)'}
                     >
                       <Button
+                        testID={'flipTokensButton'}
                         bc={'$color0'}
                         circular={true}
                         size={'$5'}
@@ -626,6 +627,7 @@ export const Slippage = ({
         <XStack gap={'$2'}>
           <Paragraph size={'$5'}>{slippage / 100}%</Paragraph>
           <Button
+            testID={'slippageDetailsButton'}
             chromeless
             backgroundColor={'transparent'}
             hoverStyle={{
@@ -670,6 +672,7 @@ export const Slippage = ({
           ))}
           <XStack pos={'relative'} $gtSm={{ marginLeft: 'auto' }}>
             <Input
+              testID={'customSlippageInput'}
               inputMode={'decimal'}
               bw={0}
               bc={hoverStyles.background}

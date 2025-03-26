@@ -7,11 +7,6 @@ import { ScrollDirectionProvider } from 'app/provider/scroll'
 
 jest.mock('app/features/home/utils/useTokenActivityFeed')
 
-// this mock can be removed when swaps are no longer behind white list
-jest.mock('app/utils/useUser', () => ({
-  useUser: jest.fn().mockReturnValue({ user: { id: 'mock-user-id' } }),
-}))
-
 jest.mock('app/utils/useSwapRouters', () => ({
   useSwapRouters: jest.fn().mockReturnValue({ data: [] }),
 }))
@@ -29,20 +24,6 @@ jest.mock('app/utils/useTokenPrices', () => ({
 }))
 
 describe('TokenDetails', () => {
-  let originalSwapAllowlist: string
-
-  // can be removed when swaps are no longer behind white list
-  beforeAll(() => {
-    originalSwapAllowlist = process.env.NEXT_PUBLIC_SWAP_ALLOWLIST || ''
-
-    process.env.NEXT_PUBLIC_SWAP_ALLOWLIST = 'mock-user-id'
-  })
-
-  // can be removed when swaps are no longer behind white list
-  afterAll(() => {
-    process.env.NEXT_PUBLIC_SWAP_ALLOWLIST = originalSwapAllowlist
-  })
-
   beforeEach(() => {
     jest.useFakeTimers()
     jest.setSystemTime(new Date('2025-01-28'))
