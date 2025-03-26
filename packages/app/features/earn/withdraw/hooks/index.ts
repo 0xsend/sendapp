@@ -63,6 +63,8 @@ export function useSendEarnWithdrawVault({
  *
  * It will return send account calls for withdrawing tokens from a Send Earn vault.
  *
+ * TODO: handle multiple vaults with balances for this asset
+ *
  * @param {Object} params - The withdraw parameters
  * @param {string} params.sender - The address of the sender
  * @param {string} params.asset - The address of the ERC20 token to withdraw
@@ -85,12 +87,18 @@ export function useSendEarnWithdrawCalls({
 
   return useQuery({
     queryKey: ['sendEarnWithdrawCalls', { sender, asset, amount, vault }] as const,
-    enabled: !vault.isLoading && asset !== undefined && amount !== undefined && amount > 0n,
+    enabled:
+      vault.isFetched &&
+      sender !== undefined &&
+      asset !== undefined &&
+      amount !== undefined &&
+      amount > 0n,
     queryFn: async (): Promise<SendAccountCall[] | null> => {
       throwIf(vault.error)
       assert(asset !== undefined, 'Asset is not defined')
       assert(amount !== undefined, 'Amount is not defined')
       assert(amount > 0n, 'Amount must be greater than 0')
+      assert(!!sender, 'Sender is not defined')
 
       if (vault.isPending || !vault.data) {
         log('No vault found to withdraw from')
@@ -107,7 +115,7 @@ export function useSendEarnWithdrawCalls({
           data: encodeFunctionData({
             abi: sendEarnAbi,
             functionName: 'withdraw',
-            args: [amount, sender ?? zeroAddress, sender ?? zeroAddress],
+            args: [amount, sender, sender],
           }),
         },
       ]
