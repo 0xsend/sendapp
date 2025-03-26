@@ -144,9 +144,9 @@ export function useSendEarnDepositCalls({
       { sender, asset, amount, vault, referrer, factory },
     ] as const,
     enabled:
-      !vault.isLoading &&
-      !referrer.isLoading &&
-      !factory.isLoading &&
+      (vault.isSuccess || vault.isError) &&
+      (referrer.isSuccess || referrer.isError) &&
+      (factory.isSuccess || factory.isError) &&
       asset !== undefined &&
       amount !== undefined,
     queryFn: async (): Promise<SendAccountCall[] | null> => {
