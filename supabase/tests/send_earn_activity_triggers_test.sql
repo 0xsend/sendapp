@@ -1,6 +1,6 @@
 -- Tests for send_earn activity triggers
 BEGIN;
-SELECT plan(6);
+SELECT plan(8);
 
 -- Create the necessary extensions
 CREATE EXTENSION IF NOT EXISTS "basejump-supabase_test_helpers";
@@ -100,16 +100,55 @@ SELECT isnt_empty(
     'Withdraw activity should have correct user_id'
 );
 
--- Test: Verify delete triggers work correctly
-DO $$
-BEGIN
-    -- Delete the test deposit
-    DELETE FROM send_earn_deposit WHERE ig_name = 'test' AND src_name = 'test';
+-- Ensure we know what activity entries we're working with
+-- SELECT diag('Activity entries before deletion:');
+-- SELECT diag(event_name || ' | ' || event_id)
+-- FROM activity
+-- WHERE event_name IN ('send_earn_deposit', 'send_earn_withdraw');
 
-    -- Delete the test withdraw
-    DELETE FROM send_earn_withdraw WHERE ig_name = 'test' AND src_name = 'test';
+-- Store event_ids for verification
+DO $$
+DECLARE
+    deposit_event_id text;
+    withdraw_event_id text;
+BEGIN
+    -- Get the event IDs for our test entries
+    SELECT event_id INTO deposit_event_id FROM send_earn_deposit
+    WHERE ig_name = 'test' AND src_name = 'test' LIMIT 1;
+
+    SELECT event_id INTO withdraw_event_id FROM send_earn_withdraw
+    WHERE ig_name = 'test' AND src_name = 'test' LIMIT 1;
+
+    -- Log for debugging
+    -- RAISE NOTICE 'Deposit event_id: %', deposit_event_id;
+    -- RAISE NOTICE 'Withdraw event_id: %', withdraw_event_id;
 END $$;
 
+-- Clean up any existing activity entries for other events before testing deletion
+-- This ensures we're only testing our specific test entries
+DELETE FROM activity
+WHERE event_name = 'send_earn_withdraw'
+AND event_id NOT IN (
+    SELECT event_id FROM send_earn_withdraw WHERE ig_name = 'test' AND src_name = 'test'
+);
+
+-- Test: Verify delete triggers work correctly
+-- First verify we have the activity entries to delete
+SELECT isnt_empty(
+    $$SELECT * FROM activity WHERE event_name = 'send_earn_deposit'$$,
+    'Should have send_earn_deposit activity entries before deletion'
+);
+
+SELECT isnt_empty(
+    $$SELECT * FROM activity WHERE event_name = 'send_earn_withdraw'$$,
+    'Should have send_earn_withdraw activity entries before deletion'
+);
+
+-- Now delete the test entries
+DELETE FROM send_earn_deposit WHERE ig_name = 'test' AND src_name = 'test';
+DELETE FROM send_earn_withdraw WHERE ig_name = 'test' AND src_name = 'test';
+
+-- Verify the activity entries were removed by the triggers
 SELECT is_empty(
     $$SELECT * FROM activity WHERE event_name = 'send_earn_deposit'$$,
     'Delete trigger should remove send_earn_deposit activity entries'
