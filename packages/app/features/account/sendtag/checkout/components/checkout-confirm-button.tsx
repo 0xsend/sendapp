@@ -14,6 +14,7 @@ import { AlertTriangle } from '@tamagui/lucide-icons'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { TRPCClientError } from '@trpc/client'
 import { total } from 'app/data/sendtags'
+import { useCoin } from 'app/provider/coins'
 import { api } from 'app/utils/api'
 import { assert } from 'app/utils/assert'
 import { byteaToHex } from 'app/utils/byteaToHex'
@@ -34,8 +35,6 @@ import {
   useSendtagCheckout,
   useSendtagCheckoutReceipts,
 } from '../checkout-utils'
-import { useCoin } from 'app/provider/coins'
-import { useReferrer } from 'app/utils/useReferrer'
 
 export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
   const { updateProfile } = useUser()

@@ -1,9 +1,6 @@
 import { Paragraph, Text, XStack, YStack } from '@my/ui'
-import {
-  useAmountFromActivity,
-  useEventNameFromActivity,
-  useSubtextFromActivity,
-} from 'app/utils/activity'
+import { useEventNameFromActivity, useSubtextFromActivity } from 'app/utils/activity'
+import { useAmountFromActivity } from 'app/utils/activity-hooks'
 import { CommentsTime } from 'app/utils/dateHelper'
 import {
   type Activity,
