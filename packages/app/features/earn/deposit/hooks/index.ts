@@ -77,9 +77,9 @@ export function useSendEarnDepositVault({
     queryKey: ['sendEarnDepositVault', { referrerVault, balances, sendAccount, asset }] as const,
     enabled:
       asset !== undefined &&
-      !balances.isLoading &&
-      !referrerVault.isLoading &&
-      !sendAccount.isLoading,
+      (balances.isSuccess || balances.isError) &&
+      (referrerVault.isSuccess || referrerVault.isError) &&
+      (sendAccount.isSuccess || sendAccount.isError),
     queryFn: async ({ queryKey: [, { referrerVault, balances, sendAccount, asset }] }) => {
       throwIf(referrerVault.error)
       throwIf(balances.error)
