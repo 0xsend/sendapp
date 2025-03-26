@@ -154,7 +154,7 @@ export function useCoinbaseOnramp({
     closeOnramp,
     status,
     error: mutation.error as Error | null,
-    isLoading: mutation.isPending || isSuccess || paymentSubmitted,
+    isLoading: mutation.isPending,
     isRedirecting: isSuccess,
   }
 }
