@@ -54,7 +54,7 @@ export function useAddressBook() {
   const queries = useAddressBookDepQueries()
   const data = useMemo(() => [queries[0].data, queries[1].data] as const, [queries])
   const errors = useMemo(() => queries.map((q) => q.error), [queries])
-  const enabled = useMemo(() => queries.every((q) => q.isSuccess || q.isError), [queries])
+  const enabled = useMemo(() => queries.every((q) => q.isFetched), [queries])
   const queryKey = ['addressBook', { data, errors } as const] as const
 
   const queryFn = useCallback(async (): Promise<AddressBook> => {

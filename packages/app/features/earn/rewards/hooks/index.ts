@@ -103,10 +103,7 @@ export function useEarnRewardsActivityFeed(params?: {
 
   const enabled = useMemo(
     () =>
-      enabledProp &&
-      (addressBook.isError || addressBook.isSuccess) &&
-      (sendAccount.isSuccess || sendAccount.isError) &&
-      (myAffiliateVault.isSuccess || myAffiliateVault.isError),
+      enabledProp && addressBook.isFetched && sendAccount.isFetched && myAffiliateVault.isFetched,
     [enabledProp, addressBook, sendAccount, myAffiliateVault]
   )
 
