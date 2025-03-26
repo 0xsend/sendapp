@@ -55,6 +55,7 @@ export function TokenActivityRow({
             <Text color="$color12" fontSize="$6" fontWeight={'500'}>
               {eventName}
             </Text>
+            &nbsp;
             <Text color="$color12" fontSize="$6" fontWeight={'500'} ta="right">
               {amount}
             </Text>

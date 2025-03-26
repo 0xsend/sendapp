@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker'
 import { expect } from '@my/playwright/fixtures/send-accounts'
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
+import type { Database, Tables } from '@my/supabase/database.types'
 import {
   sendEarnAbi,
   sendEarnAddress,
@@ -8,13 +9,14 @@ import {
   sendEarnUsdcFactoryAddress,
 } from '@my/wagmi'
 import { mergeTests, type Page } from '@playwright/test'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { type erc20Coin, ethCoin, usdcCoin } from 'app/data/coins'
 import { AffiliateVaultSchema } from 'app/features/earn/zod'
 import { assert } from 'app/utils/assert'
 import { byteaToHex } from 'app/utils/byteaToHex'
 import formatAmount from 'app/utils/formatAmount'
 import { hexToBytea } from 'app/utils/hexToBytea'
-import { WAD } from 'app/utils/math'
+import { mulDivDown, WAD } from 'app/utils/math'
 import { assetsToEarnFactory } from 'app/utils/sendEarn'
 import { throwIf } from 'app/utils/throwIf'
 import { Events } from 'app/utils/zod/activity'
@@ -31,7 +33,7 @@ import {
 } from 'viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { readContract } from 'viem/actions'
-import { coinToParam, test as earnTest } from './fixtures/earn'
+import { coinToParam, test as earnTest, type EarnWithdrawPage } from './fixtures/earn'
 import { checkReferralCodeHidden, checkReferralCodeVisibility } from './fixtures/referrals'
 import { fund, testBaseClient } from './fixtures/viem'
 import { createBaseWalletClient } from './fixtures/viem/base'
@@ -56,11 +58,6 @@ const readSendEarnBalanceOf = async ({
     functionName: 'balanceOf',
     args: [owner],
   })
-}
-
-// Helper function to calculate the reward share based on the split
-const mulDivDown = (a: bigint, b: bigint, denominator: bigint): bigint => {
-  return (a * b) / denominator
 }
 
 const readSendEarnConvertToAssets = async ({
@@ -232,7 +229,8 @@ const createSendEarn = async ({
       throw err
     })
   const hash = await wallet.writeContract(request)
-  await testBaseClient.waitForTransactionReceipt({ hash, timeout: 5_000 })
+  const receipt = await testBaseClient.waitForTransactionReceipt({ hash, timeout: 5_000 })
+  assert(receipt.status === 'success', 'createSendEarn failed')
 }
 
 for (const coin of [usdcCoin]) {
@@ -441,9 +439,32 @@ for (const coin of [usdcCoin]) {
       sendAccount,
       supabase,
     }) => {
-      // Navigate to withdraw page
-      await earnWithdrawPage.goto(coin)
+      // Calculate a withdrawal amount (half of the deposit)
+      const balances = await readSendEarnBalanceOf({
+        vault: sendEarnAddress[testBaseClient.chain.id],
+        owner: sendAccount.address,
+      })
 
+      const assets = await readSendEarnConvertToAssets({
+        vault: sendEarnAddress[testBaseClient.chain.id],
+        shares: balances,
+      })
+      const withdrawAmount = faker.number.bigInt({ min: 1n, max: assets })
+
+      await withdraw({
+        earnWithdrawPage,
+        sendAccount,
+        supabase,
+        amount: withdrawAmount,
+        startAssets: assets,
+      })
+    })
+
+    test(`can withdraw all ${coin.symbol} deposited amount from SendEarn`, async ({
+      earnWithdrawPage,
+      sendAccount,
+      supabase,
+    }) => {
       // Calculate a withdrawal amount (half of the deposit)
       const balances = await readSendEarnBalanceOf({
         vault: sendEarnAddress[testBaseClient.chain.id],
@@ -455,8 +476,34 @@ for (const coin of [usdcCoin]) {
         shares: balances,
       })
 
-      // Withdraw half of the deposited amount
-      const withdrawAmount = assets / BigInt(2)
+      // Withdraw all deposited amount
+      await withdraw({
+        earnWithdrawPage,
+        sendAccount,
+        supabase,
+        amount: assets,
+        startAssets: assets,
+      })
+    })
+
+    async function withdraw({
+      earnWithdrawPage,
+      sendAccount,
+      supabase,
+      amount,
+      startAssets,
+    }: {
+      earnWithdrawPage: EarnWithdrawPage
+      sendAccount: Tables<'send_accounts'>
+      supabase: SupabaseClient<Database>
+      amount: bigint
+      startAssets: bigint
+    }) {
+      // Navigate to withdraw page
+      await earnWithdrawPage.goto(coin)
+
+      // Withdraw random deposited amount
+      const withdrawAmount = amount
       const withdrawAmountDecimals = formatUnits(withdrawAmount, coin.decimals)
 
       log('withdrawing', withdrawAmountDecimals, coin.symbol)
@@ -490,8 +537,8 @@ for (const coin of [usdcCoin]) {
       // The remaining assets should be approximately half of the original deposit
       // We allow for some small difference due to rounding and fees
       const tolerance = BigInt(10 ** (coin.decimals - 2)) // 0.01 in the coin's smallest unit
-      expect(remainingAssets).toBeLessThanOrEqual(assets - withdrawAmount + tolerance)
-      expect(remainingAssets).toBeGreaterThanOrEqual(assets - withdrawAmount - tolerance)
+      expect(remainingAssets).toBeLessThanOrEqual(startAssets - withdrawAmount + tolerance)
+      expect(remainingAssets).toBeGreaterThanOrEqual(startAssets - withdrawAmount - tolerance)
 
       await verifyActivity({
         page: earnWithdrawPage.page,
@@ -505,7 +552,7 @@ for (const coin of [usdcCoin]) {
         assets: BigInt(withdrawAmount),
         event: 'Withdraw',
       })
-    })
+    }
   })
 
   test.describe(`Affiliate Rewards for ${coin.symbol}`, () => {
@@ -839,12 +886,13 @@ async function verifyActivity({
   event: string
 }) {
   await page.goto('/activity')
-  await expect(page.getByText(event)).toBeVisible()
   await expect(
     page.getByText(
-      `${formatAmount(formatUnits(BigInt(assets), coin.decimals), 5, coin.formatDecimals)} ${
-        coin.symbol
-      }`
+      `${event} ${formatAmount(
+        formatUnits(BigInt(assets), coin.decimals),
+        5,
+        coin.formatDecimals
+      )} ${coin.symbol}`
     )
   ).toBeVisible()
 }
@@ -861,10 +909,13 @@ async function verifyEarnings({
   event: string
 }) {
   await page.goto(`/earn/${coinToParam(coin)}/balance`)
-  await expect(page.getByText(event)).toBeVisible()
   await expect(
     page.getByText(
-      `${formatAmount(formatUnits(assets, coin.decimals), 5, coin.formatDecimals)} ${coin.symbol}`
+      `${event} ${formatAmount(
+        formatUnits(BigInt(assets), coin.decimals),
+        5,
+        coin.formatDecimals
+      )} ${coin.symbol}`
     )
   ).toBeVisible()
 }
