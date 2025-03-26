@@ -32,10 +32,7 @@ export function useTokenActivityFeed(params: {
   const { pageSize = 10, address, refetchInterval = 30_000, enabled: enabledProp = true } = params
   const supabase = useSupabase()
   const addressBook = useAddressBook()
-  const enabled = useMemo(
-    () => enabledProp && (addressBook.isError || addressBook.isSuccess),
-    [enabledProp, addressBook]
-  )
+  const enabled = useMemo(() => enabledProp && addressBook.isFetched, [enabledProp, addressBook])
   const queryKey = useMemo(
     () => ['token_activity_feed', { addressBook, supabase, pageSize, address }] as const,
     [addressBook, supabase, pageSize, address]
