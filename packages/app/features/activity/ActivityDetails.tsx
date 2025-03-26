@@ -13,11 +13,8 @@ import { IconX } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { ContractLabels } from 'app/data/contract-labels'
 import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
-import {
-  amountFromActivity,
-  usePhraseFromActivity,
-  useSubtextFromActivity,
-} from 'app/utils/activity'
+import { usePhraseFromActivity, useSubtextFromActivity } from 'app/utils/activity'
+import { useAmountFromActivity } from 'app/utils/activity-hooks'
 import { useAddressBook } from 'app/utils/useAddressBook'
 import type { Activity } from 'app/utils/zod/activity'
 import {
@@ -37,7 +34,7 @@ export const ActivityDetails = ({
 } & StackProps) => {
   const activityText = usePhraseFromActivity(activity)
   const subText = useSubtextFromActivity(activity)
-  const amount = amountFromActivity(activity)
+  const amount = useAmountFromActivity(activity)
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const addressBook = useAddressBook()
   const isERC20TransferToSendEarn =
