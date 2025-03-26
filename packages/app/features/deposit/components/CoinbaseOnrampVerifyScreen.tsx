@@ -2,7 +2,9 @@ import { Spinner, Text, YStack } from '@my/ui'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useEffect } from 'react'
 import { fetchOnrampTransactionStatus } from '@coinbase/onchainkit/fund'
+import debug from 'debug'
 
+const log = debug('app:features:deposit:components:CoinbaseOnrampVerifyScreen')
 const CHECK_INTERVAL_MS = 5000
 const MAX_TIMEOUT_MS = 180000 // 3 minutes
 
@@ -18,13 +20,13 @@ export function CoinbaseOnrampVerifyScreen({
   useEffect(() => {
     // Set a timer that will trigger onFailure after MAX_TIMEOUT_MS
     const maxTimer = setTimeout(() => {
-      console.log('[COINBASE_VERIFY_SCREEN] Transaction timed out after 3 minutes')
+      log('Transaction timed out after 3 minutes')
       onFailure()
     }, MAX_TIMEOUT_MS)
 
     const checkTransactionStatus = async () => {
       if (!sendAccount?.user_id) {
-        console.log('[COINBASE_VERIFY_SCREEN] No Send Account Found')
+        log('No Send Account Found')
         clearTimeout(maxTimer)
         onFailure()
         return
@@ -37,28 +39,26 @@ export function CoinbaseOnrampVerifyScreen({
         })
 
         if (!transactions || !transactions.transactions || transactions.transactions.length === 0) {
-          console.log('[COINBASE_VERIFY_SCREEN] No CB Transactions found, trying again..')
+          log('No CB Transactions found, trying again..')
           return
         }
 
         const latestTxStatus = transactions.transactions[0]?.status
-        console.log('[COINBASE_VERIFY_SCREEN] Transaction status:', latestTxStatus)
+        log('Transaction status:', latestTxStatus)
         if (latestTxStatus === 'ONRAMP_TRANSACTION_STATUS_SUCCESS') {
-          console.log('[COINBASE_VERIFY_SCREEN] Successful transaction')
+          log('Successful transaction')
           clearTimeout(maxTimer)
           onSuccess()
         } else if (latestTxStatus === 'ONRAMP_TRANSACTION_STATUS_FAILED') {
-          console.log('[COINBASE_VERIFY_SCREEN] Failed transaction')
+          log('Failed transaction')
           clearTimeout(maxTimer)
           onFailure()
         } else {
-          console.log(
-            `[COINBASE_VERIFY_SCREEN] Checking transactions again in ${CHECK_INTERVAL_MS} ms`
-          )
+          log(`Checking transactions again in ${CHECK_INTERVAL_MS} ms`)
           setTimeout(checkTransactionStatus, CHECK_INTERVAL_MS)
         }
       } catch (err) {
-        console.error('Error checking transaction status:', err)
+        log('Error checking transaction status:', err)
         clearTimeout(maxTimer)
         onFailure()
       }

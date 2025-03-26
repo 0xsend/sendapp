@@ -1,11 +1,13 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { getOnrampBuyUrl } from '@coinbase/onchainkit/fund'
 import { useMutation } from '@tanstack/react-query'
+import debug from 'debug'
 
-type OnrampStatus = 'idle' | 'pending_payment' | 'success' | 'failed' | 'payment_submitted'
-
+const log = debug('app:utils:useCoinbaseOnramp')
 const COINBASE_PAY_ORIGIN = 'https://pay.coinbase.com'
 const COINBASE_PAYMENT_SUBMITTED_PAGE_ROUTE = '/v2/guest/onramp/order-submitted'
+
+type OnrampStatus = 'idle' | 'pending_payment' | 'success' | 'failed' | 'payment_submitted'
 interface OnrampConfig {
   projectId: string
   address: string
@@ -43,7 +45,7 @@ export function useCoinbaseOnramp({
 
   const mutation = useMutation<void, Error, OnrampParams>({
     mutationFn: async ({ amount }) => {
-      console.log('[Onramp] Starting transaction for:', amount, 'USD')
+      log('Starting transaction for:', amount, 'USD')
 
       const onrampUrl = getOnrampBuyUrl({
         projectId,
@@ -68,11 +70,10 @@ export function useCoinbaseOnramp({
 
       return new Promise<void>((resolve, reject) => {
         const checker = setInterval(() => {
-          console.log(paymentSubmittedRef.current)
           if (!newPopup.closed) {
             return
           }
-          console.log('[Onramp] Popup closed by user.')
+          log('Popup closed by user.')
           clearInterval(checker)
           popupRef.current = null
           // A user can close the tab and be in two states
@@ -87,7 +88,7 @@ export function useCoinbaseOnramp({
       })
     },
     onError: (error) => {
-      console.log('[Onramp] Transaction failed:', error.message)
+      log('[Transaction failed:', error.message)
       cleanup()
       return error instanceof Error ? error : new Error('Unknown error occurred')
     },
@@ -101,12 +102,12 @@ export function useCoinbaseOnramp({
       if (event.origin !== COINBASE_PAY_ORIGIN) return
       const eventData = JSON.parse(event.data)
       if (eventData?.data?.eventName === 'success') {
-        console.log('[Onramp] Transaction successful - processing completion')
+        log('Transaction successful - processing completion')
         setIsSuccess(true)
         cleanup()
         mutation.reset()
       } else if (eventData?.data?.pageRoute === COINBASE_PAYMENT_SUBMITTED_PAGE_ROUTE) {
-        console.log('[Onramp] Transaction pending - waiting for Coinbase approval')
+        log('[Transaction pending - waiting for Coinbase approval')
         paymentSubmittedRef.current = true
         setPaymentSubmitted(true)
       }
