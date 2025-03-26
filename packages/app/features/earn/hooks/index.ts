@@ -5,12 +5,7 @@ import {
   useReadMorphoViewGetVaultInfo,
   useReadSendEarnUsdcFactorySplit,
 } from '@my/wagmi'
-import type { PostgrestError, SupabaseClient } from '@supabase/supabase-js'
-import {
-  useInfiniteQuery,
-  type InfiniteData,
-  type UseInfiniteQueryResult,
-} from '@tanstack/react-query'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { ERC20CoinSchema, type erc20Coin } from 'app/data/coins'
 import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
@@ -23,14 +18,10 @@ import debug from 'debug'
 import { useCallback, useMemo } from 'react'
 import { formatUnits, isAddressEqual, zeroAddress } from 'viem'
 import { useChainId, useReadContracts } from 'wagmi'
+import { queryOptions } from '@tanstack/react-query'
 import { hashFn, useQuery, type UseQueryReturnType } from 'wagmi/query'
-import { z, type ZodError } from 'zod'
-import {
-  AffiliateVaultSchema,
-  SendEarnActivitySchemaArray,
-  type AffiliateVault,
-  type SendEarnActivity,
-} from '../zod'
+import { z } from 'zod'
+import { AffiliateVaultSchema, type AffiliateVault } from '../zod'
 
 const log = debug('app:earn:hooks')
 
@@ -157,59 +148,6 @@ function calculateBaseApy({
   return baseApy
 }
 
-/**
- * Fetches the user's send earn deposits.
- */
-/**
- * Infinite query to fetch Send Earn activity.
- *
- * @param params.pageSize - Number of items to fetch per page
- * @param params.refetchInterval - Interval in ms to refetch data
- * @param params.enabled - Whether the query is enabled
- */
-export function useSendEarnActivity(params?: {
-  pageSize?: number
-  refetchInterval?: number
-  enabled?: boolean
-}): UseInfiniteQueryResult<InfiniteData<SendEarnActivity[]>, PostgrestError | ZodError> {
-  const { pageSize = 10, refetchInterval = 30_000, enabled = true } = params ?? {}
-  const supabase = useSupabase()
-
-  async function fetchSendEarnActivity({
-    pageParam,
-  }: { pageParam: number }): Promise<SendEarnActivity[]> {
-    const from = pageParam * pageSize
-    const to = (pageParam + 1) * pageSize - 1
-
-    const { data, error } = await supabase
-      .from('send_earn_activity')
-      .select('type,block_num,block_time,log_addr,owner,sender,assets::text,shares::text,tx_hash')
-      .order('block_time', { ascending: false })
-      .range(from, to)
-
-    if (error) throw error
-    return SendEarnActivitySchemaArray.parse(data)
-  }
-
-  return useInfiniteQuery({
-    queryKey: ['send_earn_activity'],
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, _allPages, lastPageParam) => {
-      if (lastPage !== null && lastPage.length < pageSize) return undefined
-      return lastPageParam + 1
-    },
-    getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => {
-      if (firstPageParam <= 1) {
-        return undefined
-      }
-      return firstPageParam - 1
-    },
-    queryFn: fetchSendEarnActivity,
-    refetchInterval,
-    enabled,
-  })
-}
-
 const SendEarnBalanceSchema = z.object({
   log_addr: byteaToHexEthAddress,
   owner: byteaToHexEthAddress,
@@ -231,17 +169,17 @@ async function fetchSendEarnBalances(supabase: SupabaseClient<Database>) {
  * Fetches the user's send earn balances from supabase. This includes all
  * send earn vaults the user has deposited into.
  */
-export function useSendEarnBalances(): UseQueryReturnType<SendEarnBalance[]> {
-  const supabase = useSupabase()
-  const queryFn = useCallback(
-    async (): Promise<SendEarnBalance[]> => fetchSendEarnBalances(supabase),
-    [supabase]
-  )
-  return useQuery({
-    queryKey: ['send_earn_balances'] as const,
-    queryFn,
+export function sendEarnBalancesQueryOptions(supabase: SupabaseClient<Database>) {
+  return queryOptions({
+    queryKey: ['send_earn_balances', { supabase }] as const,
+    queryFn: async () => fetchSendEarnBalances(supabase),
     staleTime: Number.POSITIVE_INFINITY,
   })
+}
+
+export function useSendEarnBalances(): UseQueryReturnType<SendEarnBalance[]> {
+  const supabase = useSupabase()
+  return useQuery(sendEarnBalancesQueryOptions(supabase))
 }
 
 /**
@@ -430,16 +368,17 @@ export function useSendEarnCoinBalances(
 /**
  * Fetches the user's affiliate vault information.
  */
-export function useMyAffiliateVault(): UseQueryReturnType<AffiliateVault | null> {
-  const supabase = useSupabase()
-  const sendAccount = useSendAccount()
-  return useQuery({
-    queryKey: ['myAffiliateVault', { supabase, sendAccount }] as const,
+export function myAffiliateVaultQueryOptions({
+  supabase,
+  sendAccount,
+}: {
+  supabase: SupabaseClient<Database>
+  sendAccount: ReturnType<typeof useSendAccount>
+}) {
+  return queryOptions({
+    queryKey: ['myAffiliateVault', { sendAccount }] as const,
     enabled: sendAccount.isFetched,
-    queryFn: async ({
-      queryKey: [, { supabase, sendAccount }],
-      signal,
-    }): Promise<AffiliateVault | null> => {
+    queryFn: async ({ queryKey: [, { sendAccount }], signal }): Promise<AffiliateVault | null> => {
       throwIf(sendAccount.error)
       assert(!!sendAccount.data, 'No send account found')
       const { data, error } = await supabase
@@ -458,7 +397,14 @@ export function useMyAffiliateVault(): UseQueryReturnType<AffiliateVault | null>
       log('myAffiliateVault', { data, error })
       return AffiliateVaultSchema.parse(data)
     },
+    staleTime: Number.POSITIVE_INFINITY,
   })
+}
+
+export function useMyAffiliateVault(): UseQueryReturnType<AffiliateVault | null> {
+  const supabase = useSupabase()
+  const sendAccount = useSendAccount()
+  return useQuery(myAffiliateVaultQueryOptions({ supabase, sendAccount }))
 }
 
 /**

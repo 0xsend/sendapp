@@ -9,17 +9,18 @@ import {
   YStack,
   type StackProps,
 } from '@my/ui'
+import { IconX } from 'app/components/icons'
+import { IconCoin } from 'app/components/icons/IconCoin'
+import { ContractLabels } from 'app/data/contract-labels'
+import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
 import {
   phraseFromActivity,
   amountFromActivity,
   subtextFromActivity,
   isActivitySwapTransfer,
 } from 'app/utils/activity'
-import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
-import { IconX } from 'app/components/icons'
-import { IconCoin } from 'app/components/icons/IconCoin'
 import { usePhraseFromActivity, useSubtextFromActivity } from 'app/utils/activity'
-import { ContractLabels, useAddressBook } from 'app/utils/useAddressBook'
+import { useAddressBook } from 'app/utils/useAddressBook'
 import type { Activity } from 'app/utils/zod/activity'
 import {
   isSendAccountTransfersEvent,
