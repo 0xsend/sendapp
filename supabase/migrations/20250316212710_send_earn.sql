@@ -475,6 +475,7 @@ AS $$
 DECLARE
   v_referred_id UUID;
   v_referrer_id UUID;
+  v_affiliate_address bytea;
 BEGIN
   -- Find the referred_id (user who made the deposit)
   SELECT user_id INTO v_referred_id
@@ -486,27 +487,36 @@ BEGIN
     RETURN NEW;
   END IF;
 
-  -- Find the referrer_id by joining through the tables
-  SELECT sa.user_id INTO v_referrer_id
+  -- Check if user was already referred - if so, exit early
+  IF EXISTS (
+    SELECT 1 FROM referrals
+    WHERE referred_id = v_referred_id
+  ) THEN
+    RETURN NEW;
+  END IF;
+
+  -- Find the affiliate's address and the referrer_id
+  SELECT c.fee_recipient, sa.user_id
+  INTO v_affiliate_address, v_referrer_id
   FROM send_earn_create c
   JOIN send_earn_new_affiliate a ON c.fee_recipient = a.send_earn_affiliate
   JOIN send_accounts sa ON lower(concat('0x', encode(a.affiliate, 'hex'::text)))::citext = sa.address
   WHERE c.send_earn = NEW.log_addr;
 
-  -- Skip if we can't find the referrer
-  IF v_referrer_id IS NULL THEN
+  -- Skip if we can't find the affiliate or referrer
+  IF v_affiliate_address IS NULL OR v_referrer_id IS NULL THEN
     RETURN NEW;
   END IF;
 
-  -- Check if this referral relationship already exists
-  IF NOT EXISTS (
-    SELECT 1 FROM referrals
-    WHERE referrer_id = v_referrer_id AND referred_id = v_referred_id
-  ) THEN
-    -- Insert the new referral relationship
+  -- Insert the new referral relationship with error handling
+  BEGIN
     INSERT INTO referrals (referrer_id, referred_id, created_at)
     VALUES (v_referrer_id, v_referred_id, NOW());
-  END IF;
+  EXCEPTION
+    WHEN unique_violation THEN
+      -- A referral was already created (possibly by another concurrent process)
+      NULL;
+  END;
 
   RETURN NEW;
 END;
@@ -527,7 +537,7 @@ AS $$
 DECLARE
   v_referred_id UUID;
   v_referrer_id UUID;
-  v_deposit_owner bytea;
+  v_deposit_record RECORD;
 BEGIN
   -- Find the referrer_id (the affiliate)
   SELECT user_id INTO v_referrer_id
@@ -539,36 +549,41 @@ BEGIN
     RETURN NEW;
   END IF;
 
-  -- Find a deposit with the same transaction hash
-  SELECT owner INTO v_deposit_owner
-  FROM send_earn_deposit
-  WHERE tx_hash = NEW.tx_hash
-  LIMIT 1;
+  -- Process all deposits with the same transaction hash that match an earn contract
+  -- where the fee_recipient matches the send_earn_affiliate
+  FOR v_deposit_record IN
+    SELECT d.owner
+    FROM send_earn_deposit d
+    JOIN send_earn_create c ON d.log_addr = c.send_earn
+    WHERE d.tx_hash = NEW.tx_hash
+    AND c.fee_recipient = NEW.send_earn_affiliate
+  LOOP
+    -- Find the referred_id (user who made the deposit)
+    SELECT user_id INTO v_referred_id
+    FROM send_accounts
+    WHERE address = lower(concat('0x', encode(v_deposit_record.owner, 'hex'::text)))::citext;
 
-  -- Skip if we can't find a deposit with the same transaction hash
-  IF v_deposit_owner IS NULL THEN
-    RETURN NEW;
-  END IF;
+    -- Skip if we can't find the referred user
+    IF v_referred_id IS NULL THEN
+      CONTINUE;
+    END IF;
 
-  -- Find the referred_id (user who made the deposit)
-  SELECT user_id INTO v_referred_id
-  FROM send_accounts
-  WHERE address = lower(concat('0x', encode(v_deposit_owner, 'hex'::text)))::citext;
-
-  -- Skip if we can't find the referred user
-  IF v_referred_id IS NULL THEN
-    RETURN NEW;
-  END IF;
-
-  -- Check if this referral relationship already exists
-  IF NOT EXISTS (
-    SELECT 1 FROM referrals
-    WHERE referrer_id = v_referrer_id AND referred_id = v_referred_id
-  ) THEN
-    -- Insert the new referral relationship
-    INSERT INTO referrals (referrer_id, referred_id, created_at)
-    VALUES (v_referrer_id, v_referred_id, NOW());
-  END IF;
+    -- Check if user was already referred
+    IF NOT EXISTS (
+      SELECT 1 FROM referrals
+      WHERE referred_id = v_referred_id
+    ) THEN
+      -- Insert the new referral relationship with error handling
+      BEGIN
+        INSERT INTO referrals (referrer_id, referred_id, created_at)
+        VALUES (v_referrer_id, v_referred_id, NOW());
+      EXCEPTION
+        WHEN unique_violation THEN
+          -- A referral was already created (possibly by another concurrent process)
+          NULL;
+      END;
+    END IF;
+  END LOOP;
 
   RETURN NEW;
 END;
@@ -579,3 +594,71 @@ CREATE TRIGGER insert_referral_on_new_affiliate
 AFTER INSERT ON public.send_earn_new_affiliate
 FOR EACH ROW
 EXECUTE FUNCTION private.insert_referral_on_new_affiliate();
+
+-- Create trigger function to insert referral relationship when a send_earn_create is indexed
+CREATE OR REPLACE FUNCTION private.insert_referral_on_create()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_referred_id UUID;
+  v_referrer_id UUID;
+  v_deposit_record RECORD;
+  v_affiliate_address bytea;
+BEGIN
+  -- Find deposits made to this Send Earn contract
+  FOR v_deposit_record IN
+    SELECT d.owner, a.affiliate
+    FROM send_earn_deposit d
+    JOIN send_earn_new_affiliate a ON NEW.fee_recipient = a.send_earn_affiliate
+    WHERE d.log_addr = NEW.send_earn
+  LOOP
+    -- Find the referred_id (user who made the deposit)
+    SELECT user_id INTO v_referred_id
+    FROM send_accounts
+    WHERE address = lower(concat('0x', encode(v_deposit_record.owner, 'hex'::text)))::citext;
+
+    -- Skip if we can't find the referred user
+    IF v_referred_id IS NULL THEN
+      CONTINUE;
+    END IF;
+
+    -- Check if user was already referred
+    IF EXISTS (
+      SELECT 1 FROM referrals
+      WHERE referred_id = v_referred_id
+    ) THEN
+      CONTINUE;
+    END IF;
+
+    -- Find the referrer_id (the affiliate)
+    SELECT user_id INTO v_referrer_id
+    FROM send_accounts
+    WHERE address = lower(concat('0x', encode(v_deposit_record.affiliate, 'hex'::text)))::citext;
+
+    -- Skip if we can't find the referrer user
+    IF v_referrer_id IS NULL THEN
+      CONTINUE;
+    END IF;
+
+    -- Insert the new referral relationship with error handling
+    BEGIN
+      INSERT INTO referrals (referrer_id, referred_id, created_at)
+      VALUES (v_referrer_id, v_referred_id, NOW());
+    EXCEPTION
+      WHEN unique_violation THEN
+        -- A referral was already created (possibly by another concurrent process)
+        NULL;
+    END;
+  END LOOP;
+
+  RETURN NEW;
+END;
+$$;
+
+-- Create trigger on send_earn_create table
+CREATE TRIGGER insert_referral_on_create
+AFTER INSERT ON public.send_earn_create
+FOR EACH ROW
+EXECUTE FUNCTION private.insert_referral_on_create();
