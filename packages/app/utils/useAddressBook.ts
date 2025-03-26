@@ -1,138 +1,86 @@
-import type { Database } from '@my/supabase/database.types'
 import {
   sendEarnAddress,
   sendEarnUsdcFactoryAddress,
   sendtagCheckoutAddress,
   tokenPaymasterAddress,
 } from '@my/wagmi'
-import type { SupabaseClient } from '@supabase/supabase-js'
-import { useQueries } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { ContractLabels } from 'app/data/contract-labels'
-import { myAffiliateVaultQueryOptions, sendEarnBalancesQueryOptions } from 'app/features/earn/hooks'
-import { useSupabase } from 'app/utils/supabase/useSupabase'
+import { useMyAffiliateVault, useSendEarnBalances } from 'app/features/earn/hooks'
+import { useCallback, useMemo } from 'react'
 import SuperJSON from 'superjson'
 import { z } from 'zod'
-import { useSendAccount } from './send-accounts'
+import { throwIf } from './throwIf'
 import { address } from './zod'
 
 const AddressBookSchema = z.record(address, z.string())
 export type AddressBook = z.infer<typeof AddressBookSchema>
 
 /**
- * Query options to build a dynamic address book for a Send Account.
+ * Queries to build a dynamic address book for a Send Account. Ideally, we would offload
+ * this to a database completely, but that presents a lot of challenges with respects to race conditions.
+ * There's no guarantee that all event logs are indexed in the correct order on the backend, so we need to
+ * handle this on the client for now.
  *
- * This returns the query options for the dependent queries that are used to build the address book.
- * It is useful for screens that have mutations and want to update the address book.
+ * This is useful for screens that have mutations and want to update the address book, but it's not ideal
+ *
+ * ```ts
+ * const queries = useAddressBookDepQueries()
+ * const queryClient = useQueryClient()
+ * queryClient.invalidateQueries({ queryKey: [queries[0].queryKey] })
+ * queryClient.invalidateQueries({ queryKey: [queries[1].queryKey] })
+ * ```
  */
-export function useAddressBookDepQueries({
-  supabase,
-  sendAccount,
-}: {
-  supabase: SupabaseClient<Database>
-  sendAccount: ReturnType<typeof useSendAccount>
-}) {
-  const queryOptions = [
-    sendEarnBalancesQueryOptions(supabase),
-    myAffiliateVaultQueryOptions({ supabase, sendAccount }),
+export function useAddressBookDepQueries() {
+  const queries = [
+    useSendEarnBalances(),
+    useMyAffiliateVault(),
     // add more queries here
   ] as const
-  return queryOptions
+  return queries
 }
 
 /**
- * A hook to build a contacts list for the Send Account using useQueries.
+ * A hook to build a contacts list for the Send Account. There are probably better ways to do this and lots of room for improvement.
  *
  * Potentially there is a solution that can be solved by joining a computed table with the activity feed view.
  *
- * For now, we use useQueries that combines the results into an address book.
+ * For now, we use a query that resolves to an address book.
  *
  * The stale time is set to Infinity to prevent the address book from causing infinite render loops. If you need
- * to update the address book, invalidate the dependent queries.
+ * to update the address book, invalidate
  */
 export function useAddressBook() {
-  const supabase = useSupabase()
-  const sendAccount = useSendAccount()
-  const queryOptions = useAddressBookDepQueries({
-    supabase,
-    sendAccount,
+  const queries = useAddressBookDepQueries()
+  const data = useMemo(() => [queries[0].data, queries[1].data] as const, [queries])
+  const errors = useMemo(() => queries.map((q) => q.error), [queries])
+  const enabled = useMemo(() => queries.every((q) => q.isSuccess || q.isError), [queries])
+  const queryKey = ['addressBook', { data, errors } as const] as const
+
+  const queryFn = useCallback(async (): Promise<AddressBook> => {
+    for (const error of errors) {
+      throwIf(error)
+    }
+    const input = {
+      ...Object.fromEntries([
+        ...(data[0]?.map((b) => [b.log_addr, ContractLabels.SendEarn]) || []),
+        ...(data[1] ? [[data[1].send_earn_affiliate, ContractLabels.SendEarnAffiliate]] : []),
+        // add more entries here
+        ...Object.values(sendEarnAddress).map((p) => [p, ContractLabels.SendEarn]),
+        ...Object.values(sendEarnUsdcFactoryAddress).map((p) => [p, ContractLabels.SendEarn]),
+        ...Object.values(tokenPaymasterAddress).map((p) => [p, ContractLabels.Paymaster]),
+        ...Object.values(sendtagCheckoutAddress).map((p) => [p, ContractLabels.SendtagCheckout]),
+      ]),
+    }
+    const addressBook = AddressBookSchema.parse(input)
+    return addressBook
+  }, [data, errors])
+  const query = useQuery({
+    queryKey,
+    queryKeyHashFn: (queryKey) => SuperJSON.stringify(queryKey),
+    enabled,
+    queryFn,
+    staleTime: Number.POSITIVE_INFINITY, // prevent infinite render loops, invalidate when needed
   })
-
-  const result = useQueries({
-    queries: queryOptions,
-    combine: (results) => {
-      // Extract the data from each query result
-      const [balancesResult, affiliateVaultResult] = results
-      const data = [balancesResult.data, affiliateVaultResult.data] as const
-      const errors = results.map((q) => q.error)
-      const enabled = results.every((q) => q.isSuccess || q.isError)
-
-      // Create a query key data object similar to the original implementation
-      const queryKeyData = {
-        balanceIds: data[0]?.map((b) => b.log_addr),
-        affiliateVaultId: data[1]?.send_earn_affiliate,
-        errors,
-      }
-
-      // Only proceed if all queries have completed (success or error)
-      if (!enabled) {
-        return {
-          data: undefined,
-          isLoading: false,
-          isSuccess: false,
-          isError: false,
-          error: undefined,
-        }
-      }
-
-      // Check for errors
-      const error = errors.find((e) => e !== null && e !== undefined)
-      if (error) {
-        return {
-          data: undefined,
-          isLoading: false,
-          isSuccess: false,
-          isError: true,
-          error,
-        }
-      }
-
-      // Generate the address book data
-      try {
-        const addressBookData = AddressBookSchema.parse({
-          ...Object.fromEntries([
-            ...(data[0]?.map((b) => [b.log_addr, ContractLabels.SendEarn]) || []),
-            ...(data[1]?.send_earn_affiliate
-              ? ([[data[1].send_earn_affiliate, ContractLabels.SendEarnAffiliate]] as const)
-              : []),
-            // add more entries here
-            ...Object.values(sendEarnAddress).map((p) => [p, ContractLabels.SendEarn]),
-            ...Object.values(sendEarnUsdcFactoryAddress).map((p) => [p, ContractLabels.SendEarn]),
-            ...Object.values(tokenPaymasterAddress).map((p) => [p, ContractLabels.Paymaster]),
-            ...Object.values(sendtagCheckoutAddress).map((p) => [
-              p,
-              ContractLabels.SendtagCheckout,
-            ]),
-          ]),
-        })
-
-        return {
-          data: addressBookData,
-          isSuccess: true,
-          isError: false,
-          error: undefined,
-          // Include additional properties similar to useQuery result
-          queryKey: ['addressBook', queryKeyData] as const,
-          queryKeyHashFn: (queryKey: unknown) => SuperJSON.stringify(queryKey),
-        }
-      } catch (err) {
-        return {
-          data: undefined,
-          isSuccess: false,
-          isError: true,
-          error: err instanceof Error ? err : new Error(String(err)),
-        }
-      }
-    },
-  })
-  return result
+  return query
 }
