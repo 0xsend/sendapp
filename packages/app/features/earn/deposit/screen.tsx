@@ -378,17 +378,23 @@ export function DepositForm() {
                     </Paragraph>
                   </Fade>
                 ) : null}
-                <XStack alignItems="center" jc="center" gap={'$2'}>
-                  {[calls.error, sendAccount.error, uop.error, mutation.error]
-                    .filter(Boolean)
-                    .map((e) =>
-                      e ? (
-                        <Paragraph key={e.message} color="$error" role="alert">
-                          {toNiceError(e)}
-                        </Paragraph>
-                      ) : null
-                    )}
-                </XStack>
+                {[calls.error, sendAccount.error, uop.error, mutation.error]
+                  .filter(Boolean)
+                  .map((e) =>
+                    e ? (
+                      <Fade key="error-state">
+                        <XStack
+                          alignItems="center"
+                          jc="center"
+                          gap={'$2'}
+                          key={e.message}
+                          role="alert"
+                        >
+                          <Paragraph color="$error">{toNiceError(e)}</Paragraph>
+                        </XStack>
+                      </Fade>
+                    ) : null
+                  )}
                 <SubmitButton
                   theme="green"
                   onPress={() => {
