@@ -13,10 +13,24 @@ const HexSchema = z
   .regex(/^0x[a-fA-F0-9]+$/i)
   .refine((v): v is `0x${string}` => true)
 
-const EthAddressSchema = z
+export const EthAddressSchema = z
   .string()
   .regex(/^0x[a-fA-F0-9]{40}$/i)
   .refine((v): v is `0x${string}` => true)
+
+const SwapRoutePoolSchema = z.object({
+  pool: z.string(), //kyber can return various formats here, contracts addresses (or custom values) instead of LP address (e.g. uniswap v4 hooks)
+  tokenIn: EthAddressSchema,
+  tokenOut: EthAddressSchema,
+  limitReturnAmount: z.string(),
+  swapAmount: z.string(),
+  amountOut: z.string(),
+  exchange: z.string(),
+  poolLength: z.number(),
+  poolType: z.string(),
+  poolExtra: z.any().optional(),
+  extra: z.any().optional(),
+})
 
 export const KyberRouteSummarySchema = z.object({
   tokenIn: EthAddressSchema,
@@ -36,23 +50,7 @@ export const KyberRouteSummarySchema = z.object({
       feeReceiver: z.string(),
     })
     .optional(),
-  route: z.array(
-    z.array(
-      z.object({
-        pool: EthAddressSchema,
-        tokenIn: EthAddressSchema,
-        tokenOut: EthAddressSchema,
-        limitReturnAmount: z.string(),
-        swapAmount: z.string(),
-        amountOut: z.string(),
-        exchange: z.string(),
-        poolLength: z.number(),
-        poolType: z.string(),
-        poolExtra: z.any().optional(),
-        extra: z.any().optional(),
-      })
-    )
-  ),
+  route: z.array(z.array(SwapRoutePoolSchema)),
   checksum: z.string(),
   timestamp: z.number(),
 })
