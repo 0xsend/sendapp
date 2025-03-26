@@ -6,8 +6,6 @@ import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 import debug from 'debug'
 import { testBaseClient } from './base'
 
-const log = debug('sendapp:tests:viem')
-
 /**
  * Lookup the balance of the given address for the given token
  */
