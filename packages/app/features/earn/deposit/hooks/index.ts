@@ -96,10 +96,7 @@ export function useSendEarnDepositVault({
       }
 
       if (referrerVault.data) {
-        log(
-          'referrer has no deposits, but has a referrer. Using referrer vault:',
-          referrerVault.data
-        )
+        log('user has no deposits, but has a referrer. Using referrer vault:', referrerVault.data)
         return referrerVault.data
       }
 
