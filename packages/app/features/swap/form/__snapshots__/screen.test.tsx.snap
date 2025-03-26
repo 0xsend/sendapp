@@ -2329,7 +2329,7 @@ exports[`swap form screen should render 1`] = `
               }
             >
               <View
-                aria-labelledby=":rd:"
+                aria-labelledby=":rg:"
                 disabled={false}
                 role="group"
                 style={
@@ -2344,7 +2344,7 @@ exports[`swap form screen should render 1`] = `
                 }
               >
                 <View
-                  aria-labelledby=":re:"
+                  aria-labelledby=":rh:"
                   aria-selected={true}
                   cancelable={true}
                   disabled={false}
@@ -2408,7 +2408,7 @@ exports[`swap form screen should render 1`] = `
                     }
                   >
                     <Text
-                      id=":re:"
+                      id=":rh:"
                       lineBreakMode="clip"
                       numberOfLines={1}
                       style={
@@ -2561,7 +2561,7 @@ exports[`swap form screen should render 1`] = `
                   }
                 />
                 <View
-                  aria-labelledby=":rf:"
+                  aria-labelledby=":ri:"
                   aria-selected={false}
                   cancelable={true}
                   disabled={false}
@@ -2625,7 +2625,7 @@ exports[`swap form screen should render 1`] = `
                     }
                   >
                     <Text
-                      id=":rf:"
+                      id=":ri:"
                       lineBreakMode="clip"
                       numberOfLines={1}
                       style={
@@ -2971,7 +2971,7 @@ exports[`swap form screen should render 1`] = `
               }
             >
               <View
-                aria-labelledby=":rg:"
+                aria-labelledby=":rj:"
                 disabled={false}
                 role="group"
                 style={
@@ -2986,7 +2986,7 @@ exports[`swap form screen should render 1`] = `
                 }
               >
                 <View
-                  aria-labelledby=":rh:"
+                  aria-labelledby=":rk:"
                   aria-selected={false}
                   cancelable={true}
                   disabled={false}
@@ -3050,7 +3050,7 @@ exports[`swap form screen should render 1`] = `
                     }
                   >
                     <Text
-                      id=":rh:"
+                      id=":rk:"
                       lineBreakMode="clip"
                       numberOfLines={1}
                       style={
@@ -3203,7 +3203,7 @@ exports[`swap form screen should render 1`] = `
                   }
                 />
                 <View
-                  aria-labelledby=":ri:"
+                  aria-labelledby=":rl:"
                   aria-selected={true}
                   cancelable={true}
                   disabled={false}
@@ -3267,7 +3267,7 @@ exports[`swap form screen should render 1`] = `
                     }
                   >
                     <Text
-                      id=":ri:"
+                      id=":rl:"
                       lineBreakMode="clip"
                       numberOfLines={1}
                       style={
@@ -3336,6 +3336,333 @@ exports[`swap form screen should render 1`] = `
             "maxHeight": "100%",
             "maxWidth": 738,
             "overflow": "hidden",
+            "position": "absolute",
+            "right": 0,
+            "shadowColor": undefined,
+            "shadowOffset": {
+              "height": 0,
+              "width": 0,
+            },
+            "shadowOpacity": 0,
+            "shadowRadius": 0,
+            "width": "100%",
+            "zIndex": -1,
+          }
+        }
+      />
+    </View>
+  </View>,
+  <View
+    pointerEvents="box-none"
+    style={
+      {
+        "bottom": 0,
+        "flexDirection": "column",
+        "left": 0,
+        "maxWidth": "100%",
+        "position": "absolute",
+        "right": 0,
+        "top": 0,
+        "zIndex": 100001,
+      }
+    }
+  >
+    <View
+      cancelable={true}
+      disabled={false}
+      focusable={true}
+      minPressDuration={0}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      onPress={[Function]}
+      onPressIn={[Function]}
+      onPressOut={[Function]}
+      pointerEvents="auto"
+      style={
+        {
+          "backgroundColor": "rgba(0,0,0,0.9)",
+          "bottom": 0,
+          "flexDirection": "column",
+          "left": 0,
+          "position": "absolute",
+          "right": 0,
+          "top": 0,
+          "zIndex": 99999,
+        }
+      }
+    />
+    <View
+      collapsable={false}
+      disableClassName={true}
+      forwardedRef={[Function]}
+      jestAnimatedStyle={
+        {
+          "value": {
+            "transform": [
+              {
+                "translateY": 10000.1,
+              },
+            ],
+          },
+        }
+      }
+      onLayout={[Function]}
+      style={
+        {
+          "height": "80%",
+          "minHeight": "80%",
+          "opacity": 1,
+          "position": "absolute",
+          "transform": [
+            {
+              "translateY": 10000.1,
+            },
+          ],
+          "width": "100%",
+          "zIndex": 100001,
+        }
+      }
+    >
+      <View
+        pointerEvents="auto"
+        style={
+          {
+            "backgroundColor": "#081619",
+            "borderTopLeftRadius": 16,
+            "borderTopRightRadius": 16,
+            "flex": 1,
+            "flexDirection": "column",
+            "height": 0,
+            "maxHeight": "100%",
+            "overflow": "hidden",
+            "paddingBottom": 18,
+            "paddingLeft": 18,
+            "paddingRight": 18,
+            "paddingTop": 18,
+            "width": "100%",
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "flexDirection": "column",
+              "gap": 18,
+            }
+          }
+        >
+          <Text
+            accessibilityRole="header"
+            id="title-:rd:"
+            style={
+              {
+                "color": "#FFFFFF",
+                "fontFamily": "System",
+                "fontSize": 30,
+                "fontWeight": "700",
+                "lineHeight": 34,
+                "marginBottom": 0,
+                "marginLeft": 0,
+                "marginRight": 0,
+                "marginTop": 0,
+                "textTransform": "none",
+                "userSelect": "auto",
+              }
+            }
+            suppressHighlighting={true}
+          >
+            Important Disclaimer
+          </Text>
+          <Text
+            style={
+              {
+                "color": "#FFFFFF",
+                "fontFamily": "System",
+                "fontSize": 16.8,
+                "fontWeight": "400",
+                "lineHeight": 19,
+                "userSelect": "auto",
+              }
+            }
+            suppressHighlighting={true}
+          >
+            Trading cryptocurrencies involves a high level of risk and may not be suitable for all investors. You could lose some or all of your principal, and should only invest money you can afford to lose. Carefully consider your investment objectives, experience, and risk tolerance before proceeding.
+             
+            <a
+              href="https://support.send.app/en/articles/10916009-terms-of-service"
+              rel="noreferrer"
+              target="_blank"
+            >
+              Learn more.
+            </a>
+          </Text>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 7,
+              }
+            }
+          >
+            <View
+              aria-checked={false}
+              cancelable={true}
+              checked={false}
+              disabled={false}
+              focusVisibleStyle={{}}
+              focusable={[Function]}
+              minPressDuration={0}
+              onBlur={[Function]}
+              onFocus={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onPress={[Function]}
+              onPressIn={[Function]}
+              onPressOut={[Function]}
+              role="checkbox"
+              style={
+                {
+                  "alignItems": "center",
+                  "backgroundColor": "#3E4A3C",
+                  "borderBottomColor": "#3E4A3C",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderBottomWidth": 0,
+                  "borderLeftColor": "#3E4A3C",
+                  "borderLeftWidth": 0,
+                  "borderRightColor": "#3E4A3C",
+                  "borderRightWidth": 0,
+                  "borderStyle": "solid",
+                  "borderTopColor": "#3E4A3C",
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "borderTopWidth": 0,
+                  "flexDirection": "column",
+                  "height": 20,
+                  "justifyContent": "center",
+                  "maxHeight": 20,
+                  "maxWidth": 20,
+                  "minHeight": 20,
+                  "minWidth": 20,
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "width": 20,
+                }
+              }
+              testID="swapRiskDialogCheckbox"
+            />
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              I have read and understand the risks involved.
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 18,
+                "justifyContent": "flex-end",
+                "marginTop": 18,
+              }
+            }
+          >
+            <View
+              focusVisibleStyle={
+                {
+                  "borderColor": "$background",
+                }
+              }
+              pointerEvents="none"
+              role="button"
+              style={
+                {
+                  "alignItems": "center",
+                  "backgroundColor": "#40FB50",
+                  "borderBottomColor": "transparent",
+                  "borderBottomLeftRadius": 5,
+                  "borderBottomRightRadius": 5,
+                  "borderBottomWidth": 1,
+                  "borderLeftColor": "transparent",
+                  "borderLeftWidth": 1,
+                  "borderRightColor": "transparent",
+                  "borderRightWidth": 1,
+                  "borderStyle": "solid",
+                  "borderTopColor": "transparent",
+                  "borderTopLeftRadius": 5,
+                  "borderTopRightRadius": 5,
+                  "borderTopWidth": 1,
+                  "flexDirection": "row",
+                  "flexWrap": "nowrap",
+                  "height": 44,
+                  "justifyContent": "center",
+                  "opacity": 0.5,
+                  "paddingLeft": 18,
+                  "paddingRight": 18,
+                }
+              }
+              testID="swapRiskDialogContinueButton"
+            >
+              <Text
+                lineBreakMode="clip"
+                numberOfLines={1}
+                style={
+                  {
+                    "color": "#12643F",
+                    "flexGrow": 0,
+                    "flexShrink": 1,
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "userSelect": "none",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                Continue
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          {
+            "backgroundColor": "#081619",
+            "borderBottomLeftRadius": 0,
+            "borderBottomRightRadius": 0,
+            "borderBottomWidth": 0,
+            "borderLeftWidth": 0,
+            "borderRightWidth": 0,
+            "borderStyle": "solid",
+            "borderTopLeftRadius": 0,
+            "borderTopRightRadius": 0,
+            "borderTopWidth": 0,
+            "bottom": "-100%",
+            "flex": 1,
+            "flexDirection": "column",
+            "height": 0,
+            "left": 0,
+            "maxHeight": "100%",
+            "overflow": "hidden",
+            "paddingBottom": 18,
+            "paddingLeft": 18,
+            "paddingRight": 18,
+            "paddingTop": 18,
             "position": "absolute",
             "right": 0,
             "shadowColor": undefined,
