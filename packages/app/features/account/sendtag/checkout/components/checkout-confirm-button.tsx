@@ -10,7 +10,6 @@ import {
   YStack,
   type YStackProps,
 } from '@my/ui'
-import { baseMainnetClient, usdcAddress } from '@my/wagmi'
 import { AlertTriangle } from '@tamagui/lucide-icons'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { TRPCClientError } from '@trpc/client'
@@ -27,7 +26,7 @@ import { sendUserOpTransfer } from 'app/utils/useUserOpTransferMutation'
 import { useAccountNonce } from 'app/utils/userop'
 import { type PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react'
 import { isAddressEqual, zeroAddress } from 'viem'
-import { useBalance, useWaitForTransactionReceipt } from 'wagmi'
+import { useWaitForTransactionReceipt } from 'wagmi'
 import { useReferralCodeCookie } from 'app/utils/useReferralCodeCookie'
 import { useReferrer } from 'app/utils/useReferrer'
 import {
@@ -35,13 +34,13 @@ import {
   useSendtagCheckout,
   useSendtagCheckoutReceipts,
 } from '../checkout-utils'
+import { useCoin } from 'app/provider/coins'
 
 export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
   const { updateProfile } = useUser()
   const { data: sendAccount } = useSendAccount()
   const sender = useMemo(() => sendAccount?.address, [sendAccount?.address])
 
-  const chainId = baseMainnetClient.chain.id
   const pendingTags = usePendingTags() ?? []
   const amountDue = useMemo(() => total(pendingTags ?? []), [pendingTags])
   const {
@@ -51,22 +50,13 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
   } = useReferrer()
   const { data: rewardDue } = useReferralReward({ tags: pendingTags })
   const { data: referralCodeCookie } = useReferralCodeCookie()
+  const { coin: usdc, tokensQuery, isLoading: isLoadingUSDC } = useCoin('USDC')
 
   const webauthnCreds =
     sendAccount?.send_account_credentials
       .filter((c) => !!c.webauthn_credentials)
       .map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? []
   const hasPendingTags = !!pendingTags?.length
-  const {
-    data: balance,
-    isLoading: isLoadingBalance,
-    error: balanceError,
-    queryKey: [balanceQueryKey],
-  } = useBalance({
-    address: sender,
-    chainId: baseMainnetClient.chain.id,
-    token: usdcAddress[chainId],
-  })
 
   const [submitting, setSubmitting] = useState(false)
   const confirm = api.tag.confirm.useMutation()
@@ -153,7 +143,7 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
   const { userOp, userOpError, isLoadingUserOp, usdcFees, usdcFeesError, isLoadingUSDCFees } =
     useSendtagCheckout()
   const canAffordTags =
-    balance && usdcFees && balance.value + usdcFees.baseFee + usdcFees.gasFees >= amountDue
+    usdc?.balance && usdcFees && usdc.balance + usdcFees.baseFee + usdcFees.gasFees >= amountDue
 
   const queryClient = useQueryClient()
   const { mutateAsync: sendUserOp, isPending: sendTransactionIsPending } = useMutation({
@@ -167,7 +157,7 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
-      queryClient.invalidateQueries({ queryKey: [balanceQueryKey] })
+      queryClient.invalidateQueries({ queryKey: [tokensQuery.queryKey] })
     },
   })
 
@@ -296,8 +286,8 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
 
   return (
     <ConfirmButtonStack w={'100%'} gap="$2">
-      {balanceError && (
-        <Paragraph color="$error">{balanceError?.message?.split('.').at(0)}</Paragraph>
+      {tokensQuery.error && (
+        <Paragraph color="$error">{tokensQuery.error?.message?.split('.').at(0)}</Paragraph>
       )}
       {usdcFeesError && (
         <Paragraph color="$error">{usdcFeesError?.message?.split('.').at(0)}</Paragraph>
@@ -317,7 +307,7 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
         {(() => {
           switch (true) {
             case isLoadingUserOp ||
-              isLoadingBalance ||
+              isLoadingUSDC ||
               isLoadingUSDCFees ||
               isLoadingReceipts ||
               isLoadingReferrer:
