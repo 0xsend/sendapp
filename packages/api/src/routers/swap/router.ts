@@ -1,5 +1,6 @@
 import { createTRPCRouter, protectedProcedure } from '../../trpc'
 import {
+  EthAddressSchema,
   type KyberEncodeRouteRequest,
   KyberEncodeRouteRequestSchema,
   KyberEncodeRouteResponseSchema,
@@ -83,6 +84,15 @@ const encodeKyberSwapRoute = async ({
           !tokenInLiquidityPool ||
           isAddressEqual(routeSummary.tokenIn, KYBER_NATIVE_TOKEN_ADDRESS)
         ) {
+          return null
+        }
+
+        const result = EthAddressSchema.safeParse(tokenInLiquidityPool.pool)
+
+        // kyber can return contracts addresses (or custom values) instead of LP address (e.g. uniswap v4 hooks)
+        // for now we gonna ignore those
+        if (!result.success) {
+          log('Not saving LP address: ', tokenInLiquidityPool.pool)
           return null
         }
 
