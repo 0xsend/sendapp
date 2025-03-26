@@ -10,13 +10,6 @@ const mockUseAddressBook = {
 
 export const useAddressBook = jest.fn().mockReturnValue(mockUseAddressBook)
 
-export const ContractLabels = {
-  SendEarn: 'Send Earn',
-  Paymaster: 'Paymaster',
-  SendtagCheckout: 'Sendtag Checkout',
-}
-
 export default {
   useAddressBook,
-  ContractLabels,
 }

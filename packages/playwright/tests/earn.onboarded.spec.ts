@@ -7,11 +7,12 @@ import {
   sendEarnUsdcFactoryAbi,
   sendEarnUsdcFactoryAddress,
 } from '@my/wagmi'
-import { mergeTests } from '@playwright/test'
+import { mergeTests, type Page } from '@playwright/test'
 import { type erc20Coin, ethCoin, usdcCoin } from 'app/data/coins'
 import { AffiliateVaultSchema } from 'app/features/earn/zod'
 import { assert } from 'app/utils/assert'
 import { byteaToHex } from 'app/utils/byteaToHex'
+import formatAmount from 'app/utils/formatAmount'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { WAD } from 'app/utils/math'
 import { assetsToEarnFactory } from 'app/utils/sendEarn'
@@ -30,7 +31,7 @@ import {
 } from 'viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { readContract } from 'viem/actions'
-import { test as earnTest } from './fixtures/earn'
+import { coinToParam, test as earnTest } from './fixtures/earn'
 import { checkReferralCodeHidden, checkReferralCodeVisibility } from './fixtures/referrals'
 import { fund, testBaseClient } from './fixtures/viem'
 import { createBaseWalletClient } from './fixtures/viem/base'
@@ -269,6 +270,20 @@ for (const coin of [usdcCoin]) {
         depositedAssets: randomAmount,
         deposit,
       })
+
+      await verifyActivity({
+        page: page.page,
+        assets: BigInt(deposit.assets),
+        coin,
+        event: 'Deposit',
+      })
+
+      await verifyEarnings({
+        page: page.page,
+        coin,
+        assets: BigInt(deposit.assets),
+        event: 'Deposit',
+      })
     })
 
     test(`can deposit ${coin.symbol} into SendEarn with a referral code`, async ({
@@ -384,6 +399,19 @@ for (const coin of [usdcCoin]) {
         timeout: 10_000,
         intervals: [1000, 2000, 3000, 5000],
       })
+
+      await verifyActivity({
+        page: page.page,
+        assets: BigInt(deposit.assets),
+        coin,
+        event: 'Deposit',
+      })
+      await verifyEarnings({
+        page: page.page,
+        coin,
+        assets: BigInt(deposit.assets),
+        event: 'Deposit',
+      })
     })
   })
 
@@ -464,6 +492,19 @@ for (const coin of [usdcCoin]) {
       const tolerance = BigInt(10 ** (coin.decimals - 2)) // 0.01 in the coin's smallest unit
       expect(remainingAssets).toBeLessThanOrEqual(assets - withdrawAmount + tolerance)
       expect(remainingAssets).toBeGreaterThanOrEqual(assets - withdrawAmount - tolerance)
+
+      await verifyActivity({
+        page: earnWithdrawPage.page,
+        assets: BigInt(withdrawAmount),
+        coin,
+        event: 'Withdraw',
+      })
+      await verifyEarnings({
+        page: earnWithdrawPage.page,
+        coin,
+        assets: BigInt(withdrawAmount),
+        event: 'Withdraw',
+      })
     })
   })
 
@@ -595,20 +636,18 @@ for (const coin of [usdcCoin]) {
         2
       )
 
-      // 6. Verify activity feed shows the claim
-      // TODO: need to include send earn desposits in the activity feed
-      // handle activity feed client side filtering to show only send account transfers
-      // but on earn specific pages, we should allow only earn events (withdraw, deposit)
-      // await expect(supabase).toHaveEventInActivityFeed({
-      //   event_name: 'send_account_transfers', // Affiliate rewards appear as transfers
-      //   from_user: expect.objectContaining({
-      //     send_id: profile.send_id,
-      //   }),
-      //   data: expect.objectContaining({
-      //     v: expect.any(String), // Amount value
-      //     f: hexToBytea(affiliateVault.send_earn_affiliate),
-      //   }),
-      // })
+      await verifyActivity({
+        page: earnClaimPage.page,
+        assets: BigInt(claimTx.assets),
+        coin,
+        event: 'Rewards',
+      })
+      await verifyEarnings({
+        page: earnClaimPage.page,
+        coin,
+        assets: BigInt(claimTx.assets),
+        event: 'Rewards',
+      })
     })
   })
 
@@ -779,4 +818,45 @@ for (const coin of [usdcCoin]) {
       expect(totalAssets).toBeCloseTo(totalDeposited, 2)
     })
   })
+}
+async function verifyActivity({
+  page,
+  assets,
+  coin,
+  event,
+}: {
+  page: Page
+  assets: bigint
+  coin: erc20Coin
+  event: string
+}) {
+  await page.goto('/activity')
+  await expect(page.getByText(event)).toBeVisible()
+  await expect(
+    page.getByText(
+      `${formatAmount(formatUnits(BigInt(assets), coin.decimals), 5, coin.formatDecimals)} ${
+        coin.symbol
+      }`
+    )
+  ).toBeVisible()
+}
+
+async function verifyEarnings({
+  page,
+  coin,
+  assets,
+  event,
+}: {
+  page: Page
+  coin: erc20Coin
+  assets: bigint
+  event: string
+}) {
+  await page.goto(`/earn/${coinToParam(coin)}/balance`)
+  await expect(page.getByText(event)).toBeVisible()
+  await expect(
+    page.getByText(
+      `${formatAmount(formatUnits(assets, coin.decimals), 5, coin.formatDecimals)} ${coin.symbol}`
+    )
+  ).toBeVisible()
 }

@@ -1,10 +1,11 @@
 import { Paragraph, Spinner, TooltipSimple } from '@my/ui'
 import { Bug } from '@tamagui/lucide-icons'
 import { coinsDict } from 'app/data/coins'
-import { formatCoinAmount } from 'app/utils/formatCoinAmount'
+import formatAmount from 'app/utils/formatAmount'
 import { toNiceError } from 'app/utils/toNiceError'
 import type { SendEarnEvent } from 'app/utils/zod/activity/SendEarnEventSchema'
 import type { ReactNode } from 'react'
+import { formatUnits } from 'viem'
 import { useUnderlyingVaultsAsset } from '../hooks'
 
 export function SendEarnAmount({ activity }: { activity: SendEarnEvent }): ReactNode {
@@ -36,5 +37,9 @@ export function SendEarnAmount({ activity }: { activity: SendEarnEvent }): React
     console.warn('coin not found for SendEarnAmount', activity)
     return null
   }
-  return `${formatCoinAmount({ amount: activity.data.assets, coin })} ${coin.symbol}`
+  return `${formatAmount(
+    formatUnits(activity.data.assets, coin.decimals),
+    5,
+    coin.formatDecimals
+  )} ${coin.symbol}`
 }

@@ -1,9 +1,11 @@
-import { Avatar, LinkableAvatar, Spinner, type LinkableAvatarProps, XStack } from '@my/ui'
+import { Avatar, LinkableAvatar, type LinkableAvatarProps, Spinner, XStack } from '@my/ui'
+import { Minus, Plus } from '@tamagui/lucide-icons'
 import { AvatarSendEarnDeposit } from 'app/components/avatars'
 import { AvatarSendEarnWithdraw } from 'app/components/avatars/AvatarSendEarnWithdraw'
 import { IconUpgrade } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { allCoinsDict } from 'app/data/coins'
+import { ContractLabels } from 'app/data/contract-labels'
 import {
   counterpart,
   isActivitySwapTransfer,
@@ -11,10 +13,9 @@ import {
   isSendPotWin,
   isSwapBuyTransfer,
 } from 'app/utils/activity'
-import { ContractLabels, useAddressBook } from 'app/utils/useAddressBook'
-import { useSwapRouters } from 'app/utils/useSwapRouters'
+import { useAddressBook } from 'app/utils/useAddressBook'
 import { useLiquidityPools } from 'app/utils/useLiquidityPools'
-import { Minus, Plus } from '@tamagui/lucide-icons'
+import { useSwapRouters } from 'app/utils/useSwapRouters'
 import { IconSendPotTicket } from 'app/components/icons/IconSendPotTicket'
 import {
   type Activity,

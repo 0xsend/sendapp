@@ -6,8 +6,9 @@ import {
   tokenPaymasterAddress,
 } from '@my/wagmi'
 import { sendCoin, sendV0Coin } from 'app/data/coins'
+import { ContractLabels } from 'app/data/contract-labels'
 import { SendEarnAmount } from 'app/features/earn/components/SendEarnAmount'
-import { ContractLabels, useAddressBook } from 'app/utils/useAddressBook'
+import { useAddressBook } from 'app/utils/useAddressBook'
 import type { Activity } from 'app/utils/zod/activity'
 import { type ReactNode, useMemo } from 'react'
 import { formatUnits, isAddressEqual } from 'viem'
@@ -368,7 +369,14 @@ export function eventNameFromActivity(
 export function useEventNameFromActivity(activity: Activity) {
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const { data: addressBook } = useAddressBook()
+
   return useMemo(() => {
+    if (
+      isSendEarnDepositEvent(activity) &&
+      addressBook?.[activity.data.sender] === ContractLabels.SendEarnAffiliate
+    ) {
+      return 'Rewards'
+    }
     if (isERC20Transfer && addressBook?.[activity.data.t] === ContractLabels.SendEarn) {
       return 'Deposit'
     }
