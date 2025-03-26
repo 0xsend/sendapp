@@ -53,6 +53,7 @@ for (const inCoin of allCoins) {
         `test:swap:can-swap:${inCoin.symbol}:${outCoin.symbol}:${test.info().parallelIndex}`
       )
       const inAmount = formatUnits(swapInAmount[inCoin.symbol], inCoin.decimals)
+      const slippage = Math.floor(Math.random() * (20 - 2 + 1)) + 2 // from 2% to 20%, lower might make tests flaky
 
       if (inCoin.symbol === usdcCoin.symbol) {
         await fund({
@@ -79,7 +80,7 @@ for (const inCoin of allCoins) {
         inAmount,
         inToken: inCoin.symbol,
         outToken: outCoin.symbol,
-        customSlippage: '3',
+        customSlippage: slippage.toString(),
       })
       await swapFormPage.waitForSwapRouteResponse()
       const outAmount = await swapFormPage.outAmountInput.inputValue()
@@ -88,7 +89,7 @@ for (const inCoin of allCoins) {
       await page.waitForURL(
         `/swap/summary?outToken=${outCoin.token}&inToken=${inCoin.token}&inAmount=${
           swapInAmount[inCoin.symbol]
-        }&slippage=300`
+        }&slippage=${slippage * 100}`
       )
       await swapSummaryPage.validateSummary({
         inAmount: inAmount,
@@ -96,7 +97,7 @@ for (const inCoin of allCoins) {
         outToken: outCoin.symbol,
         outAmount,
         exchangeRate,
-        slippage: '3%',
+        slippage,
       })
       await swapSummaryPage.confirmSwap()
 
