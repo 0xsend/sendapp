@@ -286,7 +286,7 @@ test('can refer multiple tags in separate transactions', async ({
   await checkoutPage.page.goto(`/?referral=${referrer.referral_code}`)
   await checkoutPage.goto()
 
-  await checkReferralCodeHidden(checkoutPage.page)
+  await checkReferralCodeDisabled(checkoutPage)
   // save current balance so we can verify the reward later
   const currentBalance = await lookupBalance({
     address: referrerSendAccount.address as `0x${string}`,
