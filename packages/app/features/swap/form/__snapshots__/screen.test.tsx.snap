@@ -1646,6 +1646,7 @@ exports[`swap form screen should render 1`] = `
                       "width": 52,
                     }
                   }
+                  testID="flipTokensButton"
                 >
                   <RNSVGSvgView
                     align="xMidYMid"
@@ -1858,6 +1859,7 @@ exports[`swap form screen should render 1`] = `
                           "shadowRadius": 0,
                         }
                       }
+                      testID="slippageDetailsButton"
                     >
                       <RNSVGSvgView
                         align="xMidYMid"

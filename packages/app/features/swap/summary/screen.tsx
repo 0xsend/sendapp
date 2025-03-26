@@ -162,7 +162,9 @@ export const SwapSummaryScreen = () => {
               <XStack ai={'center'} jc={'space-between'}>
                 <XStack gap={'$2'} ai={'center'}>
                   <IconCoin symbol={inCoin?.symbol || ''} />
-                  <Paragraph size={'$5'}>{inCoin?.symbol}</Paragraph>
+                  <Paragraph testID={'inTokenSymbol'} size={'$5'}>
+                    {inCoin?.symbol}
+                  </Paragraph>
                 </XStack>
                 <EditButton />
               </XStack>
@@ -192,7 +194,9 @@ export const SwapSummaryScreen = () => {
               <XStack ai={'center'} jc={'space-between'}>
                 <XStack gap={'$2'} ai={'center'}>
                   <IconCoin symbol={outCoin?.symbol || ''} />
-                  <Paragraph size={'$5'}>{outCoin?.symbol}</Paragraph>
+                  <Paragraph testID={'outTokenSymbol'} size={'$5'}>
+                    {outCoin?.symbol}
+                  </Paragraph>
                 </XStack>
                 <EditButton />
               </XStack>
@@ -233,6 +237,7 @@ export const SwapSummaryScreen = () => {
           <FadeCard>
             <YStack gap={'$2'}>
               <Row
+                testID={'exchangeRate'}
                 label={'Exchange Rate'}
                 value={`1 ${inCoin?.symbol} = ${exchangeRate} ${outCoin?.symbol}`}
               />
@@ -251,6 +256,7 @@ export const SwapSummaryScreen = () => {
               />
               <Row label={'Send Fee'} value={'0.75%'} />
               <Row
+                testID={'slippage'}
                 label={'Max Slippage'}
                 value={`${(Number(slippage || DEFAULT_SLIPPAGE) / 100).toString()}%`}
               />
@@ -344,7 +350,15 @@ export const SwapSummaryScreen = () => {
   )
 }
 
-export const Row = ({ label, value }: { label: string; value: ReactNode }) => {
+export const Row = ({
+  label,
+  value,
+  testID,
+}: {
+  label: string
+  value: ReactNode
+  testID?: string
+}) => {
   return (
     <XStack gap={'$2.5'} jc={'space-between'} flexWrap={'wrap'}>
       <Paragraph
@@ -355,7 +369,9 @@ export const Row = ({ label, value }: { label: string; value: ReactNode }) => {
         {label}
       </Paragraph>
       <XStack gap={'$2.5'} flexWrap={'wrap'} flexShrink={1}>
-        <Paragraph size={'$5'}>{value}</Paragraph>
+        <Paragraph testID={testID} size={'$5'}>
+          {value}
+        </Paragraph>
       </XStack>
     </XStack>
   )

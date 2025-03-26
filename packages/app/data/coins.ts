@@ -7,15 +7,29 @@ import {
 } from '@my/wagmi'
 import { z } from 'zod'
 
-export const CoinSchema = z.object({
+const BaseCoinSchema = z.object({
   label: z.string(),
   symbol: z.string(),
-  token: z.custom<`0x${string}` | 'eth'>(),
   decimals: z.number().min(0).max(18),
   formatDecimals: z.number().min(0).optional(),
   coingeckoTokenId: z.string(),
 })
+
+// ERC20 specific schema
+export const ERC20CoinSchema = BaseCoinSchema.extend({
+  token: z.custom<`0x${string}`>(),
+})
+
+// ETH specific schema
+export const ETHCoinSchema = BaseCoinSchema.extend({
+  token: z.literal('eth'),
+})
+
+export const CoinSchema = z.union([ERC20CoinSchema, ETHCoinSchema])
+
 export type coin = z.infer<typeof CoinSchema>
+export type erc20Coin = z.infer<typeof ERC20CoinSchema>
+export type ethCoin = z.infer<typeof ETHCoinSchema>
 
 export const usdcCoin = {
   label: 'USDC',
@@ -120,3 +134,5 @@ export type CoinWithBalance = allCoins[number] & {
  * Known coins are a list of coins that Send app knows about but not necessarily supports.
  */
 export const knownCoins: coin[] = [...allCoins, sendV0Coin] as const
+
+export const isEthCoin = (coin: coin): coin is ethCoin => coin.symbol === 'ETH'

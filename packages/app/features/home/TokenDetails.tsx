@@ -45,9 +45,10 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
   const hoverStyles = useHoverStyles()
 
   // this code can be removed as swaps are no longer behind whitelist
+  const isSwapAllowListSet = Boolean(process.env.NEXT_PUBLIC_SWAP_ALLOWLIST)
   const swapEnabledUsers = (process.env.NEXT_PUBLIC_SWAP_ALLOWLIST ?? '').split(',')
   const { user } = useUser()
-  const isSwapEnabled = user?.id && swapEnabledUsers.includes(user.id)
+  const isSwapEnabled = !isSwapAllowListSet || (user?.id && swapEnabledUsers.includes(user.id))
 
   const getSwapUrl = () => {
     if (coin?.symbol === sendCoin.symbol) {

@@ -233,6 +233,7 @@ exports[`swap summary screen should render 1`] = `
                     }
                   }
                   suppressHighlighting={true}
+                  testID="inTokenSymbol"
                 >
                   USDC
                 </Text>
@@ -526,6 +527,7 @@ exports[`swap summary screen should render 1`] = `
                     }
                   }
                   suppressHighlighting={true}
+                  testID="outTokenSymbol"
                 >
                   SEND
                 </Text>
@@ -837,6 +839,7 @@ exports[`swap summary screen should render 1`] = `
                     }
                   }
                   suppressHighlighting={true}
+                  testID="exchangeRate"
                 >
                   1 USDC = 0.5 SEND
                 </Text>
@@ -993,6 +996,7 @@ exports[`swap summary screen should render 1`] = `
                     }
                   }
                   suppressHighlighting={true}
+                  testID="slippage"
                 >
                   0.5%
                 </Text>
