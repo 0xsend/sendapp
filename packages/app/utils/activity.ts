@@ -7,7 +7,6 @@ import {
 } from '@my/wagmi'
 import { sendCoin, sendV0Coin } from 'app/data/coins'
 import { ContractLabels } from 'app/data/contract-labels'
-import { SendEarnAmount } from 'app/features/earn/components/SendEarnAmount'
 import { useAddressBook } from 'app/utils/useAddressBook'
 import type { Activity } from 'app/utils/zod/activity'
 import { type ReactNode, useMemo } from 'react'
@@ -111,9 +110,6 @@ export function amountFromActivity(activity: Activity): ReactNode {
         return `${amount} ${coin.symbol}`
       }
       return formatAmount(`${value}`, 5, 0)
-    }
-    case isSendEarnEvent(activity): {
-      return SendEarnAmount({ activity })
     }
     case isSendAccountTransfersEvent(activity): {
       const { v, coin } = activity.data
@@ -245,13 +241,6 @@ export const isActivitySwapTransfer = (
     isSwapBuyTransfer(activity, swapRouters) ||
     isSwapSellTransfer(activity, swapRouters, liquidityPools)
   )
-}
-
-/**
- * Returns the amount of the activity if there is one.
- */
-export function useAmountFromActivity(activity: Activity): ReactNode {
-  return amountFromActivity(activity)
 }
 
 /**
@@ -409,7 +398,15 @@ export function phraseFromActivity(
 export function usePhraseFromActivity(activity: Activity): string {
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const { data: addressBook } = useAddressBook()
+  const isSendEarnDeposit = isSendEarnDepositEvent(activity)
+
   return useMemo(() => {
+    if (
+      isSendEarnDeposit &&
+      addressBook?.[activity.data.sender] === ContractLabels.SendEarnAffiliate
+    ) {
+      return 'Earned Rewards'
+    }
     if (isERC20Transfer && addressBook?.[activity.data.t] === ContractLabels.SendEarn) {
       return 'Deposited to Send Earn'
     }
@@ -418,7 +415,7 @@ export function usePhraseFromActivity(activity: Activity): string {
     }
     // this should have always been a hook
     return phraseFromActivity(activity)
-  }, [activity, addressBook, isERC20Transfer])
+  }, [activity, addressBook, isERC20Transfer, isSendEarnDeposit])
 }
 
 /**
@@ -492,6 +489,9 @@ export function useSubtextFromActivity(activity: Activity): string | null {
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const { data: addressBook } = useAddressBook()
   return useMemo(() => {
+    if (isSendEarnEvent(activity)) {
+      return 'Send Earn'
+    }
     if (isERC20Transfer) {
       if (addressBook?.[activity.data.t] === ContractLabels.SendEarn) {
         return 'Send Earn'
