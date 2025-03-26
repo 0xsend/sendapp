@@ -7,8 +7,10 @@ import {
   type InfiniteData,
   type UseInfiniteQueryResult,
 } from '@tanstack/react-query'
+import { ContractLabels } from 'app/data/contract-labels'
 import { getBaseAddressFilterCondition } from 'app/utils/activity'
 import { assert } from 'app/utils/assert'
+import { hexToBytea } from 'app/utils/hexToBytea'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import { useAddressBook, type AddressBook } from 'app/utils/useAddressBook'
@@ -82,6 +84,7 @@ async function fetchActivityFeed({
   pageParam,
   supabase,
   pageSize,
+  addressBook,
 }: {
   pageParam: number
   addressBook: AddressBook
@@ -91,6 +94,10 @@ async function fetchActivityFeed({
   const from = pageParam * pageSize
   const to = (pageParam + 1) * pageSize - 1
 
+  const myAffiliateAddr = Object.entries(addressBook).find(
+    ([, label]) => label === ContractLabels.SendEarnAffiliate
+  )
+
   const request = supabase
     .from('activity_feed')
     .select('*')
@@ -98,14 +105,24 @@ async function fetchActivityFeed({
     .or(
       getBaseAddressFilterCondition({
         extraFrom: undefined,
+        // shows as Sendtag Registered using a different activity row
         extraTo: sendtagCheckoutAddresses,
       })
-    ) // shows as Sendtag Registered using a different activity row
-    .not(
-      'event_name',
-      'in',
-      // exclude Send Earn deposits and withdrawals from the feed (they show up as SendAccountTransfers)
-      `(${[Events.SendEarnDeposit, Events.SendEarnWithdraw].join(',')})`
+    )
+    .or(
+      [
+        // exclude Send Earn deposits and withdrawals from the feed (they show up as SendAccountTransfers)
+        `event_name.not.in.(${[Events.SendEarnDeposit, Events.SendEarnWithdraw].join(',')})`,
+        // affiliate rewards are send earn deposits, so include them in the feed (they won't show up as SendAccountTransfers)
+        myAffiliateAddr
+          ? `and(${[
+              `event_name.in.(${Events.SendEarnDeposit})`,
+              `data->>sender.eq.${hexToBytea(myAffiliateAddr[0] as `0x${string}`)})`,
+            ].join(',')})`
+          : null,
+      ]
+        .filter(Boolean)
+        .join(',')
     )
     .order('created_at', { ascending: false })
     .range(from, to)
