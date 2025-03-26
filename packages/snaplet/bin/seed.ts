@@ -17,7 +17,7 @@ const dryRun = process.env.DRY !== '0'
 // * For more on getting started with @snaplet/seed: https://docs.snaplet.dev/getting-started/quick-start/seed
 // * For a more detailed reference: https://docs.snaplet.dev/core-concepts/seed
 const seed = await createSeedClient({
-  dryRun: false,
+  dryRun,
   models,
 })
 
