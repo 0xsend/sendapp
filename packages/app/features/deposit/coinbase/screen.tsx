@@ -46,7 +46,7 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
     switch (true) {
       case !!error:
         return (
-          <YStack ai="center" gap="$4" py="$8">
+          <YStack ai="center" gap="$4" py="$8" testID="error">
             <Text fontSize="$6" fontWeight="500" color="$red10" ta="center">
               Onramp page closed
             </Text>
@@ -73,7 +73,7 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
 
       case coinbaseStatus === 'success':
         return (
-          <YStack ai="center" gap="$4" py="$8">
+          <YStack ai="center" gap="$4" py="$8" testID="success">
             <Spinner size="large" color="$primary" />
             <Text fontSize="$6" fontWeight="500" ta="center">
               Transaction Complete
@@ -94,7 +94,7 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
 
       case coinbaseStatus === 'pending_payment':
         return (
-          <YStack ai="center" gap="$4" py="$8">
+          <YStack ai="center" gap="$4" py="$8" testID="pending-payment">
             <Spinner size="large" color="$primary" />
             <Text fontSize="$6" fontWeight="500" ta="center">
               Processing Transaction
@@ -122,7 +122,7 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
 
       case status === 'failure':
         return (
-          <YStack ai="center" gap="$4" py="$8">
+          <YStack ai="center" gap="$4" py="$8" testID="failure">
             <Text fontSize="$6" fontWeight="500" color="$red10" ta="center">
               Transaction Timed Out
             </Text>
@@ -137,7 +137,7 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
 
       case coinbaseStatus === 'failed':
         return (
-          <YStack ai="center" gap="$4" py="$8">
+          <YStack ai="center" gap="$4" py="$8" testID="coinbase-failure">
             <Text fontSize="$6" fontWeight="500" color="$red10" ta="center">
               Transaction Failed
             </Text>

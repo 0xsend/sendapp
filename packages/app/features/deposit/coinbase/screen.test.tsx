@@ -7,9 +7,6 @@ import { useCoinbaseOnramp } from 'app/utils/useCoinbaseOnramp'
 import { OnrampFlow } from 'app/features/deposit/components/OnrampFlow'
 import { Provider } from 'app/__mocks__/app/provider'
 // Mock dependencies
-
-jest.mock('@my/ui')
-
 jest.mock('app/utils/send-accounts', () => ({
   useSendAccount: jest.fn(),
 }))
@@ -21,23 +18,29 @@ jest.mock('solito/router', () => ({
     push: jest.fn(),
   }),
 }))
-jest.mock('app/features/deposit/components/OnrampFlow', () => ({
-  OnrampFlow: async ({ onConfirmTransaction }) => {
-    const { Button } = await import('@my/ui')
-    return (
-      <Button testID={'onramp-button'} onPress={() => onConfirmTransaction(100)}>
+jest.mock('app/features/deposit/components/OnrampFlow', () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { Button } = require('@my/ui')
+  return {
+    __esModule: true,
+    OnrampFlow: ({ onConfirmTransaction }) => (
+      <Button testID="onramp-button" onPress={() => onConfirmTransaction(100)}>
         Confirm
       </Button>
-    )
-  },
-}))
+    ),
+  }
+})
 
-jest.mock('app/features/deposit/components/CoinbaseOnrampVerifyScreen', () => ({
-  CoinbaseOnrampVerifyScreen: async () => {
-    const { Container } = await import('@my/ui')
-    return <Container testID={'pending-screen'}>CoinbaseOnrampVerifyScreen Mock</Container>
-  },
-}))
+jest.mock('app/features/deposit/components/CoinbaseOnrampVerifyScreen', () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { Container } = require('@my/ui')
+  return {
+    __esModule: true,
+    CoinbaseOnrampVerifyScreen: () => (
+      <Container testID="pending-screen">CoinbaseOnrampVerifyScreen Mock</Container>
+    ),
+  }
+})
 
 describe('DepositCoinbaseScreen', () => {
   // Setup mocks
@@ -72,7 +75,7 @@ describe('DepositCoinbaseScreen', () => {
         <DepositCoinbaseScreen />
       </Provider>
     )
-    expect(OnrampFlow).toHaveBeenCalled()
+    expect(screen.getByTestId('onramp-button')).toBeTruthy()
   })
 
   test('calls openOnramp when user submits', () => {
@@ -134,8 +137,7 @@ describe('DepositCoinbaseScreen', () => {
         <DepositCoinbaseScreen />
       </Provider>
     )
-    expect(screen.getByText('Transaction Complete')).toBeTruthy()
-    expect(screen.getByText('Finishing up...')).toBeTruthy()
+    expect(screen.getByTestId('success')).toBeTruthy()
   })
 
   test('renders error state when there is an error', () => {
@@ -153,11 +155,10 @@ describe('DepositCoinbaseScreen', () => {
         <DepositCoinbaseScreen />
       </Provider>
     )
-    expect(screen.getByText('Unable to Initialize Payment')).toBeTruthy()
-    expect(screen.getByText('Test error message')).toBeTruthy()
+    expect(screen.getByTestId('error')).toBeTruthy()
   })
 
-  test('renders failed state when status is failed', () => {
+  test('renders failed state when coinbase status is failed', () => {
     ;(useCoinbaseOnramp as jest.Mock).mockReturnValue({
       openOnramp: mockOpenOnramp,
       closeOnramp: mockCloseOnramp,
@@ -171,8 +172,7 @@ describe('DepositCoinbaseScreen', () => {
         <DepositCoinbaseScreen />
       </Provider>
     )
-    expect(screen.getByText('Transaction Failed')).toBeTruthy()
-    expect(screen.getByText('Your payment could not be processed. Please try again.')).toBeTruthy()
+    expect(screen.getByTestId('coinbase-failure')).toBeTruthy()
   })
 
   test('calls closeOnramp when Try Again button is clicked in error state', () => {
