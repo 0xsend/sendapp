@@ -78,8 +78,7 @@ export function CoinbaseOnrampVerifyScreen({
         Transaction Pending
       </Text>
       <Text ta="center" fos="$4">
-        Coinbase is currently verifying your payment. This page will automatically redirect once
-        ready.
+        Coinbase is verifying your payment. This page will automatically redirect once ready.
       </Text>
     </YStack>
   )
