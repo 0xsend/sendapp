@@ -38,6 +38,10 @@ export class SwapFormPage {
   public readonly slippageDetailsButton: Locator
   public readonly customSlippageInput: Locator
   public readonly reviewButton: Locator
+  public readonly swapRiskDialogContent: Locator
+  public readonly swapRiskDialogCheckbox: Locator
+  public readonly swapRiskDialogCancelButton: Locator
+  public readonly swapRiskDialogContinueButton: Locator
 
   constructor(public page: Page) {
     this.inAmountInput = this.page.getByTestId('inAmountInput')
@@ -50,6 +54,10 @@ export class SwapFormPage {
     this.slippageDetailsButton = this.page.getByTestId('slippageDetailsButton')
     this.customSlippageInput = this.page.getByTestId('customSlippageInput')
     this.reviewButton = this.page.getByRole('button', { name: 'review' })
+    this.swapRiskDialogContent = this.page.getByTestId('swapRiskDialogContent')
+    this.swapRiskDialogCheckbox = this.page.getByTestId('swapRiskDialogCheckbox')
+    this.swapRiskDialogCancelButton = this.page.getByTestId('swapRiskDialogCancelButton')
+    this.swapRiskDialogContinueButton = this.page.getByTestId('swapRiskDialogContinueButton')
   }
 
   async validatePageVisible() {
@@ -61,7 +69,10 @@ export class SwapFormPage {
       await expect(this.outTokenSelectTrigger).toBeVisible()
       await expect(this.slippageDetailsButton).toBeVisible()
       await expect(this.customSlippageInput).not.toBeVisible()
-      await expect(this.reviewButton).toBeVisible()
+      await expect(this.swapRiskDialogContent).toBeVisible()
+      await expect(this.swapRiskDialogCheckbox).toBeVisible()
+      await expect(this.swapRiskDialogCancelButton).toBeVisible()
+      await expect(this.swapRiskDialogContinueButton).toBeVisible()
     }).toPass({ timeout: 5_000 })
   }
 
@@ -71,6 +82,19 @@ export class SwapFormPage {
     await this.page.getByRole('link', { name: 'Swap' }).nth(0).click()
     await this.page.waitForURL('/swap')
     await this.validatePageVisible()
+  }
+
+  async closeRiskDialog() {
+    await expect(async () => {
+      await this.swapRiskDialogCancelButton.click()
+    }).toPass({ timeout: 1_000 })
+  }
+
+  async acceptRiskDialog() {
+    await expect(async () => {
+      await this.swapRiskDialogCheckbox.check()
+      await this.swapRiskDialogContinueButton.click()
+    }).toPass({ timeout: 3_000 })
   }
 
   async fillInAmount(inAmount: string) {

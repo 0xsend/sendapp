@@ -5,6 +5,12 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 const queryClient = new QueryClient()
 
+jest.mock('app/features/swap/hooks/useDidUserSwap', () => ({
+  useDidUserSwap: jest.fn().mockReturnValue({
+    data: false,
+  }),
+}))
+
 jest.mock('app/provider/coins', () => ({
   useCoins: jest.fn().mockReturnValue({
     allCoins: [

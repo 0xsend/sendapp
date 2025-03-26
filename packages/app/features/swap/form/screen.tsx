@@ -27,6 +27,7 @@ import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { useQueryClient } from '@tanstack/react-query'
 import { DEFAULT_SLIPPAGE, SWAP_ROUTE_SUMMARY_QUERY_KEY } from 'app/features/swap/constants'
+import SwapRiskDialog from 'app/features/swap/form/RiskDialog/SwapRiskDialog'
 
 const SwapFormSchema = z.object({
   outToken: formFields.coin,
@@ -565,6 +566,7 @@ export const SwapFormScreen = () => {
           )}
         </SchemaForm>
       </FormProvider>
+      <SwapRiskDialog />
     </YStack>
   )
 }

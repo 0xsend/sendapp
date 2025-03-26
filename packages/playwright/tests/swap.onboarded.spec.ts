@@ -74,6 +74,7 @@ for (const inCoin of allCoins) {
       }
 
       await swapFormPage.goto()
+      await swapFormPage.acceptRiskDialog()
       await swapFormPage.fillSwapForm({
         inAmount,
         inToken: inCoin.symbol,
@@ -115,6 +116,7 @@ for (const inCoin of allCoins) {
 test('can refresh swap form and preserve filled data', async ({ page, swapFormPage }) => {
   log = debug(`test:swap:form-refresh:${test.info().parallelIndex}`)
   await swapFormPage.goto()
+  await swapFormPage.acceptRiskDialog()
   await swapFormPage.fillSwapForm({
     inAmount: '1000',
     inToken: 'SEND',
@@ -126,6 +128,7 @@ test('can refresh swap form and preserve filled data', async ({ page, swapFormPa
     '/swap?outToken=0xEab49138BA2Ea6dd776220fE26b7b8E446638956&inToken=0x50dA645f148798F68EF2d7dB7C1CB22A6819bb2C&inAmount=100000000000&slippage=1000'
   )
   await page.reload()
+  await swapFormPage.acceptRiskDialog()
   await swapFormPage.validateSwapForm({
     inAmount: '1,000',
     inToken: 'SPX',
@@ -134,8 +137,12 @@ test('can refresh swap form and preserve filled data', async ({ page, swapFormPa
   })
 })
 
-// TODO
-// test("risk modal won't show after accepting it and refreshing the page", async () => {})
+test("can't access form page without accepting risk dialog", async ({ page, swapFormPage }) => {
+  log = debug(`test:swap:cancel-risk-dialog:${test.info().parallelIndex}`)
+  await swapFormPage.goto()
+  await swapFormPage.closeRiskDialog()
+  await page.waitForURL('/')
+})
 
 test("can't access summary page without filling swap form", async ({
   swapSummaryPage,
