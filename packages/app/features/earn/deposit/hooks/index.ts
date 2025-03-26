@@ -52,7 +52,7 @@ export function useReferrerVault(): UseQueryReturnType<`0x${string}` | null> {
 
       return affiliateVault?.send_earn_affiliate_vault ?? null
     },
-    enabled: !referredBy.isLoading,
+    enabled: referredBy.isSuccess || referredBy.isError,
   })
 }
 
