@@ -1,24 +1,44 @@
-import { Avatar, LinkableAvatar, XStack, type LinkableAvatarProps } from '@my/ui'
+import { Avatar, LinkableAvatar, type LinkableAvatarProps, XStack } from '@my/ui'
 import { IconUpgrade } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { allCoinsDict } from 'app/data/coins'
-import { counterpart } from 'app/utils/activity'
+import { counterpart, isSwapBuyTransfer, isSwapSellTransfer } from 'app/utils/activity'
 import {
+  type Activity,
   isSendAccountReceiveEvent,
   isSendAccountTransfersEvent,
-  type Activity,
 } from 'app/utils/zod/activity'
 import { isSendTokenUpgradeEvent } from 'app/utils/zod/activity/SendAccountTransfersEventSchema'
+import { useSwapRouters } from 'app/utils/useSwapRouters'
+import { useLiquidityPools } from 'app/utils/useLiquidityPools'
+import { Minus, Plus } from '@tamagui/lucide-icons'
 
 export function ActivityAvatar({
   activity,
   ...props
 }: { activity: Activity } & Omit<LinkableAvatarProps, 'children' | 'href'>) {
   const user = counterpart(activity)
+  const { data: swapRouters } = useSwapRouters()
+  const { data: liquidityPools } = useLiquidityPools()
   const { from_user, to_user, data } = activity
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
-
   const isETHReceive = isSendAccountReceiveEvent(activity)
+
+  if (isSwapBuyTransfer(activity, swapRouters)) {
+    return (
+      <XStack w="$4.5" h={'$4.5'} br="$4" ai={'center'} jc={'center'} bc={'$olive'}>
+        <Plus color={'$color2'} />
+      </XStack>
+    )
+  }
+
+  if (isSwapSellTransfer(activity, swapRouters, liquidityPools)) {
+    return (
+      <XStack w="$4.5" h={'$4.5'} br="$4" ai={'center'} jc={'center'} bc={'$error'}>
+        <Minus />
+      </XStack>
+    )
+  }
 
   if (user) {
     return (

@@ -1,13 +1,14 @@
 import { createContext, useContext, useMemo } from 'react'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import type { allCoins, CoinWithBalance } from 'app/data/coins'
-import { coins as coinsOg, partnerCoins } from 'app/data/coins'
+import { coins as coinsOg, partnerCoins, allCoins as allCoinsList } from 'app/data/coins'
 import { isAddress } from 'viem'
 import type { UseQueryResult } from '@tanstack/react-query'
 import type { UseBalanceReturnType, UseReadContractsReturnType } from 'wagmi'
 
 type CoinsContextType = {
   coins: CoinWithBalance[]
+  allCoins: CoinWithBalance[]
   isLoading: boolean
   totalPrice: number | undefined
   ethQuery: UseBalanceReturnType
@@ -47,7 +48,20 @@ export function CoinsProvider({ children }: { children: React.ReactNode }) {
     return [...coinsWithBalances, ...activePartnerCoins]
   }, [balanceData])
 
-  return <CoinsContext.Provider value={{ ...balanceData, coins }}>{children}</CoinsContext.Provider>
+  const allCoins = useMemo(() => {
+    const { balances } = balanceData
+
+    return allCoinsList.map((coin) => ({
+      ...coin,
+      balance: balances?.[coin.token === 'eth' ? coin.symbol : coin.token],
+    }))
+  }, [balanceData])
+
+  return (
+    <CoinsContext.Provider value={{ ...balanceData, coins, allCoins }}>
+      {children}
+    </CoinsContext.Provider>
+  )
 }
 
 export const useCoins = () => {
@@ -60,12 +74,12 @@ export const useCoin = (
   addressOrSymbol: allCoins[number]['symbol'] | allCoins[number]['token'] | undefined
 ) => {
   const meta = useCoins()
-  const { coins, ...rest } = meta
+  const { allCoins, ...rest } = meta
   if (!addressOrSymbol) return { coin: undefined, ...rest }
   const coin =
     isAddress(addressOrSymbol) || addressOrSymbol === 'eth'
-      ? coins.find((coin) => coin.token === addressOrSymbol)
-      : coins.find((coin) => coin.symbol === addressOrSymbol)
+      ? allCoins.find((coin) => coin.token === addressOrSymbol)
+      : allCoins.find((coin) => coin.symbol === addressOrSymbol)
   if (!coin) throw new Error(`Coin not found for ${addressOrSymbol}`)
   return { coin, ...rest }
 }

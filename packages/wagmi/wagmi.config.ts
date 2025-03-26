@@ -95,6 +95,17 @@ export default defineConfig({
       },
       abi: [],
     },
+    /**
+     * [Send: Swaps Revenue](https://basescan.org/address/0x17D46f667B0e4156238645536c344d010FC099d7)
+     **/
+    {
+      name: 'SendSwapsRevenueSafe',
+      address: {
+        [baseLocal.id]: '0x17D46f667B0e4156238645536c344d010FC099d7',
+        [base.id]: '0x17D46f667B0e4156238645536c344d010FC099d7',
+      },
+      abi: [],
+    },
     {
       /**
        * [Send: Treasury](https://basescan.org/address/0x05CEa6C36f3a44944A4F4bA39B1820677AcB97EE)

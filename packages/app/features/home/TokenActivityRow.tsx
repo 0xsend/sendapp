@@ -1,9 +1,9 @@
 import { Paragraph, Text, XStack, YStack } from '@my/ui'
 import { amountFromActivity, eventNameFromActivity, subtextFromActivity } from 'app/utils/activity'
 import {
+  type Activity,
   isSendAccountReceiveEvent,
   isSendAccountTransfersEvent,
-  type Activity,
 } from 'app/utils/zod/activity'
 import { ActivityAvatar } from '../activity/ActivityAvatar'
 import { CommentsTime } from 'app/utils/dateHelper'
@@ -11,6 +11,8 @@ import { Link } from 'solito/link'
 
 import { useUser } from 'app/utils/useUser'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { useSwapRouters } from 'app/utils/useSwapRouters'
+import { useLiquidityPools } from 'app/utils/useLiquidityPools'
 
 export function TokenActivityRow({
   activity,
@@ -20,11 +22,13 @@ export function TokenActivityRow({
   onPress?: (activity: Activity) => void
 }) {
   const { profile } = useUser()
+  const { data: swapRouters } = useSwapRouters()
+  const { data: liquidityPools } = useLiquidityPools()
   const { created_at, from_user, to_user } = activity
   const amount = amountFromActivity(activity)
   const date = CommentsTime(new Date(created_at))
-  const eventName = eventNameFromActivity(activity)
-  const subtext = subtextFromActivity(activity)
+  const eventName = eventNameFromActivity(activity, swapRouters, liquidityPools)
+  const subtext = subtextFromActivity(activity, swapRouters, liquidityPools)
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
   const hoverStyles = useHoverStyles()
