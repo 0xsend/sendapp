@@ -11,7 +11,8 @@ import {
   YStack,
 } from '@my/ui'
 import { baseMainnetClient, sendAccountAbi, tokenPaymasterAddress } from '@my/wagmi'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { SettingsHeader } from 'app/features/account/settings/components/SettingsHeader'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { assert } from 'app/utils/assert'
 import { byteaToBytes } from 'app/utils/byteaToBytes'
@@ -21,6 +22,7 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import { defaultUserOp, useUserOpTransferMutation } from 'app/utils/useUserOpTransferMutation'
 import { useAccountNonce } from 'app/utils/userop'
+import debug from 'debug'
 import type { UserOperation } from 'permissionless'
 import { FormProvider, useForm } from 'react-hook-form'
 import { createParam } from 'solito'
@@ -28,7 +30,8 @@ import { useRouter } from 'solito/router'
 import { encodeFunctionData } from 'viem'
 import { useEstimateFeesPerGas } from 'wagmi'
 import { z } from 'zod'
-import { SettingsHeader } from 'app/features/account/settings/components/SettingsHeader'
+
+const log = debug('app:settings:backup:confirm')
 
 type Params = {
   cred_id: string
@@ -107,6 +110,7 @@ const AddPasskeySigner = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cre
 
 const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_credentials'> }) => {
   const toast = useToastController()
+  const queryClient = useQueryClient()
   const {
     data: sendAccount,
     error: sendAccountError,
@@ -200,8 +204,18 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
     },
   })
   const { mutateAsync: sendUserOp } = useUserOpTransferMutation()
+  log('sendUserOp', {
+    userOp,
+    webauthnCred,
+    sendAccount,
+    keySlot,
+    nonce,
+    gasFeesError,
+    userOpError,
+  })
   const onSubmit = async () => {
     try {
+      log('sendUserOp', { userOp, webauthnCreds, sendAccount })
       throwIf(sendAccountError)
       throwIf(nonceError)
       throwIf(gasFeesError)
@@ -212,6 +226,7 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
       } = await sendUserOp({ userOp, webauthnCreds })
       console.log('sent user op', transactionHash)
       toast.show('Success!')
+      queryClient.invalidateQueries({ queryKey: [useSendAccount.queryKey] })
       router.replace('/account/settings/backup')
     } catch (e) {
       console.error(e)
