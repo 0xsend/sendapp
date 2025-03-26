@@ -1,13 +1,13 @@
 import { sendEarnAbi } from '@my/wagmi'
-import { useSendEarnBalances, useSendEarnCoinBalances } from 'app/features/earn/hooks'
+import type { erc20Coin } from 'app/data/coins'
+import { useSendEarnCoinBalances } from 'app/features/earn/hooks'
 import { assert } from 'app/utils/assert'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { throwIf } from 'app/utils/throwIf'
 import type { SendAccountCall } from 'app/utils/userop'
 import debug from 'debug'
-import { encodeFunctionData, zeroAddress } from 'viem'
+import { encodeFunctionData } from 'viem'
 import { useQuery, type UseQueryReturnType } from 'wagmi/query'
-import type { erc20Coin } from 'app/data/coins'
 
 const log = debug('app:features:earn:withdraw')
 
