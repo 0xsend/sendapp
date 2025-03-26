@@ -7,8 +7,6 @@ Activities such as registering a sendtag, sending some tokens, receiving tokens,
 
 The feed should be enriched with user profile information and sendtag information where possible.
 
-> **Note**: This document focuses on the database design for the activity feed. For information on the client-side processing layer that enables virtual event types and contextual processing, see [Activity Feed Client-Side Processing](./activity-feed-client-processing.md).
-
 ## Unified Activity Table
 
 A more generic table that can be used to capture all events, onchain and offchain, for the user. For example, there may be a user referral tracked inside the database that should show up in the activity table. The table should be generic enough to be used for any event that is emitted by the send account contract or to represent any other event that a user may want to track and see in their activity feed.
