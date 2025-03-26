@@ -35,7 +35,7 @@ export function useEarnActivityFeed(params?: {
   const sendAccount = useSendAccount()
 
   const enabled = useMemo(
-    () => enabledProp && (addressBook.isError || addressBook.isSuccess) && sendAccount.isSuccess,
+    () => enabledProp && addressBook.isFetched && sendAccount.isFetched,
     [enabledProp, addressBook, sendAccount]
   )
 
