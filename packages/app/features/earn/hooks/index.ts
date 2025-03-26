@@ -126,7 +126,8 @@ function useUnderlyingVault(underlyingVaultAddress: `0x${string}` | undefined) {
  *
  * @param params - The vault parameters
  * @param params.underlyingVault - The underlying vault
- * @param params.fee - The Send Earn fee on top of the underlying vault fee* @returns The base apy
+ * @param params.fee - The Send Earn fee on top of the underlying vault fee*
+ * @returns The base apy
  */
 function calculateBaseApy({
   underlyingVault,
