@@ -175,7 +175,10 @@ export function WithdrawForm() {
     if (earnCoinBalances.isLoading || !earnCoinBalances.data) return BigInt(0)
 
     // Sum up all assets from the balances
-    return earnCoinBalances.data.reduce((total, balance) => total + balance.assets, BigInt(0))
+    return earnCoinBalances.data.reduce(
+      (total, balance) => total + balance.currentAssets,
+      BigInt(0)
+    )
   }, [earnCoinBalances.data, earnCoinBalances.isLoading])
 
   const canSubmit =
@@ -253,6 +256,14 @@ export function WithdrawForm() {
     const monthlyRate = (1 + baseApy.data.baseApy / 100) ** (1 / 12) - 1
     return formatAmount(Number(decimalAmount ?? 0) * monthlyRate)
   }, [baseApy.data, parsedAmount, depositBalance, coin.data?.decimals])
+
+  log('WithdrawForm', {
+    coin,
+    formState: form.formState,
+    parsedAmount,
+    insufficientAmount,
+    depositBalance,
+  })
 
   if (!coin.isLoading && !coin.data) {
     router.push('/earn')
@@ -343,17 +354,23 @@ export function WithdrawForm() {
                   </Paragraph>
                 </Fade>
               ) : null}
-              <XStack alignItems="center" jc="center" gap={'$2'}>
-                {[calls.error, sendAccount.error, uop.error, mutation.error]
-                  .filter(Boolean)
-                  .map((e) =>
-                    e ? (
-                      <Paragraph key={e.message} color="$error" role="alert">
-                        {toNiceError(e)}
-                      </Paragraph>
-                    ) : null
-                  )}
-              </XStack>
+              {[calls.error, sendAccount.error, uop.error, mutation.error]
+                .filter(Boolean)
+                .map((e) =>
+                  e ? (
+                    <Fade key="error-state">
+                      <XStack
+                        alignItems="center"
+                        jc="center"
+                        gap={'$2'}
+                        key={e.message}
+                        role="alert"
+                      >
+                        <Paragraph color="$error">{toNiceError(e)}</Paragraph>
+                      </XStack>
+                    </Fade>
+                  ) : null
+                )}
               <SubmitButton
                 theme="green"
                 onPress={() => submit()}
