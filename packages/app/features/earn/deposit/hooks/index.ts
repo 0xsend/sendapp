@@ -52,7 +52,7 @@ export function useReferrerVault(): UseQueryReturnType<`0x${string}` | null> {
 
       return affiliateVault?.send_earn_affiliate_vault ?? null
     },
-    enabled: referredBy.isSuccess || referredBy.isError,
+    enabled: referredBy.isFetched,
   })
 }
 
@@ -76,10 +76,7 @@ export function useSendEarnDepositVault({
   return useQuery({
     queryKey: ['sendEarnDepositVault', { referrerVault, balances, sendAccount, asset }] as const,
     enabled:
-      asset !== undefined &&
-      (balances.isSuccess || balances.isError) &&
-      (referrerVault.isSuccess || referrerVault.isError) &&
-      (sendAccount.isSuccess || sendAccount.isError),
+      asset !== undefined && balances.isFetched && referrerVault.isFetched && sendAccount.isFetched,
     queryFn: async ({ queryKey: [, { referrerVault, balances, sendAccount, asset }] }) => {
       throwIf(referrerVault.error)
       throwIf(balances.error)
@@ -144,9 +141,9 @@ export function useSendEarnDepositCalls({
       { sender, asset, amount, vault, referrer, factory },
     ] as const,
     enabled:
-      (vault.isSuccess || vault.isError) &&
-      (referrer.isSuccess || referrer.isError) &&
-      (factory.isSuccess || factory.isError) &&
+      vault.isFetched &&
+      referrer.isFetched &&
+      factory.isFetched &&
       asset !== undefined &&
       amount !== undefined,
     queryFn: async (): Promise<SendAccountCall[] | null> => {
