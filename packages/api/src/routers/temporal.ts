@@ -2,12 +2,12 @@ import { TRPCError } from '@trpc/server'
 import debug from 'debug'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
-import { getTemporalClient } from '@my/temporal/client'
 import type { UserOperation } from 'permissionless'
 import { TransferWorkflow } from '@my/workflows/all-workflows'
 import { baseMainnetClient, entryPointAddress } from '@my/wagmi'
 import { getUserOperationHash } from 'permissionless/utils'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
+import { getTemporalClient } from '@my/temporal/client'
 
 const log = debug('api:temporal')
 
@@ -31,6 +31,7 @@ export const temporalRouter = createTRPCRouter({
             message: e.message,
           })
         })
+
         const chainId = baseMainnetClient.chain.id
         const entryPoint = entryPointAddress[chainId]
         const userOpHash = getUserOperationHash({

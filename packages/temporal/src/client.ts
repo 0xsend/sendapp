@@ -1,26 +1,31 @@
 import { Client, Connection } from '@temporalio/client'
 import debug from 'debug'
-import fs from 'node:fs/promises'
-const { NODE_ENV = 'development' } = process.env
+const {
+  NODE_ENV = 'development',
+  TEMPORAL_NAMESPACE = 'default',
+  TEMPORAL_MTLS_TLS_CERT,
+  TEMPORAL_MTLS_TLS_KEY,
+} = process.env
 const isDeployed = ['production', 'test'].includes(NODE_ENV)
 
 const log = debug('api:temporal')
-log(`connecting to temporal: ${process.env.TEMPORAL_NAMESPACE} with NODE_ENV: ${NODE_ENV}`)
+log(`connecting to temporal: ${TEMPORAL_NAMESPACE} with NODE_ENV: ${NODE_ENV}`)
 
 let connectionOptions = {}
+
 if (isDeployed) {
+  if (!TEMPORAL_MTLS_TLS_CERT) {
+    throw new Error('no cert found. Check the TEMPORAL_MTLS_TLS_CERT env var')
+  }
+  if (!TEMPORAL_MTLS_TLS_KEY) {
+    throw new Error('no key found.  Check the TEMPORAL_MTLS_TLS_KEY env var')
+  }
   connectionOptions = {
     address: `${process.env.TEMPORAL_NAMESPACE}.tmprl.cloud:7233`,
     tls: {
       clientCertPair: {
-        crt: await fs.readFile(process.env.TEMPORAL_MTLS_TLS_CERT ?? '').catch((e) => {
-          console.error(e)
-          throw new Error('no cert found. Check the TEMPORAL_MTLS_TLS_CERT env var')
-        }),
-        key: await fs.readFile(process.env.TEMPORAL_MTLS_TLS_KEY ?? '').catch((e) => {
-          console.error(e)
-          throw new Error('no key found. Check the TEMPORAL_MTLS_TLS_KEY env var')
-        }),
+        crt: Buffer.from(TEMPORAL_MTLS_TLS_CERT, 'base64'),
+        key: Buffer.from(TEMPORAL_MTLS_TLS_KEY, 'base64'),
       },
     },
   }

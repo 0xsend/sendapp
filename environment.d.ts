@@ -47,11 +47,13 @@ declare global {
        */
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: string
       /**
-       * Temporal Cloud certification
+       * Temporal Cloud certification for workers and api
+       * Base64 encoded
        */
       TEMPORAL_MTLS_TLS_CERT: string
       /**
        * Temporal Cloud key
+       * Base64 encoded
        */
       TEMPORAL_MTLS_TLS_KEY: string
       /**
