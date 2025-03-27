@@ -6235,7 +6235,7 @@
           "id": "temporal.send_account_transfers.created_at_block_num",
           "name": "created_at_block_num",
           "columnName": "created_at_block_num",
-          "type": "int8",
+          "type": "numeric",
           "isRequired": false,
           "kind": "scalar",
           "isList": false,

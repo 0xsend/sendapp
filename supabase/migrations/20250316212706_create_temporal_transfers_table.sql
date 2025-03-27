@@ -96,7 +96,18 @@ DECLARE
   _to_user_id uuid;
   _data jsonb;
 BEGIN
+  -- Do nothing if we haven't sent the transfer yet
   IF NOT NEW.data ? 'log_addr' THEN
+    RETURN NEW;
+  END IF;
+
+  -- Do nothing if we have already indexed the transfer
+  IF NEW.created_at_block_num <= (
+    SELECT block_num
+    FROM public.send_account_transfers
+    ORDER BY block_num DESC
+    LIMIT 1
+  ) THEN
     RETURN NEW;
   END IF;
 
