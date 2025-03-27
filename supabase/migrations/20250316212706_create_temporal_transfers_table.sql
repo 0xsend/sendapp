@@ -26,7 +26,7 @@ CREATE TABLE temporal.send_account_transfers(
     workflow_id text not null,
     status temporal.transfer_status not null default 'initialized',
     user_id uuid, -- rely on trigger to set user_id
-    created_at_block_num bigint,
+    created_at_block_num numeric,
     data jsonb,
     created_at timestamp with time zone not null default (now() AT TIME ZONE 'utc'::text),
     updated_at timestamp with time zone not null default (now() AT TIME ZONE 'utc'::text)
@@ -186,7 +186,8 @@ security definer as
 $$
 begin
     delete from public.activity a
-    where a.event_name = 'temporal_send_account_transfers' and a.event_id in (
+    where a.event_name = 'temporal_send_account_transfers'
+    and a.event_id in (
       select t_sat.workflow_id
       from temporal.send_account_transfers t_sat
       where t_sat.created_at_block_num <= NEW.block_num
