@@ -2998,9 +2998,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@coinbase/onchainkit@npm:^0.38.0":
-  version: 0.38.0
-  resolution: "@coinbase/onchainkit@npm:0.38.0"
+"@coinbase/onchainkit@npm:^0.38.1":
+  version: 0.38.1
+  resolution: "@coinbase/onchainkit@npm:0.38.1"
   dependencies:
     "@farcaster/frame-sdk": "npm:^0.0.28"
     "@farcaster/frame-wagmi-connector": "npm:^0.0.16"
@@ -3017,7 +3017,7 @@ __metadata:
     "@types/react": ^18 || ^19
     react: ^18 || ^19
     react-dom: ^18 || ^19
-  checksum: 10/ee0b159d3ceb9e962c37d481940d35c8dbf83fef4c270e93b1bdbe66feb4ca087884d0eeb90b56c8affe49aa24c5e9aaa67e2c5abd33a96744d6ea0e507c5263
+  checksum: 10/138a76fdc536cf9ba228f7027bcab437885d2c08d37a5712264862fd7eea95660f8b295dd9d1282e2fca6bc5884c7bee020f829805380f4c0dd2717748eb55e1
   languageName: node
   linkType: hard
 
@@ -14705,7 +14705,7 @@ __metadata:
   resolution: "app@workspace:packages/app"
   dependencies:
     "@babel/plugin-syntax-import-attributes": "npm:^7.24.7"
-    "@coinbase/onchainkit": "npm:^0.38.0"
+    "@coinbase/onchainkit": "npm:^0.38.1"
     "@daimo/expo-passkeys": "workspace:*"
     "@jest/globals": "npm:^29.7.0"
     "@marsidev/react-turnstile": "npm:^0.7.1"
@@ -14769,8 +14769,8 @@ __metadata:
     superjson: "npm:^1.13.1"
     type-fest: "npm:^4.32.0"
     typescript: "npm:^5.5.3"
-    viem: "npm:^2.19.0"
-    wagmi: "npm:^2.13.1"
+    viem: "npm:^2.23.0"
+    wagmi: "npm:^2.14.11"
     zod: "npm:^3.23.8"
   languageName: unknown
   linkType: soft

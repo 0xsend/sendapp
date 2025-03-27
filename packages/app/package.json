@@ -14,7 +14,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@coinbase/onchainkit": "^0.38.0",
+    "@coinbase/onchainkit": "^0.38.1",
     "@daimo/expo-passkeys": "workspace:*",
     "@marsidev/react-turnstile": "^0.7.1",
     "@my/supabase": "workspace:*",
@@ -61,8 +61,8 @@
     "react-use-precision-timer": "^3.5.5",
     "solito": "^4.0.1",
     "superjson": "^1.13.1",
-    "viem": "^2.19.0",
-    "wagmi": "^2.13.1",
+    "viem": "^2.23.0",
+    "wagmi": "^2.14.11",
     "zod": "^3.23.8"
   },
   "devDependencies": {
