@@ -35,9 +35,10 @@ CREATE TABLE temporal.send_account_transfers(
 GRANT ALL ON TABLE temporal.send_account_transfers TO service_role;
 GRANT USAGE, SELECT ON SEQUENCE temporal.send_account_transfers_id_seq TO service_role;
 
-
 alter table "temporal"."send_account_transfers"
     enable row level security;
+
+GRANT SELECT ON TABLE temporal.send_account_transfers to authenticated;
 
 create policy "users can see their own temporal transfers"
 on "temporal"."send_account_transfers" as permissive
