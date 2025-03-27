@@ -114,11 +114,14 @@ web_modules/
 
 .next
 out
+dist/*
+!dist/workflow-bundle.js
+
 
 # Nuxt.js build / generate output
 
 .nuxt
-dist
+
 
 # Gatsby files
 
@@ -175,3 +178,4 @@ dist
 .DS_Store
 
 lib
+
