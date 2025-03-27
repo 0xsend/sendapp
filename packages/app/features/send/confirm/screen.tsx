@@ -110,8 +110,7 @@ export function SendConfirm() {
     sender: sendAccount?.address,
   })
 
-  // Only generate UserOp when signing starts
-  const { data: userOp, isLoading: isGeneratingUserOp } = useGenerateTransferUserOp({
+  const { data: userOp, isPending: isGeneratingUserOp } = useGenerateTransferUserOp({
     sender: sendAccount?.address,
     // @ts-expect-error some work to` do here
     to: profile?.address ?? recipient,
@@ -156,8 +155,6 @@ export function SendConfirm() {
     isSendAccountLoading ||
     isGeneratingUserOp ||
     isValidatePending ||
-    isGasLoading ||
-    isFeesLoading ||
     isTransferPending ||
     isTransferInitialized ||
     isTransferStatusLoading
@@ -230,15 +227,20 @@ export function SendConfirm() {
 
       const { workflowId, status } = await transfer({ userOp: validatedUserOp })
 
-      if (workflowId && status !== 'initialized') {
+      if (status && status !== 'initialized') {
         router.replace({ pathname: '/', query: { token: sendToken } })
       }
       setWorkflowId(workflowId)
     } catch (e) {
+      // @TODO: handle sending repeated tx when nonce is still pending
+      // if (e.message.includes('Workflow execution already started')) {
+      //   router.replace({ pathname: '/', query: { token: sendToken } })
+      //   return
+      // }
       console.error(e)
       setError(e)
-      setWorkflowId(null)
       await queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
+      setWorkflowId(null)
     }
   }
 
@@ -253,16 +255,7 @@ export function SendConfirm() {
     }
   }, [])
 
-  if (
-    nonceIsLoading ||
-    isProfileLoading ||
-    isSendAccountLoading ||
-    isValidatePending ||
-    isTransferPending ||
-    isTransferInitialized ||
-    isTransferStatusLoading
-  )
-    return <Spinner size="large" color={'$color'} />
+  if (isLoading) return <Spinner size="large" color={'$color'} />
 
   return (
     <YStack

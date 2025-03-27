@@ -25,49 +25,70 @@ export const temporalRouter = createTRPCRouter({
           session: { user },
         },
       }) => {
-        try {
-          const client = await getTemporalClient()
-          const chainId = baseMainnetClient.chain.id
-          const entryPoint = entryPointAddress[chainId]
-          const userOpHash = getUserOperationHash({
-            userOperation: userOp,
-            entryPoint,
-            chainId,
+        const client = await getTemporalClient().catch((e) => {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: e.message,
           })
-          const { workflowId } = await client.workflow.start(TransferWorkflow, {
-            taskQueue: 'monorepo',
-            workflowId: `temporal/transfer/${user.id}/${userOpHash}`,
-            args: [userOp],
-          })
-          await baseMainnetClient.call({
+        })
+        const chainId = baseMainnetClient.chain.id
+        const entryPoint = entryPointAddress[chainId]
+        const userOpHash = getUserOperationHash({
+          userOperation: userOp,
+          entryPoint,
+          chainId,
+        })
+        await baseMainnetClient
+          .call({
             account: entryPointAddress[baseMainnetClient.chain.id],
             to: userOp.sender,
             data: userOp.callData,
           })
-          log(`Workflow Created: ${workflowId}`)
-          const { data: transfer, error: transferError } = await supabaseAdmin
-            .schema('temporal')
-            .from('send_account_transfers')
-            .select('status')
-            .eq('workflow_id', workflowId)
-            .single()
-
-          if (transferError) {
-            log('Error fetching transfer status', transferError)
-            return { workflowId, status: null }
-          }
-
-          if (!transfer) {
-            return { workflowId, status: null }
-          }
-
-          return { workflowId, status: transfer.status }
-        } catch (error) {
-          throw new TRPCError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: error instanceof Error ? error.message : 'Unknown error',
+          .catch((e) => {
+            throw new TRPCError({
+              code: 'PRECONDITION_FAILED',
+              message: e.message,
+            })
           })
+
+        const { workflowId } = await client.workflow
+          .start(TransferWorkflow, {
+            taskQueue: 'monorepo',
+            workflowId: `temporal/transfer/${user.id}/${userOpHash}`,
+            args: [userOp],
+          })
+          .catch((e) => {
+            if (e.message.includes('Workflow already exists')) {
+              throw new TRPCError({
+                code: 'PRECONDITION_FAILED',
+                message: e.message,
+              })
+            }
+            throw new TRPCError({
+              code: 'INTERNAL_SERVER_ERROR',
+              message: e.message,
+            })
+          })
+
+        log(`Workflow Created: ${workflowId}`)
+
+        const { data: transfer, error: transferError } = await supabaseAdmin
+          .schema('temporal')
+          .from('send_account_transfers')
+          .select('status')
+          .eq('workflow_id', workflowId)
+          .single()
+
+        if (transferError) {
+          log('Error fetching transfer status', transferError)
+          return { workflowId, status: null }
         }
+
+        if (!transfer) {
+          return { workflowId, status: null }
+        }
+
+        return { workflowId, status: transfer.status }
       }
     ),
 })
