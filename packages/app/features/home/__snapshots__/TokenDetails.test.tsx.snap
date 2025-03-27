@@ -930,6 +930,7 @@ exports[`TokenDetails renders correctly 1`] = `
                         >
                           Withdraw
                         </Text>
+                         
                         <Text
                           style={
                             {
@@ -1195,6 +1196,7 @@ exports[`TokenDetails renders correctly 1`] = `
                         >
                           Deposit
                         </Text>
+                         
                         <Text
                           style={
                             {
@@ -1481,6 +1483,7 @@ exports[`TokenDetails renders correctly 1`] = `
                         >
                           Received
                         </Text>
+                         
                         <Text
                           style={
                             {
