@@ -11,6 +11,7 @@ export const __dirname = dirname(__filename)
 async function bundle() {
   const { code } = await bundleWorkflowCode({
     workflowsPath: require.resolve('../all-workflows.ts'),
+    payloadConverterPath: require.resolve('@my/temporal/payload-converter'),
   })
   const codePath = path.join(__dirname, '../../dist/workflow-bundle.js')
 
