@@ -21,7 +21,9 @@
     "./.eslintrc.cjs",
     "../../supabase",
     "../../globals.d.ts",
-    "../../environment.d.ts"
+    "../../environment.d.ts",
+    "../temporal/src",
+    "../workflows/src"
   ],
   "exclude": ["coverage"],
   "compilerOptions": {
@@ -40,7 +42,11 @@
       "@my/contracts/out/*": ["../contracts/out/*"],
       "@my/supabase": ["../../supabase"],
       "@my/supabase/*": ["../../supabase/*"],
-      "@daimo/expo-passkeys/*": ["../daimo-expo-passkeys/src/*"]
+      "@daimo/expo-passkeys/*": ["../daimo-expo-passkeys/src/*"],
+      "@my/temporal": ["../temporal/src"],
+      "@my/temporal/*": ["../temporal/src/*"],
+      "@my/workflows": ["../workflows/src/all-workflows.ts"],
+      "@my/workflows/*": ["../workflows/src/*"]
     }
   },
   "references": []

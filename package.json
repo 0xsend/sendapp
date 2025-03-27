@@ -33,7 +33,9 @@
     "playwright": "yarn workspace @my/playwright",
     "distributor": "yarn workspace distributor",
     "snaplet": "yarn workspace @my/snaplet",
+    "workers": "yarn workspace workers",
     "shovel": "yarn workspace @my/shovel",
+    "workflows": "yarn workspace @my/workflows",
     "clean": "yarn workspaces foreach --all -pi run clean"
   },
   "resolutions": {
@@ -55,7 +57,7 @@
     "check-dependency-version-consistency": "^3.0.3",
     "eslint": "^8.46.0",
     "node-gyp": "^9.3.1",
-    "turbo": "^2.0.3",
+    "turbo": "^2.1.2",
     "typescript": "^5.5.3"
   },
   "packageManager": "yarn@4.3.1",

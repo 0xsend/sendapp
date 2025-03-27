@@ -1488,6 +1488,61 @@ export type Database = {
       }
     }
   }
+  temporal: {
+    Tables: {
+      send_account_transfers: {
+        Row: {
+          created_at: string
+          created_at_block_num: number | null
+          data: Json | null
+          id: number
+          status: Database["temporal"]["Enums"]["transfer_status"]
+          updated_at: string
+          user_id: string | null
+          workflow_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_at_block_num?: number | null
+          data?: Json | null
+          id?: number
+          status?: Database["temporal"]["Enums"]["transfer_status"]
+          updated_at?: string
+          user_id?: string | null
+          workflow_id: string
+        }
+        Update: {
+          created_at?: string
+          created_at_block_num?: number | null
+          data?: Json | null
+          id?: number
+          status?: Database["temporal"]["Enums"]["transfer_status"]
+          updated_at?: string
+          user_id?: string | null
+          workflow_id?: string
+        }
+        Relationships: []
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      transfer_status:
+        | "initialized"
+        | "submitted"
+        | "sent"
+        | "confirmed"
+        | "failed"
+        | "cancelled"
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
 }
 
 export type Tables<

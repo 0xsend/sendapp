@@ -1,38 +1,55 @@
-import { Worker } from '@temporalio/worker'
-import { createActivities } from '@my/workflows/all-activities'
-import { URL, fileURLToPath } from 'node:url'
-import path from 'node:path'
+import { Worker, NativeConnection } from '@temporalio/worker'
+import { createTransferActivities } from '@my/workflows/all-activities'
+import { createRequire } from 'node:module'
+const require = createRequire(import.meta.url)
+
+const { NODE_ENV = 'development', TEMPORAL_MTLS_TLS_CERT, TEMPORAL_MTLS_TLS_KEY } = process.env
+const isDeployed = ['production', 'test'].includes(NODE_ENV)
+
+const workflowOption = () =>
+  isDeployed
+    ? {
+        workflowBundle: {
+          codePath: require.resolve('@my/workflows/workflow-bundle'),
+        },
+      }
+    : { workflowsPath: require.resolve('@my/workflows/all-workflows') }
 
 async function run() {
-  const workflowsPathUrl = new URL(
-    `../../../packages/workflows/src/all-workflows${path.extname(import.meta.url)}`,
-    import.meta.url
-  )
+  let connection: NativeConnection | undefined = undefined
+  if (isDeployed) {
+    if (!TEMPORAL_MTLS_TLS_CERT) {
+      throw new Error('no cert found. Check the TEMPORAL_MTLS_TLS_CERT env var')
+    }
+    if (!TEMPORAL_MTLS_TLS_KEY) {
+      throw new Error('no key found.  Check the TEMPORAL_MTLS_TLS_KEY env var')
+    }
+    connection = await NativeConnection.connect({
+      address: `${process.env.TEMPORAL_NAMESPACE}.tmprl.cloud:7233`,
+      tls: {
+        clientCertPair: {
+          crt: Buffer.from(TEMPORAL_MTLS_TLS_CERT, 'base64'),
+          key: Buffer.from(TEMPORAL_MTLS_TLS_KEY, 'base64'),
+        },
+      },
+    })
+  }
 
-  // Step 1: Register Workflows and Activities with the Worker and connect to
-  // the Temporal server.
   const worker = await Worker.create({
-    workflowsPath: fileURLToPath(workflowsPathUrl),
-    activities: createActivities(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE
-    ),
-    taskQueue: 'dev',
+    connection,
+    dataConverter: {
+      payloadConverterPath: require.resolve('@my/temporal/payload-converter'),
+    },
+    ...workflowOption(),
+    activities: createTransferActivities(process.env),
+    namespace: process.env.TEMPORAL_NAMESPACE ?? 'default',
+    taskQueue: 'monorepo',
     bundlerOptions: {
       ignoreModules: ['@supabase/supabase-js'],
     },
   })
-  // Worker connects to localhost by default and uses console.error for logging.
-  // Customize the Worker by passing more options to create():
-  // https://typescript.temporal.io/api/classes/worker.Worker
 
-  // If you need to configure server connection parameters, see the mTLS example:
-  // https://github.com/temporalio/samples-typescript/tree/main/hello-world-mtls
-
-  // Step 2: Start accepting tasks on the `monorepo` queue
   await worker.run()
-
-  // You may create multiple Workers in a single process in order to poll on multiple task queues.
 }
 
 run().catch((err) => {
