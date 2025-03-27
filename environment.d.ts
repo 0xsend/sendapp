@@ -47,6 +47,16 @@ declare global {
        */
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: string
       /**
+       * Coinbase Developer Portal App ID
+       */
+      NEXT_PUBLIC_CDP_APP_ID: string
+
+      /**
+       * Onchain Kit API Key
+       */
+      NEXT_PUBLIC_ONCHAIN_KIT_API_KEY: string
+
+      /**
        * Temporal Cloud certification
        */
       TEMPORAL_MTLS_TLS_CERT: string

@@ -1,4 +1,15 @@
-# workers
+# Temporal Workers
+
+## Deploy
+
+Environment variables:
+
+- TEMPORAL_NAMESPACE: namespace for the Temporal Cloud
+- TEMPORAL_TASK_QUEUE (hard-coded to `monorepo` for now)
+- TEMPORAL_MTLS_TLS_CERT (file path to cert)
+- NODE_ENV=production
+
+# Structure
 
 Notes on the structure demonstrated:
 
@@ -10,3 +21,4 @@ Notes on the structure demonstrated:
   - You can organize activities however you like, but it is important to understand that activities don't "belong" to workflows as far as Temporal is concerned.
 
 We built this with `yarn` Workspaces. We expect this structure to work with most monorepo tooling: lerna, pnpm, nx, preconstruct, changesets, and Rush but haven't verified it - we cannot support your build tooling specifics but don't mind receiving feedback in our issues.
+
