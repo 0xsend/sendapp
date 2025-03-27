@@ -66,6 +66,20 @@ const plugins = [
       },
     }
   },
+  (nextConfig) => {
+    return {
+      webpack: (webpackConfig, options) => {
+        if (webpackConfig.name === 'server') {
+          // Disable minification for server builds to avoid temporal build errors
+          webpackConfig.optimization.minimize = false
+        }
+        if (typeof nextConfig.webpack === 'function') {
+          return nextConfig.webpack(webpackConfig, options)
+        }
+        return webpackConfig
+      },
+    }
+  },
 ]
 
 export default () => {
