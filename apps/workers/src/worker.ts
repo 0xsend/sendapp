@@ -5,7 +5,7 @@ import { createRequire } from 'node:module'
 const require = createRequire(import.meta.url)
 
 const { NODE_ENV = 'development' } = process.env
-const isDeployed = ['production', 'staging'].includes(NODE_ENV)
+const isDeployed = ['production', 'test'].includes(NODE_ENV)
 
 const workflowOption = () =>
   isDeployed

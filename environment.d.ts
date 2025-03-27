@@ -46,6 +46,18 @@ declare global {
        * Cloudflare Turnstile site key
        */
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: string
+      /**
+       * Temporal Cloud certification
+       */
+      TEMPORAL_MTLS_TLS_CERT: string
+      /**
+       * Temporal Cloud key
+       */
+      TEMPORAL_MTLS_TLS_KEY: string
+      /**
+       * Temporal Cloud namespace
+       */
+      TEMPORAL_NAMESPACE: string
     }
   }
   /**

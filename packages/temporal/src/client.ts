@@ -2,7 +2,7 @@ import { Client, Connection } from '@temporalio/client'
 import debug from 'debug'
 import fs from 'node:fs/promises'
 const { NODE_ENV = 'development' } = process.env
-const isDeployed = ['production', 'staging'].includes(NODE_ENV)
+const isDeployed = ['production', 'test'].includes(NODE_ENV)
 
 const log = debug('api:temporal')
 log(`connecting to temporal: ${process.env.TEMPORAL_NAMESPACE} with NODE_ENV: ${NODE_ENV}`)
