@@ -49,6 +49,7 @@ using (
 
 CREATE INDEX temporal_send_account_transfers_user_id_idx ON temporal.send_account_transfers(user_id);
 CREATE INDEX temporal_send_account_transfers_created_at_idx ON temporal.send_account_transfers(created_at);
+CREATE INDEX temporal_send_account_transfers_created_at_block_num_idx ON temporal.send_account_transfers(created_at_block_num);
 CREATE UNIQUE INDEX temporal_send_account_transfers_workflow_id_idx ON temporal.send_account_transfers(workflow_id);
 
 -- Insert user_id attached to workflow
