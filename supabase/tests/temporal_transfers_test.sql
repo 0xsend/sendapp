@@ -210,3 +210,5 @@ SELECT results_eq(
 
 SELECT * FROM finish();
 ROLLBACK;
+
+--@TODO test activity triggers

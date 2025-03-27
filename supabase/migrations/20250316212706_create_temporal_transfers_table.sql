@@ -48,7 +48,6 @@ using (
 );
 
 CREATE INDEX temporal_send_account_transfers_user_id_idx ON temporal.send_account_transfers(user_id);
-CREATE INDEX temporal_send_account_transfers_created_at_idx ON temporal.send_account_transfers(created_at);
 CREATE UNIQUE INDEX temporal_send_account_transfers_workflow_id_idx ON temporal.send_account_transfers(workflow_id);
 
 -- Insert user_id attached to workflow
@@ -191,19 +190,33 @@ CREATE TRIGGER temporal_send_account_transfers_trigger_delete_activity
 -- We know they are indexed if its inserting newer blocks.
 -- This prevents duplicate activities once a transfer is completed.
 -- keep failed so we can show it to the user, we can garbage collect later
+-- Use a loop for because we shouldn't expect a large number of rows
 create or replace function send_account_transfers_delete_temporal_activity() returns trigger
 language plpgsql
 security definer as
 $$
+declare
+    t_sat_record record;
+    workflow_ids text[] := '{}';
 begin
-    delete from public.activity a
-    where a.event_name = 'temporal_send_account_transfers'
-    and a.event_id in (
-      select t_sat.workflow_id
-      from temporal.send_account_transfers t_sat
-      where t_sat.created_at_block_num <= NEW.block_num
-      and t_sat.status != 'failed'
-    );
+    for t_sat_record in (
+        select workflow_id, created_at_block_num, status
+        from temporal.send_account_transfers
+    ) loop
+        if t_sat_record.created_at_block_num <= NEW.block_num
+        and t_sat_record.status != 'failed' then
+            workflow_ids := array_append(workflow_ids, t_sat_record.workflow_id);
+        else
+            exit;
+        end if;
+    end loop;
+
+    if array_length(workflow_ids, 1) > 0 then
+        delete from public.activity
+        where event_name = 'temporal_send_account_transfers'
+        and event_id = any(workflow_ids);
+    end if;
+
     return NEW;
 end;
 $$;
