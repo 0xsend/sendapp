@@ -212,3 +212,28 @@ export const useAuthScreenParams = () => {
     setParams,
   ] as const
 }
+
+export type DepositScreenParams = {
+  depositAmount?: string
+}
+
+const { useParam: useDepositParam, useParams: useDepositParams } =
+  createParam<DepositScreenParams>()
+
+const useDepositAmount = () => {
+  const [depositAmount, setDepositAmount] = useDepositParam('depositAmount')
+
+  return [depositAmount, setDepositAmount] as const
+}
+
+export const useDepositScreenParams = () => {
+  const { setParams } = useDepositParams()
+  const [depositAmount] = useDepositAmount()
+
+  return [
+    {
+      depositAmount,
+    },
+    setParams,
+  ] as const
+}
