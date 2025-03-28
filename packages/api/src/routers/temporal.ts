@@ -8,6 +8,10 @@ import { baseMainnetClient, entryPointAddress } from '@my/wagmi'
 import { getUserOperationHash } from 'permissionless/utils'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import { getTemporalClient } from '@my/temporal/client'
+import { withRetry } from 'viem'
+import type { PostgrestError } from '@supabase/supabase-js'
+import { throwIf } from 'app/utils/throwIf'
+import { assert } from 'app/utils/assert'
 
 const log = debug('api:temporal')
 
@@ -73,23 +77,32 @@ export const temporalRouter = createTRPCRouter({
 
         log(`Workflow Created: ${workflowId}`)
 
-        const { data: transfer, error: transferError } = await supabaseAdmin
-          .schema('temporal')
-          .from('send_account_transfers')
-          .select('status')
-          .eq('workflow_id', workflowId)
-          .single()
+        await withRetry(
+          async () => {
+            const { data, error } = await supabaseAdmin
+              .schema('temporal')
+              .from('send_account_transfers')
+              .select('status')
+              .eq('workflow_id', workflowId)
+              .single()
+            throwIf(error)
+            assert(data?.status !== 'initialized', 'Transfer not yet submitted')
+            return data
+          },
+          {
+            retryCount: 10,
+            delay: 500,
+            shouldRetry({ error: e }) {
+              const error = e as unknown as PostgrestError
+              if (error.code === 'PGRST116' || error.message === 'Transfer not yet submitted') {
+                return true // retry on no rows
+              }
+              return false
+            },
+          }
+        )
 
-        if (transferError) {
-          log('Error fetching transfer status', transferError)
-          return { workflowId, status: null }
-        }
-
-        if (!transfer) {
-          return { workflowId, status: null }
-        }
-
-        return { workflowId, status: transfer.status }
+        return { workflowId }
       }
     ),
 })

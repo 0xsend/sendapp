@@ -41,7 +41,6 @@ import { api } from 'app/utils/api'
 import { signUserOp } from 'app/utils/signUserOp'
 import { decodeTransferUserOp } from 'app/utils/decodeTransferUserOp'
 import type { UserOperation } from 'permissionless'
-import { TEMPORAL_STATUS_INTERVAL, useTemporalStatus } from 'app/utils/useTemporalStatus'
 
 export function SendConfirmScreen() {
   const [queryParams] = useSendScreenParams()
@@ -76,7 +75,6 @@ export function SendConfirm() {
   const { sendToken, recipient, idType, amount } = queryParams
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
   const { coin: selectedCoin } = useCoinFromSendTokenParam()
-  const [workflowId, setWorkflowId] = useState<string | null>(null)
 
   // states for auth flow
   const [error, setError] = useState<Error | null>(null)
@@ -121,13 +119,6 @@ export function SendConfirm() {
 
   const { mutateAsync: validateUserOp, isPending: isValidatePending } = useValidateTransferUserOp()
 
-  const { data: transferStatus, isLoading: isTransferStatusLoading } = useTemporalStatus({
-    workflowId: workflowId,
-    table: 'send_account_transfers',
-    enabled: workflowId !== null,
-    refetchInterval: TEMPORAL_STATUS_INTERVAL,
-  })
-
   const {
     data: usdcFees,
     isLoading: isFeesLoading,
@@ -156,8 +147,7 @@ export function SendConfirm() {
     isGeneratingUserOp ||
     isValidatePending ||
     isTransferPending ||
-    isTransferInitialized ||
-    isTransferStatusLoading
+    isTransferInitialized
 
   const canSubmit = !isLoading && hasEnoughBalance && hasEnoughGas && feesPerGas
 
@@ -225,12 +215,11 @@ export function SendConfirm() {
       const validatedUserOp = await validateUserOp(userOp)
       assert(!!validatedUserOp, 'Operation expected to fail')
 
-      const { workflowId, status } = await transfer({ userOp: validatedUserOp })
+      const { workflowId } = await transfer({ userOp: validatedUserOp })
 
-      if (status && status !== 'initialized') {
+      if (workflowId) {
         router.replace({ pathname: '/', query: { token: sendToken } })
       }
-      setWorkflowId(workflowId)
     } catch (e) {
       // @TODO: handle sending repeated tx when nonce is still pending
       // if (e.message.includes('Workflow execution already started')) {
@@ -240,14 +229,8 @@ export function SendConfirm() {
       console.error(e)
       setError(e)
       await queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
-      setWorkflowId(null)
     }
   }
-
-  useEffect(() => {
-    if (!transferStatus || transferStatus === 'initialized') return
-    router.replace({ pathname: '/', query: { token: sendToken } })
-  }, [transferStatus, router, sendToken])
 
   useEffect(() => {
     if (submitButtonRef.current) {
@@ -255,7 +238,8 @@ export function SendConfirm() {
     }
   }, [])
 
-  if (isLoading) return <Spinner size="large" color={'$color'} />
+  if (isSendAccountLoading || nonceIsLoading || isProfileLoading)
+    return <Spinner size="large" color={'$color12'} />
 
   return (
     <YStack
@@ -403,7 +387,7 @@ export function SendConfirm() {
       >
         {(() => {
           switch (true) {
-            case isFeesLoading || isGasLoading:
+            case isLoading:
               return (
                 <Button.Icon>
                   <Spinner size="small" color="$color12" />
