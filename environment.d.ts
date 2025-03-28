@@ -16,6 +16,13 @@ declare global {
       NEXT_PUBLIC_SUPABASE_PROJECT_ID: string
       NEXT_PUBLIC_SUPABASE_GRAPHQL_URL: string
       NEXT_PUBLIC_MAINNET_RPC_URL: string
+      /**
+       * The URL of the ERC 4337 Account Abstraction Bundler RPC endpoint
+       */
+      BUNDLER_RPC_URL: string
+      /**
+       * The URL of the Base network RPC endpoint
+       */
       NEXT_PUBLIC_BASE_RPC_URL: string
       NEXT_PUBLIC_BUNDLER_RPC_URL: string
       SUPABASE_DB_URL: string
@@ -39,21 +46,20 @@ declare global {
        * Cloudflare Turnstile site key
        */
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: string
-
       /**
-       * Coinbase Developer Portal App ID
+       * Temporal Cloud certification for workers and api
+       * Base64 encoded
        */
-      NEXT_PUBLIC_CDP_APP_ID: string
-
+      TEMPORAL_MTLS_TLS_CERT: string
       /**
-       * Onchain Kit API Key
+       * Temporal Cloud key
+       * Base64 encoded
        */
-      NEXT_PUBLIC_ONCHAIN_KIT_API_KEY: string
-
+      TEMPORAL_MTLS_TLS_KEY: string
       /**
-       * Onramp Allowlist (comma separated list of user ids that can see the debit card option)
+       * Temporal Cloud namespace
        */
-      NEXT_PUBLIC_ONRAMP_ALLOWLIST: string
+      TEMPORAL_NAMESPACE: string
     }
   }
   /**

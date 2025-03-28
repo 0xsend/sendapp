@@ -23,4 +23,8 @@ export enum Events {
    * Send account receives ETH
    */
   SendAccountReceive = 'send_account_receives',
+  /**
+   * Temporal send account transfers
+   */
+  TemporalSendAccountTransfers = 'temporal_send_account_transfers',
 }

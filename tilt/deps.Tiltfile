@@ -248,6 +248,27 @@ local_resource(
 )
 
 local_resource(
+    name = "temporal:build",
+    allow_parallel = True,
+    cmd = "yarn workspace @my/temporal build",
+    labels = labels,
+    resource_deps = [
+        "yarn:install",
+    ],
+    deps = ui_files,
+)
+
+local_resource(
+    name="workflows:build",
+    allow_parallel = True,
+    cmd = "yarn workspace @my/workflows build",
+    labels = labels,
+    resource_deps = [
+        "yarn:install",
+    ],
+)
+
+local_resource(
     name = "shovel:generate-config",
     allow_parallel = True,
     cmd = "yarn workspace @my/shovel generate",

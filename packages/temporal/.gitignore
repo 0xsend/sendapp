@@ -1,0 +1,6 @@
+# Finder (MacOS) folder config
+.DS_Store
+
+/build
+
+var/**

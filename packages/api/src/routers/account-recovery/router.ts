@@ -50,7 +50,7 @@ export const accountRecoveryRouter = createTRPCRouter({
       .single()
 
     if (challengeError || !challengeData) {
-      logger(`getChallenge:cant-insert-challenge: [${challengeError}]`)
+      logger(`getChallenge:cant-insert-challenge: [${JSON.stringify(challengeError)}]`)
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
         message: formatErr('Cannot generate challenge: Internal server error'),
