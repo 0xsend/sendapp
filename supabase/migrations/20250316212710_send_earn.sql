@@ -477,10 +477,12 @@ DECLARE
   v_referrer_id UUID;
   v_affiliate_address bytea;
 BEGIN
+
   -- Find the referred_id (user who made the deposit)
   SELECT user_id INTO v_referred_id
   FROM send_accounts
   WHERE address = lower(concat('0x', encode(NEW.owner, 'hex'::text)))::citext;
+
 
   -- Skip if we can't find the referred user
   IF v_referred_id IS NULL THEN
@@ -503,10 +505,12 @@ BEGIN
   JOIN send_accounts sa ON lower(concat('0x', encode(a.affiliate, 'hex'::text)))::citext = sa.address
   WHERE c.send_earn = NEW.log_addr;
 
+
   -- Skip if we can't find the affiliate or referrer
   IF v_affiliate_address IS NULL OR v_referrer_id IS NULL THEN
     RETURN NEW;
   END IF;
+
 
   -- Insert the new referral relationship with error handling
   BEGIN
@@ -515,7 +519,7 @@ BEGIN
   EXCEPTION
     WHEN unique_violation THEN
       -- A referral was already created (possibly by another concurrent process)
-      NULL;
+      RETURN NEW;
   END;
 
   RETURN NEW;
@@ -524,7 +528,7 @@ $$;
 
 -- Create trigger on send_earn_deposit table
 CREATE TRIGGER insert_referral_on_deposit
-AFTER INSERT ON public.send_earn_deposit
+BEFORE INSERT ON public.send_earn_deposit
 FOR EACH ROW
 EXECUTE FUNCTION private.insert_referral_on_deposit();
 
@@ -580,7 +584,7 @@ BEGIN
       EXCEPTION
         WHEN unique_violation THEN
           -- A referral was already created (possibly by another concurrent process)
-          NULL;
+          RETURN NEW;
       END;
     END IF;
   END LOOP;
@@ -591,7 +595,7 @@ $$;
 
 -- Create trigger on send_earn_new_affiliate table
 CREATE TRIGGER insert_referral_on_new_affiliate
-AFTER INSERT ON public.send_earn_new_affiliate
+BEFORE INSERT ON public.send_earn_new_affiliate
 FOR EACH ROW
 EXECUTE FUNCTION private.insert_referral_on_new_affiliate();
 
@@ -605,7 +609,6 @@ DECLARE
   v_referred_id UUID;
   v_referrer_id UUID;
   v_deposit_record RECORD;
-  v_affiliate_address bytea;
 BEGIN
   -- Find deposits made to this Send Earn contract
   FOR v_deposit_record IN
@@ -637,6 +640,7 @@ BEGIN
     FROM send_accounts
     WHERE address = lower(concat('0x', encode(v_deposit_record.affiliate, 'hex'::text)))::citext;
 
+
     -- Skip if we can't find the referrer user
     IF v_referrer_id IS NULL THEN
       CONTINUE;
@@ -649,7 +653,7 @@ BEGIN
     EXCEPTION
       WHEN unique_violation THEN
         -- A referral was already created (possibly by another concurrent process)
-        NULL;
+        RETURN NEW;
     END;
   END LOOP;
 
@@ -659,6 +663,6 @@ $$;
 
 -- Create trigger on send_earn_create table
 CREATE TRIGGER insert_referral_on_create
-AFTER INSERT ON public.send_earn_create
+BEFORE INSERT ON public.send_earn_create
 FOR EACH ROW
 EXECUTE FUNCTION private.insert_referral_on_create();
