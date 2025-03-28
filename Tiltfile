@@ -1,7 +1,7 @@
-load("ext://color", "color")
-load("ext://dotenv", "dotenv")
 load("./tilt/common.Tiltfile", "CFG", "CI", "DEBUG")
 load("./tilt/utils.Tiltfile", "replace_in_file", "require_env", "require_tools")
+load("ext://color", "color")
+load("ext://dotenv", "dotenv")
 
 include("./tilt/preamble.tiltfile")
 
@@ -40,7 +40,6 @@ for dotfile in [
 
 require_env(
     "ANVIL_BASE_FORK_URL",
-    "ANVIL_MAINNET_FORK_URL",
 )
 
 # ensure .env matches what's in .env.local.template
@@ -59,9 +58,9 @@ if CFG.dockerize:
     host_docker_rdy = str(local("ping -c 1 host.docker.internal || true", echo_off = True, quiet = True)).strip()
     if host_docker_rdy.find("server can't find host.docker.interna") != -1:
         print(color.red("Could not resolve host.docker.internal domain.") + """
-    
+
 Add the following to your /etc/hosts file:
-    
+
 127.0.0.1 host.docker.internal
         """)
         fail(color.red("Could not resolve host.docker.internal domain."))

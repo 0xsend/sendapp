@@ -6,7 +6,7 @@ const {
   TEMPORAL_MTLS_TLS_CERT,
   TEMPORAL_MTLS_TLS_KEY,
 } = process.env
-const isDeployed = ['production', 'test'].includes(NODE_ENV)
+const isDeployed = ['production', 'test'].includes(NODE_ENV) && !process.env.CI
 
 const log = debug('api:temporal')
 log(`connecting to temporal: ${TEMPORAL_NAMESPACE} with NODE_ENV: ${NODE_ENV}`)
