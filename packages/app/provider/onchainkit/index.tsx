@@ -8,6 +8,7 @@ export const OnchainKitProvider: FC<{ children: ReactNode }> = ({
   children: ReactNode
 }) => {
   return (
+    // @ts-expect-error: Type is not assignable to type 'Chain'
     <BaseOnchainKitProvider apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY} chain={base}>
       {children}
     </BaseOnchainKitProvider>

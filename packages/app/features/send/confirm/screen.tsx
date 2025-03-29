@@ -1,9 +1,6 @@
 import {
   Avatar,
   Button,
-  ButtonText,
-  isWeb,
-  Label,
   LinkableAvatar,
   Paragraph,
   type ParagraphProps,
@@ -13,44 +10,37 @@ import {
   XStack,
   YStack,
   type TamaguiElement,
-  type YStackProps,
 } from '@my/ui'
-import { baseMainnet } from '@my/wagmi'
-import { useQueryClient } from '@tanstack/react-query'
+import { baseMainnet, baseMainnetClient, entryPointAddress } from '@my/wagmi'
+import { useQueryClient, useMutation } from '@tanstack/react-query'
 import { IconAccount } from 'app/components/icons'
-import { useTokenActivityFeed } from 'app/features/home/utils/useTokenActivityFeed'
+import { IconCoin } from 'app/components/icons/IconCoin'
 import { useSendScreenParams } from 'app/routers/params'
 import { assert } from 'app/utils/assert'
 import formatAmount, { localizeAmount } from 'app/utils/formatAmount'
-import { hexToBytea } from 'app/utils/hexToBytea'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { shorten } from 'app/utils/strings'
 import { throwIf } from 'app/utils/throwIf'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useUSDCFees } from 'app/utils/useUSDCFees'
-import {
-  useGenerateTransferUserOp,
-  useUserOpTransferMutation,
-} from 'app/utils/useUserOpTransferMutation'
+import { useGenerateTransferUserOp } from 'app/utils/useUserOpTransferMutation'
 import { useAccountNonce } from 'app/utils/userop'
-import {
-  type Activity,
-  isSendAccountReceiveEvent,
-  isSendAccountTransfersEvent,
-} from 'app/utils/zod/activity'
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'solito/router'
-import { formatUnits, type Hex, isAddress } from 'viem'
+import { formatUnits, isAddress } from 'viem'
 import { useEstimateFeesPerGas } from 'wagmi'
 import { useCoin } from 'app/provider/coins'
 import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
-import { allCoinsDict } from 'app/data/coins'
-import { IconCoin } from 'app/components/icons/IconCoin'
+import { allCoins, allCoinsDict } from 'app/data/coins'
 
 import debug from 'debug'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
 
 const log = debug('app:features:send:confirm:screen')
+import { api } from 'app/utils/api'
+import { signUserOp } from 'app/utils/signUserOp'
+import { decodeTransferUserOp } from 'app/utils/decodeTransferUserOp'
+import type { UserOperation } from 'permissionless'
 
 export function SendConfirmScreen() {
   const [queryParams] = useSendScreenParams()
@@ -79,12 +69,21 @@ export function SendConfirmScreen() {
 
 export function SendConfirm() {
   const submitButtonRef = useRef<TamaguiElement | null>(null)
+  const queryClient = useQueryClient()
+  const router = useRouter()
   const [queryParams] = useSendScreenParams()
   const { sendToken, recipient, idType, amount } = queryParams
-
-  const queryClient = useQueryClient()
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
-  const { coin: selectedCoin, tokensQuery, ethQuery } = useCoinFromSendTokenParam()
+  const { coin: selectedCoin } = useCoinFromSendTokenParam()
+
+  // states for auth flow
+  const [error, setError] = useState<Error | null>(null)
+  const {
+    mutateAsync: transfer,
+    isPending: isTransferPending,
+    isSuccess: isTransferInitialized,
+  } = api.temporal.transfer.useMutation()
+
   const isUSDCSelected = selectedCoin?.label === 'USDC'
   const { coin: usdc } = useCoin('USDC')
   const { data: prices, isLoading: isPricesLoading } = useTokenPrices()
@@ -100,9 +99,6 @@ export function SendConfirm() {
     sendAccount?.send_account_credentials
       .filter((c) => !!c.webauthn_credentials)
       .map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? []
-  const [sentTxHash, setSentTxHash] = useState<Hex>()
-
-  const router = useRouter()
 
   const {
     data: nonce,
@@ -111,14 +107,17 @@ export function SendConfirm() {
   } = useAccountNonce({
     sender: sendAccount?.address,
   })
-  const { data: userOp } = useGenerateTransferUserOp({
+
+  const { data: userOp, isPending: isGeneratingUserOp } = useGenerateTransferUserOp({
     sender: sendAccount?.address,
     // @ts-expect-error some work to` do here
     to: profile?.address ?? recipient,
     token: sendToken === 'eth' ? undefined : sendToken,
     amount: BigInt(queryParams.amount ?? '0'),
-    nonce: nonce,
+    nonce,
   })
+
+  const { mutateAsync: validateUserOp, isPending: isValidatePending } = useValidateTransferUserOp()
 
   const {
     data: usdcFees,
@@ -135,27 +134,22 @@ export function SendConfirm() {
   } = useEstimateFeesPerGas({
     chainId: baseMainnet.id,
   })
-  const {
-    mutateAsync: sendUserOp,
-    isPending: isTransferPending,
-    isError: isTransferError,
-    submittedAt,
-  } = useUserOpTransferMutation()
-
-  const [error, setError] = useState<Error>()
-
-  const { data: transfers, error: tokenActivityError } = useTokenActivityFeed({
-    address: sendToken === 'eth' ? undefined : hexToBytea(sendToken),
-    refetchInterval: sentTxHash ? 1000 : undefined, // refetch every second if we have sent a tx
-    enabled: !!sentTxHash,
-  })
 
   const hasEnoughBalance = selectedCoin?.balance && selectedCoin.balance >= BigInt(amount ?? '0')
   const gas = usdcFees ? usdcFees.baseFee + usdcFees.gasFees : BigInt(Number.MAX_SAFE_INTEGER)
   const hasEnoughGas =
     (usdc?.balance ?? BigInt(0)) > (isUSDCSelected ? BigInt(amount ?? '0') + gas : gas)
 
-  const canSubmit = BigInt(queryParams.amount ?? '0') > 0 && hasEnoughGas && hasEnoughBalance
+  const isLoading =
+    nonceIsLoading ||
+    isProfileLoading ||
+    isSendAccountLoading ||
+    isGeneratingUserOp ||
+    isValidatePending ||
+    isTransferPending ||
+    isTransferInitialized
+
+  const canSubmit = !isLoading && hasEnoughBalance && hasEnoughGas && feesPerGas
 
   const localizedAmount = localizeAmount(
     formatUnits(
@@ -207,72 +201,36 @@ export function SendConfirm() {
       log('gasEstimate', usdcFees)
       log('feesPerGas', feesPerGas)
       log('userOp', _userOp)
-      const receipt = await sendUserOp({
-        userOp: _userOp,
+      const chainId = baseMainnetClient.chain.id
+      const entryPoint = entryPointAddress[chainId]
+
+      const signature = await signUserOp({
+        userOp,
+        chainId,
         webauthnCreds,
+        entryPoint,
       })
-      assert(receipt.success, 'Failed to send user op')
-      setSentTxHash(receipt.receipt.transactionHash)
-      if (selectedCoin?.token === 'eth') {
-        await ethQuery.refetch()
-      } else {
-        await tokensQuery.refetch()
+      userOp.signature = signature
+
+      const validatedUserOp = await validateUserOp(userOp)
+      assert(!!validatedUserOp, 'Operation expected to fail')
+
+      const { workflowId } = await transfer({ userOp: validatedUserOp })
+
+      if (workflowId) {
+        router.replace({ pathname: '/', query: { token: sendToken } })
       }
     } catch (e) {
+      // @TODO: handle sending repeated tx when nonce is still pending
+      // if (e.message.includes('Workflow execution already started')) {
+      //   router.replace({ pathname: '/', query: { token: sendToken } })
+      //   return
+      // }
       console.error(e)
       setError(e)
       await queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
     }
   }
-
-  useEffect(() => {
-    if (!submittedAt) return
-
-    if (sentTxHash) {
-      log('sent tx hash', { sentTxHash })
-      const tfr = transfers?.pages.some((page) =>
-        page.some((activity: Activity) => {
-          if (isSendAccountTransfersEvent(activity)) {
-            return activity.data.tx_hash === sentTxHash
-          }
-          if (isSendAccountReceiveEvent(activity)) {
-            return activity.data.tx_hash === sentTxHash
-          }
-          return false
-        })
-      )
-
-      if (tokenActivityError) {
-        console.error(tokenActivityError)
-      }
-
-      // found the transfer or we waited too long or we got an error 😢
-      // or we are sending eth since event logs are not always available for eth
-      // (when receipient is not a send account or contract)
-      if (tfr || tokenActivityError || (sentTxHash && sendToken === 'eth')) {
-        router.replace({ pathname: '/', query: { token: sendToken } })
-      }
-    }
-
-    // create a window unload event on web
-    const eventHandlersToRemove: (() => void)[] = []
-    if (isWeb) {
-      const unloadHandler = (e: BeforeUnloadEvent) => {
-        // prevent unload if we have a tx hash or a submitted at
-        if (submittedAt || sentTxHash) {
-          e.preventDefault()
-        }
-      }
-      window.addEventListener('beforeunload', unloadHandler)
-      eventHandlersToRemove.push(() => window.removeEventListener('beforeunload', unloadHandler))
-    }
-
-    return () => {
-      for (const remove of eventHandlersToRemove) {
-        remove()
-      }
-    }
-  }, [sentTxHash, transfers, router, sendToken, tokenActivityError, submittedAt])
 
   useEffect(() => {
     if (submitButtonRef.current) {
@@ -281,7 +239,7 @@ export function SendConfirm() {
   }, [])
 
   if (isSendAccountLoading || nonceIsLoading || isProfileLoading)
-    return <Spinner size="large" color={'$color'} />
+    return <Spinner size="large" color={'$color12'} />
 
   return (
     <YStack
@@ -420,38 +378,20 @@ export function SendConfirm() {
         ref={submitButtonRef}
         theme={canSubmit ? 'green' : 'red_alt1'}
         onPress={onSubmit}
-        br={'$4'}
         disabledStyle={{ opacity: 0.7, cursor: 'not-allowed', pointerEvents: 'none' }}
-        disabled={!canSubmit || isTransferPending || !!sentTxHash}
+        disabled={!canSubmit}
+        br={'$4'}
         gap={4}
         py={'$5'}
         width={'100%'}
       >
         {(() => {
           switch (true) {
-            case isFeesLoading || isGasLoading:
+            case isLoading:
               return (
                 <Button.Icon>
                   <Spinner size="small" color="$color12" />
                 </Button.Icon>
-              )
-            case isTransferPending && !isTransferError:
-              return (
-                <>
-                  <Button.Icon>
-                    <Spinner size="small" color="$color12" />
-                  </Button.Icon>
-                  <Button.Text fontWeight={'600'}>Sending...</Button.Text>
-                </>
-              )
-            case sentTxHash !== undefined:
-              return (
-                <>
-                  <Button.Icon>
-                    <Spinner size="small" color="$color12" />
-                  </Button.Icon>
-                  <Button.Text fontWeight={'600'}>Confirming...</Button.Text>
-                </>
               )
             case !hasEnoughBalance:
               return <Button.Text fontWeight={'600'}>Insufficient Balance</Button.Text>
@@ -462,122 +402,42 @@ export function SendConfirm() {
           }
         })()}
       </Button>
-      {/*  TODO add this back when backend is ready
-         <YStack gap="$5" f={1}>
-           <Label
-             fontWeight="500"
-             fontSize={'$5'}
-             textTransform="uppercase"
-             $theme-dark={{ col: '$gray8Light' }}
-           >
-             ADD A NOTE
-           </Label>
-           <Input
-             placeholder="(Optional)"
-             placeholderTextColor="$color12"
-             value={note}
-             onChangeText={(text) => setParams({ note: text }, { webBehavior: 'replace' })}
-             fontSize={20}
-             fontWeight="400"
-             lineHeight={1}
-             color="$color12"
-             borderColor="transparent"
-             outlineColor="transparent"
-             $theme-light={{ bc: '$gray3Light' }}
-             br={'$3'}
-             bc="$metalTouch"
-             hoverStyle={{
-               borderColor: 'transparent',
-               outlineColor: 'transparent',
-             }}
-             focusStyle={{
-               borderColor: 'transparent',
-               outlineColor: 'transparent',
-             }}
-             fontFamily="$mono"
-           />
-         </YStack> */}
     </YStack>
   )
 }
 
-export function SendRecipient({ ...props }: YStackProps) {
-  const [queryParams] = useSendScreenParams()
-  const { recipient, idType } = queryParams
-  const router = useRouter()
-  const { data: profile, isLoading, error } = useProfileLookup(idType ?? 'tag', recipient ?? '')
-  const href = profile ? `/profile/${profile?.sendid}` : ''
+function useValidateTransferUserOp() {
+  return useMutation({
+    mutationFn: async (userOp?: UserOperation<'v0.7'>) => {
+      if (!userOp?.signature) return null
 
-  if (isLoading) return <Spinner size="large" />
-  if (error) throw new Error(error.message)
+      try {
+        await baseMainnetClient.call({
+          account: entryPointAddress[baseMainnetClient.chain.id],
+          to: userOp.sender,
+          data: userOp.callData,
+        })
 
-  return (
-    <YStack gap="$2.5" {...props}>
-      <XStack jc="space-between" ai="center" gap="$3">
-        <Label
-          fontWeight="500"
-          fontSize={'$5'}
-          textTransform="uppercase"
-          $theme-dark={{ col: '$gray8Light' }}
-        >
-          TO
-        </Label>
-        <Button
-          bc="transparent"
-          chromeless
-          hoverStyle={{ bc: 'transparent' }}
-          pressStyle={{ bc: 'transparent' }}
-          focusStyle={{ bc: 'transparent' }}
-          onPress={() =>
-            router.push({
-              pathname: '/send',
-              query: { sendToken: queryParams.sendToken, amount: queryParams.amount },
-            })
-          }
-        >
-          <ButtonText $theme-dark={{ col: '$primary' }}>edit</ButtonText>
-        </Button>
-      </XStack>
-      <XStack
-        ai="center"
-        gap="$3"
-        bc="$metalTouch"
-        p="$2"
-        br="$3"
-        $theme-light={{ bc: '$gray3Light' }}
-      >
-        <LinkableAvatar size="$4.5" br="$3" href={href}>
-          <Avatar.Image src={profile?.avatar_url ?? ''} />
-          <Avatar.Fallback jc="center">
-            <IconAccount size="$4.5" color="$olive" />
-          </Avatar.Fallback>
-        </LinkableAvatar>
-        <YStack gap="$1.5">
-          <Paragraph fontSize="$4" fontWeight="500" color="$color12">
-            {profile?.name}
-          </Paragraph>
-          <Paragraph
-            fontFamily="$mono"
-            fontSize="$4"
-            fontWeight="400"
-            lineHeight="$1"
-            color="$color11"
-          >
-            {(() => {
-              switch (true) {
-                case idType === 'address':
-                  return shorten(recipient, 5, 4)
-                case !!profile?.tag:
-                  return `/${profile?.tag}`
-                default:
-                  return `#${profile?.sendid}`
-              }
-            })()}
-          </Paragraph>
-        </YStack>
-      </XStack>
-    </YStack>
-  )
+        const { from, to, token, amount } = decodeTransferUserOp({ userOp })
+        if (!from || !to || !amount || !token) {
+          log('Failed to decode transfer user op', { from, to, amount, token })
+          throw new Error('Not a valid transfer')
+        }
+        if (!allCoins.find((c) => c.token === token)) {
+          log('Token ${token} is not a supported', { token })
+          throw new Error(`Token ${token} is not a supported`)
+        }
+        if (amount < 0n) {
+          log('User Operation has amount < 0', { amount })
+          throw new Error('User Operation has amount < 0')
+        }
+        return userOp
+      } catch (e) {
+        const error = e instanceof Error ? e : new Error('Validation failed')
+        throw error
+      }
+    },
+  })
 }
 
 function ErrorMessage({ error, ...props }: ParagraphProps & { error?: string }) {

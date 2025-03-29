@@ -41,9 +41,37 @@ const plugins = [
   (nextConfig) => {
     return {
       webpack: (webpackConfig, options) => {
+        // Add Temporal to externals when building for server
+        if (options.isServer) {
+          webpackConfig.externals = [...(webpackConfig.externals || []), '@temporalio/client']
+        }
+        if (typeof nextConfig.webpack === 'function') {
+          return nextConfig.webpack(webpackConfig, options)
+        }
+        return webpackConfig
+      },
+    }
+  },
+  (nextConfig) => {
+    return {
+      webpack: (webpackConfig, options) => {
         webpackConfig.resolve.alias = {
           ...webpackConfig.resolve.alias,
           'react-native-svg': '@tamagui/react-native-svg',
+        }
+        if (typeof nextConfig.webpack === 'function') {
+          return nextConfig.webpack(webpackConfig, options)
+        }
+        return webpackConfig
+      },
+    }
+  },
+  (nextConfig) => {
+    return {
+      webpack: (webpackConfig, options) => {
+        if (webpackConfig.name === 'server') {
+          // Disable minification for server builds to avoid temporal build errors
+          webpackConfig.optimization.minimize = false
         }
         if (typeof nextConfig.webpack === 'function') {
           return nextConfig.webpack(webpackConfig, options)
