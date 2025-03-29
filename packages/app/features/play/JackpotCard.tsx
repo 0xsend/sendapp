@@ -10,10 +10,18 @@ import {
   H2,
   H3,
   Button,
+  Spinner, // Added Spinner
 } from '@my/ui'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react' // Added useMemo
 import { Timer } from '@tamagui/lucide-icons'
 import { PlayButtons } from './PlayButtons'
+import {
+  useReadBaseJackpotLpPoolTotal,
+  useReadBaseJackpotLastJackpotEndTime,
+  useReadBaseJackpotRoundDurationInSeconds,
+  useReadBaseJackpotTokenDecimals,
+} from '@my/wagmi/contracts/base-jackpot' // Corrected import path
+import { formatUnits } from 'viem' // Import formatUnits
 
 const GreenSquare = styled(Stack, {
   name: 'Surface',
@@ -24,27 +32,30 @@ const GreenSquare = styled(Stack, {
 })
 
 export const JackpotCard = () => {
-  // Mock data - in a real implementation, this would come from an API
-  const jackpotAmount = 250000 // 250,000 SEND
+  // Fetch contract data
+  const { data: lpPoolTotal, isLoading: isLoadingPoolTotal } = useReadBaseJackpotLpPoolTotal()
+  const { data: lastJackpotEndTime, isLoading: isLoadingEndTime } =
+    useReadBaseJackpotLastJackpotEndTime()
+  const { data: roundDuration, isLoading: isLoadingDuration } =
+    useReadBaseJackpotRoundDurationInSeconds()
+  const { data: tokenDecimals, isLoading: isLoadingDecimals } = useReadBaseJackpotTokenDecimals()
 
-  // Calculate time until next draw (24 hours from now)
-  const calculateTimeUntilNextDraw = () => {
-    // Get current time
-    const now = new Date()
+  // Calculate next draw time based on contract data
+  const nextDrawTime = useMemo(() => {
+    if (lastJackpotEndTime === undefined || roundDuration === undefined) return null
+    // Contract times are in seconds, convert to milliseconds
+    return (Number(lastJackpotEndTime) + Number(roundDuration)) * 1000
+  }, [lastJackpotEndTime, roundDuration])
 
-    // Set next draw time to 8:00 PM today
-    const nextDraw = new Date(now)
-    nextDraw.setHours(20, 0, 0, 0)
+  // Calculate time remaining until the next draw
+  const calculateTimeRemaining = () => {
+    if (!nextDrawTime) return { hours: 0, minutes: 0, seconds: 0 }
 
-    // If it's already past 8:00 PM, set next draw to tomorrow
-    if (now > nextDraw) {
-      nextDraw.setDate(nextDraw.getDate() + 1)
-    }
+    const now = Date.now()
+    const diff = nextDrawTime - now
 
-    // Calculate time difference
-    const diff = nextDraw.getTime() - now.getTime()
+    if (diff <= 0) return { hours: 0, minutes: 0, seconds: 0 } // Draw time has passed or is now
 
-    // Convert to hours, minutes, seconds
     const hours = Math.floor(diff / (1000 * 60 * 60))
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
     const seconds = Math.floor((diff % (1000 * 60)) / 1000)
@@ -52,37 +63,50 @@ export const JackpotCard = () => {
     return { hours, minutes, seconds }
   }
 
-  const [timeRemaining, setTimeRemaining] = useState(calculateTimeUntilNextDraw())
+  const [timeRemaining, setTimeRemaining] = useState(calculateTimeRemaining())
 
-  // Format the next draw date
-  const getNextDrawDate = () => {
-    const now = new Date()
-    const nextDraw = new Date(now)
-    nextDraw.setHours(20, 0, 0, 0)
+  // Update timer every second
+  useEffect(() => {
+    if (!nextDrawTime) return // Don't start timer if draw time isn't calculated yet
 
-    if (now > nextDraw) {
-      nextDraw.setDate(nextDraw.getDate() + 1)
-    }
+    const timer = setInterval(() => {
+      setTimeRemaining(calculateTimeRemaining())
+    }, 1000)
 
-    return nextDraw.toLocaleDateString('en-US', {
+    return () => clearInterval(timer)
+  }, [nextDrawTime, calculateTimeRemaining]) // Added calculateTimeRemaining to dependencies
+
+  // Format the next draw date string
+  const nextDrawDateString = useMemo(() => {
+    if (!nextDrawTime) return 'Loading...'
+    const date = new Date(nextDrawTime)
+    return date.toLocaleDateString('en-US', {
       weekday: 'short',
       month: 'short',
       day: 'numeric',
       hour: 'numeric',
       minute: '2-digit',
     })
-  }
+  }, [nextDrawTime])
 
-  // Simulate countdown timer
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeRemaining(calculateTimeUntilNextDraw())
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [calculateTimeUntilNextDraw])
+  // Format jackpot amount (using lpPoolTotal as placeholder)
+  const formattedJackpotAmount = useMemo(() => {
+    // Ensure lpPoolTotal is a bigint and tokenDecimals is loaded
+    if (typeof lpPoolTotal !== 'bigint' || tokenDecimals === undefined) {
+      return '...' // Show loading state
+    }
+    // Assuming lpPoolTotal represents the jackpot amount for display
+    return Number.parseFloat(formatUnits(lpPoolTotal, Number(tokenDecimals))).toLocaleString(
+      undefined,
+      {
+        maximumFractionDigits: 0, // Display as whole number
+      }
+    )
+  }, [lpPoolTotal, tokenDecimals])
 
   const formatNumber = (num: number) => (num < 10 ? `0${num}` : `${num}`)
+
+  const isLoading = isLoadingPoolTotal || isLoadingEndTime || isLoadingDuration || isLoadingDecimals
 
   return (
     <Card p={'$5'} w={'100%'} jc="space-between" $gtLg={{ p: '$6', h: 'auto', mih: 244 }} mih={184}>
@@ -116,9 +140,10 @@ export const JackpotCard = () => {
               color={'$color12'}
               zIndex={1}
             >
-              {jackpotAmount.toLocaleString()}
+              {isLoading ? <Spinner /> : formattedJackpotAmount}
             </BigHeading>
             <Paragraph fontSize={'$6'} fontWeight={'500'} zIndex={1} $sm={{ mt: '$4' }}>
+              {/* Assuming the token is always SEND, otherwise fetch token symbol */}
               {'SEND'}
             </Paragraph>
           </XStack>
@@ -126,14 +151,18 @@ export const JackpotCard = () => {
             <XStack ai="center" gap="$2">
               <Timer size="$1.5" color="$color10" />
               <H3 color="$color10">
-                {`${formatNumber(timeRemaining.hours)}:${formatNumber(
-                  timeRemaining.minutes
-                )}:${formatNumber(timeRemaining.seconds)}`}
+                {isLoading ? (
+                  <Spinner size="small" />
+                ) : (
+                  `${formatNumber(timeRemaining.hours)}:${formatNumber(
+                    timeRemaining.minutes
+                  )}:${formatNumber(timeRemaining.seconds)}`
+                )}
               </H3>
             </XStack>
             <XStack ai="center" jc="center">
               <Paragraph color="$color10" fontSize="$4" ta="center">
-                Next draw: {getNextDrawDate()} (daily at 8:00 PM)
+                Next draw: {isLoading ? 'Loading...' : nextDrawDateString}
               </Paragraph>
             </XStack>
           </YStack>

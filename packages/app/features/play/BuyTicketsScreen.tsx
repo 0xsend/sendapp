@@ -10,37 +10,119 @@ import {
   Button,
   useMedia,
   useSafeAreaInsets,
+  useToastController, // Added for notifications
 } from '@my/ui'
-import { useState } from 'react'
+import { useState, useMemo } from 'react' // Added useMemo
 import { useRouter } from 'solito/router'
 import { IconGame } from 'app/components/icons'
 import { AlertCircle, Timer } from '@tamagui/lucide-icons'
+import { usePurchaseJackpotTicketMutation } from './usePurchaseJackpotTicketMutation' // Import the mutation hook
+import {
+  useReadBaseJackpotTicketPrice,
+  useReadBaseJackpotToken,
+  useReadBaseJackpotTokenDecimals, // Need decimals for parsing
+} from '@my/wagmi/contracts/base-jackpot' // Import read hooks
+import { parseUnits, formatUnits as formatUnitsViem, isAddress } from 'viem' // Import parseUnits, rename formatUnits, add isAddress
 import { TopNav } from 'app/components/TopNav'
 import { HomeLayout } from 'app/features/home/layout.web'
-import { useCoins } from 'app/provider/coins'
+// TODO: Replace useCoins with a hook that provides the user's SendAccount address, nonce, and webauthn credentials
+// import { useUserAccount } from 'app/provider/userAccount' // Example hypothetical hook
+import { useCoins } from 'app/provider/coins' // Keep for balance display for now
 import formatAmount from 'app/utils/formatAmount'
+import type { Address } from 'viem' // Import Address type
 
 export function BuyTicketsScreen() {
   const router = useRouter()
+  const toast = useToastController()
   const { bottom } = useSafeAreaInsets()
   const media = useMedia()
   const [ticketCount, setTicketCount] = useState('1')
   const [isInputFocused, setIsInputFocused] = useState(false)
 
-  // Get user's SEND balance using the useCoins hook
-  const { coins, isLoading } = useCoins()
-  const sendCoin = coins.find((coin) => coin.symbol === 'SEND')
+  // --- Fetch Contract Data ---
+  const { data: contractTicketPrice, isLoading: isLoadingPrice } = useReadBaseJackpotTicketPrice()
+  const { data: tokenAddress, isLoading: isLoadingToken } = useReadBaseJackpotToken()
+  const { data: tokenDecimals, isLoading: isLoadingDecimals } = useReadBaseJackpotTokenDecimals()
 
-  // Calculate total cost
-  const ticketPrice = 30 // SEND per ticket
-  const totalCost = Number.parseInt(ticketCount || '0') * ticketPrice
+  // --- TODO: Fetch User Account Data ---
+  // Replace with actual hooks/context accessors
+  const {
+    address: senderAddress,
+    nonce,
+    webauthnCreds,
+    isLoading: isLoadingUser,
+  } = {
+    address: undefined as Address | undefined, // Placeholder
+    nonce: undefined as bigint | undefined, // Placeholder
+    webauthnCreds: [] as { raw_credential_id: `\\x${string}`; name: string }[], // Placeholder
+    isLoading: true, // Placeholder
+  }
+  // const { address: senderAddress, nonce, webauthnCreds, isLoading: isLoadingUser } = useUserAccount(); // Example
 
-  // Format user balance
-  const userBalance =
-    sendCoin?.balance !== undefined ? Number(sendCoin.balance) / 10 ** sendCoin.decimals : 0
-  const insufficientFunds = totalCost > userBalance
+  // --- Get SEND Balance (keep for display) ---
+  const { coins, isLoading: isLoadingBalance } = useCoins() // Renamed original isLoading
+  const sendCoin = useMemo(
+    () => coins.find((coin) => coin.symbol === 'SEND'),
+    [coins] // Assuming tokenAddress corresponds to SEND for now
+  )
 
-  // Get next draw date
+  // --- Calculations ---
+  const ticketPriceBigInt = useMemo(() => contractTicketPrice ?? 0n, [contractTicketPrice])
+  const numTickets = useMemo(() => {
+    const parsed = Number.parseInt(ticketCount || '0', 10)
+    return Number.isNaN(parsed) ? 0n : BigInt(parsed) // Use Number.isNaN and ensure valid bigint
+  }, [ticketCount])
+  const totalCostBigInt = useMemo(() => {
+    // Explicitly check types before multiplication
+    if (typeof numTickets === 'bigint' && typeof ticketPriceBigInt === 'bigint') {
+      return numTickets * ticketPriceBigInt
+    }
+    return 0n // Default to 0n if types are not bigint
+  }, [numTickets, ticketPriceBigInt])
+
+  // Format user balance (BigInt)
+  const userBalanceBigInt = useMemo(() => {
+    if (!sendCoin?.balance) return 0n
+    try {
+      // Assuming sendCoin.balance is already a bigint or string representing it
+      return BigInt(sendCoin.balance)
+    } catch {
+      return 0n
+    }
+  }, [sendCoin])
+
+  const insufficientFunds = useMemo(
+    () => totalCostBigInt > userBalanceBigInt,
+    [totalCostBigInt, userBalanceBigInt]
+  )
+
+  // Format display values
+  const displayTicketPrice = useMemo(() => {
+    // Check type explicitly
+    if (typeof ticketPriceBigInt !== 'bigint' || tokenDecimals === undefined) return '...'
+    // Use formatUnitsViem here
+    return formatUnitsViem(ticketPriceBigInt, Number(tokenDecimals))
+  }, [ticketPriceBigInt, tokenDecimals])
+
+  const displayTotalCost = useMemo(() => {
+    // Check type explicitly
+    if (typeof totalCostBigInt !== 'bigint' || tokenDecimals === undefined) return '...'
+    // Use formatUnitsViem here
+    return formatUnitsViem(totalCostBigInt, Number(tokenDecimals))
+  }, [totalCostBigInt, tokenDecimals])
+
+  // --- Combined Loading State ---
+  const purchaseMutation = usePurchaseJackpotTicketMutation() // Initialize mutation hook earlier
+  const isLoading =
+    isLoadingPrice ||
+    isLoadingToken ||
+    isLoadingDecimals ||
+    isLoadingUser ||
+    isLoadingBalance ||
+    purchaseMutation.isPending // Combine all loading states
+
+  // --- Get next draw date (keep existing logic) ---
+  // Removed old userBalance and insufficientFunds calculations here
   const getNextDrawDate = () => {
     const now = new Date()
     const nextDraw = new Date(now)
@@ -59,10 +141,83 @@ export function BuyTicketsScreen() {
     })
   }
 
-  const handleBuyTickets = () => {
-    // In a real implementation, this would call an API to purchase tickets
-    console.log(`Buying ${ticketCount} tickets`)
-    router.push('/play')
+  // --- Mutation Handler ---
+  const handleBuyTickets = async () => {
+    // --- Perform all checks upfront ---
+    if (isLoading) {
+      console.log('Purchase attempt blocked: Already loading')
+      return // Prevent multiple clicks
+    }
+    if (insufficientFunds) {
+      toast.show('Error', { message: 'Insufficient funds.' })
+      return
+    }
+    if (numTickets <= 0n) {
+      toast.show('Error', { message: 'Please enter a valid number of tickets.' })
+      return
+    }
+    if (!senderAddress) {
+      toast.show('Error', { message: 'User account address not found.' })
+      return
+    }
+    // // Check tokenAddress is a valid address string
+    // if (!tokenAddress || !isAddress(tokenAddress)) {
+    //   toast.show('Error', { message: 'Ticket token address not found or invalid.' })
+    //   return
+    // }
+    if (nonce === undefined) {
+      toast.show('Error', { message: 'Could not determine account nonce.' })
+      return
+    }
+    if (webauthnCreds.length === 0) {
+      toast.show('Error', { message: 'WebAuthn credentials not found.' })
+      return
+    }
+    // Ensure ticketPriceBigInt is valid (should be > 0n if contract loaded)
+    if (typeof ticketPriceBigInt !== 'bigint' || ticketPriceBigInt <= 0n) {
+      toast.show('Error', { message: 'Invalid or zero ticket price.' })
+      return
+    }
+
+    // If all checks pass, proceed with mutation
+    // Ensure all values are strings for logging
+    const logData = {
+      sender: senderAddress ?? 'undefined',
+      tokenAddress: tokenAddress ?? 'undefined',
+      ticketPrice: ticketPriceBigInt.toString(),
+      recipient: senderAddress ?? 'undefined',
+      nonce: nonce !== undefined ? nonce.toString() : 'undefined',
+      numTickets: numTickets.toString(),
+    }
+    // Removed console.log statements causing persistent TS errors
+
+    try {
+      toast.show('Processing...', { message: 'Submitting transaction...' })
+      // Now TypeScript knows these values are defined and have the correct types
+      await purchaseMutation.mutateAsync({
+        sender: senderAddress,
+        tokenAddress: `0x${tokenAddress}`, // No assertion needed
+        ticketPrice: ticketPriceBigInt, // No assertion needed
+        recipient: senderAddress, // User buys tickets for themselves
+        nonce: nonce, // No assertion needed
+        webauthnCreds: webauthnCreds,
+        // Optional: Add referrer logic if needed
+      })
+      toast.show('Success', { message: `Successfully purchased ${ticketCount} tickets!` })
+      router.push('/play') // Navigate back on success
+    } catch (error: unknown) {
+      // Use unknown for type safety
+      console.error('Failed to purchase tickets:', error)
+      let errorMessage = 'Could not purchase tickets.'
+      // Safely check if error is an object and has message properties
+      if (typeof error === 'object' && error !== null) {
+        errorMessage =
+          (error as { shortMessage?: string }).shortMessage ||
+          (error as { message?: string }).message ||
+          errorMessage
+      }
+      toast.show('Purchase Failed', { message: errorMessage })
+    }
   }
 
   const handleCancel = () => {
@@ -87,8 +242,8 @@ export function BuyTicketsScreen() {
             <YStack gap="$5">
               <YStack gap="$2" ai="center">
                 <Paragraph fontSize="$6" ta="center">
-                  Each /ticket costs {ticketPrice} SEND. How many tickets would you like to
-                  purchase?
+                  Each ticket costs {isLoading ? <Spinner size="small" /> : displayTicketPrice}{' '}
+                  SEND. How many tickets would you like to purchase?
                 </Paragraph>
                 <XStack ai="center" gap="$2">
                   <Timer size="$1" color="$color10" />
@@ -121,7 +276,15 @@ export function BuyTicketsScreen() {
                     fontFamily="$mono"
                     inputMode="numeric"
                     value={ticketCount}
-                    onChangeText={setTicketCount}
+                    // Basic validation: allow only numbers, prevent leading zeros unless it's just "0"
+                    onChangeText={(text) => {
+                      const numericValue = text.replace(/[^0-9]/g, '')
+                      setTicketCount(
+                        numericValue.length > 1 && numericValue.startsWith('0')
+                          ? numericValue.substring(1)
+                          : numericValue || '0' // Ensure it's not empty, default to '0'
+                      )
+                    }}
                     onFocus={() => setIsInputFocused(true)}
                     onBlur={() => setIsInputFocused(false)}
                     autoFocus
@@ -154,7 +317,7 @@ export function BuyTicketsScreen() {
                       >
                         Balance:
                       </Paragraph>
-                      {isLoading ? (
+                      {isLoadingBalance ? ( // Use specific loading flag for balance
                         <Spinner size="small" />
                       ) : (
                         <Paragraph
@@ -164,6 +327,7 @@ export function BuyTicketsScreen() {
                         >
                           {sendCoin
                             ? formatAmount(
+                                // TODO: Use userBalanceBigInt and tokenDecimals for formatting
                                 (Number(sendCoin.balance) / 10 ** sendCoin.decimals).toString(),
                                 10,
                                 sendCoin.formatDecimals ?? 5
@@ -173,11 +337,12 @@ export function BuyTicketsScreen() {
                         </Paragraph>
                       )}
                     </XStack>
-                    {insufficientFunds && !isLoading && (
-                      <Paragraph color={'$error'} size={'$5'}>
-                        Insufficient funds
-                      </Paragraph>
-                    )}
+                    {insufficientFunds &&
+                      !isLoadingBalance && ( // Check specific loading flag
+                        <Paragraph color={'$error'} size={'$5'}>
+                          Insufficient funds
+                        </Paragraph>
+                      )}
                   </YStack>
                 </XStack>
               </YStack>
@@ -186,7 +351,9 @@ export function BuyTicketsScreen() {
                 <Paragraph fontSize="$6" fontWeight="500">
                   Total Cost:
                 </Paragraph>
-                <H3 color="$color12">{totalCost} SEND</H3>
+                <H3 color="$color12">
+                  {isLoading ? <Spinner size="small" /> : displayTotalCost} SEND
+                </H3>
               </XStack>
             </YStack>
           </Card>
@@ -202,10 +369,14 @@ export function BuyTicketsScreen() {
               px="$4"
               py="$4"
               f={2}
-              disabled={isLoading || insufficientFunds || totalCost === 0}
+              disabled={isLoading || insufficientFunds || numTickets <= 0n} // Use combined isLoading and bigint checks
               disabledStyle={{ opacity: 0.5 }}
+              // Add icon for loading state
+              {...(purchaseMutation.isPending && { icon: <Spinner /> })}
             >
-              <Button.Text fontWeight="600">{isLoading ? 'Loading...' : 'Buy Tickets'}</Button.Text>
+              <Button.Text fontWeight="600">
+                {purchaseMutation.isPending ? 'Purchasing...' : 'Buy Tickets'}
+              </Button.Text>
             </Button>
           </XStack>
         </YStack>
