@@ -105,7 +105,7 @@ export function DepositForm() {
   const mutation = useMutation({
     mutationFn: async () => {
       log('formState', form.formState)
-      assert(form.formState.isValid, 'form is not valid')
+      assert(Object.keys(form.formState.errors).length === 0, 'form is not valid')
       assert(uop.isSuccess, 'uop is not success')
 
       uop.data.signature = await signUserOp({
@@ -191,11 +191,9 @@ export function DepositForm() {
     uop.isSuccess &&
     !calls.isPending &&
     !uop.isPending &&
-    mutation.isIdle &&
-    !mutation.isSuccess &&
-    !mutation.isError &&
+    !mutation.isPending &&
     !insufficientAmount &&
-    form.formState.isValid
+    Object.keys(form.formState.errors).length === 0
 
   const validateAndSanitizeAmount = useCallback(
     ({ amount: _amount }: { amount: string | undefined }) => {
