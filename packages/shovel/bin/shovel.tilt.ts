@@ -20,7 +20,9 @@ const blockNumber =
   await $`cast rpc --rpc-url http://127.0.0.1:8546 eth_blockNumber | jq -r . | cast to-dec`
 const chainId = await $`cast chain-id --rpc-url http://127.0.0.1:8546`
 
-await import('./empty-shovel.dev.ts')
+if (!$.env.SHOVEL_SKIP_EMPTY) {
+  await import('./empty-shovel.dev.ts')
+}
 
 await $`docker run --rm \
     --name shovel \
