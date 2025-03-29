@@ -262,6 +262,20 @@
           "isGenerated": false,
           "sequence": false,
           "hasDefaultValue": false
+        },
+        {
+          "name": "send_earn_deposits",
+          "type": "send_earn_deposits",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "send_earn_depositsToactivity",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
         }
       ],
       "uniqueConstraints": [
@@ -7644,6 +7658,226 @@
         }
       ]
     },
+    "send_earn_deposits": {
+      "id": "temporal.send_earn_deposits",
+      "schemaName": "temporal",
+      "tableName": "send_earn_deposits",
+      "fields": [
+        {
+          "id": "temporal.send_earn_deposits.user_id",
+          "name": "user_id",
+          "columnName": "user_id",
+          "type": "uuid",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "temporal.send_earn_deposits.workflow_id",
+          "name": "workflow_id",
+          "columnName": "workflow_id",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "temporal.send_earn_deposits.status",
+          "name": "status",
+          "columnName": "status",
+          "type": "temporal_status",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "temporal.send_earn_deposits.owner",
+          "name": "owner",
+          "columnName": "owner",
+          "type": "bytea",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "temporal.send_earn_deposits.asset",
+          "name": "asset",
+          "columnName": "asset",
+          "type": "numeric",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "temporal.send_earn_deposits.vault",
+          "name": "vault",
+          "columnName": "vault",
+          "type": "bytea",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "temporal.send_earn_deposits.user_op_hash",
+          "name": "user_op_hash",
+          "columnName": "user_op_hash",
+          "type": "bytea",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "temporal.send_earn_deposits.tx_hash",
+          "name": "tx_hash",
+          "columnName": "tx_hash",
+          "type": "bytea",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "temporal.send_earn_deposits.activity_id",
+          "name": "activity_id",
+          "columnName": "activity_id",
+          "type": "int8",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "temporal.send_earn_deposits.error_message",
+          "name": "error_message",
+          "columnName": "error_message",
+          "type": "text",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "temporal.send_earn_deposits.created_at",
+          "name": "created_at",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "temporal.send_earn_deposits.updated_at",
+          "name": "updated_at",
+          "columnName": "updated_at",
+          "type": "timestamptz",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "users",
+          "type": "users",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "send_earn_depositsTousers",
+          "relationFromFields": [
+            "user_id"
+          ],
+          "relationToFields": [
+            "id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "activity",
+          "type": "activity",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "send_earn_depositsToactivity",
+          "relationFromFields": [
+            "activity_id"
+          ],
+          "relationToFields": [
+            "id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "send_earn_deposits_pkey",
+          "fields": [
+            "workflow_id"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
     "send_earn_new_affiliate": {
       "id": "public.send_earn_new_affiliate",
       "schemaName": "public",
@@ -11463,6 +11697,20 @@
           "isGenerated": false,
           "sequence": false,
           "hasDefaultValue": false
+        },
+        {
+          "name": "send_earn_deposits",
+          "type": "send_earn_deposits",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "send_earn_depositsTousers",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
         }
       ],
       "uniqueConstraints": [
@@ -11804,6 +12052,29 @@
         }
       ]
     },
+    "one_time_token_type": {
+      "schemaName": "auth",
+      "values": [
+        {
+          "name": "confirmation_token"
+        },
+        {
+          "name": "email_change_token_current"
+        },
+        {
+          "name": "email_change_token_new"
+        },
+        {
+          "name": "phone_change_token"
+        },
+        {
+          "name": "reauthentication_token"
+        },
+        {
+          "name": "recovery_token"
+        }
+      ]
+    },
     "request_status": {
       "schemaName": "net",
       "values": [
@@ -11934,6 +12205,26 @@
         },
         {
           "name": "pending"
+        }
+      ]
+    },
+    "temporal_status": {
+      "schemaName": "public",
+      "values": [
+        {
+          "name": "confirmed"
+        },
+        {
+          "name": "failed"
+        },
+        {
+          "name": "initialized"
+        },
+        {
+          "name": "sent"
+        },
+        {
+          "name": "submitted"
         }
       ]
     },

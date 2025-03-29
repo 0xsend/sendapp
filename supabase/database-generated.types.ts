@@ -1916,6 +1916,12 @@ export type Database = {
       key_type_enum: "ES256"
       lookup_type_enum: "sendid" | "tag" | "refcode" | "address" | "phone"
       tag_status: "pending" | "confirmed"
+      temporal_status:
+        | "initialized"
+        | "submitted"
+        | "sent"
+        | "confirmed"
+        | "failed"
       verification_type:
         | "tag_registration"
         | "tag_referral"
@@ -1997,6 +2003,66 @@ export type Database = {
           workflow_id?: string
         }
         Relationships: []
+      }
+      send_earn_deposits: {
+        Row: {
+          activity_id: number | null
+          asset: number
+          created_at: string
+          error_message: string | null
+          owner: string
+          status: Database["public"]["Enums"]["temporal_status"]
+          tx_hash: string | null
+          updated_at: string
+          user_id: string
+          user_op_hash: string | null
+          vault: string
+          workflow_id: string
+        }
+        Insert: {
+          activity_id?: number | null
+          asset: number
+          created_at?: string
+          error_message?: string | null
+          owner: string
+          status?: Database["public"]["Enums"]["temporal_status"]
+          tx_hash?: string | null
+          updated_at?: string
+          user_id: string
+          user_op_hash?: string | null
+          vault: string
+          workflow_id: string
+        }
+        Update: {
+          activity_id?: number | null
+          asset?: number
+          created_at?: string
+          error_message?: string | null
+          owner?: string
+          status?: Database["public"]["Enums"]["temporal_status"]
+          tx_hash?: string | null
+          updated_at?: string
+          user_id?: string
+          user_op_hash?: string | null
+          vault?: string
+          workflow_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_activity"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activity"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "send_earn_deposits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

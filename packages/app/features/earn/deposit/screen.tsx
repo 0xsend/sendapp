@@ -12,8 +12,8 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { baseMainnetBundlerClient, entryPointAddress, sendEarnAddress } from '@my/wagmi'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { entryPointAddress, sendEarnAddress } from '@my/wagmi' // Removed baseMainnetBundlerClient
+import { useQueryClient } from '@tanstack/react-query' // Removed useMutation
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { ReferredBy } from 'app/components/ReferredBy'
 import { usdcCoin } from 'app/data/coins'
@@ -27,13 +27,14 @@ import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { signUserOp } from 'app/utils/signUserOp'
 import { toNiceError } from 'app/utils/toNiceError'
+import { api } from 'app/utils/api'
 import { useAccountNonce, useUserOp } from 'app/utils/userop'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import debug from 'debug'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
-import { formatUnits, withRetry } from 'viem'
+import { formatUnits } from 'viem' // Removed withRetry
 import { useChainId } from 'wagmi'
 import { type BRAND, z } from 'zod'
 import { useSendEarnAPY, useSendEarnBalances, useSendEarnCoinBalances } from '../hooks'
@@ -98,16 +99,47 @@ export function DepositForm() {
     [sendAccount?.data?.send_account_credentials]
   )
 
-  // MUTATION DEPOSIT USEROP
-  const [useropState, setUseropState] = useState('')
+  // MUTATION DEPOSIT USEROP via Temporal
   const toast = useToastController()
   const queryClient = useQueryClient()
-  const mutation = useMutation({
-    mutationFn: async () => {
-      log('formState', form.formState)
-      assert(Object.keys(form.formState.errors).length === 0, 'form is not valid')
-      assert(uop.isSuccess, 'uop is not success')
+  // Corrected API path: sendEarn.deposit
+  const depositMutation = api.sendEarn.deposit.useMutation({
+    onMutate: () => {
+      log('sendEarn.deposit.onMutate')
+      // Optionally return context for rollback
+    },
+    onError: (error) => {
+      log('sendEarn.deposit.onError', error)
+      toast.show('Deposit Error', {
+        message: toNiceError(error),
+        preset: 'error',
+      })
+    },
+    onSuccess: (data) => {
+      log('sendEarn.deposit.onSuccess', data)
+      toast.show('Deposit Submitted', {
+        message: `Your deposit is being processed (ID: ${data.workflowId.split('/').pop()})`,
+      })
+      if (!coin.data) return
+      router.push({
+        pathname: `/earn/${coinToParam(coin.data)}`,
+      })
+    },
+    onSettled: () => {
+      log('sendEarn.deposit.onSettled')
+      // Invalidate queries that might be affected by the deposit starting
+      queryClient.invalidateQueries({ queryKey: nonce.queryKey })
+      queryClient.invalidateQueries({ queryKey: tokensQuery.queryKey })
+      queryClient.invalidateQueries({ queryKey: allBalances.queryKey })
+    },
+  })
 
+  const handleDepositSubmit = useCallback(async () => {
+    log('handleDepositSubmit: formState', form.formState)
+    assert(Object.keys(form.formState.errors).length === 0, 'form is not valid')
+    assert(uop.isSuccess, 'uop is not success')
+
+    try {
       uop.data.signature = await signUserOp({
         userOp: uop.data,
         webauthnCreds,
@@ -115,72 +147,28 @@ export function DepositForm() {
         entryPoint: entryPointAddress[chainId],
       })
 
-      setUseropState('Sending transaction...')
-
-      const userOpHash = await baseMainnetBundlerClient.sendUserOperation({
-        userOperation: uop.data,
+      // Pass entryPoint and sendAccountCalls (if needed by API, though current sendEarn doesn't use sendAccountCalls directly)
+      // The current sendEarn.deposit expects userop and entryPoint. sendAccountCalls is in the Zod schema but not used in the mutation logic.
+      await depositMutation.mutateAsync({
+        userop: uop.data,
+        entryPoint: entryPointAddress[chainId],
+        sendAccountCalls: calls.data ?? [], // Pass calls data, even if not used by current API logic, to match schema
       })
-
-      setUseropState('Waiting for confirmation...')
-
-      const receipt = await withRetry(
-        () =>
-          baseMainnetBundlerClient.waitForUserOperationReceipt({
-            hash: userOpHash,
-            timeout: 10000,
-          }),
-        {
-          delay: 100,
-          retryCount: 3,
-        }
-      )
-
-      log('receipt', receipt)
-
-      assert(receipt.success, 'receipt status is not success')
-
-      log('mutationFn', { uop })
-      return
-    },
-    onMutate: (variables) => {
-      // A mutation is about to happen!
-      log('onMutate', variables)
-      setUseropState('Requesting signature...')
-      // Optionally return a context containing data to use when for example rolling back
-      // return { id: 1 }
-    },
-    onError: (error, variables, context) => {
-      // An error happened!
-      log('onError', error, variables, context)
-    },
-    onSuccess: (data, variables, context) => {
-      // Boom baby!
-      log('onSuccess', data, variables, context)
-
-      toast.show('Deposited successfully')
-      if (!coin.data) return
-      router.push({
-        pathname: `/earn/${coinToParam(coin.data)}`,
-      })
-    },
-    onSettled: (data, error, variables, context) => {
-      // Error or success... doesn't matter!
-      log('onSettled', data, error, variables, context)
-      queryClient.invalidateQueries({ queryKey: nonce.queryKey })
-      queryClient.invalidateQueries({ queryKey: tokensQuery.queryKey })
-      queryClient.invalidateQueries({ queryKey: allBalances.queryKey })
-    },
-  })
+    } catch (error) {
+      log('Error during signing or mutation', error)
+      // Error handled by depositMutation.onError
+    }
+  }, [form.formState, uop.isSuccess, uop.data, webauthnCreds, chainId, depositMutation, calls.data])
 
   // DEBUG
   log('uop', uop)
   log('calls', calls)
-  log('mutation', mutation)
+  log('depositMutation', depositMutation)
 
   const insufficientAmount =
     coinBalance.coin?.balance !== undefined &&
     parsedAmount > coinBalance.coin?.balance &&
-    !mutation.isSuccess
+    !depositMutation.isSuccess // Check against new mutation
 
   const canSubmit =
     !coin.isLoading &&
@@ -191,7 +179,7 @@ export function DepositForm() {
     uop.isSuccess &&
     !calls.isPending &&
     !uop.isPending &&
-    !mutation.isPending &&
+    !depositMutation.isPending && // Check against new mutation
     !insufficientAmount &&
     Object.keys(form.formState.errors).length === 0
 
@@ -209,7 +197,8 @@ export function DepositForm() {
         form.clearErrors('amount')
       }
 
-      if (!mutation.isSuccess) {
+      if (!depositMutation.isSuccess) {
+        // Check against new mutation
         setParams(
           {
             ...params,
@@ -219,7 +208,14 @@ export function DepositForm() {
         )
       }
     },
-    [form.clearErrors, form.setError, setParams, coin.data?.decimals, params, mutation.isSuccess]
+    [
+      form.clearErrors,
+      form.setError,
+      setParams,
+      coin.data?.decimals,
+      params,
+      depositMutation.isSuccess,
+    ] // Use new mutation state
   )
 
   // validate and sanitize amount
@@ -286,7 +282,7 @@ export function DepositForm() {
         <SchemaForm
           form={form}
           schema={DepositFormSchema}
-          onSubmit={() => mutation.mutate()}
+          onSubmit={handleDepositSubmit} // Use new handler
           props={{
             amount: {
               fontSize: (() => {
@@ -351,79 +347,65 @@ export function DepositForm() {
                 : undefined,
             areTermsAccepted: hasExistingDeposit,
           }}
-          renderAfter={({ submit }) =>
-            mutation.isSuccess ? (
-              <YStack>
-                <Paragraph color={'$color10'} ta="center" size="$3">
-                  Success. Redirecting...
-                </Paragraph>
-              </YStack>
-            ) : (
-              <YStack>
-                {mutation.isPending ? (
-                  <Fade key="userop-state">
-                    <Paragraph color={'$color10'} ta="center" size="$3">
-                      {useropState}
-                    </Paragraph>
+          renderAfter={({ submit }) => (
+            // Removed mutation.isSuccess check here, success handled by mutation hook
+            <YStack>
+              {depositMutation.isPending ? ( // Check against new mutation
+                <Fade key="userop-state">
+                  <Paragraph color={'$color10'} ta="center" size="$3">
+                    Requesting signature...
+                  </Paragraph>
+                </Fade>
+              ) : null}
+              {/* Error display is handled by toast in depositMutation.onError */}
+              {[calls.error, sendAccount.error, uop.error].filter(Boolean).map((e) =>
+                e ? (
+                  <Fade key={`error-${e.message}`}>
+                    <XStack alignItems="center" jc="center" gap={'$2'} role="alert">
+                      <Paragraph color="$error">{toNiceError(e)}</Paragraph>
+                    </XStack>
                   </Fade>
-                ) : null}
-                {[calls.error, sendAccount.error, uop.error, mutation.error]
-                  .filter(Boolean)
-                  .map((e) =>
-                    e ? (
-                      <Fade key="error-state">
-                        <XStack
-                          alignItems="center"
-                          jc="center"
-                          gap={'$2'}
-                          key={e.message}
-                          role="alert"
-                        >
-                          <Paragraph color="$error">{toNiceError(e)}</Paragraph>
-                        </XStack>
-                      </Fade>
-                    ) : null
-                  )}
-                <SubmitButton
-                  theme="green"
-                  onPress={() => {
-                    if (!areTermsAccepted) {
-                      form.setError(
-                        'areTermsAccepted',
-                        {
-                          type: 'required',
-                        },
-                        {
-                          shouldFocus: true,
-                        }
-                      )
-                      return
-                    }
-                    submit()
-                  }}
-                  py={'$5'}
-                  br={'$4'}
-                  disabledStyle={{ opacity: 0.5 }}
-                  disabled={!canSubmit}
-                  iconAfter={mutation.isPending ? <Spinner size="small" /> : undefined}
-                >
-                  {[calls.isLoading, sendAccount.isLoading, uop.isLoading].some((p) => p) &&
-                  !mutation.isPending ? (
-                    <Spinner size="small" />
-                  ) : (
-                    <Button.Text
-                      size={'$5'}
-                      fontWeight={'500'}
-                      fontFamily={'$mono'}
-                      color={'$black'}
-                    >
-                      CONFIRM DEPOSIT
-                    </Button.Text>
-                  )}
-                </SubmitButton>
-              </YStack>
-            )
-          }
+                ) : null
+              )}
+              <SubmitButton
+                theme="green"
+                onPress={() => {
+                  if (!areTermsAccepted) {
+                    form.setError(
+                      'areTermsAccepted',
+                      {
+                        type: 'required',
+                      },
+                      {
+                        shouldFocus: true,
+                      }
+                    )
+                    return
+                  }
+                  submit()
+                }}
+                py={'$5'}
+                br={'$4'}
+                disabledStyle={{ opacity: 0.5 }}
+                disabled={!canSubmit}
+                iconAfter={depositMutation.isPending ? <Spinner size="small" /> : undefined} // Check against new mutation
+              >
+                {/* Simplified loading state */}
+                {[
+                  calls.isLoading,
+                  sendAccount.isLoading,
+                  uop.isLoading,
+                  depositMutation.isPending,
+                ].some((p) => p) ? (
+                  <Spinner size="small" />
+                ) : (
+                  <Button.Text size={'$5'} fontWeight={'500'} fontFamily={'$mono'} color={'$black'}>
+                    CONFIRM DEPOSIT
+                  </Button.Text>
+                )}
+              </SubmitButton>
+            </YStack>
+          )}
         >
           {({ amount, areTermsAccepted }) => (
             <YStack width={'100%'} gap={'$5'}>
