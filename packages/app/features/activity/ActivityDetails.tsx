@@ -107,12 +107,12 @@ export const ActivityDetails = ({
                         return null
                       case isSendEarnEvent(activity):
                         return null
-                      case subText === null:
-                        return <Text>{activityPhrase}</Text>
                       case isERC20TransferToSendEarn || isERC20TransferFromSendEarn:
                         return null
                       case !activityPhrase:
                         return null
+                      case subText === null:
+                        return <Text>{activityText}</Text>
                       default:
                         return (
                           <Text
