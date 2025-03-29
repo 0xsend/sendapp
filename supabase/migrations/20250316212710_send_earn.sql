@@ -528,7 +528,7 @@ $$;
 
 -- Create trigger on send_earn_deposit table
 CREATE TRIGGER aac_insert_referral_on_deposit
-BEFORE INSERT ON public.send_earn_deposit
+AFTER INSERT ON public.send_earn_deposit
 FOR EACH ROW
 EXECUTE FUNCTION private.insert_referral_on_deposit();
 
@@ -595,7 +595,7 @@ $$;
 
 -- Create trigger on send_earn_new_affiliate table
 CREATE TRIGGER insert_referral_on_new_affiliate
-BEFORE INSERT ON public.send_earn_new_affiliate
+AFTER INSERT ON public.send_earn_new_affiliate
 FOR EACH ROW
 EXECUTE FUNCTION private.insert_referral_on_new_affiliate();
 
@@ -663,6 +663,6 @@ $$;
 
 -- Create trigger on send_earn_create table
 CREATE TRIGGER insert_referral_on_create
-BEFORE INSERT ON public.send_earn_create
+AFTER INSERT ON public.send_earn_create
 FOR EACH ROW
 EXECUTE FUNCTION private.insert_referral_on_create();
