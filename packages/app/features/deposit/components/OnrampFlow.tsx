@@ -93,7 +93,12 @@ export function OnrampFlow({
         onPress={form.handleSubmit(handleSubmit)}
       >
         <XStack w="100%" gap="$2.5" ai="center" jc="center">
-          <LinkableButton.Text fontWeight="500" tt="uppercase" $theme-dark={{ col: '$color0' }}>
+          <LinkableButton.Text
+            testID="onramp-button"
+            fontWeight="500"
+            tt="uppercase"
+            $theme-dark={{ col: '$color0' }}
+          >
             {isLoading ? 'PROCESSING...' : 'BUY NOW'}
           </LinkableButton.Text>
         </XStack>
