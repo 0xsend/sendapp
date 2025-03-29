@@ -179,7 +179,7 @@ for each row
 execute function private.aaa_filter_send_earn_deposit_with_no_send_account_created();
 
 -- Trigger function for send_earn_deposit
-CREATE OR REPLACE FUNCTION private.aab_send_earn_deposit_trigger_insert_activity()
+CREATE OR REPLACE FUNCTION private.send_earn_deposit_trigger_insert_activity()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -230,10 +230,10 @@ $$;
 CREATE TRIGGER aab_send_earn_deposit_trigger_insert_activity
 AFTER INSERT ON public.send_earn_deposit
 FOR EACH ROW
-EXECUTE FUNCTION private.aab_send_earn_deposit_trigger_insert_activity();
+EXECUTE FUNCTION private.send_earn_deposit_trigger_insert_activity();
 
 -- Also add delete triggers to maintain consistency
-CREATE OR REPLACE FUNCTION private.aaa_send_earn_deposit_trigger_delete_activity()
+CREATE OR REPLACE FUNCTION private.send_earn_deposit_trigger_delete_activity()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -249,7 +249,7 @@ $$;
 CREATE TRIGGER aaa_send_earn_deposit_trigger_delete_activity
 AFTER DELETE ON public.send_earn_deposit
 FOR EACH ROW
-EXECUTE FUNCTION private.aaa_send_earn_deposit_trigger_delete_activity();
+EXECUTE FUNCTION private.send_earn_deposit_trigger_delete_activity();
 
 create table "public"."send_earn_withdraw" (
     "id" bigint not null generated always as identity,
@@ -310,7 +310,7 @@ to public using (
 set check_function_bodies = off;
 
 -- create trigger function for filtering send_earn_withdraw with no send_account_created
-create or replace function private.aaa_filter_send_earn_withdraw_with_no_send_account_created()
+create or replace function private.filter_send_earn_withdraw_with_no_send_account_created()
  returns trigger
  language plpgsql
  security definer
@@ -334,11 +334,11 @@ $$;
 create trigger aaa_filter_send_earn_withdraw_with_no_send_account_created
 before insert on public.send_earn_withdraw
 for each row
-execute function private.aaa_filter_send_earn_withdraw_with_no_send_account_created();
+execute function private.filter_send_earn_withdraw_with_no_send_account_created();
 
 
 -- Trigger function for send_earn_withdraw
-CREATE OR REPLACE FUNCTION private.aab_send_earn_withdraw_trigger_insert_activity()
+CREATE OR REPLACE FUNCTION private.send_earn_withdraw_trigger_insert_activity()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -389,9 +389,9 @@ $$;
 CREATE TRIGGER aab_send_earn_withdraw_trigger_insert_activity
 AFTER INSERT ON public.send_earn_withdraw
 FOR EACH ROW
-EXECUTE FUNCTION private.aab_send_earn_withdraw_trigger_insert_activity();
+EXECUTE FUNCTION private.send_earn_withdraw_trigger_insert_activity();
 
-CREATE OR REPLACE FUNCTION private.aaa_send_earn_withdraw_trigger_delete_activity()
+CREATE OR REPLACE FUNCTION private.send_earn_withdraw_trigger_delete_activity()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -407,7 +407,7 @@ $$;
 CREATE TRIGGER aaa_send_earn_withdraw_trigger_delete_activity
 AFTER DELETE ON public.send_earn_withdraw
 FOR EACH ROW
-EXECUTE FUNCTION private.aaa_send_earn_withdraw_trigger_delete_activity();
+EXECUTE FUNCTION private.send_earn_withdraw_trigger_delete_activity();
 
 
 -- view so users can see their earn balances by vault
@@ -527,7 +527,7 @@ END;
 $$;
 
 -- Create trigger on send_earn_deposit table
-CREATE TRIGGER insert_referral_on_deposit
+CREATE TRIGGER aac_insert_referral_on_deposit
 BEFORE INSERT ON public.send_earn_deposit
 FOR EACH ROW
 EXECUTE FUNCTION private.insert_referral_on_deposit();
