@@ -182,33 +182,36 @@ execute function private.aaa_filter_send_earn_deposit_with_no_send_account_creat
 CREATE OR REPLACE FUNCTION private.send_earn_deposit_trigger_insert_activity()
 RETURNS TRIGGER
 LANGUAGE plpgsql
-SECURITY DEFINER
+SECURITY DEFINER -- Runs as the function owner (postgres)
 AS $$
 DECLARE
     _owner_user_id uuid;
     _data jsonb;
+    _workflow_id TEXT;
 BEGIN
     -- Select send app info for owner address (the Send account owner)
+    -- Requires SELECT on public.send_accounts
     SELECT user_id INTO _owner_user_id
-    FROM send_accounts
+    FROM public.send_accounts
     WHERE address = concat('0x', encode(NEW.owner, 'hex'))::citext;
 
     -- Build data object with the same pattern as send_account_transfers
     -- Cast numeric values to text to avoid losing precision
     _data := json_build_object(
-        'log_addr', NEW.log_addr,
-        'sender', NEW.sender,
-        'owner', NEW.owner,
+        'log_addr', encode(NEW.log_addr, 'hex'), -- Encode bytea for JSON
+        'sender', encode(NEW.sender, 'hex'),     -- Encode bytea for JSON
+        'owner', encode(NEW.owner, 'hex'),       -- Encode bytea for JSON
         'assets', NEW.assets::text,
         'shares', NEW.shares::text,
-        'tx_hash', NEW.tx_hash,
+        'tx_hash', encode(NEW.tx_hash, 'hex'),   -- Encode bytea for JSON
         'block_num', NEW.block_num::text,
         'tx_idx', NEW.tx_idx::text,
         'log_idx', NEW.log_idx::text
     );
 
     -- Insert into activity table - notice the similar pattern to send_account_transfers
-    INSERT INTO activity (event_name, event_id, from_user_id, to_user_id, data, created_at)
+    -- Requires INSERT/UPDATE on public.activity
+    INSERT INTO public.activity (event_name, event_id, from_user_id, to_user_id, data, created_at)
     VALUES (
         'send_earn_deposit',
         NEW.event_id,
@@ -218,11 +221,29 @@ BEGIN
         to_timestamp(NEW.block_time) at time zone 'UTC'
     )
     ON CONFLICT (event_name, event_id) DO UPDATE SET
-        from_user_id = _owner_user_id,
-        data = _data,
-        created_at = to_timestamp(NEW.block_time) at time zone 'UTC';
+        from_user_id = COALESCE(EXCLUDED.from_user_id, activity.from_user_id), -- Keep existing if new is NULL
+        to_user_id = EXCLUDED.to_user_id, -- Allow update if needed, though NULL here
+        data = EXCLUDED.data,
+        created_at = EXCLUDED.created_at;
 
-    RETURN NEW;
+    -- *** CLEANUP LOGIC ***
+    -- Find the workflow_id associated with this transaction hash
+    -- Requires SELECT on temporal.send_earn_deposits
+    SELECT workflow_id INTO _workflow_id
+    FROM temporal.send_earn_deposits
+    WHERE tx_hash = NEW.tx_hash
+    ORDER BY created_at DESC
+    LIMIT 1;
+
+    -- If a corresponding workflow_id was found, delete the pending activity
+    IF _workflow_id IS NOT NULL THEN
+        DELETE FROM public.activity
+        WHERE event_name = 'temporal_send_earn_deposit'
+          AND event_id = _workflow_id;
+    END IF;
+    -- *** END CLEANUP LOGIC ***
+
+    RETURN NEW; -- Keep RETURN NEW as per original function definition in 20250328202927_send_earn.sql
 END;
 $$;
 
@@ -664,3 +685,106 @@ CREATE TRIGGER insert_referral_on_create
 AFTER INSERT ON public.send_earn_create
 FOR EACH ROW
 EXECUTE FUNCTION private.insert_referral_on_create();
+
+-- Function to update updated_at column
+CREATE OR REPLACE FUNCTION public.set_current_timestamp_updated_at()
+RETURNS TRIGGER AS $$
+DECLARE
+  _new record;
+BEGIN
+  _new := NEW;
+  _new."updated_at" = NOW();
+  RETURN _new;
+END;
+$$ LANGUAGE plpgsql;
+
+create type temporal_status as enum (
+    'initialized',
+    'submitted',
+    'sent',
+    'confirmed',
+    'failed'
+);
+
+-- Create the temporal.send_earn_deposits table
+CREATE TABLE temporal.send_earn_deposits (
+    user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    workflow_id text PRIMARY KEY,
+    status temporal_status NOT NULL DEFAULT 'initialized',
+    owner bytea NOT NULL,
+    assets numeric NOT NULL,
+    vault bytea NOT NULL,
+    user_op_hash bytea,
+    tx_hash bytea,
+    activity_id bigint,
+    error_message text,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- Add indexes
+CREATE INDEX idx_temporal_send_earn_deposits_created_at ON temporal.send_earn_deposits(created_at);
+CREATE INDEX idx_temporal_send_earn_deposits_owner ON temporal.send_earn_deposits(owner);
+CREATE INDEX idx_temporal_send_earn_deposits_tx_hash ON temporal.send_earn_deposits(tx_hash);
+CREATE INDEX idx_temporal_send_earn_deposits_user_id ON temporal.send_earn_deposits(user_id);
+CREATE INDEX idx_temporal_send_earn_deposits_activity_id ON temporal.send_earn_deposits(activity_id);
+
+-- Add foreign key constraint to public.activity
+ALTER TABLE temporal.send_earn_deposits
+ADD CONSTRAINT fk_activity
+FOREIGN KEY (activity_id) REFERENCES public.activity(id) ON DELETE CASCADE;
+
+-- Add trigger to automatically update updated_at
+CREATE TRIGGER set_temporal_send_earn_deposits_updated_at
+BEFORE UPDATE ON temporal.send_earn_deposits
+FOR EACH ROW
+EXECUTE FUNCTION public.set_current_timestamp_updated_at();
+
+-- Trigger function to insert pending activity
+-- Needs access to public.activity and public.chain_addresses
+CREATE OR REPLACE FUNCTION temporal.temporal_deposit_insert_pending_activity()
+RETURNS TRIGGER AS $$
+DECLARE
+  inserted_activity_id BIGINT;
+  owner_user_id UUID;
+BEGIN
+  -- Attempt to find the user_id based on the owner address
+  -- Requires SELECT permission on public.chain_addresses for the function executor (service_role or postgres)
+  SELECT user_id INTO owner_user_id
+  FROM public.send_accounts
+  WHERE address = concat('0x', encode(NEW.owner, 'hex'))::citext
+  LIMIT 1;
+
+  if owner_user_id is null then
+    return null;
+  end if;
+
+  -- Insert into public.activity
+  INSERT INTO public.activity (event_name, event_id, data, from_user_id)
+  VALUES (
+    'temporal_send_earn_deposit', -- Correct event name
+    NEW.workflow_id,
+    jsonb_build_object(
+      'owner', NEW.owner,
+      'asset', NEW.asset::text,
+      'vault', NEW.vault,
+      'workflow_id', NEW.workflow_id
+    ),
+    owner_user_id -- Use the looked-up user_id or NULL if not found
+  )
+  RETURNING id INTO inserted_activity_id;
+
+  -- Update the temporal.send_earn_deposits row with the new activity_id
+  UPDATE temporal.send_earn_deposits
+  SET activity_id = inserted_activity_id
+  WHERE workflow_id = NEW.workflow_id;
+
+  RETURN NULL; -- AFTER triggers should return NULL
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Create the trigger
+CREATE TRIGGER aaa_temporal_deposit_insert_pending_activity
+AFTER INSERT ON temporal.send_earn_deposits
+FOR EACH ROW
+EXECUTE FUNCTION temporal.temporal_deposit_insert_pending_activity();

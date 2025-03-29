@@ -6,6 +6,7 @@ import { distributionRouter } from './distribution'
 import { tagRouter } from './tag'
 import { secretShopRouter } from './secretShop'
 import { sendAccountRouter } from './sendAccount'
+import { sendEarnRouter } from './sendEarn'
 import { temporalRouter } from './temporal'
 import { accountRecoveryRouter } from './account-recovery/router'
 import { swapRouter } from './swap/router'
@@ -18,6 +19,7 @@ export const appRouter = createTRPCRouter({
   distribution: distributionRouter,
   secretShop: secretShopRouter,
   sendAccount: sendAccountRouter,
+  sendEarn: sendEarnRouter,
   temporal: temporalRouter,
   swap: swapRouter,
 })
