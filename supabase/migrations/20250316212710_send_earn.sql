@@ -477,12 +477,10 @@ DECLARE
   v_referrer_id UUID;
   v_affiliate_address bytea;
 BEGIN
-
   -- Find the referred_id (user who made the deposit)
   SELECT user_id INTO v_referred_id
   FROM send_accounts
   WHERE address = lower(concat('0x', encode(NEW.owner, 'hex'::text)))::citext;
-
 
   -- Skip if we can't find the referred user
   IF v_referred_id IS NULL THEN
