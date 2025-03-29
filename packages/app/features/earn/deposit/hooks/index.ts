@@ -28,7 +28,10 @@ export function useReferrerVault(): UseQueryReturnType<`0x${string}` | null> {
 
   return useQuery({
     queryKey: ['referrerVault', { supabase, referredBy, referrer }] as const,
-    queryFn: async ({ queryKey: [, { supabase, referredBy, referrer }], signal }) => {
+    queryFn: async ({
+      queryKey: [, { supabase, referredBy, referrer }],
+      signal,
+    }): Promise<`0x${string}` | null> => {
       throwIf(referredBy.isError)
       throwIf(referrer.isError)
       // use referredBy ahead of referrer
@@ -50,7 +53,7 @@ export function useReferrerVault(): UseQueryReturnType<`0x${string}` | null> {
 
       const affiliateVault = AffiliateVaultSchema.parse(data)
 
-      return affiliateVault?.send_earn_affiliate_vault ?? null
+      return affiliateVault?.send_earn_affiliate_vault?.send_earn ?? null
     },
     enabled: referredBy.isFetched && referrer.isFetched,
   })
