@@ -210,7 +210,7 @@ export function DepositForm() {
       } else {
         form.clearErrors('amount')
       }
-      form.trigger('amount')
+
       if (!mutation.isSuccess) {
         setParams(
           {
@@ -221,15 +221,7 @@ export function DepositForm() {
         )
       }
     },
-    [
-      form.clearErrors,
-      form.setError,
-      setParams,
-      coin.data?.decimals,
-      params,
-      form.trigger,
-      mutation.isSuccess,
-    ]
+    [form.clearErrors, form.setError, setParams, coin.data?.decimals, params, mutation.isSuccess]
   )
 
   // validate and sanitize amount
@@ -237,6 +229,7 @@ export function DepositForm() {
     const subscription = form.watch(({ amount: _amount }) => {
       validateAndSanitizeAmount({ amount: _amount })
     })
+
     return () => subscription.unsubscribe()
   }, [form.watch, validateAndSanitizeAmount])
 
@@ -250,14 +243,12 @@ export function DepositForm() {
     if (areTermsAccepted && form.formState.errors.areTermsAccepted) {
       form.clearErrors('areTermsAccepted')
     }
-    form.trigger('areTermsAccepted')
   }, [
     form.clearErrors,
     areTermsAccepted,
     form.formState.errors.areTermsAccepted,
     hasExistingDeposit,
     form.setValue,
-    form.trigger,
   ])
 
   // use deposit vault if it exists, or the default vault for the asset
