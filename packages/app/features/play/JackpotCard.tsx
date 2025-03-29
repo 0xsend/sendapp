@@ -7,9 +7,7 @@ import {
   BigHeading,
   styled,
   Card,
-  H2,
   H3,
-  Button,
   Spinner, // Added Spinner
 } from '@my/ui'
 import { useEffect, useState, useMemo } from 'react' // Added useMemo

@@ -2,27 +2,24 @@ import {
   Paragraph,
   XStack,
   YStack,
-  Stack,
   Spinner,
   Card,
   H3,
   Input,
   Button,
-  useMedia,
   useSafeAreaInsets,
   useToastController, // Added for notifications
 } from '@my/ui'
 import { useState, useMemo } from 'react' // Added useMemo
 import { useRouter } from 'solito/router'
-import { IconGame } from 'app/components/icons'
-import { AlertCircle, Timer } from '@tamagui/lucide-icons'
+import { Timer } from '@tamagui/lucide-icons'
 import { usePurchaseJackpotTicketMutation } from './usePurchaseJackpotTicketMutation' // Import the mutation hook
 import {
   useReadBaseJackpotTicketPrice,
   useReadBaseJackpotToken,
   useReadBaseJackpotTokenDecimals, // Need decimals for parsing
 } from '@my/wagmi/contracts/base-jackpot' // Import read hooks
-import { parseUnits, formatUnits as formatUnitsViem, isAddress } from 'viem' // Import parseUnits, rename formatUnits, add isAddress
+import { formatUnits as formatUnitsViem } from 'viem' // Import parseUnits, rename formatUnits, add isAddress
 import { TopNav } from 'app/components/TopNav'
 import { HomeLayout } from 'app/features/home/layout.web'
 // TODO: Replace useCoins with a hook that provides the user's SendAccount address, nonce, and webauthn credentials
@@ -35,7 +32,6 @@ export function BuyTicketsScreen() {
   const router = useRouter()
   const toast = useToastController()
   const { bottom } = useSafeAreaInsets()
-  const media = useMedia()
   const [ticketCount, setTicketCount] = useState('1')
   const [isInputFocused, setIsInputFocused] = useState(false)
 
@@ -178,18 +174,6 @@ export function BuyTicketsScreen() {
       toast.show('Error', { message: 'Invalid or zero ticket price.' })
       return
     }
-
-    // If all checks pass, proceed with mutation
-    // Ensure all values are strings for logging
-    const logData = {
-      sender: senderAddress ?? 'undefined',
-      tokenAddress: tokenAddress ?? 'undefined',
-      ticketPrice: ticketPriceBigInt.toString(),
-      recipient: senderAddress ?? 'undefined',
-      nonce: nonce !== undefined ? nonce.toString() : 'undefined',
-      numTickets: numTickets.toString(),
-    }
-    // Removed console.log statements causing persistent TS errors
 
     try {
       toast.show('Processing...', { message: 'Submitting transaction...' })

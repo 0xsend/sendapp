@@ -4,7 +4,6 @@ import {
   entryPointAddress,
   sendAccountAbi,
   tokenPaymasterAddress,
-  // Assuming sendAccountAbi is exported from @my/wagmi
 } from '@my/wagmi'
 import { baseJackpotAbi, baseJackpotAddress } from '@my/wagmi/contracts/base-jackpot' // Import jackpot contract details
 import { useMutation, type UseMutationResult } from '@tanstack/react-query'
@@ -13,7 +12,7 @@ import {
   type UserOperation,
   type GetUserOperationReceiptReturnType,
 } from 'permissionless'
-import { encodeFunctionData, erc20Abi, type Hex, type Address, isAddress } from 'viem'
+import { encodeFunctionData, erc20Abi, type Address, isAddress } from 'viem'
 import { assert } from '../../utils/assert'
 import { byteaToBase64 } from '../../utils/byteaToBase64'
 import { throwNiceError } from '../../utils/userop'
