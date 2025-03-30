@@ -47,7 +47,7 @@ export const models: SeedClientOptions['models'] = {
       address: () => privateKeyToAddress(generatePrivateKey()),
     },
   },
-  send_account_transfers: {
+  public_send_account_transfers: {
     data: {
       src_name: 'base_logs',
       ig_name: 'send_account_transfers',

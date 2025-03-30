@@ -1,4 +1,7 @@
 {
   "extends": "../../tsconfig.base.json",
-  "include": ["bin", "src"]
+  "include": ["bin", "src"],
+  "compilerOptions": {
+    "noEmit": true
+  }
 }

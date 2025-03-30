@@ -12,6 +12,7 @@
     "./models": "./src/models.ts"
   },
   "scripts": {
+    "lint": "tsc",
     "seed": "DRY=0 bunx tsx ./bin/seed.ts",
     "restore": "bun run ./bin/snaplet.ts --restore",
     "sync": "bunx @snaplet/seed sync",
@@ -22,6 +23,7 @@
     "@snaplet/seed": "^0.98.0",
     "@snaplet/snapshot": "^0.93.2",
     "@types/pg": "^8",
+    "typescript": "^5.5.3",
     "zx": "^8.1.2"
   },
   "dependencies": {
