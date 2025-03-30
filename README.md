@@ -21,13 +21,12 @@ Send offers an alternative: a user-first, non-custodial app where you stay in co
 More info here: https://info.send.it/send-docs
 
 ## What are we currently working on?
-1. Consistently improving the onboarding, UX, and our reward program.
-3. Send Earn - powered by Moonwell and Morpho
+1. Send UX: improve our onboarding, UX, and our SEND token experiences.
+3. Send Earn - earn through Moonwell and Morpho immutable vaults
 4. Send Swaps - swap between assets
-5. Send Card - Use a debit card to spend your stables
-6. SendPot - onchain consumer games powered by Megapot
-7. EoA support with EIP 7702
-8. Interproabiliy across the superchain
+5. Send Card - spend stables with a debit card
+6. Send Pot - play simple onchain consumer games.
+7. Send Interporability: add EOA support with EIP-7702 and SuperchainERC20 support
 
 ## Contributing
 
