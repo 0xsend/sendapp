@@ -22,13 +22,13 @@ SELECT has_index('temporal', 'send_earn_deposits', 'idx_temporal_send_earn_depos
 -- Prepare data for insert
 SELECT lives_ok(
     $$
-        INSERT INTO temporal.send_earn_deposits (user_id, workflow_id, status, owner, asset, vault)
+        INSERT INTO temporal.send_earn_deposits (user_id, workflow_id, status, owner, assets, vault)
         VALUES (
             'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
             'test-workflow-1',
             'initialized',
             '\x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed', -- owner
-            1000000, -- asset (1 USDC)
+            1000000, -- assets (1 USDC)
             '\x42cd8732570621c426f55aC16dB1e2997086817a' -- vault
         );
     $$,
@@ -65,13 +65,13 @@ SELECT is(
 -- Prepare data: Insert another temporal record and its corresponding send_earn_deposit
 SELECT lives_ok(
     $$
-        INSERT INTO temporal.send_earn_deposits (user_id, workflow_id, status, owner, asset, vault, tx_hash)
+        INSERT INTO temporal.send_earn_deposits (user_id, workflow_id, status, owner, assets, vault, tx_hash)
         VALUES (
             'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
             'test-workflow-2',
             'sent',
             '\x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed', -- owner
-            1000000, -- asset (1 USDC)
+            1000000, -- assets (1 USDC)
             '\x42cd8732570621c426f55aC16dB1e2997086817a', -- vault
             '\x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' -- example tx_hash
         );

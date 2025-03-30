@@ -7720,9 +7720,9 @@
           "maxLength": null
         },
         {
-          "id": "temporal.send_earn_deposits.asset",
-          "name": "asset",
-          "columnName": "asset",
+          "id": "temporal.send_earn_deposits.assets",
+          "name": "assets",
+          "columnName": "assets",
           "type": "numeric",
           "isRequired": true,
           "kind": "scalar",

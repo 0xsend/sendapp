@@ -762,15 +762,15 @@ BEGIN
   -- Insert into public.activity
   INSERT INTO public.activity (event_name, event_id, data, from_user_id)
   VALUES (
-    'temporal_send_earn_deposit', -- Correct event name
+    'temporal_send_earn_deposit',
     NEW.workflow_id,
     jsonb_build_object(
       'owner', NEW.owner,
-      'asset', NEW.asset::text,
+      'assets', NEW.assets::text,
       'vault', NEW.vault,
       'workflow_id', NEW.workflow_id
     ),
-    owner_user_id -- Use the looked-up user_id or NULL if not found
+    owner_user_id
   )
   RETURNING id INTO inserted_activity_id;
 
