@@ -6671,6 +6671,7 @@ __metadata:
     app: "workspace:*"
     cbor: "npm:^9.0.1"
     debug: "npm:^4.3.6"
+    dotenv: "npm:^16.4.7"
     dotenv-cli: "npm:^7.3.0"
     extract-zip: "npm:^2.0.1"
     jsonwebtoken: "npm:^9.0.2"
@@ -18735,6 +18736,13 @@ __metadata:
   version: 16.4.1
   resolution: "dotenv@npm:16.4.1"
   checksum: 10/8da20250633703686961004df3ea81b1f81e16fbe873372050676f54ca4053172d0589aae902e683eb575884d56b6bc89fe48bbac5e1e0bef606a061389ca33c
+  languageName: node
+  linkType: hard
+
+"dotenv@npm:^16.4.7":
+  version: 16.4.7
+  resolution: "dotenv@npm:16.4.7"
+  checksum: 10/f13bfe97db88f0df4ec505eeffb8925ec51f2d56a3d0b6d916964d8b4af494e6fb1633ba5d09089b552e77ab2a25de58d70259b2c5ed45ec148221835fc99a0c
   languageName: node
   linkType: hard
 
