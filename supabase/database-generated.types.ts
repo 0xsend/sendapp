@@ -1870,7 +1870,7 @@ export type Database = {
       send_earn_deposits: {
         Row: {
           activity_id: number | null
-          asset: number
+          assets: number
           created_at: string
           error_message: string | null
           owner: string
@@ -1884,7 +1884,7 @@ export type Database = {
         }
         Insert: {
           activity_id?: number | null
-          asset: number
+          assets: number
           created_at?: string
           error_message?: string | null
           owner: string
@@ -1898,7 +1898,7 @@ export type Database = {
         }
         Update: {
           activity_id?: number | null
-          asset?: number
+          assets?: number
           created_at?: string
           error_message?: string | null
           owner?: string
