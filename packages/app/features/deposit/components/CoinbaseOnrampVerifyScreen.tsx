@@ -1,8 +1,9 @@
-import { Spinner, Text, YStack, Card, XStack, Button } from '@my/ui'
+import { FadeCard, Paragraph, Spinner, YStack } from '@my/ui'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useEffect } from 'react'
 import { fetchOnrampTransactionStatus } from '@coinbase/onchainkit/fund'
 import debug from 'debug'
+import { useThemeSetting } from '@tamagui/next-theme'
 
 const log = debug('app:features:deposit:components:CoinbaseOnrampVerifyScreen')
 const CHECK_INTERVAL_MS = 5000
@@ -16,6 +17,8 @@ export function CoinbaseOnrampVerifyScreen({
   onSuccess: () => void
 }) {
   const { data: sendAccount } = useSendAccount()
+  const { resolvedTheme } = useThemeSetting()
+  const isDarkTheme = resolvedTheme?.startsWith('dark')
 
   useEffect(() => {
     // Set a timer that will trigger onFailure after MAX_TIMEOUT_MS
@@ -72,18 +75,21 @@ export function CoinbaseOnrampVerifyScreen({
   }, [sendAccount, onSuccess, onFailure])
 
   return (
-    <YStack width="100%" $gtSm={{ width: 600 }} gap="$4">
-      <Card bc="$color1" width="100%" p="$6">
-        <YStack ai="center" gap="$4">
-          <Spinner size="large" color="$primary" />
-          <Text fontSize="$8" fontWeight="600" ta="center">
-            Transaction Pending
-          </Text>
-          <Text color="$gray11" ta="center">
-            Coinbase is verifying your payment. This page will redirect when complete.
-          </Text>
-        </YStack>
-      </Card>
-    </YStack>
+    <FadeCard ai={'center'} testID="success">
+      <Spinner size="large" color={isDarkTheme ? '$primary' : '$color12'} />
+      <YStack ai={'center'} gap={'$2'}>
+        <Paragraph size={'$8'} fontWeight={500} $gtLg={{ size: '$9' }} ta={'center'}>
+          Transaction Pending
+        </Paragraph>
+        <Paragraph
+          ta={'center'}
+          size={'$5'}
+          color={'$lightGrayTextField'}
+          $theme-light={{ color: '$darkGrayTextField' }}
+        >
+          Coinbase is verifying your payment. This page will redirect when complete.
+        </Paragraph>
+      </YStack>
+    </FadeCard>
   )
 }
