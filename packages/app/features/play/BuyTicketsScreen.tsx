@@ -2,31 +2,34 @@ import {
   Paragraph,
   XStack,
   YStack,
+  H4,
   Spinner,
   Card,
   H3,
   Input,
   Button,
   useSafeAreaInsets,
-  useToastController, // Added for notifications
+  useToastController,
 } from '@my/ui'
-import { useState, useMemo } from 'react' // Added useMemo
+import { assert } from 'app/utils/assert'
+import { useState, useMemo } from 'react'
 import { useRouter } from 'solito/router'
 import { Timer } from '@tamagui/lucide-icons'
-import { usePurchaseJackpotTicketMutation } from './usePurchaseJackpotTicketMutation' // Import the mutation hook
+import { usePurchaseJackpotTicket } from './usePurchaseJackpotTicketMutation'
 import {
   useReadBaseJackpotTicketPrice,
   useReadBaseJackpotToken,
-  useReadBaseJackpotTokenDecimals, // Need decimals for parsing
-} from '@my/wagmi/contracts/base-jackpot' // Import read hooks
-import { formatUnits as formatUnitsViem } from 'viem' // Import parseUnits, rename formatUnits, add isAddress
+  useReadBaseJackpotTokenDecimals,
+} from '@my/wagmi/contracts/base-jackpot'
+import { formatUnits } from 'viem'
 import { TopNav } from 'app/components/TopNav'
 import { HomeLayout } from 'app/features/home/layout.web'
-import { useSendAccount } from 'app/utils/send-accounts' // Import the hook
-import { useAccountNonce } from 'app/utils/userop' // Import the nonce hook
-import { useCoins } from 'app/provider/coins' // Keep for balance display for now
+import { useSendAccount } from 'app/utils/send-accounts'
+import { useAccountNonce } from 'app/utils/userop'
+import { useSendUserOpMutation } from 'app/utils/sendUserOp'
+import { useCoins } from 'app/provider/coins'
 import formatAmount from 'app/utils/formatAmount'
-import type { Address } from 'viem' // Re-add Address type import if needed, or ensure it's imported elsewhere
+import type { Address } from 'viem'
 
 export function BuyTicketsScreen() {
   const router = useRouter()
@@ -43,7 +46,6 @@ export function BuyTicketsScreen() {
   // --- Fetch User Account Data ---
   const { data: sendAccount, isLoading: isLoadingUser } = useSendAccount()
   const senderAddress = sendAccount?.address
-  // Fetch nonce using the dedicated hook
   const {
     data: fetchedNonce,
     isLoading: isLoadingNonce,
@@ -51,10 +53,9 @@ export function BuyTicketsScreen() {
   } = useAccountNonce({
     sender: senderAddress,
   })
-  const webauthnCreds = sendAccount?.send_account_credentials ?? [] // Assuming credentials are here
 
   // --- Get SEND Balance (keep for display) ---
-  const { coins, isLoading: isLoadingBalance } = useCoins() // Renamed original isLoading
+  const { coins, isLoading: isLoadingBalance } = useCoins()
   const sendCoin = useMemo(
     () => coins.find((coin) => coin.symbol === 'SEND'),
     [coins] // Assuming tokenAddress corresponds to SEND for now
@@ -64,17 +65,16 @@ export function BuyTicketsScreen() {
   const ticketPriceBigInt = useMemo(() => contractTicketPrice ?? 0n, [contractTicketPrice])
   const numTickets = useMemo(() => {
     const parsed = Number.parseInt(ticketCount || '0', 10)
-    return Number.isNaN(parsed) ? 0n : BigInt(parsed) // Use Number.isNaN and ensure valid bigint
+    return Number.isNaN(parsed) ? 0n : BigInt(parsed)
   }, [ticketCount])
   const totalCostBigInt = useMemo(() => {
-    // Explicitly check types before multiplication
     if (typeof numTickets === 'bigint' && typeof ticketPriceBigInt === 'bigint') {
       return numTickets * ticketPriceBigInt
     }
-    return 0n // Default to 0n if types are not bigint
+    return 0n
   }, [numTickets, ticketPriceBigInt])
 
-  // Format user balance (BigInt)
+  // Format user balance
   const userBalanceBigInt = useMemo(() => {
     if (!sendCoin?.balance) return 0n
     try {
@@ -92,32 +92,42 @@ export function BuyTicketsScreen() {
 
   // Format display values
   const displayTicketPrice = useMemo(() => {
-    // Check type explicitly
     if (typeof ticketPriceBigInt !== 'bigint' || tokenDecimals === undefined) return '...'
-    // Use formatUnitsViem here
-    return formatUnitsViem(ticketPriceBigInt, Number(tokenDecimals))
+    return formatUnits(ticketPriceBigInt, Number(tokenDecimals))
   }, [ticketPriceBigInt, tokenDecimals])
 
   const displayTotalCost = useMemo(() => {
-    // Check type explicitly
     if (typeof totalCostBigInt !== 'bigint' || tokenDecimals === undefined) return '...'
-    // Use formatUnitsViem here
-    return formatUnitsViem(totalCostBigInt, Number(tokenDecimals))
+    return formatUnits(totalCostBigInt, Number(tokenDecimals))
   }, [totalCostBigInt, tokenDecimals])
 
+  // --- Prepare Purchase Data ---
+  const {
+    userOp: preparedUserOp, // Rename to avoid conflict later
+    usdcFees,
+    isLoading: isLoadingPreparation,
+    error: preparationError,
+  } = usePurchaseJackpotTicket({
+    tokenAddress: tokenAddress as Address,
+    ticketPrice: ticketPriceBigInt as bigint, // Explicit cast to satisfy TS
+    recipient: senderAddress as Address,
+    // Referrer can be added if needed: referrer: '0x...'
+  })
+
+  const sendUserOpMutation = useSendUserOpMutation()
+
   // --- Combined Loading State ---
-  const purchaseMutation = usePurchaseJackpotTicketMutation() // Initialize mutation hook earlier
   const isLoading =
     isLoadingPrice ||
     isLoadingToken ||
     isLoadingDecimals ||
     isLoadingUser ||
-    isLoadingNonce || // Add nonce loading state
+    isLoadingNonce ||
     isLoadingBalance ||
-    purchaseMutation.isPending // Combine all loading states
+    isLoadingPreparation ||
+    sendUserOpMutation.isPending
 
-  // --- Get next draw date (keep existing logic) ---
-  // Removed old userBalance and insufficientFunds calculations here
+  // --- Get next draw date ---
   const getNextDrawDate = () => {
     const now = new Date()
     const nextDraw = new Date(now)
@@ -143,62 +153,43 @@ export function BuyTicketsScreen() {
       console.log('Purchase attempt blocked: Already loading')
       return // Prevent multiple clicks
     }
-    if (insufficientFunds) {
-      toast.show('Error', { message: 'Insufficient funds.' })
-      return
-    }
-    if (numTickets <= 0n) {
-      toast.show('Error', { message: 'Please enter a valid number of tickets.' })
-      return
-    }
-    if (!senderAddress) {
-      toast.show('Error', { message: 'User account address not found.' })
-      return
-    }
-    // Check for nonce error first
-    if (nonceError) {
-      console.error('Nonce fetch error:', nonceError)
-      toast.show('Error', { message: 'Could not fetch account nonce. Please try again.' })
-      return
-    }
-    // Now check if fetchedNonce is defined
-    if (fetchedNonce === undefined) {
-      toast.show('Error', { message: 'Could not determine account nonce.' })
-      return
-    }
-    if (webauthnCreds.length === 0) {
-      toast.show('Error', { message: 'WebAuthn credentials not found.' })
-      return
-    }
-    // Ensure ticketPriceBigInt is valid (should be > 0n if contract loaded)
-    if (typeof ticketPriceBigInt !== 'bigint' || ticketPriceBigInt <= 0n) {
-      toast.show('Error', { message: 'Invalid or zero ticket price.' })
-      return
-    }
+
+    const webauthnCreds =
+      sendAccount?.send_account_credentials
+        .filter((c) => !!c.webauthn_credentials)
+        .map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? []
 
     try {
+      // Use assert for preconditions
+      assert(!nonceError, 'Nonce failed to generate')
+      assert(!preparationError, 'Userop failed to generate')
+      assert(!insufficientFunds, 'Insufficient funds.')
+      assert(numTickets > 0n, 'Please enter a valid number of tickets.')
+      assert(!!senderAddress, 'User account address not found.')
+      assert(fetchedNonce !== undefined, 'Could not determine account nonce.')
+      assert(webauthnCreds.length > 0, 'WebAuthn credentials not found.')
+      assert(
+        typeof ticketPriceBigInt === 'bigint' && ticketPriceBigInt > 0n,
+        'Invalid or zero ticket price.'
+      )
+      // Use assert for preconditions
+      assert(!!preparedUserOp, 'Transaction details could not be prepared.')
+
+      // Final UserOp to be signed and sent
+      const finalUserOp = {
+        ...preparedUserOp,
+        nonce: fetchedNonce, // Ensure the latest nonce is used
+        // Note: Signature will be added by useSendUserOpMutation internally
+      }
+
       toast.show('Processing...', { message: 'Submitting transaction...' })
-      await purchaseMutation.mutateAsync({
-        sender: senderAddress,
-        tokenAddress: tokenAddress as Address,
-        ticketPrice: ticketPriceBigInt, // No assertion needed
-        recipient: senderAddress, // User buys tickets for themselves
-        nonce: fetchedNonce, // Use the fetched nonce
-        webauthnCreds: webauthnCreds
-          .map((cred) => ({
-            // Map from the nested structure provided by useSendAccount query
-            raw_credential_id: cred.webauthn_credentials?.raw_credential_id,
-            name: cred.webauthn_credentials?.name,
-          }))
-          .filter(
-            (cred): cred is { raw_credential_id: `\\x${string}`; name: string } =>
-              // Filter out any credentials where mapping failed or values are missing
-              !!cred.raw_credential_id && !!cred.name
-          ),
-        // Optional: Add referrer logic if needed
+      await sendUserOpMutation.mutateAsync({
+        userOp: finalUserOp,
+        // Pass credentials for signing using the correct property name 'webauthnCreds'
+        webauthnCreds: webauthnCreds,
       })
       toast.show('Success', { message: `Successfully purchased ${ticketCount} tickets!` })
-      router.push('/play') // Navigate back on success
+      router.push('/play')
     } catch (error: unknown) {
       // Use unknown for type safety
       console.error('Failed to purchase tickets:', error)
@@ -311,7 +302,7 @@ export function BuyTicketsScreen() {
                       >
                         Balance:
                       </Paragraph>
-                      {isLoadingBalance ? ( // Use specific loading flag for balance
+                      {isLoadingBalance ? (
                         <Spinner size="small" />
                       ) : (
                         <Paragraph
@@ -319,10 +310,9 @@ export function BuyTicketsScreen() {
                           size={'$5'}
                           fontWeight={'600'}
                         >
-                          {sendCoin
+                          {sendCoin && tokenDecimals !== undefined
                             ? formatAmount(
-                                // TODO: Use userBalanceBigInt and tokenDecimals for formatting
-                                (Number(sendCoin.balance) / 10 ** sendCoin.decimals).toString(),
+                                formatUnits(userBalanceBigInt, Number(tokenDecimals)), // Use calculated balance and decimals
                                 10,
                                 sendCoin.formatDecimals ?? 5
                               )
@@ -331,12 +321,11 @@ export function BuyTicketsScreen() {
                         </Paragraph>
                       )}
                     </XStack>
-                    {insufficientFunds &&
-                      !isLoadingBalance && ( // Check specific loading flag
-                        <Paragraph color={'$error'} size={'$5'}>
-                          Insufficient funds
-                        </Paragraph>
-                      )}
+                    {insufficientFunds && !isLoadingBalance && (
+                      <Paragraph color={'$error'} size={'$5'}>
+                        Insufficient funds
+                      </Paragraph>
+                    )}
                   </YStack>
                 </XStack>
               </YStack>
@@ -348,6 +337,24 @@ export function BuyTicketsScreen() {
                 <H3 color="$color12">
                   {isLoading ? <Spinner size="small" /> : displayTotalCost} SEND
                 </H3>
+              </XStack>
+
+              {/* Display Estimated Fee */}
+              <XStack jc="space-between" ai="center" mt="$2">
+                <Paragraph fontSize="$5" fontWeight="500" color="$color10">
+                  Estimated Fee:
+                </Paragraph>
+                <H4 color="$color10">
+                  {isLoadingPreparation ? (
+                    <Spinner size="small" />
+                  ) : usdcFees !== undefined ? (
+                    `~${formatAmount(
+                      formatUnits(usdcFees.baseFee + usdcFees.gasFees, usdcFees.decimals)
+                    )} USDC` // Assuming 6 decimals for USDC
+                  ) : (
+                    '...' // Or handle error state if preparationError exists
+                  )}
+                </H4>
               </XStack>
             </YStack>
           </Card>
@@ -363,13 +370,12 @@ export function BuyTicketsScreen() {
               px="$4"
               py="$4"
               f={2}
-              disabled={isLoading || insufficientFunds || numTickets <= 0n} // Use combined isLoading and bigint checks
+              disabled={isLoading || insufficientFunds || numTickets <= 0n}
               disabledStyle={{ opacity: 0.5 }}
-              // Add icon for loading state
-              {...(purchaseMutation.isPending && { icon: <Spinner /> })}
+              {...(sendUserOpMutation.isPending && { icon: <Spinner /> })}
             >
               <Button.Text fontWeight="600">
-                {purchaseMutation.isPending ? 'Purchasing...' : 'Buy Tickets'}
+                {sendUserOpMutation.isPending ? 'Purchasing...' : 'Buy Tickets'}
               </Button.Text>
             </Button>
           </XStack>
