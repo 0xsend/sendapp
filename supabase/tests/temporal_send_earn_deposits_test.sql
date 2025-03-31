@@ -13,7 +13,6 @@ INSERT INTO public.send_accounts (user_id, address, chain_id, init_code) VALUES 
 SELECT has_table('temporal', 'send_earn_deposits', 'Table temporal.send_earn_deposits should exist.');
 SELECT has_column('temporal', 'send_earn_deposits', 'workflow_id', 'Column workflow_id should exist.');
 SELECT col_is_pk('temporal', 'send_earn_deposits', 'workflow_id', 'Column workflow_id should be the primary key.');
-SELECT col_is_fk('temporal', 'send_earn_deposits', 'user_id', 'Column user_id should be a foreign key to auth.users.');
 SELECT col_is_fk('temporal', 'send_earn_deposits', 'activity_id', 'Column activity_id should be a foreign key to public.activity.');
 SELECT has_index('temporal', 'send_earn_deposits', 'idx_temporal_send_earn_deposits_tx_hash', 'Index on tx_hash should exist.');
 SELECT has_index('temporal', 'send_earn_deposits', 'idx_temporal_send_earn_deposits_owner', 'Index on owner should exist.');
@@ -22,9 +21,8 @@ SELECT has_index('temporal', 'send_earn_deposits', 'idx_temporal_send_earn_depos
 -- Prepare data for insert
 SELECT lives_ok(
     $$
-        INSERT INTO temporal.send_earn_deposits (user_id, workflow_id, status, owner, assets, vault)
+        INSERT INTO temporal.send_earn_deposits (workflow_id, status, owner, assets, vault)
         VALUES (
-            'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
             'test-workflow-1',
             'initialized',
             '\x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed', -- owner
@@ -65,9 +63,8 @@ SELECT is(
 -- Prepare data: Insert another temporal record and its corresponding send_earn_deposit
 SELECT lives_ok(
     $$
-        INSERT INTO temporal.send_earn_deposits (user_id, workflow_id, status, owner, assets, vault, tx_hash)
+        INSERT INTO temporal.send_earn_deposits (workflow_id, status, owner, assets, vault, tx_hash)
         VALUES (
-            'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
             'test-workflow-2',
             'sent',
             '\x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed', -- owner
