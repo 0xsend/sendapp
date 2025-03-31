@@ -132,6 +132,7 @@ export function DepositFormScreen() {
           }}
           renderAfter={({ submit }) => (
             <SubmitButton
+              // testID="onramp-button"
               theme="green"
               onPress={submit}
               py={'$5'}
