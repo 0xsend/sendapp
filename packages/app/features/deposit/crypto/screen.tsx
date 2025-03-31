@@ -42,13 +42,15 @@ export function DepositCryptoScreen() {
       w={'100%'}
       gap="$5"
       py={'$3.5'}
+      ai={'center'}
       $gtLg={{
         w: '50%',
+        ai: 'flex-start',
       }}
     >
       <YStack gap={'$3.5'}>
-        <Paragraph size={'$7'}>Base Network</Paragraph>
         <FadeCard width={'max-content'}>
+          <Paragraph size={'$7'}>Base Network</Paragraph>
           <DepositAddressQR
             address={sendAccount?.address}
             onPress={() => setCopyAddressDialogIsOpen(true)}
