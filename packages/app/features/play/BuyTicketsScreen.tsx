@@ -127,25 +127,6 @@ export function BuyTicketsScreen() {
     isLoadingPreparation ||
     sendUserOpMutation.isPending
 
-  // --- Get next draw date ---
-  const getNextDrawDate = () => {
-    const now = new Date()
-    const nextDraw = new Date(now)
-    nextDraw.setHours(20, 0, 0, 0)
-
-    if (now > nextDraw) {
-      nextDraw.setDate(nextDraw.getDate() + 1)
-    }
-
-    return nextDraw.toLocaleDateString('en-US', {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    })
-  }
-
   // --- Mutation Handler ---
   const handleBuyTickets = async () => {
     // --- Perform all checks upfront ---
@@ -230,12 +211,6 @@ export function BuyTicketsScreen() {
                   Each ticket costs {isLoading ? <Spinner size="small" /> : displayTicketPrice}{' '}
                   SEND. How many tickets would you like to purchase?
                 </Paragraph>
-                <XStack ai="center" gap="$2">
-                  <Timer size="$1" color="$color10" />
-                  <Paragraph fontSize="$4" color="$color10" ta="center">
-                    Next draw: {getNextDrawDate()} (daily at 8:00 PM)
-                  </Paragraph>
-                </XStack>
               </YStack>
 
               <YStack
