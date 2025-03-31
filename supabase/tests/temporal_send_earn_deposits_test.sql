@@ -1,7 +1,7 @@
 -- Start transaction and plan tests
 BEGIN;
 
-SELECT plan(16); -- Adjust count as tests are added/refined
+SELECT plan(18); -- Increased from 16 to 18 for additional tests
 
 -- Test Setup: Create a user and a send account
 -- Note: Using fixed UUIDs and addresses for deterministic testing
@@ -59,7 +59,26 @@ SELECT is(
 );
 
 
--- Test Case 3: Test the cleanup logic in the modified send_earn_deposit trigger
+-- Test Case 3: Test nullable fields
+SELECT lives_ok(
+    $$
+        INSERT INTO temporal.send_earn_deposits (workflow_id, status)
+        VALUES (
+            'test-workflow-null-fields',
+            'initialized'
+        );
+    $$,
+    'Insert into temporal.send_earn_deposits with nullable fields should succeed.'
+);
+
+-- Verify activity was NOT created with null fields (since our updated trigger skips creation without owner)
+SELECT results_eq(
+    $$ SELECT count(*)::int FROM public.activity WHERE event_id = 'test-workflow-null-fields' $$,
+    $$ VALUES (0) $$,
+    'No activity record should be created when owner is null.'
+);
+
+-- Test Case 4: Test the cleanup logic in the modified send_earn_deposit trigger
 -- Prepare data: Insert another temporal record and its corresponding send_earn_deposit
 SELECT lives_ok(
     $$

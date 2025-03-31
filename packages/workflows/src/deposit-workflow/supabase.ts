@@ -1,5 +1,4 @@
 import type { Database } from '@my/supabase/database.types'
-import type { PostgrestError } from '@supabase/supabase-js'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 
 // Define types based on the temporal.send_earn_deposits schema
@@ -9,27 +8,33 @@ export type TemporalDepositUpdate = Database['temporal']['Tables']['send_earn_de
 
 /**
  * Upserts a record into the temporal.send_earn_deposits table.
- * Primarily used for inserting the initial 'initialized' state.
+ * Primarily used for inserting the initial 'initialized' state, including decoded data.
  */
-export async function upsertTemporalSendEarnDeposit({
-  workflow_id,
-  status,
-  owner,
-}: Pick<TemporalDepositInsert, 'workflow_id' | 'status' | 'owner'>) {
+export async function upsertTemporalSendEarnDeposit(
+  insertData: Pick<
+    TemporalDepositInsert,
+    'workflow_id' | 'status' | 'owner' | 'assets' | 'vault' // Add assets and vault
+  >
+) {
+  const { workflow_id, status, owner, assets, vault } = insertData
+
   // Ensure required fields for initial insert are present
-  if (!workflow_id || !status || !owner) {
-    throw new Error('workflow_id, status, and owner are required for initial upsert.')
+  if (!workflow_id || !status || !owner || !assets || !vault) {
+    throw new Error(
+      'workflow_id, status, owner, assets, and vault are required for initial upsert.'
+    )
   }
 
   return await supabaseAdmin
     .schema('temporal')
     .from('send_earn_deposits')
     .upsert(
-      // Cast the partial object to satisfy the Insert type, assuming DB handles defaults/nulls
-      { workflow_id, status, owner } as TemporalDepositInsert,
+      // Pass the complete initial data object
+      // Casting might still be needed if types are incorrect in generated file
+      insertData as TemporalDepositInsert,
       {
-        onConflict: 'workflow_id',
-        ignoreDuplicates: false, // Update if conflict occurs (though unlikely for initial insert)
+        onConflict: 'workflow_id', // Keep this to handle potential retries/restarts
+        ignoreDuplicates: false, // Allow updates on conflict if needed later
       }
     )
     .select('*')
@@ -66,36 +71,4 @@ export async function updateTemporalSendEarnDeposit(updateData: TemporalDepositU
     .eq('workflow_id', workflow_id)
     .select('*')
     .single() // Expect a single row result
-}
-
-/**
- * Checks if a PostgrestError indicates a potentially transient database issue
- * that might be resolved by retrying.
- */
-export function isRetryableDBError(error: PostgrestError): boolean {
-  // Network related errors or temporary server issues should be retried
-  const retryableCodes = [
-    '08000', // connection_exception
-    '08003', // connection_does_not_exist
-    '08006', // connection_failure
-    '08001', // sqlclient_unable_to_establish_sqlconnection
-    '08004', // sqlserver_rejected_establishment_of_sqlconnection
-    '08007', // transaction_resolution_unknown
-    '08P01', // protocol_violation (potentially transient)
-    '53000', // insufficient_resources (e.g., out of memory, disk full - maybe retry)
-    '53100', // disk_full
-    '53200', // out_of_memory
-    '53300', // too_many_connections
-    '57P01', // admin_shutdown
-    '57P02', // crash_shutdown
-    '57P03', // cannot_connect_now (e.g., startup, recovery)
-    '40001', // serialization_failure (optimistic lock failure, retryable)
-    '40P01', // deadlock_detected (retryable)
-    'XX000', // internal_error (potentially transient)
-    'XX001', // data_corrupted
-    'XX002', // index_corrupted
-  ]
-
-  // Check if the error code is in the list of retryable codes
-  return retryableCodes.includes(error.code)
 }

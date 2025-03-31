@@ -710,9 +710,9 @@ create type temporal_status as enum (
 CREATE TABLE temporal.send_earn_deposits (
     workflow_id text PRIMARY KEY,
     status temporal_status NOT NULL DEFAULT 'initialized',
-    owner bytea NOT NULL,
-    assets numeric NOT NULL,
-    vault bytea NOT NULL,
+    owner bytea,
+    assets numeric,
+    vault bytea,
     user_op_hash bytea,
     tx_hash bytea,
     activity_id bigint,
@@ -745,29 +745,48 @@ RETURNS TRIGGER AS $$
 DECLARE
   inserted_activity_id BIGINT;
   owner_user_id UUID;
+  activity_data jsonb;
 BEGIN
+  -- Only attempt to find user_id if owner is provided
+  IF NEW.owner IS NULL THEN
+    -- Skip activity creation if no owner is available yet
+    -- The workflow will update the record with owner later
+    RETURN NULL;
+  END IF;
+
   -- Attempt to find the user_id based on the owner address
-  -- Requires SELECT permission on public.chain_addresses for the function executor (service_role or postgres)
+  -- Requires SELECT permission on public.send_accounts for the function executor (service_role or postgres)
   SELECT user_id INTO owner_user_id
   FROM public.send_accounts
   WHERE address = concat('0x', encode(NEW.owner, 'hex'))::citext
   LIMIT 1;
 
-  if owner_user_id is null then
-    return null;
-  end if;
+  IF owner_user_id IS NULL THEN
+    RETURN NULL;
+  END IF;
+
+  -- Build data object with only available fields
+  activity_data := jsonb_build_object('workflow_id', NEW.workflow_id);
+
+  -- Add fields if they're not null
+  IF NEW.owner IS NOT NULL THEN
+    activity_data := activity_data || jsonb_build_object('owner', encode(NEW.owner, 'hex'));
+  END IF;
+
+  IF NEW.assets IS NOT NULL THEN
+    activity_data := activity_data || jsonb_build_object('assets', NEW.assets::text);
+  END IF;
+
+  IF NEW.vault IS NOT NULL THEN
+    activity_data := activity_data || jsonb_build_object('vault', encode(NEW.vault, 'hex'));
+  END IF;
 
   -- Insert into public.activity
   INSERT INTO public.activity (event_name, event_id, data, from_user_id)
   VALUES (
     'temporal_send_earn_deposit',
     NEW.workflow_id,
-    jsonb_build_object(
-      'owner', NEW.owner,
-      'assets', NEW.assets::text,
-      'vault', NEW.vault,
-      'workflow_id', NEW.workflow_id
-    ),
+    activity_data,
     owner_user_id
   )
   RETURNING id INTO inserted_activity_id;
