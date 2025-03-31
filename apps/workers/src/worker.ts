@@ -1,5 +1,5 @@
-import { Worker, NativeConnection } from '@temporalio/worker'
-import { createTransferActivities } from '@my/workflows/all-activities'
+import { createMonorepoActivities } from '@my/workflows/all-activities'
+import { NativeConnection, Worker } from '@temporalio/worker'
 import { createRequire } from 'node:module'
 const require = createRequire(import.meta.url)
 
@@ -41,7 +41,7 @@ async function run() {
       payloadConverterPath: require.resolve('@my/temporal/payload-converter'),
     },
     ...workflowOption(),
-    activities: createTransferActivities(process.env),
+    activities: createMonorepoActivities(process.env),
     namespace: process.env.TEMPORAL_NAMESPACE ?? 'default',
     taskQueue: 'monorepo',
     bundlerOptions: {
