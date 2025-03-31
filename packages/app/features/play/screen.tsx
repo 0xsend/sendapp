@@ -6,19 +6,13 @@ import {
   Spinner,
   Card,
   AnimatePresence,
-  H4,
   useMedia,
   type XStackProps,
-  H1,
-  Theme,
   useSafeAreaInsets,
-  Container,
 } from '@my/ui'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { JackpotCard } from './JackpotCard'
-import { TicketHoldings } from './TicketHoldings'
-import { PlayButtons } from './PlayButtons'
-import { AlertCircle } from '@tamagui/lucide-icons'
+import { DrawingHistory } from './DrawingHistory'
 
 import { TopNav } from 'app/components/TopNav'
 import { HomeLayout } from 'app/features/home/layout.web'
@@ -32,14 +26,17 @@ function PlayBody(props: XStackProps) {
         $gtLg={{ display: 'flex', w: '100%', gap: '$5', pb: 0 }}
         display={'flex'}
         width="100%"
+        maxWidth={600} // Add maxWidth for consistency
         gap="$5"
-        ai={'center'}
+        // ai={'center'} // Removed for left alignment
         pb={Math.max(bottom, 24) + 72} // add mobile bottom button row + 24px
       >
         <JackpotCard />
-        <YStack w={'100%'} ai={'center'}>
+        {/* Remove ai={'center'} from inner stack as well */}
+        <YStack w={'100%'}>
           <Card bc={'$color1'} width="100%" p="$4">
-            <TicketHoldings />
+            {/* Use the renamed component */}
+            <DrawingHistory />
           </Card>
         </YStack>
       </YStack>
@@ -50,7 +47,6 @@ function PlayBody(props: XStackProps) {
 export function PlayScreen() {
   const media = useMedia()
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
-
   return (
     <HomeLayout TopNav={<TopNav header="Play" showLogo={true} />}>
       <YStack f={1}>

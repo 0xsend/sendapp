@@ -103,7 +103,7 @@ export function BuyTicketsScreen() {
 
   // --- Prepare Purchase Data ---
   const {
-    userOp: preparedUserOp, // Rename to avoid conflict later
+    userOp,
     usdcFees,
     isLoading: isLoadingPreparation,
     error: preparationError,
@@ -116,22 +116,29 @@ export function BuyTicketsScreen() {
 
   const sendUserOpMutation = useSendUserOpMutation()
 
-  // --- Combined Loading State ---
-  const isLoading =
+  // --- Loading States ---
+  // Loading state for fetching initial data & preparing the transaction
+  const isDataLoading =
     isLoadingPrice ||
     isLoadingToken ||
     isLoadingDecimals ||
     isLoadingUser ||
     isLoadingNonce ||
     isLoadingBalance ||
-    isLoadingPreparation ||
-    sendUserOpMutation.isPending
+    isLoadingPreparation
+
+  // Loading state for the final submission mutation
+  const isSubmitting = sendUserOpMutation.isPending
+
+  // Combined state for disabling button / initial check
+  const isProcessingOrLoadingData = isDataLoading || isSubmitting
 
   // --- Mutation Handler ---
   const handleBuyTickets = async () => {
     // --- Perform all checks upfront ---
-    if (isLoading) {
-      console.log('Purchase attempt blocked: Already loading')
+    if (isProcessingOrLoadingData) {
+      // Use the combined state here
+      console.log('Purchase attempt blocked: Already loading or submitting')
       return // Prevent multiple clicks
     }
 
@@ -154,22 +161,19 @@ export function BuyTicketsScreen() {
         'Invalid or zero ticket price.'
       )
       // Use assert for preconditions
-      assert(!!preparedUserOp, 'Transaction details could not be prepared.')
+      assert(!!userOp, 'Transaction details could not be prepared.')
 
       // Final UserOp to be signed and sent
       const finalUserOp = {
-        ...preparedUserOp,
+        ...userOp,
         nonce: fetchedNonce, // Ensure the latest nonce is used
         // Note: Signature will be added by useSendUserOpMutation internally
       }
-
-      toast.show('Processing...', { message: 'Submitting transaction...' })
       await sendUserOpMutation.mutateAsync({
         userOp: finalUserOp,
         // Pass credentials for signing using the correct property name 'webauthnCreds'
         webauthnCreds: webauthnCreds,
       })
-      toast.show('Success', { message: `Successfully purchased ${ticketCount} tickets!` })
       router.push('/play')
     } catch (error: unknown) {
       // Use unknown for type safety
@@ -193,22 +197,26 @@ export function BuyTicketsScreen() {
   return (
     <HomeLayout TopNav={<TopNav header="Buy Send Tickets" showLogo={true} />}>
       <YStack f={1} pb={Math.max(bottom, 24) + 16}>
+        {/* Apply maxWidth and mx: 'auto' by default for consistent width */}
         <YStack
           px="$4"
           py="$6"
           gap="$6"
-          ai="center"
+          // Remove ai="center" and mx="auto" for left alignment
+          w="100%" // Ensure it takes full width before applying maxWidth
+          maxWidth={600} // Apply max width by default
+          // mx="auto" // Removed for left alignment
           $gtMd={{
             px: '$6',
-            maxWidth: 600,
-            mx: 'auto',
+            // maxWidth is already set, potentially adjust if needed for larger screens
+            // mx: 'auto', // Removed for left alignment
           }}
         >
           <Card w="100%" p="$5">
             <YStack gap="$5">
               <YStack gap="$2" ai="center">
                 <Paragraph fontSize="$6" ta="center">
-                  Each ticket costs {isLoading ? <Spinner size="small" /> : displayTicketPrice}{' '}
+                  Each ticket costs {isDataLoading ? <Spinner size="small" /> : displayTicketPrice}{' '}
                   SEND. How many tickets would you like to purchase?
                 </Paragraph>
               </YStack>
@@ -277,7 +285,8 @@ export function BuyTicketsScreen() {
                       >
                         Balance:
                       </Paragraph>
-                      {isLoadingBalance ? (
+                      {/* Use isDataLoading here as balance depends on initial fetches */}
+                      {isDataLoading ? (
                         <Spinner size="small" />
                       ) : (
                         <Paragraph
@@ -310,7 +319,7 @@ export function BuyTicketsScreen() {
                   Total Cost:
                 </Paragraph>
                 <H3 color="$color12">
-                  {isLoading ? <Spinner size="small" /> : displayTotalCost} SEND
+                  {isDataLoading ? <Spinner size="small" /> : displayTotalCost} SEND
                 </H3>
               </XStack>
 
@@ -320,7 +329,8 @@ export function BuyTicketsScreen() {
                   Estimated Fee:
                 </Paragraph>
                 <H4 color="$color10">
-                  {isLoadingPreparation ? (
+                  {/* isLoadingPreparation is part of isDataLoading */}
+                  {isDataLoading ? (
                     <Spinner size="small" />
                   ) : usdcFees !== undefined ? (
                     `~${formatAmount(
@@ -345,12 +355,12 @@ export function BuyTicketsScreen() {
               px="$4"
               py="$4"
               f={2}
-              disabled={isLoading || insufficientFunds || numTickets <= 0n}
+              disabled={isProcessingOrLoadingData || insufficientFunds || numTickets <= 0n}
               disabledStyle={{ opacity: 0.5 }}
-              {...(sendUserOpMutation.isPending && { icon: <Spinner /> })}
+              {...(isSubmitting && { icon: <Spinner /> })} // Show spinner only when submitting
             >
               <Button.Text fontWeight="600">
-                {sendUserOpMutation.isPending ? 'Purchasing...' : 'Buy Tickets'}
+                {isSubmitting ? 'Purchasing...' : 'Buy Tickets'}
               </Button.Text>
             </Button>
           </XStack>

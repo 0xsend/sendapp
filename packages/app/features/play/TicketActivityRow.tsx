@@ -2,7 +2,7 @@ import { Paragraph, Text, XStack, YStack } from '@my/ui'
 import { Ticket } from '@tamagui/lucide-icons'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { CommentsTime } from 'app/utils/dateHelper'
-import type { TicketEntry } from './TicketHoldings'
+import type { TicketEntry } from './DrawingHistory'
 
 export function TicketActivityRow({
   ticket,

@@ -9,10 +9,13 @@ import {
   Card,
   H3,
   Spinner, // Added Spinner
+  LinkableButton, // Added LinkableButton
+  type LinkableButtonProps, // Added LinkableButtonProps
 } from '@my/ui'
-import { useEffect, useState, useMemo } from 'react' // Added useMemo
-import { Timer } from '@tamagui/lucide-icons'
-import { PlayButtons } from './PlayButtons'
+import { useCallback, useEffect, useState, useMemo } from 'react' // Added useCallback
+import { Timer } from '@tamagui/lucide-icons' // Removed IconGame from here
+import { IconGame } from 'app/components/icons' // Added correct IconGame import
+// Removed PlayButtons import
 import {
   useReadBaseJackpotLpPoolTotal,
   useReadBaseJackpotLastJackpotEndTime,
@@ -29,6 +32,8 @@ const GreenSquare = styled(Stack, {
   bc: '$background',
 })
 
+const zeroTime = { days: 0, hours: 0, minutes: 0, seconds: 0 }
+
 export const JackpotCard = () => {
   // Fetch contract data
   const { data: lpPoolTotal, isLoading: isLoadingPoolTotal } = useReadBaseJackpotLpPoolTotal()
@@ -39,21 +44,20 @@ export const JackpotCard = () => {
   const { data: tokenDecimals, isLoading: isLoadingDecimals } = useReadBaseJackpotTokenDecimals()
 
   // Calculate next draw time based on contract data
-  const nextDrawTime = useMemo(() => {
+  const jackpotEndTime = useMemo(() => {
     if (lastJackpotEndTime === undefined || roundDuration === undefined) return null
     // Contract times are in seconds, convert to milliseconds
     return (Number(lastJackpotEndTime) + Number(roundDuration)) * 1000
   }, [lastJackpotEndTime, roundDuration])
 
-  // Calculate time remaining until the next draw
-  const calculateTimeRemaining = () => {
-    // Return type now includes days
-    if (!nextDrawTime) return { days: 0, hours: 0, minutes: 0, seconds: 0 }
+  // Wrap calculateTimeRemaining in useCallback to stabilize its reference
+  const calculateTimeRemaining = useCallback(() => {
+    if (!jackpotEndTime) return zeroTime
 
     const now = Date.now()
-    const diff = nextDrawTime - now
+    const diff = jackpotEndTime - now
 
-    if (diff <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0 } // Draw time has passed or is now
+    if (diff <= 0) return zeroTime
 
     // Calculate days
     const days = Math.floor(diff / (1000 * 60 * 60 * 24))
@@ -64,26 +68,38 @@ export const JackpotCard = () => {
 
     // Return object now includes days
     return { days, hours, minutes, seconds }
-  }
+  }, [jackpotEndTime]) // Dependency is jackpotEndTime
 
-  // Initial state now includes days
-  const [timeRemaining, setTimeRemaining] = useState(calculateTimeRemaining())
+  // Use functional update for initial state based on the stable calculateTimeRemaining
+  const [timeRemaining, setTimeRemaining] = useState(() => calculateTimeRemaining())
 
   // Update timer every second
   useEffect(() => {
-    if (!nextDrawTime) return // Don't start timer if draw time isn't calculated yet
+    if (!jackpotEndTime) {
+      setTimeRemaining(zeroTime) // Reset timer if jackpotEndTime becomes invalid
+      return // Don't start timer if draw time isn't calculated yet
+    }
+
+    // Set initial time immediately when the effect runs or jackpotEndTime changes
+    setTimeRemaining(calculateTimeRemaining())
 
     const timer = setInterval(() => {
-      setTimeRemaining(calculateTimeRemaining())
+      // Use the stable calculateTimeRemaining from the outer scope
+      const remaining = calculateTimeRemaining()
+      setTimeRemaining(remaining)
+      // Optional: Clear interval if time runs out to prevent unnecessary checks
+      if (remaining === zeroTime) {
+        clearInterval(timer)
+      }
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [nextDrawTime, calculateTimeRemaining]) // Added calculateTimeRemaining to dependencies
+  }, [jackpotEndTime, calculateTimeRemaining]) // Dependencies are correct now
 
   // Format the jackpot end time string
   const jackpotEndTimeString = useMemo(() => {
-    if (!nextDrawTime) return 'Loading...'
-    const date = new Date(nextDrawTime)
+    if (!jackpotEndTime) return 'Loading...'
+    const date = new Date(jackpotEndTime)
     // Use toLocaleString to include both date and time
     return date.toLocaleString('en-US', {
       weekday: 'short', // e.g., Wed
@@ -94,7 +110,7 @@ export const JackpotCard = () => {
       second: '2-digit', // e.g., 14
       timeZoneName: 'short', // Optionally add timezone
     })
-  }, [nextDrawTime])
+  }, [jackpotEndTime])
 
   // Format jackpot amount (using lpPoolTotal as placeholder)
   const formattedJackpotAmount = useMemo(() => {
@@ -118,7 +134,8 @@ export const JackpotCard = () => {
   return (
     <Card p={'$5'} w={'100%'} jc="space-between" $gtLg={{ p: '$6', h: 'auto', mih: 244 }} mih={184}>
       <XStack w={'100%'} zIndex={4} h="100%">
-        <YStack jc={'center'} gap={'$2'} w={'100%'}>
+        {/* Removed jc={'center'} to allow left alignment */}
+        <YStack gap={'$2'} w={'100%'}>
           <YStack w="fit-content" gap={'$2.5'} jc="space-between">
             <XStack ai={'center'} gap="$2.5" width={'100%'}>
               <XStack ai={'center'} gap="$2.5">
@@ -160,6 +177,8 @@ export const JackpotCard = () => {
               <H3 color="$color10">
                 {isLoading ? (
                   <Spinner size="small" />
+                ) : timeRemaining === zeroTime ? (
+                  '--:--:--:--'
                 ) : (
                   // Update format to DD:HH:SS
                   `${formatNumber(timeRemaining.days)}:${formatNumber(
@@ -168,18 +187,44 @@ export const JackpotCard = () => {
                 )}
               </H3>
             </XStack>
-            {/* Restore the XStack and update the Paragraph */}
-            <XStack ai="center" jc="center">
-              <Paragraph color="$color10" fontSize="$4" ta="center">
+            {/* Restore the XStack and update the Paragraph, removed centering */}
+            <XStack ai="center">
+              <Paragraph color="$color10" fontSize="$4" ta="left">
                 Jackpot ends: {isLoading ? 'Loading...' : jackpotEndTimeString}
               </Paragraph>
             </XStack>
           </YStack>
 
-          {/* Buy Ticket Button */}
-          <XStack w="100%" jc="center" mt="$4">
-            <Stack f={1} w="100%" jc={'center'} maw={350}>
-              <PlayButtons.BuyTicketsButton href="/play/buy-tickets" />
+          {/* Buy Ticket Button - Removed centering, using local BuyTicketsButton */}
+          <XStack w="100%" mt="$2">
+            <Stack f={1} w="100%" maw={350}>
+              <LinkableButton
+                href="/play/buy-tickets"
+                theme={'green'}
+                br="$4"
+                px={'$3.5'}
+                h={'$4.5'}
+                key="play-buy-tickets-button"
+                animation="200ms"
+                enterStyle={{
+                  opacity: 0,
+                }}
+                exitStyle={{
+                  opacity: 0,
+                }}
+              >
+                <XStack w={'100%'} ai={'center'} jc="center" h="100%" gap="$2">
+                  <IconGame size={'$1.5'} $theme-dark={{ color: '$color0' }} />
+                  <LinkableButton.Text
+                    fontWeight={'400'}
+                    $theme-dark={{ col: '$color0' }}
+                    tt="uppercase"
+                    size={'$5'}
+                  >
+                    Buy /ticket
+                  </LinkableButton.Text>
+                </XStack>
+              </LinkableButton>
             </Stack>
           </XStack>
         </YStack>
