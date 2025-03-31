@@ -13,9 +13,9 @@ We need a new table to track the state of deposit workflows.
     *   Columns:
         *   `workflow_id` (TEXT, PRIMARY KEY)
         *   `status` (TEXT - e.g., 'initialized', 'submitted', 'sent', 'confirmed', 'failed')
-        *   `owner` (BYTEA) - The address of the send account depositing the tokens
-        *   `asset` (BYTEA - Address of the ERC20 token being deposited)
-        *   `vault` (BYTEA - Address of the vault contract)
+        *   `owner` (BYTEA, nullable) - The address of the send account depositing the tokens
+        *   `assets` (NUMERIC, nullable) - Amount of the ERC20 token being deposited
+        *   `vault` (BYTEA, nullable) - Address of the vault contract
         *   `user_op_hash` (BYTEA, nullable)
         *   `tx_hash` (BYTEA, nullable)
         *   `activity_id` - (foreign key to public.activity, nullable)
@@ -25,15 +25,18 @@ We need a new table to track the state of deposit workflows.
     *   Add appropriate indexes (e.g., on `workflow_id`, `sender`, `status`).
     *   Create a Supabase migration file for this change (`supabase/migrations/20250329182006_create_temporal_send_earn_deposits.sql`).
     *   Create an `AFTER INSERT` trigger (`temporal.temporal_deposit_insert_pending_activity`) on `temporal.send_earn_deposits`:
-        *   Looks up the `user_id` from `public.send_accounts` using the `owner` address.
-        *   Inserts a record into `public.activity` with `event_name` = `'temporal_send_earn_deposit_pending'`.
-        *   Stores relevant details (`owner`, `vault` as hex strings; `asset` as text; `workflow_id`) in the `activity.data` JSONB field.
-        *   Updates the `activity_id` column in the triggering `temporal.send_earn_deposits` row.
-    *   Create triggers to delete the `'temporal_send_earn_deposit_pending'` activity record after the deposit is indexed into `public.send_earn_deposits` (using the transaction hash to find the activity id to delete). *(Note: This deletion trigger is assumed but wasn't explicitly part of the reviewed files)*.
+        *   **Handles Nullable Fields:** Checks if `owner` is present. If `owner` is NULL (e.g., during initial record creation by the workflow before decoding), the trigger exits without creating an activity record.
+        *   **Looks up User ID:** If `owner` is NOT NULL, looks up the `user_id` from `public.send_accounts`.
+        *   **Inserts Pending Activity:** If `user_id` is found, inserts a record into `public.activity` with `event_name` = `'temporal_send_earn_deposit'`.
+        *   **Stores Available Data:** Stores available details (`workflow_id`, `owner`, `assets`, `vault`) in the `activity.data` JSONB field, handling NULLs appropriately.
+        *   **Updates Foreign Key:** Updates the `activity_id` column in the triggering `temporal.send_earn_deposits` row.
+    *   Create triggers to delete the `'temporal_send_earn_deposit'` activity record after the deposit is indexed into `public.send_earn_deposit` (using the transaction hash to find the activity id to delete). *(Note: This deletion trigger is part of the `private.send_earn_deposit_trigger_insert_activity` function)*.
     *   Supabase pgtap tests (`supabase/tests/temporal_send_earn_deposits_test.sql`) to verify the triggers are working:
-        *   Test setup requires inserting into `auth.users` and `public.send_accounts` (ensuring `user_id`, `address`, `chain_id`, and `init_code` are provided). `chain_addresses` is not needed for this flow.
-        *   Test setup also requires inserting into `public.send_account_created` with the correct schema if simulating the final deposit event.
-        *   Verify the correct `event_name` and `data` format (hex strings for addresses) in `public.activity`.
+        *   Test setup requires inserting into `auth.users` and `public.send_accounts`.
+        *   Test setup also requires inserting into `public.send_account_created` if simulating the final deposit event.
+        *   Verify the correct `event_name` and `data` format in `public.activity`.
+        *   **Verify Nullable Field Handling:** Includes tests to ensure records inserted with NULL `owner` do not create an activity entry initially.
+        *   Verify the cleanup trigger correctly removes the pending activity upon `public.send_earn_deposit` insertion.
 
 ## 3. Temporal Workflow Implementation (`packages/workflows`)
 
@@ -41,45 +44,47 @@ We need a new table to track the state of deposit workflows.
     *   Create a `createDepositActivities` function similar to `createTransferActivities`.
     *   Activities needed:
         *   `upsertTemporalDepositActivity`: Inserts the initial record into `temporal.send_earn_deposits` with status 'initialized'.
+        *   `upsertTemporalDepositActivity`: Inserts or updates the record in `temporal.send_earn_deposits`. Handles initial insert with `owner`, `assets`, `vault` and subsequent status/hash updates.
         *   `simulateDepositActivity`: Simulates the deposit UserOperation using `pimlicoBundlerClient.simulateUserOperation`. (Consider reusing or adapting simulation logic if possible).
-        *   `decodeDepositUserOpActivity`: Decodes the `userOp.callData` to extract `asset`, `vault`, etc. This will likely involve interacting with the Send Earn contract ABI.
-        *   `updateTemporalDepositActivity`: Updates the status, `user_op_hash`, `tx_hash`, `created_at_block_num`, `error_message`, etc., in `temporal.send_earn_deposits`.
         *   `sendUserOpActivity`: Can likely reuse the existing activity from `transfer-workflow`.
         *   `waitForTransactionReceiptActivity`: Can likely reuse the existing activity from `transfer-workflow`.
         *   `getBaseBlockNumberActivity`: Can likely reuse the existing activity from `transfer-workflow`.
 
 *   **Define Workflow (`src/deposit-workflow/workflow.ts`):**
-    *   Create `DepositWorkflow` function, mirroring the structure of `TransferWorkflow`.
-    *   Input: `UserOperation<'v0.7'>`.
+    *   Create `DepositWorkflow` function
+    *   Input: `userOp: UserOperation<'v0.7'>`, `owner: Address`, `assets: Address`, `vault: Address`.
     *   Workflow steps:
-        1.  Generate `workflowId` (e.g., `temporal/deposit/{userId}/{userOpHash}`).
-        2.  Call `upsertTemporalDepositActivity`.
-        3.  Call `simulateDepositActivity`.
-        4.  Call `getBaseBlockNumberActivity`.
-        5.  Call `decodeDepositUserOpActivity`.
-        6.  Call `updateTemporalDepositActivity` (status 'submitted', add decoded data, `created_at_block_num`).
+        1.  Get `workflowId` from `workflowInfo()`.
+        2.  Call `upsertTemporalDepositActivity` with minimal data (status 'initialized', workflow_id) to create initial record.
+        3.  Decode `userop.callData`: Use `app/utils/decodeDepositUserOp`, `viem`, and the appropriate ABI (Send Account `execute` or Send Earn `deposit`) to extract `assets` and `vault`.
+        4.  Call `updateTemporalDepositActivity` to update record with decoded data (add `owner`, `assets`, `vault`).
+        5.  Call `simulateDepositActivity`.
+        6.  Call `updateTemporalDepositActivity` (status 'submitted').
         7.  Call `sendUserOpActivity` to submit the UserOp.
         8.  Call `updateTemporalDepositActivity` (status 'sent', add `user_op_hash`).
         9.  Call `waitForTransactionReceiptActivity`.
-        10. Call `updateTemporalDepositActivity` (status 'confirmed', add `tx_hash`, `block_num`).
+        10. Call `updateTemporalDepositActivity` (status 'confirmed', add `tx_hash`).
     *   Implement error handling (e.g., using `try...catch` and updating status to 'failed' with `error_message`).
     *   Register the new workflow in `packages/workflows/src/all-workflows.ts`.
 
-## 4. API Layer (tRPC - `packages/api`) [DONE]
+## 4. API Layer (tRPC - `packages/api`)
 
-*   **Create Router (`packages/api/src/routers/sendEarn.ts`):** [DONE]
-    *   Created a new `sendEarnRouter`.
-    *   Added a `deposit` mutation to this router.
-    *   Input schema: `z.object({ userop: UserOperationSchema, sendAccountCalls: SendAccountCallsSchema, entryPoint: address })`.
-    *   Logic implemented:
+*   **Update Router (`packages/api/src/routers/sendEarn.ts`):**
+    *   Modify the existing `deposit` mutation.
+    *   Input schema remains: `z.object({ userop: UserOperationSchema, sendAccountCalls: SendAccountCallsSchema, entryPoint: address })`.
+    *   Updated Logic:
         1.  Get Temporal client (`getTemporalClient`).
-        2.  Calculate `userOpHash` using `getUserOperationHash` with the provided `userop`, `entryPoint`, and internal `chainId`.
-        3.  Start the `DepositWorkflow` using `client.workflow.start`, passing the `userop` and constructing the `workflowId` (`temporal/deposit/{userId}/{userOpHash}`). (Note: `sendAccountCalls` is part of the input schema but not currently used in the workflow start).
-        4.  Handle potential `WorkflowExecutionAlreadyStartedError` errors gracefully by logging and allowing the request to proceed (returning the existing `workflowId`).
-        5.  Return `{ workflowId }`.
+        2.  **Validate UserOp:**
+            *   Verify the decoded call is a valid deposit.
+            *   Verify `userop.sender` matches the authenticated user's Send Account (`session.user.id`).
+            *   Validate `assets` and `vault` addresses.
+        3.  Calculate `userOpHash` using `getUserOperationHash`.
+        4.  Construct `workflowId` (`temporal/deposit/{userId}/{userOpHash}`).
+        5.  Start the `DepositWorkflow` using `client.workflow.start`, passing the `userop`.
+        6.  Handle potential `WorkflowExecutionAlreadyStartedError` errors gracefully.
+        7.  Return `{ workflowId }`.
 *   **Register Router (`packages/api/src/routers/_app.ts`):** [DONE]
-    *   Imported `sendEarnRouter`.
-    *   Registered `sendEarn: sendEarnRouter` in the main `appRouter`.
+    *   No changes needed here if the router was already registered.
 
 ## 5. Frontend Changes (`packages/app`) [DONE]
 
