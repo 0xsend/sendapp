@@ -2014,7 +2014,6 @@ export type Database = {
           status: Database["public"]["Enums"]["temporal_status"]
           tx_hash: string | null
           updated_at: string
-          user_id: string
           user_op_hash: string | null
           vault: string
           workflow_id: string
@@ -2028,7 +2027,6 @@ export type Database = {
           status?: Database["public"]["Enums"]["temporal_status"]
           tx_hash?: string | null
           updated_at?: string
-          user_id: string
           user_op_hash?: string | null
           vault: string
           workflow_id: string
@@ -2042,7 +2040,6 @@ export type Database = {
           status?: Database["public"]["Enums"]["temporal_status"]
           tx_hash?: string | null
           updated_at?: string
-          user_id?: string
           user_op_hash?: string | null
           vault?: string
           workflow_id?: string
@@ -2053,13 +2050,6 @@ export type Database = {
             columns: ["activity_id"]
             isOneToOne: false
             referencedRelation: "activity"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "send_earn_deposits_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]

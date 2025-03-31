@@ -708,7 +708,6 @@ create type temporal_status as enum (
 
 -- Create the temporal.send_earn_deposits table
 CREATE TABLE temporal.send_earn_deposits (
-    user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     workflow_id text PRIMARY KEY,
     status temporal_status NOT NULL DEFAULT 'initialized',
     owner bytea NOT NULL,
@@ -726,7 +725,6 @@ CREATE TABLE temporal.send_earn_deposits (
 CREATE INDEX idx_temporal_send_earn_deposits_created_at ON temporal.send_earn_deposits(created_at);
 CREATE INDEX idx_temporal_send_earn_deposits_owner ON temporal.send_earn_deposits(owner);
 CREATE INDEX idx_temporal_send_earn_deposits_tx_hash ON temporal.send_earn_deposits(tx_hash);
-CREATE INDEX idx_temporal_send_earn_deposits_user_id ON temporal.send_earn_deposits(user_id);
 CREATE INDEX idx_temporal_send_earn_deposits_activity_id ON temporal.send_earn_deposits(activity_id);
 
 -- Add foreign key constraint to public.activity
@@ -788,3 +786,8 @@ CREATE TRIGGER aaa_temporal_deposit_insert_pending_activity
 AFTER INSERT ON temporal.send_earn_deposits
 FOR EACH ROW
 EXECUTE FUNCTION temporal.temporal_deposit_insert_pending_activity();
+
+-- Grant permissions for service_role on the temporal schema and its tables
+GRANT USAGE ON SCHEMA temporal TO service_role;
+GRANT ALL ON TABLE temporal.send_earn_deposits TO service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA temporal GRANT ALL ON TABLES TO service_role;
