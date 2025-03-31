@@ -53,7 +53,7 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
             <IconError size={'$4'} color={'$error'} />
             <YStack ai={'center'} gap={'$2'}>
               <Paragraph size={'$8'} fontWeight={500} ta={'center'}>
-                Unable to Initialize Payment
+                Coinbase window was closed
               </Paragraph>
               <Paragraph
                 size={'$5'}
