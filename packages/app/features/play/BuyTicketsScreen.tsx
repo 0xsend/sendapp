@@ -197,21 +197,7 @@ export function BuyTicketsScreen() {
   return (
     <HomeLayout TopNav={<TopNav header="Buy Send Tickets" showLogo={true} />}>
       <YStack f={1} pb={Math.max(bottom, 24) + 16}>
-        {/* Apply maxWidth and mx: 'auto' by default for consistent width */}
-        <YStack
-          px="$4"
-          py="$6"
-          gap="$6"
-          // Remove ai="center" and mx="auto" for left alignment
-          w="100%" // Ensure it takes full width before applying maxWidth
-          maxWidth={600} // Apply max width by default
-          // mx="auto" // Removed for left alignment
-          $gtMd={{
-            px: '$6',
-            // maxWidth is already set, potentially adjust if needed for larger screens
-            // mx: 'auto', // Removed for left alignment
-          }}
-        >
+        <YStack py="$6" gap="$6" w="100%" maxWidth={600}>
           <Card w="100%" p="$5">
             <YStack gap="$5">
               <YStack gap="$2" ai="center">
