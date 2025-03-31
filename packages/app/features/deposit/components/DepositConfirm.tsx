@@ -60,6 +60,7 @@ export const DepositConfirm = ({ onConfirmTransaction, isLoading }: DepositConfi
         </FadeCard>
       </YStack>
       <SubmitButton
+        testID={'onramp-button'}
         theme="green"
         onPress={handleSubmit}
         py={'$5'}
