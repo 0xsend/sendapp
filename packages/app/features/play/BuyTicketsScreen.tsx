@@ -22,11 +22,11 @@ import {
 import { formatUnits as formatUnitsViem } from 'viem' // Import parseUnits, rename formatUnits, add isAddress
 import { TopNav } from 'app/components/TopNav'
 import { HomeLayout } from 'app/features/home/layout.web'
-// TODO: Replace useCoins with a hook that provides the user's SendAccount address, nonce, and webauthn credentials
-// import { useUserAccount } from 'app/provider/userAccount' // Example hypothetical hook
+import { useSendAccount } from 'app/utils/send-accounts' // Import the hook
+import { useAccountNonce } from 'app/utils/userop' // Import the nonce hook
 import { useCoins } from 'app/provider/coins' // Keep for balance display for now
 import formatAmount from 'app/utils/formatAmount'
-import type { Address } from 'viem' // Import Address type
+import type { Address } from 'viem' // Re-add Address type import if needed, or ensure it's imported elsewhere
 
 export function BuyTicketsScreen() {
   const router = useRouter()
@@ -40,20 +40,18 @@ export function BuyTicketsScreen() {
   const { data: tokenAddress, isLoading: isLoadingToken } = useReadBaseJackpotToken()
   const { data: tokenDecimals, isLoading: isLoadingDecimals } = useReadBaseJackpotTokenDecimals()
 
-  // --- TODO: Fetch User Account Data ---
-  // Replace with actual hooks/context accessors
+  // --- Fetch User Account Data ---
+  const { data: sendAccount, isLoading: isLoadingUser } = useSendAccount()
+  const senderAddress = sendAccount?.address
+  // Fetch nonce using the dedicated hook
   const {
-    address: senderAddress,
-    nonce,
-    webauthnCreds,
-    isLoading: isLoadingUser,
-  } = {
-    address: undefined as Address | undefined, // Placeholder
-    nonce: undefined as bigint | undefined, // Placeholder
-    webauthnCreds: [] as { raw_credential_id: `\\x${string}`; name: string }[], // Placeholder
-    isLoading: true, // Placeholder
-  }
-  // const { address: senderAddress, nonce, webauthnCreds, isLoading: isLoadingUser } = useUserAccount(); // Example
+    data: fetchedNonce,
+    isLoading: isLoadingNonce,
+    error: nonceError,
+  } = useAccountNonce({
+    sender: senderAddress,
+  })
+  const webauthnCreds = sendAccount?.send_account_credentials ?? [] // Assuming credentials are here
 
   // --- Get SEND Balance (keep for display) ---
   const { coins, isLoading: isLoadingBalance } = useCoins() // Renamed original isLoading
@@ -114,6 +112,7 @@ export function BuyTicketsScreen() {
     isLoadingToken ||
     isLoadingDecimals ||
     isLoadingUser ||
+    isLoadingNonce || // Add nonce loading state
     isLoadingBalance ||
     purchaseMutation.isPending // Combine all loading states
 
@@ -156,12 +155,14 @@ export function BuyTicketsScreen() {
       toast.show('Error', { message: 'User account address not found.' })
       return
     }
-    // // Check tokenAddress is a valid address string
-    // if (!tokenAddress || !isAddress(tokenAddress)) {
-    //   toast.show('Error', { message: 'Ticket token address not found or invalid.' })
-    //   return
-    // }
-    if (nonce === undefined) {
+    // Check for nonce error first
+    if (nonceError) {
+      console.error('Nonce fetch error:', nonceError)
+      toast.show('Error', { message: 'Could not fetch account nonce. Please try again.' })
+      return
+    }
+    // Now check if fetchedNonce is defined
+    if (fetchedNonce === undefined) {
       toast.show('Error', { message: 'Could not determine account nonce.' })
       return
     }
@@ -177,14 +178,23 @@ export function BuyTicketsScreen() {
 
     try {
       toast.show('Processing...', { message: 'Submitting transaction...' })
-      // Now TypeScript knows these values are defined and have the correct types
       await purchaseMutation.mutateAsync({
         sender: senderAddress,
-        tokenAddress: `0x${tokenAddress}`, // No assertion needed
+        tokenAddress: tokenAddress as Address,
         ticketPrice: ticketPriceBigInt, // No assertion needed
         recipient: senderAddress, // User buys tickets for themselves
-        nonce: nonce, // No assertion needed
-        webauthnCreds: webauthnCreds,
+        nonce: fetchedNonce, // Use the fetched nonce
+        webauthnCreds: webauthnCreds
+          .map((cred) => ({
+            // Map from the nested structure provided by useSendAccount query
+            raw_credential_id: cred.webauthn_credentials?.raw_credential_id,
+            name: cred.webauthn_credentials?.name,
+          }))
+          .filter(
+            (cred): cred is { raw_credential_id: `\\x${string}`; name: string } =>
+              // Filter out any credentials where mapping failed or values are missing
+              !!cred.raw_credential_id && !!cred.name
+          ),
         // Optional: Add referrer logic if needed
       })
       toast.show('Success', { message: `Successfully purchased ${ticketCount} tickets!` })

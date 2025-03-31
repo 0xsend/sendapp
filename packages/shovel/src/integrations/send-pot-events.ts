@@ -1,10 +1,8 @@
 import type { BlockData, Column, Integration, Table } from '@indexsupply/shovel-config'
 
-// Placeholder for the actual SendPot contract address
-const SEND_POT_CONTRACT_ADDRESS_PLACEHOLDER = '0x...' // TODO: Replace with actual address
+const SEND_POT_CONTRACT_ADDRESS_PLACEHOLDER = '0xa0A5611b9A1071a1D8A308882065c48650bAeE8b'
 
 // --- UserTicketPurchase Event ---
-
 export const sendPotUserTicketPurchasesTable: Table = {
   name: 'send_pot_user_ticket_purchases',
   columns: [
