@@ -1,36 +1,19 @@
 import {
-  Label,
+  BigHeading,
+  Button,
+  Card,
   Paragraph,
   Spinner,
   XStack,
-  YStack,
-  Stack,
-  BigHeading,
-  styled,
-  AnimatePresence,
   type XStackProps,
-  Card,
+  YStack,
 } from '@my/ui'
 import formatAmount from 'app/utils/formatAmount'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useEffect, useState } from 'react'
 import { type Timer, useStopwatch } from 'react-use-precision-timer'
 import { useCoins } from 'app/provider/coins'
-
-const GreenSquare = styled(Stack, {
-  name: 'Surface',
-  w: 11,
-  h: 11,
-  theme: 'green_active',
-  bc: '$background',
-})
-
-const HiddenSquare = styled(Stack, {
-  name: 'Surface',
-  w: 11,
-  h: 11,
-  bc: '$color10',
-})
+import { Eye, EyeOff } from '@tamagui/lucide-icons'
 
 export const TokenBalanceCard = () => {
   // @todo add an enabled flag for when hidden
@@ -51,26 +34,45 @@ export const TokenBalanceCard = () => {
     <Card p={'$5'} w={'100%'} jc="space-between" $gtLg={{ p: '$6', h: 244, mih: 244 }} mih={184}>
       <XStack w={'100%'} zIndex={4} h="100%">
         <YStack jc={'center'} gap={'$2'} w={'100%'}>
-          <YStack w="fit-content" gap={'$2.5'} jc="space-between">
-            <XStack ai={'center'} gap="$2.5" width={'100%'}>
-              <XStack ai={'center'} gap="$2.5">
-                <AnimatePresence exitBeforeEnter>
-                  {isPriceHidden ? <HiddenSquare /> : <GreenSquare />}
-                </AnimatePresence>
-                <Label
-                  fontSize={'$4'}
-                  zIndex={1}
-                  fontWeight={'500'}
-                  textTransform={'uppercase'}
-                  lineHeight={0}
-                  col={'$color10'}
-                >
-                  Total Balance
-                </Label>
-              </XStack>
+          <YStack w={'100%'} gap={'$2.5'} jc="space-between">
+            <XStack ai={'center'} jc={'space-between'} gap="$2.5" width={'100%'}>
+              <Paragraph
+                fontSize={'$5'}
+                color={'$lightGrayTextField'}
+                $theme-light={{ color: '$darkGrayTextField' }}
+                zIndex={1}
+                $gtLg={{ fontSize: '$6' }}
+              >
+                Total Balance
+              </Paragraph>
+              <Button
+                chromeless
+                backgroundColor="transparent"
+                hoverStyle={{ backgroundColor: 'transparent' }}
+                pressStyle={{
+                  backgroundColor: 'transparent',
+                  borderColor: 'transparent',
+                }}
+                focusStyle={{ backgroundColor: 'transparent' }}
+                p={0}
+                height={'auto'}
+                onPress={toggleIsPriceHidden}
+              >
+                <Button.Icon>
+                  {isPriceHidden ? (
+                    <EyeOff
+                      size={'$1.5'}
+                      color={'$lightGrayTextField'}
+                      $theme-light={{ color: '$darkGrayTextField' }}
+                    />
+                  ) : (
+                    <Eye size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
+                  )}
+                </Button.Icon>
+              </Button>
             </XStack>
             {isGameVisible && (
-              <XStack w="100%" gap={'$2'} jc={'space-between'} ai={'center'} my="auto">
+              <XStack w="fit-content" gap={'$2'} jc={'space-between'} ai={'center'} my="auto">
                 <Paragraph fontSize={'$6'} fontWeight={'500'} zIndex={1} color={'$color10'}>
                   {presses}
                 </Paragraph>
@@ -118,11 +120,8 @@ export const TokenBalanceCard = () => {
                         color={'$color12'}
                         zIndex={1}
                       >
-                        {formattedBalance}
+                        ${formattedBalance}
                       </BigHeading>
-                      <Paragraph fontSize={'$6'} fontWeight={'500'} zIndex={1} $sm={{ mt: '$4' }}>
-                        {'USD'}
-                      </Paragraph>
                     </>
                   )
               }
