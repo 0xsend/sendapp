@@ -178,7 +178,7 @@ describe('DepositCoinbaseScreen', () => {
         <DepositCoinbaseScreen />
       </Provider>
     )
-    expect(screen.getByText('Unable to Initialize Payment')).toBeOnTheScreen()
+    expect(screen.getByText('Coinbase window was closed')).toBeOnTheScreen()
     expect(screen.getByText('Test error')).toBeOnTheScreen()
     fireEvent.press(screen.getByText('try again'))
     expect(mockCloseOnramp).toHaveBeenCalled()
