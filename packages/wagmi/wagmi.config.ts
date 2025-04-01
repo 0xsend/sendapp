@@ -155,6 +155,36 @@ export default defineConfig({
       abi: erc20Abi,
     },
     {
+      name: 'Moonwell', // TODO is this available on eth?
+      address: {
+        [baseLocal.id]: '0xa88594d404727625a9437c3f886c7643872296ae',
+        [base.id]: '0xa88594d404727625a9437c3f886c7643872296ae',
+        [baseSepolia.id]: '0xa88594d404727625a9437c3f886c7643872296ae', // TODO is this available on base sepolia?
+      },
+      abi: erc20Abi,
+    },
+    {
+      name: 'Morpho',
+      address: {
+        [mainnet.id]: '0x58d97b57bb95320f9a05dc918aef65434969c2b2',
+        [localhost.id]: '0x58d97b57bb95320f9a05dc918aef65434969c2b2',
+        [sepolia.id]: '0x58d97b57bb95320f9a05dc918aef65434969c2b2', // TODO is this available on eth sepolia?
+        [base.id]: '0xbaa5cc21fd487b8fcc2f632f3f4e8d37262a0842',
+        [baseLocal.id]: '0xbaa5cc21fd487b8fcc2f632f3f4e8d37262a0842',
+        [baseSepolia.id]: '0xbaa5cc21fd487b8fcc2f632f3f4e8d37262a0842', // TODO is this available on base sepolia?
+      },
+      abi: erc20Abi,
+    },
+    {
+      name: 'Aerodrome Finance', // TODO is this available on eth?
+      address: {
+        [base.id]: '0x940181a94a35a4569e4529a3cdfb74e38fd98631',
+        [baseLocal.id]: '0x940181a94a35a4569e4529a3cdfb74e38fd98631',
+        [baseSepolia.id]: '0x940181a94a35a4569e4529a3cdfb74e38fd98631', // TODO is this available on base sepolia?
+      },
+      abi: erc20Abi,
+    },
+    {
       name: 'EntryPoint',
       address: {
         [mainnet.id]: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',

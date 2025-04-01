@@ -4,6 +4,9 @@ import {
   sendTokenAddress as sendAddresses,
   spx6900Address as spx6900Addresses,
   sendTokenV0Address,
+  moonwellAddress as moonwellAddresses,
+  morphoAddress as morphoAddresses,
+  aerodromeFinanceAddress as aerodromeFinanceAddresses,
 } from '@my/wagmi'
 import { z } from 'zod'
 
@@ -75,6 +78,33 @@ export const spx6900Coin = {
   coingeckoTokenId: 'spx6900',
 } as const satisfies coin
 
+export const moonwellCoin = {
+  label: 'Moonwell',
+  symbol: 'WELL',
+  token: moonwellAddresses[baseMainnet.id],
+  decimals: 18,
+  formatDecimals: 0,
+  coingeckoTokenId: 'moonwell-artemis',
+}
+
+export const morphoCoin = {
+  label: 'Morpho',
+  symbol: 'MORPHO',
+  token: morphoAddresses[baseMainnet.id],
+  decimals: 18,
+  formatDecimals: 2,
+  coingeckoTokenId: 'morpho',
+}
+
+export const aerodromeCoin = {
+  label: 'Aerodrome Finance',
+  symbol: 'AERO',
+  token: aerodromeFinanceAddresses[baseMainnet.id],
+  decimals: 18,
+  formatDecimals: 0,
+  coingeckoTokenId: 'aerodrome-finance',
+}
+
 /**
  * The coins (tokens) array that are supported by Send App.
  */
@@ -96,7 +126,7 @@ export type coinsDict = typeof coinsDict
 /**
  * The coins (tokens) that sendapp supports through partnerships. (Hidden when balance is 0)
  */
-export const partnerCoins: coin[] = [spx6900Coin] as const
+export const partnerCoins: coin[] = [spx6900Coin, moonwellCoin, morphoCoin, aerodromeCoin] as const
 export type partnerCoins = typeof partnerCoins
 
 type PartnerCoinsDict = { [key in partnerCoins[number]['token']]: partnerCoins[number] }

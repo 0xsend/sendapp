@@ -13,8 +13,11 @@ import {
 import { useSendAccounts } from 'app/utils/send-accounts'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 import {
+  aerodromeFinanceAddress,
   baseMainnet,
   baseMainnetClient,
+  moonwellAddress,
+  morphoAddress,
   sendTokenAddress,
   sendTokenV0Address,
   spx6900Address,
@@ -154,6 +157,45 @@ export function SecretShopScreen() {
                     }}
                   >
                     Fund with 69K SPX6900
+                  </Button>
+                  <Button
+                    onPress={async () => {
+                      await setERC20Balance({
+                        client: testClient,
+                        address: sendAcct.address,
+                        tokenAddress: moonwellAddress[baseMainnetClient.chain.id],
+                        value: BigInt(10000 * 1e18),
+                      })
+                      toast.show('Funded with 10K WELL')
+                    }}
+                  >
+                    Fund with 10K WELL
+                  </Button>
+                  <Button
+                    onPress={async () => {
+                      await setERC20Balance({
+                        client: testClient,
+                        address: sendAcct.address,
+                        tokenAddress: morphoAddress[baseMainnetClient.chain.id],
+                        value: BigInt(10000 * 1e18),
+                      })
+                      toast.show('Funded with 10K MORPHO')
+                    }}
+                  >
+                    Fund with 10K MORPHO
+                  </Button>
+                  <Button
+                    onPress={async () => {
+                      await setERC20Balance({
+                        client: testClient,
+                        address: sendAcct.address,
+                        tokenAddress: aerodromeFinanceAddress[baseMainnetClient.chain.id],
+                        value: BigInt(10000 * 1e18),
+                      })
+                      toast.show('Funded with 10K AERO')
+                    }}
+                  >
+                    Fund with 10K AERO
                   </Button>
                 </>
               ) : (
