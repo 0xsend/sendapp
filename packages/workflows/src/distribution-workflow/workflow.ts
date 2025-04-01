@@ -10,18 +10,18 @@ const {
   startToCloseTimeout: '30 seconds',
 })
 
-export async function DistributionWorkflow(distributionId: number): Promise<void> {
+export async function distribution(distributionId: number): Promise<void> {
   const distribution = await fetchDistributionActivity(distributionId.toString())
   if (!distribution) throw new ApplicationFailure('Distribution not found')
   await calculateDistributionSharesActivity(distribution)
 }
 
-export async function DistributionsWorkflow(): Promise<void> {
+export async function distributions(): Promise<void> {
   // fetch all distributions in qualification period
   const distributions = await fetchAllOpenDistributionsActivity()
   if (!distributions) throw new ApplicationFailure('No distributions found')
 
-  for (const distribution of distributions) {
-    await DistributionWorkflow(distribution.id) // calculate one distribution at a time for now
+  for (const d of distributions) {
+    await distribution(d.id) // calculate one distribution at a time for now
   }
 }
