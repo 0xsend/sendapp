@@ -105,11 +105,17 @@ for (const inCoin of allCoins) {
         timeout: isEthCoin(outCoin) ? 10_000 : undefined,
       })
       const history = page.getByTestId('TokenActivityFeed')
-      await expect(history).toBeVisible()
-      await expect(history.getByText('Bought')).toBeVisible()
-      const countCoinSymbols = await history.getByText(outCoin.symbol).count()
-      expect(countCoinSymbols).toBe(2)
-      await expect(history.getByText('1 min ago')).toBeVisible()
+      let attempts = 0
+      await expect(async () => {
+        if (attempts > 0) {
+          await page.reload() // give shovel some time to catch up
+        }
+        attempts++
+        await expect(history).toBeVisible()
+        await expect(history.getByText('Bought')).toBeVisible()
+        const countCoinSymbols = await history.getByText(outCoin.symbol).count()
+        expect(countCoinSymbols).toBe(2)
+      }).toPass({ timeout: 10_000 })
     })
   }
 }

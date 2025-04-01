@@ -1,6 +1,12 @@
+import { baseMainnetClient, sendSwapsRevenueSafeAddress } from '@my/wagmi'
+import { TRPCError } from '@trpc/server'
+import { hexToBytea } from 'app/utils/hexToBytea'
+import { supabaseAdmin } from 'app/utils/supabase/admin'
+import { address } from 'app/utils/zod'
+import debug from 'debug'
+import { isAddress, isAddressEqual } from 'viem'
 import { createTRPCRouter, protectedProcedure } from '../../trpc'
 import {
-  EthAddressSchema,
   type KyberEncodeRouteRequest,
   KyberEncodeRouteRequestSchema,
   KyberEncodeRouteResponseSchema,
@@ -8,11 +14,6 @@ import {
   KyberGetSwapRouteRequestSchema,
   KyberGetSwapRouteResponseSchema,
 } from './types'
-import debug from 'debug'
-import { baseMainnetClient, sendSwapsRevenueSafeAddress } from '@my/wagmi'
-import { TRPCError } from '@trpc/server'
-import { supabaseAdmin } from 'app/utils/supabase/admin'
-import { isAddressEqual } from 'viem'
 
 const log = debug('api:routers:swap')
 
@@ -87,11 +88,11 @@ const encodeKyberSwapRoute = async ({
           return null
         }
 
-        const result = EthAddressSchema.safeParse(tokenInLiquidityPool.pool)
+        const result = address.safeParse(tokenInLiquidityPool.pool)
 
         // kyber can return contracts addresses (or custom values) instead of LP address (e.g. uniswap v4 hooks)
         // for now we gonna ignore those
-        if (!result.success) {
+        if (!result.success || !isAddress(tokenInLiquidityPool.pool)) {
           log('Not saving LP address: ', tokenInLiquidityPool.pool)
           return null
         }
@@ -105,23 +106,28 @@ const encodeKyberSwapRoute = async ({
       })
       .filter((item) => item !== null)
 
-    const { error: liquidityPoolsError } = await supabaseAdmin
-      .from('liquidity_pools')
-      .upsert(liquidityPools, { ignoreDuplicates: true })
+    const { error: liquidityPoolsError } = await supabaseAdmin.from('liquidity_pools').upsert(
+      liquidityPools.map((lp) => ({
+        ...lp,
+        pool_addr: hexToBytea(lp.pool_addr as `0x${string}`),
+      })),
+      { ignoreDuplicates: true }
+    )
 
     if (liquidityPoolsError) {
       throw new Error(liquidityPoolsError.message)
     }
 
+    const body = JSON.stringify({
+      sender,
+      recipient,
+      slippageTolerance,
+      routeSummary,
+    })
     const response = await fetch(url, {
       method: 'POST',
       headers: getHeaders(),
-      body: JSON.stringify({
-        sender,
-        recipient,
-        slippageTolerance,
-        routeSummary,
-      }),
+      body,
     }).then((res) => res.json())
 
     const kyberEncodeRouteResponse = KyberEncodeRouteResponseSchema.parse(response)
@@ -132,7 +138,7 @@ const encodeKyberSwapRoute = async ({
 
     const { error: swapRoutersError } = await supabaseAdmin.from('swap_routers').upsert(
       {
-        router_addr: kyberEncodeRouteResponse.data.routerAddress,
+        router_addr: hexToBytea(kyberEncodeRouteResponse.data.routerAddress),
         chain_id: baseMainnetClient.chain.id,
       },
       { ignoreDuplicates: true }

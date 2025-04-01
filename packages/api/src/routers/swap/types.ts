@@ -1,4 +1,8 @@
+import { address, hex } from 'app/utils/zod'
 import { z } from 'zod'
+
+// for some reason, kyber requires addresses to be lowercase
+const addressLower = address.transform((v): `0x${string}` => v.toLowerCase() as `0x${string}`)
 
 export const KyberGetSwapRouteRequestSchema = z.object({
   tokenIn: z.string(),
@@ -8,20 +12,10 @@ export const KyberGetSwapRouteRequestSchema = z.object({
 
 export type KyberGetSwapRouteRequest = z.infer<typeof KyberGetSwapRouteRequestSchema>
 
-const HexSchema = z
-  .string()
-  .regex(/^0x[a-fA-F0-9]+$/i)
-  .refine((v): v is `0x${string}` => true)
-
-export const EthAddressSchema = z
-  .string()
-  .regex(/^0x[a-fA-F0-9]{40}$/i)
-  .refine((v): v is `0x${string}` => true)
-
 const SwapRoutePoolSchema = z.object({
   pool: z.string(), //kyber can return various formats here, contracts addresses (or custom values) instead of LP address (e.g. uniswap v4 hooks)
-  tokenIn: EthAddressSchema,
-  tokenOut: EthAddressSchema,
+  tokenIn: addressLower,
+  tokenOut: addressLower,
   limitReturnAmount: z.string(),
   swapAmount: z.string(),
   amountOut: z.string(),
@@ -33,10 +27,10 @@ const SwapRoutePoolSchema = z.object({
 })
 
 export const KyberRouteSummarySchema = z.object({
-  tokenIn: EthAddressSchema,
+  tokenIn: addressLower,
   amountIn: z.string(),
   amountInUsd: z.string(),
-  tokenOut: EthAddressSchema,
+  tokenOut: addressLower,
   amountOut: z.string(),
   amountOutUsd: z.string(),
   gas: z.string(),
@@ -61,14 +55,14 @@ export const KyberGetSwapRouteResponseSchema = z.object({
   code: z.number(),
   message: z.string(),
   data: z.object({
-    routerAddress: EthAddressSchema,
+    routerAddress: addressLower,
     routeSummary: KyberRouteSummarySchema,
   }),
 })
 
 export const KyberEncodeRouteRequestSchema = z.object({
-  sender: EthAddressSchema,
-  recipient: EthAddressSchema,
+  sender: addressLower,
+  recipient: addressLower,
   slippageTolerance: z.number().min(0).max(2000),
   routeSummary: KyberRouteSummarySchema,
 })
@@ -85,7 +79,7 @@ export const KyberEncodeRouteResponseSchema = z.object({
     amountOutUsd: z.string(),
     gas: z.string(),
     gasUsd: z.string(),
-    data: HexSchema,
-    routerAddress: EthAddressSchema,
+    data: hex,
+    routerAddress: addressLower,
   }),
 })

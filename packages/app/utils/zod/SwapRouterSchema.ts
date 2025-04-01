@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { byteaToHexEthAddress } from './bytea'
 
 export const SwapRouterSchema = z.object({
   created_at: z.string().transform((v, ctx) => {
@@ -14,10 +15,7 @@ export const SwapRouterSchema = z.object({
       return z.NEVER
     }
   }),
-  router_addr: z
-    .string()
-    .transform((v) => Buffer.from(v.slice(2), 'hex').toString())
-    .refine((v): v is `0x${string}` => true),
+  router_addr: byteaToHexEthAddress,
 })
 
 export type SwapRouter = z.infer<typeof SwapRouterSchema>

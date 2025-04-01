@@ -10,6 +10,7 @@ import { models } from '../src'
 import { pravatar } from '../src/utils'
 import { leaderboardReferralsAllTimes, userOnboarded } from '../src/models'
 import { baseMainnetClient } from '@my/wagmi'
+import { hexToBytes } from 'viem'
 
 const dryRun = process.env.DRY !== '0'
 
@@ -36,7 +37,7 @@ const dryRun = process.env.DRY !== '0'
 
   await seed.swap_routers([
     {
-      router_addr: Buffer.from('0xc7d3ab410d49b664d03fe5b1038852ac852b1b29'),
+      router_addr: Buffer.from(hexToBytes('0xc7d3ab410d49b664d03fe5b1038852ac852b1b29')),
       chain_id: baseMainnetClient.chain.id,
     },
   ])

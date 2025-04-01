@@ -1,4 +1,3 @@
-import { useCallback, useEffect, useState } from 'react'
 import {
   Button,
   FadeCard,
@@ -12,22 +11,23 @@ import {
   YStack,
 } from '@my/ui'
 import { ArrowDown, ArrowUp, ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
-import { IconSwap } from 'app/components/icons'
-import { allCoinsDict, usdcCoin } from 'app/data/coins'
-import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
-import { useCoin, useCoins } from 'app/provider/coins'
-import { FormProvider, useForm } from 'react-hook-form'
-import { formatUnits } from 'viem'
-import { formFields, SchemaForm } from 'app/utils/SchemaForm'
-import { z } from 'zod'
-import { api } from 'app/utils/api'
-import { useSwapScreenParams } from 'app/routers/params'
-import { useRouter } from 'solito/router'
-import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { useQueryClient } from '@tanstack/react-query'
+import { IconSwap } from 'app/components/icons'
+import { allCoinsDict, usdcCoin } from 'app/data/coins'
 import { DEFAULT_SLIPPAGE, SWAP_ROUTE_SUMMARY_QUERY_KEY } from 'app/features/swap/constants'
 import SwapRiskDialog from 'app/features/swap/form/RiskDialog/SwapRiskDialog'
+import { useCoin, useCoins } from 'app/provider/coins'
+import { useSwapScreenParams } from 'app/routers/params'
+import { api } from 'app/utils/api'
+import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
+import { formFields, SchemaForm } from 'app/utils/SchemaForm'
+import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { useCallback, useEffect, useState } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
+import { useRouter } from 'solito/router'
+import { formatUnits } from 'viem'
+import { type BRAND, z } from 'zod'
 
 const SwapFormSchema = z.object({
   outToken: formFields.coin,
@@ -95,6 +95,7 @@ export const SwapFormScreen = () => {
 
     queryClient.setQueryDefaults([SWAP_ROUTE_SUMMARY_QUERY_KEY], {
       gcTime: 20 * 60_000, // 20 minutes
+      staleTime: 10 * 1000, // 10 seconds
     })
     queryClient.setQueryData([SWAP_ROUTE_SUMMARY_QUERY_KEY], swapRoute.routeSummary)
 
@@ -287,7 +288,7 @@ export const SwapFormScreen = () => {
             inToken: {
               defaultValue: inToken,
               showAllCoins: true,
-              onValueChange: (value) => {
+              onValueChange: (value: string & BRAND<'coin'>) => {
                 if (value === outToken) {
                   handleFlipTokens()
                   return
@@ -299,7 +300,7 @@ export const SwapFormScreen = () => {
             outToken: {
               defaultValue: outToken,
               showAllCoins: true,
-              onValueChange: (value) => {
+              onValueChange: (value: string & BRAND<'coin'>) => {
                 if (value === inToken) {
                   handleFlipTokens()
                   return

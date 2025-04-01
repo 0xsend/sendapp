@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { byteaToHexEthAddress } from './bytea'
 
 export const LiquidityPoolSchema = z.object({
   created_at: z.string().transform((v, ctx) => {
@@ -14,10 +15,7 @@ export const LiquidityPoolSchema = z.object({
       return z.NEVER
     }
   }),
-  pool_addr: z
-    .string()
-    .transform((v) => Buffer.from(v.slice(2), 'hex').toString())
-    .refine((v): v is `0x${string}` => true),
+  pool_addr: byteaToHexEthAddress,
   pool_name: z.string(),
   pool_type: z.string(),
 })
