@@ -5,10 +5,10 @@ exports[`DepositScreen renders the deposit screen 1`] = `
   style={
     {
       "flexDirection": "column",
-      "marginLeft": "auto",
-      "marginRight": "auto",
-      "marginTop": 18,
-      "maxWidth": 600,
+      "gap": 24,
+      "justifyContent": "space-between",
+      "paddingBottom": 16,
+      "paddingTop": 16,
       "width": "100%",
     }
   }
@@ -17,110 +17,105 @@ exports[`DepositScreen renders the deposit screen 1`] = `
     style={
       {
         "flexDirection": "column",
+        "gap": 7,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#FFFFFF",
+          "fontFamily": "System",
+          "fontSize": 36,
+          "fontWeight": 500,
+          "lineHeight": 35,
+          "userSelect": "auto",
+        }
+      }
+      suppressHighlighting={true}
+    >
+      Deposit Funds
+    </Text>
+    <Text
+      style={
+        {
+          "color": "#B3B3B3",
+          "fontFamily": "System",
+          "fontSize": 19.2,
+          "fontWeight": "400",
+          "lineHeight": 19,
+          "userSelect": "auto",
+        }
+      }
+      suppressHighlighting={true}
+    >
+      Select a deposit method
+    </Text>
+  </View>
+  <View
+    style={
+      {
+        "flexDirection": "column",
+        "gap": 16,
         "width": "100%",
       }
     }
   >
     <View
-      style={
-        {
-          "flex": 1,
-          "flexDirection": "column",
-          "justifyContent": "space-between",
-          "paddingBottom": 18,
-          "paddingLeft": 18,
-          "paddingRight": 18,
-        }
-      }
+      href="/deposit/crypto"
+      testID="MockSolitoLink"
     >
       <View
+        collapsable={false}
+        forwardedRef={[Function]}
+        jestAnimatedStyle={
+          {
+            "value": {
+              "opacity": 0,
+              "transform": [
+                {
+                  "scale": 0.9,
+                },
+              ],
+            },
+          }
+        }
         style={
           {
-            "flexDirection": "column",
-            "gap": 13,
-            "width": "100%",
+            "opacity": 0,
+            "transform": [
+              {
+                "scale": 0.9,
+              },
+            ],
           }
         }
       >
         <View
-          cancelable={true}
-          disabled={false}
-          focusVisibleStyle={{}}
-          focusable={[Function]}
-          minPressDuration={0}
-          onBlur={[Function]}
-          onFocus={[Function]}
-          onMouseEnter={[Function]}
-          onMouseLeave={[Function]}
-          onPress={[Function]}
-          onPressIn={[Function]}
-          onPressOut={[Function]}
-          role="button"
           style={
             {
-              "alignItems": "center",
               "backgroundColor": "#111f22",
-              "borderBottomColor": "#40FB50",
-              "borderBottomLeftRadius": 9,
-              "borderBottomRightRadius": 9,
-              "borderBottomWidth": 0,
-              "borderLeftColor": "#40FB50",
-              "borderLeftWidth": 0,
-              "borderRightColor": "#40FB50",
-              "borderRightWidth": 0,
-              "borderStyle": "solid",
-              "borderTopColor": "#40FB50",
-              "borderTopLeftRadius": 9,
-              "borderTopRightRadius": 9,
-              "borderTopWidth": 0,
-              "flexDirection": "row",
-              "flexWrap": "nowrap",
-              "height": 80,
-              "justifyContent": "center",
-              "paddingLeft": 18,
-              "paddingRight": 18,
+              "borderBottomLeftRadius": 10,
+              "borderBottomRightRadius": 10,
+              "borderTopLeftRadius": 10,
+              "borderTopRightRadius": 10,
+              "flexDirection": "column",
+              "gap": 16,
+              "paddingBottom": 24,
+              "paddingLeft": 24,
+              "paddingRight": 24,
+              "paddingTop": 24,
               "position": "relative",
+              "width": "100%",
             }
           }
         >
           <View
             style={
               {
-                "backgroundColor": "#40FB50",
-                "flexDirection": "column",
-                "height": 40,
-                "left": 0,
-                "position": "absolute",
-                "top": "50%",
-                "transform": [
-                  {
-                    "translateY": -20,
-                  },
-                ],
-                "width": 4,
-              }
-            }
-          />
-          <View
-            pointerEvents="none"
-            style={
-              {
-                "height": 0,
-                "minHeight": 0,
-                "minWidth": 11.088000000000001,
-                "width": 11.088000000000001,
-              }
-            }
-          />
-          <View
-            style={
-              {
                 "alignItems": "center",
                 "flexDirection": "row",
                 "justifyContent": "space-between",
-                "paddingLeft": 18,
-                "paddingRight": 18,
-                "width": "100%",
               }
             }
           >
@@ -128,24 +123,22 @@ exports[`DepositScreen renders the deposit screen 1`] = `
               style={
                 {
                   "alignItems": "center",
+                  "flex": 1,
                   "flexDirection": "row",
-                  "gap": 13,
+                  "gap": 24,
                 }
               }
             >
               <RNSVGSvgView
                 align="xMidYMid"
-                bbHeight={24}
-                bbWidth={24}
-                fill="none"
+                bbHeight={28}
+                bbWidth={28}
+                color="#40FB50"
                 focusable={false}
-                height={24}
+                height={28}
                 meetOrSlice={0}
                 minX={0}
                 minY={0}
-                stroke="#888"
-                strokeLinecap="round"
-                strokeLinejoin="round"
                 strokeWidth="2"
                 style={
                   [
@@ -154,217 +147,229 @@ exports[`DepositScreen renders the deposit screen 1`] = `
                       "borderWidth": 0,
                     },
                     {
-                      "color": "#888",
+                      "color": "#40FB50",
+                      "flexShrink": 0,
                     },
                     {
                       "flex": 0,
-                      "height": 24,
-                      "width": 24,
+                      "height": 28,
+                      "width": 28,
                     },
                   ]
                 }
-                tintColor="#888"
+                tintColor="#40FB50"
                 vbHeight={24}
                 vbWidth={24}
-                width={24}
+                width={28}
               >
                 <RNSVGGroup
-                  fill={null}
+                  fill={
+                    {
+                      "payload": 4278190080,
+                      "type": 0,
+                    }
+                  }
                   propList={
                     [
-                      "fill",
-                      "stroke",
                       "strokeWidth",
-                      "strokeLinecap",
-                      "strokeLinejoin",
+                    ]
+                  }
+                  strokeWidth="2"
+                >
+                  <RNSVGPath
+                    d="M2 20V4H22V20H2ZM4 8H20V6H4V8ZM15.775 14.075L20 10.525V10H4V11.225L15.775 14.075Z"
+                    fill={
+                      {
+                        "type": 2,
+                      }
+                    }
+                    propList={
+                      [
+                        "fill",
+                      ]
+                    }
+                  />
+                </RNSVGGroup>
+              </RNSVGSvgView>
+              <View
+                style={
+                  {
+                    "flex": 1,
+                    "flexDirection": "column",
+                    "gap": 7,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "#FFFFFF",
+                      "fontFamily": "System",
+                      "fontSize": 21.599999999999998,
+                      "fontWeight": 500,
+                      "lineHeight": 19,
+                      "userSelect": "auto",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  Crypto Wallet
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "#B3B3B3",
+                      "fontFamily": "System",
+                      "fontSize": 19.2,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                      "userSelect": "auto",
+                      "width": "100%",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  Deposit from an external wallet
+                </Text>
+              </View>
+            </View>
+            <RNSVGSvgView
+              align="xMidYMid"
+              bbHeight={20}
+              bbWidth={20}
+              fill="none"
+              focusable={false}
+              height={20}
+              meetOrSlice={0}
+              minX={0}
+              minY={0}
+              stroke="#B3B3B3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              style={
+                [
+                  {
+                    "backgroundColor": "transparent",
+                    "borderWidth": 0,
+                  },
+                  {
+                    "color": "#B3B3B3",
+                  },
+                  {
+                    "flex": 0,
+                    "height": 20,
+                    "width": 20,
+                  },
+                ]
+              }
+              tintColor="#B3B3B3"
+              vbHeight={24}
+              vbWidth={24}
+              width={20}
+            >
+              <RNSVGGroup
+                fill={null}
+                propList={
+                  [
+                    "fill",
+                    "stroke",
+                    "strokeWidth",
+                    "strokeLinecap",
+                    "strokeLinejoin",
+                  ]
+                }
+                stroke={
+                  {
+                    "payload": 4289967027,
+                    "type": 0,
+                  }
+                }
+                strokeLinecap={1}
+                strokeLinejoin={1}
+                strokeWidth="2"
+              >
+                <RNSVGPath
+                  d="m9 18 6-6-6-6"
+                  fill={
+                    {
+                      "payload": 4278190080,
+                      "type": 0,
+                    }
+                  }
+                  propList={
+                    [
+                      "stroke",
                     ]
                   }
                   stroke={
                     {
-                      "payload": 4287137928,
+                      "payload": 4289967027,
                       "type": 0,
                     }
                   }
-                  strokeLinecap={1}
-                  strokeLinejoin={1}
-                  strokeWidth="2"
-                >
-                  <RNSVGPath
-                    d="M21 12V7H5a2 2 0 0 1 0-4h14v4"
-                    fill={
-                      {
-                        "payload": 4278190080,
-                        "type": 0,
-                      }
-                    }
-                    propList={
-                      [
-                        "stroke",
-                      ]
-                    }
-                    stroke={
-                      {
-                        "payload": 4287137928,
-                        "type": 0,
-                      }
-                    }
-                  />
-                  <RNSVGPath
-                    d="M3 5v14a2 2 0 0 0 2 2h16v-5"
-                    fill={
-                      {
-                        "payload": 4278190080,
-                        "type": 0,
-                      }
-                    }
-                    propList={
-                      [
-                        "stroke",
-                      ]
-                    }
-                    stroke={
-                      {
-                        "payload": 4287137928,
-                        "type": 0,
-                      }
-                    }
-                  />
-                  <RNSVGPath
-                    d="M18 12a2 2 0 0 0 0 4h4v-4Z"
-                    fill={
-                      {
-                        "payload": 4278190080,
-                        "type": 0,
-                      }
-                    }
-                    propList={
-                      [
-                        "stroke",
-                      ]
-                    }
-                    stroke={
-                      {
-                        "payload": 4287137928,
-                        "type": 0,
-                      }
-                    }
-                  />
-                </RNSVGGroup>
-              </RNSVGSvgView>
-              <View
-                style={
-                  {
-                    "flexDirection": "column",
-                  }
-                }
-              >
-                <Text
-                  style={
-                    {
-                      "color": "#FFFFFF",
-                      "fontFamily": "System",
-                      "fontWeight": "500",
-                    }
-                  }
-                  suppressHighlighting={true}
-                >
-                  Via Crypto
-                </Text>
-                <Text
-                  style={
-                    {
-                      "color": "#FFFFFF",
-                      "fontFamily": "System",
-                      "fontSize": 15.6,
-                    }
-                  }
-                  suppressHighlighting={true}
-                >
-                  Direct deposit via External Wallet
-                </Text>
-              </View>
-            </View>
+                />
+              </RNSVGGroup>
+            </RNSVGSvgView>
           </View>
         </View>
+      </View>
+    </View>
+    <View
+      href="/deposit/apple-pay"
+      testID="MockSolitoLink"
+    >
+      <View
+        collapsable={false}
+        forwardedRef={[Function]}
+        jestAnimatedStyle={
+          {
+            "value": {
+              "opacity": 0,
+              "transform": [
+                {
+                  "scale": 0.9,
+                },
+              ],
+            },
+          }
+        }
+        style={
+          {
+            "opacity": 0,
+            "transform": [
+              {
+                "scale": 0.9,
+              },
+            ],
+          }
+        }
+      >
         <View
-          cancelable={true}
-          disabled={false}
-          focusVisibleStyle={{}}
-          focusable={[Function]}
-          minPressDuration={0}
-          onBlur={[Function]}
-          onFocus={[Function]}
-          onMouseEnter={[Function]}
-          onMouseLeave={[Function]}
-          onPress={[Function]}
-          onPressIn={[Function]}
-          onPressOut={[Function]}
-          role="button"
           style={
             {
-              "alignItems": "center",
               "backgroundColor": "#111f22",
-              "borderBottomColor": "#40FB50",
-              "borderBottomLeftRadius": 9,
-              "borderBottomRightRadius": 9,
-              "borderBottomWidth": 0,
-              "borderLeftColor": "#40FB50",
-              "borderLeftWidth": 0,
-              "borderRightColor": "#40FB50",
-              "borderRightWidth": 0,
-              "borderStyle": "solid",
-              "borderTopColor": "#40FB50",
-              "borderTopLeftRadius": 9,
-              "borderTopRightRadius": 9,
-              "borderTopWidth": 0,
-              "flexDirection": "row",
-              "flexWrap": "nowrap",
-              "height": 80,
-              "justifyContent": "center",
-              "paddingLeft": 18,
-              "paddingRight": 18,
+              "borderBottomLeftRadius": 10,
+              "borderBottomRightRadius": 10,
+              "borderTopLeftRadius": 10,
+              "borderTopRightRadius": 10,
+              "flexDirection": "column",
+              "gap": 16,
+              "paddingBottom": 24,
+              "paddingLeft": 24,
+              "paddingRight": 24,
+              "paddingTop": 24,
               "position": "relative",
+              "width": "100%",
             }
           }
         >
           <View
             style={
               {
-                "backgroundColor": "#40FB50",
-                "flexDirection": "column",
-                "height": 40,
-                "left": 0,
-                "position": "absolute",
-                "top": "50%",
-                "transform": [
-                  {
-                    "translateY": -20,
-                  },
-                ],
-                "width": 4,
-              }
-            }
-          />
-          <View
-            pointerEvents="none"
-            style={
-              {
-                "height": 0,
-                "minHeight": 0,
-                "minWidth": 11.088000000000001,
-                "width": 11.088000000000001,
-              }
-            }
-          />
-          <View
-            style={
-              {
                 "alignItems": "center",
                 "flexDirection": "row",
                 "justifyContent": "space-between",
-                "paddingLeft": 18,
-                "paddingRight": 18,
-                "width": "100%",
               }
             }
           >
@@ -372,22 +377,22 @@ exports[`DepositScreen renders the deposit screen 1`] = `
               style={
                 {
                   "alignItems": "center",
+                  "flex": 1,
                   "flexDirection": "row",
-                  "gap": 13,
+                  "gap": 24,
                 }
               }
             >
               <RNSVGSvgView
                 align="xMidYMid"
-                bbHeight={24}
-                bbWidth={24}
-                color="#888"
-                fill="none"
+                bbHeight={28}
+                bbWidth={28}
+                color="#40FB50"
                 focusable={false}
-                height={24}
+                height={28}
                 meetOrSlice={0}
                 minX={0}
-                minY={-34.55}
+                minY={0}
                 strokeWidth="2"
                 style={
                   [
@@ -396,101 +401,56 @@ exports[`DepositScreen renders the deposit screen 1`] = `
                       "borderWidth": 0,
                     },
                     {
-                      "color": "#888",
+                      "color": "#40FB50",
+                      "flexShrink": 0,
                     },
                     {
                       "flex": 0,
-                      "height": 24,
-                      "width": 24,
+                      "height": 28,
+                      "width": 28,
                     },
                   ]
                 }
-                tintColor="#888"
-                vbHeight={120.3}
-                vbWidth={120.3}
-                width={24}
+                tintColor="#40FB50"
+                vbHeight={24}
+                vbWidth={24}
+                width={28}
               >
                 <RNSVGGroup
-                  fill={null}
+                  fill={
+                    {
+                      "payload": 4278190080,
+                      "type": 0,
+                    }
+                  }
                   propList={
                     [
-                      "fill",
                       "strokeWidth",
                     ]
                   }
                   strokeWidth="2"
                 >
-                  <RNSVGMask
+                  <RNSVGPath
+                    d="M18.1726 22.1173C16.975 23.2783 15.6674 23.095 14.4086 22.5451C13.0766 21.9829 11.8545 21.9585 10.4491 22.5451C8.68937 23.3027 7.7606 23.0828 6.70962 22.1173C0.745927 15.9703 1.62582 6.60929 8.39607 6.26711C10.0459 6.35266 11.1946 7.17144 12.16 7.24477C13.6021 6.95147 14.983 6.10824 16.5228 6.21823C18.3681 6.36488 19.7613 7.09812 20.6779 8.41795C16.865 10.7032 17.7693 15.7259 21.2644 17.1313C20.5679 18.9644 19.6635 20.7853 18.1604 22.1296L18.1726 22.1173ZM12.0378 6.19379C11.8545 3.46858 14.0665 1.21997 16.6084 1C16.9628 4.15294 13.7487 6.49931 12.0378 6.19379Z"
                     fill={
                       {
-                        "payload": 4278190080,
-                        "type": 0,
+                        "type": 2,
                       }
                     }
-                    height={24}
-                    maskContentUnits={1}
-                    maskUnits={1}
-                    width={24}
-                    x={0}
-                    y={0}
-                  >
-                    <RNSVGPath
-                      d="M0 0h20v20H0z"
-                      fill={
-                        {
-                          "payload": 4292467161,
-                          "type": 0,
-                        }
-                      }
-                      propList={
-                        [
-                          "fill",
-                        ]
-                      }
-                    />
-                  </RNSVGMask>
-                  <RNSVGGroup
-                    fill={
-                      {
-                        "payload": 4278190080,
-                        "type": 0,
-                      }
+                    propList={
+                      [
+                        "fill",
+                      ]
                     }
-                    mask="a"
-                  >
-                    <RNSVGPath
-                      d="M22.8 6.6c1.4-1.8 2.4-4.2 2.1-6.6-2.1.1-4.6 1.4-6.1 3.1-1.3 1.5-2.5 4-2.2 6.3 2.4.3 4.7-1 6.2-2.8M24.9 10c-3.4-.2-6.3 1.9-7.9 1.9-1.6 0-4.1-1.8-6.8-1.8-3.5.1-6.7 2-8.5 5.2-3.6 6.3-1 15.6 2.6 20.7 1.7 2.5 3.8 5.3 6.5 5.2 2.6-.1 3.6-1.7 6.7-1.7s4 1.7 6.8 1.6 4.6-2.5 6.3-5.1c2-2.9 2.8-5.7 2.8-5.8-.1-.1-5.5-2.1-5.5-8.3-.1-5.2 4.2-7.7 4.4-7.8-2.3-3.6-6.1-4-7.4-4.1"
-                      fill={
-                        {
-                          "type": 2,
-                        }
-                      }
-                      propList={
-                        [
-                          "fill",
-                        ]
-                      }
-                    />
-                    <RNSVGPath
-                      d="M54.3 2.9c7.4 0 12.5 5.1 12.5 12.4 0 7.4-5.2 12.5-12.7 12.5H46v12.9h-5.9V2.9h14.2zm-8.3 20h6.7c5.1 0 8-2.8 8-7.5 0-4.8-2.9-7.5-8-7.5h-6.8v15h.1zM68.3 33c0-4.8 3.7-7.8 10.3-8.2l7.6-.4v-2.1c0-3.1-2.1-4.9-5.5-4.9-3.3 0-5.3 1.6-5.8 4h-5.4c.3-5 4.6-8.7 11.4-8.7 6.7 0 11 3.5 11 9.1v19h-5.4v-4.5h-.1c-1.6 3.1-5.1 5-8.7 5-5.6 0-9.4-3.4-9.4-8.3zm17.9-2.5v-2.2l-6.8.4c-3.4.2-5.3 1.7-5.3 4.1 0 2.4 2 4 5 4 4 0 7.1-2.7 7.1-6.3zM96.9 51v-4.6c.4.1 1.4.1 1.8.1 2.6 0 4-1.1 4.9-3.9 0-.1.5-1.7.5-1.7l-10-27.6h6.1l7 22.5h.1l7-22.5h6L110 42.4c-2.4 6.7-5.1 8.8-10.8 8.8-.4-.1-1.8-.1-2.3-.2z"
-                      fill={
-                        {
-                          "type": 2,
-                        }
-                      }
-                      propList={
-                        [
-                          "fill",
-                        ]
-                      }
-                    />
-                  </RNSVGGroup>
+                  />
                 </RNSVGGroup>
               </RNSVGSvgView>
               <View
                 style={
                   {
+                    "flex": 1,
                     "flexDirection": "column",
+                    "gap": 7,
                   }
                 }
               >
@@ -499,7 +459,10 @@ exports[`DepositScreen renders the deposit screen 1`] = `
                     {
                       "color": "#FFFFFF",
                       "fontFamily": "System",
-                      "fontWeight": "500",
+                      "fontSize": 21.599999999999998,
+                      "fontWeight": 500,
+                      "lineHeight": 19,
+                      "userSelect": "auto",
                     }
                   }
                   suppressHighlighting={true}
@@ -509,9 +472,13 @@ exports[`DepositScreen renders the deposit screen 1`] = `
                 <Text
                   style={
                     {
-                      "color": "#FFFFFF",
+                      "color": "#B3B3B3",
                       "fontFamily": "System",
-                      "fontSize": 15.6,
+                      "fontSize": 19.2,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                      "userSelect": "auto",
+                      "width": "100%",
                     }
                   }
                   suppressHighlighting={true}
@@ -520,87 +487,143 @@ exports[`DepositScreen renders the deposit screen 1`] = `
                 </Text>
               </View>
             </View>
+            <RNSVGSvgView
+              align="xMidYMid"
+              bbHeight={20}
+              bbWidth={20}
+              fill="none"
+              focusable={false}
+              height={20}
+              meetOrSlice={0}
+              minX={0}
+              minY={0}
+              stroke="#B3B3B3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              style={
+                [
+                  {
+                    "backgroundColor": "transparent",
+                    "borderWidth": 0,
+                  },
+                  {
+                    "color": "#B3B3B3",
+                  },
+                  {
+                    "flex": 0,
+                    "height": 20,
+                    "width": 20,
+                  },
+                ]
+              }
+              tintColor="#B3B3B3"
+              vbHeight={24}
+              vbWidth={24}
+              width={20}
+            >
+              <RNSVGGroup
+                fill={null}
+                propList={
+                  [
+                    "fill",
+                    "stroke",
+                    "strokeWidth",
+                    "strokeLinecap",
+                    "strokeLinejoin",
+                  ]
+                }
+                stroke={
+                  {
+                    "payload": 4289967027,
+                    "type": 0,
+                  }
+                }
+                strokeLinecap={1}
+                strokeLinejoin={1}
+                strokeWidth="2"
+              >
+                <RNSVGPath
+                  d="m9 18 6-6-6-6"
+                  fill={
+                    {
+                      "payload": 4278190080,
+                      "type": 0,
+                    }
+                  }
+                  propList={
+                    [
+                      "stroke",
+                    ]
+                  }
+                  stroke={
+                    {
+                      "payload": 4289967027,
+                      "type": 0,
+                    }
+                  }
+                />
+              </RNSVGGroup>
+            </RNSVGSvgView>
           </View>
         </View>
+      </View>
+    </View>
+    <View
+      href="/deposit/debit-card"
+      testID="MockSolitoLink"
+    >
+      <View
+        collapsable={false}
+        forwardedRef={[Function]}
+        jestAnimatedStyle={
+          {
+            "value": {
+              "opacity": 0,
+              "transform": [
+                {
+                  "scale": 0.9,
+                },
+              ],
+            },
+          }
+        }
+        style={
+          {
+            "opacity": 0,
+            "transform": [
+              {
+                "scale": 0.9,
+              },
+            ],
+          }
+        }
+      >
         <View
-          cancelable={true}
-          disabled={false}
-          focusVisibleStyle={{}}
-          focusable={[Function]}
-          minPressDuration={0}
-          onBlur={[Function]}
-          onFocus={[Function]}
-          onMouseEnter={[Function]}
-          onMouseLeave={[Function]}
-          onPress={[Function]}
-          onPressIn={[Function]}
-          onPressOut={[Function]}
-          role="button"
           style={
             {
-              "alignItems": "center",
               "backgroundColor": "#111f22",
-              "borderBottomColor": "#40FB50",
-              "borderBottomLeftRadius": 9,
-              "borderBottomRightRadius": 9,
-              "borderBottomWidth": 0,
-              "borderLeftColor": "#40FB50",
-              "borderLeftWidth": 0,
-              "borderRightColor": "#40FB50",
-              "borderRightWidth": 0,
-              "borderStyle": "solid",
-              "borderTopColor": "#40FB50",
-              "borderTopLeftRadius": 9,
-              "borderTopRightRadius": 9,
-              "borderTopWidth": 0,
-              "flexDirection": "row",
-              "flexWrap": "nowrap",
-              "height": 80,
-              "justifyContent": "center",
-              "paddingLeft": 18,
-              "paddingRight": 18,
+              "borderBottomLeftRadius": 10,
+              "borderBottomRightRadius": 10,
+              "borderTopLeftRadius": 10,
+              "borderTopRightRadius": 10,
+              "flexDirection": "column",
+              "gap": 16,
+              "paddingBottom": 24,
+              "paddingLeft": 24,
+              "paddingRight": 24,
+              "paddingTop": 24,
               "position": "relative",
+              "width": "100%",
             }
           }
         >
           <View
             style={
               {
-                "backgroundColor": "#40FB50",
-                "flexDirection": "column",
-                "height": 40,
-                "left": 0,
-                "position": "absolute",
-                "top": "50%",
-                "transform": [
-                  {
-                    "translateY": -20,
-                  },
-                ],
-                "width": 4,
-              }
-            }
-          />
-          <View
-            pointerEvents="none"
-            style={
-              {
-                "height": 0,
-                "minHeight": 0,
-                "minWidth": 11.088000000000001,
-                "width": 11.088000000000001,
-              }
-            }
-          />
-          <View
-            style={
-              {
                 "alignItems": "center",
                 "flexDirection": "row",
                 "justifyContent": "space-between",
-                "paddingLeft": 18,
-                "paddingRight": 18,
-                "width": "100%",
               }
             }
           >
@@ -608,24 +631,22 @@ exports[`DepositScreen renders the deposit screen 1`] = `
               style={
                 {
                   "alignItems": "center",
+                  "flex": 1,
                   "flexDirection": "row",
-                  "gap": 13,
+                  "gap": 24,
                 }
               }
             >
               <RNSVGSvgView
                 align="xMidYMid"
-                bbHeight={24}
-                bbWidth={24}
-                fill="none"
+                bbHeight={28}
+                bbWidth={28}
+                color="#40FB50"
                 focusable={false}
-                height={24}
+                height={28}
                 meetOrSlice={0}
                 minX={0}
                 minY={0}
-                stroke="#888"
-                strokeLinecap="round"
-                strokeLinejoin="round"
                 strokeWidth="2"
                 style={
                   [
@@ -634,105 +655,46 @@ exports[`DepositScreen renders the deposit screen 1`] = `
                       "borderWidth": 0,
                     },
                     {
-                      "color": "#888",
+                      "color": "#40FB50",
+                      "flexShrink": 0,
                     },
                     {
                       "flex": 0,
-                      "height": 24,
-                      "width": 24,
+                      "height": 28,
+                      "width": 28,
                     },
                   ]
                 }
-                tintColor="#888"
+                tintColor="#40FB50"
                 vbHeight={24}
                 vbWidth={24}
-                width={24}
+                width={28}
               >
                 <RNSVGGroup
-                  fill={null}
-                  propList={
-                    [
-                      "fill",
-                      "stroke",
-                      "strokeWidth",
-                      "strokeLinecap",
-                      "strokeLinejoin",
-                    ]
-                  }
-                  stroke={
+                  fill={
                     {
-                      "payload": 4287137928,
+                      "payload": 4278190080,
                       "type": 0,
                     }
                   }
-                  strokeLinecap={1}
-                  strokeLinejoin={1}
+                  propList={
+                    [
+                      "strokeWidth",
+                    ]
+                  }
                   strokeWidth="2"
                 >
-                  <RNSVGRect
-                    fill={
-                      {
-                        "payload": 4278190080,
-                        "type": 0,
-                      }
-                    }
-                    height="12"
-                    propList={
-                      [
-                        "stroke",
-                      ]
-                    }
-                    rx="2"
-                    stroke={
-                      {
-                        "payload": 4287137928,
-                        "type": 0,
-                      }
-                    }
-                    width="20"
-                    x="2"
-                    y="6"
-                  />
-                  <RNSVGCircle
-                    cx="12"
-                    cy="12"
-                    fill={
-                      {
-                        "payload": 4278190080,
-                        "type": 0,
-                      }
-                    }
-                    propList={
-                      [
-                        "stroke",
-                      ]
-                    }
-                    r="2"
-                    stroke={
-                      {
-                        "payload": 4287137928,
-                        "type": 0,
-                      }
-                    }
-                  />
                   <RNSVGPath
-                    d="M6 12h.01M18 12h.01"
+                    d="M2 20V4H22V20H2ZM4 8H20V6H4V8ZM4 18H20V12H4V18Z"
                     fill={
                       {
-                        "payload": 4278190080,
-                        "type": 0,
+                        "type": 2,
                       }
                     }
                     propList={
                       [
-                        "stroke",
+                        "fill",
                       ]
-                    }
-                    stroke={
-                      {
-                        "payload": 4287137928,
-                        "type": 0,
-                      }
                     }
                   />
                 </RNSVGGroup>
@@ -740,7 +702,9 @@ exports[`DepositScreen renders the deposit screen 1`] = `
               <View
                 style={
                   {
+                    "flex": 1,
                     "flexDirection": "column",
+                    "gap": 7,
                   }
                 }
               >
@@ -749,7 +713,10 @@ exports[`DepositScreen renders the deposit screen 1`] = `
                     {
                       "color": "#FFFFFF",
                       "fontFamily": "System",
-                      "fontWeight": "500",
+                      "fontSize": 21.599999999999998,
+                      "fontWeight": 500,
+                      "lineHeight": 19,
+                      "userSelect": "auto",
                     }
                   }
                   suppressHighlighting={true}
@@ -759,17 +726,99 @@ exports[`DepositScreen renders the deposit screen 1`] = `
                 <Text
                   style={
                     {
-                      "color": "#FFFFFF",
+                      "color": "#B3B3B3",
                       "fontFamily": "System",
-                      "fontSize": 15.6,
+                      "fontSize": 19.2,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                      "userSelect": "auto",
+                      "width": "100%",
                     }
                   }
                   suppressHighlighting={true}
                 >
-                  Up to $500 per week
+                  Quick deposits up to $500/week
                 </Text>
               </View>
             </View>
+            <RNSVGSvgView
+              align="xMidYMid"
+              bbHeight={20}
+              bbWidth={20}
+              fill="none"
+              focusable={false}
+              height={20}
+              meetOrSlice={0}
+              minX={0}
+              minY={0}
+              stroke="#B3B3B3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              style={
+                [
+                  {
+                    "backgroundColor": "transparent",
+                    "borderWidth": 0,
+                  },
+                  {
+                    "color": "#B3B3B3",
+                  },
+                  {
+                    "flex": 0,
+                    "height": 20,
+                    "width": 20,
+                  },
+                ]
+              }
+              tintColor="#B3B3B3"
+              vbHeight={24}
+              vbWidth={24}
+              width={20}
+            >
+              <RNSVGGroup
+                fill={null}
+                propList={
+                  [
+                    "fill",
+                    "stroke",
+                    "strokeWidth",
+                    "strokeLinecap",
+                    "strokeLinejoin",
+                  ]
+                }
+                stroke={
+                  {
+                    "payload": 4289967027,
+                    "type": 0,
+                  }
+                }
+                strokeLinecap={1}
+                strokeLinejoin={1}
+                strokeWidth="2"
+              >
+                <RNSVGPath
+                  d="m9 18 6-6-6-6"
+                  fill={
+                    {
+                      "payload": 4278190080,
+                      "type": 0,
+                    }
+                  }
+                  propList={
+                    [
+                      "stroke",
+                    ]
+                  }
+                  stroke={
+                    {
+                      "payload": 4289967027,
+                      "type": 0,
+                    }
+                  }
+                />
+              </RNSVGGroup>
+            </RNSVGSvgView>
           </View>
         </View>
       </View>

@@ -3,7 +3,7 @@ import { HomeLayout } from 'app/features/home/layout.web'
 import { TopNav } from 'app/components/TopNav'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from '../../_app'
-import { SuccessScreen } from 'app/features/deposit/components/SuccessScreen'
+import { DepositSuccessScreen } from '../../../../../packages/app/features/deposit/success/screen'
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -11,7 +11,7 @@ export const Page: NextPageWithLayout = () => {
       <Head>
         <title>Send | Deposit</title>
       </Head>
-      <SuccessScreen />
+      <DepositSuccessScreen />
     </>
   )
 }
