@@ -3450,6 +3450,7 @@ exports[`swap form screen should render 1`] = `
               "gap": 18,
             }
           }
+          testID="swapRiskDialogContent"
         >
           <Text
             accessibilityRole="header"
