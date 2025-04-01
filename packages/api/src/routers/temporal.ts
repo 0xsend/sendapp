@@ -3,7 +3,6 @@ import debug from 'debug'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
 import type { UserOperation } from 'permissionless'
-import { TransferWorkflow } from '@my/workflows/all-workflows'
 import { baseMainnetClient, entryPointAddress } from '@my/wagmi'
 import { getUserOperationHash } from 'permissionless/utils'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
@@ -12,6 +11,7 @@ import { withRetry } from 'viem'
 import type { PostgrestError } from '@supabase/supabase-js'
 import { throwIf } from 'app/utils/throwIf'
 import { assert } from 'app/utils/assert'
+import { startWorkflow } from '@my/workflows/utils'
 
 const log = debug('api:temporal')
 
@@ -56,24 +56,23 @@ export const temporalRouter = createTRPCRouter({
             })
           })
 
-        const { workflowId } = await client.workflow
-          .start(TransferWorkflow, {
-            taskQueue: 'monorepo',
-            workflowId: `temporal/transfer/${user.id}/${userOpHash}`,
-            args: [userOp],
-          })
-          .catch((e) => {
-            if (e.message.includes('Workflow already exists')) {
-              throw new TRPCError({
-                code: 'PRECONDITION_FAILED',
-                message: e.message,
-              })
-            }
+        const { workflowId } = await startWorkflow({
+          client,
+          workflow: 'transfer',
+          ids: [user.id, userOpHash],
+          args: [userOp],
+        }).catch((e) => {
+          if (e.message.includes('Workflow already exists')) {
             throw new TRPCError({
-              code: 'INTERNAL_SERVER_ERROR',
+              code: 'PRECONDITION_FAILED',
               message: e.message,
             })
+          }
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: e.message,
           })
+        })
 
         log(`Workflow Created: ${workflowId}`)
 

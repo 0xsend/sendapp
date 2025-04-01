@@ -20,7 +20,7 @@ const {
   startToCloseTimeout: '10 minutes',
 })
 
-export async function TransferWorkflow(userOp: UserOperation<'v0.7'>) {
+export async function transfer(userOp: UserOperation<'v0.7'>) {
   const workflowId = workflowInfo().workflowId
   log('Starting SendTransfer Workflow with userOp:', workflowId)
   await upsertTemporalSendAccountTransferActivity({
