@@ -79,15 +79,6 @@ export function counterpart(activity: Activity): Activity['from_user'] | Activit
  */
 export function amountFromActivity(activity: Activity): string {
   switch (true) {
-    case isSendSwapEvent(activity): {
-      const { coin, v } = activity.data
-      if (coin) {
-        const amount = formatAmount(formatUnits(v, coin.decimals), 5, coin.formatDecimals)
-
-        return `${amount} ${coin.symbol}`
-      }
-      return formatAmount(`${v}`, 5, 0)
-    }
     case isTemporalTokenTransfersEvent(activity): {
       const { v, coin } = activity.data
       if (coin) {

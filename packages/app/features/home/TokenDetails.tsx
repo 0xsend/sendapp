@@ -11,7 +11,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import type { CoinWithBalance, sendCoin, usdcCoin } from 'app/data/coins'
+import { type CoinWithBalance, sendCoin, usdcCoin } from 'app/data/coins'
 import { ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
 import { IconError, IconPlus, IconSwap } from 'app/components/icons'
 import { useTokenMarketData } from 'app/utils/coin-gecko'
@@ -21,7 +21,6 @@ import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { convertBalanceToFiat } from 'app/utils/convertBalanceToUSD'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
-import { ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
 import { useUser } from 'app/utils/useUser'
 
 export function AnimateEnter({ children }: { children: React.ReactNode }) {
