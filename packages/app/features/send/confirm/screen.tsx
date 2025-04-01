@@ -141,15 +141,11 @@ export function SendConfirm() {
     (usdc?.balance ?? BigInt(0)) > (isUSDCSelected ? BigInt(amount ?? '0') + gas : gas)
 
   const isLoading =
-    nonceIsLoading ||
-    isProfileLoading ||
-    isSendAccountLoading ||
-    isGeneratingUserOp ||
-    isValidatePending ||
-    isTransferPending ||
-    isTransferInitialized
+    nonceIsLoading || isProfileLoading || isSendAccountLoading || isGeneratingUserOp || isGasLoading
 
-  const canSubmit = !isLoading && hasEnoughBalance && hasEnoughGas && feesPerGas
+  const isSubmitting = isValidatePending || isTransferPending || isTransferInitialized
+
+  const canSubmit = (!isLoading || !isSubmitting) && hasEnoughBalance && hasEnoughGas && feesPerGas
 
   const localizedAmount = localizeAmount(
     formatUnits(
@@ -218,6 +214,9 @@ export function SendConfirm() {
       const { workflowId } = await transfer({ userOp: validatedUserOp })
 
       if (workflowId) {
+        await queryClient.invalidateQueries({
+          queryKey: ['token_activity_feed', selectedCoin.token],
+        })
         router.replace({ pathname: '/', query: { token: sendToken } })
       }
     } catch (e) {
@@ -376,7 +375,7 @@ export function SendConfirm() {
       </YStack>
       <Button
         ref={submitButtonRef}
-        theme={canSubmit ? 'green' : 'red_alt1'}
+        theme={error ? 'red_alt1' : 'green'}
         onPress={onSubmit}
         disabledStyle={{ opacity: 0.7, cursor: 'not-allowed', pointerEvents: 'none' }}
         disabled={!canSubmit}
@@ -387,7 +386,7 @@ export function SendConfirm() {
       >
         {(() => {
           switch (true) {
-            case isLoading:
+            case isSubmitting:
               return (
                 <Button.Icon>
                   <Spinner size="small" color="$color12" />
