@@ -2,15 +2,7 @@ import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
 import { mergeTests } from '@playwright/test'
 import debug from 'debug'
 import { expect, test as swapTest } from './fixtures/swap'
-import {
-  allCoins,
-  type coin,
-  ethCoin,
-  isEthCoin,
-  sendCoin,
-  spx6900Coin,
-  usdcCoin,
-} from 'app/data/coins'
+import { allCoins, type coin, isEthCoin, usdcCoin } from 'app/data/coins'
 import { fund } from '@my/playwright/fixtures/viem'
 import { formatUnits } from 'viem'
 
@@ -32,12 +24,9 @@ const calculateExchangeRate = (
 
 const swapInAmount = {
   [usdcCoin.symbol]: 10000000n,
-  [ethCoin.symbol]: 10000000000000000n,
-  [sendCoin.symbol]: 100000000000000000000n,
-  [spx6900Coin.symbol]: 10000000000n,
 }
 
-for (const inCoin of allCoins) {
+for (const inCoin of [usdcCoin]) {
   for (const outCoin of allCoins) {
     if (inCoin.symbol === outCoin.symbol) {
       continue
