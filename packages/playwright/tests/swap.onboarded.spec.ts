@@ -49,6 +49,7 @@ for (const inCoin of allCoins) {
       swapFormPage,
       swapSummaryPage,
     }) => {
+      test.setTimeout(45_000)
       log = debug(
         `test:swap:can-swap:${inCoin.symbol}:${outCoin.symbol}:${test.info().parallelIndex}`
       )

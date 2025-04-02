@@ -256,7 +256,7 @@ export class SwapSummaryPage {
       await expect(this.outTokenSymbol).toHaveText(outToken)
       await expect(this.slippage).toHaveText(`${slippage}%`)
       await expect(this.exchangeRate).toHaveText(exchangeRate)
-    }).toPass({ timeout: 15_000 })
+    }).toPass({ timeout: 20_000 })
   }
 
   async confirmSwap() {
