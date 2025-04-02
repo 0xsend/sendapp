@@ -4,8 +4,8 @@ import {
   FieldError,
   Fieldset,
   getFontSize,
-  isWeb,
   isTouchable,
+  isWeb,
   Paragraph,
   Select,
   type SelectProps,
@@ -26,13 +26,21 @@ import { useId, useState } from 'react'
 import { IconCoin } from '../icons/IconCoin'
 import type { CoinWithBalance } from 'app/data/coins'
 import { useCoins } from 'app/provider/coins'
+import { useHoverStyles } from 'app/utils/useHoverStyles'
 
 export const CoinField = ({
   native = false,
+  showAllCoins = false,
   ...props
-}: Pick<SelectProps, 'size' | 'native' | 'defaultValue' | 'onValueChange'>) => {
+}: { showAllCoins?: boolean } & Pick<
+  SelectProps,
+  'size' | 'native' | 'defaultValue' | 'onValueChange'
+>) => {
   const [isOpen, setIsOpen] = useState(false)
-  const { coins } = useCoins()
+  const { coins: _coins, allCoins } = useCoins()
+  const hoverStyles = useHoverStyles()
+
+  const coins = showAllCoins ? allCoins : _coins
 
   const {
     field,
@@ -62,16 +70,18 @@ export const CoinField = ({
           >
             <Select.Trigger
               testID={'SelectCoinTrigger'}
-              br={0}
+              br={999}
               borderWidth={0}
               w={'fit-content'}
               scaleSpace={0.5}
               scaleIcon={1.5}
-              padding={0}
-              bc={'transparent'}
+              padding={'$2'}
+              bc={hoverStyles.background}
               focusStyle={{
                 bc: 'transparent',
               }}
+              hoverStyle={hoverStyles}
+              $gtSm={{ p: '$2.5' }}
               iconAfter={
                 isOpen ? (
                   <ChevronUp color={'$primary'} $theme-light={{ color: '$color12' }} />
@@ -88,7 +98,7 @@ export const CoinField = ({
                   color={'$color12'}
                   placeholder={'Token'}
                   $gtSm={{
-                    size: '$8',
+                    size: '$5',
                   }}
                 />
               </XStack>
@@ -136,14 +146,14 @@ export const CoinField = ({
               <Select.Viewport
                 disableScroll
                 backgroundColor={'$color1'}
-                br={'$3'}
                 btrr={0}
                 boc="transparent"
-                focusStyle={{ bc: '$color0' }}
                 x={'-50%'}
                 $gtLg={{
                   x: 0,
                 }}
+                br={'$6'}
+                overflow={'hidden'}
               >
                 <XStack
                   als="flex-start"
@@ -152,10 +162,10 @@ export const CoinField = ({
                   boc={'transparent'}
                   f={1}
                 >
-                  <Select.Group disabled={disabled} space="$0">
+                  <Select.Group disabled={disabled} space="$0" p={'$2'}>
                     {/* <Select.Label>{label}</Select.Label> */}
                     {coins
-                      .filter((coin) => coin.balance && coin.balance >= 0n)
+                      .filter((coin) => showAllCoins || (coin.balance && coin.balance >= 0n))
                       .map((coin, i) => {
                         return (
                           <CoinFieldItem
@@ -203,7 +213,18 @@ const CoinFieldItem = ({
   index: number
 }) => {
   return (
-    <Select.Item index={index} key={coin.token} value={coin.token} bc="transparent" f={1} w="100%">
+    <Select.Item
+      index={index}
+      key={coin.token}
+      value={coin.token}
+      f={1}
+      w="100%"
+      bw={0}
+      br={'$4'}
+      bc={'transparent'}
+      focusStyle={{ backgroundColor: 'transparent' }}
+      hoverStyle={{ backgroundColor: 'transparent' }}
+    >
       <XStack gap={'$2'} $gtLg={{ gap: '$3.5' }} ai={'center'} jc={'space-between'}>
         <IconCoin symbol={coin.symbol} />
         <Select.ItemText
@@ -233,7 +254,7 @@ const TokenBalance = ({ coin: { balance, decimals } }: { coin: CoinWithBalance }
     return <></>
   }
   return (
-    <Paragraph fontFamily={'$mono'} fontSize={'$9'} fontWeight={'500'} color={'$color12'}>
+    <Paragraph fontFamily={'$mono'} fontSize={'$7'} fontWeight={'500'} color={'$color12'}>
       {formatAmount((Number(balance) / 10 ** decimals).toString())}
     </Paragraph>
   )
