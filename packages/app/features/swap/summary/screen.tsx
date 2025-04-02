@@ -18,6 +18,7 @@ import { DEFAULT_SLIPPAGE, SWAP_ROUTE_SUMMARY_QUERY_KEY } from 'app/features/swa
 import { baseMainnet } from '@my/wagmi'
 import { useLiquidityPools } from 'app/utils/useLiquidityPools'
 import { useSwapRouters } from 'app/utils/useSwapRouters'
+import { toNiceError } from 'app/utils/toNiceError'
 
 export const SwapSummaryScreen = () => {
   const router = useRouter()
@@ -109,7 +110,6 @@ export const SwapSummaryScreen = () => {
 
     if (__DEV__ || baseMainnet.id === 84532) {
       userOp.callGasLimit = userOp.callGasLimit * 3n
-      userOp.preVerificationGas = userOp.preVerificationGas * 2n
     }
 
     try {
@@ -268,13 +268,13 @@ export const SwapSummaryScreen = () => {
           {(() => {
             switch (true) {
               case !!encodeRouteError:
-                return encodeRouteError?.message
+                return toNiceError(encodeRouteError)
               case !!userOpError:
-                return userOpError?.message?.split('.').at(0)
+                return toNiceError(userOpError)
               case !!usdcFeesError:
-                return usdcFeesError?.message?.split('.').at(0)
+                return toNiceError(usdcFeesError)
               case !!sendUserOpError:
-                return sendUserOpError?.message?.split('.').at(0)
+                return toNiceError(sendUserOpError)
               default:
                 return ''
             }
