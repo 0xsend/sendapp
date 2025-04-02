@@ -207,8 +207,6 @@ export type CoinWithBalance = allCoins[number] & {
  */
 export const knownCoins: coin[] = [...allCoins, sendV0Coin] as const
 
-export const isEthCoin = (coin: coin): coin is ethCoin => coin.symbol === 'ETH'
-
 /**
  * List of erc20 coins
  */
