@@ -1,3 +1,5 @@
+import { parseUnits } from 'viem'
+
 /**
  * Floors a number to a specified precision.
  * @param num - The number to be floored.
@@ -19,3 +21,8 @@ export function floor(num: number, precision = 0): number {
   // For positive precision (or precision of 0), round as we discussed before.
   return Math.floor(num * factor) / factor
 }
+
+export const WAD = parseUnits('1', 18)
+export const wMulDown = (x: bigint, y: bigint): bigint => mulDivDown(x, y, WAD)
+export const mulDivDown = (x: bigint, y: bigint, d: bigint): bigint =>
+  (BigInt(x) * BigInt(y)) / BigInt(d)
