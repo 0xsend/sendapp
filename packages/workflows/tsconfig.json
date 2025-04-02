@@ -10,7 +10,7 @@
       "app/*": ["../app/*"],
       "@my/wagmi": ["../wagmi/src"],
       "@my/wagmi/*": ["../wagmi/src/*"],
-      "@my/workflows": ["./src/all-workflows.ts"],
+      "@my/workflows": ["./src"],
       "@my/workflows/*": ["./src/*"],
       "@my/temporal": ["../temporal/src"],
       "@my/temporal/*": ["../temporal/src/*"]

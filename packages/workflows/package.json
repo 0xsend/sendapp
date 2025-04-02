@@ -7,6 +7,10 @@
   ],
   "type": "module",
   "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
     "./all-activities": {
       "types": "./src/all-activities.ts",
       "default": "./src/all-activities.ts"
@@ -14,6 +18,10 @@
     "./utils": {
       "types": "./src/utils/index.ts",
       "default": "./src/utils/index.ts"
+    },
+    "./utils/*": {
+      "types": "./src/utils/*",
+      "default": "./src/utils/*"
     },
     "./all-workflows": {
       "types": "./src/all-workflows.ts",

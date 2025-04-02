@@ -2,7 +2,7 @@ import { ApplicationFailure, proxyActivities, workflowInfo } from '@temporalio/w
 import { hexToBytea } from 'app/utils/hexToBytea'
 import debug from 'debug'
 import type { UserOperation } from 'permissionless'
-import type { createDepositActivities } from './createDepositActivities'
+import type { createDepositActivities } from './activities'
 
 const log = debug('workflows:deposit')
 

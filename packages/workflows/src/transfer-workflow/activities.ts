@@ -9,6 +9,8 @@ import {
   updateTemporalSendAccountTransfer,
   upsertTemporalSendAccountTransfer,
   type TemporalTransfer,
+  type TemporalTransferInsert,
+  type TemporalTransferUpdate,
 } from './supabase'
 import { isAddressInTopic, isReceiveTopic, isTransferTopic } from './wagmi'
 

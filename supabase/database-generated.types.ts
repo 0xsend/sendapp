@@ -2007,41 +2007,41 @@ export type Database = {
       send_earn_deposits: {
         Row: {
           activity_id: number | null
-          assets: number
+          assets: number | null
           created_at: string
           error_message: string | null
-          owner: string
+          owner: string | null
           status: Database["public"]["Enums"]["temporal_status"]
           tx_hash: string | null
           updated_at: string
           user_op_hash: string | null
-          vault: string
+          vault: string | null
           workflow_id: string
         }
         Insert: {
           activity_id?: number | null
-          assets: number
+          assets?: number | null
           created_at?: string
           error_message?: string | null
-          owner: string
+          owner?: string | null
           status?: Database["public"]["Enums"]["temporal_status"]
           tx_hash?: string | null
           updated_at?: string
           user_op_hash?: string | null
-          vault: string
+          vault?: string | null
           workflow_id: string
         }
         Update: {
           activity_id?: number | null
-          assets?: number
+          assets?: number | null
           created_at?: string
           error_message?: string | null
-          owner?: string
+          owner?: string | null
           status?: Database["public"]["Enums"]["temporal_status"]
           tx_hash?: string | null
           updated_at?: string
           user_op_hash?: string | null
-          vault?: string
+          vault?: string | null
           workflow_id?: string
         }
         Relationships: [

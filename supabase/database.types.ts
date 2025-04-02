@@ -154,6 +154,33 @@ export type Database = MergeDeep<
         }
       }
     }
+    temporal: {
+      Tables: {
+        send_earn_deposits: {
+          Row: {
+            assets?: bigint | string | number | null
+            owner?: PgBytea | null
+            tx_hash?: PgBytea | null
+            user_op_hash?: PgBytea | null
+            vault?: PgBytea | null
+          }
+          Insert: {
+            assets?: bigint | string | number | null
+            owner?: PgBytea | null
+            tx_hash?: PgBytea | null
+            user_op_hash?: PgBytea | null
+            vault?: PgBytea | null
+          }
+          Update: {
+            assets?: bigint | string | number | null
+            owner?: PgBytea | null
+            tx_hash?: PgBytea | null
+            user_op_hash?: PgBytea | null
+            vault?: PgBytea | null
+          }
+        }
+      }
+    }
   }
 >
 
