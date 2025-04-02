@@ -1,0 +1,3684 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`swap form screen should render 1`] = `
+[
+  <View
+    style={
+      {
+        "flexDirection": "column",
+        "gap": 24,
+        "justifyContent": "space-between",
+        "paddingBottom": 16,
+        "width": "100%",
+      }
+    }
+  >
+    <View
+      footerProps={
+        {
+          "pb": 0,
+        }
+      }
+      onLayout={[Function]}
+      onSubmit={[Function]}
+      style={
+        {
+          "flex": 1,
+          "flexDirection": "column",
+          "gap": 18,
+          "justifyContent": "space-between",
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "flexDirection": "column",
+            "gap": 16,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "flexDirection": "column",
+              "gap": 24,
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "flexDirection": "column",
+                "gap": 24,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "flexDirection": "column",
+                  "gap": 24,
+                  "position": "relative",
+                }
+              }
+            >
+              <View
+                collapsable={false}
+                forwardedRef={[Function]}
+                jestAnimatedStyle={
+                  {
+                    "value": {
+                      "opacity": 1,
+                      "transform": [
+                        {
+                          "scale": 1,
+                        },
+                      ],
+                    },
+                  }
+                }
+                style={
+                  {
+                    "opacity": 0,
+                    "transform": [
+                      {
+                        "scale": 0.9,
+                      },
+                    ],
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "backgroundColor": "#111f22",
+                      "borderBottomColor": "transparent",
+                      "borderBottomLeftRadius": 10,
+                      "borderBottomRightRadius": 10,
+                      "borderBottomWidth": 1,
+                      "borderLeftColor": "transparent",
+                      "borderLeftWidth": 1,
+                      "borderRightColor": "transparent",
+                      "borderRightWidth": 1,
+                      "borderStyle": "solid",
+                      "borderTopColor": "transparent",
+                      "borderTopLeftRadius": 10,
+                      "borderTopRightRadius": 10,
+                      "borderTopWidth": 1,
+                      "flexDirection": "column",
+                      "gap": 16,
+                      "paddingBottom": 24,
+                      "paddingLeft": 24,
+                      "paddingRight": 24,
+                      "paddingTop": 24,
+                      "position": "relative",
+                      "width": "100%",
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "gap": 7,
+                      }
+                    }
+                  >
+                    <RNSVGSvgView
+                      align="xMidYMid"
+                      bbHeight={20}
+                      bbWidth={20}
+                      fill="none"
+                      focusable={false}
+                      height={20}
+                      meetOrSlice={0}
+                      minX={0}
+                      minY={0}
+                      stroke="#B3B3B3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      style={
+                        [
+                          {
+                            "backgroundColor": "transparent",
+                            "borderWidth": 0,
+                          },
+                          {
+                            "color": "#B3B3B3",
+                          },
+                          {
+                            "flex": 0,
+                            "height": 20,
+                            "width": 20,
+                          },
+                        ]
+                      }
+                      tintColor="#B3B3B3"
+                      vbHeight={24}
+                      vbWidth={24}
+                      width={20}
+                    >
+                      <RNSVGGroup
+                        fill={null}
+                        propList={
+                          [
+                            "fill",
+                            "stroke",
+                            "strokeWidth",
+                            "strokeLinecap",
+                            "strokeLinejoin",
+                          ]
+                        }
+                        stroke={
+                          {
+                            "payload": 4289967027,
+                            "type": 0,
+                          }
+                        }
+                        strokeLinecap={1}
+                        strokeLinejoin={1}
+                        strokeWidth="2"
+                      >
+                        <RNSVGPath
+                          d="m5 12 7-7 7 7"
+                          fill={
+                            {
+                              "payload": 4278190080,
+                              "type": 0,
+                            }
+                          }
+                          propList={
+                            [
+                              "stroke",
+                            ]
+                          }
+                          stroke={
+                            {
+                              "payload": 4289967027,
+                              "type": 0,
+                            }
+                          }
+                        />
+                        <RNSVGPath
+                          d="M12 19V5"
+                          fill={
+                            {
+                              "payload": 4278190080,
+                              "type": 0,
+                            }
+                          }
+                          propList={
+                            [
+                              "stroke",
+                            ]
+                          }
+                          stroke={
+                            {
+                              "payload": 4289967027,
+                              "type": 0,
+                            }
+                          }
+                        />
+                      </RNSVGGroup>
+                    </RNSVGSvgView>
+                    <Text
+                      style={
+                        {
+                          "color": "#B3B3B3",
+                          "fontFamily": "System",
+                          "fontSize": 16.8,
+                          "fontWeight": "400",
+                          "lineHeight": 19,
+                          "userSelect": "auto",
+                        }
+                      }
+                      suppressHighlighting={true}
+                    >
+                      You Pay
+                    </Text>
+                  </View>
+                  <View
+                    style={
+                      {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "gap": 7,
+                        "justifyContent": "space-between",
+                        "position": "relative",
+                      }
+                    }
+                  >
+                    <View
+                      style={
+                        {
+                          "flexDirection": "column",
+                          "width": "60%",
+                        }
+                      }
+                    >
+                      <View
+                        collapsable={false}
+                        jestAnimatedStyle={
+                          {
+                            "value": {
+                              "transform": [
+                                {
+                                  "translateX": 0,
+                                },
+                              ],
+                            },
+                          }
+                        }
+                        style={
+                          {
+                            "transform": [
+                              {
+                                "translateX": 0,
+                              },
+                            ],
+                          }
+                        }
+                      >
+                        <View
+                          style={
+                            {
+                              "position": "relative",
+                            }
+                          }
+                        >
+                          <TextInput
+                            aria-label="inAmount"
+                            control={
+                              {
+                                "_defaultValues": {
+                                  "inAmount": "1",
+                                  "inToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                                  "outToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                                  "slippage": 50,
+                                },
+                                "_disableForm": [Function],
+                                "_executeSchema": [Function],
+                                "_fields": {
+                                  "inAmount": {
+                                    "_f": {
+                                      "mount": true,
+                                      "name": "inAmount",
+                                      "ref": {
+                                        "name": "inAmount",
+                                      },
+                                      "value": "1",
+                                    },
+                                  },
+                                  "inToken": {
+                                    "_f": {
+                                      "mount": true,
+                                      "name": "inToken",
+                                      "ref": {
+                                        "name": "inToken",
+                                      },
+                                      "value": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                                    },
+                                  },
+                                  "outAmount": {
+                                    "_f": {
+                                      "mount": true,
+                                      "name": "outAmount",
+                                      "ref": {
+                                        "name": "outAmount",
+                                        "value": "0.00012",
+                                      },
+                                      "value": "0.00012",
+                                    },
+                                  },
+                                  "outToken": {
+                                    "_f": {
+                                      "mount": true,
+                                      "name": "outToken",
+                                      "ref": {
+                                        "name": "outToken",
+                                      },
+                                      "value": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                                    },
+                                  },
+                                },
+                                "_formState": {
+                                  "dirtyFields": {},
+                                  "disabled": false,
+                                  "errors": {},
+                                  "isDirty": false,
+                                  "isLoading": false,
+                                  "isSubmitSuccessful": false,
+                                  "isSubmitted": false,
+                                  "isSubmitting": false,
+                                  "isValid": true,
+                                  "isValidating": false,
+                                  "submitCount": 0,
+                                  "touchedFields": {},
+                                },
+                                "_formValues": {
+                                  "inAmount": "1",
+                                  "inToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                                  "outAmount": "0.00012",
+                                  "outToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                                  "slippage": 50,
+                                },
+                                "_getDirty": [Function],
+                                "_getFieldArray": [Function],
+                                "_getWatch": [Function],
+                                "_names": {
+                                  "array": Set {},
+                                  "focus": "",
+                                  "mount": Set {
+                                    "inAmount",
+                                    "inToken",
+                                    "outAmount",
+                                    "outToken",
+                                  },
+                                  "unMount": Set {},
+                                  "watch": Set {
+                                    "outAmount",
+                                    "inAmount",
+                                    "slippage",
+                                  },
+                                  "watchAll": false,
+                                },
+                                "_options": {
+                                  "mode": "onSubmit",
+                                  "reValidateMode": "onChange",
+                                  "shouldFocusError": true,
+                                },
+                                "_proxyFormState": {
+                                  "dirtyFields": false,
+                                  "disabled": true,
+                                  "errors": "all",
+                                  "isDirty": false,
+                                  "isSubmitting": true,
+                                  "isValid": true,
+                                  "isValidating": false,
+                                  "touchedFields": false,
+                                },
+                                "_removeUnmounted": [Function],
+                                "_reset": [Function],
+                                "_resetDefaultValues": [Function],
+                                "_state": {
+                                  "action": false,
+                                  "mount": true,
+                                  "watch": false,
+                                },
+                                "_subjects": {
+                                  "array": {
+                                    "next": [Function],
+                                    "observers": [],
+                                    "subscribe": [Function],
+                                    "unsubscribe": [Function],
+                                  },
+                                  "state": {
+                                    "next": [Function],
+                                    "observers": [
+                                      {
+                                        "next": [Function],
+                                      },
+                                      {
+                                        "next": [Function],
+                                      },
+                                      {
+                                        "next": [Function],
+                                      },
+                                      {
+                                        "next": [Function],
+                                      },
+                                      {
+                                        "next": [Function],
+                                      },
+                                      {
+                                        "next": [Function],
+                                      },
+                                    ],
+                                    "subscribe": [Function],
+                                    "unsubscribe": [Function],
+                                  },
+                                  "values": {
+                                    "next": [Function],
+                                    "observers": [
+                                      {
+                                        "next": [Function],
+                                      },
+                                      {
+                                        "next": [Function],
+                                      },
+                                      {
+                                        "next": [Function],
+                                      },
+                                      {
+                                        "next": [Function],
+                                      },
+                                      {
+                                        "next": [Function],
+                                      },
+                                    ],
+                                    "subscribe": [Function],
+                                    "unsubscribe": [Function],
+                                  },
+                                },
+                                "_updateDisabledField": [Function],
+                                "_updateFieldArray": [Function],
+                                "_updateFormState": [Function],
+                                "_updateValid": [Function],
+                                "getFieldState": [Function],
+                                "handleSubmit": [Function],
+                                "register": [Function],
+                                "setError": [Function],
+                                "unregister": [Function],
+                              }
+                            }
+                            fieldsetProps={
+                              {
+                                "width": "60%",
+                              }
+                            }
+                            focusVisibleStyle={{}}
+                            focusable={true}
+                            id=":r1:"
+                            inputMode="decimal"
+                            name="inAmount"
+                            onBlur={[Function]}
+                            onChangeText={[Function]}
+                            onFocus={[Function]}
+                            placeholder="0"
+                            placeholderTextColor="#666666"
+                            readOnly={false}
+                            style={
+                              {
+                                "backgroundColor": "#111f22",
+                                "borderBottomColor": "#111f22",
+                                "borderBottomLeftRadius": 0,
+                                "borderBottomRightRadius": 0,
+                                "borderBottomWidth": 0,
+                                "borderLeftColor": "#111f22",
+                                "borderLeftWidth": 0,
+                                "borderRightColor": "#111f22",
+                                "borderRightWidth": 0,
+                                "borderStyle": "solid",
+                                "borderTopColor": "#111f22",
+                                "borderTopLeftRadius": 0,
+                                "borderTopRightRadius": 0,
+                                "borderTopWidth": 0,
+                                "color": "#FFFFFF",
+                                "fontFamily": "System",
+                                "fontSize": 36,
+                                "fontWeight": "500",
+                                "height": 44,
+                                "minWidth": 0,
+                                "paddingBottom": 1,
+                                "paddingLeft": 1,
+                                "paddingRight": 1,
+                                "paddingTop": 1,
+                                "position": "relative",
+                              }
+                            }
+                            testID="inAmountInput"
+                            value="1"
+                          />
+                        </View>
+                      </View>
+                      <View
+                        style={
+                          {
+                            "bottom": 10,
+                            "gap": 7,
+                            "position": "absolute",
+                            "right": 18,
+                          }
+                        }
+                      />
+                    </View>
+                    <View
+                      style={
+                        {
+                          "flexDirection": "column",
+                        }
+                      }
+                    >
+                      <View
+                        collapsable={false}
+                        jestAnimatedStyle={
+                          {
+                            "value": {
+                              "transform": [
+                                {
+                                  "translateX": 0,
+                                },
+                              ],
+                            },
+                          }
+                        }
+                        style={
+                          {
+                            "transform": [
+                              {
+                                "translateX": 0,
+                              },
+                            ],
+                          }
+                        }
+                      >
+                        <View
+                          aria-autocomplete="none"
+                          aria-expanded={false}
+                          cancelable={true}
+                          disabled={false}
+                          focusVisibleStyle={
+                            {
+                              "outlineColor": "$outlineColor",
+                              "outlineStyle": "solid",
+                              "outlineWidth": 2,
+                            }
+                          }
+                          focusable={[Function]}
+                          id=":r2:"
+                          minPressDuration={0}
+                          onBlur={[Function]}
+                          onFocus={[Function]}
+                          onMouseEnter={[Function]}
+                          onMouseLeave={[Function]}
+                          onPress={[Function]}
+                          onPressIn={[Function]}
+                          onPressOut={[Function]}
+                          style={
+                            {
+                              "alignItems": "center",
+                              "backgroundColor": "rgba(0,0,0, 0.1)",
+                              "borderBottomColor": "#081619",
+                              "borderBottomLeftRadius": 999,
+                              "borderBottomRightRadius": 999,
+                              "borderBottomWidth": 0,
+                              "borderLeftColor": "#081619",
+                              "borderLeftWidth": 0,
+                              "borderRightColor": "#081619",
+                              "borderRightWidth": 0,
+                              "borderStyle": "solid",
+                              "borderTopColor": "#081619",
+                              "borderTopLeftRadius": 999,
+                              "borderTopRightRadius": 999,
+                              "borderTopWidth": 0,
+                              "flexDirection": "row",
+                              "flexWrap": "nowrap",
+                              "justifyContent": "space-between",
+                              "maxWidth": "100%",
+                              "minHeight": 44,
+                              "overflow": "hidden",
+                              "paddingBottom": 7,
+                              "paddingLeft": 7,
+                              "paddingRight": 7,
+                              "paddingTop": 7,
+                              "width": "fit-content",
+                            }
+                          }
+                          testID="SelectCoinTrigger"
+                          type="button"
+                        >
+                          <View
+                            style={
+                              {
+                                "alignItems": "center",
+                                "flexDirection": "row",
+                                "gap": 7,
+                              }
+                            }
+                          >
+                            <Text
+                              lineBreakMode="clip"
+                              numberOfLines={1}
+                              pointerEvents="none"
+                              style={
+                                {
+                                  "color": "#FFFFFF",
+                                  "fontFamily": "System",
+                                  "fontSize": 19.2,
+                                  "fontWeight": "400",
+                                  "lineHeight": 21,
+                                  "userSelect": "none",
+                                }
+                              }
+                              suppressHighlighting={true}
+                              testID="SelectCoinValue"
+                            />
+                          </View>
+                          <View
+                            pointerEvents="none"
+                            style={
+                              {
+                                "height": 12.600000000000001,
+                                "minHeight": 12.600000000000001,
+                                "minWidth": 12.600000000000001,
+                                "width": 12.600000000000001,
+                              }
+                            }
+                          />
+                          <RNSVGSvgView
+                            align="xMidYMid"
+                            bbHeight={25.200000000000003}
+                            bbWidth={25.200000000000003}
+                            fill="none"
+                            focusable={false}
+                            height={25.200000000000003}
+                            meetOrSlice={0}
+                            minX={0}
+                            minY={0}
+                            stroke="#40FB50"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            style={
+                              [
+                                {
+                                  "backgroundColor": "transparent",
+                                  "borderWidth": 0,
+                                },
+                                {
+                                  "color": "#40FB50",
+                                },
+                                {
+                                  "flex": 0,
+                                  "height": 25,
+                                  "width": 25,
+                                },
+                              ]
+                            }
+                            tintColor="#40FB50"
+                            vbHeight={24}
+                            vbWidth={24}
+                            width={25.200000000000003}
+                          >
+                            <RNSVGGroup
+                              fill={null}
+                              propList={
+                                [
+                                  "fill",
+                                  "stroke",
+                                  "strokeWidth",
+                                  "strokeLinecap",
+                                  "strokeLinejoin",
+                                ]
+                              }
+                              stroke={
+                                {
+                                  "payload": 4282448720,
+                                  "type": 0,
+                                }
+                              }
+                              strokeLinecap={1}
+                              strokeLinejoin={1}
+                              strokeWidth="2"
+                            >
+                              <RNSVGPath
+                                d="m6 9 6 6 6-6"
+                                fill={
+                                  {
+                                    "payload": 4278190080,
+                                    "type": 0,
+                                  }
+                                }
+                                propList={
+                                  [
+                                    "stroke",
+                                  ]
+                                }
+                                stroke={
+                                  {
+                                    "payload": 4282448720,
+                                    "type": 0,
+                                  }
+                                }
+                              />
+                            </RNSVGGroup>
+                          </RNSVGSvgView>
+                        </View>
+                      </View>
+                    </View>
+                    <View
+                      style={
+                        {
+                          "backgroundColor": "#666666",
+                          "bottom": -8,
+                          "flexDirection": "row",
+                          "height": 1,
+                          "left": 0,
+                          "position": "absolute",
+                          "right": 0,
+                        }
+                      }
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "justifyContent": "space-between",
+                      }
+                    }
+                  >
+                    <Text
+                      style={
+                        {
+                          "color": "#B3B3B3",
+                          "fontFamily": "System",
+                          "fontSize": 19.2,
+                          "fontWeight": "400",
+                          "lineHeight": 21,
+                          "userSelect": "auto",
+                        }
+                      }
+                      suppressHighlighting={true}
+                    >
+                      $1
+                    </Text>
+                    <View
+                      style={
+                        {
+                          "alignItems": "center",
+                          "flexDirection": "row",
+                          "gap": 16,
+                        }
+                      }
+                    >
+                      <Text
+                        style={
+                          {
+                            "color": "#FFFFFF",
+                            "fontFamily": "System",
+                            "fontSize": 19.2,
+                            "fontWeight": "400",
+                            "lineHeight": 21,
+                            "userSelect": "auto",
+                          }
+                        }
+                        suppressHighlighting={true}
+                      >
+                        2.50
+                         
+                      </Text>
+                      <View
+                        cancelable={true}
+                        disabled={false}
+                        focusVisibleStyle={{}}
+                        focusable={[Function]}
+                        minPressDuration={0}
+                        onBlur={[Function]}
+                        onFocus={[Function]}
+                        onMouseEnter={[Function]}
+                        onMouseLeave={[Function]}
+                        onPress={[Function]}
+                        onPressIn={[Function]}
+                        onPressOut={[Function]}
+                        role="button"
+                        style={
+                          {
+                            "alignItems": "center",
+                            "backgroundColor": "transparent",
+                            "borderBottomColor": "transparent",
+                            "borderBottomLeftRadius": 16,
+                            "borderBottomRightRadius": 16,
+                            "borderBottomWidth": 0,
+                            "borderLeftColor": "transparent",
+                            "borderLeftWidth": 0,
+                            "borderRightColor": "transparent",
+                            "borderRightWidth": 0,
+                            "borderStyle": "solid",
+                            "borderTopColor": "transparent",
+                            "borderTopLeftRadius": 16,
+                            "borderTopRightRadius": 16,
+                            "borderTopWidth": 0,
+                            "flexDirection": "row",
+                            "flexWrap": "nowrap",
+                            "height": "auto",
+                            "justifyContent": "center",
+                            "paddingBottom": 0,
+                            "paddingLeft": 0,
+                            "paddingRight": 0,
+                            "paddingTop": 0,
+                            "shadowColor": "rgb(0,0,0)",
+                            "shadowOffset": {
+                              "height": 0,
+                              "width": 0,
+                            },
+                            "shadowOpacity": 0,
+                            "shadowRadius": 0,
+                          }
+                        }
+                      >
+                        <Text
+                          lineBreakMode="clip"
+                          numberOfLines={1}
+                          style={
+                            {
+                              "color": "#B2B2B2",
+                              "flexGrow": 0,
+                              "flexShrink": 1,
+                              "fontFamily": "System",
+                              "fontSize": 19.2,
+                              "fontWeight": "400",
+                              "lineHeight": 21,
+                              "textDecorationLine": "underline",
+                              "textTransform": "uppercase",
+                              "userSelect": "none",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                          max
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </View>
+              <View
+                collapsable={false}
+                forwardedRef={[Function]}
+                jestAnimatedStyle={
+                  {
+                    "value": {
+                      "opacity": 1,
+                      "transform": [
+                        {
+                          "scale": 1,
+                        },
+                      ],
+                    },
+                  }
+                }
+                style={
+                  {
+                    "opacity": 0,
+                    "transform": [
+                      {
+                        "scale": 0.9,
+                      },
+                    ],
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "backgroundColor": "#111f22",
+                      "borderBottomLeftRadius": 10,
+                      "borderBottomRightRadius": 10,
+                      "borderTopLeftRadius": 10,
+                      "borderTopRightRadius": 10,
+                      "flexDirection": "column",
+                      "gap": 16,
+                      "paddingBottom": 24,
+                      "paddingLeft": 24,
+                      "paddingRight": 24,
+                      "paddingTop": 24,
+                      "position": "relative",
+                      "width": "100%",
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "gap": 7,
+                      }
+                    }
+                  >
+                    <RNSVGSvgView
+                      align="xMidYMid"
+                      bbHeight={20}
+                      bbWidth={20}
+                      fill="none"
+                      focusable={false}
+                      height={20}
+                      meetOrSlice={0}
+                      minX={0}
+                      minY={0}
+                      stroke="#B3B3B3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      style={
+                        [
+                          {
+                            "backgroundColor": "transparent",
+                            "borderWidth": 0,
+                          },
+                          {
+                            "color": "#B3B3B3",
+                          },
+                          {
+                            "flex": 0,
+                            "height": 20,
+                            "width": 20,
+                          },
+                        ]
+                      }
+                      tintColor="#B3B3B3"
+                      vbHeight={24}
+                      vbWidth={24}
+                      width={20}
+                    >
+                      <RNSVGGroup
+                        fill={null}
+                        propList={
+                          [
+                            "fill",
+                            "stroke",
+                            "strokeWidth",
+                            "strokeLinecap",
+                            "strokeLinejoin",
+                          ]
+                        }
+                        stroke={
+                          {
+                            "payload": 4289967027,
+                            "type": 0,
+                          }
+                        }
+                        strokeLinecap={1}
+                        strokeLinejoin={1}
+                        strokeWidth="2"
+                      >
+                        <RNSVGPath
+                          d="M12 5v14"
+                          fill={
+                            {
+                              "payload": 4278190080,
+                              "type": 0,
+                            }
+                          }
+                          propList={
+                            [
+                              "stroke",
+                            ]
+                          }
+                          stroke={
+                            {
+                              "payload": 4289967027,
+                              "type": 0,
+                            }
+                          }
+                        />
+                        <RNSVGPath
+                          d="m19 12-7 7-7-7"
+                          fill={
+                            {
+                              "payload": 4278190080,
+                              "type": 0,
+                            }
+                          }
+                          propList={
+                            [
+                              "stroke",
+                            ]
+                          }
+                          stroke={
+                            {
+                              "payload": 4289967027,
+                              "type": 0,
+                            }
+                          }
+                        />
+                      </RNSVGGroup>
+                    </RNSVGSvgView>
+                    <Text
+                      style={
+                        {
+                          "color": "#B3B3B3",
+                          "fontFamily": "System",
+                          "fontSize": 16.8,
+                          "fontWeight": "400",
+                          "lineHeight": 19,
+                          "userSelect": "auto",
+                        }
+                      }
+                      suppressHighlighting={true}
+                    >
+                      You Receive
+                    </Text>
+                  </View>
+                  <View
+                    style={
+                      {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "gap": 7,
+                        "justifyContent": "space-between",
+                        "position": "relative",
+                      }
+                    }
+                  >
+                    <View
+                      style={
+                        {
+                          "flexDirection": "column",
+                          "width": "60%",
+                        }
+                      }
+                    >
+                      <View
+                        collapsable={false}
+                        jestAnimatedStyle={
+                          {
+                            "value": {
+                              "transform": [
+                                {
+                                  "translateX": 0,
+                                },
+                              ],
+                            },
+                          }
+                        }
+                        style={
+                          {
+                            "transform": [
+                              {
+                                "translateX": 0,
+                              },
+                            ],
+                          }
+                        }
+                      >
+                        <View
+                          style={
+                            {
+                              "position": "relative",
+                            }
+                          }
+                        >
+                          <TextInput
+                            aria-label="outAmount"
+                            control={
+                              {
+                                "_defaultValues": {
+                                  "inAmount": "1",
+                                  "inToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                                  "outToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                                  "slippage": 50,
+                                },
+                                "_disableForm": [Function],
+                                "_executeSchema": [Function],
+                                "_fields": {
+                                  "inAmount": {
+                                    "_f": {
+                                      "mount": true,
+                                      "name": "inAmount",
+                                      "ref": {
+                                        "name": "inAmount",
+                                      },
+                                      "value": "1",
+                                    },
+                                  },
+                                  "inToken": {
+                                    "_f": {
+                                      "mount": true,
+                                      "name": "inToken",
+                                      "ref": {
+                                        "name": "inToken",
+                                      },
+                                      "value": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                                    },
+                                  },
+                                  "outAmount": {
+                                    "_f": {
+                                      "mount": true,
+                                      "name": "outAmount",
+                                      "ref": {
+                                        "name": "outAmount",
+                                        "value": "0.00012",
+                                      },
+                                      "value": "0.00012",
+                                    },
+                                  },
+                                  "outToken": {
+                                    "_f": {
+                                      "mount": true,
+                                      "name": "outToken",
+                                      "ref": {
+                                        "name": "outToken",
+                                      },
+                                      "value": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                                    },
+                                  },
+                                },
+                                "_formState": {
+                                  "dirtyFields": {},
+                                  "disabled": false,
+                                  "errors": {},
+                                  "isDirty": false,
+                                  "isLoading": false,
+                                  "isSubmitSuccessful": false,
+                                  "isSubmitted": false,
+                                  "isSubmitting": false,
+                                  "isValid": true,
+                                  "isValidating": false,
+                                  "submitCount": 0,
+                                  "touchedFields": {},
+                                },
+                                "_formValues": {
+                                  "inAmount": "1",
+                                  "inToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                                  "outAmount": "0.00012",
+                                  "outToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                                  "slippage": 50,
+                                },
+                                "_getDirty": [Function],
+                                "_getFieldArray": [Function],
+                                "_getWatch": [Function],
+                                "_names": {
+                                  "array": Set {},
+                                  "focus": "",
+                                  "mount": Set {
+                                    "inAmount",
+                                    "inToken",
+                                    "outAmount",
+                                    "outToken",
+                                  },
+                                  "unMount": Set {},
+                                  "watch": Set {
+                                    "outAmount",
+                                    "inAmount",
+                                    "slippage",
+                                  },
+                                  "watchAll": false,
+                                },
+                                "_options": {
+                                  "mode": "onSubmit",
+                                  "reValidateMode": "onChange",
+                                  "shouldFocusError": true,
+                                },
+                                "_proxyFormState": {
+                                  "dirtyFields": false,
+                                  "disabled": true,
+                                  "errors": "all",
+                                  "isDirty": false,
+                                  "isSubmitting": true,
+                                  "isValid": true,
+                                  "isValidating": false,
+                                  "touchedFields": false,
+                                },
+                                "_removeUnmounted": [Function],
+                                "_reset": [Function],
+                                "_resetDefaultValues": [Function],
+                                "_state": {
+                                  "action": false,
+                                  "mount": true,
+                                  "watch": false,
+                                },
+                                "_subjects": {
+                                  "array": {
+                                    "next": [Function],
+                                    "observers": [],
+                                    "subscribe": [Function],
+                                    "unsubscribe": [Function],
+                                  },
+                                  "state": {
+                                    "next": [Function],
+                                    "observers": [
+                                      {
+                                        "next": [Function],
+                                      },
+                                      {
+                                        "next": [Function],
+                                      },
+                                      {
+                                        "next": [Function],
+                                      },
+                                      {
+                                        "next": [Function],
+                                      },
+                                      {
+                                        "next": [Function],
+                                      },
+                                      {
+                                        "next": [Function],
+                                      },
+                                    ],
+                                    "subscribe": [Function],
+                                    "unsubscribe": [Function],
+                                  },
+                                  "values": {
+                                    "next": [Function],
+                                    "observers": [
+                                      {
+                                        "next": [Function],
+                                      },
+                                      {
+                                        "next": [Function],
+                                      },
+                                      {
+                                        "next": [Function],
+                                      },
+                                      {
+                                        "next": [Function],
+                                      },
+                                      {
+                                        "next": [Function],
+                                      },
+                                    ],
+                                    "subscribe": [Function],
+                                    "unsubscribe": [Function],
+                                  },
+                                },
+                                "_updateDisabledField": [Function],
+                                "_updateFieldArray": [Function],
+                                "_updateFormState": [Function],
+                                "_updateValid": [Function],
+                                "getFieldState": [Function],
+                                "handleSubmit": [Function],
+                                "register": [Function],
+                                "setError": [Function],
+                                "unregister": [Function],
+                              }
+                            }
+                            fieldsetProps={
+                              {
+                                "width": "60%",
+                              }
+                            }
+                            focusVisibleStyle={{}}
+                            focusable={true}
+                            id=":r7:"
+                            name="outAmount"
+                            onChangeText={[Function]}
+                            placeholder="0"
+                            placeholderTextColor="#666666"
+                            pointerEvents="none"
+                            readOnly={true}
+                            style={
+                              {
+                                "backgroundColor": "#111f22",
+                                "borderBottomColor": "#111f22",
+                                "borderBottomLeftRadius": 0,
+                                "borderBottomRightRadius": 0,
+                                "borderBottomWidth": 0,
+                                "borderLeftColor": "#111f22",
+                                "borderLeftWidth": 0,
+                                "borderRightColor": "#111f22",
+                                "borderRightWidth": 0,
+                                "borderStyle": "solid",
+                                "borderTopColor": "#111f22",
+                                "borderTopLeftRadius": 0,
+                                "borderTopRightRadius": 0,
+                                "borderTopWidth": 0,
+                                "color": "#FFFFFF",
+                                "fontFamily": "System",
+                                "fontSize": 36,
+                                "fontWeight": "500",
+                                "height": 44,
+                                "minWidth": 0,
+                                "paddingBottom": 1,
+                                "paddingLeft": 1,
+                                "paddingRight": 1,
+                                "paddingTop": 1,
+                                "position": "relative",
+                              }
+                            }
+                            testID="outAmountInput"
+                            value="0.00012"
+                          />
+                        </View>
+                      </View>
+                      <View
+                        style={
+                          {
+                            "bottom": 10,
+                            "gap": 7,
+                            "position": "absolute",
+                            "right": 18,
+                          }
+                        }
+                      />
+                    </View>
+                    <View
+                      style={
+                        {
+                          "flexDirection": "column",
+                        }
+                      }
+                    >
+                      <View
+                        collapsable={false}
+                        jestAnimatedStyle={
+                          {
+                            "value": {
+                              "transform": [
+                                {
+                                  "translateX": 0,
+                                },
+                              ],
+                            },
+                          }
+                        }
+                        style={
+                          {
+                            "transform": [
+                              {
+                                "translateX": 0,
+                              },
+                            ],
+                          }
+                        }
+                      >
+                        <View
+                          aria-autocomplete="none"
+                          aria-expanded={false}
+                          cancelable={true}
+                          disabled={false}
+                          focusVisibleStyle={
+                            {
+                              "outlineColor": "$outlineColor",
+                              "outlineStyle": "solid",
+                              "outlineWidth": 2,
+                            }
+                          }
+                          focusable={[Function]}
+                          id=":r8:"
+                          minPressDuration={0}
+                          onBlur={[Function]}
+                          onFocus={[Function]}
+                          onMouseEnter={[Function]}
+                          onMouseLeave={[Function]}
+                          onPress={[Function]}
+                          onPressIn={[Function]}
+                          onPressOut={[Function]}
+                          style={
+                            {
+                              "alignItems": "center",
+                              "backgroundColor": "rgba(0,0,0, 0.1)",
+                              "borderBottomColor": "#081619",
+                              "borderBottomLeftRadius": 999,
+                              "borderBottomRightRadius": 999,
+                              "borderBottomWidth": 0,
+                              "borderLeftColor": "#081619",
+                              "borderLeftWidth": 0,
+                              "borderRightColor": "#081619",
+                              "borderRightWidth": 0,
+                              "borderStyle": "solid",
+                              "borderTopColor": "#081619",
+                              "borderTopLeftRadius": 999,
+                              "borderTopRightRadius": 999,
+                              "borderTopWidth": 0,
+                              "flexDirection": "row",
+                              "flexWrap": "nowrap",
+                              "justifyContent": "space-between",
+                              "maxWidth": "100%",
+                              "minHeight": 44,
+                              "overflow": "hidden",
+                              "paddingBottom": 7,
+                              "paddingLeft": 7,
+                              "paddingRight": 7,
+                              "paddingTop": 7,
+                              "width": "fit-content",
+                            }
+                          }
+                          testID="SelectCoinTrigger"
+                          type="button"
+                        >
+                          <View
+                            style={
+                              {
+                                "alignItems": "center",
+                                "flexDirection": "row",
+                                "gap": 7,
+                              }
+                            }
+                          >
+                            <Text
+                              lineBreakMode="clip"
+                              numberOfLines={1}
+                              pointerEvents="none"
+                              style={
+                                {
+                                  "color": "#FFFFFF",
+                                  "fontFamily": "System",
+                                  "fontSize": 19.2,
+                                  "fontWeight": "400",
+                                  "lineHeight": 21,
+                                  "userSelect": "none",
+                                }
+                              }
+                              suppressHighlighting={true}
+                              testID="SelectCoinValue"
+                            />
+                          </View>
+                          <View
+                            pointerEvents="none"
+                            style={
+                              {
+                                "height": 12.600000000000001,
+                                "minHeight": 12.600000000000001,
+                                "minWidth": 12.600000000000001,
+                                "width": 12.600000000000001,
+                              }
+                            }
+                          />
+                          <RNSVGSvgView
+                            align="xMidYMid"
+                            bbHeight={25.200000000000003}
+                            bbWidth={25.200000000000003}
+                            fill="none"
+                            focusable={false}
+                            height={25.200000000000003}
+                            meetOrSlice={0}
+                            minX={0}
+                            minY={0}
+                            stroke="#40FB50"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            style={
+                              [
+                                {
+                                  "backgroundColor": "transparent",
+                                  "borderWidth": 0,
+                                },
+                                {
+                                  "color": "#40FB50",
+                                },
+                                {
+                                  "flex": 0,
+                                  "height": 25,
+                                  "width": 25,
+                                },
+                              ]
+                            }
+                            tintColor="#40FB50"
+                            vbHeight={24}
+                            vbWidth={24}
+                            width={25.200000000000003}
+                          >
+                            <RNSVGGroup
+                              fill={null}
+                              propList={
+                                [
+                                  "fill",
+                                  "stroke",
+                                  "strokeWidth",
+                                  "strokeLinecap",
+                                  "strokeLinejoin",
+                                ]
+                              }
+                              stroke={
+                                {
+                                  "payload": 4282448720,
+                                  "type": 0,
+                                }
+                              }
+                              strokeLinecap={1}
+                              strokeLinejoin={1}
+                              strokeWidth="2"
+                            >
+                              <RNSVGPath
+                                d="m6 9 6 6 6-6"
+                                fill={
+                                  {
+                                    "payload": 4278190080,
+                                    "type": 0,
+                                  }
+                                }
+                                propList={
+                                  [
+                                    "stroke",
+                                  ]
+                                }
+                                stroke={
+                                  {
+                                    "payload": 4282448720,
+                                    "type": 0,
+                                  }
+                                }
+                              />
+                            </RNSVGGroup>
+                          </RNSVGSvgView>
+                        </View>
+                      </View>
+                    </View>
+                    <View
+                      style={
+                        {
+                          "backgroundColor": "#666666",
+                          "bottom": -8,
+                          "flexDirection": "row",
+                          "height": 1,
+                          "left": 0,
+                          "position": "absolute",
+                          "right": 0,
+                        }
+                      }
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "height": 28,
+                      }
+                    }
+                  >
+                    <Text
+                      style={
+                        {
+                          "color": "#B3B3B3",
+                          "fontFamily": "System",
+                          "fontSize": 19.2,
+                          "fontWeight": "400",
+                          "lineHeight": 21,
+                          "userSelect": "auto",
+                        }
+                      }
+                      suppressHighlighting={true}
+                    >
+                      $
+                      0.99
+                    </Text>
+                  </View>
+                </View>
+              </View>
+              <View
+                style={
+                  {
+                    "backgroundColor": "#081619",
+                    "borderBottomLeftRadius": 9999,
+                    "borderBottomRightRadius": 9999,
+                    "borderTopLeftRadius": 9999,
+                    "borderTopRightRadius": 9999,
+                    "flexDirection": "column",
+                    "left": "50%",
+                    "position": "absolute",
+                    "top": "50%",
+                    "transform": "translate(-50%, -50%)",
+                  }
+                }
+              >
+                <View
+                  cancelable={true}
+                  disabled={false}
+                  focusVisibleStyle={{}}
+                  focusable={[Function]}
+                  minPressDuration={0}
+                  onBlur={[Function]}
+                  onFocus={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onPress={[Function]}
+                  onPressIn={[Function]}
+                  onPressOut={[Function]}
+                  role="button"
+                  style={
+                    {
+                      "alignItems": "center",
+                      "backgroundColor": "#081619",
+                      "borderBottomColor": "transparent",
+                      "borderBottomLeftRadius": 100000,
+                      "borderBottomRightRadius": 100000,
+                      "borderBottomWidth": 0,
+                      "borderLeftColor": "transparent",
+                      "borderLeftWidth": 0,
+                      "borderRightColor": "transparent",
+                      "borderRightWidth": 0,
+                      "borderStyle": "solid",
+                      "borderTopColor": "transparent",
+                      "borderTopLeftRadius": 100000,
+                      "borderTopRightRadius": 100000,
+                      "borderTopWidth": 0,
+                      "flexDirection": "row",
+                      "flexWrap": "nowrap",
+                      "height": 52,
+                      "justifyContent": "center",
+                      "maxHeight": 52,
+                      "maxWidth": 52,
+                      "minHeight": 52,
+                      "minWidth": 52,
+                      "paddingBottom": 0,
+                      "paddingLeft": 0,
+                      "paddingRight": 0,
+                      "paddingTop": 0,
+                      "width": 52,
+                    }
+                  }
+                  testID="flipTokensButton"
+                >
+                  <RNSVGSvgView
+                    align="xMidYMid"
+                    bbHeight={20}
+                    bbWidth={20}
+                    color="#FFFFFF"
+                    fill="none"
+                    focusable={false}
+                    height={20}
+                    meetOrSlice={0}
+                    minX={0}
+                    minY={0}
+                    strokeWidth="2"
+                    style={
+                      [
+                        {
+                          "backgroundColor": "transparent",
+                          "borderWidth": 0,
+                        },
+                        {
+                          "color": "#FFFFFF",
+                        },
+                        {
+                          "flex": 0,
+                          "height": 20,
+                          "width": 20,
+                        },
+                      ]
+                    }
+                    tintColor="#FFFFFF"
+                    vbHeight={20}
+                    vbWidth={16}
+                    width={20}
+                  >
+                    <RNSVGGroup
+                      fill={null}
+                      propList={
+                        [
+                          "fill",
+                          "strokeWidth",
+                        ]
+                      }
+                      strokeWidth="2"
+                    >
+                      <RNSVGPath
+                        d="M4 11L4 3.825L1.425 6.4L0 5L5 0L10 5L8.575 6.4L6 3.825L6 11H4ZM11 20L6 15L7.425 13.6L10 16.175V9H12V16.175L14.575 13.6L16 15L11 20Z"
+                        fill={
+                          {
+                            "type": 2,
+                          }
+                        }
+                        propList={
+                          [
+                            "fill",
+                          ]
+                        }
+                      />
+                    </RNSVGGroup>
+                  </RNSVGSvgView>
+                </View>
+              </View>
+            </View>
+          </View>
+          <View
+            collapsable={false}
+            forwardedRef={[Function]}
+            jestAnimatedStyle={
+              {
+                "value": {
+                  "opacity": 1,
+                  "transform": [
+                    {
+                      "scale": 1,
+                    },
+                  ],
+                },
+              }
+            }
+            style={
+              {
+                "opacity": 0,
+                "transform": [
+                  {
+                    "scale": 0.9,
+                  },
+                ],
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "backgroundColor": "#111f22",
+                  "borderBottomLeftRadius": 10,
+                  "borderBottomRightRadius": 10,
+                  "borderTopLeftRadius": 10,
+                  "borderTopRightRadius": 10,
+                  "flexDirection": "column",
+                  "gap": 16,
+                  "paddingBottom": 24,
+                  "paddingLeft": 24,
+                  "paddingRight": 24,
+                  "paddingTop": 24,
+                  "position": "relative",
+                  "width": "100%",
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "flexDirection": "column",
+                    "gap": 16,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                      "justifyContent": "space-between",
+                    }
+                  }
+                >
+                  <Text
+                    style={
+                      {
+                        "color": "#B3B3B3",
+                        "fontFamily": "System",
+                        "fontSize": 19.2,
+                        "fontWeight": "400",
+                        "lineHeight": 21,
+                        "userSelect": "auto",
+                      }
+                    }
+                    suppressHighlighting={true}
+                  >
+                    Max Slippage
+                  </Text>
+                  <View
+                    style={
+                      {
+                        "flexDirection": "row",
+                        "gap": 7,
+                      }
+                    }
+                  >
+                    <Text
+                      style={
+                        {
+                          "color": "#FFFFFF",
+                          "fontFamily": "System",
+                          "fontSize": 19.2,
+                          "fontWeight": "400",
+                          "lineHeight": 21,
+                          "userSelect": "auto",
+                        }
+                      }
+                      suppressHighlighting={true}
+                    >
+                      0.5
+                      %
+                    </Text>
+                    <View
+                      cancelable={true}
+                      disabled={false}
+                      focusVisibleStyle={{}}
+                      focusable={[Function]}
+                      minPressDuration={0}
+                      onBlur={[Function]}
+                      onFocus={[Function]}
+                      onMouseEnter={[Function]}
+                      onMouseLeave={[Function]}
+                      onPress={[Function]}
+                      onPressIn={[Function]}
+                      onPressOut={[Function]}
+                      role="button"
+                      style={
+                        {
+                          "alignItems": "center",
+                          "backgroundColor": "transparent",
+                          "borderBottomColor": "transparent",
+                          "borderBottomLeftRadius": 16,
+                          "borderBottomRightRadius": 16,
+                          "borderBottomWidth": 0,
+                          "borderLeftColor": "transparent",
+                          "borderLeftWidth": 0,
+                          "borderRightColor": "transparent",
+                          "borderRightWidth": 0,
+                          "borderStyle": "solid",
+                          "borderTopColor": "transparent",
+                          "borderTopLeftRadius": 16,
+                          "borderTopRightRadius": 16,
+                          "borderTopWidth": 0,
+                          "flexDirection": "row",
+                          "flexWrap": "nowrap",
+                          "height": "auto",
+                          "justifyContent": "center",
+                          "paddingBottom": 0,
+                          "paddingLeft": 0,
+                          "paddingRight": 0,
+                          "paddingTop": 0,
+                          "shadowColor": "rgb(0,0,0)",
+                          "shadowOffset": {
+                            "height": 0,
+                            "width": 0,
+                          },
+                          "shadowOpacity": 0,
+                          "shadowRadius": 0,
+                        }
+                      }
+                      testID="slippageDetailsButton"
+                    >
+                      <RNSVGSvgView
+                        align="xMidYMid"
+                        bbHeight={20}
+                        bbWidth={20}
+                        fill="none"
+                        focusable={false}
+                        height={20}
+                        meetOrSlice={0}
+                        minX={0}
+                        minY={0}
+                        stroke="#40FB50"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        style={
+                          [
+                            {
+                              "backgroundColor": "transparent",
+                              "borderWidth": 0,
+                            },
+                            {
+                              "color": "#40FB50",
+                            },
+                            {
+                              "flex": 0,
+                              "height": 20,
+                              "width": 20,
+                            },
+                          ]
+                        }
+                        tintColor="#40FB50"
+                        vbHeight={24}
+                        vbWidth={24}
+                        width={20}
+                      >
+                        <RNSVGGroup
+                          fill={null}
+                          propList={
+                            [
+                              "fill",
+                              "stroke",
+                              "strokeWidth",
+                              "strokeLinecap",
+                              "strokeLinejoin",
+                            ]
+                          }
+                          stroke={
+                            {
+                              "payload": 4282448720,
+                              "type": 0,
+                            }
+                          }
+                          strokeLinecap={1}
+                          strokeLinejoin={1}
+                          strokeWidth="2"
+                        >
+                          <RNSVGPath
+                            d="m6 9 6 6 6-6"
+                            fill={
+                              {
+                                "payload": 4278190080,
+                                "type": 0,
+                              }
+                            }
+                            propList={
+                              [
+                                "stroke",
+                              ]
+                            }
+                            stroke={
+                              {
+                                "payload": 4282448720,
+                                "type": 0,
+                              }
+                            }
+                          />
+                        </RNSVGGroup>
+                      </RNSVGSvgView>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+        <Text
+          style={
+            {
+              "color": "#DE4747",
+              "fontFamily": "System",
+              "fontSize": 16.8,
+              "fontWeight": "400",
+              "lineHeight": 19,
+              "userSelect": "auto",
+            }
+          }
+          suppressHighlighting={true}
+        />
+      </View>
+      <View
+        onLayout={[Function]}
+        style={
+          {
+            "paddingBottom": 0,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "flexDirection": "column-reverse",
+              "gap": 18,
+              "paddingBottom": 0,
+              "paddingLeft": 18,
+              "paddingRight": 18,
+            }
+          }
+        >
+          <View
+            accessible={true}
+            aria-busy={false}
+            cancelable={true}
+            disabled={false}
+            focusVisibleStyle={{}}
+            focusable={[Function]}
+            minPressDuration={0}
+            onBlur={[Function]}
+            onFocus={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onPress={[Function]}
+            onPressIn={[Function]}
+            onPressOut={[Function]}
+            role="button"
+            style={
+              {
+                "alignItems": "center",
+                "backgroundColor": "#40FB50",
+                "borderBottomColor": "transparent",
+                "borderBottomLeftRadius": 9,
+                "borderBottomRightRadius": 9,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "transparent",
+                "borderLeftWidth": 1,
+                "borderRightColor": "transparent",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "transparent",
+                "borderTopLeftRadius": 9,
+                "borderTopRightRadius": 9,
+                "borderTopWidth": 1,
+                "flexDirection": "row",
+                "flexWrap": "nowrap",
+                "height": 44,
+                "justifyContent": "center",
+                "opacity": 1,
+                "paddingBottom": 24,
+                "paddingLeft": 18,
+                "paddingRight": 18,
+                "paddingTop": 24,
+              }
+            }
+            testID="SubmitButton"
+          >
+            <Text
+              lineBreakMode="clip"
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#12643F",
+                  "flexGrow": 0,
+                  "flexShrink": 1,
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                  "userSelect": "none",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              <Text
+                lineBreakMode="clip"
+                numberOfLines={1}
+                style={
+                  {
+                    "color": "#122023",
+                    "flexGrow": 0,
+                    "flexShrink": 1,
+                    "fontFamily": "System",
+                    "fontSize": 19.2,
+                    "fontWeight": "400",
+                    "lineHeight": 21,
+                    "textTransform": "uppercase",
+                    "userSelect": "none",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                review
+              </Text>
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>,
+  <View
+    pointerEvents="box-none"
+    style={
+      {
+        "bottom": 0,
+        "flexDirection": "column",
+        "left": 0,
+        "maxWidth": "100%",
+        "position": "absolute",
+        "right": 0,
+        "top": 0,
+        "zIndex": 100001,
+      }
+    }
+  >
+    <View
+      onLayout={[Function]}
+      style={
+        {
+          "bottom": 0,
+          "left": 0,
+          "opacity": 0,
+          "pointerEvents": "none",
+          "position": "absolute",
+          "right": 0,
+          "top": 0,
+        }
+      }
+    />
+    <View
+      animation="quick"
+      collapsable={false}
+      disableClassName={true}
+      forwardedRef={[Function]}
+      jestAnimatedStyle={
+        {
+          "value": {
+            "transform": [
+              {
+                "translateY": 10000.1,
+              },
+            ],
+          },
+        }
+      }
+      onLayout={[Function]}
+      style={
+        {
+          "height": undefined,
+          "minHeight": undefined,
+          "opacity": 0,
+          "pointerEvents": "none",
+          "position": "absolute",
+          "transform": [
+            {
+              "translateY": 10000.1,
+            },
+          ],
+          "width": "100%",
+          "zIndex": 100001,
+        }
+      }
+    >
+      <View
+        pointerEvents="none"
+        style={
+          {
+            "backgroundColor": "#111f22",
+            "borderTopLeftRadius": 16,
+            "borderTopRightRadius": 16,
+            "flex": 0,
+            "flexDirection": "column",
+            "maxHeight": "100%",
+            "maxWidth": 738,
+            "overflow": "hidden",
+            "width": "100%",
+          }
+        }
+      >
+        <View
+          cancelable={true}
+          disabled={false}
+          focusable={true}
+          minPressDuration={0}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onPress={[Function]}
+          onPressIn={[Function]}
+          onPressOut={[Function]}
+          pointerEvents="none"
+          style={
+            {
+              "backgroundColor": "transparent",
+              "borderBottomLeftRadius": 100,
+              "borderBottomRightRadius": 100,
+              "borderTopLeftRadius": 100,
+              "borderTopRightRadius": 100,
+              "flex": 1,
+              "flexDirection": "row",
+              "height": 10,
+              "justifyContent": "space-between",
+              "marginBottom": 0,
+              "marginLeft": 0,
+              "marginRight": 0,
+              "marginTop": 0,
+              "opacity": 1,
+              "paddingBottom": 24,
+              "paddingTop": 24,
+              "zIndex": 10,
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "paddingLeft": 18,
+                "paddingRight": 18,
+                "width": "100%",
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "fontFamily": "System",
+                  "fontSize": 19.2,
+                  "fontWeight": "700",
+                  "lineHeight": 19,
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              Select Currency
+            </Text>
+            <View
+              cancelable={true}
+              disabled={false}
+              focusable={[Function]}
+              minPressDuration={0}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onPress={[Function]}
+              onPressIn={[Function]}
+              onPressOut={[Function]}
+              role="button"
+              style={
+                {
+                  "backgroundColor": "transparent",
+                  "borderBottomColor": "transparent",
+                  "borderLeftColor": "transparent",
+                  "borderRightColor": "transparent",
+                  "borderTopColor": "transparent",
+                  "flexDirection": "column",
+                  "shadowColor": "rgb(0,0,0)",
+                  "shadowOffset": {
+                    "height": 0,
+                    "width": 0,
+                  },
+                  "shadowOpacity": 0,
+                  "shadowRadius": 0,
+                }
+              }
+            >
+              <RNSVGSvgView
+                align="xMidYMid"
+                bbHeight={24}
+                bbWidth={24}
+                color="#FFFFFF"
+                focusable={false}
+                height={24}
+                meetOrSlice={0}
+                minX={0}
+                minY={0}
+                strokeWidth="2"
+                style={
+                  [
+                    {
+                      "backgroundColor": "transparent",
+                      "borderWidth": 0,
+                    },
+                    {
+                      "color": "#FFFFFF",
+                    },
+                    {
+                      "flex": 0,
+                      "height": 24,
+                      "width": 24,
+                    },
+                  ]
+                }
+                tintColor="#FFFFFF"
+                vbHeight={32}
+                vbWidth={32}
+                width={24}
+              >
+                <RNSVGGroup
+                  fill={
+                    {
+                      "payload": 4278190080,
+                      "type": 0,
+                    }
+                  }
+                  propList={
+                    [
+                      "strokeWidth",
+                    ]
+                  }
+                  strokeWidth="2"
+                >
+                  <RNSVGPath
+                    d="M8.30006 25.1004L6.90005 23.7004L14.6001 16.0004L6.90005 8.30039L8.30006 6.90039L16.0001 14.6004L23.7001 6.90039L25.1001 8.30039L17.4001 16.0004L25.1001 23.7004L23.7001 25.1004L16.0001 17.4004L8.30006 25.1004Z"
+                    fill={
+                      {
+                        "type": 2,
+                      }
+                    }
+                    propList={
+                      [
+                        "fill",
+                      ]
+                    }
+                  />
+                </RNSVGGroup>
+              </RNSVGSvgView>
+            </View>
+          </View>
+        </View>
+        <RCTScrollView
+          onMoveShouldSetResponder={[Function]}
+          onResponderRelease={[Function]}
+          onScroll={[Function]}
+          onStartShouldSetResponder={[Function]}
+          scrollEnabled={true}
+          scrollEventThrottle={8}
+          style={
+            {
+              "flex": 1,
+            }
+          }
+        >
+          <View>
+            <View
+              style={
+                {
+                  "alignSelf": "flex-start",
+                  "borderBottomColor": "transparent",
+                  "borderLeftColor": "transparent",
+                  "borderRightColor": "transparent",
+                  "borderTopColor": "transparent",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "width": "100%",
+                }
+              }
+            >
+              <View
+                aria-labelledby=":rg:"
+                disabled={false}
+                role="group"
+                style={
+                  {
+                    "flexDirection": "column",
+                    "paddingBottom": 7,
+                    "paddingLeft": 7,
+                    "paddingRight": 7,
+                    "paddingTop": 7,
+                    "width": "100%",
+                  }
+                }
+              >
+                <View
+                  aria-labelledby=":rh:"
+                  aria-selected={true}
+                  cancelable={true}
+                  disabled={false}
+                  focusVisibleStyle={
+                    {
+                      "outlineColor": "$outlineColor",
+                      "outlineStyle": "solid",
+                      "outlineWidth": 1,
+                    }
+                  }
+                  focusable={true}
+                  minPressDuration={0}
+                  onBlur={[Function]}
+                  onFocus={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onPress={[Function]}
+                  onPressIn={[Function]}
+                  onPressOut={[Function]}
+                  style={
+                    {
+                      "alignItems": "center",
+                      "backgroundColor": "transparent",
+                      "borderBottomColor": "#111f22",
+                      "borderBottomLeftRadius": 9,
+                      "borderBottomRightRadius": 9,
+                      "borderBottomWidth": 0,
+                      "borderLeftColor": "#111f22",
+                      "borderLeftWidth": 0,
+                      "borderRightColor": "#111f22",
+                      "borderRightWidth": 0,
+                      "borderStyle": "solid",
+                      "borderTopColor": "#111f22",
+                      "borderTopLeftRadius": 9,
+                      "borderTopRightRadius": 9,
+                      "borderTopWidth": 0,
+                      "flex": 1,
+                      "flexDirection": "row",
+                      "flexWrap": "nowrap",
+                      "justifyContent": "space-between",
+                      "maxWidth": "100%",
+                      "minHeight": 44,
+                      "overflow": "hidden",
+                      "paddingBottom": 10,
+                      "paddingLeft": 18,
+                      "paddingRight": 18,
+                      "paddingTop": 10,
+                      "width": "100%",
+                    }
+                  }
+                  tabIndex={-1}
+                >
+                  <View
+                    style={
+                      {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "gap": 7,
+                        "justifyContent": "space-between",
+                      }
+                    }
+                  >
+                    <Text
+                      id=":rh:"
+                      lineBreakMode="clip"
+                      numberOfLines={1}
+                      style={
+                        {
+                          "color": "#FFFFFF",
+                          "fontFamily": "System",
+                          "fontSize": 19.2,
+                          "fontWeight": "500",
+                          "lineHeight": 19,
+                          "textTransform": "uppercase",
+                          "userSelect": "none",
+                        }
+                      }
+                      suppressHighlighting={true}
+                    />
+                    <RNSVGSvgView
+                      align="xMidYMid"
+                      bbHeight={24}
+                      bbWidth={24}
+                      fill="none"
+                      focusable={false}
+                      height={24}
+                      meetOrSlice={0}
+                      minX={0}
+                      minY={0}
+                      stroke="#FFFFFF"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      style={
+                        [
+                          {
+                            "backgroundColor": "transparent",
+                            "borderWidth": 0,
+                          },
+                          {
+                            "color": "#FFFFFF",
+                          },
+                          {
+                            "flex": 0,
+                            "height": 24,
+                            "width": 24,
+                          },
+                        ]
+                      }
+                      tintColor="#FFFFFF"
+                      vbHeight={24}
+                      vbWidth={24}
+                      width={24}
+                    >
+                      <RNSVGGroup
+                        fill={null}
+                        propList={
+                          [
+                            "fill",
+                            "stroke",
+                            "strokeWidth",
+                            "strokeLinecap",
+                            "strokeLinejoin",
+                          ]
+                        }
+                        stroke={
+                          {
+                            "payload": 4294967295,
+                            "type": 0,
+                          }
+                        }
+                        strokeLinecap={1}
+                        strokeLinejoin={1}
+                        strokeWidth="2"
+                      >
+                        <RNSVGPath
+                          d="M22 11.08V12a10 10 0 1 1-5.93-9.14"
+                          fill={
+                            {
+                              "payload": 4278190080,
+                              "type": 0,
+                            }
+                          }
+                          propList={
+                            [
+                              "stroke",
+                            ]
+                          }
+                          stroke={
+                            {
+                              "payload": 4294967295,
+                              "type": 0,
+                            }
+                          }
+                        />
+                        <RNSVGPath
+                          d="m9 11 3 3L22 4"
+                          fill={
+                            {
+                              "payload": 4278190080,
+                              "type": 0,
+                            }
+                          }
+                          propList={
+                            [
+                              "stroke",
+                            ]
+                          }
+                          stroke={
+                            {
+                              "payload": 4294967295,
+                              "type": 0,
+                            }
+                          }
+                        />
+                      </RNSVGGroup>
+                    </RNSVGSvgView>
+                  </View>
+                  <View
+                    style={
+                      {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "gap": 16,
+                      }
+                    }
+                  >
+                    <Text
+                      style={
+                        {
+                          "color": "#FFFFFF",
+                          "fontFamily": "System",
+                          "fontSize": 24,
+                          "fontWeight": "500",
+                          "lineHeight": 19,
+                          "userSelect": "auto",
+                        }
+                      }
+                      suppressHighlighting={true}
+                    >
+                      0.25
+                    </Text>
+                  </View>
+                </View>
+                <View
+                  pointerEvents="none"
+                  style={
+                    {
+                      "height": 0,
+                      "minHeight": 0,
+                      "minWidth": 0,
+                      "width": 0,
+                    }
+                  }
+                />
+                <View
+                  aria-labelledby=":ri:"
+                  aria-selected={false}
+                  cancelable={true}
+                  disabled={false}
+                  focusVisibleStyle={
+                    {
+                      "outlineColor": "$outlineColor",
+                      "outlineStyle": "solid",
+                      "outlineWidth": 1,
+                    }
+                  }
+                  focusable={true}
+                  minPressDuration={0}
+                  onBlur={[Function]}
+                  onFocus={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onPress={[Function]}
+                  onPressIn={[Function]}
+                  onPressOut={[Function]}
+                  style={
+                    {
+                      "alignItems": "center",
+                      "backgroundColor": "transparent",
+                      "borderBottomColor": "#111f22",
+                      "borderBottomLeftRadius": 9,
+                      "borderBottomRightRadius": 9,
+                      "borderBottomWidth": 0,
+                      "borderLeftColor": "#111f22",
+                      "borderLeftWidth": 0,
+                      "borderRightColor": "#111f22",
+                      "borderRightWidth": 0,
+                      "borderStyle": "solid",
+                      "borderTopColor": "#111f22",
+                      "borderTopLeftRadius": 9,
+                      "borderTopRightRadius": 9,
+                      "borderTopWidth": 0,
+                      "flex": 1,
+                      "flexDirection": "row",
+                      "flexWrap": "nowrap",
+                      "justifyContent": "space-between",
+                      "maxWidth": "100%",
+                      "minHeight": 44,
+                      "overflow": "hidden",
+                      "paddingBottom": 10,
+                      "paddingLeft": 18,
+                      "paddingRight": 18,
+                      "paddingTop": 10,
+                      "width": "100%",
+                    }
+                  }
+                  tabIndex={-1}
+                >
+                  <View
+                    style={
+                      {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "gap": 7,
+                        "justifyContent": "space-between",
+                      }
+                    }
+                  >
+                    <Text
+                      id=":ri:"
+                      lineBreakMode="clip"
+                      numberOfLines={1}
+                      style={
+                        {
+                          "color": "#FFFFFF",
+                          "fontFamily": "System",
+                          "fontSize": 19.2,
+                          "fontWeight": "500",
+                          "lineHeight": 19,
+                          "textTransform": "uppercase",
+                          "userSelect": "none",
+                        }
+                      }
+                      suppressHighlighting={true}
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "gap": 16,
+                      }
+                    }
+                  >
+                    <Text
+                      style={
+                        {
+                          "color": "#FFFFFF",
+                          "fontFamily": "System",
+                          "fontSize": 24,
+                          "fontWeight": "500",
+                          "lineHeight": 19,
+                          "userSelect": "auto",
+                        }
+                      }
+                      suppressHighlighting={true}
+                    >
+                      0
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+        </RCTScrollView>
+      </View>
+      <View
+        style={
+          {
+            "backgroundColor": "#111f22",
+            "borderBottomLeftRadius": 0,
+            "borderBottomRightRadius": 0,
+            "borderBottomWidth": 0,
+            "borderLeftWidth": 0,
+            "borderRightWidth": 0,
+            "borderStyle": "solid",
+            "borderTopLeftRadius": 0,
+            "borderTopRightRadius": 0,
+            "borderTopWidth": 0,
+            "bottom": "-100%",
+            "flex": 1,
+            "flexDirection": "column",
+            "height": 0,
+            "left": 0,
+            "maxHeight": "100%",
+            "maxWidth": 738,
+            "overflow": "hidden",
+            "position": "absolute",
+            "right": 0,
+            "shadowColor": undefined,
+            "shadowOffset": {
+              "height": 0,
+              "width": 0,
+            },
+            "shadowOpacity": 0,
+            "shadowRadius": 0,
+            "width": "100%",
+            "zIndex": -1,
+          }
+        }
+      />
+    </View>
+  </View>,
+  <View
+    pointerEvents="box-none"
+    style={
+      {
+        "bottom": 0,
+        "flexDirection": "column",
+        "left": 0,
+        "maxWidth": "100%",
+        "position": "absolute",
+        "right": 0,
+        "top": 0,
+        "zIndex": 100001,
+      }
+    }
+  >
+    <View
+      onLayout={[Function]}
+      style={
+        {
+          "bottom": 0,
+          "left": 0,
+          "opacity": 0,
+          "pointerEvents": "none",
+          "position": "absolute",
+          "right": 0,
+          "top": 0,
+        }
+      }
+    />
+    <View
+      animation="quick"
+      collapsable={false}
+      disableClassName={true}
+      forwardedRef={[Function]}
+      jestAnimatedStyle={
+        {
+          "value": {
+            "transform": [
+              {
+                "translateY": 10000.1,
+              },
+            ],
+          },
+        }
+      }
+      onLayout={[Function]}
+      style={
+        {
+          "height": undefined,
+          "minHeight": undefined,
+          "opacity": 0,
+          "pointerEvents": "none",
+          "position": "absolute",
+          "transform": [
+            {
+              "translateY": 10000.1,
+            },
+          ],
+          "width": "100%",
+          "zIndex": 100001,
+        }
+      }
+    >
+      <View
+        pointerEvents="none"
+        style={
+          {
+            "backgroundColor": "#111f22",
+            "borderTopLeftRadius": 16,
+            "borderTopRightRadius": 16,
+            "flex": 0,
+            "flexDirection": "column",
+            "maxHeight": "100%",
+            "maxWidth": 738,
+            "overflow": "hidden",
+            "width": "100%",
+          }
+        }
+      >
+        <View
+          cancelable={true}
+          disabled={false}
+          focusable={true}
+          minPressDuration={0}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onPress={[Function]}
+          onPressIn={[Function]}
+          onPressOut={[Function]}
+          pointerEvents="none"
+          style={
+            {
+              "backgroundColor": "transparent",
+              "borderBottomLeftRadius": 100,
+              "borderBottomRightRadius": 100,
+              "borderTopLeftRadius": 100,
+              "borderTopRightRadius": 100,
+              "flex": 1,
+              "flexDirection": "row",
+              "height": 10,
+              "justifyContent": "space-between",
+              "marginBottom": 0,
+              "marginLeft": 0,
+              "marginRight": 0,
+              "marginTop": 0,
+              "opacity": 1,
+              "paddingBottom": 24,
+              "paddingTop": 24,
+              "zIndex": 10,
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "paddingLeft": 18,
+                "paddingRight": 18,
+                "width": "100%",
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "fontFamily": "System",
+                  "fontSize": 19.2,
+                  "fontWeight": "700",
+                  "lineHeight": 19,
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              Select Currency
+            </Text>
+            <View
+              cancelable={true}
+              disabled={false}
+              focusable={[Function]}
+              minPressDuration={0}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onPress={[Function]}
+              onPressIn={[Function]}
+              onPressOut={[Function]}
+              role="button"
+              style={
+                {
+                  "backgroundColor": "transparent",
+                  "borderBottomColor": "transparent",
+                  "borderLeftColor": "transparent",
+                  "borderRightColor": "transparent",
+                  "borderTopColor": "transparent",
+                  "flexDirection": "column",
+                  "shadowColor": "rgb(0,0,0)",
+                  "shadowOffset": {
+                    "height": 0,
+                    "width": 0,
+                  },
+                  "shadowOpacity": 0,
+                  "shadowRadius": 0,
+                }
+              }
+            >
+              <RNSVGSvgView
+                align="xMidYMid"
+                bbHeight={24}
+                bbWidth={24}
+                color="#FFFFFF"
+                focusable={false}
+                height={24}
+                meetOrSlice={0}
+                minX={0}
+                minY={0}
+                strokeWidth="2"
+                style={
+                  [
+                    {
+                      "backgroundColor": "transparent",
+                      "borderWidth": 0,
+                    },
+                    {
+                      "color": "#FFFFFF",
+                    },
+                    {
+                      "flex": 0,
+                      "height": 24,
+                      "width": 24,
+                    },
+                  ]
+                }
+                tintColor="#FFFFFF"
+                vbHeight={32}
+                vbWidth={32}
+                width={24}
+              >
+                <RNSVGGroup
+                  fill={
+                    {
+                      "payload": 4278190080,
+                      "type": 0,
+                    }
+                  }
+                  propList={
+                    [
+                      "strokeWidth",
+                    ]
+                  }
+                  strokeWidth="2"
+                >
+                  <RNSVGPath
+                    d="M8.30006 25.1004L6.90005 23.7004L14.6001 16.0004L6.90005 8.30039L8.30006 6.90039L16.0001 14.6004L23.7001 6.90039L25.1001 8.30039L17.4001 16.0004L25.1001 23.7004L23.7001 25.1004L16.0001 17.4004L8.30006 25.1004Z"
+                    fill={
+                      {
+                        "type": 2,
+                      }
+                    }
+                    propList={
+                      [
+                        "fill",
+                      ]
+                    }
+                  />
+                </RNSVGGroup>
+              </RNSVGSvgView>
+            </View>
+          </View>
+        </View>
+        <RCTScrollView
+          onMoveShouldSetResponder={[Function]}
+          onResponderRelease={[Function]}
+          onScroll={[Function]}
+          onStartShouldSetResponder={[Function]}
+          scrollEnabled={true}
+          scrollEventThrottle={8}
+          style={
+            {
+              "flex": 1,
+            }
+          }
+        >
+          <View>
+            <View
+              style={
+                {
+                  "alignSelf": "flex-start",
+                  "borderBottomColor": "transparent",
+                  "borderLeftColor": "transparent",
+                  "borderRightColor": "transparent",
+                  "borderTopColor": "transparent",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "width": "100%",
+                }
+              }
+            >
+              <View
+                aria-labelledby=":rj:"
+                disabled={false}
+                role="group"
+                style={
+                  {
+                    "flexDirection": "column",
+                    "paddingBottom": 7,
+                    "paddingLeft": 7,
+                    "paddingRight": 7,
+                    "paddingTop": 7,
+                    "width": "100%",
+                  }
+                }
+              >
+                <View
+                  aria-labelledby=":rk:"
+                  aria-selected={false}
+                  cancelable={true}
+                  disabled={false}
+                  focusVisibleStyle={
+                    {
+                      "outlineColor": "$outlineColor",
+                      "outlineStyle": "solid",
+                      "outlineWidth": 1,
+                    }
+                  }
+                  focusable={true}
+                  minPressDuration={0}
+                  onBlur={[Function]}
+                  onFocus={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onPress={[Function]}
+                  onPressIn={[Function]}
+                  onPressOut={[Function]}
+                  style={
+                    {
+                      "alignItems": "center",
+                      "backgroundColor": "transparent",
+                      "borderBottomColor": "#111f22",
+                      "borderBottomLeftRadius": 9,
+                      "borderBottomRightRadius": 9,
+                      "borderBottomWidth": 0,
+                      "borderLeftColor": "#111f22",
+                      "borderLeftWidth": 0,
+                      "borderRightColor": "#111f22",
+                      "borderRightWidth": 0,
+                      "borderStyle": "solid",
+                      "borderTopColor": "#111f22",
+                      "borderTopLeftRadius": 9,
+                      "borderTopRightRadius": 9,
+                      "borderTopWidth": 0,
+                      "flex": 1,
+                      "flexDirection": "row",
+                      "flexWrap": "nowrap",
+                      "justifyContent": "space-between",
+                      "maxWidth": "100%",
+                      "minHeight": 44,
+                      "overflow": "hidden",
+                      "paddingBottom": 10,
+                      "paddingLeft": 18,
+                      "paddingRight": 18,
+                      "paddingTop": 10,
+                      "width": "100%",
+                    }
+                  }
+                  tabIndex={-1}
+                >
+                  <View
+                    style={
+                      {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "gap": 7,
+                        "justifyContent": "space-between",
+                      }
+                    }
+                  >
+                    <Text
+                      id=":rk:"
+                      lineBreakMode="clip"
+                      numberOfLines={1}
+                      style={
+                        {
+                          "color": "#FFFFFF",
+                          "fontFamily": "System",
+                          "fontSize": 19.2,
+                          "fontWeight": "500",
+                          "lineHeight": 19,
+                          "textTransform": "uppercase",
+                          "userSelect": "none",
+                        }
+                      }
+                      suppressHighlighting={true}
+                    />
+                    <RNSVGSvgView
+                      align="xMidYMid"
+                      bbHeight={24}
+                      bbWidth={24}
+                      fill="none"
+                      focusable={false}
+                      height={24}
+                      meetOrSlice={0}
+                      minX={0}
+                      minY={0}
+                      stroke="#FFFFFF"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      style={
+                        [
+                          {
+                            "backgroundColor": "transparent",
+                            "borderWidth": 0,
+                          },
+                          {
+                            "color": "#FFFFFF",
+                          },
+                          {
+                            "flex": 0,
+                            "height": 24,
+                            "width": 24,
+                          },
+                        ]
+                      }
+                      tintColor="#FFFFFF"
+                      vbHeight={24}
+                      vbWidth={24}
+                      width={24}
+                    >
+                      <RNSVGGroup
+                        fill={null}
+                        propList={
+                          [
+                            "fill",
+                            "stroke",
+                            "strokeWidth",
+                            "strokeLinecap",
+                            "strokeLinejoin",
+                          ]
+                        }
+                        stroke={
+                          {
+                            "payload": 4294967295,
+                            "type": 0,
+                          }
+                        }
+                        strokeLinecap={1}
+                        strokeLinejoin={1}
+                        strokeWidth="2"
+                      >
+                        <RNSVGPath
+                          d="M22 11.08V12a10 10 0 1 1-5.93-9.14"
+                          fill={
+                            {
+                              "payload": 4278190080,
+                              "type": 0,
+                            }
+                          }
+                          propList={
+                            [
+                              "stroke",
+                            ]
+                          }
+                          stroke={
+                            {
+                              "payload": 4294967295,
+                              "type": 0,
+                            }
+                          }
+                        />
+                        <RNSVGPath
+                          d="m9 11 3 3L22 4"
+                          fill={
+                            {
+                              "payload": 4278190080,
+                              "type": 0,
+                            }
+                          }
+                          propList={
+                            [
+                              "stroke",
+                            ]
+                          }
+                          stroke={
+                            {
+                              "payload": 4294967295,
+                              "type": 0,
+                            }
+                          }
+                        />
+                      </RNSVGGroup>
+                    </RNSVGSvgView>
+                  </View>
+                  <View
+                    style={
+                      {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "gap": 16,
+                      }
+                    }
+                  >
+                    <Text
+                      style={
+                        {
+                          "color": "#FFFFFF",
+                          "fontFamily": "System",
+                          "fontSize": 24,
+                          "fontWeight": "500",
+                          "lineHeight": 19,
+                          "userSelect": "auto",
+                        }
+                      }
+                      suppressHighlighting={true}
+                    >
+                      0.25
+                    </Text>
+                  </View>
+                </View>
+                <View
+                  pointerEvents="none"
+                  style={
+                    {
+                      "height": 0,
+                      "minHeight": 0,
+                      "minWidth": 0,
+                      "width": 0,
+                    }
+                  }
+                />
+                <View
+                  aria-labelledby=":rl:"
+                  aria-selected={true}
+                  cancelable={true}
+                  disabled={false}
+                  focusVisibleStyle={
+                    {
+                      "outlineColor": "$outlineColor",
+                      "outlineStyle": "solid",
+                      "outlineWidth": 1,
+                    }
+                  }
+                  focusable={true}
+                  minPressDuration={0}
+                  onBlur={[Function]}
+                  onFocus={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onPress={[Function]}
+                  onPressIn={[Function]}
+                  onPressOut={[Function]}
+                  style={
+                    {
+                      "alignItems": "center",
+                      "backgroundColor": "transparent",
+                      "borderBottomColor": "#111f22",
+                      "borderBottomLeftRadius": 9,
+                      "borderBottomRightRadius": 9,
+                      "borderBottomWidth": 0,
+                      "borderLeftColor": "#111f22",
+                      "borderLeftWidth": 0,
+                      "borderRightColor": "#111f22",
+                      "borderRightWidth": 0,
+                      "borderStyle": "solid",
+                      "borderTopColor": "#111f22",
+                      "borderTopLeftRadius": 9,
+                      "borderTopRightRadius": 9,
+                      "borderTopWidth": 0,
+                      "flex": 1,
+                      "flexDirection": "row",
+                      "flexWrap": "nowrap",
+                      "justifyContent": "space-between",
+                      "maxWidth": "100%",
+                      "minHeight": 44,
+                      "overflow": "hidden",
+                      "paddingBottom": 10,
+                      "paddingLeft": 18,
+                      "paddingRight": 18,
+                      "paddingTop": 10,
+                      "width": "100%",
+                    }
+                  }
+                  tabIndex={-1}
+                >
+                  <View
+                    style={
+                      {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "gap": 7,
+                        "justifyContent": "space-between",
+                      }
+                    }
+                  >
+                    <Text
+                      id=":rl:"
+                      lineBreakMode="clip"
+                      numberOfLines={1}
+                      style={
+                        {
+                          "color": "#FFFFFF",
+                          "fontFamily": "System",
+                          "fontSize": 19.2,
+                          "fontWeight": "500",
+                          "lineHeight": 19,
+                          "textTransform": "uppercase",
+                          "userSelect": "none",
+                        }
+                      }
+                      suppressHighlighting={true}
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "gap": 16,
+                      }
+                    }
+                  >
+                    <Text
+                      style={
+                        {
+                          "color": "#FFFFFF",
+                          "fontFamily": "System",
+                          "fontSize": 24,
+                          "fontWeight": "500",
+                          "lineHeight": 19,
+                          "userSelect": "auto",
+                        }
+                      }
+                      suppressHighlighting={true}
+                    >
+                      0
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+        </RCTScrollView>
+      </View>
+      <View
+        style={
+          {
+            "backgroundColor": "#111f22",
+            "borderBottomLeftRadius": 0,
+            "borderBottomRightRadius": 0,
+            "borderBottomWidth": 0,
+            "borderLeftWidth": 0,
+            "borderRightWidth": 0,
+            "borderStyle": "solid",
+            "borderTopLeftRadius": 0,
+            "borderTopRightRadius": 0,
+            "borderTopWidth": 0,
+            "bottom": "-100%",
+            "flex": 1,
+            "flexDirection": "column",
+            "height": 0,
+            "left": 0,
+            "maxHeight": "100%",
+            "maxWidth": 738,
+            "overflow": "hidden",
+            "position": "absolute",
+            "right": 0,
+            "shadowColor": undefined,
+            "shadowOffset": {
+              "height": 0,
+              "width": 0,
+            },
+            "shadowOpacity": 0,
+            "shadowRadius": 0,
+            "width": "100%",
+            "zIndex": -1,
+          }
+        }
+      />
+    </View>
+  </View>,
+  <View
+    pointerEvents="box-none"
+    style={
+      {
+        "bottom": 0,
+        "flexDirection": "column",
+        "left": 0,
+        "maxWidth": "100%",
+        "position": "absolute",
+        "right": 0,
+        "top": 0,
+        "zIndex": 100001,
+      }
+    }
+  >
+    <View
+      cancelable={true}
+      disabled={false}
+      focusable={true}
+      minPressDuration={0}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      onPress={[Function]}
+      onPressIn={[Function]}
+      onPressOut={[Function]}
+      pointerEvents="auto"
+      style={
+        {
+          "backgroundColor": "rgba(0,0,0,0.9)",
+          "bottom": 0,
+          "flexDirection": "column",
+          "left": 0,
+          "position": "absolute",
+          "right": 0,
+          "top": 0,
+          "zIndex": 99999,
+        }
+      }
+    />
+    <View
+      collapsable={false}
+      disableClassName={true}
+      forwardedRef={[Function]}
+      jestAnimatedStyle={
+        {
+          "value": {
+            "transform": [
+              {
+                "translateY": 10000.1,
+              },
+            ],
+          },
+        }
+      }
+      onLayout={[Function]}
+      style={
+        {
+          "height": "80%",
+          "minHeight": "80%",
+          "opacity": 1,
+          "position": "absolute",
+          "transform": [
+            {
+              "translateY": 10000.1,
+            },
+          ],
+          "width": "100%",
+          "zIndex": 100001,
+        }
+      }
+    >
+      <View
+        pointerEvents="auto"
+        style={
+          {
+            "backgroundColor": "#081619",
+            "borderTopLeftRadius": 16,
+            "borderTopRightRadius": 16,
+            "flex": 1,
+            "flexDirection": "column",
+            "height": 0,
+            "maxHeight": "100%",
+            "overflow": "hidden",
+            "paddingBottom": 18,
+            "paddingLeft": 18,
+            "paddingRight": 18,
+            "paddingTop": 18,
+            "width": "100%",
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "flexDirection": "column",
+              "gap": 18,
+            }
+          }
+          testID="swapRiskDialogContent"
+        >
+          <Text
+            accessibilityRole="header"
+            id="title-:rd:"
+            style={
+              {
+                "color": "#FFFFFF",
+                "fontFamily": "System",
+                "fontSize": 30,
+                "fontWeight": "700",
+                "lineHeight": 34,
+                "marginBottom": 0,
+                "marginLeft": 0,
+                "marginRight": 0,
+                "marginTop": 0,
+                "textTransform": "none",
+                "userSelect": "auto",
+              }
+            }
+            suppressHighlighting={true}
+          >
+            Important Disclaimer
+          </Text>
+          <Text
+            style={
+              {
+                "color": "#FFFFFF",
+                "fontFamily": "System",
+                "fontSize": 16.8,
+                "fontWeight": "400",
+                "lineHeight": 19,
+                "userSelect": "auto",
+              }
+            }
+            suppressHighlighting={true}
+          >
+            Trading cryptocurrencies involves a high level of risk and may not be suitable for all investors. You could lose some or all of your principal, and should only invest money you can afford to lose. Carefully consider your investment objectives, experience, and risk tolerance before proceeding.
+             
+            <a
+              href="https://support.send.app/en/articles/10916009-terms-of-service"
+              rel="noreferrer"
+              target="_blank"
+            >
+              Learn more.
+            </a>
+          </Text>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 7,
+              }
+            }
+          >
+            <View
+              aria-checked={false}
+              cancelable={true}
+              checked={false}
+              disabled={false}
+              focusVisibleStyle={{}}
+              focusable={[Function]}
+              minPressDuration={0}
+              onBlur={[Function]}
+              onFocus={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onPress={[Function]}
+              onPressIn={[Function]}
+              onPressOut={[Function]}
+              role="checkbox"
+              style={
+                {
+                  "alignItems": "center",
+                  "backgroundColor": "#3E4A3C",
+                  "borderBottomColor": "#3E4A3C",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderBottomWidth": 0,
+                  "borderLeftColor": "#3E4A3C",
+                  "borderLeftWidth": 0,
+                  "borderRightColor": "#3E4A3C",
+                  "borderRightWidth": 0,
+                  "borderStyle": "solid",
+                  "borderTopColor": "#3E4A3C",
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "borderTopWidth": 0,
+                  "flexDirection": "column",
+                  "height": 20,
+                  "justifyContent": "center",
+                  "maxHeight": 20,
+                  "maxWidth": 20,
+                  "minHeight": 20,
+                  "minWidth": 20,
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "width": 20,
+                }
+              }
+              testID="swapRiskDialogCheckbox"
+            />
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              I have read and understand the risks involved.
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 18,
+                "justifyContent": "flex-end",
+                "marginTop": 18,
+              }
+            }
+          >
+            <View
+              focusVisibleStyle={
+                {
+                  "borderColor": "$background",
+                }
+              }
+              pointerEvents="none"
+              role="button"
+              style={
+                {
+                  "alignItems": "center",
+                  "backgroundColor": "#40FB50",
+                  "borderBottomColor": "transparent",
+                  "borderBottomLeftRadius": 5,
+                  "borderBottomRightRadius": 5,
+                  "borderBottomWidth": 1,
+                  "borderLeftColor": "transparent",
+                  "borderLeftWidth": 1,
+                  "borderRightColor": "transparent",
+                  "borderRightWidth": 1,
+                  "borderStyle": "solid",
+                  "borderTopColor": "transparent",
+                  "borderTopLeftRadius": 5,
+                  "borderTopRightRadius": 5,
+                  "borderTopWidth": 1,
+                  "flexDirection": "row",
+                  "flexWrap": "nowrap",
+                  "height": 44,
+                  "justifyContent": "center",
+                  "opacity": 0.5,
+                  "paddingLeft": 18,
+                  "paddingRight": 18,
+                }
+              }
+              testID="swapRiskDialogContinueButton"
+            >
+              <Text
+                lineBreakMode="clip"
+                numberOfLines={1}
+                style={
+                  {
+                    "color": "#12643F",
+                    "flexGrow": 0,
+                    "flexShrink": 1,
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "userSelect": "none",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                Continue
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          {
+            "backgroundColor": "#081619",
+            "borderBottomLeftRadius": 0,
+            "borderBottomRightRadius": 0,
+            "borderBottomWidth": 0,
+            "borderLeftWidth": 0,
+            "borderRightWidth": 0,
+            "borderStyle": "solid",
+            "borderTopLeftRadius": 0,
+            "borderTopRightRadius": 0,
+            "borderTopWidth": 0,
+            "bottom": "-100%",
+            "flex": 1,
+            "flexDirection": "column",
+            "height": 0,
+            "left": 0,
+            "maxHeight": "100%",
+            "overflow": "hidden",
+            "paddingBottom": 18,
+            "paddingLeft": 18,
+            "paddingRight": 18,
+            "paddingTop": 18,
+            "position": "absolute",
+            "right": 0,
+            "shadowColor": undefined,
+            "shadowOffset": {
+              "height": 0,
+              "width": 0,
+            },
+            "shadowOpacity": 0,
+            "shadowRadius": 0,
+            "width": "100%",
+            "zIndex": -1,
+          }
+        }
+      />
+    </View>
+  </View>,
+]
+`;

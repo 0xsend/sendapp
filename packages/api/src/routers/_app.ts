@@ -9,6 +9,7 @@ import { sendAccountRouter } from './sendAccount'
 import { temporalRouter } from './temporal'
 import { accountRecoveryRouter } from './account-recovery/router'
 import { referralsRouter } from './referrals'
+import { swapRouter } from './swap/router'
 
 export const appRouter = createTRPCRouter({
   chainAddress: chainAddressRouter,
@@ -20,6 +21,7 @@ export const appRouter = createTRPCRouter({
   sendAccount: sendAccountRouter,
   referrals: referralsRouter,
   temporal: temporalRouter,
+  swap: swapRouter,
 })
 
 export type AppRouter = typeof appRouter

@@ -1,6 +1,8 @@
 import {
   AnimatePresence,
+  Button,
   Card,
+  LinkableButton,
   Paragraph,
   Separator,
   Spinner,
@@ -9,15 +11,17 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import type { CoinWithBalance } from 'app/data/coins'
+import { type CoinWithBalance, sendCoin, usdcCoin } from 'app/data/coins'
 import { ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
-import { IconError } from 'app/components/icons'
+import { IconError, IconPlus, IconSwap } from 'app/components/icons'
 import { useTokenMarketData } from 'app/utils/coin-gecko'
 import formatAmount from 'app/utils/formatAmount'
 import { TokenActivity } from './TokenActivity'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { convertBalanceToFiat } from 'app/utils/convertBalanceToUSD'
 import { IconCoin } from 'app/components/icons/IconCoin'
+import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { useUser } from 'app/utils/useUser'
 
 export function AnimateEnter({ children }: { children: React.ReactNode }) {
   return (
@@ -35,7 +39,24 @@ export function AnimateEnter({ children }: { children: React.ReactNode }) {
     </AnimatePresence>
   )
 }
+
 export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
+  const hoverStyles = useHoverStyles()
+
+  // this code can be removed as swaps are no longer behind whitelist
+  const isSwapAllowListSet = Boolean(process.env.NEXT_PUBLIC_SWAP_ALLOWLIST)
+  const swapEnabledUsers = (process.env.NEXT_PUBLIC_SWAP_ALLOWLIST ?? '').split(',')
+  const { user } = useUser()
+  const isSwapEnabled = !isSwapAllowListSet || (user?.id && swapEnabledUsers.includes(user.id))
+
+  const getSwapUrl = () => {
+    if (coin?.symbol === sendCoin.symbol) {
+      return `/swap?inToken=${coin?.token}&outToken=${usdcCoin.token}`
+    }
+
+    return `/swap?inToken=${coin?.token}`
+  }
+
   return (
     <YStack f={1} gap="$5" $gtLg={{ w: '45%', pb: '$0' }} pb="$5">
       <YStack gap="$5">
@@ -66,22 +87,48 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
             </YStack>
           </YStack>
         </Card>
-        {/* <XStack w={'100%'}>
-          <LinkableButton href="/deposit" p="$7" mih={88} w="30%">
-            <YStack gap="$2" jc={'space-between'} ai="center">
-              <Theme name="green">
+        {isSwapEnabled && (
+          <XStack w={'100%'} gap={'$5'}>
+            <LinkableButton
+              href="/deposit"
+              f={1}
+              height={'auto'}
+              hoverStyle={hoverStyles}
+              focusStyle={hoverStyles}
+            >
+              <YStack gap="$2" jc={'space-between'} ai="center" p="$4">
                 <IconPlus
                   size={'$1.5'}
-                  $theme-dark={{ color: '$color4' }}
+                  $theme-dark={{ color: '$primary' }}
                   $theme-light={{ color: '$color12' }}
                 />
-              </Theme>
-              <Button.Text fontSize={'$4'} px="$2">
-                Deposit
-              </Button.Text>
-            </YStack>
-          </LinkableButton>
-        </XStack> */}
+                <Button.Text fontSize={'$4'} px="$2">
+                  Deposit
+                </Button.Text>
+              </YStack>
+            </LinkableButton>
+            <LinkableButton
+              href={getSwapUrl()}
+              f={1}
+              height={'auto'}
+              hoverStyle={hoverStyles}
+              focusStyle={hoverStyles}
+            >
+              <YStack gap="$2" jc={'space-between'} ai="center" p="$4" height={'auto'}>
+                <Theme name="green">
+                  <IconSwap
+                    size={'$1'}
+                    $theme-dark={{ color: '$primary' }}
+                    $theme-light={{ color: '$color12' }}
+                  />
+                </Theme>
+                <Button.Text fontSize={'$4'} px="$2">
+                  Swap
+                </Button.Text>
+              </YStack>
+            </LinkableButton>
+          </XStack>
+        )}
       </YStack>
       <YStack gap={'$3'}>
         <TokenActivity coin={coin} />

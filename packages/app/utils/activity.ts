@@ -22,6 +22,8 @@ import {
   isTemporalTokenTransfersEvent,
   temporalEventNameFromStatus,
 } from './zod/activity/TemporalTransfersEventSchema'
+import type { SwapRouter } from 'app/utils/zod/SwapRouterSchema'
+import type { LiquidityPool } from 'app/utils/zod/LiquidityPoolSchema'
 
 const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
   Object.values(addresses).map((a) => [a, label])
@@ -163,17 +165,89 @@ export function amountFromActivity(activity: Activity): string {
 }
 
 /**
+ * Determines if the given activity is a swap buy transfer.
+ * A swap buy transfer is validated by checking if the sender or token address matches any address in the provided swap routers.
+ *
+ * @param activity - The activity to check.
+ * @param swapRouters - Optional list of swap routers to check against.
+ * @returns `true` if the activity is a swap buy transfer, otherwise `false`.
+ */
+export const isSwapBuyTransfer = (activity: Activity, swapRouters: SwapRouter[] = []) => {
+  const { data } = activity
+
+  const isEthBuy =
+    data.sender &&
+    swapRouters.some((swapRouter) => isAddressEqual(data.sender, swapRouter.router_addr))
+
+  const isErc20Buy =
+    data.f && swapRouters.some((swapRouter) => isAddressEqual(data.f, swapRouter.router_addr))
+
+  return Boolean(isEthBuy || isErc20Buy)
+}
+
+/**
+ * Determines if the given activity is a swap sell transfer.
+ * A swap sell transfer is validated by checking if the address `data.t` matches any address in the provided liquidity pools or swap routers.
+ *
+ * @param activity - The activity to check.
+ * @param swapRouters - Optional list of swap routers to check against.
+ * @param liquidityPools - Optional list of liquidity pools to check against.
+ * @returns `true` if the activity is a swap sell transfer, otherwise `false`.
+ */
+export const isSwapSellTransfer = (
+  activity: Activity,
+  swapRouters: SwapRouter[] = [],
+  liquidityPools: LiquidityPool[] = []
+) => {
+  const { data } = activity
+
+  return Boolean(
+    data.t &&
+      (liquidityPools.some((liquidityPool) => isAddressEqual(data.t, liquidityPool.pool_addr)) ||
+        swapRouters.some((swapRouter) => isAddressEqual(data.t, swapRouter.router_addr)))
+  )
+}
+
+/**
+ * Checks if a given activity is a swap transfer.
+ * A swap transfer can either be a swap buy transfer or a swap sell transfer.
+ *
+ * @param activity - The activity to check.
+ * @param swapRouters - Optional list of swap routers to validate the activity against.
+ * @param liquidityPools - Optional list of liquidity pools to validate the activity against.
+ * @returns `true` if the activity is a swap transfer, otherwise `false`.
+ */
+export const isActivitySwapTransfer = (
+  activity: Activity,
+  swapRouters: SwapRouter[] = [],
+  liquidityPools: LiquidityPool[] = []
+) => {
+  return (
+    isSwapBuyTransfer(activity, swapRouters) ||
+    isSwapSellTransfer(activity, swapRouters, liquidityPools)
+  )
+}
+
+/**
  * Returns the human readable event name of the activity.
- * @param activity
+ * @param activity - The activity to check.
+ * @param swapRouters - Optional list of swap routers to validate the activity against.
+ * @param liquidityPools - Optional list of liquidity pools to validate the activity against.
  * @returns
  */
-export function eventNameFromActivity(activity: Activity) {
+export function eventNameFromActivity(
+  activity: Activity,
+  swapRouters: SwapRouter[] = [],
+  liquidityPools: LiquidityPool[] = []
+) {
   const { event_name, from_user, to_user, data } = activity
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
   const isTransferOrReceive = isERC20Transfer || isETHReceive
   const isTemporalTransfer =
     isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
+  const isSwapTransfer = isActivitySwapTransfer(activity, swapRouters, liquidityPools)
+
   switch (true) {
     case isTemporalTransfer:
       return temporalEventNameFromStatus(data.status)
@@ -182,8 +256,14 @@ export function eventNameFromActivity(activity: Activity) {
     case isSendTokenUpgradeEvent(activity):
       return 'Send Token Upgrade'
     case isERC20Transfer && to_user?.send_id === undefined:
+      if (isSwapTransfer) {
+        return 'Sold'
+      }
       return 'Withdraw'
     case isTransferOrReceive && from_user === null:
+      if (isSwapTransfer) {
+        return 'Bought'
+      }
       return 'Deposit'
     case isTransferOrReceive && !!to_user?.id:
       return 'Received'
@@ -206,16 +286,23 @@ export function eventNameFromActivity(activity: Activity) {
 
 /**
  * Returns the human-readable phrase for event name of the activity for activity details.
- * @param activity
+ * @param activity - The activity to check.
+ * @param swapRouters - Optional list of swap routers to validate the activity against.
+ * @param liquidityPools - Optional list of liquidity pools to validate the activity against.
  * @returns
  */
-export function phraseFromActivity(activity: Activity) {
+export function phraseFromActivity(
+  activity: Activity,
+  swapRouters: SwapRouter[] = [],
+  liquidityPools: LiquidityPool[] = []
+) {
   const { event_name, from_user, to_user, data } = activity
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
   const isTransferOrReceive = isERC20Transfer || isETHReceive
   const isTemporalTransfer =
     isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
+  const isSwapTransfer = isActivitySwapTransfer(activity, swapRouters, liquidityPools)
 
   switch (true) {
     case isTemporalTransfer:
@@ -225,8 +312,14 @@ export function phraseFromActivity(activity: Activity) {
     case isSendTokenUpgradeEvent(activity):
       return 'Upgraded'
     case isERC20Transfer && to_user?.send_id === undefined:
+      if (isSwapTransfer) {
+        return 'Sold'
+      }
       return 'Withdrew'
     case isTransferOrReceive && from_user === null:
+      if (isSwapTransfer) {
+        return 'Bought'
+      }
       return 'Deposited'
     case isTransferOrReceive && !!to_user?.id:
       return 'Sent you'
@@ -249,11 +342,16 @@ export function phraseFromActivity(activity: Activity) {
 /**
  * Returns the subtext of the activity if there is one.
  */
-export function subtextFromActivity(activity: Activity): string | null {
+export function subtextFromActivity(
+  activity: Activity,
+  swapRouters: SwapRouter[] = [],
+  liquidityPools: LiquidityPool[] = []
+): string | null {
   const _user = counterpart(activity)
   const { from_user, to_user, data } = activity
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
+  const isSwapTransfer = isActivitySwapTransfer(activity, swapRouters, liquidityPools)
 
   if (isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity)) {
     return activity.data.tags.map((t) => `/${t}`).join(', ')
@@ -283,6 +381,9 @@ export function subtextFromActivity(activity: Activity): string | null {
       5,
       sendCoin.formatDecimals
     )}`
+  }
+  if (isSwapTransfer) {
+    return activity.data.coin?.symbol
   }
   if (isERC20Transfer && from_user?.id) {
     return labelAddress(data.t)
