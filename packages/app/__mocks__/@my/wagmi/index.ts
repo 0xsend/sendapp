@@ -49,6 +49,9 @@ const mockMyWagmi = {
   aerodromeFinanceAddress: {
     845337: '0x940181a94a35a4569e4529a3cdfb74e38fd98631',
   },
+  coinbaseWrappedBtcAddress: {
+    845337: '0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf',
+  },
   tokenPaymasterAddress: {
     845337: '0x5e421172B27658f2bD83BCBD13738ADdE00E7CA9',
   },
@@ -93,6 +96,7 @@ export const spx6900Address = mockMyWagmi.spx6900Address
 export const moonwellAddress = mockMyWagmi.moonwellAddress
 export const morphoAddress = mockMyWagmi.morphoAddress
 export const aerodromeFinanceAddress = mockMyWagmi.aerodromeFinanceAddress
+export const coinbaseWrappedBtcAddress = mockMyWagmi.coinbaseWrappedBtcAddress
 export const tokenPaymasterAddress = mockMyWagmi.tokenPaymasterAddress
 export const entryPointAddress = mockMyWagmi.entryPointAddress
 export const sendVerifierAbi = mockMyWagmi.sendVerifierAbi

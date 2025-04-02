@@ -1,6 +1,7 @@
 import {
   aerodromeFinanceAddress,
   baseMainnet,
+  coinbaseWrappedBtcAddress,
   moonwellAddress,
   morphoAddress,
   sendTokenAddress,
@@ -8,7 +9,7 @@ import {
   usdcAddress,
 } from '@my/wagmi'
 import { z } from 'zod'
-import { type UseQueryResult, useQuery } from '@tanstack/react-query'
+import { useQuery, type UseQueryResult } from '@tanstack/react-query'
 import { allCoins } from 'app/data/coins'
 
 const CoingeckoTokenPriceSchema = z.object({
@@ -23,6 +24,7 @@ export const CoingeckoTokenPricesSchema = z.object({
   'moonwell-artemis': CoingeckoTokenPriceSchema,
   morpho: CoingeckoTokenPriceSchema,
   'aerodrome-finance': CoingeckoTokenPriceSchema,
+  'coinbase-wrapped-btc': CoingeckoTokenPriceSchema,
 })
 
 const DexScreenerTokenPriceSchema = z.object({
@@ -105,6 +107,11 @@ const normalizeDexScreenerPrices = (prices: z.infer<typeof DexScreenerTokenPrice
           break
         case 'AERO':
           acc[aerodromeFinanceAddress[baseMainnet.id]] = price.priceUsd ? Number(price.priceUsd) : 0
+          break
+        case 'CBBTC':
+          acc[coinbaseWrappedBtcAddress[baseMainnet.id]] = price.priceUsd
+            ? Number(price.priceUsd)
+            : 0
           break
         default:
           break

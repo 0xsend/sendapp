@@ -1,15 +1,15 @@
 import type { BlockData, Column, Integration, Table } from '@indexsupply/shovel-config'
 // import { sendAccountFactorySenderFilterRef, sendAcctFactoryTable } from './send-account-deployed'
 import {
+  aerodromeFinanceAddress,
+  coinbaseWrappedBtcAddress,
+  moonwellAddress,
+  morphoAddress,
   sendTokenAddress,
   sendTokenV0Address,
   spx6900Address,
   usdcAddress,
-  moonwellAddress,
-  morphoAddress,
-  aerodromeFinanceAddress,
 } from '@my/wagmi'
-import { sendAccountFactorySenderFilterRef } from './send-account-created'
 
 export const transfersTable: Table = {
   name: 'send_account_transfers',
@@ -53,6 +53,7 @@ export const integration: Omit<Integration, 'sources'> = {
         ...new Set(Object.values(moonwellAddress)),
         ...new Set(Object.values(morphoAddress)),
         ...new Set(Object.values(aerodromeFinanceAddress)),
+        ...new Set(Object.values(coinbaseWrappedBtcAddress)),
       ].sort(),
     },
   ] as BlockData[],

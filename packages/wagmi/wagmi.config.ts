@@ -185,6 +185,18 @@ export default defineConfig({
       abi: erc20Abi,
     },
     {
+      name: 'Coinbase Wrapped BTC',
+      address: {
+        [mainnet.id]: '0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf',
+        [localhost.id]: '0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf',
+        [sepolia.id]: '0xcbb7c0006f23900c38eb856149f799620fcb8a4a',
+        [base.id]: '0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf',
+        [baseLocal.id]: '0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf',
+        [baseSepolia.id]: '0x08e53b71490e00e8dc1c0367f97ba053567a547e',
+      },
+      abi: erc20Abi,
+    },
+    {
       name: 'EntryPoint',
       address: {
         [mainnet.id]: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',

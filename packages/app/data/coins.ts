@@ -7,6 +7,7 @@ import {
   moonwellAddress as moonwellAddresses,
   morphoAddress as morphoAddresses,
   aerodromeFinanceAddress as aerodromeFinanceAddresses,
+  coinbaseWrappedBtcAddress as coinbaseWrappedBtcAddresses,
 } from '@my/wagmi'
 import { z } from 'zod'
 
@@ -105,6 +106,15 @@ export const aerodromeCoin = {
   coingeckoTokenId: 'aerodrome-finance',
 }
 
+export const cbBtcCoin = {
+  label: 'Coinbase Wrapped BTC',
+  symbol: 'CBBTC',
+  token: coinbaseWrappedBtcAddresses[baseMainnet.id],
+  decimals: 8,
+  formatDecimals: 6,
+  coingeckoTokenId: 'coinbase-wrapped-btc',
+}
+
 /**
  * The coins (tokens) array that are supported by Send App.
  */
@@ -126,7 +136,13 @@ export type coinsDict = typeof coinsDict
 /**
  * The coins (tokens) that sendapp supports through partnerships. (Hidden when balance is 0)
  */
-export const partnerCoins: coin[] = [spx6900Coin, moonwellCoin, morphoCoin, aerodromeCoin] as const
+export const partnerCoins: coin[] = [
+  cbBtcCoin,
+  spx6900Coin,
+  moonwellCoin,
+  aerodromeCoin,
+  morphoCoin,
+] as const
 export type partnerCoins = typeof partnerCoins
 
 type PartnerCoinsDict = { [key in partnerCoins[number]['token']]: partnerCoins[number] }

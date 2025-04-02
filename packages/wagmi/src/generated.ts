@@ -137,6 +137,142 @@ export const aerodromeFinanceConfig = {
 } as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Coinbase Wrapped BTC
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const coinbaseWrappedBtcAbi = [
+  {
+    type: 'event',
+    inputs: [
+      { name: 'owner', type: 'address', indexed: true },
+      { name: 'spender', type: 'address', indexed: true },
+      { name: 'value', type: 'uint256', indexed: false },
+    ],
+    name: 'Approval',
+  },
+  {
+    type: 'event',
+    inputs: [
+      { name: 'from', type: 'address', indexed: true },
+      { name: 'to', type: 'address', indexed: true },
+      { name: 'value', type: 'uint256', indexed: false },
+    ],
+    name: 'Transfer',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'owner', type: 'address' },
+      { name: 'spender', type: 'address' },
+    ],
+    name: 'allowance',
+    outputs: [{ type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'spender', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    name: 'approve',
+    outputs: [{ type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'account', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'decimals',
+    outputs: [{ type: 'uint8' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'name',
+    outputs: [{ type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'symbol',
+    outputs: [{ type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'totalSupply',
+    outputs: [{ type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'recipient', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    name: 'transfer',
+    outputs: [{ type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'sender', type: 'address' },
+      { name: 'recipient', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    name: 'transferFrom',
+    outputs: [{ type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+] as const
+
+/**
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const coinbaseWrappedBtcAddress = {
+  1: '0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf',
+  1337: '0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf',
+  8453: '0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf',
+  84532: '0x08E53B71490E00e8dC1c0367f97BA053567a547E',
+  845337: '0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf',
+  11155111: '0xcbB7C0006F23900c38EB856149F799620fcb8A4a',
+} as const
+
+/**
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const coinbaseWrappedBtcConfig = {
+  address: coinbaseWrappedBtcAddress,
+  abi: coinbaseWrappedBtcAbi,
+} as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ERC165
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -5331,6 +5467,272 @@ export const watchAerodromeFinanceApprovalEvent = /*#__PURE__*/ createWatchContr
 export const watchAerodromeFinanceTransferEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: aerodromeFinanceAbi,
   address: aerodromeFinanceAddress,
+  eventName: 'Transfer',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const readCoinbaseWrappedBtc = /*#__PURE__*/ createReadContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `functionName` set to `"allowance"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const readCoinbaseWrappedBtcAllowance = /*#__PURE__*/ createReadContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+  functionName: 'allowance',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `functionName` set to `"balanceOf"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const readCoinbaseWrappedBtcBalanceOf = /*#__PURE__*/ createReadContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+  functionName: 'balanceOf',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `functionName` set to `"decimals"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const readCoinbaseWrappedBtcDecimals = /*#__PURE__*/ createReadContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+  functionName: 'decimals',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `functionName` set to `"name"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const readCoinbaseWrappedBtcName = /*#__PURE__*/ createReadContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+  functionName: 'name',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `functionName` set to `"symbol"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const readCoinbaseWrappedBtcSymbol = /*#__PURE__*/ createReadContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+  functionName: 'symbol',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `functionName` set to `"totalSupply"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const readCoinbaseWrappedBtcTotalSupply = /*#__PURE__*/ createReadContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+  functionName: 'totalSupply',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const writeCoinbaseWrappedBtc = /*#__PURE__*/ createWriteContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `functionName` set to `"approve"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const writeCoinbaseWrappedBtcApprove = /*#__PURE__*/ createWriteContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `functionName` set to `"transfer"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const writeCoinbaseWrappedBtcTransfer = /*#__PURE__*/ createWriteContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `functionName` set to `"transferFrom"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const writeCoinbaseWrappedBtcTransferFrom = /*#__PURE__*/ createWriteContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const prepareWriteCoinbaseWrappedBtc = /*#__PURE__*/ createSimulateContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `functionName` set to `"approve"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const prepareWriteCoinbaseWrappedBtcApprove = /*#__PURE__*/ createSimulateContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `functionName` set to `"transfer"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const prepareWriteCoinbaseWrappedBtcTransfer = /*#__PURE__*/ createSimulateContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `functionName` set to `"transferFrom"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const prepareWriteCoinbaseWrappedBtcTransferFrom = /*#__PURE__*/ createSimulateContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const watchCoinbaseWrappedBtcEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `eventName` set to `"Approval"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const watchCoinbaseWrappedBtcApprovalEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+  eventName: 'Approval',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `eventName` set to `"Transfer"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const watchCoinbaseWrappedBtcTransferEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
   eventName: 'Transfer',
 })
 
@@ -11756,6 +12158,272 @@ export const useWatchAerodromeFinanceApprovalEvent = /*#__PURE__*/ createUseWatc
 export const useWatchAerodromeFinanceTransferEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: aerodromeFinanceAbi,
   address: aerodromeFinanceAddress,
+  eventName: 'Transfer',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const useReadCoinbaseWrappedBtc = /*#__PURE__*/ createUseReadContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `functionName` set to `"allowance"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const useReadCoinbaseWrappedBtcAllowance = /*#__PURE__*/ createUseReadContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+  functionName: 'allowance',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `functionName` set to `"balanceOf"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const useReadCoinbaseWrappedBtcBalanceOf = /*#__PURE__*/ createUseReadContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+  functionName: 'balanceOf',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `functionName` set to `"decimals"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const useReadCoinbaseWrappedBtcDecimals = /*#__PURE__*/ createUseReadContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+  functionName: 'decimals',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `functionName` set to `"name"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const useReadCoinbaseWrappedBtcName = /*#__PURE__*/ createUseReadContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+  functionName: 'name',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `functionName` set to `"symbol"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const useReadCoinbaseWrappedBtcSymbol = /*#__PURE__*/ createUseReadContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+  functionName: 'symbol',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `functionName` set to `"totalSupply"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const useReadCoinbaseWrappedBtcTotalSupply = /*#__PURE__*/ createUseReadContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+  functionName: 'totalSupply',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const useWriteCoinbaseWrappedBtc = /*#__PURE__*/ createUseWriteContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `functionName` set to `"approve"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const useWriteCoinbaseWrappedBtcApprove = /*#__PURE__*/ createUseWriteContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `functionName` set to `"transfer"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const useWriteCoinbaseWrappedBtcTransfer = /*#__PURE__*/ createUseWriteContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `functionName` set to `"transferFrom"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const useWriteCoinbaseWrappedBtcTransferFrom = /*#__PURE__*/ createUseWriteContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const useSimulateCoinbaseWrappedBtc = /*#__PURE__*/ createUseSimulateContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `functionName` set to `"approve"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const useSimulateCoinbaseWrappedBtcApprove = /*#__PURE__*/ createUseSimulateContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `functionName` set to `"transfer"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const useSimulateCoinbaseWrappedBtcTransfer = /*#__PURE__*/ createUseSimulateContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `functionName` set to `"transferFrom"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const useSimulateCoinbaseWrappedBtcTransferFrom = /*#__PURE__*/ createUseSimulateContract({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const useWatchCoinbaseWrappedBtcEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `eventName` set to `"Approval"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const useWatchCoinbaseWrappedBtcApprovalEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
+  eventName: 'Approval',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link coinbaseWrappedBtcAbi}__ and `eventName` set to `"Transfer"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x08e53b71490e00e8dc1c0367f97ba053567a547e)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xcbb7c0006f23900c38eb856149f799620fcb8a4a)
+ */
+export const useWatchCoinbaseWrappedBtcTransferEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: coinbaseWrappedBtcAbi,
+  address: coinbaseWrappedBtcAddress,
   eventName: 'Transfer',
 })
 

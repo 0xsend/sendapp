@@ -8,6 +8,7 @@ import type { NamedExoticComponent } from 'react'
 import { IconMopho } from './IconMorpho'
 import { IconAerodrome } from './IconAerodrome'
 import { IconMoonwell } from './IconMoonwell'
+import { IconCbBtc } from './IconCbBtc'
 
 const coinSymbolToIcons: Record<coin['symbol'], NamedExoticComponent<IconProps>> = {
   USDC: IconUSDC,
@@ -17,6 +18,7 @@ const coinSymbolToIcons: Record<coin['symbol'], NamedExoticComponent<IconProps>>
   WELL: IconMoonwell,
   MORPHO: IconMopho,
   AERO: IconAerodrome,
+  CBBTC: IconCbBtc,
 }
 
 export const IconCoin = ({
