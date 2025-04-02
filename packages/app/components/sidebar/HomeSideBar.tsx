@@ -43,6 +43,16 @@ const links = [
     href: '/send',
   },
   {
+    icon: <IconStacks size={'$1'} color={'inherit'} />,
+    text: 'Earn',
+    href: '/earn',
+  },
+  {
+    icon: <IconSwap size={'$1'} color={'inherit'} />,
+    text: 'Swap',
+    href: '/swap',
+  },
+  {
     icon: <IconDeviceReset size={'$1'} color={'inherit'} />,
     text: 'Activity',
     href: '/activity',
