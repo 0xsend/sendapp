@@ -93,7 +93,7 @@ export function counterpart(activity: Activity): Activity['from_user'] | Activit
 /**
  * Returns the amount of the activity if there is one.
  */
-export function amountFromActivity(activity: Activity): ReactNode {
+export function amountFromActivity(activity: Activity): string {
   switch (true) {
     case isTemporalTokenTransfersEvent(activity): {
       const { v, coin } = activity.data
@@ -309,7 +309,7 @@ export function eventNameFromActivity(
  * @param activity
  * @returns the human readable event name of the activity
  */
-export function useEventNameFromActivity(activity: Activity) {
+export function useEventNameFromActivity(activity: Activity): string {
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const { data: addressBook } = useAddressBook()
 
@@ -342,7 +342,7 @@ export function phraseFromActivity(
   activity: Activity,
   swapRouters: SwapRouter[] = [],
   liquidityPools: LiquidityPool[] = []
-) {
+): string {
   const { event_name, from_user, to_user, data } = activity
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
