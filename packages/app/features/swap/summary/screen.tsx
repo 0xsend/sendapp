@@ -123,6 +123,7 @@ export const SwapSummaryScreen = () => {
         ethQuery.refetch(),
         queryClient.refetchQueries({ queryKey: [useLiquidityPools.queryKey] }),
         queryClient.refetchQueries({ queryKey: [useSwapRouters.queryKey] }),
+        queryClient.invalidateQueries({ queryKey: ['token_activity_feed', outCoin?.token] }),
       ])
 
       router.push(`/?token=${outCoin?.token}`)

@@ -3022,7 +3022,7 @@
           "isGenerated": false,
           "sequence": false,
           "hasDefaultValue": false,
-          "isId": false,
+          "isId": true,
           "maxLength": null
         },
         {
@@ -3044,6 +3044,7 @@
         {
           "name": "liquidity_pools_pkey",
           "fields": [
+            "chain_id",
             "pool_addr"
           ],
           "nullNotDistinct": false
@@ -8209,7 +8210,7 @@
           "isGenerated": false,
           "sequence": false,
           "hasDefaultValue": false,
-          "isId": false,
+          "isId": true,
           "maxLength": null
         },
         {
@@ -8231,6 +8232,7 @@
         {
           "name": "swap_routers_pkey",
           "fields": [
+            "chain_id",
             "router_addr"
           ],
           "nullNotDistinct": false

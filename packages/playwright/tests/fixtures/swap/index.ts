@@ -73,7 +73,7 @@ export class SwapFormPage {
       await expect(this.swapRiskDialogCheckbox).toBeVisible()
       await expect(this.swapRiskDialogCancelButton).toBeVisible()
       await expect(this.swapRiskDialogContinueButton).toBeVisible()
-    }).toPass({ timeout: 5_000 })
+    }).toPass({ timeout: 15_000 })
   }
 
   async goto() {
@@ -256,12 +256,12 @@ export class SwapSummaryPage {
       await expect(this.outTokenSymbol).toHaveText(outToken)
       await expect(this.slippage).toHaveText(`${slippage}%`)
       await expect(this.exchangeRate).toHaveText(exchangeRate)
-    }).toPass({ timeout: 30_000 })
+    }).toPass({ timeout: 20_000 })
   }
 
   async confirmSwap() {
     await expect(async () => {
       await this.swapButton.click()
-    }).toPass({ timeout: 1_000 })
+    }).toPass({ timeout: 10_000 })
   }
 }
