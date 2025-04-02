@@ -271,7 +271,7 @@ function userOpQueryOptions({
 
             // if estimated preVerificationGas is higher than default, we use estimated with some buffer
             if (preVerificationGas > userOp.preVerificationGas) {
-              userOp.preVerificationGas = wMulDown(preVerificationGas, parseUnits('1.25', 18))
+              userOp.preVerificationGas = wMulDown(preVerificationGas, parseUnits('1.25', 18)) // 125%
             }
           })
       }
