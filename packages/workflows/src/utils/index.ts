@@ -1,1 +1,2 @@
-export * from './bootstrap'
+export { bootstrap } from './bootstrap'
+export { isRetryableDBError } from './isRetryableDBError'

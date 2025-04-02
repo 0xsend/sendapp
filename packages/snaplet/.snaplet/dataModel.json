@@ -7636,20 +7636,6 @@
       "tableName": "send_earn_deposits",
       "fields": [
         {
-          "id": "temporal.send_earn_deposits.user_id",
-          "name": "user_id",
-          "columnName": "user_id",
-          "type": "uuid",
-          "isRequired": true,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false,
-          "isId": false,
-          "maxLength": null
-        },
-        {
           "id": "temporal.send_earn_deposits.workflow_id",
           "name": "workflow_id",
           "columnName": "workflow_id",
@@ -7682,7 +7668,7 @@
           "name": "owner",
           "columnName": "owner",
           "type": "bytea",
-          "isRequired": true,
+          "isRequired": false,
           "kind": "scalar",
           "isList": false,
           "isGenerated": false,
@@ -7696,7 +7682,7 @@
           "name": "assets",
           "columnName": "assets",
           "type": "numeric",
-          "isRequired": true,
+          "isRequired": false,
           "kind": "scalar",
           "isList": false,
           "isGenerated": false,
@@ -7710,7 +7696,7 @@
           "name": "vault",
           "columnName": "vault",
           "type": "bytea",
-          "isRequired": true,
+          "isRequired": false,
           "kind": "scalar",
           "isList": false,
           "isGenerated": false,
@@ -7802,24 +7788,6 @@
           "hasDefaultValue": true,
           "isId": false,
           "maxLength": null
-        },
-        {
-          "name": "users",
-          "type": "users",
-          "isRequired": true,
-          "kind": "object",
-          "relationName": "send_earn_depositsTousers",
-          "relationFromFields": [
-            "user_id"
-          ],
-          "relationToFields": [
-            "id"
-          ],
-          "isList": false,
-          "isId": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false
         },
         {
           "name": "activity",
@@ -11174,20 +11142,6 @@
           "isRequired": false,
           "kind": "object",
           "relationName": "webauthn_credentialsTousers",
-          "relationFromFields": [],
-          "relationToFields": [],
-          "isList": true,
-          "isId": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false
-        },
-        {
-          "name": "send_earn_deposits",
-          "type": "send_earn_deposits",
-          "isRequired": false,
-          "kind": "object",
-          "relationName": "send_earn_depositsTousers",
           "relationFromFields": [],
           "relationToFields": [],
           "isList": true,
