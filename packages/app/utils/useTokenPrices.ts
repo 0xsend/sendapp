@@ -2,6 +2,7 @@ import {
   aerodromeFinanceAddress,
   baseMainnet,
   coinbaseWrappedBtcAddress,
+  eurcAddress,
   moonwellAddress,
   morphoAddress,
   sendTokenAddress,
@@ -25,6 +26,7 @@ export const CoingeckoTokenPricesSchema = z.object({
   morpho: CoingeckoTokenPriceSchema,
   'aerodrome-finance': CoingeckoTokenPriceSchema,
   'coinbase-wrapped-btc': CoingeckoTokenPriceSchema,
+  'euro-coin': CoingeckoTokenPriceSchema,
 })
 
 const DexScreenerTokenPriceSchema = z.object({
@@ -112,6 +114,9 @@ const normalizeDexScreenerPrices = (prices: z.infer<typeof DexScreenerTokenPrice
           acc[coinbaseWrappedBtcAddress[baseMainnet.id]] = price.priceUsd
             ? Number(price.priceUsd)
             : 0
+          break
+        case 'EURC':
+          acc[eurcAddress[baseMainnet.id]] = price.priceUsd ? Number(price.priceUsd) : 0
           break
         default:
           break

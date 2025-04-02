@@ -8,6 +8,7 @@ import {
   morphoAddress as morphoAddresses,
   aerodromeFinanceAddress as aerodromeFinanceAddresses,
   coinbaseWrappedBtcAddress as coinbaseWrappedBtcAddresses,
+  eurcAddress as eurcAddresses,
 } from '@my/wagmi'
 import { z } from 'zod'
 
@@ -115,6 +116,15 @@ export const cbBtcCoin = {
   coingeckoTokenId: 'coinbase-wrapped-btc',
 }
 
+export const eurcCoin = {
+  label: 'EURC',
+  symbol: 'EURC',
+  token: eurcAddresses[baseMainnet.id],
+  decimals: 6,
+  formatDecimals: 2,
+  coingeckoTokenId: 'euro-coin',
+}
+
 /**
  * The coins (tokens) array that are supported by Send App.
  */
@@ -142,6 +152,7 @@ export const partnerCoins: coin[] = [
   moonwellCoin,
   aerodromeCoin,
   morphoCoin,
+  eurcCoin,
 ] as const
 export type partnerCoins = typeof partnerCoins
 

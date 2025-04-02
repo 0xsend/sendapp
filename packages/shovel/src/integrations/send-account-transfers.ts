@@ -3,6 +3,7 @@ import type { BlockData, Column, Integration, Table } from '@indexsupply/shovel-
 import {
   aerodromeFinanceAddress,
   coinbaseWrappedBtcAddress,
+  eurcAddress,
   moonwellAddress,
   morphoAddress,
   sendTokenAddress,
@@ -54,6 +55,7 @@ export const integration: Omit<Integration, 'sources'> = {
         ...new Set(Object.values(morphoAddress)),
         ...new Set(Object.values(aerodromeFinanceAddress)),
         ...new Set(Object.values(coinbaseWrappedBtcAddress)),
+        ...new Set(Object.values(eurcAddress)),
       ].sort(),
     },
   ] as BlockData[],

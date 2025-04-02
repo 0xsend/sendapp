@@ -155,11 +155,11 @@ export default defineConfig({
       abi: erc20Abi,
     },
     {
-      name: 'Moonwell', // TODO is this available on eth?
+      name: 'Moonwell',
       address: {
         [baseLocal.id]: '0xa88594d404727625a9437c3f886c7643872296ae',
         [base.id]: '0xa88594d404727625a9437c3f886c7643872296ae',
-        [baseSepolia.id]: '0xa88594d404727625a9437c3f886c7643872296ae', // TODO is this available on base sepolia?
+        [baseSepolia.id]: '0xa88594d404727625a9437c3f886c7643872296ae',
       },
       abi: erc20Abi,
     },
@@ -168,19 +168,19 @@ export default defineConfig({
       address: {
         [mainnet.id]: '0x58d97b57bb95320f9a05dc918aef65434969c2b2',
         [localhost.id]: '0x58d97b57bb95320f9a05dc918aef65434969c2b2',
-        [sepolia.id]: '0x58d97b57bb95320f9a05dc918aef65434969c2b2', // TODO is this available on eth sepolia?
+        [sepolia.id]: '0x58d97b57bb95320f9a05dc918aef65434969c2b2',
         [base.id]: '0xbaa5cc21fd487b8fcc2f632f3f4e8d37262a0842',
         [baseLocal.id]: '0xbaa5cc21fd487b8fcc2f632f3f4e8d37262a0842',
-        [baseSepolia.id]: '0xbaa5cc21fd487b8fcc2f632f3f4e8d37262a0842', // TODO is this available on base sepolia?
+        [baseSepolia.id]: '0xbaa5cc21fd487b8fcc2f632f3f4e8d37262a0842',
       },
       abi: erc20Abi,
     },
     {
-      name: 'Aerodrome Finance', // TODO is this available on eth?
+      name: 'Aerodrome Finance',
       address: {
         [base.id]: '0x940181a94a35a4569e4529a3cdfb74e38fd98631',
         [baseLocal.id]: '0x940181a94a35a4569e4529a3cdfb74e38fd98631',
-        [baseSepolia.id]: '0x940181a94a35a4569e4529a3cdfb74e38fd98631', // TODO is this available on base sepolia?
+        [baseSepolia.id]: '0x940181a94a35a4569e4529a3cdfb74e38fd98631',
       },
       abi: erc20Abi,
     },
@@ -193,6 +193,18 @@ export default defineConfig({
         [base.id]: '0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf',
         [baseLocal.id]: '0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf',
         [baseSepolia.id]: '0x08e53b71490e00e8dc1c0367f97ba053567a547e',
+      },
+      abi: erc20Abi,
+    },
+    {
+      name: 'EURC',
+      address: {
+        [mainnet.id]: '0x1abaea1f7c830bd89acc67ec4af516284b1bc33c',
+        [localhost.id]: '0x1abaea1f7c830bd89acc67ec4af516284b1bc33c',
+        [sepolia.id]: '0x08210f9170f89ab7658f0b5e3ff39b0e03c594d4',
+        [base.id]: '0x60a3e35cc302bfa44cb288bc5a4f316fdb1adb42',
+        [baseLocal.id]: '0x60a3e35cc302bfa44cb288bc5a4f316fdb1adb42',
+        [baseSepolia.id]: '0x808456652fdb597867f38412077A9182bf77359F',
       },
       abi: erc20Abi,
     },
