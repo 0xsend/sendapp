@@ -1,12 +1,11 @@
-import type { Tables } from '@my/supabase/database-generated.types'
-import { usdcAddress } from '@my/wagmi'
+import type { Tables } from '@my/supabase/database.types'
 import type { Expect, Page } from '@playwright/test'
+import { ethCoin, usdcCoin } from 'app/data/coins'
 import { assert } from 'app/utils/assert'
-import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 import debug from 'debug'
 import { parseEther, withRetry, zeroAddress } from 'viem'
 import { test as base } from '../auth'
-import { testBaseClient } from '../viem/base'
+import { fund } from '../viem'
 import { OnboardingPage } from './page'
 
 let log: debug.Debugger
@@ -32,11 +31,9 @@ export const signUp = async (page: Page, phone: string, expect: Expect) => {
 const sendAccountTest = base.extend<{
   page: Page
   sendAccount: Tables<'send_accounts'>
-  setEthBalance: ({ address, value }: { address: `0x${string}`; value: bigint }) => Promise<void>
-  setUsdcBalance: ({ address, value }: { address: `0x${string}`; value: bigint }) => Promise<void>
 }>({
   sendAccount: [
-    async ({ context, supabase, setEthBalance, setUsdcBalance, user: { user } }, use) => {
+    async ({ context, supabase, user: { user } }, use) => {
       log = debug(`test:send-accounts:${user.id}:${test.info().parallelIndex}`)
       log('start onboarding')
 
@@ -57,14 +54,20 @@ const sendAccountTest = base.extend<{
       assert(sendAccount.address !== zeroAddress, 'send account address is zero')
 
       await Promise.all([
-        withRetry(() => setEthBalance({ address: sendAccount.address, value: parseEther('1') }), {
-          delay: 250,
-          retryCount: 40,
-        }),
-        withRetry(() => setUsdcBalance({ address: sendAccount.address, value: 100n * 10n ** 6n }), {
-          delay: 250,
-          retryCount: 40,
-        }),
+        withRetry(
+          () => fund({ address: sendAccount.address, amount: parseEther('1'), coin: ethCoin }),
+          {
+            delay: 250,
+            retryCount: 40,
+          }
+        ),
+        withRetry(
+          () => fund({ address: sendAccount.address, amount: 100n * 10n ** 6n, coin: usdcCoin }),
+          {
+            delay: 250,
+            retryCount: 40,
+          }
+        ),
       ])
 
       await onboardingPage.page.close() // close the onboarding page
@@ -74,33 +77,6 @@ const sendAccountTest = base.extend<{
     { timeout: 20000, scope: 'test' },
   ],
   page: [({ sendAccount: _, page }, use) => use(page), { scope: 'test' }],
-  // biome-ignore lint/correctness/noEmptyPattern: playwright requires this
-  setEthBalance: async ({}, use) => {
-    use(async ({ address, value }) => {
-      log('fund send account with eth', `address=${address} value=${value}`)
-      await testBaseClient
-        .setBalance({
-          address,
-          value,
-        })
-        .catch((e) => {
-          log('setBalance error', e)
-          throw e
-        })
-    })
-  },
-  // biome-ignore lint/correctness/noEmptyPattern: playwright requires this
-  setUsdcBalance: async ({}, use) => {
-    use(async ({ address, value }) => {
-      log('fund send account with usdc', `address=${address} value=${value}`)
-      await setERC20Balance({
-        client: testBaseClient,
-        address,
-        tokenAddress: usdcAddress[testBaseClient.chain.id],
-        value,
-      })
-    })
-  },
 })
 export const test = sendAccountTest
 

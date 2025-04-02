@@ -20,6 +20,7 @@ import {
   IconHome,
   IconSendLogo,
   IconSwap,
+  IconStacks,
 } from 'app/components/icons'
 import { SideBarNavLink } from 'app/components/sidebar/SideBarNavLink'
 
@@ -40,6 +41,11 @@ const links = [
     icon: <IconActivity size={'$1'} color={'inherit'} />,
     text: 'Send',
     href: '/send',
+  },
+  {
+    icon: <IconStacks size={'$1'} color={'inherit'} />,
+    text: 'Earn',
+    href: '/earn',
   },
   {
     icon: <IconSwap size={'$1'} color={'inherit'} />,
@@ -158,7 +164,7 @@ export const HomeSideBarWrapper = ({ children }: { children?: React.ReactNode })
     <XStack overflow="hidden" height={'100%'}>
       {media.gtLg && <HomeSideBar width={234} minWidth={234} pt={80} jc="flex-start" />}
       {children}
-      <HomeBottomSheet />
+      {!media.gtLg && <HomeBottomSheet />}
     </XStack>
   )
 }

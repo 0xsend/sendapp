@@ -1,7 +1,7 @@
 import { test } from '@jest/globals'
 import { ProfileScreen } from './screen'
 import { TamaguiProvider, config } from '@my/ui'
-import { render, screen, waitFor } from '@testing-library/react-native'
+import { act, render, screen, waitFor } from '@testing-library/react-native'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useRootScreenParams } from 'app/routers/params'
 
@@ -119,7 +119,10 @@ test('ProfileScreen', async () => {
   )
 
   await waitFor(() => expect(screen.getByText(PROFILE.name)).toBeVisible())
-
+  await act(async () => {
+    jest.advanceTimersByTime(5000)
+    jest.runAllTimers()
+  })
   const h1 = screen.getByText(PROFILE.name)
   expect(h1).toBeOnTheScreen()
   const avatar = screen.getByTestId('avatar')
@@ -138,7 +141,7 @@ test('ProfileScreen', async () => {
   expect(screen.toJSON()).toMatchSnapshot('ProfileScreen')
 })
 
-test('ProfileScreen with opened modal', () => {
+test('ProfileScreen with opened modal', async () => {
   useRootScreenParamsMock.mockReturnValue([{ profile: 0 }, jest.fn()])
 
   render(
@@ -148,6 +151,10 @@ test('ProfileScreen with opened modal', () => {
       </TamaguiProvider>
     </QueryClientProvider>
   )
+  await act(async () => {
+    jest.advanceTimersByTime(5000)
+    jest.runAllTimers()
+  })
 
   expect(screen.getByTestId('profile-about-tile')).toBeOnTheScreen()
 })

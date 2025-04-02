@@ -1,3 +1,5 @@
+import { ZodError } from 'zod'
+
 interface ErrorWithDetails {
   message?: string
   details?: string
@@ -15,6 +17,9 @@ interface ErrorWithDetails {
  */
 export function toNiceError(e: ErrorWithDetails | any): string {
   if (!e) return 'Unknown error'
+  if (e instanceof ZodError) {
+    return e.errors.map((e) => `${e.message} ${e.path.join('.')}`).join(', ')
+  }
   // prioritzie details over message
   if (e.details !== undefined) return e.details.split('.').at(0) ?? e.details
   if (e instanceof Error || e.message) return e.message.split('.').at(0) ?? e.name

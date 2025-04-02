@@ -80,6 +80,34 @@ export type Database = MergeDeep<
             referrer: PgBytea
           }
         }
+        send_earn_new_affiliate: {
+          Row: {
+            log_addr: PgBytea
+            tx_hash: PgBytea
+            affiliate: PgBytea
+            send_earn_affiliate: PgBytea
+          }
+        }
+        send_earn_create: {
+          Row: {
+            log_addr: PgBytea
+            tx_hash: PgBytea
+            send_earn: PgBytea
+            caller: PgBytea
+            initial_owner: PgBytea
+            vault: PgBytea
+            fee_recipient: PgBytea
+            collections: PgBytea
+            salt: PgBytea
+          }
+        }
+        send_earn_deposit: {
+          Row: {
+            log_addr: PgBytea
+            owner: PgBytea
+            sender: PgBytea
+          }
+        }
       }
       Functions: {
         distribution_hodler_addresses: {
@@ -106,6 +134,49 @@ export type Database = MergeDeep<
               DatabaseGenerated['public']['CompositeTypes']['activity_feed_user'],
               { tags: string[] }
             > | null
+          }
+        }
+        referrer: {
+          Row: ProfileLookup
+        }
+        send_earn_balances: {
+          Row: {
+            log_addr: PgBytea
+            owner: PgBytea
+          }
+        }
+        send_earn_activity: {
+          Row: {
+            log_addr: PgBytea
+            owner: PgBytea
+            tx_hash: PgBytea
+          }
+        }
+      }
+    }
+    temporal: {
+      Tables: {
+        send_earn_deposits: {
+          Row: {
+            assets?: bigint | string | number | null
+            owner?: PgBytea | null
+            tx_hash?: PgBytea | null
+            user_op_hash?: PgBytea | null
+            vault?: PgBytea | null
+          }
+          Insert: {
+            assets?: bigint | string | number | null
+            owner?: PgBytea | null
+            tx_hash?: PgBytea | null
+            user_op_hash?: PgBytea | null
+            vault?: PgBytea | null
+          }
+          Update: {
+            assets?: bigint | string | number | null
+            owner?: PgBytea | null
+            tx_hash?: PgBytea | null
+            user_op_hash?: PgBytea | null
+            vault?: PgBytea | null
           }
         }
       }

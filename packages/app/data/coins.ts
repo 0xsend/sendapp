@@ -7,6 +7,7 @@ import {
 } from '@my/wagmi'
 import { z } from 'zod'
 
+// Base coin schema with common properties
 const BaseCoinSchema = z.object({
   label: z.string(),
   symbol: z.string(),
@@ -38,7 +39,7 @@ export const usdcCoin = {
   decimals: 6,
   formatDecimals: 2,
   coingeckoTokenId: 'usd-coin',
-} as const satisfies coin
+} as const satisfies erc20Coin
 
 export const ethCoin = {
   label: 'Ethereum',
@@ -46,7 +47,7 @@ export const ethCoin = {
   token: 'eth',
   decimals: 18,
   coingeckoTokenId: 'ethereum',
-} as const satisfies coin
+} as const satisfies ethCoin
 
 export const sendCoin = {
   label: 'Send',
@@ -55,7 +56,7 @@ export const sendCoin = {
   decimals: 18,
   formatDecimals: 0,
   coingeckoTokenId: 'send-token-2',
-} as const satisfies coin
+} as const satisfies erc20Coin
 
 // can probably remove this
 export const sendV0Coin = {
@@ -65,7 +66,7 @@ export const sendV0Coin = {
   decimals: 0,
   coingeckoTokenId: 'send-token',
   formatDecimals: 0,
-} as const satisfies coin
+} as const satisfies erc20Coin
 
 export const spx6900Coin = {
   label: 'SPX',
@@ -73,7 +74,7 @@ export const spx6900Coin = {
   token: spx6900Addresses[baseMainnet.id],
   decimals: 8,
   coingeckoTokenId: 'spx6900',
-} as const satisfies coin
+} as const satisfies erc20Coin
 
 /**
  * The coins (tokens) array that are supported by Send App.
@@ -92,6 +93,14 @@ export const coinsDict = coins.reduce((acc, coin) => {
 }, {} as CoinsDict)
 
 export type coinsDict = typeof coinsDict
+
+type CoinsBySymbolDict = { [key in coins[number]['symbol']]: coins[number] }
+export const coinsBySymbol = coins.reduce((acc, coin) => {
+  acc[coin.symbol] = coin
+  return acc
+}, {} as CoinsBySymbolDict)
+
+export type coinsBySymbol = typeof coinsBySymbol
 
 /**
  * The coins (tokens) that sendapp supports through partnerships. (Hidden when balance is 0)
@@ -134,5 +143,10 @@ export type CoinWithBalance = allCoins[number] & {
  * Known coins are a list of coins that Send app knows about but not necessarily supports.
  */
 export const knownCoins: coin[] = [...allCoins, sendV0Coin] as const
+
+/**
+ * List of erc20 coins
+ */
+export const erc20Coins: erc20Coin[] = [usdcCoin, sendCoin, spx6900Coin] as const
 
 export const isEthCoin = (coin: coin): coin is ethCoin => coin.symbol === 'ETH'

@@ -1,6 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
+import debug from 'debug'
 import { useSessionContext } from './supabase/useSessionContext'
 import { useSupabase } from './supabase/useSupabase'
+
+const log = debug('app:utils:useUser')
 
 export const useUser = () => {
   const { session, isLoading: isLoadingSession } = useSessionContext()
@@ -23,11 +26,13 @@ export const useUser = () => {
       if (error) {
         // no rows - edge case of user being deleted
         if (error.code === 'PGRST116') {
+          log('no profile found for user', user?.id)
           await supabase.auth.signOut()
           return null
         }
         // check unauthorized or jwt error
         if (error.code === 'PGRST301') {
+          log('unauthorized')
           await supabase.auth.signOut()
         }
         throw new Error(error.message)
@@ -50,6 +55,7 @@ export const useUser = () => {
         if (error.code === 'PGRST116') {
           return []
         }
+        log('error fetching tags', error)
         throw new Error(error.message)
       }
       return data

@@ -1,25 +1,25 @@
 import {
   Fade,
+  H4,
   Paragraph,
   Separator,
   Stack,
+  Text,
   XStack,
   YStack,
-  Text,
-  H4,
   type StackProps,
 } from '@my/ui'
-import {
-  phraseFromActivity,
-  amountFromActivity,
-  subtextFromActivity,
-  isActivitySwapTransfer,
-} from 'app/utils/activity'
-import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
 import { IconX } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
+import { ContractLabels } from 'app/data/contract-labels'
+import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
+import { usePhraseFromActivity, useSubtextFromActivity } from 'app/utils/activity'
+import { useAmountFromActivity } from 'app/utils/activity-hooks'
+import { useAddressBook } from 'app/utils/useAddressBook'
 import type { Activity } from 'app/utils/zod/activity'
 import {
+  isSendAccountTransfersEvent,
+  isSendEarnEvent,
   isSendtagCheckoutEvent,
   isSendTokenUpgradeEvent,
 } from 'app/utils/zod/activity/SendAccountTransfersEventSchema'
@@ -36,9 +36,15 @@ export const ActivityDetails = ({
 } & StackProps) => {
   const { data: swapRouters } = useSwapRouters()
   const { data: liquidityPools } = useLiquidityPools()
-  const activityText = phraseFromActivity(activity, swapRouters, liquidityPools)
-  const subText = subtextFromActivity(activity, swapRouters, liquidityPools)
-  const amount = amountFromActivity(activity)
+  const activityText = usePhraseFromActivity(activity, swapRouters, liquidityPools)
+  const subText = useSubtextFromActivity(activity, swapRouters, liquidityPools)
+  const amount = useAmountFromActivity(activity)
+  const isERC20Transfer = isSendAccountTransfersEvent(activity)
+  const addressBook = useAddressBook()
+  const isERC20TransferToSendEarn =
+    isERC20Transfer && addressBook?.data?.[activity.data.t] === ContractLabels.SendEarn
+  const isERC20TransferFromSendEarn =
+    isERC20Transfer && addressBook?.data?.[activity.data.f] === ContractLabels.SendEarn
 
   return (
     <Fade {...props}>
@@ -81,6 +87,12 @@ export const ActivityDetails = ({
                       case isSendTokenUpgradeEvent(activity):
                         return null
                       case isActivitySwapTransfer(activity, swapRouters, liquidityPools):
+                        return null
+                      case isSendEarnEvent(activity):
+                        return null
+                      case isERC20TransferToSendEarn || isERC20TransferFromSendEarn:
+                        return null
+                      case !activityText:
                         return null
                       case subText === null:
                         return <Text>{activityText}</Text>

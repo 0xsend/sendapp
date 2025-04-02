@@ -1,5 +1,13 @@
 import { defineConfig, devices } from '@playwright/test'
 import os from 'node:os'
+import dotenv from 'dotenv'
+
+import path from 'node:path'
+
+const __dirname = path.dirname(new URL(import.meta.url).pathname)
+
+dotenv.config({ path: path.join(__dirname, '..', '..', '.env') })
+dotenv.config({ path: path.join(__dirname, '..', '..', '.env.local') })
 
 const cpus = os.cpus().length
 // never scheduler more than 4 workers or up to 50% of the available cores

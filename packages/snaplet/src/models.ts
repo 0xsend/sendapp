@@ -1,12 +1,13 @@
+import { copycat, faker } from '@snaplet/copycat'
 import type {
   leaderboard_referrals_all_timeInputs,
   SeedClientOptions,
   usersInputs,
 } from '@snaplet/seed'
-import { pravatar, tagName } from './utils'
-import { generatePrivateKey, privateKeyToAddress } from 'viem/accounts'
-import { copycat } from '@snaplet/copycat'
 import crypto from 'node:crypto'
+import { hexToBytes } from 'viem'
+import { generatePrivateKey, privateKeyToAddress } from 'viem/accounts'
+import { pravatar, tagName } from './utils'
 
 export const models: SeedClientOptions['models'] = {
   users: {
@@ -44,6 +45,23 @@ export const models: SeedClientOptions['models'] = {
   chain_addresses: {
     data: {
       address: () => privateKeyToAddress(generatePrivateKey()),
+    },
+  },
+  public_send_account_transfers: {
+    data: {
+      src_name: 'base_logs',
+      ig_name: 'send_account_transfers',
+      chain_id: 845337,
+      abi_idx: (ctx) => copycat.int(ctx.seed, { min: 0, max: 1000 }),
+      tx_idx: (ctx) => copycat.int(ctx.seed, { min: 0, max: 1000 }),
+      log_idx: (ctx) => copycat.int(ctx.seed, { min: 0, max: 1000 }),
+      block_num: (ctx) => copycat.int(ctx.seed, { min: 0, max: 100_000_000 }),
+      block_time: Math.floor(new Date().getTime() / 1000),
+      tx_hash: Buffer.from(hexToBytes(generatePrivateKey())),
+      f: (ctx) => Buffer.from(hexToBytes(generatePrivateKey())),
+      t: (ctx) => Buffer.from(hexToBytes(generatePrivateKey())),
+      // @ts-expect-error - thinks it's a number
+      v: (ctx) => faker.number.bigInt({ min: 0, max: BigInt(100_000_000_000) }),
     },
   },
 }

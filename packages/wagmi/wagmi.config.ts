@@ -22,6 +22,8 @@ import sendTokenV1Artifact from '@0xsend/send-token-upgrade/artifacts/contracts/
   type: 'json',
 }
 
+import { sendEarnAbi, sendEarnFactoryAbi } from '@0xsend/send-earn-contracts'
+
 const broadcasts = (
   await globby([`${process.cwd()}/../contracts/broadcast/**/run-latest.json`])
 ).filter((f) => !f.includes('dry-run'))
@@ -103,6 +105,18 @@ export default defineConfig({
       address: {
         [baseLocal.id]: '0x17D46f667B0e4156238645536c344d010FC099d7',
         [base.id]: '0x17D46f667B0e4156238645536c344d010FC099d7',
+      },
+      abi: [],
+    },
+    /**
+     * [Send: Earn Revenue](https://basescan.org/address/0x65049C4B8e970F5bcCDAE8E141AA06346833CeC4)
+     **/
+    {
+      name: 'SendEarnRevenueSafe',
+      address: {
+        [baseLocal.id]: '0x65049C4B8e970F5bcCDAE8E141AA06346833CeC4',
+        [base.id]: '0x65049C4B8e970F5bcCDAE8E141AA06346833CeC4',
+        [baseSepolia.id]: '0x269cD0a2afd1BAbdA7A74ab1dC853869a37aa4a7',
       },
       abi: [],
     },
@@ -217,6 +231,146 @@ export default defineConfig({
         // [localhost.id]: sendTokenUpgradeAddresses['SendTokenModule#SendToken'] as `0x${string}`,
         // [sepolia.id]: sendTokenUpgradeAddresses['SendTokenModule#SendToken'] as `0x${string}`,
       },
+    },
+    {
+      name: 'SendEarnUSDCFactory',
+      address: {
+        [mainnet.id]: '0x392f337911a610a3850bfe7805ab9c948b836838',
+        [localhost.id]: '0x392f337911a610a3850bfe7805ab9c948b836838',
+        [sepolia.id]: '0x392f337911a610a3850bfe7805ab9c948b836838',
+        [baseLocal.id]: '0x392f337911a610a3850bfe7805ab9c948b836838',
+        [base.id]: '0x392f337911a610a3850bfe7805ab9c948b836838',
+        [baseSepolia.id]: '0x392f337911a610a3850bfe7805ab9c948b836838',
+      },
+      abi: sendEarnFactoryAbi,
+    },
+    {
+      name: 'SendEarn',
+      address: {
+        [mainnet.id]: '0x987e69A31aE91427F129b73e654e5Cb036A11493',
+        [localhost.id]: '0x987e69A31aE91427F129b73e654e5Cb036A11493',
+        [sepolia.id]: '0x987e69A31aE91427F129b73e654e5Cb036A11493',
+        [baseLocal.id]: '0x987e69A31aE91427F129b73e654e5Cb036A11493',
+        [base.id]: '0x987e69A31aE91427F129b73e654e5Cb036A11493',
+        [baseSepolia.id]: '0x987e69A31aE91427F129b73e654e5Cb036A11493',
+      },
+      abi: sendEarnAbi,
+    },
+    {
+      name: 'MorphoView',
+      address: {
+        [mainnet.id]: '0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B',
+        [localhost.id]: '0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B',
+        [sepolia.id]: '0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B',
+        [baseLocal.id]: '0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B',
+        [base.id]: '0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B',
+        [baseSepolia.id]: '0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B',
+      },
+      abi: [
+        {
+          type: 'function',
+          name: 'getVaultInfo',
+          inputs: [
+            {
+              name: '_vault',
+              type: 'address',
+              internalType: 'contract IMetaMorpho',
+            },
+          ],
+          outputs: [
+            {
+              name: '',
+              type: 'tuple',
+              internalType: 'struct MorphoViews.MorphoVault',
+              components: [
+                {
+                  name: 'vault',
+                  type: 'address',
+                  internalType: 'address',
+                },
+                {
+                  name: 'totalSupply',
+                  type: 'uint256',
+                  internalType: 'uint256',
+                },
+                {
+                  name: 'totalAssets',
+                  type: 'uint256',
+                  internalType: 'uint256',
+                },
+                {
+                  name: 'underlyingPrice',
+                  type: 'uint256',
+                  internalType: 'uint256',
+                },
+                {
+                  name: 'fee',
+                  type: 'uint256',
+                  internalType: 'uint256',
+                },
+                {
+                  name: 'timelock',
+                  type: 'uint256',
+                  internalType: 'uint256',
+                },
+                {
+                  name: 'markets',
+                  type: 'tuple[]',
+                  internalType: 'struct MorphoViews.MorphoVaultMarketsInfo[]',
+                  components: [
+                    {
+                      name: 'marketId',
+                      type: 'bytes32',
+                      internalType: 'Id',
+                    },
+                    {
+                      name: 'marketCollateral',
+                      type: 'address',
+                      internalType: 'address',
+                    },
+                    {
+                      name: 'marketCollateralName',
+                      type: 'string',
+                      internalType: 'string',
+                    },
+                    {
+                      name: 'marketCollateralSymbol',
+                      type: 'string',
+                      internalType: 'string',
+                    },
+                    {
+                      name: 'marketLiquidity',
+                      type: 'uint256',
+                      internalType: 'uint256',
+                    },
+                    {
+                      name: 'marketLltv',
+                      type: 'uint256',
+                      internalType: 'uint256',
+                    },
+                    {
+                      name: 'marketApy',
+                      type: 'uint256',
+                      internalType: 'uint256',
+                    },
+                    {
+                      name: 'vaultAllocation',
+                      type: 'uint256',
+                      internalType: 'uint256',
+                    },
+                    {
+                      name: 'vaultSupplied',
+                      type: 'uint256',
+                      internalType: 'uint256',
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          stateMutability: 'view',
+        },
+      ] as const,
     },
   ],
   plugins: [

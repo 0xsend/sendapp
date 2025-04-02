@@ -311,6 +311,55 @@ export const mockSendTokenUpgradeEvent = {
   },
 }
 
+export const mockSendEarnDepositEvent = {
+  created_at: '2025-01-29T14:47:36+00:00',
+  event_name: 'send_earn_deposit',
+  from_user: {
+    id: '5c833c74-5a6c-461d-8612-b4982d7a7b51',
+    name: null,
+    avatar_url: null,
+    send_id: 48,
+    tags: ['asfd'],
+  },
+  to_user: null,
+  data: {
+    log_addr: '\\x5afe000000000000000000000000000000000000',
+    owner: '\\xB0B0000000000000000000000000000000000000',
+    sender: '\\xB0B0000000000000000000000000000000000000',
+    assets: '1000000000000000000',
+    shares: '950000000000000000',
+    tx_hash: '\\x1234567890123456789012345678901234567890123456789012345678901234',
+    block_num: '12345',
+    tx_idx: '0',
+    log_idx: '0',
+  },
+}
+
+export const mockSendEarnWithdrawEvent = {
+  created_at: '2025-02-15T14:47:36+00:00',
+  event_name: 'send_earn_withdraw',
+  from_user: null,
+  to_user: {
+    id: '5c833c74-5a6c-461d-8612-b4982d7a7b51',
+    name: null,
+    avatar_url: null,
+    send_id: 48,
+    tags: ['asfd'],
+  },
+  data: {
+    log_addr: '\\x5afe000000000000000000000000000000000000',
+    owner: '\\xB0B0000000000000000000000000000000000000',
+    sender: '\\xB0B0000000000000000000000000000000000000',
+    receiver: '\\xB0B0000000000000000000000000000000000000',
+    assets: '5000000000000000000',
+    shares: '475000000000000000',
+    tx_hash: '\\x1234567890123456789012345678901234567890123456789012345678901234',
+    block_num: '12345',
+    tx_idx: '0',
+    log_idx: '0',
+  },
+}
+
 // make it easier on yourself and add the events to the end of the array
 export const MockActivityFeed = [
   mockReceivedTransfer,
@@ -323,6 +372,8 @@ export const MockActivityFeed = [
   mockTagReceiptUSDC,
   mockSendtagReferralRewardUSDC,
   mockSendTokenUpgradeEvent,
+  mockSendEarnDepositEvent,
+  mockSendEarnWithdrawEvent,
 ] as const
 
 // you can use this to mock the activity feed by overriding the network request in the developer console

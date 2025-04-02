@@ -1,13 +1,13 @@
 import { H4, Paragraph, Spinner, XStack, YStack } from '@my/ui'
-import { useActivityFeed } from './utils/useActivityFeed'
 import type { PostgrestError } from '@supabase/postgrest-js'
 import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
-import type { ZodError } from 'zod'
-import type { Activity } from 'app/utils/zod/activity'
-import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
-import { type PropsWithChildren, useState, useMemo } from 'react'
 import { ActivityDetails } from 'app/features/activity/ActivityDetails'
+import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
+import type { Activity } from 'app/utils/zod/activity'
+import { type PropsWithChildren, useMemo, useState } from 'react'
 import { SectionList } from 'react-native'
+import type { ZodError } from 'zod'
+import { useActivityFeed } from './utils/useActivityFeed'
 
 export function RecentActivity() {
   const result = useActivityFeed()

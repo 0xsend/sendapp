@@ -1,4 +1,3 @@
-import '@jest/globals'
 import { TamaguiProvider, config } from '@my/ui'
 import { usdcCoin } from 'app/data/coins'
 import { TokenDetails } from './TokenDetails'

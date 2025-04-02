@@ -21,14 +21,14 @@ import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
 import { usePendingTags } from 'app/utils/tags'
 import { throwIf } from 'app/utils/throwIf'
 import { useReceipts } from 'app/utils/useReceipts'
+import { useReferralCodeCookie } from 'app/utils/useReferralCodeCookie'
+import { useReferrer } from 'app/utils/useReferrer'
 import { useUser } from 'app/utils/useUser'
 import { sendUserOpTransfer } from 'app/utils/useUserOpTransferMutation'
 import { useAccountNonce } from 'app/utils/userop'
 import { type PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react'
 import { isAddressEqual, zeroAddress } from 'viem'
 import { useWaitForTransactionReceipt } from 'wagmi'
-import { useReferralCodeCookie } from 'app/utils/useReferralCodeCookie'
-import { useReferrer } from 'app/utils/useReferrer'
 import {
   useReferralReward,
   useSendtagCheckout,

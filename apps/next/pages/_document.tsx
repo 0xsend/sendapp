@@ -11,6 +11,8 @@ import { AppRegistry } from 'react-native'
 
 import { config } from '@my/ui'
 
+const DEV = process.env.NODE_ENV === 'development'
+
 export default class Document extends NextDocument {
   static async getInitialProps(ctx: DocumentContext): Promise<DocumentInitialProps> {
     AppRegistry.registerComponent('Main', () => Main)
@@ -30,7 +32,7 @@ export default class Document extends NextDocument {
         // biome-ignore lint/security/noDangerouslySetInnerHtml: tamagui is a trusted source
         dangerouslySetInnerHTML={{
           __html: config.getCSS({
-            exclude: process.env.NODE_ENV === 'development' ? null : 'design-system',
+            exclude: DEV ? null : 'design-system',
           }),
         }}
       />,
@@ -43,6 +45,9 @@ export default class Document extends NextDocument {
     return (
       <Html>
         <Head>
+          {DEV && !!process.env.NEXT_PUBLIC_REACT_SCAN_ENABLED ? (
+            <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
+          ) : null}
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         </Head>
         <body>

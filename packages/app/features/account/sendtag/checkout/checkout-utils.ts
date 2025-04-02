@@ -12,12 +12,12 @@ import { useSendAccount } from 'app/utils/send-accounts'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { usePendingTags } from 'app/utils/tags'
 import { throwIf } from 'app/utils/throwIf'
+import { useReferrer } from 'app/utils/useReferrer'
 import { useUserOp } from 'app/utils/userop'
 import { useUSDCFees } from 'app/utils/useUSDCFees'
 import { useMemo } from 'react'
 import { encodeFunctionData, erc20Abi, zeroAddress } from 'viem'
 import { fetchSendtagCheckoutReceipts } from './checkout-utils.fetchSendtagCheckoutReceipts'
-import { useReferrer } from 'app/utils/useReferrer'
 
 export const verifyAddressMsg = (a: string | `0x${string}`) =>
   `I am the owner of the address: ${a}.
