@@ -5,12 +5,22 @@ import { IconUSDC } from './IconUSDC'
 import { IconSPX6900 } from './IconSPX6900'
 import type { IconProps } from '@tamagui/helpers-icon'
 import type { NamedExoticComponent } from 'react'
+import { IconMopho } from './IconMorpho'
+import { IconAerodrome } from './IconAerodrome'
+import { IconMoonwell } from './IconMoonwell'
+import { IconCbBtc } from './IconCbBtc'
+import { IconEURC } from './IconEURC'
 
 const coinSymbolToIcons: Record<coin['symbol'], NamedExoticComponent<IconProps>> = {
   USDC: IconUSDC,
   ETH: IconEthereum,
   SEND: IconSend,
   SPX: IconSPX6900,
+  WELL: IconMoonwell,
+  MORPHO: IconMopho,
+  AERO: IconAerodrome,
+  CBBTC: IconCbBtc,
+  EURC: IconEURC,
 }
 
 export const IconCoin = ({

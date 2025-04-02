@@ -30,6 +30,8 @@ import {
   toHex,
   type Address,
   type Hex,
+  parseUnits,
+  InvalidParamsRpcError,
 } from 'viem'
 import { useEstimateFeesPerGas } from 'wagmi'
 import { useQuery as useWagmiQuery, type UseQueryReturnType } from 'wagmi/query'
@@ -39,6 +41,7 @@ import { defaultUserOp } from './useUserOpTransferMutation'
 import { baseMainnetClient } from './viem'
 import { useMemo } from 'react'
 import debugBase from 'debug'
+import { wMulDown } from 'app/utils/math'
 
 const debug = debugBase('app:utils:userop')
 
@@ -263,8 +266,13 @@ function userOpQueryOptions({
           .catch((e) => {
             throwNiceError(e)
           })
-          .then(({ callGasLimit: cgl }) => {
+          .then(({ callGasLimit: cgl, preVerificationGas }) => {
             userOp.callGasLimit = cgl
+
+            // if estimated preVerificationGas is higher than default, we use estimated with some buffer
+            if (preVerificationGas > userOp.preVerificationGas) {
+              userOp.preVerificationGas = wMulDown(preVerificationGas, parseUnits('1.25', 18)) // 125%
+            }
           })
       }
 
@@ -397,6 +405,14 @@ export function throwNiceError(e: Error & { cause?: Error }): never {
           throw new Error('Invalid nonce, please try again')
         case 'execution reverted: revert: Return amount is not enough':
           throw new Error('Slippage exceeded, please try again or increase max slippage')
+        default:
+          throw e
+      }
+    }
+    case cause instanceof InvalidParamsRpcError: {
+      switch (true) {
+        case cause.details?.includes('preVerificationGas too low'):
+          throw new Error('Swap failed, try again')
         default:
           throw e
       }
