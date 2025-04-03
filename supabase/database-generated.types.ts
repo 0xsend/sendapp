@@ -857,6 +857,120 @@ export type Database = {
         }
         Relationships: []
       }
+      send_pot_jackpot_runs: {
+        Row: {
+          abi_idx: number | null
+          block_num: number | null
+          block_time: number | null
+          chain_id: number | null
+          id: number
+          ig_name: string | null
+          log_addr: string | null
+          log_idx: number | null
+          src_name: string | null
+          tickets_purchased_total_bps: number | null
+          time: number | null
+          tx_hash: string | null
+          tx_idx: number | null
+          win_amount: number | null
+          winner: string | null
+          winning_ticket: number | null
+        }
+        Insert: {
+          abi_idx?: number | null
+          block_num?: number | null
+          block_time?: number | null
+          chain_id?: number | null
+          id?: number
+          ig_name?: string | null
+          log_addr?: string | null
+          log_idx?: number | null
+          src_name?: string | null
+          tickets_purchased_total_bps?: number | null
+          time?: number | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+          win_amount?: number | null
+          winner?: string | null
+          winning_ticket?: number | null
+        }
+        Update: {
+          abi_idx?: number | null
+          block_num?: number | null
+          block_time?: number | null
+          chain_id?: number | null
+          id?: number
+          ig_name?: string | null
+          log_addr?: string | null
+          log_idx?: number | null
+          src_name?: string | null
+          tickets_purchased_total_bps?: number | null
+          time?: number | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+          win_amount?: number | null
+          winner?: string | null
+          winning_ticket?: number | null
+        }
+        Relationships: []
+      }
+      send_pot_user_ticket_purchases: {
+        Row: {
+          abi_idx: number | null
+          block_num: number | null
+          block_time: number | null
+          buyer: string | null
+          chain_id: number | null
+          id: number
+          ig_name: string | null
+          log_addr: string | null
+          log_idx: number | null
+          recipient: string | null
+          referrer: string | null
+          src_name: string | null
+          tickets_purchased_total_bps: number | null
+          tx_hash: string | null
+          tx_idx: number | null
+          value: number | null
+        }
+        Insert: {
+          abi_idx?: number | null
+          block_num?: number | null
+          block_time?: number | null
+          buyer?: string | null
+          chain_id?: number | null
+          id?: number
+          ig_name?: string | null
+          log_addr?: string | null
+          log_idx?: number | null
+          recipient?: string | null
+          referrer?: string | null
+          src_name?: string | null
+          tickets_purchased_total_bps?: number | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+          value?: number | null
+        }
+        Update: {
+          abi_idx?: number | null
+          block_num?: number | null
+          block_time?: number | null
+          buyer?: string | null
+          chain_id?: number | null
+          id?: number
+          ig_name?: string | null
+          log_addr?: string | null
+          log_idx?: number | null
+          recipient?: string | null
+          referrer?: string | null
+          src_name?: string | null
+          tickets_purchased_total_bps?: number | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+          value?: number | null
+        }
+        Relationships: []
+      }
       send_revenues_safe_receives: {
         Row: {
           abi_idx: number
@@ -1565,6 +1679,39 @@ export type Database = {
         }
         Relationships: []
       }
+      send_pot_user_ticket_purchases: {
+        Row: {
+          created_at: string
+          created_at_block_num: number | null
+          data: Json | null
+          id: number
+          status: Database["temporal"]["Enums"]["transaction_status"]
+          updated_at: string
+          user_id: string | null
+          workflow_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_at_block_num?: number | null
+          data?: Json | null
+          id?: number
+          status?: Database["temporal"]["Enums"]["transaction_status"]
+          updated_at?: string
+          user_id?: string | null
+          workflow_id: string
+        }
+        Update: {
+          created_at?: string
+          created_at_block_num?: number | null
+          data?: Json | null
+          id?: number
+          status?: Database["temporal"]["Enums"]["transaction_status"]
+          updated_at?: string
+          user_id?: string | null
+          workflow_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -1573,6 +1720,13 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      transaction_status:
+        | "initialized"
+        | "submitted"
+        | "sent"
+        | "confirmed"
+        | "failed"
+        | "cancelled"
       transfer_status:
         | "initialized"
         | "submitted"
