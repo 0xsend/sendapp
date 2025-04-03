@@ -1,11 +1,11 @@
 import { Queue } from '@my/temporal'
 import { getTemporalClient } from '@my/temporal/client'
-import { baseMainnet } from '@my/wagmi'
+import { baseMainnet, baseMainnetClient, entryPointAddress } from '@my/wagmi'
 import { DepositWorkflow } from '@my/workflows/all-workflows'
 import { WorkflowExecutionAlreadyStartedError } from '@temporalio/client'
 import { TRPCError } from '@trpc/server'
 import { assert } from 'app/utils/assert'
-import { decodeDepositUserOp } from 'app/utils/decodeDepositUserOp'
+import { decodeSendEarnDepositUserOp } from 'app/utils/decodeDepositUserOp'
 import { address } from 'app/utils/zod'
 import { SendAccountCallsSchema, UserOperationSchema } from 'app/utils/zod/evm'
 import debug from 'debug'
@@ -37,20 +37,32 @@ export const sendEarnRouter = createTRPCRouter({
       assert(ENTRYPOINT_ADDRESS_V07 === entryPoint, 'Invalid entry point')
 
       // validate userop
-      const { owner, assets, vault } = decodeDepositUserOp({ userOp: userop })
+      const { owner, assets, vault } = decodeSendEarnDepositUserOp({ userOp: userop })
       assert(isAddress(owner), 'Invalid owner')
       assert(isAddress(vault), 'Invalid vault')
       assert(assets > 0n, 'Invalid assets')
 
       const client = await getTemporalClient()
+
+      // simulate
+      await baseMainnetClient
+        .call({
+          account: entryPointAddress[baseMainnetClient.chain.id],
+          to: userop.sender,
+          data: userop.callData,
+        })
+        .catch((e) => {
+          throw new TRPCError({
+            code: 'PRECONDITION_FAILED',
+            message: e.message,
+          })
+        })
+
       const userOpHash = getUserOperationHash({
         userOperation: userop,
         entryPoint: entryPoint,
         chainId: baseMainnet.id,
       })
-
-      // TODO: simulate userop
-
       const workflowId = `temporal/deposit/${session.user.id}/${userOpHash}`
       log(`Starting DepositWorkflow with ID: ${workflowId}`)
 
