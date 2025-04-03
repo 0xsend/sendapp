@@ -1,7 +1,6 @@
--- Start transaction and plan tests
 BEGIN;
 
-SELECT plan(18); -- Increased from 16 to 18 for additional tests
+SELECT plan(17);
 
 -- Test Setup: Create a user and a send account
 -- Note: Using fixed UUIDs and addresses for deterministic testing
@@ -9,7 +8,7 @@ INSERT INTO auth.users (id, email, raw_user_meta_data) VALUES ('a0eebc99-9c0b-4e
 -- Insert the send account directly, including required chain_id and init_code (chain_addresses not needed)
 INSERT INTO public.send_accounts (user_id, address, chain_id, init_code) VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed', 8453, '\x') ON CONFLICT DO NOTHING;
 
--- Test Case 1: Verify table structure and basic constraints
+-- Test Case: Verify table structure and basic constraints
 SELECT has_table('temporal', 'send_earn_deposits', 'Table temporal.send_earn_deposits should exist.');
 SELECT has_column('temporal', 'send_earn_deposits', 'workflow_id', 'Column workflow_id should exist.');
 SELECT col_is_pk('temporal', 'send_earn_deposits', 'workflow_id', 'Column workflow_id should be the primary key.');
@@ -17,7 +16,7 @@ SELECT col_is_fk('temporal', 'send_earn_deposits', 'activity_id', 'Column activi
 SELECT has_index('temporal', 'send_earn_deposits', 'idx_temporal_send_earn_deposits_tx_hash', 'Index on tx_hash should exist.');
 SELECT has_index('temporal', 'send_earn_deposits', 'idx_temporal_send_earn_deposits_owner', 'Index on owner should exist.');
 
--- Test Case 2: Test the AFTER INSERT trigger for pending activity creation
+-- Test Case: Test the AFTER INSERT trigger for pending activity creation
 -- Prepare data for insert
 SELECT lives_ok(
     $$
@@ -59,7 +58,7 @@ SELECT is(
 );
 
 
--- Test Case 3: Test nullable fields
+-- Test Case: Test nullable fields
 SELECT lives_ok(
     $$
         INSERT INTO temporal.send_earn_deposits (workflow_id, status)
@@ -78,7 +77,7 @@ SELECT results_eq(
     'No activity record should be created when owner is null.'
 );
 
--- Test Case 4: Test the cleanup logic in the modified send_earn_deposit trigger
+-- Test Case: Test the cleanup logic in the modified send_earn_deposit trigger
 -- Prepare data: Insert another temporal record and its corresponding send_earn_deposit
 SELECT lives_ok(
     $$
@@ -132,7 +131,7 @@ SELECT results_eq(
 
 -- Verify the final 'send_earn_deposit' activity record exists
 SELECT results_ne(
-    $$ SELECT count(*)::int FROM public.activity WHERE event_name = 'send_earn_deposit' AND data->>'tx_hash' = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' $$,
+    $$ SELECT count(*)::int FROM public.activity WHERE event_name = 'send_earn_deposit' AND data->>'tx_hash' = '\x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' $$,
     $$ VALUES (0) $$,
     'Final send_earn_deposit activity record should exist.'
 );
