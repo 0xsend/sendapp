@@ -28,8 +28,8 @@ export function TokenActivityRow({
   const { created_at, from_user, to_user } = activity
   const amount = useAmountFromActivity(activity, swapRouters, liquidityPools)
   const date = CommentsTime(new Date(created_at))
-  const eventName = useEventNameFromActivity(activity)
-  const subtext = useSubtextFromActivity(activity)
+  const eventName = useEventNameFromActivity({ activity, swapRouters })
+  const subtext = useSubtextFromActivity({ activity, swapRouters, liquidityPools })
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
   const hoverStyles = useHoverStyles()
