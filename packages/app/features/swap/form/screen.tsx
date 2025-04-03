@@ -424,6 +424,8 @@ export const SwapFormScreen = () => {
                           })()}
                           {inCoin !== undefined && inCoin.symbol !== usdcCoin.symbol && (
                             <Button
+                              // @ts-expect-error tamagui is tripping here
+                              type={'button'}
                               chromeless
                               backgroundColor={'transparent'}
                               hoverStyle={{ backgroundColor: 'transparent' }}
@@ -532,6 +534,8 @@ export const SwapFormScreen = () => {
                       transform={'translate(-50%, -50%)'}
                     >
                       <Button
+                        // @ts-expect-error tamagui is tripping here
+                        type={'button'}
                         testID={'flipTokensButton'}
                         bc={'$color0'}
                         circular={true}
@@ -630,6 +634,8 @@ export const Slippage = ({
         <XStack gap={'$2'}>
           <Paragraph size={'$5'}>{slippage / 100}%</Paragraph>
           <Button
+            // @ts-expect-error tamagui is tripping here
+            type={'button'}
             testID={'slippageDetailsButton'}
             chromeless
             backgroundColor={'transparent'}
@@ -661,6 +667,8 @@ export const Slippage = ({
         <XStack gap={'$2'} columnGap={'$2'} flexWrap={'wrap'} flex={1}>
           {SLIPPAGE_OPTIONS.map((slippageOption) => (
             <Button
+              // @ts-expect-error tamagui is tripping here
+              type={'button'}
               key={`slippage-${slippageOption}`}
               onPress={() => handleOnPress(slippageOption)}
               hoverStyle={hoverStyles}
