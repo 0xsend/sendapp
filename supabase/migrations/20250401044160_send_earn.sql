@@ -198,12 +198,12 @@ BEGIN
     -- Build data object with the same pattern as send_account_transfers
     -- Cast numeric values to text to avoid losing precision
     _data := json_build_object(
-        'log_addr', encode(NEW.log_addr, 'hex'), -- Encode bytea for JSON
-        'sender', encode(NEW.sender, 'hex'),     -- Encode bytea for JSON
-        'owner', encode(NEW.owner, 'hex'),       -- Encode bytea for JSON
+        'log_addr', NEW.log_addr,
+        'sender', NEW.sender,
+        'owner', NEW.owner,
         'assets', NEW.assets::text,
         'shares', NEW.shares::text,
-        'tx_hash', encode(NEW.tx_hash, 'hex'),   -- Encode bytea for JSON
+        'tx_hash', NEW.tx_hash,
         'block_num', NEW.block_num::text,
         'tx_idx', NEW.tx_idx::text,
         'log_idx', NEW.log_idx::text
@@ -770,7 +770,7 @@ BEGIN
 
   -- Add fields if they're not null
   IF NEW.owner IS NOT NULL THEN
-    activity_data := activity_data || jsonb_build_object('owner', encode(NEW.owner, 'hex'));
+    activity_data := activity_data || jsonb_build_object('owner', NEW.owner);
   END IF;
 
   IF NEW.assets IS NOT NULL THEN
@@ -778,7 +778,7 @@ BEGIN
   END IF;
 
   IF NEW.vault IS NOT NULL THEN
-    activity_data := activity_data || jsonb_build_object('vault', encode(NEW.vault, 'hex'));
+    activity_data := activity_data || jsonb_build_object('vault', NEW.vault);
   END IF;
 
   -- Insert into public.activity
