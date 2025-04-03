@@ -7,12 +7,13 @@ import {
   type TemporalTransferInsert,
   type TemporalTransferUpdate,
 } from './supabase'
-import type { UserOperation } from 'permissionless'
+import type { UserOperation, GetUserOperationReceiptReturnType } from 'permissionless'
 import { bootstrap } from '@my/workflows/utils'
 import { decodeTransferUserOp } from 'app/utils/decodeTransferUserOp'
 import { allCoins } from 'app/data/coins'
 import { createUserOpActivities, type UserOpActivities } from '../shared/userop-activities'
 import type { Address } from 'viem'
+import { isAddressInTopic, isReceiveTopic, isTransferTopic } from './wagmi'
 
 type TransferActivities = {
   upsertTemporalSendAccountTransferActivity: (TemporalTransferInsert) => Promise<TemporalTransfer>
@@ -26,6 +27,20 @@ type TransferActivities = {
     token: Address | null
   }>
   updateTemporalSendAccountTransferActivity: (TemporalTransferUpdate) => Promise<TemporalTransfer>
+  getEventFromTransferActivity: ({
+    bundlerReceipt,
+    token,
+    from,
+    to,
+  }: {
+    bundlerReceipt: GetUserOperationReceiptReturnType
+    token: Address | null
+    from: Address
+    to: Address
+  }) => Promise<{
+    eventName: string
+    eventId: string
+  }>
 } & UserOpActivities
 
 export const createTransferActivities = (
@@ -167,6 +182,39 @@ export const createTransferActivities = (
       }
 
       return upsertedData
+    },
+    async getEventFromTransferActivity({ bundlerReceipt, token, from, to }) {
+      const logs = bundlerReceipt.logs
+      const block_num = bundlerReceipt.receipt.blockNumber.toString()
+      const tx_idx = bundlerReceipt.receipt.transactionIndex.toString()
+
+      const log_idx = token
+        ? logs.find(
+            ({ topics }) =>
+              topics[0] &&
+              topics[1] &&
+              topics[2] &&
+              isTransferTopic(topics[0]) &&
+              isAddressInTopic(topics[1], from) &&
+              isAddressInTopic(topics[2], to)
+          )?.logIndex
+        : logs
+            .find(
+              ({ topics }) =>
+                topics[0] &&
+                topics[1] &&
+                isReceiveTopic(topics[0]) &&
+                isAddressInTopic(topics[1], to)
+            )
+            ?.logIndex.toString()
+
+      const eventName = token ? 'send_account_transfers' : 'send_account_receives'
+      const eventId = `${eventName}/base_logs/${block_num}/${tx_idx}/${log_idx}`
+
+      return {
+        eventName,
+        eventId,
+      }
     },
   }
 }
