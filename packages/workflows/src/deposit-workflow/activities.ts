@@ -3,7 +3,7 @@ import { bootstrap } from '@my/workflows/utils'
 import { isRetryableDBError } from '@my/workflows/utils/isRetryableDBError'
 import { ApplicationFailure, log } from '@temporalio/activity'
 import { byteaToHex } from 'app/utils/byteaToHex'
-import { decodeDepositUserOp } from 'app/utils/decodeDepositUserOp'
+import { decodeSendEarnDepositUserOp } from 'app/utils/decodeSendEarnDepositUserOp'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import type { UserOperation } from 'permissionless'
 import superjson from 'superjson'
@@ -206,8 +206,9 @@ export const createDepositActivities = (
   const decodeDepositUserOpActivity = async (workflowId, userOp) => {
     log.info('Decoding deposit UserOperation', { workflowId })
     try {
-      const decoded = decodeDepositUserOp({ userOp })
+      const decoded = decodeSendEarnDepositUserOp({ userOp })
 
+      // @ts-expect-error FIXME: handle when deposit into send earn factory vs direct vault deposit
       if (!decoded || !decoded.owner || !decoded.assets || !decoded.vault) {
         log.error('Failed to decode deposit user op or missing required fields', {
           workflowId,
@@ -220,12 +221,14 @@ export const createDepositActivities = (
         workflowId,
         owner: decoded.owner,
         assets: decoded.assets,
+        // @ts-expect-error FIXME: handle when deposit into send earn factory vs direct vault deposit
         vault: decoded.vault,
       })
 
       return {
         owner: hexToBytea(decoded.owner),
         assets: decoded.assets,
+        // @ts-expect-error FIXME: handle when deposit into send earn factory vs direct vault deposit
         vault: hexToBytea(decoded.vault),
       }
     } catch (error) {
