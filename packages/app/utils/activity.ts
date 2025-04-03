@@ -251,11 +251,11 @@ export const isActivitySwapTransfer = (
  * @deprecated use useEventNameFromActivity instead
  * @returns the human readable event name of the activity
  */
-export function eventNameFromActivity(
-  activity: Activity,
-  swapRouters: SwapRouter[] = [],
-  liquidityPools: LiquidityPool[] = []
-): string {
+export function eventNameFromActivity({
+  activity,
+  swapRouters = [],
+  liquidityPools = [],
+}: { activity: Activity; swapRouters?: SwapRouter[]; liquidityPools?: LiquidityPool[] }): string {
   const { event_name, from_user, to_user, data } = activity
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
@@ -309,7 +309,10 @@ export function eventNameFromActivity(
  * @param activity
  * @returns the human readable event name of the activity
  */
-export function useEventNameFromActivity(activity: Activity): string {
+export function useEventNameFromActivity({
+  activity,
+  swapRouters = [],
+}: { activity: Activity; swapRouters?: SwapRouter[] }): string {
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const { data: addressBook } = useAddressBook()
 
@@ -327,8 +330,8 @@ export function useEventNameFromActivity(activity: Activity): string {
       return 'Withdraw'
     }
     // this should have always been a hook
-    return eventNameFromActivity(activity)
-  }, [activity, addressBook, isERC20Transfer])
+    return eventNameFromActivity({ activity, swapRouters })
+  }, [activity, addressBook, isERC20Transfer, swapRouters])
 }
 
 /**
@@ -338,11 +341,11 @@ export function useEventNameFromActivity(activity: Activity): string {
  * @param liquidityPools - Optional list of liquidity pools to validate the activity against.
  * @returns
  */
-export function phraseFromActivity(
-  activity: Activity,
-  swapRouters: SwapRouter[] = [],
-  liquidityPools: LiquidityPool[] = []
-): string {
+export function phraseFromActivity({
+  activity,
+  swapRouters = [],
+  liquidityPools = [],
+}: { activity: Activity; swapRouters?: SwapRouter[]; liquidityPools?: LiquidityPool[] }): string {
   const { event_name, from_user, to_user, data } = activity
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
@@ -395,7 +398,11 @@ export function phraseFromActivity(
  * @param activity
  * @returns the phrase for event name of the activity for activity details
  */
-export function usePhraseFromActivity(activity: Activity): string {
+export function usePhraseFromActivity({
+  activity,
+  swapRouters = [],
+  liquidityPools = [],
+}: { activity: Activity; swapRouters?: SwapRouter[]; liquidityPools?: LiquidityPool[] }): string {
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const { data: addressBook } = useAddressBook()
   const isSendEarnDeposit = isSendEarnDepositEvent(activity)
@@ -414,18 +421,20 @@ export function usePhraseFromActivity(activity: Activity): string {
       return 'Withdrew from Send Earn'
     }
     // this should have always been a hook
-    return phraseFromActivity(activity)
-  }, [activity, addressBook, isERC20Transfer, isSendEarnDeposit])
+    return phraseFromActivity({ activity, swapRouters, liquidityPools })
+  }, [activity, addressBook, isERC20Transfer, isSendEarnDeposit, swapRouters, liquidityPools])
 }
 
 /**
  * Returns the subtext of the activity if there is one.
  */
-export function subtextFromActivity(
-  activity: Activity,
-  swapRouters: SwapRouter[] = [],
-  liquidityPools: LiquidityPool[] = []
-): string | null {
+export function subtextFromActivity({
+  activity,
+  swapRouters = [],
+  liquidityPools = [],
+}: { activity: Activity; swapRouters?: SwapRouter[]; liquidityPools?: LiquidityPool[] }):
+  | string
+  | null {
   const _user = counterpart(activity)
   const { from_user, to_user, data } = activity
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
@@ -485,7 +494,15 @@ export function subtextFromActivity(
   return null
 }
 
-export function useSubtextFromActivity(activity: Activity): string | null {
+export function useSubtextFromActivity({
+  activity,
+  swapRouters = [],
+  liquidityPools = [],
+}: {
+  activity: Activity
+  swapRouters?: SwapRouter[]
+  liquidityPools?: LiquidityPool[]
+}): string | null {
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const { data: addressBook } = useAddressBook()
   return useMemo(() => {
@@ -501,8 +518,8 @@ export function useSubtextFromActivity(activity: Activity): string | null {
       }
     }
     // this should have always been a hook
-    return subtextFromActivity(activity)
-  }, [activity, addressBook, isERC20Transfer])
+    return subtextFromActivity({ activity, swapRouters, liquidityPools })
+  }, [activity, addressBook, isERC20Transfer, swapRouters, liquidityPools])
 }
 
 /**
