@@ -2318,6 +2318,7 @@ exports[`swap form screen should render 1`] = `
         >
           <View>
             <View
+              overflowY="hidden"
               style={
                 {
                   "alignSelf": "flex-start",
@@ -2327,7 +2328,6 @@ exports[`swap form screen should render 1`] = `
                   "borderTopColor": "transparent",
                   "flex": 1,
                   "flexDirection": "row",
-                  "overflow": "hidden",
                   "width": "100%",
                 }
               }
@@ -2961,6 +2961,7 @@ exports[`swap form screen should render 1`] = `
         >
           <View>
             <View
+              overflowY="hidden"
               style={
                 {
                   "alignSelf": "flex-start",
@@ -2970,7 +2971,6 @@ exports[`swap form screen should render 1`] = `
                   "borderTopColor": "transparent",
                   "flex": 1,
                   "flexDirection": "row",
-                  "overflow": "hidden",
                   "width": "100%",
                 }
               }

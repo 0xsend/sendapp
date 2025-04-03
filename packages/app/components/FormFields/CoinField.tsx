@@ -162,7 +162,8 @@ export const CoinField = ({
                   boc={'transparent'}
                   f={1}
                   maxHeight={isTouchable ? 'unset' : 275}
-                  overflow={isTouchable ? 'hidden' : 'scroll'}
+                  // @ts-expect-error tamagui tripping here
+                  overflowY={isTouchable ? 'hidden' : 'scroll'}
                 >
                   <Select.Group disabled={disabled} space="$0" p={'$2'}>
                     {/* <Select.Label>{label}</Select.Label> */}
@@ -224,6 +225,7 @@ const CoinFieldItem = ({
       bw={0}
       br={'$4'}
       bc={'transparent'}
+      cursor={'pointer'}
       focusStyle={{ backgroundColor: 'transparent' }}
       hoverStyle={{ backgroundColor: 'transparent' }}
     >
