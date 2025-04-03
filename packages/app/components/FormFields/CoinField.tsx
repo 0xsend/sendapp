@@ -161,6 +161,8 @@ export const CoinField = ({
                   $sm={{ w: isTouchable ? '100%' : 320 }}
                   boc={'transparent'}
                   f={1}
+                  maxHeight={isTouchable ? 'unset' : 275}
+                  overflow={isTouchable ? 'hidden' : 'scroll'}
                 >
                   <Select.Group disabled={disabled} space="$0" p={'$2'}>
                     {/* <Select.Label>{label}</Select.Label> */}
