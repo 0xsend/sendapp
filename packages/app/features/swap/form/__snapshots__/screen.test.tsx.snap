@@ -850,6 +850,7 @@ exports[`swap form screen should render 1`] = `
                             "shadowRadius": 0,
                           }
                         }
+                        type="button"
                       >
                         <Text
                           lineBreakMode="clip"
@@ -1647,6 +1648,7 @@ exports[`swap form screen should render 1`] = `
                     }
                   }
                   testID="flipTokensButton"
+                  type="button"
                 >
                   <RNSVGSvgView
                     align="xMidYMid"
@@ -1860,6 +1862,7 @@ exports[`swap form screen should render 1`] = `
                         }
                       }
                       testID="slippageDetailsButton"
+                      type="button"
                     >
                       <RNSVGSvgView
                         align="xMidYMid"
@@ -2315,6 +2318,7 @@ exports[`swap form screen should render 1`] = `
         >
           <View>
             <View
+              overflowY="hidden"
               style={
                 {
                   "alignSelf": "flex-start",
@@ -2957,6 +2961,7 @@ exports[`swap form screen should render 1`] = `
         >
           <View>
             <View
+              overflowY="hidden"
               style={
                 {
                   "alignSelf": "flex-start",

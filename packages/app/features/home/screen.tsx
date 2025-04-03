@@ -59,7 +59,7 @@ function HomeBody(props: XStackProps) {
     )
 
   return (
-    <XStack w={'100%'} $gtLg={{ gap: '$5' }} $lg={{ f: 1, pt: '$3' }} {...props}>
+    <XStack w={'100%'} $gtLg={{ gap: '$5' }} $lg={{ f: 1, pt: '$3' }} minHeight={'100%'} {...props}>
       <YStack
         $gtLg={{ display: 'flex', w: '45%', gap: '$5', pb: 0 }}
         display={!selectedCoin ? 'flex' : 'none'}
@@ -93,7 +93,16 @@ function HomeBody(props: XStackProps) {
           <TokenBalanceCard />
         )}
         <YStack w={'100%'} ai={'center'}>
-          <Card bc={'$color1'} width="100%" p="$4">
+          <Card
+            bc={'$color1'}
+            width="100%"
+            p="$4"
+            $gtLg={{
+              maxHeight: 310,
+              // @ts-expect-error tamagui tripping here
+              overflowY: 'scroll',
+            }}
+          >
             <TokenBalanceList />
           </Card>
         </YStack>
