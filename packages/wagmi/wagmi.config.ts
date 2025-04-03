@@ -451,6 +451,11 @@ export default defineConfig({
           [baseLocal.id]: '0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6', // base localnet
           ...deployedSendMerkleDrop,
         },
+        SendVerifierProxy: {
+          [base.id]: '0x339960716f26c318f9c28c3efc363246f274f859',
+          [baseLocal.id]: '0x339960716f26c318f9c28c3efc363246f274f859',
+          [baseSepolia.id]: '0xc578475d39894163a07cb31dbb704e2c9a907c39',
+        },
       },
       include: [
         'Send*.sol/*',
