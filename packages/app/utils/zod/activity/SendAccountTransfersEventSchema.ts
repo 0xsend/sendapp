@@ -24,6 +24,10 @@ export const TransferDataSchema = OnchainEventDataSchema.extend({
    * The value of the transaction
    */
   v: decimalStrToBigInt,
+  /**
+   * Note attached to transaction, encoded as URI component
+   */
+  note: z.string().optional(),
 })
   .extend({
     coin: CoinSchema.optional(),
