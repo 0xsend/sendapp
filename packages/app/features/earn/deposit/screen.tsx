@@ -48,7 +48,7 @@ import {
 import { useSendEarnDepositCalls, useSendEarnDepositVault } from './hooks'
 
 const log = debug('app:earn:deposit')
-const MINIMUM_DEPOSIT = BigInt(10 * 1e6) // 10 USDC
+const MINIMUM_DEPOSIT = BigInt(5 * 1e6) // 5 USDC
 
 const DepositFormSchema = z.object({
   amount: formFields.text,
