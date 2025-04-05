@@ -53,7 +53,6 @@ export const NoteField = forwardRef<
   useEffect(() => {
     if (ref.current && isWeb && field.value !== undefined) {
       const textAreaElement = ref.current as unknown as HTMLTextAreaElement
-      // Access .current directly instead of composedRefs[0]?.current
 
       if (textAreaElement.value !== field.value) {
         textAreaElement.value = field.value
