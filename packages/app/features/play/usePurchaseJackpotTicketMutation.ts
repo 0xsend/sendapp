@@ -1,6 +1,10 @@
 import { useMemo } from 'react'
 import { encodeFunctionData, erc20Abi, type Address, type Hex, isAddress } from 'viem'
-import { baseJackpotAbi, baseJackpotAddress } from '@my/wagmi/contracts/base-jackpot'
+import {
+  baseJackpotAbi,
+  baseJackpotAddress,
+  useReadBaseJackpotTicketPrice,
+} from '@my/wagmi/contracts/base-jackpot'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useUserOp } from 'app/utils/userop'
 import { useUSDCFees } from 'app/utils/useUSDCFees'
@@ -8,7 +12,7 @@ import { assert } from 'app/utils/assert'
 
 export type UsePurchaseJackpotTicketArgs = {
   tokenAddress?: Address // Address of the token used for tickets (e.g., SEND)
-  ticketPrice?: bigint // Price of ONE ticket
+  // ticketPrice is now fetched via hook
   quantity?: number // Number of tickets to purchase
   referrer?: Address // Optional referrer address
   recipient?: Address // Address receiving the ticket (usually the sender)
@@ -22,7 +26,7 @@ export type UsePurchaseJackpotTicketArgs = {
  */
 export function usePurchaseJackpotTicket({
   tokenAddress,
-  ticketPrice,
+  // ticketPrice removed from args
   quantity = 1, // Default to purchasing 1 ticket if quantity is not provided
   // Default referrer to address(0) if not provided
   referrer = '0x0000000000000000000000000000000000000000',
@@ -31,25 +35,33 @@ export function usePurchaseJackpotTicket({
   const { data: sendAccount } = useSendAccount()
   const sender = useMemo(() => sendAccount?.address, [sendAccount?.address])
 
+  // Fetch the current ticket price from the contract
+  const {
+    data: ticketPrice,
+    error: ticketPriceError,
+    isLoading: isLoadingTicketPrice,
+  } = useReadBaseJackpotTicketPrice()
+
   // Construct the calls array for approving the token and purchasing the ticket
   const calls = useMemo(() => {
-    // Ensure all required parameters are valid before constructing calls
-    if (
-      !tokenAddress ||
-      !ticketPrice ||
-      ticketPrice <= 0n ||
-      quantity <= 0 || // Ensure quantity is positive
-      !recipient ||
-      !sender ||
-      !isAddress(tokenAddress) ||
-      !isAddress(recipient) ||
-      !isAddress(referrer) ||
-      !isAddress(sender)
-    ) {
+    // Return undefined if ticketPrice is not yet loaded or invalid
+    if (typeof ticketPrice !== 'bigint' || ticketPrice <= 0n) {
       return undefined
     }
 
+    // Ensure other required parameters are valid before constructing calls
+    assert(tokenAddress !== undefined, 'tokenAddress is required')
+    assert(isAddress(tokenAddress), 'tokenAddress must be a valid address')
+    assert(quantity > 0, 'quantity must be greater than 0')
+    assert(recipient !== undefined, 'recipient is required')
+    assert(isAddress(recipient), 'recipient must be a valid address')
+    // referrer has a default, so no need to check for undefined
+    assert(isAddress(referrer), 'referrer must be a valid address')
+    assert(sender !== undefined, 'sender is required')
+    assert(isAddress(sender), 'sender must be a valid address')
+
     // Calculate total cost based on ticket price and quantity
+    // We've asserted ticketPrice is a valid bigint > 0n above
     const totalCost = ticketPrice * BigInt(quantity)
 
     // 1. Encode approve call data for the total cost
@@ -82,7 +94,7 @@ export function usePurchaseJackpotTicket({
         data: purchaseCallData,
       },
     ]
-    // Add quantity to dependency array
+    // Add quantity and fetched ticketPrice to dependency array
   }, [tokenAddress, ticketPrice, quantity, recipient, referrer, sender])
 
   // Use useUserOp hook to estimate the UserOperation based on the sender and calls
@@ -111,10 +123,10 @@ export function usePurchaseJackpotTicket({
   })
 
   // Combine loading states
-  const isLoading = isLoadingUserOp || isLoadingUSDCFees
+  const isLoading = isLoadingUserOp || isLoadingUSDCFees || isLoadingTicketPrice
 
-  // Combine errors - prioritize userOpError if both exist
-  const error = userOpError || usdcFeesError
+  // Combine errors - prioritize userOpError, then ticketPriceError
+  const error = userOpError || ticketPriceError || usdcFeesError
 
   return {
     userOp, // The prepared UserOperation (unsigned)
@@ -123,6 +135,9 @@ export function usePurchaseJackpotTicket({
     usdcFees, // Estimated fees in USDC
     usdcFeesError,
     isLoadingUSDCFees,
+    ticketPrice, // Expose fetched ticket price
+    ticketPriceError,
+    isLoadingTicketPrice,
     isLoading, // Combined loading state
     error, // Combined error state
     calls, // Expose calls for potential debugging or inspection

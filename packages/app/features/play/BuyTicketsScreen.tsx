@@ -109,7 +109,7 @@ export function BuyTicketsScreen() {
     error: preparationError,
   } = usePurchaseJackpotTicket({
     tokenAddress: tokenAddress as Address,
-    ticketPrice: ticketPriceBigInt as bigint, // Explicit cast to satisfy TS
+    // ticketPrice is now fetched within the hook
     quantity: Number(numTickets), // Pass the calculated number of tickets
     recipient: senderAddress as Address,
     // Referrer can be added if needed: referrer: '0x...'
