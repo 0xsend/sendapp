@@ -48,8 +48,6 @@ export const NoteField = forwardRef<
   const ref = useRef<TamaguiElement>(null)
   const composedRefs = useComposedRefs<TamaguiElement>(forwardedRef, field.ref, ref)
 
-  const isNoteTooLong = (field.value?.length ?? 0) > MAX_NOTE_LENGTH
-
   useEffect(() => {
     if (ref.current && isWeb && field.value !== undefined) {
       const textAreaElement = ref.current as unknown as HTMLTextAreaElement
@@ -114,7 +112,7 @@ export const NoteField = forwardRef<
             ref={composedRefs}
             placeholder={placeholder ?? 'Add a note'}
             id={id}
-            boc={isNoteTooLong ? '$error' : '$color1'}
+            boc={error ? '$error' : '$color1'}
             focusStyle={{
               fontStyle: 'italic',
               borderColor: '$color12',

@@ -51,7 +51,7 @@ export function SendAmountForm() {
   const noteFieldRef = useRef<TamaguiElement>(null)
   const { resolvedTheme } = useThemeSetting()
 
-  const formNote = form.watch('note')
+  const noteValidationError = form.formState.errors.note
 
   const onFormChange = useDebounce(
     useCallback(
@@ -60,6 +60,16 @@ export function SendAmountForm() {
         const token = _token as allCoins[number]['token']
         const sanitizedAmount = sanitizeAmount(amount, allCoinsDict[token]?.decimals)
 
+        const noteValidation = formFields.note.safeParse(note)
+        if (noteValidation.error) {
+          form.setError('note', {
+            message:
+              noteValidation.error.errors[0]?.message ??
+              'Note failed to match validation constraints',
+          })
+        } else {
+          form.clearErrors('note')
+        }
         setSendParams(
           {
             ...sendParams,
@@ -70,7 +80,7 @@ export function SendAmountForm() {
           { webBehavior: 'replace' }
         )
       },
-      [setSendParams, sendParams]
+      [setSendParams, sendParams, form]
     ),
     300,
     { leading: false },
@@ -91,15 +101,13 @@ export function SendAmountForm() {
   const parsedAmount = BigInt(sendParams.amount ?? '0')
   const formAmount = form.watch('amount')
 
-  const isNoteTooLong = (formNote?.length ?? 0) > MAX_NOTE_LENGTH
-
   const canSubmit =
     !isLoadingCoins &&
     coin?.balance !== undefined &&
     sendParams.amount !== undefined &&
     coin.balance >= parsedAmount &&
     parsedAmount > BigInt(0) &&
-    !isNoteTooLong
+    !noteValidationError
 
   const insufficientAmount =
     coin?.balance !== undefined && sendParams.amount !== undefined && parsedAmount > coin?.balance
@@ -121,9 +129,10 @@ export function SendAmountForm() {
 
   const handleNoteClearClick = () => {
     form.setValue('note', '' as string & BRAND<'note'>)
+    form.clearErrors('note')
   }
 
-  const noteBorderActiveColor = isNoteTooLong
+  const noteBorderActiveColor = form.formState.errors.note
     ? '$error'
     : resolvedTheme?.startsWith('dark')
       ? '$primary'
@@ -347,12 +356,15 @@ export function SendAmountForm() {
                 </YStack>
                 <YStack gap={'$2'}>
                   {note}
-                  {(isNoteInputFocused || isNoteTooLong) && (
+                  {(isNoteInputFocused || noteValidationError) && (
                     <Paragraph
-                      color={isNoteTooLong ? '$error' : '$lightGrayTextField'}
+                      color={noteValidationError ? '$error' : '$lightGrayTextField'}
                       $theme-light={{ color: '$darkGrayTextField' }}
                     >
-                      Max: {MAX_NOTE_LENGTH} characters
+                      {noteValidationError
+                        ? noteValidationError.message
+                        : `Max: ${MAX_NOTE_LENGTH}
+                      characters`}
                     </Paragraph>
                   )}
                 </YStack>
