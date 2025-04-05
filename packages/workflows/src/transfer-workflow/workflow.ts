@@ -16,6 +16,7 @@ const {
   sendUserOpActivity,
   waitForTransactionReceiptActivity,
   getEventFromTransferActivity,
+  isTransferInActivityFeedActivity,
 } = proxyActivities<ReturnType<typeof createTransferActivities>>({
   // TODO: make this configurablea
   startToCloseTimeout: '10 minutes',
@@ -116,6 +117,8 @@ export async function transfer(userOp: UserOperation<'v0.7'>, note?: string) {
     from,
     to,
   })
+
+  await isTransferInActivityFeedActivity(workflowId, eventName, eventId)
 
   await updateTemporalSendAccountTransferActivity({
     workflowId,

@@ -1,4 +1,4 @@
-import type { Database } from '@my/supabase/database.types'
+import type { Database, PgBytea } from '@my/supabase/database.types'
 import type { PostgrestError } from '@supabase/supabase-js'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 
@@ -46,6 +46,14 @@ export async function updateTemporalSendAccountTransfer({
     .eq('workflow_id', workflow_id)
     .select('*')
     .single()
+}
+
+export async function isTransferInActivityFeed(eventName: string, eventId: string) {
+  return await supabaseAdmin
+    .from('activity')
+    .select('*', { count: 'exact', head: true })
+    .eq('eventName', eventName)
+    .eq('eventId', eventId)
 }
 
 export function isRetryableDBError(error: PostgrestError) {
