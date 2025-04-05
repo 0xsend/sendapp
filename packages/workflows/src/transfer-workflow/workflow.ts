@@ -15,12 +15,13 @@ const {
   updateTemporalSendAccountTransferActivity,
   sendUserOpActivity,
   waitForTransactionReceiptActivity,
+  getEventFromTransferActivity,
 } = proxyActivities<ReturnType<typeof createTransferActivities>>({
   // TODO: make this configurablea
   startToCloseTimeout: '10 minutes',
 })
 
-export async function transfer(userOp: UserOperation<'v0.7'>) {
+export async function transfer(userOp: UserOperation<'v0.7'>, note?: string) {
   const workflowId = workflowInfo().workflowId
   debugLog('Starting SendTransfer Workflow with userOp:', workflowId)
   await upsertTemporalSendAccountTransferActivity({
@@ -64,6 +65,7 @@ export async function transfer(userOp: UserOperation<'v0.7'>) {
           t: hexToBytea(to),
           v: amount.toString(),
           log_addr: hexToBytea(token),
+          note,
         },
       })
     : await updateTemporalSendAccountTransferActivity({
@@ -74,6 +76,7 @@ export async function transfer(userOp: UserOperation<'v0.7'>) {
           sender: hexToBytea(from),
           value: amount.toString(),
           log_addr: hexToBytea(to),
+          note,
         },
       })
   debugLog('Inserted temporal transfer into temporal.send_account_transfers', workflowId)
@@ -103,9 +106,16 @@ export async function transfer(userOp: UserOperation<'v0.7'>) {
       workflow_id: workflowId,
       status: 'failed',
     })
-    throw ApplicationFailure.nonRetryable('Error sending user operation', error.code, error)
+    throw ApplicationFailure.nonRetryable('Error sending user operation', error.code, error.details)
   })
   debugLog('Receipt received:', { tx_hash: bundlerReceipt.receipt.transactionHash })
+
+  const { eventName, eventId } = await getEventFromTransferActivity({
+    bundlerReceipt,
+    token,
+    from,
+    to,
+  })
 
   await updateTemporalSendAccountTransferActivity({
     workflowId,
@@ -114,6 +124,8 @@ export async function transfer(userOp: UserOperation<'v0.7'>) {
       ...(sentTransfer.data as Record<string, unknown>),
       tx_hash: hexToBytea(bundlerReceipt.receipt.transactionHash),
       block_num: bundlerReceipt.receipt.blockNumber.toString(),
+      event_name: eventName,
+      event_id: eventId,
     },
   })
   return hash
