@@ -45,9 +45,13 @@ export function useTokenActivityFeed(params: {
           `event_name.eq.${Events.SendAccountTransfers},event_name.eq.${Events.TemporalSendAccountTransfers}`
         )
     } else {
-      query = query.or(
-        `event_name.eq.${Events.SendAccountReceive},event_name.eq.${Events.TemporalSendAccountTransfers}`
-      )
+      // @todo currently will show transfers that fail validation in eth activity
+      // This is because sender is defined but log_addr is null
+      query = query
+        .not('data->>sender', 'is', null)
+        .or(
+          `event_name.eq.${Events.SendAccountReceive},event_name.eq.${Events.TemporalSendAccountTransfers}`
+        )
     }
 
     const paymasterAddresses = Object.values(tokenPaymasterAddress)
