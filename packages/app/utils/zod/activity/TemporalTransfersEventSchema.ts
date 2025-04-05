@@ -23,9 +23,9 @@ export const temporalTransferStatus = z.enum([
 const BaseTemporalTransfersDataSchema = z.object({
   status: temporalTransferStatus,
   log_addr: byteaToHexEthAddress,
-  user_op_hash: byteaToHexTxHash.nullable(),
-  tx_hash: byteaToHexTxHash.nullable(),
-  block_num: decimalStrToBigInt.nullable(),
+  user_op_hash: byteaToHexTxHash.nullable().optional(),
+  tx_hash: byteaToHexTxHash.nullable().optional(),
+  block_num: decimalStrToBigInt.nullable().optional(),
   note: z.string().nullable().optional(),
 })
 
