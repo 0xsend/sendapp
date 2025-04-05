@@ -3,6 +3,7 @@ import {
   upsertTemporalSendAccountTransfer,
   updateTemporalSendAccountTransfer,
   isRetryableDBError,
+  getActivityTableIdFromEvent,
   type TemporalTransfer,
   type TemporalTransferInsert,
   type TemporalTransferUpdate,
@@ -41,9 +42,14 @@ type TransferActivities = {
     from: Address
     to: Address
   }) => Promise<{
-    eventName: string
-    eventId: string
+    event_name: string
+    event_id: string
   }>
+  getActivityIdFromEventActivity: (
+    workflowId: string,
+    eventName: string,
+    eventId: string
+  ) => Promise<number>
 }
 
 export const createTransferActivities = (
@@ -199,13 +205,28 @@ export const createTransferActivities = (
             )
             ?.logIndex.toString()
 
-      const eventName = token ? 'send_account_transfers' : 'send_account_receives'
-      const eventId = `${eventName}/base_logs/${block_num}/${tx_idx}/${log_idx}`
+      const event_name = token ? 'send_account_transfers' : 'send_account_receives'
+      const event_id = `${event_name}/base_logs/${block_num}/${tx_idx}/${log_idx}`
 
       return {
-        eventName,
-        eventId,
+        event_name,
+        event_id,
       }
+    },
+    async getActivityIdFromEventActivity(workflowId, eventName, eventId) {
+      const { data, error } = await getActivityTableIdFromEvent(eventName, eventId)
+      if (error || !data) {
+        throw ApplicationFailure.retryable(
+          `No activity found with event name ${eventName} and event id ${eventId}, retrying...`,
+          error.code,
+          {
+            error,
+            workflowId,
+          }
+        )
+      }
+
+      return data.id
     },
   }
 }
