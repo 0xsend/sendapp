@@ -4,155 +4,173 @@ import { FlatList } from 'react-native'
 import {
   useReadBaseJackpotLpPoolTotal,
   useReadBaseJackpotTokenDecimals,
-  useReadBaseJackpotUsersInfo, // Import the hook for user info
-} from '@my/wagmi/contracts/base-jackpot'
+} from '@my/wagmi/contracts/base-jackpot' // Removed useReadBaseJackpotUsersInfo
 import { useSendAccount } from 'app/utils/send-accounts'
-import { formatUnits, zeroAddress } from 'viem' // Import zeroAddress
+import { formatUnits } from 'viem' // Removed zeroAddress if unused
+import { useUserJackpotSummary } from 'app/utils/useUserJackpotSummary'
+import type { Functions } from '@my/supabase/database.types'
 
 // Define the structure for a general drawing history entry
-// User-specific details are optional or can be 0
+// User-specific details for *past* drawings are no longer available from the hook
 export type DrawingHistoryEntry = {
   id: string // Unique ID for the drawing period
   drawDate: string // Date of the weekly drawing
   prizePool: number // Total prize pool for this drawing
   winner?: string // Address or sendtag of the winner (undefined if pending or no winner yet)
   totalTicketsPurchased: number // Total tickets bought *by the user* for this drawing (can be 0)
-  result?: 'won' | 'lost' | 'pending' // Result *for the user* (undefined if not participated)
+  result?: 'won' | 'lost' | 'pending' // Result *for the user*
 }
 
-// Helper function to format dates
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString)
-  // Using UTC methods to avoid timezone issues if dates are meant to be specific days
-  return date.toLocaleDateString('en-US', {
-    timeZone: 'UTC', // Assuming draw dates are based on UTC or a specific timezone
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
+// Helper function to format dates (or block numbers as fallback)
+const formatDateOrBlock = (blockNum: number | null, dateString?: string) => {
+  if (dateString && dateString !== 'Upcoming') {
+    try {
+      const date = new Date(dateString)
+      return date.toLocaleDateString('en-US', {
+        timeZone: 'UTC', // Assuming draw dates are based on UTC or a specific timezone
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      })
+    } catch (e) {
+      // Fallback if dateString is invalid
+    }
+  }
+  if (blockNum) {
+    return `Block ${blockNum}` // Fallback to block number if no valid date
+  }
+  return 'N/A' // Default fallback
 }
-
-// Initial mock data *without* the current pending entry
-// We will add the current entry dynamically after fetching data
-const initialHistory: DrawingHistoryEntry[] = [
-  // Previous drawings
-  {
-    id: 'draw-2025-03-28', // Assuming today is around March 31st, this is the most recent completed draw
-    drawDate: '2025-03-28',
-    totalTicketsPurchased: 10,
-    result: 'lost',
-    prizePool: 10000,
-    winner: '/Alice', // Example winner sendtag
-  },
-  {
-    id: 'draw-2025-03-21',
-    drawDate: '2025-03-21',
-    totalTicketsPurchased: 5,
-    result: 'won', // User won this one
-    prizePool: 8500,
-    winner: '0x1234...abcd', // Example winner address (user's address in this case)
-  },
-  {
-    id: 'draw-2025-03-14',
-    drawDate: '2025-03-14',
-    totalTicketsPurchased: 0, // Example: User did not participate
-    result: undefined,
-    prizePool: 9200,
-    winner: '/Bob', // Example winner sendtag
-  },
-  {
-    id: 'draw-2025-03-07',
-    drawDate: '2025-03-07',
-    totalTicketsPurchased: 3,
-    result: 'lost',
-    prizePool: 7800,
-    winner: '0x5678...efgh', // Example winner address
-  },
-]
 
 // Renamed component to reflect general drawing history
 export const DrawingHistory = () => {
-  const [drawingHistory, setDrawingHistory] = useState<DrawingHistoryEntry[]>(initialHistory)
+  const [drawingHistory, setDrawingHistory] = useState<DrawingHistoryEntry[]>([]) // Start with empty array
 
   // --- Fetch Data ---
+  // Fetch current pool/token info
   const { data: lpPoolTotal, isLoading: isLoadingPoolTotal } = useReadBaseJackpotLpPoolTotal()
   const { data: tokenDecimals, isLoading: isLoadingDecimals } = useReadBaseJackpotTokenDecimals()
+  // Fetch user account info
   const { data: sendAccount, isLoading: isLoadingSendAccount } = useSendAccount()
+  // Fetch historical jackpot summary data (assuming it might include current)
+  const { data: summaryData, isLoading: isLoadingSummary } = useUserJackpotSummary(5)
 
-  // Fetch user's info (including ticket count) for the current round using the wagmi hook
-  const { data: userInfo, isLoading: isLoadingUserInfo } = useReadBaseJackpotUsersInfo({
-    userAddress: sendAccount?.address ?? zeroAddress,
-  })
-
-  // --- Format Data ---
-  const formattedJackpotAmount = useMemo(() => {
+  // --- Format Current Pool Data ---
+  const formattedCurrentJackpotAmount = useMemo(() => {
     if (typeof lpPoolTotal !== 'bigint' || tokenDecimals === undefined) {
-      return undefined // Return undefined when loading or data is missing
+      return undefined // Still loading current pool data
     }
-    return Number.parseFloat(formatUnits(lpPoolTotal, Number(tokenDecimals)))
+    const decimals = tokenDecimals ? Number(tokenDecimals) : 18
+    return Number.parseFloat(formatUnits(lpPoolTotal, decimals))
   }, [lpPoolTotal, tokenDecimals])
 
-  const currentUserTickets = useMemo(() => {
-    // userInfo is a tuple [ticketsPurchasedTotalBps, winningsClaimable, active]
-    // Extract ticketsPurchasedTotalBps from the first element (index 0)
-    if (
-      userInfo &&
-      Array.isArray(userInfo) &&
-      userInfo.length > 0 &&
-      typeof userInfo[0] === 'bigint'
-    ) {
-      // Assuming ticketsPurchasedTotalBps is the actual count for now.
-      // If it's basis points, further calculation might be needed.
-      return Number(userInfo[0] / 7000n)
-    }
-    return undefined // Return undefined if data is not loaded or not in expected format
-  }, [userInfo])
-
-  // --- Update State with Current Drawing Info ---
+  // --- Combine and Update State ---
   useEffect(() => {
-    // Determine if we have the necessary data to construct the current entry
-    const canUpdateCurrent =
-      formattedJackpotAmount !== undefined && // Jackpot amount is calculated
-      !isLoadingSendAccount && // Send account loading is finished
-      (!sendAccount || !isLoadingUserInfo) // If user has account, wait for userInfo query
+    // Combine loading states for current pool info
+    const isLoadingCurrentPool = isLoadingPoolTotal || isLoadingDecimals
 
-    if (canUpdateCurrent) {
-      const currentEntry: DrawingHistoryEntry = {
-        id: 'draw-current', // Use a consistent ID for the current entry
-        drawDate: 'Upcoming', // Placeholder date for current
-        totalTicketsPurchased: sendAccount ? currentUserTickets ?? 0 : 0, // Use fetched tickets or 0 if no account/loading/error
-        result: 'pending',
-        prizePool: formattedJackpotAmount ?? 0, // Use formatted amount or 0
-      }
-
-      // Update the state by prepending the current entry to the historical data
-      setDrawingHistory([currentEntry, ...initialHistory])
-    } else {
-      // If data isn't ready, ensure the list only shows historical data
-      // or potentially a placeholder loading state for the current entry if desired
-      setDrawingHistory(initialHistory) // Or potentially add a loading placeholder entry
+    // Only proceed if summary data is loaded (or errored)
+    if (isLoadingSummary) {
+      // setDrawingHistory([]); // Optionally clear while loading summary
+      return
     }
-    // Dependencies: Include all variables that trigger a recalculation/update
+
+    const userAddressLower = sendAccount?.address?.toLowerCase()
+    const summaryResults =
+      (summaryData as Functions<'get_user_jackpot_summary'> | undefined | null) ?? []
+
+    let currentRunData: Functions<'get_user_jackpot_summary'>[number] | undefined = undefined
+    const historicalEntries: DrawingHistoryEntry[] = []
+
+    // Process summary results, separating potential current run from historical
+    for (const run of summaryResults) {
+      // Heuristic to identify current run: winner is null or undefined
+      // Adjust this condition if the RPC function has a better way to indicate the current run
+      if (run.winner === null || run.winner === undefined) {
+        currentRunData = run
+      } else {
+        // This is a historical run
+        const userTickets = run.total_tickets ?? 0
+        let resultStatus: 'won' | 'lost' | undefined = undefined
+        if (userAddressLower && run.winner) {
+          if (run.winner.toLowerCase() === userAddressLower) {
+            resultStatus = 'won'
+          } else if (userTickets > 0) {
+            resultStatus = 'lost'
+          }
+        }
+        historicalEntries.push({
+          id: `draw-${run.jackpot_run_id}`,
+          drawDate: formatDateOrBlock(run.jackpot_block_num),
+          prizePool: run.win_amount ?? 0,
+          winner: run.winner, // Winner is guaranteed non-null here
+          totalTicketsPurchased: userTickets,
+          result: resultStatus,
+        })
+      }
+    }
+
+    let combinedHistory = historicalEntries
+    const isLoadingCurrentSpecificData = isLoadingSendAccount || isLoadingCurrentPool
+
+    // Determine if we *can* create the current entry display
+    // Requires current pool amount and summary data (for tickets) to be loaded
+    const canDisplayCurrentEntry = formattedCurrentJackpotAmount !== undefined && !isLoadingSummary
+
+    if (canDisplayCurrentEntry) {
+      const currentTickets = currentRunData?.total_tickets ?? 0 // Get tickets from summary if available
+      const currentEntry: DrawingHistoryEntry = {
+        id: 'draw-current',
+        drawDate: 'Upcoming',
+        // Use tickets from summary if current run was included, otherwise default to 0
+        totalTicketsPurchased: sendAccount ? currentTickets : 0,
+        result: 'pending',
+        // Use live pool amount for current display
+        prizePool: formattedCurrentJackpotAmount ?? 0,
+        winner: undefined, // No winner yet
+      }
+      combinedHistory = [currentEntry, ...historicalEntries]
+    } else if (isLoadingCurrentSpecificData || isLoadingSummary) {
+      // Add loading placeholder if summary or current pool/account info is still loading
+      if (!isLoadingSummary || !isLoadingCurrentPool || !isLoadingSendAccount) {
+        // Avoid double loading indicator if initial summary is loading
+        const loadingEntry: DrawingHistoryEntry = {
+          id: 'draw-current-loading',
+          drawDate: 'Upcoming',
+          totalTicketsPurchased: 0,
+          result: 'pending',
+          prizePool: 0,
+          winner: '(Loading...)',
+        }
+        combinedHistory = [loadingEntry, ...historicalEntries]
+      }
+    }
+
+    setDrawingHistory(combinedHistory)
   }, [
-    formattedJackpotAmount,
-    currentUserTickets,
+    summaryData,
+    isLoadingSummary,
+    formattedCurrentJackpotAmount,
     sendAccount,
     isLoadingSendAccount,
-    isLoadingUserInfo, // Correct dependency
+    isLoadingPoolTotal,
+    isLoadingDecimals,
   ])
 
-  // Combined loading state for simplicity in rendering
-  const isLoadingCurrentData =
-    isLoadingPoolTotal || isLoadingDecimals || isLoadingSendAccount || isLoadingUserInfo
+  // Loading state for the initial fetch of summary data
+  const isLoadingInitialData = isLoadingSummary
 
   // Render item for the FlatList
   const renderDrawingEntry = ({ item }: { item: DrawingHistoryEntry }) => {
     const isCurrent = item.result === 'pending'
-    const displayTickets = isCurrent ? currentUserTickets : item.totalTicketsPurchased
-    const displayPrizePool = isCurrent ? formattedJackpotAmount : item.prizePool
+    // Use totalTicketsPurchased directly, as it comes from summaryData now
+    const displayTickets = item.totalTicketsPurchased
+    const displayPrizePool = item.prizePool
 
-    // Determine loading state specifically for this item if it's the current one
-    const itemIsLoading = isCurrent && isLoadingCurrentData
+    // Determine loading state specifically for the current item
+    // Check based on loading states for current pool and account info
+    const itemIsLoadingCurrent =
+      isCurrent && (isLoadingPoolTotal || isLoadingDecimals || isLoadingSendAccount)
 
     return (
       <YStack gap="$2" py="$3" px="$3.5" bc="$color1" br="$4" mb="$3">
@@ -160,45 +178,56 @@ export const DrawingHistory = () => {
           {/* Left Side: Date/Current and Tickets Purchased */}
           <YStack ai="flex-start" gap="$1">
             <H4 fontWeight="600" mt="$1">
-              {isCurrent ? 'Current' : formatDate(item.drawDate)}
+              {isCurrent ? 'Current' : formatDateOrBlock(null, item.drawDate)}
             </H4>
-            {/* Show ticket purchase info - handle loading/zero state */}
-            {/* Show ticket purchase info - handle loading/zero state only if user is logged in */}
+            {/* Show ticket purchase info if user is logged in */}
             {sendAccount && (
               <Paragraph color="$color10" fos="$3">
-                {itemIsLoading ? (
+                {/* Handle loading state for current item */}
+                {itemIsLoadingCurrent && isCurrent ? ( // Only show spinner for current item loading
                   <Spinner size="small" />
-                ) : displayTickets !== undefined && displayTickets > 0 ? (
+                ) : displayTickets > 0 ? (
                   `You purchased ${displayTickets} ticket${displayTickets !== 1 ? 's' : ''}`
                 ) : (
-                  'You purchased 0 tickets' // Show 0 if logged in, tickets loaded, and count is 0 or undefined
+                  'You purchased 0 tickets'
                 )}
               </Paragraph>
             )}
-            {/* Don't show ticket info at all if user is not logged in */}
           </YStack>
-          {/* Right Side: User Result and Prize Pool stacked */}
+          {/* Right Side: Result/Winner and Prize Pool stacked */}
           <YStack ai="flex-end" gap="$1">
-            {/* Winner Display Logic */}
+            {/* Result/Winner Display Logic */}
             {isCurrent ? (
               <Paragraph fos="$5" color="$color10" ta="right">
-                Winner: (Pending)
+                Winner: {item.winner ?? '(Pending)'}
+              </Paragraph>
+            ) : item.result === 'won' ? (
+              <Paragraph fos="$5" color="$green10" ta="right">
+                You Won! (Winner: {item.winner})
+              </Paragraph>
+            ) : item.result === 'lost' ? (
+              <Paragraph fos="$5" color="$red10" ta="right">
+                Lost (Winner: {item.winner})
               </Paragraph>
             ) : item.winner ? (
-              <Paragraph fos="$5" color="$green10" ta="right">
+              <Paragraph fos="$5" color="$color10" ta="right">
                 Winner: {item.winner}
               </Paragraph>
-            ) : null}
+            ) : (
+              <Paragraph fos="$5" color="$color10" ta="right">
+                Winner: (N/A)
+              </Paragraph>
+            )}
 
-            {/* Always show Prize Pool - handle loading state */}
+            {/* Always show Prize Pool - handle loading state for current */}
             <Paragraph fos="$4" color="$color10">
               Total Pool:{' '}
-              {itemIsLoading ? (
+              {itemIsLoadingCurrent && isCurrent ? ( // Only show spinner for current item loading
                 <Spinner size="small" />
               ) : displayPrizePool !== undefined ? (
-                `${displayPrizePool.toLocaleString(undefined, { maximumFractionDigits: 0 })} SEND` // Format with commas
+                `${displayPrizePool.toLocaleString(undefined, { maximumFractionDigits: 0 })} SEND`
               ) : (
-                '... SEND' // Fallback loading text
+                '... SEND'
               )}
             </Paragraph>
           </YStack>
@@ -210,35 +239,32 @@ export const DrawingHistory = () => {
   // *** Start of the main component return statement ***
   return (
     <YStack gap="$4" w="100%">
-      {/* Removed Active Tickets Section */}
-
       {/* Drawing History Section - Title Only */}
       <XStack ai="center" jc="space-between">
         <H2 fontWeight="600">Drawing History</H2>
-        {/* Removed Toggle Button */}
       </XStack>
       <Separator />
 
-      {/* Always attempt to render list or empty state */}
-      {drawingHistory.length > 0 ? (
+      {/* Render list or empty/loading state */}
+      {isLoadingInitialData && drawingHistory.length === 0 ? (
+        // Show spinner only during the initial load of summary data
+        <YStack ai="center" jc="center" p="$4">
+          <Spinner />
+        </YStack>
+      ) : drawingHistory.length > 0 ? (
         <FlatList
           data={drawingHistory}
           renderItem={renderDrawingEntry}
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
-          // Optional: Add ListHeaderComponent or ListFooterComponent if needed
         />
       ) : (
-        // Show empty state if no history (or only loading placeholder)
+        // Show empty state if not loading and history is empty
         <YStack ai="center" jc="center" p="$4">
-          {isLoadingCurrentData ? (
-            <Spinner /> // Show spinner if loading initial history/current data
-          ) : (
-            <Paragraph color="$color10">No drawing history available.</Paragraph>
-          )}
+          <Paragraph color="$color10">No drawing history available.</Paragraph>
         </YStack>
       )}
     </YStack>
   )
   // *** End of the main component return statement ***
-} // Closing brace for the component function
+}

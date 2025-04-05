@@ -8,7 +8,8 @@ import { assert } from 'app/utils/assert'
 
 export type UsePurchaseJackpotTicketArgs = {
   tokenAddress?: Address // Address of the token used for tickets (e.g., SEND)
-  ticketPrice?: bigint // Price of one ticket
+  ticketPrice?: bigint // Price of ONE ticket
+  quantity?: number // Number of tickets to purchase
   referrer?: Address // Optional referrer address
   recipient?: Address // Address receiving the ticket (usually the sender)
 }
@@ -22,6 +23,7 @@ export type UsePurchaseJackpotTicketArgs = {
 export function usePurchaseJackpotTicket({
   tokenAddress,
   ticketPrice,
+  quantity = 1, // Default to purchasing 1 ticket if quantity is not provided
   // Default referrer to address(0) if not provided
   referrer = '0x0000000000000000000000000000000000000000',
   recipient,
@@ -36,6 +38,7 @@ export function usePurchaseJackpotTicket({
       !tokenAddress ||
       !ticketPrice ||
       ticketPrice <= 0n ||
+      quantity <= 0 || // Ensure quantity is positive
       !recipient ||
       !sender ||
       !isAddress(tokenAddress) ||
@@ -46,18 +49,22 @@ export function usePurchaseJackpotTicket({
       return undefined
     }
 
-    // 1. Encode approve call data
+    // Calculate total cost based on ticket price and quantity
+    const totalCost = ticketPrice * BigInt(quantity)
+
+    // 1. Encode approve call data for the total cost
     const approveCallData = encodeFunctionData({
       abi: erc20Abi,
       functionName: 'approve',
-      args: [baseJackpotAddress, ticketPrice], // Approve jackpot contract to spend ticketPrice
+      args: [baseJackpotAddress, totalCost], // Approve jackpot contract to spend totalCost
     })
 
-    // 2. Encode purchaseTickets call data
+    // 2. Encode purchaseTickets call data using the total cost
+    // Assuming the contract's purchaseTickets function expects the total value/amount
     const purchaseCallData = encodeFunctionData({
       abi: baseJackpotAbi,
       functionName: 'purchaseTickets',
-      args: [referrer, ticketPrice, recipient],
+      args: [referrer, totalCost, recipient],
     })
 
     // Return the batch calls
@@ -75,7 +82,8 @@ export function usePurchaseJackpotTicket({
         data: purchaseCallData,
       },
     ]
-  }, [tokenAddress, ticketPrice, recipient, referrer, sender])
+    // Add quantity to dependency array
+  }, [tokenAddress, ticketPrice, quantity, recipient, referrer, sender])
 
   // Use useUserOp hook to estimate the UserOperation based on the sender and calls
   const {

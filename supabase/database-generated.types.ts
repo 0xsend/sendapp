@@ -1498,6 +1498,18 @@ export type Database = {
           referral_count: number
         }[]
       }
+      get_user_jackpot_summary: {
+        Args: {
+          num_runs: number
+        }
+        Returns: {
+          jackpot_run_id: number
+          jackpot_block_num: number
+          winner: string
+          win_amount: number
+          total_tickets: number
+        }[]
+      }
       insert_challenge: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -1679,39 +1691,6 @@ export type Database = {
         }
         Relationships: []
       }
-      send_pot_user_ticket_purchases: {
-        Row: {
-          created_at: string
-          created_at_block_num: number | null
-          data: Json | null
-          id: number
-          status: Database["temporal"]["Enums"]["transaction_status"]
-          updated_at: string
-          user_id: string | null
-          workflow_id: string
-        }
-        Insert: {
-          created_at?: string
-          created_at_block_num?: number | null
-          data?: Json | null
-          id?: number
-          status?: Database["temporal"]["Enums"]["transaction_status"]
-          updated_at?: string
-          user_id?: string | null
-          workflow_id: string
-        }
-        Update: {
-          created_at?: string
-          created_at_block_num?: number | null
-          data?: Json | null
-          id?: number
-          status?: Database["temporal"]["Enums"]["transaction_status"]
-          updated_at?: string
-          user_id?: string | null
-          workflow_id?: string
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never
@@ -1720,13 +1699,6 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      transaction_status:
-        | "initialized"
-        | "submitted"
-        | "sent"
-        | "confirmed"
-        | "failed"
-        | "cancelled"
       transfer_status:
         | "initialized"
         | "submitted"
