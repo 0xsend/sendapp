@@ -468,22 +468,26 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
                     {
                       "flexDirection": "column",
                       "gap": 2,
+                      "width": "min-content",
                     }
                   }
                 >
                   <View
                     style={
                       {
+                        "alignItems": "flex-end",
                         "backgroundColor": "#111f22",
                         "borderBottomLeftRadius": 9,
                         "borderBottomRightRadius": 9,
                         "borderTopLeftRadius": 9,
                         "borderTopRightRadius": 9,
                         "flexDirection": "column",
+                        "gap": 13,
                         "paddingBottom": 18,
                         "paddingLeft": 18,
                         "paddingRight": 18,
                         "paddingTop": 18,
+                        "width": "min-content",
                       }
                     }
                   >
@@ -493,6 +497,7 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
                           "alignItems": "center",
                           "flexDirection": "row-reverse",
                           "gap": 13,
+                          "width": "max-content",
                         }
                       }
                     >
@@ -746,6 +751,22 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
                         </Text>
                       </View>
                     </View>
+                    <Text
+                      style={
+                        {
+                          "color": "#B2B2B2",
+                          "fontFamily": "System",
+                          "fontSize": 19.2,
+                          "fontWeight": "400",
+                          "lineHeight": 21,
+                          "userSelect": "auto",
+                          "width": "100%",
+                        }
+                      }
+                      suppressHighlighting={true}
+                    >
+                      test note
+                    </Text>
                   </View>
                   <Text
                     style={

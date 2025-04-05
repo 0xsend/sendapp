@@ -170,22 +170,32 @@ const TransactionEntry = ({
   otherUserProfile?: AvatarProfileProps
   currentUserProfile?: AvatarProfileProps
 }) => {
-  const { created_at } = activity
+  const {
+    created_at,
+    data: { note },
+  } = activity
   const amount = amountFromActivity(activity)
   const date = new Date(created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
 
   return (
     <XStack justifyContent={sent ? 'flex-end' : 'flex-start'} testID="activityTest" my={'$2.5'}>
-      <YStack gap={'$1'}>
-        <YStack bg={'$color1'} p={'$4'} borderRadius={'$4'}>
-          <XStack gap={'$3'} alignItems={'center'} flexDirection={sent ? 'row-reverse' : 'row'}>
+      <YStack gap={'$1'} w={'min-content'}>
+        <YStack
+          bg={'$color1'}
+          p={'$4'}
+          br={'$4'}
+          w={'min-content'}
+          gap={'$3'}
+          ai={sent ? 'flex-end' : 'flex-start'}
+        >
+          <XStack gap={'$3'} ai={'center'} fd={sent ? 'row-reverse' : 'row'} w={'max-content'}>
             <AvatarProfile
               profile={sent ? currentUserProfile : otherUserProfile}
               mx="none"
               size="$5"
             />
             <YStack>
-              <XStack gap={'$2'} alignItems={'center'} flexDirection={sent ? 'row-reverse' : 'row'}>
+              <XStack gap={'$2'} ai={'center'} fd={sent ? 'row-reverse' : 'row'}>
                 {!sent && <IconArrowRight size={'$size.0.9'} rotate={'90deg'} color={'$olive'} />}
                 <Paragraph size={'$3'} color={'$color8'} theme={sent ? 'red' : 'green'}>
                   You {sent ? 'Sent' : 'Received'}
@@ -197,10 +207,23 @@ const TransactionEntry = ({
               <Paragraph size={'$7'}>{amount}</Paragraph>
             </YStack>
           </XStack>
+          {note && (
+            <Paragraph
+              size={'$5'}
+              color={'$silverChalice'}
+              w={'100%'}
+              whiteSpace={'pre-wrap'}
+              $theme-light={{
+                color: '$darkGrayTextField',
+              }}
+            >
+              {decodeURIComponent(note)}
+            </Paragraph>
+          )}
         </YStack>
         <Paragraph
           size={'$2'}
-          textAlign={sent ? 'right' : 'left'}
+          ta={sent ? 'right' : 'left'}
           color={'$color4'}
           $theme-light={{ color: '$silverChalice' }}
         >

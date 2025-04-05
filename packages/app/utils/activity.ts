@@ -164,6 +164,14 @@ export function amountFromActivity(activity: Activity): string {
   }
 }
 
+export const noteFromActivity = (activity: Activity) =>
+  isTemporalTokenTransfersEvent(activity) ||
+  isTemporalEthTransfersEvent(activity) ||
+  isSendAccountTransfersEvent(activity) ||
+  isSendAccountReceiveEvent(activity)
+    ? activity.data.note ?? null
+    : null
+
 /**
  * Determines if the given activity is a swap buy transfer.
  * A swap buy transfer is validated by checking if the sender or token address matches any address in the provided swap routers.

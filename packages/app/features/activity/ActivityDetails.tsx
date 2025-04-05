@@ -14,6 +14,7 @@ import {
   amountFromActivity,
   subtextFromActivity,
   isActivitySwapTransfer,
+  noteFromActivity,
 } from 'app/utils/activity'
 import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
 import { IconX } from 'app/components/icons'
@@ -39,6 +40,7 @@ export const ActivityDetails = ({
   const activityText = phraseFromActivity(activity, swapRouters, liquidityPools)
   const subText = subtextFromActivity(activity, swapRouters, liquidityPools)
   const amount = amountFromActivity(activity)
+  const note = noteFromActivity(activity)
 
   return (
     <Fade {...props}>
@@ -51,7 +53,7 @@ export const ActivityDetails = ({
           bg={'$color1'}
           br={'$6'}
           p={'$4'}
-          gap={'$5'}
+          gap={'$3.5'}
           $gtLg={{
             p: '$7',
           }}
@@ -128,6 +130,11 @@ export const ActivityDetails = ({
               </XStack>
             )}
           </XStack>
+          {note && (
+            <Paragraph size={'$7'} color={'$color10'} w={'100%'} whiteSpace={'pre-wrap'} pl="$3">
+              {decodeURIComponent(note)}
+            </Paragraph>
+          )}
           <Separator px="$4" bw="$0.75" borderRadius={'$4'} />
           <YStack gap={'$2'}>
             <XStack jc={'space-between'}>

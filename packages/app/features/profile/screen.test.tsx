@@ -63,6 +63,7 @@ jest.mock('./utils/useInterUserActivityFeed', () => ({
             to_user: { id: 2 },
             data: {
               v: 10000n,
+              note: 'test note',
             },
           },
         ],

@@ -19,6 +19,10 @@ export const SendAccountReceiveDataSchema = OnchainEventDataSchema.extend({
    * The coin of the transaction
    */
   coin: CoinSchema.optional().default(ethCoin),
+  /**
+   * The note attached to transaction, encoded as URI component
+   */
+  note: z.string().optional(),
 })
 
 export const SendAccountReceiveEventSchema = BaseEventSchema.extend({
