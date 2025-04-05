@@ -41,10 +41,11 @@ import { api } from 'app/utils/api'
 import { signUserOp } from 'app/utils/signUserOp'
 import { decodeTransferUserOp } from 'app/utils/decodeTransferUserOp'
 import type { UserOperation } from 'permissionless'
+import { MAX_NOTE_LENGTH } from 'app/components/FormFields/NoteField'
 
 export function SendConfirmScreen() {
   const [queryParams] = useSendScreenParams()
-  const { recipient, idType, sendToken, amount } = queryParams
+  const { recipient, idType, sendToken, amount, note } = queryParams
   const { data: profile, isLoading, error } = useProfileLookup(idType ?? 'tag', recipient ?? '')
 
   const router = useRouter()
@@ -58,9 +59,10 @@ export function SendConfirmScreen() {
           recipient: recipient,
           sendToken: sendToken,
           amount: amount,
+          note,
         },
       })
-  }, [recipient, idType, router, sendToken, amount])
+  }, [recipient, idType, router, sendToken, amount, note])
 
   if (error) throw new Error(error.message)
   if (isLoading && !profile) return <Spinner size="large" />
@@ -68,13 +70,14 @@ export function SendConfirmScreen() {
 }
 
 export function SendConfirm() {
-  const submitButtonRef = useRef<TamaguiElement | null>(null)
   const queryClient = useQueryClient()
   const router = useRouter()
   const [queryParams] = useSendScreenParams()
-  const { sendToken, recipient, idType, amount } = queryParams
+  const { sendToken, recipient, idType, amount, note } = queryParams
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
   const { coin: selectedCoin } = useCoinFromSendTokenParam()
+
+  const submitButtonRef = useRef<TamaguiElement | null>(null)
 
   // states for auth flow
   const [error, setError] = useState<Error | null>(null)
@@ -164,7 +167,7 @@ export function SendConfirm() {
       )
     )
 
-  const onEditAmount = () => {
+  const onEdit = () => {
     router.push({
       pathname: '/send',
       query: {
@@ -172,6 +175,7 @@ export function SendConfirm() {
         recipient,
         amount: amount ?? '',
         sendToken,
+        note,
       },
     })
   }
@@ -184,6 +188,7 @@ export function SendConfirm() {
       assert(nonce !== undefined, 'Nonce is not available')
       throwIf(feesPerGasError)
       assert(!!feesPerGas, 'Fees per gas is not available')
+      assert(!note || note.length <= MAX_NOTE_LENGTH, 'Note is too long')
 
       assert(selectedCoin?.balance >= BigInt(amount ?? '0'), 'Insufficient balance')
       const sender = sendAccount?.address as `0x${string}`
@@ -211,7 +216,7 @@ export function SendConfirm() {
       const validatedUserOp = await validateUserOp(userOp)
       assert(!!validatedUserOp, 'Operation expected to fail')
 
-      const { workflowId } = await transfer({ userOp: validatedUserOp })
+      const { workflowId } = await transfer({ userOp: validatedUserOp, note })
 
       if (workflowId) {
         await queryClient.invalidateQueries({
@@ -330,7 +335,7 @@ export function SendConfirm() {
               )}
             </YStack>
             <Paragraph
-              onPress={onEditAmount}
+              onPress={onEdit}
               cursor="pointer"
               hoverStyle={{ color: '$primary' }}
               size={'$5'}
@@ -366,6 +371,40 @@ export function SendConfirm() {
               )}
             </XStack>
           </YStack>
+        </YStack>
+        <YStack
+          bg={'$color1'}
+          br={'$6'}
+          p={'$6'}
+          gap={'$4.5'}
+          $gtSm={{
+            gap: '$5',
+          }}
+        >
+          <XStack gap={'$2'} ai={'center'} jc={'space-between'}>
+            <Paragraph
+              color={'$silverChalice'}
+              size={'$6'}
+              $theme-light={{
+                color: '$darkGrayTextField',
+              }}
+            >
+              Your note
+            </Paragraph>
+            <Paragraph
+              onPress={onEdit}
+              cursor="pointer"
+              hoverStyle={{ color: '$primary' }}
+              size={'$5'}
+              pl={'$2'}
+              textAlign={'right'}
+            >
+              edit
+            </Paragraph>
+          </XStack>
+          <Paragraph size={'$5'} whiteSpace={'pre-wrap'}>
+            {note ? decodeURIComponent(note) : '-'}
+          </Paragraph>
         </YStack>
         {error && (
           <ErrorMessage

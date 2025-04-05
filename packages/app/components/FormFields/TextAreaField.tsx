@@ -2,18 +2,19 @@ import { useThemeSetting } from '@tamagui/next-theme'
 import { useStringFieldInfo, useTsController } from '@ts-react/form'
 import { forwardRef, type ReactNode, useId } from 'react'
 import {
-  FieldError,
   Fieldset,
   Label,
-  type LabelProps,
-  Shake,
-  type TamaguiElement,
   TextArea,
   type TextAreaProps,
   Theme,
   type ThemeName,
-  useComposedRefs,
   useThemeName,
+  FieldError,
+  Shake,
+  type LabelProps,
+  Stack,
+  useComposedRefs,
+  type TamaguiElement,
 } from '@my/ui'
 
 export const TextAreaField = forwardRef<
@@ -50,6 +51,18 @@ export const TextAreaField = forwardRef<
           </Label>
         )}
         <Shake shakeKey={error?.errorMessage}>
+          {props.iconBefore && (
+            <Stack
+              pos={'absolute'}
+              top="50%"
+              p={'$3'}
+              left={2}
+              transform={'translateY(-50%)'}
+              zIndex={1}
+            >
+              {props.iconBefore}
+            </Stack>
+          )}
           <TextArea
             disabled={disabled}
             borderWidth={0}
@@ -78,6 +91,18 @@ export const TextAreaField = forwardRef<
             }}
             {...props}
           />
+          {props.iconAfter && (
+            <Stack
+              pos={'absolute'}
+              top="50%"
+              p={'$5'}
+              right={2}
+              transform={'translateY(-50%)'}
+              zIndex={1}
+            >
+              {props.iconAfter}
+            </Stack>
+          )}
         </Shake>
         <FieldError message={error?.errorMessage} />
       </Fieldset>
