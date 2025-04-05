@@ -6,6 +6,7 @@ import {
   type TemporalTransfer,
   type TemporalTransferInsert,
   type TemporalTransferUpdate,
+  isTransferInActivityFeed,
 } from './supabase'
 import type { UserOperation, GetUserOperationReceiptReturnType } from 'permissionless'
 import { bootstrap } from '@my/workflows/utils'
@@ -27,6 +28,11 @@ type TransferActivities = {
     token: Address | null
   }>
   updateTemporalSendAccountTransferActivity: (TemporalTransferUpdate) => Promise<TemporalTransfer>
+  isTransferInActivityFeedActivity: (
+    workflowId: string,
+    eventName: string,
+    eventId: string
+  ) => Promise<boolean>
   getEventFromTransferActivity: ({
     bundlerReceipt,
     token,
@@ -182,6 +188,17 @@ export const createTransferActivities = (
       }
 
       return upsertedData
+    },
+    async isTransferInActivityFeedActivity(workflowId, eventName, eventId) {
+      const { count, error } = await isTransferInActivityFeed(eventName, eventId)
+      if (error) {
+        throw ApplicationFailure.retryable('Not indexed, retrying...', error.code, {
+          error,
+          workflowId,
+        })
+      }
+
+      return count !== null && count > 0
     },
     async getEventFromTransferActivity({ bundlerReceipt, token, from, to }) {
       const logs = bundlerReceipt.logs
