@@ -269,9 +269,14 @@ function userOpQueryOptions({
           .then(({ callGasLimit: cgl, preVerificationGas }) => {
             userOp.callGasLimit = cgl
 
-            // if estimated preVerificationGas is higher than default, we use estimated with some buffer
-            if (preVerificationGas > userOp.preVerificationGas) {
-              userOp.preVerificationGas = wMulDown(preVerificationGas, parseUnits('1.25', 18)) // 125%
+            const preVerificationGasWithBuffer = wMulDown(
+              preVerificationGas,
+              parseUnits('1.25', 18)
+            ) // 125%
+
+            // if estimated preVerificationGas with buffers is higher than default, use it instead
+            if (preVerificationGasWithBuffer > userOp.preVerificationGas) {
+              userOp.preVerificationGas = preVerificationGasWithBuffer
             }
           })
       }

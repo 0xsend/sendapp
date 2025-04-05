@@ -1,6 +1,6 @@
 import { useThemeSetting } from '@tamagui/next-theme'
 import { useStringFieldInfo, useTsController } from '@ts-react/form'
-import { forwardRef, type ReactNode, useId } from 'react'
+import { forwardRef, type ReactNode, useEffect, useId, useRef } from 'react'
 import {
   Fieldset,
   Label,
@@ -15,9 +15,22 @@ import {
   Stack,
   useComposedRefs,
   type TamaguiElement,
+  isWeb,
 } from '@my/ui'
 
-export const TextAreaField = forwardRef<
+export const MAX_NOTE_LENGTH = 100
+const MIN_NOTE_ROWS = 1
+const MAX_NOTE_ROWS = 4
+const LINE_HEIGHT = 24
+const BASE_NOTE_HEIGHT = 60
+
+function adjustNoteFieldHeightForWeb(noteField: HTMLTextAreaElement) {
+  noteField.rows = MIN_NOTE_ROWS
+  const rows = Math.ceil((noteField.scrollHeight - BASE_NOTE_HEIGHT) / LINE_HEIGHT)
+  noteField.rows = Math.min(MAX_NOTE_ROWS, MIN_NOTE_ROWS + rows)
+}
+
+export const NoteField = forwardRef<
   TamaguiElement,
   TextAreaProps & { labelProps?: LabelProps; iconBefore?: ReactNode; iconAfter?: ReactNode }
 >((props, forwardedRef) => {
@@ -32,7 +45,23 @@ export const TextAreaField = forwardRef<
   const defaultTheme = useThemeName() as string
   const { resolvedTheme } = useThemeSetting()
   const themeName = (resolvedTheme ?? defaultTheme) as ThemeName
-  const composedRefs = useComposedRefs(forwardedRef, field.ref)
+  const ref = useRef<TamaguiElement>(null)
+  const composedRefs = useComposedRefs<TamaguiElement>(forwardedRef, field.ref, ref)
+
+  const isNoteTooLong = (field.value?.length ?? 0) > MAX_NOTE_LENGTH
+
+  useEffect(() => {
+    if (ref.current && isWeb && field.value !== undefined) {
+      const textAreaElement = ref.current as unknown as HTMLTextAreaElement
+      // Access .current directly instead of composedRefs[0]?.current
+
+      if (textAreaElement.value !== field.value) {
+        textAreaElement.value = field.value
+      }
+
+      adjustNoteFieldHeightForWeb(textAreaElement)
+    }
+  }, [field.value])
 
   return (
     <Theme name={error ? 'red' : themeName} forceClassName>
@@ -82,13 +111,16 @@ export const TextAreaField = forwardRef<
             value={field.value}
             onChangeText={(text) => field.onChange(text)}
             onBlur={field.onBlur}
+            // @ts-expect-error Tamagui no have TextArea
             ref={composedRefs}
-            placeholder={placeholder}
+            placeholder={placeholder ?? 'Add a note'}
             id={id}
+            boc={isNoteTooLong ? '$error' : '$color1'}
             focusStyle={{
               fontStyle: 'italic',
               borderColor: '$color12',
             }}
+            bw={1}
             {...props}
           />
           {props.iconAfter && (
@@ -110,4 +142,4 @@ export const TextAreaField = forwardRef<
   )
 })
 
-TextAreaField.displayName = 'TextAreaField'
+NoteField.displayName = 'NoteField'

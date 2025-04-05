@@ -13,6 +13,7 @@ import {
   TextAreaField,
   TextField,
   DateField,
+  NoteField,
 } from '../components/FormFields'
 import type { ComponentProps } from 'react'
 import { useFormContext } from 'react-hook-form'
@@ -48,6 +49,7 @@ export const formFields = {
   countrycode: createUniqueFieldSchema(z.string(), 'countrycode_select'),
   otp: createUniqueFieldSchema(z.string(), 'otp'),
   coin: createUniqueFieldSchema(z.string(), 'coin'),
+  note: createUniqueFieldSchema(z.string().max(100, 'Note cannot exceed 100 characters'), 'note'),
   date: z.date(),
 }
 
@@ -62,6 +64,7 @@ const mapping = [
   [formFields.countrycode, CountryCodeField] as const,
   [formFields.otp, OTPField] as const,
   [formFields.coin, CoinField],
+  [formFields.note, NoteField] as const,
   [formFields.date, DateField] as const,
 ] as const
 

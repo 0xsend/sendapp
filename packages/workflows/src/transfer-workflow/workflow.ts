@@ -1,28 +1,29 @@
-import { proxyActivities, workflowInfo } from '@temporalio/workflow'
+import { proxyActivities, workflowInfo, log, ApplicationFailure } from '@temporalio/workflow'
 import type { createTransferActivities } from './activities'
 import type { UserOperation } from 'permissionless'
 import superjson from 'superjson'
 import debug from 'debug'
 import { hexToBytea } from 'app/utils/hexToBytea'
 
-const log = debug('workflows:transfer')
+const debugLog = debug('workflows:transfer')
 
 const {
   upsertTemporalSendAccountTransferActivity,
-  simulateTransferActivity,
+  simulateUserOperationActivity,
   getBaseBlockNumberActivity,
   decodeTransferUserOpActivity,
   updateTemporalSendAccountTransferActivity,
   sendUserOpActivity,
   waitForTransactionReceiptActivity,
+  getEventFromTransferActivity,
 } = proxyActivities<ReturnType<typeof createTransferActivities>>({
   // TODO: make this configurablea
   startToCloseTimeout: '10 minutes',
 })
 
-export async function TransferWorkflow(userOp: UserOperation<'v0.7'>) {
+export async function transfer(userOp: UserOperation<'v0.7'>, note?: string) {
   const workflowId = workflowInfo().workflowId
-  log('Starting SendTransfer Workflow with userOp:', workflowId)
+  debugLog('Starting SendTransfer Workflow with userOp:', workflowId)
   await upsertTemporalSendAccountTransferActivity({
     workflowId,
     data: {
@@ -30,29 +31,41 @@ export async function TransferWorkflow(userOp: UserOperation<'v0.7'>) {
     },
   })
 
-  log('Simulating transfer', workflowId)
-  const _ = await simulateTransferActivity(workflowId, userOp)
-  log('Successfully simulated transfer', workflowId)
+  debugLog('Simulating transfer', workflowId)
+  const _ = await simulateUserOperationActivity(userOp).catch(async (error) => {
+    log.error('simulateUserOperationActivity failed', { error })
+    await updateTemporalSendAccountTransferActivity({
+      workflow_id: workflowId,
+      status: 'failed',
+    })
+    throw ApplicationFailure.nonRetryable(
+      'Error simulating user operation',
+      error.code,
+      error.details
+    )
+  })
+  debugLog('Successfully simulated transfer', workflowId)
 
-  log('Getting latest base block', workflowId)
+  debugLog('Getting latest base block', workflowId)
   const createdAtBlockNum = await getBaseBlockNumberActivity()
-  log('Base block:', { workflowId, createdAtBlockNum: createdAtBlockNum.toString() })
+  debugLog('Base block:', { workflowId, createdAtBlockNum: createdAtBlockNum.toString() })
 
-  log('Decoding transfer userOp', workflowId)
+  debugLog('Decoding transfer userOp', workflowId)
   const { token, from, to, amount } = await decodeTransferUserOpActivity(workflowId, userOp)
-  log('Decoded transfer userOp', { workflowId, token, from, to, amount: amount.toString() })
+  debugLog('Decoded transfer userOp', { workflowId, token, from, to, amount: amount.toString() })
 
-  log('Inserting temporal transfer into temporal.send_account_transfers', workflowId)
+  debugLog('Inserting temporal transfer into temporal.send_account_transfers', workflowId)
   const submittedTransfer = token
     ? await updateTemporalSendAccountTransferActivity({
         workflowId,
         status: 'submitted',
         createdAtBlockNum,
         data: {
-          f: from,
-          t: to,
+          f: hexToBytea(from),
+          t: hexToBytea(to),
           v: amount.toString(),
-          log_addr: token,
+          log_addr: hexToBytea(token),
+          note,
         },
       })
     : await updateTemporalSendAccountTransferActivity({
@@ -60,16 +73,24 @@ export async function TransferWorkflow(userOp: UserOperation<'v0.7'>) {
         status: 'submitted',
         createdAtBlockNum,
         data: {
-          sender: from,
+          sender: hexToBytea(from),
           value: amount.toString(),
-          log_addr: to,
+          log_addr: hexToBytea(to),
+          note,
         },
       })
-  log('Inserted temporal transfer into temporal.send_account_transfers', workflowId)
+  debugLog('Inserted temporal transfer into temporal.send_account_transfers', workflowId)
 
-  log('Sending UserOperation', superjson.stringify(userOp))
-  const hash = await sendUserOpActivity(workflowId, userOp)
-  log('UserOperation sent, hash:', hash)
+  debugLog('Sending UserOperation', superjson.stringify(userOp))
+  const hash = await sendUserOpActivity(userOp).catch(async (error) => {
+    log.error('sendUserOpActivity failed', { error })
+    await updateTemporalSendAccountTransferActivity({
+      workflow_id: workflowId,
+      status: 'failed',
+    })
+    throw ApplicationFailure.nonRetryable('Error sending user operation', error.code, error.details)
+  })
+  debugLog('UserOperation sent, hash:', hash)
   const sentTransfer = await updateTemporalSendAccountTransferActivity({
     workflowId,
     status: 'sent',
@@ -79,16 +100,32 @@ export async function TransferWorkflow(userOp: UserOperation<'v0.7'>) {
     },
   })
 
-  const receipt = await waitForTransactionReceiptActivity(workflowId, hash)
-  log('Receipt received:', { tx_hash: receipt.transactionHash })
+  const bundlerReceipt = await waitForTransactionReceiptActivity(hash).catch(async (error) => {
+    log.error('waitForTransactionReceiptActivity failed', { error })
+    await upsertTemporalSendAccountTransferActivity({
+      workflow_id: workflowId,
+      status: 'failed',
+    })
+    throw ApplicationFailure.nonRetryable('Error sending user operation', error.code, error.details)
+  })
+  debugLog('Receipt received:', { tx_hash: bundlerReceipt.receipt.transactionHash })
+
+  const { eventName, eventId } = await getEventFromTransferActivity({
+    bundlerReceipt,
+    token,
+    from,
+    to,
+  })
 
   await updateTemporalSendAccountTransferActivity({
     workflowId,
     status: 'confirmed',
     data: {
       ...(sentTransfer.data as Record<string, unknown>),
-      tx_hash: hexToBytea(receipt.transactionHash),
-      block_num: receipt.blockNumber.toString(),
+      tx_hash: hexToBytea(bundlerReceipt.receipt.transactionHash),
+      block_num: bundlerReceipt.receipt.blockNumber.toString(),
+      event_name: eventName,
+      event_id: eventId,
     },
   })
   return hash
