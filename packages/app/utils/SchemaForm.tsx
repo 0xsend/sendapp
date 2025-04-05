@@ -50,7 +50,12 @@ export const formFields = {
   otp: createUniqueFieldSchema(z.string(), 'otp'),
   coin: createUniqueFieldSchema(z.string(), 'coin'),
   note: createUniqueFieldSchema(
-    z.string().trim().max(100, 'Note cannot exceed 100 characters'),
+    z
+      .string()
+      .trim()
+      .max(100, 'Note cannot exceed 100 characters')
+      .regex(/^[^\n]*(?:\n[^\n]*){0,3}$/, 'Note cannot exceed 3 paragraphs')
+      .optional(),
     'note'
   ),
   date: z.date(),

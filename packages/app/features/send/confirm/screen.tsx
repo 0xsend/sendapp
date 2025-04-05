@@ -41,7 +41,7 @@ import { api } from 'app/utils/api'
 import { signUserOp } from 'app/utils/signUserOp'
 import { decodeTransferUserOp } from 'app/utils/decodeTransferUserOp'
 import type { UserOperation } from 'permissionless'
-import { MAX_NOTE_LENGTH } from 'app/components/FormFields/NoteField'
+import { formFields } from 'app/utils/SchemaForm'
 
 export function SendConfirmScreen() {
   const [queryParams] = useSendScreenParams()
@@ -188,7 +188,10 @@ export function SendConfirm() {
       assert(nonce !== undefined, 'Nonce is not available')
       throwIf(feesPerGasError)
       assert(!!feesPerGas, 'Fees per gas is not available')
-      assert(!note || note.length <= MAX_NOTE_LENGTH, 'Note is too long')
+      const noteValidationError = note
+        ? formFields.note.safeParse(decodeURIComponent(note)).error
+        : null
+      assert(!noteValidationError, 'Note failed to match validation constraints')
 
       assert(selectedCoin?.balance >= BigInt(amount ?? '0'), 'Insufficient balance')
       const sender = sendAccount?.address as `0x${string}`
