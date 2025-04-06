@@ -5,28 +5,30 @@ import {
   XStack,
   YStack,
   Separator,
-  Card, // Using Card for consistency
+  FadeCard, // Use FadeCard like SwapSummaryScreen
   Text,
-  useToastController, // Import the toast controller hook
+  useToastController,
 } from '@my/ui'
 import { createParam } from 'solito'
-import { useLink } from 'solito/link'
+// useLink is not used directly for the EditButton pattern
 import { useRouter } from 'solito/router'
-import type React from 'react'
+import type { ReactNode } from 'react' // Import ReactNode
 import { useMemo } from 'react'
-import { usePurchaseJackpotTicket } from './usePurchaseJackpotTicketMutation' // Import the combined hook
-import formatAmount from 'app/utils/formatAmount'
+import { usePurchaseJackpotTicket } from './usePurchaseJackpotTicketMutation'
+import formatAmount, { localizeAmount } from 'app/utils/formatAmount' // Import localizeAmount if needed, though maybe not for tickets
 import { toNiceError } from 'app/utils/toNiceError'
-import { useQueryClient } from '@tanstack/react-query' // For cache invalidation
-import { useSendAccount } from 'app/utils/send-accounts' // Hook to get sender/recipient address
+import { useQueryClient } from '@tanstack/react-query'
+import { useSendAccount } from 'app/utils/send-accounts'
 import type { Address } from 'viem'
-import { formatUnits } from 'viem' // Needed for fee formatting
+import { formatUnits } from 'viem'
+// Import necessary contract hooks
 import {
   useReadBaseJackpotToken,
-  useReadBaseJackpotTokenDecimals, // Import the decimals hook
-} from '@my/wagmi/contracts/base-jackpot' // To get token address
+  useReadBaseJackpotTokenDecimals,
+} from '@my/wagmi/contracts/base-jackpot'
 
-const currencySymbol = 'SEND'
+// Assuming SEND is the currency symbol for the payment token
+const currencySymbol = 'SEND' // Define based on actual payment token if dynamic
 
 type ConfirmBuyTicketsScreenParams = {
   numberOfTickets: string // Route params are strings
@@ -39,30 +41,37 @@ export function ConfirmBuyTicketsScreen() {
   const queryClient = useQueryClient()
   const toast = useToastController() // Get the toast controller instance
   const [rawNumberOfTickets] = useParam('numberOfTickets')
-  const numberOfTickets = Number.parseInt(rawNumberOfTickets || '0', 10)
+  // Ensure numberOfTickets is a valid number, default to 0 if parsing fails or param is missing
+  const numberOfTickets = Number.parseInt(rawNumberOfTickets || '0', 10) || 0
 
-  const { data: sendAccount } = useSendAccount()
+  const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount() // Add loading state
   const recipientAddress = useMemo(() => sendAccount?.address, [sendAccount?.address])
 
   // Fetch the token address used by the jackpot contract
   const {
     data: paymentTokenAddress,
     isLoading: isLoadingToken,
-    error: tokenError,
+    error: tokenError, // Capture token fetch error
   } = useReadBaseJackpotToken()
 
   // Fetch the token decimals
-  const { data: tokenDecimals, isLoading: isLoadingDecimals } = useReadBaseJackpotTokenDecimals()
+  const {
+    data: tokenDecimals,
+    isLoading: isLoadingDecimals,
+    error: decimalsError, // Capture decimals fetch error
+  } = useReadBaseJackpotTokenDecimals()
 
   const {
     isPreparing,
     prepareError,
-    usdcFees,
-    ticketPrice,
+    // Destructure all necessary values correctly from the hook
     userOp,
     purchaseAsync,
     isPurchasing,
     purchaseError,
+    usdcFees,
+    // Removed usdcFeesError and isLoadingUSDCFees
+    ticketPrice,
   } = usePurchaseJackpotTicket(
     {
       // Preparation args
@@ -85,19 +94,16 @@ export function ConfirmBuyTicketsScreen() {
         router.push('/play')
       },
       onError: (error) => {
-        console.error('Purchase mutation failed:', error) // Log specific error source
+        console.error('Purchase mutation failed:', error)
         toast.show('Purchase Failed', {
           message: toNiceError(error),
-          type: 'error', // Assuming 'error' type exists
+          type: 'error',
         })
       },
     }
   )
 
-  // Link back to the buy tickets screen
-  const backLink = useLink({
-    href: `/play/buy-tickets?numberOfTickets=${numberOfTickets}`,
-  })
+  // No need for backLink with EditButton pattern
 
   const handleConfirmPurchase = async () => {
     if (numberOfTickets <= 0) {
@@ -122,141 +128,240 @@ export function ConfirmBuyTicketsScreen() {
     }
 
     // Call the mutation with the prepared userOp and the credentials
-    await purchaseAsync({ webauthnCreds }) // Call the new async function
-    // onSuccess and onError handlers in usePurchaseJackpotTicketMutation handle the rest
+    await purchaseAsync({ webauthnCreds })
   }
 
+  // Calculations (ensure types are handled correctly)
   const ticketPriceBn = ticketPrice ? (ticketPrice as bigint) : 0n
-  // Ensure ticketPriceBn is a BigInt before multiplying
   const totalCost = ticketPriceBn * BigInt(numberOfTickets)
+  const decimalsToUse = typeof tokenDecimals === 'number' ? tokenDecimals : 18 // Default if loading/error
 
-  // Use fetched decimals, default to 18 if loading or undefined
-  const decimalsToUse = typeof tokenDecimals === 'number' ? tokenDecimals : 18
+  // Format amounts using decimals
+  // Use localizeAmount if needed for display consistency, otherwise formatAmount is fine
+  const formattedTotalCost = formatAmount(formatUnits(totalCost, decimalsToUse))
+  const formattedTicketPrice = formatAmount(formatUnits(ticketPriceBn, decimalsToUse))
+  // Calculate the number of tickets to display first, explicitly typing as number
+  const ticketsToShow: number = numberOfTickets > 0 ? numberOfTickets : 0
+  // Removed intermediate string variable
 
-  const formattedTotalCost = `${formatAmount(
-    formatUnits(totalCost, decimalsToUse)
-  )} ${currencySymbol}`
-  const formattedTicketPrice = `${formatAmount(
-    formatUnits(ticketPriceBn, decimalsToUse)
-  )} ${currencySymbol}`
-  // Ensure decimals is a number before formatting fee
-  // Use the usdcFees obtained from the preparation hook
+  // Format fees
+  const gas = usdcFees ? usdcFees.baseFee + usdcFees.gasFees : BigInt(Number.MAX_SAFE_INTEGER) // Use MAX_SAFE_INTEGER as fallback like SwapSummary
   const feeDecimals = typeof usdcFees?.decimals === 'number' ? usdcFees.decimals : 6 // Default USDC decimals
-  const formattedFee = usdcFees
-    ? `~${formatAmount(formatUnits(usdcFees.baseFee + usdcFees.gasFees, feeDecimals))} USDC`
-    : '...'
 
   // --- Loading and Error States ---
-  // Combined loading state for preparation
-  const isLoadingPrep = isLoadingToken || isPreparing || isLoadingDecimals
+  // Adjusted loading state (removed isLoadingUSDCFees)
+  const initLoading = isLoadingToken || isLoadingDecimals || isSendAccountLoading || isPreparing
 
-  // Show spinner during initial preparation
-  if (isLoadingPrep && (!paymentTokenAddress || tokenDecimals === undefined)) {
-    return (
-      <YStack f={1} jc="center" ai="center" space>
-        <Spinner size="large" />
-      </YStack>
-    )
+  // Show main spinner if essential data is loading initially
+  if (initLoading && (!paymentTokenAddress || tokenDecimals === undefined)) {
+    return <Spinner size="large" color="$olive" /> // Match SwapSummaryScreen spinner
   }
 
   // --- Render Logic ---
-  // Error could come from preparation or sending
-  const combinedError = tokenError || prepareError || purchaseError
-  // TODO: Implement actual balance check against totalCost + usdcFees?.totalFee
-  const hasSufficientBalance = true // Assume true for now
-  // Ready to attempt purchase if userOp is prepared (even if fees are still loading briefly)
-  const isPrepReady = !!userOp && !!paymentTokenAddress && tokenDecimals !== undefined
-  // Can submit if preparation is ready, not currently sending, and balance is sufficient
-  const canSubmit = isPrepReady && !isPurchasing && hasSufficientBalance && numberOfTickets > 0
+  // Adjusted combinedError calculation (removed usdcFeesError)
+  const combinedError = tokenError || decimalsError || prepareError || purchaseError
+  // TODO: Implement actual balance check
+  const hasSufficientBalance = true // Placeholder
+  const hasSufficientGas = true // Placeholder for gas check (compare usdcFees.totalFee with USDC balance)
+
+  // Determine if the transaction can be submitted
+  const canSubmit =
+    !initLoading &&
+    !isPurchasing &&
+    hasSufficientBalance &&
+    hasSufficientGas &&
+    !!userOp && // Ensure userOp is ready
+    numberOfTickets > 0 && // Ensure valid number of tickets
+    !combinedError // Ensure no critical errors occurred
 
   return (
-    // Removed HomeLayout wrapper and outer YStack
-    <YStack f={1} py="$6" gap="$6" w="100%" maxWidth={600} jc="space-between">
-      {/* Kept inner YStack for content */}
-      <YStack space="$4">
-        {/* Removed H2 as it's likely in TopNav now */}
+    <YStack
+      w={'100%'}
+      gap="$5"
+      pb={'$3.5'}
+      jc={'space-between'}
+      $gtLg={{
+        w: '50%',
+      }}
+    >
+      {/* Content section */}
+      <YStack gap="$3.5">
+        {/* Use FadeCard for summary details */}
+        <FadeCard>
+          <YStack gap="$3">
+            {/* Row for Number of Tickets with Edit Button */}
+            <XStack ai={'center'} jc={'space-between'}>
+              <Paragraph size={'$5'} color={'$color11'}>
+                Tickets
+              </Paragraph>
+              <EditButton /> {/* Ensure EditButton is defined correctly */}
+            </XStack>
+            <Paragraph
+              testID={'numberOfTickets'}
+              width={'100%'}
+              ff={'$mono'}
+              size={'$9'} // Large size for primary info
+              $gtSm={{ size: '$9' }} // Consistent size on larger screens
+            >
+              {/* Embed toString() call directly */}
+              {ticketsToShow.toString()}
+            </Paragraph>
+          </YStack>
+        </FadeCard>
 
-        <Card p="$4" space="$3" elevation="$2">
-          <Row label="Tickets" value={formatAmount(numberOfTickets)} />
-          <Row label="Price per Ticket" value={formattedTicketPrice} />
-          <Separator />
-          <Row label="Total Cost" value={formattedTotalCost} isTotal />
-          <Row label="Est. Fee" value={formattedFee} />
-        </Card>
+        {/* Second FadeCard for cost breakdown */}
+        <FadeCard>
+          <YStack gap={'$2'}>
+            <Row label="Price per Ticket" value={`${formattedTicketPrice} ${currencySymbol}`} />
+            <Row label="Total Cost" value={`${formattedTotalCost} ${currencySymbol}`} isTotal />
+            <Separator my="$2" /> {/* Add separator */}
+            <Row
+              label={'Est. Transaction Fee'}
+              value={(() => {
+                // Simplified fee display logic
+                if (!usdcFees) {
+                  return '-' // Show dash if fees aren't calculated yet
+                }
+                // Format gas fee similar to SwapSummaryScreen
+                return `${formatAmount(formatUnits(gas, feeDecimals))} USDC`
+                // Correctly close the IIFE
+              })()}
+            />
+            {/* Add Send Fee if applicable */}
+            {/* <Row label={'Send Fee'} value={'0.75%'} /> */}
+          </YStack>
+        </FadeCard>
 
-        {combinedError && (
-          <Paragraph theme="red" ta="center">
-            {toNiceError(combinedError)}
-          </Paragraph>
-        )}
-        {!hasSufficientBalance && !combinedError && (
-          <Paragraph theme="red" ta="center">
-            Insufficient balance to complete purchase.
-          </Paragraph>
-        )}
+        {/* Error display area */}
+        <Paragraph color="$error" mt="$2" ta="center">
+          {/* Display combined error or specific messages */}
+          {combinedError
+            ? toNiceError(combinedError)
+            : !hasSufficientBalance
+              ? 'Insufficient balance.'
+              : !hasSufficientGas
+                ? 'Insufficient gas.'
+                : ''}
+        </Paragraph>
       </YStack>
 
-      <YStack space="$3" mt="$4">
-        <Button
-          theme={!hasSufficientBalance && !combinedError ? 'red_alt1' : 'green'}
-          onPress={handleConfirmPurchase}
-          disabled={!canSubmit} // Disable based on combined readiness and sending state
-          disabledStyle={{ opacity: 0.5 }}
-          icon={isPurchasing || (isLoadingPrep && !combinedError) ? <Spinner /> : undefined} // Show spinner if purchasing OR still preparing
+      {/* Action Button Area */}
+      <Button
+        theme={
+          // Ensure boolean logic is sound: if ((!balance or !gas) AND not loading AND no error) then red, else green
+          (!hasSufficientBalance || !hasSufficientGas) && !initLoading && !combinedError
+            ? 'red_alt1'
+            : 'green'
+        }
+        onPress={handleConfirmPurchase}
+        py={'$5'}
+        br={'$4'}
+        disabledStyle={{ opacity: 0.5 }}
+        disabled={!canSubmit}
+      >
+        {/* Simplified Button Content Logic using ternary operators */}
+        {isPurchasing || (initLoading && !combinedError) ? (
+          // Loading state
+          <>
+            <Button.Icon>
+              <Spinner size="small" color="$color12" mr={'$2'} />
+            </Button.Icon>
+            <Button.Text
+              ff={'$mono'}
+              fontWeight={'500'}
+              tt="uppercase"
+              size={'$5'}
+              color={'$black'}
+            >
+              {isPurchasing ? 'Processing...' : 'Preparing...'}
+            </Button.Text>
+          </>
+        ) : !hasSufficientBalance && !combinedError ? (
+          // Insufficient Balance state
+          <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'}>
+            insufficient balance
+          </Button.Text>
+        ) : !hasSufficientGas && !combinedError ? (
+          // Insufficient Gas state
+          <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'}>
+            insufficient gas
+          </Button.Text>
+        ) : (
+          // Default action text
+          <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
+            {`Buy ${numberOfTickets} Ticket${numberOfTickets > 1 ? 's' : ''}`}
+          </Button.Text>
+        )}
+      </Button>
+      {/* Cancel button removed in favor of EditButton pattern */}
+    </YStack> // Closing tag for the main content YStack
+  ) // Closing parenthesis for the return statement
+} // Closing brace for the ConfirmBuyTicketsScreen function
+
+// Reusable Row component matching SwapSummaryScreen style
+export const Row = ({
+  label,
+  value,
+  testID,
+  isTotal = false, // Added isTotal prop for potential styling differences
+}: {
+  label: string
+  value: ReactNode
+  testID?: string
+  isTotal?: boolean // Optional prop
+}) => {
+  return (
+    <XStack gap={'$2.5'} jc={'space-between'} flexWrap={'wrap'} ai="center">
+      <Paragraph
+        size={'$5'}
+        color={'$color11'} // Use a consistent secondary text color
+        fow={isTotal ? '700' : 'normal'} // Make total label bold
+      >
+        {label}
+      </Paragraph>
+      {/* Wrap value in XStack for potential icons/complex values */}
+      <XStack gap={'$2.5'} flexWrap={'wrap'} flexShrink={1}>
+        <Paragraph
+          testID={testID}
+          size={isTotal ? '$6' : '$5'} // Make total value slightly larger
+          fow={isTotal ? '700' : 'normal'} // Make total value bold
         >
-          {(() => {
-            // Prioritize showing spinner if still preparing essential data
-            if (isLoadingPrep && !combinedError && !userOp) {
-              return 'Preparing...'
-            }
-            if (!hasSufficientBalance && !combinedError) {
-              return 'Insufficient Balance'
-            }
-            if (isPurchasing) {
-              return 'Processing...'
-            }
-            // If prep failed, show error indication or allow retry? For now, just show label.
-            if (prepareError || tokenError) {
-              return 'Error Preparing' // Or just the normal label, error is shown above
-            }
-            return `Buy ${numberOfTickets} Ticket${numberOfTickets > 1 ? 's' : ''}`
-          })()}
-        </Button>
-        <Button
-          chromeless
-          transparent
-          onPress={backLink.onPress}
-          disabled={isPurchasing}
-          hoverStyle={{ bg: 'transparent' }}
-          pressStyle={{ bg: 'transparent' }}
-        >
-          Cancel
-        </Button>
-      </YStack>
-      {/* Removed closing tags for HomeLayout and outer YStack */}
-    </YStack>
+          {value}
+        </Paragraph>
+      </XStack>
+    </XStack> // Ensure this closing tag is present for the Row component's outer XStack
   )
 }
 
-// Reusable Row component (similar to SwapSummaryScreen)
-const Row = ({
-  label,
-  value,
-  isTotal = false,
-}: {
-  label: string
-  value: React.ReactNode
-  isTotal?: boolean
-}) => {
-  // Use fow on Paragraph, size on Text
-  const valueProps = isTotal ? { size: '$6' } : { size: '$5' }
+// EditButton component matching SwapSummaryScreen
+export const EditButton = () => {
+  const router = useRouter()
+  const [rawNumberOfTickets] = useParam('numberOfTickets') // Get param to pass back
+
+  const handlePress = () => {
+    // Navigate back to the screen where the number of tickets can be edited
+    router.push({ pathname: '/play/buy-tickets', query: { numberOfTickets: rawNumberOfTickets } })
+  }
 
   return (
-    <XStack gap="$2.5" jc="space-between" ai="center" flexWrap="wrap">
-      <Paragraph size="$5" color="$color11" fow={isTotal ? '700' : 'normal'}>
-        {label}
-      </Paragraph>
-      <Text {...valueProps}>{value}</Text>
-    </XStack>
+    <Button
+      unstyled // Use unstyled and apply styles directly or via props
+      chromeless
+      backgroundColor="transparent"
+      // Apply hover/press styles directly to Button or Button.Text as appropriate
+      hoverStyle={{ bg: 'transparent' }} // Apply to Button
+      pressStyle={{ bg: 'transparent' }} // Apply to Button
+      focusStyle={{ outlineStyle: 'none' }} // Remove focus ring if desired
+      p={0}
+      bw={0}
+      height={'auto'}
+      onPress={handlePress}
+      accessibilityLabel="Edit number of tickets" // Accessibility
+    >
+      {/* Apply text color and hover style to Button.Text */}
+      <Button.Text size={'$5'} color="$color11" hoverStyle={{ color: '$primary' }}>
+        edit
+      </Button.Text>
+    </Button>
   )
 }
