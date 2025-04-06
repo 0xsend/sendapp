@@ -790,33 +790,3 @@ export const useReadBaseJackpotToken = (config: Parameters<typeof useReadContrac
     ...config,
   })
 }
-
-// Add more read hooks here as needed for other view functions in the ABI...
-
-// ================================================================================================
-// WRITE HOOKS (Example - Implement as needed)
-// ================================================================================================
-/*
-import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
-
-export const useWriteBaseJackpotPurchaseTickets = (
-  config: Parameters<typeof useWriteContract>[0] = {}
-) => {
-  const { data: hash, writeContract, ...rest } = useWriteContract(config);
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
-
-  return {
-    writeContract: (args: { referrer: Address; value: bigint; recipient: Address }) =>
-      writeContract({
-        abi: baseJackpotAbi,
-        address: baseJackpotAddress,
-        functionName: 'purchaseTickets',
-        args: [args.referrer, args.value, args.recipient],
-      }),
-    hash,
-    isConfirming,
-    isConfirmed,
-    ...rest,
-  };
-};
-*/
