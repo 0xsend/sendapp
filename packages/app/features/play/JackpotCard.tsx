@@ -194,7 +194,6 @@ export const JackpotCard = () => {
             </XStack>
           </YStack>
 
-          {/* Buy Ticket Button - Removed centering, using local BuyTicketsButton */}
           <XStack w="100%" mt="$2">
             <Stack f={1} w="100%" maw={350}>
               <LinkableButton
@@ -213,14 +212,13 @@ export const JackpotCard = () => {
                 }}
               >
                 <XStack w={'100%'} ai={'center'} jc="center" h="100%" gap="$2">
-                  <IconTicket size={'$1.5'} $theme-dark={{ color: '$color0' }} />
                   <LinkableButton.Text
                     fontWeight={'400'}
                     $theme-dark={{ col: '$color0' }}
                     tt="uppercase"
                     size={'$5'}
                   >
-                    Buy /ticket
+                    Buy ticket
                   </LinkableButton.Text>
                 </XStack>
               </LinkableButton>

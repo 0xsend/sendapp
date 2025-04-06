@@ -4,7 +4,7 @@ import type { ColorTokens } from '@my/ui'
 import { type IconProps, themed } from '@tamagui/helpers-icon'
 
 const SendPotTicket = (props) => {
-  const { size, color, ...rest } = props
+  const { color, ...rest } = props
   return (
     <Svg
       viewBox="0 0 40 40"
