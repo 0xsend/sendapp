@@ -324,7 +324,7 @@ export function phraseFromActivity(
     case isTemporalTransfer:
       return temporalEventNameFromStatus(data.status)
     case isTicketPurchase(activity):
-      return 'Bought Ticket'
+      return 'Bought Tickets'
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Earned referral reward'
     case isSendTokenUpgradeEvent(activity):
