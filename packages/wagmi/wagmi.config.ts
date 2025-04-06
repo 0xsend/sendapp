@@ -24,6 +24,10 @@ import sendTokenV1Artifact from '@0xsend/send-token-upgrade/artifacts/contracts/
 
 import { sendEarnAbi, sendEarnFactoryAbi } from '@0xsend/send-earn-contracts'
 
+import sendEarnFactoryBroadcast from '@0xsend/send-earn-contracts/broadcast/DeploySendEarn.s.sol/845337/run-latest.json' with {
+  type: 'json',
+}
+
 const broadcasts = (
   await globby([`${process.cwd()}/../contracts/broadcast/**/run-latest.json`])
 ).filter((f) => !f.includes('dry-run'))
@@ -289,24 +293,24 @@ export default defineConfig({
     {
       name: 'SendEarnUSDCFactory',
       address: {
-        [mainnet.id]: '0x392f337911a610a3850bfe7805ab9c948b836838',
-        [localhost.id]: '0x392f337911a610a3850bfe7805ab9c948b836838',
-        [sepolia.id]: '0x392f337911a610a3850bfe7805ab9c948b836838',
-        [baseLocal.id]: '0x392f337911a610a3850bfe7805ab9c948b836838',
-        [base.id]: '0x392f337911a610a3850bfe7805ab9c948b836838',
-        [baseSepolia.id]: '0x392f337911a610a3850bfe7805ab9c948b836838',
+        [mainnet.id]: sendEarnFactoryBroadcast.returns.factoryAddress.value as `0x${string}`,
+        [localhost.id]: sendEarnFactoryBroadcast.returns.factoryAddress.value as `0x${string}`,
+        [sepolia.id]: sendEarnFactoryBroadcast.returns.factoryAddress.value as `0x${string}`,
+        [baseLocal.id]: sendEarnFactoryBroadcast.returns.factoryAddress.value as `0x${string}`,
+        [base.id]: sendEarnFactoryBroadcast.returns.factoryAddress.value as `0x${string}`,
+        [baseSepolia.id]: sendEarnFactoryBroadcast.returns.factoryAddress.value as `0x${string}`,
       },
       abi: sendEarnFactoryAbi,
     },
     {
       name: 'SendEarn',
       address: {
-        [mainnet.id]: '0x987e69A31aE91427F129b73e654e5Cb036A11493',
-        [localhost.id]: '0x987e69A31aE91427F129b73e654e5Cb036A11493',
-        [sepolia.id]: '0x987e69A31aE91427F129b73e654e5Cb036A11493',
-        [baseLocal.id]: '0x987e69A31aE91427F129b73e654e5Cb036A11493',
-        [base.id]: '0x987e69A31aE91427F129b73e654e5Cb036A11493',
-        [baseSepolia.id]: '0x987e69A31aE91427F129b73e654e5Cb036A11493',
+        [mainnet.id]: sendEarnFactoryBroadcast.returns.sendEarnAddress.value as `0x${string}`,
+        [localhost.id]: sendEarnFactoryBroadcast.returns.sendEarnAddress.value as `0x${string}`,
+        [sepolia.id]: sendEarnFactoryBroadcast.returns.sendEarnAddress.value as `0x${string}`,
+        [baseLocal.id]: sendEarnFactoryBroadcast.returns.sendEarnAddress.value as `0x${string}`,
+        [base.id]: sendEarnFactoryBroadcast.returns.sendEarnAddress.value as `0x${string}`,
+        [baseSepolia.id]: sendEarnFactoryBroadcast.returns.sendEarnAddress.value as `0x${string}`,
       },
       abi: sendEarnAbi,
     },
