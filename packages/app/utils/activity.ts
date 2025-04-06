@@ -279,7 +279,7 @@ export function eventNameFromActivity(
     case isSendPotTicketPurchase(activity):
       return 'Ticket Purchase'
     case isSendPotWin(activity):
-      return 'Sendpot win'
+      return 'SendPot Win'
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Referral Reward'
     case isSendTokenUpgradeEvent(activity):
