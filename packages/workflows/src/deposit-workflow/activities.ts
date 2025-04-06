@@ -3,7 +3,10 @@ import { bootstrap } from '@my/workflows/utils'
 import { isRetryableDBError } from '@my/workflows/utils/isRetryableDBError'
 import { ApplicationFailure, log } from '@temporalio/activity'
 import { byteaToHex } from 'app/utils/byteaToHex'
-import { decodeSendEarnDepositUserOp } from 'app/utils/decodeSendEarnDepositUserOp'
+import {
+  decodeSendEarnDepositUserOp,
+  type SendEarnDepositCall,
+} from 'app/utils/decodeSendEarnDepositUserOp'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import type { UserOperation } from 'permissionless'
 import superjson from 'superjson'
@@ -26,11 +29,7 @@ type DepositActivities = {
   decodeDepositUserOpActivity: (
     workflowId: string,
     userOp: UserOperation<'v0.7'>
-  ) => Promise<{
-    owner: PgBytea
-    assets: bigint
-    vault: PgBytea
-  }>
+  ) => Promise<SendEarnDepositCall>
   updateTemporalDepositActivity: (params: TemporalDepositUpdate) => Promise<TemporalDeposit>
   sendUserOpActivity: (workflowId: string, userOp: UserOperation<'v0.7'>) => Promise<PgBytea> // Returns userOpHash as PgBytea
   waitForTransactionReceiptActivity: (
@@ -47,7 +46,7 @@ export const createDepositActivities = (
 ): DepositActivities => {
   bootstrap(env)
 
-  const sendUserOpActivity = async (
+  const sendUserOpActivity: DepositActivities['sendUserOpActivity'] = async (
     workflowId: string,
     userOp: UserOperation<'v0.7'>
   ): Promise<PgBytea> => {
@@ -78,68 +77,69 @@ export const createDepositActivities = (
     }
   }
 
-  const waitForTransactionReceiptActivity = async (
-    workflowId: string,
-    userOpHash: PgBytea
-  ): Promise<{ transactionHash: `0x${string}`; blockNumber: bigint }> => {
-    const hexHash = byteaToHex(userOpHash)
-    try {
-      const bundlerReceipt = await waitForTransactionReceipt(hexHash)
-      if (!bundlerReceipt) {
-        throw ApplicationFailure.retryable(
-          'No receipt returned from waitForTransactionReceipt',
-          'NO_RECEIPT'
-        )
-      }
-      log.info('waitForTransactionReceiptActivity received receipt', {
-        workflowId,
-        bundlerReceipt: superjson.stringify(bundlerReceipt),
-      })
-      if (!bundlerReceipt.success) {
-        // Non-retryable failure if the transaction itself failed on-chain
-        throw ApplicationFailure.nonRetryable('Transaction failed on-chain', 'TX_FAILED', {
-          receipt: bundlerReceipt.receipt,
-        })
-      }
-      if (!bundlerReceipt.receipt.transactionHash || !bundlerReceipt.receipt.blockNumber) {
-        throw ApplicationFailure.nonRetryable(
-          'Receipt missing transactionHash or blockNumber',
-          'INVALID_RECEIPT',
-          { receipt: bundlerReceipt.receipt }
-        )
-      }
-      return {
-        transactionHash: bundlerReceipt.receipt.transactionHash,
-        blockNumber: bundlerReceipt.receipt.blockNumber,
-      }
-    } catch (error) {
-      log.error('waitForTransactionReceiptActivity failed', { workflowId, hexHash, error })
-      // Attempt to mark the workflow as failed in the DB
-      const { error: updateError } = await updateTemporalSendEarnDeposit({
-        workflow_id: workflowId,
-        status: 'failed',
-        error_message: error.message ?? 'Failed waiting for transaction receipt',
-      })
-      if (updateError) {
-        log.error('Failed to update deposit status after waitForTransactionReceipt failure', {
+  const waitForTransactionReceiptActivity: DepositActivities['waitForTransactionReceiptActivity'] =
+    async (
+      workflowId: string,
+      userOpHash: PgBytea
+    ): Promise<{ transactionHash: `0x${string}`; blockNumber: bigint }> => {
+      const hexHash = byteaToHex(userOpHash)
+      try {
+        const bundlerReceipt = await waitForTransactionReceipt(hexHash)
+        if (!bundlerReceipt) {
+          throw ApplicationFailure.retryable(
+            'No receipt returned from waitForTransactionReceipt',
+            'NO_RECEIPT'
+          )
+        }
+        log.info('waitForTransactionReceiptActivity received receipt', {
           workflowId,
-          updateError,
+          bundlerReceipt: superjson.stringify(bundlerReceipt),
         })
-      }
+        if (!bundlerReceipt.success) {
+          // Non-retryable failure if the transaction itself failed on-chain
+          throw ApplicationFailure.nonRetryable('Transaction failed on-chain', 'TX_FAILED', {
+            receipt: bundlerReceipt.receipt,
+          })
+        }
+        if (!bundlerReceipt.receipt.transactionHash || !bundlerReceipt.receipt.blockNumber) {
+          throw ApplicationFailure.nonRetryable(
+            'Receipt missing transactionHash or blockNumber',
+            'INVALID_RECEIPT',
+            { receipt: bundlerReceipt.receipt }
+          )
+        }
+        return {
+          transactionHash: bundlerReceipt.receipt.transactionHash,
+          blockNumber: bundlerReceipt.receipt.blockNumber,
+        }
+      } catch (error) {
+        log.error('waitForTransactionReceiptActivity failed', { workflowId, hexHash, error })
+        // Attempt to mark the workflow as failed in the DB
+        const { error: updateError } = await updateTemporalSendEarnDeposit({
+          workflow_id: workflowId,
+          status: 'failed',
+          error_message: error.message ?? 'Failed waiting for transaction receipt',
+        })
+        if (updateError) {
+          log.error('Failed to update deposit status after waitForTransactionReceipt failure', {
+            workflowId,
+            updateError,
+          })
+        }
 
-      // Re-throw original error (could be retryable or non-retryable based on the catch block)
-      if (error instanceof ApplicationFailure) {
-        throw error // Preserve original failure type
+        // Re-throw original error (could be retryable or non-retryable based on the catch block)
+        if (error instanceof ApplicationFailure) {
+          throw error // Preserve original failure type
+        }
+        // Treat unexpected errors as non-retryable by default
+        throw ApplicationFailure.nonRetryable(
+          error.message ?? 'Error waiting for transaction receipt',
+          error.code ?? 'WAIT_RECEIPT_FAILED',
+          error
+        )
       }
-      // Treat unexpected errors as non-retryable by default
-      throw ApplicationFailure.nonRetryable(
-        error.message ?? 'Error waiting for transaction receipt',
-        error.code ?? 'WAIT_RECEIPT_FAILED',
-        error
-      )
     }
-  }
-  const upsertTemporalDepositActivity = async ({
+  const upsertTemporalDepositActivity: DepositActivities['upsertTemporalDepositActivity'] = async ({
     workflow_id: workflowId,
     owner,
     assets,
@@ -177,7 +177,10 @@ export const createDepositActivities = (
     return upsertData
   }
 
-  const simulateDepositActivity = async (workflowId, userOp) => {
+  const simulateDepositActivity: DepositActivities['simulateDepositActivity'] = async (
+    workflowId,
+    userOp
+  ) => {
     log.info('Simulating deposit UserOperation', { workflowId })
     try {
       await simulateUserOperation(userOp)
@@ -203,34 +206,14 @@ export const createDepositActivities = (
     }
   }
 
-  const decodeDepositUserOpActivity = async (workflowId, userOp) => {
+  const decodeDepositUserOpActivity: DepositActivities['decodeDepositUserOpActivity'] = async (
+    workflowId: string,
+    userOp: UserOperation<'v0.7'>
+  ): Promise<SendEarnDepositCall> => {
     log.info('Decoding deposit UserOperation', { workflowId })
     try {
       const decoded = decodeSendEarnDepositUserOp({ userOp })
-
-      // @ts-expect-error FIXME: handle when deposit into send earn factory vs direct vault deposit
-      if (!decoded || !decoded.owner || !decoded.assets || !decoded.vault) {
-        log.error('Failed to decode deposit user op or missing required fields', {
-          workflowId,
-          decoded,
-        })
-        throw new Error('User Operation is not a valid deposit or decoding failed')
-      }
-
-      log.info('Deposit UserOperation decoded successfully', {
-        workflowId,
-        owner: decoded.owner,
-        assets: decoded.assets,
-        // @ts-expect-error FIXME: handle when deposit into send earn factory vs direct vault deposit
-        vault: decoded.vault,
-      })
-
-      return {
-        owner: hexToBytea(decoded.owner),
-        assets: decoded.assets,
-        // @ts-expect-error FIXME: handle when deposit into send earn factory vs direct vault deposit
-        vault: hexToBytea(decoded.vault),
-      }
+      return decoded
     } catch (error) {
       log.error('decodeDepositUserOpActivity failed', { workflowId, error })
       const { error: updateError } = await updateTemporalSendEarnDeposit({
@@ -252,7 +235,7 @@ export const createDepositActivities = (
     }
   }
 
-  const updateTemporalDepositActivity = async ({
+  const updateTemporalDepositActivity: DepositActivities['updateTemporalDepositActivity'] = async ({
     workflow_id: workflowId,
     status,
     assets,

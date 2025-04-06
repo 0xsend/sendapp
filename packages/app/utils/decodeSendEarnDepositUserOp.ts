@@ -18,6 +18,27 @@ const VAULT_DEPOSIT_SIG = '0x6e553f65'
  */
 const FACTORY_DEPOSIT_SIG = '0xb473b00b'
 
+enum DepositType {
+  VAULT = 'vault',
+  FACTORY = 'factory',
+}
+
+type VaultDeposit = {
+  type: DepositType.VAULT
+  owner: Address
+  assets: bigint
+  vault: Address
+}
+
+type FactoryDeposit = {
+  type: DepositType.FACTORY
+  owner: Address
+  referrer: Address
+  assets: bigint
+}
+
+export type SendEarnDepositCall = VaultDeposit | FactoryDeposit
+
 /**
  * Decodes the calldata for a user operation depositing into Send Earn.
  *
@@ -26,17 +47,9 @@ const FACTORY_DEPOSIT_SIG = '0xb473b00b'
  * @see VAULT_DEPOSIT_SIG
  * @see FACTORY_DEPOSIT_SIG
  */
-export function decodeSendEarnDepositUserOp({ userOp }: { userOp: UserOperation<'v0.7'> }):
-  | {
-      owner: Address
-      vault: Address
-      assets: bigint
-    }
-  | {
-      owner: Address
-      referrer: Address
-      assets: bigint
-    } {
+export function decodeSendEarnDepositUserOp({
+  userOp,
+}: { userOp: UserOperation<'v0.7'> }): SendEarnDepositCall {
   // Decode the outer executeBatch call
   const calls = decodeSendAccountExecuteBatchCalls(userOp.callData)
 
@@ -58,6 +71,7 @@ export function decodeSendEarnDepositUserOp({ userOp }: { userOp: UserOperation<
     assert(decoded.functionName === 'deposit', 'Invalid deposit function name')
     const [assets, owner] = decoded.args
     return {
+      type: DepositType.VAULT,
       owner,
       assets,
       vault: vaultDeposit.dest,
@@ -72,10 +86,19 @@ export function decodeSendEarnDepositUserOp({ userOp }: { userOp: UserOperation<
     assert(decoded.functionName === 'createAndDeposit', 'Invalid createAndDeposit function name')
     const [referrer, , assets] = decoded.args
     return {
+      type: DepositType.FACTORY,
       owner: userOp.sender,
       assets,
       referrer,
     }
   }
   throw new Error('Failed to decode a valid Send Earn Deposit from user op')
+}
+
+export function isVaultDeposit(args: SendEarnDepositCall): args is VaultDeposit {
+  return args.type === DepositType.VAULT
+}
+
+export function isFactoryDeposit(args: SendEarnDepositCall): args is FactoryDeposit {
+  return args.type === DepositType.FACTORY
 }

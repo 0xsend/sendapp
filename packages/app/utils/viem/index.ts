@@ -1,6 +1,6 @@
 export { baseMainnetClient, mainnetClient } from '@my/wagmi'
-export { useRpcChainId } from './useRpcChainId'
 export {
-  SendAccountCall,
   decodeSendAccountExecuteBatchCalls,
+  type SendAccountCall,
 } from './decodeSendAccountExecuteBatchCalls'
+export { useRpcChainId } from './useRpcChainId'

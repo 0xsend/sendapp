@@ -1,4 +1,5 @@
 const mockMyWagmi = {
+  __esModule: true,
   baseMainnetClient: {
     chain: {
       id: 845337,

@@ -5,7 +5,11 @@ import { DepositWorkflow } from '@my/workflows/all-workflows'
 import { WorkflowExecutionAlreadyStartedError } from '@temporalio/client'
 import { TRPCError } from '@trpc/server'
 import { assert } from 'app/utils/assert'
-import { decodeSendEarnDepositUserOp } from 'app/utils/decodeDepositUserOp'
+import {
+  decodeSendEarnDepositUserOp,
+  isFactoryDeposit,
+  isVaultDeposit,
+} from 'app/utils/decodeSendEarnDepositUserOp'
 import { address } from 'app/utils/zod'
 import { SendAccountCallsSchema, UserOperationSchema } from 'app/utils/zod/evm'
 import debug from 'debug'
@@ -37,11 +41,18 @@ export const sendEarnRouter = createTRPCRouter({
       assert(ENTRYPOINT_ADDRESS_V07 === entryPoint, 'Invalid entry point')
 
       // validate userop
-      const { owner, assets, vault } = decodeSendEarnDepositUserOp({ userOp: userop })
-      assert(isAddress(owner), 'Invalid owner')
-      assert(isAddress(vault), 'Invalid vault')
-      assert(assets > 0n, 'Invalid assets')
-
+      const args = decodeSendEarnDepositUserOp({ userOp: userop })
+      if (isVaultDeposit(args)) {
+        const { owner, assets, vault } = args
+        assert(isAddress(owner), 'Invalid owner')
+        assert(isAddress(vault), 'Invalid vault')
+        assert(assets > 0n, 'Invalid assets')
+      } else if (isFactoryDeposit(args)) {
+        const { owner, assets, referrer } = args
+        assert(isAddress(owner), 'Invalid owner')
+        assert(isAddress(referrer), 'Invalid referrer')
+        assert(assets > 0n, 'Invalid assets')
+      }
       const client = await getTemporalClient()
 
       // simulate

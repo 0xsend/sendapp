@@ -18,13 +18,11 @@ export async function DepositWorkflow({ userOp }: DepositWorkflowInput) {
   const { workflowId } = workflowInfo()
   log(`Starting SendEarn Deposit Workflow: ${workflowId}`)
 
-  const { owner, assets, vault } = await activities.decodeDepositUserOpActivity(workflowId, userOp)
+  const depositCall = await activities.decodeDepositUserOpActivity(workflowId, userOp)
 
   try {
     // 1. Initialize record in the database with data passed from API
-    log(
-      `[${workflowId}] Initializing deposit record with owner=${owner}, assets=${assets}, vault=${vault}`
-    )
+    log(`[${workflowId}] Initializing deposit record with deposit=${depositCall}`)
     // Ensure the upsert activity accepts these fields directly
     await activities.upsertTemporalDepositActivity({
       workflow_id: workflowId,

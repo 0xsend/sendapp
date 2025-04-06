@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals'
 import { sendAccountAbi, sendEarnAbi, sendEarnUsdcFactoryAbi } from '@my/wagmi'
 import type { UserOperation } from 'permissionless'
-import { encodeFunctionData, erc20Abi, type Address, type Hex, zeroHash } from 'viem'
+import { encodeFunctionData, erc20Abi, zeroHash, type Address, type Hex } from 'viem'
 import { decodeSendEarnDepositUserOp } from './decodeSendEarnDepositUserOp'
 
 jest.unmock('@my/wagmi')
@@ -20,10 +20,6 @@ const defaultUserOp: Omit<UserOperation<'v0.7'>, 'sender' | 'nonce' | 'callData'
 }
 
 describe('decodeSendEarnDepositUserOp', () => {
-  // Corrected describe block name
-  beforeEach(() => {
-    // No need to unmock if it's already unmocked at the top level
-  })
   it('should correctly decode a valid direct deposit UserOperation (VAULT_DEPOSIT_SIG)', () => {
     const sender = `0x${'1'.repeat(40)}` as Address
     const owner = sender // In this context, sender is the owner
@@ -75,6 +71,7 @@ describe('decodeSendEarnDepositUserOp', () => {
     const result = decodeSendEarnDepositUserOp({ userOp })
 
     expect(result).toEqual({
+      type: 'vault',
       owner,
       assets,
       vault,
@@ -134,6 +131,7 @@ describe('decodeSendEarnDepositUserOp', () => {
 
     // For factory deposits, the owner is the userOp.sender
     expect(result).toEqual({
+      type: 'factory',
       owner: sender,
       referrer,
       assets,
