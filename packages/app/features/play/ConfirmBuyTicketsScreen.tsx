@@ -6,29 +6,25 @@ import {
   YStack,
   Separator,
   FadeCard, // Use FadeCard like SwapSummaryScreen
-  Text,
   useToastController,
 } from '@my/ui'
 import { createParam } from 'solito'
-// useLink is not used directly for the EditButton pattern
 import { useRouter } from 'solito/router'
-import type { ReactNode } from 'react' // Import ReactNode
+import type { ReactNode } from 'react'
 import { useMemo } from 'react'
 import { usePurchaseJackpotTicket } from './usePurchaseJackpotTicketMutation'
-import formatAmount, { localizeAmount } from 'app/utils/formatAmount' // Import localizeAmount if needed, though maybe not for tickets
+import formatAmount from 'app/utils/formatAmount'
 import { toNiceError } from 'app/utils/toNiceError'
 import { useQueryClient } from '@tanstack/react-query'
 import { useSendAccount } from 'app/utils/send-accounts'
 import type { Address } from 'viem'
 import { formatUnits } from 'viem'
-// Import necessary contract hooks
 import {
   useReadBaseJackpotToken,
   useReadBaseJackpotTokenDecimals,
 } from '@my/wagmi/contracts/base-jackpot'
 
-// Assuming SEND is the currency symbol for the payment token
-const currencySymbol = 'SEND' // Define based on actual payment token if dynamic
+const currencySymbol = 'SEND'
 
 type ConfirmBuyTicketsScreenParams = {
   numberOfTickets: string // Route params are strings

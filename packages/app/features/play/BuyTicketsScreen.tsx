@@ -18,9 +18,7 @@ import {
   useReadBaseJackpotTokenDecimals,
 } from '@my/wagmi/contracts/base-jackpot'
 import { formatUnits } from 'viem'
-import { TopNav } from 'app/components/TopNav'
-import { HomeLayout } from 'app/features/home/layout.web'
-import { useCoin, useCoins } from 'app/provider/coins'
+import { useCoin } from 'app/provider/coins'
 import formatAmount from 'app/utils/formatAmount'
 
 type BuyTicketsScreenParams = {
@@ -32,7 +30,6 @@ const { useParam } = createParam<BuyTicketsScreenParams>()
 export function BuyTicketsScreen() {
   const router = useRouter()
   const toast = useToastController()
-  const { bottom } = useSafeAreaInsets()
   const [ticketCount, setTicketCount] = useState('1')
   const [isInputFocused, setIsInputFocused] = useState(false)
   const [queryTickets] = useParam('numberOfTickets')
