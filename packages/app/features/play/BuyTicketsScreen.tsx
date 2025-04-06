@@ -7,7 +7,6 @@ import {
   H3,
   Input,
   Button,
-  useSafeAreaInsets,
   useToastController,
 } from '@my/ui'
 import { useState, useMemo, useEffect } from 'react'
