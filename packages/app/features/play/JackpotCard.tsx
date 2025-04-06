@@ -10,11 +10,10 @@ import {
   H3,
   Spinner, // Added Spinner
   LinkableButton, // Added LinkableButton
-  type LinkableButtonProps, // Added LinkableButtonProps
 } from '@my/ui'
 import { useCallback, useEffect, useState, useMemo } from 'react' // Added useCallback
-import { Timer } from '@tamagui/lucide-icons' // Removed IconGame from here
-import { IconGame } from 'app/components/icons' // Added correct IconGame import
+import { Timer } from '@tamagui/lucide-icons'
+import { IconTicket } from 'app/components/icons'
 // Removed PlayButtons import
 import {
   useReadBaseJackpotLpPoolTotal,
@@ -214,7 +213,7 @@ export const JackpotCard = () => {
                 }}
               >
                 <XStack w={'100%'} ai={'center'} jc="center" h="100%" gap="$2">
-                  <IconGame size={'$1.5'} $theme-dark={{ color: '$color0' }} />
+                  <IconTicket size={'$1.5'} $theme-dark={{ color: '$color0' }} />
                   <LinkableButton.Text
                     fontWeight={'400'}
                     $theme-dark={{ col: '$color0' }}
