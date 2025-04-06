@@ -78,9 +78,15 @@ export function BuyTicketsScreen() {
     }
   }, [sendCoin])
 
+  const isDataLoading =
+    isLoadingPrice ||
+    isLoadingDecimals ||
+    isLoadingBalance ||
+    typeof sendCoin?.balance === 'undefined'
+
   const insufficientFunds = useMemo(
-    () => totalCostBigInt > userBalanceBigInt,
-    [totalCostBigInt, userBalanceBigInt]
+    () => totalCostBigInt > userBalanceBigInt && !isDataLoading,
+    [totalCostBigInt, userBalanceBigInt, isDataLoading]
   )
 
   // // Format display values
@@ -93,8 +99,6 @@ export function BuyTicketsScreen() {
     if (typeof totalCostBigInt !== 'bigint' || tokenDecimals === undefined) return '...'
     return formatUnits(totalCostBigInt, Number(tokenDecimals))
   }, [totalCostBigInt, tokenDecimals])
-
-  const isDataLoading = isLoadingPrice || isLoadingDecimals || isLoadingBalance
 
   // --- Navigation Handler ---
   const handleProceedToConfirm = () => {
@@ -219,7 +223,7 @@ export function BuyTicketsScreen() {
                         </Paragraph>
                       )}
                     </XStack>
-                    {insufficientFunds && !isLoadingBalance && (
+                    {insufficientFunds && (
                       <Paragraph color={'$error'} size={'$5'}>
                         Insufficient funds
                       </Paragraph>
