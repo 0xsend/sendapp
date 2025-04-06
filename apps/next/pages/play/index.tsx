@@ -1,17 +1,17 @@
 import { HomeLayout } from 'app/features/home/layout.web'
-import { ConfirmBuyTicketsScreen } from 'app/features/play/ConfirmBuyTicketsScreen'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from '../_app'
 import { TopNav } from 'app/components/TopNav'
+import { PlayScreen } from 'app/features/play/screen'
 
 export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Buy Tickets Summary</title>
+        <title>Send | Play</title>
       </Head>
-      <ConfirmBuyTicketsScreen />
+      <PlayScreen />
     </>
   )
 }
@@ -19,9 +19,7 @@ export const Page: NextPageWithLayout = () => {
 export const getServerSideProps = userProtectedGetSSP()
 
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Buy Ticket Summary" backFunction="router" />}>
-    {children}
-  </HomeLayout>
+  <HomeLayout TopNav={<TopNav header="Play" backFunction="router" />}>{children}</HomeLayout>
 )
 
 export default Page

@@ -190,7 +190,7 @@ export const JackpotCard = () => {
             {/* Restore the XStack and update the Paragraph, removed centering */}
             <XStack ai="center">
               <Paragraph color="$color10" fontSize="$4" ta="left">
-                Jackpot ends: {isLoading ? 'Loading...' : jackpotEndTimeString}
+                Drawing occurs on: {isLoading ? 'Loading...' : jackpotEndTimeString}
               </Paragraph>
             </XStack>
           </YStack>
