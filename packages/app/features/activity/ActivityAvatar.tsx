@@ -31,7 +31,7 @@ export function ActivityAvatar({
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
 
-  if (isSendPotTicketPurchase(activity)) {
+  if (isSendPotTicketPurchase(activity) || isSendPotWin(activity)) {
     return (
       <XStack w="$4.5" h={'$4.5'} br="$4" bc={'$olive'}>
         <IconSendPotTicket color={'$color2'} />
@@ -39,7 +39,7 @@ export function ActivityAvatar({
     )
   }
 
-  if (isSwapBuyTransfer(activity, swapRouters) || isSendPotWin(activity)) {
+  if (isSwapBuyTransfer(activity, swapRouters)) {
     return (
       <XStack w="$4.5" h={'$4.5'} br="$4" ai={'center'} jc={'center'} bc={'$olive'}>
         <Plus color={'$color2'} />
