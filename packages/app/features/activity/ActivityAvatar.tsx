@@ -18,6 +18,7 @@ import { isSendTokenUpgradeEvent } from 'app/utils/zod/activity/SendAccountTrans
 import { useSwapRouters } from 'app/utils/useSwapRouters'
 import { useLiquidityPools } from 'app/utils/useLiquidityPools'
 import { Minus, Plus } from '@tamagui/lucide-icons'
+import { IconSendPotTicket } from 'app/components/icons/IconSendPotTicket'
 
 export function ActivityAvatar({
   activity,
@@ -30,6 +31,14 @@ export function ActivityAvatar({
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
 
+  if (isSendPotTicketPurchase(activity)) {
+    return (
+      <XStack w="$4.5" h={'$4.5'} br="$4" bc={'$olive'}>
+        <IconSendPotTicket color={'$color2'} />
+      </XStack>
+    )
+  }
+
   if (isSwapBuyTransfer(activity, swapRouters) || isSendPotWin(activity)) {
     return (
       <XStack w="$4.5" h={'$4.5'} br="$4" ai={'center'} jc={'center'} bc={'$olive'}>
@@ -38,10 +47,7 @@ export function ActivityAvatar({
     )
   }
 
-  if (
-    isSwapSellTransfer(activity, swapRouters, liquidityPools) ||
-    isSendPotTicketPurchase(activity)
-  ) {
+  if (isSwapSellTransfer(activity, swapRouters, liquidityPools)) {
     return (
       <XStack w="$4.5" h={'$4.5'} br="$4" ai={'center'} jc={'center'} bc={'$error'}>
         <Minus />
