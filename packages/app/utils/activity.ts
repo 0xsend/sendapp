@@ -24,8 +24,7 @@ import {
 } from './zod/activity/TemporalTransfersEventSchema'
 import type { SwapRouter } from 'app/utils/zod/SwapRouterSchema'
 import type { LiquidityPool } from 'app/utils/zod/LiquidityPoolSchema'
-
-const SEND_POT_CONTRACT_ADDRESS = '0xa0A5611b9A1071a1D8A308882065c48650bAeE8b'
+import { SEND_POT_CONTRACT_ADDRESS } from 'app/data/sendpot'
 
 const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
   Object.values(addresses).map((a) => [a, label])
