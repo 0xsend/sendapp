@@ -2,7 +2,12 @@ import { Avatar, LinkableAvatar, type LinkableAvatarProps, XStack } from '@my/ui
 import { IconUpgrade } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { allCoinsDict } from 'app/data/coins'
-import { counterpart, isSwapBuyTransfer, isSwapSellTransfer } from 'app/utils/activity'
+import {
+  counterpart,
+  isSwapBuyTransfer,
+  isSwapSellTransfer,
+  isTicketPurchase,
+} from 'app/utils/activity'
 import {
   type Activity,
   isSendAccountReceiveEvent,
@@ -24,7 +29,7 @@ export function ActivityAvatar({
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
 
-  if (isSwapBuyTransfer(activity, swapRouters)) {
+  if (isSwapBuyTransfer(activity, swapRouters) || isTicketPurchase(activity)) {
     return (
       <XStack w="$4.5" h={'$4.5'} br="$4" ai={'center'} jc={'center'} bc={'$olive'}>
         <Plus color={'$color2'} />
