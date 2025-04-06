@@ -10,7 +10,7 @@ export const useUserJackpotSummary = (
   return useQuery({
     queryKey: ['userJackpotSummary', limit],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('get_user_jackpot_summary').select('*')
+      const { data, error } = await supabase.rpc('get_user_jackpot_summary', { num_runs: limit })
       if (error) {
         // no rows in receipts table
         if (error.code === 'PGRST116') {
