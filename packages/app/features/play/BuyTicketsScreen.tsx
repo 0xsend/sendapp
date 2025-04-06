@@ -85,11 +85,11 @@ export function BuyTicketsScreen() {
     [totalCostBigInt, userBalanceBigInt, isDataLoading]
   )
 
-  // // Format display values
-  // const displayTicketPrice = useMemo(() => {
-  //   if (typeof ticketPriceBigInt !== 'bigint' || tokenDecimals === undefined) return '...'
-  //   return formatUnits(ticketPriceBigInt, Number(tokenDecimals))
-  // }, [ticketPriceBigInt, tokenDecimals])
+  // Format display values
+  const displayTicketPrice = useMemo(() => {
+    if (typeof ticketPriceBigInt !== 'bigint' || tokenDecimals === undefined) return '...'
+    return formatUnits(ticketPriceBigInt, Number(tokenDecimals))
+  }, [ticketPriceBigInt, tokenDecimals])
 
   const displayTotalCost = useMemo(() => {
     if (typeof totalCostBigInt !== 'bigint' || tokenDecimals === undefined) return '...'
@@ -189,8 +189,9 @@ export function BuyTicketsScreen() {
                 }}
               />
             </XStack>
-
-            <XStack jc="space-between" ai={'flex-start'}>
+            {/* Balance and Price Per Ticket Row */}
+            <XStack jc="space-between" ai="center">
+              {/* Left Side: Balance */}
               <YStack>
                 <XStack gap={'$2'} ai="center">
                   <Paragraph
@@ -227,12 +228,16 @@ export function BuyTicketsScreen() {
                   </Paragraph>
                 )}
               </YStack>
+              {/* Right Side: Price per Ticket */}
+              <Paragraph fontSize="$5" fontWeight="500" color="$color10">
+                {isDataLoading ? <Spinner size="small" /> : displayTicketPrice} SEND each
+              </Paragraph>
             </XStack>
           </YStack>
 
           <XStack jc="space-between" ai="center">
             <Paragraph fontSize="$6" fontWeight="500">
-              Total Cost:
+              Total Cost
             </Paragraph>
             <H3 color="$color12">
               {isDataLoading ? <Spinner size="small" /> : displayTotalCost} SEND

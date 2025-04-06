@@ -1,6 +1,6 @@
 import type { BlockData, Column, Integration, Table } from '@indexsupply/shovel-config'
 
-const SEND_POT_CONTRACT_ADDRESS_PLACEHOLDER = '0xa0A5611b9A1071a1D8A308882065c48650bAeE8b'
+const SEND_POT_CONTRACT_ADDRESS = '0xa0A5611b9A1071a1D8A308882065c48650bAeE8b'
 
 // --- UserTicketPurchase Event ---
 export const sendPotUserTicketPurchasesTable: Table = {
@@ -34,7 +34,7 @@ export const userTicketPurchaseIntegration: Omit<Integration, 'sources'> = {
       name: 'log_addr',
       column: 'log_addr',
       filter_op: 'equals', // Filter for the specific SendPot contract
-      filter_val: SEND_POT_CONTRACT_ADDRESS_PLACEHOLDER,
+      filter_val: SEND_POT_CONTRACT_ADDRESS,
     },
   ] as BlockData[],
   table: sendPotUserTicketPurchasesTable,
@@ -109,7 +109,7 @@ export const jackpotRunIntegration: Omit<Integration, 'sources'> = {
       name: 'log_addr',
       column: 'log_addr',
       filter_op: 'equals', // Filter for the specific SendPot contract
-      filter_val: SEND_POT_CONTRACT_ADDRESS_PLACEHOLDER,
+      filter_val: SEND_POT_CONTRACT_ADDRESS,
     },
   ] as BlockData[],
   table: sendPotJackpotRunsTable,

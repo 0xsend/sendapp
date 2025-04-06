@@ -25,6 +25,8 @@ import {
 import type { SwapRouter } from 'app/utils/zod/SwapRouterSchema'
 import type { LiquidityPool } from 'app/utils/zod/LiquidityPoolSchema'
 
+const SEND_POT_CONTRACT_ADDRESS = '0xa0A5611b9A1071a1D8A308882065c48650bAeE8b'
+
 const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
   Object.values(addresses).map((a) => [a, label])
 
@@ -209,6 +211,18 @@ export const isSwapSellTransfer = (
 }
 
 /**
+ * Checks if the activity represents a ticket purchase from the Send Pot contract.
+ * @param activity - The activity to check.
+ * @returns `true` if the activity is an ERC20 transfer from the Send Pot contract, otherwise `false`.
+ */
+export const isTicketPurchase = (activity: Activity): boolean => {
+  return (
+    isSendAccountTransfersEvent(activity) &&
+    isAddressEqual(activity.data.t, SEND_POT_CONTRACT_ADDRESS)
+  )
+}
+
+/**
  * Checks if a given activity is a swap transfer.
  * A swap transfer can either be a swap buy transfer or a swap sell transfer.
  *
@@ -251,6 +265,8 @@ export function eventNameFromActivity(
   switch (true) {
     case isTemporalTransfer:
       return temporalEventNameFromStatus(data.status)
+    case isTicketPurchase(activity):
+      return 'Ticket Purchase'
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Referral Reward'
     case isSendTokenUpgradeEvent(activity):
@@ -307,6 +323,8 @@ export function phraseFromActivity(
   switch (true) {
     case isTemporalTransfer:
       return temporalEventNameFromStatus(data.status)
+    case isTicketPurchase(activity):
+      return 'Bought Ticket'
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Earned referral reward'
     case isSendTokenUpgradeEvent(activity):
@@ -353,6 +371,9 @@ export function subtextFromActivity(
   const isETHReceive = isSendAccountReceiveEvent(activity)
   const isSwapTransfer = isActivitySwapTransfer(activity, swapRouters, liquidityPools)
 
+  if (isTicketPurchase(activity)) {
+    return null // No subtext for ticket purchases
+  }
   if (isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity)) {
     return activity.data.tags.map((t) => `/${t}`).join(', ')
   }
