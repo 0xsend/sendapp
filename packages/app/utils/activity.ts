@@ -212,12 +212,24 @@ export const isSwapSellTransfer = (
 /**
  * Checks if the activity represents a ticket purchase from the Send Pot contract.
  * @param activity - The activity to check.
- * @returns `true` if the activity is an ERC20 transfer from the Send Pot contract, otherwise `false`.
+ * @returns `true` if the activity is an ERC20 transfer *to* the Send Pot contract, otherwise `false`.
  */
-export const isTicketPurchase = (activity: Activity): boolean => {
+export const isSendPotTicketPurchase = (activity: Activity): boolean => {
   return (
     isSendAccountTransfersEvent(activity) &&
     isAddressEqual(activity.data.t, SEND_POT_CONTRACT_ADDRESS)
+  )
+}
+
+/**
+ * Checks if the activity represents a win payout from the Send Pot contract.
+ * @param activity - The activity to check.
+ * @returns `true` if the activity is an ERC20 transfer *from* the Send Pot contract, otherwise `false`.
+ */
+export const isSendPotWin = (activity: Activity): boolean => {
+  return (
+    isSendAccountTransfersEvent(activity) &&
+    isAddressEqual(activity.data.f, SEND_POT_CONTRACT_ADDRESS)
   )
 }
 
@@ -264,8 +276,10 @@ export function eventNameFromActivity(
   switch (true) {
     case isTemporalTransfer:
       return temporalEventNameFromStatus(data.status)
-    case isTicketPurchase(activity):
+    case isSendPotTicketPurchase(activity):
       return 'Ticket Purchase'
+    case isSendPotWin(activity):
+      return 'Sendpot win'
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Referral Reward'
     case isSendTokenUpgradeEvent(activity):
@@ -322,7 +336,7 @@ export function phraseFromActivity(
   switch (true) {
     case isTemporalTransfer:
       return temporalEventNameFromStatus(data.status)
-    case isTicketPurchase(activity):
+    case isSendPotTicketPurchase(activity):
       return 'Bought Tickets'
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Earned referral reward'
@@ -370,7 +384,7 @@ export function subtextFromActivity(
   const isETHReceive = isSendAccountReceiveEvent(activity)
   const isSwapTransfer = isActivitySwapTransfer(activity, swapRouters, liquidityPools)
 
-  if (isTicketPurchase(activity)) {
+  if (isSendPotTicketPurchase(activity)) {
     return null // No subtext for ticket purchases
   }
   if (isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity)) {

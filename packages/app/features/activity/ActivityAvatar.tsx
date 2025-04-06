@@ -6,7 +6,8 @@ import {
   counterpart,
   isSwapBuyTransfer,
   isSwapSellTransfer,
-  isTicketPurchase,
+  isSendPotTicketPurchase,
+  isSendPotWin,
 } from 'app/utils/activity'
 import {
   type Activity,
@@ -29,7 +30,7 @@ export function ActivityAvatar({
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
 
-  if (isSwapBuyTransfer(activity, swapRouters) || isTicketPurchase(activity)) {
+  if (isSwapBuyTransfer(activity, swapRouters) || isSendPotWin(activity)) {
     return (
       <XStack w="$4.5" h={'$4.5'} br="$4" ai={'center'} jc={'center'} bc={'$olive'}>
         <Plus color={'$color2'} />
@@ -37,7 +38,10 @@ export function ActivityAvatar({
     )
   }
 
-  if (isSwapSellTransfer(activity, swapRouters, liquidityPools)) {
+  if (
+    isSwapSellTransfer(activity, swapRouters, liquidityPools) ||
+    isSendPotTicketPurchase(activity)
+  ) {
     return (
       <XStack w="$4.5" h={'$4.5'} br="$4" ai={'center'} jc={'center'} bc={'$error'}>
         <Minus />
