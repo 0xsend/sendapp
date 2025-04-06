@@ -7,8 +7,6 @@
 import { createSeedClient } from '@snaplet/seed'
 import { models } from '../src'
 import { leaderboardReferralsAllTimes, userOnboarded } from '../src/models'
-import { baseMainnetClient } from '@my/wagmi'
-import { hexToBytes } from 'viem'
 import { pravatar } from '../src/utils'
 
 const dryRun = process.env.DRY !== '0'
