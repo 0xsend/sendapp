@@ -18,7 +18,9 @@ const calculateExchangeRate = (
   inCoin: coin,
   outCoin: coin
 ) => {
-  const exchangeRate = Number(outAmount.replace(',', '')) / Number(inAmount.replace(',', ''))
+  const exchangeRate = (
+    Number(outAmount.replace(',', '')) / Number(inAmount.replace(',', ''))
+  ).toFixed(outCoin.formatDecimals)
   return `1 ${inCoin.symbol} = ${exchangeRate} ${outCoin.symbol}`
 }
 

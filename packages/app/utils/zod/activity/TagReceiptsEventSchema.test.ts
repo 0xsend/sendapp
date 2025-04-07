@@ -29,6 +29,7 @@ describe('TagReceiptsDataSchema', () => {
             label: 'Ethereum',
             symbol: 'ETH',
             token: 'eth',
+            formatDecimals: 5,
           },
         },
       },

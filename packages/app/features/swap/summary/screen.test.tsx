@@ -14,12 +14,14 @@ jest.mock('app/provider/coins', () => ({
         token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
         balance: 250000n,
         decimals: 6,
+        formatDecimals: 2,
       },
       {
         label: 'SEND',
         token: '0xEab49138BA2Ea6dd776220fE26b7b8E446638956',
         balance: 250000n,
         decimals: 18,
+        formatDecimals: 0,
       },
     ],
     totalPrice: 5000000n,
@@ -32,6 +34,7 @@ jest.mock('app/provider/coins', () => ({
         token: '0xEab49138BA2Ea6dd776220fE26b7b8E446638956',
         balance: 2500000n,
         decimals: 18,
+        formatDecimals: 0,
       },
       isLoading: false,
     })
@@ -41,6 +44,7 @@ jest.mock('app/provider/coins', () => ({
         token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
         balance: 2500000n,
         decimals: 6,
+        formatDecimals: 2,
       },
       isLoading: false,
     }),
@@ -114,8 +118,8 @@ jest.mock('solito/router', () => ({
 
 describe('swap summary screen', () => {
   queryClient.setQueryData([SWAP_ROUTE_SUMMARY_QUERY_KEY], {
-    amountIn: '10000000000',
-    amountOut: '5000000000000000000000',
+    amountIn: '1000000',
+    amountOut: '140527385864174618010',
   })
 
   beforeEach(() => {
@@ -139,11 +143,11 @@ describe('swap summary screen', () => {
 
     expect(screen.toJSON()).toMatchSnapshot()
 
-    expect(screen.getByTestId('swapInAmount')).toHaveTextContent('10,000')
-    expect(screen.getByTestId('swapOutAmount')).toHaveTextContent('5,000')
+    expect(screen.getByTestId('swapInAmount')).toHaveTextContent('1')
+    expect(screen.getByTestId('swapOutAmount')).toHaveTextContent('140')
 
     expect(screen.getByText('Exchange Rate')).toBeOnTheScreen()
-    expect(screen.getByText('1 USDC = 0.5 SEND')).toBeOnTheScreen()
+    expect(screen.getByText('1 USDC = 140 SEND')).toBeOnTheScreen()
 
     expect(screen.getByText('Transaction Fee')).toBeOnTheScreen()
     expect(screen.getByText('0.20 USDC')).toBeOnTheScreen()
