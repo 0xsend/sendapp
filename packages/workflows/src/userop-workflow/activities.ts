@@ -33,16 +33,29 @@ export const createUserOpActivities = (
   bootstrap(env)
   return {
     async simulateUserOperationActivity(userOp) {
-      await simulateUserOperation(userOp)
+      try {
+        await simulateUserOperation(userOp)
+      } catch (error) {
+        log.error('Failed to simulate user operation', { error })
+        throw ApplicationFailure.nonRetryable(
+          'Failed to simulate user operation',
+          error.code,
+          error.details
+        )
+      }
     },
     async decodeExecuteBatchCallDataActivity(data) {
-      const { args, functionName } = decodeExecuteBatchCalldata(data)
-      if (!args || !functionName) {
-        log.error('Failed to decode executeBatch user op', { args, functionName })
-        throw new Error('Failed to decode executeBatch user op')
-      }
+      try {
+        const { args, functionName } = decodeExecuteBatchCalldata(data)
+        if (!args || !functionName) {
+          throw ApplicationFailure.nonRetryable('Failed to decode executeBatch user op')
+        }
 
-      return { functionName, args }
+        return { functionName, args }
+      } catch (error) {
+        log.error('Failed to decode executeBatch user op', { error })
+        throw ApplicationFailure.nonRetryable(error.message, error.code, error.details)
+      }
     },
     async getBaseBlockNumberActivity() {
       try {
@@ -53,24 +66,38 @@ export const createUserOpActivities = (
       }
     },
     async sendUserOpActivity(userOp) {
-      const hash = await sendUserOperation(userOp)
-      const hashBytea = hexToBytea(hash)
-      return hashBytea
+      try {
+        const hash = await sendUserOperation(userOp)
+        const hashBytea = hexToBytea(hash)
+        return hashBytea
+      } catch (error) {
+        log.error('sendUserOpActivity failed', { error })
+        // Throw non retryable error for now
+        // This should retry a few times
+        throw ApplicationFailure.nonRetryable(
+          'Failed to send user operation',
+          error.code,
+          error.details
+        )
+      }
     },
     async waitForTransactionReceiptActivity(hash) {
-      const hexHash = byteaToHex(hash)
-
-      const bundlerReceipt = await waitForTransactionReceipt(hexHash)
-      if (!bundlerReceipt) {
-        throw ApplicationFailure.retryable('No receipt returned from waitForTransactionReceipt')
+      try {
+        const hexHash = byteaToHex(hash)
+        const bundlerReceipt = await waitForTransactionReceipt(hexHash)
+        log.info('waitForTransactionReceiptActivity', {
+          bundlerReceipt: superjson.stringify(bundlerReceipt),
+        })
+        if (!bundlerReceipt.success) {
+          throw ApplicationFailure.nonRetryable(
+            `Transaction failed: ${bundlerReceipt.receipt.transactionHash}`
+          )
+        }
+        return bundlerReceipt
+      } catch (error) {
+        log.error('waitForTransactionReceipt failed', { error })
+        throw ApplicationFailure.nonRetryable(error.message, error.code, error.details)
       }
-      log.info('waitForTransactionReceiptActivity', {
-        bundlerReceipt: superjson.stringify(bundlerReceipt),
-      })
-      if (!bundlerReceipt.success) {
-        throw new Error('Transaction failed')
-      }
-      return bundlerReceipt
     },
   }
 }
