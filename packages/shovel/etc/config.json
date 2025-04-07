@@ -998,7 +998,7 @@
       "sources": [
         {
           "name": "base_logs",
-          "start": "27948000"
+          "start": "$SENDPOT_BLOCK_START"
         }
       ]
     },
@@ -1138,7 +1138,7 @@
       "sources": [
         {
           "name": "base_logs",
-          "start": "27948000"
+          "start": "$SENDPOT_BLOCK_START"
         }
       ]
     }

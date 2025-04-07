@@ -75,11 +75,11 @@ export const integrations: Integration[] = [
   },
   {
     ...sendPotUserTicketPurchaseIntegration,
-    sources: [{ name: baseSrcLogs.name, start: '$BASE_BLOCK_START' }],
+    sources: [{ name: baseSrcLogs.name, start: '$SENDPOT_BLOCK_START' }],
   },
   {
     ...sendPotJackpotRunIntegration,
-    sources: [{ name: baseSrcLogs.name, start: '$BASE_BLOCK_START' }],
+    sources: [{ name: baseSrcLogs.name, start: '$SENDPOT_BLOCK_START' }],
   },
 ]
 
