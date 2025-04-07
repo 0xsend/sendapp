@@ -39,7 +39,7 @@ export const ActivityDetails = ({
   const { data: liquidityPools } = useLiquidityPools()
   const activityText = phraseFromActivity(activity, swapRouters, liquidityPools)
   const subText = subtextFromActivity(activity, swapRouters, liquidityPools)
-  const amount = amountFromActivity(activity)
+  const amount = amountFromActivity(activity, swapRouters, liquidityPools)
   const note = noteFromActivity(activity)
 
   return (

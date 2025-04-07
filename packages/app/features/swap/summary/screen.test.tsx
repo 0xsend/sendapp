@@ -154,6 +154,6 @@ describe('swap summary screen', () => {
     expect(screen.getByText('Max Slippage')).toBeOnTheScreen()
     expect(screen.getByText('0.5%')).toBeOnTheScreen()
 
-    expect(screen.getByText('confirm swap')).toBeOnTheScreen()
+    expect(screen.getByText('confirm trade')).toBeOnTheScreen()
   })
 })

@@ -77,7 +77,11 @@ export function counterpart(activity: Activity): Activity['from_user'] | Activit
 /**
  * Returns the amount of the activity if there is one.
  */
-export function amountFromActivity(activity: Activity): string {
+export function amountFromActivity(
+  activity: Activity,
+  swapRouters: SwapRouter[] = [],
+  liquidityPools: LiquidityPool[] = []
+): string {
   switch (true) {
     case isTemporalTokenTransfersEvent(activity): {
       const { v, coin } = activity.data
@@ -97,6 +101,7 @@ export function amountFromActivity(activity: Activity): string {
     }
     case isSendAccountTransfersEvent(activity): {
       const { v, coin } = activity.data
+      const isSellTransfer = isSwapSellTransfer(activity, swapRouters, liquidityPools)
       if (coin) {
         // scale the send v0 amount to send v1 amount
         if (
@@ -116,7 +121,7 @@ export function amountFromActivity(activity: Activity): string {
 
         const amount = formatAmount(formatUnits(v, coin.decimals), 5, coin.formatDecimals)
 
-        return `${amount} ${coin.symbol}`
+        return `${isSellTransfer ? '- ' : ''}${amount} ${coin.symbol}`
       }
       return formatAmount(`${v}`, 5, 0)
     }
@@ -265,12 +270,12 @@ export function eventNameFromActivity(
       return 'Send Token Upgrade'
     case isERC20Transfer && to_user?.send_id === undefined:
       if (isSwapTransfer) {
-        return 'Sold'
+        return 'Traded'
       }
       return 'Withdraw'
     case isTransferOrReceive && from_user === null:
       if (isSwapTransfer) {
-        return 'Bought'
+        return 'Traded'
       }
       return 'Deposit'
     case isTransferOrReceive && !!to_user?.id:
@@ -321,12 +326,12 @@ export function phraseFromActivity(
       return 'Upgraded'
     case isERC20Transfer && to_user?.send_id === undefined:
       if (isSwapTransfer) {
-        return 'Sold'
+        return 'Traded'
       }
       return 'Withdrew'
     case isTransferOrReceive && from_user === null:
       if (isSwapTransfer) {
-        return 'Bought'
+        return 'Traded'
       }
       return 'Deposited'
     case isTransferOrReceive && !!to_user?.id:
