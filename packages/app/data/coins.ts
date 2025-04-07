@@ -51,6 +51,7 @@ export const ethCoin = {
   token: 'eth',
   decimals: 18,
   coingeckoTokenId: 'ethereum',
+  formatDecimals: 5,
 } as const satisfies coin
 
 export const sendCoin = {
@@ -77,6 +78,7 @@ export const spx6900Coin = {
   symbol: 'SPX',
   token: spx6900Addresses[baseMainnet.id],
   decimals: 8,
+  formatDecimals: 2,
   coingeckoTokenId: 'spx6900',
 } as const satisfies coin
 
@@ -103,7 +105,7 @@ export const aerodromeCoin = {
   symbol: 'AERO',
   token: aerodromeFinanceAddresses[baseMainnet.id],
   decimals: 18,
-  formatDecimals: 0,
+  formatDecimals: 2,
   coingeckoTokenId: 'aerodrome-finance',
 } as const satisfies coin
 

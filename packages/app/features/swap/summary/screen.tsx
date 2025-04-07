@@ -70,9 +70,16 @@ export const SwapSummaryScreen = () => {
     formatUnits(BigInt(routeSummary?.amountIn || 0), inCoin?.decimals || 0)
   )
   const amountOut = localizeAmount(
-    formatUnits(BigInt(routeSummary?.amountOut || 0), outCoin?.decimals || 0)
+    formatAmount(
+      formatUnits(BigInt(routeSummary?.amountOut || 0), outCoin?.decimals || 0),
+      12,
+      outCoin?.formatDecimals
+    )
   )
-  const exchangeRate = Number(amountOut.replace(/,/g, '')) / Number(amountIn.replace(/,/g, ''))
+
+  const exchangeRate = (
+    Number(amountOut.replace(/,/g, '')) / Number(amountIn.replace(/,/g, ''))
+  ).toFixed(outCoin?.formatDecimals)
 
   const initLoading =
     isLoadingCoins || isSendAccountLoading || isEncodeRouteLoading || isLoadingUserOp

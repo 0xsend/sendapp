@@ -324,7 +324,7 @@ exports[`swap summary screen should render 1`] = `
               suppressHighlighting={true}
               testID="swapInAmount"
             >
-              10,000
+              1
             </Text>
           </View>
         </View>
@@ -618,7 +618,7 @@ exports[`swap summary screen should render 1`] = `
               suppressHighlighting={true}
               testID="swapOutAmount"
             >
-              5,000
+              140
             </Text>
           </View>
         </View>
@@ -841,7 +841,7 @@ exports[`swap summary screen should render 1`] = `
                   suppressHighlighting={true}
                   testID="exchangeRate"
                 >
-                  1 USDC = 0.5 SEND
+                  1 USDC = 140 SEND
                 </Text>
               </View>
             </View>
