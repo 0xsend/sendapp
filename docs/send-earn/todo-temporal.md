@@ -18,17 +18,17 @@ Refactor the current client-side Send Earn deposit process to utilize a Temporal
         *   [x] Verify `public.referrals` table constraints (unique `referred_id`) and insert logic (e.g., `ignoreDuplicates: true` behavior on conflict).
         *   [x] Verify the activity cleanup trigger functions correctly.
 
-## Phase 2: Supabase Helpers and Unit Testing
+## Phase 2: Supabase Helpers and Unit Testing [COMPLETED]
 
-1.  **Implement/Update Helpers (`packages/workflows/src/.../supabase.ts` or shared utils):**
-    *   Modify `upsertTemporalSendEarnDeposit` to accept `vault: null` and remove the strict requirement check in its validation logic.
-    *   Ensure `updateTemporalSendEarnDeposit` can update the `vault` field.
-    *   Verify or implement `async function getUserIdFromAddress(address: Address): Promise<string | null>` using `supabaseAdmin` (e.g., query `public.send_accounts`).
-2.  **Unit Testing (Jest/Vitest):**
-    *   Write/update unit tests for:
-        *   `upsertTemporalSendEarnDeposit` (mock Supabase client, test null vault handling).
-        *   `updateTemporalSendEarnDeposit` (mock Supabase client).
-        *   `getUserIdFromAddress` (mock Supabase client, test found/not found cases).
+1.  **[x] Implement/Update Helpers (`packages/workflows/src/deposit-workflow/supabase.ts`):**
+    *   [x] Modify `upsertTemporalSendEarnDeposit` to accept `vault: null` and remove the strict requirement check in its validation logic.
+    *   [x] Ensure `updateTemporalSendEarnDeposit` can update the `vault` field. (Verified, no changes needed).
+    *   [x] Implement `async function getUserIdFromAddress(address: Address): Promise<string | null>` using `supabaseAdmin` (query `public.send_accounts`).
+2.  **[x] Unit Testing (Vitest):**
+    *   [x] Write unit tests for:
+        *   [x] `upsertTemporalSendEarnDeposit` (mock Supabase client, test null vault handling).
+        *   [x] `updateTemporalSendEarnDeposit` (mock Supabase client).
+        *   [x] `getUserIdFromAddress` (mock Supabase client, test found/not found cases).
 
 ## Phase 3: Temporal Activities and Unit Testing
 
