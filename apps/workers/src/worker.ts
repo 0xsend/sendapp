@@ -2,6 +2,7 @@ import { Worker, NativeConnection } from '@temporalio/worker'
 import { createTransferActivities } from '@my/workflows/all-activities'
 import { createRequire } from 'node:module'
 const require = createRequire(import.meta.url)
+import { version } from '@my/workflows/version'
 
 const { NODE_ENV = 'development', TEMPORAL_MTLS_TLS_CERT, TEMPORAL_MTLS_TLS_KEY } = process.env
 const isDeployed = ['production', 'test'].includes(NODE_ENV)
@@ -43,7 +44,7 @@ async function run() {
     ...workflowOption(),
     activities: createTransferActivities(process.env),
     namespace: process.env.TEMPORAL_NAMESPACE ?? 'default',
-    taskQueue: 'monorepo',
+    taskQueue: `monorepo@${version}`,
     bundlerOptions: {
       ignoreModules: ['@supabase/supabase-js'],
     },

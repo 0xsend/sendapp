@@ -1,5 +1,6 @@
 {
   "name": "@my/workflows",
+  "version": "0.0.1",
   "files": [
     "package.json",
     "src"
@@ -20,6 +21,10 @@
     },
     "./workflow-bundle": {
       "default": "./dist/workflow-bundle.js"
+    },
+    "./version": {
+      "types": "./src/version.ts",
+      "default": "./src/version.ts"
     }
   },
   "scripts": {
