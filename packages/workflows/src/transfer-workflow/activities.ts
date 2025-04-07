@@ -11,7 +11,6 @@ import type { UserOperation, GetUserOperationReceiptReturnType } from 'permissio
 import { bootstrap } from '@my/workflows/utils'
 import { decodeTransferUserOp } from 'app/utils/decodeTransferUserOp'
 import { allCoins } from 'app/data/coins'
-import { createUserOpActivities, type UserOpActivities } from '../shared/userop-activities'
 import type { Address } from 'viem'
 import { isAddressInTopic, isReceiveTopic, isTransferTopic } from './wagmi'
 
@@ -41,17 +40,14 @@ type TransferActivities = {
     eventName: string
     eventId: string
   }>
-} & UserOpActivities
+}
 
 export const createTransferActivities = (
   env: Record<string, string | undefined>
 ): TransferActivities => {
   bootstrap(env)
 
-  const userOpActivities = createUserOpActivities(env)
-
   return {
-    ...userOpActivities,
     async upsertTemporalSendAccountTransferActivity({ workflowId, data }) {
       const { data: upsertData, error } = await upsertTemporalSendAccountTransfer({
         workflow_id: workflowId,

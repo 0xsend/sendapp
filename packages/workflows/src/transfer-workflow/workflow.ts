@@ -4,20 +4,26 @@ import type { UserOperation } from 'permissionless'
 import superjson from 'superjson'
 import debug from 'debug'
 import { hexToBytea } from 'app/utils/hexToBytea'
+import type { createUserOpActivities } from '../userop-workflow/activities'
 
 const debugLog = debug('workflows:transfer')
 
 const {
   upsertTemporalSendAccountTransferActivity,
-  simulateUserOperationActivity,
-  getBaseBlockNumberActivity,
   decodeTransferUserOpActivity,
   updateTemporalSendAccountTransferActivity,
-  sendUserOpActivity,
-  waitForTransactionReceiptActivity,
   getEventFromTransferActivity,
 } = proxyActivities<ReturnType<typeof createTransferActivities>>({
-  // TODO: make this configurablea
+  // TODO: make this configurable
+  startToCloseTimeout: '10 minutes',
+})
+
+const {
+  simulateUserOperationActivity,
+  getBaseBlockNumberActivity,
+  sendUserOpActivity,
+  waitForTransactionReceiptActivity,
+} = proxyActivities<ReturnType<typeof createUserOpActivities>>({
   startToCloseTimeout: '10 minutes',
 })
 
