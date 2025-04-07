@@ -11,12 +11,13 @@ import type { UserOperation, GetUserOperationReceiptReturnType } from 'permissio
 import { bootstrap } from '@my/workflows/utils'
 import { decodeTransferUserOp } from 'app/utils/decodeTransferUserOp'
 import { allCoins } from 'app/data/coins'
-import { createUserOpActivities, type UserOpActivities } from '../shared/userop-activities'
 import type { Address } from 'viem'
 import { isAddressInTopic, isReceiveTopic, isTransferTopic } from './wagmi'
 
 type TransferActivities = {
-  upsertTemporalSendAccountTransferActivity: (TemporalTransferInsert) => Promise<TemporalTransfer>
+  upsertTemporalSendAccountTransferActivity: (
+    params: TemporalTransferInsert
+  ) => Promise<TemporalTransfer>
   decodeTransferUserOpActivity: (
     workflowId: string,
     userOp: UserOperation<'v0.7'>
@@ -26,7 +27,9 @@ type TransferActivities = {
     amount: bigint
     token: Address | null
   }>
-  updateTemporalSendAccountTransferActivity: (TemporalTransferUpdate) => Promise<TemporalTransfer>
+  updateTemporalSendAccountTransferActivity: (
+    params: TemporalTransferUpdate
+  ) => Promise<TemporalTransfer>
   getEventFromTransferActivity: ({
     bundlerReceipt,
     token,
@@ -41,34 +44,31 @@ type TransferActivities = {
     eventName: string
     eventId: string
   }>
-} & UserOpActivities
+}
 
 export const createTransferActivities = (
   env: Record<string, string | undefined>
 ): TransferActivities => {
   bootstrap(env)
 
-  const userOpActivities = createUserOpActivities(env)
-
   return {
-    ...userOpActivities,
-    async upsertTemporalSendAccountTransferActivity({ workflowId, data }) {
+    async upsertTemporalSendAccountTransferActivity(params) {
+      const { workflow_id } = params
       const { data: upsertData, error } = await upsertTemporalSendAccountTransfer({
-        workflow_id: workflowId,
+        ...params,
         status: 'initialized',
-        data,
       })
 
       if (error) {
         if (isRetryableDBError(error)) {
           throw ApplicationFailure.retryable('Database connection error, retrying...', error.code, {
             error,
-            workflowId,
+            workflow_id,
           })
         }
 
         const { error: upsertFailedError } = await upsertTemporalSendAccountTransfer({
-          workflow_id: workflowId,
+          workflow_id,
           status: 'failed',
         })
         if (upsertFailedError) {
@@ -77,13 +77,13 @@ export const createTransferActivities = (
             upsertFailedError.code,
             {
               error: upsertFailedError,
-              workflowId,
+              workflow_id,
             }
           )
         }
         throw ApplicationFailure.nonRetryable('Database error occurred', error.code, {
           error,
-          workflowId,
+          workflow_id,
         })
       }
 
@@ -139,29 +139,20 @@ export const createTransferActivities = (
         )
       }
     },
-    async updateTemporalSendAccountTransferActivity({
-      workflowId,
-      status,
-      createdAtBlockNum,
-      data,
-    }) {
-      const { data: upsertedData, error } = await updateTemporalSendAccountTransfer({
-        workflow_id: workflowId,
-        status,
-        created_at_block_num: createdAtBlockNum ? Number(createdAtBlockNum) : null,
-        data,
-      })
+    async updateTemporalSendAccountTransferActivity(params) {
+      const { workflow_id } = params
+      const { data: upsertedData, error } = await updateTemporalSendAccountTransfer(params)
 
       if (error) {
         if (isRetryableDBError(error)) {
           throw ApplicationFailure.retryable('Database connection error, retrying...', error.code, {
             error,
-            workflowId,
+            workflow_id,
           })
         }
 
         const { error: updateError } = await updateTemporalSendAccountTransfer({
-          workflow_id: workflowId,
+          workflow_id,
           status: 'failed',
         })
         if (updateError) {
@@ -170,14 +161,14 @@ export const createTransferActivities = (
             updateError.code,
             {
               error: updateError,
-              workflowId,
+              workflow_id,
             }
           )
         }
 
         throw ApplicationFailure.nonRetryable('Database error occurred', error.code, {
           error,
-          workflowId,
+          workflow_id,
         })
       }
 

@@ -27,18 +27,16 @@ export async function upsertTemporalSendAccountTransfer({
     .single()
 }
 
-export async function updateTemporalSendAccountTransfer({
-  workflow_id,
-  status,
-  created_at_block_num,
-  data,
-}: TemporalTransferUpdate) {
+export async function updateTemporalSendAccountTransfer(params: TemporalTransferUpdate) {
+  const { workflow_id, ...rest } = params
   if (!workflow_id) throw new Error('Workflow ID is required to update temporal transfer')
-  const payload = {
-    status,
-  } as TemporalTransferUpdate
-  if (created_at_block_num) payload.created_at_block_num = created_at_block_num
-  if (data) payload.data = data
+  const payload: TemporalTransferUpdate = {}
+
+  for (const [key, value] of Object.entries(rest)) {
+    if (value !== null && value !== undefined) {
+      payload[key] = value
+    }
+  }
   return await supabaseAdmin
     .schema('temporal')
     .from('send_account_transfers')
