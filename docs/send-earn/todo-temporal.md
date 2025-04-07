@@ -35,8 +35,8 @@ Refactor the current client-side Send Earn deposit process to utilize a Temporal
 1.  **Implement/Update Activities (`packages/workflows/src/deposit-workflow/activities.ts`):**
     *   Update `upsertTemporalDepositActivity` input type (`TemporalDepositInsert`) to allow optional/null `vault`, ensuring it calls the modified Supabase helper correctly.
     *   Implement `getVaultFromFactoryDepositActivity`:
-        *   Input: `transactionHash: \`0x\${string}\``.
-        *   Logic: Query `public.send_earn_deposit` table using the `transactionHash` to retrieve the associated `vault` address. Handle cases where the record or vault is not found. Return `Address | null`.
+        *   Input: `{ transactionHash: \`0x\${string}\`, owner: Address }`.
+        *   Logic: Query `public.send_earn_deposit` table using the `transactionHash` **and `owner`** to retrieve the associated `vault` address. Handle cases where the record or vault is not found. Return `Address | null`.
     *   Implement `upsertReferralRelationshipActivity`:
         *   Input: `referrerAddress: Address`, `referredAddress: Address`.
         *   Logic:
