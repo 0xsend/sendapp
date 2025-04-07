@@ -43,8 +43,8 @@ const links = [
   },
   {
     icon: <IconSwap size={'$1'} color={'inherit'} />,
-    text: 'Swap',
-    href: '/swap',
+    text: 'Trade',
+    href: '/trade',
   },
   {
     icon: <IconDeviceReset size={'$1'} color={'inherit'} />,

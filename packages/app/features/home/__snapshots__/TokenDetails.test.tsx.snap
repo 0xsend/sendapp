@@ -509,7 +509,7 @@ exports[`TokenDetails renders correctly 1`] = `
             }
             suppressHighlighting={true}
           >
-            Swap
+            Trade
           </Text>
         </View>
       </View>

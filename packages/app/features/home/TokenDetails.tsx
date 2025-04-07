@@ -42,12 +42,12 @@ export function AnimateEnter({ children }: { children: React.ReactNode }) {
 export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
   const hoverStyles = useHoverStyles()
 
-  const getSwapUrl = () => {
+  const getTradeUrl = () => {
     if (coin?.symbol === sendCoin.symbol) {
-      return `/swap?inToken=${coin?.token}&outToken=${usdcCoin.token}`
+      return `/trade?inToken=${coin?.token}&outToken=${usdcCoin.token}`
     }
 
-    return `/swap?inToken=${coin?.token}`
+    return `/trade?inToken=${coin?.token}`
   }
 
   return (
@@ -100,7 +100,7 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
             </YStack>
           </LinkableButton>
           <LinkableButton
-            href={getSwapUrl()}
+            href={getTradeUrl()}
             f={1}
             height={'auto'}
             hoverStyle={hoverStyles}
@@ -115,7 +115,7 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
                 />
               </Theme>
               <Button.Text fontSize={'$4'} px="$2">
-                Swap
+                Trade
               </Button.Text>
             </YStack>
           </LinkableButton>

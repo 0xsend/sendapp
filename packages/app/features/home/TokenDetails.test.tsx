@@ -58,7 +58,7 @@ describe('TokenDetails', () => {
     expect(screen.toJSON()).toMatchSnapshot()
 
     // Assertions
-    expect(screen.getByText('Swap')).toBeOnTheScreen()
+    expect(screen.getByText('Trade')).toBeOnTheScreen()
 
     // 2 deposit elements, button to deposit and deposit activity row
 

@@ -134,7 +134,7 @@ export const SwapSummaryScreen = () => {
 
   useEffect(() => {
     if (!routeSummary) {
-      router.push({ pathname: '/swap', query: swapParams })
+      router.push({ pathname: '/trade', query: swapParams })
     }
 
     if (encodeRouteStatus === 'idle') {
@@ -328,7 +328,7 @@ export const SwapSummaryScreen = () => {
                     size={'$5'}
                     color={'$black'}
                   >
-                    swapping...
+                    trading...
                   </Button.Text>
                 </>
               )
@@ -341,7 +341,7 @@ export const SwapSummaryScreen = () => {
                   size={'$5'}
                   color={'$black'}
                 >
-                  confirm swap
+                  confirm trade
                 </Button.Text>
               )
           }
