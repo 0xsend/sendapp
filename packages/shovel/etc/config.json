@@ -1173,7 +1173,7 @@
           "column": "log_addr",
           "filter_op": "contains",
           "filter_arg": [
-            "0x392F337911A610a3850bfE7805ab9C948B836838"
+            "0x5a11492a244920eD0c5f440D13088DA21fDF99c1"
           ]
         }
       ],
@@ -1313,7 +1313,7 @@
           "column": "log_addr",
           "filter_op": "contains",
           "filter_arg": [
-            "0x392F337911A610a3850bfE7805ab9C948B836838"
+            "0x5a11492a244920eD0c5f440D13088DA21fDF99c1"
           ]
         }
       ],
