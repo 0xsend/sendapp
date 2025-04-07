@@ -65,21 +65,7 @@ const links = [
     : undefined,
 ].filter(Boolean) as { icon: ReactElement; text: string; href: string }[]
 
-// this code can be removed then swaps are no longer behind whitelist
-const useActiveLinks = () => {
-  const { user } = useUser()
-  const isSwapAllowListSet = Boolean(process.env.NEXT_PUBLIC_SWAP_ALLOWLIST)
-  const swapEnabledUsers = (process.env.NEXT_PUBLIC_SWAP_ALLOWLIST ?? '').split(',')
-  const isSwapEnabled = !isSwapAllowListSet || (user?.id && swapEnabledUsers.includes(user.id))
-  const _links = isSwapEnabled ? links : links.filter((link) => link.href !== '/swap')
-
-  return _links
-}
-
 const HomeSideBar = ({ ...props }: YStackProps) => {
-  // this code can be removed then swaps are no longer behind whitelist
-  const links = useActiveLinks()
-
   return (
     <SideBar {...props} ai={'flex-start'} pl="$7">
       <Link href={'/'}>
@@ -99,8 +85,6 @@ const HomeBottomSheet = () => {
   const { profile } = useUser()
   const hoverStyles = useHoverStyles()
   const avatarUrl = profile?.avatar_url
-  // this code can be removed then swaps are no longer behind whitelist
-  const links = useActiveLinks()
 
   return (
     <NavSheet navId="home">
