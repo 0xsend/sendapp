@@ -70,11 +70,6 @@ declare global {
        * Kyberswap clientId, a stricter rate limit will be applied if a clientId is not provided
        */
       NEXT_PUBLIC_KYBER_CLIENT_ID: string
-
-      /**
-       * Swap Allowlist (comma separated list of user ids that can see the debit card option)
-       */
-      NEXT_PUBLIC_SWAP_ALLOWLIST: string
     }
   }
   /**
