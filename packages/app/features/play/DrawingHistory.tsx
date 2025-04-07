@@ -9,6 +9,7 @@ import { useSendAccount } from 'app/utils/send-accounts'
 import { formatUnits } from 'viem' // Removed zeroAddress if unused
 import { useUserJackpotSummary } from 'app/utils/useUserJackpotSummary'
 import type { Functions } from '@my/supabase/database.types'
+import { calculateActualTickets } from 'app/data/sendpot'
 
 // Define the structure for a general drawing history entry
 // User-specific details for *past* drawings are no longer available from the hook
@@ -17,7 +18,7 @@ export type DrawingHistoryEntry = {
   drawDate: string // Date of the weekly drawing
   prizePool: number // Total prize pool for this drawing
   winner?: string // Address or sendtag of the winner (undefined if pending or no winner yet)
-  totalTicketsPurchased: number // Total tickets bought *by the user* for this drawing (can be 0)
+  totalTicketsPurchased: number // Total tickets bought *by the user* for this drawing (can be 0) - THIS IS IN BPS
   result?: 'won' | 'lost' | 'pending' // Result *for the user*
 }
 
@@ -90,12 +91,12 @@ export const DrawingHistory = () => {
         currentRunData = run
       } else {
         // This is a historical run
-        const userTickets = run.total_tickets ?? 0
+        const userTicketsBps = run.total_tickets ?? 0 // Assuming this is BPS
         let resultStatus: 'won' | 'lost' | undefined = undefined
         if (userAddressLower && run.winner) {
           if (run.winner.toLowerCase() === userAddressLower) {
             resultStatus = 'won'
-          } else if (userTickets > 0) {
+          } else if (userTicketsBps > 0) {
             resultStatus = 'lost'
           }
         }
@@ -104,7 +105,7 @@ export const DrawingHistory = () => {
           drawDate: formatDateOrBlock(run.jackpot_block_num),
           prizePool: run.win_amount ?? 0,
           winner: run.winner, // Winner is guaranteed non-null here
-          totalTicketsPurchased: userTickets,
+          totalTicketsPurchased: userTicketsBps, // Store BPS
           result: resultStatus,
         })
       }
@@ -118,12 +119,12 @@ export const DrawingHistory = () => {
     const canDisplayCurrentEntry = formattedCurrentJackpotAmount !== undefined && !isLoadingSummary
 
     if (canDisplayCurrentEntry) {
-      const currentTickets = currentRunData?.total_tickets ?? 0 // Get tickets from summary if available
+      const currentTicketsBps = currentRunData?.total_tickets ?? 0 // Get tickets BPS from summary if available
       const currentEntry: DrawingHistoryEntry = {
         id: 'draw-current',
         drawDate: 'Upcoming',
-        // Use tickets from summary if current run was included, otherwise default to 0
-        totalTicketsPurchased: sendAccount ? currentTickets : 0,
+        // Use tickets BPS from summary if current run was included, otherwise default to 0
+        totalTicketsPurchased: sendAccount ? currentTicketsBps : 0, // Store BPS
         result: 'pending',
         // Use live pool amount for current display
         prizePool: formattedCurrentJackpotAmount ?? 0,
@@ -137,7 +138,7 @@ export const DrawingHistory = () => {
         const loadingEntry: DrawingHistoryEntry = {
           id: 'draw-current-loading',
           drawDate: 'Upcoming',
-          totalTicketsPurchased: 0,
+          totalTicketsPurchased: 0, // BPS
           result: 'pending',
           prizePool: 0,
           winner: '(Loading...)',
@@ -160,11 +161,11 @@ export const DrawingHistory = () => {
   // Loading state for the initial fetch of summary data
   const isLoadingInitialData = isLoadingSummary
 
-  // Render item for the FlatList
   const renderDrawingEntry = ({ item }: { item: DrawingHistoryEntry }) => {
     const isCurrent = item.result === 'pending'
-    // Use totalTicketsPurchased directly, as it comes from summaryData now
-    const displayTickets = item.totalTicketsPurchased
+    // Use totalTicketsPurchased (BPS) directly from item
+    const ticketsBps = item.totalTicketsPurchased
+    const actualTickets = calculateActualTickets(ticketsBps) // Calculate actual tickets
     const displayPrizePool = item.prizePool
 
     // Determine loading state specifically for the current item
@@ -186,8 +187,8 @@ export const DrawingHistory = () => {
                 {/* Handle loading state for current item */}
                 {itemIsLoadingCurrent && isCurrent ? ( // Only show spinner for current item loading
                   <Spinner size="small" />
-                ) : displayTickets > 0 ? (
-                  `You purchased ${displayTickets} ticket${displayTickets !== 1 ? 's' : ''}`
+                ) : actualTickets > 0 ? ( // Use actualTickets for display
+                  `You purchased ${actualTickets} ticket${actualTickets !== 1 ? 's' : ''}`
                 ) : (
                   'You purchased 0 tickets'
                 )}

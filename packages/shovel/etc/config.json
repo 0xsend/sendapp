@@ -998,7 +998,7 @@
       "sources": [
         {
           "name": "base_logs",
-          "start": "$BASE_BLOCK_START"
+          "start": "27948000"
         }
       ]
     },
@@ -1138,7 +1138,7 @@
       "sources": [
         {
           "name": "base_logs",
-          "start": "$BASE_BLOCK_START"
+          "start": "27948000"
         }
       ]
     }
