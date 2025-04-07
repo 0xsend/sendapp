@@ -20,6 +20,7 @@ import {
   IconHome,
   IconSendLogo,
   IconSwap,
+  IconTicket,
 } from 'app/components/icons'
 import { SideBarNavLink } from 'app/components/sidebar/SideBarNavLink'
 
@@ -45,6 +46,11 @@ const links = [
     icon: <IconSwap size={'$1'} color={'inherit'} />,
     text: 'Swap',
     href: '/swap',
+  },
+  {
+    icon: <IconTicket size={'$1'} color={'inherit'} />,
+    text: 'Play',
+    href: '/play',
   },
   {
     icon: <IconDeviceReset size={'$1'} color={'inherit'} />,

@@ -125,6 +125,7 @@ export function TopNav({
     path.includes('/secret-shop') ||
     path.includes('/deposit') ||
     path.includes('/swap') ||
+    path.includes('/play') || // Add /play here
     path.includes('/leaderboard')
 
   return (
