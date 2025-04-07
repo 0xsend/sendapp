@@ -6,3 +6,5 @@ pre-push:
   commands:
     check:
       run: bunx @biomejs/biome check --no-errors-on-unmatched --files-ignore-unknown=true {pushed_files}
+    workflows-version-check:
+      run: sh ./packages/workflows/workflows-version-check.sh
