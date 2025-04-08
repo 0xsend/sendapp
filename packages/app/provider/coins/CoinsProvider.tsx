@@ -37,12 +37,12 @@ export function CoinsProvider({ children }: { children: React.ReactNode }) {
     // Only include partner coins with non-zero balances
     const activePartnerCoins = partnerCoins
       .filter((coin) => {
-        const balance = balances[coin.token]
+        const balance = balances?.[coin.token === 'eth' ? coin.symbol : coin.token]
         return balance !== undefined && balance > 0n
       })
       .map((coin) => ({
         ...coin,
-        balance: balances[coin.token],
+        balance: balances?.[coin.token === 'eth' ? coin.symbol : coin.token],
       }))
 
     return [...coinsWithBalances, ...activePartnerCoins]

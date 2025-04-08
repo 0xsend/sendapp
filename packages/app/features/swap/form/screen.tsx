@@ -99,7 +99,7 @@ export const SwapFormScreen = () => {
     })
     queryClient.setQueryData([SWAP_ROUTE_SUMMARY_QUERY_KEY], swapRoute.routeSummary)
 
-    router.push({ pathname: '/swap/summary', query: swapParams })
+    router.push({ pathname: '/trade/summary', query: swapParams })
   }
 
   const handleFlipTokens = () => {
@@ -159,9 +159,15 @@ export const SwapFormScreen = () => {
 
     form.setValue(
       'outAmount',
-      localizeAmount(formatUnits(BigInt(swapRoute.routeSummary.amountOut), outCoin?.decimals || 0))
+      localizeAmount(
+        formatAmount(
+          formatUnits(BigInt(swapRoute.routeSummary.amountOut), outCoin?.decimals || 0),
+          12,
+          outCoin?.formatDecimals
+        )
+      )
     )
-  }, [swapRoute, outCoin?.decimals, form.setValue, formInAmount])
+  }, [swapRoute, outCoin?.decimals, form.setValue, formInAmount, outCoin?.formatDecimals])
 
   useEffect(() => {
     queryClient.removeQueries({ queryKey: [SWAP_ROUTE_SUMMARY_QUERY_KEY] })

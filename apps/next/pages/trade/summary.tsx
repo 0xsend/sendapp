@@ -9,7 +9,7 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Swap Summary</title>
+        <title>Send | Trade Summary</title>
       </Head>
       <SwapSummaryScreen />
     </>
@@ -19,7 +19,7 @@ export const Page: NextPageWithLayout = () => {
 export const getServerSideProps = userProtectedGetSSP()
 
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Swap Summary" backFunction="router" />}>
+  <HomeLayout TopNav={<TopNav header="Trade Summary" backFunction="router" />}>
     {children}
   </HomeLayout>
 )

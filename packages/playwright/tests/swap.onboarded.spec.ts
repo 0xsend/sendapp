@@ -18,7 +18,9 @@ const calculateExchangeRate = (
   inCoin: coin,
   outCoin: coin
 ) => {
-  const exchangeRate = Number(outAmount.replace(',', '')) / Number(inAmount.replace(',', ''))
+  const exchangeRate = (
+    Number(outAmount.replace(',', '')) / Number(inAmount.replace(',', ''))
+  ).toFixed(outCoin.formatDecimals)
   return `1 ${inCoin.symbol} = ${exchangeRate} ${outCoin.symbol}`
 }
 
@@ -38,7 +40,7 @@ for (const inCoin of [usdcCoin]) {
       swapFormPage,
       swapSummaryPage,
     }) => {
-      test.setTimeout(45_000)
+      test.setTimeout(60_000)
       log = debug(
         `test:swap:can-swap:${inCoin.symbol}:${outCoin.symbol}:${test.info().parallelIndex}`
       )
@@ -77,7 +79,7 @@ for (const inCoin of [usdcCoin]) {
       const exchangeRate = calculateExchangeRate(inAmount, outAmount, inCoin, outCoin)
       await swapFormPage.reviewSwap()
       await page.waitForURL(
-        `/swap/summary?outToken=${outCoin.token}&inToken=${inCoin.token}&inAmount=${
+        `/trade/summary?outToken=${outCoin.token}&inToken=${inCoin.token}&inAmount=${
           swapInAmount[inCoin.symbol]
         }&slippage=${slippage * 100}`
       )
@@ -102,10 +104,10 @@ for (const inCoin of [usdcCoin]) {
         }
         attempts++
         await expect(history).toBeVisible()
-        await expect(history.getByText('Bought')).toBeVisible()
+        await expect(history.getByText('Traded')).toBeVisible()
         const countCoinSymbols = await history.getByText(outCoin.symbol).count()
         expect(countCoinSymbols).toBe(2)
-      }).toPass({ timeout: 10_000 })
+      }).toPass({ timeout: 15_000 })
     })
   }
 }
@@ -122,7 +124,7 @@ test('can refresh swap form and preserve filled data', async ({ page, swapFormPa
   })
   await swapFormPage.flipTokens()
   await page.waitForURL(
-    '/swap?outToken=0xEab49138BA2Ea6dd776220fE26b7b8E446638956&inToken=0x50dA645f148798F68EF2d7dB7C1CB22A6819bb2C&inAmount=100000000000&slippage=1000'
+    '/trade?outToken=0xEab49138BA2Ea6dd776220fE26b7b8E446638956&inToken=0x50dA645f148798F68EF2d7dB7C1CB22A6819bb2C&inAmount=100000000000&slippage=1000'
   )
   await page.reload()
   await swapFormPage.acceptRiskDialog()

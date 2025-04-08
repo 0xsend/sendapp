@@ -328,9 +328,9 @@ exports[`swap form screen should render 1`] = `
                                       "name": "outAmount",
                                       "ref": {
                                         "name": "outAmount",
-                                        "value": "0.00012",
+                                        "value": "0.00",
                                       },
-                                      "value": "0.00012",
+                                      "value": "0.00",
                                     },
                                   },
                                   "outToken": {
@@ -361,7 +361,7 @@ exports[`swap form screen should render 1`] = `
                                 "_formValues": {
                                   "inAmount": "1",
                                   "inToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-                                  "outAmount": "0.00012",
+                                  "outAmount": "0.00",
                                   "outToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
                                   "slippage": 50,
                                 },
@@ -1134,9 +1134,9 @@ exports[`swap form screen should render 1`] = `
                                       "name": "outAmount",
                                       "ref": {
                                         "name": "outAmount",
-                                        "value": "0.00012",
+                                        "value": "0.00",
                                       },
-                                      "value": "0.00012",
+                                      "value": "0.00",
                                     },
                                   },
                                   "outToken": {
@@ -1167,7 +1167,7 @@ exports[`swap form screen should render 1`] = `
                                 "_formValues": {
                                   "inAmount": "1",
                                   "inToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-                                  "outAmount": "0.00012",
+                                  "outAmount": "0.00",
                                   "outToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
                                   "slippage": 50,
                                 },
@@ -1324,7 +1324,7 @@ exports[`swap form screen should render 1`] = `
                               }
                             }
                             testID="outAmountInput"
-                            value="0.00012"
+                            value="0.00"
                           />
                         </View>
                       </View>

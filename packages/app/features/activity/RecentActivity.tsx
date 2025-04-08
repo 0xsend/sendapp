@@ -126,6 +126,7 @@ function ActivityFeed({
             pt: '$2',
             $gtLg: {
               pt: '$3.5',
+              px: '$3.5',
             },
             borderTopLeftRadius: '$4',
             borderTopRightRadius: '$4',
@@ -134,6 +135,7 @@ function ActivityFeed({
             pb: '$2',
             $gtLg: {
               pb: '$3.5',
+              px: '$3.5',
             },
             borderBottomLeftRadius: '$4',
             borderBottomRightRadius: '$4',
