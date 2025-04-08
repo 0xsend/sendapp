@@ -45,9 +45,6 @@ async function run() {
     activities: createMonorepoActivities(process.env),
     namespace: process.env.TEMPORAL_NAMESPACE ?? 'default',
     taskQueue: `monorepo@${version}`,
-    bundlerOptions: {
-      ignoreModules: ['@supabase/supabase-js', 'viem', 'permissionless', 'wagmi', '@wagmi/core'],
-    },
   })
 
   await worker.run()

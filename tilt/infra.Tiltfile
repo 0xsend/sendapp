@@ -341,3 +341,17 @@ local_resource(
     serve_dir = _prj_root,
 )
 
+cmd_button(
+    "temporal:db reset",
+    argv = [
+        "/bin/sh",
+        "-c",
+        "rm -f ./var/temporal.db && tilt trigger temporal",
+    ],
+    dir = _prj_root,
+    icon_name = "restart_alt",
+    location = location.RESOURCE,
+    resource = "temporal",
+    text = "temporal db reset",
+)
+

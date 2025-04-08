@@ -12,8 +12,8 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { entryPointAddress, sendEarnAddress } from '@my/wagmi' // Removed baseMainnetBundlerClient
-import { useQueryClient } from '@tanstack/react-query' // Removed useMutation
+import { entryPointAddress, sendEarnAddress } from '@my/wagmi'
+import { useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { ReferredBy } from 'app/components/ReferredBy'
 import { usdcCoin } from 'app/data/coins'
@@ -21,20 +21,20 @@ import { CalculatedBenefits } from 'app/features/earn/components/CalculatedBenef
 import { EarnTerms } from 'app/features/earn/components/EarnTerms'
 import { Row } from 'app/features/earn/components/Row'
 import { useCoin } from 'app/provider/coins'
+import { api } from 'app/utils/api'
 import { assert } from 'app/utils/assert'
 import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
 import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { signUserOp } from 'app/utils/signUserOp'
 import { toNiceError } from 'app/utils/toNiceError'
-import { api } from 'app/utils/api'
 import { useAccountNonce, useUserOp } from 'app/utils/userop'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import debug from 'debug'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
-import { formatUnits } from 'viem' // Removed withRetry
+import { formatUnits } from 'viem'
 import { useChainId } from 'wagmi'
 import { type BRAND, z } from 'zod'
 import { useSendEarnAPY, useSendEarnBalances, useSendEarnCoinBalances } from '../hooks'
@@ -118,7 +118,7 @@ export function DepositForm() {
     onSuccess: (data) => {
       log('sendEarn.deposit.onSuccess', data)
       toast.show('Deposit Submitted', {
-        message: `Your deposit is being processed (ID: ${data.workflowId.split('/').pop()})`,
+        message: 'Your deposit is being processed.',
       })
       if (!coin.data) return
       router.push({

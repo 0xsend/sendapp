@@ -100,7 +100,7 @@ export class EarnDepositPage {
     await expect(this.page.getByRole('button', { name: 'Confirm Deposit' })).toBeVisible()
     await expect(this.page.getByRole('button', { name: 'Confirm Deposit' })).toBeEnabled()
     await this.page.getByRole('button', { name: 'Confirm Deposit' }).click()
-    await expect(this.page.getByText('Deposited successfully', { exact: true })).toBeVisible({
+    await expect(this.page.getByText('Deposit Submitted', { exact: true })).toBeVisible({
       timeout: 10_000,
     })
   }

@@ -4,6 +4,7 @@
     "noEmit": true,
     "composite": true,
     "moduleResolution": "bundler",
+    "target": "ESNext",
     "baseUrl": "./src",
     "paths": {
       "@my/supabase/*": ["../../supabase/*"],

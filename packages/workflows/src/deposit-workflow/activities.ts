@@ -67,7 +67,7 @@ export const createDepositActivities = (
     updateTemporalDepositActivity,
     sendUserOpActivity,
     waitForTransactionReceiptActivity,
-    verifyDepositIndexedActivity, // Added verifyDepositIndexedActivity
+    verifyDepositIndexedActivity,
     getVaultFromFactoryDepositActivity,
     upsertReferralRelationshipActivity,
   }

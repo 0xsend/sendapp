@@ -1,13 +1,9 @@
-import { ApplicationFailure, proxyActivities, workflowInfo } from '@temporalio/workflow'
-import { isFactoryDeposit, isVaultDeposit } from 'app/utils/decodeSendEarnDepositUserOp' // Added type guards and type
+import { ApplicationFailure, proxyActivities, workflowInfo, log } from '@temporalio/workflow'
+// import { isFactoryDeposit, isVaultDeposit } from 'app/utils/decodeSendEarnDepositUserOp'
 import { hexToBytea } from 'app/utils/hexToBytea'
-import debug from 'debug'
 import type { UserOperation } from 'permissionless'
-// Removed incorrect AddressZero import
+// import { isAddressEqual, zeroAddress } from 'viem'
 import type { createDepositActivities } from './activities'
-import { isAddressEqual, zeroAddress } from 'viem'
-
-const log = debug('workflows:deposit')
 
 const activities = proxyActivities<ReturnType<typeof createDepositActivities>>({
   startToCloseTimeout: '10 minutes', // Increased timeout for potentially longer indexing/referral steps
@@ -28,95 +24,100 @@ interface DepositWorkflowInput {
  */
 export async function DepositWorkflow({ userOp }: DepositWorkflowInput) {
   const { workflowId } = workflowInfo()
-  log(`Starting SendEarn Deposit Workflow: ${workflowId}`)
+  log.debug(`Starting SendEarn Deposit Workflow: ${workflowId}`)
+
+  log.debug(`[${workflowId}] Starting SendEarn Deposit Workflow`)
 
   try {
     // Decode UserOp (Moved inside try block)
     const depositCall = await activities.decodeDepositUserOpActivity(workflowId, userOp)
-    log(`[${workflowId}] Decoded UserOp: type=${depositCall.type}, owner=${depositCall.owner}`)
+    log.debug(
+      `[${workflowId}] Decoded UserOp: type=${depositCall.type}, owner=${depositCall.owner}`
+    )
 
     // Initial Upsert
-    log(`[${workflowId}] Initializing deposit record`)
+    log.debug(`[${workflowId}] Initializing deposit record`)
     await activities.upsertTemporalDepositActivity({
       workflow_id: workflowId,
       status: 'initialized',
       owner: hexToBytea(depositCall.owner), // Convert owner to bytea
       assets: depositCall.assets.toString(), // Convert assets (bigint) to string
       // Set vault based on deposit type, convert to bytea if present
-      vault: isVaultDeposit(depositCall) ? hexToBytea(depositCall.vault) : null,
+      // vault: isVaultDeposit(depositCall) ? hexToBytea(depositCall.vault) : null,
+      vault: null,
     })
-    log(`[${workflowId}] Deposit record initialized`)
+    log.debug(`[${workflowId}] Deposit record initialized`)
 
     // Simulate the UserOperation
-    log(`[${workflowId}] Simulating deposit UserOperation`)
+    log.debug(`[${workflowId}] Simulating deposit UserOperation`)
     await activities.simulateDepositActivity(workflowId, userOp)
-    log(`[${workflowId}] Simulation successful`)
+    log.debug(`[${workflowId}] Simulation successful`)
 
     // Update Status (Submitted)
-    log(`[${workflowId}] Updating deposit record to 'submitted'`)
+    log.debug(`[${workflowId}] Updating deposit record to 'submitted'`)
     await activities.updateTemporalDepositActivity({
       workflow_id: workflowId,
       status: 'submitted',
     })
-    log(`[${workflowId}] Deposit record updated to 'submitted'`)
+    log.debug(`[${workflowId}] Deposit record updated to 'submitted'`)
 
     // Send UserOp
-    log(`[${workflowId}] Sending UserOperation`)
+    log.debug(`[${workflowId}] Sending UserOperation`)
     const userOpHashBytea = await activities.sendUserOpActivity(workflowId, userOp)
-    log(`[${workflowId}] UserOperation sent, hash: ${userOpHashBytea}`)
+    log.debug(`[${workflowId}] UserOperation sent, hash: ${userOpHashBytea}`)
 
     // Update Status (Sent)
-    log(`[${workflowId}] Updating deposit record to 'sent'`)
+    log.debug(`[${workflowId}] Updating deposit record to 'sent'`)
     await activities.updateTemporalDepositActivity({
       workflow_id: workflowId,
       status: 'sent',
       user_op_hash: userOpHashBytea, // Pass bytea hash
     })
-    log(`[${workflowId}] Deposit record updated to 'sent'`)
+    log.debug(`[${workflowId}] Deposit record updated to 'sent'`)
 
     // Wait for Receipt
-    log(`[${workflowId}] Waiting for transaction receipt for hash: ${userOpHashBytea}`)
+    log.debug(`[${workflowId}] Waiting for transaction receipt for hash: ${userOpHashBytea}`)
     const receipt = await activities.waitForTransactionReceiptActivity(workflowId, userOpHashBytea)
-    log(
+    log.debug(
       `[${workflowId}] Transaction receipt received: txHash=${receipt.transactionHash}, block=${receipt.blockNumber}`
     )
 
     // Verify Indexing
-    log(`[${workflowId}] Verifying deposit indexing for tx: ${receipt.transactionHash}`)
+    log.debug(`[${workflowId}] Verifying deposit indexing for tx: ${receipt.transactionHash}`)
     await activities.verifyDepositIndexedActivity({
       transactionHash: receipt.transactionHash,
       owner: depositCall.owner, // Use owner from decoded call
     })
-    log(`[${workflowId}] Deposit indexing verified`)
+    log.debug(`[${workflowId}] Deposit indexing verified`)
 
     // Conditional Referral Upsert
     // Use literal zero address string instead of imported constant
-    if (isFactoryDeposit(depositCall) && !isAddressEqual(depositCall.referrer, zeroAddress)) {
-      log(
-        `[${workflowId}] Factory deposit with referrer (${depositCall.referrer}), attempting referral upsert`
-      )
-      try {
-        await activities.upsertReferralRelationshipActivity({
-          referrerAddress: depositCall.referrer,
-          referredAddress: depositCall.owner,
-          transactionHash: receipt.transactionHash,
-        })
-        log(`[${workflowId}] Referral upsert activity completed (may have been skipped or ignored)`)
-      } catch (referralError) {
-        // Log the error but allow the workflow to continue, as per plan
-        // Use log() with a WARN prefix instead of log.warn()
-        log(
-          `WARN: [${workflowId}] Non-fatal error during referral upsert activity: ${referralError.message}`,
-          referralError
-        )
-      }
-    } else {
-      log(`[${workflowId}] Skipping referral upsert (not a factory deposit or no referrer)`)
-    }
+    // if (isFactoryDeposit(depositCall) && !isAddressEqual(depositCall.referrer, zeroAddress)) {
+    //   log.debug(
+    //     `[${workflowId}] Factory deposit with referrer (${depositCall.referrer}), attempting referral upsert`
+    //   )
+    //   try {
+    //     await activities.upsertReferralRelationshipActivity({
+    //       referrerAddress: depositCall.referrer,
+    //       referredAddress: depositCall.owner,
+    //       transactionHash: receipt.transactionHash,
+    //     })
+    //     log.debug(`[${workflowId}] Referral upsert activity completed (may have been skipped or ignored)`)
+    //   } catch (referralError) {
+    //     // Log the error but allow the workflow to continue, as per plan
+    //     // Use log.debug() with a WARN prefix instead of log.warn()
+    //     log.debug(
+    //       `WARN: [${workflowId}] Non-fatal error during referral upsert activity: ${referralError.message}`,
+    //       referralError
+    //     )
+    //   }
+    // } else {
+    //   log.debug(`[${workflowId}] Skipping referral upsert (not a factory deposit or no referrer)`)
+    // }
 
     // Workflow Completion (Implicit)
     // No final status update needed, DB trigger handles cleanup.
-    log(`[${workflowId}] Workflow completed successfully`)
+    log.debug(`[${workflowId}] Workflow completed successfully`)
 
     return userOpHashBytea // Return the userOpHash (bytea) on success
   } catch (error) {

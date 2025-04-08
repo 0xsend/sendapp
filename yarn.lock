@@ -6617,7 +6617,7 @@ __metadata:
     "@my/wagmi": "workspace:*"
     "@my/workflows": "workspace:*"
     "@supabase/supabase-js": "npm:2.44.2"
-    "@tanstack/react-query": "npm:^5.18.1"
+    "@tanstack/react-query": "npm:^5.72.1"
     "@trpc/client": "npm:^11.0.4"
     "@trpc/next": "npm:^11.0.4"
     "@trpc/react-query": "npm:^11.0.4"
@@ -6800,6 +6800,7 @@ __metadata:
     "@temporalio/testing": "npm:^1.10.1"
     "@temporalio/workflow": "npm:^1.10.1"
     "@types/source-map-support": "npm:^0"
+    "@wagmi/core": "npm:^2.13.1"
     app: "workspace:*"
     dotenv-cli: "npm:^7.3.0"
     jest: "npm:^29.7.0"
@@ -6810,6 +6811,7 @@ __metadata:
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.5.3"
     viem: "npm:^2.19.0"
+    wagmi: "npm:^2.13.1"
   peerDependencies:
     typescript: ^5.5.3
   languageName: unknown
@@ -11408,13 +11410,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/query-core@npm:5.18.1":
-  version: 5.18.1
-  resolution: "@tanstack/query-core@npm:5.18.1"
-  checksum: 10/e832388e2033d6ae16eb9b9343e3d7a6f304f74ec74b16e4154417d2771aa9aa3f2659046223731d4eacb4e1ee125d98de330dd4208d9369fe0a81f5436c4847
-  languageName: node
-  linkType: hard
-
 "@tanstack/query-core@npm:5.66.0":
   version: 5.66.0
   resolution: "@tanstack/query-core@npm:5.66.0"
@@ -11422,22 +11417,29 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/query-devtools@npm:5.18.1":
-  version: 5.18.1
-  resolution: "@tanstack/query-devtools@npm:5.18.1"
-  checksum: 10/7514ad0eb5516bed6b96e42590639e529a4585181205001dfc5c3fc096bfc48a583d8570c756539eca742b3c6946ee06439b4791c31102496878f0efe908fa6b
+"@tanstack/query-core@npm:5.72.1":
+  version: 5.72.1
+  resolution: "@tanstack/query-core@npm:5.72.1"
+  checksum: 10/a4dc68bdbcedc9dcb2a8c7e7a5c1829b4ae5dee66d71b9b6b4c00a446a7842005e370b6f3c3c269b0f2294ace6b6787bd0ce1e67c6743878cb880fce55c498fd
   languageName: node
   linkType: hard
 
-"@tanstack/react-query-devtools@npm:^5.18.1":
-  version: 5.18.1
-  resolution: "@tanstack/react-query-devtools@npm:5.18.1"
+"@tanstack/query-devtools@npm:5.72.1":
+  version: 5.72.1
+  resolution: "@tanstack/query-devtools@npm:5.72.1"
+  checksum: 10/b591bbed201d2efa53a84566d129986fb926a790c649a28bec9b0c2dba55acd749dcba956aaa8a731480004a4f503ef94aa901196f50070550e7b9a314966e1d
+  languageName: node
+  linkType: hard
+
+"@tanstack/react-query-devtools@npm:^5.72.1":
+  version: 5.72.1
+  resolution: "@tanstack/react-query-devtools@npm:5.72.1"
   dependencies:
-    "@tanstack/query-devtools": "npm:5.18.1"
+    "@tanstack/query-devtools": "npm:5.72.1"
   peerDependencies:
-    "@tanstack/react-query": ^5.18.1
-    react: ^18.0.0
-  checksum: 10/2941c7d0dd149bb88b5bf7d404920e81376ab705bc555e048311ec1cc2d67c655e3e28b1b091122909435e7e12ea222bc4b060abdd1f776a5f34f611feeeb7f9
+    "@tanstack/react-query": ^5.72.1
+    react: ^18 || ^19
+  checksum: 10/6831089bb7eef5d8392c1eb64cf83f521db56083225c50e6fea103d198759a54ef851c43ff61911e6938f9711a4020a28792794aaf6f7421bc1be18c2a33f964
   languageName: node
   linkType: hard
 
@@ -11452,14 +11454,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/react-query@npm:^5.18.1":
-  version: 5.18.1
-  resolution: "@tanstack/react-query@npm:5.18.1"
+"@tanstack/react-query@npm:^5.72.1":
+  version: 5.72.1
+  resolution: "@tanstack/react-query@npm:5.72.1"
   dependencies:
-    "@tanstack/query-core": "npm:5.18.1"
+    "@tanstack/query-core": "npm:5.72.1"
   peerDependencies:
-    react: ^18.0.0
-  checksum: 10/6129af25c91768fc208fd4d52940b682988bcb90f1dd65baf241f474cd8a89b948a37736e57afb50ecfd5fa5a204870e02c9078b2d5fa3c44b7e94790d6085e5
+    react: ^18 || ^19
+  checksum: 10/2c1aedb4cf70c1cd19041fa195b4296c674796f24234dd029654d027e30cfc0b58a53cc043b4fe5b518dc80b57ed183abd6141f3d9111c8abbd5e6269a4a8b1e
   languageName: node
   linkType: hard
 
@@ -14980,7 +14982,7 @@ __metadata:
     "@tamagui/shorthands": "npm:^1.101.7"
     "@tamagui/themes": "npm:^1.101.7"
     "@tanstack/eslint-plugin-query": "npm:^5.20.1"
-    "@tanstack/react-query": "npm:^5.18.1"
+    "@tanstack/react-query": "npm:^5.72.1"
     "@testing-library/react-native": "npm:^12.5.1"
     "@trpc/client": "npm:^11.0.4"
     "@types/jsonwebtoken": "npm:^9.0.2"
@@ -27721,8 +27723,8 @@ __metadata:
     "@supabase/supabase-js": "npm:2.44.2"
     "@tamagui/next-plugin": "npm:^1.101.7"
     "@tamagui/next-theme": "npm:^1.101.7"
-    "@tanstack/react-query": "npm:^5.18.1"
-    "@tanstack/react-query-devtools": "npm:^5.18.1"
+    "@tanstack/react-query": "npm:^5.72.1"
+    "@tanstack/react-query-devtools": "npm:^5.72.1"
     "@trpc/client": "npm:^11.0.4"
     "@trpc/next": "npm:^11.0.4"
     "@trpc/react-query": "npm:^11.0.4"
@@ -36886,12 +36888,14 @@ __metadata:
     "@supabase/supabase-js": "npm:2.44.2"
     "@temporalio/worker": "npm:^1.10.1"
     "@types/bun": "npm:^1.1.6"
+    "@wagmi/core": "npm:^2.13.1"
     app: "workspace:*"
     dotenv-cli: "npm:^7.3.0"
     permissionless: "npm:^0.1.14"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.5.3"
     viem: "npm:^2.19.0"
+    wagmi: "npm:^2.13.1"
   peerDependencies:
     typescript: ^5.5.3
   languageName: unknown
