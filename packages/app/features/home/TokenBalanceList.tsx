@@ -1,4 +1,4 @@
-import { Link, type LinkProps, Paragraph, useMedia, XStack } from '@my/ui'
+import { Link, type LinkProps, Paragraph, XStack } from '@my/ui'
 
 import { IconCoin } from 'app/components/icons/IconCoin'
 import type { CoinWithBalance } from 'app/data/coins'
@@ -41,19 +41,12 @@ const TokenBalanceItem = ({
   coin,
   ...props
 }: { coin: CoinWithBalance } & Omit<LinkProps, 'children'>) => {
-  const { gtMd } = useMedia()
-
   return (
     <Link display="flex" {...props}>
       <XStack gap={'$2'} $gtLg={{ gap: '$3.5' }} ai={'center'}>
         <IconCoin symbol={coin.symbol} />
-        <Paragraph
-          fontSize={'$5'}
-          fontWeight={'500'}
-          textTransform={'uppercase'}
-          color={'$color12'}
-        >
-          {coin.label.length > 15 && !gtMd ? coin.symbol : coin.label}
+        <Paragraph fontSize={'$5'} fontWeight={'500'} color={'$color12'}>
+          {coin.shortLabel || coin.label}
         </Paragraph>
       </XStack>
       <XStack gap={'$3.5'} ai={'center'}>

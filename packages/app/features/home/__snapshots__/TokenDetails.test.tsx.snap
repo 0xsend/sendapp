@@ -182,9 +182,8 @@ exports[`TokenDetails renders correctly 1`] = `
                 "color": "#FFFFFF",
                 "fontFamily": "System",
                 "fontSize": 24,
-                "fontWeight": "700",
+                "fontWeight": "500",
                 "lineHeight": 25,
-                "textTransform": "uppercase",
                 "userSelect": "auto",
               }
             }
