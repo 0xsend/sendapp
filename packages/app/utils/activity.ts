@@ -270,12 +270,12 @@ export function eventNameFromActivity(
       return 'Send Token Upgrade'
     case isERC20Transfer && to_user?.send_id === undefined:
       if (isSwapTransfer) {
-        return 'Traded'
+        return 'Trade'
       }
       return 'Withdraw'
     case isTransferOrReceive && from_user === null:
       if (isSwapTransfer) {
-        return 'Traded'
+        return 'Trade'
       }
       return 'Deposit'
     case isTransferOrReceive && !!to_user?.id:
@@ -326,12 +326,12 @@ export function phraseFromActivity(
       return 'Upgraded'
     case isERC20Transfer && to_user?.send_id === undefined:
       if (isSwapTransfer) {
-        return 'Traded'
+        return 'Trade'
       }
       return 'Withdrew'
     case isTransferOrReceive && from_user === null:
       if (isSwapTransfer) {
-        return 'Traded'
+        return 'Trade'
       }
       return 'Deposited'
     case isTransferOrReceive && !!to_user?.id:
