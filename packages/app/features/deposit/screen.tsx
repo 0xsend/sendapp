@@ -1,40 +1,56 @@
-import { YStack } from '@my/ui'
+import { Paragraph, YStack } from '@my/ui'
 import { DepositOptionButton } from './components/DepositOptionButton'
-import { useRouter } from 'next/router'
+import { IconApple, IconDebitCard, IconWallet } from 'app/components/icons'
 
 export function DepositScreen() {
-  const router = useRouter()
-
   return (
-    <YStack mt="$4" mx="auto" width={'100%'} $sm={{ maxWidth: 600 }}>
-      <YStack w={'100%'}>
-        <YStack f={1} px="$4" jc="space-between" pb="$4">
-          <YStack gap="$3" width="100%">
-            <DepositOptionButton
-              option="crypto"
-              selectedOption={null}
-              onPress={() => router.push('/deposit/crypto')}
-              title="Via Crypto"
-              description="Direct deposit via External Wallet"
-            />
-
-            <DepositOptionButton
-              option="apple"
-              selectedOption={null}
-              onPress={() => router.push('/deposit/apple-pay')}
-              title="Apple Pay"
-              description="Debit card only"
-            />
-
-            <DepositOptionButton
-              option="card"
-              selectedOption={null}
-              onPress={() => router.push('/deposit/debit-card')}
-              title="Debit Card"
-              description="Up to $500 per week"
-            />
-          </YStack>
-        </YStack>
+    <YStack
+      width={'100%'}
+      gap="$5"
+      jc={'space-between'}
+      py={'$3.5'}
+      $gtLg={{
+        width: '50%',
+        jc: 'flex-start',
+      }}
+    >
+      <YStack gap={'$2'}>
+        <Paragraph size={'$9'} fontWeight={500}>
+          Deposit Funds
+        </Paragraph>
+        <Paragraph
+          fontSize={'$5'}
+          color={'$lightGrayTextField'}
+          $theme-light={{ color: '$darkGrayTextField' }}
+        >
+          Select a deposit method
+        </Paragraph>
+      </YStack>
+      <YStack
+        width="100%"
+        gap="$3.5"
+        $gtLg={{
+          gap: '$5',
+        }}
+      >
+        <DepositOptionButton
+          title="Crypto Wallet"
+          description="Deposit from an external wallet"
+          Icon={IconWallet}
+          href={'/deposit/crypto'}
+        />
+        <DepositOptionButton
+          title="Apple Pay"
+          description="Debit card only"
+          Icon={IconApple}
+          href={'/deposit/apple-pay'}
+        />
+        <DepositOptionButton
+          title="Debit Card"
+          description="Quick deposits up to $500/week"
+          Icon={IconDebitCard}
+          href={'/deposit/debit-card'}
+        />
       </YStack>
     </YStack>
   )
