@@ -4,7 +4,7 @@
     "noEmit": true,
     "composite": true,
     "moduleResolution": "bundler",
-    "baseUrl": ".",
+    "baseUrl": "./src",
     "paths": {
       "@my/supabase/*": ["../../supabase/*"],
       "app/*": ["../app/*"],
@@ -17,6 +17,7 @@
     }
   },
   "include": [
+    "tsconfig.json",
     "./src",
     "../temporal/src",
     "./jest.config.ts",

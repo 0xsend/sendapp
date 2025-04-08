@@ -46,7 +46,7 @@ async function run() {
     namespace: process.env.TEMPORAL_NAMESPACE ?? 'default',
     taskQueue: `monorepo@${version}`,
     bundlerOptions: {
-      ignoreModules: ['@supabase/supabase-js'],
+      ignoreModules: ['@supabase/supabase-js', 'viem', 'permissionless', 'wagmi', '@wagmi/core'],
     },
   })
 

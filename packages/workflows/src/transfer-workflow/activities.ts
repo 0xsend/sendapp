@@ -1,5 +1,5 @@
-import { bootstrap } from '@my/workflows/utils'
-import { isRetryableDBError } from '@my/workflows/utils/isRetryableDBError'
+import type { PgBytea } from '@my/supabase/database.types'
+import { bootstrap, isRetryableDBError } from '@my/workflows/utils'
 import { ApplicationFailure, log } from '@temporalio/activity'
 import { allCoins } from 'app/data/coins'
 import { decodeTransferUserOp } from 'app/utils/decodeTransferUserOp'

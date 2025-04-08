@@ -22,7 +22,13 @@
     "typescript": "^5.5.3"
   },
   "dependencies": {
+    "@my/supabase": "workspace:*",
+    "@my/wagmi": "workspace:*",
     "@my/workflows": "workspace:*",
-    "@temporalio/worker": "^1.10.1"
+    "@supabase/supabase-js": "2.44.2",
+    "@temporalio/worker": "^1.10.1",
+    "app": "workspace:*",
+    "permissionless": "^0.1.14",
+    "viem": "^2.19.0"
   }
 }

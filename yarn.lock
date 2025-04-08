@@ -6618,10 +6618,10 @@ __metadata:
     "@my/workflows": "workspace:*"
     "@supabase/supabase-js": "npm:2.44.2"
     "@tanstack/react-query": "npm:^5.18.1"
-    "@trpc/client": "npm:11.0.0-next-beta.264"
-    "@trpc/next": "npm:11.0.0-next-beta.264"
-    "@trpc/react-query": "npm:11.0.0-next-beta.264"
-    "@trpc/server": "npm:11.0.0-next-beta.264"
+    "@trpc/client": "npm:^11.0.4"
+    "@trpc/next": "npm:^11.0.4"
+    "@trpc/react-query": "npm:^11.0.4"
+    "@trpc/server": "npm:^11.0.4"
     "@types/jsonwebtoken": "npm:^9.0.2"
     "@wagmi/core": "npm:^2.13.1"
     app: "workspace:*"
@@ -6804,6 +6804,7 @@ __metadata:
     dotenv-cli: "npm:^7.3.0"
     jest: "npm:^29.7.0"
     nyc: "npm:^17.0.0"
+    permissionless: "npm:^0.1.14"
     source-map-support: "npm:^0.5.21"
     ts-jest: "npm:^29.3.1"
     ts-node: "npm:^10.9.2"
@@ -11679,52 +11680,57 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@trpc/client@npm:11.0.0-next-beta.264":
-  version: 11.0.0-next-beta.264
-  resolution: "@trpc/client@npm:11.0.0-next-beta.264"
+"@trpc/client@npm:^11.0.4":
+  version: 11.0.4
+  resolution: "@trpc/client@npm:11.0.4"
   peerDependencies:
-    "@trpc/server": 11.0.0-next-beta.264+f5f08f35d
-  checksum: 10/647fa7ada467b86da75e7cb0053919cbcdab9e70d8e0a3eeb19e89e4495be1d8297163b077ce64767c9af50b731925b4fe4cf7cd7ae4fad6155f11c2a11b5e4e
+    "@trpc/server": 11.0.4
+    typescript: ">=5.7.2"
+  checksum: 10/3e5aabaad269849d2b464edfd303adbdce2d6692692965277df61460e72ac0b924882ee2a7956c7f18765dda5e99941ad38f3861de16b1e8107fb4ec97318761
   languageName: node
   linkType: hard
 
-"@trpc/next@npm:11.0.0-next-beta.264":
-  version: 11.0.0-next-beta.264
-  resolution: "@trpc/next@npm:11.0.0-next-beta.264"
+"@trpc/next@npm:^11.0.4":
+  version: 11.0.4
+  resolution: "@trpc/next@npm:11.0.4"
   peerDependencies:
-    "@tanstack/react-query": ^5.0.0
-    "@trpc/client": 11.0.0-next-beta.264+f5f08f35d
-    "@trpc/react-query": 11.0.0-next-beta.264+f5f08f35d
-    "@trpc/server": 11.0.0-next-beta.264+f5f08f35d
+    "@tanstack/react-query": ^5.59.15
+    "@trpc/client": 11.0.4
+    "@trpc/react-query": 11.0.4
+    "@trpc/server": 11.0.4
     next: "*"
     react: ">=16.8.0"
     react-dom: ">=16.8.0"
+    typescript: ">=5.7.2"
   peerDependenciesMeta:
     "@tanstack/react-query":
       optional: true
     "@trpc/react-query":
       optional: true
-  checksum: 10/828002d09f6a40b711584ad7329ffac0aedb0192b8b92b95ec1808ae74614d26a4011ae6951f85049264de68b9a219acc0ee553bf703e554504ab836a3b13db4
+  checksum: 10/6bd83ba953e827d98be1e289e20551f047aa6effd9983506bb4f25c8c11d0928422cf09322a1c9259e237d45cb7c830ae832fddbbe5ba29e30b95cde2de4ab27
   languageName: node
   linkType: hard
 
-"@trpc/react-query@npm:11.0.0-next-beta.264":
-  version: 11.0.0-next-beta.264
-  resolution: "@trpc/react-query@npm:11.0.0-next-beta.264"
+"@trpc/react-query@npm:^11.0.4":
+  version: 11.0.4
+  resolution: "@trpc/react-query@npm:11.0.4"
   peerDependencies:
-    "@tanstack/react-query": ^5.0.0
-    "@trpc/client": 11.0.0-next-beta.264+f5f08f35d
-    "@trpc/server": 11.0.0-next-beta.264+f5f08f35d
+    "@tanstack/react-query": ^5.67.1
+    "@trpc/client": 11.0.4
+    "@trpc/server": 11.0.4
     react: ">=18.2.0"
     react-dom: ">=18.2.0"
-  checksum: 10/8f6f54959917318dcebede1a4d61fac09ae1d6fafc0bb9032330e4c16f96f833808f6d082311a6555a8ee16266a11320ca6b0a0e7525450702d96c2e23a9c6c5
+    typescript: ">=5.7.2"
+  checksum: 10/40b694bf13468a40206584654a0525140adf5f0674de0e688ac15a565a949e65abca596d39a252fe696c58c224d52a41b95c75010a5ddf76a7f27443b323514a
   languageName: node
   linkType: hard
 
-"@trpc/server@npm:11.0.0-next-beta.264":
-  version: 11.0.0-next-beta.264
-  resolution: "@trpc/server@npm:11.0.0-next-beta.264"
-  checksum: 10/9798e2a61708c19eb7fc70e879d3ea61001bd68439e1973801935b5bfa9266becf6781389c976b89eab22addf8ed00c9fa583b63100555dabcd1eca4be07604a
+"@trpc/server@npm:^11.0.4":
+  version: 11.0.4
+  resolution: "@trpc/server@npm:11.0.4"
+  peerDependencies:
+    typescript: ">=5.7.2"
+  checksum: 10/921bd846da4c83ba14d8ede6debe365688c3c7eb41ab700a0ed2404e03bef4fb89cb8088da122ad1a749f38e2f6e01954355703b6672970d1832bfeb82e01a8d
   languageName: node
   linkType: hard
 
@@ -14976,7 +14982,7 @@ __metadata:
     "@tanstack/eslint-plugin-query": "npm:^5.20.1"
     "@tanstack/react-query": "npm:^5.18.1"
     "@testing-library/react-native": "npm:^12.5.1"
-    "@trpc/client": "npm:11.0.0-next-beta.264"
+    "@trpc/client": "npm:^11.0.4"
     "@types/jsonwebtoken": "npm:^9.0.2"
     "@types/qrcode": "npm:^1.5.3"
     "@types/react": "npm:^18.2.15"
@@ -27717,10 +27723,10 @@ __metadata:
     "@tamagui/next-theme": "npm:^1.101.7"
     "@tanstack/react-query": "npm:^5.18.1"
     "@tanstack/react-query-devtools": "npm:^5.18.1"
-    "@trpc/client": "npm:11.0.0-next-beta.264"
-    "@trpc/next": "npm:11.0.0-next-beta.264"
-    "@trpc/react-query": "npm:11.0.0-next-beta.264"
-    "@trpc/server": "npm:11.0.0-next-beta.264"
+    "@trpc/client": "npm:^11.0.4"
+    "@trpc/next": "npm:^11.0.4"
+    "@trpc/react-query": "npm:^11.0.4"
+    "@trpc/server": "npm:^11.0.4"
     "@types/node": "npm:^20.11.0"
     app: "workspace:*"
     dotenv-cli: "npm:^7.3.0"
@@ -36874,12 +36880,18 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "workers@workspace:apps/workers"
   dependencies:
+    "@my/supabase": "workspace:*"
+    "@my/wagmi": "workspace:*"
     "@my/workflows": "workspace:*"
+    "@supabase/supabase-js": "npm:2.44.2"
     "@temporalio/worker": "npm:^1.10.1"
     "@types/bun": "npm:^1.1.6"
+    app: "workspace:*"
     dotenv-cli: "npm:^7.3.0"
+    permissionless: "npm:^0.1.14"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.5.3"
+    viem: "npm:^2.19.0"
   peerDependencies:
     typescript: ^5.5.3
   languageName: unknown

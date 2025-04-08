@@ -14,13 +14,13 @@ import { IconCoin } from 'app/components/icons/IconCoin'
 import { ContractLabels } from 'app/data/contract-labels'
 import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
 import {
-  amountFromActivity,
   eventNameFromActivity,
   isActivitySwapTransfer,
   noteFromActivity,
   usePhraseFromActivity,
   useSubtextFromActivity,
 } from 'app/utils/activity'
+import { useAmountFromActivity } from 'app/utils/activity-hooks'
 import { useAddressBook } from 'app/utils/useAddressBook'
 import { useLiquidityPools } from 'app/utils/useLiquidityPools'
 import { useSwapRouters } from 'app/utils/useSwapRouters'
@@ -42,9 +42,9 @@ export const ActivityDetails = ({
   const { data: swapRouters } = useSwapRouters()
   const { data: liquidityPools } = useLiquidityPools()
   const activityEventName = eventNameFromActivity(activity, swapRouters, liquidityPools)
-  const activityPhrase = usePhraseFromActivity(activity, swapRouters, liquidityPools)
-  const subText = useSubtextFromActivity(activity, swapRouters, liquidityPools)
-  const amount = amountFromActivity(activity, swapRouters, liquidityPools)
+  const activityPhrase = usePhraseFromActivity({ activity, swapRouters, liquidityPools })
+  const subText = useSubtextFromActivity({ activity, swapRouters, liquidityPools })
+  const amount = useAmountFromActivity(activity)
   const note = noteFromActivity(activity)
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const addressBook = useAddressBook()

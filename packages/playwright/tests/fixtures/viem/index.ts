@@ -3,7 +3,6 @@ export { testMainnetClient } from './mainnet'
 import { expect } from '@playwright/test'
 import { isEthCoin, type coin } from 'app/data/coins'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
-import debug from 'debug'
 import { testBaseClient } from './base'
 
 /**

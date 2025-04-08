@@ -1,6 +1,5 @@
 import type { PgBytea } from '@my/supabase/database.types'
-import { bootstrap } from '@my/workflows/utils'
-import { isRetryableDBError } from '@my/workflows/utils/isRetryableDBError'
+import { bootstrap, isRetryableDBError } from '@my/workflows/utils'
 import { Context as ActivityContext, ApplicationFailure, log, sleep } from '@temporalio/activity'
 import { byteaToHex } from 'app/utils/byteaToHex'
 import {
