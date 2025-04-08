@@ -10,16 +10,15 @@ export type TemporalDepositUpdate = Database['temporal']['Tables']['send_earn_de
 
 /**
  * Upserts a record into the temporal.send_earn_deposits table.
- * Primarily used for inserting the initial 'initialized' state, including decoded data.
+ * Primarily used for inserting the initial 'initialized' state.
  */
 export async function upsertTemporalSendEarnDeposit(
-  // Make vault optional for initial insert (factory deposits won't have it yet)
-  insertData: Pick<TemporalDepositInsert, 'workflow_id' | 'status' | 'owner' | 'assets'> &
-    Partial<Pick<TemporalDepositInsert, 'vault'>>
+  insertData: Pick<TemporalDepositInsert, 'workflow_id' | 'status' | 'owner' | 'assets' | 'vault'>
 ) {
-  const { workflow_id, status, owner, assets } = insertData // vault is optional
+  const { workflow_id, status, owner, assets, vault } = insertData
 
   // Ensure required fields for initial insert are present
+  // Vault can be null, so no check needed here.
   if (!workflow_id || !status || !owner || !assets) {
     throw new Error('workflow_id, status, owner, and assets are required for initial upsert.')
   }
@@ -28,11 +27,11 @@ export async function upsertTemporalSendEarnDeposit(
     .schema('temporal')
     .from('send_earn_deposits')
     .upsert(
-      // Ensure vault is explicitly null if undefined
-      { ...insertData, vault: insertData.vault ?? null },
+      // Pass the data directly, vault is already handled (can be null)
+      insertData,
       {
         onConflict: 'workflow_id', // Keep this to handle potential retries/restarts
-        ignoreDuplicates: false, // Allow updates on conflict if needed later
+        ignoreDuplicates: false, // Allow updates on conflict
       }
     )
     .select('*')

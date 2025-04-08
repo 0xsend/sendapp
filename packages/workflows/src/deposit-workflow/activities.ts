@@ -4,13 +4,14 @@ import { Context as ActivityContext, ApplicationFailure, log, sleep } from '@tem
 import { byteaToHex } from 'app/utils/byteaToHex'
 import {
   decodeSendEarnDepositUserOp,
+  isFactoryDeposit,
   type SendEarnDepositCall,
 } from 'app/utils/decodeSendEarnDepositUserOp'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import type { UserOperation } from 'permissionless'
 import superjson from 'superjson'
-import type { Address } from 'viem'
+import { isAddressEqual, zeroAddress, type Address } from 'viem'
 import {
   sendUserOperation,
   simulateUserOperation,
@@ -25,8 +26,16 @@ import {
   type TemporalDepositUpdate,
 } from './supabase'
 
+type UpsertTemporalDepositActivityParams = {
+  workflow_id: string
+  status: TemporalDepositInsert['status']
+  deposit: SendEarnDepositCall
+}
+
 type DepositActivities = {
-  upsertTemporalDepositActivity: (params: TemporalDepositInsert) => Promise<TemporalDeposit>
+  upsertTemporalDepositActivity: (
+    params: UpsertTemporalDepositActivityParams
+  ) => Promise<TemporalDeposit>
   simulateDepositActivity: (workflowId: string, userOp: UserOperation<'v0.7'>) => Promise<void>
   decodeDepositUserOpActivity: (
     workflowId: string,
@@ -45,13 +54,9 @@ type DepositActivities = {
     transactionHash: `0x${string}`
     owner: Address
   }) => Promise<boolean>
-  getVaultFromFactoryDepositActivity: ({
-    userOp,
-    txHash,
-  }: { userOp: UserOperation<'v0.7'>; txHash: `0x${string}` }) => Promise<Address | null>
   upsertReferralRelationshipActivity: (params: {
-    referrerAddress: Address
-    referredAddress: Address
+    // Checks internally if referral needed
+    deposit: SendEarnDepositCall
     transactionHash: `0x${string}`
   }) => Promise<void>
 }
@@ -68,7 +73,7 @@ export const createDepositActivities = (
     sendUserOpActivity,
     waitForTransactionReceiptActivity,
     verifyDepositIndexedActivity,
-    getVaultFromFactoryDepositActivity,
+    // Removed getVaultFromFactoryDepositActivity
     upsertReferralRelationshipActivity,
   }
 }
@@ -167,80 +172,42 @@ async function verifyDepositIndexedActivity({
   )
 }
 
-async function getVaultFromFactoryDepositActivity({
-  userOp,
-  txHash,
-}: { userOp: UserOperation<'v0.7'>; txHash: `0x${string}` }): Promise<Address | null> {
-  const txHashBytea = hexToBytea(txHash)
-  log.info('Attempting to fetch vault address from send_earn_create', { transactionHash: txHash })
-
-  try {
-    // Query the send_earn_create table which logs the SendEarnCreated event
-    const { data, error } = await supabaseAdmin
-      .from('send_earn_create')
-      .select('vault')
-      .eq('tx_hash', txHashBytea)
-      .eq('caller', hexToBytea(userOp.sender))
-      .maybeSingle()
-
-    if (error) {
-      log.error('DB error fetching vault from send_earn_create', { transactionHash: txHash, error })
-      if (isRetryableDBError(error)) {
-        throw ApplicationFailure.retryable('Database connection error fetching vault', error.code, {
-          error,
-          transactionHash: txHash,
-        })
-      }
-      throw ApplicationFailure.nonRetryable(
-        'Non-retryable DB error fetching vault from send_earn_create',
-        error.code,
-        {
-          error,
-          transactionHash: txHash,
-        }
-      )
-    }
-
-    if (!data || !data.vault) {
-      log.warn('Vault address not found in send_earn_create for tx', { transactionHash: txHash })
-      return null
-    }
-
-    const vaultAddress = byteaToHex(data.vault as `\\x${string}`)
-    log.info('Successfully fetched vault address', { transactionHash: txHash, vaultAddress })
-    return vaultAddress
-  } catch (error) {
-    // Catch potential ApplicationFailures rethrown from DB checks or unexpected errors
-    log.error('Unexpected error in getVaultFromFactoryDepositActivity', {
-      transactionHash: txHash,
-      error,
-    })
-    if (error instanceof ApplicationFailure) {
-      throw error // Re-throw known Temporal failures
-    }
-    // Treat other errors as non-retryable
-    throw ApplicationFailure.nonRetryable(
-      error.message ?? 'Unexpected error fetching vault address',
-      'VAULT_FETCH_FAILED',
-      { error, transactionHash: txHash }
-    )
-  }
-}
-
+/**
+ * Attempts to create a referral relationship based on a factory deposit event.
+ * This activity now contains the logic to check if the deposit was a factory
+ * deposit with a non-zero referrer address.
+ * It validates the referral against the `send_earn_new_affiliate` table,
+ * fetches user UUIDs, and inserts the relationship into the `referrals` table.
+ * Logs warnings and does not throw errors for non-critical issues like
+ * missing UUIDs or duplicate relationships to allow the main workflow to continue.
+ */
 async function upsertReferralRelationshipActivity({
-  referrerAddress,
-  referredAddress,
+  deposit, // The decoded deposit call object
   transactionHash,
 }: {
-  referrerAddress: Address
-  referredAddress: Address
+  deposit: SendEarnDepositCall
   transactionHash: `0x${string}`
 }): Promise<void> {
-  log.info('Attempting to upsert referral relationship', {
+  // Check if it's a factory deposit with a non-zero referrer inside the activity
+  if (!isFactoryDeposit(deposit) || isAddressEqual(deposit.referrer, zeroAddress)) {
+    log.info('Skipping referral upsert: Not a factory deposit or no referrer', {
+      depositType: deposit.type,
+      referrer: isFactoryDeposit(deposit) ? deposit.referrer : undefined,
+      transactionHash,
+    })
+    return // Exit early if conditions aren't met
+  }
+
+  // Conditions met, proceed with upsert
+  const referrerAddress = deposit.referrer
+  const referredAddress = deposit.owner // The owner of the deposit is the referred user
+
+  log.info('Attempting to upsert referral relationship for factory deposit', {
     referrerAddress,
     referredAddress,
     transactionHash,
   })
+
   const referrerBytea = hexToBytea(referrerAddress)
   const referredBytea = hexToBytea(referredAddress)
   const txHashBytea = hexToBytea(transactionHash)
@@ -458,22 +425,35 @@ async function waitForTransactionReceiptActivity(
   }
 }
 
+/**
+ * Upserts the initial temporal deposit record.
+ * Extracts owner, assets, and potentially vault from the decoded deposit call.
+ */
 async function upsertTemporalDepositActivity({
   workflow_id: workflowId,
-  owner,
-  assets,
-  vault,
-}: TemporalDepositInsert): Promise<TemporalDeposit> {
+  status,
+  deposit,
+}: UpsertTemporalDepositActivityParams): Promise<TemporalDeposit> {
   log.info('Upserting initial deposit record', {
     workflowId,
-    owner: byteaToHex(owner as `\\x${string}`),
+    owner: deposit.owner,
+    status,
   })
+
+  // Extract necessary fields from the deposit object
+  const ownerBytea = hexToBytea(deposit.owner)
+  // Convert bigint assets to hex string before converting to bytea
+  const assetsHex = `0x${deposit.assets.toString(16)}` as `0x${string}`
+  const assetsBytea = hexToBytea(assetsHex)
+  // Vault only exists on VaultDeposit type
+  const vaultBytea = deposit.type === 'vault' ? hexToBytea(deposit.vault) : null
+
   const { data: upsertData, error } = await upsertTemporalSendEarnDeposit({
     workflow_id: workflowId,
-    status: 'initialized',
-    owner,
-    assets,
-    vault,
+    status: status, // Use the passed status
+    owner: ownerBytea,
+    assets: assetsBytea,
+    vault: vaultBytea, // Pass potentially null vault
   })
 
   if (error) {
