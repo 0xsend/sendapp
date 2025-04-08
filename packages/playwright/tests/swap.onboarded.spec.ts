@@ -104,7 +104,7 @@ for (const inCoin of [usdcCoin]) {
         }
         attempts++
         await expect(history).toBeVisible()
-        await expect(history.getByText('Traded')).toBeVisible()
+        await expect(history.getByText('Trade')).toBeVisible()
         const countCoinSymbols = await history.getByText(outCoin.symbol).count()
         expect(countCoinSymbols).toBe(2)
       }).toPass({ timeout: 15_000 })

@@ -17,6 +17,7 @@ const BaseCoinSchema = z.object({
   symbol: z.string(),
   decimals: z.number().min(0).max(18),
   formatDecimals: z.number().min(0).optional(),
+  shortLabel: z.string().optional(),
   coingeckoTokenId: z.string(),
 })
 
@@ -102,6 +103,7 @@ export const morphoCoin = {
 
 export const aerodromeCoin = {
   label: 'Aerodrome Finance',
+  shortLabel: 'Aerodrome',
   symbol: 'AERO',
   token: aerodromeFinanceAddresses[baseMainnet.id],
   decimals: 18,
@@ -111,6 +113,7 @@ export const aerodromeCoin = {
 
 export const cbBtcCoin = {
   label: 'Coinbase Wrapped BTC',
+  shortLabel: 'cbBTC',
   symbol: 'CBBTC',
   token: coinbaseWrappedBtcAddresses[baseMainnet.id],
   decimals: 8,
