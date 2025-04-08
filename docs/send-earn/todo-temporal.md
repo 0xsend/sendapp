@@ -30,23 +30,23 @@ Refactor the current client-side Send Earn deposit process to utilize a Temporal
         *   [x] `updateTemporalSendEarnDeposit` (mock Supabase client).
         *   [x] `getUserIdFromAddress` (mock Supabase client, test found/not found cases).
 
-## Phase 3: Temporal Activities
+## Phase 3: Temporal Activities [COMPLETED]
 
-1.  **Implement/Update Activities (`packages/workflows/src/deposit-workflow/activities.ts`):**
-    *   Update `upsertTemporalDepositActivity` input type (`TemporalDepositInsert`) to allow optional/null `vault`, ensuring it calls the modified Supabase helper correctly.
-    *   Implement `verifyDepositIndexedActivity`:
-        *   Input: `{ transactionHash: \`0x\${string}\`, owner: Address }`.
-        *   Logic: Query `public.send_earn_deposit` table using the `transactionHash` and `owner` to confirm the deposit record exists (indicating successful indexing by Shovel). This activity should likely retry with backoff until the record is found or a timeout is reached. Return `boolean` (or the found record if needed downstream). Handle query errors.
-    *   Implement `upsertReferralRelationshipActivity`:
-        *   Input: `referrerAddress: Address`, `referredAddress: Address`.
-        *   Logic:
-            1.  Query `public.send_earn_new_affiliate` using the `referrerAddress` (and potentially other relevant identifiers like `referredAddress` or tx info if available in that table) to validate if this specific deposit corresponds to a new affiliate creation event. *(Action: Need to confirm the exact schema and query logic for `send_earn_new_affiliate`)*.
-            2.  If validated as a new affiliate referral for this context:
-                *   Use `getUserIdFromAddress` for both `referrerAddress` and `referredAddress`.
-                *   If both UUIDs (`referrerUuid`, `referredUuid`) are found, call `supabaseAdmin.from('referrals').insert({ referrer_id: referrerUuid, referred_id: referredUuid }, { ignoreDuplicates: true })`. **Note:** This relies on the unique constraint on `referred_id` to prevent duplicates for the same referred user, effectively implementing "first referrer wins". Using `insert` with `ignoreDuplicates: true` handles the conflict implicitly.
-            3.  Log outcomes (validated/not validated, users found/not found, insert success/ignored due to conflict/DB error).
-            4.  Handle errors appropriately (retryable for DB connection, non-retryable/warning otherwise).
-    *   Verify other activities (`decode...`, `simulate...`, `send...`, `waitFor...`) are suitable.
+1.  **[x] Implement/Update Activities (`packages/workflows/src/deposit-workflow/activities.ts`):**
+    *   [x] Update `upsertTemporalDepositActivity` input type (`TemporalDepositInsert`) to allow optional/null `vault`, ensuring it calls the modified Supabase helper correctly.
+    *   [x] Implement `verifyDepositIndexedActivity`:
+        *   [x] Input: `{ transactionHash: \`0x\${string}\`, owner: Address }`.
+        *   [x] Logic: Query `public.send_earn_deposit` table using the `transactionHash` and `owner` to confirm the deposit record exists (indicating successful indexing by Shovel). This activity should likely retry with backoff until the record is found or a timeout is reached. Return `boolean` (or the found record if needed downstream). Handle query errors.
+    *   [x] Implement `upsertReferralRelationshipActivity`:
+        *   [x] Input: `referrerAddress: Address`, `referredAddress: Address`, `transactionHash: \`0x\${string}\``. *(Note: Added txHash based on implementation)*
+        *   [x] Logic:
+            1.  [x] Query `public.send_earn_new_affiliate` using the `referrerAddress`, `referredAddress`, and `transactionHash` to validate if this specific deposit corresponds to a new affiliate creation event.
+            2.  [x] If validated as a new affiliate referral for this context:
+                *   [x] Use `getUserIdFromAddress` for both `referrerAddress` and `referredAddress`.
+                *   [x] If both UUIDs (`referrerUuid`, `referredUuid`) are found, call `supabaseAdmin.from('referrals').insert({ referrer_id: referrerUuid, referred_id: referredUuid })`. Handle unique constraint violation (`23505`) gracefully for "first referrer wins".
+            3.  [x] Log outcomes (validated/not validated, users found/not found, insert success/ignored due to conflict/DB error).
+            4.  [x] Handle errors appropriately (retryable for DB connection, non-retryable/warning otherwise, ensuring workflow doesn't fail for this optional step).
+    *   [x] Verify other activities (`decode...`, `simulate...`, `send...`, `waitFor...`) are suitable.
 
 ## Phase 4: Temporal Workflow Refactoring and Testing
 
