@@ -24,6 +24,7 @@ import { useRootScreenParams } from 'app/routers/params'
 import { HomeButtons } from './HomeButtons'
 import { AlertCircle } from '@tamagui/lucide-icons'
 import { useIsSendingUnlocked } from 'app/utils/useIsSendingUnlocked'
+import { HomeQuickActions } from 'app/features/home/HomeQuickActions'
 
 function SendSearchBody() {
   const { isLoading, error } = useTagSearch()
@@ -64,7 +65,7 @@ function HomeBody(props: XStackProps) {
         $gtLg={{ display: 'flex', w: '45%', gap: '$5', pb: 0 }}
         display={!selectedCoin ? 'flex' : 'none'}
         width="100%"
-        gap="$5"
+        gap="$3.5"
         ai={'center'}
         pb={Math.max(bottom, 24) + 72} // add mobile bottom button row + 24px
       >
@@ -92,6 +93,7 @@ function HomeBody(props: XStackProps) {
         ) : (
           <TokenBalanceCard />
         )}
+        <HomeQuickActions $gtLg={{ display: 'none' }} />
         <YStack w={'100%'} ai={'center'}>
           <Card
             bc={'$color1'}
