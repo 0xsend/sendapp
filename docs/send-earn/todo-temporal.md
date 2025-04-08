@@ -2,7 +2,7 @@
 
 ## 1. Goal
 
-Refactor the current client-side Send Earn deposit process to utilize a Temporal workflow for improved reliability, observability, and separation of concerns. This aligns the deposit flow with the existing pattern used for Send transfers. This plan includes updates to handle refactored deposit decoding logic (`decodeSendEarnDepositUserOp`), specifically differentiating between direct vault deposits (`VaultDeposit`) and factory-based deposits (`FactoryDeposit`), and ensuring off-chain referral relationships are created for factory deposits with referrers. Referrals are one-to-one so once a user is referred, it should not change in the future. Unit and database tests are integrated into each phase.
+Refactor the current client-side Send Earn deposit process to utilize a Temporal workflow for improved reliability, observability, and separation of concerns. This aligns the deposit flow with the existing pattern used for Send transfers. This plan includes updates to handle refactored deposit decoding logic (`decodeSendEarnDepositUserOp`), specifically differentiating between direct vault deposits (`VaultDeposit`) and factory-based deposits (`FactoryDeposit`). **Crucially, for factory deposits initiated with a valid referrer (`referrer != address(0)`), the workflow must ensure the corresponding off-chain referral relationship is created in the `public.referrals` table, respecting the "first referrer wins" logic by ignoring subsequent attempts for the same referred user.** Unit and database tests are integrated into each phase.
 
 ## Phase 1: Database Setup and Testing [COMPLETED]
 
@@ -24,19 +24,19 @@ Refactor the current client-side Send Earn deposit process to utilize a Temporal
     *   [x] Modify `upsertTemporalSendEarnDeposit` to accept `vault: null` and remove the strict requirement check in its validation logic.
     *   [x] Ensure `updateTemporalSendEarnDeposit` can update the `vault` field. (Verified, no changes needed).
     *   [x] Implement `async function getUserIdFromAddress(address: Address): Promise<string | null>` using `supabaseAdmin` (query `public.send_accounts`).
-2.  **[x] Unit Testing (Vitest):**
+2.  **[x] Unit Testing (Jest):**
     *   [x] Write unit tests for:
         *   [x] `upsertTemporalSendEarnDeposit` (mock Supabase client, test null vault handling).
         *   [x] `updateTemporalSendEarnDeposit` (mock Supabase client).
         *   [x] `getUserIdFromAddress` (mock Supabase client, test found/not found cases).
 
-## Phase 3: Temporal Activities and Unit Testing
+## Phase 3: Temporal Activities
 
 1.  **Implement/Update Activities (`packages/workflows/src/deposit-workflow/activities.ts`):**
     *   Update `upsertTemporalDepositActivity` input type (`TemporalDepositInsert`) to allow optional/null `vault`, ensuring it calls the modified Supabase helper correctly.
-    *   Implement `getVaultFromFactoryDepositActivity`:
+    *   Implement `verifyDepositIndexedActivity`:
         *   Input: `{ transactionHash: \`0x\${string}\`, owner: Address }`.
-        *   Logic: Query `public.send_earn_deposit` table using the `transactionHash` **and `owner`** to retrieve the associated `vault` address. Handle cases where the record or vault is not found. Return `Address | null`.
+        *   Logic: Query `public.send_earn_deposit` table using the `transactionHash` and `owner` to confirm the deposit record exists (indicating successful indexing by Shovel). This activity should likely retry with backoff until the record is found or a timeout is reached. Return `boolean` (or the found record if needed downstream). Handle query errors.
     *   Implement `upsertReferralRelationshipActivity`:
         *   Input: `referrerAddress: Address`, `referredAddress: Address`.
         *   Logic:
@@ -47,11 +47,6 @@ Refactor the current client-side Send Earn deposit process to utilize a Temporal
             3.  Log outcomes (validated/not validated, users found/not found, insert success/ignored due to conflict/DB error).
             4.  Handle errors appropriately (retryable for DB connection, non-retryable/warning otherwise).
     *   Verify other activities (`decode...`, `simulate...`, `send...`, `waitFor...`) are suitable.
-2.  **Unit Testing (Jest/Vitest):**
-    *   Write/update unit tests for:
-        *   `upsertTemporalDepositActivity` (mock `upsertTemporalSendEarnDeposit`).
-        *   `getVaultFromFactoryDepositActivity` (mock Supabase client/query, test found/not found).
-        *   `upsertReferralRelationshipActivity` (mock Supabase client, `getUserIdFromAddress`, test validation logic against `send_earn_new_affiliate`, upsert call, error handling).
 
 ## Phase 4: Temporal Workflow Refactoring and Testing
 
@@ -66,27 +61,13 @@ Refactor the current client-side Send Earn deposit process to utilize a Temporal
         7.  Call `sendUserOpActivity` -> `userOpHashBytea`.
         8.  Call `updateTemporalDepositActivity` (status 'sent').
         9.  Call `waitForTransactionReceiptActivity` -> `receipt`.
-        10. Initialize `vaultAddressBytea: PgBytea | null`.
-        11. **If `isFactoryDeposit(depositCall)`:**
-            *   `try...catch` block for vault fetch.
-            *   Call `getVaultFromFactoryDepositActivity(receipt.transactionHash)` -> `fetchedVaultAddress: Address | null`.
-            *   If `fetchedVaultAddress`, set `vaultAddressBytea = hexToBytea(fetchedVaultAddress)`. Log outcome.
-        12. **If `isFactoryDeposit(depositCall)`:**
-            *   `try...catch` block for referral upsert.
-            *   Call `upsertReferralRelationshipActivity(depositCall.referrer, depositCall.owner)`. Log outcome.
-        13. Call final `updateTemporalDepositActivity` (status 'confirmed', update `tx_hash`, update `vault: vaultAddressBytea`).
-    *   Ensure workflow does not fail after a successful UserOp receipt (steps 11 & 12 should be in try-catch).
-    *   Ensure all necessary imports (`hexToBytea`, type guards).
+        10. Call `verifyDepositIndexedActivity({ transactionHash: receipt.transactionHash, owner: depositCall.owner })`. This activity should handle retries internally until the deposit is confirmed indexed or a timeout occurs.
+        11. **If `isFactoryDeposit(depositCall)` and `depositCall.referrer !== constants.AddressZero`:**
+            *   `try...catch` block for referral upsert (or handle errors within the activity).
+            *   Call `upsertReferralRelationshipActivity({ referrerAddress: depositCall.referrer, referredAddress: depositCall.owner })`. Log outcome.
+        // Note: No final update to temporal table needed. The cleanup trigger handles deletion upon public table insertion.
+    *   Ensure workflow completes successfully after `verifyDepositIndexedActivity` confirms indexing. The referral step (11) should log errors but not fail the workflow if the deposit itself was successful and indexed.
+    *   Ensure all necessary imports (`hexToBytea`, type guards, `constants.AddressZero`).
     *   Register workflow in `all-workflows.ts`.
-2.  **Workflow Unit Testing (Temporal Testing Framework):**
-    *   Write/update workflow tests:
-        *   Mock all activities (`proxyActivities`).
-        *   Test the `VaultDeposit` path to successful confirmation.
-        *   Test the `FactoryDeposit` path, covering:
-            *   Successful vault fetch and successful referral upsert.
-            *   Successful vault fetch and referral activity skipped/warns (e.g., users not found, not validated).
-            *   Failed vault fetch (ensure workflow proceeds to final update).
-            *   Failed referral upsert (ensure workflow proceeds to final update).
-        *   Test error handling paths (e.g., activity failures before `sendUserOpActivity` should fail workflow).
 
 *(End-to-End tests using Playwright are excluded for now)*.

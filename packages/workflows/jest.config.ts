@@ -4,6 +4,9 @@
  */
 
 import type { Config } from 'jest'
+import { pathsToModuleNameMapper } from 'ts-jest' // Import the utility
+// Import compilerOptions from this package's tsconfig
+import { compilerOptions } from './tsconfig.json'
 
 const config: Config = {
   preset: 'ts-jest/presets/default-esm',
@@ -17,7 +20,12 @@ const config: Config = {
   globalSetup: '<rootDir>/jest.setup.ts',
   transformIgnorePatterns: ['node_modules/(?!(get-port))'],
   moduleNameMapper: {
+    // Keep the existing ESM .js mapping
     '^(\\.{1,2}/.*)\\.js$': '$1',
+
+    // Generate mappings from this package's tsconfig.json paths
+    // Prefix is relative to <rootDir> (packages/workflows)
+    ...pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' }),
   },
   transform: {
     // '^.+\\.[tj]sx?$' to process ts,js,tsx,jsx with `ts-jest`
@@ -26,6 +34,8 @@ const config: Config = {
       'ts-jest',
       {
         useESM: true,
+        // ts-jest should automatically find the tsconfig, but specify if needed:
+        // tsconfig: '<rootDir>/tsconfig.json'
       },
     ],
   },

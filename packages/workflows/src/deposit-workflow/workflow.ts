@@ -14,6 +14,15 @@ interface DepositWorkflowInput {
   userOp: UserOperation<'v0.7'>
 }
 
+/**
+ * The Send Earn Deposit workflow handles validating and submitting the users
+ * deposit operation to the bundler, waiting for the indexing of the onchain events
+ * and then ensuring a referral relationship is created if needed
+ * (due to race conditions between the shovel tables).
+ *
+ * The workflow also shows updates to user by using a temporal table that
+ * mimics the schema of the `public.send_earn_deposit` table.
+ */
 export async function DepositWorkflow({ userOp }: DepositWorkflowInput) {
   const { workflowId } = workflowInfo()
   log(`Starting SendEarn Deposit Workflow: ${workflowId}`)
@@ -67,6 +76,9 @@ export async function DepositWorkflow({ userOp }: DepositWorkflowInput) {
     log(
       `[${workflowId}] Transaction receipt received: txHash=${receipt.transactionHash}, block=${receipt.blockNumber}`
     )
+
+    // TODO: ensure the deposit is indexed by shovel
+    // TODO: if it was a deposit using the send earn factory, and a referrer was present (referrer != address(0)), create the referrer relationship ignoring duplicates.
 
     // 7. Update record with transaction hash, block number, and 'confirmed' status
     log(`[${workflowId}] Updating deposit record to 'confirmed'`)
