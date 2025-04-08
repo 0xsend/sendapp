@@ -1,10 +1,7 @@
 import { describe, expect, it } from '@jest/globals'
-import { TamaguiProvider, config } from '@my/ui'
-import { act, render, screen, userEvent, waitFor } from '@testing-library/react-native'
-
-jest.mock('expo-router', () => ({
-  usePathname: jest.fn().mockReturnValue('/send'),
-}))
+import { config, TamaguiProvider } from '@my/ui'
+import { render, screen } from '@testing-library/react-native'
+import { SendScreen } from './screen'
 
 jest.mock('app/utils/api', () => ({
   transfer: {
@@ -34,51 +31,30 @@ jest.mock('app/provider/coins', () => ({
   }),
 }))
 
-jest.mock('solito', () => {
-  // console.log('mock solito')
-  const mockCreateParam = jest.fn(() => {
-    // console.log('createParam in')
-    return {
-      useParam: jest.fn(() => {
-        // console.log('useParam', name, opts)
-        return ['test', jest.fn()]
-      }),
-      useParams: jest.fn(() => {
-        // console.log('useParams', name, opts)
-        return ['test', jest.fn()]
-      }),
-    }
-  })
-  return {
-    __esModule: true,
-    createParam: mockCreateParam,
-  }
-})
+jest.mock('solito/router', () => ({
+  useRouter: () => ({
+    back: jest.fn(),
+  }),
+}))
 
-jest.mock('app/utils/useProfileLookup')
-jest.mock('@my/wagmi')
+jest.mock('app/provider/tag-search', () => ({
+  useTagSearch: {
+    results: [],
+    isLoading: false,
+    error: null,
+  },
+}))
 
-jest.mock('app/utils/supabase/useSupabase', () => ({
-  useSupabase: jest.fn().mockReturnValue({
-    rpc: jest.fn().mockReturnValue({
-      abortSignal: jest.fn().mockReturnValue({
-        data: [
-          {
-            send_id_matches: [],
-            tag_matches: [
-              {
-                send_id: 3665,
-                tag_name: 'test',
-                avatar_url: 'https://avatars.githubusercontent.com/u/123',
-                address: '0x123',
-              },
-            ],
-            phone_matches: [],
-          },
-        ],
-        error: null,
-      }),
-    }),
+jest.mock('app/utils/useProfileLookup', () => ({
+  useProfileLookup: jest.fn().mockReturnValue({
+    data: {
+      address: '0x123',
+      send_id: 3665,
+      tag_name: 'test',
+      avatar_url: 'https://avatars.githubusercontent.com/u/123',
+    },
+    isLoading: false,
+    error: null,
   }),
 }))
 
@@ -86,109 +62,48 @@ jest.mock('app/routers/params', () => ({
   useSendScreenParams: jest
     .fn()
     .mockReturnValue([
-      { idType: 'tag', recipient: 'test', amount: 'test', sendToken: 'test', note: 'test' },
+      { idType: 'tag', amount: '1000000', sendToken: 'test', note: 'test' },
       jest.fn(),
     ]),
+  useRootScreenParams: jest.fn().mockReturnValue([{}, jest.fn()]),
 }))
 
 jest.mock('app/utils/useCoinFromTokenParam', () => ({
-  useCoinFromTokenParam: jest.fn().mockReturnValue({
+  useCoinFromSendTokenParam: jest.fn().mockReturnValue({
     coin: {
       label: 'USDC',
+      token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
       balance: 250000n,
     },
-    isLoading: false,
   }),
 }))
 
-import { SendScreen } from './screen'
-import { usePathname } from 'expo-router'
-import { useProfileLookup } from 'app/utils/useProfileLookup'
+jest.mock('app/provider/theme', () => ({
+  useThemeSetting: jest.fn().mockReturnValue({ resolvedTheme: 'dark' }),
+}))
 
-// @ts-expect-error mock
-usePathname.mockReturnValue('/send')
-// TODO: these tests are out of date and broken
-describe.skip('SendScreen', () => {
-  beforeEach(() => jest.useFakeTimers())
-
-  afterEach(() => jest.useRealTimers())
-
-  it('should render with search when on /send and no recipient in params', async () => {
-    const tree = render(
-      <TamaguiProvider defaultTheme={'dark'} config={config}>
-        <SendScreen />
-      </TamaguiProvider>
-    ).toJSON()
-
-    act(() => {
-      jest.runAllTimers()
-      jest.advanceTimersByTime(2000)
-      jest.runAllTimers()
-    })
-
-    expect(tree).toMatchSnapshot('render')
-
-    const searchBy = await screen.findByRole('search', { name: 'query' })
-    const user = userEvent.setup()
-
-    await act(async () => {
-      await user.type(searchBy, 'test')
-      jest.advanceTimersByTime(2000)
-      jest.runAllTimers()
-    })
-
-    await waitFor(() => screen.findByTestId('searchResults'))
-
-    expect(screen.toJSON()).toMatchSnapshot('search')
-    expect(screen.getByTestId('tag-search-3665')).toHaveTextContent('??test/test')
-    const avatar = screen.getByTestId('avatar')
-    expect(avatar).toBeOnTheScreen()
-    expect(avatar.props.source.uri).toBe('https://avatars.githubusercontent.com/u/123')
-    const link = screen.getByTestId('MockSolitoLink')
-    expect(link).toBeOnTheScreen()
-    expect(link.props.href).toBe(
-      '/send?idType=tag&recipient=test&amount=test&sendToken=test&note=test'
-    )
+describe('SendScreen', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
   })
 
-  it('should render /send check when no send account', async () => {
-    // @ts-expect-error mock
-    usePathname.mockReturnValue('/send?recipient=test&idType=tag')
-    // @ts-expect-error mock
-    useProfileLookup.mockReturnValue({
-      data: {
-        avatar_url: 'https://avatars.githubusercontent.com/u/123',
-        name: 'test',
-        about: 'test',
-        refcode: 'test',
-        tag: 'test',
-        address: null,
-        phone: 'test',
-        chain_id: 1,
-        is_public: true,
-        sendid: 1,
-        all_tags: ['test'],
-      },
-      isLoading: false,
-      error: null,
-    })
-
+  it('should render send form when profile is found', () => {
     render(
       <TamaguiProvider defaultTheme={'dark'} config={config}>
         <SendScreen />
       </TamaguiProvider>
     )
 
-    await act(async () => {
-      jest.runAllTimers()
-    })
-    await waitFor(() => screen.findByText('Write /send Check'))
-
-    expect(screen.toJSON()).toMatchSnapshot('render')
-
-    // screen.debug('amount form')
-    expect(screen.getByTestId('NoSendAccountLink')).toHaveTextContent(
-      '/test has no send account! Ask them to create one or write a /send Check.'
-    )
+    const avatar = screen.getByTestId('avatarImage')
+    expect(avatar).toBeOnTheScreen()
+    expect(avatar.props.source.uri).toBe('https://avatars.githubusercontent.com/u/123')
+    expect(screen.getByTestId('MockSolitoLink')).toBeOnTheScreen()
+    expect(screen.getByTestId('SelectCoinTrigger')).toBeOnTheScreen()
+    expect(screen.getByTestId('SendFormBalance')).toBeOnTheScreen()
+    expect(screen.getByPlaceholderText('Add a note')).toBeOnTheScreen()
+    expect(screen.getByText('CONTINUE')).toBeOnTheScreen()
+    expect(screen).toMatchSnapshot()
   })
+
+  // TODO add more cases
 })

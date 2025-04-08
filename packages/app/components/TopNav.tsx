@@ -59,7 +59,7 @@ export function AvatarMenuButton({ profile }: { profile?: Tables<'profiles'> | n
         opacity: 0,
       }} /// We need the button to be there for layout purposes
       onPress={handleHomeBottomSheet}
-      br={'$2'}
+      overflow={'hidden'}
       bc="$color2"
       size={'$3.5'}
       icon={
