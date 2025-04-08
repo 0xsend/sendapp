@@ -1117,7 +1117,17 @@ exports[`ActivityScreen renders activity screen 1`] = `
                         >
                           Deposit
                         </Text>
-                         
+                        <Text
+                          style={
+                            {
+                              "color": "#FFFFFF",
+                              "fontFamily": "System",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                           
+                        </Text>
                         <Text
                           style={
                             {
@@ -1410,7 +1420,17 @@ exports[`ActivityScreen renders activity screen 1`] = `
                         >
                           Sendtag Registered
                         </Text>
-                         
+                        <Text
+                          style={
+                            {
+                              "color": "#FFFFFF",
+                              "fontFamily": "System",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                           
+                        </Text>
                         <Text
                           style={
                             {
@@ -1708,7 +1728,17 @@ exports[`ActivityScreen renders activity screen 1`] = `
                         >
                           Referral
                         </Text>
-                         
+                        <Text
+                          style={
+                            {
+                              "color": "#FFFFFF",
+                              "fontFamily": "System",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                           
+                        </Text>
                         <Text
                           style={
                             {
@@ -1986,7 +2016,17 @@ exports[`ActivityScreen renders activity screen 1`] = `
                         >
                           Sendtag Registered
                         </Text>
-                         
+                        <Text
+                          style={
+                            {
+                              "color": "#FFFFFF",
+                              "fontFamily": "System",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                           
+                        </Text>
                         <Text
                           style={
                             {
@@ -2301,7 +2341,17 @@ exports[`ActivityScreen renders activity screen 1`] = `
                         >
                           Send Account Signing Key Added
                         </Text>
-                         
+                        <Text
+                          style={
+                            {
+                              "color": "#FFFFFF",
+                              "fontFamily": "System",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                           
+                        </Text>
                         <Text
                           style={
                             {
@@ -2574,7 +2624,17 @@ exports[`ActivityScreen renders activity screen 1`] = `
                         >
                           Send Account Signing Key Removed
                         </Text>
-                         
+                        <Text
+                          style={
+                            {
+                              "color": "#FFFFFF",
+                              "fontFamily": "System",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                           
+                        </Text>
                         <Text
                           style={
                             {
@@ -2829,7 +2889,17 @@ exports[`ActivityScreen renders activity screen 1`] = `
                         >
                           Send Token Upgrade
                         </Text>
-                         
+                        <Text
+                          style={
+                            {
+                              "color": "#FFFFFF",
+                              "fontFamily": "System",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                           
+                        </Text>
                         <Text
                           style={
                             {

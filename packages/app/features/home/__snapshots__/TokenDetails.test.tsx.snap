@@ -525,7 +525,6 @@ exports[`TokenDetails renders correctly 1`] = `
     <View
       style={
         {
-          "display": "flex",
           "flexDirection": "column",
           "gap": 13,
         }
@@ -929,7 +928,17 @@ exports[`TokenDetails renders correctly 1`] = `
                         >
                           Withdraw
                         </Text>
-                         
+                        <Text
+                          style={
+                            {
+                              "color": "#FFFFFF",
+                              "fontFamily": "System",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                           
+                        </Text>
                         <Text
                           style={
                             {
@@ -1195,7 +1204,17 @@ exports[`TokenDetails renders correctly 1`] = `
                         >
                           Deposit
                         </Text>
-                         
+                        <Text
+                          style={
+                            {
+                              "color": "#FFFFFF",
+                              "fontFamily": "System",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                           
+                        </Text>
                         <Text
                           style={
                             {
@@ -1482,7 +1501,17 @@ exports[`TokenDetails renders correctly 1`] = `
                         >
                           Received
                         </Text>
-                         
+                        <Text
+                          style={
+                            {
+                              "color": "#FFFFFF",
+                              "fontFamily": "System",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                           
+                        </Text>
                         <Text
                           style={
                             {
