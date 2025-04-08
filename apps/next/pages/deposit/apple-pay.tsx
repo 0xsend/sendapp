@@ -1,9 +1,9 @@
-import { HomeLayout } from '../../../../packages/app/features/home/layout.web'
-import { TopNav } from '../../../../packages/app/components/TopNav'
+import { HomeLayout } from 'app/features/home/layout.web'
+import { TopNav } from 'app/components/TopNav'
 import Head from 'next/head'
-import { userProtectedGetSSP } from '../../utils/userProtected'
+import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from '../_app'
-import { DepositCoinbaseScreen } from '../../../../packages/app/features/deposit/DepositCoinbase/screen'
+import { DepositCoinbaseScreen } from 'app/features/deposit/DepositCoinbase/screen'
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -11,7 +11,7 @@ export const Page: NextPageWithLayout = () => {
       <Head>
         <title>Send | Apple Pay Deposit</title>
       </Head>
-      <DepositCoinbaseScreen />
+      <DepositCoinbaseScreen defaultPaymentMethod="APPLE_PAY" />
     </>
   )
 }

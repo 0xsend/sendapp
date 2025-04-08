@@ -1,9 +1,9 @@
 import Head from 'next/head'
-import { HomeLayout } from '../../../../packages/app/features/home/layout.web'
-import { TopNav } from '../../../../packages/app/components/TopNav'
-import { userProtectedGetSSP } from '../../utils/userProtected'
+import { HomeLayout } from 'app/features/home/layout.web'
+import { TopNav } from 'app/components/TopNav'
+import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from '../_app'
-import { DepositSuccessScreen } from '../../../../packages/app/features/deposit/success/screen'
+import { DepositSuccessScreen } from 'app/features/deposit/success/screen'
 
 export const Page: NextPageWithLayout = () => {
   return (
