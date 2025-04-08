@@ -1,6 +1,6 @@
 // packages/app/features/deposit/coinbase/screen.test.tsx
 import '@jest/globals'
-import { render, screen, fireEvent } from '@testing-library/react-native'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react-native'
 import { DepositCoinbaseScreen } from './screen'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinbaseOnramp } from 'app/utils/useCoinbaseOnramp'
@@ -30,6 +30,12 @@ jest.mock('app/features/deposit/components/CoinbaseOnrampVerifyScreen', () => {
     ),
   }
 })
+jest.mock('app/provider/coins', () => ({
+  useCoins: jest.fn().mockReturnValue({
+    coins: [],
+    totalPrice: 5000000n,
+  }),
+}))
 
 describe('DepositCoinbaseScreen', () => {
   // Setup mocks
@@ -67,14 +73,17 @@ describe('DepositCoinbaseScreen', () => {
     expect(screen.getByTestId('onramp-button')).toBeTruthy()
   })
 
-  test('calls openOnramp when user submits', () => {
+  test('calls openOnramp when user submits', async () => {
     render(
       <Provider>
         <DepositCoinbaseScreen />
       </Provider>
     )
     fireEvent.press(screen.getByTestId('onramp-button'))
-    expect(mockOpenOnramp).toHaveBeenCalledWith(10)
+
+    await waitFor(() => {
+      expect(mockOpenOnramp).toHaveBeenCalledWith(10)
+    })
   })
 
   test('renders loading state when status is pending_payment', () => {

@@ -2,12 +2,12 @@ import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinbaseOnramp } from 'app/utils/useCoinbaseOnramp'
 import { toNiceError } from 'app/utils/toNiceError'
 import { Button, FadeCard, Paragraph, Spinner, YStack } from '@my/ui'
-import { DepositConfirm } from 'app/features/deposit/components/DepositConfirm'
 import { IconError } from 'app/components/icons'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { CoinbaseOnrampVerifyScreen } from '../components/CoinbaseOnrampVerifyScreen'
 import { useRouter } from 'solito/router'
 import { useEffect, useState } from 'react'
+import { DepositCoinbaseForm } from 'app/features/deposit/DepositCoinbase/DepositCoinbaseForm'
 
 const COINBASE_APP_ID = process.env.NEXT_PUBLIC_CDP_APP_ID ?? ''
 
@@ -206,7 +206,10 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
         )
       default:
         return (
-          <DepositConfirm onConfirmTransaction={handleConfirmTransaction} isLoading={isLoading} />
+          <DepositCoinbaseForm
+            onConfirmTransaction={handleConfirmTransaction}
+            isLoading={isLoading}
+          />
         )
     }
   }

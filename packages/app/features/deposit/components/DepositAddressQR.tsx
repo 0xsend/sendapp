@@ -25,7 +25,7 @@ export function DepositAddressQR({ address, isConfirmed, onPress }: DepositAddre
   }
 
   return (
-    <YStack ai="center" gap="$4" width="100%">
+    <YStack ai="center" gap="$4" width="100%" cursor={'pointer'}>
       <YStack
         position="relative"
         onPress={() => {

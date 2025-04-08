@@ -6,16 +6,17 @@ import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import { useDepositScreenParams } from 'app/routers/params'
 import { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
 import { formatUnits } from 'viem'
-import { useRouter } from 'solito/router'
-import { usePathname } from 'app/utils/usePathname'
 
 const DepositFormScreenSchema = z.object({
   depositAmount: formFields.text,
 })
 
-export function DepositFormScreen() {
-  const router = useRouter()
-  const location = usePathname()
+type DepositCoinbaseFormProps = {
+  onConfirmTransaction: (amount: number) => void
+  isLoading: boolean
+}
+
+export function DepositCoinbaseForm({ onConfirmTransaction, isLoading }: DepositCoinbaseFormProps) {
   const form = useForm<z.infer<typeof DepositFormScreenSchema>>()
   const [depositParams, setDepositParams] = useDepositScreenParams()
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
@@ -23,10 +24,14 @@ export function DepositFormScreen() {
   const formDepositAmount = form.watch('depositAmount')
   const parsedDepositAmount = BigInt(depositParams.depositAmount ?? '0')
   const invalidDepositAmount = parsedDepositAmount < 1000n || parsedDepositAmount > 50000n // $10-$500 per week
-  const canSubmit = depositParams.depositAmount !== undefined && !invalidDepositAmount
+  const canSubmit = depositParams.depositAmount !== undefined && !invalidDepositAmount && !isLoading
 
   const handleSubmit = () => {
-    router.push({ pathname: `${location}/confirm`, query: depositParams })
+    const depositAmount = Number(depositParams.depositAmount ?? '0') / 100
+
+    if (!Number.isNaN(depositAmount)) {
+      onConfirmTransaction(depositAmount)
+    }
   }
 
   useEffect(() => {
@@ -49,15 +54,7 @@ export function DepositFormScreen() {
   }, [form.watch, depositParams, setDepositParams])
 
   return (
-    <YStack
-      w={'100%'}
-      gap="$5"
-      py={'$3.5'}
-      jc={'space-between'}
-      $gtLg={{
-        w: '50%',
-      }}
-    >
+    <YStack w={'100%'} gap="$5" py={'$3.5'}>
       <Paragraph size={'$7'}>Enter Deposit Amount</Paragraph>
       <FormProvider {...form}>
         <SchemaForm
@@ -132,7 +129,7 @@ export function DepositFormScreen() {
           }}
           renderAfter={({ submit }) => (
             <SubmitButton
-              // testID="onramp-button"
+              testID="onramp-button"
               theme="green"
               onPress={submit}
               py={'$5'}
@@ -147,7 +144,7 @@ export function DepositFormScreen() {
                 size={'$5'}
                 color={'$black'}
               >
-                continue
+                {isLoading ? 'processing...' : 'confirm deposit'}
               </Button.Text>
             </SubmitButton>
           )}
@@ -204,16 +201,29 @@ export function DepositFormScreen() {
                   }}
                 />
               </XStack>
-              <Paragraph
-                fontSize="$5"
-                color={formDepositAmount && invalidDepositAmount ? '$error' : '$lightGrayTextField'}
-                $theme-light={{
-                  color:
-                    formDepositAmount && invalidDepositAmount ? '$error' : '$darkGrayTextField',
-                }}
-              >
-                Min $10 - Max $500 per week
-              </Paragraph>
+              <XStack ai={'center'} jc={'space-between'}>
+                <Paragraph
+                  fontSize="$5"
+                  color={
+                    formDepositAmount && invalidDepositAmount ? '$error' : '$lightGrayTextField'
+                  }
+                  $theme-light={{
+                    color:
+                      formDepositAmount && invalidDepositAmount ? '$error' : '$darkGrayTextField',
+                  }}
+                >
+                  Min $10 - Max $500 per week
+                </Paragraph>
+                <Paragraph
+                  fontSize="$5"
+                  color={'$lightGrayTextField'}
+                  $theme-light={{
+                    color: '$darkGrayTextField',
+                  }}
+                >
+                  Fees: $0.00
+                </Paragraph>
+              </XStack>
             </FadeCard>
           )}
         </SchemaForm>
@@ -221,5 +231,3 @@ export function DepositFormScreen() {
     </YStack>
   )
 }
-
-export default DepositFormScreen
