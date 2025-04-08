@@ -209,6 +209,21 @@ const CreatePasskeyForm = ({
 
 /**
  * Finds a free key slot for the given account address.
+ *
+ * The active keys is an array with the X & Y coordinates of the key and their slot.
+ *
+ * ```ts
+ * const activeSigningKeys: readonly [readonly (readonly [`0x${string}`, `0x${string}`])[], readonly number[]] = [
+ *   // X & Y coordinates of the key
+ *   [
+ *     [ "0x4889909311d8d5e31c34db5f5d44a23f4623f6e3539a858422f8384979691a24", "0xf95b830329d26f7998aa4c8181edf291c030dcb519b2f23da6839185c8f7b5b4" ]
+ *   ],
+ *   // Array of slot numbers corresponding to the X & Y coordinates
+ *   [ 1 ]
+ *  ]
+ *  ```
+ *
+ * This hook returns the first free slot.
  */
 function useFreeKeySlot({ address }: { address: `0x${string}` | undefined }) {
   const {
@@ -250,7 +265,7 @@ function useFreeKeySlot({ address }: { address: `0x${string}` | undefined }) {
       throwIf(maxSigningKeysError)
       const takenSlots = activeSigningKeys[1].map((s) => s).sort()
       for (let i = 0; i < maxSigningKeys; i++) {
-        if (takenSlots[i] === undefined) {
+        if (!takenSlots.includes(i)) {
           return i
         }
       }
