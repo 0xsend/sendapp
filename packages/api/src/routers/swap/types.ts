@@ -16,11 +16,11 @@ const SwapRoutePoolSchema = z.object({
   pool: z.string(), //kyber can return various formats here, contracts addresses (or custom values) instead of LP address (e.g. uniswap v4 hooks)
   tokenIn: addressLower,
   tokenOut: addressLower,
-  limitReturnAmount: z.string(),
+  limitReturnAmount: z.string().optional(),
   swapAmount: z.string(),
   amountOut: z.string(),
   exchange: z.string(),
-  poolLength: z.number(),
+  poolLength: z.number().optional(),
   poolType: z.string(),
   poolExtra: z.any().optional(),
   extra: z.any().optional(),
