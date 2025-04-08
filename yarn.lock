@@ -14982,6 +14982,8 @@ __metadata:
     react-native-svg: "npm:15.2.0"
     react-test-renderer: "npm:^18.3.1"
     react-use-precision-timer: "npm:^3.5.5"
+    recyclerlistview: "npm:^4.2.3"
+    recyclerlistview-gridlayoutprovider: "npm:1.0.1"
     solito: "npm:^4.0.1"
     superjson: "npm:^2.2.1"
     type-fest: "npm:^4.32.0"
@@ -31348,6 +31350,15 @@ __metadata:
     source-map: "npm:~0.6.1"
     tslib: "npm:^2.0.1"
   checksum: 10/b41da2bcf7e705511db2f27d17420ace027de8dd167de9f19190d4988a1f80d112f60c095101ac2f145c8657ddde0c5133eb71df20504efaf3fd9d76ad07e15d
+  languageName: node
+  linkType: hard
+
+"recyclerlistview-gridlayoutprovider@npm:1.0.1":
+  version: 1.0.1
+  resolution: "recyclerlistview-gridlayoutprovider@npm:1.0.1"
+  peerDependencies:
+    recyclerlistview: ">=1.4.0"
+  checksum: 10/ac31ae77b1ee2e0073943edeb7c770b42026673f713311b91f037a56caa84ee7bb8326d8cf4271c43440be3df8ce5398ab313eb3f5eb63f8a831e02b38a80add
   languageName: node
   linkType: hard
 

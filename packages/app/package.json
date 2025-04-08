@@ -61,6 +61,8 @@
     "react-native": "0.74.1",
     "react-native-svg": "15.2.0",
     "react-use-precision-timer": "^3.5.5",
+    "recyclerlistview": "^4.2.3",
+    "recyclerlistview-gridlayoutprovider": "1.0.1",
     "solito": "^4.0.1",
     "superjson": "^2.2.1",
     "viem": "^2.19.0",
