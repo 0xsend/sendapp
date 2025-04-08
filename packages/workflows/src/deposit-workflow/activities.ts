@@ -1,16 +1,17 @@
 import type { PgBytea } from '@my/supabase/database.types'
+import { baseMainnetClient, sendEarnUsdcFactoryAbi } from '@my/wagmi'
 import { bootstrap, isRetryableDBError } from '@my/workflows/utils'
 import { Context as ActivityContext, ApplicationFailure, log, sleep } from '@temporalio/activity'
 import { byteaToHex } from 'app/utils/byteaToHex'
 import {
   decodeSendEarnDepositUserOp,
   isFactoryDeposit,
+  isVaultDeposit,
   type SendEarnDepositCall,
 } from 'app/utils/decodeSendEarnDepositUserOp'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import type { UserOperation } from 'permissionless'
-import superjson from 'superjson'
 import { isAddressEqual, zeroAddress, type Address } from 'viem'
 import {
   sendUserOperation,
@@ -378,7 +379,7 @@ async function waitForTransactionReceiptActivity(
     }
     log.info('waitForTransactionReceiptActivity received receipt', {
       workflowId,
-      bundlerReceipt: superjson.stringify(bundlerReceipt),
+      bundlerReceipt,
     })
     if (!bundlerReceipt.success) {
       // Non-retryable failure if the transaction itself failed on-chain
@@ -442,18 +443,24 @@ async function upsertTemporalDepositActivity({
 
   // Extract necessary fields from the deposit object
   const ownerBytea = hexToBytea(deposit.owner)
-  // Convert bigint assets to hex string before converting to bytea
-  const assetsHex = `0x${deposit.assets.toString(16)}` as `0x${string}`
-  const assetsBytea = hexToBytea(assetsHex)
   // Vault only exists on VaultDeposit type
-  const vaultBytea = deposit.type === 'vault' ? hexToBytea(deposit.vault) : null
+  const vaultBytea = hexToBytea(
+    isVaultDeposit(deposit)
+      ? deposit.vault
+      : // HACK: lookup the default vault for the factory. THIS MAY NOT BE THE ACTUAL VAULT FOR THE DEPOSIT IF IT IS A REFERRAL
+        await baseMainnetClient.readContract({
+          address: deposit.factory,
+          abi: sendEarnUsdcFactoryAbi,
+          functionName: 'VAULT',
+        })
+  )
 
   const { data: upsertData, error } = await upsertTemporalSendEarnDeposit({
     workflow_id: workflowId,
-    status: status, // Use the passed status
+    status: status,
     owner: ownerBytea,
-    assets: assetsBytea,
-    vault: vaultBytea, // Pass potentially null vault
+    assets: deposit.assets.toString(),
+    vault: vaultBytea,
   })
 
   if (error) {

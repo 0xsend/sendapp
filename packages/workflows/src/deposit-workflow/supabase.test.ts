@@ -90,10 +90,9 @@ describe('Deposit Workflow Supabase Helpers', () => {
   const mockWorkflowId = 'wf-123'
   const mockOwnerAddress = '0x1234567890abcdef1234567890abcdef12345678' as Address
   const mockVaultAddress = '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' as Address
-  const mockAssetsBytes = hexToBytes('0x01')
   const mockVaultBytes = hexToBytes(mockVaultAddress)
   const mockOwnerBytea = toPgBytea(hexToBytes(mockOwnerAddress))
-  const mockAssetsBytea = toPgBytea(mockAssetsBytes)
+  const mockAssets = 10_000_000n
   const mockVaultBytea = toPgBytea(mockVaultBytes)
 
   // Helper to create a successful single response
@@ -124,39 +123,43 @@ describe('Deposit Workflow Supabase Helpers', () => {
   })
 
   describe('upsertTemporalSendEarnDeposit', () => {
-    // Define base input with only required fields (vault is optional)
-    const baseInputData: Pick<
-      TemporalDepositInsert,
-      'workflow_id' | 'status' | 'owner' | 'assets'
-    > = {
+    // Define input data matching the new function signature
+    const inputDataWithVault: TemporalDepositInsert = {
       workflow_id: mockWorkflowId,
       status: 'initialized',
       owner: mockOwnerBytea,
-      assets: mockAssetsBytea,
+      assets: mockAssets,
+      vault: mockVaultBytea,
+      // Other fields are optional or set by DB defaults
+      created_at: '', // Mocked below
+      updated_at: '', // Mocked below
+      error_message: null,
+      tx_hash: null,
+      user_op_hash: null,
     }
-    jest
+
+    const inputDataWithoutVault: TemporalDepositInsert = {
+      ...inputDataWithVault,
+      vault: null,
+    }
+
     it('should successfully upsert with all fields including vault', async () => {
-      const inputData = { ...baseInputData, vault: mockVaultBytea }
-      const expectedResult: TemporalDeposit = {
-        ...inputData,
-        status: 'initialized',
-        created_at: new Date().toISOString(),
+      const expectedResult: TemporalDepositInsert = {
+        ...inputDataWithVault, // Use the full input data
+        created_at: new Date().toISOString(), // Mock timestamps
         updated_at: new Date().toISOString(),
-        activity_id: null,
-        error_message: null,
-        tx_hash: null,
-        user_op_hash: null,
       }
       const mockResponse = createSuccessSingleResponse(expectedResult)
       mockSingle.mockResolvedValueOnce(mockResponse)
 
-      // Expect the function to resolve to the full response object
-      await expect(upsertTemporalSendEarnDeposit(inputData)).resolves.toEqual(mockResponse)
+      // Call with the single object argument
+      await expect(upsertTemporalSendEarnDeposit(inputDataWithVault)).resolves.toEqual(mockResponse)
 
       // Assertions using the mocked structure
       expect(mockSchema).toHaveBeenCalledWith('temporal')
       expect(mockFrom).toHaveBeenCalledWith('send_earn_deposits')
-      expect(mockUpsert).toHaveBeenCalledWith(inputData, {
+      // Check the upsert call with the exact input object
+      expect(mockUpsert).toHaveBeenCalledWith(inputDataWithVault, {
         onConflict: 'workflow_id',
         ignoreDuplicates: false,
       })
@@ -165,55 +168,49 @@ describe('Deposit Workflow Supabase Helpers', () => {
     })
 
     it('should successfully upsert with vault as null', async () => {
-      const inputData: TemporalDepositInsert = { ...baseInputData, vault: null }
-      const expectedResult: TemporalDeposit = {
-        ...inputData,
-        status: 'initialized', // Ensure status is set correctly if not in input
+      const expectedResult: TemporalDepositInsert = {
+        ...inputDataWithoutVault, // Use input with null vault
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        activity_id: null,
-        error_message: null,
-        tx_hash: null,
-        user_op_hash: null,
       }
       const mockResponse = createSuccessSingleResponse(expectedResult)
       mockSingle.mockResolvedValueOnce(mockResponse)
 
-      await expect(upsertTemporalSendEarnDeposit(inputData)).resolves.toEqual(mockResponse)
-      expect(mockUpsert).toHaveBeenCalledWith(inputData, expect.any(Object))
+      // Call with the object containing null vault
+      await expect(upsertTemporalSendEarnDeposit(inputDataWithoutVault)).resolves.toEqual(
+        mockResponse
+      )
+      // Check the upsert call with the exact input object
+      expect(mockUpsert).toHaveBeenCalledWith(inputDataWithoutVault, expect.any(Object))
       expect(mockSingle).toHaveBeenCalledTimes(1) // Reset by beforeEach
     })
 
-    it('should successfully upsert with vault undefined (treated as null)', async () => {
-      // Create input data directly from baseInputData; vault is implicitly undefined
-      const inputData = { ...baseInputData }
+    // This test case is no longer relevant as the function signature requires vault (even if null)
+    // it('should successfully upsert with vault undefined (treated as null)', async () => { ... })
 
-      const expectedResult: TemporalDeposit = {
+    it('should throw error if required fields (excluding vault) are missing', async () => {
+      // Test with missing 'owner' for example
+      const incompleteData = {
+        workflow_id: mockWorkflowId,
+        status: 'initialized',
+        assets: mockAssets,
+        vault: mockVaultBytea,
+      }
+      await expect(
+        // biome-ignore lint/suspicious/noExplicitAny: testing invalid input
+        upsertTemporalSendEarnDeposit(incompleteData as any)
+      ).rejects.toThrow('workflow_id, status, owner, and assets are required for initial upsert.')
+      expect(mockUpsert).not.toHaveBeenCalled()
+    })
+
+    // Test case for missing 'assets'
+    it('should throw error if assets field is missing', async () => {
+      const incompleteData = {
         workflow_id: mockWorkflowId,
         status: 'initialized',
         owner: mockOwnerBytea,
-        assets: mockAssetsBytea,
-        vault: null, // Expect vault to be null in the result
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        activity_id: null,
-        error_message: null,
-        tx_hash: null,
-        user_op_hash: null,
+        vault: mockVaultBytea,
       }
-      const mockResponse = createSuccessSingleResponse(expectedResult)
-      mockSingle.mockResolvedValueOnce(mockResponse)
-
-      // The function should handle undefined vault by setting it to null before upserting
-      const expectedUpsertPayload = { ...inputData, vault: null }
-
-      await expect(upsertTemporalSendEarnDeposit(inputData)).resolves.toEqual(mockResponse)
-      expect(mockUpsert).toHaveBeenCalledWith(expectedUpsertPayload, expect.any(Object))
-      expect(mockSingle).toHaveBeenCalledTimes(1) // Reset by beforeEach
-    })
-
-    it('should throw error if required fields (excluding vault) are missing', async () => {
-      const incompleteData = { workflow_id: mockWorkflowId, status: 'initialized' }
       await expect(
         // biome-ignore lint/suspicious/noExplicitAny: testing invalid input
         upsertTemporalSendEarnDeposit(incompleteData as any)
@@ -222,6 +219,7 @@ describe('Deposit Workflow Supabase Helpers', () => {
     })
   })
 
+  // This is the start of the next describe block, the duplicated content above will be removed.
   describe('updateTemporalSendEarnDeposit', () => {
     const baseUpdateData: Pick<TemporalDepositUpdate, 'workflow_id'> = {
       workflow_id: mockWorkflowId,
@@ -235,7 +233,7 @@ describe('Deposit Workflow Supabase Helpers', () => {
         workflow_id: mockWorkflowId,
         status: 'submitted',
         owner: mockOwnerBytea,
-        assets: mockAssetsBytea,
+        assets: mockAssets,
         vault: null,
         tx_hash: mockTxHashBytea,
         user_op_hash: null,
@@ -265,7 +263,7 @@ describe('Deposit Workflow Supabase Helpers', () => {
         workflow_id: mockWorkflowId,
         status: 'sent', // Assuming previous status
         owner: mockOwnerBytea,
-        assets: mockAssetsBytea,
+        assets: mockAssets,
         vault: mockVaultBytea,
         tx_hash: toPgBytea(hexToBytes('0xabc')), // Assuming previous tx_hash
         user_op_hash: null,
@@ -298,7 +296,7 @@ describe('Deposit Workflow Supabase Helpers', () => {
         workflow_id: mockWorkflowId,
         status: 'sent',
         owner: mockOwnerBytea,
-        assets: mockAssetsBytea,
+        assets: mockAssets,
         vault: mockVaultBytea,
         tx_hash: toPgBytea(hexToBytes('0xabc')),
         user_op_hash: null,

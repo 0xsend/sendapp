@@ -11,6 +11,7 @@
     "noEmit": true,
     "composite": true,
     "baseUrl": ".",
+    "moduleResolution": "bundler",
     "paths": {
       "@my/workflows": ["../../packages/workflows/src"],
       "@my/workflows/*": ["../../packages/workflows/src/*"],
@@ -29,7 +30,7 @@
     "./src",
     "../../packages/workflows/src",
     "../../packages/temporal/src",
-    "../supabase",
+    "../../supabase",
     "../../packages/wagmi/src",
     "../../packages/app",
     "../../globals.d.ts",

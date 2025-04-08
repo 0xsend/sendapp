@@ -105,7 +105,13 @@ async function fetchEarnActivityFeed({
   const query = supabase
     .from('activity_feed')
     .select('*')
-    .or(`event_name.eq.${Events.SendEarnDeposit},event_name.eq.${Events.SendEarnWithdraw}`)
+    .or(
+      `event_name.in.(${[
+        Events.SendEarnDeposit,
+        Events.SendEarnWithdraw,
+        Events.TemporalSendEarnDeposit,
+      ].join(',')})`
+    )
     // Apply base address filtering
     .or(getBaseAddressFilterCondition())
     .order('created_at', { ascending: false })

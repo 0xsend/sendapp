@@ -33,6 +33,7 @@ type VaultDeposit = {
 type FactoryDeposit = {
   type: DepositType.FACTORY
   owner: Address
+  factory: Address
   referrer: Address
   assets: bigint
 }
@@ -89,6 +90,7 @@ export function decodeSendEarnDepositUserOp({
       type: DepositType.FACTORY,
       owner: userOp.sender,
       assets,
+      factory: factoryDeposit.dest,
       referrer,
     }
   }

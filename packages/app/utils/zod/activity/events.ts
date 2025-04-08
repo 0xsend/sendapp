@@ -33,6 +33,10 @@ export enum Events {
    */
   SendEarnDeposit = 'send_earn_deposit',
   /**
+   * Temporal Send Earn deposit
+   */
+  TemporalSendEarnDeposit = 'temporal_send_earn_deposit',
+  /**
    * Send Earn withdraw
    */
   SendEarnWithdraw = 'send_earn_withdraw',
