@@ -15,7 +15,7 @@ exports[`TokenDetails renders correctly 1`] = `
     style={
       {
         "flexDirection": "column",
-        "gap": 24,
+        "gap": 16,
       }
     }
   >
@@ -232,7 +232,7 @@ exports[`TokenDetails renders correctly 1`] = `
       style={
         {
           "flexDirection": "row",
-          "gap": 24,
+          "gap": 16,
           "width": "100%",
         }
       }

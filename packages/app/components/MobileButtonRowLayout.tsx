@@ -95,21 +95,15 @@ const Home = ({ children, ...props }: XStackProps) => {
                   return null
                 case selectedCoin !== undefined:
                   return (
-                    <Stack f={1} $gtSm={{ w: '50%' }} flexDirection="row-reverse" maw={350}>
+                    <Stack f={1} $gtSm={{ maw: 350 }}>
                       <HomeButtons.SendButton />
                     </Stack>
                   )
                 default:
                   return (
-                    <>
-                      <Stack f={1} w="50%" flexDirection="row-reverse" maw={350}>
-                        <HomeButtons.GhostDepositButton />
-                      </Stack>
-
-                      <Stack f={1} w="50%" jc={'center'} maw={350}>
-                        <HomeButtons.SendButton />
-                      </Stack>
-                    </>
+                    <Stack f={1} $gtSm={{ maw: 350 }}>
+                      <HomeButtons.SendButton />
+                    </Stack>
                   )
               }
             })()}
