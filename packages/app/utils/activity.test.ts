@@ -95,23 +95,23 @@ describe('test eventNameFromActivity', () => {
     const _activity = EventSchema.parse(activity)
     expect(eventNameFromActivity(_activity)).toBe('Referral Reward')
   })
-  it('should return "Traded" when withdrawal address is swap router or liquidity pool', () => {
+  it('should return "Trade" when withdrawal address is swap router or liquidity pool', () => {
     const activity = JSON.parse(JSON.stringify(mockSwapSellErc20Transfer))
     expect(
       eventNameFromActivity(EventSchema.parse(activity), mockSwapRouters, mockLiquidityPools)
-    ).toBe('Traded')
+    ).toBe('Trade')
   })
-  it('should return "Traded" when erc20 deposit address is swap router or liquidity pool', () => {
+  it('should return "Trade" when erc20 deposit address is swap router or liquidity pool', () => {
     const activity = JSON.parse(JSON.stringify(mockSwapBuyErc20Transfer))
     expect(
       eventNameFromActivity(EventSchema.parse(activity), mockSwapRouters, mockLiquidityPools)
-    ).toBe('Traded')
+    ).toBe('Trade')
   })
-  it('should return "Traded" when eth deposit address is swap router or liquidity pool', () => {
+  it('should return "Trade" when eth deposit address is swap router or liquidity pool', () => {
     const activity = JSON.parse(JSON.stringify(mockSwapBuyEthTransfer))
     expect(
       eventNameFromActivity(EventSchema.parse(activity), mockSwapRouters, mockLiquidityPools)
-    ).toBe('Traded')
+    ).toBe('Trade')
   })
 })
 
@@ -158,28 +158,28 @@ describe('phraseFromActivity', () => {
     expect(phraseFromActivity(_activity)).toBe('Earned referral reward')
   })
 
-  it('should return "Traded" when withdrawal address is swap router or liquidity pool', () => {
+  it('should return "Trade" when withdrawal address is swap router or liquidity pool', () => {
     expect(
       phraseFromActivity(
         EventSchema.parse(mockSwapSellErc20Transfer),
         mockSwapRouters,
         mockLiquidityPools
       )
-    ).toBe('Traded')
+    ).toBe('Trade')
   })
 
-  it('should return "Traded" when erc20 deposit address is swap router or liquidity pool', () => {
+  it('should return "Trade" when erc20 deposit address is swap router or liquidity pool', () => {
     const activity = JSON.parse(JSON.stringify(mockSwapBuyErc20Transfer))
     expect(
       phraseFromActivity(EventSchema.parse(activity), mockSwapRouters, mockLiquidityPools)
-    ).toBe('Traded')
+    ).toBe('Trade')
   })
 
-  it('should return "Traded" when eth deposit address is swap router or liquidity pool', () => {
+  it('should return "Trade" when eth deposit address is swap router or liquidity pool', () => {
     const activity = JSON.parse(JSON.stringify(mockSwapBuyEthTransfer))
     expect(
       phraseFromActivity(EventSchema.parse(activity), mockSwapRouters, mockLiquidityPools)
-    ).toBe('Traded')
+    ).toBe('Trade')
   })
 })
 
