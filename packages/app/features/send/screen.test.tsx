@@ -2,6 +2,7 @@ import { describe, expect, it } from '@jest/globals'
 import { config, TamaguiProvider } from '@my/ui'
 import { render, screen } from '@testing-library/react-native'
 import { SendScreen } from './screen'
+import { useProfileLookup } from 'app/utils/useProfileLookup'
 
 jest.mock('app/utils/api', () => ({
   transfer: {
@@ -38,12 +39,25 @@ jest.mock('solito/router', () => ({
 }))
 
 jest.mock('app/provider/tag-search', () => ({
-  useTagSearch: {
+  useTagSearch: jest.fn().mockReturnValue({
     results: [],
     isLoading: false,
     error: null,
-  },
+  }),
+  TagSearchProvider: jest.fn().mockImplementation(({ children }) => children),
 }))
+
+jest.mock('app/components/SearchBar', () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { View } = require('react-native')
+  const MockedSearch = () => <View testID="mocked-search" />
+  // eslint-disable-next-line react/display-name
+  MockedSearch.Results = () => <View testID="mocked-search-results" />
+  return {
+    __esModule: true,
+    default: MockedSearch,
+  }
+})
 
 jest.mock('app/utils/useProfileLookup', () => ({
   useProfileLookup: jest.fn().mockReturnValue({
@@ -82,6 +96,8 @@ jest.mock('app/provider/theme', () => ({
   useThemeSetting: jest.fn().mockReturnValue({ resolvedTheme: 'dark' }),
 }))
 
+const mockUseProfileLookup = useProfileLookup as jest.Mock
+
 describe('SendScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -105,5 +121,29 @@ describe('SendScreen', () => {
     expect(screen).toMatchSnapshot()
   })
 
-  // TODO add more cases
+  it('should render search when no profile was returned profile lookup returned', () => {
+    mockUseProfileLookup.mockReturnValueOnce({ data: null, isLoading: false, error: null })
+
+    render(
+      <TamaguiProvider defaultTheme={'dark'} config={config}>
+        <SendScreen />
+      </TamaguiProvider>
+    )
+
+    expect(screen.getByTestId('mocked-search')).toBeOnTheScreen()
+    expect(screen.getByTestId('mocked-search-results')).toBeOnTheScreen()
+  })
+
+  it('should render no send account when returned profile has no address', () => {
+    mockUseProfileLookup.mockReturnValueOnce({ data: {}, isLoading: false, error: null })
+
+    render(
+      <TamaguiProvider defaultTheme={'dark'} config={config}>
+        <SendScreen />
+      </TamaguiProvider>
+    )
+
+    expect(screen.getByTestId('NoSendAccount')).toBeOnTheScreen()
+    expect(screen.getByText('No send account')).toBeOnTheScreen()
+  })
 })
