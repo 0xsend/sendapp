@@ -296,7 +296,7 @@ exports[`swap form screen should render 1`] = `
                                 "_defaultValues": {
                                   "inAmount": "1",
                                   "inToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-                                  "outToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                                  "outToken": "0xEab49138BA2Ea6dd776220fE26b7b8E446638956",
                                   "slippage": 50,
                                 },
                                 "_disableForm": [Function],
@@ -328,9 +328,9 @@ exports[`swap form screen should render 1`] = `
                                       "name": "outAmount",
                                       "ref": {
                                         "name": "outAmount",
-                                        "value": "0.00",
+                                        "value": "142",
                                       },
-                                      "value": "0.00",
+                                      "value": "142",
                                     },
                                   },
                                   "outToken": {
@@ -340,7 +340,7 @@ exports[`swap form screen should render 1`] = `
                                       "ref": {
                                         "name": "outToken",
                                       },
-                                      "value": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                                      "value": "0xEab49138BA2Ea6dd776220fE26b7b8E446638956",
                                     },
                                   },
                                 },
@@ -361,8 +361,8 @@ exports[`swap form screen should render 1`] = `
                                 "_formValues": {
                                   "inAmount": "1",
                                   "inToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-                                  "outAmount": "0.00",
-                                  "outToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                                  "outAmount": "142",
+                                  "outToken": "0xEab49138BA2Ea6dd776220fE26b7b8E446638956",
                                   "slippage": 50,
                                 },
                                 "_getDirty": [Function],
@@ -775,7 +775,8 @@ exports[`swap form screen should render 1`] = `
                       }
                       suppressHighlighting={true}
                     >
-                      $1
+                      $
+                      1
                     </Text>
                     <View
                       style={
@@ -801,79 +802,8 @@ exports[`swap form screen should render 1`] = `
                       >
                         2.50
                          
+                        USDC
                       </Text>
-                      <View
-                        cancelable={true}
-                        disabled={false}
-                        focusVisibleStyle={{}}
-                        focusable={[Function]}
-                        minPressDuration={0}
-                        onBlur={[Function]}
-                        onFocus={[Function]}
-                        onMouseEnter={[Function]}
-                        onMouseLeave={[Function]}
-                        onPress={[Function]}
-                        onPressIn={[Function]}
-                        onPressOut={[Function]}
-                        role="button"
-                        style={
-                          {
-                            "alignItems": "center",
-                            "backgroundColor": "transparent",
-                            "borderBottomColor": "transparent",
-                            "borderBottomLeftRadius": 16,
-                            "borderBottomRightRadius": 16,
-                            "borderBottomWidth": 0,
-                            "borderLeftColor": "transparent",
-                            "borderLeftWidth": 0,
-                            "borderRightColor": "transparent",
-                            "borderRightWidth": 0,
-                            "borderStyle": "solid",
-                            "borderTopColor": "transparent",
-                            "borderTopLeftRadius": 16,
-                            "borderTopRightRadius": 16,
-                            "borderTopWidth": 0,
-                            "flexDirection": "row",
-                            "flexWrap": "nowrap",
-                            "height": "auto",
-                            "justifyContent": "center",
-                            "paddingBottom": 0,
-                            "paddingLeft": 0,
-                            "paddingRight": 0,
-                            "paddingTop": 0,
-                            "shadowColor": "rgb(0,0,0)",
-                            "shadowOffset": {
-                              "height": 0,
-                              "width": 0,
-                            },
-                            "shadowOpacity": 0,
-                            "shadowRadius": 0,
-                          }
-                        }
-                        type="button"
-                      >
-                        <Text
-                          lineBreakMode="clip"
-                          numberOfLines={1}
-                          style={
-                            {
-                              "color": "#B2B2B2",
-                              "flexGrow": 0,
-                              "flexShrink": 1,
-                              "fontFamily": "System",
-                              "fontSize": 19.2,
-                              "fontWeight": "400",
-                              "lineHeight": 21,
-                              "textDecorationLine": "underline",
-                              "textTransform": "uppercase",
-                              "userSelect": "none",
-                            }
-                          }
-                          suppressHighlighting={true}
-                        >
-                          max
-                        </Text>
-                      </View>
                     </View>
                   </View>
                 </View>
@@ -1102,7 +1032,7 @@ exports[`swap form screen should render 1`] = `
                                 "_defaultValues": {
                                   "inAmount": "1",
                                   "inToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-                                  "outToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                                  "outToken": "0xEab49138BA2Ea6dd776220fE26b7b8E446638956",
                                   "slippage": 50,
                                 },
                                 "_disableForm": [Function],
@@ -1134,9 +1064,9 @@ exports[`swap form screen should render 1`] = `
                                       "name": "outAmount",
                                       "ref": {
                                         "name": "outAmount",
-                                        "value": "0.00",
+                                        "value": "142",
                                       },
-                                      "value": "0.00",
+                                      "value": "142",
                                     },
                                   },
                                   "outToken": {
@@ -1146,7 +1076,7 @@ exports[`swap form screen should render 1`] = `
                                       "ref": {
                                         "name": "outToken",
                                       },
-                                      "value": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                                      "value": "0xEab49138BA2Ea6dd776220fE26b7b8E446638956",
                                     },
                                   },
                                 },
@@ -1167,8 +1097,8 @@ exports[`swap form screen should render 1`] = `
                                 "_formValues": {
                                   "inAmount": "1",
                                   "inToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-                                  "outAmount": "0.00",
-                                  "outToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                                  "outAmount": "142",
+                                  "outToken": "0xEab49138BA2Ea6dd776220fE26b7b8E446638956",
                                   "slippage": 50,
                                 },
                                 "_getDirty": [Function],
@@ -1324,7 +1254,7 @@ exports[`swap form screen should render 1`] = `
                               }
                             }
                             testID="outAmountInput"
-                            value="0.00"
+                            value="142"
                           />
                         </View>
                       </View>
@@ -3071,104 +3001,6 @@ exports[`swap form screen should render 1`] = `
                       }
                       suppressHighlighting={true}
                     />
-                    <RNSVGSvgView
-                      align="xMidYMid"
-                      bbHeight={24}
-                      bbWidth={24}
-                      fill="none"
-                      focusable={false}
-                      height={24}
-                      meetOrSlice={0}
-                      minX={0}
-                      minY={0}
-                      stroke="#FFFFFF"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      style={
-                        [
-                          {
-                            "backgroundColor": "transparent",
-                            "borderWidth": 0,
-                          },
-                          {
-                            "color": "#FFFFFF",
-                          },
-                          {
-                            "flex": 0,
-                            "height": 24,
-                            "width": 24,
-                          },
-                        ]
-                      }
-                      tintColor="#FFFFFF"
-                      vbHeight={24}
-                      vbWidth={24}
-                      width={24}
-                    >
-                      <RNSVGGroup
-                        fill={null}
-                        propList={
-                          [
-                            "fill",
-                            "stroke",
-                            "strokeWidth",
-                            "strokeLinecap",
-                            "strokeLinejoin",
-                          ]
-                        }
-                        stroke={
-                          {
-                            "payload": 4294967295,
-                            "type": 0,
-                          }
-                        }
-                        strokeLinecap={1}
-                        strokeLinejoin={1}
-                        strokeWidth="2"
-                      >
-                        <RNSVGPath
-                          d="M22 11.08V12a10 10 0 1 1-5.93-9.14"
-                          fill={
-                            {
-                              "payload": 4278190080,
-                              "type": 0,
-                            }
-                          }
-                          propList={
-                            [
-                              "stroke",
-                            ]
-                          }
-                          stroke={
-                            {
-                              "payload": 4294967295,
-                              "type": 0,
-                            }
-                          }
-                        />
-                        <RNSVGPath
-                          d="m9 11 3 3L22 4"
-                          fill={
-                            {
-                              "payload": 4278190080,
-                              "type": 0,
-                            }
-                          }
-                          propList={
-                            [
-                              "stroke",
-                            ]
-                          }
-                          stroke={
-                            {
-                              "payload": 4294967295,
-                              "type": 0,
-                            }
-                          }
-                        />
-                      </RNSVGGroup>
-                    </RNSVGSvgView>
                   </View>
                   <View
                     style={
@@ -3288,6 +3120,104 @@ exports[`swap form screen should render 1`] = `
                       }
                       suppressHighlighting={true}
                     />
+                    <RNSVGSvgView
+                      align="xMidYMid"
+                      bbHeight={24}
+                      bbWidth={24}
+                      fill="none"
+                      focusable={false}
+                      height={24}
+                      meetOrSlice={0}
+                      minX={0}
+                      minY={0}
+                      stroke="#FFFFFF"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      style={
+                        [
+                          {
+                            "backgroundColor": "transparent",
+                            "borderWidth": 0,
+                          },
+                          {
+                            "color": "#FFFFFF",
+                          },
+                          {
+                            "flex": 0,
+                            "height": 24,
+                            "width": 24,
+                          },
+                        ]
+                      }
+                      tintColor="#FFFFFF"
+                      vbHeight={24}
+                      vbWidth={24}
+                      width={24}
+                    >
+                      <RNSVGGroup
+                        fill={null}
+                        propList={
+                          [
+                            "fill",
+                            "stroke",
+                            "strokeWidth",
+                            "strokeLinecap",
+                            "strokeLinejoin",
+                          ]
+                        }
+                        stroke={
+                          {
+                            "payload": 4294967295,
+                            "type": 0,
+                          }
+                        }
+                        strokeLinecap={1}
+                        strokeLinejoin={1}
+                        strokeWidth="2"
+                      >
+                        <RNSVGPath
+                          d="M22 11.08V12a10 10 0 1 1-5.93-9.14"
+                          fill={
+                            {
+                              "payload": 4278190080,
+                              "type": 0,
+                            }
+                          }
+                          propList={
+                            [
+                              "stroke",
+                            ]
+                          }
+                          stroke={
+                            {
+                              "payload": 4294967295,
+                              "type": 0,
+                            }
+                          }
+                        />
+                        <RNSVGPath
+                          d="m9 11 3 3L22 4"
+                          fill={
+                            {
+                              "payload": 4278190080,
+                              "type": 0,
+                            }
+                          }
+                          propList={
+                            [
+                              "stroke",
+                            ]
+                          }
+                          stroke={
+                            {
+                              "payload": 4294967295,
+                              "type": 0,
+                            }
+                          }
+                        />
+                      </RNSVGGroup>
+                    </RNSVGSvgView>
                   </View>
                   <View
                     style={

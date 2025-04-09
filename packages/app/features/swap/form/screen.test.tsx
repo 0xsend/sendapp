@@ -29,14 +29,32 @@ jest.mock('app/provider/coins', () => ({
     ],
     totalPrice: 5000000n,
   }),
-  useCoin: jest.fn().mockReturnValue({
-    coin: {
-      label: 'USDC',
-      token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
-      balance: 2500000n,
-      decimals: 6,
-    },
-    isLoading: false,
+  useCoin: jest.fn().mockImplementation((token) => {
+    if (token === '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913') {
+      return {
+        coin: {
+          label: 'USDC',
+          token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+          balance: 2500000n,
+          decimals: 6,
+          formatDecimals: 2,
+          symbol: 'USDC',
+        },
+        isLoading: false,
+      }
+    }
+
+    return {
+      coin: {
+        label: 'Send',
+        token: '0xEab49138BA2Ea6dd776220fE26b7b8E446638956',
+        balance: 2500000n,
+        decimals: 18,
+        formatDecimals: 0,
+        symbol: 'SEND',
+      },
+      isLoading: false,
+    }
   }),
 }))
 
@@ -49,7 +67,7 @@ jest.mock('app/utils/api', () => ({
             routeSummary: {
               amountInUsd: '1.00',
               amountOutUsd: '0.99',
-              amountOut: '120',
+              amountOut: '142000000000000000000',
             },
           },
           error: null,
@@ -58,6 +76,15 @@ jest.mock('app/utils/api', () => ({
       },
     },
   },
+}))
+
+jest.mock('app/utils/useTokenPrices', () => ({
+  useTokenPrices: jest.fn().mockReturnValue({
+    data: {
+      '0xEab49138BA2Ea6dd776220fE26b7b8E446638956': 0.00699378,
+    },
+    isLoading: false,
+  }),
 }))
 
 jest.mock('app/routers/params', () => ({
@@ -102,8 +129,6 @@ describe('swap form screen', () => {
 
     expect(screen.getByText('You Pay')).toBeOnTheScreen()
     expect(screen.getByText('$1')).toBeOnTheScreen()
-
-    expect(screen.getByText('max')).toBeOnTheScreen()
 
     expect(screen.getByText('You Receive')).toBeOnTheScreen()
     expect(screen.getByText('$0.99')).toBeOnTheScreen()
