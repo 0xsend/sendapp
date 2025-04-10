@@ -88,8 +88,9 @@ The integration includes several database triggers ([defined in migrations like 
 1. **`aaa_filter_send_earn_deposit_with_no_send_account_created`**: Filters out deposits from non-Send accounts
 2. **`aab_send_earn_deposit_trigger_insert_activity`**: Creates activity entries for deposits
 3. **`aaa_send_earn_deposit_trigger_delete_activity`**: Removes activity entries when deposits are deleted
-4. **`insert_referral_on_deposit`**: Automatically creates referral relationships when deposits are made
-5. **`insert_referral_on_new_affiliate`**: Creates referral relationships when new affiliates are created
+4. **`aab_temporal_deposit_update_activity_on_status_change`**: Updates the initial 'pending' activity record to 'failed' if the corresponding Temporal workflow fails, including the error message.
+5. **`insert_referral_on_deposit`**: Automatically creates referral relationships when deposits are made
+6. **`insert_referral_on_new_affiliate`**: Creates referral relationships when new affiliates are created
 
 ## 3. Frontend Implementation
 
@@ -228,11 +229,12 @@ sequenceDiagram
     participant BC as Blockchain
     participant Indexer as Shovel Indexer
     participant DB_Public as public.send_earn_deposit
+    participant DB_Activity as public.activity
 
     Client->>API: Initiate Deposit (UserOp Signed)
     API->>TemporalWF: Start sendEarnDepositWorkflow
     TemporalWF->>TemporalActivity: upsertTemporalDepositActivity (status: initiated)
-    TemporalActivity->>DB_Temporal: Upsert Record
+    TemporalActivity->>DB_Temporal: Upsert Record (triggers creation of initial 'pending' activity in DB_Activity)
     TemporalWF->>TemporalActivity: simulateDepositActivity
     TemporalActivity->>Bundler: Simulate UserOp
     TemporalActivity-->>TemporalWF: Simulation Result
@@ -261,10 +263,13 @@ sequenceDiagram
     alt On Error
         TemporalWF->>TemporalActivity: updateTemporalDepositActivity (status: failed)
         TemporalActivity->>DB_Temporal: Update Record
+    alt On Error (e.g., simulation, submission, mining)
+        TemporalWF->>TemporalActivity: updateTemporalDepositActivity (status: failed, error_message)
+        TemporalActivity->>DB_Temporal: Update Record (triggers update of linked activity in DB_Activity to 'failed')
     end
 ```
 
-This workflow ensures that the deposit is tracked end-to-end, from submission to final confirmation in the application's public database, handling potential failures along the way.
+This workflow ensures that the deposit is tracked end-to-end, from submission to final confirmation in the application's public database tables (`public.send_earn_deposit` for success, `public.activity` for both success and failure), handling potential failures along the way. The `temporal.send_earn_deposits` table acts as the source of truth for the workflow's state, and triggers ensure this state is reflected appropriately in the user-facing activity feed.
 
 ## 6. Referral System Implementation
 
@@ -340,9 +345,14 @@ Send Earn activities are integrated into the main Send App activity feed.
 1. **[Trigger Functions](../supabase/migrations/20250401044160_send_earn.sql)**:
    - `aab_send_earn_deposit_trigger_insert_activity`: Creates activity entries for deposits
    - `aab_send_earn_withdraw_trigger_insert_activity`: Creates activity entries for withdrawals
+   - `aab_temporal_deposit_update_activity_on_status_change`: Updates activity entries for failed deposits (initiated via Temporal)
 
-2. **Data Transformation**:
-   - Raw blockchain data is transformed into user-friendly format
+2. **Activity States**:
+   - Successful deposits and withdrawals appear as distinct events.
+   - Failed deposit attempts (orchestrated via Temporal) also appear in the feed, marked with a 'failed' status and including the specific error message encountered during the workflow.
+
+3. **Data Transformation**:
+   - Raw blockchain data and Temporal workflow outcomes are transformed into user-friendly formats.
    - Includes human-readable amounts, timestamps, and transaction references
 
 3. **UI Components**:

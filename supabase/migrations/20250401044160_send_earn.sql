@@ -799,6 +799,51 @@ AFTER INSERT ON temporal.send_earn_deposits
 FOR EACH ROW
 EXECUTE FUNCTION temporal.temporal_deposit_insert_pending_activity();
 
+-- Function to update the linked activity record when temporal deposit status changes
+CREATE OR REPLACE FUNCTION temporal.temporal_deposit_update_activity_on_status_change()
+RETURNS TRIGGER AS $$
+DECLARE
+  updated_data jsonb;
+BEGIN
+  -- Check if status actually changed and if activity_id exists
+  IF NEW.status IS DISTINCT FROM OLD.status AND NEW.activity_id IS NOT NULL THEN
+
+    -- If the new status is 'failed'
+    IF NEW.status = 'failed' THEN
+      -- Prepare the updated data JSONB
+      -- Start with existing data and add/overwrite status and error
+      -- Ensure we handle potential NULL existing data gracefully
+      SELECT COALESCE(a.data, '{}'::jsonb) || jsonb_build_object(
+                          'status', 'failed',
+                          'error_message', NEW.error_message
+                      )
+      INTO updated_data
+      FROM public.activity a
+      WHERE a.id = NEW.activity_id;
+
+      -- Update the corresponding activity record only if it was found
+      IF FOUND THEN
+          UPDATE public.activity
+          SET
+            event_name = 'temporal_send_earn_deposit_failed',
+            data = updated_data,
+            -- Use the timestamp from the temporal table update
+            created_at = NEW.updated_at -- Reflects the failure time
+          WHERE id = NEW.activity_id;
+      END IF;
+    END IF;
+  END IF;
+
+  RETURN NEW; -- Result is ignored for AFTER triggers, but required syntax
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Trigger to execute the function after update on temporal.send_earn_deposits
+CREATE TRIGGER aab_temporal_deposit_update_activity_on_status_change
+AFTER UPDATE ON temporal.send_earn_deposits
+FOR EACH ROW
+EXECUTE FUNCTION temporal.temporal_deposit_update_activity_on_status_change();
+
 -- Grant permissions for service_role on the temporal schema and its tables
 GRANT USAGE ON SCHEMA temporal TO service_role;
 GRANT ALL ON TABLE temporal.send_earn_deposits TO service_role;
