@@ -23,6 +23,7 @@ export const TokenActivityFeed = ({
   >
   onActivityPress: (activity: Activity) => void
 } & CardProps) => {
+  const [queryParams] = useRootScreenParams()
   const { isAtEnd } = useScrollDirection()
   const [layoutSize, setLayoutSize] = useState<Dimension>({ width: 0, height: 0 })
 
@@ -43,7 +44,13 @@ export const TokenActivityFeed = ({
   })
 
   const _renderRow = (type, activity: Activity) => {
-    return <TokenActivityRow activity={activity} onPress={onActivityPress} />
+    return (
+      <TokenActivityRow
+        activity={activity}
+        activityIndex={activities.findIndex((a) => a.created_at === activity.created_at)}
+        onPress={onActivityPress}
+      />
+    )
   }
 
   const renderFooter = () => {
@@ -75,6 +82,7 @@ export const TokenActivityFeed = ({
       <RecyclerList
         style={{ flex: 1 }}
         dataProvider={dataProvider}
+        initialOffset={queryParams.activityIndex ? Number(queryParams.activityIndex) : 0}
         rowRenderer={_renderRow}
         layoutProvider={_layoutProvider}
         renderFooter={renderFooter}

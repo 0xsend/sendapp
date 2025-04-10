@@ -7,12 +7,19 @@ import { useState } from 'react'
 import { ActivityDetails } from '../activity/ActivityDetails'
 import { TokenActivityFeed } from './TokenActivityFeed'
 import { useTokenActivityFeed } from './utils/useTokenActivityFeed'
+<<<<<<< HEAD
+=======
+
+import { useRootScreenParams } from 'app/routers/params'
+>>>>>>> 12fedd85 (retain activity list index in params)
 
 export const TokenActivity = ({ coin }: { coin: CoinWithBalance }) => {
+  const [queryParams, setRootParams] = useRootScreenParams()
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
 
-  const handleActivityPress = (activity: Activity) => {
+  const handleActivityPress = (activity: Activity, index?: number) => {
     setSelectedActivity(activity)
+    index ? setRootParams({ ...queryParams, activityIndex: index?.toString() }) : null
   }
   const handleCloseActivityDetails = () => {
     setSelectedActivity(null)

@@ -17,10 +17,12 @@ import { useUser } from 'app/utils/useUser'
 
 export function TokenActivityRow({
   activity,
+  activityIndex,
   onPress,
 }: {
   activity: Activity
-  onPress?: (activity: Activity) => void
+  activityIndex?: number
+  onPress?: (activity: Activity, activityIndex?: number) => void
 }) {
   const { profile } = useUser()
   const { data: swapRouters } = useSwapRouters()
@@ -46,7 +48,7 @@ export function TokenActivityRow({
       $gtLg={{ p: '$5' }}
       testID={'TokenActivityRow'}
       hoverStyle={onPress ? hoverStyles : null}
-      onPress={() => onPress?.(activity)}
+      onPress={() => onPress?.(activity, activityIndex)}
     >
       <XStack gap="$3.5" width={'100%'} f={1}>
         <ActivityAvatar activity={activity} />
