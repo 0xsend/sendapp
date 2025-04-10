@@ -2263,7 +2263,7 @@ exports[`swap form screen should render 1`] = `
               }
             >
               <View
-                aria-labelledby=":rg:"
+                aria-labelledby=":rh:"
                 disabled={false}
                 role="group"
                 style={
@@ -2278,7 +2278,7 @@ exports[`swap form screen should render 1`] = `
                 }
               >
                 <View
-                  aria-labelledby=":rh:"
+                  aria-labelledby=":ri:"
                   aria-selected={true}
                   cancelable={true}
                   disabled={false}
@@ -2342,7 +2342,7 @@ exports[`swap form screen should render 1`] = `
                     }
                   >
                     <Text
-                      id=":rh:"
+                      id=":ri:"
                       lineBreakMode="clip"
                       numberOfLines={1}
                       style={
@@ -2495,7 +2495,7 @@ exports[`swap form screen should render 1`] = `
                   }
                 />
                 <View
-                  aria-labelledby=":ri:"
+                  aria-labelledby=":rj:"
                   aria-selected={false}
                   cancelable={true}
                   disabled={false}
@@ -2559,7 +2559,7 @@ exports[`swap form screen should render 1`] = `
                     }
                   >
                     <Text
-                      id=":ri:"
+                      id=":rj:"
                       lineBreakMode="clip"
                       numberOfLines={1}
                       style={
@@ -2906,7 +2906,7 @@ exports[`swap form screen should render 1`] = `
               }
             >
               <View
-                aria-labelledby=":rj:"
+                aria-labelledby=":rk:"
                 disabled={false}
                 role="group"
                 style={
@@ -2921,7 +2921,7 @@ exports[`swap form screen should render 1`] = `
                 }
               >
                 <View
-                  aria-labelledby=":rk:"
+                  aria-labelledby=":rl:"
                   aria-selected={false}
                   cancelable={true}
                   disabled={false}
@@ -2985,7 +2985,7 @@ exports[`swap form screen should render 1`] = `
                     }
                   >
                     <Text
-                      id=":rk:"
+                      id=":rl:"
                       lineBreakMode="clip"
                       numberOfLines={1}
                       style={
@@ -3040,7 +3040,7 @@ exports[`swap form screen should render 1`] = `
                   }
                 />
                 <View
-                  aria-labelledby=":rl:"
+                  aria-labelledby=":rm:"
                   aria-selected={true}
                   cancelable={true}
                   disabled={false}
@@ -3104,7 +3104,7 @@ exports[`swap form screen should render 1`] = `
                     }
                   >
                     <Text
-                      id=":rl:"
+                      id=":rm:"
                       lineBreakMode="clip"
                       numberOfLines={1}
                       style={
@@ -3389,7 +3389,7 @@ exports[`swap form screen should render 1`] = `
         >
           <Text
             accessibilityRole="header"
-            id="title-:rd:"
+            id="title-:re:"
             style={
               {
                 "color": "#FFFFFF",
@@ -3448,6 +3448,7 @@ exports[`swap form screen should render 1`] = `
               disabled={false}
               focusVisibleStyle={{}}
               focusable={[Function]}
+              id=":rd:"
               minPressDuration={0}
               onBlur={[Function]}
               onFocus={[Function]}
@@ -3491,14 +3492,30 @@ exports[`swap form screen should render 1`] = `
               testID="swapRiskDialogCheckbox"
             />
             <Text
+              cancelable={true}
+              disabled={false}
+              focusable={true}
+              htmlFor=":rd:"
+              id=":rn:"
+              minPressDuration={0}
+              onBlur={[Function]}
+              onFocus={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onPress={[Function]}
+              onPressIn={[Function]}
+              onPressOut={[Function]}
               style={
                 {
+                  "alignItems": "center",
+                  "backgroundColor": "transparent",
                   "color": "#FFFFFF",
+                  "display": "flex",
                   "fontFamily": "System",
                   "fontSize": 16.8,
                   "fontWeight": "400",
-                  "lineHeight": 19,
-                  "userSelect": "auto",
+                  "lineHeight": 44,
+                  "userSelect": "none",
                 }
               }
               suppressHighlighting={true}
