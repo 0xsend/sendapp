@@ -863,7 +863,6 @@ export type Database = {
           block_num: number | null
           block_time: number | null
           chain_id: number | null
-          id: number
           ig_name: string | null
           log_addr: string | null
           log_idx: number | null
@@ -881,7 +880,6 @@ export type Database = {
           block_num?: number | null
           block_time?: number | null
           chain_id?: number | null
-          id?: number
           ig_name?: string | null
           log_addr?: string | null
           log_idx?: number | null
@@ -899,7 +897,6 @@ export type Database = {
           block_num?: number | null
           block_time?: number | null
           chain_id?: number | null
-          id?: number
           ig_name?: string | null
           log_addr?: string | null
           log_idx?: number | null
@@ -921,7 +918,6 @@ export type Database = {
           block_time: number | null
           buyer: string | null
           chain_id: number | null
-          id: number
           ig_name: string | null
           log_addr: string | null
           log_idx: number | null
@@ -931,7 +927,6 @@ export type Database = {
           tickets_purchased_total_bps: number | null
           tx_hash: string | null
           tx_idx: number | null
-          value: number | null
         }
         Insert: {
           abi_idx?: number | null
@@ -939,7 +934,6 @@ export type Database = {
           block_time?: number | null
           buyer?: string | null
           chain_id?: number | null
-          id?: number
           ig_name?: string | null
           log_addr?: string | null
           log_idx?: number | null
@@ -949,7 +943,6 @@ export type Database = {
           tickets_purchased_total_bps?: number | null
           tx_hash?: string | null
           tx_idx?: number | null
-          value?: number | null
         }
         Update: {
           abi_idx?: number | null
@@ -957,7 +950,6 @@ export type Database = {
           block_time?: number | null
           buyer?: string | null
           chain_id?: number | null
-          id?: number
           ig_name?: string | null
           log_addr?: string | null
           log_idx?: number | null
@@ -967,7 +959,6 @@ export type Database = {
           tickets_purchased_total_bps?: number | null
           tx_hash?: string | null
           tx_idx?: number | null
-          value?: number | null
         }
         Relationships: []
       }
@@ -1496,18 +1487,6 @@ export type Database = {
           created_at: string
           user_id: string
           referral_count: number
-        }[]
-      }
-      get_user_jackpot_summary: {
-        Args: {
-          num_runs: number
-        }
-        Returns: {
-          jackpot_run_id: number
-          jackpot_block_num: number
-          winner: string
-          win_amount: number
-          total_tickets: number
         }[]
       }
       insert_challenge: {

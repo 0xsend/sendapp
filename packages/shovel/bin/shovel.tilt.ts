@@ -32,7 +32,7 @@ await $`docker run --rm \
     --env BASE_RPC_URL=http://host.docker.internal:8546 \
     --env BASE_CHAIN_ID=${chainId} \
     --env BASE_BLOCK_START="${blockNumber}" \
-    --env SENDPOT_BLOCK_START="${SENDPOT_BLOCK_START}" \
+    --env SENDPOT_BLOCK_START="${blockNumber}" \
     --env DASHBOARD_ROOT_PASSWORD=shoveladmin \
     -v ${import.meta.dir}/../etc:/etc/shovel \
     --entrypoint /usr/local/bin/shovel \
