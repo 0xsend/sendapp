@@ -7748,10 +7748,10 @@
           "maxLength": null
         },
         {
-          "id": "temporal.send_earn_deposits.tx_hash",
-          "name": "tx_hash",
-          "columnName": "tx_hash",
-          "type": "bytea",
+          "id": "temporal.send_earn_deposits.block_num",
+          "name": "block_num",
+          "columnName": "block_num",
+          "type": "numeric",
           "isRequired": false,
           "kind": "scalar",
           "isList": false,

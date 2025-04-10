@@ -13,29 +13,37 @@ export type TemporalDepositUpdate = Database['temporal']['Tables']['send_earn_de
  * Primarily used for inserting the initial 'initialized' state.
  */
 export async function upsertTemporalSendEarnDeposit(
-  insertData: Pick<TemporalDepositInsert, 'workflow_id' | 'status' | 'owner' | 'assets' | 'vault'>
+  insertData: Pick<
+    TemporalDepositInsert,
+    'workflow_id' | 'status' | 'owner' | 'assets' | 'vault' | 'block_num'
+  >
 ) {
-  const { workflow_id, status, owner, assets, vault } = insertData
+  const { workflow_id, status, owner, assets, vault, block_num } = insertData
 
   // Ensure required fields for initial insert are present
   // Vault can be null, so no check needed here.
-  if (!workflow_id || !status || !owner || !assets) {
-    throw new Error('workflow_id, status, owner, and assets are required for initial upsert.')
+  if (
+    !workflow_id ||
+    !status ||
+    !owner ||
+    !assets ||
+    block_num === undefined ||
+    block_num === null
+  ) {
+    throw new Error(
+      'workflow_id, status, owner, assets, and block_num are required for initial upsert.'
+    )
   }
 
   return await supabaseAdmin
     .schema('temporal')
     .from('send_earn_deposits')
-    .upsert(
-      // Pass the data directly, vault is already handled (can be null)
-      insertData,
-      {
-        onConflict: 'workflow_id', // Keep this to handle potential retries/restarts
-        ignoreDuplicates: false, // Allow updates on conflict
-      }
-    )
+    .upsert(insertData, {
+      onConflict: 'workflow_id',
+      ignoreDuplicates: false,
+    })
     .select('*')
-    .single() // Expect a single row result
+    .single()
 }
 
 /**

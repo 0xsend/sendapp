@@ -26,10 +26,15 @@ export async function DepositWorkflow({ userOp }: DepositWorkflowInput) {
   log.debug(`[${workflowId}] Starting SendEarn Deposit Workflow`)
 
   try {
+    // Get the latest block number
+    const [blockNumber, depositCall] = await Promise.all([
+      activities.getBlockNumberActivity(),
+      activities.decodeDepositUserOpActivity(workflowId, userOp),
+    ] as const)
+
     // Decode UserOp (Moved inside try block)
-    const depositCall = await activities.decodeDepositUserOpActivity(workflowId, userOp)
     log.debug(
-      `[${workflowId}] Decoded UserOp: type=${depositCall.type}, owner=${depositCall.owner}`
+      `[${workflowId}] Decoded UserOp: type=${depositCall.type}, owner=${depositCall.owner}, blockNumber=${blockNumber}`
     )
 
     // Initial Upsert - Pass the decoded deposit call to the activity
@@ -38,6 +43,7 @@ export async function DepositWorkflow({ userOp }: DepositWorkflowInput) {
       workflow_id: workflowId,
       status: 'initialized',
       deposit: depositCall,
+      block_num: blockNumber,
     })
     log.debug(`[${workflowId}] Deposit record initialized`)
 

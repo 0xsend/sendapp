@@ -11,13 +11,15 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'test@example.com', 'authenticat
 INSERT INTO public.send_accounts (user_id, address, chain_id, init_code) VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '0x1111111111111111111111111111111111111111', 8453, decode('', 'hex'));
 
 -- Insert a temporal record first (this will trigger the pending activity creation)
-INSERT INTO temporal.send_earn_deposits (workflow_id, owner, assets, vault, tx_hash)
+-- Use user_op_hash and block_num instead of tx_hash
+INSERT INTO temporal.send_earn_deposits (workflow_id, owner, assets, vault, user_op_hash, block_num)
 VALUES (
     'test-cleanup-workflow',
     decode('1111111111111111111111111111111111111111', 'hex'), -- owner
     1000000, -- assets
     decode('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'hex'), -- vault
-    decode('1111111111111111111111111111111111111111111111111111111111111111', 'hex') -- tx_hash (dummy valid hex)
+    decode('0000000000000000000000000000000000000000000000000000000000000000', 'hex'), -- user_op_hash (dummy)
+    123450 -- block_num (must be <= the block_num of the public.send_earn_deposit insert below)
 );
 
 -- 2. Verification 1: Check if the pending activity record was created

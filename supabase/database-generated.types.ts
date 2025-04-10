@@ -2008,11 +2008,11 @@ export type Database = {
         Row: {
           activity_id: number | null
           assets: number | null
+          block_num: number | null
           created_at: string
           error_message: string | null
           owner: string | null
           status: Database["public"]["Enums"]["temporal_status"]
-          tx_hash: string | null
           updated_at: string
           user_op_hash: string | null
           vault: string | null
@@ -2021,11 +2021,11 @@ export type Database = {
         Insert: {
           activity_id?: number | null
           assets?: number | null
+          block_num?: number | null
           created_at?: string
           error_message?: string | null
           owner?: string | null
           status?: Database["public"]["Enums"]["temporal_status"]
-          tx_hash?: string | null
           updated_at?: string
           user_op_hash?: string | null
           vault?: string | null
@@ -2034,11 +2034,11 @@ export type Database = {
         Update: {
           activity_id?: number | null
           assets?: number | null
+          block_num?: number | null
           created_at?: string
           error_message?: string | null
           owner?: string | null
           status?: Database["public"]["Enums"]["temporal_status"]
-          tx_hash?: string | null
           updated_at?: string
           user_op_hash?: string | null
           vault?: string | null

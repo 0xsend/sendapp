@@ -13,8 +13,8 @@ SELECT has_table('temporal', 'send_earn_deposits', 'Table temporal.send_earn_dep
 SELECT has_column('temporal', 'send_earn_deposits', 'workflow_id', 'Column workflow_id should exist.');
 SELECT col_is_pk('temporal', 'send_earn_deposits', 'workflow_id', 'Column workflow_id should be the primary key.');
 SELECT col_is_fk('temporal', 'send_earn_deposits', 'activity_id', 'Column activity_id should be a foreign key to public.activity.');
-SELECT has_index('temporal', 'send_earn_deposits', 'idx_temporal_send_earn_deposits_tx_hash', 'Index on tx_hash should exist.');
-SELECT has_index('temporal', 'send_earn_deposits', 'idx_temporal_send_earn_deposits_owner', 'Index on owner should exist.');
+SELECT has_index('temporal', 'send_earn_deposits', 'idx_temporal_send_earn_deposits_status_owner_block_num', 'Index on owner and block_num should exist.');
+SELECT has_index('temporal', 'send_earn_deposits', 'idx_temporal_send_earn_deposits_activity_id', 'Index on activity_id should exist.');
 
 -- Test Case: Test the AFTER INSERT trigger for pending activity creation
 -- Prepare data for insert
@@ -81,14 +81,15 @@ SELECT results_eq(
 -- Prepare data: Insert another temporal record and its corresponding send_earn_deposit
 SELECT lives_ok(
     $$
-        INSERT INTO temporal.send_earn_deposits (workflow_id, status, owner, assets, vault, tx_hash)
+        INSERT INTO temporal.send_earn_deposits (workflow_id, status, owner, assets, vault, user_op_hash, block_num)
         VALUES (
             'test-workflow-2',
             'sent',
             '\x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed', -- owner
             1000000, -- assets (1 USDC)
             '\x42cd8732570621c426f55aC16dB1e2997086817a', -- vault
-            '\x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' -- example tx_hash
+            '\x0000000000000000000000000000000000000000000000000000000000000000', -- example user_op_hash
+            999 -- block_num (must be <= the block_num of the public.send_earn_deposit insert below)
         );
     $$,
     'Insert second temporal record should succeed.'

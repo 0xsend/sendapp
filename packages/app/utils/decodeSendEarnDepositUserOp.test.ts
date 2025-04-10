@@ -76,7 +76,6 @@ describe('decodeSendEarnDepositUserOp', () => {
       assets,
       vault,
     })
-    // Removed extra closing brace here
   })
 
   it('should correctly decode a valid factory deposit UserOperation (FACTORY_DEPOSIT_SIG)', () => {
@@ -133,6 +132,7 @@ describe('decodeSendEarnDepositUserOp', () => {
     expect(result).toEqual({
       type: 'factory',
       owner: sender,
+      factory,
       referrer,
       assets,
     })

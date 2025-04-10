@@ -31,9 +31,11 @@ type UpsertTemporalDepositActivityParams = {
   workflow_id: string
   status: TemporalDepositInsert['status']
   deposit: SendEarnDepositCall
+  block_num: bigint
 }
 
 type DepositActivities = {
+  getBlockNumberActivity: () => Promise<bigint>
   upsertTemporalDepositActivity: (
     params: UpsertTemporalDepositActivityParams
   ) => Promise<TemporalDeposit>
@@ -67,6 +69,7 @@ export const createDepositActivities = (
 ): DepositActivities => {
   bootstrap(env)
   return {
+    getBlockNumberActivity,
     upsertTemporalDepositActivity,
     simulateDepositActivity,
     decodeDepositUserOpActivity,
@@ -74,9 +77,12 @@ export const createDepositActivities = (
     sendUserOpActivity,
     waitForTransactionReceiptActivity,
     verifyDepositIndexedActivity,
-    // Removed getVaultFromFactoryDepositActivity
     upsertReferralRelationshipActivity,
   }
+}
+
+async function getBlockNumberActivity(): Promise<bigint> {
+  return baseMainnetClient.getBlockNumber()
 }
 
 async function verifyDepositIndexedActivity({
@@ -434,10 +440,12 @@ async function upsertTemporalDepositActivity({
   workflow_id: workflowId,
   status,
   deposit,
+  block_num,
 }: UpsertTemporalDepositActivityParams): Promise<TemporalDeposit> {
   log.info('Upserting initial deposit record', {
     workflowId,
     owner: deposit.owner,
+    block_num: block_num.toString(),
     status,
   })
 
@@ -461,6 +469,7 @@ async function upsertTemporalDepositActivity({
     owner: ownerBytea,
     assets: deposit.assets.toString(),
     vault: vaultBytea,
+    block_num: Number(block_num),
   })
 
   if (error) {

@@ -227,23 +227,17 @@ BEGIN
         created_at = EXCLUDED.created_at;
 
     -- *** CLEANUP LOGIC ***
-    -- Find the workflow_id associated with this transaction hash
-    -- Requires SELECT on temporal.send_earn_deposits
-    SELECT workflow_id INTO _workflow_id
-    FROM temporal.send_earn_deposits
-    WHERE tx_hash = NEW.tx_hash
-    ORDER BY created_at DESC
-    LIMIT 1;
-
-    -- If a corresponding workflow_id was found, delete the pending activity
-    IF _workflow_id IS NOT NULL THEN
-        DELETE FROM public.activity
-        WHERE event_name = 'temporal_send_earn_deposit'
-          AND event_id = _workflow_id;
-    END IF;
+    DELETE FROM public.activity
+    WHERE id in (
+      SELECT activity_id
+      FROM temporal.send_earn_deposits
+      WHERE owner = NEW.owner
+        AND block_num <= NEW.block_num
+        AND status <> 'failed'
+    );
     -- *** END CLEANUP LOGIC ***
 
-    RETURN NEW; -- Keep RETURN NEW as per original function definition in 20250328202927_send_earn.sql
+    RETURN NEW;
 END;
 $$;
 
@@ -714,7 +708,7 @@ CREATE TABLE temporal.send_earn_deposits (
     assets numeric,
     vault bytea,
     user_op_hash bytea,
-    tx_hash bytea,
+    block_num numeric,
     activity_id bigint,
     error_message text,
     created_at timestamptz NOT NULL DEFAULT now(),
@@ -723,8 +717,7 @@ CREATE TABLE temporal.send_earn_deposits (
 
 -- Add indexes
 CREATE INDEX idx_temporal_send_earn_deposits_created_at ON temporal.send_earn_deposits(created_at);
-CREATE INDEX idx_temporal_send_earn_deposits_owner ON temporal.send_earn_deposits(owner);
-CREATE INDEX idx_temporal_send_earn_deposits_tx_hash ON temporal.send_earn_deposits(tx_hash);
+CREATE INDEX idx_temporal_send_earn_deposits_status_owner_block_num ON temporal.send_earn_deposits(status, owner, block_num);
 CREATE INDEX idx_temporal_send_earn_deposits_activity_id ON temporal.send_earn_deposits(activity_id);
 
 -- Add foreign key constraint to public.activity
