@@ -231,7 +231,9 @@ export const SignUpForm = () => {
     >
       {({ countrycode: CountryCode, phone: Phone }) => (
         <YStack gap="$5" jc="center" $sm={{ f: 1 }}>
-          <BigHeading color="$color12">CREATE YOUR ACCOUNT</BigHeading>
+          <BigHeading color="$color12" fontWeight={700}>
+            CREATE YOUR ACCOUNT
+          </BigHeading>
           <H3
             lineHeight={28}
             $platform-web={{ fontFamily: '$mono' }}
@@ -259,7 +261,9 @@ export const SignUpForm = () => {
 
   const backUpForm = (
     <YStack gap="$5" jc="center" $sm={{ f: 1 }} maw={535}>
-      <BigHeading color="$color12">ARE YOU BACKING UP?</BigHeading>
+      <BigHeading color="$color12" fontWeight={700}>
+        ARE YOU BACKING UP?
+      </BigHeading>
       <H3
         lineHeight={28}
         $platform-web={{ fontFamily: '$mono' }}
