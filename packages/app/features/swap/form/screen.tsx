@@ -53,7 +53,7 @@ export const SwapFormScreen = () => {
   const hoverStyles = useHoverStyles()
   const { resolvedTheme } = useThemeSetting()
   const queryClient = useQueryClient()
-  const { data: prices, isLoading: isPricesLoading } = useTokenPrices()
+  const { data: prices, isLoading: isLoadingPrices } = useTokenPrices()
 
   const {
     data: swapRoute,
@@ -77,6 +77,8 @@ export const SwapFormScreen = () => {
 
   const parsedInAmount = BigInt(swapParams.inAmount ?? '0')
   const parsedSlippage = Number(slippage || 0)
+  const inAmountUsd = formatAmount(swapRoute?.routeSummary.amountInUsd)
+  const outAmountUsd = formatAmount(swapRoute?.routeSummary.amountOutUsd)
   const isDarkTheme = resolvedTheme?.startsWith('dark')
 
   const canSubmit =
@@ -392,9 +394,9 @@ export const SwapFormScreen = () => {
                       <XStack ai={'center'} jc={'space-between'}>
                         {(() => {
                           switch (true) {
-                            case isLoadingCoins || isPricesLoading:
+                            case isLoadingCoins || isLoadingPrices:
                               return <Spinner color="$color11" />
-                            case !inCoin || !parsedInAmount || !prices:
+                            case !inCoin || !parsedInAmount:
                               return (
                                 <Paragraph
                                   size={'$5'}
@@ -402,6 +404,16 @@ export const SwapFormScreen = () => {
                                   $theme-light={{ color: '$darkGrayTextField' }}
                                 >
                                   $0
+                                </Paragraph>
+                              )
+                            case !prices:
+                              return (
+                                <Paragraph
+                                  size={'$5'}
+                                  color={'$lightGrayTextField'}
+                                  $theme-light={{ color: '$darkGrayTextField' }}
+                                >
+                                  {inAmountUsd ? `$${inAmountUsd}` : '$0'}
                                 </Paragraph>
                               )
                             default:
@@ -534,9 +546,9 @@ export const SwapFormScreen = () => {
                       <XStack height={'$2'} ai={'center'}>
                         {(() => {
                           switch (true) {
-                            case isFetchingRoute || isLoadingCoins || isPricesLoading:
+                            case isFetchingRoute || isLoadingCoins || isLoadingPrices:
                               return <Spinner color="$color11" />
-                            case !outCoin || !prices || !swapRoute?.routeSummary?.amountOut:
+                            case !outCoin || !swapRoute?.routeSummary?.amountOut:
                               return (
                                 <Paragraph
                                   size={'$5'}
@@ -544,6 +556,16 @@ export const SwapFormScreen = () => {
                                   $theme-light={{ color: '$darkGrayTextField' }}
                                 >
                                   $0
+                                </Paragraph>
+                              )
+                            case !prices:
+                              return (
+                                <Paragraph
+                                  size={'$5'}
+                                  color={'$lightGrayTextField'}
+                                  $theme-light={{ color: '$darkGrayTextField' }}
+                                >
+                                  {outAmountUsd ? `$${outAmountUsd}` : '$0'}
                                 </Paragraph>
                               )
                             default:
