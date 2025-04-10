@@ -102,11 +102,10 @@ export function DepositForm() {
   // MUTATION DEPOSIT USEROP via Temporal
   const toast = useToastController()
   const queryClient = useQueryClient()
-  // Corrected API path: sendEarn.deposit
+
   const depositMutation = api.sendEarn.deposit.useMutation({
     onMutate: () => {
       log('sendEarn.deposit.onMutate')
-      // Optionally return context for rollback
     },
     onError: (error) => {
       log('sendEarn.deposit.onError', error)
@@ -152,13 +151,12 @@ export function DepositForm() {
       await depositMutation.mutateAsync({
         userop: uop.data,
         entryPoint: entryPointAddress[chainId],
-        sendAccountCalls: calls.data ?? [], // Pass calls data, even if not used by current API logic, to match schema
       })
     } catch (error) {
       log('Error during signing or mutation', error)
       // Error handled by depositMutation.onError
     }
-  }, [form.formState, uop.isSuccess, uop.data, webauthnCreds, chainId, depositMutation, calls.data])
+  }, [form.formState, uop.isSuccess, uop.data, webauthnCreds, chainId, depositMutation])
 
   // DEBUG
   log('uop', uop)

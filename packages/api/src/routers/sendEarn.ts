@@ -26,11 +26,6 @@ export const sendEarnRouter = createTRPCRouter({
          * The user op for the deposit.
          */
         userop: UserOperationSchema,
-        /**
-         * The send account calls to prove the userop is for the deposit.
-         * Note: Currently unused in validation logic below, but kept in schema.
-         */
-        sendAccountCalls: SendAccountCallsSchema,
         entryPoint: address,
       })
     )
@@ -52,6 +47,11 @@ export const sendEarnRouter = createTRPCRouter({
         assert(isAddress(owner), 'Invalid owner')
         assert(isAddress(referrer), 'Invalid referrer')
         assert(assets > 0n, 'Invalid assets')
+      } else {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Invalid deposit type',
+        })
       }
       const client = await getTemporalClient()
 
