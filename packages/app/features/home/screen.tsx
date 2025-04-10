@@ -98,9 +98,12 @@ function HomeBody(props: XStackProps) {
           <Card
             bc={'$color1'}
             width="100%"
-            p="$4"
+            p="$2"
+            $gtSm={{
+              p: '$4',
+            }}
             $gtLg={{
-              maxHeight: 310,
+              maxHeight: 370,
               // @ts-expect-error tamagui tripping here
               overflowY: 'scroll',
             }}

@@ -29,13 +29,13 @@ export const HomeQuickActions = (props: XStackProps) => {
         hoverStyle={hoverStyles}
         focusStyle={hoverStyles}
       >
-        <YStack gap="$2" jc={'space-between'} ai="center" p="$4">
+        <YStack gap="$2" jc={'space-between'} ai="center" px="$4" py="$3.5" $gtSm={{ py: '$4' }}>
           <IconPlus
             size={'$1.5'}
             $theme-dark={{ color: '$primary' }}
             $theme-light={{ color: '$color12' }}
           />
-          <Button.Text fontSize={'$4'} px="$2">
+          <Button.Text fontSize={'$5'} px="$2">
             Deposit
           </Button.Text>
         </YStack>
@@ -55,7 +55,7 @@ export const HomeQuickActions = (props: XStackProps) => {
               $theme-light={{ color: '$color12' }}
             />
           </Theme>
-          <Button.Text fontSize={'$4'} px="$2">
+          <Button.Text fontSize={'$5'} px="$2">
             Trade
           </Button.Text>
         </YStack>

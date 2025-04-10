@@ -31,9 +31,9 @@ export const TokenBalanceCard = () => {
   }
 
   return (
-    <Card p={'$5'} w={'100%'} jc="space-between" $gtLg={{ p: '$6', h: 244, mih: 244 }} mih={184}>
-      <XStack w={'100%'} zIndex={4} h="100%">
-        <YStack jc={'center'} gap={'$2'} w={'100%'}>
+    <Card px={'$5'} py={'$6'} w={'100%'} jc="space-between" $gtLg={{ p: '$6', h: 244, mih: 244 }}>
+      <XStack w={'100%'} zIndex={4}>
+        <YStack jc={'center'} gap={'$5'} w={'100%'} $gtLg={{ gap: '$9' }}>
           <YStack w={'100%'} gap={'$2.5'} jc="space-between">
             <XStack ai={'center'} jc={'space-between'} gap="$2.5" width={'100%'}>
               <Paragraph
@@ -80,18 +80,17 @@ export const TokenBalanceCard = () => {
               </XStack>
             )}
           </YStack>
-          <XStack style={{ color: 'white' }} gap={'$2.5'} mt="auto" onPress={onShowHidePress}>
+          <XStack style={{ color: 'white' }} gap={'$2.5'} onPress={onShowHidePress}>
             {(() => {
               switch (true) {
                 case isPriceHidden:
                   return (
                     <BigHeading
                       $platform-web={{ width: 'fit-content' }}
-                      fontSize={96}
-                      lineHeight={'$15'}
-                      fontWeight={'600'}
+                      fontWeight={600}
                       color={'$color12'}
                       zIndex={1}
+                      $gtSm={{ fontSize: 96, lineHeight: 96 }}
                     >
                       {'//////'}
                     </BigHeading>
@@ -103,22 +102,13 @@ export const TokenBalanceCard = () => {
                     <>
                       <BigHeading
                         $platform-web={{ width: 'fit-content' }}
-                        $sm={{
-                          fontSize: (() => {
-                            switch (true) {
-                              case formattedBalance.length > 8:
-                                return '$10'
-                              case formattedBalance.length > 5:
-                                return '$11'
-                              default:
-                                return 86
-                            }
-                          })(),
-                        }}
-                        fontSize={96}
-                        lineHeight={'$15'}
                         color={'$color12'}
+                        fontWeight={600}
                         zIndex={1}
+                        $gtSm={{
+                          fontSize: 96,
+                          lineHeight: 96,
+                        }}
                       >
                         ${formattedBalance}
                       </BigHeading>

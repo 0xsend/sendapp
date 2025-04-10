@@ -190,7 +190,9 @@ export const OnboardingForm = () => {
         {(fields) => (
           <YStack gap="$5" jc="center" $sm={{ f: 1 }}>
             <Theme inverse={true}>
-              <BigHeading col="$background">OPEN ACCOUNT</BigHeading>
+              <BigHeading col="$background" fontWeight={700}>
+                OPEN ACCOUNT
+              </BigHeading>
             </Theme>
             <H3
               lineHeight={28}

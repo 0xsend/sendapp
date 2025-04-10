@@ -20,10 +20,7 @@ const ConfirmSchema = z.object({
 
 export type VerifyCodeProps = {
   phone: string
-  onSuccess: (data?: {
-    user: User | null
-    session: Session | null
-  }) => void
+  onSuccess: (data?: { user: User | null; session: Session | null }) => void
   type?: MobileOtpType
 }
 
@@ -120,7 +117,9 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
       >
         {({ token }) => (
           <YStack gap="$5" jc="center" $sm={{ f: 1 }}>
-            <BigHeading color="$color12">VERIFY ACCOUNT</BigHeading>
+            <BigHeading color="$color12" fontWeight={700}>
+              VERIFY ACCOUNT
+            </BigHeading>
             <H3
               lineHeight={28}
               $platform-web={{ fontFamily: '$mono' }}
