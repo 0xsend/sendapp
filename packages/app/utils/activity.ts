@@ -28,6 +28,7 @@ import {
   isSendEarnDepositEvent,
   isSendEarnEvent,
   isSendEarnWithdrawEvent,
+  isTemporalSendEarnDepositEvent,
 } from './zod/activity/SendEarnEventSchema'
 import {
   isTemporalEthTransfersEvent,
@@ -154,6 +155,15 @@ export function amountFromActivity(
         return `${amount} ${coin.symbol}`
       }
       return formatAmount(`${activity.data.value}`, 5, 0)
+    }
+    case isTemporalSendEarnDepositEvent(activity): {
+      const { assets, coin } = activity.data
+      if (coin && assets !== undefined && assets !== null) {
+        const amount = formatAmount(formatUnits(assets, coin.decimals), 5, coin.formatDecimals)
+        return `${amount} ${coin.symbol}`
+      }
+      // Fallback if coin or assets are missing (less likely for this event type)
+      return assets !== undefined && assets !== null ? formatAmount(`${assets}`, 5, 0) : ''
     }
     case isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity): {
       const data = activity.data
@@ -307,6 +317,10 @@ export function eventNameFromActivity({
       return 'Ticket Purchase'
     case isSendPotWin(activity):
       return 'SendPot Win'
+    case isTemporalSendEarnDepositEvent(activity):
+      return activity.data.status === 'failed'
+        ? 'Deposit Failed'
+        : temporalEventNameFromStatus(data.status)
     case isSendEarnDepositEvent(activity):
       return 'Send Earn Deposit'
     case isSendEarnWithdrawEvent(activity):
@@ -399,6 +413,10 @@ export function phraseFromActivity({
   switch (true) {
     case isSendPotTicketPurchase(activity):
       return 'Bought Tickets'
+    case isTemporalSendEarnDepositEvent(activity):
+      return activity.data.status === 'failed'
+        ? 'Failed to deposit to Send Earn'
+        : 'Depositing to Send Earn...'
     case isSendEarnDepositEvent(activity):
       return 'Deposited to Send Earn'
     case isSendEarnWithdrawEvent(activity):
@@ -553,6 +571,12 @@ export function useSubtextFromActivity({
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const { data: addressBook } = useAddressBook()
   return useMemo(() => {
+    if (isTemporalSendEarnDepositEvent(activity)) {
+      if (activity.data.status === 'failed') {
+        return activity.data.error_message || 'Send Earn'
+      }
+      return 'Send Earn'
+    }
     if (isSendEarnEvent(activity)) {
       return 'Send Earn'
     }

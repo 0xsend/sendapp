@@ -5,7 +5,11 @@ import { SendAccountReceiveEventSchema } from './SendAccountReceiveEventSchema'
 import { SendAccountSigningKeyAddedEventSchema } from './SendAccountSigningKeyAddedEventSchema'
 import { SendAccountSigningKeyRemovedEventSchema } from './SendAccountSigningKeyRemovedEventSchema'
 import { SendAccountTransfersEventSchema } from './SendAccountTransfersEventSchema'
-import { SendEarnDepositEventSchema, SendEarnWithdrawEventSchema } from './SendEarnEventSchema'
+import {
+  SendEarnDepositEventSchema,
+  SendEarnWithdrawEventSchema,
+  TemporalSendEarnDepositEventSchema,
+} from './SendEarnEventSchema'
 import { TagReceiptsEventSchema } from './TagReceiptsEventSchema'
 import { TagReceiptUSDCEventSchema } from './TagReceiptUSDCEventSchema'
 import { TemporalTransfersEventSchema } from './TemporalTransfersEventSchema'
@@ -28,10 +32,13 @@ export {
   isSendEarnDepositEvent,
   isSendEarnEvent,
   isSendEarnWithdrawEvent,
+  isTemporalSendEarnDepositEvent,
   SendEarnDepositEventSchema,
   SendEarnWithdrawEventSchema,
+  TemporalSendEarnDepositEventSchema,
   type SendEarnDepositEvent,
   type SendEarnWithdrawEvent,
+  type TemporalSendEarnDepositEvent,
 } from './SendEarnEventSchema'
 export { isTagReceiptsEvent, TagReceiptsEventSchema } from './TagReceiptsEventSchema'
 export { isTagReceiptUSDCEvent, TagReceiptUSDCEventSchema } from './TagReceiptUSDCEventSchema'
@@ -46,6 +53,7 @@ export const EventSchema = z
     TemporalTransfersEventSchema,
     SendEarnDepositEventSchema,
     SendEarnWithdrawEventSchema,
+    TemporalSendEarnDepositEventSchema,
     SendAccountSigningKeyAddedEventSchema,
     SendAccountSigningKeyRemovedEventSchema,
   ])

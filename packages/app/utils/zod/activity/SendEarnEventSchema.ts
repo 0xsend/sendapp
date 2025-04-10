@@ -1,9 +1,11 @@
+import { CoinSchema, usdcCoin } from 'app/data/coins'
 import { z } from 'zod'
 import { decimalStrToBigInt } from '../bigint'
 import { byteaToHexEthAddress } from '../bytea'
 import { BaseEventSchema } from './BaseEventSchema'
 import { Events } from './events'
 import { OnchainEventDataSchema } from './OnchainDataSchema'
+import { temporalUserOpStatus } from './temporal'
 
 /**
  * Base Schema for Send Earn event data
@@ -59,7 +61,38 @@ export const SendEarnWithdrawEventSchema = BaseEventSchema.extend({
 
 export type SendEarnWithdrawEvent = z.infer<typeof SendEarnWithdrawEventSchema>
 
-export type SendEarnEvent = SendEarnDepositEvent | SendEarnWithdrawEvent
+/**
+ * Schema for Temporal Send Earn Deposit events (pending or failed state)
+ */
+export const TemporalSendEarnDepositDataSchema = z
+  .object({
+    workflow_id: z.string(),
+    owner: byteaToHexEthAddress.optional(),
+    assets: decimalStrToBigInt.optional(),
+    vault: byteaToHexEthAddress.optional(),
+    status: temporalUserOpStatus,
+    error_message: z.string().nullable().optional(),
+  })
+  .extend({
+    coin: CoinSchema.optional(),
+  })
+  .transform((t) => ({
+    ...t,
+    // Assume USDC if assets are present, otherwise null
+    coin: t.assets && usdcCoin ? usdcCoin : null,
+  }))
+
+export const TemporalSendEarnDepositEventSchema = BaseEventSchema.extend({
+  event_name: z.literal(Events.TemporalSendEarnDeposit),
+  data: TemporalSendEarnDepositDataSchema,
+})
+
+export type TemporalSendEarnDepositEvent = z.infer<typeof TemporalSendEarnDepositEventSchema>
+
+export type SendEarnEvent =
+  | SendEarnDepositEvent
+  | SendEarnWithdrawEvent
+  | TemporalSendEarnDepositEvent
 export const isSendEarnDepositEvent = (event: {
   event_name: string
 }): event is SendEarnDepositEvent => event.event_name === Events.SendEarnDeposit
@@ -68,7 +101,13 @@ export const isSendEarnWithdrawEvent = (event: {
   event_name: string
 }): event is SendEarnWithdrawEvent => event.event_name === Events.SendEarnWithdraw
 
+export const isTemporalSendEarnDepositEvent = (event: {
+  event_name: string
+}): event is TemporalSendEarnDepositEvent => event.event_name === Events.TemporalSendEarnDeposit
+
 export const isSendEarnEvent = (event: {
   event_name: string
-}): event is SendEarnDepositEvent | SendEarnWithdrawEvent =>
-  isSendEarnDepositEvent(event) || isSendEarnWithdrawEvent(event)
+}): event is SendEarnEvent =>
+  isSendEarnDepositEvent(event) ||
+  isSendEarnWithdrawEvent(event) ||
+  isTemporalSendEarnDepositEvent(event)
