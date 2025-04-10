@@ -376,7 +376,7 @@ async function waitForTransactionReceiptActivity(
 ): Promise<{ transactionHash: `0x${string}`; blockNumber: bigint }> {
   const hexHash = byteaToHex(userOpHash)
   try {
-    const bundlerReceipt = await waitForUserOperationReceipt(hexHash)
+    const bundlerReceipt = await waitForUserOperationReceipt({ hash: hexHash })
     if (!bundlerReceipt) {
       throw ApplicationFailure.retryable(
         'No receipt returned from waitForTransactionReceipt',

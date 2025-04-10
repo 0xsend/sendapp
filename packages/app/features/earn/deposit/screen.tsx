@@ -122,7 +122,7 @@ export function DepositForm() {
       })
       if (!coin.data) return
       router.push({
-        pathname: `/earn/${coinToParam(coin.data)}`,
+        pathname: `/earn/${coinToParam(coin.data)}/balance`,
       })
     },
     onSettled: () => {

@@ -129,17 +129,17 @@ export async function DepositWorkflow({ userOp }: DepositWorkflowInput) {
 
     // Attempt to update the database record to 'failed' status
     try {
-      console.error(`[${workflowId}] Attempting to update deposit status to 'failed' in DB`) // Reverted to console.error
+      log.error(`[${workflowId}] Attempting to update deposit status to 'failed' in DB`)
       await activities.updateTemporalDepositActivity({
         workflow_id: workflowId,
         status: 'failed',
         error_message: failure.message, // Use message from ApplicationFailure
       })
-      console.error(`[${workflowId}] Successfully updated deposit status to 'failed'`) // Reverted to console.error
+      log.error(`[${workflowId}] Successfully updated deposit status to 'failed'`)
     } catch (dbError) {
       // Log the error during the failure update, but don't mask the original workflow error
-      console.error(
-        // Reverted to console.error
+      log.error(
+        // Reverted to log.error
         `[${workflowId}] CRITICAL: Failed to update deposit status to 'failed' after workflow error:`,
         dbError
       )

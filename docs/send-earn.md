@@ -83,13 +83,13 @@ erDiagram
 
 ### Database Triggers:
 
-The integration includes several database triggers that perform automatic actions:
+The integration includes several database triggers ([defined in migrations like this one](../supabase/migrations/20250401044160_send_earn.sql)) that perform automatic actions:
 
-1. **aaa_filter_send_earn_deposit_with_no_send_account_created**: Filters out deposits from non-Send accounts
-2. **aab_send_earn_deposit_trigger_insert_activity**: Creates activity entries for deposits
-3. **aaa_send_earn_deposit_trigger_delete_activity**: Removes activity entries when deposits are deleted
-4. **insert_referral_on_deposit**: Automatically creates referral relationships when deposits are made
-5. **insert_referral_on_new_affiliate**: Creates referral relationships when new affiliates are created
+1. **`aaa_filter_send_earn_deposit_with_no_send_account_created`**: Filters out deposits from non-Send accounts
+2. **`aab_send_earn_deposit_trigger_insert_activity`**: Creates activity entries for deposits
+3. **`aaa_send_earn_deposit_trigger_delete_activity`**: Removes activity entries when deposits are deleted
+4. **`insert_referral_on_deposit`**: Automatically creates referral relationships when deposits are made
+5. **`insert_referral_on_new_affiliate`**: Creates referral relationships when new affiliates are created
 
 ## 3. Frontend Implementation
 
@@ -117,26 +117,26 @@ The frontend implementation provides users with intuitive interfaces for interac
 ```
 features/earn/
 ├── components/              # Shared components
-│   ├── SendEarnAmount.tsx   # Amount input component
-│   ├── CalculatedBenefits.tsx # APY and earnings display
-│   └── EarnTerms.tsx        # Terms and conditions component
+│   ├── [SendEarnAmount.tsx](../packages/app/features/earn/components/SendEarnAmount.tsx)   # Amount input component
+│   ├── [CalculatedBenefits.tsx](../packages/app/features/earn/components/CalculatedBenefits.tsx) # APY and earnings display
+│   └── [EarnTerms.tsx](../packages/app/features/earn/components/EarnTerms.tsx)        # Terms and conditions component
 ├── deposit/                 # Deposit flow
-│   ├── screen.tsx           # Main deposit screen
-│   └── hooks/               # Deposit-specific hooks
+│   ├── [screen.tsx](../packages/app/features/earn/deposit/screen.tsx)           # Main deposit screen
+│   └── [hooks/](../packages/app/features/earn/deposit/hooks/index.ts)               # Deposit-specific hooks
 ├── withdraw/                # Withdraw flow
-│   ├── screen.tsx           # Main withdraw screen
+│   ├── [screen.tsx](../packages/app/features/earn/withdraw/screen.tsx)           # Main withdraw screen
 │   └── hooks/               # Withdraw-specific hooks
 ├── earnings/                # Earnings display
-│   └── screen.tsx           # Main earnings screen
-├── hooks/                   # Shared hooks
+│   └── [screen.tsx](../packages/app/features/earn/earnings/screen.tsx)           # Main earnings screen
+├── [hooks/](../packages/app/features/earn/hooks/index.ts)                   # Shared hooks
 │   └── index.ts             # Common hooks for Send Earn
 └── utils/                   # Utility functions
-    └── useEarnActivityFeed.ts # Activity feed for earnings
+    └── [useEarnActivityFeed.ts](../packages/app/features/earn/utils/useEarnActivityFeed.ts) # Activity feed for earnings
 ```
 
 ### State Management:
 
-Send App uses React Query for state management, with custom hooks that:
+Send App uses React Query for state management, with [custom hooks](../packages/app/features/earn/hooks/index.ts) that:
 
 1. **Fetch onchain data**: APY rates, current balances, and protocol state
 2. **Query database**: User balances, activity history, and referral information
@@ -150,12 +150,12 @@ Send App interacts with the Send Earn protocol through Account Abstraction and U
 ### UserOp System:
 
 1. **Transaction Preparation**:
-   - The app prepares transactions using `useSendEarnDepositCalls` or `useSendEarnWithdrawCalls`
+   - The app prepares transactions using [`useSendEarnDepositCalls`](../packages/app/features/earn/deposit/hooks/index.ts) or `useSendEarnWithdrawCalls`
    - These hooks generate the necessary contract calls based on user actions
 
 2. **Signature Process**:
    - Transactions are signed using WebAuthn credentials
-   - The `signUserOp` utility handles the signature process
+   - The [`signUserOp`](../packages/workflows/src/utils/userop.ts) utility handles the signature process
 
 3. **Transaction Submission**:
    - Signed UserOps are submitted to a bundler
@@ -190,7 +190,83 @@ The app interacts with three main contracts:
    - Approves token transfers before deposits
    - Receives tokens during withdrawals
 
-## 5. Referral System Implementation
+## 5. Deposit Workflow Orchestration (Temporal)
+
+While the frontend prepares and signs the UserOperation (UserOp) for a deposit, the actual submission, monitoring, and confirmation process is managed by a Temporal workflow to ensure resilience and observability. This is crucial because UserOps involve multiple steps (bundling, blockchain confirmation, indexing) that can take time and potentially fail.
+
+### Purpose
+
+Using Temporal for deposit orchestration provides several benefits:
+- **Reliability:** Handles transient errors (e.g., network issues, bundler downtime) with built-in retries.
+- **State Management:** Tracks the precise state of each deposit UserOp throughout its lifecycle.
+- **Observability:** Offers visibility into the workflow progress and any failures.
+- **Consistency:** Ensures that the final state in the public database tables accurately reflects the onchain outcome.
+
+### Components
+
+1.  **[`sendEarnDepositWorkflow`](../packages/workflows/src/deposit-workflow/workflow.ts)**: The main Temporal workflow orchestrating the deposit process. It's typically initiated by the backend API after receiving a signed UserOp from the client.
+2.  **[Temporal Activities](../packages/workflows/src/deposit-workflow/activities.ts)**: Discrete units of work executed by the workflow:
+    *   `upsertTemporalDepositActivity`: Creates or updates the initial record in the tracking table.
+    *   `simulateDepositActivity`: Simulates the UserOp against the bundler to catch potential issues before submission.
+    *   `updateTemporalDepositActivity`: Updates the status and details of the deposit in the tracking table at various stages.
+    *   `waitForTransactionReceiptActivity`: Polls the blockchain for the transaction receipt once the UserOp is submitted.
+    *   `verifyDepositIndexedActivity`: Polls the public database table (`public.send_earn_deposit`) to confirm the event has been successfully indexed by Shovel.
+3.  **[`temporal.send_earn_deposits` Table](../supabase/migrations/20250401044160_send_earn.sql)**: A dedicated Supabase table within the `temporal` schema used by the workflow to track the intermediate state of each deposit (e.g., `initiated`, `simulated`, `submitted`, `sent`, `mined`, `indexed`, `failed`). This table mirrors the structure of `public.send_earn_deposit` but includes additional status fields for workflow management.
+
+### Workflow Steps
+
+The typical sequence orchestrated by the `sendEarnDepositWorkflow` is as follows:
+
+```mermaid
+sequenceDiagram
+    participant Client as Send App Client
+    participant API as Send App API/Backend
+    participant TemporalWF as Temporal Workflow
+    participant TemporalActivity as Temporal Activities
+    participant DB_Temporal as temporal.send_earn_deposits
+    participant Bundler as UserOp Bundler
+    participant BC as Blockchain
+    participant Indexer as Shovel Indexer
+    participant DB_Public as public.send_earn_deposit
+
+    Client->>API: Initiate Deposit (UserOp Signed)
+    API->>TemporalWF: Start sendEarnDepositWorkflow
+    TemporalWF->>TemporalActivity: upsertTemporalDepositActivity (status: initiated)
+    TemporalActivity->>DB_Temporal: Upsert Record
+    TemporalWF->>TemporalActivity: simulateDepositActivity
+    TemporalActivity->>Bundler: Simulate UserOp
+    TemporalActivity-->>TemporalWF: Simulation Result
+    TemporalWF->>TemporalActivity: updateTemporalDepositActivity (status: simulated)
+    TemporalActivity->>DB_Temporal: Update Record
+    TemporalWF->>Bundler: Submit UserOp
+    TemporalWF->>TemporalActivity: updateTemporalDepositActivity (status: submitted)
+    TemporalActivity->>DB_Temporal: Update Record
+    Bundler-->>TemporalWF: UserOp Hash
+    TemporalWF->>TemporalActivity: updateTemporalDepositActivity (status: sent, userOpHash)
+    TemporalActivity->>DB_Temporal: Update Record
+    TemporalWF->>TemporalActivity: waitForTransactionReceiptActivity (polling BC)
+    TemporalActivity->>BC: Get Transaction Receipt
+    BC-->>TemporalActivity: Receipt
+    TemporalActivity-->>TemporalWF: Receipt Received
+    TemporalWF->>TemporalActivity: updateTemporalDepositActivity (status: mined, txHash)
+    TemporalActivity->>DB_Temporal: Update Record
+    TemporalWF->>TemporalActivity: verifyDepositIndexedActivity (polling DB_Public)
+    Note right of Indexer: Indexer processes BC event<br/>and writes to DB_Public
+    TemporalActivity->>DB_Public: Query for indexed record
+    DB_Public-->>TemporalActivity: Record Found
+    TemporalActivity-->>TemporalWF: Indexing Verified
+    TemporalWF->>TemporalActivity: updateTemporalDepositActivity (status: indexed)
+    TemporalActivity->>DB_Temporal: Update Record
+
+    alt On Error
+        TemporalWF->>TemporalActivity: updateTemporalDepositActivity (status: failed)
+        TemporalActivity->>DB_Temporal: Update Record
+    end
+```
+
+This workflow ensures that the deposit is tracked end-to-end, from submission to final confirmation in the application's public database, handling potential failures along the way.
+
+## 6. Referral System Implementation
 
 The referral system is a key feature of Send App's integration with Send Earn.
 
@@ -214,7 +290,7 @@ sequenceDiagram
 
 ### Implementation Components:
 
-1. **`useReferrer` and `useReferredBy` Hooks**:
+1. **[`useReferrer` and `useReferredBy` Hooks](../packages/app/features/earn/hooks/index.ts)**:
    - Track referral relationships in both directions
    - Used to display referral information and calculate earnings
 
@@ -222,12 +298,12 @@ sequenceDiagram
    - Displays the user's referrer in the UI
    - Shows during the deposit flow
 
-3. **`useSendEarnDepositVault` Hook**:
+3. **[`useSendEarnDepositVault` Hook](../packages/app/features/earn/deposit/hooks/index.ts)**:
    - Determines the appropriate vault based on referral status
    - Prioritizes existing deposits, then referrer relationships
 
-4. **Database Triggers**:
-   - Automatically create referral relationships from onchain events
+4. **[Database Triggers](../supabase/migrations/20250401044160_send_earn.sql)**:
+   - Automatically create referral relationships from onchain events (`insert_referral_on_deposit`, `insert_referral_on_new_affiliate`)
    - Track both direct and multi-level referrals
 
 ### Multi-Level Referrals:
@@ -241,7 +317,7 @@ The system supports multi-level referrals where:
    - User B's earnings are deposited to User A's affiliate vault
    - This creates a chain of revenue sharing
 
-## 6. Activity Feed Integration
+## 7. Activity Feed Integration
 
 Send Earn activities are integrated into the main Send App activity feed.
 
@@ -256,12 +332,12 @@ Send Earn activities are integrated into the main Send App activity feed.
    - Link activities to user accounts for permission control
 
 3. **Activity Feed Queries**:
-   - `useEarnActivityFeed` hook fetches Send Earn activities
+   - [`useEarnActivityFeed`](../packages/app/features/earn/utils/useEarnActivityFeed.ts) hook fetches Send Earn activities
    - Integrates with the main activity feed system
 
 ### Implementation Details:
 
-1. **Trigger Functions**:
+1. **[Trigger Functions](../supabase/migrations/20250401044160_send_earn.sql)**:
    - `aab_send_earn_deposit_trigger_insert_activity`: Creates activity entries for deposits
    - `aab_send_earn_withdraw_trigger_insert_activity`: Creates activity entries for withdrawals
 

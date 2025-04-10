@@ -139,7 +139,7 @@ export class EarnDepositPage {
       timeout: 10_000,
     })
     await this.submit()
-    await this.page.waitForURL(`/earn/${coinToParam(coin)}`)
+    await this.page.waitForURL(`/earn/${coinToParam(coin)}/balance`)
 
     let deposit: { owner: `\\x${string}`; shares: string; assets: string; log_addr: `\\x${string}` }
 
