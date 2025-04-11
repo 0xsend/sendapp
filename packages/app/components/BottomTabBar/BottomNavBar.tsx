@@ -64,12 +64,12 @@ export const BottomNavBar = () => {
           bc={'$color1'}
           w={'100%'}
           h={'100%'}
-          br={'$3.5'}
+          br={'$6'}
           ai={'center'}
           jc={'space-between'}
           p={'$4'}
           shadowColor={'#000000'}
-          shadowOffset={{ height: -5 }}
+          shadowOffset={{ width: 0, height: -5 }}
           shadowOpacity={0.3}
           shadowRadius={60}
         >
