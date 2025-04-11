@@ -130,6 +130,7 @@ describe('Deposit Workflow Supabase Helpers', () => {
       owner: mockOwnerBytea,
       assets: mockAssets,
       vault: mockVaultBytea,
+      block_num: 1,
       // Other fields are optional or set by DB defaults
       created_at: '', // Mocked below
       updated_at: '', // Mocked below
@@ -199,7 +200,9 @@ describe('Deposit Workflow Supabase Helpers', () => {
       await expect(
         // biome-ignore lint/suspicious/noExplicitAny: testing invalid input
         upsertTemporalSendEarnDeposit(incompleteData as any)
-      ).rejects.toThrow('workflow_id, status, owner, and assets are required for initial upsert.')
+      ).rejects.toThrow(
+        'workflow_id, status, owner, assets, and block_num are required for initial upsert.'
+      )
       expect(mockUpsert).not.toHaveBeenCalled()
     })
 
@@ -214,7 +217,9 @@ describe('Deposit Workflow Supabase Helpers', () => {
       await expect(
         // biome-ignore lint/suspicious/noExplicitAny: testing invalid input
         upsertTemporalSendEarnDeposit(incompleteData as any)
-      ).rejects.toThrow('workflow_id, status, owner, and assets are required for initial upsert.')
+      ).rejects.toThrow(
+        'workflow_id, status, owner, assets, and block_num are required for initial upsert.'
+      )
       expect(mockUpsert).not.toHaveBeenCalled()
     })
   })
@@ -238,6 +243,7 @@ describe('Deposit Workflow Supabase Helpers', () => {
         tx_hash: mockTxHashBytea,
         user_op_hash: null,
         error_message: null,
+        block_num: 1,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         activity_id: null,
@@ -268,6 +274,7 @@ describe('Deposit Workflow Supabase Helpers', () => {
         tx_hash: toPgBytea(hexToBytes('0xabc')), // Assuming previous tx_hash
         user_op_hash: null,
         error_message: null,
+        block_num: 1,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         activity_id: null,
@@ -301,6 +308,7 @@ describe('Deposit Workflow Supabase Helpers', () => {
         tx_hash: toPgBytea(hexToBytes('0xabc')),
         user_op_hash: null,
         error_message: null,
+        block_num: 1,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         activity_id: null,

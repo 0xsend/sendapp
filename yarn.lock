@@ -29,10 +29,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@0xsend/send-earn-contracts@npm:^0.0.13":
-  version: 0.0.13
-  resolution: "@0xsend/send-earn-contracts@npm:0.0.13"
-  checksum: 10/be247b63df778e0eabe0721ab61d58467dc067c7888abfda0520ad8b8e08641e5433477165eb734c76329592fd7c1767887ecde8d774ffd14d6e4bdf39ebe858
+"@0xsend/send-earn-contracts@npm:^0.0.14":
+  version: 0.0.14
+  resolution: "@0xsend/send-earn-contracts@npm:0.0.14"
+  checksum: 10/781281e20a63cb80dd88e5a5e18447e9416ab3dfa72be5a7131accfd8ef311110a6a0086ba1ed843ffe96a5fea2e9f05c82bcd31f8d313de22401cccf9b652bb
   languageName: node
   linkType: hard
 
@@ -6772,7 +6772,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@my/wagmi@workspace:packages/wagmi"
   dependencies:
-    "@0xsend/send-earn-contracts": "npm:^0.0.13"
+    "@0xsend/send-earn-contracts": "npm:^0.0.14"
     "@0xsend/send-token-upgrade": "npm:0.0.3"
     "@my/contracts": "workspace:*"
     "@wagmi/cli": "npm:^2.1.15"
@@ -14957,7 +14957,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "app@workspace:packages/app"
   dependencies:
-    "@0xsend/send-earn-contracts": "npm:^0.0.13"
+    "@0xsend/send-earn-contracts": "npm:^0.0.14"
     "@babel/plugin-syntax-import-attributes": "npm:^7.24.7"
     "@coinbase/onchainkit": "npm:^0.38.1"
     "@daimo/expo-passkeys": "workspace:*"
