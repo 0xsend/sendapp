@@ -13,6 +13,7 @@ const {
   decodeTransferUserOpActivity,
   updateTemporalSendAccountTransferActivity,
   getEventFromTransferActivity,
+  getActivityIdFromEventActivity,
 } = proxyActivities<ReturnType<typeof createTransferActivities>>({
   // TODO: make this configurable
   startToCloseTimeout: '10 minutes',
@@ -122,7 +123,7 @@ export async function transfer(userOp: UserOperation<'v0.7'>, note?: string) {
   })
   debugLog('Receipt received:', { tx_hash: bundlerReceipt.receipt.transactionHash })
 
-  const { eventName, eventId } = await getEventFromTransferActivity({
+  const { event_name, event_id } = await getEventFromTransferActivity({
     bundlerReceipt,
     token,
     from,
@@ -132,13 +133,24 @@ export async function transfer(userOp: UserOperation<'v0.7'>, note?: string) {
   await updateTemporalSendAccountTransferActivity({
     workflow_id: workflowId,
     status: 'confirmed',
+    send_account_transfers_activity_event_id: event_id,
+    send_account_transfers_activity_event_name: event_name,
     data: {
       ...(sentTransfer.data as Record<string, unknown>),
       tx_hash: hexToBytea(bundlerReceipt.receipt.transactionHash),
       block_num: bundlerReceipt.receipt.blockNumber.toString(),
-      event_name: eventName,
-      event_id: eventId,
+      event_name,
+      event_id,
     },
   })
+
+  const send_account_transfers_activity_id = await getActivityIdFromEventActivity(
+    workflowId,
+    event_name,
+    event_id
+  )
+
+  //@TODO: delete acitivity here incase triggers don't
+
   return hash
 }
