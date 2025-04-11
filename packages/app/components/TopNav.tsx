@@ -128,7 +128,8 @@ export function TopNav({
     path.includes('/leaderboard') ||
     path.includes('/earn') ||
     path.includes('/sendpot') ||
-    path.includes('/feed')
+    path.includes('/feed') ||
+    path.includes('/explore')
 
   return (
     <Header w="100%" $lg={{ py: '$3' }}>
