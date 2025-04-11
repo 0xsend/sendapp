@@ -3,15 +3,15 @@ import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from '../_app'
 import { TopNav } from 'app/components/TopNav'
-import { ComingSoon } from 'app/components/ComingSoon'
+import { EarnScreen } from 'app/features/earn/screen'
 
 export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Deposit</title>
+        <title>Send | Earn</title>
       </Head>
-      <ComingSoon />
+      <EarnScreen />
     </>
   )
 }
