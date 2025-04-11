@@ -253,6 +253,7 @@ export function SendConfirm() {
       f={1}
       jc={'space-between'}
       pb={'$4'}
+      gap={'$3.5'}
       $gtLg={{
         display: 'flex',
         maxWidth: '50%',

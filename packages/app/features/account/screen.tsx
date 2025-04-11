@@ -91,6 +91,8 @@ export function AccountScreen() {
       pb={'$3.5'}
       maxWidth={'500px'}
       marginHorizontal={'auto'}
+      className={'hide-scroll'}
+      overflow={'scroll'}
       $gtLg={{
         gap: '$5',
         flexDirection: 'row',
