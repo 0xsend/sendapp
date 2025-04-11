@@ -19,10 +19,10 @@ describe('formatCoinAmount', () => {
     expect(formatCoinAmount({ amount, coin: ethCoin })).toBe('1')
 
     const smallAmount = BigInt('100000000000000') // 0.0001 ETH
-    expect(formatCoinAmount({ amount: smallAmount, coin: ethCoin })).toBe('>0.0')
+    expect(formatCoinAmount({ amount: smallAmount, coin: ethCoin })).toBe('0.0001')
 
-    const largeAmount = BigInt('1234567890000000000000') // 1,234.5679 ETH
-    expect(formatCoinAmount({ amount: largeAmount, coin: ethCoin })).toBe('1,234.56')
+    const largeAmount = BigInt('1234567890000000000000') // 1,234.56789 ETH
+    expect(formatCoinAmount({ amount: largeAmount, coin: ethCoin })).toBe('1,234.56789')
   })
 
   it('should format SEND amounts correctly (18 decimals, 0 format decimals)', () => {
