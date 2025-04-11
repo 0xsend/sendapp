@@ -6373,6 +6373,34 @@
           "hasDefaultValue": true,
           "isId": false,
           "maxLength": null
+        },
+        {
+          "id": "temporal.send_account_transfers.send_account_transfers_activity_event_id",
+          "name": "send_account_transfers_activity_event_id",
+          "columnName": "send_account_transfers_activity_event_id",
+          "type": "text",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "temporal.send_account_transfers.send_account_transfers_activity_event_name",
+          "name": "send_account_transfers_activity_event_name",
+          "columnName": "send_account_transfers_activity_event_name",
+          "type": "text",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
         }
       ],
       "uniqueConstraints": [
