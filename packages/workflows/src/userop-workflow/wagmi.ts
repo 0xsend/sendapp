@@ -1,4 +1,8 @@
-import type { UserOperation, GetUserOperationReceiptReturnType } from 'permissionless'
+import type {
+  UserOperation,
+  GetUserOperationReceiptReturnType,
+  WaitForUserOperationReceiptParameters,
+} from 'permissionless'
 import { baseMainnetBundlerClient, baseMainnetClient, entryPointAddress } from '@my/wagmi'
 
 export async function simulateUserOperation(userOp: UserOperation<'v0.7'>) {
@@ -19,6 +23,12 @@ export async function waitForTransactionReceipt(
   hash: `0x${string}`
 ): Promise<GetUserOperationReceiptReturnType> {
   return await baseMainnetBundlerClient.waitForUserOperationReceipt({ hash })
+}
+
+export async function waitForUserOperationReceipt(
+  params: WaitForUserOperationReceiptParameters
+): Promise<GetUserOperationReceiptReturnType> {
+  return await baseMainnetBundlerClient.waitForUserOperationReceipt(params)
 }
 
 export async function getBaseBlockNumber() {

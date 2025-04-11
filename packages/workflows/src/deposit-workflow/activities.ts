@@ -1,8 +1,6 @@
-import type { PgBytea } from '@my/supabase/database.types'
 import { baseMainnetClient, sendEarnUsdcFactoryAbi } from '@my/wagmi'
 import { bootstrap, isRetryableDBError } from '@my/workflows/utils'
 import { Context as ActivityContext, ApplicationFailure, log, sleep } from '@temporalio/activity'
-import { byteaToHex } from 'app/utils/byteaToHex'
 import {
   decodeSendEarnDepositUserOp,
   isFactoryDeposit,
@@ -13,11 +11,8 @@ import { hexToBytea } from 'app/utils/hexToBytea'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import type { UserOperation } from 'permissionless'
 import { isAddressEqual, zeroAddress, type Address } from 'viem'
-import {
-  sendUserOperation,
-  simulateUserOperation,
-  waitForUserOperationReceipt,
-} from '../utils/userop'
+import { createUserOpActivities, type UserOpActivities } from '../userop-workflow/activities'
+import { simulateUserOperation } from '../utils/userop'
 import {
   getUserIdFromAddress,
   updateTemporalSendEarnDeposit,
@@ -34,25 +29,15 @@ type UpsertTemporalDepositActivityParams = {
   block_num: bigint
 }
 
-type DepositActivities = {
-  getBlockNumberActivity: () => Promise<bigint>
+type DepositActivities = UserOpActivities & {
   upsertTemporalDepositActivity: (
     params: UpsertTemporalDepositActivityParams
   ) => Promise<TemporalDeposit>
-  simulateDepositActivity: (workflowId: string, userOp: UserOperation<'v0.7'>) => Promise<void>
   decodeDepositUserOpActivity: (
     workflowId: string,
     userOp: UserOperation<'v0.7'>
   ) => Promise<SendEarnDepositCall>
   updateTemporalDepositActivity: (params: TemporalDepositUpdate) => Promise<TemporalDeposit>
-  sendUserOpActivity: (workflowId: string, userOp: UserOperation<'v0.7'>) => Promise<PgBytea> // Returns userOpHash as PgBytea
-  waitForTransactionReceiptActivity: (
-    workflowId: string,
-    userOpHash: PgBytea
-  ) => Promise<{
-    transactionHash: `0x${string}`
-    blockNumber: bigint
-  }>
   verifyDepositIndexedActivity: (params: {
     transactionHash: `0x${string}`
     owner: Address
@@ -69,20 +54,13 @@ export const createDepositActivities = (
 ): DepositActivities => {
   bootstrap(env)
   return {
-    getBlockNumberActivity,
     upsertTemporalDepositActivity,
-    simulateDepositActivity,
     decodeDepositUserOpActivity,
     updateTemporalDepositActivity,
-    sendUserOpActivity,
-    waitForTransactionReceiptActivity,
     verifyDepositIndexedActivity,
     upsertReferralRelationshipActivity,
+    ...createUserOpActivities(env),
   }
-}
-
-async function getBlockNumberActivity(): Promise<bigint> {
-  return baseMainnetClient.getBlockNumber()
 }
 
 async function verifyDepositIndexedActivity({
@@ -336,99 +314,6 @@ async function upsertReferralRelationshipActivity({
       referredAddress,
     })
     // Do not throw ApplicationFailure here to allow workflow to continue
-  }
-}
-
-async function sendUserOpActivity(
-  workflowId: string,
-  userOp: UserOperation<'v0.7'>
-): Promise<PgBytea> {
-  try {
-    const hash = await sendUserOperation(userOp)
-    const hashBytea = hexToBytea(hash)
-    return hashBytea
-  } catch (error) {
-    log.error('sendUserOpActivity failed', { workflowId, error })
-    const { error: updateError } = await updateTemporalSendEarnDeposit({
-      workflow_id: workflowId,
-      status: 'failed',
-      error_message: error.message ?? 'Failed to send UserOperation',
-    })
-    if (updateError) {
-      // Log the update error but prioritize throwing the original failure
-      log.error('Failed to update deposit status after sendUserOp failure', {
-        workflowId,
-        updateError,
-      })
-    }
-    // Throw non-retryable failure for the activity
-    throw ApplicationFailure.nonRetryable(
-      error.message ?? 'Error sending user operation',
-      error.code ?? 'SEND_USER_OP_FAILED',
-      error
-    )
-  }
-}
-
-async function waitForTransactionReceiptActivity(
-  workflowId: string,
-  userOpHash: PgBytea
-): Promise<{ transactionHash: `0x${string}`; blockNumber: bigint }> {
-  const hexHash = byteaToHex(userOpHash)
-  try {
-    const bundlerReceipt = await waitForUserOperationReceipt({ hash: hexHash })
-    if (!bundlerReceipt) {
-      throw ApplicationFailure.retryable(
-        'No receipt returned from waitForTransactionReceipt',
-        'NO_RECEIPT'
-      )
-    }
-    log.info('waitForTransactionReceiptActivity received receipt', {
-      workflowId,
-      bundlerReceipt,
-    })
-    if (!bundlerReceipt.success) {
-      // Non-retryable failure if the transaction itself failed on-chain
-      throw ApplicationFailure.nonRetryable('Transaction failed on-chain', 'TX_FAILED', {
-        receipt: bundlerReceipt.receipt,
-      })
-    }
-    if (!bundlerReceipt.receipt.transactionHash || !bundlerReceipt.receipt.blockNumber) {
-      throw ApplicationFailure.nonRetryable(
-        'Receipt missing transactionHash or blockNumber',
-        'INVALID_RECEIPT',
-        { receipt: bundlerReceipt.receipt }
-      )
-    }
-    return {
-      transactionHash: bundlerReceipt.receipt.transactionHash,
-      blockNumber: bundlerReceipt.receipt.blockNumber,
-    }
-  } catch (error) {
-    log.error('waitForTransactionReceiptActivity failed', { workflowId, hexHash, error })
-    // Attempt to mark the workflow as failed in the DB
-    const { error: updateError } = await updateTemporalSendEarnDeposit({
-      workflow_id: workflowId,
-      status: 'failed',
-      error_message: error.message ?? 'Failed waiting for transaction receipt',
-    })
-    if (updateError) {
-      log.error('Failed to update deposit status after waitForTransactionReceipt failure', {
-        workflowId,
-        updateError,
-      })
-    }
-
-    // Re-throw original error (could be retryable or non-retryable based on the catch block)
-    if (error instanceof ApplicationFailure) {
-      throw error // Preserve original failure type
-    }
-    // Treat unexpected errors as non-retryable by default
-    throw ApplicationFailure.nonRetryable(
-      error.message ?? 'Error waiting for transaction receipt',
-      error.code ?? 'WAIT_RECEIPT_FAILED',
-      error
-    )
   }
 }
 
