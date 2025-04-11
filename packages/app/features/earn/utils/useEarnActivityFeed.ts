@@ -16,6 +16,9 @@ import { EventArraySchema, Events, type Activity } from 'app/utils/zod/activity'
 import { useMemo } from 'react'
 import type { ZodError } from 'zod'
 
+const PENDING_TRANSFERS_INTERVAL = 1_000
+const MAX_REFETCHES = 10 // 10 seconds
+
 /**
  * Infinite query to fetch Send Earn activity feed.
  * Uses the client-side processing to identify Send Earn deposits and withdrawals.
@@ -53,7 +56,6 @@ export function useEarnActivityFeed(params?: {
   >({
     enabled,
     queryKey,
-    refetchInterval,
     initialPageParam: 0,
     getNextPageParam: (lastPage, _allPages, lastPageParam) => {
       if (lastPage !== null && lastPage.length < pageSize) return undefined
@@ -80,6 +82,28 @@ export function useEarnActivityFeed(params?: {
         pageSize,
         addressBook: addressBook.data,
       })
+    },
+    refetchInterval: ({ dataUpdateCount, state: { data } }) => {
+      const { pages } = data ?? {}
+      if (!pages || !pages[0]) return refetchInterval
+      const activities = pages.flat()
+      const hasPendingTransfer = activities.some(
+        (a) =>
+          a.event_name === Events.TemporalSendEarnDeposit &&
+          !['cancelled', 'failed'].includes(a.data.status)
+      )
+
+      if (hasPendingTransfer) {
+        if (dataUpdateCount >= MAX_REFETCHES) {
+          return refetchInterval // Return to normal interval after max refetches
+        }
+        dataUpdateCount += 1
+        return PENDING_TRANSFERS_INTERVAL
+      }
+
+      // Reset refetch count when there are no pending transfers
+      dataUpdateCount = 0
+      return refetchInterval
     },
   })
 }
