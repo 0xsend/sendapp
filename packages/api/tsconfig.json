@@ -15,6 +15,7 @@
     "baseUrl": ".",
     "moduleResolution": "bundler",
     "paths": {
+      "app": ["../app"],
       "app/*": ["../app/*"],
       "@my/wagmi": ["../wagmi/src"],
       "@my/wagmi/*": ["../wagmi/src/*"],

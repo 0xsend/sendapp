@@ -1,7 +1,7 @@
 import { Queue } from '@my/temporal'
 import { getTemporalClient } from '@my/temporal/client'
 import { baseMainnet, baseMainnetClient, entryPointAddress } from '@my/wagmi'
-import { DepositWorkflow } from '@my/workflows/all-workflows'
+import { DepositWorkflow, version } from '@my/workflows'
 import { WorkflowExecutionAlreadyStartedError } from '@temporalio/client'
 import { TRPCError } from '@trpc/server'
 import { assert } from 'app/utils/assert'
@@ -11,13 +11,12 @@ import {
   isVaultDeposit,
 } from 'app/utils/decodeSendEarnDepositUserOp'
 import { address } from 'app/utils/zod'
-import { SendAccountCallsSchema, UserOperationSchema } from 'app/utils/zod/evm'
+import { UserOperationSchema } from 'app/utils/zod/evm'
 import debug from 'debug'
 import { ENTRYPOINT_ADDRESS_V07, getUserOperationHash } from 'permissionless'
 import { isAddress } from 'viem'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
-import { version } from '@my/workflows'
 
 export const sendEarnRouter = createTRPCRouter({
   deposit: protectedProcedure
