@@ -296,7 +296,7 @@ exports[`swap form screen should render 1`] = `
                                 "_defaultValues": {
                                   "inAmount": "1",
                                   "inToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-                                  "outToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                                  "outToken": "0xEab49138BA2Ea6dd776220fE26b7b8E446638956",
                                   "slippage": 50,
                                 },
                                 "_disableForm": [Function],
@@ -328,9 +328,9 @@ exports[`swap form screen should render 1`] = `
                                       "name": "outAmount",
                                       "ref": {
                                         "name": "outAmount",
-                                        "value": "0.00",
+                                        "value": "142",
                                       },
-                                      "value": "0.00",
+                                      "value": "142",
                                     },
                                   },
                                   "outToken": {
@@ -340,7 +340,7 @@ exports[`swap form screen should render 1`] = `
                                       "ref": {
                                         "name": "outToken",
                                       },
-                                      "value": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                                      "value": "0xEab49138BA2Ea6dd776220fE26b7b8E446638956",
                                     },
                                   },
                                 },
@@ -361,8 +361,8 @@ exports[`swap form screen should render 1`] = `
                                 "_formValues": {
                                   "inAmount": "1",
                                   "inToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-                                  "outAmount": "0.00",
-                                  "outToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                                  "outAmount": "142",
+                                  "outToken": "0xEab49138BA2Ea6dd776220fE26b7b8E446638956",
                                   "slippage": 50,
                                 },
                                 "_getDirty": [Function],
@@ -775,7 +775,8 @@ exports[`swap form screen should render 1`] = `
                       }
                       suppressHighlighting={true}
                     >
-                      $1
+                      $
+                      1
                     </Text>
                     <View
                       style={
@@ -801,79 +802,8 @@ exports[`swap form screen should render 1`] = `
                       >
                         2.50
                          
+                        USDC
                       </Text>
-                      <View
-                        cancelable={true}
-                        disabled={false}
-                        focusVisibleStyle={{}}
-                        focusable={[Function]}
-                        minPressDuration={0}
-                        onBlur={[Function]}
-                        onFocus={[Function]}
-                        onMouseEnter={[Function]}
-                        onMouseLeave={[Function]}
-                        onPress={[Function]}
-                        onPressIn={[Function]}
-                        onPressOut={[Function]}
-                        role="button"
-                        style={
-                          {
-                            "alignItems": "center",
-                            "backgroundColor": "transparent",
-                            "borderBottomColor": "transparent",
-                            "borderBottomLeftRadius": 16,
-                            "borderBottomRightRadius": 16,
-                            "borderBottomWidth": 0,
-                            "borderLeftColor": "transparent",
-                            "borderLeftWidth": 0,
-                            "borderRightColor": "transparent",
-                            "borderRightWidth": 0,
-                            "borderStyle": "solid",
-                            "borderTopColor": "transparent",
-                            "borderTopLeftRadius": 16,
-                            "borderTopRightRadius": 16,
-                            "borderTopWidth": 0,
-                            "flexDirection": "row",
-                            "flexWrap": "nowrap",
-                            "height": "auto",
-                            "justifyContent": "center",
-                            "paddingBottom": 0,
-                            "paddingLeft": 0,
-                            "paddingRight": 0,
-                            "paddingTop": 0,
-                            "shadowColor": "rgb(0,0,0)",
-                            "shadowOffset": {
-                              "height": 0,
-                              "width": 0,
-                            },
-                            "shadowOpacity": 0,
-                            "shadowRadius": 0,
-                          }
-                        }
-                        type="button"
-                      >
-                        <Text
-                          lineBreakMode="clip"
-                          numberOfLines={1}
-                          style={
-                            {
-                              "color": "#B2B2B2",
-                              "flexGrow": 0,
-                              "flexShrink": 1,
-                              "fontFamily": "System",
-                              "fontSize": 19.2,
-                              "fontWeight": "400",
-                              "lineHeight": 21,
-                              "textDecorationLine": "underline",
-                              "textTransform": "uppercase",
-                              "userSelect": "none",
-                            }
-                          }
-                          suppressHighlighting={true}
-                        >
-                          max
-                        </Text>
-                      </View>
                     </View>
                   </View>
                 </View>
@@ -1102,7 +1032,7 @@ exports[`swap form screen should render 1`] = `
                                 "_defaultValues": {
                                   "inAmount": "1",
                                   "inToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-                                  "outToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                                  "outToken": "0xEab49138BA2Ea6dd776220fE26b7b8E446638956",
                                   "slippage": 50,
                                 },
                                 "_disableForm": [Function],
@@ -1134,9 +1064,9 @@ exports[`swap form screen should render 1`] = `
                                       "name": "outAmount",
                                       "ref": {
                                         "name": "outAmount",
-                                        "value": "0.00",
+                                        "value": "142",
                                       },
-                                      "value": "0.00",
+                                      "value": "142",
                                     },
                                   },
                                   "outToken": {
@@ -1146,7 +1076,7 @@ exports[`swap form screen should render 1`] = `
                                       "ref": {
                                         "name": "outToken",
                                       },
-                                      "value": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                                      "value": "0xEab49138BA2Ea6dd776220fE26b7b8E446638956",
                                     },
                                   },
                                 },
@@ -1167,8 +1097,8 @@ exports[`swap form screen should render 1`] = `
                                 "_formValues": {
                                   "inAmount": "1",
                                   "inToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-                                  "outAmount": "0.00",
-                                  "outToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                                  "outAmount": "142",
+                                  "outToken": "0xEab49138BA2Ea6dd776220fE26b7b8E446638956",
                                   "slippage": 50,
                                 },
                                 "_getDirty": [Function],
@@ -1324,7 +1254,7 @@ exports[`swap form screen should render 1`] = `
                               }
                             }
                             testID="outAmountInput"
-                            value="0.00"
+                            value="142"
                           />
                         </View>
                       </View>
@@ -2333,7 +2263,7 @@ exports[`swap form screen should render 1`] = `
               }
             >
               <View
-                aria-labelledby=":rg:"
+                aria-labelledby=":rh:"
                 disabled={false}
                 role="group"
                 style={
@@ -2348,7 +2278,7 @@ exports[`swap form screen should render 1`] = `
                 }
               >
                 <View
-                  aria-labelledby=":rh:"
+                  aria-labelledby=":ri:"
                   aria-selected={true}
                   cancelable={true}
                   disabled={false}
@@ -2412,7 +2342,7 @@ exports[`swap form screen should render 1`] = `
                     }
                   >
                     <Text
-                      id=":rh:"
+                      id=":ri:"
                       lineBreakMode="clip"
                       numberOfLines={1}
                       style={
@@ -2565,7 +2495,7 @@ exports[`swap form screen should render 1`] = `
                   }
                 />
                 <View
-                  aria-labelledby=":ri:"
+                  aria-labelledby=":rj:"
                   aria-selected={false}
                   cancelable={true}
                   disabled={false}
@@ -2629,7 +2559,7 @@ exports[`swap form screen should render 1`] = `
                     }
                   >
                     <Text
-                      id=":ri:"
+                      id=":rj:"
                       lineBreakMode="clip"
                       numberOfLines={1}
                       style={
@@ -2976,7 +2906,7 @@ exports[`swap form screen should render 1`] = `
               }
             >
               <View
-                aria-labelledby=":rj:"
+                aria-labelledby=":rk:"
                 disabled={false}
                 role="group"
                 style={
@@ -2991,7 +2921,7 @@ exports[`swap form screen should render 1`] = `
                 }
               >
                 <View
-                  aria-labelledby=":rk:"
+                  aria-labelledby=":rl:"
                   aria-selected={false}
                   cancelable={true}
                   disabled={false}
@@ -3055,7 +2985,126 @@ exports[`swap form screen should render 1`] = `
                     }
                   >
                     <Text
-                      id=":rk:"
+                      id=":rl:"
+                      lineBreakMode="clip"
+                      numberOfLines={1}
+                      style={
+                        {
+                          "color": "#FFFFFF",
+                          "fontFamily": "System",
+                          "fontSize": 19.2,
+                          "fontWeight": "500",
+                          "lineHeight": 19,
+                          "textTransform": "uppercase",
+                          "userSelect": "none",
+                        }
+                      }
+                      suppressHighlighting={true}
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "gap": 16,
+                      }
+                    }
+                  >
+                    <Text
+                      style={
+                        {
+                          "color": "#FFFFFF",
+                          "fontFamily": "System",
+                          "fontSize": 24,
+                          "fontWeight": "500",
+                          "lineHeight": 19,
+                          "userSelect": "auto",
+                        }
+                      }
+                      suppressHighlighting={true}
+                    >
+                      0.25
+                    </Text>
+                  </View>
+                </View>
+                <View
+                  pointerEvents="none"
+                  style={
+                    {
+                      "height": 0,
+                      "minHeight": 0,
+                      "minWidth": 0,
+                      "width": 0,
+                    }
+                  }
+                />
+                <View
+                  aria-labelledby=":rm:"
+                  aria-selected={true}
+                  cancelable={true}
+                  disabled={false}
+                  focusVisibleStyle={
+                    {
+                      "outlineColor": "$outlineColor",
+                      "outlineStyle": "solid",
+                      "outlineWidth": 1,
+                    }
+                  }
+                  focusable={true}
+                  minPressDuration={0}
+                  onBlur={[Function]}
+                  onFocus={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onPress={[Function]}
+                  onPressIn={[Function]}
+                  onPressOut={[Function]}
+                  style={
+                    {
+                      "alignItems": "center",
+                      "backgroundColor": "transparent",
+                      "borderBottomColor": "#111f22",
+                      "borderBottomLeftRadius": 9,
+                      "borderBottomRightRadius": 9,
+                      "borderBottomWidth": 0,
+                      "borderLeftColor": "#111f22",
+                      "borderLeftWidth": 0,
+                      "borderRightColor": "#111f22",
+                      "borderRightWidth": 0,
+                      "borderStyle": "solid",
+                      "borderTopColor": "#111f22",
+                      "borderTopLeftRadius": 9,
+                      "borderTopRightRadius": 9,
+                      "borderTopWidth": 0,
+                      "flex": 1,
+                      "flexDirection": "row",
+                      "flexWrap": "nowrap",
+                      "justifyContent": "space-between",
+                      "maxWidth": "100%",
+                      "minHeight": 44,
+                      "overflow": "hidden",
+                      "paddingBottom": 10,
+                      "paddingLeft": 18,
+                      "paddingRight": 18,
+                      "paddingTop": 10,
+                      "width": "100%",
+                    }
+                  }
+                  tabIndex={-1}
+                >
+                  <View
+                    style={
+                      {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "gap": 7,
+                        "justifyContent": "space-between",
+                      }
+                    }
+                  >
+                    <Text
+                      id=":rm:"
                       lineBreakMode="clip"
                       numberOfLines={1}
                       style={
@@ -3169,125 +3218,6 @@ exports[`swap form screen should render 1`] = `
                         />
                       </RNSVGGroup>
                     </RNSVGSvgView>
-                  </View>
-                  <View
-                    style={
-                      {
-                        "alignItems": "center",
-                        "flexDirection": "row",
-                        "gap": 16,
-                      }
-                    }
-                  >
-                    <Text
-                      style={
-                        {
-                          "color": "#FFFFFF",
-                          "fontFamily": "System",
-                          "fontSize": 24,
-                          "fontWeight": "500",
-                          "lineHeight": 19,
-                          "userSelect": "auto",
-                        }
-                      }
-                      suppressHighlighting={true}
-                    >
-                      0.25
-                    </Text>
-                  </View>
-                </View>
-                <View
-                  pointerEvents="none"
-                  style={
-                    {
-                      "height": 0,
-                      "minHeight": 0,
-                      "minWidth": 0,
-                      "width": 0,
-                    }
-                  }
-                />
-                <View
-                  aria-labelledby=":rl:"
-                  aria-selected={true}
-                  cancelable={true}
-                  disabled={false}
-                  focusVisibleStyle={
-                    {
-                      "outlineColor": "$outlineColor",
-                      "outlineStyle": "solid",
-                      "outlineWidth": 1,
-                    }
-                  }
-                  focusable={true}
-                  minPressDuration={0}
-                  onBlur={[Function]}
-                  onFocus={[Function]}
-                  onMouseEnter={[Function]}
-                  onMouseLeave={[Function]}
-                  onPress={[Function]}
-                  onPressIn={[Function]}
-                  onPressOut={[Function]}
-                  style={
-                    {
-                      "alignItems": "center",
-                      "backgroundColor": "transparent",
-                      "borderBottomColor": "#111f22",
-                      "borderBottomLeftRadius": 9,
-                      "borderBottomRightRadius": 9,
-                      "borderBottomWidth": 0,
-                      "borderLeftColor": "#111f22",
-                      "borderLeftWidth": 0,
-                      "borderRightColor": "#111f22",
-                      "borderRightWidth": 0,
-                      "borderStyle": "solid",
-                      "borderTopColor": "#111f22",
-                      "borderTopLeftRadius": 9,
-                      "borderTopRightRadius": 9,
-                      "borderTopWidth": 0,
-                      "flex": 1,
-                      "flexDirection": "row",
-                      "flexWrap": "nowrap",
-                      "justifyContent": "space-between",
-                      "maxWidth": "100%",
-                      "minHeight": 44,
-                      "overflow": "hidden",
-                      "paddingBottom": 10,
-                      "paddingLeft": 18,
-                      "paddingRight": 18,
-                      "paddingTop": 10,
-                      "width": "100%",
-                    }
-                  }
-                  tabIndex={-1}
-                >
-                  <View
-                    style={
-                      {
-                        "alignItems": "center",
-                        "flexDirection": "row",
-                        "gap": 7,
-                        "justifyContent": "space-between",
-                      }
-                    }
-                  >
-                    <Text
-                      id=":rl:"
-                      lineBreakMode="clip"
-                      numberOfLines={1}
-                      style={
-                        {
-                          "color": "#FFFFFF",
-                          "fontFamily": "System",
-                          "fontSize": 19.2,
-                          "fontWeight": "500",
-                          "lineHeight": 19,
-                          "textTransform": "uppercase",
-                          "userSelect": "none",
-                        }
-                      }
-                      suppressHighlighting={true}
-                    />
                   </View>
                   <View
                     style={
@@ -3459,7 +3389,7 @@ exports[`swap form screen should render 1`] = `
         >
           <Text
             accessibilityRole="header"
-            id="title-:rd:"
+            id="title-:re:"
             style={
               {
                 "color": "#FFFFFF",
@@ -3518,6 +3448,7 @@ exports[`swap form screen should render 1`] = `
               disabled={false}
               focusVisibleStyle={{}}
               focusable={[Function]}
+              id=":rd:"
               minPressDuration={0}
               onBlur={[Function]}
               onFocus={[Function]}
@@ -3561,14 +3492,30 @@ exports[`swap form screen should render 1`] = `
               testID="swapRiskDialogCheckbox"
             />
             <Text
+              cancelable={true}
+              disabled={false}
+              focusable={true}
+              htmlFor=":rd:"
+              id=":rn:"
+              minPressDuration={0}
+              onBlur={[Function]}
+              onFocus={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onPress={[Function]}
+              onPressIn={[Function]}
+              onPressOut={[Function]}
               style={
                 {
+                  "alignItems": "center",
+                  "backgroundColor": "transparent",
                   "color": "#FFFFFF",
+                  "display": "flex",
                   "fontFamily": "System",
                   "fontSize": 16.8,
                   "fontWeight": "400",
-                  "lineHeight": 19,
-                  "userSelect": "auto",
+                  "lineHeight": 44,
+                  "userSelect": "none",
                 }
               }
               suppressHighlighting={true}

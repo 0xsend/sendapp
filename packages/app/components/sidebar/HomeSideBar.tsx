@@ -16,10 +16,12 @@ import { baseMainnet } from '@my/wagmi/chains'
 import {
   IconAccount,
   IconActivity,
+  IconChart,
   IconDeviceReset,
   IconHome,
   IconSendLogo,
   IconSwap,
+  IconWorldSearch,
 } from 'app/components/icons'
 import { SideBarNavLink } from 'app/components/sidebar/SideBarNavLink'
 
@@ -42,9 +44,19 @@ const links = [
     href: '/send',
   },
   {
+    icon: <IconWorldSearch size={'$1'} color={'inherit'} />,
+    text: 'Explore',
+    href: '/explore',
+  },
+  {
     icon: <IconSwap size={'$1'} color={'inherit'} />,
     text: 'Trade',
     href: '/trade',
+  },
+  {
+    icon: <IconChart size={'$1'} color={'inherit'} />,
+    text: 'Invest',
+    href: '/invest',
   },
   {
     icon: <IconDeviceReset size={'$1'} color={'inherit'} />,

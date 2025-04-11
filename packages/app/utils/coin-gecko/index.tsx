@@ -38,6 +38,8 @@ export const MarketDataSchema = z
   })
   .array()
 
+export type MarketData = z.infer<typeof MarketDataSchema>
+
 /**
  * React query function to fetch current token price for a given token id
  */
@@ -89,6 +91,39 @@ export const useTokenMarketData = <
       const d = MarketDataSchema.parse(data)
 
       return d
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  })
+}
+
+/**
+ * Fetch coin market data for multiple tokens at once
+ */
+export const useMultipleTokensMarketData = <
+  T extends coins[number]['coingeckoTokenId'] | CoinWithBalance['coingeckoTokenId'],
+>(
+  tokenIds: T[]
+) => {
+  const joinedTokenIds = tokenIds.join(', ')
+
+  return useQuery({
+    queryKey: ['coin-market-data', joinedTokenIds],
+    enabled: joinedTokenIds.length > 0,
+    queryFn: async () => {
+      const response = await fetch(
+        `https://api.coingecko.com/api/v3/coins/markets?ids=${joinedTokenIds}&vs_currency=usd`,
+        {
+          headers: {
+            Accept: 'application/json',
+          },
+          mode: 'cors',
+        }
+      )
+
+      if (!response.ok)
+        throw new Error(`Failed to fetch market data for: ${joinedTokenIds}, ${response.status}`)
+      const data = await response.json()
+      return MarketDataSchema.parse(data)
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
   })

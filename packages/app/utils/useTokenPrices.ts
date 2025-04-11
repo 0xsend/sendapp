@@ -73,9 +73,20 @@ const normalizeCoingeckoPrices = (prices: z.infer<typeof CoingeckoTokenPricesSch
 }
 
 const fetchDexScreenerPrices = async () => {
-  const res = await fetch(
-    'https://api.dexscreener.com/tokens/v1/base/0x4200000000000000000000000000000000000006,0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913,0xEab49138BA2Ea6dd776220fE26b7b8E446638956,0x50dA645f148798F68EF2d7dB7C1CB22A6819bb2C' // WETH,USDC,SEND,SPX. hardcoded to avoid testnet tokens
-  )
+  // hardcoded to avoid testnet tokens
+  const tokensToFetch = [
+    '0x4200000000000000000000000000000000000006', // WETH
+    usdcAddress['8453'],
+    sendTokenAddress['8453'],
+    spx6900Address['8453'],
+    moonwellAddress['8453'],
+    morphoAddress['8453'],
+    aerodromeFinanceAddress['8453'],
+    coinbaseWrappedBtcAddress['8453'],
+    eurcAddress['8453'],
+  ]
+
+  const res = await fetch(`https://api.dexscreener.com/tokens/v1/base/${tokensToFetch.join(',')}`)
   if (!res.ok) {
     throw new Error(`Failed to fetch DexScreener prices. Status: ${res.status}`)
   }

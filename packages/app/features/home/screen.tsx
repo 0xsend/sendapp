@@ -11,7 +11,6 @@ import {
   type XStackProps,
   H1,
   Theme,
-  useSafeAreaInsets,
 } from '@my/ui'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
@@ -48,7 +47,6 @@ function SendSearchBody() {
 }
 
 function HomeBody(props: XStackProps) {
-  const { bottom } = useSafeAreaInsets()
   const { coin: selectedCoin } = useCoinFromTokenParam()
   const { isSendingUnlocked, isLoading } = useIsSendingUnlocked()
 
@@ -67,7 +65,6 @@ function HomeBody(props: XStackProps) {
         width="100%"
         gap="$3.5"
         ai={'center'}
-        pb={Math.max(bottom, 24) + 72} // add mobile bottom button row + 24px
       >
         {!isSendingUnlocked ? (
           <>
@@ -98,9 +95,12 @@ function HomeBody(props: XStackProps) {
           <Card
             bc={'$color1'}
             width="100%"
-            p="$4"
+            p="$2"
+            $gtSm={{
+              p: '$4',
+            }}
             $gtLg={{
-              maxHeight: 310,
+              maxHeight: 370,
               // @ts-expect-error tamagui tripping here
               overflowY: 'scroll',
             }}

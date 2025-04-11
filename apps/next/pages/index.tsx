@@ -14,8 +14,6 @@ import { AuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
 import { useCallback, useEffect, useState } from 'react'
 import { getRemoteAssets } from 'utils/getRemoteAssets'
 import type { GetPlaiceholderImage } from 'app/utils/getPlaiceholderImage'
-
-import { MobileButtonRowLayout } from 'app/components/MobileButtonRowLayout'
 import { useQueryClient } from '@tanstack/react-query'
 import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
 
@@ -51,11 +49,9 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
         <title>Send</title>
       </Head>
       {session ? (
-        <MobileButtonRowLayout.Home>
-          <HomeLayout TopNav={<TopNav header="Home" showLogo={true} />}>
-            <HomeScreen />
-          </HomeLayout>
-        </MobileButtonRowLayout.Home>
+        <HomeLayout TopNav={<TopNav header="Home" showLogo={true} />}>
+          <HomeScreen />
+        </HomeLayout>
       ) : (
         <AuthCarouselContext.Provider
           value={{

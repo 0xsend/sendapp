@@ -58,36 +58,47 @@ export function DepositCryptoScreen() {
           />
         </FadeCard>
       </YStack>
-      <YStack gap={'$3.5'}>
-        <Paragraph size={'$7'}>Wallet Address</Paragraph>
-        <FadeCard width={'max-content'} maxWidth={'100%'}>
-          <Button
-            chromeless
-            backgroundColor="transparent"
-            hoverStyle={{ backgroundColor: 'transparent' }}
-            pressStyle={{
-              backgroundColor: 'transparent',
-              borderColor: 'transparent',
-            }}
-            focusStyle={{ backgroundColor: 'transparent' }}
-            p={0}
-            height={'auto'}
-            onPress={copyOnPress}
-          >
-            <Button.Text fontSize={'$5'}>{sendAccount?.address}</Button.Text>
-            <Button.Icon>
-              {hasCopied ? (
-                <Check color="$primary" size="$1" $theme-light={{ color: '$color12' }} />
-              ) : (
-                <IconCopy
-                  size="$1"
-                  $theme-dark={{ color: '$primary' }}
-                  $theme-light={{ color: '$color12' }}
-                />
-              )}
-            </Button.Icon>
-          </Button>
-        </FadeCard>
+      <YStack width={'100%'}>
+        <YStack
+          marginHorizontal={'auto'}
+          width={'max-content'}
+          maxWidth={'100%'}
+          gap={'$3.5'}
+          $gtLg={{ marginHorizontal: 0 }}
+        >
+          <Paragraph w={'100%'} size={'$7'}>
+            Wallet Address
+          </Paragraph>
+          <FadeCard width={'max-content'} maxWidth={'100%'}>
+            <Button
+              chromeless
+              backgroundColor="transparent"
+              hoverStyle={{ backgroundColor: 'transparent' }}
+              pressStyle={{
+                backgroundColor: 'transparent',
+                borderColor: 'transparent',
+              }}
+              focusStyle={{ backgroundColor: 'transparent' }}
+              p={0}
+              height={'auto'}
+              onPress={copyOnPress}
+            >
+              <Button.Text fontSize={'$5'}>{sendAccount?.address}</Button.Text>
+              <Button.Icon>
+                {hasCopied ? (
+                  <Check color="$primary" size="$1" $theme-light={{ color: '$color12' }} />
+                ) : (
+                  <IconCopy
+                    flexShrink={0}
+                    size="$1"
+                    $theme-dark={{ color: '$primary' }}
+                    $theme-light={{ color: '$color12' }}
+                  />
+                )}
+              </Button.Icon>
+            </Button>
+          </FadeCard>
+        </YStack>
       </YStack>
       <CopyAddressDialog
         isOpen={copyAddressDialogIsOpen}
