@@ -125,7 +125,8 @@ export function TopNav({
     path.includes('/secret-shop') ||
     path.includes('/deposit') ||
     path.includes('/trade') ||
-    path.includes('/leaderboard')
+    path.includes('/leaderboard') ||
+    path.includes('/earn')
 
   return (
     <Header w="100%" $lg={{ py: '$3' }}>
