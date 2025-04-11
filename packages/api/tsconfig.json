@@ -19,7 +19,7 @@
       "@my/wagmi": ["../wagmi/src"],
       "@my/wagmi/*": ["../wagmi/src/*"],
       "@my/supabase/*": ["../../supabase/*"],
-      "@my/workflows": ["../workflows/src/all-workflows.ts"],
+      "@my/workflows": ["../workflows/src"],
       "@my/workflows/*": ["../workflows/src/*"],
       "@my/temporal": ["../temporal/src"],
       "@my/temporal/*": ["../temporal/src/*"]

@@ -17,6 +17,7 @@ import { ENTRYPOINT_ADDRESS_V07, getUserOperationHash } from 'permissionless'
 import { isAddress } from 'viem'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
+import { version } from '@my/workflows'
 
 export const sendEarnRouter = createTRPCRouter({
   deposit: protectedProcedure
@@ -80,7 +81,7 @@ export const sendEarnRouter = createTRPCRouter({
       try {
         await client.workflow.start(DepositWorkflow, {
           args: [{ userOp: userop }],
-          taskQueue: Queue.MONOREPO,
+          taskQueue: `${Queue.MONOREPO}@${version}`,
           workflowId: workflowId,
         })
         log(`Workflow ${workflowId} started successfully.`)
