@@ -83,7 +83,7 @@ export function useEarnActivityFeed(params?: {
         addressBook: addressBook.data,
       })
     },
-    refetchInterval: ({ dataUpdateCount, state: { data } }) => {
+    refetchInterval: ({ state: { dataUpdateCount, data } }) => {
       const { pages } = data ?? {}
       if (!pages || !pages[0]) return refetchInterval
       const activities = pages.flat()
@@ -101,8 +101,6 @@ export function useEarnActivityFeed(params?: {
         return PENDING_TRANSFERS_INTERVAL
       }
 
-      // Reset refetch count when there are no pending transfers
-      dataUpdateCount = 0
       return refetchInterval
     },
   })
