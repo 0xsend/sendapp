@@ -146,15 +146,12 @@ export function DepositForm() {
         entryPoint: entryPointAddress[chainId],
       })
 
-      // Pass entryPoint and sendAccountCalls (if needed by API, though current sendEarn doesn't use sendAccountCalls directly)
-      // The current sendEarn.deposit expects userop and entryPoint. sendAccountCalls is in the Zod schema but not used in the mutation logic.
       await depositMutation.mutateAsync({
         userop: uop.data,
         entryPoint: entryPointAddress[chainId],
       })
     } catch (error) {
       log('Error during signing or mutation', error)
-      // Error handled by depositMutation.onError
     }
   }, [form.formState, uop.isSuccess, uop.data, webauthnCreds, chainId, depositMutation])
 
@@ -166,7 +163,7 @@ export function DepositForm() {
   const insufficientAmount =
     coinBalance.coin?.balance !== undefined &&
     parsedAmount > coinBalance.coin?.balance &&
-    !depositMutation.isSuccess // Check against new mutation
+    !depositMutation.isSuccess
 
   const canSubmit =
     !coin.isLoading &&
@@ -177,7 +174,7 @@ export function DepositForm() {
     uop.isSuccess &&
     !calls.isPending &&
     !uop.isPending &&
-    !depositMutation.isPending && // Check against new mutation
+    !depositMutation.isPending &&
     !insufficientAmount &&
     Object.keys(form.formState.errors).length === 0
 
@@ -196,7 +193,6 @@ export function DepositForm() {
       }
 
       if (!depositMutation.isSuccess) {
-        // Check against new mutation
         setParams(
           {
             ...params,
@@ -213,7 +209,7 @@ export function DepositForm() {
       coin.data?.decimals,
       params,
       depositMutation.isSuccess,
-    ] // Use new mutation state
+    ]
   )
 
   // validate and sanitize amount
@@ -280,7 +276,7 @@ export function DepositForm() {
         <SchemaForm
           form={form}
           schema={DepositFormSchema}
-          onSubmit={handleDepositSubmit} // Use new handler
+          onSubmit={handleDepositSubmit}
           props={{
             amount: {
               fontSize: (() => {
@@ -346,16 +342,14 @@ export function DepositForm() {
             areTermsAccepted: hasExistingDeposit,
           }}
           renderAfter={({ submit }) => (
-            // Removed mutation.isSuccess check here, success handled by mutation hook
             <YStack>
-              {depositMutation.isPending ? ( // Check against new mutation
+              {depositMutation.isPending ? (
                 <Fade key="userop-state">
                   <Paragraph color={'$color10'} ta="center" size="$3">
                     Requesting signature...
                   </Paragraph>
                 </Fade>
               ) : null}
-              {/* Error display is handled by toast in depositMutation.onError */}
               {[calls.error, sendAccount.error, uop.error].filter(Boolean).map((e) =>
                 e ? (
                   <Fade key={`error-${e.message}`}>
@@ -386,9 +380,8 @@ export function DepositForm() {
                 br={'$4'}
                 disabledStyle={{ opacity: 0.5 }}
                 disabled={!canSubmit}
-                iconAfter={depositMutation.isPending ? <Spinner size="small" /> : undefined} // Check against new mutation
+                iconAfter={depositMutation.isPending ? <Spinner size="small" /> : undefined}
               >
-                {/* Simplified loading state */}
                 {[
                   calls.isLoading,
                   sendAccount.isLoading,
