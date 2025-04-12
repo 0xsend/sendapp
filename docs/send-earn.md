@@ -205,7 +205,7 @@ Using Temporal for deposit orchestration provides several benefits:
 
 ### Components
 
-1.  **[`sendEarnDepositWorkflow`](../packages/workflows/src/deposit-workflow/workflow.ts)**: The main Temporal workflow orchestrating the deposit process. It's typically initiated by the backend API after receiving a signed UserOp from the client.
+1.  **[`DepositWorkflow`](../packages/workflows/src/deposit-workflow/workflow.ts)**: The main Temporal workflow orchestrating the deposit process. It's typically initiated by the backend API after receiving a signed UserOp from the client.
 2.  **[Temporal Activities](../packages/workflows/src/deposit-workflow/activities.ts)**: Discrete units of work executed by the workflow:
     *   `upsertTemporalDepositActivity`: Creates or updates the initial record in the tracking table.
     *   `simulateDepositActivity`: Simulates the UserOp against the bundler to catch potential issues before submission.
