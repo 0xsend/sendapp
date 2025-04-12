@@ -77,12 +77,20 @@ for (const inCoin of [usdcCoin]) {
       await swapFormPage.waitForSwapRouteResponse()
       const outAmount = await swapFormPage.outAmountInput.inputValue()
       const exchangeRate = calculateExchangeRate(inAmount, outAmount, inCoin, outCoin)
+
+      // start listening before clicking review
+      const request = swapFormPage.page.waitForRequest('/api/trpc/swap.encodeSwapRoute?batch=1')
+
       await swapFormPage.reviewSwap()
       await page.waitForURL(
         `/trade/summary?outToken=${outCoin.token}&inToken=${inCoin.token}&inAmount=${
           swapInAmount[inCoin.symbol]
         }&slippage=${slippage * 100}`
       )
+      const requestPayload = (await request).postDataJSON()
+      expect(requestPayload['0'].json.slippageTolerance).toEqual(slippage * 100)
+
+      // validate summary page
       await swapSummaryPage.validateSummary({
         inAmount: inAmount,
         inToken: inCoin.symbol,
@@ -123,9 +131,16 @@ test('can refresh swap form and preserve filled data', async ({ page, swapFormPa
     customSlippage: '10',
   })
   await swapFormPage.flipTokens()
-  await page.waitForURL(
-    '/trade?outToken=0xEab49138BA2Ea6dd776220fE26b7b8E446638956&inToken=0x50dA645f148798F68EF2d7dB7C1CB22A6819bb2C&inAmount=100000000000&slippage=1000'
-  )
+
+  await expect(async () => {
+    const currentUrl = new URL(page.url())
+    const params = currentUrl.searchParams
+    expect(params.get('outToken')).toBe('0xEab49138BA2Ea6dd776220fE26b7b8E446638956')
+    expect(params.get('inToken')).toBe('0x50dA645f148798F68EF2d7dB7C1CB22A6819bb2C')
+    expect(params.get('inAmount')).toBe('100000000000')
+    expect(params.get('slippage')).toBe('1000')
+  }).toPass({ timeout: 10000 })
+
   await page.reload()
   await swapFormPage.acceptRiskDialog()
   await swapFormPage.validateSwapForm({
