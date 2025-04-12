@@ -1,6 +1,7 @@
 import type { Enums } from '@my/supabase/database.types'
 import { baseMainnet, sendTokenAddress, usdcAddress } from '@my/wagmi'
 import { allCoinsDict, type allCoins } from 'app/data/coins'
+import { removeEmpty } from 'app/utils/removeEmpty'
 import { createParam } from 'solito'
 import { isAddress, type Address } from 'viem'
 
@@ -15,25 +16,21 @@ const { useParam: useRootParam, useParams: useRootParams } = createParam<RootPar
 
 const useNav = () => {
   const [nav, setNavParam] = useRootParam('nav')
-
   return [nav, setNavParam] as const
 }
 
 const useToken = () => {
   const [token, setTokenParam] = useRootParam('token')
-
   return [token, setTokenParam] as const
 }
 
 const useSearch = () => {
   const [search, setSearchParam] = useRootParam('search')
-
   return [search, setSearchParam] as const
 }
 
 const useProfile = () => {
   const [profile, setProfileParam] = useRootParam('profile')
-
   return [profile, setProfileParam] as const
 }
 
@@ -51,7 +48,7 @@ export const useRootScreenParams = () => {
       search,
       profile,
     },
-    setParams,
+    (...args: Parameters<typeof setParams>) => setParams(removeEmpty(args[0]), args[1]),
   ] as const
 }
 
@@ -65,7 +62,6 @@ const useDistribution = () => {
     initial: undefined,
     parse: (value) => Number(value),
   })
-
   return [distribution, setDistributionParam] as const
 }
 
@@ -76,7 +72,7 @@ export const useRewardsScreenParams = () => {
     {
       distribution,
     },
-    setParams,
+    (...args: Parameters<typeof setParams>) => setParams(removeEmpty(args[0]), args[1]),
   ] as const
 }
 
@@ -95,19 +91,16 @@ const useIdType = () => {
     initial: undefined,
     parse: (value) => value as Enums<'lookup_type_enum'>,
   })
-
   return [idType, setIdTypeParam] as const
 }
 
 const useRecipient = () => {
   const [recipient, setRecipientParam] = useSendParam('recipient')
-
   return [recipient, setRecipientParam] as const
 }
 
 const useAmount = () => {
   const [amount, setAmountParam] = useSendParam('amount')
-
   return [amount, setAmountParam] as const
 }
 
@@ -128,7 +121,6 @@ export const useSendToken = () => {
     initial: usdcAddress[baseMainnet.id],
     parse: parseTokenParam,
   })
-
   return [sendToken, setSendTokenParam] as const
 }
 
@@ -154,7 +146,7 @@ export const useSendScreenParams = () => {
       sendToken,
       note,
     },
-    setParams,
+    (...args: Parameters<typeof setParams>) => setParams(removeEmpty(args[0]), args[1]),
   ] as const
 }
 
@@ -181,7 +173,10 @@ export const useProfileScreenParams = () => {
   const [sendid] = useSendId()
   const [tag] = useTag()
 
-  return [{ sendid, tag }, setParams] as const
+  return [
+    { sendid, tag },
+    (...args: Parameters<typeof setParams>) => setParams(removeEmpty(args[0]), args[1]),
+  ] as const
 }
 
 export type AuthScreenParams = {
@@ -199,7 +194,6 @@ export const useRedirectUri = () => {
       return Array.isArray(value) ? decodeURIComponent(value[0] ?? '') : decodeURIComponent(value)
     },
   })
-
   return [redirectUri, setRedirectUriParam] as const
 }
 
@@ -211,7 +205,7 @@ export const useAuthScreenParams = () => {
     {
       redirectUri,
     },
-    setParams,
+    (...args: Parameters<typeof setParams>) => setParams(removeEmpty(args[0]), args[1]),
   ] as const
 }
 
@@ -229,7 +223,6 @@ const useInToken = () => {
     initial: usdcAddress[baseMainnet.id],
     parse: parseTokenParam,
   })
-
   return [inToken, setInToken] as const
 }
 
@@ -238,19 +231,16 @@ const useOutToken = () => {
     initial: sendTokenAddress[baseMainnet.id],
     parse: parseTokenParam,
   })
-
   return [outToken, setOutToken] as const
 }
 
 const useInAmount = () => {
   const [inAmount, setInAmount] = useSwapParam('inAmount')
-
   return [inAmount, setInAmount] as const
 }
 
 const useSlippage = () => {
   const [slippage, setSlippage] = useSwapParam('slippage')
-
   return [slippage, setSlippage] as const
 }
 
@@ -268,7 +258,7 @@ export const useSwapScreenParams = () => {
       inAmount,
       slippage,
     },
-    setParams,
+    (...args: Parameters<typeof setParams>) => setParams(removeEmpty(args[0]), args[1]),
   ] as const
 }
 
@@ -281,7 +271,6 @@ const { useParam: useDepositParam, useParams: useDepositParams } =
 
 const useDepositAmount = () => {
   const [depositAmount, setDepositAmount] = useDepositParam('depositAmount')
-
   return [depositAmount, setDepositAmount] as const
 }
 
@@ -293,6 +282,6 @@ export const useDepositScreenParams = () => {
     {
       depositAmount,
     },
-    setParams,
+    (...args: Parameters<typeof setParams>) => setParams(removeEmpty(args[0]), args[1]),
   ] as const
 }
