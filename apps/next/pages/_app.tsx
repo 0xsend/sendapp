@@ -39,7 +39,7 @@ function MyApp({
         <title>Send</title>
         <meta
           name="description"
-          content="Peer-to-peer app to send, trade, and earn USDC. Instant, global, and only accessible by you."
+          content="Send is a peer-to-peer app to send, trade, and earn USDC. Instant, global, and accessible only by you."
         />
         <meta
           name="viewport"
