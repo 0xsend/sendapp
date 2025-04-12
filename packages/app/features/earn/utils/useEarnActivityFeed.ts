@@ -97,7 +97,6 @@ export function useEarnActivityFeed(params?: {
         if (dataUpdateCount >= MAX_REFETCHES) {
           return refetchInterval // Return to normal interval after max refetches
         }
-        dataUpdateCount += 1
         return PENDING_TRANSFERS_INTERVAL
       }
 
