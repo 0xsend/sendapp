@@ -13,15 +13,23 @@ import { toNiceError } from 'app/utils/toNiceError'
 import { FlatList } from 'react-native-web'
 import { Fade } from '@my/ui'
 import { useScrollDirection } from 'app/provider/scroll'
+import { useRootScreenParams } from 'app/routers/params'
 
 export const TokenActivity = ({ coin }: { coin: CoinWithBalance }) => {
+  const [rootParams, setRootParams] = useRootScreenParams()
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
 
   const handleActivityPress = (activity: Activity) => {
+    const fromSendId = activity.from_user?.send_id.toString()
     setSelectedActivity(activity)
+    if (fromSendId && rootParams.profile !== fromSendId) {
+      setRootParams({ ...rootParams, profile: fromSendId }, { webBehavior: 'push' })
+    }
   }
   const handleCloseActivityDetails = () => {
     setSelectedActivity(null)
+    const { profile: _, ...rest } = rootParams
+    setRootParams(rest, { webBehavior: 'push' })
   }
   const tokenActivityFeedQuery = useTokenActivityFeed({
     pageSize: 10,

@@ -68,8 +68,10 @@ export const GhostDepositButton = (props: Omit<LinkableButtonProps, 'href' | 'ch
 
 //@todo this patch should be fixed in LinkableButtonProps
 export const SendButton = (props: Omit<LinkableButtonProps, 'href' | 'children'>) => {
-  const [{ token }] = useRootScreenParams()
-  const href = token ? `/send?sendToken=${token}` : '/send'
+  const [{ token, profile }] = useRootScreenParams()
+  const href = token
+    ? `/send?sendToken=${token}${profile ? `&idType=sendid&recipient=${profile}` : ''}`
+    : '/send'
   return (
     <XStack testID="homeSendButton" f={1}>
       <LinkableButton

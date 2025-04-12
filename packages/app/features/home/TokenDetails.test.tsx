@@ -7,6 +7,16 @@ import { ScrollDirectionProvider } from 'app/provider/scroll'
 
 jest.mock('app/features/home/utils/useTokenActivityFeed')
 
+jest.mock('app/routers/params', () => ({
+  useRootScreenParams: jest.fn().mockReturnValue([
+    {
+      nav: 'home',
+      token: 'usdc',
+    },
+    jest.fn(),
+  ]),
+}))
+
 jest.mock('app/utils/useSwapRouters', () => ({
   useSwapRouters: jest.fn().mockReturnValue({ data: [] }),
 }))
