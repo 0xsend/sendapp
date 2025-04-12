@@ -6,10 +6,7 @@ import type { erc20Coin } from 'app/data/coins'
 import type { AffiliateVault } from 'app/features/earn/zod'
 import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
-import debug from 'debug'
-import { coinToParam } from '.'
-
-let log: debug.Debugger
+import { coinToParam, navigateToEarnPage } from '.'
 
 /**
  * Page object for the earn claim rewards page
@@ -19,28 +16,31 @@ export class EarnClaimPage {
   public readonly availableRewardsText: Locator
 
   constructor(public page: Page) {
-    log = debug(`test:earn:claim:${Math.random().toString(36).substring(7)}`)
     this.claimButton = this.page.getByRole('button', { name: 'Claim Rewards' })
     this.availableRewardsText = this.page.getByTestId('availableRewards')
   }
 
   async goto(coin: erc20Coin) {
-    log('goto /earn/rewards')
-    await this.page.goto('/')
-    await expect(this.page.getByRole('link', { name: 'Earn', exact: true })).toBeVisible()
-    await this.page.getByRole('link', { name: 'Earn', exact: true }).click()
-    await this.page.waitForURL('/earn')
+    await navigateToEarnPage(this.page)
+
+    // From /earn, navigate to the specific coin's balance page
     await expect(this.page.getByRole('button', { name: 'VIEW DETAILS' })).toBeVisible()
     await this.page.getByRole('button', { name: 'VIEW DETAILS' }).click()
     await this.page.waitForURL(`/earn/${coinToParam(coin)}`)
+
+    // From the balance page, navigate to the rewards page
     await expect(this.page.getByRole('link', { name: 'Rewards' })).toBeVisible()
     await this.page.getByRole('link', { name: 'Rewards' }).click()
+    await this.page.waitForURL(`/earn/${coinToParam(coin)}/rewards`) // Wait for rewards page URL
+
+    // Assert elements on the rewards page
+    await expect(this.availableRewardsText).toBeVisible()
+    await expect(this.claimButton).toBeVisible() // Check claim button visibility
   }
 
   async getAvailableRewards(): Promise<number> {
     await expect(this.availableRewardsText).toBeVisible()
     const rewardsText = await this.availableRewardsText.textContent()
-    log('rewards text')
     // Extract the numeric value from the text (e.g., "Available: 1.23 USDC" -> 1.23)
     const match = rewardsText?.match(/[\d.]+/)
     assert(!!match?.[0], 'No rewards text match found')
@@ -61,7 +61,6 @@ export class EarnClaimPage {
     type: string
   }> {
     assert(!!affiliateVault.send_earn_affiliate_vault?.send_earn, 'Affiliate vault is not defined')
-    log('claiming rewards')
     await expect(this.claimButton).toBeVisible()
     await expect(this.claimButton).toBeEnabled()
     await this.claimButton.click()
@@ -91,11 +90,9 @@ export class EarnClaimPage {
             .single()
 
           if (error) {
-            log('error fetching claim', error)
             return false
           }
 
-          log('claim data', data)
           claim = data as {
             owner: `\\x${string}`
             assets: string
