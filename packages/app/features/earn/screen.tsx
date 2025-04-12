@@ -1,11 +1,14 @@
 import { Card, Fade, LinearGradient, Paragraph, Separator, Spinner, XStack, YStack } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
+import { ComingSoon } from 'app/components/ComingSoon'
 import { IconArrowRight, IconStacks } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { Row } from 'app/features/earn/components/Row'
 import { SectionButton } from 'app/features/earn/components/SectionButton'
 import formatAmount from 'app/utils/formatAmount'
+import { isSendSquadMember } from 'app/utils/isSendSquadMember'
 import { useSendAccount } from 'app/utils/send-accounts'
+import { useUser } from 'app/utils/useUser'
 import debug from 'debug'
 import { useMemo, type ReactNode } from 'react'
 import { Link } from 'solito/link'
@@ -15,7 +18,7 @@ import { useSendEarnBalances, useVaultConvertSharesToAssets, type SendEarnBalanc
 
 const log = debug('app:earn:screen')
 
-export function EarnScreen() {
+function EarnScreen() {
   const sendAccount = useSendAccount()
   const balances = useSendEarnBalances()
 
@@ -45,6 +48,23 @@ export function EarnScreen() {
       {sections}
     </YStack>
   )
+}
+
+// Wrapper component to handle sendsquad check
+export function EarnOrComingSoonScreen() {
+  const { tags, isLoading: isLoadingUser } = useUser()
+
+  if (isLoadingUser) {
+    return <Spinner size="large" color={'$color12'} />
+  }
+
+  const isMember = isSendSquadMember(tags)
+
+  if (!isMember) {
+    return <ComingSoon />
+  }
+
+  return <EarnScreen />
 }
 
 const ListItem = ({ children }: { children: ReactNode }) => {
