@@ -35,7 +35,6 @@ export function useTokenActivityFeed(params: {
 }): UseInfiniteQueryResult<InfiniteData<Activity[]>, PostgrestError | ZodError> {
   const { pageSize = 10, address, refetchInterval = 30_000, enabled: enabledProp = true } = params
   const supabase = useSupabase()
-  const refetchCount = useRef(0)
   const addressBook = useAddressBook()
   const enabled = useMemo(() => enabledProp && addressBook.isFetched, [enabledProp, addressBook])
   const queryKey = useMemo(
@@ -73,7 +72,7 @@ export function useTokenActivityFeed(params: {
         addressBook: addressBook.data,
       })
     },
-    refetchInterval: ({ state: { data } }) => {
+    refetchInterval: ({ state: { dataUpdateCount, data } }) => {
       const { pages } = data ?? {}
       if (!pages || !pages[0]) return refetchInterval
       const activities = pages.flat()
@@ -84,15 +83,11 @@ export function useTokenActivityFeed(params: {
       )
 
       if (hasPendingTransfer) {
-        if (refetchCount.current >= MAX_REFETCHES) {
+        if (dataUpdateCount >= MAX_REFETCHES) {
           return refetchInterval // Return to normal interval after max refetches
         }
-        refetchCount.current += 1
         return PENDING_TRANSFERS_INTERVAL
       }
-
-      // Reset refetch count when there are no pending transfers
-      refetchCount.current = 0
       return refetchInterval
     },
   })

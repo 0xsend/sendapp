@@ -234,27 +234,7 @@ async function handleTokenTransfer({
   await sendPage.waitForSendingCompletion()
   await sendPage.expectNoSendError()
 
-  await expect(async () =>
-    isETH
-      ? // just ensure balance is updated, since the send_account_receives event is not emitted
-        expect(
-          await testBaseClient.getBalance({
-            address: recvAccount.address as `0x${string}`,
-          })
-        ).toBe(transferAmount)
-      : await expect(supabase).toHaveEventInActivityFeed({
-          event_name: 'send_account_transfers',
-          ...(profile ? { to_user: { id: profile.id, send_id: profile.send_id } } : {}),
-          data: {
-            t: hexToBytea(recvAccount.address as `0x${string}`),
-            v: transferAmount.toString(),
-          },
-        })
-  ).toPass({
-    timeout: 10000,
-  })
-
-  await expect(page).toHaveURL(`/?token=${token.token}`, { timeout: isETH ? 10_000 : undefined }) // sometimes ETH needs more time
+  await page.waitForURL(`/?token=${token.token}`, { timeout: 10_000 })
 
   if (!isETH) {
     // no history for eth since no send_account_receives event is emitted
@@ -277,6 +257,26 @@ async function handleTokenTransfer({
       history.getByText(isAddress(counterparty) ? shorten(counterparty ?? '', 5, 4) : counterparty)
     ).toBeVisible()
   }
+
+  await expect(async () =>
+    isETH
+      ? // just ensure balance is updated, since the send_account_receives event is not emitted
+        expect(
+          await testBaseClient.getBalance({
+            address: recvAccount.address as `0x${string}`,
+          })
+        ).toBe(transferAmount)
+      : await expect(supabase).toHaveEventInActivityFeed({
+          event_name: 'send_account_transfers',
+          ...(profile ? { to_user: { id: profile.id, send_id: profile.send_id } } : {}),
+          data: {
+            t: hexToBytea(recvAccount.address as `0x${string}`),
+            v: transferAmount.toString(),
+          },
+        })
+  ).toPass({
+    timeout: 10000,
+  })
 }
 
 const truncateDecimals = (amount: string, decimals: number) => {
