@@ -1,6 +1,6 @@
 {
   "name": "@my/workflows",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "files": [
     "package.json",
     "src"

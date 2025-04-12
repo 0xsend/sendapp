@@ -132,6 +132,8 @@ export async function transfer(userOp: UserOperation<'v0.7'>, note?: string) {
   await updateTemporalSendAccountTransferActivity({
     workflow_id: workflowId,
     status: 'confirmed',
+    send_account_transfers_activity_event_id: eventId,
+    send_account_transfers_activity_event_name: eventName,
     data: {
       ...(sentTransfer.data as Record<string, unknown>),
       tx_hash: hexToBytea(bundlerReceipt.receipt.transactionHash),
@@ -140,5 +142,6 @@ export async function transfer(userOp: UserOperation<'v0.7'>, note?: string) {
       event_id: eventId,
     },
   })
+
   return hash
 }
