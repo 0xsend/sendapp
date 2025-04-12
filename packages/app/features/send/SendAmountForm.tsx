@@ -57,8 +57,9 @@ export function SendAmountForm() {
     useCallback(
       (values) => {
         const { amount, token: _token, note } = values
-        const token = _token as allCoins[number]['token']
-        const sanitizedAmount = sanitizeAmount(amount, allCoinsDict[token]?.decimals)
+        const sendToken = _token as allCoins[number]['token']
+        const sanitizedAmount = sanitizeAmount(amount, allCoinsDict[sendToken]?.decimals).toString()
+        const sanitizedNote = note.length > 0 ? encodeURIComponent(note.trim()) : undefined
 
         const noteValidation = formFields.note.safeParse(note)
         if (noteValidation.error) {
@@ -73,9 +74,9 @@ export function SendAmountForm() {
         setSendParams(
           {
             ...sendParams,
-            amount: sanitizedAmount.toString(),
-            sendToken: token,
-            note: encodeURIComponent(note.trim()),
+            amount: sanitizedAmount,
+            sendToken,
+            note: sanitizedNote,
           },
           { webBehavior: 'replace' }
         )
@@ -88,9 +89,7 @@ export function SendAmountForm() {
   )
 
   useEffect(() => {
-    const subscription = form.watch((values) => {
-      onFormChange(values)
-    })
+    const subscription = form.watch(onFormChange)
 
     return () => {
       subscription.unsubscribe()
@@ -267,7 +266,7 @@ export function SendAmountForm() {
                 sendParams.amount && coin !== undefined
                   ? localizeAmount(formatUnits(BigInt(sendParams.amount), coin.decimals))
                   : undefined,
-              note: sendParams.note ? decodeURIComponent(sendParams.note) : '',
+              note: sendParams.note || '',
             }}
             renderAfter={({ submit }) => (
               <SubmitButton
