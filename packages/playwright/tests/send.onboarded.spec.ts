@@ -264,12 +264,8 @@ async function handleTokenTransfer({
 
   // 2. Check if the UI has updated to show the indexed event (not the pending one)
   const history = page.getByTestId('TokenActivityFeed')
-  if ((await history.isVisible()) === false) {
-    log('history is not visible')
-    await page.reload()
-  }
 
-  await expect(history).toBeVisible()
+  await expect(history).toBeVisible({ timeout: 5_000 })
 
   const historyAmount = (() => {
     switch (token.symbol) {

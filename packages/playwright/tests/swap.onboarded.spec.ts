@@ -87,6 +87,8 @@ for (const inCoin of [usdcCoin]) {
           swapInAmount[inCoin.symbol]
         }&slippage=${slippage * 100}`
       )
+
+      // validate slippage is still set correctly
       const requestPayload = (await request).postDataJSON()
       expect(requestPayload['0'].json.slippageTolerance).toEqual(slippage * 100)
 

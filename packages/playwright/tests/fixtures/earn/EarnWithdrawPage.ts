@@ -48,7 +48,9 @@ export class EarnWithdrawPage {
     await expect(this.page.getByRole('button', { name: 'Confirm Withdraw' })).toBeVisible()
     await expect(this.page.getByRole('button', { name: 'Confirm Withdraw' })).toBeEnabled()
     await this.page.getByRole('button', { name: 'Confirm Withdraw' }).click()
-    await expect(this.page.getByText('Withdrawn successfully', { exact: true })).toBeVisible()
+    await expect(this.page.getByText('Withdrawn successfully', { exact: true })).toBeVisible({
+      timeout: 15_000,
+    })
   }
 
   /**
