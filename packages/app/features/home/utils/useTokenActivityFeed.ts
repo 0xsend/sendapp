@@ -12,7 +12,6 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import { useAddressBook, type AddressBook } from 'app/utils/useAddressBook'
 import { EventArraySchema, Events, type Activity } from 'app/utils/zod/activity'
-import { useRef } from 'react'
 import { useMemo } from 'react'
 import type { ZodError } from 'zod'
 

@@ -223,7 +223,7 @@ export function SendConfirm() {
 
       if (workflowId) {
         await queryClient.invalidateQueries({
-          queryKey: ['token_activity_feed', selectedCoin.token],
+          queryKey: ['token_activity_feed', { address: selectedCoin.token }],
         })
         router.replace({ pathname: '/', query: { token: sendToken } })
       }

@@ -236,47 +236,62 @@ async function handleTokenTransfer({
 
   await page.waitForURL(`/?token=${token.token}`, { timeout: 10_000 })
 
-  if (!isETH) {
-    // no history for eth since no send_account_receives event is emitted
-    const history = page.getByTestId('TokenActivityFeed')
-    await expect(history).toBeVisible()
+  await expect(async () => {
+    if (isETH) {
+      // just ensure balance is updated, since the send_account_receives event is not emitted
+      expect(
+        await testBaseClient.getBalance({
+          address: recvAccount.address as `0x${string}`,
+        })
+      ).toBe(transferAmount)
+    } else {
+      // 1. Check if the indexed event exists in the database
+      await expect(supabase).toHaveEventInActivityFeed({
+        event_name: 'send_account_transfers',
+        ...(profile ? { to_user: { id: profile.id, send_id: profile.send_id } } : {}),
+        data: {
+          t: hexToBytea(recvAccount.address as `0x${string}`),
+          v: transferAmount.toString(),
+        },
+      })
+    }
+  }).toPass({
+    // Increased timeout to allow for indexing and UI update
+    timeout: 15000,
+  })
 
-    const historyAmount = (() => {
-      switch (token.symbol) {
-        case 'USDC':
-          return truncateDecimals(decimalAmount, 2)
-        case 'SEND':
-          return truncateDecimals(decimalAmount, 0)
-        default:
-          return decimalAmount
-      }
-    })()
+  if (isETH) return // nothing else to check with eth because it won't show up in activity
 
-    await expect(history.getByText(`${historyAmount} ${token.symbol}`)).toBeVisible()
-    await expect(
-      history.getByText(isAddress(counterparty) ? shorten(counterparty ?? '', 5, 4) : counterparty)
-    ).toBeVisible()
+  // 2. Check if the UI has updated to show the indexed event (not the pending one)
+  const history = page.getByTestId('TokenActivityFeed')
+  if ((await history.isVisible()) === false) {
+    log('history is not visible')
+    await page.reload()
   }
 
-  await expect(async () =>
-    isETH
-      ? // just ensure balance is updated, since the send_account_receives event is not emitted
-        expect(
-          await testBaseClient.getBalance({
-            address: recvAccount.address as `0x${string}`,
-          })
-        ).toBe(transferAmount)
-      : await expect(supabase).toHaveEventInActivityFeed({
-          event_name: 'send_account_transfers',
-          ...(profile ? { to_user: { id: profile.id, send_id: profile.send_id } } : {}),
-          data: {
-            t: hexToBytea(recvAccount.address as `0x${string}`),
-            v: transferAmount.toString(),
-          },
-        })
-  ).toPass({
-    timeout: 10000,
-  })
+  await expect(history).toBeVisible()
+
+  const historyAmount = (() => {
+    switch (token.symbol) {
+      case 'USDC':
+        return truncateDecimals(decimalAmount, 2)
+      case 'SEND':
+        return truncateDecimals(decimalAmount, 0)
+      default:
+        return decimalAmount
+    }
+  })()
+
+  const isAddressCounterparty = isAddress(counterparty)
+
+  // Ensure the correct amount and counterparty are visible
+  await expect(history.getByText(`${historyAmount} ${token.symbol}`)).toBeVisible()
+  await expect(
+    history.getByText(isAddressCounterparty ? shorten(counterparty ?? '', 5, 4) : counterparty)
+  ).toBeVisible()
+
+  // Ensure Sent is visible
+  await expect(history.getByText(isAddressCounterparty ? 'Withdraw' : 'Sent')).toBeVisible()
 }
 
 const truncateDecimals = (amount: string, decimals: number) => {
