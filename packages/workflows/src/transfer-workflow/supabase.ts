@@ -1,5 +1,4 @@
 import type { Database } from '@my/supabase/database.types'
-import type { PostgrestError } from '@supabase/supabase-js'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 
 export type TemporalTransfer = Database['temporal']['Tables']['send_account_transfers']['Row']

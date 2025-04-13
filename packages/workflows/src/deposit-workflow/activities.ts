@@ -12,7 +12,7 @@ import { supabaseAdmin } from 'app/utils/supabase/admin'
 import type { UserOperation } from 'permissionless'
 import { isAddressEqual, zeroAddress, type Address } from 'viem'
 import { createUserOpActivities, type UserOpActivities } from '../userop-workflow/activities'
-import { simulateUserOperation } from '../utils/userop'
+
 import {
   getUserIdFromAddress,
   updateTemporalSendEarnDeposit,

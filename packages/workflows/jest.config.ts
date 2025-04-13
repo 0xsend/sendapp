@@ -4,8 +4,7 @@
  */
 
 import type { Config } from 'jest'
-import { pathsToModuleNameMapper } from 'ts-jest' // Import the utility
-// Import compilerOptions from this package's tsconfig
+import { pathsToModuleNameMapper } from 'ts-jest'
 import { compilerOptions } from './tsconfig.json'
 
 const config: Config = {
