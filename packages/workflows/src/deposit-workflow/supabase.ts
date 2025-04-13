@@ -18,7 +18,7 @@ export async function upsertTemporalSendEarnDeposit(
     'workflow_id' | 'status' | 'owner' | 'assets' | 'vault' | 'block_num'
   >
 ) {
-  const { workflow_id, status, owner, assets, vault, block_num } = insertData
+  const { workflow_id, status, owner, assets, block_num } = insertData
 
   // Ensure required fields for initial insert are present
   // Vault can be null, so no check needed here.
