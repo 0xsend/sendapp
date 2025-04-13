@@ -357,7 +357,7 @@ async function upsertTemporalDepositActivity({
   })
 
   if (error) {
-    log.error('upsertTemporalDepositActivity failed', { workflowId, error })
+    log.error('upsertTemporalDepositActivity failed', { error })
     if (isRetryableDBError(error)) {
       throw ApplicationFailure.retryable(
         'Database connection error, retrying upsert...',
@@ -372,46 +372,20 @@ async function upsertTemporalDepositActivity({
       { error, workflowId }
     )
   }
-  log.info('Initial deposit record upserted', { workflowId, id: upsertData.workflow_id }) // Corrected property access
+  log.info('Initial deposit record upserted')
   return upsertData
-}
-
-async function simulateDepositActivity(workflowId, userOp) {
-  log.info('Simulating deposit UserOperation', { workflowId })
-  try {
-    await simulateUserOperation(userOp)
-    log.info('Deposit UserOperation simulation successful', { workflowId })
-  } catch (error) {
-    log.error('simulateDepositActivity failed', { workflowId, error })
-    const { error: updateError } = await updateTemporalSendEarnDeposit({
-      workflow_id: workflowId,
-      status: 'failed',
-      error_message: error.message ?? 'Simulation failed',
-    })
-    if (updateError) {
-      log.error('Failed to update deposit status after simulation failure', {
-        workflowId,
-        updateError,
-      })
-    }
-    throw ApplicationFailure.nonRetryable(
-      error.message ?? 'Error simulating user operation',
-      error.code ?? 'SIMULATION_FAILED',
-      error
-    )
-  }
 }
 
 async function decodeDepositUserOpActivity(
   workflowId: string,
   userOp: UserOperation<'v0.7'>
 ): Promise<SendEarnDepositCall> {
-  log.info('Decoding deposit UserOperation', { workflowId })
+  log.info('Decoding deposit UserOperation')
   try {
     const decoded = decodeSendEarnDepositUserOp({ userOp })
     return decoded
   } catch (error) {
-    log.error('decodeDepositUserOpActivity failed', { workflowId, error })
+    log.error('decodeDepositUserOpActivity failed', { error })
     const { error: updateError } = await updateTemporalSendEarnDeposit({
       workflow_id: workflowId,
       status: 'failed',
@@ -419,7 +393,6 @@ async function decodeDepositUserOpActivity(
     })
     if (updateError) {
       log.error('Failed to update deposit status after decode failure', {
-        workflowId,
         updateError,
       })
     }
@@ -440,7 +413,6 @@ async function updateTemporalDepositActivity({
   tx_hash: txHash,
 }: TemporalDepositUpdate): Promise<TemporalDeposit> {
   log.info('Updating temporal deposit record', {
-    workflowId,
     status,
     user_op_hash: userOpHash,
     tx_hash: txHash,
@@ -457,12 +429,12 @@ async function updateTemporalDepositActivity({
   const { data: updatedData, error } = await updateTemporalSendEarnDeposit(updatePayload)
 
   if (error) {
-    log.error('updateTemporalDepositActivity failed', { workflowId, status, error })
+    log.error('updateTemporalDepositActivity failed', { status, error })
     if (isRetryableDBError(error)) {
       throw ApplicationFailure.retryable(
         'Database connection error, retrying update...',
         error.code,
-        { error, workflowId, status }
+        { error, status }
       )
     }
     // Avoid trying to update status to 'failed' if the update itself failed,
@@ -475,7 +447,6 @@ async function updateTemporalDepositActivity({
       })
       if (updateFailedError) {
         log.error('Failed to update deposit status to failed after another update failure', {
-          workflowId,
           updateFailedError,
         })
       }
@@ -483,11 +454,10 @@ async function updateTemporalDepositActivity({
     throw ApplicationFailure.nonRetryable(
       `Database error occurred during update to status ${status}`,
       error.code,
-      { error, workflowId, status }
+      { error, status }
     )
   }
   log.info('Temporal deposit record updated successfully', {
-    workflowId,
     status: updatedData.status,
   })
   return updatedData
