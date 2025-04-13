@@ -194,8 +194,6 @@ async function upsertReferralRelationshipActivity({
   })
 
   const referrerBytea = hexToBytea(referrerAddress)
-  const referredBytea = hexToBytea(referredAddress)
-  const txHashBytea = hexToBytea(transactionHash)
 
   try {
     // 1. Validate against send_earn_new_affiliate
@@ -204,7 +202,6 @@ async function upsertReferralRelationshipActivity({
       .from('send_earn_new_affiliate')
       .select('id', { count: 'exact', head: true })
       .eq('affiliate', referrerBytea)
-      .eq('tx_hash', txHashBytea)
 
     if (validationResult.error) {
       log.error('DB error validating referral in send_earn_new_affiliate', {
@@ -327,7 +324,6 @@ async function upsertTemporalDepositActivity({
   block_num,
 }: UpsertTemporalDepositActivityParams): Promise<TemporalDeposit> {
   log.info('Upserting initial deposit record', {
-    workflowId,
     owner: deposit.owner,
     block_num: block_num.toString(),
     status,
