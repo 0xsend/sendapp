@@ -5,7 +5,7 @@ type Json = Nested<JsonPrimitive>;
 type Enum_auth_aal_level = 'aal1' | 'aal2' | 'aal3';
 type Enum_auth_code_challenge_method = 'plain' | 's256';
 type Enum_auth_factor_status = 'unverified' | 'verified';
-type Enum_auth_factor_type = 'phone' | 'totp' | 'webauthn';
+type Enum_auth_factor_type = 'totp' | 'webauthn';
 type Enum_auth_one_time_token_type = 'confirmation_token' | 'email_change_token_current' | 'email_change_token_new' | 'phone_change_token' | 'reauthentication_token' | 'recovery_token';
 type Enum_net_request_status = 'ERROR' | 'PENDING' | 'SUCCESS';
 type Enum_pgsodium_key_status = 'default' | 'expired' | 'invalid' | 'valid';
@@ -15,10 +15,10 @@ type Enum_pgtle_pg_tle_features = 'clientauth' | 'passcheck';
 type Enum_public_key_type_enum = 'ES256';
 type Enum_public_lookup_type_enum = 'address' | 'phone' | 'refcode' | 'sendid' | 'tag';
 type Enum_public_tag_status = 'confirmed' | 'pending';
+type Enum_public_temporal_status = 'confirmed' | 'failed' | 'initialized' | 'sent' | 'submitted';
 type Enum_public_verification_type = 'create_passkey' | 'send_ceiling' | 'send_one_hundred' | 'send_streak' | 'send_ten' | 'tag_referral' | 'tag_registration' | 'total_tag_referrals';
 type Enum_public_verification_value_mode = 'aggregate' | 'individual';
-type Enum_realtime_action = 'DELETE' | 'ERROR' | 'INSERT' | 'TRUNCATE' | 'UPDATE';
-type Enum_realtime_equality_op = 'eq' | 'gt' | 'gte' | 'in' | 'lt' | 'lte' | 'neq';
+type Enum_temporal_transfer_status = 'cancelled' | 'confirmed' | 'failed' | 'initialized' | 'sent' | 'submitted';
 interface Table_net_http_response {
   id: number | null;
   status_code: number | null;
@@ -87,7 +87,6 @@ interface Table_public_distribution_shares {
   created_at: string;
   updated_at: string;
   index: number;
-  amount_after_slash: number;
 }
 interface Table_public_distribution_verification_values {
   type: Enum_public_verification_type;
@@ -129,6 +128,7 @@ interface Table_public_distributions {
   merkle_drop_addr: string | null;
   token_addr: string | null;
   token_decimals: number | null;
+  tranche_id: number;
 }
 interface Table_pgtle_feature_info {
   feature: Enum_pgtle_pg_tle_features;
@@ -217,15 +217,12 @@ interface Table_private_leaderboard_referrals_all_time {
   rewards_usdc: number | null;
   updated_at: string | null;
 }
-interface Table_realtime_messages {
-  topic: string;
-  extension: string;
-  payload: Json | null;
-  event: string | null;
-  private: boolean | null;
-  updated_at: string;
-  inserted_at: string;
-  id: string;
+interface Table_public_liquidity_pools {
+  pool_name: string;
+  pool_type: string;
+  pool_addr: string;
+  chain_id: number;
+  created_at: string;
 }
 interface Table_auth_mfa_amr_claims {
   session_id: string;
@@ -240,8 +237,6 @@ interface Table_auth_mfa_challenges {
   created_at: string;
   verified_at: string | null;
   ip_address: string;
-  otp_code: string | null;
-  web_authn_session_data: Json | null;
 }
 interface Table_auth_mfa_factors {
   id: string;
@@ -252,10 +247,6 @@ interface Table_auth_mfa_factors {
   created_at: string;
   updated_at: string;
   secret: string | null;
-  phone: string | null;
-  last_challenged_at: string | null;
-  web_authn_credential: Json | null;
-  web_authn_aaguid: string | null;
 }
 interface Table_storage_migrations {
   id: number;
@@ -278,7 +269,6 @@ interface Table_storage_objects {
   metadata: Json | null;
   version: string | null;
   owner_id: string | null;
-  user_metadata: Json | null;
 }
 interface Table_auth_one_time_tokens {
   id: string;
@@ -310,8 +300,8 @@ interface Table_public_receipts {
 interface Table_public_referrals {
   referrer_id: string;
   referred_id: string;
-  tag: string;
   id: number;
+  created_at: string;
 }
 interface Table_auth_refresh_tokens {
   instance_id: string | null;
@@ -333,7 +323,6 @@ interface Table_storage_s_3_multipart_uploads {
   version: string;
   owner_id: string | null;
   created_at: string;
-  user_metadata: Json | null;
 }
 interface Table_storage_s_3_multipart_uploads_parts {
   id: string;
@@ -371,10 +360,6 @@ interface Table_auth_saml_relay_states {
 interface Table_auth_schema_migrations {
   version: string;
 }
-interface Table_realtime_schema_migrations {
-  version: number;
-  inserted_at: string | null;
-}
 interface Table_supabase_migrations_schema_migrations {
   version: string;
   statements: string[] | null;
@@ -389,10 +374,6 @@ interface Table_vault_secrets {
   nonce: string | null;
   created_at: string;
   updated_at: string;
-}
-interface Table_supabase_migrations_seed_files {
-  path: string;
-  hash: string;
 }
 interface Table_public_send_account_created {
   chain_id: number;
@@ -477,6 +458,18 @@ interface Table_public_send_account_transfers {
   log_idx: number;
   abi_idx: number;
 }
+interface Table_temporal_send_account_transfers {
+  id: number;
+  workflow_id: string;
+  status: Enum_temporal_transfer_status;
+  user_id: string | null;
+  created_at_block_num: number | null;
+  data: Json | null;
+  created_at: string;
+  updated_at: string;
+  send_account_transfers_activity_event_id: string | null;
+  send_account_transfers_activity_event_name: string | null;
+}
 interface Table_public_send_accounts {
   id: string;
   user_id: string;
@@ -486,6 +479,90 @@ interface Table_public_send_accounts {
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
+}
+interface Table_public_send_earn_create {
+  id: number;
+  chain_id: number;
+  log_addr: string;
+  block_time: number;
+  tx_hash: string;
+  send_earn: string;
+  caller: string;
+  initial_owner: string;
+  vault: string;
+  fee_recipient: string;
+  collections: string;
+  fee: number;
+  salt: string;
+  ig_name: string;
+  src_name: string;
+  block_num: number;
+  tx_idx: number;
+  log_idx: number;
+  abi_idx: number;
+}
+interface Table_public_send_earn_deposit {
+  id: number;
+  chain_id: number;
+  log_addr: string;
+  block_time: number;
+  tx_hash: string;
+  sender: string;
+  owner: string;
+  assets: number;
+  shares: number;
+  ig_name: string;
+  src_name: string;
+  block_num: number;
+  tx_idx: number;
+  log_idx: number;
+  abi_idx: number;
+}
+interface Table_temporal_send_earn_deposits {
+  workflow_id: string;
+  status: Enum_public_temporal_status;
+  owner: string | null;
+  assets: number | null;
+  vault: string | null;
+  user_op_hash: string | null;
+  block_num: number | null;
+  activity_id: number | null;
+  error_message: string | null;
+  created_at: string;
+  updated_at: string;
+}
+interface Table_public_send_earn_new_affiliate {
+  id: number;
+  chain_id: number;
+  log_addr: string;
+  block_time: number;
+  tx_hash: string;
+  affiliate: string;
+  send_earn_affiliate: string;
+  ig_name: string;
+  src_name: string;
+  block_num: number;
+  tx_idx: number;
+  log_idx: number;
+  abi_idx: number;
+}
+interface Table_public_send_earn_withdraw {
+  id: number;
+  chain_id: number;
+  log_addr: string;
+  block_time: number;
+  tx_hash: string;
+  sender: string;
+  receiver: string;
+  owner: string;
+  assets: number;
+  shares: number;
+  ig_name: string;
+  src_name: string;
+  block_num: number;
+  tx_idx: number;
+  log_idx: number;
+  abi_idx: number;
 }
 interface Table_public_send_liquidity_pools {
   id: number;
@@ -593,32 +670,9 @@ interface Table_auth_sso_providers {
   created_at: string | null;
   updated_at: string | null;
 }
-interface Table_realtime_subscription {
-  id: number;
-  subscription_id: string;
-  /**
-  * We couldn't determine the type of this column. The type might be coming from an unknown extension
-  * or be specific to your database. Please if it's a common used type report this issue so we can fix it!
-  * Otherwise, please manually type this column by casting it to the correct type.
-  * @example
-  * Here is a cast example for copycat use:
-  * ```
-  * copycat.scramble(row.unknownColumn as string)
-  * ```
-  */
-  entity: unknown;
-  /**
-  * We couldn't determine the type of this column. The type might be coming from an unknown extension
-  * or be specific to your database. Please if it's a common used type report this issue so we can fix it!
-  * Otherwise, please manually type this column by casting it to the correct type.
-  * @example
-  * Here is a cast example for copycat use:
-  * ```
-  * copycat.scramble(row.unknownColumn as string)
-  * ```
-  */
-  filters: unknown[];
-  claims: Json;
+interface Table_public_swap_routers {
+  router_addr: string;
+  chain_id: number;
   created_at: string;
 }
 interface Table_public_tag_receipts {
@@ -703,6 +757,12 @@ interface Table_public_webauthn_credentials {
   updated_at: string;
   deleted_at: string | null;
 }
+interface Schema_analytics {
+
+}
+interface Schema_realtime {
+
+}
 interface Schema_auth {
   audit_log_entries: Table_auth_audit_log_entries;
   flow_state: Table_auth_flow_state;
@@ -758,6 +818,7 @@ interface Schema_public {
   distribution_verification_values: Table_public_distribution_verification_values;
   distribution_verifications: Table_public_distribution_verifications;
   distributions: Table_public_distributions;
+  liquidity_pools: Table_public_liquidity_pools;
   profiles: Table_public_profiles;
   receipts: Table_public_receipts;
   referrals: Table_public_referrals;
@@ -768,21 +829,24 @@ interface Schema_public {
   send_account_signing_key_removed: Table_public_send_account_signing_key_removed;
   send_account_transfers: Table_public_send_account_transfers;
   send_accounts: Table_public_send_accounts;
+  send_earn_create: Table_public_send_earn_create;
+  send_earn_deposit: Table_public_send_earn_deposit;
+  send_earn_new_affiliate: Table_public_send_earn_new_affiliate;
+  send_earn_withdraw: Table_public_send_earn_withdraw;
   send_liquidity_pools: Table_public_send_liquidity_pools;
   send_revenues_safe_receives: Table_public_send_revenues_safe_receives;
   send_slash: Table_public_send_slash;
   send_token_transfers: Table_public_send_token_transfers;
   send_token_v0_transfers: Table_public_send_token_v_0_transfers;
   sendtag_checkout_receipts: Table_public_sendtag_checkout_receipts;
+  swap_routers: Table_public_swap_routers;
   tag_receipts: Table_public_tag_receipts;
   tag_reservations: Table_public_tag_reservations;
   tags: Table_public_tags;
   webauthn_credentials: Table_public_webauthn_credentials;
 }
 interface Schema_realtime {
-  messages: Table_realtime_messages;
-  schema_migrations: Table_realtime_schema_migrations;
-  subscription: Table_realtime_subscription;
+
 }
 interface Schema_shovel {
   ig_updates: Table_shovel_ig_updates;
@@ -803,12 +867,17 @@ interface Schema_supabase_functions {
 }
 interface Schema_supabase_migrations {
   schema_migrations: Table_supabase_migrations_schema_migrations;
-  seed_files: Table_supabase_migrations_seed_files;
+}
+interface Schema_temporal {
+  send_account_transfers: Table_temporal_send_account_transfers;
+  send_earn_deposits: Table_temporal_send_earn_deposits;
 }
 interface Schema_vault {
   secrets: Table_vault_secrets;
 }
 interface Database {
+  _analytics: Schema__analytics;
+  _realtime: Schema__realtime;
   auth: Schema_auth;
   dbdev: Schema_dbdev;
   extensions: Schema_extensions;
@@ -825,6 +894,7 @@ interface Database {
   storage: Schema_storage;
   supabase_functions: Schema_supabase_functions;
   supabase_migrations: Schema_supabase_migrations;
+  temporal: Schema_temporal;
   vault: Schema_vault;
 }
 interface Extension {
@@ -842,10 +912,10 @@ interface Tables_relationships {
        activity_to_user_id_fkey: "auth.users";
     };
     children: {
-
+       fk_activity: "temporal.send_earn_deposits";
     };
     parentDestinationsTables: "auth.users" | {};
-    childDestinationsTables:  | {};
+    childDestinationsTables: "temporal.send_earn_deposits" | {};
     
   };
   "public.affiliate_stats": {
@@ -1061,12 +1131,11 @@ interface Tables_relationships {
     parent: {
        referrals_referred_id_fkey: "public.profiles";
        referrals_referrer_id_fkey: "public.profiles";
-       referrals_tag_fkey: "public.tags";
     };
     children: {
 
     };
-    parentDestinationsTables: "public.profiles" | "public.tags" | {};
+    parentDestinationsTables: "public.profiles" | {};
     childDestinationsTables:  | {};
     
   };
@@ -1161,6 +1230,17 @@ interface Tables_relationships {
     childDestinationsTables: "public.send_account_credentials" | {};
     
   };
+  "temporal.send_earn_deposits": {
+    parent: {
+       fk_activity: "public.activity";
+    };
+    children: {
+
+    };
+    parentDestinationsTables: "public.activity" | {};
+    childDestinationsTables:  | {};
+    
+  };
   "public.send_slash": {
     parent: {
        send_slash_distribution_id_fkey: "public.distributions";
@@ -1224,11 +1304,10 @@ interface Tables_relationships {
        tags_user_id_fkey: "auth.users";
     };
     children: {
-       referrals_tag_fkey: "public.referrals";
        tag_receipts_tag_name_fkey: "public.tag_receipts";
     };
     parentDestinationsTables: "auth.users" | {};
-    childDestinationsTables: "public.referrals" | "public.tag_receipts" | {};
+    childDestinationsTables: "public.tag_receipts" | {};
     
   };
   "auth.users": {

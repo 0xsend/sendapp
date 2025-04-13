@@ -15,7 +15,7 @@
     "lint": "tsc",
     "seed": "DRY=0 bunx tsx ./bin/seed.ts",
     "restore": "bun run ./bin/snaplet.ts --restore",
-    "sync": "bunx @snaplet/seed sync",
+    "sync": "bunx @snaplet/snapshot config generate && bunx @snaplet/seed sync",
     "snapshot": "bunx @snaplet/snapshot"
   },
   "devDependencies": {

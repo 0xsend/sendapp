@@ -64,7 +64,6 @@ type Override = {
       created_at?: string;
       updated_at?: string;
       index?: string;
-      amount_after_slash?: string;
       users?: string;
       distributions?: string;
     };
@@ -122,6 +121,7 @@ type Override = {
       merkle_drop_addr?: string;
       token_addr?: string;
       token_decimals?: string;
+      tranche_id?: string;
       distribution_shares?: string;
       distribution_verification_values?: string;
       distribution_verifications?: string;
@@ -146,6 +146,16 @@ type Override = {
       rewards_usdc?: string;
       updated_at?: string;
       users?: string;
+    };
+  }
+  liquidity_pools?: {
+    name?: string;
+    fields?: {
+      pool_name?: string;
+      pool_type?: string;
+      pool_addr?: string;
+      chain_id?: string;
+      created_at?: string;
     };
   }
   storage_migrations?: {
@@ -178,7 +188,6 @@ type Override = {
       path_tokens?: string;
       version?: string;
       owner_id?: string;
-      user_metadata?: string;
       buckets?: string;
     };
   }
@@ -200,16 +209,26 @@ type Override = {
       referrals_referrals_referrer_idToprofiles?: string;
     };
   }
+  receipts?: {
+    name?: string;
+    fields?: {
+      hash?: string;
+      created_at?: string;
+      user_id?: string;
+      id?: string;
+      event_id?: string;
+      users?: string;
+    };
+  }
   referrals?: {
     name?: string;
     fields?: {
       referrer_id?: string;
       referred_id?: string;
-      tag?: string;
       id?: string;
+      created_at?: string;
       profiles_referrals_referred_idToprofiles?: string;
       profiles_referrals_referrer_idToprofiles?: string;
-      tags?: string;
     };
   }
   auth_schema_migrations?: {
@@ -226,11 +245,112 @@ type Override = {
       name?: string;
     };
   }
-  seed_files?: {
+  send_account_created?: {
     name?: string;
     fields?: {
-      path?: string;
-      hash?: string;
+      chain_id?: string;
+      log_addr?: string;
+      block_time?: string;
+      user_op_hash?: string;
+      tx_hash?: string;
+      account?: string;
+      ig_name?: string;
+      src_name?: string;
+      block_num?: string;
+      tx_idx?: string;
+      log_idx?: string;
+      id?: string;
+      event_id?: string;
+    };
+  }
+  send_account_credentials?: {
+    name?: string;
+    fields?: {
+      account_id?: string;
+      credential_id?: string;
+      key_slot?: string;
+      created_at?: string;
+      send_accounts?: string;
+      webauthn_credentials?: string;
+    };
+  }
+  send_account_receives?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      event_id?: string;
+      chain_id?: string;
+      block_num?: string;
+      block_time?: string;
+      tx_hash?: string;
+      tx_idx?: string;
+      log_idx?: string;
+      log_addr?: string;
+      sender?: string;
+      value?: string;
+      ig_name?: string;
+      src_name?: string;
+      abi_idx?: string;
+    };
+  }
+  send_account_signing_key_added?: {
+    name?: string;
+    fields?: {
+      chain_id?: string;
+      log_addr?: string;
+      block_time?: string;
+      tx_hash?: string;
+      account?: string;
+      key_slot?: string;
+      key?: string;
+      ig_name?: string;
+      src_name?: string;
+      block_num?: string;
+      tx_idx?: string;
+      log_idx?: string;
+      abi_idx?: string;
+      id?: string;
+      event_id?: string;
+    };
+  }
+  send_account_signing_key_removed?: {
+    name?: string;
+    fields?: {
+      chain_id?: string;
+      log_addr?: string;
+      block_time?: string;
+      tx_hash?: string;
+      account?: string;
+      key_slot?: string;
+      key?: string;
+      ig_name?: string;
+      src_name?: string;
+      block_num?: string;
+      tx_idx?: string;
+      log_idx?: string;
+      abi_idx?: string;
+      id?: string;
+      event_id?: string;
+    };
+  }
+  send_account_transfers?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      chain_id?: string;
+      log_addr?: string;
+      block_time?: string;
+      tx_hash?: string;
+      f?: string;
+      t?: string;
+      v?: string;
+      ig_name?: string;
+      src_name?: string;
+      block_num?: string;
+      tx_idx?: string;
+      log_idx?: string;
+      abi_idx?: string;
+      event_id?: string;
     };
   }
   send_accounts?: {
@@ -245,6 +365,94 @@ type Override = {
       updated_at?: string;
       deleted_at?: string;
       users?: string;
+      send_account_credentials?: string;
+    };
+  }
+  send_earn_create?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      chain_id?: string;
+      log_addr?: string;
+      block_time?: string;
+      tx_hash?: string;
+      send_earn?: string;
+      caller?: string;
+      initial_owner?: string;
+      vault?: string;
+      fee_recipient?: string;
+      collections?: string;
+      fee?: string;
+      salt?: string;
+      ig_name?: string;
+      src_name?: string;
+      block_num?: string;
+      tx_idx?: string;
+      log_idx?: string;
+      abi_idx?: string;
+      event_id?: string;
+    };
+  }
+  send_earn_deposit?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      chain_id?: string;
+      log_addr?: string;
+      block_time?: string;
+      tx_hash?: string;
+      sender?: string;
+      owner?: string;
+      assets?: string;
+      shares?: string;
+      ig_name?: string;
+      src_name?: string;
+      block_num?: string;
+      tx_idx?: string;
+      log_idx?: string;
+      abi_idx?: string;
+      event_id?: string;
+    };
+  }
+  send_earn_new_affiliate?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      chain_id?: string;
+      log_addr?: string;
+      block_time?: string;
+      tx_hash?: string;
+      affiliate?: string;
+      send_earn_affiliate?: string;
+      ig_name?: string;
+      src_name?: string;
+      block_num?: string;
+      tx_idx?: string;
+      log_idx?: string;
+      abi_idx?: string;
+      event_id?: string;
+    };
+  }
+  send_earn_withdraw?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      chain_id?: string;
+      log_addr?: string;
+      block_time?: string;
+      tx_hash?: string;
+      sender?: string;
+      receiver?: string;
+      owner?: string;
+      assets?: string;
+      shares?: string;
+      ig_name?: string;
+      src_name?: string;
+      block_num?: string;
+      tx_idx?: string;
+      log_idx?: string;
+      abi_idx?: string;
+      event_id?: string;
     };
   }
   send_liquidity_pools?: {
@@ -284,6 +492,46 @@ type Override = {
       distributions?: string;
     };
   }
+  send_token_transfers?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      chain_id?: string;
+      log_addr?: string;
+      block_time?: string;
+      tx_hash?: string;
+      f?: string;
+      t?: string;
+      v?: string;
+      ig_name?: string;
+      src_name?: string;
+      block_num?: string;
+      tx_idx?: string;
+      log_idx?: string;
+      abi_idx?: string;
+      event_id?: string;
+    };
+  }
+  send_token_v0_transfers?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      chain_id?: string;
+      log_addr?: string;
+      block_time?: string;
+      tx_hash?: string;
+      f?: string;
+      t?: string;
+      v?: string;
+      ig_name?: string;
+      src_name?: string;
+      block_num?: string;
+      tx_idx?: string;
+      log_idx?: string;
+      abi_idx?: string;
+      event_id?: string;
+    };
+  }
   sendtag_checkout_receipts?: {
     name?: string;
     fields?: {
@@ -305,6 +553,25 @@ type Override = {
       abi_idx?: string;
     };
   }
+  swap_routers?: {
+    name?: string;
+    fields?: {
+      router_addr?: string;
+      chain_id?: string;
+      created_at?: string;
+    };
+  }
+  tag_receipts?: {
+    name?: string;
+    fields?: {
+      tag_name?: string;
+      hash?: string;
+      event_id?: string;
+      id?: string;
+      created_at?: string;
+      tags?: string;
+    };
+  }
   tag_reservations?: {
     name?: string;
     fields?: {
@@ -321,7 +588,7 @@ type Override = {
       user_id?: string;
       created_at?: string;
       users?: string;
-      referrals?: string;
+      tag_receipts?: string;
     };
   }
   users?: {
@@ -367,8 +634,29 @@ type Override = {
       distribution_shares?: string;
       distribution_verifications?: string;
       profiles?: string;
+      receipts?: string;
       send_accounts?: string;
       tags?: string;
+      webauthn_credentials?: string;
+    };
+  }
+  webauthn_credentials?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      name?: string;
+      display_name?: string;
+      raw_credential_id?: string;
+      user_id?: string;
+      public_key?: string;
+      key_type?: string;
+      sign_count?: string;
+      attestation_object?: string;
+      created_at?: string;
+      updated_at?: string;
+      deleted_at?: string;
+      users?: string;
+      send_account_credentials?: string;
     };
   }}
 export type Alias = {
@@ -420,7 +708,6 @@ export interface Fingerprint {
     createdAt?: FingerprintDateField;
     updatedAt?: FingerprintDateField;
     index?: FingerprintNumberField;
-    amountAfterSlash?: FingerprintNumberField;
     user?: FingerprintRelationField;
     distribution?: FingerprintRelationField;
   }
@@ -462,6 +749,7 @@ export interface Fingerprint {
     snapshotBlockNum?: FingerprintNumberField;
     chainId?: FingerprintNumberField;
     tokenDecimals?: FingerprintNumberField;
+    trancheId?: FingerprintNumberField;
     distributionShares?: FingerprintRelationField;
     distributionVerificationValues?: FingerprintRelationField;
     distributionVerifications?: FingerprintRelationField;
@@ -479,6 +767,10 @@ export interface Fingerprint {
     updatedAt?: FingerprintDateField;
     user?: FingerprintRelationField;
   }
+  liquidityPools?: {
+    chainId?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+  }
   storageMigrations?: {
     id?: FingerprintNumberField;
     executedAt?: FingerprintDateField;
@@ -491,7 +783,6 @@ export interface Fingerprint {
     updatedAt?: FingerprintDateField;
     lastAccessedAt?: FingerprintDateField;
     metadata?: FingerprintJsonField;
-    userMetadata?: FingerprintJsonField;
     bucket?: FingerprintRelationField;
   }
   profiles?: {
@@ -502,11 +793,16 @@ export interface Fingerprint {
     referralsByReferredId?: FingerprintRelationField;
     referralsByReferrerId?: FingerprintRelationField;
   }
+  receipts?: {
+    createdAt?: FingerprintDateField;
+    id?: FingerprintNumberField;
+    user?: FingerprintRelationField;
+  }
   referrals?: {
     id?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
     referred?: FingerprintRelationField;
     referrer?: FingerprintRelationField;
-    tagByTag?: FingerprintRelationField;
   }
   authSchemaMigrations?: {
 
@@ -514,8 +810,59 @@ export interface Fingerprint {
   supabaseMigrationsSchemaMigrations?: {
 
   }
-  seedFiles?: {
-
+  sendAccountCreateds?: {
+    chainId?: FingerprintNumberField;
+    blockTime?: FingerprintNumberField;
+    blockNum?: FingerprintNumberField;
+    txIdx?: FingerprintNumberField;
+    logIdx?: FingerprintNumberField;
+    id?: FingerprintNumberField;
+  }
+  sendAccountCredentials?: {
+    keySlot?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+    account?: FingerprintRelationField;
+    credential?: FingerprintRelationField;
+  }
+  sendAccountReceives?: {
+    id?: FingerprintNumberField;
+    chainId?: FingerprintNumberField;
+    blockNum?: FingerprintNumberField;
+    blockTime?: FingerprintNumberField;
+    txIdx?: FingerprintNumberField;
+    logIdx?: FingerprintNumberField;
+    value?: FingerprintNumberField;
+    abiIdx?: FingerprintNumberField;
+  }
+  sendAccountSigningKeyAddeds?: {
+    chainId?: FingerprintNumberField;
+    blockTime?: FingerprintNumberField;
+    keySlot?: FingerprintNumberField;
+    blockNum?: FingerprintNumberField;
+    txIdx?: FingerprintNumberField;
+    logIdx?: FingerprintNumberField;
+    abiIdx?: FingerprintNumberField;
+    id?: FingerprintNumberField;
+  }
+  sendAccountSigningKeyRemoveds?: {
+    chainId?: FingerprintNumberField;
+    blockTime?: FingerprintNumberField;
+    keySlot?: FingerprintNumberField;
+    blockNum?: FingerprintNumberField;
+    txIdx?: FingerprintNumberField;
+    logIdx?: FingerprintNumberField;
+    abiIdx?: FingerprintNumberField;
+    id?: FingerprintNumberField;
+  }
+  sendAccountTransfers?: {
+    id?: FingerprintNumberField;
+    chainId?: FingerprintNumberField;
+    blockTime?: FingerprintNumberField;
+    v?: FingerprintNumberField;
+    blockNum?: FingerprintNumberField;
+    txIdx?: FingerprintNumberField;
+    logIdx?: FingerprintNumberField;
+    abiIdx?: FingerprintNumberField;
   }
   sendAccounts?: {
     chainId?: FingerprintNumberField;
@@ -523,6 +870,48 @@ export interface Fingerprint {
     updatedAt?: FingerprintDateField;
     deletedAt?: FingerprintDateField;
     user?: FingerprintRelationField;
+    sendAccountCredentialsByAccountId?: FingerprintRelationField;
+  }
+  sendEarnCreates?: {
+    id?: FingerprintNumberField;
+    chainId?: FingerprintNumberField;
+    blockTime?: FingerprintNumberField;
+    fee?: FingerprintNumberField;
+    blockNum?: FingerprintNumberField;
+    txIdx?: FingerprintNumberField;
+    logIdx?: FingerprintNumberField;
+    abiIdx?: FingerprintNumberField;
+  }
+  sendEarnDeposits?: {
+    id?: FingerprintNumberField;
+    chainId?: FingerprintNumberField;
+    blockTime?: FingerprintNumberField;
+    assets?: FingerprintNumberField;
+    shares?: FingerprintNumberField;
+    blockNum?: FingerprintNumberField;
+    txIdx?: FingerprintNumberField;
+    logIdx?: FingerprintNumberField;
+    abiIdx?: FingerprintNumberField;
+  }
+  sendEarnNewAffiliates?: {
+    id?: FingerprintNumberField;
+    chainId?: FingerprintNumberField;
+    blockTime?: FingerprintNumberField;
+    blockNum?: FingerprintNumberField;
+    txIdx?: FingerprintNumberField;
+    logIdx?: FingerprintNumberField;
+    abiIdx?: FingerprintNumberField;
+  }
+  sendEarnWithdraws?: {
+    id?: FingerprintNumberField;
+    chainId?: FingerprintNumberField;
+    blockTime?: FingerprintNumberField;
+    assets?: FingerprintNumberField;
+    shares?: FingerprintNumberField;
+    blockNum?: FingerprintNumberField;
+    txIdx?: FingerprintNumberField;
+    logIdx?: FingerprintNumberField;
+    abiIdx?: FingerprintNumberField;
   }
   sendLiquidityPools?: {
     id?: FingerprintNumberField;
@@ -545,6 +934,26 @@ export interface Fingerprint {
     distributionId?: FingerprintNumberField;
     distribution?: FingerprintRelationField;
   }
+  sendTokenTransfers?: {
+    id?: FingerprintNumberField;
+    chainId?: FingerprintNumberField;
+    blockTime?: FingerprintNumberField;
+    v?: FingerprintNumberField;
+    blockNum?: FingerprintNumberField;
+    txIdx?: FingerprintNumberField;
+    logIdx?: FingerprintNumberField;
+    abiIdx?: FingerprintNumberField;
+  }
+  sendTokenV0Transfers?: {
+    id?: FingerprintNumberField;
+    chainId?: FingerprintNumberField;
+    blockTime?: FingerprintNumberField;
+    v?: FingerprintNumberField;
+    blockNum?: FingerprintNumberField;
+    txIdx?: FingerprintNumberField;
+    logIdx?: FingerprintNumberField;
+    abiIdx?: FingerprintNumberField;
+  }
   sendtagCheckoutReceipts?: {
     id?: FingerprintNumberField;
     chainId?: FingerprintNumberField;
@@ -556,13 +965,22 @@ export interface Fingerprint {
     logIdx?: FingerprintNumberField;
     abiIdx?: FingerprintNumberField;
   }
+  swapRouters?: {
+    chainId?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+  }
+  tagReceipts?: {
+    id?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+    tag?: FingerprintRelationField;
+  }
   tagReservations?: {
     createdAt?: FingerprintDateField;
   }
   tags?: {
     createdAt?: FingerprintDateField;
     user?: FingerprintRelationField;
-    referralsByTag?: FingerprintRelationField;
+    tagReceipts?: FingerprintRelationField;
   }
   users?: {
     emailConfirmedAt?: FingerprintDateField;
@@ -587,6 +1005,16 @@ export interface Fingerprint {
     distributionShares?: FingerprintRelationField;
     distributionVerifications?: FingerprintRelationField;
     profiles?: FingerprintRelationField;
+    receipts?: FingerprintRelationField;
     sendAccounts?: FingerprintRelationField;
     tags?: FingerprintRelationField;
+    webauthnCredentials?: FingerprintRelationField;
+  }
+  webauthnCredentials?: {
+    signCount?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    deletedAt?: FingerprintDateField;
+    user?: FingerprintRelationField;
+    sendAccountCredentialsByCredentialId?: FingerprintRelationField;
   }}

@@ -56,6 +56,7 @@ export default defineConfig({
       challenges: false,
       activity: false,
     },
+    temporal: false,
   },
   subset: {
     keepDisconnectedTables: true,
