@@ -161,7 +161,7 @@ begin
 -- Deletes send_earn_deposit with no send_account_created.
 -- This is due to performance issues in our shovel indexer and using filter_ref to limit indexing to only
 -- send_earn_deposit with send_account_created.
--- For now, we index all USDC and SEND token transfers, and use this function filter any send_earn_deposit with no send_account_created.
+-- For now, we index all rows, and use this function filter any send_earn_deposit with no send_account_created.
 -- See https://github.com/orgs/indexsupply/discussions/268
   if exists ( select 1 from send_account_created where account = new.owner )
   then
@@ -334,7 +334,7 @@ begin
 -- Deletes send_earn_withdraw with no send_account_created.
 -- This is due to performance issues in our shovel indexer and using filter_ref to limit indexing to only
 -- send_earn_withdraw with send_account_created.
--- For now, we index all USDC and SEND token transfers, and use this function filter any send_earn_withdraw with no send_account_created.
+-- For now, we index all rows, and use this function filter any send_earn_withdraw with no send_account_created.
 -- See https://github.com/orgs/indexsupply/discussions/268
   if exists ( select 1 from send_account_created where account = new.owner )
   then
@@ -523,7 +523,6 @@ BEGIN
   IF v_affiliate_address IS NULL OR v_referrer_id IS NULL THEN
     RETURN NEW;
   END IF;
-
 
   -- Insert the new referral relationship with error handling
   BEGIN
@@ -825,7 +824,7 @@ BEGIN
       IF FOUND THEN
           UPDATE public.activity
           SET
-            event_name = 'temporal_send_earn_deposit_failed',
+            event_name = 'temporal_send_earn_deposit',
             data = updated_data,
             -- Use the timestamp from the temporal table update
             created_at = NEW.updated_at -- Reflects the failure time

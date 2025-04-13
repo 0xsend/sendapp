@@ -35,7 +35,7 @@ SELECT lives_ok(
 );
 SELECT results_eq(
     $$ SELECT event_name FROM public.activity WHERE id = (SELECT activity_id FROM temporal.send_earn_deposits WHERE workflow_id = 'test-update-workflow-1') $$,
-    $$ VALUES ('temporal_send_earn_deposit_failed'::text) $$,
+    $$ VALUES ('temporal_send_earn_deposit'::text) $$,
     'Test 1.2: Activity event_name updated to "failed"'
 );
 SELECT results_eq(
@@ -68,7 +68,7 @@ SELECT lives_ok(
 -- The trigger should only act when NEW.status = 'failed', so event_name should remain 'failed'
 SELECT results_eq(
     $$ SELECT event_name FROM public.activity WHERE id = (SELECT activity_id FROM temporal.send_earn_deposits WHERE workflow_id = 'test-update-workflow-1') $$,
-    $$ VALUES ('temporal_send_earn_deposit_failed'::text) $$,
+    $$ VALUES ('temporal_send_earn_deposit'::text) $$,
     'Test 2.2: Activity event_name remains "failed" when status changes to non-failed'
 );
 
