@@ -204,7 +204,6 @@ async function upsertReferralRelationshipActivity({
       .from('send_earn_new_affiliate')
       .select('id', { count: 'exact', head: true })
       .eq('affiliate', referrerBytea)
-      .eq('send_earn_affiliate', referredBytea)
       .eq('tx_hash', txHashBytea)
 
     if (validationResult.error) {
