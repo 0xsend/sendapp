@@ -13,6 +13,9 @@
     },
     "./chains": {
       "import": "./src/chains.ts"
+    },
+    "./contracts/base-jackpot": {
+      "import": "./src/contracts/base-jackpot.ts"
     }
   },
   "scripts": {
