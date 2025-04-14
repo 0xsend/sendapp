@@ -15,6 +15,34 @@ Foundry consists of:
 
 ## Usage
 
+### Update Token Paymaster Config
+
+This script updates the token paymaster config, pass in the ENV variables you wish to update. It will read the onchain config and update the ENV variables if they are different.
+
+>[!NOTE]
+> The `PAYMASTER` env variable is required.
+
+```shell
+# export PRICE_MARKUP=
+# export MIN_ENTRY_POINT_BALANCE=
+# export REFUND_POSTOP_COST=
+# export PRICE_MAX_AGE=
+# export BASE_FEE=
+# use this to clear the base fee
+# export BASE_FEE_CLEAR=
+# export REWARDS_POOL=
+export BASE_FEE=10000
+export PAYMASTER=0x592e1224D203Be4214B15e205F6081FbbaCFcD2D
+export REWARDS_POOL=0xB3dCBE168cFe6ccb123b2c13F7CF9Aa95B7Ec5aE
+forge script ./script/UpdateTokenPaymasterConfig.s.sol:UpdateTokenPaymasterConfigScript \
+  -vvvv \
+  --rpc-url base \
+  --sender 0x436454a68bef94901014e2af90f86e7355a029f3 \
+  --froms 0x436454a68bef94901014e2af90f86e7355a029f3 \
+  --keystores ~/.foundry/keystores/send_deployer \
+  --broadcast
+```
+
 ### Deploy Send Merkle Drop
 
 ```shell

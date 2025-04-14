@@ -1,12 +1,16 @@
 {
   "name": "@my/workflows",
-  "version": "0.0.4",
+  "version": "0.0.7",
   "files": [
     "package.json",
     "src"
   ],
   "type": "module",
   "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
     "./all-activities": {
       "types": "./src/all-activities.ts",
       "default": "./src/all-activities.ts"
@@ -14,6 +18,10 @@
     "./utils": {
       "types": "./src/utils/index.ts",
       "default": "./src/utils/index.ts"
+    },
+    "./utils/*": {
+      "types": "./src/utils/*",
+      "default": "./src/utils/*"
     },
     "./all-workflows": {
       "types": "./src/all-workflows.ts",
@@ -35,14 +43,14 @@
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
-    "@temporalio/nyc-test-coverage": "^1.10.1",
-    "@temporalio/testing": "^1.10.1",
+    "@temporalio/nyc-test-coverage": "^1.11.7",
+    "@temporalio/testing": "^1.11.7",
     "@types/source-map-support": "^0",
     "dotenv-cli": "^7.3.0",
     "jest": "^29.7.0",
     "nyc": "^17.0.0",
     "source-map-support": "^0.5.21",
-    "ts-jest": "^29.1.5",
+    "ts-jest": "^29.3.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.3"
   },
@@ -53,8 +61,12 @@
     "@my/supabase": "workspace:*",
     "@my/wagmi": "workspace:*",
     "@supabase/supabase-js": "2.44.2",
-    "@temporalio/activity": "^1.10.1",
-    "@temporalio/workflow": "^1.10.1",
-    "app": "workspace:*"
+    "@temporalio/activity": "^1.11.7",
+    "@temporalio/workflow": "^1.11.7",
+    "@wagmi/core": "^2.13.1",
+    "app": "workspace:*",
+    "permissionless": "^0.1.14",
+    "viem": "^2.19.0",
+    "wagmi": "^2.13.1"
   }
 }

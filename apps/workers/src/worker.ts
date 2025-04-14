@@ -1,10 +1,11 @@
-import { Worker, NativeConnection } from '@temporalio/worker'
-import { createTransferActivities, createUserOpActivities } from '@my/workflows/all-activities'
+import { getTemporalConnectionOptions, getTemporalNamespace } from '@my/temporal/client'
+import { createMonorepoActivities } from '@my/workflows/all-activities'
+import { version } from '@my/workflows/version'
+import { NativeConnection, Worker } from '@temporalio/worker'
 import { createRequire } from 'node:module'
 const require = createRequire(import.meta.url)
-import { version } from '@my/workflows/version'
 
-const { NODE_ENV = 'development', TEMPORAL_MTLS_TLS_CERT, TEMPORAL_MTLS_TLS_KEY } = process.env
+const { NODE_ENV = 'development' } = process.env
 const isDeployed = ['production', 'test'].includes(NODE_ENV)
 
 const workflowOption = () =>
@@ -17,24 +18,10 @@ const workflowOption = () =>
     : { workflowsPath: require.resolve('@my/workflows/all-workflows') }
 
 async function run() {
-  let connection: NativeConnection | undefined = undefined
-  if (isDeployed) {
-    if (!TEMPORAL_MTLS_TLS_CERT) {
-      throw new Error('no cert found. Check the TEMPORAL_MTLS_TLS_CERT env var')
-    }
-    if (!TEMPORAL_MTLS_TLS_KEY) {
-      throw new Error('no key found.  Check the TEMPORAL_MTLS_TLS_KEY env var')
-    }
-    connection = await NativeConnection.connect({
-      address: `${process.env.TEMPORAL_NAMESPACE}.tmprl.cloud:7233`,
-      tls: {
-        clientCertPair: {
-          crt: Buffer.from(TEMPORAL_MTLS_TLS_CERT, 'base64'),
-          key: Buffer.from(TEMPORAL_MTLS_TLS_KEY, 'base64'),
-        },
-      },
-    })
-  }
+  // Get connection options using the shared function from @my/temporal/client
+  const connectionOptions = getTemporalConnectionOptions()
+  // Establish the native connection using the shared options
+  const connection = await NativeConnection.connect(connectionOptions)
 
   const worker = await Worker.create({
     connection,
@@ -42,15 +29,9 @@ async function run() {
       payloadConverterPath: require.resolve('@my/temporal/payload-converter'),
     },
     ...workflowOption(),
-    activities: {
-      ...createTransferActivities(process.env),
-      ...createUserOpActivities(process.env),
-    },
-    namespace: process.env.TEMPORAL_NAMESPACE ?? 'default',
+    activities: createMonorepoActivities(process.env),
+    namespace: getTemporalNamespace(),
     taskQueue: `monorepo@${version}`,
-    bundlerOptions: {
-      ignoreModules: ['@supabase/supabase-js'],
-    },
   })
 
   await worker.run()

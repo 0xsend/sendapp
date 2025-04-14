@@ -32,6 +32,11 @@ abstract contract Helper is Script {
      */
     address constant SEND_REVENUE_SAFE = 0x71fa02bb11e4b119bEDbeeD2f119F62048245301;
     /**
+     * Send: Transaction Revenue
+     * https://basescan.io/address/0xB3dCBE168cFe6ccb123b2c13F7CF9Aa95B7Ec5aE
+     */
+    address constant SEND_TX_REVENUE_SAFE = 0xB3dCBE168cFe6ccb123b2c13F7CF9Aa95B7Ec5aE;
+    /**
      * Send: Airdrops
      * https://etherscan.io/address/0x6204Bc0662ccd8a9A762d59fe7906733f251E3b7
      */
@@ -69,5 +74,6 @@ abstract contract Helper is Script {
         vm.label(AA_ENTRY_POINT_V0_7, "AA_ENTRY_POINT_V0_7");
         vm.label(USDC_BASE, "USDC_BASE");
         vm.label(SEND_REWARDS_SAFE, "SEND_REWARDS_SAFE");
+        vm.label(SEND_TX_REVENUE_SAFE, "SEND_TX_REVENUE_SAFE");
     }
 }

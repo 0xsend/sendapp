@@ -8,7 +8,6 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
       "gap": 16,
       "marginLeft": "auto",
       "marginRight": "auto",
-      "maxWidth": "500px",
       "overflow": "scroll",
       "paddingBottom": 16,
       "width": "100%",

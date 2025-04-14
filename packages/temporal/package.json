@@ -15,6 +15,10 @@
     "./client": {
       "types": "./src/client.ts",
       "default": "./src/client.ts"
+    },
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
     }
   },
   "scripts": {
@@ -23,8 +27,8 @@
     "build": "esbuild --bundle --format=cjs --minify --outfile=build/payload-converter.cjs --target=esnext --platform=node --external:@temporalio/common --external:@bufbuild/protobuf src/payload-converter.ts"
   },
   "dependencies": {
-    "@temporalio/client": "^1.10.1",
-    "@temporalio/common": "^1.11.1",
+    "@temporalio/client": "^1.11.7",
+    "@temporalio/common": "^1.11.7",
     "superjson": "^2.2.1"
   },
   "peerDependencies": {

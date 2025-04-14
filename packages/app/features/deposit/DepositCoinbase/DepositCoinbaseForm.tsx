@@ -42,7 +42,7 @@ export function DepositCoinbaseForm({ onConfirmTransaction, isLoading }: Deposit
       setDepositParams(
         {
           ...depositParams,
-          depositAmount: sanitizedDepositAmount.toString(),
+          depositAmount: sanitizedDepositAmount ? sanitizedDepositAmount.toString() : undefined,
         },
         { webBehavior: 'replace' }
       )

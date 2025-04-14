@@ -55,9 +55,8 @@ export default defineConfig({
     public: {
       challenges: false,
       activity: false,
-      receipts: false,
-      tag_receipts: false,
     },
+    temporal: false,
   },
   subset: {
     keepDisconnectedTables: true,
@@ -115,9 +114,9 @@ export default defineConfig({
     },
 
     public: {
-      activity: ({ row }) => {
-        return row
-      },
+      // activity: ({ row }) => {
+      //   return row
+      // },
       profiles: ({ row }) => {
         return {
           ...row,
@@ -154,6 +153,9 @@ export default defineConfig({
         return row
       },
       distribution_verifications: ({ row }) => {
+        return row
+      },
+      receipts: ({ row }) => {
         return row
       },
       referrals: ({ row }) => {

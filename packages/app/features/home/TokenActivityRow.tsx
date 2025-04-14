@@ -1,18 +1,19 @@
 import { Paragraph, Text, XStack, YStack } from '@my/ui'
-import { amountFromActivity, eventNameFromActivity, subtextFromActivity } from 'app/utils/activity'
+import { useEventNameFromActivity, useSubtextFromActivity } from 'app/utils/activity'
+import { useAmountFromActivity } from 'app/utils/activity-hooks'
+import { CommentsTime } from 'app/utils/dateHelper'
 import {
   type Activity,
   isSendAccountReceiveEvent,
   isSendAccountTransfersEvent,
 } from 'app/utils/zod/activity'
-import { ActivityAvatar } from '../activity/ActivityAvatar'
-import { CommentsTime } from 'app/utils/dateHelper'
 import { Link } from 'solito/link'
+import { ActivityAvatar } from '../activity/ActivityAvatar'
 
-import { useUser } from 'app/utils/useUser'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { useSwapRouters } from 'app/utils/useSwapRouters'
 import { useLiquidityPools } from 'app/utils/useLiquidityPools'
+import { useUser } from 'app/utils/useUser'
 
 export function TokenActivityRow({
   activity,
@@ -25,10 +26,10 @@ export function TokenActivityRow({
   const { data: swapRouters } = useSwapRouters()
   const { data: liquidityPools } = useLiquidityPools()
   const { created_at, from_user, to_user } = activity
-  const amount = amountFromActivity(activity, swapRouters, liquidityPools)
+  const amount = useAmountFromActivity(activity, swapRouters, liquidityPools)
   const date = CommentsTime(new Date(created_at))
-  const eventName = eventNameFromActivity(activity, swapRouters, liquidityPools)
-  const subtext = subtextFromActivity(activity, swapRouters, liquidityPools)
+  const eventName = useEventNameFromActivity({ activity, swapRouters })
+  const subtext = useSubtextFromActivity({ activity, swapRouters, liquidityPools })
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
   const hoverStyles = useHoverStyles()
@@ -54,6 +55,7 @@ export function TokenActivityRow({
             <Text color="$color12" fontSize="$6" fontWeight={'500'}>
               {eventName}
             </Text>
+            &nbsp;
             <Text color="$color12" fontSize="$6" fontWeight={'500'} ta="right">
               {amount}
             </Text>

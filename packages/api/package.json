@@ -3,17 +3,20 @@
   "name": "@my/api",
   "main": "src/index.ts",
   "private": true,
+  "scripts": {
+    "lint": "tsc --noEmit"
+  },
   "dependencies": {
     "@my/supabase": "workspace:*",
     "@my/temporal": "workspace:*",
     "@my/wagmi": "workspace:*",
     "@my/workflows": "workspace:*",
     "@supabase/supabase-js": "2.44.2",
-    "@tanstack/react-query": "^5.18.1",
-    "@trpc/client": "11.0.0-next-beta.264",
-    "@trpc/next": "11.0.0-next-beta.264",
-    "@trpc/react-query": "11.0.0-next-beta.264",
-    "@trpc/server": "11.0.0-next-beta.264",
+    "@tanstack/react-query": "^5.72.1",
+    "@trpc/client": "^11.0.4",
+    "@trpc/next": "^11.0.4",
+    "@trpc/react-query": "^11.0.4",
+    "@trpc/server": "^11.0.4",
     "@wagmi/core": "^2.13.1",
     "app": "workspace:*",
     "debug": "^4.3.6",
@@ -26,6 +29,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/jsonwebtoken": "^9.0.2"
+    "@types/jsonwebtoken": "^9.0.2",
+    "typescript": "^5.5.3"
   }
 }

@@ -2,12 +2,20 @@ import {
   baseMainnet,
   sendtagCheckoutAddress,
   sendTokenV0Address,
+  sendTokenV0LockboxAddress,
   tokenPaymasterAddress,
 } from '@my/wagmi'
+import { sendCoin, sendV0Coin } from 'app/data/coins'
+import { ContractLabels } from 'app/data/contract-labels'
+import { useAddressBook } from 'app/utils/useAddressBook'
 import type { Activity } from 'app/utils/zod/activity'
+import type { LiquidityPool } from 'app/utils/zod/LiquidityPoolSchema'
+import type { SwapRouter } from 'app/utils/zod/SwapRouterSchema'
+import { useMemo } from 'react'
 import { formatUnits, isAddressEqual } from 'viem'
 import formatAmount from './formatAmount'
-import { shorten } from './strings'
+import { pgAddrCondValues } from './pgAddrCondValues'
+import { shorten, squish } from './strings'
 import {
   isReferralsEvent,
   isSendAccountTransfersEvent,
@@ -16,23 +24,32 @@ import {
 } from './zod/activity'
 import { isSendAccountReceiveEvent } from './zod/activity/SendAccountReceiveEventSchema'
 import { isSendTokenUpgradeEvent } from './zod/activity/SendAccountTransfersEventSchema'
-import { sendCoin, sendV0Coin } from 'app/data/coins'
+import {
+  isSendEarnDepositEvent,
+  isSendEarnEvent,
+  isSendEarnWithdrawEvent,
+  isTemporalSendEarnDepositEvent,
+} from './zod/activity/SendEarnEventSchema'
 import {
   isTemporalEthTransfersEvent,
   isTemporalTokenTransfersEvent,
   temporalEventNameFromStatus,
 } from './zod/activity/TemporalTransfersEventSchema'
-import type { SwapRouter } from 'app/utils/zod/SwapRouterSchema'
-import type { LiquidityPool } from 'app/utils/zod/LiquidityPoolSchema'
 import { SENDPOT_CONTRACT_ADDRESS } from 'app/data/sendpot'
 
 const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
   Object.values(addresses).map((a) => [a, label])
 
+/**
+ * @see useAddressBook
+ * @deprecated
+ */
 const AddressLabels = {
-  ...Object.fromEntries(wagmiAddresWithLabel(Object.values(tokenPaymasterAddress), 'Paymaster')),
   ...Object.fromEntries(
-    wagmiAddresWithLabel(Object.values(sendtagCheckoutAddress), 'Sendtag Checkout')
+    wagmiAddresWithLabel(Object.values(tokenPaymasterAddress), ContractLabels.Paymaster)
+  ),
+  ...Object.fromEntries(
+    wagmiAddresWithLabel(Object.values(sendtagCheckoutAddress), ContractLabels.SendtagCheckout)
   ),
 }
 
@@ -139,6 +156,15 @@ export function amountFromActivity(
       }
       return formatAmount(`${activity.data.value}`, 5, 0)
     }
+    case isTemporalSendEarnDepositEvent(activity): {
+      const { assets, coin } = activity.data
+      if (coin && assets !== undefined && assets !== null) {
+        const amount = formatAmount(formatUnits(assets, coin.decimals), 5, coin.formatDecimals)
+        return `${amount} ${coin.symbol}`
+      }
+      // Fallback if coin or assets are missing (less likely for this event type)
+      return assets !== undefined && assets !== null ? formatAmount(`${assets}`, 5, 0) : ''
+    }
     case isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity): {
       const data = activity.data
       const amount = formatAmount(
@@ -151,8 +177,7 @@ export function amountFromActivity(
     }
     case isReferralsEvent(activity) && !!activity.from_user?.id: {
       // only show if the user is the referrer
-      const data = activity.data
-      return `${data.tags.length} ${data.tags.length > 1 ? 'Referrals' : 'Referral'}`
+      return '' // no amount
     }
     case isReferralsEvent(activity) && !!activity.to_user?.id: {
       // only show if the user is the referred
@@ -271,13 +296,14 @@ export const isActivitySwapTransfer = (
  * @param activity - The activity to check.
  * @param swapRouters - Optional list of swap routers to validate the activity against.
  * @param liquidityPools - Optional list of liquidity pools to validate the activity against.
- * @returns
+ * @deprecated use useEventNameFromActivity instead
+ * @returns the human readable event name of the activity
  */
-export function eventNameFromActivity(
-  activity: Activity,
-  swapRouters: SwapRouter[] = [],
-  liquidityPools: LiquidityPool[] = []
-) {
+export function eventNameFromActivity({
+  activity,
+  swapRouters = [],
+  liquidityPools = [],
+}: { activity: Activity; swapRouters?: SwapRouter[]; liquidityPools?: LiquidityPool[] }): string {
   const { event_name, from_user, to_user, data } = activity
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
@@ -287,14 +313,22 @@ export function eventNameFromActivity(
   const isSwapTransfer = isActivitySwapTransfer(activity, swapRouters, liquidityPools)
 
   switch (true) {
-    case isTemporalTransfer:
-      return temporalEventNameFromStatus(data.status)
     case isSendPotTicketPurchase(activity):
       return 'Ticket Purchase'
     case isSendPotWin(activity):
       return 'SendPot Win'
+    case isTemporalSendEarnDepositEvent(activity):
+      return activity.data.status === 'failed'
+        ? 'Deposit Failed'
+        : temporalEventNameFromStatus(data.status)
+    case isSendEarnDepositEvent(activity):
+      return 'Send Earn Deposit'
+    case isSendEarnWithdrawEvent(activity):
+      return 'Send Earn Withdraw'
+    case isTemporalTransfer:
+      return temporalEventNameFromStatus(data.status)
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
-      return 'Referral Reward'
+      return 'Revenue Share'
     case isSendTokenUpgradeEvent(activity):
       return 'Send Token Upgrade'
     case isERC20Transfer && to_user?.send_id === undefined:
@@ -327,17 +361,47 @@ export function eventNameFromActivity(
 }
 
 /**
+ * Returns the human readable event name of the activity.
+ * @param activity
+ * @returns the human readable event name of the activity
+ */
+export function useEventNameFromActivity({
+  activity,
+  swapRouters = [],
+}: { activity: Activity; swapRouters?: SwapRouter[] }): string {
+  const isERC20Transfer = isSendAccountTransfersEvent(activity)
+  const { data: addressBook } = useAddressBook()
+
+  return useMemo(() => {
+    if (
+      isSendEarnDepositEvent(activity) &&
+      addressBook?.[activity.data.sender] === ContractLabels.SendEarnAffiliate
+    ) {
+      return 'Rewards'
+    }
+    if (isERC20Transfer && addressBook?.[activity.data.t] === ContractLabels.SendEarn) {
+      return 'Deposit'
+    }
+    if (isERC20Transfer && addressBook?.[activity.data.f] === ContractLabels.SendEarn) {
+      return 'Withdraw'
+    }
+    // this should have always been a hook
+    return eventNameFromActivity({ activity, swapRouters })
+  }, [activity, addressBook, isERC20Transfer, swapRouters])
+}
+
+/**
  * Returns the human-readable phrase for event name of the activity for activity details.
  * @param activity - The activity to check.
  * @param swapRouters - Optional list of swap routers to validate the activity against.
  * @param liquidityPools - Optional list of liquidity pools to validate the activity against.
  * @returns
  */
-export function phraseFromActivity(
-  activity: Activity,
-  swapRouters: SwapRouter[] = [],
-  liquidityPools: LiquidityPool[] = []
-) {
+export function phraseFromActivity({
+  activity,
+  swapRouters = [],
+  liquidityPools = [],
+}: { activity: Activity; swapRouters?: SwapRouter[]; liquidityPools?: LiquidityPool[] }): string {
   const { event_name, from_user, to_user, data } = activity
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
@@ -347,12 +411,20 @@ export function phraseFromActivity(
   const isSwapTransfer = isActivitySwapTransfer(activity, swapRouters, liquidityPools)
 
   switch (true) {
-    case isTemporalTransfer:
-      return temporalEventNameFromStatus(data.status)
     case isSendPotTicketPurchase(activity):
       return 'Bought Tickets'
+    case isTemporalSendEarnDepositEvent(activity):
+      return activity.data.status === 'failed'
+        ? 'Failed to deposit to Send Earn'
+        : 'Depositing to Send Earn...'
+    case isSendEarnDepositEvent(activity):
+      return 'Deposited to Send Earn'
+    case isSendEarnWithdrawEvent(activity):
+      return 'Withdrew from Send Earn'
+    case isTemporalTransfer:
+      return temporalEventNameFromStatus(data.status)
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
-      return 'Earned referral reward'
+      return 'Earned revenue share'
     case isSendTokenUpgradeEvent(activity):
       return 'Upgraded'
     case isERC20Transfer && to_user?.send_id === undefined:
@@ -384,13 +456,47 @@ export function phraseFromActivity(
 }
 
 /**
+ * Returns the phrase for event name of the activity for activity details.
+ * @param activity
+ * @returns the phrase for event name of the activity for activity details
+ */
+export function usePhraseFromActivity({
+  activity,
+  swapRouters = [],
+  liquidityPools = [],
+}: { activity: Activity; swapRouters?: SwapRouter[]; liquidityPools?: LiquidityPool[] }): string {
+  const isERC20Transfer = isSendAccountTransfersEvent(activity)
+  const { data: addressBook } = useAddressBook()
+  const isSendEarnDeposit = isSendEarnDepositEvent(activity)
+
+  return useMemo(() => {
+    if (
+      isSendEarnDeposit &&
+      addressBook?.[activity.data.sender] === ContractLabels.SendEarnAffiliate
+    ) {
+      return 'Earned Rewards'
+    }
+    if (isERC20Transfer && addressBook?.[activity.data.t] === ContractLabels.SendEarn) {
+      return 'Deposited to Send Earn'
+    }
+    if (isERC20Transfer && addressBook?.[activity.data.f] === ContractLabels.SendEarn) {
+      return 'Withdrew from Send Earn'
+    }
+    // this should have always been a hook
+    return phraseFromActivity({ activity, swapRouters, liquidityPools })
+  }, [activity, addressBook, isERC20Transfer, isSendEarnDeposit, swapRouters, liquidityPools])
+}
+
+/**
  * Returns the subtext of the activity if there is one.
  */
-export function subtextFromActivity(
-  activity: Activity,
-  swapRouters: SwapRouter[] = [],
-  liquidityPools: LiquidityPool[] = []
-): string | null {
+export function subtextFromActivity({
+  activity,
+  swapRouters = [],
+  liquidityPools = [],
+}: { activity: Activity; swapRouters?: SwapRouter[]; liquidityPools?: LiquidityPool[] }):
+  | string
+  | null {
   const _user = counterpart(activity)
   const { from_user, to_user, data } = activity
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
@@ -453,6 +559,40 @@ export function subtextFromActivity(
   return null
 }
 
+export function useSubtextFromActivity({
+  activity,
+  swapRouters = [],
+  liquidityPools = [],
+}: {
+  activity: Activity
+  swapRouters?: SwapRouter[]
+  liquidityPools?: LiquidityPool[]
+}): string | null {
+  const isERC20Transfer = isSendAccountTransfersEvent(activity)
+  const { data: addressBook } = useAddressBook()
+  return useMemo(() => {
+    if (isTemporalSendEarnDepositEvent(activity)) {
+      if (activity.data.status === 'failed') {
+        return activity.data.error_message || 'Send Earn'
+      }
+      return 'Send Earn'
+    }
+    if (isSendEarnEvent(activity)) {
+      return 'Send Earn'
+    }
+    if (isERC20Transfer) {
+      if (addressBook?.[activity.data.t] === ContractLabels.SendEarn) {
+        return 'Send Earn'
+      }
+      if (addressBook?.[activity.data.f] === ContractLabels.SendEarn) {
+        return 'Send Earn'
+      }
+    }
+    // this should have always been a hook
+    return subtextFromActivity({ activity, swapRouters, liquidityPools })
+  }, [activity, addressBook, isERC20Transfer, swapRouters, liquidityPools])
+}
+
 /**
  * Returns the name of the user from the activity user.
  * The cascading fallback is to:
@@ -479,4 +619,45 @@ export function userNameFromActivityUser(
       }
       return ''
   }
+}
+
+/**
+ * Creates base filtering conditions for activity feed queries to exclude system addresses
+ * like paymasters that should be filtered from activity displays.
+ *
+ * @param extraFrom - Additional addresses to ignore in 'from' field
+ * @param extraTo - Additional addresses to ignore in 'to' field
+ * @returns SQL condition string for use in Supabase queries
+ */
+export function getBaseAddressFilterCondition({
+  extraFrom = [],
+  extraTo = [],
+}: { extraFrom?: `0x${string}`[]; extraTo?: `0x${string}`[] } = {}): string {
+  const paymasterAddresses = Object.values(tokenPaymasterAddress)
+  const sendTokenV0LockboxAddresses = Object.values(sendTokenV0LockboxAddress)
+
+  // Base addresses to ignore in 'from' field
+  const fromIgnoreAddresses = [
+    ...paymasterAddresses, // show fees on send screen instead
+    ...extraFrom,
+  ]
+
+  // Base addresses to ignore in 'to' field
+  const toIgnoreAddresses = [
+    ...paymasterAddresses, // show fees on send screen instead
+    ...sendTokenV0LockboxAddresses, // will instead show the "mint"
+    ...extraTo,
+  ]
+
+  const fromTransferIgnoreValues = pgAddrCondValues(fromIgnoreAddresses)
+  const toTransferIgnoreValues = pgAddrCondValues(toIgnoreAddresses)
+
+  return squish(`
+    data->t.is.null,
+    data->f.is.null,
+    and(
+      data->>t.not.in.(${toTransferIgnoreValues}),
+      data->>f.not.in.(${fromTransferIgnoreValues})
+    )
+  `)
 }

@@ -13,26 +13,26 @@ import {
 import { Check } from '@tamagui/lucide-icons'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconX } from 'app/components/icons'
+import { IconCoin } from 'app/components/icons/IconCoin'
+import { RowLabel } from 'app/components/layout/RowLabel'
+import { usdcCoin } from 'app/data/coins'
 import { total } from 'app/data/sendtags'
+import { useCoin } from 'app/provider/coins'
+import formatAmount from 'app/utils/formatAmount'
 import { usePendingTags } from 'app/utils/tags'
-import { useUser } from 'app/utils/useUser'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useRouter } from 'solito/router'
-import { formatUnits } from 'viem'
-import { useSendtagCheckout } from './checkout-utils'
-import { useReferrer } from 'app/utils/useReferrer'
 import {
   REFERRAL_COOKIE_MAX_AGE,
   REFERRAL_COOKIE_NAME,
   setCookie,
   useReferralCodeCookie,
 } from 'app/utils/useReferralCodeCookie'
+import { useReferrer } from 'app/utils/useReferrer'
+import { useUser } from 'app/utils/useUser'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'solito/router'
+import { formatUnits } from 'viem'
+import { useSendtagCheckout } from './checkout-utils'
 import { ConfirmButton } from './components/checkout-confirm-button'
-import formatAmount from 'app/utils/formatAmount'
-import { RowLabel } from 'app/components/layout/RowLabel'
-import { IconCoin } from 'app/components/icons/IconCoin'
-import { usdcCoin } from 'app/data/coins'
-import { useCoin } from 'app/provider/coins'
 
 export const CheckoutForm = () => {
   const user = useUser()

@@ -7,9 +7,13 @@ import { Events } from './events'
  */
 export const ReferralsDataSchema = z.object({
   /**
-   * The sendtags that were referred
+   * The sendtags that were referred, null if it is a non-sendtag referral such as Send Earn
    */
-  tags: z.array(z.string()),
+  tags: z
+    .array(z.string())
+    .nullable()
+    .optional()
+    .transform((val) => val ?? null),
 })
 
 export const ReferralsEventSchema = BaseEventSchema.extend({

@@ -853,6 +853,697 @@ exports[`shovel config 1`] = `
         "name": "sendtag_checkout_receipts",
       },
     },
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_num",
+          "name": "block_num",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "tx_hash",
+          "name": "tx_hash",
+        },
+        {
+          "column": "tx_idx",
+          "name": "tx_idx",
+        },
+        {
+          "column": "log_idx",
+          "name": "log_idx",
+        },
+        {
+          "column": "log_addr",
+          "filter_op": "equals",
+          "filter_val": "0xa0A5611b9A1071a1D8A308882065c48650bAeE8b",
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "column": "recipient",
+            "indexed": true,
+            "internalType": "address",
+            "name": "recipient",
+            "type": "address",
+          },
+          {
+            "column": "tickets_purchased_total_bps",
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "ticketsPurchasedTotalBps",
+            "type": "uint256",
+          },
+          {
+            "column": "referrer",
+            "indexed": true,
+            "internalType": "address",
+            "name": "referrer",
+            "type": "address",
+          },
+          {
+            "column": "buyer",
+            "indexed": true,
+            "internalType": "address",
+            "name": "buyer",
+            "type": "address",
+          },
+        ],
+        "name": "UserTicketPurchase",
+        "type": "event",
+      },
+      "name": "sendpot_user_ticket_purchases",
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "constraints": "PRIMARY KEY",
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "constraints": "PRIMARY KEY",
+            "name": "block_num",
+            "type": "numeric",
+          },
+          {
+            "constraints": "PRIMARY KEY",
+            "name": "log_idx",
+            "type": "numeric",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "tx_idx",
+            "type": "numeric",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "recipient",
+            "type": "bytea",
+          },
+          {
+            "name": "tickets_purchased_total_bps",
+            "type": "numeric",
+          },
+          {
+            "name": "referrer",
+            "type": "bytea",
+          },
+          {
+            "name": "buyer",
+            "type": "bytea",
+          },
+        ],
+        "name": "sendpot_user_ticket_purchases",
+      },
+    },
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_num",
+          "name": "block_num",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "tx_hash",
+          "name": "tx_hash",
+        },
+        {
+          "column": "tx_idx",
+          "name": "tx_idx",
+        },
+        {
+          "column": "log_idx",
+          "name": "log_idx",
+        },
+        {
+          "column": "log_addr",
+          "filter_op": "equals",
+          "filter_val": "0xa0A5611b9A1071a1D8A308882065c48650bAeE8b",
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "column": "time",
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "time",
+            "type": "uint256",
+          },
+          {
+            "column": "winner",
+            "indexed": false,
+            "internalType": "address",
+            "name": "winner",
+            "type": "address",
+          },
+          {
+            "column": "winning_ticket",
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "winningTicket",
+            "type": "uint256",
+          },
+          {
+            "column": "win_amount",
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "winAmount",
+            "type": "uint256",
+          },
+          {
+            "column": "tickets_purchased_total_bps",
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "ticketsPurchasedTotalBps",
+            "type": "uint256",
+          },
+        ],
+        "name": "JackpotRun",
+        "type": "event",
+      },
+      "name": "sendpot_jackpot_runs",
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "constraints": "PRIMARY KEY",
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "constraints": "PRIMARY KEY",
+            "name": "block_num",
+            "type": "numeric",
+          },
+          {
+            "constraints": "PRIMARY KEY",
+            "name": "log_idx",
+            "type": "numeric",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "tx_idx",
+            "type": "numeric",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "time",
+            "type": "numeric",
+          },
+          {
+            "name": "winner",
+            "type": "bytea",
+          },
+          {
+            "name": "winning_ticket",
+            "type": "numeric",
+          },
+          {
+            "name": "win_amount",
+            "type": "numeric",
+          },
+          {
+            "name": "tickets_purchased_total_bps",
+            "type": "numeric",
+          },
+        ],
+        "name": "sendpot_jackpot_runs",
+      },
+    },
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "tx_hash",
+          "name": "tx_hash",
+        },
+        {
+          "column": "log_addr",
+          "filter_arg": [
+            "0xC4b42349E919e6c66B57d4832B20029b3D0f79Bd",
+          ],
+          "filter_op": "contains",
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "column": "send_earn",
+            "indexed": true,
+            "name": "sendEarn",
+            "type": "address",
+          },
+          {
+            "column": "caller",
+            "indexed": true,
+            "name": "caller",
+            "type": "address",
+          },
+          {
+            "column": "initial_owner",
+            "indexed": false,
+            "name": "initialOwner",
+            "type": "address",
+          },
+          {
+            "column": "vault",
+            "indexed": true,
+            "name": "vault",
+            "type": "address",
+          },
+          {
+            "column": "fee_recipient",
+            "indexed": false,
+            "name": "feeRecipient",
+            "type": "address",
+          },
+          {
+            "column": "collections",
+            "indexed": false,
+            "name": "collections",
+            "type": "address",
+          },
+          {
+            "column": "fee",
+            "indexed": false,
+            "name": "fee",
+            "type": "uint96",
+          },
+          {
+            "column": "salt",
+            "indexed": false,
+            "name": "salt",
+            "type": "bytes32",
+          },
+        ],
+        "name": "CreateSendEarn",
+        "type": "event",
+      },
+      "name": "send_earn_create",
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "send_earn",
+            "type": "bytea",
+          },
+          {
+            "name": "caller",
+            "type": "bytea",
+          },
+          {
+            "name": "initial_owner",
+            "type": "bytea",
+          },
+          {
+            "name": "vault",
+            "type": "bytea",
+          },
+          {
+            "name": "fee_recipient",
+            "type": "bytea",
+          },
+          {
+            "name": "collections",
+            "type": "bytea",
+          },
+          {
+            "name": "fee",
+            "type": "numeric",
+          },
+          {
+            "name": "salt",
+            "type": "bytea",
+          },
+        ],
+        "name": "send_earn_create",
+      },
+    },
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "tx_hash",
+          "name": "tx_hash",
+        },
+        {
+          "column": "log_addr",
+          "filter_arg": [
+            "0xC4b42349E919e6c66B57d4832B20029b3D0f79Bd",
+          ],
+          "filter_op": "contains",
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "column": "affiliate",
+            "indexed": false,
+            "name": "affiliate",
+            "type": "address",
+          },
+          {
+            "column": "send_earn_affiliate",
+            "indexed": false,
+            "name": "send_earn_affiliate",
+            "type": "address",
+          },
+        ],
+        "name": "NewAffiliate",
+        "type": "event",
+      },
+      "name": "send_earn_new_affiliate",
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "affiliate",
+            "type": "bytea",
+          },
+          {
+            "name": "send_earn_affiliate",
+            "type": "bytea",
+          },
+        ],
+        "name": "send_earn_new_affiliate",
+      },
+    },
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "tx_hash",
+          "name": "tx_hash",
+        },
+        {
+          "column": "log_addr",
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "column": "sender",
+            "indexed": true,
+            "name": "sender",
+            "type": "address",
+          },
+          {
+            "column": "owner",
+            "indexed": true,
+            "name": "owner",
+            "type": "address",
+          },
+          {
+            "column": "assets",
+            "indexed": false,
+            "name": "assets",
+            "type": "uint256",
+          },
+          {
+            "column": "shares",
+            "indexed": false,
+            "name": "shares",
+            "type": "uint256",
+          },
+        ],
+        "name": "Deposit",
+        "type": "event",
+      },
+      "name": "send_earn_deposit",
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "sender",
+            "type": "bytea",
+          },
+          {
+            "name": "owner",
+            "type": "bytea",
+          },
+          {
+            "name": "assets",
+            "type": "numeric",
+          },
+          {
+            "name": "shares",
+            "type": "numeric",
+          },
+        ],
+        "name": "send_earn_deposit",
+      },
+    },
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "tx_hash",
+          "name": "tx_hash",
+        },
+        {
+          "column": "log_addr",
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "column": "sender",
+            "indexed": true,
+            "name": "sender",
+            "type": "address",
+          },
+          {
+            "column": "receiver",
+            "indexed": true,
+            "name": "receiver",
+            "type": "address",
+          },
+          {
+            "column": "owner",
+            "indexed": true,
+            "name": "owner",
+            "type": "address",
+          },
+          {
+            "column": "assets",
+            "indexed": false,
+            "name": "assets",
+            "type": "uint256",
+          },
+          {
+            "column": "shares",
+            "indexed": false,
+            "name": "shares",
+            "type": "uint256",
+          },
+        ],
+        "name": "Withdraw",
+        "type": "event",
+      },
+      "name": "send_earn_withdraw",
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "sender",
+            "type": "bytea",
+          },
+          {
+            "name": "receiver",
+            "type": "bytea",
+          },
+          {
+            "name": "owner",
+            "type": "bytea",
+          },
+          {
+            "name": "assets",
+            "type": "numeric",
+          },
+          {
+            "name": "shares",
+            "type": "numeric",
+          },
+        ],
+        "name": "send_earn_withdraw",
+      },
+    },
   ],
   "pg_url": "$DATABASE_URL",
   "sources": [
@@ -861,9 +1552,14 @@ exports[`shovel config 1`] = `
       "chain_id": "$BASE_CHAIN_ID",
       "concurrency": 1,
       "name": "base_block_headers",
-      "url": "$BASE_RPC_URL",
+      "url": "$BASE_RPC_URL_PRIMARY",
       "urls": [
-        "$BASE_RPC_URL",
+        "$BASE_RPC_URL_PRIMARY",
+        "$BASE_RPC_URL_BACKUP1",
+        "$BASE_RPC_URL_PRIMARY",
+        "$BASE_RPC_URL_BACKUP2",
+        "$BASE_RPC_URL_PRIMARY",
+        "$BASE_RPC_URL_BACKUP3",
       ],
     },
     {
@@ -871,9 +1567,14 @@ exports[`shovel config 1`] = `
       "chain_id": "$BASE_CHAIN_ID",
       "concurrency": 2,
       "name": "base_logs",
-      "url": "$BASE_RPC_URL",
+      "url": "$BASE_RPC_URL_PRIMARY",
       "urls": [
-        "$BASE_RPC_URL",
+        "$BASE_RPC_URL_PRIMARY",
+        "$BASE_RPC_URL_BACKUP1",
+        "$BASE_RPC_URL_PRIMARY",
+        "$BASE_RPC_URL_BACKUP2",
+        "$BASE_RPC_URL_PRIMARY",
+        "$BASE_RPC_URL_BACKUP3",
       ],
     },
   ],

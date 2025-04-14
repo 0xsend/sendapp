@@ -143,6 +143,7 @@ export function useAccountNonce({
 }): UseQueryReturnType<bigint, Error> {
   return useWagmiQuery({
     queryKey: [useAccountNonceQueryKey, sender],
+    enabled: sender !== undefined,
     queryFn: async () => {
       assert(sender !== undefined, 'No sender found')
       const nonce = await getAccountNonce(baseMainnetClient, {
@@ -202,6 +203,15 @@ function userOpQueryOptions({
         paymasterData,
       },
     ] as const,
+    retry(failureCount, error) {
+      debug('userOpQueryOptions retry', `failureCount=${failureCount}`, error)
+      if (error) {
+        if (error.message === ERR_MSG_NOT_ENOUGH_USDC) {
+          return false
+        }
+      }
+      return failureCount < 3
+    },
     queryFn: async ({
       queryKey: [
         ,
@@ -227,6 +237,20 @@ function userOpQueryOptions({
       assert(maxFeePerGas !== undefined, 'No max fee per gas found')
       assert(maxPriorityFeePerGas !== undefined, 'No max priority fee per gas found')
 
+      debug('useUserOpGasEstimate', {
+        sender,
+        nonce,
+        calls,
+        callGasLimit,
+        chainId,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        paymaster,
+        paymasterVerificationGasLimit,
+        paymasterPostOpGasLimit,
+        paymasterData,
+      })
+
       const callData = encodeFunctionData({
         abi: sendAccountAbi,
         functionName: 'executeBatch',
@@ -249,6 +273,7 @@ function userOpQueryOptions({
       const userOp: UserOperation<'v0.7'> = {
         ...defaultUserOp,
         ...paymasterDefaults,
+        callGasLimit: callGasLimit ?? defaultUserOp.callGasLimit,
         maxFeePerGas,
         maxPriorityFeePerGas,
         sender,
@@ -292,6 +317,8 @@ function userOpQueryOptions({
  * Generates and prepares a UserOperation encoding the calls into the calldata. If no sender or calls are provided, it will
  * pause the query. It relies on the useAccountNonce hook to get the nonce and the useEstimateFeesPerGas hook to get the
  * gas fees.
+ *
+ * TODO: add nonce to the userop params, until then you must manually invalidate the nonce query
  */
 export function useUserOp({
   sender,
@@ -301,16 +328,17 @@ export function useUserOp({
   paymasterVerificationGasLimit,
   paymasterPostOpGasLimit,
   paymasterData,
+  chainId = baseMainnetClient.chain.id,
 }: {
   sender: Address | undefined
   callGasLimit?: bigint | undefined
-  calls?: SendAccountCall[] | undefined
+  calls: SendAccountCall[] | undefined
   paymaster?: Hex
   paymasterVerificationGasLimit?: bigint
   paymasterPostOpGasLimit?: bigint
   paymasterData?: Hex
+  chainId?: keyof typeof entryPointAddress
 }): UseQueryReturnType<UserOperation<'v0.7'>, Error> {
-  const chainId = baseMainnetClient.chain.id
   const { data: nonce, error: nonceError, isLoading: isLoadingNonce } = useAccountNonce({ sender })
   const {
     data: feesPerGas,
@@ -376,6 +404,8 @@ export function useUserOp({
   })
 }
 
+const ERR_MSG_NOT_ENOUGH_USDC = 'Not enough USDC to cover transaction fees'
+
 /**
  * User operation errors are not very helpful and confusing. This function converts them to something more helpful.
  */
@@ -395,7 +425,7 @@ export function throwNiceError(e: Error & { cause?: Error }): never {
     case cause instanceof PaymasterValidationRevertedError: {
       switch (cause.details) {
         case `FailedOpWithRevert(0,"AA33 reverted",Error(ERC20: transfer amount exceeds balance))`:
-          throw new Error('Not enough USDC to cover transaction fees')
+          throw new Error(ERR_MSG_NOT_ENOUGH_USDC)
         default:
           throw e
       }

@@ -1,31 +1,35 @@
 import {
   Fade,
+  H4,
   Paragraph,
   Separator,
   Stack,
+  Text,
   XStack,
   YStack,
-  Text,
-  H4,
   type StackProps,
 } from '@my/ui'
-import {
-  phraseFromActivity,
-  amountFromActivity,
-  subtextFromActivity,
-  isActivitySwapTransfer,
-  noteFromActivity,
-} from 'app/utils/activity'
-import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
 import { IconX } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
-import type { Activity } from 'app/utils/zod/activity'
+import { ContractLabels } from 'app/data/contract-labels'
+import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
 import {
+  isActivitySwapTransfer,
+  noteFromActivity,
+  useEventNameFromActivity,
+  usePhraseFromActivity,
+  useSubtextFromActivity,
+} from 'app/utils/activity'
+import { useAmountFromActivity } from 'app/utils/activity-hooks'
+import { useAddressBook } from 'app/utils/useAddressBook'
+import { useLiquidityPools } from 'app/utils/useLiquidityPools'
+import { useSwapRouters } from 'app/utils/useSwapRouters'
+import { isSendEarnEvent, type Activity } from 'app/utils/zod/activity'
+import {
+  isSendAccountTransfersEvent,
   isSendtagCheckoutEvent,
   isSendTokenUpgradeEvent,
 } from 'app/utils/zod/activity/SendAccountTransfersEventSchema'
-import { useSwapRouters } from 'app/utils/useSwapRouters'
-import { useLiquidityPools } from 'app/utils/useLiquidityPools'
 
 export const ActivityDetails = ({
   activity,
@@ -37,10 +41,17 @@ export const ActivityDetails = ({
 } & StackProps) => {
   const { data: swapRouters } = useSwapRouters()
   const { data: liquidityPools } = useLiquidityPools()
-  const activityText = phraseFromActivity(activity, swapRouters, liquidityPools)
-  const subText = subtextFromActivity(activity, swapRouters, liquidityPools)
-  const amount = amountFromActivity(activity, swapRouters, liquidityPools)
+  const activityEventName = useEventNameFromActivity({ activity, swapRouters })
+  const activityPhrase = usePhraseFromActivity({ activity, swapRouters, liquidityPools })
+  const subText = useSubtextFromActivity({ activity, swapRouters, liquidityPools })
+  const amount = useAmountFromActivity(activity)
   const note = noteFromActivity(activity)
+  const isERC20Transfer = isSendAccountTransfersEvent(activity)
+  const addressBook = useAddressBook()
+  const isERC20TransferToSendEarn =
+    isERC20Transfer && addressBook?.data?.[activity.data.t] === ContractLabels.SendEarn
+  const isERC20TransferFromSendEarn =
+    isERC20Transfer && addressBook?.data?.[activity.data.f] === ContractLabels.SendEarn
 
   return (
     <Fade {...props}>
@@ -72,20 +83,36 @@ export const ActivityDetails = ({
                   {(() => {
                     switch (true) {
                       case isActivitySwapTransfer(activity, swapRouters, liquidityPools):
-                        return <Text>{activityText}</Text>
+                        return <Text>{activityPhrase}</Text>
                       default:
                         return <Text>{subText}</Text>
                     }
                   })()} {(() => {
                     switch (true) {
                       case isSendtagCheckoutEvent(activity):
-                        return null
+                        return (
+                          <Text
+                            color={'$silverChalice'}
+                            textTransform={'lowercase'}
+                            $theme-light={{
+                              color: '$darkGrayTextField',
+                            }}
+                          >
+                            {activityEventName}
+                          </Text>
+                        )
                       case isSendTokenUpgradeEvent(activity):
                         return null
                       case isActivitySwapTransfer(activity, swapRouters, liquidityPools):
                         return null
+                      case isSendEarnEvent(activity):
+                        return null
+                      case isERC20TransferToSendEarn || isERC20TransferFromSendEarn:
+                        return null
+                      case !activityPhrase:
+                        return null
                       case subText === null:
-                        return <Text>{activityText}</Text>
+                        return <Text>{activityPhrase}</Text>
                       default:
                         return (
                           <Text
@@ -95,7 +122,7 @@ export const ActivityDetails = ({
                               color: '$darkGrayTextField',
                             }}
                           >
-                            {activityText}
+                            {activityPhrase}
                           </Text>
                         )
                     }
@@ -145,7 +172,7 @@ export const ActivityDetails = ({
                   color: '$darkGrayTextField',
                 }}
               >
-                {activityText} on
+                {activityPhrase} on
               </Paragraph>
               <Paragraph
                 size={'$5'}

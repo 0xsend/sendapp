@@ -1,0 +1,2581 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ActivityScreen renders activity screen 1`] = `
+<View
+  style={
+    {
+      "flex": 1,
+      "flexDirection": "column",
+      "gap": 32,
+      "paddingBottom": 13,
+      "paddingTop": 13,
+      "width": "100%",
+    }
+  }
+>
+  <View
+    collapsable={false}
+    forwardedRef={[Function]}
+    jestAnimatedStyle={
+      {
+        "value": {
+          "opacity": {
+            "callStart": null,
+            "callback": [Function],
+            "current": 1,
+            "finished": true,
+            "lastTimestamp": 0,
+            "omega0": 14.433756729740644,
+            "omega1": 11.785113019775793,
+            "onFrame": [Function],
+            "onStart": [Function],
+            "reduceMotion": false,
+            "startTimestamp": 0,
+            "startValue": 1,
+            "timestamp": 0,
+            "toValue": 1,
+            "velocity": 0,
+            "zeta": 0.5773502691896257,
+          },
+          "transform": [
+            {
+              "translateY": {
+                "callStart": null,
+                "callback": [Function],
+                "current": 0,
+                "finished": true,
+                "lastTimestamp": 0,
+                "omega0": 14.433756729740644,
+                "omega1": 11.785113019775793,
+                "onFrame": [Function],
+                "onStart": [Function],
+                "reduceMotion": false,
+                "startTimestamp": 0,
+                "startValue": 0,
+                "timestamp": 0,
+                "toValue": 0,
+                "velocity": 0,
+                "zeta": 0.5773502691896257,
+              },
+            },
+          ],
+        },
+      }
+    }
+    style={
+      {
+        "flex": 1,
+        "flexDirection": "column",
+        "gap": 18,
+        "opacity": 1,
+        "transform": [
+          {
+            "translateY": 0,
+          },
+        ],
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "flex": 1,
+          "flexDirection": "row",
+          "gap": 24,
+          "height": 0,
+          "width": "100%",
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "display": "flex",
+            "flex": 1,
+            "flexDirection": "column",
+          }
+        }
+      >
+        <RCTScrollView
+          ListFooterComponent={null}
+          data={
+            [
+              {
+                "data": [
+                  {
+                    "created_at": 2024-05-26T13:38:25.000Z,
+                    "data": {
+                      "block_num": 15164540n,
+                      "coin": {
+                        "coingeckoTokenId": "usd-coin",
+                        "decimals": 6,
+                        "formatDecimals": 2,
+                        "label": "USDC",
+                        "symbol": "USDC",
+                        "token": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                      },
+                      "f": "0x760E2928C3aa3aF87897bE52eb4833d42bbB27cf",
+                      "log_addr": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                      "log_idx": 2n,
+                      "t": "0xbf65EE06b43B9cA718216241f0b9F81b5ff30CC1",
+                      "tx_hash": "0xf1443b5abd14e6212dda2d9f5ff1d1d691599de3e8fa019ccc19b909d9bb46a4",
+                      "tx_idx": 0n,
+                      "v": 19032n,
+                    },
+                    "event_name": "send_account_transfers",
+                    "from_user": null,
+                    "to_user": {
+                      "avatar_url": null,
+                      "id": "97476407-bf7f-4ebe-86aa-c9d18a0b388a",
+                      "name": null,
+                      "send_id": 65244,
+                      "tags": [
+                        "asdf",
+                        "teq",
+                        "yuw",
+                      ],
+                    },
+                  },
+                  {
+                    "created_at": 2024-05-26T19:41:05.370Z,
+                    "data": {
+                      "block_num": 15164541n,
+                      "coin": {
+                        "coingeckoTokenId": "ethereum",
+                        "decimals": 18,
+                        "formatDecimals": 5,
+                        "label": "Ethereum",
+                        "symbol": "ETH",
+                        "token": "eth",
+                      },
+                      "log_addr": "0x71fa02bb11e4b119bEDbeeD2f119F62048245301",
+                      "log_idx": 2n,
+                      "tags": [
+                        "yuw",
+                      ],
+                      "tx_hash": "0x37c4281422413a3a78e765452c47abb5c3a95c102282bdd3632ced0b640d861c",
+                      "tx_idx": 0n,
+                      "value": 20000000000000000n,
+                    },
+                    "event_name": "tag_receipts",
+                    "from_user": {
+                      "avatar_url": null,
+                      "id": "97476407-bf7f-4ebe-86aa-c9d18a0b388a",
+                      "name": null,
+                      "send_id": 65244,
+                      "tags": [
+                        "asdf",
+                        "teq",
+                        "yuw",
+                      ],
+                    },
+                    "to_user": null,
+                  },
+                  {
+                    "created_at": 2024-05-26T19:41:05.370Z,
+                    "data": {
+                      "tags": [
+                        "disconnect_whorl7351",
+                      ],
+                    },
+                    "event_name": "referrals",
+                    "from_user": {
+                      "avatar_url": null,
+                      "id": "97476407-bf7f-4ebe-86aa-c9d18a0b388a",
+                      "name": null,
+                      "send_id": 65244,
+                      "tags": [
+                        "asdf",
+                        "teq",
+                        "yuw",
+                      ],
+                    },
+                    "to_user": {
+                      "avatar_url": "https://i.pravatar.cc/500?u=Hortense Ratke",
+                      "id": null,
+                      "name": "Mr. Dan Conn",
+                      "send_id": 12530,
+                      "tags": [
+                        "disconnect_whorl7351",
+                      ],
+                    },
+                  },
+                  {
+                    "created_at": 2024-05-26T19:41:05.370Z,
+                    "data": {
+                      "block_num": 15164541n,
+                      "coin": {
+                        "coingeckoTokenId": "usd-coin",
+                        "decimals": 6,
+                        "formatDecimals": 2,
+                        "label": "USDC",
+                        "symbol": "USDC",
+                        "token": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                      },
+                      "log_addr": "0x71fa02bb11e4b119bEDbeeD2f119F62048245301",
+                      "log_idx": 2n,
+                      "tags": [
+                        "tag_receipt_usdc",
+                      ],
+                      "tx_hash": "0x37c4281422413a3a78e765452c47abb5c3a95c102282bdd3632ced0b640d861c",
+                      "tx_idx": 0n,
+                      "value": 2000000n,
+                    },
+                    "event_name": "tag_receipt_usdc",
+                    "from_user": {
+                      "avatar_url": null,
+                      "id": "97476407-bf7f-4ebe-86aa-c9d18a0b388a",
+                      "name": null,
+                      "send_id": 65244,
+                      "tags": [
+                        "asdf",
+                        "teq",
+                      ],
+                    },
+                    "to_user": null,
+                  },
+                ],
+                "index": 0,
+                "title": "May 26",
+              },
+              {
+                "data": [
+                  {
+                    "created_at": 2024-05-29T13:34:26.000Z,
+                    "data": {
+                      "account": "\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1",
+                      "block_num": "15164541",
+                      "key": [
+                        "\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07",
+                        "\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43",
+                      ],
+                      "key_slot": 0,
+                      "log_addr": "\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1",
+                      "log_idx": "2",
+                      "tx_hash": "\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85",
+                      "tx_idx": "0",
+                    },
+                    "event_name": "send_account_signing_key_added",
+                    "from_user": {
+                      "avatar_url": null,
+                      "id": "97476407-bf7f-4ebe-86aa-c9d18a0b388a",
+                      "name": null,
+                      "send_id": 55617,
+                      "tags": null,
+                    },
+                    "to_user": null,
+                  },
+                  {
+                    "created_at": 2024-05-29T13:34:26.000Z,
+                    "data": {
+                      "account": "\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1",
+                      "block_num": "15164542",
+                      "key": [
+                        "\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07",
+                        "\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43",
+                      ],
+                      "key_slot": 0,
+                      "log_addr": "\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1",
+                      "log_idx": "2",
+                      "tx_hash": "\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85",
+                      "tx_idx": "0",
+                    },
+                    "event_name": "send_account_signing_key_removed",
+                    "from_user": {
+                      "avatar_url": null,
+                      "id": "97476407-bf7f-4ebe-86aa-c9d18a0b388a",
+                      "name": null,
+                      "send_id": 55617,
+                      "tags": null,
+                    },
+                    "to_user": null,
+                  },
+                  {
+                    "created_at": 2024-05-29T14:47:36.000Z,
+                    "data": {
+                      "block_num": 25254355n,
+                      "coin": {
+                        "coingeckoTokenId": "send-token-2",
+                        "decimals": 18,
+                        "formatDecimals": 0,
+                        "label": "Send",
+                        "symbol": "SEND",
+                        "token": "0xEab49138BA2Ea6dd776220fE26b7b8E446638956",
+                      },
+                      "f": "0x0000000000000000000000000000000000000000",
+                      "log_addr": "0xEab49138BA2Ea6dd776220fE26b7b8E446638956",
+                      "log_idx": 5n,
+                      "t": "0x649667EfCcf6497290616e7A669024ffEAF75968",
+                      "tx_hash": "0xc8e94001e225e3d4570c352a3811de04586c1cfabc8b7c9367d477fcf003424d",
+                      "tx_idx": 0n,
+                      "v": 10000000000000000000000n,
+                    },
+                    "event_name": "send_account_transfers",
+                    "from_user": null,
+                    "to_user": {
+                      "avatar_url": null,
+                      "id": "5c833c74-5a6c-461d-8612-b4982d7a7b51",
+                      "name": null,
+                      "send_id": 48,
+                      "tags": [
+                        "asfd",
+                      ],
+                    },
+                  },
+                ],
+                "index": 1,
+                "title": "May 29",
+              },
+              {
+                "data": [
+                  {
+                    "created_at": 2024-05-27T13:36:07.156Z,
+                    "data": {
+                      "block_num": 15164541n,
+                      "coin": {
+                        "coingeckoTokenId": "usd-coin",
+                        "decimals": 6,
+                        "formatDecimals": 2,
+                        "label": "USDC",
+                        "symbol": "USDC",
+                        "token": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                      },
+                      "f": "0x760E2928C3aa3aF87897bE52eb4833d42bbB27cf",
+                      "log_addr": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                      "log_idx": 2n,
+                      "t": "0xbf65EE06b43B9cA718216241f0b9F81b5ff30CC1",
+                      "tx_hash": "0xf1443b5abd14e6212dda2d9f5ff1d1d691599de3e8fa019ccc19b909d9bb46a4",
+                      "tx_idx": 0n,
+                      "v": 77777n,
+                    },
+                    "event_name": "send_account_transfers",
+                    "from_user": {
+                      "avatar_url": null,
+                      "id": "97476407-bf7f-4ebe-86aa-c9d18a0b388a",
+                      "name": null,
+                      "send_id": 65244,
+                      "tags": [
+                        "asdf",
+                        "teq",
+                        "yuw",
+                      ],
+                    },
+                    "to_user": {
+                      "avatar_url": "https://i.pravatar.cc/500?u=Hortense Ratke",
+                      "id": null,
+                      "name": "Mr. Dan Conn",
+                      "send_id": 12530,
+                      "tags": [
+                        "dan",
+                      ],
+                    },
+                  },
+                ],
+                "index": 2,
+                "title": "May 27",
+              },
+              {
+                "data": [
+                  {
+                    "created_at": 2024-06-12T00:31:48.000Z,
+                    "data": {
+                      "block_num": 15681483n,
+                      "coin": {
+                        "coingeckoTokenId": "ethereum",
+                        "decimals": 18,
+                        "formatDecimals": 5,
+                        "label": "Ethereum",
+                        "symbol": "ETH",
+                        "token": "eth",
+                      },
+                      "log_addr": "0xB2c21F54653531aa4AffA80F63593913f0C70628",
+                      "log_idx": 0n,
+                      "sender": "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720",
+                      "tx_hash": "0xeec33cc50042cbba53fc1de714bd99b206635f890dbe29771c7986df6da0f6af",
+                      "tx_idx": 0n,
+                      "value": 10000000000000000n,
+                    },
+                    "event_name": "send_account_receives",
+                    "from_user": {
+                      "avatar_url": null,
+                      "id": null,
+                      "name": null,
+                      "send_id": 65244,
+                      "tags": null,
+                    },
+                    "to_user": {
+                      "avatar_url": null,
+                      "id": "97476407-bf7f-4ebe-86aa-c9d18a0b388a",
+                      "name": null,
+                      "send_id": 65244,
+                      "tags": [
+                        "asdf",
+                        "teq",
+                        "yuw",
+                      ],
+                    },
+                  },
+                ],
+                "index": 3,
+                "title": "June 12",
+              },
+              {
+                "data": [
+                  {
+                    "created_at": 2024-07-18T19:32:08.000Z,
+                    "data": {
+                      "block_num": 17270890n,
+                      "coin": {
+                        "coingeckoTokenId": "usd-coin",
+                        "decimals": 6,
+                        "formatDecimals": 2,
+                        "label": "USDC",
+                        "symbol": "USDC",
+                        "token": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                      },
+                      "f": "0xfC1e51BBae1C1Ee9e6Cc629ea0023329EA5023a6",
+                      "log_addr": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                      "log_idx": 4n,
+                      "t": "0x29369A06d3c17897E819C43202A7f4A1004B20cF",
+                      "tx_hash": "0x797a6a0fdd1c849e4e6e58bdc02966d19cff1eb8ef257216914288e715e460b8",
+                      "tx_idx": 0n,
+                      "v": 8000000n,
+                    },
+                    "event_name": "send_account_transfers",
+                    "from_user": null,
+                    "to_user": {
+                      "avatar_url": null,
+                      "id": "5def5ec4-7f0e-4509-990f-d52e85e95187",
+                      "name": null,
+                      "send_id": 64705,
+                      "tags": null,
+                    },
+                  },
+                ],
+                "index": 4,
+                "title": "July 18",
+              },
+              {
+                "data": [
+                  {
+                    "created_at": 2025-01-29T14:47:36.000Z,
+                    "data": {
+                      "assets": 1000000000000000000n,
+                      "block_num": 12345n,
+                      "log_addr": "0x5AFE000000000000000000000000000000000000",
+                      "log_idx": 0n,
+                      "owner": "0xB0b0000000000000000000000000000000000000",
+                      "sender": "0xB0b0000000000000000000000000000000000000",
+                      "shares": 950000000000000000n,
+                      "tx_hash": "0x1234567890123456789012345678901234567890123456789012345678901234",
+                      "tx_idx": 0n,
+                    },
+                    "event_name": "send_earn_deposit",
+                    "from_user": {
+                      "avatar_url": null,
+                      "id": "5c833c74-5a6c-461d-8612-b4982d7a7b51",
+                      "name": null,
+                      "send_id": 48,
+                      "tags": [
+                        "asfd",
+                      ],
+                    },
+                    "to_user": null,
+                  },
+                ],
+                "index": 5,
+                "title": "January 29",
+              },
+              {
+                "data": [
+                  {
+                    "created_at": 2025-02-15T14:47:36.000Z,
+                    "data": {
+                      "assets": 5000000000000000000n,
+                      "block_num": 12345n,
+                      "log_addr": "0x5AFE000000000000000000000000000000000000",
+                      "log_idx": 0n,
+                      "owner": "0xB0b0000000000000000000000000000000000000",
+                      "receiver": "0xB0b0000000000000000000000000000000000000",
+                      "sender": "0xB0b0000000000000000000000000000000000000",
+                      "shares": 475000000000000000n,
+                      "tx_hash": "0x1234567890123456789012345678901234567890123456789012345678901234",
+                      "tx_idx": 0n,
+                    },
+                    "event_name": "send_earn_withdraw",
+                    "from_user": null,
+                    "to_user": {
+                      "avatar_url": null,
+                      "id": "5c833c74-5a6c-461d-8612-b4982d7a7b51",
+                      "name": null,
+                      "send_id": 48,
+                      "tags": [
+                        "asfd",
+                      ],
+                    },
+                  },
+                ],
+                "index": 6,
+                "title": "February 15",
+              },
+            ]
+          }
+          getItem={[Function]}
+          getItemCount={[Function]}
+          keyExtractor={[Function]}
+          onContentSizeChange={[Function]}
+          onEndReached={[Function]}
+          onLayout={[Function]}
+          onMomentumScrollBegin={[Function]}
+          onMomentumScrollEnd={[Function]}
+          onScroll={[Function]}
+          onScrollBeginDrag={[Function]}
+          onScrollEndDrag={[Function]}
+          renderItem={[Function]}
+          scrollEventThrottle={0.0001}
+          showsVerticalScrollIndicator={false}
+          stickyHeaderIndices={
+            [
+              0,
+              6,
+            ]
+          }
+          testID="RecentActivity"
+        >
+          <View>
+            <View
+              onFocusCapture={[Function]}
+              onLayout={[Function]}
+              style={null}
+            >
+              <Text
+                accessibilityRole="header"
+                style={
+                  {
+                    "backgroundColor": "#081619",
+                    "color": "#FFFFFF",
+                    "fontFamily": "System",
+                    "fontSize": 20,
+                    "fontWeight": "700",
+                    "lineHeight": 24,
+                    "marginBottom": 0,
+                    "marginLeft": 0,
+                    "marginRight": 0,
+                    "marginTop": 0,
+                    "paddingBottom": 16,
+                    "paddingTop": 0,
+                    "textTransform": "none",
+                    "userSelect": "auto",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                May 26
+              </Text>
+            </View>
+            <View
+              onFocusCapture={[Function]}
+              onLayout={[Function]}
+              style={null}
+            >
+              <View
+                style={
+                  {
+                    "backgroundColor": "#111f22",
+                    "borderTopLeftRadius": 9,
+                    "borderTopRightRadius": 9,
+                    "flexDirection": "column",
+                    "paddingLeft": 7,
+                    "paddingRight": 7,
+                    "paddingTop": 7,
+                  }
+                }
+              >
+                <View
+                  cancelable={true}
+                  disabled={false}
+                  focusable={true}
+                  minPressDuration={0}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onPress={[Function]}
+                  onPressIn={[Function]}
+                  onPressOut={[Function]}
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 9,
+                      "borderBottomRightRadius": 9,
+                      "borderTopLeftRadius": 9,
+                      "borderTopRightRadius": 9,
+                      "flexDirection": "row",
+                      "gap": 18,
+                      "justifyContent": "space-between",
+                      "paddingBottom": 16,
+                      "paddingLeft": 16,
+                      "paddingRight": 16,
+                      "paddingTop": 16,
+                      "width": "100%",
+                    }
+                  }
+                  testID="TokenActivityRow"
+                >
+                  <View
+                    style={
+                      {
+                        "flex": 1,
+                        "flexDirection": "row",
+                        "gap": 16,
+                        "width": "100%",
+                      }
+                    }
+                  >
+                    <View
+                      style={
+                        {
+                          "alignItems": "center",
+                          "borderBottomLeftRadius": 9,
+                          "borderBottomRightRadius": 9,
+                          "borderTopLeftRadius": 9,
+                          "borderTopRightRadius": 9,
+                          "flexDirection": "column",
+                          "gap": 7,
+                          "height": 48,
+                          "justifyContent": "center",
+                          "maxHeight": 48,
+                          "maxWidth": 48,
+                          "minHeight": 48,
+                          "minWidth": 48,
+                          "overflow": "hidden",
+                          "position": "relative",
+                          "width": 48,
+                        }
+                      }
+                    >
+                      <View
+                        style={
+                          {
+                            "bottom": 0,
+                            "flexDirection": "column",
+                            "left": 0,
+                            "position": "absolute",
+                            "right": 0,
+                            "top": 0,
+                            "zIndex": 1,
+                          }
+                        }
+                      >
+                        <Image
+                          fullscreen={true}
+                          onError={[Function]}
+                          onLoad={[Function]}
+                          source={
+                            {
+                              "uri": "https://ui-avatars.com/api/?name=0x760E2928C3aa3aF87897bE52eb4833d42bbB27cf&size=256&format=png&background=86ad7f",
+                            }
+                          }
+                          style={
+                            {
+                              "height": 48,
+                              "width": 48,
+                            }
+                          }
+                        />
+                      </View>
+                      <View
+                        style={
+                          {
+                            "backgroundColor": "#86AE80",
+                            "bottom": 0,
+                            "flexDirection": "column",
+                            "justifyContent": "center",
+                            "left": 0,
+                            "position": "absolute",
+                            "right": 0,
+                            "top": 0,
+                            "zIndex": 0,
+                          }
+                        }
+                      >
+                        <View
+                          style={
+                            {
+                              "alignItems": "center",
+                              "borderBottomLeftRadius": 9,
+                              "borderBottomRightRadius": 9,
+                              "borderTopLeftRadius": 9,
+                              "borderTopRightRadius": 9,
+                              "flexDirection": "column",
+                              "height": 48,
+                              "justifyContent": "center",
+                              "maxHeight": 48,
+                              "maxWidth": 48,
+                              "minHeight": 48,
+                              "minWidth": 48,
+                              "overflow": "hidden",
+                              "position": "relative",
+                              "width": 48,
+                            }
+                          }
+                        >
+                          <View
+                            style={
+                              {
+                                "bottom": 0,
+                                "flexDirection": "column",
+                                "left": 0,
+                                "position": "absolute",
+                                "right": 0,
+                                "top": 0,
+                                "zIndex": 1,
+                              }
+                            }
+                          >
+                            <Image
+                              fullscreen={true}
+                              onError={[Function]}
+                              onLoad={[Function]}
+                              source={
+                                {
+                                  "uri": "https://ui-avatars.com/api/?name=0x760E2928C3aa3aF87897bE52eb4833d42bbB27cf&size=256&format=png&background=86ad7f",
+                                }
+                              }
+                              style={
+                                {
+                                  "height": 48,
+                                  "width": 48,
+                                }
+                              }
+                            />
+                          </View>
+                        </View>
+                      </View>
+                    </View>
+                    <View
+                      style={
+                        {
+                          "flex": 1,
+                          "flexDirection": "column",
+                          "overflow": "hidden",
+                          "width": "100%",
+                        }
+                      }
+                    >
+                      <View
+                        style={
+                          {
+                            "flex": 1,
+                            "flexDirection": "row",
+                            "gap": 4,
+                            "justifyContent": "space-between",
+                            "width": "100%",
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            {
+                              "color": "#FFFFFF",
+                              "fontFamily": "System",
+                              "fontSize": 21.599999999999998,
+                              "fontWeight": "500",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                          Deposit
+                        </Text>
+                         
+                        <Text
+                          style={
+                            {
+                              "color": "#FFFFFF",
+                              "fontFamily": "System",
+                              "fontSize": 21.599999999999998,
+                              "fontWeight": "500",
+                              "textAlign": "right",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                          0.01 USDC
+                        </Text>
+                      </View>
+                      <View
+                        style={
+                          {
+                            "alignItems": "flex-start",
+                            "flex": 1,
+                            "flexDirection": "row",
+                            "gap": 4,
+                            "justifyContent": "space-between",
+                            "overflow": "hidden",
+                            "width": "100%",
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            {
+                              "color": "#B2B2B2",
+                              "fontFamily": "System",
+                              "fontSize": 19.2,
+                              "fontWeight": "400",
+                              "lineHeight": 19,
+                              "maxWidth": "100%",
+                              "overflow": "hidden",
+                              "userSelect": "auto",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                          0x760...27cf
+                        </Text>
+                        <Text
+                          style={
+                            {
+                              "color": "#B2B2B2",
+                              "fontFamily": "System",
+                              "fontSize": 19.2,
+                              "fontWeight": "400",
+                              "lineHeight": 21,
+                              "textAlign": "right",
+                              "userSelect": "auto",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                          7 mon ago
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+            <View
+              onFocusCapture={[Function]}
+              onLayout={[Function]}
+              style={null}
+            >
+              <View
+                style={
+                  {
+                    "backgroundColor": "#111f22",
+                    "flexDirection": "column",
+                    "paddingLeft": 7,
+                    "paddingRight": 7,
+                  }
+                }
+              >
+                <View
+                  cancelable={true}
+                  disabled={false}
+                  focusable={true}
+                  minPressDuration={0}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onPress={[Function]}
+                  onPressIn={[Function]}
+                  onPressOut={[Function]}
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 9,
+                      "borderBottomRightRadius": 9,
+                      "borderTopLeftRadius": 9,
+                      "borderTopRightRadius": 9,
+                      "flexDirection": "row",
+                      "gap": 18,
+                      "justifyContent": "space-between",
+                      "paddingBottom": 16,
+                      "paddingLeft": 16,
+                      "paddingRight": 16,
+                      "paddingTop": 16,
+                      "width": "100%",
+                    }
+                  }
+                  testID="TokenActivityRow"
+                >
+                  <View
+                    style={
+                      {
+                        "flex": 1,
+                        "flexDirection": "row",
+                        "gap": 16,
+                        "width": "100%",
+                      }
+                    }
+                  >
+                    <View
+                      cancelable={true}
+                      disabled={false}
+                      focusable={true}
+                      minPressDuration={0}
+                      onMouseEnter={[Function]}
+                      onMouseLeave={[Function]}
+                      onPress={[Function]}
+                      onPressIn={[Function]}
+                      onPressOut={[Function]}
+                      style={
+                        {
+                          "flexDirection": "row",
+                        }
+                      }
+                    >
+                      <View
+                        testID="MockSolitoLink"
+                      >
+                        <View
+                          style={
+                            {
+                              "alignItems": "center",
+                              "borderBottomLeftRadius": 9,
+                              "borderBottomRightRadius": 9,
+                              "borderTopLeftRadius": 9,
+                              "borderTopRightRadius": 9,
+                              "flexDirection": "column",
+                              "gap": 7,
+                              "height": 48,
+                              "justifyContent": "center",
+                              "maxHeight": 48,
+                              "maxWidth": 48,
+                              "minHeight": 48,
+                              "minWidth": 48,
+                              "overflow": "hidden",
+                              "position": "relative",
+                              "width": 48,
+                            }
+                          }
+                        >
+                          <View
+                            style={
+                              {
+                                "bottom": 0,
+                                "flexDirection": "column",
+                                "left": 0,
+                                "position": "absolute",
+                                "right": 0,
+                                "top": 0,
+                                "zIndex": 1,
+                              }
+                            }
+                          >
+                            <Image
+                              fullscreen={true}
+                              onError={[Function]}
+                              onLoad={[Function]}
+                              style={
+                                {
+                                  "height": 48,
+                                  "width": 48,
+                                }
+                              }
+                            />
+                          </View>
+                          <View
+                            style={
+                              {
+                                "backgroundColor": "#86AE80",
+                                "bottom": 0,
+                                "flexDirection": "column",
+                                "justifyContent": "center",
+                                "left": 0,
+                                "position": "absolute",
+                                "right": 0,
+                                "top": 0,
+                                "zIndex": 0,
+                              }
+                            }
+                          >
+                            <View
+                              style={
+                                {
+                                  "alignItems": "center",
+                                  "borderBottomLeftRadius": 9,
+                                  "borderBottomRightRadius": 9,
+                                  "borderTopLeftRadius": 9,
+                                  "borderTopRightRadius": 9,
+                                  "flexDirection": "column",
+                                  "height": 48,
+                                  "justifyContent": "center",
+                                  "maxHeight": 48,
+                                  "maxWidth": 48,
+                                  "minHeight": 48,
+                                  "minWidth": 48,
+                                  "overflow": "hidden",
+                                  "position": "relative",
+                                  "width": 48,
+                                }
+                              }
+                            >
+                              <View
+                                style={
+                                  {
+                                    "bottom": 0,
+                                    "flexDirection": "column",
+                                    "left": 0,
+                                    "position": "absolute",
+                                    "right": 0,
+                                    "top": 0,
+                                    "zIndex": 1,
+                                  }
+                                }
+                              >
+                                <Image
+                                  fullscreen={true}
+                                  onError={[Function]}
+                                  onLoad={[Function]}
+                                  source={
+                                    {
+                                      "uri": "https://ui-avatars.com/api/?name=asdf&size=256&format=png&background=86ad7f",
+                                    }
+                                  }
+                                  style={
+                                    {
+                                      "height": 48,
+                                      "width": 48,
+                                    }
+                                  }
+                                />
+                              </View>
+                            </View>
+                          </View>
+                        </View>
+                      </View>
+                    </View>
+                    <View
+                      style={
+                        {
+                          "flex": 1,
+                          "flexDirection": "column",
+                          "overflow": "hidden",
+                          "width": "100%",
+                        }
+                      }
+                    >
+                      <View
+                        style={
+                          {
+                            "flex": 1,
+                            "flexDirection": "row",
+                            "gap": 4,
+                            "justifyContent": "space-between",
+                            "width": "100%",
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            {
+                              "color": "#FFFFFF",
+                              "fontFamily": "System",
+                              "fontSize": 21.599999999999998,
+                              "fontWeight": "500",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                          Sendtag Registered
+                        </Text>
+                         
+                        <Text
+                          style={
+                            {
+                              "color": "#FFFFFF",
+                              "fontFamily": "System",
+                              "fontSize": 21.599999999999998,
+                              "fontWeight": "500",
+                              "textAlign": "right",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                          0.02 ETH
+                        </Text>
+                      </View>
+                      <View
+                        style={
+                          {
+                            "alignItems": "flex-start",
+                            "flex": 1,
+                            "flexDirection": "row",
+                            "gap": 4,
+                            "justifyContent": "space-between",
+                            "overflow": "hidden",
+                            "width": "100%",
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            {
+                              "color": "#B2B2B2",
+                              "fontFamily": "System",
+                              "fontSize": 19.2,
+                              "fontWeight": "400",
+                              "lineHeight": 19,
+                              "maxWidth": "100%",
+                              "overflow": "hidden",
+                              "userSelect": "auto",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                          /yuw
+                        </Text>
+                        <Text
+                          style={
+                            {
+                              "color": "#B2B2B2",
+                              "fontFamily": "System",
+                              "fontSize": 19.2,
+                              "fontWeight": "400",
+                              "lineHeight": 21,
+                              "textAlign": "right",
+                              "userSelect": "auto",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                          7 mon ago
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+            <View
+              onFocusCapture={[Function]}
+              onLayout={[Function]}
+              style={null}
+            >
+              <View
+                style={
+                  {
+                    "backgroundColor": "#111f22",
+                    "flexDirection": "column",
+                    "paddingLeft": 7,
+                    "paddingRight": 7,
+                  }
+                }
+              >
+                <View
+                  cancelable={true}
+                  disabled={false}
+                  focusable={true}
+                  minPressDuration={0}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onPress={[Function]}
+                  onPressIn={[Function]}
+                  onPressOut={[Function]}
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 9,
+                      "borderBottomRightRadius": 9,
+                      "borderTopLeftRadius": 9,
+                      "borderTopRightRadius": 9,
+                      "flexDirection": "row",
+                      "gap": 18,
+                      "justifyContent": "space-between",
+                      "paddingBottom": 16,
+                      "paddingLeft": 16,
+                      "paddingRight": 16,
+                      "paddingTop": 16,
+                      "width": "100%",
+                    }
+                  }
+                  testID="TokenActivityRow"
+                >
+                  <View
+                    style={
+                      {
+                        "flex": 1,
+                        "flexDirection": "row",
+                        "gap": 16,
+                        "width": "100%",
+                      }
+                    }
+                  >
+                    <View
+                      cancelable={true}
+                      disabled={false}
+                      focusable={true}
+                      minPressDuration={0}
+                      onMouseEnter={[Function]}
+                      onMouseLeave={[Function]}
+                      onPress={[Function]}
+                      onPressIn={[Function]}
+                      onPressOut={[Function]}
+                      style={
+                        {
+                          "flexDirection": "row",
+                        }
+                      }
+                    >
+                      <View
+                        testID="MockSolitoLink"
+                      >
+                        <View
+                          style={
+                            {
+                              "alignItems": "center",
+                              "borderBottomLeftRadius": 9,
+                              "borderBottomRightRadius": 9,
+                              "borderTopLeftRadius": 9,
+                              "borderTopRightRadius": 9,
+                              "flexDirection": "column",
+                              "gap": 7,
+                              "height": 48,
+                              "justifyContent": "center",
+                              "maxHeight": 48,
+                              "maxWidth": 48,
+                              "minHeight": 48,
+                              "minWidth": 48,
+                              "overflow": "hidden",
+                              "position": "relative",
+                              "width": 48,
+                            }
+                          }
+                        >
+                          <View
+                            style={
+                              {
+                                "bottom": 0,
+                                "flexDirection": "column",
+                                "left": 0,
+                                "position": "absolute",
+                                "right": 0,
+                                "top": 0,
+                                "zIndex": 1,
+                              }
+                            }
+                          >
+                            <Image
+                              fullscreen={true}
+                              onError={[Function]}
+                              onLoad={[Function]}
+                              source={
+                                {
+                                  "uri": "https://i.pravatar.cc/500?u=Hortense Ratke",
+                                }
+                              }
+                              style={
+                                {
+                                  "height": 48,
+                                  "width": 48,
+                                }
+                              }
+                            />
+                          </View>
+                          <View
+                            style={
+                              {
+                                "backgroundColor": "#86AE80",
+                                "bottom": 0,
+                                "flexDirection": "column",
+                                "justifyContent": "center",
+                                "left": 0,
+                                "position": "absolute",
+                                "right": 0,
+                                "top": 0,
+                                "zIndex": 0,
+                              }
+                            }
+                          >
+                            <View
+                              style={
+                                {
+                                  "alignItems": "center",
+                                  "borderBottomLeftRadius": 9,
+                                  "borderBottomRightRadius": 9,
+                                  "borderTopLeftRadius": 9,
+                                  "borderTopRightRadius": 9,
+                                  "flexDirection": "column",
+                                  "height": 48,
+                                  "justifyContent": "center",
+                                  "maxHeight": 48,
+                                  "maxWidth": 48,
+                                  "minHeight": 48,
+                                  "minWidth": 48,
+                                  "overflow": "hidden",
+                                  "position": "relative",
+                                  "width": 48,
+                                }
+                              }
+                            >
+                              <View
+                                style={
+                                  {
+                                    "bottom": 0,
+                                    "flexDirection": "column",
+                                    "left": 0,
+                                    "position": "absolute",
+                                    "right": 0,
+                                    "top": 0,
+                                    "zIndex": 1,
+                                  }
+                                }
+                              >
+                                <Image
+                                  fullscreen={true}
+                                  onError={[Function]}
+                                  onLoad={[Function]}
+                                  source={
+                                    {
+                                      "uri": "https://ui-avatars.com/api/?name=Mr. Dan Conn&size=256&format=png&background=86ad7f",
+                                    }
+                                  }
+                                  style={
+                                    {
+                                      "height": 48,
+                                      "width": 48,
+                                    }
+                                  }
+                                />
+                              </View>
+                            </View>
+                          </View>
+                        </View>
+                      </View>
+                    </View>
+                    <View
+                      style={
+                        {
+                          "flex": 1,
+                          "flexDirection": "column",
+                          "overflow": "hidden",
+                          "width": "100%",
+                        }
+                      }
+                    >
+                      <View
+                        style={
+                          {
+                            "flex": 1,
+                            "flexDirection": "row",
+                            "gap": 4,
+                            "justifyContent": "space-between",
+                            "width": "100%",
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            {
+                              "color": "#FFFFFF",
+                              "fontFamily": "System",
+                              "fontSize": 21.599999999999998,
+                              "fontWeight": "500",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                          Referral
+                        </Text>
+                         
+                        <Text
+                          style={
+                            {
+                              "color": "#FFFFFF",
+                              "fontFamily": "System",
+                              "fontSize": 21.599999999999998,
+                              "fontWeight": "500",
+                              "textAlign": "right",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        />
+                      </View>
+                      <View
+                        style={
+                          {
+                            "alignItems": "flex-start",
+                            "flex": 1,
+                            "flexDirection": "row",
+                            "gap": 4,
+                            "justifyContent": "space-between",
+                            "overflow": "hidden",
+                            "width": "100%",
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            {
+                              "color": "#B2B2B2",
+                              "fontFamily": "System",
+                              "fontSize": 19.2,
+                              "fontWeight": "400",
+                              "lineHeight": 19,
+                              "maxWidth": "100%",
+                              "overflow": "hidden",
+                              "userSelect": "auto",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                          /disconnect_whorl7351
+                        </Text>
+                        <Text
+                          style={
+                            {
+                              "color": "#B2B2B2",
+                              "fontFamily": "System",
+                              "fontSize": 19.2,
+                              "fontWeight": "400",
+                              "lineHeight": 21,
+                              "textAlign": "right",
+                              "userSelect": "auto",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                          7 mon ago
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+            <View
+              onFocusCapture={[Function]}
+              onLayout={[Function]}
+              style={null}
+            >
+              <View
+                style={
+                  {
+                    "backgroundColor": "#111f22",
+                    "borderBottomLeftRadius": 9,
+                    "borderBottomRightRadius": 9,
+                    "flexDirection": "column",
+                    "paddingBottom": 7,
+                    "paddingLeft": 7,
+                    "paddingRight": 7,
+                  }
+                }
+              >
+                <View
+                  cancelable={true}
+                  disabled={false}
+                  focusable={true}
+                  minPressDuration={0}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onPress={[Function]}
+                  onPressIn={[Function]}
+                  onPressOut={[Function]}
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 9,
+                      "borderBottomRightRadius": 9,
+                      "borderTopLeftRadius": 9,
+                      "borderTopRightRadius": 9,
+                      "flexDirection": "row",
+                      "gap": 18,
+                      "justifyContent": "space-between",
+                      "paddingBottom": 16,
+                      "paddingLeft": 16,
+                      "paddingRight": 16,
+                      "paddingTop": 16,
+                      "width": "100%",
+                    }
+                  }
+                  testID="TokenActivityRow"
+                >
+                  <View
+                    style={
+                      {
+                        "flex": 1,
+                        "flexDirection": "row",
+                        "gap": 16,
+                        "width": "100%",
+                      }
+                    }
+                  >
+                    <View
+                      style={
+                        {
+                          "alignItems": "center",
+                          "borderBottomLeftRadius": 9,
+                          "borderBottomRightRadius": 9,
+                          "borderTopLeftRadius": 9,
+                          "borderTopRightRadius": 9,
+                          "flexDirection": "column",
+                          "gap": 7,
+                          "height": 48,
+                          "justifyContent": "center",
+                          "maxHeight": 48,
+                          "maxWidth": 48,
+                          "minHeight": 48,
+                          "minWidth": 48,
+                          "overflow": "hidden",
+                          "position": "relative",
+                          "width": 48,
+                        }
+                      }
+                    >
+                      <View
+                        style={
+                          {
+                            "bottom": 0,
+                            "flexDirection": "column",
+                            "left": 0,
+                            "position": "absolute",
+                            "right": 0,
+                            "top": 0,
+                            "zIndex": 1,
+                          }
+                        }
+                      >
+                        <Image
+                          fullscreen={true}
+                          onError={[Function]}
+                          onLoad={[Function]}
+                          source={
+                            {
+                              "uri": "https://ui-avatars.com/api/?name=TODO&size=256&format=png&background=86ad7f",
+                            }
+                          }
+                          style={
+                            {
+                              "height": 48,
+                              "width": 48,
+                            }
+                          }
+                        />
+                      </View>
+                      <View
+                        style={
+                          {
+                            "backgroundColor": "#86AE80",
+                            "bottom": 0,
+                            "flexDirection": "column",
+                            "justifyContent": "center",
+                            "left": 0,
+                            "position": "absolute",
+                            "right": 0,
+                            "top": 0,
+                            "zIndex": 0,
+                          }
+                        }
+                      >
+                        <View
+                          style={
+                            {
+                              "alignItems": "center",
+                              "borderBottomLeftRadius": 9,
+                              "borderBottomRightRadius": 9,
+                              "borderTopLeftRadius": 9,
+                              "borderTopRightRadius": 9,
+                              "flexDirection": "column",
+                              "height": 48,
+                              "justifyContent": "center",
+                              "maxHeight": 48,
+                              "maxWidth": 48,
+                              "minHeight": 48,
+                              "minWidth": 48,
+                              "overflow": "hidden",
+                              "position": "relative",
+                              "width": 48,
+                            }
+                          }
+                        >
+                          <View
+                            style={
+                              {
+                                "bottom": 0,
+                                "flexDirection": "column",
+                                "left": 0,
+                                "position": "absolute",
+                                "right": 0,
+                                "top": 0,
+                                "zIndex": 1,
+                              }
+                            }
+                          >
+                            <Image
+                              fullscreen={true}
+                              onError={[Function]}
+                              onLoad={[Function]}
+                              source={
+                                {
+                                  "uri": "https://ui-avatars.com/api/?name=TODO&size=256&format=png&background=86ad7f",
+                                }
+                              }
+                              style={
+                                {
+                                  "height": 48,
+                                  "width": 48,
+                                }
+                              }
+                            />
+                          </View>
+                        </View>
+                      </View>
+                    </View>
+                    <View
+                      style={
+                        {
+                          "flex": 1,
+                          "flexDirection": "column",
+                          "overflow": "hidden",
+                          "width": "100%",
+                        }
+                      }
+                    >
+                      <View
+                        style={
+                          {
+                            "flex": 1,
+                            "flexDirection": "row",
+                            "gap": 4,
+                            "justifyContent": "space-between",
+                            "width": "100%",
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            {
+                              "color": "#FFFFFF",
+                              "fontFamily": "System",
+                              "fontSize": 21.599999999999998,
+                              "fontWeight": "500",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                          Sendtag Registered
+                        </Text>
+                         
+                        <Text
+                          style={
+                            {
+                              "color": "#FFFFFF",
+                              "fontFamily": "System",
+                              "fontSize": 21.599999999999998,
+                              "fontWeight": "500",
+                              "textAlign": "right",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                          2 USDC
+                        </Text>
+                      </View>
+                      <View
+                        style={
+                          {
+                            "alignItems": "flex-start",
+                            "flex": 1,
+                            "flexDirection": "row",
+                            "gap": 4,
+                            "justifyContent": "space-between",
+                            "overflow": "hidden",
+                            "width": "100%",
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            {
+                              "color": "#B2B2B2",
+                              "fontFamily": "System",
+                              "fontSize": 19.2,
+                              "fontWeight": "400",
+                              "lineHeight": 19,
+                              "maxWidth": "100%",
+                              "overflow": "hidden",
+                              "userSelect": "auto",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                          /tag_receipt_usdc
+                        </Text>
+                        <Text
+                          style={
+                            {
+                              "color": "#B2B2B2",
+                              "fontFamily": "System",
+                              "fontSize": 19.2,
+                              "fontWeight": "400",
+                              "lineHeight": 21,
+                              "textAlign": "right",
+                              "userSelect": "auto",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                          7 mon ago
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+            <View
+              onFocusCapture={[Function]}
+              onLayout={[Function]}
+              style={null}
+            />
+            <View
+              onFocusCapture={[Function]}
+              onLayout={[Function]}
+              style={null}
+            >
+              <Text
+                accessibilityRole="header"
+                style={
+                  {
+                    "backgroundColor": "#081619",
+                    "color": "#FFFFFF",
+                    "fontFamily": "System",
+                    "fontSize": 20,
+                    "fontWeight": "700",
+                    "lineHeight": 24,
+                    "marginBottom": 0,
+                    "marginLeft": 0,
+                    "marginRight": 0,
+                    "marginTop": 0,
+                    "paddingBottom": 16,
+                    "paddingTop": 16,
+                    "textTransform": "none",
+                    "userSelect": "auto",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                May 29
+              </Text>
+            </View>
+            <View
+              onFocusCapture={[Function]}
+              onLayout={[Function]}
+              style={null}
+            >
+              <View
+                style={
+                  {
+                    "backgroundColor": "#111f22",
+                    "borderTopLeftRadius": 9,
+                    "borderTopRightRadius": 9,
+                    "flexDirection": "column",
+                    "paddingLeft": 7,
+                    "paddingRight": 7,
+                    "paddingTop": 7,
+                  }
+                }
+              >
+                <View
+                  cancelable={true}
+                  disabled={false}
+                  focusable={true}
+                  minPressDuration={0}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onPress={[Function]}
+                  onPressIn={[Function]}
+                  onPressOut={[Function]}
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 9,
+                      "borderBottomRightRadius": 9,
+                      "borderTopLeftRadius": 9,
+                      "borderTopRightRadius": 9,
+                      "flexDirection": "row",
+                      "gap": 18,
+                      "justifyContent": "space-between",
+                      "paddingBottom": 16,
+                      "paddingLeft": 16,
+                      "paddingRight": 16,
+                      "paddingTop": 16,
+                      "width": "100%",
+                    }
+                  }
+                  testID="TokenActivityRow"
+                >
+                  <View
+                    style={
+                      {
+                        "flex": 1,
+                        "flexDirection": "row",
+                        "gap": 16,
+                        "width": "100%",
+                      }
+                    }
+                  >
+                    <View
+                      style={
+                        {
+                          "alignItems": "center",
+                          "borderBottomLeftRadius": 9,
+                          "borderBottomRightRadius": 9,
+                          "borderTopLeftRadius": 9,
+                          "borderTopRightRadius": 9,
+                          "flexDirection": "column",
+                          "gap": 7,
+                          "height": 48,
+                          "justifyContent": "center",
+                          "maxHeight": 48,
+                          "maxWidth": 48,
+                          "minHeight": 48,
+                          "minWidth": 48,
+                          "overflow": "hidden",
+                          "position": "relative",
+                          "width": 48,
+                        }
+                      }
+                    >
+                      <View
+                        style={
+                          {
+                            "bottom": 0,
+                            "flexDirection": "column",
+                            "left": 0,
+                            "position": "absolute",
+                            "right": 0,
+                            "top": 0,
+                            "zIndex": 1,
+                          }
+                        }
+                      >
+                        <Image
+                          fullscreen={true}
+                          onError={[Function]}
+                          onLoad={[Function]}
+                          source={
+                            {
+                              "uri": "https://ui-avatars.com/api/?name=TODO&size=256&format=png&background=86ad7f",
+                            }
+                          }
+                          style={
+                            {
+                              "height": 48,
+                              "width": 48,
+                            }
+                          }
+                        />
+                      </View>
+                      <View
+                        style={
+                          {
+                            "backgroundColor": "#86AE80",
+                            "bottom": 0,
+                            "flexDirection": "column",
+                            "justifyContent": "center",
+                            "left": 0,
+                            "position": "absolute",
+                            "right": 0,
+                            "top": 0,
+                            "zIndex": 0,
+                          }
+                        }
+                      >
+                        <View
+                          style={
+                            {
+                              "alignItems": "center",
+                              "borderBottomLeftRadius": 9,
+                              "borderBottomRightRadius": 9,
+                              "borderTopLeftRadius": 9,
+                              "borderTopRightRadius": 9,
+                              "flexDirection": "column",
+                              "height": 48,
+                              "justifyContent": "center",
+                              "maxHeight": 48,
+                              "maxWidth": 48,
+                              "minHeight": 48,
+                              "minWidth": 48,
+                              "overflow": "hidden",
+                              "position": "relative",
+                              "width": 48,
+                            }
+                          }
+                        >
+                          <View
+                            style={
+                              {
+                                "bottom": 0,
+                                "flexDirection": "column",
+                                "left": 0,
+                                "position": "absolute",
+                                "right": 0,
+                                "top": 0,
+                                "zIndex": 1,
+                              }
+                            }
+                          >
+                            <Image
+                              fullscreen={true}
+                              onError={[Function]}
+                              onLoad={[Function]}
+                              source={
+                                {
+                                  "uri": "https://ui-avatars.com/api/?name=TODO&size=256&format=png&background=86ad7f",
+                                }
+                              }
+                              style={
+                                {
+                                  "height": 48,
+                                  "width": 48,
+                                }
+                              }
+                            />
+                          </View>
+                        </View>
+                      </View>
+                    </View>
+                    <View
+                      style={
+                        {
+                          "flex": 1,
+                          "flexDirection": "column",
+                          "overflow": "hidden",
+                          "width": "100%",
+                        }
+                      }
+                    >
+                      <View
+                        style={
+                          {
+                            "flex": 1,
+                            "flexDirection": "row",
+                            "gap": 4,
+                            "justifyContent": "space-between",
+                            "width": "100%",
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            {
+                              "color": "#FFFFFF",
+                              "fontFamily": "System",
+                              "fontSize": 21.599999999999998,
+                              "fontWeight": "500",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                          Send Account Signing Key Added
+                        </Text>
+                         
+                        <Text
+                          style={
+                            {
+                              "color": "#FFFFFF",
+                              "fontFamily": "System",
+                              "fontSize": 21.599999999999998,
+                              "fontWeight": "500",
+                              "textAlign": "right",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        />
+                      </View>
+                      <View
+                        style={
+                          {
+                            "alignItems": "flex-start",
+                            "flex": 1,
+                            "flexDirection": "row",
+                            "gap": 4,
+                            "justifyContent": "space-between",
+                            "overflow": "hidden",
+                            "width": "100%",
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            {
+                              "color": "#B2B2B2",
+                              "fontFamily": "System",
+                              "fontSize": 19.2,
+                              "fontWeight": "400",
+                              "lineHeight": 19,
+                              "maxWidth": "100%",
+                              "overflow": "hidden",
+                              "userSelect": "auto",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        />
+                        <Text
+                          style={
+                            {
+                              "color": "#B2B2B2",
+                              "fontFamily": "System",
+                              "fontSize": 19.2,
+                              "fontWeight": "400",
+                              "lineHeight": 21,
+                              "textAlign": "right",
+                              "userSelect": "auto",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                          7 mon ago
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+            <View
+              onFocusCapture={[Function]}
+              onLayout={[Function]}
+              style={null}
+            >
+              <View
+                style={
+                  {
+                    "backgroundColor": "#111f22",
+                    "flexDirection": "column",
+                    "paddingLeft": 7,
+                    "paddingRight": 7,
+                  }
+                }
+              >
+                <View
+                  cancelable={true}
+                  disabled={false}
+                  focusable={true}
+                  minPressDuration={0}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onPress={[Function]}
+                  onPressIn={[Function]}
+                  onPressOut={[Function]}
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 9,
+                      "borderBottomRightRadius": 9,
+                      "borderTopLeftRadius": 9,
+                      "borderTopRightRadius": 9,
+                      "flexDirection": "row",
+                      "gap": 18,
+                      "justifyContent": "space-between",
+                      "paddingBottom": 16,
+                      "paddingLeft": 16,
+                      "paddingRight": 16,
+                      "paddingTop": 16,
+                      "width": "100%",
+                    }
+                  }
+                  testID="TokenActivityRow"
+                >
+                  <View
+                    style={
+                      {
+                        "flex": 1,
+                        "flexDirection": "row",
+                        "gap": 16,
+                        "width": "100%",
+                      }
+                    }
+                  >
+                    <View
+                      style={
+                        {
+                          "alignItems": "center",
+                          "borderBottomLeftRadius": 9,
+                          "borderBottomRightRadius": 9,
+                          "borderTopLeftRadius": 9,
+                          "borderTopRightRadius": 9,
+                          "flexDirection": "column",
+                          "gap": 7,
+                          "height": 48,
+                          "justifyContent": "center",
+                          "maxHeight": 48,
+                          "maxWidth": 48,
+                          "minHeight": 48,
+                          "minWidth": 48,
+                          "overflow": "hidden",
+                          "position": "relative",
+                          "width": 48,
+                        }
+                      }
+                    >
+                      <View
+                        style={
+                          {
+                            "bottom": 0,
+                            "flexDirection": "column",
+                            "left": 0,
+                            "position": "absolute",
+                            "right": 0,
+                            "top": 0,
+                            "zIndex": 1,
+                          }
+                        }
+                      >
+                        <Image
+                          fullscreen={true}
+                          onError={[Function]}
+                          onLoad={[Function]}
+                          source={
+                            {
+                              "uri": "https://ui-avatars.com/api/?name=TODO&size=256&format=png&background=86ad7f",
+                            }
+                          }
+                          style={
+                            {
+                              "height": 48,
+                              "width": 48,
+                            }
+                          }
+                        />
+                      </View>
+                      <View
+                        style={
+                          {
+                            "backgroundColor": "#86AE80",
+                            "bottom": 0,
+                            "flexDirection": "column",
+                            "justifyContent": "center",
+                            "left": 0,
+                            "position": "absolute",
+                            "right": 0,
+                            "top": 0,
+                            "zIndex": 0,
+                          }
+                        }
+                      >
+                        <View
+                          style={
+                            {
+                              "alignItems": "center",
+                              "borderBottomLeftRadius": 9,
+                              "borderBottomRightRadius": 9,
+                              "borderTopLeftRadius": 9,
+                              "borderTopRightRadius": 9,
+                              "flexDirection": "column",
+                              "height": 48,
+                              "justifyContent": "center",
+                              "maxHeight": 48,
+                              "maxWidth": 48,
+                              "minHeight": 48,
+                              "minWidth": 48,
+                              "overflow": "hidden",
+                              "position": "relative",
+                              "width": 48,
+                            }
+                          }
+                        >
+                          <View
+                            style={
+                              {
+                                "bottom": 0,
+                                "flexDirection": "column",
+                                "left": 0,
+                                "position": "absolute",
+                                "right": 0,
+                                "top": 0,
+                                "zIndex": 1,
+                              }
+                            }
+                          >
+                            <Image
+                              fullscreen={true}
+                              onError={[Function]}
+                              onLoad={[Function]}
+                              source={
+                                {
+                                  "uri": "https://ui-avatars.com/api/?name=TODO&size=256&format=png&background=86ad7f",
+                                }
+                              }
+                              style={
+                                {
+                                  "height": 48,
+                                  "width": 48,
+                                }
+                              }
+                            />
+                          </View>
+                        </View>
+                      </View>
+                    </View>
+                    <View
+                      style={
+                        {
+                          "flex": 1,
+                          "flexDirection": "column",
+                          "overflow": "hidden",
+                          "width": "100%",
+                        }
+                      }
+                    >
+                      <View
+                        style={
+                          {
+                            "flex": 1,
+                            "flexDirection": "row",
+                            "gap": 4,
+                            "justifyContent": "space-between",
+                            "width": "100%",
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            {
+                              "color": "#FFFFFF",
+                              "fontFamily": "System",
+                              "fontSize": 21.599999999999998,
+                              "fontWeight": "500",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                          Send Account Signing Key Removed
+                        </Text>
+                         
+                        <Text
+                          style={
+                            {
+                              "color": "#FFFFFF",
+                              "fontFamily": "System",
+                              "fontSize": 21.599999999999998,
+                              "fontWeight": "500",
+                              "textAlign": "right",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        />
+                      </View>
+                      <View
+                        style={
+                          {
+                            "alignItems": "flex-start",
+                            "flex": 1,
+                            "flexDirection": "row",
+                            "gap": 4,
+                            "justifyContent": "space-between",
+                            "overflow": "hidden",
+                            "width": "100%",
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            {
+                              "color": "#B2B2B2",
+                              "fontFamily": "System",
+                              "fontSize": 19.2,
+                              "fontWeight": "400",
+                              "lineHeight": 19,
+                              "maxWidth": "100%",
+                              "overflow": "hidden",
+                              "userSelect": "auto",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        />
+                        <Text
+                          style={
+                            {
+                              "color": "#B2B2B2",
+                              "fontFamily": "System",
+                              "fontSize": 19.2,
+                              "fontWeight": "400",
+                              "lineHeight": 21,
+                              "textAlign": "right",
+                              "userSelect": "auto",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                          7 mon ago
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+            <View
+              onFocusCapture={[Function]}
+              onLayout={[Function]}
+              style={null}
+            >
+              <View
+                style={
+                  {
+                    "backgroundColor": "#111f22",
+                    "borderBottomLeftRadius": 9,
+                    "borderBottomRightRadius": 9,
+                    "flexDirection": "column",
+                    "paddingBottom": 7,
+                    "paddingLeft": 7,
+                    "paddingRight": 7,
+                  }
+                }
+              >
+                <View
+                  cancelable={true}
+                  disabled={false}
+                  focusable={true}
+                  minPressDuration={0}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onPress={[Function]}
+                  onPressIn={[Function]}
+                  onPressOut={[Function]}
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 9,
+                      "borderBottomRightRadius": 9,
+                      "borderTopLeftRadius": 9,
+                      "borderTopRightRadius": 9,
+                      "flexDirection": "row",
+                      "gap": 18,
+                      "justifyContent": "space-between",
+                      "paddingBottom": 16,
+                      "paddingLeft": 16,
+                      "paddingRight": 16,
+                      "paddingTop": 16,
+                      "width": "100%",
+                    }
+                  }
+                  testID="TokenActivityRow"
+                >
+                  <View
+                    style={
+                      {
+                        "flex": 1,
+                        "flexDirection": "row",
+                        "gap": 16,
+                        "width": "100%",
+                      }
+                    }
+                  >
+                    <View
+                      style={
+                        {
+                          "alignItems": "center",
+                          "borderBottomLeftRadius": 9,
+                          "borderBottomRightRadius": 9,
+                          "borderTopLeftRadius": 9,
+                          "borderTopRightRadius": 9,
+                          "flexDirection": "column",
+                          "gap": 7,
+                          "height": 48,
+                          "justifyContent": "center",
+                          "maxHeight": 48,
+                          "maxWidth": 48,
+                          "minHeight": 48,
+                          "minWidth": 48,
+                          "overflow": "hidden",
+                          "position": "relative",
+                          "width": 48,
+                        }
+                      }
+                    >
+                      <RNSVGSvgView
+                        align="xMidYMid"
+                        bbHeight={48}
+                        bbWidth={48}
+                        color="#FFFFFF"
+                        fill="none"
+                        focusable={false}
+                        height={48}
+                        meetOrSlice={0}
+                        minX={0}
+                        minY={0}
+                        size={48}
+                        strokeWidth="2"
+                        style={
+                          [
+                            {
+                              "backgroundColor": "transparent",
+                              "borderWidth": 0,
+                            },
+                            {
+                              "borderBottomLeftRadius": 9,
+                              "borderBottomRightRadius": 9,
+                              "borderTopLeftRadius": 9,
+                              "borderTopRightRadius": 9,
+                              "gap": 7,
+                            },
+                            {
+                              "flex": 0,
+                              "height": 48,
+                              "width": 48,
+                            },
+                          ]
+                        }
+                        tintColor="#FFFFFF"
+                        vbHeight={40}
+                        vbWidth={40}
+                        width={48}
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <RNSVGGroup
+                          fill={null}
+                          propList={
+                            [
+                              "fill",
+                              "strokeWidth",
+                            ]
+                          }
+                          strokeWidth="2"
+                        >
+                          <RNSVGPath
+                            d="M33.714 28l-1.6 1.6-2.971-2.972v9.371h-2.286v-9.371l-2.971 2.971-1.6-1.6L28 22.285 33.714 28z"
+                            fill={
+                              {
+                                "type": 2,
+                              }
+                            }
+                            propList={
+                              [
+                                "fill",
+                              ]
+                            }
+                          />
+                          <RNSVGPath
+                            d="M19.314 36L7.428 28.914c-.685-.457-1.142-1.143-1.142-1.943V13.03c0-.8.457-1.6 1.143-1.943l11.428-6.743A1.93 1.93 0 0120 4c.457 0 .8.114 1.143.343l11.428 6.743c.686.457 1.143 1.143 1.143 1.943V20H31.43v-6.971l-11.43-6.743-11.428 6.743V26.97l12 7.086L19.314 36z"
+                            fill={
+                              {
+                                "type": 2,
+                              }
+                            }
+                            propList={
+                              [
+                                "fill",
+                              ]
+                            }
+                          />
+                        </RNSVGGroup>
+                      </RNSVGSvgView>
+                    </View>
+                    <View
+                      style={
+                        {
+                          "flex": 1,
+                          "flexDirection": "column",
+                          "overflow": "hidden",
+                          "width": "100%",
+                        }
+                      }
+                    >
+                      <View
+                        style={
+                          {
+                            "flex": 1,
+                            "flexDirection": "row",
+                            "gap": 4,
+                            "justifyContent": "space-between",
+                            "width": "100%",
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            {
+                              "color": "#FFFFFF",
+                              "fontFamily": "System",
+                              "fontSize": 21.599999999999998,
+                              "fontWeight": "500",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                          Send Token Upgrade
+                        </Text>
+                         
+                        <Text
+                          style={
+                            {
+                              "color": "#FFFFFF",
+                              "fontFamily": "System",
+                              "fontSize": 21.599999999999998,
+                              "fontWeight": "500",
+                              "textAlign": "right",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                          10,000 SEND
+                        </Text>
+                      </View>
+                      <View
+                        style={
+                          {
+                            "alignItems": "flex-start",
+                            "flex": 1,
+                            "flexDirection": "row",
+                            "gap": 4,
+                            "justifyContent": "space-between",
+                            "overflow": "hidden",
+                            "width": "100%",
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            {
+                              "color": "#B2B2B2",
+                              "fontFamily": "System",
+                              "fontSize": 19.2,
+                              "fontWeight": "400",
+                              "lineHeight": 19,
+                              "maxWidth": "100%",
+                              "overflow": "hidden",
+                              "userSelect": "auto",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                          1M -&gt; 10,000
+                        </Text>
+                        <Text
+                          style={
+                            {
+                              "color": "#B2B2B2",
+                              "fontFamily": "System",
+                              "fontSize": 19.2,
+                              "fontWeight": "400",
+                              "lineHeight": 21,
+                              "textAlign": "right",
+                              "userSelect": "auto",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                          7 mon ago
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "height": 0,
+                }
+              }
+            />
+          </View>
+        </RCTScrollView>
+      </View>
+    </View>
+  </View>
+</View>
+`;

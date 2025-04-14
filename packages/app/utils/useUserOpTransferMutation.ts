@@ -7,7 +7,12 @@ import {
   tokenPaymasterAddress,
 } from '@my/wagmi'
 import { useMutation, useQuery, type UseQueryResult } from '@tanstack/react-query'
-import { getRequiredPrefund, getUserOperationHash, type UserOperation } from 'permissionless'
+import {
+  getRequiredPrefund,
+  getUserOperationHash,
+  type GetUserOperationReceiptReturnType,
+  type UserOperation,
+} from 'permissionless'
 import {
   encodeFunctionData,
   erc20Abi,
@@ -49,7 +54,7 @@ export const defaultUserOp: Pick<
   paymasterVerificationGasLimit: 150000n,
   paymasterPostOpGasLimit: 100000n,
   paymasterData: '0x',
-}
+} as const
 
 export type UseUserOpTransferMutationArgs = {
   /**
@@ -91,7 +96,7 @@ export async function sendUserOpTransfer({
   version,
   validUntil,
   webauthnCreds,
-}: UseUserOpTransferMutationArgs) {
+}: UseUserOpTransferMutationArgs): Promise<GetUserOperationReceiptReturnType> {
   const chainId = baseMainnetClient.chain.id
   const entryPoint = entryPointAddress[chainId]
   const userOpHash = getUserOperationHash({
@@ -153,7 +158,7 @@ export function useGenerateTransferUserOp({
   return useQuery({
     queryKey: ['generateTransferUserOp', sender, to, token, String(amount), String(nonce)],
     enabled: !!sender && !!to && amount !== undefined && nonce !== undefined,
-    queryFn: () => {
+    queryFn: (): UserOperation<'v0.7'> => {
       assert(!!sender && isAddress(sender), 'Invalid send account address')
       assert(!!to && isAddress(to), 'Invalid to address')
       assert(!token || isAddress(token), 'Invalid token address')

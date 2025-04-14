@@ -58,7 +58,7 @@ export function SendAmountForm() {
       (values) => {
         const { amount, token: _token, note } = values
         const sendToken = _token as allCoins[number]['token']
-        const sanitizedAmount = sanitizeAmount(amount, allCoinsDict[sendToken]?.decimals).toString()
+        const sanitizedAmount = sanitizeAmount(amount, allCoinsDict[sendToken]?.decimals)
         const sanitizedNote = note.length > 0 ? encodeURIComponent(note.trim()) : undefined
 
         const noteValidation = formFields.note.safeParse(note)
@@ -74,7 +74,7 @@ export function SendAmountForm() {
         setSendParams(
           {
             ...sendParams,
-            amount: sanitizedAmount,
+            amount: sanitizedAmount ? sanitizedAmount.toString() : undefined,
             sendToken,
             note: sanitizedNote,
           },
@@ -215,7 +215,7 @@ export function SendAmountForm() {
                 py: '$4',
                 px: '$5',
                 pr: '$10',
-                fontSize: '$5',
+                fontSize: 17,
                 fontStyle: 'normal',
                 minHeight: 40,
                 '$theme-dark': {

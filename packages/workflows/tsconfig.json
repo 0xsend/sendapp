@@ -4,19 +4,21 @@
     "noEmit": true,
     "composite": true,
     "moduleResolution": "bundler",
-    "baseUrl": ".",
+    "target": "ESNext",
+    "baseUrl": "./src",
     "paths": {
       "@my/supabase/*": ["../../supabase/*"],
       "app/*": ["../app/*"],
       "@my/wagmi": ["../wagmi/src"],
       "@my/wagmi/*": ["../wagmi/src/*"],
-      "@my/workflows": ["./src/all-workflows.ts"],
+      "@my/workflows": ["./src"],
       "@my/workflows/*": ["./src/*"],
       "@my/temporal": ["../temporal/src"],
       "@my/temporal/*": ["../temporal/src/*"]
     }
   },
   "include": [
+    "tsconfig.json",
     "./src",
     "../temporal/src",
     "./jest.config.ts",

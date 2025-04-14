@@ -1,5 +1,4 @@
 import type { Database } from '@my/supabase/database.types'
-import type { PostgrestError } from '@supabase/supabase-js'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 
 export type TemporalTransfer = Database['temporal']['Tables']['send_account_transfers']['Row']
@@ -44,20 +43,4 @@ export async function updateTemporalSendAccountTransfer(params: TemporalTransfer
     .eq('workflow_id', workflow_id)
     .select('*')
     .single()
-}
-
-export function isRetryableDBError(error: PostgrestError) {
-  // Network related errors should be retried
-  const retryableCodes = [
-    '08000', // Connection error
-    '08006', // Connection failure
-    '08001', // SQL client unable to establish connection
-    '08004', // Rejected by server
-    '57P01', // Admin shutdown
-    '57P02', // Crash shutdown
-    '40001', // Serialization failure
-    '40P01', // Deadlock detected
-  ]
-
-  return retryableCodes.includes(error.code)
 }

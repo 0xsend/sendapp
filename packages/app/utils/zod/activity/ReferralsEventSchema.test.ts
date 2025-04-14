@@ -13,6 +13,31 @@ describe('ReferralsDataSchema', () => {
           tags: ['disconnect_whorl7351'],
         },
       },
+      // tags are nullable and optional
+      {
+        input: {
+          tags: null,
+        },
+        expected: {
+          tags: null,
+        },
+      },
+      {
+        input: {
+          tags: [],
+        },
+        expected: {
+          tags: [],
+        },
+      },
+      {
+        input: {
+          tags: undefined,
+        },
+        expected: {
+          tags: null,
+        },
+      },
     ]
     for (const { input, expected } of cases) {
       const result = ReferralsDataSchema.safeParse(input)
@@ -21,21 +46,6 @@ describe('ReferralsDataSchema', () => {
       }
       assert(result.success === true)
       expect(result.data).toEqual(expected)
-    }
-  })
-  it('should handle invalid tag receipt data', () => {
-    const cases = [
-      {
-        tags: null,
-      },
-      {},
-    ]
-    for (const input of cases) {
-      const result = ReferralsDataSchema.safeParse(input)
-      if (result.success) {
-        console.log('success', result)
-      }
-      assert(result.success === false)
     }
   })
 })

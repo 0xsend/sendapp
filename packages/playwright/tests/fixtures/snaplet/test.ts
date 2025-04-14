@@ -1,14 +1,15 @@
-import { models, type SeedClient } from '@my/snaplet'
+import { models, userOnboarded, type SeedClient } from '@my/snaplet'
 import { test as baseTest } from '@playwright/test'
 import { copycat } from '@snaplet/copycat'
 import { createSeedClient } from '@snaplet/seed'
+import type { SeedPostgres } from '@snaplet/seed/adapter-postgres'
+import { assert } from 'app/utils/assert'
 import debug from 'debug'
 import pg from 'pg'
 
 let log: debug.Debugger
 
-// biome-ignore lint/complexity/noBannedTypes: playwright needs any type
-export const test = baseTest.extend<{}, { seed: SeedClient; pg: pg.Client }>({
+export const test = baseTest.extend<{ referrer: Referrer }, { seed: SeedClient; pg: pg.Client }>({
   seed: [
     async ({ pg }, use) => {
       const key = `test:fixtures:snaplet:${test.info().workerIndex}`
@@ -16,16 +17,7 @@ export const test = baseTest.extend<{}, { seed: SeedClient; pg: pg.Client }>({
 
       log('seed')
 
-      //             export class SeedPg extends DatabaseClient {
-      //     async execute(query) {
-      //         await this.client.query(query);
-      //     }
-      //     async query(query) {
-      //         const { rows } = await this.client.query(query);
-      //         return rows;
-      //     }
-      // }
-      const adapter = {
+      const adapter: SeedPostgres = {
         execute: async (queryText) => {
           log('execute', queryText)
           await pg.query('SET session_replication_role = replica') // do not run any triggers
@@ -116,6 +108,31 @@ export const test = baseTest.extend<{}, { seed: SeedClient; pg: pg.Client }>({
     },
     { scope: 'worker' },
   ],
+  referrer: async ({ seed }, use) => use(await setupReferrer(seed)),
 })
 
 export const { expect } = test
+
+type Referrer = {
+  referrer: { referral_code: string; send_id: number; id: string }
+  referrerSendAccount: { address: `0x${string}` }
+  referrerTags: string[]
+}
+
+/**
+ * Sets up a referrer user with a valid referral code and send account
+ */
+export const setupReferrer = async (seed: SeedClient): Promise<Referrer> => {
+  const plan = await seed.users([userOnboarded])
+  const referrer = plan.profiles[0]
+  const referrerSendAccount = plan.send_accounts[0] as { address: `0x${string}` }
+  const referrerTags = plan.tags.map((t) => t.name)
+  assert(!!referrer, 'profile not found')
+  assert(!!referrer.referral_code, 'referral code not found')
+  assert(!!referrerSendAccount, 'referrer send account not found')
+  return { referrer, referrerSendAccount, referrerTags } as {
+    referrer: { referral_code: string; send_id: number; id: string }
+    referrerSendAccount: { address: `0x${string}` }
+    referrerTags: string[]
+  }
+}

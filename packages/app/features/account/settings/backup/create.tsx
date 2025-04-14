@@ -7,7 +7,8 @@ import {
   useReadSendAccountMaxKeys,
 } from '@my/wagmi'
 import { base16, base64 } from '@scure/base'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { SettingsHeader } from 'app/features/account/settings/components/SettingsHeader'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { assert } from 'app/utils/assert'
 import { base64ToBase16 } from 'app/utils/base64ToBase16'
@@ -20,7 +21,6 @@ import * as Device from 'expo-device'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { z } from 'zod'
-import { SettingsHeader } from 'app/features/account/settings/components/SettingsHeader'
 
 const CreatePasskeySchema = z.object({
   accountName: z.string().min(1).trim().describe('Passkey name'),
@@ -66,6 +66,7 @@ const CreatePasskeyForm = ({
   } = useFreeKeySlot({
     address: sendAcct?.address,
   })
+  const queryClient = useQueryClient()
 
   const isLoading = isLoadingUser || isLoadingSendAccount || isLoadingKeySlot
 
@@ -112,6 +113,7 @@ const CreatePasskeyForm = ({
         }
         throw error.message
       }
+      queryClient.invalidateQueries({ queryKey: [useSendAccount.queryKey] })
       assert(!!webauthnCred, 'Failed to save passkey')
       onPasskeySaved(webauthnCred)
     } catch (e) {

@@ -45,7 +45,7 @@
       "@daimo/expo-passkeys/*": ["../daimo-expo-passkeys/src/*"],
       "@my/temporal": ["../temporal/src"],
       "@my/temporal/*": ["../temporal/src/*"],
-      "@my/workflows": ["../workflows/src/all-workflows.ts"],
+      "@my/workflows": ["../workflows/src"],
       "@my/workflows/*": ["../workflows/src/*"]
     }
   },

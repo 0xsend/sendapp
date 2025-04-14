@@ -2,13 +2,13 @@ import { userOnboarded } from '@my/snaplet'
 import { sendtagCheckoutAddress, usdcAddress } from '@my/wagmi'
 import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
+import { shorten } from 'app/utils/strings'
 import { SUPABASE_URL } from 'app/utils/supabase/admin'
 import debug from 'debug'
 import crypto from 'node:crypto'
 import { zeroAddress } from 'viem'
 import { expect, test } from './fixtures/send-accounts'
 import { testBaseClient } from './fixtures/viem'
-import { shorten } from 'app/utils/strings'
 
 let log: debug.Debugger
 
@@ -151,7 +151,7 @@ test('can visit activity page and see correct activity feed', async ({
       to_user_id: null,
       created_at: dateFromNow(8).toISOString(),
       data: fakeOnchainEventData({
-        key: ['0x1234', '0x5678'],
+        key: [hexToBytea('0x1234'), hexToBytea('0x5678')],
         account: hexToBytea(sendAccount.address as `0x${string}`),
         key_slot: 0,
       }),
@@ -164,7 +164,7 @@ test('can visit activity page and see correct activity feed', async ({
       to_user_id: null,
       created_at: dateFromNow(9).toISOString(),
       data: fakeOnchainEventData({
-        key: ['0x1234', '0x5678'],
+        key: [hexToBytea('0x1234'), hexToBytea('0x5678')],
         account: hexToBytea(sendAccount.address as `0x${string}`),
         key_slot: 0,
       }),
@@ -216,9 +216,9 @@ test('can visit activity page and see correct activity feed', async ({
   expect.soft(await activityRows.first().isVisible()) // FlatList doesn't render offscreen items
 
   // Referral reward
-  await expect.soft(activityRows.nth(0)).toContainText('Referral Reward')
+  await expect.soft(activityRows.nth(0)).toContainText('Revenue Share')
   await expect.soft(activityRows.nth(0)).toContainText('1 USDC')
-  await expect.soft(activityRows.nth(0)).toContainText('Sendtag Checkout')
+  await expect.soft(activityRows.nth(0)).toContainText('Sendtags')
 
   // Signing key removed
   await expect.soft(activityRows.nth(1)).toContainText('Send Account Signing Key Removed')
@@ -232,7 +232,6 @@ test('can visit activity page and see correct activity feed', async ({
 
   // Referral (as referrer)
   await expect.soft(activityRows.nth(4)).toContainText('Referral')
-  await expect.soft(activityRows.nth(4)).toContainText('1 Referral')
   await expect.soft(activityRows.nth(4)).toContainText(anotherUser.name ?? '')
 
   // Tag receipt (USDC)
