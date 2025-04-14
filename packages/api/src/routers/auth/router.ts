@@ -1,5 +1,5 @@
 import { TRPCError } from '@trpc/server'
-import { supabaseAdmin } from 'app/utils/supabase/admin'
+import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import debug from 'debug'
 import { z } from 'zod'
 import { createTRPCRouter, publicProcedure } from '../../trpc'
@@ -18,6 +18,7 @@ export const authRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input }) => {
+      const supabaseAdmin = createSupabaseAdminClient()
       const { phone, countrycode, captchaToken, bypassOnboardedCheck } = input
 
       if (!phone) {

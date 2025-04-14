@@ -5,7 +5,7 @@ import { createTRPCRouter, protectedProcedure } from '../trpc'
 import type { UserOperation } from 'permissionless'
 import { baseMainnetClient, entryPointAddress } from '@my/wagmi'
 import { getUserOperationHash } from 'permissionless/utils'
-import { supabaseAdmin } from 'app/utils/supabase/admin'
+import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { getTemporalClient } from '@my/temporal/client'
 import { withRetry } from 'viem'
 import type { PostgrestError } from '@supabase/supabase-js'
@@ -85,6 +85,7 @@ export const temporalRouter = createTRPCRouter({
 
         await withRetry(
           async () => {
+            const supabaseAdmin = createSupabaseAdminClient()
             const { data, error } = await supabaseAdmin
               .from('activity')
               .select('data->>status')

@@ -20,7 +20,7 @@ import { verifyMessage, hexToBytes } from 'viem'
 import { verifySignature } from 'app/utils/userop'
 import { COSEECDHAtoXY } from 'app/utils/passkeys'
 import { byteaToHex } from 'app/utils/byteaToHex'
-import { supabaseAdmin } from 'app/utils/supabase/admin'
+import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import ms from 'ms'
 
 const logger = debug('api:routers:account-recovery')
@@ -45,6 +45,7 @@ export const ValidateSignatureResponseSchema = z.object({
 
 export const accountRecoveryRouter = createTRPCRouter({
   getChallenge: publicProcedure.mutation(async () => {
+    const supabaseAdmin = createSupabaseAdminClient()
     const { data: challengeData, error: challengeError } = await supabaseAdmin
       .rpc('insert_challenge')
       .single()

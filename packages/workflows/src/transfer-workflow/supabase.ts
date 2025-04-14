@@ -1,5 +1,5 @@
 import type { Database } from '@my/supabase/database.types'
-import { supabaseAdmin } from 'app/utils/supabase/admin'
+import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 
 export type TemporalTransfer = Database['temporal']['Tables']['send_account_transfers']['Row']
 export type TemporalTransferInsert =
@@ -12,6 +12,7 @@ export async function upsertTemporalSendAccountTransfer({
   status,
   data,
 }: TemporalTransferInsert) {
+  const supabaseAdmin = createSupabaseAdminClient()
   return await supabaseAdmin
     .schema('temporal')
     .from('send_account_transfers')
@@ -36,6 +37,7 @@ export async function updateTemporalSendAccountTransfer(params: TemporalTransfer
       payload[key] = value
     }
   }
+  const supabaseAdmin = createSupabaseAdminClient()
   return await supabaseAdmin
     .schema('temporal')
     .from('send_account_transfers')
