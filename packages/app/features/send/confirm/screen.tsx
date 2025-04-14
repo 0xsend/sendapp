@@ -407,7 +407,7 @@ export function SendConfirm() {
                 edit
               </Paragraph>
             </XStack>
-            <Paragraph size={'$5'} whiteSpace={'pre-wrap'}>
+            <Paragraph fontSize={17} whiteSpace={'pre-wrap'}>
               {note}
             </Paragraph>
           </YStack>

@@ -209,7 +209,7 @@ const TransactionEntry = ({
           </XStack>
           {note && (
             <Paragraph
-              size={'$5'}
+              fontSize={17}
               color={'$silverChalice'}
               w={'100%'}
               whiteSpace={'pre-wrap'}

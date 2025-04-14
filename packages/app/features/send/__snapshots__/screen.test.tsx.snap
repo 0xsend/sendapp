@@ -1143,7 +1143,7 @@ exports[`SendScreen should render send form when profile is found 1`] = `
                       "borderTopWidth": 1,
                       "color": "#FFFFFF",
                       "fontFamily": "System",
-                      "fontSize": 19.2,
+                      "fontSize": 17,
                       "fontStyle": "normal",
                       "fontWeight": "400",
                       "height": "auto",
