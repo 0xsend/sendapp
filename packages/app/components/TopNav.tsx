@@ -1,16 +1,17 @@
 // TopNav.tsx
 import {
+  Avatar,
+  Button as ButtonOg,
+  type ButtonProps,
+  Container,
   H2,
   Header,
+  LinkableAvatar,
   Paragraph,
-  XStack,
+  Separator,
   Stack,
   useMedia,
-  Button as ButtonOg,
-  Container,
-  Separator,
-  type ButtonProps,
-  Avatar,
+  XStack,
 } from '@my/ui'
 import { useRootScreenParams } from 'app/routers/params'
 import { IconAccount, IconArrowLeft, IconSendLogo } from 'app/components/icons'
@@ -44,33 +45,21 @@ interface TopNavProps {
 }
 
 export function AvatarMenuButton({ profile }: { profile?: Tables<'profiles'> | null }) {
-  const [queryParams, setRootParams] = useRootScreenParams()
-  const handleHomeBottomSheet = () => {
-    setRootParams(
-      { ...queryParams, nav: queryParams.nav ? undefined : 'home' },
-      { webBehavior: 'replace' }
-    )
-  }
-
   return (
-    <Button
+    <LinkableAvatar
+      href={'/account'}
+      size={'$3.5'}
+      circular={true}
       $gtLg={{
-        disabled: true,
+        pointerEvents: 'none',
         opacity: 0,
       }} /// We need the button to be there for layout purposes
-      onPress={handleHomeBottomSheet}
-      overflow={'hidden'}
-      bc="$color2"
-      size={'$3.5'}
-      icon={
-        <Avatar size={'$3.5'} br={'$2'}>
-          <Avatar.Image src={profile?.avatar_url ?? ''} w="100%" h="100%" objectFit="cover" />
-          <Avatar.Fallback jc={'center'} ai="center" theme="green_active">
-            <IconAccount size={'$2'} $theme-light={{ color: '$color12' }} />
-          </Avatar.Fallback>
-        </Avatar>
-      }
-    />
+    >
+      <Avatar.Image src={profile?.avatar_url ?? ''} w="100%" h="100%" objectFit="cover" />
+      <Avatar.Fallback jc={'center'} ai="center" theme="green_active" bc="$color2">
+        <IconAccount size={'$2'} $theme-light={{ color: '$color12' }} />
+      </Avatar.Fallback>
+    </LinkableAvatar>
   )
 }
 
