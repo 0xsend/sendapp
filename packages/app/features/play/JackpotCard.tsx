@@ -13,7 +13,7 @@ import {
 } from '@my/ui'
 import { useCallback, useEffect, useState, useMemo } from 'react' // Added useCallback
 import { Timer } from '@tamagui/lucide-icons'
-import { IconTicket } from 'app/components/icons'
+
 // Removed PlayButtons import
 import {
   useReadBaseJackpotLpPoolTotal,
@@ -166,7 +166,6 @@ export const JackpotCard = () => {
               {isLoading ? <Spinner /> : formattedJackpotAmount}
             </BigHeading>
             <Paragraph fontSize={'$6'} fontWeight={'500'} zIndex={1} $sm={{ mt: '$4' }}>
-              {/* Assuming the token is always SEND, otherwise fetch token symbol */}
               {'SEND'}
             </Paragraph>
           </XStack>
@@ -179,14 +178,12 @@ export const JackpotCard = () => {
                 ) : timeRemaining === zeroTime ? (
                   '--:--:--:--'
                 ) : (
-                  // Update format to DD:HH:SS
                   `${formatNumber(timeRemaining.days)}:${formatNumber(
                     timeRemaining.hours
                   )}:${formatNumber(timeRemaining.minutes)}:${formatNumber(timeRemaining.seconds)}`
                 )}
               </H3>
             </XStack>
-            {/* Restore the XStack and update the Paragraph, removed centering */}
             <XStack ai="center">
               <Paragraph color="$color10" fontSize="$4" ta="left">
                 Drawing occurs on: {isLoading ? 'Loading...' : jackpotEndTimeString}

@@ -16,7 +16,7 @@ await $`docker ps -a | grep shovel | awk '{{print $1}}' | xargs -r docker rm -f 
 
 await $`docker pull docker.io/indexsupply/shovel:3410 || true`
 
-const SENDPOT_BLOCK_START = 27948000
+const SENDPOT_BLOCK_START = 28890744
 const blockNumber =
   await $`cast rpc --rpc-url http://127.0.0.1:8546 eth_blockNumber | jq -r . | cast to-dec`
 const chainId = await $`cast chain-id --rpc-url http://127.0.0.1:8546`
@@ -32,7 +32,7 @@ await $`docker run --rm \
     --env BASE_RPC_URL=http://host.docker.internal:8546 \
     --env BASE_CHAIN_ID=${chainId} \
     --env BASE_BLOCK_START="${blockNumber}" \
-    --env SENDPOT_BLOCK_START="${blockNumber}" \
+    --env SENDPOT_BLOCK_START="${SENDPOT_BLOCK_START}" \
     --env DASHBOARD_ROOT_PASSWORD=shoveladmin \
     -v ${import.meta.dir}/../etc:/etc/shovel \
     --entrypoint /usr/local/bin/shovel \
