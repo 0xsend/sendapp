@@ -31,9 +31,7 @@ const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
 
 const AddressLabels = {
   ...Object.fromEntries(wagmiAddresWithLabel(Object.values(tokenPaymasterAddress), 'Paymaster')),
-  ...Object.fromEntries(
-    wagmiAddresWithLabel(Object.values(sendtagCheckoutAddress), 'Sendtag Checkout')
-  ),
+  ...Object.fromEntries(wagmiAddresWithLabel(Object.values(sendtagCheckoutAddress), 'Sendtags')),
 }
 
 const labelAddress = (address: `0x${string}`): string =>
@@ -294,7 +292,7 @@ export function eventNameFromActivity(
     case isSendPotWin(activity):
       return 'SendPot Win'
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
-      return 'Referral Reward'
+      return 'Revenue Share'
     case isSendTokenUpgradeEvent(activity):
       return 'Send Token Upgrade'
     case isERC20Transfer && to_user?.send_id === undefined:
@@ -352,7 +350,7 @@ export function phraseFromActivity(
     case isSendPotTicketPurchase(activity):
       return 'Bought Tickets'
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
-      return 'Earned referral reward'
+      return 'Earned revenue share'
     case isSendTokenUpgradeEvent(activity):
       return 'Upgraded'
     case isERC20Transfer && to_user?.send_id === undefined:
