@@ -14,9 +14,9 @@ import { IconCoin } from 'app/components/icons/IconCoin'
 import { ContractLabels } from 'app/data/contract-labels'
 import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
 import {
-  eventNameFromActivity,
   isActivitySwapTransfer,
   noteFromActivity,
+  useEventNameFromActivity,
   usePhraseFromActivity,
   useSubtextFromActivity,
 } from 'app/utils/activity'
@@ -41,7 +41,7 @@ export const ActivityDetails = ({
 } & StackProps) => {
   const { data: swapRouters } = useSwapRouters()
   const { data: liquidityPools } = useLiquidityPools()
-  const activityEventName = eventNameFromActivity(activity, swapRouters, liquidityPools)
+  const activityEventName = useEventNameFromActivity({ activity, swapRouters })
   const activityPhrase = usePhraseFromActivity({ activity, swapRouters, liquidityPools })
   const subText = useSubtextFromActivity({ activity, swapRouters, liquidityPools })
   const amount = useAmountFromActivity(activity)
@@ -112,7 +112,7 @@ export const ActivityDetails = ({
                       case !activityPhrase:
                         return null
                       case subText === null:
-                        return <Text>{activityText}</Text>
+                        return <Text>{activityPhrase}</Text>
                       default:
                         return (
                           <Text
