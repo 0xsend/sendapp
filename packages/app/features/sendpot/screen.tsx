@@ -3,6 +3,7 @@ import { JackpotCard } from './JackpotCard'
 import { DrawingHistory } from './DrawingHistory'
 import { useUser } from 'app/utils/useUser'
 import { isSendSquadMember } from 'app/utils/isSendSquadMember'
+import { ComingSoon } from 'app/components/ComingSoon'
 export function SendPotScreen() {
   return (
     <XStack
@@ -40,7 +41,7 @@ export function SendPotOrComingSoonScreen() {
   const isMember = isSendSquadMember(tags)
 
   if (!isMember) {
-    return <Spinner size="large" color={'$color12'} />
+    return <ComingSoon />
   }
 
   return <SendPotScreen />

@@ -9,7 +9,7 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Pot</title>
+        <title>Send | SendPot</title>
       </Head>
       <SendPotOrComingSoonScreen />
     </>
