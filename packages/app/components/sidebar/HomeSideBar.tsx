@@ -15,7 +15,7 @@ import {
 import { baseMainnet } from '@my/wagmi/chains'
 import {
   IconAccount,
-  IconActivity,
+  IconArrowUp,
   IconChart,
   IconDeviceReset,
   IconHome,
@@ -34,12 +34,12 @@ import { useHoverStyles } from 'app/utils/useHoverStyles'
 
 const links = [
   {
-    icon: <IconHome size={'$1.75'} color={'inherit'} />,
+    icon: <IconHome size={'$1'} color={'inherit'} scale={'1.2'} />,
     text: 'Home',
     href: '/',
   },
   {
-    icon: <IconActivity size={'$1'} color={'inherit'} />,
+    icon: <IconArrowUp size={'$1'} color={'inherit'} scale={'1.3'} />,
     text: 'Send',
     href: '/send',
   },
@@ -59,12 +59,12 @@ const links = [
     href: '/invest',
   },
   {
-    icon: <IconDeviceReset size={'$1'} color={'inherit'} />,
+    icon: <IconDeviceReset size={'$1'} color={'inherit'} scale={'1.2'} />,
     text: 'Activity',
     href: '/activity',
   },
   {
-    icon: <IconAccount size={'$1'} color={'inherit'} />,
+    icon: <IconAccount size={'$1'} color={'inherit'} scale={'1.3'} />,
     text: 'Account',
     href: '/account',
   },
