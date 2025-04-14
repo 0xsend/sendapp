@@ -157,11 +157,13 @@ export const DrawingHistory = () => {
 
     return (
       <YStack gap="$2" py="$3" px="$3.5" bc="$color1" br="$4" mb="$3">
-        <XStack jc="space-between" ai="flex-start">
-          <YStack ai="flex-start" gap="$1">
+        <XStack width="100%">
+          <YStack flex={1} gap="$1">
+            {/* Left side: Date, user’s tickets */}
             <H4 fontWeight="600" mt="$1">
               {isCurrent ? 'Current' : item.drawDate}
             </H4>
+
             {sendAccount && (
               <Paragraph color="$color10" fos="$3">
                 {itemIsLoadingCurrent && isCurrent ? (
@@ -174,21 +176,24 @@ export const DrawingHistory = () => {
               </Paragraph>
             )}
           </YStack>
-          <YStack ai="flex-end" gap="$1">
+
+          <YStack flex={1} ai="flex-end" gap="$1">
+            {/* Right side: Winner, pool */}
             {isCurrent ? (
-              <Paragraph fos="$5" color="$color10" ta="right">
+              <Paragraph fos="$4" color="$color10" ta="right">
                 Winner: (Pending)
               </Paragraph>
             ) : item.result === 'won' ? (
-              <Paragraph fos="$5" color="$green10" ta="right">
+              <Paragraph fos="$4" color="$green10" ta="right">
                 Winner: You Won!
               </Paragraph>
             ) : (
-              <Paragraph fos="$5" color="$color10" ta="right">
+              <Paragraph fos="$4" color="$color10" ta="right">
                 Winner: {item.winnerFormatted}
               </Paragraph>
             )}
-            <Paragraph fos="$4" color="$color10">
+
+            <Paragraph fos="$4" color="$color10" ta="right">
               Total Pool:{' '}
               {itemIsLoadingCurrent && isCurrent ? (
                 <Spinner size="small" />
