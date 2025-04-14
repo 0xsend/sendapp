@@ -39,10 +39,6 @@ create index sendpot_user_ticket_purchases_buyer on public.sendpot_user_ticket_p
 create index idx_sendpot_user_ticket_purchases_block_num
   ON public.sendpot_user_ticket_purchases USING btree (block_num);
 
-create index idx_utp_blocknum_covering
-  ON public.sendpot_user_ticket_purchases USING btree (block_num)
-  INCLUDE (tickets_purchased_total_bps);
-
 
 create table "public"."sendpot_jackpot_runs"(
     "id" serial primary key,
