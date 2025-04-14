@@ -10,7 +10,7 @@
     "eject": "bunx expo eject"
   },
   "dependencies": {
-    "@babel/runtime": "^7.18.9",
+    "@babel/runtime": "^7.27.0",
     "@expo/config-plugins": "~7.8.0",
     "@my/ui": "workspace:*",
     "@react-native-async-storage/async-storage": "^2.0.0",

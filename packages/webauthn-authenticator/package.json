@@ -17,7 +17,7 @@
   "dependencies": {
     "@scure/base": "^1.1.5",
     "cbor": "^9.0.1",
-    "debug": "^4.3.6"
+    "debug": "^4.3.7"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.7",
@@ -25,7 +25,7 @@
     "@rollup/plugin-typescript": "^11.1.5",
     "@types/debug": "^4",
     "@vitest/coverage-v8": "^0.34.6",
-    "rollup": "^4.6.1",
+    "rollup": "^4.22.4",
     "rollup-plugin-polyfill-node": "^0.13.0",
     "typescript": "^5.5.3",
     "vitest": "^0.34.6"
