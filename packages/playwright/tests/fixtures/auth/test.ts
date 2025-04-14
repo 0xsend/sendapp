@@ -85,6 +85,12 @@ const authTest = snapletTest.extend<{
       },
     ])
 
+    // set debug in localStorage
+    await context.addInitScript(() => {
+      console.log('setting debug in localStorage to app:*')
+      localStorage.setItem('debug', 'app:*')
+    })
+
     try {
       await use(context)
     } finally {

@@ -4,29 +4,32 @@ import {
   Paragraph,
   Separator,
   Stack,
-  type StackProps,
   Text,
   XStack,
   YStack,
+  type StackProps,
 } from '@my/ui'
-import {
-  amountFromActivity,
-  eventNameFromActivity,
-  isActivitySwapTransfer,
-  noteFromActivity,
-  phraseFromActivity,
-  subtextFromActivity,
-} from 'app/utils/activity'
-import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
 import { IconX } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
-import type { Activity } from 'app/utils/zod/activity'
+import { ContractLabels } from 'app/data/contract-labels'
+import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
 import {
+  isActivitySwapTransfer,
+  noteFromActivity,
+  useEventNameFromActivity,
+  usePhraseFromActivity,
+  useSubtextFromActivity,
+} from 'app/utils/activity'
+import { useAmountFromActivity } from 'app/utils/activity-hooks'
+import { useAddressBook } from 'app/utils/useAddressBook'
+import { useLiquidityPools } from 'app/utils/useLiquidityPools'
+import { useSwapRouters } from 'app/utils/useSwapRouters'
+import { isSendEarnEvent, type Activity } from 'app/utils/zod/activity'
+import {
+  isSendAccountTransfersEvent,
   isSendtagCheckoutEvent,
   isSendTokenUpgradeEvent,
 } from 'app/utils/zod/activity/SendAccountTransfersEventSchema'
-import { useSwapRouters } from 'app/utils/useSwapRouters'
-import { useLiquidityPools } from 'app/utils/useLiquidityPools'
 
 export const ActivityDetails = ({
   activity,
@@ -38,11 +41,17 @@ export const ActivityDetails = ({
 } & StackProps) => {
   const { data: swapRouters } = useSwapRouters()
   const { data: liquidityPools } = useLiquidityPools()
-  const activityEventName = eventNameFromActivity(activity, swapRouters, liquidityPools)
-  const activityPhrase = phraseFromActivity(activity, swapRouters, liquidityPools)
-  const subText = subtextFromActivity(activity, swapRouters, liquidityPools)
-  const amount = amountFromActivity(activity, swapRouters, liquidityPools)
+  const activityEventName = useEventNameFromActivity({ activity, swapRouters })
+  const activityPhrase = usePhraseFromActivity({ activity, swapRouters, liquidityPools })
+  const subText = useSubtextFromActivity({ activity, swapRouters, liquidityPools })
+  const amount = useAmountFromActivity(activity)
   const note = noteFromActivity(activity)
+  const isERC20Transfer = isSendAccountTransfersEvent(activity)
+  const addressBook = useAddressBook()
+  const isERC20TransferToSendEarn =
+    isERC20Transfer && addressBook?.data?.[activity.data.t] === ContractLabels.SendEarn
+  const isERC20TransferFromSendEarn =
+    isERC20Transfer && addressBook?.data?.[activity.data.f] === ContractLabels.SendEarn
 
   return (
     <Fade {...props}>
@@ -95,6 +104,12 @@ export const ActivityDetails = ({
                       case isSendTokenUpgradeEvent(activity):
                         return null
                       case isActivitySwapTransfer(activity, swapRouters, liquidityPools):
+                        return null
+                      case isSendEarnEvent(activity):
+                        return null
+                      case isERC20TransferToSendEarn || isERC20TransferFromSendEarn:
+                        return null
+                      case !activityPhrase:
                         return null
                       case subText === null:
                         return <Text>{activityPhrase}</Text>

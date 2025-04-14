@@ -327,5 +327,56 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
       ],
     },
   },
+  {
+    "created_at": 2025-01-29T14:47:36.000Z,
+    "data": {
+      "assets": 1000000000000000000n,
+      "block_num": 12345n,
+      "log_addr": "0x5AFE000000000000000000000000000000000000",
+      "log_idx": 0n,
+      "owner": "0xB0b0000000000000000000000000000000000000",
+      "sender": "0xB0b0000000000000000000000000000000000000",
+      "shares": 950000000000000000n,
+      "tx_hash": "0x1234567890123456789012345678901234567890123456789012345678901234",
+      "tx_idx": 0n,
+    },
+    "event_name": "send_earn_deposit",
+    "from_user": {
+      "avatar_url": null,
+      "id": "5c833c74-5a6c-461d-8612-b4982d7a7b51",
+      "name": null,
+      "send_id": 48,
+      "tags": [
+        "asfd",
+      ],
+    },
+    "to_user": null,
+  },
+  {
+    "created_at": 2025-02-15T14:47:36.000Z,
+    "data": {
+      "assets": 5000000000000000000n,
+      "block_num": 12345n,
+      "log_addr": "0x5AFE000000000000000000000000000000000000",
+      "log_idx": 0n,
+      "owner": "0xB0b0000000000000000000000000000000000000",
+      "receiver": "0xB0b0000000000000000000000000000000000000",
+      "sender": "0xB0b0000000000000000000000000000000000000",
+      "shares": 475000000000000000n,
+      "tx_hash": "0x1234567890123456789012345678901234567890123456789012345678901234",
+      "tx_idx": 0n,
+    },
+    "event_name": "send_earn_withdraw",
+    "from_user": null,
+    "to_user": {
+      "avatar_url": null,
+      "id": "5c833c74-5a6c-461d-8612-b4982d7a7b51",
+      "name": null,
+      "send_id": 48,
+      "tags": [
+        "asfd",
+      ],
+    },
+  },
 ]
 `;

@@ -8,13 +8,12 @@ import { coins, type coin, ethCoin } from 'app/data/coins'
 import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { shorten } from 'app/utils/strings'
-import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 import debug from 'debug'
 import { isAddress, parseUnits } from 'viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { ProfilePage } from './fixtures/profiles'
 import { SendPage } from './fixtures/send'
-import { lookupBalance, testBaseClient } from './fixtures/viem'
+import { fund, testBaseClient } from './fixtures/viem'
 
 const test = mergeTests(sendAccountTest, snapletTest)
 
@@ -225,30 +224,9 @@ async function handleTokenTransfer({
   assert(!!sendAccount, 'no send account found')
 
   // fund account
-  if (isETH) {
-    await testBaseClient.setBalance({
-      address: sendAccount.address as `0x${string}`,
-      value: balanceBefore, // padding
-    })
-    expect(await testBaseClient.getBalance({ address: sendAccount.address as `0x${string}` })).toBe(
-      balanceBefore
-    )
-  } else {
-    await setERC20Balance({
-      client: testBaseClient,
-      address: sendAccount.address as `0x${string}`,
-      tokenAddress: token.token as `0x${string}`,
-      value: balanceBefore, // padding
-    })
-    expect(
-      await lookupBalance({
-        address: sendAccount.address as `0x${string}`,
-        token: token.token as `0x${string}`,
-      })
-    ).toBe(balanceBefore)
-  }
+  await fund({ address: sendAccount.address, amount: balanceBefore, coin: token })
 
-  await page.reload() // ensure balance is updated
+  await page.reload() // ensure balance is updated on the page
 
   const sendPage = new SendPage(page, expect)
   await sendPage.expectTokenSelect(token.symbol)
@@ -256,49 +234,60 @@ async function handleTokenTransfer({
   await sendPage.waitForSendingCompletion()
   await sendPage.expectNoSendError()
 
-  await expect(async () =>
-    isETH
-      ? // just ensure balance is updated, since the send_account_receives event is not emitted
-        expect(
-          await testBaseClient.getBalance({
-            address: recvAccount.address as `0x${string}`,
-          })
-        ).toBe(transferAmount)
-      : await expect(supabase).toHaveEventInActivityFeed({
-          event_name: 'send_account_transfers',
-          ...(profile ? { to_user: { id: profile.id, send_id: profile.send_id } } : {}),
-          data: {
-            t: hexToBytea(recvAccount.address as `0x${string}`),
-            v: transferAmount.toString(),
-          },
+  await page.waitForURL(`/?token=${token.token}`, { timeout: 10_000 })
+
+  await expect(async () => {
+    if (isETH) {
+      // just ensure balance is updated, since the send_account_receives event is not emitted
+      expect(
+        await testBaseClient.getBalance({
+          address: recvAccount.address as `0x${string}`,
         })
-  ).toPass({
-    timeout: isETH ? 10000 : 5000, // eth needs more time since no send_account_receives event is emitted
+      ).toBe(transferAmount)
+    } else {
+      // 1. Check if the indexed event exists in the database
+      await expect(supabase).toHaveEventInActivityFeed({
+        event_name: 'send_account_transfers',
+        ...(profile ? { to_user: { id: profile.id, send_id: profile.send_id } } : {}),
+        data: {
+          t: hexToBytea(recvAccount.address as `0x${string}`),
+          v: transferAmount.toString(),
+        },
+      })
+    }
+  }).toPass({
+    // Increased timeout to allow for indexing and UI update
+    timeout: 15000,
   })
 
-  await expect(page).toHaveURL(`/?token=${token.token}`, { timeout: isETH ? 10_000 : undefined }) // sometimes ETH needs more time
+  if (isETH) return // nothing else to check with eth because it won't show up in activity
 
-  if (!isETH) {
-    // no history for eth since no send_account_receives event is emitted
-    const history = page.getByTestId('TokenActivityFeed')
-    await expect(history).toBeVisible()
+  // 2. Check if the UI has updated to show the indexed event (not the pending one)
+  const history = page.getByTestId('TokenActivityFeed')
 
-    const historyAmount = (() => {
-      switch (token.symbol) {
-        case 'USDC':
-          return truncateDecimals(decimalAmount, 2)
-        case 'SEND':
-          return truncateDecimals(decimalAmount, 0)
-        default:
-          return decimalAmount
-      }
-    })()
+  await expect(history).toBeVisible({ timeout: 5_000 })
 
-    await expect(history.getByText(`${historyAmount} ${token.symbol}`)).toBeVisible()
-    await expect(
-      history.getByText(isAddress(counterparty) ? shorten(counterparty ?? '', 5, 4) : counterparty)
-    ).toBeVisible()
-  }
+  const historyAmount = (() => {
+    switch (token.symbol) {
+      case 'USDC':
+        return truncateDecimals(decimalAmount, 2)
+      case 'SEND':
+        return truncateDecimals(decimalAmount, 0)
+      default:
+        return decimalAmount
+    }
+  })()
+
+  const isAddressCounterparty = isAddress(counterparty)
+
+  // Ensure the correct amount and counterparty are visible
+  await expect(history.getByText(`${historyAmount} ${token.symbol}`)).toBeVisible()
+  await expect(
+    history.getByText(isAddressCounterparty ? shorten(counterparty ?? '', 5, 4) : counterparty)
+  ).toBeVisible()
+
+  // Ensure Sent is visible
+  await expect(history.getByText(isAddressCounterparty ? 'Withdraw' : 'Sent')).toBeVisible()
 }
 
 const truncateDecimals = (amount: string, decimals: number) => {

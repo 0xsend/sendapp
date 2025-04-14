@@ -1,11 +1,13 @@
-import { setERC20Balance } from 'app/utils/useSetErc20Balance'
-import { expect } from '@playwright/test'
 export { testBaseClient } from './base'
 export { testMainnetClient } from './mainnet'
+import { expect } from '@playwright/test'
 import { isEthCoin, type coin } from 'app/data/coins'
-
+import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 import { testBaseClient } from './base'
 
+/**
+ * Lookup the balance of the given address for the given token
+ */
 export const lookupBalance = async ({
   address,
   token: tokenAddress,

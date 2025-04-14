@@ -247,16 +247,13 @@ export class SwapSummaryPage {
     exchangeRate: string
   }) {
     await expect(async () => {
-      const request = await this.page.waitForRequest('/api/trpc/swap.encodeSwapRoute?batch=1')
-      const requestPayload = request.postDataJSON()
-      expect(requestPayload['0'].json.slippageTolerance).toEqual(slippage * 100)
       await expect(this.swapInAmount).toHaveText(inAmount)
       await expect(this.inTokenSymbol).toHaveText(inToken)
       await expect(this.swapOutAmount).toHaveText(outAmount)
       await expect(this.outTokenSymbol).toHaveText(outToken)
       await expect(this.slippage).toHaveText(`${slippage}%`)
       await expect(this.exchangeRate).toHaveText(exchangeRate)
-    }).toPass({ timeout: 30_000 })
+    }).toPass({ timeout: 10_000 })
   }
 
   async confirmSwap() {

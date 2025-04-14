@@ -1,19 +1,23 @@
-import { log, ApplicationFailure } from '@temporalio/activity'
+import type { PgBytea } from '@my/supabase/database.types'
+import { ApplicationFailure, log } from '@temporalio/activity'
+import { byteaToHex } from 'app/utils/byteaToHex'
+import { decodeExecuteBatchCalldata } from 'app/utils/decode-calldata'
+import { hexToBytea } from 'app/utils/hexToBytea'
+import type {
+  GetUserOperationReceiptReturnType,
+  UserOperation,
+  WaitForUserOperationReceiptParameters,
+} from 'permissionless'
+import superjson from 'superjson'
+import type { Hex } from 'viem'
+import { bootstrap } from '../utils'
 import {
   getBaseBlockNumber,
   sendUserOperation,
   simulateUserOperation,
   waitForTransactionReceipt,
+  waitForUserOperationReceipt,
 } from './wagmi'
-import type { PgBytea } from '@my/supabase/database.types'
-import type { UserOperation } from 'permissionless'
-import { hexToBytea } from 'app/utils/hexToBytea'
-import { byteaToHex } from 'app/utils/byteaToHex'
-import superjson from 'superjson'
-import { bootstrap } from '../utils'
-import { decodeExecuteBatchCalldata } from 'app/utils/decode-calldata'
-import type { Hex } from 'viem'
-import type { GetUserOperationReceiptReturnType } from 'permissionless'
 
 export type UserOpActivities = {
   simulateUserOperationActivity: (userOp: UserOperation<'v0.7'>) => Promise<void>
@@ -25,6 +29,9 @@ export type UserOpActivities = {
   getBaseBlockNumberActivity: () => Promise<bigint>
   sendUserOpActivity: (userOp: UserOperation<'v0.7'>) => Promise<PgBytea>
   waitForTransactionReceiptActivity: (hash: PgBytea) => Promise<GetUserOperationReceiptReturnType>
+  waitForUserOperationReceiptActivity: (
+    params: WaitForUserOperationReceiptParameters
+  ) => Promise<GetUserOperationReceiptReturnType>
 }
 
 export const createUserOpActivities = (
@@ -81,6 +88,10 @@ export const createUserOpActivities = (
         )
       }
     },
+    /**
+     * Waits for the transaction receipt for the given hash.
+     * @deprecated - use waitForUserOperationReceiptActivity instead
+     */
     async waitForTransactionReceiptActivity(hash) {
       try {
         const hexHash = byteaToHex(hash)
@@ -96,6 +107,27 @@ export const createUserOpActivities = (
         return bundlerReceipt
       } catch (error) {
         log.error('waitForTransactionReceipt failed', { error })
+        throw ApplicationFailure.nonRetryable(error.message, error.code, error.details)
+      }
+    },
+
+    /**
+     * Waits for the user operation receipt for the given hash.
+     */
+    async waitForUserOperationReceiptActivity(params: WaitForUserOperationReceiptParameters) {
+      try {
+        const bundlerReceipt = await waitForUserOperationReceipt(params)
+        log.info('waitForUserOperationReceiptActivity', {
+          bundlerReceipt,
+        })
+        if (!bundlerReceipt.success) {
+          throw ApplicationFailure.nonRetryable(
+            `Transaction failed: ${bundlerReceipt.receipt.transactionHash}`
+          )
+        }
+        return bundlerReceipt
+      } catch (error) {
+        log.error('waitForUserOperationReceipt failed', { error })
         throw ApplicationFailure.nonRetryable(error.message, error.code, error.details)
       }
     },

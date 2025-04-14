@@ -14,7 +14,11 @@ import {
 import type { PostgrestError, SupabaseClient } from '@supabase/supabase-js'
 import { useMutation, useQuery, type UseQueryResult } from '@tanstack/react-query'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
-import { getUserOperationHash, type UserOperation } from 'permissionless'
+import {
+  getUserOperationHash,
+  type GetUserOperationReceiptReturnType,
+  type UserOperation,
+} from 'permissionless'
 import type { MergeDeep } from 'type-fest'
 import { type CallExecutionError, encodeFunctionData, isAddress, zeroAddress } from 'viem'
 import { useReadContract, useSimulateContract } from 'wagmi'
@@ -395,7 +399,7 @@ export async function sendUserOpClaim({
   version,
   validUntil,
   webauthnCreds,
-}: UseUserOpClaimMutationArgs) {
+}: UseUserOpClaimMutationArgs): Promise<GetUserOperationReceiptReturnType> {
   const chainId = baseMainnetClient.chain.id
   const entryPoint = entryPointAddress[chainId]
   const userOpHash = getUserOperationHash({

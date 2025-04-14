@@ -25,7 +25,8 @@
       "./supabase/.temp/**",
       "./packages/contracts/var/*.json",
       "**/tsconfig.json",
-      "**/*.tsconfig.json"
+      "**/*.tsconfig.json",
+      "postgrestools.jsonc"
     ]
   },
   "organizeImports": {

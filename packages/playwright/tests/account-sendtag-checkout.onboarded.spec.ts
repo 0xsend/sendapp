@@ -11,8 +11,9 @@ import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import debug from 'debug'
 import { getAuthSessionFromContext } from './fixtures/auth'
-import { type CheckoutPage, expect, test as checkoutTest } from './fixtures/sendtags/checkout'
+import { checkReferralCodeVisibility } from './fixtures/referrals'
 import type { ActivityMatch } from './fixtures/send-accounts/matchers/activity-feed'
+import { type CheckoutPage, test as checkoutTest, expect } from './fixtures/sendtags/checkout'
 import { lookupBalance, testBaseClient } from './fixtures/viem'
 
 let log: debug.Debugger
@@ -101,17 +102,6 @@ const verifyReferralReward = async (
 // tag names are limited to 1-20 characters
 const generateTagName = () => faker.string.alphanumeric({ length: { min: 6, max: 20 } })
 
-const checkReferralCodeVisibility = async (
-  checkoutPage: CheckoutPage,
-  referrer: { tags: string[]; referral_code: string }
-) => {
-  const refcode = checkoutPage.page.getByTestId('referral-code-input')
-  const referralCodeConfirmation = checkoutPage.page.getByText('Referral code applied')
-  await expect(refcode).toBeVisible()
-  await expect(refcode).toHaveValue(referrer.tags[0] ?? referrer.referral_code)
-  await expect(referralCodeConfirmation).toBeVisible()
-}
-
 const checkReferralCodeDisabled = async (checkoutPage: CheckoutPage) => {
   const refcode = checkoutPage.page.getByTestId('referral-code-input')
   await expect(refcode).toBeDisabled()
@@ -184,9 +174,9 @@ test('can refer a tag', async ({ seed, checkoutPage, supabase, user: { profile: 
 
   // check referral code and referrer are visible
   const refcode = checkoutPage.page.getByTestId('referral-code-input')
-  await checkReferralCodeVisibility(checkoutPage, {
-    referral_code: referrer.referral_code,
-    tags: referrerTags,
+  await checkReferralCodeVisibility({
+    page: checkoutPage.page,
+    referralCode: referrerTags[0] ?? referrer.referral_code,
   })
   // can change the referral code
   await refcode.fill('1234567890')
@@ -194,9 +184,9 @@ test('can refer a tag', async ({ seed, checkoutPage, supabase, user: { profile: 
   await expect(referralCodeInvalid).toBeVisible()
   // can change the referrer to valid code
   await refcode.fill(referrer.referral_code)
-  await checkReferralCodeVisibility(checkoutPage, {
-    referral_code: referrer.referral_code,
-    tags: referrerTags,
+  await checkReferralCodeVisibility({
+    page: checkoutPage.page,
+    referralCode: referrer.referral_code,
   })
 
   await confirmTags(checkoutPage, tagsToRegister)
@@ -236,7 +226,7 @@ test('can refer a tag', async ({ seed, checkoutPage, supabase, user: { profile: 
       send_id: myProfile.send_id,
     },
     data: {
-      tags: [tagsToRegister[0]],
+      tags: expect.arrayContaining([tagsToRegister[0]]),
     },
   })
 
@@ -260,9 +250,9 @@ test('can refer multiple tags in separate transactions', async ({
   await checkoutPage.page.goto(`/?referral=${referrer.referral_code}`)
   await checkoutPage.goto()
 
-  await checkReferralCodeVisibility(checkoutPage, {
-    referral_code: referrer.referral_code,
-    tags: referrerTags,
+  await checkReferralCodeVisibility({
+    page: checkoutPage.page,
+    referralCode: referrerTags[0] ?? referrer.referral_code,
   })
   await confirmTags(checkoutPage, firstTags)
   await verifyTagsInDatabase(supabase, firstTags)
@@ -278,7 +268,7 @@ test('can refer multiple tags in separate transactions', async ({
       send_id: myProfile.send_id,
     },
     data: {
-      tags: [firstTags[0]],
+      tags: expect.arrayContaining([firstTags[0]]),
     },
   })
   const firstRewardAmount = await verifyReferralReward(

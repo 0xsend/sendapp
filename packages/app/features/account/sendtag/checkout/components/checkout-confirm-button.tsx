@@ -14,6 +14,7 @@ import { AlertTriangle } from '@tamagui/lucide-icons'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { TRPCClientError } from '@trpc/client'
 import { total } from 'app/data/sendtags'
+import { useCoin } from 'app/provider/coins'
 import { api } from 'app/utils/api'
 import { assert } from 'app/utils/assert'
 import { byteaToHex } from 'app/utils/byteaToHex'
@@ -21,20 +22,19 @@ import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
 import { usePendingTags } from 'app/utils/tags'
 import { throwIf } from 'app/utils/throwIf'
 import { useReceipts } from 'app/utils/useReceipts'
+import { useReferralCodeCookie } from 'app/utils/useReferralCodeCookie'
+import { useReferrer } from 'app/utils/useReferrer'
 import { useUser } from 'app/utils/useUser'
 import { sendUserOpTransfer } from 'app/utils/useUserOpTransferMutation'
 import { useAccountNonce } from 'app/utils/userop'
 import { type PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react'
 import { isAddressEqual, zeroAddress } from 'viem'
 import { useWaitForTransactionReceipt } from 'wagmi'
-import { useReferralCodeCookie } from 'app/utils/useReferralCodeCookie'
-import { useReferrer } from 'app/utils/useReferrer'
 import {
   useReferralReward,
   useSendtagCheckout,
   useSendtagCheckoutReceipts,
 } from '../checkout-utils'
-import { useCoin } from 'app/provider/coins'
 
 export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
   const { updateProfile } = useUser()

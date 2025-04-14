@@ -60,148 +60,182 @@ describe('test amountFromActivity', () => {
 describe('test eventNameFromActivity', () => {
   it('should return the received when transfer and to user ID is present', () => {
     const activity = JSON.parse(JSON.stringify(mockReceivedTransfer))
-    expect(eventNameFromActivity(EventSchema.parse(activity))).toBe('Deposit')
+    expect(eventNameFromActivity({ activity: EventSchema.parse(activity) })).toBe('Deposit')
   })
   it('should return the received when received eth and to user ID is present', () => {
     const activity = JSON.parse(JSON.stringify(mockSendAccountReceive))
-    expect(eventNameFromActivity(EventSchema.parse(activity))).toBe('Received')
+    expect(eventNameFromActivity({ activity: EventSchema.parse(activity) })).toBe('Received')
   })
   it('should return the sent when received eth and from user ID is present', () => {
     const activity = JSON.parse(JSON.stringify({ ...mockSendAccountReceive }))
     activity.from_user = { ...activity.from_user, id: '1234' }
     activity.to_user = { ...activity.to_user, id: null }
-    expect(eventNameFromActivity(EventSchema.parse(activity))).toBe('Sent')
+    expect(eventNameFromActivity({ activity: EventSchema.parse(activity) })).toBe('Sent')
   })
   it('should return the sent when transfer and from user ID is present', () => {
     const activity = JSON.parse(JSON.stringify(mockSentTransfer))
-    expect(eventNameFromActivity(EventSchema.parse(activity))).toBe('Sent')
+    expect(eventNameFromActivity({ activity: EventSchema.parse(activity) })).toBe('Sent')
   })
   it('should return the sendtag registered when tag receipts event', () => {
     const activity = JSON.parse(JSON.stringify(mockTagReceipt))
-    expect(eventNameFromActivity(EventSchema.parse(activity))).toBe('Sendtag Registered')
+    expect(eventNameFromActivity({ activity: EventSchema.parse(activity) })).toBe(
+      'Sendtag Registered'
+    )
   })
   it('should return the referral when referrals event', () => {
     const activity = JSON.parse(JSON.stringify(mockReferral))
-    expect(eventNameFromActivity(EventSchema.parse(activity))).toBe('Referral')
+    expect(eventNameFromActivity({ activity: EventSchema.parse(activity) })).toBe('Referral')
   })
   it('should return I Am Rick James when unknown event name equals i_am_rick_james', () => {
     const activity = JSON.parse(JSON.stringify(MockActivityFeed[4]))
     expect(
-      eventNameFromActivity({ ...EventSchema.parse(activity), event_name: 'i_am_rick_james' })
+      eventNameFromActivity({
+        activity: { ...EventSchema.parse(activity), event_name: 'i_am_rick_james' },
+      })
     ).toBe('I Am Rick James')
   })
   it('should return Revenue Share when send_account_transfer from SendtagCheckout contract', () => {
     const activity = JSON.parse(JSON.stringify(mockSendtagReferralRewardUSDC))
     const _activity = EventSchema.parse(activity)
-    expect(eventNameFromActivity(_activity)).toBe('Revenue Share')
+    expect(eventNameFromActivity({ activity: _activity })).toBe('Revenue Share')
   })
   it('should return "Trade" when withdrawal address is swap router or liquidity pool', () => {
     const activity = JSON.parse(JSON.stringify(mockSwapSellErc20Transfer))
     expect(
-      eventNameFromActivity(EventSchema.parse(activity), mockSwapRouters, mockLiquidityPools)
+      eventNameFromActivity({
+        activity: EventSchema.parse(activity),
+        swapRouters: mockSwapRouters,
+        liquidityPools: mockLiquidityPools,
+      })
     ).toBe('Trade')
   })
   it('should return "Trade" when erc20 deposit address is swap router or liquidity pool', () => {
     const activity = JSON.parse(JSON.stringify(mockSwapBuyErc20Transfer))
     expect(
-      eventNameFromActivity(EventSchema.parse(activity), mockSwapRouters, mockLiquidityPools)
+      eventNameFromActivity({
+        activity: EventSchema.parse(activity),
+        swapRouters: mockSwapRouters,
+        liquidityPools: mockLiquidityPools,
+      })
     ).toBe('Trade')
   })
   it('should return "Trade" when eth deposit address is swap router or liquidity pool', () => {
     const activity = JSON.parse(JSON.stringify(mockSwapBuyEthTransfer))
     expect(
-      eventNameFromActivity(EventSchema.parse(activity), mockSwapRouters, mockLiquidityPools)
+      eventNameFromActivity({
+        activity: EventSchema.parse(activity),
+        swapRouters: mockSwapRouters,
+        liquidityPools: mockLiquidityPools,
+      })
     ).toBe('Trade')
   })
 })
 
 describe('phraseFromActivity', () => {
   it('should return "Deposited" when transfer and to user ID is present', () => {
-    expect(phraseFromActivity(EventSchema.parse(mockReceivedTransfer))).toBe('Deposited')
+    expect(phraseFromActivity({ activity: EventSchema.parse(mockReceivedTransfer) })).toBe(
+      'Deposited'
+    )
   })
 
   it('should return "Sent" when received eth and to user ID is present', () => {
-    expect(phraseFromActivity(EventSchema.parse(mockSendAccountReceive))).toBe('Sent you')
+    expect(phraseFromActivity({ activity: EventSchema.parse(mockSendAccountReceive) })).toBe(
+      'Sent you'
+    )
   })
 
   it('should return "Received" when received eth and from user ID is present', () => {
     const activity = JSON.parse(JSON.stringify({ ...mockSendAccountReceive }))
     activity.from_user = { ...activity.from_user, id: '1234' }
     activity.to_user = { ...activity.to_user, id: null }
-    expect(phraseFromActivity(EventSchema.parse(activity))).toBe('Received')
+    expect(phraseFromActivity({ activity: EventSchema.parse(activity) })).toBe('Received')
   })
 
   it('should return "Received" when transfer and from user ID is present', () => {
-    expect(phraseFromActivity(EventSchema.parse(mockSentTransfer))).toBe('Received')
+    expect(phraseFromActivity({ activity: EventSchema.parse(mockSentTransfer) })).toBe('Received')
   })
 
   it('should return "Sendtag created" when tag receipts event', () => {
-    expect(phraseFromActivity(EventSchema.parse(mockTagReceipt))).toBe('Sendtag created')
+    expect(phraseFromActivity({ activity: EventSchema.parse(mockTagReceipt) })).toBe(
+      'Sendtag created'
+    )
   })
 
   it('should return "Referred" when referrals event', () => {
-    expect(phraseFromActivity(EventSchema.parse(mockReferral))).toBe('Referred')
+    expect(phraseFromActivity({ activity: EventSchema.parse(mockReferral) })).toBe('Referred')
   })
 
   it('should return "I am rick james" when unknown event name equals i_am_rick_james', () => {
     const activity = JSON.parse(JSON.stringify(MockActivityFeed[4]))
     expect(
       phraseFromActivity({
-        ...EventSchema.parse(activity),
-        event_name: 'i_am_rick_james',
+        activity: {
+          ...EventSchema.parse(activity),
+          event_name: 'i_am_rick_james',
+        },
       })
     ).toBe('I am rick james')
   })
 
   it('should return "Earned revenue share" when send_account_transfer from SendtagCheckout contract', () => {
     const _activity = EventSchema.parse(mockSendtagReferralRewardUSDC)
-    expect(phraseFromActivity(_activity)).toBe('Earned revenue share')
+    expect(phraseFromActivity({ activity: _activity })).toBe('Earned revenue share')
   })
 
   it('should return "Trade" when withdrawal address is swap router or liquidity pool', () => {
     expect(
-      phraseFromActivity(
-        EventSchema.parse(mockSwapSellErc20Transfer),
-        mockSwapRouters,
-        mockLiquidityPools
-      )
+      phraseFromActivity({
+        activity: EventSchema.parse(mockSwapSellErc20Transfer),
+        swapRouters: mockSwapRouters,
+        liquidityPools: mockLiquidityPools,
+      })
     ).toBe('Trade')
   })
 
   it('should return "Trade" when erc20 deposit address is swap router or liquidity pool', () => {
     const activity = JSON.parse(JSON.stringify(mockSwapBuyErc20Transfer))
     expect(
-      phraseFromActivity(EventSchema.parse(activity), mockSwapRouters, mockLiquidityPools)
+      phraseFromActivity({
+        activity: EventSchema.parse(activity),
+        swapRouters: mockSwapRouters,
+        liquidityPools: mockLiquidityPools,
+      })
     ).toBe('Trade')
   })
 
   it('should return "Trade" when eth deposit address is swap router or liquidity pool', () => {
     const activity = JSON.parse(JSON.stringify(mockSwapBuyEthTransfer))
     expect(
-      phraseFromActivity(EventSchema.parse(activity), mockSwapRouters, mockLiquidityPools)
+      phraseFromActivity({
+        activity: EventSchema.parse(activity),
+        swapRouters: mockSwapRouters,
+        liquidityPools: mockLiquidityPools,
+      })
     ).toBe('Trade')
   })
 })
 
 describe('test subtextFromActivity', () => {
   it('should return the address when transfer and to user ID is present and no from user ID', () => {
-    expect(subtextFromActivity(EventSchema.parse(mockReceivedTransfer))).toBe(
+    expect(subtextFromActivity({ activity: EventSchema.parse(mockReceivedTransfer) })).toBe(
       shorten(byteaToHexEthAddress.parse(mockReceivedTransfer.data.f), 5, 4)
     )
   })
   it('should return the to user tags when transfer and from user ID is present', () => {
-    expect(subtextFromActivity(EventSchema.parse(mockSentTransfer))).toEqual(
+    expect(subtextFromActivity({ activity: EventSchema.parse(mockSentTransfer) })).toEqual(
       `/${mockSentTransfer.to_user.tags[0]}`
     )
   })
   it('should return the tags when tag receipts event', () => {
-    expect(subtextFromActivity(EventSchema.parse(mockTagReceipt))).toEqual(
+    expect(subtextFromActivity({ activity: EventSchema.parse(mockTagReceipt) })).toEqual(
       `/${mockTagReceipt.data.tags[0]}`
     )
   })
   it('should return the referrals when referrals event', () => {
     const activity = JSON.parse(JSON.stringify(mockReferral))
-    expect(subtextFromActivity(EventSchema.parse(activity))).toBe('/disconnect_whorl7351')
+    expect(subtextFromActivity({ activity: EventSchema.parse(activity) })).toBe(
+      '/disconnect_whorl7351'
+    )
   })
   it('should return Paymaster when sent to paymaster', () => {
     const activity = JSON.parse(JSON.stringify(mockSentTransfer))
@@ -209,7 +243,7 @@ describe('test subtextFromActivity', () => {
     const anyPaymaster = Object.values(tokenPaymasterAddress)[0]
     assert(!!anyPaymaster, 'anyPaymaster not found')
     activity.data.t = hexToBytea(anyPaymaster)
-    expect(subtextFromActivity(EventSchema.parse(activity))).toBe('Paymaster')
+    expect(subtextFromActivity({ activity: EventSchema.parse(activity) })).toBe('Paymaster')
   })
   it('should return Paymaster when received from paymaster', () => {
     const activity = JSON.parse(JSON.stringify(mockReceivedTransfer))
@@ -217,35 +251,43 @@ describe('test subtextFromActivity', () => {
     const anyPaymaster = Object.values(tokenPaymasterAddress)[0]
     assert(!!anyPaymaster, 'anyPaymaster not found')
     activity.data.f = hexToBytea(anyPaymaster)
-    expect(subtextFromActivity(EventSchema.parse(activity))).toBe('Paymaster')
+    expect(subtextFromActivity({ activity: EventSchema.parse(activity) })).toBe('Paymaster')
   })
   it('should return Sendtags when received from SendtagCheckout contract', () => {
     const activity = JSON.parse(JSON.stringify(mockSendtagReferralRewardUSDC))
-    expect(subtextFromActivity(EventSchema.parse(activity))).toBe('Sendtags')
+    expect(subtextFromActivity({ activity: EventSchema.parse(activity) })).toBe('Sendtags')
   })
   it('should return upgraded amount when mint of new Send Token V1', () => {
     const activity = JSON.parse(JSON.stringify(mockSendTokenUpgradeEvent))
-    expect(subtextFromActivity(EventSchema.parse(activity))).toBe('1M -> 10,000')
+    expect(subtextFromActivity({ activity: EventSchema.parse(activity) })).toBe('1M -> 10,000')
   })
   it('should return coin when withdrawal address is swap router or liquidity pool', () => {
     expect(
-      subtextFromActivity(
-        EventSchema.parse(mockSwapSellErc20Transfer),
-        mockSwapRouters,
-        mockLiquidityPools
-      )
+      subtextFromActivity({
+        activity: EventSchema.parse(mockSwapSellErc20Transfer),
+        swapRouters: mockSwapRouters,
+        liquidityPools: mockLiquidityPools,
+      })
     ).toBe('USDC')
   })
   it('should return coin when erc20 deposit address is swap router or liquidity pool', () => {
     const activity = JSON.parse(JSON.stringify(mockSwapBuyErc20Transfer))
     expect(
-      subtextFromActivity(EventSchema.parse(activity), mockSwapRouters, mockLiquidityPools)
+      subtextFromActivity({
+        activity: EventSchema.parse(activity),
+        swapRouters: mockSwapRouters,
+        liquidityPools: mockLiquidityPools,
+      })
     ).toBe('USDC')
   })
   it('should return coin when eth deposit address is swap router or liquidity pool', () => {
     const activity = JSON.parse(JSON.stringify(mockSwapBuyEthTransfer))
     expect(
-      subtextFromActivity(EventSchema.parse(activity), mockSwapRouters, mockLiquidityPools)
+      subtextFromActivity({
+        activity: EventSchema.parse(activity),
+        swapRouters: mockSwapRouters,
+        liquidityPools: mockLiquidityPools,
+      })
     ).toBe('ETH')
   })
 })

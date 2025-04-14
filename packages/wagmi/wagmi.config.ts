@@ -22,6 +22,12 @@ import sendTokenV1Artifact from '@0xsend/send-token-upgrade/artifacts/contracts/
   type: 'json',
 }
 
+import { sendEarnAbi, sendEarnFactoryAbi } from '@0xsend/send-earn-contracts'
+
+import sendEarnFactoryBroadcast from '@0xsend/send-earn-contracts/broadcast/DeploySendEarn.s.sol/8453/run-latest.json' with {
+  type: 'json',
+}
+
 const broadcasts = (
   await globby([`${process.cwd()}/../contracts/broadcast/**/run-latest.json`])
 ).filter((f) => !f.includes('dry-run'))
@@ -103,6 +109,18 @@ export default defineConfig({
       address: {
         [baseLocal.id]: '0x17D46f667B0e4156238645536c344d010FC099d7',
         [base.id]: '0x17D46f667B0e4156238645536c344d010FC099d7',
+      },
+      abi: [],
+    },
+    /**
+     * [Send: Earn Revenue](https://basescan.org/address/0x65049C4B8e970F5bcCDAE8E141AA06346833CeC4)
+     **/
+    {
+      name: 'SendEarnRevenueSafe',
+      address: {
+        [baseLocal.id]: '0x65049C4B8e970F5bcCDAE8E141AA06346833CeC4',
+        [base.id]: '0x65049C4B8e970F5bcCDAE8E141AA06346833CeC4',
+        [baseSepolia.id]: '0x269cD0a2afd1BAbdA7A74ab1dC853869a37aa4a7',
       },
       abi: [],
     },
@@ -272,6 +290,146 @@ export default defineConfig({
         // [sepolia.id]: sendTokenUpgradeAddresses['SendTokenModule#SendToken'] as `0x${string}`,
       },
     },
+    {
+      name: 'SendEarnUSDCFactory',
+      address: {
+        [mainnet.id]: sendEarnFactoryBroadcast.returns.factoryAddress.value as `0x${string}`,
+        [localhost.id]: sendEarnFactoryBroadcast.returns.factoryAddress.value as `0x${string}`,
+        [sepolia.id]: sendEarnFactoryBroadcast.returns.factoryAddress.value as `0x${string}`,
+        [baseLocal.id]: sendEarnFactoryBroadcast.returns.factoryAddress.value as `0x${string}`,
+        [base.id]: sendEarnFactoryBroadcast.returns.factoryAddress.value as `0x${string}`,
+        [baseSepolia.id]: sendEarnFactoryBroadcast.returns.factoryAddress.value as `0x${string}`,
+      },
+      abi: sendEarnFactoryAbi,
+    },
+    {
+      name: 'SendEarn',
+      address: {
+        [mainnet.id]: sendEarnFactoryBroadcast.returns.sendEarnAddress.value as `0x${string}`,
+        [localhost.id]: sendEarnFactoryBroadcast.returns.sendEarnAddress.value as `0x${string}`,
+        [sepolia.id]: sendEarnFactoryBroadcast.returns.sendEarnAddress.value as `0x${string}`,
+        [baseLocal.id]: sendEarnFactoryBroadcast.returns.sendEarnAddress.value as `0x${string}`,
+        [base.id]: sendEarnFactoryBroadcast.returns.sendEarnAddress.value as `0x${string}`,
+        [baseSepolia.id]: sendEarnFactoryBroadcast.returns.sendEarnAddress.value as `0x${string}`,
+      },
+      abi: sendEarnAbi,
+    },
+    {
+      name: 'MorphoView',
+      address: {
+        [mainnet.id]: '0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B',
+        [localhost.id]: '0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B',
+        [sepolia.id]: '0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B',
+        [baseLocal.id]: '0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B',
+        [base.id]: '0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B',
+        [baseSepolia.id]: '0xc72fCC9793a10b9c363EeaAcaAbe422E0672B42B',
+      },
+      abi: [
+        {
+          type: 'function',
+          name: 'getVaultInfo',
+          inputs: [
+            {
+              name: '_vault',
+              type: 'address',
+              internalType: 'contract IMetaMorpho',
+            },
+          ],
+          outputs: [
+            {
+              name: '',
+              type: 'tuple',
+              internalType: 'struct MorphoViews.MorphoVault',
+              components: [
+                {
+                  name: 'vault',
+                  type: 'address',
+                  internalType: 'address',
+                },
+                {
+                  name: 'totalSupply',
+                  type: 'uint256',
+                  internalType: 'uint256',
+                },
+                {
+                  name: 'totalAssets',
+                  type: 'uint256',
+                  internalType: 'uint256',
+                },
+                {
+                  name: 'underlyingPrice',
+                  type: 'uint256',
+                  internalType: 'uint256',
+                },
+                {
+                  name: 'fee',
+                  type: 'uint256',
+                  internalType: 'uint256',
+                },
+                {
+                  name: 'timelock',
+                  type: 'uint256',
+                  internalType: 'uint256',
+                },
+                {
+                  name: 'markets',
+                  type: 'tuple[]',
+                  internalType: 'struct MorphoViews.MorphoVaultMarketsInfo[]',
+                  components: [
+                    {
+                      name: 'marketId',
+                      type: 'bytes32',
+                      internalType: 'Id',
+                    },
+                    {
+                      name: 'marketCollateral',
+                      type: 'address',
+                      internalType: 'address',
+                    },
+                    {
+                      name: 'marketCollateralName',
+                      type: 'string',
+                      internalType: 'string',
+                    },
+                    {
+                      name: 'marketCollateralSymbol',
+                      type: 'string',
+                      internalType: 'string',
+                    },
+                    {
+                      name: 'marketLiquidity',
+                      type: 'uint256',
+                      internalType: 'uint256',
+                    },
+                    {
+                      name: 'marketLltv',
+                      type: 'uint256',
+                      internalType: 'uint256',
+                    },
+                    {
+                      name: 'marketApy',
+                      type: 'uint256',
+                      internalType: 'uint256',
+                    },
+                    {
+                      name: 'vaultAllocation',
+                      type: 'uint256',
+                      internalType: 'uint256',
+                    },
+                    {
+                      name: 'vaultSupplied',
+                      type: 'uint256',
+                      internalType: 'uint256',
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          stateMutability: 'view',
+        },
+      ] as const,
+    },
   ],
   plugins: [
     foundry({
@@ -296,6 +454,11 @@ export default defineConfig({
           [baseSepolia.id]: '0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE', // base sepolia
           [baseLocal.id]: '0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6', // base localnet
           ...deployedSendMerkleDrop,
+        },
+        SendVerifierProxy: {
+          [base.id]: '0x339960716f26c318f9c28c3efc363246f274f859',
+          [baseLocal.id]: '0x339960716f26c318f9c28c3efc363246f274f859',
+          [baseSepolia.id]: '0xc578475d39894163a07cb31dbb704e2c9a907c39',
         },
       },
       include: [

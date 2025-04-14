@@ -30,6 +30,7 @@ export const IconCoin = ({
   const Icon = coinSymbolToIcons[symbol]
 
   if (!Icon) {
+    console.warn(`No icon found for symbol ${symbol}`)
     return null
   }
 

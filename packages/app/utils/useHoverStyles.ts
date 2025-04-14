@@ -10,5 +10,6 @@ export const useHoverStyles = () => {
   return {
     background: rowHoverBC,
     transition: 'background 0.2s ease-in-out',
+    cursor: 'pointer',
   }
 }

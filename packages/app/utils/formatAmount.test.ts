@@ -1,6 +1,7 @@
 import { describe, expect, it } from '@jest/globals'
 
-import formatAmount from './formatAmount' // Adjust the import path
+import formatAmount, { sanitizeAmount } from './formatAmount' // Adjust the import path
+import { parseUnits } from 'viem'
 
 describe('abbreviateNumber', () => {
   it('should handle negatives', () => {
@@ -109,5 +110,49 @@ describe('Additional scenarios', () => {
 
   it('should not show less than when number has integers', () => {
     expect(formatAmount(5313.01, 4, 0)).toBe('5,313')
+  })
+})
+
+describe('sanitizeAmount', () => {
+  it('should return null when amount is undefined', () => {
+    expect(sanitizeAmount(undefined)).toBeNull()
+  })
+
+  it('should return null when amount is empty string', () => {
+    expect(sanitizeAmount('')).toBeNull()
+  })
+
+  it('should remove non-numeric characters except decimal point', () => {
+    expect(sanitizeAmount('abc123.45xyz')).toEqual(parseUnits('123.45', 18))
+  })
+
+  it('should handle multiple decimal points by keeping only the first one', () => {
+    expect(sanitizeAmount('123.45.67')).toEqual(parseUnits('123.4567', 18))
+  })
+
+  it('should work with custom decimal places', () => {
+    expect(sanitizeAmount('123.45', 6)).toEqual(parseUnits('123.45', 6))
+  })
+
+  it('should handle zero amount', () => {
+    expect(sanitizeAmount('0')).toEqual(parseUnits('0', 18))
+  })
+
+  it('should handle amount with only decimal point', () => {
+    expect(sanitizeAmount('.')).toEqual(parseUnits('0', 18))
+  })
+
+  it('should handle amount with leading decimal point', () => {
+    expect(sanitizeAmount('.123')).toEqual(parseUnits('0.123', 18))
+  })
+
+  it('should handle amount with trailing decimal point', () => {
+    expect(sanitizeAmount('123.')).toEqual(parseUnits('123.0', 18))
+  })
+
+  it('should handle very large numbers', () => {
+    expect(sanitizeAmount('999999999999.999999999999')).toEqual(
+      parseUnits('999999999999.999999999999', 18)
+    )
   })
 })

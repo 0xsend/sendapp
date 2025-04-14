@@ -11,11 +11,18 @@
     "noEmit": true,
     "composite": true,
     "baseUrl": ".",
+    "moduleResolution": "bundler",
     "paths": {
-      "@my/workflows": ["../../packages/workflows/src/all-workflows.ts"],
+      "@my/workflows": ["../../packages/workflows/src"],
       "@my/workflows/*": ["../../packages/workflows/src/*"],
       "@my/temporal": ["../../packages/temporal/src"],
-      "@my/temporal/*": ["../../packages/temporal/src/*"]
+      "@my/temporal/*": ["../../packages/temporal/src/*"],
+      "@my/supabase": ["../../supabase"],
+      "@my/supabase/*": ["../../supabase/*"],
+      "@my/wagmi": ["../../packages/wagmi/src"],
+      "@my/wagmi/*": ["../../packages/wagmi/src/*"],
+      "app": ["../../packages/app"],
+      "app/*": ["../../packages/app/*"]
     }
   },
   "references": [],
@@ -23,6 +30,9 @@
     "./src",
     "../../packages/workflows/src",
     "../../packages/temporal/src",
+    "../../supabase",
+    "../../packages/wagmi/src",
+    "../../packages/app",
     "../../globals.d.ts",
     "../../environment.d.ts"
   ]

@@ -1,18 +1,17 @@
-import { Card, type CardProps, H4, Paragraph, Spinner, YStack } from '@my/ui'
-import type { CoinWithBalance } from 'app/data/coins'
-import { hexToBytea } from 'app/utils/hexToBytea'
-import { useEffect, useState } from 'react'
-import { useTokenActivityFeed } from './utils/useTokenActivityFeed'
-import { TokenActivityRow } from './TokenActivityRow'
-import type { Activity } from 'app/utils/zod/activity'
-import { ActivityDetails } from '../activity/ActivityDetails'
-import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
-import type { ZodError } from 'zod'
+import { Card, type CardProps, Fade, H4, Paragraph, Spinner, YStack } from '@my/ui'
 import type { PostgrestError } from '@supabase/postgrest-js'
-import { toNiceError } from 'app/utils/toNiceError'
-import { FlatList } from 'react-native-web'
-import { Fade } from '@my/ui'
+import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
+import type { CoinWithBalance } from 'app/data/coins'
 import { useScrollDirection } from 'app/provider/scroll'
+import { hexToBytea } from 'app/utils/hexToBytea'
+import { toNiceError } from 'app/utils/toNiceError'
+import type { Activity } from 'app/utils/zod/activity'
+import { useEffect, useState } from 'react'
+import { FlatList } from 'react-native'
+import type { ZodError } from 'zod'
+import { ActivityDetails } from '../activity/ActivityDetails'
+import { TokenActivityRow } from './TokenActivityRow'
+import { useTokenActivityFeed } from './utils/useTokenActivityFeed'
 
 export const TokenActivity = ({ coin }: { coin: CoinWithBalance }) => {
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
@@ -106,8 +105,9 @@ const TokenActivityFeed = ({
             <TokenActivityRow activity={activity} onPress={onActivityPress} />
           )}
           ListFooterComponent={
-            !isLoadingActivities &&
-            isFetchingNextPageActivities && <Spinner size="small" color={'$color12'} mb="$3.5" />
+            !isLoadingActivities && isFetchingNextPageActivities ? (
+              <Spinner size="small" color={'$color12'} mb="$3.5" />
+            ) : null
           }
           showsVerticalScrollIndicator={false}
         />

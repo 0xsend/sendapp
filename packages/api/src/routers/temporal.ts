@@ -68,6 +68,7 @@ export const temporalRouter = createTRPCRouter({
           ids: [user.id, userOpHash],
           args: [userOp, note],
         }).catch((e) => {
+          log('Error starting transfer workflow', { error: e.message })
           if (e.message.includes('Workflow already exists')) {
             throw new TRPCError({
               code: 'PRECONDITION_FAILED',

@@ -1,13 +1,12 @@
 import { Card, Paragraph, Separator, Spinner, Stack, Theme, XStack, YStack } from '@my/ui'
-import type { CoinWithBalance } from 'app/data/coins'
+import type { allCoins, CoinWithBalance } from 'app/data/coins'
 import { ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
-import { IconError } from 'app/components/icons'
+import { IconCoin, IconError } from 'app/components/icons'
 import { useTokenMarketData } from 'app/utils/coin-gecko'
-import formatAmount from 'app/utils/formatAmount'
-import { TokenActivity } from './TokenActivity'
-import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { convertBalanceToFiat } from 'app/utils/convertBalanceToUSD'
-import { IconCoin } from 'app/components/icons/IconCoin'
+import formatAmount from 'app/utils/formatAmount'
+import { useTokenPrices } from 'app/utils/useTokenPrices'
+import { TokenActivity } from './TokenActivity'
 import { HomeQuickActions } from 'app/features/home/HomeQuickActions'
 
 export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
@@ -44,7 +43,7 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
   )
 }
 
-export const TokenDetailsMarketData = ({ coin }: { coin: CoinWithBalance }) => {
+export const TokenDetailsMarketData = ({ coin }: { coin: allCoins[number] }) => {
   const { data: tokenMarketData, isLoading: isLoadingMarketData } = useTokenMarketData(
     coin.coingeckoTokenId
   )
@@ -80,34 +79,46 @@ export const TokenDetailsMarketData = ({ coin }: { coin: CoinWithBalance }) => {
 
   if (isLoadingMarketData && isLoadingPrices) return <Spinner size="small" color={'$color12'} />
 
+  const isUSDC = coin.symbol === 'USDC'
+
   return (
     <XStack gap="$3">
-      {isLoadingPrices ? (
-        <Spinner size="small" color={'$color12'} />
-      ) : (
-        <Paragraph
-          fontSize={14}
-          fontWeight="500"
-          $theme-dark={{ color: '$gray8Light' }}
-          color={'$color12'}
-        >
-          {price === undefined ? '' : `1 ${coin.symbol} = ${formatPrice(price)} USD`}
-        </Paragraph>
-      )}
-      {isLoadingMarketData ? (
-        <Spinner size="small" color={'$color12'} />
-      ) : (
-        <XStack gap={'$1.5'} ai="center" jc={'space-around'}>
-          {changePercent24h === null ? (
-            <XStack gap="$2" ai="center">
-              <Paragraph color="$color10">Failed to load market data</Paragraph>
-              <IconError size="$1.75" color={'$redVibrant'} />
-            </XStack>
-          ) : (
-            formatPriceChange(changePercent24h)
-          )}
-        </XStack>
-      )}
+      <Paragraph
+        fontSize={14}
+        fontWeight="500"
+        $theme-dark={{ color: '$gray8Light' }}
+        color={'$color12'}
+      >
+        {(() => {
+          switch (true) {
+            case isLoadingPrices:
+              return <Spinner size="small" color={'$color12'} />
+            case price === undefined:
+              return null
+            case isUSDC:
+              return `1 ${coin.symbol} = 1 USD`
+            default:
+              return `1 ${coin.symbol} = ${formatPrice(price)} USD`
+          }
+        })()}
+      </Paragraph>
+      {(() => {
+        switch (true) {
+          case isLoadingMarketData:
+            return <Spinner size="small" color={'$color12'} />
+          case changePercent24h === null:
+            return (
+              <XStack gap="$2" ai="center">
+                <Paragraph color="$color10">Failed to load market data</Paragraph>
+                <IconError size="$1.75" color={'$redVibrant'} />
+              </XStack>
+            )
+          case isUSDC:
+            return null
+          default:
+            return formatPriceChange(changePercent24h)
+        }
+      })()}
     </XStack>
   )
 }

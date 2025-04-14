@@ -169,7 +169,7 @@ SELECT
 SELECT
     isnt_empty($test$
         SELECT
-            tag FROM referrals
+            referrer_id, referred_id, created_at FROM referrals
             WHERE
                 referrer_id = tests.get_supabase_uid('bob')
                 AND referred_id = tests.get_supabase_uid('alice') $test$, 'Referral should be created');
@@ -199,7 +199,7 @@ SELECT
 SELECT
     is_empty($test$
         SELECT
-            tag FROM referrals
+            referrer_id, referred_id, created_at FROM referrals
             WHERE
                 referrer_id = tests.get_supabase_uid('bob2')
                 AND referred_id = tests.get_supabase_uid('alice') $test$, 'Referral should not be created');
@@ -308,4 +308,3 @@ SELECT
 SELECT
     finish();
 ROLLBACK;
-

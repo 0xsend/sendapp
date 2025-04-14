@@ -8,6 +8,8 @@ const requiredEnvVars = [
   'SUPABASE_SERVICE_ROLE',
 ] as const
 
+const optionalEnvVars = ['DEBUG']
+
 /**
  * Bootstraps the workflow by setting up the environment variables that many of our clients depend on.
  * This is due to Temporal's deterministic execution requirements.
@@ -25,6 +27,12 @@ export const bootstrap = (env: Record<string, string | undefined>) => {
     }
     varsSet.push(envVar)
     globalThis.process.env[envVar] = env[envVar]
+  }
+  for (const envVar of optionalEnvVars) {
+    if (env[envVar]) {
+      varsSet.push(envVar)
+      globalThis.process.env[envVar] = env[envVar]
+    }
   }
   console.log('Bootstrapped environment variables:', varsSet)
 }
