@@ -10,10 +10,8 @@ import { formatUnits } from 'viem'
 import { useUserJackpotSummary } from 'app/utils/useUserJackpotSummary'
 import { useUserPendingJackpotTickets } from 'app/utils/useUserPendingJackpotTickets'
 import type { Functions } from '@my/supabase/database.types'
-import { calculateActualTickets } from 'app/data/sendpot'
+import { calculateActualTickets, MAX_JACKPOT_HISTORY, NO_WINNER_ADDRESS } from 'app/data/sendpot'
 import { byteaToHex } from 'app/utils/byteaToHex'
-
-const NO_WINNER_ADDRESS: `0x${string}` = '0x0000000000000000000000000000000000000000'
 
 export type DrawingHistoryEntry = {
   id: string
@@ -45,7 +43,8 @@ export const DrawingHistory = () => {
   const { data: lpPoolTotal, isLoading: isLoadingPoolTotal } = useReadBaseJackpotLpPoolTotal()
   const { data: tokenDecimals, isLoading: isLoadingDecimals } = useReadBaseJackpotTokenDecimals()
   const { data: sendAccount, isLoading: isLoadingSendAccount } = useSendAccount()
-  const { data: summaryData, isLoading: isLoadingSummary } = useUserJackpotSummary(5)
+  const { data: summaryData, isLoading: isLoadingSummary } =
+    useUserJackpotSummary(MAX_JACKPOT_HISTORY)
   const { data: pendingTicketsData, isLoading: isLoadingPendingTickets } =
     useUserPendingJackpotTickets()
 

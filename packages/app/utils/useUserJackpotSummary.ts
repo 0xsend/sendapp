@@ -12,7 +12,7 @@ export const useUserJackpotSummary = (
     queryFn: async () => {
       const { data, error } = await supabase.rpc('get_user_jackpot_summary', { num_runs: limit })
       if (error) {
-        // no rows in receipts table
+        // no rows in jackpot table
         if (error.code === 'PGRST116') {
           return []
         }

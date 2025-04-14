@@ -33,38 +33,30 @@ export function BuyTicketsScreen() {
   const [isInputFocused, setIsInputFocused] = useState(false)
   const [queryTickets] = useParam('numberOfTickets')
 
-  // Read numberOfTickets from query params
   useEffect(() => {
     if (typeof queryTickets === 'string' && /^\d+$/.test(queryTickets)) {
       const num = Number.parseInt(queryTickets, 10)
-      if (num > 0) {
-        setTicketCount(queryTickets)
-      } else {
-        setTicketCount('1')
-      }
+      setTicketCount(num > 0 ? queryTickets : '1')
     }
   }, [queryTickets])
 
-  // --- Fetch Contract Data ---
   const { data: contractTicketPrice, isLoading: isLoadingPrice } = useReadBaseJackpotTicketPrice()
   const { data: tokenDecimals, isLoading: isLoadingDecimals } = useReadBaseJackpotTokenDecimals()
-
   const { coin: sendCoin, isLoading: isLoadingBalance } = useCoin('SEND')
 
-  // --- Calculations ---
-  const ticketPriceBigInt = useMemo(() => contractTicketPrice ?? 0n, [contractTicketPrice])
+  const ticketPriceBigInt = useMemo(
+    () => (contractTicketPrice as bigint) ?? 0n,
+    [contractTicketPrice]
+  )
   const numTickets = useMemo(() => {
     const parsed = Number.parseInt(ticketCount || '0', 10)
     return Number.isNaN(parsed) ? 0n : BigInt(parsed)
   }, [ticketCount])
-  const totalCostBigInt = useMemo(() => {
-    if (typeof numTickets === 'bigint' && typeof ticketPriceBigInt === 'bigint') {
-      return numTickets * ticketPriceBigInt
-    }
-    return 0n
-  }, [numTickets, ticketPriceBigInt])
+  const totalCostBigInt = useMemo(
+    () => numTickets * ticketPriceBigInt,
+    [numTickets, ticketPriceBigInt]
+  )
 
-  // Format user balance
   const userBalanceBigInt = useMemo(() => {
     if (!sendCoin?.balance) return 0n
     try {
@@ -85,7 +77,6 @@ export function BuyTicketsScreen() {
     [totalCostBigInt, userBalanceBigInt, isDataLoading]
   )
 
-  // Format display values
   const displayTicketPrice = useMemo(() => {
     if (typeof ticketPriceBigInt !== 'bigint' || tokenDecimals === undefined) return '...'
     return formatUnits(ticketPriceBigInt, Number(tokenDecimals))
@@ -96,9 +87,7 @@ export function BuyTicketsScreen() {
     return formatUnits(totalCostBigInt, Number(tokenDecimals))
   }, [totalCostBigInt, tokenDecimals])
 
-  // --- Navigation Handler ---
   const handleProceedToConfirm = () => {
-    // Basic client-side checks
     if (insufficientFunds) {
       toast.show('Error', { message: 'Insufficient funds.' })
       return
@@ -112,7 +101,6 @@ export function BuyTicketsScreen() {
       return
     }
 
-    // Navigate to confirmation screen
     router.push({
       pathname: '/play/confirm-buy-tickets',
       query: {
@@ -122,15 +110,7 @@ export function BuyTicketsScreen() {
   }
 
   return (
-    <YStack
-      w={'100%'}
-      gap="$5"
-      pb={'$3.5'}
-      jc={'space-between'}
-      $gtLg={{
-        w: '50%',
-      }}
-    >
+    <YStack w="100%" gap="$5" pb="$3.5" jc="space-between" $gtLg={{ w: '50%' }}>
       <Card w="100%" p="$5">
         <YStack gap="$5">
           <YStack gap="$2" ai="center">
@@ -141,13 +121,13 @@ export function BuyTicketsScreen() {
 
           <YStack
             gap="$5"
-            bg={'$color1'}
-            br={'$6'}
-            p={'$5'}
+            bg="$color1"
+            br="$6"
+            p="$5"
             borderColor={insufficientFunds ? '$error' : 'transparent'}
             bw={1}
           >
-            <XStack ai={'center'} position="relative" jc={'space-between'}>
+            <XStack ai="center" position="relative" jc="space-between">
               <Input
                 fontSize="$10"
                 color="$color12"
@@ -155,9 +135,7 @@ export function BuyTicketsScreen() {
                 bw={0}
                 br={0}
                 p={1}
-                focusStyle={{
-                  outlineWidth: 0,
-                }}
+                focusStyle={{ outlineWidth: 0 }}
                 placeholder="1"
                 fontFamily="$mono"
                 inputMode="numeric"
@@ -184,22 +162,16 @@ export function BuyTicketsScreen() {
                 right={0}
                 height={1}
                 backgroundColor={isInputFocused ? '$primary' : '$silverChalice'}
-                $theme-light={{
-                  backgroundColor: isInputFocused ? '$color12' : '$silverChalice',
-                }}
+                $theme-light={{ backgroundColor: isInputFocused ? '$color12' : '$silverChalice' }}
               />
             </XStack>
-            {/* Balance and Price Per Ticket Row */}
             <XStack jc="space-between" ai="center">
-              {/* Left Side: Balance */}
               <YStack>
-                <XStack gap={'$2'} ai="center">
+                <XStack gap="$2" ai="center">
                   <Paragraph
                     color={insufficientFunds ? '$error' : '$silverChalice'}
-                    size={'$5'}
-                    $theme-light={{
-                      color: insufficientFunds ? '$error' : '$darkGrayTextField',
-                    }}
+                    size="$5"
+                    $theme-light={{ color: insufficientFunds ? '$error' : '$darkGrayTextField' }}
                   >
                     Balance:
                   </Paragraph>
@@ -208,8 +180,8 @@ export function BuyTicketsScreen() {
                   ) : (
                     <Paragraph
                       color={insufficientFunds ? '$error' : '$color12'}
-                      size={'$5'}
-                      fontWeight={'600'}
+                      size="$5"
+                      fontWeight="600"
                     >
                       {sendCoin && tokenDecimals !== undefined
                         ? formatAmount(
@@ -223,12 +195,11 @@ export function BuyTicketsScreen() {
                   )}
                 </XStack>
                 {insufficientFunds && (
-                  <Paragraph color={'$error'} size={'$5'}>
+                  <Paragraph color="$error" size="$5">
                     Insufficient funds
                   </Paragraph>
                 )}
               </YStack>
-              {/* Right Side: Price per Ticket */}
               <Paragraph fontSize="$5" fontWeight="500" color="$color10">
                 {isDataLoading ? <Spinner size="small" /> : displayTicketPrice} SEND each
               </Paragraph>
@@ -253,11 +224,11 @@ export function BuyTicketsScreen() {
           br="$4"
           px="$4"
           py="$4"
-          f={1} // Take full width
+          f={1}
           disabled={isDataLoading || insufficientFunds || numTickets <= 0n}
           disabledStyle={{ opacity: 0.5 }}
         >
-          <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
+          <Button.Text ff="$mono" fontWeight="500" tt="uppercase" size="$5" color="$black">
             Review
           </Button.Text>
         </Button>

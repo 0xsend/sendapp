@@ -1,9 +1,8 @@
-import { XStack, YStack, Card, useSafeAreaInsets } from '@my/ui'
+import { XStack, YStack, Card } from '@my/ui'
 import { JackpotCard } from './JackpotCard'
 import { DrawingHistory } from './DrawingHistory'
 
 export function PlayScreen() {
-  const { bottom } = useSafeAreaInsets()
   return (
     <XStack
       w={'100%'}
@@ -18,10 +17,8 @@ export function PlayScreen() {
         width="100%"
         maxWidth={600}
         gap="$5"
-        pb={Math.max(bottom, 24) + 72}
       >
         <JackpotCard />
-
         <YStack w={'100%'}>
           <Card bc={'$color1'} width="100%" p="$4">
             <DrawingHistory />

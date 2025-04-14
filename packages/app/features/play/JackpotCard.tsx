@@ -8,20 +8,18 @@ import {
   styled,
   Card,
   H3,
-  Spinner, // Added Spinner
-  LinkableButton, // Added LinkableButton
+  Spinner,
+  LinkableButton,
 } from '@my/ui'
-import { useCallback, useEffect, useState, useMemo } from 'react' // Added useCallback
+import { useCallback, useEffect, useState, useMemo } from 'react'
 import { Timer } from '@tamagui/lucide-icons'
-
-// Removed PlayButtons import
 import {
   useReadBaseJackpotLpPoolTotal,
   useReadBaseJackpotLastJackpotEndTime,
   useReadBaseJackpotRoundDurationInSeconds,
   useReadBaseJackpotTokenDecimals,
-} from '@my/wagmi/contracts/base-jackpot' // Corrected import path
-import { formatUnits } from 'viem' // Import formatUnits
+} from '@my/wagmi/contracts/base-jackpot'
+import { formatUnits } from 'viem'
 
 const GreenSquare = styled(Stack, {
   name: 'Surface',
@@ -34,7 +32,6 @@ const GreenSquare = styled(Stack, {
 const zeroTime = { days: 0, hours: 0, minutes: 0, seconds: 0 }
 
 export const JackpotCard = () => {
-  // Fetch contract data
   const { data: lpPoolTotal, isLoading: isLoadingPoolTotal } = useReadBaseJackpotLpPoolTotal()
   const { data: lastJackpotEndTime, isLoading: isLoadingEndTime } =
     useReadBaseJackpotLastJackpotEndTime()
@@ -42,14 +39,11 @@ export const JackpotCard = () => {
     useReadBaseJackpotRoundDurationInSeconds()
   const { data: tokenDecimals, isLoading: isLoadingDecimals } = useReadBaseJackpotTokenDecimals()
 
-  // Calculate next draw time based on contract data
   const jackpotEndTime = useMemo(() => {
     if (lastJackpotEndTime === undefined || roundDuration === undefined) return null
-    // Contract times are in seconds, convert to milliseconds
     return (Number(lastJackpotEndTime) + Number(roundDuration)) * 1000
   }, [lastJackpotEndTime, roundDuration])
 
-  // Wrap calculateTimeRemaining in useCallback to stabilize its reference
   const calculateTimeRemaining = useCallback(() => {
     if (!jackpotEndTime) return zeroTime
 
@@ -58,70 +52,57 @@ export const JackpotCard = () => {
 
     if (diff <= 0) return zeroTime
 
-    // Calculate days
     const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-    // Calculate remaining hours after accounting for days
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
     const seconds = Math.floor((diff % (1000 * 60)) / 1000)
 
-    // Return object now includes days
     return { days, hours, minutes, seconds }
-  }, [jackpotEndTime]) // Dependency is jackpotEndTime
+  }, [jackpotEndTime])
 
-  // Use functional update for initial state based on the stable calculateTimeRemaining
   const [timeRemaining, setTimeRemaining] = useState(() => calculateTimeRemaining())
 
-  // Update timer every second
   useEffect(() => {
     if (!jackpotEndTime) {
-      setTimeRemaining(zeroTime) // Reset timer if jackpotEndTime becomes invalid
-      return // Don't start timer if draw time isn't calculated yet
+      setTimeRemaining(zeroTime)
+      return
     }
 
-    // Set initial time immediately when the effect runs or jackpotEndTime changes
     setTimeRemaining(calculateTimeRemaining())
 
     const timer = setInterval(() => {
-      // Use the stable calculateTimeRemaining from the outer scope
       const remaining = calculateTimeRemaining()
       setTimeRemaining(remaining)
-      // Optional: Clear interval if time runs out to prevent unnecessary checks
       if (remaining === zeroTime) {
         clearInterval(timer)
       }
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [jackpotEndTime, calculateTimeRemaining]) // Dependencies are correct now
+  }, [jackpotEndTime, calculateTimeRemaining])
 
-  // Format the jackpot end time string
   const jackpotEndTimeString = useMemo(() => {
     if (!jackpotEndTime) return 'Loading...'
     const date = new Date(jackpotEndTime)
-    // Use toLocaleString to include both date and time
     return date.toLocaleString('en-US', {
-      weekday: 'short', // e.g., Wed
-      month: 'short', // e.g., Mar
-      day: 'numeric', // e.g., 31
-      hour: 'numeric', // e.g., 12
-      minute: '2-digit', // e.g., 35
-      second: '2-digit', // e.g., 14
-      timeZoneName: 'short', // Optionally add timezone
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      second: '2-digit',
+      timeZoneName: 'short',
     })
   }, [jackpotEndTime])
 
-  // Format jackpot amount (using lpPoolTotal as placeholder)
   const formattedJackpotAmount = useMemo(() => {
-    // Ensure lpPoolTotal is a bigint and tokenDecimals is loaded
     if (typeof lpPoolTotal !== 'bigint' || tokenDecimals === undefined) {
-      return '...' // Show loading state
+      return '...'
     }
-    // Assuming lpPoolTotal represents the jackpot amount for display
     return Number.parseFloat(formatUnits(lpPoolTotal, Number(tokenDecimals))).toLocaleString(
       undefined,
       {
-        maximumFractionDigits: 0, // Display as whole number
+        maximumFractionDigits: 0,
       }
     )
   }, [lpPoolTotal, tokenDecimals])
@@ -133,7 +114,6 @@ export const JackpotCard = () => {
   return (
     <Card p={'$5'} w={'100%'} jc="space-between" $gtLg={{ p: '$6', h: 'auto', mih: 244 }} mih={184}>
       <XStack w={'100%'} zIndex={4} h="100%">
-        {/* Removed jc={'center'} to allow left alignment */}
         <YStack gap={'$2'} w={'100%'}>
           <YStack w="fit-content" gap={'$2.5'} jc="space-between">
             <XStack ai={'center'} gap="$2.5" width={'100%'}>
@@ -166,7 +146,7 @@ export const JackpotCard = () => {
               {isLoading ? <Spinner /> : formattedJackpotAmount}
             </BigHeading>
             <Paragraph fontSize={'$6'} fontWeight={'500'} zIndex={1} $sm={{ mt: '$4' }}>
-              {'SEND'}
+              SEND
             </Paragraph>
           </XStack>
           <YStack gap="$2" mt="$2">
@@ -190,7 +170,6 @@ export const JackpotCard = () => {
               </Paragraph>
             </XStack>
           </YStack>
-
           <XStack w="100%" mt="$2">
             <Stack f={1} w="100%" maw={350}>
               <LinkableButton
