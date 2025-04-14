@@ -1,12 +1,12 @@
+# create a foundry image to copy over foundry binaries
+FROM ghcr.io/foundry-rs/foundry:stable AS foundry
+
 # builder has all the dependencies to build the app
-FROM node:20-slim AS base
+FROM node:20 AS base
 WORKDIR /src
 RUN corepack enable
 ENV SHELL=/bin/bash
 SHELL ["/bin/bash", "-c"]
-RUN apt update && apt install -y curl git cargo build-essential
-RUN curl -Lo- https://foundry.paradigm.xyz | /bin/bash
-RUN source /root/.bashrc && foundryup
 ENV PATH="$PATH:/root/.foundry/bin"
 ENV DO_NOT_TRACK=1
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -49,6 +49,10 @@ FROM base AS builder
 WORKDIR /sendapp
 COPY . .
 COPY --from=installer /src/node_modules ./node_modules
+COPY --from=foundry /usr/local/bin/forge /usr/local/bin/forge
+COPY --from=foundry /usr/local/bin/cast /usr/local/bin/cast
+COPY --from=foundry /usr/local/bin/anvil /usr/local/bin/anvil
+COPY --from=foundry /usr/local/bin/chisel /usr/local/bin/chisel
 ARG CI=
 ARG DEBUG=
 ARG NEXT_PUBLIC_SUPABASE_PROJECT_ID
