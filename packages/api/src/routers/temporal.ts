@@ -86,13 +86,13 @@ export const temporalRouter = createTRPCRouter({
         await withRetry(
           async () => {
             const { data, error } = await supabaseAdmin
-              .schema('temporal')
-              .from('send_account_transfers')
-              .select('status')
-              .eq('workflow_id', workflowId)
+              .from('activity')
+              .select('data->>status')
+              .eq('event_id', workflowId)
+              .eq('event_name', 'temporal_send_account_transfers')
               .single()
             throwIf(error)
-            assert(data?.status !== 'initialized', 'Transfer not yet submitted')
+            assert(!!data && data.status !== 'initialized', 'Transfer not yet submitted')
             return data
           },
           {
