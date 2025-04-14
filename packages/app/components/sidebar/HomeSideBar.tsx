@@ -16,11 +16,12 @@ import { baseMainnet } from '@my/wagmi/chains'
 import {
   IconAccount,
   IconActivity,
+  IconChart,
   IconDeviceReset,
   IconHome,
   IconSendLogo,
   IconSwap,
-  IconTicket,
+  IconWorldSearch,
 } from 'app/components/icons'
 import { SideBarNavLink } from 'app/components/sidebar/SideBarNavLink'
 
@@ -43,14 +44,19 @@ const links = [
     href: '/send',
   },
   {
-    icon: <IconSwap size={'$1'} color={'inherit'} />,
-    text: 'Swap',
-    href: '/swap',
+    icon: <IconWorldSearch size={'$1'} color={'inherit'} />,
+    text: 'Explore',
+    href: '/explore',
   },
   {
-    icon: <IconTicket size={'$1'} color={'inherit'} />,
-    text: 'Play',
-    href: '/play',
+    icon: <IconSwap size={'$1'} color={'inherit'} />,
+    text: 'Trade',
+    href: '/trade',
+  },
+  {
+    icon: <IconChart size={'$1'} color={'inherit'} />,
+    text: 'Invest',
+    href: '/invest',
   },
   {
     icon: <IconDeviceReset size={'$1'} color={'inherit'} />,
@@ -71,21 +77,7 @@ const links = [
     : undefined,
 ].filter(Boolean) as { icon: ReactElement; text: string; href: string }[]
 
-// this code can be removed then swaps are no longer behind whitelist
-const useActiveLinks = () => {
-  const { user } = useUser()
-  const isSwapAllowListSet = Boolean(process.env.NEXT_PUBLIC_SWAP_ALLOWLIST)
-  const swapEnabledUsers = (process.env.NEXT_PUBLIC_SWAP_ALLOWLIST ?? '').split(',')
-  const isSwapEnabled = !isSwapAllowListSet || (user?.id && swapEnabledUsers.includes(user.id))
-  const _links = isSwapEnabled ? links : links.filter((link) => link.href !== '/swap')
-
-  return _links
-}
-
 const HomeSideBar = ({ ...props }: YStackProps) => {
-  // this code can be removed then swaps are no longer behind whitelist
-  const links = useActiveLinks()
-
   return (
     <SideBar {...props} ai={'flex-start'} pl="$7">
       <Link href={'/'}>
@@ -105,8 +97,6 @@ const HomeBottomSheet = () => {
   const { profile } = useUser()
   const hoverStyles = useHoverStyles()
   const avatarUrl = profile?.avatar_url
-  // this code can be removed then swaps are no longer behind whitelist
-  const links = useActiveLinks()
 
   return (
     <NavSheet navId="home">

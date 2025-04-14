@@ -43,6 +43,7 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
       "coin": {
         "coingeckoTokenId": "ethereum",
         "decimals": 18,
+        "formatDecimals": 5,
         "label": "Ethereum",
         "symbol": "ETH",
         "token": "eth",
@@ -198,6 +199,7 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
       "coin": {
         "coingeckoTokenId": "ethereum",
         "decimals": 18,
+        "formatDecimals": 5,
         "label": "Ethereum",
         "symbol": "ETH",
         "token": "eth",

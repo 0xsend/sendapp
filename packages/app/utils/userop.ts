@@ -417,7 +417,7 @@ export function throwNiceError(e: Error & { cause?: Error }): never {
     case cause instanceof InvalidParamsRpcError: {
       switch (true) {
         case cause.details?.includes('preVerificationGas too low'):
-          throw new Error('Swap failed, try again')
+          throw new Error('Trade failed, try again')
         default:
           throw e
       }

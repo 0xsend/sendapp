@@ -2,13 +2,7 @@ import { Avatar, LinkableAvatar, type LinkableAvatarProps, XStack } from '@my/ui
 import { IconUpgrade } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { allCoinsDict } from 'app/data/coins'
-import {
-  counterpart,
-  isSwapBuyTransfer,
-  isSwapSellTransfer,
-  isSendPotTicketPurchase,
-  isSendPotWin,
-} from 'app/utils/activity'
+import { isActivitySwapTransfer, isSendPotTicketPurchase, isSendPotWin } from 'app/utils/activity'
 import {
   type Activity,
   isSendAccountReceiveEvent,
@@ -39,20 +33,8 @@ export function ActivityAvatar({
     )
   }
 
-  if (isSwapBuyTransfer(activity, swapRouters)) {
-    return (
-      <XStack w="$4.5" h={'$4.5'} br="$4" ai={'center'} jc={'center'} bc={'$olive'}>
-        <Plus color={'$color2'} />
-      </XStack>
-    )
-  }
-
-  if (isSwapSellTransfer(activity, swapRouters, liquidityPools)) {
-    return (
-      <XStack w="$4.5" h={'$4.5'} br="$4" ai={'center'} jc={'center'} bc={'$error'}>
-        <Minus />
-      </XStack>
-    )
+  if (isActivitySwapTransfer(activity, swapRouters, liquidityPools)) {
+    return <TradeActivityAvatar activity={activity} />
   }
 
   if (user) {
@@ -133,5 +115,29 @@ export function ActivityAvatar({
         </Avatar>
       </Avatar.Fallback>
     </Avatar>
+  )
+}
+
+const TradeActivityAvatar = ({ activity }: { activity: Activity }) => {
+  const { data: swapRouters } = useSwapRouters()
+  const isButTransfer = isSwapBuyTransfer(activity, swapRouters)
+  const Icon = isButTransfer ? Plus : Minus
+
+  return (
+    <XStack w="$4.5" h={'$4.5'} br="$4" ai={'center'} jc={'center'} position={'relative'}>
+      <IconCoin symbol={activity.data?.coin?.symbol ?? ''} width={'90%'} height={'90%'} />
+      <Icon
+        position={'absolute'}
+        top={'-5%'}
+        right={'-5%'}
+        size={'$1'}
+        bc={isButTransfer ? '$olive' : '$error'}
+        borderRadius={999}
+        shadowColor={'$black'}
+        shadowOffset={{ width: 0, height: 2 }}
+        shadowOpacity={1}
+        shadowRadius={4}
+      />
+    </XStack>
   )
 }

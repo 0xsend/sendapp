@@ -39,7 +39,7 @@ function MyApp({
         <title>Send</title>
         <meta
           name="description"
-          content="Send is a non-custodial payments app powered by USDC, offering instant global transfers, banking features, passkey security, and sendtags for seamless transactions—combining blockchain efficiency with user-friendly design for secure, low-cost money management."
+          content="Send is a peer-to-peer app to send, trade, and earn USDC. Instant, global, and accessible only by you."
         />
         <meta
           name="viewport"

@@ -4,7 +4,7 @@ import { userOnboarded } from '@my/snaplet/models'
 import type { Database } from '@my/supabase/database.types'
 import { mergeTests, type Page } from '@playwright/test'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { coins, type coin } from 'app/data/coins'
+import { coins, type coin, ethCoin } from 'app/data/coins'
 import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { shorten } from 'app/utils/strings'
@@ -26,7 +26,7 @@ test.beforeEach(async ({ user: { profile } }) => {
 
 const idTypes = ['tag', 'sendid', 'address'] as const
 
-for (const token of coins) {
+for (const token of [...coins, ethCoin]) {
   test(`can send ${token.symbol} starting from profile page`, async ({ page, seed, supabase }) => {
     const plan = await seed.users([userOnboarded])
     const tag = plan.tags[0]

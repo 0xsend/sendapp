@@ -11,7 +11,6 @@ import {
   type XStackProps,
   H1,
   Theme,
-  useSafeAreaInsets,
 } from '@my/ui'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
@@ -24,6 +23,7 @@ import { useRootScreenParams } from 'app/routers/params'
 import { HomeButtons } from './HomeButtons'
 import { AlertCircle } from '@tamagui/lucide-icons'
 import { useIsSendingUnlocked } from 'app/utils/useIsSendingUnlocked'
+import { HomeQuickActions } from 'app/features/home/HomeQuickActions'
 
 function SendSearchBody() {
   const { isLoading, error } = useTagSearch()
@@ -47,7 +47,6 @@ function SendSearchBody() {
 }
 
 function HomeBody(props: XStackProps) {
-  const { bottom } = useSafeAreaInsets()
   const { coin: selectedCoin } = useCoinFromTokenParam()
   const { isSendingUnlocked, isLoading } = useIsSendingUnlocked()
 
@@ -64,9 +63,8 @@ function HomeBody(props: XStackProps) {
         $gtLg={{ display: 'flex', w: '45%', gap: '$5', pb: 0 }}
         display={!selectedCoin ? 'flex' : 'none'}
         width="100%"
-        gap="$5"
+        gap="$3.5"
         ai={'center'}
-        pb={Math.max(bottom, 24) + 72} // add mobile bottom button row + 24px
       >
         {!isSendingUnlocked ? (
           <>
@@ -92,13 +90,17 @@ function HomeBody(props: XStackProps) {
         ) : (
           <TokenBalanceCard />
         )}
+        <HomeQuickActions $gtLg={{ display: 'none' }} />
         <YStack w={'100%'} ai={'center'}>
           <Card
             bc={'$color1'}
             width="100%"
-            p="$4"
+            p="$2"
+            $gtSm={{
+              p: '$4',
+            }}
             $gtLg={{
-              maxHeight: 310,
+              maxHeight: 370,
               // @ts-expect-error tamagui tripping here
               overflowY: 'scroll',
             }}

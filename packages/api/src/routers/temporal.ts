@@ -12,7 +12,7 @@ import type { PostgrestError } from '@supabase/supabase-js'
 import { throwIf } from 'app/utils/throwIf'
 import { assert } from 'app/utils/assert'
 import { startWorkflow } from '@my/workflows/utils'
-import { MAX_NOTE_LENGTH } from 'app/components/FormFields/NoteField'
+import { formFields } from 'app/utils/SchemaForm'
 
 const log = debug('api:temporal')
 
@@ -21,7 +21,10 @@ export const temporalRouter = createTRPCRouter({
     .input(
       z.object({
         userOp: z.custom<UserOperation<'v0.7'>>(),
-        note: z.string().optional(),
+        note: z
+          .string()
+          .transform((str) => (str === '' ? undefined : str))
+          .optional(),
       })
     )
     .mutation(
@@ -31,7 +34,8 @@ export const temporalRouter = createTRPCRouter({
           session: { user },
         },
       }) => {
-        assert(!note || note.length <= MAX_NOTE_LENGTH, 'Note must be less than 100 characters')
+        const noteValidationError = note ? formFields.note.safeParse(note).error : null
+        assert(!noteValidationError, 'Note failed to match validation constraints')
         const client = await getTemporalClient().catch((e) => {
           throw new TRPCError({
             code: 'INTERNAL_SERVER_ERROR',
@@ -58,7 +62,6 @@ export const temporalRouter = createTRPCRouter({
               message: e.message,
             })
           })
-
         const { workflowId } = await startWorkflow({
           client,
           workflow: 'transfer',

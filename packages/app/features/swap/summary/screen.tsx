@@ -70,9 +70,16 @@ export const SwapSummaryScreen = () => {
     formatUnits(BigInt(routeSummary?.amountIn || 0), inCoin?.decimals || 0)
   )
   const amountOut = localizeAmount(
-    formatUnits(BigInt(routeSummary?.amountOut || 0), outCoin?.decimals || 0)
+    formatAmount(
+      formatUnits(BigInt(routeSummary?.amountOut || 0), outCoin?.decimals || 0),
+      12,
+      outCoin?.formatDecimals
+    )
   )
-  const exchangeRate = Number(amountOut.replace(/,/g, '')) / Number(amountIn.replace(/,/g, ''))
+
+  const exchangeRate = (
+    Number(amountOut.replace(/,/g, '')) / Number(amountIn.replace(/,/g, ''))
+  ).toFixed(outCoin?.formatDecimals)
 
   const initLoading =
     isLoadingCoins || isSendAccountLoading || isEncodeRouteLoading || isLoadingUserOp
@@ -134,7 +141,7 @@ export const SwapSummaryScreen = () => {
 
   useEffect(() => {
     if (!routeSummary) {
-      router.push({ pathname: '/swap', query: swapParams })
+      router.push({ pathname: '/trade', query: swapParams })
     }
 
     if (encodeRouteStatus === 'idle') {
@@ -328,7 +335,7 @@ export const SwapSummaryScreen = () => {
                     size={'$5'}
                     color={'$black'}
                   >
-                    swapping...
+                    trading...
                   </Button.Text>
                 </>
               )
@@ -341,7 +348,7 @@ export const SwapSummaryScreen = () => {
                   size={'$5'}
                   color={'$black'}
                 >
-                  confirm swap
+                  confirm trade
                 </Button.Text>
               )
           }

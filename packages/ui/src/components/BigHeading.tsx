@@ -7,7 +7,7 @@ export const BigHeading = ({
   ...props
 }: HeadingProps) => {
   return (
-    <H1 fontSize={fontSize} lineHeight={lineHeight} {...props}>
+    <H1 fontSize={fontSize} lineHeight={lineHeight} fontWeight={fontWeight} {...props}>
       {props.children}
     </H1>
   )

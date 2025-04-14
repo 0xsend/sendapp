@@ -59,7 +59,7 @@ export function AvatarMenuButton({ profile }: { profile?: Tables<'profiles'> | n
         opacity: 0,
       }} /// We need the button to be there for layout purposes
       onPress={handleHomeBottomSheet}
-      br={'$2'}
+      overflow={'hidden'}
       bc="$color2"
       size={'$3.5'}
       icon={
@@ -124,8 +124,14 @@ export function TopNav({
     (!noSubroute && parts.length > 1) ||
     path.includes('/secret-shop') ||
     path.includes('/deposit') ||
-    path.includes('/swap') ||
-    path.includes('/play')
+    path.includes('/trade') ||
+    path.includes('/leaderboard') ||
+    path.includes('/earn') ||
+    path.includes('/sendpot') ||
+    path.includes('/feed') ||
+    path.includes('/explore') ||
+    path.includes('/invest')
+  path.includes('/swap') || path.includes('/play')
   path.includes('/leaderboard')
 
   return (

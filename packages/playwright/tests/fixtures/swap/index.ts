@@ -77,10 +77,10 @@ export class SwapFormPage {
   }
 
   async goto() {
-    log('goto /swap')
+    log('goto /trade')
     await this.page.goto('/')
-    await this.page.getByRole('link', { name: 'Swap' }).nth(0).click()
-    await this.page.waitForURL('/swap')
+    await this.page.getByRole('link', { name: 'Trade' }).nth(0).click()
+    await this.page.waitForURL('/trade')
     await this.validatePageVisible()
   }
 
@@ -223,12 +223,12 @@ export class SwapSummaryPage {
     this.outTokenSymbol = this.page.getByTestId('outTokenSymbol')
     this.exchangeRate = this.page.getByTestId('exchangeRate')
     this.slippage = this.page.getByTestId('slippage')
-    this.swapButton = this.page.getByRole('button', { name: 'confirm swap' })
+    this.swapButton = this.page.getByRole('button', { name: 'confirm trade' })
   }
 
   async goto() {
-    log('goto /swapSummary')
-    await this.page.goto('/swap/summary')
+    log('goto /trade/summary')
+    await this.page.goto('/trade/summary')
   }
 
   async validateSummary({
@@ -256,7 +256,7 @@ export class SwapSummaryPage {
       await expect(this.outTokenSymbol).toHaveText(outToken)
       await expect(this.slippage).toHaveText(`${slippage}%`)
       await expect(this.exchangeRate).toHaveText(exchangeRate)
-    }).toPass({ timeout: 20_000 })
+    }).toPass({ timeout: 30_000 })
   }
 
   async confirmSwap() {

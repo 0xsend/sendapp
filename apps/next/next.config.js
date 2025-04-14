@@ -143,6 +143,15 @@ export default () => {
       scrollRestoration: true,
     },
     output: process.env.NODE_ENV === 'production' ? 'standalone' : null,
+    async redirects() {
+      return [
+        {
+          source: '/swap',
+          destination: '/trade',
+          permanent: true,
+        },
+      ]
+    },
   }
 
   for (const plugin of plugins) {

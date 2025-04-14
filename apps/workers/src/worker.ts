@@ -1,7 +1,8 @@
 import { Worker, NativeConnection } from '@temporalio/worker'
-import { createTransferActivities } from '@my/workflows/all-activities'
+import { createTransferActivities, createUserOpActivities } from '@my/workflows/all-activities'
 import { createRequire } from 'node:module'
 const require = createRequire(import.meta.url)
+import { version } from '@my/workflows/version'
 
 const { NODE_ENV = 'development', TEMPORAL_MTLS_TLS_CERT, TEMPORAL_MTLS_TLS_KEY } = process.env
 const isDeployed = ['production', 'test'].includes(NODE_ENV)
@@ -41,9 +42,12 @@ async function run() {
       payloadConverterPath: require.resolve('@my/temporal/payload-converter'),
     },
     ...workflowOption(),
-    activities: createTransferActivities(process.env),
+    activities: {
+      ...createTransferActivities(process.env),
+      ...createUserOpActivities(process.env),
+    },
     namespace: process.env.TEMPORAL_NAMESPACE ?? 'default',
-    taskQueue: 'monorepo',
+    taskQueue: `monorepo@${version}`,
     bundlerOptions: {
       ignoreModules: ['@supabase/supabase-js'],
     },

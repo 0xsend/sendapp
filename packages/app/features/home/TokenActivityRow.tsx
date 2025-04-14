@@ -25,7 +25,7 @@ export function TokenActivityRow({
   const { data: swapRouters } = useSwapRouters()
   const { data: liquidityPools } = useLiquidityPools()
   const { created_at, from_user, to_user } = activity
-  const amount = amountFromActivity(activity)
+  const amount = amountFromActivity(activity, swapRouters, liquidityPools)
   const date = CommentsTime(new Date(created_at))
   const eventName = eventNameFromActivity(activity, swapRouters, liquidityPools)
   const subtext = subtextFromActivity(activity, swapRouters, liquidityPools)

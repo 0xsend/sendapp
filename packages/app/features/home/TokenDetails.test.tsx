@@ -23,6 +23,17 @@ jest.mock('app/utils/useTokenPrices', () => ({
   }),
 }))
 
+jest.mock('app/utils/useCoinFromTokenParam', () => ({
+  useCoinFromTokenParam: jest.fn().mockReturnValue({
+    coin: {
+      label: 'USDC',
+      token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+      balance: 250000n,
+    },
+    isLoading: false,
+  }),
+}))
+
 describe('TokenDetails', () => {
   beforeEach(() => {
     jest.useFakeTimers()
@@ -58,7 +69,7 @@ describe('TokenDetails', () => {
     expect(screen.toJSON()).toMatchSnapshot()
 
     // Assertions
-    expect(screen.getByText('Swap')).toBeOnTheScreen()
+    expect(screen.getByText('Trade')).toBeOnTheScreen()
 
     // 2 deposit elements, button to deposit and deposit activity row
 

@@ -1,8 +1,8 @@
-import { Button, Checkbox, Dialog, Paragraph, Sheet, XStack, YStack } from '@my/ui'
+import { Button, Checkbox, Dialog, Paragraph, Sheet, XStack, YStack, Label } from '@my/ui'
 import { Check } from '@tamagui/lucide-icons'
 import { useDidUserSwap } from 'app/features/swap/hooks/useDidUserSwap'
 import { toNiceError } from 'app/utils/toNiceError'
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { useRouter } from 'solito/router'
 
 const SwapRiskDialog = () => {
@@ -10,6 +10,7 @@ const SwapRiskDialog = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const didUserSwap = useDidUserSwap()
   const router = useRouter()
+  const id = useId()
 
   const handleConfirm = () => {
     setIsOpen(false)
@@ -62,6 +63,7 @@ const SwapRiskDialog = () => {
               </Paragraph>
               <XStack ai={'center'} gap={'$2'}>
                 <Checkbox
+                  id={id}
                   testID={'swapRiskDialogCheckbox'}
                   checked={isChecked}
                   onCheckedChange={(checked) => {
@@ -76,7 +78,9 @@ const SwapRiskDialog = () => {
                     <Check color={'$black'} />
                   </Checkbox.Indicator>
                 </Checkbox>
-                <Paragraph>I have read and understand the risks involved.</Paragraph>
+                <Label htmlFor={id} cursor={'pointer'}>
+                  I have read and understand the risks involved.
+                </Label>
               </XStack>
               <XStack justifyContent="flex-end" marginTop="$4" gap="$4">
                 <Dialog.Close asChild>

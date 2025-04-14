@@ -49,7 +49,15 @@ export const formFields = {
   countrycode: createUniqueFieldSchema(z.string(), 'countrycode_select'),
   otp: createUniqueFieldSchema(z.string(), 'otp'),
   coin: createUniqueFieldSchema(z.string(), 'coin'),
-  note: createUniqueFieldSchema(z.string().max(100, 'Note cannot exceed 100 characters'), 'note'),
+  note: createUniqueFieldSchema(
+    z
+      .string()
+      .trim()
+      .max(100, 'Note cannot exceed 100 characters')
+      .regex(/^[^\n]*(?:\n[^\n]*){0,3}$/, 'Note cannot exceed 3 paragraphs')
+      .optional(),
+    'note'
+  ),
   date: z.date(),
 }
 

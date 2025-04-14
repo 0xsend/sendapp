@@ -1,5 +1,6 @@
 import type { Client } from '@temporalio/client'
 import * as workflows from '../all-workflows'
+import { version } from '../version'
 
 type WorkflowType = typeof workflows
 type WorkflowName = keyof WorkflowType
@@ -21,7 +22,7 @@ export async function startWorkflow<T extends WorkflowName>({
 }: StartWorkflowParams<T>): Promise<ReturnType<Client['workflow']['start']>> {
   //@ts-expect-error Mad about args actually being typed
   return await client.workflow.start(workflows[workflow], {
-    taskQueue: 'monorepo',
+    taskQueue: `monorepo@${version}`,
     workflowId: `temporal/${workflow}/${ids.join('/')}`,
     args,
   })

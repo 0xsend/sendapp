@@ -132,9 +132,15 @@ export const useSendToken = () => {
   return [sendToken, setSendTokenParam] as const
 }
 
-const useNote = () => {
-  const [note, setNoteParam] = useSendParam('note')
-
+export const useNote = () => {
+  const [note, setNoteParam] = useSendParam('note', {
+    initial: undefined,
+    parse: (value) => {
+      if (value === '') return undefined
+      if (!value || !value[0]) return undefined
+      return Array.isArray(value) ? decodeURIComponent(value[0]) : decodeURIComponent(value)
+    },
+  })
   return [note, setNoteParam] as const
 }
 
@@ -267,6 +273,31 @@ export const useSwapScreenParams = () => {
       inToken,
       inAmount,
       slippage,
+    },
+    setParams,
+  ] as const
+}
+
+export type DepositScreenParams = {
+  depositAmount?: string
+}
+
+const { useParam: useDepositParam, useParams: useDepositParams } =
+  createParam<DepositScreenParams>()
+
+const useDepositAmount = () => {
+  const [depositAmount, setDepositAmount] = useDepositParam('depositAmount')
+
+  return [depositAmount, setDepositAmount] as const
+}
+
+export const useDepositScreenParams = () => {
+  const { setParams } = useDepositParams()
+  const [depositAmount] = useDepositAmount()
+
+  return [
+    {
+      depositAmount,
     },
     setParams,
   ] as const

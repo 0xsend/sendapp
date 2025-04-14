@@ -41,7 +41,7 @@ import { api } from 'app/utils/api'
 import { signUserOp } from 'app/utils/signUserOp'
 import { decodeTransferUserOp } from 'app/utils/decodeTransferUserOp'
 import type { UserOperation } from 'permissionless'
-import { MAX_NOTE_LENGTH } from 'app/components/FormFields/NoteField'
+import { formFields } from 'app/utils/SchemaForm'
 
 export function SendConfirmScreen() {
   const [queryParams] = useSendScreenParams()
@@ -188,7 +188,10 @@ export function SendConfirm() {
       assert(nonce !== undefined, 'Nonce is not available')
       throwIf(feesPerGasError)
       assert(!!feesPerGas, 'Fees per gas is not available')
-      assert(!note || note.length <= MAX_NOTE_LENGTH, 'Note is too long')
+      assert(
+        !note || !formFields.note.safeParse(note).error,
+        'Note failed to match validation constraints'
+      )
 
       assert(selectedCoin?.balance >= BigInt(amount ?? '0'), 'Insufficient balance')
       const sender = sendAccount?.address as `0x${string}`
@@ -250,6 +253,7 @@ export function SendConfirm() {
       f={1}
       jc={'space-between'}
       pb={'$4'}
+      gap={'$3.5'}
       $gtLg={{
         display: 'flex',
         maxWidth: '50%',
@@ -372,40 +376,42 @@ export function SendConfirm() {
             </XStack>
           </YStack>
         </YStack>
-        <YStack
-          bg={'$color1'}
-          br={'$6'}
-          p={'$6'}
-          gap={'$4.5'}
-          $gtSm={{
-            gap: '$5',
-          }}
-        >
-          <XStack gap={'$2'} ai={'center'} jc={'space-between'}>
-            <Paragraph
-              color={'$silverChalice'}
-              size={'$6'}
-              $theme-light={{
-                color: '$darkGrayTextField',
-              }}
-            >
-              Your note
+        {Boolean(note) && (
+          <YStack
+            bg={'$color1'}
+            br={'$6'}
+            p={'$6'}
+            gap={'$4.5'}
+            $gtSm={{
+              gap: '$5',
+            }}
+          >
+            <XStack gap={'$2'} ai={'center'} jc={'space-between'}>
+              <Paragraph
+                color={'$silverChalice'}
+                size={'$6'}
+                $theme-light={{
+                  color: '$darkGrayTextField',
+                }}
+              >
+                Your note
+              </Paragraph>
+              <Paragraph
+                onPress={onEdit}
+                cursor="pointer"
+                hoverStyle={{ color: '$primary' }}
+                size={'$5'}
+                pl={'$2'}
+                textAlign={'right'}
+              >
+                edit
+              </Paragraph>
+            </XStack>
+            <Paragraph size={'$5'} whiteSpace={'pre-wrap'}>
+              {note}
             </Paragraph>
-            <Paragraph
-              onPress={onEdit}
-              cursor="pointer"
-              hoverStyle={{ color: '$primary' }}
-              size={'$5'}
-              pl={'$2'}
-              textAlign={'right'}
-            >
-              edit
-            </Paragraph>
-          </XStack>
-          <Paragraph size={'$5'} whiteSpace={'pre-wrap'}>
-            {note ? decodeURIComponent(note) : '-'}
-          </Paragraph>
-        </YStack>
+          </YStack>
+        )}
         {error && (
           <ErrorMessage
             error={(error as { details?: string }).details ?? error.message ?? 'Error sending'}

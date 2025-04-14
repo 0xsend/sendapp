@@ -17,6 +17,7 @@ const BaseCoinSchema = z.object({
   symbol: z.string(),
   decimals: z.number().min(0).max(18),
   formatDecimals: z.number().min(0).optional(),
+  shortLabel: z.string().optional(),
   coingeckoTokenId: z.string(),
 })
 
@@ -51,6 +52,7 @@ export const ethCoin = {
   token: 'eth',
   decimals: 18,
   coingeckoTokenId: 'ethereum',
+  formatDecimals: 5,
 } as const satisfies coin
 
 export const sendCoin = {
@@ -77,6 +79,7 @@ export const spx6900Coin = {
   symbol: 'SPX',
   token: spx6900Addresses[baseMainnet.id],
   decimals: 8,
+  formatDecimals: 2,
   coingeckoTokenId: 'spx6900',
 } as const satisfies coin
 
@@ -87,7 +90,7 @@ export const moonwellCoin = {
   decimals: 18,
   formatDecimals: 0,
   coingeckoTokenId: 'moonwell-artemis',
-}
+} as const satisfies coin
 
 export const morphoCoin = {
   label: 'Morpho',
@@ -96,25 +99,27 @@ export const morphoCoin = {
   decimals: 18,
   formatDecimals: 2,
   coingeckoTokenId: 'morpho',
-}
+} as const satisfies coin
 
 export const aerodromeCoin = {
   label: 'Aerodrome Finance',
+  shortLabel: 'Aerodrome',
   symbol: 'AERO',
   token: aerodromeFinanceAddresses[baseMainnet.id],
   decimals: 18,
-  formatDecimals: 0,
+  formatDecimals: 2,
   coingeckoTokenId: 'aerodrome-finance',
-}
+} as const satisfies coin
 
 export const cbBtcCoin = {
   label: 'Coinbase Wrapped BTC',
+  shortLabel: 'cbBTC',
   symbol: 'CBBTC',
   token: coinbaseWrappedBtcAddresses[baseMainnet.id],
   decimals: 8,
   formatDecimals: 6,
   coingeckoTokenId: 'coinbase-wrapped-btc',
-}
+} as const satisfies coin
 
 export const eurcCoin = {
   label: 'EURC',
@@ -123,12 +128,12 @@ export const eurcCoin = {
   decimals: 6,
   formatDecimals: 2,
   coingeckoTokenId: 'euro-coin',
-}
+} as const satisfies coin
 
 /**
  * The coins (tokens) array that are supported by Send App.
  */
-export const coins: coin[] = [usdcCoin, ethCoin, sendCoin] as const
+export const coins: coin[] = [usdcCoin, sendCoin] as const
 export type coins = typeof coins
 
 type CoinsDict = { [key in coins[number]['token']]: coins[number] }
@@ -147,6 +152,7 @@ export type coinsDict = typeof coinsDict
  * The coins (tokens) that sendapp supports through partnerships. (Hidden when balance is 0)
  */
 export const partnerCoins: coin[] = [
+  ethCoin,
   cbBtcCoin,
   spx6900Coin,
   moonwellCoin,
