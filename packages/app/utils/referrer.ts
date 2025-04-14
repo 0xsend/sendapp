@@ -45,25 +45,34 @@ export async function fetchReferrer({
   if (profile?.referral_code === referralCode) return null // no self referrals
   const signalToUse = signal ?? new AbortController().signal
   const [
+    { data: referredBy, error: errorByReferredBy },
     { data: profileByReferralCode, error: errorByReferralCode },
     { data: profileByTag, error: errorByTag },
   ] = await Promise.all([
-    fetchProfile({
-      supabase,
-      lookup_type: 'refcode',
-      identifier: referralCode,
-    })
-      .abortSignal(signalToUse)
-      .maybeSingle(),
-    fetchProfile({
-      supabase,
-      lookup_type: 'tag',
-      identifier: referralCode,
-    })
-      .abortSignal(signalToUse)
-      .maybeSingle(),
+    fetchReferredBy({ supabase }).abortSignal(signalToUse).maybeSingle(),
+    !referralCode
+      ? { data: null, error: null }
+      : fetchProfile({
+          supabase,
+          lookup_type: 'refcode',
+          identifier: referralCode,
+        })
+          .abortSignal(signalToUse)
+          .maybeSingle(),
+    !referralCode
+      ? { data: null, error: null }
+      : fetchProfile({
+          supabase,
+          lookup_type: 'tag',
+          identifier: referralCode,
+        })
+          .abortSignal(signalToUse)
+          .maybeSingle(),
   ] as const)
-  const referrer = ([profileByReferralCode, profileByTag] as const).find((p) => {
+  // use existing referrer if it exists
+  // otherwise, use the referrer code
+  // otherwise, use the referrer tag
+  const referrer = ([referredBy, profileByReferralCode, profileByTag] as const).find((p) => {
     if (!p) return false
     if (p.id === profile.id) return false // no self referrals
     if (!p.address) return false // need a send account
@@ -73,6 +82,12 @@ export async function fetchReferrer({
 
   if (referrer) {
     return referrer as ReferrerProfile // safe because we filter out referrers with no address and tag
+  }
+
+  if (errorByReferredBy) {
+    if (errorByReferredBy.code !== 'PGRST116') {
+      throw errorByReferredBy
+    }
   }
 
   if (errorByReferralCode) {
@@ -97,10 +112,9 @@ export function useReferrer() {
     queryKey: ['referrer', { referralCode, supabase, profile }] as const,
     queryFn: async ({ queryKey: [, { referralCode, supabase, profile }], signal }) => {
       throwIf(referralCode.error)
-      if (!referralCode.data) return null
       assert(!!supabase, 'supabase is required')
       assert(!!profile, 'profile is required')
-      return fetchReferrer({ supabase, profile, referralCode: referralCode.data, signal })
+      return fetchReferrer({ supabase, profile, referralCode: referralCode.data ?? '', signal })
     },
     enabled: !!profile && referralCode.isFetched,
   })

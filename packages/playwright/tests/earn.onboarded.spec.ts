@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker'
 import { expect } from '@my/playwright/fixtures/send-accounts'
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
-import type { Database, Tables } from '@my/supabase/database.types'
+import type { Database, PgBytea, Tables } from '@my/supabase/database.types'
 import {
   sendEarnAbi,
   sendEarnAddress,
@@ -338,23 +338,12 @@ for (const coin of [usdcCoin]) {
         deposit,
       })
 
-      const factory = assetsToEarnFactory[coin.token]
-      assert(!!factory, 'Asset is not supported')
-
-      // Verify the deposit was into the referrer affiliate vault
-      const { data, error } = await supabase
-        .from('send_earn_new_affiliate')
-        .select('affiliate, send_earn_affiliate, send_earn_affiliate_vault(send_earn, log_addr)')
-        .eq('affiliate', hexToBytea(referrerSendAccount.address))
-        .eq('log_addr', hexToBytea(factory)) // each asset has its own factory
-        .not('send_earn_affiliate_vault', 'is', null)
-        .single()
-      expect(error).toBeFalsy()
-      assert(!!data, 'No affiliate vault found')
-      const affiliateVault = AffiliateVaultSchema.parse(data)
-      assert(!!affiliateVault, 'Affiliate vault is not defined')
-      expect(affiliateVault.send_earn_affiliate_vault).toBeDefined()
-      expect(affiliateVault.send_earn_affiliate_vault?.send_earn).toBe(vault)
+      await verifyDepositAffiliateVault({
+        coin,
+        supabase,
+        referrerSendAccount: hexToBytea(referrerSendAccount.address),
+        vault,
+      })
 
       await expect(async () => {
         await expect(supabase).toHaveEventInActivityFeed({
@@ -419,6 +408,64 @@ for (const coin of [usdcCoin]) {
         coin,
         assets: BigInt(deposit.assets),
         event: 'Deposit',
+      })
+    })
+
+    test(`can deposit ${coin.symbol} into SendEarn with an existing upline`, async ({
+      earnDepositPage: page,
+      sendAccount,
+      supabase,
+      user: { profile },
+      referrer: { referrer, referrerTags, referrerSendAccount },
+      pg,
+    }) => {
+      log = debug(`test:earn:deposit:referrer:${profile.id}:${test.info().parallelIndex}`)
+      // using pg directly since using supabaseAdmin here is not working
+      await pg.query(
+        `
+        INSERT INTO referrals (referrer_id, referred_id)
+        VALUES ($1, $2)
+      `,
+        [referrer.id, profile.id]
+      )
+
+      // Generate a random deposit amount
+      const randomAmount = faker.number.bigInt({ min: MIN_DEPOSIT_AMOUNT, max: MAX_DEPOSIT_AMOUNT })
+      const amountDecimals = formatUnits(randomAmount, coin.decimals)
+
+      // Fund the account
+      await fund({ address: sendAccount.address, amount: randomAmount + GAS_FEES, coin })
+
+      // Navigate to the earn page with the referral code
+      await page.navigate(coin)
+
+      // Referral code should not be visible
+      await checkReferralCodeHidden(page.page)
+
+      // Complete the deposit
+      const deposit = await page.deposit({
+        coin,
+        supabase,
+        amount: amountDecimals,
+      })
+
+      // vault is the log_addr which should be the Send Earn address where the
+      // fee recipient is the send earn affiliate
+      const vault = checksumAddress(byteaToHex(deposit.log_addr))
+
+      await verifyDeposit({
+        owner: sendAccount.address,
+        vault: vault,
+        minDepositedAssets: MIN_DEPOSIT_AMOUNT,
+        depositedAssets: randomAmount,
+        deposit: deposit,
+      })
+
+      await verifyDepositAffiliateVault({
+        coin,
+        supabase,
+        referrerSendAccount: hexToBytea(referrerSendAccount.address),
+        vault,
       })
     })
   })
@@ -662,6 +709,7 @@ for (const coin of [usdcCoin]) {
       })
 
       const { affiliateVault } = await claimReady
+      assert(!!affiliateVault.send_earn_affiliate_vault, 'Affiliate vault is not defined')
 
       // Calculate expected reward
       const split = await readSendEarnSplit(coin)
@@ -688,6 +736,12 @@ for (const coin of [usdcCoin]) {
       assert(!!availableRewards, 'Available rewards is not defined')
       expect(availableRewards).toBeCloseTo(Number(formatUnits(rewardShare, coin.decimals)), 2)
 
+      // Ensure Send Earn Revenue Safe gets split
+      const revenueSafeBalance = await readSendEarnBalanceOf({
+        vault: sendEarnAddress[testBaseClient.chain.id],
+        owner: '0x65049c4b8e970f5bccdae8e141aa06346833cec4',
+      })
+
       // 4. Claim rewards
       const claimTx = await earnClaimPage.claimRewards({
         affiliateVault,
@@ -713,6 +767,14 @@ for (const coin of [usdcCoin]) {
         assets: BigInt(claimTx.assets),
         event: 'Rewards',
       })
+
+      // all we really can do is check that the balance increased
+      expect(
+        await readSendEarnBalanceOf({
+          vault: sendEarnAddress[testBaseClient.chain.id],
+          owner: '0x65049c4b8e970f5bccdae8e141aa06346833cec4',
+        })
+      ).toBeGreaterThan(revenueSafeBalance)
     })
   })
 
@@ -928,4 +990,33 @@ async function verifyEarnings({
       )} ${coin.symbol}`
     )
   ).toBeVisible()
+}
+async function verifyDepositAffiliateVault({
+  coin,
+  supabase,
+  referrerSendAccount,
+  vault,
+}: {
+  coin: erc20Coin
+  supabase: SupabaseClient<Database>
+  referrerSendAccount: PgBytea
+  vault: `0x${string}`
+}) {
+  const factory = assetsToEarnFactory[coin.token]
+  assert(!!factory, 'Asset is not supported')
+
+  // Verify the deposit was into the referrer affiliate vault
+  const { data, error } = await supabase
+    .from('send_earn_new_affiliate')
+    .select('affiliate, send_earn_affiliate, send_earn_affiliate_vault(send_earn, log_addr)')
+    .eq('affiliate', referrerSendAccount)
+    .eq('log_addr', hexToBytea(factory)) // each asset has its own factory
+    .not('send_earn_affiliate_vault', 'is', null)
+    .single()
+  expect(error).toBeFalsy()
+  assert(!!data, 'No affiliate vault found')
+  const affiliateVault = AffiliateVaultSchema.parse(data)
+  assert(!!affiliateVault, 'Affiliate vault is not defined')
+  expect(affiliateVault.send_earn_affiliate_vault).toBeDefined()
+  expect(affiliateVault.send_earn_affiliate_vault?.send_earn).toBe(vault)
 }

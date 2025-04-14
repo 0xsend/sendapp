@@ -144,7 +144,6 @@ export class EarnDepositPage {
         },
         {
           timeout: 15000,
-          intervals: [1000, 2000, 3000, 5000],
           message: `Expected to find a new send_earn_deposit record after block ${lastBlockNum} in Supabase`,
         }
       )
