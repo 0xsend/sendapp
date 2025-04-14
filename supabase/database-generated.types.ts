@@ -1669,8 +1669,6 @@ export type Database = {
           created_at_block_num: number | null
           data: Json | null
           id: number
-          send_account_transfers_activity_event_id: string | null
-          send_account_transfers_activity_event_name: string | null
           status: Database["temporal"]["Enums"]["transfer_status"]
           updated_at: string
           user_id: string | null
@@ -1681,8 +1679,6 @@ export type Database = {
           created_at_block_num?: number | null
           data?: Json | null
           id?: number
-          send_account_transfers_activity_event_id?: string | null
-          send_account_transfers_activity_event_name?: string | null
           status?: Database["temporal"]["Enums"]["transfer_status"]
           updated_at?: string
           user_id?: string | null
@@ -1693,8 +1689,6 @@ export type Database = {
           created_at_block_num?: number | null
           data?: Json | null
           id?: number
-          send_account_transfers_activity_event_id?: string | null
-          send_account_transfers_activity_event_name?: string | null
           status?: Database["temporal"]["Enums"]["transfer_status"]
           updated_at?: string
           user_id?: string | null

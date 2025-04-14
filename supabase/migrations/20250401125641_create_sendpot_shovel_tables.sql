@@ -42,6 +42,13 @@ alter table public."send_pot_user_ticket_purchases" enable row level security;
 create index send_pot_user_ticket_purchases_referrer on public.send_pot_user_ticket_purchases using btree(referrer);
 create index send_pot_user_ticket_purchases_recipient on public.send_pot_user_ticket_purchases using btree(recipient);
 create index send_pot_user_ticket_purchases_buyer on public.send_pot_user_ticket_purchases using btree(buyer);
+create index idx_send_pot_user_ticket_purchases_block_num
+  ON public.send_pot_user_ticket_purchases USING btree (block_num);
+
+create index idx_utp_blocknum_covering
+  ON public.send_pot_user_ticket_purchases USING btree (block_num)
+  INCLUDE (tickets_purchased_total_bps);
+
 
 create table "public"."send_pot_jackpot_runs"(
     "id" serial primary key,
@@ -65,6 +72,8 @@ create table "public"."send_pot_jackpot_runs"(
 alter table "public"."send_pot_jackpot_runs" enable row level security;
 
 create index send_pot_jackpot_runs_winner on public.send_pot_jackpot_runs using btree(winner);
+create index idx_send_pot_jackpot_runs_block_num
+  ON public.send_pot_jackpot_runs USING btree (block_num);
 
 -- Jackpot summary returns the user jackpots summary where it aggregates user ticket purchases based off jackpot block_num.
 -- num_runs is the number of jackpot runs to chose from, in descending order from block_num.
