@@ -80,7 +80,7 @@ export function useAddressBook() {
     queryKeyHashFn: (queryKey) => SuperJSON.stringify(queryKey),
     enabled,
     queryFn,
-    staleTime: Number.POSITIVE_INFINITY, // prevent infinite render loops, invalidate when needed
+    staleTime: 30_000, // prevent infinite render loops, invalidate when needed
   })
   return query
 }

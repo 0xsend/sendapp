@@ -9,7 +9,7 @@ export const useSwapRouters = () => {
 
   return useQuery({
     queryKey: [useSwapRoutersQueryKey],
-    staleTime: Number.POSITIVE_INFINITY,
+    staleTime: 30_000,
     refetchOnMount: false,
     refetchOnReconnect: false,
     refetchOnWindowFocus: false,

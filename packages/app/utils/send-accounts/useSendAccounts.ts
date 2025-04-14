@@ -56,7 +56,7 @@ export function sendAccountQueryOptions({
       }
       return data
     },
-    staleTime: Number.POSITIVE_INFINITY,
+    staleTime: 30_000,
   })
 }
 

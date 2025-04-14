@@ -174,7 +174,7 @@ export function sendEarnBalancesQueryOptions(supabase: SupabaseClient<Database>)
   return queryOptions({
     queryKey: ['send_earn_balances', { supabase }] as const,
     queryFn: async () => fetchSendEarnBalances(supabase),
-    staleTime: Number.POSITIVE_INFINITY,
+    staleTime: 30_000,
   })
 }
 
@@ -398,7 +398,7 @@ export function myAffiliateVaultQueryOptions({
       log('myAffiliateVault', { data, error })
       return AffiliateVaultSchema.parse(data)
     },
-    staleTime: Number.POSITIVE_INFINITY,
+    staleTime: 30_000,
   })
 }
 
