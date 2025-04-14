@@ -6,7 +6,7 @@ import type { NextPageWithLayout } from '../_app'
 import type { GetServerSideProps, GetServerSidePropsContext } from 'next'
 import type { Database } from '@my/supabase/database.types'
 import { userOnboarded } from 'utils/userOnboarded'
-import { supabaseAdmin } from 'app/utils/supabase/admin'
+import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { TopNav } from 'app/components/TopNav'
 
 export const Page: NextPageWithLayout = () => {
@@ -44,6 +44,7 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   }
 
   // check if profile exists
+  const supabaseAdmin = createSupabaseAdminClient()
   const { data: profile, error } = await supabaseAdmin
     .rpc('profile_lookup', { lookup_type: 'sendid', identifier: sendid.toString() })
     .maybeSingle()

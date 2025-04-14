@@ -2,7 +2,7 @@ import express, { type Request, type Response, Router } from 'express'
 import pino from 'pino'
 import { StandardMerkleTree } from '@openzeppelin/merkle-tree'
 import { selectAll } from 'app/utils/supabase/selectAll'
-import { supabaseAdmin } from './supabase'
+import { createSupabaseAdminClient } from './supabase'
 import { DistributorV2Worker } from './distributorv2'
 
 const logger = pino({
@@ -51,6 +51,7 @@ distributorRouter.post('/merkle', checkAuthorization, async (req: Request, res: 
 
   logger.info({ id }, 'Received request to distribution merkle root')
 
+  const supabaseAdmin = createSupabaseAdminClient()
   const { data: shares, error: sharesError } = await selectAll(
     supabaseAdmin
       .from('distribution_shares')

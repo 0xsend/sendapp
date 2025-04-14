@@ -8,7 +8,7 @@ import {
   type SendEarnDepositCall,
 } from 'app/utils/decodeSendEarnDepositUserOp'
 import { hexToBytea } from 'app/utils/hexToBytea'
-import { supabaseAdmin } from 'app/utils/supabase/admin'
+import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import type { UserOperation } from 'permissionless'
 import { isAddressEqual, zeroAddress, type Address } from 'viem'
 import { createUserOpActivities, type UserOpActivities } from '../userop-workflow/activities'
@@ -83,6 +83,7 @@ async function verifyDepositIndexedActivity({
     ActivityContext.current().heartbeat(`Attempt ${attempt}/${maxAttempts}`) // Send heartbeat
 
     try {
+      const supabaseAdmin = createSupabaseAdminClient()
       const { error, count } = await supabaseAdmin
         .from('send_earn_deposit')
         .select('*', { count: 'exact', head: true }) // Efficiently check existence
@@ -196,6 +197,7 @@ async function upsertReferralRelationshipActivity({
   const referrerBytea = hexToBytea(referrerAddress)
 
   try {
+    const supabaseAdmin = createSupabaseAdminClient()
     // 1. Validate against send_earn_new_affiliate
     // Use head: true and count: 'exact' to efficiently check existence without fetching data
     const validationResult = await supabaseAdmin
@@ -260,6 +262,7 @@ async function upsertReferralRelationshipActivity({
     log.info('Found UUIDs for referrer and referred users', { referrerUuid, referredUuid })
 
     // 3. Insert into referrals table
+    // Note: We re-use the supabaseAdmin instance created earlier in this try block
     const { error: insertError } = await supabaseAdmin
       .from('referrals')
       .insert({ referrer_id: referrerUuid, referred_id: referredUuid })

@@ -1,5 +1,5 @@
 import type { Database } from '@my/supabase/database.types'
-import { supabaseAdmin } from 'app/utils/supabase/admin'
+import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import type { Address } from 'viem'
 import { log } from '@temporalio/activity'
 
@@ -35,6 +35,7 @@ export async function upsertTemporalSendEarnDeposit(
     )
   }
 
+  const supabaseAdmin = createSupabaseAdminClient()
   return await supabaseAdmin
     .schema('temporal')
     .from('send_earn_deposits')
@@ -55,6 +56,7 @@ export async function getUserIdFromAddress(address: Address): Promise<string | n
     return null
   }
 
+  const supabaseAdmin = createSupabaseAdminClient()
   const { data, error } = await supabaseAdmin
     .schema('public')
     .from('send_accounts')
@@ -91,6 +93,7 @@ export async function updateTemporalSendEarnDeposit(updateData: TemporalDepositU
     log.warn(`No fields to update for workflow ${workflow_id}`)
     // Need to fetch the current state if we want to return it, or adjust return type
     // For now, fetch and return the current record
+    const supabaseAdmin = createSupabaseAdminClient()
     return await supabaseAdmin
       .schema('temporal')
       .from('send_earn_deposits')
@@ -99,6 +102,7 @@ export async function updateTemporalSendEarnDeposit(updateData: TemporalDepositU
       .single()
   }
 
+  const supabaseAdmin = createSupabaseAdminClient()
   return await supabaseAdmin
     .schema('temporal')
     .from('send_earn_deposits')
