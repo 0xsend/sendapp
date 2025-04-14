@@ -7,6 +7,7 @@ import {
   isActivitySwapTransfer,
   isSendPotTicketPurchase,
   isSendPotWin,
+  isSwapBuyTransfer,
 } from 'app/utils/activity'
 import {
   type Activity,
