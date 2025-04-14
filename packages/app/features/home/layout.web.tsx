@@ -34,7 +34,7 @@ export function HomeLayout({
           <Container
             safeAreaProps={{
               style: { flex: 1 },
-              edges: { bottom: 'maximum' }, // Removed left and right additive padding
+              edges: { bottom: 'maximum', left: 'additive', right: 'additive' },
             }}
             $gtLg={{ pt: '$5', pb: '$0' }}
             height={fullHeight ? '100%' : 'auto'}
