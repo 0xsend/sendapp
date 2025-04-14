@@ -1045,6 +1045,120 @@ export type Database = {
         }
         Relationships: []
       }
+      sendpot_jackpot_runs: {
+        Row: {
+          abi_idx: number | null
+          block_num: number | null
+          block_time: number | null
+          chain_id: number | null
+          id: number
+          ig_name: string | null
+          log_addr: string | null
+          log_idx: number | null
+          src_name: string | null
+          tickets_purchased_total_bps: number | null
+          time: number | null
+          tx_hash: string | null
+          tx_idx: number | null
+          win_amount: number | null
+          winner: string | null
+          winning_ticket: number | null
+        }
+        Insert: {
+          abi_idx?: number | null
+          block_num?: number | null
+          block_time?: number | null
+          chain_id?: number | null
+          id?: number
+          ig_name?: string | null
+          log_addr?: string | null
+          log_idx?: number | null
+          src_name?: string | null
+          tickets_purchased_total_bps?: number | null
+          time?: number | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+          win_amount?: number | null
+          winner?: string | null
+          winning_ticket?: number | null
+        }
+        Update: {
+          abi_idx?: number | null
+          block_num?: number | null
+          block_time?: number | null
+          chain_id?: number | null
+          id?: number
+          ig_name?: string | null
+          log_addr?: string | null
+          log_idx?: number | null
+          src_name?: string | null
+          tickets_purchased_total_bps?: number | null
+          time?: number | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+          win_amount?: number | null
+          winner?: string | null
+          winning_ticket?: number | null
+        }
+        Relationships: []
+      }
+      sendpot_user_ticket_purchases: {
+        Row: {
+          abi_idx: number | null
+          block_num: number | null
+          block_time: number | null
+          buyer: string | null
+          chain_id: number | null
+          id: number
+          ig_name: string | null
+          log_addr: string | null
+          log_idx: number | null
+          recipient: string | null
+          referrer: string | null
+          src_name: string | null
+          tickets_purchased_total_bps: number | null
+          tx_hash: string | null
+          tx_idx: number | null
+          value: number | null
+        }
+        Insert: {
+          abi_idx?: number | null
+          block_num?: number | null
+          block_time?: number | null
+          buyer?: string | null
+          chain_id?: number | null
+          id?: number
+          ig_name?: string | null
+          log_addr?: string | null
+          log_idx?: number | null
+          recipient?: string | null
+          referrer?: string | null
+          src_name?: string | null
+          tickets_purchased_total_bps?: number | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+          value?: number | null
+        }
+        Update: {
+          abi_idx?: number | null
+          block_num?: number | null
+          block_time?: number | null
+          buyer?: string | null
+          chain_id?: number | null
+          id?: number
+          ig_name?: string | null
+          log_addr?: string | null
+          log_idx?: number | null
+          recipient?: string | null
+          referrer?: string | null
+          src_name?: string | null
+          tickets_purchased_total_bps?: number | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+          value?: number | null
+        }
+        Relationships: []
+      }
       sendtag_checkout_receipts: {
         Row: {
           abi_idx: number
@@ -1382,6 +1496,23 @@ export type Database = {
           created_at: string
           user_id: string
           referral_count: number
+        }[]
+      }
+      get_pending_jackpot_tickets_purchased: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      get_user_jackpot_summary: {
+        Args: {
+          num_runs: number
+        }
+        Returns: {
+          jackpot_run_id: number
+          jackpot_block_num: number
+          jackpot_block_time: number
+          winner: string
+          win_amount: number
+          total_tickets: number
         }[]
       }
       insert_challenge: {

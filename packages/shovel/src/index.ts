@@ -10,6 +10,8 @@ import {
   sendAccountSigningKeyAdded,
   sendAccountSigningKeyRemoved,
   sendtagCheckoutReceiptsIntegration,
+  sendPotUserTicketPurchaseIntegration,
+  sendPotJackpotRunIntegration,
 } from './integrations'
 
 // baseSrcBlockHeaders is to be used for integrations that require block headers
@@ -69,6 +71,14 @@ export const integrations: Integration[] = [
   },
   {
     ...sendtagCheckoutReceiptsIntegration,
+    sources: [{ name: baseSrcLogs.name, start: '$BASE_BLOCK_START' }],
+  },
+  {
+    ...sendPotUserTicketPurchaseIntegration,
+    sources: [{ name: baseSrcLogs.name, start: '$BASE_BLOCK_START' }],
+  },
+  {
+    ...sendPotJackpotRunIntegration,
     sources: [{ name: baseSrcLogs.name, start: '$BASE_BLOCK_START' }],
   },
 ]

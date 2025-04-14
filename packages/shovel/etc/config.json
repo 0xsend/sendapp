@@ -872,6 +872,275 @@
           "start": "$BASE_BLOCK_START"
         }
       ]
+    },
+    {
+      "name": "sendpot_user_ticket_purchases",
+      "enabled": true,
+      "block": [
+        {
+          "name": "chain_id",
+          "column": "chain_id"
+        },
+        {
+          "name": "block_num",
+          "column": "block_num"
+        },
+        {
+          "name": "block_time",
+          "column": "block_time"
+        },
+        {
+          "name": "tx_hash",
+          "column": "tx_hash"
+        },
+        {
+          "name": "tx_idx",
+          "column": "tx_idx"
+        },
+        {
+          "name": "log_idx",
+          "column": "log_idx"
+        },
+        {
+          "name": "log_addr",
+          "column": "log_addr",
+          "filter_op": "equals",
+          "filter_val": "0xa0A5611b9A1071a1D8A308882065c48650bAeE8b"
+        }
+      ],
+      "table": {
+        "name": "sendpot_user_ticket_purchases",
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+            "constraints": "PRIMARY KEY"
+          },
+          {
+            "name": "block_num",
+            "type": "numeric",
+            "constraints": "PRIMARY KEY"
+          },
+          {
+            "name": "log_idx",
+            "type": "numeric",
+            "constraints": "PRIMARY KEY"
+          },
+          {
+            "name": "block_time",
+            "type": "numeric"
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea"
+          },
+          {
+            "name": "tx_idx",
+            "type": "numeric"
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea"
+          },
+          {
+            "name": "recipient",
+            "type": "bytea"
+          },
+          {
+            "name": "tickets_purchased_total_bps",
+            "type": "numeric"
+          },
+          {
+            "name": "referrer",
+            "type": "bytea"
+          },
+          {
+            "name": "buyer",
+            "type": "bytea"
+          }
+        ]
+      },
+      "event": {
+        "type": "event",
+        "anonymous": false,
+        "name": "UserTicketPurchase",
+        "inputs": [
+          {
+            "column": "recipient",
+            "name": "recipient",
+            "internalType": "address",
+            "type": "address",
+            "indexed": true
+          },
+          {
+            "column": "tickets_purchased_total_bps",
+            "name": "ticketsPurchasedTotalBps",
+            "internalType": "uint256",
+            "type": "uint256",
+            "indexed": false
+          },
+          {
+            "column": "referrer",
+            "name": "referrer",
+            "internalType": "address",
+            "type": "address",
+            "indexed": true
+          },
+          {
+            "column": "buyer",
+            "name": "buyer",
+            "internalType": "address",
+            "type": "address",
+            "indexed": true
+          }
+        ]
+      },
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START"
+        }
+      ]
+    },
+    {
+      "name": "sendpot_jackpot_runs",
+      "enabled": true,
+      "block": [
+        {
+          "name": "chain_id",
+          "column": "chain_id"
+        },
+        {
+          "name": "block_num",
+          "column": "block_num"
+        },
+        {
+          "name": "block_time",
+          "column": "block_time"
+        },
+        {
+          "name": "tx_hash",
+          "column": "tx_hash"
+        },
+        {
+          "name": "tx_idx",
+          "column": "tx_idx"
+        },
+        {
+          "name": "log_idx",
+          "column": "log_idx"
+        },
+        {
+          "name": "log_addr",
+          "column": "log_addr",
+          "filter_op": "equals",
+          "filter_val": "0xa0A5611b9A1071a1D8A308882065c48650bAeE8b"
+        }
+      ],
+      "table": {
+        "name": "sendpot_jackpot_runs",
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+            "constraints": "PRIMARY KEY"
+          },
+          {
+            "name": "block_num",
+            "type": "numeric",
+            "constraints": "PRIMARY KEY"
+          },
+          {
+            "name": "log_idx",
+            "type": "numeric",
+            "constraints": "PRIMARY KEY"
+          },
+          {
+            "name": "block_time",
+            "type": "numeric"
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea"
+          },
+          {
+            "name": "tx_idx",
+            "type": "numeric"
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea"
+          },
+          {
+            "name": "time",
+            "type": "numeric"
+          },
+          {
+            "name": "winner",
+            "type": "bytea"
+          },
+          {
+            "name": "winning_ticket",
+            "type": "numeric"
+          },
+          {
+            "name": "win_amount",
+            "type": "numeric"
+          },
+          {
+            "name": "tickets_purchased_total_bps",
+            "type": "numeric"
+          }
+        ]
+      },
+      "event": {
+        "type": "event",
+        "anonymous": false,
+        "name": "JackpotRun",
+        "inputs": [
+          {
+            "column": "time",
+            "name": "time",
+            "internalType": "uint256",
+            "type": "uint256",
+            "indexed": false
+          },
+          {
+            "column": "winner",
+            "name": "winner",
+            "internalType": "address",
+            "type": "address",
+            "indexed": false
+          },
+          {
+            "column": "winning_ticket",
+            "name": "winningTicket",
+            "internalType": "uint256",
+            "type": "uint256",
+            "indexed": false
+          },
+          {
+            "column": "win_amount",
+            "name": "winAmount",
+            "internalType": "uint256",
+            "type": "uint256",
+            "indexed": false
+          },
+          {
+            "column": "tickets_purchased_total_bps",
+            "name": "ticketsPurchasedTotalBps",
+            "internalType": "uint256",
+            "type": "uint256",
+            "indexed": false
+          }
+        ]
+      },
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START"
+        }
+      ]
     }
   ]
 }
