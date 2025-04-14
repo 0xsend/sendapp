@@ -23,15 +23,15 @@ SELECT is_empty(
     $$ SELECT 1 FROM public.get_user_jackpot_summary(0) $$,
     'Summary Function: Test with num_runs = 0 should return empty'
 );
-TRUNCATE public.send_pot_jackpot_runs RESTART IDENTITY CASCADE;
-TRUNCATE public.send_pot_user_ticket_purchases RESTART IDENTITY CASCADE;
+TRUNCATE public.sendpot_jackpot_runs RESTART IDENTITY CASCADE;
+TRUNCATE public.sendpot_user_ticket_purchases RESTART IDENTITY CASCADE;
 SELECT is_empty(
     $$ SELECT 1 FROM public.get_user_jackpot_summary(5) $$,
     'Summary Function: Test with no data should return empty'
 );
 
--- Mock data for send_pot_user_ticket_purchases
-INSERT INTO public.send_pot_user_ticket_purchases (
+-- Mock data for sendpot_user_ticket_purchases
+INSERT INTO public.sendpot_user_ticket_purchases (
     chain_id, log_addr, block_time, tx_hash, referrer, value, recipient, buyer, tickets_purchased_total_bps, ig_name, src_name, block_num, tx_idx, log_idx, abi_idx
 ) VALUES
     (1, '\x01', 1000, '\x01', '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 100, '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 10, 'ig1', 'src1', 50, 1, 1, 1), -- User A purchase 1 (Run 1, 10 bps)
@@ -42,8 +42,8 @@ INSERT INTO public.send_pot_user_ticket_purchases (
     (1, '\x01', 2200, '\x05', NULL, 500, '\xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', '\xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 50, 'ig1', 'src1', 250, 1, 1, 1), -- User B purchase 2 (Run 2) - Referrer remains NULL (50 bps)
     (1, '\x01', 3100, '\x06', '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 600, '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 60, 'ig1', 'src1', 310, 1, 1, 1); -- User A purchase 4 (Run 4, 60 bps)
 
--- Mock data for send_pot_jackpot_runs
-INSERT INTO public.send_pot_jackpot_runs (
+-- Mock data for sendpot_jackpot_runs
+INSERT INTO public.sendpot_jackpot_runs (
     chain_id, log_addr, block_time, tx_hash, time, winner, winning_ticket, win_amount, tickets_purchased_total_bps, ig_name, src_name, block_num, tx_idx, log_idx, abi_idx
 ) VALUES
     (1, '\x01', 1000, '\x11', 1000, '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 1, 50, 60, 'ig1', 'src1', 100, 1, 1, 1), -- Run 1
@@ -51,13 +51,13 @@ INSERT INTO public.send_pot_jackpot_runs (
     (1, '\x01', 3000, '\x33', 3000, '\xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 3, 50, 60, 'ig1', 'src1', 300, 1, 1, 1); -- Run 3
 
 -- =============================================================================
--- Test RLS on send_pot_user_ticket_purchases
+-- Test RLS on sendpot_user_ticket_purchases
 -- =============================================================================
 
 -- Test 1: User A can see their own ticket purchases
 SELECT tests.authenticate_as('user_a');
 SELECT results_eq(
-    $$ SELECT recipient, block_num, tickets_purchased_total_bps FROM public.send_pot_user_ticket_purchases ORDER BY block_num $$,
+    $$ SELECT recipient, block_num, tickets_purchased_total_bps FROM public.sendpot_user_ticket_purchases ORDER BY block_num $$,
     $$ VALUES ('\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'::bytea, 50::numeric,  10::numeric),
               ('\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'::bytea, 100::numeric, 20::numeric),
               ('\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'::bytea, 150::numeric, 20::numeric),
@@ -70,7 +70,7 @@ SELECT tests.clear_authentication();
 -- Test 2: User B can see their own ticket purchases
 SELECT tests.authenticate_as('user_b');
 SELECT results_eq(
-    $$ SELECT recipient, block_num, tickets_purchased_total_bps FROM public.send_pot_user_ticket_purchases ORDER BY block_num $$,
+    $$ SELECT recipient, block_num, tickets_purchased_total_bps FROM public.sendpot_user_ticket_purchases ORDER BY block_num $$,
     $$ VALUES ('\xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'::bytea, 50::numeric, 30::numeric),
               ('\xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'::bytea, 250::numeric, 50::numeric) $$,
     'RLS: User B should see only their ticket purchases'
@@ -80,7 +80,7 @@ SELECT tests.clear_authentication();
 -- Test 3: Anonymous user cannot see any ticket purchases
 SET ROLE anon;
 SELECT is_empty(
-    $$ SELECT 1 FROM public.send_pot_user_ticket_purchases $$,
+    $$ SELECT 1 FROM public.sendpot_user_ticket_purchases $$,
     'RLS: Anonymous user should not see any ticket purchases'
 );
 RESET ROLE;
