@@ -63,6 +63,10 @@ create table "public"."sendpot_jackpot_runs"(
     "abi_idx" smallint
 );
 
+create index sendpot_jackpot_runs_winner on public.sendpot_jackpot_runs using btree(winner);
+create index idx_sendpot_jackpot_runs_block_num
+  ON public.sendpot_jackpot_runs USING btree (block_num);
+
 CREATE POLICY "authenticated can read jackpot runs"
 ON public.sendpot_jackpot_runs
 FOR SELECT
@@ -71,9 +75,6 @@ USING (true);
 
 alter table "public"."sendpot_jackpot_runs" enable row level security;
 
-create index sendpot_jackpot_runs_winner on public.sendpot_jackpot_runs using btree(winner);
-create index idx_sendpot_jackpot_runs_block_num
-  ON public.sendpot_jackpot_runs USING btree (block_num);
 
 -- Jackpot summary returns the user jackpots summary where it aggregates user ticket purchases based off jackpot block_num.
 -- num_runs is the number of jackpot runs to chose from, in descending order from block_num.
