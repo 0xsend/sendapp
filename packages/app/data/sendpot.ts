@@ -1,4 +1,4 @@
-export const SEND_POT_CONTRACT_ADDRESS = '0xa0A5611b9A1071a1D8A308882065c48650bAeE8b'
+export const SENDPOT_CONTRACT_ADDRESS = '0xa0A5611b9A1071a1D8A308882065c48650bAeE8b'
 
 // Constant for basis points per ticket
 export const BPS_PER_TICKET = 7000

@@ -1,10 +1,10 @@
 import type { BlockData, Column, Integration, Table } from '@indexsupply/shovel-config'
 
-const SEND_POT_CONTRACT_ADDRESS = '0xa0A5611b9A1071a1D8A308882065c48650bAeE8b'
+const SENDPOT_CONTRACT_ADDRESS = '0xa0A5611b9A1071a1D8A308882065c48650bAeE8b'
 
 // --- UserTicketPurchase Event ---
 export const sendPotUserTicketPurchasesTable: Table = {
-  name: 'send_pot_user_ticket_purchases',
+  name: 'sendpot_user_ticket_purchases',
   columns: [
     { name: 'chain_id', type: 'numeric', constraints: 'PRIMARY KEY' },
     { name: 'block_num', type: 'numeric', constraints: 'PRIMARY KEY' },
@@ -21,7 +21,7 @@ export const sendPotUserTicketPurchasesTable: Table = {
 } as const
 
 export const userTicketPurchaseIntegration: Omit<Integration, 'sources'> = {
-  name: 'send_pot_user_ticket_purchases',
+  name: 'sendpot_user_ticket_purchases',
   enabled: true,
   block: [
     { name: 'chain_id', column: 'chain_id' },
@@ -34,7 +34,7 @@ export const userTicketPurchaseIntegration: Omit<Integration, 'sources'> = {
       name: 'log_addr',
       column: 'log_addr',
       filter_op: 'equals', // Filter for the specific SendPot contract
-      filter_val: SEND_POT_CONTRACT_ADDRESS,
+      filter_val: SENDPOT_CONTRACT_ADDRESS,
     },
   ] as BlockData[],
   table: sendPotUserTicketPurchasesTable,
@@ -78,7 +78,7 @@ export const userTicketPurchaseIntegration: Omit<Integration, 'sources'> = {
 // --- JackpotRun Event ---
 
 export const sendPotJackpotRunsTable: Table = {
-  name: 'send_pot_jackpot_runs',
+  name: 'sendpot_jackpot_runs',
   columns: [
     { name: 'chain_id', type: 'numeric', constraints: 'PRIMARY KEY' },
     { name: 'block_num', type: 'numeric', constraints: 'PRIMARY KEY' },
@@ -96,7 +96,7 @@ export const sendPotJackpotRunsTable: Table = {
 } as const
 
 export const jackpotRunIntegration: Omit<Integration, 'sources'> = {
-  name: 'send_pot_jackpot_runs',
+  name: 'sendpot_jackpot_runs',
   enabled: true,
   block: [
     { name: 'chain_id', column: 'chain_id' },
@@ -109,7 +109,7 @@ export const jackpotRunIntegration: Omit<Integration, 'sources'> = {
       name: 'log_addr',
       column: 'log_addr',
       filter_op: 'equals', // Filter for the specific SendPot contract
-      filter_val: SEND_POT_CONTRACT_ADDRESS,
+      filter_val: SENDPOT_CONTRACT_ADDRESS,
     },
   ] as BlockData[],
   table: sendPotJackpotRunsTable,

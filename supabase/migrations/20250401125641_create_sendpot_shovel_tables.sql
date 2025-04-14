@@ -1,4 +1,4 @@
-create table "public"."send_pot_user_ticket_purchases"(
+create table "public"."sendpot_user_ticket_purchases"(
     "id" serial primary key,
     "chain_id" numeric,
     "log_addr" bytea,
@@ -18,7 +18,7 @@ create table "public"."send_pot_user_ticket_purchases"(
 );
 
 CREATE POLICY "users can see their own ticket purchases"
-ON public.send_pot_user_ticket_purchases
+ON public.sendpot_user_ticket_purchases
 AS PERMISSIVE
 FOR SELECT
 TO public
@@ -33,7 +33,7 @@ USING (
 );
 
 CREATE POLICY "authenticated can read jackpot runs"
-ON public.send_pot_jackpot_runs
+ON public.sendpot_jackpot_runs
 FOR SELECT
 TO authenticated
 USING (true);

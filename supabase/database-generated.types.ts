@@ -1159,6 +1159,111 @@ export type Database = {
         }
         Relationships: []
       }
+      sendpot_jackpot_runs: {
+        Row: {
+          abi_idx: number | null
+          block_num: number | null
+          block_time: number | null
+          chain_id: number | null
+          ig_name: string | null
+          log_addr: string | null
+          log_idx: number | null
+          src_name: string | null
+          tickets_purchased_total_bps: number | null
+          time: number | null
+          tx_hash: string | null
+          tx_idx: number | null
+          win_amount: number | null
+          winner: string | null
+          winning_ticket: number | null
+        }
+        Insert: {
+          abi_idx?: number | null
+          block_num?: number | null
+          block_time?: number | null
+          chain_id?: number | null
+          ig_name?: string | null
+          log_addr?: string | null
+          log_idx?: number | null
+          src_name?: string | null
+          tickets_purchased_total_bps?: number | null
+          time?: number | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+          win_amount?: number | null
+          winner?: string | null
+          winning_ticket?: number | null
+        }
+        Update: {
+          abi_idx?: number | null
+          block_num?: number | null
+          block_time?: number | null
+          chain_id?: number | null
+          ig_name?: string | null
+          log_addr?: string | null
+          log_idx?: number | null
+          src_name?: string | null
+          tickets_purchased_total_bps?: number | null
+          time?: number | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+          win_amount?: number | null
+          winner?: string | null
+          winning_ticket?: number | null
+        }
+        Relationships: []
+      }
+      sendpot_user_ticket_purchases: {
+        Row: {
+          abi_idx: number | null
+          block_num: number | null
+          block_time: number | null
+          buyer: string | null
+          chain_id: number | null
+          ig_name: string | null
+          log_addr: string | null
+          log_idx: number | null
+          recipient: string | null
+          referrer: string | null
+          src_name: string | null
+          tickets_purchased_total_bps: number | null
+          tx_hash: string | null
+          tx_idx: number | null
+        }
+        Insert: {
+          abi_idx?: number | null
+          block_num?: number | null
+          block_time?: number | null
+          buyer?: string | null
+          chain_id?: number | null
+          ig_name?: string | null
+          log_addr?: string | null
+          log_idx?: number | null
+          recipient?: string | null
+          referrer?: string | null
+          src_name?: string | null
+          tickets_purchased_total_bps?: number | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+        }
+        Update: {
+          abi_idx?: number | null
+          block_num?: number | null
+          block_time?: number | null
+          buyer?: string | null
+          chain_id?: number | null
+          ig_name?: string | null
+          log_addr?: string | null
+          log_idx?: number | null
+          recipient?: string | null
+          referrer?: string | null
+          src_name?: string | null
+          tickets_purchased_total_bps?: number | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+        }
+        Relationships: []
+      }
       sendtag_checkout_receipts: {
         Row: {
           abi_idx: number

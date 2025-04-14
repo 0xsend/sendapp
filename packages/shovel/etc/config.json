@@ -874,7 +874,7 @@
       ]
     },
     {
-      "name": "send_pot_user_ticket_purchases",
+      "name": "sendpot_user_ticket_purchases",
       "enabled": true,
       "block": [
         {
@@ -909,7 +909,7 @@
         }
       ],
       "table": {
-        "name": "send_pot_user_ticket_purchases",
+        "name": "sendpot_user_ticket_purchases",
         "columns": [
           {
             "name": "chain_id",
@@ -1003,7 +1003,7 @@
       ]
     },
     {
-      "name": "send_pot_jackpot_runs",
+      "name": "sendpot_jackpot_runs",
       "enabled": true,
       "block": [
         {
@@ -1038,7 +1038,7 @@
         }
       ],
       "table": {
-        "name": "send_pot_jackpot_runs",
+        "name": "sendpot_jackpot_runs",
         "columns": [
           {
             "name": "chain_id",

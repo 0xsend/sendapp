@@ -6650,13 +6650,13 @@
         }
       ]
     },
-    "send_pot_jackpot_runs": {
-      "id": "public.send_pot_jackpot_runs",
+    "sendpot_jackpot_runs": {
+      "id": "public.sendpot_jackpot_runs",
       "schemaName": "public",
-      "tableName": "send_pot_jackpot_runs",
+      "tableName": "sendpot_jackpot_runs",
       "fields": [
         {
-          "id": "public.send_pot_jackpot_runs.id",
+          "id": "public.sendpot_jackpot_runs.id",
           "name": "id",
           "columnName": "id",
           "type": "int4",
@@ -6665,7 +6665,7 @@
           "isList": false,
           "isGenerated": false,
           "sequence": {
-            "identifier": "\"public\".\"send_pot_jackpot_runs_id_seq\"",
+            "identifier": "\"public\".\"sendpot_jackpot_runs_id_seq\"",
             "increment": 1,
             "start": 1
           },
@@ -6674,7 +6674,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_jackpot_runs.chain_id",
+          "id": "public.sendpot_jackpot_runs.chain_id",
           "name": "chain_id",
           "columnName": "chain_id",
           "type": "numeric",
@@ -6688,7 +6688,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_jackpot_runs.log_addr",
+          "id": "public.sendpot_jackpot_runs.log_addr",
           "name": "log_addr",
           "columnName": "log_addr",
           "type": "bytea",
@@ -6702,7 +6702,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_jackpot_runs.block_time",
+          "id": "public.sendpot_jackpot_runs.block_time",
           "name": "block_time",
           "columnName": "block_time",
           "type": "numeric",
@@ -6716,7 +6716,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_jackpot_runs.tx_hash",
+          "id": "public.sendpot_jackpot_runs.tx_hash",
           "name": "tx_hash",
           "columnName": "tx_hash",
           "type": "bytea",
@@ -6730,7 +6730,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_jackpot_runs.time",
+          "id": "public.sendpot_jackpot_runs.time",
           "name": "time",
           "columnName": "time",
           "type": "numeric",
@@ -6744,7 +6744,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_jackpot_runs.winner",
+          "id": "public.sendpot_jackpot_runs.winner",
           "name": "winner",
           "columnName": "winner",
           "type": "bytea",
@@ -6758,7 +6758,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_jackpot_runs.winning_ticket",
+          "id": "public.sendpot_jackpot_runs.winning_ticket",
           "name": "winning_ticket",
           "columnName": "winning_ticket",
           "type": "numeric",
@@ -6772,7 +6772,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_jackpot_runs.win_amount",
+          "id": "public.sendpot_jackpot_runs.win_amount",
           "name": "win_amount",
           "columnName": "win_amount",
           "type": "numeric",
@@ -6786,7 +6786,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_jackpot_runs.tickets_purchased_total_bps",
+          "id": "public.sendpot_jackpot_runs.tickets_purchased_total_bps",
           "name": "tickets_purchased_total_bps",
           "columnName": "tickets_purchased_total_bps",
           "type": "numeric",
@@ -6800,7 +6800,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_jackpot_runs.ig_name",
+          "id": "public.sendpot_jackpot_runs.ig_name",
           "name": "ig_name",
           "columnName": "ig_name",
           "type": "text",
@@ -6814,7 +6814,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_jackpot_runs.src_name",
+          "id": "public.sendpot_jackpot_runs.src_name",
           "name": "src_name",
           "columnName": "src_name",
           "type": "text",
@@ -6828,7 +6828,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_jackpot_runs.block_num",
+          "id": "public.sendpot_jackpot_runs.block_num",
           "name": "block_num",
           "columnName": "block_num",
           "type": "numeric",
@@ -6842,7 +6842,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_jackpot_runs.tx_idx",
+          "id": "public.sendpot_jackpot_runs.tx_idx",
           "name": "tx_idx",
           "columnName": "tx_idx",
           "type": "int4",
@@ -6856,7 +6856,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_jackpot_runs.log_idx",
+          "id": "public.sendpot_jackpot_runs.log_idx",
           "name": "log_idx",
           "columnName": "log_idx",
           "type": "int4",
@@ -6870,7 +6870,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_jackpot_runs.abi_idx",
+          "id": "public.sendpot_jackpot_runs.abi_idx",
           "name": "abi_idx",
           "columnName": "abi_idx",
           "type": "int2",
@@ -6886,14 +6886,14 @@
       ],
       "uniqueConstraints": [
         {
-          "name": "send_pot_jackpot_runs_pkey",
+          "name": "sendpot_jackpot_runs_pkey",
           "fields": [
             "id"
           ],
           "nullNotDistinct": false
         },
         {
-          "name": "u_send_pot_jackpot_runs",
+          "name": "u_sendpot_jackpot_runs",
           "fields": [
             "abi_idx",
             "block_num",
@@ -6906,13 +6906,13 @@
         }
       ]
     },
-    "public_send_pot_user_ticket_purchases": {
-      "id": "public.send_pot_user_ticket_purchases",
+    "public_sendpot_user_ticket_purchases": {
+      "id": "public.sendpot_user_ticket_purchases",
       "schemaName": "public",
-      "tableName": "send_pot_user_ticket_purchases",
+      "tableName": "sendpot_user_ticket_purchases",
       "fields": [
         {
-          "id": "public.send_pot_user_ticket_purchases.id",
+          "id": "public.sendpot_user_ticket_purchases.id",
           "name": "id",
           "columnName": "id",
           "type": "int4",
@@ -6921,7 +6921,7 @@
           "isList": false,
           "isGenerated": false,
           "sequence": {
-            "identifier": "\"public\".\"send_pot_user_ticket_purchases_id_seq\"",
+            "identifier": "\"public\".\"sendpot_user_ticket_purchases_id_seq\"",
             "increment": 1,
             "start": 1
           },
@@ -6930,7 +6930,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_user_ticket_purchases.chain_id",
+          "id": "public.sendpot_user_ticket_purchases.chain_id",
           "name": "chain_id",
           "columnName": "chain_id",
           "type": "numeric",
@@ -6944,7 +6944,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_user_ticket_purchases.log_addr",
+          "id": "public.sendpot_user_ticket_purchases.log_addr",
           "name": "log_addr",
           "columnName": "log_addr",
           "type": "bytea",
@@ -6958,7 +6958,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_user_ticket_purchases.block_time",
+          "id": "public.sendpot_user_ticket_purchases.block_time",
           "name": "block_time",
           "columnName": "block_time",
           "type": "numeric",
@@ -6972,7 +6972,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_user_ticket_purchases.tx_hash",
+          "id": "public.sendpot_user_ticket_purchases.tx_hash",
           "name": "tx_hash",
           "columnName": "tx_hash",
           "type": "bytea",
@@ -6986,7 +6986,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_user_ticket_purchases.referrer",
+          "id": "public.sendpot_user_ticket_purchases.referrer",
           "name": "referrer",
           "columnName": "referrer",
           "type": "bytea",
@@ -7000,7 +7000,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_user_ticket_purchases.value",
+          "id": "public.sendpot_user_ticket_purchases.value",
           "name": "value",
           "columnName": "value",
           "type": "numeric",
@@ -7014,7 +7014,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_user_ticket_purchases.recipient",
+          "id": "public.sendpot_user_ticket_purchases.recipient",
           "name": "recipient",
           "columnName": "recipient",
           "type": "bytea",
@@ -7028,7 +7028,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_user_ticket_purchases.buyer",
+          "id": "public.sendpot_user_ticket_purchases.buyer",
           "name": "buyer",
           "columnName": "buyer",
           "type": "bytea",
@@ -7042,7 +7042,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_user_ticket_purchases.tickets_purchased_total_bps",
+          "id": "public.sendpot_user_ticket_purchases.tickets_purchased_total_bps",
           "name": "tickets_purchased_total_bps",
           "columnName": "tickets_purchased_total_bps",
           "type": "numeric",
@@ -7056,7 +7056,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_user_ticket_purchases.ig_name",
+          "id": "public.sendpot_user_ticket_purchases.ig_name",
           "name": "ig_name",
           "columnName": "ig_name",
           "type": "text",
@@ -7070,7 +7070,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_user_ticket_purchases.src_name",
+          "id": "public.sendpot_user_ticket_purchases.src_name",
           "name": "src_name",
           "columnName": "src_name",
           "type": "text",
@@ -7084,7 +7084,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_user_ticket_purchases.block_num",
+          "id": "public.sendpot_user_ticket_purchases.block_num",
           "name": "block_num",
           "columnName": "block_num",
           "type": "numeric",
@@ -7098,7 +7098,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_user_ticket_purchases.tx_idx",
+          "id": "public.sendpot_user_ticket_purchases.tx_idx",
           "name": "tx_idx",
           "columnName": "tx_idx",
           "type": "int4",
@@ -7112,7 +7112,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_user_ticket_purchases.log_idx",
+          "id": "public.sendpot_user_ticket_purchases.log_idx",
           "name": "log_idx",
           "columnName": "log_idx",
           "type": "int4",
@@ -7126,7 +7126,7 @@
           "maxLength": null
         },
         {
-          "id": "public.send_pot_user_ticket_purchases.abi_idx",
+          "id": "public.sendpot_user_ticket_purchases.abi_idx",
           "name": "abi_idx",
           "columnName": "abi_idx",
           "type": "int2",
@@ -7142,14 +7142,14 @@
       ],
       "uniqueConstraints": [
         {
-          "name": "send_pot_user_ticket_purchases_pkey",
+          "name": "sendpot_user_ticket_purchases_pkey",
           "fields": [
             "id"
           ],
           "nullNotDistinct": false
         },
         {
-          "name": "u_send_pot_user_ticket_purchases",
+          "name": "u_sendpot_user_ticket_purchases",
           "fields": [
             "abi_idx",
             "block_num",
@@ -7162,13 +7162,13 @@
         }
       ]
     },
-    "temporal_send_pot_user_ticket_purchases": {
-      "id": "temporal.send_pot_user_ticket_purchases",
+    "temporal_sendpot_user_ticket_purchases": {
+      "id": "temporal.sendpot_user_ticket_purchases",
       "schemaName": "temporal",
-      "tableName": "send_pot_user_ticket_purchases",
+      "tableName": "sendpot_user_ticket_purchases",
       "fields": [
         {
-          "id": "temporal.send_pot_user_ticket_purchases.id",
+          "id": "temporal.sendpot_user_ticket_purchases.id",
           "name": "id",
           "columnName": "id",
           "type": "int4",
@@ -7177,7 +7177,7 @@
           "isList": false,
           "isGenerated": false,
           "sequence": {
-            "identifier": "\"temporal\".\"send_pot_user_ticket_purchases_id_seq\"",
+            "identifier": "\"temporal\".\"sendpot_user_ticket_purchases_id_seq\"",
             "increment": 1,
             "start": 1
           },
@@ -7186,7 +7186,7 @@
           "maxLength": null
         },
         {
-          "id": "temporal.send_pot_user_ticket_purchases.workflow_id",
+          "id": "temporal.sendpot_user_ticket_purchases.workflow_id",
           "name": "workflow_id",
           "columnName": "workflow_id",
           "type": "text",
@@ -7200,7 +7200,7 @@
           "maxLength": null
         },
         {
-          "id": "temporal.send_pot_user_ticket_purchases.status",
+          "id": "temporal.sendpot_user_ticket_purchases.status",
           "name": "status",
           "columnName": "status",
           "type": "transaction_status",
@@ -7214,7 +7214,7 @@
           "maxLength": null
         },
         {
-          "id": "temporal.send_pot_user_ticket_purchases.user_id",
+          "id": "temporal.sendpot_user_ticket_purchases.user_id",
           "name": "user_id",
           "columnName": "user_id",
           "type": "uuid",
@@ -7228,7 +7228,7 @@
           "maxLength": null
         },
         {
-          "id": "temporal.send_pot_user_ticket_purchases.created_at_block_num",
+          "id": "temporal.sendpot_user_ticket_purchases.created_at_block_num",
           "name": "created_at_block_num",
           "columnName": "created_at_block_num",
           "type": "numeric",
@@ -7242,7 +7242,7 @@
           "maxLength": null
         },
         {
-          "id": "temporal.send_pot_user_ticket_purchases.data",
+          "id": "temporal.sendpot_user_ticket_purchases.data",
           "name": "data",
           "columnName": "data",
           "type": "jsonb",
@@ -7256,7 +7256,7 @@
           "maxLength": null
         },
         {
-          "id": "temporal.send_pot_user_ticket_purchases.created_at",
+          "id": "temporal.sendpot_user_ticket_purchases.created_at",
           "name": "created_at",
           "columnName": "created_at",
           "type": "timestamptz",
@@ -7270,7 +7270,7 @@
           "maxLength": null
         },
         {
-          "id": "temporal.send_pot_user_ticket_purchases.updated_at",
+          "id": "temporal.sendpot_user_ticket_purchases.updated_at",
           "name": "updated_at",
           "columnName": "updated_at",
           "type": "timestamptz",
@@ -7286,14 +7286,14 @@
       ],
       "uniqueConstraints": [
         {
-          "name": "send_pot_user_ticket_purchases_pkey",
+          "name": "sendpot_user_ticket_purchases_pkey",
           "fields": [
             "id"
           ],
           "nullNotDistinct": false
         },
         {
-          "name": "temporal_send_pot_user_ticket_purchases_workflow_id_idx",
+          "name": "temporal_sendpot_user_ticket_purchases_workflow_id_idx",
           "fields": [
             "workflow_id"
           ],

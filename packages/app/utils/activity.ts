@@ -24,7 +24,7 @@ import {
 } from './zod/activity/TemporalTransfersEventSchema'
 import type { SwapRouter } from 'app/utils/zod/SwapRouterSchema'
 import type { LiquidityPool } from 'app/utils/zod/LiquidityPoolSchema'
-import { SEND_POT_CONTRACT_ADDRESS } from 'app/data/sendpot'
+import { SENDPOT_CONTRACT_ADDRESS } from 'app/data/sendpot'
 
 const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
   Object.values(addresses).map((a) => [a, label])
@@ -230,7 +230,7 @@ export const isSwapSellTransfer = (
 export const isSendPotTicketPurchase = (activity: Activity): boolean => {
   return (
     isSendAccountTransfersEvent(activity) &&
-    isAddressEqual(activity.data.t, SEND_POT_CONTRACT_ADDRESS)
+    isAddressEqual(activity.data.t, SENDPOT_CONTRACT_ADDRESS)
   )
 }
 
@@ -242,7 +242,7 @@ export const isSendPotTicketPurchase = (activity: Activity): boolean => {
 export const isSendPotWin = (activity: Activity): boolean => {
   return (
     isSendAccountTransfersEvent(activity) &&
-    isAddressEqual(activity.data.f, SEND_POT_CONTRACT_ADDRESS)
+    isAddressEqual(activity.data.f, SENDPOT_CONTRACT_ADDRESS)
   )
 }
 
