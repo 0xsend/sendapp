@@ -622,6 +622,42 @@ interface Table_public_send_token_v_0_transfers {
   log_idx: number;
   abi_idx: number;
 }
+interface Table_public_sendpot_jackpot_runs {
+  id: number;
+  chain_id: number | null;
+  log_addr: string | null;
+  block_time: number | null;
+  tx_hash: string | null;
+  time: number | null;
+  winner: string | null;
+  winning_ticket: number | null;
+  win_amount: number | null;
+  tickets_purchased_total_bps: number | null;
+  ig_name: string | null;
+  src_name: string | null;
+  block_num: number | null;
+  tx_idx: number | null;
+  log_idx: number | null;
+  abi_idx: number | null;
+}
+interface Table_public_sendpot_user_ticket_purchases {
+  id: number;
+  chain_id: number | null;
+  log_addr: string | null;
+  block_time: number | null;
+  tx_hash: string | null;
+  referrer: string | null;
+  value: number | null;
+  recipient: string | null;
+  buyer: string | null;
+  tickets_purchased_total_bps: number | null;
+  ig_name: string | null;
+  src_name: string | null;
+  block_num: number | null;
+  tx_idx: number | null;
+  log_idx: number | null;
+  abi_idx: number | null;
+}
 interface Table_public_sendtag_checkout_receipts {
   id: number;
   chain_id: number;
@@ -838,6 +874,8 @@ interface Schema_public {
   send_slash: Table_public_send_slash;
   send_token_transfers: Table_public_send_token_transfers;
   send_token_v0_transfers: Table_public_send_token_v_0_transfers;
+  sendpot_jackpot_runs: Table_public_sendpot_jackpot_runs;
+  sendpot_user_ticket_purchases: Table_public_sendpot_user_ticket_purchases;
   sendtag_checkout_receipts: Table_public_sendtag_checkout_receipts;
   swap_routers: Table_public_swap_routers;
   tag_receipts: Table_public_tag_receipts;

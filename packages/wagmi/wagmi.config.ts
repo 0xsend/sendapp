@@ -24,7 +24,7 @@ import sendTokenV1Artifact from '@0xsend/send-token-upgrade/artifacts/contracts/
 
 import { sendEarnAbi, sendEarnFactoryAbi } from '@0xsend/send-earn-contracts'
 
-import sendEarnFactoryBroadcast from '@0xsend/send-earn-contracts/broadcast/DeploySendEarn.s.sol/845337/run-latest.json' with {
+import sendEarnFactoryBroadcast from '@0xsend/send-earn-contracts/broadcast/DeploySendEarn.s.sol/8453/run-latest.json' with {
   type: 'json',
 }
 

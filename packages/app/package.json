@@ -14,7 +14,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@0xsend/send-earn-contracts": "^0.0.15",
+    "@0xsend/send-earn-contracts": "^0.1.0",
     "@coinbase/onchainkit": "^0.38.1",
     "@daimo/expo-passkeys": "workspace:*",
     "@marsidev/react-turnstile": "^0.7.1",

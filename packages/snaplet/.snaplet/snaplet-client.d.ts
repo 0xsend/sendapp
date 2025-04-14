@@ -532,6 +532,48 @@ type Override = {
       event_id?: string;
     };
   }
+  sendpot_jackpot_runs?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      chain_id?: string;
+      log_addr?: string;
+      block_time?: string;
+      tx_hash?: string;
+      time?: string;
+      winner?: string;
+      winning_ticket?: string;
+      win_amount?: string;
+      tickets_purchased_total_bps?: string;
+      ig_name?: string;
+      src_name?: string;
+      block_num?: string;
+      tx_idx?: string;
+      log_idx?: string;
+      abi_idx?: string;
+    };
+  }
+  sendpot_user_ticket_purchases?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      chain_id?: string;
+      log_addr?: string;
+      block_time?: string;
+      tx_hash?: string;
+      referrer?: string;
+      value?: string;
+      recipient?: string;
+      buyer?: string;
+      tickets_purchased_total_bps?: string;
+      ig_name?: string;
+      src_name?: string;
+      block_num?: string;
+      tx_idx?: string;
+      log_idx?: string;
+      abi_idx?: string;
+    };
+  }
   sendtag_checkout_receipts?: {
     name?: string;
     fields?: {
@@ -949,6 +991,30 @@ export interface Fingerprint {
     chainId?: FingerprintNumberField;
     blockTime?: FingerprintNumberField;
     v?: FingerprintNumberField;
+    blockNum?: FingerprintNumberField;
+    txIdx?: FingerprintNumberField;
+    logIdx?: FingerprintNumberField;
+    abiIdx?: FingerprintNumberField;
+  }
+  sendpotJackpotRuns?: {
+    id?: FingerprintNumberField;
+    chainId?: FingerprintNumberField;
+    blockTime?: FingerprintNumberField;
+    time?: FingerprintNumberField;
+    winningTicket?: FingerprintNumberField;
+    winAmount?: FingerprintNumberField;
+    ticketsPurchasedTotalBps?: FingerprintNumberField;
+    blockNum?: FingerprintNumberField;
+    txIdx?: FingerprintNumberField;
+    logIdx?: FingerprintNumberField;
+    abiIdx?: FingerprintNumberField;
+  }
+  sendpotUserTicketPurchases?: {
+    id?: FingerprintNumberField;
+    chainId?: FingerprintNumberField;
+    blockTime?: FingerprintNumberField;
+    value?: FingerprintNumberField;
+    ticketsPurchasedTotalBps?: FingerprintNumberField;
     blockNum?: FingerprintNumberField;
     txIdx?: FingerprintNumberField;
     logIdx?: FingerprintNumberField;

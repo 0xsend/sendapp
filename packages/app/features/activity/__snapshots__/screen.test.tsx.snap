@@ -455,6 +455,69 @@ exports[`ActivityScreen renders activity screen 1`] = `
                 "index": 4,
                 "title": "July 18",
               },
+              {
+                "data": [
+                  {
+                    "created_at": 2025-01-29T14:47:36.000Z,
+                    "data": {
+                      "assets": 1000000000000000000n,
+                      "block_num": 12345n,
+                      "log_addr": "0x5AFE000000000000000000000000000000000000",
+                      "log_idx": 0n,
+                      "owner": "0xB0b0000000000000000000000000000000000000",
+                      "sender": "0xB0b0000000000000000000000000000000000000",
+                      "shares": 950000000000000000n,
+                      "tx_hash": "0x1234567890123456789012345678901234567890123456789012345678901234",
+                      "tx_idx": 0n,
+                    },
+                    "event_name": "send_earn_deposit",
+                    "from_user": {
+                      "avatar_url": null,
+                      "id": "5c833c74-5a6c-461d-8612-b4982d7a7b51",
+                      "name": null,
+                      "send_id": 48,
+                      "tags": [
+                        "asfd",
+                      ],
+                    },
+                    "to_user": null,
+                  },
+                ],
+                "index": 5,
+                "title": "January 29",
+              },
+              {
+                "data": [
+                  {
+                    "created_at": 2025-02-15T14:47:36.000Z,
+                    "data": {
+                      "assets": 5000000000000000000n,
+                      "block_num": 12345n,
+                      "log_addr": "0x5AFE000000000000000000000000000000000000",
+                      "log_idx": 0n,
+                      "owner": "0xB0b0000000000000000000000000000000000000",
+                      "receiver": "0xB0b0000000000000000000000000000000000000",
+                      "sender": "0xB0b0000000000000000000000000000000000000",
+                      "shares": 475000000000000000n,
+                      "tx_hash": "0x1234567890123456789012345678901234567890123456789012345678901234",
+                      "tx_idx": 0n,
+                    },
+                    "event_name": "send_earn_withdraw",
+                    "from_user": null,
+                    "to_user": {
+                      "avatar_url": null,
+                      "id": "5c833c74-5a6c-461d-8612-b4982d7a7b51",
+                      "name": null,
+                      "send_id": 48,
+                      "tags": [
+                        "asfd",
+                      ],
+                    },
+                  },
+                ],
+                "index": 6,
+                "title": "February 15",
+              },
             ]
           }
           getItem={[Function]}
@@ -722,6 +785,7 @@ exports[`ActivityScreen renders activity screen 1`] = `
                         >
                           Deposit
                         </Text>
+                         
                         <Text
                           style={
                             {
@@ -1014,6 +1078,7 @@ exports[`ActivityScreen renders activity screen 1`] = `
                         >
                           Sendtag Registered
                         </Text>
+                         
                         <Text
                           style={
                             {
@@ -1311,6 +1376,7 @@ exports[`ActivityScreen renders activity screen 1`] = `
                         >
                           Referral
                         </Text>
+                         
                         <Text
                           style={
                             {
@@ -1322,9 +1388,7 @@ exports[`ActivityScreen renders activity screen 1`] = `
                             }
                           }
                           suppressHighlighting={true}
-                        >
-                          1 Referral
-                        </Text>
+                        />
                       </View>
                       <View
                         style={
@@ -1590,6 +1654,7 @@ exports[`ActivityScreen renders activity screen 1`] = `
                         >
                           Sendtag Registered
                         </Text>
+                         
                         <Text
                           style={
                             {
@@ -1904,6 +1969,7 @@ exports[`ActivityScreen renders activity screen 1`] = `
                         >
                           Send Account Signing Key Added
                         </Text>
+                         
                         <Text
                           style={
                             {
@@ -2176,6 +2242,7 @@ exports[`ActivityScreen renders activity screen 1`] = `
                         >
                           Send Account Signing Key Removed
                         </Text>
+                         
                         <Text
                           style={
                             {
@@ -2296,83 +2363,106 @@ exports[`ActivityScreen renders activity screen 1`] = `
                       }
                     }
                   >
-                    <RNSVGSvgView
-                      align="xMidYMid"
-                      bbHeight={48}
-                      bbWidth={48}
-                      color="#FFFFFF"
-                      fill="none"
-                      focusable={false}
-                      height={48}
-                      meetOrSlice={0}
-                      minX={0}
-                      minY={0}
-                      size={48}
-                      strokeWidth="2"
+                    <View
                       style={
-                        [
-                          {
-                            "backgroundColor": "transparent",
-                            "borderWidth": 0,
-                          },
-                          {
-                            "borderBottomLeftRadius": 9,
-                            "borderBottomRightRadius": 9,
-                            "borderTopLeftRadius": 9,
-                            "borderTopRightRadius": 9,
-                            "gap": 7,
-                          },
-                          {
-                            "flex": 0,
-                            "height": 48,
-                            "width": 48,
-                          },
-                        ]
+                        {
+                          "alignItems": "center",
+                          "borderBottomLeftRadius": 9,
+                          "borderBottomRightRadius": 9,
+                          "borderTopLeftRadius": 9,
+                          "borderTopRightRadius": 9,
+                          "flexDirection": "column",
+                          "gap": 7,
+                          "height": 48,
+                          "justifyContent": "center",
+                          "maxHeight": 48,
+                          "maxWidth": 48,
+                          "minHeight": 48,
+                          "minWidth": 48,
+                          "overflow": "hidden",
+                          "position": "relative",
+                          "width": 48,
+                        }
                       }
-                      tintColor="#FFFFFF"
-                      vbHeight={40}
-                      vbWidth={40}
-                      width={48}
-                      xmlns="http://www.w3.org/2000/svg"
                     >
-                      <RNSVGGroup
-                        fill={null}
-                        propList={
+                      <RNSVGSvgView
+                        align="xMidYMid"
+                        bbHeight={48}
+                        bbWidth={48}
+                        color="#FFFFFF"
+                        fill="none"
+                        focusable={false}
+                        height={48}
+                        meetOrSlice={0}
+                        minX={0}
+                        minY={0}
+                        size={48}
+                        strokeWidth="2"
+                        style={
                           [
-                            "fill",
-                            "strokeWidth",
+                            {
+                              "backgroundColor": "transparent",
+                              "borderWidth": 0,
+                            },
+                            {
+                              "borderBottomLeftRadius": 9,
+                              "borderBottomRightRadius": 9,
+                              "borderTopLeftRadius": 9,
+                              "borderTopRightRadius": 9,
+                              "gap": 7,
+                            },
+                            {
+                              "flex": 0,
+                              "height": 48,
+                              "width": 48,
+                            },
                           ]
                         }
-                        strokeWidth="2"
+                        tintColor="#FFFFFF"
+                        vbHeight={40}
+                        vbWidth={40}
+                        width={48}
+                        xmlns="http://www.w3.org/2000/svg"
                       >
-                        <RNSVGPath
-                          d="M33.714 28l-1.6 1.6-2.971-2.972v9.371h-2.286v-9.371l-2.971 2.971-1.6-1.6L28 22.285 33.714 28z"
-                          fill={
-                            {
-                              "type": 2,
-                            }
-                          }
+                        <RNSVGGroup
+                          fill={null}
                           propList={
                             [
                               "fill",
+                              "strokeWidth",
                             ]
                           }
-                        />
-                        <RNSVGPath
-                          d="M19.314 36L7.428 28.914c-.685-.457-1.142-1.143-1.142-1.943V13.03c0-.8.457-1.6 1.143-1.943l11.428-6.743A1.93 1.93 0 0120 4c.457 0 .8.114 1.143.343l11.428 6.743c.686.457 1.143 1.143 1.143 1.943V20H31.43v-6.971l-11.43-6.743-11.428 6.743V26.97l12 7.086L19.314 36z"
-                          fill={
-                            {
-                              "type": 2,
+                          strokeWidth="2"
+                        >
+                          <RNSVGPath
+                            d="M33.714 28l-1.6 1.6-2.971-2.972v9.371h-2.286v-9.371l-2.971 2.971-1.6-1.6L28 22.285 33.714 28z"
+                            fill={
+                              {
+                                "type": 2,
+                              }
                             }
-                          }
-                          propList={
-                            [
-                              "fill",
-                            ]
-                          }
-                        />
-                      </RNSVGGroup>
-                    </RNSVGSvgView>
+                            propList={
+                              [
+                                "fill",
+                              ]
+                            }
+                          />
+                          <RNSVGPath
+                            d="M19.314 36L7.428 28.914c-.685-.457-1.142-1.143-1.142-1.943V13.03c0-.8.457-1.6 1.143-1.943l11.428-6.743A1.93 1.93 0 0120 4c.457 0 .8.114 1.143.343l11.428 6.743c.686.457 1.143 1.143 1.143 1.943V20H31.43v-6.971l-11.43-6.743-11.428 6.743V26.97l12 7.086L19.314 36z"
+                            fill={
+                              {
+                                "type": 2,
+                              }
+                            }
+                            propList={
+                              [
+                                "fill",
+                              ]
+                            }
+                          />
+                        </RNSVGGroup>
+                      </RNSVGSvgView>
+                    </View>
                     <View
                       style={
                         {
@@ -2407,6 +2497,7 @@ exports[`ActivityScreen renders activity screen 1`] = `
                         >
                           Send Token Upgrade
                         </Text>
+                         
                         <Text
                           style={
                             {
