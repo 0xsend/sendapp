@@ -10,7 +10,7 @@ export const useLiquidityPools = () => {
 
   return useQuery({
     queryKey: [useLiquidityPoolsQueryKey],
-    staleTime: Number.POSITIVE_INFINITY,
+    staleTime: 30_000,
     refetchOnMount: false,
     refetchOnReconnect: false,
     refetchOnWindowFocus: false,
