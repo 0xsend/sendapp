@@ -106,10 +106,13 @@ jobs:
           TURBO_SCM_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
 
   playwright-tests:
-    # **always** skip if not dev or main to save resources
-    name: Playwright Tests
+    name: Playwright Tests (Shard ${{ matrix.shard }}/4)
     # if: ${{ github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' || github.head_ref == 'dev' || github.head_ref == 'main' }}
     runs-on: arc-runner-set
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
@@ -235,41 +238,74 @@ jobs:
           # never scheduler more than 4 workers or up to 50% of the available cores
           # this is due to concurrency issues within the send account sign up and resource contention
           workers=$(MAX_WORKERS=4 node ./.devops/bin/worker-count)
-          yarn playwright test --workers=$workers
-      - name: Playwright Markdown Report
-        if: always() && steps.playwright.outcome != 'skipped'
-        id: playwright-md-report
-        shell: bash
-        run: |
-          echo "------------------"
-          bun run packages/playwright/bin/report-markdown.ts > playwright-report.md
-          cat playwright-report.md
-          echo "------------------"
-      - uses: mshick/add-pr-comment@v2
-        if: always() && steps.playwright.outcome != 'skipped' && steps.playwright-md-report.outcome == 'success'
-        with:
-          message-id: playwright-report
-          refresh-message-position: true
-          message-path: |
-            playwright-report.md
+          yarn playwright test --workers=$workers --shard=${{ matrix.shard }}/4
       - name: Tilt Down
         # always run tilt down if tilt ci started
         if: always() && steps.playwright.outcome != 'skipped'
         shell: bash
         run: tilt down
-      - name: Playwright Report
-        uses: actions/upload-artifact@v4
-        if: always() && steps.playwright.outcome == 'failure'
-        with:
-          name: playwright-report
-          path: packages/playwright/playwright-report/
-          retention-days: 30
+      # Upload raw results per shard for merging later
       - name: Playwright Test Results
         uses: actions/upload-artifact@v4
-        if: always() && steps.playwright.outcome == 'failure'
+        if: always() # Upload results even if tests fail
         with:
-          name: playwright-test-results
+          name: playwright-test-results-shard-${{ matrix.shard }}
           path: packages/playwright/test-results/
+          retention-days: 30
+
+  playwright-merge-reports:
+    name: Playwright Merge Reports
+    runs-on: arc-runner-set
+    # Run this job even if previous jobs fail to capture results
+    if: always()
+    needs: playwright-tests
+
+    # for writing PR comments
+    permissions:
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Environment
+        uses: ./.github/actions/setup-env
+        env:
+          YARN_ENABLE_HARDENED_MODE: 0
+      - name: Download Shard Results
+        uses: actions/download-artifact@v4
+        with:
+          name: playwright-test-results-shard-* # Download all shard results
+          path: all-test-results/ # Put them in a subdirectory
+          pattern: playwright-test-results-shard-* # Match artifact names
+          merge-multiple: true # Merge into the single path directory
+      - name: Install Playwright Dependencies
+        run: yarn playwright playwright install --with-deps
+      - name: Merge Playwright Reports HTML
+        id: merge-reports
+        run: npx playwright merge-reports ./all-test-results --reporter html
+      - name: Playwright Markdown Report
+        if: always() && steps.merge-reports.outcome == 'success' # Only run if merge succeeded
+        id: playwright-md-report
+        shell: bash
+        run: |
+          echo "------------------"
+          # Assumes the markdown script reads from the default playwright-report directory
+          export PLAYWRIGHT_REPORT_PATH=all-test-results/playwright-report
+          bun run packages/playwright/bin/report-markdown.ts > playwright-report.md
+          cat playwright-report.md
+          echo "------------------"
+      - uses: mshick/add-pr-comment@v2
+        if: always() && steps.playwright-md-report.outcome == 'success' # Only comment if markdown generated
+        with:
+          message-id: playwright-report # Use the same ID to update the comment
+          refresh-message-position: true
+          message-path: |
+            playwright-report.md
+      - name: Upload Merged Playwright Report
+        uses: actions/upload-artifact@v4
+        if: always() # Upload merged report even if subsequent steps fail
+        with:
+          name: playwright-merged-report
+          path: playwright-report/
           retention-days: 30
 
   vercel-deploy-preview:
