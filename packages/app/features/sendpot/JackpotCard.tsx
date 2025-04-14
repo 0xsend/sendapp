@@ -173,12 +173,12 @@ export const JackpotCard = () => {
           <XStack w="100%" mt="$2">
             <Stack f={1} w="100%" maw={350}>
               <LinkableButton
-                href="/play/buy-tickets"
+                href="/sendpot/buy-tickets"
                 theme={'green'}
                 br="$4"
                 px={'$3.5'}
                 h={'$4.5'}
-                key="play-buy-tickets-button"
+                key="sendpot-buy-tickets-button"
                 animation="200ms"
                 enterStyle={{
                   opacity: 0,

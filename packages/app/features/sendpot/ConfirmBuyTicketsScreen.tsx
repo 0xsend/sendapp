@@ -79,7 +79,7 @@ export function ConfirmBuyTicketsScreen() {
             numberOfTickets > 1 ? 's' : ''
           }.`,
         })
-        router.push('/play')
+        router.push('/sendpot')
       },
       onError: (error) => {
         console.error('Purchase mutation failed:', error)
@@ -279,7 +279,10 @@ export const EditButton = () => {
   const [rawNumberOfTickets] = useParam('numberOfTickets')
 
   const handlePress = () => {
-    router.push({ pathname: '/play/buy-tickets', query: { numberOfTickets: rawNumberOfTickets } })
+    router.push({
+      pathname: '/sendpot/buy-tickets',
+      query: { numberOfTickets: rawNumberOfTickets },
+    })
   }
 
   return (

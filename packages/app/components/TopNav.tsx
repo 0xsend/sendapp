@@ -131,7 +131,7 @@ export function TopNav({
     path.includes('/feed') ||
     path.includes('/explore') ||
     path.includes('/invest')
-  path.includes('/swap') || path.includes('/play')
+  path.includes('/swap')
   path.includes('/leaderboard')
 
   return (

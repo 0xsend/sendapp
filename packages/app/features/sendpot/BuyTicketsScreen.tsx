@@ -102,7 +102,7 @@ export function BuyTicketsScreen() {
     }
 
     router.push({
-      pathname: '/play/confirm-buy-tickets',
+      pathname: '/sendpot/confirm-buy-tickets',
       query: {
         numberOfTickets: ticketCount,
       },

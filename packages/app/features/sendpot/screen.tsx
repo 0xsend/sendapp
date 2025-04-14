@@ -3,7 +3,7 @@ import { JackpotCard } from './JackpotCard'
 import { DrawingHistory } from './DrawingHistory'
 import { useUser } from 'app/utils/useUser'
 import { isSendSquadMember } from 'app/utils/isSendSquadMember'
-export function PlayScreen() {
+export function SendPotScreen() {
   return (
     <XStack
       w={'100%'}
@@ -30,7 +30,7 @@ export function PlayScreen() {
   )
 }
 
-export function PlayOrComingSoonScreen() {
+export function SendPotOrComingSoonScreen() {
   const { tags, isLoading: isLoadingUser } = useUser()
 
   if (isLoadingUser) {
@@ -43,5 +43,5 @@ export function PlayOrComingSoonScreen() {
     return <Spinner size="large" color={'$color12'} />
   }
 
-  return <PlayScreen />
+  return <SendPotScreen />
 }
