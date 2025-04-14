@@ -92,7 +92,7 @@ export function WithdrawForm() {
   const mutation = useMutation({
     mutationFn: async () => {
       log('formState', form.formState)
-      assert(form.formState.isValid, 'form is not valid')
+      assert(Object.keys(form.formState.errors).length === 0, 'form is not valid')
       assert(uop.isSuccess, 'uop is not success')
 
       uop.data.signature = await signUserOp({
@@ -158,6 +158,7 @@ export function WithdrawForm() {
       queryClient.invalidateQueries({ queryKey: nonce.queryKey })
       queryClient.invalidateQueries({ queryKey: tokensQuery.queryKey })
       queryClient.invalidateQueries({ queryKey: allBalances.queryKey })
+      queryClient.invalidateQueries({ queryKey: ['send_earn_balances'] })
     },
   })
 
@@ -190,7 +191,8 @@ export function WithdrawForm() {
     uop.isSuccess &&
     !calls.isPending &&
     !uop.isPending &&
-    mutation.isIdle
+    !mutation.isPending &&
+    Object.keys(form.formState.errors).length === 0
 
   const insufficientAmount = depositBalance !== undefined && parsedAmount > depositBalance
 

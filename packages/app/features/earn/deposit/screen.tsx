@@ -130,6 +130,7 @@ export function DepositForm() {
       queryClient.invalidateQueries({ queryKey: nonce.queryKey })
       queryClient.invalidateQueries({ queryKey: tokensQuery.queryKey })
       queryClient.invalidateQueries({ queryKey: allBalances.queryKey })
+      queryClient.invalidateQueries({ queryKey: ['send_earn_balances'] })
     },
   })
 
