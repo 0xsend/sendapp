@@ -89,10 +89,13 @@ export function AccountScreen() {
       gap={'$3.5'}
       w={'100%'}
       pb={'$3.5'}
-      maxWidth={'500px'}
       marginHorizontal={'auto'}
       className={'hide-scroll'}
       overflow={'scroll'}
+      $gtSm={{
+        maxWidth: '500px',
+        overflow: 'visible',
+      }}
       $gtLg={{
         gap: '$5',
         flexDirection: 'row',
