@@ -153,7 +153,7 @@ export function usePurchaseJackpotTicket(
         `Invalid ticket price: ${ticketPrice}`
       )
       assert(calls !== undefined, 'Transaction calls not generated.')
-      assert(webauthnCreds !== undefined, 'WebAuthn credentials are required.')
+      assert(webauthnCreds.length > 0, 'WebAuthn credentials are required.')
 
       log('Sending UserOperation:', userOp)
       try {
