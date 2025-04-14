@@ -131,8 +131,6 @@ export function TopNav({
     path.includes('/feed') ||
     path.includes('/explore') ||
     path.includes('/invest')
-  path.includes('/swap')
-  path.includes('/leaderboard')
 
   return (
     <Header w="100%" $lg={{ py: '$3' }}>
