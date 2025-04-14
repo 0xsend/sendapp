@@ -215,7 +215,7 @@ export function SendAmountForm() {
                 py: '$4',
                 px: '$5',
                 pr: '$10',
-                fontSize: '$5',
+                fontSize: 17,
                 fontStyle: 'normal',
                 minHeight: 40,
                 '$theme-dark': {
