@@ -165,7 +165,7 @@ export function BuyTicketsScreen() {
                 $theme-light={{ backgroundColor: isInputFocused ? '$color12' : '$silverChalice' }}
               />
             </XStack>
-            <XStack jc="space-between" ai="center">
+            <XStack jc="space-between" ai="center" flexWrap="wrap">
               <YStack>
                 <XStack gap="$2" ai="center">
                   <Paragraph
@@ -200,13 +200,22 @@ export function BuyTicketsScreen() {
                   </Paragraph>
                 )}
               </YStack>
-              <Paragraph fontSize="$5" fontWeight="500" color="$color10">
-                {isDataLoading ? <Spinner size="small" /> : displayTicketPrice} SEND each
-              </Paragraph>
+              <XStack gap="$2" ai="center">
+                <Paragraph fontSize="$5" fontWeight="500" color="$color10">
+                  Ticket price:
+                </Paragraph>
+                <Paragraph
+                  color={insufficientFunds ? '$error' : '$color12'}
+                  size="$5"
+                  fontWeight="600"
+                >
+                  {isDataLoading ? <Spinner size="small" /> : displayTicketPrice} SEND{' '}
+                </Paragraph>
+              </XStack>
             </XStack>
           </YStack>
 
-          <XStack jc="space-between" ai="center">
+          <XStack jc="space-between" ai="center" flexWrap="wrap">
             <Paragraph fontSize="$6" fontWeight="500">
               Total Cost
             </Paragraph>
