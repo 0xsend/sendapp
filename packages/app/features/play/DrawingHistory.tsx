@@ -7,11 +7,12 @@ import {
 } from '@my/wagmi/contracts/base-jackpot'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { formatUnits } from 'viem'
-import { useUserJackpotSummary } from 'app/utils/useUserJackpotSummary'
-import { useUserPendingJackpotTickets } from 'app/utils/useUserPendingJackpotTickets'
+
 import type { Functions } from '@my/supabase/database.types'
 import { calculateActualTickets, MAX_JACKPOT_HISTORY, NO_WINNER_ADDRESS } from 'app/data/sendpot'
 import { byteaToHex } from 'app/utils/byteaToHex'
+import { useUserPendingJackpotTickets } from './hooks/useUserPendingJackpotTickets'
+import { useUserJackpotSummary } from './hooks/useUserJackpotSummary'
 
 export type DrawingHistoryEntry = {
   id: string
