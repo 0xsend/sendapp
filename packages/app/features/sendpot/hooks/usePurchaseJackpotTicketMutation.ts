@@ -147,13 +147,13 @@ export function usePurchaseJackpotTicket(
       log('Attempting purchase...')
       assert(!isPreparing, 'Preparation must complete before purchasing.')
       assert(!prepareError, `Preparation failed: ${prepareError?.message}`)
-      assert(userOp, 'UserOperation must be prepared before purchasing.')
+      assert(userOp !== undefined, 'UserOperation must be prepared before purchasing.')
       assert(
         typeof ticketPrice === 'bigint' && ticketPrice > 0n,
         `Invalid ticket price: ${ticketPrice}`
       )
-      assert(calls, 'Transaction calls not generated.')
-      assert(webauthnCreds?.length, 'WebAuthn credentials are required.')
+      assert(calls !== undefined, 'Transaction calls not generated.')
+      assert(webauthnCreds !== undefined, 'WebAuthn credentials are required.')
 
       log('Sending UserOperation:', userOp)
       try {
