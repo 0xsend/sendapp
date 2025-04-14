@@ -233,6 +233,16 @@ const createSendEarn = async ({
   assert(receipt.status === 'success', 'createSendEarn failed')
 }
 
+// can remove this once we deploy the new send earn contracts
+test.beforeEach(async () => {
+  // ensure the SendEarnFactory is deployed
+  await testBaseClient.readContract({
+    address: sendEarnUsdcFactoryAddress[testBaseClient.chain.id],
+    abi: sendEarnUsdcFactoryAbi,
+    functionName: 'VAULT',
+  })
+})
+
 for (const coin of [usdcCoin]) {
   // $100K
   const MAX_DEPOSIT_AMOUNT = BigInt(100_000 * 10 ** coin.decimals)

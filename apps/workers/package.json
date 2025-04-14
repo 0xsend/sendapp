@@ -26,7 +26,7 @@
     "@my/wagmi": "workspace:*",
     "@my/workflows": "workspace:*",
     "@supabase/supabase-js": "2.44.2",
-    "@temporalio/worker": "^1.10.1",
+    "@temporalio/worker": "^1.11.7",
     "@wagmi/core": "^2.13.1",
     "app": "workspace:*",
     "permissionless": "^0.1.14",

@@ -1,44 +1,74 @@
 import { Client, Connection } from '@temporalio/client'
+import type { NativeConnectionOptions } from '@temporalio/worker'
 import debug from 'debug'
+
 const {
-  NODE_ENV = 'development',
-  TEMPORAL_NAMESPACE = 'default',
+  TEMPORAL_ADDR,
+  TEMPORAL_NAMESPACE: envNamespace,
   TEMPORAL_MTLS_TLS_CERT,
   TEMPORAL_MTLS_TLS_KEY,
 } = process.env
-const isDeployed = ['production', 'test'].includes(NODE_ENV) && !process.env.CI
 
-const log = debug('api:temporal')
-log(`connecting to temporal: ${TEMPORAL_NAMESPACE} with NODE_ENV: ${NODE_ENV}`)
+const log = debug('temporal:client')
 
-let connectionOptions = {}
+/**
+ * Gets the Temporal namespace from the environment variable TEMPORAL_NAMESPACE,
+ * defaulting to 'default' if not set.
+ * @returns The Temporal namespace string.
+ */
+export function getTemporalNamespace(): string {
+  return envNamespace ?? 'default'
+}
 
-if (isDeployed) {
-  if (!TEMPORAL_MTLS_TLS_CERT) {
-    throw new Error('no cert found. Check the TEMPORAL_MTLS_TLS_CERT env var')
+/**
+ * Generates Temporal connection options based on environment variables.
+ * Requires TEMPORAL_ADDR to be set.
+ * Optionally configures TLS if TEMPORAL_MTLS_TLS_CERT and TEMPORAL_MTLS_TLS_KEY are provided.
+ *
+ * @returns Connection options compatible with both Client and NativeConnection.
+ */
+export function getTemporalConnectionOptions(): NativeConnectionOptions {
+  if (!TEMPORAL_ADDR) {
+    throw new Error('TEMPORAL_ADDR environment variable is not set.')
   }
-  if (!TEMPORAL_MTLS_TLS_KEY) {
-    throw new Error('no key found.  Check the TEMPORAL_MTLS_TLS_KEY env var')
+
+  // Call the function to get the namespace for logging
+  log(`connecting to temporal at ${TEMPORAL_ADDR} in namespace ${getTemporalNamespace()}`)
+
+  // Explicitly type as NativeConnectionOptions to satisfy the worker's requirements
+  const connectionOptions: NativeConnectionOptions = {
+    address: TEMPORAL_ADDR,
+    // Note: We are not setting 'metadata' here, avoiding the type conflict.
   }
-  connectionOptions = {
-    address: `${process.env.TEMPORAL_NAMESPACE}.tmprl.cloud:7233`,
-    tls: {
+
+  if (TEMPORAL_MTLS_TLS_CERT && TEMPORAL_MTLS_TLS_KEY) {
+    log('configuring TLS for Temporal connection')
+    connectionOptions.tls = {
       clientCertPair: {
         crt: Buffer.from(TEMPORAL_MTLS_TLS_CERT, 'base64'),
         key: Buffer.from(TEMPORAL_MTLS_TLS_KEY, 'base64'),
       },
-    },
+    }
+  } else {
+    log('TLS not configured for Temporal connection (CERT or KEY missing)')
   }
+
+  return connectionOptions
 }
 
 let client: Client | null = null
 
+/**
+ * Gets a singleton Temporal client instance.
+ * Connects using options derived from environment variables.
+ */
 export async function getTemporalClient(): Promise<Client> {
   if (!client) {
+    const connectionOptions = getTemporalConnectionOptions()
     const connection = await Connection.connect(connectionOptions)
     client = new Client({
       connection,
-      namespace: process.env.TEMPORAL_NAMESPACE ?? 'default',
+      namespace: getTemporalNamespace(),
       dataConverter: {
         payloadConverterPath: new URL('../build/payload-converter.cjs', import.meta.url).pathname,
       },
