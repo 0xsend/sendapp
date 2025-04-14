@@ -504,7 +504,8 @@ export function DepositForm() {
                     return <StaticBenefits />
                 }
               })()}
-              <ReferredBy />
+              {/* Only show referred by if there is no existing deposit */}
+              {!balances.isLoading && !hasExistingDeposit && <ReferredBy />}
               {hasExistingDeposit ? null : (
                 <XStack gap={'$3'} ai={'center'}>
                   {areTermsAccepted}
