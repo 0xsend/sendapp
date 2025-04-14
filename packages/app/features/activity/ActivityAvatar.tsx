@@ -2,7 +2,12 @@ import { Avatar, LinkableAvatar, type LinkableAvatarProps, XStack } from '@my/ui
 import { IconUpgrade } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { allCoinsDict } from 'app/data/coins'
-import { isActivitySwapTransfer, isSendPotTicketPurchase, isSendPotWin } from 'app/utils/activity'
+import {
+  counterpart,
+  isActivitySwapTransfer,
+  isSendPotTicketPurchase,
+  isSendPotWin,
+} from 'app/utils/activity'
 import {
   type Activity,
   isSendAccountReceiveEvent,
