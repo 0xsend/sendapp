@@ -32,25 +32,19 @@ USING (
     )
 );
 
-CREATE POLICY "authenticated can read jackpot runs"
-ON public.sendpot_jackpot_runs
-FOR SELECT
-TO authenticated
-USING (true);
-
-alter table public."send_pot_user_ticket_purchases" enable row level security;
-create index send_pot_user_ticket_purchases_referrer on public.send_pot_user_ticket_purchases using btree(referrer);
-create index send_pot_user_ticket_purchases_recipient on public.send_pot_user_ticket_purchases using btree(recipient);
-create index send_pot_user_ticket_purchases_buyer on public.send_pot_user_ticket_purchases using btree(buyer);
-create index idx_send_pot_user_ticket_purchases_block_num
-  ON public.send_pot_user_ticket_purchases USING btree (block_num);
+alter table public."sendpot_user_ticket_purchases" enable row level security;
+create index sendpot_user_ticket_purchases_referrer on public.sendpot_user_ticket_purchases using btree(referrer);
+create index sendpot_user_ticket_purchases_recipient on public.sendpot_user_ticket_purchases using btree(recipient);
+create index sendpot_user_ticket_purchases_buyer on public.sendpot_user_ticket_purchases using btree(buyer);
+create index idx_sendpot_user_ticket_purchases_block_num
+  ON public.sendpot_user_ticket_purchases USING btree (block_num);
 
 create index idx_utp_blocknum_covering
-  ON public.send_pot_user_ticket_purchases USING btree (block_num)
+  ON public.sendpot_user_ticket_purchases USING btree (block_num)
   INCLUDE (tickets_purchased_total_bps);
 
 
-create table "public"."send_pot_jackpot_runs"(
+create table "public"."sendpot_jackpot_runs"(
     "id" serial primary key,
     "chain_id" numeric,
     "log_addr" bytea,
@@ -69,11 +63,17 @@ create table "public"."send_pot_jackpot_runs"(
     "abi_idx" smallint
 );
 
-alter table "public"."send_pot_jackpot_runs" enable row level security;
+CREATE POLICY "authenticated can read jackpot runs"
+ON public.sendpot_jackpot_runs
+FOR SELECT
+TO authenticated
+USING (true);
 
-create index send_pot_jackpot_runs_winner on public.send_pot_jackpot_runs using btree(winner);
-create index idx_send_pot_jackpot_runs_block_num
-  ON public.send_pot_jackpot_runs USING btree (block_num);
+alter table "public"."sendpot_jackpot_runs" enable row level security;
+
+create index sendpot_jackpot_runs_winner on public.sendpot_jackpot_runs using btree(winner);
+create index idx_sendpot_jackpot_runs_block_num
+  ON public.sendpot_jackpot_runs USING btree (block_num);
 
 -- Jackpot summary returns the user jackpots summary where it aggregates user ticket purchases based off jackpot block_num.
 -- num_runs is the number of jackpot runs to chose from, in descending order from block_num.
@@ -106,7 +106,7 @@ WITH cte AS (
       LAG(r.block_num) OVER (ORDER BY r.block_num ASC),
       0
     ) AS prev_block_num
-  FROM public.send_pot_jackpot_runs r
+  FROM public.sendpot_jackpot_runs r
 )
 SELECT
   c.jackpot_run_id,
@@ -116,7 +116,7 @@ SELECT
   c.win_amount,
   (
     SELECT COALESCE(SUM(utp.tickets_purchased_total_bps), 0)
-    FROM public.send_pot_user_ticket_purchases utp
+    FROM public.sendpot_user_ticket_purchases utp
     WHERE utp.block_num >= c.prev_block_num
       AND utp.block_num < c.jackpot_block_num
   ) AS total_tickets
@@ -133,15 +133,15 @@ RETURNS numeric
 LANGUAGE sql
 AS $$
 WITH last_jackpot AS (
-    -- Retrieve the maximum block number from the send_pot_jackpot_runs table.
+    -- Retrieve the maximum block number from the sendpot_jackpot_runs table.
   -- This block number represents the end of the last completed jackpot.
   -- If no jackpot runs exist, use 0 as the default value.
   SELECT COALESCE(MAX(block_num), 0) AS last_block
-  FROM public.send_pot_jackpot_runs
+  FROM public.sendpot_jackpot_runs
 )
--- Sum the tickets purchased (tickets_purchased_total_bps) from the send_pot_user_ticket_purchases
+-- Sum the tickets purchased (tickets_purchased_total_bps) from the sendpot_user_ticket_purchases
 -- table for all rows where the block_num is greater than or equal to the last completed jackpot's block.
 SELECT COALESCE(SUM(tickets_purchased_total_bps), 0) AS total_tickets
-FROM public.send_pot_user_ticket_purchases
+FROM public.sendpot_user_ticket_purchases
 WHERE block_num >= (SELECT last_block FROM last_jackpot);
 $$;
