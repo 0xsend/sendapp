@@ -216,9 +216,9 @@ test('can visit activity page and see correct activity feed', async ({
   expect.soft(await activityRows.first().isVisible()) // FlatList doesn't render offscreen items
 
   // Referral reward
-  await expect.soft(activityRows.nth(0)).toContainText('Referral Reward')
+  await expect.soft(activityRows.nth(0)).toContainText('Revenue Share')
   await expect.soft(activityRows.nth(0)).toContainText('1 USDC')
-  await expect.soft(activityRows.nth(0)).toContainText('Sendtag Checkout')
+  await expect.soft(activityRows.nth(0)).toContainText('Sendtags')
 
   // Signing key removed
   await expect.soft(activityRows.nth(1)).toContainText('Send Account Signing Key Removed')

@@ -90,10 +90,10 @@ describe('test eventNameFromActivity', () => {
       eventNameFromActivity({ ...EventSchema.parse(activity), event_name: 'i_am_rick_james' })
     ).toBe('I Am Rick James')
   })
-  it('should return Referral Reward when send_account_transfer from SendtagCheckout contract', () => {
+  it('should return Revenue Share when send_account_transfer from SendtagCheckout contract', () => {
     const activity = JSON.parse(JSON.stringify(mockSendtagReferralRewardUSDC))
     const _activity = EventSchema.parse(activity)
-    expect(eventNameFromActivity(_activity)).toBe('Referral Reward')
+    expect(eventNameFromActivity(_activity)).toBe('Revenue Share')
   })
   it('should return "Trade" when withdrawal address is swap router or liquidity pool', () => {
     const activity = JSON.parse(JSON.stringify(mockSwapSellErc20Transfer))
@@ -153,9 +153,9 @@ describe('phraseFromActivity', () => {
     ).toBe('I am rick james')
   })
 
-  it('should return "Earned referral reward" when send_account_transfer from SendtagCheckout contract', () => {
+  it('should return "Earned revenue share" when send_account_transfer from SendtagCheckout contract', () => {
     const _activity = EventSchema.parse(mockSendtagReferralRewardUSDC)
-    expect(phraseFromActivity(_activity)).toBe('Earned referral reward')
+    expect(phraseFromActivity(_activity)).toBe('Earned revenue share')
   })
 
   it('should return "Trade" when withdrawal address is swap router or liquidity pool', () => {
@@ -219,9 +219,9 @@ describe('test subtextFromActivity', () => {
     activity.data.f = hexToBytea(anyPaymaster)
     expect(subtextFromActivity(EventSchema.parse(activity))).toBe('Paymaster')
   })
-  it('should return Sendtag Checkout when received from SendtagCheckout contract', () => {
+  it('should return Sendtags when received from SendtagCheckout contract', () => {
     const activity = JSON.parse(JSON.stringify(mockSendtagReferralRewardUSDC))
-    expect(subtextFromActivity(EventSchema.parse(activity))).toBe('Sendtag Checkout')
+    expect(subtextFromActivity(EventSchema.parse(activity))).toBe('Sendtags')
   })
   it('should return upgraded amount when mint of new Send Token V1', () => {
     const activity = JSON.parse(JSON.stringify(mockSendTokenUpgradeEvent))

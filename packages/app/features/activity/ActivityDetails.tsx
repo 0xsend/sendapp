@@ -1,20 +1,21 @@
 import {
   Fade,
+  H4,
   Paragraph,
   Separator,
   Stack,
+  type StackProps,
+  Text,
   XStack,
   YStack,
-  Text,
-  H4,
-  type StackProps,
 } from '@my/ui'
 import {
-  phraseFromActivity,
   amountFromActivity,
-  subtextFromActivity,
+  eventNameFromActivity,
   isActivitySwapTransfer,
   noteFromActivity,
+  phraseFromActivity,
+  subtextFromActivity,
 } from 'app/utils/activity'
 import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
 import { IconX } from 'app/components/icons'
@@ -37,7 +38,8 @@ export const ActivityDetails = ({
 } & StackProps) => {
   const { data: swapRouters } = useSwapRouters()
   const { data: liquidityPools } = useLiquidityPools()
-  const activityText = phraseFromActivity(activity, swapRouters, liquidityPools)
+  const activityEventName = eventNameFromActivity(activity, swapRouters, liquidityPools)
+  const activityPhrase = phraseFromActivity(activity, swapRouters, liquidityPools)
   const subText = subtextFromActivity(activity, swapRouters, liquidityPools)
   const amount = amountFromActivity(activity, swapRouters, liquidityPools)
   const note = noteFromActivity(activity)
@@ -72,20 +74,30 @@ export const ActivityDetails = ({
                   {(() => {
                     switch (true) {
                       case isActivitySwapTransfer(activity, swapRouters, liquidityPools):
-                        return <Text>{activityText}</Text>
+                        return <Text>{activityPhrase}</Text>
                       default:
                         return <Text>{subText}</Text>
                     }
                   })()} {(() => {
                     switch (true) {
                       case isSendtagCheckoutEvent(activity):
-                        return null
+                        return (
+                          <Text
+                            color={'$silverChalice'}
+                            textTransform={'lowercase'}
+                            $theme-light={{
+                              color: '$darkGrayTextField',
+                            }}
+                          >
+                            {activityEventName}
+                          </Text>
+                        )
                       case isSendTokenUpgradeEvent(activity):
                         return null
                       case isActivitySwapTransfer(activity, swapRouters, liquidityPools):
                         return null
                       case subText === null:
-                        return <Text>{activityText}</Text>
+                        return <Text>{activityPhrase}</Text>
                       default:
                         return (
                           <Text
@@ -95,7 +107,7 @@ export const ActivityDetails = ({
                               color: '$darkGrayTextField',
                             }}
                           >
-                            {activityText}
+                            {activityPhrase}
                           </Text>
                         )
                     }
@@ -145,7 +157,7 @@ export const ActivityDetails = ({
                   color: '$darkGrayTextField',
                 }}
               >
-                {activityText} on
+                {activityPhrase} on
               </Paragraph>
               <Paragraph
                 size={'$5'}
