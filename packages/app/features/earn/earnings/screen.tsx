@@ -126,13 +126,30 @@ function TotalEarning() {
     }, 0n)
     return totalCurrentAssets
   }, [balances.data])
-  const totalEarnings = useMemo(() => {
-    if (!coin.data) return '0'
-    if (!balances.data) return '0'
+
+  const { formattedTotal, displayString } = useMemo(() => {
+    if (!coin.data || !balances.data) {
+      return {
+        formattedPrincipal: '0',
+        formattedYield: '0',
+        formattedTotal: '0',
+        displayString: '0',
+        yieldAmount: 0n,
+      }
+    }
+
     const totalAssets = balances.data.reduce((acc, balance) => {
       return acc + balance.currentAssets
     }, 0n)
-    return formatCoinAmount({ amount: totalAssets - totalDeposits, coin: coin.data })
+    const yieldAmount = totalAssets - totalDeposits
+    const formattedPrincipal = formatCoinAmount({ amount: totalDeposits, coin: coin.data })
+    const formattedYield = formatCoinAmount({ amount: yieldAmount, coin: coin.data })
+    const formattedTotal = formatCoinAmount({ amount: totalAssets, coin: coin.data })
+
+    const displayString =
+      yieldAmount > 0n ? `${formattedPrincipal} + ${formattedYield}` : formattedPrincipal
+
+    return { formattedPrincipal, formattedYield, formattedTotal, displayString, yieldAmount }
   }, [balances.data, totalDeposits, coin.data])
 
   if (!balances.isSuccess || !coin.isSuccess || !coin.data) return null
@@ -148,12 +165,12 @@ function TotalEarning() {
           <YStack gap={'$2'}>
             <Paragraph
               fontWeight={'500'}
-              size={totalEarnings.length > 16 ? '$9' : '$11'}
+              size={displayString.length > 16 ? '$9' : '$11'}
               $gtLg={{
-                size: totalEarnings.length > 16 ? '$9' : totalEarnings.length > 8 ? '$10' : '$11',
+                size: displayString.length > 16 ? '$9' : displayString.length > 8 ? '$10' : '$11',
               }}
             >
-              {totalEarnings}
+              {displayString}
             </Paragraph>
           </YStack>
           <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
@@ -162,7 +179,7 @@ function TotalEarning() {
             color={'$lightGrayTextField'}
             $theme-light={{ color: '$darkGrayTextField' }}
           >
-            ${totalEarnings}
+            ${formattedTotal} {/* Show total USD value */}
           </Paragraph>
         </YStack>
       </Card>
