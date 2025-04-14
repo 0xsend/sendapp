@@ -31,7 +31,7 @@ export const TokenBalanceCard = () => {
   }
 
   return (
-    <Card px={'$5'} py={'$6'} w={'100%'} jc="space-between" $gtLg={{ p: '$6', h: 244, mih: 244 }}>
+    <Card p={'$5'} w={'100%'} jc="space-between" $gtLg={{ p: '$6', h: 244, mih: 244 }}>
       <XStack w={'100%'} zIndex={4}>
         <YStack jc={'center'} gap={'$5'} w={'100%'} $gtLg={{ gap: '$9' }}>
           <YStack w={'100%'} gap={'$2.5'} jc="space-between">
@@ -103,6 +103,7 @@ export const TokenBalanceCard = () => {
                       <BigHeading
                         $platform-web={{ width: 'fit-content' }}
                         color={'$color12'}
+                        fontSize={'$11'}
                         fontWeight={600}
                         zIndex={1}
                         $gtSm={{
