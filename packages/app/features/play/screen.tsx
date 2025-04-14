@@ -1,7 +1,8 @@
-import { XStack, YStack, Card } from '@my/ui'
+import { XStack, YStack, Card, Spinner } from '@my/ui'
 import { JackpotCard } from './JackpotCard'
 import { DrawingHistory } from './DrawingHistory'
-
+import { useUser } from 'app/utils/useUser'
+import { isSendSquadMember } from 'app/utils/isSendSquadMember'
 export function PlayScreen() {
   return (
     <XStack
@@ -27,4 +28,20 @@ export function PlayScreen() {
       </YStack>
     </XStack>
   )
+}
+
+export function PlayOrComingSoonScreen() {
+  const { tags, isLoading: isLoadingUser } = useUser()
+
+  if (isLoadingUser) {
+    return <Spinner size="large" color={'$color12'} />
+  }
+
+  const isMember = isSendSquadMember(tags)
+
+  if (!isMember) {
+    return <Spinner size="large" color={'$color12'} />
+  }
+
+  return <PlayScreen />
 }
