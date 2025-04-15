@@ -106,13 +106,13 @@ export function AccountScreen() {
     >
       <YStack
         w="100%"
-        height={'75%'}
+        aspectRatio={1}
         br="$6"
         position="relative"
         $gtLg={{
           gap: '$5',
           width: '50%',
-          height: 'auto',
+          aspectRatio: 'unset',
         }}
       >
         <Avatar w={'100%'} h={'100%'} maxWidth={'100%'} maxHeight={'100%'} bc="$color2" br="$6">
