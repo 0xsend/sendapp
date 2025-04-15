@@ -2,11 +2,13 @@ import { Card, Fade, H4, Paragraph, ScrollView, Separator, Spinner, XStack, YSta
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
 import { formatCoinAmount } from 'app/utils/formatCoinAmount'
-import { useMemo } from 'react'
+import { Events, isTemporalSendEarnDepositEvent } from 'app/utils/zod/activity' // Import Events
+import { useEffect, useMemo, useRef } from 'react' // Import useRef
 import { SectionList } from 'react-native'
 import { useSendEarnCoinBalances } from '../hooks'
 import { useERC20AssetCoin } from '../params'
 import { useEarnActivityFeed } from '../utils/useEarnActivityFeed'
+import { useQueryClient } from '@tanstack/react-query'
 
 export const EarningsBalance = () => {
   return (
@@ -30,6 +32,32 @@ export const EarningsFeed = () => {
     useEarnActivityFeed({
       pageSize: 10,
     })
+  const queryClient = useQueryClient()
+  const wasPendingRef = useRef(false) // Ref to track if a pending deposit was seen previously
+
+  useEffect(() => {
+    // Only proceed if data is available
+    if (!data?.pages) return
+
+    const activities = data.pages.flat()
+
+    // Check if there's currently a pending temporal deposit
+    const isCurrentlyPending = activities.some(
+      (activity) =>
+        isTemporalSendEarnDepositEvent(activity) &&
+        // Assuming 'status' is within the 'data' object for this event type
+        !['cancelled', 'failed'].includes(activity.data?.status)
+    )
+
+    // If it was pending previously but isn't anymore, invalidate the balances query
+    if (wasPendingRef.current && !isCurrentlyPending) {
+      // Invalidate the query using the base key
+      queryClient.invalidateQueries({ queryKey: ['send_earn_balances'] })
+    }
+
+    // Update the ref to store the current pending state for the next effect run
+    wasPendingRef.current = isCurrentlyPending
+  }, [data, queryClient])
 
   const sections = useMemo(() => {
     if (!data?.pages) return []
