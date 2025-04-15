@@ -5,6 +5,7 @@ import { ActivityScreen } from './screen'
 import { useSearchResultHref } from 'app/utils/useSearchResultHref'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useRootScreenParams } from 'app/routers/params'
+import { ScrollDirectionProvider } from 'app/provider/scroll'
 
 jest.unmock('app/provider/tag-search')
 jest.mock('app/utils/useSearchResultHref')
@@ -81,7 +82,9 @@ describe('ActivityScreen', () => {
 
     render(
       <TamaguiProvider defaultTheme={'dark'} config={config}>
-        <ActivityScreen />
+        <ScrollDirectionProvider>
+          <ActivityScreen />
+        </ScrollDirectionProvider>
       </TamaguiProvider>
     )
     await act(async () => {
@@ -127,7 +130,9 @@ describe('ActivityScreen', () => {
 
     render(
       <TamaguiProvider defaultTheme={'dark'} config={config}>
-        <ActivityScreen />
+        <ScrollDirectionProvider>
+          <ActivityScreen />
+        </ScrollDirectionProvider>
       </TamaguiProvider>
     )
     const searchInput = screen.getByPlaceholderText('Search')

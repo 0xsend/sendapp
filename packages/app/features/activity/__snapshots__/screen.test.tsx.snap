@@ -415,7 +415,6 @@ exports[`ActivityScreen renders activity screen 1`] = `
           "flex": 1,
           "flexDirection": "row",
           "gap": 24,
-          "height": 0,
           "width": "100%",
         }
       }
