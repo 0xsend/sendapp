@@ -303,7 +303,11 @@ export function eventNameFromActivity({
   activity,
   swapRouters = [],
   liquidityPools = [],
-}: { activity: Activity; swapRouters?: SwapRouter[]; liquidityPools?: LiquidityPool[] }): string {
+}: {
+  activity: Activity
+  swapRouters?: SwapRouter[]
+  liquidityPools?: LiquidityPool[]
+}): string {
   const { event_name, from_user, to_user, data } = activity
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
@@ -363,12 +367,19 @@ export function eventNameFromActivity({
 /**
  * Returns the human readable event name of the activity.
  * @param activity
+ * @param swapRouters - Optional list of swap routers to validate the activity against.
+ * @param liquidityPools - Optional list of liquidity pools to validate the activity against.
  * @returns the human readable event name of the activity
  */
 export function useEventNameFromActivity({
   activity,
   swapRouters = [],
-}: { activity: Activity; swapRouters?: SwapRouter[] }): string {
+  liquidityPools = [],
+}: {
+  activity: Activity
+  swapRouters?: SwapRouter[]
+  liquidityPools?: LiquidityPool[]
+}): string {
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const { data: addressBook } = useAddressBook()
 
@@ -386,8 +397,8 @@ export function useEventNameFromActivity({
       return 'Withdraw'
     }
     // this should have always been a hook
-    return eventNameFromActivity({ activity, swapRouters })
-  }, [activity, addressBook, isERC20Transfer, swapRouters])
+    return eventNameFromActivity({ activity, swapRouters, liquidityPools })
+  }, [activity, addressBook, isERC20Transfer, swapRouters, liquidityPools])
 }
 
 /**
@@ -401,7 +412,11 @@ export function phraseFromActivity({
   activity,
   swapRouters = [],
   liquidityPools = [],
-}: { activity: Activity; swapRouters?: SwapRouter[]; liquidityPools?: LiquidityPool[] }): string {
+}: {
+  activity: Activity
+  swapRouters?: SwapRouter[]
+  liquidityPools?: LiquidityPool[]
+}): string {
   const { event_name, from_user, to_user, data } = activity
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
@@ -458,13 +473,19 @@ export function phraseFromActivity({
 /**
  * Returns the phrase for event name of the activity for activity details.
  * @param activity
+ * @param swapRouters - Optional list of swap routers to validate the activity against.
+ * @param liquidityPools - Optional list of liquidity pools to validate the activity against.
  * @returns the phrase for event name of the activity for activity details
  */
 export function usePhraseFromActivity({
   activity,
   swapRouters = [],
   liquidityPools = [],
-}: { activity: Activity; swapRouters?: SwapRouter[]; liquidityPools?: LiquidityPool[] }): string {
+}: {
+  activity: Activity
+  swapRouters?: SwapRouter[]
+  liquidityPools?: LiquidityPool[]
+}): string {
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const { data: addressBook } = useAddressBook()
   const isSendEarnDeposit = isSendEarnDepositEvent(activity)
@@ -494,9 +515,11 @@ export function subtextFromActivity({
   activity,
   swapRouters = [],
   liquidityPools = [],
-}: { activity: Activity; swapRouters?: SwapRouter[]; liquidityPools?: LiquidityPool[] }):
-  | string
-  | null {
+}: {
+  activity: Activity
+  swapRouters?: SwapRouter[]
+  liquidityPools?: LiquidityPool[]
+}): string | null {
   const _user = counterpart(activity)
   const { from_user, to_user, data } = activity
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
