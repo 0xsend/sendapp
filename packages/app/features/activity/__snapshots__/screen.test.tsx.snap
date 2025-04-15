@@ -14,6 +14,339 @@ exports[`ActivityScreen renders activity screen 1`] = `
   }
 >
   <View
+    style={
+      {
+        "flexDirection": "column",
+        "gap": 24,
+        "width": "100%",
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "position": "relative",
+        }
+      }
+      testID="sendSearchContainer"
+    >
+      <View
+        onLayout={[Function]}
+        onSubmit={[Function]}
+        style={
+          {
+            "alignSelf": "center",
+            "flex": 1,
+            "flexDirection": "column",
+            "gap": 18,
+            "justifyContent": "space-between",
+            "width": "100%",
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "flexDirection": "column",
+            }
+          }
+        >
+          <View
+            collapsable={false}
+            jestAnimatedStyle={
+              {
+                "value": {
+                  "transform": [
+                    {
+                      "translateX": 0,
+                    },
+                  ],
+                },
+              }
+            }
+            style={
+              {
+                "transform": [
+                  {
+                    "translateX": 0,
+                  },
+                ],
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "position": "relative",
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "left": 2,
+                    "paddingBottom": 13,
+                    "paddingLeft": 13,
+                    "paddingRight": 13,
+                    "paddingTop": 13,
+                    "position": "absolute",
+                    "top": "50%",
+                    "transform": "translateY(-50%)",
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <RNSVGSvgView
+                  align="xMidYMid"
+                  bbHeight={24}
+                  bbWidth={24}
+                  color="#B2B2B2"
+                  focusable={false}
+                  height={24}
+                  meetOrSlice={0}
+                  minX={0}
+                  minY={0}
+                  strokeWidth="2"
+                  style={
+                    [
+                      {
+                        "backgroundColor": "transparent",
+                        "borderWidth": 0,
+                      },
+                      {
+                        "color": "#B2B2B2",
+                      },
+                      {
+                        "flex": 0,
+                        "height": 24,
+                        "width": 24,
+                      },
+                    ]
+                  }
+                  tintColor="#B2B2B2"
+                  vbHeight={1024}
+                  vbWidth={1024}
+                  width={24}
+                >
+                  <RNSVGGroup
+                    fill={
+                      {
+                        "payload": 4278190080,
+                        "type": 0,
+                      }
+                    }
+                    propList={
+                      [
+                        "strokeWidth",
+                      ]
+                    }
+                    strokeWidth="2"
+                  >
+                    <RNSVGPath
+                      d="M909.6 854.5L649.9 594.8C690.2 542.7 712 479 712 412c0-80.2-31.3-155.4-87.9-212.1-56.6-56.7-132-87.9-212.1-87.9s-155.5 31.3-212.1 87.9C143.2 256.5 112 331.8 112 412c0 80.1 31.3 155.5 87.9 212.1C256.5 680.8 331.8 712 412 712c67 0 130.6-21.8 182.7-62l259.7 259.6a8.2 8.2 0 0011.6 0l43.6-43.5a8.2 8.2 0 000-11.6zM570.4 570.4C528 612.7 471.8 636 412 636s-116-23.3-158.4-65.6C211.3 528 188 471.8 188 412s23.3-116.1 65.6-158.4C296 211.3 352.2 188 412 188s116.1 23.2 158.4 65.6S636 352.2 636 412s-23.3 116.1-65.6 158.4z"
+                      fill={
+                        {
+                          "type": 2,
+                        }
+                      }
+                      propList={
+                        [
+                          "fill",
+                        ]
+                      }
+                    />
+                  </RNSVGGroup>
+                </RNSVGSvgView>
+              </View>
+              <TextInput
+                accessibilityRole="search"
+                aria-label="query"
+                autoFocus={false}
+                control={
+                  {
+                    "_defaultValues": {
+                      "query": undefined,
+                    },
+                    "_disableForm": [Function],
+                    "_executeSchema": [Function],
+                    "_fields": {
+                      "query": {
+                        "_f": {
+                          "mount": true,
+                          "name": "query",
+                          "ref": {
+                            "name": "query",
+                          },
+                          "value": undefined,
+                        },
+                      },
+                    },
+                    "_formState": {
+                      "dirtyFields": {},
+                      "disabled": false,
+                      "errors": {},
+                      "isDirty": false,
+                      "isLoading": false,
+                      "isSubmitSuccessful": false,
+                      "isSubmitted": false,
+                      "isSubmitting": false,
+                      "isValid": true,
+                      "isValidating": false,
+                      "submitCount": 0,
+                      "touchedFields": {},
+                    },
+                    "_formValues": {
+                      "query": undefined,
+                    },
+                    "_getDirty": [Function],
+                    "_getFieldArray": [Function],
+                    "_getWatch": [Function],
+                    "_names": {
+                      "array": Set {},
+                      "focus": "",
+                      "mount": Set {
+                        "query",
+                      },
+                      "unMount": Set {},
+                      "watch": Set {
+                        "query",
+                      },
+                      "watchAll": false,
+                    },
+                    "_options": {
+                      "mode": "onSubmit",
+                      "reValidateMode": "onChange",
+                      "shouldFocusError": true,
+                    },
+                    "_proxyFormState": {
+                      "dirtyFields": false,
+                      "disabled": true,
+                      "errors": true,
+                      "isDirty": false,
+                      "isSubmitting": true,
+                      "isValid": true,
+                      "isValidating": false,
+                      "touchedFields": false,
+                    },
+                    "_removeUnmounted": [Function],
+                    "_reset": [Function],
+                    "_resetDefaultValues": [Function],
+                    "_state": {
+                      "action": false,
+                      "mount": true,
+                      "watch": false,
+                    },
+                    "_subjects": {
+                      "array": {
+                        "next": [Function],
+                        "observers": [],
+                        "subscribe": [Function],
+                        "unsubscribe": [Function],
+                      },
+                      "state": {
+                        "next": [Function],
+                        "observers": [
+                          {
+                            "next": [Function],
+                          },
+                          {
+                            "next": [Function],
+                          },
+                        ],
+                        "subscribe": [Function],
+                        "unsubscribe": [Function],
+                      },
+                      "values": {
+                        "next": [Function],
+                        "observers": [
+                          {
+                            "next": [Function],
+                          },
+                          {
+                            "next": [Function],
+                          },
+                        ],
+                        "subscribe": [Function],
+                        "unsubscribe": [Function],
+                      },
+                    },
+                    "_updateDisabledField": [Function],
+                    "_updateFieldArray": [Function],
+                    "_updateFormState": [Function],
+                    "_updateValid": [Function],
+                    "getFieldState": [Function],
+                    "handleSubmit": [Function],
+                    "register": [Function],
+                    "setError": [Function],
+                    "unregister": [Function],
+                  }
+                }
+                focusVisibleStyle={{}}
+                focusable={true}
+                iconBefore={
+                  <Memo(wrapped)
+                    $theme-light={
+                      {
+                        "color": "$darkGrayTextField",
+                      }
+                    }
+                    color="$silverChalice"
+                  />
+                }
+                id=":r0:"
+                name="query"
+                onBlur={[Function]}
+                onChangeText={[Function]}
+                onFocus={[Function]}
+                placeholder="Search"
+                placeholderTextColor="#B2B2B2"
+                readOnly={false}
+                style={
+                  {
+                    "backgroundColor": "#111f22",
+                    "borderBottomColor": "#111f22",
+                    "borderBottomLeftRadius": 9,
+                    "borderBottomRightRadius": 9,
+                    "borderBottomWidth": 0,
+                    "borderLeftColor": "#111f22",
+                    "borderLeftWidth": 0,
+                    "borderRightColor": "#111f22",
+                    "borderRightWidth": 0,
+                    "borderStyle": "solid",
+                    "borderTopColor": "#111f22",
+                    "borderTopLeftRadius": 9,
+                    "borderTopRightRadius": 9,
+                    "borderTopWidth": 0,
+                    "color": "#FFFFFF",
+                    "fontFamily": "System",
+                    "fontSize": 17,
+                    "fontWeight": "normal",
+                    "height": 44,
+                    "minWidth": 0,
+                    "paddingLeft": 46,
+                    "paddingRight": 40,
+                    "position": "relative",
+                  }
+                }
+                value=""
+              />
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "bottom": 10,
+                "gap": 7,
+                "position": "absolute",
+                "right": 18,
+              }
+            }
+          />
+        </View>
+      </View>
+    </View>
+  </View>
+  <View
     collapsable={false}
     forwardedRef={[Function]}
     jestAnimatedStyle={
@@ -924,7 +1257,7 @@ exports[`ActivityScreen renders activity screen 1`] = `
                       }
                     >
                       <View
-                        testID="MockSolitoLink"
+                        data-href="/profile/123"
                       >
                         <View
                           style={
@@ -1217,7 +1550,7 @@ exports[`ActivityScreen renders activity screen 1`] = `
                       }
                     >
                       <View
-                        testID="MockSolitoLink"
+                        data-href="/profile/123"
                       >
                         <View
                           style={
