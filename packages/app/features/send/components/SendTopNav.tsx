@@ -26,6 +26,8 @@ export function SendTopNav() {
     }
   }
 
+  const isOnSelectRecipient = !(path.includes('/confirm') || sendParams.recipient)
+
   return (
     <Header w="100%" $lg={{ pt: '$3' }}>
       <Container
@@ -35,17 +37,19 @@ export function SendTopNav() {
         safeAreaProps={{ edges: ['top'] }}
       >
         <XStack ai="center" $lg={{ f: 1 }} w="20%" $gtLg={{ display: 'none' }}>
-          <Button onPress={handleBack}>
-            <ButtonOg.Icon>
-              <IconArrowLeft
-                size={'$1.5'}
-                $theme-dark={{ color: '$primary' }}
-                $theme-light={{ color: '$color12' }}
-                color={'$color12'}
-              />
-            </ButtonOg.Icon>
-          </Button>
-          <Paragraph size={'$8'} col={'$color10'}>
+          {!isOnSelectRecipient && (
+            <Button onPress={handleBack}>
+              <ButtonOg.Icon>
+                <IconArrowLeft
+                  size={'$1.5'}
+                  $theme-dark={{ color: '$primary' }}
+                  $theme-light={{ color: '$color12' }}
+                  color={'$color12'}
+                />
+              </ButtonOg.Icon>
+            </Button>
+          )}
+          <Paragraph size={isOnSelectRecipient ? '$9' : '$8'} col={'$color10'}>
             {(() => {
               switch (true) {
                 case path.includes('/confirm'):
@@ -53,7 +57,7 @@ export function SendTopNav() {
                 case Boolean(sendParams.recipient):
                   return 'Enter Amount'
                 default:
-                  return 'Select Recipient'
+                  return 'Send'
               }
             })()}
           </Paragraph>
@@ -75,7 +79,7 @@ export function SendTopNav() {
                 case Boolean(sendParams.recipient):
                   return 'Enter Amount'
                 default:
-                  return 'Select Recipient'
+                  return 'Send'
               }
             })()}
           </H2>
