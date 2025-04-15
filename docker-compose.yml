@@ -22,9 +22,6 @@ services:
         - NEXT_PUBLIC_BASE_CHAIN_ID=${NEXT_PUBLIC_BASE_CHAIN_ID}
         - NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=${NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID}
         - NEXT_PUBLIC_TURNSTILE_SITE_KEY=${NEXT_PUBLIC_TURNSTILE_SITE_KEY}
-      secrets:
-        - SUPABASE_DB_URL
-        - SUPABASE_SERVICE_ROLE
     restart: always
     ports:
       - 3000:3000
@@ -35,18 +32,10 @@ services:
         required: false
       - path: .env.local.docker
         required: false
-    secrets:
-      - SUPABASE_DB_URL
-      - SUPABASE_SERVICE_ROLE
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     networks:
       - supabase_network_send
-secrets:
-  SUPABASE_DB_URL:
-    environment: SUPABASE_DB_URL
-  SUPABASE_SERVICE_ROLE:
-    environment: SUPABASE_SERVICE_ROLE
 
 networks:
   supabase_network_send:
