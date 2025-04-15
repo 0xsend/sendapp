@@ -1,40 +1,58 @@
+import { useIsomorphicLayoutEffect } from '@my/ui'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native'
 import type {
   ThemeProviderProps,
   useThemeSetting as next_useThemeSetting,
 } from '@tamagui/next-theme'
-import {
-  type ThemePreference,
-  setThemePreference,
-  useThemePreference,
-} from '@vonovak/react-native-theme-control'
 import { StatusBar } from 'expo-status-bar'
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import { AppState, type ColorSchemeName, useColorScheme } from 'react-native'
+import { Appearance, useColorScheme } from 'react-native'
 
-export const ThemeContext = createContext<
-  (ThemeProviderProps & { current: ThemeName | null }) | null
->(null)
+type ThemeContextValue = (ThemeProviderProps & { current?: string | null }) | null
+export const ThemeContext = createContext<ThemeContextValue>(null)
 
 type ThemeName = 'light' | 'dark' | 'system'
 
+// start early
+let persistedTheme: ThemeName | null = null
+export const loadThemePromise = AsyncStorage.getItem('@preferred_theme')
+loadThemePromise.then((val) => {
+  persistedTheme = val as ThemeName
+})
+
 export const UniversalThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const current = useThemePreference()
-  const systemTheme = useNonFlickeringColorScheme()
+  const [current, setCurrent] = useState<ThemeName | null>(null) // Start with null
+  const systemTheme = useColorScheme() || 'system'
+
+  useIsomorphicLayoutEffect(() => {
+    async function main() {
+      await loadThemePromise
+      setCurrent(persistedTheme ?? 'system') // Set theme after loading
+    }
+    main()
+  }, [])
+
+  useEffect(() => {
+    if (current) {
+      AsyncStorage.setItem('@preferred_theme', current)
+    }
+  }, [current])
 
   const themeContext = useMemo(() => {
-    const set = (val: string) => {
-      setThemePreference(val as ThemePreference)
-    }
-
     return {
-      set,
       themes: ['light', 'dark'],
-      onChangeTheme: set,
-      current,
-      systemTheme: systemTheme as string,
-    }
+      onChangeTheme: (next: string) => {
+        setCurrent(next as ThemeName)
+      },
+      current: current ?? 'system', // Default to 'system' if current is null
+      systemTheme,
+    } satisfies ThemeContextValue
   }, [current, systemTheme])
+
+  if (current === null) {
+    return null // Render nothing until theme is loaded
+  }
 
   return (
     <ThemeContext.Provider value={themeContext}>
@@ -45,6 +63,13 @@ export const UniversalThemeProvider = ({ children }: { children: React.ReactNode
 
 const InnerProvider = ({ children }: { children: React.ReactNode }) => {
   const { resolvedTheme } = useThemeSetting()
+
+  // ensure we set color scheme as soon as possible
+  if (resolvedTheme !== Appearance.getColorScheme()) {
+    if (resolvedTheme === 'light' || resolvedTheme === 'dark') {
+      Appearance.setColorScheme(resolvedTheme)
+    }
+  }
 
   return (
     <ThemeProvider value={resolvedTheme === 'dark' ? DarkTheme : DefaultTheme}>
@@ -61,14 +86,16 @@ export const useThemeSetting: typeof next_useThemeSetting = () => {
     throw new Error('useThemeSetting should be used within the context provider.')
   }
 
+  const resolvedTheme =
+    context.current === 'system' ? context.systemTheme : (context.current ?? 'system')
+
   const outputContext: ReturnType<typeof next_useThemeSetting> = {
     ...context,
     systemTheme: context.systemTheme as 'light' | 'dark',
-    // biome-ignore lint/style/noNonNullAssertion: context.themes should always defined
+    // biome-ignore lint/style/noNonNullAssertion: false positive
     themes: context.themes!,
     current: context.current ?? 'system',
-    resolvedTheme:
-      context.current === 'system' ? context.systemTheme : (context.current ?? 'system'),
+    resolvedTheme,
     set: (value) => {
       context.onChangeTheme?.(value)
     },
@@ -78,7 +105,7 @@ export const useThemeSetting: typeof next_useThemeSetting = () => {
         dark: 'system',
         system: 'light',
       }
-      context.onChangeTheme?.(map[context.current ?? 'system'])
+      context.onChangeTheme?.(map[(context.current as ThemeName) ?? 'system'])
     },
   }
 
@@ -88,27 +115,4 @@ export const useThemeSetting: typeof next_useThemeSetting = () => {
 export const useRootTheme = () => {
   const context = useThemeSetting()
   return [context.current === 'system' ? context.systemTheme : context.current, context.set]
-}
-
-// fix flash of wrong theme on iOS:
-// https://github.com/bluesky-social/social-app/pull/1417
-// wait on merge from react-native to remove:
-// https://github.com/facebook/react-native/pull/39439
-function useNonFlickeringColorScheme() {
-  const colorSchemeFromRN = useColorScheme()
-  const [nonFlickerScheme, setNonFlickerScheme] = useState<ColorSchemeName>(colorSchemeFromRN)
-
-  useEffect(() => {
-    const subscription = AppState.addEventListener('change', (state) => {
-      const isActive = state === 'active'
-      if (!isActive) return
-      setNonFlickerScheme(colorSchemeFromRN)
-    })
-
-    return () => {
-      subscription.remove()
-    }
-  }, [colorSchemeFromRN])
-
-  return nonFlickerScheme || 'system'
 }

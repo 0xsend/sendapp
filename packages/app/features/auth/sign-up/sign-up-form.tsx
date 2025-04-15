@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Turnstile } from '@marsidev/react-turnstile'
+import { Turnstile } from './Turnstile'
 import {
   BigHeading,
   ButtonText,
@@ -177,14 +177,7 @@ export const SignUpForm = () => {
           </XStack>
         </YStack>
         <YStack pt="$4">
-          {!!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
-            <Turnstile
-              siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
-              onSuccess={(token) => {
-                setCaptchaToken(token)
-              }}
-            />
-          )}
+          <Turnstile onSuccess={(t) => setCaptchaToken(t)} />
         </YStack>
       </YStack>
     ),

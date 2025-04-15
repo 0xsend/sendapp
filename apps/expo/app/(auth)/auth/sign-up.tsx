@@ -1,3 +1,4 @@
+import { SignUpScreen } from 'app/features/auth/sign-up/screen'
 import { Stack } from 'expo-router'
 
 export default function Screen() {
@@ -5,9 +6,11 @@ export default function Screen() {
     <>
       <Stack.Screen
         options={{
-          title: 'User',
+          headerShown: false,
+          title: 'Sign Up',
         }}
       />
+      <SignUpScreen />
     </>
   )
 }

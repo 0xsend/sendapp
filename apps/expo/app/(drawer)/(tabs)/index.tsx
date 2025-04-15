@@ -1,13 +1,13 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { Stack, useRouter } from 'expo-router'
+import { Paragraph, YStack } from '@my/ui'
+import { useQueryClient } from '@tanstack/react-query'
+import { AuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
 import { HomeScreen } from 'app/features/home/screen'
 import { SplashScreen } from 'app/features/splash/screen'
-import { useUser } from 'app/utils/useUser'
-import { AuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
-import { useQueryClient } from '@tanstack/react-query'
-import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
-import { YStack } from '@my/ui'
 import type { GetPlaiceholderImage } from 'app/utils/getPlaiceholderImage'
+import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
+import { useUser } from 'app/utils/useUser'
+import { Stack } from 'expo-router'
+import { useCallback, useEffect, useState } from 'react'
 
 // Hardcoded carousel images for mobile - using type assertion to avoid complexities with GetPlaiceholderImage type
 const mobileCarouselImages = [
@@ -93,7 +93,10 @@ export default function Screen() {
             setCarouselProgress,
           }}
         >
-          <SplashScreen />
+          <YStack flex={1} jc="center" ai="center" f={1} height={'100%'} w={'100%'} bc="$red9Light">
+            <Paragraph>hello too asdfa sdfasfasdsda</Paragraph>
+          </YStack>
+          {/* <SplashScreen /> */}
         </AuthCarouselContext.Provider>
       )}
     </>

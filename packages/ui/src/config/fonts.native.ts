@@ -74,3 +74,5 @@ export const bodyFont = createFont({
     Object.entries(headingSize).map(([k, v]) => [k, getVariableValue(v) + 5])
   ),
 })
+
+export const monoFont = bodyFont
