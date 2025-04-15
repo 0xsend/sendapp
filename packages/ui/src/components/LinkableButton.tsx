@@ -39,7 +39,6 @@ const LinkableButtonFrame = styled(Button, {
         borderColor: 'transparent',
 
         focusVisibleStyle: {
-          outlineColor: '$outlineColor',
           outlineStyle: 'solid',
           outlineWidth: 2,
         },
