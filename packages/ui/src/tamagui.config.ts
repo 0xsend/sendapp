@@ -1,14 +1,16 @@
+import { defaultConfig } from '@tamagui/config/v4'
 import { shorthands } from '@tamagui/shorthands'
-import { createTokens } from '@tamagui/web'
-import { createTamagui } from 'tamagui'
+import { createTokens, createTamagui, setupDev } from 'tamagui'
+
 import { animations } from './config/animations'
 import { bodyFont, headingFont, monoFont } from './config/fonts'
 import { media, mediaQueryDefaultActive } from './config/media'
+import { themes as themesGen } from './themes/theme-generated'
+import { color } from './themes/token-colors'
 import { radius } from './themes/token-radius'
 import { size } from './themes/token-size'
 import { space } from './themes/token-space'
 import { zIndex } from './themes/token-z-index'
-import { setupDev } from '@tamagui/core'
 
 setupDev({
   // can just be true as well for defaulting to key: Alt + delay: 800
@@ -17,11 +19,17 @@ setupDev({
     delay: 800,
   },
 })
+/**
+ * This avoids shipping themes as JS. Instead, Tamagui will hydrate them from CSS.
+ */
 
-import * as themes from './themes/theme-generated'
-import { color } from './themes/token-colors'
+const themes =
+  process.env.TAMAGUI_TARGET !== 'web' || process.env.TAMAGUI_IS_SERVER || process.env.STORYBOOK
+    ? themesGen
+    : ({} as typeof themesGen)
 
-const conf = {
+export const config = createTamagui({
+  ...defaultConfig,
   themes,
   defaultFont: 'body',
   animations,
@@ -41,10 +49,14 @@ const conf = {
     size,
   }),
   media,
-} satisfies Parameters<typeof createTamagui>['0']
-
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore - passing this directly breaks TS types
-conf.mediaQueryDefaultActive = mediaQueryDefaultActive
-
-export const config = createTamagui(conf)
+  mediaQueryDefaultActive,
+  selectionStyles: (theme) => ({
+    backgroundColor: theme.color5,
+    color: theme.color11,
+  }),
+  settings: {
+    allowedStyleValues: 'somewhat-strict',
+    autocompleteSpecificTokens: 'except-special',
+    fastSchemeChange: true,
+  },
+})
