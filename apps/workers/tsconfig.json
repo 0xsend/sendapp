@@ -35,5 +35,6 @@
     "../../packages/app",
     "../../globals.d.ts",
     "../../environment.d.ts"
-  ]
+  ],
+  "exclude": ["../../packages/app/**/*.test.tsx", "../../packages/app/**/*.test.ts"]
 }

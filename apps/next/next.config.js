@@ -139,6 +139,8 @@ export default () => {
       'expo-device',
       'expo-image-picker',
       'expo-crypto',
+      '@ts-react/form',
+      'react-hook-form',
     ],
     experimental: {
       scrollRestoration: true,

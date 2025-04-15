@@ -39,12 +39,12 @@
     "clean": "yarn workspaces foreach --all -pi run clean"
   },
   "resolutions": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-refresh": "^0.14.0",
-    "react-native-svg": "15.2.0",
+    "react-native-svg": "15.10.1",
     "react-native-web": "~0.19.10",
-    "@babel/core": "^7.24.0",
+    "@babel/core": "^7.24",
     "babel-loader": "^8.3.0",
     "istanbul-lib-coverage@npm:^3.2.0": "patch:istanbul-lib-coverage@npm%3A3.2.2#~/.yarn/patches/istanbul-lib-coverage-npm-3.2.2-5c0526e059.patch",
     "istanbul-lib-coverage@npm:^3.0.0": "patch:istanbul-lib-coverage@npm%3A3.2.2#~/.yarn/patches/istanbul-lib-coverage-npm-3.2.2-5c0526e059.patch",
