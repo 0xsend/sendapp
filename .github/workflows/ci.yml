@@ -12,6 +12,92 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  build_next_image:
+    name: Build Next.js Docker Image
+    runs-on: arc-runner-set
+    permissions:
+      contents: read
+      packages: write # Required to push to GHCR
+      id-token: write # Required for OIDC login to some registries, if needed
+    outputs:
+      tags: ${{ steps.meta.outputs.tags }} # Output tags from metadata action
+      labels: ${{ steps.meta.outputs.labels }} # Output labels from metadata action
+    env:
+      # Define build args here, potentially pulling from secrets
+      # Example: NEXT_PUBLIC_SUPABASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SUPABASE_PROJECT_ID }}
+      # Ensure all required args from docker-compose.yml are defined
+      CI: true # Example build arg
+      NEXT_PUBLIC_SUPABASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SUPABASE_PROJECT_ID }}
+      NEXT_PUBLIC_URL: ${{ secrets.NEXT_PUBLIC_URL }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_GRAPHQL_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_GRAPHQL_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      NEXT_PUBLIC_MAINNET_RPC_URL: ${{ secrets.NEXT_PUBLIC_MAINNET_RPC_URL }}
+      NEXT_PUBLIC_BASE_RPC_URL: ${{ secrets.NEXT_PUBLIC_BASE_RPC_URL }}
+      NEXT_PUBLIC_BUNDLER_RPC_URL: ${{ secrets.NEXT_PUBLIC_BUNDLER_RPC_URL }}
+      NEXT_PUBLIC_MAINNET_CHAIN_ID: ${{ secrets.NEXT_PUBLIC_MAINNET_CHAIN_ID }}
+      NEXT_PUBLIC_BASE_CHAIN_ID: ${{ secrets.NEXT_PUBLIC_BASE_CHAIN_ID }}
+      NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID }}
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}/next-app
+          tags: |
+            type=sha,prefix= # Git SHA tag (e.g., sha-abcdef1)
+            type=ref,event=branch # Branch name tag (e.g., main, dev)
+            type=ref,event=pr # PR number tag (e.g., pr-123)
+            type=ref,event=tag # Git tag (e.g., v1.0.0)
+            # Add other tag types if needed
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        id: buildx # Give the step an ID if needed elsewhere, otherwise optional
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Docker image
+        id: build-push # Give the step an ID
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./apps/next/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: | # Pass build args newline-separated
+            CI=${{ env.CI }}
+            NEXT_PUBLIC_SUPABASE_PROJECT_ID=${{ env.NEXT_PUBLIC_SUPABASE_PROJECT_ID }}
+            NEXT_PUBLIC_URL=${{ env.NEXT_PUBLIC_URL }}
+            NEXT_PUBLIC_SUPABASE_URL=${{ env.NEXT_PUBLIC_SUPABASE_URL }}
+            NEXT_PUBLIC_SUPABASE_GRAPHQL_URL=${{ env.NEXT_PUBLIC_SUPABASE_GRAPHQL_URL }}
+            NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ env.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+            NEXT_PUBLIC_MAINNET_RPC_URL=${{ env.NEXT_PUBLIC_MAINNET_RPC_URL }}
+            NEXT_PUBLIC_BASE_RPC_URL=${{ env.NEXT_PUBLIC_BASE_RPC_URL }}
+            NEXT_PUBLIC_BUNDLER_RPC_URL=${{ env.NEXT_PUBLIC_BUNDLER_RPC_URL }}
+            NEXT_PUBLIC_MAINNET_CHAIN_ID=${{ env.NEXT_PUBLIC_MAINNET_CHAIN_ID }}
+            NEXT_PUBLIC_BASE_CHAIN_ID=${{ env.NEXT_PUBLIC_BASE_CHAIN_ID }}
+            NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=${{ env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID }}
+            NEXT_PUBLIC_TURNSTILE_SITE_KEY=${{ env.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
   unit-tests:
     name: Unit Tests
     runs-on: arc-runner-set
@@ -107,6 +193,7 @@ jobs:
 
   playwright-tests:
     name: Playwright Tests (Shard ${{ matrix.shard }}/4)
+    needs: build_next_image # Ensure image is built first
     # if: ${{ github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' || github.head_ref == 'dev' || github.head_ref == 'main' }}
     runs-on: arc-runner-set
     strategy:
@@ -117,6 +204,7 @@ jobs:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
       YARN_ENABLE_HARDENED_MODE: 0
+      NEXT_APP_IMAGE_TAG: ${{ needs.build_next_image.outputs.tags }}
 
     # for writing PR comments
     permissions:
@@ -138,21 +226,17 @@ jobs:
           submodules: recursive
       - name: Setup Environment
         uses: ./.github/actions/setup-env
-        with:
-          # will do it in the Build Next.js step
-          yarn-install: false
+        # yarn-install is now handled below
         env:
           YARN_ENABLE_HARDENED_MODE: 0
+      - name: Yarn Install
+        shell: bash
+        run: yarn install --immutable
       # @todo anvil fixtures cause dirty repo, but only in github actions 😢
       # - name: All Changes Committed
       #   shell: bash
       #   run: git diff --exit-code
-      # this is on purpose so we get github annotations
-      - name: Build Next.js
-        shell: bash
-        run: |
-          tilt ci yarn:install # install and setup env
-          yarn web:docker:build # build nextjs docker image
+      # Build step removed - image is pre-built
       - name: Install Playwright Dependencies
         run: yarn playwright playwright install --with-deps
       - name: Playwright Tests
