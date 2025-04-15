@@ -17,12 +17,12 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
   <View
     style={
       {
+        "aspectRatio": 1,
         "borderBottomLeftRadius": 16,
         "borderBottomRightRadius": 16,
         "borderTopLeftRadius": 16,
         "borderTopRightRadius": 16,
         "flexDirection": "column",
-        "height": "75%",
         "position": "relative",
         "width": "100%",
       }
