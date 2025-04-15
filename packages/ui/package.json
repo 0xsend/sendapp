@@ -16,7 +16,7 @@
     "build": "tamagui-build --skip-types",
     "watch": "tamagui-build --skip-types --watch",
     "lint": "tsc --noEmit",
-    "clean": "rm -rf dist && rm -rf types",
+    "clean": "rm -rf dist",
     "generate-theme": "tamagui generate-themes ./src/themes/theme.ts ./src/themes/theme-generated.ts"
   },
   "dependencies": {

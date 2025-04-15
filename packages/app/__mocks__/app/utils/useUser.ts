@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals'
 const mock = {
   useUser: jest.fn().mockReturnValue({
     profile: {

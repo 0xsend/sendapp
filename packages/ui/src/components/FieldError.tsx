@@ -12,6 +12,7 @@ export const FieldError = ({ message }: FieldErrorProps) => {
     <AnimatePresence>
       {!!message && (
         <Paragraph
+          // biome-ignore lint/a11y/useSemanticElements: intentional
           role="status"
           key="error"
           animation="200ms"

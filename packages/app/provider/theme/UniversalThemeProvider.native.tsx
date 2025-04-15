@@ -67,7 +67,8 @@ export const useThemeSetting: typeof next_useThemeSetting = () => {
     // biome-ignore lint/style/noNonNullAssertion: context.themes should always defined
     themes: context.themes!,
     current: context.current ?? 'system',
-    resolvedTheme: context.current === 'system' ? context.systemTheme : context.current ?? 'system',
+    resolvedTheme:
+      context.current === 'system' ? context.systemTheme : (context.current ?? 'system'),
     set: (value) => {
       context.onChangeTheme?.(value)
     },

@@ -11,12 +11,21 @@ export type CredentialCreationOptionsSerialized = {
   publicKey: PublicKeyCredentialCreationOptionsSerialized
 }
 export interface AuthenticatorAttestationResponseSerialized
-  extends Omit<AuthenticatorAttestationResponse, 'clientDataJSON' | 'attestationObject'> {
+  extends Omit<
+    AuthenticatorAttestationResponse,
+    | 'clientDataJSON'
+    | 'attestationObject'
+    | 'getClientExtensionResults'
+    | 'getAuthenticatorData'
+    | 'getPublicKey'
+    | 'getPublicKeyAlgorithm'
+    | 'getTransports'
+  > {
   clientDataJSON: string
   attestationObject: string
 }
 export interface PublicKeyCredentialAttestationSerialized
-  extends Omit<PublicKeyCredential, 'response' | 'rawId'> {
+  extends Omit<PublicKeyCredential, 'response' | 'rawId' | 'toJSON' | 'getClientExtensionResults'> {
   response: AuthenticatorAttestationResponseSerialized
   rawId: string
 }

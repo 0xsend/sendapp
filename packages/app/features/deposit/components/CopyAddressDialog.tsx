@@ -11,7 +11,7 @@ export function CopyAddressDialog({ isOpen, onClose, onConfirm }) {
           br={'$5'}
           p={'$5'}
           gap={'$3.5'}
-          maxWidth={'400px'}
+          maxWidth={400}
           $gtLg={{ p: '$7', gap: '$5' }}
         >
           <Paragraph size={'$8'} fontWeight={500}>

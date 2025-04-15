@@ -31,8 +31,8 @@ li,
 select,
 input,
 button,
-[role='slider'],
-[role='listbox'] {
+[role="slider"],
+[role="listbox"] {
   outline: none;
 }
 

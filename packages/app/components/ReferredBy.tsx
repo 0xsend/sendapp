@@ -104,7 +104,7 @@ export function ReferredBy() {
             case !!referrer:
               return (
                 <Fade>
-                  <Check color="$primary" size="1" $theme-light={{ color: '$color12' }} />
+                  <Check color="$primary" size="$1" $theme-light={{ color: '$color12' }} />
                 </Fade>
               )
             case !!referralCodeFromCookie && !!referralCode:

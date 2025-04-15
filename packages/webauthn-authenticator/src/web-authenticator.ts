@@ -214,7 +214,7 @@ export class Authenticator {
     )
     const clientDataHash = Buffer.from(await crypto.subtle.digest('SHA-256', clientDataJSON))
     const rpId = credOptsPubKey.rp.id || 'localhost'
-    const userHandle = base64urlnopad.decode(credOptsPubKey.user.id) || null
+    const userHandle = new Uint8Array(base64urlnopad.decode(credOptsPubKey.user.id)).buffer || null
     const cred = this.createWebauthnCredential({
       rpId,
       userHandle,
@@ -227,8 +227,8 @@ export class Authenticator {
 
     // save response to cred for inspection
     const response = {
-      attestationObject,
-      clientDataJSON,
+      attestationObject: new Uint8Array(attestationObject).buffer,
+      clientDataJSON: new Uint8Array(clientDataJSON).buffer,
     }
     cred.attestations.push(response)
 
@@ -284,9 +284,9 @@ export class Authenticator {
     cred.signCounter++ // increment counter on each "access" to the authenticator
     const assertionObject = generateAssertionObject(authData, clientDataHash, privateKey)
     const response: AuthenticatorAssertionResponse = {
-      authenticatorData: authData,
-      clientDataJSON: clientDataBuffer,
-      signature: assertionObject,
+      authenticatorData: new Uint8Array(authData).buffer,
+      clientDataJSON: new Uint8Array(clientDataBuffer).buffer,
+      signature: new Uint8Array(assertionObject).buffer,
       userHandle: cred.userHandle,
     }
 

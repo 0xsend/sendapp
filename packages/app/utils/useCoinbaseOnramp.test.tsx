@@ -1,3 +1,4 @@
+import { jest, describe, beforeEach, afterEach, it, expect } from '@jest/globals'
 import { useCoinbaseOnramp } from './useCoinbaseOnramp'
 import { act, renderHook, waitFor } from '@testing-library/react-native'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -28,6 +29,7 @@ describe('useCoinbaseOnramp', () => {
   const popupMock = {
     closed: false,
     close: jest.fn(function () {
+      // @ts-expect-error - testing
       this.closed = true
     }),
   }
@@ -36,6 +38,7 @@ describe('useCoinbaseOnramp', () => {
     jest.clearAllMocks()
     jest.useFakeTimers()
     mockGetOnrampBuyUrl.mockImplementation(() => mockUrl)
+    // @ts-expect-error - testing
     window.open = jest.fn().mockReturnValue(popupMock)
     window.addEventListener = jest.fn()
     window.removeEventListener = jest.fn()
@@ -101,11 +104,13 @@ describe('useCoinbaseOnramp', () => {
     // Simulate success message
     await act(async () => {
       // Get the event listener callback
+      // @ts-expect-error - testing
       const eventListenerCallback = (window.addEventListener as jest.Mock).mock.calls.find(
         (call) => call[0] === 'message'
       )[1]
 
       // Call the event listener with a success message
+      // @ts-expect-error - testing
       eventListenerCallback({
         origin: mockOrigin,
         data: JSON.stringify({ data: { eventName: 'success' } }),
@@ -147,11 +152,13 @@ describe('useCoinbaseOnramp', () => {
     })
 
     // Simulate payment submitted event
+    // @ts-expect-error - testing
     const eventListenerCallback = (window.addEventListener as jest.Mock).mock.calls.find(
       (call) => call[0] === 'message'
     )[1]
 
     act(() => {
+      // @ts-expect-error - testing
       eventListenerCallback({
         origin: mockOrigin,
         data: JSON.stringify({ data: { pageRoute: '/v2/guest/onramp/order-submitted' } }),

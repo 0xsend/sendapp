@@ -1,3 +1,4 @@
+import { describe, it, jest, expect } from '@jest/globals'
 import { Wrapper } from 'app/utils/__mocks__/Wrapper'
 import { AccountScreen } from './screen'
 import { render, screen, act } from '@testing-library/react-native'

@@ -1,5 +1,5 @@
 // packages/app/utils/useSearchResultHref.test.tsx
-import '@jest/globals'
+import { describe, it, expect, jest } from '@jest/globals'
 import { useProfileHref } from './useProfileHref'
 import type { SearchResultCommonType } from 'app/components/SearchBar'
 import { baseMainnet } from '@my/wagmi'

@@ -1,6 +1,7 @@
+import { describe, expect, it, jest } from '@jest/globals'
+import { act, render, screen } from '@testing-library/react-native'
 import { Wrapper } from 'app/utils/__mocks__/Wrapper'
 import { ActivityRewardsScreen } from './screen'
-import { act, render, screen } from '@testing-library/react-native'
 
 jest.mock('app/utils/distributions', () => ({
   useMonthlyDistributions: () => ({
@@ -78,15 +79,18 @@ jest.mock('wagmi')
 
 jest.mock('@my/wagmi', () => ({
   __esModule: true,
-  ...jest.requireActual('@my/wagmi'),
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  ...(jest.requireActual('@my/wagmi') as any),
   baseMainnetClient: {
     chain: {
       id: 845337,
     },
+    // @ts-expect-error - mock
     simulateContract: jest.fn().mockResolvedValue({}),
   },
   baseMainnetBundlerClient: {
     sendUserOperation: jest.fn(),
+    // @ts-expect-error - mock
     waitForUserOperationReceipt: jest.fn().mockResolvedValue({ success: true }),
   },
   useReadSendTokenBalanceOf: jest.fn().mockReturnValue({

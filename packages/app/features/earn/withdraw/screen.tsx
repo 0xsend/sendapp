@@ -267,6 +267,59 @@ export function WithdrawForm() {
     depositBalance,
   })
 
+  const renderAfterContent = useCallback(
+    ({ submit }: { submit: () => void }) => (
+      <YStack>
+        {mutation.isPending ? (
+          <Fade key="userop-state">
+            <Paragraph color={'$color10'} ta="center" size="$3">
+              {useropState}
+            </Paragraph>
+          </Fade>
+        ) : null}
+        {[calls.error, sendAccount.error, uop.error, mutation.error].filter(Boolean).map((e) =>
+          e ? (
+            <Fade key="error-state">
+              <XStack alignItems="center" jc="center" gap={'$2'} key={e.message} role="alert">
+                <Paragraph color="$error">{toNiceError(e)}</Paragraph>
+              </XStack>
+            </Fade>
+          ) : null
+        )}
+        <SubmitButton
+          theme="green"
+          onPress={() => submit()}
+          py={'$5'}
+          br={'$4'}
+          disabledStyle={{ opacity: 0.5 }}
+          disabled={!canSubmit}
+          iconAfter={mutation.isPending ? <Spinner size="small" /> : undefined}
+        >
+          {[calls.isLoading, sendAccount.isLoading, uop.isLoading].some((p) => p) &&
+          !mutation.isPending ? (
+            <Spinner size="small" />
+          ) : (
+            <Button.Text size={'$5'} fontWeight={'500'} fontFamily={'$mono'} color={'$black'}>
+              CONFIRM WITHDRAW
+            </Button.Text>
+          )}
+        </SubmitButton>
+      </YStack>
+    ),
+    [
+      mutation.isPending,
+      useropState,
+      calls.error,
+      sendAccount.error,
+      uop.error,
+      mutation.error,
+      canSubmit,
+      calls.isLoading,
+      sendAccount.isLoading,
+      uop.isLoading,
+    ]
+  )
+
   if (!coin.isLoading && !coin.data) {
     router.push('/earn')
     return null
@@ -348,52 +401,7 @@ export function WithdrawForm() {
                 ? localizeAmount(formatUnits(BigInt(params.amount), coin.data?.decimals))
                 : undefined,
           }}
-          renderAfter={({ submit }) => (
-            <YStack>
-              {mutation.isPending ? (
-                <Fade key="userop-state">
-                  <Paragraph color={'$color10'} ta="center" size="$3">
-                    {useropState}
-                  </Paragraph>
-                </Fade>
-              ) : null}
-              {[calls.error, sendAccount.error, uop.error, mutation.error]
-                .filter(Boolean)
-                .map((e) =>
-                  e ? (
-                    <Fade key="error-state">
-                      <XStack
-                        alignItems="center"
-                        jc="center"
-                        gap={'$2'}
-                        key={e.message}
-                        role="alert"
-                      >
-                        <Paragraph color="$error">{toNiceError(e)}</Paragraph>
-                      </XStack>
-                    </Fade>
-                  ) : null
-                )}
-              <SubmitButton
-                theme="green"
-                onPress={() => submit()}
-                py={'$5'}
-                br={'$4'}
-                disabledStyle={{ opacity: 0.5 }}
-                disabled={!canSubmit}
-                iconAfter={mutation.isPending ? <Spinner size="small" /> : undefined}
-              >
-                {[calls.isLoading, sendAccount.isLoading, uop.isLoading].some((p) => p) &&
-                !mutation.isPending ? (
-                  <Spinner size="small" />
-                ) : (
-                  <Button.Text size={'$5'} fontWeight={'500'} fontFamily={'$mono'} color={'$black'}>
-                    CONFIRM WITHDRAW
-                  </Button.Text>
-                )}
-              </SubmitButton>
-            </YStack>
-          )}
+          renderAfter={renderAfterContent}
         >
           {({ amount }) => (
             <YStack gap={'$5'}>

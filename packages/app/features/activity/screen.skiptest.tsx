@@ -1,4 +1,4 @@
-import { expect } from '@jest/globals'
+import { expect, describe, beforeEach, afterEach, it, jest } from '@jest/globals'
 import { TamaguiProvider, View as MockView, config } from '@my/ui'
 import { act, render, screen, fireEvent, waitFor } from '@testing-library/react-native'
 import { ActivityScreen } from './screen'
@@ -60,7 +60,7 @@ describe('ActivityScreen', () => {
     })
   })
 
-  afterEach(() => jest.useRealTimers())
+  afterEach(async () => jest.useRealTimers())
 
   it('renders activity screen', async () => {
     ;(useSupabase as jest.Mock).mockReturnValue({

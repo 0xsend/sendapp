@@ -34,24 +34,25 @@ import { assert } from 'app/utils/assert'
 export function SplashScreen() {
   return (
     <XStack
-      h={isWeb ? '100svh' : '100%'}
+      h={'100%'}
       justifyContent={'space-between'}
       mx={'auto'}
-      maxWidth={'1600px'}
+      maxWidth={1600}
       w={'100%'}
+      style={{ height: '100svh' }}
     >
       {/* Top section with carousel */}
 
       <YStack
         flex={1}
-        p={'$size.6'}
+        p={'$6'}
         justifyContent="space-between"
         display="none"
         $gtMd={{ display: 'flex' }}
         flexShrink={0}
       >
         <IconSendLogo size="$4" color="$white" $gtMd={{ color: '$color12' }} />
-        <YStack gap={'$size.0.9'}>
+        <YStack gap={'$0.9'}>
           <H1 textTransform={'uppercase'} $gtLg={{ size: '$14' }} size={'$12'} fontWeight={'900'}>
             Welcome
           </H1>
@@ -129,30 +130,28 @@ function Hero() {
 
   return (
     <XStack
-      h={containerHeight}
-      $gtMd={{ p: '$size.1.5', maxWidth: '720px' }}
+      h={'100%'}
+      $gtMd={{ p: '$1.5', maxWidth: 720 }}
       w="100%"
       position="relative"
       f={1}
+      style={{
+        height: containerHeight,
+      }}
     >
       <YStack
         f={1}
-        h={isPwa ? '100vh' : 'unset'}
         pt={Math.max(top, 24)}
         pb={Math.max(bottom, 16)}
         overflow="hidden"
         $gtMd={{ borderRadius: '$8' }}
         w="100%"
+        style={{
+          height: '100vh',
+        }}
       >
         {carouselImage && (
-          <Stack
-            pos="absolute"
-            top={0}
-            left={0}
-            right={0}
-            bottom={0}
-            height={isWeb ? '100dvh' : '100%'}
-          >
+          <Stack pos="absolute" top={0} left={0} right={0} bottom={0} style={{ height: '100dvh' }}>
             <Stack
               bc="$color1"
               pos="absolute"
@@ -160,7 +159,7 @@ function Hero() {
               left={0}
               right={0}
               bottom={0}
-              height={isWeb ? '100dvh' : '100%'}
+              style={{ height: '100dvh' }}
             />
             <AnimationLayout
               currentKey={carouselImage.base64 || 'none'}
@@ -173,7 +172,7 @@ function Hero() {
                 left={0}
                 right={0}
                 bottom={0}
-                height={isWeb ? '100dvh' : '100%'}
+                style={{ height: '100dvh' }}
               >
                 <SolitoImage
                   placeholder="blur"
@@ -190,7 +189,9 @@ function Hero() {
                   h="100%"
                   locations={media.gtMd ? [0.3, 1] : [0, 0.5, 1]}
                   colors={
-                    media.gtMd ? ['transparent', '$black'] : ['$black', 'transparent', '$black']
+                    media.gtMd
+                      ? ['rgba(0,0,0,0)', 'rgba(0,0,0,1)']
+                      : ['rgba(0,0,0,1)', 'rgba(0,0,0,0)', 'rgba(0,0,0,1)']
                   }
                 />
               </Stack>
@@ -203,14 +204,14 @@ function Hero() {
           display="flex"
           fd="column"
           jc="flex-end"
-          p="$size.3.5"
+          p="$3.5"
           pb={0}
           maw={738}
           mx="auto"
           w="100%"
         >
           <YStack w="100%">
-            <YStack jc="flex-end" f={1} gap="$2" pb="$size.7" $gtMd={{ pb: '$size.0.9' }}>
+            <YStack jc="flex-end" f={1} gap="$2" pb="$7" $gtMd={{ pb: '$0.9' }}>
               <Carousel currentKey={carouselProgress.toString()} fullscreen={false} />
             </YStack>
             {/* <XStack gap="$4" ai="center" jc="center">
@@ -232,13 +233,13 @@ function Hero() {
             jc="space-between"
             $gtMd={{ display: 'none' }}
             ai="flex-start"
-            pt="$size.4"
-            pb="$size.0.5"
+            pt="$4"
+            pb="$0.5"
             f={1}
             l={0}
             w="100%"
           >
-            <IconSendLogo size="$size.2" color="$white" ml={'$size.3.5'} />
+            <IconSendLogo size="$2" color="$white" ml={'$3.5'} />
             <AuthButtons />
           </YStack>
         </YStack>
@@ -322,9 +323,9 @@ function AuthButtons() {
 
   return (
     <XStack
-      gap={'$size.0.9'}
+      gap={'$0.9'}
       pos={'relative'}
-      pb={'$size.2'}
+      pb={'$2'}
       jc="center"
       $gtMd={{ jc: 'flex-start' }}
       w="100%"

@@ -41,7 +41,6 @@ body {
   scrollbar-color: var(--color1) transparent;
 }
 
-
 .hide-scroll {
   -ms-overflow-style: none;
   scrollbar-width: none;

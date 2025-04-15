@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Button, FadeCard, Paragraph, SubmitButton, XStack, YStack } from '@my/ui'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -52,6 +52,25 @@ export function DepositCoinbaseForm({ onConfirmTransaction, isLoading }: Deposit
       subscription.unsubscribe()
     }
   }, [form.watch, depositParams, setDepositParams])
+
+  const renderAfterContent = useCallback(
+    ({ submit }: { submit: () => void }) => (
+      <SubmitButton
+        testID="onramp-button"
+        theme="green"
+        onPress={submit}
+        py={'$5'}
+        br={'$4'}
+        disabledStyle={{ opacity: 0.5 }}
+        disabled={!canSubmit}
+      >
+        <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
+          {isLoading ? 'processing...' : 'confirm deposit'}
+        </Button.Text>
+      </SubmitButton>
+    ),
+    [canSubmit, isLoading]
+  )
 
   return (
     <YStack w={'100%'} gap="$5" py={'$3.5'}>
@@ -127,31 +146,11 @@ export function DepositCoinbaseForm({ onConfirmTransaction, isLoading }: Deposit
               ? localizeAmount(formatUnits(BigInt(depositParams.depositAmount), 2))
               : undefined,
           }}
-          renderAfter={({ submit }) => (
-            <SubmitButton
-              testID="onramp-button"
-              theme="green"
-              onPress={submit}
-              py={'$5'}
-              br={'$4'}
-              disabledStyle={{ opacity: 0.5 }}
-              disabled={!canSubmit}
-            >
-              <Button.Text
-                ff={'$mono'}
-                fontWeight={'500'}
-                tt="uppercase"
-                size={'$5'}
-                color={'$black'}
-              >
-                {isLoading ? 'processing...' : 'confirm deposit'}
-              </Button.Text>
-            </SubmitButton>
-          )}
+          renderAfter={renderAfterContent}
         >
           {({ depositAmount }) => (
             <FadeCard
-              bw={'1px'}
+              bw={1}
               borderColor={formDepositAmount && invalidDepositAmount ? '$error' : 'transparent'}
             >
               <XStack position="relative" jc="space-between" ai="center" gap={'$2'}>

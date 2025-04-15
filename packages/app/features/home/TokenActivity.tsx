@@ -29,7 +29,7 @@ export const TokenActivity = ({ coin }: { coin: CoinWithBalance }) => {
   if (isLoading) return <Spinner size="small" />
   if (error !== null) {
     return (
-      <Paragraph maxWidth={'600'} fontFamily={'$mono'} fontSize={'$5'} color={'$color12'}>
+      <Paragraph maxWidth={600} fontFamily={'$mono'} fontSize={'$5'} color={'$color12'}>
         {toNiceError(error)}
       </Paragraph>
     )

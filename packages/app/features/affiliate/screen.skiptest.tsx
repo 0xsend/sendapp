@@ -1,4 +1,4 @@
-import { expect, test } from '@jest/globals'
+import { expect, test, jest } from '@jest/globals'
 import { TamaguiProvider, config } from '@my/ui'
 import { render, act, screen } from '@testing-library/react-native'
 import { AffiliateScreen } from './screen'

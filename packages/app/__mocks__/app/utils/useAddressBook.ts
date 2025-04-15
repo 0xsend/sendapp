@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals'
 const mockUseAddressBook = {
   data: {
     '0x1234567890123456789012345678901234567890': `0x${'1234'.repeat(40)}`,

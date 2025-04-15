@@ -184,7 +184,7 @@ export const DrawingHistory = () => {
                 Winner: (Pending)
               </Paragraph>
             ) : item.result === 'won' ? (
-              <Paragraph fos="$4" color="$green10" ta="right">
+              <Paragraph fos="$4" color="$green10Dark" ta="right">
                 Winner: You Won!
               </Paragraph>
             ) : (

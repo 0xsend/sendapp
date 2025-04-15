@@ -1,4 +1,4 @@
-import { createTRPCReact } from '@trpc/react-query'
+import { type CreateTRPCReact, createTRPCReact } from '@trpc/react-query'
 
 import type { AppRouter } from '@my/api'
 import { httpBatchLink } from '@trpc/client'
@@ -6,7 +6,7 @@ import SuperJSON from 'superjson'
 import { getBaseUrl } from './getBaseUrl'
 import { supabase } from './supabase/client.native'
 
-export const api = createTRPCReact<AppRouter>()
+export const api: CreateTRPCReact<AppRouter, unknown> = createTRPCReact<AppRouter>()
 export const createTrpcClient = () =>
   api.createClient({
     links: [
@@ -30,4 +30,4 @@ export const createTrpcClient = () =>
     ],
   })
 
-export { type RouterInputs, type RouterOutputs } from '@my/api'
+export type { RouterInputs, RouterOutputs } from '@my/api'

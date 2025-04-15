@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals'
 import { SendAccountTransfersEventSchema } from 'app/utils/zod/activity'
 import { mockUsdcTransfers } from './mock-usdc-transfers'
 

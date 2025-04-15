@@ -5,6 +5,7 @@
     "playwright.config.ts",
     "../snaplet/src",
     "../app",
+    "../ui/src",
     "../wagmi",
     "../contracts/out",
     "../webauthn-authenticator",
@@ -12,6 +13,7 @@
     "../temporal/src",
     "../workflows/src"
   ],
+  "exclude": ["../wagmi/wagmi.config.ts"],
   "compilerOptions": {
     "noEmit": true,
     "composite": true,
@@ -20,6 +22,7 @@
     "baseUrl": ".",
     "paths": {
       "app/*": ["../app/*"],
+      "@my/ui": ["../ui/src"],
       "@my/ui/*": ["../ui/src/*"],
       "@my/wagmi": ["../wagmi/src"],
       "@my/wagmi/*": ["../wagmi/src/*"],

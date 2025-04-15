@@ -1,7 +1,7 @@
 import { type IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
 import { ClipPath, Defs, G, Path, Rect, Svg } from 'react-native-svg'
-import type { ColorTokens } from '@my/ui/types'
+import type { ColorTokens } from '@my/ui'
 
 const Send = (props) => {
   const { size, color, ...rest } = props

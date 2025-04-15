@@ -21,10 +21,6 @@ const plugins = [
   }),
   withPlaiceholder,
   withTamagui({
-    themeBuilder: {
-      input: '../../packages/ui/src/themes/theme.ts',
-      output: '../../packages/ui/src/themes/theme-generated.ts',
-    },
     config: '../../packages/ui/src/tamagui.config.ts',
     components: ['tamagui', '@my/ui'],
     importsWhitelist: ['constants.js', 'colors.js'],
@@ -36,6 +32,7 @@ const plugins = [
         return true
       }
     },
+    disableThemesBundleOptimize: true,
     excludeReactNativeWebExports: ['Switch', 'ProgressBar', 'Picker', 'CheckBox', 'Touchable'],
   }),
   (nextConfig) => {

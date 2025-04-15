@@ -16,7 +16,7 @@ import { SchemaForm } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useConfirmedTags, usePendingTags } from 'app/utils/tags'
 import { useUser } from 'app/utils/useUser'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { formatUnits } from 'viem'
 import type { z } from 'zod'
@@ -66,6 +66,35 @@ export const AddSendtagsForm = () => {
     }
   }
 
+  const renderAfterContent = useCallback(
+    ({ submit }: { submit: () => void }) => (
+      <XStack jc="space-between" ai={'center'}>
+        {media.gtMd ? (
+          <SendTagPricingTooltip name={form.watch('name', '')} />
+        ) : (
+          <SendTagPricingDialog name={form.watch('name', '')} />
+        )}
+        <SubmitButton
+          onPress={submit}
+          borderRadius={'$4'}
+          variant="outlined"
+          px={'$3'}
+          py={'$1.5'}
+          hoverStyle={{ borderColor: isDarkTheme ? '$primary' : '$color12' }}
+          $theme-light={{
+            borderColor: '$color12',
+          }}
+          icon={<IconPlus size={'$1'} color={'$primary'} $theme-light={{ color: '$color12' }} />}
+        >
+          <ButtonText fontFamily={'$mono'} color={'$white'} $theme-light={{ color: '$color12' }}>
+            ADD TAG
+          </ButtonText>
+        </SubmitButton>
+      </XStack>
+    ),
+    [media, form, isDarkTheme]
+  )
+
   return (
     <>
       <YStack gap={'$5'}>
@@ -109,42 +138,7 @@ export const AddSendtagsForm = () => {
                     f: 0,
                     footerProps: { pb: 0 },
                   }}
-                  renderAfter={({ submit }) => (
-                    <XStack jc="space-between" ai={'center'}>
-                      {media.gtMd ? (
-                        <SendTagPricingTooltip name={form.watch('name', '')} />
-                      ) : (
-                        <SendTagPricingDialog name={form.watch('name', '')} />
-                      )}
-                      <SubmitButton
-                        onPress={submit}
-                        borderRadius={'$4'}
-                        variant="outlined"
-                        height={'fit-content'}
-                        px={'$3'}
-                        py={'$1.5'}
-                        hoverStyle={{ borderColor: isDarkTheme ? '$primary' : '$color12' }}
-                        $theme-light={{
-                          borderColor: '$color12',
-                        }}
-                        icon={
-                          <IconPlus
-                            size={'$1'}
-                            color={'$primary'}
-                            $theme-light={{ color: '$color12' }}
-                          />
-                        }
-                      >
-                        <ButtonText
-                          fontFamily={'$mono'}
-                          color={'$white'}
-                          $theme-light={{ color: '$color12' }}
-                        >
-                          ADD TAG
-                        </ButtonText>
-                      </SubmitButton>
-                    </XStack>
-                  )}
+                  renderAfter={renderAfterContent}
                 >
                   {({ name }) => {
                     return (
@@ -169,75 +163,72 @@ export const AddSendtagsForm = () => {
             </YStack>
           )}
           {hasPendingTags && (
-            <>
-              <YStack gap={'$3.5'}>
-                <RowLabel>
-                  Sendtags [ {pendingTags?.length || 0}/
-                  {maxNumSendTags - (confirmedTags?.length || 0)} ]
-                </RowLabel>
-                <FadeCard>
-                  <XStack jc={'space-between'}>
-                    <Paragraph size={'$6'}>Name</Paragraph>
-                    <Paragraph size={'$6'}>Price</Paragraph>
-                  </XStack>
-                  <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
-                  <YStack aria-labelledby="checkout-pending-tags-label" gap={'$2'}>
-                    {pendingTags
-                      ?.sort(
-                        (a, b) =>
-                          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-                      )
-                      .map((tag) => (
-                        <XStack ai="center" jc="space-between" key={tag.name}>
-                          <XStack
-                            px={'$3.5'}
-                            py={'$2'}
-                            gap={'$3'}
-                            ai={'center'}
-                            jc={'space-between'}
-                            backgroundColor={
-                              isDarkTheme ? 'rgba(255,255,255, 0.1)' : 'rgba(0,0,0, 0.1)'
-                            }
-                            borderRadius={'$3'}
-                            maxWidth={'80%'}
-                            testID={`pending-tag-${tag.name}`}
-                          >
-                            <Paragraph size={'$5'} width={'90%'}>
-                              {tag.name}
-                            </Paragraph>
-                            <Button
-                              chromeless
-                              backgroundColor="transparent"
-                              hoverStyle={{ backgroundColor: 'transparent' }}
-                              pressStyle={{
-                                backgroundColor: 'transparent',
-                                borderColor: 'transparent',
-                              }}
-                              focusStyle={{ backgroundColor: 'transparent' }}
-                              padding={0}
-                              height={'auto'}
-                              onPress={() => releaseTagMutateAsync(tag.name)}
-                            >
-                              <Button.Icon>
-                                <IconX size={'$0.9'} color="$error" />
-                              </Button.Icon>
-                            </Button>
-                          </XStack>
-                          <Paragraph
-                            size={'$5'}
-                            color={'$lightGrayTextField'}
-                            $theme-light={{ color: '$darkGrayTextField' }}
-                          >
-                            <ConfirmTagPrice tag={tag} />
+            <YStack gap={'$3.5'}>
+              <RowLabel>
+                Sendtags [ {pendingTags?.length || 0}/
+                {maxNumSendTags - (confirmedTags?.length || 0)} ]
+              </RowLabel>
+              <FadeCard>
+                <XStack jc={'space-between'}>
+                  <Paragraph size={'$6'}>Name</Paragraph>
+                  <Paragraph size={'$6'}>Price</Paragraph>
+                </XStack>
+                <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
+                <YStack aria-labelledby="checkout-pending-tags-label" gap={'$2'}>
+                  {pendingTags
+                    ?.sort(
+                      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+                    )
+                    .map((tag) => (
+                      <XStack ai="center" jc="space-between" key={tag.name}>
+                        <XStack
+                          px={'$3.5'}
+                          py={'$2'}
+                          gap={'$3'}
+                          ai={'center'}
+                          jc={'space-between'}
+                          backgroundColor={
+                            isDarkTheme ? 'rgba(255,255,255, 0.1)' : 'rgba(0,0,0, 0.1)'
+                          }
+                          borderRadius={'$3'}
+                          maxWidth={'80%'}
+                          testID={`pending-tag-${tag.name}`}
+                        >
+                          <Paragraph size={'$5'} width={'90%'}>
+                            {tag.name}
                           </Paragraph>
+                          <Button
+                            chromeless
+                            backgroundColor="transparent"
+                            hoverStyle={{ backgroundColor: 'transparent' }}
+                            pressStyle={{
+                              backgroundColor: 'transparent',
+                              borderColor: 'transparent',
+                            }}
+                            focusStyle={{ backgroundColor: 'transparent' }}
+                            padding={0}
+                            height={'auto'}
+                            onPress={() => releaseTagMutateAsync(tag.name)}
+                          >
+                            <Button.Icon>
+                              <IconX size={'$0.9'} color="$error" />
+                            </Button.Icon>
+                          </Button>
                         </XStack>
-                      ))}
-                  </YStack>
-                  <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
-                  <TotalPrice />
-                </FadeCard>
-              </YStack>
-            </>
+                        <Paragraph
+                          size={'$5'}
+                          color={'$lightGrayTextField'}
+                          $theme-light={{ color: '$darkGrayTextField' }}
+                        >
+                          <ConfirmTagPrice tag={tag} />
+                        </Paragraph>
+                      </XStack>
+                    ))}
+                </YStack>
+                <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
+                <TotalPrice />
+              </FadeCard>
+            </YStack>
           )}
         </FormProvider>
       </YStack>
