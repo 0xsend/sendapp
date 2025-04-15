@@ -1,5 +1,5 @@
 import { toNiceError } from 'app/utils/toNiceError'
-import { describe, it, expect } from '@jest/globals'
+import { describe, it, expect, jest } from '@jest/globals'
 import { z } from 'zod'
 
 describe('toNiceError', () => {

@@ -31,7 +31,7 @@ export const ProfileHeader = ({
       padding={'$5'}
       onPressOut={handlePressOut}
     >
-      <XStack ai="center" gap={'$size.1.5'} width={'80%'}>
+      <XStack ai="center" gap={'$1.5'} width={'80%'}>
         <LinkableAvatar
           size="$6"
           br="$4"

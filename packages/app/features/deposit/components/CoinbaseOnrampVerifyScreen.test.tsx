@@ -1,4 +1,4 @@
-import '@jest/globals'
+import { describe, beforeEach, afterEach, it, jest, expect } from '@jest/globals'
 import { act, render } from '@testing-library/react-native'
 import { CoinbaseOnrampVerifyScreen } from './CoinbaseOnrampVerifyScreen'
 import { fetchOnrampTransactionStatus } from '@coinbase/onchainkit/fund'
@@ -45,6 +45,7 @@ describe('CoinbaseOnrampVerifyScreen', () => {
 
   it('calls onSuccess when transaction status is successful', async () => {
     ;(useSendAccount as unknown as jest.Mock).mockReturnValue({ data: { user_id: 'user123' } })
+    // @ts-expect-error - testing
     ;(fetchOnrampTransactionStatus as jest.Mock).mockResolvedValue({
       transactions: [{ status: 'ONRAMP_TRANSACTION_STATUS_SUCCESS' }],
     })
@@ -62,6 +63,7 @@ describe('CoinbaseOnrampVerifyScreen', () => {
 
   it('calls onFailure when transaction status is failed', async () => {
     ;(useSendAccount as unknown as jest.Mock).mockReturnValue({ data: { user_id: 'user123' } })
+    // @ts-expect-error - testing
     ;(fetchOnrampTransactionStatus as jest.Mock).mockResolvedValue({
       transactions: [{ status: 'ONRAMP_TRANSACTION_STATUS_FAILED' }],
     })
@@ -78,6 +80,7 @@ describe('CoinbaseOnrampVerifyScreen', () => {
 
   it('calls onFailure after max timeout if no valid transactions', async () => {
     ;(useSendAccount as unknown as jest.Mock).mockReturnValue({ data: { user_id: 'user123' } })
+    // @ts-expect-error - testing
     ;(fetchOnrampTransactionStatus as jest.Mock).mockResolvedValue({
       transactions: null,
     })
@@ -95,6 +98,7 @@ describe('CoinbaseOnrampVerifyScreen', () => {
 
   it('calls onFailure if fetchOnrampTransactionStatus throws an error', async () => {
     ;(useSendAccount as unknown as jest.Mock).mockReturnValue({ data: { user_id: 'user123' } })
+    // @ts-expect-error - testing
     ;(fetchOnrampTransactionStatus as jest.Mock).mockRejectedValue(new Error('error'))
     const onFailure = jest.fn()
     const onSuccess = jest.fn()

@@ -1,3 +1,5 @@
+import { jest } from '@jest/globals'
+
 const mockWagmi = {
   __esModule: true,
   useChainId: jest.fn().mockReturnValue(845337),

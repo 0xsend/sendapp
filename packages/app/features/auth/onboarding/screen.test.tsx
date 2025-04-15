@@ -1,4 +1,4 @@
-import { expect, test } from '@jest/globals'
+import { expect, test, jest, afterEach } from '@jest/globals'
 import { TamaguiProvider, config } from '@my/ui'
 import { act, render } from '@testing-library/react-native'
 import { OnboardingScreen } from './screen'
@@ -66,7 +66,8 @@ jest.mock('app/utils/send-accounts', () => ({
 }))
 
 jest.mock('app/utils/userop', () => ({
-  ...jest.requireActual('app/utils/userop'),
+  // biome-ignore lint/suspicious/noExplicitAny: this is for testing
+  ...(jest.requireActual('app/utils/userop') as any),
   receiverAccount: {
     address: '0x123',
   },

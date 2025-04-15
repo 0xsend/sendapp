@@ -154,7 +154,7 @@ export const ActivityDetails = ({
               {amount}
             </Paragraph>
             {activity.data.coin?.symbol && (
-              <XStack minWidth={'min-content'}>
+              <XStack>
                 <IconCoin symbol={activity.data.coin.symbol} size={'$2'} />
               </XStack>
             )}

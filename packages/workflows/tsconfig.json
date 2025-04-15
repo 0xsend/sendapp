@@ -5,10 +5,12 @@
     "composite": true,
     "moduleResolution": "bundler",
     "target": "ESNext",
-    "baseUrl": "./src",
+    "baseUrl": ".",
     "paths": {
       "@my/supabase/*": ["../../supabase/*"],
       "app/*": ["../app/*"],
+      "@my/ui": ["../ui/src"],
+      "@my/ui/*": ["../ui/src/*"],
       "@my/wagmi": ["../wagmi/src"],
       "@my/wagmi/*": ["../wagmi/src/*"],
       "@my/workflows": ["./src"],
@@ -24,6 +26,7 @@
     "./jest.config.ts",
     "../../supabase",
     "../app",
+    "../ui/src",
     "../wagmi/src",
     "../../globals.d.ts",
     "../../environment.d.ts"

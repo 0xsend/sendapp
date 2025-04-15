@@ -1,7 +1,7 @@
 import { SettingsNavLink } from './SettingsNavLink'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import type { PropsWithChildren } from 'react'
-import { Fade, YGroup, YStack } from '@my/ui'
+import { type ColorTokens, Fade, type SizeTokens, YGroup, YStack } from '@my/ui'
 import {
   IconAccount,
   IconFingerprint,
@@ -13,14 +13,21 @@ import {
 import { RowLabel } from 'app/components/layout/RowLabel'
 
 const iconProps = {
-  size: '$1.5',
-  color: '$primary',
+  size: '$1.5' as SizeTokens,
+  color: '$primary' as ColorTokens,
   '$theme-light': {
-    color: '$color12',
+    color: '$color12' as ColorTokens,
   },
 }
 
-const SETTINGS_LINKS = {
+const SETTINGS_LINKS: {
+  [category: string]: {
+    text: string
+    href: string
+    icon: JSX.Element
+    target?: string
+  }[]
+} = {
   Account: [
     {
       text: 'Profile',

@@ -224,6 +224,74 @@ export function DepositForm() {
 
   useInitializeFormAmount(form)
 
+  const renderAfterContent = useCallback(
+    ({ submit }: { submit: () => void }) => (
+      <YStack>
+        {depositMutation.isPending ? (
+          <Fade key="userop-state">
+            <Paragraph color={'$color10'} ta="center" size="$3">
+              Requesting signature...
+            </Paragraph>
+          </Fade>
+        ) : null}
+        {[calls.error, sendAccount.error, uop.error].filter(Boolean).map((e) =>
+          e ? (
+            <Fade key={`error-${e.message}`}>
+              <XStack alignItems="center" jc="center" gap={'$2'} role="alert">
+                <Paragraph color="$error">{toNiceError(e)}</Paragraph>
+              </XStack>
+            </Fade>
+          ) : null
+        )}
+        <SubmitButton
+          theme="green"
+          onPress={() => {
+            if (!areTermsAccepted) {
+              form.setError(
+                'areTermsAccepted',
+                {
+                  type: 'required',
+                },
+                {
+                  shouldFocus: true,
+                }
+              )
+              return
+            }
+            submit()
+          }}
+          py={'$5'}
+          br={'$4'}
+          disabledStyle={{ opacity: 0.5 }}
+          disabled={!canSubmit}
+          iconAfter={depositMutation.isPending ? <Spinner size="small" /> : undefined}
+        >
+          {[calls.isLoading, sendAccount.isLoading, uop.isLoading, depositMutation.isPending].some(
+            (p) => p
+          ) ? (
+            <Spinner size="small" />
+          ) : (
+            <Button.Text size={'$5'} fontWeight={'500'} fontFamily={'$mono'} color={'$black'}>
+              CONFIRM DEPOSIT
+            </Button.Text>
+          )}
+        </SubmitButton>
+      </YStack>
+    ),
+    [
+      depositMutation.isPending,
+      calls.error,
+      sendAccount.error,
+      uop.error,
+      areTermsAccepted,
+      form.setError,
+      canSubmit,
+      calls.isLoading,
+      sendAccount.isLoading,
+      uop.isLoading,
+    ]
+  )
+
   // RESET FORM ERRORS for terms or auto accept if user has existing deposit
   useEffect(() => {
     if (hasExistingDeposit) {
@@ -342,62 +410,7 @@ export function DepositForm() {
                 : undefined,
             areTermsAccepted: hasExistingDeposit,
           }}
-          renderAfter={({ submit }) => (
-            <YStack>
-              {depositMutation.isPending ? (
-                <Fade key="userop-state">
-                  <Paragraph color={'$color10'} ta="center" size="$3">
-                    Requesting signature...
-                  </Paragraph>
-                </Fade>
-              ) : null}
-              {[calls.error, sendAccount.error, uop.error].filter(Boolean).map((e) =>
-                e ? (
-                  <Fade key={`error-${e.message}`}>
-                    <XStack alignItems="center" jc="center" gap={'$2'} role="alert">
-                      <Paragraph color="$error">{toNiceError(e)}</Paragraph>
-                    </XStack>
-                  </Fade>
-                ) : null
-              )}
-              <SubmitButton
-                theme="green"
-                onPress={() => {
-                  if (!areTermsAccepted) {
-                    form.setError(
-                      'areTermsAccepted',
-                      {
-                        type: 'required',
-                      },
-                      {
-                        shouldFocus: true,
-                      }
-                    )
-                    return
-                  }
-                  submit()
-                }}
-                py={'$5'}
-                br={'$4'}
-                disabledStyle={{ opacity: 0.5 }}
-                disabled={!canSubmit}
-                iconAfter={depositMutation.isPending ? <Spinner size="small" /> : undefined}
-              >
-                {[
-                  calls.isLoading,
-                  sendAccount.isLoading,
-                  uop.isLoading,
-                  depositMutation.isPending,
-                ].some((p) => p) ? (
-                  <Spinner size="small" />
-                ) : (
-                  <Button.Text size={'$5'} fontWeight={'500'} fontFamily={'$mono'} color={'$black'}>
-                    CONFIRM DEPOSIT
-                  </Button.Text>
-                )}
-              </SubmitButton>
-            </YStack>
-          )}
+          renderAfter={renderAfterContent}
         >
           {({ amount, areTermsAccepted }) => (
             <YStack width={'100%'} gap={'$5'}>

@@ -90,6 +90,24 @@ export const SwapFormScreen = () => {
     parsedInAmount > BigInt(0) &&
     swapRoute
 
+  const renderAfterContent = useCallback(
+    ({ submit }: { submit: () => void }) => (
+      <SubmitButton
+        theme="green"
+        onPress={submit}
+        py={'$5'}
+        br={'$4'}
+        disabledStyle={{ opacity: 0.5 }}
+        disabled={!canSubmit}
+      >
+        <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
+          review
+        </Button.Text>
+      </SubmitButton>
+    ),
+    [canSubmit]
+  )
+
   const insufficientAmount =
     inCoin?.balance !== undefined && inAmount !== undefined && parsedInAmount > inCoin?.balance
 
@@ -335,26 +353,7 @@ export const SwapFormScreen = () => {
                 : undefined,
             slippage: parsedSlippage || DEFAULT_SLIPPAGE,
           }}
-          renderAfter={({ submit }) => (
-            <SubmitButton
-              theme="green"
-              onPress={submit}
-              py={'$5'}
-              br={'$4'}
-              disabledStyle={{ opacity: 0.5 }}
-              disabled={!canSubmit}
-            >
-              <Button.Text
-                ff={'$mono'}
-                fontWeight={'500'}
-                tt="uppercase"
-                size={'$5'}
-                color={'$black'}
-              >
-                review
-              </Button.Text>
-            </SubmitButton>
-          )}
+          renderAfter={renderAfterContent}
         >
           {({ outToken, inToken, outAmount, inAmount }) => (
             <YStack gap="$3.5">
@@ -600,13 +599,13 @@ export const SwapFormScreen = () => {
                       transform={'translate(-50%, -50%)'}
                     >
                       <Button
-                        // @ts-expect-error tamagui is tripping here
                         type={'button'}
                         testID={'flipTokensButton'}
                         bc={'$color0'}
                         circular={true}
                         size={'$5'}
                         borderWidth={0}
+                        // @ts-expect-error - background type is confused here
                         hoverStyle={hoverStyles}
                         onPress={handleFlipTokens}
                       >
@@ -733,10 +732,10 @@ export const Slippage = ({
         <XStack gap={'$2'} columnGap={'$2'} flexWrap={'wrap'} flex={1}>
           {SLIPPAGE_OPTIONS.map((slippageOption) => (
             <Button
-              // @ts-expect-error tamagui is tripping here
               type={'button'}
               key={`slippage-${slippageOption}`}
               onPress={() => handleOnPress(slippageOption)}
+              // @ts-expect-error - background type is confused here
               hoverStyle={hoverStyles}
               bw={0}
               p={'$2'}

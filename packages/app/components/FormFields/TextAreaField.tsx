@@ -17,10 +17,9 @@ import {
   type TamaguiElement,
 } from '@my/ui'
 
-export const TextAreaField = forwardRef<
-  TamaguiElement,
-  TextAreaProps & { labelProps?: LabelProps; iconBefore?: ReactNode; iconAfter?: ReactNode }
->((props, forwardedRef) => {
+export const TextAreaField = (
+  props: TextAreaProps & { labelProps?: LabelProps; iconBefore?: ReactNode; iconAfter?: ReactNode }
+) => {
   const {
     field,
     error,
@@ -32,7 +31,6 @@ export const TextAreaField = forwardRef<
   const defaultTheme = useThemeName() as string
   const { resolvedTheme } = useThemeSetting()
   const themeName = (resolvedTheme ?? defaultTheme) as ThemeName
-  const composedRefs = useComposedRefs(forwardedRef, field.ref)
 
   return (
     <Theme name={error ? 'red' : themeName} forceClassName>
@@ -82,7 +80,7 @@ export const TextAreaField = forwardRef<
             value={field.value}
             onChangeText={(text) => field.onChange(text)}
             onBlur={field.onBlur}
-            ref={composedRefs}
+            ref={field.ref}
             placeholder={placeholder}
             id={id}
             focusStyle={{
@@ -108,6 +106,4 @@ export const TextAreaField = forwardRef<
       </Fieldset>
     </Theme>
   )
-})
-
-TextAreaField.displayName = 'TextAreaField'
+}

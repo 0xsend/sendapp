@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals'
 const mockAppKit = {
   useWeb3Modal: jest.fn().mockReturnValue({
     open: jest.fn(),

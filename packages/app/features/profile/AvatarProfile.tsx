@@ -8,7 +8,7 @@ export function AvatarProfile({
   ...rest
 }: AvatarProps & { profile?: AvatarProfileProps }) {
   return (
-    <Avatar testID="avatar" size="$8" br="$4" gap="$2" mx="auto" $gtSm={{ mx: '0' }} {...rest}>
+    <Avatar testID="avatar" size="$8" br="$4" gap="$2" mx="auto" $gtSm={{ mx: 0 }} {...rest}>
       <Avatar.Image
         testID="avatarImage"
         accessibilityLabel={profile?.name ?? '??'}

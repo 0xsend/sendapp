@@ -114,7 +114,7 @@ export const TokenDetailsMarketData = ({ coin }: { coin: allCoins[number] }) => 
             return (
               <XStack gap="$2" ai="center">
                 <Paragraph color="$color10">Failed to load market data</Paragraph>
-                <IconError size="$1.75" color={'$redVibrant'} />
+                <IconError size="$1.5" color={'$error'} />
               </XStack>
             )
           case isUSDC:

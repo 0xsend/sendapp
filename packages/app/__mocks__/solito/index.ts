@@ -1,3 +1,5 @@
+import { jest } from '@jest/globals'
+
 export const createParam = jest.fn(() => {
   return {
     useParam: jest.fn(),

@@ -66,8 +66,8 @@ export function ReferralLink(props: ButtonProps) {
         jc={'flex-start'}
         height={'auto'}
         hoverStyle={{
-          backgroundColor: 'transparent',
-          borderColor: '$transparent',
+          backgroundColor: '$backgroundTransparent',
+          borderColor: '$colorTransparent',
         }}
         pressStyle={{
           backgroundColor: 'transparent',

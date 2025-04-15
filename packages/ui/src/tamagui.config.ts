@@ -19,14 +19,17 @@ setupDev({
     delay: 800,
   },
 })
+
 /**
  * This avoids shipping themes as JS. Instead, Tamagui will hydrate them from CSS.
  */
+// const themes =
+//   process.env.TAMAGUI_TARGET !== 'web' || process.env.TAMAGUI_IS_SERVER || process.env.STORYBOOK
+//     ? themesGen
+//     : ({} as typeof themesGen)
 
-const themes =
-  process.env.TAMAGUI_TARGET !== 'web' || process.env.TAMAGUI_IS_SERVER || process.env.STORYBOOK
-    ? themesGen
-    : ({} as typeof themesGen)
+// breaks with Missing theme. when building for production
+const themes = themesGen
 
 export const config = createTamagui({
   ...defaultConfig,
@@ -60,3 +63,5 @@ export const config = createTamagui({
     fastSchemeChange: true,
   },
 })
+
+export default config

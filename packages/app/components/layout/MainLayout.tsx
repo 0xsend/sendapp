@@ -16,7 +16,7 @@ const MainLayout = ({
   const iconColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$black'
   return (
     <YStack>
-      <YStack height={'100vh'} pb={'$size.10'} $shorter={{ pb: '$size.8' }}>
+      <YStack height={'100%'} pb={'$10'} $shorter={{ pb: '$8' }} style={{ height: '100vh' }}>
         <XStack borderColor={separatorColor} borderBottomWidth={1} pt={'$6'}>
           <XStack w={'90%'} ai={'center'} jc={'space-between'} marginHorizontal={'5%'} py={'$6'}>
             <Link href={'/account'}>
@@ -44,8 +44,8 @@ const MainLayout = ({
               colors={['$background', 'transparent']}
               pos={'absolute'}
               pointerEvents={'none'}
-              b={'$size.10'}
-              $shorter={{ b: '$size.8' }}
+              b={'$10'}
+              $shorter={{ b: '$8' }}
             />
           </>
         ) : (

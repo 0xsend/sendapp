@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals'
+import { describe, expect, it, jest } from '@jest/globals'
 import { act, render, screen } from '@testing-library/react-native'
 import { Wrapper } from 'app/utils/__mocks__/Wrapper'
 import { SendTagScreen } from './screen'

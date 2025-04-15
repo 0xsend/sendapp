@@ -1,7 +1,7 @@
 import { type IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
 import { Circle, Defs, LinearGradient, Path, Stop, Svg } from 'react-native-svg'
-import type { ColorTokens } from '@my/ui/types'
+import type { ColorTokens } from '@my/ui'
 
 const ArrowDown = (props) => {
   const { size, color, ...rest } = props

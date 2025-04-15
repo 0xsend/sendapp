@@ -77,15 +77,14 @@ export const DistributionSelect = memo(
           ref={selectTriggerRef}
           testID={'SelectDistributionDate'}
           br="$3"
-          w={'fit-content'}
           bw={'$1'}
           $theme-light={{
             boc: isOpen ? '$color1' : '$black',
-            bc: isOpen ? '$color1' : '$transparent',
+            bc: isOpen ? '$color1' : 'transparent',
           }}
           $theme-dark={{
             boc: isOpen ? '$color1' : '$primary',
-            bc: isOpen ? '$color1' : '$transparent',
+            bc: isOpen ? '$color1' : 'transparent',
             hoverStyle: { bc: '$color1' },
           }}
           iconAfter={

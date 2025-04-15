@@ -75,7 +75,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
         {activitiesError !== null && (
           <YStack f={1}>
             <Paragraph
-              maxWidth={'600'}
+              maxWidth={600}
               fontFamily={'$mono'}
               fontSize={'$5'}
               theme={'red'}
@@ -99,7 +99,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                     fontWeight={'300'}
                     color={'$color10'}
                     textAlign={'center'}
-                    pt={'$size.1.5'}
+                    pt={'$1.5'}
                   >
                     No Activities
                   </Paragraph>
@@ -177,30 +177,33 @@ const TransactionEntry = ({
 
   return (
     <XStack justifyContent={sent ? 'flex-end' : 'flex-start'} testID="activityTest" my={'$2.5'}>
-      <YStack gap={'$1'} w={'min-content'}>
+      <YStack gap={'$1'} style={{ width: 'min-content' }}>
         <YStack
           bg={'$color1'}
           p={'$4'}
           br={'$4'}
-          w={'min-content'}
+          style={{ width: 'min-content' }}
           gap={'$3'}
           ai={sent ? 'flex-end' : 'flex-start'}
         >
-          <XStack gap={'$3'} ai={'center'} fd={sent ? 'row-reverse' : 'row'} w={'max-content'}>
+          <XStack
+            gap={'$3'}
+            ai={'center'}
+            fd={sent ? 'row-reverse' : 'row'}
+            style={{ width: 'max-content' }}
+          >
             <AvatarProfile
               profile={sent ? currentUserProfile : otherUserProfile}
-              mx="none"
+              mx={0}
               size="$5"
             />
             <YStack>
               <XStack gap={'$2'} ai={'center'} fd={sent ? 'row-reverse' : 'row'}>
-                {!sent && <IconArrowRight size={'$size.0.9'} rotate={'90deg'} color={'$olive'} />}
+                {!sent && <IconArrowRight size={'$0.9'} rotate={'90deg'} color={'$olive'} />}
                 <Paragraph size={'$3'} color={'$color8'} theme={sent ? 'red' : 'green'}>
                   You {sent ? 'Sent' : 'Received'}
                 </Paragraph>
-                {sent && (
-                  <IconArrowRight size={'$size.0.9'} rotate={'-90deg'} color={'$red10Dark'} />
-                )}
+                {sent && <IconArrowRight size={'$0.9'} rotate={'-90deg'} color={'$red10Dark'} />}
               </XStack>
               <Paragraph size={'$7'}>{amount}</Paragraph>
             </YStack>
@@ -238,10 +241,10 @@ const DatePill = ({ date }: { date: string }) => {
       ff={'$mono'}
       textAlign={'center'}
       size={'$4'}
-      py={'$size.0.25'}
+      py={'$0.25'}
       bc={'$background'}
       color={'$color10'}
-      px={'$size.0.9'}
+      px={'$0.9'}
       br={'$2'}
     >
       {date}

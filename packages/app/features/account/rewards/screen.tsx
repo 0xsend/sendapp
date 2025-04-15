@@ -39,9 +39,9 @@ export function RewardsScreen() {
   })
 
   return (
-    <YStack pt={'$size.3.5'} $gtLg={{ pt: 0 }} f={1}>
-      <YStack pb={'$size.3.5'}>
-        <YStack w={'100%'} mb={'$size.3.5'} gap={'$size.0.9'}>
+    <YStack pt={'$3.5'} $gtLg={{ pt: 0 }} f={1}>
+      <YStack pb={'$3.5'}>
+        <YStack w={'100%'} mb={'$3.5'} gap={'$0.9'}>
           <H1
             size={'$9'}
             fontWeight={'900'}
@@ -56,7 +56,7 @@ export function RewardsScreen() {
           </Paragraph>
         </YStack>
 
-        <YStack $gtLg={{ flexDirection: 'row' }} gap={'$size.3.5'}>
+        <YStack $gtLg={{ flexDirection: 'row' }} gap={'$3.5'}>
           {/* @TODO: href, reward */}
           <Section
             title="Activity Rewards"
@@ -134,8 +134,8 @@ const Section = ({
           ai="center"
           alignSelf="flex-start"
           pos={'relative'}
-          p={'$size.0.75'}
-          pr={'$size.0.9'}
+          p={'$0.75'}
+          pr={'$0.9'}
           borderRadius={'$4'}
           backgroundColor={'#1F352A'}
         >
@@ -144,7 +144,7 @@ const Section = ({
             {title}
           </Paragraph>
         </XStack>
-        <XStack gap={'$size.1'} jc="space-between">
+        <XStack gap={'$1'} jc="space-between">
           <YStack w="100%">
             <Paragraph fontWeight={400} color={'$white'} size={'$5'}>
               {isLoading ? '' : claimStatus}
@@ -163,9 +163,9 @@ const Section = ({
                   {reward === '' ? '' : `${reward} SEND`}
                 </Paragraph>
               )}
-              <LinkableButton href={href} unstyled borderRadius={'$3'} p={'$size.0.5'}>
+              <LinkableButton href={href} unstyled borderRadius={'$3'} p={'$0.5'}>
                 <Button.Icon>
-                  <IconArrowRight size={'3'} color={'$primary'} />
+                  <IconArrowRight size={'$3'} color={'$primary'} />
                 </Button.Icon>
               </LinkableButton>
             </XStack>

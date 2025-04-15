@@ -18,6 +18,7 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import { useUser } from 'app/utils/useUser'
 import * as Device from 'expo-device'
+import { useCallback } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { z } from 'zod'
@@ -133,6 +134,36 @@ const CreatePasskeyForm = ({
     ? Device.deviceName
     : `My ${Device.modelName ?? 'Send Account'}`
 
+  const renderAfterContent = useCallback(
+    ({ submit }: { submit: () => void }) => (
+      <>
+        {form.formState.errors?.root?.message ? (
+          <Shake>
+            <Paragraph color="red" testID="AccountSendTagScreen">
+              {form.formState.errors?.root?.message}
+            </Paragraph>
+          </Shake>
+        ) : null}
+        {isLoading ? (
+          <Spinner size="small" color={'$color'} />
+        ) : (
+          <SubmitButton onPress={submit} theme="green" borderRadius={'$4'} p={'$4'} mt={'$1.5'}>
+            <Button.Text
+              ff={'$mono'}
+              fontWeight={'600'}
+              tt="uppercase"
+              size={'$5'}
+              color={'$black'}
+            >
+              Add a Passkey
+            </Button.Text>
+          </SubmitButton>
+        )}
+      </>
+    ),
+    [form, isLoading]
+  )
+
   return (
     <FadeCard>
       <FormProvider {...form}>
@@ -140,7 +171,7 @@ const CreatePasskeyForm = ({
           form={form}
           formProps={{
             $gtLg: {
-              maxWidth: 'none',
+              maxWidth: '100%',
               als: 'flex-start',
             },
             px: '$0',
@@ -169,38 +200,7 @@ const CreatePasskeyForm = ({
               </Paragraph>
             </>
           )}
-          renderAfter={({ submit }) => (
-            <>
-              {form.formState.errors?.root?.message ? (
-                <Shake>
-                  <Paragraph color="red" testID="AccountSendTagScreen">
-                    {form.formState.errors?.root?.message}
-                  </Paragraph>
-                </Shake>
-              ) : null}
-              {isLoading ? (
-                <Spinner size="small" color={'$color'} />
-              ) : (
-                <SubmitButton
-                  onPress={submit}
-                  theme="green"
-                  borderRadius={'$4'}
-                  p={'$4'}
-                  mt={'$size.1.5'}
-                >
-                  <Button.Text
-                    ff={'$mono'}
-                    fontWeight={'600'}
-                    tt="uppercase"
-                    size={'$5'}
-                    color={'$black'}
-                  >
-                    Add a Passkey
-                  </Button.Text>
-                </SubmitButton>
-              )}
-            </>
-          )}
+          renderAfter={renderAfterContent}
         >
           {(fields) => <>{Object.values(fields)}</>}
         </SchemaForm>

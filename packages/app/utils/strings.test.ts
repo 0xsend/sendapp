@@ -1,4 +1,4 @@
-import { describe, it } from '@jest/globals'
+import { describe, it, expect } from '@jest/globals'
 import { shorten, squish } from './strings'
 describe('test app', () => {
   it('test shorten', () => {

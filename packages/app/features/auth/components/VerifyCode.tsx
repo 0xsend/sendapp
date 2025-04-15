@@ -8,6 +8,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
+import { useCallback } from 'react'
 import type { MobileOtpType, Session, User } from '@supabase/supabase-js'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
@@ -41,6 +42,38 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
       onSuccess(data)
     }
   }
+
+  const renderAfterContent = useCallback(
+    ({ submit }: { submit: () => void }) => (
+      <XStack
+        f={1}
+        mt={0}
+        jc={'space-between'}
+        $sm={{ jc: 'center', height: '100%' }}
+        ai={'center'}
+      >
+        <SubmitButton
+          onPress={() => submit()}
+          br="$3"
+          bc={'$green9Light'}
+          $sm={{ w: '100%' }}
+          $gtMd={{
+            mt: 0,
+            als: 'flex-end',
+            mx: 0,
+            ml: 'auto',
+            w: '$12',
+            h: '$3.5',
+          }}
+        >
+          <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="black">
+            {'VERIFY ACCOUNT'}
+          </ButtonText>
+        </SubmitButton>
+      </XStack>
+    ),
+    []
+  )
 
   return (
     <FormWrapper>
@@ -86,34 +119,7 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
             },
           },
         }}
-        renderAfter={({ submit }) => (
-          <XStack
-            f={1}
-            mt={'0'}
-            jc={'space-between'}
-            $sm={{ jc: 'center', height: '100%' }}
-            ai={'center'}
-          >
-            <SubmitButton
-              onPress={() => submit()}
-              br="$3"
-              bc={'$green9Light'}
-              $sm={{ w: '100%' }}
-              $gtMd={{
-                mt: '0',
-                als: 'flex-end',
-                mx: 0,
-                ml: 'auto',
-                w: '$10.5',
-                h: '$3.5',
-              }}
-            >
-              <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="black">
-                {'VERIFY ACCOUNT'}
-              </ButtonText>
-            </SubmitButton>
-          </XStack>
-        )}
+        renderAfter={renderAfterContent}
       >
         {({ token }) => (
           <YStack gap="$5" jc="center" $sm={{ f: 1 }}>

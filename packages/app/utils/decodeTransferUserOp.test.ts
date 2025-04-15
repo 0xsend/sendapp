@@ -1,4 +1,4 @@
-import { describe } from '@jest/globals'
+import { describe, jest, it, expect } from '@jest/globals'
 import { baseMainnet, sendAccountAbi, sendTokenAddress } from '@my/wagmi'
 import { decodeTransferUserOp } from './decodeTransferUserOp'
 import { encodeFunctionData, erc20Abi } from 'viem'
@@ -11,7 +11,8 @@ jest.mock('./userop', () => ({
 jest.mock('wagmi')
 jest.mock('@my/wagmi', () => ({
   __esModule: true,
-  ...jest.requireActual('@my/wagmi'),
+  // biome-ignore lint/suspicious/noExplicitAny: this is for testing
+  ...(jest.requireActual('@my/wagmi') as any),
   tokenPaymasterAddress: {
     1: '0xfbbC7F7da495c9957d491F40482710DC5DFd7d85',
     1337: '0xfbbC7F7da495c9957d491F40482710DC5DFd7d85',

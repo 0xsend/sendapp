@@ -135,9 +135,9 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
                 case isUploading:
                   return <Spinner size="small" />
                 case !!profile?.avatar_url:
-                  return <IconRefresh color="primary" />
+                  return <IconRefresh color="$primary" />
                 default:
-                  return <Camera color="primary" size={'$4'} />
+                  return <Camera color="$primary" size={'$4'} />
               }
             })()}
           </YStack>

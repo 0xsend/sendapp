@@ -22,8 +22,8 @@ export const ProfilesDetailsModal = () => {
           $gtLg={{
             width: '35%',
             minWidth: 400,
+            // @ts-expect-error - web type is confused here
             height: isWeb ? '81vh' : 'auto',
-            // @ts-expect-error typescript is complaining about overflowY not available and advising overflow. Overflow will work differently than overflowY here, overflowY is working fine
             overflowY: 'scroll',
           }}
           className={'hide-scroll'}

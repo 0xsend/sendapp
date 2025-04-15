@@ -115,7 +115,7 @@ export const JackpotCard = () => {
     <Card p={'$5'} w={'100%'} jc="space-between" $gtLg={{ p: '$6', h: 'auto', mih: 244 }} mih={184}>
       <XStack w={'100%'} zIndex={4} h="100%">
         <YStack gap={'$2'} w={'100%'}>
-          <YStack w="fit-content" gap={'$2.5'} jc="space-between">
+          <YStack gap={'$2.5'} jc="space-between">
             <XStack ai={'center'} gap="$2.5" width={'100%'}>
               <XStack ai={'center'} gap="$2.5">
                 <GreenSquare />

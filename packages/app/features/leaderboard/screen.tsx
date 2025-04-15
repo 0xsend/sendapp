@@ -6,8 +6,8 @@ export function LeaderboardScreen() {
   const { data } = useLeaderboard()
 
   return (
-    <YStack w={'100%'} gap={'$size.3.5'} pb={'$size.2'} $gtMd={{ pt: 0 }} pt={'$size.3.5'}>
-      <YStack gap={'$size.0.9'}>
+    <YStack w={'100%'} gap={'$3.5'} pb={'$2'} $gtMd={{ pt: 0 }} pt={'$3.5'}>
+      <YStack gap={'$0.9'}>
         <H2 tt={'uppercase'} fontWeight={'900'} testID="mainTitle">
           Best in Class
         </H2>
@@ -16,12 +16,7 @@ export function LeaderboardScreen() {
         </Paragraph>
       </YStack>
       {data?.referrals.length ? (
-        <YStack
-          gap={'$size.1.5'}
-          $gtMd={{ flexDirection: 'row' }}
-          // @TODO: remove when we get transactions
-          maxWidth={'600px'}
-        >
+        <YStack gap={'$1.5'} $gtMd={{ flexDirection: 'row' }} maxWidth={600}>
           <Leaderboard title="Referrals" list={data?.referrals} />
           {/* <Leaderboard title="Transactions" list={data?.rewards} /> */}
         </YStack>
@@ -37,8 +32,8 @@ function Leaderboard({ title, list }: { title: string; list: LeaderboardEntry[] 
   return (
     <Card f={1} pb={0}>
       <YStack br="$8">
-        <YStack gap="$size.0.9" p="$5" $gtMd={{ p: '$8', pb: '$size.0.9' }} pb="$size.0.9" br="$8">
-          <H3 pb={'$size.0.9'} fontWeight={'600'} size={'$7'} testID={`title${title}`}>
+        <YStack gap="$0.9" p="$5" $gtMd={{ p: '$8', pb: '$0.9' }} pb="$0.9" br="$8">
+          <H3 pb={'$0.9'} fontWeight={'600'} size={'$7'} testID={`title${title}`}>
             {title}
           </H3>
           <LeaderBoardHeader isReferrals={isReferrals} />
@@ -57,10 +52,10 @@ function LeaderBoardHeader({ isReferrals }: { isReferrals: boolean }) {
       jc="space-between"
       borderBottomWidth={2}
       borderBottomColor={'$color9'}
-      pb="$size.0.9"
+      pb="$0.9"
     >
       <XStack>
-        <Paragraph fontFamily={'$mono'} color={'$color10'} tt={'uppercase'} w="$size.3">
+        <Paragraph fontFamily={'$mono'} color={'$color10'} tt={'uppercase'} w="$3">
           #
         </Paragraph>
         <Paragraph fontFamily={'$mono'} color={'$color10'} tt={'uppercase'}>
@@ -92,17 +87,17 @@ function LeaderboardList({
 }: { isReferrals: boolean; list: LeaderboardEntry[] }) {
   return list.map(({ user, referrals, rewards_usdc }, i) => (
     <XStack
-      gap={'$size.0.9'}
+      gap={'$0.9'}
       ai="center"
       jc={'space-between'}
       key={user.send_id}
       testID={`${user.id}-${user.send_id}`}
     >
       <XStack gap={'$2'} flexShrink={1}>
-        <Paragraph mb="0" w="$size.3" lineHeight="$4" color={'$color10'} fontFamily={'$mono'}>
+        <Paragraph mb={0} w="$3" lineHeight="$4" color={'$color10'} fontFamily={'$mono'}>
           {i + 1}
         </Paragraph>
-        <XStack f={1} gap={'$size.0.9'} ai={'center'}>
+        <XStack f={1} gap={'$0.9'} ai={'center'}>
           <Avatar size="$2" borderRadius={'$3'}>
             <Avatar.Image src={user.avatar_url} />
             <Avatar.Fallback
@@ -110,7 +105,7 @@ function LeaderboardList({
               $theme-light={{ backgroundColor: '$white' }}
             />
           </Avatar>
-          <Paragraph mb="0" lineHeight="$4" color="$primary" $theme-light={{ color: '$color12' }}>
+          <Paragraph mb={0} lineHeight="$4" color="$primary" $theme-light={{ color: '$color12' }}>
             {getName(user)}
           </Paragraph>
         </XStack>

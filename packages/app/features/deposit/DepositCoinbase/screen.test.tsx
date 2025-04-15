@@ -1,5 +1,5 @@
 // packages/app/features/deposit/coinbase/screen.test.tsx
-import '@jest/globals'
+import { describe, beforeEach, test, jest, expect } from '@jest/globals'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native'
 import { DepositCoinbaseScreen } from './screen'
 import { useSendAccount } from 'app/utils/send-accounts'

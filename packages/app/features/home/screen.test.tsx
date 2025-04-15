@@ -1,3 +1,4 @@
+import { jest, test, expect } from '@jest/globals'
 import { TamaguiProvider, config } from '@my/ui'
 import { render, act, screen } from '@testing-library/react-native'
 import { HomeScreen } from './screen'
@@ -74,7 +75,8 @@ jest.mock('app/provider/coins', () => ({
 }))
 
 jest.mock('@tamagui/tooltip', () => ({
-  ...jest.requireActual('@tamagui/tooltip'),
+  // biome-ignore lint/suspicious/noExplicitAny: this is for testing
+  ...(jest.requireActual('@tamagui/tooltip') as any),
   TooltipGroup: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }))
 jest.mock('solito', () => ({

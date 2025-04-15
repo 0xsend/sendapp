@@ -72,7 +72,7 @@ export const TokenBalanceCard = () => {
               </Button>
             </XStack>
             {isGameVisible && (
-              <XStack w="fit-content" gap={'$2'} jc={'space-between'} ai={'center'} my="auto">
+              <XStack gap={'$2'} jc={'space-between'} ai={'center'} my="auto">
                 <Paragraph fontSize={'$6'} fontWeight={'500'} zIndex={1} color={'$color10'}>
                   {presses}
                 </Paragraph>

@@ -36,6 +36,7 @@ export const TokenBalanceList = () => {
           pathname: '/',
           query: { token: coin.token },
         }}
+        // @ts-expect-error - background type is confused here
         hoverStyle={hoverStyles}
         tokensMarketData={tokensMarketData}
         isLoadingTokensMarketData={isLoadingTokensMarketData}

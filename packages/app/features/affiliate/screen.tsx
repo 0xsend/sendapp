@@ -99,7 +99,7 @@ const ReferralsList = () => {
       {Boolean(pages?.[0]?.length) && (
         <Card gap="$5" p="$5" w="100%" fd="row" flexWrap="wrap">
           {referralsError && (
-            <Paragraph maxWidth={'600'} fontFamily={'$mono'} fontSize={'$5'} color={'$color12'}>
+            <Paragraph maxWidth={600} fontFamily={'$mono'} fontSize={'$5'} color={'$color12'}>
               {referralsError?.message.split('.').at(0) ?? `${referralsError}`}
             </Paragraph>
           )}

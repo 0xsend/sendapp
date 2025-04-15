@@ -21,7 +21,7 @@ import { useSendAccount } from 'app/utils/send-accounts'
 import { useIsClient } from 'app/utils/useIsClient'
 import { useUser } from 'app/utils/useUser'
 import * as Device from 'expo-device'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { z } from 'zod'
@@ -96,6 +96,63 @@ export const OnboardingForm = () => {
       replace('/') // redirect to home page if account already exists
     }
   }, [sendAccount.data?.address, replace])
+  const renderAfterContent = useCallback(
+    ({ submit }: { submit: () => void }) => (
+      <>
+        <XStack
+          jc="space-between"
+          ai="center"
+          w="100%"
+          px="$2"
+          $sm={{ jc: 'center', height: '100%' }}
+        >
+          <Anchor
+            $theme-dark={{
+              col: '$background',
+            }}
+            $theme-light={{ col: '$black' }}
+            href="https://help.send.app/what-are-passkeys/"
+            target="_blank"
+            dsp="none"
+            $gtMd={{ dsp: 'block' }}
+          >
+            Why Passkey?
+          </Anchor>
+
+          <SubmitButton
+            onPress={submit}
+            theme={errorMessage ? 'yellow_active' : 'green'}
+            mb="auto"
+            als="auto"
+            r={'$1'}
+            br="$4"
+            mx="auto"
+            w="100%"
+            $gtMd={{
+              mt: 0,
+              als: 'flex-end',
+              mx: 0,
+              ml: 'auto',
+              maw: '$12',
+              h: '$3.5',
+            }}
+          >
+            <ButtonText
+              size={'$2'}
+              padding={'unset'}
+              textTransform="uppercase"
+              ta="center"
+              margin={'unset'}
+              col="black"
+            >
+              {errorMessage ? 'Try again' : 'CREATE PASSKEY'}
+            </ButtonText>
+          </SubmitButton>
+        </XStack>
+      </>
+    ),
+    [errorMessage]
+  )
 
   if (!isClient) return null
 
@@ -132,60 +189,7 @@ export const OnboardingForm = () => {
             autoFocus: true,
           },
         }}
-        renderAfter={({ submit }) => (
-          <>
-            <XStack
-              jc="space-between"
-              ai="center"
-              w="100%"
-              px="$2"
-              $sm={{ jc: 'center', height: '100%' }}
-            >
-              <Anchor
-                $theme-dark={{
-                  col: '$background',
-                }}
-                $theme-light={{ col: '$black' }}
-                href="https://help.send.app/what-are-passkeys/"
-                target="_blank"
-                dsp="none"
-                $gtMd={{ dsp: 'block' }}
-              >
-                Why Passkey?
-              </Anchor>
-
-              <SubmitButton
-                onPress={submit}
-                theme={errorMessage ? 'yellow_active' : 'green'}
-                mb="auto"
-                als="auto"
-                r
-                br="$4"
-                mx="auto"
-                w="100%"
-                $gtMd={{
-                  mt: '0',
-                  als: 'flex-end',
-                  mx: 0,
-                  ml: 'auto',
-                  maw: '$12',
-                  h: '$3.5',
-                }}
-              >
-                <ButtonText
-                  size={'$2'}
-                  padding={'unset'}
-                  textTransform="uppercase"
-                  ta="center"
-                  margin={'unset'}
-                  col="black"
-                >
-                  {errorMessage ? 'Try again' : 'CREATE PASSKEY'}
-                </ButtonText>
-              </SubmitButton>
-            </XStack>
-          </>
-        )}
+        renderAfter={renderAfterContent}
       >
         {(fields) => (
           <YStack gap="$5" jc="center" $sm={{ f: 1 }}>
@@ -210,7 +214,7 @@ export const OnboardingForm = () => {
                 {Object.values(fields)}
                 <Anchor
                   $theme-dark={{
-                    col: '$greenBackground',
+                    col: '$primary',
                   }}
                   $theme-light={{ col: '$black' }}
                   href="https://help.send.app/what-are-passkeys/"

@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals'
+import { describe, expect, it, jest } from '@jest/globals'
 import { sendAccountAbi, sendEarnAbi, sendEarnUsdcFactoryAbi } from '@my/wagmi'
 import type { UserOperation } from 'permissionless'
 import { encodeFunctionData, erc20Abi, zeroHash, type Address, type Hex } from 'viem'

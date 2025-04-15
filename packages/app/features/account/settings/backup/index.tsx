@@ -33,7 +33,7 @@ import { throwIf } from 'app/utils/throwIf'
 import { defaultUserOp, useUserOpTransferMutation } from 'app/utils/useUserOpTransferMutation'
 import { useAccountNonce } from 'app/utils/userop'
 import type { UserOperation } from 'permissionless'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useLink } from 'solito/link'
 import { encodeFunctionData } from 'viem'
@@ -69,13 +69,13 @@ export const BackupScreen = () => {
   const hasSendAccount = !!sendAcct
 
   return (
-    <YStack w={'100%'} als={'center'} gap={'$size.3.5'}>
+    <YStack w={'100%'} als={'center'} gap={'$3.5'}>
       {(() => {
         switch (true) {
           case error !== null || webAuthnCredsError !== null:
             return (
               <YStack w={'100%'}>
-                <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
+                <Paragraph size={'$6'} fontWeight={'300'} color={'$error'}>
                   {error?.message}
                   {webAuthnCredsError?.message}
                 </Paragraph>
@@ -86,7 +86,7 @@ export const BackupScreen = () => {
           case !webAuthnCreds:
             return (
               <YStack w={'100%'} gap={'$6'}>
-                <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
+                <Paragraph size={'$6'} fontWeight={'300'} color={'$error'}>
                   You have no WebAuthn credentials. This should never happen. Please reach out to
                   <Link href="/account/settings/support" target="_blank">
                     {' '}
@@ -99,11 +99,11 @@ export const BackupScreen = () => {
                   target="_blank"
                   display="flex"
                   alignItems="center"
-                  gap="2"
+                  gap="$2"
                   color="$color12"
                 >
-                  <IconNote size="1.5" />
-                  <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
+                  <IconNote size="$1.5" />
+                  <Paragraph size={'$6'} fontWeight={'300'}>
                     Learn more about WebAuthn credentials
                   </Paragraph>
                 </Link>
@@ -112,7 +112,7 @@ export const BackupScreen = () => {
           case !hasSendAccount:
             return (
               <YStack w={'100%'} gap={'$6'}>
-                <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
+                <Paragraph size={'$6'} fontWeight={'300'}>
                   You have no Send Account.
                 </Paragraph>
                 <Link
@@ -120,11 +120,11 @@ export const BackupScreen = () => {
                   target="_blank"
                   display="flex"
                   alignItems="center"
-                  gap="2"
+                  gap="$2"
                   color="$color12"
                 >
-                  <IconNote size="1.5" />
-                  <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
+                  <IconNote size="$1.5" />
+                  <Paragraph size={'$6'} fontWeight={'300'}>
                     Learn more about Send Accounts
                   </Paragraph>
                 </Link>
@@ -208,10 +208,10 @@ const WebAuthnCred = ({
         {cardStatus !== 'remove' && (
           <Button
             chromeless
-            px={'0'}
+            px={'$0'}
             borderRadius={'$1'}
-            height={'$size.1.5'}
-            width={'$size.1.5'}
+            height={'$1.5'}
+            width={'$1.5'}
             onPress={() => setCardStatus(cardStatus === 'default' ? 'settings' : 'default')}
           >
             {cardStatus === 'default' ? (
@@ -232,7 +232,7 @@ const WebAuthnCred = ({
                 borderColor={'$error'}
                 color={'$color12'}
                 variant="outlined"
-                mt={'$size.0.9'}
+                mt={'$0.9'}
                 borderRadius={'$5'}
                 hoverStyle={{ borderColor: '$error' }}
                 onPress={() => setCardStatus('remove')}
@@ -271,7 +271,7 @@ const WebAuthnCred = ({
                       return <Spinner size="small" />
                     case activeSigningKeysError !== null:
                       return (
-                        <Paragraph maxWidth={'600'} fontSize={'$5'} color={'$color12'}>
+                        <Paragraph maxWidth={600} fontSize={'$5'} color={'$color12'}>
                           {activeSigningKeysError?.message ??
                             `Something went wrong: ${
                               activeSigningKeysError?.message.split('.').at(0) ??
@@ -281,7 +281,7 @@ const WebAuthnCred = ({
                       )
                     case !isActive:
                       return (
-                        <YStack gap={'$size.1.5'} ai="flex-start">
+                        <YStack gap={'$1.5'} ai="flex-start">
                           <CardTextBlock
                             label="Status"
                             text="Passkey is not confirmed onchain. Finish confirming the passkey onchain."
@@ -344,7 +344,7 @@ const CardTextBlock = ({
       >
         {label}
       </Paragraph>
-      <Paragraph size={'$5'} color={warningText ? '$error' : 'color12'}>
+      <Paragraph size={'$5'} color={warningText ? '$error' : '$color12'}>
         {text}
       </Paragraph>
     </YStack>
@@ -470,6 +470,60 @@ const RemovePasskeyConfirmation = ({
   const queryClient = useQueryClient()
   const { resolvedTheme } = useThemeSetting()
   const isDarkTheme = resolvedTheme?.startsWith('dark')
+  const isLoading =
+    isLoadingNonce ||
+    isLoadingGasFees ||
+    isLoadingSendAccount ||
+    isLoadingUserOp ||
+    isLoadingUsdcBal
+  const inputVal = form.watch('name', '')
+
+  const renderAfterContent = useCallback(
+    ({ submit }: { submit: () => void }) => (
+      <XStack gap="$1" jc="space-between" w={'100%'} pt={'$0.9'}>
+        <Button
+          borderColor={'$primary'}
+          variant="outlined"
+          flex={1}
+          hoverStyle={{ borderColor: isDarkTheme ? '$primary' : '$color12' }}
+          $theme-light={{
+            borderColor: '$color12',
+          }}
+          onPress={onCancel}
+        >
+          <Button.Text
+            color="$primary"
+            $theme-light={{
+              color: '$color12',
+            }}
+          >
+            CANCEL
+          </Button.Text>
+        </Button>
+        <SubmitButton
+          testID={'RemovePasskeyButton'}
+          theme={'red'}
+          variant="outlined"
+          flex={1}
+          hoverStyle={{ borderColor: '$error' }}
+          disabledStyle={{ opacity: 0.5 }}
+          onPress={submit}
+          {...(isLoading || displayName !== inputVal ? { disabled: true } : {})}
+        >
+          <Button.Text
+            color={'$error'}
+            $theme-light={{
+              color: '$color12',
+            }}
+          >
+            REMOVE
+          </Button.Text>
+        </SubmitButton>
+      </XStack>
+    ),
+    [onCancel, isLoading, displayName, inputVal, isDarkTheme]
+  )
+
   const onSubmit = async () => {
     try {
       if (isActiveOnchain) {
@@ -504,14 +558,6 @@ const RemovePasskeyConfirmation = ({
     }
   }
 
-  const isLoading =
-    isLoadingNonce ||
-    isLoadingGasFees ||
-    isLoadingSendAccount ||
-    isLoadingUserOp ||
-    isLoadingUsdcBal
-  const inputVal = form.watch('name', '')
-
   return (
     <FormProvider {...form}>
       <SchemaForm
@@ -536,51 +582,10 @@ const RemovePasskeyConfirmation = ({
         }}
         schema={RemovePasskeySchema}
         onSubmit={onSubmit}
-        renderAfter={({ submit }) => (
-          <XStack gap="$size.1" jc="space-between" w={'100%'} pt={'$size.0.9'}>
-            <Button
-              borderColor={'$primary'}
-              variant="outlined"
-              flex={1}
-              hoverStyle={{ borderColor: isDarkTheme ? '$primary' : '$color12' }}
-              $theme-light={{
-                borderColor: '$color12',
-              }}
-              onPress={onCancel}
-            >
-              <Button.Text
-                color="$primary"
-                $theme-light={{
-                  color: '$color12',
-                }}
-              >
-                CANCEL
-              </Button.Text>
-            </Button>
-            <SubmitButton
-              testID={'RemovePasskeyButton'}
-              theme={'red'}
-              variant="outlined"
-              flex={1}
-              hoverStyle={{ borderColor: '$error' }}
-              disabledStyle={{ opacity: 0.5 }}
-              onPress={submit}
-              {...(isLoading || displayName !== inputVal ? { disabled: true } : {})}
-            >
-              <Button.Text
-                color={'$error'}
-                $theme-light={{
-                  color: '$color12',
-                }}
-              >
-                REMOVE
-              </Button.Text>
-            </SubmitButton>
-          </XStack>
-        )}
+        renderAfter={renderAfterContent}
       >
         {({ name: nameCheck }) => (
-          <YStack gap={'$size.3.5'}>
+          <YStack gap={'$3.5'}>
             <Text fontWeight={'400'} fontSize={'$5'} color="$color12">
               Removing &quot;{displayName}&quot; as a signer on your Send account.{' '}
               <Text
@@ -593,7 +598,7 @@ const RemovePasskeyConfirmation = ({
               </Text>
             </Text>
 
-            <YStack gap={'$size.1.5'}>
+            <YStack gap={'$1.5'}>
               <Text
                 fontWeight={'400'}
                 fontSize={'$5'}
@@ -681,7 +686,7 @@ const UpdateKeySlotButton = ({
   const isDisabled = isSuccess || isPending
   return (
     <>
-      <Paragraph fontWeight={'300'} color={'$yellowVibrant'}>
+      <Paragraph fontWeight={'300'} color={'$warning'}>
         Onchain Slot, {onchainSlot}, does not match Webauthn Slot {sendAcctCred?.key_slot ?? 'N/A'}.
         This should never happen. Please update the key slot below.
       </Paragraph>
@@ -689,7 +694,7 @@ const UpdateKeySlotButton = ({
         Update Key Slot
       </Button>
       {isError && <Paragraph color={'$error'}>{error?.message}</Paragraph>}
-      {isSuccess && <Paragraph color={'$green'}>Updated key slot</Paragraph>}
+      {isSuccess && <Paragraph color={'$primary'}>Updated key slot</Paragraph>}
     </>
   )
 }

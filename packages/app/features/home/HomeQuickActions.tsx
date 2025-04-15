@@ -37,7 +37,9 @@ export const HomeQuickActions = ({ showSendAction, ...props }: HomeQuickActionsP
           href={getSendUrl()}
           f={1}
           height={'auto'}
+          // @ts-expect-error - background type is confused here
           hoverStyle={hoverStyles}
+          // @ts-expect-error - background type is confused here
           focusStyle={hoverStyles}
         >
           <YStack
@@ -64,7 +66,9 @@ export const HomeQuickActions = ({ showSendAction, ...props }: HomeQuickActionsP
         href="/deposit"
         f={1}
         height={'auto'}
+        // @ts-expect-error - background type is confused here
         hoverStyle={hoverStyles}
+        // @ts-expect-error - background type is confused here
         focusStyle={hoverStyles}
       >
         <YStack gap="$2" jc={'space-between'} ai="center" px="$4" py="$3.5" $gtSm={{ py: '$4' }}>
@@ -82,7 +86,9 @@ export const HomeQuickActions = ({ showSendAction, ...props }: HomeQuickActionsP
         href={getTradeUrl()}
         f={1}
         height={'auto'}
+        // @ts-expect-error - background type is confused here
         hoverStyle={hoverStyles}
+        // @ts-expect-error - background type is confused here
         focusStyle={hoverStyles}
       >
         <YStack gap="$2" jc={'space-between'} ai="center" p="$4" height={'auto'}>

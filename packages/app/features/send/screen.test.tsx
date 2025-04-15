@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals'
+import { describe, expect, it, jest, beforeEach } from '@jest/globals'
 import { config, TamaguiProvider } from '@my/ui'
 import { render, screen } from '@testing-library/react-native'
 import { SendScreen } from './screen'
@@ -44,6 +44,7 @@ jest.mock('app/provider/tag-search', () => ({
     isLoading: false,
     error: null,
   }),
+  // @ts-expect-error - this is a mock
   TagSearchProvider: jest.fn().mockImplementation(({ children }) => children),
 }))
 

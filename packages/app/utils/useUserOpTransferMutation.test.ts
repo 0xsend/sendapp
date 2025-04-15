@@ -1,4 +1,4 @@
-import { describe, test } from '@jest/globals'
+import { describe, test, jest, beforeEach, expect } from '@jest/globals'
 import { act, renderHook, waitFor } from '@testing-library/react-native'
 import { baseMainnetBundlerClient, sendAccountAbi } from '@my/wagmi'
 import { signUserOpHash } from './signUserOp'
@@ -14,7 +14,8 @@ jest.mock('./userop', () => ({
 jest.mock('wagmi')
 jest.mock('@my/wagmi', () => ({
   __esModule: true,
-  ...jest.requireActual('@my/wagmi'),
+  // biome-ignore lint/suspicious/noExplicitAny: testing
+  ...(jest.requireActual('@my/wagmi') as any),
   tokenPaymasterAddress: {
     1: '0xfbbC7F7da495c9957d491F40482710DC5DFd7d85',
     1337: '0xfbbC7F7da495c9957d491F40482710DC5DFd7d85',
@@ -26,18 +27,22 @@ jest.mock('@my/wagmi', () => ({
     chain: {
       id: 845337,
     },
+    // @ts-expect-error - this is a mock
     simulateContract: jest.fn().mockResolvedValue({}),
     getGasPrice: jest.fn().mockReturnValue(Promise.resolve(BigInt(0))),
     estimateFeesPerGas: jest.fn().mockResolvedValue(
+      // @ts-expect-error - this is a mock
       Promise.resolve({
         maxFeePerGas: BigInt(0),
         maxPriorityFeePerGas: BigInt(0),
       })
     ),
+    // @ts-expect-error - this is a mock
     call: jest.fn().mockResolvedValue({}),
   },
   baseMainnetBundlerClient: {
     sendUserOperation: jest.fn(),
+    // @ts-expect-error - this is a mock
     waitForUserOperationReceipt: jest.fn().mockResolvedValue({ success: true }),
     estimateUserOperationGas: jest.fn().mockReturnValue(
       Promise.resolve({
@@ -87,6 +92,7 @@ describe('useUserOpTransferMutation', () => {
       callData: '0x' as `0x${string}`,
       ...defaultUserOp,
     }
+    // @ts-expect-error - testing
     baseMainnetBundlerClient.sendUserOperation = jest.fn().mockImplementation((_args) => {
       expect(_args).toStrictEqual({
         userOperation: userOp,

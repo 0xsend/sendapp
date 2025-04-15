@@ -374,13 +374,13 @@ const ConfirmButtonError = ({
             },
           },
         ]}
-        boc={'$red500'}
+        boc={'$error'}
         borderWidth={1}
         maw={300}
         $theme-dark={{ bc: '$black' }}
         $theme-light={{ bc: '$gray4Light' }}
       >
-        <Tooltip.Arrow borderColor={'$red500'} bw={4} />
+        <Tooltip.Arrow borderColor={'$error'} bw={4} />
         {children}
       </Tooltip.Content>
       <Tooltip.Trigger>

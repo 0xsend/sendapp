@@ -2,8 +2,8 @@ import { Card, Fade, H4, Paragraph, ScrollView, Separator, Spinner, XStack, YSta
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
 import { formatCoinAmount } from 'app/utils/formatCoinAmount'
-import { Events, isTemporalSendEarnDepositEvent } from 'app/utils/zod/activity' // Import Events
-import { useEffect, useMemo, useRef } from 'react' // Import useRef
+import { isTemporalSendEarnDepositEvent } from 'app/utils/zod/activity'
+import { useEffect, useMemo, useRef } from 'react'
 import { SectionList } from 'react-native'
 import { useSendEarnCoinBalances } from '../hooks'
 import { useERC20AssetCoin } from '../params'

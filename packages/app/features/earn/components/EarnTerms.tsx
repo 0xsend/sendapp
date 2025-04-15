@@ -6,7 +6,7 @@ export const EarnTerms = ({ hasError }: { hasError?: boolean }) => {
     '$theme-light': {
       color: hasError ? '$error' : '$darkGrayTextField',
     },
-  }
+  } as const
 
   return (
     <Paragraph flexShrink={1} maxWidth={'100%'} {...colorProps}>

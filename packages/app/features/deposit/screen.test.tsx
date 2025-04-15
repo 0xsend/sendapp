@@ -1,4 +1,4 @@
-import '@jest/globals'
+import { describe, it, jest, expect } from '@jest/globals'
 import { render, screen } from '@testing-library/react-native'
 import { Provider } from 'app/__mocks__/app/provider'
 import { DepositScreen } from './screen'
@@ -6,7 +6,8 @@ import { DepositScreen } from './screen'
 jest.mock('wagmi')
 
 jest.mock('@my/ui', () => ({
-  ...jest.requireActual('@my/ui'),
+  // biome-ignore lint/suspicious/noExplicitAny: this is for testing
+  ...(jest.requireActual('@my/ui') as any),
   Fade: ({ children }) => children,
 }))
 

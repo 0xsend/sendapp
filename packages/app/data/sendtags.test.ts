@@ -1,5 +1,5 @@
-import '@jest/globals'
 import { reward, total } from './sendtags'
+import { describe, it, expect } from '@jest/globals'
 
 const decimals = 10n ** 6n
 

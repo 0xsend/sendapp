@@ -12,7 +12,7 @@ export const ReadOnlyFieldWithLabel = ({
 }) => {
   return (
     <FieldWithLabel label={label} additionalInfo={additionalInfo}>
-      <Paragraph size={'$5'} color={'color12'}>
+      <Paragraph size={'$5'} color={'$color12'}>
         {text}
       </Paragraph>
     </FieldWithLabel>
