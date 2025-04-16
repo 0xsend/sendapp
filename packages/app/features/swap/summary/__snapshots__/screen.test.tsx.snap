@@ -242,7 +242,6 @@ exports[`swap summary screen should render 1`] = `
                 disabled={false}
                 focusVisibleStyle={{}}
                 focusable={[Function]}
-                hitSlop={[Function]}
                 minPressDuration={0}
                 onBlur={[Function]}
                 onFocus={[Function]}
@@ -273,10 +272,14 @@ exports[`swap summary screen should render 1`] = `
                     "flexWrap": "nowrap",
                     "height": "auto",
                     "justifyContent": "center",
-                    "paddingBottom": 0,
-                    "paddingLeft": 0,
-                    "paddingRight": 0,
-                    "paddingTop": 0,
+                    "marginBottom": -10,
+                    "marginLeft": -10,
+                    "marginRight": -10,
+                    "marginTop": -10,
+                    "paddingBottom": 10,
+                    "paddingLeft": 10,
+                    "paddingRight": 10,
+                    "paddingTop": 10,
                     "shadowColor": "rgb(0,0,0)",
                     "shadowOffset": {
                       "height": 0,
@@ -537,7 +540,6 @@ exports[`swap summary screen should render 1`] = `
                 disabled={false}
                 focusVisibleStyle={{}}
                 focusable={[Function]}
-                hitSlop={[Function]}
                 minPressDuration={0}
                 onBlur={[Function]}
                 onFocus={[Function]}
@@ -568,10 +570,14 @@ exports[`swap summary screen should render 1`] = `
                     "flexWrap": "nowrap",
                     "height": "auto",
                     "justifyContent": "center",
-                    "paddingBottom": 0,
-                    "paddingLeft": 0,
-                    "paddingRight": 0,
-                    "paddingTop": 0,
+                    "marginBottom": -10,
+                    "marginLeft": -10,
+                    "marginRight": -10,
+                    "marginTop": -10,
+                    "paddingBottom": 10,
+                    "paddingLeft": 10,
+                    "paddingRight": 10,
+                    "paddingTop": 10,
                     "shadowColor": "rgb(0,0,0)",
                     "shadowOffset": {
                       "height": 0,

@@ -405,7 +405,8 @@ export const EditButton = () => {
       br={0}
       height={'auto'}
       onPress={handlePress}
-      hitSlop={20}
+      padding={10} // This increases clickable area
+      margin={-10} // This keeps layout visually unchanged
     >
       <Button.Text size={'$5'} hoverStyle={{ color: '$primary' }}>
         edit
