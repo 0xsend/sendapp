@@ -9,6 +9,7 @@ import {
 import { Button, LinearGradient, LinkableButton } from '@my/ui'
 import { usePathname } from 'app/utils/usePathname'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { useScrollDirection } from 'app/provider/scroll'
 
 const TABS = [
   {
@@ -39,17 +40,20 @@ export const BottomNavBar = () => {
   const location = usePathname()
   const parts = location.split('/').filter(Boolean)
   const hoverStyles = useHoverStyles()
+  const { direction } = useScrollDirection()
 
   return (
     <XStack
       $platform-web={{
         position: 'fixed',
       }}
-      bottom={0}
+      bottom={direction === 'down' ? -BOTTOM_NAV_BAR_HEIGHT : 0}
       left={0}
       right={0}
       zIndex={100}
       height={BOTTOM_NAV_BAR_HEIGHT}
+      animation="200ms"
+      animateOnly={['bottom']}
       $gtLg={{ display: 'none' }}
     >
       <LinearGradient
