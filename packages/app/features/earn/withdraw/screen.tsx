@@ -276,7 +276,7 @@ export function WithdrawForm() {
     return <Spinner size="large" color={'$color12'} />
   }
   return (
-    <YStack testID="WithdrawForm" w={'100%'} gap={'$4'} pb={'$3'} $gtLg={{ w: '50%' }}>
+    <YStack testID="WithdrawForm" w={'100%'} gap={'$4'} $gtLg={{ w: '50%', pb: '$3.5' }}>
       <Paragraph size={'$7'} fontWeight={'500'}>
         Withdraw Amount
       </Paragraph>
@@ -335,6 +335,7 @@ export function WithdrawForm() {
           }}
           formProps={{
             testID: 'withdraw-deposit-form',
+            footerProps: { pb: 0 },
             $gtSm: {
               maxWidth: '100%',
             },

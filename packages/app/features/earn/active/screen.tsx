@@ -64,7 +64,7 @@ function ActiveEarnings() {
   log('ActiveEarnings', { balances, coin })
 
   return (
-    <YStack w={'100%'} gap={'$4'} pb={'$3'} jc={'space-between'} $gtLg={{ w: '50%' }}>
+    <YStack w={'100%'} gap={'$4'} jc={'space-between'} $gtLg={{ w: '50%', pb: '$3.5' }}>
       <YStack w={'100%'} gap={'$4'}>
         <TotalValue />
         <XStack flexGrow={1} gap={'$3.5'}>

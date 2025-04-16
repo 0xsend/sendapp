@@ -287,7 +287,6 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
       style={
         {
           "flex": 1,
-          "paddingBottom": 18,
         }
       }
     >

@@ -91,7 +91,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
         {Boolean(otherUserProfile) && (
           <>
             <ProfileHeader profile={otherUserProfile} />
-            <Stack pb={'$4'} f={1}>
+            <Stack f={1} $gtLg={{ pb: '$3.5' }}>
               {Boolean(!activities?.length) && (
                 <YStack f={1}>
                   <Paragraph
