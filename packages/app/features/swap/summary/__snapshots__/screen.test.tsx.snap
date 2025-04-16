@@ -242,6 +242,7 @@ exports[`swap summary screen should render 1`] = `
                 disabled={false}
                 focusVisibleStyle={{}}
                 focusable={[Function]}
+                hitSlop={[Function]}
                 minPressDuration={0}
                 onBlur={[Function]}
                 onFocus={[Function]}
@@ -256,8 +257,8 @@ exports[`swap summary screen should render 1`] = `
                     "alignItems": "center",
                     "backgroundColor": "transparent",
                     "borderBottomColor": "transparent",
-                    "borderBottomLeftRadius": 16,
-                    "borderBottomRightRadius": 16,
+                    "borderBottomLeftRadius": 0,
+                    "borderBottomRightRadius": 0,
                     "borderBottomWidth": 0,
                     "borderLeftColor": "transparent",
                     "borderLeftWidth": 0,
@@ -265,8 +266,8 @@ exports[`swap summary screen should render 1`] = `
                     "borderRightWidth": 0,
                     "borderStyle": "solid",
                     "borderTopColor": "transparent",
-                    "borderTopLeftRadius": 16,
-                    "borderTopRightRadius": 16,
+                    "borderTopLeftRadius": 0,
+                    "borderTopRightRadius": 0,
                     "borderTopWidth": 0,
                     "flexDirection": "row",
                     "flexWrap": "nowrap",
@@ -536,6 +537,7 @@ exports[`swap summary screen should render 1`] = `
                 disabled={false}
                 focusVisibleStyle={{}}
                 focusable={[Function]}
+                hitSlop={[Function]}
                 minPressDuration={0}
                 onBlur={[Function]}
                 onFocus={[Function]}
@@ -550,8 +552,8 @@ exports[`swap summary screen should render 1`] = `
                     "alignItems": "center",
                     "backgroundColor": "transparent",
                     "borderBottomColor": "transparent",
-                    "borderBottomLeftRadius": 16,
-                    "borderBottomRightRadius": 16,
+                    "borderBottomLeftRadius": 0,
+                    "borderBottomRightRadius": 0,
                     "borderBottomWidth": 0,
                     "borderLeftColor": "transparent",
                     "borderLeftWidth": 0,
@@ -559,8 +561,8 @@ exports[`swap summary screen should render 1`] = `
                     "borderRightWidth": 0,
                     "borderStyle": "solid",
                     "borderTopColor": "transparent",
-                    "borderTopLeftRadius": 16,
-                    "borderTopRightRadius": 16,
+                    "borderTopLeftRadius": 0,
+                    "borderTopRightRadius": 0,
                     "borderTopWidth": 0,
                     "flexDirection": "row",
                     "flexWrap": "nowrap",
