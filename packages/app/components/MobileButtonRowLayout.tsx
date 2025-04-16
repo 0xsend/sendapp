@@ -8,6 +8,7 @@ import {
   H3,
   AnimatePresence,
   useSafeAreaInsets,
+  Container,
 } from '@my/ui'
 import { HomeButtons } from '../features/home/HomeButtons'
 import { useScrollDirection } from '../provider/scroll'
@@ -22,6 +23,7 @@ import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { useIsSendingUnlocked } from 'app/utils/useIsSendingUnlocked'
 import { formatUnits } from 'viem'
 import { sendCoin } from 'app/data/coins'
+import { BOTTOM_NAV_BAR_HEIGHT } from 'app/components/BottomTabBar/BottomNavBar'
 
 const Row = styled(XStack, {
   w: '100%',
@@ -81,35 +83,32 @@ const Home = ({ children, ...props }: XStackProps) => {
   const { coin: selectedCoin } = useCoinFromTokenParam()
   const { isSendingUnlocked, isLoading } = useIsSendingUnlocked()
   const { direction } = useScrollDirection()
-  const isVisible = isSendingUnlocked && direction !== 'down'
+  const isVisible = !isLoading && isSendingUnlocked && direction !== 'down' && selectedCoin
 
   return (
     <>
       {children}
-      <MobileButtonRow isLoading={isLoading} isVisible={isVisible}>
-        <Row {...props}>
-          <AnimatePresence>
-            {(() => {
-              switch (true) {
-                case !isSendingUnlocked || !isVisible:
-                  return null
-                case selectedCoin !== undefined:
-                  return (
-                    <Stack f={1} $gtSm={{ maw: 350 }}>
-                      <HomeButtons.SendButton />
-                    </Stack>
-                  )
-                default:
-                  return (
-                    <Stack f={1} $gtSm={{ maw: 350 }}>
-                      <HomeButtons.SendButton />
-                    </Stack>
-                  )
-              }
-            })()}
-          </AnimatePresence>
-        </Row>
-      </MobileButtonRow>
+      {isVisible && (
+        <Container>
+          <XStack
+            $platform-web={{
+              position: 'fixed',
+            }}
+            bottom={BOTTOM_NAV_BAR_HEIGHT}
+            left={0}
+            right={0}
+            zIndex={100}
+            jc={'center'}
+            px={'$3.5'}
+            $gtLg={{ display: 'none' }}
+            {...props}
+          >
+            <XStack w={'100%'} $gtSm={{ maxWidth: 736 }} $gtMd={{ maxWidth: 896 }}>
+              <HomeButtons.SendButton />
+            </XStack>
+          </XStack>
+        </Container>
+      )}
     </>
   )
 }
