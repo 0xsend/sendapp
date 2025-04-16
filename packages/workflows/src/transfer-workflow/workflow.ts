@@ -29,7 +29,7 @@ const {
 } = proxyActivities<ReturnType<typeof createUserOpActivities>>({
   startToCloseTimeout: '2 minutes',
   retry: {
-    maximumAttempts: 20,
+    maximumAttempts: 19,
   },
 })
 
