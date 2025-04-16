@@ -39,6 +39,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+          fetch-depth: 2
       - name: Set up Homebrew
         id: set-up-homebrew
         uses: Homebrew/actions/setup-homebrew@master
@@ -54,6 +55,8 @@ jobs:
       # - name: Snaplet Login
       #   shell: bash
       #   run: bunx snaplet auth login ${{ secrets.CI_SNAPLET_AUTH_TOKEN }}
+      - name: Check Workflows Version
+        run: bash ./packages/workflows/workflows-version-check.sh
       - name: Tilt CI
         id: tilt-ci
         shell: bash
