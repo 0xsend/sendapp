@@ -7,10 +7,8 @@ import {
   type UseInfiniteQueryResult,
 } from '@tanstack/react-query'
 import { getBaseAddressFilterCondition } from 'app/utils/activity'
-import { assert } from 'app/utils/assert'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
-import { useAddressBook, type AddressBook } from 'app/utils/useAddressBook'
 import { EventArraySchema, Events, type Activity } from 'app/utils/zod/activity'
 import { useMemo } from 'react'
 import type { ZodError } from 'zod'
@@ -34,11 +32,10 @@ export function useTokenActivityFeed(params: {
 }): UseInfiniteQueryResult<InfiniteData<Activity[]>, PostgrestError | ZodError> {
   const { pageSize = 10, address, refetchInterval = 30_000, enabled: enabledProp = true } = params
   const supabase = useSupabase()
-  const addressBook = useAddressBook()
-  const enabled = useMemo(() => enabledProp && addressBook.isFetched, [enabledProp, addressBook])
+  const enabled = useMemo(() => enabledProp, [enabledProp])
   const queryKey = useMemo(
-    () => ['token_activity_feed', { addressBook, supabase, pageSize, address }] as const,
-    [addressBook, supabase, pageSize, address]
+    () => ['token_activity_feed', { supabase, pageSize, address }] as const,
+    [supabase, pageSize, address]
   )
   return useInfiniteQuery<
     Activity[],
@@ -60,15 +57,12 @@ export function useTokenActivityFeed(params: {
       }
       return firstPageParam - 1
     },
-    queryFn: async ({ queryKey: [, { addressBook, supabase, pageSize, address }], pageParam }) => {
-      throwIf(addressBook.error)
-      assert(!!addressBook.data, 'Fetching address book failed')
+    queryFn: async ({ queryKey: [, { supabase, pageSize, address }], pageParam }) => {
       return await fetchTokenActivityFeed({
         address,
         pageParam,
         supabase,
         pageSize,
-        addressBook: addressBook.data,
       })
     },
     refetchInterval: ({ state: { dataUpdateCount, data } }) => {
@@ -96,7 +90,6 @@ export function useTokenActivityFeed(params: {
  * Fetches the activity feed for a specific token address.
  *
  * @param params.pageParam - The page number to fetch
- * @param params.addressBook - The address book containing known addresses and their labels
  * @param params.supabase - The Supabase client
  * @param params.pageSize - The number of items to fetch per page
  * @param params.address - The token address to fetch activities for
@@ -108,7 +101,6 @@ export async function fetchTokenActivityFeed({
   address,
 }: {
   pageParam: number
-  addressBook: AddressBook
   supabase: SupabaseClient<Database>
   pageSize: number
   address?: PgBytea
