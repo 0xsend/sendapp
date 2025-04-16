@@ -41,7 +41,7 @@ export const ActivityDetails = ({
 } & StackProps) => {
   const { data: swapRouters } = useSwapRouters()
   const { data: liquidityPools } = useLiquidityPools()
-  const activityEventName = useEventNameFromActivity({ activity, swapRouters })
+  const activityEventName = useEventNameFromActivity({ activity, swapRouters, liquidityPools })
   const activityPhrase = usePhraseFromActivity({ activity, swapRouters, liquidityPools })
   const subText = useSubtextFromActivity({ activity, swapRouters, liquidityPools })
   const amount = useAmountFromActivity(activity)
@@ -87,7 +87,9 @@ export const ActivityDetails = ({
                       default:
                         return <Text>{subText}</Text>
                     }
-                  })()} {(() => {
+                  })()}
+                  &nbsp;
+                  {(() => {
                     switch (true) {
                       case isSendtagCheckoutEvent(activity):
                         return (

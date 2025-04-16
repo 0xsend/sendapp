@@ -179,22 +179,25 @@ export const createTransferActivities = (
       const tx_idx = bundlerReceipt.receipt.transactionIndex.toString()
 
       const log_idx = token
-        ? logs.find(
-            ({ topics }) =>
-              topics[0] &&
-              topics[1] &&
-              topics[2] &&
-              isTransferTopic(topics[0]) &&
-              isAddressInTopic(topics[1], from) &&
-              isAddressInTopic(topics[2], to)
-          )?.logIndex
-        : logs
+        ? logs
             .find(
               ({ topics }) =>
                 topics[0] &&
                 topics[1] &&
+                topics[2] &&
+                isTransferTopic(topics[0]) &&
+                isAddressInTopic(topics[1], from) &&
+                isAddressInTopic(topics[2], to)
+            )
+            ?.logIndex.toString()
+        : logs
+            .find(
+              ({ topics, address }) =>
+                address.toLowerCase() === to.toLowerCase() &&
+                topics[0] &&
+                topics[1] &&
                 isReceiveTopic(topics[0]) &&
-                isAddressInTopic(topics[1], to)
+                isAddressInTopic(topics[1], from)
             )
             ?.logIndex.toString()
 

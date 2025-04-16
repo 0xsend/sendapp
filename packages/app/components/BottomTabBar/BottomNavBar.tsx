@@ -50,7 +50,7 @@ export const BottomNavBar = () => {
       right={0}
       zIndex={100}
       height={BOTTOM_NAV_BAR_HEIGHT}
-      $gtSm={{ display: 'none' }}
+      $gtLg={{ display: 'none' }}
     >
       <LinearGradient
         start={[0, 0]}
@@ -59,6 +59,7 @@ export const BottomNavBar = () => {
         fullscreen
         colors={['transparent', '$color0', '$color0']}
         overflow={'visible'}
+        ai={'center'}
       >
         <XStack
           bc={'$color1'}
@@ -72,6 +73,8 @@ export const BottomNavBar = () => {
           shadowOffset={{ width: 0, height: -5 }}
           shadowOpacity={0.3}
           shadowRadius={60}
+          $gtSm={{ jc: 'space-around', maxWidth: 736 }}
+          $gtMd={{ maxWidth: 896 }}
         >
           {TABS.map((tab) => {
             const isActiveRoute =

@@ -1,13 +1,14 @@
-import { H4, Paragraph, Spinner, XStack, YStack } from '@my/ui'
+import { H4, Paragraph, Spinner, useMedia, XStack, YStack } from '@my/ui'
 import type { PostgrestError } from '@supabase/postgrest-js'
 import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
 import { ActivityDetails } from 'app/features/activity/ActivityDetails'
 import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
 import type { Activity } from 'app/utils/zod/activity'
-import { type PropsWithChildren, useMemo, useState } from 'react'
+import { type PropsWithChildren, useEffect, useMemo, useState } from 'react'
 import { SectionList } from 'react-native'
 import type { ZodError } from 'zod'
 import { useActivityFeed } from './utils/useActivityFeed'
+import { useScrollDirection } from 'app/provider/scroll'
 
 export function RecentActivity() {
   const result = useActivityFeed()
@@ -22,7 +23,14 @@ export function RecentActivity() {
   }
 
   return (
-    <XStack w={'100%'} height={0} gap={'$5'} f={1}>
+    <XStack
+      w={'100%'}
+      gap={'$5'}
+      f={1}
+      $gtLg={{
+        height: 0,
+      }}
+    >
       <YStack
         f={1}
         display={selectedActivity ? 'none' : 'flex'}
@@ -54,6 +62,9 @@ function ActivityFeed({
   activityFeedQuery: UseInfiniteQueryResult<InfiniteData<Activity[]>, PostgrestError | ZodError>
   onActivityPress: (activity: Activity) => void
 }) {
+  const { isAtEnd } = useScrollDirection()
+  const media = useMedia()
+
   const {
     data,
     isLoading: isLoadingActivities,
@@ -62,6 +73,12 @@ function ActivityFeed({
     fetchNextPage,
     hasNextPage,
   } = activityFeedQuery
+
+  useEffect(() => {
+    if (isAtEnd && !media.gtLg && hasNextPage && !isFetchingNextPageActivities) {
+      fetchNextPage()
+    }
+  }, [isAtEnd, hasNextPage, fetchNextPage, isFetchingNextPageActivities, media.gtLg])
 
   const sections = useMemo(() => {
     if (!data?.pages) return []
@@ -147,7 +164,7 @@ function ActivityFeed({
       renderSectionHeader={({ section: { title, index } }) => (
         <RowLabel first={index === 0}>{title}</RowLabel>
       )}
-      onEndReached={() => hasNextPage && fetchNextPage()}
+      onEndReached={() => hasNextPage && media.gtLg && fetchNextPage()}
       ListFooterComponent={
         !isLoadingActivities && isFetchingNextPageActivities ? <Spinner size="small" /> : null
       }

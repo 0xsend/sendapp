@@ -94,7 +94,6 @@ export function AccountScreen() {
       overflow={'scroll'}
       $gtSm={{
         maxWidth: '500px',
-        overflow: 'visible',
       }}
       $gtLg={{
         gap: '$5',
@@ -102,17 +101,18 @@ export function AccountScreen() {
         maxWidth: '1100px',
         marginHorizontal: 0,
         height: isWeb ? 'min-content' : 'auto',
+        overflow: 'visible',
       }}
     >
       <YStack
         w="100%"
-        height={'75%'}
+        aspectRatio={1}
         br="$6"
         position="relative"
         $gtLg={{
           gap: '$5',
           width: '50%',
-          height: 'auto',
+          aspectRatio: 'unset',
         }}
       >
         <Avatar w={'100%'} h={'100%'} maxWidth={'100%'} maxHeight={'100%'} bc="$color2" br="$6">
