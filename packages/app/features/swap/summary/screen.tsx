@@ -402,8 +402,10 @@ export const EditButton = () => {
       focusStyle={{ backgroundColor: 'transparent' }}
       p={0}
       bw={0}
+      br={0}
       height={'auto'}
       onPress={handlePress}
+      hitSlop={20}
     >
       <Button.Text size={'$5'} hoverStyle={{ color: '$primary' }}>
         edit
