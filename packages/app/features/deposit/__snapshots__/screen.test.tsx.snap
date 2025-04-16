@@ -7,8 +7,6 @@ exports[`DepositScreen renders the deposit screen 1`] = `
       "flexDirection": "column",
       "gap": 24,
       "justifyContent": "space-between",
-      "paddingBottom": 16,
-      "paddingTop": 16,
       "width": "100%",
     }
   }

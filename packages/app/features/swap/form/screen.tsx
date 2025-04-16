@@ -180,10 +180,10 @@ export const SwapFormScreen = () => {
     <YStack
       w={'100%'}
       gap="$5"
-      pb={'$3.5'}
       jc={'space-between'}
       $gtLg={{
         w: '50%',
+        pb: '$3.5',
       }}
     >
       <FormProvider {...form}>
