@@ -13,11 +13,13 @@ import { IconArrowLeft } from 'app/components/icons'
 import { useSendScreenParams } from 'app/routers/params'
 import { usePathname } from 'app/utils/usePathname'
 import { useRouter } from 'solito/router'
+import { AvatarMenuButton } from 'app/components/TopNav'
+import { useUser } from 'app/utils/useUser'
 
 export function SendTopNav() {
   const [sendParams] = useSendScreenParams()
   const { back } = useRouter()
-
+  const { profile } = useUser()
   const path = usePathname()
 
   const handleBack = () => {
@@ -61,6 +63,11 @@ export function SendTopNav() {
               }
             })()}
           </Paragraph>
+          {isOnSelectRecipient && profile && (
+            <XStack ml={'auto'}>
+              <AvatarMenuButton profile={profile} />
+            </XStack>
+          )}
         </XStack>
         <Stack $lg={{ display: 'none' }} jc="center">
           <H2
