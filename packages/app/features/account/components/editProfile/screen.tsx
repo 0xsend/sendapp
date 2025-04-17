@@ -166,6 +166,11 @@ function EditProfileForm({ profile, onSave }: { profile: Tables<'profiles'>; onS
         about: about ? about : '',
         isPublic: is_public !== null ? is_public : true,
       }}
+      formProps={{
+        $gtSm: {
+          maxWidth: '100%',
+        },
+      }}
       onSubmit={handleSubmit}
       renderAfter={({ submit }) => (
         <YStack>
