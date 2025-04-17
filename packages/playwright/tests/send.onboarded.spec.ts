@@ -102,7 +102,8 @@ for (const token of [...coins, ethCoin]) {
       await page.goto('/')
 
       //Press send button
-      await page.getByTestId('homeSendButton').first().click()
+      await page.locator(`a[href="/?token=${token.token}"]`).click()
+      await page.getByTestId('send-quick-action').click()
 
       // fill search input
       const searchInput = page.getByRole('search', { name: 'query' })

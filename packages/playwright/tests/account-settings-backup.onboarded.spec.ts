@@ -19,7 +19,7 @@ test.beforeEach(async ({ page, user: { user } }) => {
   const nextContainer = page.locator('[id="__next"]')
   await page.goto('/')
   await page.waitForURL('/')
-  await nextContainer.getByRole('link', { name: 'account' }).click()
+  await page.getByTestId('account-menu-entry').click()
   await page.waitForURL('/account')
   await nextContainer.getByRole('link', { name: 'Settings' }).click()
   await page.waitForURL('/account/settings')

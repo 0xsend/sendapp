@@ -40,7 +40,15 @@ export const HomeQuickActions = ({ showSendAction, ...props }: HomeQuickActionsP
           hoverStyle={hoverStyles}
           focusStyle={hoverStyles}
         >
-          <YStack gap="$2" jc={'space-between'} ai="center" px="$4" py="$3.5" $gtSm={{ py: '$4' }}>
+          <YStack
+            testID={'send-quick-action'}
+            gap="$2"
+            jc={'space-between'}
+            ai="center"
+            px="$4"
+            py="$3.5"
+            $gtSm={{ py: '$4' }}
+          >
             <IconArrowUp
               size={'$1.5'}
               $theme-dark={{ color: '$primary' }}
