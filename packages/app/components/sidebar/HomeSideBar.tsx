@@ -112,9 +112,6 @@ const DesktopAccountMenuEntry = () => {
       focusStyle={{
         backgroundColor: '$color0',
       }}
-      focusVisibleStyle={{
-        backgroundColor: '$color0',
-      }}
     >
       <Avatar circular={true} size={'$4.5'}>
         <Avatar.Image src={profile?.avatar_url ?? ''} w="100%" h="100%" objectFit="cover" />
