@@ -119,7 +119,7 @@ const DesktopAccountMenuEntry = () => {
           <IconAccount size={'$2'} $theme-light={{ color: '$color12' }} />
         </Avatar.Fallback>
       </Avatar>
-      <YStack jc={'center'} f={1}>
+      <YStack jc={'center'} f={1} testID={'account-menu-entry'}>
         <Paragraph size={'$7'} numberOfLines={1} f={1} textOverflow={'ellipsis'}>
           {profile?.name ?? `#${profile?.send_id}`}
         </Paragraph>
