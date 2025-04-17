@@ -147,6 +147,11 @@ export const PersonalInfoScreen = () => {
           disabled: Boolean(profile?.birthday),
         },
       }}
+      formProps={{
+        $gtSm: {
+          maxWidth: '100%',
+        },
+      }}
       renderAfter={({ submit }) => (
         <YStack>
           <SubmitButton
