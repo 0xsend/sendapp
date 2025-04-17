@@ -2,6 +2,7 @@ import {
   Avatar,
   Link,
   LinkableAvatar,
+  LinkableButton,
   Nav,
   Paragraph,
   ScrollView,
@@ -20,7 +21,6 @@ import {
   IconDeviceReset,
   IconHome,
   IconSendLogo,
-  IconSwap,
   IconWorldSearch,
 } from 'app/components/icons'
 import { SideBarNavLink } from 'app/components/sidebar/SideBarNavLink'
@@ -39,19 +39,14 @@ const links = [
     href: '/',
   },
   {
+    icon: <IconDeviceReset size={'$1'} color={'inherit'} scale={'1.2'} />,
+    text: 'Activity',
+    href: '/activity',
+  },
+  {
     icon: <IconArrowUp size={'$1'} color={'inherit'} scale={'1.3'} />,
     text: 'Send',
     href: '/send',
-  },
-  {
-    icon: <IconWorldSearch size={'$1'} color={'inherit'} />,
-    text: 'Explore',
-    href: '/explore',
-  },
-  {
-    icon: <IconSwap size={'$1'} color={'inherit'} />,
-    text: 'Trade',
-    href: '/trade',
   },
   {
     icon: <IconChart size={'$1'} color={'inherit'} />,
@@ -59,14 +54,9 @@ const links = [
     href: '/invest',
   },
   {
-    icon: <IconDeviceReset size={'$1'} color={'inherit'} scale={'1.2'} />,
-    text: 'Activity',
-    href: '/activity',
-  },
-  {
-    icon: <IconAccount size={'$1'} color={'inherit'} scale={'1.3'} />,
-    text: 'Account',
-    href: '/account',
+    icon: <IconWorldSearch size={'$1'} color={'inherit'} />,
+    text: 'Explore',
+    href: '/explore',
   },
   __DEV__ || baseMainnet.id === 84532
     ? {
@@ -79,7 +69,7 @@ const links = [
 
 const HomeSideBar = ({ ...props }: YStackProps) => {
   return (
-    <SideBar {...props} ai={'flex-start'} pl="$7">
+    <SideBar {...props} ai={'flex-start'} px="$7">
       <Link href={'/'}>
         <IconSendLogo color={'$color12'} size={'$2.5'} />
       </Link>
@@ -89,7 +79,63 @@ const HomeSideBar = ({ ...props }: YStackProps) => {
           <SideBarNavLink key={link.href} {...link} />
         ))}
       </YStack>
+      <DesktopAccountMenuEntry />
     </SideBar>
+  )
+}
+
+const DesktopAccountMenuEntry = () => {
+  const { profile, tags } = useUser()
+  const hoverStyles = useHoverStyles()
+  const tagToShow = tags?.filter((tag) => tag.status === 'confirmed')[0]
+
+  return (
+    <LinkableButton
+      href={'/account'}
+      width={'100%'}
+      jc={'flex-start'}
+      px={'$4'}
+      py={'$2.5'}
+      h={'auto'}
+      br={'$6'}
+      bc={'$color0'}
+      backgroundColor={'$color0'}
+      hoverStyle={{ ...hoverStyles, borderColor: 'transparent' }}
+      pressStyle={{
+        backgroundColor: '$color0',
+        borderColor: 'transparent',
+      }}
+      focusStyle={{
+        backgroundColor: '$color0',
+      }}
+    >
+      <Avatar circular={true} size={'$4.5'}>
+        <Avatar.Image src={profile?.avatar_url ?? ''} w="100%" h="100%" objectFit="cover" />
+        <Avatar.Fallback jc={'center'} ai="center" theme="green_active" bc="$color2">
+          <IconAccount size={'$2'} $theme-light={{ color: '$color12' }} />
+        </Avatar.Fallback>
+      </Avatar>
+      <YStack jc={'center'} f={1}>
+        <Paragraph size={'$7'} numberOfLines={1} f={1} textOverflow={'ellipsis'}>
+          {profile?.name ?? `#${profile?.send_id}`}
+        </Paragraph>
+        {tagToShow && (
+          <Paragraph
+            bc={'$color1'}
+            size={'$2'}
+            width={'max-content'}
+            maxWidth={'100%'}
+            numberOfLines={1}
+            px={'$2'}
+            py={'$1.5'}
+            textOverflow={'ellipsis'}
+            br={'$2'}
+          >
+            {`/${tagToShow.name}`}
+          </Paragraph>
+        )}
+      </YStack>
+    </LinkableButton>
   )
 }
 
@@ -152,7 +198,7 @@ export const HomeSideBarWrapper = ({ children }: { children?: React.ReactNode })
 
   return (
     <XStack overflow="hidden" height={'100%'}>
-      {media.gtLg && <HomeSideBar width={234} minWidth={234} pt={80} jc="flex-start" />}
+      {media.gtLg && <HomeSideBar width={291} minWidth={291} py={80} jc={'space-between'} />}
       {children}
       {!media.gtLg && <HomeBottomSheet />}
     </XStack>
