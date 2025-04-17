@@ -33,6 +33,10 @@ jest.mock('app/utils/useCoinFromTokenParam', () => ({
   }),
 }))
 
+jest.mock('app/utils/useIsSendingUnlocked', () => ({
+  useIsSendingUnlocked: jest.fn().mockReturnValue(true),
+}))
+
 describe('TokenDetails', () => {
   beforeEach(() => {
     jest.useFakeTimers()

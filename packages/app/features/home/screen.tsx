@@ -49,6 +49,7 @@ function SendSearchBody() {
 function HomeBody(props: XStackProps) {
   const { coin: selectedCoin } = useCoinFromTokenParam()
   const { isSendingUnlocked, isLoading } = useIsSendingUnlocked()
+  const quickActionHeightWithOffset = 117
 
   if (isLoading)
     return (
@@ -58,7 +59,13 @@ function HomeBody(props: XStackProps) {
     )
 
   return (
-    <XStack w={'100%'} $gtLg={{ gap: '$5' }} $lg={{ f: 1, pt: '$3' }} minHeight={'100%'} {...props}>
+    <XStack
+      w={'100%'}
+      $gtLg={{ gap: '$5', pb: '$3.5' }}
+      $lg={{ f: 1, pt: '$3' }}
+      minHeight={'100%'}
+      {...props}
+    >
       <YStack
         $gtLg={{ display: 'flex', w: '45%', gap: '$5', pb: 0 }}
         display={!selectedCoin ? 'flex' : 'none'}
@@ -90,8 +97,19 @@ function HomeBody(props: XStackProps) {
         ) : (
           <TokenBalanceCard />
         )}
-        <HomeQuickActions $gtLg={{ display: 'none' }} />
-        <YStack w={'100%'} ai={'center'}>
+        <HomeQuickActions
+          y={selectedCoin ? -quickActionHeightWithOffset : 0}
+          zIndex={selectedCoin ? -1 : 0}
+          animateOnly={['transform']}
+          animation="200ms"
+        />
+        <YStack
+          w={'100%'}
+          ai={'center'}
+          y={selectedCoin ? -quickActionHeightWithOffset : 0}
+          animateOnly={['transform']}
+          animation="200ms"
+        >
           <Card
             bc={'$color1'}
             width="100%"
@@ -99,27 +117,11 @@ function HomeBody(props: XStackProps) {
             $gtSm={{
               p: '$4',
             }}
-            $gtLg={{
-              maxHeight: 370,
-              // @ts-expect-error tamagui tripping here
-              overflowY: 'scroll',
-            }}
           >
             <TokenBalanceList />
           </Card>
         </YStack>
-        {isSendingUnlocked && (
-          <XStack $lg={{ display: 'none' }} pt={'$4'} jc={'center'} gap={'$4'} w="100%">
-            <Stack f={1} w="50%" flexDirection="row-reverse" maw={350}>
-              <HomeButtons.GhostDepositButton />
-            </Stack>
-            <Stack f={1} w="50%" jc={'center'} maw={350}>
-              <HomeButtons.SendButton />
-            </Stack>
-          </XStack>
-        )}
       </YStack>
-
       {selectedCoin !== undefined && <TokenDetails coin={selectedCoin} />}
     </XStack>
   )
