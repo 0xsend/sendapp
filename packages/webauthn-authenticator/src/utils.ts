@@ -15,6 +15,14 @@ export function base64URLToBuffer(str: string) {
   return base64urlnopad.decode(str)
 }
 
+/**
+ * Safely converts a Buffer or Uint8Array to an ArrayBuffer
+ * @param buffer The buffer to convert
+ */
+function toArrayBuffer(buffer: Buffer | Uint8Array): ArrayBuffer {
+  return new Uint8Array(buffer).buffer
+}
+
 // Parses authenticatorData buffer to struct
 // https://www.w3.org/TR/webauthn-2/#sctn-authenticator-data
 export function parseCredAuthData(buffer: Uint8Array) {
@@ -87,10 +95,10 @@ export function deserializePublicKeyCredentialAttestion(
   const publicKey = cbor.decodeAllSync(COSEPublicKey)[0]
 
   const response: AuthenticatorAttestationResponse = {
-    attestationObject,
-    clientDataJSON,
+    attestationObject: toArrayBuffer(attestationObject),
+    clientDataJSON: toArrayBuffer(clientDataJSON),
     getAuthenticatorData() {
-      return authData
+      return toArrayBuffer(authData)
     },
     // returns an array buffer containing the DER SubjectPublicKeyInfo of the new credential
     getPublicKey() {
@@ -100,7 +108,7 @@ export function deserializePublicKeyCredentialAttestion(
         publicKey.get(-2),
         publicKey.get(-3),
       ]
-      return Buffer.concat(key)
+      return toArrayBuffer(Buffer.concat(key))
     },
     getPublicKeyAlgorithm() {
       return attStmt.alg
@@ -111,7 +119,7 @@ export function deserializePublicKeyCredentialAttestion(
   }
   return {
     id: bufferToBase64URL(credentialId),
-    rawId: credentialId,
+    rawId: toArrayBuffer(credentialId),
     authenticatorAttachment: 'platform',
     attestationObject,
     clientDataJSON,
@@ -120,6 +128,20 @@ export function deserializePublicKeyCredentialAttestion(
     },
     response,
     type: 'public-key',
+    toJSON() {
+      return {
+        id: bufferToBase64URL(credentialId),
+        rawId: credentialId,
+        authenticatorAttachment: 'platform',
+        attestationObject,
+        clientDataJSON,
+        getClientExtensionResults() {
+          return {}
+        },
+        response,
+        type: 'public-key',
+      } as PublicKeyCredentialJSON
+    },
   } as PublicKeyCredential & {
     response: AuthenticatorAttestationResponse
   }
@@ -139,14 +161,14 @@ export function deserializePublicKeyCredentialAssertion(
     ? base64URLToBuffer(credential.response.userHandle)
     : null
   const response: AuthenticatorAssertionResponse = {
-    authenticatorData,
-    clientDataJSON,
-    signature,
-    userHandle,
+    authenticatorData: toArrayBuffer(authenticatorData),
+    clientDataJSON: toArrayBuffer(clientDataJSON),
+    signature: toArrayBuffer(signature),
+    userHandle: userHandle ? toArrayBuffer(userHandle) : null,
   }
   return {
     id: credential.id,
-    rawId: credentialId,
+    rawId: toArrayBuffer(credentialId),
     authenticatorAttachment: 'platform',
     clientDataJSON,
     getClientExtensionResults() {
@@ -154,6 +176,19 @@ export function deserializePublicKeyCredentialAssertion(
     },
     response,
     type: 'public-key',
+    toJSON() {
+      return {
+        id: credential.id,
+        rawId: toArrayBuffer(credentialId),
+        authenticatorAttachment: 'platform',
+        clientDataJSON,
+        getClientExtensionResults() {
+          return {}
+        },
+        response,
+        type: 'public-key',
+      } as PublicKeyCredentialJSON
+    },
   } as PublicKeyCredential & {
     response: AuthenticatorAssertionResponse
   }

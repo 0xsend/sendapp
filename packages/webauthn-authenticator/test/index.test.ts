@@ -83,7 +83,7 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
 
         const cred = deserializePublicKeyCredentialAttestion(credSer)
 
-        expect(cred.rawId).toEqual(new Uint8Array(testBytes))
+        expect(new Uint8Array(cred.rawId)).toEqual(new Uint8Array(testBytes))
         expect(cred.id).toEqual(testBytes.toString('base64url'))
 
         verifyAttestation({ cred, attestationChallenge, publicKey: keyPair.publicKey })
@@ -191,7 +191,7 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
 
         const cred = deserializePublicKeyCredentialAttestion(credSer)
 
-        expect(cred.rawId).toEqual(new Uint8Array(testBytes))
+        expect(new Uint8Array(cred.rawId)).toEqual(new Uint8Array(testBytes))
         expect(cred.id).toEqual(testBytes.toString('base64url'))
         verifyAttestation({ cred, attestationChallenge, publicKey: keyPair.publicKey })
 
@@ -243,7 +243,7 @@ async function verifyAssertion({
   testBytes: Buffer
   keyPair: { publicKey: Buffer; privateKey: string }
 }) {
-  expect(cred.rawId).toEqual(new Uint8Array(testBytes))
+  expect(new Uint8Array(cred.rawId)).toEqual(new Uint8Array(testBytes))
   expect(cred.id).toEqual(testBytes.toString('base64url'))
   const clientDataHash = Buffer.from(
     await crypto.subtle.digest('SHA-256', cred.response.clientDataJSON)
@@ -292,13 +292,13 @@ async function verifyAttestation({
   const responsePublicKey = response.getPublicKey()
   expect(responsePublicKey).toBeTruthy()
   // @ts-expect-error - null checked above
-  expect(responsePublicKey.toString('hex')).toEqual(publicKey.toString('hex'))
+  expect(Buffer.from(responsePublicKey).toString('hex')).toEqual(publicKey.toString('hex'))
   // verify the attStmt sig against
   const attestation = cbor.decodeAllSync(response.attestationObject)[0]
 
   expect(attestation).toBeDefined()
   expect(attestation.authData).toBeDefined()
-  expect(attestation.authData).toEqual(response.getAuthenticatorData())
+  expect(attestation.authData).toEqual(Buffer.from(response.getAuthenticatorData()))
   expect(attestation.attStmt).toBeDefined()
   expect(attestation.attStmt.sig).toBeDefined()
   const verified = crypto.verify(
