@@ -16,7 +16,7 @@
     "@types/bun": "^1.1.6",
     "dotenv-cli": "^7.3.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.5.3"
+    "typescript": "^5.8.3"
   },
   "peerDependencies": {
     "typescript": "^5.5.3"
