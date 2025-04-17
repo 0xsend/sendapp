@@ -85,7 +85,7 @@ const HomeSideBar = ({ ...props }: YStackProps) => {
 }
 
 const DesktopAccountMenuEntry = () => {
-  const { profile, tags } = useUser()
+  const { profile, tags, isLoadingProfile, isLoadingTags } = useUser()
   const hoverStyles = useHoverStyles()
   const tagToShow = tags?.filter((tag) => tag.status === 'confirmed')[0]
 
@@ -98,8 +98,12 @@ const DesktopAccountMenuEntry = () => {
       py={'$2.5'}
       h={'auto'}
       br={'$6'}
+      height={82}
       bc={'$color0'}
       backgroundColor={'$color0'}
+      opacity={isLoadingProfile || isLoadingTags ? 0 : 1}
+      animateOnly={['opacity']}
+      animation="200ms"
       hoverStyle={{ ...hoverStyles, borderColor: 'transparent' }}
       pressStyle={{
         backgroundColor: '$color0',
