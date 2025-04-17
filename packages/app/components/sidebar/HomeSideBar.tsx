@@ -104,12 +104,15 @@ const DesktopAccountMenuEntry = () => {
       opacity={isLoadingProfile || isLoadingTags ? 0 : 1}
       animateOnly={['opacity']}
       animation="200ms"
-      hoverStyle={{ ...hoverStyles, borderColor: 'transparent' }}
       pressStyle={{
         backgroundColor: '$color0',
         borderColor: 'transparent',
       }}
+      hoverStyle={{ backgroundColor: hoverStyles.background, borderColor: 'transparent' }}
       focusStyle={{
+        backgroundColor: '$color0',
+      }}
+      focusVisibleStyle={{
         backgroundColor: '$color0',
       }}
     >
