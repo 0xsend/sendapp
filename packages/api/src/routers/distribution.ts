@@ -1,6 +1,6 @@
 import { StandardMerkleTree } from '@openzeppelin/merkle-tree'
 import { TRPCError } from '@trpc/server'
-import { supabaseAdmin } from 'app/utils/supabase/admin'
+import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
 import { selectAll } from 'app/utils/supabase/selectAll'
@@ -16,6 +16,7 @@ export const distributionRouter = createTRPCRouter({
       })
     )
     .query(async ({ ctx: { session }, input: { distributionId } }) => {
+      const supabaseAdmin = createSupabaseAdminClient()
       // lookup active distribution shares
       const { data: shares, error: sharesError } = await selectAll(
         supabaseAdmin

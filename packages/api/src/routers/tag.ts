@@ -5,7 +5,7 @@ import { fetchSendtagCheckoutReceipts } from 'app/features/account/sendtag/check
 import { assert } from 'app/utils/assert'
 import { byteaToHex } from 'app/utils/byteaToHex'
 import { hexToBytea } from 'app/utils/hexToBytea'
-import { supabaseAdmin } from 'app/utils/supabase/admin'
+import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { throwIf } from 'app/utils/throwIf'
 import { fetchReferrer } from 'app/utils/useReferrer'
 import { byteaTxHash } from 'app/utils/zod'
@@ -157,6 +157,7 @@ export const tagRouter = createTRPCRouter({
       log('confirming tags', `event_id=${event_id}`)
 
       // confirm all pending tags and save the transaction receipt
+      const supabaseAdmin = createSupabaseAdminClient()
       const { error: confirmTagsErr } = await supabaseAdmin.rpc('confirm_tags', {
         tag_names: pendingTags.map((t) => t.name),
         event_id,

@@ -6,7 +6,11 @@ import { test as snapletTest } from '../snaplet'
 import type { Database, Tables } from '@my/supabase/database.types'
 import { type Session, type SupabaseClient, type User, createClient } from '@supabase/supabase-js'
 import { countries } from 'app/utils/country'
-import { SUPABASE_URL, SUPABASE_SUBDOMAIN, supabaseAdmin } from 'app/utils/supabase/admin'
+import {
+  SUPABASE_URL,
+  SUPABASE_SUBDOMAIN,
+  createSupabaseAdminClient,
+} from 'app/utils/supabase/admin'
 import debug from 'debug'
 import jwt, { type JwtPayload } from 'jsonwebtoken'
 import config from '../../../playwright.config'
@@ -111,6 +115,7 @@ const authTest = snapletTest.extend<{
   user: async ({}, use) => {
     const { parallelIndex } = test.info()
     log = debug(`test:auth:${parallelIndex}`)
+    const supabaseAdmin = createSupabaseAdminClient()
 
     const randomNumber = generatePhone()
     const country = randomCountry()

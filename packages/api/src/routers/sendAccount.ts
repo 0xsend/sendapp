@@ -18,7 +18,7 @@ import { TRPCError } from '@trpc/server'
 import { base16Regex } from 'app/utils/base16Regex'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { COSEECDHAtoXY } from 'app/utils/passkeys'
-import { supabaseAdmin } from 'app/utils/supabase/admin'
+import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { throwIf } from 'app/utils/throwIf'
 import { USEROP_SALT, getSendAccountCreateArgs, packUserOp } from 'app/utils/userop'
 import debug from 'debug'
@@ -265,6 +265,7 @@ export const sendAccountRouter = createTRPCRouter({
 
         await withRetry(
           async function waitForTransactionReceipt() {
+            const supabaseAdmin = createSupabaseAdminClient()
             const { count, error } = await supabaseAdmin
               .from('send_account_created')
               .select('*', { count: 'exact', head: true })

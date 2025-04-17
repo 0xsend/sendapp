@@ -5,7 +5,8 @@ import type {
   PostgrestSingleResponse,
 } from '@supabase/supabase-js'
 import { log } from '@temporalio/activity'
-import { supabaseAdmin } from 'app/utils/supabase/admin'
+// Import the factory function, although we'll mock it
+import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import type { Address } from 'viem'
 import { bytesToHex, hexToBytes } from 'viem'
 import {
@@ -38,6 +39,28 @@ function toPgBytea(bytes: Uint8Array): PgBytea {
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 
+// --- Mock Setup ---
+// Create the mock client instance first
+const mockedSupabaseAdmin = {
+  schema: jest.fn(),
+  // Add other top-level methods if needed, though schema is usually the entry point
+} as unknown as jest.Mocked<SupabaseClient>
+
+// Mock the module, making the factory function return our mock instance
+jest.mock('app/utils/supabase/admin', () => ({
+  createSupabaseAdminClient: jest.fn(() => mockedSupabaseAdmin),
+}))
+
+// Mock the temporal activity log
+jest.mock('@temporalio/activity', () => ({
+  log: {
+    warn: jest.fn(),
+    error: jest.fn(),
+    info: jest.fn(),
+    debug: jest.fn(),
+  },
+}))
+
 // Helper to create a mock PostgrestError
 const createMockPostgrestError = (message: string): PostgrestError => ({
   message,
@@ -46,11 +69,7 @@ const createMockPostgrestError = (message: string): PostgrestError => ({
   code: 'MOCK',
 })
 
-// Type the mocked supabaseAdmin more specifically if possible, or use as jest.Mocked
-const mockedSupabaseAdmin = supabaseAdmin as jest.Mocked<SupabaseClient>
-
-// --- Mock Setup ---
-// Define reusable mock functions for the chain
+// Define reusable mock functions for the chain (to be attached to mockedSupabaseAdmin)
 const mockMaybeSingle = jest.fn<() => Promise<PostgrestMaybeSingleResponse<unknown>>>()
 const mockSingle = jest.fn<() => Promise<PostgrestSingleResponse<unknown>>>()
 const mockEq = jest.fn().mockImplementation(() => ({
@@ -80,11 +99,21 @@ const mockSchema = jest.fn().mockImplementation(() => ({
 }))
 
 beforeEach(() => {
+  // Clear mocks including the factory mock call count
   jest.clearAllMocks()
-  // Assign the mock implementation to the mocked client
+  // Re-assign the mock implementation to the mocked client's schema method
+  // This ensures the chained mocks are reset for each test
   ;(mockedSupabaseAdmin.schema as jest.Mock).mockImplementation(mockSchema)
+  // Also reset the chained mocks themselves
+  mockSchema.mockClear()
+  mockFrom.mockClear()
+  mockSelect.mockClear()
+  mockEq.mockClear()
+  mockUpdate.mockClear()
+  mockUpsert.mockClear()
+  mockSingle.mockClear()
+  mockMaybeSingle.mockClear()
 })
-// --- End Mock Setup ---
 
 describe('Deposit Workflow Supabase Helpers', () => {
   const mockWorkflowId = 'wf-123'

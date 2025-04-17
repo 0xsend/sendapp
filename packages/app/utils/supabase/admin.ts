@@ -1,27 +1,32 @@
 import type { Database } from '@my/supabase/database.types'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
-if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-  throw new Error(
-    'NEXT_PUBLIC_SUPABASE_URL is not set. Please update the root .env.local and restart the server.'
-  )
-}
-if (!process.env.SUPABASE_SERVICE_ROLE) {
-  throw new Error(
-    'SUPABASE_SERVICE_ROLE is not set. Please update the root .env.local and restart the server.'
-  )
-}
-
-export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
-
-// @note see how Supabase does it here: https://github.com/supabase/supabase-js/blob/f6bf008d8017ae013450ecd3fa806acad735bacc/src/SupabaseClient.ts#L95
-export const SUPABASE_SUBDOMAIN = new URL(SUPABASE_URL).hostname.split('.')[0]
-
-const SUPABASE_SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE
+// Export constants derived from environment variables if they exist,
+// but don't throw errors here.
+export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+export const SUPABASE_SUBDOMAIN = SUPABASE_URL ? new URL(SUPABASE_URL).hostname.split('.')[0] : ''
 
 /**
- * only meant to be used on the server side.
+ * Creates a Supabase client configured for server-side admin access.
+ * This function should be called each time an admin client is needed.
+ * It will throw an error if the required environment variables are not set.
+ * @returns {SupabaseClient<Database>} A new Supabase client instance.
+ * @throws {Error} If NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE environment variables are not set.
  */
-export const supabaseAdmin = createClient<Database>(SUPABASE_URL, SUPABASE_SERVICE_ROLE, {
-  auth: { persistSession: false },
-})
+export function createSupabaseAdminClient(): SupabaseClient<Database> {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseServiceRole = process.env.SUPABASE_SERVICE_ROLE
+
+  // Check for environment variables inside the function
+  if (!supabaseUrl) {
+    throw new Error('NEXT_PUBLIC_SUPABASE_URL is not set. Please update the environment variables.')
+  }
+  if (!supabaseServiceRole) {
+    throw new Error('SUPABASE_SERVICE_ROLE is not set. Please update the environment variables.')
+  }
+
+  // Use the validated environment variables to create the client
+  return createClient<Database>(supabaseUrl, supabaseServiceRole, {
+    auth: { persistSession: false }, // Ensure client is stateless for server use
+  })
+}

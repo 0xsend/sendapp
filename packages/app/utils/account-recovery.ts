@@ -1,4 +1,4 @@
-import { supabaseAdmin } from 'app/utils/supabase/admin'
+import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import type { Debugger } from 'debug'
 
 /**
@@ -7,6 +7,7 @@ import type { Debugger } from 'debug'
  * @returns chainAddress row
  */
 export const getChainAddress = async (chainAddress: string) => {
+  const supabaseAdmin = createSupabaseAdminClient()
   return await supabaseAdmin
     .from('chain_addresses')
     .select('*')
@@ -20,6 +21,7 @@ export const getChainAddress = async (chainAddress: string) => {
  * @returns passkey row
  */
 export const getPasskey = async (passkeyName: string) => {
+  const supabaseAdmin = createSupabaseAdminClient()
   return await supabaseAdmin
     .from('webauthn_credentials')
     .select('*')
@@ -33,6 +35,7 @@ export const getPasskey = async (passkeyName: string) => {
  * @returns challenge row
  */
 export const getChallengeById = async (challengeId: number) => {
+  const supabaseAdmin = createSupabaseAdminClient()
   return await supabaseAdmin.from('challenges').select('*').eq('id', challengeId).single()
 }
 
@@ -46,6 +49,7 @@ export const isChallengeExpired = async (
   challengeId: number,
   logger?: Debugger
 ): Promise<boolean> => {
+  const supabaseAdmin = createSupabaseAdminClient()
   const { data, error } = await supabaseAdmin
     .from('challenges')
     .select('*')

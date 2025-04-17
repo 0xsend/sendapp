@@ -12,8 +12,8 @@ import { throwIf } from 'app/utils/throwIf'
 import type { SendAccountCall } from 'app/utils/userop'
 import debug from 'debug'
 import { getRandomBytes } from 'expo-crypto'
-import { bytesToHex, encodeFunctionData, erc20Abi, zeroAddress } from 'viem'
-import { useChainId } from 'wagmi'
+import { bytesToHex, encodeFunctionData, erc20Abi, isAddressEqual, zeroAddress } from 'viem'
+import { useChainId, useReadContract } from 'wagmi'
 import { useQuery, type UseQueryReturnType } from 'wagmi/query'
 
 const log = debug('app:features:earn')
@@ -75,35 +75,87 @@ export function useSendEarnDepositVault({
   const referrerVault = useReferrerVault()
   const balances = useSendEarnBalances()
   const sendAccount = useSendAccount()
-  log('useSendEarnDepositVault', { referrerVault, balances, sendAccount, asset })
+  const factory = useSendEarnFactory({ asset })
+  const factoryDepositVault = useReadContract({
+    address: factory.data,
+    abi: sendEarnFactoryAbi,
+    functionName: 'deposits',
+    args: sendAccount.data?.address ? [sendAccount.data.address] : undefined,
+    query: {
+      enabled: factory.isFetched,
+    },
+  })
+
+  log('useSendEarnDepositVault', {
+    referrerVault,
+    balances,
+    sendAccount,
+    asset,
+    factory,
+    factoryDepositVault,
+  })
+
   return useQuery({
-    queryKey: ['sendEarnDepositVault', { referrerVault, balances, sendAccount, asset }] as const,
+    queryKey: [
+      'sendEarnDepositVault',
+      {
+        referrerVault,
+        balances,
+        sendAccount,
+        asset,
+        factoryDepositVault,
+        factory,
+      },
+    ] as const,
     enabled:
-      asset !== undefined && balances.isFetched && referrerVault.isFetched && sendAccount.isFetched,
-    queryFn: async ({ queryKey: [, { referrerVault, balances, sendAccount, asset }] }) => {
+      asset !== undefined &&
+      balances.isFetched &&
+      referrerVault.isFetched &&
+      sendAccount.isFetched &&
+      factory.isFetched &&
+      factoryDepositVault.isFetched,
+    queryFn: async ({
+      queryKey: [, { referrerVault, balances, sendAccount, asset, factoryDepositVault }],
+    }) => {
       throwIf(referrerVault.error)
       throwIf(balances.error)
       throwIf(sendAccount.error)
+      throwIf(factory.error)
+      throwIf(factoryDepositVault.error)
       assert(asset !== undefined, 'Asset is not defined')
+      assert(!!sendAccount.data?.address, 'Send account address not available') // Explicit boolean check
 
+      // 1. Check factory deposit vault first
+      const factoryVaultAddr = factoryDepositVault.data
+      if (factoryVaultAddr && !isAddressEqual(factoryVaultAddr, zeroAddress)) {
+        log('Found deposit vault in factory. Using factory vault:', factoryVaultAddr)
+        return factoryVaultAddr
+      }
+
+      // 2. Check existing balances (only if factory vault is zero)
       const userBalances = Array.isArray(balances.data)
         ? balances.data.filter(
             (balance) => balance.assets !== null && balance.assets > 0 && balance.log_addr !== null
           )
         : []
 
-      if (userBalances.length > 0 && userBalances[0]) {
+      if (userBalances.length > 0 && userBalances[0]?.log_addr) {
         const addr = userBalances[0].log_addr
-        log('Found existing deposit. Using existing vault:', addr)
+        log('Factory vault is zero. Found existing balance. Using balance vault:', addr)
         return addr
       }
 
+      // 3. Check referrer vault (only if factory and balances are zero/empty)
       if (referrerVault.data) {
-        log('user has no deposits, but has a referrer. Using referrer vault:', referrerVault.data)
+        log(
+          'Factory vault and balances are zero. User has a referrer. Using referrer vault:',
+          referrerVault.data
+        )
         return referrerVault.data
       }
 
-      log('No existing deposits and no referrer.')
+      // 4. Fallback. This means use factory.createAndDeposit
+      log('No factory vault, no existing balances, and no referrer.')
       return null
     },
   })

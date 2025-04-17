@@ -9435,6 +9435,18 @@
             "id"
           ],
           "nullNotDistinct": false
+        },
+        {
+          "name": "u_sendpot_jackpot_runs",
+          "fields": [
+            "abi_idx",
+            "block_num",
+            "ig_name",
+            "log_idx",
+            "src_name",
+            "tx_idx"
+          ],
+          "nullNotDistinct": false
         }
       ]
     },
@@ -9677,6 +9689,18 @@
           "name": "sendpot_user_ticket_purchases_pkey",
           "fields": [
             "id"
+          ],
+          "nullNotDistinct": false
+        },
+        {
+          "name": "u_sendpot_user_ticket_purchases",
+          "fields": [
+            "abi_idx",
+            "block_num",
+            "ig_name",
+            "log_idx",
+            "src_name",
+            "tx_idx"
           ],
           "nullNotDistinct": false
         }

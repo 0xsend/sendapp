@@ -8,7 +8,7 @@ import type { Database } from '@my/supabase/database.types'
 import { userOnboarded } from 'utils/userOnboarded'
 import { SendtagSchema } from 'app/utils/zod/sendtag'
 import { assert } from 'app/utils/assert'
-import { supabaseAdmin } from 'app/utils/supabase/admin'
+import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { TopNav } from 'app/components/TopNav'
 
 export const Page: NextPageWithLayout<{ sendid: number | null }> = ({ sendid }) => {
@@ -54,6 +54,7 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   }
 
   // check if profile exists
+  const supabaseAdmin = createSupabaseAdminClient()
   const { data: profile, error } = await supabaseAdmin
     .rpc('profile_lookup', {
       lookup_type: 'tag',

@@ -1752,7 +1752,7 @@ export type Database = {
       get_affiliate_referrals: {
         Args: Record<PropertyKey, never>
         Returns: {
-          referred_id: string
+          send_plus_minus: number
           avatar_url: string
           tag: string
           created_at: string

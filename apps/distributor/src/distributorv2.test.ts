@@ -4,7 +4,7 @@ globalThis.__DEV__ = true
 import { describe, expect, it, mock } from 'bun:test'
 import request from 'supertest'
 import app from './app'
-import { type fetchActiveDistributions, supabaseAdmin } from './supabase'
+import { type fetchActiveDistributions, createSupabaseAdminClient } from './supabase'
 import pino from 'pino'
 import { DistributorV2Worker } from './distributorv2'
 import type { Tables } from '@my/supabase/database.types'
@@ -37,6 +37,7 @@ describe('Distributor Route', () => {
   })
 
   it.skip('should perform distributor logic correctly', async () => {
+    const supabaseAdmin = createSupabaseAdminClient()
     const { data: distribution, error } = await supabaseAdmin
       .from('distributions')
       .select(
