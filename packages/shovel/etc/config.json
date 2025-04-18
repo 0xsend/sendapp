@@ -914,8 +914,10 @@
         {
           "name": "log_addr",
           "column": "log_addr",
-          "filter_op": "equals",
-          "filter_val": "0xa0A5611b9A1071a1D8A308882065c48650bAeE8b"
+          "filter_op": "eq",
+          "filter_arg": [
+            "0xa0A5611b9A1071a1D8A308882065c48650bAeE8b"
+          ]
         }
       ],
       "table": {
@@ -1043,8 +1045,10 @@
         {
           "name": "log_addr",
           "column": "log_addr",
-          "filter_op": "equals",
-          "filter_val": "0xa0A5611b9A1071a1D8A308882065c48650bAeE8b"
+          "filter_op": "eq",
+          "filter_arg": [
+            "0xa0A5611b9A1071a1D8A308882065c48650bAeE8b"
+          ]
         }
       ],
       "table": {

@@ -33,8 +33,8 @@ export const userTicketPurchaseIntegration: Omit<Integration, 'sources'> = {
     {
       name: 'log_addr',
       column: 'log_addr',
-      filter_op: 'equals', // Filter for the specific SendPot contract
-      filter_val: SENDPOT_CONTRACT_ADDRESS,
+      filter_op: 'eq',
+      filter_arg: [SENDPOT_CONTRACT_ADDRESS],
     },
   ] as BlockData[],
   table: sendPotUserTicketPurchasesTable,
@@ -108,8 +108,8 @@ export const jackpotRunIntegration: Omit<Integration, 'sources'> = {
     {
       name: 'log_addr',
       column: 'log_addr',
-      filter_op: 'equals', // Filter for the specific SendPot contract
-      filter_val: SENDPOT_CONTRACT_ADDRESS,
+      filter_op: 'eq',
+      filter_arg: [SENDPOT_CONTRACT_ADDRESS],
     },
   ] as BlockData[],
   table: sendPotJackpotRunsTable,
