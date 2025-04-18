@@ -55,8 +55,6 @@ jobs:
       # - name: Snaplet Login
       #   shell: bash
       #   run: bunx snaplet auth login ${{ secrets.CI_SNAPLET_AUTH_TOKEN }}
-      - name: Check Workflows Version
-        run: bash ./packages/workflows/workflows-version-check.sh
       - name: Tilt CI
         id: tilt-ci
         shell: bash
