@@ -881,8 +881,10 @@ exports[`shovel config 1`] = `
         },
         {
           "column": "log_addr",
-          "filter_op": "equals",
-          "filter_val": "0xa0A5611b9A1071a1D8A308882065c48650bAeE8b",
+          "filter_arg": [
+            "0xa0A5611b9A1071a1D8A308882065c48650bAeE8b",
+          ],
+          "filter_op": "eq",
           "name": "log_addr",
         },
       ],
@@ -1010,8 +1012,10 @@ exports[`shovel config 1`] = `
         },
         {
           "column": "log_addr",
-          "filter_op": "equals",
-          "filter_val": "0xa0A5611b9A1071a1D8A308882065c48650bAeE8b",
+          "filter_arg": [
+            "0xa0A5611b9A1071a1D8A308882065c48650bAeE8b",
+          ],
+          "filter_op": "eq",
           "name": "log_addr",
         },
       ],
