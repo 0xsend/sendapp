@@ -252,11 +252,11 @@ export function SendConfirm() {
     <YStack
       f={1}
       jc={'space-between'}
-      pb={'$4'}
       gap={'$3.5'}
       $gtLg={{
         display: 'flex',
         maxWidth: '50%',
+        pb: '$3.5',
       }}
     >
       <YStack gap={'$4'} pt={'$4'}>

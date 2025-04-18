@@ -1,8 +1,9 @@
 import type { Database, Tables } from '@my/supabase/database.types'
-import { supabaseAdmin } from 'app/utils/supabase/admin'
+import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { selectAll } from 'app/utils/supabase/selectAll'
 
 export async function fetchAllOpenDistributions() {
+  const supabaseAdmin = createSupabaseAdminClient()
   return selectAll(
     supabaseAdmin
       .from('distributions')
@@ -19,6 +20,7 @@ export async function fetchAllOpenDistributions() {
 }
 
 export async function fetchDistribution(id: string) {
+  const supabaseAdmin = createSupabaseAdminClient()
   return supabaseAdmin
     .from('distributions')
     .select(
@@ -30,6 +32,7 @@ export async function fetchDistribution(id: string) {
 }
 
 export async function fetchAllVerifications(distributionId: number) {
+  const supabaseAdmin = createSupabaseAdminClient()
   return selectAll(
     supabaseAdmin
       .from('distribution_verifications')
@@ -39,6 +42,7 @@ export async function fetchAllVerifications(distributionId: number) {
 }
 
 export async function fetchAllHodlers(distributionId: number) {
+  const supabaseAdmin = createSupabaseAdminClient()
   return selectAll(
     supabaseAdmin
       .rpc(
@@ -56,6 +60,7 @@ export async function createDistributionShares(
   distributionId: number,
   shares: Tables<'distribution_shares'>[]
 ) {
+  const supabaseAdmin = createSupabaseAdminClient()
   return supabaseAdmin.rpc('update_distribution_shares', {
     distribution_id: distributionId,
     shares,

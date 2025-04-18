@@ -283,6 +283,11 @@ exports[`SendScreen should render send form when profile is found 1`] = `
         </RNSVGSvgView>
       </View>
       <View
+        footerProps={
+          {
+            "pb": 0,
+          }
+        }
         onLayout={[Function]}
         onSubmit={[Function]}
         style={
@@ -1282,7 +1287,7 @@ exports[`SendScreen should render send form when profile is found 1`] = `
               {
                 "flexDirection": "column-reverse",
                 "gap": 18,
-                "paddingBottom": 18,
+                "paddingBottom": 0,
                 "paddingLeft": 18,
                 "paddingRight": 18,
               }

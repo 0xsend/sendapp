@@ -1,10 +1,12 @@
 import { Button, LinkableButton, Theme, XStack, YStack, type XStackProps } from '@my/ui'
-import { IconPlus, IconSwap } from 'app/components/icons'
+import { IconArrowUp, IconPlus, IconSwap } from 'app/components/icons'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { sendCoin, usdcCoin } from 'app/data/coins'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 
-export const HomeQuickActions = (props: XStackProps) => {
+type HomeQuickActionsProps = XStackProps & { showSendAction?: boolean }
+
+export const HomeQuickActions = ({ showSendAction, ...props }: HomeQuickActionsProps) => {
   const { coin } = useCoinFromTokenParam()
   const hoverStyles = useHoverStyles()
 
@@ -20,8 +22,44 @@ export const HomeQuickActions = (props: XStackProps) => {
     return `/trade?inToken=${coin.token}`
   }
 
+  const getSendUrl = () => {
+    if (!coin) {
+      return '/send'
+    }
+
+    return `/send?sendToken=${coin.token}`
+  }
+
   return (
     <XStack w={'100%'} gap={'$3.5'} $gtLg={{ gap: '$5' }} {...props}>
+      {showSendAction && (
+        <LinkableButton
+          href={getSendUrl()}
+          f={1}
+          height={'auto'}
+          hoverStyle={hoverStyles}
+          focusStyle={hoverStyles}
+        >
+          <YStack
+            testID={'send-quick-action'}
+            gap="$2"
+            jc={'space-between'}
+            ai="center"
+            px="$4"
+            py="$3.5"
+            $gtSm={{ py: '$4' }}
+          >
+            <IconArrowUp
+              size={'$1.5'}
+              $theme-dark={{ color: '$primary' }}
+              $theme-light={{ color: '$color12' }}
+            />
+            <Button.Text fontSize={'$5'} px="$2">
+              Send
+            </Button.Text>
+          </YStack>
+        </LinkableButton>
+      )}
       <LinkableButton
         href="/deposit"
         f={1}

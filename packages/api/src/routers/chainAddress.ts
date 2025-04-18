@@ -1,6 +1,6 @@
 import { TRPCError } from '@trpc/server'
 import { verifyAddressMsg } from 'app/features/account/sendtag/checkout/checkout-utils'
-import { supabaseAdmin } from 'app/utils/supabase/admin'
+import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { verifyMessage, isAddress, getAddress } from 'viem'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
@@ -36,6 +36,7 @@ export const chainAddressRouter = createTRPCRouter({
         })
       }
 
+      const supabaseAdmin = createSupabaseAdminClient()
       const { data: results, error } = await supabaseAdmin.from('chain_addresses').insert({
         address,
         user_id: session.user.id,

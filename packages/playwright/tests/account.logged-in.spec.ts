@@ -8,7 +8,7 @@ test.beforeEach(async ({ page, user: { user } }) => {
   log = debug(`test:account:logged-in:${user.id}:${test.info().parallelIndex}`)
   await page.goto('/')
   await page.waitForURL('/')
-  await page.locator('[id="__next"]').getByRole('link', { name: 'Account' }).click()
+  await page.getByTestId('account-menu-entry').click()
   await page.waitForURL('/account')
 })
 

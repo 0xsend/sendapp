@@ -1,5 +1,5 @@
 import { parseArgs } from 'node:util'
-import { supabaseAdmin } from '../src/supabase'
+import { createSupabaseAdminClient } from '../src/supabase'
 import 'zx/globals'
 
 if (!$.env.SUPABASE_SERVICE_ROLE) {
@@ -23,6 +23,7 @@ const { values } = parseArgs({
 })
 
 if (values.distribution === undefined) {
+  const supabaseAdmin = createSupabaseAdminClient()
   const { data, error } = await supabaseAdmin
     .from('distributions')
     .select('*')

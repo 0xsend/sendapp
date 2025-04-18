@@ -468,6 +468,119 @@ for (const coin of [usdcCoin]) {
         vault,
       })
     })
+
+    test(`can deposit again after withdrawing all funds for ${coin.symbol}`, async ({
+      earnDepositPage,
+      earnWithdrawPage,
+      sendAccount,
+      supabase,
+      user: { profile }, // Added profile for logging
+    }) => {
+      test.setTimeout(60000) // Increase timeout as it involves multiple steps
+      log = debug(`test:earn:deposit-after-withdraw:${profile.id}:${test.info().parallelIndex}`) // Updated log identifier
+
+      // Generate random amount for initial deposit
+      const initialDepositAmount = faker.number.bigInt({
+        min: MIN_DEPOSIT_AMOUNT,
+        max: MAX_DEPOSIT_AMOUNT,
+      })
+      const initialAmountDecimals = formatUnits(initialDepositAmount, coin.decimals)
+
+      // Fund for initial deposit + gas
+      await fund({ address: sendAccount.address, amount: initialDepositAmount + GAS_FEES, coin })
+      log('Funded for initial deposit:', initialAmountDecimals, coin.symbol)
+
+      // 1. Initial Deposit
+      await earnDepositPage.navigate(coin)
+      const deposit1 = await earnDepositPage.deposit({
+        coin,
+        supabase,
+        amount: initialAmountDecimals,
+      })
+      const vault1 = checksumAddress(byteaToHex(deposit1.log_addr))
+      log('Initial deposit completed into vault:', vault1)
+
+      // Verify initial deposit went to the platform vault (assuming no referral for this test)
+      expect(vault1).toBe(sendEarnAddress[testBaseClient.chain.id])
+
+      // 2. Full Withdrawal
+      // Get current balance (shares and assets)
+      const initialShares = await readSendEarnBalanceOf({
+        vault: vault1,
+        owner: sendAccount.address,
+      })
+      const assetsToWithdraw = await readSendEarnConvertToAssets({
+        vault: vault1,
+        shares: initialShares,
+      })
+      const withdrawAmountDecimals = formatUnits(assetsToWithdraw, coin.decimals)
+      log('Calculated assets to withdraw:', withdrawAmountDecimals, coin.symbol)
+
+      // Need gas for withdrawal
+      await fund({ address: sendAccount.address, amount: GAS_FEES, coin: usdcCoin }) // Assuming USDC for gas funding for simplicity, adjust if needed
+
+      await earnWithdrawPage.goto(coin)
+      await earnWithdrawPage.withdraw({
+        coin,
+        supabase,
+        amount: withdrawAmountDecimals, // Withdraw the exact calculated amount
+      })
+      log('Full withdrawal completed')
+
+      // Verify balance is near zero after withdrawal
+      const remainingShares = await readSendEarnBalanceOf({
+        vault: vault1,
+        owner: sendAccount.address,
+      })
+      const remainingAssets = await readSendEarnConvertToAssets({
+        vault: vault1,
+        shares: remainingShares,
+      })
+      log('Remaining assets after withdrawal:', formatUnits(remainingAssets, coin.decimals))
+      // Allow a small tolerance for potential dust amounts
+      const tolerance = BigInt(10 ** (coin.decimals - 4)) // e.g., 0.0001 USDC
+      expect(remainingAssets).toBeLessThanOrEqual(tolerance)
+
+      // 3. Second Deposit
+      const secondDepositAmount = faker.number.bigInt({
+        min: MIN_DEPOSIT_AMOUNT,
+        max: MAX_DEPOSIT_AMOUNT,
+      })
+      const secondAmountDecimals = formatUnits(secondDepositAmount, coin.decimals)
+
+      // Fund for second deposit + gas
+      await fund({ address: sendAccount.address, amount: secondDepositAmount + GAS_FEES, coin })
+      log('Funded for second deposit:', secondAmountDecimals, coin.symbol)
+
+      await earnDepositPage.goto(coin) // Navigate back to deposit page
+      const deposit2 = await earnDepositPage.deposit({
+        coin,
+        supabase,
+        amount: secondAmountDecimals,
+      })
+      const vault2 = checksumAddress(byteaToHex(deposit2.log_addr))
+      log('Second deposit completed into vault:', vault2)
+
+      // 4. Verification: Ensure the second deposit used the SAME vault
+      expect(vault2).toBe(vault1)
+      log('SUCCESS: Second deposit used the same vault as the first.')
+
+      // Optional: Verify final balance
+      const finalShares = await readSendEarnBalanceOf({
+        vault: vault2, // or vault1, they should be the same
+        owner: sendAccount.address,
+      })
+      const finalAssets = await readSendEarnConvertToAssets({
+        vault: vault2,
+        shares: finalShares,
+      })
+      log('Final assets after second deposit:', formatUnits(finalAssets, coin.decimals))
+      // Final assets should be close to the second deposit amount
+      expect(Number(formatUnits(finalAssets, coin.decimals))).toBeCloseTo(
+        Number(secondAmountDecimals),
+        2 // Allow some precision difference
+      )
+    })
   })
 
   test.describe(`Withdraw ${coin.symbol}`, () => {

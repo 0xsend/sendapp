@@ -146,6 +146,7 @@ export function SendAmountForm() {
         $gtLg={{
           display: 'flex',
           maxWidth: '50%',
+          pb: '$3.5',
         }}
         testID={'SendFormContainer'}
       >
@@ -254,6 +255,7 @@ export function SendAmountForm() {
             }}
             formProps={{
               testID: 'SendForm',
+              footerProps: { pb: 0 },
               justifyContent: 'space-between',
               $gtSm: {
                 maxWidth: '100%',

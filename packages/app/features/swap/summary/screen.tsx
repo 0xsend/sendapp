@@ -157,10 +157,10 @@ export const SwapSummaryScreen = () => {
     <YStack
       w={'100%'}
       gap="$5"
-      pb={'$3.5'}
       jc={'space-between'}
       $gtLg={{
         w: '50%',
+        pb: '$3.5',
       }}
     >
       <YStack gap="$3.5">
@@ -402,8 +402,11 @@ export const EditButton = () => {
       focusStyle={{ backgroundColor: 'transparent' }}
       p={0}
       bw={0}
+      br={0}
       height={'auto'}
       onPress={handlePress}
+      padding={10} // This increases clickable area
+      margin={-10} // This keeps layout visually unchanged
     >
       <Button.Text size={'$5'} hoverStyle={{ color: '$primary' }}>
         edit

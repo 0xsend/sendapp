@@ -8,7 +8,6 @@ exports[`swap form screen should render 1`] = `
         "flexDirection": "column",
         "gap": 24,
         "justifyContent": "space-between",
-        "paddingBottom": 16,
         "width": "100%",
       }
     }

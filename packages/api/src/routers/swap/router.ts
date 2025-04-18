@@ -1,7 +1,7 @@
 import { baseMainnetClient, sendSwapsRevenueSafeAddress } from '@my/wagmi'
 import { TRPCError } from '@trpc/server'
 import { hexToBytea } from 'app/utils/hexToBytea'
-import { supabaseAdmin } from 'app/utils/supabase/admin'
+import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { address } from 'app/utils/zod'
 import debug from 'debug'
 import { isAddress, isAddressEqual } from 'viem'
@@ -74,6 +74,7 @@ const encodeKyberSwapRoute = async ({
   sender,
   slippageTolerance,
 }: KyberEncodeRouteRequest) => {
+  const supabaseAdmin = createSupabaseAdminClient()
   try {
     const url = `${process.env.NEXT_PUBLIC_KYBER_SWAP_BASE_URL}/${CHAIN}/api/v1/route/build`
 
