@@ -214,9 +214,10 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
     [attempts, refetchReceipts, confirm.mutateAsync, onConfirmed, updateProfile]
   )
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: otherwise it infinite loops
   useEffect(() => {
     if (txReceipt) submitTxToDb(txReceipt.transactionHash)
-  }, [txReceipt, submitTxToDb])
+  }, [txReceipt])
 
   useEffect(() => {
     if (txWaitError) {
