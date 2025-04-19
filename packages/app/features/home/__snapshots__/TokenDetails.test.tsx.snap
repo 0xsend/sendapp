@@ -232,7 +232,7 @@ exports[`TokenDetails renders correctly 1`] = `
       style={
         {
           "flexDirection": "row",
-          "gap": 16,
+          "gap": 13,
           "width": "100%",
         }
       }
@@ -276,8 +276,10 @@ exports[`TokenDetails renders correctly 1`] = `
             "justifyContent": "center",
             "paddingLeft": 18,
             "paddingRight": 18,
+            "width": "100%",
           }
         }
+        textAlign="center"
       >
         <View
           style={
@@ -365,6 +367,7 @@ exports[`TokenDetails renders correctly 1`] = `
                 "lineHeight": 19,
                 "paddingLeft": 7,
                 "paddingRight": 7,
+                "textAlign": "center",
                 "userSelect": "none",
               }
             }
@@ -413,8 +416,10 @@ exports[`TokenDetails renders correctly 1`] = `
             "justifyContent": "center",
             "paddingLeft": 18,
             "paddingRight": 18,
+            "width": "100%",
           }
         }
+        textAlign="center"
       >
         <View
           style={
@@ -503,6 +508,7 @@ exports[`TokenDetails renders correctly 1`] = `
                 "lineHeight": 19,
                 "paddingLeft": 7,
                 "paddingRight": 7,
+                "textAlign": "center",
                 "userSelect": "none",
               }
             }
