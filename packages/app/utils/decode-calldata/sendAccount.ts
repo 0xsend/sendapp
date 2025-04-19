@@ -1,14 +1,23 @@
-import { type Hex, decodeFunctionData } from 'viem'
+import { type Address, type Hex, decodeFunctionData } from 'viem'
 import { sendAccountAbi } from '@my/wagmi'
+import { assert } from '../assert'
 
-export function decodeExecuteBatchCalldata(data: Hex) {
-  const { args: rawArgs, functionName: rawFunctionName } = decodeFunctionData({
+export type SendAccountCall = {
+  dest: Address
+  value: bigint
+  data: Hex
+}
+
+/**
+ * Decodes the calldata of a UserOperation intended for a SendAccount executeBatch.
+ */
+export function decodeExecuteBatchCalldata(data: Hex): readonly SendAccountCall[] {
+  const result = decodeFunctionData({
     abi: sendAccountAbi,
     data,
   })
-  const functionName = rawFunctionName === 'executeBatch' ? rawFunctionName : null
+  assert(result.functionName === 'executeBatch', 'Invalid function name')
+  assert(result.args.length > 0, 'Invalid number of calls in UserOperation')
 
-  const args = !rawArgs || rawArgs.length === 0 ? null : rawArgs
-
-  return { args, functionName }
+  return result.args[0]
 }
