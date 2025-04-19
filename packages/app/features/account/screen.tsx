@@ -40,7 +40,7 @@ const links = [
   },
   {
     label: 'Rewards',
-    href: '/account/rewards',
+    href: '/explore/rewards',
     icon: <IconStarOutline size={'$1.5'} $theme-light={{ color: '$color12' }} />,
   },
   {
