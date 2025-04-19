@@ -135,7 +135,7 @@ const LearnSection = () => {
               Start Growing
             </Paragraph>
             <Paragraph color={'$white'} size={'$9'}>
-              Your USDC Saving
+              Your USDC Savings
             </Paragraph>
             <XStack mt={'$3'} ai={'center'} jc={'space-between'}>
               <Paragraph color={'$white'} size={'$5'}>
