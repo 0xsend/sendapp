@@ -102,7 +102,11 @@ function HomeBody(props: XStackProps) {
           zIndex={selectedCoin ? -1 : 0}
           animateOnly={['transform']}
           animation="200ms"
-        />
+        >
+          <HomeQuickActions.Deposit />
+          <HomeQuickActions.Earn />
+          <HomeQuickActions.Trade />
+        </HomeQuickActions>
         <YStack
           w={'100%'}
           ai={'center'}

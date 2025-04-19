@@ -1,4 +1,4 @@
-import { Card, Paragraph, Separator, Spinner, Stack, Theme, useMedia, XStack, YStack } from '@my/ui'
+import { Card, Paragraph, Separator, Spinner, Stack, Theme, XStack, YStack } from '@my/ui'
 import type { allCoins, CoinWithBalance } from 'app/data/coins'
 import { ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
 import { IconCoin, IconError } from 'app/components/icons'
@@ -34,7 +34,11 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
             </YStack>
           </YStack>
         </Card>
-        <HomeQuickActions />
+        <HomeQuickActions>
+          <HomeQuickActions.Deposit />
+          <HomeQuickActions.Send />
+          <HomeQuickActions.Trade />
+        </HomeQuickActions>
       </YStack>
       <YStack gap={'$3'}>
         <TokenActivity coin={coin} />
