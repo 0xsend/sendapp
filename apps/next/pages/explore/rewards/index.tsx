@@ -1,4 +1,4 @@
-import { ActivityRewardsScreen } from 'app/features/account/rewards/activity/screen'
+import { ActivityRewardsScreen } from 'app/features/explore/rewards/activity/screen'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from 'next-app/pages/_app'
@@ -10,7 +10,7 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Activity Rewards</title>
+        <title>Send | Rewards</title>
       </Head>
       <ActivityRewardsScreen />
     </>

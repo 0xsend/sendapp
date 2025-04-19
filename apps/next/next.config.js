@@ -151,6 +151,11 @@ export default () => {
           destination: '/trade',
           permanent: true,
         },
+        {
+          source: '/account/rewards/activity',
+          destination: '/explore/rewards',
+          permanent: true,
+        },
       ]
     },
   }
