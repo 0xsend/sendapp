@@ -17,6 +17,7 @@
     "@0xsend/send-earn-contracts": "^0.1.0",
     "@coinbase/onchainkit": "^0.38.1",
     "@daimo/expo-passkeys": "workspace:*",
+    "@jmondi/oauth2-server": "^3.4.1",
     "@marsidev/react-turnstile": "^0.7.1",
     "@my/supabase": "workspace:*",
     "@my/ui": "workspace:*",
