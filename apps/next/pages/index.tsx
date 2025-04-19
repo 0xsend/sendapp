@@ -16,7 +16,6 @@ import { getRemoteAssets } from 'utils/getRemoteAssets'
 import type { GetPlaiceholderImage } from 'app/utils/getPlaiceholderImage'
 import { useQueryClient } from '@tanstack/react-query'
 import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
-import { MobileButtonRowLayout } from 'app/components/MobileButtonRowLayout'
 
 const log = debug('app:pages:index')
 
@@ -50,11 +49,9 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
         <title>Send</title>
       </Head>
       {session ? (
-        <MobileButtonRowLayout.Home>
-          <HomeLayout TopNav={<TopNav header="Home" showLogo={true} />}>
-            <HomeScreen />
-          </HomeLayout>
-        </MobileButtonRowLayout.Home>
+        <HomeLayout TopNav={<TopNav header="Home" showLogo={true} />}>
+          <HomeScreen />
+        </HomeLayout>
       ) : (
         <AuthCarouselContext.Provider
           value={{

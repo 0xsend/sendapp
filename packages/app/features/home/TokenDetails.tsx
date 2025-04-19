@@ -8,12 +8,8 @@ import formatAmount from 'app/utils/formatAmount'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { TokenActivity } from './TokenActivity'
 import { HomeQuickActions } from 'app/features/home/HomeQuickActions'
-import { useIsSendingUnlocked } from 'app/utils/useIsSendingUnlocked'
 
 export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
-  const media = useMedia()
-  const { isSendingUnlocked } = useIsSendingUnlocked()
-
   return (
     <YStack f={1} gap="$5" $gtLg={{ w: '45%', pb: '$0' }} pb="$5">
       <YStack gap="$3.5" $gtLg={{ gap: '$5' }}>
@@ -38,7 +34,7 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
             </YStack>
           </YStack>
         </Card>
-        <HomeQuickActions showSendAction={media.gtLg && isSendingUnlocked} />
+        <HomeQuickActions />
       </YStack>
       <YStack gap={'$3'}>
         <TokenActivity coin={coin} />
