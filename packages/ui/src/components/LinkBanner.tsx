@@ -38,13 +38,15 @@ export const LinkBanner = ({
             start={[0, 0]}
             end={[0, 1]}
             fullscreen
-            colors={['transparent', 'rgba(0,0,0,0.5)']}
+            colors={['transparent', 'rgba(0,0,0,0.8)']}
           >
             <YStack position="absolute" top={0} left={0} bottom={0} right={0} />
           </LinearGradient>
           <YStack gap={'$2'}>
             <XStack gap={'$3'} jc={'space-between'} ai={'center'}>
-              <H1 color={'$white'}>{title}</H1>
+              <H1 color={'$white'} tt="uppercase">
+                {title}
+              </H1>
               {!subtitle && <ArrowRight size={'$3'} color={'$primary'} flexShrink={0} />}
             </XStack>
             {subtitle && (
