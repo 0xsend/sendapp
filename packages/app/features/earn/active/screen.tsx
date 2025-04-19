@@ -1,7 +1,7 @@
 import { Card, Fade, Paragraph, Separator, Spinner, Stack, XStack, YStack } from '@my/ui'
 import type { IconProps } from '@tamagui/helpers-icon'
 import { ArrowDown } from '@tamagui/lucide-icons'
-import { IconSendSingleLetter, IconStacks } from 'app/components/icons'
+import { IconStarOutline, IconStacks } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { SectionButton } from 'app/features/earn/components/SectionButton'
 import { formatCoinAmount } from 'app/utils/formatCoinAmount'
@@ -47,7 +47,7 @@ function ActiveEarnings() {
         },
         isAffiliate
           ? {
-              Icon: IconSendSingleLetter,
+              Icon: IconStarOutline,
               label: 'Rewards',
               href: `/earn/${coinToParam(coin.data)}/rewards`,
             }

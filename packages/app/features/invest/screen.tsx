@@ -13,8 +13,8 @@ export const InvestScreen = () => {
       <LinkBanner
         href={'/earn'}
         imgUrl={'url(https://ghassets.send.app/app_images/deposit.jpg)'}
-        title={'Send Earn'}
-        subtitle={'Modern finance with Send: Earn, Spend, and send USDC worldwide'}
+        title={'Earn'}
+        subtitle={'High-yield interest on your USDC — no lockups, no minimums, full control'}
         backgroundPosition={'center 15%'}
       />
     </YStack>
