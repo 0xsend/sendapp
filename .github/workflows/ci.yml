@@ -12,6 +12,92 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  build_next_image:
+    name: Build Next.js Docker Image
+    runs-on: arc-runner-set
+    permissions:
+      contents: read
+      packages: write # Required to push to GHCR
+      id-token: write # Required for OIDC login to some registries, if needed
+    outputs:
+      tags: ${{ steps.meta.outputs.tags }} # Output tags from metadata action
+      labels: ${{ steps.meta.outputs.labels }} # Output labels from metadata action
+    env:
+      # Define build args here, potentially pulling from secrets
+      # Example: NEXT_PUBLIC_SUPABASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SUPABASE_PROJECT_ID }}
+      # Ensure all required args from docker-compose.yml are defined
+      CI: true # Example build arg
+      NEXT_PUBLIC_SUPABASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SUPABASE_PROJECT_ID }}
+      NEXT_PUBLIC_URL: ${{ secrets.NEXT_PUBLIC_URL }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_GRAPHQL_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_GRAPHQL_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      NEXT_PUBLIC_MAINNET_RPC_URL: ${{ secrets.NEXT_PUBLIC_MAINNET_RPC_URL }}
+      NEXT_PUBLIC_BASE_RPC_URL: ${{ secrets.NEXT_PUBLIC_BASE_RPC_URL }}
+      NEXT_PUBLIC_BUNDLER_RPC_URL: ${{ secrets.NEXT_PUBLIC_BUNDLER_RPC_URL }}
+      NEXT_PUBLIC_MAINNET_CHAIN_ID: ${{ secrets.NEXT_PUBLIC_MAINNET_CHAIN_ID }}
+      NEXT_PUBLIC_BASE_CHAIN_ID: ${{ secrets.NEXT_PUBLIC_BASE_CHAIN_ID }}
+      NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID }}
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}/next-app
+          tags: |
+            type=sha,prefix= # Git SHA tag (e.g., sha-abcdef1)
+            type=ref,event=branch # Branch name tag (e.g., main, dev)
+            type=ref,event=pr # PR number tag (e.g., pr-123)
+            type=ref,event=tag # Git tag (e.g., v1.0.0)
+            # Add other tag types if needed
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        id: buildx # Give the step an ID if needed elsewhere, otherwise optional
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Docker image
+        id: build-push # Give the step an ID
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./apps/next/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: | # Pass build args newline-separated
+            CI=${{ env.CI }}
+            NEXT_PUBLIC_SUPABASE_PROJECT_ID=${{ env.NEXT_PUBLIC_SUPABASE_PROJECT_ID }}
+            NEXT_PUBLIC_URL=${{ env.NEXT_PUBLIC_URL }}
+            NEXT_PUBLIC_SUPABASE_URL=${{ env.NEXT_PUBLIC_SUPABASE_URL }}
+            NEXT_PUBLIC_SUPABASE_GRAPHQL_URL=${{ env.NEXT_PUBLIC_SUPABASE_GRAPHQL_URL }}
+            NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ env.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+            NEXT_PUBLIC_MAINNET_RPC_URL=${{ env.NEXT_PUBLIC_MAINNET_RPC_URL }}
+            NEXT_PUBLIC_BASE_RPC_URL=${{ env.NEXT_PUBLIC_BASE_RPC_URL }}
+            NEXT_PUBLIC_BUNDLER_RPC_URL=${{ env.NEXT_PUBLIC_BUNDLER_RPC_URL }}
+            NEXT_PUBLIC_MAINNET_CHAIN_ID=${{ env.NEXT_PUBLIC_MAINNET_CHAIN_ID }}
+            NEXT_PUBLIC_BASE_CHAIN_ID=${{ env.NEXT_PUBLIC_BASE_CHAIN_ID }}
+            NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=${{ env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID }}
+            NEXT_PUBLIC_TURNSTILE_SITE_KEY=${{ env.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
   unit-tests:
     name: Unit Tests
     runs-on: arc-runner-set
@@ -72,14 +158,19 @@ jobs:
         run: git diff # --exit-code
 
   playwright-tests:
-    # **always** skip if not dev or main to save resources
-    name: Playwright Tests
+    name: Playwright Tests (Shard ${{ matrix.shard }}/4)
+    needs: build_next_image # Ensure image is built first
     # if: ${{ github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' || github.head_ref == 'dev' || github.head_ref == 'main' }}
     runs-on: arc-runner-set
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
       YARN_ENABLE_HARDENED_MODE: 0
+      NEXT_APP_IMAGE_TAG: ${{ needs.build_next_image.outputs.tags }}
 
     # for writing PR comments
     permissions:
@@ -115,21 +206,17 @@ jobs:
           brew cleanup
       - name: Setup Environment
         uses: ./.github/actions/setup-env
-        with:
-          # will do it in the Build Next.js step
-          yarn-install: false
+        # yarn-install is now handled below
         env:
           YARN_ENABLE_HARDENED_MODE: 0
+      - name: Yarn Install
+        shell: bash
+        run: yarn install --immutable
       # @todo anvil fixtures cause dirty repo, but only in github actions 😢
       # - name: All Changes Committed
       #   shell: bash
       #   run: git diff --exit-code
-      # this is on purpose so we get github annotations
-      - name: Build Next.js
-        shell: bash
-        run: |
-          tilt ci yarn:install # install and setup env
-          yarn web:docker:build # build nextjs docker image
+      # Build step removed - image is pre-built
       - name: Install Playwright Dependencies
         run: yarn playwright playwright install --with-deps
       - name: Playwright Tests
@@ -215,41 +302,74 @@ jobs:
           # never scheduler more than 4 workers or up to 50% of the available cores
           # this is due to concurrency issues within the send account sign up and resource contention
           workers=$(MAX_WORKERS=4 node ./.devops/bin/worker-count)
-          yarn playwright test --workers=$workers
-      - name: Playwright Markdown Report
-        if: always() && steps.playwright.outcome != 'skipped'
-        id: playwright-md-report
-        shell: bash
-        run: |
-          echo "------------------"
-          bun run packages/playwright/bin/report-markdown.ts > playwright-report.md
-          cat playwright-report.md
-          echo "------------------"
-      - uses: mshick/add-pr-comment@v2
-        if: always() && steps.playwright.outcome != 'skipped' && steps.playwright-md-report.outcome == 'success'
-        with:
-          message-id: playwright-report
-          refresh-message-position: true
-          message-path: |
-            playwright-report.md
+          yarn playwright test --workers=$workers --shard=${{ matrix.shard }}/4
       - name: Tilt Down
         # always run tilt down if tilt ci started
         if: always() && steps.playwright.outcome != 'skipped'
         shell: bash
         run: tilt down
-      - name: Playwright Report
-        uses: actions/upload-artifact@v4
-        if: always() && steps.playwright.outcome == 'failure'
-        with:
-          name: playwright-report
-          path: packages/playwright/playwright-report/
-          retention-days: 30
+      # Upload raw results per shard for merging later
       - name: Playwright Test Results
         uses: actions/upload-artifact@v4
-        if: always() && steps.playwright.outcome == 'failure'
+        if: always() # Upload results even if tests fail
         with:
-          name: playwright-test-results
+          name: playwright-test-results-shard-${{ matrix.shard }}
           path: packages/playwright/test-results/
+          retention-days: 30
+
+  playwright-merge-reports:
+    name: Playwright Merge Reports
+    runs-on: arc-runner-set
+    # Run this job even if previous jobs fail to capture results
+    if: always()
+    needs: playwright-tests
+
+    # for writing PR comments
+    permissions:
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Environment
+        uses: ./.github/actions/setup-env
+        env:
+          YARN_ENABLE_HARDENED_MODE: 0
+      - name: Download Shard Results
+        uses: actions/download-artifact@v4
+        with:
+          name: playwright-test-results-shard-* # Download all shard results
+          path: all-test-results/ # Put them in a subdirectory
+          pattern: playwright-test-results-shard-* # Match artifact names
+          merge-multiple: true # Merge into the single path directory
+      - name: Install Playwright Dependencies
+        run: yarn playwright playwright install --with-deps
+      - name: Merge Playwright Reports HTML
+        id: merge-reports
+        run: npx playwright merge-reports ./all-test-results --reporter html
+      - name: Playwright Markdown Report
+        if: always() && steps.merge-reports.outcome == 'success' # Only run if merge succeeded
+        id: playwright-md-report
+        shell: bash
+        run: |
+          echo "------------------"
+          # Assumes the markdown script reads from the default playwright-report directory
+          export PLAYWRIGHT_REPORT_PATH=all-test-results/playwright-report
+          bun run packages/playwright/bin/report-markdown.ts > playwright-report.md
+          cat playwright-report.md
+          echo "------------------"
+      - uses: mshick/add-pr-comment@v2
+        if: always() && steps.playwright-md-report.outcome == 'success' # Only comment if markdown generated
+        with:
+          message-id: playwright-report # Use the same ID to update the comment
+          refresh-message-position: true
+          message-path: |
+            playwright-report.md
+      - name: Upload Merged Playwright Report
+        uses: actions/upload-artifact@v4
+        if: always() # Upload merged report even if subsequent steps fail
+        with:
+          name: playwright-merged-report
+          path: playwright-report/
           retention-days: 30
 
   vercel-deploy-preview:
