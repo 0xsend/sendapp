@@ -44,7 +44,13 @@ export const TokenActivityFeed = ({
 
   const _renderRow = useCallback(
     (type, activity: Activity) => {
-      return <TokenActivityRow activity={activity} onPress={onActivityPress} />
+      return (
+        <TokenActivityRow
+          key={`${activity.event_name}-${activity.created_at.getTime()}`}
+          activity={activity}
+          onPress={onActivityPress}
+        />
+      )
     },
     [onActivityPress]
   )
