@@ -233,7 +233,6 @@ exports[`TokenDetails renders correctly 1`] = `
         {
           "flexDirection": "row",
           "gap": 13,
-          "gap": 13,
           "width": "100%",
         }
       }
@@ -278,10 +277,8 @@ exports[`TokenDetails renders correctly 1`] = `
             "paddingLeft": 18,
             "paddingRight": 18,
             "width": "100%",
-            "width": "100%",
           }
         }
-        textAlign="center"
       >
         <View
           style={
@@ -369,7 +366,6 @@ exports[`TokenDetails renders correctly 1`] = `
                 "lineHeight": 19,
                 "paddingLeft": 7,
                 "paddingRight": 7,
-                "textAlign": "center",
                 "userSelect": "none",
               }
             }
@@ -565,7 +561,6 @@ exports[`TokenDetails renders correctly 1`] = `
             "width": "100%",
           }
         }
-        textAlign="center"
       >
         <View
           style={
@@ -654,7 +649,6 @@ exports[`TokenDetails renders correctly 1`] = `
                 "lineHeight": 19,
                 "paddingLeft": 7,
                 "paddingRight": 7,
-                "textAlign": "center",
                 "userSelect": "none",
               }
             }

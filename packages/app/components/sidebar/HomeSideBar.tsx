@@ -17,7 +17,6 @@ import { baseMainnet } from '@my/wagmi/chains'
 import {
   IconAccount,
   IconArrowUp,
-  IconChart,
   IconDeviceReset,
   IconHome,
   IconSendLogo,
@@ -47,11 +46,6 @@ const links = [
     icon: <IconArrowUp size={'$1'} color={'inherit'} scale={'1.3'} />,
     text: 'Send',
     href: '/send',
-  },
-  {
-    icon: <IconChart size={'$1'} color={'inherit'} />,
-    text: 'Invest',
-    href: '/invest',
   },
   {
     icon: <IconWorldSearch size={'$1'} color={'inherit'} />,
