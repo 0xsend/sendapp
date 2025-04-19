@@ -37,7 +37,7 @@
     "typescript": "^5.5.3"
   },
   "devDependencies": {
-    "esbuild": "^0.23.1",
+    "esbuild": "^0.25.2",
     "temporal": "^0.7.1",
     "typescript": "^5.5.3"
   }

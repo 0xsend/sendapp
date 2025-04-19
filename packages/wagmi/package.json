@@ -25,7 +25,7 @@
     "@0xsend/send-earn-contracts": "^0.1.0",
     "@0xsend/send-token-upgrade": "0.0.3",
     "@wagmi/cli": "^2.1.15",
-    "debug": "^4.3.6",
+    "debug": "^4.3.7",
     "globby": "^14.0.0",
     "typescript": "^5.5.3"
   },
