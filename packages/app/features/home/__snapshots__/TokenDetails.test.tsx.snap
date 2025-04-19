@@ -232,7 +232,7 @@ exports[`TokenDetails renders correctly 1`] = `
       style={
         {
           "flexDirection": "row",
-          "gap": 16,
+          "gap": 13,
           "width": "100%",
         }
       }
@@ -276,6 +276,7 @@ exports[`TokenDetails renders correctly 1`] = `
             "justifyContent": "center",
             "paddingLeft": 18,
             "paddingRight": 18,
+            "width": "100%",
           }
         }
       >
@@ -413,6 +414,151 @@ exports[`TokenDetails renders correctly 1`] = `
             "justifyContent": "center",
             "paddingLeft": 18,
             "paddingRight": 18,
+            "width": "100%",
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "column",
+              "gap": 7,
+              "justifyContent": "space-between",
+              "paddingBottom": 16,
+              "paddingLeft": 18,
+              "paddingRight": 18,
+              "paddingTop": 16,
+            }
+          }
+          testID="send-quick-action"
+        >
+          <RNSVGSvgView
+            align="xMidYMid"
+            bbHeight={24}
+            bbWidth={24}
+            color="#40FB50"
+            focusable={false}
+            height={24}
+            meetOrSlice={0}
+            minX={0}
+            minY={0}
+            strokeWidth="2"
+            style={
+              [
+                {
+                  "backgroundColor": "transparent",
+                  "borderWidth": 0,
+                },
+                {
+                  "color": "#40FB50",
+                },
+                {
+                  "flex": 0,
+                  "height": 24,
+                  "width": 24,
+                },
+              ]
+            }
+            tintColor="#40FB50"
+            vbHeight={24}
+            vbWidth={24}
+            width={24}
+          >
+            <RNSVGGroup
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+              propList={
+                [
+                  "strokeWidth",
+                ]
+              }
+              strokeWidth="2"
+            >
+              <RNSVGPath
+                d="M11.1008 19.2008V8.25078L6.07578 13.2758L4.80078 12.0008L12.0008 4.80078L19.2008 12.0008L17.9258 13.2758L12.9008 8.25078V19.2008H11.1008Z"
+                fill={
+                  {
+                    "type": 2,
+                  }
+                }
+                propList={
+                  [
+                    "fill",
+                  ]
+                }
+              />
+            </RNSVGGroup>
+          </RNSVGSvgView>
+          <Text
+            lineBreakMode="clip"
+            numberOfLines={1}
+            style={
+              {
+                "color": "#FFFFFF",
+                "flexGrow": 0,
+                "flexShrink": 1,
+                "fontFamily": "System",
+                "fontSize": 19.2,
+                "fontWeight": "400",
+                "lineHeight": 19,
+                "paddingLeft": 7,
+                "paddingRight": 7,
+                "textAlign": "center",
+                "userSelect": "none",
+                "width": "100%",
+              }
+            }
+            suppressHighlighting={true}
+          >
+            Send
+          </Text>
+        </View>
+      </View>
+      <View
+        cancelable={true}
+        disabled={false}
+        focusVisibleStyle={{}}
+        focusable={[Function]}
+        minPressDuration={0}
+        onBlur={[Function]}
+        onFocus={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onPress={[Function]}
+        onPressIn={[Function]}
+        onPressOut={[Function]}
+        role="button"
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#081619",
+            "borderBottomColor": "transparent",
+            "borderBottomLeftRadius": 16,
+            "borderBottomRightRadius": 16,
+            "borderBottomWidth": 1,
+            "borderLeftColor": "transparent",
+            "borderLeftWidth": 1,
+            "borderRightColor": "transparent",
+            "borderRightWidth": 1,
+            "borderStyle": "solid",
+            "borderTopColor": "transparent",
+            "borderTopLeftRadius": 16,
+            "borderTopRightRadius": 16,
+            "borderTopWidth": 1,
+            "display": "flex",
+            "flex": 1,
+            "flexDirection": "row",
+            "flexWrap": "nowrap",
+            "height": "auto",
+            "justifyContent": "center",
+            "paddingLeft": 18,
+            "paddingRight": 18,
+            "width": "100%",
           }
         }
       >

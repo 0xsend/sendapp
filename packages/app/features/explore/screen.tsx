@@ -11,6 +11,12 @@ export const ExploreScreen = () => {
       }}
     >
       <LinkBanner
+        href={'/explore/rewards'}
+        imgUrl={'url(https://ghassets.send.app/app_images/explore_rewards.jpg)'}
+        title={'Get Rewarded'}
+        subtitle={'Earn SEND while engaging, referring, and growing the network'}
+      />
+      <LinkBanner
         href={'/sendpot'}
         imgUrl={'url(https://ghassets.send.app/app_images/sendpot.jpg)'}
         title={'SENDPOT'}

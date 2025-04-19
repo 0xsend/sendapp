@@ -1,11 +1,5 @@
 import { XStack } from 'tamagui'
-import {
-  IconArrowUp,
-  IconChart,
-  IconDeviceReset,
-  IconHome,
-  IconWorldSearch,
-} from 'app/components/icons'
+import { IconArrowUp, IconHome, IconWorldSearch } from 'app/components/icons'
 import { Button, LinearGradient, LinkableButton } from '@my/ui'
 import { usePathname } from 'app/utils/usePathname'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
@@ -17,16 +11,8 @@ const TABS = [
     href: '/',
   },
   {
-    Icon: IconDeviceReset,
-    href: '/activity',
-  },
-  {
     Icon: IconArrowUp,
     href: '/send',
-  },
-  {
-    Icon: IconChart,
-    href: '/invest',
   },
   {
     Icon: IconWorldSearch,
@@ -68,11 +54,10 @@ export const BottomNavBar = () => {
         <XStack
           bc={'$color1'}
           w={'100%'}
-          h={'100%'}
           br={'$6'}
           ai={'center'}
-          jc={'space-between'}
-          p={'$4'}
+          jc={'space-around'}
+          p={'$3'}
           shadowColor={'#000000'}
           shadowOffset={{ width: 0, height: -5 }}
           shadowOpacity={0.3}
@@ -102,7 +87,7 @@ export const BottomNavBar = () => {
                 focusStyle={{
                   backgroundColor: isActiveRoute ? hoverStyles.background : 'transparent',
                 }}
-                p={'$3'}
+                p={'$2'}
                 br={'$3'}
                 height={'auto'}
               >

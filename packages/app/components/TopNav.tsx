@@ -7,14 +7,15 @@ import {
   H2,
   Header,
   LinkableAvatar,
+  LinkableButton,
   Paragraph,
   Separator,
-  Stack,
+  Spinner,
   useMedia,
   XStack,
 } from '@my/ui'
 import { useRootScreenParams } from 'app/routers/params'
-import { IconAccount, IconArrowLeft, IconSendLogo } from 'app/components/icons'
+import { IconAccount, IconArrowLeft, IconDeviceReset, IconSendLogo } from 'app/components/icons'
 import { usePathname } from 'app/utils/usePathname'
 import { useRouter } from 'solito/router'
 
@@ -45,21 +46,48 @@ interface TopNavProps {
 }
 
 export function AvatarMenuButton({ profile }: { profile?: Tables<'profiles'> | null }) {
+  const { isLoading } = useUser()
+
+  if (isLoading) return <Spinner size="small" color={'$color12'} alignSelf="center" p="$3" />
+
   return (
-    <LinkableAvatar
-      href={'/account'}
-      size={'$3.5'}
-      circular={true}
-      $gtLg={{
-        pointerEvents: 'none',
-        opacity: 0,
-      }} /// We need the button to be there for layout purposes
-    >
+    <LinkableAvatar href={'/account'} size={'$3.5'} circular={true}>
       <Avatar.Image src={profile?.avatar_url ?? ''} w="100%" h="100%" objectFit="cover" />
       <Avatar.Fallback jc={'center'} ai="center" theme="green_active" bc="$color2">
         <IconAccount size={'$2'} $theme-light={{ color: '$color12' }} />
       </Avatar.Fallback>
     </LinkableAvatar>
+  )
+}
+
+function ActivityMenuButton() {
+  const href = '/activity'
+  const location = usePathname()
+  const parts = location.split('/').filter(Boolean)
+  const isActiveRoute =
+    location === href.toString() ||
+    parts.includes(href.toString()) ||
+    href.toString().startsWith(`/${parts[0]}`)
+
+  return (
+    <LinkableButton
+      href={'/activity'}
+      bc={'$color0'}
+      p={'$2'}
+      circular
+      chromeless
+      hoverStyle={{ bc: '$color0' }}
+      pressStyle={{ bc: '$color0' }}
+      focusStyle={{ bc: '$color0' }}
+    >
+      <LinkableButton.Icon>
+        <IconDeviceReset
+          size={'$1.5'}
+          color={isActiveRoute ? '$primary' : '$color10'}
+          $theme-light={{ color: isActiveRoute ? '$color12' : '$color10' }}
+        />
+      </LinkableButton.Icon>
+    </LinkableButton>
   )
 }
 
@@ -170,9 +198,18 @@ export function TopNav({
                       {header}
                     </H2>
                   )}
-                  <Stack jc="center" $gtLg={{ fd: 'row' }}>
-                    {profile ? <AvatarMenuButton profile={profile} /> : null}
-                  </Stack>
+                  <XStack
+                    jc="center"
+                    gap="$2"
+                    $gtLg={{
+                      pointerEvents: 'none',
+                      opacity: 0,
+                    }}
+                  >
+                    {/* We need the buttons to be there for layout purposes */}
+                    <ActivityMenuButton />
+                    <AvatarMenuButton profile={profile} />
+                  </XStack>
                 </>
               )
             case showLogo:

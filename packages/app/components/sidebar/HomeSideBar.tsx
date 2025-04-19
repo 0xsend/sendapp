@@ -17,7 +17,6 @@ import { baseMainnet } from '@my/wagmi/chains'
 import {
   IconAccount,
   IconArrowUp,
-  IconChart,
   IconDeviceReset,
   IconHome,
   IconSendLogo,
@@ -49,11 +48,6 @@ const links = [
     href: '/send',
   },
   {
-    icon: <IconChart size={'$1'} color={'inherit'} />,
-    text: 'Invest',
-    href: '/invest',
-  },
-  {
     icon: <IconWorldSearch size={'$1'} color={'inherit'} />,
     text: 'Explore',
     href: '/explore',
@@ -74,7 +68,7 @@ const HomeSideBar = ({ ...props }: YStackProps) => {
         <IconSendLogo color={'$color12'} size={'$2.5'} />
       </Link>
 
-      <YStack gap={'$7'} pt={'$10'} jc={'space-between'}>
+      <YStack gap={'$7'} pb={'$15'} jc={'space-between'}>
         {links.map((link) => (
           <SideBarNavLink key={link.href} {...link} />
         ))}

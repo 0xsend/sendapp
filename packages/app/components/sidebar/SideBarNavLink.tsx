@@ -25,7 +25,7 @@ export function SideBarNavLink({
           scale: '105%',
           color: '$color12',
         }}
-        fontSize={'$7'}
+        fontSize={'$8'}
         f={1}
         fontWeight={isActiveRoute ? '400' : '300'}
         gap="$3"
