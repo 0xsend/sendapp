@@ -27,28 +27,28 @@ import { SideBarNavLink } from 'app/components/sidebar/SideBarNavLink'
 import type { ReactElement } from 'react'
 import { NavSheet } from '../NavSheet'
 
+import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { useUser } from 'app/utils/useUser'
 import { ReferralLink } from '../ReferralLink'
-import { useHoverStyles } from 'app/utils/useHoverStyles'
 
 const links = [
   {
-    icon: <IconHome size={'$1'} color={'inherit'} scale={'1.2'} />,
+    icon: <IconHome size={'$1'} scale={1.2} />,
     text: 'Home',
     href: '/',
   },
   {
-    icon: <IconDeviceReset size={'$1'} color={'inherit'} scale={'1.2'} />,
+    icon: <IconDeviceReset size={'$1'} scale={1.2} />,
     text: 'Activity',
     href: '/activity',
   },
   {
-    icon: <IconArrowUp size={'$1'} color={'inherit'} scale={'1.3'} />,
+    icon: <IconArrowUp size={'$1'} scale={1.3} />,
     text: 'Send',
     href: '/send',
   },
   {
-    icon: <IconWorldSearch size={'$1'} color={'inherit'} />,
+    icon: <IconWorldSearch size={'$1'} />,
     text: 'Explore',
     href: '/explore',
   },
@@ -121,7 +121,6 @@ const DesktopAccountMenuEntry = () => {
           <Paragraph
             bc={'$color1'}
             size={'$2'}
-            width={'max-content'}
             maxWidth={'100%'}
             numberOfLines={1}
             px={'$2'}
@@ -179,7 +178,13 @@ const HomeBottomSheet = () => {
                 paddingTop={first ? '$2' : 0}
                 paddingBottom={last ? '$2' : 0}
               >
-                <YStack w={'100%'} p={'$4'} borderRadius={'$4'} hoverStyle={hoverStyles}>
+                <YStack
+                  w={'100%'}
+                  p={'$4'}
+                  borderRadius={'$4'}
+                  // @ts-expect-error - background type is confused here
+                  hoverStyle={hoverStyles}
+                >
                   <SideBarNavLink key={link.href} hoverStyle={{}} {...link} />
                 </YStack>
               </YStack>

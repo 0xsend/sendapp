@@ -74,7 +74,7 @@ function SearchResults() {
         testID="searchResults"
         key="searchResults"
         animation="quick"
-        gap="$size.2.5"
+        gap="$2.5"
         width="100%"
         enterStyle={{
           opacity: 0,
@@ -109,7 +109,7 @@ function SearchResults() {
       testID="searchResults"
       key="searchResults"
       animation="quick"
-      gap="$size.2.5"
+      gap="$2.5"
       width="100%"
       enterStyle={{
         opacity: 0,
@@ -248,6 +248,7 @@ const AddressSearchResultRow = ({ address }: { address: Address }) => {
         ai="center"
         jc={'space-between'}
         onPress={() => setSendConfirmDialogIsOpen(true)}
+        // biome-ignore lint/a11y/useSemanticElements: intentional
         role="link"
         aria-label={address}
       >
@@ -287,7 +288,7 @@ const AddressSearchResultRow = ({ address }: { address: Address }) => {
           </YStack>
         </XStack>
         <IconArrowRight
-          size={'1.5'}
+          size={'$1.5'}
           color={'$primary'}
           $theme-light={{
             color: '$color12',
@@ -391,6 +392,7 @@ function SearchResultRow({
       key={`SearchResultRow-${keyField}-${profile.tag_name}-${profile.send_id}`}
       width="100%"
       p={'$4'}
+      // @ts-expect-error - background type is confused here
       hoverStyle={hoverStyles}
     >
       <Link href={href}>
@@ -435,7 +437,7 @@ function SearchResultRow({
             </YStack>
           </XStack>
           <IconArrowRight
-            size={'1.5'}
+            size={'$1.5'}
             color={'$primary'}
             $theme-light={{
               color: '$color12',
@@ -502,7 +504,7 @@ function Search({ label, placeholder = 'Search', autoFocus = false }: SearchProp
             schema={SearchSchema}
             props={{
               query: {
-                pr: '$size.3.5',
+                pr: '$3.5',
                 pl: '$8',
                 accessibilityRole: 'search',
                 placeholder,

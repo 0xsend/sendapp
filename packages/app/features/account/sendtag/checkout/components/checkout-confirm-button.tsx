@@ -173,44 +173,48 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
     }
   }
 
-  function submitTxToDb(tx: string) {
-    setAttempts((a) => a + 1)
-    setSubmitting(true)
-    confirm
-      .mutateAsync({ transaction: tx })
-      .then(async () => {
-        setSubmitting(false)
-        await updateProfile().then(() => {
-          refetchReceipts()
+  const submitTxToDb = useCallback(
+    function submitTxToDb(tx: string) {
+      setAttempts((a) => a + 1)
+      setSubmitting(true)
+      confirm
+        .mutateAsync({ transaction: tx })
+        .then(async () => {
+          setSubmitting(false)
+          await updateProfile().then(() => {
+            refetchReceipts()
+          })
+          onConfirmed()
         })
-        onConfirmed()
-      })
-      .catch((err) => {
-        console.error('Error confirming', err)
-        if (err instanceof TRPCClientError) {
-          // handle transaction too new error
-          if (
-            [
-              'Transaction too new.',
-              'The Transaction may not be processed on a block yet.',
-              `Transaction with hash "${tx}" could not be found`,
-            ].some((s) => err.message.includes(s)) &&
-            attempts < 10
-          ) {
-            // try again
-            setTimeout(() => {
-              submitTxToDb(tx)
-            }, 1000)
-            return
+        .catch((err) => {
+          console.error('Error confirming', err)
+          if (err instanceof TRPCClientError) {
+            // handle transaction too new error
+            if (
+              [
+                'Transaction too new.',
+                'The Transaction may not be processed on a block yet.',
+                `Transaction with hash "${tx}" could not be found`,
+              ].some((s) => err.message.includes(s)) &&
+              attempts < 10
+            ) {
+              // try again
+              setTimeout(() => {
+                submitTxToDb(tx)
+              }, 1000)
+              return
+            }
           }
-        }
-        setError((err?.details ?? err?.message)?.split('.').at(0) ?? 'Something went wrong')
-      })
-      .finally(() => {
-        setSubmitting(false)
-      })
-  }
+          setError((err?.details ?? err?.message)?.split('.').at(0) ?? 'Something went wrong')
+        })
+        .finally(() => {
+          setSubmitting(false)
+        })
+    },
+    [attempts, refetchReceipts, confirm.mutateAsync, onConfirmed, updateProfile]
+  )
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: otherwise it infinite loops
   useEffect(() => {
     if (txReceipt) submitTxToDb(txReceipt.transactionHash)
   }, [txReceipt])
@@ -374,13 +378,13 @@ const ConfirmButtonError = ({
             },
           },
         ]}
-        boc={'$red500'}
+        boc={'$error'}
         borderWidth={1}
         maw={300}
         $theme-dark={{ bc: '$black' }}
         $theme-light={{ bc: '$gray4Light' }}
       >
-        <Tooltip.Arrow borderColor={'$red500'} bw={4} />
+        <Tooltip.Arrow borderColor={'$error'} bw={4} />
         {children}
       </Tooltip.Content>
       <Tooltip.Trigger>

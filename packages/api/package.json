@@ -12,12 +12,12 @@
     "@my/wagmi": "workspace:*",
     "@my/workflows": "workspace:*",
     "@supabase/supabase-js": "2.44.2",
-    "@tanstack/react-query": "^5.72.1",
-    "@trpc/client": "^11.0.4",
-    "@trpc/next": "^11.0.4",
-    "@trpc/react-query": "^11.0.4",
-    "@trpc/server": "^11.0.4",
-    "@wagmi/core": "^2.13.1",
+    "@tanstack/react-query": "^5.74.4",
+    "@trpc/client": "^11.1.0",
+    "@trpc/next": "^11.1.0",
+    "@trpc/react-query": "^11.1.0",
+    "@trpc/server": "^11.1.0",
+    "@wagmi/core": "^2.16.7",
     "app": "workspace:*",
     "debug": "^4.3.6",
     "jsonwebtoken": "^9.0.2",
@@ -25,11 +25,11 @@
     "p-queue": "^8.0.1",
     "permissionless": "^0.1.14",
     "superjson": "^2.2.1",
-    "viem": "^2.19.0",
+    "viem": "^2.27.2",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.2",
-    "typescript": "^5.5.3"
+    "typescript": "^5.8.3"
   }
 }

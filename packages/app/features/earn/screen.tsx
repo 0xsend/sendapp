@@ -77,7 +77,6 @@ const Badge = ({ text }: { text: string }) => {
 
   return (
     <XStack
-      width={'max-content'}
       backgroundColor={badgeBackgroundColor}
       px={'$3.5'}
       py={'$2'}
@@ -97,7 +96,7 @@ const LearnSection = () => {
       <Link href="https://info.send.it/send-docs/features-and-products/send-earn">
         <Card
           w={'100%'}
-          h={'300px'}
+          h={300}
           p={'$5'}
           gap={'$7'}
           jc={'space-between'}
@@ -117,7 +116,6 @@ const LearnSection = () => {
             <YStack position="absolute" top={0} left={0} bottom={0} right={0} />
           </LinearGradient>
           <XStack
-            width={'max-content'}
             backgroundColor={'$oliveDrab'}
             px={'$3.5'}
             py={'$2'}
@@ -141,7 +139,7 @@ const LearnSection = () => {
               <Paragraph color={'$white'} size={'$5'}>
                 Learn How It Works
               </Paragraph>
-              <IconArrowRight size={'2'} color={'$primary'} />
+              <IconArrowRight size={'$2'} color={'$primary'} />
             </XStack>
           </YStack>
         </Card>

@@ -22,7 +22,9 @@
       "@my/wagmi": ["../../packages/wagmi/src"],
       "@my/wagmi/*": ["../../packages/wagmi/src/*"],
       "app": ["../../packages/app"],
-      "app/*": ["../../packages/app/*"]
+      "app/*": ["../../packages/app/*"],
+      "@my/ui": ["../../packages/ui/src"],
+      "@my/ui/*": ["../../packages/ui/src/*"]
     }
   },
   "references": [],
@@ -34,6 +36,7 @@
     "../../packages/wagmi/src",
     "../../packages/app",
     "../../globals.d.ts",
-    "../../environment.d.ts"
+    "../../environment.d.ts",
+    "../../packages/ui/src"
   ]
 }

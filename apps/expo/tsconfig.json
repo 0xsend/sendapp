@@ -1,3 +1,10 @@
 {
-  "extends": "../../tsconfig"
+  "extends": "../../tsconfig.base",
+  "include": ["app", "types.d.ts", "../../packages/ui", "../../packages/api", "../../packages/app"],
+  "compilerOptions": {
+    "noEmit": true,
+    "composite": true,
+    "jsx": "react-jsx"
+  },
+  "references": []
 }

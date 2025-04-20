@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals'
 const mockUseProfileLookup = jest.fn(() => ({
   isLoading: false,
   error: null,

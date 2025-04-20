@@ -125,3 +125,7 @@ web-build/
 dist/
 
 # @end expo-cli
+
+# Expo local iOS and Android builds
+/ios/
+/android/

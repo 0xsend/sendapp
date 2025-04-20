@@ -30,7 +30,7 @@ export function SendEarnAmount({ activity }: { activity: SendEarnEvent }): React
       <TooltipSimple label={toNiceError(assets.error)} placement="top">
         <Paragraph color="$error" size={'$5'}>
           &nbsp;
-          <Bug size="1.5" />
+          <Bug size="$1.5" />
         </Paragraph>
       </TooltipSimple>
     )

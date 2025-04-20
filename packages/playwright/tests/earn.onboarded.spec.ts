@@ -503,19 +503,6 @@ for (const coin of [usdcCoin]) {
       // Verify initial deposit went to the platform vault (assuming no referral for this test)
       expect(vault1).toBe(sendEarnAddress[testBaseClient.chain.id])
 
-      // 2. Full Withdrawal
-      // Get current balance (shares and assets)
-      const initialShares = await readSendEarnBalanceOf({
-        vault: vault1,
-        owner: sendAccount.address,
-      })
-      const assetsToWithdraw = await readSendEarnConvertToAssets({
-        vault: vault1,
-        shares: initialShares,
-      })
-      const withdrawAmountDecimals = formatUnits(assetsToWithdraw, coin.decimals)
-      log('Calculated assets to withdraw:', withdrawAmountDecimals, coin.symbol)
-
       // Need gas for withdrawal
       await fund({ address: sendAccount.address, amount: GAS_FEES, coin: usdcCoin }) // Assuming USDC for gas funding for simplicity, adjust if needed
 
@@ -523,7 +510,7 @@ for (const coin of [usdcCoin]) {
       await earnWithdrawPage.withdraw({
         coin,
         supabase,
-        amount: withdrawAmountDecimals, // Withdraw the exact calculated amount
+        amount: initialAmountDecimals, // Withdraw the exact calculated amount
       })
       log('Full withdrawal completed')
 
@@ -538,7 +525,7 @@ for (const coin of [usdcCoin]) {
       })
       log('Remaining assets after withdrawal:', formatUnits(remainingAssets, coin.decimals))
       // Allow a small tolerance for potential dust amounts
-      const tolerance = BigInt(10 ** (coin.decimals - 4)) // e.g., 0.0001 USDC
+      const tolerance = 1n * BigInt(10 ** (coin.decimals - 4)) // e.g., 0.0001 USDC
       expect(remainingAssets).toBeLessThanOrEqual(tolerance)
 
       // 3. Second Deposit

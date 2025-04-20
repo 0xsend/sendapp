@@ -67,13 +67,15 @@ export function useProtectedRoute(user: User | null) {
   useEffect(() => {
     const inAuthGroup = firstSegment === '(auth)'
 
+    if (firstSegment === '_sitemap') return
+
     if (
       // If the user is not signed in and the initial segment is not anything in the auth group.
       !user &&
       !inAuthGroup
     ) {
       // Redirect to the sign-in page.
-      replaceRoute('/auth/onboarding')
+      replaceRoute('/auth/sign-up')
     } else if (user && inAuthGroup) {
       // Redirect away from the sign-in page.
       replaceRoute('/')

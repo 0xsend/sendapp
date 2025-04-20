@@ -7,12 +7,7 @@ export function ActivityScreen() {
   return (
     <TagSearchProvider>
       <YStack f={1} width={'100%'} pb="$3" pt="$3" gap="$6" $gtLg={{ pt: 0, gap: '$7' }}>
-        <YStack
-          width={'100%'}
-          gap="$size.1.5"
-          $gtSm={{ gap: '$size.2.5' }}
-          $gtLg={{ display: 'none' }}
-        >
+        <YStack width={'100%'} gap="$1.5" $gtSm={{ gap: '$2.5' }} $gtLg={{ display: 'none' }}>
           <Search />
         </YStack>
         <AnimatePresence>
@@ -52,7 +47,7 @@ function ActivityBody() {
         <YStack
           key="loading"
           $gtLg={{
-            maxWidth: '600px',
+            maxWidth: 600,
           }}
         >
           <Spinner size="small" />

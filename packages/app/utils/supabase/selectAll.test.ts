@@ -1,4 +1,4 @@
-import { test } from '@jest/globals'
+import { test, jest, expect } from '@jest/globals'
 import { selectAll } from './selectAll'
 
 test('successfully fetches all rows with pagination', async () => {
@@ -10,6 +10,7 @@ test('successfully fetches all rows with pagination', async () => {
   // Mock queryBuilder
   const mockQueryBuilder = {
     range: jest.fn().mockImplementation((start, end) => {
+      // @ts-expect-error - testing
       const pageData = mockData.slice(start, end + 1)
       return Promise.resolve({ data: pageData, count: totalRows, error: null })
     }),
@@ -51,10 +52,13 @@ test('handles actual page size smaller than default', async () => {
   const mockQueryBuilder = {
     range: jest.fn().mockImplementation((start, end) => {
       if (firstPage) {
+        // @ts-expect-error - testing
         expect(end - start).toBe(defaultPageSize - 1)
       } else {
+        // @ts-expect-error - testing
         expect(end - start).toBe(pageSize - 1)
       }
+      // @ts-expect-error - testing
       const pageData = mockData.slice(start, start + pageSize)
       firstPage = false
       return Promise.resolve({ data: pageData, count: totalRows, error: null })

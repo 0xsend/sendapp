@@ -1,7 +1,6 @@
 import {
   Avatar,
   Button,
-  isWeb,
   LinearGradient,
   LinkableButton,
   Paragraph,
@@ -93,15 +92,17 @@ export function AccountScreen() {
       className={'hide-scroll'}
       overflow={'scroll'}
       $gtSm={{
-        maxWidth: '500px',
+        maxWidth: 500,
       }}
       $gtLg={{
         gap: '$5',
         flexDirection: 'row',
-        maxWidth: '1100px',
+        maxWidth: 1100,
         marginHorizontal: 0,
-        height: isWeb ? 'min-content' : 'auto',
         overflow: 'visible',
+        '$platform-web': {
+          height: 'min-content',
+        },
       }}
     >
       <YStack
@@ -199,7 +200,7 @@ export function AccountScreen() {
                 flexShrink={1}
                 p={'$4'}
               >
-                <XStack jc={'space-between'} gap={'$size.0.75'} ai={'center'}>
+                <XStack jc={'space-between'} gap={'$0.75'} ai={'center'}>
                   <Button.Icon>
                     <IconQRFull size={16} color={'$white'} $platform-web={{ cursor: 'pointer' }} />
                   </Button.Icon>
@@ -221,7 +222,6 @@ export function AccountScreen() {
       <YStack gap={'$3.5'} width="100%" $gtLg={{ gap: '$5', width: '50%' }}>
         <XStack
           gap={'$3.5'}
-          // @ts-expect-error typescript is complaining about overflowX not available and advising overflow. Overflow will work differently than overflowX here, overflowY is working fine
           overflowX={'scroll'}
           className={'hide-scroll'}
           $gtLg={{ gap: '$5', flexDirection: 'column' }}
@@ -247,6 +247,7 @@ const StackButton = ({ href, label, icon }: { href: string; label: string; icon:
       backgroundColor={'$color1'}
       borderRadius={'$6'}
       p={'$5'}
+      // @ts-expect-error - background type is confused here
       hoverStyle={hoverStyles}
       $gtLg={{ p: '$7' }}
     >
@@ -332,8 +333,8 @@ const ReferralCode = () => {
         </XStack>
         <Paragraph
           ff={'$mono'}
-          py={'$size.0.5'}
-          px={'$size.0.9'}
+          py={'$0.5'}
+          px={'$0.9'}
           borderWidth={1}
           borderColor={'$primary'}
           $theme-light={{ borderColor: '$color12' }}

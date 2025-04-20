@@ -72,7 +72,6 @@ export const CoinField = ({
               testID={'SelectCoinTrigger'}
               br={999}
               borderWidth={0}
-              w={'fit-content'}
               scaleSpace={0.5}
               scaleIcon={1.5}
               padding={'$2'}
@@ -80,6 +79,7 @@ export const CoinField = ({
               focusStyle={{
                 bc: 'transparent',
               }}
+              // @ts-expect-error - background type is confused here
               hoverStyle={hoverStyles}
               $gtSm={{ p: '$2.5' }}
               iconAfter={
@@ -89,6 +89,9 @@ export const CoinField = ({
                   <ChevronDown color="$primary" $theme-light={{ color: '$color12' }} />
                 )
               }
+              style={{
+                width: 'fit-content',
+              }}
             >
               <XStack gap={'$2'} ai={'center'}>
                 {pickedCoinSymbol && <IconCoin symbol={pickedCoinSymbol} size={'$2'} />}
@@ -162,7 +165,6 @@ export const CoinField = ({
                   boc={'transparent'}
                   f={1}
                   maxHeight={isTouchable ? 'unset' : 275}
-                  // @ts-expect-error tamagui tripping here
                   overflowY={isTouchable ? 'hidden' : 'scroll'}
                 >
                   <Select.Group disabled={disabled} space="$0" p={'$2'}>

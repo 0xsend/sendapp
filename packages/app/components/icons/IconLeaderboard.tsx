@@ -1,7 +1,7 @@
 import { type IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
 import { Path, Svg } from 'react-native-svg'
-import type { ColorTokens } from '@my/ui/types'
+import type { ColorTokens } from '@my/ui'
 
 const Leaderboard = (props) => {
   const { size, color, ...rest } = props

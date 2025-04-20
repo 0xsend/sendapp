@@ -14,7 +14,7 @@ import { SchemaForm } from 'app/utils/SchemaForm'
 import { ProfileSchema, useProfileMutation } from 'app/utils/useProfileMutation'
 import { useUser } from 'app/utils/useUser'
 import { UploadAvatar, type UploadAvatarRefObject } from '../uploadProfileImage/screen'
-import { useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import type { Tables } from '@my/supabase/database.types'
 import { Check } from '@tamagui/lucide-icons'
 import { SettingsHeader } from 'app/features/account/settings/components/SettingsHeader'
@@ -133,6 +133,24 @@ function EditProfileForm({ profile, onSave }: { profile: Tables<'profiles'>; onS
   const { mutateAsync, error } = useProfileMutation(id)
   const form = useForm<z.infer<typeof ProfileSchema>>()
 
+  const renderAfterContent = useCallback(
+    ({ submit }: { submit: () => void }) => (
+      <YStack>
+        <SubmitButton theme="green" borderRadius={'$4'} p={'$4'} mt={'$1'} onPress={() => submit()}>
+          <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
+            SAVE CHANGES
+          </Button.Text>
+        </SubmitButton>
+        {error && (
+          <Paragraph marginTop={'$3'} theme="red" color="$color9">
+            {error.message}
+          </Paragraph>
+        )}
+      </YStack>
+    ),
+    [error]
+  )
+
   const handleSubmit = async () => {
     const values = form.getValues()
     await mutateAsync(values)
@@ -172,32 +190,7 @@ function EditProfileForm({ profile, onSave }: { profile: Tables<'profiles'>; onS
         },
       }}
       onSubmit={handleSubmit}
-      renderAfter={({ submit }) => (
-        <YStack>
-          <SubmitButton
-            theme="green"
-            borderRadius={'$4'}
-            p={'$4'}
-            mt={'$1'}
-            onPress={() => submit()}
-          >
-            <Button.Text
-              ff={'$mono'}
-              fontWeight={'500'}
-              tt="uppercase"
-              size={'$5'}
-              color={'$black'}
-            >
-              SAVE CHANGES
-            </Button.Text>
-          </SubmitButton>
-          {error && (
-            <Paragraph marginTop={'$3'} theme="red" color="$color9">
-              {error.message}
-            </Paragraph>
-          )}
-        </YStack>
-      )}
+      renderAfter={renderAfterContent}
     >
       {({ name, about, isPublic }) => (
         <FadeCard>

@@ -5,7 +5,7 @@
     "package.json": "package-lock.json, yarn.lock, bun.lockb",
     "*.js": "${capture}.js.map, ${capture}.d.ts, ${capture}.d.ts.map",
     "*.ts": "$(capture).test.ts, $(capture).test.node.ts, $(capture).test.native.ts, $(capture).test.ios.ts, $(capture).test.web.ts, $(capture).test.android.ts, ${capture}.native.ts, ${capture}.ios.ts, ${capture}.android.ts, ${capture}.web.ts, ${capture}.stories.ts, ${capture}.example.ts",
-    "*.tsx": "$(capture).test.tsx,$(capture).test.node.tsx,$(capture).test.native.tsx,$(capture).test.ios.tsx,$(capture).test.web.tsx,$(capture).test.android.tsx,${capture}.native.tsx,${capture}.ios.tsx,${capture}.android.tsx,${capture}.web.tsx,${capture}.stories.tsx,${capture}.example.tsx"
+    "*.tsx": "$(capture).test.tsx,$(capture).skiptest.tsx,$(capture).test.node.tsx,$(capture).test.native.tsx,$(capture).test.ios.tsx,$(capture).test.web.tsx,$(capture).test.android.tsx,${capture}.native.tsx,${capture}.ios.tsx,${capture}.android.tsx,${capture}.web.tsx,${capture}.stories.tsx,${capture}.example.tsx"
   },
   "typescript.tsdk": "node_modules/typescript/lib",
   "[javascript]": {

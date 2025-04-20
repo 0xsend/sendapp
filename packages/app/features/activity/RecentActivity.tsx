@@ -114,7 +114,7 @@ function ActivityFeed({
 
   if (activitiesError) {
     return (
-      <Paragraph maxWidth={'600'} fontFamily={'$mono'} fontSize={'$5'} color={'$color12'}>
+      <Paragraph maxWidth={600} fontFamily={'$mono'} fontSize={'$5'} color={'$color12'}>
         {activitiesError?.message.split('.').at(0) ?? `${activitiesError}`}
       </Paragraph>
     )

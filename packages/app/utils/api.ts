@@ -1,10 +1,11 @@
 import type { AppRouter } from '@my/api'
 import { httpBatchLink } from '@trpc/client'
-import { createTRPCNext } from '@trpc/next'
+import { type CreateTRPCNext, createTRPCNext } from '@trpc/next'
 import SuperJSON from 'superjson'
 import { getBaseUrl } from './getBaseUrl'
+import type { NextPageContext } from 'next/types'
 
-export const api = createTRPCNext<AppRouter>({
+export const api: CreateTRPCNext<AppRouter, NextPageContext> = createTRPCNext<AppRouter>({
   config() {
     return {
       links: [

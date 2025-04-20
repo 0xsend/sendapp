@@ -56,8 +56,8 @@ export function DepositAddressQR({ address, isConfirmed, onPress }: DepositAddre
                   backgroundColor="white"
                   padding={4}
                   borderRadius={4}
-                  top={qrData.logoOverlay.position.top}
-                  left={qrData.logoOverlay.position.left}
+                  top={Number(qrData.logoOverlay.position.top)}
+                  left={Number(qrData.logoOverlay.position.left)}
                   style={{
                     transform: qrData.logoOverlay.position.transform,
                   }}

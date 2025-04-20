@@ -1,26 +1,23 @@
-import { useThemeSetting } from '@tamagui/next-theme'
-import { useStringFieldInfo, useTsController } from '@ts-react/form'
-import { forwardRef, type ReactNode, useId } from 'react'
 import {
+  FieldError,
   Fieldset,
   Label,
+  type LabelProps,
+  Shake,
+  Stack,
   TextArea,
   type TextAreaProps,
   Theme,
   type ThemeName,
   useThemeName,
-  FieldError,
-  Shake,
-  type LabelProps,
-  Stack,
-  useComposedRefs,
-  type TamaguiElement,
 } from '@my/ui'
+import { useThemeSetting } from '@tamagui/next-theme'
+import { useStringFieldInfo, useTsController } from '@ts-react/form'
+import { type ReactNode, useId } from 'react'
 
-export const TextAreaField = forwardRef<
-  TamaguiElement,
-  TextAreaProps & { labelProps?: LabelProps; iconBefore?: ReactNode; iconAfter?: ReactNode }
->((props, forwardedRef) => {
+export const TextAreaField = (
+  props: TextAreaProps & { labelProps?: LabelProps; iconBefore?: ReactNode; iconAfter?: ReactNode }
+) => {
   const {
     field,
     error,
@@ -32,7 +29,6 @@ export const TextAreaField = forwardRef<
   const defaultTheme = useThemeName() as string
   const { resolvedTheme } = useThemeSetting()
   const themeName = (resolvedTheme ?? defaultTheme) as ThemeName
-  const composedRefs = useComposedRefs(forwardedRef, field.ref)
 
   return (
     <Theme name={error ? 'red' : themeName} forceClassName>
@@ -82,7 +78,7 @@ export const TextAreaField = forwardRef<
             value={field.value}
             onChangeText={(text) => field.onChange(text)}
             onBlur={field.onBlur}
-            ref={composedRefs}
+            ref={field.ref}
             placeholder={placeholder}
             id={id}
             focusStyle={{
@@ -108,6 +104,4 @@ export const TextAreaField = forwardRef<
       </Fieldset>
     </Theme>
   )
-})
-
-TextAreaField.displayName = 'TextAreaField'
+}

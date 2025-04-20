@@ -24,6 +24,7 @@ import { defaultUserOp, useUserOpTransferMutation } from 'app/utils/useUserOpTra
 import { useAccountNonce } from 'app/utils/userop'
 import debug from 'debug'
 import type { UserOperation } from 'permissionless'
+import { useCallback } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { createParam } from 'solito'
 import { useRouter } from 'solito/router'
@@ -66,7 +67,7 @@ export const ConfirmPasskeyScreen = () => {
             return <Spinner size="large" color={'$color'} />
           case error !== null:
             return (
-              <Paragraph maxWidth={'600'} fontSize={'$5'} color={'$color12'}>
+              <Paragraph maxWidth={600} fontSize={'$5'} color={'$color12'}>
                 {error?.message ?? `Something went wrong: ${error}`}
               </Paragraph>
             )
@@ -89,7 +90,7 @@ const AddPasskeySigner = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cre
         bc={'$color1'}
         borderRadius={'$5'}
         p={'$5'}
-        $gtLg={{ p: '$7', gap: '$5', als: 'flex-start', maxWidth: 'none' }}
+        $gtLg={{ p: '$7', gap: '$5', als: 'flex-start', maxWidth: '100%' }}
       >
         <H1 size={'$9'} fontWeight={'600'} color="$color12">
           Add Passkey as Signer
@@ -243,39 +244,38 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
 
   const isLoading = isLoadingNonce || isLoadingGasFees || isLoadingSendAccount || isLoadingUserOp
 
+  const renderAfterContent = useCallback(
+    ({ submit }: { submit: () => void }) => (
+      <SubmitButton
+        onPress={submit}
+        theme="green"
+        borderRadius={'$4'}
+        p={'$4'}
+        mt={'$1.5'}
+        {...(isLoading ? { disabled: true } : {})}
+      >
+        <Button.Text ff={'$mono'} fontWeight={'600'} tt="uppercase" size={'$5'} color={'$black'}>
+          Add Passkey as Signer
+        </Button.Text>
+      </SubmitButton>
+    ),
+    [isLoading]
+  )
+
   return (
     <FormProvider {...form}>
       <SchemaForm
         form={form}
         formProps={{
           $gtLg: {
-            maxWidth: 'none',
+            maxWidth: '100%',
             als: 'flex-start',
           },
           px: '$0',
         }}
         schema={z.object({})}
         onSubmit={onSubmit}
-        renderAfter={({ submit }) => (
-          <SubmitButton
-            onPress={submit}
-            theme="green"
-            borderRadius={'$4'}
-            p={'$4'}
-            mt={'$size.1.5'}
-            {...(isLoading ? { disabled: true } : {})}
-          >
-            <Button.Text
-              ff={'$mono'}
-              fontWeight={'600'}
-              tt="uppercase"
-              size={'$5'}
-              color={'$black'}
-            >
-              Add Passkey as Signer
-            </Button.Text>
-          </SubmitButton>
-        )}
+        renderAfter={renderAfterContent}
       >
         {() => (
           <>

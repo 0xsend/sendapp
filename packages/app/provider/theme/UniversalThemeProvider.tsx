@@ -4,3 +4,6 @@ export const UniversalThemeProvider = ({ children }: { children: React.ReactNode
 }
 
 export { useRootTheme, useThemeSetting } from '@tamagui/next-theme'
+
+// biome-ignore lint/suspicious/noExplicitAny: false positive
+export const loadThemePromise = new Promise<any>((res) => res({}))

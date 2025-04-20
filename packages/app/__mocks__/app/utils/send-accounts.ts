@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals'
 const mockSendAccounts = {
   useSendAccounts: jest.fn().mockReturnValue({
     data: [

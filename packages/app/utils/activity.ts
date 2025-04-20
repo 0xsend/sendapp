@@ -200,7 +200,7 @@ export const noteFromActivity = (activity: Activity) =>
   isTemporalEthTransfersEvent(activity) ||
   isSendAccountTransfersEvent(activity) ||
   isSendAccountReceiveEvent(activity)
-    ? activity.data.note ?? null
+    ? (activity.data.note ?? null)
     : null
 
 /**

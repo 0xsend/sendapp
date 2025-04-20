@@ -187,7 +187,7 @@ const Header = () => (
       start={[0, 0]}
       end={[0, 1]}
       fullscreen
-      colors={['$darkest', 'transparent', '$darkest']}
+      colors={['$background', 'transparent', '$background']}
     />
 
     <YStack p="$4" pt={'$3'} position="absolute" zIndex={1}>
@@ -424,8 +424,8 @@ const TaskCard = ({
             {(isSendStreak || isTagRegistration) && (
               <Paragraph
                 ff={'$mono'}
-                py={'$size.0.5'}
-                px={'$size.0.9'}
+                py={'$0.5'}
+                px={'$0.9'}
                 borderWidth={1}
                 borderColor={'$primary'}
                 $theme-light={{ borderColor: '$color12' }}
@@ -445,8 +445,8 @@ const TaskCard = ({
             </XStack>
             <Paragraph
               ff={'$mono'}
-              py={'$size.0.5'}
-              px={'$size.0.9'}
+              py={'$0.5'}
+              px={'$0.9'}
               borderWidth={1}
               borderColor={'$primary'}
               $theme-light={{ borderColor: '$color12' }}
@@ -511,9 +511,9 @@ const MultiplierCards = ({
         {activeMultipliers.map(({ type: verificationType, value }) => (
           <MultiplierCard key={verificationType}>
             <XStack ai="center" gap="$2" jc="center">
-              <IconAccount size={'2'} color={'$color10'} />
+              <IconAccount size={'$2'} color={'$color10'} />
               <H3 fontWeight={'500'} color={'$color10'}>
-                {verificationType === 'tag_referral' ? distributionMonth ?? 'Monthly' : ''}{' '}
+                {verificationType === 'tag_referral' ? (distributionMonth ?? 'Monthly') : ''}{' '}
                 {verificationTypesAndTitles[verificationType]?.title}
               </H3>
             </XStack>
@@ -535,7 +535,7 @@ const MultiplierCards = ({
 
 const MultiplierCard = ({ children }: PropsWithChildren<CardProps>) => {
   return (
-    <Card br={'$6'} p="$6" jc={'center'} ai={'center'} mih={112} w={'fit-content'}>
+    <Card br={'$6'} p="$6" jc={'center'} ai={'center'} mih={112} style={{ width: 'fit-content' }}>
       <XStack
         ai="center"
         w={'100%'}
@@ -633,8 +633,8 @@ const Progress = ({ progress }: { progress: number }) => {
       <XStack jc="flex-end">
         <Paragraph
           ff={'$mono'}
-          py={'$size.0.5'}
-          px={'$size.0.9'}
+          py={'$0.5'}
+          px={'$0.9'}
           borderWidth={1}
           borderColor={'$primary'}
           $theme-light={{ borderColor: '$color12' }}
