@@ -16,6 +16,7 @@ import {
   XStack,
   YGroup,
   YStack,
+  Dialog,
 } from '@my/ui'
 import { ExternalLink } from '@tamagui/lucide-icons'
 import { useThemeSetting } from '@tamagui/next-theme'
@@ -29,7 +30,6 @@ import { Fragment, useEffect, useState } from 'react'
 import { FormProvider } from 'react-hook-form'
 import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
-import { Adapt, Dialog, Sheet } from 'tamagui'
 import { type Address, isAddress } from 'viem'
 import { IconAccount, IconArrowRight, IconSearch, IconX } from './icons'
 import { baseMainnet } from '@my/wagmi'
@@ -308,15 +308,6 @@ const AddressSearchResultRow = ({ address }: { address: Address }) => {
 function ConfirmSendDialog({ isOpen, onClose, onConfirm, address }) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <Adapt when="sm" platform="touch">
-        <Sheet modal dismissOnSnapToBottom open={isOpen} onOpenChange={onClose}>
-          <Sheet.Frame padding="$4">
-            <Adapt.Contents />
-          </Sheet.Frame>
-          <Sheet.Overlay />
-        </Sheet>
-      </Adapt>
-
       <Dialog.Portal>
         <Dialog.Overlay />
         <Dialog.Content gap="$4">
@@ -332,7 +323,7 @@ function ConfirmSendDialog({ isOpen, onClose, onConfirm, address }) {
               <Button
                 size="$2"
                 py="$4"
-                theme="green"
+                theme="yellow_active"
                 onPress={() => {
                   if (isWeb) {
                     window.open(
@@ -346,10 +337,10 @@ function ConfirmSendDialog({ isOpen, onClose, onConfirm, address }) {
                 }}
                 fontFamily={'$mono'}
                 fontWeight={'bold'}
-                iconAfter={<ExternalLink size={14} />}
+                iconAfter={<ExternalLink size={14} $theme-light={{ col: '$color11' }} />}
                 mt="$4"
               >
-                {address}
+                <Button.Text $theme-light={{ col: '$color11' }}>{address}</Button.Text>
               </Button>
             </Paragraph>
 
@@ -359,10 +350,14 @@ function ConfirmSendDialog({ isOpen, onClose, onConfirm, address }) {
 
             <XStack justifyContent="flex-end" marginTop="$4" gap="$4">
               <Dialog.Close asChild>
-                <Button br={'$2'}>Cancel</Button>
+                <Button theme="red_active" br={'$2'}>
+                  <Button.Text>Cancel</Button.Text>
+                </Button>
               </Dialog.Close>
-              <Button theme="yellow_active" onPress={onConfirm} br={'$2'}>
-                I Agree & Continue
+              <Button theme="green" onPress={onConfirm} br={'$2'} zIndex={100}>
+                <Button.Text color="$color0" $theme-light={{ color: '$color12' }}>
+                  I Agree & Continue
+                </Button.Text>
               </Button>
             </XStack>
           </YStack>
