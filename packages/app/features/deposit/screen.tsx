@@ -7,10 +7,9 @@ export function DepositScreen() {
     <YStack
       width={'100%'}
       gap="$5"
-      jc={'space-between'}
+      jc="flex-start"
       $gtLg={{
         width: '50%',
-        jc: 'flex-start',
         pb: '$3.5',
       }}
     >
