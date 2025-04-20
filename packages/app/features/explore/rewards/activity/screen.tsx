@@ -187,7 +187,7 @@ const Header = () => (
       start={[0, 0]}
       end={[0, 1]}
       fullscreen
-      colors={['$darkest', 'transparent', '$darkest']}
+      colors={['$background', 'transparent', '$background']}
     />
 
     <YStack p="$4" pt={'$3'} position="absolute" zIndex={1}>
