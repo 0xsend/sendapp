@@ -78,6 +78,7 @@ export const DistributionSelect = memo(
           testID={'SelectDistributionDate'}
           br="$3"
           bw={'$1'}
+          width={'$14'}
           $theme-light={{
             boc: isOpen ? '$color1' : '$black',
             bc: isOpen ? '$color1' : 'transparent',
