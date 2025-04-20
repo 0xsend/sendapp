@@ -38,7 +38,12 @@ export function HomeLayout({
             <Container
               safeAreaProps={{
                 style: { flex: 1 },
-                edges: { bottom: 'maximum', left: 'additive', right: 'additive' },
+                edges: {
+                  top: 'off',
+                  bottom: 'maximum',
+                  left: 'additive',
+                  right: 'additive',
+                },
               }}
               pb={BOTTOM_NAV_BAR_HEIGHT}
               $gtLg={{ pt: '$5', pb: '$0' }}
