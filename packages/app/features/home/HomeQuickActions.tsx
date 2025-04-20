@@ -29,7 +29,9 @@ const QuickActionButton = ({ href, children }: LinkableButtonProps) => {
       href={href}
       f={1}
       height={'auto'}
+      // @ts-expect-error - background type is confused here
       hoverStyle={hoverStyles}
+      // @ts-expect-error - background type is confused here
       focusStyle={hoverStyles}
       w="100%"
     >
