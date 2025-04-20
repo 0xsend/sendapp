@@ -1,3 +1,4 @@
+import { RecoveryOptions } from '@my/api/src/routers/account-recovery/types'
 import {
   Button,
   ButtonText,
@@ -6,39 +7,42 @@ import {
   Paragraph,
   Spinner,
   Stack,
+  SubmitButton,
   XStack,
   YStack,
   isWeb,
   useMedia,
   usePwa,
   useSafeAreaInsets,
+  useToastController,
 } from '@my/ui'
+import { useQuery } from '@tanstack/react-query'
 import { IconSendLogo } from 'app/components/icons'
 import { useAuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
 import { Carousel, carouselImagePositions } from 'app/features/auth/components/Carousel'
+import { useAuthScreenParams } from 'app/routers/params'
+import { api } from 'app/utils/api'
+import { assert } from 'app/utils/assert'
+import { formatErrorMessage } from 'app/utils/formatErrorMessage'
+import { signChallenge } from 'app/utils/signChallenge'
+import { useEffect, useState } from 'react'
 import { SolitoImage } from 'solito/image'
 import { useLink } from 'solito/link'
-import { AnimationLayout } from '../../components/layout/animation-layout'
-import { useEffect, useState } from 'react'
-import { formatErrorMessage } from 'app/utils/formatErrorMessage'
-import { RecoveryOptions } from '@my/api/src/routers/account-recovery/types'
-import { SubmitButton, useToastController } from '@my/ui'
-import { api } from 'app/utils/api'
-import { signChallenge } from 'app/utils/signChallenge'
 import { useRouter } from 'solito/router'
 import { bytesToHex, hexToBytes } from 'viem'
-import { useAuthScreenParams } from 'app/routers/params'
-import { useQuery } from '@tanstack/react-query'
-import { assert } from 'app/utils/assert'
+import { AnimationLayout } from '../../components/layout/animation-layout'
 
 export function SplashScreen() {
   return (
     <XStack
-      h={isWeb ? '100svh' : '100%'}
+      flex={1}
       justifyContent={'space-between'}
       mx={'auto'}
       maxWidth={1600}
       w={'100%'}
+      $platform-web={{
+        height: '100svh',
+      }}
     >
       {/* Top section with carousel */}
 
@@ -129,19 +133,19 @@ function Hero() {
 
   return (
     <XStack
-      h={containerHeight}
       $gtMd={{ p: '$1.5', maxWidth: 720 }}
-      w="100%"
       position="relative"
       f={1}
+      $platform-web={{
+        height: containerHeight,
+      }}
     >
       <YStack
-        f={1}
         pt={Math.max(top, 24)}
         pb={Math.max(bottom, 16)}
         overflow="hidden"
         $gtMd={{ borderRadius: '$8' }}
-        w="100%"
+        f={1}
       >
         {carouselImage && (
           <Stack
@@ -150,16 +154,20 @@ function Hero() {
             left={0}
             right={0}
             bottom={0}
-            height={isWeb ? '100dvh' : '100%'}
+            $platform-web={{
+              height: '100dvh',
+            }}
           >
             <Stack
-              bc="$color1"
+              bc="$black"
               pos="absolute"
               top={0}
               left={0}
               right={0}
               bottom={0}
-              height={isWeb ? '100dvh' : '100%'}
+              $platform-web={{
+                height: '100dvh',
+              }}
             />
             <AnimationLayout
               currentKey={carouselImage.base64 || 'none'}
@@ -172,7 +180,9 @@ function Hero() {
                 left={0}
                 right={0}
                 bottom={0}
-                height={isWeb ? '100dvh' : '100%'}
+                $platform-web={{
+                  height: '100dvh',
+                }}
               >
                 <SolitoImage
                   placeholder="blur"
@@ -180,7 +190,7 @@ function Hero() {
                   src={carouselImage.img.src}
                   fill={true}
                   contentPosition={media.gtMd ? undefined : mobileImagePosition}
-                  style={{ objectFit: 'cover' }}
+                  resizeMode="cover"
                   alt="splash-screen-carousel"
                 />
                 <LinearGradient
@@ -199,19 +209,9 @@ function Hero() {
           </Stack>
         )}
 
-        <YStack
-          f={1}
-          display="flex"
-          fd="column"
-          jc="flex-end"
-          p="$3.5"
-          pb={0}
-          maw={738}
-          mx="auto"
-          w="100%"
-        >
-          <YStack w="100%">
-            <YStack jc="flex-end" f={1} gap="$2" pb="$7" $gtMd={{ pb: '$0.9' }}>
+        <YStack f={1} display="flex" fd="column" jc="flex-end" pb={0} maw={738} mx="auto">
+          <YStack f={1}>
+            <YStack jc="flex-end" f={1} gap="$2" pb="$7" $gtMd={{ pb: '$0.9' }} px="$3.5">
               <Carousel currentKey={carouselProgress.toString()} fullscreen={false} />
             </YStack>
             {/* <XStack gap="$4" ai="center" jc="center">
@@ -237,7 +237,9 @@ function Hero() {
             pb="$0.5"
             f={1}
             l={0}
-            w="100%"
+            $platform-web={{
+              width: '100%',
+            }}
           >
             <IconSendLogo size="$2" color="$white" ml={'$3.5'} />
             <AuthButtons />
@@ -328,8 +330,8 @@ function AuthButtons() {
       pb={'$2'}
       jc="center"
       $gtMd={{ jc: 'flex-start' }}
-      w="100%"
       alignSelf="center"
+      width="100%"
     >
       <SubmitButton
         size="$4"
@@ -340,7 +342,7 @@ function AuthButtons() {
         {(() => {
           switch (true) {
             case isLoadingChallenge:
-              return <Spinner size="small" color={'$black'} />
+              return <Spinner size="small" color="$color12" />
             default:
               return <ButtonText>{isSigningIn ? 'SIGNING IN...' : 'SIGN-IN'}</ButtonText>
           }

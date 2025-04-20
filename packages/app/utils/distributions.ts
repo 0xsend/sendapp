@@ -24,7 +24,7 @@ import { type CallExecutionError, encodeFunctionData, isAddress, zeroAddress } f
 import { useReadContract, useSimulateContract } from 'wagmi'
 import { api } from './api'
 import { assert } from './assert'
-import { byteaToBase64 } from './byteaToBase64'
+import { byteaToBase64URLNoPad } from './byteaToBase64URLNoPad'
 import { byteaToHex } from './byteaToHex'
 import { adjustUTCDateForTimezone } from './dateHelper'
 import { useSendAccount } from './send-accounts'
@@ -428,7 +428,7 @@ export async function sendUserOpClaim({
     validUntil,
     allowedCredentials:
       webauthnCreds?.map((c) => ({
-        id: byteaToBase64(c.raw_credential_id),
+        id: byteaToBase64URLNoPad(c.raw_credential_id),
         userHandle: c.name,
       })) ?? [],
   })

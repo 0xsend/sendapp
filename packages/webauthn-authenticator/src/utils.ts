@@ -1,5 +1,5 @@
 import { base64urlnopad } from '@scure/base'
-import cbor from 'cbor'
+import * as cbor from 'cbor2'
 import { AAGUID } from './aaguid'
 import type {
   Attestation,
@@ -80,33 +80,32 @@ export function deserializePublicKeyCredentialAttestion(
   const credentialId = base64URLToBuffer(credential.id)
   const clientDataJSON = base64URLToBuffer(credential.response.clientDataJSON)
   const attestationObject = base64URLToBuffer(credential.response.attestationObject)
-  const attestation = cbor.decodeAllSync(attestationObject)[0] as Attestation
-
+  const attestation = cbor.decode(attestationObject) as Attestation
   if (!attestation) {
     throw new Error('Invalid attestation object')
   }
   const { attStmt, authData } = attestation
-  const { COSEPublicKey } = parseCredAuthData(authData)
+
+  const { COSEPublicKey } = parseCredAuthData(Buffer.from(authData))
 
   if (!COSEPublicKey) {
     throw new Error('Invalid COSEPublicKey')
   }
-
-  const publicKey = cbor.decodeAllSync(COSEPublicKey)[0]
+  const publicKey = cbor.decode<Map<number, ArrayBuffer>>(COSEPublicKey)
 
   const response: AuthenticatorAttestationResponse = {
     attestationObject: toArrayBuffer(attestationObject),
     clientDataJSON: toArrayBuffer(clientDataJSON),
     getAuthenticatorData() {
-      return toArrayBuffer(authData)
+      return toArrayBuffer(Buffer.from(authData))
     },
     // returns an array buffer containing the DER SubjectPublicKeyInfo of the new credential
     getPublicKey() {
       const key = [
         // ASN.1 SubjectPublicKeyInfo structure for EC public keys
         Buffer.from('3059301306072a8648ce3d020106082a8648ce3d03010703420004', 'hex'),
-        publicKey.get(-2),
-        publicKey.get(-3),
+        Buffer.from(publicKey.get(-2) as ArrayBuffer),
+        Buffer.from(publicKey.get(-3) as ArrayBuffer),
       ]
       return toArrayBuffer(Buffer.concat(key))
     },

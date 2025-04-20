@@ -1,4 +1,3 @@
-import { createPasskey } from '@daimo/expo-passkeys'
 import {
   Anchor,
   BigHeading,
@@ -11,12 +10,12 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { base16, base64 } from '@scure/base'
+import { base16, base64urlnopad } from '@scure/base'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { api } from 'app/utils/api'
 import { assert } from 'app/utils/assert'
-import { base64ToBase16 } from 'app/utils/base64ToBase16'
-import { parseCreateResponse } from 'app/utils/passkeys'
+import { base64URLNoPadToBase16 } from 'app/utils/base64ToBase16'
+import { createPasskey } from 'app/utils/createPasskey'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useIsClient } from 'app/utils/useIsClient'
 import { useUser } from 'app/utils/useUser'
@@ -55,20 +54,20 @@ export const OnboardingForm = () => {
 
       const keySlot = 0
       const passkeyName = `${user.id}.${keySlot}` // 64 bytes max
-      const [rawCred, authData] = await createPasskey({
-        domain: window.location.hostname,
-        challengeB64: base64.encode(Buffer.from('foobar')), // TODO: generate a random challenge from the server
-        passkeyName,
-        passkeyDisplayTitle: `Send App: ${accountName}`,
-      }).then((r) => [r, parseCreateResponse(r)] as const)
+      const challenge = base64urlnopad.encode(Buffer.from('foobar'))
+
+      const [rawCred, authData] = await createPasskey({ user, keySlot, challenge, accountName })
+
+      const raw_credential_id = base64URLNoPadToBase16(rawCred.rawId)
+      const attestation_object = base64URLNoPadToBase16(rawCred.response.attestationObject)
 
       await sendAccountCreate
         .mutateAsync({
           accountName,
           passkeyName,
-          rawCredentialIDB16: base64ToBase16(rawCred.credentialIDB64),
+          rawCredentialIDB16: raw_credential_id,
           cosePublicKeyB16: base16.encode(authData.COSEPublicKey),
-          rawAttestationObjectB16: base64ToBase16(rawCred.rawAttestationObjectB64),
+          rawAttestationObjectB16: attestation_object,
           keySlot,
         })
         .then(async () => {

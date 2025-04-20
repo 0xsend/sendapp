@@ -26,6 +26,7 @@ export const SubmitButton = ({ children, theme = 'green', ...props }: ButtonProp
           <AnimatePresence>
             {isSubmitting ? (
               <Spinner
+                theme="light"
                 color="$color12"
                 key="loading-spinner"
                 opacity={1}

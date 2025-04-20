@@ -42,6 +42,7 @@ const themesBuilder = createThemeBuilder()
     yellow: colorThemeDefinition('yellow'),
     green: colorThemeDefinition('green'),
     red: colorThemeDefinition('red'),
+    gray: colorThemeDefinition('gray'),
   })
   .addChildThemes({
     ghost: {

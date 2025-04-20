@@ -128,6 +128,7 @@ export default () => {
     transpilePackages: [
       'solito',
       'react-native-web',
+      'expo-application',
       'expo-linking',
       'expo-constants',
       'expo-clipboard',

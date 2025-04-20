@@ -23,11 +23,21 @@ export const AuthProvider = ({ children, initialSession }: AuthProviderProps) =>
     setIsLoading(true)
     supabase.auth
       .getSession()
-      .then(({ data: { session } }) => {
-        setSession(session)
+      .then(({ data: { session: newSession } }) => {
+        setSession(newSession)
       })
       .catch((error) => setError(new AuthError(error.message)))
       .finally(() => setIsLoading(false))
+  }, [])
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession(newSession)
+    })
+    return () => {
+      subscription.unsubscribe()
+    }
   }, [])
 
   return (
@@ -68,18 +78,23 @@ export function useProtectedRoute(user: User | null) {
     const inAuthGroup = firstSegment === '(auth)'
 
     if (firstSegment === '_sitemap') return
+    if (firstSegment === '+not-found') return
 
     if (
       // If the user is not signed in and the initial segment is not anything in the auth group.
       !user &&
       !inAuthGroup
     ) {
-      // Redirect to the sign-in page.
-      replaceRoute('/auth/sign-up')
-    } else if (user && inAuthGroup) {
-      // Redirect away from the sign-in page.
+      // Redirect to the splash page.
       replaceRoute('/')
+      console.log('redirecting to / for auth group', firstSegment)
     }
+    // TODO: decide if we need to redirect to onboarding if user has no send account
+    // else if (user && inAuthGroup) {
+    //   // Redirect away from the sign-in page.
+    //   replaceRoute('/')
+    //   console.log('redirecting to / away from auth group', firstSegment)
+    // }
   }, [user, firstSegment])
 }
 

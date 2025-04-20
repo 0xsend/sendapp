@@ -4,7 +4,7 @@ import { signChallenge } from './signChallenge'
 import { USEROP_VERSION, generateChallenge } from './userop'
 import { getUserOperationHash, type UserOperation } from 'permissionless'
 import type { EntryPoint } from 'permissionless/types'
-import { byteaToBase64 } from './byteaToBase64'
+import { byteaToBase64URLNoPad } from './byteaToBase64URLNoPad'
 
 /**
  * Signs a user operation and returns the signature in a format for the SendVerifier contract.
@@ -83,7 +83,7 @@ export function webauthnCredToAllowedCredentials(
 ) {
   return (
     webauthnCreds?.map((c) => ({
-      id: byteaToBase64(c.raw_credential_id),
+      id: byteaToBase64URLNoPad(c.raw_credential_id),
       userHandle: c.name,
     })) ?? []
   )
