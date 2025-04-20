@@ -39,7 +39,6 @@ export function SplashScreen() {
       mx={'auto'}
       maxWidth={1600}
       w={'100%'}
-      style={{ height: '100svh' }}
     >
       {/* Top section with carousel */}
 
@@ -135,9 +134,6 @@ function Hero() {
       w="100%"
       position="relative"
       f={1}
-      style={{
-        height: containerHeight,
-      }}
     >
       <YStack
         f={1}
@@ -146,9 +142,6 @@ function Hero() {
         overflow="hidden"
         $gtMd={{ borderRadius: '$8' }}
         w="100%"
-        style={{
-          height: '100vh',
-        }}
       >
         {carouselImage && (
           <Stack
