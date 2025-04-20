@@ -1,5 +1,5 @@
+import { jest } from '@jest/globals'
 import nock from 'nock'
-import '@testing-library/react-native/extend-expect'
 
 nock.disableNetConnect()
 

@@ -84,12 +84,12 @@ export const DateField = (
                   },
                 },
               ]}
-              boc={'$red500'}
+              boc={'$error'}
               borderWidth={1}
               $theme-dark={{ bc: '$black' }}
               $theme-light={{ bc: '$white' }}
             >
-              <Tooltip.Arrow borderColor={'$red500'} bw={4} />
+              <Tooltip.Arrow borderColor={'$error'} bw={4} />
               <Paragraph
                 size={'$4'}
                 $theme-dark={{ col: '$white' }}

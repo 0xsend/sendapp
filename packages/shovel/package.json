@@ -13,7 +13,7 @@
     "@my/wagmi": "workspace:*",
     "@types/bun": "^1.1.6",
     "permissionless": "^0.1.14",
-    "viem": "^2.19.0",
+    "viem": "^2.27.2",
     "zx": "^8.1.2"
   },
   "peerDependencies": {

@@ -16,7 +16,7 @@ import type { z } from 'zod'
 import { FormProvider, useForm } from 'react-hook-form'
 import { VerifyCode } from 'app/features/auth/components/VerifyCode'
 import { AuthUserSchema, useAuthUserMutation } from 'app/utils/useAuthUserMutation'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useProfileMutation } from 'app/utils/useUserPersonalDataMutation'
 import { useQuery } from '@tanstack/react-query'
 import { adjustUTCDateForTimezone } from 'app/utils/dateHelper'
@@ -117,6 +117,24 @@ export const PersonalInfoScreen = () => {
     </FadeCard>
   )
 
+  const renderAfterContent = useCallback(
+    ({ submit }: { submit: () => void }) => (
+      <YStack>
+        <SubmitButton theme="green" borderRadius={'$4'} p={'$4'} mt={'$1'} onPress={() => submit()}>
+          <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
+            SAVE CHANGES
+          </Button.Text>
+        </SubmitButton>
+        {errorMessage && (
+          <Paragraph marginTop={'$5'} theme="red" color="$color9">
+            {errorMessage}
+          </Paragraph>
+        )}
+      </YStack>
+    ),
+    [errorMessage]
+  )
+
   const personalInfoForm = (
     <SchemaForm
       form={form}
@@ -152,32 +170,7 @@ export const PersonalInfoScreen = () => {
           maxWidth: '100%',
         },
       }}
-      renderAfter={({ submit }) => (
-        <YStack>
-          <SubmitButton
-            theme="green"
-            borderRadius={'$4'}
-            p={'$4'}
-            mt={'$1'}
-            onPress={() => submit()}
-          >
-            <Button.Text
-              ff={'$mono'}
-              fontWeight={'500'}
-              tt="uppercase"
-              size={'$5'}
-              color={'$black'}
-            >
-              SAVE CHANGES
-            </Button.Text>
-          </SubmitButton>
-          {errorMessage && (
-            <Paragraph marginTop={'$5'} theme="red" color="$color9">
-              {errorMessage}
-            </Paragraph>
-          )}
-        </YStack>
-      )}
+      renderAfter={renderAfterContent}
     >
       {({ phone, birthday, xUsername }) => (
         <FadeCard>

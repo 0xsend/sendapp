@@ -131,6 +131,22 @@ export function SendAmountForm() {
     form.clearErrors('note')
   }
 
+  const renderAfterContent = useCallback(
+    ({ submit }: { submit: () => void }) => (
+      <SubmitButton
+        theme="green"
+        onPress={submit}
+        py={'$5'}
+        br={'$4'}
+        disabledStyle={{ opacity: 0.5 }}
+        disabled={!canSubmit}
+      >
+        <Button.Text fontWeight={'600'}>CONTINUE</Button.Text>
+      </SubmitButton>
+    ),
+    [canSubmit]
+  )
+
   const noteBorderActiveColor = form.formState.errors.note
     ? '$error'
     : resolvedTheme?.startsWith('dark')
@@ -270,18 +286,7 @@ export function SendAmountForm() {
                   : undefined,
               note: sendParams.note || '',
             }}
-            renderAfter={({ submit }) => (
-              <SubmitButton
-                theme="green"
-                onPress={submit}
-                py={'$5'}
-                br={'$4'}
-                disabledStyle={{ opacity: 0.5 }}
-                disabled={!canSubmit}
-              >
-                <Button.Text fontWeight={'600'}>CONTINUE</Button.Text>
-              </SubmitButton>
-            )}
+            renderAfter={renderAfterContent}
           >
             {({ amount, token, note }) => (
               <YStack gap="$5">

@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { Turnstile } from '@marsidev/react-turnstile'
+import { useCallback, useEffect, useState } from 'react'
+import { Turnstile } from './Turnstile'
 import {
   BigHeading,
   ButtonText,
@@ -56,7 +56,7 @@ export const SignUpForm = () => {
     { retry: false }
   )
 
-  const handleSignIn = async () => {
+  const handleSignIn = useCallback(async () => {
     setIsSigningIn(true)
 
     try {
@@ -90,7 +90,7 @@ export const SignUpForm = () => {
     } finally {
       setIsSigningIn(false)
     }
-  }
+  }, [getChallengeMutateAsync, router, redirectUri, validateSignatureMutateAsync, toast.show])
 
   async function signUpWithPhone(formData: z.infer<typeof SignUpSchema>) {
     const { phone, countrycode } = formData
@@ -134,6 +134,56 @@ export const SignUpForm = () => {
     />
   )
 
+  const renderAfter: ({ submit }: { submit: () => void }) => React.ReactNode = useCallback(
+    ({ submit }) => (
+      <YStack jc="center" ai="center" mt="$4">
+        <XStack
+          f={1}
+          mt={0}
+          jc={'space-between'}
+          $sm={{ jc: 'center', height: '100%' }}
+          ai={'center'}
+        >
+          <SubmitButton
+            disabled={!captchaToken}
+            onPress={() => submit()}
+            br="$3"
+            bc={'$green9Light'}
+            $sm={{ w: '100%' }}
+            $gtMd={{
+              mt: 0,
+              als: 'flex-end',
+              mx: 0,
+              ml: 'auto',
+              w: '$10',
+              h: '$3.5',
+            }}
+          >
+            <ButtonText size={'$2'} padding={'unset'} ta="center" margin={'unset'} col="black">
+              {'/SIGN UP'}
+            </ButtonText>
+          </SubmitButton>
+        </XStack>
+        <YStack pos="relative" pb={'$1'} w="100%" maw="$22">
+          <XStack jc="center" ai="center" mt="$4" gap="$1">
+            <Paragraph size="$2" color="$color11">
+              Already have an account?
+            </Paragraph>
+            <SubmitButton onPress={handleSignIn} disabled={isSigningIn} unstyled>
+              <ButtonText color="$color11" size="$2" textDecorationLine="underline">
+                {isSigningIn ? 'Signing in...' : 'Sign in'}
+              </ButtonText>
+            </SubmitButton>
+          </XStack>
+        </YStack>
+        <YStack pt="$4">
+          <Turnstile onSuccess={(t) => setCaptchaToken(t)} />
+        </YStack>
+      </YStack>
+    ),
+    [captchaToken, handleSignIn, isSigningIn]
+  )
+
   const signUpForm = (
     <SchemaForm
       form={form}
@@ -175,59 +225,7 @@ export const SignUpForm = () => {
           },
         },
       }}
-      renderAfter={({ submit }) => (
-        <YStack jc="center" ai="center" mt="$4">
-          <XStack
-            f={1}
-            mt={'0'}
-            jc={'space-between'}
-            $sm={{ jc: 'center', height: '100%' }}
-            ai={'center'}
-          >
-            <SubmitButton
-              disabled={!captchaToken}
-              onPress={() => submit()}
-              br="$3"
-              bc={'$green9Light'}
-              $sm={{ w: '100%' }}
-              $gtMd={{
-                mt: '0',
-                als: 'flex-end',
-                mx: 0,
-                ml: 'auto',
-                w: '$10',
-                h: '$3.5',
-              }}
-            >
-              <ButtonText size={'$2'} padding={'unset'} ta="center" margin={'unset'} col="black">
-                {'/SIGN UP'}
-              </ButtonText>
-            </SubmitButton>
-          </XStack>
-          <YStack pos="relative" pb={'$size.1'} w="100%" maw="$size.22">
-            <XStack jc="center" ai="center" mt="$4" gap="$1">
-              <Paragraph size="$2" color="$color11">
-                Already have an account?
-              </Paragraph>
-              <SubmitButton onPress={handleSignIn} disabled={isSigningIn} unstyled>
-                <ButtonText color="$color11" size="$2" textDecorationLine="underline">
-                  {isSigningIn ? 'Signing in...' : 'Sign in'}
-                </ButtonText>
-              </SubmitButton>
-            </XStack>
-          </YStack>
-          <YStack pt="$4">
-            {!!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
-              <Turnstile
-                siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
-                onSuccess={(token) => {
-                  setCaptchaToken(token)
-                }}
-              />
-            )}
-          </YStack>
-        </YStack>
-      )}
+      renderAfter={renderAfter}
     >
       {({ countrycode: CountryCode, phone: Phone }) => (
         <YStack gap="$5" jc="center" $sm={{ f: 1 }}>

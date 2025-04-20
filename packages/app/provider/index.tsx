@@ -12,6 +12,8 @@ import { CoinsProvider } from './coins'
 import { OnchainKitProvider } from './onchainkit'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
+export { loadThemePromise } from './theme/UniversalThemeProvider'
+
 export function Provider({
   initialSession,
   children,

@@ -429,7 +429,7 @@ export function useMyAffiliateRewards(): UseQueryReturnType<
     if (!balance.data || !split.data) return { shares: undefined, vaults: undefined }
     if (!myAffiliateVault.data?.send_earn_affiliate_vault?.send_earn)
       return { shares: undefined, vaults: undefined }
-    const affiliateShares = wMulDown(balance.data ?? 0n, WAD - split.data ?? 0n)
+    const affiliateShares = wMulDown(balance.data ?? 0n, WAD - (split.data ?? 0n))
     return {
       shares: [affiliateShares],
       vaults: [myAffiliateVault.data.send_earn_affiliate_vault.send_earn],

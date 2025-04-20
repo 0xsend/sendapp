@@ -1,4 +1,4 @@
-import { Button, Checkbox, Dialog, Paragraph, Sheet, XStack, YStack, Label } from '@my/ui'
+import { Button, Checkbox, Dialog, Label, Paragraph, XStack, YStack } from '@my/ui'
 import { Check } from '@tamagui/lucide-icons'
 import { useDidUserSwap } from 'app/features/swap/hooks/useDidUserSwap'
 import { toNiceError } from 'app/utils/toNiceError'
@@ -29,17 +29,23 @@ const SwapRiskDialog = () => {
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <Dialog.Adapt when="sm" platform="touch">
-        <Sheet modal dismissOnSnapToBottom open={isOpen} onOpenChange={handleClose}>
-          <Sheet.Frame padding="$4">
+        <Dialog.Sheet zIndex={400000} modal dismissOnSnapToBottom>
+          <Dialog.Sheet.Frame padding="$4">
             <Dialog.Adapt.Contents />
-          </Sheet.Frame>
-          <Sheet.Overlay />
-        </Sheet>
+          </Dialog.Sheet.Frame>
+          <Dialog.Sheet.Overlay />
+        </Dialog.Sheet>
       </Dialog.Adapt>
 
       <Dialog.Portal>
         <Dialog.Overlay />
-        <Dialog.Content gap="$4" maxWidth={'90%'} $gtMd={{ maxWidth: '40%' }}>
+
+        <Dialog.Content
+          key="swap-risk-dialog"
+          gap="$4"
+          maxWidth={'90%'}
+          $gtMd={{ maxWidth: '40%' }}
+        >
           {didUserSwap.error ? (
             <YStack gap="$4">
               <Dialog.Title>Error</Dialog.Title>

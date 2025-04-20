@@ -19,6 +19,7 @@ export function SettingsNavLink({
         p="$3.5"
         br={'$4'}
         $gtLg={{ p: '$5' }}
+        // @ts-expect-error - background type is confused here
         hoverStyle={hoverStyles}
       >
         <XStack gap="$3.5" ai="center">

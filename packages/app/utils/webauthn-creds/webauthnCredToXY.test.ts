@@ -1,4 +1,4 @@
-import { test } from '@jest/globals'
+import { test, expect } from '@jest/globals'
 import { webauthnCredToXY } from './webauthnCredToXY'
 
 const cases: readonly { public_key: `0x${string}` | `\\x${string}` }[] = [

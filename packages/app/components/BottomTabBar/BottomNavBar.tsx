@@ -47,7 +47,7 @@ export const BottomNavBar = () => {
         end={[0, 1]}
         p={'$3.5'}
         fullscreen
-        colors={['transparent', '$color0', '$color0']}
+        colors={['rgba(0,0,0,0)', '$color0', '$color0']}
         overflow={'visible'}
         ai={'center'}
       >

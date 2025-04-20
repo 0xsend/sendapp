@@ -10,6 +10,7 @@ import {
   type PublicClient,
   type TestClient,
   type LocalAccount,
+  type WalletClient,
 } from 'viem'
 
 if (!process.env.NEXT_PUBLIC_BASE_RPC_URL) {
@@ -29,7 +30,10 @@ export const baseMainnetClient = createPublicClient({
   transport: http(NEXT_PUBLIC_BASE_RPC_URL),
 }) as PublicClient<HttpTransport, typeof baseMainnet>
 
-export function createBaseWalletClient({ account }: { account: LocalAccount }) {
+export function createBaseWalletClient({
+  account,
+}: { account: LocalAccount }): WalletClient<HttpTransport, typeof baseMainnet, LocalAccount> &
+  PublicActions<HttpTransport, typeof baseMainnet> {
   return createWalletClient({
     account,
     chain: baseMainnet,

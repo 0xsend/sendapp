@@ -49,7 +49,7 @@ export function DepositCryptoScreen() {
       }}
     >
       <YStack gap={'$3.5'}>
-        <FadeCard width={'max-content'}>
+        <FadeCard>
           <Paragraph size={'$7'}>Base Network</Paragraph>
           <DepositAddressQR
             address={sendAccount?.address}
@@ -61,7 +61,6 @@ export function DepositCryptoScreen() {
       <YStack width={'100%'}>
         <YStack
           marginHorizontal={'auto'}
-          width={'max-content'}
           maxWidth={'100%'}
           gap={'$3.5'}
           $gtLg={{ marginHorizontal: 0 }}
@@ -69,7 +68,7 @@ export function DepositCryptoScreen() {
           <Paragraph w={'100%'} size={'$7'}>
             Wallet Address
           </Paragraph>
-          <FadeCard width={'max-content'} maxWidth={'100%'}>
+          <FadeCard maxWidth={'100%'}>
             <Button
               chromeless
               backgroundColor="transparent"

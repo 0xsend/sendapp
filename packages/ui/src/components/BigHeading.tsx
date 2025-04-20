@@ -3,7 +3,7 @@ import { H1, type HeadingProps } from 'tamagui'
 export const BigHeading = ({
   fontSize = 64,
   fontWeight = '900',
-  lineHeight = 57,
+  lineHeight = 64,
   ...props
 }: HeadingProps) => {
   return (

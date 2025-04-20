@@ -49,7 +49,7 @@
     "formatter": {
       "semicolons": "asNeeded",
       "quoteStyle": "single",
-      "trailingComma": "es5"
+      "trailingCommas": "es5"
     }
   },
   "json": {

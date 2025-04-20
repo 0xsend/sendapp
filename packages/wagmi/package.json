@@ -24,17 +24,17 @@
   "devDependencies": {
     "@0xsend/send-earn-contracts": "^0.1.0",
     "@0xsend/send-token-upgrade": "0.0.3",
-    "@wagmi/cli": "^2.1.15",
+    "@wagmi/cli": "^2.2.1",
     "debug": "^4.3.6",
     "globby": "^14.0.0",
-    "typescript": "^5.5.3"
+    "typescript": "^5.8.3"
   },
   "dependencies": {
     "@my/contracts": "workspace:*",
-    "@wagmi/core": "^2.13.1",
+    "@wagmi/core": "^2.16.7",
     "change-case": "^5.4.2",
     "permissionless": "^0.1.14",
-    "viem": "^2.19.0",
-    "wagmi": "^2.13.1"
+    "viem": "^2.27.2",
+    "wagmi": "^2.14.16"
   }
 }

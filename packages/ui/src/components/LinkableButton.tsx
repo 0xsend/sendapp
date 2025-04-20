@@ -39,7 +39,6 @@ const LinkableButtonFrame = styled(Button, {
         borderColor: 'transparent',
 
         focusVisibleStyle: {
-          outlineColor: '$outlineColor',
           outlineStyle: 'solid',
           outlineWidth: 2,
         },
@@ -83,7 +82,7 @@ const LinkableButtonFrame = styled(Button, {
   } as const,
 
   defaultVariants: {
-    unstyled: process.env.TAMAGUI_HEADLESS === '1' ? true : false,
+    unstyled: process.env.TAMAGUI_HEADLESS === '1',
   },
 })
 

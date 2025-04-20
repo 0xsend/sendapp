@@ -1,4 +1,4 @@
-import { expect, test } from '@jest/globals'
+import { expect, test, jest, beforeEach, afterEach } from '@jest/globals'
 
 import {
   baseMainnetBundlerClient,
@@ -266,7 +266,7 @@ const entrypoint = getContract({
   client: baseMainnetClient,
 })
 
-export async function generateUserOp(publicKey: [Hex, Hex]) {
+async function generateUserOp(publicKey: [Hex, Hex]) {
   const factory = sendAccountFactoryAddress[baseMainnetClient.chain.id]
   const factoryData = encodeFunctionData({
     abi: [getAbiItem({ abi: sendAccountFactoryAbi, name: 'createAccount' })],

@@ -4,7 +4,7 @@ import { useSendAccount } from './send-accounts'
 import { useTokenPrices } from './useTokenPrices'
 import { convertBalanceToFiat } from './convertBalanceToUSD'
 import { allCoins } from '../data/coins'
-import { useMemo } from 'react'
+import { useMemo, useCallback } from 'react'
 import type { Hex } from 'viem'
 
 type BalanceOfResult =
@@ -47,12 +47,12 @@ export const useSendAccountBalances = () => {
     multicallAddress: multicall3Address[baseMainnet.id],
   })
 
-  const unpackResult = (result: BalanceOfResult): bigint | undefined => {
+  const unpackResult = useCallback((result: BalanceOfResult): bigint | undefined => {
     if (result && result.status === 'success') {
       return BigInt(result.result)
     }
     return undefined
-  }
+  }, [])
 
   const ethQuery = useBalance({
     address: sendAccount?.address,
