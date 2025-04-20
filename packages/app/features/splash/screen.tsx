@@ -34,7 +34,7 @@ import { assert } from 'app/utils/assert'
 export function SplashScreen() {
   return (
     <XStack
-      h={'100%'}
+      h={isWeb ? '100svh' : '100%'}
       justifyContent={'space-between'}
       mx={'auto'}
       maxWidth={1600}
@@ -130,7 +130,7 @@ function Hero() {
 
   return (
     <XStack
-      h={'100%'}
+      h={containerHeight}
       $gtMd={{ p: '$1.5', maxWidth: 720 }}
       w="100%"
       position="relative"
@@ -151,7 +151,14 @@ function Hero() {
         }}
       >
         {carouselImage && (
-          <Stack pos="absolute" top={0} left={0} right={0} bottom={0} style={{ height: '100dvh' }}>
+          <Stack
+            pos="absolute"
+            top={0}
+            left={0}
+            right={0}
+            bottom={0}
+            height={isWeb ? '100dvh' : '100%'}
+          >
             <Stack
               bc="$color1"
               pos="absolute"
@@ -159,7 +166,7 @@ function Hero() {
               left={0}
               right={0}
               bottom={0}
-              style={{ height: '100dvh' }}
+              height={isWeb ? '100dvh' : '100%'}
             />
             <AnimationLayout
               currentKey={carouselImage.base64 || 'none'}
@@ -172,7 +179,7 @@ function Hero() {
                 left={0}
                 right={0}
                 bottom={0}
-                style={{ height: '100dvh' }}
+                height={isWeb ? '100dvh' : '100%'}
               >
                 <SolitoImage
                   placeholder="blur"
