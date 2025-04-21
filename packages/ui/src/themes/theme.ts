@@ -70,4 +70,5 @@ const themesBuilder = createThemeBuilder()
   })
   .addChildThemes(componentThemeDefinitions)
 
-export const themes = themesBuilder.build()
+// biome-ignore lint/suspicious/noExplicitAny: type is too large
+export const themes: any = themesBuilder.build()
