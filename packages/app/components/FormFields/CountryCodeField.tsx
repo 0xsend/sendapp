@@ -1,6 +1,5 @@
 import { LinearGradient } from '@tamagui/linear-gradient'
 import { Check, ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
-import { useThemeSetting } from '@tamagui/next-theme'
 import { useTsController } from '@ts-react/form'
 import { countries } from 'app/utils/country'
 import { useGeoIp } from 'app/utils/useGeoIp'
@@ -28,7 +27,6 @@ export const CountryCodeField = ({
   const { data: geoData, isLoading } = useGeoIp()
   const { field, error } = useTsController<string>()
   const themeName = useThemeName()
-  const { resolvedTheme } = useThemeSetting()
 
   // set the country code based on geoip
   useEffect(() => {
@@ -61,17 +59,11 @@ export const CountryCodeField = ({
         >
           <Select.Trigger
             f={1}
-            $theme-light={{
-              bc: '$gray6Light',
-              hoverStyle: { bc: '$gray8Light' },
-            }}
-            $theme-dark={{
-              bc: '$gray8Light',
-              hoverStyle: { bc: '$gray8Dark' },
-            }}
+            bc="$color4"
+            theme={'gray'}
             br={12}
             borderWidth="$0"
-            iconAfter={() => <ChevronDown color="$black" />}
+            iconAfter={() => <ChevronDown />}
             gap="$2"
             {...(isWeb
               ? {
@@ -84,7 +76,6 @@ export const CountryCodeField = ({
                 fontSize="$7"
                 fontWeight="bold"
                 fontFamily={'$mono'}
-                col={'$black'}
                 style={{
                   textTransform: 'uppercase',
                 }}
@@ -92,13 +83,13 @@ export const CountryCodeField = ({
                 {country?.flag} +{country?.dialCode}
               </Text>
             ) : (
-              <Text fontSize="$2" fontWeight="normal" col={'$black'}>
+              <Text fontSize="$2" fontWeight="normal">
                 Country
               </Text>
             )}
           </Select.Trigger>
 
-          <Adapt platform="web" when="sm">
+          <Adapt platform="touch" when="sm">
             <Sheet native modal dismissOnSnapToBottom>
               <Sheet.Frame>
                 <Sheet.ScrollView>
@@ -117,10 +108,7 @@ export const CountryCodeField = ({
               width="100%"
             >
               <YStack zIndex={10}>
-                <ChevronUp
-                  size={30}
-                  color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'}
-                />
+                <ChevronUp size={30} />
               </YStack>
               <LinearGradient
                 start={[0, 0]}
@@ -134,9 +122,7 @@ export const CountryCodeField = ({
             <Select.Viewport>
               <XStack>
                 <Select.Group gap="$0">
-                  <Select.Label color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'}>
-                    Select Country
-                  </Select.Label>
+                  <Select.Label>Select Country</Select.Label>
                   {countries?.map((country, i) => {
                     return (
                       <Select.Item
@@ -147,9 +133,7 @@ export const CountryCodeField = ({
                         cursor="pointer"
                         theme={themeName}
                       >
-                        <Select.ItemText
-                          color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'}
-                        >
+                        <Select.ItemText>
                           {country.flag}&nbsp;{country.dialCode} {isOpen && country.name}
                         </Select.ItemText>
                         <Select.ItemIndicator marginLeft="auto">
@@ -170,10 +154,7 @@ export const CountryCodeField = ({
               height="$3"
             >
               <YStack zIndex={10}>
-                <ChevronDown
-                  size={30}
-                  color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'}
-                />
+                <ChevronDown size={30} />
               </YStack>
               <LinearGradient
                 start={[0, 0]}
