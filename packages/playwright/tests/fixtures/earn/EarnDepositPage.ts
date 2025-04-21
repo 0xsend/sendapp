@@ -23,9 +23,7 @@ export class EarnDepositPage {
 
   async navigate(coin: { symbol: string }) {
     await this.page.goto('/')
-    await this.page.getByRole('link', { name: 'Invest', exact: true }).click()
-    await this.page.waitForURL('/invest')
-    await this.page.getByRole('link', { name: 'Send Earn' }).click()
+    await this.page.getByRole('link', { name: 'Earn' }).click()
     await this.page.waitForURL('/earn')
     await expect(this.startEarningButton).toBeVisible()
     await this.startEarningButton.click()

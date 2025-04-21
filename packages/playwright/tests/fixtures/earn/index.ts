@@ -13,9 +13,7 @@ import { EarnWithdrawPage } from './EarnWithdrawPage'
 export async function navigateToEarnPage(page: Page) {
   log('Navigating to /earn via /invest')
   await page.goto('/')
-  await page.getByRole('link', { name: 'Invest', exact: true }).click()
-  await page.waitForURL('/invest')
-  await page.getByRole('link', { name: 'Send Earn' }).click()
+  await page.getByRole('link', { name: 'Earn' }).click()
   await page.waitForURL('/earn')
   log('Successfully navigated to /earn')
 }
