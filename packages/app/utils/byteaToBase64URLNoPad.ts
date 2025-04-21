@@ -1,4 +1,4 @@
-import { base64, base64urlnopad } from '@scure/base'
+import { base64urlnopad } from '@scure/base'
 import { assert } from './assert'
 import { byteaToBytes } from './byteaToBytes'
 
