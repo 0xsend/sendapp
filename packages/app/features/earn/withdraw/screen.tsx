@@ -215,6 +215,8 @@ export function WithdrawForm() {
         form.clearErrors('amount')
       }
 
+      if (mutation.isSuccess) return
+
       setParams(
         {
           ...params,
@@ -223,7 +225,15 @@ export function WithdrawForm() {
         { webBehavior: 'replace' }
       )
     },
-    [form.clearErrors, form.setError, setParams, coin.data?.decimals, params, depositBalance]
+    [
+      form.clearErrors,
+      form.setError,
+      setParams,
+      coin.data?.decimals,
+      params,
+      depositBalance,
+      mutation.isSuccess,
+    ]
   )
 
   // validate and sanitize amount

@@ -11,7 +11,7 @@ import { EarnWithdrawPage } from './EarnWithdrawPage'
  * @param page Playwright Page object
  */
 export async function navigateToEarnPage(page: Page) {
-  log('Navigating to /earn via /invest')
+  log('Navigating to /earn')
   await page.goto('/')
   await page.getByRole('link', { name: 'Earn' }).click()
   await page.waitForURL('/earn')
