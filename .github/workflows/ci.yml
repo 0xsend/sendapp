@@ -60,7 +60,10 @@ jobs:
         shell: bash
         run: tilt ci unit-tests --timeout=15m
       - name: Lint
-        run: yarn lint
+        run: |
+          # do not overwork the machine
+          workers=$(MAX_WORKERS=4 node ./.devops/bin/worker-count)
+          yarn lint --concurrency=$workers
       - name: Tilt Down
         # always run tilt down if tilt ci started
         if: always() && steps.tilt-ci.outcome != 'skipped'
