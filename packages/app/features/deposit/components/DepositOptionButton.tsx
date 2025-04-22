@@ -17,7 +17,6 @@ export function DepositOptionButton({ title, description, Icon, href }: DepositO
 
   return (
     <Link href={href}>
-      {/* @ts-expect-error - background type is confused here */}
       <FadeCard hoverStyle={hoverStyles}>
         <XStack ai={'center'} jc={'space-between'}>
           <XStack gap={'$5'} ai={'center'} f={1}>

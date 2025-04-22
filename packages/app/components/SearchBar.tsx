@@ -387,7 +387,6 @@ function SearchResultRow({
       key={`SearchResultRow-${keyField}-${profile.tag_name}-${profile.send_id}`}
       width="100%"
       p={'$4'}
-      // @ts-expect-error - background type is confused here
       hoverStyle={hoverStyles}
     >
       <Link href={href}>

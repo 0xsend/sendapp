@@ -45,7 +45,6 @@ export function TokenActivityRow({
       cursor={onPress ? 'pointer' : 'default'}
       $gtLg={{ p: '$5' }}
       testID={'TokenActivityRow'}
-      // @ts-expect-error - background type is confused here
       hoverStyle={onPress ? hoverStyles : null}
       onPress={() => onPress?.(activity)}
     >

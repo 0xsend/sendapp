@@ -178,13 +178,7 @@ const HomeBottomSheet = () => {
                 paddingTop={first ? '$2' : 0}
                 paddingBottom={last ? '$2' : 0}
               >
-                <YStack
-                  w={'100%'}
-                  p={'$4'}
-                  borderRadius={'$4'}
-                  // @ts-expect-error - background type is confused here
-                  hoverStyle={hoverStyles}
-                >
+                <YStack w={'100%'} p={'$4'} borderRadius={'$4'} hoverStyle={hoverStyles}>
                   <SideBarNavLink key={link.href} hoverStyle={{}} {...link} />
                 </YStack>
               </YStack>
