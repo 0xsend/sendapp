@@ -18,7 +18,6 @@ next_app_resource_deps = [
     "wagmi:generate",
     "ui:build",
     "ui:generate-theme",
-    "daimo-expo-passkeys:build",
 ] if not CFG.dockerize else [])
 
 # Next

@@ -42,7 +42,6 @@
       "@my/contracts/out/*": ["../contracts/out/*"],
       "@my/supabase": ["../../supabase"],
       "@my/supabase/*": ["../../supabase/*"],
-      "@daimo/expo-passkeys/*": ["../daimo-expo-passkeys/src/*"],
       "@my/temporal": ["../temporal/src"],
       "@my/temporal/*": ["../temporal/src/*"],
       "@my/workflows": ["../workflows/src"],
