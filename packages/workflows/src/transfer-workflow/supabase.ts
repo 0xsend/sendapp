@@ -7,22 +7,15 @@ export type TemporalTransferInsert =
 export type TemporalTransferUpdate =
   Database['temporal']['Tables']['send_account_transfers']['Update']
 
-export async function upsertTemporalSendAccountTransfer({
-  workflow_id,
-  status,
-  data,
-}: TemporalTransferInsert) {
+export async function upsertTemporalSendAccountTransfer(params: TemporalTransferInsert) {
   const supabaseAdmin = createSupabaseAdminClient()
   return await supabaseAdmin
     .schema('temporal')
     .from('send_account_transfers')
-    .upsert(
-      { workflow_id, status, data },
-      {
-        onConflict: 'workflow_id',
-        ignoreDuplicates: false, // false means do update on conflict
-      }
-    )
+    .upsert(params, {
+      onConflict: 'nonce',
+      ignoreDuplicates: false, // false means do update on conflict
+    })
     .select('*')
     .single()
 }
@@ -45,4 +38,22 @@ export async function updateTemporalSendAccountTransfer(params: TemporalTransfer
     .eq('workflow_id', workflow_id)
     .select('*')
     .single()
+}
+
+export async function verifyActivityEventExists({ eventName, eventId }) {
+  const supabaseAdmin = createSupabaseAdminClient()
+  return await supabaseAdmin
+    .from('activity')
+    .select('*', { count: 'exact', head: true }) // Efficiently check existence
+    .eq('event_eane', eventName)
+    .eq('event_id', eventId)
+}
+
+export async function deleteTemporalTransferEvent({ workflowId }: { workflowId: string }) {
+  const supabaseAdmin = createSupabaseAdminClient()
+  return await supabaseAdmin
+    .from('activity')
+    .delete({ count: 'exact' })
+    .eq('event_id', workflowId)
+    .eq('event_name', 'temporal_send_account_transfers')
 }
