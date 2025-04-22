@@ -1,6 +1,5 @@
 import type { PgBytea } from '@my/supabase/database.types'
-import { ApplicationFailure, log } from '@temporalio/activity'
-import { byteaToHex } from 'app/utils/byteaToHex'
+import { Context, ApplicationFailure, log, sleep } from '@temporalio/activity'
 import { decodeExecuteBatchCalldata } from 'app/utils/decode-calldata'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import type {
@@ -8,16 +7,17 @@ import type {
   UserOperation,
   WaitForUserOperationReceiptParameters,
 } from 'permissionless'
-import superjson from 'superjson'
-import type { Hex } from 'viem'
+import type { Block, Hex } from 'viem'
 import { bootstrap } from '../utils'
 import {
+  getBaseBlock,
   getBaseBlockNumber,
   sendUserOperation,
   simulateUserOperation,
-  waitForTransactionReceipt,
   waitForUserOperationReceipt,
 } from './wagmi'
+import { getUserOperationHash } from 'permissionless/utils'
+import { baseMainnetBundlerClient, baseMainnetClient, entryPointAddress } from '@my/wagmi'
 
 export type UserOpActivities = {
   simulateUserOperationActivity: (userOp: UserOperation<'v0.7'>) => Promise<void>
@@ -28,10 +28,14 @@ export type UserOpActivities = {
   }>
   getBaseBlockNumberActivity: () => Promise<bigint>
   sendUserOpActivity: (userOp: UserOperation<'v0.7'>) => Promise<PgBytea>
-  waitForTransactionReceiptActivity: (hash: PgBytea) => Promise<GetUserOperationReceiptReturnType>
   waitForUserOperationReceiptActivity: (
     params: WaitForUserOperationReceiptParameters
   ) => Promise<GetUserOperationReceiptReturnType>
+  getBaseBlockActivity: (params: { blockHash: Hex }) => Promise<Block>
+  getUserOperationHashActivity: (params: { userOperation: UserOperation<'v0.7'> }) => Promise<Hex>
+  getUserOperationReceiptActivity: (params: {
+    hash: Hex
+  }) => Promise<GetUserOperationReceiptReturnType>
 }
 
 export const createUserOpActivities = (
@@ -88,28 +92,6 @@ export const createUserOpActivities = (
         )
       }
     },
-    /**
-     * Waits for the transaction receipt for the given hash.
-     * @deprecated - use waitForUserOperationReceiptActivity instead
-     */
-    async waitForTransactionReceiptActivity(hash) {
-      try {
-        const hexHash = byteaToHex(hash)
-        const bundlerReceipt = await waitForTransactionReceipt(hexHash)
-        log.info('waitForTransactionReceiptActivity', {
-          bundlerReceipt: superjson.stringify(bundlerReceipt),
-        })
-        if (!bundlerReceipt.success) {
-          throw ApplicationFailure.nonRetryable(
-            `Transaction failed: ${bundlerReceipt.receipt.transactionHash}`
-          )
-        }
-        return bundlerReceipt
-      } catch (error) {
-        log.error('waitForTransactionReceipt failed', { error })
-        throw ApplicationFailure.nonRetryable(error.message, error.code, error.details)
-      }
-    },
 
     /**
      * Waits for the user operation receipt for the given hash.
@@ -130,6 +112,89 @@ export const createUserOpActivities = (
         log.error('waitForUserOperationReceipt failed', { error })
         throw ApplicationFailure.nonRetryable(error.message, error.code, error.details)
       }
+    },
+    async getBaseBlockActivity({ blockHash }) {
+      try {
+        return await getBaseBlock(blockHash)
+      } catch (error) {
+        log.error('getBaseBlockActivity failed', { blockHash, error })
+        throw ApplicationFailure.retryable('Failed to get block')
+      }
+    },
+    async getUserOperationHashActivity({ userOperation }) {
+      try {
+        const chainId = baseMainnetClient.chain.id
+        const entryPoint = entryPointAddress[chainId]
+        return getUserOperationHash({ userOperation, chainId, entryPoint })
+      } catch (error) {
+        log.error('getUserOperationHashActivity failed', { error })
+        throw ApplicationFailure.nonRetryable('Failed to get user operation hash')
+      }
+    },
+    async getUserOperationReceiptActivity({ hash }) {
+      const maxAttempts = 10 // Example: Retry up to 10 times
+      const initialDelayMs = 1000 // Example: Start with 1 second delay
+      const backoffCoefficient = 2 // Example: Double delay each time
+
+      log.info('Getting userOp receipt', { hash })
+
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        Context.current().heartbeat(`Attempt ${attempt}/${maxAttempts}`) // Send heartbeat
+
+        try {
+          const bundlerReceipt = await baseMainnetBundlerClient.getUserOperationReceipt({
+            hash,
+          })
+
+          if (bundlerReceipt?.success) {
+            log.info('Operation succeeded', {
+              hash,
+              tx_hash: bundlerReceipt.receipt.transactionHash,
+            })
+            return bundlerReceipt // Found the records
+          }
+
+          // Record not found yet, log and prepare for next attempt
+          log.info(`Operation not yet onchain, attempt ${attempt}/${maxAttempts}`, {
+            hash,
+          })
+        } catch (error) {
+          // Catch ApplicationFailures rethrown from DB checks or unexpected errors
+          log.error('Error getting transfer receipt attempt', {
+            hash,
+            attempt,
+            error,
+          })
+          if (error instanceof ApplicationFailure) {
+            throw error // Re-throw known Temporal failures
+          }
+          // Treat other unexpected errors as non-retryable for this attempt
+          throw ApplicationFailure.nonRetryable(
+            error.message ?? `Unexpected error getting userOp attempt ${attempt}`,
+            'GET_USEROP_ATTEMPT_FAILED',
+            { error }
+          )
+        }
+
+        // If not the last attempt, wait before retrying
+        if (attempt < maxAttempts) {
+          const delay = initialDelayMs * backoffCoefficient ** (attempt - 1) // Use exponentiation operator
+          log.info(`Waiting ${delay}ms before next attempt`, {
+            hash,
+          })
+          await sleep(delay) // Use Temporal's sleep for cancellation awareness
+        }
+      }
+      // If loop completes without finding the record
+      log.error('Getting userOp receipt timed out after max attempts', {
+        hash,
+        maxAttempts,
+      })
+      throw ApplicationFailure.nonRetryable(
+        'Getting userOp receipt failed after maximum attempts',
+        'GET_USEROP_TIMEOUT',
+        { hash, maxAttempts }
+      )
     },
   }
 }

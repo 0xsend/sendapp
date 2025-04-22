@@ -1,18 +1,18 @@
 import { proxyActivities, workflowInfo, log, ApplicationFailure } from '@temporalio/workflow'
-import type { createTransferActivities } from './activities'
-import type { UserOperation } from 'permissionless'
+import type { createTransferActivities, IndexedTransfer } from './activities'
+import type { GetUserOperationReceiptReturnType, UserOperation } from 'permissionless'
 import superjson from 'superjson'
-import debug from 'debug'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import type { createUserOpActivities } from '../userop-workflow/activities'
-
-const debugLog = debug('workflows:transfer')
+import { byteaToHex } from 'app/utils/byteaToHex'
 
 const {
   upsertTemporalSendAccountTransferActivity,
   decodeTransferUserOpActivity,
   updateTemporalSendAccountTransferActivity,
-  getEventFromTransferActivity,
+  getUserIdByAddressActivity,
+  insertEthTransferActivity,
+  insertTransferEventActivity,
 } = proxyActivities<ReturnType<typeof createTransferActivities>>({
   // TODO: make this configurable
   startToCloseTimeout: '10 minutes',
@@ -23,9 +23,9 @@ const {
 
 const {
   simulateUserOperationActivity,
-  getBaseBlockNumberActivity,
   sendUserOpActivity,
-  waitForTransactionReceiptActivity,
+  getBaseBlockActivity,
+  getUserOperationReceiptActivity,
 } = proxyActivities<ReturnType<typeof createUserOpActivities>>({
   startToCloseTimeout: '2 minutes',
   retry: {
@@ -35,113 +35,167 @@ const {
 
 export async function transfer(userOp: UserOperation<'v0.7'>, note?: string) {
   const workflowId = workflowInfo().workflowId
-  debugLog('Starting SendTransfer Workflow with userOp:', workflowId)
+  log.debug('Starting SendTransfer Workflow with userOp:', { workflowId })
+
   await upsertTemporalSendAccountTransferActivity({
     workflow_id: workflowId,
+    nonce: Number(userOp.nonce),
     data: {
       sender: hexToBytea(userOp.sender),
     },
   })
 
-  debugLog('Simulating transfer', workflowId)
-  const _ = await simulateUserOperationActivity(userOp).catch(async (error) => {
-    log.error('simulateUserOperationActivity failed', { error })
-    await updateTemporalSendAccountTransferActivity({
-      workflow_id: workflowId,
-      status: 'failed',
+  try {
+    log.debug('Simulating transfer', { workflowId })
+    const _ = await simulateUserOperationActivity(userOp)
+    log.debug('Successfully simulated transfer', { workflowId })
+
+    log.debug('Decoding transfer userOp', { workflowId })
+    const {
+      token,
+      from: sender,
+      to: recipient,
+      amount,
+    } = await decodeTransferUserOpActivity(workflowId, userOp)
+    log.debug('Decoded transfer userOp', {
+      workflowId,
+      token,
+      sender,
+      recipient,
+      amount: amount.toString(),
     })
-    throw ApplicationFailure.nonRetryable(
-      'Error simulating user operation',
-      error.code,
-      error.details
+
+    log.debug('Getting userIds for sender and recipient', { workflowId })
+    const [senderUserId, recipientUserId] = await getUserIdByAddressActivity({
+      workflowId,
+      addresses: [sender, recipient],
+    })
+    log.debug('userIds found', { workflowId, senderUserId, recipientUserId })
+
+    log.debug('Inserting temporal transfer into temporal.send_account_transfers', { workflowId })
+    const submittedTransfer = token
+      ? await updateTemporalSendAccountTransferActivity({
+          workflow_id: workflowId,
+          status: 'submitted',
+          data: {
+            f: hexToBytea(sender),
+            t: hexToBytea(recipient),
+            v: amount.toString(),
+            log_addr: hexToBytea(token),
+            nonce: userOp.nonce.toString(),
+            note,
+          },
+        })
+      : await updateTemporalSendAccountTransferActivity({
+          workflow_id: workflowId,
+          status: 'submitted',
+          data: {
+            sender: hexToBytea(sender),
+            value: amount.toString(),
+            log_addr: hexToBytea(recipient),
+            nonce: userOp.nonce.toString(),
+            note,
+          },
+        })
+    log.debug(
+      'Updated temporal transfer status to submitted into temporal.send_account_transfers',
+      { workflowId }
     )
-  })
-  debugLog('Successfully simulated transfer', workflowId)
 
-  debugLog('Decoding transfer userOp', workflowId)
-  const { token, from, to, amount } = await decodeTransferUserOpActivity(workflowId, userOp)
-  debugLog('Decoded transfer userOp', { workflowId, token, from, to, amount: amount.toString() })
+    log.debug('Sending UserOperation', { userOp: superjson.stringify(userOp) })
+    const hash = await sendUserOpActivity(userOp)
+    log.debug('UserOperation sent, hash:', { hash })
 
-  debugLog('Getting latest base block', workflowId)
-  const createdAtBlockNum = await getBaseBlockNumberActivity()
-  debugLog('Base block:', { workflowId, createdAtBlockNum: createdAtBlockNum.toString() })
+    const sentTransfer = await updateTemporalSendAccountTransferActivity({
+      workflow_id: workflowId,
+      status: 'sent',
+      data: {
+        ...(submittedTransfer.data as Record<string, unknown>),
+        user_op_hash: hash,
+      },
+    })
+    log.debug('Finding the new indexed transfer in the database', { workflowId })
 
-  debugLog('Inserting temporal transfer into temporal.send_account_transfers', workflowId)
-  const submittedTransfer = token
-    ? await updateTemporalSendAccountTransferActivity({
-        workflow_id: workflowId,
-        status: 'submitted',
-        created_at_block_num: createdAtBlockNum ? Number(createdAtBlockNum) : null,
-        data: {
-          f: hexToBytea(from),
-          t: hexToBytea(to),
-          v: amount.toString(),
-          log_addr: hexToBytea(token),
-          note,
-        },
-      })
-    : await updateTemporalSendAccountTransferActivity({
-        workflow_id: workflowId,
-        status: 'submitted',
-        created_at_block_num: createdAtBlockNum ? Number(createdAtBlockNum) : null,
-        data: {
-          sender: hexToBytea(from),
-          value: amount.toString(),
-          log_addr: hexToBytea(to),
-          note,
-        },
-      })
-  debugLog('Inserted temporal transfer into temporal.send_account_transfers', workflowId)
+    const bundlerReceipt = await getUserOperationReceiptActivity({
+      hash: byteaToHex(hash),
+    })
 
-  debugLog('Sending UserOperation', superjson.stringify(userOp))
-  const hash = await sendUserOpActivity(userOp).catch(async (error) => {
-    log.error('sendUserOpActivity failed', { error })
+    if (!bundlerReceipt.success) {
+      throw ApplicationFailure.nonRetryable(
+        `Transaction failed: ${bundlerReceipt.receipt.transactionHash}`
+      )
+    }
+
     await updateTemporalSendAccountTransferActivity({
       workflow_id: workflowId,
-      status: 'failed',
+      status: 'confirmed',
+      data: {
+        ...(sentTransfer.data as Record<string, unknown>),
+        tx_hash: bundlerReceipt.receipt.transactionHash,
+        block_num: bundlerReceipt.receipt.blockNumber.toString(),
+      },
     })
-    throw ApplicationFailure.nonRetryable('Error sending user operation', error.code, error.details)
-  })
-  debugLog('UserOperation sent, hash:', hash)
-  const sentTransfer = await updateTemporalSendAccountTransferActivity({
-    workflow_id: workflowId,
-    status: 'sent',
-    data: {
-      ...(submittedTransfer.data as Record<string, unknown>),
-      user_op_hash: hash,
-    },
-  })
 
-  const bundlerReceipt = await waitForTransactionReceiptActivity(hash).catch(async (error) => {
-    log.error('waitForTransactionReceiptActivity failed', { error })
-    await updateTemporalSendAccountTransferActivity({
-      workflow_id: workflowId,
-      status: 'failed',
+    const block = await getBaseBlockActivity({
+      blockHash: bundlerReceipt.receipt.blockHash,
     })
-    throw ApplicationFailure.nonRetryable('Error sending user operation', error.code, error.details)
-  })
-  debugLog('Receipt received:', { tx_hash: bundlerReceipt.receipt.transactionHash })
 
-  const { eventName, eventId } = await getEventFromTransferActivity({
-    bundlerReceipt,
-    token,
-    from,
-    to,
-  })
+    if (!token && !recipientUserId) {
+      await insertEthTransferActivity({
+        bundlerReceipt,
+        recipient,
+        sender,
+        amount,
+        blockTime: block.timestamp,
+      })
+    }
 
-  await updateTemporalSendAccountTransferActivity({
-    workflow_id: workflowId,
-    status: 'confirmed',
-    send_account_transfers_activity_event_id: eventId,
-    send_account_transfers_activity_event_name: eventName,
-    data: {
-      ...(sentTransfer.data as Record<string, unknown>),
-      tx_hash: hexToBytea(bundlerReceipt.receipt.transactionHash),
-      block_num: bundlerReceipt.receipt.blockNumber.toString(),
-      event_name: eventName,
-      event_id: eventId,
-    },
-  })
+    log.debug('Inserting indexed transfers events into activity table', { workflowId })
+    await insertTransferEventActivity({
+      workflowId,
+      senderUserId,
+      recipientUserId,
+      bundlerReceipt,
+      note,
+      token,
+      sender,
+      recipient,
+      amount,
+      blockTime: block.timestamp,
+    })
 
-  return hash
+    return hash
+  } catch (error) {
+    log.error('Workflow failed', { error })
+
+    // Ensure error is an ApplicationFailure for Temporal
+    const failure =
+      error instanceof ApplicationFailure
+        ? error
+        : ApplicationFailure.nonRetryable(
+            error.message ?? 'Unknown workflow error',
+            error.name ?? 'WorkflowFailure',
+            error
+          )
+
+    // Attempt to update the database record to 'failed' status
+    try {
+      log.error(`Attempting to update transfer status to 'failed' in DB`)
+      await updateTemporalSendAccountTransferActivity({
+        workflow_id: workflowId,
+        status: 'failed',
+      })
+      log.error(`Successfully updated transfer status to 'failed'`)
+    } catch (dbError) {
+      // Log the error during the failure update, but don't mask the original workflow error
+      log.error(
+        // Reverted to log.error
+        `CRITICAL: Failed to update transfer status to 'failed' after workflow error:`,
+        dbError
+      )
+    }
+
+    // Rethrow the original error to fail the workflow run
+    throw failure
+  }
 }
