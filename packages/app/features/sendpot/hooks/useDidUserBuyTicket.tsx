@@ -13,11 +13,7 @@ export const useDidUserBuyTicket = () => {
     enabled: pendingJackpotTickets.isSuccess && userJackpotSummary.isSuccess,
     queryFn: async () => {
       if (!pendingJackpotTickets.data || !userJackpotSummary.data) {
-        return
-      }
-
-      if (pendingJackpotTickets.data > 0) {
-        return true
+        return false
       }
       return (
         pendingJackpotTickets.data > 0 || userJackpotSummary?.data?.find((s) => s.total_tickets > 0)
