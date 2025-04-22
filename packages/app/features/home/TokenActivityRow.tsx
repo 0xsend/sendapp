@@ -14,6 +14,10 @@ import { useSwapRouters } from 'app/utils/useSwapRouters'
 import { useLiquidityPools } from 'app/utils/useLiquidityPools'
 import { useUser } from 'app/utils/useUser'
 import { useRouter } from 'solito/router'
+import {
+  isTemporalEthTransfersEvent,
+  isTemporalTokenTransfersEvent,
+} from 'app/utils/zod/activity/TemporalTransfersEventSchema'
 
 export function TokenActivityRow({
   activity,
@@ -32,11 +36,15 @@ export function TokenActivityRow({
   const subtext = useSubtextFromActivity({ activity, swapRouters, liquidityPools })
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
+  const isTemporalTransfer =
+    isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
   const hoverStyles = useHoverStyles()
   const router = useRouter()
 
   const isUserTransfer =
-    (isERC20Transfer || isETHReceive) && Boolean(to_user?.send_id) && Boolean(from_user?.send_id)
+    (isERC20Transfer || isETHReceive || isTemporalTransfer) &&
+    Boolean(to_user?.send_id) &&
+    Boolean(from_user?.send_id)
 
   const handlePress = () => {
     if (onPress) {

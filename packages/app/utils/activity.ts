@@ -331,7 +331,7 @@ export function eventNameFromActivity({
     case isSendEarnWithdrawEvent(activity):
       return 'Send Earn Withdraw'
     case isTemporalTransfer:
-      return temporalEventNameFromStatus(data.status)
+      return note || temporalEventNameFromStatus(data.status)
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Revenue Share'
     case isSendTokenUpgradeEvent(activity):
