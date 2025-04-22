@@ -13,7 +13,7 @@ import {
 } from '@my/ui'
 import { useCallback, useEffect, useState, useMemo } from 'react'
 import { Timer } from '@tamagui/lucide-icons'
-import { useOFACGeoBlock } from '../../utils/useOFACGeoBlock'
+import { useGeoBlock } from '../../utils/useOFACGeoBlock'
 import {
   useReadBaseJackpotLpPoolTotal,
   useReadBaseJackpotLastJackpotEndTime,
@@ -39,7 +39,7 @@ export const JackpotCard = () => {
   const { data: roundDuration, isLoading: isLoadingDuration } =
     useReadBaseJackpotRoundDurationInSeconds()
   const { data: tokenDecimals, isLoading: isLoadingDecimals } = useReadBaseJackpotTokenDecimals()
-  const { data: isGeoBlocked, isLoading: isLoadingGeoBlock } = useOFACGeoBlock()
+  const { data: isGeoBlocked, isLoading: isLoadingGeoBlock } = useGeoBlock()
 
   const jackpotEndTime = useMemo(() => {
     if (lastJackpotEndTime === undefined || roundDuration === undefined) return null
