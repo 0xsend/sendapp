@@ -6,7 +6,7 @@ import type {
   PublicKeyCredentialCreationOptionsJSON,
   RegistrationResponseJSON,
 } from 'react-native-passkeys/build/ReactNativePasskeys.types'
-import { rpId } from './rpId'
+import { getRpId } from './getRpId'
 
 export async function createPasskey({
   user,
@@ -65,7 +65,7 @@ export function createSendAccountPasskeyArgs({
     pubKeyCredParams: [{ alg: -7, type: 'public-key' }],
     rp: {
       name: 'Send App',
-      id: rpId,
+      id: getRpId(),
     },
     authenticatorSelection: {
       userVerification: 'required',
