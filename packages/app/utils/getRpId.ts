@@ -3,8 +3,9 @@ import { Platform } from 'react-native'
 
 export function getRpId() {
   const bundleId = applicationId?.split('.').reverse().join('.')
+  const web = window ? window.location.hostname : undefined
   return Platform.select({
-    web: undefined,
+    web,
     ios: bundleId,
     android: bundleId?.replaceAll('_', '-'),
   })
