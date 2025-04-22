@@ -28,14 +28,20 @@ export async function signChallenge(
     throw new Error('Passkeys not supported')
   }
 
-  const sign = await get({
+  const params = {
     rpId: getRpId(),
     challenge,
-    allowCredentials: allowedCredentials.map(({ id }) => ({
-      id,
-      type: 'public-key',
-    })),
-  }).catch((e) => {
+    userVerification: 'required',
+    allowCredentials: allowedCredentials.map(
+      ({ id }) =>
+        ({
+          id,
+          type: 'public-key',
+        }) as const satisfies PublicKeyCredentialDescriptorJSON
+    ),
+  } as const satisfies PublicKeyCredentialRequestOptionsJSON
+
+  const sign = await get(params).catch((e) => {
     if (e.message.includes(`Calling the 'get' function has failed\n→ Caused by: `)) {
       throw new Error(e.message.replace(`Calling the 'get' function has failed\n→ Caused by: `, ''))
     }
