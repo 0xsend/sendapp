@@ -16,7 +16,8 @@ export const useDidUserBuyTicket = () => {
         return false
       }
       return (
-        pendingJackpotTickets.data > 0 || userJackpotSummary?.data?.find((s) => s.total_tickets > 0)
+        pendingJackpotTickets.data > 0 ||
+        userJackpotSummary.data.find((s) => s.total_tickets > 0) !== undefined
       )
     },
   })
