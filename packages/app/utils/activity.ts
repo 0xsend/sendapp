@@ -35,11 +35,7 @@ import {
   isTemporalTokenTransfersEvent,
   temporalEventNameFromStatus,
 } from './zod/activity/TemporalTransfersEventSchema'
-import {
-  calculateTicketsFromWei,
-  COST_PER_TICKET_WEI,
-  SENDPOT_CONTRACT_ADDRESS,
-} from 'app/data/sendpot'
+import { calculateTicketsFromWei, SENDPOT_CONTRACT_ADDRESS } from 'app/data/sendpot'
 
 const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
   Object.values(addresses).map((a) => [a, label])
