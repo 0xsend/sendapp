@@ -315,6 +315,7 @@ export function eventNameFromActivity({
   const isTemporalTransfer =
     isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
   const isSwapTransfer = isActivitySwapTransfer(activity, swapRouters, liquidityPools)
+  const note = noteFromActivity(activity)
 
   switch (true) {
     case isSendPotTicketPurchase(activity):
@@ -346,9 +347,9 @@ export function eventNameFromActivity({
       }
       return 'Deposit'
     case isTransferOrReceive && !!to_user?.id:
-      return 'Received'
+      return note || 'Received'
     case isTransferOrReceive && !!from_user?.id:
-      return 'Sent'
+      return note || 'Sent'
     case isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity):
       return 'Sendtag Registered'
     case isReferralsEvent(activity) && !!from_user?.id:

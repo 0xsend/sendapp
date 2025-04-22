@@ -11,6 +11,8 @@ import { SendButton } from './ProfileButtons'
 import { ProfileHeader } from 'app/features/profile/components/ProfileHeader'
 import { FlatList } from 'react-native'
 import { ProfilesDetailsModal } from 'app/features/profile/components/ProfileDetailsModal'
+import { useState } from 'react'
+import { ActivityDetails } from 'app/features/activity/ActivityDetails'
 
 interface ProfileScreenProps {
   sendid?: number | null
@@ -26,6 +28,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   } = useProfileLookup('sendid', otherUserId?.toString() || '')
   const { user, profile: currentUserProfile } = useUser()
   const [{ profile: profileParam }] = useRootScreenParams()
+  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
 
   const {
     data,
@@ -65,7 +68,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
         f={1}
         height={'100%'}
         gap={'$2'}
-        display={profileParam ? 'none' : 'flex'}
+        display={profileParam || selectedActivity ? 'none' : 'flex'}
         overflow={'hidden'}
         $gtLg={{
           display: 'flex',
@@ -124,6 +127,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                           sent={activity?.to_user?.id !== user?.id}
                           otherUserProfile={otherUserProfile}
                           currentUserProfile={currentUserProfile}
+                          onPress={() => setSelectedActivity(activity)}
                         />
                       </Fade>
                       {shouldShowDatePill ? <DatePill date={date} /> : null}
@@ -153,6 +157,16 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
         )}
       </YStack>
       <ProfilesDetailsModal />
+      {selectedActivity && (
+        <ActivityDetails
+          activity={selectedActivity}
+          onClose={() => setSelectedActivity(null)}
+          w={'100%'}
+          $gtLg={{
+            maxWidth: '47%',
+          }}
+        />
+      )}
     </XStack>
   )
 }
@@ -162,11 +176,13 @@ const TransactionEntry = ({
   sent,
   otherUserProfile,
   currentUserProfile,
+  onPress,
 }: {
   activity: Activity
   sent: boolean
   otherUserProfile?: AvatarProfileProps
   currentUserProfile?: AvatarProfileProps
+  onPress: () => void
 }) => {
   const {
     created_at,
@@ -177,14 +193,16 @@ const TransactionEntry = ({
 
   return (
     <XStack justifyContent={sent ? 'flex-end' : 'flex-start'} testID="activityTest" my={'$2.5'}>
-      <YStack gap={'$1'} style={{ width: 'min-content' }}>
+      <YStack gap={'$1'}>
         <YStack
           bg={'$color1'}
           p={'$4'}
           br={'$4'}
-          style={{ width: 'min-content' }}
+          maxWidth={300}
           gap={'$3'}
           ai={sent ? 'flex-end' : 'flex-start'}
+          onPress={onPress}
+          cursor={'pointer'}
         >
           <XStack
             gap={'$3'}
