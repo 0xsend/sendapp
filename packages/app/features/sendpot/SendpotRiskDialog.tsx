@@ -1,14 +1,15 @@
 import { Button, Checkbox, Dialog, Label, Paragraph, XStack, YStack } from '@my/ui'
 import { Check } from '@tamagui/lucide-icons'
-import { useDidUserSwap } from 'app/features/swap/hooks/useDidUserSwap'
+
 import { toNiceError } from 'app/utils/toNiceError'
 import { useEffect, useId, useState } from 'react'
 import { useRouter } from 'solito/router'
+import { useDidUserBuyTicket } from './hooks/useDidUserBuyTicket'
 
 const SendpotRiskDialog = () => {
   const [isChecked, setIsChecked] = useState<boolean>(false)
   const [isOpen, setIsOpen] = useState<boolean>(false)
-  const didUserSwap = useDidUserSwap()
+  const didUserBuyTicket = useDidUserBuyTicket()
   const router = useRouter()
   const id = useId()
 
@@ -21,10 +22,10 @@ const SendpotRiskDialog = () => {
   }
 
   useEffect(() => {
-    if (didUserSwap.data === false || didUserSwap.error) {
+    if (didUserBuyTicket.data === false || didUserBuyTicket.error) {
       setIsOpen(true)
     }
-  }, [didUserSwap.data, didUserSwap.error])
+  }, [didUserBuyTicket.data, didUserBuyTicket.error])
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -46,10 +47,10 @@ const SendpotRiskDialog = () => {
           maxWidth={'90%'}
           $gtMd={{ maxWidth: '40%' }}
         >
-          {didUserSwap.error ? (
+          {didUserBuyTicket.error ? (
             <YStack gap="$4">
               <Dialog.Title>Error</Dialog.Title>
-              <Paragraph>{toNiceError(didUserSwap.error)}</Paragraph>
+              <Paragraph>{toNiceError(didUserBuyTicket.error)}</Paragraph>
             </YStack>
           ) : (
             <YStack gap="$4" testID={'swapRiskDialogContent'}>
