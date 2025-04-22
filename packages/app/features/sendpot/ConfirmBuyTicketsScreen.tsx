@@ -59,6 +59,7 @@ export function ConfirmBuyTicketsScreen() {
     isPreparing,
     prepareError,
     userOp,
+    refetchPrepare,
     purchaseAsync,
     isPurchasing,
     purchaseError,
@@ -96,6 +97,11 @@ export function ConfirmBuyTicketsScreen() {
       console.error('Invalid jackpotId or numberOfTickets')
       return
     }
+    // if we never prepared or the last prepare errored, re‐run it
+    if (!userOp) {
+      await refetchPrepare()
+    }
+
     if (!userOp) {
       console.error('UserOp is not prepared')
       return
@@ -142,8 +148,7 @@ export function ConfirmBuyTicketsScreen() {
     hasSufficientBalance &&
     hasSufficientGas &&
     !!userOp &&
-    numberOfTickets > 0 &&
-    !combinedError
+    numberOfTickets > 0
 
   return (
     <YStack
