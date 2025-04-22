@@ -34,7 +34,8 @@ import { assert } from 'app/utils/assert'
 export function SplashScreen() {
   return (
     <XStack
-      h={isWeb ? '100svh' : '100%'}
+      $platform-web={{ h: '100svh' }}
+      h={'100%'}
       justifyContent={'space-between'}
       mx={'auto'}
       maxWidth={1600}
@@ -172,7 +173,10 @@ function Hero() {
                 left={0}
                 right={0}
                 bottom={0}
-                height={isWeb ? '100dvh' : '100%'}
+                $platform-web={{
+                  h: '100dvh',
+                }}
+                height={'100%'}
               >
                 <SolitoImage
                   placeholder="blur"
@@ -336,13 +340,16 @@ function AuthButtons() {
         w="$12"
         onPress={handleSignIn}
         disabled={isSigningIn || isLoadingChallenge || !!challengeError}
+        theme="green"
       >
         {(() => {
           switch (true) {
             case isLoadingChallenge:
-              return <Spinner size="small" color={'$black'} />
+              return <Spinner size="small" />
             default:
-              return <ButtonText>{isSigningIn ? 'SIGNING IN...' : 'SIGN-IN'}</ButtonText>
+              return (
+                <ButtonText color="$black">{isSigningIn ? 'SIGNING IN...' : 'SIGN-IN'}</ButtonText>
+              )
           }
         })()}
       </SubmitButton>
