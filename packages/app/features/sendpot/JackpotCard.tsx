@@ -209,7 +209,7 @@ export const JackpotCard = () => {
                 </XStack>
               </LinkableButton>
               {isGeoBlocked && (
-                <Paragraph color="$red10" fontSize="$3" textAlign="center">
+                <Paragraph color="$red10Dark" fontSize="$3" textAlign="center">
                   Ticket purchases are not available in your region currently.
                 </Paragraph>
               )}

@@ -30,7 +30,6 @@ local_resource(
         "snaplet:sync",
         "ui:build",
         "ui:generate-theme",
-        "daimo-expo-passkeys:build",
         "webauthn-authenticator:build",
         "shovel:generate-config",
     ],

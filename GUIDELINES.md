@@ -196,7 +196,6 @@ Here is our base `tsconfig.base.json` for the entire project:
     "rootDir": ".",
     "paths": {
       "@0xsend/webauthn-authenticator/*": ["./packages/webauthn-authenticator/src/*"],
-      "@daimo/expo-passkeys/*": ["./packages/daimo-expo-passkeys/src/*"],
       "@my/contracts/*": ["./packages/contracts/out/*", "./packages/contracts/broadcast/*"],
       "@my/playwright/*": ["./packages/playwright/tests/*"],
       "@my/snaplet/*": ["./packages/snaplet/*"],
