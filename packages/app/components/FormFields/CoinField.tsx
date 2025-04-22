@@ -79,7 +79,6 @@ export const CoinField = ({
               focusStyle={{
                 bc: 'transparent',
               }}
-              // @ts-expect-error - background type is confused here
               hoverStyle={hoverStyles}
               $gtSm={{ p: '$2.5' }}
               iconAfter={

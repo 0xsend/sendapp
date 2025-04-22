@@ -247,7 +247,6 @@ const StackButton = ({ href, label, icon }: { href: string; label: string; icon:
       backgroundColor={'$color1'}
       borderRadius={'$6'}
       p={'$5'}
-      // @ts-expect-error - background type is confused here
       hoverStyle={hoverStyles}
       $gtLg={{ p: '$7' }}
     >
