@@ -27221,7 +27221,6 @@ __metadata:
     react: "npm:^18.3.1"
     react-dom: "npm:^18.3.1"
     react-native: "npm:0.76.9"
-    react-native-passkeys: "npm:^0.3.1"
     react-native-reanimated: "npm:~3.16.6"
     react-native-web: "npm:~0.19.13"
     sharp: "npm:0.32.6"
@@ -30410,17 +30409,6 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 10/4cdf2b2fb5b131f2015c26d2cb7688b4a0c5f3c8474b1bf0ddfa9eabb0263df440c87262ae8f812a6ecab0d5310df0373bddad4b51f53dabb2ffee01e9ef0f44
-  languageName: node
-  linkType: hard
-
-"react-native-passkeys@npm:^0.3.1":
-  version: 0.3.1
-  resolution: "react-native-passkeys@npm:0.3.1"
-  peerDependencies:
-    expo: "*"
-    react: "*"
-    react-native: "*"
-  checksum: 10/9361867994567b31abe92814c501cdf6410566efe97f6780f3e6e0a10bb251c593cea9d58939d4f2dd6bb7352ff31ac69e099c30b7829949a6ffc5c9bd071358
   languageName: node
   linkType: hard
 
