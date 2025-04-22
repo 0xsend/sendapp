@@ -71,6 +71,5 @@ export function createSendAccountPasskeyArgs({
       userVerification: 'required',
       residentKey: 'required',
     },
-    attestation: undefined,
   } as const satisfies PublicKeyCredentialCreationOptionsJSON
 }

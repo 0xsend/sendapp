@@ -14,6 +14,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@0xbigboss/react-native-passkeys": "0.4.0",
     "@0xsend/send-earn-contracts": "^0.1.0",
     "@coinbase/onchainkit": "^0.38.1",
     "@marsidev/react-turnstile": "^0.7.1",
@@ -58,7 +59,6 @@
     "qrcode": "^1.5.3",
     "react-hook-form": "^7.48.2",
     "react-native": "0.76.9",
-    "react-native-passkeys": "^0.3.1",
     "react-native-svg": "15.10.1",
     "react-native-webview": "13.12.5",
     "react-use-precision-timer": "^3.5.5",
