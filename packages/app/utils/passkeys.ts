@@ -1,10 +1,10 @@
-import { p256 } from '@noble/curves/p256'
-import { base64urlnopad } from '@scure/base'
-import * as cbor from 'cbor2'
 import type {
   AuthenticationResponseJSON,
   RegistrationResponseJSON,
-} from 'react-native-passkeys/build/ReactNativePasskeys.types'
+} from '@0xbigboss/react-native-passkeys/build/ReactNativePasskeys.types'
+import { p256 } from '@noble/curves/p256'
+import { base64urlnopad } from '@scure/base'
+import * as cbor from 'cbor2'
 import { type Hex, bytesToBigInt, bytesToHex, hexToBytes } from 'viem'
 import { assert } from './assert'
 
