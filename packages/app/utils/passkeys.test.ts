@@ -1,7 +1,11 @@
-import crypto from 'node:crypto'
-import { describe, it, expect } from '@jest/globals'
+import type {
+  AuthenticationResponseJSON,
+  RegistrationResponseJSON,
+} from '@0xbigboss/react-native-passkeys/build/ReactNativePasskeys.types'
+import { describe, expect, it } from '@jest/globals'
 import { p256 } from '@noble/curves/p256'
 import { base64, base64urlnopad } from '@scure/base'
+import crypto from 'node:crypto'
 import { type Hex, bytesToHex } from 'viem'
 import {
   contractFriendlyKeyToDER,
@@ -11,10 +15,6 @@ import {
   parseCreateResponse,
   parseSignResponse,
 } from './passkeys'
-import type {
-  AuthenticationResponseJSON,
-  RegistrationResponseJSON,
-} from 'react-native-passkeys/build/ReactNativePasskeys.types'
 
 type ExpectedCreateResult = {
   expectedDer: Hex

@@ -75,7 +75,7 @@ const sendAccountFactory = getContract({
   client: baseMainnetClient,
 })
 
-jest.mock('react-native-passkeys', () => ({
+jest.mock('@0xbigboss/react-native-passkeys', () => ({
   create: jest.fn(),
   get: jest.fn(),
 }))

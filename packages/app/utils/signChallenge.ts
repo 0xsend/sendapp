@@ -1,6 +1,6 @@
+import { get, isSupported } from '@0xbigboss/react-native-passkeys'
 import { sendAccountAbi } from '@my/wagmi'
 import { base64urlnopad } from '@scure/base'
-import { get, isSupported } from 'react-native-passkeys'
 import { bytesToHex, encodeAbiParameters, getAbiItem, type Hex, hexToBytes, isHex } from 'viem'
 import { assert } from './assert'
 import { getRpId } from './getRpId'
