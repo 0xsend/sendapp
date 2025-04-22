@@ -1,5 +1,5 @@
 import { describe, beforeEach, it, jest, expect } from '@jest/globals'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react-native'
 import { encodeFunctionData } from 'viem'
 import { useSwap } from './useSwap'
 import { useSendAccount } from 'app/utils/send-accounts'
@@ -11,11 +11,11 @@ jest.mock('app/utils/send-accounts', () => ({
 }))
 
 jest.mock('app/utils/userop', () => ({
-  useUserOp: jest.fn(),
+  useUserOp: jest.fn().mockReturnValue({ data: {} }),
 }))
 
 jest.mock('app/utils/useUSDCFees', () => ({
-  useUSDCFees: jest.fn(),
+  useUSDCFees: jest.fn().mockReturnValue({ data: {} }),
 }))
 
 jest.mock('viem', () => ({

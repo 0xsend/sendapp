@@ -7,7 +7,7 @@ import { hexToBytea } from 'app/utils/hexToBytea'
 import { COSEECDHAtoXY } from 'app/utils/passkeys'
 import { byteaToHex } from 'app/utils/byteaToHex'
 import { withRetry, checksumAddress } from 'viem'
-import cbor from 'cbor'
+import * as cbor from 'cbor2'
 import { expect } from '@playwright/test'
 
 expect.extend({
@@ -63,11 +63,21 @@ expect.extend({
         `\\x${Buffer.from(attestationObject).toString('hex')}`
       )
 
-      const cborAttObj = cbor.decodeAllSync(attestationObject)[0]
+      const cborAttObj = cbor.decode<{
+        fmt: string
+        attStmt: {
+          alg: number
+          sig: Buffer
+        }
+        authData: {
+          type: 'Buffer'
+          data: Uint8Array
+        }
+      }>(Buffer.from(attestationObject))
       assert(!!cborAttObj, `Missing CBOR attestation object for credential at index ${index}`)
 
       const { authData } = cborAttObj
-      const { COSEPublicKey: COSEPublicKeyBytes } = parseCredAuthData(authData)
+      const { COSEPublicKey: COSEPublicKeyBytes } = parseCredAuthData(Buffer.from(authData.data))
       assert(
         !!COSEPublicKeyBytes && COSEPublicKeyBytes.length > 0,
         `Missing COSEPublicKey for credential at index ${index}`

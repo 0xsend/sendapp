@@ -35,7 +35,7 @@ import {
   isTemporalTokenTransfersEvent,
   temporalEventNameFromStatus,
 } from './zod/activity/TemporalTransfersEventSchema'
-import { SENDPOT_CONTRACT_ADDRESS } from 'app/data/sendpot'
+import { calculateTicketsFromWei, SENDPOT_CONTRACT_ADDRESS } from 'app/data/sendpot'
 
 const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
   Object.values(addresses).map((a) => [a, label])
@@ -315,12 +315,13 @@ export function eventNameFromActivity({
   const isTemporalTransfer =
     isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
   const isSwapTransfer = isActivitySwapTransfer(activity, swapRouters, liquidityPools)
+  const note = noteFromActivity(activity)
 
   switch (true) {
     case isSendPotTicketPurchase(activity):
-      return 'Ticket Purchase'
+      return 'Bought'
     case isSendPotWin(activity):
-      return 'SendPot Win'
+      return 'Sendpot Win'
     case isTemporalSendEarnDepositEvent(activity):
       return activity.data.status === 'failed'
         ? 'Deposit Failed'
@@ -330,7 +331,7 @@ export function eventNameFromActivity({
     case isSendEarnWithdrawEvent(activity):
       return 'Send Earn Withdraw'
     case isTemporalTransfer:
-      return temporalEventNameFromStatus(data.status)
+      return note || temporalEventNameFromStatus(data.status)
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Revenue Share'
     case isSendTokenUpgradeEvent(activity):
@@ -346,9 +347,9 @@ export function eventNameFromActivity({
       }
       return 'Deposit'
     case isTransferOrReceive && !!to_user?.id:
-      return 'Received'
+      return note || 'Received'
     case isTransferOrReceive && !!from_user?.id:
-      return 'Sent'
+      return note || 'Sent'
     case isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity):
       return 'Sendtag Registered'
     case isReferralsEvent(activity) && !!from_user?.id:
@@ -426,8 +427,10 @@ export function phraseFromActivity({
   const isSwapTransfer = isActivitySwapTransfer(activity, swapRouters, liquidityPools)
 
   switch (true) {
+    case isSendPotWin(activity):
+      return 'won'
     case isSendPotTicketPurchase(activity):
-      return 'Bought Tickets'
+      return 'bought'
     case isTemporalSendEarnDepositEvent(activity):
       return activity.data.status === 'failed'
         ? 'Failed to deposit to Send Earn'
@@ -527,8 +530,10 @@ export function subtextFromActivity({
   const isSwapTransfer = isActivitySwapTransfer(activity, swapRouters, liquidityPools)
 
   if (isSendPotTicketPurchase(activity)) {
-    return null // No subtext for ticket purchases
+    const tickets = calculateTicketsFromWei(data.v)
+    return `${tickets} ticket${tickets > 1 ? 's' : ''}`
   }
+
   if (isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity)) {
     return activity.data.tags.map((t) => `/${t}`).join(', ')
   }

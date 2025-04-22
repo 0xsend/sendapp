@@ -1,8 +1,11 @@
-import crypto from 'node:crypto'
-import type { CreateResult, SignResult } from '@daimo/expo-passkeys'
-import { describe, it, expect } from '@jest/globals'
+import type {
+  AuthenticationResponseJSON,
+  RegistrationResponseJSON,
+} from '@0xbigboss/react-native-passkeys/build/ReactNativePasskeys.types'
+import { describe, expect, it } from '@jest/globals'
 import { p256 } from '@noble/curves/p256'
-import { base64 } from '@scure/base'
+import { base64, base64urlnopad } from '@scure/base'
+import crypto from 'node:crypto'
 import { type Hex, bytesToHex } from 'viem'
 import {
   contractFriendlyKeyToDER,
@@ -25,14 +28,23 @@ type ExpectedCreateResult = {
   }
 }
 
-const mockAttestations: [CreateResult, ExpectedCreateResult][] = [
+const mockAttestations: [RegistrationResponseJSON, ExpectedCreateResult][] = [
   [
+    // @ts-expect-error this is a mock
     {
-      credentialIDB64: 'y5p83Ze+tE9+X1GsNFxK2w==',
-      rawClientDataJSONB64:
-        'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiYzI5dFpTQmphR0ZzYkdWdVoyVSIsIm9yaWdpbiI6Imh0dHBzOi8vc2VuZGFwcC5sb2NhbGhvc3QifQ==',
-      rawAttestationObjectB64:
-        'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViUVVJTlMb5JhbV7rFoaFKDcCvBmzc1HOD7tW1Q7aed139dAAAAALraVWanqkAfvZZFYZpVEg0AECiF0g45fqmWxdVxz4i5f4ulAQIDJiABIVggfpK6HX0EGYMbV8afoFaCZkUcfQ+dw9YE0jSNRcAC0zYiWCAdWvSb1BQUVM3/dW/urTzaX80vFmZ95ClXofI1uTn4Gg==',
+      id: base64urlnopad.encode(base64.decode('y5p83Ze+tE9+X1GsNFxK2w==')),
+      response: {
+        clientDataJSON: base64urlnopad.encode(
+          base64.decode(
+            'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiYzI5dFpTQmphR0ZzYkdWdVoyVSIsIm9yaWdpbiI6Imh0dHBzOi8vc2VuZGFwcC5sb2NhbGhvc3QifQ=='
+          )
+        ),
+        attestationObject: base64urlnopad.encode(
+          base64.decode(
+            'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViUVVJTlMb5JhbV7rFoaFKDcCvBmzc1HOD7tW1Q7aed139dAAAAALraVWanqkAfvZZFYZpVEg0AECiF0g45fqmWxdVxz4i5f4ulAQIDJiABIVggfpK6HX0EGYMbV8afoFaCZkUcfQ+dw9YE0jSNRcAC0zYiWCAdWvSb1BQUVM3/dW/urTzaX80vFmZ95ClXofI1uTn4Gg=='
+          )
+        ),
+      },
     },
     {
       expectedAuthData: {
@@ -49,12 +61,21 @@ const mockAttestations: [CreateResult, ExpectedCreateResult][] = [
     },
   ],
   [
+    // @ts-expect-error this is a mock
     {
-      credentialIDB64: 'y5p83Ze+tE9+X1GsNFxK2w==',
-      rawAttestationObjectB64:
-        'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYizwk775fdfZnAPIbCJXH2QqOQs1ZeTxiGxM/cExRMsRdAAAAAAAAAAAAAAAAAAAAAAAAAAAAFI6/XGQDoO+69ZA1ZDSqXMU1A8q2pQECAyYgASFYILbo5B0aQxUxtm2tq4VU9VILS61c4ZSqXLXFEBdgbo61Ilgg4Lme/b/dEoIbWLn85MlpREPQLp82agWlpoaOLVgTgsQ=',
-      rawClientDataJSONB64:
-        'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiWTNKbFlYUmxJR3RsZVNCMFpYTjBNek1nTVRJNCIsIm9yaWdpbiI6Imh0dHBzOi8vZGFpbW8ueHl6In0=',
+      id: base64urlnopad.encode(base64.decode('y5p83Ze+tE9+X1GsNFxK2w==')),
+      response: {
+        clientDataJSON: base64urlnopad.encode(
+          base64.decode(
+            'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiWTNKbFlYUmxJR3RsZVNCMFpYTjBNek1nTVRJNCIsIm9yaWdpbiI6Imh0dHBzOi8vZGFpbW8ueHl6In0='
+          )
+        ),
+        attestationObject: base64urlnopad.encode(
+          base64.decode(
+            'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYizwk775fdfZnAPIbCJXH2QqOQs1ZeTxiGxM/cExRMsRdAAAAAAAAAAAAAAAAAAAAAAAAAAAAFI6/XGQDoO+69ZA1ZDSqXMU1A8q2pQECAyYgASFYILbo5B0aQxUxtm2tq4VU9VILS61c4ZSqXLXFEBdgbo61Ilgg4Lme/b/dEoIbWLn85MlpREPQLp82agWlpoaOLVgTgsQ='
+          )
+        ),
+      },
     },
     {
       expectedAuthData: {
@@ -74,29 +95,34 @@ const mockAttestations: [CreateResult, ExpectedCreateResult][] = [
 
 const expectedParsedAssertions = [
   {
-    derSig:
-      '0x3045022100820869b66e0c61894cf32fa0bf5351e74486b9c2cd983c6485685473063cee2d02202a24a3f1b168fcd86fd2f4e03da83538f284f6b37eb90b05a42a713b99350077',
-    rawAuthenticatorData:
-      '0x55525394c6f92616d5eeb168685283702bc19b37351ce0fbb56d50eda79dd77f1d00000000',
-    accountName: 'sendappuser',
-    keySlot: 1,
+    accountName: 'd7302060-a077-4024-93a5-316c487945d0',
+    challengeLocation: 23n,
     clientDataJSON:
-      '{"type":"webauthn.get","challenge":"YW5vdGhlciBjaGFsbGVuZ2U","origin":"https://sendapp.localhost"}',
-    challengeLocation: '17',
-    responseTypeLocation: '1',
+      '{"type":"webauthn.get","challenge":"AQAAaAZNXckjIuVV8dXk6hFtq2L3Wf5_GFiDlhO_y_dXwXNi_nqh","origin":"https://sendapp.localhost","crossOrigin":false}',
+    derSig:
+      '0x3045022100f25af14855f5884d8aed5b27fb576da196c710bc2afe7a3f90420e8a0bd7de7c022047079de5f4c7ecf5c155c9f0efa852160176baa036280138f6839c13fa614c89',
+    keySlot: 0,
+    rawAuthenticatorData:
+      '0x55525394c6f92616d5eeb168685283702bc19b37351ce0fbb56d50eda79dd77f050000000a',
+    responseTypeLocation: 1n,
   },
 ] as const
 
-const mockAssertions: [SignResult, (typeof expectedParsedAssertions)[number]][] = [
+const mockAssertions: [AuthenticationResponseJSON, (typeof expectedParsedAssertions)[number]][] = [
   [
     {
-      id: '1',
-      passkeyName: 'sendappuser.1',
-      rawClientDataJSONB64:
-        'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiWVc1dmRHaGxjaUJqYUdGc2JHVnVaMlUiLCJvcmlnaW4iOiJodHRwczovL3NlbmRhcHAubG9jYWxob3N0In0=',
-      rawAuthenticatorDataB64: 'VVJTlMb5JhbV7rFoaFKDcCvBmzc1HOD7tW1Q7aed138dAAAAAA==',
-      signatureB64:
-        'MEUCIQCCCGm2bgxhiUzzL6C/U1HnRIa5ws2YPGSFaFRzBjzuLQIgKiSj8bFo/Nhv0vTgPag1OPKE9rN+uQsFpCpxO5k1AHc=',
+      id: 'gHqym2me8Gz82DbicLdfMfVqimIFilsqjEq5aU7d-SI',
+      rawId: 'gHqym2me8Gz82DbicLdfMfVqimIFilsqjEq5aU7d-SI',
+      response: {
+        clientDataJSON:
+          'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQVFBQWFBWk5YY2tqSXVWVjhkWGs2aEZ0cTJMM1dmNV9HRmlEbGhPX3lfZFh3WE5pX25xaCIsIm9yaWdpbiI6Imh0dHBzOi8vc2VuZGFwcC5sb2NhbGhvc3QiLCJjcm9zc09yaWdpbiI6ZmFsc2V9',
+        authenticatorData: 'VVJTlMb5JhbV7rFoaFKDcCvBmzc1HOD7tW1Q7aed138FAAAACg',
+        signature:
+          'MEUCIQDyWvFIVfWITYrtWyf7V22hlscQvCr-ej-QQg6KC9fefAIgRwed5fTH7PXBVcnw76hSFgF2uqA2KAE49oOcE_phTIk',
+        userHandle: 'ZDczMDIwNjAtYTA3Ny00MDI0LTkzYTUtMzE2YzQ4Nzk0NWQwLjA',
+      },
+      clientExtensionResults: {},
+      type: 'public-key',
     },
     expectedParsedAssertions[0],
   ],
@@ -144,8 +170,8 @@ describe('parseSignResponse', () => {
         accountName: parsed.accountName,
         keySlot: parsed.keySlot,
         clientDataJSON: parsed.clientDataJSON,
-        challengeLocation: parsed.challengeLocation.toString(16),
-        responseTypeLocation: parsed.responseTypeLocation.toString(16),
+        challengeLocation: parsed.challengeLocation,
+        responseTypeLocation: parsed.responseTypeLocation,
       }).toStrictEqual(expected)
     }
   })
@@ -159,7 +185,9 @@ describe('parseAndNormalizeSig', () => {
       const expectedR = parsedExpectedSig.r.toString(16)
       const expectedS = parsedExpectedSig.s.toString(16)
 
-      const sig = parseAndNormalizeSig(bytesToHex(base64.decode(assertion.signatureB64)))
+      const sig = parseAndNormalizeSig(
+        bytesToHex(base64urlnopad.decode(assertion.response.signature))
+      )
       const rHex = sig.r.toString(16)
       const sHex = sig.s.toString(16)
 
@@ -213,22 +241,36 @@ describe('contractFriendlyKeyToDER', () => {
   })
 })
 
-const createResult = {
-  credentialIDB64: 'y5p83Ze+tE9+X1GsNFxK2w==',
-  rawAttestationObjectB64:
-    'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYizwk775fdfZnAPIbCJXH2QqOQs1ZeTxiGxM/cExRMsRdAAAAAAAAAAAAAAAAAAAAAAAAAAAAFI6/XGQDoO+69ZA1ZDSqXMU1A8q2pQECAyYgASFYILbo5B0aQxUxtm2tq4VU9VILS61c4ZSqXLXFEBdgbo61Ilgg4Lme/b/dEoIbWLn85MlpREPQLp82agWlpoaOLVgTgsQ=',
-  rawClientDataJSONB64:
-    'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiWTNKbFlYUmxJR3RsZVNCMFpYTjBNek1nTVRJNCIsIm9yaWdpbiI6Imh0dHBzOi8vZGFpbW8ueHl6In0=',
+// @ts-expect-error this is a mock
+const createResult: RegistrationResponseJSON = {
+  id: 'y5p83Ze+tE9+X1GsNFxK2w==',
+  response: {
+    attestationObject: base64urlnopad.encode(
+      base64.decode(
+        'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYizwk775fdfZnAPIbCJXH2QqOQs1ZeTxiGxM/cExRMsRdAAAAAAAAAAAAAAAAAAAAAAAAAAAAFI6/XGQDoO+69ZA1ZDSqXMU1A8q2pQECAyYgASFYILbo5B0aQxUxtm2tq4VU9VILS61c4ZSqXLXFEBdgbo61Ilgg4Lme/b/dEoIbWLn85MlpREPQLp82agWlpoaOLVgTgsQ='
+      )
+    ),
+    clientDataJSON: base64urlnopad.encode(
+      base64.decode(
+        'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiWTNKbFlYUmxJR3RsZVNCMFpYTjBNek1nTVRJNCIsIm9yaWdpbiI6Imh0dHBzOi8vZGFpbW8ueHl6In0='
+      )
+    ),
+  },
 }
 
-const signResult = {
-  id: '1',
-  passkeyName: 'test33.128',
-  rawAuthenticatorDataB64: 'izwk775fdfZnAPIbCJXH2QqOQs1ZeTxiGxM/cExRMsQdAAAAAA==',
-  rawClientDataJSONB64:
-    'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiM3EwIiwib3JpZ2luIjoiaHR0cHM6Ly9kYWltby54eXoifQ==',
-  signatureB64:
-    'MEQCID7Flt3axeMxi1ZqPcRVfWB7PTlEr7ATkiCzWe5G080wAiB5/xo5R/SuGDdjbUN4Uaw0hNg4d/f86Hbk/9sVH+n9rQ==',
+const signResult: AuthenticationResponseJSON = {
+  id: 'gHqym2me8Gz82DbicLdfMfVqimIFilsqjEq5aU7d-SI',
+  rawId: 'gHqym2me8Gz82DbicLdfMfVqimIFilsqjEq5aU7d-SI',
+  response: {
+    clientDataJSON:
+      'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQVFBQWFBWk1lejZoenYtdUpjU0lYMzJQdGdhUEptMkVwMHBhdGxxU01PcURLclBJYklDbyIsIm9yaWdpbiI6Imh0dHBzOi8vc2VuZGFwcC5sb2NhbGhvc3QiLCJjcm9zc09yaWdpbiI6ZmFsc2UsIm90aGVyX2tleXNfY2FuX2JlX2FkZGVkX2hlcmUiOiJkbyBub3QgY29tcGFyZSBjbGllbnREYXRhSlNPTiBhZ2FpbnN0IGEgdGVtcGxhdGUuIFNlZSBodHRwczovL2dvby5nbC95YWJQZXgifQ',
+    authenticatorData: 'VVJTlMb5JhbV7rFoaFKDcCvBmzc1HOD7tW1Q7aed138FAAAACA',
+    signature:
+      'MEUCIQDIcHvXaTfrleOetNccR0F0cMV0s72YS8nkWE0POYHXwwIgFP_2Ij20BE02Ej5qMg1FM-sqY1gGJs0x8Nmr7kvn5zc',
+    userHandle: 'ZDczMDIwNjAtYTA3Ny00MDI0LTkzYTUtMzE2YzQ4Nzk0NWQwLjA',
+  },
+  clientExtensionResults: {},
+  type: 'public-key',
 }
 
 describe('Passkey', () => {
@@ -243,15 +285,20 @@ describe('Passkey', () => {
 
   it('Parses sign response', () => {
     const parsedSignResponse = parseSignResponse(signResult)
-    expect(parsedSignResponse.accountName).toEqual('test33')
-    expect(parsedSignResponse.keySlot).toEqual(128)
+    expect(parsedSignResponse.accountName).toEqual('d7302060-a077-4024-93a5-316c487945d0')
+    expect(parsedSignResponse.keySlot).toEqual(0)
     const { r, s } = parseAndNormalizeSig(parsedSignResponse.derSig)
-    expect(r).toEqual(BigInt('0x3ec596dddac5e3318b566a3dc4557d607b3d3944afb0139220b359ee46d3cd30'))
-    expect(s).toEqual(BigInt('0x79ff1a3947f4ae1837636d437851ac3484d83877f7fce876e4ffdb151fe9fdad'))
+    expect(r).toEqual(
+      90661311310178440280483027166461848589758788641220681684302042449695901603779n
+    )
+    expect(s).toEqual(9498501725921417342599962913269823263022187497481156602522757345925034141495n)
     expect(JSON.parse(parsedSignResponse.clientDataJSON)).toEqual({
       type: 'webauthn.get',
-      challenge: '3q0',
-      origin: 'https://daimo.xyz',
+      challenge: 'AQAAaAZMez6hzv-uJcSIX32PtgaPJm2Ep0patlqSMOqDKrPIbICo',
+      crossOrigin: false,
+      origin: 'https://sendapp.localhost',
+      other_keys_can_be_added_here:
+        'do not compare clientDataJSON against a template. See https://goo.gl/yabPex',
     })
     expect(parsedSignResponse.responseTypeLocation).toEqual(1n)
     expect(parsedSignResponse.challengeLocation).toEqual(23n)

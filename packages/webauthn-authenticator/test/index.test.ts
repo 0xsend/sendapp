@@ -1,5 +1,5 @@
 import * as crypto from 'node:crypto'
-import * as cbor from 'cbor'
+import * as cbor from 'cbor2'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   COSE_PUB_KEY_ALG,
@@ -294,22 +294,30 @@ async function verifyAttestation({
   // @ts-expect-error - null checked above
   expect(Buffer.from(responsePublicKey).toString('hex')).toEqual(publicKey.toString('hex'))
   // verify the attStmt sig against
-  const attestation = cbor.decodeAllSync(response.attestationObject)[0]
-
+  const attestation = cbor.decode<{
+    fmt: string
+    attStmt: {
+      alg: number
+      sig: Buffer
+    }
+    authData: Buffer
+  }>(Buffer.from(response.attestationObject))
   expect(attestation).toBeDefined()
   expect(attestation.authData).toBeDefined()
-  expect(attestation.authData).toEqual(Buffer.from(response.getAuthenticatorData()))
+  expect(Buffer.from(attestation.authData).toString('hex')).toEqual(
+    Buffer.from(response.getAuthenticatorData()).toString('hex')
+  )
   expect(attestation.attStmt).toBeDefined()
   expect(attestation.attStmt.sig).toBeDefined()
   const verified = crypto.verify(
     'sha256',
-    Buffer.concat([attestation.authData, clientDataHash]),
+    Buffer.concat([Buffer.from(attestation.authData), clientDataHash]),
     crypto.createPublicKey({
       key: publicKey,
       format: 'der',
       type: 'spki',
     }),
-    attestation.attStmt.sig
+    Buffer.from(attestation.attStmt.sig)
   )
 
   expect(verified).toBeTruthy()

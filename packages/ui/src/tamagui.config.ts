@@ -1,7 +1,6 @@
 import { defaultConfig } from '@tamagui/config/v4'
 import { shorthands } from '@tamagui/shorthands'
-import { createTokens, createTamagui, setupDev } from 'tamagui'
-
+import { createTamagui, createTokens, setupDev } from 'tamagui'
 import { animations } from './config/animations'
 import { bodyFont, headingFont, monoFont } from './config/fonts'
 import { media, mediaQueryDefaultActive } from './config/media'

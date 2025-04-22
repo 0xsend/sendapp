@@ -39,6 +39,7 @@
     "lint": "tsc",
     "test": "jest",
     "build": "yarn bundle",
+    "clean": "rm -rf dist",
     "bundle": "node --loader ts-node/esm src/scripts/build-workflow-bundle.ts"
   },
   "devDependencies": {

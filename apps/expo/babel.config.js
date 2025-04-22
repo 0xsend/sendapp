@@ -12,6 +12,7 @@ module.exports = (api) => {
             app: '../../packages/app',
             '@my/ui': '../../packages/ui',
             '@wagmi/core/codegen': '../../node_modules/@wagmi/core/dist/esm/exports/codegen.js',
+            cbor2: '../../node_modules/cbor2/lib/index.js',
           },
           extensions: ['.js', '.jsx', '.tsx', '.ios.js', '.android.js'],
         },

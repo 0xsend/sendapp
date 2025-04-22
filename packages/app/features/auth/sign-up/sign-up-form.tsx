@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from 'react'
-import { Turnstile } from './Turnstile'
+import { RecoveryOptions } from '@my/api/src/routers/account-recovery/types'
 import {
   BigHeading,
+  Button,
   ButtonText,
   H3,
   Paragraph,
@@ -9,19 +9,19 @@ import {
   XStack,
   YStack,
   useToastController,
-  Button,
 } from '@my/ui'
-import { bytesToHex, hexToBytes } from 'viem'
-import { useRouter } from 'solito/router'
-import { z } from 'zod'
-import { FormProvider, useForm } from 'react-hook-form'
-import { RecoveryOptions } from '@my/api/src/routers/account-recovery/types'
 import { VerifyCode } from 'app/features/auth/components/VerifyCode'
+import { useAuthScreenParams } from 'app/routers/params'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { api } from 'app/utils/api'
 import { formatErrorMessage } from 'app/utils/formatErrorMessage'
 import { signChallenge } from 'app/utils/signChallenge'
-import { useAuthScreenParams } from 'app/routers/params'
+import { useCallback, useEffect, useState } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
+import { useRouter } from 'solito/router'
+import { bytesToHex, hexToBytes } from 'viem'
+import { z } from 'zod'
+import { Turnstile } from './Turnstile'
 
 const SignUpSchema = z.object({
   countrycode: formFields.countrycode,
@@ -129,7 +129,7 @@ export const SignUpForm = () => {
     <VerifyCode
       phone={`${form.getValues().countrycode}${form.getValues().phone}`}
       onSuccess={() => {
-        router.push('/')
+        router.push('/auth/onboarding')
       }}
     />
   )
@@ -164,8 +164,8 @@ export const SignUpForm = () => {
             </ButtonText>
           </SubmitButton>
         </XStack>
-        <YStack pos="relative" pb={'$1'} w="100%" maw="$22">
-          <XStack jc="center" ai="center" mt="$4" gap="$1">
+        <YStack pos="relative" pb={'$1'} w="100%" maw="$22" gap="$2">
+          <XStack jc="center" ai="center" mt="$5" gap="$1">
             <Paragraph size="$2" color="$color11">
               Already have an account?
             </Paragraph>
@@ -229,7 +229,7 @@ export const SignUpForm = () => {
     >
       {({ countrycode: CountryCode, phone: Phone }) => (
         <YStack gap="$5" jc="center" $sm={{ f: 1 }}>
-          <BigHeading color="$color12" fontWeight={700}>
+          <BigHeading color="$color12" fontWeight={700} fontSize="$10" lineHeight="$10">
             CREATE YOUR ACCOUNT
           </BigHeading>
           <H3

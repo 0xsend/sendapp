@@ -1,4 +1,3 @@
-import { createPasskey } from '@daimo/expo-passkeys'
 import type { Tables } from '@my/supabase/database-generated.types'
 import { Button, FadeCard, H1, Paragraph, Shake, Spinner, SubmitButton, YStack } from '@my/ui'
 import {
@@ -11,8 +10,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { SettingsHeader } from 'app/features/account/settings/components/SettingsHeader'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { assert } from 'app/utils/assert'
-import { base64ToBase16 } from 'app/utils/base64ToBase16'
-import { parseCreateResponse } from 'app/utils/passkeys'
+import { base64URLNoPadToBase16 } from 'app/utils/base64ToBase16'
+import { createPasskey } from 'app/utils/createPasskey'
 import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
@@ -80,17 +79,13 @@ const CreatePasskeyForm = ({
       assert(!!sendAccountId, 'No send account id found')
       assert(keySlot !== undefined, 'No key slot found')
 
+      const challenge = base64.encode(Buffer.from('foobar'))
       const passkeyName = `${userId}.${keySlot}`
-      const [rawCred, authData] = await createPasskey({
-        domain: window.location.hostname,
-        challengeB64: base64.encode(Buffer.from('foobar')),
-        passkeyName,
-        passkeyDisplayTitle: `Send App: ${accountName}`,
-      }).then((r) => [r, parseCreateResponse(r)] as const)
+      const [rawCred, authData] = await createPasskey({ user, keySlot, challenge, accountName })
 
       const public_key = `\\x${base16.encode(authData.COSEPublicKey)}`
-      const raw_credential_id = `\\x${base64ToBase16(rawCred.credentialIDB64)}`
-      const attestation_object = `\\x${base64ToBase16(rawCred.rawAttestationObjectB64)}`
+      const raw_credential_id = `\\x${base64URLNoPadToBase16(rawCred.rawId)}`
+      const attestation_object = `\\x${base64URLNoPadToBase16(rawCred.response.attestationObject)}`
 
       const { data: webauthnCred, error } = await supabase.rpc(
         'send_accounts_add_webauthn_credential',

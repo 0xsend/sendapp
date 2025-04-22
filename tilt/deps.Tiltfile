@@ -193,43 +193,6 @@ local_resource(
 )
 
 local_resource(
-    name = "daimo-expo-passkeys:build",
-    allow_parallel = True,
-    cmd = "yarn workspace @daimo/expo-passkeys build",
-    labels = labels,
-    resource_deps = [
-        "yarn:install",
-    ],
-    deps = files_matching(
-               os.path.join(
-                   config.main_dir,
-                   "packages",
-                   "daimo-expo-passkeys",
-                   "src",
-               ),
-               lambda f: (f.endswith(".tsx") or f.endswith(".ts")),
-           ) +
-           files_matching(
-               os.path.join(
-                   config.main_dir,
-                   "packages",
-                   "daimo-expo-passkeys",
-                   "ios",
-               ),
-               lambda f: f.endswith(".swift"),
-           ) +
-           files_matching(
-               os.path.join(
-                   config.main_dir,
-                   "packages",
-                   "daimo-expo-passkeys",
-                   "android",
-               ),
-               lambda f: f.endswith(".kt"),
-           ),
-)
-
-local_resource(
     name = "webauthn-authenticator:build",
     allow_parallel = True,
     cmd = "yarn workspace @0xsend/webauthn-authenticator build",
@@ -259,7 +222,7 @@ local_resource(
 )
 
 local_resource(
-    name="workflows:build",
+    name = "workflows:build",
     allow_parallel = True,
     cmd = "yarn workspace @my/workflows build",
     labels = labels,

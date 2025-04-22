@@ -128,6 +128,7 @@ export default () => {
     transpilePackages: [
       'solito',
       'react-native-web',
+      'expo-application',
       'expo-linking',
       'expo-constants',
       'expo-clipboard',
@@ -138,6 +139,7 @@ export default () => {
       'expo-crypto',
       '@ts-react/form',
       'react-hook-form',
+      '@0xbigboss/react-native-passkeys',
     ],
     experimental: {
       scrollRestoration: true,

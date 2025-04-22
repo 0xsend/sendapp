@@ -75,7 +75,7 @@ export function installWebAuthnMock({
   navigator.credentials.get = async (credential: CredentialRequestOptions) => {
     if (!credential.publicKey) throw new Error('Missing publicKey in credentialOptions')
     if (!credential.publicKey.challenge) throw new Error('Missing challenge in publicKey')
-    if (!credential.publicKey.rpId) throw new Error('Missing rpId in publicKey')
+    credential.publicKey.rpId = credential.publicKey.rpId ?? window.location.hostname
 
     const credOpts = {
       publicKey: {

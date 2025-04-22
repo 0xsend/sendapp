@@ -22,7 +22,7 @@ import {
   type Hex,
 } from 'viem'
 import { assert } from './assert'
-import { byteaToBase64 } from './byteaToBase64'
+import { byteaToBase64URLNoPad } from './byteaToBase64URLNoPad'
 import { throwNiceError } from './userop'
 import { signUserOpHash } from './signUserOp'
 
@@ -125,7 +125,7 @@ export async function sendUserOpTransfer({
     validUntil,
     allowedCredentials:
       webauthnCreds?.map((c) => ({
-        id: byteaToBase64(c.raw_credential_id),
+        id: byteaToBase64URLNoPad(c.raw_credential_id),
         userHandle: c.name,
       })) ?? [],
   })

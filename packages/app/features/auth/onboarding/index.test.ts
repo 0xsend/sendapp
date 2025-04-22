@@ -75,9 +75,9 @@ const sendAccountFactory = getContract({
   client: baseMainnetClient,
 })
 
-jest.mock('@daimo/expo-passkeys', () => ({
-  createPasskey: jest.fn(),
-  signWithPasskey: jest.fn(),
+jest.mock('@0xbigboss/react-native-passkeys', () => ({
+  create: jest.fn(),
+  get: jest.fn(),
 }))
 
 const signatureStruct = getAbiItem({

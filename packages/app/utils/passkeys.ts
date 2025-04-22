@@ -1,7 +1,10 @@
-import type { CreateResult, SignResult } from '@daimo/expo-passkeys'
+import type {
+  AuthenticationResponseJSON,
+  RegistrationResponseJSON,
+} from '@0xbigboss/react-native-passkeys/build/ReactNativePasskeys.types'
 import { p256 } from '@noble/curves/p256'
-import { base64 } from '@scure/base'
-import cbor from 'cbor'
+import { base64urlnopad } from '@scure/base'
+import * as cbor from 'cbor2'
 import { type Hex, bytesToBigInt, bytesToHex, hexToBytes } from 'viem'
 import { assert } from './assert'
 
@@ -49,7 +52,17 @@ export function parseAndNormalizeSig(derSig: Hex): { r: bigint; s: bigint } {
 
 // Parses authenticatorData buffer to struct
 // https://www.w3.org/TR/webauthn-2/#sctn-authenticator-data
-function parseMakeCredAuthData(buffer: Uint8Array) {
+export type ParsedCredAuthData = {
+  rpIdHash: Uint8Array
+  flagsBuf: Uint8Array
+  flags?: number
+  counterBuf: Uint8Array
+  counter: number
+  aaguid: Uint8Array
+  credID: Uint8Array
+  COSEPublicKey: Uint8Array
+}
+function parseMakeCredAuthData(buffer: Uint8Array): ParsedCredAuthData {
   let buf = buffer
   const rpIdHash = buf.slice(0, 32)
   buf = buf.slice(32)
@@ -77,7 +90,7 @@ function parseMakeCredAuthData(buffer: Uint8Array) {
     aaguid,
     credID,
     COSEPublicKey,
-  }
+  } satisfies ParsedCredAuthData
 }
 
 // Takes COSE encoded public key and converts it to DER keys
@@ -89,23 +102,30 @@ export function COSEECDHAtoDER(COSEPublicKey: Uint8Array): Hex {
 // Takes COSE encoded public key and return x and y coordinates
 // https://www.rfc-editor.org/rfc/rfc8152.html#section-13.1
 export function COSEECDHAtoXY(COSEPublicKey: Uint8Array): [Hex, Hex] {
-  const coseStruct = cbor.decodeAllSync(COSEPublicKey)
-  assert(coseStruct.length === 1, 'CBOR encoded public key must have exactly one element')
-  const x = coseStruct[0].get(-2)
-  const y = coseStruct[0].get(-3)
+  const coseStruct = cbor.decode<Map<number, ArrayBuffer>>(COSEPublicKey)
+  const x = coseStruct.get(-2)
+  const y = coseStruct.get(-3)
+  assert(x !== undefined && y !== undefined, 'Invalid COSE public key')
   return [`0x${Buffer.from(x).toString('hex')}`, `0x${Buffer.from(y).toString('hex')}`]
 }
 
 // Parses Webauthn MakeCredential authData
-export function parseCreateResponse(result: CreateResult) {
-  const rawAttestationObject = base64.decode(result.rawAttestationObjectB64)
-  const attestationObject = cbor.decode(rawAttestationObject)
-  return parseMakeCredAuthData(attestationObject.authData)
+export function parseCreateResponse(result: RegistrationResponseJSON) {
+  const rawAttestationObject = base64urlnopad.decode(result.response.attestationObject)
+  const attestationObject = cbor.decode<{
+    fmt: string
+    attStmt: {
+      alg: number
+      sig: ArrayBuffer
+    }
+    authData: ArrayBuffer
+  }>(rawAttestationObject)
+  return parseMakeCredAuthData(Buffer.from(attestationObject.authData))
 }
 
 // Parses DER public key from Webauthn MakeCredential response
 // https://www.w3.org/TR/webauthn-2/#sctn-op-make-cred
-export function createResponseToDER(result: CreateResult) {
+export function createResponseToDER(result: RegistrationResponseJSON) {
   const authData = parseCreateResponse(result)
   const pubKey = COSEECDHAtoDER(authData.COSEPublicKey)
   return pubKey
@@ -113,23 +133,28 @@ export function createResponseToDER(result: CreateResult) {
 
 // Parses Webauthn GetAssertion response
 // https://www.w3.org/TR/webauthn-2/#sctn-op-get-assertion
-export function parseSignResponse(result: SignResult) {
-  const derSig = base64.decode(result.signatureB64)
-  const rawAuthenticatorData = base64.decode(result.rawAuthenticatorDataB64)
-  const passkeyName = result.passkeyName
+export function parseSignResponse(result: AuthenticationResponseJSON) {
+  const derSig = base64urlnopad.decode(result.response.signature)
+  const rawAuthenticatorData = base64urlnopad.decode(result.response.authenticatorData)
+  assert(!!result.response.userHandle, 'User handle is required')
+  const passkeyName = new TextDecoder('utf-8').decode(
+    base64urlnopad.decode(result.response.userHandle)
+  )
   // not ideal to handle null case but this is due to a few send accounts being opened with non-resident passkeys (which have no userHandle)
   // still assert that the passkey name is valid since it's required for the user to be able to sign user ops
-  const [accountName, keySlotStr] = passkeyName?.split('.') ?? [] // Assumes account name does not have periods (.) in it.
-  assert(!!accountName && !!keySlotStr, 'Invalid passkey name')
+  const [userId, keySlotStr] = passkeyName?.split('.') ?? [] // Assumes account name does not have periods (.) in it.
+  assert(!!userId && !!keySlotStr, 'Invalid passkey name')
   const keySlot = Number.parseInt(keySlotStr, 10)
-  const clientDataJSON = Buffer.from(base64.decode(result.rawClientDataJSONB64)).toString('utf-8')
+  const clientDataJSON = Buffer.from(
+    base64urlnopad.decode(result.response.clientDataJSON)
+  ).toString('utf-8')
   const challengeLocation = BigInt(clientDataJSON.indexOf('"challenge":"'))
   const responseTypeLocation = BigInt(clientDataJSON.indexOf('"type":"'))
 
   return {
     derSig: bytesToHex(derSig),
     rawAuthenticatorData,
-    accountName,
+    accountName: userId,
     keySlot,
     clientDataJSON,
     challengeLocation,

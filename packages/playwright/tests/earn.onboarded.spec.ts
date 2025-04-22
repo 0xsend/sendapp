@@ -479,15 +479,16 @@ for (const coin of [usdcCoin]) {
       test.setTimeout(60000) // Increase timeout as it involves multiple steps
       log = debug(`test:earn:deposit-after-withdraw:${profile.id}:${test.info().parallelIndex}`) // Updated log identifier
 
-      // Generate random amount for initial deposit
-      const initialDepositAmount = faker.number.bigInt({
-        min: MIN_DEPOSIT_AMOUNT,
-        max: MAX_DEPOSIT_AMOUNT,
-      })
+      // $10 for initial deposit
+      const initialDepositAmount = BigInt(10e6)
       const initialAmountDecimals = formatUnits(initialDepositAmount, coin.decimals)
 
       // Fund for initial deposit + gas
-      await fund({ address: sendAccount.address, amount: initialDepositAmount + GAS_FEES, coin })
+      await fund({
+        address: sendAccount.address,
+        amount: initialDepositAmount + 2n * GAS_FEES,
+        coin,
+      })
       log('Funded for initial deposit:', initialAmountDecimals, coin.symbol)
 
       // 1. Initial Deposit

@@ -7,7 +7,7 @@
 
 import crypto from 'node:crypto'
 import { base64urlnopad } from '@scure/base'
-import cbor from 'cbor'
+import * as cbor from 'cbor2'
 import debug from 'debug'
 import { AAGUID } from './aaguid'
 import type {
@@ -108,7 +108,7 @@ function generateAttestionObject(
     authData,
   }
 
-  return cbor.encode(attestation)
+  return Buffer.from(cbor.encode(attestation))
 }
 /**
  * Generate assertion signature proving possession of the webauthn credential private key.

@@ -599,13 +599,13 @@ export const SwapFormScreen = () => {
                       transform={'translate(-50%, -50%)'}
                     >
                       <Button
+                        // @ts-expect-error tamagui is tripping here
                         type={'button'}
                         testID={'flipTokensButton'}
                         bc={'$color0'}
                         circular={true}
                         size={'$5'}
                         borderWidth={0}
-                        // @ts-expect-error - background type is confused here
                         hoverStyle={hoverStyles}
                         onPress={handleFlipTokens}
                       >
@@ -732,10 +732,10 @@ export const Slippage = ({
         <XStack gap={'$2'} columnGap={'$2'} flexWrap={'wrap'} flex={1}>
           {SLIPPAGE_OPTIONS.map((slippageOption) => (
             <Button
+              // @ts-expect-error tamagui is tripping here
               type={'button'}
               key={`slippage-${slippageOption}`}
               onPress={() => handleOnPress(slippageOption)}
-              // @ts-expect-error - background type is confused here
               hoverStyle={hoverStyles}
               bw={0}
               p={'$2'}

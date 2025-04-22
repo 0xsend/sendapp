@@ -11,6 +11,7 @@ import {
   type XStackProps,
   H1,
   Theme,
+  Button,
 } from '@my/ui'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
@@ -24,6 +25,8 @@ import { HomeButtons } from './HomeButtons'
 import { AlertCircle } from '@tamagui/lucide-icons'
 import { useIsSendingUnlocked } from 'app/utils/useIsSendingUnlocked'
 import { HomeQuickActions } from 'app/features/home/HomeQuickActions'
+import { useSupabase } from 'app/utils/supabase/useSupabase'
+import { useRouter } from 'solito/router'
 
 function SendSearchBody() {
   const { isLoading, error } = useTagSearch()
@@ -133,6 +136,8 @@ function HomeBody(props: XStackProps) {
 
 export function HomeScreen() {
   const media = useMedia()
+  const router = useRouter()
+  const supabase = useSupabase()
   const [queryParams] = useRootScreenParams()
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
   const { search } = queryParams
@@ -150,8 +155,11 @@ export function HomeScreen() {
               )
             case !sendAccount:
               return (
-                <Stack f={1} h={'100%'} ai={'center'} jc={'center'}>
-                  <Paragraph theme="red_alt1">No send account found</Paragraph>
+                <Stack f={1} h={'100%'} ai={'center'} jc={'center'} gap="$4">
+                  <H1 theme="red">No send account found</H1>
+                  <Paragraph>This should never happen.</Paragraph>
+                  <Button onPress={() => router.push('/auth/onboarding')}>Go To Onboarding</Button>
+                  <Button onPress={() => supabase.auth.signOut()}>Sign Out</Button>
                 </Stack>
               )
             case search !== undefined: //@todo remove this

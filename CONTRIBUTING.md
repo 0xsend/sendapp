@@ -33,7 +33,6 @@ Here is a quick peek at the send stack. Quickly jump to any of the submodules by
 │   ├── <a href="https://github.com/0xsend/sendapp/tree/main/packages/api">api</a>
 │   ├── <a href="https://github.com/0xsend/sendapp/tree/main/packages/app">app</a>
 │   ├── <a href="https://github.com/0xsend/sendapp/tree/main/packages/contracts">contracts</a>
-│   ├── <a href="https://github.com/0xsend/sendapp/tree/main/packages/daimo-expo-passkeys">daimo-expo-passkeys</a>
 │   ├── <a href="https://github.com/0xsend/sendapp/tree/main/packages/eslint-config-custom">eslint-config-customs</a>
 │   ├── <a href="https://github.com/0xsend/sendapp/tree/main/packages/playwright">playwright</a>
 |   ├── <a href="https://github.com/0xsend/sendapp/tree/main/packages/shovel">shovel</a>

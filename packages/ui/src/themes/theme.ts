@@ -42,6 +42,7 @@ const themesBuilder = createThemeBuilder()
     yellow: colorThemeDefinition('yellow'),
     green: colorThemeDefinition('green'),
     red: colorThemeDefinition('red'),
+    gray: colorThemeDefinition('gray'),
   })
   .addChildThemes({
     ghost: {
@@ -69,4 +70,5 @@ const themesBuilder = createThemeBuilder()
   })
   .addChildThemes(componentThemeDefinitions)
 
-export const themes = themesBuilder.build()
+// biome-ignore lint/suspicious/noExplicitAny: type is too large
+export const themes: any = themesBuilder.build()
