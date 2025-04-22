@@ -31,12 +31,12 @@ export function SendTopNav() {
   const isOnSelectRecipient = !(path.includes('/confirm') || sendParams.recipient)
 
   return (
-    <Header w="100%" $lg={{ pt: '$3' }}>
+    <Header w="100%" $lg={{ py: '$3' }}>
       <Container
         $gtLg={{ jc: 'flex-start', pb: '$2', ai: 'flex-start' }}
         ai="center"
         jc="space-between"
-        safeAreaProps={{ edges: ['top'] }}
+        safeAreaProps={{ edges: { bottom: 'off' } }}
       >
         <XStack ai="center" $lg={{ f: 1 }} w="20%" $gtLg={{ display: 'none' }}>
           {!isOnSelectRecipient && (
