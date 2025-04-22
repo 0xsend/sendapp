@@ -24,11 +24,16 @@ const OFACblocklist = [
 ] // OFAC (Belarus, Cuba, Iran, North Korea, Russia, Syria, Ukraine, Venezuela) + FATF (Iran, North Korea, Myanmar) + Australia, Austria, Comoros, France, Germany, Netherlands, Spain, United Kingdom
 // USA is tracked separately
 export const useOFACGeoBlock = (): UseQueryResult<boolean> => {
+  const geoblockEnabled = process.env.NEXT_PUBLIC_GEOBLOCK_ENABLED
   const { tags, isLoading: isLoadingUser } = useUser()
 
   return useQuery<boolean>({
-    queryKey: ['ofacGeoBlock', tags],
+    queryKey: ['ofacGeoBlock', tags, geoblockEnabled],
     queryFn: async () => {
+      if (!geoblockEnabled) {
+        return false
+      }
+
       // 1) Bypass check for internal team for testing
       if (isSendSquadMember(tags)) {
         return false
@@ -49,6 +54,6 @@ export const useOFACGeoBlock = (): UseQueryResult<boolean> => {
 
       return countryCode === 'US' || OFACblocklist.includes(countryCode)
     },
-    enabled: !isLoadingUser,
+    enabled: !isLoadingUser || !geoblockEnabled,
   })
 }
