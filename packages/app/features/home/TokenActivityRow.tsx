@@ -50,6 +50,16 @@ export function TokenActivityRow({
     }
   }
 
+  console.log('=====================================')
+  console.log('amount', amount)
+  console.log('date', date)
+  console.log('eventName', eventName)
+  console.log('subtext', subtext)
+  console.log('isERC20Transfer', isERC20Transfer)
+  console.log('isETHReceive', isETHReceive)
+  console.log('activity', activity)
+  console.log('=====================================')
+
   return (
     <XStack
       width={'100%'}
