@@ -461,18 +461,21 @@ export type Database = {
           id: number
           referred_id: string
           referrer_id: string
+          tag: string
         }
         Insert: {
           created_at?: string
           id?: number
           referred_id: string
           referrer_id: string
+          tag: string
         }
         Update: {
           created_at?: string
           id?: number
           referred_id?: string
           referrer_id?: string
+          tag?: string
         }
         Relationships: [
           {
@@ -488,6 +491,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_tag_fkey"
+            columns: ["tag"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["name"]
           },
         ]
       }
@@ -828,244 +838,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      send_earn_create: {
-        Row: {
-          abi_idx: number
-          block_num: number
-          block_time: number
-          caller: string
-          chain_id: number
-          collections: string
-          event_id: string
-          fee: number
-          fee_recipient: string
-          id: number
-          ig_name: string
-          initial_owner: string
-          log_addr: string
-          log_idx: number
-          salt: string
-          send_earn: string
-          src_name: string
-          tx_hash: string
-          tx_idx: number
-          vault: string
-        }
-        Insert: {
-          abi_idx: number
-          block_num: number
-          block_time: number
-          caller: string
-          chain_id: number
-          collections: string
-          event_id?: string
-          fee: number
-          fee_recipient: string
-          id?: never
-          ig_name: string
-          initial_owner: string
-          log_addr: string
-          log_idx: number
-          salt: string
-          send_earn: string
-          src_name: string
-          tx_hash: string
-          tx_idx: number
-          vault: string
-        }
-        Update: {
-          abi_idx?: number
-          block_num?: number
-          block_time?: number
-          caller?: string
-          chain_id?: number
-          collections?: string
-          event_id?: string
-          fee?: number
-          fee_recipient?: string
-          id?: never
-          ig_name?: string
-          initial_owner?: string
-          log_addr?: string
-          log_idx?: number
-          salt?: string
-          send_earn?: string
-          src_name?: string
-          tx_hash?: string
-          tx_idx?: number
-          vault?: string
-        }
-        Relationships: []
-      }
-      send_earn_deposit: {
-        Row: {
-          abi_idx: number
-          assets: number
-          block_num: number
-          block_time: number
-          chain_id: number
-          event_id: string
-          id: number
-          ig_name: string
-          log_addr: string
-          log_idx: number
-          owner: string
-          sender: string
-          shares: number
-          src_name: string
-          tx_hash: string
-          tx_idx: number
-        }
-        Insert: {
-          abi_idx: number
-          assets: number
-          block_num: number
-          block_time: number
-          chain_id: number
-          event_id?: string
-          id?: never
-          ig_name: string
-          log_addr: string
-          log_idx: number
-          owner: string
-          sender: string
-          shares: number
-          src_name: string
-          tx_hash: string
-          tx_idx: number
-        }
-        Update: {
-          abi_idx?: number
-          assets?: number
-          block_num?: number
-          block_time?: number
-          chain_id?: number
-          event_id?: string
-          id?: never
-          ig_name?: string
-          log_addr?: string
-          log_idx?: number
-          owner?: string
-          sender?: string
-          shares?: number
-          src_name?: string
-          tx_hash?: string
-          tx_idx?: number
-        }
-        Relationships: []
-      }
-      send_earn_new_affiliate: {
-        Row: {
-          abi_idx: number
-          affiliate: string
-          block_num: number
-          block_time: number
-          chain_id: number
-          event_id: string
-          id: number
-          ig_name: string
-          log_addr: string
-          log_idx: number
-          send_earn_affiliate: string
-          src_name: string
-          tx_hash: string
-          tx_idx: number
-          send_earn_affiliate_vault: unknown | null
-        }
-        Insert: {
-          abi_idx: number
-          affiliate: string
-          block_num: number
-          block_time: number
-          chain_id: number
-          event_id?: string
-          id?: never
-          ig_name: string
-          log_addr: string
-          log_idx: number
-          send_earn_affiliate: string
-          src_name: string
-          tx_hash: string
-          tx_idx: number
-        }
-        Update: {
-          abi_idx?: number
-          affiliate?: string
-          block_num?: number
-          block_time?: number
-          chain_id?: number
-          event_id?: string
-          id?: never
-          ig_name?: string
-          log_addr?: string
-          log_idx?: number
-          send_earn_affiliate?: string
-          src_name?: string
-          tx_hash?: string
-          tx_idx?: number
-        }
-        Relationships: []
-      }
-      send_earn_withdraw: {
-        Row: {
-          abi_idx: number
-          assets: number
-          block_num: number
-          block_time: number
-          chain_id: number
-          event_id: string
-          id: number
-          ig_name: string
-          log_addr: string
-          log_idx: number
-          owner: string
-          receiver: string
-          sender: string
-          shares: number
-          src_name: string
-          tx_hash: string
-          tx_idx: number
-        }
-        Insert: {
-          abi_idx: number
-          assets: number
-          block_num: number
-          block_time: number
-          chain_id: number
-          event_id?: string
-          id?: never
-          ig_name: string
-          log_addr: string
-          log_idx: number
-          owner: string
-          receiver: string
-          sender: string
-          shares: number
-          src_name: string
-          tx_hash: string
-          tx_idx: number
-        }
-        Update: {
-          abi_idx?: number
-          assets?: number
-          block_num?: number
-          block_time?: number
-          chain_id?: number
-          event_id?: string
-          id?: never
-          ig_name?: string
-          log_addr?: string
-          log_idx?: number
-          owner?: string
-          receiver?: string
-          sender?: string
-          shares?: number
-          src_name?: string
-          tx_hash?: string
-          tx_idx?: number
-        }
-        Relationships: []
       }
       send_liquidity_pools: {
         Row: {
@@ -1610,47 +1382,6 @@ export type Database = {
         }
         Relationships: []
       }
-      referrer: {
-        Row: {
-          about: string | null
-          address: string | null
-          all_tags: string[] | null
-          avatar_url: string | null
-          chain_id: number | null
-          id: string | null
-          is_public: boolean | null
-          name: string | null
-          refcode: string | null
-          send_id: number | null
-          sendid: number | null
-          tag: string | null
-          x_username: string | null
-        }
-        Relationships: []
-      }
-      send_earn_activity: {
-        Row: {
-          assets: number | null
-          block_num: number | null
-          block_time: number | null
-          log_addr: string | null
-          owner: string | null
-          sender: string | null
-          shares: number | null
-          tx_hash: string | null
-          type: string | null
-        }
-        Relationships: []
-      }
-      send_earn_balances: {
-        Row: {
-          assets: number | null
-          log_addr: string | null
-          owner: string | null
-          shares: number | null
-        }
-        Relationships: []
-      }
     }
     Functions: {
       calculate_and_insert_send_ceiling_verification: {
@@ -1752,7 +1483,7 @@ export type Database = {
       get_affiliate_referrals: {
         Args: Record<PropertyKey, never>
         Returns: {
-          send_plus_minus: number
+          referred_id: string
           avatar_url: string
           tag: string
           created_at: string
@@ -1851,33 +1582,6 @@ export type Database = {
           user_id: string
         }
       }
-      send_earn_affiliate_vault: {
-        Args: {
-          "": unknown
-        }
-        Returns: {
-          abi_idx: number
-          block_num: number
-          block_time: number
-          caller: string
-          chain_id: number
-          collections: string
-          event_id: string
-          fee: number
-          fee_recipient: string
-          id: number
-          ig_name: string
-          initial_owner: string
-          log_addr: string
-          log_idx: number
-          salt: string
-          send_earn: string
-          src_name: string
-          tx_hash: string
-          tx_idx: number
-          vault: string
-        }[]
-      }
       sum_qualification_sends: {
         Args: {
           distribution_number: number
@@ -1916,12 +1620,6 @@ export type Database = {
       key_type_enum: "ES256"
       lookup_type_enum: "sendid" | "tag" | "refcode" | "address" | "phone"
       tag_status: "pending" | "confirmed"
-      temporal_status:
-        | "initialized"
-        | "submitted"
-        | "sent"
-        | "confirmed"
-        | "failed"
       verification_type:
         | "tag_registration"
         | "tag_referral"
@@ -2003,56 +1701,6 @@ export type Database = {
           workflow_id?: string
         }
         Relationships: []
-      }
-      send_earn_deposits: {
-        Row: {
-          activity_id: number | null
-          assets: number | null
-          block_num: number | null
-          created_at: string
-          error_message: string | null
-          owner: string | null
-          status: Database["public"]["Enums"]["temporal_status"]
-          updated_at: string
-          user_op_hash: string | null
-          vault: string | null
-          workflow_id: string
-        }
-        Insert: {
-          activity_id?: number | null
-          assets?: number | null
-          block_num?: number | null
-          created_at?: string
-          error_message?: string | null
-          owner?: string | null
-          status?: Database["public"]["Enums"]["temporal_status"]
-          updated_at?: string
-          user_op_hash?: string | null
-          vault?: string | null
-          workflow_id: string
-        }
-        Update: {
-          activity_id?: number | null
-          assets?: number | null
-          block_num?: number | null
-          created_at?: string
-          error_message?: string | null
-          owner?: string | null
-          status?: Database["public"]["Enums"]["temporal_status"]
-          updated_at?: string
-          user_op_hash?: string | null
-          vault?: string | null
-          workflow_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fk_activity"
-            columns: ["activity_id"]
-            isOneToOne: false
-            referencedRelation: "activity"
-            referencedColumns: ["id"]
-          },
-        ]
       }
     }
     Views: {
