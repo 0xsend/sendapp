@@ -1,13 +1,12 @@
 import { base64urlnopad } from '@scure/base'
 import { assert } from 'app/utils/assert'
 import { type ParsedCredAuthData, parseCreateResponse } from 'app/utils/passkeys'
-import { applicationId } from 'expo-application'
-import { Platform } from 'react-native'
 import { create, isSupported } from 'react-native-passkeys'
 import type {
   PublicKeyCredentialCreationOptionsJSON,
   RegistrationResponseJSON,
 } from 'react-native-passkeys/build/ReactNativePasskeys.types'
+import { rpId } from './rpId'
 
 export async function createPasskey({
   user,
@@ -75,10 +74,3 @@ export function createSendAccountPasskeyArgs({
     attestation: undefined,
   } as const satisfies PublicKeyCredentialCreationOptionsJSON
 }
-
-const bundleId = applicationId?.split('.').reverse().join('.')
-export const rpId = Platform.select({
-  web: undefined,
-  ios: bundleId,
-  android: bundleId?.replaceAll('_', '-'),
-})
