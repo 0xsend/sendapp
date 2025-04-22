@@ -3,8 +3,8 @@ import { base64urlnopad } from '@scure/base'
 import { get, isSupported } from 'react-native-passkeys'
 import { bytesToHex, encodeAbiParameters, getAbiItem, type Hex, hexToBytes, isHex } from 'viem'
 import { assert } from './assert'
+import { getRpId } from './getRpId'
 import { parseAndNormalizeSig, parseSignResponse } from './passkeys'
-import { rpId } from './rpId'
 
 /**
  * Signs a challenge using the user's passkey and returns the signature in a format that matches the ABI of a signature
@@ -29,7 +29,7 @@ export async function signChallenge(
   }
 
   const sign = await get({
-    rpId,
+    rpId: getRpId(),
     challenge,
     allowCredentials: allowedCredentials.map(({ id }) => ({
       id,
