@@ -13,6 +13,7 @@ import {
 } from '@my/ui'
 import { useCallback, useEffect, useState, useMemo } from 'react'
 import { Timer } from '@tamagui/lucide-icons'
+import { useGeoBlock } from '../../utils/useOFACGeoBlock'
 import {
   useReadBaseJackpotLpPoolTotal,
   useReadBaseJackpotLastJackpotEndTime,
@@ -38,6 +39,7 @@ export const JackpotCard = () => {
   const { data: roundDuration, isLoading: isLoadingDuration } =
     useReadBaseJackpotRoundDurationInSeconds()
   const { data: tokenDecimals, isLoading: isLoadingDecimals } = useReadBaseJackpotTokenDecimals()
+  const { data: isGeoBlocked, isLoading: isLoadingGeoBlock } = useGeoBlock()
 
   const jackpotEndTime = useMemo(() => {
     if (lastJackpotEndTime === undefined || roundDuration === undefined) return null
@@ -110,9 +112,16 @@ export const JackpotCard = () => {
   const formatNumber = (num: number) => (num < 10 ? `0${num}` : `${num}`)
 
   const isLoading = isLoadingPoolTotal || isLoadingEndTime || isLoadingDuration || isLoadingDecimals
+  const isBuyButtonDisabled = isLoadingGeoBlock || isGeoBlocked
 
   return (
-    <Card p={'$5'} w={'100%'} jc="space-between" $gtLg={{ p: '$6', h: 'auto', mih: 244 }} mih={184}>
+    <Card
+      padding={'$5'}
+      w={'100%'}
+      jc="space-between"
+      $gtLg={{ padding: '$6', height: 'auto', minHeight: 244 }}
+      minHeight={184}
+    >
       <XStack w={'100%'} zIndex={4} h="100%">
         <YStack gap={'$2'} w={'100%'}>
           <YStack gap={'$2.5'} jc="space-between">
@@ -125,7 +134,7 @@ export const JackpotCard = () => {
                   fontWeight={'500'}
                   textTransform={'uppercase'}
                   lineHeight={0}
-                  col={'$color10'}
+                  color={'$color10'}
                 >
                   Current Sendpot
                 </Label>
@@ -145,7 +154,7 @@ export const JackpotCard = () => {
             >
               {isLoading ? <Spinner /> : formattedJackpotAmount}
             </BigHeading>
-            <Paragraph fontSize={'$6'} fontWeight={'500'} zIndex={1} $sm={{ mt: '$4' }}>
+            <Paragraph fontSize={'$6'} fontWeight={'500'} zIndex={1} $sm={{ marginTop: '$4' }}>
               SEND
             </Paragraph>
           </XStack>
@@ -165,15 +174,16 @@ export const JackpotCard = () => {
               </H3>
             </XStack>
             <XStack ai="center">
-              <Paragraph color="$color10" fontSize="$4" ta="left">
+              <Paragraph color="$color10" fontSize="$4" textAlign="left">
                 Drawing occurs on: {isLoading ? 'Loading...' : jackpotEndTimeString}
               </Paragraph>
             </XStack>
           </YStack>
           <XStack w="100%" mt="$2">
-            <Stack f={1} w="100%" maw={350}>
+            <Stack f={1} w="100%" maw={350} gap="$2">
               <LinkableButton
                 href="/sendpot/buy-tickets"
+                disabled={isBuyButtonDisabled}
                 theme={'green'}
                 br="$4"
                 px={'$3.5'}
@@ -198,6 +208,11 @@ export const JackpotCard = () => {
                   </LinkableButton.Text>
                 </XStack>
               </LinkableButton>
+              {isGeoBlocked && (
+                <Paragraph color="$red10" fontSize="$3" textAlign="center">
+                  Ticket purchases are not available in your region currently.
+                </Paragraph>
+              )}
             </Stack>
           </XStack>
         </YStack>

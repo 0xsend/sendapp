@@ -84,8 +84,8 @@ export function BuyTicketsScreen() {
 
   const displayTotalCost = useMemo(() => {
     if (typeof totalCostBigInt !== 'bigint' || tokenDecimals === undefined) return '...'
-    return formatUnits(totalCostBigInt, Number(tokenDecimals))
-  }, [totalCostBigInt, tokenDecimals])
+    return formatAmount(formatUnits(totalCostBigInt, Number(tokenDecimals)), 10, sendCoin?.decimals)
+  }, [totalCostBigInt, tokenDecimals, sendCoin?.decimals])
 
   const handleProceedToConfirm = () => {
     if (insufficientFunds) {

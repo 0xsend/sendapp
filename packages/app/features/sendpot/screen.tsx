@@ -1,9 +1,7 @@
-import { XStack, YStack, Card, Spinner } from '@my/ui'
+import { XStack, YStack, Card } from '@my/ui'
 import { JackpotCard } from './JackpotCard'
 import { DrawingHistory } from './DrawingHistory'
-import { useUser } from 'app/utils/useUser'
-import { isSendSquadMember } from 'app/utils/isSendSquadMember'
-import { ComingSoon } from 'app/components/ComingSoon'
+import SendpotRiskDialog from './SendpotRiskDialog'
 export function SendPotScreen() {
   return (
     <XStack
@@ -26,23 +24,8 @@ export function SendPotScreen() {
             <DrawingHistory />
           </Card>
         </YStack>
+        <SendpotRiskDialog />
       </YStack>
     </XStack>
   )
-}
-
-export function SendPotOrComingSoonScreen() {
-  const { tags, isLoading: isLoadingUser } = useUser()
-
-  if (isLoadingUser) {
-    return <Spinner size="large" color={'$color12'} />
-  }
-
-  const isMember = isSendSquadMember(tags)
-
-  if (!isMember) {
-    return <ComingSoon />
-  }
-
-  return <SendPotScreen />
 }

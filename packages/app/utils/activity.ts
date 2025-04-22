@@ -35,7 +35,11 @@ import {
   isTemporalTokenTransfersEvent,
   temporalEventNameFromStatus,
 } from './zod/activity/TemporalTransfersEventSchema'
-import { SENDPOT_CONTRACT_ADDRESS } from 'app/data/sendpot'
+import {
+  calculateTicketsFromWei,
+  COST_PER_TICKET_WEI,
+  SENDPOT_CONTRACT_ADDRESS,
+} from 'app/data/sendpot'
 
 const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
   Object.values(addresses).map((a) => [a, label])
@@ -319,9 +323,9 @@ export function eventNameFromActivity({
 
   switch (true) {
     case isSendPotTicketPurchase(activity):
-      return 'Ticket Purchase'
+      return 'Bought'
     case isSendPotWin(activity):
-      return 'SendPot Win'
+      return 'Sendpot Win'
     case isTemporalSendEarnDepositEvent(activity):
       return activity.data.status === 'failed'
         ? 'Deposit Failed'
@@ -427,8 +431,10 @@ export function phraseFromActivity({
   const isSwapTransfer = isActivitySwapTransfer(activity, swapRouters, liquidityPools)
 
   switch (true) {
+    case isSendPotWin(activity):
+      return 'won'
     case isSendPotTicketPurchase(activity):
-      return 'Bought Tickets'
+      return 'bought'
     case isTemporalSendEarnDepositEvent(activity):
       return activity.data.status === 'failed'
         ? 'Failed to deposit to Send Earn'
@@ -528,8 +534,10 @@ export function subtextFromActivity({
   const isSwapTransfer = isActivitySwapTransfer(activity, swapRouters, liquidityPools)
 
   if (isSendPotTicketPurchase(activity)) {
-    return null // No subtext for ticket purchases
+    const tickets = calculateTicketsFromWei(data.v)
+    return `${tickets} ticket${tickets > 1 ? 's' : ''}`
   }
+
   if (isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity)) {
     return activity.data.tags.map((t) => `/${t}`).join(', ')
   }
