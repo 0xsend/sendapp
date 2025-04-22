@@ -9,7 +9,7 @@ import { useSendAccount } from 'app/utils/send-accounts'
 import { formatUnits } from 'viem'
 
 import type { Functions } from '@my/supabase/database.types'
-import { calculateActualTickets, MAX_JACKPOT_HISTORY, NO_WINNER_ADDRESS } from 'app/data/sendpot'
+import { calculateTicketsFromBps, MAX_JACKPOT_HISTORY, NO_WINNER_ADDRESS } from 'app/data/sendpot'
 import { byteaToHex } from 'app/utils/byteaToHex'
 import { useUserPendingJackpotTickets } from './hooks/useUserPendingJackpotTickets'
 import { useUserJackpotSummary } from './hooks/useUserJackpotSummary'
@@ -149,7 +149,7 @@ export const DrawingHistory = () => {
   const renderDrawingEntry = ({ item }: { item: DrawingHistoryEntry }) => {
     const isCurrent = item.result === 'pending'
     const ticketsBps = item.totalTicketsPurchased
-    const actualTickets = calculateActualTickets(ticketsBps)
+    const actualTickets = calculateTicketsFromBps(ticketsBps)
     const displayPrizePool = item.prizePool
 
     const itemIsLoadingCurrent =

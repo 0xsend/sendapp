@@ -3,15 +3,15 @@ import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from '../_app'
 import { TopNav } from 'app/components/TopNav'
-import { SendPotOrComingSoonScreen } from 'app/features/sendpot/screen'
+import { SendPotScreen } from 'app/features/sendpot/screen'
 
 export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | SendPot</title>
+        <title>Send | Sendpot</title>
       </Head>
-      <SendPotOrComingSoonScreen />
+      <SendPotScreen />
     </>
   )
 }
