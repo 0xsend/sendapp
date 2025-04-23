@@ -76,16 +76,16 @@ export const BottomNavBar = () => {
                 key={tab.href}
                 href={tab.href}
                 chromeless
-                backgroundColor={isActiveRoute ? hoverStyles.background : 'transparent'}
+                backgroundColor={isActiveRoute ? hoverStyles.backgroundColor : 'transparent'}
                 hoverStyle={{
-                  backgroundColor: isActiveRoute ? hoverStyles.background : 'transparent',
+                  backgroundColor: isActiveRoute ? hoverStyles.backgroundColor : 'transparent',
                 }}
                 pressStyle={{
-                  backgroundColor: isActiveRoute ? hoverStyles.background : 'transparent',
+                  backgroundColor: isActiveRoute ? hoverStyles.backgroundColor : 'transparent',
                   borderColor: 'transparent',
                 }}
                 focusStyle={{
-                  backgroundColor: isActiveRoute ? hoverStyles.background : 'transparent',
+                  backgroundColor: isActiveRoute ? hoverStyles.backgroundColor : 'transparent',
                 }}
                 p={'$2'}
                 br={'$3'}
