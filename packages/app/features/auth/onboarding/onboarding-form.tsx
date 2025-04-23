@@ -13,6 +13,7 @@ import {
 import { base16, base64urlnopad } from '@scure/base'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { api } from 'app/utils/api'
+import { asciiToByteArray } from 'app/utils/asciiToByteArray'
 import { assert } from 'app/utils/assert'
 import { base64URLNoPadToBase16 } from 'app/utils/base64ToBase16'
 import { createPasskey } from 'app/utils/createPasskey'
@@ -54,7 +55,7 @@ export const OnboardingForm = () => {
 
       const keySlot = 0
       const passkeyName = `${user.id}.${keySlot}` // 64 bytes max
-      const challenge = base64urlnopad.encode(Buffer.from('foobar'))
+      const challenge = base64urlnopad.encode(asciiToByteArray('foobar'))
 
       const [rawCred, authData] = await createPasskey({ user, keySlot, challenge, accountName })
 
