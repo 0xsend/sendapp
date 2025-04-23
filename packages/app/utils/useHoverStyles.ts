@@ -1,7 +1,7 @@
 import { useThemeSetting } from '@tamagui/next-theme'
 
 export const useHoverStyles = (): {
-  background: `rgba(${string})`
+  backgroundColor: `rgba(${string})`
   transition: string
   cursor: string
 } => {
@@ -12,7 +12,7 @@ export const useHoverStyles = (): {
     : 'rgba(0,0,0, 0.1)'
 
   return {
-    background: rowHoverBC,
+    backgroundColor: rowHoverBC,
     transition: 'background 0.2s ease-in-out',
     cursor: 'pointer',
   }

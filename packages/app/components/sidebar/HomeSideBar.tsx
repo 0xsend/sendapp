@@ -30,6 +30,7 @@ import { NavSheet } from '../NavSheet'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { useUser } from 'app/utils/useUser'
 import { ReferralLink } from '../ReferralLink'
+import { usePathname } from 'app/utils/usePathname'
 
 const links = [
   {
@@ -64,14 +65,15 @@ const links = [
 const HomeSideBar = ({ ...props }: YStackProps) => {
   return (
     <SideBar {...props} ai={'flex-start'} px="$7">
-      <Link href={'/'}>
-        <IconSendLogo color={'$color12'} size={'$2.5'} />
-      </Link>
-
-      <YStack gap={'$7'} pb={'$15'} jc={'space-between'}>
-        {links.map((link) => (
-          <SideBarNavLink key={link.href} {...link} />
-        ))}
+      <YStack width={'100%'}>
+        <Link href={'/'}>
+          <IconSendLogo color={'$color12'} size={'$2.5'} />
+        </Link>
+        <YStack gap={'$2.5'} pt={'$12'} width={'100%'}>
+          {links.map((link) => (
+            <SideBarNavLink key={link.href} {...link} />
+          ))}
+        </YStack>
       </YStack>
       <DesktopAccountMenuEntry />
     </SideBar>
@@ -79,59 +81,44 @@ const HomeSideBar = ({ ...props }: YStackProps) => {
 }
 
 const DesktopAccountMenuEntry = () => {
-  const { profile, tags, isLoadingProfile, isLoadingTags } = useUser()
+  const { profile, isLoadingProfile } = useUser()
   const hoverStyles = useHoverStyles()
-  const tagToShow = tags?.filter((tag) => tag.status === 'confirmed')[0]
+  const location = usePathname()
+  const parts = location.split('/').filter(Boolean)
+  const isActiveRoute =
+    location === 'account' || parts.includes('account') || 'account'.startsWith(`/${parts[0]}`)
 
   return (
     <LinkableButton
       href={'/account'}
       width={'100%'}
       jc={'flex-start'}
-      px={'$4'}
+      px={'$3.5'}
       py={'$2.5'}
       h={'auto'}
-      br={'$6'}
-      height={82}
-      bc={'$color0'}
-      backgroundColor={'$color0'}
-      opacity={isLoadingProfile || isLoadingTags ? 0 : 1}
+      br={'$4'}
+      bw={0}
+      backgroundColor={isActiveRoute ? hoverStyles.backgroundColor : 'transparent'}
+      opacity={isLoadingProfile ? 0 : 1}
       animateOnly={['opacity']}
       animation="200ms"
-      pressStyle={{
-        backgroundColor: '$color0',
-        borderColor: 'transparent',
-      }}
-      hoverStyle={{ backgroundColor: hoverStyles.background, borderColor: 'transparent' }}
-      focusStyle={{
-        backgroundColor: '$color0',
-      }}
+      hoverStyle={hoverStyles}
+      pressStyle={hoverStyles}
+      focusStyle={hoverStyles}
     >
-      <Avatar circular={true} size={'$4.5'}>
+      <Avatar circular={true} size={'$3.5'}>
         <Avatar.Image src={profile?.avatar_url ?? ''} w="100%" h="100%" objectFit="cover" />
         <Avatar.Fallback jc={'center'} ai="center" theme="green_active" bc="$color2">
           <IconAccount size={'$2'} $theme-light={{ color: '$color12' }} />
         </Avatar.Fallback>
       </Avatar>
-      <YStack jc={'center'} f={1} testID={'account-menu-entry'}>
-        <Paragraph size={'$7'} numberOfLines={1} f={1} textOverflow={'ellipsis'}>
-          {profile?.name ?? `#${profile?.send_id}`}
-        </Paragraph>
-        {tagToShow && (
-          <Paragraph
-            bc={'$color1'}
-            size={'$2'}
-            maxWidth={'100%'}
-            numberOfLines={1}
-            px={'$2'}
-            py={'$1.5'}
-            textOverflow={'ellipsis'}
-            br={'$2'}
-          >
-            {`/${tagToShow.name}`}
-          </Paragraph>
-        )}
-      </YStack>
+      <Paragraph
+        size={'$6'}
+        color={isActiveRoute ? '$color12' : '$lightGrayTextField'}
+        $theme-light={{ color: isActiveRoute ? '$color12' : '$darkGrayTextField' }}
+      >
+        Account
+      </Paragraph>
     </LinkableButton>
   )
 }
