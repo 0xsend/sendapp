@@ -6,7 +6,6 @@ export default function Screen() {
     <>
       <Stack.Screen
         options={{
-          headerShown: false,
           title: 'Sign Up',
         }}
       />

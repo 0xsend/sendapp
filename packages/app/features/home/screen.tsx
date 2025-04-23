@@ -160,7 +160,7 @@ export function HomeScreen() {
                   <Paragraph>This should never happen.</Paragraph>
                   <Button
                     onPress={() => {
-                      router.push('_sitemap')
+                      router.push('/_sitemap')
                     }}
                   >
                     Sitemap

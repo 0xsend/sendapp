@@ -7,7 +7,6 @@ export default function AuthLayout() {
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
-
       <Container
         safeAreaProps={{
           edges: ['top', 'bottom', 'left', 'right'],
