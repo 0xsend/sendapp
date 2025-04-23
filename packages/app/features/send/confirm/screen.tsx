@@ -219,7 +219,10 @@ export function SendConfirm() {
       const validatedUserOp = await validateUserOp(userOp)
       assert(!!validatedUserOp, 'Operation expected to fail')
 
-      const { workflowId } = await transfer({ userOp: validatedUserOp, note })
+      const { workflowId } = await transfer({
+        userOp: validatedUserOp,
+        ...(note && { note: encodeURIComponent(note) }),
+      })
 
       if (workflowId) {
         await queryClient.invalidateQueries({

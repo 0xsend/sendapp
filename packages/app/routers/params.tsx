@@ -4,6 +4,7 @@ import { type allCoins, allCoinsDict } from 'app/data/coins'
 import { createParam } from 'solito'
 import { type Address, isAddress } from 'viem'
 import { useCoin } from 'app/provider/coins'
+import { useCallback } from 'react'
 
 export type RootParams = {
   nav?: 'home'
@@ -140,9 +141,12 @@ export const useSendToken = () => {
 export const useNote = () => {
   const [note, setNoteParam] = useSendParam('note', {
     initial: undefined,
+    stringify: (note) => {
+      if (!note) return ''
+      return encodeURIComponent(note)
+    },
     parse: (value) => {
-      if (value === '') return undefined
-      if (!value || !value[0]) return undefined
+      if (!value || !value[0] || value === '') return undefined
       return Array.isArray(value) ? decodeURIComponent(value[0]) : decodeURIComponent(value)
     },
   })
@@ -157,6 +161,17 @@ export const useSendScreenParams = () => {
   const [sendToken] = useSendToken()
   const [note] = useNote()
 
+  const setEncodedParams = useCallback(
+    (params: Parameters<typeof setParams>[0], options?: Parameters<typeof setParams>[1]) => {
+      const encodedParams = {
+        ...params,
+        note: params.note ? encodeURIComponent(params.note) : undefined,
+      }
+      setParams(encodedParams, options)
+    },
+    [setParams]
+  )
+
   return [
     {
       idType,
@@ -165,7 +180,7 @@ export const useSendScreenParams = () => {
       sendToken,
       note,
     },
-    setParams,
+    setEncodedParams,
   ] as const
 }
 
