@@ -21,10 +21,7 @@ export const temporalRouter = createTRPCRouter({
     .input(
       z.object({
         userOp: z.custom<UserOperation<'v0.7'>>(),
-        note: z
-          .string()
-          .transform((str) => (str === '' ? undefined : str))
-          .optional(),
+        note: z.string().optional(),
       })
     )
     .mutation(
@@ -34,7 +31,9 @@ export const temporalRouter = createTRPCRouter({
           session: { user },
         },
       }) => {
-        const noteValidationError = note ? formFields.note.safeParse(note).error : null
+        const noteValidationError = note
+          ? formFields.note.safeParse(decodeURIComponent(note)).error
+          : null
         assert(!noteValidationError, 'Note failed to match validation constraints')
         const client = await getTemporalClient().catch((e) => {
           throw new TRPCError({
@@ -62,6 +61,7 @@ export const temporalRouter = createTRPCRouter({
               message: e.message,
             })
           })
+
         const { workflowId } = await startWorkflow({
           client,
           workflow: 'transfer',
