@@ -14,12 +14,14 @@ export function HomeLayout({
   children: React.ReactNode
   TopNav?: React.ReactNode
 } & ScrollViewProps & { fullHeight?: boolean }) {
-  const { onScroll, onLayout, onContentSizeChange } = useScrollDirection()
+  const { onScroll, onContentSizeChange, ref } = useScrollDirection()
+
   return (
     <HomeSideBarWrapper>
       <BottomNavBarWrapper>
         <TagSearchProvider>
           <ScrollView
+            ref={ref}
             mih="100%"
             contentContainerStyle={{
               mih: '100%',
@@ -27,7 +29,6 @@ export function HomeLayout({
             }}
             scrollEventThrottle={128}
             onScroll={onScroll}
-            onLayout={onLayout}
             onContentSizeChange={onContentSizeChange}
             showsVerticalScrollIndicator={false}
             {...props}
