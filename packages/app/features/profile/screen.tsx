@@ -209,6 +209,7 @@ const TransactionEntry = ({
             ai={'center'}
             fd={sent ? 'row-reverse' : 'row'}
             style={{ width: 'max-content' }}
+            alignSelf={sent ? 'flex-end' : 'flex-start'}
           >
             <AvatarProfile
               profile={sent ? currentUserProfile : otherUserProfile}
