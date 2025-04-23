@@ -1,4 +1,4 @@
-import { Card, type CardProps, Spinner, RecyclerList } from '@my/ui'
+import { Card, type CardProps, Spinner, RecyclerList, useMedia } from '@my/ui'
 import {
   layoutProviderMaker,
   dataProviderMaker,
@@ -25,6 +25,9 @@ export const TokenActivityFeed = ({
 } & CardProps) => {
   const { isAtEnd } = useScrollDirection()
   const [layoutSize, setLayoutSize] = useState<Dimension>({ width: 0, height: 0 })
+  const media = useMedia()
+
+  const layoutSizeAdjustment = media.gtLg ? 32 : 14
 
   const {
     data,
@@ -81,13 +84,13 @@ export const TokenActivityFeed = ({
     <Card {...props} f={1} onLayout={onCardLayout}>
       {dataProvider.getSize() > 0 && layoutSize.height > 0 ? (
         <RecyclerList
-          style={{ flex: 1 }}
+          style={{ flex: 1, overflow: 'auto' }}
           dataProvider={dataProvider}
           rowRenderer={_renderRow}
           layoutProvider={_layoutProvider}
           renderFooter={renderFooter}
           // Need this for SSR
-          layoutSize={{ width: layoutSize.width - 32, height: layoutSize.height }}
+          layoutSize={{ width: layoutSize.width - layoutSizeAdjustment, height: layoutSize.height }}
           // Need this so it rerenders when layout changes
           key={`recycler-${layoutSize.width}-${layoutSize.height}`}
         />
