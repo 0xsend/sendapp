@@ -204,12 +204,7 @@ const TransactionEntry = ({
           onPress={onPress}
           cursor={'pointer'}
         >
-          <XStack
-            gap={'$3'}
-            ai={'center'}
-            fd={sent ? 'row-reverse' : 'row'}
-            style={{ width: 'max-content' }}
-          >
+          <XStack gap={'$3'} ai={'center'} fd={sent ? 'row-reverse' : 'row'}>
             <AvatarProfile
               profile={sent ? currentUserProfile : otherUserProfile}
               mx={0}
