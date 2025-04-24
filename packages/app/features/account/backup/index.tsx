@@ -39,7 +39,7 @@ import { useLink } from 'solito/link'
 import { encodeFunctionData } from 'viem'
 import { useBalance, useEstimateFeesPerGas } from 'wagmi'
 import { z } from 'zod'
-import { SettingsHeader } from 'app/features/account/settings/components/SettingsHeader'
+import { SettingsHeader } from 'app/features/account/components/SettingsHeader'
 import { useThemeSetting } from '@tamagui/next-theme'
 
 export const BackupScreen = () => {
@@ -148,7 +148,7 @@ const WebauthnCreds = ({
   })[]
 }) => {
   const addPasskeyLink = useLink({
-    href: '/account/settings/backup/create',
+    href: '/account/backup/create',
   })
 
   return (
@@ -196,7 +196,7 @@ const WebAuthnCred = ({
   const isActive = isLoadingActiveSigningKeys || activeIndex !== -1 // default to active if loading (strongmind check)
   const onchainSlot = activeSigningKeys?.[1][activeIndex]
   const link = useLink({
-    href: `/account/settings/backup/confirm/${cred?.id}`,
+    href: `/account/backup/confirm/${cred?.id}`,
   })
 
   return (

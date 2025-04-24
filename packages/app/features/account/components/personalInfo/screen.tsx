@@ -20,9 +20,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useProfileMutation } from 'app/utils/useUserPersonalDataMutation'
 import { useQuery } from '@tanstack/react-query'
 import { adjustUTCDateForTimezone } from 'app/utils/dateHelper'
-import { SettingsHeader } from 'app/features/account/settings/components/SettingsHeader'
-import { FieldWithLabel } from 'app/features/account/settings/components/FieldWithLabel'
-import { ReadOnlyFieldWithLabel } from 'app/features/account/settings/components/ReadOnlyFieldWithLabel'
+import { SettingsHeader } from 'app/features/account/components/SettingsHeader'
+import { FieldWithLabel } from 'app/features/account/components/FieldWithLabel'
+import { ReadOnlyFieldWithLabel } from 'app/features/account/components/ReadOnlyFieldWithLabel'
 
 enum FormState {
   Overview = 'Overview',

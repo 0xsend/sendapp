@@ -17,9 +17,9 @@ import { UploadAvatar, type UploadAvatarRefObject } from '../uploadProfileImage/
 import { useCallback, useRef, useState } from 'react'
 import type { Tables } from '@my/supabase/database.types'
 import { Check } from '@tamagui/lucide-icons'
-import { SettingsHeader } from 'app/features/account/settings/components/SettingsHeader'
-import { ReadOnlyFieldWithLabel } from 'app/features/account/settings/components/ReadOnlyFieldWithLabel'
-import { FieldWithLabel } from 'app/features/account/settings/components/FieldWithLabel'
+import { SettingsHeader } from 'app/features/account/components/SettingsHeader'
+import { ReadOnlyFieldWithLabel } from 'app/features/account/components/ReadOnlyFieldWithLabel'
+import { FieldWithLabel } from 'app/features/account/components/FieldWithLabel'
 import { useForm } from 'react-hook-form'
 import type { z } from 'zod'
 

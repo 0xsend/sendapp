@@ -3,7 +3,7 @@ import type { ReactElement, ReactNode } from 'react'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { ChevronRight } from '@tamagui/lucide-icons'
 
-export function SettingsNavLink({
+export function AccountNavLink({
   text,
   icon,
   ...props
@@ -23,7 +23,7 @@ export function SettingsNavLink({
       >
         <XStack gap="$3.5" ai="center">
           {icon}
-          <Paragraph size={'$6'}>{text}</Paragraph>
+          <Paragraph size={'$5'}>{text}</Paragraph>
         </XStack>
         <ChevronRight
           size={'$1'}

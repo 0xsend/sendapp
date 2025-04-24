@@ -7,7 +7,7 @@ import {
 } from '@my/wagmi'
 import { base16, base64 } from '@scure/base'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { SettingsHeader } from 'app/features/account/settings/components/SettingsHeader'
+import { SettingsHeader } from 'app/features/account/components/SettingsHeader'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { assert } from 'app/utils/assert'
 import { base64URLNoPadToBase16 } from 'app/utils/base64ToBase16'
@@ -35,7 +35,7 @@ export const CreatePasskeyScreen = () => {
     <YStack w={'100%'} gap={'$3.5'}>
       <SettingsHeader>Passkeys</SettingsHeader>
       <CreatePasskeyForm
-        onPasskeySaved={(cred) => router.push(`/account/settings/backup/confirm/${cred.id}`)}
+        onPasskeySaved={(cred) => router.push(`/account/backup/confirm/${cred.id}`)}
       />
     </YStack>
   )
