@@ -2,6 +2,7 @@ import { get, isSupported } from '@0xbigboss/react-native-passkeys'
 import { sendAccountAbi } from '@my/wagmi'
 import { base64urlnopad } from '@scure/base'
 import { bytesToHex, encodeAbiParameters, getAbiItem, type Hex, hexToBytes, isHex } from 'viem'
+import { asciiToByteArray } from './asciiToByteArray'
 import { assert } from './assert'
 import { getRpId } from './getRpId'
 import { parseAndNormalizeSig, parseSignResponse } from './passkeys'
@@ -51,7 +52,9 @@ export async function signChallenge(
   // handle if a non-resident passkey is used so no userHandle is returned
   sign.response.userHandle =
     sign.response.userHandle ??
-    allowedCredentials.find(({ id }) => id === sign.id)?.userHandle ??
+    base64urlnopad.encode(
+      asciiToByteArray(allowedCredentials.find(({ id }) => id === sign.id)?.userHandle ?? '')
+    ) ??
     ''
   assert(!!sign.response.userHandle, 'No passkey name found')
   const signResult = parseSignResponse(sign)

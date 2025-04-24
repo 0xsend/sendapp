@@ -158,6 +158,13 @@ export function HomeScreen() {
                 <Stack f={1} h={'100%'} ai={'center'} jc={'center'} gap="$4">
                   <H1 theme="red">No send account found</H1>
                   <Paragraph>This should never happen.</Paragraph>
+                  <Button
+                    onPress={() => {
+                      router.push('/_sitemap')
+                    }}
+                  >
+                    Sitemap
+                  </Button>
                   <Button onPress={() => router.push('/auth/onboarding')}>Go To Onboarding</Button>
                   <Button onPress={() => supabase.auth.signOut()}>Sign Out</Button>
                 </Stack>

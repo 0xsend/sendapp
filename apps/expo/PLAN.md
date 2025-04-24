@@ -1,139 +1,150 @@
-# Expo App Feature Parity Plan
+# Native App Onboarding Plan
 
 ## Goal
 
-This document outlines the plan to bring the Expo application (`apps/expo`) to feature parity with the Next.js application (`apps/next`) in terms of page structure and navigation. We will leverage Expo Router's file-based routing and utilize shared components from `packages/app` where possible, adapting the UI for a mobile experience using Tamagui.
+Create a native app onboarding page and refactor the existing sign-up page to use a shared authentication layout.
 
-## 1. Next.js Page Structure (`apps/next/pages`)
+## Analysis
 
-The current structure of the Next.js application includes the following top-level pages and directories:
+The existing sign-up page (`apps/expo/app/(auth)/auth/sign-up.tsx`) contains common layout elements that can be extracted:
+- Main `Container` with safe area handling.
+- `YStack` for centering content.
+- `Anchor` containing the `IconSendLogo` positioned at the top.
+- `ScrollView` wrapping the main page content.
 
-**Files:**
+## Proposed Steps
 
-*   `_app.tsx` (App wrapper)
-*   `_document.tsx` (Document structure)
-*   `[tag].tsx` (Dynamic route for tags)
-*   `404.tsx` (Not Found page)
-*   `activity.tsx`
-*   `index.tsx` (Home page)
-*   `leaderboard.tsx`
-*   `secret-shop.tsx`
+1.  **Create Shared Auth Layout:**
+    *   Modify `apps/expo/app/(auth)/_layout.tsx` to serve as the shared `AuthLayout`.
+    *   The layout component will accept `children` as a prop.
+    *   It will render the `Container`, `YStack`, `Anchor` (with logo), and `ScrollView`, placing the `children` inside the `ScrollView`.
 
-**Directories:**
+2.  **Refactor Sign-Up Page:**
+    *   Update `apps/expo/app/(auth)/auth/sign-up.tsx` to use the `AuthLayout`.
+    *   Remove duplicated layout code, rendering only the `<SignUpScreen />` component within the layout.
 
-*   `account/`
-*   `api/` (API routes - not relevant for Expo UI)
-*   `auth/`
-*   `deposit/`
-*   `earn/`
-*   `explore/`
-*   `feed/`
-*   `invest/`
-*   `profile/` (Contains dynamic route `[sendid].tsx`)
-*   `send/`
-*   `sendpot/`
-*   `trade/`
+3.  **Create Onboarding Page:**
+    *   Create a new file: `apps/expo/app/(auth)/onboarding.tsx`.
+    *   Use the `AuthLayout` in this new page.
+    *   Add specific content for the onboarding steps (start with placeholder).
+    *   Configure `Stack.Screen` options for the onboarding page title.
 
-## 2. Current Expo App Structure (`apps/expo/app`)
+## Visual Structure
 
-The current structure is minimal:
+```mermaid
+graph TD
+    subgraph Shared Auth Layout (apps/expo/app/(auth)/_layout.tsx)
+        A[Container + SafeArea] --> B(YStack);
+        B --> C{Logo Anchor};
+        B --> D[ScrollView];
+        D --> E((Children Prop));
+    end
 
-**Files:**
+    subgraph Sign Up Page (apps/expo/app/(auth)/auth/sign-up.tsx)
+        F[AuthLayout] --> G[SignUpScreen Component];
+    end
 
-*   `_layout.tsx` (Root layout)
-*   `index.tsx` (Home screen)
+    subgraph Onboarding Page (apps/expo/app/(auth)/onboarding.tsx)
+        H[AuthLayout] --> I[Onboarding Content];
+    end
 
-**Directories:**
+    G --> E;
+    I --> E;
+```
 
-*   `(auth)/` (Authentication flow with `_layout.tsx`)
+## Next Action
 
-## 3. Authentication Flow Implementation
+Once this plan is approved, toggle to Act Mode to begin implementation, starting with the creation/modification of the shared `AuthLayout` in `apps/expo/app/(auth)/_layout.tsx`.
+*   `settings/`
+    *   `index.tsx` (Settings screen, likely accessed via Drawer)
+
+## 3. Authentication Flow Implementation (Revised v2)
 
 The app uses a non-traditional authentication approach:
 
-* **Passkey Authentication**: If a user already has an account, they authenticate using passkeys (WebAuthn) rather than username/password
-* **Sign Up Flow**: New users are redirected to the sign-up process
-* **Home Page Implementation**: The Next.js `index.tsx` demonstrates this flow:
-  * Checks for user session
-  * If authenticated: Renders `HomeLayout` with `HomeScreen`
-  * If not authenticated: Renders `SplashScreen` with `AuthCarouselContext` for onboarding carousel
+*   **Root Check (`app/index.tsx`)**:
+    *   Checks for user session (`useUser`).
+    *   If authenticated: Renders `HomeScreen` directly. *(Note: This might need adjustment to delegate rendering to the `(drawer)/(tabs)/index.tsx`)*
+    *   If not authenticated: Renders `SplashScreen` wrapped in `AuthCarouselContext`. The carousel images are hardcoded here.
+*   **Sign Up (`app/(auth)/auth/sign-up.tsx`)**: Screen exists for the sign-up process. Users needing to sign up will be directed here.
+*   **Sign In**: Initiated directly from the `SplashScreen` component (e.g., via a "Sign In" button). This will trigger the passkey authentication flow. **No separate `sign-in.tsx` screen will be created.**
+*   **Auth Group (`app/(auth)/_layout.tsx`)**: Provides a basic Stack layout for screens within the `(auth)` group (currently just sign-up).
 
 **Implementation Notes:**
-* The Expo app already has a `(auth)/_layout.tsx` with `AuthCarouselContext` structure in place
-* When implementing authentication in Expo:
-  * Review `apps/next/pages/index.tsx` for flow logic
-  * Examine `packages/app/features/splash/screen.tsx` for the unauthenticated experience
-  * Implement similar passkey authentication and sign-up redirects
-  * Ensure carousel images and progress state are properly managed (the Next.js implementation loads these from server-side props)
+*   The primary auth check happens at the root (`app/index.tsx`).
+*   The `SplashScreen` handles the unauthenticated experience, onboarding carousel, and **must include the trigger for the sign-in (passkey) flow**.
+*   **Need to implement:**
+    *   The sign-in (passkey) logic triggered from `SplashScreen`.
+    *   Logic to redirect unauthenticated users attempting to access `(drawer)` routes to the appropriate auth screen (likely back to the root `index.tsx` which shows `SplashScreen`, or directly to `sign-up.tsx` if applicable). This might involve a higher-level check in `app/_layout.tsx` or the root `(drawer)/_layout.tsx`.
 
-## 4. Proposed Expo App Structure & Implementation Plan
+## 4. Navigation Structure (Drawer > Tabs)
 
-We will use Expo Router's file-based routing conventions. Directories correspond to route segments, and files like `index.tsx` serve as the default screen for a directory. `_layout.tsx` files configure layout wrappers (e.g., Stack, Tabs).
+*(This section remains the same as the previous revision)*
 
-**Implementation Approach:**
-* For each screen implementation, first review the corresponding Next.js page to understand:
-  * Component structure and imports
-  * Authentication/protection logic
-  * Data fetching patterns
-  * UI layout and specific components
+The authenticated part of the app uses a nested navigation structure:
 
-**Mapping:**
+*   **Drawer (`app/(drawer)/_layout.tsx`)**:
+    *   Acts as the main container for authenticated screens.
+    *   Currently uses a placeholder component for its `drawerContent`. Needs implementation (likely the `ProfileScreen` or a custom drawer menu).
+*   **Tabs (`app/(drawer)/(tabs)/_layout.tsx`)**:
+    *   Nested inside the Drawer.
+    *   Defines two tabs: 'Home' (`index.tsx`) and 'Profile' (`profile.tsx`).
+    *   Includes a shared header with:
+        *   A menu button to open the Drawer.
+        *   A plus button that navigates to a `/create` route (which doesn't exist yet).
+    *   Tab icons use `Home` and `User` from `@tamagui/lucide-icons`.
 
-| Next.js Route (`apps/next/pages`) | Proposed Expo Route (`apps/expo/app`) | Shared Component (`packages/app`)                                  | Next.js Page to Review                                                                             |
-| :-------------------------------- | :------------------------------------ | :----------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------- |
-| `index.tsx`                       | `index.tsx`                           | `HomeScreen` (or equivalent)                                       | `apps/next/pages/index.tsx` - Review how session check and UI is handled.                             |
-| `activity.tsx`                    | `activity.tsx`                        | `ActivityScreen` (`packages/app/features/activity/screen.tsx`)     | `apps/next/pages/activity.tsx` - Review activity data loading and display.                           |
-| `leaderboard.tsx`                 | `leaderboard.tsx`                     | `LeaderboardScreen` (`packages/app/features/leaderboard/screen.tsx`) | `apps/next/pages/leaderboard.tsx` - Review leaderboard implementation.                                |
-| `secret-shop.tsx`                 | `secret-shop.tsx`                     | `SecretShopScreen` (`packages/app/features/secret-shop/screen.tsx`)  | `apps/next/pages/secret-shop.tsx` - Review shop layout and item display.                              |
-| `[tag].tsx`                       | `[tag].tsx`                           | `TagScreen` (`packages/app/features/tag/screen.tsx`)               | `apps/next/pages/[tag].tsx` - Review dynamic parameter handling.                                     |
-| `deposit/`                        | `deposit/index.tsx`                   | `DepositScreen` (`packages/app/features/deposit/screen.tsx`)       | `apps/next/pages/deposit/index.tsx` - Review deposit flow.                                           |
-| `earn/`                           | `earn/_layout.tsx`, `earn/index.tsx`  | `EarnScreen` (`packages/app/features/earn/screen.tsx`)             | `apps/next/pages/earn/index.tsx` - Review earnings overview screen.                                  |
-| `earn/[asset]/balance.tsx`        | `earn/[asset]/balance.tsx`            | `EarnBalanceScreen` (`packages/app/features/earn/balance/screen.tsx`) | `apps/next/pages/earn/[asset]/balance.tsx` - Review dynamic asset balance display.                    |
-| `explore/`                        | `explore/index.tsx`                   | `ExploreScreen` (`packages/app/features/explore/screen.tsx`)       | `apps/next/pages/explore/index.tsx` - Review exploration interface.                                  |
-| `feed/`                           | `feed/index.tsx`                      | `FeedScreen` (`packages/app/features/feed/screen.tsx`)             | `apps/next/pages/feed/index.tsx` - Review feed data loading and UI.                                  |
-| `invest/`                         | `invest/index.tsx`                    | `InvestScreen` (`packages/app/features/invest/screen.tsx`)         | `apps/next/pages/invest/index.tsx` - Review investment options presentation.                         |
-| `send/`                           | `send/index.tsx`                      | `SendScreen` (`packages/app/features/send/screen.tsx`)             | `apps/next/pages/send/index.tsx` - Review send transaction flow.                                     |
-| `sendpot/`                        | `sendpot/index.tsx`                   | `SendpotScreen` (`packages/app/features/sendpot/screen.tsx`)       | `apps/next/pages/sendpot/index.tsx` - Review sendpot functionality.                                  |
-| `trade/`                          | `trade/index.tsx`                     | `TradeScreen` (`packages/app/features/trade/screen.tsx`)           | `apps/next/pages/trade/index.tsx` - Review trading interface.                                        |
-| `account/`                        | `account/_layout.tsx`, `account/index.tsx` | `AccountScreen` (`packages/app/features/account/screen.tsx`)       | `apps/next/pages/account/index.tsx` - Review account overview screen.                                |
-| `account/affiliate.tsx`           | `account/affiliate.tsx`               | `AffiliateScreen` (`packages/app/features/account/affiliate/screen.tsx`) | `apps/next/pages/account/affiliate.tsx` - Review affiliate program interface.                         |
-| `account/sendtag/index.tsx`       | `account/sendtag.tsx`                 | `SendtagScreen` (`packages/app/features/account/sendtag/screen.tsx`) | `apps/next/pages/account/sendtag/index.tsx` - Review sendtag management.                              |
-| `profile/[sendid].tsx`            | `profile/[sendid].tsx`                | `ProfileScreen` (`packages/app/features/profile/screen.tsx`)       | `apps/next/pages/profile/[sendid].tsx` - Review profile display with dynamic ID.                      |
-| `auth/`                           | `(auth)/_layout.tsx`, `(auth)/sign-in.tsx`, `(auth)/sign-up.tsx` | `SignInScreen`, `SignUpScreen` (`packages/app/features/auth/...`) | `apps/next/pages/auth/*` - Review authentication screens and implement passkey flow.                  |
+## 5. Proposed Implementation Plan (Revised v2)
+
+Leverage the existing Drawer > Tabs structure. Port Next.js pages into this structure, creating new screens/routes as needed.
+
+**Immediate Priorities:**
+
+1.  **Implement Drawer Content:** Replace the placeholder in `app/(drawer)/_layout.tsx` with the actual `ProfileScreen` component (or a custom drawer menu component) from `packages/app/features/profile/screen.tsx` (or similar). Adapt for mobile.
+2.  **Implement Profile Tab Screen:** Create `app/(drawer)/(tabs)/profile.tsx`. Import and render the `ProfileScreen` component, adapting its content for the main tab view vs. the drawer view if necessary. Review `apps/next/pages/profile/[sendid].tsx` for logic (needs adaptation as the tab likely shows the *logged-in user's* profile).
+3.  **Implement Home Tab Screen:** Verify `app/(drawer)/(tabs)/index.tsx`. Ensure it correctly renders the main content for the home tab (likely `HomeScreen` from `packages/app/features/home/screen.tsx`). Adjust `app/index.tsx` if needed to avoid rendering `HomeScreen` twice.
+4.  **Address `/create` Route:** Decide what the Plus button in the header should do. Implement the corresponding `app/(drawer)/create.tsx` screen or change the button's navigation target. Review potential Next.js counterparts like `send/index.tsx` or `deposit/index.tsx`.
+5.  **Implement Sign-In Logic:** Add the necessary logic and UI elements (e.g., button) to the `SplashScreen` component (`packages/app/features/splash/screen.tsx`) to trigger the passkey sign-in flow.
+6.  **Authentication Guarding:** Implement proper route protection, likely in `app/_layout.tsx` or `app/(drawer)/_layout.tsx`, to redirect unauthenticated users away from the `(drawer)` group.
+
+**Porting Remaining Screens (Mapping Example - Needs Refinement):**
+
+*   Decide where each feature fits: New Tab? Screen within Drawer? Stack pushed from a Tab?
+*   Update the mapping table based on the Drawer/Tabs structure.
+
+| Next.js Route (`apps/next/pages`) | Proposed Expo Route (`apps/expo/app`)                                  | Placement Idea        | Shared Component (`packages/app`)                                  | Next.js Page to Review                                                                             |
+| :-------------------------------- | :--------------------------------------------------------------------- | :-------------------- | :----------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------- |
+| `index.tsx`                       | `(drawer)/(tabs)/index.tsx`                                            | **Existing Tab**      | `HomeScreen`                                                       | `apps/next/pages/index.tsx`                                                                          |
+| `profile/[sendid].tsx`            | `(drawer)/(tabs)/profile.tsx` & Drawer Content                         | **Existing Tab/Drawer** | `ProfileScreen`                                                    | `apps/next/pages/profile/[sendid].tsx`                                                               |
+| `activity.tsx`                    | `(drawer)/activity.tsx` OR `(drawer)/(tabs)/activity.tsx`              | New Screen or Tab     | `ActivityScreen` (`packages/app/features/activity/screen.tsx`)     | `apps/next/pages/activity.tsx`                                                                       |
+| `leaderboard.tsx`                 | `(drawer)/leaderboard.tsx` OR `(drawer)/(tabs)/leaderboard.tsx`        | New Screen or Tab     | `LeaderboardScreen` (`packages/app/features/leaderboard/screen.tsx`) | `apps/next/pages/leaderboard.tsx`                                                                    |
+| `deposit/`                        | `(drawer)/deposit/index.tsx` (pushed as stack)                         | Stack from Tab/Drawer | `DepositScreen` (`packages/app/features/deposit/screen.tsx`)       | `apps/next/pages/deposit/index.tsx`                                                                  |
+| `earn/`                           | `(drawer)/earn/_layout.tsx`, `(drawer)/earn/index.tsx` (pushed stack)  | Stack from Tab/Drawer | `EarnScreen` (`packages/app/features/earn/screen.tsx`)             | `apps/next/pages/earn/index.tsx`                                                                     |
+| ... *(continue for other routes)* | ...                                                                    | ...                   | ...                                                                | ...                                                                                                  |
+| `auth/sign-up.tsx`                | `(auth)/auth/sign-up.tsx`                                              | **Existing Auth Screen**| `SignUpScreen` (`packages/app/features/auth/sign-up-screen.tsx`)   | `apps/next/pages/auth/sign-up.tsx`                                                                   |
 
 **Notes:**
 
-*   **Shared Components:** Shared screen components are located in `packages/app/features/*`. If a required component doesn't exist, it needs to be created or adapted.
-*   **Next.js Page Review:** For each screen implementation, carefully review the corresponding Next.js page to understand authentication requirements, data fetching patterns, and UI components in use.
-*   **Authentication Implementation:** Implement the non-traditional auth flow using passkeys for existing users and redirect to sign-up for new users, mirroring the pattern in `apps/next/pages/index.tsx`.
-*   **Navigation:** Use `solito`'s `<Link>` component and `useRouter` hook for cross-platform navigation between screens, leveraging Expo Router's file structure. Stack navigation will likely be the default via `_layout.tsx` files. Consider Tab navigation for top-level sections if appropriate for mobile UX.
-*   **Authentication:** Implement authentication checks within the relevant `_layout.tsx` files (e.g., the root layout or a specific group layout) to protect routes. Redirect unauthenticated users to the `(auth)` group.
-*   **Styling:** Utilize Tamagui components (`@tamagui/core`, `tamagui`) for UI elements consistent with the design system.
+*   **Shared Components:** Continue leveraging `packages/app/features/*`. Create/adapt components as needed.
+*   **Navigation:** Use `solito`'s `<Link>` and `useRouter` within the established Drawer/Tabs structure. Use `router.push('/(drawer)/deposit')` for stack navigation.
+*   **Styling:** Utilize Tamagui components.
 
-## 5. Next Steps and Progress
+## 6. Next Steps and Progress (Revised v2)
 
 ### Completed
-1. ✅ Authentication flow implementation:
-   - Updated home page implementation in `apps/expo/app/index.tsx` with session checking and conditional rendering similar to Next.js
-   - Implemented the sign-in and sign-up screens in `apps/expo/app/(auth)/`
-   - Set up the auth carousel for new users including image loading
-   - Configured the AuthCarouselContext properly in both root index and auth layout
+1. ✅ Root `index.tsx` handles session check and renders `HomeScreen` or `SplashScreen`.
+2. ✅ `SplashScreen` uses `AuthCarouselContext` with hardcoded mobile images.
+3. ✅ Sign-up screen exists at `app/(auth)/auth/sign-up.tsx`.
+4. ✅ Drawer navigator is set up (`app/(drawer)/_layout.tsx`).
+5. ✅ Tabs navigator (Home, Profile) is nested in Drawer (`app/(drawer)/(tabs)/_layout.tsx`).
+6. ✅ Header with Drawer toggle and `/create` button exists in Tabs layout.
 
-### Upcoming Tasks
-1. Ensure `solito` is correctly configured in both `apps/next` and `apps/expo`.
-2. Complete the directory structure within `apps/expo/app` as outlined above.
-3. Create the basic `.tsx` files for each screen.
-4. For each screen implementation:
-   - Review the corresponding Next.js page implementation
-   - Understand the data fetching patterns and UI components used
-   - Import and render the corresponding shared screen components from `packages/app`
-   - Adapt as needed for the mobile experience
-5. Implement navigation between screens using `solito`'s `<Link>` component and `useRouter` hook.
-6. Set up `_layout.tsx` files for Stack navigation within each main section (account, earn, etc.), potentially considering Tab navigation for the root layout.
-
-### Specific Next Screen Priorities
-1. Activity screen
-2. Leaderboard screen
-3. Profile screen
-4. Deposit flow
-5. Earn screens
+### Upcoming Tasks (Prioritized)
+1.  Implement Drawer content in `app/(drawer)/_layout.tsx` (using `ProfileScreen` or custom menu).
+2.  Implement Profile tab screen (`app/(drawer)/(tabs)/profile.tsx`) using `ProfileScreen`.
+3.  Verify/Implement Home tab screen (`app/(drawer)/(tabs)/index.tsx`) using `HomeScreen`.
+4.  Define and implement the `/create` route/screen (`app/(drawer)/create.tsx` or similar).
+5.  Implement Sign-In logic/button within `SplashScreen` (`packages/app/features/splash/screen.tsx`).
+6.  Add authentication guards to protect the `(drawer)` group.
+7.  Plan navigation structure for remaining features (Activity, Leaderboard, Deposit, Earn, etc.).
+8.  Port remaining screens based on the decided structure.
