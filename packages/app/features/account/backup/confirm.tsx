@@ -12,7 +12,7 @@ import {
 } from '@my/ui'
 import { baseMainnetClient, sendAccountAbi, tokenPaymasterAddress } from '@my/wagmi'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { SettingsHeader } from 'app/features/account/settings/components/SettingsHeader'
+import { SettingsHeader } from 'app/features/account/components/SettingsHeader'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { assert } from 'app/utils/assert'
 import { byteaToBytes } from 'app/utils/byteaToBytes'
@@ -228,7 +228,7 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
       console.log('sent user op', transactionHash)
       toast.show('Success!')
       queryClient.invalidateQueries({ queryKey: [useSendAccount.queryKey] })
-      router.replace('/account/settings/backup')
+      router.replace('/account/backup')
     } catch (e) {
       console.error(e)
       const message =

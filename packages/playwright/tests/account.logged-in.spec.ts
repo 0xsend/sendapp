@@ -33,10 +33,6 @@ test('can visit account page', async ({ page, user: { profile } }) => {
 })
 
 test('can update profile', async ({ page, supabase }) => {
-  const editProfileButton = page.getByRole('link', { name: 'Settings' })
-  await editProfileButton.click()
-
-  await page.waitForURL('/account/settings')
   await page.getByRole('link', { name: 'profile' }).click()
   await expect(page).toHaveTitle('Send | Edit Profile')
 

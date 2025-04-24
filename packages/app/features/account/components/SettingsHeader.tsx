@@ -8,7 +8,7 @@ export const SettingsHeader = ({ children }: PropsWithChildren) => {
   const { push } = useRouter()
 
   const handleClosePress = () => {
-    push('/account/settings')
+    push('/account')
   }
 
   return (

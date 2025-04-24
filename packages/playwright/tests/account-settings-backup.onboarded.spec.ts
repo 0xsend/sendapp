@@ -23,10 +23,8 @@ test.beforeEach(async ({ page, user: { user } }) => {
   expect(accountLink).toBeVisible()
   await accountLink.click()
   await page.waitForURL('/account')
-  await nextContainer.getByRole('link', { name: 'Settings' }).click()
-  await page.waitForURL('/account/settings')
   await nextContainer.getByRole('link', { name: 'Passkeys' }).click()
-  await expect(page).toHaveURL('/account/settings/backup')
+  await expect(page).toHaveURL('/account/backup')
 })
 
 const backupAccountTest = async ({
@@ -48,7 +46,7 @@ const backupAccountTest = async ({
   expect(page.getByText(cred.display_name)).toBeVisible()
 
   await page.getByRole('link', { name: 'add a passkey' }).click()
-  await page.waitForURL('/account/settings/backup/create')
+  await page.waitForURL('/account/backup/create')
 
   const acctName = `test-${Math.floor(Math.random() * 1000000)}`
   await page.getByRole('textbox', { name: 'Passkey name' }).fill(acctName)
@@ -72,7 +70,7 @@ const backupAccountTest = async ({
   const webAuthnCred = sendAcct.webauthn_credentials[1]
   assert(!!webAuthnCred, 'Missing webauthn credential')
 
-  await page.waitForURL(`/account/settings/backup/confirm/${webAuthnCred.id}`)
+  await page.waitForURL(`/account/backup/confirm/${webAuthnCred.id}`)
   const bundlerReq = page.waitForRequest('**/rpc')
   const bundlerRes = page.waitForResponse('**/rpc')
   const confirmBtn = page.getByRole('button', { name: 'Add Passkey as Signer' })
@@ -81,7 +79,7 @@ const backupAccountTest = async ({
   await bundlerRes // wait for bundler response
   await expect.soft(confirmBtn).toBeHidden() // page navigates after successful mutation
   await expect(page.getByText('Something went wrong: Error:')).toBeHidden() // no error
-  await page.waitForURL('/account/settings/backup') // yay, we're back on the page
+  await page.waitForURL('/account/backup') // yay, we're back on the page
 
   await expect(supabase).toHaveValidWebAuthnCredentials(authenticator)
 

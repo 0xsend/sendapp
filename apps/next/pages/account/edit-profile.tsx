@@ -1,29 +1,27 @@
-import { TopNav } from 'app/components/TopNav'
 import { HomeLayout } from 'app/features/home/layout.web'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from '../_app'
+import { TopNav } from 'app/components/TopNav'
 import { AccountScreenLayout } from 'app/features/account/AccountScreenLayout'
+import { EditProfile } from 'app/features/account/components/editProfile/screen'
 
 export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Account</title>
-        <meta
-          name="description"
-          content="Sendtags simplify transactions by replacing long wallet addresses with memorable identifiers."
-          key="desc"
-        />
+        <title>Send | Edit Profile</title>
+        <meta name="description" content="Edit Profile" key="desc" />
       </Head>
+      <EditProfile />
     </>
   )
 }
 
 export const getServerSideProps = userProtectedGetSSP()
-Page.getLayout = () => (
-  <HomeLayout TopNav={<TopNav header="Account" showOnGtLg={true} />} fullHeight>
-    <AccountScreenLayout />
+Page.getLayout = (children) => (
+  <HomeLayout TopNav={<TopNav header={'Account'} backFunction={'router'} />} fullHeight>
+    <AccountScreenLayout>{children}</AccountScreenLayout>
   </HomeLayout>
 )
 

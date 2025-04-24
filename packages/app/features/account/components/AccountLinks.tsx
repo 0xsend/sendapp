@@ -1,14 +1,17 @@
-import { SettingsNavLink } from './SettingsNavLink'
+import { AccountNavLink } from './AccountNavLink'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
-import type { PropsWithChildren } from 'react'
-import { type ColorTokens, Fade, type SizeTokens, YGroup, YStack } from '@my/ui'
+import type { PropsWithChildren, ReactNode } from 'react'
+import { Button, type ColorTokens, Fade, type SizeTokens, YGroup, YStack } from '@my/ui'
 import {
   IconAccount,
+  IconDollar,
   IconFingerprint,
   IconIdCard,
   IconInfoCircle,
   IconLogout,
   IconQuestionCircle,
+  IconSlash,
+  IconStarOutline,
 } from 'app/components/icons'
 import { RowLabel } from 'app/components/layout/RowLabel'
 
@@ -20,29 +23,44 @@ const iconProps = {
   },
 }
 
-const SETTINGS_LINKS: {
+const ACCOUNT_LINKS: {
   [category: string]: {
     text: string
     href: string
-    icon: JSX.Element
+    icon: ReactNode
     target?: string
   }[]
 } = {
-  Account: [
+  Settings: [
     {
       text: 'Profile',
-      href: '/account/settings/edit-profile',
+      href: '/account/edit-profile',
       icon: <IconAccount {...iconProps} />,
     },
     {
       text: 'Personal Information',
-      href: '/account/settings/personal-info',
+      href: '/account/personal-info',
       icon: <IconIdCard {...iconProps} />,
     },
     {
       text: 'Passkeys',
-      href: '/account/settings/backup',
+      href: '/account/backup',
       icon: <IconFingerprint {...iconProps} />,
+    },
+    {
+      text: 'Sendtags',
+      href: '/account/sendtag',
+      icon: <IconSlash {...iconProps} />,
+    },
+    {
+      text: 'Rewards',
+      href: '/explore/rewards',
+      icon: <IconStarOutline {...iconProps} />,
+    },
+    {
+      text: 'Affiliate',
+      href: '/account/affiliate',
+      icon: <IconDollar {...iconProps} scale={1.2} />,
     },
   ],
   Support: [
@@ -61,35 +79,33 @@ const SETTINGS_LINKS: {
   ],
 }
 
-export function SettingsLinks(): JSX.Element {
+export function AccountLinks(): JSX.Element {
   const supabase = useSupabase()
 
   return (
     <YStack gap={'$5'}>
-      {Object.entries(SETTINGS_LINKS).map(([category, links]) => {
+      {Object.entries(ACCOUNT_LINKS).map(([category, links]) => {
         return (
           <YStack key={category} gap={'$3.5'}>
             <RowLabel>{category}</RowLabel>
             <LinksGroup>
               {links.map((link) => (
                 <YGroup.Item key={link.href}>
-                  <SettingsNavLink {...link} />
+                  <AccountNavLink {...link} />
                 </YGroup.Item>
               ))}
             </LinksGroup>
           </YStack>
         )
       })}
-      <LinksGroup>
-        <YGroup.Item key="logout">
-          <SettingsNavLink
-            href=""
-            text="Sign out"
-            icon={<IconLogout {...iconProps} />}
-            onPress={() => supabase.auth.signOut()}
-          />
-        </YGroup.Item>
-      </LinksGroup>
+      <Button theme="green" onPress={() => supabase.auth.signOut()} py={'$5'} br={'$4'}>
+        <Button.Icon>
+          <IconLogout {...iconProps} color={'$black'} />
+        </Button.Icon>
+        <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
+          sign out
+        </Button.Text>
+      </Button>
     </YStack>
   )
 }
