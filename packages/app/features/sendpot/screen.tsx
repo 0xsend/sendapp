@@ -1,7 +1,6 @@
 import { XStack, YStack, Card } from '@my/ui'
 import { JackpotCard } from './JackpotCard'
 import { DrawingHistory } from './DrawingHistory'
-import SendpotRiskDialog from './SendpotRiskDialog'
 export function SendPotScreen() {
   return (
     <XStack
@@ -24,7 +23,6 @@ export function SendPotScreen() {
             <DrawingHistory />
           </Card>
         </YStack>
-        <SendpotRiskDialog />
       </YStack>
     </XStack>
   )
