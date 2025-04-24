@@ -196,11 +196,12 @@ export function amountFromActivity(
 }
 
 export const noteFromActivity = (activity: Activity) =>
-  isTemporalTokenTransfersEvent(activity) ||
-  isTemporalEthTransfersEvent(activity) ||
-  isSendAccountTransfersEvent(activity) ||
-  isSendAccountReceiveEvent(activity)
-    ? (activity.data.note ?? null)
+  (isTemporalTokenTransfersEvent(activity) ||
+    isTemporalEthTransfersEvent(activity) ||
+    isSendAccountTransfersEvent(activity) ||
+    isSendAccountReceiveEvent(activity)) &&
+  activity.data.note
+    ? decodeURIComponent(activity.data.note)
     : null
 
 /**

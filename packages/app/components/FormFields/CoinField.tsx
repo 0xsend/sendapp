@@ -75,7 +75,7 @@ export const CoinField = ({
               scaleSpace={0.5}
               scaleIcon={1.5}
               padding={'$2'}
-              bc={hoverStyles.background}
+              bc={hoverStyles.backgroundColor}
               focusStyle={{
                 bc: 'transparent',
               }}

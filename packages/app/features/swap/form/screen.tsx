@@ -741,7 +741,7 @@ export const Slippage = ({
               p={'$2'}
               width={'$6'}
               br={'$4'}
-              bc={slippageOption === slippage ? hoverStyles.background : '$color1'}
+              bc={slippageOption === slippage ? hoverStyles.backgroundColor : '$color1'}
             >
               <Button.Text>{slippageOption / 100}%</Button.Text>
             </Button>
@@ -751,7 +751,7 @@ export const Slippage = ({
               testID={'customSlippageInput'}
               inputMode={'decimal'}
               bw={0}
-              bc={hoverStyles.background}
+              bc={hoverStyles.backgroundColor}
               textAlign={'center'}
               focusStyle={{ outlineWidth: 0 }}
               w={100}

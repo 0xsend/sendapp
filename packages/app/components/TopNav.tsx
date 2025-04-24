@@ -151,7 +151,7 @@ export function TopNav({
     <Header w="100%" $lg={{ py: '$3' }}>
       <Container
         safeAreaProps={{
-          edges: ['top', 'left', 'right'],
+          edges: { bottom: 'off' },
         }}
         $gtLg={{ jc: 'flex-start', pb: '$2', ai: 'flex-start' }}
         ai="center"
