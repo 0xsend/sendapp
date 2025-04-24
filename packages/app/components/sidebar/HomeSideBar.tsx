@@ -49,7 +49,7 @@ const links = [
     href: '/send',
   },
   {
-    icon: <IconWorldSearch size={'$1'} />,
+    icon: <IconWorldSearch size={'$1'} scale={1.1} />,
     text: 'Explore',
     href: '/explore',
   },
