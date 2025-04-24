@@ -9,18 +9,16 @@ import {
   YStack,
 } from '@my/ui'
 import formatAmount from 'app/utils/formatAmount'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { type Timer, useStopwatch } from 'react-use-precision-timer'
 import { useCoins } from 'app/provider/coins'
 import { Eye, EyeOff } from '@tamagui/lucide-icons'
+import { useIsPriceHidden } from 'app/features/home/utils/useIsPriceHidden'
 
 export const TokenBalanceCard = () => {
   // @todo add an enabled flag for when hidden
   const { totalPrice, pricesQuery } = useCoins()
-
   const formattedBalance = formatAmount(totalPrice, 9, 0)
-
   const { isPriceHidden, toggleIsPriceHidden } = useIsPriceHidden()
   const timer = useStopwatch()
   const { isGameVisible, presses, increaseScore } = useShowHideGame(timer)
@@ -92,7 +90,7 @@ export const TokenBalanceCard = () => {
                       zIndex={1}
                       $gtSm={{ fontSize: 96, lineHeight: 96 }}
                     >
-                      {'//////'}
+                      {'///////'}
                     </BigHeading>
                   )
                 case pricesQuery.isLoading || !totalPrice:
@@ -122,40 +120,6 @@ export const TokenBalanceCard = () => {
       </XStack>
     </Card>
   )
-}
-
-const useIsPriceHidden = () => {
-  const [isPriceHidden, setIsPriceHidden] = useState<boolean>(true)
-
-  useEffect(() => {
-    const getIsPriceHidden = async () => {
-      try {
-        const savedIsPriceHidden = await AsyncStorage.getItem('isPriceHidden')
-        if (savedIsPriceHidden === null) {
-          setIsPriceHidden(false)
-        }
-        if (savedIsPriceHidden !== null) {
-          setIsPriceHidden(JSON.parse(savedIsPriceHidden))
-        }
-      } catch (error) {
-        console.error('Error reading isPriceHidden from AsyncStorage:', error)
-      }
-    }
-
-    getIsPriceHidden()
-  }, [])
-
-  const toggleIsPriceHidden = async () => {
-    try {
-      const newValue = !isPriceHidden
-      await AsyncStorage.setItem('isPriceHidden', JSON.stringify(newValue))
-      setIsPriceHidden(newValue)
-    } catch (error) {
-      console.error('Error saving isPriceHidden to AsyncStorage:', error)
-    }
-  }
-
-  return { isPriceHidden, toggleIsPriceHidden }
 }
 
 const useShowHideGame = (timer: Timer) => {
