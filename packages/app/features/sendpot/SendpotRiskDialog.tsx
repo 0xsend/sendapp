@@ -29,20 +29,10 @@ const SendpotRiskDialog = () => {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <Dialog.Adapt when="sm" platform="touch">
-        <Dialog.Sheet zIndex={400000} modal dismissOnSnapToBottom>
-          <Dialog.Sheet.Frame padding="$4">
-            <Dialog.Adapt.Contents />
-          </Dialog.Sheet.Frame>
-          <Dialog.Sheet.Overlay />
-        </Dialog.Sheet>
-      </Dialog.Adapt>
-
       <Dialog.Portal>
         <Dialog.Overlay />
-
         <Dialog.Content
-          key="swap-risk-dialog"
+          key="sendpot-risk-dialog"
           gap="$4"
           maxWidth={'90%'}
           $gtMd={{ maxWidth: '40%' }}
@@ -53,7 +43,7 @@ const SendpotRiskDialog = () => {
               <Paragraph>{toNiceError(didUserBuyTicket.error)}</Paragraph>
             </YStack>
           ) : (
-            <YStack gap="$4" testID={'swapRiskDialogContent'}>
+            <YStack gap="$4" testID={'sendpotRiskDialogContent'}>
               <Dialog.Title>Important Disclaimer</Dialog.Title>
               <Paragraph>
                 By purchasing a Sendpot ticket, you acknowledge that winnings are not guaranteed and
@@ -70,7 +60,7 @@ const SendpotRiskDialog = () => {
               <XStack ai={'center'} gap={'$2'}>
                 <Checkbox
                   id={id}
-                  testID={'swapRiskDialogCheckbox'}
+                  testID={'sendpotRiskDialogCheckbox'}
                   checked={isChecked}
                   onCheckedChange={(checked) => {
                     setIsChecked(checked === true)
@@ -90,19 +80,21 @@ const SendpotRiskDialog = () => {
               </XStack>
               <XStack justifyContent="flex-end" marginTop="$4" gap="$4">
                 <Dialog.Close asChild>
-                  <Button testID={'swapRiskDialogCancelButton'} br={'$2'}>
-                    Cancel
+                  <Button theme="red_active" br={'$2'}>
+                    <Button.Text>Cancel</Button.Text>
                   </Button>
                 </Dialog.Close>
                 <Button
-                  testID={'swapRiskDialogContinueButton'}
+                  testID={'sendpotRiskDialogContinueButton'}
                   theme="green"
                   onPress={handleConfirm}
                   br={'$2'}
                   disabled={!isChecked}
                   disabledStyle={{ opacity: 0.5 }}
                 >
-                  <Button.Text>Continue</Button.Text>
+                  <Button.Text color="$color0" $theme-light={{ color: '$color12' }}>
+                    I Agree & Continue
+                  </Button.Text>
                 </Button>
               </XStack>
             </YStack>
