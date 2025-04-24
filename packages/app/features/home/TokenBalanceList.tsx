@@ -12,6 +12,7 @@ import { convertBalanceToFiat } from 'app/utils/convertBalanceToUSD'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { type MarketData, useMultipleTokensMarketData } from 'app/utils/coin-gecko'
 import { useThemeSetting } from '@tamagui/next-theme'
+import { useIsPriceHidden } from 'app/features/home/utils/useIsPriceHidden'
 
 export const TokenBalanceList = () => {
   const { coins, isLoading } = useCoins()
@@ -66,6 +67,7 @@ const TokenBalanceItem = ({
       ?.price_change_percentage_24h ?? null
   const changeText = changePercent24h?.toFixed(2) || ''
   const isNeutral = changeText === '0.00' || changeText === '-0.00'
+  const { isPriceHidden } = useIsPriceHidden()
 
   return (
     <Link display="flex" {...props}>
@@ -84,9 +86,16 @@ const TokenBalanceItem = ({
               color={'$lightGrayTextField'}
               $theme-light={{ color: '$darkGrayTextField' }}
             >
-              {isLoadingTokenPrices || balanceInUSD === undefined
-                ? '$0.00'
-                : `$${formatAmount(balanceInUSD, 12, 2)}`}
+              {(() => {
+                switch (true) {
+                  case isLoadingTokenPrices || balanceInUSD === undefined:
+                    return '$0.00'
+                  case isPriceHidden:
+                    return '///////'
+                  default:
+                    return `$${formatAmount(balanceInUSD, 12, 2)}`
+                }
+              })()}
             </Paragraph>
             <Paragraph
               color={(() => {
@@ -116,6 +125,8 @@ const TokenBalance = ({
 }: {
   coin: CoinWithBalance
 }) => {
+  const { isPriceHidden } = useIsPriceHidden()
+
   if (balance === undefined) return <></>
   return (
     <Paragraph
@@ -124,7 +135,9 @@ const TokenBalance = ({
       col="$color12"
       $gtSm={{ fontSize: '$8', fontWeight: '600' }}
     >
-      {formatAmount((Number(balance) / 10 ** decimals).toString(), 10, formatDecimals ?? 5)}
+      {isPriceHidden
+        ? '//////'
+        : formatAmount((Number(balance) / 10 ** decimals).toString(), 10, formatDecimals ?? 5)}
     </Paragraph>
   )
 }
