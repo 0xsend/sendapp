@@ -1,6 +1,6 @@
-import { AccountScreen } from 'app/features/account/screen'
 import { Stack } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { AccountScreenLayout } from 'app/features/account/AccountScreenLayout'
 
 export default function Screen() {
   return (
@@ -10,7 +10,7 @@ export default function Screen() {
           title: 'Account',
         }}
       />
-      <AccountScreen />
+      <AccountScreenLayout />
     </SafeAreaView>
   )
 }

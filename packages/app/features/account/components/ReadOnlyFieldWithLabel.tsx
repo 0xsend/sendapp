@@ -1,4 +1,4 @@
-import { FieldWithLabel } from 'app/features/account/settings/components/FieldWithLabel'
+import { FieldWithLabel } from 'app/features/account/components/FieldWithLabel'
 import { Paragraph } from '@my/ui'
 
 export const ReadOnlyFieldWithLabel = ({

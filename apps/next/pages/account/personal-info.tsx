@@ -1,10 +1,10 @@
 import { HomeLayout } from 'app/features/home/layout.web'
-import { SettingsLayout } from 'app/features/account/settings/layout.web'
-import { PersonalInfoScreen } from 'app/features/account/settings'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
-import type { NextPageWithLayout } from '../../_app'
+import type { NextPageWithLayout } from '../_app'
 import { TopNav } from 'app/components/TopNav'
+import { AccountScreenLayout } from 'app/features/account/AccountScreenLayout'
+import { PersonalInfoScreen } from 'app/features/account/components/personalInfo/screen'
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -20,8 +20,8 @@ export const Page: NextPageWithLayout = () => {
 
 export const getServerSideProps = userProtectedGetSSP()
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Settings" backFunction={'router'} />} fullHeight>
-    <SettingsLayout>{children}</SettingsLayout>
+  <HomeLayout TopNav={<TopNav header="Account" backFunction={'router'} />} fullHeight>
+    <AccountScreenLayout>{children}</AccountScreenLayout>
   </HomeLayout>
 )
 
