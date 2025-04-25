@@ -1,25 +1,22 @@
 import {
-  YStack,
-  H1,
-  Paragraph,
-  XStack,
-  Image,
-  LinearGradient,
-  Stack,
-  Spinner,
-  H3,
   Card,
-  Label,
-  Theme,
   type CardProps,
+  H3,
+  Label,
+  Paragraph,
+  Spinner,
+  Stack,
+  Theme,
+  XStack,
+  YStack,
 } from '@my/ui'
 import { CheckCircle2 } from '@tamagui/lucide-icons'
 import { IconAccount, IconInfoCircle } from 'app/components/icons'
 import {
   type DistributionsVerificationsQuery,
+  type UseDistributionsResultData,
   useDistributionVerifications,
   useMonthlyDistributions,
-  type UseDistributionsResultData,
   useSnapshotBalance,
 } from 'app/utils/distributions'
 import formatAmount from 'app/utils/formatAmount'
@@ -67,7 +64,6 @@ export function ActivityRewardsScreen() {
   if (isLoading) {
     return (
       <YStack f={1} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
-        <Header />
         <Stack w="100%" f={1} jc={'center'} ai={'center'}>
           <Spinner color="$color12" size="large" />
         </Stack>
@@ -78,7 +74,6 @@ export function ActivityRewardsScreen() {
   if (!distributions?.length) {
     return (
       <YStack f={1} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
-        <Header />
         <Stack w="100%" f={1} jc={'center'} ai={'center'}>
           <Paragraph color={'$color10'} size={'$5'}>
             No rewards available
@@ -97,7 +92,6 @@ export function ActivityRewardsScreen() {
 
   return (
     <YStack f={1} pb={'$12'} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
-      <Header />
       <XStack w={'100%'} jc={'space-between'} ai={'center'}>
         <H3 fontWeight={'600'} color={'$color12'} pr={'$2'}>
           {`${distributionDates[selectedDistributionIndex]?.split(' ')[0] ?? 'Monthly'} Rewards`}
@@ -156,58 +150,6 @@ export function ActivityRewardsScreen() {
     </YStack>
   )
 }
-
-const Header = () => (
-  <Stack w={'100%'} h={224} jc={'center'} br={'$6'} overflow="hidden">
-    <Image
-      pos={'absolute'}
-      br={'$6'}
-      t={0}
-      bc="$black"
-      zIndex={0}
-      source={{
-        height: 1024,
-        width: 1024,
-        uri: 'https://ghassets.send.app/app_images/flower.jpg',
-      }}
-      $sm={{
-        h: '150%',
-        w: '150%',
-        t: '-25%',
-        l: '-25%',
-      }}
-      h={'100%'}
-      w={'100%'}
-      objectFit="cover"
-    />
-    <LinearGradient
-      pos={'absolute'}
-      br={'$6'}
-      t={0}
-      start={[0, 0]}
-      end={[0, 1]}
-      fullscreen
-      colors={['$background', 'transparent', '$background']}
-    />
-
-    <YStack p="$4" pt={'$3'} position="absolute" zIndex={1}>
-      <H1 tt={'uppercase'} color={'white'} size={'$9'} $gtMd={{ size: '$10' }}>
-        Unlock <br />
-        Extra Rewards
-      </H1>
-      <Paragraph
-        color="$darkAlabaster"
-        size={'$2'}
-        $gtMd={{
-          size: '$5',
-        }}
-      >
-        Register at least 1 Sendtag, maintain the minimum balance,
-        <br /> avoid selling, and refer others for a bonus multiplier.
-      </Paragraph>
-    </YStack>
-  </Stack>
-)
 
 const DistributionRequirementsCard = ({
   distribution,
