@@ -66,7 +66,7 @@ export const AccountHeader = (props: YStackProps) => {
             <Button.Icon>
               <IconShare size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
             </Button.Icon>
-            <Button.Text size={'$5'}>Refer Friends</Button.Text>
+            <Button.Text size={'$5'}>Invite Friends</Button.Text>
           </Button>
           <Button f={1} py={'$5'} h={'auto'} br={'$5'} bw={0} hoverStyle={hoverStyles}>
             <Button.Icon>

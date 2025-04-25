@@ -50,7 +50,7 @@ const StatsCards = () => {
       >
         <Card $gtLg={{ flexShrink: 0, flexBasis: '32%' }} w="100%" mih={152}>
           <CardHeader>
-            <Label color={'$color10'}>Total Referrals</Label>
+            <Label color={'$color10'}>Your Friends</Label>
           </CardHeader>
           {isLoading ? (
             <Spinner alignSelf="flex-start" size="large" color="$color12" mt="auto" p="$4" />
@@ -94,7 +94,9 @@ const ReferralsList = () => {
   return (
     <YStack space="$4">
       <XStack alignItems="center" gap="$3">
-        <H3 fontWeight={'normal'}>{!pages || !pages[0]?.length ? 'No Referrals' : 'Referrals'}</H3>
+        <H3 fontWeight={'normal'}>
+          {!pages || !pages[0]?.length ? 'No invited friends yet' : 'Friends'}
+        </H3>
       </XStack>
       {Boolean(pages?.[0]?.length) && (
         <Card gap="$5" p="$5" w="100%" fd="row" flexWrap="wrap">
@@ -144,7 +146,9 @@ const ReferralsList = () => {
 
 const ReferralsListRow = ({
   referral,
-}: { referral: Functions<'get_affiliate_referrals'>[number] }) => {
+}: {
+  referral: Functions<'get_affiliate_referrals'>[number]
+}) => {
   const date = new Date(referral?.created_at).toLocaleString(undefined, { dateStyle: 'medium' })
 
   return (
