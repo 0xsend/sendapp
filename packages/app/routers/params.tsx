@@ -6,11 +6,43 @@ import { type Address, isAddress } from 'viem'
 import { useCoin } from 'app/provider/coins'
 import { useCallback } from 'react'
 
+export type AuthScreenParams = {
+  redirectUri?: string
+}
+
+const { useParam: useAuthParam, useParams: useAuthParams } = createParam<AuthScreenParams>()
+
+const useRedirectUri = () => {
+  const [redirectUri, setRedirectUriParam] = useAuthParam('redirectUri', {
+    initial: undefined,
+    parse: (value) => {
+      if (value === undefined) return undefined
+      if (value.includes('/auth/')) return undefined
+      return Array.isArray(value) ? decodeURIComponent(value[0] ?? '') : decodeURIComponent(value)
+    },
+  })
+
+  return [redirectUri, setRedirectUriParam] as const
+}
+
+export const useAuthScreenParams = () => {
+  const { setParams } = useAuthParams()
+  const [redirectUri] = useRedirectUri()
+
+  return [
+    {
+      redirectUri,
+    },
+    setParams,
+  ] as const
+}
+
 export type RootParams = {
   nav?: 'home'
   token?: allCoins[number]['token']
   search?: string
   profile?: string
+  activity?: string
 }
 
 const { useParam: useRootParam, useParams: useRootParams } = createParam<RootParams>()
@@ -39,12 +71,18 @@ const useProfile = () => {
   return [profile, setProfileParam] as const
 }
 
+const useActivity = () => {
+  const [activity, setActivityParam] = useRootParam('activity')
+  return [activity, setActivityParam] as const
+}
+
 export const useRootScreenParams = () => {
   const { setParams } = useRootParams()
   const [nav] = useNav()
   const [token] = useToken()
   const [search] = useSearch()
   const [profile] = useProfile()
+  const [activity] = useActivity()
 
   return [
     {
@@ -52,9 +90,61 @@ export const useRootScreenParams = () => {
       token,
       search,
       profile,
+      activity,
     },
     setParams,
   ] as const
+}
+
+type SetStateOptions = {
+  webBehavior?: 'push' | 'replace'
+}
+
+type ParamsHook<T> = () => readonly [T, (params: Partial<T>, options?: SetStateOptions) => void]
+
+// Exclude RootParams keys from T
+type ExcludeRootParams<T> = {
+  [K in keyof T]: K extends keyof RootParams ? never : T[K]
+}
+
+const withRootParams = <T extends object>(
+  useScreenParamsHook: ParamsHook<ExcludeRootParams<T>>
+) => {
+  return (): readonly [
+    RootParams & T,
+    (params: Partial<RootParams & T>, options?: SetStateOptions) => void,
+  ] => {
+    const [rootParamsData, setRootParams] = useRootScreenParams()
+    const [screenParams, setScreenParams] = useScreenParamsHook()
+
+    const setCombinedParams = useCallback(
+      (params: Partial<RootParams & T>, options?: SetStateOptions) => {
+        const rootKeys = Object.keys(params).filter((key) => key in rootParamsData)
+        const screenKeys = Object.keys(params).filter((key) => key in screenParams)
+
+        if (rootKeys.length > 0) {
+          const rootUpdate = Object.fromEntries(rootKeys.map((key) => [key, params[key]]))
+          setRootParams(rootUpdate, options)
+        }
+
+        if (screenKeys.length > 0) {
+          const screenUpdate = Object.fromEntries(
+            screenKeys.map((key) => [key, params[key]])
+          ) as ExcludeRootParams<T>
+          setScreenParams(screenUpdate, options)
+        }
+      },
+      [rootParamsData, screenParams, setRootParams, setScreenParams]
+    )
+
+    return [
+      {
+        ...rootParamsData,
+        ...screenParams,
+      },
+      setCombinedParams,
+    ] as const
+  }
 }
 
 export type DistributionScreenParams = { distribution?: number }
@@ -71,9 +161,10 @@ const useDistribution = () => {
   return [distribution, setDistributionParam] as const
 }
 
-export const useRewardsScreenParams = () => {
+const useRewardsScreenParamsBase = () => {
   const { setParams } = useDistributionParams()
   const [distribution] = useDistribution()
+
   return [
     {
       distribution,
@@ -81,6 +172,8 @@ export const useRewardsScreenParams = () => {
     setParams,
   ] as const
 }
+
+export const useRewardsScreenParams = withRootParams(useRewardsScreenParamsBase)
 
 export type SendScreenParams = {
   idType?: Enums<'lookup_type_enum'> | Address
@@ -125,7 +218,7 @@ const parseTokenParam = (value) => {
     : usdcAddress[baseMainnet.id]
 }
 
-export const useSendToken = () => {
+const useSendToken = () => {
   const { coin: sendCoin } = useCoin('SEND')
   const [sendToken, setSendTokenParam] = useSendParam('sendToken', {
     initial:
@@ -138,7 +231,7 @@ export const useSendToken = () => {
   return [sendToken, setSendTokenParam] as const
 }
 
-export const useNote = () => {
+const useNote = () => {
   const [note, setNoteParam] = useSendParam('note', {
     initial: undefined,
     stringify: (note) => {
@@ -153,7 +246,7 @@ export const useNote = () => {
   return [note, setNoteParam] as const
 }
 
-export const useSendScreenParams = () => {
+const useSendScreenParamsBase = () => {
   const { setParams } = useSendParams()
   const [idType] = useIdType()
   const [recipient] = useRecipient()
@@ -162,11 +255,12 @@ export const useSendScreenParams = () => {
   const [note] = useNote()
 
   const setEncodedParams = useCallback(
-    (params: Parameters<typeof setParams>[0], options?: Parameters<typeof setParams>[1]) => {
+    (params, options) => {
       const encodedParams = {
         ...params,
         note: params.note ? encodeURIComponent(params.note) : undefined,
       }
+
       setParams(encodedParams, options)
     },
     [setParams]
@@ -183,6 +277,8 @@ export const useSendScreenParams = () => {
     setEncodedParams,
   ] as const
 }
+
+export const useSendScreenParams = withRootParams(useSendScreenParamsBase)
 
 export type ProfileScreenParams = {
   sendid?: string
@@ -202,44 +298,21 @@ export const useTag = () => {
   return [tag, setTag] as const
 }
 
-export const useProfileScreenParams = () => {
+const useProfileScreenParamsBase = () => {
   const { setParams } = useProfileParams()
   const [sendid] = useSendId()
   const [tag] = useTag()
 
-  return [{ sendid, tag }, setParams] as const
-}
-
-export type AuthScreenParams = {
-  redirectUri?: string
-}
-
-const { useParam: useAuthParam, useParams: useAuthParams } = createParam<AuthScreenParams>()
-
-export const useRedirectUri = () => {
-  const [redirectUri, setRedirectUriParam] = useAuthParam('redirectUri', {
-    initial: undefined,
-    parse: (value) => {
-      if (value === undefined) return undefined
-      if (value.includes('/auth/')) return undefined
-      return Array.isArray(value) ? decodeURIComponent(value[0] ?? '') : decodeURIComponent(value)
-    },
-  })
-
-  return [redirectUri, setRedirectUriParam] as const
-}
-
-export const useAuthScreenParams = () => {
-  const { setParams } = useAuthParams()
-  const [redirectUri] = useRedirectUri()
-
   return [
     {
-      redirectUri,
+      sendid,
+      tag,
     },
     setParams,
   ] as const
 }
+
+export const useProfileScreenParams = withRootParams(useProfileScreenParamsBase)
 
 export type SwapScreenParams = {
   outToken: allCoins[number]['token']
@@ -280,7 +353,7 @@ const useSlippage = () => {
   return [slippage, setSlippage] as const
 }
 
-export const useSwapScreenParams = () => {
+const useSwapScreenParamsBase = () => {
   const { setParams } = useSwapParams()
   const [outToken] = useOutToken()
   const [inToken] = useInToken()
@@ -298,6 +371,8 @@ export const useSwapScreenParams = () => {
   ] as const
 }
 
+export const useSwapScreenParams = withRootParams(useSwapScreenParamsBase)
+
 export type DepositScreenParams = {
   depositAmount?: string
 }
@@ -311,7 +386,7 @@ const useDepositAmount = () => {
   return [depositAmount, setDepositAmount] as const
 }
 
-export const useDepositScreenParams = () => {
+const useDepositScreenParamsBase = () => {
   const { setParams } = useDepositParams()
   const [depositAmount] = useDepositAmount()
 
@@ -322,3 +397,5 @@ export const useDepositScreenParams = () => {
     setParams,
   ] as const
 }
+
+export const useDepositScreenParams = withRootParams(useDepositScreenParamsBase)
