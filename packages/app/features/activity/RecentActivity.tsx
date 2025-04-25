@@ -9,16 +9,19 @@ import { SectionList } from 'react-native'
 import type { ZodError } from 'zod'
 import { useActivityFeed } from './utils/useActivityFeed'
 import { useScrollDirection } from 'app/provider/scroll'
+import { useRootScreenParams } from 'app/routers/params'
 
 export function RecentActivity() {
   const result = useActivityFeed()
+  const [queryParams, setParams] = useRootScreenParams()
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
 
   const handleActivityPress = (activity: Activity) => {
+    setParams({ ...queryParams, activity: 'details' }, { webBehavior: 'replace' })
     setSelectedActivity(activity)
   }
-
   const handleCloseActivityDetails = () => {
+    setParams({ ...queryParams, activity: undefined }, { webBehavior: 'replace' })
     setSelectedActivity(null)
   }
 
@@ -33,7 +36,7 @@ export function RecentActivity() {
     >
       <YStack
         f={1}
-        display={selectedActivity ? 'none' : 'flex'}
+        display={selectedActivity && queryParams.activity ? 'none' : 'flex'}
         $gtLg={{
           display: 'flex',
           maxWidth: '50%',
@@ -41,7 +44,7 @@ export function RecentActivity() {
       >
         <ActivityFeed activityFeedQuery={result} onActivityPress={handleActivityPress} />
       </YStack>
-      {selectedActivity && (
+      {selectedActivity && queryParams.activity && (
         <ActivityDetails
           activity={selectedActivity}
           onClose={handleCloseActivityDetails}
