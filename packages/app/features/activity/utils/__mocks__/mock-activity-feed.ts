@@ -48,6 +48,7 @@ export const mockSentTransfer = {
     block_num: '15164541',
     tx_idx: '0',
     log_idx: '2',
+    note: 'Send gonna be $1 someday',
   },
 }
 
@@ -210,6 +211,7 @@ export const mockSendAccountReceive = {
     tx_hash: '\\xeec33cc50042cbba53fc1de714bd99b206635f890dbe29771c7986df6da0f6af',
     log_addr: '\\xb2c21f54653531aa4affa80f63593913f0c70628',
     block_num: '15681483',
+    note: 'Send gonna be $1 someday',
   },
 } as const
 

@@ -334,7 +334,7 @@ export function eventNameFromActivity({
     case isSendEarnWithdrawEvent(activity):
       return 'Send Earn Withdraw'
     case isTemporalTransfer:
-      return note || temporalEventNameFromStatus(data.status)
+      return note || ''
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Revenue Share'
     case isSendTokenUpgradeEvent(activity):
@@ -350,9 +350,9 @@ export function eventNameFromActivity({
       }
       return 'Deposit'
     case isTransferOrReceive && !!to_user?.id:
-      return note || 'Received'
+      return note || ''
     case isTransferOrReceive && !!from_user?.id:
-      return note || 'Sent'
+      return note || ''
     case isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity):
       return 'Sendtag Registered'
     case isReferralsEvent(activity) && !!from_user?.id:
@@ -442,8 +442,6 @@ export function phraseFromActivity({
       return 'Deposited to Send Earn'
     case isSendEarnWithdrawEvent(activity):
       return 'Withdrew from Send Earn'
-    case isTemporalTransfer:
-      return temporalEventNameFromStatus(data.status)
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Earned revenue share'
     case isSendTokenUpgradeEvent(activity):
@@ -458,9 +456,9 @@ export function phraseFromActivity({
         return 'Trade'
       }
       return 'Deposited'
-    case isTransferOrReceive && !!to_user?.id:
+    case (isTransferOrReceive || isTemporalTransfer) && !!to_user?.id:
       return 'Sent you'
-    case isTransferOrReceive && !!from_user?.id:
+    case (isTransferOrReceive || isTemporalTransfer) && !!from_user?.id:
       return 'Received'
     case isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity):
       return data.tags?.length > 1 ? 'Sendtags created' : 'Sendtag created'
