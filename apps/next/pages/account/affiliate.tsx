@@ -9,24 +9,20 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Affiliates</title>
-        <meta
-          name="description"
-          content="View your network and track referral activity."
-          key="desc"
-        />
+        <title>Send | Friends</title>
+        <meta name="description" content="View invited friends and track activity." key="desc" />
       </Head>
       <AffiliateScreen />
     </>
   )
 }
 
-const subheader = 'View your network and track referral activity.'
+const subheader = 'View invited friends and track activity.'
 
 export const getServerSideProps = userProtectedGetSSP()
 
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Affiliate" subheader={subheader} />}>{children}</HomeLayout>
+  <HomeLayout TopNav={<TopNav header="Friends" subheader={subheader} />}>{children}</HomeLayout>
 )
 
 export default Page
