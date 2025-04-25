@@ -6,9 +6,11 @@ import { ReferralLink } from 'app/components/ReferralLink'
 import { useEffect, useState } from 'react'
 import * as Sharing from 'expo-sharing'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { useConfirmedTags } from 'app/utils/tags'
 
 export const AccountHeader = (props: YStackProps) => {
-  const { profile, tags } = useUser()
+  const { profile } = useUser()
+  const tags = useConfirmedTags()
   const avatar_url = profile?.avatar_url
   const name = profile?.name
   const referralCode = tags?.[0]?.name || profile?.referral_code
