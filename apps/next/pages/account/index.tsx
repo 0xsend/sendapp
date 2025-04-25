@@ -22,7 +22,10 @@ export const Page: NextPageWithLayout = () => {
 
 export const getServerSideProps = userProtectedGetSSP()
 Page.getLayout = () => (
-  <HomeLayout TopNav={<TopNav header="Account" showOnGtLg={true} />} fullHeight>
+  <HomeLayout
+    TopNav={<TopNav header="Account" showOnGtLg={true} hideRightActions={true} />}
+    fullHeight
+  >
     <AccountScreenLayout />
   </HomeLayout>
 )
