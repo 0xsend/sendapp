@@ -36,6 +36,8 @@ import {
   temporalEventNameFromStatus,
 } from './zod/activity/TemporalTransfersEventSchema'
 import { calculateTicketsFromWei, SENDPOT_CONTRACT_ADDRESS } from 'app/data/sendpot'
+import { CommentsTime } from 'app/utils/dateHelper'
+import { Spinner } from '@my/ui'
 
 const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
   Object.values(addresses).map((a) => [a, label])
@@ -689,4 +691,44 @@ export function getBaseAddressFilterCondition({
       data->>f.not.in.(${fromTransferIgnoreValues})
     )
   `)
+}
+
+export function useDateFromActivity({ activity }: { activity: Activity }) {
+  const { created_at, data } = activity
+  const isTemporalTransfer =
+    isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
+
+  if (isTemporalTransfer) {
+    switch (data.status) {
+      case 'failed':
+      case 'cancelled':
+        return 'Failed'
+      case 'confirmed':
+        return CommentsTime(new Date(created_at))
+      default:
+        return <Spinner size="small" color={'$color11'} />
+    }
+  }
+
+  return CommentsTime(new Date(created_at))
+}
+
+export function useDateDetailsFromActivity({ activity }: { activity: Activity }) {
+  const { created_at, data } = activity
+  const isTemporalTransfer =
+    isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
+
+  if (isTemporalTransfer) {
+    switch (data.status) {
+      case 'failed':
+      case 'cancelled':
+        return 'Failed'
+      case 'confirmed':
+        return created_at.toLocaleString()
+      default:
+        return <Spinner size="small" color={'$color11'} />
+    }
+  }
+
+  return created_at.toLocaleString()
 }
