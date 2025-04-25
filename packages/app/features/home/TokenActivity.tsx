@@ -7,16 +7,21 @@ import { useState } from 'react'
 import { ActivityDetails } from '../activity/ActivityDetails'
 import { TokenActivityFeed } from './TokenActivityFeed'
 import { useTokenActivityFeed } from './utils/useTokenActivityFeed'
+import { useRootScreenParams } from 'app/routers/params'
 
 export const TokenActivity = ({ coin }: { coin: CoinWithBalance }) => {
+  const [queryParams, setParams] = useRootScreenParams()
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
 
   const handleActivityPress = (activity: Activity) => {
+    setParams({ ...queryParams, activity: 'details' }, { webBehavior: 'replace' })
     setSelectedActivity(activity)
   }
   const handleCloseActivityDetails = () => {
+    setParams({ ...queryParams, activity: undefined }, { webBehavior: 'replace' })
     setSelectedActivity(null)
   }
+
   const tokenActivityFeedQuery = useTokenActivityFeed({
     pageSize: 10,
     address: coin.token === 'eth' ? undefined : hexToBytea(coin.token),
@@ -35,7 +40,7 @@ export const TokenActivity = ({ coin }: { coin: CoinWithBalance }) => {
     )
   }
 
-  if (selectedActivity) {
+  if (selectedActivity && queryParams.activity) {
     return <ActivityDetails activity={selectedActivity} onClose={handleCloseActivityDetails} />
   }
   return (
