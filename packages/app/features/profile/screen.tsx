@@ -141,12 +141,10 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                   ) : null
                 }
                 ListHeaderComponent={
-                  Boolean(otherUserProfile) && user?.id !== otherUserProfile?.id ? (
-                    <SendButton
-                      identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
-                      idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
-                    />
-                  ) : null
+                  <SendButton
+                    identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
+                    idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
+                  />
                 }
                 inverted={true}
                 showsVerticalScrollIndicator={false}
