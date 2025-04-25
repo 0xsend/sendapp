@@ -190,7 +190,7 @@ const TransactionEntry = ({
     data: { note },
   } = activity
   const amount = amountFromActivity(activity)
-  const date = useTransactionEntryDate({ activity })
+  const date = useTransactionEntryDate({ activity, sent })
 
   return (
     <XStack justifyContent={sent ? 'flex-end' : 'flex-start'} testID="activityTest" my={'$2.5'}>
@@ -272,7 +272,7 @@ const DatePill = ({ date }: { date: string }) => {
   )
 }
 
-const useTransactionEntryDate = ({ activity }: { activity: Activity }) => {
+const useTransactionEntryDate = ({ activity, sent }: { activity: Activity; sent: boolean }) => {
   const { created_at, data } = activity
   const isTemporalTransfer =
     isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
@@ -285,7 +285,9 @@ const useTransactionEntryDate = ({ activity }: { activity: Activity }) => {
       case 'confirmed':
         return new Date(created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
       default:
-        return <Spinner size="small" color={'$color11'} alignItems={'flex-start'} />
+        return (
+          <Spinner size="small" color={'$color11'} alignItems={sent ? 'flex-end' : 'flex-start'} />
+        )
     }
   }
 
