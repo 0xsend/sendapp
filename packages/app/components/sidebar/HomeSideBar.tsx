@@ -39,14 +39,14 @@ const links = [
     href: '/',
   },
   {
-    icon: <IconDeviceReset size={'$1'} scale={1.2} />,
-    text: 'Activity',
-    href: '/activity',
-  },
-  {
     icon: <IconArrowUp size={'$1'} scale={1.3} />,
     text: 'Send',
     href: '/send',
+  },
+  {
+    icon: <IconDeviceReset size={'$1'} scale={1.2} />,
+    text: 'Activity',
+    href: '/activity',
   },
   {
     icon: <IconWorldSearch size={'$1'} scale={1.1} />,
