@@ -1,5 +1,5 @@
 import { Avatar, LinkableAvatar, type LinkableAvatarProps, Spinner, XStack } from '@my/ui'
-import { ArrowDown, ArrowUp, Minus, Plus } from '@tamagui/lucide-icons'
+import { Minus, Plus } from '@tamagui/lucide-icons'
 import { AvatarSendEarnDeposit } from 'app/components/avatars'
 import { AvatarSendEarnWithdraw } from 'app/components/avatars/AvatarSendEarnWithdraw'
 import { IconUpgrade } from 'app/components/icons'
@@ -57,9 +57,7 @@ export function ActivityAvatar({
         onPress={(e) => {
           e.stopPropagation()
         }}
-        position={'relative'}
       >
-        <TransferDirectionIndicator activity={activity} />
         <LinkableAvatar size="$4.5" br="$4" gap="$2" href={`/profile/${user.send_id}`} {...props}>
           {(() => {
             switch (true) {
@@ -186,28 +184,6 @@ const TradeActivityAvatar = ({ activity }: { activity: Activity }) => {
         shadowOpacity={1}
         shadowRadius={4}
       />
-    </XStack>
-  )
-}
-
-const TransferDirectionIndicator = ({ activity }: { activity: Activity }) => {
-  const { to_user } = activity
-
-  return (
-    <XStack
-      position={'absolute'}
-      top={0}
-      right={0}
-      transform={'translate(30%, -30%)'}
-      bc={'$olive'}
-      borderRadius={999}
-      shadowColor={'#000000'}
-      shadowOffset={{ width: 0, height: 2 }}
-      shadowOpacity={0.7}
-      shadowRadius={8}
-      zIndex={1}
-    >
-      {to_user?.id ? <ArrowDown size={'$1'} /> : <ArrowUp size={'$1'} />}
     </XStack>
   )
 }
