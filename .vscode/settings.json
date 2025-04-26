@@ -52,5 +52,6 @@
     "@uniswap/=./node_modules/@uniswap/"
   ],
   "sqlfluff.config": "supabase/sqlfluff.cfg",
-  "nix.formatterPath": "alejandra"
+  "nix.formatterPath": "alejandra",
+  "biome.lspBin": "./node_modules/.bin/biome"
 }
