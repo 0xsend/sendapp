@@ -333,8 +333,6 @@ export function eventNameFromActivity({
       return 'Send Earn Deposit'
     case isSendEarnWithdrawEvent(activity):
       return 'Send Earn Withdraw'
-    case isTemporalTransfer:
-      return note || ''
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Revenue Share'
     case isSendTokenUpgradeEvent(activity):
@@ -349,10 +347,10 @@ export function eventNameFromActivity({
         return 'Trade'
       }
       return 'Deposit'
-    case isTransferOrReceive && !!to_user?.id:
-      return note || ''
-    case isTransferOrReceive && !!from_user?.id:
-      return note || ''
+    case (isTransferOrReceive || isTemporalTransfer) && !!to_user?.id:
+      return note || 'Received'
+    case (isTransferOrReceive || isTemporalTransfer) && !!from_user?.id:
+      return note || 'Sent'
     case isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity):
       return 'Sendtag Registered'
     case isReferralsEvent(activity) && !!from_user?.id:
