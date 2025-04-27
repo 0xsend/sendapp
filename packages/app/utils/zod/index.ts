@@ -7,3 +7,4 @@ export {
 export { decimalStrToBigInt } from './bigint'
 export { hex, address } from './evm'
 export { epochToDate } from './activity/time'
+export { TransferSchema } from './TransferSchema'

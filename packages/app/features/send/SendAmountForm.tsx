@@ -19,7 +19,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
 
-import { type BRAND, z } from 'zod'
+import type { BRAND, z } from 'zod'
 
 import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { useCoins } from 'app/provider/coins'
@@ -29,15 +29,10 @@ import { ProfilesDetailsModal } from 'app/features/profile/components/ProfileDet
 import { IconX } from 'app/components/icons'
 import { useThemeSetting } from 'app/provider/theme'
 import { MAX_NOTE_LENGTH } from 'app/components/FormFields/NoteField'
-
-const SendAmountSchema = z.object({
-  amount: formFields.text,
-  token: formFields.coin,
-  note: formFields.note,
-})
+import { TransferSchema } from 'app/utils/zod'
 
 export function SendAmountForm() {
-  const form = useForm<z.infer<typeof SendAmountSchema>>()
+  const form = useForm<z.infer<typeof TransferSchema>>()
   const router = useRouter()
   const [sendParams, setSendParams] = useSendScreenParams()
   const { coin } = useCoinFromSendTokenParam()
@@ -172,7 +167,7 @@ export function SendAmountForm() {
         <FormProvider {...form}>
           <SchemaForm
             form={form}
-            schema={SendAmountSchema}
+            schema={TransferSchema}
             onSubmit={onSubmit}
             props={{
               amount: {
