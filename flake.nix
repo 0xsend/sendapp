@@ -40,24 +40,24 @@
         pkgs = import nixpkgs {inherit overlays system;};
         nodejs = pkgs.nodejs_20;
         yarn = pkgs.yarn.override {inherit nodejs;};
-      in rec {
+      in {
         formatter = pkgs.alejandra;
 
         devShells.default = pkgs.mkShell {
-          nativeBuildInputs = with pkgs; [
-            foundry
-            nodejs_20
+          nativeBuildInputs = [
+            pkgs.foundry
+            nodejs
             yarn
-            python310
-            gnused
-            postgresql_15
+            pkgs.python310
+            pkgs.gnused
+            pkgs.postgresql_15
 
-            unstable.jq
-            unstable.yj
-            unstable.caddy
-            unstable.bun
-            unstable.tilt
-            unstable.temporal-cli
+            pkgs.unstable.jq
+            pkgs.unstable.yj
+            pkgs.unstable.caddy
+            pkgs.unstable.bun
+            pkgs.unstable.tilt
+            pkgs.unstable.temporal-cli
           ];
         };
 
