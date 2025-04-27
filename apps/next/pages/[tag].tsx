@@ -10,6 +10,7 @@ import { SendtagSchema } from 'app/utils/zod/sendtag'
 import { assert } from 'app/utils/assert'
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { TopNav } from 'app/components/TopNav'
+import { ProfileLayout } from 'app/features/profile/layout.web'
 
 export const Page: NextPageWithLayout<{ sendid: number | null }> = ({ sendid }) => {
   return (
@@ -83,9 +84,9 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
 }) satisfies GetServerSideProps
 
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="History" backFunction="router" />} fullHeight>
+  <ProfileLayout TopNav={<TopNav header="History" backFunction="router" />} fullHeight>
     {children}
-  </HomeLayout>
+  </ProfileLayout>
 )
 
 export default Page

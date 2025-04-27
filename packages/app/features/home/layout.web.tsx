@@ -49,7 +49,6 @@ export function HomeLayout({
                   right: 'additive',
                 },
               }}
-              pb={BOTTOM_NAV_BAR_HEIGHT}
               $gtLg={{ pt: '$5', pb: '$0' }}
               height={fullHeight ? '100%' : 'auto'}
             >

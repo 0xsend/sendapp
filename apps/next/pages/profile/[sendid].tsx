@@ -1,5 +1,5 @@
 import { ProfileScreen } from 'app/features/profile/screen'
-import { HomeLayout } from 'app/features/home/layout.web'
+import { ProfileLayout } from 'app/features/profile/layout.web'
 import Head from 'next/head'
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
 import type { NextPageWithLayout } from '../_app'
@@ -68,9 +68,9 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
 }) satisfies GetServerSideProps
 
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="History" backFunction="router" />} fullHeight>
+  <ProfileLayout TopNav={<TopNav header="History" backFunction="router" />} fullHeight>
     {children}
-  </HomeLayout>
+  </ProfileLayout>
 )
 
 export default Page
