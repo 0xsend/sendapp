@@ -1,20 +1,20 @@
 import '../public/reset.css'
 import '../styles/globals.css'
+
 import 'raf/polyfill'
+
 import '@my/ui/src/config/fonts.css'
 
 import { type ColorScheme, NextThemeProvider, useRootTheme } from '@tamagui/next-theme'
 
+import { Concerns } from 'app/concerns'
+import { Provider } from 'app/provider'
 import type { AuthProviderProps } from 'app/provider/auth'
 import { api } from 'app/utils/api'
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import type { ReactElement, ReactNode } from 'react'
 import type { SolitoAppProps } from 'solito'
-import { Provider } from 'app/provider'
-import { YStack, H1, H2 } from '@my/ui'
-import { IconSendLogo } from 'app/components/icons'
-import { SendV0TokenUpgradeScreen } from 'app/features/send-token-upgrade/screen'
 
 if (process.env.NODE_ENV === 'production') {
   require('../public/tamagui.css')
@@ -63,12 +63,7 @@ function MyApp({
         }}
       >
         <Provider initialSession={pageProps.initialSession}>
-          {/* TODO: create a concerns screen or move to provider instead of wrapping here in next app */}
-          <MaintenanceMode>
-            <SendV0TokenUpgradeScreen>
-              {getLayout(<Component {...pageProps} />)}
-            </SendV0TokenUpgradeScreen>
-          </MaintenanceMode>
+          <Concerns>{getLayout(<Component {...pageProps} />)}</Concerns>
         </Provider>
       </NextThemeProvider>
     </>
@@ -76,31 +71,3 @@ function MyApp({
 }
 
 export default api.withTRPC(MyApp)
-
-function MaintenanceMode({ children }: { children: ReactNode }) {
-  if (process.env.NEXT_PUBLIC_MAINTENANCE_MODE === 'true') {
-    return (
-      <YStack
-        p="$4"
-        ai="center"
-        jc="center"
-        w="100%"
-        h="100%"
-        $gtMd={{
-          p: '$6',
-          ai: 'flex-start',
-          jc: 'flex-start',
-        }}
-      >
-        <IconSendLogo size={'$2.5'} color="$color12" />
-        <H1 $gtMd={{ size: '$8' }} size="$4" fontWeight={'300'} color="$color12">
-          currently undergoing maintenance
-        </H1>
-        <H2 $gtMd={{ size: '$6' }} size="$4" fontWeight={'300'} color="$color12">
-          We will be back shortly!
-        </H2>
-      </YStack>
-    )
-  }
-  return children
-}
