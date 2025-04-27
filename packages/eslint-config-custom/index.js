@@ -30,4 +30,10 @@ module.exports = {
       version: 'detect',
     },
   },
+  globals: {
+    global: 'readonly',
+    globalThis: 'readonly',
+    require: 'readonly',
+    module: 'readonly',
+  },
 }
