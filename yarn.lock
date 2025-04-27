@@ -18854,6 +18854,7 @@ __metadata:
     babel-plugin-module-resolver: "npm:^4.1.0"
     babel-plugin-transform-inline-environment-variables: "npm:^0.4.4"
     babel-preset-expo: "npm:~12.0.4"
+    buffer: "npm:^6.0.3"
     burnt: "npm:^0.12.1"
     cbor2: "npm:^1.12.0"
     cross-env: "npm:^7.0.3"
