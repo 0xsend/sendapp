@@ -1,5 +1,6 @@
 import { useSendAccount } from 'app/utils/send-accounts'
 import { usePathname } from 'app/utils/usePathname'
+import { useEffect } from 'react'
 import { useRouter } from 'solito/router'
 
 /**
@@ -13,16 +14,18 @@ export function OnboardedConcern({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
 
-  // we don't know yet if they need to be onboarded or we encountered an error let the children deal with it
-  if (!sendAccount.isFetched || sendAccount.isError) {
-    return children
-  }
+  useEffect(() => {
+    // we don't know yet if they need to be onboarded or we encountered an error let the children deal with it
+    if (!sendAccount.isFetched || sendAccount.isError) {
+      return
+    }
 
-  if (!sendAccount.data && pathname !== '/auth/onboarding') {
-    router.push('/auth/onboarding')
-    return null
-  }
+    if (!sendAccount.data && pathname !== '/auth/onboarding') {
+      router.push('/auth/onboarding')
+      return
+    }
+  }, [sendAccount, pathname, router])
 
-  // if we're here, we know the user is onboarded
+  // let the user through, they'll be redirected if they need to be onboarded
   return children
 }

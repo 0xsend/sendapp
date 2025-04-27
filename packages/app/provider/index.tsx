@@ -1,16 +1,17 @@
 import type { Session } from '@supabase/supabase-js'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { Concerns } from 'app/concerns'
 import type React from 'react'
 import { AuthProvider } from './auth'
+import { CoinsProvider } from './coins'
+import { OnchainKitProvider } from './onchainkit'
 import { QueryClientProvider } from './react-query'
 import { SafeAreaProvider } from './safe-area'
+import { ScrollDirectionProvider } from './scroll'
 import { TamaguiProvider } from './tamagui'
 import { UniversalThemeProvider } from './theme'
 import { ToastProvider } from './toast'
 import { WagmiProvider } from './wagmi'
-import { ScrollDirectionProvider } from './scroll'
-import { CoinsProvider } from './coins'
-import { OnchainKitProvider } from './onchainkit'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 export { loadThemePromise } from './theme/UniversalThemeProvider'
 
@@ -24,7 +25,7 @@ export function Provider({
   return (
     <AuthProvider initialSession={initialSession}>
       <Providers>
-        {children}
+        <Concerns>{children}</Concerns>
         {process.env.NEXT_PUBLIC_REACT_QUERY_DEV_TOOLS && <ReactQueryDevtools />}
       </Providers>
     </AuthProvider>

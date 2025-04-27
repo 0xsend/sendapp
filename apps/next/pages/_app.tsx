@@ -63,7 +63,7 @@ function MyApp({
         }}
       >
         <Provider initialSession={pageProps.initialSession}>
-          <Concerns>{getLayout(<Component {...pageProps} />)}</Concerns>
+          {getLayout(<Component {...pageProps} />)}
         </Provider>
       </NextThemeProvider>
     </>
