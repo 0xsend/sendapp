@@ -13,6 +13,10 @@ import { FlatList } from 'react-native'
 import { ProfilesDetailsModal } from 'app/features/profile/components/ProfileDetailsModal'
 import { useState } from 'react'
 import { ActivityDetails } from 'app/features/activity/ActivityDetails'
+import {
+  isTemporalEthTransfersEvent,
+  isTemporalTokenTransfersEvent,
+} from 'app/utils/zod/activity/TemporalTransfersEventSchema'
 
 interface ProfileScreenProps {
   sendid?: number | null
@@ -141,12 +145,10 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                   ) : null
                 }
                 ListHeaderComponent={
-                  Boolean(otherUserProfile) && user?.id !== otherUserProfile?.id ? (
-                    <SendButton
-                      identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
-                      idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
-                    />
-                  ) : null
+                  <SendButton
+                    identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
+                    idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
+                  />
                 }
                 inverted={true}
                 showsVerticalScrollIndicator={false}
@@ -185,11 +187,10 @@ const TransactionEntry = ({
   onPress: () => void
 }) => {
   const {
-    created_at,
     data: { note },
   } = activity
   const amount = amountFromActivity(activity)
-  const date = new Date(created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+  const date = useTransactionEntryDate({ activity, sent })
 
   return (
     <XStack justifyContent={sent ? 'flex-end' : 'flex-start'} testID="activityTest" my={'$2.5'}>
@@ -269,4 +270,26 @@ const DatePill = ({ date }: { date: string }) => {
       {date}
     </Paragraph>
   )
+}
+
+const useTransactionEntryDate = ({ activity, sent }: { activity: Activity; sent: boolean }) => {
+  const { created_at, data } = activity
+  const isTemporalTransfer =
+    isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
+
+  if (isTemporalTransfer) {
+    switch (data.status) {
+      case 'failed':
+      case 'cancelled':
+        return 'Failed'
+      case 'confirmed':
+        return new Date(created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+      default:
+        return (
+          <Spinner size="small" color={'$color11'} alignItems={sent ? 'flex-end' : 'flex-start'} />
+        )
+    }
+  }
+
+  return new Date(created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
 }

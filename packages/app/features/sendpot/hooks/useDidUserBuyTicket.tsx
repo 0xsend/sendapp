@@ -10,7 +10,11 @@ export const useDidUserBuyTicket = () => {
 
   return useQuery({
     queryKey: ['useDidUserBuyTicket', { userJackpotSummary, pendingJackpotTickets }] as const,
-    enabled: pendingJackpotTickets.isSuccess && userJackpotSummary.isSuccess,
+    enabled:
+      pendingJackpotTickets.isSuccess &&
+      userJackpotSummary.isSuccess &&
+      pendingJackpotTickets.data !== undefined &&
+      userJackpotSummary.data !== undefined,
     queryFn: async () => {
       if (!pendingJackpotTickets.data || !userJackpotSummary.data) {
         return false

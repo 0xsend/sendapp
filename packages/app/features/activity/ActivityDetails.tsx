@@ -16,6 +16,7 @@ import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
 import {
   isActivitySwapTransfer,
   noteFromActivity,
+  useDateDetailsFromActivity,
   useEventNameFromActivity,
   usePhraseFromActivity,
   useSubtextFromActivity,
@@ -45,6 +46,7 @@ export const ActivityDetails = ({
   const activityPhrase = usePhraseFromActivity({ activity, swapRouters, liquidityPools })
   const subText = useSubtextFromActivity({ activity, swapRouters, liquidityPools })
   const amount = useAmountFromActivity(activity)
+  const date = useDateDetailsFromActivity({ activity })
   const note = noteFromActivity(activity)
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const addressBook = useAddressBook()
@@ -166,7 +168,7 @@ export const ActivityDetails = ({
           )}
           <Separator px="$4" bw="$0.75" borderRadius={'$4'} />
           <YStack gap={'$2'}>
-            <XStack jc={'space-between'}>
+            <XStack jc={'space-between'} ai={'center'}>
               <Paragraph
                 size={'$5'}
                 color={'$silverChalice'}
@@ -181,7 +183,7 @@ export const ActivityDetails = ({
                 // @ts-expect-error end value for text-align is valid value, left is not working properly in this case
                 ta={'end'}
               >
-                {activity.created_at.toLocaleString()}
+                {date}
               </Paragraph>
             </XStack>
           </YStack>

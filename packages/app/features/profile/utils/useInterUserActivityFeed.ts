@@ -1,12 +1,12 @@
 import type { PostgrestError } from '@supabase/postgrest-js'
 import {
-  useInfiniteQuery,
   type InfiniteData,
+  useInfiniteQuery,
   type UseInfiniteQueryResult,
 } from '@tanstack/react-query'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
-import { EventArraySchema, type Activity } from 'app/utils/zod/activity'
+import { type Activity, EventArraySchema, Events } from 'app/utils/zod/activity'
 import type { ZodError } from 'zod'
 
 /**
@@ -48,7 +48,11 @@ export function useInterUserActivityFeed(params: {
       .or(
         `and(from_user->send_id.eq.${currentUserId},to_user->send_id.eq.${otherUserId}), and(from_user->send_id.eq.${otherUserId},to_user->send_id.eq.${currentUserId})`
       )
-      .in('event_name', ['send_account_transfers', 'send_account_receives'])
+      .in('event_name', [
+        Events.SendAccountTransfers,
+        Events.SendAccountReceive,
+        Events.TemporalSendAccountTransfers,
+      ])
       .order('created_at', { ascending })
       .range(from, to)
     const { data, error } = await request

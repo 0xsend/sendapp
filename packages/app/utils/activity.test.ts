@@ -62,19 +62,25 @@ describe('test eventNameFromActivity', () => {
     const activity = JSON.parse(JSON.stringify(mockReceivedTransfer))
     expect(eventNameFromActivity({ activity: EventSchema.parse(activity) })).toBe('Deposit')
   })
-  it('should return the received when received eth and to user ID is present', () => {
+  it('should return the note when received eth and to user ID is present', () => {
     const activity = JSON.parse(JSON.stringify(mockSendAccountReceive))
-    expect(eventNameFromActivity({ activity: EventSchema.parse(activity) })).toBe('Received')
+    expect(eventNameFromActivity({ activity: EventSchema.parse(activity) })).toBe(
+      'Send gonna be $1 someday'
+    )
   })
-  it('should return the sent when received eth and from user ID is present', () => {
+  it('should return the note when received eth and from user ID is present', () => {
     const activity = JSON.parse(JSON.stringify({ ...mockSendAccountReceive }))
     activity.from_user = { ...activity.from_user, id: '1234' }
     activity.to_user = { ...activity.to_user, id: null }
-    expect(eventNameFromActivity({ activity: EventSchema.parse(activity) })).toBe('Sent')
+    expect(eventNameFromActivity({ activity: EventSchema.parse(activity) })).toBe(
+      'Send gonna be $1 someday'
+    )
   })
-  it('should return the sent when transfer and from user ID is present', () => {
+  it('should return the note when transfer and from user ID is present', () => {
     const activity = JSON.parse(JSON.stringify(mockSentTransfer))
-    expect(eventNameFromActivity({ activity: EventSchema.parse(activity) })).toBe('Sent')
+    expect(eventNameFromActivity({ activity: EventSchema.parse(activity) })).toBe(
+      'Send gonna be $1 someday'
+    )
   })
   it('should return the sendtag registered when tag receipts event', () => {
     const activity = JSON.parse(JSON.stringify(mockTagReceipt))

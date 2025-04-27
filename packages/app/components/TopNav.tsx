@@ -43,6 +43,7 @@ interface TopNavProps {
    * @default false
    */
   showOnGtLg?: boolean
+  hideRightActions?: boolean
 }
 
 export function AvatarMenuButton({ profile }: { profile?: Tables<'profiles'> | null }) {
@@ -98,6 +99,7 @@ export function TopNav({
   noSubroute = false,
   backFunction = 'root',
   showOnGtLg = false,
+  hideRightActions = false,
 }: TopNavProps) {
   const [queryParams, setRootParams] = useRootScreenParams()
   const path = usePathname()
@@ -201,6 +203,8 @@ export function TopNav({
                   <XStack
                     jc="center"
                     gap="$2"
+                    opacity={hideRightActions ? 0 : 1}
+                    pointerEvents={hideRightActions ? 'none' : 'unset'}
                     $gtLg={{
                       pointerEvents: 'none',
                       opacity: 0,

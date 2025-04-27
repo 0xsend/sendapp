@@ -58,7 +58,7 @@ const ACCOUNT_LINKS: {
       icon: <IconStarOutline {...iconProps} />,
     },
     {
-      text: 'Affiliate',
+      text: 'Friends',
       href: '/account/affiliate',
       icon: <IconDollar {...iconProps} scale={1.2} />,
     },

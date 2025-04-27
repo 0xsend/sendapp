@@ -1,4 +1,4 @@
-import { H4, Paragraph, Spinner, useMedia, XStack, YStack } from '@my/ui'
+import { Card, H4, Paragraph, Spinner, useMedia, XStack, YStack } from '@my/ui'
 import type { PostgrestError } from '@supabase/postgrest-js'
 import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
 import { ActivityDetails } from 'app/features/activity/ActivityDetails'
@@ -9,31 +9,27 @@ import { SectionList } from 'react-native'
 import type { ZodError } from 'zod'
 import { useActivityFeed } from './utils/useActivityFeed'
 import { useScrollDirection } from 'app/provider/scroll'
+import { useRootScreenParams } from 'app/routers/params'
 
 export function RecentActivity() {
   const result = useActivityFeed()
+  const [queryParams, setParams] = useRootScreenParams()
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
 
   const handleActivityPress = (activity: Activity) => {
+    setParams({ ...queryParams, activity: 'details' }, { webBehavior: 'replace' })
     setSelectedActivity(activity)
   }
-
   const handleCloseActivityDetails = () => {
+    setParams({ ...queryParams, activity: undefined }, { webBehavior: 'replace' })
     setSelectedActivity(null)
   }
 
   return (
-    <XStack
-      w={'100%'}
-      gap={'$5'}
-      f={1}
-      $gtLg={{
-        height: 0,
-      }}
-    >
+    <XStack w={'100%'} gap={'$5'} f={1}>
       <YStack
         f={1}
-        display={selectedActivity ? 'none' : 'flex'}
+        display={selectedActivity && queryParams.activity ? 'none' : 'flex'}
         $gtLg={{
           display: 'flex',
           maxWidth: '50%',
@@ -41,11 +37,16 @@ export function RecentActivity() {
       >
         <ActivityFeed activityFeedQuery={result} onActivityPress={handleActivityPress} />
       </YStack>
-      {selectedActivity && (
+      {selectedActivity && queryParams.activity && (
         <ActivityDetails
           activity={selectedActivity}
           onClose={handleCloseActivityDetails}
           w={'100%'}
+          $platform-web={{
+            height: 'fit-content',
+            position: 'sticky',
+            top: 10,
+          }}
           $gtLg={{
             maxWidth: '47%',
           }}
@@ -63,7 +64,6 @@ function ActivityFeed({
   onActivityPress: (activity: Activity) => void
 }) {
   const { isAtEnd } = useScrollDirection()
-  const media = useMedia()
 
   const {
     data,
@@ -75,10 +75,10 @@ function ActivityFeed({
   } = activityFeedQuery
 
   useEffect(() => {
-    if (isAtEnd && !media.gtLg && hasNextPage && !isFetchingNextPageActivities) {
+    if (isAtEnd && hasNextPage && !isFetchingNextPageActivities) {
       fetchNextPage()
     }
-  }, [isAtEnd, hasNextPage, fetchNextPage, isFetchingNextPageActivities, media.gtLg])
+  }, [isAtEnd, hasNextPage, fetchNextPage, isFetchingNextPageActivities])
 
   const sections = useMemo(() => {
     if (!data?.pages) return []
@@ -126,6 +126,7 @@ function ActivityFeed({
 
   return (
     <SectionList
+      style={{ flex: 1 }}
       sections={sections}
       testID={'RecentActivity'}
       showsVerticalScrollIndicator={false}
@@ -164,7 +165,6 @@ function ActivityFeed({
       renderSectionHeader={({ section: { title, index } }) => (
         <RowLabel first={index === 0}>{title}</RowLabel>
       )}
-      onEndReached={() => hasNextPage && media.gtLg && fetchNextPage()}
       ListFooterComponent={
         !isLoadingActivities && isFetchingNextPageActivities ? <Spinner size="small" /> : null
       }

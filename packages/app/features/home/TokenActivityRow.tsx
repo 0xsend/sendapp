@@ -1,7 +1,10 @@
 import { Paragraph, Text, XStack, YStack } from '@my/ui'
-import { useEventNameFromActivity, useSubtextFromActivity } from 'app/utils/activity'
+import {
+  useDateFromActivity,
+  useEventNameFromActivity,
+  useSubtextFromActivity,
+} from 'app/utils/activity'
 import { useAmountFromActivity } from 'app/utils/activity-hooks'
-import { CommentsTime } from 'app/utils/dateHelper'
 import {
   type Activity,
   isSendAccountReceiveEvent,
@@ -29,9 +32,9 @@ export function TokenActivityRow({
   const { profile } = useUser()
   const { data: swapRouters } = useSwapRouters()
   const { data: liquidityPools } = useLiquidityPools()
-  const { created_at, from_user, to_user } = activity
+  const { from_user, to_user } = activity
   const amount = useAmountFromActivity(activity, swapRouters, liquidityPools)
-  const date = CommentsTime(new Date(created_at))
+  const date = useDateFromActivity({ activity })
   const eventName = useEventNameFromActivity({ activity, swapRouters, liquidityPools })
   const subtext = useSubtextFromActivity({ activity, swapRouters, liquidityPools })
   const isERC20Transfer = isSendAccountTransfersEvent(activity)

@@ -1,14 +1,21 @@
-import { usePathname } from 'app/utils/usePathname'
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
-import type { LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
+import { useRouter } from 'next/router'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import type {
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  ScrollView,
+  ScrollViewProps,
+} from 'react-native'
 import { Dimensions } from 'react-native'
+
+export type ScrollPositions = Record<string, number>
 
 export type ScrollDirectionContextValue = {
   direction: 'up' | 'down' | null
   isAtEnd: boolean
-  onScroll: (e: NativeSyntheticEvent<NativeScrollEvent>) => void
-  onContentSizeChange: (width: number, height: number) => void
-  onLayout: (e: LayoutChangeEvent) => void
+  onScroll: ScrollViewProps['onScroll']
+  onContentSizeChange: ScrollViewProps['onContentSizeChange']
+  ref: React.RefObject<ScrollView>
 }
 
 const ScrollDirection = createContext<ScrollDirectionContextValue>(
@@ -17,87 +24,120 @@ const ScrollDirection = createContext<ScrollDirectionContextValue>(
 
 const THRESHOLD = 50
 
-export const ScrollDirectionProvider = ({ children }: { children: React.ReactNode }) => {
-  const [direction, setDirection] = useState<ScrollDirectionContextValue['direction']>(null)
-  const [isAtEnd, setIsAtEnd] = useState<ScrollDirectionContextValue['isAtEnd']>(false)
-  const lastScrollY = useRef(0)
-  const pathName = usePathname()
-  const [, setPreviousPath] = useState('')
+// Helper function to generate a unique key based only on pathname and query keys
+// @TODO naive approach, only seperates scroll positions by key
+const generateScrollKey = (
+  pathname: string,
+  query: Record<string, string | string[] | undefined>
+) => {
+  // If no query, just return pathname
+  if (Object.keys(query).length === 0) {
+    return pathname
+  }
 
-  // Use window dimensions for initial values
-  const initialHeight =
-    typeof window !== 'undefined' ? window.innerHeight : Dimensions.get('window').height
-  const [viewportHeight, setViewportHeight] = useState(initialHeight)
-  const [contentHeight, setContentHeight] = useState(0)
+  // Sort query keys to create a consistent key
+  const queryKeys = Object.keys(query).sort()
+
+  // Create a key with pathname and query keys in alphabetical order
+  const queryString = queryKeys
+    .map((key) => {
+      // @TODO handle query params that should be unique
+      if (key === 'token') {
+        return `${key}=${query[key]}`
+      }
+      return key
+    })
+    .join('&')
+
+  return `${pathname}?${queryString}`
+}
+
+export const ScrollDirectionProvider = ({ children }: { children: React.ReactNode }) => {
+  const ref = useRef<ScrollView>(null)
+  const { pathname, query } = useRouter()
+
+  // Get window dimensions
+  const windowHeight = Dimensions.get('window').height
+
+  // Refs for performance-critical values
+  const contentOffsetRef = useRef(0)
+
+  // State for UI updates
+  const [direction, setDirection] = useState<ScrollDirectionContextValue['direction']>(null)
+  const [contentHeight, setContentHeight] = useState<number>(0)
+
+  const [isAtEnd, setIsAtEnd] = useState(false)
+  const [, setScrollPositions] = useState<ScrollPositions>({})
 
   useEffect(() => {
-    setPreviousPath((previousPath) => {
-      if (previousPath !== pathName) {
-        setDirection(null)
-        setIsAtEnd(false)
-        setContentHeight(0)
-        setViewportHeight(initialHeight)
+    const key = generateScrollKey(pathname, query)
+    setScrollPositions((prev) => {
+      if (prev[key] === undefined) {
+        return { ...prev, [key]: 0 }
       }
-      return pathName
+      if (prev[key] !== undefined && contentHeight >= prev[key]) {
+        ref.current?.scrollTo({ y: prev[key], animated: false })
+      }
+      return prev
     })
-  }, [pathName, initialHeight])
-
-  const checkIsAtEnd = useCallback((contentHeight: number, viewportHeight: number, scrollY = 0) => {
-    if (contentHeight === 0 || viewportHeight === 0) {
-      return
+    if (contentHeight <= windowHeight) {
+      setDirection(null)
     }
+  }, [pathname, query, contentHeight, windowHeight])
 
-    const isContentShorterThanViewport = contentHeight <= viewportHeight
-    const isEndOfView =
-      isContentShorterThanViewport || viewportHeight + scrollY >= contentHeight - THRESHOLD
-
-    setIsAtEnd(isEndOfView)
-  }, [])
-
+  // Callback for content size change
   const onContentSizeChange = useCallback(
-    (_: number, height: number) => {
+    (w: number, height: number) => {
       setContentHeight(height)
-      checkIsAtEnd(height, viewportHeight)
+      setIsAtEnd(height <= windowHeight)
     },
-    [viewportHeight, checkIsAtEnd]
+    [windowHeight]
   )
 
-  const onLayout = useCallback(
-    (e: LayoutChangeEvent) => {
-      const height = e.nativeEvent.layout.height
-      setViewportHeight(height)
-      checkIsAtEnd(contentHeight, height)
-    },
-    [contentHeight, checkIsAtEnd]
-  )
-
+  // Scroll event handler
   const onScroll = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const key = generateScrollKey(pathname, query)
       const { contentOffset } = e.nativeEvent
-      const currentScrollY = contentOffset.y
-      checkIsAtEnd(contentHeight, viewportHeight, currentScrollY)
+      const contentOffsetY = contentOffset.y
 
-      // Update direction
-      if (currentScrollY < THRESHOLD) {
+      // Determine scroll direction
+      if (contentOffsetY < THRESHOLD) {
         setDirection('up')
-      } else if (lastScrollY.current - currentScrollY > THRESHOLD && !isAtEnd) {
+      } else if (contentOffsetRef.current - contentOffsetY > THRESHOLD && !isAtEnd) {
         setDirection('up')
-      } else if (currentScrollY - lastScrollY.current > THRESHOLD || isAtEnd) {
+      } else if (contentOffsetY - contentOffsetRef.current > THRESHOLD || isAtEnd) {
         setDirection('down')
       }
 
-      lastScrollY.current = currentScrollY
+      // Update last scroll position
+      contentOffsetRef.current = contentOffsetY
+      setScrollPositions((prev) => ({ ...prev, [key]: contentOffsetY }))
+
+      // Check if at the end of content
+      const isScrollAtEnd =
+        contentHeight > windowHeight
+          ? windowHeight + contentOffsetY >= contentHeight - THRESHOLD
+          : false
+
+      setIsAtEnd(isScrollAtEnd)
     },
-    [contentHeight, viewportHeight, isAtEnd, checkIsAtEnd]
+    [isAtEnd, contentHeight, windowHeight, pathname, query]
+  )
+  // Memoized context value
+  const value = useMemo(
+    () => ({
+      direction,
+      isAtEnd,
+      onScroll,
+      onContentSizeChange,
+
+      ref,
+    }),
+    [direction, isAtEnd, onScroll, onContentSizeChange]
   )
 
-  return (
-    <ScrollDirection.Provider
-      value={{ direction, isAtEnd, onScroll, onLayout, onContentSizeChange }}
-    >
-      {children}
-    </ScrollDirection.Provider>
-  )
+  return <ScrollDirection.Provider value={value}>{children}</ScrollDirection.Provider>
 }
 
 export const useScrollDirection = () => {

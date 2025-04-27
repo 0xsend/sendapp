@@ -36,6 +36,8 @@ import {
   temporalEventNameFromStatus,
 } from './zod/activity/TemporalTransfersEventSchema'
 import { calculateTicketsFromWei, SENDPOT_CONTRACT_ADDRESS } from 'app/data/sendpot'
+import { CommentsTime } from 'app/utils/dateHelper'
+import { Spinner } from '@my/ui'
 
 const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
   Object.values(addresses).map((a) => [a, label])
@@ -331,8 +333,6 @@ export function eventNameFromActivity({
       return 'Send Earn Deposit'
     case isSendEarnWithdrawEvent(activity):
       return 'Send Earn Withdraw'
-    case isTemporalTransfer:
-      return note || temporalEventNameFromStatus(data.status)
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Revenue Share'
     case isSendTokenUpgradeEvent(activity):
@@ -347,9 +347,9 @@ export function eventNameFromActivity({
         return 'Trade'
       }
       return 'Deposit'
-    case isTransferOrReceive && !!to_user?.id:
+    case (isTransferOrReceive || isTemporalTransfer) && !!to_user?.id:
       return note || 'Received'
-    case isTransferOrReceive && !!from_user?.id:
+    case (isTransferOrReceive || isTemporalTransfer) && !!from_user?.id:
       return note || 'Sent'
     case isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity):
       return 'Sendtag Registered'
@@ -440,8 +440,6 @@ export function phraseFromActivity({
       return 'Deposited to Send Earn'
     case isSendEarnWithdrawEvent(activity):
       return 'Withdrew from Send Earn'
-    case isTemporalTransfer:
-      return temporalEventNameFromStatus(data.status)
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
       return 'Earned revenue share'
     case isSendTokenUpgradeEvent(activity):
@@ -456,9 +454,9 @@ export function phraseFromActivity({
         return 'Trade'
       }
       return 'Deposited'
-    case isTransferOrReceive && !!to_user?.id:
+    case (isTransferOrReceive || isTemporalTransfer) && !!to_user?.id:
       return 'Sent you'
-    case isTransferOrReceive && !!from_user?.id:
+    case (isTransferOrReceive || isTemporalTransfer) && !!from_user?.id:
       return 'Received'
     case isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity):
       return data.tags?.length > 1 ? 'Sendtags created' : 'Sendtag created'
@@ -689,4 +687,44 @@ export function getBaseAddressFilterCondition({
       data->>f.not.in.(${fromTransferIgnoreValues})
     )
   `)
+}
+
+export function useDateFromActivity({ activity }: { activity: Activity }) {
+  const { created_at, data } = activity
+  const isTemporalTransfer =
+    isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
+
+  if (isTemporalTransfer) {
+    switch (data.status) {
+      case 'failed':
+      case 'cancelled':
+        return 'Failed'
+      case 'confirmed':
+        return CommentsTime(new Date(created_at))
+      default:
+        return <Spinner size="small" color={'$color11'} />
+    }
+  }
+
+  return CommentsTime(new Date(created_at))
+}
+
+export function useDateDetailsFromActivity({ activity }: { activity: Activity }) {
+  const { created_at, data } = activity
+  const isTemporalTransfer =
+    isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
+
+  if (isTemporalTransfer) {
+    switch (data.status) {
+      case 'failed':
+      case 'cancelled':
+        return 'Failed'
+      case 'confirmed':
+        return created_at.toLocaleString()
+      default:
+        return <Spinner size="small" color={'$color11'} />
+    }
+  }
+
+  return created_at.toLocaleString()
 }

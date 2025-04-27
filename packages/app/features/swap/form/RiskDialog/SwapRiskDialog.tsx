@@ -28,18 +28,8 @@ const SwapRiskDialog = () => {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <Dialog.Adapt when="sm" platform="touch">
-        <Dialog.Sheet zIndex={400000} modal dismissOnSnapToBottom>
-          <Dialog.Sheet.Frame padding="$4">
-            <Dialog.Adapt.Contents />
-          </Dialog.Sheet.Frame>
-          <Dialog.Sheet.Overlay />
-        </Dialog.Sheet>
-      </Dialog.Adapt>
-
       <Dialog.Portal>
         <Dialog.Overlay />
-
         <Dialog.Content
           key="swap-risk-dialog"
           gap="$4"
@@ -90,8 +80,8 @@ const SwapRiskDialog = () => {
               </XStack>
               <XStack justifyContent="flex-end" marginTop="$4" gap="$4">
                 <Dialog.Close asChild>
-                  <Button testID={'swapRiskDialogCancelButton'} br={'$2'}>
-                    Cancel
+                  <Button theme="red_active" testID={'swapRiskDialogCancelButton'} br={'$2'}>
+                    <Button.Text>Cancel</Button.Text>
                   </Button>
                 </Dialog.Close>
                 <Button
@@ -102,7 +92,7 @@ const SwapRiskDialog = () => {
                   disabled={!isChecked}
                   disabledStyle={{ opacity: 0.5 }}
                 >
-                  <Button.Text>Continue</Button.Text>
+                  <Button.Text>I Agree & Continue</Button.Text>
                 </Button>
               </XStack>
             </YStack>

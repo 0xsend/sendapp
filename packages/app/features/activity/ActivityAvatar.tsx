@@ -50,6 +50,7 @@ export function ActivityAvatar({
   if (isActivitySwapTransfer(activity, swapRouters, liquidityPools)) {
     return <TradeActivityAvatar activity={activity} />
   }
+
   if (user) {
     return (
       <XStack
@@ -165,8 +166,8 @@ export function ActivityAvatar({
 
 const TradeActivityAvatar = ({ activity }: { activity: Activity }) => {
   const { data: swapRouters } = useSwapRouters()
-  const isButTransfer = isSwapBuyTransfer(activity, swapRouters)
-  const Icon = isButTransfer ? Plus : Minus
+  const isBuyTransfer = isSwapBuyTransfer(activity, swapRouters)
+  const Icon = isBuyTransfer ? Plus : Minus
 
   return (
     <XStack w="$4.5" h={'$4.5'} br="$4" ai={'center'} jc={'center'} position={'relative'}>
@@ -176,7 +177,7 @@ const TradeActivityAvatar = ({ activity }: { activity: Activity }) => {
         top={'-5%'}
         right={'-5%'}
         size={'$1'}
-        bc={isButTransfer ? '$olive' : '$error'}
+        bc={isBuyTransfer ? '$olive' : '$error'}
         borderRadius={999}
         shadowColor={'$black'}
         shadowOffset={{ width: 0, height: 2 }}

@@ -1,4 +1,4 @@
-import { Avatar, Button, FadeCard, Paragraph, Separator, XStack, YStack } from '@my/ui'
+import { Avatar, Button, Fade, FadeCard, Paragraph, Separator, XStack, YStack } from '@my/ui'
 import type { YStackProps } from 'tamagui'
 import { IconAccount, IconQRFull, IconShare } from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
@@ -6,9 +6,11 @@ import { ReferralLink } from 'app/components/ReferralLink'
 import { useEffect, useState } from 'react'
 import * as Sharing from 'expo-sharing'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { useConfirmedTags } from 'app/utils/tags'
 
 export const AccountHeader = (props: YStackProps) => {
-  const { profile, tags } = useUser()
+  const { profile } = useUser()
+  const tags = useConfirmedTags()
   const avatar_url = profile?.avatar_url
   const name = profile?.name
   const referralCode = tags?.[0]?.name || profile?.referral_code
@@ -52,28 +54,30 @@ export const AccountHeader = (props: YStackProps) => {
           </YStack>
         </XStack>
       </FadeCard>
-      <XStack gap={'$3.5'}>
-        <Button
-          f={1}
-          py={'$5'}
-          bw={0}
-          h={'auto'}
-          br={'$5'}
-          onPress={handleSharePress}
-          hoverStyle={hoverStyles}
-        >
-          <Button.Icon>
-            <IconShare size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
-          </Button.Icon>
-          <Button.Text size={'$5'}>Refer Friends</Button.Text>
-        </Button>
-        <Button f={1} py={'$5'} h={'auto'} br={'$5'} bw={0} hoverStyle={hoverStyles}>
-          <Button.Icon>
-            <IconQRFull size={'$1'} color={'$primary'} $theme-light={{ color: '$color12' }} />
-          </Button.Icon>
-          <Button.Text size={'$5'}>Share Profile</Button.Text>
-        </Button>
-      </XStack>
+      <Fade>
+        <XStack gap={'$3.5'}>
+          <Button
+            f={1}
+            py={'$5'}
+            bw={0}
+            h={'auto'}
+            br={'$5'}
+            onPress={handleSharePress}
+            hoverStyle={hoverStyles}
+          >
+            <Button.Icon>
+              <IconShare size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
+            </Button.Icon>
+            <Button.Text size={'$5'}>Invite Friends</Button.Text>
+          </Button>
+          <Button f={1} py={'$5'} h={'auto'} br={'$5'} bw={0} hoverStyle={hoverStyles}>
+            <Button.Icon>
+              <IconQRFull size={'$1'} color={'$primary'} $theme-light={{ color: '$color12' }} />
+            </Button.Icon>
+            <Button.Text size={'$5'}>Share Profile</Button.Text>
+          </Button>
+        </XStack>
+      </Fade>
     </YStack>
   )
 }
