@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "send",
+    "owner": "send-it",
     "slug": "send",
     "scheme": "send",
     "version": "1.0.0",
