@@ -93,7 +93,8 @@ jobs:
         id: workers
         shell: bash
         run: |
-          workers=$(MAX_WORKERS=4 node ./.devops/bin/worker-count)
+          # set to max workers 1 until we figure out which task is causing the runner to disconnect
+          workers=$(MAX_WORKERS=1 node ./.devops/bin/worker-count)
           echo "workers=$workers" >> $GITHUB_OUTPUT
       - name: Lint
         run: |
