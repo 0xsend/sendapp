@@ -38,6 +38,8 @@ jobs:
         uses: ./.github/actions/setup-env
         env:
           YARN_ENABLE_HARDENED_MODE: 0
+        with:
+          yarn-install: false
       - name: Tilt CI
         id: tilt-ci
         shell: bash
@@ -80,6 +82,12 @@ jobs:
           YARN_ENABLE_HARDENED_MODE: 0
         with:
           build-nextjs: 'false'
+          yarn-install: false
+
+      - name: Lint deps
+        shell: bash
+        run: |
+          tilt ci lint:deps
 
       - name: Set Workers Count
         id: workers

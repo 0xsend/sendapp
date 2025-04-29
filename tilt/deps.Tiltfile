@@ -41,14 +41,26 @@ cmd_button(
 )
 
 local_resource(
-    "lint",
-    "yarn lint",
+    "lint:deps",
+    "echo 'lint:deps' ready",
     allow_parallel = True,
     labels = labels,
     resource_deps = [
         "yarn:install",
         "contracts:build",
         "ui:build",
+        "wagmi:generate",
+        "snaplet:sync",
+    ],
+)
+
+local_resource(
+    "lint",
+    "yarn lint",
+    allow_parallel = True,
+    labels = labels,
+    resource_deps = [
+        "lint:deps",
     ],
 )
 
