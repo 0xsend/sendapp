@@ -1,10 +1,9 @@
-import { YStack } from '@my/ui'
-import { SignUpForm } from 'app/features/auth/sign-up/sign-up-form'
+import { NewSignUpForm } from 'app/features/auth/sign-up/NewSignUpForm'
 
 export const SignUpScreen = () => {
   return (
-    <YStack f={1} maxWidth={600}>
-      <SignUpForm />
-    </YStack>
+    <>
+      <NewSignUpForm />
+    </>
   )
 }
