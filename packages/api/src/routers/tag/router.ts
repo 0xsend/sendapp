@@ -12,11 +12,45 @@ import { byteaTxHash } from 'app/utils/zod'
 import debug from 'debug'
 import { isAddressEqual, withRetry, zeroAddress } from 'viem'
 import { z } from 'zod'
-import { createTRPCRouter, protectedProcedure } from '../trpc'
+import { createTRPCRouter, protectedProcedure, publicProcedure } from '../../trpc'
+import { SendtagSchema } from 'app/utils/zod/sendtag'
+import { SendtagAvailability } from './types'
 
 const log = debug('api:routers:tag')
 
 export const tagRouter = createTRPCRouter({
+  checkAvailability: publicProcedure.input(SendtagSchema).query(async ({ input: { name } }) => {
+    log('checking sendtag availability: ', { name })
+
+    try {
+      const supabaseAdmin = createSupabaseAdminClient()
+
+      const { count, error } = await supabaseAdmin
+        .from('tags')
+        .select('*', { count: 'exact', head: true })
+        .eq('name', name)
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          return { sendtagAvailability: SendtagAvailability.Available }
+        }
+
+        throw new Error(error.message)
+      }
+
+      if (count && count > 0) {
+        return { sendtagAvailability: SendtagAvailability.Taken }
+      }
+
+      return { sendtagAvailability: SendtagAvailability.Available }
+    } catch (error) {
+      log('Error checking sendtag availability: ', error)
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: `Failed to check sendtag availability: ${error.message}`,
+      })
+    }
+  }),
   confirm: protectedProcedure
     .input(
       z.object({
