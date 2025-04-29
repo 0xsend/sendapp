@@ -75,7 +75,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-          fetch-depth: 2
+          filter: 'blob:none'
+          fetch-depth: 0
       - name: Setup Environment
         uses: ./.github/actions/setup-env
         env:
@@ -98,10 +99,11 @@ jobs:
           echo "workers=$workers" >> $GITHUB_OUTPUT
       - name: Lint
         run: |
-          npx turbo run lint --concurrency=${{ steps.workers.outputs.workers }}
+          npx turbo run lint --affected --concurrency=${{ steps.workers.outputs.workers }}
         env:
           # app:lint is heavy on memory, so we need to increase the limit
           NODE_OPTIONS: --max_old_space_size=8192
+          TURBO_SCM_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
 
   playwright-tests:
     # **always** skip if not dev or main to save resources
