@@ -89,7 +89,7 @@ jobs:
           echo "workers=$workers" >> $GITHUB_OUTPUT
       - name: Lint
         run: |
-          turbo run lint --concurrency=${{ steps.workers.outputs.workers }}
+          npx turbo run lint --concurrency=${{ steps.workers.outputs.workers }}
 
   playwright-tests:
     # **always** skip if not dev or main to save resources
