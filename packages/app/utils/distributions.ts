@@ -203,23 +203,25 @@ export const useDistributionVerifications = (distributionNumber?: number) => {
       // Get the first (and should be only) distribution
       const distribution = data[0]
 
-      const verification_values = distribution.distribution_verification_values.map((item) => {
-        const verifications = item.distribution_verifications ?? []
-        const totalWeight = verifications.reduce((sum, v) => sum + BigInt(v.weight ?? 0), 0n)
-        const latestCreatedAt = verifications.reduce(
-          (maxDate, v) => (!maxDate || v.created_at > maxDate ? v.created_at : maxDate),
-          ''
+      const verification_values = distribution.distribution_verification_values
+        .filter(({ distribution_verifications }) =>
+          distribution_verifications?.some((v) => v.created_at && v.created_at !== '')
         )
-
-        return {
-          type: item.type as Database['public']['Enums']['verification_type'],
-          weight: totalWeight,
-          fixed_value: BigInt(item.fixed_value ?? 0),
-          metadata: verifications.map((v) => v.metadata).filter(Boolean),
-          created_at: latestCreatedAt,
-        }
-      })
-
+        .map((item) => {
+          const verifications = item.distribution_verifications ?? []
+          const totalWeight = verifications.reduce((sum, v) => sum + BigInt(v.weight ?? 0), 0n)
+          const latestCreatedAt = verifications.reduce(
+            (maxDate, v) => (!maxDate || v.created_at > maxDate ? v.created_at : maxDate),
+            ''
+          )
+          return {
+            type: item.type as Database['public']['Enums']['verification_type'],
+            weight: totalWeight,
+            fixed_value: BigInt(item.fixed_value ?? 0),
+            metadata: verifications.map((v) => v.metadata).filter(Boolean),
+            created_at: latestCreatedAt,
+          }
+        })
       const multipliers = (distribution.distribution_verification_values ?? []).map((item) => {
         const verifications = item.distribution_verifications ?? []
         const totalWeight = verifications.reduce((sum, v) => sum + BigInt(v.weight ?? 0), 0n)
