@@ -1,11 +1,11 @@
-import { create, isSupported } from '@0xbigboss/react-native-passkeys'
-import type {
-  PublicKeyCredentialCreationOptionsJSON,
-  RegistrationResponseJSON,
-} from '@0xbigboss/react-native-passkeys/build/ReactNativePasskeys.types'
 import { base64urlnopad } from '@scure/base'
 import { assert } from 'app/utils/assert'
 import { type ParsedCredAuthData, parseCreateResponse } from 'app/utils/passkeys'
+import { create, isSupported } from 'react-native-passkeys'
+import type {
+  PublicKeyCredentialCreationOptionsJSON,
+  RegistrationResponseJSON,
+} from 'react-native-passkeys/build/ReactNativePasskeys.types'
 import { getRpId } from './getRpId'
 
 export async function createPasskey({
