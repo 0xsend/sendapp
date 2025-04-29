@@ -94,11 +94,14 @@ jobs:
         shell: bash
         run: |
           # set to max workers 1 until we figure out which task is causing the runner to disconnect
-          workers=$(MAX_WORKERS=1 node ./.devops/bin/worker-count)
+          workers=$(MAX_WORKERS=4 node ./.devops/bin/worker-count)
           echo "workers=$workers" >> $GITHUB_OUTPUT
       - name: Lint
         run: |
           npx turbo run lint --concurrency=${{ steps.workers.outputs.workers }}
+        env:
+          # app:lint is heavy on memory, so we need to increase the limit
+          NODE_OPTIONS: --max_old_space_size=8192
 
   playwright-tests:
     # **always** skip if not dev or main to save resources
