@@ -1,7 +1,7 @@
 export {
   SafeAreaView as SafeArea,
-  SafeAreaViewProps as SafeAreaProps,
+  type SafeAreaViewProps as SafeAreaProps,
   SafeAreaProvider,
-  SafeAreaProviderProps,
+  type SafeAreaProviderProps,
   initialWindowMetrics,
 } from 'react-native-safe-area-context'
