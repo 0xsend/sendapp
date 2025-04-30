@@ -37,7 +37,9 @@ export function AuthLayout({ children }: { children: ReactNode }) {
               <IconSendLogo size={'$3.5'} color={'$color12'} />
             </Link>
           </XStack>
-          <YStack f={1}>{children}</YStack>
+          <YStack f={1} width={'100%'} maxWidth={600} alignSelf={'center'}>
+            {children}
+          </YStack>
         </Container>
       </ScrollView>
     </YStack>
