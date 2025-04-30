@@ -51,5 +51,7 @@
     "p256-verifier/=packages/contracts/lib/p256-verifier/src/",
     "@uniswap/=./node_modules/@uniswap/"
   ],
-  "sqlfluff.config": "supabase/sqlfluff.cfg"
+  "sqlfluff.config": "supabase/sqlfluff.cfg",
+  "nix.formatterPath": "alejandra",
+  "biome.lspBin": "./node_modules/.bin/biome"
 }

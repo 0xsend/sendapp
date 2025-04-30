@@ -201,10 +201,12 @@ export const OnboardingForm = () => {
             <H3
               lineHeight={28}
               $platform-web={{ fontFamily: '$mono' }}
+              fontWeight={'300'}
               $theme-light={{ col: '$gray10Light' }}
               $theme-dark={{ col: '$olive' }}
-              fontWeight={'300'}
-              $sm={{ size: '$5' }}
+              color={'$color10'}
+              size={'$5'}
+              $gtMd={{ size: '$8' }}
             >
               Send will securely save your key on this device. Name it so you can recognize it next
               time

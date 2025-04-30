@@ -68,3 +68,5 @@ Brewfile.lock.json
 .tool-versions
 
 var/**
+
+/memory-bank
