@@ -6,9 +6,9 @@ This guide provides **MANDATORY** instructions for effectively breaking down com
 
 ## ⚠️ CONTEXT WINDOW MONITORING - MANDATORY ACTION REQUIRED ⚠️
 
-You **MUST** monitor the context window usage displayed in the environment details. When usage exceeds 50% of the available context window, you **MUST** initiate a task handoff using the `new_task` tool.
+You **MUST** monitor the context window usage displayed in the environment details. When usage exceeds 33% of the available context window, you **MUST** initiate a task handoff using the `new_task` tool.
 
-Example of context window usage over 50% with a 200K context window:
+Example of context window usage over 33% with a 200K context window:
 
 \`\`\`text
 # Context Window Usage
@@ -16,7 +16,7 @@ Example of context window usage over 50% with a 200K context window:
 Model: anthropic/claude-3.7-sonnet (200K context window)
 \`\`\`
 
-**IMPORTANT**: When you see context window usage at or above 50%, you MUST:
+**IMPORTANT**: When you see context window usage at or above 33%, you MUST:
 1. Complete your current logical step
 2. Use the `ask_followup_question` tool to offer creating a new task
 3. If approved, use the `new_task` tool with comprehensive handoff instructions
@@ -79,7 +79,7 @@ You **MUST** identify natural handoff points when:
 - You've reached a logical stopping point in a larger subtask
 - The implementation is taking longer than expected and can be continued later
 - The task scope has expanded beyond the original plan
-- **CRITICAL**: The context window usage exceeds 50% (e.g., 100,000+ tokens for a 200K context window)
+- **CRITICAL**: The context window usage exceeds 33% (e.g., 66,667+ tokens for a 200K context window)
 
 ### 3. Initiating the Handoff Process - MANDATORY ACTION
 
@@ -240,7 +240,7 @@ Please continue by implementing the login endpoint following the same patterns e
 
 You **MUST** initiate task handoffs in these scenarios:
 
-1. **CRITICAL**: When context window usage exceeds 50% (e.g., 100,000+ tokens for a 200K context window)
+1. **CRITICAL**: When context window usage exceeds 33% (e.g., 100,000+ tokens for a 200K context window)
 2. **Long-running projects** that exceed a single session
 3. **Complex implementations** with multiple distinct phases
 4. **When context window limitations** are approaching
@@ -249,7 +249,7 @@ You **MUST** initiate task handoffs in these scenarios:
 
 **⚠️ FINAL REMINDER - CRITICAL INSTRUCTION ⚠️**
 
-You **MUST** monitor the context window usage in the environment details section. When it exceeds 50% (e.g., "105,000 / 200,000 tokens (53%)"), you **MUST** proactively initiate the task handoff process using the `ask_followup_question` tool followed by the `new_task` tool. You MUST use the `new_task` tool.
+You **MUST** monitor the context window usage in the environment details section. When it exceeds 33% (e.g., "105,000 / 200,000 tokens (53%)"), you **MUST** proactively initiate the task handoff process using the `ask_followup_question` tool followed by the `new_task` tool. You MUST use the `new_task` tool.
 
 By strictly following these guidelines, you'll ensure smooth transitions between tasks, maintain project momentum, and provide the best possible experience for users working on complex, multi-session projects.
 ```markdown

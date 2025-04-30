@@ -1,0 +1,14 @@
+{
+  "webcredentials": {
+    "apps": ["8S6R4SU556.app.send"]
+  },
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "8S6R4SU556.app.send",
+        "paths": ["*"]
+      }
+    ]
+  }
+}

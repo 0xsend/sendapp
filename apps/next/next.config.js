@@ -139,7 +139,7 @@ export default () => {
       'expo-crypto',
       '@ts-react/form',
       'react-hook-form',
-      '@0xbigboss/react-native-passkeys',
+      'react-native-passkeys',
     ],
     experimental: {
       scrollRestoration: true,

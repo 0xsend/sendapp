@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "send",
+    "owner": "send-it",
     "slug": "send",
     "scheme": "send",
     "version": "1.0.0",
@@ -18,7 +19,8 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "app.send"
+      "bundleIdentifier": "8S6R4SU556.app.send",
+      "associatedDomains": ["webcredentials:send.app"]
     },
     "android": {
       "adaptiveIcon": {
@@ -49,6 +51,11 @@
         }
       ],
       "expo-router"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "21a964cb-0d04-42e5-bc00-7f8bf0fd5064"
+      }
+    }
   }
 }

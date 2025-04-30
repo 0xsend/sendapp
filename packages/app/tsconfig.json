@@ -2,6 +2,7 @@
   // "noErrorTruncation": true,
   "extends": "../../tsconfig.base",
   "include": [
+    "concerns",
     "features",
     "components",
     "data",
