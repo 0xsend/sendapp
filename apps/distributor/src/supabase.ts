@@ -132,3 +132,14 @@ export async function fetchSendSlash(distribution: {
     .eq('distribution_id', distribution.id)
     .single()
 }
+
+export async function updateReferralVerifications(
+  distributionId: number,
+  shares: Tables<'distribution_shares'>[]
+) {
+  const supabaseAdmin = createSupabaseAdminClient()
+  return supabaseAdmin.rpc('update_referral_verifications', {
+    distribution_id: distributionId,
+    shares,
+  })
+}
