@@ -1,6 +1,8 @@
 import {
+  Anchor,
   Button,
   FadeCard,
+  Label,
   Paragraph,
   Separator,
   SubmitButton,
@@ -8,7 +10,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useId, useState } from 'react'
 import { Turnstile } from 'app/features/auth/sign-up/Turnstile'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -30,9 +32,11 @@ import { createPasskey } from 'app/utils/createPasskey'
 import { base64URLNoPadToBase16 } from 'app/utils/base64ToBase16'
 import { assert } from 'app/utils/assert'
 import { useUser } from 'app/utils/useUser'
+import { useThemeSetting } from '@tamagui/next-theme'
 
 const SendtagSchemaWithoutRestrictions = z.object({
   name: formFields.text,
+  isAgreedToTerms: formFields.boolean_checkbox,
 })
 
 enum SignUpFormState {
@@ -53,11 +57,16 @@ export const SignUpScreen = () => {
   const sendAccount = useSendAccount()
   const supabase = useSupabase()
   const { user } = useUser()
+  const termsCheckboxId = useId()
+  const { resolvedTheme } = useThemeSetting()
+  const isDarkTheme = resolvedTheme?.startsWith('dark')
 
   const formName = form.watch('name')
+  const formIsAgreedToTerms = form.watch('isAgreedToTerms')
   const validationError = form.formState.errors.root
   const canSubmit =
-    signUpFormState === SignUpFormState.PasskeyCreationFailed || (!!formName && !validationError)
+    signUpFormState === SignUpFormState.PasskeyCreationFailed ||
+    (!!formName && !validationError && formIsAgreedToTerms)
 
   const { refetch: refetchCheckSendtagAvailability } = api.tag.checkAvailability.useQuery(
     { name: formName },
@@ -77,6 +86,9 @@ export const SignUpScreen = () => {
   )
 
   const { mutateAsync: sendAccountCreateMutateAsync } = api.sendAccount.create.useMutation()
+
+  const { mutateAsync: registerFirstSendtagMutateAsync } =
+    api.tag.registerFirstSendtag.useMutation()
 
   useEffect(() => {
     const subscription = form.watch(() => {
@@ -176,6 +188,8 @@ export const SignUpScreen = () => {
         setSignUpFormState(SignUpFormState.PasskeyCreationFailed)
         throw error
       })
+
+      await registerFirstSendtagMutateAsync({ name })
     } catch (error) {
       form.setError('root', {
         type: 'custom',
@@ -184,7 +198,6 @@ export const SignUpScreen = () => {
       return
     }
 
-    // TODO register sendtag
     // TODO register upstream
 
     router.replace('/')
@@ -279,6 +292,7 @@ export const SignUpScreen = () => {
             schema={SendtagSchemaWithoutRestrictions}
             defaultValues={{
               name: '',
+              isAgreedToTerms: false,
             }}
             props={{
               name: {
@@ -312,6 +326,10 @@ export const SignUpScreen = () => {
                   </Paragraph>
                 ),
               },
+              isAgreedToTerms: {
+                disabled: signUpFormState === SignUpFormState.PasskeyCreationFailed,
+                id: termsCheckboxId,
+              },
             }}
             formProps={{
               w: '100%',
@@ -323,11 +341,10 @@ export const SignUpScreen = () => {
             }}
             renderAfter={renderAfterContent}
           >
-            {({ name }) => {
+            {({ name, isAgreedToTerms }) => {
               return (
                 <FadeCard
                   w={'100%'}
-                  pb={validationError ? '$5' : '$6'}
                   my={'$5'}
                   borderColor={validationError ? '$error' : 'transparent'}
                   bw={1}
@@ -349,6 +366,43 @@ export const SignUpScreen = () => {
                   {validationError && (
                     <Paragraph color={'$error'}>{validationError.message}</Paragraph>
                   )}
+                  <XStack gap={'$2'} ai={'center'}>
+                    {isAgreedToTerms}
+                    <Label
+                      cursor={'pointer'}
+                      size={'$5'}
+                      htmlFor={termsCheckboxId}
+                      color={'$lightGrayTextField'}
+                      lineHeight={'$5'}
+                      $theme-light={{ color: '$darkGrayTextField' }}
+                      pressStyle={{
+                        color: isDarkTheme ? '$lightGrayTextField' : '$darkGrayTextField',
+                      }}
+                    >
+                      Agree to&nbsp;
+                      <Anchor
+                        size={'$5'}
+                        href={'https://support.send.app/en/articles/10916356-privacy-policy'}
+                        target="_blank"
+                        textDecorationLine="underline"
+                        color={'$primary'}
+                        $theme-light={{ color: '$color12' }}
+                      >
+                        Privacy
+                      </Anchor>
+                      &nbsp;and&nbsp;
+                      <Anchor
+                        size={'$5'}
+                        href={'https://support.send.app/en/articles/10916009-terms-of-service'}
+                        target="_blank"
+                        textDecorationLine="underline"
+                        color={'$primary'}
+                        $theme-light={{ color: '$color12' }}
+                      >
+                        Terms
+                      </Anchor>
+                    </Label>
+                  </XStack>
                 </FadeCard>
               )
             }}

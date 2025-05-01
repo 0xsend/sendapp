@@ -51,6 +51,38 @@ export const tagRouter = createTRPCRouter({
       })
     }
   }),
+  registerFirstSendtag: protectedProcedure
+    .input(SendtagSchema)
+    .mutation(async ({ ctx: { supabase, session }, input: { name } }) => {
+      try {
+        const { count, error: tagsError } = await supabase
+          .from('tags')
+          .select('*', { count: 'exact', head: true })
+
+        if (tagsError) {
+          throw new Error(tagsError.message)
+        }
+
+        if (count && count > 0) {
+          throw new Error('First sendtag already registered')
+        }
+
+        const supabaseAdmin = createSupabaseAdminClient()
+        const { error: insertError } = await supabaseAdmin
+          .from('tags')
+          .insert({ name, status: 'confirmed', user_id: session.user.id })
+
+        if (insertError) {
+          throw new Error(insertError.message)
+        }
+      } catch (error) {
+        log('Error registering first sendtag: ', error)
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: `Failed to register first sendtag: ${error.message}`,
+        })
+      }
+    }),
   confirm: protectedProcedure
     .input(
       z.object({
