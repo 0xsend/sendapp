@@ -32,6 +32,7 @@ export const authRouter = createTRPCRouter({
         const { error } = await supabase.auth.signUp({
           email,
           password,
+          options: { captchaToken },
         })
 
         if (error) {
