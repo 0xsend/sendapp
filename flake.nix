@@ -68,7 +68,7 @@
               if pkgs.stdenv.isDarwin
               then ''
                 # Use the host's Xcode installation
-                export DEVELOPER_DIR=$(xcrun xcode-select -p)
+                export DEVELOPER_DIR=$(xcode-select -p)
                 export SDKROOT=$(xcrun --sdk macosx --show-sdk-path)
 
                 # Prioritize host tools over Nix
