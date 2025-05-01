@@ -35,7 +35,7 @@ export const authRouter = createTRPCRouter({
         })
 
         if (error) {
-          throw new Error(error.message)
+          throw new Error(error.message || 'Unable to create account')
         }
       } catch (error) {
         log('Error creating an account: ', error)

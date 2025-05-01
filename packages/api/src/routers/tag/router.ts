@@ -35,7 +35,7 @@ export const tagRouter = createTRPCRouter({
           return { sendtagAvailability: SendtagAvailability.Available }
         }
 
-        throw new Error(error.message)
+        throw new Error(error.message || "Unable to fetch user's tags")
       }
 
       if (count && count > 0) {
@@ -53,27 +53,71 @@ export const tagRouter = createTRPCRouter({
   }),
   registerFirstSendtag: protectedProcedure
     .input(SendtagSchema)
-    .mutation(async ({ ctx: { supabase, session }, input: { name } }) => {
+    .mutation(async ({ ctx: { supabase, session, referralCode }, input: { name } }) => {
       try {
+        const supabaseAdmin = createSupabaseAdminClient()
+
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .single()
+
+        if (profileError || !profile) {
+          throw new Error(profileError.message || 'Profile not found')
+        }
+
         const { count, error: tagsError } = await supabase
           .from('tags')
           .select('*', { count: 'exact', head: true })
 
         if (tagsError) {
-          throw new Error(tagsError.message)
+          throw new Error(tagsError.message || "Unable to fetch user's tags")
         }
 
         if (count && count > 0) {
           throw new Error('First sendtag already registered')
         }
 
-        const supabaseAdmin = createSupabaseAdminClient()
+        const referrerProfileLookupResult = referralCode
+          ? await fetchReferrer({
+              supabase,
+              profile,
+              referral_code: referralCode,
+            }).catch((e) => {
+              const error = e as unknown as PostgrestError
+              if (error.code === 'PGRST116') {
+                return null
+              }
+              throw new Error(error.message || "Unable to fetch referrer's profile")
+            })
+          : null
+
         const { error: insertError } = await supabaseAdmin
           .from('tags')
           .insert({ name, status: 'confirmed', user_id: session.user.id })
 
         if (insertError) {
-          throw new Error(insertError.message)
+          throw new Error(insertError.message || 'Unable to save tag')
+        }
+
+        if (referrerProfileLookupResult) {
+          const { data: referrerProfile, error: referrerProfileError } = await supabaseAdmin
+            .from('profiles')
+            .select('*')
+            .eq('referral_code', referrerProfileLookupResult.refcode)
+            .single()
+
+          if (referrerProfileError || !referrerProfile) {
+            throw new Error(referrerProfileError.message || "Unable to fetch referrer's profile")
+          }
+
+          const { error: insertReferralError } = await supabaseAdmin
+            .from('referrals')
+            .insert({ referrer_id: referrerProfile.id, referred_id: session.user.id })
+
+          if (insertReferralError) {
+            throw new Error(insertReferralError.message || 'Unable to save referral')
+          }
         }
       } catch (error) {
         log('Error registering first sendtag: ', error)
