@@ -9,6 +9,7 @@ import {
   fetchDistribution,
   fetchDistributionShares,
   fetchSendSlash,
+  updateReferralVerifications,
 } from './supabase'
 import { fetchAllBalances, isMerkleDropActive } from './wagmi'
 import { calculateWeights, PERC_DENOM } from './weights'
@@ -40,23 +41,6 @@ const getHoursInMonth = (date: Date) => {
 const getCurrentHourInMonth = (date: Date) => {
   return (date.getDate() - 1) * 24 + date.getHours()
 }
-
-/**
- * 100B supply -> 1B supply
- * 0 decimals -> 18 decimals
- * 1e18 / 100 = 1e16
- * v0Amount * 1e16
- * @param v0Amount
- * @returns converted v1Amount
- */
-function sendV1Converstion(v0Amount: bigint) {
-  return v0Amount * BigInt(1e16)
-}
-
-/**
- * The distribution number of the pre-sendv0 migration distribution
- */
-const PRE_SENDV0_MIGRATION_DISTRIBUTION = 11
 
 /**
  * Changes from V1:
@@ -325,27 +309,15 @@ export class DistributorV2Worker {
     }
     assert(previousShares !== null, 'No previous shares found')
 
-    let scaledBalances = 0
     const previousSharesByUserId = previousShares.reduce(
       (acc, share) => {
-        // NOTE: this is for handling the migration from send token v0 to send token v1
-        // scale to new token decimals if needed after migration
-        if (distribution.number === PRE_SENDV0_MIGRATION_DISTRIBUTION) {
-          acc[share.user_id] = sendV1Converstion(BigInt(share.amount))
-          scaledBalances++
-          return acc
-        }
         acc[share.user_id] = BigInt(share.amount)
         return acc
       },
       {} as Record<string, bigint>
     )
 
-    log.debug(
-      `Found ${
-        Object.keys(previousSharesByUserId).length
-      } previous shares and ${scaledBalances} scaled balances`
-    )
+    log.debug(`Found ${Object.keys(previousSharesByUserId).length}`)
 
     // Get send ceiling verifications
     const sendCeilingVerifications = verifications.filter((v) => v.type === 'send_ceiling')
@@ -359,11 +331,6 @@ export class DistributorV2Worker {
           weight: BigInt(v.weight || 0) > maxWeight ? maxWeight : BigInt(v.weight || 0),
           // @ts-expect-error @todo metadata is untyped but value is the convention
           ceiling: BigInt(v.metadata?.value || 0),
-        }
-
-        if (distribution.number === PRE_SENDV0_MIGRATION_DISTRIBUTION) {
-          ceiling.weight = sendV1Converstion(ceiling.weight)
-          ceiling.ceiling = sendV1Converstion(ceiling.ceiling)
         }
 
         acc[v.user_id] = ceiling
@@ -639,6 +606,21 @@ export class DistributorV2Worker {
         log.error({ share }, 'Share missing amount')
         throw new Error(`Share for user ${share.user_id} missing amount`)
       }
+    }
+
+    const { error: updateReferralVerificationsError } = await updateReferralVerifications(
+      distribution.id,
+      shares
+    )
+    if (updateReferralVerificationsError) {
+      log.error(
+        {
+          error: updateReferralVerificationsError.message,
+          code: updateReferralVerificationsError.code,
+        },
+        'Error updating referral verifications'
+      )
+      throw updateReferralVerificationsError
     }
 
     const { error } = await createDistributionShares(distribution.id, shares)

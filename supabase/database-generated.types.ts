@@ -1907,6 +1907,13 @@ export type Database = {
         }
         Returns: undefined
       }
+      update_referral_verifications: {
+        Args: {
+          distribution_id: number
+          shares: unknown[]
+        }
+        Returns: undefined
+      }
       user_referrals_count: {
         Args: Record<PropertyKey, never>
         Returns: number
