@@ -242,8 +242,8 @@ export const AddSendtagsForm = () => {
         </Paragraph>
         <LinkableButton
           theme="green"
-          borderRadius={'$4'}
-          p={'$4'}
+          py={'$5'}
+          br={'$4'}
           href={'/account/sendtag/checkout'}
           disabled={!hasPendingTags}
         >
