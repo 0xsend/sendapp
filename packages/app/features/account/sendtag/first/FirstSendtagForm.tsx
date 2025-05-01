@@ -8,6 +8,7 @@ import { api } from 'app/utils/api'
 import { useRouter } from 'solito/router'
 import { SendtagAvailability } from '@my/api/src/routers/tag/types'
 import { useUser } from 'app/utils/useUser'
+import { ReferredBy } from 'app/features/account/sendtag/checkout/checkout-form'
 
 const SendtagSchemaWithoutRestrictions = z.object({
   name: formFields.text,
@@ -163,31 +164,34 @@ export const FirstSendtagForm = () => {
         >
           {({ name }) => {
             return (
-              <FadeCard
-                w={'100%'}
-                my={'$5'}
-                borderColor={validationError ? '$error' : 'transparent'}
-                bw={1}
-                pb={validationError ? '$5' : '$6'}
-              >
-                <XStack position="relative">
-                  {name}
-                  <XStack
-                    position="absolute"
-                    bottom={0}
-                    left={0}
-                    right={0}
-                    height={1}
-                    backgroundColor={isInputFocused ? '$primary' : '$darkGrayTextField'}
-                    $theme-light={{
-                      backgroundColor: isInputFocused ? '$color12' : '$silverChalice',
-                    }}
-                  />
-                </XStack>
-                {validationError && (
-                  <Paragraph color={'$error'}>{validationError.message}</Paragraph>
-                )}
-              </FadeCard>
+              <YStack>
+                <FadeCard
+                  w={'100%'}
+                  my={'$5'}
+                  borderColor={validationError ? '$error' : 'transparent'}
+                  bw={1}
+                  pb={validationError ? '$5' : '$6'}
+                >
+                  <XStack position="relative">
+                    {name}
+                    <XStack
+                      position="absolute"
+                      bottom={0}
+                      left={0}
+                      right={0}
+                      height={1}
+                      backgroundColor={isInputFocused ? '$primary' : '$darkGrayTextField'}
+                      $theme-light={{
+                        backgroundColor: isInputFocused ? '$color12' : '$silverChalice',
+                      }}
+                    />
+                  </XStack>
+                  {validationError && (
+                    <Paragraph color={'$error'}>{validationError.message}</Paragraph>
+                  )}
+                </FadeCard>
+                <ReferredBy />
+              </YStack>
             )
           }}
         </SchemaForm>

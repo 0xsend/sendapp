@@ -60,7 +60,7 @@ export const CheckoutForm = () => {
 /**
  * Shows the referral code and the user's profile if they have one
  */
-function ReferredBy() {
+export function ReferredBy() {
   const queryClient = useQueryClient()
   const mutation = useMutation({
     mutationFn: async (newReferralCode: string) => {
@@ -180,7 +180,7 @@ function ReferredBy() {
           left={0}
           right={0}
           height={1}
-          backgroundColor={isInputFocused ? '$primary' : '$silverChalice'}
+          backgroundColor={isInputFocused ? '$primary' : '$darkGrayTextField'}
           $theme-light={{
             backgroundColor: isInputFocused ? '$color12' : '$silverChalice',
           }}
