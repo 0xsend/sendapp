@@ -6,6 +6,7 @@ import { useUser } from 'app/utils/useUser'
 
 export function SendTagScreen() {
   const { tags, isLoading } = useUser()
+  const isFirstSendtagClaimable = tags?.length === 0
   const confirmedTags = tags?.filter((tag) => tag.status === 'confirmed')
 
   if (isLoading)
@@ -27,7 +28,9 @@ export function SendTagScreen() {
     >
       <YStack gap="$5">
         <YStack gap="$3">
-          <H2 tt={'uppercase'}>Your verified tags</H2>
+          <H2 tt={'uppercase'}>
+            {isFirstSendtagClaimable ? 'Register your first Sendtag' : 'Your verified Sendtags'}
+          </H2>
           <Paragraph
             fontSize={'$5'}
             color={'$lightGrayTextField'}
@@ -41,21 +44,34 @@ export function SendTagScreen() {
         </Paragraph>
         <SendtagList tags={confirmedTags} />
       </YStack>
-      <AddNewTagButton tags={confirmedTags} />
+      <AddNewTagButton tags={confirmedTags} isFirstSendtagClaimable={isFirstSendtagClaimable} />
     </YStack>
   )
 }
 
-function AddNewTagButton({ tags }: { tags?: Tables<'tags'>[] }) {
+function AddNewTagButton({
+  tags,
+  isFirstSendtagClaimable,
+}: {
+  tags?: Tables<'tags'>[]
+  isFirstSendtagClaimable: boolean
+}) {
   if (tags && tags.length >= maxNumSendTags) {
     return null
   }
 
   return (
-    <LinkableButton theme="green" borderRadius={'$4'} p={'$4'} href={'/account/sendtag/add'}>
-      <LinkableButton.Icon>
-        <IconPlus size={'$1'} color={'$black'} />
-      </LinkableButton.Icon>
+    <LinkableButton
+      theme="green"
+      py={'$5'}
+      br={'$4'}
+      href={isFirstSendtagClaimable ? '/account/sendtag/first' : '/account/sendtag/add'}
+    >
+      {!isFirstSendtagClaimable && (
+        <LinkableButton.Icon>
+          <IconPlus size={'$1'} color={'$black'} />
+        </LinkableButton.Icon>
+      )}
       <LinkableButton.Text
         ff={'$mono'}
         fontWeight={'500'}
@@ -63,7 +79,7 @@ function AddNewTagButton({ tags }: { tags?: Tables<'tags'>[] }) {
         size={'$5'}
         color={'$black'}
       >
-        add new
+        {isFirstSendtagClaimable ? 'register free sendtag' : 'add new'}
       </LinkableButton.Text>
     </LinkableButton>
   )
