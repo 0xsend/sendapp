@@ -69,7 +69,6 @@
             ++ (pkgs.lib.optionals pkgs.stdenv.isDarwin [
               pkgs.darwin.apple_sdk.frameworks.CoreServices
               pkgs.darwin.apple_sdk.frameworks.CoreFoundation
-              # Removed xcode_16_3 to use host Xcode instead
             ]);
 
           shellHook = ''
@@ -79,17 +78,17 @@
                 # Force using host Xcode instead of Nix-provided one
                 export PATH=$(echo $PATH | tr ":" "\n" | grep -v "${pkgs.xcbuild or "xcbuild"}/bin" | tr "\n" ":")
                 unset DEVELOPER_DIR
-                
+
                 # Add host tools with higher priority
                 export PATH=/usr/bin:$PATH
-                
+
                 echo "Using host Xcode installation"
               ''
               else ''
                 # silence is golden
               ''
             }
-            eval "$(fnm env --use-on-cd --shell bash)"
+            eval "$(fnm env --use-on-cd --corepack-enabled --shell bash)"
             echo "Welcome to the Send.app development environment!"
           '';
         };
