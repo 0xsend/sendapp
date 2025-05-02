@@ -111,7 +111,7 @@ export const OnboardingForm = () => {
               col: '$background',
             }}
             $theme-light={{ col: '$black' }}
-            href="https://help.send.app/what-are-passkeys/"
+            href="https://support.send.app/en/articles/9789876-what-are-passkeys"
             target="_blank"
             dsp="none"
             $gtMd={{ dsp: 'block' }}
@@ -219,7 +219,7 @@ export const OnboardingForm = () => {
                     col: '$primary',
                   }}
                   $theme-light={{ col: '$black' }}
-                  href="https://help.send.app/what-are-passkeys/"
+                  href="https://support.send.app/en/articles/9789876-what-are-passkeys"
                   target="_blank"
                   dsp="flex"
                   jc="flex-end"

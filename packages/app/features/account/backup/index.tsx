@@ -95,7 +95,7 @@ export const BackupScreen = () => {
                   if you need help.
                 </Paragraph>
                 <Link
-                  href="https://help.send.app/what-are-passkeys/"
+                  href="https://support.send.app/en/articles/9789876-what-are-passkeys"
                   target="_blank"
                   display="flex"
                   alignItems="center"
@@ -116,7 +116,7 @@ export const BackupScreen = () => {
                   You have no Send Account.
                 </Paragraph>
                 <Link
-                  href="https://help.send.app/what-are-passkeys/"
+                  href="https://support.send.app/en/articles/9789876-what-are-passkeys"
                   target="_blank"
                   display="flex"
                   alignItems="center"
