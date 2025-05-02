@@ -19,7 +19,7 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "8S6R4SU556.app.send",
+      "bundleIdentifier": "app.send",
       "associatedDomains": ["webcredentials:send.app"],
       "appleTeamId": "8S6R4SU556"
     },
