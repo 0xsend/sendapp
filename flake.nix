@@ -28,6 +28,9 @@
         unstable = import nixpkgs-unstable {
           inherit (prev) system;
           overlays = [foundry-overlay.overlays.default];
+          config = {
+            allowUnfree = true;
+          };
         };
       })
     ];
@@ -37,7 +40,12 @@
   in
     flake-utils.lib.eachSystem systems (
       system: let
-        pkgs = import nixpkgs {inherit overlays system;};
+        pkgs = import nixpkgs {
+          inherit overlays system;
+          config = {
+            allowUnfree = true; # Allow unfree packages like Xcode
+          };
+        };
       in {
         formatter = pkgs.alejandra;
 
@@ -61,18 +69,21 @@
             ++ (pkgs.lib.optionals pkgs.stdenv.isDarwin [
               pkgs.darwin.apple_sdk.frameworks.CoreServices
               pkgs.darwin.apple_sdk.frameworks.CoreFoundation
+              # Removed xcode_16_3 to use host Xcode instead
             ]);
 
           shellHook = ''
             ${
               if pkgs.stdenv.isDarwin
               then ''
-                # Use the host's Xcode installation
-                export DEVELOPER_DIR=$(xcode-select -p)
-                export SDKROOT=$(xcrun --sdk macosx --show-sdk-path)
-
-                # Prioritize host tools over Nix
-                export PATH=/usr/bin:$DEVELOPER_DIR/usr/bin:$PATH
+                # Force using host Xcode instead of Nix-provided one
+                export PATH=$(echo $PATH | tr ":" "\n" | grep -v "${pkgs.xcbuild or "xcbuild"}/bin" | tr "\n" ":")
+                unset DEVELOPER_DIR
+                
+                # Add host tools with higher priority
+                export PATH=/usr/bin:$PATH
+                
+                echo "Using host Xcode installation"
               ''
               else ''
                 # silence is golden
