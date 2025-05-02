@@ -1,6 +1,36 @@
-# Claude Code Guidelines
+# CLAUDE.md - Instructions for Claude
 
-This document contains guidelines and best practices for using Claude Code with this project.
+## Development Process
+
+The development process should be agile and iterative and focus on very tight feedback loops.
+
+Keep the context in mind. The context is the current state of the code, the desired state, and the results.
+
+Focus on keeping it simple and small. When the context grows, suggest summarizing the context and starting a new iteration.
+
+### Development Loop
+
+A loop focuses on observing the current state, orienting the code to the desired state, running the code, and observing the results:
+
+1. **Observe**: Read the code, understand the problem, and understand the desired state.
+2. **Orient**: Write the code and tests to achieve the desired state.
+3. **Run**: Execute the process and tests.
+4. **Reflect**: Did the code achieve the desired state? Did it fail?
+5. **Repeat**: Repeat until the desired state is achieved. Avoid getting stuck in a loop. If progress is blocked, explain the problem and ask for clarification.
+
+## Code Style
+
+Use a consistent style throughout the project, including code formatting, naming conventions, and documentation.
+
+Follow the existing convention and style used in the project. Style can be localized to specific files or sections of code.
+
+It is acceptable to vary styles to avoid making too many changes at once.
+
+Assume the style is enforced by a linter and formatter.
+
+### Comments
+
+Focus comments solely on explaining the code's functionality and design choices, not the history of how the code was changed during our session. Ensure final code does not contain comments related to the debugging steps or conversational edits.
 
 ## Git Commit Conventions
 
@@ -49,6 +79,86 @@ Always include the Claude signature at the end of your commit messages:
 Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
+## Documentation
+
+Documentation is a critical component of software development.
+Use a root `/docs` folder to store all documentation files.
+Keep it well organized, structured, and easy to navigate.
+Assume it could be published using a static site generator.
+
+### Grooming, Refining, and Updating
+
+Read the relevant documentation files and update them as needed.
+
+Update the documentation after tasks.
+
+### TODO
+
+Use the TODO.md file to track outstanding tasks and add next steps there.
+
+When a TODO has multiple tasks, create a new file TODO file in the /docs folder.
+
+## Testing
+
+This section outlines the testing architecture and procedures for different parts of the project. Understanding how to run tests is crucial after making code changes.
+
+### General Packages (`/packages/*`)
+
+Most packages located under the `/packages` directory utilize **Jest** for testing.
+
+**How to run tests:**
+
+1. Navigate to the specific package directory:
+   ```bash
+   cd packages/<package-name>
+   ```
+2. Run the tests using Yarn:
+   ```bash
+   yarn test | cat
+   ```
+   *(Note: Piping to `cat` can help with formatting or handling specific terminal output behaviors.)*
+
+### Supabase (`/supabase`)
+
+The `/supabase` package uses **pgTAP** for database testing.
+
+**How to run tests:**
+
+```bash
+yarn supabase test
+```
+
+**Important Considerations:**
+
+* If you have made changes to database migrations within `/supabase/migrations`, you **must** reset the test database before running tests to ensure the schema is up-to-date. Reset the database using the following command:
+  ```bash
+  cd supabase && yarn supabase reset
+  ```
+* Ensure your local Supabase instance (or the designated test instance) is running.
+  ```bash
+  cd supabase && yarn supabase start
+  ```
+
+### Next.js App (`/apps/next`)
+
+The Next.js application located at `/apps/next` uses **Playwright** for end-to-end testing. The Playwright tests themselves are located within the `/packages/playwright` directory.
+
+**How to run tests:**
+
+1. Navigate to the Playwright package directory:
+   ```bash
+   cd packages/playwright
+   ```
+2. Run the Playwright tests using Yarn:
+   ```bash
+   yarn playwright test
+   ```
+* Ensure the Next.js application is running (usually via `yarn dev` in the `/apps/next` directory) before executing Playwright tests against it.
+
+### Other Apps (`/apps/*`)
+
+Applications located under `/apps` (excluding `/apps/next`) do not currently have standardized testing frameworks established. If you are working within these applications, consider discussing and implementing an appropriate testing strategy.
+
 ## Useful Commands
 
 ### Linting and Testing
@@ -59,6 +169,120 @@ This project uses Biome for linting and formatting. Run lint checks with:
 npx @biomejs/biome check
 ```
 
-## Other Guidelines
+## Continuous Improvement
 
-Add additional guidelines as needed for this project.
+You should proactively identify opportunities to improve the development lifecycle. Your goal is to help the development team work more efficiently, maintain high code quality, and continuously evolve their processes.
+
+### When to Suggest Improvements
+
+You should suggest improvements in these scenarios:
+
+1. When you notice **repetitive tasks** that could be automated
+2. When you observe **inefficiencies** in the development workflow
+3. When you identify **inconsistencies** in coding practices or documentation
+4. When you recognize **opportunities for optimization** in the build process, testing strategy, or deployment pipeline
+5. When you see **potential enhancements** to the project rules themselves
+6. When industry **best practices** have evolved since the current processes were established
+
+### Types of Improvements to Consider
+
+#### 1. Development Workflow Enhancements
+- Suggest automation for repetitive tasks
+- Recommend tools or extensions that could improve productivity
+- Identify opportunities to streamline the development process
+- Propose improvements to the project structure or organization
+
+#### 2. Code Quality Improvements
+- Suggest additional linting rules or code quality checks
+- Recommend refactoring strategies for complex or hard-to-maintain code
+- Propose patterns or practices to improve code readability and maintainability
+- Identify opportunities to reduce technical debt
+
+#### 3. Testing Strategy Optimization
+- Recommend improvements to test coverage or testing approaches
+- Suggest tools or frameworks that could enhance the testing process
+- Identify areas where additional testing would be beneficial
+- Propose strategies to make tests more reliable or efficient
+
+#### 4. Documentation Enhancements
+- Suggest improvements to documentation structure or content
+- Identify areas where additional documentation would be helpful
+- Recommend tools or practices to keep documentation up-to-date
+- Propose standards for documentation to ensure consistency
+
+## Task Management
+
+When working on complex projects, it's important to break down tasks effectively.
+
+### Task Breakdown Process
+
+1. **Initial Task Analysis**
+   - Begin by thoroughly understanding the full scope of the user's request
+   - Identify all major components and dependencies of the task
+   - Consider potential challenges, edge cases, and prerequisites
+
+2. **Strategic Task Decomposition**
+   - Break the overall task into logical, discrete subtasks
+   - Prioritize subtasks based on dependencies (what must be completed first)
+   - Aim for subtasks that can be completed within a single session (15-30 minutes of work)
+   - Consider natural breaking points where context switching makes sense
+
+3. **Creating a Task Roadmap**
+   - Present a clear, numbered list of subtasks to the user
+   - Explain dependencies between subtasks
+   - Provide time estimates for each subtask when possible
+   - Use diagrams to visualize task flow and dependencies when helpful
+
+4. **Getting User Approval**
+   - Ask for user feedback on the proposed task breakdown
+   - Adjust the plan based on user priorities or additional requirements
+   - Confirm which subtask to begin with
+
+### Best Practices for Effective Task Management
+
+1. **Maintain Continuity**
+   - Use consistent terminology between tasks
+   - Reference previous decisions and their rationale
+   - Maintain the same architectural approach unless explicitly changing direction
+
+2. **Preserve Context**
+   - Include relevant code snippets when discussing implementation
+   - Summarize key discussions from the previous interactions
+   - Reference specific files and line numbers when applicable
+
+3. **Set Clear Next Actions**
+   - Begin with clear, actionable next steps
+   - Prioritize remaining tasks
+   - Highlight any decisions that need to be made
+
+4. **Document Assumptions**
+   - Clearly state any assumptions made during implementation
+   - Note areas where user input might be needed
+   - Identify potential alternative approaches
+
+## Memory Management
+
+Remember that your effectiveness depends on the clarity and accuracy of the project information presented to you. For complex, ongoing projects, maintaining clear documentation and context is essential.
+
+When providing information about the current state of the project, always include:
+
+1. **Project Context**
+   - The overall goal and purpose of the project
+   - Key architectural decisions and patterns
+   - Technology stack and dependencies
+
+2. **Implementation Details**
+   - Files created or modified in the current session
+   - Specific functions, classes, or components implemented
+   - Design patterns being followed
+   - Testing approach
+
+3. **Progress Tracking**
+   - Checklist of completed items
+   - Checklist of remaining items
+   - Any blockers or challenges encountered
+
+4. **User Preferences**
+   - Coding style preferences mentioned by the user
+   - Specific approaches requested by the user
+   - Priority areas identified by the user

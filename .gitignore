@@ -70,3 +70,5 @@ Brewfile.lock.json
 var/**
 
 /memory-bank
+
+**/.claude/settings.local.json
