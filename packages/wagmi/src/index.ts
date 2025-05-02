@@ -9,3 +9,4 @@ export {
 } from './chains'
 export { config, chains, client } from './config'
 export { mainnetClient, baseMainnetClient, baseMainnetBundlerClient } from './client'
+export { getRpcUrl, getRpcUrls } from './utils/getRpcUrl'
