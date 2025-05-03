@@ -12,7 +12,7 @@ import {
   updateReferralVerifications,
 } from './supabase'
 import { fetchAllBalances, isMerkleDropActive } from './wagmi'
-import { calculateWeights, PERC_DENOM } from './weights'
+import { calculateWeights, Mode, PERC_DENOM } from './weights'
 import { assert } from 'app/utils/assert'
 
 type Multiplier = {
@@ -510,7 +510,7 @@ export class DistributorV2Worker {
 
       // Calculate weighted shares for current slashed state
 
-      const weightedShares = calculateWeights(slashedBalances, timeAdjustedAmount)
+      const weightedShares = calculateWeights(slashedBalances, timeAdjustedAmount, Mode.EaseInOut)
 
       hodlerShares = slashedBalances.map((balance) => ({
         address: balance.address,

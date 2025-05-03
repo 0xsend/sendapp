@@ -372,34 +372,62 @@ describe('Distributor V2 Worker', () => {
 
     //Expected values are a little different than back of the napkin because of rounding
     //Keep an eye on this, may need to investigate if we see distro problems
-    const expectedShares = [
-      {
-        address: bobAddr,
-        distribution_id: 4,
-        user_id,
-        bonus_pool_amount: '0', // Always 0 in V2
-        amount: '5578', // 75% of original (example slash)
-        fixed_pool_amount: '28', // 75% of 984
-        hodler_pool_amount: '5550', // 75% of 5872
-      },
-      {
-        address: aliceAddr,
-        distribution_id: 4,
-        user_id: user_id2,
-        bonus_pool_amount: '0', // Always 0 in V2
-        amount: '1111', // 50% of original (example slash)
-        fixed_pool_amount: '1', // 50% of 208
-        hodler_pool_amount: '1110', // 50% of 2936
-      },
-    ]
+    const expectedShares = {
+      linear: [
+        {
+          address: bobAddr,
+          distribution_id: 4,
+          user_id,
+          bonus_pool_amount: '0', // Always 0 in V2
+          amount: '5578', // 75% of original (example slash)
+          fixed_pool_amount: '28', // 75% of 984
+          hodler_pool_amount: '5550', // 75% of 5872
+        },
+        {
+          address: aliceAddr,
+          distribution_id: 4,
+          user_id: user_id2,
+          bonus_pool_amount: '0', // Always 0 in V2
+          amount: '1111', // 50% of original (example slash)
+          fixed_pool_amount: '1', // 50% of 208
+          hodler_pool_amount: '1110', // 50% of 2936
+        },
+      ],
+      easeInAndOut: [
+        {
+          address: bobAddr,
+          distribution_id: 4,
+          user_id,
+          bonus_pool_amount: '0', // Always 0 in V2
+          amount: '5825', // 75% of original (example slash) with cubic bezier
+          fixed_pool_amount: '28', // 75% of 984
+          hodler_pool_amount: '5797', // 5872 with cubic bezier
+        },
+        {
+          address: aliceAddr,
+          distribution_id: 4,
+          user_id: user_id2,
+          bonus_pool_amount: '0', // Always 0 in V2
+          amount: '864', // 50% of original (example slash) with cubic bezier
+          fixed_pool_amount: '1', // 50% of 208
+          hodler_pool_amount: '863', // 50% of 2936 with cubic bezier
+        },
+      ],
+    }
     expect(createDistributionShares).toHaveBeenCalled()
 
-    // @ts-expect-error supabase-js does not support bigint
-    expect(createDistributionShares.mock.calls[0]).toEqual([distribution.id, expectedShares])
+    expect(createDistributionShares.mock.calls[0]).toEqual([
+      distribution.id,
+      // @ts-expect-error supabase-js does not support bigint
+      expectedShares.easeInAndOut,
+    ])
 
     // expected share amounts cannot exceed the total distribution amount
     const totalDistributionAmount = BigInt(distribution.amount)
-    const totalShareAmounts = expectedShares.reduce((acc, share) => acc + BigInt(share.amount), 0n)
+    const totalShareAmounts = expectedShares.easeInAndOut.reduce(
+      (acc, share) => acc + BigInt(share.amount),
+      0n
+    )
     expect(totalShareAmounts).toBeLessThanOrEqual(totalDistributionAmount)
   })
 })
