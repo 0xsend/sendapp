@@ -9,7 +9,7 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Trade</title>
+        <title>Send | Invest</title>
       </Head>
       <SwapFormScreen />
     </>
@@ -19,7 +19,7 @@ export const Page: NextPageWithLayout = () => {
 export const getServerSideProps = userProtectedGetSSP()
 
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Trade" backFunction="router" />}>{children}</HomeLayout>
+  <HomeLayout TopNav={<TopNav header="Invest" backFunction="router" />}>{children}</HomeLayout>
 )
 
 export default Page

@@ -2,73 +2,44 @@ import {
   BigHeading,
   Button,
   Card,
+  LinkableButton,
   Paragraph,
   Spinner,
   XStack,
   type XStackProps,
   YStack,
+  Link,
 } from '@my/ui'
 import formatAmount from 'app/utils/formatAmount'
 import { useState } from 'react'
 import { type Timer, useStopwatch } from 'react-use-precision-timer'
 import { useCoins } from 'app/provider/coins'
-import { Eye, EyeOff } from '@tamagui/lucide-icons'
+import { ArrowRight, Eye, EyeOff } from '@tamagui/lucide-icons'
 import { useIsPriceHidden } from 'app/features/home/utils/useIsPriceHidden'
+import { baseMainnet, usdcAddress } from '@my/wagmi'
+import { IconArrowRight, IconDollar, IconPlus } from 'app/components/icons'
+import type { GestureResponderEvent } from 'react-native'
+import { TopNav } from 'app/components/TopNav'
 
-export const TokenBalanceCard = () => {
+export const FiatBalanceCard = () => {
   // @todo add an enabled flag for when hidden
-  const { totalPrice, pricesQuery } = useCoins()
-  const formattedBalance = formatAmount(totalPrice, 9, 0)
+  const { fiatBalances, pricesQuery } = useCoins()
+  const formattedUSDBalance = formatAmount(fiatBalances?.[usdcAddress[baseMainnet.id]], 9, 0)
   const { isPriceHidden, toggleIsPriceHidden } = useIsPriceHidden()
   const timer = useStopwatch()
   const { isGameVisible, presses, increaseScore } = useShowHideGame(timer)
 
-  const onShowHidePress = () => {
+  const onShowHidePress = (e: GestureResponderEvent) => {
     toggleIsPriceHidden()
     increaseScore()
   }
 
   return (
-    <Card p={'$5'} w={'100%'} jc="space-between" $gtLg={{ p: '$6', h: 244, mih: 244 }}>
+    <Card p={'$3'} pb="$5" px="$5" w={'100%'} jc="space-between" $gtLg={{ p: '$5', mih: 244 }}>
+      <TopNav showLogo />
       <XStack w={'100%'} zIndex={4}>
-        <YStack jc={'center'} gap={'$5'} w={'100%'} $gtLg={{ gap: '$9' }}>
+        <YStack jc={'center'} gap={'$8'} w={'100%'} $gtLg={{ gap: '$9' }}>
           <YStack w={'100%'} gap={'$2.5'} jc="space-between">
-            <XStack ai={'center'} jc={'space-between'} gap="$2.5" width={'100%'}>
-              <Paragraph
-                fontSize={'$5'}
-                color={'$lightGrayTextField'}
-                $theme-light={{ color: '$darkGrayTextField' }}
-                zIndex={1}
-                $gtLg={{ fontSize: '$6' }}
-              >
-                Total Balance
-              </Paragraph>
-              <Button
-                chromeless
-                backgroundColor="transparent"
-                hoverStyle={{ backgroundColor: 'transparent' }}
-                pressStyle={{
-                  backgroundColor: 'transparent',
-                  borderColor: 'transparent',
-                }}
-                focusStyle={{ backgroundColor: 'transparent' }}
-                p={0}
-                height={'auto'}
-                onPress={toggleIsPriceHidden}
-              >
-                <Button.Icon>
-                  {isPriceHidden ? (
-                    <EyeOff
-                      size={'$1.5'}
-                      color={'$lightGrayTextField'}
-                      $theme-light={{ color: '$darkGrayTextField' }}
-                    />
-                  ) : (
-                    <Eye size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
-                  )}
-                </Button.Icon>
-              </Button>
-            </XStack>
             {isGameVisible && (
               <XStack gap={'$2'} jc={'space-between'} ai={'center'} my="auto">
                 <Paragraph fontSize={'$6'} fontWeight={'500'} zIndex={1} color={'$color10'}>
@@ -78,7 +49,13 @@ export const TokenBalanceCard = () => {
               </XStack>
             )}
           </YStack>
-          <XStack style={{ color: 'white' }} gap={'$2.5'} onPress={onShowHidePress}>
+          <XStack
+            style={{ color: 'white' }}
+            gap={'$2.5'}
+            jc="space-between"
+            ai="flex-end"
+            onPress={onShowHidePress}
+          >
             {(() => {
               switch (true) {
                 case isPriceHidden:
@@ -93,15 +70,16 @@ export const TokenBalanceCard = () => {
                       {'///////'}
                     </BigHeading>
                   )
-                case pricesQuery.isLoading || !totalPrice:
+                case pricesQuery.isLoading || !fiatBalances:
                   return <Spinner size={'large'} />
                 default:
                   return (
                     <>
                       <BigHeading
+                        onPress={onShowHidePress}
                         $platform-web={{ width: 'fit-content' }}
                         color={'$color12'}
-                        fontSize={'$11'}
+                        fontSize={'$12'}
                         fontWeight={600}
                         zIndex={1}
                         $gtSm={{
@@ -109,7 +87,7 @@ export const TokenBalanceCard = () => {
                           lineHeight: 96,
                         }}
                       >
-                        ${formattedBalance}
+                        ${formattedUSDBalance}
                       </BigHeading>
                     </>
                   )

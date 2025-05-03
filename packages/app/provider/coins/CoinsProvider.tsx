@@ -2,7 +2,7 @@ import { createContext, useContext, useMemo } from 'react'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import type { allCoins, CoinWithBalance } from 'app/data/coins'
 import { coins as coinsOg, partnerCoins, allCoins as allCoinsList } from 'app/data/coins'
-import { isAddress } from 'viem'
+import { type Address, isAddress } from 'viem'
 import type { UseQueryResult } from '@tanstack/react-query'
 import type { UseBalanceReturnType, UseReadContractsReturnType } from 'wagmi'
 
@@ -10,7 +10,7 @@ type CoinsContextType = {
   coins: CoinWithBalance[]
   allCoins: CoinWithBalance[]
   isLoading: boolean
-  totalPrice: number | undefined
+  fiatBalances: Record<Address, number> | undefined
   ethQuery: UseBalanceReturnType
   tokensQuery: UseReadContractsReturnType
   pricesQuery: UseQueryResult<Record<allCoins[number]['token'], number>, Error>

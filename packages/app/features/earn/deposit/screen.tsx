@@ -272,7 +272,7 @@ export function DepositForm() {
             <Spinner size="small" />
           ) : (
             <Button.Text size={'$5'} fontWeight={'500'} fontFamily={'$mono'} color={'$black'}>
-              CONFIRM DEPOSIT
+              Add Money
             </Button.Text>
           )}
         </SubmitButton>
@@ -338,9 +338,6 @@ export function DepositForm() {
 
   return (
     <YStack testID="DepositForm" w={'100%'} gap={'$4'} pb={'$3'} $gtLg={{ w: '50%' }}>
-      <Paragraph size={'$7'} fontWeight={'500'}>
-        Deposit Amount
-      </Paragraph>
       <FormProvider {...form}>
         <SchemaForm
           form={form}
@@ -364,7 +361,7 @@ export function DepositForm() {
               focusStyle: {
                 outlineWidth: 0,
               },
-              placeholder: '0',
+              placeholder: '$0',
               fontFamily: '$mono',
               '$theme-dark': {
                 placeholderTextColor: '$darkGrayTextField',
@@ -375,7 +372,7 @@ export function DepositForm() {
               inputMode: coin.data?.decimals ? 'decimal' : 'numeric',
               onChangeText: (amount: string) => {
                 const localizedAmount = localizeAmount(amount)
-                form.setValue('amount', localizedAmount)
+                form.setValue('amount', `$${localizedAmount}`)
               },
               onFocus: () => setIsInputFocused(true),
               onBlur: () => setIsInputFocused(false),
@@ -406,7 +403,7 @@ export function DepositForm() {
           defaultValues={{
             amount:
               params.amount && coin.data?.decimals
-                ? localizeAmount(formatUnits(BigInt(params.amount), coin.data?.decimals))
+                ? `$${localizeAmount(formatUnits(BigInt(params.amount), coin.data?.decimals))}`
                 : undefined,
             areTermsAccepted: hasExistingDeposit,
           }}
@@ -426,10 +423,6 @@ export function DepositForm() {
                 >
                   <XStack ai={'center'} position="relative" jc={'space-between'}>
                     {amount}
-                    <XStack ai={'center'} gap={'$2'}>
-                      <IconCoin symbol={'USDC'} size={'$2'} />
-                      <Paragraph size={'$6'}>{coin.data?.symbol}</Paragraph>
-                    </XStack>
                     <XStack
                       position="absolute"
                       bottom={-8}
@@ -474,6 +467,7 @@ export function DepositForm() {
                                     size={'$5'}
                                     fontWeight={'600'}
                                   >
+                                    $
                                     {coin.data?.decimals
                                       ? formatAmount(
                                           formatUnits(
@@ -543,20 +537,17 @@ const StaticBenefits = () => {
   return (
     <Fade>
       <YStack gap={'$3.5'}>
-        <Paragraph size={'$7'} fontWeight={'500'}>
-          Benefits
-        </Paragraph>
         <Card w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>
           <YStack gap={'$3.5'}>
             <XStack gap={'$2.5'} jc={'space-between'}>
-              <Paragraph size={'$6'}>APY</Paragraph>
+              <Paragraph size={'$6'}>Interest</Paragraph>
               <Paragraph size={'$6'}>up to 12%</Paragraph>
             </XStack>
             <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
             <YStack gap={'$2'}>
               <Row
                 label={'Minimum Deposit'}
-                value={formatAmount(formatUnits(MINIMUM_DEPOSIT, usdcCoin.decimals), undefined, 2)}
+                value={`$${formatAmount(formatUnits(MINIMUM_DEPOSIT, usdcCoin.decimals), undefined, 2)}`}
               />
               <Row label={'Withdraw Anytime'} value={'Full flexibility'} />
               <Row label={'Rewards'} value={'Bonus SEND tokens'} />

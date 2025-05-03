@@ -34,11 +34,6 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
             </YStack>
           </YStack>
         </Card>
-        <HomeQuickActions>
-          <HomeQuickActions.Deposit />
-          <HomeQuickActions.Send />
-          <HomeQuickActions.Trade />
-        </HomeQuickActions>
       </YStack>
       <YStack gap={'$3'}>
         <TokenActivity coin={coin} />

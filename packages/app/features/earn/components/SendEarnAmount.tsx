@@ -50,9 +50,9 @@ export function SendEarnAmount({ activity }: { activity: SendEarnEvent }): React
     // this can actually happen for temporal events, but should be rare
     return null
   }
-  return `${formatAmount(
+  return `$${formatAmount(
     formatUnits(activity.data.assets, coin.decimals),
     5,
     coin.formatDecimals
-  )} ${coin.symbol}`
+  )} `
 }

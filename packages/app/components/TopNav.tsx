@@ -52,7 +52,7 @@ export function AvatarMenuButton({ profile }: { profile?: Tables<'profiles'> | n
   if (isLoading) return <Spinner size="small" color={'$color12'} alignSelf="center" p="$3" />
 
   return (
-    <LinkableAvatar href={'/account'} size={'$3.5'} circular={true}>
+    <LinkableAvatar href={'/account'} size={'$4'} circular={true}>
       <Avatar.Image src={profile?.avatar_url ?? ''} w="100%" h="100%" objectFit="cover" />
       <Avatar.Fallback jc={'center'} ai="center" theme="green_active" bc="$color2">
         <IconAccount size={'$2'} $theme-light={{ color: '$color12' }} />
@@ -150,111 +150,102 @@ export function TopNav({
     path.includes('/feed')
 
   return (
-    <Header w="100%" $lg={{ py: '$3' }}>
-      <Container
-        safeAreaProps={{
-          edges: { bottom: 'off' },
-        }}
-        $gtLg={{ jc: 'flex-start', pb: '$2', ai: 'flex-start' }}
-        ai="center"
-        jc="space-between"
-      >
-        {(() => {
-          switch (true) {
-            case media.gtLg && isSubRoute:
-              return (
-                <H2 fontWeight={'300'} col="$color10" lineHeight={32} als={'center'}>
-                  {header}
-                </H2>
-              )
-            case media.gtLg && !showOnGtLg:
-              return null
-            case hasSelectedCoin:
-              return (
-                <XStack ai="center" f={1}>
-                  <Button onPress={handleBack}>
-                    <ButtonOg.Icon>
-                      <IconArrowLeft
-                        size={'$1.5'}
-                        $theme-dark={{ color: '$primary' }}
-                        $theme-light={{ color: '$color12' }}
-                      />
-                    </ButtonOg.Icon>
-                  </Button>
-                  <Paragraph size={'$8'} col={'$color10'}>
-                    Balance
-                  </Paragraph>
-                </XStack>
-              )
-            case !isSubRoute:
-              return (
-                <>
-                  {showLogo ? (
-                    <XStack>
-                      <Link href="/">
-                        <IconSendLogo size={'$2.5'} color={'$color12'} />
-                      </Link>
-                    </XStack>
-                  ) : (
-                    <H2 fontWeight={'300'} col="$color10" lineHeight={32} als={'center'}>
-                      {header}
-                    </H2>
-                  )}
-                  <XStack
-                    jc="center"
-                    gap="$2"
-                    opacity={hideRightActions ? 0 : 1}
-                    pointerEvents={hideRightActions ? 'none' : 'unset'}
-                    $gtLg={{
-                      pointerEvents: 'none',
-                      opacity: 0,
-                    }}
-                  >
-                    {/* We need the buttons to be there for layout purposes */}
-                    <ActivityMenuButton />
-                    <AvatarMenuButton profile={profile} />
-                  </XStack>
-                </>
-              )
-            case showLogo:
-              return (
-                <>
-                  <Button onPress={handleBack}>
-                    <ButtonOg.Icon>
-                      <IconArrowLeft
-                        size={'$1.5'}
-                        $theme-dark={{ color: '$primary' }}
-                        $theme-light={{ color: '$color12' }}
-                      />
-                    </ButtonOg.Icon>
-                  </Button>
+    <Header w="100%" py="$3">
+      {(() => {
+        switch (true) {
+          case media.gtLg && isSubRoute:
+            return (
+              <H2 fontWeight={'300'} col="$color10" lineHeight={32} als={'center'}>
+                {header}
+              </H2>
+            )
+          case hasSelectedCoin:
+            return (
+              <XStack ai="center" f={1}>
+                <Button onPress={handleBack}>
+                  <ButtonOg.Icon>
+                    <IconArrowLeft
+                      size={'$1.5'}
+                      $theme-dark={{ color: '$primary' }}
+                      $theme-light={{ color: '$color12' }}
+                    />
+                  </ButtonOg.Icon>
+                </Button>
+              </XStack>
+            )
+          case !isSubRoute:
+            return (
+              <XStack jc="space-between" ai="center">
+                {showLogo ? (
                   <XStack>
-                    <Link href="/send">
+                    <Link href="/">
                       <IconSendLogo size={'$2.5'} color={'$color12'} />
                     </Link>
                   </XStack>
-                </>
-              )
-            default:
-              return (
-                <XStack ai="center" f={1}>
-                  <Button onPress={handleBack}>
-                    <ButtonOg.Icon>
-                      <IconArrowLeft
-                        size={'$1.5'}
-                        $theme-dark={{ color: '$primary' }}
-                        $theme-light={{ color: '$color12' }}
-                      />
-                    </ButtonOg.Icon>
-                  </Button>
-                  <Paragraph size={'$8'} col={'$color10'}>
+                ) : (
+                  <H2 fontWeight={'300'} col="$color10" lineHeight={32} als={'center'}>
                     {header}
-                  </Paragraph>
+                  </H2>
+                )}
+                <XStack
+                  jc="flex-end"
+                  gap="$4"
+                  opacity={hideRightActions ? 0 : 1}
+                  pointerEvents={hideRightActions ? 'none' : 'unset'}
+                >
+                  <LinkableButton
+                    p={'$4'}
+                    bc={'$color0'}
+                    $theme-light={{ color: '$color12' }}
+                    href={'/deposit'}
+                  >
+                    <LinkableButton.Text>
+                      <Paragraph>Add Money</Paragraph>
+                    </LinkableButton.Text>
+                  </LinkableButton>
+
+                  <AvatarMenuButton profile={profile} />
                 </XStack>
-              )
-          }
-        })()}
-      </Container>
+              </XStack>
+            )
+          case showLogo:
+            return (
+              <>
+                <Button onPress={handleBack}>
+                  <ButtonOg.Icon>
+                    <IconArrowLeft
+                      size={'$1.5'}
+                      $theme-dark={{ color: '$primary' }}
+                      $theme-light={{ color: '$color12' }}
+                    />
+                  </ButtonOg.Icon>
+                </Button>
+                <XStack>
+                  <Link href="/send">
+                    <IconSendLogo size={'$2.5'} color={'$color12'} />
+                  </Link>
+                </XStack>
+              </>
+            )
+          default:
+            return (
+              <XStack ai="center" f={1}>
+                <Button onPress={handleBack}>
+                  <ButtonOg.Icon>
+                    <IconArrowLeft
+                      size={'$1.5'}
+                      $theme-dark={{ color: '$primary' }}
+                      $theme-light={{ color: '$color12' }}
+                    />
+                  </ButtonOg.Icon>
+                </Button>
+                <Paragraph size={'$8'} col={'$color10'}>
+                  {header}
+                </Paragraph>
+              </XStack>
+            )
+        }
+      })()}
       {subheader && (
         <Container fd="column" safeAreaProps={{ edges: ['left', 'right'] }}>
           <Paragraph

@@ -34,6 +34,7 @@ export const brandColors = {
   aztec: '#111f22',
   lunarGreen: '#3E4A3C',
   mineShaft: '#343434',
+  tokenUsdc: '#2775CA',
 } as const
 
 export const greenPalette = {

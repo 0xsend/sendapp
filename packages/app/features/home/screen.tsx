@@ -15,8 +15,7 @@ import {
 } from '@my/ui'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
-import { TokenBalanceCard } from './TokenBalanceCard'
-import { TokenBalanceList } from './TokenBalanceList'
+import { FiatBalanceCard } from './TokenBalanceCard'
 import { TokenDetails } from './TokenDetails'
 import Search from 'app/components/SearchBar'
 import { useTagSearch } from 'app/provider/tag-search'
@@ -86,12 +85,7 @@ function HomeBody(props: XStackProps) {
                     <AlertCircle size={'$3'} />
                   </Theme>
                   <YStack ai="center" gap="$2">
-                    <H1 tt="uppercase" fontWeight={'800'}>
-                      ADD FUNDS
-                    </H1>
-                    <Paragraph color="$color10" $gtMd={{ fontSize: '$6' }} ta="center">
-                      Deposit at least .05 USDC to unlock sending
-                    </Paragraph>
+                    <H1 fontWeight={'800'}>Add Money</H1>
                   </YStack>
                   <XStack w="100%">
                     <HomeButtons.DepositButton mah={40} />
@@ -100,7 +94,7 @@ function HomeBody(props: XStackProps) {
               </Card>
             </>
           ) : (
-            <TokenBalanceCard />
+            <FiatBalanceCard />
           )}
           <HomeQuickActions
             y={selectedCoin ? -quickActionHeightWithOffset : 0}
@@ -108,28 +102,19 @@ function HomeBody(props: XStackProps) {
             animateOnly={['transform']}
             animation="200ms"
           >
-            <HomeQuickActions.Deposit />
-            <HomeQuickActions.Earn />
-            <HomeQuickActions.Trade />
+            <HomeQuickActions.Savings />
+            <HomeQuickActions.Invest />
           </HomeQuickActions>
-          <YStack
-            w={'100%'}
-            ai={'center'}
+
+          <HomeQuickActions
             y={selectedCoin ? -quickActionHeightWithOffset : 0}
+            zIndex={selectedCoin ? -1 : 0}
             animateOnly={['transform']}
             animation="200ms"
           >
-            <Card
-              bc={'$color1'}
-              width="100%"
-              p="$2"
-              $gtSm={{
-                p: '$4',
-              }}
-            >
-              <TokenBalanceList />
-            </Card>
-          </YStack>
+            <HomeQuickActions.Rewards />
+            <HomeQuickActions.Send />
+          </HomeQuickActions>
         </YStack>
         {selectedCoin !== undefined && <TokenDetails coin={selectedCoin} />}
       </XStack>

@@ -3,15 +3,15 @@ import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from '../_app'
 import { TopNav } from 'app/components/TopNav'
-import { EarnScreen } from 'app/features/earn/screen'
+import { SavingsScreen } from 'app/features/earn/screen'
 
 export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Earn</title>
+        <title>Send | Save</title>
       </Head>
-      <EarnScreen />
+      <SavingsScreen />
     </>
   )
 }
@@ -19,7 +19,9 @@ export const Page: NextPageWithLayout = () => {
 export const getServerSideProps = userProtectedGetSSP()
 
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Earn" backFunction="router" />}>{children}</HomeLayout>
+  <HomeLayout TopNav={<TopNav header="Savings Account" backFunction="pop" />}>
+    {children}
+  </HomeLayout>
 )
 
 export default Page

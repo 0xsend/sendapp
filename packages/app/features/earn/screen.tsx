@@ -15,7 +15,7 @@ import { useSendEarnBalances, useVaultConvertSharesToAssets, type SendEarnBalanc
 
 const log = debug('app:earn:screen')
 
-export function EarnScreen() {
+export function SavingsScreen() {
   const sendAccount = useSendAccount()
   const balances = useSendEarnBalances()
 
@@ -78,6 +78,7 @@ const Badge = ({ text }: { text: string }) => {
   return (
     <XStack
       backgroundColor={badgeBackgroundColor}
+      maw={150}
       px={'$3.5'}
       py={'$2'}
       br={'$4'}
@@ -99,7 +100,7 @@ const LearnSection = () => {
           h={300}
           p={'$5'}
           gap={'$7'}
-          jc={'space-between'}
+          jc={'flex-end'}
           $gtLg={{ p: '$7' }}
           backgroundImage={'url(https://ghassets.send.app/app_images/deposit.jpg)'}
           backgroundPosition={'center 15%'}
@@ -115,19 +116,6 @@ const LearnSection = () => {
           >
             <YStack position="absolute" top={0} left={0} bottom={0} right={0} />
           </LinearGradient>
-          <XStack
-            backgroundColor={'$oliveDrab'}
-            px={'$3.5'}
-            py={'$2'}
-            br={'$4'}
-            gap={'$2'}
-            ai={'center'}
-          >
-            <IconCoin symbol={'USDC'} size={'$2'} />
-            <Paragraph color={'$white'} size={'$5'}>
-              Deposits
-            </Paragraph>
-          </XStack>
           <YStack>
             <Paragraph color={'$white'} size={'$9'}>
               Start Growing
@@ -154,19 +142,19 @@ const EarningsCallToAction = () => {
   return (
     <Fade>
       <Card w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>
-        <Badge text={'Earnings'} />
+        <Badge text={'Savings'} />
         <YStack gap={'$3.5'}>
           <Paragraph size={'$7'} fontWeight={'500'}>
             Boost Your Savings Instantly
           </Paragraph>
           <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
           <YStack gap={'$2'}>
-            <ListItem>High APY: up to 12% on your deposits</ListItem>
+            <ListItem>High Interest: up to 12% annually</ListItem>
             <ListItem>Full Flexibility: Access your funds anytime</ListItem>
             <ListItem>Rewards: Bonus SEND tokens</ListItem>
           </YStack>
         </YStack>
-        <SectionButton onPress={() => push('/earn/usdc/deposit')}>START EARNING</SectionButton>
+        <SectionButton onPress={() => push('/earn/usdc/deposit')}>START SAVING</SectionButton>
       </Card>
     </Fade>
   )
@@ -199,24 +187,13 @@ const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) =
     () => formatUSDCValue(currentAssets.data?.reduce((sum, assets) => sum + assets, 0n) ?? 0n),
     [currentAssets.data]
   )
-  const totalDeposits = useMemo(
-    () => formatUSDCValue(balances?.reduce((sum, balance) => sum + balance.assets, 0n) ?? 0n),
-    [balances]
-  )
 
   return (
     <Fade>
       <Card w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>
-        <Badge text={'Active Earnings'} />
+        <Badge text={'Balance'} />
         <YStack gap={'$3.5'}>
           <YStack gap={'$2'}>
-            <Paragraph
-              size={'$5'}
-              color={'$lightGrayTextField'}
-              $theme-light={{ color: '$darkGrayTextField' }}
-            >
-              Total Value
-            </Paragraph>
             <XStack ai={'center'} jc={'space-between'}>
               <Paragraph
                 fontWeight={'500'}
@@ -245,22 +222,16 @@ const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) =
               >
                 {totalAssets}
               </Paragraph>
-              <XStack ai={'center'} gap={'$2'}>
-                <IconCoin symbol={'USDC'} size={totalAssets.length > 16 ? '$1.5' : '$2.5'} />
-                <Paragraph size={'$7'}>USDC</Paragraph>
-              </XStack>
             </XStack>
           </YStack>
-          <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
           <YStack gap={'$2'}>
-            <Row label={'Deposits'} value={`${totalDeposits} USDC`} />
             {/* Rewards section commented out since it won't be live on launch
             <Row label={'Earnings'} value={`+${formatUSDCValue(0n)} USDC`} />
             <Row label={'Rewards'} value={`+0 SEND`} />
             */}
           </YStack>
         </YStack>
-        <SectionButton onPress={() => push('/earn/usdc')}>VIEW DETAILS</SectionButton>
+        <SectionButton onPress={() => push('/earn/usdc')}>SAVINGS ACCOUNT</SectionButton>
       </Card>
     </Fade>
   )
@@ -278,5 +249,5 @@ const DetailsSection = ({
 
 const formatUSDCValue = (value: bigint): string => {
   const valueInUSDC = Number(formatUnits(value, 6))
-  return formatAmount(valueInUSDC, 10, 2)
+  return `$${formatAmount(valueInUSDC, 10, 2)}`
 }

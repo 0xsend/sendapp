@@ -17,44 +17,36 @@ export function HomeLayout({
   const { onScroll, onContentSizeChange, ref } = useScrollDirection()
 
   return (
-    <HomeSideBarWrapper>
-      <BottomNavBarWrapper>
-        <TagSearchProvider>
-          <ScrollView
-            ref={ref}
-            mih="100%"
-            contentContainerStyle={{
-              mih: '100%',
-              height: fullHeight ? '100%' : 'auto',
-            }}
-            scrollEventThrottle={128}
-            onScroll={onScroll}
-            onContentSizeChange={onContentSizeChange}
-            showsVerticalScrollIndicator={false}
-            {...props}
-          >
-            <YStack gap="$3" $gtLg={{ pt: 80 }} w={'100%'}>
-              {TopNav}
-            </YStack>
-            <Container
-              safeAreaProps={{
-                style: { flex: 1 },
-                edges: {
-                  top: 'off',
-                  bottom: 'maximum',
-                  left: 'additive',
-                  right: 'additive',
-                },
-              }}
-              pb={BOTTOM_NAV_BAR_HEIGHT}
-              $gtLg={{ pt: '$5', pb: '$0' }}
-              height={fullHeight ? '100%' : 'auto'}
-            >
-              {children}
-            </Container>
-          </ScrollView>
-        </TagSearchProvider>
-      </BottomNavBarWrapper>
-    </HomeSideBarWrapper>
+    <TagSearchProvider>
+      <ScrollView
+        ref={ref}
+        mih="100%"
+        contentContainerStyle={{
+          mih: '100%',
+          height: fullHeight ? '100%' : 'auto',
+        }}
+        scrollEventThrottle={128}
+        onScroll={onScroll}
+        onContentSizeChange={onContentSizeChange}
+        showsVerticalScrollIndicator={false}
+        {...props}
+      >
+        <Container
+          safeAreaProps={{
+            style: { flex: 1 },
+            edges: {
+              top: 'maximum',
+              bottom: 'maximum',
+              left: 'additive',
+              right: 'additive',
+            },
+          }}
+          py="$5"
+          height={fullHeight ? '100%' : 'auto'}
+        >
+          {children}
+        </Container>
+      </ScrollView>
+    </TagSearchProvider>
   )
 }
