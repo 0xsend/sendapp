@@ -65,6 +65,7 @@
               pkgs.unstable.bun
               pkgs.unstable.tilt
               pkgs.unstable.temporal-cli
+              pkgs.unstable.ripgrep
             ] # macOS-specific tools
             ++ (pkgs.lib.optionals pkgs.stdenv.isDarwin [
               pkgs.unstable.darwin.xcode_16_3
