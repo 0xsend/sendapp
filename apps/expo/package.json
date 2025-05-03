@@ -33,7 +33,7 @@
     "remove-xcode-env-local-file": "rm ios/.xcode.env.local"
   },
   "dependencies": {
-    "@babel/runtime": "^7.18.9",
+    "@babel/runtime": "^7.26.10",
     "@my/ui": "workspace:*",
     "@react-native-async-storage/async-storage": "^2.0.0",
     "@react-native-community/netinfo": "11.4.1",
