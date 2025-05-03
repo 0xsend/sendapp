@@ -14,6 +14,7 @@ concurrency:
 jobs:
   build_next_image:
     name: Build Next.js Docker Image
+    if: ${{ github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' || github.head_ref == 'dev' || github.head_ref == 'main' }}
     runs-on: arc-runner-set
     permissions:
       contents: read
@@ -193,10 +194,11 @@ jobs:
 
   playwright-tests:
     name: Playwright Tests (Shard ${{ matrix.shard }}/4)
-    needs: build_next_image # Ensure image is built first
-    # if: ${{ github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' || github.head_ref == 'dev' || github.head_ref == 'main' }}
+    needs: [build_next_image]
+    if: ${{ github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' || github.head_ref == 'dev' || github.head_ref == 'main' }}
     runs-on: arc-runner-set
     strategy:
+      # Don't stop all shards if one fails
       fail-fast: false
       matrix:
         shard: [1, 2, 3, 4]
@@ -336,14 +338,14 @@ jobs:
           name: playwright-test-results-shard-${{ matrix.shard }}
           path: packages/playwright/test-results/
           retention-days: 30
+          if-no-files-found: ignore # Don't fail if no files found
 
   playwright-merge-reports:
     name: Playwright Merge Reports
     runs-on: arc-runner-set
     # Run this job even if previous jobs fail to capture results
     if: always()
-    needs: playwright-tests
-
+    needs: [playwright-tests]
     # for writing PR comments
     permissions:
       pull-requests: write
@@ -355,41 +357,59 @@ jobs:
         env:
           YARN_ENABLE_HARDENED_MODE: 0
       - name: Download Shard Results
+        id: download-artifacts
         uses: actions/download-artifact@v4
+        continue-on-error: true # Continue even if some artifacts are missing
         with:
-          name: playwright-test-results-shard-* # Download all shard results
           path: all-test-results/ # Put them in a subdirectory
           pattern: playwright-test-results-shard-* # Match artifact names
           merge-multiple: true # Merge into the single path directory
+
+      # Create empty directory if no artifacts were downloaded
+      - name: Create empty results directory if needed
+        if: steps.download-artifacts.outcome == 'failure'
+        run: |
+          mkdir -p all-test-results/playwright-report
+          echo "No test results were found. This could be because all test shards failed to run or produce artifacts." > all-test-results/playwright-report/README.md
+
       - name: Install Playwright Dependencies
         run: yarn playwright playwright install --with-deps
+
       - name: Merge Playwright Reports HTML
         id: merge-reports
         run: npx playwright merge-reports ./all-test-results --reporter html
+        continue-on-error: true # Continue even if merge fails
+
       - name: Playwright Markdown Report
-        if: always() && steps.merge-reports.outcome == 'success' # Only run if merge succeeded
+        if: always() # Always run regardless of previous step outcome
         id: playwright-md-report
         shell: bash
         run: |
           echo "------------------"
           # Assumes the markdown script reads from the default playwright-report directory
           export PLAYWRIGHT_REPORT_PATH=all-test-results/playwright-report
-          bun run packages/playwright/bin/report-markdown.ts > playwright-report.md
+          if [ ! -f "all-test-results/report.json" ] && [ ! -d "all-test-results/playwright-report" ]; then
+            echo "# Playwright Test Results\n\n## No test results available\n\nNo test results were found. This could be because tests failed to run or artifacts were not uploaded." > playwright-report.md
+          else
+            bun run packages/playwright/bin/report-markdown.ts > playwright-report.md || echo "# Playwright Test Results\n\n## Error generating report\n\nThere was an error generating the test report." > playwright-report.md
+          fi
           cat playwright-report.md
           echo "------------------"
+
       - uses: mshick/add-pr-comment@v2
-        if: always() && steps.playwright-md-report.outcome == 'success' # Only comment if markdown generated
+        if: always() && github.event_name == 'pull_request' # Only comment on PRs
         with:
           message-id: playwright-report # Use the same ID to update the comment
           refresh-message-position: true
           message-path: |
             playwright-report.md
+
       - name: Upload Merged Playwright Report
         uses: actions/upload-artifact@v4
         if: always() # Upload merged report even if subsequent steps fail
         with:
           name: playwright-merged-report
-          path: playwright-report/
+          path: all-test-results/
           retention-days: 30
 
   vercel-deploy-preview:
