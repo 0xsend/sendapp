@@ -14,7 +14,8 @@ concurrency:
 jobs:
   build_next_image:
     name: Build Next.js Docker Image
-    if: ${{ github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' || github.head_ref == 'dev' || github.head_ref == 'main' }}
+    # Testing, uncomment when ready
+    # if: ${{ github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' || github.head_ref == 'dev' || github.head_ref == 'main' }}
     runs-on: arc-runner-set
     permissions:
       contents: read
@@ -195,7 +196,8 @@ jobs:
   playwright-tests:
     name: Playwright Tests (Shard ${{ matrix.shard }}/4)
     needs: [build_next_image]
-    if: ${{ github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' || github.head_ref == 'dev' || github.head_ref == 'main' }}
+    # Testing, uncomment when ready
+    # if: ${{ github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' || github.head_ref == 'dev' || github.head_ref == 'main' }}
     runs-on: arc-runner-set
     strategy:
       # Don't stop all shards if one fails
