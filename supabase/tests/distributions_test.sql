@@ -697,13 +697,11 @@ SELECT
                 AND type = 'tag_referral' $$, $$
             VALUES (1) $$, 'Verification for user referral should be inserted');
 SELECT
-    results_eq($$
-        SELECT
-            (weight)::integer FROM distribution_verifications
-            WHERE
-                user_id = tests.get_supabase_uid('bob')
-                AND type = 'total_tag_referrals' $$, $$
-            VALUES (1) $$, 'Verification for total tag referral should be inserted');
+    is_empty($$
+        SELECT 1 FROM distribution_verifications
+        WHERE
+            user_id = tests.get_supabase_uid('bob')
+            AND type = 'total_tag_referrals' $$, 'Verification for total tag referral should still not be inserted');
 -- Test streak verification
 SELECT
     results_eq($$
