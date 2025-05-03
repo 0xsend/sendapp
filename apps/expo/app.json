@@ -19,15 +19,17 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "8S6R4SU556.app.send",
-      "associatedDomains": ["webcredentials:send.app"]
+      "bundleIdentifier": "app.send",
+      "associatedDomains": ["webcredentials:send.app"],
+      "appleTeamId": "8S6R4SU556"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "app.send"
+      "package": "app.send",
+      "permissions": ["android.permission.RECORD_AUDIO"]
     },
     "web": {
       "favicon": "./assets/favicon.png"

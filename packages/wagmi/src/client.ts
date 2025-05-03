@@ -3,6 +3,8 @@ import { bundlerActions, type BundlerClient } from 'permissionless'
 import { ENTRYPOINT_ADDRESS_V07 } from 'permissionless/utils'
 import { createClient, createPublicClient, http, type HttpTransport, type PublicClient } from 'viem'
 import { baseMainnet, mainnet } from './chains'
+import { isWeb } from './utils/platform'
+import { getRpcUrl } from './utils/getRpcUrl'
 
 const log = debug('app:utils:viem:client')
 
@@ -29,10 +31,16 @@ export const baseMainnetClient: PublicClient<HttpTransport, typeof baseMainnet> 
     transport: http(baseMainnet.rpcUrls.default.http[0]),
   })
 
-const BUNDLER_RPC_URL =
+let BUNDLER_RPC_URL =
   process.env.BUNDLER_RPC_URL ??
   process.env.NEXT_PUBLIC_BUNDLER_RPC_URL ??
-  'http://127.0.0.1:3030/rpc'
+  'http://localhost:3030/rpc'
+
+// Convert localhost URLs to device IP in native environments
+if (!isWeb) {
+  BUNDLER_RPC_URL = getRpcUrl(BUNDLER_RPC_URL)
+}
+
 export const baseMainnetBundlerClient: BundlerClient<
   typeof ENTRYPOINT_ADDRESS_V07,
   typeof baseMainnet

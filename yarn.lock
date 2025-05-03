@@ -6283,6 +6283,7 @@ __metadata:
     "@wagmi/core": "npm:^2.16.7"
     change-case: "npm:^5.4.2"
     debug: "npm:^4.3.6"
+    expo-constants: "npm:~17.0.3"
     globby: "npm:^14.0.0"
     permissionless: "npm:^0.1.14"
     typescript: "npm:^5.8.3"
