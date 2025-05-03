@@ -66,8 +66,8 @@ const MobileButtonRow = ({
       <LinearGradient
         h={'150%'}
         top={'-50%'}
-        start={{ x: 0, y: 1 }}
-        end={{ x: 0, y: 0 }}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
         locations={[0, 0.33]}
         fullscreen
         colors={['transparent', '$background']}
