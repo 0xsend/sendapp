@@ -187,6 +187,10 @@ function fetchDistributionVerifications(
 
 export type DistributionsVerificationsQuery = ReturnType<typeof useDistributionVerifications>
 
+const TYPES_REQUIRING_CREATED_AT: Array<Database['public']['Enums']['verification_type']> = [
+  'create_passkey',
+]
+
 export const useDistributionVerifications = (distributionNumber?: number) => {
   const supabase = useSupabase()
 
@@ -204,9 +208,6 @@ export const useDistributionVerifications = (distributionNumber?: number) => {
       const distribution = data[0]
 
       const verification_values = distribution.distribution_verification_values
-        .filter(({ distribution_verifications }) =>
-          distribution_verifications?.some((v) => v.created_at && v.created_at !== '')
-        )
         .map((item) => {
           const verifications = item.distribution_verifications ?? []
           const totalWeight = verifications.reduce((sum, v) => sum + BigInt(v.weight ?? 0), 0n)
@@ -222,6 +223,10 @@ export const useDistributionVerifications = (distributionNumber?: number) => {
             created_at: latestCreatedAt,
           }
         })
+        .filter(
+          ({ created_at, type }) => !TYPES_REQUIRING_CREATED_AT.includes(type) || created_at !== ''
+        )
+
       const multipliers = (distribution.distribution_verification_values ?? []).map((item) => {
         const verifications = item.distribution_verifications ?? []
         const totalWeight = verifications.reduce((sum, v) => sum + BigInt(v.weight ?? 0), 0n)
