@@ -1,7 +1,7 @@
 import type { ColorTokens } from '@my/ui'
 import { type IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
-import { Defs, G, Path, Rect, Svg } from 'react-native-svg'
+import { Defs, G, Path, Rect, Svg, ClipPath } from 'react-native-svg'
 
 const Usdc = (props) => {
   const { size, color, ...rest } = props
@@ -28,9 +28,9 @@ const Usdc = (props) => {
         />
       </G>
       <Defs>
-        <clipPath id="clip0_265_2602">
+        <ClipPath id="clip0_265_2602">
           <Rect width="32" height="32" fill="white" />
-        </clipPath>
+        </ClipPath>
       </Defs>
     </Svg>
   )
