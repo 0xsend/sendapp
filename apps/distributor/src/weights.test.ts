@@ -127,6 +127,33 @@ const testCases = [
       },
     },
   },
+  {
+    name: 'ease_in_out',
+    mode: 'ease_in_out',
+    expected: {
+      totalWeight: 26666n, // Approximate total based on the curve
+      weightPerSend: 2666n,
+      poolWeights: {
+        '0x1': 7466n, // ~28% weight for lowest balance
+        '0x2': 9600n, // ~36% weight for middle balance
+        '0x3': 9600n, // ~36% weight for highest balance
+      },
+      weightedShares: {
+        '0x1': {
+          address: '0x1',
+          amount: 28000n, // ~35% of 80000
+        },
+        '0x2': {
+          address: '0x2',
+          amount: 26000n, // ~32.5% of 80000
+        },
+        '0x3': {
+          address: '0x3',
+          amount: 26000n, // ~32.5% of 80000
+        },
+      },
+    },
+  },
 ] as const
 
 describe('calculateWeights', () => {

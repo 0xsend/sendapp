@@ -1793,6 +1793,62 @@ export type Database = {
           id: number
         }
       }
+      insert_create_passkey_verifications: {
+        Args: {
+          distribution_num: number
+        }
+        Returns: undefined
+      }
+      insert_send_slash: {
+        Args: {
+          distribution_number: number
+          scaling_divisor?: number
+          minimum_sends?: number
+        }
+        Returns: undefined
+      }
+      insert_send_streak_verifications: {
+        Args: {
+          distribution_num: number
+        }
+        Returns: undefined
+      }
+      insert_send_verifications: {
+        Args: {
+          distribution_num: number
+        }
+        Returns: undefined
+      }
+      insert_tag_referral_verifications: {
+        Args: {
+          distribution_num: number
+        }
+        Returns: undefined
+      }
+      insert_tag_registration_verifications: {
+        Args: {
+          distribution_num: number
+        }
+        Returns: undefined
+      }
+      insert_total_referral_verifications: {
+        Args: {
+          distribution_num: number
+        }
+        Returns: undefined
+      }
+      insert_verification_value: {
+        Args: {
+          distribution_number: number
+          type: Database["public"]["Enums"]["verification_type"]
+          fixed_value?: number
+          bips_value?: number
+          multiplier_min?: number
+          multiplier_max?: number
+          multiplier_step?: number
+        }
+        Returns: undefined
+      }
       leaderboard_referrals_all_time: {
         Args: Record<PropertyKey, never>
         Returns: {
