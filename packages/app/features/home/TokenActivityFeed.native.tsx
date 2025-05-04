@@ -1,13 +1,12 @@
-import { Card, type CardProps, Spinner } from '@my/ui'
+import { Card, type CardProps, Fade, Paragraph, Spinner, YStack } from '@my/ui'
+import type { PostgrestError } from '@supabase/postgrest-js'
+import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
+import { useScrollDirection } from 'app/provider/scroll'
 import type { Activity } from 'app/utils/zod/activity'
 import { useEffect } from 'react'
-import { TokenActivityRow } from './TokenActivityRow'
-import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
-import type { ZodError } from 'zod'
-import type { PostgrestError } from '@supabase/postgrest-js'
 import { FlatList } from 'react-native'
-import { Fade } from '@my/ui'
-import { useScrollDirection } from 'app/provider/scroll'
+import type { ZodError } from 'zod'
+import { TokenActivityRow } from './TokenActivityRow'
 
 export const TokenActivityFeed = ({
   tokenActivityFeedQuery,
@@ -37,9 +36,19 @@ export const TokenActivityFeed = ({
     }
   }, [isAtEnd, hasNextPage, fetchNextPage, isFetchingNextPageActivities])
 
+  // Show empty state when there are no activities
   if (!activities.length) {
-    return null
+    return (
+      <Card {...props} f={1} jc="center" ai="center" p="$4">
+        <YStack ai="center" gap="$2" p="$4">
+          <Paragraph color="$color10" ta="center">
+            No activity to display yet.
+          </Paragraph>
+        </YStack>
+      </Card>
+    )
   }
+
   return (
     <Card {...props} f={1}>
       <Fade>
