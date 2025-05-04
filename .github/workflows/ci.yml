@@ -82,23 +82,29 @@ jobs:
       - name: Generate Build Args
         id: build-args
         run: |
-          # Start with basic build args
-          echo "build_args<<EOF" >> $GITHUB_OUTPUT
-          echo "CI=${{ env.CI }}" >> $GITHUB_OUTPUT
+          # Build a complete string of all build args in Bash
+          build_args="CI=${CI}"
           
           # Add all NEXT_PUBLIC_ variables from the environment
           for var in $(env | grep -o "^NEXT_PUBLIC_[^=]*"); do
-            echo "$var=${{ env.$var }}" >> $GITHUB_OUTPUT
+            # Use Bash variable reference for indirect expansion
+            value=$(printenv "$var")
+            if [[ -n "$value" ]]; then
+              build_args="${build_args} ${var}=${value}"
+            fi
           done
           
           # Add other important variables
           for var in ANVIL_BASE_FORK_URL SECRET_SHOP_PRIVATE_KEY SEND_ACCOUNT_FACTORY_PRIVATE_KEY SNAPLET_HASH_KEY SUPABASE_DB_URL SUPABASE_JWT_SECRET SUPABASE_SERVICE_ROLE SHOVEL_QUIET TEMPORAL_ADDR; do
-            if [[ -n "${{ env.$var }}" ]]; then
-              echo "$var=${{ env.$var }}" >> $GITHUB_OUTPUT
+            # Use Bash variable reference for indirect expansion
+            value=$(printenv "$var")
+            if [[ -n "$value" ]]; then
+              build_args="${build_args} ${var}=${value}"
             fi
           done
           
-          echo "EOF" >> $GITHUB_OUTPUT
+          # Output the complete string as a single value
+          echo "build_args=${build_args}" >> $GITHUB_OUTPUT
 
       - name: Build and push Docker image
         id: build-push # Give the step an ID
