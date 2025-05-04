@@ -24,7 +24,7 @@
     "@supabase/supabase-js": "2.44.2",
     "@wagmi/core": "^2.16.7",
     "app": "workspace:*",
-    "express": "^4.20.0",
+    "express": "^5.0.0",
     "pino": "^8.16.1",
     "viem": "^2.27.2"
   },
