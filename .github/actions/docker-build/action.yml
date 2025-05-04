@@ -37,6 +37,16 @@ runs:
         SHORT_SHA=$(git rev-parse --short=10 HEAD)
         IMAGE_TAG="ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}/${{ inputs.image-name }}:${SHORT_SHA}"
         echo "IMAGE_TAG=${IMAGE_TAG,,}" >> $GITHUB_OUTPUT # Lowercase for Docker compatibility
+        
+    - name: Set Environment Variables from Template
+      shell: bash
+      run: |
+        if [ -f "./scripts/github-actions-set-env-from-template.sh" ]; then
+          chmod +x ./scripts/github-actions-set-env-from-template.sh
+          ./scripts/github-actions-set-env-from-template.sh .env.local.template
+        else
+          echo "Warning: Environment script not found, using default environment variables"
+        fi
 
     - name: Build and Push Docker Image
       id: build-and-push
@@ -48,6 +58,12 @@ runs:
             BUILD_ARGS_STRING+=" --build-arg $arg"
           done
         fi
+        
+        # Add environment variables from template as build arguments
+        # Only include variables starting with NEXT_PUBLIC_ for the Next.js build
+        for var in $(env | grep "^NEXT_PUBLIC_" | cut -d= -f1); do
+          BUILD_ARGS_STRING+=" --build-arg ${var}=${!var}"
+        done
 
         echo "Building image: ${{ steps.generate-tag.outputs.IMAGE_TAG }}"
         echo "Using build args:${BUILD_ARGS_STRING}" # Be careful not to expose secrets here
