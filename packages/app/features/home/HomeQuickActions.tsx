@@ -1,16 +1,17 @@
 import {
-  Button,
+  ButtonText,
   LinkableButton,
   type LinkableButtonProps,
   Theme,
   XStack,
-  YStack,
   type XStackProps,
+  YStack,
+  useMedia,
 } from '@my/ui'
 import { IconArrowUp, IconPlus, IconStacks, IconSwap } from 'app/components/icons'
-import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { sendCoin, usdcCoin } from 'app/data/coins'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
+import { useHoverStyles } from 'app/utils/useHoverStyles'
 
 type HomeQuickActionsProps = XStackProps
 
@@ -24,6 +25,7 @@ export const HomeQuickActions = ({ children, ...props }: HomeQuickActionsProps) 
 
 const QuickActionButton = ({ href, children }: LinkableButtonProps) => {
   const hoverStyles = useHoverStyles()
+
   return (
     <LinkableButton
       href={href}
@@ -40,6 +42,9 @@ const QuickActionButton = ({ href, children }: LinkableButtonProps) => {
 
 const Send = () => {
   const { coin } = useCoinFromTokenParam()
+  const media = useMedia()
+  const isSmallScreen = !media.gtXs
+
   const getSendUrl = () => {
     if (!coin) {
       return '/send'
@@ -47,6 +52,7 @@ const Send = () => {
 
     return `/send?sendToken=${coin.token}`
   }
+
   return (
     <QuickActionButton href={getSendUrl()}>
       <YStack
@@ -54,7 +60,7 @@ const Send = () => {
         gap="$2"
         jc={'space-between'}
         ai="center"
-        px="$4"
+        px={isSmallScreen ? '$3' : '$4'}
         py="$3.5"
         $gtSm={{ py: '$4' }}
       >
@@ -63,9 +69,16 @@ const Send = () => {
           $theme-dark={{ color: '$primary' }}
           $theme-light={{ color: '$color12' }}
         />
-        <Button.Text fontSize={'$5'} px="$2" ta="center" w="100%">
+        <ButtonText
+          fontSize={isSmallScreen ? '$4' : '$5'}
+          px="$1"
+          ta="center"
+          w="100%"
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
           Send
-        </Button.Text>
+        </ButtonText>
       </YStack>
     </QuickActionButton>
   )
@@ -73,6 +86,9 @@ const Send = () => {
 
 const Trade = () => {
   const { coin } = useCoinFromTokenParam()
+  const media = useMedia()
+  const isSmallScreen = !media.gtXs
+
   const getTradeUrl = () => {
     if (!coin) {
       return '/trade'
@@ -84,9 +100,18 @@ const Trade = () => {
 
     return `/trade?inToken=${coin.token}`
   }
+
   return (
     <QuickActionButton href={getTradeUrl()}>
-      <YStack gap="$2" jc={'space-between'} ai="center" p="$4" height={'auto'}>
+      <YStack
+        gap="$2"
+        jc={'space-between'}
+        ai="center"
+        px={isSmallScreen ? '$3' : '$4'}
+        py="$3.5"
+        $gtSm={{ py: '$4' }}
+        height={'auto'}
+      >
         <Theme name="green">
           <IconSwap
             size={'$1'}
@@ -94,43 +119,84 @@ const Trade = () => {
             $theme-light={{ color: '$color12' }}
           />
         </Theme>
-        <Button.Text fontSize={'$5'} px="$2">
+        <ButtonText
+          fontSize={isSmallScreen ? '$4' : '$5'}
+          px="$1"
+          ta="center"
+          w="100%"
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
           Trade
-        </Button.Text>
+        </ButtonText>
       </YStack>
     </QuickActionButton>
   )
 }
 
 const Deposit = () => {
+  const media = useMedia()
+  const isSmallScreen = !media.gtXs
+
   return (
     <QuickActionButton href={'/deposit'}>
-      <YStack gap="$2" jc={'space-between'} ai="center" px="$4" py="$3.5" $gtSm={{ py: '$4' }}>
+      <YStack
+        gap="$2"
+        jc={'space-between'}
+        ai="center"
+        px={isSmallScreen ? '$3' : '$4'}
+        py="$3.5"
+        $gtSm={{ py: '$4' }}
+      >
         <IconPlus
           size={'$1.5'}
           $theme-dark={{ color: '$primary' }}
           $theme-light={{ color: '$color12' }}
         />
-        <Button.Text fontSize={'$5'} px="$2">
+        <ButtonText
+          fontSize={isSmallScreen ? '$4' : '$5'}
+          px="$1"
+          ta="center"
+          w="100%"
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
           Deposit
-        </Button.Text>
+        </ButtonText>
       </YStack>
     </QuickActionButton>
   )
 }
 
 const Earn = () => {
+  const media = useMedia()
+  const isSmallScreen = !media.gtXs
+
   return (
     <QuickActionButton href={'/earn'}>
-      <YStack gap="$2" jc={'space-between'} ai="center" px="$4" py="$3.5" $gtSm={{ py: '$4' }}>
+      <YStack
+        gap="$2"
+        jc={'space-between'}
+        ai="center"
+        px={isSmallScreen ? '$3' : '$4'}
+        py="$3.5"
+        $gtSm={{ py: '$4' }}
+      >
         <IconStacks
           size={'$1.5'}
           $theme-dark={{ color: '$primary' }}
           $theme-light={{ color: '$color12' }}
         />
-        <Button.Text fontSize={'$5'} px="$2">
+        <ButtonText
+          fontSize={isSmallScreen ? '$4' : '$5'}
+          px="$1"
+          ta="center"
+          w="100%"
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
           Earn
-        </Button.Text>
+        </ButtonText>
       </YStack>
     </QuickActionButton>
   )

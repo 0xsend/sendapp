@@ -32,7 +32,7 @@ const OnboardingSchema = z.object({
 
 export const OnboardingForm = () => {
   const sendAccountCreate = api.sendAccount.create.useMutation()
-  const { user } = useUser()
+  const { user, validateToken } = useUser()
   const form = useForm<z.infer<typeof OnboardingSchema>>()
   const sendAccount = useSendAccount()
   const { replace } = useRouter()
@@ -42,8 +42,35 @@ export const OnboardingForm = () => {
 
   const [errorMessage, setErrorMessage] = useState<string>()
 
+  // Validate the token when this component mounts
+  useEffect(() => {
+    async function checkTokenValidity() {
+      // Only continue if we have what appears to be a user
+      if (!user?.id) {
+        replace('/')
+        return
+      }
+
+      // Validate token to ensure it's still valid
+      const isValid = await validateToken()
+      if (!isValid) {
+        // Token validation handles redirect in useUser
+        return
+      }
+    }
+
+    checkTokenValidity()
+  }, [user, validateToken, replace])
+
   async function createAccount({ accountName }: z.infer<typeof OnboardingSchema>) {
     try {
+      // First, validate token
+      const isTokenValid = await validateToken()
+      if (!isTokenValid) {
+        // Token validation already handles redirection
+        return
+      }
+
       assert(!!user?.id, 'No user id')
 
       // double check that the user has not already created a send account before creating a passkey
@@ -84,7 +111,27 @@ export const OnboardingForm = () => {
         })
     } catch (error) {
       console.error('Error creating account', error)
-      const message = error?.message.split('.')[0] ?? 'Unknown error'
+
+      // Check for authentication errors
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        setErrorMessage('Session expired. Redirecting to sign in...')
+        setTimeout(() => {
+          replace('/')
+        }, 1500)
+        return
+      }
+
+      const message = error?.message?.split('.')[0] ?? 'Unknown error'
+
+      // Check for "No user id" which means token is invalid
+      if (message.includes('No user id')) {
+        setErrorMessage('Session expired. Redirecting to sign in...')
+        setTimeout(() => {
+          replace('/')
+        }, 1500)
+        return
+      }
+
       setErrorMessage(message)
       form.setError('accountName', { type: 'custom' })
     }
@@ -96,6 +143,7 @@ export const OnboardingForm = () => {
       replace('/') // redirect to home page if account already exists
     }
   }, [sendAccount.data?.address, replace])
+
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (
       <>
@@ -154,6 +202,7 @@ export const OnboardingForm = () => {
     [errorMessage]
   )
 
+  // If we're not in the client, or the user isn't available, don't render
   if (!isClient) return null
 
   return (

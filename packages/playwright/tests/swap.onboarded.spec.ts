@@ -82,11 +82,16 @@ for (const inCoin of [usdcCoin]) {
       const request = swapFormPage.page.waitForRequest('/api/trpc/swap.encodeSwapRoute?batch=1')
 
       await swapFormPage.reviewSwap()
-      await page.waitForURL(
-        `/trade/summary?outToken=${outCoin.token}&inToken=${inCoin.token}&inAmount=${
-          swapInAmount[inCoin.symbol]
-        }&slippage=${slippage * 100}`
-      )
+
+      await expect(async () => {
+        const currentUrl = new URL(page.url())
+        expect(currentUrl.pathname).toBe('/trade/summary')
+        const params = currentUrl.searchParams
+        expect(params.get('outToken')).toBe(outCoin.token)
+        expect(params.get('inToken')).toBe(inCoin.token)
+        expect(params.get('inAmount')).toBe(swapInAmount[inCoin.symbol].toString())
+        expect(params.get('slippage')).toBe((slippage * 100).toString())
+      }).toPass({ timeout: 10000 })
 
       // validate slippage is still set correctly
       const requestPayload = (await request).postDataJSON()
@@ -103,8 +108,13 @@ for (const inCoin of [usdcCoin]) {
       })
       await swapSummaryPage.confirmSwap()
 
-      await page.waitForURL(`/?token=${outCoin.token}`, {
-        timeout: isEthCoin(outCoin) ? 10_000 : undefined,
+      await expect(async () => {
+        const currentUrl = new URL(page.url())
+        expect(currentUrl.pathname).toBe('/')
+        const params = currentUrl.searchParams
+        expect(params.get('token')).toBe(outCoin.token)
+      }).toPass({
+        timeout: isEthCoin(outCoin) ? 10_000 : 5_000,
       })
       const history = page.getByTestId('TokenActivityFeed')
       let attempts = 0
@@ -157,7 +167,12 @@ test("can't access form page without accepting risk dialog", async ({ page, swap
   log = debug(`test:swap:cancel-risk-dialog:${test.info().parallelIndex}`)
   await swapFormPage.goto()
   await swapFormPage.closeRiskDialog()
-  await page.waitForURL('/')
+
+  await expect(async () => {
+    const currentUrl = new URL(page.url())
+    expect(currentUrl.pathname).toBe('/')
+    expect(currentUrl.searchParams.toString()).toBe('')
+  }).toPass({ timeout: 5000 })
 })
 
 test("can't access summary page without filling swap form", async ({

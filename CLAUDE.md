@@ -28,6 +28,27 @@ It is acceptable to vary styles to avoid making too many changes at once.
 
 Assume the style is enforced by a linter and formatter.
 
+### Platform-Specific Code
+
+This project uses a platform-specific extension pattern to handle web vs. native differences:
+
+1. **File naming convention**:
+   - Base component: `ComponentName.tsx` - shared logic or web-specific implementation
+   - Native override: `ComponentName.native.tsx` - React Native specific implementation
+
+2. **When to create platform-specific files**:
+   - When UI components need different native implementations
+   - When using platform-specific APIs or components
+   - When optimizing for different platform performance characteristics
+   - When handling platform-specific UX patterns
+
+3. **Example pattern** (TokenActivityFeed):
+   - Web version uses RecyclerList (virtualized web list)
+   - Native version uses FlatList (React Native's optimized list)
+   - Components maintain the same API while using platform-optimized implementations
+
+When developing new features, consider whether platform-specific implementations are needed and follow this established pattern.
+
 ### Comments
 
 Focus comments solely on explaining the code's functionality and design choices, not the history of how the code was changed during our session. Ensure final code does not contain comments related to the debugging steps or conversational edits.

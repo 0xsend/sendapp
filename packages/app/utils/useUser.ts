@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import debug from 'debug'
+import { useRouter } from 'solito/router'
 import { useSessionContext } from './supabase/useSessionContext'
 import { useSupabase } from './supabase/useSupabase'
 
@@ -8,8 +9,38 @@ const log = debug('app:utils:useUser')
 export const useUser = () => {
   const { session, isLoading: isLoadingSession } = useSessionContext()
   const user = session?.user
-
+  const router = useRouter()
   const supabase = useSupabase()
+
+  // Enhance validation for the token
+  const validateToken = async () => {
+    try {
+      // Test token validity with a lightweight API call
+      const { error } = await supabase.auth.getUser()
+      if (error) {
+        log('invalid token detected', error)
+        await supabase.auth.signOut()
+        router.replace('/')
+        return false
+      }
+      return true
+    } catch (e) {
+      log('error validating token', e)
+      await supabase.auth.signOut()
+      router.replace('/')
+      return false
+    }
+  }
+
+  // Run validation on mount if we have a session
+  useQuery({
+    queryKey: ['validateToken', user?.id],
+    queryFn: validateToken,
+    enabled: !!session, // Only run when we have a session
+    retry: false,
+    staleTime: 60_000, // Cache validation for 1 minute
+  })
+
   const {
     data: profile,
     isLoading: isLoadingProfile,
@@ -28,12 +59,15 @@ export const useUser = () => {
         if (error.code === 'PGRST116') {
           log('no profile found for user', user?.id)
           await supabase.auth.signOut()
+          router.replace('/')
           return null
         }
         // check unauthorized or jwt error
-        if (error.code === 'PGRST301') {
-          log('unauthorized')
+        if (error.code === 'PGRST301' || error.code === 'PGRST401') {
+          log('unauthorized or invalid JWT token')
           await supabase.auth.signOut()
+          router.replace('/')
+          return null
         }
         throw new Error(error.message)
       }
@@ -53,6 +87,13 @@ export const useUser = () => {
       if (error) {
         // no rows
         if (error.code === 'PGRST116') {
+          return []
+        }
+        // Handle unauthorized or invalid JWT
+        if (error.code === 'PGRST301' || error.code === 'PGRST401') {
+          log('unauthorized or invalid JWT when fetching tags')
+          await supabase.auth.signOut()
+          router.replace('/')
           return []
         }
         log('error fetching tags', error)
@@ -87,5 +128,6 @@ export const useUser = () => {
     isLoadingProfile,
     isLoadingTags,
     isLoading: isLoadingSession || isLoadingProfile || isLoadingTags,
+    validateToken,
   }
 }

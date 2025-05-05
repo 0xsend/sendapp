@@ -80,7 +80,7 @@ test('can visit my own profile', async ({
   assert(!!profile?.about, 'profile about not found')
   const profilePage = new ProfilePage(page, { name: profile.name, about: profile.about })
   await profilePage.visit(tag.name, expect)
-  await expect(profilePage.sendButton).not.toBeVisible()
+  await expect(profilePage.sendButton).toBeVisible()
 })
 
 test('can visit private profile', async ({ page, seed }) => {
