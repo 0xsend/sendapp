@@ -132,7 +132,7 @@ export const StablesBalanceCard = () => {
                           toggleIsPriceHidden()
                         }}
                       >
-                        ${formattedBalance}
+                        ${formattedUSDBalance}
                       </BigHeading>
                     </>
                   )
