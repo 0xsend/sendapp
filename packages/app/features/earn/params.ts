@@ -78,7 +78,7 @@ export function useInitializeFormAmount(form: {
     if (!coin.data?.decimals) return
     try {
       if (formAmount === undefined && amount !== undefined) {
-        form.setValue('amount', formatUnits(BigInt(amount), coin.data?.decimals))
+        form.setValue('amount', `$${formatUnits(BigInt(amount), coin.data?.decimals)}`)
       }
     } catch (e) {
       log('error setting amount', e)

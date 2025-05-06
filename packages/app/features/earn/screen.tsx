@@ -278,5 +278,5 @@ const DetailsSection = ({
 
 const formatUSDCValue = (value: bigint): string => {
   const valueInUSDC = Number(formatUnits(value, 6))
-  return formatAmount(valueInUSDC, 10, 2)
+  return `$${formatAmount(valueInUSDC, 10, 2)}`
 }

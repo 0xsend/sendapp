@@ -42,7 +42,7 @@ export const CalculatedBenefits = ({
               {monthlyEarning ? (
                 <Row
                   label={'Estimated Monthly Earning'}
-                  value={`${monthlyEarning}${overrideMonthlyEarning ? '' : ' USDC'}`}
+                  value={`+${overrideMonthlyEarning ? '' : '$'}${monthlyEarning}${overrideMonthlyEarning ?? ''}`}
                   overrideValue={
                     overrideMonthlyEarning ? `${overrideMonthlyEarning} USDC` : undefined
                   }

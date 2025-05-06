@@ -364,7 +364,7 @@ export function DepositForm() {
               focusStyle: {
                 outlineWidth: 0,
               },
-              placeholder: '0',
+              placeholder: '$0',
               fontFamily: '$mono',
               '$theme-dark': {
                 placeholderTextColor: '$darkGrayTextField',
@@ -375,7 +375,7 @@ export function DepositForm() {
               inputMode: coin.data?.decimals ? 'decimal' : 'numeric',
               onChangeText: (amount: string) => {
                 const localizedAmount = localizeAmount(amount)
-                form.setValue('amount', localizedAmount)
+                form.setValue('amount', `$${localizedAmount}`)
               },
               onFocus: () => setIsInputFocused(true),
               onBlur: () => setIsInputFocused(false),
@@ -406,7 +406,7 @@ export function DepositForm() {
           defaultValues={{
             amount:
               params.amount && coin.data?.decimals
-                ? localizeAmount(formatUnits(BigInt(params.amount), coin.data?.decimals))
+                ? `$${localizeAmount(formatUnits(BigInt(params.amount), coin.data?.decimals))}`
                 : undefined,
             areTermsAccepted: hasExistingDeposit,
           }}
@@ -474,6 +474,7 @@ export function DepositForm() {
                                     size={'$5'}
                                     fontWeight={'600'}
                                   >
+                                    $
                                     {coin.data?.decimals
                                       ? formatAmount(
                                           formatUnits(
@@ -556,7 +557,7 @@ const StaticBenefits = () => {
             <YStack gap={'$2'}>
               <Row
                 label={'Minimum Deposit'}
-                value={formatAmount(formatUnits(MINIMUM_DEPOSIT, usdcCoin.decimals), undefined, 2)}
+                value={`$${formatAmount(formatUnits(MINIMUM_DEPOSIT, usdcCoin.decimals), undefined, 2)}`}
               />
               <Row label={'Withdraw Anytime'} value={'Full flexibility'} />
               <Row label={'Rewards'} value={'Bonus SEND tokens'} />

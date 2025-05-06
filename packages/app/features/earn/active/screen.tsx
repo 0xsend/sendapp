@@ -142,7 +142,7 @@ function TotalValue() {
                   })(),
                 }}
               >
-                {totalValue}
+                ${totalValue}
               </Paragraph>
             )}
           </YStack>
