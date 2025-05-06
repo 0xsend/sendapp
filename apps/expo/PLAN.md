@@ -1,150 +1,152 @@
-# Native App Onboarding Plan
+# Native App Implementation Plan
 
 ## Goal
 
-Create a native app onboarding page and refactor the existing sign-up page to use a shared authentication layout.
+Complete the Send native app implementation by addressing layout issues, improving user experience, and porting remaining features from the Next.js application.
 
-## Analysis
+## Analysis of Current State
 
-The existing sign-up page (`apps/expo/app/(auth)/auth/sign-up.tsx`) contains common layout elements that can be extracted:
-- Main `Container` with safe area handling.
-- `YStack` for centering content.
-- `Anchor` containing the `IconSendLogo` positioned at the top.
-- `ScrollView` wrapping the main page content.
+Based on the provided screenshot and code review:
 
-## Proposed Steps
+1. **Authentication Flow**:
+   - Onboarding has been completed
+   - Auth route group needs refinement
+   - Sign-up page exists but needs shared auth layout
 
-1.  **Create Shared Auth Layout:**
-    *   Modify `apps/expo/app/(auth)/_layout.tsx` to serve as the shared `AuthLayout`.
-    *   The layout component will accept `children` as a prop.
-    *   It will render the `Container`, `YStack`, `Anchor` (with logo), and `ScrollView`, placing the `children` inside the `ScrollView`.
+2. **UI/UX Issues**:
+   - Layout problems in TokenDetails screen
+   - Button text truncation in quick action buttons ("Trade" shows as "Tr...")
+   - "No Activity" state is handled incorrectly in TokenActivityFeed.native.tsx
+   - Overall mobile layout needs optimization
 
-2.  **Refactor Sign-Up Page:**
-    *   Update `apps/expo/app/(auth)/auth/sign-up.tsx` to use the `AuthLayout`.
-    *   Remove duplicated layout code, rendering only the `<SignUpScreen />` component within the layout.
+3. **Navigation Structure**:
+   - Drawer/Tab navigation is in place but needs refinement
+   - Many screens from Next.js still need to be ported to Expo
 
-3.  **Create Onboarding Page:**
-    *   Create a new file: `apps/expo/app/(auth)/onboarding.tsx`.
-    *   Use the `AuthLayout` in this new page.
-    *   Add specific content for the onboarding steps (start with placeholder).
-    *   Configure `Stack.Screen` options for the onboarding page title.
+## Proposed Implementation Plan
 
-## Visual Structure
+### 1. Fix Mobile Layout Issues
 
-```mermaid
-graph TD
-    subgraph Shared Auth Layout (apps/expo/app/(auth)/_layout.tsx)
-        A[Container + SafeArea] --> B(YStack);
-        B --> C{Logo Anchor};
-        B --> D[ScrollView];
-        D --> E((Children Prop));
-    end
+#### 1.1. TokenDetails Screen Improvements
 
-    subgraph Sign Up Page (apps/expo/app/(auth)/auth/sign-up.tsx)
-        F[AuthLayout] --> G[SignUpScreen Component];
-    end
+- Fix HomeQuickActions component to prevent text truncation:
+  - Optimize button layout and spacing for mobile screens
+  - Implement text scaling or appropriate text overflow handling
+  - Consider using icons-only layout for very small screens
 
-    subgraph Onboarding Page (apps/expo/app/(auth)/onboarding.tsx)
-        H[AuthLayout] --> I[Onboarding Content];
-    end
+- Fix TokenActivityFeed.native.tsx:
+  - Currently returns null when no activities, should render "No Activity" message
+  - Implement consistent empty state between web and native versions
 
-    G --> E;
-    I --> E;
-```
+- Improve responsive layout:
+  - Review responsive breakpoints in the TokenDetails component
+  - Adjust paddings and margins for better mobile experience
 
-## Next Action
+### 2. Authentication Improvements
 
-Once this plan is approved, toggle to Act Mode to begin implementation, starting with the creation/modification of the shared `AuthLayout` in `apps/expo/app/(auth)/_layout.tsx`.
-*   `settings/`
-    *   `index.tsx` (Settings screen, likely accessed via Drawer)
+- Create shared AuthLayout component:
+  - Modify `apps/expo/app/(auth)/_layout.tsx` to serve as shared AuthLayout
+  - Extract common layout elements: Container, YStack, Logo Anchor, ScrollView
+  - Apply this layout to sign-up and onboarding screens
 
-## 3. Authentication Flow Implementation (Revised v2)
+- Implement proper authentication guards:
+  - Protect (drawer) routes from unauthenticated access
+  - Implement proper flow for auth state changes
 
-The app uses a non-traditional authentication approach:
+### 3. Complete Core Features
 
-*   **Root Check (`app/index.tsx`)**:
-    *   Checks for user session (`useUser`).
-    *   If authenticated: Renders `HomeScreen` directly. *(Note: This might need adjustment to delegate rendering to the `(drawer)/(tabs)/index.tsx`)*
-    *   If not authenticated: Renders `SplashScreen` wrapped in `AuthCarouselContext`. The carousel images are hardcoded here.
-*   **Sign Up (`app/(auth)/auth/sign-up.tsx`)**: Screen exists for the sign-up process. Users needing to sign up will be directed here.
-*   **Sign In**: Initiated directly from the `SplashScreen` component (e.g., via a "Sign In" button). This will trigger the passkey authentication flow. **No separate `sign-in.tsx` screen will be created.**
-*   **Auth Group (`app/(auth)/_layout.tsx`)**: Provides a basic Stack layout for screens within the `(auth)` group (currently just sign-up).
+- Drawer Implementation:
+  - Complete the drawer content with proper profile display
+  - Implement navigation to all needed sections
 
-**Implementation Notes:**
-*   The primary auth check happens at the root (`app/index.tsx`).
-*   The `SplashScreen` handles the unauthenticated experience, onboarding carousel, and **must include the trigger for the sign-in (passkey) flow**.
-*   **Need to implement:**
-    *   The sign-in (passkey) logic triggered from `SplashScreen`.
-    *   Logic to redirect unauthenticated users attempting to access `(drawer)` routes to the appropriate auth screen (likely back to the root `index.tsx` which shows `SplashScreen`, or directly to `sign-up.tsx` if applicable). This might involve a higher-level check in `app/_layout.tsx` or the root `(drawer)/_layout.tsx`.
+- Key Screens to Implement (in priority order):
+  1. Activity & Token Details
+  2. Send & Receive
+  3. Deposit & Withdraw
+  4. Profile
+  5. Earn & Rewards
+  6. Settings
 
-## 4. Navigation Structure (Drawer > Tabs)
+- Implement consistent mobile header treatment:
+  - Review header/title treatment across screens
+  - Ensure consistency in navigation patterns
 
-*(This section remains the same as the previous revision)*
+### 4. Screen Mapping Reference
 
-The authenticated part of the app uses a nested navigation structure:
+| Next.js Route | Expo Route | Status | Priority |
+|---------------|------------|--------|----------|
+| `index.tsx` | `(drawer)/(tabs)/index.tsx` | In Progress | High |
+| `profile/[sendid].tsx` | `(drawer)/(tabs)/profile.tsx` | Not Started | High |
+| `activity.tsx` | `(drawer)/activity.tsx` | Not Started | High |
+| `send/index.tsx` | `(drawer)/send/index.tsx` | Not Started | High |
+| `deposit/index.tsx` | `(drawer)/deposit/index.tsx` | Not Started | High |
+| `earn/index.tsx` | `(drawer)/earn/index.tsx` | Not Started | Medium |
+| `leaderboard.tsx` | `(drawer)/leaderboard.tsx` | Not Started | Medium |
+| `settings/index.tsx` | `(drawer)/settings/index.tsx` | Partial | Medium |
+| `sendpot/index.tsx` | `(drawer)/sendpot/index.tsx` | Not Started | Low |
+| `trade/index.tsx` | `(drawer)/trade/index.tsx` | Not Started | Low |
 
-*   **Drawer (`app/(drawer)/_layout.tsx`)**:
-    *   Acts as the main container for authenticated screens.
-    *   Currently uses a placeholder component for its `drawerContent`. Needs implementation (likely the `ProfileScreen` or a custom drawer menu).
-*   **Tabs (`app/(drawer)/(tabs)/_layout.tsx`)**:
-    *   Nested inside the Drawer.
-    *   Defines two tabs: 'Home' (`index.tsx`) and 'Profile' (`profile.tsx`).
-    *   Includes a shared header with:
-        *   A menu button to open the Drawer.
-        *   A plus button that navigates to a `/create` route (which doesn't exist yet).
-    *   Tab icons use `Home` and `User` from `@tamagui/lucide-icons`.
+### 5. Technical Tasks
 
-## 5. Proposed Implementation Plan (Revised v2)
+- Address token detail screen issues:
+  - Fix padding, spacing, and responsive layout
+  - Optimize quick action buttons for mobile display
+  - Ensure consistent empty state handling
 
-Leverage the existing Drawer > Tabs structure. Port Next.js pages into this structure, creating new screens/routes as needed.
+- Improve component re-usability:
+  - Ensure components like HomeQuickActions are adaptive across screen sizes
+  - Create mobile-specific versions of components when needed
 
-**Immediate Priorities:**
+- Optimize performance:
+  - Implement virtualized lists for long scrolling content
+  - Ensure smooth transitions and animations
 
-1.  **Implement Drawer Content:** Replace the placeholder in `app/(drawer)/_layout.tsx` with the actual `ProfileScreen` component (or a custom drawer menu component) from `packages/app/features/profile/screen.tsx` (or similar). Adapt for mobile.
-2.  **Implement Profile Tab Screen:** Create `app/(drawer)/(tabs)/profile.tsx`. Import and render the `ProfileScreen` component, adapting its content for the main tab view vs. the drawer view if necessary. Review `apps/next/pages/profile/[sendid].tsx` for logic (needs adaptation as the tab likely shows the *logged-in user's* profile).
-3.  **Implement Home Tab Screen:** Verify `app/(drawer)/(tabs)/index.tsx`. Ensure it correctly renders the main content for the home tab (likely `HomeScreen` from `packages/app/features/home/screen.tsx`). Adjust `app/index.tsx` if needed to avoid rendering `HomeScreen` twice.
-4.  **Address `/create` Route:** Decide what the Plus button in the header should do. Implement the corresponding `app/(drawer)/create.tsx` screen or change the button's navigation target. Review potential Next.js counterparts like `send/index.tsx` or `deposit/index.tsx`.
-5.  **Implement Sign-In Logic:** Add the necessary logic and UI elements (e.g., button) to the `SplashScreen` component (`packages/app/features/splash/screen.tsx`) to trigger the passkey sign-in flow.
-6.  **Authentication Guarding:** Implement proper route protection, likely in `app/_layout.tsx` or `app/(drawer)/_layout.tsx`, to redirect unauthenticated users away from the `(drawer)` group.
+## Implementation Steps
 
-**Porting Remaining Screens (Mapping Example - Needs Refinement):**
+### Phase 1: Fix Critical Issues (High Priority)
 
-*   Decide where each feature fits: New Tab? Screen within Drawer? Stack pushed from a Tab?
-*   Update the mapping table based on the Drawer/Tabs structure.
+1. **Fix Mobile Layout Issues**:
+   - Update HomeQuickActions.tsx to better handle text truncation
+   - Fix TokenActivityFeed.native.tsx to handle empty state
+   - Improve responsive breakpoints in TokenDetails
 
-| Next.js Route (`apps/next/pages`) | Proposed Expo Route (`apps/expo/app`)                                  | Placement Idea        | Shared Component (`packages/app`)                                  | Next.js Page to Review                                                                             |
-| :-------------------------------- | :--------------------------------------------------------------------- | :-------------------- | :----------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------- |
-| `index.tsx`                       | `(drawer)/(tabs)/index.tsx`                                            | **Existing Tab**      | `HomeScreen`                                                       | `apps/next/pages/index.tsx`                                                                          |
-| `profile/[sendid].tsx`            | `(drawer)/(tabs)/profile.tsx` & Drawer Content                         | **Existing Tab/Drawer** | `ProfileScreen`                                                    | `apps/next/pages/profile/[sendid].tsx`                                                               |
-| `activity.tsx`                    | `(drawer)/activity.tsx` OR `(drawer)/(tabs)/activity.tsx`              | New Screen or Tab     | `ActivityScreen` (`packages/app/features/activity/screen.tsx`)     | `apps/next/pages/activity.tsx`                                                                       |
-| `leaderboard.tsx`                 | `(drawer)/leaderboard.tsx` OR `(drawer)/(tabs)/leaderboard.tsx`        | New Screen or Tab     | `LeaderboardScreen` (`packages/app/features/leaderboard/screen.tsx`) | `apps/next/pages/leaderboard.tsx`                                                                    |
-| `deposit/`                        | `(drawer)/deposit/index.tsx` (pushed as stack)                         | Stack from Tab/Drawer | `DepositScreen` (`packages/app/features/deposit/screen.tsx`)       | `apps/next/pages/deposit/index.tsx`                                                                  |
-| `earn/`                           | `(drawer)/earn/_layout.tsx`, `(drawer)/earn/index.tsx` (pushed stack)  | Stack from Tab/Drawer | `EarnScreen` (`packages/app/features/earn/screen.tsx`)             | `apps/next/pages/earn/index.tsx`                                                                     |
-| ... *(continue for other routes)* | ...                                                                    | ...                   | ...                                                                | ...                                                                                                  |
-| `auth/sign-up.tsx`                | `(auth)/auth/sign-up.tsx`                                              | **Existing Auth Screen**| `SignUpScreen` (`packages/app/features/auth/sign-up-screen.tsx`)   | `apps/next/pages/auth/sign-up.tsx`                                                                   |
+2. **Implement Authentication Layout**:
+   - Create shared AuthLayout in (auth)/_layout.tsx
+   - Apply to sign-up and onboarding screens
 
-**Notes:**
+3. **Implement Drawer Content**:
+   - Complete drawer with profile and navigation options
+   - Ensure proper routing between tabs and drawer items
 
-*   **Shared Components:** Continue leveraging `packages/app/features/*`. Create/adapt components as needed.
-*   **Navigation:** Use `solito`'s `<Link>` and `useRouter` within the established Drawer/Tabs structure. Use `router.push('/(drawer)/deposit')` for stack navigation.
-*   **Styling:** Utilize Tamagui components.
+### Phase 2: Complete Core App Screens (Medium Priority)
 
-## 6. Next Steps and Progress (Revised v2)
+1. **Implement Activity Screen**:
+   - Port activity feed with mobile optimizations
+   - Ensure consistent UX with token activity views
 
-### Completed
-1. ✅ Root `index.tsx` handles session check and renders `HomeScreen` or `SplashScreen`.
-2. ✅ `SplashScreen` uses `AuthCarouselContext` with hardcoded mobile images.
-3. ✅ Sign-up screen exists at `app/(auth)/auth/sign-up.tsx`.
-4. ✅ Drawer navigator is set up (`app/(drawer)/_layout.tsx`).
-5. ✅ Tabs navigator (Home, Profile) is nested in Drawer (`app/(drawer)/(tabs)/_layout.tsx`).
-6. ✅ Header with Drawer toggle and `/create` button exists in Tabs layout.
+2. **Complete Send & Receive Flows**:
+   - Implement optimized send flow for mobile
+   - Test QR code scanning and contact selection
 
-### Upcoming Tasks (Prioritized)
-1.  Implement Drawer content in `app/(drawer)/_layout.tsx` (using `ProfileScreen` or custom menu).
-2.  Implement Profile tab screen (`app/(drawer)/(tabs)/profile.tsx`) using `ProfileScreen`.
-3.  Verify/Implement Home tab screen (`app/(drawer)/(tabs)/index.tsx`) using `HomeScreen`.
-4.  Define and implement the `/create` route/screen (`app/(drawer)/create.tsx` or similar).
-5.  Implement Sign-In logic/button within `SplashScreen` (`packages/app/features/splash/screen.tsx`).
-6.  Add authentication guards to protect the `(drawer)` group.
-7.  Plan navigation structure for remaining features (Activity, Leaderboard, Deposit, Earn, etc.).
-8.  Port remaining screens based on the decided structure.
+3. **Implement Deposit & Withdraw**:
+   - Create mobile-friendly deposit options
+   - Implement withdraw flow with proper confirmations
+
+### Phase 3: Polish and Refinement (Lower Priority)
+
+1. **Complete Remaining Screens**:
+   - Implement remaining features following priority order
+   - Ensure consistent navigation patterns
+
+2. **Final Testing and Optimization**:
+   - Test on various screen sizes and devices
+   - Optimize animations and transitions
+   - Finalize responsive design
+
+## Next Steps
+
+1. Fix the HomeQuickActions component for better mobile display
+2. Update TokenActivityFeed.native.tsx to properly show "No Activity" state
+3. Create the shared auth layout 
+4. Complete the drawer implementation
+5. Begin porting highest priority screens (Activity, Send, Deposit)

@@ -37,7 +37,7 @@
     "@supabase/supabase-js": "2.44.2",
     "@types/bun": "^1.1.6",
     "@uniswap/v3-periphery": "^1.4.4",
-    "debug": "^4.3.6",
+    "debug": "^4.3.7",
     "solhint": "^3.6.2",
     "zx": "^8.1.2"
   }

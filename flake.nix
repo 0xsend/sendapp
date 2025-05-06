@@ -49,7 +49,8 @@
       in {
         formatter = pkgs.alejandra;
 
-        devShells.default = pkgs.mkShell {
+        devShells.default = pkgs.llvmPackages_17.libcxxStdenv.mkDerivation {
+          name = "sendapp-dev";
           nativeBuildInputs =
             [
               pkgs.foundry
@@ -64,30 +65,23 @@
               pkgs.unstable.bun
               pkgs.unstable.tilt
               pkgs.unstable.temporal-cli
-            ]
-            # macOS-specific tools
+              pkgs.unstable.ripgrep
+            ] # macOS-specific tools
             ++ (pkgs.lib.optionals pkgs.stdenv.isDarwin [
-              pkgs.darwin.apple_sdk.frameworks.CoreServices
-              pkgs.darwin.apple_sdk.frameworks.CoreFoundation
+              pkgs.unstable.darwin.xcode_16_3
+              pkgs.unstable.apple-sdk
+              pkgs.unstable.darwin.apple_sdk.frameworks.CoreServices
+              pkgs.unstable.darwin.apple_sdk.frameworks.CoreFoundation
+              pkgs.unstable.darwin.apple_sdk.frameworks.SystemConfiguration
             ]);
-
+          # For C++ development
+          buildInputs = [
+            pkgs.unstable.llvmPackages_17.libcxxStdenv
+            pkgs.unstable.llvmPackages_17.libcxxClang
+            pkgs.unstable.llvmPackages_17.compiler-rt
+            pkgs.unstable.llvmPackages_17.libcxx
+          ];
           shellHook = ''
-            ${
-              if pkgs.stdenv.isDarwin
-              then ''
-                # Force using host Xcode instead of Nix-provided one
-                export PATH=$(echo $PATH | tr ":" "\n" | grep -v "${pkgs.xcbuild or "xcbuild"}/bin" | tr "\n" ":")
-                unset DEVELOPER_DIR
-
-                # Add host tools with higher priority
-                export PATH=/usr/bin:$PATH
-
-                echo "Using host Xcode installation"
-              ''
-              else ''
-                # silence is golden
-              ''
-            }
             eval "$(fnm env --use-on-cd --corepack-enabled --shell bash)"
             echo "Welcome to the Send.app development environment!"
           '';

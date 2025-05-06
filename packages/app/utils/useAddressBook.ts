@@ -52,12 +52,13 @@ export function useAddressBookDepQueries() {
  */
 export function useAddressBook() {
   const queries = useAddressBookDepQueries()
-  const data = useMemo(() => [queries[0].data, queries[1].data] as const, [queries])
-  const errors = useMemo(() => queries.map((q) => q.error), [queries])
   const enabled = useMemo(() => queries.every((q) => q.isFetched), [queries])
-  const queryKey = ['addressBook', { data, errors } as const] as const
+  const queryKey = useMemo(() => ['addressBook'] as const, [])
 
   const queryFn = useCallback(async (): Promise<AddressBook> => {
+    const data = [queries[0].data, queries[1].data] as const
+    const errors = queries.map((q) => q.error)
+
     for (const error of errors) {
       throwIf(error)
     }
@@ -74,13 +75,13 @@ export function useAddressBook() {
     }
     const addressBook = AddressBookSchema.parse(input)
     return addressBook
-  }, [data, errors])
+  }, [queries])
   const query = useQuery({
     queryKey,
     queryKeyHashFn: (queryKey) => SuperJSON.stringify(queryKey),
     enabled,
     queryFn,
-    staleTime: 30_000, // prevent infinite render loops, invalidate when needed
+    staleTime: Number.POSITIVE_INFINITY, // prevent infinite render loops, invalidate when needed
   })
   return query
 }

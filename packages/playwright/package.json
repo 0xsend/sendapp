@@ -15,7 +15,7 @@
     "@types/pg": "^8",
     "@wagmi/core": "^2.16.7",
     "app": "workspace:*",
-    "debug": "^4.3.6",
+    "debug": "^4.3.7",
     "dotenv": "^16.4.7",
     "dotenv-cli": "^7.3.0",
     "extract-zip": "^2.0.1",
