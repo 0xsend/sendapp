@@ -1,4 +1,4 @@
-import { Card, Fade, Paragraph, Separator, Spinner, Stack, XStack, YStack } from '@my/ui'
+import { Card, Fade, Paragraph, Spinner, Stack, XStack, YStack } from '@my/ui'
 import type { IconProps } from '@tamagui/helpers-icon'
 import { ArrowDown } from '@tamagui/lucide-icons'
 import { IconStarOutline, IconStacks } from 'app/components/icons'
@@ -42,7 +42,7 @@ function ActiveEarnings() {
         },
         {
           Icon: IconStacks,
-          label: 'Earnings',
+          label: 'Statements',
           href: `/earn/${coinToParam(coin.data)}/balance`,
         },
         isAffiliate
@@ -77,7 +77,7 @@ function ActiveEarnings() {
       <SectionButton
         onPress={() => (!coin.data ? undefined : push(`/earn/${coinToParam(coin.data)}/deposit`))}
       >
-        ADD MORE DEPOSITS
+        ADD MONEY
       </SectionButton>
     </YStack>
   )
@@ -111,10 +111,6 @@ function TotalValue() {
     <Fade>
       <Card w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>
         <YStack gap={'$4'}>
-          <XStack ai={'center'} gap={'$2'}>
-            <IconCoin symbol={coin.data?.symbol || ''} size={'$2'} />
-            <Paragraph size={'$7'}>{coin.data?.symbol || ''}</Paragraph>
-          </XStack>
           <YStack gap={'$2'}>
             {isLoading ? (
               <Spinner size={'large'} alignSelf="flex-start" flexShrink={1} />
@@ -146,20 +142,6 @@ function TotalValue() {
               </Paragraph>
             )}
           </YStack>
-          <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
-          {[coin.isError, balances.isError].some((e) => e) ? (
-            <Paragraph size={'$5'} color={'$error'}>
-              {[coin.error, balances.error].map((e) => toNiceError(e)).join('. ')}
-            </Paragraph>
-          ) : (
-            <Paragraph
-              size={'$5'}
-              color={'$lightGrayTextField'}
-              $theme-light={{ color: '$darkGrayTextField' }}
-            >
-              Total Value
-            </Paragraph>
-          )}
         </YStack>
       </Card>
     </Fade>
@@ -201,12 +183,7 @@ function ActiveEarningBreakdown() {
       <Card w={'100%'} p={'$5'} gap={'$6'} $gtLg={{ p: '$7' }}>
         <BreakdownRow
           symbol={coin.data.symbol}
-          label={'Deposits'}
-          value={formatCoinAmount({ amount: totalDeposits, coin: coin.data })}
-        />
-        <BreakdownRow
-          symbol={coin.data.symbol}
-          label={'Earnings'}
+          label={'Interest'}
           value={formatCoinAmount({ amount: totalEarnings, coin: coin.data })}
         />
         {myEarnRewards.data && myEarnRewards.data.assets > 0n ? (

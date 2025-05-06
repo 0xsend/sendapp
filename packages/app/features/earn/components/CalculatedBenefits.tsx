@@ -19,13 +19,10 @@ export const CalculatedBenefits = ({
   return (
     <Fade>
       <YStack gap={'$3.5'}>
-        <Paragraph size={'$7'} fontWeight={'500'}>
-          Benefits
-        </Paragraph>
         <Card w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>
           <YStack gap={'$3.5'}>
             <XStack gap={'$2.5'} jc={'space-between'}>
-              <Paragraph size={'$6'}>Deposit APY</Paragraph>
+              <Paragraph size={'$6'}>Interest</Paragraph>
               <XStack gap={'$2.5'}>
                 <Paragraph size={'$6'} textDecorationLine={overrideApy ? 'line-through' : 'none'}>
                   {apy}%
@@ -41,8 +38,8 @@ export const CalculatedBenefits = ({
             <YStack gap={'$2'}>
               {monthlyEarning ? (
                 <Row
-                  label={'Estimated Monthly Earning'}
-                  value={`${monthlyEarning}${overrideMonthlyEarning ? '' : ' USDC'}`}
+                  label={'Estimated Monthly Increase'}
+                  value={`+${overrideMonthlyEarning ? '' : '$'}${monthlyEarning}${overrideMonthlyEarning ?? ''}`}
                   overrideValue={
                     overrideMonthlyEarning ? `${overrideMonthlyEarning} USDC` : undefined
                   }

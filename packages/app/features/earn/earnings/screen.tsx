@@ -10,23 +10,18 @@ import { useERC20AssetCoin } from '../params'
 import { useEarnActivityFeed } from '../utils/useEarnActivityFeed'
 import { useQueryClient } from '@tanstack/react-query'
 
-export const EarningsBalance = () => {
+export const SavingsBalance = () => {
   return (
     <YStack w={'100%'} gap={'$4'} pb={'$3'} $gtLg={{ w: '50%' }}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <YStack gap={'$4'}>
-          <TotalEarning />
-          <Paragraph size={'$7'} fontWeight={'500'}>
-            Earnings History
-          </Paragraph>
-          <EarningsFeed />
-        </YStack>
-      </ScrollView>
+      <YStack gap={'$4'}>
+        <TotalSavings />
+        <SavingsFeed />
+      </YStack>
     </YStack>
   )
 }
 
-export const EarningsFeed = () => {
+export const SavingsFeed = () => {
   const coin = useERC20AssetCoin()
   const { data, isLoading, error, isFetchingNextPage, fetchNextPage, hasNextPage } =
     useEarnActivityFeed({
@@ -144,7 +139,7 @@ export const EarningsFeed = () => {
   )
 }
 
-function TotalEarning() {
+function TotalSavings() {
   const coin = useERC20AssetCoin()
   const balances = useSendEarnCoinBalances(coin.data || undefined)
   const totalDeposits = useMemo(() => {
@@ -155,7 +150,7 @@ function TotalEarning() {
     return totalCurrentAssets
   }, [balances.data])
 
-  const { formattedTotal, displayString } = useMemo(() => {
+  const { displayString } = useMemo(() => {
     if (!coin.data || !balances.data) {
       return {
         formattedPrincipal: '0',
@@ -186,10 +181,7 @@ function TotalEarning() {
     <Fade>
       <Card w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>
         <YStack gap={'$4'}>
-          <XStack ai={'center'} gap={'$2'}>
-            <IconCoin symbol={coin.data.symbol} size={'$2'} />
-            <Paragraph size={'$7'}>{coin.data.symbol}</Paragraph>
-          </XStack>
+          <Paragraph size={'$7'}>Balance</Paragraph>
           <YStack gap={'$2'}>
             <Paragraph
               fontWeight={'500'}
@@ -198,17 +190,9 @@ function TotalEarning() {
                 size: displayString.length > 16 ? '$9' : displayString.length > 8 ? '$10' : '$11',
               }}
             >
-              {displayString}
+              ${displayString}
             </Paragraph>
           </YStack>
-          <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
-          <Paragraph
-            size={'$5'}
-            color={'$lightGrayTextField'}
-            $theme-light={{ color: '$darkGrayTextField' }}
-          >
-            ${formattedTotal} {/* Show total USD value */}
-          </Paragraph>
         </YStack>
       </Card>
     </Fade>

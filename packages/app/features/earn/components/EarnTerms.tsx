@@ -20,7 +20,7 @@ export const EarnTerms = ({ hasError }: { hasError?: boolean }) => {
       </TermsLink>{' '}
       &{' '}
       <TermsLink href="https://info.send.it/send-docs/legal/disclaimer" {...colorProps}>
-        Disclaimer of the Send Earn Program
+        Disclaimer of the Send Saving Program
       </TermsLink>
     </Paragraph>
   )

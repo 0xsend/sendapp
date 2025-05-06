@@ -11,7 +11,7 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Start Earning</title>
+        <title>Send | Savings Deposit</title>
       </Head>
       <DepositScreen />
     </>
@@ -23,9 +23,7 @@ export const getServerSideProps: GetServerSideProps = (context) => {
 }
 
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Start Earning" backFunction="router" />}>
-    {children}
-  </HomeLayout>
+  <HomeLayout TopNav={<TopNav header="Save Money" backFunction="router" />}>{children}</HomeLayout>
 )
 
 export default Page

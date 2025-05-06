@@ -11,7 +11,7 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Rewards Balance</title>
+        <title>Send | Saving Rewards</title>
       </Head>
       <RewardsBalanceScreen />
     </>
@@ -23,7 +23,7 @@ export const getServerSideProps: GetServerSideProps = (context) => {
 }
 
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Rewards Balance" backFunction="router" />} fullHeight>
+  <HomeLayout TopNav={<TopNav header="Saving Rewards" backFunction="router" />} fullHeight>
     {children}
   </HomeLayout>
 )

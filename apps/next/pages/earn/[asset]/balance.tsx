@@ -1,5 +1,5 @@
 import { TopNav } from 'app/components/TopNav'
-import { EarningsBalance } from 'app/features/earn/earnings/screen'
+import { SavingsBalance } from 'app/features/earn/earnings/screen'
 import { assetParam } from '../../../utils/assetParam'
 import { HomeLayout } from 'app/features/home/layout.web'
 import type { GetServerSideProps } from 'next'
@@ -11,9 +11,9 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Earnings Balance</title>
+        <title>Send | Statements</title>
       </Head>
-      <EarningsBalance />
+      <SavingsBalance />
     </>
   )
 }
@@ -23,7 +23,7 @@ export const getServerSideProps: GetServerSideProps = (context) => {
 }
 
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Earnings Balance" backFunction="router" />} fullHeight>
+  <HomeLayout TopNav={<TopNav header="Statements" backFunction="router" />} fullHeight>
     {children}
   </HomeLayout>
 )

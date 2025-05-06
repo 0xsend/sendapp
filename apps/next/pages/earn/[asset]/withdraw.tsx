@@ -11,7 +11,7 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Withdraw Deposit</title>
+        <title>Send | Withdraw Savings</title>
       </Head>
       <WithdrawForm />
     </>
@@ -23,9 +23,7 @@ export const getServerSideProps: GetServerSideProps = (context) => {
 }
 
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Withdraw Deposit" backFunction="router" />}>
-    {children}
-  </HomeLayout>
+  <HomeLayout TopNav={<TopNav header="Withdraw" backFunction="router" />}>{children}</HomeLayout>
 )
 
 export default Page
