@@ -198,8 +198,6 @@ export const SignUpScreen = () => {
       return
     }
 
-    // TODO register upstream
-
     router.replace('/')
   }
 

@@ -76,8 +76,6 @@ export const FirstSendtagForm = () => {
       return
     }
 
-    // TODO register upstream
-
     await user?.updateProfile()
     router.replace('/account/sendtag')
   }
