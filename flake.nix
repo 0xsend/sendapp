@@ -6,6 +6,7 @@
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     foundry-overlay.url = "github:0xbigboss/foundry-overlay";
+    bun-overlay.url = "github:0xbigboss/bun-overlay";
 
     # Used for shell.nix
     flake-compat = {
@@ -20,14 +21,19 @@
     nixpkgs-unstable,
     flake-utils,
     foundry-overlay,
+    bun-overlay,
     ...
   } @ inputs: let
     overlays = [
       foundry-overlay.overlays.default
+      bun-overlay.overlays.default
       (final: prev: {
         unstable = import nixpkgs-unstable {
           inherit (prev) system;
-          overlays = [foundry-overlay.overlays.default];
+          overlays = [
+            foundry-overlay.overlays.default
+            bun-overlay.overlays.default
+          ];
           config = {
             allowUnfree = true;
           };
@@ -57,12 +63,12 @@
               pkgs.python310
               pkgs.gnused
               pkgs.postgresql_15
+              pkgs.bun
 
               pkgs.unstable.fnm
               pkgs.unstable.jq
               pkgs.unstable.yj
               pkgs.unstable.caddy
-              pkgs.unstable.bun
               pkgs.unstable.tilt
               pkgs.unstable.temporal-cli
               pkgs.unstable.ripgrep
