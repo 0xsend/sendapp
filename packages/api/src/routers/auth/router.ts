@@ -16,6 +16,8 @@ export const authRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx: { supabase }, input: { sendtag, captchaToken } }) => {
+      log('Signing up: ', sendtag)
+
       if (!!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && !captchaToken) {
         throw new TRPCError({
           code: 'BAD_REQUEST',

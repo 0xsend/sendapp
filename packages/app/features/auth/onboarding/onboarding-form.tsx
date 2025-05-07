@@ -10,14 +10,9 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { base16, base64urlnopad } from '@scure/base'
-import { SchemaForm, formFields } from 'app/utils/SchemaForm'
-import { api } from 'app/utils/api'
-import { asciiToByteArray } from 'app/utils/asciiToByteArray'
+import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import { assert } from 'app/utils/assert'
-import { base64URLNoPadToBase16 } from 'app/utils/base64ToBase16'
-import { createPasskey } from 'app/utils/createPasskey'
-import { useSendAccount } from 'app/utils/send-accounts'
+import { useCreateSendAccount, useSendAccount } from 'app/utils/send-accounts'
 import { useIsClient } from 'app/utils/useIsClient'
 import { useUser } from 'app/utils/useUser'
 import * as Device from 'expo-device'
@@ -31,7 +26,6 @@ const OnboardingSchema = z.object({
 })
 
 export const OnboardingForm = () => {
-  const sendAccountCreate = api.sendAccount.create.useMutation()
   const { user, validateToken } = useUser()
   const form = useForm<z.infer<typeof OnboardingSchema>>()
   const sendAccount = useSendAccount()
@@ -41,6 +35,7 @@ export const OnboardingForm = () => {
     : `My ${Device.modelName ?? 'Send Account'}`
 
   const [errorMessage, setErrorMessage] = useState<string>()
+  const { createSendAccount } = useCreateSendAccount()
 
   // Validate the token when this component mounts
   useEffect(() => {
@@ -73,42 +68,8 @@ export const OnboardingForm = () => {
 
       assert(!!user?.id, 'No user id')
 
-      // double check that the user has not already created a send account before creating a passkey
-      const { data: sendAcct, error: refetchError } = await sendAccount.refetch()
-      if (refetchError) throw refetchError
-      if (sendAcct) {
-        throw new Error(`Account already created: ${sendAcct.address}`)
-      }
-
-      const keySlot = 0
-      const passkeyName = `${user.id}.${keySlot}` // 64 bytes max
-      const challenge = base64urlnopad.encode(asciiToByteArray('foobar'))
-
-      const [rawCred, authData] = await createPasskey({ user, keySlot, challenge, accountName })
-
-      const raw_credential_id = base64URLNoPadToBase16(rawCred.rawId)
-      const attestation_object = base64URLNoPadToBase16(rawCred.response.attestationObject)
-
-      await sendAccountCreate
-        .mutateAsync({
-          accountName,
-          passkeyName,
-          rawCredentialIDB16: raw_credential_id,
-          cosePublicKeyB16: base16.encode(authData.COSEPublicKey),
-          rawAttestationObjectB16: attestation_object,
-          keySlot,
-        })
-        .then(async () => {
-          // success refetch accounts to check if account was created
-          const { data: sendAcct, error: refetchError } = await sendAccount.refetch()
-          if (refetchError) throw refetchError
-          if (sendAcct) {
-            replace('/')
-            return
-          }
-          setErrorMessage('Account not created. Please try again.')
-          form.setError('accountName', { type: 'custom' })
-        })
+      await createSendAccount({ user, accountName })
+      replace('/')
     } catch (error) {
       console.error('Error creating account', error)
 
