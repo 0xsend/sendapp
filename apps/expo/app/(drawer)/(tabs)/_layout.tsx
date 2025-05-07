@@ -1,6 +1,7 @@
-import { Button, useTheme } from '@my/ui'
+import { Button, useTheme, XStack } from '@my/ui'
 import { DrawerActions } from '@react-navigation/native'
 import { Home, Menu, Plus, User } from '@tamagui/lucide-icons'
+import { IconSendLogo } from 'app/components/icons'
 import { router, Stack, Tabs, useNavigation, usePathname } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -18,9 +19,18 @@ export default function Layout() {
     <>
       <Stack.Screen
         options={{
-          title: 'Home',
-          headerShown: pathname === '/' || pathname === '/create',
+          title: '/send',
+          headerTitle: () => (
+            <XStack ai="center" jc="center">
+              <IconSendLogo size={'$2'} color={'$color12'} />
+            </XStack>
+          ),
+          headerShown: true,
+          headerShadowVisible: false,
+          headerTitleAlign: 'center',
+          headerStyle: {},
           headerTintColor: accentColor.val,
+
           headerLeft: () => (
             <Button
               borderStyle="unset"
@@ -53,13 +63,16 @@ export default function Layout() {
       <Tabs
         screenOptions={{
           tabBarShowLabel: false,
+          headerShown: false, // Hide tab headers - use Stack.Screen header instead
           headerTintColor: accentColor.val,
           tabBarStyle: {
             paddingTop: 10,
-            paddingBottom: insets.bottom + 20, // edit this with safe area insets
+            paddingBottom: insets.bottom + 10, // reduce bottom padding
             height: 60,
             alignContent: 'center',
             justifyContent: 'center',
+            borderTopWidth: 1,
+            borderTopColor: '$borderColor',
           },
           tabBarItemStyle: {
             paddingBottom: 10,
