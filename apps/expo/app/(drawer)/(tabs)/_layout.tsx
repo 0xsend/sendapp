@@ -2,19 +2,22 @@ import { Button, useTheme, XStack } from '@my/ui'
 import { DrawerActions } from '@react-navigation/native'
 import { Home, Menu, Plus, User } from '@tamagui/lucide-icons'
 import { IconSendLogo } from 'app/components/icons'
-import { router, Stack, Tabs, useNavigation, usePathname } from 'expo-router'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useUser } from 'app/utils/useUser'
+import { router, Stack, Tabs, useNavigation, Redirect } from 'expo-router'
+import { useSafeAreaInsets } from '@my/ui'
 
 export default function Layout() {
   const theme = useTheme()
   const accentColor = theme.color10
   const navigation = useNavigation()
-  const pathname = usePathname()
+  const { session } = useUser()
   const insets = useSafeAreaInsets()
 
-  if (__DEV__) {
-    console.log('pathname', pathname)
+  // Redirect to root if not logged in - this ensures the tabs layout is only shown for logged-in users
+  if (!session) {
+    return <Redirect href="/" />
   }
+
   return (
     <>
       <Stack.Screen
@@ -30,7 +33,6 @@ export default function Layout() {
           headerTitleAlign: 'center',
           headerStyle: {},
           headerTintColor: accentColor.val,
-
           headerLeft: () => (
             <Button
               borderStyle="unset"

@@ -3,11 +3,18 @@ import { LogOut, Moon, Settings, User } from '@tamagui/lucide-icons'
 import { IconSendLogo } from 'app/components/icons'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useUser } from 'app/utils/useUser'
-import { useRouter } from 'expo-router'
+import { Redirect, useRouter } from 'expo-router'
 import { Drawer } from 'expo-router/drawer'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 export default function Layout() {
+  const { session } = useUser()
+
+  // Redirect to root if not logged in to prevent accessing the drawer
+  if (!session) {
+    return <Redirect href="/" />
+  }
+
   return <Drawer drawerContent={ProfileScreen} />
 }
 
