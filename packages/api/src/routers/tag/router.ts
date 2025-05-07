@@ -19,7 +19,7 @@ import { SendtagAvailability } from './types'
 const log = debug('api:routers:tag')
 
 export const tagRouter = createTRPCRouter({
-  checkAvailability: publicProcedure.input(SendtagSchema).query(async ({ input: { name } }) => {
+  checkAvailability: publicProcedure.input(SendtagSchema).mutation(async ({ input: { name } }) => {
     log('checking sendtag availability: ', { name })
 
     try {
