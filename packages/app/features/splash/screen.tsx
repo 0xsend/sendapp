@@ -40,7 +40,6 @@ export function SplashScreen() {
       mx={'auto'}
       maxWidth={1600}
       w={'100%'}
-      backgroundColor="black"
       $platform-web={{
         height: '100svh',
       }}
@@ -137,7 +136,6 @@ function Hero() {
       $gtMd={{ p: '$1.5', maxWidth: 720 }}
       position="relative"
       f={1}
-      backgroundColor="black"
       $platform-web={{
         height: containerHeight,
       }}
@@ -146,7 +144,6 @@ function Hero() {
         pt={Math.max(top, 24)}
         pb={Math.max(bottom, 16)}
         overflow="hidden"
-        backgroundColor="black"
         $gtMd={{ borderRadius: '$8' }}
         f={1}
       >
