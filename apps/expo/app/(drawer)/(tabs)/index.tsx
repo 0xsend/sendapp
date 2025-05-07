@@ -14,7 +14,7 @@ export default function HomeTabScreen() {
 
       <Container
         safeAreaProps={{
-          edges: ['left', 'right', 'bottom'],
+          edges: ['left', 'right'],
           style: { flex: 1 },
         }}
         flex={1}
@@ -31,9 +31,7 @@ export default function HomeTabScreen() {
           bounces={true}
           overScrollMode="always" // Android scroll indicator
         >
-          <YStack f={1} px="$4" pb="$4">
-            <HomeScreen />
-          </YStack>
+          <HomeScreen />
         </ScrollView>
       </Container>
     </>
