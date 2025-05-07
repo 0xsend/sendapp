@@ -92,18 +92,6 @@ export default function Layout() {
             ),
           }}
         />
-        <Tabs.Screen
-          name="profile"
-          key="profile"
-          options={{
-            headerShown: false,
-            title: 'Profile',
-            tabBarLabel: 'Profile',
-            tabBarIcon: ({ size, color, focused }) => (
-              <User color={focused ? '$color12' : '$color10'} size={size} strokeWidth={2} />
-            ),
-          }}
-        />
       </Tabs>
     </>
   )
