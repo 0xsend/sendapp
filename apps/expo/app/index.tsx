@@ -99,13 +99,13 @@ export default function Index() {
       <Container
         safeAreaProps={{
           edges: ['left', 'right', 'bottom'],
-          style: { flex: 1 },
+          style: { flex: 1, backgroundColor: 'black' },
         }}
         flex={1}
-        backgroundColor="$background"
+        backgroundColor="black"
         px="$0"
       >
-        <YStack flex={1} jc="center" ai="center" f={1}>
+        <YStack flex={1} jc="center" ai="center" f={1} backgroundColor="black">
           <SplashScreen />
         </YStack>
       </Container>
