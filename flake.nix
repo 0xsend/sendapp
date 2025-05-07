@@ -55,42 +55,37 @@
       in {
         formatter = pkgs.alejandra;
 
-        devShells.default = pkgs.llvmPackages_17.libcxxStdenv.mkDerivation {
+        devShells.default = pkgs.mkShell {
           name = "sendapp-dev";
-          nativeBuildInputs =
-            [
-              pkgs.foundry
-              pkgs.python310
-              pkgs.gnused
-              pkgs.postgresql_15
-              pkgs.bun
+          nativeBuildInputs = [
+            pkgs.foundry
+            pkgs.python310
+            pkgs.gnused
+            pkgs.postgresql_15
+            pkgs.bun
 
-              pkgs.unstable.fnm
-              pkgs.unstable.jq
-              pkgs.unstable.yj
-              pkgs.unstable.caddy
-              pkgs.unstable.tilt
-              pkgs.unstable.temporal-cli
-              pkgs.unstable.ripgrep
-            ] # macOS-specific tools
-            ++ (pkgs.lib.optionals pkgs.stdenv.isDarwin [
-              pkgs.unstable.darwin.xcode_16_3
-              pkgs.unstable.apple-sdk
-              pkgs.unstable.darwin.apple_sdk.frameworks.CoreServices
-              pkgs.unstable.darwin.apple_sdk.frameworks.CoreFoundation
-              pkgs.unstable.darwin.apple_sdk.frameworks.SystemConfiguration
-            ]);
-          # For C++ development
-          buildInputs = [
-            pkgs.unstable.llvmPackages_17.libcxxStdenv
-            pkgs.unstable.llvmPackages_17.libcxxClang
-            pkgs.unstable.llvmPackages_17.compiler-rt
-            pkgs.unstable.llvmPackages_17.libcxx
+            pkgs.unstable.fnm
+            pkgs.unstable.jq
+            pkgs.unstable.yj
+            pkgs.unstable.caddy
+            pkgs.unstable.tilt
+            pkgs.unstable.temporal-cli
+            pkgs.unstable.ripgrep
           ];
-          shellHook = ''
-            eval "$(fnm env --use-on-cd --corepack-enabled --shell bash)"
-            echo "Welcome to the Send.app development environment!"
-          '';
+          shellHook =
+            ''
+              eval "$(fnm env --use-on-cd --corepack-enabled --shell bash)"
+              echo "Welcome to the Send.app development environment!"
+            ''
+            + (pkgs.lib.optionalString pkgs.stdenv.hostPlatform.isDarwin ''
+              # On macOS, we unset the macOS SDK env vars that Nix sets up because
+              # we rely on a system installation. Nix only provides a macOS SDK
+              # and we need iOS too.
+              unset SDKROOT
+              unset DEVELOPER_DIR
+              # We need to add the system Xcode tools to the PATH so that expo works correctly
+              export PATH=/usr/bin:$PATH
+            '');
         };
 
         # For compatibility with older versions of the `nix` binary
