@@ -22,6 +22,8 @@ const log = debug('app:pages:index')
 export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServerSideProps>> = ({
   images,
 }) => {
+  console.log('whatever change to trigger preview build')
+
   const { session } = useUser()
   const [carouselImages, setCarouselImages] = useState<GetPlaiceholderImage[]>([])
   const [carouselProgress, setCarouselProgress] = useState(0)
