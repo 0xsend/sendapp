@@ -36,6 +36,7 @@ The current navigation architecture for the Expo app is built using Expo Router 
 The Next.js app has a more comprehensive routing structure with many additional screens:
 
 1. **Main Sections**:
+   - Secret Shop for minting tokens on localnet.
    - Activity feed
    - Profile pages
    - Send/receive functionality
@@ -70,7 +71,7 @@ Update the tab navigation to include the core sections from the Next.js app:
     }}
   />
   <Tabs.Screen
-    name="activity" 
+    name="activity"
     options={{
       title: 'Activity',
       tabBarIcon: ({ focused }) => <Activity color={focused ? '$color12' : '$color10'} />
@@ -118,9 +119,9 @@ function ProfileScreen() {
     <Container f={1} backgroundColor="$background">
       {/* Profile section */}
       {/* ... */}
-      
+
       <Separator />
-      
+
       <YStack f={1} gap="$4">
         {menuItems.map((item) => (
           <Button
@@ -134,12 +135,15 @@ function ProfileScreen() {
           </Button>
         ))}
       </YStack>
-      
+
       {/* Sign out button */}
     </Container>
   )
 }
 ```
+
+>[!NOTE]
+> Reference the relevant icons and navigation from the web project see packages/app/components/sidebar/HomeSideBar.tsx.
 
 ### 3. Create Consistent Route Structure
 
@@ -223,9 +227,9 @@ export function configureScreenHeader(options: {
     headerShown: true,
     headerShadowVisible: false,
     headerTitleAlign: 'center',
-    headerLeft: options.showMenu 
+    headerLeft: options.showMenu
       ? () => <MenuButton />
-      : options.showBack 
+      : options.showBack
         ? undefined // Use default back button
         : () => <View />,
     headerRight: options.showAction
@@ -291,6 +295,16 @@ export function configureScreenHeader(options: {
 3. **Trade & SendPot**:
    - Add basic trading UI
    - Implement SendPot lottery feature
+
+## Verification
+
+You can use the `xcrun simctl io booted screenshot` command to take a screenshot of the app. Use this to verify that the app is functioning as expected and that the navigation, layout, and screens are working as intended.
+
+```bash
+xcrun simctl io booted screenshot ./screenshot.png
+```
+
+Then read the contents of the screenshot and compare it to the expected output.
 
 ## Next Steps
 
