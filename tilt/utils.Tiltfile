@@ -29,7 +29,7 @@ def require_env(*envs):
     """
     for env in envs:
         msg = "%s is required but was not found in ENV" % env
-        if os.getenv(env, "") == "":
+        if os.getenv(env, None) == None:
             fail(color.red("Missing required environment variable: " + env))
 
 def files_matching(dir, lambda_):
