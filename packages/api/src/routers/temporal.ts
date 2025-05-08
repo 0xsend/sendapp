@@ -3,7 +3,7 @@ import debug from 'debug'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
 import type { UserOperation } from 'permissionless'
-import { baseMainnetClient, entryPointAddress } from '@my/wagmi'
+import { baseMainnetBundlerClient, baseMainnetClient, entryPointAddress } from '@my/wagmi'
 import { getUserOperationHash } from 'permissionless/utils'
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { getTemporalClient } from '@my/temporal/client'
@@ -85,16 +85,33 @@ export const temporalRouter = createTRPCRouter({
 
         await withRetry(
           async () => {
-            const supabaseAdmin = createSupabaseAdminClient()
-            const { data, error } = await supabaseAdmin
-              .from('activity')
-              .select('data->>status')
-              .eq('event_id', workflowId)
-              .eq('event_name', 'temporal_send_account_transfers')
-              .single()
-            throwIf(error)
-            assert(!!data && data.status !== 'initialized', 'Transfer not yet submitted')
-            return data
+            const [initialized, receipt] = await Promise.allSettled([
+              lookupIntializedWorkflow(workflowId)
+                .then(() => true)
+                .catch(() => false),
+              (async () => {
+                // maybe bundler already has the receipt
+                const receipt = await baseMainnetBundlerClient.getUserOperationReceipt({
+                  hash: userOpHash,
+                })
+                return receipt
+              })(),
+            ] as const)
+
+            if (initialized.status === 'fulfilled' && initialized.value) {
+              log('transfer initialized')
+              return true
+            }
+
+            if (receipt.status === 'fulfilled' && receipt.value) {
+              log('userop receipt found', receipt.value.receipt.transactionHash)
+              return true
+            }
+
+            throw new TRPCError({
+              code: 'PRECONDITION_FAILED',
+              message: 'Transfer not yet submitted',
+            })
           },
           {
             retryCount: 20,
@@ -117,3 +134,17 @@ export const temporalRouter = createTRPCRouter({
       }
     ),
 })
+
+async function lookupIntializedWorkflow(workflowId: string): Promise<{ status: string }> {
+  // check if the transfer is initialized
+  const supabaseAdmin = createSupabaseAdminClient()
+  const { data, error } = await supabaseAdmin
+    .from('activity')
+    .select('data->>status')
+    .eq('event_id', workflowId)
+    .eq('event_name', 'temporal_send_account_transfers')
+    .single()
+  throwIf(error)
+  assert(!!data && data.status !== 'initialized', 'Transfer not yet submitted')
+  return data
+}
