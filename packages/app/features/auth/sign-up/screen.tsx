@@ -26,6 +26,7 @@ import { assert } from 'app/utils/assert'
 import { useUser } from 'app/utils/useUser'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { useValidateSendtag } from 'app/utils/tags/useValidateSendtag'
+import { setFirstSendtagCookie } from 'app/utils/useFirstSendtagCookie'
 
 const SignUpScreenFormSchema = z.object({
   name: formFields.text,
@@ -92,14 +93,16 @@ export const SignUpScreen = () => {
 
   const handleSubmit = async ({ name }: z.infer<typeof SignUpScreenFormSchema>) => {
     try {
-      if (signUpFormState !== SignUpFormState.PasskeyCreationFailed) {
-        await validateSendtag(name)
+      await validateSendtag(name)
 
+      if (signUpFormState !== SignUpFormState.PasskeyCreationFailed) {
         await signUpMutateAsync({
           sendtag: name,
           captchaToken,
         })
       }
+
+      setFirstSendtagCookie(name)
 
       await createAccount().catch((error) => {
         setSignUpFormState(SignUpFormState.PasskeyCreationFailed)

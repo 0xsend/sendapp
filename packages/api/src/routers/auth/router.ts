@@ -26,7 +26,8 @@ export const authRouter = createTRPCRouter({
       }
 
       try {
-        const email = `${sendtag}@no-reply.users.send.app`
+        const emailId = crypto.randomUUID()
+        const email = `${sendtag}_${emailId}@no-reply.users.send.app`
         const password = Array.from(crypto.getRandomValues(new Uint8Array(32)))
           .map((b) => b.toString(16).padStart(2, '0'))
           .join('')

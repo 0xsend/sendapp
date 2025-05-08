@@ -7,13 +7,260 @@
  * - Generate a deterministic address from the public key
  * - Ask the user to deposit funds
  */
-import { YStack } from '@my/ui'
-import { OnboardingForm } from './onboarding-form'
+import { Button, FadeCard, Paragraph, SubmitButton, XStack, YStack } from '@my/ui'
+import { useUser } from 'app/utils/useUser'
+import { FormProvider, useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { useCreateSendAccount, useSendAccount } from 'app/utils/send-accounts'
+import { useRouter } from 'solito/router'
+import { useCallback, useEffect, useState } from 'react'
+import { useIsClient } from 'app/utils/useIsClient'
+import { api } from 'app/utils/api'
+import { assert } from 'app/utils/assert'
+import { formFields, SchemaForm } from 'app/utils/SchemaForm'
+import { useValidateSendtag } from 'app/utils/tags/useValidateSendtag'
+import { useFirstSendtagCookie } from 'app/utils/useFirstSendtagCookie'
+
+const OnboardingSchema = z.object({
+  name: formFields.text,
+})
 
 export function OnboardingScreen() {
+  const { user, validateToken } = useUser()
+  const form = useForm<z.infer<typeof OnboardingSchema>>()
+  const sendAccount = useSendAccount()
+  const { replace } = useRouter()
+  const { createSendAccount } = useCreateSendAccount()
+  const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
+  const isClient = useIsClient()
+  const { validateSendtag } = useValidateSendtag()
+  const { data: firstSendtag } = useFirstSendtagCookie()
+
+  const formName = form.watch('name')
+  const validationError = form.formState.errors.root
+  const canSubmit = formName
+
+  const { mutateAsync: registerFirstSendtagMutateAsync } =
+    api.tag.registerFirstSendtag.useMutation()
+
+  // Validate the token when this component mounts
+  useEffect(() => {
+    async function checkTokenValidity() {
+      // Only continue if we have what appears to be a user
+      if (!user?.id) {
+        replace('/')
+        return
+      }
+
+      // Validate token to ensure it's still valid
+      const isValid = await validateToken()
+      if (!isValid) {
+        // Token validation handles redirect in useUser
+        return
+      }
+    }
+
+    checkTokenValidity()
+  }, [user?.id, validateToken, replace])
+
+  useEffect(() => {
+    if (sendAccount.data?.address) {
+      replace('/') // redirect to home page if account already exists
+    }
+  }, [sendAccount.data?.address, replace])
+
+  useEffect(() => {
+    if (firstSendtag) {
+      form.setValue('name', firstSendtag)
+    }
+  }, [firstSendtag, form.setValue])
+
+  useEffect(() => {
+    const subscription = form.watch(() => {
+      form.clearErrors('root')
+    })
+
+    return () => subscription.unsubscribe()
+  }, [form.watch, form.clearErrors])
+
+  async function handleSubmit({ name }: z.infer<typeof OnboardingSchema>) {
+    try {
+      // First, validate token
+      const isTokenValid = await validateToken()
+      if (!isTokenValid) {
+        // Token validation already handles redirection
+        return
+      }
+
+      assert(!!user?.id, 'No user id')
+
+      await validateSendtag(name)
+      await createSendAccount({ user, accountName: name })
+      await registerFirstSendtagMutateAsync({ name })
+      replace('/')
+    } catch (error) {
+      console.error('Error creating account', error)
+
+      // Check for authentication errors
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        form.setError('root', {
+          type: 'custom',
+          message: 'Session expired. Redirecting to sign in...',
+        })
+        setTimeout(() => {
+          replace('/')
+        }, 1500)
+        return
+      }
+
+      const message = error?.message?.split('.')[0] ?? 'Unknown error'
+
+      // Check for "No user id" which means token is invalid
+      if (message.includes('No user id')) {
+        form.setError('root', {
+          type: 'custom',
+          message: 'Session expired. Redirecting to sign in...',
+        })
+        setTimeout(() => {
+          replace('/')
+        }, 1500)
+        return
+      }
+
+      form.setError('root', {
+        type: 'custom',
+        message,
+      })
+    }
+  }
+
+  const renderAfterContent = useCallback(
+    ({ submit }: { submit: () => void }) => (
+      <SubmitButton
+        alignSelf={'center'}
+        w={'90%'}
+        theme="green"
+        onPress={submit}
+        py={'$5'}
+        br={'$4'}
+        bw={'$1'}
+        disabled={!canSubmit}
+        $theme-light={{
+          disabledStyle: { opacity: 0.5 },
+        }}
+        $theme-dark={{
+          variant: canSubmit ? undefined : 'outlined',
+        }}
+      >
+        <Button.Text
+          ff={'$mono'}
+          fontWeight={'500'}
+          tt="uppercase"
+          size={'$5'}
+          color={canSubmit ? '$black' : '$primary'}
+          $theme-light={{
+            color: '$black',
+          }}
+        >
+          finish account
+        </Button.Text>
+      </SubmitButton>
+    ),
+    [canSubmit]
+  )
+
+  // If we're not in the client, or the user isn't available, don't render
+  if (!isClient) return null
+
   return (
-    <YStack h="100%" jc="center" ai="center">
-      <OnboardingForm />
+    <YStack f={1} jc={'space-between'} ai={'center'} gap={'$3.5'} py={'$8'}>
+      <FormProvider {...form}>
+        <YStack w={'100%'} ai={'center'}>
+          <Paragraph w={'90%'} size={'$8'} fontWeight={500} tt={'uppercase'}>
+            finish your account
+          </Paragraph>
+          <Paragraph w={'90%'} size={'$5'} color={'$olive'}>
+            Sendtags are usernames
+          </Paragraph>
+          <SchemaForm
+            form={form}
+            onSubmit={handleSubmit}
+            schema={OnboardingSchema}
+            defaultValues={{
+              name: '',
+            }}
+            props={{
+              name: {
+                placeholder: 'Input desired Sendtag',
+                color: '$color12',
+                fontWeight: '500',
+                bw: 0,
+                br: 0,
+                p: 0,
+                pl: '$2.5',
+                focusStyle: {
+                  outlineWidth: 0,
+                },
+                '$theme-dark': {
+                  placeholderTextColor: '$darkGrayTextField',
+                },
+                '$theme-light': {
+                  placeholderTextColor: '$darkGrayTextField',
+                },
+                fontSize: '$5',
+                onFocus: () => setIsInputFocused(true),
+                onBlur: () => setIsInputFocused(false),
+                fieldsetProps: {
+                  width: '100%',
+                },
+                iconBefore: (
+                  <Paragraph ml={-12} size={'$5'} opacity={formName ? 1 : 0}>
+                    /
+                  </Paragraph>
+                ),
+              },
+            }}
+            formProps={{
+              w: '100%',
+              footerProps: { pb: 0 },
+              $gtSm: {
+                maxWidth: '100%',
+              },
+              style: { justifyContent: 'space-between' },
+            }}
+            renderAfter={renderAfterContent}
+          >
+            {({ name }) => {
+              return (
+                <FadeCard
+                  w={'100%'}
+                  my={'$5'}
+                  borderColor={validationError ? '$error' : 'transparent'}
+                  bw={1}
+                >
+                  <XStack position="relative">
+                    {name}
+                    <XStack
+                      position="absolute"
+                      bottom={0}
+                      left={0}
+                      right={0}
+                      height={1}
+                      backgroundColor={isInputFocused ? '$primary' : '$darkGrayTextField'}
+                      $theme-light={{
+                        backgroundColor: isInputFocused ? '$color12' : '$silverChalice',
+                      }}
+                    />
+                  </XStack>
+                  {validationError && (
+                    <Paragraph color={'$error'}>{validationError.message}</Paragraph>
+                  )}
+                </FadeCard>
+              )
+            }}
+          </SchemaForm>
+        </YStack>
+      </FormProvider>
     </YStack>
   )
 }
