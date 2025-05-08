@@ -7,7 +7,6 @@ import type { Activity } from 'app/utils/zod/activity'
 import { amountFromActivity } from 'app/utils/activity'
 import { useProfileScreenParams, useRootScreenParams } from 'app/routers/params'
 import { IconArrowRight } from 'app/components/icons'
-import { SendButton } from './ProfileButtons'
 import { ProfileHeader } from 'app/features/profile/components/ProfileHeader'
 import { FlatList } from 'react-native'
 import { ProfilesDetailsModal } from 'app/features/profile/components/ProfileDetailsModal'
@@ -17,6 +16,7 @@ import {
   isTemporalEthTransfersEvent,
   isTemporalTokenTransfersEvent,
 } from 'app/utils/zod/activity/TemporalTransfersEventSchema'
+import { SendNoteForm } from './components/SendNoteForm'
 
 interface ProfileScreenProps {
   sendid?: number | null
@@ -144,17 +144,12 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                     <Spinner size="small" color={'$color12'} my={'$4'} />
                   ) : null
                 }
-                ListHeaderComponent={
-                  <SendButton
-                    identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
-                    idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
-                  />
-                }
                 inverted={true}
                 showsVerticalScrollIndicator={false}
-                stickyHeaderIndices={[0]}
               />
             </Stack>
+
+            <SendNoteForm otherUserId={otherUserId} />
           </>
         )}
       </YStack>
