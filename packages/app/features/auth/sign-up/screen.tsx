@@ -145,7 +145,6 @@ export const SignUpScreen = () => {
         w={'90%'}
         theme="green"
         onPress={submit}
-        py={'$5'}
         br={'$4'}
         bw={'$1'}
         disabled={!canSubmit}
@@ -176,7 +175,7 @@ export const SignUpScreen = () => {
   )
 
   return (
-    <YStack f={1} jc={'space-between'} ai={'center'} gap={'$3.5'} py={'$8'}>
+    <YStack f={1} jc={'space-around'} ai={'center'} gap={'$3.5'} py={'$3'}>
       <FormProvider {...form}>
         <YStack w={'100%'} ai={'center'}>
           <Paragraph w={'90%'} size={'$8'} fontWeight={500} tt={'uppercase'}>
@@ -243,7 +242,7 @@ export const SignUpScreen = () => {
               return (
                 <FadeCard
                   w={'100%'}
-                  my={'$5'}
+                  mt={'$5'}
                   borderColor={validationError ? '$error' : 'transparent'}
                   bw={1}
                 >
@@ -323,7 +322,6 @@ export const SignUpScreen = () => {
             bw={0}
             br={0}
             height={'auto'}
-            p={'$3'}
             disabled={isSigningIn}
           >
             <Button.Text
@@ -348,7 +346,6 @@ export const SignUpScreen = () => {
           bw={0}
           br={0}
           height={'auto'}
-          p={'$3'}
           disabled={isSigningIn}
         >
           <Button.Text

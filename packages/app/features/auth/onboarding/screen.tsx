@@ -234,9 +234,10 @@ export function OnboardingScreen() {
               return (
                 <FadeCard
                   w={'100%'}
-                  my={'$5'}
+                  mt={'$5'}
                   borderColor={validationError ? '$error' : 'transparent'}
                   bw={1}
+                  pb={validationError ? '$5' : '$6'}
                 >
                   <XStack position="relative">
                     {name}
