@@ -1,5 +1,7 @@
 import type { UserOperation } from 'permissionless'
 import type { Hex } from 'viem'
+import { bytesToHex, concat, hexToBytes, isHex, numberToBytes } from 'viem'
+import { assert } from './assert'
 
 /**
  * default user op with preset gas values that work will probably need to move this to the database.
@@ -65,7 +67,3 @@ export function generateChallenge({
     validUntilBytes,
   }
 }
-
-// Import these after function declarations to avoid circular dependencies
-import { bytesToHex, concat, hexToBytes, isHex, numberToBytes } from 'viem'
-import { assert } from './assert'
