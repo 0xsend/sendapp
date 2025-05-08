@@ -97,8 +97,12 @@ export const temporalRouter = createTRPCRouter({
             return data
           },
           {
-            retryCount: 10,
-            delay: 500,
+            retryCount: 20,
+            delay: ({ count, error }) => {
+              const backoff = 500 + Math.random() * 100 // add some randomness to the backoff
+              log(`Waiting for transfer to start count=${count} backoff=${backoff}`, error)
+              return Math.min(backoff, 3000) // cap backoff at 3 seconds
+            },
             shouldRetry({ error: e }) {
               const error = e as unknown as PostgrestError
               if (error.code === 'PGRST116' || error.message === 'Transfer not yet submitted') {
