@@ -7,7 +7,6 @@ import { useEffect, useMemo, useState } from 'react'
 import {
   Adapt,
   Fieldset,
-  isWeb,
   Select,
   type SelectProps,
   Sheet,
@@ -81,18 +80,13 @@ export const CountryCodeField = ({
           {...props}
         >
           <Select.Trigger
-            f={1}
             bc="$color4"
             theme={'gray'}
             br={12}
             borderWidth="$0"
-            iconAfter={() => <ChevronDown />}
-            gap="$2"
-            {...(isWeb
-              ? {
-                  type: 'button',
-                }
-              : {})}
+            gap={'$2'}
+            p={'$2'}
+            minHeight={'auto'}
           >
             {country ? (
               <Text
@@ -109,6 +103,7 @@ export const CountryCodeField = ({
                 Country
               </Text>
             )}
+            <ChevronDown />
           </Select.Trigger>
 
           <Adapt platform="touch" when="sm">

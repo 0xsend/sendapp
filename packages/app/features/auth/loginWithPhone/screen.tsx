@@ -103,10 +103,10 @@ export const LoginWithPhoneScreen = () => {
         <FormProvider {...form}>
           <YStack w={'100%'} ai={'center'}>
             <Paragraph w={'90%'} size={'$8'} fontWeight={500} tt={'uppercase'}>
-              sign in with your phone
+              login with your phone
             </Paragraph>
             <Paragraph w={'90%'} size={'$5'} color={'$olive'}>
-              If you created your account with phone number, sign in using it
+              If you created your account with phone number, login using it
             </Paragraph>
           </YStack>
           <SchemaForm
@@ -154,11 +154,12 @@ export const LoginWithPhoneScreen = () => {
             {({ countryCode, phone }) => (
               <FadeCard
                 w={'100%'}
-                my={'$5'}
+                mt={'$5'}
                 borderColor={validationError ? '$error' : 'transparent'}
                 bw={1}
+                pb={validationError ? '$5' : '$6'}
               >
-                <XStack position="relative">
+                <XStack position="relative" ai={'center'}>
                   {countryCode}
                   {phone}
                   <XStack
@@ -192,7 +193,6 @@ export const LoginWithPhoneScreen = () => {
         bw={0}
         br={0}
         height={'auto'}
-        p={'$3'}
       >
         <Button.Text
           color={'$primary'}
