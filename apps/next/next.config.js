@@ -156,7 +156,6 @@ export default () => {
         'p-queue',
         'permissionless',
         'superjson',
-        'viem',
         'react-native-reanimated',
         '@tamagui/animations-moti',
         '@tamagui/animations-react-native',
