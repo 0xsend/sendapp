@@ -187,7 +187,7 @@ export function OnboardingScreen() {
             onSubmit={handleSubmit}
             schema={OnboardingSchema}
             defaultValues={{
-              name: '',
+              name: firstSendtag || '',
             }}
             props={{
               name: {
