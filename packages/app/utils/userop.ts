@@ -9,39 +9,43 @@ import {
   usdcAddress,
 } from '@my/wagmi'
 import { queryOptions } from '@tanstack/react-query'
+import { wMulDown } from 'app/utils/math'
+import debugBase from 'debug'
 import {
   getAccountNonce,
   PaymasterValidationRevertedError,
   SendUserOperationError,
   type UserOperation,
 } from 'permissionless'
+import { useMemo } from 'react'
 import {
-  bytesToHex,
   concat,
   encodeFunctionData,
   getContract,
-  hexToBytes,
+  InvalidParamsRpcError,
   isAddress,
   isHex,
   maxUint256,
-  numberToBytes,
   pad,
+  parseUnits,
   RpcRequestError,
   toHex,
   type Address,
   type Hex,
-  parseUnits,
-  InvalidParamsRpcError,
 } from 'viem'
 import { useEstimateFeesPerGas } from 'wagmi'
 import { useQuery as useWagmiQuery, type UseQueryReturnType } from 'wagmi/query'
 import { assert } from './assert'
 import { throwIf } from './throwIf'
-import { defaultUserOp } from './useUserOpTransferMutation'
+import {
+  defaultUserOp,
+  ERR_MSG_NOT_ENOUGH_USDC,
+  generateChallenge,
+  USEROP_KEY_SLOT,
+  USEROP_SALT,
+  USEROP_VERSION,
+} from './userOpConstants'
 import { baseMainnetClient } from './viem'
-import { useMemo } from 'react'
-import debugBase from 'debug'
-import { wMulDown } from 'app/utils/math'
 
 const debug = debugBase('app:utils:userop')
 
@@ -77,9 +81,8 @@ export async function verifySignature(
   return await verifier.read.verifySignature([challenge, signature, x, y])
 }
 
-export const USEROP_VERSION = 1
-export const USEROP_KEY_SLOT = 0
-export const USEROP_SALT = 0n
+// Export constants from userOpConstants
+export { generateChallenge, USEROP_KEY_SLOT, USEROP_SALT, USEROP_VERSION }
 
 export function getSendAccountCreateArgs(
   publicKey: [Hex, Hex]
@@ -103,35 +106,6 @@ export function getSendAccountCreateArgs(
     initCalls, // init calls
     USEROP_SALT, // salt
   ]
-}
-
-/**
- * Generates a SendAccount challenge from a user operation hash.
- */
-export function generateChallenge({
-  userOpHash,
-  version = USEROP_VERSION,
-  validUntil,
-}: {
-  userOpHash: Hex
-  version?: number
-  validUntil: number
-}): {
-  challenge: Hex
-  versionBytes: Uint8Array
-  validUntilBytes: Uint8Array
-} {
-  const opHash = hexToBytes(userOpHash)
-  const versionBytes = numberToBytes(version, { size: 1 })
-  const validUntilBytes = numberToBytes(validUntil, { size: 6 })
-  // 1 byte version + 6 bytes validUntil + 32 bytes opHash
-  const challenge = bytesToHex(concat([versionBytes, validUntilBytes, opHash]))
-  assert(isHex(challenge) && challenge.length === 80, 'Invalid challenge')
-  return {
-    challenge,
-    versionBytes,
-    validUntilBytes,
-  }
 }
 
 const useAccountNonceQueryKey = 'accountNonce'
@@ -403,8 +377,6 @@ export function useUserOp({
     queryFn,
   })
 }
-
-const ERR_MSG_NOT_ENOUGH_USDC = 'Not enough USDC to cover transaction fees'
 
 /**
  * User operation errors are not very helpful and confusing. This function converts them to something more helpful.

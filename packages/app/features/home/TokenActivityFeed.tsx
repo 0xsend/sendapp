@@ -1,16 +1,19 @@
-import { Card, type CardProps, Spinner, RecyclerList, useMedia } from '@my/ui'
+import { Card, type CardProps, RecyclerList, Spinner, useMedia } from '@my/ui'
 import {
-  layoutProviderMaker,
   dataProviderMaker,
   type Dimension,
+  layoutProviderMaker,
 } from '@my/ui/src/components/RecyclerList.web'
-import type { Activity } from 'app/utils/zod/activity'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { TokenActivityRow } from './TokenActivityRow'
-import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
-import type { ZodError } from 'zod'
 import type { PostgrestError } from '@supabase/postgrest-js'
+import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { useScrollDirection } from 'app/provider/scroll'
+import type { Activity } from 'app/utils/zod/activity'
+import { isTemporalSendEarnDepositEvent } from 'app/utils/zod/activity'
+import { Events } from 'app/utils/zod/activity/events'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import type { ZodError } from 'zod'
+import { TokenActivityRow } from './TokenActivityRow'
 
 export const TokenActivityFeed = ({
   tokenActivityFeedQuery,
@@ -26,6 +29,8 @@ export const TokenActivityFeed = ({
   const { isAtEnd } = useScrollDirection()
   const [layoutSize, setLayoutSize] = useState<Dimension>({ width: 0, height: 0 })
   const media = useMedia()
+  const queryClient = useQueryClient()
+  const wasPendingRef = useRef(false) // Ref to track if a pending activity was seen previously
 
   const layoutSizeAdjustment = media.gtLg ? 32 : 14
 
@@ -38,6 +43,43 @@ export const TokenActivityFeed = ({
   } = tokenActivityFeedQuery
 
   const activities = useMemo(() => data?.pages.flat() || [], [data])
+
+  useEffect(() => {
+    // Only proceed if data is available
+    if (!data?.pages) return
+
+    const allActivities = data.pages.flat()
+
+    // Check if there's currently any pending temporal activity (deposits or transfers)
+    const isCurrentlyPending = allActivities.some((activity) => {
+      // Check for pending Send Earn deposits
+      if (
+        isTemporalSendEarnDepositEvent(activity) &&
+        !['cancelled', 'failed'].includes(activity.data?.status)
+      ) {
+        return true
+      }
+
+      // Check for pending transfers
+      if (
+        activity.event_name === Events.TemporalSendAccountTransfers &&
+        !['cancelled', 'failed', 'confirmed'].includes(activity.data?.status)
+      ) {
+        return true
+      }
+
+      return false
+    })
+
+    // If it was pending previously but isn't anymore, invalidate the activity feed query
+    if (wasPendingRef.current && !isCurrentlyPending) {
+      // Invalidate the query
+      queryClient.invalidateQueries({ queryKey: ['activity_feed'] })
+    }
+
+    // Update the ref to store the current pending state for the next effect run
+    wasPendingRef.current = isCurrentlyPending
+  }, [data, queryClient])
 
   const [dataProvider, setDataProvider] = useState(dataProviderMaker(activities))
 

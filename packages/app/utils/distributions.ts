@@ -31,8 +31,7 @@ import { useSendAccount } from './send-accounts'
 import { signUserOpHash } from './signUserOp'
 import { selectAll } from './supabase/selectAll'
 import { throwNiceError } from './userop'
-import { defaultUserOp } from './useUserOpTransferMutation'
-
+import { defaultUserOp } from 'app/utils/userOpConstants'
 export const DISTRIBUTION_INITIAL_POOL_AMOUNT = BigInt(20e9)
 
 export type UseDistributionsResultData = MergeDeep<

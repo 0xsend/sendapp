@@ -4,149 +4,312 @@
 
 Complete the Send native app implementation by addressing layout issues, improving user experience, and porting remaining features from the Next.js application.
 
-## Analysis of Current State
+## Current Navigation Architecture
 
-Based on the provided screenshot and code review:
+The current navigation architecture for the Expo app is built using Expo Router v2 and follows a nested structure:
 
-1. **Authentication Flow**:
-   - Onboarding has been completed
-   - Auth route group needs refinement
-   - Sign-up page exists but needs shared auth layout
+1. **Root Layout** (`/app/_layout.tsx`):
+   - Sets up the Provider, theme loading, and authentication state
+   - Configures the main Stack Navigator with screens for:
+     - `index` (splash/login screen)
+     - `(drawer)` (authenticated content)
+     - `(auth)` (authentication flows)
+     - `settings/index` (settings screen)
 
-2. **UI/UX Issues**:
-   - Layout problems in TokenDetails screen
-   - Button text truncation in quick action buttons ("Trade" shows as "Tr...")
-   - "No Activity" state is handled incorrectly in TokenActivityFeed.native.tsx
-   - Overall mobile layout needs optimization
+2. **Authentication Flow** (`/app/(auth)/`):
+   - Contained in route group `(auth)`
+   - Includes screens for sign-up and onboarding
+   - Uses a basic layout without drawer or tabs
 
-3. **Navigation Structure**:
-   - Drawer/Tab navigation is in place but needs refinement
-   - Many screens from Next.js still need to be ported to Expo
+3. **Main App Flow** (`/app/(drawer)/`):
+   - Protected by authentication check
+   - Uses Drawer Navigator from `expo-router/drawer`
+   - Custom drawer content with profile info and menu items
 
-## Proposed Implementation Plan
+4. **Tab Navigation** (`/app/(drawer)/(tabs)/`):
+   - Nested inside the drawer navigator
+   - Currently only has the home screen tab
+   - Custom header with drawer menu toggle and "+" button
 
-### 1. Fix Mobile Layout Issues
+## Next.js App Structure
 
-#### 1.1. TokenDetails Screen Improvements
+The Next.js app has a more comprehensive routing structure with many additional screens:
 
-- Fix HomeQuickActions component to prevent text truncation:
-  - Optimize button layout and spacing for mobile screens
-  - Implement text scaling or appropriate text overflow handling
-  - Consider using icons-only layout for very small screens
+1. **Main Sections**:
+   - Secret Shop for minting tokens on localnet.
+   - Activity feed
+   - Profile pages
+   - Send/receive functionality
+   - Deposit/withdraw flows
+   - Earn and rewards
+   - Settings and account management
+   - Trade features
+   - SendPot (lottery) functionality
 
-- Fix TokenActivityFeed.native.tsx:
-  - Currently returns null when no activities, should render "No Activity" message
-  - Implement consistent empty state between web and native versions
+2. **Account Management**:
+   - Profile editing
+   - Backup credentials
+   - SendTag management
+   - Affiliate program
 
-- Improve responsive layout:
-  - Review responsive breakpoints in the TokenDetails component
-  - Adjust paddings and margins for better mobile experience
+## Proposed Navigation Improvements
 
-### 2. Authentication Improvements
+To align the Expo app with the Next.js app structure, I recommend the following improvements:
 
-- Create shared AuthLayout component:
-  - Modify `apps/expo/app/(auth)/_layout.tsx` to serve as shared AuthLayout
-  - Extract common layout elements: Container, YStack, Logo Anchor, ScrollView
-  - Apply this layout to sign-up and onboarding screens
+### 1. Expand Tab Navigation
 
-- Implement proper authentication guards:
-  - Protect (drawer) routes from unauthenticated access
-  - Implement proper flow for auth state changes
+Update the tab navigation to include the core sections from the Next.js app:
 
-### 3. Complete Core Features
+```tsx
+// In apps/expo/app/(drawer)/(tabs)/_layout.tsx
+<Tabs>
+  <Tabs.Screen
+    name="index"
+    options={{
+      title: 'Home',
+      tabBarIcon: ({ focused }) => <Home color={focused ? '$color12' : '$color10'} />
+    }}
+  />
+  <Tabs.Screen
+    name="activity"
+    options={{
+      title: 'Activity',
+      tabBarIcon: ({ focused }) => <Activity color={focused ? '$color12' : '$color10'} />
+    }}
+  />
+  <Tabs.Screen
+    name="profile"
+    options={{
+      title: 'Profile',
+      tabBarIcon: ({ focused }) => <User color={focused ? '$color12' : '$color10'} />
+    }}
+  />
+  <Tabs.Screen
+    name="earn"
+    options={{
+      title: 'Earn',
+      tabBarIcon: ({ focused }) => <DollarSign color={focused ? '$color12' : '$color10'} />
+    }}
+  />
+</Tabs>
+```
 
-- Drawer Implementation:
-  - Complete the drawer content with proper profile display
-  - Implement navigation to all needed sections
+### 2. Enhance Drawer Content
 
-- Key Screens to Implement (in priority order):
-  1. Activity & Token Details
-  2. Send & Receive
-  3. Deposit & Withdraw
-  4. Profile
-  5. Earn & Rewards
-  6. Settings
+Expand the drawer to include all major navigation sections:
 
-- Implement consistent mobile header treatment:
-  - Review header/title treatment across screens
-  - Ensure consistency in navigation patterns
+```tsx
+// Enhanced drawer content
+function ProfileScreen() {
+  // ... existing code
 
-### 4. Screen Mapping Reference
+  const menuItems = [
+    { icon: <Home size={20} />, label: 'Home', route: '/(tabs)' },
+    { icon: <Activity size={20} />, label: 'Activity', route: '/activity' },
+    { icon: <Send size={20} />, label: 'Send', route: '/send' },
+    { icon: <Download size={20} />, label: 'Deposit', route: '/deposit' },
+    { icon: <DollarSign size={20} />, label: 'Earn', route: '/earn' },
+    { icon: <TrendingUp size={20} />, label: 'Trade', route: '/trade' },
+    { icon: <Gift size={20} />, label: 'SendPot', route: '/sendpot' },
+    { icon: <Award size={20} />, label: 'Leaderboard', route: '/leaderboard' },
+    { icon: <Settings size={20} />, label: 'Settings', route: '/settings' },
+  ]
 
-| Next.js Route | Expo Route | Status | Priority |
-|---------------|------------|--------|----------|
-| `index.tsx` | `(drawer)/(tabs)/index.tsx` | In Progress | High |
-| `profile/[sendid].tsx` | `(drawer)/(tabs)/profile.tsx` | Not Started | High |
-| `activity.tsx` | `(drawer)/activity.tsx` | Not Started | High |
-| `send/index.tsx` | `(drawer)/send/index.tsx` | Not Started | High |
-| `deposit/index.tsx` | `(drawer)/deposit/index.tsx` | Not Started | High |
-| `earn/index.tsx` | `(drawer)/earn/index.tsx` | Not Started | Medium |
-| `leaderboard.tsx` | `(drawer)/leaderboard.tsx` | Not Started | Medium |
-| `settings/index.tsx` | `(drawer)/settings/index.tsx` | Partial | Medium |
-| `sendpot/index.tsx` | `(drawer)/sendpot/index.tsx` | Not Started | Low |
-| `trade/index.tsx` | `(drawer)/trade/index.tsx` | Not Started | Low |
+  return (
+    <Container f={1} backgroundColor="$background">
+      {/* Profile section */}
+      {/* ... */}
 
-### 5. Technical Tasks
+      <Separator />
 
-- Address token detail screen issues:
-  - Fix padding, spacing, and responsive layout
-  - Optimize quick action buttons for mobile display
-  - Ensure consistent empty state handling
+      <YStack f={1} gap="$4">
+        {menuItems.map((item) => (
+          <Button
+            key={item.route}
+            variant="outlined"
+            onPress={() => router.push(item.route)}
+            icon={item.icon}
+            color="$color12"
+          >
+            {item.label}
+          </Button>
+        ))}
+      </YStack>
 
-- Improve component re-usability:
-  - Ensure components like HomeQuickActions are adaptive across screen sizes
-  - Create mobile-specific versions of components when needed
+      {/* Sign out button */}
+    </Container>
+  )
+}
+```
 
-- Optimize performance:
-  - Implement virtualized lists for long scrolling content
-  - Ensure smooth transitions and animations
+>[!NOTE]
+> Reference the relevant icons and navigation from the web project see packages/app/components/sidebar/HomeSideBar.tsx.
 
-## Implementation Steps
+### 3. Create Consistent Route Structure
 
-### Phase 1: Fix Critical Issues (High Priority)
+Add the corresponding routes matching the Next.js structure:
 
-1. **Fix Mobile Layout Issues**:
-   - Update HomeQuickActions.tsx to better handle text truncation
-   - Fix TokenActivityFeed.native.tsx to handle empty state
-   - Improve responsive breakpoints in TokenDetails
+```
+/app/(drawer)/
+  ├── (tabs)/
+  │   ├── _layout.tsx (tabs navigator)
+  │   ├── index.tsx (home screen)
+  │   ├── activity.tsx
+  │   ├── profile.tsx
+  │   └── earn.tsx
+  ├── _layout.tsx (drawer navigator)
+  ├── send/
+  │   ├── index.tsx
+  │   └── confirm.tsx
+  ├── deposit/
+  │   ├── index.tsx
+  │   ├── crypto.tsx
+  │   └── debit-card.tsx
+  ├── sendpot/
+  │   ├── index.tsx
+  │   └── buy-tickets.tsx
+  ├── trade/
+  │   ├── index.tsx
+  │   └── summary.tsx
+  ├── leaderboard.tsx
+  └── settings/
+      ├── index.tsx
+      └── account/
+          ├── index.tsx
+          ├── edit-profile.tsx
+          └── sendtag/
+              ├── index.tsx
+              └── add.tsx
+```
 
-2. **Implement Authentication Layout**:
-   - Create shared AuthLayout in (auth)/_layout.tsx
-   - Apply to sign-up and onboarding screens
+### 4. Authentication Flow Refinement
 
-3. **Implement Drawer Content**:
-   - Complete drawer with profile and navigation options
-   - Ensure proper routing between tabs and drawer items
+Enhance the authentication flow with a shared layout:
 
-### Phase 2: Complete Core App Screens (Medium Priority)
+```tsx
+// In apps/expo/app/(auth)/_layout.tsx
+export default function AuthLayout() {
+  return (
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: 'black' }
+      }}
+    >
+      <Stack.Screen name="auth/onboarding" />
+      <Stack.Screen name="auth/sign-up" />
+    </Stack>
+  )
+}
+```
 
-1. **Implement Activity Screen**:
-   - Port activity feed with mobile optimizations
-   - Ensure consistent UX with token activity views
+### 5. Dynamic Header Configuration
 
-2. **Complete Send & Receive Flows**:
-   - Implement optimized send flow for mobile
-   - Test QR code scanning and contact selection
+Create a consistent header treatment across screens:
 
-3. **Implement Deposit & Withdraw**:
-   - Create mobile-friendly deposit options
-   - Implement withdraw flow with proper confirmations
+```tsx
+// Header configuration utility
+export function configureScreenHeader(options: {
+  title: string,
+  showBack?: boolean,
+  showMenu?: boolean,
+  showAction?: boolean,
+  actionIcon?: React.ReactNode,
+  onActionPress?: () => void
+}) {
+  return {
+    title: options.title,
+    headerTitle: () => (
+      <XStack ai="center" jc="center">
+        <H4>{options.title}</H4>
+      </XStack>
+    ),
+    headerShown: true,
+    headerShadowVisible: false,
+    headerTitleAlign: 'center',
+    headerLeft: options.showMenu
+      ? () => <MenuButton />
+      : options.showBack
+        ? undefined // Use default back button
+        : () => <View />,
+    headerRight: options.showAction
+      ? () => (
+          <Button
+            borderStyle="unset"
+            backgroundColor="transparent"
+            onPress={options.onActionPress}
+          >
+            {options.actionIcon || <Plus size={24} />}
+          </Button>
+        )
+      : () => <View />
+  }
+}
+```
 
-### Phase 3: Polish and Refinement (Lower Priority)
+## Implementation Plan
 
-1. **Complete Remaining Screens**:
-   - Implement remaining features following priority order
-   - Ensure consistent navigation patterns
+### Phase 1: Navigation Structure (High Priority)
 
-2. **Final Testing and Optimization**:
-   - Test on various screen sizes and devices
-   - Optimize animations and transitions
-   - Finalize responsive design
+1. **Expand Tab Navigation**:
+   - Modify `(drawer)/(tabs)/_layout.tsx` to include all main tab screens
+   - Create empty placeholder screens for each tab
+
+2. **Enhance Drawer Navigation**:
+   - Update drawer content in `(drawer)/_layout.tsx`
+   - Add all menu items with proper routes
+   - Implement navigation logic
+
+3. **Create Auth Layout**:
+   - Update `(auth)/_layout.tsx` to provide consistent auth experience
+   - Style auth screens consistently
+
+### Phase 2: Core Screen Implementation (Medium Priority)
+
+1. **Home Screen**:
+   - Complete home screen implementation
+   - Fix HomeQuickActions and TokenActivityFeed.native.tsx
+
+2. **Profile Screen**:
+   - Implement profile viewing
+   - Add profile editing functionality
+
+3. **Activity Screen**:
+   - Port activity feed
+   - Optimize for mobile
+
+4. **Send/Receive Functionality**:
+   - Implement send flow
+   - Add QR code scanning
+
+### Phase 3: Additional Features (Lower Priority)
+
+1. **Deposit/Withdraw**:
+   - Implement deposit options
+   - Add crypto and fiat flows
+
+2. **Earn & Rewards**:
+   - Port earn functionality
+   - Implement rewards tracking
+
+3. **Trade & SendPot**:
+   - Add basic trading UI
+   - Implement SendPot lottery feature
+
+## Verification
+
+You can use the `xcrun simctl io booted screenshot` command to take a screenshot of the app. Use this to verify that the app is functioning as expected and that the navigation, layout, and screens are working as intended.
+
+```bash
+xcrun simctl io booted screenshot ./screenshot.png
+```
+
+Then read the contents of the screenshot and compare it to the expected output.
 
 ## Next Steps
 
-1. Fix the HomeQuickActions component for better mobile display
-2. Update TokenActivityFeed.native.tsx to properly show "No Activity" state
-3. Create the shared auth layout 
-4. Complete the drawer implementation
-5. Begin porting highest priority screens (Activity, Send, Deposit)
+1. Expand the tab navigation to include all main screens (home, activity, profile, earn)
+2. Update drawer content with all navigation options
+3. Create consistent auth layout
+4. Begin implementing core screens according to priority
+5. Fix existing UI issues in HomeQuickActions and TokenActivityFeed.native.tsx
