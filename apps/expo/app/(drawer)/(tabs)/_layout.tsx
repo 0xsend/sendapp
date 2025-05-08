@@ -1,6 +1,6 @@
 import { Button, useTheme, XStack } from '@my/ui'
 import { DrawerActions } from '@react-navigation/native'
-import { Home, Menu, Plus, User } from '@tamagui/lucide-icons'
+import { Activity, DollarSign, Home, Menu, Plus, User } from '@tamagui/lucide-icons'
 import { IconSendLogo } from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
 import { router, Stack, Tabs, useNavigation, Redirect } from 'expo-router'
@@ -89,6 +89,39 @@ export default function Layout() {
             title: 'Home',
             tabBarIcon: ({ size, color, focused }) => (
               <Home color={focused ? '$color12' : '$color10'} size={size} strokeWidth={2} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="activity"
+          key="activity"
+          options={{
+            headerShown: false,
+            title: 'Activity',
+            tabBarIcon: ({ size, color, focused }) => (
+              <Activity color={focused ? '$color12' : '$color10'} size={size} strokeWidth={2} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="profile"
+          key="profile"
+          options={{
+            headerShown: false,
+            title: 'Profile',
+            tabBarIcon: ({ size, color, focused }) => (
+              <User color={focused ? '$color12' : '$color10'} size={size} strokeWidth={2} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="earn"
+          key="earn"
+          options={{
+            headerShown: false,
+            title: 'Earn',
+            tabBarIcon: ({ size, color, focused }) => (
+              <DollarSign color={focused ? '$color12' : '$color10'} size={size} strokeWidth={2} />
             ),
           }}
         />

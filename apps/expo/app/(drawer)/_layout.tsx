@@ -1,5 +1,18 @@
 import { Button, Container, H3, Paragraph, Separator, XStack, YStack } from '@my/ui'
-import { LogOut, Moon, Settings, User } from '@tamagui/lucide-icons'
+import {
+  Activity,
+  Award,
+  DollarSign,
+  Download,
+  Gift,
+  Home,
+  LogOut,
+  Moon,
+  Send,
+  Settings,
+  TrendingUp,
+  User,
+} from '@tamagui/lucide-icons'
 import { IconSendLogo } from 'app/components/icons'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useUser } from 'app/utils/useUser'
@@ -24,6 +37,18 @@ function ProfileScreen() {
   const router = useRouter()
   const { user, profile } = useUser()
 
+  const menuItems = [
+    { icon: <Home size={20} />, label: 'Home', route: '/(tabs)' },
+    { icon: <Activity size={20} />, label: 'Activity', route: '/(tabs)/activity' },
+    { icon: <Send size={20} />, label: 'Send', route: '/send' },
+    { icon: <Download size={20} />, label: 'Deposit', route: '/deposit' },
+    { icon: <DollarSign size={20} />, label: 'Earn', route: '/(tabs)/earn' },
+    { icon: <TrendingUp size={20} />, label: 'Trade', route: '/trade' },
+    { icon: <Gift size={20} />, label: 'SendPot', route: '/sendpot' },
+    { icon: <Award size={20} />, label: 'Leaderboard', route: '/leaderboard' },
+    { icon: <Settings size={20} />, label: 'Settings', route: '/settings' },
+  ]
+
   return (
     <Container f={1} backgroundColor="$background">
       <YStack f={1} pt={top} pb={bottom} px="$4" gap="$6">
@@ -33,7 +58,12 @@ function ProfileScreen() {
 
         <YStack gap="$4">
           <XStack ai="center" gap="$3">
-            <Button circular size="$5" icon={<User size={20} />} />
+            <Button
+              circular
+              size="$5"
+              icon={<User size={20} />}
+              onPress={() => router.push('/(tabs)/profile')}
+            />
             <YStack>
               <H3>{profile?.name || 'User'}</H3>
               <Paragraph color="$color10">{user?.email || ''}</Paragraph>
@@ -44,16 +74,17 @@ function ProfileScreen() {
         <Separator />
 
         <YStack f={1} gap="$4">
-          <Button
-            variant="outlined"
-            onPress={() => {
-              router.push('/settings')
-            }}
-            icon={<Settings size={20} />}
-            color="$color12"
-          >
-            Settings
-          </Button>
+          {menuItems.map((item) => (
+            <Button
+              key={item.route}
+              variant="outlined"
+              onPress={() => router.push(item.route)}
+              icon={item.icon}
+              color="$color12"
+            >
+              {item.label}
+            </Button>
+          ))}
 
           <Button variant="outlined" icon={<Moon size={20} />} color="$color12">
             Dark Mode
