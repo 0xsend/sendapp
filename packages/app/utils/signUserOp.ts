@@ -1,10 +1,10 @@
-import { type Hex, concat, numberToBytes, hexToBytes, bytesToHex } from 'viem'
-import { assert } from './assert'
-import { signChallenge } from './signChallenge'
-import { USEROP_VERSION, generateChallenge } from './userop'
 import { getUserOperationHash, type UserOperation } from 'permissionless'
 import type { EntryPoint } from 'permissionless/types'
+import { bytesToHex, concat, hexToBytes, numberToBytes, type Hex } from 'viem'
+import { assert } from './assert'
 import { byteaToBase64URLNoPad } from './byteaToBase64URLNoPad'
+import { signChallenge } from './signChallenge'
+import { USEROP_VERSION, generateChallenge } from './userOpConstants'
 
 /**
  * Signs a user operation and returns the signature in a format for the SendVerifier contract.

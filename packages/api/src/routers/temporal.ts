@@ -1,18 +1,19 @@
+import { getTemporalClient } from '@my/temporal/client'
+import { baseMainnetBundlerClient, baseMainnetClient, entryPointAddress } from '@my/wagmi'
+import { startWorkflow } from '@my/workflows/utils'
+import type { PostgrestError } from '@supabase/supabase-js'
 import { TRPCError } from '@trpc/server'
+import { formFields } from 'app/utils/SchemaForm'
+import { assert } from 'app/utils/assert'
+import { hexToBytea } from 'app/utils/hexToBytea'
+import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
+import { throwIf } from 'app/utils/throwIf'
 import debug from 'debug'
+import type { UserOperation } from 'permissionless'
+import { getUserOperationHash } from 'permissionless/utils'
+import { withRetry } from 'viem'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
-import type { UserOperation } from 'permissionless'
-import { baseMainnetClient, entryPointAddress } from '@my/wagmi'
-import { getUserOperationHash } from 'permissionless/utils'
-import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
-import { getTemporalClient } from '@my/temporal/client'
-import { withRetry } from 'viem'
-import type { PostgrestError } from '@supabase/supabase-js'
-import { throwIf } from 'app/utils/throwIf'
-import { assert } from 'app/utils/assert'
-import { startWorkflow } from '@my/workflows/utils'
-import { formFields } from 'app/utils/SchemaForm'
 
 const log = debug('api:temporal')
 
@@ -85,20 +86,50 @@ export const temporalRouter = createTRPCRouter({
 
         await withRetry(
           async () => {
-            const supabaseAdmin = createSupabaseAdminClient()
-            const { data, error } = await supabaseAdmin
-              .from('activity')
-              .select('data->>status')
-              .eq('event_id', workflowId)
-              .eq('event_name', 'temporal_send_account_transfers')
-              .single()
-            throwIf(error)
-            assert(!!data && data.status !== 'initialized', 'Transfer not yet submitted')
-            return data
+            const [initialized, receipt] = await Promise.allSettled([
+              lookupIntializedWorkflow(workflowId)
+                .then(() => true)
+                .catch(() => false),
+              (async () => {
+                // maybe bundler already has the receipt
+                const receipt = await baseMainnetBundlerClient.getUserOperationReceipt({
+                  hash: userOpHash,
+                })
+                if (!receipt) return null
+                const supabase = createSupabaseAdminClient()
+                // do not redirect unless it's been indexed into send_account_transfers
+                const { data, error } = await supabase
+                  .from('send_account_transfers')
+                  .select('*')
+                  .eq('tx_hash', hexToBytea(receipt.receipt.transactionHash))
+                  .maybeSingle()
+                throwIf(error)
+                return data
+              })(),
+            ] as const)
+
+            if (initialized.status === 'fulfilled' && initialized.value) {
+              log('transfer initialized')
+              return true
+            }
+
+            if (receipt.status === 'fulfilled' && receipt.value) {
+              log('userop already onchain', receipt.value.tx_hash)
+              return true
+            }
+
+            throw new TRPCError({
+              code: 'PRECONDITION_FAILED',
+              message: 'Transfer not yet submitted',
+            })
           },
           {
-            retryCount: 10,
-            delay: 500,
+            retryCount: 20,
+            delay: ({ count, error }) => {
+              const backoff = 500 + Math.random() * 100 // add some randomness to the backoff
+              log(`Waiting for transfer to start count=${count} backoff=${backoff}`, error)
+              return Math.min(backoff, 3000) // cap backoff at 3 seconds
+            },
             shouldRetry({ error: e }) {
               const error = e as unknown as PostgrestError
               if (error.code === 'PGRST116' || error.message === 'Transfer not yet submitted') {
@@ -113,3 +144,17 @@ export const temporalRouter = createTRPCRouter({
       }
     ),
 })
+
+async function lookupIntializedWorkflow(workflowId: string): Promise<{ status: string }> {
+  // check if the transfer is initialized
+  const supabaseAdmin = createSupabaseAdminClient()
+  const { data, error } = await supabaseAdmin
+    .from('activity')
+    .select('data->>status')
+    .eq('event_id', workflowId)
+    .eq('event_name', 'temporal_send_account_transfers')
+    .single()
+  throwIf(error)
+  assert(!!data && data.status !== 'initialized', 'Transfer not yet submitted')
+  return data
+}

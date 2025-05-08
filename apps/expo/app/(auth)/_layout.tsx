@@ -29,7 +29,7 @@ export default function AuthLayout() {
             position="absolute"
             top={headerHeight || top || '$4'}
           >
-            <IconSendLogo size={'$4'} color={'$color12'} />
+            <IconSendLogo size={'$8'} color={'$color12'} />
           </Anchor>
           <ScrollView
             pt="$2"

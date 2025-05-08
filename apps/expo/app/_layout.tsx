@@ -61,12 +61,8 @@ export default function HomeLayout() {
       <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
         <Provider initialSession={initialSession}>
           <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen
-              name="(drawer)/(tabs)/index"
-              options={{
-                headerShown: false,
-              }}
-            />
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
             <Stack.Screen
               name="settings/index"

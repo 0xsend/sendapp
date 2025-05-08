@@ -7,7 +7,6 @@ import '@my/ui/src/config/fonts.css'
 
 import { type ColorScheme, NextThemeProvider, useRootTheme } from '@tamagui/next-theme'
 
-import { Concerns } from 'app/concerns'
 import { Provider } from 'app/provider'
 import type { AuthProviderProps } from 'app/provider/auth'
 import { api } from 'app/utils/api'
@@ -56,6 +55,7 @@ function MyApp({
         <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
         <meta name="theme-color" content="#081619" media="(prefers-color-scheme: dark)" />
         <meta property="og:image" content="https://ghassets.send.app/2024/04/send-og-image.png" />
+        <link rel="stylesheet" href="/tamagui.css" />
       </Head>
       <NextThemeProvider
         onChangeTheme={(next) => {
