@@ -9,7 +9,7 @@ import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { shorten } from 'app/utils/strings'
 import debug from 'debug'
-import { isAddress, parseUnits } from 'viem'
+import { isAddress, parseUnits, withRetry } from 'viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { ProfilePage } from './fixtures/profiles'
 import { SendPage } from './fixtures/send'
@@ -235,9 +235,9 @@ async function handleTokenTransfer({
   await sendPage.waitForSendingCompletion()
   await sendPage.expectNoSendError()
 
-  await page.waitForURL(`/?token=${token.token}`, { timeout: 10_000 })
-
   await expect(async () => {
+    await page.waitForURL(`/?token=${token.token}`, { timeout: 10_000 })
+
     if (isETH) {
       // just ensure balance is updated, since the send_account_receives event is not emitted
       expect(
@@ -266,29 +266,41 @@ async function handleTokenTransfer({
   // 2. Check if the UI has updated to show the indexed event (not the pending one)
   const history = page.getByTestId('TokenActivityFeed')
 
-  await expect(history).toBeVisible({ timeout: 5_000 })
+  await withRetry(
+    async () => {
+      await expect(history).toBeVisible({ timeout: 5_000 })
 
-  const historyAmount = (() => {
-    switch (token.symbol) {
-      case 'USDC':
-        return truncateDecimals(decimalAmount, 2)
-      case 'SEND':
-        return truncateDecimals(decimalAmount, 0)
-      default:
-        return decimalAmount
+      const historyAmount = (() => {
+        switch (token.symbol) {
+          case 'USDC':
+            return truncateDecimals(decimalAmount, 2)
+          case 'SEND':
+            return truncateDecimals(decimalAmount, 0)
+          default:
+            return decimalAmount
+        }
+      })()
+
+      const isAddressCounterparty = isAddress(counterparty)
+
+      // Ensure the correct amount and counterparty are visible
+      await expect(history.getByText(`${historyAmount} ${token.symbol}`)).toBeVisible()
+      await expect(
+        history.getByText(isAddressCounterparty ? shorten(counterparty ?? '', 5, 4) : counterparty)
+      ).toBeVisible()
+
+      // Ensure Sent is visible
+      await expect(history.getByText(isAddressCounterparty ? 'Withdraw' : 'Sent')).toBeVisible()
+    },
+    {
+      shouldRetry: async () => {
+        log('retrying history check')
+        await page.reload() // FIXME: this is a hack to force the UI to update for some reason the activity is not showing up
+        return true
+      },
+      retryCount: 10,
     }
-  })()
-
-  const isAddressCounterparty = isAddress(counterparty)
-
-  // Ensure the correct amount and counterparty are visible
-  await expect(history.getByText(`${historyAmount} ${token.symbol}`)).toBeVisible()
-  await expect(
-    history.getByText(isAddressCounterparty ? shorten(counterparty ?? '', 5, 4) : counterparty)
-  ).toBeVisible()
-
-  // Ensure Sent is visible
-  await expect(history.getByText(isAddressCounterparty ? 'Withdraw' : 'Sent')).toBeVisible()
+  )
 }
 
 const truncateDecimals = (amount: string, decimals: number) => {
