@@ -1,18 +1,19 @@
+import { getTemporalClient } from '@my/temporal/client'
+import { baseMainnetBundlerClient, baseMainnetClient, entryPointAddress } from '@my/wagmi'
+import { startWorkflow } from '@my/workflows/utils'
+import type { PostgrestError } from '@supabase/supabase-js'
 import { TRPCError } from '@trpc/server'
+import { formFields } from 'app/utils/SchemaForm'
+import { assert } from 'app/utils/assert'
+import { hexToBytea } from 'app/utils/hexToBytea'
+import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
+import { throwIf } from 'app/utils/throwIf'
 import debug from 'debug'
+import type { UserOperation } from 'permissionless'
+import { getUserOperationHash } from 'permissionless/utils'
+import { withRetry } from 'viem'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
-import type { UserOperation } from 'permissionless'
-import { baseMainnetBundlerClient, baseMainnetClient, entryPointAddress } from '@my/wagmi'
-import { getUserOperationHash } from 'permissionless/utils'
-import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
-import { getTemporalClient } from '@my/temporal/client'
-import { withRetry } from 'viem'
-import type { PostgrestError } from '@supabase/supabase-js'
-import { throwIf } from 'app/utils/throwIf'
-import { assert } from 'app/utils/assert'
-import { startWorkflow } from '@my/workflows/utils'
-import { formFields } from 'app/utils/SchemaForm'
 
 const log = debug('api:temporal')
 
@@ -94,7 +95,16 @@ export const temporalRouter = createTRPCRouter({
                 const receipt = await baseMainnetBundlerClient.getUserOperationReceipt({
                   hash: userOpHash,
                 })
-                return receipt
+                if (!receipt) return null
+                const supabase = createSupabaseAdminClient()
+                // do not redirect unless it's been indexed into send_account_transfers
+                const { data, error } = await supabase
+                  .from('send_account_transfers')
+                  .select('*')
+                  .eq('tx_hash', hexToBytea(receipt.receipt.transactionHash))
+                  .maybeSingle()
+                throwIf(error)
+                return data
               })(),
             ] as const)
 
@@ -104,7 +114,7 @@ export const temporalRouter = createTRPCRouter({
             }
 
             if (receipt.status === 'fulfilled' && receipt.value) {
-              log('userop receipt found', receipt.value.receipt.transactionHash)
+              log('userop already onchain', receipt.value.tx_hash)
               return true
             }
 
