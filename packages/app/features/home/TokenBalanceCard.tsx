@@ -2,50 +2,65 @@ import {
   BigHeading,
   Button,
   Card,
+  LinkableButton,
   Paragraph,
   Spinner,
   XStack,
-  type XStackProps,
   YStack,
 } from '@my/ui'
 import formatAmount from 'app/utils/formatAmount'
-import { useMemo, useState } from 'react'
-import { type Timer, useStopwatch } from 'react-use-precision-timer'
-import { Eye, EyeOff } from '@tamagui/lucide-icons'
+
+import { ChevronLeft, ChevronRight } from '@tamagui/lucide-icons'
 import { useIsPriceHidden } from 'app/features/home/utils/useIsPriceHidden'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
+import { stableCoins } from 'app/data/coins'
+import { useRootScreenParams } from 'app/routers/params'
+import { useHoverStyles } from 'app/utils/useHoverStyles'
 
-export const TokenBalanceCard = () => {
-  // @todo add an enabled flag for when hidden
-  const { dollarBalances, pricesQuery } = useSendAccountBalances()
-  const totalDollarBalance = useMemo(() => {
-    if (!dollarBalances) return 0
-    return Object.values(dollarBalances).reduce((total, balance) => total + balance, 0)
-  }, [dollarBalances])
-  const formattedBalance = formatAmount(totalDollarBalance, 9, 0)
+export const StablesBalanceCard = () => {
+  const hoverStyles = useHoverStyles()
   const { isPriceHidden, toggleIsPriceHidden } = useIsPriceHidden()
-  const timer = useStopwatch()
-  const { isGameVisible, presses, increaseScore } = useShowHideGame(timer)
 
-  const onShowHidePress = () => {
-    toggleIsPriceHidden()
-    increaseScore()
-  }
+  const [queryParams, setParams] = useRootScreenParams()
+  const isStableCoin = stableCoins.some(
+    (coin) => coin.token.toLowerCase() === queryParams.token?.toLowerCase()
+  )
+  const isStablesScreen = queryParams.token === 'stables'
+
+  const { dollarBalances, pricesQuery } = useSendAccountBalances()
+  const dollarTotal = Object.entries(dollarBalances ?? {})
+    .filter(([address]) =>
+      stableCoins.some((coin) => coin.token.toLowerCase() === address.toLowerCase())
+    )
+    .reduce((total, [, balance]) => total + balance, 0)
+  const formattedBalance = formatAmount(dollarTotal, 9, 0)
+
+  const toggleSubScreen = () =>
+    setParams(
+      { ...queryParams, token: queryParams.token === 'stables' ? undefined : 'stables' },
+      { webBehavior: 'push' }
+    )
 
   return (
-    <Card p={'$5'} w={'100%'} jc="space-between" $gtLg={{ p: '$6', h: 244, mih: 244 }}>
+    <Card
+      py={'$5'}
+      px="$4"
+      w={'100%'}
+      jc="space-between"
+      onPress={toggleSubScreen}
+      cursor="pointer"
+    >
       <XStack w={'100%'} zIndex={4}>
-        <YStack jc={'center'} gap={'$5'} w={'100%'} $gtLg={{ gap: '$9' }}>
+        <YStack jc={'center'} gap={'$4'} w={'100%'}>
           <YStack w={'100%'} gap={'$2.5'} jc="space-between">
             <XStack ai={'center'} jc={'space-between'} gap="$2.5" width={'100%'}>
               <Paragraph
                 fontSize={'$5'}
                 color={'$lightGrayTextField'}
                 $theme-light={{ color: '$darkGrayTextField' }}
-                zIndex={1}
                 $gtLg={{ fontSize: '$6' }}
               >
-                Total Balance
+                Cash Balance
               </Paragraph>
               <Button
                 chromeless
@@ -58,31 +73,27 @@ export const TokenBalanceCard = () => {
                 focusStyle={{ backgroundColor: 'transparent' }}
                 p={0}
                 height={'auto'}
-                onPress={toggleIsPriceHidden}
               >
                 <Button.Icon>
-                  {isPriceHidden ? (
-                    <EyeOff
+                  {isStableCoin || isStablesScreen ? (
+                    <ChevronLeft
                       size={'$1.5'}
                       color={'$lightGrayTextField'}
                       $theme-light={{ color: '$darkGrayTextField' }}
+                      $lg={{ display: 'none' }}
                     />
                   ) : (
-                    <Eye size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
+                    <ChevronRight
+                      size={'$1.5'}
+                      color={'$primary'}
+                      $theme-light={{ color: '$color12' }}
+                    />
                   )}
                 </Button.Icon>
               </Button>
             </XStack>
-            {isGameVisible && (
-              <XStack gap={'$2'} jc={'space-between'} ai={'center'} my="auto">
-                <Paragraph fontSize={'$6'} fontWeight={'500'} zIndex={1} color={'$color10'}>
-                  {presses}
-                </Paragraph>
-                <ShowHideGameStopwatch timer={timer} />
-              </XStack>
-            )}
           </YStack>
-          <XStack style={{ color: 'white' }} gap={'$2.5'} onPress={onShowHidePress}>
+          <YStack>
             {(() => {
               switch (true) {
                 case isPriceHidden:
@@ -93,11 +104,15 @@ export const TokenBalanceCard = () => {
                       color={'$color12'}
                       zIndex={1}
                       $gtSm={{ fontSize: 96, lineHeight: 96 }}
+                      onPress={(e) => {
+                        e.stopPropagation()
+                        toggleIsPriceHidden()
+                      }}
                     >
                       {'///////'}
                     </BigHeading>
                   )
-                case pricesQuery.isLoading || !totalDollarBalance:
+                case pricesQuery.isLoading || !dollarBalances:
                   return <Spinner size={'large'} />
                 default:
                   return (
@@ -112,6 +127,10 @@ export const TokenBalanceCard = () => {
                           fontSize: 96,
                           lineHeight: 96,
                         }}
+                        onPress={(e) => {
+                          e.stopPropagation()
+                          toggleIsPriceHidden()
+                        }}
                       >
                         ${formattedBalance}
                       </BigHeading>
@@ -119,74 +138,23 @@ export const TokenBalanceCard = () => {
                   )
               }
             })()}
-          </XStack>
+            <LinkableButton
+              als="flex-end"
+              onPress={(e) => {
+                e.stopPropagation()
+              }}
+              href="/deposit"
+              p={'$4'}
+              w={176}
+              bc={'$color0'}
+              br={'$4'}
+              hoverStyle={hoverStyles}
+            >
+              <Button.Text size={'$4'}>Add Money</Button.Text>
+            </LinkableButton>
+          </YStack>
         </YStack>
       </XStack>
     </Card>
-  )
-}
-
-const useShowHideGame = (timer: Timer) => {
-  const countToStop = 100
-  const countToVisible = 10
-
-  const [isGameVisible, setIsGameVisible] = useState<boolean>(false)
-  const [presses, setPresses] = useState<number>(0)
-
-  const onPress = () => {
-    if (!timer.isRunning() && presses < countToStop) {
-      timer.start()
-      setPresses(presses + 1)
-      return
-    }
-
-    if (presses >= countToStop) {
-      timer.pause()
-      return
-    }
-    if (presses >= countToVisible && !isGameVisible) {
-      setIsGameVisible(true)
-    }
-    setPresses(presses + 1)
-  }
-
-  return { isGameVisible, presses, increaseScore: onPress }
-}
-
-const ShowHideGameStopwatch = ({ timer, ...props }: XStackProps & { timer: Timer }) => {
-  const time = timer.getElapsedRunningTime()
-  return (
-    <XStack {...props}>
-      <Paragraph
-        fontSize={'$4'}
-        zIndex={1}
-        fontWeight={'500'}
-        textTransform={'uppercase'}
-        lineHeight={0}
-        col={'$color10'}
-      >
-        {`0 + ${Math.floor((time / 60000) % 60)}`.slice(-2)}:
-      </Paragraph>
-      <Paragraph
-        fontSize={'$4'}
-        zIndex={1}
-        fontWeight={'500'}
-        textTransform={'uppercase'}
-        lineHeight={0}
-        col={'$color10'}
-      >
-        {`0 + ${Math.floor((time / 1000) % 60)}`.slice(-2)}.
-      </Paragraph>
-      <Paragraph
-        fontSize={'$4'}
-        zIndex={1}
-        fontWeight={'500'}
-        textTransform={'uppercase'}
-        lineHeight={0}
-        col={'$color10'}
-      >
-        {`0 + ${Math.floor((time / 10) % 100)}`.slice(-2)}
-      </Paragraph>
-    </XStack>
   )
 }
