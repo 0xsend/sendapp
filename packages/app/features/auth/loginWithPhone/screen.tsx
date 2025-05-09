@@ -32,7 +32,7 @@ export const LoginWithPhoneScreen = () => {
 
   const formPhone = form.watch('phone')
   const validationError = form.formState.errors.root
-  const canSubmit = formPhone && !validationError
+  const canSubmit = formPhone
 
   const { mutateAsync: getCredentialByPhoneMutateAsync } =
     api.challenge.getCredentialByPhone.useMutation({
@@ -90,7 +90,7 @@ export const LoginWithPhoneScreen = () => {
             color: '$black',
           }}
         >
-          sign in
+          login
         </ButtonText>
       </SubmitButton>
     ),
@@ -98,7 +98,7 @@ export const LoginWithPhoneScreen = () => {
   )
 
   return (
-    <YStack f={1} jc={'space-between'} ai={'center'} gap={'$3.5'} py={'$8'}>
+    <YStack f={1} jc={'space-between'} ai={'center'} gap={'$3.5'} py={'$10'}>
       <YStack w={'100%'} ai={'center'} gap={'$3.5'}>
         <FormProvider {...form}>
           <YStack w={'100%'} ai={'center'}>

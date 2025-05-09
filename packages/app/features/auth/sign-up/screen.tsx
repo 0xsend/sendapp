@@ -60,7 +60,7 @@ export const SignUpScreen = () => {
   const formName = form.watch('name')
   const formIsAgreedToTerms = form.watch('isAgreedToTerms')
   const validationError = form.formState.errors.root
-  const canSubmit = formName && formIsAgreedToTerms
+  const canSubmit = formName && formIsAgreedToTerms && captchaToken
 
   const { mutateAsync: signUpMutateAsync } = api.auth.signUp.useMutation({
     retry: false,
@@ -226,6 +226,7 @@ export const SignUpScreen = () => {
             }}
             props={{
               name: {
+                testID: 'sendtag-input',
                 placeholder: 'Input desired Sendtag',
                 color: '$color12',
                 fontWeight: '500',

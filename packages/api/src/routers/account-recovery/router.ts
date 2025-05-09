@@ -173,7 +173,7 @@ export const accountRecoveryRouter = createTRPCRouter({
         logger('Error signing in with phone: ', error)
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message: `Failed to sign in: ${error.message}`,
+          message: `Failed to login: ${error.message}`,
         })
       }
     }),
