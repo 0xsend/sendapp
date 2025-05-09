@@ -43,6 +43,7 @@ export type RootParams = {
   search?: string
   profile?: string
   activity?: string
+  subPage?: 'investments' | 'stables' | Address
 }
 
 const { useParam: useRootParam, useParams: useRootParams } = createParam<RootParams>()
@@ -51,12 +52,6 @@ const useNav = () => {
   const [nav, setNavParam] = useRootParam('nav')
 
   return [nav, setNavParam] as const
-}
-
-const useToken = () => {
-  const [token, setTokenParam] = useRootParam('token')
-
-  return [token, setTokenParam] as const
 }
 
 const useSearch = () => {
@@ -76,21 +71,27 @@ const useActivity = () => {
   return [activity, setActivityParam] as const
 }
 
+const useSubPage = () => {
+  const [subPage, setSubPage] = useRootParam('subPage')
+
+  return [subPage, setSubPage] as const
+}
+
 export const useRootScreenParams = () => {
   const { setParams } = useRootParams()
   const [nav] = useNav()
-  const [token] = useToken()
   const [search] = useSearch()
   const [profile] = useProfile()
   const [activity] = useActivity()
+  const [subPage] = useSubPage()
 
   return [
     {
       nav,
-      token,
       search,
       profile,
       activity,
+      subPage,
     },
     setParams,
   ] as const

@@ -3,8 +3,8 @@ import { useCoin } from 'app/provider/coins'
 import { useRootScreenParams, useSendScreenParams } from 'app/routers/params'
 
 export const useCoinFromTokenParam = () => {
-  const [{ token }] = useRootScreenParams()
-  return useCoin(token)
+  const [{ subPage }] = useRootScreenParams()
+  return useCoin(subPage)
 }
 
 export const useCoinFromSendTokenParam = () => {

@@ -16,7 +16,7 @@ import { useIsPriceHidden } from 'app/features/home/utils/useIsPriceHidden'
 
 export const TokenBalanceList = () => {
   const { coins, isLoading } = useCoins()
-  const [{ token: tokenParam }] = useRootScreenParams()
+  const [{ subPage }] = useRootScreenParams()
   const hoverStyles = useHoverStyles()
   const { data: tokensMarketData, isLoading: isLoadingTokensMarketData } =
     useMultipleTokensMarketData(coins?.map((c) => c.coingeckoTokenId) || [])
@@ -31,11 +31,11 @@ export const TokenBalanceList = () => {
         ai={'center'}
         p={'$3.5'}
         br={'$4'}
-        disabled={tokenParam !== undefined && tokenParam !== coin.token}
+        disabled={subPage !== undefined && subPage !== coin.token}
         disabledStyle={{ opacity: 0.5 }}
         href={{
           pathname: '/',
-          query: { token: coin.token },
+          query: { subPage: coin.token },
         }}
         hoverStyle={hoverStyles}
         tokensMarketData={tokensMarketData}

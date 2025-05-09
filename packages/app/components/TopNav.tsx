@@ -101,7 +101,6 @@ export function TopNav({
   showOnGtLg = false,
   hideRightActions = false,
 }: TopNavProps) {
-  const [queryParams, setRootParams] = useRootScreenParams()
   const path = usePathname()
   const parts = path.split('/').filter(Boolean)
   const { push, back } = useRouter()
@@ -112,12 +111,6 @@ export function TopNav({
   const hasSelectedCoin = Boolean(selectedCoin)
 
   const handleBack = () => {
-    // pop to the base path if subroute. e.g. /account/settings/edit-profile -> /account
-    // else, go to home page
-    if (hasSelectedCoin) {
-      setRootParams({ ...queryParams, token: undefined })
-      return
-    }
     if (backFunction === 'router') {
       back()
       return
