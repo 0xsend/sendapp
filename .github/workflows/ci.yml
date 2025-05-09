@@ -19,10 +19,10 @@ jobs:
     runs-on: arc-runner-set
     permissions:
       contents: read
-      packages: write # Required to push to GHCR
     outputs:
-      tags: ${{ steps.meta.outputs.tags }} # Output tags from metadata action
-      labels: ${{ steps.meta.outputs.labels }} # Output labels from metadata action
+      image-tar: ${{ steps.output-tar.outputs.path }}
+      image-name: next-app
+      image-tag: ${{ steps.image-tag.outputs.tag }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -32,36 +32,48 @@ jobs:
       - name: Set Environment Variables from Template
         run: cp .env.local.template .env
 
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract build args from environment file
+        id: build-args
+        run: |
+          # Extract env vars and format them for docker build-args
+          echo "args<<EOF" >> $GITHUB_OUTPUT
+          cat .env.local.template | grep -v '^#' | grep -v '^$' >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository }}/next-app
-          tags: |
-            type=sha,prefix= # Git SHA tag (e.g., sha-abcdef1)
-            type=ref,event=branch # Branch name tag (e.g., main, dev)
-            type=ref,event=pr # PR number tag (e.g., pr-123)
-            type=ref,event=tag # Git tag (e.g., v1.0.0)
-            # Add other tag types if needed
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Build and push Docker image
-        id: build-push # Give the step an ID
+      - name: Generate unique image tag
+        id: image-tag
+        run: echo "tag=next-app-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_OUTPUT
+
+      - name: Build Docker image
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./apps/next/Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          push: false
+          load: true
+          tags: ${{ steps.image-tag.outputs.tag }}
+          build-args: ${{ steps.build-args.outputs.args }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Export Docker image to tarball
+        run: docker save ${{ steps.image-tag.outputs.tag }} > next-app-image.tar
+
+      - name: Upload Docker image as artifact
+        id: upload-artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-app-image
+          path: next-app-image.tar
+          retention-days: 1
+
+      - name: Output tarball path
+        id: output-tar
+        run: echo "path=next-app-image.tar" >> $GITHUB_OUTPUT
 
   unit-tests:
     name: Unit Tests
@@ -171,7 +183,8 @@ jobs:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
       YARN_ENABLE_HARDENED_MODE: 0
-      NEXT_APP_IMAGE_TAG: ${{ needs.build_next_image.outputs.tags }}
+      NEXT_APP_IMAGE_NAME: ${{ needs.build_next_image.outputs.image-name }}
+      NEXT_APP_IMAGE_TAG: ${{ needs.build_next_image.outputs.image-tag }}
 
     # for writing PR comments
     permissions:
@@ -199,11 +212,24 @@ jobs:
       - name: Yarn Install
         shell: bash
         run: yarn install --immutable
+
+      - name: Download Docker image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: next-app-image
+          path: ./
+
+      - name: Load Docker image
+        run: |
+          docker load < next-app-image.tar
+          echo "Loaded Docker image: ${{ env.NEXT_APP_IMAGE_TAG }}"
+          docker images
+
       # @todo anvil fixtures cause dirty repo, but only in github actions 😢
       # - name: All Changes Committed
       #   shell: bash
       #   run: git diff --exit-code
-      # Build step removed - image is pre-built
+
       - name: Install Playwright Dependencies
         run: yarn playwright playwright install --with-deps
       - name: Playwright Tests
