@@ -66,7 +66,7 @@ export const LoginWithPhoneScreen = () => {
     ({ submit }: { submit: () => void }) => (
       <SubmitButton
         alignSelf={'center'}
-        w={'90%'}
+        w={'100%'}
         theme="green"
         onPress={submit}
         py={'$5'}
@@ -102,10 +102,10 @@ export const LoginWithPhoneScreen = () => {
       <YStack w={'100%'} ai={'center'} gap={'$3.5'}>
         <FormProvider {...form}>
           <YStack w={'100%'} ai={'center'}>
-            <Paragraph w={'90%'} size={'$8'} fontWeight={500} tt={'uppercase'}>
+            <Paragraph w={'100%'} size={'$8'} fontWeight={500} tt={'uppercase'}>
               login with your phone
             </Paragraph>
-            <Paragraph w={'90%'} size={'$5'} color={'$olive'}>
+            <Paragraph w={'100%'} size={'$5'} color={'$olive'}>
               If you created your account with phone number, login using it
             </Paragraph>
           </YStack>

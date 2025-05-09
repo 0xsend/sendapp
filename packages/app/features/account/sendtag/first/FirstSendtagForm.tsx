@@ -6,8 +6,8 @@ import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import { api } from 'app/utils/api'
 import { useRouter } from 'solito/router'
 import { useUser } from 'app/utils/useUser'
-import { ReferredBy } from 'app/features/account/sendtag/checkout/checkout-form'
 import { useValidateSendtag } from 'app/utils/tags/useValidateSendtag'
+import { ReferredBy } from 'app/features/account/sendtag/components/ReferredBy'
 
 const SendtagSchemaWithoutRestrictions = z.object({
   name: formFields.text,

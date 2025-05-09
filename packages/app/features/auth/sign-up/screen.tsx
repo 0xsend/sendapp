@@ -60,9 +60,7 @@ export const SignUpScreen = () => {
   const formName = form.watch('name')
   const formIsAgreedToTerms = form.watch('isAgreedToTerms')
   const validationError = form.formState.errors.root
-  const canSubmit =
-    signUpFormState === SignUpFormState.PasskeyCreationFailed ||
-    (!!formName && !validationError && formIsAgreedToTerms)
+  const canSubmit = formName && formIsAgreedToTerms
 
   const { mutateAsync: signUpMutateAsync } = api.auth.signUp.useMutation({
     retry: false,
@@ -111,9 +109,11 @@ export const SignUpScreen = () => {
 
       await registerFirstSendtagMutateAsync({ name })
     } catch (error) {
+      const message = formatErrorMessage(error).split('.')[0] ?? 'Unknown error'
+
       form.setError('root', {
         type: 'custom',
-        message: error.message,
+        message,
       })
       return
     }
@@ -121,7 +121,7 @@ export const SignUpScreen = () => {
     router.replace('/')
   }
 
-  const handleSignIn = async () => {
+  const handleSignIn = useCallback(async () => {
     setIsSigningIn(true)
 
     try {
@@ -136,52 +136,84 @@ export const SignUpScreen = () => {
     } finally {
       setIsSigningIn(false)
     }
-  }
+  }, [signIn, toast.show, router.push, redirectUri])
 
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (
-      <SubmitButton
-        alignSelf={'center'}
-        w={'90%'}
-        theme="green"
-        onPress={submit}
-        br={'$4'}
-        bw={'$1'}
-        disabled={!canSubmit}
-        $theme-light={{
-          disabledStyle: { opacity: 0.5 },
-        }}
-        $theme-dark={{
-          variant: canSubmit ? undefined : 'outlined',
-        }}
-      >
-        <Button.Text
-          ff={'$mono'}
-          fontWeight={'500'}
-          tt="uppercase"
-          size={'$5'}
-          color={canSubmit ? '$black' : '$primary'}
+      <YStack>
+        <SubmitButton
+          alignSelf={'center'}
+          w={'100%'}
+          theme="green"
+          onPress={submit}
+          py={'$5'}
+          br={'$4'}
+          bw={'$1'}
+          disabled={!canSubmit}
           $theme-light={{
-            color: '$black',
+            disabledStyle: { opacity: 0.5 },
+          }}
+          $theme-dark={{
+            variant: canSubmit ? undefined : 'outlined',
           }}
         >
-          {signUpFormState === SignUpFormState.PasskeyCreationFailed
-            ? 'create passkey'
-            : 'create account'}
-        </Button.Text>
-      </SubmitButton>
+          <Button.Text
+            ff={'$mono'}
+            fontWeight={'500'}
+            tt="uppercase"
+            size={'$5'}
+            color={canSubmit ? '$black' : '$primary'}
+            $theme-light={{
+              color: '$black',
+            }}
+          >
+            {signUpFormState === SignUpFormState.PasskeyCreationFailed
+              ? 'create passkey'
+              : 'create account'}
+          </Button.Text>
+        </SubmitButton>
+        <YStack w={'100%'} gap={'$3.5'} mt={'$3.5'}>
+          <XStack w={'100%'} gap={'$3.5'} ai={'center'}>
+            <Separator bc={'$color10'} />
+            <Paragraph tt={'uppercase'}>or</Paragraph>
+            <Separator bc={'$color10'} />
+          </XStack>
+          <Button
+            onPress={handleSignIn}
+            transparent
+            chromeless
+            backgroundColor="transparent"
+            hoverStyle={{ backgroundColor: 'transparent' }}
+            pressStyle={{ backgroundColor: 'transparent' }}
+            focusStyle={{ backgroundColor: 'transparent' }}
+            bw={0}
+            br={0}
+            height={'auto'}
+            disabled={isSigningIn}
+          >
+            <Button.Text
+              color={'$primary'}
+              $theme-light={{
+                color: '$color12',
+              }}
+            >
+              {isSigningIn ? 'Signing in...' : 'Sign in'}
+            </Button.Text>
+          </Button>
+        </YStack>
+      </YStack>
     ),
-    [canSubmit, signUpFormState]
+    [canSubmit, signUpFormState, isSigningIn, handleSignIn]
   )
 
   return (
-    <YStack f={1} jc={'space-around'} ai={'center'} gap={'$3.5'} py={'$3'}>
+    <YStack f={1} jc={'space-around'} ai={'center'} gap={'$3.5'} pt={'$5'}>
       <FormProvider {...form}>
         <YStack w={'100%'} ai={'center'}>
-          <Paragraph w={'90%'} size={'$8'} fontWeight={500} tt={'uppercase'}>
+          <Paragraph w={'100%'} size={'$8'} fontWeight={500} tt={'uppercase'}>
             create your account
           </Paragraph>
-          <Paragraph w={'90%'} size={'$5'} color={'$olive'}>
+          <Paragraph w={'100%'} size={'$5'} color={'$olive'}>
             Sendtags are usernames
           </Paragraph>
           <SchemaForm
@@ -211,7 +243,6 @@ export const SignUpScreen = () => {
                   placeholderTextColor: '$darkGrayTextField',
                 },
                 fontSize: '$5',
-                disabled: signUpFormState === SignUpFormState.PasskeyCreationFailed,
                 onFocus: () => setIsInputFocused(true),
                 onBlur: () => setIsInputFocused(false),
                 fieldsetProps: {
@@ -224,7 +255,6 @@ export const SignUpScreen = () => {
                 ),
               },
               isAgreedToTerms: {
-                disabled: signUpFormState === SignUpFormState.PasskeyCreationFailed,
                 id: termsCheckboxId,
               },
             }}
@@ -260,9 +290,6 @@ export const SignUpScreen = () => {
                       }}
                     />
                   </XStack>
-                  {validationError && (
-                    <Paragraph color={'$error'}>{validationError.message}</Paragraph>
-                  )}
                   <XStack gap={'$2'} ai={'center'}>
                     {isAgreedToTerms}
                     <Label
@@ -300,19 +327,18 @@ export const SignUpScreen = () => {
                       </Anchor>
                     </Label>
                   </XStack>
+                  {validationError && (
+                    <Paragraph color={'$error'}>{validationError.message}</Paragraph>
+                  )}
                 </FadeCard>
               )
             }}
           </SchemaForm>
         </YStack>
-        <YStack w={'100%'} gap={'$3.5'}>
-          <XStack w={'100%'} gap={'$3.5'} ai={'center'}>
-            <Separator bc={'$color10'} />
-            <Paragraph tt={'uppercase'}>or</Paragraph>
-            <Separator bc={'$color10'} />
-          </XStack>
-          <Button
-            onPress={handleSignIn}
+        <YStack w={'100%'} ai={'center'} gap={'$3.5'}>
+          <Turnstile onSuccess={(t) => setCaptchaToken(t)} />
+          <LinkableButton
+            href={'/auth/login-with-phone'}
             transparent
             chromeless
             backgroundColor="transparent"
@@ -323,41 +349,19 @@ export const SignUpScreen = () => {
             br={0}
             height={'auto'}
             disabled={isSigningIn}
+            pb={'$3.5'}
           >
             <Button.Text
               color={'$primary'}
               $theme-light={{
                 color: '$color12',
               }}
+              ta={'center'}
             >
-              {isSigningIn ? 'Signing in...' : 'Sign in'}
+              Don't see your passkey? Try login with phone number
             </Button.Text>
-          </Button>
+          </LinkableButton>
         </YStack>
-        <Turnstile onSuccess={(t) => setCaptchaToken(t)} />
-        <LinkableButton
-          href={'/auth/login-with-phone'}
-          transparent
-          chromeless
-          backgroundColor="transparent"
-          hoverStyle={{ backgroundColor: 'transparent' }}
-          pressStyle={{ backgroundColor: 'transparent' }}
-          focusStyle={{ backgroundColor: 'transparent' }}
-          bw={0}
-          br={0}
-          height={'auto'}
-          disabled={isSigningIn}
-        >
-          <Button.Text
-            color={'$primary'}
-            $theme-light={{
-              color: '$color12',
-            }}
-            ta={'center'}
-          >
-            Don't see your passkey? Try login with phone number
-          </Button.Text>
-        </LinkableButton>
       </FormProvider>
     </YStack>
   )
