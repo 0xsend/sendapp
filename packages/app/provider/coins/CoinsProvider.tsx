@@ -1,7 +1,13 @@
 import { createContext, useContext, useMemo } from 'react'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import type { allCoins, CoinWithBalance } from 'app/data/coins'
-import { coins as coinsOg, partnerCoins, allCoins as allCoinsList } from 'app/data/coins'
+import {
+  coins as coinsOg,
+  partnerCoins,
+  allCoins as allCoinsList,
+  investmentCoins as investmentCoinsList,
+  stableCoins as stableCoinsList,
+} from 'app/data/coins'
 import { isAddress } from 'viem'
 import type { UseQueryResult } from '@tanstack/react-query'
 import type { UseBalanceReturnType, UseReadContractsReturnType } from 'wagmi'
@@ -9,8 +15,9 @@ import type { UseBalanceReturnType, UseReadContractsReturnType } from 'wagmi'
 type CoinsContextType = {
   coins: CoinWithBalance[]
   allCoins: CoinWithBalance[]
+  investmentCoins: CoinWithBalance[]
+  stableCoins: CoinWithBalance[]
   isLoading: boolean
-  totalPrice: number | undefined
   ethQuery: UseBalanceReturnType
   tokensQuery: UseReadContractsReturnType
   pricesQuery: UseQueryResult<Record<allCoins[number]['token'], number>, Error>
@@ -19,11 +26,9 @@ type CoinsContextType = {
 const CoinsContext = createContext<CoinsContextType | undefined>(undefined)
 
 export function CoinsProvider({ children }: { children: React.ReactNode }) {
-  const balanceData = useSendAccountBalances()
+  const { balances, isLoading, ethQuery, tokensQuery, pricesQuery } = useSendAccountBalances()
 
   const coins = useMemo(() => {
-    const { balances } = balanceData
-
     // Create coins array regardless of balances
     const coinsWithBalances = coinsOg.map((coin) => ({
       ...coin,
@@ -46,19 +51,42 @@ export function CoinsProvider({ children }: { children: React.ReactNode }) {
       }))
 
     return [...coinsWithBalances, ...activePartnerCoins]
-  }, [balanceData])
+  }, [balances])
 
   const allCoins = useMemo(() => {
-    const { balances } = balanceData
-
     return allCoinsList.map((coin) => ({
       ...coin,
       balance: balances?.[coin.token === 'eth' ? coin.symbol : coin.token],
     }))
-  }, [balanceData])
+  }, [balances])
+
+  const investmentCoins = useMemo(() => {
+    return investmentCoinsList.map((coin) => ({
+      ...coin,
+      balance: balances?.[coin.token === 'eth' ? coin.symbol : coin.token],
+    }))
+  }, [balances])
+
+  const stableCoins = useMemo(() => {
+    return stableCoinsList.map((coin) => ({
+      ...coin,
+      balance: balances?.[coin.token],
+    }))
+  }, [balances])
 
   return (
-    <CoinsContext.Provider value={{ ...balanceData, coins, allCoins }}>
+    <CoinsContext.Provider
+      value={{
+        isLoading,
+        ethQuery,
+        tokensQuery,
+        pricesQuery,
+        coins,
+        allCoins,
+        investmentCoins,
+        stableCoins,
+      }}
+    >
       {children}
     </CoinsContext.Provider>
   )
@@ -80,6 +108,5 @@ export const useCoin = (
     isAddress(addressOrSymbol) || addressOrSymbol === 'eth'
       ? allCoins.find((coin) => coin.token === addressOrSymbol)
       : allCoins.find((coin) => coin.symbol === addressOrSymbol)
-  if (!coin) throw new Error(`Coin not found for ${addressOrSymbol}`)
   return { coin, ...rest }
 }
