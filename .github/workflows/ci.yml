@@ -317,7 +317,13 @@ jobs:
           workers=$(MAX_WORKERS=4 node ./.devops/bin/worker-count)
           export NEXT_APP_IMAGE_TAG=${{ needs.build_next_image.outputs.image-tag }}
           export NEXT_APP_PORT=0.0.0.0:3000
-          export PLAYWRIGHT_WEB_SERVER_COMMAND="docker compose up next-app"
+          docker compose up -d next-app
+          docker compose logs -f --no-log-prefix next-app &
+          # wait for next app to be ready
+          for i in {1..30}; do
+            curl -s http://localhost:3000 > /dev/null && break || echo "Attempt $i failed, trying again..."
+            sleep 1
+          done
           yarn playwright test --workers=$workers --shard=${{ matrix.shard }}/4
       - name: Tilt Down
         # always run tilt down if tilt ci started
