@@ -9,16 +9,20 @@ import {
   YStack,
 } from '@my/ui'
 import formatAmount from 'app/utils/formatAmount'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { type Timer, useStopwatch } from 'react-use-precision-timer'
-import { useCoins } from 'app/provider/coins'
 import { Eye, EyeOff } from '@tamagui/lucide-icons'
 import { useIsPriceHidden } from 'app/features/home/utils/useIsPriceHidden'
+import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 
 export const TokenBalanceCard = () => {
   // @todo add an enabled flag for when hidden
-  const { totalPrice, pricesQuery } = useCoins()
-  const formattedBalance = formatAmount(totalPrice, 9, 0)
+  const { dollarBalances, pricesQuery } = useSendAccountBalances()
+  const totalDollarBalance = useMemo(() => {
+    if (!dollarBalances) return 0
+    return Object.values(dollarBalances).reduce((total, balance) => total + balance, 0)
+  }, [dollarBalances])
+  const formattedBalance = formatAmount(totalDollarBalance, 9, 0)
   const { isPriceHidden, toggleIsPriceHidden } = useIsPriceHidden()
   const timer = useStopwatch()
   const { isGameVisible, presses, increaseScore } = useShowHideGame(timer)
@@ -93,7 +97,7 @@ export const TokenBalanceCard = () => {
                       {'///////'}
                     </BigHeading>
                   )
-                case pricesQuery.isLoading || !totalPrice:
+                case pricesQuery.isLoading || !totalDollarBalance:
                   return <Spinner size={'large'} />
                 default:
                   return (
