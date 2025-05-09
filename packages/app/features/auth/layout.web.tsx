@@ -22,7 +22,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
       >
         <Container
           safeAreaProps={{
-            style: { flex: 1, pb: '$3.5' },
+            style: { flex: 1 },
             edges: {
               top: 'off',
               bottom: 'maximum',
@@ -32,7 +32,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
           }}
           flexDirection={'column'}
         >
-          <XStack w={'90%'} alignSelf={'center'}>
+          <XStack w={'100%'} alignSelf={'center'}>
             <Link href={'/'} pt="$7">
               <IconSendLogo size={'$3.5'} color={'$color12'} />
             </Link>

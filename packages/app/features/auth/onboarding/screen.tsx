@@ -20,6 +20,7 @@ import { assert } from 'app/utils/assert'
 import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import { useValidateSendtag } from 'app/utils/tags/useValidateSendtag'
 import { useFirstSendtagCookie } from 'app/utils/useFirstSendtagCookie'
+import { formatErrorMessage } from 'app/utils/formatErrorMessage'
 
 const OnboardingSchema = z.object({
   name: formFields.text,
@@ -113,7 +114,7 @@ export function OnboardingScreen() {
         return
       }
 
-      const message = error?.message?.split('.')[0] ?? 'Unknown error'
+      const message = formatErrorMessage(error).split('.')[0] ?? 'Unknown error'
 
       // Check for "No user id" which means token is invalid
       if (message.includes('No user id')) {
@@ -138,7 +139,7 @@ export function OnboardingScreen() {
     ({ submit }: { submit: () => void }) => (
       <SubmitButton
         alignSelf={'center'}
-        w={'90%'}
+        w={'100%'}
         theme="green"
         onPress={submit}
         py={'$5'}
@@ -173,13 +174,13 @@ export function OnboardingScreen() {
   if (!isClient) return null
 
   return (
-    <YStack f={1} jc={'space-between'} ai={'center'} gap={'$3.5'} py={'$8'}>
+    <YStack f={1} jc={'space-between'} ai={'center'} gap={'$3.5'} py={'$10'}>
       <FormProvider {...form}>
         <YStack w={'100%'} ai={'center'}>
-          <Paragraph w={'90%'} size={'$8'} fontWeight={500} tt={'uppercase'}>
+          <Paragraph w={'100%'} size={'$8'} fontWeight={500} tt={'uppercase'}>
             finish your account
           </Paragraph>
-          <Paragraph w={'90%'} size={'$5'} color={'$olive'}>
+          <Paragraph w={'100%'} size={'$5'} color={'$olive'}>
             Sendtags are usernames
           </Paragraph>
           <SchemaForm
@@ -210,6 +211,7 @@ export function OnboardingScreen() {
                 fontSize: '$5',
                 onFocus: () => setIsInputFocused(true),
                 onBlur: () => setIsInputFocused(false),
+                testID: 'sendtag-input',
                 fieldsetProps: {
                   width: '100%',
                 },

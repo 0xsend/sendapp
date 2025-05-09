@@ -14,3 +14,10 @@ REVOKE EXECUTE ON FUNCTION query_webauthn_credentials_by_phone(phone_number TEXT
 REVOKE EXECUTE ON FUNCTION query_webauthn_credentials_by_phone(phone_number TEXT) FROM authenticated;
 GRANT EXECUTE ON FUNCTION query_webauthn_credentials_by_phone(phone_number TEXT) TO service_role;
 
+-- Drop the existing trigger
+DROP TRIGGER IF EXISTS "insert_verification_tag_registration" ON "public"."tags";
+
+-- Recreate it for both INSERT and UPDATE
+CREATE TRIGGER "insert_verification_tag_registration"
+AFTER INSERT OR UPDATE ON "public"."tags"
+FOR EACH ROW EXECUTE PROCEDURE "public"."insert_verification_tag_registration"();
