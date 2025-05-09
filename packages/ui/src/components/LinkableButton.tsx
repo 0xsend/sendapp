@@ -87,8 +87,17 @@ const LinkableButtonFrame = styled(Button, {
 })
 
 const LinkableButton_ = ({ href, ...props }: LinkableButtonProps) => {
-  const linkProps = useLink({ href })
-  return <LinkableButtonFrame {...props} {...linkProps} />
+  const { onPress: linkOnPress, ...linkProps } = useLink({ href })
+  return (
+    <LinkableButtonFrame
+      onPress={(e) => {
+        e.stopPropagation()
+        linkOnPress(e)
+      }}
+      {...props}
+      {...linkProps}
+    />
+  )
 }
 
 export const LinkableButton = withStaticProperties(LinkableButton_, {

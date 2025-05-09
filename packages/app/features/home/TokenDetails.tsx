@@ -1,27 +1,26 @@
 import { Card, Paragraph, Separator, Spinner, Stack, Theme, useMedia, XStack, YStack } from '@my/ui'
 import { ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
 import { IconCoin, IconError } from 'app/components/icons'
-import type { allCoins, CoinWithBalance } from 'app/data/coins'
+import { stableCoins, type allCoins, type CoinWithBalance } from 'app/data/coins'
 import { HomeQuickActions } from 'app/features/home/HomeQuickActions'
 import { useTokenMarketData } from 'app/utils/coin-gecko'
 import { convertBalanceToFiat } from 'app/utils/convertBalanceToUSD'
 import formatAmount from 'app/utils/formatAmount'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { TokenActivity } from './TokenActivity'
+import { useMemo } from 'react'
 
 export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
   const media = useMedia()
   const isSmallScreen = !media.gtXs
+  const isStableCoin = useMemo(() => {
+    return stableCoins.some((c) => c.token === coin.token)
+  }, [coin])
 
   return (
     <YStack f={1} gap={isSmallScreen ? '$3' : '$5'} $gtLg={{ w: '45%', pb: '$0' }} pb="$4">
       <YStack gap={isSmallScreen ? '$2.5' : '$3.5'} $gtLg={{ gap: '$5' }}>
-        <Card
-          p={isSmallScreen ? '$3.5' : '$4.5'}
-          w={'100%'}
-          jc={'space-between'}
-          $gtLg={{ h: 244, p: '$6' }}
-        >
+        <Card py="$5" px="$4" w={'100%'} jc={'space-between'}>
           <YStack gap="$4">
             <XStack ai={'center'} gap={'$3'}>
               <IconCoin size={'$2'} symbol={coin.symbol} />
@@ -48,9 +47,9 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
           </YStack>
         </Card>
         <HomeQuickActions>
-          <HomeQuickActions.Deposit />
+          {isStableCoin && <HomeQuickActions.Deposit />}
           <HomeQuickActions.Send />
-          <HomeQuickActions.Trade />
+          {!isStableCoin && <HomeQuickActions.Trade />}
         </HomeQuickActions>
       </YStack>
       <YStack gap={'$3'}>
