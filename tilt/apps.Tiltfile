@@ -40,7 +40,10 @@ if CFG.dockerize:
 
     #     ]
     # )
-    docker_compose("../docker-compose.yml")
+    docker_compose(
+        configPaths = ["../docker-compose.yml"],
+        env_file = "../.env.local" if os.path.exists("../.env.local") else None,
+    )
     dc_resource(
         "next-app",
         labels = ["apps"],
