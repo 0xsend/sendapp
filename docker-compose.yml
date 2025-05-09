@@ -23,7 +23,7 @@ services:
         - NEXT_PUBLIC_KYBER_CLIENT_ID=${NEXT_PUBLIC_KYBER_CLIENT_ID}
     restart: always
     ports:
-      - ${NEXT_APP_PORT:-}:3000
+      - ${NEXT_APP_PORT:-3000}:3000
     env_file:
       - path: .env.development
       - path: .env.development.docker
