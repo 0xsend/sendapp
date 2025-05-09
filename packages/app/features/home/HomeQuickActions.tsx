@@ -113,8 +113,8 @@ const Trade = () => {
         height={'auto'}
       >
         <Theme name="green">
-          <IconSwap
-            size={'$1'}
+          <IconPlus
+            size={'$1.5'}
             $theme-dark={{ color: '$primary' }}
             $theme-light={{ color: '$color12' }}
           />
@@ -127,7 +127,7 @@ const Trade = () => {
           numberOfLines={1}
           ellipsizeMode="tail"
         >
-          Trade
+          Invest
         </ButtonText>
       </YStack>
     </QuickActionButton>
