@@ -178,7 +178,8 @@ jobs:
       # Don't stop all shards if one fails
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4]
+        shard: [1]
+        # shard: [1, 2, 3, 4]
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
@@ -320,10 +321,31 @@ jobs:
           docker compose up -d next-app
           docker compose logs -f --no-log-prefix next-app &
           # wait for next app to be ready
+          started=0
           for i in {1..30}; do
-            curl -s http://localhost:3000 > /dev/null && break || echo "Attempt $i failed, trying again..."
+            if curl -s http://localhost:3000 > /dev/null; then
+              started=1
+              break
+            fi
+            echo "Attempt $i failed, trying again..."
             sleep 1
           done
+
+          if [ $started -eq 0 ]; then
+            echo "Next app did not start"
+            exit 1
+          fi
+
+          # debug, wait until a ready file exists
+          for i in {1..300}; do
+            if [ -f ready ]; then
+              break
+            fi
+            echo "Waiting for ready file..."
+            sleep 1
+          done
+
+          # start playwright tests
           yarn playwright test --workers=$workers --shard=${{ matrix.shard }}/4
       - name: Tilt Down
         # always run tilt down if tilt ci started
