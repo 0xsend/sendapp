@@ -116,7 +116,9 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   webServer: {
     command: process.env.CI
-      ? 'yarn workspace next-app run serve --port 3000'
+      ? process.env.PLAYWRIGHT_WEB_SERVER_COMMAND
+        ? process.env.PLAYWRIGHT_WEB_SERVER_COMMAND
+        : 'yarn workspace next-app run serve --port 3000'
       : 'yarn workspace next-app run dev',
     url: baseURL,
     // reuseExistingServer: !process.env.CI,
