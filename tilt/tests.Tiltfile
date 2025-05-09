@@ -85,10 +85,9 @@ local_resource(
         "anvil:fixtures",
         "aa_bundler:base",
         "snaplet:sync",
-        "next:web",
         "supabase",
         "shovel",
-    ],
+    ] + (["next:web"] if not CI else []),  # in CI, we will let playwright test start the web server
 )
 
 local_resource(

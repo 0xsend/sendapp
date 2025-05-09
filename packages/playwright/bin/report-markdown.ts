@@ -8,9 +8,18 @@ import type {
   // TestCase,
   TestResult,
 } from '@playwright/test/reporter'
-const file = Bun.file(`${import.meta.dir}/../playwright-report/report.json`)
+import path from 'node:path'
+
+// Read report path from ENV var, default to ../playwright-report/report.json relative to script dir
+const reportJsonPath = process.env.PLAYWRIGHT_REPORT_PATH
+  ? path.resolve(process.env.PLAYWRIGHT_REPORT_PATH) // Resolve if absolute or relative path provided
+  : path.resolve(import.meta.dir, '../playwright-report/report.json') // Default relative path
+
+console.log(`Reading report from: ${reportJsonPath}`) // Log the path being used
+
+const file = Bun.file(reportJsonPath)
 const report = await file.json().catch((e) => {
-  console.error('Failed to read report.json', e)
+  console.error(`Failed to read report from ${reportJsonPath}`, e)
   process.exit(1)
 })
 
@@ -40,6 +49,7 @@ for (const suite of report.suites) {
   }, {})
   for (const [specTitle, specs] of Object.entries(specsByTitle)) {
     console.log(`#### ${specTitle}`)
+    // @ts-expect-error specs is not unknown
     for (const spec of specs) {
       for (const test of spec.tests) {
         const result = test.results[test.results.length - 1] as TestResult // Last result

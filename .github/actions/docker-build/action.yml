@@ -1,54 +1,80 @@
-name: "Setup Docker Build Environment"
-description: "Set up Node.js, install Foundry, and set up Bun. Runs Yarn install run docker build"
+name: "Build and Push Next App Docker Image"
+description: "Builds the next-app Docker image using Buildx, caches layers with GHCR, tags, and pushes to GHCR."
+
 inputs:
-  build-nextjs-docker:
-    description: "Whether to build Next.js docker image"
+  build-args:
+    description: "Build arguments to pass to docker buildx build (e.g., 'ARG1=value1 ARG2=value2')"
     required: false
-    default: "true"
-  push-nextjs-docker-image:
-    description: "Whether to push build to dockerhub"
-    required: false
-    default: "false"
-  dockerhub_username:
-    description: "Username to login to dockerhub"
-    required: false
-  dockerhub_password:
-    description: "Password to login to dockerhub"
-    required: false
+    default: ""
+  ghcr-token:
+    description: "Token for authenticating with GHCR"
+    required: true
+    default: ${{ github.token }}
+  image-name:
+    description: "Base name for the image in GHCR (e.g., next-app)"
+    required: true
+    default: "next-app"
+
+outputs:
+  image-tag:
+    description: "The full GHCR tag of the pushed image (e.g., ghcr.io/owner/repo/next-app:sha)"
+    value: ${{ steps.build-and-push.outputs.image-tag }}
+
 runs:
   using: "composite"
   steps:
-    - name: Use Node.js
-      if: ${{ inputs.build-nextjs-docker == 'true' }}
-      uses: actions/setup-node@v4
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v3
       with:
-        node-version-file: .node-version
-        cache: "yarn"
-    - name: Setup Bun
-      if: ${{ inputs.build-nextjs-docker == 'true' }}
-      uses: oven-sh/setup-bun@v1
-    - name: Install Foundry
-      if: ${{ inputs.build-nextjs-docker == 'true' }}
-      uses: foundry-rs/foundry-toolchain@v1
-      with:
-        version: stable
-    - name: Yarn Install
-      if: ${{ inputs.build-nextjs-docker == 'true' }}
-      shell: bash
-      run: yarn install --immutable
-    - name: Build Next.js
-      if: ${{ inputs.build-nextjs-docker == 'true' }}
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ inputs.ghcr-token }}
+
+    - name: Generate Image Tag
+      id: generate-tag
       shell: bash
       run: |
-        cp .env.local.template .env.local
-        yarn web:docker:build
-        rm .env.local
-    - uses: docker/login-action@v3
-      if: ${{ inputs.build-nextjs-docker == 'true' }} && ${{ inputs.push-nextjs-docker-image == 'true' }}
-      with:
-        username: ${{ inputs.dockerhub_username }}
-        password: ${{ inputs.dockerhub_password }}
-    - name: Push to dockerhub
+        SHORT_SHA=$(git rev-parse --short=10 HEAD)
+        IMAGE_TAG="ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}/${{ inputs.image-name }}:${SHORT_SHA}"
+        echo "IMAGE_TAG=${IMAGE_TAG,,}" >> $GITHUB_OUTPUT # Lowercase for Docker compatibility
+        
+    - name: Set Environment Variables from Template
       shell: bash
-      if: ${{ inputs.build-nextjs-docker == 'true' }} && ${{ inputs.push-nextjs-docker-image == 'true' }}
-      run: yarn web:docker:push
+      run: |
+        if [ -f "./scripts/github-actions-set-env-from-template.sh" ]; then
+          chmod +x ./scripts/github-actions-set-env-from-template.sh
+          ./scripts/github-actions-set-env-from-template.sh .env.local.template
+        else
+          echo "Warning: Environment script not found, using default environment variables"
+        fi
+
+    - name: Build and Push Docker Image
+      id: build-and-push
+      shell: bash
+      run: |
+        BUILD_ARGS_STRING=""
+        if [[ -n "${{ inputs.build-args }}" ]]; then
+          for arg in ${{ inputs.build-args }}; do
+            BUILD_ARGS_STRING+=" --build-arg $arg"
+          done
+        fi
+        
+        # Add environment variables from template as build arguments
+        # Only include variables starting with NEXT_PUBLIC_ for the Next.js build
+        for var in $(env | grep "^NEXT_PUBLIC_" | cut -d= -f1); do
+          BUILD_ARGS_STRING+=" --build-arg ${var}=${!var}"
+        done
+
+        echo "Building image: ${{ steps.generate-tag.outputs.IMAGE_TAG }}"
+        echo "Using build args:${BUILD_ARGS_STRING}" # Be careful not to expose secrets here
+
+        docker buildx build \
+          --tag ${{ steps.generate-tag.outputs.IMAGE_TAG }} \
+          --cache-from type=gha \
+          --cache-to type=gha,mode=max \
+          --push \
+          -f ./apps/next/Dockerfile \
+          ${BUILD_ARGS_STRING} \
+          .
+
+        echo "image-tag=${{ steps.generate-tag.outputs.IMAGE_TAG }}" >> $GITHUB_OUTPUT
