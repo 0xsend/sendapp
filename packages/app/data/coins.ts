@@ -222,3 +222,15 @@ export const erc20Coins: erc20Coin[] = [
 ] as const
 
 export const isEthCoin = (coin: coin): coin is ethCoin => coin.symbol === 'ETH'
+
+export const stableCoins = [usdcCoin, eurcCoin] as const
+
+export const investmentCoins = [
+  ethCoin,
+  sendCoin,
+  cbBtcCoin,
+  spx6900Coin,
+  moonwellCoin,
+  aerodromeCoin,
+  morphoCoin,
+] as const
