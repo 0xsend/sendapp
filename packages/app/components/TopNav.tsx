@@ -4,6 +4,7 @@ import {
   Button as ButtonOg,
   type ButtonProps,
   Container,
+  H1,
   H2,
   Header,
   LinkableAvatar,
@@ -27,7 +28,6 @@ import type { Tables } from '@my/supabase/database-generated.types'
 interface TopNavProps {
   header?: string
   subheader?: string
-  showLogo?: boolean
   /**
    * Hide the subroute button
    * @default false
@@ -42,7 +42,6 @@ interface TopNavProps {
    * Show header even on greater than large screens
    * @default false
    */
-  showOnGtLg?: boolean
   hideRightActions?: boolean
 }
 
@@ -95,10 +94,8 @@ function ActivityMenuButton() {
 export function TopNav({
   header = '',
   subheader,
-  showLogo = false,
   noSubroute = false,
   backFunction = 'root',
-  showOnGtLg = false,
   hideRightActions = false,
 }: TopNavProps) {
   const [queryParams] = useRootScreenParams()
@@ -154,14 +151,6 @@ export function TopNav({
       >
         {(() => {
           switch (true) {
-            case media.gtLg && isSubRoute:
-              return (
-                <H2 fontWeight={'300'} col="$color10" lineHeight={32} als={'center'}>
-                  {header}
-                </H2>
-              )
-            case media.gtLg && !showOnGtLg:
-              return null
             case Boolean(queryParams.token):
               return (
                 <XStack ai="center" f={1}>
@@ -179,17 +168,12 @@ export function TopNav({
             case !isSubRoute:
               return (
                 <>
-                  {showLogo ? (
-                    <XStack>
-                      <Link href="/">
-                        <IconSendLogo size={'$2.5'} color={'$color12'} />
-                      </Link>
-                    </XStack>
-                  ) : (
-                    <H2 fontWeight={'300'} col="$color10" lineHeight={32} als={'center'}>
-                      {header}
-                    </H2>
-                  )}
+                  <XStack>
+                    <Link href="/">
+                      <H1 fontWeight={'600'} letterSpacing={1} tt="lowercase">{`/${header}`}</H1>
+                      {/* <IconSendLogo size={'$2.5'} color={'$color12'} /> */}
+                    </Link>
+                  </XStack>
                   <XStack
                     jc="center"
                     gap="$2"
@@ -206,25 +190,6 @@ export function TopNav({
                   </XStack>
                 </>
               )
-            case showLogo:
-              return (
-                <>
-                  <Button onPress={handleBack}>
-                    <ButtonOg.Icon>
-                      <IconArrowLeft
-                        size={'$1.5'}
-                        $theme-dark={{ color: '$primary' }}
-                        $theme-light={{ color: '$color12' }}
-                      />
-                    </ButtonOg.Icon>
-                  </Button>
-                  <XStack>
-                    <Link href="/send">
-                      <IconSendLogo size={'$2.5'} color={'$color12'} />
-                    </Link>
-                  </XStack>
-                </>
-              )
             default:
               return (
                 <XStack ai="center" f={1}>
@@ -237,9 +202,7 @@ export function TopNav({
                       />
                     </ButtonOg.Icon>
                   </Button>
-                  <Paragraph size={'$8'} col={'$color10'}>
-                    {header}
-                  </Paragraph>
+                  <H1 fontWeight={'600'} letterSpacing={1} tt="lowercase">{`/${header}`}</H1>
                 </XStack>
               )
           }
