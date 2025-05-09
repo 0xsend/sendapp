@@ -305,8 +305,8 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
         gap="$1.5"
         onPress={handleCheckoutTx}
         theme="green"
-        borderRadius={'$4'}
-        p={'$4'}
+        py={'$5'}
+        br={'$4'}
       >
         {(() => {
           switch (true) {
@@ -388,7 +388,7 @@ const ConfirmButtonError = ({
         {children}
       </Tooltip.Content>
       <Tooltip.Trigger>
-        <Button theme="green" borderRadius={'$4'} p={'$4'} onPress={onPress} {...props}>
+        <Button theme="green" py={'$5'} br={'$4'} onPress={onPress} {...props}>
           <ConfirmButtonText>{buttonText || 'error'}</ConfirmButtonText>
           <ButtonIcon>
             <AlertTriangle color={'$error'} size={'$1'} />

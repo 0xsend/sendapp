@@ -1,4 +1,5 @@
 import type { Expect, Page } from '@playwright/test'
+import { generateSendtag } from '@my/playwright/utils/generators'
 
 export class OnboardingPage {
   constructor(
@@ -6,16 +7,12 @@ export class OnboardingPage {
     public readonly log?: debug.Debugger
   ) {}
 
-  public readonly accountName = `test-${Math.floor(Math.random() * 1000000)}`
-
   async completeOnboarding(expect: Expect) {
     await this.page.goto('/')
     expect(this.page).toHaveURL('/auth/onboarding') // no send accounts redirects to onboarding page
 
-    // choose a random account name
-    const acctName = this.accountName
-    await this.page.getByRole('textbox', { name: 'Account name' }).fill(acctName)
-    await expect(this.page.getByLabel('Account name')).toHaveValue(acctName)
+    const sendtag = generateSendtag()
+    await this.page.getByTestId('sendtag-input').fill(sendtag)
 
     const request = this.page.waitForRequest((request) => {
       if (request.url().includes('/api/trpc/sendAccount.create') && request.method() === 'POST') {
@@ -47,10 +44,10 @@ export class OnboardingPage {
       timeout: 15_000,
     })
 
-    await this.page.getByRole('button', { name: 'Create Passkey' }).click()
+    await this.page.getByRole('button', { name: 'finish account' }).click()
     await request
     await response
-    await this.page.getByRole('button', { name: 'Create Passkey' }).waitFor({ state: 'detached' })
+    await this.page.getByRole('button', { name: 'finish account' }).waitFor({ state: 'detached' })
 
     await this.page.waitForURL('/')
   }

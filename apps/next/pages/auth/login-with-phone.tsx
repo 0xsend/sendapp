@@ -1,16 +1,15 @@
-import { SignUpScreen } from 'app/features/auth/sign-up/screen'
 import Head from 'next/head'
 import type { NextPageWithLayout } from '../_app'
 import { AuthLayout } from 'app/features/auth/layout.web'
+import { LoginWithPhoneScreen } from 'app/features/auth/loginWithPhone/screen'
 
 export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Sign Up</title>
-        <meta name="description" content="Future Cash. Sign up for Send." key="desc" />
+        <title>Send | Login With Phone</title>
       </Head>
-      <SignUpScreen />
+      <LoginWithPhoneScreen />
     </>
   )
 }
