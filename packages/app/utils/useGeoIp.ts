@@ -10,7 +10,12 @@ type GeoIp = {
 const fetchGeoIp = async () => {
   const response = await fetch('https://ipapi.co/json/')
   if (!response.ok) {
-    throw new Error('Failed to fetch geo IP data')
+    const response2 = await fetch('https://api.ip2location.io/')
+    if (!response2.ok) {
+      throw new Error('Failed to fetch geo IP data')
+    }
+    const data2 = await response2.json()
+    return data2 as GeoIp
   }
   const data = await response.json()
   return data as GeoIp
