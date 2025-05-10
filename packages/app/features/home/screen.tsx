@@ -2,12 +2,12 @@ import {
   AnimatePresence,
   Button,
   Card,
+  Fade,
   H1,
   H4,
   Paragraph,
   Spinner,
   Stack,
-  Theme,
   useMedia,
   XStack,
   type XStackProps,
@@ -15,19 +15,20 @@ import {
 } from '@my/ui'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
-import { TokenBalanceCard } from './TokenBalanceCard'
-import { TokenBalanceList } from './TokenBalanceList'
+import { StablesBalanceCard } from './TokenBalanceCard'
 import { TokenDetails } from './TokenDetails'
 import Search from 'app/components/SearchBar'
 import { useTagSearch } from 'app/provider/tag-search'
 import { useRootScreenParams } from 'app/routers/params'
-import { HomeButtons } from './HomeButtons'
-import { AlertCircle } from '@tamagui/lucide-icons'
-import { useIsSendingUnlocked } from 'app/utils/useIsSendingUnlocked'
-import { HomeQuickActions } from 'app/features/home/HomeQuickActions'
+
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useRouter } from 'solito/router'
 import { IsPriceHiddenProvider } from 'app/features/home/utils/useIsPriceHidden'
+
+import { SavingsBalanceCard } from './SavingsBalanceCard'
+import { InvestmentsBalanceCard } from './InvestmentsBalanceCard'
+import { InvestmentsBalanceList } from './InvestmentBalanceList'
+import { StablesBalanceList } from './StablesBalanceList'
 
 function SendSearchBody() {
   const { isLoading, error } = useTagSearch()
@@ -51,9 +52,8 @@ function SendSearchBody() {
 }
 
 function HomeBody(props: XStackProps) {
-  const { coin: selectedCoin } = useCoinFromTokenParam()
-  const { isSendingUnlocked, isLoading } = useIsSendingUnlocked()
-  const quickActionHeightWithOffset = 117
+  const { coin: selectedCoin, isLoading } = useCoinFromTokenParam()
+  const [queryParams] = useRootScreenParams()
 
   if (isLoading)
     return (
@@ -73,67 +73,74 @@ function HomeBody(props: XStackProps) {
       >
         <YStack
           $gtLg={{ display: 'flex', w: '45%', gap: '$5', pb: 0 }}
-          display={!selectedCoin ? 'flex' : 'none'}
           width="100%"
-          gap="$3.5"
+          display={!queryParams.token ? 'flex' : 'none'}
+          gap="$5"
           ai={'center'}
         >
-          {!isSendingUnlocked ? (
-            <>
-              <Card p={'$4.5'} ai={'center'} gap="$5" jc="space-around" w={'100%'}>
-                <YStack gap="$6" jc="center" ai="center">
-                  <Theme name="red_active">
-                    <AlertCircle size={'$3'} />
-                  </Theme>
-                  <YStack ai="center" gap="$2">
-                    <H1 tt="uppercase" fontWeight={'800'}>
-                      ADD FUNDS
-                    </H1>
-                    <Paragraph color="$color10" $gtMd={{ fontSize: '$6' }} ta="center">
-                      Deposit at least .05 USDC to unlock sending
-                    </Paragraph>
-                  </YStack>
-                  <XStack w="100%">
-                    <HomeButtons.DepositButton mah={40} />
-                  </XStack>
-                </YStack>
-              </Card>
-            </>
-          ) : (
-            <TokenBalanceCard />
-          )}
-          <HomeQuickActions
-            y={selectedCoin ? -quickActionHeightWithOffset : 0}
-            zIndex={selectedCoin ? -1 : 0}
-            animateOnly={['transform']}
-            animation="200ms"
-          >
-            <HomeQuickActions.Deposit />
-            <HomeQuickActions.Earn />
-            <HomeQuickActions.Trade />
-          </HomeQuickActions>
-          <YStack
-            w={'100%'}
-            ai={'center'}
-            y={selectedCoin ? -quickActionHeightWithOffset : 0}
-            animateOnly={['transform']}
-            animation="200ms"
-          >
-            <Card
-              bc={'$color1'}
-              width="100%"
-              p="$2"
-              $gtSm={{
-                p: '$4',
-              }}
-            >
-              <TokenBalanceList />
-            </Card>
-          </YStack>
+          <StablesBalanceCard />
+          <Paragraph fontSize={'$7'} fontWeight={'500'} color={'$color12'} als="flex-start">
+            Save & Invest
+          </Paragraph>
+          <SavingsBalanceCard />
+          <InvestmentsBalanceCard />
         </YStack>
-        {selectedCoin !== undefined && <TokenDetails coin={selectedCoin} />}
+        {(() => {
+          switch (true) {
+            case selectedCoin !== undefined:
+              return <TokenDetails coin={selectedCoin} />
+            case queryParams.token === 'investments':
+              return <InvestmentsBody />
+            case queryParams.token === 'stables':
+              return <StablesBody />
+            default:
+              return null
+          }
+        })()}
       </XStack>
     </IsPriceHiddenProvider>
+  )
+}
+
+function InvestmentsBody() {
+  const media = useMedia()
+
+  return (
+    <YStack $gtXs={{ gap: '$3' }} gap={'$3.5'} f={1}>
+      {media.lg && <InvestmentsBalanceCard />}
+
+      <Card
+        bc={'$color1'}
+        width="100%"
+        p="$2"
+        $gtSm={{
+          p: '$4',
+        }}
+      >
+        <InvestmentsBalanceList />
+      </Card>
+    </YStack>
+  )
+}
+
+function StablesBody() {
+  const media = useMedia()
+
+  return (
+    <YStack $gtXs={{ gap: '$3' }} gap={'$3.5'} f={1}>
+      {media.lg && <StablesBalanceCard />}
+
+      <Card
+        bc={'$color1'}
+        width="100%"
+        p="$2"
+        $gtSm={{
+          p: '$4',
+        }}
+      >
+        <StablesBalanceList />
+      </Card>
+    </YStack>
   )
 }
 
