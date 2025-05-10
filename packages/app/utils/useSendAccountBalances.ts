@@ -5,7 +5,7 @@ import { useTokenPrices } from './useTokenPrices'
 import { convertBalanceToFiat } from './convertBalanceToUSD'
 import { allCoins } from '../data/coins'
 import { useMemo, useCallback } from 'react'
-import type { Hex } from 'viem'
+import type { Address, Hex } from 'viem'
 
 type BalanceOfResult =
   | {
@@ -84,20 +84,22 @@ export const useSendAccountBalances = () => {
     )
   }, [isLoading, ethQuery, tokensQuery, tokenContracts, unpackResult])
 
-  const totalPrice = useMemo(() => {
+  const dollarBalances = useMemo(() => {
     const { data: tokenPrices } = pricesQuery
     const { data: ethBalance } = ethQuery
     if (!tokenPrices || !balances) return undefined
+    return allCoins.reduce(
+      (values, coin) => {
+        const balance = coin.token === 'eth' ? ethBalance?.value : balances[coin.token]
+        // Always use $1 for USDC regardless of market price
+        const price = coin.symbol === 'USDC' ? 1 : tokenPrices[coin.token]
+        values[coin.token] = convertBalanceToFiat({ ...coin, balance: balance ?? 0n }, price) ?? 0
 
-    return allCoins.reduce((total, coin) => {
-      const balance = coin.token === 'eth' ? ethBalance?.value : balances[coin.token]
+        return values
+      },
+      {} as Record<Address | 'eth', number>
+    )
+  }, [pricesQuery, ethQuery, balances])
 
-      // Always use $1 for USDC regardless of market price
-      const price = coin.symbol === 'USDC' ? 1 : tokenPrices[coin.token]
-
-      return total + (convertBalanceToFiat({ ...coin, balance: balance ?? 0n }, price) ?? 0)
-    }, 0)
-  }, [pricesQuery, balances, ethQuery])
-
-  return { balances, isLoading, totalPrice, ethQuery, tokensQuery, pricesQuery }
+  return { balances, isLoading, dollarBalances, ethQuery, tokensQuery, pricesQuery }
 }
