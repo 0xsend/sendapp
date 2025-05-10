@@ -360,6 +360,10 @@ interface Table_auth_saml_relay_states {
 interface Table_auth_schema_migrations {
   version: string;
 }
+interface Table_realtime_schema_migrations {
+  version: number;
+  inserted_at: string | null;
+}
 interface Table_supabase_migrations_schema_migrations {
   version: string;
   statements: string[] | null;
@@ -799,6 +803,9 @@ interface Schema_analytics {
 interface Schema_realtime {
 
 }
+interface Schema_supavisor {
+
+}
 interface Schema_auth {
   audit_log_entries: Table_auth_audit_log_entries;
   flow_state: Table_auth_flow_state;
@@ -884,7 +891,9 @@ interface Schema_public {
   webauthn_credentials: Table_public_webauthn_credentials;
 }
 interface Schema_realtime {
-
+  messages: Table_realtime_messages;
+  schema_migrations: Table_realtime_schema_migrations;
+  subscription: Table_realtime_subscription;
 }
 interface Schema_shovel {
   ig_updates: Table_shovel_ig_updates;
@@ -916,6 +925,7 @@ interface Schema_vault {
 interface Database {
   _analytics: Schema__analytics;
   _realtime: Schema__realtime;
+  _supavisor: Schema__supavisor;
   auth: Schema_auth;
   dbdev: Schema_dbdev;
   extensions: Schema_extensions;
@@ -954,7 +964,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "auth.users" | {};
     childDestinationsTables: "temporal.send_earn_deposits" | {};
-    
+
   };
   "public.affiliate_stats": {
     parent: {
@@ -965,7 +975,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "public.profiles" | {};
     childDestinationsTables:  | {};
-    
+
   };
   "storage.buckets": {
     parent: {
@@ -978,7 +988,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables:  | {};
     childDestinationsTables: "storage.objects" | "storage.s3_multipart_uploads" | "storage.s3_multipart_uploads_parts" | {};
-    
+
   };
   "public.chain_addresses": {
     parent: {
@@ -989,7 +999,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "auth.users" | {};
     childDestinationsTables:  | {};
-    
+
   };
   "public.distribution_shares": {
     parent: {
@@ -1001,7 +1011,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "auth.users" | "public.distributions" | {};
     childDestinationsTables:  | {};
-    
+
   };
   "public.distribution_verification_values": {
     parent: {
@@ -1012,7 +1022,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "public.distributions" | {};
     childDestinationsTables: "public.distribution_verifications" | {};
-    
+
   };
   "public.distribution_verifications": {
     parent: {
@@ -1025,7 +1035,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "auth.users" | "public.distribution_verification_values" | "public.distributions" | {};
     childDestinationsTables:  | {};
-    
+
   };
   "public.distributions": {
     parent: {
@@ -1039,7 +1049,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables:  | {};
     childDestinationsTables: "public.distribution_shares" | "public.distribution_verification_values" | "public.distribution_verifications" | "public.send_slash" | {};
-    
+
   };
   "auth.flow_state": {
     parent: {
@@ -1050,7 +1060,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables:  | {};
     childDestinationsTables: "auth.saml_relay_states" | {};
-    
+
   };
   "auth.identities": {
     parent: {
@@ -1061,7 +1071,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "auth.users" | {};
     childDestinationsTables:  | {};
-    
+
   };
   "pgsodium.key": {
     parent: {
@@ -1073,7 +1083,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "pgsodium.key" | {};
     childDestinationsTables: "pgsodium.key" | "vault.secrets" | {};
-    
+
   };
   "private.leaderboard_referrals_all_time": {
     parent: {
@@ -1084,7 +1094,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "auth.users" | {};
     childDestinationsTables:  | {};
-    
+
   };
   "auth.mfa_amr_claims": {
     parent: {
@@ -1095,7 +1105,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "auth.sessions" | {};
     childDestinationsTables:  | {};
-    
+
   };
   "auth.mfa_challenges": {
     parent: {
@@ -1106,7 +1116,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "auth.mfa_factors" | {};
     childDestinationsTables:  | {};
-    
+
   };
   "auth.mfa_factors": {
     parent: {
@@ -1117,7 +1127,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "auth.users" | {};
     childDestinationsTables: "auth.mfa_challenges" | {};
-    
+
   };
   "storage.objects": {
     parent: {
@@ -1128,7 +1138,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "storage.buckets" | {};
     childDestinationsTables:  | {};
-    
+
   };
   "auth.one_time_tokens": {
     parent: {
@@ -1139,7 +1149,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "auth.users" | {};
     childDestinationsTables:  | {};
-    
+
   };
   "public.profiles": {
     parent: {
@@ -1152,7 +1162,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "auth.users" | {};
     childDestinationsTables: "public.affiliate_stats" | "public.referrals" | {};
-    
+
   };
   "public.receipts": {
     parent: {
@@ -1163,7 +1173,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "auth.users" | {};
     childDestinationsTables:  | {};
-    
+
   };
   "public.referrals": {
     parent: {
@@ -1175,7 +1185,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "public.profiles" | {};
     childDestinationsTables:  | {};
-    
+
   };
   "auth.refresh_tokens": {
     parent: {
@@ -1186,7 +1196,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "auth.sessions" | {};
     childDestinationsTables:  | {};
-    
+
   };
   "storage.s3_multipart_uploads": {
     parent: {
@@ -1197,7 +1207,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "storage.buckets" | {};
     childDestinationsTables: "storage.s3_multipart_uploads_parts" | {};
-    
+
   };
   "storage.s3_multipart_uploads_parts": {
     parent: {
@@ -1209,7 +1219,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "storage.buckets" | "storage.s3_multipart_uploads" | {};
     childDestinationsTables:  | {};
-    
+
   };
   "auth.saml_providers": {
     parent: {
@@ -1220,7 +1230,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "auth.sso_providers" | {};
     childDestinationsTables:  | {};
-    
+
   };
   "auth.saml_relay_states": {
     parent: {
@@ -1232,7 +1242,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "auth.flow_state" | "auth.sso_providers" | {};
     childDestinationsTables:  | {};
-    
+
   };
   "vault.secrets": {
     parent: {
@@ -1243,7 +1253,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "pgsodium.key" | {};
     childDestinationsTables:  | {};
-    
+
   };
   "public.send_account_credentials": {
     parent: {
@@ -1255,7 +1265,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "public.send_accounts" | "public.webauthn_credentials" | {};
     childDestinationsTables:  | {};
-    
+
   };
   "public.send_accounts": {
     parent: {
@@ -1266,7 +1276,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "auth.users" | {};
     childDestinationsTables: "public.send_account_credentials" | {};
-    
+
   };
   "temporal.send_earn_deposits": {
     parent: {
@@ -1277,7 +1287,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "public.activity" | {};
     childDestinationsTables:  | {};
-    
+
   };
   "public.send_slash": {
     parent: {
@@ -1288,7 +1298,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "public.distributions" | {};
     childDestinationsTables:  | {};
-    
+
   };
   "auth.sessions": {
     parent: {
@@ -1300,7 +1310,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "auth.users" | {};
     childDestinationsTables: "auth.mfa_amr_claims" | "auth.refresh_tokens" | {};
-    
+
   };
   "auth.sso_domains": {
     parent: {
@@ -1311,7 +1321,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "auth.sso_providers" | {};
     childDestinationsTables:  | {};
-    
+
   };
   "auth.sso_providers": {
     parent: {
@@ -1324,7 +1334,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables:  | {};
     childDestinationsTables: "auth.saml_providers" | "auth.saml_relay_states" | "auth.sso_domains" | {};
-    
+
   };
   "public.tag_receipts": {
     parent: {
@@ -1335,7 +1345,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "public.tags" | {};
     childDestinationsTables:  | {};
-    
+
   };
   "public.tags": {
     parent: {
@@ -1346,7 +1356,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "auth.users" | {};
     childDestinationsTables: "public.tag_receipts" | {};
-    
+
   };
   "auth.users": {
     parent: {
@@ -1371,7 +1381,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables:  | {};
     childDestinationsTables: "auth.identities" | "auth.mfa_factors" | "auth.one_time_tokens" | "auth.sessions" | "private.leaderboard_referrals_all_time" | "public.activity" | "public.chain_addresses" | "public.distribution_shares" | "public.distribution_verifications" | "public.profiles" | "public.receipts" | "public.send_accounts" | "public.tags" | "public.webauthn_credentials" | {};
-    
+
   };
   "public.webauthn_credentials": {
     parent: {
@@ -1382,7 +1392,7 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "auth.users" | {};
     childDestinationsTables: "public.send_account_credentials" | {};
-    
+
   };
 }
 //#endregion
