@@ -120,7 +120,15 @@ export const SwapFormScreen = () => {
     })
     queryClient.setQueryData([SWAP_ROUTE_SUMMARY_QUERY_KEY], swapRoute.routeSummary)
 
-    router.push({ pathname: '/trade/summary', query: swapParams })
+    router.push({
+      pathname: '/trade/summary',
+      query: {
+        inToken: swapParams.inToken,
+        outToken: swapParams.outToken,
+        inAmount: swapParams.inAmount,
+        slippage: swapParams.slippage,
+      },
+    })
   }
 
   const handleFlipTokens = () => {
