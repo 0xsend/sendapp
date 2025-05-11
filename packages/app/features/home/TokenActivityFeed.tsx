@@ -14,6 +14,7 @@ import { Events } from 'app/utils/zod/activity/events'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ZodError } from 'zod'
 import { TokenActivityRow } from './TokenActivityRow'
+import { useRootScreenParams } from 'app/routers/params'
 
 export const TokenActivityFeed = ({
   tokenActivityFeedQuery,
@@ -31,6 +32,7 @@ export const TokenActivityFeed = ({
   const media = useMedia()
   const queryClient = useQueryClient()
   const wasPendingRef = useRef(false) // Ref to track if a pending activity was seen previously
+  const [queryParams] = useRootScreenParams()
 
   const layoutSizeAdjustment = media.gtLg ? 32 : 14
 
@@ -74,12 +76,15 @@ export const TokenActivityFeed = ({
     // If it was pending previously but isn't anymore, invalidate the activity feed query
     if (wasPendingRef.current && !isCurrentlyPending) {
       // Invalidate the query
-      queryClient.invalidateQueries({ queryKey: ['activity_feed'] })
+      queryClient.invalidateQueries({
+        queryKey: ['token_activity_feed', { address: queryParams.token }],
+        exact: false,
+      })
     }
 
     // Update the ref to store the current pending state for the next effect run
     wasPendingRef.current = isCurrentlyPending
-  }, [data, queryClient])
+  }, [data, queryClient, queryParams.token])
 
   const [dataProvider, setDataProvider] = useState(dataProviderMaker(activities))
 
