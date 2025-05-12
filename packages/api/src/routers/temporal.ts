@@ -11,7 +11,7 @@ import { throwIf } from 'app/utils/throwIf'
 import debug from 'debug'
 import type { UserOperation } from 'permissionless'
 import { getUserOperationHash } from 'permissionless/utils'
-import { withRetry } from 'viem'
+import { type Hex, withRetry } from 'viem'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
 
@@ -32,6 +32,8 @@ export const temporalRouter = createTRPCRouter({
           session: { user },
         },
       }) => {
+        const startTime = new Date(Date.now())
+
         const noteValidationError = note
           ? formFields.note.safeParse(decodeURIComponent(note)).error
           : null
@@ -81,47 +83,27 @@ export const temporalRouter = createTRPCRouter({
             message: e.message,
           })
         })
-
-        log(`Workflow Created: ${workflowId}`)
-
         await withRetry(
           async () => {
-            const [initialized, receipt] = await Promise.allSettled([
-              lookupIntializedWorkflow(workflowId)
-                .then(() => true)
-                .catch(() => false),
-              (async () => {
-                // maybe bundler already has the receipt
-                const receipt = await baseMainnetBundlerClient.getUserOperationReceipt({
-                  hash: userOpHash,
-                })
-                if (!receipt) return null
-                const supabase = createSupabaseAdminClient()
-                // do not redirect unless it's been indexed into send_account_transfers
-                const { data, error } = await supabase
-                  .from('send_account_transfers')
-                  .select('*')
-                  .eq('tx_hash', hexToBytea(receipt.receipt.transactionHash))
-                  .maybeSingle()
-                throwIf(error)
-                return data
-              })(),
-            ] as const)
-
-            if (initialized.status === 'fulfilled' && initialized.value) {
-              log('transfer initialized')
-              return true
-            }
-
-            if (receipt.status === 'fulfilled' && receipt.value) {
-              log('userop already onchain', receipt.value.tx_hash)
-              return true
-            }
-
-            throw new TRPCError({
-              code: 'PRECONDITION_FAILED',
-              message: 'Transfer not yet submitted',
+            const initPromise = lookupInitializedWorkflow(workflowId, startTime).catch((e) => {
+              log(e)
+              return Promise.reject()
             })
+
+            const receiptPromise = lookupTransferReceipt(userOpHash, startTime).catch((e) => {
+              log(e)
+              return Promise.reject()
+            })
+
+            try {
+              return await Promise.any([initPromise, receiptPromise])
+            } catch (error) {
+              throw new TRPCError({
+                code: 'PRECONDITION_FAILED',
+                message:
+                  'Pending transfer not found: Please manually verify whether the send was completed.',
+              })
+            }
           },
           {
             retryCount: 20,
@@ -132,7 +114,7 @@ export const temporalRouter = createTRPCRouter({
             },
             shouldRetry({ error: e }) {
               const error = e as unknown as PostgrestError
-              if (error.code === 'PGRST116' || error.message === 'Transfer not yet submitted') {
+              if (error.code === 'PGRST116' || error.code === 'PRECONDITION_FAILED') {
                 return true // retry on no rows
               }
               return false
@@ -145,16 +127,38 @@ export const temporalRouter = createTRPCRouter({
     ),
 })
 
-async function lookupIntializedWorkflow(workflowId: string): Promise<{ status: string }> {
-  // check if the transfer is initialized
+async function lookupTransferReceipt(userOpHash: Hex, startTime: Date): Promise<boolean> {
+  const blockTimeWindow = Math.floor(startTime.getTime() / 1000) - 5 * 60 // subtract 5 minutes as a buffer window
+  const receipt = await baseMainnetBundlerClient.getUserOperationReceipt({
+    hash: userOpHash,
+  })
+  assert(!!receipt, 'Transfer not onchain')
+
+  const supabase = createSupabaseAdminClient()
+  const { count, error } = await supabase
+    .from('send_account_transfers')
+    .select('*', { count: 'exact', head: true })
+    .eq('tx_hash', hexToBytea(receipt.receipt.transactionHash))
+    .gte('block_time', blockTimeWindow)
+
+  throwIf(error)
+  assert(count !== null && count > 0, 'Transfer not indexed')
+  log('userop already onchain', receipt.receipt.transactionHash)
+  return true
+}
+
+async function lookupInitializedWorkflow(workflowId: string, startTime: Date): Promise<boolean> {
   const supabaseAdmin = createSupabaseAdminClient()
   const { data, error } = await supabaseAdmin
     .from('activity')
     .select('data->>status')
     .eq('event_id', workflowId)
     .eq('event_name', 'temporal_send_account_transfers')
+    .gte('created_at', startTime.toISOString())
     .single()
+
   throwIf(error)
   assert(!!data && data.status !== 'initialized', 'Transfer not yet submitted')
-  return data
+  log(`${data.status} transfer found: ${workflowId}`)
+  return true
 }
