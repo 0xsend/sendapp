@@ -21,6 +21,10 @@ inputs:
     description: "Whether to build Next.js."
     required: false
     default: "false"
+  install-tilt:
+    description: "Whether to install Tilt."
+    required: false
+    default: "true"
 runs:
   using: "composite"
   steps:
@@ -49,6 +53,9 @@ runs:
       if: ${{ inputs.yarn-install == 'true' }}
       shell: bash
       run: yarn install --immutable  --inline-builds
+    - name: Install Tilt
+      if: ${{ inputs.install-tilt == 'true' }}
+      uses: ./.github/actions/install-tilt
     - name: Build Next.js
       if: ${{ inputs.build-nextjs == 'true' }}
       shell: bash
