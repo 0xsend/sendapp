@@ -233,35 +233,29 @@ jobs:
 
       - name: Install Playwright Dependencies
         run: yarn playwright playwright install --with-deps
-
-      - name: Start Tilt Dependencies
-        id: start-tilt-deps
+      - name: Playwright Tests
+        id: playwright
         shell: bash
         run: |
+          # set debug logs if runner.debug is set
+          # if [ "${{runner.debug}}" == "1" ]; then
+          #   export DEBUG="test:*,app:*,api:*,next:*"
+          # fi
           export DEBUG="api:*,app:*,test:*,-test:fixtures:snaplet:*"
           nohup tilt up playwright:deps &
           tilt_pid=$!
           echo "Tilt process started with PID: $tilt_pid"
-          # Output PID for the next step
-          echo "tilt_pid=$tilt_pid" >> $GITHUB_OUTPUT
-
-      - name: Wait for Tilt Ready
-        id: wait-tilt-ready
-        shell: bash
-        run: |
-          tilt_pid=${{ steps.start-tilt-deps.outputs.tilt_pid }}
-          echo "Waiting for Tilt (PID: $tilt_pid) to be ready..."
-          # Initial quick check if tilt API is up
+          echo waiting for tilt to be ready
           for i in {1..10}; do
-            curl -s http://localhost:10350 > /dev/null && break || echo "Attempt $i: Waiting for Tilt API..."
+            curl -s http://localhost:10350 > /dev/null && break || echo "Attempt $i failed, trying again..."
             sleep 1
           done
-          sleep 1 # Give it a moment after API is up
-
+          sleep 1
+          echo tilt is ready
           max_attempts=90
           wait_timeout=10
           for ((i=1; i<=max_attempts; i++)); do
-            echo "Attempt $i: Waiting for tilt resources with timeout ${wait_timeout}s"
+            echo "Attempt $i: Waiting for tilt with timeout ${wait_timeout}s"
 
             # Check if the Tilt process is still running
             if ! ps -p $tilt_pid > /dev/null; then
@@ -298,7 +292,6 @@ jobs:
               exit 1
             fi
 
-            # Wait for the specific uiresource to be ready
             if tilt wait --timeout "${wait_timeout}s" --for=condition=Ready "uiresource/playwright:deps"; then
               echo "Tilt is ready"
               break
@@ -316,77 +309,47 @@ jobs:
               fi
             fi
             if ((i == max_attempts)); then
-              echo "Reached maximum attempts waiting for Tilt, exiting"
+              echo "Reached maximum attempts, exiting"
               exit 1
             fi
           done
-
-      - name: Wait for Ready File (Debug Step)
-        id: wait-ready-file
-        shell: bash
-        run: |
-          echo "Waiting for 'ready' file (debug step)..."
-          # Consider removing this step if it's no longer needed for debugging
-          for i in {1..300}; do
-            if [ -f ready ]; then
-              echo "'ready' file found."
-              break
-            fi
-            if (( i % 10 == 0 )); then # Print message less frequently
-              echo "Still waiting for 'ready' file..."
-            fi
-            sleep 1
-          done
-          if [ ! -f ready ]; then
-            echo "Warning: 'ready' file not found after 300 seconds."
-            # Decide if this should be a failure or just a warning
-            # exit 1
-          fi
-
-      - name: Start Next.js App
-        id: start-next-app
-        shell: bash
-        run: |
+          # never scheduler more than 4 workers or up to 50% of the available cores
+          # this is due to concurrency issues within the send account sign up and resource contention
+          workers=$(MAX_WORKERS=4 node ./.devops/bin/worker-count)
           export NEXT_APP_IMAGE_TAG=${{ needs.build_next_image.outputs.image-tag }}
           export NEXT_APP_PORT=0.0.0.0:3000
           docker compose up -d next-app
           docker compose logs -f --no-log-prefix next-app &
-
-      - name: Wait for Next.js App Ready
-        id: wait-next-app-ready
-        shell: bash
-        run: |
-          echo "Waiting for Next.js app at http://localhost:3000..."
+          # wait for next app to be ready
           started=0
           for i in {1..30}; do
             if curl -s http://localhost:3000 > /dev/null; then
-              echo "Next.js app is ready."
               started=1
               break
             fi
-            echo "Attempt $i: Next.js app not ready, trying again..."
+            echo "Attempt $i failed, trying again..."
             sleep 1
           done
 
           if [ $started -eq 0 ]; then
-            echo "Next.js app did not start within the timeout period."
+            echo "Next app did not start"
             exit 1
           fi
 
-      - name: Run Playwright Tests
-        id: playwright-run
-        shell: bash
-        run: |
-          # Calculate worker count
-          # never scheduler more than 4 workers or up to 50% of the available cores
-          # this is due to concurrency issues within the send account sign up and resource contention
-          workers=$(MAX_WORKERS=4 node ./.devops/bin/worker-count)
-          echo "Running Playwright tests with $workers workers for shard ${{ matrix.shard }}/4..."
-          yarn playwright test --workers=$workers --shard=${{ matrix.shard }}/4
+          # debug, wait until a ready file exists
+          for i in {1..300}; do
+            if [ -f ready ]; then
+              break
+            fi
+            echo "Waiting for ready file..."
+            sleep 1
+          done
 
+          # start playwright tests
+          yarn playwright test --workers=$workers --shard=${{ matrix.shard }}/4
       - name: Tilt Down
-        # always run tilt down, even if tests fail or previous steps fail
-        if: always()
+        # always run tilt down if tilt ci started
+        if: always() && steps.playwright.outcome != 'skipped'
         shell: bash
         run: tilt down
       # Upload raw results per shard for merging later
