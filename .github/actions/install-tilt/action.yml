@@ -6,4 +6,4 @@ runs:
     - name: Install Tilt
       id: tilt
       shell: bash
-      run: command -v tilt || curl -fsSL https://raw.githubusercontent.com/tilt-dev/tilt/master/scripts/install.sh | bash
+      run: command -v tilt || cd /tmp && curl -fsSL https://raw.githubusercontent.com/tilt-dev/tilt/master/scripts/install.sh | bash
