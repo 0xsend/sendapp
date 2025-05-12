@@ -25,6 +25,10 @@ inputs:
     description: "Whether to install Tilt."
     required: false
     default: "true"
+  brew-bundle:
+    description: "Whether to run Brew bundle."
+    required: false
+    default: "true"
 runs:
   using: "composite"
   steps:
@@ -56,6 +60,10 @@ runs:
     - name: Install Tilt
       if: ${{ inputs.install-tilt == 'true' }}
       uses: ./.github/actions/install-tilt
+    - name: Brew Bundle
+      if: ${{ inputs.brew-bundle == 'true' }}
+      shell: bash
+      run: brew bundle
     - name: Build Next.js
       if: ${{ inputs.build-nextjs == 'true' }}
       shell: bash
