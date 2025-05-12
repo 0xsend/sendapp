@@ -378,6 +378,9 @@ jobs:
         uses: ./.github/actions/setup-env
         env:
           YARN_ENABLE_HARDENED_MODE: 0
+        with:
+          build-nextjs: false
+          yarn-install: false
       - name: Download Shard Results
         id: download-artifacts
         uses: actions/download-artifact@v4
@@ -393,9 +396,6 @@ jobs:
         run: |
           mkdir -p all-test-results/playwright-report
           echo "No test results were found. This could be because all test shards failed to run or produce artifacts." > all-test-results/playwright-report/README.md
-
-      - name: Install Playwright Dependencies
-        run: yarn playwright playwright install --with-deps
 
       - name: Merge Playwright Reports HTML
         id: merge-reports
