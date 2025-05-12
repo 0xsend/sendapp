@@ -62,7 +62,6 @@ runs:
       uses: ./.github/actions/install-tilt
     - name: Set up Homebrew
       if: ${{ inputs.brew-bundle == 'true' }}
-      shell: bash
       id: set-up-homebrew
       uses: Homebrew/actions/setup-homebrew@master
     - name: Brew Bundle
