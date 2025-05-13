@@ -172,12 +172,8 @@ export const PersonalInfoScreen = () => {
       }}
       renderAfter={renderAfterContent}
     >
-      {({ phone, birthday, xUsername }) => (
+      {({ birthday, xUsername }) => (
         <FadeCard>
-          <FieldWithLabel label={'Phone'} gap={'$2'}>
-            {phone}
-          </FieldWithLabel>
-          <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
           <FieldWithLabel label={'Date of Birth'} additionalInfo={'(non-editable)'} gap={'$2'}>
             {birthday}
           </FieldWithLabel>
@@ -193,8 +189,6 @@ export const PersonalInfoScreen = () => {
   const overview = (
     <YStack gap={'$5'}>
       <FadeCard>
-        <ReadOnlyFieldWithLabel label={'Phone'} text={user?.phone || '-'} />
-        <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
         <ReadOnlyFieldWithLabel
           label={'Date of Birth'}
           text={formatDate(birthday) || '-'}
