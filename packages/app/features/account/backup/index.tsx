@@ -203,7 +203,11 @@ const WebAuthnCred = ({
   return (
     <FadeCard>
       <XStack jc="space-between" ai="center">
-        <Paragraph size={'$5'} color={cardStatus === 'remove' ? '$error' : '$color12'}>
+        <Paragraph
+          testID={`passkey-${cred.display_name}`}
+          size={'$5'}
+          color={cardStatus === 'remove' ? '$error' : '$color12'}
+        >
           {cardStatus === 'remove' ? 'Remove Passkey?' : cred.display_name}
         </Paragraph>
         {cardStatus !== 'remove' && (

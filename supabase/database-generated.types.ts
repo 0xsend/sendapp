@@ -1533,6 +1533,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "tags_profile_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "tags_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
@@ -1875,6 +1882,25 @@ export type Database = {
           is_public: boolean
           sendid: number
           all_tags: string[]
+        }[]
+      }
+      query_webauthn_credentials_by_phone: {
+        Args: {
+          phone_number: string
+        }
+        Returns: {
+          attestation_object: string
+          created_at: string
+          deleted_at: string | null
+          display_name: string
+          id: string
+          key_type: Database["public"]["Enums"]["key_type_enum"]
+          name: string
+          public_key: string
+          raw_credential_id: string
+          sign_count: number
+          updated_at: string
+          user_id: string
         }[]
       }
       referrer_lookup: {
