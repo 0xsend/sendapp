@@ -181,7 +181,7 @@ export function OnboardingScreen() {
             finish your account
           </Paragraph>
           <Paragraph w={'100%'} size={'$5'} color={'$olive'}>
-            Sendtags are usernames
+            Choose your Sendtag — your unique username on Send.
           </Paragraph>
           <SchemaForm
             form={form}

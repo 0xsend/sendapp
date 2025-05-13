@@ -99,7 +99,7 @@ export const LoginWithPhoneScreen = () => {
 
   return (
     <YStack f={1} jc={'space-between'} ai={'center'} gap={'$3.5'} py={'$10'}>
-      <YStack w={'100%'} ai={'center'} gap={'$3.5'}>
+      <YStack w={'100%'} ai={'center'}>
         <FormProvider {...form}>
           <YStack w={'100%'} ai={'center'}>
             <Paragraph w={'100%'} size={'$8'} fontWeight={500} tt={'uppercase'}>
