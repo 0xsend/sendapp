@@ -1533,6 +1533,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "tags_profile_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "tags_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false

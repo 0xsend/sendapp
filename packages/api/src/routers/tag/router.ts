@@ -59,22 +59,15 @@ export const tagRouter = createTRPCRouter({
 
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
-          .select('*')
+          .select('*, tags (*)')
+          .eq('tags.status', 'confirmed')
           .single()
 
         if (profileError || !profile) {
           throw new Error(profileError.message || 'Profile not found')
         }
 
-        const { count, error: tagsError } = await supabase
-          .from('tags')
-          .select('*', { count: 'exact', head: true })
-
-        if (tagsError) {
-          throw new Error(tagsError.message || "Unable to fetch user's tags")
-        }
-
-        if (count && count > 0) {
+        if (profile.tags.length > 0) {
           throw new Error('First sendtag already registered')
         }
 

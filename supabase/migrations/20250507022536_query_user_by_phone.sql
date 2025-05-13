@@ -21,3 +21,9 @@ DROP TRIGGER IF EXISTS "insert_verification_tag_registration" ON "public"."tags"
 CREATE TRIGGER "insert_verification_tag_registration"
 AFTER INSERT OR UPDATE ON "public"."tags"
 FOR EACH ROW EXECUTE PROCEDURE "public"."insert_verification_tag_registration"();
+
+-- Added reference between tags and profile to perform less API calls to db
+ALTER TABLE public.tags
+ADD CONSTRAINT tags_profile_user_id_fkey
+FOREIGN KEY (user_id)
+REFERENCES public.profiles(id);

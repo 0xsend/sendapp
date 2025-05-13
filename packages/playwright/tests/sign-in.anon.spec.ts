@@ -6,7 +6,7 @@ import { sendCoin } from 'app/data/coins'
 import { assert } from 'app/utils/assert'
 import debug from 'debug'
 import { signUp } from './fixtures/send-accounts'
-import { generateSendtag } from './utils/generators'
+import { generateCountry, generateSendtag } from './utils/generators'
 
 let log: debug.Debugger
 
@@ -77,6 +77,45 @@ test('redirect to send confirm page on sign-in', async ({ page, seed, pg }) => {
     await expect(page).toHaveURL(
       `/send/confirm?idType=tag&recipient=${tag?.name}&amount=1&sendToken=${sendCoin.token}`
     )
+  } finally {
+    await pg.query('DELETE FROM auth.users WHERE email like $1', [`${sendtag}_%`]).catch((e) => {
+      log('delete failed', e)
+    })
+  }
+})
+
+test('old user can login using phone number', async ({ page, seed, pg, context }) => {
+  const country = generateCountry()
+  const sendtag = generateSendtag()
+  const phone = '123456'
+
+  await page.route('https://ipapi.co/json/', async (route) => {
+    await route.fulfill({
+      json: { country_code: country.code },
+    })
+  })
+  const ipPromise = page.waitForRequest('https://ipapi.co/json/')
+
+  await page.goto('/auth/sign-up')
+  await page.waitForURL('/auth/sign-up')
+
+  try {
+    await signUp(page, sendtag, expect)
+    await page.context().clearCookies()
+    await pg.query('UPDATE auth.users SET phone = $1 WHERE email like $2', [
+      `${country.dialCode}${phone}`,
+      `${sendtag}_%`,
+    ])
+
+    await page.goto('/auth/sign-up')
+    await page.waitForURL('/auth/sign-up')
+    await page.getByText('login with phone number', { exact: false }).click()
+    await page.waitForURL('/auth/login-with-phone')
+    await ipPromise
+    await page.getByTestId('phone-number-input').fill(phone)
+    await page.getByRole('button', { name: 'login' }).click()
+    await page.waitForURL('/')
+    await expect(page.getByRole('link', { name: 'Account' })).toBeVisible()
   } finally {
     await pg.query('DELETE FROM auth.users WHERE email like $1', [`${sendtag}_%`]).catch((e) => {
       log('delete failed', e)

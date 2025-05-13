@@ -28,12 +28,12 @@ export const LoginWithPhoneScreen = () => {
   const [queryParams] = useAuthScreenParams()
   const { redirectUri } = queryParams
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
-  const { signIn } = useSignIn()
 
   const formPhone = form.watch('phone')
   const validationError = form.formState.errors.root
   const canSubmit = formPhone
 
+  const { mutateAsync: signInMutateAsync } = useSignIn()
   const { mutateAsync: getCredentialByPhoneMutateAsync } =
     api.challenge.getCredentialByPhone.useMutation({
       retry: false,
@@ -50,7 +50,7 @@ export const LoginWithPhoneScreen = () => {
   const handleSubmit = async (formData: z.infer<typeof SignInWithPhoneSchema>) => {
     try {
       const allowedCredentials = await getCredentialByPhoneMutateAsync(formData)
-      await signIn({ allowedCredentials })
+      await signInMutateAsync({ allowedCredentials })
     } catch (error) {
       form.setError('root', {
         type: 'custom',
@@ -125,6 +125,7 @@ export const LoginWithPhoneScreen = () => {
             }}
             props={{
               phone: {
+                testID: 'phone-number-input',
                 placeholder: 'Input phone number',
                 color: '$color12',
                 fontWeight: '500',

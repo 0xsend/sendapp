@@ -1149,9 +1149,10 @@ interface Tables_relationships {
        affiliate_stats_user_id_fkey: "public.affiliate_stats";
        referrals_referred_id_fkey: "public.referrals";
        referrals_referrer_id_fkey: "public.referrals";
+       tags_profile_user_id_fkey: "public.tags";
     };
     parentDestinationsTables: "auth.users" | {};
-    childDestinationsTables: "public.affiliate_stats" | "public.referrals" | {};
+    childDestinationsTables: "public.affiliate_stats" | "public.referrals" | "public.tags" | {};
     
   };
   "public.receipts": {
@@ -1340,11 +1341,12 @@ interface Tables_relationships {
   "public.tags": {
     parent: {
        tags_user_id_fkey: "auth.users";
+       tags_profile_user_id_fkey: "public.profiles";
     };
     children: {
        tag_receipts_tag_name_fkey: "public.tag_receipts";
     };
-    parentDestinationsTables: "auth.users" | {};
+    parentDestinationsTables: "auth.users" | "public.profiles" | {};
     childDestinationsTables: "public.tag_receipts" | {};
     
   };

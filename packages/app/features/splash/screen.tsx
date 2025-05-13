@@ -251,12 +251,12 @@ function AuthButtons() {
   const router = useRouter()
   const signUpLink = useLink({ href: '/auth/sign-up' })
   const [isSigningIn, setIsSigningIn] = useState(false)
-  const { signIn } = useSignIn()
+  const { mutateAsync: signInMutateAsync } = useSignIn()
 
   const handleSignIn = async () => {
     setIsSigningIn(true)
     try {
-      await signIn({})
+      await signInMutateAsync({})
       router.push(redirectUri ?? '/')
     } catch (error) {
       toast.show(formatErrorMessage(error), {

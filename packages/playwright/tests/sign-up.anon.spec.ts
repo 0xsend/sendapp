@@ -1,10 +1,9 @@
 import { expect, mergeTests } from '@playwright/test'
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
 import { test as webauthnTest } from '@my/playwright/fixtures/webauthn'
-import { countries } from 'app/utils/country'
 import debug from 'debug'
 import { signUp } from './fixtures/send-accounts'
-import { generateSendtag } from './utils/generators'
+import { generateCountry, generateSendtag } from './utils/generators'
 
 let log: debug.Debugger
 
@@ -13,9 +12,6 @@ const test = mergeTests(snapletTest, webauthnTest)
 test.beforeEach(async ({ page }) => {
   log = debug(`test:sign-in:${test.info().parallelIndex}`)
 })
-
-const randomCountry = () =>
-  countries[Math.floor(Math.random() * countries.length)] as (typeof countries)[number]
 
 test('can sign up', async ({ page, pg }) => {
   const sendtag = generateSendtag()
@@ -52,7 +48,7 @@ test('can sign up', async ({ page, pg }) => {
 })
 
 test('country code is selected based on geoip', async ({ page, context, pg }) => {
-  const country = randomCountry()
+  const country = generateCountry()
 
   await page.route('https://ipapi.co/json/', async (route) => {
     await route.fulfill({

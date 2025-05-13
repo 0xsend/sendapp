@@ -18,12 +18,12 @@ export const FirstSendtagForm = () => {
   const form = useForm<z.infer<typeof SendtagSchemaWithoutRestrictions>>()
   const router = useRouter()
   const user = useUser()
-  const { validateSendtag } = useValidateSendtag()
 
   const formName = form.watch('name')
   const validationError = form.formState.errors.root
   const canSubmit = !!formName && !validationError
 
+  const { mutateAsync: validateSendtagMutateAsync } = useValidateSendtag()
   const { mutateAsync: registerFirstSendtagMutateAsync } =
     api.tag.registerFirstSendtag.useMutation()
 
@@ -37,7 +37,7 @@ export const FirstSendtagForm = () => {
 
   const handleSubmit = async ({ name }: z.infer<typeof SendtagSchemaWithoutRestrictions>) => {
     try {
-      await validateSendtag(name)
+      await validateSendtagMutateAsync({ name })
       await registerFirstSendtagMutateAsync({ name })
     } catch (error) {
       form.setError('root', {

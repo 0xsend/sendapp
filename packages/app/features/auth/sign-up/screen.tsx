@@ -26,7 +26,7 @@ import { assert } from 'app/utils/assert'
 import { useUser } from 'app/utils/useUser'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { useValidateSendtag } from 'app/utils/tags/useValidateSendtag'
-import { setFirstSendtagCookie } from 'app/utils/useFirstSendtagCookie'
+import { useSetFirstSendtag } from 'app/utils/useFirstSendtag'
 
 const SignUpScreenFormSchema = z.object({
   name: formFields.text,
@@ -53,21 +53,19 @@ export const SignUpScreen = () => {
   const termsCheckboxId = useId()
   const { resolvedTheme } = useThemeSetting()
   const isDarkTheme = resolvedTheme?.startsWith('dark')
-  const { signIn } = useSignIn()
   const { createSendAccount } = useCreateSendAccount()
-  const { validateSendtag } = useValidateSendtag()
 
   const formName = form.watch('name')
   const formIsAgreedToTerms = form.watch('isAgreedToTerms')
   const validationError = form.formState.errors.root
   const canSubmit = formName && formIsAgreedToTerms && captchaToken
 
-  const { mutateAsync: signUpMutateAsync } = api.auth.signUp.useMutation({
-    retry: false,
-  })
-
+  const { mutateAsync: validateSendtagMutateAsync } = useValidateSendtag()
+  const { mutateAsync: signInMutateAsync } = useSignIn()
+  const { mutateAsync: signUpMutateAsync } = api.auth.signUp.useMutation({ retry: false })
   const { mutateAsync: registerFirstSendtagMutateAsync } =
     api.tag.registerFirstSendtag.useMutation()
+  const { mutateAsync: setFirstSendtagMutateAsync } = useSetFirstSendtag()
 
   useEffect(() => {
     const subscription = form.watch(() => {
@@ -91,7 +89,7 @@ export const SignUpScreen = () => {
 
   const handleSubmit = async ({ name }: z.infer<typeof SignUpScreenFormSchema>) => {
     try {
-      await validateSendtag(name)
+      await validateSendtagMutateAsync({ name })
 
       if (signUpFormState !== SignUpFormState.PasskeyCreationFailed) {
         await signUpMutateAsync({
@@ -100,7 +98,10 @@ export const SignUpScreen = () => {
         })
       }
 
-      setFirstSendtagCookie(name)
+      await setFirstSendtagMutateAsync(name).catch((error) => {
+        // don't interrupt flow if async storage is not available
+        console.error('Unable to save sendtag into async storage: ', error.message)
+      })
 
       await createAccount().catch((error) => {
         setSignUpFormState(SignUpFormState.PasskeyCreationFailed)
@@ -125,7 +126,7 @@ export const SignUpScreen = () => {
     setIsSigningIn(true)
 
     try {
-      await signIn({})
+      await signInMutateAsync({})
       router.push(redirectUri ?? '/')
     } catch (error) {
       toast.show(formatErrorMessage(error), {
@@ -136,7 +137,7 @@ export const SignUpScreen = () => {
     } finally {
       setIsSigningIn(false)
     }
-  }, [signIn, toast.show, router.push, redirectUri])
+  }, [signInMutateAsync, toast.show, router.push, redirectUri])
 
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (

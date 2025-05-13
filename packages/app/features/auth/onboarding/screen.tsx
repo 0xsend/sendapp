@@ -19,8 +19,8 @@ import { api } from 'app/utils/api'
 import { assert } from 'app/utils/assert'
 import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import { useValidateSendtag } from 'app/utils/tags/useValidateSendtag'
-import { useFirstSendtagCookie } from 'app/utils/useFirstSendtagCookie'
 import { formatErrorMessage } from 'app/utils/formatErrorMessage'
+import { useFirstSendtagQuery } from 'app/utils/useFirstSendtag'
 
 const OnboardingSchema = z.object({
   name: formFields.text,
@@ -34,13 +34,13 @@ export function OnboardingScreen() {
   const { createSendAccount } = useCreateSendAccount()
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
   const isClient = useIsClient()
-  const { validateSendtag } = useValidateSendtag()
-  const { data: firstSendtag } = useFirstSendtagCookie()
+  const { data: firstSendtag } = useFirstSendtagQuery()
 
   const formName = form.watch('name')
   const validationError = form.formState.errors.root
   const canSubmit = formName
 
+  const { mutateAsync: validateSendtagMutateAsync } = useValidateSendtag()
   const { mutateAsync: registerFirstSendtagMutateAsync } =
     api.tag.registerFirstSendtag.useMutation()
 
@@ -95,7 +95,7 @@ export function OnboardingScreen() {
 
       assert(!!user?.id, 'No user id')
 
-      await validateSendtag(name)
+      await validateSendtagMutateAsync({ name })
       await createSendAccount({ user, accountName: name })
       await registerFirstSendtagMutateAsync({ name })
       replace('/')

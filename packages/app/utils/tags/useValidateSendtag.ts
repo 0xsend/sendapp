@@ -1,23 +1,25 @@
 import { SendtagSchema } from 'app/utils/zod/sendtag'
 import { SendtagAvailability } from '@my/api/src/routers/tag/types'
 import { api } from 'app/utils/api'
+import { useMutation } from '@tanstack/react-query'
 
 export const useValidateSendtag = () => {
-  const { mutateAsync: checkAvailabilityMutateAsync } = api.tag.checkAvailability.useMutation()
+  const { mutateAsync: checkAvailability } = api.tag.checkAvailability.useMutation()
 
-  const validateSendtag = async (name: string) => {
-    const { error: schemaError } = SendtagSchema.safeParse({ name })
+  return useMutation({
+    mutationFn: async ({ name }: { name: string }) => {
+      const { error } = SendtagSchema.safeParse({ name })
 
-    if (schemaError) {
-      throw new Error(schemaError.errors[0]?.message ?? 'Invalid Sendtag')
-    }
+      if (error) {
+        throw new Error(error.errors[0]?.message ?? 'Invalid Sendtag')
+      }
 
-    const { sendtagAvailability } = await checkAvailabilityMutateAsync({ name })
+      const { sendtagAvailability } = await checkAvailability({ name })
 
-    if (sendtagAvailability === SendtagAvailability.Taken) {
-      throw new Error('This Sendtag is already taken')
-    }
-  }
-
-  return { validateSendtag }
+      if (sendtagAvailability === SendtagAvailability.Taken) {
+        throw new Error('This Sendtag is already taken')
+      }
+    },
+    retry: false,
+  })
 }
