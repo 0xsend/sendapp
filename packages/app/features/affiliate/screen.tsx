@@ -1,207 +1,348 @@
 import {
-  AnimatePresence,
   Avatar,
-  Button,
   Card,
-  CardHeader,
-  H3,
-  Label,
-  LinkableButton,
+  Link,
   Paragraph,
+  RecyclerList,
+  Separator,
   Spinner,
-  Stack,
+  useMedia,
   XStack,
   YStack,
-  Link,
 } from '@my/ui'
-
-import { useAffiliateReferrals } from './utils/useAffiliateReferrals'
-import { Fragment } from 'react'
-import { useAffiliateStats } from './utils/useAffiliateStats'
+import { type PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react'
 import type { Functions } from '@my/supabase/database.types'
+import { toNiceError } from 'app/utils/toNiceError'
+import { useScrollDirection } from 'app/provider/scroll'
+import {
+  dataProviderMaker,
+  type Dimension,
+  layoutProviderMaker,
+} from '@my/ui/src/components/RecyclerList.web'
+import { IconBirthday, IconXLogo } from 'app/components/icons'
+import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { adjustUTCDateForTimezone } from 'app/utils/dateHelper'
+import { useReferrer } from 'app/utils/useReferrer'
+import { useFriends } from 'app/features/affiliate/utils/useFriends'
+import { ReferralLink } from 'app/components/ReferralLink'
 
-export const AffiliateScreen = () => {
-  return (
-    <YStack width={'100%'} gap="$4" pb="$6">
-      <XStack alignItems="center" width={'100%'} jc="flex-end" gap="$6">
-        <LinkableButton href="/leaderboard" fontWeight={'bold'}>
-          Leaderboard
-        </LinkableButton>
-      </XStack>
-      <StatsCards />
-      <ReferralsList />
-    </YStack>
-  )
-}
+type Referral = Pick<
+  Functions<'profile_lookup'>[number],
+  'avatar_url' | 'x_username' | 'birthday' | 'tag'
+>
 
-const StatsCards = () => {
-  const { data: affiliateStats, isLoading, error: affiliateStatsError } = useAffiliateStats()
-
-  return (
-    <>
-      <Stack
-        fd="column"
-        $gtLg={{ fd: 'row' }}
-        flexWrap="wrap"
-        ai="flex-start"
-        gap="$3"
-        mb="$4"
-        width={'100%'}
-      >
-        <Card $gtLg={{ flexShrink: 0, flexBasis: '32%' }} w="100%" mih={152}>
-          <CardHeader>
-            <Label color={'$color10'}>Your Friends</Label>
-          </CardHeader>
-          {isLoading ? (
-            <Spinner alignSelf="flex-start" size="large" color="$color12" mt="auto" p="$4" />
-          ) : (
-            <>
-              <Paragraph pl="$4" pb="$3" fontWeight="600" size={'$12'} lineHeight={'$11'}>
-                {affiliateStats?.referral_count || 0}
-              </Paragraph>
-            </>
-          )}
-        </Card>
-      </Stack>
-      {affiliateStatsError && (
-        <Paragraph theme={'red_active'}>{affiliateStatsError?.message}</Paragraph>
-      )}
-    </>
-  )
-}
-
-const ReferralsList = () => {
-  const pageSize = 30
-  const result = useAffiliateReferrals({
-    pageSize,
+export const FriendsScreen = () => {
+  const media = useMedia()
+  const { isAtEnd } = useScrollDirection()
+  const [layoutSize, setLayoutSize] = useState<Dimension>({ width: 0, height: 0 })
+  const friendsFeedQuery = useFriends({
+    pageSize: 10,
   })
-  const {
-    data,
-    isLoading: isLoadingReferrals,
-    error: referralsError,
-    isFetching: isFetchingReferrals,
-    isFetchingNextPage: isFetchingNextPageReferrals,
-    fetchNextPage,
-    hasNextPage,
-  } = result
+  const { data, isLoading, error, isFetchingNextPage, fetchNextPage, hasNextPage } =
+    friendsFeedQuery
+  const { data: referrer, isLoading: isReferrerLoading } = useReferrer()
 
-  const { pages } = data ?? {}
+  const referrals = useMemo(() => {
+    const refs: Referral[] = []
 
-  if (isLoadingReferrals) {
-    return <Spinner size="small" color="$color12" />
+    if (referrer) {
+      refs.push(referrer)
+    }
+
+    if (data?.pages) {
+      refs.push(...(data.pages.flat() as Referral[]))
+    }
+
+    return refs
+  }, [data, referrer])
+  const [dataProvider, setDataProvider] = useState(dataProviderMaker(referrals))
+
+  const layoutSizeAdjustment = media.gtLg ? 78 : 0
+
+  const _layoutProvider = layoutProviderMaker({
+    getHeightOrWidth: () => (media.gtLg ? 42 : 96),
+  })
+
+  const _renderRow = useCallback(
+    (_, referral: Referral, index: number) =>
+      media.gtLg ? (
+        <FriendDesktopRow referral={referral} referrer={referrer} index={index} />
+      ) : (
+        <FriendMobileRow referral={referral} referrer={referrer} />
+      ),
+    [referrer, media.gtLg]
+  )
+
+  const renderFooter = () => {
+    if (!isLoading && isFetchingNextPage) {
+      return <Spinner size="small" color={'$color12'} mb="$3.5" />
+    }
+    return <Spinner opacity={0} mb="$3.5" />
+  }
+
+  useEffect(() => {
+    setDataProvider((prev) => prev.cloneWithRows(referrals))
+  }, [referrals])
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (isAtEnd && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage().then(({ data }) => {
+          const referrals: Referral[] = []
+
+          if (referrer) {
+            referrals.push(referrer)
+          }
+
+          if (data?.pages) {
+            referrals.push(...(data.pages.flat() as Referral[]))
+          }
+
+          setDataProvider((prev) => prev.cloneWithRows(referrals))
+        })
+      }
+    }, 50)
+  }, [isAtEnd, hasNextPage, fetchNextPage, isFetchingNextPage, referrer])
+
+  const onCardLayout = useCallback((e) => {
+    setLayoutSize({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height })
+  }, [])
+
+  if (isLoading || isReferrerLoading) return <Spinner size="small" />
+
+  if (error !== null) {
+    return (
+      <Paragraph maxWidth={600} fontFamily={'$mono'} fontSize={'$5'} color={'$color12'}>
+        {toNiceError(error)}
+      </Paragraph>
+    )
+  }
+
+  if (referrals.length === 0) {
+    return (
+      <XStack ai={'flex-start'} pt={'$5'}>
+        <ReferralLink
+          f={0}
+          p={0}
+          label={
+            <Paragraph size={'$5'}>Invite friends to Send using your referral code:</Paragraph>
+          }
+        />
+      </XStack>
+    )
   }
 
   return (
-    <YStack space="$4">
-      <XStack alignItems="center" gap="$3">
-        <H3 fontWeight={'normal'}>
-          {!pages || !pages[0]?.length ? 'No invited friends yet' : 'Friends'}
-        </H3>
-      </XStack>
-      {Boolean(pages?.[0]?.length) && (
-        <Card gap="$5" p="$5" w="100%" fd="row" flexWrap="wrap">
-          {referralsError && (
-            <Paragraph maxWidth={600} fontFamily={'$mono'} fontSize={'$5'} color={'$color12'}>
-              {referralsError?.message.split('.').at(0) ?? `${referralsError}`}
-            </Paragraph>
-          )}
-          {pages?.map((referrals) => {
-            return referrals?.map((referral) => {
-              if (!referral) return null
-              return (
-                <Fragment key={`${referral.tag}`}>
-                  <AnimateEnter>
-                    <ReferralsListRow referral={referral} />
-                  </AnimateEnter>
-                </Fragment>
-              )
-            })
-          })}
-          <AnimateEnter>
-            {!isLoadingReferrals && (isFetchingNextPageReferrals || hasNextPage) ? (
-              <>
-                {isFetchingNextPageReferrals && <Spinner size="small" />}
-                {hasNextPage && (
-                  <Button
-                    onPress={() => {
-                      fetchNextPage()
-                    }}
-                    disabled={isFetchingNextPageReferrals || isFetchingReferrals}
-                    width={200}
-                    mx="auto"
-                    mb="$6"
-                    bc="$color3"
-                  >
-                    Load More
-                  </Button>
-                )}
-              </>
-            ) : null}
-          </AnimateEnter>
-        </Card>
-      )}
+    <YStack flex={1} onLayout={onCardLayout} pb={'$3.5'}>
+      {dataProvider.getSize() > 0 && layoutSize.height > 0 ? (
+        <FriendsListTable>
+          <RecyclerList
+            style={{ flex: 1, overflow: 'auto' }}
+            dataProvider={dataProvider}
+            rowRenderer={_renderRow}
+            layoutProvider={_layoutProvider}
+            renderFooter={renderFooter}
+            layoutSize={{
+              width: layoutSize.width - layoutSizeAdjustment,
+              height: layoutSize.height,
+            }}
+            key={`recycler-${layoutSize.width}-${layoutSize.height}`}
+          />
+        </FriendsListTable>
+      ) : null}
     </YStack>
   )
 }
 
-const ReferralsListRow = ({
+const FriendMobileRow = ({
   referral,
+  referrer,
 }: {
-  referral: Functions<'get_affiliate_referrals'>[number]
+  referral: Referral
+  referrer?: Referral | null
 }) => {
-  const date = new Date(referral?.created_at).toLocaleString(undefined, { dateStyle: 'medium' })
+  const hoverStyles = useHoverStyles()
+
+  const birthday = referral.birthday
+    ? adjustUTCDateForTimezone(new Date(referral.birthday)).toLocaleString(undefined, {
+        day: 'numeric',
+        month: 'long',
+      })
+    : 'NA'
 
   return (
-    <Card bc="$color0" ai="center">
-      <Link href={`/${referral.tag}`} f={1} als="stretch" px="$5" py="$3" w="100%" h="100%">
-        <XStack gap="$5" f={1} ai="center" jc={'space-between'}>
-          <XStack gap="$3.5" f={1} ai="center">
+    <Card w={'100%'} gap={'$3.5'} br={'$5'} p={'$3.5'} cursor={'pointer'} hoverStyle={hoverStyles}>
+      <XStack f={1} w={'100%'} ai={'center'}>
+        <Link
+          href={`/${referral.tag}`}
+          containerProps={{
+            f: 1,
+          }}
+        >
+          <XStack f={1} w={'100%'} gap={'$3.5'}>
             <Avatar size="$4.5" br="$4" gap="$2">
               <Avatar.Image src={referral.avatar_url ?? ''} />
               <Avatar.Fallback jc="center" bc="$olive">
                 <Avatar size="$4.5" br="$4">
                   <Avatar.Image
-                    src={
-                      'https://ui-avatars.com/api/?name=TODO&size=256&format=png&background=86ad7f'
-                    }
+                    src={`https://ui-avatars.com/api/?name=${referral.tag}&size=256&format=png&background=86ad7f`}
                   />
                 </Avatar>
               </Avatar.Fallback>
             </Avatar>
-
-            <YStack>
-              <XStack gap="$1.5" width={'100%'}>
-                <Paragraph color="$color12" fontSize="$5">
-                  /{referral.tag}
-                </Paragraph>
+            <YStack gap={'$2'} f={1}>
+              <Paragraph lineHeight={20}>
+                /{referral.tag}
+                {referral.tag === referrer?.tag ? ' (Invited you to Send)' : ''}
+              </Paragraph>
+              <XStack gap={'$2'} alignItems={'center'}>
+                <IconBirthday size={'$1'} />
+                <Paragraph lineHeight={20}>{birthday}</Paragraph>
               </XStack>
-
-              <Stack>
-                <Paragraph color="$color10" size={'$3'}>
-                  {date}
-                </Paragraph>
-              </Stack>
             </YStack>
           </XStack>
-        </XStack>
-      </Link>
+        </Link>
+        {referral.x_username && (
+          <Link href={`https://x.com/${referral.x_username}`} target={'_blank'}>
+            <IconXLogo size={'$1'} color={'$primary'} $theme-light={{ color: '$color12' }} />
+          </Link>
+        )}
+      </XStack>
     </Card>
   )
 }
 
-function AnimateEnter({ children }: { children: React.ReactNode }) {
+const FriendDesktopRow = ({
+  referral,
+  referrer,
+  index,
+}: {
+  referral: Referral
+  index: number
+  referrer?: Referral | null
+}) => {
+  const hoverStyles = useHoverStyles()
+
+  const birthday = referral.birthday
+    ? adjustUTCDateForTimezone(new Date(referral.birthday)).toLocaleString(undefined, {
+        day: 'numeric',
+        month: 'long',
+      })
+    : 'NA'
+
   return (
-    <AnimatePresence>
-      <Stack
-        key="enter"
-        animateOnly={['transform', 'opacity']}
-        animation="200ms"
-        enterStyle={{ opacity: 0, scale: 0.9 }}
-        exitStyle={{ opacity: 0, scale: 0.95 }}
-        opacity={1}
+    <Link href={`/${referral.tag}`}>
+      <XStack
+        gap={'$3.5'}
+        px={'$3.5'}
+        py={'$2'}
+        ai={'center'}
+        cursor={'pointer'}
+        br={'$3'}
+        hoverStyle={hoverStyles}
       >
-        {children}
-      </Stack>
-    </AnimatePresence>
+        <Paragraph
+          w={'3%'}
+          tt={'uppercase'}
+          textAlign={'right'}
+          color={'$lightGrayTextField'}
+          $theme-light={{ color: '$darkGrayTextField' }}
+        >
+          {index + 1}
+        </Paragraph>
+        <XStack w={'45%'} gap={'$2'} ai={'center'}>
+          <Avatar size="$2" br="$2">
+            <Avatar.Image src={referral.avatar_url ?? ''} />
+            <Avatar.Fallback jc="center" bc="$olive">
+              <Avatar size="$2" br="$2">
+                <Avatar.Image
+                  src={`https://ui-avatars.com/api/?name=${referral.tag}&size=256&format=png&background=86ad7f`}
+                />
+              </Avatar>
+            </Avatar.Fallback>
+          </Avatar>
+          <Paragraph lineHeight={20}>
+            /{referral.tag}
+            {referral.tag === referrer?.tag ? ' (Invited you to Send)' : ''}
+          </Paragraph>
+        </XStack>
+        <Paragraph w={'25%'} ta={'right'}>
+          {birthday}
+        </Paragraph>
+        {referral.x_username ? (
+          <Paragraph
+            w={'25%'}
+            ta={'right'}
+            cursor={'pointer'}
+            textDecorationLine={'underline'}
+            onPress={(e) => {
+              e.stopPropagation?.()
+              e.preventDefault?.()
+              if (window) {
+                window.open(`https://x.com/${referral.x_username}`, '_blank')
+              }
+            }}
+          >
+            @{referral.x_username}
+          </Paragraph>
+        ) : (
+          <Paragraph w={'25%'} ta={'right'}>
+            NA
+          </Paragraph>
+        )}
+      </XStack>
+    </Link>
   )
+}
+
+const FriendsListTable = ({ children }: PropsWithChildren) => {
+  const media = useMedia()
+
+  if (media.gtLg) {
+    return (
+      <Card p={'$7'} gap={'$3.5'}>
+        <XStack gap={'$3.5'} px={'$3.5'}>
+          <Paragraph
+            width={'3%'}
+            tt={'uppercase'}
+            textAlign={'right'}
+            color={'$lightGrayTextField'}
+            $theme-light={{ color: '$darkGrayTextField' }}
+          >
+            #
+          </Paragraph>
+          <Paragraph
+            width={'47%'}
+            tt={'uppercase'}
+            color={'$lightGrayTextField'}
+            $theme-light={{ color: '$darkGrayTextField' }}
+          >
+            sendtag
+          </Paragraph>
+          <Paragraph
+            width={'25%'}
+            tt={'uppercase'}
+            textAlign={'right'}
+            color={'$lightGrayTextField'}
+            $theme-light={{ color: '$darkGrayTextField' }}
+          >
+            birthday
+          </Paragraph>
+          <Paragraph
+            width={'25%'}
+            tt={'uppercase'}
+            textAlign={'right'}
+            color={'$lightGrayTextField'}
+            $theme-light={{ color: '$darkGrayTextField' }}
+          >
+            social link
+          </Paragraph>
+        </XStack>
+        <Separator boc={'$darkGrayTextField'} />
+        {children}
+      </Card>
+    )
+  }
+
+  return children
 }

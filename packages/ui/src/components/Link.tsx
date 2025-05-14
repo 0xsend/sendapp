@@ -1,11 +1,12 @@
 import { useLink, type LinkProps as SolitoLinkProps } from 'solito/link'
-import { SizableText, styled, View, type TextProps } from 'tamagui'
+import { SizableText, styled, View, type TextProps, type ViewProps } from 'tamagui'
 
 export type LinkProps = Omit<SolitoLinkProps, 'passHref' | 'as'> &
   TextProps & {
     target?: string
     rel?: string
     title?: string
+    containerProps?: ViewProps
   }
 
 const StyledLink = styled(View, {
@@ -27,11 +28,12 @@ export const Link = ({
   locale,
   children,
   target,
+  containerProps,
   ...props
 }: LinkProps) => {
   const linkProps = useLink({ href, replace, scroll, shallow })
   return (
-    <StyledLink target={target} {...linkProps}>
+    <StyledLink target={target} {...linkProps} {...containerProps}>
       <SizableText tag="span" {...props}>
         {children}
       </SizableText>
