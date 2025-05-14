@@ -107,8 +107,7 @@ function InvestmentsAggregate() {
     // Simple average of percentage changes
     const aggregatePercentage =
       marketData.reduce((total, coin) => {
-        // Use 0 if market_cap_change_percentage_24h is null or undefined
-        return total + (coin?.market_cap_change_percentage_24h ?? 0)
+        return total + (coin?.price_change_percentage_24h ?? 0)
       }, 0) / marketData.length
 
     return {
