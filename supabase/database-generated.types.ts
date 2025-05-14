@@ -1623,6 +1623,7 @@ export type Database = {
           address: string | null
           all_tags: string[] | null
           avatar_url: string | null
+          birthday: string | null
           chain_id: number | null
           id: string | null
           is_public: boolean | null
@@ -1774,6 +1775,16 @@ export type Database = {
           referral_count: number
         }[]
       }
+      get_friends: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          avatar_url: string
+          x_username: string
+          birthday: string
+          tag: string
+          created_at: string
+        }[]
+      }
       get_pending_jackpot_tickets_purchased: {
         Args: Record<PropertyKey, never>
         Returns: number
@@ -1876,6 +1887,7 @@ export type Database = {
           about: string
           refcode: string
           x_username: string
+          birthday: string
           tag: string
           address: string
           chain_id: number
@@ -2037,6 +2049,7 @@ export type Database = {
         about: string
         refcode: string
         x_username: string
+        birthday: string
         tag: string
         address: string
         chain_id: number
