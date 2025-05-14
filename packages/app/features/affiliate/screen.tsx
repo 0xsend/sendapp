@@ -9,7 +9,6 @@ import {
   useMedia,
   XStack,
   YStack,
-  Anchor,
 } from '@my/ui'
 import { type PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react'
 import type { Functions } from '@my/supabase/database.types'
@@ -25,6 +24,7 @@ import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { adjustUTCDateForTimezone } from 'app/utils/dateHelper'
 import { useReferrer } from 'app/utils/useReferrer'
 import { useFriends } from 'app/features/affiliate/utils/useFriends'
+import { ReferralLink } from 'app/components/ReferralLink'
 
 type Referral = Pick<
   Functions<'profile_lookup'>[number],
@@ -120,29 +120,15 @@ export const FriendsScreen = () => {
 
   if (referrals.length === 0) {
     return (
-      <Paragraph size={'$5'} pt={'$5'}>
-        You have no friends yet.&nbsp;
-        <Anchor
-          size={'$5'}
-          href={'/account/sendtag'}
-          textDecorationLine="underline"
-          color={'$primary'}
-          $theme-light={{ color: '$color12' }}
-        >
-          Register your send tag
-        </Anchor>
-        &nbsp;and&nbsp;
-        <Anchor
-          size={'$5'}
-          href={'/account'}
-          textDecorationLine="underline"
-          color={'$primary'}
-          $theme-light={{ color: '$color12' }}
-        >
-          invite your friends
-        </Anchor>
-        &nbsp;to Send.
-      </Paragraph>
+      <XStack ai={'flex-start'} pt={'$5'}>
+        <ReferralLink
+          f={0}
+          p={0}
+          label={
+            <Paragraph size={'$5'}>Invite friends to Send using your referral code:</Paragraph>
+          }
+        />
+      </XStack>
     )
   }
 
