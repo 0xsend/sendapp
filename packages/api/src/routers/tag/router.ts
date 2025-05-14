@@ -12,11 +12,114 @@ import { byteaTxHash } from 'app/utils/zod'
 import debug from 'debug'
 import { isAddressEqual, withRetry, zeroAddress } from 'viem'
 import { z } from 'zod'
-import { createTRPCRouter, protectedProcedure } from '../trpc'
+import { createTRPCRouter, protectedProcedure, publicProcedure } from '../../trpc'
+import { SendtagSchema } from 'app/utils/zod/sendtag'
+import { SendtagAvailability } from './types'
 
 const log = debug('api:routers:tag')
 
 export const tagRouter = createTRPCRouter({
+  checkAvailability: publicProcedure.input(SendtagSchema).mutation(async ({ input: { name } }) => {
+    log('checking sendtag availability: ', { name })
+
+    try {
+      const supabaseAdmin = createSupabaseAdminClient()
+
+      const { count, error } = await supabaseAdmin
+        .from('tags')
+        .select('*', { count: 'exact', head: true })
+        .eq('name', name)
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          return { sendtagAvailability: SendtagAvailability.Available }
+        }
+
+        throw new Error(error.message || "Unable to fetch user's tags")
+      }
+
+      if (count && count > 0) {
+        return { sendtagAvailability: SendtagAvailability.Taken }
+      }
+
+      return { sendtagAvailability: SendtagAvailability.Available }
+    } catch (error) {
+      log('Error checking sendtag availability: ', error)
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: `Failed to check sendtag availability: ${error.message}`,
+      })
+    }
+  }),
+  registerFirstSendtag: protectedProcedure
+    .input(SendtagSchema)
+    .mutation(async ({ ctx: { supabase, session, referralCode }, input: { name } }) => {
+      try {
+        const supabaseAdmin = createSupabaseAdminClient()
+
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('*, tags (*)')
+          .eq('tags.status', 'confirmed')
+          .single()
+
+        if (profileError || !profile) {
+          throw new Error(profileError.message || 'Profile not found')
+        }
+
+        if (profile.tags.length > 0) {
+          throw new Error('First sendtag already registered')
+        }
+
+        const referrerProfileLookupResult = referralCode
+          ? await fetchReferrer({
+              supabase,
+              profile,
+              referral_code: referralCode,
+            }).catch((e) => {
+              const error = e as unknown as PostgrestError
+              if (error.code === 'PGRST116') {
+                return null
+              }
+              throw new Error(error.message || "Unable to fetch referrer's profile")
+            })
+          : null
+
+        const { error: insertError } = await supabaseAdmin
+          .from('tags')
+          .insert({ name, status: 'confirmed', user_id: session.user.id })
+
+        if (insertError) {
+          throw new Error(insertError.message || 'Unable to save tag')
+        }
+
+        if (referrerProfileLookupResult) {
+          const { data: referrerProfile, error: referrerProfileError } = await supabaseAdmin
+            .from('profiles')
+            .select('*')
+            .eq('referral_code', referrerProfileLookupResult.refcode)
+            .single()
+
+          if (referrerProfileError || !referrerProfile) {
+            throw new Error(referrerProfileError.message || "Unable to fetch referrer's profile")
+          }
+
+          const { error: insertReferralError } = await supabaseAdmin
+            .from('referrals')
+            .insert({ referrer_id: referrerProfile.id, referred_id: session.user.id })
+
+          if (insertReferralError) {
+            throw new Error(insertReferralError.message || 'Unable to save referral')
+          }
+        }
+      } catch (error) {
+        log('Error registering first sendtag: ', error)
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: `Failed to register first sendtag: ${error.message}`,
+        })
+      }
+    }),
   confirm: protectedProcedure
     .input(
       z.object({

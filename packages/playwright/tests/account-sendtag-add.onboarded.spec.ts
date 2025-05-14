@@ -68,7 +68,8 @@ test('cannot add an invalid tag name', async ({ addSendtagsPage }) => {
 })
 
 test('cannot add more than 5 tags', async ({ addSendtagsPage, supabase }) => {
-  const tagNames = Array.from({ length: 5 }, () => ({
+  // counting 1st free tag registered during onboarding
+  const tagNames = Array.from({ length: 4 }, () => ({
     name: `${faker.lorem.word()}_${test.info().parallelIndex}`,
   }))
   await supabase

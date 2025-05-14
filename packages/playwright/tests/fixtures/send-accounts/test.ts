@@ -10,22 +10,33 @@ import { OnboardingPage } from './page'
 
 let log: debug.Debugger
 
-export const signUp = async (page: Page, phone: string, expect: Expect) => {
-  await page.getByLabel('Phone number').fill(phone)
-  const signUpButton = page.getByRole('button', { name: 'Sign Up' })
+export const signUp = async (page: Page, sendtag: string, expect: Expect) => {
+  const request = page.waitForRequest((request) => {
+    return request.url().includes('/api/trpc/sendAccount.create') && request.method() === 'POST'
+  })
+
+  const response = page.waitForEvent('response', {
+    predicate: async (response) => {
+      if (response.url().includes('/api/trpc/sendAccount.create')) {
+        const json = await response.json()
+        expect(json.data?.[0]?.error).toBeFalsy()
+        return true
+      }
+      return false
+    },
+    timeout: 15_000,
+  })
+
+  await page.getByTestId('sendtag-input').fill(sendtag)
+  await page.getByRole('checkbox').check()
+  const signUpButton = page.getByRole('button', { name: 'create account' })
   await expect(signUpButton).toBeVisible()
   await expect(signUpButton).toBeEnabled()
   await signUpButton.click()
-  const otpInput = page.getByLabel('One-time Password')
-  await expect(otpInput).toBeVisible()
-  await otpInput.fill('123456')
-  const verifyAccountButton = page.getByRole('button', { name: 'VERIFY ACCOUNT' })
-  await expect(verifyAccountButton).toBeVisible()
-  await verifyAccountButton.click()
-  await page.waitForLoadState()
-  await expect(page).toHaveURL('/auth/onboarding')
-  const onboardingPage = new OnboardingPage(page)
-  await onboardingPage.completeOnboarding(expect)
+  await request
+  await response
+  await page.getByRole('button', { name: 'create account' }).waitFor({ state: 'detached' })
+  await page.waitForURL('/')
 }
 
 const sendAccountTest = base.extend<{

@@ -20,7 +20,7 @@ export function OnboardedConcern({ children }: { children: React.ReactNode }) {
       return
     }
 
-    if (!sendAccount.data && pathname !== '/auth/onboarding') {
+    if (!sendAccount.data && pathname !== '/auth/onboarding' && pathname !== '/auth/sign-up') {
       router.push('/auth/onboarding')
       return
     }

@@ -4,22 +4,18 @@ import { test as webauthnTest } from '../webauthn'
 import { test as snapletTest } from '../snaplet'
 
 import type { Database, Tables } from '@my/supabase/database.types'
-import { type Session, type SupabaseClient, type User, createClient } from '@supabase/supabase-js'
-import { countries } from 'app/utils/country'
+import { createClient, type Session, type SupabaseClient, type User } from '@supabase/supabase-js'
 import {
-  SUPABASE_URL,
-  SUPABASE_SUBDOMAIN,
   createSupabaseAdminClient,
+  SUPABASE_SUBDOMAIN,
+  SUPABASE_URL,
 } from 'app/utils/supabase/admin'
 import debug from 'debug'
 import jwt, { type JwtPayload } from 'jsonwebtoken'
 import config from '../../../playwright.config'
 import { assert } from 'app/utils/assert'
 import { faker } from '@faker-js/faker'
-import { generatePhone } from '../../utils/generators'
-
-const randomCountry = () =>
-  countries[Math.floor(Math.random() * countries.length)] as (typeof countries)[number]
+import { generateCountry, generatePhone } from '../../utils/generators'
 
 let log: debug.Debugger
 
@@ -118,7 +114,7 @@ const authTest = snapletTest.extend<{
     const supabaseAdmin = createSupabaseAdminClient()
 
     const randomNumber = generatePhone()
-    const country = randomCountry()
+    const country = generateCountry()
     const { data, error } = await supabaseAdmin.auth.signUp({
       options: {
         data: {

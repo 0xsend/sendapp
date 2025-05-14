@@ -1,36 +1,30 @@
-import { RecoveryOptions } from '@my/api/src/routers/account-recovery/types'
 import {
   Button,
   ButtonText,
   H1,
+  isWeb,
   LinearGradient,
   Paragraph,
-  Spinner,
   Stack,
   SubmitButton,
-  XStack,
-  YStack,
-  isWeb,
   useMedia,
   usePwa,
   useSafeAreaInsets,
   useToastController,
+  XStack,
+  YStack,
 } from '@my/ui'
-import { useQuery } from '@tanstack/react-query'
 import { IconSendLogo } from 'app/components/icons'
 import { useAuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
 import { Carousel, carouselImagePositions } from 'app/features/auth/components/Carousel'
 import { useAuthScreenParams } from 'app/routers/params'
-import { api } from 'app/utils/api'
-import { assert } from 'app/utils/assert'
 import { formatErrorMessage } from 'app/utils/formatErrorMessage'
-import { signChallenge } from 'app/utils/signChallenge'
 import { useEffect, useState } from 'react'
 import { SolitoImage } from 'solito/image'
 import { useLink } from 'solito/link'
 import { useRouter } from 'solito/router'
-import { bytesToHex, hexToBytes } from 'viem'
 import { AnimationLayout } from '../../components/layout/animation-layout'
+import { useSignIn } from 'app/utils/send-accounts'
 
 export function SplashScreen() {
   return (
@@ -257,48 +251,12 @@ function AuthButtons() {
   const router = useRouter()
   const signUpLink = useLink({ href: '/auth/sign-up' })
   const [isSigningIn, setIsSigningIn] = useState(false)
-
-  const { mutateAsync: getChallengeMutateAsync } = api.challenge.getChallenge.useMutation({
-    retry: false,
-  })
-  const {
-    data: challengeData,
-    isLoading: isLoadingChallenge,
-    error: challengeError,
-  } = useQuery({
-    queryKey: ['challenge'],
-    queryFn: async () => await getChallengeMutateAsync(),
-    enabled: !!getChallengeMutateAsync,
-  })
-
-  const { mutateAsync: validateSignatureMutateAsync } = api.challenge.validateSignature.useMutation(
-    { retry: false }
-  )
+  const { mutateAsync: signInMutateAsync } = useSignIn()
 
   const handleSignIn = async () => {
     setIsSigningIn(true)
     try {
-      assert(!!challengeData, 'Challenge data is missing')
-      assert(!!challengeData.challenge, 'Challenge challenge is missing')
-
-      const rawIdsB64: { id: string; userHandle: string }[] = []
-      const { encodedWebAuthnSig, accountName, keySlot } = await signChallenge(
-        challengeData.challenge as `0x${string}`,
-        rawIdsB64
-      )
-
-      const encodedWebAuthnSigBytes = hexToBytes(encodedWebAuthnSig)
-      const newEncodedWebAuthnSigBytes = new Uint8Array(encodedWebAuthnSigBytes.length + 1)
-      newEncodedWebAuthnSigBytes[0] = keySlot
-      newEncodedWebAuthnSigBytes.set(encodedWebAuthnSigBytes, 1)
-
-      await validateSignatureMutateAsync({
-        recoveryType: RecoveryOptions.WEBAUTHN,
-        signature: bytesToHex(newEncodedWebAuthnSigBytes),
-        challengeId: challengeData.id,
-        identifier: `${accountName}.${keySlot}`,
-      })
-
+      await signInMutateAsync({})
       router.push(redirectUri ?? '/')
     } catch (error) {
       toast.show(formatErrorMessage(error), {
@@ -313,16 +271,6 @@ function AuthButtons() {
 
   useEffect(() => () => toast.hide(), [toast])
 
-  useEffect(() => {
-    if (challengeError) {
-      toast.show(challengeError.message, {
-        preset: 'error',
-        isUrgent: true,
-        duration: 10000000,
-      })
-    }
-  }, [challengeError, toast])
-
   return (
     <XStack
       gap={'$0.9'}
@@ -333,20 +281,8 @@ function AuthButtons() {
       alignSelf="center"
       width="100%"
     >
-      <SubmitButton
-        size="$4"
-        w="$12"
-        onPress={handleSignIn}
-        disabled={isSigningIn || isLoadingChallenge || !!challengeError}
-      >
-        {(() => {
-          switch (true) {
-            case isLoadingChallenge:
-              return <Spinner size="small" color="$color12" />
-            default:
-              return <ButtonText>{isSigningIn ? 'SIGNING IN...' : 'SIGN-IN'}</ButtonText>
-          }
-        })()}
+      <SubmitButton size="$4" w="$12" onPress={handleSignIn} disabled={isSigningIn}>
+        <ButtonText>{isSigningIn ? 'SIGNING IN...' : 'SIGN-IN'}</ButtonText>
       </SubmitButton>
 
       <Button {...signUpLink} borderColor="$primary" variant="outlined" size="$4" w="$12">

@@ -1,27 +1,27 @@
 import { TRPCError } from '@trpc/server'
 import debug from 'debug'
-import { SUPABASE_SUBDOMAIN } from 'app/utils/supabase/admin'
+import { createSupabaseAdminClient, SUPABASE_SUBDOMAIN } from 'app/utils/supabase/admin'
 import { createTRPCRouter, publicProcedure } from '../../trpc'
 import { z } from 'zod'
 import {
   type ChallengeResponse,
-  type VerifyChallengeResponse,
-  RecoveryOptions,
   RecoveryEOAPreamble,
+  RecoveryOptions,
+  type VerifyChallengeResponse,
 } from '@my/api/src/routers/account-recovery/types'
 import {
-  getChallengeById,
   getChainAddress,
+  getChallengeById,
   getPasskey,
   isChallengeExpired,
 } from 'app/utils/account-recovery'
-import { mintAuthenticatedJWTToken, mintJWTToken } from 'app/utils/jwt'
-import { verifyMessage, hexToBytes } from 'viem'
+import { mintJWTToken } from 'app/utils/jwt'
+import { hexToBytes, verifyMessage } from 'viem'
 import { verifySignature } from 'app/utils/userop'
 import { COSEECDHAtoXY } from 'app/utils/passkeys'
 import { byteaToHex } from 'app/utils/byteaToHex'
-import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import ms from 'ms'
+import { byteaToBase64URLNoPad } from 'app/utils/byteaToBase64URLNoPad'
 
 const logger = debug('api:routers:account-recovery')
 
@@ -144,6 +144,37 @@ export const accountRecoveryRouter = createTRPCRouter({
       )
       return {
         jwt,
+      }
+    }),
+  getCredentialByPhone: publicProcedure
+    .input(
+      z.object({
+        phone: z.string().trim(),
+        countryCode: z.string(),
+      })
+    )
+    .mutation(async ({ input: { phone, countryCode } }) => {
+      logger('getting credentials by phone: ', phone, countryCode)
+      const supabaseAdmin = createSupabaseAdminClient()
+      try {
+        const { data: credentials, error: credentialsError } = await supabaseAdmin
+          .rpc('query_webauthn_credentials_by_phone', { phone_number: `${countryCode}${phone}` })
+          .select('*')
+
+        if (credentialsError || !credentials || credentials.length === 0) {
+          throw new Error(credentialsError?.message || 'Unable to find credentials')
+        }
+
+        return credentials.map((credential) => ({
+          id: byteaToBase64URLNoPad(credential.raw_credential_id as `\\x${string}`),
+          userHandle: credential.display_name,
+        }))
+      } catch (error) {
+        logger('Error signing in with phone: ', error)
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: `Failed to login: ${error.message}`,
+        })
       }
     }),
 })

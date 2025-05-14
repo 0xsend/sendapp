@@ -75,6 +75,7 @@ export const useUser = () => {
     },
   })
 
+  // TODO refactor fetching tags to use foreign key between profile and tags tables
   const {
     data: tags,
     isLoading: isLoadingTags,
