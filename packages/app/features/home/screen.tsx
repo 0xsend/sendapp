@@ -13,7 +13,7 @@ import {
 } from '@my/ui'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
-import { StablesBalanceCard } from './TokenBalanceCard'
+import { StablesBalanceCard } from './StablesBalanceCard'
 import { TokenDetails } from './TokenDetails'
 import { useRootScreenParams } from 'app/routers/params'
 
