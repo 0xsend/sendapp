@@ -1,4 +1,4 @@
-import { Button, Card, Paragraph, Spinner, Theme, ThemeName, XStack, YStack } from '@my/ui'
+import { Button, Card, Paragraph, Spinner, Theme, XStack, YStack } from '@my/ui'
 import formatAmount from 'app/utils/formatAmount'
 
 import { ChevronLeft, ChevronRight } from '@tamagui/lucide-icons'
@@ -101,8 +101,8 @@ function InvestmentsAggregate() {
     .map((c) => c.coingeckoTokenId)
 
   const { data: marketData, isLoading, isError } = useMultipleTokensMarketData(tokenIds)
-  const { investmentsDailyAggregate, sign } = useMemo(() => {
-    if (!marketData?.length) return { investmentsDailyAggregate: 0, sign: null } as const
+  const aggregatePercentage = useMemo(() => {
+    if (!marketData?.length) return 0
 
     // Simple average of percentage changes
     const aggregatePercentage =
@@ -110,11 +110,9 @@ function InvestmentsAggregate() {
         return total + (coin?.price_change_percentage_24h ?? 0)
       }, 0) / marketData.length
 
-    return {
-      investmentsDailyAggregate: Number(aggregatePercentage.toFixed(2)),
-      sign: aggregatePercentage > 0 ? 'positive' : aggregatePercentage < 0 ? 'negative' : 'zero',
-    } as const
+    return Number(aggregatePercentage.toFixed(2))
   }, [marketData])
+
   if (tokenIds.length === 0)
     return (
       <XStack gap="$2" ai="center">
@@ -136,21 +134,21 @@ function InvestmentsAggregate() {
       </XStack>
     )
 
-  if (sign === 'positive')
+  if (aggregatePercentage > 0)
     return (
       <Theme name={'green_active'}>
-        <Paragraph fontSize={'$4'}>+{investmentsDailyAggregate}%</Paragraph>
+        <Paragraph fontSize={'$4'}>+{aggregatePercentage}%</Paragraph>
       </Theme>
     )
-  if (sign === 'negative')
+  if (aggregatePercentage < 0)
     return (
       <Theme name={'red_active'}>
-        <Paragraph fontSize={'$4'}>{investmentsDailyAggregate}%</Paragraph>
+        <Paragraph fontSize={'$4'}>{aggregatePercentage}%</Paragraph>
       </Theme>
     )
   return (
     <Paragraph fontSize={'$4'} color="$color10">
-      {investmentsDailyAggregate}%
+      {aggregatePercentage}%
     </Paragraph>
   )
 }
