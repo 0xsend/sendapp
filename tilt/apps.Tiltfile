@@ -40,22 +40,25 @@ if CFG.dockerize:
 
     #     ]
     # )
-    docker_compose(
-        configPaths = ["../docker-compose.yml"],
-        env_file = "../.env.local" if os.path.exists("../.env.local") else None,
-    )
-    dc_resource(
-        "next-app",
-        labels = ["apps"],
-        new_name = "next:web",
-        resource_deps = [
-            "yarn:install",
-            "supabase",
-            "anvil:fixtures",
-            "aa_bundler:base",
-            "shovel",
-        ],
-    )
+
+    # Only run docker compose and dc_resource if skip_docker_compose is False
+    if not CFG.skip_docker_compose:
+        docker_compose(
+            configPaths = ["../docker-compose.yml"],
+            env_file = "../.env.local" if os.path.exists("../.env.local") else None,
+        )
+        dc_resource(
+            "next-app",
+            labels = ["apps"],
+            new_name = "next:web",
+            resource_deps = [
+                "yarn:install",
+                "supabase",
+                "anvil:fixtures",
+                "aa_bundler:base",
+                "shovel",
+            ],
+        )
 else:
     local_resource(
         "next:web",

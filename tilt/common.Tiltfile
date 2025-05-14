@@ -37,6 +37,7 @@ def get_cfg():
         )
 
         config.define_bool("dockerize", False, "Whether to build and run the apps in docker")
+        config.define_bool("skip_docker_compose", False, "Whether to skip running docker compose for next app")
 
         _cfg = config.parse()
 
@@ -49,6 +50,7 @@ def get_cfg():
     return struct(
         args = _cfg.get("args", []),
         dockerize = _cfg.get("dockerize", CI),
+        skip_docker_compose = _cfg.get("skip_docker_compose", False),
     )
 
 CFG = get_cfg()

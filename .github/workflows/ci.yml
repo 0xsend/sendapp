@@ -31,11 +31,12 @@ jobs:
 
       - name: Set Environment Variables from Template
         run: |
-          cp .env.local.template .env
+          cp .env.local.template .env.local
           # fix for dockerized mode
-          sed -i 's/localhost/host.docker.internal/g' .env
+          sed -i 's/localhost/host.docker.internal/g' .env.local
           # except NEXT_PUBLIC_URL
-          sed -i 's/NEXT_PUBLIC_URL=http:\/\/host.docker.internal/NEXT_PUBLIC_URL=http:\/\/localhost/g' .env
+          sed -i 's/NEXT_PUBLIC_URL=http:\/\/host.docker.internal/NEXT_PUBLIC_URL=http:\/\/localhost/g' .env.local
+          cat .env.local
 
       - name: Extract build args from environment file
         id: build-args
@@ -242,7 +243,8 @@ jobs:
         shell: bash
         run: |
           export DEBUG="api:*,app:*,test:*,-test:fixtures:snaplet:*"
-          nohup tilt up playwright:deps &
+          # Use the skip_docker_compose flag to not manage docker compose in tilt
+          nohup tilt up --skip_docker_compose playwright:deps &
           tilt_pid=$!
           echo "Tilt process started with PID: $tilt_pid"
           echo waiting for tilt to be ready
