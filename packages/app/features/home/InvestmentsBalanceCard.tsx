@@ -17,7 +17,7 @@ import { useCoins } from 'app/provider/coins'
 export const InvestmentsBalanceCard = () => {
   const [queryParams, setParams] = useRootScreenParams()
   const isInvestmentCoin = investmentCoins.some(
-    (coin) => coin.token.toLowerCase() === queryParams.token
+    (coin) => coin.token.toLowerCase() === queryParams.token?.toLowerCase()
   )
   const isInvestmentsScreen = queryParams.token === 'investments'
 

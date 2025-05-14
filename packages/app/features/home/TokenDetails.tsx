@@ -49,7 +49,7 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
         <HomeQuickActions>
           {isStableCoin && <HomeQuickActions.Deposit />}
           <HomeQuickActions.Send />
-          {!isStableCoin && <HomeQuickActions.Trade />}
+          {!isStableCoin && <HomeQuickActions.Invest />}
         </HomeQuickActions>
       </YStack>
       <YStack gap={'$3'}>
