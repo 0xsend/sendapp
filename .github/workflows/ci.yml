@@ -184,7 +184,6 @@ jobs:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
       YARN_ENABLE_HARDENED_MODE: 0
-      NEXT_APP_IMAGE_NAME: ${{ needs.build_next_image.outputs.image-name }}
       NEXT_APP_IMAGE_TAG: ${{ needs.build_next_image.outputs.image-tag }}
 
     # for writing PR comments

@@ -21,6 +21,14 @@ services:
         - NEXT_PUBLIC_ONCHAINKIT_API_KEY=${NEXT_PUBLIC_ONCHAINKIT_API_KEY}
         - NEXT_PUBLIC_KYBER_SWAP_BASE_URL=${NEXT_PUBLIC_KYBER_SWAP_BASE_URL}
         - NEXT_PUBLIC_KYBER_CLIENT_ID=${NEXT_PUBLIC_KYBER_CLIENT_ID}
+    deploy:
+      resources:
+        limits:
+          memory: 4G # Set maximum memory limit
+          cpus: '2' # Limit to 2 CPUs
+        reservations:
+          memory: 2G # Guarantee this amount of memory
+          cpus: '1' # Reserve at least 1 CPU
     ports:
       - ${NEXT_APP_PORT:-3000}:3000
     env_file:
