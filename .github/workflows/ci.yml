@@ -190,7 +190,7 @@ jobs:
     permissions:
       pull-requests: write
 
-    timeout-minutes: 45
+    timeout-minutes: 60
 
     steps:
       - name: Add hosts to /etc/hosts
@@ -231,15 +231,11 @@ jobs:
       #   run: git diff --exit-code
 
       - name: Install Playwright Dependencies
-        run: yarn playwright playwright install --with-deps
-      - name: Playwright Tests
-        id: playwright
+        run: yarn playwright playwright install --with-deps > /dev/null
+
+      - name: Start Playwright Dependencies
         shell: bash
         run: |
-          # set debug logs if runner.debug is set
-          # if [ "${{runner.debug}}" == "1" ]; then
-          #   export DEBUG="test:*,app:*,api:*,next:*"
-          # fi
           export DEBUG="api:*,app:*,test:*,-test:fixtures:snaplet:*"
           nohup tilt up playwright:deps &
           tilt_pid=$!
@@ -312,13 +308,11 @@ jobs:
               exit 1
             fi
           done
-          # never scheduler more than 4 workers or up to 50% of the available cores
-          # this is due to concurrency issues within the send account sign up and resource contention
-          workers=$(MAX_WORKERS=4 node ./.devops/bin/worker-count)
-          export NEXT_APP_IMAGE_TAG=${{ needs.build_next_image.outputs.image-tag }}
+      - name: Start Next App
+        shell: bash
+        run: |
           export NEXT_APP_PORT=0.0.0.0:3000
           docker compose --env-file ./.env.local up -d next-app
-          docker compose logs -f --no-log-prefix next-app &
           # wait for next app to be ready
           started=0
           for i in {1..30}; do
@@ -334,9 +328,11 @@ jobs:
             echo "Next app did not start"
             exit 1
           fi
-
+      - name: Debug
+        shell: bash
+        run: |
           # debug, wait until a ready file exists
-          for i in {1..900}; do
+          for i in {1..1200}; do
             if [ -f ready ]; then
               break
             fi
@@ -344,8 +340,17 @@ jobs:
             sleep 1
           done
 
+      - name: Playwright Tests
+        id: playwright
+        shell: bash
+        run: |
+          docker compose logs -f --no-log-prefix next-app &
           # start playwright tests
+          # never scheduler more than 4 workers or up to 50% of the available cores
+          # this is due to concurrency issues within the send account sign up and resource contention
+          workers=$(MAX_WORKERS=4 node ./.devops/bin/worker-count)
           yarn playwright test --workers=$workers --shard=${{ matrix.shard }}/4
+
       - name: Tilt Down
         # always run tilt down if tilt ci started
         if: always() && steps.playwright.outcome != 'skipped'
