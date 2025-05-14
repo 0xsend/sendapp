@@ -244,7 +244,7 @@ jobs:
         run: |
           export DEBUG="api:*,app:*,test:*,-test:fixtures:snaplet:*"
           # Use the skip_docker_compose flag to not manage docker compose in tilt
-          nohup tilt up --skip_docker_compose playwright:deps &
+          nohup tilt up playwright:deps -- --skip_docker_compose &
           tilt_pid=$!
           echo "Tilt process started with PID: $tilt_pid"
           echo waiting for tilt to be ready
@@ -335,17 +335,6 @@ jobs:
             echo "Next app did not start"
             exit 1
           fi
-      - name: Debug
-        shell: bash
-        run: |
-          # debug, wait until a ready file exists
-          for i in {1..1200}; do
-            if [ -f ready ]; then
-              break
-            fi
-            echo "Waiting for ready file..."
-            sleep 1
-          done
 
       - name: Playwright Tests
         id: playwright
