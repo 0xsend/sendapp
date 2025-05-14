@@ -43,7 +43,7 @@ jobs:
         run: |
           # Extract env vars and format them for docker build-args
           echo "args<<EOF" >> $GITHUB_OUTPUT
-          cat .env.local.template | grep -v '^#' | grep -v '^$' >> $GITHUB_OUTPUT
+          cat .env.local | grep -v '^#' | grep -v '^$' >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Set up Docker Buildx
@@ -352,21 +352,18 @@ jobs:
         if: always() && steps.playwright.outcome != 'skipped'
         shell: bash
         run: tilt down
-      # Upload raw results per shard for merging later
-      - name: Playwright Test Results
+      - name: Upload blob report to GitHub Actions Artifacts
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
-        if: always() # Upload results even if tests fail
         with:
-          name: playwright-test-results-shard-${{ matrix.shard }}
-          path: packages/playwright/test-results/
-          retention-days: 30
-          if-no-files-found: ignore # Don't fail if no files found
+          name: blob-report-${{ matrix.shard }}
+          path: blob-report
+          retention-days: 1
 
   playwright-merge-reports:
     name: Playwright Merge Reports
     runs-on: ubuntu-latest
-    # Run this job even if previous jobs fail to capture results
-    if: always()
+    if: ${{ !cancelled() }}
     needs: [playwright-tests]
     # for writing PR comments
     permissions:
@@ -381,26 +378,22 @@ jobs:
         with:
           build-nextjs: false
           yarn-install: false
-      - name: Download Shard Results
-        id: download-artifacts
+      - name: Download blob reports from GitHub Actions Artifacts
         uses: actions/download-artifact@v4
-        continue-on-error: true # Continue even if some artifacts are missing
         with:
-          path: all-test-results/ # Put them in a subdirectory
-          pattern: playwright-test-results-shard-* # Match artifact names
-          merge-multiple: true # Merge into the single path directory
+          path: all-blob-reports
+          pattern: blob-report-*
+          merge-multiple: true
 
-      # Create empty directory if no artifacts were downloaded
-      - name: Create empty results directory if needed
-        if: steps.download-artifacts.outcome == 'failure'
-        run: |
-          mkdir -p all-test-results/playwright-report
-          echo "No test results were found. This could be because all test shards failed to run or produce artifacts." > all-test-results/playwright-report/README.md
+      - name: Merge into HTML Report
+        run: npx playwright merge-reports --reporter html ./all-blob-reports
 
-      - name: Merge Playwright Reports HTML
-        id: merge-reports
-        run: npx playwright merge-reports ./all-test-results --reporter html
-        continue-on-error: true # Continue even if merge fails
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-report--attempt-${{ github.run_attempt }}
+          path: playwright-report
+          retention-days: 14
 
       - name: Playwright Markdown Report
         if: always() # Always run regardless of previous step outcome
@@ -409,8 +402,8 @@ jobs:
         run: |
           echo "------------------"
           # Assumes the markdown script reads from the default playwright-report directory
-          export PLAYWRIGHT_REPORT_PATH=all-test-results/playwright-report
-          if [ ! -f "all-test-results/report.json" ] && [ ! -d "all-test-results/playwright-report" ]; then
+          export PLAYWRIGHT_REPORT_PATH=playwright-report
+          if [ ! -d "$PLAYWRIGHT_REPORT_PATH" ] && [ ! -f "$PLAYWRIGHT_REPORT_PATH/report.json" ]; then
             echo "# Playwright Test Results\n\n## No test results available\n\nNo test results were found. This could be because tests failed to run or artifacts were not uploaded." > playwright-report.md
           else
             bun run packages/playwright/bin/report-markdown.ts > playwright-report.md || echo "# Playwright Test Results\n\n## Error generating report\n\nThere was an error generating the test report." > playwright-report.md
@@ -419,20 +412,12 @@ jobs:
           echo "------------------"
 
       - uses: mshick/add-pr-comment@v2
-        if: always() && github.event_name == 'pull_request' # Only comment on PRs
+        if: ${{ !cancelled() && github.event_name == 'pull_request' }} # Only comment on PRs
         with:
           message-id: playwright-report # Use the same ID to update the comment
           refresh-message-position: true
           message-path: |
             playwright-report.md
-
-      - name: Upload Merged Playwright Report
-        uses: actions/upload-artifact@v4
-        if: always() # Upload merged report even if subsequent steps fail
-        with:
-          name: playwright-merged-report
-          path: all-test-results/
-          retention-days: 30
 
   vercel-deploy-preview:
     # **always** skip if on dev and main since it will be deployed with another workflow
