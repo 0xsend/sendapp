@@ -84,7 +84,7 @@ const Send = () => {
   )
 }
 
-const Trade = () => {
+const Invest = () => {
   const { coin } = useCoinFromTokenParam()
   const media = useMedia()
   const isSmallScreen = !media.gtXs
@@ -94,11 +94,7 @@ const Trade = () => {
       return '/trade'
     }
 
-    if (coin.symbol === sendCoin.symbol) {
-      return `/trade?inToken=${coin.token}&outToken=${usdcCoin.token}`
-    }
-
-    return `/trade?inToken=${coin.token}`
+    return `/trade?inToken=${usdcCoin.token}&outToken=${coin.token}`
   }
 
   return (
@@ -204,5 +200,5 @@ const Earn = () => {
 
 HomeQuickActions.Deposit = Deposit
 HomeQuickActions.Send = Send
-HomeQuickActions.Trade = Trade
+HomeQuickActions.Invest = Invest
 HomeQuickActions.Earn = Earn
