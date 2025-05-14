@@ -9,7 +9,7 @@ let log: debug.Debugger
 
 const test = mergeTests(snapletTest, webauthnTest)
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async () => {
   log = debug(`test:sign-in:${test.info().parallelIndex}`)
 })
 
@@ -17,7 +17,7 @@ test('can sign up', async ({ page, pg }) => {
   const sendtag = generateSendtag()
   // naive but go to home page to see if user is logged in
   await page.goto('/')
-  const signUpLink = page.getByRole('link', { name: 'SIGN-UP' })
+  const signUpLink = page.getByRole('link', { name: 'SIGN UP' })
   await expect(signUpLink).toBeVisible()
   await signUpLink.click()
   await expect(page).toHaveURL('/auth/sign-up')
@@ -29,7 +29,7 @@ test('can sign up', async ({ page, pg }) => {
     await page.context().clearCookies()
     await page.goto('/')
     await expect(page).toHaveURL('/')
-    const signInButton = page.getByRole('button', { name: 'SIGN-IN' })
+    const signInButton = page.getByRole('button', { name: 'SIGN IN' })
     await expect(signInButton).toBeVisible()
     await signInButton.click()
     // @todo: Heading checks need to be refactored to mobile only
@@ -47,7 +47,7 @@ test('can sign up', async ({ page, pg }) => {
   }
 })
 
-test('country code is selected based on geoip', async ({ page, context, pg }) => {
+test('country code is selected based on geoip', async ({ page }) => {
   const country = generateCountry()
 
   await page.route('https://ipapi.co/json/', async (route) => {

@@ -12,7 +12,7 @@ let log: debug.Debugger
 
 const test = mergeTests(snapletTest, webauthnTest)
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async () => {
   log = debug(`test:sign-in:${test.info().parallelIndex}`)
 })
 
@@ -31,7 +31,7 @@ test('redirect on sign-in', async ({ page, pg }) => {
     await page.waitForURL(/\//)
     // redirect to send after user is logged in
     await expect(page).toHaveURL(`/?redirectUri=${encodeURIComponent('/send')}`)
-    const signInButton = page.getByRole('button', { name: 'SIGN-IN' })
+    const signInButton = page.getByRole('button', { name: 'SIGN IN' })
     await expect(signInButton).toBeVisible()
     await signInButton.click()
     const sendSearchInput = page.getByPlaceholder('Search')
@@ -68,7 +68,7 @@ test('redirect to send confirm page on sign-in', async ({ page, seed, pg }) => {
       redirectUri: `/send/confirm?idType=tag&recipient=${tag?.name}&amount=1&sendToken=${sendCoin.token}`,
     })
     // redirect to send after user is logged in
-    const signInButton = page.getByRole('button', { name: 'SIGN-IN' })
+    const signInButton = page.getByRole('button', { name: 'SIGN IN' })
     await expect(signInButton).toBeVisible()
     await signInButton.click()
     await page.waitForURL(/send\/confirm/)
@@ -84,7 +84,7 @@ test('redirect to send confirm page on sign-in', async ({ page, seed, pg }) => {
   }
 })
 
-test('old user can login using phone number', async ({ page, seed, pg, context }) => {
+test('old user can login using phone number', async ({ page, pg }) => {
   const country = generateCountry()
   const sendtag = generateSendtag()
   const phone = '123456'
