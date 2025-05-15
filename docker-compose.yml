@@ -1,15 +1,10 @@
 services:
   next-app:
-    image: sendapp/next-app-dev:latest
+    image: ${NEXT_APP_IMAGE_TAG:-sendapp/next-app-dev:latest}
     build:
       context: .
       dockerfile: ./apps/next/Dockerfile
-      tags:
-        - sendapp/next-app-${GIT_BRANCH:-dev}:${GIT_HASH:-latest}
-        - sendapp/next-app-${GIT_BRANCH:-dev}:latest
       args:
-        - CI=${CI:-}
-        - DEBUG=${DEBUG:-}
         - NEXT_PUBLIC_SUPABASE_PROJECT_ID=${NEXT_PUBLIC_SUPABASE_PROJECT_ID}
         - NEXT_PUBLIC_URL=${NEXT_PUBLIC_URL}
         - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
@@ -22,9 +17,12 @@ services:
         - NEXT_PUBLIC_BASE_CHAIN_ID=${NEXT_PUBLIC_BASE_CHAIN_ID}
         - NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=${NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID}
         - NEXT_PUBLIC_TURNSTILE_SITE_KEY=${NEXT_PUBLIC_TURNSTILE_SITE_KEY}
-    restart: always
+        - NEXT_PUBLIC_CDP_APP_ID=${NEXT_PUBLIC_CDP_APP_ID}
+        - NEXT_PUBLIC_ONCHAINKIT_API_KEY=${NEXT_PUBLIC_ONCHAINKIT_API_KEY}
+        - NEXT_PUBLIC_KYBER_SWAP_BASE_URL=${NEXT_PUBLIC_KYBER_SWAP_BASE_URL}
+        - NEXT_PUBLIC_KYBER_CLIENT_ID=${NEXT_PUBLIC_KYBER_CLIENT_ID}
     ports:
-      - 3000:3000
+      - ${NEXT_APP_PORT:-3000}:3000
     env_file:
       - path: .env.development
       - path: .env.development.docker
