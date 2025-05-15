@@ -402,15 +402,15 @@ jobs:
         shell: bash
         run: |
           echo "------------------"
-          # Assumes the markdown script reads from the default playwright-report directory
-          export PLAYWRIGHT_REPORT_PATH=playwright-report
-          if [ ! -d "$PLAYWRIGHT_REPORT_PATH" ] && [ ! -f "$PLAYWRIGHT_REPORT_PATH/report.json" ]; then
+          if [ ! -f "$PLAYWRIGHT_REPORT_PATH" ]; then
             echo -e "# Playwright Test Results\n\n## No test results available\n\nNo test results were found. This could be because tests failed to run or artifacts were not uploaded." > playwright-report.md
           else
             bun run packages/playwright/bin/report-markdown.ts > playwright-report.md || echo -e "# Playwright Test Results\n\n## Error generating report\n\nThere was an error generating the test report." > playwright-report.md
           fi
           cat playwright-report.md
           echo "------------------"
+        env:
+          PLAYWRIGHT_REPORT_PATH: playwright-report/report.json
 
       - uses: mshick/add-pr-comment@v2
         if: ${{ !cancelled() && github.event_name == 'pull_request' }} # Only comment on PRs
