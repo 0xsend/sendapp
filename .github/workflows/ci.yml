@@ -357,7 +357,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: blob-report-${{ matrix.shard }}
-          path: blob-report
+          path: packages/playwright/blob-report/
           retention-days: 1
 
   playwright-merge-reports:
@@ -382,7 +382,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: all-blob-reports
-          pattern: blob-report-*
+          pattern: packages/playwright/blob-report-*
           merge-multiple: true
 
       - name: Merge into HTML Report
@@ -394,7 +394,8 @@ jobs:
           name: html-report--attempt-${{ github.run_attempt }}
           path: playwright-report
           retention-days: 14
-
+      - name: Merge into JSON Report
+        run: npx playwright merge-reports --reporter json ./all-blob-reports > playwright-report/report.json
       - name: Playwright Markdown Report
         if: always() # Always run regardless of previous step outcome
         id: playwright-md-report
@@ -404,9 +405,9 @@ jobs:
           # Assumes the markdown script reads from the default playwright-report directory
           export PLAYWRIGHT_REPORT_PATH=playwright-report
           if [ ! -d "$PLAYWRIGHT_REPORT_PATH" ] && [ ! -f "$PLAYWRIGHT_REPORT_PATH/report.json" ]; then
-            echo "# Playwright Test Results\n\n## No test results available\n\nNo test results were found. This could be because tests failed to run or artifacts were not uploaded." > playwright-report.md
+            echo -e "# Playwright Test Results\n\n## No test results available\n\nNo test results were found. This could be because tests failed to run or artifacts were not uploaded." > playwright-report.md
           else
-            bun run packages/playwright/bin/report-markdown.ts > playwright-report.md || echo "# Playwright Test Results\n\n## Error generating report\n\nThere was an error generating the test report." > playwright-report.md
+            bun run packages/playwright/bin/report-markdown.ts > playwright-report.md || echo -e "# Playwright Test Results\n\n## Error generating report\n\nThere was an error generating the test report." > playwright-report.md
           fi
           cat playwright-report.md
           echo "------------------"
