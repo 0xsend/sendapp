@@ -1049,6 +1049,7 @@ export interface Fingerprint {
   tags?: {
     createdAt?: FingerprintDateField;
     user?: FingerprintRelationField;
+    user?: FingerprintRelationField;
     tagReceipts?: FingerprintRelationField;
   }
   users?: {
