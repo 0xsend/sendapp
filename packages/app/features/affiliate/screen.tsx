@@ -120,15 +120,10 @@ export const FriendsScreen = () => {
 
   if (referrals.length === 0) {
     return (
-      <XStack ai={'flex-start'} pt={'$5'}>
-        <ReferralLink
-          f={0}
-          p={0}
-          label={
-            <Paragraph size={'$5'}>Invite friends to Send using your referral code:</Paragraph>
-          }
-        />
-      </XStack>
+      <YStack w={'100%'} ai={'flex-start'} pt={'$5'} gap={'$5'}>
+        <Paragraph size={'$5'}>Invite friends to Send using your referral code.</Paragraph>
+        <ReferralLink f={0} p={0} />
+      </YStack>
     )
   }
 

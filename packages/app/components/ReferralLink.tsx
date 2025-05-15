@@ -10,14 +10,12 @@ import {
 } from '@my/ui'
 import { useUser } from 'app/utils/useUser'
 import { CheckCheck } from '@tamagui/lucide-icons'
-import { type ReactNode, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { IconCopy } from './icons'
 import * as Clipboard from 'expo-clipboard'
 import { useConfirmedTags } from 'app/utils/tags'
 
-type ReferralLink = { label?: ReactNode } & ButtonProps
-
-export function ReferralLink({ label, ...props }: ReferralLink) {
+export function ReferralLink(props: ButtonProps) {
   const { profile } = useUser()
   const send_id = profile?.send_id
   const tags = useConfirmedTags()
@@ -62,11 +60,9 @@ export function ReferralLink({ label, ...props }: ReferralLink) {
 
   return (
     <XStack ai={'center'} gap={'$2'} width={'100%'}>
-      {label || (
-        <Paragraph size={'$5'} color={'$color10'} flexShrink={0}>
-          Referral Code:
-        </Paragraph>
-      )}
+      <Paragraph size={'$5'} color={'$color10'} flexShrink={0}>
+        Referral Code:
+      </Paragraph>
       <Button
         chromeless
         flex={1}
@@ -91,7 +87,7 @@ export function ReferralLink({ label, ...props }: ReferralLink) {
         <ButtonText
           fontSize={'$5'}
           fontWeight={'500'}
-          bc="$background"
+          bc="transparent"
           maxWidth={'85%'}
           hoverStyle={{
             color: '$primary',
