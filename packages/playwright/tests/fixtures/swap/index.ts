@@ -77,10 +77,15 @@ export class SwapFormPage {
   }
 
   async goto() {
-    log('goto /trade')
+    log('goto /?token=investments')
     await this.page.goto('/')
-    await this.page.getByRole('link', { name: 'Trade' }).nth(0).click()
-    await this.page.waitForURL('/trade')
+    const investButton = this.page.getByText('Invest', { exact: true })
+    await expect(investButton).toBeVisible()
+    await investButton.click()
+    await this.page.waitForURL('/?token=investments')
+    const addInvestmentButton = this.page.getByRole('link', { name: 'Add Investment' })
+    await expect(addInvestmentButton).toBeVisible()
+    await addInvestmentButton.click()
     await this.validatePageVisible()
   }
 

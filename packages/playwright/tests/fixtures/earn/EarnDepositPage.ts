@@ -23,7 +23,8 @@ export class EarnDepositPage {
 
   async navigate(coin: { symbol: string }) {
     await this.page.goto('/')
-    await this.page.getByRole('link', { name: 'Earn' }).click()
+    // The Earn link is now inside the SavingsBalanceCard
+    await this.page.getByText('Savings').click()
     await this.page.waitForURL('/earn')
     await expect(this.startEarningButton).toBeVisible()
     await this.startEarningButton.click()
@@ -63,8 +64,12 @@ export class EarnDepositPage {
   }
 
   async submit() {
-    await expect(this.page.getByRole('button', { name: 'Confirm Deposit' })).toBeVisible()
-    await expect(this.page.getByRole('button', { name: 'Confirm Deposit' })).toBeEnabled()
+    await expect(async () => {
+      await expect(this.page.getByRole('button', { name: 'Confirm Deposit' })).toBeVisible()
+      await expect(this.page.getByRole('button', { name: 'Confirm Deposit' })).toBeEnabled()
+    }).toPass({
+      timeout: 15000,
+    })
     await this.page.getByRole('button', { name: 'Confirm Deposit' }).click()
     await expect(this.page.getByText('Deposit Submitted', { exact: true })).toBeVisible({
       timeout: 10000,

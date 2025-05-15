@@ -4,7 +4,7 @@ import { userOnboarded } from '@my/snaplet/models'
 import type { Database } from '@my/supabase/database.types'
 import { mergeTests, type Page } from '@playwright/test'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { coins, type coin, ethCoin } from 'app/data/coins'
+import { coins, type coin, ethCoin, stableCoins } from 'app/data/coins'
 import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { shorten } from 'app/utils/strings'
@@ -101,9 +101,25 @@ for (const token of [...coins, ethCoin]) {
       // goto send page
       await page.goto('/')
 
-      //Press send button
-      await page.locator(`a[href="/?token=${token.token}"]`).click()
-      await page.getByTestId('send-quick-action').click()
+      //Press send button - navigate to correct category based on token type
+      const isStableCoin = stableCoins.some((coin) => coin.symbol === token.symbol)
+
+      if (isStableCoin) {
+        const cashBalButton = page.getByText('Cash Balance')
+        await expect(cashBalButton).toBeVisible()
+        await cashBalButton.click()
+      } else {
+        const investmentsButton = page.getByText('Invest', { exact: true })
+        await expect(investmentsButton).toBeVisible()
+        await investmentsButton.click()
+      }
+
+      const tokenButton = page.getByTestId(`token-balance-list-${token.label}`)
+      await expect(tokenButton).toBeVisible()
+      await tokenButton.click()
+      const sendButton = page.getByTestId('send-quick-action')
+      await expect(sendButton).toBeVisible()
+      await sendButton.click()
 
       // fill search input
       const searchInput = page.getByRole('search', { name: 'query' })
@@ -134,6 +150,7 @@ for (const token of [...coins, ethCoin]) {
         expect(Object.fromEntries(url.searchParams.entries())).toMatchObject({
           recipient: query,
           idType,
+          sendToken: token.token,
         })
       }).toPass({
         timeout: 5000,

@@ -171,7 +171,7 @@ test("can't access form page without accepting risk dialog", async ({ page, swap
   await expect(async () => {
     const currentUrl = new URL(page.url())
     expect(currentUrl.pathname).toBe('/')
-    expect(currentUrl.searchParams.toString()).toBe('')
+    expect(currentUrl.searchParams.toString()).toBe('token=investments')
   }).toPass({ timeout: 5000 })
 })
 

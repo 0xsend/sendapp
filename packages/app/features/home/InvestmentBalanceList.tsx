@@ -26,6 +26,7 @@ export const InvestmentsBalanceList = () => {
   return investmentCoins.map((coin) => (
     <Fragment key={`token-balance-list-${coin.label}`}>
       <TokenBalanceItem
+        testID={`token-balance-list-${coin.label}`}
         coin={coin}
         jc={'space-between'}
         ai={'center'}
@@ -144,7 +145,14 @@ export const AddInvestmentLink = () => {
   const hoverStyles = useHoverStyles()
 
   return (
-    <LinkableButton circular href="/trade" p="$2" size="$5" hoverStyle={hoverStyles}>
+    <LinkableButton
+      circular
+      href="/trade"
+      p="$2"
+      size="$5"
+      hoverStyle={hoverStyles}
+      title="Add Investment"
+    >
       <LinkableButton.Icon>
         <IconPlus size="$5" color="$color10" />
       </LinkableButton.Icon>
