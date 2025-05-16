@@ -13,7 +13,8 @@ import { EarnWithdrawPage } from './EarnWithdrawPage'
 export async function navigateToEarnPage(page: Page) {
   log('Navigating to /earn')
   await page.goto('/')
-  await page.getByRole('link', { name: 'Earn' }).click()
+  // The Earn link is now inside the SavingsBalanceCard
+  await page.getByText('Savings').click()
   await page.waitForURL('/earn')
   log('Successfully navigated to /earn')
 }
