@@ -24,21 +24,19 @@ export const tagRouter = createTRPCRouter({
 
     try {
       const supabaseAdmin = createSupabaseAdminClient()
+      const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString()
 
       const { count, error } = await supabaseAdmin
         .from('tags')
         .select('*', { count: 'exact', head: true })
         .eq('name', name)
+        .or(`status.eq.confirmed,and(status.eq.pending,created_at.gt.${thirtyMinutesAgo})`)
 
-      if (error) {
-        if (error.code === 'PGRST116') {
-          return { sendtagAvailability: SendtagAvailability.Available }
-        }
-
-        throw new Error(error.message || "Unable to fetch user's tags")
+      if (error || count === null) {
+        throw new Error(error?.message || "Unable to fetch user's tags")
       }
 
-      if (count && count > 0) {
+      if (count > 0) {
         return { sendtagAvailability: SendtagAvailability.Taken }
       }
 
