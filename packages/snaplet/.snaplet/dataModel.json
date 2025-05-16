@@ -10651,64 +10651,6 @@
         }
       ]
     },
-    "tag_reservations": {
-      "id": "public.tag_reservations",
-      "schemaName": "public",
-      "tableName": "tag_reservations",
-      "fields": [
-        {
-          "id": "public.tag_reservations.tag_name",
-          "name": "tag_name",
-          "columnName": "tag_name",
-          "type": "citext",
-          "isRequired": true,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false,
-          "isId": true,
-          "maxLength": null
-        },
-        {
-          "id": "public.tag_reservations.chain_address",
-          "name": "chain_address",
-          "columnName": "chain_address",
-          "type": "citext",
-          "isRequired": false,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false,
-          "isId": false,
-          "maxLength": null
-        },
-        {
-          "id": "public.tag_reservations.created_at",
-          "name": "created_at",
-          "columnName": "created_at",
-          "type": "timestamptz",
-          "isRequired": true,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": true,
-          "isId": false,
-          "maxLength": null
-        }
-      ],
-      "uniqueConstraints": [
-        {
-          "name": "tag_reservations_pkey",
-          "fields": [
-            "tag_name"
-          ],
-          "nullNotDistinct": false
-        }
-      ]
-    },
     "tags": {
       "id": "public.tags",
       "schemaName": "public",

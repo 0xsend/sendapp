@@ -1494,24 +1494,6 @@ export type Database = {
           },
         ]
       }
-      tag_reservations: {
-        Row: {
-          chain_address: string | null
-          created_at: string
-          tag_name: string
-        }
-        Insert: {
-          chain_address?: string | null
-          created_at?: string
-          tag_name: string
-        }
-        Update: {
-          chain_address?: string | null
-          created_at?: string
-          tag_name?: string
-        }
-        Relationships: []
-      }
       tags: {
         Row: {
           created_at: string

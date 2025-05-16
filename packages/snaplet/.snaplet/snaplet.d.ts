@@ -718,11 +718,6 @@ interface Table_public_tag_receipts {
   id: number;
   created_at: string | null;
 }
-interface Table_public_tag_reservations {
-  tag_name: string;
-  chain_address: string | null;
-  created_at: string;
-}
 interface Table_public_tags {
   name: string;
   status: Enum_public_tag_status;
@@ -879,7 +874,6 @@ interface Schema_public {
   sendtag_checkout_receipts: Table_public_sendtag_checkout_receipts;
   swap_routers: Table_public_swap_routers;
   tag_receipts: Table_public_tag_receipts;
-  tag_reservations: Table_public_tag_reservations;
   tags: Table_public_tags;
   webauthn_credentials: Table_public_webauthn_credentials;
 }
