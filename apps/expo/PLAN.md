@@ -6,7 +6,7 @@ Complete the Send native app implementation by addressing layout issues, improvi
 
 ## Current Navigation Architecture
 
-The current navigation architecture for the Expo app is built using Expo Router v2 and follows a nested structure:
+The current navigation architecture for the Expo app is built using Expo Router v3 and follows a nested structure:
 
 1. **Root Layout** (`/app/_layout.tsx`):
    - Sets up the Provider, theme loading, and authentication state
@@ -28,37 +28,47 @@ The current navigation architecture for the Expo app is built using Expo Router 
 
 4. **Tab Navigation** (`/app/(drawer)/(tabs)/`):
    - Nested inside the drawer navigator
-   - Currently only has the home screen tab
+   - Currently includes: index (home), activity, earn, and profile tabs
    - Custom header with drawer menu toggle and "+" button
 
 ## Next.js App Structure
 
-The Next.js app has a more comprehensive routing structure with many additional screens:
+The Next.js app has a comprehensive routing structure with these sections:
 
 1. **Main Sections**:
-   - Secret Shop for minting tokens on localnet.
+   - Secret Shop for minting tokens on localnet
    - Activity feed
    - Profile pages
    - Send/receive functionality
-   - Deposit/withdraw flows
+   - Deposit/withdraw flows (including Apple Pay)
    - Earn and rewards
-   - Settings and account management
+   - Settings and account management  
    - Trade features
-   - SendPot (lottery) functionality
+   - SendPot (lottery) functionality with confirmation flow
+   - Feed (dedicated feed section)
+   - Explore section with rewards
+   - Invest (investment features)
+   - Leaderboard
 
 2. **Account Management**:
    - Profile editing
-   - Backup credentials
-   - SendTag management
+   - Backup credentials with confirmation flow
+   - SendTag management (add, checkout, first tag)
    - Affiliate program
+   - Personal info management
+
+3. **Authentication**:
+   - Login with phone
+   - Sign-up flow
+   - Onboarding process
 
 ## Proposed Navigation Improvements
 
 To align the Expo app with the Next.js app structure, I recommend the following improvements:
 
-### 1. Expand Tab Navigation
+### 1. Enhance Tab Navigation
 
-Update the tab navigation to include the core sections from the Next.js app:
+The tab navigation already includes the core sections but could be expanded to match the Next.js app more closely:
 
 ```tsx
 // In apps/expo/app/(drawer)/(tabs)/_layout.tsx
@@ -78,17 +88,17 @@ Update the tab navigation to include the core sections from the Next.js app:
     }}
   />
   <Tabs.Screen
-    name="profile"
-    options={{
-      title: 'Profile',
-      tabBarIcon: ({ focused }) => <User color={focused ? '$color12' : '$color10'} />
-    }}
-  />
-  <Tabs.Screen
     name="earn"
     options={{
       title: 'Earn',
       tabBarIcon: ({ focused }) => <DollarSign color={focused ? '$color12' : '$color10'} />
+    }}
+  />
+  <Tabs.Screen
+    name="profile"
+    options={{
+      title: 'Profile',
+      tabBarIcon: ({ focused }) => <User color={focused ? '$color12' : '$color10'} />
     }}
   />
 </Tabs>
@@ -96,7 +106,7 @@ Update the tab navigation to include the core sections from the Next.js app:
 
 ### 2. Enhance Drawer Content
 
-Expand the drawer to include all major navigation sections:
+Expand the drawer to include all major navigation sections from the Next.js app:
 
 ```tsx
 // Enhanced drawer content
@@ -111,6 +121,9 @@ function ProfileScreen() {
     { icon: <DollarSign size={20} />, label: 'Earn', route: '/earn' },
     { icon: <TrendingUp size={20} />, label: 'Trade', route: '/trade' },
     { icon: <Gift size={20} />, label: 'SendPot', route: '/sendpot' },
+    { icon: <Search size={20} />, label: 'Explore', route: '/explore' },
+    { icon: <LineChart size={20} />, label: 'Invest', route: '/invest' },
+    { icon: <Rss size={20} />, label: 'Feed', route: '/feed' },
     { icon: <Award size={20} />, label: 'Leaderboard', route: '/leaderboard' },
     { icon: <Settings size={20} />, label: 'Settings', route: '/settings' },
   ]
@@ -164,27 +177,47 @@ Add the corresponding routes matching the Next.js structure:
   ├── deposit/
   │   ├── index.tsx
   │   ├── crypto.tsx
-  │   └── debit-card.tsx
+  │   ├── debit-card.tsx
+  │   ├── apple-pay.tsx
+  │   └── success.tsx
   ├── sendpot/
   │   ├── index.tsx
-  │   └── buy-tickets.tsx
+  │   ├── buy-tickets.tsx
+  │   └── confirm-buy-tickets.tsx
   ├── trade/
   │   ├── index.tsx
   │   └── summary.tsx
+  ├── explore/
+  │   ├── index.tsx
+  │   └── rewards/
+  │       └── index.tsx
+  ├── invest/
+  │   └── index.tsx
+  ├── feed/
+  │   └── index.tsx
   ├── leaderboard.tsx
   └── settings/
       ├── index.tsx
       └── account/
           ├── index.tsx
           ├── edit-profile.tsx
+          ├── personal-info.tsx
+          ├── affiliate.tsx
+          ├── backup/
+          │   ├── index.tsx
+          │   ├── create.tsx
+          │   └── confirm/
+          │       └── [cred_id].tsx
           └── sendtag/
               ├── index.tsx
-              └── add.tsx
+              ├── add.tsx
+              ├── checkout.tsx
+              └── first.tsx
 ```
 
 ### 4. Authentication Flow Refinement
 
-Enhance the authentication flow with a shared layout:
+Enhance the authentication flow with a shared layout to include all auth methods:
 
 ```tsx
 // In apps/expo/app/(auth)/_layout.tsx
@@ -198,6 +231,7 @@ export default function AuthLayout() {
     >
       <Stack.Screen name="auth/onboarding" />
       <Stack.Screen name="auth/sign-up" />
+      <Stack.Screen name="auth/login-with-phone" />
     </Stack>
   )
 }
@@ -251,18 +285,18 @@ export function configureScreenHeader(options: {
 
 ### Phase 1: Navigation Structure (High Priority)
 
-1. **Expand Tab Navigation**:
-   - Modify `(drawer)/(tabs)/_layout.tsx` to include all main tab screens
-   - Create empty placeholder screens for each tab
+1. **Complete Tab Navigation**:
+   - Tab navigation already includes main screens, ensure they work correctly
+   - Polish UI and transitions between tabs
 
 2. **Enhance Drawer Navigation**:
    - Update drawer content in `(drawer)/_layout.tsx`
-   - Add all menu items with proper routes
+   - Add new menu items for Feed, Explore, and Invest
    - Implement navigation logic
 
-3. **Create Auth Layout**:
-   - Update `(auth)/_layout.tsx` to provide consistent auth experience
-   - Style auth screens consistently
+3. **Complete Auth Layout**:
+   - Add login-with-phone screen to auth flow
+   - Ensure consistent styling across all auth screens
 
 ### Phase 2: Core Screen Implementation (Medium Priority)
 
@@ -273,28 +307,39 @@ export function configureScreenHeader(options: {
 2. **Profile Screen**:
    - Implement profile viewing
    - Add profile editing functionality
+   - Add personal info management
 
 3. **Activity Screen**:
    - Port activity feed
    - Optimize for mobile
 
 4. **Send/Receive Functionality**:
-   - Implement send flow
+   - Implement send flow with confirmation
    - Add QR code scanning
 
 ### Phase 3: Additional Features (Lower Priority)
 
 1. **Deposit/Withdraw**:
    - Implement deposit options
-   - Add crypto and fiat flows
+   - Add Apple Pay support
+   - Add crypto and fiat flows  
+   - Implement success screens
 
 2. **Earn & Rewards**:
    - Port earn functionality
-   - Implement rewards tracking
+   - Implement asset-specific earn screens
+   - Add rewards tracking
 
 3. **Trade & SendPot**:
-   - Add basic trading UI
-   - Implement SendPot lottery feature
+   - Add trade screens with summary
+   - Implement SendPot with ticket buying
+   - Add confirmation flows
+
+4. **New Features**:
+   - Implement Feed section
+   - Add Explore with rewards
+   - Create Invest functionality
+   - Enhance backup flow with confirmation
 
 ## Verification
 
@@ -308,8 +353,11 @@ Then read the contents of the screenshot and compare it to the expected output.
 
 ## Next Steps
 
-1. Expand the tab navigation to include all main screens (home, activity, profile, earn)
-2. Update drawer content with all navigation options
-3. Create consistent auth layout
-4. Begin implementing core screens according to priority
-5. Fix existing UI issues in HomeQuickActions and TokenActivityFeed.native.tsx
+1. Update drawer content with new navigation options (Feed, Explore, Invest)
+2. Add login-with-phone to auth flow
+3. Implement missing screens for new features
+4. Fix existing UI issues in HomeQuickActions and TokenActivityFeed.native.tsx
+5. Add account management features (backup flow, personal info, affiliate program)
+6. Implement deposit success flows and Apple Pay
+7. Complete SendPot confirmation flow
+8. Add feed and explore functionality
