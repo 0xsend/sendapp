@@ -203,9 +203,17 @@ function Hero() {
           </Stack>
         )}
 
-        <YStack f={1} display="flex" fd="column" jc="flex-end" pb={0} maw={738} mx="auto">
+        <YStack
+          f={1}
+          display="flex"
+          fd="column"
+          jc="flex-end"
+          w={'100%'}
+          mx="auto"
+          $gtSm={{ maw: 738 }}
+        >
           <YStack f={1}>
-            <YStack jc="flex-end" f={1} gap="$2" pb="$7" $gtMd={{ pb: '$0.9' }} px="$3.5">
+            <YStack jc="flex-end" f={1} gap="$2" pb="$12" $gtMd={{ pb: '$0.9' }} px={'$8'}>
               <Carousel currentKey={carouselProgress.toString()} fullscreen={false} />
             </YStack>
             {/* <XStack gap="$4" ai="center" jc="center">
@@ -227,15 +235,15 @@ function Hero() {
             jc="space-between"
             $gtMd={{ display: 'none' }}
             ai="flex-start"
-            pt="$4"
-            pb="$0.5"
+            px={'$8'}
+            pt={'$8'}
             f={1}
             l={0}
             $platform-web={{
               width: '100%',
             }}
           >
-            <IconSendLogo size="$2" color="$white" ml={'$3.5'} />
+            <IconSendLogo size="$3" color="$white" />
             <AuthButtons />
           </YStack>
         </YStack>
@@ -273,23 +281,41 @@ function AuthButtons() {
 
   return (
     <XStack
-      gap={'$0.9'}
+      gap={'$3.5'}
       pos={'relative'}
-      pb={'$2'}
+      pb={'$5'}
       jc="center"
       $gtMd={{ jc: 'flex-start' }}
       alignSelf="center"
       width="100%"
     >
-      <SubmitButton size="$4" w="$12" onPress={handleSignIn} disabled={isSigningIn}>
-        <ButtonText>{isSigningIn ? 'SIGNING IN...' : 'SIGN-IN'}</ButtonText>
-      </SubmitButton>
-
-      <Button {...signUpLink} borderColor="$primary" variant="outlined" size="$4" w="$12">
-        <Button.Text color="$white" $gtMd={{ color: '$color12' }}>
-          SIGN-UP
+      <Button
+        {...signUpLink}
+        f={1}
+        flexBasis={0}
+        borderColor="$primary"
+        variant="outlined"
+        br={'$4'}
+        p={0}
+        $gtLg={{ w: '$13', f: 0 }}
+      >
+        <Button.Text color="$white" size="$5" lineHeight={16} $gtMd={{ color: '$color12' }}>
+          SIGN UP
         </Button.Text>
       </Button>
+      <SubmitButton
+        f={1}
+        flexBasis={0}
+        p={0}
+        onPress={handleSignIn}
+        disabled={isSigningIn}
+        br={'$4'}
+        $gtLg={{ w: '$13', f: 0 }}
+      >
+        <ButtonText size="$5" color={'$black'} lineHeight={16}>
+          {isSigningIn ? 'SIGNING IN...' : 'SIGN IN'}
+        </ButtonText>
+      </SubmitButton>
     </XStack>
   )
 }

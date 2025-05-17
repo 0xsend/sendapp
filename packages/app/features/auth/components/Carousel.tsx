@@ -57,7 +57,7 @@ const CarouselProgress = () => {
           <Progress
             key={title}
             f={1}
-            h={1}
+            h={2}
             backgroundColor={'$color3'}
             direction="ltr"
             miw={0}
@@ -87,9 +87,7 @@ export const Carousel = (props: { currentKey: string | undefined; fullscreen: bo
         </H1>
         <Paragraph
           $gtMd={{ ta: 'left', pb: '$2', fontSize: item?.descriptionFontSize, w: '66%' }}
-          fontSize={20}
-          fontWeight={'200'}
-          fontFamily={'$mono'}
+          fontSize={'$5'}
           lh={28}
           color="$white"
         >
