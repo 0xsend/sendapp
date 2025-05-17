@@ -1,4 +1,5 @@
 import { type Hex, decodeFunctionData, erc20Abi, isAddress } from 'viem'
+import { assert } from '../assert'
 
 export function decodeApproveTokenCallData(data: Hex) {
   const { args: approveTokenArgs, functionName: rawFunctionName } = decodeFunctionData({
@@ -22,18 +23,14 @@ export function decodeApproveTokenCallData(data: Hex) {
 }
 
 export function decodeTransferCallData(data: Hex) {
-  const { args, functionName: rawFunctionName } = decodeFunctionData({ abi: erc20Abi, data })
+  const decoded = decodeFunctionData({ abi: erc20Abi, data })
+  assert(decoded.functionName === 'transfer', 'Invalid function name')
 
-  const functionName = rawFunctionName === 'transfer' ? rawFunctionName : null
-
-  const rawTo = args?.[0]
-  const to = rawTo && isAddress(rawTo) ? rawTo : null
-
-  const rawAmount = args?.[1]
-  const amount = typeof rawAmount === 'bigint' ? rawAmount : null
+  const [to, amount] = decoded.args
+  assert(isAddress(to), 'Invalid to address')
+  assert(typeof amount === 'bigint', 'Invalid amount')
 
   return {
-    functionName,
     to,
     amount,
   }
