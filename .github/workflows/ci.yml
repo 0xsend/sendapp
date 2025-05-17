@@ -340,11 +340,7 @@ jobs:
         shell: bash
         run: |
           docker compose logs -f --no-log-prefix next-app &
-          # start playwright tests
-          # never scheduler more than 4 workers or up to 50% of the available cores
-          # this is due to concurrency issues within the send account sign up and resource contention
-          workers=$(MAX_WORKERS=4 node ./.devops/bin/worker-count)
-          yarn playwright test --workers=$workers --shard=${{ matrix.shard }}/4
+          yarn playwright test --shard=${{ matrix.shard }}/4
 
       - name: Tilt Down
         # always run tilt down if tilt ci started
