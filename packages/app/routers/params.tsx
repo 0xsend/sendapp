@@ -218,7 +218,7 @@ const parseTokenParam = (value) => {
     : usdcAddress[baseMainnet.id]
 }
 
-const useSendToken = () => {
+export const useSendToken = () => {
   const { coin: sendCoin } = useCoin('SEND')
   const [sendToken, setSendTokenParam] = useSendParam('sendToken', {
     initial:
@@ -283,6 +283,9 @@ export const useSendScreenParams = withRootParams(useSendScreenParamsBase)
 export type ProfileScreenParams = {
   sendid?: string
   tag?: string
+  note?: string
+  amount?: string
+  sendToken?: allCoins[number]['token']
 }
 
 const { useParam: useProfileParam, useParams: useProfileParams } =
@@ -302,11 +305,17 @@ const useProfileScreenParamsBase = () => {
   const { setParams } = useProfileParams()
   const [sendid] = useSendId()
   const [tag] = useTag()
+  const [note] = useNote()
+  const [amount] = useAmount()
+  const [sendToken] = useSendToken()
 
   return [
     {
       sendid,
       tag,
+      note,
+      amount,
+      sendToken,
     },
     setParams,
   ] as const
