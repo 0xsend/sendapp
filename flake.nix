@@ -72,6 +72,7 @@
             pkgs.unstable.temporal-cli
             pkgs.unstable.ripgrep
             pkgs.unstable.watchman
+            pkgs.unstable.maestro
           ];
           shellHook =
             ''
