@@ -1,9 +1,6 @@
-import { Link, LinkableButton, type LinkProps, Paragraph, XStack, YStack } from '@my/ui'
-
+import { Link, type LinkProps, Paragraph, XStack, YStack } from '@my/ui'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import type { CoinWithBalance } from 'app/data/coins'
-
-import { useCoins } from 'app/provider/coins'
 
 import formatAmount from 'app/utils/formatAmount'
 import { Fragment } from 'react'
@@ -13,17 +10,17 @@ import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { type MarketData, useMultipleTokensMarketData } from 'app/utils/coin-gecko'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { useIsPriceHidden } from 'app/features/home/utils/useIsPriceHidden'
-import { IconPlus } from 'app/components/icons'
 
-export const InvestmentsBalanceList = () => {
-  const { investmentCoins, isLoading } = useCoins()
+export const InvestmentsBalanceList = ({
+  coins,
+}: {
+  coins: CoinWithBalance[]
+}) => {
   const hoverStyles = useHoverStyles()
   const { data: tokensMarketData, isLoading: isLoadingTokensMarketData } =
-    useMultipleTokensMarketData(investmentCoins?.map((c) => c.coingeckoTokenId) || [])
+    useMultipleTokensMarketData(coins?.map((c) => c.coingeckoTokenId) || [])
 
-  if (isLoading) return null
-
-  return investmentCoins.map((coin) => (
+  return coins.map((coin) => (
     <Fragment key={`token-balance-list-${coin.label}`}>
       <TokenBalanceItem
         testID={`token-balance-list-${coin.label}`}
@@ -75,7 +72,7 @@ const TokenBalanceItem = ({
         <YStack f={1} jc={'space-between'}>
           <XStack jc={'space-between'} ai={'center'}>
             <Paragraph fontSize={'$6'} fontWeight={'500'} color={'$color12'}>
-              {coin.shortLabel || coin.label}
+              {coin.label}
             </Paragraph>
             <TokenBalance coin={coin} />
           </XStack>
@@ -128,27 +125,10 @@ const TokenBalance = ({
 
   if (balance === undefined) return <></>
   return (
-    <Paragraph
-      fontSize={'$6'}
-      fontWeight={'500'}
-      col="$color12"
-      $gtSm={{ fontSize: '$8', fontWeight: '600' }}
-    >
+    <Paragraph fontSize={'$8'} fontWeight={'500'} col="$color12">
       {isPriceHidden
         ? '//////'
         : formatAmount((Number(balance) / 10 ** decimals).toString(), 10, formatDecimals ?? 5)}
     </Paragraph>
-  )
-}
-
-export const AddInvestmentLink = () => {
-  const hoverStyles = useHoverStyles()
-
-  return (
-    <LinkableButton circular href="/trade" p="$2" size="$5" hoverStyle={hoverStyles}>
-      <LinkableButton.Icon>
-        <IconPlus size="$5" color="$color10" />
-      </LinkableButton.Icon>
-    </LinkableButton>
   )
 }
