@@ -84,7 +84,7 @@ const Send = () => {
   )
 }
 
-const Invest = () => {
+const Trade = () => {
   const { coin } = useCoinFromTokenParam()
   const media = useMedia()
   const isSmallScreen = !media.gtXs
@@ -109,8 +109,8 @@ const Invest = () => {
         height={'auto'}
       >
         <Theme name="green">
-          <IconPlus
-            size={'$1.5'}
+          <IconSwap
+            size={'$1'}
             $theme-dark={{ color: '$primary' }}
             $theme-light={{ color: '$color12' }}
           />
@@ -123,7 +123,7 @@ const Invest = () => {
           numberOfLines={1}
           ellipsizeMode="tail"
         >
-          Invest
+          Trade
         </ButtonText>
       </YStack>
     </QuickActionButton>
@@ -200,5 +200,5 @@ const Earn = () => {
 
 HomeQuickActions.Deposit = Deposit
 HomeQuickActions.Send = Send
-HomeQuickActions.Invest = Invest
+HomeQuickActions.Trade = Trade
 HomeQuickActions.Earn = Earn

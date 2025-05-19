@@ -1,26 +1,27 @@
 import { Card, Paragraph, Separator, Spinner, Stack, Theme, useMedia, XStack, YStack } from '@my/ui'
 import { ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
 import { IconCoin, IconError } from 'app/components/icons'
-import { stableCoins, type allCoins, type CoinWithBalance } from 'app/data/coins'
+import type { allCoins, CoinWithBalance } from 'app/data/coins'
 import { HomeQuickActions } from 'app/features/home/HomeQuickActions'
 import { useTokenMarketData } from 'app/utils/coin-gecko'
 import { convertBalanceToFiat } from 'app/utils/convertBalanceToUSD'
 import formatAmount from 'app/utils/formatAmount'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { TokenActivity } from './TokenActivity'
-import { useMemo } from 'react'
 
 export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
   const media = useMedia()
   const isSmallScreen = !media.gtXs
-  const isStableCoin = useMemo(() => {
-    return stableCoins.some((c) => c.token === coin.token)
-  }, [coin])
 
   return (
     <YStack f={1} gap={isSmallScreen ? '$3' : '$5'} $gtLg={{ w: '45%', pb: '$0' }} pb="$4">
       <YStack gap={isSmallScreen ? '$2.5' : '$3.5'} $gtLg={{ gap: '$5' }}>
-        <Card py="$5" px="$4" w={'100%'} jc={'space-between'}>
+        <Card
+          p={isSmallScreen ? '$3.5' : '$4.5'}
+          w={'100%'}
+          jc={'space-between'}
+          $gtLg={{ h: 244, p: '$6' }}
+        >
           <YStack gap="$4">
             <XStack ai={'center'} gap={'$3'}>
               <IconCoin size={'$2'} symbol={coin.symbol} />
@@ -47,9 +48,9 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
           </YStack>
         </Card>
         <HomeQuickActions>
-          {isStableCoin && <HomeQuickActions.Deposit />}
+          <HomeQuickActions.Deposit />
           <HomeQuickActions.Send />
-          {!isStableCoin && <HomeQuickActions.Invest />}
+          <HomeQuickActions.Trade />
         </HomeQuickActions>
       </YStack>
       <YStack gap={'$3'}>
@@ -173,7 +174,7 @@ const TokenDetailsBalance = ({ coin }: { coin: CoinWithBalance }) => {
     <XStack ai="flex-end" gap="$2">
       <Paragraph
         $platform-web={{ width: 'fit-content' }}
-        $sm={{ fontSize: balanceWithDecimalsLength ? '$8' : '$10', lineHeight: 32 }}
+        $sm={{ fontSize: balanceWithDecimalsLength ? '$10' : '$12', lineHeight: 32 }}
         fontSize={isSmallScreen ? 42 : 60}
         fontWeight={'900'}
         lineHeight={isSmallScreen ? 48 : 57}

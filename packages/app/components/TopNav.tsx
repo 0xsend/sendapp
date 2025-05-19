@@ -101,16 +101,23 @@ export function TopNav({
   showOnGtLg = false,
   hideRightActions = false,
 }: TopNavProps) {
-  const [queryParams] = useRootScreenParams()
+  const [queryParams, setRootParams] = useRootScreenParams()
   const path = usePathname()
   const parts = path.split('/').filter(Boolean)
   const { push, back } = useRouter()
   const media = useMedia()
+  const { coin: selectedCoin } = useCoinFromTokenParam()
   const { profile } = useUser()
+
+  const hasSelectedCoin = Boolean(selectedCoin)
 
   const handleBack = () => {
     // pop to the base path if subroute. e.g. /account/settings/edit-profile -> /account
     // else, go to home page
+    if (hasSelectedCoin) {
+      setRootParams({ ...queryParams, token: undefined })
+      return
+    }
     if (backFunction === 'router') {
       back()
       return
@@ -162,7 +169,7 @@ export function TopNav({
               )
             case media.gtLg && !showOnGtLg:
               return null
-            case Boolean(queryParams.token):
+            case hasSelectedCoin:
               return (
                 <XStack ai="center" f={1}>
                   <Button onPress={handleBack}>
@@ -174,6 +181,9 @@ export function TopNav({
                       />
                     </ButtonOg.Icon>
                   </Button>
+                  <Paragraph size={'$8'} col={'$color10'}>
+                    Balance
+                  </Paragraph>
                 </XStack>
               )
             case !isSubRoute:
