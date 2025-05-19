@@ -615,14 +615,6 @@ type Override = {
       tags?: string;
     };
   }
-  tag_reservations?: {
-    name?: string;
-    fields?: {
-      tag_name?: string;
-      chain_address?: string;
-      created_at?: string;
-    };
-  }
   tags?: {
     name?: string;
     fields?: {
@@ -1042,9 +1034,6 @@ export interface Fingerprint {
     id?: FingerprintNumberField;
     createdAt?: FingerprintDateField;
     tag?: FingerprintRelationField;
-  }
-  tagReservations?: {
-    createdAt?: FingerprintDateField;
   }
   tags?: {
     createdAt?: FingerprintDateField;
