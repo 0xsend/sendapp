@@ -1,4 +1,15 @@
-import { Button, Card, Paragraph, Spinner, Theme, XStack, YStack } from '@my/ui'
+import {
+  Card,
+  type CardProps,
+  H1,
+  Paragraph,
+  Spinner,
+  Theme,
+  ThemeableStack,
+  useMedia,
+  XStack,
+  type XStackProps,
+} from '@my/ui'
 import formatAmount from 'app/utils/formatAmount'
 
 import { ChevronLeft, ChevronRight } from '@tamagui/lucide-icons'
@@ -6,18 +17,20 @@ import { ChevronLeft, ChevronRight } from '@tamagui/lucide-icons'
 import { useIsPriceHidden } from './utils/useIsPriceHidden'
 
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
-import { investmentCoins } from 'app/data/coins'
+import { type CoinWithBalance, investmentCoins } from 'app/data/coins'
 
 import { useRootScreenParams } from 'app/routers/params'
 import { useMultipleTokensMarketData } from 'app/utils/coin-gecko'
 import { useMemo } from 'react'
-import { IconError } from 'app/components/icons'
+import { IconCoin, IconError } from 'app/components/icons'
 import { useCoins } from 'app/provider/coins'
+import { investmentCoins as investmentCoinsList } from 'app/data/coins'
 
-export const InvestmentsBalanceCard = () => {
+export const InvestmentsBalanceCard = (props: CardProps) => {
+  const media = useMedia()
   const [queryParams, setParams] = useRootScreenParams()
   const isInvestmentCoin = investmentCoins.some(
-    (coin) => coin.token.toLowerCase() === queryParams.token
+    (coin) => coin.token.toLowerCase() === queryParams.token?.toLowerCase()
   )
   const isInvestmentsScreen = queryParams.token === 'investments'
 
@@ -39,59 +52,104 @@ export const InvestmentsBalanceCard = () => {
   const formattedBalance = formatAmount(dollarTotal, 9, 0)
 
   return (
-    <Card py="$5" px="$4" w={'100%'} jc="space-between" onPress={toggleSubScreen}>
-      <YStack jc={'center'} gap={'$5'} w={'100%'}>
-        <YStack w={'100%'} gap={'$2.5'} jc="space-between">
-          <XStack ai={'center'} jc={'space-between'} gap="$2.5" width={'100%'}>
-            <Paragraph fontSize={'$7'} fontWeight="400">
-              Invest
-            </Paragraph>
-            <Button
-              chromeless
-              backgroundColor="transparent"
-              hoverStyle={{ backgroundColor: 'transparent' }}
-              pressStyle={{
-                backgroundColor: 'transparent',
-                borderColor: 'transparent',
-              }}
-              focusStyle={{ backgroundColor: 'transparent' }}
-              p={0}
-              height={'auto'}
-            >
-              <Button.Icon>
-                {isInvestmentCoin || isInvestmentsScreen ? (
-                  <ChevronLeft
-                    size={'$1.5'}
-                    color={'$lightGrayTextField'}
-                    $theme-light={{ color: '$darkGrayTextField' }}
-                    $lg={{ display: 'none' }}
-                  />
-                ) : (
-                  <ChevronRight
-                    size={'$1.5'}
-                    color={'$primary'}
-                    $theme-light={{ color: '$color12' }}
-                  />
-                )}
-              </Button.Icon>
-            </Button>
-          </XStack>
-        </YStack>
-        <Paragraph fontSize={'$10'} fontWeight={'600'} color={'$color12'}>
-          {(() => {
-            switch (true) {
-              case isPriceHidden:
-                return '///////'
-              case isLoading || !dollarBalances:
-                return <Spinner size={'large'} />
-              default:
-                return `$${formattedBalance}`
-            }
-          })()}
+    <Card
+      elevate
+      hoverStyle={{ scale: 0.925 }}
+      pressStyle={{ scale: 0.875 }}
+      animation="bouncy"
+      onPress={toggleSubScreen}
+      size={'$5'}
+      br="$7"
+      {...props}
+    >
+      <Card.Header padded pb={0} fd="row" ai="center" jc="space-between">
+        <Paragraph fontSize={'$5'} fontWeight="400">
+          Invest
         </Paragraph>
-        <InvestmentsAggregate />
-      </YStack>
+        {isInvestmentCoin || isInvestmentsScreen ? (
+          <ChevronLeft
+            size={'$1'}
+            color={'$primary'}
+            $theme-light={{ color: '$color12' }}
+            $lg={{ display: 'none' }}
+          />
+        ) : (
+          <ChevronRight
+            size={'$1'}
+            color={'$lightGrayTextField'}
+            $theme-light={{ color: '$darkGrayTextField' }}
+          />
+        )}
+      </Card.Header>
+      <Card.Footer padded pt={0} fd="column">
+        {isInvestmentsScreen && !media.gtLg ? (
+          <>
+            <Paragraph color={'$color12'} fontWeight={500} size={'$10'}>
+              {(() => {
+                switch (true) {
+                  case isPriceHidden:
+                    return '///////'
+                  case isLoading || !dollarBalances:
+                    return <Spinner size={'large'} color={'$color12'} />
+                  default:
+                    return `$${formattedBalance}`
+                }
+              })()}
+            </Paragraph>
+            <InvestmentsAggregate />
+          </>
+        ) : (
+          <>
+            <InvestmentsPreview />
+            <InvestmentsAggregate />
+          </>
+        )}
+      </Card.Footer>
     </Card>
+  )
+}
+
+function InvestmentsPreview() {
+  const { investmentCoins, isLoading } = useCoins()
+
+  if (isLoading) return <Spinner size="small" />
+
+  const existingSymbols = new Set(investmentCoins.map((coin) => coin.symbol))
+  const coins = [
+    ...investmentCoins,
+    ...investmentCoinsList
+      .filter((coin) => !existingSymbols.has(coin.symbol))
+      .map((coin) => ({ ...coin, balance: 0n })),
+  ]
+
+  const sortedByBalance = coins.toSorted((a, b) =>
+    (b?.balance ?? 0n) > (a?.balance ?? 0n) ? 1 : -1
+  )
+  return (
+    <XStack ai="center" jc="space-between">
+      <OverlappingCoinIcons coins={sortedByBalance} />
+      <Card circular ai="center" jc="center" bc="$color0" w={'$3.5'} h="$3.5" mih={0} miw={0}>
+        <Paragraph fontSize={'$4'} fontWeight="500">
+          {`+${investmentCoinsList.length - 3}`}
+        </Paragraph>
+      </Card>
+    </XStack>
+  )
+}
+
+function OverlappingCoinIcons({
+  coins,
+  length = 3,
+  ...props
+}: { coins: CoinWithBalance[]; length?: number } & XStackProps) {
+  return (
+    <XStack ai="center" {...props}>
+      {coins.slice(0, length).map(({ symbol }) => (
+        <ThemeableStack key={symbol} circular mr={'$-3.5'} bc="transparent" ai="center" jc="center">
+          <IconCoin size={'$3'} symbol={symbol} />
+        </ThemeableStack>
+      ))}
+    </XStack>
   )
 }
 
@@ -117,7 +175,7 @@ function InvestmentsAggregate() {
     return (
       <XStack gap="$2" ai="center">
         <Paragraph color="$color10" $gtXs={{ fontSize: 14 }} fontSize={12}>
-          Add popular crypto assets to your portfolio
+          Diversify Your Crypto Portfolio
         </Paragraph>
       </XStack>
     )

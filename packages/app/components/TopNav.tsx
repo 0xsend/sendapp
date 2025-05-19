@@ -162,7 +162,7 @@ export function TopNav({
               )
             case media.gtLg && !showOnGtLg:
               return null
-            case Boolean(queryParams.token):
+            case queryParams.token !== undefined:
               return (
                 <XStack ai="center" f={1}>
                   <Button onPress={handleBack}>
@@ -174,6 +174,18 @@ export function TopNav({
                       />
                     </ButtonOg.Icon>
                   </Button>
+                  <Paragraph size={'$8'} col={'$color10'}>
+                    {(() => {
+                      switch (queryParams.token) {
+                        case 'investments':
+                          return 'Invest'
+                        case 'stables':
+                          return 'Cash'
+                        default:
+                          return 'Balance'
+                      }
+                    })()}
+                  </Paragraph>
                 </XStack>
               )
             case !isSubRoute:
