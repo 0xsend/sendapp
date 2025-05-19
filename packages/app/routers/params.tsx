@@ -39,7 +39,7 @@ export const useAuthScreenParams = () => {
 
 export type RootParams = {
   nav?: 'home'
-  token?: 'investments' | 'stables' | allCoins[number]['token']
+  token?: allCoins[number]['token']
   search?: string
   profile?: string
   activity?: string
