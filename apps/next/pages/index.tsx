@@ -49,7 +49,7 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
         <title>Send</title>
       </Head>
       {session ? (
-        <HomeLayout TopNav={<TopNav header="Home" showLogo={true} backFunction="router" />}>
+        <HomeLayout TopNav={<TopNav header="Home" showLogo={true} backFunction="home" />}>
           <HomeScreen />
         </HomeLayout>
       ) : (

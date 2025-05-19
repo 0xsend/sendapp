@@ -79,6 +79,7 @@ export const LoginWithPhoneScreen = () => {
         $theme-dark={{
           variant: canSubmit ? undefined : 'outlined',
         }}
+        elevation={canSubmit ? '$0.75' : undefined}
       >
         <ButtonText
           ff={'$mono'}
@@ -154,6 +155,7 @@ export const LoginWithPhoneScreen = () => {
           >
             {({ countryCode, phone }) => (
               <FadeCard
+                elevation={'$0.75'}
                 w={'100%'}
                 mt={'$5'}
                 borderColor={validationError ? '$error' : 'transparent'}

@@ -13,7 +13,6 @@ import {
 } from '@my/ui'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
-import { StablesBalanceCard } from './StablesBalanceCard'
 import { TokenDetails } from './TokenDetails'
 import { useRootScreenParams } from 'app/routers/params'
 
@@ -21,10 +20,21 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useRouter } from 'solito/router'
 import { IsPriceHiddenProvider } from 'app/features/home/utils/useIsPriceHidden'
 
+import { StablesBalanceCard } from './StablesBalanceCard'
 import { SavingsBalanceCard } from './SavingsBalanceCard'
 import { InvestmentsBalanceCard } from './InvestmentsBalanceCard'
-import { AddInvestmentLink, InvestmentsBalanceList } from './InvestmentBalanceList'
+import { InvestmentsBalanceList } from './InvestmentBalanceList'
 import { StablesBalanceList } from './StablesBalanceList'
+import { RewardsCard } from './RewardsCard'
+import { FriendsCard } from './FriendsCard'
+import { useCoins } from 'app/provider/coins'
+import { useState } from 'react'
+import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { IconPlus } from 'app/components/icons'
+import { investmentCoins } from 'app/data/coins'
+import { CoinSheet } from 'app/components/CoinSheet'
+import { Link } from 'solito/link'
+import { baseMainnet, usdcAddress } from '@my/wagmi'
 
 export function HomeScreen() {
   const media = useMedia()
@@ -102,18 +112,21 @@ function HomeBody(props: XStackProps) {
         {...props}
       >
         <YStack
-          $gtLg={{ display: 'flex', w: '45%', gap: '$5', pb: 0 }}
+          $gtLg={{ display: 'flex', w: '45%', pb: 0 }}
           width="100%"
           display={!queryParams.token ? 'flex' : 'none'}
-          gap="$5"
+          gap="$3.5"
           ai={'center'}
         >
           <StablesBalanceCard />
-          <Paragraph fontSize={'$7'} fontWeight={'500'} color={'$color12'} als="flex-start">
-            Save & Invest
-          </Paragraph>
-          <SavingsBalanceCard />
-          <InvestmentsBalanceCard />
+          <XStack gap="$3.5" w="100%" mih={136} jc={'center'}>
+            <SavingsBalanceCard href="/earn" maw="50%" f={1} />
+            <InvestmentsBalanceCard maw="50%" f={1} />
+          </XStack>
+          <XStack gap="$3.5" w="100%" mih={136} jc={'center'}>
+            <RewardsCard href="/explore/rewards" maw="50%" f={1} />
+            <FriendsCard href="/account/affiliate" maw="50%" f={1} />
+          </XStack>
         </YStack>
         {(() => {
           switch (true) {
@@ -134,6 +147,9 @@ function HomeBody(props: XStackProps) {
 
 function InvestmentsBody() {
   const media = useMedia()
+  const { investmentCoins: myInvestmentCoins, isLoading } = useCoins()
+  const [isSheetOpen, setIsSheetOpen] = useState(false)
+  const hoverStyles = useHoverStyles()
 
   return (
     <YStack ai="center" $gtXs={{ gap: '$3' }} gap={'$3.5'} f={1}>
@@ -147,9 +163,37 @@ function InvestmentsBody() {
           p: '$4',
         }}
       >
-        <InvestmentsBalanceList />
+        {isLoading ? (
+          <YStack p="$3.5" ai="center">
+            <Spinner />
+          </YStack>
+        ) : (
+          <InvestmentsBalanceList coins={myInvestmentCoins} />
+        )}
       </Card>
-      <AddInvestmentLink />
+      <Button p="$3" hoverStyle={hoverStyles} onPress={() => setIsSheetOpen(true)}>
+        <Button.Icon>
+          <IconPlus size="$1" color="$color10" />
+        </Button.Icon>
+        <Button.Text>See More</Button.Text>
+      </Button>
+
+      <CoinSheet open={isSheetOpen} onOpenChange={() => setIsSheetOpen(false)}>
+        <CoinSheet.Handle onPress={() => setIsSheetOpen(false)}>New Investments</CoinSheet.Handle>
+        <CoinSheet.Items>
+          {investmentCoins.map((coin) => (
+            <Link
+              key={coin.symbol}
+              href={{
+                pathname: '/trade',
+                query: { inToken: usdcAddress[baseMainnet.id], outToken: coin.token },
+              }}
+            >
+              <CoinSheet.Item coin={coin} />
+            </Link>
+          ))}
+        </CoinSheet.Items>
+      </CoinSheet>
     </YStack>
   )
 }
