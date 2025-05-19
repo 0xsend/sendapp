@@ -164,9 +164,6 @@ export default defineConfig({
       tag_receipts: ({ row }) => {
         return row
       },
-      tag_reservations: ({ row }) => {
-        return row
-      },
       send_slash: ({ row }) => {
         return row
       },
