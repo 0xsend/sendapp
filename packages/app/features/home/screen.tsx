@@ -13,7 +13,6 @@ import {
 } from '@my/ui'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
-import { StablesBalanceCard } from './StablesBalanceCard'
 import { TokenDetails } from './TokenDetails'
 import { useRootScreenParams } from 'app/routers/params'
 
@@ -21,10 +20,13 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useRouter } from 'solito/router'
 import { IsPriceHiddenProvider } from 'app/features/home/utils/useIsPriceHidden'
 
+import { StablesBalanceCard } from './StablesBalanceCard'
 import { SavingsBalanceCard } from './SavingsBalanceCard'
 import { InvestmentsBalanceCard } from './InvestmentsBalanceCard'
 import { AddInvestmentLink, InvestmentsBalanceList } from './InvestmentBalanceList'
 import { StablesBalanceList } from './StablesBalanceList'
+import { RewardsCard } from './RewardsCard'
+import { FriendsCard } from './FriendsCard'
 
 export function HomeScreen() {
   const media = useMedia()
@@ -102,18 +104,21 @@ function HomeBody(props: XStackProps) {
         {...props}
       >
         <YStack
-          $gtLg={{ display: 'flex', w: '45%', gap: '$5', pb: 0 }}
+          $gtLg={{ display: 'flex', w: '45%', pb: 0 }}
           width="100%"
           display={!queryParams.token ? 'flex' : 'none'}
-          gap="$5"
+          gap="$4"
           ai={'center'}
         >
           <StablesBalanceCard />
-          <Paragraph fontSize={'$7'} fontWeight={'500'} color={'$color12'} als="flex-start">
-            Save & Invest
-          </Paragraph>
-          <SavingsBalanceCard />
-          <InvestmentsBalanceCard />
+          <XStack gap="$4" w="100%" mih={136}>
+            <SavingsBalanceCard href="/earn" w="48%" />
+            <InvestmentsBalanceCard w="48%" />
+          </XStack>
+          <XStack gap="$4" w="100%" mih={136}>
+            <RewardsCard href="/explore/rewards" w="48%" />
+            <FriendsCard href="/account/affiliate" w="48%" />
+          </XStack>
         </YStack>
         {(() => {
           switch (true) {
