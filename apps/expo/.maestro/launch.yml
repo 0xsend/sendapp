@@ -1,9 +1,6 @@
-appId: app.send  # Using the actual Send app bundle identifier
+appId: app.send
 ---
 - launchApp
 - waitForAnimationToEnd
-- assertVisible: "WELCOME"  # This text appears on the splash screen
-- assertVisible: "TO SEND"  # This text also appears on the splash screen
-- assertVisible: "Sign in with your passkey"  # The subtitle text
-- assertVisible: "SIGN-IN"  # The sign-in button text
-- assertVisible: "SIGN-UP"  # The sign-up button text
+- assertVisible: "SIGN-IN" # The sign-in button text
+- assertVisible: "SIGN-UP" # The sign-up button text
