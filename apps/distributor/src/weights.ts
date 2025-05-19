@@ -8,7 +8,7 @@ export enum Mode {
   EaseInOut = 'ease_in_out',
 }
 
-export const PERC_DENOM = 10000000n
+export const PERC_DENOM = 1000n
 
 export function calculatePercentageWithBips(value: bigint, bips: bigint) {
   const bps = bips * PERC_DENOM
@@ -124,18 +124,39 @@ function calculateExponentialWeight(
 }
 
 function calculateCubicBezierWeight(balance: bigint, totalBalance: bigint): bigint {
-  // Normalize the balance to [0,1]
-  const t = Number(balance) / Number(totalBalance)
+  if (totalBalance === 0n) {
+    return 0n
+  }
 
-  // Control points for flat behavior at extremes
-  const p0 = 0
-  const p1 = 0.2 // Close to start for flat beginning
-  const p2 = 0.8 // Close to end for flat ending
-  const p3 = 1
+  // t_bn represents the ratio of balance/totalBalance, scaled to PERC_DENOM
+  // e.g., if balance is 30% of total and PERC_DENOM is 1000000n, t_bn would be 300000n
+  const t_bn = (balance * PERC_DENOM) / totalBalance
 
-  // Cubic Bezier formula
+  // Cubic Bezier formula components:
+  // Term 1: (1-t)³ * p0        - influence of start point
+  // Term 2: 3(1-t)²t * p1      - influence of first control point
+  // Term 3: 3(1-t)t² * p2      - influence of second control point
+  // Term 4: t³ * p3            - influence of end point
+  const p0 = 0n
+  const p1 = (PERC_DENOM * 20n) / 100n // 0.2 as BigInt
+  const p2 = (PERC_DENOM * 80n) / 100n // 0.8 as BigInt
+  const p3 = PERC_DENOM
+
+  // inv_t is the inverse of t_bn (distance from 1)
+  // e.g., if t_bn is 300000n, inv_t would be 700000n
+  const inv_t = PERC_DENOM - t_bn
+
+  // Cubic Bezier formula components:
+  // Term 1: (1-t)³ * p0        - influence of start point
+  // Term 2: 3(1-t)²t * p1      - influence of first control point
+  // Term 3: 3(1-t)t² * p2      - influence of second control point
+  // Term 4: t³ * p3            - influence of end point
   const bezier =
-    (1 - t) ** 3 * p0 + 3 * (1 - t) ** 2 * t * p1 + 3 * (1 - t) * t ** 2 * p2 + t ** 3 * p3
+    (inv_t ** 3n * p0 +
+      3n * inv_t ** 2n * t_bn * p1 +
+      3n * inv_t * t_bn ** 2n * p2 +
+      t_bn ** 3n * p3) /
+    PERC_DENOM ** 3n
 
-  return BigInt(Math.floor(Number(PERC_DENOM) * bezier))
+  return bezier
 }
