@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Stack } from 'tamagui'
+import { isWeb, Stack, styled } from 'tamagui'
 import { usePwa, useSafeAreaInsets } from '../utils'
 
 const getTimeout = (progress: number): number => {
@@ -77,31 +77,38 @@ const LoadingBar = ({ visible }: { visible: boolean }) => {
         width="100%"
         bc="$primary"
         opacity={!render || (render && progress === 0) ? 0 : 1}
-        animation="quick"
-        transformStyle="preserve-3d"
+        animation="fastHeavy"
         x={`-${translate}%`}
         animateOnly={['transform']}
       />
     </Stack>
   )
 }
+const IndicatorContainer = styled(Stack, {
+  position: 'absolute',
+  left: 0,
+  w: '100%',
+  pointerEvents: 'none',
+  zIndex: 20,
+
+  variants: {
+    native: {
+      true: {
+        bottom: 0,
+      },
+      false: {
+        top: 0,
+      },
+    },
+  },
+})
 
 export const PendingIndicatorBar = ({ pending }: { pending: boolean }) => {
-  const isPwa = usePwa()
-
-  const placement = isPwa ? { bottom: 0 } : { top: 0 }
+  const isNative = usePwa() || !isWeb
 
   return (
-    <Stack
-      position="absolute"
-      left={0}
-      w="100%"
-      pointerEvents="none"
-      zIndex={20}
-      {...placement}
-      $platform-native={{ bottom: 0 }}
-    >
+    <IndicatorContainer native={isNative}>
       <LoadingBar visible={pending} />
-    </Stack>
+    </IndicatorContainer>
   )
 }
