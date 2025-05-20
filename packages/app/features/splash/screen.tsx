@@ -272,24 +272,25 @@ function AuthButtons() {
   useEffect(() => () => toast.hide(), [toast])
 
   return (
-    <XStack
-      gap={'$0.9'}
-      pos={'relative'}
-      pb={'$2'}
-      jc="center"
-      $gtMd={{ jc: 'flex-start' }}
-      alignSelf="center"
-      width="100%"
-    >
-      <SubmitButton size="$4" w="$12" onPress={handleSignIn} disabled={isSigningIn}>
-        <ButtonText>{isSigningIn ? 'SIGNING IN...' : 'SIGN-IN'}</ButtonText>
-      </SubmitButton>
+    <YStack width="100%" gap="$4">
+      <XStack
+        gap={'$0.9'}
+        pos={'relative'}
+        jc="center"
+        $gtMd={{ jc: 'flex-start' }}
+        alignSelf="center"
+        width="100%"
+      >
+        <SubmitButton size="$4" w="$12" onPress={handleSignIn} disabled={isSigningIn}>
+          <ButtonText>{isSigningIn ? 'SIGNING IN...' : 'SIGN-IN'}</ButtonText>
+        </SubmitButton>
 
-      <Button {...signUpLink} borderColor="$primary" variant="outlined" size="$4" w="$12">
-        <Button.Text color="$white" $gtMd={{ color: '$color12' }}>
-          SIGN-UP
-        </Button.Text>
-      </Button>
-    </XStack>
+        <Button {...signUpLink} borderColor="$primary" variant="outlined" size="$4" w="$12">
+          <Button.Text color="$white" $gtMd={{ color: '$color12' }}>
+            SIGN-UP
+          </Button.Text>
+        </Button>
+      </XStack>
+    </YStack>
   )
 }

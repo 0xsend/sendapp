@@ -10,6 +10,7 @@ module.exports = (api) => {
           alias: {
             // define aliases to shorten the import paths
             app: '../../packages/app',
+            'apps-expo': '.',
             '@my/ui': '../../packages/ui',
             '@wagmi/core/codegen': '../../node_modules/@wagmi/core/dist/esm/exports/codegen.js',
             cbor2: '../../node_modules/cbor2/lib/index.js',
