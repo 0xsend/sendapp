@@ -14,6 +14,8 @@ It seeds our database using two main methods:
 
 ## Capturing snapshots
 
+**⚠️ All the commands below need to be executed in packages/snaplet directory**
+
 `bunx @snaplet/snapshot snapshot capture`: This captures a snapshot of the database and saves it locally. It can then be shared with other developers by uploading the snapshot to snaplet's cloud storage.
 
 **⚠️ Capturing snapshots** requires access to the production database.
