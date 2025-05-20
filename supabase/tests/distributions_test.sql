@@ -2,7 +2,7 @@ SET client_min_messages TO NOTICE;
 
 BEGIN;
 SELECT
-    plan(25);
+    plan(27);
 CREATE EXTENSION "basejump-supabase_test_helpers";
 SELECT
     set_config('role', 'service_role', TRUE);
@@ -982,6 +982,76 @@ SELECT
                 user_id = tests.get_supabase_uid('bob')
                 AND type = 'send_ten' $$, $$
             VALUES ('8') $$, 'Should only count the recipient with a send account');
+
+-- Test update_referral_verifications function
+SELECT
+    results_eq($$
+        SELECT COUNT(*) FROM distribution_verifications
+        WHERE distribution_id = (SELECT id FROM distributions WHERE number = 123)
+        AND type = 'total_tag_referrals'
+    $$,
+    ARRAY[0]::bigint[],
+    'Should start with no total_tag_referrals verifications'
+);
+
+-- Setup referrals
+INSERT INTO referrals (referrer_id, referred_id)
+VALUES
+    (tests.get_supabase_uid('bob'), tests.get_supabase_uid('recipient1')),
+    (tests.get_supabase_uid('bob'), tests.get_supabase_uid('recipient2')),
+    (tests.get_supabase_uid('bob'), tests.get_supabase_uid('recipient3'));
+
+-- Call the function
+SELECT update_referral_verifications(
+    (SELECT id FROM distributions WHERE number = 123),
+    ARRAY[
+        ROW(
+            NULL, -- id
+            (SELECT id FROM distributions WHERE number = 123), -- distribution_id
+            tests.get_supabase_uid('recipient1'), -- user_id
+            '\xa71ce00000000000000000000000000000000001'::bytea, -- address
+            950, -- amount
+            500, -- hodler_pool_amount
+            200, -- bonus_pool_amount
+            300, -- fixed_pool_amount
+            CURRENT_TIMESTAMP::timestamp with time zone, -- created_at
+            CURRENT_TIMESTAMP::timestamp with time zone, -- updated_at
+            1    -- index
+        )::distribution_shares,
+        ROW(
+            NULL,
+            (SELECT id FROM distributions WHERE number = 123),
+            tests.get_supabase_uid('recipient2'),
+            '\xa71ce00000000000000000000000000000000002'::bytea,
+            950, 500, 200, 300,
+            CURRENT_TIMESTAMP::timestamp with time zone,
+            CURRENT_TIMESTAMP::timestamp with time zone,
+            2
+        )::distribution_shares,
+        ROW(
+            NULL,
+            (SELECT id FROM distributions WHERE number = 123),
+            tests.get_supabase_uid('recipient3'),
+            '\xa71ce00000000000000000000000000000000003'::bytea,
+            950, 500, 200, 300,
+            CURRENT_TIMESTAMP::timestamp with time zone,
+            CURRENT_TIMESTAMP::timestamp with time zone,
+            3
+        )::distribution_shares
+    ]
+);
+
+SELECT results_eq(
+    $$
+    SELECT COUNT(*) FROM distribution_verifications
+    WHERE distribution_id = (SELECT id FROM distributions WHERE number = 123)
+    AND user_id = tests.get_supabase_uid('bob')
+    AND type = 'total_tag_referrals'
+    $$,
+    ARRAY[1]::bigint[],
+    'Should not create duplicate records on multiple executions'
+);
+
 
 SELECT
     finish();
