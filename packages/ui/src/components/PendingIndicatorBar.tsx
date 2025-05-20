@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Stack } from 'tamagui'
+import { usePwa, useSafeAreaInsets } from '../utils'
 
 const getTimeout = (progress: number): number => {
   if (progress < 0.7) {
@@ -19,6 +20,8 @@ const LoadingBar = ({ visible }: { visible: boolean }) => {
   const [progress, setProgress] = useState(0)
 
   const translate = 100 - progress * 100
+
+  const insets = useSafeAreaInsets()
 
   useEffect(() => {
     if (render) {
@@ -65,7 +68,7 @@ const LoadingBar = ({ visible }: { visible: boolean }) => {
   }, [visible])
 
   return (
-    <Stack w="100%" h="$0.5" overflow="hidden" position="relative">
+    <Stack w="100%" h={insets.bottom > 0 ? '$0.75' : '$0.5'} overflow="hidden" position="relative">
       <Stack
         position="absolute"
         top={0}
@@ -74,14 +77,31 @@ const LoadingBar = ({ visible }: { visible: boolean }) => {
         width="100%"
         bc="$primary"
         opacity={!render || (render && progress === 0) ? 0 : 1}
-        style={{ transform: `translateX(-${translate}%)` }}
+        animation="quick"
+        transformStyle="preserve-3d"
+        x={`-${translate}%`}
+        animateOnly={['transform']}
       />
     </Stack>
   )
 }
 
-export const PendingIndicatorBar = ({ pending }: { pending: boolean }) => (
-  <Stack position="absolute" left={0} top={0} w="100%" pointerEvents="none" zIndex={20}>
-    <LoadingBar visible={pending} />
-  </Stack>
-)
+export const PendingIndicatorBar = ({ pending }: { pending: boolean }) => {
+  const isPwa = usePwa()
+
+  const placement = isPwa ? { bottom: 0 } : { top: 0 }
+
+  return (
+    <Stack
+      position="absolute"
+      left={0}
+      w="100%"
+      pointerEvents="none"
+      zIndex={20}
+      {...placement}
+      $platform-native={{ bottom: 0 }}
+    >
+      <LoadingBar visible={pending} />
+    </Stack>
+  )
+}
