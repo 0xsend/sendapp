@@ -6,16 +6,16 @@ import { CheckoutForm } from './checkout-form'
 import { useUser } from 'app/utils/useUser'
 
 export const CheckoutScreen = () => {
-  const { isLoadingTags } = useUser()
+  const { isLoading } = useUser()
   const confirmedTags = useConfirmedTags()
   const router = useRouter()
   const pendingTags = usePendingTags() ?? []
 
   useEffect(() => {
-    if (confirmedTags?.length === 5 || (!isLoadingTags && pendingTags.length === 0)) {
+    if (confirmedTags?.length === 5 || (!isLoading && pendingTags.length === 0)) {
       router.replace('/account/sendtag')
     }
-  }, [confirmedTags, router, pendingTags, isLoadingTags])
+  }, [confirmedTags, router, pendingTags, isLoading])
 
   return (
     <YStack
