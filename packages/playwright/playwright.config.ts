@@ -48,13 +48,15 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
-  workers,
+  workers: process.env.CI ? 1 : workers,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [
-    process.env.CI ? ['github'] : ['list'],
-    ['html', { host: '127.0.0.1', open: 'never' }],
-    ['json', { outputFile: 'playwright-report/report.json' }],
-  ],
+  reporter: process.env.CI
+    ? [['blob'], ['github'], ['html', { host: '127.0.0.1', open: 'never' }]]
+    : [
+        ['list'],
+        ['html', { host: '127.0.0.1', open: 'never' }],
+        ['json', { outputFile: 'playwright-report/report.json' }],
+      ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
@@ -116,7 +118,9 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   webServer: {
     command: process.env.CI
-      ? 'yarn workspace next-app run serve --port 3000'
+      ? process.env.PLAYWRIGHT_WEB_SERVER_COMMAND
+        ? process.env.PLAYWRIGHT_WEB_SERVER_COMMAND
+        : 'yarn workspace next-app run serve --port 3000'
       : 'yarn workspace next-app run dev',
     url: baseURL,
     // reuseExistingServer: !process.env.CI,

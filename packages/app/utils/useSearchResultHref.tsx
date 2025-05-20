@@ -15,8 +15,14 @@ export const useSearchResultHref = (profile?: SearchResultCommonType) => {
         return ''
       case path === '/activity':
         return `${baseMainnet.blockExplorers.default.url}/address/${query}`
-      case path === '/send' || path === '/':
-        return `/send?recipient=${query}&idType=address`
+      case path === '/send' || path === '/': {
+        const _sendParams = JSON.parse(JSON.stringify(sendParams)) //JSON makes sure we don't pass undefined values
+        return `/send?${new URLSearchParams({
+          ..._sendParams,
+          recipient: query,
+          idType: 'address',
+        }).toString()}`
+      }
 
       default:
         throw new Error(`Unhandled path: ${path}`)

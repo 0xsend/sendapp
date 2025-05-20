@@ -94,11 +94,7 @@ const Trade = () => {
       return '/trade'
     }
 
-    if (coin.symbol === sendCoin.symbol) {
-      return `/trade?inToken=${coin.token}&outToken=${usdcCoin.token}`
-    }
-
-    return `/trade?inToken=${coin.token}`
+    return `/trade?inToken=${usdcCoin.token}&outToken=${coin.token}`
   }
 
   return (

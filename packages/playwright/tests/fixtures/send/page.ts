@@ -33,9 +33,13 @@ export class SendPage {
     await this.expect(this.page.locator('h2', { hasText: 'Enter Amount' })).toBeVisible()
     await this.expect(this.amountInput).toBeVisible()
     await this.amountInput.fill(amount)
-    await this.expect(this.continueButton).toBeVisible()
-    await this.expect(this.continueButton).toBeEnabled()
-    await this.continueButton.click()
+    await this.expect(async () => {
+      await this.expect(this.continueButton).toBeVisible()
+      await this.expect(this.continueButton).toBeEnabled()
+      await this.continueButton.click()
+    }).toPass({
+      timeout: 10_000,
+    })
     await this.expect(this.sendButton).toBeVisible()
     await this.sendButton.click()
   }

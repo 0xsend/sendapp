@@ -174,7 +174,7 @@ const TokenDetailsBalance = ({ coin }: { coin: CoinWithBalance }) => {
     <XStack ai="flex-end" gap="$2">
       <Paragraph
         $platform-web={{ width: 'fit-content' }}
-        $sm={{ fontSize: balanceWithDecimalsLength ? '$8' : '$10', lineHeight: 32 }}
+        $sm={{ fontSize: balanceWithDecimalsLength ? '$10' : '$12', lineHeight: 32 }}
         fontSize={isSmallScreen ? 42 : 60}
         fontWeight={'900'}
         lineHeight={isSmallScreen ? 48 : 57}

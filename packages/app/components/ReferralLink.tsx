@@ -87,7 +87,7 @@ export function ReferralLink(props: ButtonProps) {
         <ButtonText
           fontSize={'$5'}
           fontWeight={'500'}
-          bc="$background"
+          bc="transparent"
           maxWidth={'85%'}
           hoverStyle={{
             color: '$primary',

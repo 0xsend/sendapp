@@ -26,6 +26,7 @@ export const TokenBalanceList = () => {
   return coins.map((coin) => (
     <Fragment key={`token-balance-list-${coin.label}`}>
       <TokenBalanceItem
+        testID={`token-balance-list-${coin.label}`}
         coin={coin}
         jc={'space-between'}
         ai={'center'}
