@@ -1,16 +1,20 @@
 import { SecretShopScreen } from 'app/features/secret-shop/screen'
-import { configureScreenHeader } from 'apps-expo/utils/configureScreenHeader'
 import { ScreenContentContainer } from 'app/components/ScreenContentContainer'
+import { Stack } from 'expo-router'
 
 export default function SecretShopScreenWrapper() {
   return (
-    <ScreenContentContainer>
-      <SecretShopScreen />
-    </ScreenContentContainer>
+    <>
+      <Stack.Screen
+        options={{
+          title: 'Secret Shop',
+          headerBackTitle: 'Back',
+          headerShown: true,
+        }}
+      />
+      <ScreenContentContainer>
+        <SecretShopScreen />
+      </ScreenContentContainer>
+    </>
   )
 }
-
-configureScreenHeader(SecretShopScreenWrapper, {
-  headerTitle: 'Secret Shop',
-  headerBackTitle: 'Back',
-})
