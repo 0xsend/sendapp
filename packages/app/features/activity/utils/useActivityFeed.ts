@@ -34,7 +34,6 @@ export function useActivityFeed({
 > {
   const supabase = useSupabase()
   const addressBook = useAddressBook()
-  console.log(addressBook)
   const enabled = useMemo(() => addressBook.isError || addressBook.isSuccess, [addressBook])
   const queryKey = useMemo(
     () => ['activity_feed', { addressBook, supabase, pageSize }] as const,
