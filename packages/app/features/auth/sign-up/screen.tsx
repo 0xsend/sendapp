@@ -98,6 +98,7 @@ export const SignUpScreen = () => {
           sendtag: name,
           captchaToken,
         })
+        assert(!!auth.session, 'No session returned')
         supabase.auth.setSession(auth.session)
       }
 
