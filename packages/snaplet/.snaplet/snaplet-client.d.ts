@@ -207,7 +207,6 @@ type Override = {
       affiliate_stats?: string;
       referrals_referrals_referred_idToprofiles?: string;
       referrals_referrals_referrer_idToprofiles?: string;
-      tags?: string;
     };
   }
   receipts?: {
@@ -623,7 +622,6 @@ type Override = {
       user_id?: string;
       created_at?: string;
       users?: string;
-      profiles?: string;
       tag_receipts?: string;
     };
   }
@@ -828,7 +826,6 @@ export interface Fingerprint {
     affiliateStatsByUserId?: FingerprintRelationField;
     referralsByReferredId?: FingerprintRelationField;
     referralsByReferrerId?: FingerprintRelationField;
-    tagsByUserId?: FingerprintRelationField;
   }
   receipts?: {
     createdAt?: FingerprintDateField;
