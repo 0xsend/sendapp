@@ -6,7 +6,7 @@ import {
   usdcAddress,
 } from '@my/wagmi'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { queryOptions, useMutation, useQuery } from '@tanstack/react-query'
 import { reward, total } from 'app/data/sendtags'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
@@ -18,6 +18,7 @@ import { useUSDCFees } from 'app/utils/useUSDCFees'
 import { useMemo } from 'react'
 import { encodeFunctionData, erc20Abi, zeroAddress } from 'viem'
 import { fetchSendtagCheckoutReceipts } from './checkout-utils.fetchSendtagCheckoutReceipts'
+import { useUser } from 'app/utils/useUser'
 
 export const verifyAddressMsg = (a: string | `0x${string}`) =>
   `I am the owner of the address: ${a}.
@@ -55,7 +56,7 @@ export function useSendtagCheckoutReceipts() {
 
 export const useReleaseTag = () => {
   const supabase = useSupabase()
-  const queryClient = useQueryClient()
+  const user = useUser()
 
   return useMutation({
     mutationFn: async (tagName: string) => {
@@ -66,7 +67,7 @@ export const useReleaseTag = () => {
       }
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['tags'] })
+      await user?.updateProfile()
     },
   })
 }

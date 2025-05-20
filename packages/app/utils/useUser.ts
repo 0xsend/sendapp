@@ -51,7 +51,7 @@ export const useUser = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('*, tags(*)')
         .eq('id', user?.id ?? '')
         .single()
       if (error) {
@@ -75,35 +75,6 @@ export const useUser = () => {
     },
   })
 
-  // TODO refactor fetching tags to use foreign key between profile and tags tables
-  const {
-    data: tags,
-    isLoading: isLoadingTags,
-    refetch: refetchTags,
-  } = useQuery({
-    queryKey: ['tags'],
-    queryFn: async () => {
-      const { data, error } = await supabase.from('tags').select('*')
-
-      if (error) {
-        // no rows
-        if (error.code === 'PGRST116') {
-          return []
-        }
-        // Handle unauthorized or invalid JWT
-        if (error.code === 'PGRST301' || error.code === 'PGRST401') {
-          log('unauthorized or invalid JWT when fetching tags')
-          await supabase.auth.signOut()
-          router.replace('/')
-          return []
-        }
-        log('error fetching tags', error)
-        throw new Error(error.message)
-      }
-      return data
-    },
-  })
-
   const avatarUrl = (() => {
     if (profile?.avatar_url) return profile.avatar_url
     if (typeof user?.user_metadata?.avatar_url === 'string') return user.user_metadata.avatar_url
@@ -120,15 +91,11 @@ export const useUser = () => {
     user,
     profile,
     avatarUrl,
-    tags,
-    updateProfile: () =>
-      refetch().then(() => {
-        refetchTags()
-      }),
+    tags: profile?.tags,
+    updateProfile: refetch,
     isLoadingSession,
     isLoadingProfile,
-    isLoadingTags,
-    isLoading: isLoadingSession || isLoadingProfile || isLoadingTags,
+    isLoading: isLoadingSession || isLoadingProfile,
     validateToken,
   }
 }
