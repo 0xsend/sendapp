@@ -150,7 +150,7 @@ export const SwapSummaryScreen = () => {
   }, [routeSummary, swapParams, router.push, encodeRoute, encodeRouteStatus])
 
   if (initLoading) {
-    return <Spinner size="large" color="$olive" />
+    return <Spinner size="large" color={'$color12'} />
   }
 
   return (
