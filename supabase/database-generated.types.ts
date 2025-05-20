@@ -390,6 +390,7 @@ export type Database = {
           referral_code: string | null
           send_id: number
           x_username: string | null
+          tags: unknown | null
         }
         Insert: {
           about?: string | null
@@ -1515,13 +1516,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "tags_profile_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "tags_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
@@ -1974,6 +1968,17 @@ export type Database = {
           send_id_matches: Database["public"]["CompositeTypes"]["tag_search_result"][]
           tag_matches: Database["public"]["CompositeTypes"]["tag_search_result"][]
           phone_matches: Database["public"]["CompositeTypes"]["tag_search_result"][]
+        }[]
+      }
+      tags: {
+        Args: {
+          "": unknown
+        }
+        Returns: {
+          created_at: string
+          name: string
+          status: Database["public"]["Enums"]["tag_status"]
+          user_id: string
         }[]
       }
       update_distribution_shares: {

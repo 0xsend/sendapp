@@ -57,7 +57,7 @@ export const tagRouter = createTRPCRouter({
 
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
-          .select('*, tags (*)')
+          .select('*, tags(*)')
           .eq('tags.status', 'confirmed')
           .single()
 
