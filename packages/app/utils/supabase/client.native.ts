@@ -69,35 +69,30 @@ class LargeSecureStore {
   }
 
   private async _decrypt(key: string, encodedValue: string): Promise<string | null> {
-    try {
-      const secureStoreKey = this.KEY_PREFIX + key
+    const secureStoreKey = this.KEY_PREFIX + key
 
-      // Get encryption key
-      const encryptionKeyHex = await SecureStore.getItemAsync(secureStoreKey)
-      if (!encryptionKeyHex) return null
+    // Get encryption key
+    const encryptionKeyHex = await SecureStore.getItemAsync(secureStoreKey)
+    if (!encryptionKeyHex) return null
 
-      // Extract nonce and encrypted data
-      const [nonceHex, encryptedHex] = encodedValue.split(':')
+    // Extract nonce and encrypted data
+    const [nonceHex, encryptedHex] = encodedValue.split(':')
 
-      assert(nonceHex !== undefined && encryptedHex !== undefined, 'Invalid encoded value')
+    assert(nonceHex !== undefined && encryptedHex !== undefined, 'Invalid encoded value')
 
-      // Convert hex strings back to binary data
-      const encryptionKey = hexToBytes(encryptionKeyHex)
-      const nonce = hexToBytes(nonceHex)
-      const encrypted = hexToBytes(encryptedHex)
+    // Convert hex strings back to binary data
+    const encryptionKey = hexToBytes(encryptionKeyHex)
+    const nonce = hexToBytes(nonceHex)
+    const encrypted = hexToBytes(encryptedHex)
 
-      // Create the AES-GCM cipher with the same key and nonce
-      const cipher = gcm(encryptionKey, nonce)
+    // Create the AES-GCM cipher with the same key and nonce
+    const cipher = gcm(encryptionKey, nonce)
 
-      // Decrypt the data
-      const decrypted = cipher.decrypt(encrypted)
+    // Decrypt the data
+    const decrypted = cipher.decrypt(encrypted)
 
-      // Convert back to string
-      return bytesToUtf8(decrypted)
-    } catch (error) {
-      console.error('Decryption error:', error)
-      return null
-    }
+    // Convert back to string
+    return bytesToUtf8(decrypted)
   }
 
   async getItem(key: string): Promise<string | null> {
