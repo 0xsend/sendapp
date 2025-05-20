@@ -28,8 +28,31 @@ The current navigation architecture for the Expo app is built using Expo Router 
 
 4. **Tab Navigation** (`/app/(drawer)/(tabs)/`):
    - Nested inside the drawer navigator
-   - Currently includes: index (home), activity, earn, and profile tabs
+   - Currently includes: index (home), activity, profile, and earn tabs
    - Custom header with drawer menu toggle and "+" button
+
+## Current Implementation Status
+
+The Expo app has implemented several key components:
+
+1. **Navigation Structure**:
+   - Basic drawer navigation is in place with the following menu items:
+     - Home, Activity, Send, Deposit, Earn, Trade, SendPot, Leaderboard, Settings
+   - Tab navigation includes Home, Activity, Profile, and Earn
+
+2. **Screens Implemented**:
+   - Basic authentication flow (sign-up and onboarding)
+   - Home screen with minimal functionality
+   - Simple activity, profile, and earn screens
+
+3. **Missing Features**:
+   - Feed screen
+   - Explore section
+   - Invest functionality
+   - Complete account management (backup flow, personal info, affiliate)
+   - Enhanced SendPot with confirmation flows
+   - Apple Pay integration
+   - Complete deposit and withdrawal flows
 
 ## Next.js App Structure
 
@@ -64,41 +87,62 @@ The Next.js app has a comprehensive routing structure with these sections:
 
 ## Proposed Navigation Improvements
 
-To align the Expo app with the Next.js app structure, I recommend the following improvements:
+To align the Expo app with the Next.js app structure, the following improvements are recommended:
 
-### 1. Enhance Tab Navigation
+### 1. Update Tab Navigation
 
-The tab navigation already includes the core sections but could be expanded to match the Next.js app more closely:
+The tab navigation is already well-structured but needs consistent styling and performance optimizations:
 
 ```tsx
 // In apps/expo/app/(drawer)/(tabs)/_layout.tsx
-<Tabs>
+<Tabs
+  screenOptions={{
+    tabBarShowLabel: false,
+    headerShown: false,
+    tabBarStyle: {
+      // Consistent styling with safe area insets
+      paddingTop: 10,
+      paddingBottom: insets.bottom + 10,
+      height: 60,
+      borderTopWidth: 1,
+      borderTopColor: '$borderColor',
+    },
+  }}
+>
   <Tabs.Screen
     name="index"
     options={{
       title: 'Home',
-      tabBarIcon: ({ focused }) => <Home color={focused ? '$color12' : '$color10'} />
+      tabBarIcon: ({ size, focused }) => (
+        <Home color={focused ? '$color12' : '$color10'} size={size} strokeWidth={2} />
+      ),
     }}
   />
   <Tabs.Screen
     name="activity"
     options={{
       title: 'Activity',
-      tabBarIcon: ({ focused }) => <Activity color={focused ? '$color12' : '$color10'} />
-    }}
-  />
-  <Tabs.Screen
-    name="earn"
-    options={{
-      title: 'Earn',
-      tabBarIcon: ({ focused }) => <DollarSign color={focused ? '$color12' : '$color10'} />
+      tabBarIcon: ({ size, focused }) => (
+        <Activity color={focused ? '$color12' : '$color10'} size={size} strokeWidth={2} />
+      ),
     }}
   />
   <Tabs.Screen
     name="profile"
     options={{
       title: 'Profile',
-      tabBarIcon: ({ focused }) => <User color={focused ? '$color12' : '$color10'} />
+      tabBarIcon: ({ size, focused }) => (
+        <User color={focused ? '$color12' : '$color10'} size={size} strokeWidth={2} />
+      ),
+    }}
+  />
+  <Tabs.Screen
+    name="earn"
+    options={{
+      title: 'Earn',
+      tabBarIcon: ({ size, focused }) => (
+        <DollarSign color={focused ? '$color12' : '$color10'} size={size} strokeWidth={2} />
+      ),
     }}
   />
 </Tabs>
@@ -106,21 +150,22 @@ The tab navigation already includes the core sections but could be expanded to m
 
 ### 2. Enhance Drawer Content
 
-Expand the drawer to include all major navigation sections from the Next.js app:
+The current drawer implementation includes most key navigation items but should be expanded to include all features from the Next.js app:
 
 ```tsx
-// Enhanced drawer content
+// In apps/expo/app/(drawer)/_layout.tsx
 function ProfileScreen() {
   // ... existing code
 
   const menuItems = [
     { icon: <Home size={20} />, label: 'Home', route: '/(tabs)' },
-    { icon: <Activity size={20} />, label: 'Activity', route: '/activity' },
+    { icon: <Activity size={20} />, label: 'Activity', route: '/(tabs)/activity' },
     { icon: <Send size={20} />, label: 'Send', route: '/send' },
     { icon: <Download size={20} />, label: 'Deposit', route: '/deposit' },
-    { icon: <DollarSign size={20} />, label: 'Earn', route: '/earn' },
+    { icon: <DollarSign size={20} />, label: 'Earn', route: '/(tabs)/earn' },
     { icon: <TrendingUp size={20} />, label: 'Trade', route: '/trade' },
     { icon: <Gift size={20} />, label: 'SendPot', route: '/sendpot' },
+    // Add missing navigation items
     { icon: <Search size={20} />, label: 'Explore', route: '/explore' },
     { icon: <LineChart size={20} />, label: 'Invest', route: '/invest' },
     { icon: <Rss size={20} />, label: 'Feed', route: '/feed' },
@@ -130,37 +175,73 @@ function ProfileScreen() {
 
   return (
     <Container f={1} backgroundColor="$background">
-      {/* Profile section */}
-      {/* ... */}
+      <YStack f={1} pt={top} pb={bottom} px="$4" gap="$6">
+        {/* Brand logo */}
+        <XStack py="$4" ai="center">
+          <IconSendLogo size={'$6'} color={'$color12'} />
+        </XStack>
 
-      <Separator />
+        {/* Profile section */}
+        <YStack gap="$4">
+          <XStack ai="center" gap="$3">
+            <Button
+              circular
+              size="$5"
+              icon={<User size={20} />}
+              onPress={() => router.push('/(tabs)/profile')}
+            />
+            <YStack>
+              <H3>{profile?.name || 'User'}</H3>
+              <Paragraph color="$color10">{user?.email || ''}</Paragraph>
+            </YStack>
+          </XStack>
+        </YStack>
 
-      <YStack f={1} gap="$4">
-        {menuItems.map((item) => (
-          <Button
-            key={item.route}
-            variant="outlined"
-            onPress={() => router.push(item.route)}
-            icon={item.icon}
-            color="$color12"
-          >
-            {item.label}
+        <Separator />
+
+        {/* Navigation menu */}
+        <YStack f={1} gap="$4">
+          {menuItems.map((item) => (
+            <Button
+              key={item.route}
+              variant="outlined"
+              onPress={() => router.push(item.route)}
+              icon={item.icon}
+              color="$color12"
+            >
+              {item.label}
+            </Button>
+          ))}
+
+          {/* Theme toggle */}
+          <Button variant="outlined" icon={<Moon size={20} />} color="$color12">
+            Dark Mode
           </Button>
-        ))}
-      </YStack>
+        </YStack>
 
-      {/* Sign out button */}
+        {/* Sign out button */}
+        <Button
+          onPress={async () => {
+            await supabase.auth.signOut()
+            router.push('/')
+          }}
+          theme="red"
+          icon={<LogOut size={20} />}
+        >
+          Sign Out
+        </Button>
+      </YStack>
     </Container>
   )
 }
 ```
 
 >[!NOTE]
-> Reference the relevant icons and navigation from the web project see packages/app/components/sidebar/HomeSideBar.tsx.
+> Use the web sidebar component structure from `packages/app/components/sidebar/HomeSideBar.tsx` as a reference for consistent navigation patterns and icons.
 
-### 3. Create Consistent Route Structure
+### 3. Complete Route Structure
 
-Add the corresponding routes matching the Next.js structure:
+Create the following routes to match the Next.js application structure:
 
 ```
 /app/(drawer)/
@@ -215,9 +296,9 @@ Add the corresponding routes matching the Next.js structure:
               └── first.tsx
 ```
 
-### 4. Authentication Flow Refinement
+### 4. Authentication Flow Enhancement
 
-Enhance the authentication flow with a shared layout to include all auth methods:
+Enhance the authentication flow with a complete layout that includes all auth methods:
 
 ```tsx
 // In apps/expo/app/(auth)/_layout.tsx
@@ -237,12 +318,12 @@ export default function AuthLayout() {
 }
 ```
 
-### 5. Dynamic Header Configuration
+### 5. Consistent Header Configuration
 
-Create a consistent header treatment across screens:
+Implement a consistent header configuration utility:
 
 ```tsx
-// Header configuration utility
+// In apps/expo/utils/configureScreenHeader.tsx
 export function configureScreenHeader(options: {
   title: string,
   showBack?: boolean,
@@ -283,81 +364,125 @@ export function configureScreenHeader(options: {
 
 ## Implementation Plan
 
-### Phase 1: Navigation Structure (High Priority)
+### Phase 1: Navigation Structure Completion (High Priority)
 
-1. **Complete Tab Navigation**:
-   - Tab navigation already includes main screens, ensure they work correctly
-   - Polish UI and transitions between tabs
+1. **Enhance Drawer Navigation**:
+   - Add missing menu items (Explore, Invest, Feed) to `(drawer)/_layout.tsx`
+   - Ensure consistent styling with web application
+   - Fix navigation routing between drawer items and tabs
 
-2. **Enhance Drawer Navigation**:
-   - Update drawer content in `(drawer)/_layout.tsx`
-   - Add new menu items for Feed, Explore, and Invest
-   - Implement navigation logic
-
-3. **Complete Auth Layout**:
+2. **Complete Auth Layout**:
    - Add login-with-phone screen to auth flow
    - Ensure consistent styling across all auth screens
 
+3. **Create Consistent Headers**:
+   - Implement the configureScreenHeader utility
+   - Apply consistent headers across all screens
+
 ### Phase 2: Core Screen Implementation (Medium Priority)
 
-1. **Home Screen**:
-   - Complete home screen implementation
-   - Fix HomeQuickActions and TokenActivityFeed.native.tsx
+1. **Home Screen Enhancement**:
+   - Implement and optimize HomeQuickActions.native.tsx
+   - Fix and optimize TokenActivityFeed.native.tsx
+   - Add proper skeleton loading states
 
-2. **Profile Screen**:
-   - Implement profile viewing
-   - Add profile editing functionality
-   - Add personal info management
+2. **Profile Screen Completion**:
+   - Complete profile viewing functionality
+   - Implement profile editing
+   - Add personal info management screens
 
-3. **Activity Screen**:
-   - Port activity feed
-   - Optimize for mobile
+3. **Activity Screen Optimization**:
+   - Complete activity feed implementation
+   - Optimize list rendering for mobile performance
+   - Add proper pull-to-refresh and pagination
 
 4. **Send/Receive Functionality**:
-   - Implement send flow with confirmation
-   - Add QR code scanning
+   - Complete send flow with confirmation screens
+   - Implement QR code scanning
+   - Add contact selection functionality
 
 ### Phase 3: Additional Features (Lower Priority)
 
-1. **Deposit/Withdraw**:
-   - Implement deposit options
-   - Add Apple Pay support
-   - Add crypto and fiat flows  
-   - Implement success screens
+1. **Deposit/Withdraw Flows**:
+   - Complete deposit options screens
+   - Implement Apple Pay integration
+   - Add crypto deposit/withdrawal flows
+   - Create success and confirmation screens
 
 2. **Earn & Rewards**:
-   - Port earn functionality
-   - Implement asset-specific earn screens
-   - Add rewards tracking
+   - Complete earn section with asset-specific screens
+   - Implement rewards tracking
+   - Add proper data visualization for earnings
 
 3. **Trade & SendPot**:
-   - Add trade screens with summary
-   - Implement SendPot with ticket buying
-   - Add confirmation flows
+   - Implement trade screens with confirmation flow
+   - Complete SendPot with ticket buying functionality
+   - Add ticket confirmation screens
 
 4. **New Features**:
    - Implement Feed section
-   - Add Explore with rewards
-   - Create Invest functionality
-   - Enhance backup flow with confirmation
+   - Create Explore with rewards screens
+   - Add Invest functionality
+   - Complete backup flow with credential management
 
-## Verification
+## Testing and Quality Assurance
 
-You can use the `xcrun simctl io booted screenshot` command to take a screenshot of the app. Use this to verify that the app is functioning as expected and that the navigation, layout, and screens are working as intended.
+1. **Device Testing**:
+   - Test on both iOS and Android simulators/emulators
+   - Verify UI consistency across different screen sizes
+   - Test on physical devices when possible
 
-```bash
-xcrun simctl io booted screenshot ./screenshot.png
-```
+2. **Navigation Testing**:
+   - Verify all navigation flows work as expected
+   - Test deep linking functionality
+   - Ensure proper back navigation behavior
 
-Then read the contents of the screenshot and compare it to the expected output.
+3. **Authentication Testing**:
+   - Test all auth flows (sign-up, login, logout)
+   - Verify proper session management
+   - Test error states and recovery
 
-## Next Steps
+4. **Performance Testing**:
+   - Profile render performance on low-end devices
+   - Optimize list rendering for large datasets
+   - Test network request handling and caching
 
-1. Update drawer content with new navigation options (Feed, Explore, Invest)
-2. Add login-with-phone to auth flow
-3. Implement missing screens for new features
-4. Fix existing UI issues in HomeQuickActions and TokenActivityFeed.native.tsx
-5. Add account management features (backup flow, personal info, affiliate program)
-6. Implement deposit success flows and Apple Pay
-7. Complete SendPot confirmation flow
-8. Add feed and explore functionality
+## Verification Methods
+
+You can use the following methods to verify the app is functioning correctly:
+
+1. **Screenshot Capture**:
+   ```bash
+   # For iOS Simulator
+   xcrun simctl io booted screenshot ./screenshot.png
+   
+   # For Android Emulator
+   adb shell screencap -p /sdcard/screenshot.png && adb pull /sdcard/screenshot.png
+   ```
+
+2. **Screen Recording**:
+   ```bash
+   # For iOS Simulator
+   xcrun simctl io booted recordVideo ./recording.mp4
+   
+   # For Android Emulator
+   adb shell screenrecord /sdcard/recording.mp4 && adb pull /sdcard/recording.mp4
+   ```
+
+3. **Maestro E2E Testing**:
+   - Implement Maestro flows for critical user journeys
+   - Run automated tests on CI/CD pipeline
+   - See `docs/setting-up-maestro-e2e-tests.md` for setup information
+
+## Next Steps (Prioritized)
+
+1. Update drawer navigation with missing menu items (Feed, Explore, Invest)
+2. Implement the configureScreenHeader utility for consistent headers
+3. Fix and optimize HomeQuickActions and TokenActivityFeed native components
+4. Add login-with-phone to the auth flow
+5. Complete the send flow with confirmation screens
+6. Implement profile editing and management screens
+7. Create deposit flow with crypto and fiat options
+8. Complete the earn section with rewards tracking
+9. Implement SendPot with ticket buying functionality
+10. Add explore and feed sections
