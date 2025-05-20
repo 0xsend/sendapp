@@ -8,6 +8,8 @@ Keep the context in mind. The context is the current state of the code, the desi
 
 Focus on keeping it simple and small. When the context grows, suggest summarizing the context and starting a new iteration.
 
+Create a TODO list when working on complex tasks to track progress and remain on track.
+
 ### Development Loop
 
 A loop focuses on observing the current state, orienting the code to the desired state, running the code, and observing the results:
@@ -69,7 +71,7 @@ This project follows the [Conventional Commits](https://www.conventionalcommits.
 
 Common types include:
 
-- `feat`: A new feature 
+- `feat`: A new feature
 - `fix`: A bug fix
 - `docs`: Documentation only changes
 - `style`: Changes that don't affect the meaning of the code (whitespace, formatting, etc.)
@@ -87,7 +89,7 @@ Updated outdated help.send.app URLs to the new support.send.app domain with appr
 ```
 
 ```
-feat(auth): add new passkey authentication flow 
+feat(auth): add new passkey authentication flow
 
 Added a new authentication flow using passkeys instead of traditional passwords.
 ```
@@ -112,12 +114,6 @@ Assume it could be published using a static site generator.
 Read the relevant documentation files and update them as needed.
 
 Update the documentation after tasks.
-
-### TODO
-
-Use the TODO.md file to track outstanding tasks and add next steps there.
-
-When a TODO has multiple tasks, create a new file TODO file in the /docs folder.
 
 ## Testing
 

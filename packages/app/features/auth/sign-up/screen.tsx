@@ -39,7 +39,9 @@ enum SignUpFormState {
 }
 
 export const SignUpScreen = () => {
-  const [captchaToken, setCaptchaToken] = useState<string | undefined>()
+  const [captchaToken, setCaptchaToken] = useState<string | undefined>(
+    process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ? undefined : 'DUMMY'
+  )
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
   const [isSigningIn, setIsSigningIn] = useState<boolean>(false)
   const [signUpFormState, setSignUpFormState] = useState<SignUpFormState>(SignUpFormState.Idle)
@@ -92,10 +94,12 @@ export const SignUpScreen = () => {
       await validateSendtagMutateAsync({ name })
 
       if (signUpFormState !== SignUpFormState.PasskeyCreationFailed) {
-        await signUpMutateAsync({
+        const auth = await signUpMutateAsync({
           sendtag: name,
           captchaToken,
         })
+        assert(!!auth.session, 'No session returned')
+        supabase.auth.setSession(auth.session)
       }
 
       await setFirstSendtagMutateAsync(name).catch((error) => {

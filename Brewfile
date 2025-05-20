@@ -18,3 +18,9 @@ brew "postgresql" unless system "psql --version"
 brew "gnu-sed" unless system "gsed --version"
 brew "direnv" unless system "direnv --version"
 brew "temporal" unless system "temporal --version"
+
+unless system "maestro --version"
+  tap "mobile-dev-inc/tap"
+  brew "maestro"
+end
+
