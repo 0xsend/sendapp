@@ -1,4 +1,4 @@
-import { Button, Container, H3, Paragraph, Separator, XStack, YStack } from '@my/ui'
+import { Button, Container, H3, Paragraph, ScrollView, Separator, XStack, YStack } from '@my/ui'
 import {
   Activity,
   Award,
@@ -11,12 +11,14 @@ import {
   LogOut,
   Moon,
   Rss,
+  Scroll,
   Search,
   Send,
   Settings,
   TrendingUp,
   User,
 } from '@tamagui/lucide-icons'
+import { baseMainnet } from '@my/wagmi'
 import { IconSendLogo } from 'app/components/icons'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useUser } from 'app/utils/useUser'
@@ -53,62 +55,63 @@ function ProfileScreen() {
     { icon: <LineChart size={20} />, label: 'Invest', route: '/invest' },
     { icon: <Rss size={20} />, label: 'Feed', route: '/feed' },
     { icon: <Award size={20} />, label: 'Leaderboard', route: '/leaderboard' },
+    ...(__DEV__ || baseMainnet.id === 84532
+      ? [{ icon: <BarChart2 size={20} />, label: 'Secret Shop', route: '/secret-shop' }]
+      : []),
     { icon: <Settings size={20} />, label: 'Settings', route: '/settings' },
   ]
 
   return (
-    <Container f={1} backgroundColor="$background">
-      <YStack f={1} pt={top} pb={bottom} px="$4" gap="$6">
-        <XStack py="$4" ai="center">
-          <IconSendLogo size={'$6'} color={'$color12'} />
-        </XStack>
-
-        <YStack gap="$4">
-          <XStack ai="center" gap="$3">
-            <Button
-              circular
-              size="$5"
-              icon={<User size={20} />}
-              onPress={() => router.push('/(tabs)/profile')}
-            />
-            <YStack>
-              <H3>{profile?.name || 'User'}</H3>
-              <Paragraph color="$color10">{user?.email || ''}</Paragraph>
-            </YStack>
+    <ScrollView f={1}>
+      <Container f={1} backgroundColor="$background">
+        <YStack f={1} pt={top} pb={bottom} px="$4" gap="$6">
+          <XStack py="$4" ai="center">
+            <IconSendLogo size={'$6'} color={'$color12'} />
           </XStack>
-        </YStack>
 
-        <Separator />
+          <YStack gap="$4">
+            <XStack ai="center" gap="$3">
+              <Button
+                circular
+                size="$5"
+                icon={<User size={20} />}
+                onPress={() => router.push('/(tabs)/profile')}
+              />
+              <YStack>
+                <H3>{profile?.name || 'User'}</H3>
+                <Paragraph color="$color10">{user?.email || ''}</Paragraph>
+              </YStack>
+            </XStack>
+          </YStack>
 
-        <YStack f={1} gap="$4">
-          {menuItems.map((item) => (
-            <Button
-              key={item.route}
-              variant="outlined"
-              onPress={() => router.push(item.route)}
-              icon={item.icon}
-              color="$color12"
-            >
-              {item.label}
-            </Button>
-          ))}
+          <Separator />
 
-          <Button variant="outlined" icon={<Moon size={20} />} color="$color12">
-            Dark Mode
+          <YStack f={1} gap="$4">
+            {menuItems.map((item) => (
+              <Button
+                key={item.route}
+                variant="outlined"
+                onPress={() => router.push(item.route)}
+                icon={item.icon}
+                color="$color12"
+              >
+                {item.label}
+              </Button>
+            ))}
+          </YStack>
+
+          <Button
+            onPress={async () => {
+              await supabase.auth.signOut()
+              router.push('/')
+            }}
+            theme="red"
+            icon={<LogOut size={20} />}
+          >
+            Sign Out
           </Button>
         </YStack>
-
-        <Button
-          onPress={async () => {
-            await supabase.auth.signOut()
-            router.push('/')
-          }}
-          theme="red"
-          icon={<LogOut size={20} />}
-        >
-          Sign Out
-        </Button>
-      </YStack>
-    </Container>
+      </Container>
+    </ScrollView>
   )
 }
