@@ -1891,6 +1891,10 @@ export type Database = {
           user_id: string
         }[]
       }
+      recent_senders: {
+        Args: Record<PropertyKey, never>
+        Returns: Database["public"]["CompositeTypes"]["activity_feed_user"][]
+      }
       referrer_lookup: {
         Args: {
           referral_code?: string
