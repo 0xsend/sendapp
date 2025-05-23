@@ -143,6 +143,7 @@ export const SignUpScreen = () => {
     ({ submit }: { submit: () => void }) => (
       <YStack>
         <SubmitButton
+          elevation={'$0.75'}
           alignSelf={'center'}
           w={'100%'}
           theme="green"

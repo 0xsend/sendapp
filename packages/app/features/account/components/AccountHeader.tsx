@@ -59,6 +59,7 @@ export const AccountHeader = (props: YStackProps) => {
       <Fade>
         <XStack gap={'$3.5'}>
           <Button
+            elevation={'$0.75'}
             f={1}
             py={'$5'}
             bw={0}
@@ -73,6 +74,7 @@ export const AccountHeader = (props: YStackProps) => {
             <Button.Text size={'$5'}>Invite Friends</Button.Text>
           </Button>
           <Button
+            elevation={'$0.75'}
             f={1}
             py={'$5'}
             h={'auto'}

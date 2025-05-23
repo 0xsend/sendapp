@@ -19,7 +19,6 @@ import { IconAccount, IconArrowLeft, IconDeviceReset, IconSendLogo } from 'app/c
 import { usePathname } from 'app/utils/usePathname'
 import { useRouter } from 'solito/router'
 
-import { useCoinFromTokenParam } from '../utils/useCoinFromTokenParam'
 import { Link } from 'solito/link'
 import { useUser } from 'app/utils/useUser'
 import type { Tables } from '@my/supabase/database-generated.types'
@@ -52,7 +51,7 @@ export function AvatarMenuButton({ profile }: { profile?: Tables<'profiles'> | n
   if (isLoading) return <Spinner size="small" color={'$color12'} alignSelf="center" p="$3" />
 
   return (
-    <LinkableAvatar href={'/account'} size={'$3.5'} circular={true}>
+    <LinkableAvatar elevation={5} href={'/account'} size={'$3.5'} circular={true}>
       <Avatar.Image src={profile?.avatar_url ?? ''} w="100%" h="100%" objectFit="cover" />
       <Avatar.Fallback jc={'center'} ai="center" theme="green_active" bc="$color2">
         <IconAccount size={'$2'} $theme-light={{ color: '$color12' }} />

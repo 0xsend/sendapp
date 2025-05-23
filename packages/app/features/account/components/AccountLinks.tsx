@@ -98,7 +98,13 @@ export function AccountLinks(): JSX.Element {
           </YStack>
         )
       })}
-      <Button theme="green" onPress={() => supabase.auth.signOut()} py={'$5'} br={'$4'}>
+      <Button
+        elevation={'$0.75'}
+        theme="green"
+        onPress={() => supabase.auth.signOut()}
+        py={'$5'}
+        br={'$4'}
+      >
         <Button.Icon>
           <IconLogout {...iconProps} color={'$black'} />
         </Button.Icon>
@@ -113,7 +119,7 @@ export function AccountLinks(): JSX.Element {
 const LinksGroup = ({ children }: PropsWithChildren) => {
   return (
     <Fade>
-      <YGroup bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }}>
+      <YGroup elevation={'$0.75'} bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }}>
         {children}
       </YGroup>
     </Fade>

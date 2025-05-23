@@ -62,6 +62,7 @@ function AddNewTagButton({
 
   return (
     <LinkableButton
+      elevation={5}
       theme="green"
       py={'$5'}
       br={'$4'}
@@ -92,7 +93,13 @@ function SendtagList({ tags }: { tags?: Tables<'tags'>[] }) {
 
   return (
     <Fade>
-      <YGroup bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }} testID={'sendtags-list'}>
+      <YGroup
+        elevation={'$0.75'}
+        bc={'$color1'}
+        p={'$2'}
+        $gtLg={{ p: '$3.5' }}
+        testID={'sendtags-list'}
+      >
         {tags.map((tag) => (
           <YGroup.Item key={tag.name}>
             <TagItem tag={tag} />

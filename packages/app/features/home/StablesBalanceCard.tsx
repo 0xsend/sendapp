@@ -43,7 +43,6 @@ export const StablesBalanceCard = (props: CardProps) => {
 
   return (
     <Card
-      elevate
       hoverStyle={{ scale: 0.98 }}
       animation="bouncy"
       w="100%"

@@ -158,8 +158,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
           </>
         )}
       </YStack>
-      <ProfilesDetailsModal />
-      {selectedActivity && (
+      {selectedActivity ? (
         <ActivityDetails
           activity={selectedActivity}
           onClose={() => setSelectedActivity(null)}
@@ -168,6 +167,8 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
             maxWidth: '47%',
           }}
         />
+      ) : (
+        <ProfilesDetailsModal />
       )}
     </XStack>
   )

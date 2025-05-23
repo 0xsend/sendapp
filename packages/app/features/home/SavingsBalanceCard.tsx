@@ -33,7 +33,7 @@ export const SavingsBalanceCard = ({ href, ...props }: Omit<CardProps & LinkProp
 
   return (
     <Card
-      elevate
+      elevation={'$0.75'}
       hoverStyle={{ scale: 0.925 }}
       pressStyle={{ scale: 0.875 }}
       animation="bouncy"

@@ -24,6 +24,7 @@ export const SendButton = ({
     exitStyle={{
       opacity: 0,
     }}
+    elevation={5}
   >
     <XStack w={'100%'} jc={'center'} ai={'center'} gap={'$2'} h="100%">
       <LinkableButton.Text

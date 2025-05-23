@@ -1,5 +1,6 @@
 import {
   Button,
+  Card,
   Paragraph,
   Spinner,
   Stack,
@@ -27,8 +28,8 @@ import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { ProfileHeader } from 'app/features/profile/components/ProfileHeader'
 import { ProfilesDetailsModal } from 'app/features/profile/components/ProfileDetailsModal'
 import { IconX } from 'app/components/icons'
-import { useThemeSetting } from 'app/provider/theme'
 import { MAX_NOTE_LENGTH } from 'app/components/FormFields/NoteField'
+import { useHoverStyles } from 'app/utils/useHoverStyles'
 
 const SendAmountSchema = z.object({
   amount: formFields.text,
@@ -49,7 +50,8 @@ export function SendAmountForm() {
   const [isAmountInputFocused, setIsAmountInputFocused] = useState<boolean>(false)
   const [isNoteInputFocused, setIsNoteInputFocused] = useState<boolean>(false)
   const noteFieldRef = useRef<TamaguiElement>(null)
-  const { resolvedTheme } = useThemeSetting()
+
+  const hoverStyles = useHoverStyles()
 
   const noteValidationError = form.formState.errors.note
 
@@ -136,24 +138,22 @@ export function SendAmountForm() {
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (
       <SubmitButton
+        elevation={canSubmit ? '$0.75' : undefined}
         theme="green"
         onPress={submit}
         py={'$5'}
         br={'$4'}
         disabledStyle={{ opacity: 0.5 }}
         disabled={!canSubmit}
+        hoverStyle={hoverStyles}
       >
         <Button.Text fontWeight={'600'}>CONTINUE</Button.Text>
       </SubmitButton>
     ),
-    [canSubmit]
+    [canSubmit, hoverStyles]
   )
 
-  const noteBorderActiveColor = form.formState.errors.note
-    ? '$error'
-    : resolvedTheme?.startsWith('dark')
-      ? '$primary'
-      : '$color12'
+  const noteBorderActiveColor = form.formState.errors.note ? '$error' : 'transparent'
 
   return (
     <XStack w={'100%'} gap={'$4'}>
@@ -230,6 +230,8 @@ export function SendAmountForm() {
                 defaultValue: coin?.token,
               },
               note: {
+                flex: 1,
+                w: '100%',
                 ref: noteFieldRef,
                 py: '$4',
                 px: '$5',
@@ -254,8 +256,8 @@ export function SendAmountForm() {
                 },
                 iconAfter: (
                   <Button
-                    chromeless
                     unstyled
+                    chromeless
                     cursor={'pointer'}
                     icon={
                       <IconX
@@ -292,10 +294,10 @@ export function SendAmountForm() {
           >
             {({ amount, token, note }) => (
               <YStack gap="$5">
-                <YStack
+                <Card
                   gap="$5"
                   $gtSm={{ p: '$7' }}
-                  bg={'$color1'}
+                  bc={'$color1'}
                   br={'$6'}
                   p={'$5'}
                   borderColor={insufficientAmount ? '$error' : 'transparent'}
@@ -361,9 +363,9 @@ export function SendAmountForm() {
                       })()}
                     </Stack>
                   </XStack>
-                </YStack>
+                </Card>
                 <YStack gap={'$2'}>
-                  {note}
+                  <Card unstyled>{note}</Card>
                   {(isNoteInputFocused || noteValidationError) && (
                     <Paragraph
                       color={noteValidationError ? '$error' : '$lightGrayTextField'}

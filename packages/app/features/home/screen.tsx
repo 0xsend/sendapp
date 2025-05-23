@@ -154,7 +154,6 @@ function InvestmentsBody() {
   return (
     <YStack ai="center" $gtXs={{ gap: '$3' }} gap={'$3.5'} f={1}>
       {media.lg && <InvestmentsBalanceCard />}
-
       <Card
         bc={'$color1'}
         width="100%"
@@ -171,7 +170,12 @@ function InvestmentsBody() {
           <InvestmentsBalanceList coins={myInvestmentCoins} />
         )}
       </Card>
-      <Button p="$3" hoverStyle={hoverStyles} onPress={() => setIsSheetOpen(true)}>
+      <Button
+        elevation={'$0.75'}
+        p="$3"
+        hoverStyle={hoverStyles}
+        onPress={() => setIsSheetOpen(true)}
+      >
         <Button.Icon>
           <IconPlus size="$1" color="$color10" />
         </Button.Icon>

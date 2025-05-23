@@ -120,7 +120,14 @@ export const PersonalInfoScreen = () => {
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (
       <YStack>
-        <SubmitButton theme="green" borderRadius={'$4'} p={'$4'} mt={'$1'} onPress={() => submit()}>
+        <SubmitButton
+          elevation={'$0.75'}
+          theme="green"
+          borderRadius={'$4'}
+          p={'$4'}
+          mt={'$1'}
+          onPress={() => submit()}
+        >
           <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
             SAVE CHANGES
           </Button.Text>
@@ -173,7 +180,7 @@ export const PersonalInfoScreen = () => {
       renderAfter={renderAfterContent}
     >
       {({ birthday, xUsername }) => (
-        <FadeCard>
+        <FadeCard elevation={'$0.75'}>
           <FieldWithLabel label={'Date of Birth'} additionalInfo={'(non-editable)'} gap={'$2'}>
             {birthday}
           </FieldWithLabel>
