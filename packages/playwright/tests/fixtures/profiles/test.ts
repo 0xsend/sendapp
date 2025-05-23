@@ -3,12 +3,13 @@ import type { Page, Expect, Locator } from '@playwright/test'
 export { test } from '@playwright/test'
 
 export class ProfilePage {
+  public readonly page: Page
+  public readonly profile: { name: string; about: string }
   public sendButton: Locator
 
-  constructor(
-    public readonly page: Page,
-    public readonly profile: { name: string; about: string }
-  ) {
+  constructor(page: Page, profile: { name: string; about: string }) {
+    this.page = page
+    this.profile = profile
     this.sendButton = page.getByRole('link', { name: 'SEND', exact: true })
   }
 

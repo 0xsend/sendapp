@@ -32,14 +32,23 @@ test.beforeEach(async ({ checkoutPage }) => {
 })
 
 const addPendingTags = async (supabase: SupabaseClient<Database>, tagNames: string[]) => {
-  const tagsToInsert = tagNames.map((tagName) => ({ name: tagName }))
+  // Get the user's send account first
+  const { data: sendAccount, error: sendAccountError } = await supabase
+    .from('send_accounts')
+    .select('id')
+    .single()
 
-  await supabase
-    .from('tags')
-    .insert(tagsToInsert)
-    .then(({ error }) => {
-      expect(error).toBeFalsy()
+  expect(sendAccountError).toBeFalsy()
+  expect(sendAccount).toBeTruthy()
+
+  // Create each tag using RPC
+  for (const tagName of tagNames) {
+    const { error } = await supabase.rpc('create_tag', {
+      tag_name: tagName,
+      send_account_id: sendAccount?.id,
     })
+    expect(error).toBeFalsy()
+  }
 }
 
 const confirmTags = async (checkoutPage: CheckoutPage, tagNames: string[]) => {
