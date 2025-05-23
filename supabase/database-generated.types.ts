@@ -1729,6 +1729,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      favourite_senders: {
+        Args: Record<PropertyKey, never>
+        Returns: Database["public"]["CompositeTypes"]["activity_feed_user"][]
+      }
       generate_referral_code: {
         Args: Record<PropertyKey, never>
         Returns: string
