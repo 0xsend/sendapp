@@ -2,7 +2,7 @@ SET client_min_messages TO NOTICE;
 
 BEGIN;
 SELECT
-    plan(27);
+    plan(29);
 CREATE EXTENSION "basejump-supabase_test_helpers";
 SELECT
     set_config('role', 'service_role', TRUE);
@@ -1006,17 +1006,14 @@ SELECT update_referral_verifications(
     (SELECT id FROM distributions WHERE number = 123),
     ARRAY[
         ROW(
-            NULL, -- id
-            (SELECT id FROM distributions WHERE number = 123), -- distribution_id
-            tests.get_supabase_uid('recipient1'), -- user_id
-            '\xa71ce00000000000000000000000000000000001'::bytea, -- address
-            950, -- amount
-            500, -- hodler_pool_amount
-            200, -- bonus_pool_amount
-            300, -- fixed_pool_amount
-            CURRENT_TIMESTAMP::timestamp with time zone, -- created_at
-            CURRENT_TIMESTAMP::timestamp with time zone, -- updated_at
-            1    -- index
+            NULL,
+            (SELECT id FROM distributions WHERE number = 123),
+            tests.get_supabase_uid('recipient1'),
+            '\xa71ce00000000000000000000000000000000001'::bytea,
+            950, 500, 200, 300,
+            CURRENT_TIMESTAMP::timestamp with time zone,
+            CURRENT_TIMESTAMP::timestamp with time zone,
+            1
         )::distribution_shares,
         ROW(
             NULL,
@@ -1041,6 +1038,7 @@ SELECT update_referral_verifications(
     ]
 );
 
+-- Test total_tag_referrals
 SELECT results_eq(
     $$
     SELECT COUNT(*) FROM distribution_verifications
@@ -1049,12 +1047,36 @@ SELECT results_eq(
     AND type = 'total_tag_referrals'
     $$,
     ARRAY[1]::bigint[],
-    'Should not create duplicate records on multiple executions'
+    'Should have exactly one total_tag_referrals record'
 );
 
+-- Test tag_referral records
+SELECT results_eq(
+    $$
+    SELECT COUNT(*) FROM distribution_verifications
+    WHERE distribution_id = (SELECT id FROM distributions WHERE number = 123)
+    AND user_id = tests.get_supabase_uid('bob')
+    AND type = 'tag_referral'
+    AND weight = 1
+    $$,
+    ARRAY[3]::bigint[],
+    'Should have three tag_referral records with weight = 1(one for each referred user in distribution shares)'
+);
 
-SELECT
-    finish();
+-- Test tag_referral weights
+SELECT results_eq(
+    $$
+    SELECT weight FROM distribution_verifications
+    WHERE distribution_id = (SELECT id FROM distributions WHERE number = 123)
+    AND user_id = tests.get_supabase_uid('bob')
+    AND type = 'tag_referral'
+    ORDER BY weight
+    $$,
+    ARRAY[0, 1, 1, 1]::numeric[],
+    'All tag_referral records with distribution shares should have weight = 1'
+);
+
+SELECT finish();
 ROLLBACK;
 
 RESET client_min_messages;
