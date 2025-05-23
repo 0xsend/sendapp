@@ -143,6 +143,7 @@ export const SignUpScreen = () => {
     ({ submit }: { submit: () => void }) => (
       <YStack>
         <SubmitButton
+          elevate
           alignSelf={'center'}
           w={'100%'}
           theme="green"
@@ -271,6 +272,7 @@ export const SignUpScreen = () => {
             {({ name, isAgreedToTerms }) => {
               return (
                 <FadeCard
+                  elevate
                   w={'100%'}
                   mt={'$5'}
                   borderColor={validationError ? '$error' : 'transparent'}
