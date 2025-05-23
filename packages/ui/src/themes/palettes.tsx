@@ -13,11 +13,11 @@ export const palettes = (() => {
   const lightColor = brandColors.darkest
   const darkColor = brandColors.white
   const lightPalette = [
+    brandColors.alabaster,
     brandColors.white,
     brandColors.alabaster,
     brandColors.darkAlabaster,
     brandColors.silverChalice,
-    brandColors.white,
     brandColors.white,
     brandColors.white,
     brandColors.white,
