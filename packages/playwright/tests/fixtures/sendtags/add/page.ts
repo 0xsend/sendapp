@@ -6,13 +6,15 @@ import type { Web3ProviderBackend } from '@0xbigboss/headless-web3-provider'
 const log = debug('test:fixtures:sendtags-add:page')
 
 export class AddSendtagsPage {
+  public readonly page: Page
+  public readonly wallet: Web3ProviderBackend
   public readonly pricingDialog: Locator
   public readonly pricingTooltip: Locator
   public readonly submitTagButton: Locator
-  constructor(
-    public readonly page: Page,
-    public readonly wallet: Web3ProviderBackend
-  ) {
+
+  constructor(page: Page, wallet: Web3ProviderBackend) {
+    this.page = page
+    this.wallet = wallet
     this.pricingDialog = page.getByLabel('Sendtag Pricing')
     this.pricingTooltip = page.getByTestId('SendTagPricingTooltipContent')
     this.submitTagButton = page.getByRole('button', { name: 'Add Tag' })
@@ -37,7 +39,7 @@ export class AddSendtagsPage {
     await expect(async () => {
       const request = this.page.waitForRequest(
         (request) => {
-          if (request.url().includes('/rest/v1/tags') && request.method() === 'POST') {
+          if (request.url().includes('/api/trpc/tag.create') && request.method() === 'POST') {
             log('submitTagName request', request.url(), request.method(), request.postDataJSON())
             return true
           }
@@ -47,7 +49,7 @@ export class AddSendtagsPage {
       )
       const response = this.page.waitForEvent('response', {
         predicate: async (response) => {
-          if (response.url().includes('/rest/v1/tags')) {
+          if (response.url().includes('/api/trpc/tag.create')) {
             log('submitTagName response', response.url(), response.status(), await response.text())
             return true
           }

@@ -65,3 +65,4 @@ Brewfile.lock.json
 
 # asdf
 .tool-versions
+.snaplet

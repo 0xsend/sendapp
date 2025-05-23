@@ -268,6 +268,7 @@ function TagItem({
               fontWeight="400"
               opacity={isMainTag ? 1 : 0.9}
               pb="$1"
+              testID={`confirmed-tag-${tag.name}`}
             >
               /{tag.name}
             </Text>

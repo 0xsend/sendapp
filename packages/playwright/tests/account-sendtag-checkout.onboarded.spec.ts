@@ -31,14 +31,23 @@ test.beforeEach(async ({ checkoutPage }) => {
 })
 
 const addPendingTags = async (supabase: SupabaseClient<Database>, tagNames: string[]) => {
-  const tagsToInsert = tagNames.map((tagName) => ({ name: tagName }))
+  // Get the user's send account first
+  const { data: sendAccount, error: sendAccountError } = await supabase
+    .from('send_accounts')
+    .select('id')
+    .single()
 
-  await supabase
-    .from('tags')
-    .insert(tagsToInsert)
-    .then(({ error }) => {
-      expect(error).toBeFalsy()
+  expect(sendAccountError).toBeFalsy()
+  expect(sendAccount).toBeTruthy()
+
+  // Create each tag using RPC
+  for (const tagName of tagNames) {
+    const { error } = await supabase.rpc('create_tag', {
+      tag_name: tagName,
+      send_account_id: sendAccount?.id,
     })
+    expect(error).toBeFalsy()
+  }
 }
 
 const confirmTags = async (checkoutPage: CheckoutPage, tagNames: string[]) => {
@@ -345,21 +354,38 @@ test('cannot confirm a tag without paying', async ({ checkoutPage, supabase }) =
 })
 
 test('cannot add more than 5 tags', async ({ checkoutPage, supabase }) => {
+  // Get the user's send account first
+  const { data: sendAccount } = await supabase.from('send_accounts').select('id').single()
+
+  expect(sendAccount).toBeTruthy()
+
   const tagNames = Array.from({ length: 5 }, () => ({
     name: `${faker.lorem.word()}_${test.info().parallelIndex}`,
   }))
-  await supabase
-    .from('tags')
-    .insert(tagNames)
-    .then(({ error }) => {
-      expect(error).toBeFalsy()
+
+  // Create tags using RPC for each tag
+  for (const { name } of tagNames) {
+    const { error } = await supabase.rpc('create_tag', {
+      tag_name: name,
+      send_account_id: sendAccount?.id,
     })
-  checkoutPage.page.reload()
+    expect(error).toBeFalsy()
+  }
+
+  await checkoutPage.page.reload()
+
   for (const { name } of tagNames) {
     await expect(checkoutPage.page.getByLabel(`Pending Sendtag ${name}`)).toBeVisible()
   }
+
   await expect(checkoutPage.submitTagButton).toBeHidden()
-  const { error } = await supabase.from('tags').insert({ name: faker.lorem.word() })
+
+  // Try to create one more tag via RPC - should fail
+  const { error } = await supabase.rpc('create_tag', {
+    tag_name: faker.lorem.word(),
+    send_account_id: sendAccount?.id,
+  })
+
   expect(error).toBeTruthy()
   expect(error?.message).toBe('User can have at most 5 tags')
   expect(error?.code).toBe('P0001')

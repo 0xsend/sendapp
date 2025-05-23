@@ -1,12 +1,16 @@
 import type { Expect, Page } from '@playwright/test'
+import type debug from 'debug'
 
 export class OnboardingPage {
-  constructor(
-    public readonly page: Page,
-    public readonly log?: debug.Debugger
-  ) {}
+  public readonly page: Page
+  public readonly log?: debug.Debugger
+  public readonly accountName: string
 
-  public readonly accountName = `test-${Math.floor(Math.random() * 1000000)}`
+  constructor(page: Page, log?: debug.Debugger) {
+    this.page = page
+    this.log = log
+    this.accountName = `test-${Math.floor(Math.random() * 1000000)}`
+  }
 
   async completeOnboarding(expect: Expect) {
     await this.page.goto('/')
