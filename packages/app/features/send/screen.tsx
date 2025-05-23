@@ -11,14 +11,14 @@ import {
   Paragraph,
   Spinner,
   Text,
+  useToastController,
   XStack,
   YStack,
   type YStackProps,
-  useToastController,
 } from '@my/ui'
 import Search from 'app/components/SearchBar'
 import { TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
-import { useSendScreenParams } from 'app/routers/params'
+import { useRootScreenParams, useSendScreenParams } from 'app/routers/params'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useState } from 'react'
 import { SendAmountForm } from './SendAmountForm'
@@ -26,16 +26,37 @@ import { type Address, isAddress } from 'viem'
 import { useRouter } from 'solito/router'
 import { IconAccount } from 'app/components/icons'
 import { shorten } from 'app/utils/strings'
+import { useRecentSenders } from 'app/features/send/suggestions/useRecentSenders'
+import { SendSuggestions } from 'app/features/send/suggestions/SendSuggestions'
+import { useFavouriteSenders } from 'app/features/send/suggestions/useFavouriteSenders'
+import { useTodayBirthdaySenders } from 'app/features/send/suggestions/useTodayBirthdaySenders'
 
 export const SendScreen = () => {
   const [{ recipient, idType }] = useSendScreenParams()
-  const { data: profile, isLoading, error } = useProfileLookup(idType ?? 'tag', recipient ?? '')
+  const {
+    data: profile,
+    isLoading: isLoadingProfileLookup,
+    error: errorProfileLookup,
+  } = useProfileLookup(idType ?? 'tag', recipient ?? '')
+  const recentSendersQuery = useRecentSenders()
+  const favouriteSendersQuery = useFavouriteSenders()
+  const todayBirthdaySendersQuery = useTodayBirthdaySenders()
+  const [{ search }] = useRootScreenParams()
+
+  const isLoading =
+    isLoadingProfileLookup ||
+    recentSendersQuery.isLoading ||
+    favouriteSendersQuery.isLoading ||
+    todayBirthdaySendersQuery.isLoading
+
   if (isLoading) return <Spinner size="large" color={'$color12'} />
-  if (error) throw new Error(error.message)
+
+  if (errorProfileLookup) throw new Error(errorProfileLookup.message)
 
   if (idType === 'address' && isAddress(recipient as Address)) {
     return <SendAmountForm />
   }
+
   if (!profile)
     return (
       <TagSearchProvider>
@@ -43,6 +64,13 @@ export const SendScreen = () => {
           <YStack width={'100%'} gap="$1.5" $gtSm={{ gap: '$2.5' }}>
             <Search autoFocus={true} />
           </YStack>
+          {!search && (
+            <SendSuggestions
+              recentSendersQuery={recentSendersQuery}
+              favouriteSendersQuery={favouriteSendersQuery}
+              todayBirthdaySendersQuery={todayBirthdaySendersQuery}
+            />
+          )}
           <SendSearchBody />
         </YStack>
       </TagSearchProvider>

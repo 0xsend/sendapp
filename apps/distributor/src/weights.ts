@@ -8,7 +8,7 @@ export enum Mode {
   EaseInOut = 'ease_in_out',
 }
 
-export const PERC_DENOM = 1000n
+export const PERC_DENOM = 1000000000n
 
 export function calculatePercentageWithBips(value: bigint, bips: bigint) {
   const bps = bips * PERC_DENOM
@@ -128,35 +128,25 @@ function calculateCubicBezierWeight(balance: bigint, totalBalance: bigint): bigi
     return 0n
   }
 
-  // t_bn represents the ratio of balance/totalBalance, scaled to PERC_DENOM
-  // e.g., if balance is 30% of total and PERC_DENOM is 1000000n, t_bn would be 300000n
   const t_bn = (balance * PERC_DENOM) / totalBalance
-
-  // Cubic Bezier formula components:
-  // Term 1: (1-t)³ * p0        - influence of start point
-  // Term 2: 3(1-t)²t * p1      - influence of first control point
-  // Term 3: 3(1-t)t² * p2      - influence of second control point
-  // Term 4: t³ * p3            - influence of end point
-  const p0 = 0n
-  const p1 = (PERC_DENOM * 20n) / 100n // 0.2 as BigInt
-  const p2 = (PERC_DENOM * 80n) / 100n // 0.8 as BigInt
-  const p3 = PERC_DENOM
-
-  // inv_t is the inverse of t_bn (distance from 1)
-  // e.g., if t_bn is 300000n, inv_t would be 700000n
   const inv_t = PERC_DENOM - t_bn
 
-  // Cubic Bezier formula components:
-  // Term 1: (1-t)³ * p0        - influence of start point
-  // Term 2: 3(1-t)²t * p1      - influence of first control point
-  // Term 3: 3(1-t)t² * p2      - influence of second control point
-  // Term 4: t³ * p3            - influence of end point
-  const bezier =
-    (inv_t ** 3n * p0 +
-      3n * inv_t ** 2n * t_bn * p1 +
-      3n * inv_t * t_bn ** 2n * p2 +
-      t_bn ** 3n * p3) /
-    PERC_DENOM ** 3n
+  const p0 = 0n
+  const p1 = (PERC_DENOM * 20n) / 100n
+  const p2 = (PERC_DENOM * 80n) / 100n
+  const p3 = PERC_DENOM
 
-  return bezier
+  // Break down the calculation and divide by PERC_DENOM gradually to maintain precision
+  const t2 = (t_bn * t_bn) / PERC_DENOM
+  const t3 = (t2 * t_bn) / PERC_DENOM
+
+  const inv_t2 = (inv_t * inv_t) / PERC_DENOM
+  const inv_t3 = (inv_t2 * inv_t) / PERC_DENOM
+
+  const term1 = (inv_t3 * p0) / PERC_DENOM
+  const term2 = (((((3n * inv_t2) / PERC_DENOM) * t_bn) / PERC_DENOM) * p1) / PERC_DENOM
+  const term3 = (((((3n * inv_t) / PERC_DENOM) * t2) / PERC_DENOM) * p2) / PERC_DENOM
+  const term4 = (t3 * p3) / PERC_DENOM
+
+  return term1 + term2 + term3 + term4
 }

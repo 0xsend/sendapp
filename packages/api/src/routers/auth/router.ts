@@ -32,7 +32,7 @@ export const authRouter = createTRPCRouter({
           .map((b) => b.toString(16).padStart(2, '0'))
           .join('')
 
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: { captchaToken },
@@ -41,6 +41,8 @@ export const authRouter = createTRPCRouter({
         if (error) {
           throw new Error(error.message || 'Unable to create account')
         }
+
+        return data
       } catch (error) {
         log('Error creating an account: ', error)
         throw new TRPCError({

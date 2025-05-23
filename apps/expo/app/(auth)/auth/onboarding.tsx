@@ -1,15 +1,10 @@
 import { OnboardingScreen } from 'app/features/auth/onboarding/screen'
-import { Stack } from 'expo-router'
+import { AuthLayout } from 'app/features/auth/layout'
 
 export default function Screen() {
   return (
-    <>
-      <Stack.Screen
-        options={{
-          title: 'Onboarding',
-        }}
-      />
+    <AuthLayout>
       <OnboardingScreen />
-    </>
+    </AuthLayout>
   )
 }

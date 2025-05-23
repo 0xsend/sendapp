@@ -1729,6 +1729,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      favourite_senders: {
+        Args: Record<PropertyKey, never>
+        Returns: Database["public"]["CompositeTypes"]["activity_feed_user"][]
+      }
       generate_referral_code: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -1891,6 +1895,10 @@ export type Database = {
           user_id: string
         }[]
       }
+      recent_senders: {
+        Args: Record<PropertyKey, never>
+        Returns: Database["public"]["CompositeTypes"]["activity_feed_user"][]
+      }
       referrer_lookup: {
         Args: {
           referral_code?: string
@@ -1980,6 +1988,10 @@ export type Database = {
           status: Database["public"]["Enums"]["tag_status"]
           user_id: string
         }[]
+      }
+      today_birthday_senders: {
+        Args: Record<PropertyKey, never>
+        Returns: Database["public"]["CompositeTypes"]["activity_feed_user"][]
       }
       update_distribution_shares: {
         Args: {

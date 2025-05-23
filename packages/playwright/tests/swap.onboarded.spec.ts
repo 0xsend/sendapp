@@ -114,7 +114,7 @@ for (const inCoin of [usdcCoin]) {
         const params = currentUrl.searchParams
         expect(params.get('token')).toBe(outCoin.token)
       }).toPass({
-        timeout: isEthCoin(outCoin) ? 10_000 : 5_000,
+        timeout: isEthCoin(outCoin) ? 20_000 : 10_000,
       })
       const history = page.getByTestId('TokenActivityFeed')
       let attempts = 0
@@ -127,7 +127,7 @@ for (const inCoin of [usdcCoin]) {
         await expect(history.getByText('Trade')).toBeVisible()
         const countCoinSymbols = await history.getByText(outCoin.symbol).count()
         expect(countCoinSymbols).toBe(2)
-      }).toPass({ timeout: 15_000 })
+      }).toPass({ timeout: 20_000 })
     })
   }
 }

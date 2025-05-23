@@ -33,16 +33,18 @@ const SignUpScreenFormSchema = z.object({
   isAgreedToTerms: formFields.boolean_checkbox,
 })
 
-enum SignUpFormState {
+enum FormState {
   Idle = 'Idle',
-  PasskeyCreationFailed = 'PasskeyCreationFailed',
+  SigningIn = 'SigningIn',
+  SigningUp = 'SigningUp',
 }
 
 export const SignUpScreen = () => {
-  const [captchaToken, setCaptchaToken] = useState<string | undefined>()
+  const [captchaToken, setCaptchaToken] = useState<string | undefined>(
+    process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ? undefined : 'DUMMY'
+  )
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
-  const [isSigningIn, setIsSigningIn] = useState<boolean>(false)
-  const [signUpFormState, setSignUpFormState] = useState<SignUpFormState>(SignUpFormState.Idle)
+  const [formState, setFormState] = useState<FormState>(FormState.Idle)
   const form = useForm<z.infer<typeof SignUpScreenFormSchema>>()
   const router = useRouter()
   const [queryParams] = useAuthScreenParams()
@@ -76,10 +78,10 @@ export const SignUpScreen = () => {
   }, [form.watch, form.clearErrors])
 
   useEffect(() => {
-    if (user?.id) {
+    if (user?.id && formState === FormState.Idle) {
       router.replace('/auth/onboarding')
     }
-  }, [user?.id, router.replace])
+  }, [user?.id, router.replace, formState])
 
   const createAccount = async () => {
     const { data: sessionData } = await supabase.auth.getSession()
@@ -89,26 +91,24 @@ export const SignUpScreen = () => {
 
   const handleSubmit = async ({ name }: z.infer<typeof SignUpScreenFormSchema>) => {
     try {
-      await validateSendtagMutateAsync({ name })
+      setFormState(FormState.SigningUp)
+      const validatedSendtag = await validateSendtagMutateAsync({ name })
 
-      if (signUpFormState !== SignUpFormState.PasskeyCreationFailed) {
-        await signUpMutateAsync({
-          sendtag: name,
-          captchaToken,
-        })
-      }
+      const auth = await signUpMutateAsync({
+        sendtag: validatedSendtag,
+        captchaToken,
+      })
+      assert(!!auth.session, 'No session returned')
+      supabase.auth.setSession(auth.session)
 
-      await setFirstSendtagMutateAsync(name).catch((error) => {
+      await setFirstSendtagMutateAsync(validatedSendtag).catch((error) => {
         // don't interrupt flow if async storage is not available
         console.error('Unable to save sendtag into async storage: ', error.message)
       })
 
-      await createAccount().catch((error) => {
-        setSignUpFormState(SignUpFormState.PasskeyCreationFailed)
-        throw error
-      })
-
-      await registerFirstSendtagMutateAsync({ name })
+      await createAccount()
+      await registerFirstSendtagMutateAsync({ name: validatedSendtag })
+      router.replace('/')
     } catch (error) {
       const message = formatErrorMessage(error).split('.')[0] ?? 'Unknown error'
 
@@ -117,13 +117,13 @@ export const SignUpScreen = () => {
         message,
       })
       return
+    } finally {
+      setFormState(FormState.Idle)
     }
-
-    router.replace('/')
   }
 
   const handleSignIn = useCallback(async () => {
-    setIsSigningIn(true)
+    setFormState(FormState.SigningIn)
 
     try {
       await signInMutateAsync({})
@@ -135,7 +135,7 @@ export const SignUpScreen = () => {
         duration: 10000000,
       })
     } finally {
-      setIsSigningIn(false)
+      setFormState(FormState.Idle)
     }
   }, [signInMutateAsync, toast.show, router.push, redirectUri])
 
@@ -150,7 +150,7 @@ export const SignUpScreen = () => {
           py={'$5'}
           br={'$4'}
           bw={'$1'}
-          disabled={!canSubmit}
+          disabled={!canSubmit || formState !== FormState.Idle}
           $theme-light={{
             disabledStyle: { opacity: 0.5 },
           }}
@@ -168,9 +168,7 @@ export const SignUpScreen = () => {
               color: '$black',
             }}
           >
-            {signUpFormState === SignUpFormState.PasskeyCreationFailed
-              ? 'create passkey'
-              : 'create account'}
+            create account
           </Button.Text>
         </SubmitButton>
         <YStack w={'100%'} gap={'$3.5'} mt={'$3.5'}>
@@ -190,7 +188,7 @@ export const SignUpScreen = () => {
             bw={0}
             br={0}
             height={'auto'}
-            disabled={isSigningIn}
+            disabled={formState !== FormState.Idle}
           >
             <Button.Text
               color={'$primary'}
@@ -198,13 +196,13 @@ export const SignUpScreen = () => {
                 color: '$color12',
               }}
             >
-              {isSigningIn ? 'Signing in...' : 'Sign in'}
+              {formState === FormState.SigningIn ? 'Signing in...' : 'Sign in'}
             </Button.Text>
           </Button>
         </YStack>
       </YStack>
     ),
-    [canSubmit, signUpFormState, isSigningIn, handleSignIn]
+    [canSubmit, formState, handleSignIn]
   )
 
   return (
@@ -350,7 +348,7 @@ export const SignUpScreen = () => {
             bw={0}
             br={0}
             height={'auto'}
-            disabled={isSigningIn}
+            disabled={formState !== FormState.Idle}
             pb={'$3.5'}
           >
             <Button.Text

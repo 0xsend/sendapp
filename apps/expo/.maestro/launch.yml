@@ -1,0 +1,6 @@
+appId: app.send
+---
+- launchApp
+- waitForAnimationToEnd
+- assertVisible: "SIGN-IN" # The sign-in button text
+- assertVisible: "SIGN-UP" # The sign-up button text

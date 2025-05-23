@@ -8,17 +8,19 @@ export const useValidateSendtag = () => {
 
   return useMutation({
     mutationFn: async ({ name }: { name: string }) => {
-      const { error } = SendtagSchema.safeParse({ name })
+      const { data, error } = SendtagSchema.safeParse({ name })
 
-      if (error) {
+      if (error || !data) {
         throw new Error(error.errors[0]?.message ?? 'Invalid Sendtag')
       }
 
-      const { sendtagAvailability } = await checkAvailability({ name })
+      const { sendtagAvailability } = await checkAvailability({ name: data.name })
 
       if (sendtagAvailability === SendtagAvailability.Taken) {
         throw new Error('This Sendtag is already taken')
       }
+
+      return data.name
     },
     retry: false,
   })

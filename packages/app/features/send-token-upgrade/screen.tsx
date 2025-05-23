@@ -96,7 +96,13 @@ export function SendV0TokenUpgradeScreen({ children }: { children?: React.ReactN
   }
 
   return (
-    <ScrollView ai="center" gap="$6" w="100%" maw="100%" mih={600} f={1} py="$8">
+    <ScrollView
+      contentContainerStyle={{ alignItems: 'center', gap: '$6', paddingVertical: '$8' }}
+      w="100%"
+      maw="100%"
+      mih={600}
+      f={1}
+    >
       <IconSendLogo size="$8" color="$color12" mx="auto" />
       <Fade f={1} ai="center" jc="center" gap="$6" w="100%" maw="100%" h="100%" mt="$12">
         <YStack f={1} ai="center" jc="center" px="$4" gap="$6" w="100%" maw="100%">

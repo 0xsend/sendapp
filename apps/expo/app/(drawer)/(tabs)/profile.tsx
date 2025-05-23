@@ -1,5 +1,5 @@
 import { Avatar, Button, Container, H4, Paragraph, Stack, XStack, YStack } from '@my/ui'
-import { Edit, User } from '@tamagui/lucide-icons'
+import { Edit3, User } from '@tamagui/lucide-icons'
 import { useUser } from 'app/utils/useUser'
 import { Stack as StackRouter, useRouter } from 'expo-router'
 
@@ -41,7 +41,7 @@ export default function ProfileTabScreen() {
           </XStack>
 
           <Button
-            icon={<Edit size="$1" />}
+            icon={<Edit3 size="$1" />}
             onPress={() => {
               // Navigate to edit profile page
               router.push('/settings/edit-profile')
