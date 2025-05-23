@@ -11,14 +11,14 @@ import {
   Paragraph,
   Spinner,
   Text,
+  useToastController,
   XStack,
   YStack,
   type YStackProps,
-  useToastController,
 } from '@my/ui'
 import Search from 'app/components/SearchBar'
 import { TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
-import { useSendScreenParams } from 'app/routers/params'
+import { useRootScreenParams, useSendScreenParams } from 'app/routers/params'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useState } from 'react'
 import { SendAmountForm } from './SendAmountForm'
@@ -26,16 +26,33 @@ import { type Address, isAddress } from 'viem'
 import { useRouter } from 'solito/router'
 import { IconAccount } from 'app/components/icons'
 import { shorten } from 'app/utils/strings'
+import {
+  useRecentSenders,
+  type UseRecentSendersItem,
+  type UseRecentSendersResult,
+} from 'app/features/activity/utils/useRecentSenders'
+import { Link } from 'solito/link'
+import { FlatList } from 'react-native'
 
 export const SendScreen = () => {
   const [{ recipient, idType }] = useSendScreenParams()
-  const { data: profile, isLoading, error } = useProfileLookup(idType ?? 'tag', recipient ?? '')
+  const {
+    data: profile,
+    isLoading: isLoadingProfileLookup,
+    error: errorProfileLookup,
+  } = useProfileLookup(idType ?? 'tag', recipient ?? '')
+  const recentSendersQuery = useRecentSenders()
+  const [{ search }] = useRootScreenParams()
+  const isLoading = isLoadingProfileLookup || recentSendersQuery.isLoading
+
   if (isLoading) return <Spinner size="large" color={'$color12'} />
-  if (error) throw new Error(error.message)
+
+  if (errorProfileLookup) throw new Error(errorProfileLookup.message)
 
   if (idType === 'address' && isAddress(recipient as Address)) {
     return <SendAmountForm />
   }
+
   if (!profile)
     return (
       <TagSearchProvider>
@@ -43,6 +60,7 @@ export const SendScreen = () => {
           <YStack width={'100%'} gap="$1.5" $gtSm={{ gap: '$2.5' }}>
             <Search autoFocus={true} />
           </YStack>
+          {!search && <RecentSenders recentSendersQuery={recentSendersQuery} />}
           <SendSearchBody />
         </YStack>
       </TagSearchProvider>
@@ -204,5 +222,115 @@ function NoSendAccount({ profile }: { profile: Functions<'profile_lookup'>[numbe
         </Fade>
       )}
     </YStack>
+  )
+}
+
+const RecentSenders = ({ recentSendersQuery }: { recentSendersQuery: UseRecentSendersResult }) => {
+  const { error, data } = recentSendersQuery
+  const [sendParams] = useSendScreenParams()
+  const _sendParams = JSON.parse(JSON.stringify(sendParams)) //JSON makes sure we don't pass undefined values
+
+  const renderItem = ({ item, index }: { item: UseRecentSendersItem; index: number }) => {
+    const href = item?.tags?.[0]
+      ? `/send?${new URLSearchParams({
+          ..._sendParams,
+          idType: 'tag',
+          recipient: item.tags[0],
+        }).toString()}`
+      : `/send?${new URLSearchParams({
+          ..._sendParams,
+          idType: 'sendid',
+          recipient: item?.send_id,
+        }).toString()}`
+
+    const label = item?.tags?.[0]
+      ? `/${item.tags[0]}`
+      : item?.name
+        ? item.name
+        : item?.send_id
+          ? `#${item.send_id}`
+          : '??'
+
+    return (
+      <SuggestionTile
+        key={item?.send_id ?? index}
+        href={href}
+        avatarUrl={item?.avatar_url ?? ''}
+        label={label}
+      />
+    )
+  }
+
+  return (
+    <YStack gap={'$3.5'}>
+      <Paragraph size="$7">Recent Activity</Paragraph>
+      {(() => {
+        switch (true) {
+          case !!error:
+            return (
+              <Paragraph color={'$error'}>
+                {error.message?.split('.')[0] ?? 'Unknown error'}
+              </Paragraph>
+            )
+          case !data || data.length === 0:
+            return (
+              <Paragraph
+                color={'$lightGrayTextField'}
+                $theme-light={{ color: '$darkGrayTextField' }}
+              >
+                Recent activity is empty, send it.
+              </Paragraph>
+            )
+          default:
+            return (
+              <FlatList
+                horizontal
+                data={data || []}
+                renderItem={renderItem}
+                keyExtractor={(item, index) => item?.send_id?.toString() ?? String(index)}
+                showsHorizontalScrollIndicator={false}
+              />
+            )
+        }
+      })()}
+    </YStack>
+  )
+}
+
+const SuggestionTile = ({
+  href,
+  avatarUrl,
+  label,
+}: {
+  href: string
+  avatarUrl: string
+  label: string
+}) => {
+  return (
+    <Link href={href}>
+      <YStack gap={'$1'} mr={'$2'} $gtLg={{ mr: '$3.5' }}>
+        <Avatar size="$7" br="$4">
+          <Avatar.Image src={avatarUrl} />
+          <Avatar.Fallback jc="center" bc="$olive">
+            <Avatar size="$7" br="$4">
+              <Avatar.Image
+                src={`https://ui-avatars.com/api/?name=${label}&size=256&format=png&background=86ad7f`}
+              />
+            </Avatar>
+          </Avatar.Fallback>
+        </Avatar>
+        <Paragraph
+          w={74}
+          size={'$3'}
+          textOverflow={'ellipsis'}
+          numberOfLines={1}
+          color={'$lightGrayTextField'}
+          ta={'center'}
+          $theme-light={{ color: '$darkGrayTextField' }}
+        >
+          {label}
+        </Paragraph>
+      </YStack>
+    </Link>
   )
 }
