@@ -26,9 +26,10 @@ import { type Address, isAddress } from 'viem'
 import { useRouter } from 'solito/router'
 import { IconAccount } from 'app/components/icons'
 import { shorten } from 'app/utils/strings'
-import { useRecentSenders } from 'app/features/activity/utils/useRecentSenders'
-import { SendSuggestions } from 'app/features/send/SendSuggestions'
-import { useFavouriteSenders } from 'app/features/activity/utils/useFavouriteSenders'
+import { useRecentSenders } from 'app/features/send/suggestions/useRecentSenders'
+import { SendSuggestions } from 'app/features/send/suggestions/SendSuggestions'
+import { useFavouriteSenders } from 'app/features/send/suggestions/useFavouriteSenders'
+import { useTodayBirthdaySenders } from 'app/features/send/suggestions/useTodayBirthdaySenders'
 
 export const SendScreen = () => {
   const [{ recipient, idType }] = useSendScreenParams()
@@ -39,9 +40,14 @@ export const SendScreen = () => {
   } = useProfileLookup(idType ?? 'tag', recipient ?? '')
   const recentSendersQuery = useRecentSenders()
   const favouriteSendersQuery = useFavouriteSenders()
+  const todayBirthdaySendersQuery = useTodayBirthdaySenders()
   const [{ search }] = useRootScreenParams()
+
   const isLoading =
-    isLoadingProfileLookup || recentSendersQuery.isLoading || favouriteSendersQuery.isLoading
+    isLoadingProfileLookup ||
+    recentSendersQuery.isLoading ||
+    favouriteSendersQuery.isLoading ||
+    todayBirthdaySendersQuery.isLoading
 
   if (isLoading) return <Spinner size="large" color={'$color12'} />
 
@@ -62,6 +68,7 @@ export const SendScreen = () => {
             <SendSuggestions
               recentSendersQuery={recentSendersQuery}
               favouriteSendersQuery={favouriteSendersQuery}
+              todayBirthdaySendersQuery={todayBirthdaySendersQuery}
             />
           )}
           <SendSearchBody />

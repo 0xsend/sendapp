@@ -1,13 +1,12 @@
-import { useQuery, type UseQueryResult } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { UserSchema } from 'app/utils/zod/activity/UserSchema'
 import { z } from 'zod'
+import type { SendSuggestionsQueryResult } from 'app/features/send/suggestions/SendSuggestion.types'
 
-export type UseFavouriteSendersItem = z.infer<typeof UserSchema>
-export type UseFavouriteSendersResult = UseQueryResult<UseFavouriteSendersItem[]>
 const QUERY_KEY = 'favourite_senders'
 
-export const useFavouriteSenders = (): UseFavouriteSendersResult => {
+export const useFavouriteSenders = (): SendSuggestionsQueryResult => {
   const supabase = useSupabase()
 
   return useQuery({

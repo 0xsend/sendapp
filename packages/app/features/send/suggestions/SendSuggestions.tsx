@@ -1,77 +1,56 @@
-import type {
-  UseRecentSendersItem,
-  UseRecentSendersResult,
-} from 'app/features/activity/utils/useRecentSenders'
 import { Avatar, Paragraph, YStack } from '@my/ui'
 import { FlatList } from 'react-native'
-import type { UseFavouriteSendersResult } from 'app/features/activity/utils/useFavouriteSenders'
 import { useSendScreenParams } from 'app/routers/params'
 import { Link } from 'solito/link'
+import type {
+  SendSuggestionItem,
+  SendSuggestionsQueryResult,
+} from 'app/features/send/suggestions/SendSuggestion.types'
 
 export const SendSuggestions = ({
   recentSendersQuery,
   favouriteSendersQuery,
+  todayBirthdaySendersQuery,
 }: {
-  recentSendersQuery: UseRecentSendersResult
-  favouriteSendersQuery: UseFavouriteSendersResult
+  recentSendersQuery: SendSuggestionsQueryResult
+  favouriteSendersQuery: SendSuggestionsQueryResult
+  todayBirthdaySendersQuery: SendSuggestionsQueryResult
 }) => {
   return (
     <>
-      <RecentSenders recentSendersQuery={recentSendersQuery} />
-      <FavouriteSenders favouriteSendersQuery={favouriteSendersQuery} />
+      <SuggestionsList
+        query={recentSendersQuery}
+        title={'Recent Activity'}
+        fallback={'Recent activity is empty, send it.'}
+      />
+      <SuggestionsList
+        query={favouriteSendersQuery}
+        title={'Favourite Senders'}
+        fallback={'No favourite senders, send it.'}
+      />
+      <SuggestionsList
+        query={todayBirthdaySendersQuery}
+        title={'Wish Them Happy Birthday'}
+        fallback={'No birthdays today, invite your friends to celebrate with them.'}
+      />
     </>
   )
 }
 
-const RecentSenders = ({ recentSendersQuery }: { recentSendersQuery: UseRecentSendersResult }) => {
-  const { error, data } = recentSendersQuery
-
-  return (
-    <YStack gap={'$3.5'}>
-      <Paragraph size="$7">Recent Activity</Paragraph>
-      {(() => {
-        switch (true) {
-          case !!error:
-            return (
-              <Paragraph color={'$error'}>
-                {error.message?.split('.')[0] ?? 'Unknown error'}
-              </Paragraph>
-            )
-          case !data || data.length === 0:
-            return (
-              <Paragraph
-                color={'$lightGrayTextField'}
-                $theme-light={{ color: '$darkGrayTextField' }}
-              >
-                Recent activity is empty, send it.
-              </Paragraph>
-            )
-          default:
-            return (
-              <FlatList
-                horizontal
-                data={data || []}
-                renderItem={({ item, index }) => <SenderSuggestion item={item} index={index} />}
-                keyExtractor={(item, index) => item?.send_id?.toString() ?? String(index)}
-                showsHorizontalScrollIndicator={false}
-              />
-            )
-        }
-      })()}
-    </YStack>
-  )
-}
-
-const FavouriteSenders = ({
-  favouriteSendersQuery,
+const SuggestionsList = ({
+  query,
+  fallback,
+  title,
 }: {
-  favouriteSendersQuery: UseFavouriteSendersResult
+  query: SendSuggestionsQueryResult
+  title: string
+  fallback: string
 }) => {
-  const { error, data } = favouriteSendersQuery
+  const { error, data } = query
 
   return (
     <YStack gap={'$3.5'}>
-      <Paragraph size="$7">Favourite Senders</Paragraph>
+      <Paragraph size="$7">{title}</Paragraph>
       {(() => {
         switch (true) {
           case !!error:
@@ -86,7 +65,7 @@ const FavouriteSenders = ({
                 color={'$lightGrayTextField'}
                 $theme-light={{ color: '$darkGrayTextField' }}
               >
-                No favourite senders, send it.
+                {fallback}
               </Paragraph>
             )
           default:
@@ -105,7 +84,7 @@ const FavouriteSenders = ({
   )
 }
 
-const SenderSuggestion = ({ item, index }: { item: UseRecentSendersItem; index: number }) => {
+const SenderSuggestion = ({ item, index }: { item: SendSuggestionItem; index: number }) => {
   const [sendParams] = useSendScreenParams()
   const _sendParams = JSON.parse(JSON.stringify(sendParams)) //JSON makes sure we don't pass undefined values
 
