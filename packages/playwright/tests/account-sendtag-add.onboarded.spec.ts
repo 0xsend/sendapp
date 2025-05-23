@@ -72,18 +72,39 @@ test('cannot add more than 5 tags', async ({ addSendtagsPage, supabase }) => {
   const tagNames = Array.from({ length: 4 }, () => ({
     name: `${faker.lorem.word()}_${test.info().parallelIndex}`,
   }))
-  await supabase
-    .from('tags')
-    .insert(tagNames)
-    .then(({ error }) => {
-      expect(error).toBeFalsy()
+
+  // Get the user's send account first
+  const { data: sendAccount } = await supabase.from('send_accounts').select('id').single()
+
+  expect(sendAccount).toBeTruthy()
+
+  // Create tags using RPC for each tag
+  for (const { name } of tagNames) {
+    const { error } = await supabase.rpc('create_tag', {
+      tag_name: name,
+      send_account_id: sendAccount?.id,
     })
-  addSendtagsPage.page.reload()
+    expect(error).toBeFalsy()
+  }
+
+  // Reload page to see the tags
+  await addSendtagsPage.page.reload()
+
+  // Verify all tags are visible
   for (const { name } of tagNames) {
     await expect(addSendtagsPage.page.getByTestId(`pending-tag-${name}`)).toBeVisible()
   }
+
+  // Verify the submit button is hidden when max tags reached
   await expect(addSendtagsPage.submitTagButton).toBeHidden()
-  const { error } = await supabase.from('tags').insert({ name: faker.lorem.word() })
+
+  // Try to create one more tag via RPC - should fail
+  const { error } = await supabase.rpc('create_tag', {
+    tag_name: faker.lorem.word(),
+    send_account_id: sendAccount?.id,
+  })
+
+  // Verify the error
   expect(error).toBeTruthy()
   expect(error?.message).toBe('User can have at most 5 tags')
   expect(error?.code).toBe('P0001')

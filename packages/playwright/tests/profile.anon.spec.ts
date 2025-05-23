@@ -3,6 +3,7 @@ import { userOnboarded } from '@my/snaplet/models'
 import { expect, type Page } from '@playwright/test'
 import { assert } from 'app/utils/assert'
 import { ProfilePage } from './fixtures/profiles'
+import debug from 'debug'
 
 let log: debug.Debugger
 
