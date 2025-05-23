@@ -1,6 +1,5 @@
-import { XStack } from 'tamagui'
-import { IconArrowUp, IconHome, IconWorldSearch } from 'app/components/icons'
-import { Button, LinearGradient, LinkableButton } from '@my/ui'
+import { IconArrowUp, IconDeviceReset, IconHome, IconWorldSearch } from 'app/components/icons'
+import { Button, LinearGradient, LinkableButton, XStack, Card } from '@my/ui'
 import { usePathname } from 'app/utils/usePathname'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { useScrollDirection } from 'app/provider/scroll'
@@ -17,6 +16,10 @@ const TABS = [
   {
     Icon: IconWorldSearch,
     href: '/explore',
+  },
+  {
+    Icon: IconDeviceReset,
+    href: '/activity',
   },
 ]
 
@@ -51,20 +54,7 @@ export const BottomNavBar = () => {
         overflow={'visible'}
         ai={'center'}
       >
-        <XStack
-          bc={'$color1'}
-          w={'100%'}
-          br={'$6'}
-          ai={'center'}
-          jc={'space-around'}
-          p={'$3'}
-          shadowColor={'#000000'}
-          shadowOffset={{ width: 0, height: -5 }}
-          shadowOpacity={0.3}
-          shadowRadius={60}
-          $gtSm={{ jc: 'space-around', maxWidth: 736 }}
-          $gtMd={{ maxWidth: 896 }}
-        >
+        <Card elevate fd="row" gap="$7" br={'$6'} ai={'center'} jc={'center'} py={'$3'} px="$7">
           {TABS.map((tab) => {
             const isActiveRoute =
               location === tab.href.toString() ||
@@ -101,7 +91,7 @@ export const BottomNavBar = () => {
               </LinkableButton>
             )
           })}
-        </XStack>
+        </Card>
       </LinearGradient>
     </XStack>
   )
