@@ -23,7 +23,7 @@ export function ShareProfileDialog({ isOpen, onClose }: ShareProfileDialogProps)
   const hostname = isWeb ? window.location.hostname : 'send.app'
   const profileUrl = sendtag
     ? `https://${hostname}/${sendtag}`
-    : `https://${hostname}/${profile?.send_id}`
+    : `https://${hostname}/profile/${profile?.send_id}`
 
   useEffect(() => {
     if (isOpen && profileUrl) {
