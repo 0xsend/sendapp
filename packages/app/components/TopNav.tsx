@@ -15,7 +15,7 @@ import {
   XStack,
 } from '@my/ui'
 import { useRootScreenParams } from 'app/routers/params'
-import { IconAccount, IconArrowLeft, IconDeviceReset, IconSendLogo } from 'app/components/icons'
+import { IconAccount, IconArrowLeft, IconSendLogo } from 'app/components/icons'
 import { usePathname } from 'app/utils/usePathname'
 import { useRouter } from 'solito/router'
 
@@ -57,37 +57,6 @@ export function AvatarMenuButton({ profile }: { profile?: Tables<'profiles'> | n
         <IconAccount size={'$2'} $theme-light={{ color: '$color12' }} />
       </Avatar.Fallback>
     </LinkableAvatar>
-  )
-}
-
-function ActivityMenuButton() {
-  const href = '/activity'
-  const location = usePathname()
-  const parts = location.split('/').filter(Boolean)
-  const isActiveRoute =
-    location === href.toString() ||
-    parts.includes(href.toString()) ||
-    href.toString().startsWith(`/${parts[0]}`)
-
-  return (
-    <LinkableButton
-      href={'/activity'}
-      bc={'$color0'}
-      p={'$2'}
-      circular
-      chromeless
-      hoverStyle={{ bc: '$color0' }}
-      pressStyle={{ bc: '$color0' }}
-      focusStyle={{ bc: '$color0' }}
-    >
-      <LinkableButton.Icon>
-        <IconDeviceReset
-          size={'$1.5'}
-          color={isActiveRoute ? '$primary' : '$color10'}
-          $theme-light={{ color: isActiveRoute ? '$color12' : '$color10' }}
-        />
-      </LinkableButton.Icon>
-    </LinkableButton>
   )
 }
 
@@ -212,7 +181,6 @@ export function TopNav({
                     }}
                   >
                     {/* We need the buttons to be there for layout purposes */}
-                    <ActivityMenuButton />
                     <AvatarMenuButton profile={profile} />
                   </XStack>
                 </>
