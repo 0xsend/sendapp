@@ -1,4 +1,4 @@
-import { Button, Dialog, Image, Paragraph, Separator, XStack, YStack } from '@my/ui'
+import { Button, Dialog, Image, isWeb, Paragraph, Separator, XStack, YStack } from '@my/ui'
 import { useUser } from 'app/utils/useUser'
 import { useConfirmedTags } from 'app/utils/tags'
 import { useEffect, useState } from 'react'
@@ -20,9 +20,10 @@ export function ShareProfileDialog({ isOpen, onClose }: ShareProfileDialogProps)
 
   // Use sendtag if available, otherwise fall back to send_id
   const sendtag = tags?.[0]?.name
+  const hostname = isWeb ? window.location.hostname : 'send.app'
   const profileUrl = sendtag
-    ? `https://send.app/${sendtag}`
-    : `https://send.app/${profile?.send_id}`
+    ? `https://${hostname}/${sendtag}`
+    : `https://${hostname}/${profile?.send_id}`
 
   useEffect(() => {
     if (isOpen && profileUrl) {
