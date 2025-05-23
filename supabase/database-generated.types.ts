@@ -1989,6 +1989,10 @@ export type Database = {
           user_id: string
         }[]
       }
+      today_birthday_senders: {
+        Args: Record<PropertyKey, never>
+        Returns: Database["public"]["CompositeTypes"]["activity_feed_user"][]
+      }
       update_distribution_shares: {
         Args: {
           distribution_id: number

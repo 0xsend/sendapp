@@ -1,13 +1,12 @@
-import { useQuery, type UseQueryResult } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { UserSchema } from 'app/utils/zod/activity/UserSchema'
 import { z } from 'zod'
+import type { SendSuggestionsQueryResult } from 'app/features/send/suggestions/SendSuggestion.types'
 
-export type UseRecentSendersItem = z.infer<typeof UserSchema>
-export type UseRecentSendersResult = UseQueryResult<UseRecentSendersItem[]>
 const QUERY_KEY = 'recent_senders'
 
-export const useRecentSenders = (): UseRecentSendersResult => {
+export const useRecentSenders = (): SendSuggestionsQueryResult => {
   const supabase = useSupabase()
 
   return useQuery({
