@@ -10,7 +10,7 @@ import debug from 'debug'
 import { useMemo, type NamedExoticComponent } from 'react'
 import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
-import { useMyAffiliateRewards, useMyAffiliateVault, useSendEarnCoinBalances } from '../hooks'
+import { useSendEarnCoin } from '../providers/SendEarnProvider'
 import { coinToParam, useERC20AssetCoin } from '../params'
 
 const log = debug('app:earn:active')
@@ -21,11 +21,10 @@ export function ActiveEarningsScreen() {
 function ActiveEarnings() {
   const { push } = useRouter()
   const coin = useERC20AssetCoin()
-  const balances = useSendEarnCoinBalances(coin.data || undefined)
-  const myAffiliateVault = useMyAffiliateVault()
+  const { affiliateRewards } = useSendEarnCoin(coin.data || undefined)
   const isAffiliate = useMemo(
-    () => !!myAffiliateVault.data?.send_earn_affiliate,
-    [myAffiliateVault.data]
+    () => !!affiliateRewards.data?.vault?.send_earn_affiliate,
+    [affiliateRewards.data]
   )
   const buttons: {
     Icon: NamedExoticComponent<IconProps>
@@ -61,7 +60,7 @@ function ActiveEarnings() {
     return null
   }
 
-  log('ActiveEarnings', { balances, coin })
+  log('ActiveEarnings', { coin })
 
   return (
     <YStack w={'100%'} gap={'$4'} jc={'space-between'} $gtLg={{ w: '50%', pb: '$3.5' }}>
@@ -89,23 +88,22 @@ function ActiveEarnings() {
  */
 function TotalValue() {
   const coin = useERC20AssetCoin()
-  const balances = useSendEarnCoinBalances(coin.data || undefined)
-  const myEarnRewards = useMyAffiliateRewards()
+  const { coinBalances, affiliateRewards } = useSendEarnCoin(coin.data || undefined)
   const totalValue = useMemo(() => {
-    if (!balances.data) return '0'
+    if (!coinBalances.data) return '0'
     if (!coin.data) return '0'
-    let totalAssets = balances.data.reduce((acc, balance) => {
+    let totalAssets = coinBalances.data.reduce((acc, balance) => {
       return acc + balance.currentAssets
     }, 0n)
 
-    if (myEarnRewards.data) {
-      totalAssets += myEarnRewards.data.assets
+    if (affiliateRewards.data) {
+      totalAssets += affiliateRewards.data.assets
     }
 
     return formatCoinAmount({ amount: totalAssets, coin: coin.data })
-  }, [balances.data, coin.data, myEarnRewards.data])
+  }, [coinBalances.data, coin.data, affiliateRewards.data])
 
-  const isLoading = balances.isLoading || coin.isLoading
+  const isLoading = coinBalances.isLoading || coin.isLoading
 
   return (
     <Fade>
@@ -147,9 +145,9 @@ function TotalValue() {
             )}
           </YStack>
           <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
-          {[coin.isError, balances.isError].some((e) => e) ? (
+          {[coin.isError, coinBalances.error].some((e) => e) ? (
             <Paragraph size={'$5'} color={'$error'}>
-              {[coin.error, balances.error].map((e) => toNiceError(e)).join('. ')}
+              {[coin.error, coinBalances.error].map((e) => toNiceError(e)).join('. ')}
             </Paragraph>
           ) : (
             <Paragraph
@@ -171,26 +169,31 @@ function TotalValue() {
  */
 function ActiveEarningBreakdown() {
   const coin = useERC20AssetCoin()
-  const balances = useSendEarnCoinBalances(coin.data || undefined)
-  const myEarnRewards = useMyAffiliateRewards()
+  const { coinBalances, affiliateRewards } = useSendEarnCoin(coin.data || undefined)
   const totalDeposits = useMemo(() => {
-    if (!balances.data) return 0n
-    const totalCurrentAssets = balances.data.reduce((acc, balance) => {
+    if (!coinBalances.data) return 0n
+    const totalCurrentAssets = coinBalances.data.reduce((acc, balance) => {
       return acc + balance.assets
     }, 0n)
     return totalCurrentAssets
-  }, [balances.data])
+  }, [coinBalances.data])
   const totalEarnings = useMemo(() => {
-    if (!balances.data) return 0n
-    const totalAssets = balances.data.reduce((acc, balance) => {
+    if (!coinBalances.data) return 0n
+    const totalAssets = coinBalances.data.reduce((acc, balance) => {
       return acc + balance.currentAssets
     }, 0n)
     return totalAssets - totalDeposits
-  }, [balances.data, totalDeposits])
-  log('ActiveEarningBreakdown', { balances, coin, totalDeposits, totalEarnings, myEarnRewards })
+  }, [coinBalances.data, totalDeposits])
+  log('ActiveEarningBreakdown', {
+    coinBalances,
+    coin,
+    totalDeposits,
+    totalEarnings,
+    affiliateRewards,
+  })
 
-  if ([coin.error, balances.error, myEarnRewards.error].some((e) => e))
-    return [coin.error, balances.error, myEarnRewards.error].map((e) =>
+  if ([coin.error, coinBalances.error, affiliateRewards.error].some((e) => e))
+    return [coin.error, coinBalances.error, affiliateRewards.error].map((e) =>
       e ? <ErrorMessage key={e.message} error={e} /> : null
     )
 
@@ -209,11 +212,11 @@ function ActiveEarningBreakdown() {
           label={'Earnings'}
           value={formatCoinAmount({ amount: totalEarnings, coin: coin.data })}
         />
-        {myEarnRewards.data && myEarnRewards.data.assets > 0n ? (
+        {affiliateRewards.data && affiliateRewards.data.assets > 0n ? (
           <BreakdownRow
             symbol={coin.data.symbol}
             label={'Rewards'}
-            value={formatCoinAmount({ amount: myEarnRewards.data.assets, coin: coin.data })}
+            value={formatCoinAmount({ amount: affiliateRewards.data.assets, coin: coin.data })}
           />
         ) : null}
         {/* TODO: add SEND rewards if we ever want to track them here */}

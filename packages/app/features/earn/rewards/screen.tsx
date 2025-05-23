@@ -16,7 +16,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import type { erc20Coin } from 'app/data/coins'
 import { SectionButton } from 'app/features/earn/components/SectionButton'
-import { useMyAffiliateRewards, useMyAffiliateRewardsBalance } from 'app/features/earn/hooks'
+import { useSendEarn } from 'app/features/earn/providers/SendEarnProvider'
 import { useERC20AssetCoin } from 'app/features/earn/params'
 import { useSendEarnClaimRewardsCalls } from 'app/features/earn/rewards/hooks'
 import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
@@ -54,9 +54,8 @@ function RewardsBalance() {
   const sender = useMemo(() => sendAccount?.data?.address, [sendAccount?.data?.address])
   const nonce = useAccountNonce({ sender })
 
-  // Get the user's affiliate rewards
-  const balance = useMyAffiliateRewardsBalance()
-  const affiliateRewards = useMyAffiliateRewards()
+  // Get the user's affiliate rewards from provider
+  const { affiliateRewards, invalidateQueries } = useSendEarn()
 
   // Get the webauthn credentials for signing
   const webauthnCreds = useMemo(
@@ -156,8 +155,7 @@ function RewardsBalance() {
       log('onSettled', data, error, variables, context)
       queryClient.invalidateQueries({ queryKey: nonce.queryKey })
       queryClient.invalidateQueries({ queryKey: calls.queryKey })
-      queryClient.invalidateQueries({ queryKey: balance.queryKey })
-      queryClient.invalidateQueries({ queryKey: affiliateRewards.queryKey })
+      invalidateQueries()
     },
   })
 

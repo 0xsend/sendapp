@@ -1,5 +1,6 @@
 import { TopNav } from 'app/components/TopNav'
 import { RewardsBalanceScreen } from 'app/features/earn/rewards/screen'
+import { SendEarnProvider } from 'app/features/earn/providers/SendEarnProvider'
 import { HomeLayout } from 'app/features/home/layout.web'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
@@ -13,7 +14,9 @@ export const Page: NextPageWithLayout = () => {
       <Head>
         <title>Send | Rewards Balance</title>
       </Head>
-      <RewardsBalanceScreen />
+      <SendEarnProvider>
+        <RewardsBalanceScreen />
+      </SendEarnProvider>
     </>
   )
 }

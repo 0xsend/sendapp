@@ -453,19 +453,27 @@ for (const coin of [usdcCoin]) {
       // fee recipient is the send earn affiliate
       const vault = checksumAddress(byteaToHex(deposit.log_addr))
 
-      await verifyDeposit({
-        owner: sendAccount.address,
-        vault: vault,
-        minDepositedAssets: MIN_DEPOSIT_AMOUNT,
-        depositedAssets: randomAmount,
-        deposit: deposit,
+      await expect(async () => {
+        await verifyDeposit({
+          owner: sendAccount.address,
+          vault: vault,
+          minDepositedAssets: MIN_DEPOSIT_AMOUNT,
+          depositedAssets: randomAmount,
+          deposit: deposit,
+        })
+      }).toPass({
+        timeout: 15_000,
       })
 
-      await verifyDepositAffiliateVault({
-        coin,
-        supabase,
-        referrerSendAccount: hexToBytea(referrerSendAccount.address),
-        vault,
+      await expect(async () => {
+        await verifyDepositAffiliateVault({
+          coin,
+          supabase,
+          referrerSendAccount: hexToBytea(referrerSendAccount.address),
+          vault,
+        })
+      }).toPass({
+        timeout: 15_000,
       })
     })
 

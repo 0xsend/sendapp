@@ -1,6 +1,7 @@
 import { TopNav } from 'app/components/TopNav'
 import { assetParam } from '../../../utils/assetParam'
 import { WithdrawForm } from 'app/features/earn/withdraw/screen'
+import { SendEarnProvider } from 'app/features/earn/providers/SendEarnProvider'
 import { HomeLayout } from 'app/features/home/layout.web'
 import type { GetServerSideProps } from 'next'
 import Head from 'next/head'
@@ -13,7 +14,9 @@ export const Page: NextPageWithLayout = () => {
       <Head>
         <title>Send | Withdraw Deposit</title>
       </Head>
-      <WithdrawForm />
+      <SendEarnProvider>
+        <WithdrawForm />
+      </SendEarnProvider>
     </>
   )
 }

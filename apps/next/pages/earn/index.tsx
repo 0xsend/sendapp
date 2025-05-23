@@ -4,6 +4,7 @@ import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from '../_app'
 import { TopNav } from 'app/components/TopNav'
 import { EarnScreen } from 'app/features/earn/screen'
+import { SendEarnProvider } from 'app/features/earn/providers/SendEarnProvider'
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -11,7 +12,9 @@ export const Page: NextPageWithLayout = () => {
       <Head>
         <title>Send | Earn</title>
       </Head>
-      <EarnScreen />
+      <SendEarnProvider>
+        <EarnScreen />
+      </SendEarnProvider>
     </>
   )
 }
