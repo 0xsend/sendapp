@@ -86,6 +86,7 @@ const AddPasskeySigner = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cre
   return (
     <Fade>
       <FormWrapper
+        elevation={'$0.75'}
         w={'100%'}
         gap={'$3.5'}
         bc={'$color1'}

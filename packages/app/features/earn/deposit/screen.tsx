@@ -244,6 +244,7 @@ export function DepositForm() {
           ) : null
         )}
         <SubmitButton
+          elevation={canSubmit ? '$0.75' : undefined}
           theme="green"
           onPress={() => {
             if (!areTermsAccepted) {
@@ -421,6 +422,7 @@ export function DepositForm() {
                   p={'$5'}
                   borderColor={insufficientAmount ? '$error' : 'transparent'}
                   bw={1}
+                  elevation={'$0.75'}
                 >
                   <XStack ai={'center'} position="relative" jc={'space-between'}>
                     {amount}

@@ -28,6 +28,7 @@ const QuickActionButton = ({ href, children }: LinkableButtonProps) => {
 
   return (
     <LinkableButton
+      elevation={5}
       href={href}
       f={1}
       height={'auto'}

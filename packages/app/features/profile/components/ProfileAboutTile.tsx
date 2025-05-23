@@ -16,7 +16,7 @@ export const ProfileAboutTile = ({
 
   return (
     <Fade>
-      <YStack w={'100%'} gap={'$4'} pb={'$4'} testID={'profile-about-tile'}>
+      <YStack w={'100%'} gap={'$4'} pb={'$4'} testID={'profile-about-tile'} elevation={'$0.75'}>
         <YStack w={'100%'} bg={'$color1'} borderRadius={'$6'} padding={'$5'} gap={'$4'}>
           <XStack ai="center" jc="space-between">
             <Paragraph size={'$8'}>About</Paragraph>

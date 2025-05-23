@@ -17,6 +17,7 @@ import {
   YGroup,
   YStack,
   Dialog,
+  ThemeableStack,
 } from '@my/ui'
 import { ExternalLink } from '@tamagui/lucide-icons'
 import { useThemeSetting } from '@tamagui/next-theme'
@@ -115,6 +116,7 @@ function SearchResults() {
         opacity: 0,
         y: -10,
       }}
+      overflow="visible"
     >
       {query && matchesCount > 1 && (
         <YStack mb={'$4'}>
@@ -140,6 +142,7 @@ function SearchResults() {
       )}
       {query && (
         <YGroup
+          elevation={'$0.75'}
           bc={'$color1'}
           p={'$3'}
           $gtLg={{
@@ -487,7 +490,7 @@ function Search({ label, placeholder = 'Search', autoFocus = false }: SearchProp
           {label}
         </H4>
       )}
-      <View position="relative" testID="sendSearchContainer">
+      <XStack position="relative" testID="sendSearchContainer" bc="transparent" br={'$4'}>
         <FormProvider {...form}>
           <SchemaForm
             form={form}
@@ -558,10 +561,14 @@ function Search({ label, placeholder = 'Search', autoFocus = false }: SearchProp
               },
             }}
           >
-            {({ query }) => query}
+            {({ query }) => (
+              <ThemeableStack elevation={'$0.75'} br="$4">
+                {query}
+              </ThemeableStack>
+            )}
           </SchemaForm>
         </FormProvider>
-      </View>
+      </XStack>
     </>
   )
 }

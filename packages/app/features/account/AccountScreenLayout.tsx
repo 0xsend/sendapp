@@ -21,11 +21,21 @@ export const AccountScreenLayout = ({ children }: SettingsLayoutProps) => {
 const DesktopAccountLayout = ({ children }: SettingsLayoutProps) => {
   return (
     <XStack w={'100%'} gap={'$3.5'} pb={'$3.5'}>
-      <ScrollView testID={'settings-links'} showsVerticalScrollIndicator={false} maxWidth={'49%'}>
+      <ScrollView
+        testID={'settings-links'}
+        showsVerticalScrollIndicator={false}
+        maxWidth={'49%'}
+        overflow="visible"
+      >
         <AccountHeader mb={'$3.5'} />
         <AccountLinks />
       </ScrollView>
-      <ScrollView testID={'settings-links'} showsVerticalScrollIndicator={false} maxWidth={'49%'}>
+      <ScrollView
+        testID={'settings-links'}
+        showsVerticalScrollIndicator={false}
+        maxWidth={'49%'}
+        overflow="visible"
+      >
         {children}
       </ScrollView>
     </XStack>

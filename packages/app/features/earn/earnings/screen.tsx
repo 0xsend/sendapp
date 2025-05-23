@@ -99,6 +99,7 @@ export const EarningsFeed = () => {
         keyExtractor={(activity) => `${activity.event_name}-${activity.created_at.getTime()}`}
         renderItem={({ item: activity, index, section }) => (
           <YStack
+            elevation={'$0.75'}
             bc="$color1"
             px="$2"
             $gtLg={{

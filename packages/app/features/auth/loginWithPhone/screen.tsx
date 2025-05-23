@@ -155,7 +155,6 @@ export const LoginWithPhoneScreen = () => {
           >
             {({ countryCode, phone }) => (
               <FadeCard
-                elevation={'$0.75'}
                 w={'100%'}
                 mt={'$5'}
                 borderColor={validationError ? '$error' : 'transparent'}

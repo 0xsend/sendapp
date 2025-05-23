@@ -9,6 +9,7 @@ const CardContext = createStyledContext({
 export const CardFrame = styled(ThemeableStack, {
   name: 'Card',
   context: CardContext,
+  elevation: '$0.75',
 
   variants: {
     unstyled: {
