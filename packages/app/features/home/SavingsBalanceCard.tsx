@@ -1,4 +1,4 @@
-import { Button, Card, Link, Paragraph, Spinner, XStack, YStack } from '@my/ui'
+import { Button, Card, type CardProps, H1, Paragraph, Spinner, XStack } from '@my/ui'
 import formatAmount from 'app/utils/formatAmount'
 
 import { ChevronRight } from '@tamagui/lucide-icons'
@@ -6,8 +6,10 @@ import { useMemo } from 'react'
 import { useSendEarnBalances, useVaultConvertSharesToAssets } from '../earn/hooks'
 import { useIsPriceHidden } from './utils/useIsPriceHidden'
 import { formatUnits } from 'viem'
+import { type LinkProps, useLink } from 'solito/link'
 
-export const SavingsBalanceCard = () => {
+export const SavingsBalanceCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'children'>) => {
+  const linkProps = useLink({ href })
   const { isPriceHidden } = useIsPriceHidden()
   const { data: balances, isLoading } = useSendEarnBalances()
   // Extract vaults and shares from balances for conversion
@@ -30,53 +32,56 @@ export const SavingsBalanceCard = () => {
   )
 
   return (
-    <Card py="$5" px="$4" w={'100%'} jc="space-between">
-      <Link href={'/earn'}>
-        <YStack jc={'center'} gap={'$5'} w={'100%'}>
-          <YStack w={'100%'} gap={'$2.5'} jc="space-between">
-            <XStack ai={'center'} jc={'space-between'} gap="$2.5" width={'100%'}>
-              <Paragraph fontSize={'$7'} fontWeight="400">
-                Savings
-              </Paragraph>
-              <Button
-                chromeless
-                backgroundColor="transparent"
-                hoverStyle={{ backgroundColor: 'transparent' }}
-                pressStyle={{
-                  backgroundColor: 'transparent',
-                  borderColor: 'transparent',
-                }}
-                focusStyle={{ backgroundColor: 'transparent' }}
-                p={0}
-                height={'auto'}
-              >
-                <Button.Icon>
-                  <ChevronRight
-                    size={'$1.5'}
-                    color={'$primary'}
-                    $theme-light={{ color: '$color12' }}
-                  />
-                </Button.Icon>
-              </Button>
-            </XStack>
-          </YStack>
-          <Paragraph fontSize={'$10'} fontWeight={'600'} color={'$color12'}>
-            {(() => {
-              switch (true) {
-                case isPriceHidden:
-                  return '///////'
-                case isLoading || !balances:
-                  return <Spinner size={'large'} />
-                default:
-                  return `$${totalAssets}`
-              }
-            })()}
-          </Paragraph>
-          <Paragraph fontSize={'$4'} color={'$color10'}>
-            Up to 12% interest
-          </Paragraph>
-        </YStack>
-      </Link>
+    <Card
+      elevate
+      hoverStyle={{ scale: 0.925 }}
+      pressStyle={{ scale: 0.875 }}
+      animation="bouncy"
+      size={'$5'}
+      br="$7"
+      {...linkProps}
+      {...props}
+    >
+      <Card.Header padded fd="row" ai="center" jc="space-between">
+        <Paragraph fontSize={'$7'} fontWeight="400">
+          Save
+        </Paragraph>
+        <XStack flex={1} />
+        <Button
+          chromeless
+          backgroundColor="transparent"
+          hoverStyle={{ backgroundColor: 'transparent' }}
+          pressStyle={{
+            backgroundColor: 'transparent',
+            borderColor: 'transparent',
+          }}
+          focusStyle={{ backgroundColor: 'transparent' }}
+          p={0}
+          height={'auto'}
+        >
+          <Button.Icon>
+            <ChevronRight
+              size={'$1.5'}
+              color={'$lightGrayTextField'}
+              $theme-light={{ color: '$darkGrayTextField' }}
+            />
+          </Button.Icon>
+        </Button>
+      </Card.Header>
+      <Card.Footer padded>
+        <H1 color={'$color12'}>
+          {(() => {
+            switch (true) {
+              case isPriceHidden:
+                return '///////'
+              case isLoading || !balances:
+                return <Spinner size={'large'} color={'$color12'} />
+              default:
+                return `$${totalAssets}`
+            }
+          })()}
+        </H1>
+      </Card.Footer>
     </Card>
   )
 }
