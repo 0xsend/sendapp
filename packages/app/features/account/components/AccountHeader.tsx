@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import * as Sharing from 'expo-sharing'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { useConfirmedTags } from 'app/utils/tags'
+import { ShareProfileDialog } from './ShareProfileDialog'
 
 export const AccountHeader = (props: YStackProps) => {
   const { profile } = useUser()
@@ -16,6 +17,7 @@ export const AccountHeader = (props: YStackProps) => {
   const referralCode = tags?.[0]?.name || profile?.referral_code
   const referralHref = `https://send.app?referral=${referralCode}`
   const [canShare, setCanShare] = useState(false)
+  const [shareDialogOpen, setShareDialogOpen] = useState(false)
   const hoverStyles = useHoverStyles()
 
   useEffect(() => {
@@ -70,7 +72,15 @@ export const AccountHeader = (props: YStackProps) => {
             </Button.Icon>
             <Button.Text size={'$5'}>Invite Friends</Button.Text>
           </Button>
-          <Button f={1} py={'$5'} h={'auto'} br={'$5'} bw={0} hoverStyle={hoverStyles}>
+          <Button
+            f={1}
+            py={'$5'}
+            h={'auto'}
+            br={'$5'}
+            bw={0}
+            hoverStyle={hoverStyles}
+            onPress={() => setShareDialogOpen(true)}
+          >
             <Button.Icon>
               <IconQRFull size={'$1'} color={'$primary'} $theme-light={{ color: '$color12' }} />
             </Button.Icon>
@@ -78,6 +88,7 @@ export const AccountHeader = (props: YStackProps) => {
           </Button>
         </XStack>
       </Fade>
+      <ShareProfileDialog isOpen={shareDialogOpen} onClose={() => setShareDialogOpen(false)} />
     </YStack>
   )
 }
