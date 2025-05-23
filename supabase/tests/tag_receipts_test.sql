@@ -50,7 +50,13 @@ SELECT
         SELECT
             COUNT(*)::integer FROM tag_receipts
             WHERE
-                tag_id IS NOT NULL $$, $$
+                tag_id IS NOT NULL
+                AND tag_id =(
+                    SELECT
+                        id
+                    FROM tags
+                    WHERE
+                        name = 'receipt_tag') $$, $$
             VALUES (1) $$, 'tag_receipt should be created with tag_id');
 -- Test that tag_id matches the tag
 SELECT
