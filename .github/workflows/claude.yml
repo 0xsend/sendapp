@@ -34,4 +34,38 @@ jobs:
         uses: anthropics/claude-code-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          allowed_tools: >
+            Bash(git status),
+            Bash(git add .),
+            Bash(git add *),
+            Bash(git commit -m *),
+            Bash(git diff),
+            Bash(git diff --staged),
+            Bash(git log --oneline -10),
+            Bash(git branch),
+            Bash(git checkout *),
+            Bash(npm install),
+            Bash(npm run test),
+            Bash(npm run build),
+            Bash(npm run lint),
+            Bash(npm run format),
+            Bash(yarn install),
+            Bash(yarn test),
+            Bash(yarn build),
+            Bash(yarn lint),
+            Bash(yarn format),
+            Bash(npx @biomejs/biome check),
+            Bash(npx @biomejs/biome format *),
+            Bash(yarn supabase test),
+            Bash(yarn playwright test),
+            Edit,
+            MultiEdit,
+            Write,
+            Read,
+            Glob,
+            Grep,
+            LS,
+            Task,
+            TodoRead,
+            TodoWrite
 
