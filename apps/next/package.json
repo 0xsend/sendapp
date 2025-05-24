@@ -29,7 +29,7 @@
     "@trpc/client": "^11.1.0",
     "@trpc/next": "^11.1.0",
     "@trpc/react-query": "^11.1.0",
-    "@trpc/server": "^11.1.0",
+    "@trpc/server": "^11.1.1",
     "app": "workspace:*",
     "expo-sharing": "13.0.1",
     "next": "15.3.1",
