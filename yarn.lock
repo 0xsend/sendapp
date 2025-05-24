@@ -25834,7 +25834,6 @@ __metadata:
     react-native-reanimated: "npm:~3.16.6"
     react-native-web: "npm:~0.19.13"
     sharp: "npm:0.32.6"
-    ts-node: "npm:^10.9.2"
     vercel: "npm:^33.5.2"
     zod: "npm:^3.23.8"
   languageName: unknown
