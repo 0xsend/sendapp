@@ -30,8 +30,11 @@ export function userProtectedGetSSP<
 
       if (!session || error) {
         log('no session')
-        // Normalize the URL by removing .json suffix before encoding
-        const normalizedUrl = ctx.req.url?.replace(/\.json$/, '')
+        // Normalize the URL by removing .json suffix before encoding (but preserve Next.js data URLs)
+        const rawUrl = ctx.req.url
+        const normalizedUrl = rawUrl?.startsWith('/_next/data/') 
+          ? rawUrl 
+          : rawUrl?.replace(/\.json$/, '')
         const destination =
           normalizedUrl === undefined || normalizedUrl.includes('/auth')
             ? '/'
