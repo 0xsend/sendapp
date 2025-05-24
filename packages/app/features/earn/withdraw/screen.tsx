@@ -13,11 +13,7 @@ import { baseMainnetBundlerClient, entryPointAddress } from '@my/wagmi'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { CalculatedBenefits } from 'app/features/earn/components/CalculatedBenefits'
-import {
-  useSendEarnAPY,
-  useSendEarnBalances,
-  useSendEarnCoinBalances,
-} from 'app/features/earn/hooks'
+import { useSendEarnCoin } from 'app/features/earn/providers/SendEarnProvider'
 import { assert } from 'app/utils/assert'
 import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
 import { formFields, SchemaForm } from 'app/utils/SchemaForm'
@@ -41,6 +37,7 @@ import {
   useParams,
 } from '../params'
 import { useSendEarnWithdrawCalls, useSendEarnWithdrawVault } from './hooks'
+import { useSendEarnAPY } from '../hooks'
 
 export const log = debug('app:earn:withdraw')
 
@@ -64,7 +61,7 @@ export function WithdrawForm() {
   const { params, setParams } = useParams()
   const [parsedAmount] = useAmount()
   const formAmount = form.watch('amount')
-  const allBalances = useSendEarnBalances()
+  const { coinBalances, invalidateQueries } = useSendEarnCoin(coinData)
 
   // QUERY WITHDRAW USEROP
   const chainId = useChainId()
@@ -157,8 +154,7 @@ export function WithdrawForm() {
       log('onSettled', data, error, variables, context)
       queryClient.invalidateQueries({ queryKey: nonce.queryKey })
       queryClient.invalidateQueries({ queryKey: tokensQuery.queryKey })
-      queryClient.invalidateQueries({ queryKey: allBalances.queryKey })
-      queryClient.invalidateQueries({ queryKey: ['send_earn_balances'] })
+      invalidateQueries()
     },
   })
 
@@ -167,20 +163,16 @@ export function WithdrawForm() {
   log('calls', calls)
   log('mutation', mutation)
 
-  // Fetch the user's deposit balance from Send Earn vaults
-  const earnCoinBalances = useSendEarnCoinBalances(coinData)
-  const isBalanceLoading = earnCoinBalances.isLoading
+  // Use coin balances from provider
+  const isBalanceLoading = coinBalances.isLoading
 
   // Calculate the total deposit balance for this coin
   const depositBalance = useMemo(() => {
-    if (earnCoinBalances.isLoading || !earnCoinBalances.data) return BigInt(0)
+    if (coinBalances.isLoading || !coinBalances.data) return BigInt(0)
 
     // Sum up all assets from the balances
-    return earnCoinBalances.data.reduce(
-      (total, balance) => total + balance.currentAssets,
-      BigInt(0)
-    )
-  }, [earnCoinBalances.data, earnCoinBalances.isLoading])
+    return coinBalances.data.reduce((total, balance) => total + balance.currentAssets, BigInt(0))
+  }, [coinBalances.data, coinBalances.isLoading])
 
   const canSubmit =
     !coin.isLoading &&
@@ -247,9 +239,7 @@ export function WithdrawForm() {
   useInitializeFormAmount(form)
 
   // use deposit vault if it exists, or the default vault for the asset
-  const baseApy = useSendEarnAPY({
-    vault: vault.data ?? undefined,
-  })
+  const baseApy = useSendEarnAPY({ vault: vault?.data ? vault.data : undefined })
 
   // Calculate current monthly earning (before withdrawal)
   const currentMonthlyEarning = useMemo(() => {

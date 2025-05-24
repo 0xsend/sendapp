@@ -8,6 +8,7 @@
     "*.tsx": "$(capture).test.tsx,$(capture).skiptest.tsx,$(capture).test.node.tsx,$(capture).test.native.tsx,$(capture).test.ios.tsx,$(capture).test.web.tsx,$(capture).test.android.tsx,${capture}.native.tsx,${capture}.ios.tsx,${capture}.android.tsx,${capture}.web.tsx,${capture}.stories.tsx,${capture}.example.tsx"
   },
   "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.experimental.useTsgo": false,
   "[javascript]": {
     "editor.defaultFormatter": "biomejs.biome"
   },

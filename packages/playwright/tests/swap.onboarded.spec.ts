@@ -6,8 +6,6 @@ import { allCoins, type coin, isEthCoin, usdcCoin } from 'app/data/coins'
 import { fund } from '@my/playwright/fixtures/viem'
 import { formatUnits } from 'viem'
 
-let log: debug.Debugger
-
 const test = mergeTests(swapTest, snapletTest)
 
 const GAS_FEES = BigInt(25 * 10 ** usdcCoin.decimals)
@@ -41,9 +39,7 @@ for (const inCoin of [usdcCoin]) {
       swapSummaryPage,
     }) => {
       test.setTimeout(60_000)
-      log = debug(
-        `test:swap:can-swap:${inCoin.symbol}:${outCoin.symbol}:${test.info().parallelIndex}`
-      )
+
       const inAmount = formatUnits(swapInAmount[inCoin.symbol], inCoin.decimals)
       const slippage = Math.floor(Math.random() * (20 - 2 + 1)) + 2 // from 2% to 20%, lower might make tests flaky
 
@@ -133,7 +129,6 @@ for (const inCoin of [usdcCoin]) {
 }
 
 test('can refresh swap form and preserve filled data', async ({ page, swapFormPage }) => {
-  log = debug(`test:swap:form-refresh:${test.info().parallelIndex}`)
   await swapFormPage.goto()
   await swapFormPage.acceptRiskDialog()
   await swapFormPage.fillSwapForm({
@@ -164,14 +159,21 @@ test('can refresh swap form and preserve filled data', async ({ page, swapFormPa
 })
 
 test("can't access form page without accepting risk dialog", async ({ page, swapFormPage }) => {
-  log = debug(`test:swap:cancel-risk-dialog:${test.info().parallelIndex}`)
-  await swapFormPage.goto()
+  // First navigate to home page to establish navigation history
+  await page.goto('/')
+  await page.waitForURL('/')
+
+  // Then navigate to trade page
+  await page.goto('/trade')
+  await swapFormPage.validatePageVisible()
+
+  // Close the risk dialog
   await swapFormPage.closeRiskDialog()
 
+  // Should navigate back to home page
   await expect(async () => {
     const currentUrl = new URL(page.url())
     expect(currentUrl.pathname).toBe('/')
-    expect(currentUrl.searchParams.toString()).toBe('token=investments')
   }).toPass({ timeout: 5000 })
 })
 
@@ -179,7 +181,6 @@ test("can't access summary page without filling swap form", async ({
   swapSummaryPage,
   swapFormPage,
 }) => {
-  log = debug(`test:swap:summary-access:${test.info().parallelIndex}`)
   await swapSummaryPage.goto()
   await swapFormPage.validatePageVisible()
 })

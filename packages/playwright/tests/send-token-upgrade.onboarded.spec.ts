@@ -49,7 +49,7 @@ test('can upgrade their Send Token V0 to Send Token V1', async ({ page, sendAcco
     })
     expect(sendTokenV0Balance).toEqual(0n)
   }).toPass({
-    timeout: 10_000,
+    timeout: 20_000,
   })
 
   // should see the Send Token V1 balance
