@@ -123,8 +123,9 @@ SELECT results_eq($$
         SELECT
           current_setting('vars.send_id')::int),ARRAY['valid_tag']::text[]) $$, 'Test valid tag lookup is case insensitive');
 
--- Test private profile cannot be found by phone number
-SELECT tests.authenticate_as_service_role();
+
+-- Temporarily switch to postgres role to update auth.users
+SET role postgres;
 UPDATE auth.users
 SET phone = '+15555555555'
 WHERE id = tests.get_supabase_uid('valid_tag_user');

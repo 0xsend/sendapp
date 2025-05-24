@@ -5,11 +5,9 @@ type Json = Nested<JsonPrimitive>;
 type Enum_auth_aal_level = 'aal1' | 'aal2' | 'aal3';
 type Enum_auth_code_challenge_method = 'plain' | 's256';
 type Enum_auth_factor_status = 'unverified' | 'verified';
-type Enum_auth_factor_type = 'totp' | 'webauthn';
+type Enum_auth_factor_type = 'phone' | 'totp' | 'webauthn';
 type Enum_auth_one_time_token_type = 'confirmation_token' | 'email_change_token_current' | 'email_change_token_new' | 'phone_change_token' | 'reauthentication_token' | 'recovery_token';
 type Enum_net_request_status = 'ERROR' | 'PENDING' | 'SUCCESS';
-type Enum_pgsodium_key_status = 'default' | 'expired' | 'invalid' | 'valid';
-type Enum_pgsodium_key_type = 'aead-det' | 'aead-ietf' | 'auth' | 'generichash' | 'hmacsha256' | 'hmacsha512' | 'kdf' | 'secretbox' | 'secretstream' | 'shorthash' | 'stream_xchacha20';
 type Enum_pgtle_password_types = 'PASSWORD_TYPE_MD5' | 'PASSWORD_TYPE_PLAINTEXT' | 'PASSWORD_TYPE_SCRAM_SHA_256';
 type Enum_pgtle_pg_tle_features = 'clientauth' | 'passcheck';
 type Enum_public_key_type_enum = 'ES256';
@@ -132,6 +130,14 @@ interface Table_public_distributions {
   token_decimals: number | null;
   tranche_id: number;
 }
+interface Table_realtime_extensions {
+  id: string;
+  type: string | null;
+  settings: Json | null;
+  tenant_external_id: string | null;
+  inserted_at: string;
+  updated_at: string;
+}
 interface Table_pgtle_feature_info {
   feature: Enum_pgtle_pg_tle_features;
   schema_name: string;
@@ -197,22 +203,6 @@ interface Table_shovel_integrations {
   name: string | null;
   conf: Json | null;
 }
-interface Table_pgsodium_key {
-  id: string;
-  status: Enum_pgsodium_key_status | null;
-  created: string;
-  expires: string | null;
-  key_type: Enum_pgsodium_key_type | null;
-  key_id: number | null;
-  key_context: string | null;
-  name: string | null;
-  associated_data: string | null;
-  raw_key: string | null;
-  raw_key_nonce: string | null;
-  parent_key: string | null;
-  comment: string | null;
-  user_data: string | null;
-}
 interface Table_private_leaderboard_referrals_all_time {
   user_id: string;
   referrals: number | null;
@@ -249,6 +239,8 @@ interface Table_auth_mfa_challenges {
   created_at: string;
   verified_at: string | null;
   ip_address: string;
+  otp_code: string | null;
+  web_authn_session_data: Json | null;
 }
 interface Table_auth_mfa_factors {
   id: string;
@@ -259,6 +251,10 @@ interface Table_auth_mfa_factors {
   created_at: string;
   updated_at: string;
   secret: string | null;
+  phone: string | null;
+  last_challenged_at: string | null;
+  web_authn_credential: Json | null;
+  web_authn_aaguid: string | null;
 }
 interface Table_storage_migrations {
   id: number;
@@ -377,6 +373,10 @@ interface Table_auth_saml_relay_states {
   created_at: string | null;
   updated_at: string | null;
   flow_state_id: string | null;
+}
+interface Table_realtime_schema_migrations {
+  version: number;
+  inserted_at: string | null;
 }
 interface Table_auth_schema_migrations {
   version: string;
@@ -795,6 +795,25 @@ interface Table_shovel_task_updates {
   chain_id: number | null;
   ig_name: string | null;
 }
+interface Table_realtime_tenants {
+  id: string;
+  name: string | null;
+  external_id: string | null;
+  jwt_secret: string | null;
+  max_concurrent_users: number;
+  inserted_at: string;
+  updated_at: string;
+  max_events_per_second: number;
+  postgres_cdc_default: string | null;
+  max_bytes_per_second: number;
+  max_channels_per_client: number;
+  max_joins_per_second: number;
+  suspend: boolean | null;
+  jwt_jwks: Json | null;
+  notify_private_alpha: boolean | null;
+  private_only: boolean;
+  migrations_ran: number | null;
+}
 interface Table_auth_users {
   instance_id: string | null;
   id: string;
@@ -846,7 +865,9 @@ interface Table_public_webauthn_credentials {
   deleted_at: string | null;
 }
 interface Schema_realtime {
-
+  extensions: Table_realtime_extensions;
+  schema_migrations: Table_realtime_schema_migrations;
+  tenants: Table_realtime_tenants;
 }
 interface Schema_auth {
   audit_log_entries: Table_auth_audit_log_entries;
@@ -882,10 +903,7 @@ interface Schema_net {
   _http_response: Table_net_http_response;
   http_request_queue: Table_net_http_request_queue;
 }
-interface Schema_pgsodium {
-  key: Table_pgsodium_key;
-}
-interface Schema_pgsodium_masks {
+interface Schema_pgbouncer {
 
 }
 interface Schema_pgtle {
@@ -973,8 +991,7 @@ interface Database {
   graphql: Schema_graphql;
   graphql_public: Schema_graphql_public;
   net: Schema_net;
-  pgsodium: Schema_pgsodium;
-  pgsodium_masks: Schema_pgsodium_masks;
+  pgbouncer: Schema_pgbouncer;
   pgtle: Schema_pgtle;
   private: Schema_private;
   public: Schema_public;
@@ -989,7 +1006,6 @@ interface Database {
 interface Extension {
   extensions: "http" | "pg_net" | "pg_stat_statements" | "pg_trgm" | "pgcrypto" | "pgjwt" | "uuid-ossp";
   graphql: "pg_graphql";
-  pgsodium: "pgsodium";
   pgtle: "pg_tle";
   public: "citext" | "supabase-dbdev";
   vault: "supabase_vault";
@@ -1093,6 +1109,17 @@ interface Tables_relationships {
     childDestinationsTables: "public.distribution_shares" | "public.distribution_verification_values" | "public.distribution_verifications" | "public.send_slash" | {};
     
   };
+  "_realtime.extensions": {
+    parent: {
+       extensions_tenant_external_id_fkey: "_realtime.tenants";
+    };
+    children: {
+
+    };
+    parentDestinationsTables: "_realtime.tenants" | {};
+    childDestinationsTables:  | {};
+    
+  };
   "auth.flow_state": {
     parent: {
 
@@ -1113,18 +1140,6 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "auth.users" | {};
     childDestinationsTables:  | {};
-    
-  };
-  "pgsodium.key": {
-    parent: {
-       key_parent_key_fkey: "pgsodium.key";
-    };
-    children: {
-       key_parent_key_fkey: "pgsodium.key";
-       secrets_key_id_fkey: "vault.secrets";
-    };
-    parentDestinationsTables: "pgsodium.key" | {};
-    childDestinationsTables: "pgsodium.key" | "vault.secrets" | {};
     
   };
   "private.leaderboard_referrals_all_time": {
@@ -1297,17 +1312,6 @@ interface Tables_relationships {
     childDestinationsTables:  | {};
     
   };
-  "vault.secrets": {
-    parent: {
-       secrets_key_id_fkey: "pgsodium.key";
-    };
-    children: {
-
-    };
-    parentDestinationsTables: "pgsodium.key" | {};
-    childDestinationsTables:  | {};
-    
-  };
   "public.send_account_credentials": {
     parent: {
        account_credentials_account_id_fkey: "public.send_accounts";
@@ -1409,6 +1413,17 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "auth.users" | {};
     childDestinationsTables: "public.tag_receipts" | {};
+    
+  };
+  "_realtime.tenants": {
+    parent: {
+
+    };
+    children: {
+       extensions_tenant_external_id_fkey: "_realtime.extensions";
+    };
+    parentDestinationsTables:  | {};
+    childDestinationsTables: "_realtime.extensions" | {};
     
   };
   "auth.users": {

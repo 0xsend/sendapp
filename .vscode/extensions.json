@@ -8,6 +8,7 @@
     "dbaeumer.vscode-eslint",
     "usernamehw.errorlens",
     "naumovs.color-highlight",
-    "mkhl.direnv"
+    "mkhl.direnv",
+    "supabase.postgrestools-vscode"
   ]
 }
