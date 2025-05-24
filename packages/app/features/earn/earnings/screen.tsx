@@ -5,7 +5,7 @@ import { formatCoinAmount } from 'app/utils/formatCoinAmount'
 import { isTemporalSendEarnDepositEvent } from 'app/utils/zod/activity'
 import { useEffect, useMemo, useRef } from 'react'
 import { SectionList } from 'react-native'
-import { useSendEarnCoinBalances } from '../hooks'
+import { useSendEarnCoin } from '../providers/SendEarnProvider'
 import { useERC20AssetCoin } from '../params'
 import { useEarnActivityFeed } from '../utils/useEarnActivityFeed'
 import { useQueryClient } from '@tanstack/react-query'
@@ -28,11 +28,11 @@ export const EarningsBalance = () => {
 
 export const EarningsFeed = () => {
   const coin = useERC20AssetCoin()
+  const { invalidateQueries } = useSendEarnCoin(coin.data || undefined)
   const { data, isLoading, error, isFetchingNextPage, fetchNextPage, hasNextPage } =
     useEarnActivityFeed({
       pageSize: 10,
     })
-  const queryClient = useQueryClient()
   const wasPendingRef = useRef(false) // Ref to track if a pending deposit was seen previously
 
   useEffect(() => {
@@ -51,13 +51,13 @@ export const EarningsFeed = () => {
 
     // If it was pending previously but isn't anymore, invalidate the balances query
     if (wasPendingRef.current && !isCurrentlyPending) {
-      // Invalidate the query using the base key
-      queryClient.invalidateQueries({ queryKey: ['send_earn_balances'] })
+      // Use provider's centralized invalidation
+      invalidateQueries()
     }
 
     // Update the ref to store the current pending state for the next effect run
     wasPendingRef.current = isCurrentlyPending
-  }, [data, queryClient])
+  }, [data, invalidateQueries])
 
   const sections = useMemo(() => {
     if (!data?.pages) return []
@@ -146,17 +146,17 @@ export const EarningsFeed = () => {
 
 function TotalEarning() {
   const coin = useERC20AssetCoin()
-  const balances = useSendEarnCoinBalances(coin.data || undefined)
+  const { coinBalances } = useSendEarnCoin(coin.data || undefined)
   const totalDeposits = useMemo(() => {
-    if (!balances.data) return 0n
-    const totalCurrentAssets = balances.data.reduce((acc, balance) => {
+    if (!coinBalances.data) return 0n
+    const totalCurrentAssets = coinBalances.data.reduce((acc, balance) => {
       return acc + balance.assets
     }, 0n)
     return totalCurrentAssets
-  }, [balances.data])
+  }, [coinBalances.data])
 
   const { formattedTotal, displayString } = useMemo(() => {
-    if (!coin.data || !balances.data) {
+    if (!coin.data || !coinBalances.data) {
       return {
         formattedPrincipal: '0',
         formattedYield: '0',
@@ -166,7 +166,7 @@ function TotalEarning() {
       }
     }
 
-    const totalAssets = balances.data.reduce((acc, balance) => {
+    const totalAssets = coinBalances.data.reduce((acc, balance) => {
       return acc + balance.currentAssets
     }, 0n)
     const yieldAmount = totalAssets - totalDeposits
@@ -178,9 +178,9 @@ function TotalEarning() {
       yieldAmount > 0n ? `${formattedPrincipal} + ${formattedYield}` : formattedPrincipal
 
     return { formattedPrincipal, formattedYield, formattedTotal, displayString, yieldAmount }
-  }, [balances.data, totalDeposits, coin.data])
+  }, [coinBalances.data, totalDeposits, coin.data])
 
-  if (!balances.isSuccess || !coin.isSuccess || !coin.data) return null
+  if (!coinBalances.isSuccess || !coin.isSuccess || !coin.data) return null
 
   return (
     <Fade>

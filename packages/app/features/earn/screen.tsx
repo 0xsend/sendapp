@@ -11,25 +11,25 @@ import { useMemo, type ReactNode } from 'react'
 import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
-import { useSendEarnBalances, useVaultConvertSharesToAssets, type SendEarnBalance } from './hooks'
+import { useSendEarn } from './providers/SendEarnProvider'
+import type { SendEarnBalance } from './hooks'
 
 const log = debug('app:earn:screen')
 
 export function EarnScreen() {
-  const sendAccount = useSendAccount()
-  const balances = useSendEarnBalances()
+  const { allBalances, isLoading } = useSendEarn()
 
-  if (sendAccount.isLoading || balances.isLoading) {
+  if (isLoading) {
     return <Spinner size="large" color={'$color12'} />
   }
 
   // Check if user has active deposits
   const hasActiveDeposits =
-    Array.isArray(balances.data) &&
-    balances.data.some((balance) => balance.assets > 0n && balance.log_addr !== null)
+    Array.isArray(allBalances.data) &&
+    allBalances.data.some((balance) => balance.assets > 0n && balance.log_addr !== null)
 
   // Convert undefined to null for type safety
-  const balancesData = balances.data ?? null
+  const balancesData = allBalances.data ?? null
 
   const detailsSection = (
     <DetailsSection hasActiveDeposits={hasActiveDeposits} balances={balancesData} />
@@ -174,31 +174,17 @@ const EarningsCallToAction = () => {
 
 const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) => {
   const { push } = useRouter()
+  const { getTotalAssets } = useSendEarn()
 
-  // Extract vaults and shares from balances for conversion
-  const vaults =
-    balances
-      ?.filter((balance) => balance.shares > 0n && balance.log_addr !== null)
-      .map((balance) => balance.log_addr) || []
+  // Get total assets from provider (already computed and cached)
+  const { totalCurrentValue } = getTotalAssets()
 
-  const shares =
-    balances
-      ?.filter((balance) => balance.shares > 0n && balance.log_addr !== null)
-      .map((balance) => balance.shares) || []
-
-  // Use the hook to get current asset values based on onchain rate
-  const currentAssets = useVaultConvertSharesToAssets({ vaults, shares })
-
-  log('convertSharesToAssets results', {
-    data: currentAssets.data,
-    isLoading: currentAssets.isLoading,
-    isError: currentAssets.isError,
+  log('EarningsSummary using provider data', {
+    totalCurrentValue,
+    balances,
   })
 
-  const totalAssets = useMemo(
-    () => formatUSDCValue(currentAssets.data?.reduce((sum, assets) => sum + assets, 0n) ?? 0n),
-    [currentAssets.data]
-  )
+  const totalAssets = useMemo(() => formatUSDCValue(totalCurrentValue), [totalCurrentValue])
   const totalDeposits = useMemo(
     () => formatUSDCValue(balances?.reduce((sum, balance) => sum + balance.assets, 0n) ?? 0n),
     [balances]

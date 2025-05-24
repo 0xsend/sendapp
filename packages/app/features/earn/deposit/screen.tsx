@@ -37,7 +37,7 @@ import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
 import { useChainId } from 'wagmi'
 import { type BRAND, z } from 'zod'
-import { useSendEarnAPY, useSendEarnBalances, useSendEarnCoinBalances } from '../hooks'
+import { useSendEarnCoin } from '../providers/SendEarnProvider'
 import {
   coinToParam,
   useAmount,
@@ -46,6 +46,7 @@ import {
   useParams,
 } from '../params'
 import { useSendEarnDepositCalls, useSendEarnDepositVault } from './hooks'
+import { useSendEarnAPY } from '../hooks'
 
 const log = debug('app:earn:deposit')
 const MINIMUM_DEPOSIT = BigInt(5 * 1e6) // 5 USDC
@@ -71,11 +72,10 @@ export function DepositForm() {
   const { params, setParams } = useParams()
   const [parsedAmount] = useAmount()
   const formAmount = form.watch('amount')
-  const allBalances = useSendEarnBalances()
-  const balances = useSendEarnCoinBalances(coin.data ?? undefined)
+  const { allBalances, coinBalances } = useSendEarnCoin(coin.data ?? undefined)
   const hasExistingDeposit = useMemo(
-    () => (balances.data ?? []).some((b) => b.assets > 0n) ?? false,
-    [balances.data]
+    () => (coinBalances.data ?? []).some((b) => b.assets > 0n) ?? false,
+    [coinBalances.data]
   )
   const areTermsAccepted = form.watch('areTermsAccepted')
 
@@ -309,9 +309,7 @@ export function DepositForm() {
   ])
 
   // use deposit vault if it exists, or the default vault for the asset
-  const baseApy = useSendEarnAPY({
-    vault: vault.data ?? platformVault,
-  })
+  const baseApy = useSendEarnAPY({ vault: vault.data ?? platformVault })
 
   const monthlyEarning = useMemo(() => {
     if (!coin.data?.decimals) return
@@ -518,7 +516,7 @@ export function DepositForm() {
                 }
               })()}
               {/* Only show referred by if there is no existing deposit */}
-              {!balances.isLoading && !hasExistingDeposit && <ReferredBy />}
+              {!coinBalances.isLoading && !hasExistingDeposit && <ReferredBy />}
               {hasExistingDeposit ? null : (
                 <XStack gap={'$3'} ai={'center'}>
                   {areTermsAccepted}

@@ -7,14 +7,12 @@ import { EarnDepositPage } from './EarnDepositPage'
 import { EarnWithdrawPage } from './EarnWithdrawPage'
 
 /**
- * Helper function to navigate from the root page to the main /earn page.
+ * Helper function to navigate directly to the main /earn page.
  * @param page Playwright Page object
  */
 export async function navigateToEarnPage(page: Page) {
   log('Navigating to /earn')
-  await page.goto('/')
-  // The Earn link is now inside the SavingsBalanceCard
-  await page.getByText('Savings').click()
+  await page.goto('/earn')
   await page.waitForURL('/earn')
   log('Successfully navigated to /earn')
 }

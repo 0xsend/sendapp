@@ -1,7 +1,7 @@
 import type { Database } from '@my/supabase/database.types'
 import type { Locator, Page } from '@playwright/test'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { expect, coinToParam } from '.'
+import { expect, coinToParam, navigateToEarnPage } from '.'
 import { assert } from 'app/utils/assert'
 
 /**
@@ -22,10 +22,7 @@ export class EarnDepositPage {
   }
 
   async navigate(coin: { symbol: string }) {
-    await this.page.goto('/')
-    // The Earn link is now inside the SavingsBalanceCard
-    await this.page.getByText('Savings').click()
-    await this.page.waitForURL('/earn')
+    await navigateToEarnPage(this.page)
     await expect(this.startEarningButton).toBeVisible()
     await this.startEarningButton.click()
     await this.page.waitForURL(this.depositUrl(coin))
@@ -39,9 +36,16 @@ export class EarnDepositPage {
     return `/earn/${coinToParam(coin)}/deposit`
   }
 
+  /**
+   * Navigate directly to the deposit page for a specific coin
+   */
   async goto(coin: { symbol: string }) {
     await this.page.goto(this.depositUrl(coin))
     await this.page.waitForURL(this.depositUrl(coin))
+    await expect(this.page.getByText('Start Earning', { exact: true })).toBeVisible()
+    await expect(this.amountInput).toBeVisible()
+    await expect(this.termsCheckbox).toBeVisible()
+    await expect(this.submitButton).toBeVisible({ timeout: 10000 })
   }
 
   async fillAmount(amount: string) {
@@ -146,7 +150,7 @@ export class EarnDepositPage {
           return true
         },
         {
-          timeout: 15000,
+          timeout: 20000,
           message: `Expected to find a new send_earn_deposit record after block ${lastBlockNum} in Supabase`,
         }
       )

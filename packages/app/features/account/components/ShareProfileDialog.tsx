@@ -1,11 +1,19 @@
-import { Button, Dialog, Image, isWeb, Paragraph, Separator, XStack, YStack } from '@my/ui'
-import { useUser } from 'app/utils/useUser'
-import { useConfirmedTags } from 'app/utils/tags'
-import { useEffect, useState } from 'react'
-import QRCode from 'qrcode'
-import * as Clipboard from 'expo-clipboard'
-import { useToastController } from '@my/ui'
+import {
+  Button,
+  Dialog,
+  Image,
+  isWeb,
+  Paragraph,
+  Separator,
+  useToastController,
+  YStack,
+} from '@my/ui'
 import { IconCopy } from 'app/components/icons'
+import { useConfirmedTags } from 'app/utils/tags'
+import { useUser } from 'app/utils/useUser'
+import * as Clipboard from 'expo-clipboard'
+import QRCode from 'qrcode'
+import { useEffect, useState } from 'react'
 
 interface ShareProfileDialogProps {
   isOpen: boolean

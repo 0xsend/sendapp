@@ -5,6 +5,7 @@ import type { GetServerSideProps, PreviewData } from 'next'
 import type { ParsedUrlQuery } from 'node:querystring'
 import { userOnboarded } from './userOnboarded'
 import { SUPABASE_SUBDOMAIN } from 'app/utils/supabase/admin'
+import { normalizeRedirectUrl } from './normalizeRedirectUrl'
 
 const log = debug('api:utils:userProtected')
 
@@ -29,12 +30,14 @@ export function userProtectedGetSSP<
       } = await supabase.auth.getSession()
 
       if (!session || error) {
-        log('no session')
-        const destination =
-          ctx.req.url === undefined || ctx.req.url.includes('/auth')
-            ? '/'
-            : `/?redirectUri=${encodeURIComponent(ctx.req.url)}`
+        const normalizedUrl = normalizeRedirectUrl(ctx.req.url)
 
+        const destination =
+          normalizedUrl === undefined || normalizedUrl.includes('/auth')
+            ? '/'
+            : `/?redirectUri=${encodeURIComponent(normalizedUrl)}`
+
+        log(`no session redirectUri=${normalizedUrl}`)
         return {
           redirect: {
             destination,
