@@ -1,0 +1,2 @@
+-- Add index on send_account_signing_key_added.block_num
+create index concurrently send_account_signing_key_added_block_num on send_account_signing_key_added (block_num);

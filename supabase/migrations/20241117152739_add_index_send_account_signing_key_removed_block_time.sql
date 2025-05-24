@@ -1,0 +1,2 @@
+-- Add index on send_account_signing_key_removed.block_time
+create index concurrently send_account_signing_key_removed_block_time on send_account_signing_key_removed (block_time);

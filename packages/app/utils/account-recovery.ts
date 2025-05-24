@@ -6,7 +6,7 @@ import type { Debugger } from 'debug'
  * @param {string} chainAddress - chainAddress to retrieve
  * @returns chainAddress row
  */
-export const getChainAddress = async (chainAddress: string) => {
+export const getChainAddress = async (chainAddress: `0x${string}`) => {
   const supabaseAdmin = createSupabaseAdminClient()
   return await supabaseAdmin
     .from('chain_addresses')

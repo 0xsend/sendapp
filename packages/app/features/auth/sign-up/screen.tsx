@@ -11,22 +11,22 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { useCallback, useEffect, useId, useState } from 'react'
+import { useThemeSetting } from '@tamagui/next-theme'
 import { Turnstile } from 'app/features/auth/sign-up/Turnstile'
-import { FormProvider, useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { formFields, SchemaForm } from 'app/utils/SchemaForm'
-import { formatErrorMessage } from 'app/utils/formatErrorMessage'
-import { api } from 'app/utils/api'
-import { useRouter } from 'solito/router'
 import { useAuthScreenParams } from 'app/routers/params'
+import { formFields, SchemaForm } from 'app/utils/SchemaForm'
+import { api } from 'app/utils/api'
+import { assert } from 'app/utils/assert'
+import { formatErrorMessage } from 'app/utils/formatErrorMessage'
 import { useCreateSendAccount, useSignIn } from 'app/utils/send-accounts'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
-import { assert } from 'app/utils/assert'
-import { useUser } from 'app/utils/useUser'
-import { useThemeSetting } from '@tamagui/next-theme'
 import { useValidateSendtag } from 'app/utils/tags/useValidateSendtag'
 import { useSetFirstSendtag } from 'app/utils/useFirstSendtag'
+import { useUser } from 'app/utils/useUser'
+import { useCallback, useEffect, useId, useState } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
+import { useRouter } from 'solito/router'
+import { z } from 'zod'
 
 const SignUpScreenFormSchema = z.object({
   name: formFields.text,
@@ -358,7 +358,7 @@ export const SignUpScreen = () => {
               }}
               ta={'center'}
             >
-              Don't see your passkey? Try login with phone number
+              Don&apos;t see your passkey? Try login with phone number
             </Button.Text>
           </LinkableButton>
         </YStack>

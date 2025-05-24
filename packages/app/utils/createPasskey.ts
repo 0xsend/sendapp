@@ -8,6 +8,9 @@ import type {
 } from 'react-native-passkeys/build/ReactNativePasskeys.types'
 import { getRpId } from './getRpId'
 
+// this is a copy paste from typescript lib.dom.d.ts so we can use the tsgo
+type Base64URLString = string
+
 export async function createPasskey({
   user,
   keySlot,

@@ -39,6 +39,7 @@ type Override = {
       allowed_mime_types?: string;
       owner_id?: string;
       objects?: string;
+      prefixes?: string;
     };
   }
   chain_addresses?: {
@@ -128,6 +129,18 @@ type Override = {
       send_slash?: string;
     };
   }
+  extensions?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      type?: string;
+      settings?: string;
+      tenant_external_id?: string;
+      inserted_at?: string;
+      updated_at?: string;
+      tenants?: string;
+    };
+  }
   hooks?: {
     name?: string;
     fields?: {
@@ -188,6 +201,19 @@ type Override = {
       path_tokens?: string;
       version?: string;
       owner_id?: string;
+      user_metadata?: string;
+      level?: string;
+      buckets?: string;
+    };
+  }
+  prefixes?: {
+    name?: string;
+    fields?: {
+      bucket_id?: string;
+      name?: string;
+      level?: string;
+      created_at?: string;
+      updated_at?: string;
       buckets?: string;
     };
   }
@@ -231,6 +257,13 @@ type Override = {
       profiles_referrals_referrer_idToprofiles?: string;
     };
   }
+  _realtime_schema_migrations?: {
+    name?: string;
+    fields?: {
+      version?: string;
+      inserted_at?: string;
+    };
+  }
   auth_schema_migrations?: {
     name?: string;
     fields?: {
@@ -243,6 +276,13 @@ type Override = {
       version?: string;
       statements?: string;
       name?: string;
+    };
+  }
+  seed_files?: {
+    name?: string;
+    fields?: {
+      path?: string;
+      hash?: string;
     };
   }
   send_account_created?: {
@@ -625,6 +665,29 @@ type Override = {
       tag_receipts?: string;
     };
   }
+  tenants?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      name?: string;
+      external_id?: string;
+      jwt_secret?: string;
+      max_concurrent_users?: string;
+      inserted_at?: string;
+      updated_at?: string;
+      max_events_per_second?: string;
+      postgres_cdc_default?: string;
+      max_bytes_per_second?: string;
+      max_channels_per_client?: string;
+      max_joins_per_second?: string;
+      suspend?: string;
+      jwt_jwks?: string;
+      notify_private_alpha?: string;
+      private_only?: string;
+      migrations_ran?: string;
+      extensions?: string;
+    };
+  }
   users?: {
     name?: string;
     fields?: {
@@ -727,6 +790,7 @@ export interface Fingerprint {
     updatedAt?: FingerprintDateField;
     fileSizeLimit?: FingerprintNumberField;
     objects?: FingerprintRelationField;
+    prefixes?: FingerprintRelationField;
   }
   chainAddresses?: {
     createdAt?: FingerprintDateField;
@@ -789,6 +853,12 @@ export interface Fingerprint {
     distributionVerifications?: FingerprintRelationField;
     sendSlashes?: FingerprintRelationField;
   }
+  extensions?: {
+    settings?: FingerprintJsonField;
+    insertedAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    tenant?: FingerprintRelationField;
+  }
   hooks?: {
     id?: FingerprintNumberField;
     hookTableId?: FingerprintNumberField;
@@ -817,6 +887,14 @@ export interface Fingerprint {
     updatedAt?: FingerprintDateField;
     lastAccessedAt?: FingerprintDateField;
     metadata?: FingerprintJsonField;
+    userMetadata?: FingerprintJsonField;
+    level?: FingerprintNumberField;
+    bucket?: FingerprintRelationField;
+  }
+  prefixes?: {
+    level?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
     bucket?: FingerprintRelationField;
   }
   profiles?: {
@@ -838,10 +916,17 @@ export interface Fingerprint {
     referred?: FingerprintRelationField;
     referrer?: FingerprintRelationField;
   }
+  RealtimeSchemaMigrations?: {
+    version?: FingerprintNumberField;
+    insertedAt?: FingerprintDateField;
+  }
   authSchemaMigrations?: {
 
   }
   supabaseMigrationsSchemaMigrations?: {
+
+  }
+  seedFiles?: {
 
   }
   sendAccountCreateds?: {
@@ -1036,6 +1121,18 @@ export interface Fingerprint {
     createdAt?: FingerprintDateField;
     user?: FingerprintRelationField;
     tagReceipts?: FingerprintRelationField;
+  }
+  tenants?: {
+    maxConcurrentUsers?: FingerprintNumberField;
+    insertedAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    maxEventsPerSecond?: FingerprintNumberField;
+    maxBytesPerSecond?: FingerprintNumberField;
+    maxChannelsPerClient?: FingerprintNumberField;
+    maxJoinsPerSecond?: FingerprintNumberField;
+    jwtJwks?: FingerprintJsonField;
+    migrationsRan?: FingerprintNumberField;
+    extensions?: FingerprintRelationField;
   }
   users?: {
     emailConfirmedAt?: FingerprintDateField;

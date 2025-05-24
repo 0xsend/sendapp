@@ -22,11 +22,11 @@ const item = {
 
 describe('useProfileHref', () => {
   it('should return the correct href for tag screen', () => {
-    const href = useProfileHref('tag', item.tag_name)
+    const href = useProfileHref('tag', item.tag_name ?? '')
     expect(href).toBe('/alice')
   })
   it('should return the correct href for sendid screen', () => {
-    const href = useProfileHref('sendid', item.send_id.toString())
+    const href = useProfileHref('sendid', (item.send_id ?? 0).toString())
     expect(href).toBe(`/profile/${item.send_id}`)
   })
   it('shold return basescan link for EOA', () => {
@@ -34,7 +34,7 @@ describe('useProfileHref', () => {
     expect(href).toBe(`${baseMainnet.blockExplorers.default.url}/address/${zeroAddress}`)
   })
   it('should return empty string if phone is used', () => {
-    const href = useProfileHref('phone', item.phone)
+    const href = useProfileHref('phone', item.phone ?? '')
     expect(href).toBe('')
   })
   it('should return empty string if refcode is used', () => {
