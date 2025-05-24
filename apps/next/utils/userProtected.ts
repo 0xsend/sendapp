@@ -30,10 +30,12 @@ export function userProtectedGetSSP<
 
       if (!session || error) {
         log('no session')
+        // Normalize the URL by removing .json suffix before encoding
+        const normalizedUrl = ctx.req.url?.replace(/\.json$/, '')
         const destination =
-          ctx.req.url === undefined || ctx.req.url.includes('/auth')
+          normalizedUrl === undefined || normalizedUrl.includes('/auth')
             ? '/'
-            : `/?redirectUri=${encodeURIComponent(ctx.req.url)}`
+            : `/?redirectUri=${encodeURIComponent(normalizedUrl)}`
 
         return {
           redirect: {
