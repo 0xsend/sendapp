@@ -30,8 +30,6 @@ export function userProtectedGetSSP<
       } = await supabase.auth.getSession()
 
       if (!session || error) {
-        log('no session')
-
         const normalizedUrl = normalizeRedirectUrl(ctx.req.url)
 
         const destination =
@@ -39,6 +37,7 @@ export function userProtectedGetSSP<
             ? '/'
             : `/?redirectUri=${encodeURIComponent(normalizedUrl)}`
 
+        log(`no session redirectUri=${normalizedUrl}`)
         return {
           redirect: {
             destination,

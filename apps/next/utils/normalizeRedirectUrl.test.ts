@@ -29,7 +29,34 @@ describe('normalizeRedirectUrl', () => {
   })
 
   it('should handle index routes correctly', () => {
-    expect(normalizeRedirectUrl('/_next/data/abc123/index.json')).toBe('/index')
-    // Note: You might want to handle index -> / conversion if needed
+    expect(normalizeRedirectUrl('/_next/data/abc123/index.json')).toBe('/')
+  })
+
+  it('should preserve query parameters', () => {
+    expect(normalizeRedirectUrl('/_next/data/abc123/send.json?recipient=alice')).toBe(
+      '/send?recipient=alice'
+    )
+    expect(normalizeRedirectUrl('/_next/data/build-id/profile/bigboss.json?tab=activity')).toBe(
+      '/profile/bigboss?tab=activity'
+    )
+    expect(normalizeRedirectUrl('/send.json?idType=tag&recipient=alice')).toBe(
+      '/send?idType=tag&recipient=alice'
+    )
+  })
+
+  it('should handle complex query parameters with encoding', () => {
+    expect(
+      normalizeRedirectUrl(
+        '/_next/data/development/index.json?redirectUri=%2Fsend%3Frecipient%3Dalice'
+      )
+    ).toBe('/?redirectUri=%2Fsend%3Frecipient%3Dalice')
+  })
+
+  it('should handle the problematic URL from the logs', () => {
+    const problematicUrl =
+      '/_next/data/development/index.json?redirectUri=%2F_next%2Fdata%2Fdevelopment%2Fsend.json%3FidType%3Dtag%26recipient%3Dalice'
+    const expected =
+      '/?redirectUri=%2F_next%2Fdata%2Fdevelopment%2Fsend.json%3FidType%3Dtag%26recipient%3Dalice'
+    expect(normalizeRedirectUrl(problematicUrl)).toBe(expected)
   })
 })
