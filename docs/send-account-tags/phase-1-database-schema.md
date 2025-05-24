@@ -34,7 +34,7 @@ ADD COLUMN main_tag_id INTEGER REFERENCES tags(id);
 
 ## Migration Files
 
-### 1. `20250118103223_add_tag_id.sql`
+### 1. `20250524000001_add_tag_id.sql`
 **Purpose**: Add numeric IDs to existing tags
 
 **Key Operations**:
@@ -43,7 +43,7 @@ ADD COLUMN main_tag_id INTEGER REFERENCES tags(id);
 - Update foreign key references in `tag_receipts` and `referrals`
 - Transition from name-based to ID-based references
 
-### 2. `20250118103225_sendtag_updates.sql`
+### 2. `20250524000003_sendtag_updates.sql`
 **Purpose**: Create junction table and set main tags
 
 **Key Operations**:
@@ -52,7 +52,7 @@ ADD COLUMN main_tag_id INTEGER REFERENCES tags(id);
 - Set initial main tags (oldest confirmed tag per user)
 - Add validation triggers for main_tag_id
 
-### 3. `20250118103226_tag_historical_data.sql`
+### 3. `20250524000004_tag_historical_data.sql`
 **Purpose**: Preserve tag history and audit trails
 
 ## Current Issues to Fix
@@ -75,7 +75,7 @@ CREATE INDEX idx_send_account_tags_tag_id ON send_account_tags(tag_id);
 **Impact**: Migration consistency
 
 **Problem**: Migration references dropping `referrals.tag` column that was never actually dropped
-**Location**: `supabase/migrations/20250118103228_update_tag_functions.sql:593`
+**Location**: `supabase/migrations/20250524000005_update_tag_functions.sql:593`
 
 **Fix**: Create cleanup migration to properly drop the column if it exists
 
