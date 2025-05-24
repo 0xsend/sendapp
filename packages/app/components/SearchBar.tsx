@@ -393,7 +393,7 @@ function SearchResultRow({
         <XStack ai={'center'} jc={'space-between'}>
           <XStack testID={`tag-search-${profile.send_id}`} ai="center" gap="$4">
             <Avatar size="$4.5" br="$3">
-              <Avatar.Image testID="avatar" src={profile.avatar_url} />
+              <Avatar.Image testID="avatar" src={profile.avatar_url ?? undefined} />
               <Avatar.Fallback>
                 <Avatar size="$4.5" br="$3">
                   <Avatar.Image
@@ -410,9 +410,9 @@ function SearchResultRow({
                 text={(() => {
                   switch (keyField) {
                     case 'phone_matches':
-                      return profile.phone
+                      return profile.phone ?? ''
                     case 'tag_matches':
-                      return profile.tag_name
+                      return profile.tag_name ?? ''
                     case 'send_id_matches':
                       return `#${profile.send_id}`
                     default:

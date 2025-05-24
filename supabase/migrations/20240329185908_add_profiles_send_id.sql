@@ -24,12 +24,11 @@ ALTER TABLE profiles ALTER COLUMN send_id SET NOT NULL;
 CREATE SEQUENCE profiles_send_id_seq;
 SELECT setval('profiles_send_id_seq', coalesce(max(send_id), 0) + 1, false) FROM profiles;
 ALTER TABLE profiles ALTER COLUMN send_id SET DEFAULT nextval('profiles_send_id_seq');
-create index concurrently on profiles(send_id);
 
 -- Trigger function to avoid changing send_id
 CREATE OR REPLACE FUNCTION stop_change_send_id()
   RETURNS TRIGGER LANGUAGE plpgsql security definer
-set search_path = public AS $$ BEGIN 
+set search_path = public AS $$ BEGIN
 
   IF OLD.send_id <> NEW.send_id THEN
     RAISE EXCEPTION 'send_id cannot be changed';

@@ -31,7 +31,8 @@ export const useGeoBlock = (): UseQueryResult<boolean> => {
     queryKey: ['geoblock', tags, geoblockEnabled],
     queryFn: async () => {
       // 1) Bypass check for internal team for testing
-      if (isSendSquadMember(tags)) {
+      const tagsArray = Array.isArray(tags) ? tags : null
+      if (isSendSquadMember(tagsArray)) {
         return false
       }
       if (!geoblockEnabled) {

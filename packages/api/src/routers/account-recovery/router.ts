@@ -16,7 +16,7 @@ import {
   isChallengeExpired,
 } from 'app/utils/account-recovery'
 import { mintJWTToken } from 'app/utils/jwt'
-import { hexToBytes, verifyMessage } from 'viem'
+import { hexToBytes, isAddress, verifyMessage } from 'viem'
 import { verifySignature } from 'app/utils/userop'
 import { COSEECDHAtoXY } from 'app/utils/passkeys'
 import { byteaToHex } from 'app/utils/byteaToHex'
@@ -191,7 +191,7 @@ const getUserIdByIdentifier = async (
   }
 
   let userId = ''
-  if (recoveryType === RecoveryOptions.EOA) {
+  if (recoveryType === RecoveryOptions.EOA && isAddress(identifier)) {
     userId = await getUserIdByChainAddress(identifier)
   } else if (recoveryType === RecoveryOptions.WEBAUTHN) {
     userId = await getUserIdByPasskeyName(identifier)
@@ -259,7 +259,7 @@ const verifyRecoverySignature = async (
  * @param {string} chainAddress - chain address linked to user's account
  * @returns  {Promise<string>} - user id
  */
-const getUserIdByChainAddress = async (chainAddress: string): Promise<string> => {
+const getUserIdByChainAddress = async (chainAddress: `0x${string}`): Promise<string> => {
   if (!chainAddress) {
     throw new TRPCError({
       code: 'BAD_REQUEST',

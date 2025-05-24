@@ -51,7 +51,9 @@ export function ReferredBy() {
   useEffect(() => {
     if (!isReferrerLoading && referrer) {
       const ref = referrer.tag && referrer.tag !== '' ? referrer.tag : referrer.refcode
-      setReferralCode(ref)
+      if (ref) {
+        setReferralCode(ref)
+      }
     }
   }, [referrer, isReferrerLoading])
 

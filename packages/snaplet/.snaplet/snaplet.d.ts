@@ -18,6 +18,8 @@ type Enum_public_tag_status = 'confirmed' | 'pending';
 type Enum_public_temporal_status = 'confirmed' | 'failed' | 'initialized' | 'sent' | 'submitted';
 type Enum_public_verification_type = 'create_passkey' | 'send_ceiling' | 'send_one_hundred' | 'send_streak' | 'send_ten' | 'tag_referral' | 'tag_registration' | 'total_tag_referrals';
 type Enum_public_verification_value_mode = 'aggregate' | 'individual';
+type Enum_realtime_action = 'DELETE' | 'ERROR' | 'INSERT' | 'TRUNCATE' | 'UPDATE';
+type Enum_realtime_equality_op = 'eq' | 'gt' | 'gte' | 'in' | 'lt' | 'lte' | 'neq';
 type Enum_temporal_transfer_status = 'cancelled' | 'confirmed' | 'failed' | 'initialized' | 'sent' | 'submitted';
 interface Table_net_http_response {
   id: number | null;
@@ -224,6 +226,16 @@ interface Table_public_liquidity_pools {
   chain_id: number;
   created_at: string;
 }
+interface Table_realtime_messages {
+  topic: string;
+  extension: string;
+  payload: Json | null;
+  event: string | null;
+  private: boolean | null;
+  updated_at: string;
+  inserted_at: string;
+  id: string;
+}
 interface Table_auth_mfa_amr_claims {
   session_id: string;
   created_at: string;
@@ -269,6 +281,8 @@ interface Table_storage_objects {
   metadata: Json | null;
   version: string | null;
   owner_id: string | null;
+  user_metadata: Json | null;
+  level: number | null;
 }
 interface Table_auth_one_time_tokens {
   id: string;
@@ -278,6 +292,12 @@ interface Table_auth_one_time_tokens {
   relates_to: string;
   created_at: string;
   updated_at: string;
+}
+interface Table_storage_prefixes {
+  bucket_id: string;
+  name: string;
+  created_at: string | null;
+  updated_at: string | null;
 }
 interface Table_public_profiles {
   id: string;
@@ -323,6 +343,7 @@ interface Table_storage_s_3_multipart_uploads {
   version: string;
   owner_id: string | null;
   created_at: string;
+  user_metadata: Json | null;
 }
 interface Table_storage_s_3_multipart_uploads_parts {
   id: string;
@@ -360,6 +381,10 @@ interface Table_auth_saml_relay_states {
 interface Table_auth_schema_migrations {
   version: string;
 }
+interface Table_realtime_schema_migrations {
+  version: number;
+  inserted_at: string | null;
+}
 interface Table_supabase_migrations_schema_migrations {
   version: string;
   statements: string[] | null;
@@ -374,6 +399,10 @@ interface Table_vault_secrets {
   nonce: string | null;
   created_at: string;
   updated_at: string;
+}
+interface Table_supabase_migrations_seed_files {
+  path: string;
+  hash: string;
 }
 interface Table_public_send_account_created {
   chain_id: number;
@@ -706,6 +735,34 @@ interface Table_auth_sso_providers {
   created_at: string | null;
   updated_at: string | null;
 }
+interface Table_realtime_subscription {
+  id: number;
+  subscription_id: string;
+  /**
+  * We couldn't determine the type of this column. The type might be coming from an unknown extension
+  * or be specific to your database. Please if it's a common used type report this issue so we can fix it!
+  * Otherwise, please manually type this column by casting it to the correct type.
+  * @example
+  * Here is a cast example for copycat use:
+  * ```
+  * copycat.scramble(row.unknownColumn as string)
+  * ```
+  */
+  entity: unknown;
+  /**
+  * We couldn't determine the type of this column. The type might be coming from an unknown extension
+  * or be specific to your database. Please if it's a common used type report this issue so we can fix it!
+  * Otherwise, please manually type this column by casting it to the correct type.
+  * @example
+  * Here is a cast example for copycat use:
+  * ```
+  * copycat.scramble(row.unknownColumn as string)
+  * ```
+  */
+  filters: unknown[];
+  claims: Json;
+  created_at: string;
+}
 interface Table_public_swap_routers {
   router_addr: string;
   chain_id: number;
@@ -787,9 +844,6 @@ interface Table_public_webauthn_credentials {
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
-}
-interface Schema_analytics {
-
 }
 interface Schema_realtime {
 
@@ -878,7 +932,9 @@ interface Schema_public {
   webauthn_credentials: Table_public_webauthn_credentials;
 }
 interface Schema_realtime {
-
+  messages: Table_realtime_messages;
+  schema_migrations: Table_realtime_schema_migrations;
+  subscription: Table_realtime_subscription;
 }
 interface Schema_shovel {
   ig_updates: Table_shovel_ig_updates;
@@ -890,6 +946,7 @@ interface Schema_storage {
   buckets: Table_storage_buckets;
   migrations: Table_storage_migrations;
   objects: Table_storage_objects;
+  prefixes: Table_storage_prefixes;
   s3_multipart_uploads: Table_storage_s_3_multipart_uploads;
   s3_multipart_uploads_parts: Table_storage_s_3_multipart_uploads_parts;
 }
@@ -899,6 +956,7 @@ interface Schema_supabase_functions {
 }
 interface Schema_supabase_migrations {
   schema_migrations: Table_supabase_migrations_schema_migrations;
+  seed_files: Table_supabase_migrations_seed_files;
 }
 interface Schema_temporal {
   send_account_transfers: Table_temporal_send_account_transfers;
@@ -908,7 +966,6 @@ interface Schema_vault {
   secrets: Table_vault_secrets;
 }
 interface Database {
-  _analytics: Schema__analytics;
   _realtime: Schema__realtime;
   auth: Schema_auth;
   dbdev: Schema_dbdev;
@@ -967,11 +1024,12 @@ interface Tables_relationships {
     };
     children: {
        objects_bucketId_fkey: "storage.objects";
+       prefixes_bucketId_fkey: "storage.prefixes";
        s3_multipart_uploads_bucket_id_fkey: "storage.s3_multipart_uploads";
        s3_multipart_uploads_parts_bucket_id_fkey: "storage.s3_multipart_uploads_parts";
     };
     parentDestinationsTables:  | {};
-    childDestinationsTables: "storage.objects" | "storage.s3_multipart_uploads" | "storage.s3_multipart_uploads_parts" | {};
+    childDestinationsTables: "storage.objects" | "storage.prefixes" | "storage.s3_multipart_uploads" | "storage.s3_multipart_uploads_parts" | {};
     
   };
   "public.chain_addresses": {
@@ -1132,6 +1190,17 @@ interface Tables_relationships {
 
     };
     parentDestinationsTables: "auth.users" | {};
+    childDestinationsTables:  | {};
+    
+  };
+  "storage.prefixes": {
+    parent: {
+       prefixes_bucketId_fkey: "storage.buckets";
+    };
+    children: {
+
+    };
+    parentDestinationsTables: "storage.buckets" | {};
     childDestinationsTables:  | {};
     
   };

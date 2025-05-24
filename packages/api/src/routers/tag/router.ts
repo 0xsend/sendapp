@@ -91,7 +91,7 @@ export const tagRouter = createTRPCRouter({
           throw new Error(insertError.message || 'Unable to save tag')
         }
 
-        if (referrerProfileLookupResult) {
+        if (referrerProfileLookupResult?.refcode) {
           const { data: referrerProfile, error: referrerProfileError } = await supabaseAdmin
             .from('profiles')
             .select('*')

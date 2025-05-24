@@ -16,5 +16,5 @@ export default defineConfig({
   /**
    * Tables that should be selected when seeding
    */
-  select: ['!pgtle.*', 'public.*', 'auth.*', 'shovel.*'],
+  select: ['!pgtle.*', '!realtime.*', 'public.*', 'auth.*', 'shovel.*'],
 })

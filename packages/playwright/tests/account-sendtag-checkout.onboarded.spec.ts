@@ -304,7 +304,7 @@ test('can refer multiple tags in separate transactions', async ({
   // peek at the leaderboard
   const { data: leaderboardData, error: leaderboardError } = await supabase
     .rpc('leaderboard_referrals_all_time')
-    .eq('user ->> send_id', referrer.send_id)
+    .eq('user ->> send_id', referrer.send_id.toString())
     .select('rewards_usdc::text,referrals::text,user')
   expect(leaderboardError).toBeFalsy()
   expect(leaderboardData?.[0]).toBeTruthy()

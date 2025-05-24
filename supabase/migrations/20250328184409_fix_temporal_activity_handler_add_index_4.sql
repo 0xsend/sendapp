@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY ON temporal.send_account_transfers(status, created_at_block_num desc);

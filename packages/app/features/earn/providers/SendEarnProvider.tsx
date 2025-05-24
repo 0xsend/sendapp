@@ -1,18 +1,17 @@
-import { createContext, useContext, useMemo, type ReactNode } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { useSendAccount } from 'app/utils/send-accounts'
 import type { erc20Coin } from 'app/data/coins'
+import { useSendAccount } from 'app/utils/send-accounts'
+import { createContext, useContext, useMemo, type ReactNode } from 'react'
 import { isAddressEqual } from 'viem'
+import type { UseQueryReturnType } from 'wagmi/query'
 import {
+  useMyAffiliateRewards,
+  useMyAffiliateRewardsBalance,
   useSendEarnBalances,
   useUnderlyingVaultsAsset,
   useVaultConvertSharesToAssets,
-  useSendEarnAPY,
-  useMyAffiliateRewards,
-  useMyAffiliateRewardsBalance,
   type SendEarnBalance,
 } from '../hooks'
-import type { UseQueryReturnType } from 'wagmi/query'
 
 type SendEarnCoinBalance = {
   log_addr: `0x${string}`

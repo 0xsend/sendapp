@@ -67,6 +67,7 @@ const createMockPostgrestError = (message: string): PostgrestError => ({
   details: 'Mock details',
   hint: 'Mock hint',
   code: 'MOCK',
+  name: 'PostgrestError',
 })
 
 // Define reusable mock functions for the chain (to be attached to mockedSupabaseAdmin)

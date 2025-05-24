@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY ON temporal.send_account_transfers(workflow_id, created_at desc);

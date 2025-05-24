@@ -1,4 +1,4 @@
-import type { Database } from '@my/supabase/database-generated.types'
+import type { Database } from '@my/supabase/database.types'
 import { sendtagCheckoutAddress } from '@my/wagmi'
 import type { PostgrestError } from '@supabase/postgrest-js'
 import type { SupabaseClient } from '@supabase/supabase-js'

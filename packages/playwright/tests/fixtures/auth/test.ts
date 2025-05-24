@@ -122,7 +122,7 @@ const authTest = snapletTest.extend<{
           workerIndex: test.info().workerIndex,
         },
       },
-      phone: `+${country.dialCode}${randomNumber}`,
+      email: `${faker.internet.userName()}@${faker.internet.domainName()}`,
       password: 'changeme',
     })
 
