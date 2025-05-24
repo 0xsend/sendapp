@@ -5,14 +5,13 @@ import { IconCoin } from 'app/components/icons/IconCoin'
 import { Row } from 'app/features/earn/components/Row'
 import { SectionButton } from 'app/features/earn/components/SectionButton'
 import formatAmount from 'app/utils/formatAmount'
-import { useSendAccount } from 'app/utils/send-accounts'
 import debug from 'debug'
 import { useMemo, type ReactNode } from 'react'
 import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
-import { useSendEarn } from './providers/SendEarnProvider'
 import type { SendEarnBalance } from './hooks'
+import { useSendEarn } from './providers/SendEarnProvider'
 
 const log = debug('app:earn:screen')
 

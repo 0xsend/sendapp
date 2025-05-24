@@ -9,7 +9,7 @@ import {
   useMedia,
 } from '@my/ui'
 import { IconArrowUp, IconPlus, IconStacks, IconSwap } from 'app/components/icons'
-import { sendCoin, usdcCoin } from 'app/data/coins'
+import { usdcCoin } from 'app/data/coins'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 

@@ -5,10 +5,9 @@ import { formatCoinAmount } from 'app/utils/formatCoinAmount'
 import { isTemporalSendEarnDepositEvent } from 'app/utils/zod/activity'
 import { useEffect, useMemo, useRef } from 'react'
 import { SectionList } from 'react-native'
-import { useSendEarnCoin } from '../providers/SendEarnProvider'
 import { useERC20AssetCoin } from '../params'
+import { useSendEarnCoin } from '../providers/SendEarnProvider'
 import { useEarnActivityFeed } from '../utils/useEarnActivityFeed'
-import { useQueryClient } from '@tanstack/react-query'
 
 export const EarningsBalance = () => {
   return (

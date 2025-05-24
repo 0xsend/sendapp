@@ -1,15 +1,15 @@
-import { Card, H4, Paragraph, Spinner, useMedia, XStack, YStack } from '@my/ui'
+import { H4, Paragraph, Spinner, XStack, YStack } from '@my/ui'
 import type { PostgrestError } from '@supabase/postgrest-js'
 import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
 import { ActivityDetails } from 'app/features/activity/ActivityDetails'
 import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
+import { useScrollDirection } from 'app/provider/scroll'
+import { useRootScreenParams } from 'app/routers/params'
 import type { Activity } from 'app/utils/zod/activity'
 import { type PropsWithChildren, useEffect, useMemo, useState } from 'react'
 import { SectionList } from 'react-native'
 import type { ZodError } from 'zod'
 import { useActivityFeed } from './utils/useActivityFeed'
-import { useScrollDirection } from 'app/provider/scroll'
-import { useRootScreenParams } from 'app/routers/params'
 
 export function RecentActivity() {
   const result = useActivityFeed()
