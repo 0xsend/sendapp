@@ -3,11 +3,23 @@ import { Fade, H2, LinkableButton, Paragraph, Spinner, Stack, XStack, YGroup, YS
 import { IconPlus, IconSlash } from 'app/components/icons'
 import { maxNumSendTags } from 'app/data/sendtags'
 import { useUser } from 'app/utils/useUser'
+import { useSendAccount } from 'app/utils/send-accounts'
 
 export function SendTagScreen() {
   const { tags, isLoading } = useUser()
-  const isFirstSendtagClaimable = Array.isArray(tags) && tags.length === 0
-  const confirmedTags = Array.isArray(tags) ? tags.filter((tag) => tag.status === 'confirmed') : []
+  const { data: sendAccount } = useSendAccount()
+  const isFirstSendtagClaimable = tags?.length === 0
+  const confirmedTags = tags?.filter((tag) => tag.status === 'confirmed')
+  const mainTagId = sendAccount?.main_tag_id
+
+  // Sort tags to put main tag first
+  const sortedTags = confirmedTags
+    ? [...confirmedTags].sort((a, b) => {
+        if (a?.id === mainTagId) return -1
+        if (b?.id === mainTagId) return 1
+        return 0
+      })
+    : []
 
   if (isLoading)
     return (
@@ -42,7 +54,7 @@ export function SendTagScreen() {
         <Paragraph fontSize={'$7'} fontWeight={'500'}>
           Registered [ {`${confirmedTags?.length || 0}/${maxNumSendTags}`} ]
         </Paragraph>
-        <SendtagList tags={confirmedTags} />
+        <SendtagList tags={sortedTags} mainTagId={mainTagId} />
       </YStack>
       <AddNewTagButton tags={confirmedTags} isFirstSendtagClaimable={isFirstSendtagClaimable} />
     </YStack>
@@ -59,13 +71,6 @@ function AddNewTagButton({
   if (tags && tags.length >= maxNumSendTags) {
     return null
   }
-
-  // Sort tags to put main tag first
-  const sortedTags = [...(allTags || [])].sort((a, b) => {
-    if (a?.id === mainTagId) return -1
-    if (b?.id === mainTagId) return 1
-    return 0
-  })
 
   return (
     <LinkableButton
@@ -93,7 +98,7 @@ function AddNewTagButton({
   )
 }
 
-function SendtagList({ tags }: { tags?: Tables<'tags'>[] }) {
+function SendtagList({ tags, mainTagId }: { tags?: Tables<'tags'>[]; mainTagId?: number | null }) {
   if (!tags || tags.length === 0) {
     return null
   }
@@ -109,7 +114,7 @@ function SendtagList({ tags }: { tags?: Tables<'tags'>[] }) {
       >
         {tags.map((tag) => (
           <YGroup.Item key={tag.name}>
-            <TagItem tag={tag} />
+            <TagItem tag={tag} isMain={tag.id === mainTagId} />
           </YGroup.Item>
         ))}
       </YGroup>
@@ -117,13 +122,24 @@ function SendtagList({ tags }: { tags?: Tables<'tags'>[] }) {
   )
 }
 
-function TagItem({ tag }: { tag: Tables<'tags'> }) {
+function TagItem({ tag, isMain }: { tag: Tables<'tags'>; isMain?: boolean }) {
   return (
     <XStack ai="center" gap="$3" p="$3.5" br={'$4'} $gtLg={{ p: '$5' }}>
       <IconSlash size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
-      <Paragraph size={'$8'} fontWeight={'500'} width={'80%'} testID={`confirmed-tag-${tag.name}`}>
+      <Paragraph
+        size={'$8'}
+        fontWeight={'500'}
+        width={'80%'}
+        testID={`confirmed-tag-${tag.name}`}
+        aria-label={`Tag ${tag.name}${isMain ? ' (Main)' : ''}`}
+      >
         {tag.name}
       </Paragraph>
+      {isMain && (
+        <Paragraph size={'$6'} color={'$primary'} fontWeight={'600'}>
+          Main
+        </Paragraph>
+      )}
     </XStack>
   )
 }
