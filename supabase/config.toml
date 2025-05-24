@@ -16,6 +16,13 @@ port = 54322
 # server_version;` on the remote database to check.
 major_version = 15
 
+[db.migrations]
+schema_paths = [
+  "./schemas/profiles.sql",
+  "./schemas/prod.sql",
+  "./schemas/*.sql",
+]
+
 [studio]
 # Port to use for Supabase Studio.
 port = 54323
