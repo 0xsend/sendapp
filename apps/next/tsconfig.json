@@ -6,7 +6,8 @@
     "paths": {
       "react-native": ["react-native-web"],
       "@my/wagmi": ["../../packages/wagmi/src"],
-      "@my/wagmi/*": ["../../packages/wagmi/src/*"]
+      "@my/wagmi/*": ["../../packages/wagmi/src/*"],
+      "next-app": ["./"]
     },
     "allowJs": true,
     "skipLibCheck": true,

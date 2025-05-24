@@ -11,7 +11,9 @@
     "serve": "NODE_ENV=production yarn with-env next start --port 8151",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
-    "with-env": "TAMAGUI_TARGET=web dotenv -e ../../.env -c --"
+    "with-env": "TAMAGUI_TARGET=web dotenv -e ../../.env -c --",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "@my/api": "workspace:*",
@@ -43,11 +45,16 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
     "@next/bundle-analyzer": "^13.4.19",
     "@next/eslint-plugin-next": "^14.0.4",
     "@tamagui/next-plugin": "^1.126.1",
+    "@testing-library/jest-dom": "^6.1.5",
+    "@testing-library/react": "^14.1.2",
     "@types/node": "^20",
     "dotenv-cli": "^7.3.0",
-    "eslint-config-next": "^14.0.4"
+    "eslint-config-next": "^14.0.4",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
   }
 }

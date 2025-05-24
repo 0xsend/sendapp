@@ -26,7 +26,8 @@
       "./packages/contracts/var/*.json",
       "**/tsconfig.json",
       "**/*.tsconfig.json",
-      "postgrestools.jsonc"
+      "postgrestools.jsonc",
+      "tamagui.css"
     ]
   },
   "organizeImports": {
