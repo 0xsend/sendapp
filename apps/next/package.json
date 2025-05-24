@@ -45,12 +45,12 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
     "@next/bundle-analyzer": "^13.4.19",
     "@next/eslint-plugin-next": "^14.0.4",
     "@tamagui/next-plugin": "^1.126.1",
     "@testing-library/jest-dom": "^6.1.5",
     "@testing-library/react": "^14.1.2",
-    "@types/jest": "^29.5.11",
     "@types/node": "^20",
     "dotenv-cli": "^7.3.0",
     "eslint-config-next": "^14.0.4",
