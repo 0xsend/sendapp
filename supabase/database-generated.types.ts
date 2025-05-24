@@ -1619,10 +1619,6 @@ export type Database = {
           user_id: string
         }[]
       }
-      fake_otp_credentials: {
-        Args: { phone: string }
-        Returns: undefined
-      }
       favourite_senders: {
         Args: Record<PropertyKey, never>
         Returns: Database["public"]["CompositeTypes"]["activity_feed_user"][]
