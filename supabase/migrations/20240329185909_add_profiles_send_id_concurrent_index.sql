@@ -1,0 +1,1 @@
+create index concurrently on profiles(send_id);

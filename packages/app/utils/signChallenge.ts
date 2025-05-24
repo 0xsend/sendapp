@@ -1,6 +1,15 @@
 import { sendAccountAbi } from '@my/wagmi'
 import { base64urlnopad } from '@scure/base'
 import { get, isSupported } from 'react-native-passkeys'
+import type {
+  AuthenticationExtensionsLargeBlobInputs,
+  AuthenticationResponseJSON,
+  PublicKeyCredentialCreationOptionsJSON,
+  PublicKeyCredentialRequestOptionsJSON,
+  RegistrationResponseJSON,
+  PublicKeyCredentialDescriptorJSON,
+} from 'react-native-passkeys/build/ReactNativePasskeys.types'
+
 import { bytesToHex, encodeAbiParameters, getAbiItem, type Hex, hexToBytes, isHex } from 'viem'
 import { asciiToByteArray } from './asciiToByteArray'
 import { assert } from './assert'

@@ -37,22 +37,7 @@ export type Database = {
           id?: number
           to_user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "activity_from_user_id_fkey"
-            columns: ["from_user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "activity_to_user_id_fkey"
-            columns: ["to_user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       affiliate_stats: {
         Row: {
@@ -102,15 +87,7 @@ export type Database = {
           created_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "chain_addresses_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       challenges: {
         Row: {
@@ -179,13 +156,6 @@ export type Database = {
             columns: ["distribution_id"]
             isOneToOne: false
             referencedRelation: "distributions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "distribution_shares_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -275,13 +245,6 @@ export type Database = {
             columns: ["distribution_id"]
             isOneToOne: false
             referencedRelation: "distributions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "distribution_verifications_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -390,7 +353,7 @@ export type Database = {
           referral_code: string | null
           send_id: number
           x_username: string | null
-          tags: unknown | null
+          tags: Database["public"]["Tables"]["tags"]["Row"] | null
         }
         Insert: {
           about?: string | null
@@ -414,15 +377,7 @@ export type Database = {
           send_id?: number
           x_username?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "profiles_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       receipts: {
         Row: {
@@ -446,15 +401,7 @@ export type Database = {
           id?: number
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "receipts_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       referrals: {
         Row: {
@@ -820,15 +767,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "send_accounts_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       send_earn_create: {
         Row: {
@@ -972,7 +911,9 @@ export type Database = {
           src_name: string
           tx_hash: string
           tx_idx: number
-          send_earn_affiliate_vault: unknown | null
+          send_earn_affiliate_vault:
+            | Database["public"]["Tables"]["send_earn_create"]["Row"]
+            | null
         }
         Insert: {
           abi_idx: number
@@ -1514,15 +1455,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["tag_status"]
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "tags_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       webauthn_credentials: {
         Row: {
@@ -1567,15 +1500,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "webauthn_credentials_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
     }
     Views: {
@@ -1638,58 +1563,31 @@ export type Database = {
     }
     Functions: {
       calculate_and_insert_send_ceiling_verification: {
-        Args: {
-          distribution_number: number
-        }
+        Args: { distribution_number: number }
         Returns: undefined
       }
-      citext:
-        | {
-            Args: {
-              "": boolean
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              "": string
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              "": unknown
-            }
-            Returns: string
-          }
+      citext: {
+        Args: { "": boolean } | { "": string } | { "": unknown }
+        Returns: string
+      }
       citext_hash: {
-        Args: {
-          "": string
-        }
+        Args: { "": string }
         Returns: number
       }
       citextin: {
-        Args: {
-          "": unknown
-        }
+        Args: { "": unknown }
         Returns: string
       }
       citextout: {
-        Args: {
-          "": string
-        }
+        Args: { "": string }
         Returns: unknown
       }
       citextrecv: {
-        Args: {
-          "": unknown
-        }
+        Args: { "": unknown }
         Returns: string
       }
       citextsend: {
-        Args: {
-          "": string
-        }
+        Args: { "": string }
         Returns: string
       }
       confirm_tags: {
@@ -1702,16 +1600,14 @@ export type Database = {
       }
       create_send_account: {
         Args: {
-          send_account: unknown
-          webauthn_credential: unknown
+          send_account: Database["public"]["Tables"]["send_accounts"]["Row"]
+          webauthn_credential: Database["public"]["Tables"]["webauthn_credentials"]["Row"]
           key_slot: number
         }
         Returns: Json
       }
       distribution_hodler_addresses: {
-        Args: {
-          distribution_id: number
-        }
+        Args: { distribution_id: number }
         Returns: {
           address: string
           chain_id: number
@@ -1722,12 +1618,6 @@ export type Database = {
           updated_at: string
           user_id: string
         }[]
-      }
-      fake_otp_credentials: {
-        Args: {
-          phone: string
-        }
-        Returns: undefined
       }
       favourite_senders: {
         Args: Record<PropertyKey, never>
@@ -1770,9 +1660,7 @@ export type Database = {
         Returns: number
       }
       get_user_jackpot_summary: {
-        Args: {
-          num_runs: number
-        }
+        Args: { num_runs: number }
         Returns: {
           jackpot_run_id: number
           jackpot_block_num: number
@@ -1792,9 +1680,7 @@ export type Database = {
         }
       }
       insert_create_passkey_verifications: {
-        Args: {
-          distribution_num: number
-        }
+        Args: { distribution_num: number }
         Returns: undefined
       }
       insert_send_slash: {
@@ -1806,33 +1692,23 @@ export type Database = {
         Returns: undefined
       }
       insert_send_streak_verifications: {
-        Args: {
-          distribution_num: number
-        }
+        Args: { distribution_num: number }
         Returns: undefined
       }
       insert_send_verifications: {
-        Args: {
-          distribution_num: number
-        }
+        Args: { distribution_num: number }
         Returns: undefined
       }
       insert_tag_referral_verifications: {
-        Args: {
-          distribution_num: number
-        }
+        Args: { distribution_num: number }
         Returns: undefined
       }
       insert_tag_registration_verifications: {
-        Args: {
-          distribution_num: number
-        }
+        Args: { distribution_num: number }
         Returns: undefined
       }
       insert_total_referral_verifications: {
-        Args: {
-          distribution_num: number
-        }
+        Args: { distribution_num: number }
         Returns: undefined
       }
       insert_verification_value: {
@@ -1877,9 +1753,7 @@ export type Database = {
         }[]
       }
       query_webauthn_credentials_by_phone: {
-        Args: {
-          phone_number: string
-        }
+        Args: { phone_number: string }
         Returns: {
           attestation_object: string
           created_at: string
@@ -1900,9 +1774,7 @@ export type Database = {
         Returns: Database["public"]["CompositeTypes"]["activity_feed_user"][]
       }
       referrer_lookup: {
-        Args: {
-          referral_code?: string
-        }
+        Args: { referral_code?: string }
         Returns: {
           referrer: Database["public"]["CompositeTypes"]["profile_lookup_result"]
           new_referrer: Database["public"]["CompositeTypes"]["profile_lookup_result"]
@@ -1911,7 +1783,7 @@ export type Database = {
       send_accounts_add_webauthn_credential: {
         Args: {
           send_account_id: string
-          webauthn_credential: unknown
+          webauthn_credential: Database["public"]["Tables"]["webauthn_credentials"]["Row"]
           key_slot: number
         }
         Returns: {
@@ -1931,7 +1803,7 @@ export type Database = {
       }
       send_earn_affiliate_vault: {
         Args: {
-          "": unknown
+          "": Database["public"]["Tables"]["send_earn_new_affiliate"]["Row"]
         }
         Returns: {
           abi_idx: number
@@ -1957,9 +1829,7 @@ export type Database = {
         }[]
       }
       sum_qualification_sends: {
-        Args: {
-          distribution_number: number
-        }
+        Args: { distribution_number: number }
         Returns: {
           user_id: string
           amount: number
@@ -1967,11 +1837,7 @@ export type Database = {
         }[]
       }
       tag_search: {
-        Args: {
-          query: string
-          limit_val: number
-          offset_val: number
-        }
+        Args: { query: string; limit_val: number; offset_val: number }
         Returns: {
           send_id_matches: Database["public"]["CompositeTypes"]["tag_search_result"][]
           tag_matches: Database["public"]["CompositeTypes"]["tag_search_result"][]
@@ -1979,9 +1845,7 @@ export type Database = {
         }[]
       }
       tags: {
-        Args: {
-          "": unknown
-        }
+        Args: { "": Database["public"]["Tables"]["profiles"]["Row"] }
         Returns: {
           created_at: string
           name: string
@@ -1996,14 +1860,14 @@ export type Database = {
       update_distribution_shares: {
         Args: {
           distribution_id: number
-          shares: unknown[]
+          shares: Database["public"]["Tables"]["distribution_shares"]["Row"][]
         }
         Returns: undefined
       }
       update_referral_verifications: {
         Args: {
           distribution_id: number
-          shares: unknown[]
+          shares: Database["public"]["Tables"]["distribution_shares"]["Row"][]
         }
         Returns: undefined
       }
@@ -2035,32 +1899,32 @@ export type Database = {
     }
     CompositeTypes: {
       activity_feed_user: {
-        id: string
-        name: string
-        avatar_url: string
-        send_id: number
-        tags: unknown
+        id: string | null
+        name: string | null
+        avatar_url: string | null
+        send_id: number | null
+        tags: string[] | null
       }
       profile_lookup_result: {
-        id: string
-        avatar_url: string
-        name: string
-        about: string
-        refcode: string
-        x_username: string
-        birthday: string
-        tag: string
-        address: string
-        chain_id: number
-        is_public: boolean
-        sendid: number
-        all_tags: unknown
+        id: string | null
+        avatar_url: string | null
+        name: string | null
+        about: string | null
+        refcode: string | null
+        x_username: string | null
+        birthday: string | null
+        tag: string | null
+        address: string | null
+        chain_id: number | null
+        is_public: boolean | null
+        sendid: number | null
+        all_tags: string[] | null
       }
       tag_search_result: {
-        avatar_url: string
-        tag_name: string
-        send_id: number
-        phone: string
+        avatar_url: string | null
+        tag_name: string | null
+        send_id: number | null
+        phone: string | null
       }
     }
   }
@@ -2145,15 +2009,7 @@ export type Database = {
           vault?: string | null
           workflow_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "fk_activity"
-            columns: ["activity_id"]
-            isOneToOne: false
-            referencedRelation: "activity"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
     }
     Views: {
@@ -2177,25 +2033,29 @@ export type Database = {
   }
 }
 
+type DefaultSchema = Database[Extract<keyof Database, "public">]
+
 export type Tables<
-  PublicTableNameOrOptions extends
-    | keyof (Database["public"]["Tables"] & Database["public"]["Views"])
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-        Database[PublicTableNameOrOptions["schema"]]["Views"])
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-      Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : PublicTableNameOrOptions extends keyof (Database["public"]["Tables"] &
-        Database["public"]["Views"])
-    ? (Database["public"]["Tables"] &
-        Database["public"]["Views"])[PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -2203,20 +2063,22 @@ export type Tables<
     : never
 
 export type TablesInsert<
-  PublicTableNameOrOptions extends
-    | keyof Database["public"]["Tables"]
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
-    ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -2224,20 +2086,22 @@ export type TablesInsert<
     : never
 
 export type TablesUpdate<
-  PublicTableNameOrOptions extends
-    | keyof Database["public"]["Tables"]
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
-    ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -2245,15 +2109,72 @@ export type TablesUpdate<
     : never
 
 export type Enums<
-  PublicEnumNameOrOptions extends
-    | keyof Database["public"]["Enums"]
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
     | { schema: keyof Database },
-  EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = PublicEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : PublicEnumNameOrOptions extends keyof Database["public"]["Enums"]
-    ? Database["public"]["Enums"][PublicEnumNameOrOptions]
+> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof Database },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  public: {
+    Enums: {
+      key_type_enum: ["ES256"],
+      lookup_type_enum: ["sendid", "tag", "refcode", "address", "phone"],
+      tag_status: ["pending", "confirmed"],
+      temporal_status: [
+        "initialized",
+        "submitted",
+        "sent",
+        "confirmed",
+        "failed",
+      ],
+      verification_type: [
+        "tag_registration",
+        "tag_referral",
+        "create_passkey",
+        "send_ten",
+        "send_one_hundred",
+        "total_tag_referrals",
+        "send_streak",
+        "send_ceiling",
+      ],
+      verification_value_mode: ["individual", "aggregate"],
+    },
+  },
+  temporal: {
+    Enums: {
+      transfer_status: [
+        "initialized",
+        "submitted",
+        "sent",
+        "confirmed",
+        "failed",
+        "cancelled",
+      ],
+    },
+  },
+} as const
 

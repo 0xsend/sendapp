@@ -54,6 +54,7 @@
     "@babel/runtime": "^7.26.10",
     "@manypkg/cli": "^0.19.1",
     "@nderscore/tamagui-typescript-plugin": "^0.6.0",
+    "@typescript/native-preview": "latest",
     "check-dependency-version-consistency": "^3.0.3",
     "eslint": "^8.46.0",
     "node-gyp": "^9.3.1",
@@ -63,6 +64,7 @@
   "packageManager": "yarn@4.3.1",
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
+    "@postgrestools/postgrestools": "^0.6.1",
     "dotenv-cli": "^7.3.0",
     "lefthook": "^1.5.5",
     "zx": "^8.1.2"

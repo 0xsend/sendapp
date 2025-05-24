@@ -1,8 +1,3 @@
-CREATE INDEX CONCURRENTLY ON temporal.send_account_transfers(workflow_id, created_at desc);
-CREATE INDEX CONCURRENTLY ON temporal.send_account_transfers(workflow_id, updated_at desc);
-CREATE INDEX CONCURRENTLY ON temporal.send_account_transfers(user_id, workflow_id);
-CREATE INDEX CONCURRENTLY ON temporal.send_account_transfers(status, created_at_block_num desc);
-
 -- When a send_account_transfer is inserted, delete older temporal_send_account_transfers
 -- We know they are indexed if its inserting newer blocks.
 -- This prevents duplicate activities once a transfer is completed.
