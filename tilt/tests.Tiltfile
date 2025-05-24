@@ -251,6 +251,46 @@ local_resource(
 )
 
 local_resource(
+    "next:test",
+    """
+    echo "Running with $MAX_WORKERS workers" && yarn workspace next-app test --maxWorkers=$MAX_WORKERS
+    """,
+    allow_parallel = True,
+    env = {"MAX_WORKERS": max_workers},
+    labels = labels,
+    resource_deps = [
+        "yarn:install",
+        "supabase:generate",
+        "wagmi:generate",
+        "ui:build",
+        "ui:generate-theme",
+    ],
+    deps = files_matching(
+        os.path.join(
+            config.main_dir,
+            "apps",
+            "next",
+        ),
+        lambda f: f.endswith(".ts") or f.endswith(".tsx"),
+    ),
+)
+
+cmd_button(
+    "next:test:update-snapshots",
+    argv = [
+        "yarn",
+        "workspace",
+        "next-app",
+        "test",
+        "-u",
+    ],
+    icon_name = "update",
+    location = location.RESOURCE,
+    resource = "next:test",
+    text = "update snapshots",
+)
+
+local_resource(
     name = "unit-tests",
     allow_parallel = True,
     cmd = "echo 🥳",
@@ -262,6 +302,7 @@ local_resource(
         "supabase:test",
         "contracts:test",
         "workers:test",
+        "next:test",
     ],
 )
 
