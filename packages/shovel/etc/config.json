@@ -766,6 +766,196 @@
           "start": "$BASE_BLOCK_START"
         }
       ]
+    },
+    {
+      "name": "send_check_created",
+      "enabled": true,
+      "block": [
+        {
+          "name": "chain_id",
+          "column": "chain_id"
+        },
+        {
+          "name": "block_time",
+          "column": "block_time"
+        },
+        {
+          "name": "tx_hash",
+          "column": "tx_hash"
+        },
+        {
+          "name": "log_addr",
+          "column": "log_addr",
+          "filter_op": "contains",
+          "filter_arg": [
+            "0xe1f30594e663400EeA4e51e2B5603204cfE81712"
+          ]
+        }
+      ],
+      "event": {
+        "type": "event",
+        "anonymous": false,
+        "inputs": [
+          {
+            "name": "token",
+            "type": "address",
+            "indexed": false,
+            "column": "token"
+          },
+          {
+            "name": "amount",
+            "type": "uint256",
+            "indexed": false,
+            "column": "amount"
+          },
+          {
+            "name": "from",
+            "type": "address",
+            "indexed": false,
+            "column": "from"
+          }
+        ],
+        "name": "CheckCreated"
+      },
+      "table": {
+        "name": "send_check_created",
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric"
+          },
+          {
+            "name": "block_time",
+            "type": "numeric"
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea"
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea"
+          },
+          {
+            "name": "token",
+            "type": "bytea"
+          },
+          {
+            "name": "amount",
+            "type": "numeric"
+          },
+          {
+            "name": "from",
+            "type": "bytea"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START"
+        }
+      ]
+    },
+    {
+      "name": "send_check_claimed",
+      "enabled": true,
+      "block": [
+        {
+          "name": "chain_id",
+          "column": "chain_id"
+        },
+        {
+          "name": "block_time",
+          "column": "block_time"
+        },
+        {
+          "name": "tx_hash",
+          "column": "tx_hash"
+        },
+        {
+          "name": "log_addr",
+          "column": "log_addr",
+          "filter_op": "contains",
+          "filter_arg": [
+            "0xe1f30594e663400EeA4e51e2B5603204cfE81712"
+          ]
+        }
+      ],
+      "event": {
+        "type": "event",
+        "anonymous": false,
+        "inputs": [
+          {
+            "name": "token",
+            "type": "address",
+            "indexed": false,
+            "column": "token"
+          },
+          {
+            "name": "amount",
+            "type": "uint256",
+            "indexed": false,
+            "column": "amount"
+          },
+          {
+            "name": "from",
+            "type": "address",
+            "indexed": false,
+            "column": "from"
+          },
+          {
+            "name": "redeemer",
+            "type": "address",
+            "indexed": false,
+            "column": "redeemer"
+          }
+        ],
+        "name": "CheckClaimed"
+      },
+      "table": {
+        "name": "send_check_claimed",
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric"
+          },
+          {
+            "name": "block_time",
+            "type": "numeric"
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea"
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea"
+          },
+          {
+            "name": "token",
+            "type": "bytea"
+          },
+          {
+            "name": "amount",
+            "type": "numeric"
+          },
+          {
+            "name": "from",
+            "type": "bytea"
+          },
+          {
+            "name": "redeemer",
+            "type": "bytea"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START"
+        }
+      ]
     }
   ]
 }
