@@ -294,28 +294,6 @@ $$;
 ALTER FUNCTION "private"."filter_send_earn_withdraw_with_no_send_account_created"() OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "private"."generate_referral_event_id"("referrer_id" "uuid", "tags" "text"[]) RETURNS "text"
-    LANGUAGE "sql" IMMUTABLE
-    AS $$
-select encode(sha256(referrer_id::text::bytea), 'hex') || '/' ||
-       array_to_string(array(select distinct unnest(tags) order by 1), ',');
-$$;
-
-
-ALTER FUNCTION "private"."generate_referral_event_id"("referrer_id" "uuid", "tags" "text"[]) OWNER TO "postgres";
-
-
-CREATE OR REPLACE FUNCTION "private"."generate_referral_event_id"("referrer_id" "uuid", "referred_id" "uuid") RETURNS "text"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    SET "search_path" TO 'public'
-    AS $$
-BEGIN
-  RETURN sha256(decode(replace(referrer_id::text, '-', '') || replace(referred_id::text, '-', ''), 'hex'))::text;
-END;
-$$;
-
-
-ALTER FUNCTION "private"."generate_referral_event_id"("referrer_id" "uuid", "referred_id" "uuid") OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "private"."insert_referral_on_create"() RETURNS "trigger"
@@ -3287,15 +3265,6 @@ $$;
 ALTER FUNCTION "temporal"."temporal_transfer_before_insert"() OWNER TO "postgres";
 
 
-CREATE TABLE IF NOT EXISTS "private"."leaderboard_referrals_all_time" (
-    "user_id" "uuid" NOT NULL,
-    "referrals" integer DEFAULT 0,
-    "rewards_usdc" numeric DEFAULT 0,
-    "updated_at" timestamp with time zone DEFAULT "now"()
-);
-
-
-ALTER TABLE "private"."leaderboard_referrals_all_time" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "public"."activity" (
@@ -3387,16 +3356,6 @@ ALTER TABLE "public"."chain_addresses" OWNER TO "postgres";
 
 
 
-CREATE TABLE IF NOT EXISTS "public"."referrals" (
-    "referrer_id" "uuid" NOT NULL,
-    "referred_id" "uuid" NOT NULL,
-    "id" integer NOT NULL,
-    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
-    CONSTRAINT "referrals_different_referrer_and_referred" CHECK (("referrer_id" <> "referred_id"))
-);
-
-
-ALTER TABLE "public"."referrals" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "public"."send_account_credentials" (

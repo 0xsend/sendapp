@@ -18,11 +18,13 @@ major_version = 15
 
 [db.migrations]
 schema_paths = [
+  "./schemas/challenges.sql",
   "./schemas/profiles.sql",
+  "./schemas/webauthn_credentials.sql", 
   "./schemas/send_accounts.sql",
-  "./schemas/webauthn_credentials.sql",
-  "./schemas/challenges.sql", 
+  "./schemas/chain_addresses.sql",
   "./schemas/tags.sql",
+  "./schemas/referrals.sql",
   "./schemas/prod.sql",
   "./schemas/*.sql",
 ]
