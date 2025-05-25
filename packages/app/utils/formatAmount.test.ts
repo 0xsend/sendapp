@@ -114,9 +114,10 @@ describe('Additional scenarios', () => {
 
   it('should handle whole numbers without floating point precision errors', () => {
     // Test the specific sendpot issue: 390 tickets * 30 SEND = 11700 SEND
-    expect(formatAmount('11700')).toBe('11,700')
-    expect(formatAmount(11700)).toBe('11,700')
-    expect(formatAmount('11700.0')).toBe('11,700')
+    // Using maxIntegers=10 to match the sendpot BuyTicketsScreen usage
+    expect(formatAmount('11700', 10)).toBe('11,700')
+    expect(formatAmount(11700, 10)).toBe('11,700')
+    expect(formatAmount('11700.0', 10)).toBe('11,700')
   })
 })
 
