@@ -1,4 +1,106 @@
-# CLAUDE.md - Instructions for Claude
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Architecture Overview
+
+Send is a next-generation payments app built as a monorepo with cross-platform support (React Native + Next.js). The architecture consists of:
+
+### Tech Stack
+- **Monorepo**: Yarn workspaces with Turborepo
+- **Cross-platform**: Tamagui for shared styles, Solito for routing
+- **Database/Auth**: Supabase (PostgreSQL + Auth)
+- **Blockchain**: Foundry, Wagmi, Viem, Base chain
+- **Testing**: Jest (packages), pgTAP (Supabase), Playwright (E2E)
+- **Linting**: Biome
+- **Development**: Tilt for orchestration
+
+### Key Directories
+- `/apps/next`: Next.js web app
+- `/apps/expo`: React Native mobile app
+- `/apps/distributor`: SEND token distribution service
+- `/packages/app`: Shared app logic and components
+- `/packages/ui`: Tamagui-based UI components
+- `/packages/contracts`: Smart contracts (Foundry)
+- `/supabase`: Database schema, migrations, and tests
+
+## Common Commands
+
+### Development
+```bash
+# Start all services with Tilt (recommended)
+tilt up
+
+# Start specific services only
+tilt up next:web  # Just the Next.js app
+
+# Stop all services
+tilt down
+
+# Web development (without Tilt)
+yarn web
+
+# Native development
+yarn native
+```
+
+### Testing
+```bash
+# Run all tests
+yarn test
+
+# Package-specific tests
+cd packages/<package-name> && yarn test
+
+# Supabase tests (requires local instance)
+yarn supabase test
+
+# E2E tests (requires running Next.js app)
+cd packages/playwright && yarn playwright test
+
+# Run a single test file
+cd packages/<package-name> && yarn test path/to/test.test.ts
+```
+
+### Linting & Formatting
+```bash
+# Check code with Biome
+npx @biomejs/biome check
+
+# Fix issues automatically
+npx @biomejs/biome check . --write
+
+# Run linting via Turbo
+yarn lint
+yarn lint:fix
+```
+
+### Database
+```bash
+# Start local Supabase
+cd supabase && yarn supabase start
+
+# Reset database (required after migration changes)
+cd supabase && yarn supabase reset
+
+# Generate TypeScript types
+cd supabase && yarn generate
+
+# Create a new migration
+cd supabase && yarn migration:diff <migration_name>
+```
+
+### Smart Contracts
+```bash
+# Build contracts
+yarn contracts build
+
+# Run contract tests
+yarn contracts test
+
+# Deploy to local Anvil
+yarn contracts forge script <script_name> --fork-url http://localhost:8546 --broadcast
+```
 
 ## Development Process
 
@@ -303,3 +405,11 @@ When providing information about the current state of the project, always includ
    - Coding style preferences mentioned by the user
    - Specific approaches requested by the user
    - Priority areas identified by the user
+
+# important-instruction-reminders
+Do what has been asked; nothing more, nothing less.
+NEVER create files unless they're absolutely necessary for achieving your goal.
+ALWAYS prefer editing an existing file to creating a new one.
+ALWAYS proactively create or update documentation files (*.md) or README files.
+ALWAYS ask before removing files or code.
+ALWAYS remove unnecessary files.
