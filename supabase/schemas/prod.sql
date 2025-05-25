@@ -844,262 +844,13 @@ $$;
 ALTER FUNCTION "public"."chain_addresses_after_insert"() OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "public"."confirm_tags"("tag_names" "public"."citext"[], "event_id" "text", "referral_code_input" "text") RETURNS "void"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    SET "search_path" TO 'public'
-    AS $_$
-DECLARE
-  tag_owner_ids uuid[];
-  distinct_user_ids int;
-  tag_owner_id uuid;
-  referrer_id uuid;
-  _event_id alias FOR $2;
-BEGIN
-  -- Check if the tags exist and fetch their owners.
-  SELECT
-    array_agg(user_id) INTO tag_owner_ids
-  FROM
-    public.tags
-  WHERE
-    name = ANY (tag_names)
-    AND status = 'pending'::public.tag_status;
-  -- If any of the tags do not exist or are not in pending status, throw an error.
-  IF array_length(tag_owner_ids, 1) <> array_length(tag_names, 1) THEN
-    RAISE EXCEPTION 'One or more tags do not exist or are not in pending status.';
-  END IF;
-  -- Check if all tags belong to the same user
-  SELECT
-    count(DISTINCT user_id) INTO distinct_user_ids
-  FROM
-    unnest(tag_owner_ids) AS user_id;
-  IF distinct_user_ids <> 1 THEN
-    RAISE EXCEPTION 'Tags must belong to the same user.';
-  END IF;
-  -- Fetch single user_id
-  SELECT DISTINCT
-    user_id INTO tag_owner_id
-  FROM
-    unnest(tag_owner_ids) AS user_id;
-  IF event_id IS NULL OR event_id = '' THEN
-    RAISE EXCEPTION 'Receipt event ID is required for paid tags.';
-  END IF;
-  -- Ensure event_id matches the sender
-  IF (
-    SELECT
-      count(DISTINCT scr.sender)
-    FROM
-      public.sendtag_checkout_receipts scr
-      JOIN send_accounts sa ON decode(substring(sa.address, 3), 'hex') = scr.sender
-    WHERE
-      scr.event_id = _event_id AND sa.user_id = tag_owner_id) <> 1 THEN
-    RAISE EXCEPTION 'Receipt event ID does not match the sender';
-  END IF;
-  -- save receipt event_id
-  INSERT INTO public.receipts(
-    event_id,
-    user_id)
-  VALUES (
-    _event_id,
-    tag_owner_id);
-  -- Associate the tags with the onchain event
-  INSERT INTO public.tag_receipts(
-    tag_name,
-    event_id)
-  SELECT
-    unnest(tag_names),
-    event_id;
-  -- Confirm the tags
-  UPDATE
-    public.tags
-  SET
-    status = 'confirmed'::public.tag_status
-  WHERE
-    name = ANY (tag_names)
-    AND status = 'pending'::public.tag_status;
-  -- Create referral code redemption (only if it doesn't exist)
-  IF referral_code_input IS NOT NULL AND referral_code_input <> '' THEN
-    SELECT
-      id INTO referrer_id
-    FROM
-      public.profiles
-    WHERE
-      referral_code = referral_code_input;
-    IF referrer_id IS NOT NULL AND referrer_id <> tag_owner_id THEN
-      -- Referrer cannot be the tag owner.
-      -- Check if a referral already exists for this user
-      IF NOT EXISTS (
-        SELECT
-          1
-        FROM
-          public.referrals
-        WHERE
-          referred_id = tag_owner_id) THEN
-      -- Insert only one referral for the user
-      INSERT INTO public.referrals(
-        referrer_id,
-        referred_id)
-      SELECT
-        referrer_id,
-        tag_owner_id
-      LIMIT 1;
-    END IF;
-  END IF;
-END IF;
-END;
-$_$;
-
-
-ALTER FUNCTION "public"."confirm_tags"("tag_names" "public"."citext"[], "event_id" "text", "referral_code_input" "text") OWNER TO "postgres";
-
 SET default_tablespace = '';
 
 SET default_table_access_method = "heap";
 
 
-CREATE TABLE IF NOT EXISTS "public"."send_accounts" (
-    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
-    "user_id" "uuid" DEFAULT "auth"."uid"() NOT NULL,
-    "address" "public"."citext" NOT NULL,
-    "chain_id" integer NOT NULL,
-    "init_code" "bytea" NOT NULL,
-    "created_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    "updated_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    "deleted_at" timestamp with time zone,
-    CONSTRAINT "chain_addresses_address_check" CHECK ((("length"(("address")::"text") = 42) AND ("address" OPERATOR("public".~) '^0x[A-Fa-f0-9]{40}$'::"public"."citext")))
-);
 
 
-ALTER TABLE "public"."send_accounts" OWNER TO "postgres";
-
-
-CREATE TABLE IF NOT EXISTS "public"."webauthn_credentials" (
-    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
-    "name" "text" NOT NULL,
-    "display_name" "text" NOT NULL,
-    "raw_credential_id" "bytea" NOT NULL,
-    "user_id" "uuid" DEFAULT "auth"."uid"() NOT NULL,
-    "public_key" "bytea" NOT NULL,
-    "key_type" "public"."key_type_enum" NOT NULL,
-    "sign_count" bigint NOT NULL,
-    "attestation_object" "bytea" NOT NULL,
-    "created_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    "updated_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    "deleted_at" timestamp with time zone,
-    CONSTRAINT "webauthn_credentials_sign_count_check" CHECK (("sign_count" >= 0))
-);
-
-
-ALTER TABLE "public"."webauthn_credentials" OWNER TO "postgres";
-
-
-CREATE OR REPLACE FUNCTION "public"."create_send_account"("send_account" "public"."send_accounts", "webauthn_credential" "public"."webauthn_credentials", "key_slot" integer) RETURNS "json"
-    LANGUAGE "plpgsql"
-    AS $_$
-declare _send_account send_accounts;
-
-_webauthn_credential webauthn_credentials;
-
-begin --
-
-insert into webauthn_credentials (
-    name,
-    display_name,
-    raw_credential_id,
-    public_key,
-    sign_count,
-    attestation_object,
-    key_type
-  )
-values (
-    webauthn_credential.name,
-    webauthn_credential.display_name,
-    webauthn_credential.raw_credential_id,
-    webauthn_credential.public_key,
-    webauthn_credential.sign_count,
-    webauthn_credential.attestation_object,
-    webauthn_credential.key_type
-  )
-returning * into _webauthn_credential;
-
-insert into send_accounts (address, chain_id, init_code)
-values (
-    send_account.address,
-    send_account.chain_id,
-    send_account.init_code
-  ) on conflict (address, chain_id) do
-update
-set init_code = excluded.init_code
-returning * into _send_account;
-
-insert into send_account_credentials (account_id, credential_id, key_slot)
-values (
-    _send_account.id,
-    _webauthn_credential.id,
-    $3
-  );
-
-return json_build_object(
-  'send_account',
-  _send_account,
-  'webauthn_credential',
-  _webauthn_credential
-);
-
-end;
-
-$_$;
-
-
-ALTER FUNCTION "public"."create_send_account"("send_account" "public"."send_accounts", "webauthn_credential" "public"."webauthn_credentials", "key_slot" integer) OWNER TO "postgres";
-
-
-CREATE OR REPLACE FUNCTION "public"."distribution_hodler_addresses"("distribution_id" integer) RETURNS SETOF "public"."send_accounts"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    SET "search_path" TO 'public'
-    AS $_$
-BEGIN
-  -- get the distribution
-  IF(
-    SELECT
-      1
-    FROM
-      distributions
-    WHERE
-      id = distribution_id
-    LIMIT 1) IS NULL THEN
-    RAISE EXCEPTION 'Distribution not found.';
-  END IF;
-  -- return the hodler addresses that had no sells during the qualification period and have verifications
-  RETURN query WITH sellers AS(
-    -- find sellers during the qualification period
-    SELECT
-      lower(concat('0x', encode(f, 'hex')))::citext AS seller
-    FROM
-      distributions
-      JOIN send_token_transfers ON to_timestamp(send_token_transfers.block_time) >= distributions.qualification_start
-        AND to_timestamp(send_token_transfers.block_time) <= distributions.qualification_end
-      JOIN send_liquidity_pools ON send_liquidity_pools.address = send_token_transfers.t
-    WHERE
-      distributions.id = $1)
-    -- the hodler addresses that had no sells during the qualification period and have verifications
-    SELECT DISTINCT
-      send_accounts.*
-    FROM
-      distributions
-      JOIN distribution_verifications ON distribution_verifications.distribution_id = distributions.id
-      JOIN send_accounts ON send_accounts.user_id = distribution_verifications.user_id
-    WHERE
-      distributions.id = $1
-      AND send_accounts.address NOT IN(
-        SELECT
-          seller
-        FROM
-          sellers);
-END;
-$_$;
-
-
-ALTER FUNCTION "public"."distribution_hodler_addresses"("distribution_id" integer) OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "public"."favourite_senders"() RETURNS SETOF "public"."activity_feed_user"
@@ -1335,37 +1086,6 @@ $$;
 ALTER FUNCTION "public"."handle_new_user"() OWNER TO "postgres";
 
 
-CREATE TABLE IF NOT EXISTS "public"."challenges" (
-    "id" integer NOT NULL,
-    "challenge" "bytea" DEFAULT "extensions"."gen_random_bytes"(64) NOT NULL,
-    "created_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    "expires_at" timestamp with time zone DEFAULT (CURRENT_TIMESTAMP + '00:15:00'::interval) NOT NULL
-);
-
-
-ALTER TABLE "public"."challenges" OWNER TO "postgres";
-
-
-CREATE OR REPLACE FUNCTION "public"."insert_challenge"() RETURNS "public"."challenges"
-    LANGUAGE "plpgsql"
-    AS $$
-    #variable_conflict use_column
-    declare
-            _created timestamptz := current_timestamp;
-            _expires timestamptz := _created + interval '15 minute';
-            _new_challenge challenges;
-    begin
-        INSERT INTO "public"."challenges"
-        (created_at, expires_at)
-        VALUES (_created, _expires)
-        RETURNING * into _new_challenge;
-
-        return _new_challenge;
-    end
-$$;
-
-
-ALTER FUNCTION "public"."insert_challenge"() OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "public"."insert_create_passkey_verifications"("distribution_num" integer) RETURNS "void"
@@ -1771,54 +1491,6 @@ $$;
 ALTER FUNCTION "public"."insert_total_referral_verifications"("distribution_num" integer) OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "public"."insert_verification_create_passkey"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    SET "search_path" TO 'public'
-    AS $$
-DECLARE
-  curr_distribution_id bigint;
-BEGIN
-  -- Get the current distribution id
-  SELECT
-    id INTO curr_distribution_id
-  FROM
-    distributions
-  WHERE
-    qualification_start <= now()
-    AND qualification_end >= now()
-  ORDER BY
-    qualification_start DESC
-  LIMIT 1;
-  -- Insert verification for create_passkey
-  IF curr_distribution_id IS NOT NULL AND NOT EXISTS (
-    SELECT
-      1
-    FROM
-      public.distribution_verifications
-    WHERE
-      user_id = NEW.user_id AND distribution_id = curr_distribution_id AND type = 'create_passkey'::public.verification_type) THEN
-    INSERT INTO public.distribution_verifications(
-      distribution_id,
-      user_id,
-      type,
-      metadata,
-      created_at -- Removed the extra comma here
-)
-    VALUES (
-      curr_distribution_id,
-      NEW.user_id,
-      'create_passkey' ::public.verification_type,
-      jsonb_build_object(
-        'account_created_at', NEW.created_at),
-      NEW.created_at);
-  END IF;
-  RETURN NEW;
-END;
-$$;
-
-
-ALTER FUNCTION "public"."insert_verification_create_passkey"() OWNER TO "postgres";
-
 
 CREATE OR REPLACE FUNCTION "public"."insert_verification_referral"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
@@ -2220,58 +1892,6 @@ $$;
 ALTER FUNCTION "public"."insert_verification_sends"() OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "public"."insert_verification_tag_registration"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    SET "search_path" TO 'public'
-    AS $$
-declare curr_distribution_id bigint;
-
-begin --
-    -- check if tag is confirmed
-if NEW.status <> 'confirmed'::public.tag_status then return NEW;
-
-end if;
-
-curr_distribution_id := (
-    select id
-    from distributions
-    where qualification_start <= now()
-        and qualification_end >= now()
-    order by qualification_start desc
-    limit 1
-);
-
-if curr_distribution_id is not null
-and not exists (
-    select 1
-    from public.distribution_verifications
-    where user_id = NEW.user_id
-        and metadata->>'tag' = NEW.name
-        and type = 'tag_registration'::public.verification_type
-) then -- insert new verification
-insert into public.distribution_verifications (distribution_id, user_id, type, metadata)
-values (
-        (
-            select id
-            from distributions
-            where qualification_start <= now()
-                and qualification_end >= now()
-            order by qualification_start desc
-            limit 1
-        ), NEW.user_id, 'tag_registration'::public.verification_type, jsonb_build_object('tag', NEW.name)
-    );
-
-end if;
-
-return NEW;
-
-end;
-
-$$;
-
-
-ALTER FUNCTION "public"."insert_verification_tag_registration"() OWNER TO "postgres";
-
 
 CREATE OR REPLACE FUNCTION "public"."insert_verification_value"("distribution_number" integer, "type" "public"."verification_type", "fixed_value" numeric DEFAULT NULL::numeric, "bips_value" integer DEFAULT NULL::integer, "multiplier_min" numeric DEFAULT NULL::numeric, "multiplier_max" numeric DEFAULT NULL::numeric, "multiplier_step" numeric DEFAULT NULL::numeric) RETURNS "void"
     LANGUAGE "plpgsql"
@@ -2375,18 +1995,6 @@ $$;
 
 ALTER FUNCTION "public"."profile_lookup"("lookup_type" "public"."lookup_type_enum", "identifier" "text") OWNER TO "postgres";
 
-
-CREATE OR REPLACE FUNCTION "public"."query_webauthn_credentials_by_phone"("phone_number" "text") RETURNS SETOF "public"."webauthn_credentials"
-    LANGUAGE "sql" SECURITY DEFINER
-    AS $$
-    SELECT wc.*
-    FROM auth.users AS u
-    JOIN webauthn_credentials AS wc ON u.id = wc.user_id
-    WHERE u.phone = phone_number;
-$$;
-
-
-ALTER FUNCTION "public"."query_webauthn_credentials_by_phone"("phone_number" "text") OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "public"."recent_senders"() RETURNS SETOF "public"."activity_feed_user"
@@ -2799,73 +2407,6 @@ $$;
 ALTER FUNCTION "public"."send_account_transfers_trigger_insert_activity"() OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "public"."send_accounts_add_webauthn_credential"("send_account_id" "uuid", "webauthn_credential" "public"."webauthn_credentials", "key_slot" integer) RETURNS "public"."webauthn_credentials"
-    LANGUAGE "plpgsql"
-    AS $_$
-#variable_conflict use_column
-declare
-    _webauthn_credential webauthn_credentials;
-    _key_slot alias for $3;
-begin
-
-    if ( select count(*) from send_accounts where id = send_account_id ) = 0 then
-        raise exception 'Send account not found for ID %', send_account_id;
-    end if;
-
-    -- insert the credential
-    insert into webauthn_credentials (name,
-                                      display_name,
-                                      raw_credential_id,
-                                      public_key,
-                                      sign_count,
-                                      attestation_object,
-                                      key_type)
-    values (webauthn_credential.name,
-            webauthn_credential.display_name,
-            webauthn_credential.raw_credential_id,
-            webauthn_credential.public_key,
-            webauthn_credential.sign_count,
-            webauthn_credential.attestation_object,
-            webauthn_credential.key_type)
-    returning * into _webauthn_credential;
-
-    -- associate the credential with the send account replacing any existing credential with the same key slot
-    insert into send_account_credentials (account_id, credential_id, key_slot)
-    values (send_account_id,
-            _webauthn_credential.id,
-            _key_slot)
-    on conflict (account_id, key_slot)
-    do update set credential_id = _webauthn_credential.id, key_slot = _key_slot;
-
-    -- return the result using the custom type
-    return _webauthn_credential;
-end;
-$_$;
-
-
-ALTER FUNCTION "public"."send_accounts_add_webauthn_credential"("send_account_id" "uuid", "webauthn_credential" "public"."webauthn_credentials", "key_slot" integer) OWNER TO "postgres";
-
-
-CREATE OR REPLACE FUNCTION "public"."send_accounts_after_insert"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    SET "search_path" TO 'public'
-    AS $$ BEGIN -- Ensure that a user does not exceed the send_accounts limit
-    IF (
-           SELECT COUNT(*)
-           FROM public.send_accounts
-           WHERE user_id = NEW.user_id
-       ) > 1 THEN RAISE EXCEPTION 'User can have at most 1 send account';
-
-    END IF;
-
-    RETURN NEW;
-
-END;
-
-$$;
-
-
-ALTER FUNCTION "public"."send_accounts_after_insert"() OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "public"."send_earn_create" (
@@ -3113,145 +2654,9 @@ $$;
 ALTER FUNCTION "public"."tag_receipts_insert_activity_trigger"() OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "public"."tag_search"("query" "text", "limit_val" integer, "offset_val" integer) RETURNS TABLE("send_id_matches" "public"."tag_search_result"[], "tag_matches" "public"."tag_search_result"[], "phone_matches" "public"."tag_search_result"[])
-    LANGUAGE "plpgsql" IMMUTABLE SECURITY DEFINER
-    AS $_$
-begin
-    if limit_val is null or (limit_val <= 0 or limit_val > 100) then
-        raise exception 'limit_val must be between 1 and 100';
-    end if;
-    if offset_val is null or offset_val < 0 then
-        raise exception 'offset_val must be greater than or equal to 0';
-    end if;
-    return query --
-        select ( select array_agg(row (sub.avatar_url, sub.tag_name, sub.send_id, sub.phone)::public.tag_search_result)
-                 from ( select p.avatar_url, t.name as tag_name, p.send_id, null::text as phone
-                        from profiles p
-                                left join tags t on t.user_id = p.id and t.status = 'confirmed'
-                        where query similar to '\d+'
-                          and p.send_id::varchar like '%' || query || '%'
-                        order by p.send_id
-                        limit limit_val offset offset_val ) sub ) as send_id_matches,
-               ( select array_agg(row (sub.avatar_url, sub.tag_name, sub.send_id, sub.phone)::public.tag_search_result)
-                 from ( select p.avatar_url, t.name as tag_name, p.send_id, null::text as phone
-                        from profiles p
-                                join tags t on t.user_id = p.id
-                        where t.status = 'confirmed'
-                          and (t.name <<-> query < 0.7 or t.name ilike '%' || query || '%')
-                        order by (t.name <-> query)
-                        limit limit_val offset offset_val ) sub ) as tag_matches,
-               ( select array_agg(row (sub.avatar_url, sub.tag_name, sub.send_id, sub.phone)::public.tag_search_result)
-                 from ( select p.avatar_url, t.name as tag_name, p.send_id, u.phone
-                        from profiles p
-                                 left join tags t on t.user_id = p.id and t.status = 'confirmed'
-                                 join auth.users u on u.id = p.id
-                        where p.is_public
-                          and query ~ '^\d{8,}$'
-                          and u.phone like query || '%'
-                        order by u.phone
-                        limit limit_val offset offset_val ) sub ) as phone_matches;
-end;
-$_$;
 
 
-ALTER FUNCTION "public"."tag_search"("query" "text", "limit_val" integer, "offset_val" integer) OWNER TO "postgres";
 
-
-CREATE TABLE IF NOT EXISTS "public"."tags" (
-    "name" "public"."citext" NOT NULL,
-    "status" "public"."tag_status" DEFAULT 'pending'::"public"."tag_status" NOT NULL,
-    "user_id" "uuid" DEFAULT "auth"."uid"() NOT NULL,
-    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
-    CONSTRAINT "tags_name_check" CHECK (((("length"(("name")::"text") >= 1) AND ("length"(("name")::"text") <= 20)) AND ("name" OPERATOR("public".~) '^[A-Za-z0-9_]+$'::"public"."citext")))
-);
-
-
-ALTER TABLE "public"."tags" OWNER TO "postgres";
-
-
-CREATE OR REPLACE FUNCTION "public"."tags"("public"."profiles") RETURNS SETOF "public"."tags"
-    LANGUAGE "sql" STABLE
-    AS $_$
-    SELECT * FROM tags WHERE user_id = $1.id
-$_$;
-
-
-ALTER FUNCTION "public"."tags"("public"."profiles") OWNER TO "postgres";
-
-
-CREATE OR REPLACE FUNCTION "public"."tags_after_insert_or_update_func"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    SET "search_path" TO 'public'
-    AS $$ BEGIN -- Ensure that a user does not exceed the tag limit
-    IF (
-        SELECT COUNT(*)
-        FROM public.tags
-        WHERE user_id = NEW.user_id
-            AND TG_OP = 'INSERT'
-    ) > 5 THEN RAISE EXCEPTION 'User can have at most 5 tags';
-
-END IF;
-
-RETURN NEW;
-
-END;
-
-$$;
-
-
-ALTER FUNCTION "public"."tags_after_insert_or_update_func"() OWNER TO "postgres";
-
-
-CREATE OR REPLACE FUNCTION "public"."tags_before_insert_or_update_func"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    SET "search_path" TO 'public'
-    AS $$
-begin
-    -- Ensure users can only insert or update their own tags
-    if new.user_id <> auth.uid() then
-        raise exception 'Users can only create or modify tags for themselves';
-
-    end if;
-    -- Ensure user is not changing their confirmed tag name
-    if new.status = 'confirmed'::public.tag_status and old.name <> new.name and
-	current_setting('role')::text = 'authenticated' then
-        raise exception 'Users cannot change the name of a confirmed tag';
-
-    end if;
-    -- Ensure user is not confirming their own tag
-    if new.status = 'confirmed'::public.tag_status and current_setting('role')::text =
-	'authenticated' then
-        raise exception 'Users cannot confirm their own tags';
-
-    end if;
-    -- Ensure no existing pending tag with same name within the last 30 minutes by another user
-    if exists(
-        select
-            1
-        from
-            public.tags
-        where
-            name = new.name
-            and status = 'pending'::public.tag_status
-            and(NOW() - created_at) < INTERVAL '30 minutes'
-            and user_id != new.user_id) then
-    raise exception 'Tag with same name already exists';
-
-end if;
-    -- Delete older pending tags if they belong to the same user, to avoid duplicates
-    delete from public.tags
-    where name = new.name
-        and user_id != new.user_id
-        and status = 'pending'::public.tag_status;
-    -- Return the new record to be inserted or updated
-    return NEW;
-
-end;
-
-$$;
-
-
-ALTER FUNCTION "public"."tags_before_insert_or_update_func"() OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "public"."today_birthday_senders"() RETURNS SETOF "public"."activity_feed_user"
@@ -3979,20 +3384,6 @@ CREATE TABLE IF NOT EXISTS "public"."chain_addresses" (
 
 ALTER TABLE "public"."chain_addresses" OWNER TO "postgres";
 
-
-CREATE SEQUENCE IF NOT EXISTS "public"."challenges_id_seq"
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE "public"."challenges_id_seq" OWNER TO "postgres";
-
-
-ALTER SEQUENCE "public"."challenges_id_seq" OWNED BY "public"."challenges"."id";
 
 
 
@@ -5017,15 +4408,6 @@ ALTER TABLE "public"."tag_receipts_id_seq" OWNER TO "postgres";
 ALTER SEQUENCE "public"."tag_receipts_id_seq" OWNED BY "public"."tag_receipts"."id";
 
 
-
-CREATE TABLE IF NOT EXISTS "public"."workflow_ids" (
-    "array_agg" "text"[]
-);
-
-
-ALTER TABLE "public"."workflow_ids" OWNER TO "postgres";
-
-
 CREATE TABLE IF NOT EXISTS "shovel"."ig_updates" (
     "name" "text" NOT NULL,
     "src_name" "text" NOT NULL,
@@ -5172,8 +4554,6 @@ ALTER TABLE ONLY "public"."activity" ALTER COLUMN "id" SET DEFAULT "nextval"('"p
 
 
 
-ALTER TABLE ONLY "public"."challenges" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."challenges_id_seq"'::"regclass");
-
 
 
 ALTER TABLE ONLY "public"."distribution_shares" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."distribution_shares_id_seq"'::"regclass");
@@ -5283,13 +4663,9 @@ ALTER TABLE ONLY "public"."chain_addresses"
 
 
 ALTER TABLE ONLY "public"."challenges"
-    ADD CONSTRAINT "challenges_challenge_key" UNIQUE ("challenge");
-
 
 
 ALTER TABLE ONLY "public"."challenges"
-    ADD CONSTRAINT "challenges_pkey" PRIMARY KEY ("id");
-
 
 
 ALTER TABLE ONLY "public"."distribution_verification_values"
@@ -5363,8 +4739,6 @@ ALTER TABLE ONLY "public"."send_account_transfers"
 
 
 ALTER TABLE ONLY "public"."send_accounts"
-    ADD CONSTRAINT "send_accounts_pkey" PRIMARY KEY ("id");
-
 
 
 ALTER TABLE ONLY "public"."send_liquidity_pools"
@@ -5418,8 +4792,6 @@ ALTER TABLE ONLY "public"."tag_receipts"
 
 
 ALTER TABLE ONLY "public"."tags"
-    ADD CONSTRAINT "tags_pkey" PRIMARY KEY ("name");
-
 
 
 ALTER TABLE ONLY "public"."referrals"
@@ -5428,8 +4800,6 @@ ALTER TABLE ONLY "public"."referrals"
 
 
 ALTER TABLE ONLY "public"."webauthn_credentials"
-    ADD CONSTRAINT "webauthn_credentials_pkey" PRIMARY KEY ("id");
-
 
 
 ALTER TABLE ONLY "temporal"."send_account_transfers"
@@ -5518,11 +4888,7 @@ CREATE INDEX "idx_send_account_transfers_f_t_block_time" ON "public"."send_accou
 
 
 
-CREATE INDEX "idx_send_accounts_address" ON "public"."send_accounts" USING "btree" ("address");
 
-
-
-CREATE INDEX "idx_send_accounts_address_user" ON "public"."send_accounts" USING "btree" ("address", "user_id");
 
 
 
@@ -5537,8 +4903,6 @@ CREATE INDEX "idx_sendpot_user_ticket_purchases_block_num" ON "public"."sendpot_
 CREATE INDEX "idx_sendtag_receipts" ON "public"."sendtag_checkout_receipts" USING "btree" ("amount", "reward");
 
 
-
-CREATE INDEX "idx_tags_status_created" ON "public"."tags" USING "btree" ("status", "created_at" DESC) WHERE ("status" = 'confirmed'::"public"."tag_status");
 
 
 
@@ -5610,11 +4974,7 @@ CREATE INDEX "send_account_transfers_t" ON "public"."send_account_transfers" USI
 
 
 
-CREATE UNIQUE INDEX "send_accounts_address_key" ON "public"."send_accounts" USING "btree" ("address", "chain_id");
 
-
-
-CREATE INDEX "send_accounts_user_id_index" ON "public"."send_accounts" USING "btree" ("user_id");
 
 
 
@@ -5762,11 +5122,7 @@ CREATE UNIQUE INDEX "tag_receipts_event_id_idx" ON "public"."tag_receipts" USING
 
 
 
-CREATE INDEX "tags_name_trigram_gin_idx" ON "public"."tags" USING "gin" ("name" "extensions"."gin_trgm_ops");
 
-
-
-CREATE INDEX "tags_user_id_idx" ON "public"."tags" USING "btree" ("user_id");
 
 
 
@@ -5830,11 +5186,7 @@ CREATE UNIQUE INDEX "u_sendtag_checkout_receipts" ON "public"."sendtag_checkout_
 
 
 
-CREATE UNIQUE INDEX "webauthn_credentials_public_key" ON "public"."webauthn_credentials" USING "btree" ("public_key");
 
-
-
-CREATE UNIQUE INDEX "webauthn_credentials_raw_credential_id" ON "public"."webauthn_credentials" USING "btree" ("raw_credential_id", "user_id");
 
 
 
@@ -5942,8 +5294,6 @@ CREATE OR REPLACE TRIGGER "insert_referral_on_new_affiliate" AFTER INSERT ON "pu
 
 
 
-CREATE OR REPLACE TRIGGER "insert_verification_create_passkey" AFTER INSERT ON "public"."send_accounts" FOR EACH ROW EXECUTE FUNCTION "public"."insert_verification_create_passkey"();
-
 
 
 CREATE OR REPLACE TRIGGER "insert_verification_referral" AFTER INSERT ON "public"."referrals" FOR EACH ROW EXECUTE FUNCTION "public"."insert_verification_referral"();
@@ -5957,8 +5307,6 @@ CREATE OR REPLACE TRIGGER "insert_verification_send_ceiling_trigger" AFTER INSER
 CREATE OR REPLACE TRIGGER "insert_verification_sends" AFTER INSERT ON "public"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."insert_verification_sends"();
 
 
-
-CREATE OR REPLACE TRIGGER "insert_verification_tag_registration" AFTER INSERT OR UPDATE ON "public"."tags" FOR EACH ROW EXECUTE FUNCTION "public"."insert_verification_tag_registration"();
 
 
 
@@ -6018,15 +5366,9 @@ CREATE OR REPLACE TRIGGER "trigger_chain_addresses_after_insert" AFTER INSERT OR
 
 
 
-CREATE OR REPLACE TRIGGER "trigger_send_accounts_after_insert" AFTER INSERT OR UPDATE ON "public"."send_accounts" FOR EACH ROW EXECUTE FUNCTION "public"."send_accounts_after_insert"();
 
 
 
-CREATE OR REPLACE TRIGGER "trigger_tags_after_insert_or_update" AFTER INSERT OR UPDATE ON "public"."tags" FOR EACH ROW EXECUTE FUNCTION "public"."tags_after_insert_or_update_func"();
-
-
-
-CREATE OR REPLACE TRIGGER "trigger_tags_before_insert_or_update" BEFORE INSERT OR UPDATE ON "public"."tags" FOR EACH ROW EXECUTE FUNCTION "public"."tags_before_insert_or_update_func"();
 
 
 
@@ -6152,8 +5494,6 @@ ALTER TABLE ONLY "public"."referrals"
 
 
 ALTER TABLE ONLY "public"."send_accounts"
-    ADD CONSTRAINT "send_accounts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
-
 
 
 ALTER TABLE ONLY "public"."send_slash"
@@ -6167,13 +5507,9 @@ ALTER TABLE ONLY "public"."tag_receipts"
 
 
 ALTER TABLE ONLY "public"."tags"
-    ADD CONSTRAINT "tags_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
-
 
 
 ALTER TABLE ONLY "public"."webauthn_credentials"
-    ADD CONSTRAINT "webauthn_credentials_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
-
 
 
 ALTER TABLE ONLY "temporal"."send_earn_deposits"
@@ -6278,8 +5614,6 @@ CREATE POLICY "authenticated can read jackpot runs" ON "public"."sendpot_jackpot
 ALTER TABLE "public"."chain_addresses" ENABLE ROW LEVEL SECURITY;
 
 
-ALTER TABLE "public"."challenges" ENABLE ROW LEVEL SECURITY;
-
 
 CREATE POLICY "delete_own_account_credentials" ON "public"."send_account_credentials" FOR DELETE TO "authenticated" USING (("auth"."uid"() = ( SELECT "send_accounts"."user_id"
    FROM "public"."send_accounts"
@@ -6287,11 +5621,7 @@ CREATE POLICY "delete_own_account_credentials" ON "public"."send_account_credent
 
 
 
-CREATE POLICY "delete_own_webauthn_credentials" ON "public"."webauthn_credentials" FOR DELETE TO "authenticated" USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
-
-
-CREATE POLICY "delete_policy" ON "public"."tags" FOR DELETE TO "authenticated" USING ((("auth"."uid"() = "user_id") AND ("status" = 'pending'::"public"."tag_status")));
 
 
 
@@ -6313,15 +5643,9 @@ CREATE POLICY "insert_own_account_credentials" ON "public"."send_account_credent
 
 
 
-CREATE POLICY "insert_own_accounts" ON "public"."send_accounts" FOR INSERT TO "authenticated" WITH CHECK (("auth"."uid"() = "user_id"));
 
 
 
-CREATE POLICY "insert_own_credentials" ON "public"."webauthn_credentials" FOR INSERT TO "authenticated" WITH CHECK (("auth"."uid"() = "user_id"));
-
-
-
-CREATE POLICY "insert_policy" ON "public"."tags" FOR INSERT WITH CHECK (("auth"."uid"() = "user_id"));
 
 
 
@@ -6343,15 +5667,9 @@ CREATE POLICY "select_own_account_credentials" ON "public"."send_account_credent
 
 
 
-CREATE POLICY "select_own_accounts" ON "public"."send_accounts" FOR SELECT TO "authenticated" USING (("auth"."uid"() = "user_id"));
 
 
 
-CREATE POLICY "select_own_credentials" ON "public"."webauthn_credentials" FOR SELECT TO "authenticated" USING (("auth"."uid"() = "user_id"));
-
-
-
-CREATE POLICY "select_policy" ON "public"."tags" FOR SELECT USING (("auth"."uid"() = "user_id"));
 
 
 
@@ -6372,8 +5690,6 @@ ALTER TABLE "public"."send_account_signing_key_removed" ENABLE ROW LEVEL SECURIT
 
 ALTER TABLE "public"."send_account_transfers" ENABLE ROW LEVEL SECURITY;
 
-
-ALTER TABLE "public"."send_accounts" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."send_earn_create" ENABLE ROW LEVEL SECURITY;
@@ -6426,8 +5742,6 @@ ALTER TABLE "public"."swap_routers" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."tag_receipts" ENABLE ROW LEVEL SECURITY;
 
 
-ALTER TABLE "public"."tags" ENABLE ROW LEVEL SECURITY;
-
 
 CREATE POLICY "update_own_account_credentials" ON "public"."send_account_credentials" FOR UPDATE TO "authenticated" USING ((( SELECT "auth"."uid"() AS "uid") = ( SELECT "send_accounts"."user_id"
    FROM "public"."send_accounts"
@@ -6435,15 +5749,9 @@ CREATE POLICY "update_own_account_credentials" ON "public"."send_account_credent
 
 
 
-CREATE POLICY "update_own_accounts" ON "public"."send_accounts" FOR UPDATE TO "authenticated" USING (("auth"."uid"() = "user_id"));
 
 
 
-CREATE POLICY "update_own_credentials" ON "public"."webauthn_credentials" FOR UPDATE TO "authenticated" USING (("auth"."uid"() = "user_id"));
-
-
-
-CREATE POLICY "update_policy" ON "public"."tags" FOR UPDATE USING (("auth"."uid"() = "user_id")) WITH CHECK (("auth"."uid"() = "user_id"));
 
 
 
@@ -6498,8 +5806,6 @@ CREATE POLICY "users can see their own transfers" ON "public"."send_account_tran
   WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid"))))));
 
 
-
-ALTER TABLE "public"."webauthn_credentials" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "temporal"."send_account_transfers" ENABLE ROW LEVEL SECURITY;
@@ -7085,9 +6391,6 @@ GRANT ALL ON FUNCTION "public"."citext_smaller"("public"."citext", "public"."cit
 
 
 
-REVOKE ALL ON FUNCTION "public"."confirm_tags"("tag_names" "public"."citext"[], "event_id" "text", "referral_code_input" "text") FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."confirm_tags"("tag_names" "public"."citext"[], "event_id" "text", "referral_code_input" "text") TO "service_role";
-
 
 
 GRANT ALL ON FUNCTION "public"."texticregexeq"("public"."citext", "public"."citext") TO "postgres";
@@ -7097,28 +6400,14 @@ GRANT ALL ON FUNCTION "public"."texticregexeq"("public"."citext", "public"."cite
 
 
 
-GRANT ALL ON TABLE "public"."send_accounts" TO "anon";
-GRANT ALL ON TABLE "public"."send_accounts" TO "authenticated";
-GRANT ALL ON TABLE "public"."send_accounts" TO "service_role";
 
-
-
-GRANT ALL ON TABLE "public"."webauthn_credentials" TO "anon";
-GRANT ALL ON TABLE "public"."webauthn_credentials" TO "authenticated";
-GRANT ALL ON TABLE "public"."webauthn_credentials" TO "service_role";
 
 
 
 REVOKE ALL ON FUNCTION "public"."create_send_account"("send_account" "public"."send_accounts", "webauthn_credential" "public"."webauthn_credentials", "key_slot" integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."create_send_account"("send_account" "public"."send_accounts", "webauthn_credential" "public"."webauthn_credentials", "key_slot" integer) TO "anon";
-GRANT ALL ON FUNCTION "public"."create_send_account"("send_account" "public"."send_accounts", "webauthn_credential" "public"."webauthn_credentials", "key_slot" integer) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."create_send_account"("send_account" "public"."send_accounts", "webauthn_credential" "public"."webauthn_credentials", "key_slot" integer) TO "service_role";
-
 
 
 REVOKE ALL ON FUNCTION "public"."distribution_hodler_addresses"("distribution_id" integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."distribution_hodler_addresses"("distribution_id" integer) TO "service_role";
-
 
 
 REVOKE ALL ON FUNCTION "public"."favourite_senders"() FROM PUBLIC;
@@ -7171,17 +6460,9 @@ GRANT ALL ON FUNCTION "public"."handle_new_user"() TO "service_role";
 
 
 
-GRANT ALL ON TABLE "public"."challenges" TO "anon";
-GRANT ALL ON TABLE "public"."challenges" TO "authenticated";
-GRANT ALL ON TABLE "public"."challenges" TO "service_role";
-
 
 
 REVOKE ALL ON FUNCTION "public"."insert_challenge"() FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."insert_challenge"() TO "anon";
-GRANT ALL ON FUNCTION "public"."insert_challenge"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."insert_challenge"() TO "service_role";
-
 
 
 REVOKE ALL ON FUNCTION "public"."insert_create_passkey_verifications"("distribution_num" integer) FROM PUBLIC;
@@ -7234,10 +6515,6 @@ GRANT ALL ON FUNCTION "public"."insert_total_referral_verifications"("distributi
 
 
 REVOKE ALL ON FUNCTION "public"."insert_verification_create_passkey"() FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."insert_verification_create_passkey"() TO "anon";
-GRANT ALL ON FUNCTION "public"."insert_verification_create_passkey"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."insert_verification_create_passkey"() TO "service_role";
-
 
 
 REVOKE ALL ON FUNCTION "public"."insert_verification_referral"() FROM PUBLIC;
@@ -7262,10 +6539,6 @@ GRANT ALL ON FUNCTION "public"."insert_verification_sends"() TO "service_role";
 
 
 REVOKE ALL ON FUNCTION "public"."insert_verification_tag_registration"() FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."insert_verification_tag_registration"() TO "anon";
-GRANT ALL ON FUNCTION "public"."insert_verification_tag_registration"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."insert_verification_tag_registration"() TO "service_role";
-
 
 
 REVOKE ALL ON FUNCTION "public"."insert_verification_value"("distribution_number" integer, "type" "public"."verification_type", "fixed_value" numeric, "bips_value" integer, "multiplier_min" numeric, "multiplier_max" numeric, "multiplier_step" numeric) FROM PUBLIC;
@@ -7287,9 +6560,6 @@ GRANT ALL ON FUNCTION "public"."profile_lookup"("lookup_type" "public"."lookup_t
 GRANT ALL ON FUNCTION "public"."profile_lookup"("lookup_type" "public"."lookup_type_enum", "identifier" "text") TO "service_role";
 
 
-
-REVOKE ALL ON FUNCTION "public"."query_webauthn_credentials_by_phone"("phone_number" "text") FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."query_webauthn_credentials_by_phone"("phone_number" "text") TO "service_role";
 
 
 
@@ -7462,17 +6732,9 @@ GRANT ALL ON FUNCTION "public"."send_account_transfers_trigger_insert_activity"(
 
 
 REVOKE ALL ON FUNCTION "public"."send_accounts_add_webauthn_credential"("send_account_id" "uuid", "webauthn_credential" "public"."webauthn_credentials", "key_slot" integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."send_accounts_add_webauthn_credential"("send_account_id" "uuid", "webauthn_credential" "public"."webauthn_credentials", "key_slot" integer) TO "anon";
-GRANT ALL ON FUNCTION "public"."send_accounts_add_webauthn_credential"("send_account_id" "uuid", "webauthn_credential" "public"."webauthn_credentials", "key_slot" integer) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."send_accounts_add_webauthn_credential"("send_account_id" "uuid", "webauthn_credential" "public"."webauthn_credentials", "key_slot" integer) TO "service_role";
-
 
 
 REVOKE ALL ON FUNCTION "public"."send_accounts_after_insert"() FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."send_accounts_after_insert"() TO "anon";
-GRANT ALL ON FUNCTION "public"."send_accounts_after_insert"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."send_accounts_after_insert"() TO "service_role";
-
 
 
 GRANT ALL ON TABLE "public"."send_earn_create" TO "anon";
@@ -7534,10 +6796,6 @@ GRANT ALL ON FUNCTION "public"."tag_receipts_insert_activity_trigger"() TO "serv
 
 
 
-REVOKE ALL ON FUNCTION "public"."tag_search"("query" "text", "limit_val" integer, "offset_val" integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."tag_search"("query" "text", "limit_val" integer, "offset_val" integer) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."tag_search"("query" "text", "limit_val" integer, "offset_val" integer) TO "service_role";
-
 
 
 GRANT ALL ON SEQUENCE "public"."profiles_send_id_seq" TO "anon";
@@ -7552,30 +6810,11 @@ GRANT ALL ON TABLE "public"."profiles" TO "service_role";
 
 
 
-GRANT ALL ON TABLE "public"."tags" TO "anon";
-GRANT ALL ON TABLE "public"."tags" TO "authenticated";
-GRANT ALL ON TABLE "public"."tags" TO "service_role";
 
 
 
-REVOKE ALL ON FUNCTION "public"."tags"("public"."profiles") FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."tags"("public"."profiles") TO "anon";
-GRANT ALL ON FUNCTION "public"."tags"("public"."profiles") TO "authenticated";
-GRANT ALL ON FUNCTION "public"."tags"("public"."profiles") TO "service_role";
 
 
-
-REVOKE ALL ON FUNCTION "public"."tags_after_insert_or_update_func"() FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."tags_after_insert_or_update_func"() TO "anon";
-GRANT ALL ON FUNCTION "public"."tags_after_insert_or_update_func"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."tags_after_insert_or_update_func"() TO "service_role";
-
-
-
-REVOKE ALL ON FUNCTION "public"."tags_before_insert_or_update_func"() FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."tags_before_insert_or_update_func"() TO "anon";
-GRANT ALL ON FUNCTION "public"."tags_before_insert_or_update_func"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."tags_before_insert_or_update_func"() TO "service_role";
 
 
 
@@ -7769,10 +7008,6 @@ GRANT ALL ON TABLE "public"."chain_addresses" TO "authenticated";
 GRANT ALL ON TABLE "public"."chain_addresses" TO "service_role";
 
 
-
-GRANT ALL ON SEQUENCE "public"."challenges_id_seq" TO "anon";
-GRANT ALL ON SEQUENCE "public"."challenges_id_seq" TO "authenticated";
-GRANT ALL ON SEQUENCE "public"."challenges_id_seq" TO "service_role";
 
 
 
@@ -8073,13 +7308,6 @@ GRANT ALL ON TABLE "public"."tag_receipts" TO "service_role";
 GRANT ALL ON SEQUENCE "public"."tag_receipts_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."tag_receipts_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."tag_receipts_id_seq" TO "service_role";
-
-
-
-GRANT ALL ON TABLE "public"."workflow_ids" TO "anon";
-GRANT ALL ON TABLE "public"."workflow_ids" TO "authenticated";
-GRANT ALL ON TABLE "public"."workflow_ids" TO "service_role";
-
 
 
 GRANT ALL ON TABLE "temporal"."send_account_transfers" TO "service_role";
