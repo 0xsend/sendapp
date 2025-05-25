@@ -118,6 +118,17 @@ export default function formatAmount(
 
   const lessThanMin = !integers && countLeadingZeros && countLeadingZeros >= maxDecimals
 
+  // For whole numbers (no decimal part), avoid floating point precision issues
+  // by formatting the string directly instead of using floor()
+  if (digits.length === 1 || (digits[1] && digits[1] === '0')) {
+    const wholeNumber = Number(digits[0])
+    return wholeNumber.toLocaleString('en-US', {
+      useGrouping: true,
+      maximumFractionDigits: 0,
+      minimumFractionDigits: 0,
+    })
+  }
+
   return (
     (lessThanMin ? '>' : '') +
     floor(Number(amount), maxDecimals).toLocaleString('en-US', {

@@ -111,6 +111,13 @@ describe('Additional scenarios', () => {
   it('should not show less than when number has integers', () => {
     expect(formatAmount(5313.01, 4, 0)).toBe('5,313')
   })
+
+  it('should handle whole numbers without floating point precision errors', () => {
+    // Test the specific sendpot issue: 390 tickets * 30 SEND = 11700 SEND
+    expect(formatAmount('11700')).toBe('11,700')
+    expect(formatAmount(11700)).toBe('11,700')
+    expect(formatAmount('11700.0')).toBe('11,700')
+  })
 })
 
 describe('sanitizeAmount', () => {
