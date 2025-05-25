@@ -25,6 +25,7 @@ schema_paths = [
   "./schemas/chain_addresses.sql",
   "./schemas/tags.sql",
   "./schemas/referrals.sql",
+  "./schemas/distributions.sql",
   "./schemas/prod.sql",
   "./schemas/*.sql",
 ]
