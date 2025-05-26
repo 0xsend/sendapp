@@ -2,7 +2,7 @@
 
 ## 🚀 Migration Status: IN PROGRESS
 
-**Completed Migrations:** 20 tables successfully migrated (15 core + 5 distribution tables)
+**Completed Migrations:** 21 tables successfully migrated (16 core + 5 distribution tables)
 **Last Updated:** January 26, 2025
 **Goal:** Complete migration of ALL tables and objects - prod.sql must be completely eliminated
 
@@ -137,6 +137,11 @@ schema_paths = [
   "./schemas/send_earn.sql",
   "./schemas/send_account_created.sql",
   "./schemas/send_account_transfers.sql",
+  "./schemas/send_account_receives.sql",
+  "./schemas/send_account_signing_key_added.sql",
+  "./schemas/send_account_signing_key_removed.sql",
+  "./schemas/send_account_credentials.sql",
+  "./schemas/activity.sql",
   "./schemas/prod.sql",  # TO BE REMOVED WHEN MIGRATION COMPLETE
   "./schemas/*.sql",
 ]
@@ -145,11 +150,12 @@ schema_paths = [
 ### 🧹 **Cleanup from prod.sql**
 
 **Major Components Removed:**
-- All 15 core tables and their components (challenges, profiles, webauthn_credentials, send_accounts, chain_addresses, tags, referrals, send_account_created, send_account_transfers, send_account_receives, send_account_signing_key_added, send_account_signing_key_removed, send_account_credentials)
+- All 16 core tables and their components (challenges, profiles, webauthn_credentials, send_accounts, chain_addresses, tags, referrals, send_account_created, send_account_transfers, send_account_receives, send_account_signing_key_added, send_account_signing_key_removed, send_account_credentials, activity)
 - Distribution system: verification_type enum, 12 functions, 5 tables, all related objects
 - Send Earn system: 10 functions, 4 tables, 2 views, all related objects
 - Send Account tables: 6 tables with 10 functions, triggers, and activity integration
-- Total removed: 20 tables with all associated functions, sequences, constraints, indexes, and grants
+- Activity system: activity_feed_user type, 4 functions, activity table, activity_feed view, all related objects
+- Total removed: 21 tables with all associated functions, sequences, constraints, indexes, and grants
 
 ### ✅ **Validation Completed**
 
@@ -161,17 +167,14 @@ schema_paths = [
 
 **IMPORTANT: prod.sql must be completely eliminated. This is not optional.**
 
-#### **Remaining Tables in prod.sql (22 tables):**
-
-**High Priority - Core System Tables:**
-1. **`activity`** - Central activity feed (complex, cross-cutting)
+#### **Remaining Tables in prod.sql (21 tables):**
 
 **Medium Priority - Feature Tables:**
-3. **Receipts Group (3 tables):**
+1. **Receipts Group (3 tables):**
    - `receipts`
    - `tag_receipts`
    - `sendtag_checkout_receipts`
-4. **Sendpot Group (2 tables):**
+2. **Sendpot Group (2 tables):**
    - `sendpot_jackpot_runs`
    - `sendpot_user_ticket_purchases`
 
@@ -400,31 +403,29 @@ When migrating tables with dependencies:
 - ✅ send_account_signing_key_added
 - ✅ send_account_signing_key_removed
 - ✅ send_account_credentials
+- ✅ activity (with activity_feed view and activity_feed_user type)
 
 ### 📋 **Individual Tables Remaining**
 
-**Activity Table (1 file):**
-1. `activity.sql` (complex cross-cutting table)
-
 **Receipt Tables (3 files):**
-6. `receipts.sql`
-7. `tag_receipts.sql`
-8. `sendtag_checkout_receipts.sql`
+1. `receipts.sql`
+2. `tag_receipts.sql`
+3. `sendtag_checkout_receipts.sql`
 
 **Sendpot Tables (2 files):**
-9. `sendpot_jackpot_runs.sql`
-10. `sendpot_user_ticket_purchases.sql`
+4. `sendpot_jackpot_runs.sql`
+5. `sendpot_user_ticket_purchases.sql`
 
 **Token & Revenue Tables (3 files):**
-11. `send_token_transfers.sql`
-12. `send_token_v0_transfers.sql`
-13. `send_revenues_safe_receives.sql`
+6. `send_token_transfers.sql`
+7. `send_token_v0_transfers.sql`
+8. `send_revenues_safe_receives.sql`
 
 **Financial Tables (3 files):**
-14. `liquidity_pools.sql` (or `send_liquidity_pools.sql`)
-15. `swap_routers.sql`
-16. `affiliate_stats.sql`
+9. `liquidity_pools.sql` (or `send_liquidity_pools.sql`)
+10. `swap_routers.sql`
+11. `affiliate_stats.sql`
 
 **Schema-Specific Groups:**
-17. `shovel.sql` (4 tables in shovel schema)
-18. `temporal.sql` (2 tables in temporal schema)
+12. `shovel.sql` (4 tables in shovel schema)
+13. `temporal.sql` (2 tables in temporal schema)

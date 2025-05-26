@@ -29,14 +29,6 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto" WITH SCHEMA "extensions";
 CREATE EXTENSION IF NOT EXISTS "pgjwt" WITH SCHEMA "extensions";
 CREATE EXTENSION IF NOT EXISTS "supabase_vault" WITH SCHEMA "vault";
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA "extensions";
-CREATE TYPE "public"."activity_feed_user" AS (
-	"id" "uuid",
-	"name" "text",
-	"avatar_url" "text",
-	"send_id" integer,
-	"tags" "text"[]
-);
-ALTER TYPE "public"."activity_feed_user" OWNER TO "postgres";
 CREATE TYPE "public"."key_type_enum" AS ENUM (
     'ES256'
 );
@@ -158,42 +150,6 @@ ALTER FUNCTION "public"."chain_addresses_after_insert"() OWNER TO "postgres";
 SET default_tablespace = '';
 
 SET default_table_access_method = "heap";
-CREATE OR REPLACE FUNCTION "public"."favourite_senders"() RETURNS SETOF "public"."activity_feed_user"
-    LANGUAGE "plpgsql"
-    AS $$
-BEGIN
-RETURN QUERY
-
-    -- Step 1: Filter relevant transfers and determine the counterparty
-    WITH user_transfers AS (
-        SELECT *,
-            -- Determine the counterparty: if the current user is the sender, use the recipient, and vice versa
-            CASE
-                WHEN (from_user).id = (select auth.uid()) THEN to_user -- only change is to use (select auth.uid()) instead of auth.uid()
-                ELSE from_user
-            END AS counterparty
-        FROM activity_feed
-        -- Only include rows where both from_user and to_user have a send_id (indicates a transfer between users)
-        WHERE (from_user).send_id IS NOT NULL
-          AND (to_user).send_id IS NOT NULL
-    ),
-
-    -- Count how many interactions the current user has with each counterparty
-    counterparty_counts AS (
-        SELECT counterparty,
-               COUNT(*) AS interaction_count
-        FROM user_transfers
-        GROUP BY counterparty
-    )
-
-SELECT (counterparty).*
-FROM counterparty_counts
-ORDER BY interaction_count DESC -- Order the result by most frequent counterparties
-    LIMIT 10; -- Return only the 10 most frequent counterparties
-
-END;
-$$;
-ALTER FUNCTION "public"."favourite_senders"() OWNER TO "postgres";
 CREATE OR REPLACE FUNCTION "public"."get_affiliate_referrals"() RETURNS TABLE("send_plus_minus" numeric, "avatar_url" "text", "tag" "public"."citext", "created_at" timestamp with time zone)
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO 'public'
@@ -811,45 +767,6 @@ end;
 $$;
 ALTER FUNCTION "public"."profile_lookup"("lookup_type" "public"."lookup_type_enum", "identifier" "text") OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "public"."recent_senders"() RETURNS SETOF "public"."activity_feed_user"
-    LANGUAGE "plpgsql"
-    AS $$
-BEGIN
-RETURN QUERY
-
-    -- Step 1: Filter relevant transfers and determine the counterparty
-    WITH user_transfers AS (
-        SELECT *,
-            -- Determine the counterparty: if the current user is the sender, use the recipient, and vice versa
-            CASE
-                WHEN (from_user).id = (select auth.uid()) THEN to_user -- only change is to use (select auth.uid()) instead of auth.uid()
-                ELSE from_user
-            END AS counterparty
-        FROM activity_feed
-        -- Only include rows where both from_user and to_user have a send_id (indicates a transfer between users)
-        WHERE (from_user).send_id IS NOT NULL
-          AND (to_user).send_id IS NOT NULL
-    ),
-
-    -- Step 2: Assign a row number to each transfer per counterparty, ordered by most recent
-    numbered AS (
-        SELECT *,
-            ROW_NUMBER() OVER (
-                PARTITION BY (counterparty).send_id  -- Group by each unique counterparty
-                ORDER BY created_at DESC             -- Order by most recent transfer first
-            ) AS occurrence_counter
-        FROM user_transfers
-    )
-
-SELECT (counterparty).*  -- Return only the counterparty details
-FROM numbered
-WHERE occurrence_counter = 1  -- Only the most recent interaction with each counterparty
-ORDER BY created_at DESC      -- Order the result by most recent transfer
-    LIMIT 10;                     -- Return only the 10 most recent counterparties
-
-END;
-$$;
-ALTER FUNCTION "public"."recent_senders"() OWNER TO "postgres";
 CREATE OR REPLACE FUNCTION "public"."referrals_delete_activity_trigger"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO 'public'
@@ -999,34 +916,6 @@ end;
 $$;
 ALTER FUNCTION "public"."tag_receipts_insert_activity_trigger"() OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "public"."today_birthday_senders"() RETURNS SETOF "public"."activity_feed_user"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
-BEGIN
-RETURN QUERY
-SELECT (
-   (
-    NULL,
-    p.name,
-    p.avatar_url,
-    p.send_id,
-    (
-        SELECT ARRAY_AGG(name)
-        FROM tags
-        WHERE user_id = p.id
-          AND status = 'confirmed'
-    )
-       )::activity_feed_user
-).*
-FROM profiles p
-WHERE is_public = TRUE
-  AND p.birthday IS NOT NULL
-  AND p.avatar_url IS NOT NULL
-  AND EXTRACT(MONTH FROM p.birthday) = EXTRACT(MONTH FROM CURRENT_DATE)
-  AND EXTRACT(DAY FROM p.birthday) = EXTRACT(DAY FROM CURRENT_DATE);
-END;
-$$;
-ALTER FUNCTION "public"."today_birthday_senders"() OWNER TO "postgres";
 CREATE OR REPLACE FUNCTION "public"."update_affiliate_stats_on_transfer"() RETURNS "trigger"
     LANGUAGE "plpgsql"
     AS $$
@@ -1112,42 +1001,6 @@ END IF;
 END;
 $$;
 ALTER FUNCTION "public"."update_affiliate_stats_on_transfer"() OWNER TO "postgres";
-CREATE OR REPLACE FUNCTION "public"."update_transfer_activity_before_insert"() RETURNS "trigger"
-    LANGUAGE "plpgsql"
-    AS $$
-DECLARE
-    note text;
-    temporal_event_id text;
-BEGIN
-    IF (
-    NEW.event_name = 'send_account_transfers'
-    OR NEW.event_name = 'send_account_receives'
-    )
-    AND NEW.from_user_id IS NOT NULL
-    AND NEW.to_user_id IS NOT NULL
-    THEN
-        SELECT
-            data->>'note',
-            t_sat.workflow_id INTO note, temporal_event_id
-        FROM temporal.send_account_transfers t_sat
-        WHERE t_sat.send_account_transfers_activity_event_id = NEW.event_id
-        AND t_sat.send_account_transfers_activity_event_name = NEW.event_name;
-
-        IF note IS NOT NULL THEN
-            NEW.data = NEW.data || jsonb_build_object('note', note);
-        END IF;
-
-        -- Delete any temporal activity that might exist
-        IF temporal_event_id IS NOT NULL THEN
-            DELETE FROM public.activity
-            WHERE event_id = temporal_event_id
-            AND event_name = 'temporal_send_account_transfers';
-        END IF;
-    END IF;
-    RETURN NEW;
-END;
-$$;
-ALTER FUNCTION "public"."update_transfer_activity_before_insert"() OWNER TO "postgres";
 CREATE OR REPLACE FUNCTION "public"."user_referrals_count"() RETURNS integer
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO 'public'
@@ -1417,55 +1270,6 @@ BEGIN
 END;
 $$;
 ALTER FUNCTION "temporal"."temporal_transfer_before_insert"() OWNER TO "postgres";
-CREATE TABLE IF NOT EXISTS "public"."activity" (
-    "id" integer NOT NULL,
-    "event_name" "text" NOT NULL,
-    "event_id" character varying(255) NOT NULL,
-    "from_user_id" "uuid",
-    "to_user_id" "uuid",
-    "data" "jsonb",
-    "created_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-ALTER TABLE "public"."activity" OWNER TO "postgres";
-CREATE OR REPLACE VIEW "public"."activity_feed" WITH ("security_barrier"='on') AS
- SELECT "a"."created_at",
-    "a"."event_name",
-        CASE
-            WHEN ("a"."from_user_id" = "from_p"."id") THEN ROW(
-            CASE
-                WHEN ("a"."from_user_id" = ( SELECT "auth"."uid"() AS "uid")) THEN ( SELECT "auth"."uid"() AS "uid")
-                ELSE NULL::"uuid"
-            END, "from_p"."name", "from_p"."avatar_url", "from_p"."send_id", (( SELECT "array_agg"("tags"."name") AS "array_agg"
-               FROM "public"."tags"
-              WHERE (("tags"."user_id" = "from_p"."id") AND ("tags"."status" = 'confirmed'::"public"."tag_status"))))::"text"[])::"public"."activity_feed_user"
-            ELSE NULL::"public"."activity_feed_user"
-        END AS "from_user",
-        CASE
-            WHEN ("a"."to_user_id" = "to_p"."id") THEN ROW(
-            CASE
-                WHEN ("a"."to_user_id" = ( SELECT "auth"."uid"() AS "uid")) THEN ( SELECT "auth"."uid"() AS "uid")
-                ELSE NULL::"uuid"
-            END, "to_p"."name", "to_p"."avatar_url", "to_p"."send_id", (( SELECT "array_agg"("tags"."name") AS "array_agg"
-               FROM "public"."tags"
-              WHERE (("tags"."user_id" = "to_p"."id") AND ("tags"."status" = 'confirmed'::"public"."tag_status"))))::"text"[])::"public"."activity_feed_user"
-            ELSE NULL::"public"."activity_feed_user"
-        END AS "to_user",
-    "a"."data"
-   FROM (("public"."activity" "a"
-     LEFT JOIN "public"."profiles" "from_p" ON (("a"."from_user_id" = "from_p"."id")))
-     LEFT JOIN "public"."profiles" "to_p" ON (("a"."to_user_id" = "to_p"."id")))
-  WHERE (("a"."from_user_id" = ( SELECT "auth"."uid"() AS "uid")) OR (("a"."to_user_id" = ( SELECT "auth"."uid"() AS "uid")) AND ("a"."event_name" !~~ 'temporal_%'::"text")))
-  GROUP BY "a"."created_at", "a"."event_name", "a"."from_user_id", "a"."to_user_id", "from_p"."id", "from_p"."name", "from_p"."avatar_url", "from_p"."send_id", "to_p"."id", "to_p"."name", "to_p"."avatar_url", "to_p"."send_id", "a"."data";
-ALTER TABLE "public"."activity_feed" OWNER TO "postgres";
-CREATE SEQUENCE IF NOT EXISTS "public"."activity_id_seq"
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-ALTER TABLE "public"."activity_id_seq" OWNER TO "postgres";
-ALTER SEQUENCE "public"."activity_id_seq" OWNED BY "public"."activity"."id";
 
 CREATE TABLE IF NOT EXISTS "public"."affiliate_stats" (
     "user_id" "uuid",
@@ -2016,7 +1820,6 @@ CREATE SEQUENCE IF NOT EXISTS "temporal"."send_account_transfers_id_seq"
 ALTER TABLE "temporal"."send_account_transfers_id_seq" OWNER TO "postgres";
 ALTER SEQUENCE "temporal"."send_account_transfers_id_seq" OWNED BY "temporal"."send_account_transfers"."id";
 
-ALTER TABLE ONLY "public"."activity" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."activity_id_seq"'::"regclass");
 ALTER TABLE ONLY "public"."receipts" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."receipts_id_seq"'::"regclass");
 
 ALTER TABLE ONLY "public"."referrals" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."referrals_id_seq"'::"regclass");
@@ -2049,8 +1852,6 @@ ALTER TABLE ONLY "private"."leaderboard_referrals_all_time"
 
     ADD CONSTRAINT "account_credentials_pkey" PRIMARY KEY ("account_id", "credential_id");
 
-ALTER TABLE ONLY "public"."activity"
-    ADD CONSTRAINT "activity_pkey" PRIMARY KEY ("id");
 
 ALTER TABLE ONLY "public"."affiliate_stats"
     ADD CONSTRAINT "affiliate_stats_pkey" PRIMARY KEY ("id");
@@ -2136,13 +1937,9 @@ CREATE INDEX "leaderboard_referrals_all_time_referral_count_idx" ON "private"."l
 
 CREATE INDEX "leaderboard_referrals_all_time_total_reward_idx" ON "private"."leaderboard_referrals_all_time" USING "btree" ("rewards_usdc" DESC);
 
-CREATE INDEX "activity_created_at_idx" ON "public"."activity" USING "btree" ("created_at");
 
-CREATE UNIQUE INDEX "activity_event_name_event_id_idx" ON "public"."activity" USING "btree" ("event_name", "event_id");
 
-CREATE INDEX "activity_from_user_id_event_name_idx" ON "public"."activity" USING "btree" ("from_user_id", "created_at", "event_name");
 
-CREATE INDEX "activity_to_user_id_event_name_idx" ON "public"."activity" USING "btree" ("to_user_id", "created_at", "event_name");
 
 CREATE INDEX "chain_addresses_user_id_idx" ON "public"."chain_addresses" USING "btree" ("user_id");
 
@@ -2283,7 +2080,6 @@ CREATE OR REPLACE TRIGGER "referrals_insert_activity_trigger" AFTER INSERT ON "p
 
 CREATE OR REPLACE TRIGGER "tag_receipts_insert_activity_trigger" AFTER INSERT ON "public"."tag_receipts" REFERENCING NEW TABLE AS "new_table" FOR EACH STATEMENT EXECUTE FUNCTION "public"."tag_receipts_insert_activity_trigger"();
 
-CREATE OR REPLACE TRIGGER "temporal_send_account_transfers_trigger_update_transfer_activit" BEFORE INSERT ON "public"."activity" FOR EACH ROW EXECUTE FUNCTION "public"."update_transfer_activity_before_insert"();
 
 CREATE OR REPLACE TRIGGER "trigger_chain_addresses_after_insert" AFTER INSERT OR UPDATE ON "public"."chain_addresses" FOR EACH ROW EXECUTE FUNCTION "public"."chain_addresses_after_insert"();
 
@@ -2305,11 +2101,7 @@ ALTER TABLE ONLY "private"."leaderboard_referrals_all_time"
 
     ADD CONSTRAINT "account_credentials_credential_id_fkey" FOREIGN KEY ("credential_id") REFERENCES "public"."webauthn_credentials"("id") ON DELETE CASCADE;
 
-ALTER TABLE ONLY "public"."activity"
-    ADD CONSTRAINT "activity_from_user_id_fkey" FOREIGN KEY ("from_user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
 
-ALTER TABLE ONLY "public"."activity"
-    ADD CONSTRAINT "activity_to_user_id_fkey" FOREIGN KEY ("to_user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
 
 ALTER TABLE ONLY "public"."affiliate_stats"
     ADD CONSTRAINT "affiliate_stats_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."profiles"("id") ON UPDATE CASCADE ON DELETE CASCADE;
@@ -2579,10 +2371,6 @@ GRANT ALL ON FUNCTION "public"."texticregexeq"("public"."citext", "public"."cite
 GRANT ALL ON FUNCTION "public"."texticregexeq"("public"."citext", "public"."citext") TO "service_role";
 
 REVOKE ALL ON FUNCTION "public"."create_send_account"("send_account" "public"."send_accounts", "webauthn_credential" "public"."webauthn_credentials", "key_slot" integer) FROM PUBLIC;
-REVOKE ALL ON FUNCTION "public"."favourite_senders"() FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."favourite_senders"() TO "anon";
-GRANT ALL ON FUNCTION "public"."favourite_senders"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."favourite_senders"() TO "service_role";
 REVOKE ALL ON FUNCTION "public"."get_affiliate_referrals"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."get_affiliate_referrals"() TO "anon";
 GRANT ALL ON FUNCTION "public"."get_affiliate_referrals"() TO "authenticated";
@@ -2642,10 +2430,6 @@ GRANT ALL ON FUNCTION "public"."profile_lookup"("lookup_type" "public"."lookup_t
 GRANT ALL ON FUNCTION "public"."profile_lookup"("lookup_type" "public"."lookup_type_enum", "identifier" "text") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."profile_lookup"("lookup_type" "public"."lookup_type_enum", "identifier" "text") TO "service_role";
 
-REVOKE ALL ON FUNCTION "public"."recent_senders"() FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."recent_senders"() TO "anon";
-GRANT ALL ON FUNCTION "public"."recent_senders"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."recent_senders"() TO "service_role";
 
 REVOKE ALL ON FUNCTION "public"."referrals_delete_activity_trigger"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."referrals_delete_activity_trigger"() TO "anon";
@@ -2799,10 +2583,6 @@ GRANT ALL ON FUNCTION "public"."texticregexne"("public"."citext", "public"."cite
 GRANT ALL ON FUNCTION "public"."texticregexne"("public"."citext", "public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."texticregexne"("public"."citext", "public"."citext") TO "service_role";
 
-REVOKE ALL ON FUNCTION "public"."today_birthday_senders"() FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."today_birthday_senders"() TO "anon";
-GRANT ALL ON FUNCTION "public"."today_birthday_senders"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."today_birthday_senders"() TO "service_role";
 
 GRANT ALL ON FUNCTION "public"."translate"("public"."citext", "public"."citext", "text") TO "postgres";
 GRANT ALL ON FUNCTION "public"."translate"("public"."citext", "public"."citext", "text") TO "anon";
@@ -2813,10 +2593,6 @@ REVOKE ALL ON FUNCTION "public"."update_affiliate_stats_on_transfer"() FROM PUBL
 GRANT ALL ON FUNCTION "public"."update_affiliate_stats_on_transfer"() TO "anon";
 GRANT ALL ON FUNCTION "public"."update_affiliate_stats_on_transfer"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."update_affiliate_stats_on_transfer"() TO "service_role";
-REVOKE ALL ON FUNCTION "public"."update_transfer_activity_before_insert"() FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."update_transfer_activity_before_insert"() TO "anon";
-GRANT ALL ON FUNCTION "public"."update_transfer_activity_before_insert"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."update_transfer_activity_before_insert"() TO "service_role";
 
 REVOKE ALL ON FUNCTION "public"."user_referrals_count"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."user_referrals_count"() TO "anon";
@@ -2850,17 +2626,8 @@ GRANT ALL ON FUNCTION "public"."min"("public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."min"("public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."min"("public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."min"("public"."citext") TO "service_role";
-GRANT ALL ON TABLE "public"."activity" TO "anon";
-GRANT ALL ON TABLE "public"."activity" TO "authenticated";
-GRANT ALL ON TABLE "public"."activity" TO "service_role";
 
-GRANT ALL ON TABLE "public"."activity_feed" TO "anon";
-GRANT ALL ON TABLE "public"."activity_feed" TO "authenticated";
-GRANT ALL ON TABLE "public"."activity_feed" TO "service_role";
 
-GRANT ALL ON SEQUENCE "public"."activity_id_seq" TO "anon";
-GRANT ALL ON SEQUENCE "public"."activity_id_seq" TO "authenticated";
-GRANT ALL ON SEQUENCE "public"."activity_id_seq" TO "service_role";
 
 GRANT ALL ON TABLE "public"."affiliate_stats" TO "anon";
 GRANT ALL ON TABLE "public"."affiliate_stats" TO "authenticated";

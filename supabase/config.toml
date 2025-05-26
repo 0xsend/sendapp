@@ -33,6 +33,7 @@ schema_paths = [
   "./schemas/send_account_signing_key_added.sql",
   "./schemas/send_account_signing_key_removed.sql",
   "./schemas/send_account_credentials.sql",
+  "./schemas/activity.sql",
   "./schemas/prod.sql",
   "./schemas/*.sql",
 ]
