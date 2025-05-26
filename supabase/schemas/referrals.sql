@@ -325,3 +325,48 @@ GRANT ALL ON TABLE "public"."referrals" TO "service_role";
 GRANT ALL ON SEQUENCE "public"."referrals_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."referrals_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."referrals_id_seq" TO "service_role";
+
+-- Views
+CREATE OR REPLACE VIEW "public"."referrer" WITH ("security_barrier"='on') AS
+ WITH "referrer" AS (
+         SELECT "p"."send_id"
+           FROM ("public"."referrals" "r"
+             JOIN "public"."profiles" "p" ON (("r"."referrer_id" = "p"."id")))
+          WHERE ("r"."referred_id" = ( SELECT "auth"."uid"() AS "uid"))
+          ORDER BY "r"."created_at"
+         LIMIT 1
+        ), "profile_lookup" AS (
+         SELECT "p"."id",
+            "p"."avatar_url",
+            "p"."name",
+            "p"."about",
+            "p"."refcode",
+            "p"."x_username",
+            "p"."birthday",
+            "p"."tag",
+            "p"."address",
+            "p"."chain_id",
+            "p"."is_public",
+            "p"."sendid",
+            "p"."all_tags",
+            "referrer"."send_id"
+           FROM ("public"."profile_lookup"('sendid'::"public"."lookup_type_enum", ( SELECT ("referrer_1"."send_id")::"text" AS "send_id"
+                   FROM "referrer" "referrer_1")) "p"("id", "avatar_url", "name", "about", "refcode", "x_username", "birthday", "tag", "address", "chain_id", "is_public", "sendid", "all_tags")
+             JOIN "referrer" ON (("referrer"."send_id" IS NOT NULL)))
+        )
+ SELECT "profile_lookup"."id",
+    "profile_lookup"."avatar_url",
+    "profile_lookup"."name",
+    "profile_lookup"."about",
+    "profile_lookup"."refcode",
+    "profile_lookup"."x_username",
+    "profile_lookup"."birthday",
+    "profile_lookup"."tag",
+    "profile_lookup"."address",
+    "profile_lookup"."chain_id",
+    "profile_lookup"."is_public",
+    "profile_lookup"."sendid",
+    "profile_lookup"."all_tags",
+    "profile_lookup"."send_id"
+   FROM "profile_lookup";
+ALTER TABLE "public"."referrer" OWNER TO "postgres";
