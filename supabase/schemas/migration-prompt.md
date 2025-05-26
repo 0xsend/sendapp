@@ -2,7 +2,7 @@
 
 ## 🚀 Migration Status: IN PROGRESS
 
-**Completed Migrations:** 16 tables successfully migrated (10 core + 4 distribution + 2 send account tables)
+**Completed Migrations:** 20 tables successfully migrated (15 core + 5 distribution tables)
 **Last Updated:** January 26, 2025
 **Goal:** Complete migration of ALL tables and objects - prod.sql must be completely eliminated
 
@@ -86,6 +86,40 @@ The following tables have been successfully migrated from `prod.sql` into dedica
     - RLS policy for user access
     - All grants and permissions
 
+12. **`send_account_receives.sql`** - Send account ETH receives tracking
+    - Functions: `send_account_receives_delete_activity_trigger()`, `send_account_receives_insert_activity_trigger()`
+    - Sequences: `send_account_receives_id_seq`
+    - Table: `public.send_account_receives`
+    - Indexes: 5 indexes including unique constraint
+    - Triggers: 2 triggers for activity tracking
+    - RLS policy for user access
+    - All grants and permissions
+
+13. **`send_account_signing_key_added.sql`** - Signing key addition tracking
+    - Functions: `send_account_signing_key_added_trigger_delete_activity()`, `send_account_signing_key_added_trigger_insert_activity()`
+    - Sequences: `send_account_signing_key_added_id_seq`
+    - Table: `public.send_account_signing_key_added`
+    - Indexes: 4 indexes including unique constraint
+    - Triggers: 2 triggers for activity tracking
+    - RLS policy for user access
+    - All grants and permissions
+
+14. **`send_account_signing_key_removed.sql`** - Signing key removal tracking
+    - Functions: `send_account_signing_key_removed_trigger_delete_activity()`, `send_account_signing_key_removed_trigger_insert_activity()`
+    - Sequences: `send_account_signing_key_removed_id_seq`
+    - Table: `public.send_account_signing_key_removed`
+    - Indexes: 3 indexes including unique constraint
+    - Triggers: 2 triggers for activity tracking
+    - RLS policy for user access
+    - All grants and permissions
+
+15. **`send_account_credentials.sql`** - Account credential linking
+    - Table: `public.send_account_credentials`
+    - Indexes: 1 unique index
+    - Foreign keys: References to `send_accounts` and `webauthn_credentials`
+    - RLS policies: SELECT, INSERT, DELETE policies
+    - All grants and permissions
+
 ### 🔧 **Configuration Updated**
 
 Updated `/supabase/config.toml` with proper dependency order:
@@ -111,10 +145,10 @@ schema_paths = [
 ### 🧹 **Cleanup from prod.sql**
 
 **Major Components Removed:**
-- All 11 core tables and their components (challenges, profiles, webauthn_credentials, send_accounts, chain_addresses, tags, referrals, send_account_created, send_account_transfers)
+- All 15 core tables and their components (challenges, profiles, webauthn_credentials, send_accounts, chain_addresses, tags, referrals, send_account_created, send_account_transfers, send_account_receives, send_account_signing_key_added, send_account_signing_key_removed, send_account_credentials)
 - Distribution system: verification_type enum, 12 functions, 5 tables, all related objects
 - Send Earn system: 10 functions, 4 tables, 2 views, all related objects
-- Send Account tables: 2 tables with 5 functions, triggers, and activity integration
+- Send Account tables: 6 tables with 10 functions, triggers, and activity integration
 - Total removed: 20 tables with all associated functions, sequences, constraints, indexes, and grants
 
 ### ✅ **Validation Completed**
@@ -127,15 +161,10 @@ schema_paths = [
 
 **IMPORTANT: prod.sql must be completely eliminated. This is not optional.**
 
-#### **Remaining Tables in prod.sql (26 tables):**
+#### **Remaining Tables in prod.sql (22 tables):**
 
 **High Priority - Core System Tables:**
 1. **`activity`** - Central activity feed (complex, cross-cutting)
-2. **Send Account Group (4 tables):**
-   - `send_account_receives`
-   - `send_account_signing_key_added`
-   - `send_account_signing_key_removed`
-   - `send_account_credentials`
 
 **Medium Priority - Feature Tables:**
 3. **Receipts Group (3 tables):**
@@ -367,17 +396,15 @@ When migrating tables with dependencies:
 - ✅ send_earn (all 4 tables and views)
 - ✅ send_account_created
 - ✅ send_account_transfers
+- ✅ send_account_receives
+- ✅ send_account_signing_key_added
+- ✅ send_account_signing_key_removed
+- ✅ send_account_credentials
 
 ### 📋 **Individual Tables Remaining**
 
-**Send Account Tables (4 files):**
-1. `send_account_receives.sql`
-2. `send_account_signing_key_added.sql`
-3. `send_account_signing_key_removed.sql`
-4. `send_account_credentials.sql`
-
 **Activity Table (1 file):**
-5. `activity.sql` (complex cross-cutting table)
+1. `activity.sql` (complex cross-cutting table)
 
 **Receipt Tables (3 files):**
 6. `receipts.sql`

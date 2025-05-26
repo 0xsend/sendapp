@@ -29,6 +29,10 @@ schema_paths = [
   "./schemas/send_earn.sql",
   "./schemas/send_account_created.sql",
   "./schemas/send_account_transfers.sql",
+  "./schemas/send_account_receives.sql",
+  "./schemas/send_account_signing_key_added.sql",
+  "./schemas/send_account_signing_key_removed.sql",
+  "./schemas/send_account_credentials.sql",
   "./schemas/prod.sql",
   "./schemas/*.sql",
 ]
