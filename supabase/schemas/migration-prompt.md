@@ -56,12 +56,19 @@ The following tables have been successfully migrated from `prod.sql` into dedica
    - Tables: `public.referrals`, `private.leaderboard_referrals_all_time`
    - Complex trigger system and activity integration
 
-8. **`distributions.sql`** - Complete distribution system ✨ NEW ✨
+8. **`distributions.sql`** - Complete distribution system
    - Type: `verification_type` enum
    - Functions: All 12 distribution-related functions including verification insertions and share updates
    - Sequences: `distributions_id_seq`, `distribution_shares_id_seq`, `distribution_verifications_id_seq`
    - Tables: `public.distributions`, `public.distribution_shares`, `public.distribution_verifications`, `public.distribution_verification_values`, `public.send_slash`
    - All constraints, indexes, foreign keys, and grants
+
+9. **`send_earn.sql`** - Complete Send Earn system ✨ NEW ✨
+   - Functions: All 10 send_earn-related functions including activity triggers and referral processing
+   - Sequences: `send_earn_create_id_seq`, `send_earn_new_affiliate_id_seq`, `send_earn_deposit_id_seq`, `send_earn_withdraw_id_seq`
+   - Tables: `public.send_earn_create`, `public.send_earn_new_affiliate`, `public.send_earn_deposit`, `public.send_earn_withdraw`
+   - Views: `public.send_earn_activity`, `public.send_earn_balances`
+   - All indexes, triggers, RLS policies, and grants
 
 ### 🔧 **Configuration Updated**
 
@@ -87,7 +94,8 @@ schema_paths = [
 **Major Components Removed:**
 - All 8 core tables and their components (challenges, profiles, webauthn_credentials, send_accounts, chain_addresses, tags, referrals)
 - Distribution system: verification_type enum, 12 functions, 5 tables, all related objects
-- Total removed: 12 tables with all associated functions, sequences, constraints, indexes, and grants
+- Send Earn system: 10 functions, 4 tables, 2 views, all related objects
+- Total removed: 16 tables with all associated functions, sequences, constraints, indexes, and grants
 
 ### ✅ **Validation Completed**
 

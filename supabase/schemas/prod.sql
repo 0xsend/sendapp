@@ -1,5 +1,3 @@
-
-
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
@@ -10,117 +8,27 @@ SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
-
-
 COMMENT ON SCHEMA "public" IS 'standard public schema';
-
-
 
 CREATE EXTENSION IF NOT EXISTS "pg_tle";
 
-
-
-
-
-
-
-
-
 CREATE EXTENSION IF NOT EXISTS "pg_net" WITH SCHEMA "extensions";
-
-
-
-
-
-
 CREATE EXTENSION IF NOT EXISTS "pgsodium";
-
-
-
-
-
-
 CREATE SCHEMA IF NOT EXISTS "private";
-
-
 ALTER SCHEMA "private" OWNER TO "postgres";
-
-
 CREATE SCHEMA IF NOT EXISTS "shovel";
-
-
 ALTER SCHEMA "shovel" OWNER TO "postgres";
-
-
 CREATE SCHEMA IF NOT EXISTS "temporal";
-
-
 ALTER SCHEMA "temporal" OWNER TO "postgres";
-
-
 CREATE EXTENSION IF NOT EXISTS "citext" WITH SCHEMA "public";
-
-
-
-
-
-
 CREATE EXTENSION IF NOT EXISTS "http" WITH SCHEMA "extensions";
-
-
-
-
-
-
 CREATE EXTENSION IF NOT EXISTS "pg_graphql" WITH SCHEMA "graphql";
-
-
-
-
-
-
 CREATE EXTENSION IF NOT EXISTS "pg_stat_statements" WITH SCHEMA "extensions";
-
-
-
-
-
-
 CREATE EXTENSION IF NOT EXISTS "pg_trgm" WITH SCHEMA "extensions";
-
-
-
-
-
-
 CREATE EXTENSION IF NOT EXISTS "pgcrypto" WITH SCHEMA "extensions";
-
-
-
-
-
-
 CREATE EXTENSION IF NOT EXISTS "pgjwt" WITH SCHEMA "extensions";
-
-
-
-
-
-
 CREATE EXTENSION IF NOT EXISTS "supabase_vault" WITH SCHEMA "vault";
-
-
-
-
-
-
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA "extensions";
-
-
-
-
-
-
 CREATE TYPE "public"."activity_feed_user" AS (
 	"id" "uuid",
 	"name" "text",
@@ -128,19 +36,11 @@ CREATE TYPE "public"."activity_feed_user" AS (
 	"send_id" integer,
 	"tags" "text"[]
 );
-
-
 ALTER TYPE "public"."activity_feed_user" OWNER TO "postgres";
-
-
 CREATE TYPE "public"."key_type_enum" AS ENUM (
     'ES256'
 );
-
-
 ALTER TYPE "public"."key_type_enum" OWNER TO "postgres";
-
-
 CREATE TYPE "public"."lookup_type_enum" AS ENUM (
     'sendid',
     'tag',
@@ -148,11 +48,7 @@ CREATE TYPE "public"."lookup_type_enum" AS ENUM (
     'address',
     'phone'
 );
-
-
 ALTER TYPE "public"."lookup_type_enum" OWNER TO "postgres";
-
-
 CREATE TYPE "public"."profile_lookup_result" AS (
 	"id" "uuid",
 	"avatar_url" "text",
@@ -168,31 +64,19 @@ CREATE TYPE "public"."profile_lookup_result" AS (
 	"sendid" integer,
 	"all_tags" "text"[]
 );
-
-
 ALTER TYPE "public"."profile_lookup_result" OWNER TO "postgres";
-
-
 CREATE TYPE "public"."tag_search_result" AS (
 	"avatar_url" "text",
 	"tag_name" "text",
 	"send_id" integer,
 	"phone" "text"
 );
-
-
 ALTER TYPE "public"."tag_search_result" OWNER TO "postgres";
-
-
 CREATE TYPE "public"."tag_status" AS ENUM (
     'pending',
     'confirmed'
 );
-
-
 ALTER TYPE "public"."tag_status" OWNER TO "postgres";
-
-
 CREATE TYPE "public"."temporal_status" AS ENUM (
     'initialized',
     'submitted',
@@ -200,22 +84,12 @@ CREATE TYPE "public"."temporal_status" AS ENUM (
     'confirmed',
     'failed'
 );
-
-
 ALTER TYPE "public"."temporal_status" OWNER TO "postgres";
-
-
-
-
 CREATE TYPE "public"."verification_value_mode" AS ENUM (
     'individual',
     'aggregate'
 );
-
-
 ALTER TYPE "public"."verification_value_mode" OWNER TO "postgres";
-
-
 CREATE TYPE "temporal"."transfer_status" AS ENUM (
     'initialized',
     'submitted',
@@ -224,28 +98,7 @@ CREATE TYPE "temporal"."transfer_status" AS ENUM (
     'failed',
     'cancelled'
 );
-
-
 ALTER TYPE "temporal"."transfer_status" OWNER TO "postgres";
-
-
-CREATE OR REPLACE FUNCTION "private"."aaa_filter_send_earn_deposit_with_no_send_account_created"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
-begin
-  if exists ( select 1 from send_account_created where account = new.owner )
-  then
-    return new;
-  else
-    return null;
-  end if;
-end;
-$$;
-
-
-ALTER FUNCTION "private"."aaa_filter_send_earn_deposit_with_no_send_account_created"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "private"."filter_send_account_transfers_with_no_send_account_created"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -259,356 +112,7 @@ begin
   end if;
 end;
 $$;
-
-
 ALTER FUNCTION "private"."filter_send_account_transfers_with_no_send_account_created"() OWNER TO "postgres";
-
-
-CREATE OR REPLACE FUNCTION "private"."filter_send_earn_withdraw_with_no_send_account_created"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
-begin
-  if exists ( select 1 from send_account_created where account = new.owner )
-  then
-    return new;
-  else
-    return null;
-  end if;
-end;
-$$;
-
-
-ALTER FUNCTION "private"."filter_send_earn_withdraw_with_no_send_account_created"() OWNER TO "postgres";
-
-
-
-
-CREATE OR REPLACE FUNCTION "private"."insert_referral_on_create"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
-DECLARE
-  v_referred_id UUID;
-  v_referrer_id UUID;
-  v_deposit_record RECORD;
-BEGIN
-  -- Find deposits made to this Send Earn contract
-  FOR v_deposit_record IN
-    SELECT d.owner, a.affiliate
-    FROM send_earn_deposit d
-    JOIN send_earn_new_affiliate a ON NEW.fee_recipient = a.send_earn_affiliate
-    WHERE d.log_addr = NEW.send_earn
-  LOOP
-    -- Find the referred_id (user who made the deposit)
-    SELECT user_id INTO v_referred_id
-    FROM send_accounts
-    WHERE address = lower(concat('0x', encode(v_deposit_record.owner, 'hex'::text)))::citext;
-
-    -- Skip if we can't find the referred user
-    IF v_referred_id IS NULL THEN
-      CONTINUE;
-    END IF;
-
-    -- Check if user was already referred
-    IF EXISTS (
-      SELECT 1 FROM referrals
-      WHERE referred_id = v_referred_id
-    ) THEN
-      CONTINUE;
-    END IF;
-
-    -- Find the referrer_id (the affiliate)
-    SELECT user_id INTO v_referrer_id
-    FROM send_accounts
-    WHERE address = lower(concat('0x', encode(v_deposit_record.affiliate, 'hex'::text)))::citext;
-
-
-    -- Skip if we can't find the referrer user
-    IF v_referrer_id IS NULL THEN
-      CONTINUE;
-    END IF;
-
-    -- Insert the new referral relationship with error handling
-    BEGIN
-      INSERT INTO referrals (referrer_id, referred_id, created_at)
-      VALUES (v_referrer_id, v_referred_id, NOW());
-    EXCEPTION
-      WHEN unique_violation THEN
-        -- A referral was already created (possibly by another concurrent process)
-        RETURN NEW;
-    END;
-  END LOOP;
-
-  RETURN NEW;
-END;
-$$;
-
-
-ALTER FUNCTION "private"."insert_referral_on_create"() OWNER TO "postgres";
-
-
-CREATE OR REPLACE FUNCTION "private"."insert_referral_on_deposit"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
-DECLARE
-  v_referred_id UUID;
-  v_referrer_id UUID;
-  v_affiliate_address bytea;
-BEGIN
-  -- Find the referred_id (user who made the deposit)
-  SELECT user_id INTO v_referred_id
-  FROM send_accounts
-  WHERE address = lower(concat('0x', encode(NEW.owner, 'hex'::text)))::citext;
-
-  -- Skip if we can't find the referred user
-  IF v_referred_id IS NULL THEN
-    RETURN NEW;
-  END IF;
-
-  -- Check if user was already referred - if so, exit early
-  IF EXISTS (
-    SELECT 1 FROM referrals
-    WHERE referred_id = v_referred_id
-  ) THEN
-    RETURN NEW;
-  END IF;
-
-  -- Find the affiliate's address and the referrer_id
-  SELECT c.fee_recipient, sa.user_id
-  INTO v_affiliate_address, v_referrer_id
-  FROM send_earn_create c
-  JOIN send_earn_new_affiliate a ON c.fee_recipient = a.send_earn_affiliate
-  JOIN send_accounts sa ON lower(concat('0x', encode(a.affiliate, 'hex'::text)))::citext = sa.address
-  WHERE c.send_earn = NEW.log_addr;
-
-
-  -- Skip if we can't find the affiliate or referrer
-  IF v_affiliate_address IS NULL OR v_referrer_id IS NULL THEN
-    RETURN NEW;
-  END IF;
-
-  -- Insert the new referral relationship with error handling
-  BEGIN
-    INSERT INTO referrals (referrer_id, referred_id, created_at)
-    VALUES (v_referrer_id, v_referred_id, NOW());
-  EXCEPTION
-    WHEN unique_violation THEN
-      -- A referral was already created (possibly by another concurrent process)
-      RETURN NEW;
-  END;
-
-  RETURN NEW;
-END;
-$$;
-
-
-ALTER FUNCTION "private"."insert_referral_on_deposit"() OWNER TO "postgres";
-
-
-CREATE OR REPLACE FUNCTION "private"."insert_referral_on_new_affiliate"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
-DECLARE
-  v_referred_id UUID;
-  v_referrer_id UUID;
-  v_deposit_record RECORD;
-BEGIN
-  -- Find the referrer_id (the affiliate)
-  SELECT user_id INTO v_referrer_id
-  FROM send_accounts
-  WHERE address = lower(concat('0x', encode(NEW.affiliate, 'hex'::text)))::citext;
-
-  -- Skip if we can't find the referrer user
-  IF v_referrer_id IS NULL THEN
-    RETURN NEW;
-  END IF;
-
-  -- Process all deposits with the same transaction hash that match an earn contract
-  -- where the fee_recipient matches the send_earn_affiliate
-  FOR v_deposit_record IN
-    SELECT d.owner
-    FROM send_earn_deposit d
-    JOIN send_earn_create c ON d.log_addr = c.send_earn
-    WHERE d.tx_hash = NEW.tx_hash
-    AND c.fee_recipient = NEW.send_earn_affiliate
-  LOOP
-    -- Find the referred_id (user who made the deposit)
-    SELECT user_id INTO v_referred_id
-    FROM send_accounts
-    WHERE address = lower(concat('0x', encode(v_deposit_record.owner, 'hex'::text)))::citext;
-
-    -- Skip if we can't find the referred user
-    IF v_referred_id IS NULL THEN
-      CONTINUE;
-    END IF;
-
-    -- Check if user was already referred
-    IF NOT EXISTS (
-      SELECT 1 FROM referrals
-      WHERE referred_id = v_referred_id
-    ) THEN
-      -- Insert the new referral relationship with error handling
-      BEGIN
-        INSERT INTO referrals (referrer_id, referred_id, created_at)
-        VALUES (v_referrer_id, v_referred_id, NOW());
-      EXCEPTION
-        WHEN unique_violation THEN
-          -- A referral was already created (possibly by another concurrent process)
-          RETURN NEW;
-      END;
-    END IF;
-  END LOOP;
-
-  RETURN NEW;
-END;
-$$;
-
-
-ALTER FUNCTION "private"."insert_referral_on_new_affiliate"() OWNER TO "postgres";
-
-
-CREATE OR REPLACE FUNCTION "private"."send_earn_deposit_trigger_delete_activity"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
-BEGIN
-    DELETE FROM activity
-    WHERE event_id = OLD.event_id
-        AND event_name = 'send_earn_deposit';
-    RETURN OLD;
-END;
-$$;
-
-
-ALTER FUNCTION "private"."send_earn_deposit_trigger_delete_activity"() OWNER TO "postgres";
-
-
-CREATE OR REPLACE FUNCTION "private"."send_earn_deposit_trigger_insert_activity"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
-DECLARE
-    _owner_user_id uuid;
-    _data jsonb;
-    _workflow_id TEXT;
-BEGIN
-    -- Select send app info for owner address (the Send account owner)
-    -- Requires SELECT on public.send_accounts
-    SELECT user_id INTO _owner_user_id
-    FROM public.send_accounts
-    WHERE address = concat('0x', encode(NEW.owner, 'hex'))::citext;
-
-    -- Build data object with the same pattern as send_account_transfers
-    -- Cast numeric values to text to avoid losing precision
-    _data := json_build_object(
-        'log_addr', NEW.log_addr,
-        'sender', NEW.sender,
-        'owner', NEW.owner,
-        'assets', NEW.assets::text,
-        'shares', NEW.shares::text,
-        'tx_hash', NEW.tx_hash,
-        'block_num', NEW.block_num::text,
-        'tx_idx', NEW.tx_idx::text,
-        'log_idx', NEW.log_idx::text
-    );
-
-    -- Insert into activity table - notice the similar pattern to send_account_transfers
-    -- Requires INSERT/UPDATE on public.activity
-    INSERT INTO public.activity (event_name, event_id, from_user_id, to_user_id, data, created_at)
-    VALUES (
-        'send_earn_deposit',
-        NEW.event_id,
-        _owner_user_id,  -- In this case from_user is the owner
-        NULL,            -- No to_user for deposits
-        _data,
-        to_timestamp(NEW.block_time) at time zone 'UTC'
-    )
-    ON CONFLICT (event_name, event_id) DO UPDATE SET
-        from_user_id = COALESCE(EXCLUDED.from_user_id, activity.from_user_id), -- Keep existing if new is NULL
-        to_user_id = EXCLUDED.to_user_id, -- Allow update if needed, though NULL here
-        data = EXCLUDED.data,
-        created_at = EXCLUDED.created_at;
-
-    -- *** CLEANUP LOGIC ***
-    DELETE FROM public.activity
-    WHERE id in (
-      SELECT activity_id
-      FROM temporal.send_earn_deposits
-      WHERE owner = NEW.owner
-        AND block_num <= NEW.block_num
-        AND status <> 'failed'
-    );
-    -- *** END CLEANUP LOGIC ***
-
-    RETURN NEW;
-END;
-$$;
-
-
-ALTER FUNCTION "private"."send_earn_deposit_trigger_insert_activity"() OWNER TO "postgres";
-
-
-CREATE OR REPLACE FUNCTION "private"."send_earn_withdraw_trigger_delete_activity"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
-BEGIN
-    DELETE FROM activity
-    WHERE event_id = OLD.event_id
-        AND event_name = 'send_earn_withdraw';
-    RETURN OLD;
-END;
-$$;
-
-
-ALTER FUNCTION "private"."send_earn_withdraw_trigger_delete_activity"() OWNER TO "postgres";
-
-
-CREATE OR REPLACE FUNCTION "private"."send_earn_withdraw_trigger_insert_activity"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
-DECLARE
-    _owner_user_id uuid;
-    _data jsonb;
-BEGIN
-    -- Select send app info for owner address
-    SELECT user_id INTO _owner_user_id
-    FROM send_accounts
-    WHERE address = concat('0x', encode(NEW.owner, 'hex'))::citext;
-
-    -- Build data object with the same pattern as send_account_transfers
-    _data := json_build_object(
-        'log_addr', NEW.log_addr,
-        'sender', NEW.sender,
-        'receiver', NEW.receiver,
-        'owner', NEW.owner,
-        'assets', NEW.assets::text,
-        'shares', NEW.shares::text,
-        'tx_hash', NEW.tx_hash,
-        'block_num', NEW.block_num::text,
-        'tx_idx', NEW.tx_idx::text,
-        'log_idx', NEW.log_idx::text
-    );
-
-    -- Insert into activity table with the same pattern
-    INSERT INTO activity (event_name, event_id, from_user_id, to_user_id, data, created_at)
-    VALUES (
-        'send_earn_withdraw',
-        NEW.event_id,
-        _owner_user_id,  -- In this case from_user is the owner
-        NULL,            -- No to_user for withdrawals
-        _data,
-        to_timestamp(NEW.block_time) at time zone 'UTC'
-    )
-    ON CONFLICT (event_name, event_id) DO UPDATE SET
-        from_user_id = _owner_user_id,
-        data = _data,
-        created_at = to_timestamp(NEW.block_time) at time zone 'UTC';
-
-    RETURN NEW;
-END;
-$$;
-
-
-ALTER FUNCTION "private"."send_earn_withdraw_trigger_insert_activity"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "private"."update_leaderboard_referrals_all_time_referrals"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -623,11 +127,7 @@ begin
     return NEW;
 end
 $$;
-
-
 ALTER FUNCTION "private"."update_leaderboard_referrals_all_time_referrals"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "private"."update_leaderboard_referrals_all_time_sendtag_checkout_receipts"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -645,13 +145,7 @@ begin
     return NEW;
 end;
 $$;
-
-
 ALTER FUNCTION "private"."update_leaderboard_referrals_all_time_sendtag_checkout_receipts"() OWNER TO "postgres";
-
-
-
-
 CREATE OR REPLACE FUNCTION "public"."chain_addresses_after_insert"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO 'public'
@@ -674,20 +168,10 @@ RETURN NEW;
 END;
 
 $$;
-
-
 ALTER FUNCTION "public"."chain_addresses_after_insert"() OWNER TO "postgres";
-
-
 SET default_tablespace = '';
 
 SET default_table_access_method = "heap";
-
-
-
-
-
-
 CREATE OR REPLACE FUNCTION "public"."favourite_senders"() RETURNS SETOF "public"."activity_feed_user"
     LANGUAGE "plpgsql"
     AS $$
@@ -723,13 +207,7 @@ ORDER BY interaction_count DESC -- Order the result by most frequent counterpart
 
 END;
 $$;
-
-
 ALTER FUNCTION "public"."favourite_senders"() OWNER TO "postgres";
-
-
-
-
 CREATE OR REPLACE FUNCTION "public"."get_affiliate_referrals"() RETURNS TABLE("send_plus_minus" numeric, "avatar_url" "text", "tag" "public"."citext", "created_at" timestamp with time zone)
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO 'public'
@@ -767,11 +245,7 @@ BEGIN
             send_score DESC;
 END;
 $$;
-
-
 ALTER FUNCTION "public"."get_affiliate_referrals"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "public"."get_affiliate_stats_summary"() RETURNS TABLE("id" "uuid", "created_at" timestamp with time zone, "user_id" "uuid", "referral_count" bigint)
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO 'public'
@@ -794,11 +268,7 @@ BEGIN
             a.user_id;
 END;
 $$;
-
-
 ALTER FUNCTION "public"."get_affiliate_stats_summary"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "public"."get_friends"() RETURNS TABLE("avatar_url" "text", "x_username" "text", "birthday" "date", "tag" "public"."citext", "created_at" timestamp with time zone)
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO 'public'
@@ -842,11 +312,7 @@ BEGIN
             send_score DESC;
 END;
 $$;
-
-
 ALTER FUNCTION "public"."get_friends"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "public"."get_pending_jackpot_tickets_purchased"() RETURNS numeric
     LANGUAGE "sql"
     AS $$
@@ -861,11 +327,7 @@ SELECT COALESCE(SUM(tickets_purchased_total_bps), 0) AS total_tickets
 FROM public.sendpot_user_ticket_purchases
 WHERE block_num >= (SELECT last_block FROM last_jackpot);
 $$;
-
-
 ALTER FUNCTION "public"."get_pending_jackpot_tickets_purchased"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "public"."get_user_jackpot_summary"("num_runs" integer) RETURNS TABLE("jackpot_run_id" integer, "jackpot_block_num" numeric, "jackpot_block_time" numeric, "winner" "bytea", "win_amount" numeric, "total_tickets" numeric)
     LANGUAGE "sql"
     AS $$
@@ -899,11 +361,7 @@ FROM cte c
 ORDER BY c.jackpot_block_num DESC
 LIMIT num_runs;
 $$;
-
-
 ALTER FUNCTION "public"."get_user_jackpot_summary"("num_runs" integer) OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "public"."handle_new_user"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO 'public'
@@ -916,27 +374,7 @@ return new;
 end;
 
 $$;
-
-
 ALTER FUNCTION "public"."handle_new_user"() OWNER TO "postgres";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 CREATE OR REPLACE FUNCTION "public"."insert_verification_referral"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
@@ -982,11 +420,7 @@ BEGIN
   RETURN NEW;
 END;
 $$;
-
-
 ALTER FUNCTION "public"."insert_verification_referral"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "public"."insert_verification_send_ceiling"() RETURNS "trigger"
     LANGUAGE "plpgsql"
     AS $$
@@ -1109,11 +543,7 @@ EXCEPTION
     RETURN NEW; -- Continue processing even if this trigger fails
 END;
 $$;
-
-
 ALTER FUNCTION "public"."insert_verification_send_ceiling"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "public"."insert_verification_sends"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO 'public'
@@ -1333,13 +763,7 @@ END IF;
   RETURN NEW;
 END;
 $$;
-
-
 ALTER FUNCTION "public"."insert_verification_sends"() OWNER TO "postgres";
-
-
-
-
 
 CREATE OR REPLACE FUNCTION "public"."leaderboard_referrals_all_time"() RETURNS TABLE("rewards_usdc" numeric, "referrals" integer, "user" "public"."activity_feed_user")
     LANGUAGE "plpgsql" STABLE SECURITY DEFINER
@@ -1359,11 +783,7 @@ begin
                  where p.is_public = true;
 end
 $$;
-
-
 ALTER FUNCTION "public"."leaderboard_referrals_all_time"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "public"."profile_lookup"("lookup_type" "public"."lookup_type_enum", "identifier" "text") RETURNS TABLE("id" "uuid", "avatar_url" "text", "name" "text", "about" "text", "refcode" "text", "x_username" "text", "birthday" "date", "tag" "public"."citext", "address" "public"."citext", "chain_id" integer, "is_public" boolean, "sendid" integer, "all_tags" "text"[])
     LANGUAGE "plpgsql" IMMUTABLE SECURITY DEFINER
     AS $$
@@ -1403,11 +823,7 @@ where ((lookup_type = 'sendid' and p.send_id::text = identifier) or
     limit 1;
 end;
 $$;
-
-
 ALTER FUNCTION "public"."profile_lookup"("lookup_type" "public"."lookup_type_enum", "identifier" "text") OWNER TO "postgres";
-
-
 
 CREATE OR REPLACE FUNCTION "public"."recent_senders"() RETURNS SETOF "public"."activity_feed_user"
     LANGUAGE "plpgsql"
@@ -1447,11 +863,7 @@ ORDER BY created_at DESC      -- Order the result by most recent transfer
 
 END;
 $$;
-
-
 ALTER FUNCTION "public"."recent_senders"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "public"."referrals_delete_activity_trigger"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO 'public'
@@ -1469,11 +881,7 @@ BEGIN
   RETURN NULL;
 END;
 $$;
-
-
 ALTER FUNCTION "public"."referrals_delete_activity_trigger"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "public"."referrals_insert_activity_trigger"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO 'public'
@@ -1496,11 +904,7 @@ BEGIN
   RETURN NULL;
 END;
 $$;
-
-
 ALTER FUNCTION "public"."referrals_insert_activity_trigger"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "public"."referrer_lookup"("referral_code" "text" DEFAULT NULL::"text") RETURNS TABLE("referrer" "public"."profile_lookup_result", "new_referrer" "public"."profile_lookup_result")
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -1542,11 +946,7 @@ RETURN QUERY
 SELECT ref_result, new_ref_result;
 END;
 $$;
-
-
 ALTER FUNCTION "public"."referrer_lookup"("referral_code" "text") OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "public"."send_account_receives_delete_activity_trigger"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -1555,11 +955,7 @@ begin
     return OLD;
 end;
 $$;
-
-
 ALTER FUNCTION "public"."send_account_receives_delete_activity_trigger"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "public"."send_account_receives_insert_activity_trigger"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -1599,11 +995,7 @@ begin
     return NEW;
 end;
 $$;
-
-
 ALTER FUNCTION "public"."send_account_receives_insert_activity_trigger"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "public"."send_account_signing_key_added_trigger_delete_activity"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -1615,11 +1007,7 @@ begin
     return OLD;
 end;
 $$;
-
-
 ALTER FUNCTION "public"."send_account_signing_key_added_trigger_delete_activity"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "public"."send_account_signing_key_added_trigger_insert_activity"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -1664,11 +1052,7 @@ begin
     return NEW;
 end;
 $$;
-
-
 ALTER FUNCTION "public"."send_account_signing_key_added_trigger_insert_activity"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "public"."send_account_signing_key_removed_trigger_delete_activity"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -1677,11 +1061,7 @@ begin
     return OLD;
 end;
 $$;
-
-
 ALTER FUNCTION "public"."send_account_signing_key_removed_trigger_delete_activity"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "public"."send_account_signing_key_removed_trigger_insert_activity"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -1726,11 +1106,7 @@ begin
     return NEW;
 end;
 $$;
-
-
 ALTER FUNCTION "public"."send_account_signing_key_removed_trigger_insert_activity"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "public"."send_account_transfers_delete_temporal_activity"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -1753,11 +1129,7 @@ begin
     return NEW;
 end;
 $$;
-
-
 ALTER FUNCTION "public"."send_account_transfers_delete_temporal_activity"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "public"."send_account_transfers_trigger_delete_activity"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -1769,11 +1141,7 @@ begin
     return OLD;
 end;
 $$;
-
-
 ALTER FUNCTION "public"."send_account_transfers_trigger_delete_activity"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "public"."send_account_transfers_trigger_insert_activity"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -1814,71 +1182,7 @@ begin
     return NEW;
 end;
 $$;
-
-
 ALTER FUNCTION "public"."send_account_transfers_trigger_insert_activity"() OWNER TO "postgres";
-
-
-
-
-CREATE TABLE IF NOT EXISTS "public"."send_earn_create" (
-    "id" bigint NOT NULL,
-    "chain_id" numeric NOT NULL,
-    "log_addr" "bytea" NOT NULL,
-    "block_time" numeric NOT NULL,
-    "tx_hash" "bytea" NOT NULL,
-    "send_earn" "bytea" NOT NULL,
-    "caller" "bytea" NOT NULL,
-    "initial_owner" "bytea" NOT NULL,
-    "vault" "bytea" NOT NULL,
-    "fee_recipient" "bytea" NOT NULL,
-    "collections" "bytea" NOT NULL,
-    "fee" numeric NOT NULL,
-    "salt" "bytea" NOT NULL,
-    "ig_name" "text" NOT NULL,
-    "src_name" "text" NOT NULL,
-    "block_num" numeric NOT NULL,
-    "tx_idx" integer NOT NULL,
-    "log_idx" integer NOT NULL,
-    "abi_idx" smallint NOT NULL,
-    "event_id" "text" GENERATED ALWAYS AS ((((((((("ig_name" || '/'::"text") || "src_name") || '/'::"text") || ("block_num")::"text") || '/'::"text") || ("tx_idx")::"text") || '/'::"text") || ("log_idx")::"text")) STORED NOT NULL
-);
-
-
-ALTER TABLE "public"."send_earn_create" OWNER TO "postgres";
-
-
-CREATE TABLE IF NOT EXISTS "public"."send_earn_new_affiliate" (
-    "id" bigint NOT NULL,
-    "chain_id" numeric NOT NULL,
-    "log_addr" "bytea" NOT NULL,
-    "block_time" numeric NOT NULL,
-    "tx_hash" "bytea" NOT NULL,
-    "affiliate" "bytea" NOT NULL,
-    "send_earn_affiliate" "bytea" NOT NULL,
-    "ig_name" "text" NOT NULL,
-    "src_name" "text" NOT NULL,
-    "block_num" numeric NOT NULL,
-    "tx_idx" integer NOT NULL,
-    "log_idx" integer NOT NULL,
-    "abi_idx" smallint NOT NULL,
-    "event_id" "text" GENERATED ALWAYS AS ((((((((("ig_name" || '/'::"text") || "src_name") || '/'::"text") || ("block_num")::"text") || '/'::"text") || ("tx_idx")::"text") || '/'::"text") || ("log_idx")::"text")) STORED NOT NULL
-);
-
-
-ALTER TABLE "public"."send_earn_new_affiliate" OWNER TO "postgres";
-
-
-CREATE OR REPLACE FUNCTION "public"."send_earn_affiliate_vault"("public"."send_earn_new_affiliate") RETURNS SETOF "public"."send_earn_create"
-    LANGUAGE "sql" STABLE ROWS 1
-    AS $_$
-select * from send_earn_create where fee_recipient = $1.send_earn_affiliate
-$_$;
-
-
-ALTER FUNCTION "public"."send_earn_affiliate_vault"("public"."send_earn_new_affiliate") OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "public"."set_current_timestamp_updated_at"() RETURNS "trigger"
     LANGUAGE "plpgsql"
     AS $$
@@ -1890,11 +1194,7 @@ BEGIN
   RETURN _new;
 END;
 $$;
-
-
 ALTER FUNCTION "public"."set_current_timestamp_updated_at"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "public"."stop_change_send_id"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO 'public'
@@ -1906,13 +1206,7 @@ CREATE OR REPLACE FUNCTION "public"."stop_change_send_id"() RETURNS "trigger"
   RETURN NEW;
 END;
 $$;
-
-
 ALTER FUNCTION "public"."stop_change_send_id"() OWNER TO "postgres";
-
-
-
-
 CREATE OR REPLACE FUNCTION "public"."tag_receipts_insert_activity_trigger"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -1953,15 +1247,7 @@ begin
     return NULL;
 end;
 $$;
-
-
 ALTER FUNCTION "public"."tag_receipts_insert_activity_trigger"() OWNER TO "postgres";
-
-
-
-
-
-
 
 CREATE OR REPLACE FUNCTION "public"."today_birthday_senders"() RETURNS SETOF "public"."activity_feed_user"
     LANGUAGE "plpgsql" SECURITY DEFINER
@@ -1990,11 +1276,7 @@ WHERE is_public = TRUE
   AND EXTRACT(DAY FROM p.birthday) = EXTRACT(DAY FROM CURRENT_DATE);
 END;
 $$;
-
-
 ALTER FUNCTION "public"."today_birthday_senders"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "public"."update_affiliate_stats_on_transfer"() RETURNS "trigger"
     LANGUAGE "plpgsql"
     AS $$
@@ -2079,17 +1361,7 @@ END IF;
   RETURN NEW;
 END;
 $$;
-
-
 ALTER FUNCTION "public"."update_affiliate_stats_on_transfer"() OWNER TO "postgres";
-
-
-
-
-
-
-
-
 CREATE OR REPLACE FUNCTION "public"."update_transfer_activity_before_insert"() RETURNS "trigger"
     LANGUAGE "plpgsql"
     AS $$
@@ -2125,11 +1397,7 @@ BEGIN
     RETURN NEW;
 END;
 $$;
-
-
 ALTER FUNCTION "public"."update_transfer_activity_before_insert"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "public"."user_referrals_count"() RETURNS integer
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO 'public'
@@ -2138,11 +1406,7 @@ begin
 return (select count(*) from referrals
 where referrer_id=auth.uid());
 end;$$;
-
-
 ALTER FUNCTION "public"."user_referrals_count"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "temporal"."add_note_activity_temporal_transfer_before_confirmed"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -2150,8 +1414,6 @@ BEGIN
   IF NEW.status != 'confirmed' OR NOT (NEW.data ? 'note') THEN
       RETURN NEW;
   END IF;
-
-
   UPDATE public.activity
   SET data = data || jsonb_build_object('note', NEW.data->>'note')
   WHERE event_name = NEW.data->>'event_name'
@@ -2160,11 +1422,7 @@ BEGIN
   RETURN NEW;
 END;
 $$;
-
-
 ALTER FUNCTION "temporal"."add_note_activity_temporal_transfer_before_confirmed"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "temporal"."temporal_deposit_insert_pending_activity"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -2225,11 +1483,7 @@ BEGIN
   RETURN NULL; -- AFTER triggers should return NULL
 END;
 $$;
-
-
 ALTER FUNCTION "temporal"."temporal_deposit_insert_pending_activity"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "temporal"."temporal_deposit_update_activity_on_status_change"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -2268,11 +1522,7 @@ BEGIN
   RETURN NEW; -- Result is ignored for AFTER triggers, but required syntax
 END;
 $$;
-
-
 ALTER FUNCTION "temporal"."temporal_deposit_update_activity_on_status_change"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "temporal"."temporal_send_account_transfers_trigger_delete_activity"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -2283,11 +1533,7 @@ BEGIN
     RETURN OLD;
 END;
 $$;
-
-
 ALTER FUNCTION "temporal"."temporal_send_account_transfers_trigger_delete_activity"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "temporal"."temporal_transfer_after_upsert"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -2389,11 +1635,7 @@ BEGIN
     RETURN NEW;
 END;
 $$;
-
-
 ALTER FUNCTION "temporal"."temporal_transfer_after_upsert"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "temporal"."temporal_transfer_before_insert"() RETURNS "trigger"
     LANGUAGE "plpgsql"
     AS $$
@@ -2424,13 +1666,7 @@ BEGIN
   RETURN NEW;
 END;
 $$;
-
-
 ALTER FUNCTION "temporal"."temporal_transfer_before_insert"() OWNER TO "postgres";
-
-
-
-
 CREATE TABLE IF NOT EXISTS "public"."activity" (
     "id" integer NOT NULL,
     "event_name" "text" NOT NULL,
@@ -2440,11 +1676,7 @@ CREATE TABLE IF NOT EXISTS "public"."activity" (
     "data" "jsonb",
     "created_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
-
-
 ALTER TABLE "public"."activity" OWNER TO "postgres";
-
-
 CREATE OR REPLACE VIEW "public"."activity_feed" WITH ("security_barrier"='on') AS
  SELECT "a"."created_at",
     "a"."event_name",
@@ -2474,11 +1706,7 @@ CREATE OR REPLACE VIEW "public"."activity_feed" WITH ("security_barrier"='on') A
      LEFT JOIN "public"."profiles" "to_p" ON (("a"."to_user_id" = "to_p"."id")))
   WHERE (("a"."from_user_id" = ( SELECT "auth"."uid"() AS "uid")) OR (("a"."to_user_id" = ( SELECT "auth"."uid"() AS "uid")) AND ("a"."event_name" !~~ 'temporal_%'::"text")))
   GROUP BY "a"."created_at", "a"."event_name", "a"."from_user_id", "a"."to_user_id", "from_p"."id", "from_p"."name", "from_p"."avatar_url", "from_p"."send_id", "to_p"."id", "to_p"."name", "to_p"."avatar_url", "to_p"."send_id", "a"."data";
-
-
 ALTER TABLE "public"."activity_feed" OWNER TO "postgres";
-
-
 CREATE SEQUENCE IF NOT EXISTS "public"."activity_id_seq"
     AS integer
     START WITH 1
@@ -2486,14 +1714,8 @@ CREATE SEQUENCE IF NOT EXISTS "public"."activity_id_seq"
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-
 ALTER TABLE "public"."activity_id_seq" OWNER TO "postgres";
-
-
 ALTER SEQUENCE "public"."activity_id_seq" OWNED BY "public"."activity"."id";
-
-
 
 CREATE TABLE IF NOT EXISTS "public"."affiliate_stats" (
     "user_id" "uuid",
@@ -2502,26 +1724,14 @@ CREATE TABLE IF NOT EXISTS "public"."affiliate_stats" (
     "updated_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     "send_plus_minus" numeric DEFAULT 0 NOT NULL
 );
-
-
 ALTER TABLE "public"."affiliate_stats" OWNER TO "postgres";
-
-
 CREATE TABLE IF NOT EXISTS "public"."chain_addresses" (
     "address" "public"."citext" NOT NULL,
     "user_id" "uuid" NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     CONSTRAINT "chain_addresses_address_check" CHECK ((("length"(("address")::"text") = 42) AND ("address" OPERATOR("public".~) '^0x[A-Fa-f0-9]{40}$'::"public"."citext")))
 );
-
-
 ALTER TABLE "public"."chain_addresses" OWNER TO "postgres";
-
-
-
-
-
-
 CREATE TABLE IF NOT EXISTS "public"."send_account_credentials" (
     "account_id" "uuid" NOT NULL,
     "credential_id" "uuid" NOT NULL,
@@ -2529,11 +1739,7 @@ CREATE TABLE IF NOT EXISTS "public"."send_account_credentials" (
     "created_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "account_credentials_key_slot_check" CHECK ((("key_slot" >= 0) AND ("key_slot" <= 255)))
 );
-
-
 ALTER TABLE "public"."send_account_credentials" OWNER TO "postgres";
-
-
 CREATE TABLE IF NOT EXISTS "public"."send_account_transfers" (
     "id" integer NOT NULL,
     "chain_id" numeric NOT NULL,
@@ -2551,11 +1757,7 @@ CREATE TABLE IF NOT EXISTS "public"."send_account_transfers" (
     "abi_idx" smallint NOT NULL,
     "event_id" "text" GENERATED ALWAYS AS ((((((((("ig_name" || '/'::"text") || "src_name") || '/'::"text") || ("block_num")::"text") || '/'::"text") || ("tx_idx")::"text") || '/'::"text") || ("log_idx")::"text")) STORED NOT NULL
 );
-
-
 ALTER TABLE "public"."send_account_transfers" OWNER TO "postgres";
-
-
 CREATE TABLE IF NOT EXISTS "public"."send_token_transfers" (
     "id" integer NOT NULL,
     "chain_id" numeric NOT NULL,
@@ -2573,11 +1775,7 @@ CREATE TABLE IF NOT EXISTS "public"."send_token_transfers" (
     "abi_idx" smallint NOT NULL,
     "event_id" "text" GENERATED ALWAYS AS ((((((((("ig_name" || '/'::"text") || "src_name") || '/'::"text") || ("block_num")::"text") || '/'::"text") || ("tx_idx")::"text") || '/'::"text") || ("log_idx")::"text")) STORED NOT NULL
 );
-
-
 ALTER TABLE "public"."send_token_transfers" OWNER TO "postgres";
-
-
 CREATE TABLE IF NOT EXISTS "public"."sendtag_checkout_receipts" (
     "id" integer NOT NULL,
     "event_id" "text" GENERATED ALWAYS AS ((((((((((("ig_name" || '/'::"text") || "src_name") || '/'::"text") || ("block_num")::"text") || '/'::"text") || ("tx_idx")::"text") || '/'::"text") || ("log_idx")::"text") || '/'::"text") || ("abi_idx")::"text")) STORED NOT NULL,
@@ -2596,11 +1794,7 @@ CREATE TABLE IF NOT EXISTS "public"."sendtag_checkout_receipts" (
     "log_idx" integer NOT NULL,
     "abi_idx" smallint NOT NULL
 );
-
-
 ALTER TABLE "public"."sendtag_checkout_receipts" OWNER TO "postgres";
-
-
 CREATE OR REPLACE VIEW "public"."dashboard_metrics" AS
  WITH "time_window" AS (
          SELECT EXTRACT(epoch FROM ("now"() - '24:00:00'::interval)) AS "cutoff_time"
@@ -2750,31 +1944,7 @@ CREATE OR REPLACE VIEW "public"."dashboard_metrics" AS
                  LIMIT 10) "t") AS "new_affiliates",
     ( SELECT "json_agg"("row_to_json"("tai".*)) AS "json_agg"
            FROM "top_all_ips" "tai") AS "top_all_ips";
-
-
 ALTER TABLE "public"."dashboard_metrics" OWNER TO "postgres";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 CREATE TABLE IF NOT EXISTS "public"."liquidity_pools" (
     "pool_name" "text" NOT NULL,
@@ -2783,11 +1953,7 @@ CREATE TABLE IF NOT EXISTS "public"."liquidity_pools" (
     "chain_id" integer NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL
 );
-
-
 ALTER TABLE "public"."liquidity_pools" OWNER TO "postgres";
-
-
 CREATE TABLE IF NOT EXISTS "public"."receipts" (
     "hash" "public"."citext",
     "created_at" timestamp with time zone DEFAULT "now"(),
@@ -2796,11 +1962,7 @@ CREATE TABLE IF NOT EXISTS "public"."receipts" (
     "event_id" "text" NOT NULL,
     CONSTRAINT "receipts_hash_check" CHECK ((("length"(("hash")::"text") = 66) AND ("hash" OPERATOR("public".~) '^0x[A-Fa-f0-9]{64}$'::"public"."citext")))
 );
-
-
 ALTER TABLE "public"."receipts" OWNER TO "postgres";
-
-
 CREATE SEQUENCE IF NOT EXISTS "public"."receipts_id_seq"
     AS integer
     START WITH 1
@@ -2808,14 +1970,8 @@ CREATE SEQUENCE IF NOT EXISTS "public"."receipts_id_seq"
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-
 ALTER TABLE "public"."receipts_id_seq" OWNER TO "postgres";
-
-
 ALTER SEQUENCE "public"."receipts_id_seq" OWNED BY "public"."receipts"."id";
-
-
 
 CREATE SEQUENCE IF NOT EXISTS "public"."referrals_id_seq"
     START WITH 1
@@ -2823,14 +1979,8 @@ CREATE SEQUENCE IF NOT EXISTS "public"."referrals_id_seq"
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-
 ALTER TABLE "public"."referrals_id_seq" OWNER TO "postgres";
-
-
 ALTER SEQUENCE "public"."referrals_id_seq" OWNED BY "public"."referrals"."id";
-
-
 
 CREATE OR REPLACE VIEW "public"."referrer" WITH ("security_barrier"='on') AS
  WITH "referrer" AS (
@@ -2874,11 +2024,7 @@ CREATE OR REPLACE VIEW "public"."referrer" WITH ("security_barrier"='on') AS
     "profile_lookup"."all_tags",
     "profile_lookup"."send_id"
    FROM "profile_lookup";
-
-
 ALTER TABLE "public"."referrer" OWNER TO "postgres";
-
-
 CREATE TABLE IF NOT EXISTS "public"."send_account_created" (
     "chain_id" numeric NOT NULL,
     "log_addr" "bytea" NOT NULL,
@@ -2894,11 +2040,7 @@ CREATE TABLE IF NOT EXISTS "public"."send_account_created" (
     "id" integer NOT NULL,
     "event_id" "text" GENERATED ALWAYS AS ((((((((("ig_name" || '/'::"text") || "src_name") || '/'::"text") || ("block_num")::"text") || '/'::"text") || ("tx_idx")::"text") || '/'::"text") || ("log_idx")::"text")) STORED NOT NULL
 );
-
-
 ALTER TABLE "public"."send_account_created" OWNER TO "postgres";
-
-
 CREATE SEQUENCE IF NOT EXISTS "public"."send_account_created_id_seq"
     AS integer
     START WITH 1
@@ -2906,14 +2048,8 @@ CREATE SEQUENCE IF NOT EXISTS "public"."send_account_created_id_seq"
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-
 ALTER TABLE "public"."send_account_created_id_seq" OWNER TO "postgres";
-
-
 ALTER SEQUENCE "public"."send_account_created_id_seq" OWNED BY "public"."send_account_created"."id";
-
-
 
 CREATE TABLE IF NOT EXISTS "public"."send_account_receives" (
     "id" integer NOT NULL,
@@ -2931,11 +2067,7 @@ CREATE TABLE IF NOT EXISTS "public"."send_account_receives" (
     "src_name" "text" NOT NULL,
     "abi_idx" smallint NOT NULL
 );
-
-
 ALTER TABLE "public"."send_account_receives" OWNER TO "postgres";
-
-
 CREATE SEQUENCE IF NOT EXISTS "public"."send_account_receives_id_seq"
     AS integer
     START WITH 1
@@ -2943,14 +2075,8 @@ CREATE SEQUENCE IF NOT EXISTS "public"."send_account_receives_id_seq"
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-
 ALTER TABLE "public"."send_account_receives_id_seq" OWNER TO "postgres";
-
-
 ALTER SEQUENCE "public"."send_account_receives_id_seq" OWNED BY "public"."send_account_receives"."id";
-
-
 
 CREATE TABLE IF NOT EXISTS "public"."send_account_signing_key_added" (
     "chain_id" numeric NOT NULL,
@@ -2969,11 +2095,7 @@ CREATE TABLE IF NOT EXISTS "public"."send_account_signing_key_added" (
     "id" integer NOT NULL,
     "event_id" "text" GENERATED ALWAYS AS ((((((((("ig_name" || '/'::"text") || "src_name") || '/'::"text") || ("block_num")::"text") || '/'::"text") || ("tx_idx")::"text") || '/'::"text") || ("log_idx")::"text")) STORED NOT NULL
 );
-
-
 ALTER TABLE "public"."send_account_signing_key_added" OWNER TO "postgres";
-
-
 CREATE SEQUENCE IF NOT EXISTS "public"."send_account_signing_key_added_id_seq"
     AS integer
     START WITH 1
@@ -2981,14 +2103,8 @@ CREATE SEQUENCE IF NOT EXISTS "public"."send_account_signing_key_added_id_seq"
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-
 ALTER TABLE "public"."send_account_signing_key_added_id_seq" OWNER TO "postgres";
-
-
 ALTER SEQUENCE "public"."send_account_signing_key_added_id_seq" OWNED BY "public"."send_account_signing_key_added"."id";
-
-
 
 CREATE TABLE IF NOT EXISTS "public"."send_account_signing_key_removed" (
     "chain_id" numeric NOT NULL,
@@ -3007,11 +2123,7 @@ CREATE TABLE IF NOT EXISTS "public"."send_account_signing_key_removed" (
     "id" integer NOT NULL,
     "event_id" "text" GENERATED ALWAYS AS ((((((((("ig_name" || '/'::"text") || "src_name") || '/'::"text") || ("block_num")::"text") || '/'::"text") || ("tx_idx")::"text") || '/'::"text") || ("log_idx")::"text")) STORED NOT NULL
 );
-
-
 ALTER TABLE "public"."send_account_signing_key_removed" OWNER TO "postgres";
-
-
 CREATE SEQUENCE IF NOT EXISTS "public"."send_account_signing_key_removed_id_seq"
     AS integer
     START WITH 1
@@ -3019,14 +2131,8 @@ CREATE SEQUENCE IF NOT EXISTS "public"."send_account_signing_key_removed_id_seq"
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-
 ALTER TABLE "public"."send_account_signing_key_removed_id_seq" OWNER TO "postgres";
-
-
 ALTER SEQUENCE "public"."send_account_signing_key_removed_id_seq" OWNED BY "public"."send_account_signing_key_removed"."id";
-
-
 
 CREATE SEQUENCE IF NOT EXISTS "public"."send_account_transfers_id_seq"
     AS integer
@@ -3035,169 +2141,15 @@ CREATE SEQUENCE IF NOT EXISTS "public"."send_account_transfers_id_seq"
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-
 ALTER TABLE "public"."send_account_transfers_id_seq" OWNER TO "postgres";
-
-
 ALTER SEQUENCE "public"."send_account_transfers_id_seq" OWNED BY "public"."send_account_transfers"."id";
-
-
-
-CREATE TABLE IF NOT EXISTS "public"."send_earn_deposit" (
-    "id" bigint NOT NULL,
-    "chain_id" numeric NOT NULL,
-    "log_addr" "bytea" NOT NULL,
-    "block_time" numeric NOT NULL,
-    "tx_hash" "bytea" NOT NULL,
-    "sender" "bytea" NOT NULL,
-    "owner" "bytea" NOT NULL,
-    "assets" numeric NOT NULL,
-    "shares" numeric NOT NULL,
-    "ig_name" "text" NOT NULL,
-    "src_name" "text" NOT NULL,
-    "block_num" numeric NOT NULL,
-    "tx_idx" integer NOT NULL,
-    "log_idx" integer NOT NULL,
-    "abi_idx" smallint NOT NULL,
-    "event_id" "text" GENERATED ALWAYS AS ((((((((("ig_name" || '/'::"text") || "src_name") || '/'::"text") || ("block_num")::"text") || '/'::"text") || ("tx_idx")::"text") || '/'::"text") || ("log_idx")::"text")) STORED NOT NULL
-);
-
-
-ALTER TABLE "public"."send_earn_deposit" OWNER TO "postgres";
-
-
-CREATE TABLE IF NOT EXISTS "public"."send_earn_withdraw" (
-    "id" bigint NOT NULL,
-    "chain_id" numeric NOT NULL,
-    "log_addr" "bytea" NOT NULL,
-    "block_time" numeric NOT NULL,
-    "tx_hash" "bytea" NOT NULL,
-    "sender" "bytea" NOT NULL,
-    "receiver" "bytea" NOT NULL,
-    "owner" "bytea" NOT NULL,
-    "assets" numeric NOT NULL,
-    "shares" numeric NOT NULL,
-    "ig_name" "text" NOT NULL,
-    "src_name" "text" NOT NULL,
-    "block_num" numeric NOT NULL,
-    "tx_idx" integer NOT NULL,
-    "log_idx" integer NOT NULL,
-    "abi_idx" smallint NOT NULL,
-    "event_id" "text" GENERATED ALWAYS AS ((((((((("ig_name" || '/'::"text") || "src_name") || '/'::"text") || ("block_num")::"text") || '/'::"text") || ("tx_idx")::"text") || '/'::"text") || ("log_idx")::"text")) STORED NOT NULL
-);
-
-
-ALTER TABLE "public"."send_earn_withdraw" OWNER TO "postgres";
-
-
-CREATE OR REPLACE VIEW "public"."send_earn_activity" WITH ("security_invoker"='on', "security_barrier"='on') AS
- SELECT 'deposit'::"text" AS "type",
-    "d"."block_num",
-    "d"."block_time",
-    "d"."log_addr",
-    "d"."owner",
-    "d"."sender",
-    "d"."assets",
-    "d"."shares",
-    "d"."tx_hash"
-   FROM "public"."send_earn_deposit" "d"
-UNION ALL
- SELECT 'withdraw'::"text" AS "type",
-    "w"."block_num",
-    "w"."block_time",
-    "w"."log_addr",
-    "w"."owner",
-    "w"."sender",
-    "w"."assets",
-    "w"."shares",
-    "w"."tx_hash"
-   FROM "public"."send_earn_withdraw" "w"
-  ORDER BY 3 DESC;
-
-
-ALTER TABLE "public"."send_earn_activity" OWNER TO "postgres";
-
-
-CREATE OR REPLACE VIEW "public"."send_earn_balances" WITH ("security_invoker"='on', "security_barrier"='on') AS
- WITH "txs" AS (
-         SELECT "send_earn_deposit"."log_addr",
-            "send_earn_deposit"."owner",
-            "send_earn_deposit"."assets",
-            "send_earn_deposit"."shares"
-           FROM "public"."send_earn_deposit"
-        UNION
-         SELECT "send_earn_withdraw"."log_addr",
-            "send_earn_withdraw"."owner",
-            ("send_earn_withdraw"."assets" * ('-1'::integer)::numeric),
-            ("send_earn_withdraw"."shares" * ('-1'::integer)::numeric)
-           FROM "public"."send_earn_withdraw"
-        )
- SELECT "t"."log_addr",
-    "t"."owner",
-    "sum"("t"."assets") AS "assets",
-    "sum"("t"."shares") AS "shares"
-   FROM "txs" "t"
-  GROUP BY "t"."log_addr", "t"."owner";
-
-
-ALTER TABLE "public"."send_earn_balances" OWNER TO "postgres";
-
-
-ALTER TABLE "public"."send_earn_create" ALTER COLUMN "id" ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME "public"."send_earn_create_id_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
-
-
-ALTER TABLE "public"."send_earn_deposit" ALTER COLUMN "id" ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME "public"."send_earn_deposit_id_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
-
-
-ALTER TABLE "public"."send_earn_new_affiliate" ALTER COLUMN "id" ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME "public"."send_earn_new_affiliate_id_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
-
-
-ALTER TABLE "public"."send_earn_withdraw" ALTER COLUMN "id" ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME "public"."send_earn_withdraw_id_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
-
 
 CREATE TABLE IF NOT EXISTS "public"."send_liquidity_pools" (
     "id" integer NOT NULL,
     "address" "bytea" NOT NULL,
     "chain_id" integer NOT NULL
 );
-
-
 ALTER TABLE "public"."send_liquidity_pools" OWNER TO "postgres";
-
-
 CREATE SEQUENCE IF NOT EXISTS "public"."send_liquidity_pools_id_seq"
     AS integer
     START WITH 1
@@ -3205,14 +2157,8 @@ CREATE SEQUENCE IF NOT EXISTS "public"."send_liquidity_pools_id_seq"
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-
 ALTER TABLE "public"."send_liquidity_pools_id_seq" OWNER TO "postgres";
-
-
 ALTER SEQUENCE "public"."send_liquidity_pools_id_seq" OWNED BY "public"."send_liquidity_pools"."id";
-
-
 
 CREATE TABLE IF NOT EXISTS "public"."send_revenues_safe_receives" (
     "chain_id" numeric NOT NULL,
@@ -3230,11 +2176,7 @@ CREATE TABLE IF NOT EXISTS "public"."send_revenues_safe_receives" (
     "id" integer NOT NULL,
     "event_id" "text" GENERATED ALWAYS AS ((((((((("ig_name" || '/'::"text") || "src_name") || '/'::"text") || ("block_num")::"text") || '/'::"text") || ("tx_idx")::"text") || '/'::"text") || ("log_idx")::"text")) STORED NOT NULL
 );
-
-
 ALTER TABLE "public"."send_revenues_safe_receives" OWNER TO "postgres";
-
-
 CREATE SEQUENCE IF NOT EXISTS "public"."send_revenues_safe_receives_id_seq"
     AS integer
     START WITH 1
@@ -3242,16 +2184,8 @@ CREATE SEQUENCE IF NOT EXISTS "public"."send_revenues_safe_receives_id_seq"
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-
 ALTER TABLE "public"."send_revenues_safe_receives_id_seq" OWNER TO "postgres";
-
-
 ALTER SEQUENCE "public"."send_revenues_safe_receives_id_seq" OWNED BY "public"."send_revenues_safe_receives"."id";
-
-
-
-
 
 CREATE SEQUENCE IF NOT EXISTS "public"."send_token_transfers_id_seq"
     AS integer
@@ -3260,14 +2194,8 @@ CREATE SEQUENCE IF NOT EXISTS "public"."send_token_transfers_id_seq"
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-
 ALTER TABLE "public"."send_token_transfers_id_seq" OWNER TO "postgres";
-
-
 ALTER SEQUENCE "public"."send_token_transfers_id_seq" OWNED BY "public"."send_token_transfers"."id";
-
-
 
 CREATE TABLE IF NOT EXISTS "public"."send_token_v0_transfers" (
     "id" integer NOT NULL,
@@ -3286,11 +2214,7 @@ CREATE TABLE IF NOT EXISTS "public"."send_token_v0_transfers" (
     "abi_idx" smallint NOT NULL,
     "event_id" "text" GENERATED ALWAYS AS ((((((((("ig_name" || '/'::"text") || "src_name") || '/'::"text") || ("block_num")::"text") || '/'::"text") || ("tx_idx")::"text") || '/'::"text") || ("log_idx")::"text")) STORED NOT NULL
 );
-
-
 ALTER TABLE "public"."send_token_v0_transfers" OWNER TO "postgres";
-
-
 CREATE SEQUENCE IF NOT EXISTS "public"."send_token_v0_transfers_id_seq"
     AS integer
     START WITH 1
@@ -3298,14 +2222,8 @@ CREATE SEQUENCE IF NOT EXISTS "public"."send_token_v0_transfers_id_seq"
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-
 ALTER TABLE "public"."send_token_v0_transfers_id_seq" OWNER TO "postgres";
-
-
 ALTER SEQUENCE "public"."send_token_v0_transfers_id_seq" OWNED BY "public"."send_token_v0_transfers"."id";
-
-
 
 CREATE TABLE IF NOT EXISTS "public"."sendpot_jackpot_runs" (
     "id" integer NOT NULL,
@@ -3325,11 +2243,7 @@ CREATE TABLE IF NOT EXISTS "public"."sendpot_jackpot_runs" (
     "log_idx" integer,
     "abi_idx" smallint
 );
-
-
 ALTER TABLE "public"."sendpot_jackpot_runs" OWNER TO "postgres";
-
-
 CREATE SEQUENCE IF NOT EXISTS "public"."sendpot_jackpot_runs_id_seq"
     AS integer
     START WITH 1
@@ -3337,14 +2251,8 @@ CREATE SEQUENCE IF NOT EXISTS "public"."sendpot_jackpot_runs_id_seq"
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-
 ALTER TABLE "public"."sendpot_jackpot_runs_id_seq" OWNER TO "postgres";
-
-
 ALTER SEQUENCE "public"."sendpot_jackpot_runs_id_seq" OWNED BY "public"."sendpot_jackpot_runs"."id";
-
-
 
 CREATE TABLE IF NOT EXISTS "public"."sendpot_user_ticket_purchases" (
     "id" integer NOT NULL,
@@ -3364,11 +2272,7 @@ CREATE TABLE IF NOT EXISTS "public"."sendpot_user_ticket_purchases" (
     "log_idx" integer,
     "abi_idx" smallint
 );
-
-
 ALTER TABLE "public"."sendpot_user_ticket_purchases" OWNER TO "postgres";
-
-
 CREATE SEQUENCE IF NOT EXISTS "public"."sendpot_user_ticket_purchases_id_seq"
     AS integer
     START WITH 1
@@ -3376,14 +2280,8 @@ CREATE SEQUENCE IF NOT EXISTS "public"."sendpot_user_ticket_purchases_id_seq"
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-
 ALTER TABLE "public"."sendpot_user_ticket_purchases_id_seq" OWNER TO "postgres";
-
-
 ALTER SEQUENCE "public"."sendpot_user_ticket_purchases_id_seq" OWNED BY "public"."sendpot_user_ticket_purchases"."id";
-
-
 
 CREATE SEQUENCE IF NOT EXISTS "public"."sendtag_checkout_receipts_id_seq"
     AS integer
@@ -3392,25 +2290,15 @@ CREATE SEQUENCE IF NOT EXISTS "public"."sendtag_checkout_receipts_id_seq"
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-
 ALTER TABLE "public"."sendtag_checkout_receipts_id_seq" OWNER TO "postgres";
-
-
 ALTER SEQUENCE "public"."sendtag_checkout_receipts_id_seq" OWNED BY "public"."sendtag_checkout_receipts"."id";
-
-
 
 CREATE TABLE IF NOT EXISTS "public"."swap_routers" (
     "router_addr" "bytea" NOT NULL,
     "chain_id" integer NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL
 );
-
-
 ALTER TABLE "public"."swap_routers" OWNER TO "postgres";
-
-
 CREATE TABLE IF NOT EXISTS "public"."tag_receipts" (
     "tag_name" "public"."citext" NOT NULL,
     "hash" "public"."citext",
@@ -3418,11 +2306,7 @@ CREATE TABLE IF NOT EXISTS "public"."tag_receipts" (
     "id" integer NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"()
 );
-
-
 ALTER TABLE "public"."tag_receipts" OWNER TO "postgres";
-
-
 CREATE SEQUENCE IF NOT EXISTS "public"."tag_receipts_id_seq"
     AS integer
     START WITH 1
@@ -3430,14 +2314,8 @@ CREATE SEQUENCE IF NOT EXISTS "public"."tag_receipts_id_seq"
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-
 ALTER TABLE "public"."tag_receipts_id_seq" OWNER TO "postgres";
-
-
 ALTER SEQUENCE "public"."tag_receipts_id_seq" OWNED BY "public"."tag_receipts"."id";
-
-
 CREATE TABLE IF NOT EXISTS "shovel"."ig_updates" (
     "name" "text" NOT NULL,
     "src_name" "text" NOT NULL,
@@ -3447,20 +2325,12 @@ CREATE TABLE IF NOT EXISTS "shovel"."ig_updates" (
     "nrows" numeric,
     "stop" numeric
 );
-
-
 ALTER TABLE "shovel"."ig_updates" OWNER TO "postgres";
-
-
 CREATE TABLE IF NOT EXISTS "shovel"."integrations" (
     "name" "text",
     "conf" "jsonb"
 );
-
-
 ALTER TABLE "shovel"."integrations" OWNER TO "postgres";
-
-
 CREATE TABLE IF NOT EXISTS "shovel"."task_updates" (
     "num" numeric,
     "hash" "bytea",
@@ -3475,11 +2345,7 @@ CREATE TABLE IF NOT EXISTS "shovel"."task_updates" (
     "chain_id" integer,
     "ig_name" "text"
 );
-
-
 ALTER TABLE "shovel"."task_updates" OWNER TO "postgres";
-
-
 CREATE OR REPLACE VIEW "shovel"."latest" AS
  WITH "abs_latest" AS (
          SELECT "task_updates"."src_name",
@@ -3498,11 +2364,7 @@ CREATE OR REPLACE VIEW "shovel"."latest" AS
     "min"("src_latest"."num") AS "num"
    FROM "src_latest"
   GROUP BY "src_latest"."src_name";
-
-
 ALTER TABLE "shovel"."latest" OWNER TO "postgres";
-
-
 CREATE OR REPLACE VIEW "shovel"."source_updates" AS
  SELECT DISTINCT ON ("task_updates"."src_name") "task_updates"."src_name",
     "task_updates"."num",
@@ -3514,21 +2376,13 @@ CREATE OR REPLACE VIEW "shovel"."source_updates" AS
     "task_updates"."latency"
    FROM "shovel"."task_updates"
   ORDER BY "task_updates"."src_name", "task_updates"."num" DESC;
-
-
 ALTER TABLE "shovel"."source_updates" OWNER TO "postgres";
-
-
 CREATE TABLE IF NOT EXISTS "shovel"."sources" (
     "name" "text",
     "chain_id" integer,
     "url" "text"
 );
-
-
 ALTER TABLE "shovel"."sources" OWNER TO "postgres";
-
-
 CREATE TABLE IF NOT EXISTS "temporal"."send_account_transfers" (
     "id" integer NOT NULL,
     "workflow_id" "text" NOT NULL,
@@ -3541,11 +2395,7 @@ CREATE TABLE IF NOT EXISTS "temporal"."send_account_transfers" (
     "send_account_transfers_activity_event_id" "text",
     "send_account_transfers_activity_event_name" "text"
 );
-
-
 ALTER TABLE "temporal"."send_account_transfers" OWNER TO "postgres";
-
-
 CREATE SEQUENCE IF NOT EXISTS "temporal"."send_account_transfers_id_seq"
     AS integer
     START WITH 1
@@ -3553,1019 +2403,419 @@ CREATE SEQUENCE IF NOT EXISTS "temporal"."send_account_transfers_id_seq"
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-
 ALTER TABLE "temporal"."send_account_transfers_id_seq" OWNER TO "postgres";
-
-
 ALTER SEQUENCE "temporal"."send_account_transfers_id_seq" OWNED BY "temporal"."send_account_transfers"."id";
 
-
-
-CREATE TABLE IF NOT EXISTS "temporal"."send_earn_deposits" (
-    "workflow_id" "text" NOT NULL,
-    "status" "public"."temporal_status" DEFAULT 'initialized'::"public"."temporal_status" NOT NULL,
-    "owner" "bytea",
-    "assets" numeric,
-    "vault" "bytea",
-    "user_op_hash" "bytea",
-    "block_num" numeric,
-    "activity_id" bigint,
-    "error_message" "text",
-    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
-    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL
-);
-
-
-ALTER TABLE "temporal"."send_earn_deposits" OWNER TO "postgres";
-
-
 ALTER TABLE ONLY "public"."activity" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."activity_id_seq"'::"regclass");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ALTER TABLE ONLY "public"."receipts" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."receipts_id_seq"'::"regclass");
-
-
 
 ALTER TABLE ONLY "public"."referrals" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."referrals_id_seq"'::"regclass");
 
-
-
 ALTER TABLE ONLY "public"."send_account_created" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."send_account_created_id_seq"'::"regclass");
-
-
 
 ALTER TABLE ONLY "public"."send_account_receives" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."send_account_receives_id_seq"'::"regclass");
 
-
-
 ALTER TABLE ONLY "public"."send_account_signing_key_added" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."send_account_signing_key_added_id_seq"'::"regclass");
-
-
 
 ALTER TABLE ONLY "public"."send_account_signing_key_removed" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."send_account_signing_key_removed_id_seq"'::"regclass");
 
-
-
 ALTER TABLE ONLY "public"."send_account_transfers" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."send_account_transfers_id_seq"'::"regclass");
-
-
 
 ALTER TABLE ONLY "public"."send_liquidity_pools" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."send_liquidity_pools_id_seq"'::"regclass");
 
-
-
 ALTER TABLE ONLY "public"."send_revenues_safe_receives" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."send_revenues_safe_receives_id_seq"'::"regclass");
-
-
 
 ALTER TABLE ONLY "public"."send_token_transfers" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."send_token_transfers_id_seq"'::"regclass");
 
-
-
 ALTER TABLE ONLY "public"."send_token_v0_transfers" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."send_token_v0_transfers_id_seq"'::"regclass");
-
-
 
 ALTER TABLE ONLY "public"."sendpot_jackpot_runs" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."sendpot_jackpot_runs_id_seq"'::"regclass");
 
-
-
 ALTER TABLE ONLY "public"."sendpot_user_ticket_purchases" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."sendpot_user_ticket_purchases_id_seq"'::"regclass");
-
-
 
 ALTER TABLE ONLY "public"."sendtag_checkout_receipts" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."sendtag_checkout_receipts_id_seq"'::"regclass");
 
-
-
 ALTER TABLE ONLY "public"."tag_receipts" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."tag_receipts_id_seq"'::"regclass");
 
-
-
 ALTER TABLE ONLY "temporal"."send_account_transfers" ALTER COLUMN "id" SET DEFAULT "nextval"('"temporal"."send_account_transfers_id_seq"'::"regclass");
-
-
 
 ALTER TABLE ONLY "private"."leaderboard_referrals_all_time"
     ADD CONSTRAINT "leaderboard_referrals_all_time_pkey" PRIMARY KEY ("user_id");
 
-
-
 ALTER TABLE ONLY "public"."send_account_credentials"
     ADD CONSTRAINT "account_credentials_pkey" PRIMARY KEY ("account_id", "credential_id");
-
-
 
 ALTER TABLE ONLY "public"."activity"
     ADD CONSTRAINT "activity_pkey" PRIMARY KEY ("id");
 
-
-
 ALTER TABLE ONLY "public"."affiliate_stats"
     ADD CONSTRAINT "affiliate_stats_pkey" PRIMARY KEY ("id");
-
-
 
 ALTER TABLE ONLY "public"."affiliate_stats"
     ADD CONSTRAINT "affiliate_stats_user_id_key" UNIQUE ("user_id");
 
-
-
 ALTER TABLE ONLY "public"."chain_addresses"
     ADD CONSTRAINT "chain_addresses_pkey" PRIMARY KEY ("address");
 
-
-
 ALTER TABLE ONLY "public"."challenges"
-
-
 ALTER TABLE ONLY "public"."challenges"
-
-
 ALTER TABLE ONLY "public"."distribution_verification_values"
-
-
 
 ALTER TABLE ONLY "public"."distribution_verifications"
 
-
-
 ALTER TABLE ONLY "public"."distributions"
 
-
-
 ALTER TABLE ONLY "public"."distributions"
-
-
 
 ALTER TABLE ONLY "public"."liquidity_pools"
     ADD CONSTRAINT "liquidity_pools_pkey" PRIMARY KEY ("pool_addr", "chain_id");
 
-
-
 ALTER TABLE ONLY "public"."profiles"
     ADD CONSTRAINT "profiles_pkey" PRIMARY KEY ("id");
-
-
 
 ALTER TABLE ONLY "public"."profiles"
     ADD CONSTRAINT "profiles_referral_code_key" UNIQUE ("referral_code");
 
-
-
 ALTER TABLE ONLY "public"."receipts"
     ADD CONSTRAINT "receipts_pkey" PRIMARY KEY ("id");
-
-
 
 ALTER TABLE ONLY "public"."referrals"
     ADD CONSTRAINT "referrals_pkey" PRIMARY KEY ("id");
 
-
-
 ALTER TABLE ONLY "public"."send_account_created"
     ADD CONSTRAINT "send_account_created_pkey" PRIMARY KEY ("id");
-
-
 
 ALTER TABLE ONLY "public"."send_account_receives"
     ADD CONSTRAINT "send_account_receives_pkey" PRIMARY KEY ("id");
 
-
-
 ALTER TABLE ONLY "public"."send_account_signing_key_added"
     ADD CONSTRAINT "send_account_signing_key_added_pkey" PRIMARY KEY ("id");
-
-
 
 ALTER TABLE ONLY "public"."send_account_signing_key_removed"
     ADD CONSTRAINT "send_account_signing_key_removed_pkey" PRIMARY KEY ("id");
 
-
-
 ALTER TABLE ONLY "public"."send_account_transfers"
     ADD CONSTRAINT "send_account_transfers_pkey" PRIMARY KEY ("id");
 
-
-
 ALTER TABLE ONLY "public"."send_accounts"
-
-
 ALTER TABLE ONLY "public"."send_liquidity_pools"
     ADD CONSTRAINT "send_liquidity_pools_pkey" PRIMARY KEY ("id");
-
-
 
 ALTER TABLE ONLY "public"."send_revenues_safe_receives"
     ADD CONSTRAINT "send_revenues_safe_receives_pkey" PRIMARY KEY ("id");
 
-
-
 ALTER TABLE ONLY "public"."send_slash"
-
-
 
 ALTER TABLE ONLY "public"."send_token_transfers"
     ADD CONSTRAINT "send_token_transfers_pkey" PRIMARY KEY ("id");
 
-
-
 ALTER TABLE ONLY "public"."send_token_v0_transfers"
     ADD CONSTRAINT "send_token_v0_transfers_pkey" PRIMARY KEY ("id");
-
-
 
 ALTER TABLE ONLY "public"."sendpot_jackpot_runs"
     ADD CONSTRAINT "sendpot_jackpot_runs_pkey" PRIMARY KEY ("id");
 
-
-
 ALTER TABLE ONLY "public"."sendpot_user_ticket_purchases"
     ADD CONSTRAINT "sendpot_user_ticket_purchases_pkey" PRIMARY KEY ("id");
-
-
 
 ALTER TABLE ONLY "public"."sendtag_checkout_receipts"
     ADD CONSTRAINT "sendtag_checkout_receipts_pkey" PRIMARY KEY ("id");
 
-
-
 ALTER TABLE ONLY "public"."swap_routers"
     ADD CONSTRAINT "swap_routers_pkey" PRIMARY KEY ("router_addr", "chain_id");
-
-
 
 ALTER TABLE ONLY "public"."tag_receipts"
     ADD CONSTRAINT "tag_receipts_pkey" PRIMARY KEY ("id");
 
-
-
 ALTER TABLE ONLY "public"."tags"
-
-
 ALTER TABLE ONLY "public"."referrals"
     ADD CONSTRAINT "unique_referred_id" UNIQUE ("referred_id");
 
-
-
 ALTER TABLE ONLY "public"."webauthn_credentials"
-
-
 ALTER TABLE ONLY "temporal"."send_account_transfers"
     ADD CONSTRAINT "send_account_transfers_pkey" PRIMARY KEY ("id");
-
-
 
 ALTER TABLE ONLY "temporal"."send_earn_deposits"
     ADD CONSTRAINT "send_earn_deposits_pkey" PRIMARY KEY ("workflow_id");
 
-
-
 CREATE INDEX "leaderboard_referrals_all_time_referral_count_idx" ON "private"."leaderboard_referrals_all_time" USING "btree" ("referrals" DESC);
-
-
 
 CREATE INDEX "leaderboard_referrals_all_time_total_reward_idx" ON "private"."leaderboard_referrals_all_time" USING "btree" ("rewards_usdc" DESC);
 
-
-
 CREATE INDEX "activity_created_at_idx" ON "public"."activity" USING "btree" ("created_at");
-
-
 
 CREATE UNIQUE INDEX "activity_event_name_event_id_idx" ON "public"."activity" USING "btree" ("event_name", "event_id");
 
-
-
 CREATE INDEX "activity_from_user_id_event_name_idx" ON "public"."activity" USING "btree" ("from_user_id", "created_at", "event_name");
-
-
 
 CREATE INDEX "activity_to_user_id_event_name_idx" ON "public"."activity" USING "btree" ("to_user_id", "created_at", "event_name");
 
-
-
 CREATE INDEX "chain_addresses_user_id_idx" ON "public"."chain_addresses" USING "btree" ("user_id");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 CREATE INDEX "i_send_account_receives_log_addr" ON "public"."send_account_receives" USING "btree" ("log_addr");
 
-
-
 CREATE INDEX "i_send_account_receives_sender" ON "public"."send_account_receives" USING "btree" ("sender");
-
-
 
 CREATE INDEX "idx_affiliate_stats_user_created" ON "public"."affiliate_stats" USING "btree" ("user_id", "created_at" DESC);
 
-
-
-
-
-
-
-
-
 CREATE INDEX "idx_send_account_transfers_f_t_block_time" ON "public"."send_account_transfers" USING "btree" ("f", "t", "block_time");
-
-
-
-
-
-
 
 CREATE INDEX "idx_sendpot_jackpot_runs_block_num" ON "public"."sendpot_jackpot_runs" USING "btree" ("block_num");
 
-
-
 CREATE INDEX "idx_sendpot_user_ticket_purchases_block_num" ON "public"."sendpot_user_ticket_purchases" USING "btree" ("block_num");
-
-
 
 CREATE INDEX "idx_sendtag_receipts" ON "public"."sendtag_checkout_receipts" USING "btree" ("amount", "reward");
 
-
-
-
-
 CREATE INDEX "profiles_send_id_idx" ON "public"."profiles" USING "btree" ("send_id");
-
-
 
 CREATE UNIQUE INDEX "receipts_event_id_idx" ON "public"."receipts" USING "btree" ("event_id");
 
-
-
 CREATE INDEX "receipts_user_id_idx" ON "public"."receipts" USING "btree" ("user_id");
-
-
 
 CREATE INDEX "send_account_created_account_block_num" ON "public"."send_account_created" USING "btree" ("block_num");
 
-
-
 CREATE INDEX "send_account_created_account_block_time" ON "public"."send_account_created" USING "btree" ("block_time");
-
-
 
 CREATE UNIQUE INDEX "send_account_credentials_account_id_key_slot_key" ON "public"."send_account_credentials" USING "btree" ("account_id", "key_slot");
 
-
-
 CREATE INDEX "send_account_receives_block_num" ON "public"."send_account_receives" USING "btree" ("block_num");
-
-
 
 CREATE INDEX "send_account_receives_block_time" ON "public"."send_account_receives" USING "btree" ("block_time");
 
-
-
 CREATE INDEX "send_account_signing_key_added_account_idx" ON "public"."send_account_signing_key_added" USING "btree" ("account");
-
-
 
 CREATE INDEX "send_account_signing_key_added_block_num" ON "public"."send_account_signing_key_added" USING "btree" ("block_num");
 
-
-
 CREATE INDEX "send_account_signing_key_added_block_time" ON "public"."send_account_signing_key_added" USING "btree" ("block_time");
-
-
 
 CREATE INDEX "send_account_signing_key_removed_block_num" ON "public"."send_account_signing_key_removed" USING "btree" ("block_num");
 
-
-
 CREATE INDEX "send_account_signing_key_removed_block_time" ON "public"."send_account_signing_key_removed" USING "btree" ("block_time");
-
-
 
 CREATE INDEX "send_account_transfers_block_num" ON "public"."send_account_transfers" USING "btree" ("block_num");
 
-
-
 CREATE INDEX "send_account_transfers_block_time" ON "public"."send_account_transfers" USING "btree" ("block_time");
-
-
 
 CREATE INDEX "send_account_transfers_f" ON "public"."send_account_transfers" USING "btree" ("f");
 
-
-
 CREATE INDEX "send_account_transfers_t" ON "public"."send_account_transfers" USING "btree" ("t");
-
-
-
-
-
-
-
-CREATE INDEX "send_earn_create_block_num" ON "public"."send_earn_create" USING "btree" ("block_num");
-
-
-
-CREATE INDEX "send_earn_create_block_time" ON "public"."send_earn_create" USING "btree" ("block_time");
-
-
-
-CREATE INDEX "send_earn_create_send_earn" ON "public"."send_earn_create" USING "btree" ("send_earn");
-
-
-
-CREATE INDEX "send_earn_deposit_block_num" ON "public"."send_earn_deposit" USING "btree" ("block_num");
-
-
-
-CREATE INDEX "send_earn_deposit_block_time" ON "public"."send_earn_deposit" USING "btree" ("block_time");
-
-
-
-CREATE INDEX "send_earn_deposit_owner_idx" ON "public"."send_earn_deposit" USING "btree" ("owner", "log_addr");
-
-
-
-CREATE INDEX "send_earn_new_affiliate_affiliate_idx" ON "public"."send_earn_new_affiliate" USING "btree" ("affiliate");
-
-
-
-CREATE INDEX "send_earn_new_affiliate_block_num" ON "public"."send_earn_new_affiliate" USING "btree" ("block_num");
-
-
-
-CREATE INDEX "send_earn_new_affiliate_block_time" ON "public"."send_earn_new_affiliate" USING "btree" ("block_time");
-
-
-
-CREATE INDEX "send_earn_new_affiliate_send_earn_affiliate_idx" ON "public"."send_earn_new_affiliate" USING "btree" ("send_earn_affiliate");
-
-
-
-CREATE INDEX "send_earn_withdraw_block_num" ON "public"."send_earn_withdraw" USING "btree" ("block_num");
-
-
-
-CREATE INDEX "send_earn_withdraw_block_time" ON "public"."send_earn_withdraw" USING "btree" ("block_time");
-
-
-
-CREATE INDEX "send_earn_withdraw_owner_idx" ON "public"."send_earn_withdraw" USING "btree" ("owner", "log_addr");
-
-
-
 CREATE INDEX "send_revenues_safe_receives_block_num" ON "public"."send_revenues_safe_receives" USING "btree" ("block_num");
-
-
 
 CREATE INDEX "send_revenues_safe_receives_block_time" ON "public"."send_revenues_safe_receives" USING "btree" ("block_time");
 
-
-
 CREATE INDEX "send_revenues_safe_receives_sender" ON "public"."send_revenues_safe_receives" USING "btree" ("sender");
-
-
 
 CREATE INDEX "send_revenues_safe_receives_tx_hash" ON "public"."send_revenues_safe_receives" USING "btree" ("tx_hash");
 
-
-
 CREATE INDEX "send_token_transfers_block_num" ON "public"."send_token_transfers" USING "btree" ("block_num");
-
-
 
 CREATE INDEX "send_token_transfers_block_time" ON "public"."send_token_transfers" USING "btree" ("block_time");
 
-
-
 CREATE INDEX "send_token_transfers_composite" ON "public"."send_token_transfers" USING "btree" ("block_time", "f", "t", "v");
-
-
 
 CREATE INDEX "send_token_transfers_f" ON "public"."send_token_transfers" USING "btree" ("f");
 
-
-
 CREATE INDEX "send_token_transfers_t" ON "public"."send_token_transfers" USING "btree" ("t");
-
-
 
 CREATE INDEX "send_token_v0_transfers_block_num" ON "public"."send_token_v0_transfers" USING "btree" ("block_num");
 
-
-
 CREATE INDEX "send_token_v0_transfers_block_time" ON "public"."send_token_v0_transfers" USING "btree" ("block_time");
-
-
 
 CREATE INDEX "send_token_v0_transfers_composite" ON "public"."send_token_v0_transfers" USING "btree" ("block_time", "f", "t", "v");
 
-
-
 CREATE INDEX "send_token_v0_transfers_f" ON "public"."send_token_v0_transfers" USING "btree" ("f");
-
-
 
 CREATE INDEX "send_token_v0_transfers_t" ON "public"."send_token_v0_transfers" USING "btree" ("t");
 
-
-
 CREATE INDEX "sendpot_jackpot_runs_winner" ON "public"."sendpot_jackpot_runs" USING "btree" ("winner");
-
-
 
 CREATE INDEX "sendpot_user_ticket_purchases_buyer" ON "public"."sendpot_user_ticket_purchases" USING "btree" ("buyer");
 
-
-
 CREATE INDEX "sendpot_user_ticket_purchases_recipient" ON "public"."sendpot_user_ticket_purchases" USING "btree" ("recipient");
-
-
 
 CREATE INDEX "sendpot_user_ticket_purchases_referrer" ON "public"."sendpot_user_ticket_purchases" USING "btree" ("referrer");
 
-
-
 CREATE INDEX "sendtag_checkout_receipts_block_num" ON "public"."sendtag_checkout_receipts" USING "btree" ("block_num");
-
-
 
 CREATE INDEX "sendtag_checkout_receipts_block_time" ON "public"."sendtag_checkout_receipts" USING "btree" ("block_time");
 
-
-
 CREATE INDEX "sendtag_checkout_receipts_sender_idx" ON "public"."sendtag_checkout_receipts" USING "btree" ("sender");
-
-
 
 CREATE INDEX "shovel_account" ON "public"."send_account_created" USING "btree" ("account");
 
-
-
 CREATE UNIQUE INDEX "tag_receipts_event_id_idx" ON "public"."tag_receipts" USING "btree" ("tag_name", "event_id");
-
-
-
-
-
-
 
 CREATE UNIQUE INDEX "u_send_account_created" ON "public"."send_account_created" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx");
 
-
-
 CREATE UNIQUE INDEX "u_send_account_receives" ON "public"."send_account_receives" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
-
-
 
 CREATE UNIQUE INDEX "u_send_account_signing_key_added" ON "public"."send_account_signing_key_added" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
 
-
-
 CREATE UNIQUE INDEX "u_send_account_signing_key_removed" ON "public"."send_account_signing_key_removed" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
-
-
 
 CREATE UNIQUE INDEX "u_send_account_transfers" ON "public"."send_account_transfers" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
 
-
-
-CREATE UNIQUE INDEX "u_send_earn_create" ON "public"."send_earn_create" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
-
-
-
-CREATE UNIQUE INDEX "u_send_earn_deposit" ON "public"."send_earn_deposit" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
-
-
-
-CREATE UNIQUE INDEX "u_send_earn_new_affiliate" ON "public"."send_earn_new_affiliate" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
-
-
-
-CREATE UNIQUE INDEX "u_send_earn_withdraw" ON "public"."send_earn_withdraw" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
-
-
-
 CREATE UNIQUE INDEX "u_send_revenues_safe_receives" ON "public"."send_revenues_safe_receives" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
-
-
 
 CREATE UNIQUE INDEX "u_send_token_transfers" ON "public"."send_token_transfers" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
 
-
-
 CREATE UNIQUE INDEX "u_send_token_v0_transfers" ON "public"."send_token_v0_transfers" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
-
-
 
 CREATE UNIQUE INDEX "u_sendpot_jackpot_runs" ON "public"."sendpot_jackpot_runs" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
 
-
-
 CREATE UNIQUE INDEX "u_sendpot_user_ticket_purchases" ON "public"."sendpot_user_ticket_purchases" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
-
-
 
 CREATE UNIQUE INDEX "u_sendtag_checkout_receipts" ON "public"."sendtag_checkout_receipts" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
 
-
-
-
-
-
-
 CREATE UNIQUE INDEX "intg_name_src_name_backfill_num_idx" ON "shovel"."ig_updates" USING "btree" ("name", "src_name", "backfill", "num" DESC);
-
-
 
 CREATE UNIQUE INDEX "sources_name_chain_id_idx" ON "shovel"."sources" USING "btree" ("name", "chain_id");
 
-
-
 CREATE UNIQUE INDEX "sources_name_idx" ON "shovel"."sources" USING "btree" ("name");
 
-
-
 CREATE UNIQUE INDEX "task_src_name_num_idx" ON "shovel"."task_updates" USING "btree" ("ig_name", "src_name", "num" DESC);
-
-
-
-CREATE INDEX "idx_temporal_send_earn_deposits_activity_id" ON "temporal"."send_earn_deposits" USING "btree" ("activity_id");
-
-
-
-CREATE INDEX "idx_temporal_send_earn_deposits_created_at" ON "temporal"."send_earn_deposits" USING "btree" ("created_at");
-
-
-
-CREATE INDEX "idx_temporal_send_earn_deposits_status_owner_block_num" ON "temporal"."send_earn_deposits" USING "btree" ("status", "owner", "block_num");
-
-
-
 CREATE INDEX "send_account_transfers_status_created_at_block_num_idx" ON "temporal"."send_account_transfers" USING "btree" ("status", "created_at_block_num" DESC);
-
-
 
 CREATE INDEX "send_account_transfers_user_id_workflow_id_idx" ON "temporal"."send_account_transfers" USING "btree" ("user_id", "workflow_id");
 
-
-
 CREATE INDEX "send_account_transfers_workflow_id_created_at_idx" ON "temporal"."send_account_transfers" USING "btree" ("workflow_id", "created_at" DESC);
-
-
 
 CREATE INDEX "send_account_transfers_workflow_id_updated_at_idx" ON "temporal"."send_account_transfers" USING "btree" ("workflow_id", "updated_at" DESC);
 
-
-
 CREATE INDEX "temporal_send_account_transfers_activity_event_name_event_id_id" ON "temporal"."send_account_transfers" USING "btree" ("send_account_transfers_activity_event_id", "send_account_transfers_activity_event_name");
-
-
 
 CREATE INDEX "temporal_send_account_transfers_user_id_idx" ON "temporal"."send_account_transfers" USING "btree" ("user_id");
 
-
-
 CREATE UNIQUE INDEX "temporal_send_account_transfers_workflow_id_idx" ON "temporal"."send_account_transfers" USING "btree" ("workflow_id");
-
-
-
-CREATE OR REPLACE TRIGGER "aaa_filter_send_earn_deposit_with_no_send_account_created" BEFORE INSERT ON "public"."send_earn_deposit" FOR EACH ROW EXECUTE FUNCTION "private"."aaa_filter_send_earn_deposit_with_no_send_account_created"();
-
-
-
-CREATE OR REPLACE TRIGGER "aaa_filter_send_earn_withdraw_with_no_send_account_created" BEFORE INSERT ON "public"."send_earn_withdraw" FOR EACH ROW EXECUTE FUNCTION "private"."filter_send_earn_withdraw_with_no_send_account_created"();
-
-
-
-CREATE OR REPLACE TRIGGER "aaa_send_earn_deposit_trigger_delete_activity" AFTER DELETE ON "public"."send_earn_deposit" FOR EACH ROW EXECUTE FUNCTION "private"."send_earn_deposit_trigger_delete_activity"();
-
-
-
-CREATE OR REPLACE TRIGGER "aaa_send_earn_withdraw_trigger_delete_activity" AFTER DELETE ON "public"."send_earn_withdraw" FOR EACH ROW EXECUTE FUNCTION "private"."send_earn_withdraw_trigger_delete_activity"();
-
-
-
-CREATE OR REPLACE TRIGGER "aab_send_earn_deposit_trigger_insert_activity" AFTER INSERT ON "public"."send_earn_deposit" FOR EACH ROW EXECUTE FUNCTION "private"."send_earn_deposit_trigger_insert_activity"();
-
-
-
-CREATE OR REPLACE TRIGGER "aab_send_earn_withdraw_trigger_insert_activity" AFTER INSERT ON "public"."send_earn_withdraw" FOR EACH ROW EXECUTE FUNCTION "private"."send_earn_withdraw_trigger_insert_activity"();
-
-
-
-CREATE OR REPLACE TRIGGER "aac_insert_referral_on_deposit" AFTER INSERT ON "public"."send_earn_deposit" FOR EACH ROW EXECUTE FUNCTION "private"."insert_referral_on_deposit"();
-
-
-
 CREATE OR REPLACE TRIGGER "after_transfer_update_affiliate_stats" AFTER INSERT ON "public"."send_token_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."update_affiliate_stats_on_transfer"();
-
-
 
 CREATE OR REPLACE TRIGGER "avoid_send_id_change" BEFORE UPDATE ON "public"."profiles" FOR EACH ROW EXECUTE FUNCTION "public"."stop_change_send_id"();
 
-
-
 CREATE OR REPLACE TRIGGER "filter_send_account_transfers_with_no_send_account_created" BEFORE INSERT ON "public"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "private"."filter_send_account_transfers_with_no_send_account_created"();
-
-
-
-CREATE OR REPLACE TRIGGER "insert_referral_on_create" AFTER INSERT ON "public"."send_earn_create" FOR EACH ROW EXECUTE FUNCTION "private"."insert_referral_on_create"();
-
-
-
-CREATE OR REPLACE TRIGGER "insert_referral_on_new_affiliate" AFTER INSERT ON "public"."send_earn_new_affiliate" FOR EACH ROW EXECUTE FUNCTION "private"."insert_referral_on_new_affiliate"();
-
-
-
-
 
 CREATE OR REPLACE TRIGGER "insert_verification_referral" AFTER INSERT ON "public"."referrals" FOR EACH ROW EXECUTE FUNCTION "public"."insert_verification_referral"();
 
-
-
 CREATE OR REPLACE TRIGGER "insert_verification_send_ceiling_trigger" AFTER INSERT ON "public"."send_token_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."insert_verification_send_ceiling"();
-
-
 
 CREATE OR REPLACE TRIGGER "insert_verification_sends" AFTER INSERT ON "public"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."insert_verification_sends"();
 
-
-
-
-
 CREATE OR REPLACE TRIGGER "referrals_delete_activity_trigger" AFTER DELETE ON "public"."referrals" REFERENCING OLD TABLE AS "old_table" FOR EACH STATEMENT EXECUTE FUNCTION "public"."referrals_delete_activity_trigger"();
-
-
 
 CREATE OR REPLACE TRIGGER "referrals_insert_activity_trigger" AFTER INSERT ON "public"."referrals" REFERENCING NEW TABLE AS "new_table" FOR EACH STATEMENT EXECUTE FUNCTION "public"."referrals_insert_activity_trigger"();
 
-
-
 CREATE OR REPLACE TRIGGER "send_account_receives_delete_activity_trigger" AFTER DELETE ON "public"."send_account_receives" FOR EACH ROW EXECUTE FUNCTION "public"."send_account_receives_delete_activity_trigger"();
-
-
 
 CREATE OR REPLACE TRIGGER "send_account_receives_insert_activity_trigger" AFTER INSERT ON "public"."send_account_receives" FOR EACH ROW EXECUTE FUNCTION "public"."send_account_receives_insert_activity_trigger"();
 
-
-
 CREATE OR REPLACE TRIGGER "send_account_signing_key_added_trigger_delete_activity" AFTER DELETE ON "public"."send_account_signing_key_added" FOR EACH ROW EXECUTE FUNCTION "public"."send_account_signing_key_added_trigger_delete_activity"();
-
-
 
 CREATE OR REPLACE TRIGGER "send_account_signing_key_added_trigger_insert_activity" AFTER INSERT ON "public"."send_account_signing_key_added" FOR EACH ROW EXECUTE FUNCTION "public"."send_account_signing_key_added_trigger_insert_activity"();
 
-
-
 CREATE OR REPLACE TRIGGER "send_account_signing_key_removed_trigger_delete_activity" AFTER DELETE ON "public"."send_account_signing_key_removed" FOR EACH ROW EXECUTE FUNCTION "public"."send_account_signing_key_removed_trigger_delete_activity"();
-
-
 
 CREATE OR REPLACE TRIGGER "send_account_signing_key_removed_trigger_insert_activity" AFTER INSERT ON "public"."send_account_signing_key_removed" FOR EACH ROW EXECUTE FUNCTION "public"."send_account_signing_key_removed_trigger_insert_activity"();
 
-
-
 CREATE OR REPLACE TRIGGER "send_account_transfers_trigger_delete_activity" AFTER DELETE ON "public"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."send_account_transfers_trigger_delete_activity"();
-
-
 
 CREATE OR REPLACE TRIGGER "send_account_transfers_trigger_delete_temporal_activity" BEFORE INSERT ON "public"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."send_account_transfers_delete_temporal_activity"();
 
-
-
 CREATE OR REPLACE TRIGGER "send_account_transfers_trigger_insert_activity" AFTER INSERT ON "public"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."send_account_transfers_trigger_insert_activity"();
-
-
 
 CREATE OR REPLACE TRIGGER "tag_receipts_insert_activity_trigger" AFTER INSERT ON "public"."tag_receipts" REFERENCING NEW TABLE AS "new_table" FOR EACH STATEMENT EXECUTE FUNCTION "public"."tag_receipts_insert_activity_trigger"();
 
-
-
 CREATE OR REPLACE TRIGGER "temporal_send_account_transfers_trigger_update_transfer_activit" BEFORE INSERT ON "public"."activity" FOR EACH ROW EXECUTE FUNCTION "public"."update_transfer_activity_before_insert"();
-
-
 
 CREATE OR REPLACE TRIGGER "trigger_chain_addresses_after_insert" AFTER INSERT OR UPDATE ON "public"."chain_addresses" FOR EACH ROW EXECUTE FUNCTION "public"."chain_addresses_after_insert"();
 
-
-
-
-
-
-
-
-
 CREATE OR REPLACE TRIGGER "update_leaderboard_referrals_all_time_referrals" AFTER INSERT ON "public"."referrals" FOR EACH ROW EXECUTE FUNCTION "private"."update_leaderboard_referrals_all_time_referrals"();
-
-
 
 CREATE OR REPLACE TRIGGER "update_leaderboard_referrals_all_time_sendtag_checkout_receipts" AFTER INSERT ON "public"."sendtag_checkout_receipts" FOR EACH ROW EXECUTE FUNCTION "private"."update_leaderboard_referrals_all_time_sendtag_checkout_receipts"();
 
-
-
-CREATE OR REPLACE TRIGGER "aaa_temporal_deposit_insert_pending_activity" AFTER INSERT ON "temporal"."send_earn_deposits" FOR EACH ROW EXECUTE FUNCTION "temporal"."temporal_deposit_insert_pending_activity"();
-
-
-
-CREATE OR REPLACE TRIGGER "aab_temporal_deposit_update_activity_on_status_change" AFTER UPDATE ON "temporal"."send_earn_deposits" FOR EACH ROW EXECUTE FUNCTION "temporal"."temporal_deposit_update_activity_on_status_change"();
-
-
-
 CREATE OR REPLACE TRIGGER "send_account_transfers_trigger_add_note_activity_temporal_trans" BEFORE UPDATE ON "temporal"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "temporal"."add_note_activity_temporal_transfer_before_confirmed"();
-
-
-
-CREATE OR REPLACE TRIGGER "set_temporal_send_earn_deposits_updated_at" BEFORE UPDATE ON "temporal"."send_earn_deposits" FOR EACH ROW EXECUTE FUNCTION "public"."set_current_timestamp_updated_at"();
-
-
-
 CREATE OR REPLACE TRIGGER "temporal_send_account_transfers_trigger_after_upsert" AFTER INSERT OR UPDATE ON "temporal"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "temporal"."temporal_transfer_after_upsert"();
-
-
 
 CREATE OR REPLACE TRIGGER "temporal_send_account_transfers_trigger_before_insert" BEFORE INSERT ON "temporal"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "temporal"."temporal_transfer_before_insert"();
 
-
-
 CREATE OR REPLACE TRIGGER "temporal_send_account_transfers_trigger_delete_activity" BEFORE DELETE ON "temporal"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "temporal"."temporal_send_account_transfers_trigger_delete_activity"();
-
-
 
 ALTER TABLE ONLY "private"."leaderboard_referrals_all_time"
     ADD CONSTRAINT "leaderboard_referrals_all_time_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
 
-
-
 ALTER TABLE ONLY "public"."send_account_credentials"
     ADD CONSTRAINT "account_credentials_account_id_fkey" FOREIGN KEY ("account_id") REFERENCES "public"."send_accounts"("id") ON DELETE CASCADE;
-
-
 
 ALTER TABLE ONLY "public"."send_account_credentials"
     ADD CONSTRAINT "account_credentials_credential_id_fkey" FOREIGN KEY ("credential_id") REFERENCES "public"."webauthn_credentials"("id") ON DELETE CASCADE;
 
-
-
 ALTER TABLE ONLY "public"."activity"
     ADD CONSTRAINT "activity_from_user_id_fkey" FOREIGN KEY ("from_user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
-
-
 
 ALTER TABLE ONLY "public"."activity"
     ADD CONSTRAINT "activity_to_user_id_fkey" FOREIGN KEY ("to_user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
 
-
-
 ALTER TABLE ONLY "public"."affiliate_stats"
     ADD CONSTRAINT "affiliate_stats_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."profiles"("id") ON UPDATE CASCADE ON DELETE CASCADE;
-
-
 
 ALTER TABLE ONLY "public"."chain_addresses"
     ADD CONSTRAINT "chain_addresses_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
 
-
-
 ALTER TABLE ONLY "public"."distribution_shares"
 
-
-
 ALTER TABLE ONLY "public"."distribution_shares"
-
-
 
 ALTER TABLE ONLY "public"."distribution_verification_values"
-
-
 
 ALTER TABLE ONLY "public"."distribution_verifications"
     ADD CONSTRAINT "distribution_verification_values_fk" FOREIGN KEY ("type", "distribution_id") REFERENCES "public"."distribution_verification_values"("type", "distribution_id");
 
-
-
 ALTER TABLE ONLY "public"."distribution_verifications"
 
-
-
 ALTER TABLE ONLY "public"."distribution_verifications"
-
-
 
 ALTER TABLE ONLY "public"."profiles"
     ADD CONSTRAINT "profiles_id_fkey" FOREIGN KEY ("id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
 
-
-
 ALTER TABLE ONLY "public"."receipts"
     ADD CONSTRAINT "receipts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
-
-
 
 ALTER TABLE ONLY "public"."referrals"
     ADD CONSTRAINT "referrals_referred_id_fkey" FOREIGN KEY ("referred_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE;
 
-
-
 ALTER TABLE ONLY "public"."referrals"
     ADD CONSTRAINT "referrals_referrer_id_fkey" FOREIGN KEY ("referrer_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE;
 
-
-
 ALTER TABLE ONLY "public"."send_accounts"
-
-
 ALTER TABLE ONLY "public"."send_slash"
-
-
 
 ALTER TABLE ONLY "public"."tag_receipts"
     ADD CONSTRAINT "tag_receipts_tag_name_fkey" FOREIGN KEY ("tag_name") REFERENCES "public"."tags"("name") ON DELETE CASCADE;
 
-
-
 ALTER TABLE ONLY "public"."tags"
-
-
 ALTER TABLE ONLY "public"."webauthn_credentials"
-
-
 ALTER TABLE ONLY "temporal"."send_earn_deposits"
     ADD CONSTRAINT "fk_activity" FOREIGN KEY ("activity_id") REFERENCES "public"."activity"("id") ON DELETE CASCADE;
 
-
-
 CREATE POLICY "Addresses are viewable by users who created them." ON "public"."chain_addresses" FOR SELECT USING (("auth"."uid"() = "user_id"));
-
-
 
 CREATE POLICY "Authenticated users can see distribution_verification_values" ON "public"."distribution_verification_values" FOR SELECT USING ((( SELECT "auth"."uid"() AS "uid") IS NOT NULL));
 
-
-
 CREATE POLICY "Enable read access for all users" ON "public"."send_slash" FOR SELECT USING (true);
-
-
 
 CREATE POLICY "Enable read access to authenticated users" ON "public"."liquidity_pools" FOR SELECT TO "authenticated" USING (true);
 
-
-
 CREATE POLICY "Enable read access to authenticated users" ON "public"."swap_routers" FOR SELECT TO "authenticated" USING (true);
-
-
 
 CREATE POLICY "Enable read access to public" ON "public"."distribution_verification_values" FOR SELECT TO "authenticated" USING (true);
 
-
-
 CREATE POLICY "Enable read access to public" ON "public"."distributions" FOR SELECT TO "authenticated" USING (true);
-
-
 
 CREATE POLICY "Profiles are viewable by users who created them." ON "public"."profiles" FOR SELECT USING (("auth"."uid"() = "id"));
 
-
-
 CREATE POLICY "Receipts are viewable by users." ON "public"."receipts" FOR SELECT USING (("auth"."uid"() = "user_id"));
-
-
 
 CREATE POLICY "Send account signing key added can be read by the user who crea" ON "public"."send_account_signing_key_added" FOR SELECT USING (("account" IN ( SELECT "decode"("substring"(("send_accounts"."address")::"text", 3), 'hex'::"text") AS "decode"
    FROM "public"."send_accounts"
   WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid")))));
-
-
 
 CREATE POLICY "Send revenues safe receives can be read by the user who created" ON "public"."send_revenues_safe_receives" FOR SELECT USING ((("lower"("concat"('0x', "encode"("sender", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY ( SELECT "chain_addresses"."address"
    FROM "public"."chain_addresses"
@@ -4575,199 +2825,59 @@ UNION
    FROM "public"."send_accounts"
   WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid")))));
 
-
-
 CREATE POLICY "User can see own affiliate stats" ON "public"."affiliate_stats" FOR SELECT USING (("auth"."uid"() = "user_id"));
-
-
 
 CREATE POLICY "User can see own shares" ON "public"."distribution_shares" FOR SELECT USING (("user_id" = "auth"."uid"()));
 
-
-
 CREATE POLICY "Users can insert their own profile." ON "public"."profiles" FOR INSERT WITH CHECK (("auth"."uid"() = "id"));
 
-
-
 CREATE POLICY "Users can see their own distribution verifications" ON "public"."distribution_verifications" FOR SELECT USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
-
-
 
 CREATE POLICY "Users can see their own token transfers" ON "public"."send_token_transfers" FOR SELECT USING (("auth"."uid"() IN ( SELECT "chain_addresses"."user_id"
    FROM "public"."chain_addresses"
   WHERE (("chain_addresses"."address" OPERATOR("public".=) ("lower"("concat"('0x', "encode"("send_token_transfers"."f", 'hex'::"text"))))::"public"."citext") OR ("chain_addresses"."address" OPERATOR("public".=) ("lower"("concat"('0x', "encode"("send_token_transfers"."t", 'hex'::"text"))))::"public"."citext")))));
 
-
-
 CREATE POLICY "Users can see their own token transfers" ON "public"."send_token_v0_transfers" FOR SELECT USING (("auth"."uid"() IN ( SELECT "chain_addresses"."user_id"
    FROM "public"."chain_addresses"
   WHERE (("chain_addresses"."address" OPERATOR("public".=) ("lower"("concat"('0x', "encode"("send_token_v0_transfers"."f", 'hex'::"text"))))::"public"."citext") OR ("chain_addresses"."address" OPERATOR("public".=) ("lower"("concat"('0x', "encode"("send_token_v0_transfers"."t", 'hex'::"text"))))::"public"."citext")))));
 
-
-
 CREATE POLICY "Users can update own profile." ON "public"."profiles" FOR UPDATE USING (("auth"."uid"() = "id"));
 
-
-
 ALTER TABLE "public"."activity" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."affiliate_stats" ENABLE ROW LEVEL SECURITY;
-
-
 CREATE POLICY "authenticated can read jackpot runs" ON "public"."sendpot_jackpot_runs" FOR SELECT TO "authenticated" USING (true);
 
-
-
 ALTER TABLE "public"."chain_addresses" ENABLE ROW LEVEL SECURITY;
-
-
 
 CREATE POLICY "delete_own_account_credentials" ON "public"."send_account_credentials" FOR DELETE TO "authenticated" USING (("auth"."uid"() = ( SELECT "send_accounts"."user_id"
    FROM "public"."send_accounts"
   WHERE ("send_accounts"."id" = "send_account_credentials"."account_id"))));
 
-
-
-
-
-
-
 ALTER TABLE "public"."distribution_shares" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."distribution_verification_values" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."distribution_verifications" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."distributions" ENABLE ROW LEVEL SECURITY;
-
-
 CREATE POLICY "insert_own_account_credentials" ON "public"."send_account_credentials" FOR INSERT TO "authenticated" WITH CHECK (("auth"."uid"() = ( SELECT "send_accounts"."user_id"
    FROM "public"."send_accounts"
   WHERE ("send_accounts"."id" = "send_account_credentials"."account_id"))));
 
-
-
-
-
-
-
-
-
 ALTER TABLE "public"."liquidity_pools" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."profiles" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."receipts" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."referrals" ENABLE ROW LEVEL SECURITY;
-
-
 CREATE POLICY "select_own_account_credentials" ON "public"."send_account_credentials" FOR SELECT TO "authenticated" USING (("auth"."uid"() = ( SELECT "send_accounts"."user_id"
    FROM "public"."send_accounts"
   WHERE ("send_accounts"."id" = "send_account_credentials"."account_id"))));
 
-
-
-
-
-
-
-
-
 ALTER TABLE "public"."send_account_created" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."send_account_credentials" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."send_account_receives" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."send_account_signing_key_added" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."send_account_signing_key_removed" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."send_account_transfers" ENABLE ROW LEVEL SECURITY;
-
-
-
-ALTER TABLE "public"."send_earn_create" ENABLE ROW LEVEL SECURITY;
-
-
-CREATE POLICY "send_earn_create viewable by authenticated users" ON "public"."send_earn_create" FOR SELECT TO "authenticated" USING (true);
-
-
-
-ALTER TABLE "public"."send_earn_deposit" ENABLE ROW LEVEL SECURITY;
-
-
-ALTER TABLE "public"."send_earn_new_affiliate" ENABLE ROW LEVEL SECURITY;
-
-
-CREATE POLICY "send_earn_new_affiliate viewable by authenticated users" ON "public"."send_earn_new_affiliate" FOR SELECT TO "authenticated" USING (true);
-
-
-
-ALTER TABLE "public"."send_earn_withdraw" ENABLE ROW LEVEL SECURITY;
-
-
-ALTER TABLE "public"."send_liquidity_pools" ENABLE ROW LEVEL SECURITY;
-
-
-ALTER TABLE "public"."send_revenues_safe_receives" ENABLE ROW LEVEL SECURITY;
-
-
-ALTER TABLE "public"."send_slash" ENABLE ROW LEVEL SECURITY;
-
-
-ALTER TABLE "public"."send_token_transfers" ENABLE ROW LEVEL SECURITY;
-
-
-ALTER TABLE "public"."send_token_v0_transfers" ENABLE ROW LEVEL SECURITY;
-
-
-ALTER TABLE "public"."sendpot_jackpot_runs" ENABLE ROW LEVEL SECURITY;
-
-
-ALTER TABLE "public"."sendpot_user_ticket_purchases" ENABLE ROW LEVEL SECURITY;
-
-
-ALTER TABLE "public"."sendtag_checkout_receipts" ENABLE ROW LEVEL SECURITY;
-
-
-ALTER TABLE "public"."swap_routers" ENABLE ROW LEVEL SECURITY;
-
-
-ALTER TABLE "public"."tag_receipts" ENABLE ROW LEVEL SECURITY;
-
-
-
-CREATE POLICY "update_own_account_credentials" ON "public"."send_account_credentials" FOR UPDATE TO "authenticated" USING ((( SELECT "auth"."uid"() AS "uid") = ( SELECT "send_accounts"."user_id"
-   FROM "public"."send_accounts"
-  WHERE ("send_accounts"."id" = "send_account_credentials"."account_id"))));
-
-
-
-
-
-
-
-
-
 CREATE POLICY "users can see own signing key removed" ON "public"."send_account_signing_key_removed" FOR SELECT USING ((("lower"("concat"('0x', "encode"("account", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY ( SELECT "send_accounts"."address"
    FROM "public"."send_accounts"
   WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid")))));
-
-
 
 CREATE POLICY "users can see their own ETH receives" ON "public"."send_account_receives" FOR SELECT USING (((("lower"("concat"('0x', "encode"("sender", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY ( SELECT "send_accounts"."address"
    FROM "public"."send_accounts"
@@ -4775,1559 +2885,659 @@ CREATE POLICY "users can see their own ETH receives" ON "public"."send_account_r
    FROM "public"."send_accounts"
   WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid"))))));
 
-
-
 CREATE POLICY "users can see their own account created" ON "public"."send_account_created" FOR SELECT USING ((("lower"("concat"('0x', "encode"("account", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY ( SELECT "send_accounts"."address"
    FROM "public"."send_accounts"
   WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid")))));
-
-
-
-CREATE POLICY "users can see their own send_earn_deposit" ON "public"."send_earn_deposit" FOR SELECT USING ((("lower"("concat"('0x', "encode"("owner", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY ( SELECT "send_accounts"."address"
-   FROM "public"."send_accounts"
-  WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid")))));
-
-
-
-CREATE POLICY "users can see their own send_earn_withdraw" ON "public"."send_earn_withdraw" FOR SELECT USING ((("lower"("concat"('0x', "encode"("owner", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY ( SELECT "send_accounts"."address"
-   FROM "public"."send_accounts"
-  WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid")))));
-
-
 
 CREATE POLICY "users can see their own sendtag_checkout_receipts" ON "public"."sendtag_checkout_receipts" FOR SELECT USING ((("lower"("concat"('0x', "encode"("sender", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY ( SELECT "send_accounts"."address"
    FROM "public"."send_accounts"
   WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid")))));
 
-
-
 CREATE POLICY "users can see their own ticket purchases" ON "public"."sendpot_user_ticket_purchases" FOR SELECT USING ((("lower"("concat"('0x', "encode"("recipient", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY ( SELECT "sa"."address"
    FROM "public"."send_accounts" "sa"
   WHERE ("sa"."user_id" = "auth"."uid"()))));
-
-
 
 CREATE POLICY "users can see their own transfers" ON "public"."send_account_transfers" FOR SELECT USING (((("lower"("concat"('0x', "encode"("f", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY ( SELECT "send_accounts"."address"
    FROM "public"."send_accounts"
   WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid")))) OR (("lower"("concat"('0x', "encode"("t", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY ( SELECT "send_accounts"."address"
    FROM "public"."send_accounts"
   WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid"))))));
-
-
-
-
 ALTER TABLE "temporal"."send_account_transfers" ENABLE ROW LEVEL SECURITY;
-
-
 CREATE POLICY "users can see their own temporal transfers" ON "temporal"."send_account_transfers" FOR SELECT TO "authenticated" USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
-
-
-
-
 ALTER PUBLICATION "supabase_realtime" OWNER TO "postgres";
-
-
 GRANT USAGE ON SCHEMA "public" TO "postgres";
 GRANT USAGE ON SCHEMA "public" TO "anon";
 GRANT USAGE ON SCHEMA "public" TO "authenticated";
 GRANT USAGE ON SCHEMA "public" TO "service_role";
-
-
-
-
-
-
 GRANT USAGE ON SCHEMA "temporal" TO "authenticated";
 GRANT USAGE ON SCHEMA "temporal" TO "service_role";
-
-
-
-
-
-
-
-
 
 GRANT ALL ON FUNCTION "public"."citextin"("cstring") TO "postgres";
 GRANT ALL ON FUNCTION "public"."citextin"("cstring") TO "anon";
 GRANT ALL ON FUNCTION "public"."citextin"("cstring") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."citextin"("cstring") TO "service_role";
 
-
-
 GRANT ALL ON FUNCTION "public"."citextout"("public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."citextout"("public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."citextout"("public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."citextout"("public"."citext") TO "service_role";
-
-
 
 GRANT ALL ON FUNCTION "public"."citextrecv"("internal") TO "postgres";
 GRANT ALL ON FUNCTION "public"."citextrecv"("internal") TO "anon";
 GRANT ALL ON FUNCTION "public"."citextrecv"("internal") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."citextrecv"("internal") TO "service_role";
 
-
-
 GRANT ALL ON FUNCTION "public"."citextsend"("public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."citextsend"("public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."citextsend"("public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."citextsend"("public"."citext") TO "service_role";
-
-
 
 GRANT ALL ON FUNCTION "public"."citext"(boolean) TO "postgres";
 GRANT ALL ON FUNCTION "public"."citext"(boolean) TO "anon";
 GRANT ALL ON FUNCTION "public"."citext"(boolean) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."citext"(boolean) TO "service_role";
 
-
-
 GRANT ALL ON FUNCTION "public"."citext"(character) TO "postgres";
 GRANT ALL ON FUNCTION "public"."citext"(character) TO "anon";
 GRANT ALL ON FUNCTION "public"."citext"(character) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."citext"(character) TO "service_role";
-
-
 
 GRANT ALL ON FUNCTION "public"."citext"("inet") TO "postgres";
 GRANT ALL ON FUNCTION "public"."citext"("inet") TO "anon";
 GRANT ALL ON FUNCTION "public"."citext"("inet") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."citext"("inet") TO "service_role";
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-REVOKE ALL ON FUNCTION "private"."aaa_filter_send_earn_deposit_with_no_send_account_created"() FROM PUBLIC;
-
-
-
 REVOKE ALL ON FUNCTION "private"."filter_send_account_transfers_with_no_send_account_created"() FROM PUBLIC;
 
 
-
-REVOKE ALL ON FUNCTION "private"."filter_send_earn_withdraw_with_no_send_account_created"() FROM PUBLIC;
-
-
-
 REVOKE ALL ON FUNCTION "private"."generate_referral_event_id"("referrer_id" "uuid", "tags" "text"[]) FROM PUBLIC;
-
-
 
 REVOKE ALL ON FUNCTION "private"."generate_referral_event_id"("referrer_id" "uuid", "referred_id" "uuid") FROM PUBLIC;
 
 
 
-REVOKE ALL ON FUNCTION "private"."insert_referral_on_create"() FROM PUBLIC;
 
 
-
-REVOKE ALL ON FUNCTION "private"."insert_referral_on_deposit"() FROM PUBLIC;
-
-
-
-REVOKE ALL ON FUNCTION "private"."insert_referral_on_new_affiliate"() FROM PUBLIC;
-
-
-
-REVOKE ALL ON FUNCTION "private"."send_earn_deposit_trigger_delete_activity"() FROM PUBLIC;
-
-
-
-REVOKE ALL ON FUNCTION "private"."send_earn_deposit_trigger_insert_activity"() FROM PUBLIC;
-
-
-
-REVOKE ALL ON FUNCTION "private"."send_earn_withdraw_trigger_delete_activity"() FROM PUBLIC;
-
-
-
-REVOKE ALL ON FUNCTION "private"."send_earn_withdraw_trigger_insert_activity"() FROM PUBLIC;
 
 
 
 REVOKE ALL ON FUNCTION "private"."update_leaderboard_referrals_all_time_referrals"() FROM PUBLIC;
 
-
-
 REVOKE ALL ON FUNCTION "private"."update_leaderboard_referrals_all_time_sendtag_checkout_receipts"() FROM PUBLIC;
-
-
-
-
-
-
 REVOKE ALL ON FUNCTION "public"."chain_addresses_after_insert"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."chain_addresses_after_insert"() TO "anon";
 GRANT ALL ON FUNCTION "public"."chain_addresses_after_insert"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."chain_addresses_after_insert"() TO "service_role";
-
-
 
 GRANT ALL ON FUNCTION "public"."citext_cmp"("public"."citext", "public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."citext_cmp"("public"."citext", "public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."citext_cmp"("public"."citext", "public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."citext_cmp"("public"."citext", "public"."citext") TO "service_role";
 
-
-
 GRANT ALL ON FUNCTION "public"."citext_eq"("public"."citext", "public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."citext_eq"("public"."citext", "public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."citext_eq"("public"."citext", "public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."citext_eq"("public"."citext", "public"."citext") TO "service_role";
-
-
 
 GRANT ALL ON FUNCTION "public"."citext_ge"("public"."citext", "public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."citext_ge"("public"."citext", "public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."citext_ge"("public"."citext", "public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."citext_ge"("public"."citext", "public"."citext") TO "service_role";
 
-
-
 GRANT ALL ON FUNCTION "public"."citext_gt"("public"."citext", "public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."citext_gt"("public"."citext", "public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."citext_gt"("public"."citext", "public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."citext_gt"("public"."citext", "public"."citext") TO "service_role";
-
-
 
 GRANT ALL ON FUNCTION "public"."citext_hash"("public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."citext_hash"("public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."citext_hash"("public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."citext_hash"("public"."citext") TO "service_role";
 
-
-
 GRANT ALL ON FUNCTION "public"."citext_hash_extended"("public"."citext", bigint) TO "postgres";
 GRANT ALL ON FUNCTION "public"."citext_hash_extended"("public"."citext", bigint) TO "anon";
 GRANT ALL ON FUNCTION "public"."citext_hash_extended"("public"."citext", bigint) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."citext_hash_extended"("public"."citext", bigint) TO "service_role";
-
-
 
 GRANT ALL ON FUNCTION "public"."citext_larger"("public"."citext", "public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."citext_larger"("public"."citext", "public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."citext_larger"("public"."citext", "public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."citext_larger"("public"."citext", "public"."citext") TO "service_role";
 
-
-
 GRANT ALL ON FUNCTION "public"."citext_le"("public"."citext", "public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."citext_le"("public"."citext", "public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."citext_le"("public"."citext", "public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."citext_le"("public"."citext", "public"."citext") TO "service_role";
-
-
 
 GRANT ALL ON FUNCTION "public"."citext_lt"("public"."citext", "public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."citext_lt"("public"."citext", "public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."citext_lt"("public"."citext", "public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."citext_lt"("public"."citext", "public"."citext") TO "service_role";
 
-
-
 GRANT ALL ON FUNCTION "public"."citext_ne"("public"."citext", "public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."citext_ne"("public"."citext", "public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."citext_ne"("public"."citext", "public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."citext_ne"("public"."citext", "public"."citext") TO "service_role";
-
-
 
 GRANT ALL ON FUNCTION "public"."citext_pattern_cmp"("public"."citext", "public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."citext_pattern_cmp"("public"."citext", "public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."citext_pattern_cmp"("public"."citext", "public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."citext_pattern_cmp"("public"."citext", "public"."citext") TO "service_role";
 
-
-
 GRANT ALL ON FUNCTION "public"."citext_pattern_ge"("public"."citext", "public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."citext_pattern_ge"("public"."citext", "public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."citext_pattern_ge"("public"."citext", "public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."citext_pattern_ge"("public"."citext", "public"."citext") TO "service_role";
-
-
 
 GRANT ALL ON FUNCTION "public"."citext_pattern_gt"("public"."citext", "public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."citext_pattern_gt"("public"."citext", "public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."citext_pattern_gt"("public"."citext", "public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."citext_pattern_gt"("public"."citext", "public"."citext") TO "service_role";
 
-
-
 GRANT ALL ON FUNCTION "public"."citext_pattern_le"("public"."citext", "public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."citext_pattern_le"("public"."citext", "public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."citext_pattern_le"("public"."citext", "public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."citext_pattern_le"("public"."citext", "public"."citext") TO "service_role";
-
-
 
 GRANT ALL ON FUNCTION "public"."citext_pattern_lt"("public"."citext", "public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."citext_pattern_lt"("public"."citext", "public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."citext_pattern_lt"("public"."citext", "public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."citext_pattern_lt"("public"."citext", "public"."citext") TO "service_role";
 
-
-
 GRANT ALL ON FUNCTION "public"."citext_smaller"("public"."citext", "public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."citext_smaller"("public"."citext", "public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."citext_smaller"("public"."citext", "public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."citext_smaller"("public"."citext", "public"."citext") TO "service_role";
-
-
-
-
 
 GRANT ALL ON FUNCTION "public"."texticregexeq"("public"."citext", "public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."texticregexeq"("public"."citext", "public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."texticregexeq"("public"."citext", "public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."texticregexeq"("public"."citext", "public"."citext") TO "service_role";
 
-
-
-
-
-
-
 REVOKE ALL ON FUNCTION "public"."create_send_account"("send_account" "public"."send_accounts", "webauthn_credential" "public"."webauthn_credentials", "key_slot" integer) FROM PUBLIC;
-
-
-
-
 REVOKE ALL ON FUNCTION "public"."favourite_senders"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."favourite_senders"() TO "anon";
 GRANT ALL ON FUNCTION "public"."favourite_senders"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."favourite_senders"() TO "service_role";
-
-
-
-
 REVOKE ALL ON FUNCTION "public"."get_affiliate_referrals"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."get_affiliate_referrals"() TO "anon";
 GRANT ALL ON FUNCTION "public"."get_affiliate_referrals"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."get_affiliate_referrals"() TO "service_role";
-
-
 
 REVOKE ALL ON FUNCTION "public"."get_affiliate_stats_summary"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."get_affiliate_stats_summary"() TO "anon";
 GRANT ALL ON FUNCTION "public"."get_affiliate_stats_summary"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."get_affiliate_stats_summary"() TO "service_role";
 
-
-
 REVOKE ALL ON FUNCTION "public"."get_friends"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."get_friends"() TO "anon";
 GRANT ALL ON FUNCTION "public"."get_friends"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."get_friends"() TO "service_role";
-
-
 
 REVOKE ALL ON FUNCTION "public"."get_pending_jackpot_tickets_purchased"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."get_pending_jackpot_tickets_purchased"() TO "anon";
 GRANT ALL ON FUNCTION "public"."get_pending_jackpot_tickets_purchased"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."get_pending_jackpot_tickets_purchased"() TO "service_role";
 
-
-
 REVOKE ALL ON FUNCTION "public"."get_user_jackpot_summary"("num_runs" integer) FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."get_user_jackpot_summary"("num_runs" integer) TO "anon";
 GRANT ALL ON FUNCTION "public"."get_user_jackpot_summary"("num_runs" integer) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."get_user_jackpot_summary"("num_runs" integer) TO "service_role";
-
-
 
 REVOKE ALL ON FUNCTION "public"."handle_new_user"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."handle_new_user"() TO "anon";
 GRANT ALL ON FUNCTION "public"."handle_new_user"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."handle_new_user"() TO "service_role";
 
-
-
-
-
 REVOKE ALL ON FUNCTION "public"."insert_challenge"() FROM PUBLIC;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 REVOKE ALL ON FUNCTION "public"."insert_verification_create_passkey"() FROM PUBLIC;
-
-
 REVOKE ALL ON FUNCTION "public"."insert_verification_referral"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."insert_verification_referral"() TO "anon";
 GRANT ALL ON FUNCTION "public"."insert_verification_referral"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."insert_verification_referral"() TO "service_role";
-
-
 
 REVOKE ALL ON FUNCTION "public"."insert_verification_send_ceiling"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."insert_verification_send_ceiling"() TO "anon";
 GRANT ALL ON FUNCTION "public"."insert_verification_send_ceiling"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."insert_verification_send_ceiling"() TO "service_role";
 
-
-
 REVOKE ALL ON FUNCTION "public"."insert_verification_sends"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."insert_verification_sends"() TO "anon";
 GRANT ALL ON FUNCTION "public"."insert_verification_sends"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."insert_verification_sends"() TO "service_role";
 
-
-
 REVOKE ALL ON FUNCTION "public"."insert_verification_tag_registration"() FROM PUBLIC;
-
-
-
-
 
 REVOKE ALL ON FUNCTION "public"."leaderboard_referrals_all_time"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."leaderboard_referrals_all_time"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."leaderboard_referrals_all_time"() TO "service_role";
-
-
 
 REVOKE ALL ON FUNCTION "public"."profile_lookup"("lookup_type" "public"."lookup_type_enum", "identifier" "text") FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."profile_lookup"("lookup_type" "public"."lookup_type_enum", "identifier" "text") TO "anon";
 GRANT ALL ON FUNCTION "public"."profile_lookup"("lookup_type" "public"."lookup_type_enum", "identifier" "text") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."profile_lookup"("lookup_type" "public"."lookup_type_enum", "identifier" "text") TO "service_role";
 
-
-
-
-
 REVOKE ALL ON FUNCTION "public"."recent_senders"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."recent_senders"() TO "anon";
 GRANT ALL ON FUNCTION "public"."recent_senders"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."recent_senders"() TO "service_role";
-
-
 
 REVOKE ALL ON FUNCTION "public"."referrals_delete_activity_trigger"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."referrals_delete_activity_trigger"() TO "anon";
 GRANT ALL ON FUNCTION "public"."referrals_delete_activity_trigger"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."referrals_delete_activity_trigger"() TO "service_role";
 
-
-
 REVOKE ALL ON FUNCTION "public"."referrals_insert_activity_trigger"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."referrals_insert_activity_trigger"() TO "anon";
 GRANT ALL ON FUNCTION "public"."referrals_insert_activity_trigger"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."referrals_insert_activity_trigger"() TO "service_role";
-
-
 
 REVOKE ALL ON FUNCTION "public"."referrer_lookup"("referral_code" "text") FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."referrer_lookup"("referral_code" "text") TO "anon";
 GRANT ALL ON FUNCTION "public"."referrer_lookup"("referral_code" "text") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."referrer_lookup"("referral_code" "text") TO "service_role";
 
-
-
 GRANT ALL ON FUNCTION "public"."regexp_match"("public"."citext", "public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."regexp_match"("public"."citext", "public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."regexp_match"("public"."citext", "public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."regexp_match"("public"."citext", "public"."citext") TO "service_role";
-
-
 
 GRANT ALL ON FUNCTION "public"."regexp_match"("public"."citext", "public"."citext", "text") TO "postgres";
 GRANT ALL ON FUNCTION "public"."regexp_match"("public"."citext", "public"."citext", "text") TO "anon";
 GRANT ALL ON FUNCTION "public"."regexp_match"("public"."citext", "public"."citext", "text") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."regexp_match"("public"."citext", "public"."citext", "text") TO "service_role";
 
-
-
 GRANT ALL ON FUNCTION "public"."regexp_matches"("public"."citext", "public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."regexp_matches"("public"."citext", "public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."regexp_matches"("public"."citext", "public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."regexp_matches"("public"."citext", "public"."citext") TO "service_role";
-
-
 
 GRANT ALL ON FUNCTION "public"."regexp_matches"("public"."citext", "public"."citext", "text") TO "postgres";
 GRANT ALL ON FUNCTION "public"."regexp_matches"("public"."citext", "public"."citext", "text") TO "anon";
 GRANT ALL ON FUNCTION "public"."regexp_matches"("public"."citext", "public"."citext", "text") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."regexp_matches"("public"."citext", "public"."citext", "text") TO "service_role";
 
-
-
 GRANT ALL ON FUNCTION "public"."regexp_replace"("public"."citext", "public"."citext", "text") TO "postgres";
 GRANT ALL ON FUNCTION "public"."regexp_replace"("public"."citext", "public"."citext", "text") TO "anon";
 GRANT ALL ON FUNCTION "public"."regexp_replace"("public"."citext", "public"."citext", "text") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."regexp_replace"("public"."citext", "public"."citext", "text") TO "service_role";
-
-
 
 GRANT ALL ON FUNCTION "public"."regexp_replace"("public"."citext", "public"."citext", "text", "text") TO "postgres";
 GRANT ALL ON FUNCTION "public"."regexp_replace"("public"."citext", "public"."citext", "text", "text") TO "anon";
 GRANT ALL ON FUNCTION "public"."regexp_replace"("public"."citext", "public"."citext", "text", "text") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."regexp_replace"("public"."citext", "public"."citext", "text", "text") TO "service_role";
 
-
-
 GRANT ALL ON FUNCTION "public"."regexp_split_to_array"("public"."citext", "public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."regexp_split_to_array"("public"."citext", "public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."regexp_split_to_array"("public"."citext", "public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."regexp_split_to_array"("public"."citext", "public"."citext") TO "service_role";
-
-
 
 GRANT ALL ON FUNCTION "public"."regexp_split_to_array"("public"."citext", "public"."citext", "text") TO "postgres";
 GRANT ALL ON FUNCTION "public"."regexp_split_to_array"("public"."citext", "public"."citext", "text") TO "anon";
 GRANT ALL ON FUNCTION "public"."regexp_split_to_array"("public"."citext", "public"."citext", "text") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."regexp_split_to_array"("public"."citext", "public"."citext", "text") TO "service_role";
 
-
-
 GRANT ALL ON FUNCTION "public"."regexp_split_to_table"("public"."citext", "public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."regexp_split_to_table"("public"."citext", "public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."regexp_split_to_table"("public"."citext", "public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."regexp_split_to_table"("public"."citext", "public"."citext") TO "service_role";
-
-
 
 GRANT ALL ON FUNCTION "public"."regexp_split_to_table"("public"."citext", "public"."citext", "text") TO "postgres";
 GRANT ALL ON FUNCTION "public"."regexp_split_to_table"("public"."citext", "public"."citext", "text") TO "anon";
 GRANT ALL ON FUNCTION "public"."regexp_split_to_table"("public"."citext", "public"."citext", "text") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."regexp_split_to_table"("public"."citext", "public"."citext", "text") TO "service_role";
 
-
-
 GRANT ALL ON FUNCTION "public"."replace"("public"."citext", "public"."citext", "public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."replace"("public"."citext", "public"."citext", "public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."replace"("public"."citext", "public"."citext", "public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."replace"("public"."citext", "public"."citext", "public"."citext") TO "service_role";
-
-
 
 REVOKE ALL ON FUNCTION "public"."send_account_receives_delete_activity_trigger"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."send_account_receives_delete_activity_trigger"() TO "anon";
 GRANT ALL ON FUNCTION "public"."send_account_receives_delete_activity_trigger"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."send_account_receives_delete_activity_trigger"() TO "service_role";
 
-
-
 REVOKE ALL ON FUNCTION "public"."send_account_receives_insert_activity_trigger"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."send_account_receives_insert_activity_trigger"() TO "anon";
 GRANT ALL ON FUNCTION "public"."send_account_receives_insert_activity_trigger"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."send_account_receives_insert_activity_trigger"() TO "service_role";
-
-
 
 REVOKE ALL ON FUNCTION "public"."send_account_signing_key_added_trigger_delete_activity"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."send_account_signing_key_added_trigger_delete_activity"() TO "anon";
 GRANT ALL ON FUNCTION "public"."send_account_signing_key_added_trigger_delete_activity"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."send_account_signing_key_added_trigger_delete_activity"() TO "service_role";
 
-
-
 REVOKE ALL ON FUNCTION "public"."send_account_signing_key_added_trigger_insert_activity"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."send_account_signing_key_added_trigger_insert_activity"() TO "anon";
 GRANT ALL ON FUNCTION "public"."send_account_signing_key_added_trigger_insert_activity"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."send_account_signing_key_added_trigger_insert_activity"() TO "service_role";
-
-
 
 REVOKE ALL ON FUNCTION "public"."send_account_signing_key_removed_trigger_delete_activity"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."send_account_signing_key_removed_trigger_delete_activity"() TO "anon";
 GRANT ALL ON FUNCTION "public"."send_account_signing_key_removed_trigger_delete_activity"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."send_account_signing_key_removed_trigger_delete_activity"() TO "service_role";
 
-
-
 REVOKE ALL ON FUNCTION "public"."send_account_signing_key_removed_trigger_insert_activity"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."send_account_signing_key_removed_trigger_insert_activity"() TO "anon";
 GRANT ALL ON FUNCTION "public"."send_account_signing_key_removed_trigger_insert_activity"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."send_account_signing_key_removed_trigger_insert_activity"() TO "service_role";
-
-
 
 REVOKE ALL ON FUNCTION "public"."send_account_transfers_delete_temporal_activity"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."send_account_transfers_delete_temporal_activity"() TO "anon";
 GRANT ALL ON FUNCTION "public"."send_account_transfers_delete_temporal_activity"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."send_account_transfers_delete_temporal_activity"() TO "service_role";
 
-
-
 REVOKE ALL ON FUNCTION "public"."send_account_transfers_trigger_delete_activity"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."send_account_transfers_trigger_delete_activity"() TO "anon";
 GRANT ALL ON FUNCTION "public"."send_account_transfers_trigger_delete_activity"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."send_account_transfers_trigger_delete_activity"() TO "service_role";
-
-
 
 REVOKE ALL ON FUNCTION "public"."send_account_transfers_trigger_insert_activity"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."send_account_transfers_trigger_insert_activity"() TO "anon";
 GRANT ALL ON FUNCTION "public"."send_account_transfers_trigger_insert_activity"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."send_account_transfers_trigger_insert_activity"() TO "service_role";
 
-
-
 REVOKE ALL ON FUNCTION "public"."send_accounts_add_webauthn_credential"("send_account_id" "uuid", "webauthn_credential" "public"."webauthn_credentials", "key_slot" integer) FROM PUBLIC;
-
-
 REVOKE ALL ON FUNCTION "public"."send_accounts_after_insert"() FROM PUBLIC;
-
-
-GRANT ALL ON TABLE "public"."send_earn_create" TO "anon";
-GRANT ALL ON TABLE "public"."send_earn_create" TO "authenticated";
-GRANT ALL ON TABLE "public"."send_earn_create" TO "service_role";
-
-
-
-GRANT ALL ON TABLE "public"."send_earn_new_affiliate" TO "anon";
-GRANT ALL ON TABLE "public"."send_earn_new_affiliate" TO "authenticated";
-GRANT ALL ON TABLE "public"."send_earn_new_affiliate" TO "service_role";
-
-
-
-REVOKE ALL ON FUNCTION "public"."send_earn_affiliate_vault"("public"."send_earn_new_affiliate") FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."send_earn_affiliate_vault"("public"."send_earn_new_affiliate") TO "anon";
-GRANT ALL ON FUNCTION "public"."send_earn_affiliate_vault"("public"."send_earn_new_affiliate") TO "authenticated";
-GRANT ALL ON FUNCTION "public"."send_earn_affiliate_vault"("public"."send_earn_new_affiliate") TO "service_role";
-
-
 
 REVOKE ALL ON FUNCTION "public"."set_current_timestamp_updated_at"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."set_current_timestamp_updated_at"() TO "anon";
 GRANT ALL ON FUNCTION "public"."set_current_timestamp_updated_at"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."set_current_timestamp_updated_at"() TO "service_role";
 
-
-
 GRANT ALL ON FUNCTION "public"."split_part"("public"."citext", "public"."citext", integer) TO "postgres";
 GRANT ALL ON FUNCTION "public"."split_part"("public"."citext", "public"."citext", integer) TO "anon";
 GRANT ALL ON FUNCTION "public"."split_part"("public"."citext", "public"."citext", integer) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."split_part"("public"."citext", "public"."citext", integer) TO "service_role";
-
-
 
 REVOKE ALL ON FUNCTION "public"."stop_change_send_id"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."stop_change_send_id"() TO "anon";
 GRANT ALL ON FUNCTION "public"."stop_change_send_id"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."stop_change_send_id"() TO "service_role";
 
-
-
 GRANT ALL ON FUNCTION "public"."strpos"("public"."citext", "public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."strpos"("public"."citext", "public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."strpos"("public"."citext", "public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."strpos"("public"."citext", "public"."citext") TO "service_role";
-
-
-
-
-
-
 REVOKE ALL ON FUNCTION "public"."tag_receipts_insert_activity_trigger"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."tag_receipts_insert_activity_trigger"() TO "anon";
 GRANT ALL ON FUNCTION "public"."tag_receipts_insert_activity_trigger"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."tag_receipts_insert_activity_trigger"() TO "service_role";
 
-
-
-
-
 GRANT ALL ON SEQUENCE "public"."profiles_send_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."profiles_send_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."profiles_send_id_seq" TO "service_role";
 
-
-
 GRANT ALL ON TABLE "public"."profiles" TO "anon";
 GRANT ALL ON TABLE "public"."profiles" TO "authenticated";
 GRANT ALL ON TABLE "public"."profiles" TO "service_role";
-
-
-
-
-
-
-
-
-
-
 
 GRANT ALL ON FUNCTION "public"."texticlike"("public"."citext", "text") TO "postgres";
 GRANT ALL ON FUNCTION "public"."texticlike"("public"."citext", "text") TO "anon";
 GRANT ALL ON FUNCTION "public"."texticlike"("public"."citext", "text") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."texticlike"("public"."citext", "text") TO "service_role";
 
-
-
 GRANT ALL ON FUNCTION "public"."texticlike"("public"."citext", "public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."texticlike"("public"."citext", "public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."texticlike"("public"."citext", "public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."texticlike"("public"."citext", "public"."citext") TO "service_role";
-
-
 
 GRANT ALL ON FUNCTION "public"."texticnlike"("public"."citext", "text") TO "postgres";
 GRANT ALL ON FUNCTION "public"."texticnlike"("public"."citext", "text") TO "anon";
 GRANT ALL ON FUNCTION "public"."texticnlike"("public"."citext", "text") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."texticnlike"("public"."citext", "text") TO "service_role";
 
-
-
 GRANT ALL ON FUNCTION "public"."texticnlike"("public"."citext", "public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."texticnlike"("public"."citext", "public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."texticnlike"("public"."citext", "public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."texticnlike"("public"."citext", "public"."citext") TO "service_role";
-
-
 
 GRANT ALL ON FUNCTION "public"."texticregexeq"("public"."citext", "text") TO "postgres";
 GRANT ALL ON FUNCTION "public"."texticregexeq"("public"."citext", "text") TO "anon";
 GRANT ALL ON FUNCTION "public"."texticregexeq"("public"."citext", "text") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."texticregexeq"("public"."citext", "text") TO "service_role";
 
-
-
 GRANT ALL ON FUNCTION "public"."texticregexne"("public"."citext", "text") TO "postgres";
 GRANT ALL ON FUNCTION "public"."texticregexne"("public"."citext", "text") TO "anon";
 GRANT ALL ON FUNCTION "public"."texticregexne"("public"."citext", "text") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."texticregexne"("public"."citext", "text") TO "service_role";
-
-
 
 GRANT ALL ON FUNCTION "public"."texticregexne"("public"."citext", "public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."texticregexne"("public"."citext", "public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."texticregexne"("public"."citext", "public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."texticregexne"("public"."citext", "public"."citext") TO "service_role";
 
-
-
 REVOKE ALL ON FUNCTION "public"."today_birthday_senders"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."today_birthday_senders"() TO "anon";
 GRANT ALL ON FUNCTION "public"."today_birthday_senders"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."today_birthday_senders"() TO "service_role";
-
-
 
 GRANT ALL ON FUNCTION "public"."translate"("public"."citext", "public"."citext", "text") TO "postgres";
 GRANT ALL ON FUNCTION "public"."translate"("public"."citext", "public"."citext", "text") TO "anon";
 GRANT ALL ON FUNCTION "public"."translate"("public"."citext", "public"."citext", "text") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."translate"("public"."citext", "public"."citext", "text") TO "service_role";
 
-
-
 REVOKE ALL ON FUNCTION "public"."update_affiliate_stats_on_transfer"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."update_affiliate_stats_on_transfer"() TO "anon";
 GRANT ALL ON FUNCTION "public"."update_affiliate_stats_on_transfer"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."update_affiliate_stats_on_transfer"() TO "service_role";
-
-
-
-
-
-
-
-
-
-
-
-
 REVOKE ALL ON FUNCTION "public"."update_transfer_activity_before_insert"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."update_transfer_activity_before_insert"() TO "anon";
 GRANT ALL ON FUNCTION "public"."update_transfer_activity_before_insert"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."update_transfer_activity_before_insert"() TO "service_role";
-
-
 
 REVOKE ALL ON FUNCTION "public"."user_referrals_count"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."user_referrals_count"() TO "anon";
 GRANT ALL ON FUNCTION "public"."user_referrals_count"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."user_referrals_count"() TO "service_role";
 
-
-
 REVOKE ALL ON FUNCTION "temporal"."add_note_activity_temporal_transfer_before_confirmed"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "temporal"."add_note_activity_temporal_transfer_before_confirmed"() TO "service_role";
-
-
 
 REVOKE ALL ON FUNCTION "temporal"."temporal_deposit_insert_pending_activity"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "temporal"."temporal_deposit_insert_pending_activity"() TO "service_role";
 
-
-
 REVOKE ALL ON FUNCTION "temporal"."temporal_deposit_update_activity_on_status_change"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "temporal"."temporal_deposit_update_activity_on_status_change"() TO "service_role";
-
-
 
 REVOKE ALL ON FUNCTION "temporal"."temporal_send_account_transfers_trigger_delete_activity"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "temporal"."temporal_send_account_transfers_trigger_delete_activity"() TO "service_role";
 
-
-
 REVOKE ALL ON FUNCTION "temporal"."temporal_transfer_after_upsert"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "temporal"."temporal_transfer_after_upsert"() TO "service_role";
 
-
-
 REVOKE ALL ON FUNCTION "temporal"."temporal_transfer_before_insert"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "temporal"."temporal_transfer_before_insert"() TO "service_role";
-
-
 
 GRANT ALL ON FUNCTION "public"."max"("public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."max"("public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."max"("public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."max"("public"."citext") TO "service_role";
 
-
-
 GRANT ALL ON FUNCTION "public"."min"("public"."citext") TO "postgres";
 GRANT ALL ON FUNCTION "public"."min"("public"."citext") TO "anon";
 GRANT ALL ON FUNCTION "public"."min"("public"."citext") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."min"("public"."citext") TO "service_role";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 GRANT ALL ON TABLE "public"."activity" TO "anon";
 GRANT ALL ON TABLE "public"."activity" TO "authenticated";
 GRANT ALL ON TABLE "public"."activity" TO "service_role";
-
-
 
 GRANT ALL ON TABLE "public"."activity_feed" TO "anon";
 GRANT ALL ON TABLE "public"."activity_feed" TO "authenticated";
 GRANT ALL ON TABLE "public"."activity_feed" TO "service_role";
 
-
-
 GRANT ALL ON SEQUENCE "public"."activity_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."activity_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."activity_id_seq" TO "service_role";
-
-
 
 GRANT ALL ON TABLE "public"."affiliate_stats" TO "anon";
 GRANT ALL ON TABLE "public"."affiliate_stats" TO "authenticated";
 GRANT ALL ON TABLE "public"."affiliate_stats" TO "service_role";
 
-
-
 GRANT ALL ON TABLE "public"."chain_addresses" TO "anon";
 GRANT ALL ON TABLE "public"."chain_addresses" TO "authenticated";
 GRANT ALL ON TABLE "public"."chain_addresses" TO "service_role";
-
-
-
-
 
 GRANT ALL ON TABLE "public"."referrals" TO "anon";
 GRANT ALL ON TABLE "public"."referrals" TO "authenticated";
 GRANT ALL ON TABLE "public"."referrals" TO "service_role";
 
-
-
 GRANT ALL ON TABLE "public"."send_account_credentials" TO "anon";
 GRANT ALL ON TABLE "public"."send_account_credentials" TO "authenticated";
 GRANT ALL ON TABLE "public"."send_account_credentials" TO "service_role";
-
-
 
 GRANT ALL ON TABLE "public"."send_account_transfers" TO "anon";
 GRANT ALL ON TABLE "public"."send_account_transfers" TO "authenticated";
 GRANT ALL ON TABLE "public"."send_account_transfers" TO "service_role";
 
-
-
 GRANT ALL ON TABLE "public"."send_token_transfers" TO "anon";
 GRANT ALL ON TABLE "public"."send_token_transfers" TO "authenticated";
 GRANT ALL ON TABLE "public"."send_token_transfers" TO "service_role";
-
-
 
 GRANT ALL ON TABLE "public"."sendtag_checkout_receipts" TO "anon";
 GRANT ALL ON TABLE "public"."sendtag_checkout_receipts" TO "authenticated";
 GRANT ALL ON TABLE "public"."sendtag_checkout_receipts" TO "service_role";
 
-
-
 GRANT ALL ON TABLE "public"."dashboard_metrics" TO "anon";
 GRANT ALL ON TABLE "public"."dashboard_metrics" TO "authenticated";
 GRANT ALL ON TABLE "public"."dashboard_metrics" TO "service_role";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 GRANT ALL ON TABLE "public"."liquidity_pools" TO "anon";
 GRANT ALL ON TABLE "public"."liquidity_pools" TO "authenticated";
 GRANT ALL ON TABLE "public"."liquidity_pools" TO "service_role";
 
-
-
 GRANT ALL ON TABLE "public"."receipts" TO "anon";
 GRANT ALL ON TABLE "public"."receipts" TO "authenticated";
 GRANT ALL ON TABLE "public"."receipts" TO "service_role";
-
-
 
 GRANT ALL ON SEQUENCE "public"."receipts_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."receipts_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."receipts_id_seq" TO "service_role";
 
-
-
 GRANT ALL ON SEQUENCE "public"."referrals_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."referrals_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."referrals_id_seq" TO "service_role";
-
-
 
 GRANT ALL ON TABLE "public"."referrer" TO "anon";
 GRANT ALL ON TABLE "public"."referrer" TO "authenticated";
 GRANT ALL ON TABLE "public"."referrer" TO "service_role";
 
-
-
 GRANT ALL ON TABLE "public"."send_account_created" TO "anon";
 GRANT ALL ON TABLE "public"."send_account_created" TO "authenticated";
 GRANT ALL ON TABLE "public"."send_account_created" TO "service_role";
-
-
 
 GRANT ALL ON SEQUENCE "public"."send_account_created_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."send_account_created_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."send_account_created_id_seq" TO "service_role";
 
-
-
 GRANT ALL ON TABLE "public"."send_account_receives" TO "anon";
 GRANT ALL ON TABLE "public"."send_account_receives" TO "authenticated";
 GRANT ALL ON TABLE "public"."send_account_receives" TO "service_role";
-
-
 
 GRANT ALL ON SEQUENCE "public"."send_account_receives_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."send_account_receives_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."send_account_receives_id_seq" TO "service_role";
 
-
-
 GRANT ALL ON TABLE "public"."send_account_signing_key_added" TO "anon";
 GRANT ALL ON TABLE "public"."send_account_signing_key_added" TO "authenticated";
 GRANT ALL ON TABLE "public"."send_account_signing_key_added" TO "service_role";
-
-
 
 GRANT ALL ON SEQUENCE "public"."send_account_signing_key_added_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."send_account_signing_key_added_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."send_account_signing_key_added_id_seq" TO "service_role";
 
-
-
 GRANT ALL ON TABLE "public"."send_account_signing_key_removed" TO "anon";
 GRANT ALL ON TABLE "public"."send_account_signing_key_removed" TO "authenticated";
 GRANT ALL ON TABLE "public"."send_account_signing_key_removed" TO "service_role";
-
-
 
 GRANT ALL ON SEQUENCE "public"."send_account_signing_key_removed_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."send_account_signing_key_removed_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."send_account_signing_key_removed_id_seq" TO "service_role";
 
-
-
 GRANT ALL ON SEQUENCE "public"."send_account_transfers_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."send_account_transfers_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."send_account_transfers_id_seq" TO "service_role";
-
-
-
-GRANT ALL ON TABLE "public"."send_earn_deposit" TO "anon";
-GRANT ALL ON TABLE "public"."send_earn_deposit" TO "authenticated";
-GRANT ALL ON TABLE "public"."send_earn_deposit" TO "service_role";
-
-
-
-GRANT ALL ON TABLE "public"."send_earn_withdraw" TO "anon";
-GRANT ALL ON TABLE "public"."send_earn_withdraw" TO "authenticated";
-GRANT ALL ON TABLE "public"."send_earn_withdraw" TO "service_role";
-
-
-
-GRANT ALL ON TABLE "public"."send_earn_activity" TO "anon";
-GRANT ALL ON TABLE "public"."send_earn_activity" TO "authenticated";
-GRANT ALL ON TABLE "public"."send_earn_activity" TO "service_role";
-
-
-
-GRANT ALL ON TABLE "public"."send_earn_balances" TO "anon";
-GRANT ALL ON TABLE "public"."send_earn_balances" TO "authenticated";
-GRANT ALL ON TABLE "public"."send_earn_balances" TO "service_role";
-
-
-
-GRANT ALL ON SEQUENCE "public"."send_earn_create_id_seq" TO "anon";
-GRANT ALL ON SEQUENCE "public"."send_earn_create_id_seq" TO "authenticated";
-GRANT ALL ON SEQUENCE "public"."send_earn_create_id_seq" TO "service_role";
-
-
-
-GRANT ALL ON SEQUENCE "public"."send_earn_deposit_id_seq" TO "anon";
-GRANT ALL ON SEQUENCE "public"."send_earn_deposit_id_seq" TO "authenticated";
-GRANT ALL ON SEQUENCE "public"."send_earn_deposit_id_seq" TO "service_role";
-
-
-
-GRANT ALL ON SEQUENCE "public"."send_earn_new_affiliate_id_seq" TO "anon";
-GRANT ALL ON SEQUENCE "public"."send_earn_new_affiliate_id_seq" TO "authenticated";
-GRANT ALL ON SEQUENCE "public"."send_earn_new_affiliate_id_seq" TO "service_role";
-
-
-
-GRANT ALL ON SEQUENCE "public"."send_earn_withdraw_id_seq" TO "anon";
-GRANT ALL ON SEQUENCE "public"."send_earn_withdraw_id_seq" TO "authenticated";
-GRANT ALL ON SEQUENCE "public"."send_earn_withdraw_id_seq" TO "service_role";
-
-
 
 GRANT ALL ON TABLE "public"."send_liquidity_pools" TO "anon";
 GRANT ALL ON TABLE "public"."send_liquidity_pools" TO "authenticated";
 GRANT ALL ON TABLE "public"."send_liquidity_pools" TO "service_role";
 
-
-
 GRANT ALL ON SEQUENCE "public"."send_liquidity_pools_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."send_liquidity_pools_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."send_liquidity_pools_id_seq" TO "service_role";
-
-
 
 GRANT ALL ON TABLE "public"."send_revenues_safe_receives" TO "anon";
 GRANT ALL ON TABLE "public"."send_revenues_safe_receives" TO "authenticated";
 GRANT ALL ON TABLE "public"."send_revenues_safe_receives" TO "service_role";
 
-
-
 GRANT ALL ON SEQUENCE "public"."send_revenues_safe_receives_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."send_revenues_safe_receives_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."send_revenues_safe_receives_id_seq" TO "service_role";
-
-
-
-
-
-
 GRANT ALL ON SEQUENCE "public"."send_token_transfers_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."send_token_transfers_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."send_token_transfers_id_seq" TO "service_role";
-
-
 
 GRANT ALL ON TABLE "public"."send_token_v0_transfers" TO "anon";
 GRANT ALL ON TABLE "public"."send_token_v0_transfers" TO "authenticated";
 GRANT ALL ON TABLE "public"."send_token_v0_transfers" TO "service_role";
 
-
-
 GRANT ALL ON SEQUENCE "public"."send_token_v0_transfers_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."send_token_v0_transfers_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."send_token_v0_transfers_id_seq" TO "service_role";
-
-
 
 GRANT ALL ON TABLE "public"."sendpot_jackpot_runs" TO "anon";
 GRANT ALL ON TABLE "public"."sendpot_jackpot_runs" TO "authenticated";
 GRANT ALL ON TABLE "public"."sendpot_jackpot_runs" TO "service_role";
 
-
-
 GRANT ALL ON SEQUENCE "public"."sendpot_jackpot_runs_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."sendpot_jackpot_runs_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."sendpot_jackpot_runs_id_seq" TO "service_role";
-
-
 
 GRANT ALL ON TABLE "public"."sendpot_user_ticket_purchases" TO "anon";
 GRANT ALL ON TABLE "public"."sendpot_user_ticket_purchases" TO "authenticated";
 GRANT ALL ON TABLE "public"."sendpot_user_ticket_purchases" TO "service_role";
 
-
-
 GRANT ALL ON SEQUENCE "public"."sendpot_user_ticket_purchases_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."sendpot_user_ticket_purchases_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."sendpot_user_ticket_purchases_id_seq" TO "service_role";
-
-
 
 GRANT ALL ON SEQUENCE "public"."sendtag_checkout_receipts_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."sendtag_checkout_receipts_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."sendtag_checkout_receipts_id_seq" TO "service_role";
 
-
-
 GRANT ALL ON TABLE "public"."swap_routers" TO "anon";
 GRANT ALL ON TABLE "public"."swap_routers" TO "authenticated";
 GRANT ALL ON TABLE "public"."swap_routers" TO "service_role";
-
-
 
 GRANT ALL ON TABLE "public"."tag_receipts" TO "anon";
 GRANT ALL ON TABLE "public"."tag_receipts" TO "authenticated";
 GRANT ALL ON TABLE "public"."tag_receipts" TO "service_role";
 
-
-
 GRANT ALL ON SEQUENCE "public"."tag_receipts_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."tag_receipts_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."tag_receipts_id_seq" TO "service_role";
-
-
 GRANT ALL ON TABLE "temporal"."send_account_transfers" TO "service_role";
 GRANT SELECT ON TABLE "temporal"."send_account_transfers" TO "authenticated";
 
-
-
 GRANT SELECT,USAGE ON SEQUENCE "temporal"."send_account_transfers_id_seq" TO "service_role";
-
-
-
-GRANT ALL ON TABLE "temporal"."send_earn_deposits" TO "service_role";
-
-
-
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES  TO "postgres";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES  TO "anon";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES  TO "authenticated";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES  TO "service_role";
-
-
-
-
-
-
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS  TO "postgres";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS  TO "anon";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS  TO "authenticated";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS  TO "service_role";
-
-
-
-
-
-
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES  TO "postgres";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES  TO "anon";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES  TO "authenticated";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES  TO "service_role";
-
-
-
-
-
-
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "temporal" GRANT ALL ON FUNCTIONS  TO "service_role";
-
-
 
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "temporal" GRANT ALL ON TABLES  TO "service_role";
 
-
-
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" REVOKE ALL ON FUNCTIONS  FROM PUBLIC;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 RESET ALL;

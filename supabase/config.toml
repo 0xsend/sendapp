@@ -26,6 +26,7 @@ schema_paths = [
   "./schemas/tags.sql",
   "./schemas/referrals.sql",
   "./schemas/distributions.sql",
+  "./schemas/send_earn.sql",
   "./schemas/prod.sql",
   "./schemas/*.sql",
 ]
