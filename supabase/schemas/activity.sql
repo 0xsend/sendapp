@@ -1,116 +1,5 @@
 -- Types
-CREATE TYPE "public"."activity_feed_user" AS (
-	"id" "uuid",
-	"name" "text",
-	"avatar_url" "text",
-	"send_id" integer,
-	"tags" "text"[]
-);
-ALTER TYPE "public"."activity_feed_user" OWNER TO "postgres";
-
--- Functions
-CREATE OR REPLACE FUNCTION "public"."favourite_senders"() RETURNS SETOF "public"."activity_feed_user"
-    LANGUAGE "sql" STABLE
-    AS $$
-    WITH recent_transfers AS (
-        SELECT "from_user" AS user, COUNT(*) AS activity_count
-        FROM activity_feed
-        WHERE created_at >= CURRENT_DATE - INTERVAL '30 days'
-        AND event_name = 'send_account_transfers'
-        AND to_user.id = auth.uid()
-        AND from_user IS NOT NULL
-        GROUP BY from_user
-        HAVING COUNT(*) >= 3
-        ORDER BY activity_count DESC
-        LIMIT 5
-    )
-    SELECT DISTINCT (recent_transfers.user).*
-    FROM recent_transfers
-$$;
-ALTER FUNCTION "public"."favourite_senders"() OWNER TO "postgres";
-
-CREATE OR REPLACE FUNCTION "public"."recent_senders"() RETURNS SETOF "public"."activity_feed_user"
-    LANGUAGE "sql" STABLE
-    AS $$
-    WITH recent_transfers AS (
-        SELECT "from_user" AS user, MAX(created_at) AS last_transfer_date
-        FROM activity_feed
-        WHERE created_at >= CURRENT_DATE - INTERVAL '60 days'
-        AND event_name = 'send_account_transfers'
-        AND to_user.id = auth.uid()
-        AND from_user IS NOT NULL
-        GROUP BY from_user
-        ORDER BY last_transfer_date DESC
-        LIMIT 10
-    )
-    SELECT DISTINCT (recent_transfers.user).*
-    FROM recent_transfers
-$$;
-ALTER FUNCTION "public"."recent_senders"() OWNER TO "postgres";
-
-CREATE OR REPLACE FUNCTION "public"."today_birthday_senders"() RETURNS SETOF "public"."activity_feed_user"
-    LANGUAGE "sql" STABLE
-    AS $$
-   WITH unique_senders AS (
-       SELECT DISTINCT from_user_id
-       FROM activity
-       WHERE to_user_id = auth.uid()
-         AND event_name = 'send_account_transfers'
-         AND from_user_id IS NOT NULL
-   )
-   SELECT (
-       profiles.id,
-       profiles.name,
-       profiles.avatar_url,
-       profiles.send_id,
-       ARRAY(
-           SELECT tags.name
-           FROM public.tags
-           WHERE tags.user_id = profiles.id
-             AND tags.status = 'confirmed'
-       )
-   )::activity_feed_user
-   FROM profiles
-   INNER JOIN unique_senders ON profiles.id = unique_senders.from_user_id
-   WHERE EXTRACT(MONTH FROM profiles.birthday_month_day) = EXTRACT(MONTH FROM CURRENT_DATE)
-     AND EXTRACT(DAY FROM profiles.birthday_month_day) = EXTRACT(DAY FROM CURRENT_DATE)
-$$;
-ALTER FUNCTION "public"."today_birthday_senders"() OWNER TO "postgres";
-
-CREATE OR REPLACE FUNCTION "public"."update_transfer_activity_before_insert"() RETURNS "trigger"
-    LANGUAGE "plpgsql"
-    AS $$
-DECLARE
-    tmp_data jsonb;
-    note_id uuid;
-    note_text text;
-    temporal_status temporal.transfer_status;
-BEGIN
-    -- Check if the event name contains '_transfers'
-    IF position('_transfers' in NEW.event_name) > 0 THEN
-        -- Query the temporal.send_account_transfers table
-        SELECT note, status INTO note_id, temporal_status
-        FROM temporal.send_account_transfers
-        WHERE id::text = NEW.event_id AND status = 'confirmed';
-
-        -- Check if a confirmed record was found
-        IF note_id IS NOT NULL THEN
-            -- Parse the JSON data to get the note_text
-            note_text := NEW.data ->> 'note';
-
-            -- Create the temporary JSON object
-            tmp_data := jsonb_build_object('note_id', note_id, 'note', note_text);
-
-            -- Merge tmp_data into NEW.data
-            NEW.data := NEW.data || tmp_data;
-        END IF;
-    END IF;
-
-    -- Return the modified row
-    RETURN NEW;
-END;
-$$;
-ALTER FUNCTION "public"."update_transfer_activity_before_insert"() OWNER TO "postgres";
+-- Note: activity_feed_user is defined in types.sql
 
 -- Sequences
 CREATE SEQUENCE IF NOT EXISTS "public"."activity_id_seq"
@@ -185,6 +74,111 @@ CREATE OR REPLACE VIEW "public"."activity_feed" WITH ("security_barrier"='on') A
   WHERE (("a"."from_user_id" = ( SELECT "auth"."uid"() AS "uid")) OR (("a"."to_user_id" = ( SELECT "auth"."uid"() AS "uid")) AND ("a"."event_name" !~~ 'temporal_%'::"text")))
   GROUP BY "a"."created_at", "a"."event_name", "a"."from_user_id", "a"."to_user_id", "from_p"."id", "from_p"."name", "from_p"."avatar_url", "from_p"."send_id", "to_p"."id", "to_p"."name", "to_p"."avatar_url", "to_p"."send_id", "a"."data";
 ALTER TABLE "public"."activity_feed" OWNER TO "postgres";
+
+-- Functions (that depend on activity_feed view)
+CREATE OR REPLACE FUNCTION "public"."favourite_senders"() RETURNS SETOF "public"."activity_feed_user"
+    LANGUAGE "sql" STABLE
+    AS $$
+    WITH recent_transfers AS (
+        SELECT "from_user" AS user, COUNT(*) AS activity_count
+        FROM activity_feed
+        WHERE created_at >= CURRENT_DATE - INTERVAL '30 days'
+        AND event_name = 'send_account_transfers'
+        AND (to_user).id = auth.uid()
+        AND from_user IS NOT NULL
+        GROUP BY from_user
+        HAVING COUNT(*) >= 3
+        ORDER BY activity_count DESC
+        LIMIT 5
+    )
+    SELECT DISTINCT (recent_transfers.user).*
+    FROM recent_transfers
+$$;
+ALTER FUNCTION "public"."favourite_senders"() OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."recent_senders"() RETURNS SETOF "public"."activity_feed_user"
+    LANGUAGE "sql" STABLE
+    AS $$
+    WITH recent_transfers AS (
+        SELECT "from_user" AS user, MAX(created_at) AS last_transfer_date
+        FROM activity_feed
+        WHERE created_at >= CURRENT_DATE - INTERVAL '60 days'
+        AND event_name = 'send_account_transfers'
+        AND (to_user).id = auth.uid()
+        AND from_user IS NOT NULL
+        GROUP BY from_user
+        ORDER BY last_transfer_date DESC
+        LIMIT 10
+    )
+    SELECT DISTINCT (recent_transfers.user).*
+    FROM recent_transfers
+$$;
+ALTER FUNCTION "public"."recent_senders"() OWNER TO "postgres";
+
+-- Functions (that depend on activity table directly)
+CREATE OR REPLACE FUNCTION "public"."today_birthday_senders"() RETURNS SETOF "public"."activity_feed_user"
+    LANGUAGE "sql" STABLE
+    AS $$
+   WITH unique_senders AS (
+       SELECT DISTINCT from_user_id
+       FROM activity
+       WHERE to_user_id = auth.uid()
+         AND event_name = 'send_account_transfers'
+         AND from_user_id IS NOT NULL
+   )
+   SELECT (
+       profiles.id,
+       profiles.name,
+       profiles.avatar_url,
+       profiles.send_id,
+       ARRAY(
+           SELECT tags.name
+           FROM public.tags
+           WHERE tags.user_id = profiles.id
+             AND tags.status = 'confirmed'
+       )
+   )::activity_feed_user
+   FROM profiles
+   INNER JOIN unique_senders ON profiles.id = unique_senders.from_user_id
+   WHERE EXTRACT(MONTH FROM profiles.birthday) = EXTRACT(MONTH FROM CURRENT_DATE)
+     AND EXTRACT(DAY FROM profiles.birthday) = EXTRACT(DAY FROM CURRENT_DATE)
+$$;
+ALTER FUNCTION "public"."today_birthday_senders"() OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."update_transfer_activity_before_insert"() RETURNS "trigger"
+    LANGUAGE "plpgsql"
+    AS $$
+DECLARE
+    tmp_data jsonb;
+    note_id uuid;
+    note_text text;
+    temporal_status temporal.transfer_status;
+BEGIN
+    -- Check if the event name contains '_transfers'
+    IF position('_transfers' in NEW.event_name) > 0 THEN
+        -- Query the temporal.send_account_transfers table
+        SELECT note, status INTO note_id, temporal_status
+        FROM temporal.send_account_transfers
+        WHERE id::text = NEW.event_id AND status = 'confirmed';
+
+        -- Check if a confirmed record was found
+        IF note_id IS NOT NULL THEN
+            -- Parse the JSON data to get the note_text
+            note_text := NEW.data ->> 'note';
+
+            -- Create the temporary JSON object
+            tmp_data := jsonb_build_object('note_id', note_id, 'note', note_text);
+
+            -- Merge tmp_data into NEW.data
+            NEW.data := NEW.data || tmp_data;
+        END IF;
+    END IF;
+
+    -- Return the modified row
+    RETURN NEW;
+END;
+$$;
+ALTER FUNCTION "public"."update_transfer_activity_before_insert"() OWNER TO "postgres";
 
 -- Triggers
 CREATE OR REPLACE TRIGGER "temporal_send_account_transfers_trigger_update_transfer_activit" BEFORE INSERT ON "public"."activity" FOR EACH ROW EXECUTE FUNCTION "public"."update_transfer_activity_before_insert"();

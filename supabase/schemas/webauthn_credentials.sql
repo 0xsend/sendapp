@@ -1,17 +1,5 @@
 -- Types
--- Note: key_type_enum is already defined in prod.sql and shared across tables
-
--- Functions
-CREATE OR REPLACE FUNCTION "public"."query_webauthn_credentials_by_phone"("phone_number" "text") RETURNS SETOF "public"."webauthn_credentials"
-    LANGUAGE "sql" SECURITY DEFINER
-    AS $$
-    SELECT wc.*
-    FROM auth.users AS u
-    JOIN webauthn_credentials AS wc ON u.id = wc.user_id
-    WHERE u.phone = phone_number;
-$$;
-
-ALTER FUNCTION "public"."query_webauthn_credentials_by_phone"("phone_number" "text") OWNER TO "postgres";
+-- Note: key_type_enum is already defined in types.sql and shared across tables
 
 -- Table
 CREATE TABLE IF NOT EXISTS "public"."webauthn_credentials" (
@@ -59,6 +47,18 @@ CREATE POLICY "update_own_credentials" ON "public"."webauthn_credentials" FOR UP
 GRANT ALL ON TABLE "public"."webauthn_credentials" TO "anon";
 GRANT ALL ON TABLE "public"."webauthn_credentials" TO "authenticated";
 GRANT ALL ON TABLE "public"."webauthn_credentials" TO "service_role";
+
+-- Functions (must be created after table)
+CREATE OR REPLACE FUNCTION "public"."query_webauthn_credentials_by_phone"("phone_number" "text") RETURNS SETOF "public"."webauthn_credentials"
+    LANGUAGE "sql" SECURITY DEFINER
+    AS $$
+    SELECT wc.*
+    FROM auth.users AS u
+    JOIN webauthn_credentials AS wc ON u.id = wc.user_id
+    WHERE u.phone = phone_number;
+$$;
+
+ALTER FUNCTION "public"."query_webauthn_credentials_by_phone"("phone_number" "text") OWNER TO "postgres";
 
 REVOKE ALL ON FUNCTION "public"."query_webauthn_credentials_by_phone"("phone_number" "text") FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."query_webauthn_credentials_by_phone"("phone_number" "text") TO "service_role";

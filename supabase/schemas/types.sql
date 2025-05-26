@@ -41,6 +41,15 @@ CREATE TYPE "public"."tag_search_result" AS (
 );
 ALTER TYPE "public"."tag_search_result" OWNER TO "postgres";
 
+CREATE TYPE "public"."activity_feed_user" AS (
+	"id" "uuid",
+	"name" "text",
+	"avatar_url" "text",
+	"send_id" integer,
+	"tags" "text"[]
+);
+ALTER TYPE "public"."activity_feed_user" OWNER TO "postgres";
+
 CREATE TYPE "public"."tag_status" AS ENUM (
     'pending',
     'confirmed'

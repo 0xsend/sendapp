@@ -1,23 +1,3 @@
--- Functions
-CREATE OR REPLACE FUNCTION "private"."update_leaderboard_referrals_all_time_sendtag_checkout_receipts"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
-declare
-    _referrer_id uuid;
-begin
-    select user_id into _referrer_id from public.send_accounts sa where decode(substring(sa.address, 3), 'hex') = NEW.referrer;
-    if _referrer_id is not null then
-        -- update the rewards_usdc for the user
-        insert into private.leaderboard_referrals_all_time (user_id, rewards_usdc, updated_at)
-        values (_referrer_id, NEW.reward, now())
-        on conflict (user_id) do update set rewards_usdc = private.leaderboard_referrals_all_time.rewards_usdc + NEW.reward,
-                                            updated_at   = now();
-    end if;
-    return NEW;
-end;
-$$;
-ALTER FUNCTION "private"."update_leaderboard_referrals_all_time_sendtag_checkout_receipts"() OWNER TO "postgres";
-
 -- Sequences
 CREATE SEQUENCE IF NOT EXISTS "public"."sendtag_checkout_receipts_id_seq"
     AS integer
@@ -80,5 +60,3 @@ GRANT ALL ON TABLE "public"."sendtag_checkout_receipts" TO "service_role";
 GRANT ALL ON SEQUENCE "public"."sendtag_checkout_receipts_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."sendtag_checkout_receipts_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."sendtag_checkout_receipts_id_seq" TO "service_role";
-
-REVOKE ALL ON FUNCTION "private"."update_leaderboard_referrals_all_time_sendtag_checkout_receipts"() FROM PUBLIC;

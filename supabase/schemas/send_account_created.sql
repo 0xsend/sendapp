@@ -58,7 +58,7 @@ ALTER TABLE "public"."send_account_created" ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "users can see their own account created" ON "public"."send_account_created" FOR SELECT USING ((("lower"("concat"('0x', "encode"("account", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY ( SELECT "send_accounts"."address"
    FROM "public"."send_accounts"
-  WHERE (("send_accounts"."user_id")::character varying = ( SELECT "auth"."uid"() AS "uid")))));
+  WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid")))));
 
 -- Grants
 GRANT ALL ON TABLE "public"."send_account_created" TO "anon";

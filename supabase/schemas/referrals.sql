@@ -1,4 +1,49 @@
 -- Functions
+CREATE OR REPLACE FUNCTION public.profile_lookup(lookup_type lookup_type_enum, identifier text)
+ RETURNS TABLE(id uuid, avatar_url text, name text, about text, refcode text, x_username text, birthday date, tag citext, address citext, chain_id integer, is_public boolean, sendid integer, all_tags text[])
+ LANGUAGE plpgsql
+ IMMUTABLE SECURITY DEFINER
+AS $function$
+begin
+    if identifier is null or identifier = '' then raise exception 'identifier cannot be null or empty'; end if;
+    if lookup_type is null then raise exception 'lookup_type cannot be null'; end if;
+return query --
+select case when p.id = ( select auth.uid() ) then p.id end              as id,
+       p.avatar_url::text                                                as avatar_url,
+        p.name::text                                                      as name,
+        p.about::text                                                     as about,
+        p.referral_code                                                   as refcode,
+       CASE WHEN p.is_public THEN p.x_username ELSE NULL END AS x_username,
+       CASE WHEN p.is_public THEN p.birthday ELSE NULL END AS birthday,
+       t.name                                                            as tag,
+       sa.address                                                        as address,
+       sa.chain_id                                                       as chain_id,
+       case when current_setting('role')::text = 'service_role' then p.is_public
+            when p.is_public then true
+            else false end                                               as is_public,
+       p.send_id                                                         as sendid,
+       ( select array_agg(t.name::text)
+         from tags t
+         where t.user_id = p.id and t.status = 'confirmed'::tag_status ) as all_tags
+from profiles p
+    join auth.users a on a.id = p.id
+    left join tags t on t.user_id = p.id and t.status = 'confirmed'::tag_status
+    left join send_accounts sa on sa.user_id = p.id
+where ((lookup_type = 'sendid' and p.send_id::text = identifier) or
+    (lookup_type = 'tag' and t.name = identifier::citext) or
+    (lookup_type = 'refcode' and p.referral_code = identifier) or
+    (lookup_type = 'address' and sa.address = identifier) or
+    (p.is_public and lookup_type = 'phone' and a.phone::text = identifier))
+  and (p.is_public
+   or ( select auth.uid() ) is not null
+   or current_setting('role')::text = 'service_role')
+    limit 1;
+end;
+$function$
+;
+
+ALTER FUNCTION "public"."profile_lookup"("lookup_type" "public"."lookup_type_enum", "identifier" "text") OWNER TO "postgres";
+
 CREATE OR REPLACE FUNCTION "private"."generate_referral_event_id"("referrer_id" "uuid", "tags" "text"[]) RETURNS "text"
     LANGUAGE "sql" IMMUTABLE
     AS $$
@@ -284,8 +329,6 @@ CREATE OR REPLACE TRIGGER "referrals_insert_activity_trigger" AFTER INSERT ON "p
 
 CREATE OR REPLACE TRIGGER "update_leaderboard_referrals_all_time_referrals" AFTER INSERT ON "public"."referrals" FOR EACH ROW EXECUTE FUNCTION "private"."update_leaderboard_referrals_all_time_referrals"();
 
-CREATE OR REPLACE TRIGGER "update_leaderboard_referrals_all_time_sendtag_checkout_receipts" AFTER INSERT ON "public"."sendtag_checkout_receipts" FOR EACH ROW EXECUTE FUNCTION "private"."update_leaderboard_referrals_all_time_sendtag_checkout_receipts"();
-
 -- RLS
 ALTER TABLE "public"."referrals" ENABLE ROW LEVEL SECURITY;
 
@@ -325,6 +368,10 @@ GRANT ALL ON TABLE "public"."referrals" TO "service_role";
 GRANT ALL ON SEQUENCE "public"."referrals_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."referrals_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."referrals_id_seq" TO "service_role";
+
+REVOKE ALL ON FUNCTION "public"."profile_lookup"("lookup_type" "public"."lookup_type_enum", "identifier" "text") FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."profile_lookup"("lookup_type" "public"."lookup_type_enum", "identifier" "text") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."profile_lookup"("lookup_type" "public"."lookup_type_enum", "identifier" "text") TO "service_role";
 
 -- Views
 CREATE OR REPLACE VIEW "public"."referrer" WITH ("security_barrier"='on') AS

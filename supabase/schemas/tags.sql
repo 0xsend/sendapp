@@ -1,6 +1,30 @@
 -- Types
 -- Note: tag_status and tag_search_result are defined in prod.sql and shared across tables
 
+-- Table
+CREATE TABLE IF NOT EXISTS "public"."tags" (
+    "name" "public"."citext" NOT NULL,
+    "status" "public"."tag_status" DEFAULT 'pending'::"public"."tag_status" NOT NULL,
+    "user_id" "uuid" DEFAULT "auth"."uid"() NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    CONSTRAINT "tags_name_check" CHECK (((("length"(("name")::"text") >= 1) AND ("length"(("name")::"text") <= 20)) AND ("name" OPERATOR("public".~) '^[A-Za-z0-9_]+$'::"public"."citext")))
+);
+
+ALTER TABLE "public"."tags" OWNER TO "postgres";
+
+-- Primary Keys and Constraints
+ALTER TABLE ONLY "public"."tags"
+    ADD CONSTRAINT "tags_pkey" PRIMARY KEY ("name");
+
+-- Indexes
+CREATE INDEX "idx_tags_status_created" ON "public"."tags" USING "btree" ("status", "created_at" DESC) WHERE ("status" = 'confirmed'::"public"."tag_status");
+CREATE INDEX "tags_name_trigram_gin_idx" ON "public"."tags" USING "gin" ("name" "extensions"."gin_trgm_ops");
+CREATE INDEX "tags_user_id_idx" ON "public"."tags" USING "btree" ("user_id");
+
+-- Foreign Keys
+ALTER TABLE ONLY "public"."tags"
+    ADD CONSTRAINT "tags_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
+
 -- Functions
 CREATE OR REPLACE FUNCTION "public"."confirm_tags"("tag_names" "public"."citext"[], "event_id" "text", "referral_code_input" "text") RETURNS "void"
     LANGUAGE "plpgsql" SECURITY DEFINER
@@ -275,30 +299,6 @@ end;
 $$;
 
 ALTER FUNCTION "public"."insert_verification_tag_registration"() OWNER TO "postgres";
-
--- Table
-CREATE TABLE IF NOT EXISTS "public"."tags" (
-    "name" "public"."citext" NOT NULL,
-    "status" "public"."tag_status" DEFAULT 'pending'::"public"."tag_status" NOT NULL,
-    "user_id" "uuid" DEFAULT "auth"."uid"() NOT NULL,
-    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
-    CONSTRAINT "tags_name_check" CHECK (((("length"(("name")::"text") >= 1) AND ("length"(("name")::"text") <= 20)) AND ("name" OPERATOR("public".~) '^[A-Za-z0-9_]+$'::"public"."citext")))
-);
-
-ALTER TABLE "public"."tags" OWNER TO "postgres";
-
--- Primary Keys and Constraints
-ALTER TABLE ONLY "public"."tags"
-    ADD CONSTRAINT "tags_pkey" PRIMARY KEY ("name");
-
--- Indexes
-CREATE INDEX "idx_tags_status_created" ON "public"."tags" USING "btree" ("status", "created_at" DESC) WHERE ("status" = 'confirmed'::"public"."tag_status");
-CREATE INDEX "tags_name_trigram_gin_idx" ON "public"."tags" USING "gin" ("name" "extensions"."gin_trgm_ops");
-CREATE INDEX "tags_user_id_idx" ON "public"."tags" USING "btree" ("user_id");
-
--- Foreign Keys
-ALTER TABLE ONLY "public"."tags"
-    ADD CONSTRAINT "tags_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
 
 -- Triggers
 CREATE OR REPLACE TRIGGER "insert_verification_tag_registration" AFTER INSERT OR UPDATE ON "public"."tags" FOR EACH ROW EXECUTE FUNCTION "public"."insert_verification_tag_registration"();

@@ -1,3 +1,46 @@
+-- Table
+CREATE TABLE IF NOT EXISTS "public"."send_accounts" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "user_id" "uuid" DEFAULT "auth"."uid"() NOT NULL,
+    "address" "public"."citext" NOT NULL,
+    "chain_id" integer NOT NULL,
+    "init_code" "bytea" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "deleted_at" timestamp with time zone,
+    CONSTRAINT "chain_addresses_address_check" CHECK ((("length"(("address")::"text") = 42) AND ("address" OPERATOR("public".~) '^0x[A-Fa-f0-9]{40}$'::"public"."citext")))
+);
+
+ALTER TABLE "public"."send_accounts" OWNER TO "postgres";
+
+-- Primary Keys and Constraints
+ALTER TABLE ONLY "public"."send_accounts"
+    ADD CONSTRAINT "send_accounts_pkey" PRIMARY KEY ("id");
+
+-- Indexes
+CREATE INDEX "idx_send_accounts_address" ON "public"."send_accounts" USING "btree" ("address");
+CREATE INDEX "idx_send_accounts_address_user" ON "public"."send_accounts" USING "btree" ("address", "user_id");
+CREATE UNIQUE INDEX "send_accounts_address_key" ON "public"."send_accounts" USING "btree" ("address", "chain_id");
+CREATE INDEX "send_accounts_user_id_index" ON "public"."send_accounts" USING "btree" ("user_id");
+
+-- Foreign Keys
+ALTER TABLE ONLY "public"."send_accounts"
+    ADD CONSTRAINT "send_accounts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
+
+-- RLS
+ALTER TABLE "public"."send_accounts" ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "insert_own_accounts" ON "public"."send_accounts" FOR INSERT TO "authenticated" WITH CHECK (("auth"."uid"() = "user_id"));
+
+CREATE POLICY "select_own_accounts" ON "public"."send_accounts" FOR SELECT TO "authenticated" USING (("auth"."uid"() = "user_id"));
+
+CREATE POLICY "update_own_accounts" ON "public"."send_accounts" FOR UPDATE TO "authenticated" USING (("auth"."uid"() = "user_id"));
+
+-- Grants
+GRANT ALL ON TABLE "public"."send_accounts" TO "anon";
+GRANT ALL ON TABLE "public"."send_accounts" TO "authenticated";
+GRANT ALL ON TABLE "public"."send_accounts" TO "service_role";
+
 -- Functions
 CREATE OR REPLACE FUNCTION "public"."create_send_account"("send_account" "public"."send_accounts", "webauthn_credential" "public"."webauthn_credentials", "key_slot" integer) RETURNS "json"
     LANGUAGE "plpgsql"
@@ -215,54 +258,12 @@ $$;
 
 ALTER FUNCTION "public"."insert_verification_create_passkey"() OWNER TO "postgres";
 
--- Table
-CREATE TABLE IF NOT EXISTS "public"."send_accounts" (
-    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
-    "user_id" "uuid" DEFAULT "auth"."uid"() NOT NULL,
-    "address" "public"."citext" NOT NULL,
-    "chain_id" integer NOT NULL,
-    "init_code" "bytea" NOT NULL,
-    "created_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    "updated_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    "deleted_at" timestamp with time zone,
-    CONSTRAINT "chain_addresses_address_check" CHECK ((("length"(("address")::"text") = 42) AND ("address" OPERATOR("public".~) '^0x[A-Fa-f0-9]{40}$'::"public"."citext")))
-);
-
-ALTER TABLE "public"."send_accounts" OWNER TO "postgres";
-
--- Primary Keys and Constraints
-ALTER TABLE ONLY "public"."send_accounts"
-    ADD CONSTRAINT "send_accounts_pkey" PRIMARY KEY ("id");
-
--- Indexes
-CREATE INDEX "idx_send_accounts_address" ON "public"."send_accounts" USING "btree" ("address");
-CREATE INDEX "idx_send_accounts_address_user" ON "public"."send_accounts" USING "btree" ("address", "user_id");
-CREATE UNIQUE INDEX "send_accounts_address_key" ON "public"."send_accounts" USING "btree" ("address", "chain_id");
-CREATE INDEX "send_accounts_user_id_index" ON "public"."send_accounts" USING "btree" ("user_id");
-
--- Foreign Keys
-ALTER TABLE ONLY "public"."send_accounts"
-    ADD CONSTRAINT "send_accounts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
-
 -- Triggers
 CREATE OR REPLACE TRIGGER "insert_verification_create_passkey" AFTER INSERT ON "public"."send_accounts" FOR EACH ROW EXECUTE FUNCTION "public"."insert_verification_create_passkey"();
 
 CREATE OR REPLACE TRIGGER "trigger_send_accounts_after_insert" AFTER INSERT OR UPDATE ON "public"."send_accounts" FOR EACH ROW EXECUTE FUNCTION "public"."send_accounts_after_insert"();
 
--- RLS
-ALTER TABLE "public"."send_accounts" ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "insert_own_accounts" ON "public"."send_accounts" FOR INSERT TO "authenticated" WITH CHECK (("auth"."uid"() = "user_id"));
-
-CREATE POLICY "select_own_accounts" ON "public"."send_accounts" FOR SELECT TO "authenticated" USING (("auth"."uid"() = "user_id"));
-
-CREATE POLICY "update_own_accounts" ON "public"."send_accounts" FOR UPDATE TO "authenticated" USING (("auth"."uid"() = "user_id"));
-
--- Grants
-GRANT ALL ON TABLE "public"."send_accounts" TO "anon";
-GRANT ALL ON TABLE "public"."send_accounts" TO "authenticated";
-GRANT ALL ON TABLE "public"."send_accounts" TO "service_role";
-
+-- Function Grants
 GRANT ALL ON FUNCTION "public"."create_send_account"("send_account" "public"."send_accounts", "webauthn_credential" "public"."webauthn_credentials", "key_slot" integer) TO "anon";
 GRANT ALL ON FUNCTION "public"."create_send_account"("send_account" "public"."send_accounts", "webauthn_credential" "public"."webauthn_credentials", "key_slot" integer) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."create_send_account"("send_account" "public"."send_accounts", "webauthn_credential" "public"."webauthn_credentials", "key_slot" integer) TO "service_role";

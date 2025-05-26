@@ -1,4 +1,135 @@
--- Functions
+-- Tables (must be created before functions that reference them)
+
+-- Table: send_earn_create
+CREATE TABLE IF NOT EXISTS "public"."send_earn_create" (
+    "id" bigint NOT NULL,
+    "chain_id" numeric NOT NULL,
+    "log_addr" "bytea" NOT NULL,
+    "block_time" numeric NOT NULL,
+    "tx_hash" "bytea" NOT NULL,
+    "send_earn" "bytea" NOT NULL,
+    "caller" "bytea" NOT NULL,
+    "initial_owner" "bytea" NOT NULL,
+    "vault" "bytea" NOT NULL,
+    "fee_recipient" "bytea" NOT NULL,
+    "collections" "bytea" NOT NULL,
+    "fee" numeric NOT NULL,
+    "salt" "bytea" NOT NULL,
+    "ig_name" "text" NOT NULL,
+    "src_name" "text" NOT NULL,
+    "block_num" numeric NOT NULL,
+    "tx_idx" integer NOT NULL,
+    "log_idx" integer NOT NULL,
+    "abi_idx" smallint NOT NULL,
+    "event_id" "text" GENERATED ALWAYS AS ((((((((("ig_name" || '/'::text) || "src_name") || '/'::text) || ("block_num")::text) || '/'::text) || ("tx_idx")::text) || '/'::text) || ("log_idx")::text)) STORED NOT NULL
+);
+
+ALTER TABLE "public"."send_earn_create" OWNER TO "postgres";
+
+-- Sequence for send_earn_create
+ALTER TABLE "public"."send_earn_create" ALTER COLUMN "id" ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME "public"."send_earn_create_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+-- Table: send_earn_new_affiliate
+CREATE TABLE IF NOT EXISTS "public"."send_earn_new_affiliate" (
+    "id" bigint NOT NULL,
+    "chain_id" numeric NOT NULL,
+    "log_addr" "bytea" NOT NULL,
+    "block_time" numeric NOT NULL,
+    "tx_hash" "bytea" NOT NULL,
+    "affiliate" "bytea" NOT NULL,
+    "send_earn_affiliate" "bytea" NOT NULL,
+    "ig_name" "text" NOT NULL,
+    "src_name" "text" NOT NULL,
+    "block_num" numeric NOT NULL,
+    "tx_idx" integer NOT NULL,
+    "log_idx" integer NOT NULL,
+    "abi_idx" smallint NOT NULL,
+    "event_id" "text" GENERATED ALWAYS AS ((((((((("ig_name" || '/'::text) || "src_name") || '/'::text) || ("block_num")::text) || '/'::text) || ("tx_idx")::text) || '/'::text) || ("log_idx")::text)) STORED NOT NULL
+);
+
+ALTER TABLE "public"."send_earn_new_affiliate" OWNER TO "postgres";
+
+-- Sequence for send_earn_new_affiliate
+ALTER TABLE "public"."send_earn_new_affiliate" ALTER COLUMN "id" ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME "public"."send_earn_new_affiliate_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+-- Table: send_earn_deposit
+CREATE TABLE IF NOT EXISTS "public"."send_earn_deposit" (
+    "id" bigint NOT NULL,
+    "chain_id" numeric NOT NULL,
+    "log_addr" "bytea" NOT NULL,
+    "block_time" numeric NOT NULL,
+    "tx_hash" "bytea" NOT NULL,
+    "sender" "bytea" NOT NULL,
+    "owner" "bytea" NOT NULL,
+    "assets" numeric NOT NULL,
+    "shares" numeric NOT NULL,
+    "ig_name" "text" NOT NULL,
+    "src_name" "text" NOT NULL,
+    "block_num" numeric NOT NULL,
+    "tx_idx" integer NOT NULL,
+    "log_idx" integer NOT NULL,
+    "abi_idx" smallint NOT NULL,
+    "event_id" "text" GENERATED ALWAYS AS ((((((((("ig_name" || '/'::text) || "src_name") || '/'::text) || ("block_num")::text) || '/'::text) || ("tx_idx")::text) || '/'::text) || ("log_idx")::text)) STORED NOT NULL
+);
+
+ALTER TABLE "public"."send_earn_deposit" OWNER TO "postgres";
+
+-- Sequence for send_earn_deposit
+ALTER TABLE "public"."send_earn_deposit" ALTER COLUMN "id" ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME "public"."send_earn_deposit_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+-- Table: send_earn_withdraw
+CREATE TABLE IF NOT EXISTS "public"."send_earn_withdraw" (
+    "id" bigint NOT NULL,
+    "chain_id" numeric NOT NULL,
+    "log_addr" "bytea" NOT NULL,
+    "block_time" numeric NOT NULL,
+    "tx_hash" "bytea" NOT NULL,
+    "sender" "bytea" NOT NULL,
+    "receiver" "bytea" NOT NULL,
+    "owner" "bytea" NOT NULL,
+    "assets" numeric NOT NULL,
+    "shares" numeric NOT NULL,
+    "ig_name" "text" NOT NULL,
+    "src_name" "text" NOT NULL,
+    "block_num" numeric NOT NULL,
+    "tx_idx" integer NOT NULL,
+    "log_idx" integer NOT NULL,
+    "abi_idx" smallint NOT NULL,
+    "event_id" "text" GENERATED ALWAYS AS ((((((((("ig_name" || '/'::text) || "src_name") || '/'::text) || ("block_num")::text) || '/'::text) || ("tx_idx")::text) || '/'::text) || ("log_idx")::text)) STORED NOT NULL
+);
+
+ALTER TABLE "public"."send_earn_withdraw" OWNER TO "postgres";
+
+-- Sequence for send_earn_withdraw
+ALTER TABLE "public"."send_earn_withdraw" ALTER COLUMN "id" ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME "public"."send_earn_withdraw_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);-- Functions
 CREATE OR REPLACE FUNCTION "private"."aaa_filter_send_earn_deposit_with_no_send_account_created"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -348,137 +479,6 @@ select * from send_earn_create where fee_recipient = $1.send_earn_affiliate
 $_$;
 
 ALTER FUNCTION "public"."send_earn_affiliate_vault"("public"."send_earn_new_affiliate") OWNER TO "postgres";
-
--- Table: send_earn_create
-CREATE TABLE IF NOT EXISTS "public"."send_earn_create" (
-    "id" bigint NOT NULL,
-    "chain_id" numeric NOT NULL,
-    "log_addr" "bytea" NOT NULL,
-    "block_time" numeric NOT NULL,
-    "tx_hash" "bytea" NOT NULL,
-    "send_earn" "bytea" NOT NULL,
-    "caller" "bytea" NOT NULL,
-    "initial_owner" "bytea" NOT NULL,
-    "vault" "bytea" NOT NULL,
-    "fee_recipient" "bytea" NOT NULL,
-    "collections" "bytea" NOT NULL,
-    "fee" numeric NOT NULL,
-    "salt" "bytea" NOT NULL,
-    "ig_name" "text" NOT NULL,
-    "src_name" "text" NOT NULL,
-    "block_num" numeric NOT NULL,
-    "tx_idx" integer NOT NULL,
-    "log_idx" integer NOT NULL,
-    "abi_idx" smallint NOT NULL,
-    "event_id" "text" GENERATED ALWAYS AS ((((((((("ig_name" || '/'::"text") || "src_name") || '/'::"text") || ("block_num")::"text") || '/'::"text") || ("tx_idx")::"text") || '/'::"text") || ("log_idx")::"text")) STORED NOT NULL
-);
-
-ALTER TABLE "public"."send_earn_create" OWNER TO "postgres";
-
--- Sequence for send_earn_create
-ALTER TABLE "public"."send_earn_create" ALTER COLUMN "id" ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME "public"."send_earn_create_id_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
--- Table: send_earn_new_affiliate
-CREATE TABLE IF NOT EXISTS "public"."send_earn_new_affiliate" (
-    "id" bigint NOT NULL,
-    "chain_id" numeric NOT NULL,
-    "log_addr" "bytea" NOT NULL,
-    "block_time" numeric NOT NULL,
-    "tx_hash" "bytea" NOT NULL,
-    "affiliate" "bytea" NOT NULL,
-    "send_earn_affiliate" "bytea" NOT NULL,
-    "ig_name" "text" NOT NULL,
-    "src_name" "text" NOT NULL,
-    "block_num" numeric NOT NULL,
-    "tx_idx" integer NOT NULL,
-    "log_idx" integer NOT NULL,
-    "abi_idx" smallint NOT NULL,
-    "event_id" "text" GENERATED ALWAYS AS ((((((((("ig_name" || '/'::"text") || "src_name") || '/'::"text") || ("block_num")::"text") || '/'::"text") || ("tx_idx")::"text") || '/'::"text") || ("log_idx")::"text")) STORED NOT NULL
-);
-
-ALTER TABLE "public"."send_earn_new_affiliate" OWNER TO "postgres";
-
--- Sequence for send_earn_new_affiliate
-ALTER TABLE "public"."send_earn_new_affiliate" ALTER COLUMN "id" ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME "public"."send_earn_new_affiliate_id_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
--- Table: send_earn_deposit
-CREATE TABLE IF NOT EXISTS "public"."send_earn_deposit" (
-    "id" bigint NOT NULL,
-    "chain_id" numeric NOT NULL,
-    "log_addr" "bytea" NOT NULL,
-    "block_time" numeric NOT NULL,
-    "tx_hash" "bytea" NOT NULL,
-    "sender" "bytea" NOT NULL,
-    "owner" "bytea" NOT NULL,
-    "assets" numeric NOT NULL,
-    "shares" numeric NOT NULL,
-    "ig_name" "text" NOT NULL,
-    "src_name" "text" NOT NULL,
-    "block_num" numeric NOT NULL,
-    "tx_idx" integer NOT NULL,
-    "log_idx" integer NOT NULL,
-    "abi_idx" smallint NOT NULL,
-    "event_id" "text" GENERATED ALWAYS AS ((((((((("ig_name" || '/'::"text") || "src_name") || '/'::"text") || ("block_num")::"text") || '/'::"text") || ("tx_idx")::"text") || '/'::"text") || ("log_idx")::"text")) STORED NOT NULL
-);
-
-ALTER TABLE "public"."send_earn_deposit" OWNER TO "postgres";
-
--- Sequence for send_earn_deposit
-ALTER TABLE "public"."send_earn_deposit" ALTER COLUMN "id" ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME "public"."send_earn_deposit_id_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
--- Table: send_earn_withdraw
-CREATE TABLE IF NOT EXISTS "public"."send_earn_withdraw" (
-    "id" bigint NOT NULL,
-    "chain_id" numeric NOT NULL,
-    "log_addr" "bytea" NOT NULL,
-    "block_time" numeric NOT NULL,
-    "tx_hash" "bytea" NOT NULL,
-    "sender" "bytea" NOT NULL,
-    "receiver" "bytea" NOT NULL,
-    "owner" "bytea" NOT NULL,
-    "assets" numeric NOT NULL,
-    "shares" numeric NOT NULL,
-    "ig_name" "text" NOT NULL,
-    "src_name" "text" NOT NULL,
-    "block_num" numeric NOT NULL,
-    "tx_idx" integer NOT NULL,
-    "log_idx" integer NOT NULL,
-    "abi_idx" smallint NOT NULL,
-    "event_id" "text" GENERATED ALWAYS AS ((((((((("ig_name" || '/'::"text") || "src_name") || '/'::"text") || ("block_num")::"text") || '/'::"text") || ("tx_idx")::"text") || '/'::"text") || ("log_idx")::"text")) STORED NOT NULL
-);
-
-ALTER TABLE "public"."send_earn_withdraw" OWNER TO "postgres";
-
--- Sequence for send_earn_withdraw
-ALTER TABLE "public"."send_earn_withdraw" ALTER COLUMN "id" ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME "public"."send_earn_withdraw_id_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
 
 -- Views
 CREATE OR REPLACE VIEW "public"."send_earn_activity" WITH ("security_invoker"='on', "security_barrier"='on') AS

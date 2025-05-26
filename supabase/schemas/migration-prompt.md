@@ -1,8 +1,9 @@
 # Supabase Schema Migration to Declarative Files
 
-## 🎉 Migration Status: COMPLETED
+## 🎉 Migration Status: COMPLETED with FIXES
 
 **Migration Completed:** January 26, 2025
+**Fixes Applied:** January 26, 2025
 **Total Files Created:** 30+ schema files
 **Tables Migrated:** 34 tables + associated views, functions, and triggers
 **Objective Achieved:** ✅ prod.sql has been completely eliminated
@@ -67,9 +68,11 @@ The large monolithic `prod.sql` file has been successfully decomposed into modul
 First, verify that all migrations apply cleanly:
 
 ```bash
-# Reset the database to ensure clean state
-cd supabase
-yarn supabase db reset
+# database needs to be stopped
+supabase stop --no-backup
+
+# Run a diff
+supabase db diff -f prod_sync
 
 # Check for any errors during migration
 # All schema files should apply without errors
@@ -81,13 +84,13 @@ Verify that all objects were created successfully:
 
 ```sql
 -- Check table count
-SELECT COUNT(*) FROM information_schema.tables 
+SELECT COUNT(*) FROM information_schema.tables
 WHERE table_schema IN ('public', 'private', 'shovel', 'temporal');
 
 -- Check for missing foreign keys
-SELECT 
-    tc.constraint_name, 
-    tc.table_name, 
+SELECT
+    tc.constraint_name,
+    tc.table_name,
     kcu.column_name,
     ccu.table_name AS foreign_table_name,
     ccu.column_name AS foreign_column_name
@@ -100,7 +103,7 @@ WHERE tc.constraint_type = 'FOREIGN KEY'
 ORDER BY tc.table_name;
 
 -- Check for missing indexes
-SELECT 
+SELECT
     schemaname,
     tablename,
     indexname,
@@ -118,18 +121,18 @@ Ensure tables are created in the correct order by checking foreign key dependenc
 -- List all foreign key dependencies
 WITH RECURSIVE fk_tree AS (
     -- Base tables (no foreign keys)
-    SELECT 
+    SELECT
         c.conname AS constraint_name,
         c.conrelid::regclass AS table_name,
         c.confrelid::regclass AS referenced_table,
         1 AS level
     FROM pg_constraint c
     WHERE c.contype = 'f'
-    
+
     UNION ALL
-    
+
     -- Recursive tables
-    SELECT 
+    SELECT
         c.conname AS constraint_name,
         c.conrelid::regclass AS table_name,
         c.confrelid::regclass AS referenced_table,
@@ -147,7 +150,7 @@ ORDER BY level, table_name;
 
 ```sql
 -- Check all functions exist
-SELECT 
+SELECT
     n.nspname as schema,
     p.proname as function_name,
     pg_get_function_identity_arguments(p.oid) as arguments
@@ -157,7 +160,7 @@ WHERE n.nspname IN ('public', 'private', 'temporal')
 ORDER BY n.nspname, p.proname;
 
 -- Check all triggers exist
-SELECT 
+SELECT
     schemaname,
     tablename,
     tgname as trigger_name
@@ -173,7 +176,7 @@ ORDER BY schemaname, tablename, tgname;
 
 ```sql
 -- Check RLS is enabled on appropriate tables
-SELECT 
+SELECT
     schemaname,
     tablename,
     rowsecurity
@@ -183,7 +186,7 @@ WHERE schemaname = 'public'
 ORDER BY tablename;
 
 -- List all RLS policies
-SELECT 
+SELECT
     schemaname,
     tablename,
     policyname,
@@ -223,7 +226,7 @@ yarn supabase test
    # Run Next.js app tests
    cd apps/next
    yarn test
-   
+
    # Run Playwright E2E tests
    cd packages/playwright
    yarn playwright test
