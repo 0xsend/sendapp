@@ -99,20 +99,6 @@ CREATE TYPE "temporal"."transfer_status" AS ENUM (
     'cancelled'
 );
 ALTER TYPE "temporal"."transfer_status" OWNER TO "postgres";
-CREATE OR REPLACE FUNCTION "private"."filter_send_account_transfers_with_no_send_account_created"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
-begin
-  if exists ( select 1 from send_account_created where account = new.f )
-    or exists ( select 1 from send_account_created where account = new.t )
-  then
-    return new;
-  else
-    return null;
-  end if;
-end;
-$$;
-ALTER FUNCTION "private"."filter_send_account_transfers_with_no_send_account_created"() OWNER TO "postgres";
 CREATE OR REPLACE FUNCTION "private"."update_leaderboard_referrals_all_time_referrals"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -1107,82 +1093,6 @@ begin
 end;
 $$;
 ALTER FUNCTION "public"."send_account_signing_key_removed_trigger_insert_activity"() OWNER TO "postgres";
-CREATE OR REPLACE FUNCTION "public"."send_account_transfers_delete_temporal_activity"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
-declare
-    paymaster bytea = '\xb1b01dc21a6537af7f9a46c76276b14fd7ceac67'::bytea;
-    workflow_ids text[];
-begin
-    -- Check if it's from or to paymaster
-    if (NEW.f is not null and NEW.f = paymaster) or
-       (NEW.t is not null and NEW.t = paymaster) then
-        return NEW;
-    end if;
-    -- Only proceed with deletions if we have workflow IDs
-    delete from public.activity a
-    where a.event_name = 'temporal_send_account_transfers'
-      and a.event_id in (select t_sat.workflow_id
-                         from temporal.send_account_transfers t_sat
-                         where t_sat.created_at_block_num <= NEW.block_num
-                           and t_sat.status != 'failed');
-    return NEW;
-end;
-$$;
-ALTER FUNCTION "public"."send_account_transfers_delete_temporal_activity"() OWNER TO "postgres";
-CREATE OR REPLACE FUNCTION "public"."send_account_transfers_trigger_delete_activity"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
-begin
-    delete
-    from activity
-    where event_id = OLD.event_id
-        and event_name = 'send_account_transfers';
-    return OLD;
-end;
-$$;
-ALTER FUNCTION "public"."send_account_transfers_trigger_delete_activity"() OWNER TO "postgres";
-CREATE OR REPLACE FUNCTION "public"."send_account_transfers_trigger_insert_activity"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
-declare
-    _f_user_id uuid;
-    _t_user_id uuid;
-    _data jsonb;
-begin
-    -- select send app info for from address
-    select user_id into _f_user_id from send_accounts where address = concat('0x', encode(NEW.f, 'hex'))::citext;
-    select user_id into _t_user_id from send_accounts where address = concat('0x', encode(NEW.t, 'hex'))::citext;
-
-    -- cast v to text to avoid losing precision when converting to json when sending to clients
-    _data := json_build_object(
-        'log_addr', NEW.log_addr,
-        'f', NEW.f,
-        't', NEW.t,
-        'v', NEW.v::text,
-        'tx_hash', NEW.tx_hash,
-        'block_num', NEW.block_num::text,
-        'tx_idx', NEW.tx_idx::text,
-        'log_idx', NEW.log_idx::text
-    );
-
-    insert into activity (event_name, event_id, from_user_id, to_user_id, data, created_at)
-    values ('send_account_transfers',
-            NEW.event_id,
-            _f_user_id,
-            _t_user_id,
-            _data,
-            to_timestamp(NEW.block_time) at time zone 'UTC')
-    on conflict (event_name, event_id) do update set
-        from_user_id = _f_user_id,
-        to_user_id = _t_user_id,
-        data = _data,
-        created_at = to_timestamp(NEW.block_time) at time zone 'UTC';
-
-    return NEW;
-end;
-$$;
-ALTER FUNCTION "public"."send_account_transfers_trigger_insert_activity"() OWNER TO "postgres";
 CREATE OR REPLACE FUNCTION "public"."set_current_timestamp_updated_at"() RETURNS "trigger"
     LANGUAGE "plpgsql"
     AS $$
@@ -1740,24 +1650,6 @@ CREATE TABLE IF NOT EXISTS "public"."send_account_credentials" (
     CONSTRAINT "account_credentials_key_slot_check" CHECK ((("key_slot" >= 0) AND ("key_slot" <= 255)))
 );
 ALTER TABLE "public"."send_account_credentials" OWNER TO "postgres";
-CREATE TABLE IF NOT EXISTS "public"."send_account_transfers" (
-    "id" integer NOT NULL,
-    "chain_id" numeric NOT NULL,
-    "log_addr" "bytea" NOT NULL,
-    "block_time" numeric NOT NULL,
-    "tx_hash" "bytea" NOT NULL,
-    "f" "bytea" NOT NULL,
-    "t" "bytea" NOT NULL,
-    "v" numeric NOT NULL,
-    "ig_name" "text" NOT NULL,
-    "src_name" "text" NOT NULL,
-    "block_num" numeric NOT NULL,
-    "tx_idx" integer NOT NULL,
-    "log_idx" integer NOT NULL,
-    "abi_idx" smallint NOT NULL,
-    "event_id" "text" GENERATED ALWAYS AS ((((((((("ig_name" || '/'::"text") || "src_name") || '/'::"text") || ("block_num")::"text") || '/'::"text") || ("tx_idx")::"text") || '/'::"text") || ("log_idx")::"text")) STORED NOT NULL
-);
-ALTER TABLE "public"."send_account_transfers" OWNER TO "postgres";
 CREATE TABLE IF NOT EXISTS "public"."send_token_transfers" (
     "id" integer NOT NULL,
     "chain_id" numeric NOT NULL,
@@ -2025,31 +1917,6 @@ CREATE OR REPLACE VIEW "public"."referrer" WITH ("security_barrier"='on') AS
     "profile_lookup"."send_id"
    FROM "profile_lookup";
 ALTER TABLE "public"."referrer" OWNER TO "postgres";
-CREATE TABLE IF NOT EXISTS "public"."send_account_created" (
-    "chain_id" numeric NOT NULL,
-    "log_addr" "bytea" NOT NULL,
-    "block_time" numeric NOT NULL,
-    "user_op_hash" "bytea",
-    "tx_hash" "bytea" NOT NULL,
-    "account" "bytea" NOT NULL,
-    "ig_name" "text" NOT NULL,
-    "src_name" "text" NOT NULL,
-    "block_num" numeric NOT NULL,
-    "tx_idx" integer NOT NULL,
-    "log_idx" integer NOT NULL,
-    "id" integer NOT NULL,
-    "event_id" "text" GENERATED ALWAYS AS ((((((((("ig_name" || '/'::"text") || "src_name") || '/'::"text") || ("block_num")::"text") || '/'::"text") || ("tx_idx")::"text") || '/'::"text") || ("log_idx")::"text")) STORED NOT NULL
-);
-ALTER TABLE "public"."send_account_created" OWNER TO "postgres";
-CREATE SEQUENCE IF NOT EXISTS "public"."send_account_created_id_seq"
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-ALTER TABLE "public"."send_account_created_id_seq" OWNER TO "postgres";
-ALTER SEQUENCE "public"."send_account_created_id_seq" OWNED BY "public"."send_account_created"."id";
 
 CREATE TABLE IF NOT EXISTS "public"."send_account_receives" (
     "id" integer NOT NULL,
@@ -2134,15 +2001,6 @@ CREATE SEQUENCE IF NOT EXISTS "public"."send_account_signing_key_removed_id_seq"
 ALTER TABLE "public"."send_account_signing_key_removed_id_seq" OWNER TO "postgres";
 ALTER SEQUENCE "public"."send_account_signing_key_removed_id_seq" OWNED BY "public"."send_account_signing_key_removed"."id";
 
-CREATE SEQUENCE IF NOT EXISTS "public"."send_account_transfers_id_seq"
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-ALTER TABLE "public"."send_account_transfers_id_seq" OWNER TO "postgres";
-ALTER SEQUENCE "public"."send_account_transfers_id_seq" OWNED BY "public"."send_account_transfers"."id";
 
 CREATE TABLE IF NOT EXISTS "public"."send_liquidity_pools" (
     "id" integer NOT NULL,
@@ -2411,7 +2269,6 @@ ALTER TABLE ONLY "public"."receipts" ALTER COLUMN "id" SET DEFAULT "nextval"('"p
 
 ALTER TABLE ONLY "public"."referrals" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."referrals_id_seq"'::"regclass");
 
-ALTER TABLE ONLY "public"."send_account_created" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."send_account_created_id_seq"'::"regclass");
 
 ALTER TABLE ONLY "public"."send_account_receives" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."send_account_receives_id_seq"'::"regclass");
 
@@ -2419,7 +2276,6 @@ ALTER TABLE ONLY "public"."send_account_signing_key_added" ALTER COLUMN "id" SET
 
 ALTER TABLE ONLY "public"."send_account_signing_key_removed" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."send_account_signing_key_removed_id_seq"'::"regclass");
 
-ALTER TABLE ONLY "public"."send_account_transfers" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."send_account_transfers_id_seq"'::"regclass");
 
 ALTER TABLE ONLY "public"."send_liquidity_pools" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."send_liquidity_pools_id_seq"'::"regclass");
 
@@ -2482,8 +2338,6 @@ ALTER TABLE ONLY "public"."receipts"
 ALTER TABLE ONLY "public"."referrals"
     ADD CONSTRAINT "referrals_pkey" PRIMARY KEY ("id");
 
-ALTER TABLE ONLY "public"."send_account_created"
-    ADD CONSTRAINT "send_account_created_pkey" PRIMARY KEY ("id");
 
 ALTER TABLE ONLY "public"."send_account_receives"
     ADD CONSTRAINT "send_account_receives_pkey" PRIMARY KEY ("id");
@@ -2494,8 +2348,6 @@ ALTER TABLE ONLY "public"."send_account_signing_key_added"
 ALTER TABLE ONLY "public"."send_account_signing_key_removed"
     ADD CONSTRAINT "send_account_signing_key_removed_pkey" PRIMARY KEY ("id");
 
-ALTER TABLE ONLY "public"."send_account_transfers"
-    ADD CONSTRAINT "send_account_transfers_pkey" PRIMARY KEY ("id");
 
 ALTER TABLE ONLY "public"."send_accounts"
 ALTER TABLE ONLY "public"."send_liquidity_pools"
@@ -2558,7 +2410,6 @@ CREATE INDEX "i_send_account_receives_sender" ON "public"."send_account_receives
 
 CREATE INDEX "idx_affiliate_stats_user_created" ON "public"."affiliate_stats" USING "btree" ("user_id", "created_at" DESC);
 
-CREATE INDEX "idx_send_account_transfers_f_t_block_time" ON "public"."send_account_transfers" USING "btree" ("f", "t", "block_time");
 
 CREATE INDEX "idx_sendpot_jackpot_runs_block_num" ON "public"."sendpot_jackpot_runs" USING "btree" ("block_num");
 
@@ -2572,9 +2423,7 @@ CREATE UNIQUE INDEX "receipts_event_id_idx" ON "public"."receipts" USING "btree"
 
 CREATE INDEX "receipts_user_id_idx" ON "public"."receipts" USING "btree" ("user_id");
 
-CREATE INDEX "send_account_created_account_block_num" ON "public"."send_account_created" USING "btree" ("block_num");
 
-CREATE INDEX "send_account_created_account_block_time" ON "public"."send_account_created" USING "btree" ("block_time");
 
 CREATE UNIQUE INDEX "send_account_credentials_account_id_key_slot_key" ON "public"."send_account_credentials" USING "btree" ("account_id", "key_slot");
 
@@ -2592,13 +2441,9 @@ CREATE INDEX "send_account_signing_key_removed_block_num" ON "public"."send_acco
 
 CREATE INDEX "send_account_signing_key_removed_block_time" ON "public"."send_account_signing_key_removed" USING "btree" ("block_time");
 
-CREATE INDEX "send_account_transfers_block_num" ON "public"."send_account_transfers" USING "btree" ("block_num");
 
-CREATE INDEX "send_account_transfers_block_time" ON "public"."send_account_transfers" USING "btree" ("block_time");
 
-CREATE INDEX "send_account_transfers_f" ON "public"."send_account_transfers" USING "btree" ("f");
 
-CREATE INDEX "send_account_transfers_t" ON "public"."send_account_transfers" USING "btree" ("t");
 CREATE INDEX "send_revenues_safe_receives_block_num" ON "public"."send_revenues_safe_receives" USING "btree" ("block_num");
 
 CREATE INDEX "send_revenues_safe_receives_block_time" ON "public"."send_revenues_safe_receives" USING "btree" ("block_time");
@@ -2641,11 +2486,9 @@ CREATE INDEX "sendtag_checkout_receipts_block_time" ON "public"."sendtag_checkou
 
 CREATE INDEX "sendtag_checkout_receipts_sender_idx" ON "public"."sendtag_checkout_receipts" USING "btree" ("sender");
 
-CREATE INDEX "shovel_account" ON "public"."send_account_created" USING "btree" ("account");
 
 CREATE UNIQUE INDEX "tag_receipts_event_id_idx" ON "public"."tag_receipts" USING "btree" ("tag_name", "event_id");
 
-CREATE UNIQUE INDEX "u_send_account_created" ON "public"."send_account_created" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx");
 
 CREATE UNIQUE INDEX "u_send_account_receives" ON "public"."send_account_receives" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
 
@@ -2653,7 +2496,6 @@ CREATE UNIQUE INDEX "u_send_account_signing_key_added" ON "public"."send_account
 
 CREATE UNIQUE INDEX "u_send_account_signing_key_removed" ON "public"."send_account_signing_key_removed" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
 
-CREATE UNIQUE INDEX "u_send_account_transfers" ON "public"."send_account_transfers" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
 
 CREATE UNIQUE INDEX "u_send_revenues_safe_receives" ON "public"."send_revenues_safe_receives" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
 
@@ -2691,13 +2533,11 @@ CREATE OR REPLACE TRIGGER "after_transfer_update_affiliate_stats" AFTER INSERT O
 
 CREATE OR REPLACE TRIGGER "avoid_send_id_change" BEFORE UPDATE ON "public"."profiles" FOR EACH ROW EXECUTE FUNCTION "public"."stop_change_send_id"();
 
-CREATE OR REPLACE TRIGGER "filter_send_account_transfers_with_no_send_account_created" BEFORE INSERT ON "public"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "private"."filter_send_account_transfers_with_no_send_account_created"();
 
 CREATE OR REPLACE TRIGGER "insert_verification_referral" AFTER INSERT ON "public"."referrals" FOR EACH ROW EXECUTE FUNCTION "public"."insert_verification_referral"();
 
 CREATE OR REPLACE TRIGGER "insert_verification_send_ceiling_trigger" AFTER INSERT ON "public"."send_token_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."insert_verification_send_ceiling"();
 
-CREATE OR REPLACE TRIGGER "insert_verification_sends" AFTER INSERT ON "public"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."insert_verification_sends"();
 
 CREATE OR REPLACE TRIGGER "referrals_delete_activity_trigger" AFTER DELETE ON "public"."referrals" REFERENCING OLD TABLE AS "old_table" FOR EACH STATEMENT EXECUTE FUNCTION "public"."referrals_delete_activity_trigger"();
 
@@ -2715,11 +2555,8 @@ CREATE OR REPLACE TRIGGER "send_account_signing_key_removed_trigger_delete_activ
 
 CREATE OR REPLACE TRIGGER "send_account_signing_key_removed_trigger_insert_activity" AFTER INSERT ON "public"."send_account_signing_key_removed" FOR EACH ROW EXECUTE FUNCTION "public"."send_account_signing_key_removed_trigger_insert_activity"();
 
-CREATE OR REPLACE TRIGGER "send_account_transfers_trigger_delete_activity" AFTER DELETE ON "public"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."send_account_transfers_trigger_delete_activity"();
 
-CREATE OR REPLACE TRIGGER "send_account_transfers_trigger_delete_temporal_activity" BEFORE INSERT ON "public"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."send_account_transfers_delete_temporal_activity"();
 
-CREATE OR REPLACE TRIGGER "send_account_transfers_trigger_insert_activity" AFTER INSERT ON "public"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."send_account_transfers_trigger_insert_activity"();
 
 CREATE OR REPLACE TRIGGER "tag_receipts_insert_activity_trigger" AFTER INSERT ON "public"."tag_receipts" REFERENCING NEW TABLE AS "new_table" FOR EACH STATEMENT EXECUTE FUNCTION "public"."tag_receipts_insert_activity_trigger"();
 
@@ -2869,12 +2706,10 @@ CREATE POLICY "select_own_account_credentials" ON "public"."send_account_credent
    FROM "public"."send_accounts"
   WHERE ("send_accounts"."id" = "send_account_credentials"."account_id"))));
 
-ALTER TABLE "public"."send_account_created" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."send_account_credentials" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."send_account_receives" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."send_account_signing_key_added" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."send_account_signing_key_removed" ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "public"."send_account_transfers" ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "users can see own signing key removed" ON "public"."send_account_signing_key_removed" FOR SELECT USING ((("lower"("concat"('0x', "encode"("account", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY ( SELECT "send_accounts"."address"
    FROM "public"."send_accounts"
   WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid")))));
@@ -2885,9 +2720,6 @@ CREATE POLICY "users can see their own ETH receives" ON "public"."send_account_r
    FROM "public"."send_accounts"
   WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid"))))));
 
-CREATE POLICY "users can see their own account created" ON "public"."send_account_created" FOR SELECT USING ((("lower"("concat"('0x', "encode"("account", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY ( SELECT "send_accounts"."address"
-   FROM "public"."send_accounts"
-  WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid")))));
 
 CREATE POLICY "users can see their own sendtag_checkout_receipts" ON "public"."sendtag_checkout_receipts" FOR SELECT USING ((("lower"("concat"('0x', "encode"("sender", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY ( SELECT "send_accounts"."address"
    FROM "public"."send_accounts"
@@ -2897,11 +2729,6 @@ CREATE POLICY "users can see their own ticket purchases" ON "public"."sendpot_us
    FROM "public"."send_accounts" "sa"
   WHERE ("sa"."user_id" = "auth"."uid"()))));
 
-CREATE POLICY "users can see their own transfers" ON "public"."send_account_transfers" FOR SELECT USING (((("lower"("concat"('0x', "encode"("f", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY ( SELECT "send_accounts"."address"
-   FROM "public"."send_accounts"
-  WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid")))) OR (("lower"("concat"('0x', "encode"("t", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY ( SELECT "send_accounts"."address"
-   FROM "public"."send_accounts"
-  WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid"))))));
 ALTER TABLE "temporal"."send_account_transfers" ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "users can see their own temporal transfers" ON "temporal"."send_account_transfers" FOR SELECT TO "authenticated" USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
@@ -2948,7 +2775,6 @@ GRANT ALL ON FUNCTION "public"."citext"("inet") TO "anon";
 GRANT ALL ON FUNCTION "public"."citext"("inet") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."citext"("inet") TO "service_role";
 
-REVOKE ALL ON FUNCTION "private"."filter_send_account_transfers_with_no_send_account_created"() FROM PUBLIC;
 
 
 REVOKE ALL ON FUNCTION "private"."generate_referral_event_id"("referrer_id" "uuid", "tags" "text"[]) FROM PUBLIC;
@@ -3225,19 +3051,10 @@ GRANT ALL ON FUNCTION "public"."send_account_signing_key_removed_trigger_insert_
 GRANT ALL ON FUNCTION "public"."send_account_signing_key_removed_trigger_insert_activity"() TO "service_role";
 
 REVOKE ALL ON FUNCTION "public"."send_account_transfers_delete_temporal_activity"() FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."send_account_transfers_delete_temporal_activity"() TO "anon";
-GRANT ALL ON FUNCTION "public"."send_account_transfers_delete_temporal_activity"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."send_account_transfers_delete_temporal_activity"() TO "service_role";
 
 REVOKE ALL ON FUNCTION "public"."send_account_transfers_trigger_delete_activity"() FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."send_account_transfers_trigger_delete_activity"() TO "anon";
-GRANT ALL ON FUNCTION "public"."send_account_transfers_trigger_delete_activity"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."send_account_transfers_trigger_delete_activity"() TO "service_role";
 
 REVOKE ALL ON FUNCTION "public"."send_account_transfers_trigger_insert_activity"() FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."send_account_transfers_trigger_insert_activity"() TO "anon";
-GRANT ALL ON FUNCTION "public"."send_account_transfers_trigger_insert_activity"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."send_account_transfers_trigger_insert_activity"() TO "service_role";
 
 REVOKE ALL ON FUNCTION "public"."send_accounts_add_webauthn_credential"("send_account_id" "uuid", "webauthn_credential" "public"."webauthn_credentials", "key_slot" integer) FROM PUBLIC;
 REVOKE ALL ON FUNCTION "public"."send_accounts_after_insert"() FROM PUBLIC;
@@ -3388,9 +3205,6 @@ GRANT ALL ON TABLE "public"."send_account_credentials" TO "anon";
 GRANT ALL ON TABLE "public"."send_account_credentials" TO "authenticated";
 GRANT ALL ON TABLE "public"."send_account_credentials" TO "service_role";
 
-GRANT ALL ON TABLE "public"."send_account_transfers" TO "anon";
-GRANT ALL ON TABLE "public"."send_account_transfers" TO "authenticated";
-GRANT ALL ON TABLE "public"."send_account_transfers" TO "service_role";
 
 GRANT ALL ON TABLE "public"."send_token_transfers" TO "anon";
 GRANT ALL ON TABLE "public"."send_token_transfers" TO "authenticated";
@@ -3424,13 +3238,7 @@ GRANT ALL ON TABLE "public"."referrer" TO "anon";
 GRANT ALL ON TABLE "public"."referrer" TO "authenticated";
 GRANT ALL ON TABLE "public"."referrer" TO "service_role";
 
-GRANT ALL ON TABLE "public"."send_account_created" TO "anon";
-GRANT ALL ON TABLE "public"."send_account_created" TO "authenticated";
-GRANT ALL ON TABLE "public"."send_account_created" TO "service_role";
 
-GRANT ALL ON SEQUENCE "public"."send_account_created_id_seq" TO "anon";
-GRANT ALL ON SEQUENCE "public"."send_account_created_id_seq" TO "authenticated";
-GRANT ALL ON SEQUENCE "public"."send_account_created_id_seq" TO "service_role";
 
 GRANT ALL ON TABLE "public"."send_account_receives" TO "anon";
 GRANT ALL ON TABLE "public"."send_account_receives" TO "authenticated";
@@ -3456,9 +3264,6 @@ GRANT ALL ON SEQUENCE "public"."send_account_signing_key_removed_id_seq" TO "ano
 GRANT ALL ON SEQUENCE "public"."send_account_signing_key_removed_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."send_account_signing_key_removed_id_seq" TO "service_role";
 
-GRANT ALL ON SEQUENCE "public"."send_account_transfers_id_seq" TO "anon";
-GRANT ALL ON SEQUENCE "public"."send_account_transfers_id_seq" TO "authenticated";
-GRANT ALL ON SEQUENCE "public"."send_account_transfers_id_seq" TO "service_role";
 
 GRANT ALL ON TABLE "public"."send_liquidity_pools" TO "anon";
 GRANT ALL ON TABLE "public"."send_liquidity_pools" TO "authenticated";

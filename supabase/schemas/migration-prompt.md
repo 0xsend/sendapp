@@ -2,7 +2,7 @@
 
 ## 🚀 Migration Status: IN PROGRESS
 
-**Completed Migrations:** 12 tables successfully migrated (8 core + 4 distribution tables)
+**Completed Migrations:** 16 tables successfully migrated (10 core + 4 distribution + 2 send account tables)
 **Last Updated:** January 26, 2025
 **Goal:** Complete migration of ALL tables and objects - prod.sql must be completely eliminated
 
@@ -63,12 +63,28 @@ The following tables have been successfully migrated from `prod.sql` into dedica
    - Tables: `public.distributions`, `public.distribution_shares`, `public.distribution_verifications`, `public.distribution_verification_values`, `public.send_slash`
    - All constraints, indexes, foreign keys, and grants
 
-9. **`send_earn.sql`** - Complete Send Earn system ✨ NEW ✨
+9. **`send_earn.sql`** - Complete Send Earn system
    - Functions: All 10 send_earn-related functions including activity triggers and referral processing
    - Sequences: `send_earn_create_id_seq`, `send_earn_new_affiliate_id_seq`, `send_earn_deposit_id_seq`, `send_earn_withdraw_id_seq`
    - Tables: `public.send_earn_create`, `public.send_earn_new_affiliate`, `public.send_earn_deposit`, `public.send_earn_withdraw`
    - Views: `public.send_earn_activity`, `public.send_earn_balances`
    - All indexes, triggers, RLS policies, and grants
+
+10. **`send_account_created.sql`** - Send account creation tracking
+    - Sequences: `send_account_created_id_seq`
+    - Table: `public.send_account_created`
+    - Indexes: 4 indexes including unique constraint
+    - RLS policy for user access
+    - All grants and permissions
+
+11. **`send_account_transfers.sql`** - Send account transfer tracking
+    - Functions: `filter_send_account_transfers_with_no_send_account_created()`, `send_account_transfers_delete_temporal_activity()`, activity trigger functions
+    - Sequences: `send_account_transfers_id_seq`
+    - Table: `public.send_account_transfers`
+    - Indexes: 6 indexes including unique constraint
+    - Triggers: 5 triggers for filtering, verification, and activity tracking
+    - RLS policy for user access
+    - All grants and permissions
 
 ### 🔧 **Configuration Updated**
 
@@ -84,6 +100,9 @@ schema_paths = [
   "./schemas/tags.sql",
   "./schemas/referrals.sql",
   "./schemas/distributions.sql",
+  "./schemas/send_earn.sql",
+  "./schemas/send_account_created.sql",
+  "./schemas/send_account_transfers.sql",
   "./schemas/prod.sql",  # TO BE REMOVED WHEN MIGRATION COMPLETE
   "./schemas/*.sql",
 ]
@@ -92,10 +111,11 @@ schema_paths = [
 ### 🧹 **Cleanup from prod.sql**
 
 **Major Components Removed:**
-- All 8 core tables and their components (challenges, profiles, webauthn_credentials, send_accounts, chain_addresses, tags, referrals)
+- All 11 core tables and their components (challenges, profiles, webauthn_credentials, send_accounts, chain_addresses, tags, referrals, send_account_created, send_account_transfers)
 - Distribution system: verification_type enum, 12 functions, 5 tables, all related objects
 - Send Earn system: 10 functions, 4 tables, 2 views, all related objects
-- Total removed: 16 tables with all associated functions, sequences, constraints, indexes, and grants
+- Send Account tables: 2 tables with 5 functions, triggers, and activity integration
+- Total removed: 20 tables with all associated functions, sequences, constraints, indexes, and grants
 
 ### ✅ **Validation Completed**
 
@@ -107,49 +127,42 @@ schema_paths = [
 
 **IMPORTANT: prod.sql must be completely eliminated. This is not optional.**
 
-#### **Remaining Tables in prod.sql (30 tables):**
+#### **Remaining Tables in prod.sql (26 tables):**
 
 **High Priority - Core System Tables:**
 1. **`activity`** - Central activity feed (complex, cross-cutting)
-2. **Send Account Group (6 tables):**
-   - `send_account_created`
-   - `send_account_transfers`
+2. **Send Account Group (4 tables):**
    - `send_account_receives`
    - `send_account_signing_key_added`
    - `send_account_signing_key_removed`
    - `send_account_credentials`
 
 **Medium Priority - Feature Tables:**
-3. **Send Earn Group (4 tables):**
-   - `send_earn_create`
-   - `send_earn_new_affiliate`
-   - `send_earn_deposit`
-   - `send_earn_withdraw`
-4. **Receipts Group (3 tables):**
+3. **Receipts Group (3 tables):**
    - `receipts`
    - `tag_receipts`
    - `sendtag_checkout_receipts`
-5. **Sendpot Group (2 tables):**
+4. **Sendpot Group (2 tables):**
    - `sendpot_jackpot_runs`
    - `sendpot_user_ticket_purchases`
 
 **Lower Priority - Supporting Tables:**
-6. **Token & Financial (4 tables):**
+5. **Token & Financial (4 tables):**
    - `send_token_transfers`
    - `send_token_v0_transfers`
    - `send_revenues_safe_receives`
    - `liquidity_pools`/`send_liquidity_pools`
-7. **Other Tables:**
+6. **Other Tables:**
    - `affiliate_stats`
    - `swap_routers`
 
 **Schema-specific Tables:**
-8. **Shovel Schema (4 tables):**
+7. **Shovel Schema (4 tables):**
    - `shovel.ig_updates`
    - `shovel.integrations`
    - `shovel.task_updates`
    - `shovel.sources`
-9. **Temporal Schema (2 tables):**
+8. **Temporal Schema (2 tables):**
    - `temporal.send_account_transfers`
    - `temporal.send_earn_deposits`
 
@@ -327,17 +340,18 @@ When migrating tables with dependencies:
 
 ### 🎯 **Recommended Migration Order**
 
-1. **Group Related Tables** - Migrate tables that work together as a unit:
-   - Send Account ecosystem → `send_accounts_ecosystem.sql`
-   - Send Earn system → `send_earn.sql`
-   - Receipts system → `receipts.sql`
-   - Sendpot system → `sendpot.sql`
+1. **One Table Per File** - Each table should have its own dedicated SQL file:
+   - Avoid creating large "ecosystem" or "collection" files
+   - Each file should be named after the primary table it contains
+   - This ensures files remain manageable and focused
+   - Example: `send_account_transfers.sql`, `send_account_receives.sql` (NOT `send_accounts_ecosystem.sql`)
 
 2. **Handle Complex Tables** - For tables with many dependencies:
-   - Activity table might need its own file or be split by concern
+   - Activity table might need special consideration due to cross-cutting concerns
    - Consider creating a `shared_types.sql` for types used across multiple schemas
 
-3. **Schema-Specific Files**:
+3. **Schema-Specific Considerations**:
+   - For non-public schemas (shovel, temporal), group by schema is acceptable
    - `shovel.sql` for all shovel schema objects
    - `temporal.sql` for all temporal schema objects
 
@@ -350,16 +364,40 @@ When migrating tables with dependencies:
 - ✅ tags
 - ✅ referrals
 - ✅ distributions (with send_slash)
+- ✅ send_earn (all 4 tables and views)
+- ✅ send_account_created
+- ✅ send_account_transfers
 
-### 📋 **Migration Groups Remaining**
+### 📋 **Individual Tables Remaining**
 
-1. **send_accounts_ecosystem.sql** (6 tables)
-2. **send_earn.sql** (4 tables)
-3. **activity.sql** (1 complex table)
-4. **receipts.sql** (3 tables)
-5. **sendpot.sql** (2 tables)
-6. **send_tokens.sql** (3 tables)
-7. **financial.sql** (3 tables)
-8. **affiliate_stats.sql** (1 table)
-9. **shovel.sql** (4 tables)
-10. **temporal.sql** (2 tables)
+**Send Account Tables (4 files):**
+1. `send_account_receives.sql`
+2. `send_account_signing_key_added.sql`
+3. `send_account_signing_key_removed.sql`
+4. `send_account_credentials.sql`
+
+**Activity Table (1 file):**
+5. `activity.sql` (complex cross-cutting table)
+
+**Receipt Tables (3 files):**
+6. `receipts.sql`
+7. `tag_receipts.sql`
+8. `sendtag_checkout_receipts.sql`
+
+**Sendpot Tables (2 files):**
+9. `sendpot_jackpot_runs.sql`
+10. `sendpot_user_ticket_purchases.sql`
+
+**Token & Revenue Tables (3 files):**
+11. `send_token_transfers.sql`
+12. `send_token_v0_transfers.sql`
+13. `send_revenues_safe_receives.sql`
+
+**Financial Tables (3 files):**
+14. `liquidity_pools.sql` (or `send_liquidity_pools.sql`)
+15. `swap_routers.sql`
+16. `affiliate_stats.sql`
+
+**Schema-Specific Groups:**
+17. `shovel.sql` (4 tables in shovel schema)
+18. `temporal.sql` (2 tables in temporal schema)
