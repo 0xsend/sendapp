@@ -1,13 +1,16 @@
 # Supabase Schema Migration to Declarative Files
 
-## ✅ Migration Status: PARTIALLY COMPLETED
+## 🚀 Migration Status: IN PROGRESS
 
-**Completed Migrations:** 7 tables successfully migrated
-**Last Updated:** January 25, 2025
-**Status:** Core tables migrated, optional cleanup remaining
+**Completed Migrations:** 12 tables successfully migrated (8 core + 4 distribution tables)
+**Last Updated:** January 26, 2025
+**Goal:** Complete migration of ALL tables and objects - prod.sql must be completely eliminated
 
 ## Task
 Migrate the large `prod.sql` file into modularized SQL files based on tables. Each table should have its own dedicated SQL file containing all related database objects.
+
+## 🎯 CRITICAL OBJECTIVE
+**prod.sql must be completely eliminated.** Every single object (tables, functions, types, sequences, views, triggers, etc.) must be migrated to appropriate schema files. No objects should remain in prod.sql.
 
 ## 📊 Migration Progress
 
@@ -53,6 +56,13 @@ The following tables have been successfully migrated from `prod.sql` into dedica
    - Tables: `public.referrals`, `private.leaderboard_referrals_all_time`
    - Complex trigger system and activity integration
 
+8. **`distributions.sql`** - Complete distribution system ✨ NEW ✨
+   - Type: `verification_type` enum
+   - Functions: All 12 distribution-related functions including verification insertions and share updates
+   - Sequences: `distributions_id_seq`, `distribution_shares_id_seq`, `distribution_verifications_id_seq`
+   - Tables: `public.distributions`, `public.distribution_shares`, `public.distribution_verifications`, `public.distribution_verification_values`, `public.send_slash`
+   - All constraints, indexes, foreign keys, and grants
+
 ### 🔧 **Configuration Updated**
 
 Updated `/supabase/config.toml` with proper dependency order:
@@ -66,7 +76,8 @@ schema_paths = [
   "./schemas/chain_addresses.sql",
   "./schemas/tags.sql",
   "./schemas/referrals.sql",
-  "./schemas/prod.sql",
+  "./schemas/distributions.sql",
+  "./schemas/prod.sql",  # TO BE REMOVED WHEN MIGRATION COMPLETE
   "./schemas/*.sql",
 ]
 ```
@@ -74,9 +85,9 @@ schema_paths = [
 ### 🧹 **Cleanup from prod.sql**
 
 **Major Components Removed:**
-- Referrals functions: `generate_referral_event_id()` functions
-- Referrals tables: `public.referrals` and `private.leaderboard_referrals_all_time`
-- Associated sequences, constraints, and indexes
+- All 8 core tables and their components (challenges, profiles, webauthn_credentials, send_accounts, chain_addresses, tags, referrals)
+- Distribution system: verification_type enum, 12 functions, 5 tables, all related objects
+- Total removed: 12 tables with all associated functions, sequences, constraints, indexes, and grants
 
 ### ✅ **Validation Completed**
 
@@ -84,22 +95,70 @@ schema_paths = [
 - **Database integrity maintained** - No syntax errors or broken references
 - **Function dependencies resolved** - Expected notices about removed functions confirm correct cleanup
 
-### 📋 **Remaining Work**
+### 📋 **CRITICAL: Remaining Work to Complete**
 
-The core migration is complete and functional. Optional cleanup tasks include:
+**IMPORTANT: prod.sql must be completely eliminated. This is not optional.**
 
-1. **Additional Tables** - Consider migrating other large tables if needed:
-   - `activity` (complex, cross-cutting concerns)
-   - `send_account_*` tables (transfers, receives, etc.)
-   - Distribution-related tables
-   - Send earn tables
+#### **Remaining Tables in prod.sql (30 tables):**
 
-2. **Fine-grained Cleanup** - Remove remaining references from prod.sql:
-   - Individual function grants and revokes
-   - Constraint definitions for migrated tables
-   - Index definitions for migrated tables
+**High Priority - Core System Tables:**
+1. **`activity`** - Central activity feed (complex, cross-cutting)
+2. **Send Account Group (6 tables):**
+   - `send_account_created`
+   - `send_account_transfers`
+   - `send_account_receives`
+   - `send_account_signing_key_added`
+   - `send_account_signing_key_removed`
+   - `send_account_credentials`
 
-**Note:** The current state is fully functional. Additional migrations can be done incrementally as needed.
+**Medium Priority - Feature Tables:**
+3. **Send Earn Group (4 tables):**
+   - `send_earn_create`
+   - `send_earn_new_affiliate`
+   - `send_earn_deposit`
+   - `send_earn_withdraw`
+4. **Receipts Group (3 tables):**
+   - `receipts`
+   - `tag_receipts`
+   - `sendtag_checkout_receipts`
+5. **Sendpot Group (2 tables):**
+   - `sendpot_jackpot_runs`
+   - `sendpot_user_ticket_purchases`
+
+**Lower Priority - Supporting Tables:**
+6. **Token & Financial (4 tables):**
+   - `send_token_transfers`
+   - `send_token_v0_transfers`
+   - `send_revenues_safe_receives`
+   - `liquidity_pools`/`send_liquidity_pools`
+7. **Other Tables:**
+   - `affiliate_stats`
+   - `swap_routers`
+
+**Schema-specific Tables:**
+8. **Shovel Schema (4 tables):**
+   - `shovel.ig_updates`
+   - `shovel.integrations`
+   - `shovel.task_updates`
+   - `shovel.sources`
+9. **Temporal Schema (2 tables):**
+   - `temporal.send_account_transfers`
+   - `temporal.send_earn_deposits`
+
+#### **Other Objects to Migrate:**
+- All remaining functions not tied to specific tables
+- Views (if any)
+- Triggers not associated with migrated tables
+- Custom types/enums
+- Standalone sequences
+- Extension configurations
+
+#### **Final Steps:**
+1. Complete all table migrations
+2. Migrate all remaining objects
+3. Verify prod.sql is empty except for initial setup (extensions, schemas)
+4. Remove prod.sql from config.toml
+5. Delete prod.sql file
 
 ## Process
 Work methodically through each table, one at a time:
@@ -256,19 +315,43 @@ When migrating tables with dependencies:
 
 ## Example Tables to Migrate
 
-### ✅ **Completed (High Priority)**
-- ✅ send_accounts
+## Migration Strategy
+
+### 🎯 **Recommended Migration Order**
+
+1. **Group Related Tables** - Migrate tables that work together as a unit:
+   - Send Account ecosystem → `send_accounts_ecosystem.sql`
+   - Send Earn system → `send_earn.sql`
+   - Receipts system → `receipts.sql`
+   - Sendpot system → `sendpot.sql`
+
+2. **Handle Complex Tables** - For tables with many dependencies:
+   - Activity table might need its own file or be split by concern
+   - Consider creating a `shared_types.sql` for types used across multiple schemas
+
+3. **Schema-Specific Files**:
+   - `shovel.sql` for all shovel schema objects
+   - `temporal.sql` for all temporal schema objects
+
+### ✅ **Completed**
+- ✅ challenges
+- ✅ profiles  
 - ✅ webauthn_credentials
+- ✅ send_accounts
+- ✅ chain_addresses
 - ✅ tags
 - ✅ referrals
-- ✅ chain_addresses
-- ✅ profiles
-- ✅ challenges
+- ✅ distributions (with send_slash)
 
-### 📋 **Remaining**
-- activity (complex, cross-cutting concerns - consider keeping in prod.sql)
-- send_account_* tables (created, receives, transfers, etc.)
-- distribution tables
-- send_earn tables
-- affiliate_stats
-- receipts and tag_receipts
+### 📋 **Migration Groups Remaining**
+
+1. **send_accounts_ecosystem.sql** (6 tables)
+2. **send_earn.sql** (4 tables)
+3. **activity.sql** (1 complex table)
+4. **receipts.sql** (3 tables)
+5. **sendpot.sql** (2 tables)
+6. **send_tokens.sql** (3 tables)
+7. **financial.sql** (3 tables)
+8. **affiliate_stats.sql** (1 table)
+9. **shovel.sql** (4 tables)
+10. **temporal.sql** (2 tables)
