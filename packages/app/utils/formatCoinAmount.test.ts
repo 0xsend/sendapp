@@ -8,7 +8,7 @@ describe('formatCoinAmount', () => {
     expect(formatCoinAmount({ amount, coin: usdcCoin })).toBe('1')
 
     const smallAmount = BigInt(100) // 0.0001 USDC
-    expect(formatCoinAmount({ amount: smallAmount, coin: usdcCoin })).toBe('>0.0')
+    expect(formatCoinAmount({ amount: smallAmount, coin: usdcCoin })).toBe('0.0...')
 
     const largeAmount = BigInt(1234567890) // 1,234.567890 USDC
     expect(formatCoinAmount({ amount: largeAmount, coin: usdcCoin })).toBe('1,234.56')
@@ -38,7 +38,7 @@ describe('formatCoinAmount', () => {
     expect(formatCoinAmount({ amount, coin: spx6900Coin })).toBe('1')
 
     const smallAmount = BigInt(10000) // 0.0001 SPX
-    expect(formatCoinAmount({ amount: smallAmount, coin: spx6900Coin })).toBe('>0.0')
+    expect(formatCoinAmount({ amount: smallAmount, coin: spx6900Coin })).toBe('0.0...')
   })
 
   it('should handle zero amounts', () => {
