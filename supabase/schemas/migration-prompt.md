@@ -63,9 +63,32 @@ The large monolithic `prod.sql` file has been successfully decomposed into modul
 
 ## 🧪 Verification and Testing Instructions
 
-### 1. Database Reset and Migration Test
+### 1. Verify Schema Matches prod.sql.backup
 
-First, verify that all migrations apply cleanly:
+Before testing, ensure the declared schema matches the original:
+
+```bash
+# Apply the declared schema to a fresh database
+supabase db reset
+
+# Apply the original prod.sql.backup to compare
+supabase db push --db-url "postgresql://postgres:postgres@localhost:54322/postgres_backup" < supabase/schemas/prod.sql.backup
+
+# Generate a diff between the two schemas
+supabase db diff --db-url "postgresql://postgres:postgres@localhost:54322/postgres_backup" -f verify_match
+
+# The diff should be empty or show only acceptable differences
+# (e.g., order of creation, formatting differences)
+```
+
+If differences are found:
+1. Search for the missing object in `prod.sql.backup`
+2. Add it to the appropriate schema file
+3. Re-run the verification until schemas match
+
+### 2. Database Reset and Migration Test
+
+After verifying schema completeness, test the migration:
 
 ```bash
 # database needs to be stopped
@@ -78,7 +101,7 @@ supabase db diff -f prod_sync
 # All schema files should apply without errors
 ```
 
-### 2. Schema Integrity Checks
+### 3. Schema Integrity Checks
 
 Verify that all objects were created successfully:
 
@@ -113,7 +136,7 @@ WHERE schemaname IN ('public', 'private', 'shovel', 'temporal')
 ORDER BY schemaname, tablename, indexname;
 ```
 
-### 3. Dependency Order Validation
+### 4. Dependency Order Validation
 
 Ensure tables are created in the correct order by checking foreign key dependencies:
 
@@ -146,7 +169,7 @@ FROM fk_tree
 ORDER BY level, table_name;
 ```
 
-### 4. Function and Trigger Verification
+### 5. Function and Trigger Verification
 
 ```sql
 -- Check all functions exist
@@ -172,7 +195,7 @@ WHERE n.nspname IN ('public', 'private', 'shovel', 'temporal')
 ORDER BY schemaname, tablename, tgname;
 ```
 
-### 5. RLS Policy Verification
+### 6. RLS Policy Verification
 
 ```sql
 -- Check RLS is enabled on appropriate tables
@@ -199,7 +222,7 @@ FROM pg_policies
 ORDER BY schemaname, tablename, policyname;
 ```
 
-### 6. Run Test Suite
+### 7. Run Test Suite
 
 After verifying the schema structure:
 
@@ -214,7 +237,7 @@ yarn supabase test
 # 3. Resolve dependency issues
 ```
 
-### 7. Application Integration Testing
+### 8. Application Integration Testing
 
 1. Start the local Supabase instance:
    ```bash
@@ -232,7 +255,7 @@ yarn supabase test
    yarn playwright test
    ```
 
-### 8. Final Cleanup
+### 9. Final Cleanup
 
 Once all tests pass:
 
@@ -260,18 +283,33 @@ Once all tests pass:
 
 ## Troubleshooting
 
+### Resolving Schema Differences
+
+When `supabase db diff` reports differences between the declared schema and the database:
+
+1. **Reference Source**: Use `prod.sql.backup` as the authoritative source for resolving discrepancies
+2. **Search for Missing Objects**: When an object is reported as missing, search for it in `prod.sql.backup`:
+   ```bash
+   # Search for a specific function, table, or other object
+   grep -n "function_name" supabase/schemas/prod.sql.backup
+   grep -n "CREATE TABLE.*table_name" supabase/schemas/prod.sql.backup
+   ```
+3. **Extract Missing Definitions**: Copy the complete definition from `prod.sql.backup` to the appropriate schema file
+4. **Verify Dependencies**: Ensure any dependencies (types, other tables, functions) are also included
+
 ### Common Issues
 
 1. **Foreign Key Violations**: Ensure tables are listed in correct dependency order in `config.toml`
 2. **Missing Types**: Check that `types.sql` is loaded before tables that use custom types
 3. **Function Dependencies**: Some functions may need to be moved to different files based on their dependencies
 4. **Cross-Schema References**: Ensure schemas are created before tables that use them
+5. **Missing Objects from prod.sql**: Search for them in `prod.sql.backup` and add to appropriate schema files
 
 ### Rollback Plan
 
 If issues are encountered:
 
-1. Keep a backup of the original `prod.sql`
+1. Keep a backup of the original `prod.sql` (saved as `prod.sql.backup`)
 2. Temporarily add it back to `config.toml` at the end of schema_paths
 3. Debug specific failing schemas individually
 4. Remove `prod.sql` again once issues are resolved

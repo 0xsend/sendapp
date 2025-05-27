@@ -43,6 +43,7 @@ CREATE INDEX "send_revenues_safe_receives_tx_hash" ON "public"."send_revenues_sa
 CREATE UNIQUE INDEX "u_send_revenues_safe_receives" ON "public"."send_revenues_safe_receives" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
 
 -- RLS
+ALTER TABLE "public"."send_revenues_safe_receives" ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Send revenues safe receives can be read by the user who created" ON "public"."send_revenues_safe_receives" FOR SELECT USING ((("lower"("concat"('0x', "encode"("sender", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY ( SELECT "chain_addresses"."address"
    FROM "public"."chain_addresses"
   WHERE ("chain_addresses"."user_id" = ( SELECT "auth"."uid"() AS "uid"))

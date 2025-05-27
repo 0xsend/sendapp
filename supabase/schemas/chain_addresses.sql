@@ -1,8 +1,10 @@
 -- Functions
-CREATE OR REPLACE FUNCTION "public"."chain_addresses_after_insert"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    SET "search_path" TO 'public'
-    AS $$ BEGIN -- Ensure users can only insert or update their own tags
+CREATE OR REPLACE FUNCTION public.chain_addresses_after_insert()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$ BEGIN -- Ensure users can only insert or update their own tags
     IF NEW.user_id <> auth.uid() THEN RAISE EXCEPTION 'Users can only create addresses for themselves';
 
 END IF;
@@ -20,7 +22,8 @@ RETURN NEW;
 
 END;
 
-$$;
+$function$
+;
 
 ALTER FUNCTION "public"."chain_addresses_after_insert"() OWNER TO "postgres";
 

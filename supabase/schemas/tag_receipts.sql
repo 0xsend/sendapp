@@ -79,6 +79,9 @@ ALTER TABLE ONLY "public"."tag_receipts"
 -- Triggers
 CREATE OR REPLACE TRIGGER "tag_receipts_insert_activity_trigger" AFTER INSERT ON "public"."tag_receipts" REFERENCING NEW TABLE AS "new_table" FOR EACH STATEMENT EXECUTE FUNCTION "public"."tag_receipts_insert_activity_trigger"();
 
+-- RLS
+alter table "public"."tag_receipts" enable row level security;
+
 -- Grants
 GRANT ALL ON FUNCTION "public"."tag_receipts_insert_activity_trigger"() TO "anon";
 GRANT ALL ON FUNCTION "public"."tag_receipts_insert_activity_trigger"() TO "authenticated";

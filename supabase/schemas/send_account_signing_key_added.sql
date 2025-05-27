@@ -12,9 +12,11 @@ end;
 $$;
 ALTER FUNCTION "public"."send_account_signing_key_added_trigger_delete_activity"() OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "public"."send_account_signing_key_added_trigger_insert_activity"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
+CREATE OR REPLACE FUNCTION public.send_account_signing_key_added_trigger_insert_activity()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
 declare
     _f_user_id uuid;
     _data      jsonb;
@@ -55,7 +57,8 @@ begin
 
     return NEW;
 end;
-$$;
+$function$
+;
 ALTER FUNCTION "public"."send_account_signing_key_added_trigger_insert_activity"() OWNER TO "postgres";
 
 -- Sequences

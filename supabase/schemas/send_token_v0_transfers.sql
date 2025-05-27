@@ -44,6 +44,12 @@ CREATE INDEX "send_token_v0_transfers_f" ON "public"."send_token_v0_transfers" U
 CREATE INDEX "send_token_v0_transfers_t" ON "public"."send_token_v0_transfers" USING "btree" ("t");
 CREATE UNIQUE INDEX "u_send_token_v0_transfers" ON "public"."send_token_v0_transfers" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
 
+-- RLS
+ALTER TABLE "public"."send_token_v0_transfers" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can see their own token transfers" ON "public"."send_token_v0_transfers" FOR SELECT USING (("auth"."uid"() IN ( SELECT "chain_addresses"."user_id"
+   FROM "public"."chain_addresses"
+  WHERE (("chain_addresses"."address" OPERATOR("public".=) ("lower"("concat"('0x', "encode"("send_token_v0_transfers"."f", 'hex'::"text"))))::"public"."citext") OR ("chain_addresses"."address" OPERATOR("public".=) ("lower"("concat"('0x', "encode"("send_token_v0_transfers"."t", 'hex'::"text"))))::"public"."citext")))));
+
 -- Grants
 GRANT ALL ON TABLE "public"."send_token_v0_transfers" TO "anon";
 GRANT ALL ON TABLE "public"."send_token_v0_transfers" TO "authenticated";

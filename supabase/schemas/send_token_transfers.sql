@@ -44,6 +44,12 @@ CREATE INDEX "send_token_transfers_f" ON "public"."send_token_transfers" USING "
 CREATE INDEX "send_token_transfers_t" ON "public"."send_token_transfers" USING "btree" ("t");
 CREATE UNIQUE INDEX "u_send_token_transfers" ON "public"."send_token_transfers" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
 
+-- RLS
+ALTER TABLE "public"."send_token_transfers" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can see their own token transfers" ON "public"."send_token_transfers" FOR SELECT USING (("auth"."uid"() IN ( SELECT "chain_addresses"."user_id"
+   FROM "public"."chain_addresses"
+  WHERE (("chain_addresses"."address" OPERATOR("public".=) ("lower"("concat"('0x', "encode"("send_token_transfers"."f", 'hex'::"text"))))::"public"."citext") OR ("chain_addresses"."address" OPERATOR("public".=) ("lower"("concat"('0x', "encode"("send_token_transfers"."t", 'hex'::"text"))))::"public"."citext")))));
+
 -- Grants
 GRANT ALL ON TABLE "public"."send_token_transfers" TO "anon";
 GRANT ALL ON TABLE "public"."send_token_transfers" TO "authenticated";
@@ -52,3 +58,6 @@ GRANT ALL ON TABLE "public"."send_token_transfers" TO "service_role";
 GRANT ALL ON SEQUENCE "public"."send_token_transfers_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."send_token_transfers_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."send_token_transfers_id_seq" TO "service_role";
+
+-- Triggers
+CREATE OR REPLACE TRIGGER "insert_verification_send_ceiling_trigger" AFTER INSERT ON "public"."send_token_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."insert_verification_send_ceiling"();

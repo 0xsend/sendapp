@@ -36,6 +36,12 @@ ALTER TABLE ONLY "public"."liquidity_pools"
 ALTER TABLE ONLY "public"."send_liquidity_pools"
     ADD CONSTRAINT "send_liquidity_pools_pkey" PRIMARY KEY ("id");
 
+-- RLS
+ALTER TABLE "public"."liquidity_pools" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Enable read access to authenticated users" ON "public"."liquidity_pools" FOR SELECT TO "authenticated" USING (true);
+
+alter table send_liquidity_pools enable row level security;
+
 -- Grants
 GRANT ALL ON TABLE "public"."liquidity_pools" TO "anon";
 GRANT ALL ON TABLE "public"."liquidity_pools" TO "authenticated";

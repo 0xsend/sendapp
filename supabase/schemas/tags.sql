@@ -10,6 +10,11 @@ CREATE TABLE IF NOT EXISTS "public"."tags" (
     CONSTRAINT "tags_name_check" CHECK (((("length"(("name")::"text") >= 1) AND ("length"(("name")::"text") <= 20)) AND ("name" OPERATOR("public".~) '^[A-Za-z0-9_]+$'::"public"."citext")))
 );
 
+alter table "public"."tags" drop constraint "tags_name_check";
+alter table "public"."tags" add constraint "tags_name_check" CHECK (((length((name)::text) >= 1) AND (length((name)::text) <= 20) AND (name ~ '^[A-Za-z0-9_]+$'::citext))) not valid;
+alter table "public"."tags" validate constraint "tags_name_check";
+
+
 ALTER TABLE "public"."tags" OWNER TO "postgres";
 
 -- Primary Keys and Constraints
@@ -140,10 +145,12 @@ $_$;
 
 ALTER FUNCTION "public"."tags"("public"."profiles") OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "public"."tags_after_insert_or_update_func"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    SET "search_path" TO 'public'
-    AS $$ BEGIN -- Ensure that a user does not exceed the tag limit
+CREATE OR REPLACE FUNCTION public.tags_after_insert_or_update_func()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$ BEGIN -- Ensure that a user does not exceed the tag limit
     IF (
         SELECT COUNT(*)
         FROM public.tags
@@ -157,7 +164,8 @@ RETURN NEW;
 
 END;
 
-$$;
+$function$
+;
 
 ALTER FUNCTION "public"."tags_after_insert_or_update_func"() OWNER TO "postgres";
 
@@ -253,10 +261,12 @@ $_$;
 
 ALTER FUNCTION "public"."tag_search"("query" "text", "limit_val" integer, "offset_val" integer) OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "public"."insert_verification_tag_registration"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    SET "search_path" TO 'public'
-    AS $$
+CREATE OR REPLACE FUNCTION public.insert_verification_tag_registration()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
 declare curr_distribution_id bigint;
 
 begin --
@@ -296,7 +306,8 @@ return NEW;
 
 end;
 
-$$;
+$function$
+;
 
 ALTER FUNCTION "public"."insert_verification_tag_registration"() OWNER TO "postgres";
 

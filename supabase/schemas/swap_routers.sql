@@ -10,6 +10,10 @@ ALTER TABLE "public"."swap_routers" OWNER TO "postgres";
 ALTER TABLE ONLY "public"."swap_routers"
     ADD CONSTRAINT "swap_routers_pkey" PRIMARY KEY ("router_addr", "chain_id");
 
+-- RLS
+ALTER TABLE "public"."swap_routers" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Enable read access to authenticated users" ON "public"."swap_routers" FOR SELECT TO "authenticated" USING (true);
+
 -- Grants
 GRANT ALL ON TABLE "public"."swap_routers" TO "anon";
 GRANT ALL ON TABLE "public"."swap_routers" TO "authenticated";

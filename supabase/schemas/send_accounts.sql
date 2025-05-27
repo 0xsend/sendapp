@@ -42,9 +42,10 @@ GRANT ALL ON TABLE "public"."send_accounts" TO "authenticated";
 GRANT ALL ON TABLE "public"."send_accounts" TO "service_role";
 
 -- Functions
-CREATE OR REPLACE FUNCTION "public"."create_send_account"("send_account" "public"."send_accounts", "webauthn_credential" "public"."webauthn_credentials", "key_slot" integer) RETURNS "json"
-    LANGUAGE "plpgsql"
-    AS $_$
+CREATE OR REPLACE FUNCTION public.create_send_account(send_account send_accounts, webauthn_credential webauthn_credentials, key_slot integer)
+ RETURNS json
+ LANGUAGE plpgsql
+AS $function$
 declare _send_account send_accounts;
 
 _webauthn_credential webauthn_credentials;
@@ -97,7 +98,8 @@ return json_build_object(
 
 end;
 
-$_$;
+$function$
+;
 
 ALTER FUNCTION "public"."create_send_account"("send_account" "public"."send_accounts", "webauthn_credential" "public"."webauthn_credentials", "key_slot" integer) OWNER TO "postgres";
 
@@ -193,10 +195,12 @@ $_$;
 
 ALTER FUNCTION "public"."send_accounts_add_webauthn_credential"("send_account_id" "uuid", "webauthn_credential" "public"."webauthn_credentials", "key_slot" integer) OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "public"."send_accounts_after_insert"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    SET "search_path" TO 'public'
-    AS $$ BEGIN -- Ensure that a user does not exceed the send_accounts limit
+CREATE OR REPLACE FUNCTION public.send_accounts_after_insert()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$ BEGIN -- Ensure that a user does not exceed the send_accounts limit
     IF (
            SELECT COUNT(*)
            FROM public.send_accounts
@@ -209,14 +213,18 @@ CREATE OR REPLACE FUNCTION "public"."send_accounts_after_insert"() RETURNS "trig
 
 END;
 
-$$;
+$function$
+;
+
 
 ALTER FUNCTION "public"."send_accounts_after_insert"() OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "public"."insert_verification_create_passkey"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    SET "search_path" TO 'public'
-    AS $$
+CREATE OR REPLACE FUNCTION public.insert_verification_create_passkey()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
 DECLARE
   curr_distribution_id bigint;
 BEGIN
@@ -254,7 +262,8 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$$;
+$function$
+;
 
 ALTER FUNCTION "public"."insert_verification_create_passkey"() OWNER TO "postgres";
 

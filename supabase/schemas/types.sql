@@ -1,18 +1,16 @@
 -- Custom types used across multiple tables
 
 CREATE TYPE "public"."key_type_enum" AS ENUM (
-    'es256',
-    'p256'
+    'ES256'
 );
 ALTER TYPE "public"."key_type_enum" OWNER TO "postgres";
 
 CREATE TYPE "public"."lookup_type_enum" AS ENUM (
-    'phone',
-    'address',
-    'tag',
     'sendid',
+    'tag',
     'refcode',
-    'id'
+    'address',
+    'phone'
 );
 ALTER TYPE "public"."lookup_type_enum" OWNER TO "postgres";
 

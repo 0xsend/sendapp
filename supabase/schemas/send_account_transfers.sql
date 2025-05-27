@@ -4,9 +4,11 @@
 -- Functions
 
 -- Filter function to ensure transfers only include existing send accounts
-CREATE OR REPLACE FUNCTION "private"."filter_send_account_transfers_with_no_send_account_created"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
+CREATE OR REPLACE FUNCTION private.filter_send_account_transfers_with_no_send_account_created()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
 begin
   if exists ( select 1 from send_account_created where account = new.f )
     or exists ( select 1 from send_account_created where account = new.t )
@@ -16,7 +18,8 @@ begin
     return null;
   end if;
 end;
-$$;
+$function$
+;
 ALTER FUNCTION "private"."filter_send_account_transfers_with_no_send_account_created"() OWNER TO "postgres";
 
 -- Delete temporal activity function
@@ -45,21 +48,27 @@ $$;
 ALTER FUNCTION "public"."send_account_transfers_delete_temporal_activity"() OWNER TO "postgres";
 
 -- Activity trigger functions
-CREATE OR REPLACE FUNCTION "public"."send_account_transfers_trigger_delete_activity"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
+CREATE OR REPLACE FUNCTION public.send_account_transfers_trigger_delete_activity()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
 BEGIN
     DELETE FROM activity
     WHERE event_id = CONCAT(old.ig_name, '/', old.src_name, '/', old.block_num, '/', old.tx_idx, '/', old.log_idx)
         and event_name = 'send_account_transfers';
     RETURN OLD;
 END;
-$$;
+$function$
+;
+
 ALTER FUNCTION "public"."send_account_transfers_trigger_delete_activity"() OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "public"."send_account_transfers_trigger_insert_activity"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
+CREATE OR REPLACE FUNCTION public.send_account_transfers_trigger_insert_activity()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
 DECLARE
     from_user_id uuid;
     to_user_id uuid;
@@ -67,13 +76,13 @@ DECLARE
 BEGIN
     SELECT user_id INTO from_user_id FROM send_accounts WHERE address = concat('0x', encode(new.f, 'hex'))::citext;
     SELECT user_id INTO to_user_id FROM send_accounts WHERE address = concat('0x', encode(new.t, 'hex'))::citext;
-    -- use created_at if tags has confirmed_at, otherwise use block timestamp 
+    -- use created_at if tags has confirmed_at, otherwise use block timestamp
     new_created_at = to_timestamp(new.block_time);
     -- both send accounts have user_id
     IF from_user_id IS NOT NULL AND to_user_id IS NOT NULL THEN
         -- insert activity for both
         INSERT INTO activity (event_name, event_id, from_user_id, to_user_id, data, created_at)
-        VALUES 
+        VALUES
             ('send_account_transfers', new.event_id, from_user_id, to_user_id, to_jsonb(new), new_created_at),
             ('send_account_transfers', new.event_id, to_user_id, from_user_id, to_jsonb(new), new_created_at);
     ELSIF from_user_id IS NOT NULL THEN
@@ -87,7 +96,8 @@ BEGIN
     END IF;
     RETURN NEW;
 END;
-$$;
+$function$
+;
 ALTER FUNCTION "public"."send_account_transfers_trigger_insert_activity"() OWNER TO "postgres";
 
 -- Sequences

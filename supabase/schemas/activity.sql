@@ -76,9 +76,11 @@ CREATE OR REPLACE VIEW "public"."activity_feed" WITH ("security_barrier"='on') A
 ALTER TABLE "public"."activity_feed" OWNER TO "postgres";
 
 -- Functions (that depend on activity_feed view)
-CREATE OR REPLACE FUNCTION "public"."favourite_senders"() RETURNS SETOF "public"."activity_feed_user"
-    LANGUAGE "sql" STABLE
-    AS $$
+CREATE OR REPLACE FUNCTION public.favourite_senders()
+ RETURNS SETOF activity_feed_user
+ LANGUAGE sql
+ STABLE
+AS $function$
     WITH recent_transfers AS (
         SELECT "from_user" AS user, COUNT(*) AS activity_count
         FROM activity_feed
@@ -93,12 +95,15 @@ CREATE OR REPLACE FUNCTION "public"."favourite_senders"() RETURNS SETOF "public"
     )
     SELECT DISTINCT (recent_transfers.user).*
     FROM recent_transfers
-$$;
+$function$
+;
 ALTER FUNCTION "public"."favourite_senders"() OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "public"."recent_senders"() RETURNS SETOF "public"."activity_feed_user"
-    LANGUAGE "sql" STABLE
-    AS $$
+CREATE OR REPLACE FUNCTION public.recent_senders()
+ RETURNS SETOF activity_feed_user
+ LANGUAGE sql
+ STABLE
+AS $function$
     WITH recent_transfers AS (
         SELECT "from_user" AS user, MAX(created_at) AS last_transfer_date
         FROM activity_feed
@@ -112,13 +117,17 @@ CREATE OR REPLACE FUNCTION "public"."recent_senders"() RETURNS SETOF "public"."a
     )
     SELECT DISTINCT (recent_transfers.user).*
     FROM recent_transfers
-$$;
+$function$
+;
+
 ALTER FUNCTION "public"."recent_senders"() OWNER TO "postgres";
 
 -- Functions (that depend on activity table directly)
-CREATE OR REPLACE FUNCTION "public"."today_birthday_senders"() RETURNS SETOF "public"."activity_feed_user"
-    LANGUAGE "sql" STABLE
-    AS $$
+CREATE OR REPLACE FUNCTION public.today_birthday_senders()
+ RETURNS SETOF activity_feed_user
+ LANGUAGE sql
+ STABLE
+AS $function$
    WITH unique_senders AS (
        SELECT DISTINCT from_user_id
        FROM activity
@@ -142,12 +151,14 @@ CREATE OR REPLACE FUNCTION "public"."today_birthday_senders"() RETURNS SETOF "pu
    INNER JOIN unique_senders ON profiles.id = unique_senders.from_user_id
    WHERE EXTRACT(MONTH FROM profiles.birthday) = EXTRACT(MONTH FROM CURRENT_DATE)
      AND EXTRACT(DAY FROM profiles.birthday) = EXTRACT(DAY FROM CURRENT_DATE)
-$$;
+$function$
+;
 ALTER FUNCTION "public"."today_birthday_senders"() OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "public"."update_transfer_activity_before_insert"() RETURNS "trigger"
-    LANGUAGE "plpgsql"
-    AS $$
+CREATE OR REPLACE FUNCTION public.update_transfer_activity_before_insert()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
 DECLARE
     tmp_data jsonb;
     note_id uuid;
@@ -177,14 +188,16 @@ BEGIN
     -- Return the modified row
     RETURN NEW;
 END;
-$$;
+$function$
+;
+
 ALTER FUNCTION "public"."update_transfer_activity_before_insert"() OWNER TO "postgres";
 
 -- Triggers
 CREATE OR REPLACE TRIGGER "temporal_send_account_transfers_trigger_update_transfer_activit" BEFORE INSERT ON "public"."activity" FOR EACH ROW EXECUTE FUNCTION "public"."update_transfer_activity_before_insert"();
 
 -- RLS
--- Note: RLS is not enabled on the activity table
+alter table activity enable row level security;
 
 -- Grants
 GRANT ALL ON TABLE "public"."activity" TO "anon";

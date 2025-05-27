@@ -11,9 +11,9 @@ ALTER TABLE "public"."challenges_id_seq" OWNER TO "postgres";
 -- Table
 CREATE TABLE IF NOT EXISTS "public"."challenges" (
     "id" integer NOT NULL,
+    "challenge" "bytea" DEFAULT "extensions"."gen_random_bytes"(64) NOT NULL,
     "created_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    "expires_at" timestamp with time zone NOT NULL,
-    "verified_at" timestamp with time zone
+    "expires_at" timestamp with time zone DEFAULT (CURRENT_TIMESTAMP + '00:15:00'::interval) NOT NULL
 );
 ALTER TABLE "public"."challenges" OWNER TO "postgres";
 
@@ -25,10 +25,14 @@ ALTER TABLE ONLY "public"."challenges" ALTER COLUMN "id" SET DEFAULT "nextval"('
 ALTER TABLE ONLY "public"."challenges"
     ADD CONSTRAINT "challenges_pkey" PRIMARY KEY ("id");
 
+ALTER TABLE ONLY "public"."challenges"
+    ADD CONSTRAINT "challenges_challenge_key" UNIQUE ("challenge");
+
 -- Functions
-CREATE OR REPLACE FUNCTION "public"."insert_challenge"() RETURNS "public"."challenges"
-    LANGUAGE "plpgsql"
-    AS $$
+CREATE OR REPLACE FUNCTION public.insert_challenge()
+ RETURNS challenges
+ LANGUAGE plpgsql
+AS $function$
     #variable_conflict use_column
     declare
             _created timestamptz := current_timestamp;
@@ -42,7 +46,8 @@ CREATE OR REPLACE FUNCTION "public"."insert_challenge"() RETURNS "public"."chall
 
         return _new_challenge;
     end
-$$;
+$function$
+;
 
 ALTER FUNCTION "public"."insert_challenge"() OWNER TO "postgres";
 
@@ -56,7 +61,7 @@ ALTER FUNCTION "public"."insert_challenge"() OWNER TO "postgres";
 -- No triggers
 
 -- RLS
--- RLS is not enabled
+alter table "public"."challenges" enable row level security;
 
 -- Grants
 GRANT ALL ON TABLE "public"."challenges" TO "anon";

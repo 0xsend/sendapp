@@ -42,6 +42,10 @@ CREATE INDEX "idx_sendpot_jackpot_runs_block_num" ON "public"."sendpot_jackpot_r
 CREATE INDEX "sendpot_jackpot_runs_winner" ON "public"."sendpot_jackpot_runs" USING "btree" ("winner");
 CREATE UNIQUE INDEX "u_sendpot_jackpot_runs" ON "public"."sendpot_jackpot_runs" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
 
+-- RLS
+ALTER TABLE "public"."sendpot_jackpot_runs" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "authenticated can read jackpot runs" ON "public"."sendpot_jackpot_runs" FOR SELECT TO "authenticated" USING (true);
+
 -- Grants
 GRANT ALL ON TABLE "public"."sendpot_jackpot_runs" TO "anon";
 GRANT ALL ON TABLE "public"."sendpot_jackpot_runs" TO "authenticated";
@@ -50,3 +54,45 @@ GRANT ALL ON TABLE "public"."sendpot_jackpot_runs" TO "service_role";
 GRANT ALL ON SEQUENCE "public"."sendpot_jackpot_runs_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."sendpot_jackpot_runs_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."sendpot_jackpot_runs_id_seq" TO "service_role";
+
+-- Functions
+CREATE OR REPLACE FUNCTION "public"."get_user_jackpot_summary"("num_runs" integer) RETURNS TABLE("jackpot_run_id" integer, "jackpot_block_num" numeric, "jackpot_block_time" numeric, "winner" "bytea", "win_amount" numeric, "total_tickets" numeric)
+    LANGUAGE "sql"
+    AS $$
+WITH cte AS (
+  SELECT
+    r.id AS jackpot_run_id,
+    r.block_num AS jackpot_block_num,
+    r.block_time AS jackpot_block_time,
+    r.winner,
+    r.win_amount,
+    -- "prev_block_num" is the block_num of the previous jackpot (or 0 if none)
+    COALESCE(
+      LAG(r.block_num) OVER (ORDER BY r.block_num ASC),
+      0
+    ) AS prev_block_num
+  FROM public.sendpot_jackpot_runs r
+)
+SELECT
+  c.jackpot_run_id,
+  c.jackpot_block_num,
+  c.jackpot_block_time,
+  c.winner,
+  c.win_amount,
+  (
+    SELECT COALESCE(SUM(utp.tickets_purchased_total_bps), 0)
+    FROM public.sendpot_user_ticket_purchases utp
+    WHERE utp.block_num >= c.prev_block_num
+      AND utp.block_num < c.jackpot_block_num
+  ) AS total_tickets
+FROM cte c
+ORDER BY c.jackpot_block_num DESC
+LIMIT num_runs;
+$$;
+
+ALTER FUNCTION "public"."get_user_jackpot_summary"("num_runs" integer) OWNER TO "postgres";
+
+REVOKE ALL ON FUNCTION "public"."get_user_jackpot_summary"("num_runs" integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."get_user_jackpot_summary"("num_runs" integer) TO "anon";
+GRANT ALL ON FUNCTION "public"."get_user_jackpot_summary"("num_runs" integer) TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_user_jackpot_summary"("num_runs" integer) TO "service_role";

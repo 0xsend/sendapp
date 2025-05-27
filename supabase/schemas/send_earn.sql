@@ -130,9 +130,12 @@ ALTER TABLE "public"."send_earn_withdraw" ALTER COLUMN "id" ADD GENERATED ALWAYS
     NO MAXVALUE
     CACHE 1
 );-- Functions
-CREATE OR REPLACE FUNCTION "private"."aaa_filter_send_earn_deposit_with_no_send_account_created"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
+
+CREATE OR REPLACE FUNCTION private.aaa_filter_send_earn_deposit_with_no_send_account_created()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
 begin
   if exists ( select 1 from send_account_created where account = new.owner )
   then
@@ -141,13 +144,17 @@ begin
     return null;
   end if;
 end;
-$$;
+$function$
+;
 
 ALTER FUNCTION "private"."aaa_filter_send_earn_deposit_with_no_send_account_created"() OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "private"."filter_send_earn_withdraw_with_no_send_account_created"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
+
+CREATE OR REPLACE FUNCTION private.filter_send_earn_withdraw_with_no_send_account_created()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
 begin
   if exists ( select 1 from send_account_created where account = new.owner )
   then
@@ -156,7 +163,8 @@ begin
     return null;
   end if;
 end;
-$$;
+$function$
+;
 
 ALTER FUNCTION "private"."filter_send_earn_withdraw_with_no_send_account_created"() OWNER TO "postgres";
 

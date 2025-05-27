@@ -39,6 +39,12 @@ CREATE TABLE IF NOT EXISTS "shovel"."sources" (
 );
 ALTER TABLE "shovel"."sources" OWNER TO "postgres";
 
+-- Indexes
+CREATE UNIQUE INDEX "intg_name_src_name_backfill_num_idx" ON "shovel"."ig_updates" USING "btree" ("name", "src_name", "backfill", "num" DESC);
+CREATE UNIQUE INDEX "sources_name_chain_id_idx" ON "shovel"."sources" USING "btree" ("name", "chain_id");
+CREATE UNIQUE INDEX "sources_name_idx" ON "shovel"."sources" USING "btree" ("name");
+CREATE UNIQUE INDEX "task_src_name_num_idx" ON "shovel"."task_updates" USING "btree" ("ig_name", "src_name", "num" DESC);
+
 -- Views
 CREATE OR REPLACE VIEW "shovel"."latest" AS
  WITH "abs_latest" AS (

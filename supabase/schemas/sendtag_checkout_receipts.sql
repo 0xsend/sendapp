@@ -48,6 +48,7 @@ CREATE UNIQUE INDEX "u_sendtag_checkout_receipts" ON "public"."sendtag_checkout_
 CREATE OR REPLACE TRIGGER "update_leaderboard_referrals_all_time_sendtag_checkout_receipts" AFTER INSERT ON "public"."sendtag_checkout_receipts" FOR EACH ROW EXECUTE FUNCTION "private"."update_leaderboard_referrals_all_time_sendtag_checkout_receipts"();
 
 -- RLS
+ALTER TABLE "public"."sendtag_checkout_receipts" ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "users can see their own sendtag_checkout_receipts" ON "public"."sendtag_checkout_receipts" FOR SELECT USING ((("lower"("concat"('0x', "encode"("sender", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY ( SELECT "send_accounts"."address"
    FROM "public"."send_accounts"
   WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid")))));

@@ -137,9 +137,6 @@ ALTER TABLE ONLY "public"."distributions"
 ALTER TABLE ONLY "public"."distributions"
     ADD CONSTRAINT "distributions_tranche_id_key" UNIQUE ("merkle_drop_addr", "tranche_id");
 
-ALTER TABLE ONLY "public"."distribution_shares"
-    ADD CONSTRAINT "distribution_shares_pkey" PRIMARY KEY ("id");
-
 ALTER TABLE ONLY "public"."distribution_verifications"
     ADD CONSTRAINT "distribution_verifications_pkey" PRIMARY KEY ("id");
 
@@ -914,77 +911,69 @@ $_$;
 
 ALTER FUNCTION "public"."update_distribution_shares"("distribution_id" integer, "shares" "public"."distribution_shares"[]) OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "public"."update_referral_verifications"("distribution_id" integer, "shares" "public"."distribution_shares"[]) RETURNS "void"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    SET "search_path" TO 'public'
-    AS $_$
+CREATE OR REPLACE FUNCTION public.update_referral_verifications(
+    distribution_id INTEGER,
+    shares distribution_shares[]
+)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $function$
 BEGIN
-    -- Create temporary table for shares to avoid repeated unnesting - O(x)
+    -- Create temp table for shares lookup
     CREATE TEMPORARY TABLE temp_shares ON COMMIT DROP AS
     SELECT DISTINCT user_id
-    FROM unnest(shares) ds
-    WHERE ds.distribution_id = $1;
+    FROM unnest(shares) ds;
 
-    -- Create index for better join performance - O(x log(x))
-    CREATE INDEX ON temp_shares(user_id);
+    -- Update tag_referral weights - just check if in shares
+    UPDATE distribution_verifications dv
+    SET weight = CASE
+        WHEN ts.user_id IS NOT NULL THEN 1
+        ELSE 0
+    END
+    FROM referrals r
+    LEFT JOIN temp_shares ts ON ts.user_id = r.referred_id
+    WHERE dv.distribution_id = $1
+    AND dv.type = 'tag_referral'
+    AND dv.user_id = r.referrer_id
+    AND (dv.metadata->>'referred_id')::uuid = r.referred_id;
 
-    -- Create temporary table for referrers and their counts - O(x log(y))
-    CREATE TEMPORARY TABLE temp_referrers ON COMMIT DROP AS
+    -- Insert total_tag_referrals if doesn't exist
+    INSERT INTO distribution_verifications (distribution_id, user_id, type, weight)
     SELECT
+        $1,
         r.referrer_id,
-        COUNT(ts.user_id) as referral_count
-    FROM temp_shares ts
-    JOIN referrals r ON r.referred_id = ts.user_id
+        'total_tag_referrals',
+        COUNT(ts.user_id)
+    FROM referrals r
+    JOIN temp_shares ts ON ts.user_id = r.referred_id
+    WHERE NOT EXISTS (
+        SELECT 1 FROM distribution_verifications dv
+        WHERE dv.distribution_id = $1
+        AND dv.type = 'total_tag_referrals'
+        AND dv.user_id = r.referrer_id
+    )
     GROUP BY r.referrer_id;
 
-    -- Single operation combining both updates and inserts - O(x log(y))
-    INSERT INTO public.distribution_verifications (
-        distribution_id,
-        user_id,
-        type,
-        weight
-    )
-    SELECT
-        $1,
-        tr.referrer_id,
-        'tag_referral'::verification_type,
-        1
-    FROM temp_referrers tr
-    WHERE NOT EXISTS (
-        SELECT 1
-        FROM distribution_verifications dv
-        WHERE dv.distribution_id = $1
-        AND dv.user_id = tr.referrer_id
-        AND dv.type = 'tag_referral'
-    )
-    UNION ALL
-    SELECT
-        $1,
-        tr.referrer_id,
-        'total_tag_referrals'::verification_type,
-        tr.referral_count
-    FROM temp_referrers tr
-    WHERE NOT EXISTS (
-        SELECT 1
-        FROM distribution_verifications dv
-        WHERE dv.distribution_id = $1
-        AND dv.user_id = tr.referrer_id
-        AND dv.type = 'total_tag_referrals'
-    );
-
-    -- Update existing verifications - O(x log(y))
+    -- Update existing total_tag_referrals
     UPDATE distribution_verifications dv
-    SET weight = tr.referral_count
-    FROM temp_referrers tr
+    SET weight = rc.referral_count
+    FROM (
+        SELECT
+            r.referrer_id,
+            COUNT(ts.user_id) as referral_count
+        FROM referrals r
+        JOIN temp_shares ts ON ts.user_id = r.referred_id
+        GROUP BY r.referrer_id
+    ) rc
     WHERE dv.distribution_id = $1
-    AND dv.user_id = tr.referrer_id
-    AND dv.type = 'total_tag_referrals';
+    AND dv.type = 'total_tag_referrals'
+    AND dv.user_id = rc.referrer_id;
 
-    -- Cleanup
     DROP TABLE temp_shares;
-    DROP TABLE temp_referrers;
 END;
-$_$;
+$function$;
 
 ALTER FUNCTION "public"."update_referral_verifications"("distribution_id" integer, "shares" "public"."distribution_shares"[]) OWNER TO "postgres";
 
@@ -1020,6 +1009,28 @@ GRANT ALL ON TABLE "public"."distribution_verification_values" TO "service_role"
 GRANT ALL ON TABLE "public"."send_slash" TO "anon";
 GRANT ALL ON TABLE "public"."send_slash" TO "authenticated";
 GRANT ALL ON TABLE "public"."send_slash" TO "service_role";
+
+-- RLS Policies
+-- distributions table
+ALTER TABLE ONLY "public"."distributions" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Enable read access to public" ON "public"."distribution_verification_values" FOR SELECT TO "authenticated" USING (true);
+CREATE POLICY "Enable read access to public" ON "public"."distributions" FOR SELECT TO "authenticated" USING (true);
+
+-- distribution_shares table
+ALTER TABLE ONLY "public"."distribution_shares" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "User can see own shares" ON "public"."distribution_shares" FOR SELECT USING (("user_id" = "auth"."uid"()));
+
+-- distribution_verifications table
+ALTER TABLE ONLY "public"."distribution_verifications" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can see their own distribution verifications" ON "public"."distribution_verifications" FOR SELECT USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
+
+-- distribution_verification_values table
+ALTER TABLE ONLY "public"."distribution_verification_values" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Authenticated users can see distribution_verification_values" ON "public"."distribution_verification_values" FOR SELECT USING ((( SELECT "auth"."uid"() AS "uid") IS NOT NULL));
+
+-- send_slash table
+ALTER TABLE ONLY "public"."send_slash" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Enable read access for all users" ON "public"."send_slash" FOR SELECT USING (true);
 
 -- Function grants
 REVOKE ALL ON FUNCTION "public"."calculate_and_insert_send_ceiling_verification"("distribution_number" integer) FROM PUBLIC;
@@ -1303,3 +1314,177 @@ ALTER FUNCTION "public"."insert_verification_sends"() OWNER TO "postgres";
 GRANT ALL ON FUNCTION "public"."insert_verification_sends"() TO "anon";
 GRANT ALL ON FUNCTION "public"."insert_verification_sends"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."insert_verification_sends"() TO "service_role";
+
+CREATE OR REPLACE FUNCTION "public"."insert_verification_send_ceiling"() RETURNS "trigger"
+    LANGUAGE "plpgsql"
+    AS $$
+DECLARE
+  _user_id uuid;
+  _recipient_address citext;
+  _distribution_id integer;
+  _distribution_number integer;
+  _send_ceiling numeric;
+  _verification_record record;
+BEGIN
+  -- Get the sender's user_id
+  SELECT send_accounts.user_id INTO _user_id
+  FROM send_accounts
+  WHERE address = concat('0x', encode(NEW.f, 'hex'))::citext;
+
+  -- Get recipient address
+  _recipient_address := concat('0x', encode(NEW.t, 'hex'))::citext;
+
+  -- Validate transaction value
+  IF NEW.v <= 0 THEN
+    RETURN NEW; -- Skip processing for zero or negative values
+  END IF;
+
+  -- Get the active distribution id and number
+  SELECT d.id, d.number
+  INTO _distribution_id, _distribution_number
+  FROM distributions d
+  WHERE extract(epoch FROM d.qualification_start) <= NEW.block_time
+    AND extract(epoch FROM d.qualification_end) > NEW.block_time;
+
+  -- If we found matching distribution and user
+  IF _user_id IS NOT NULL AND _distribution_id IS NOT NULL THEN
+    -- Try to update existing verification first
+    UPDATE distribution_verifications dv
+    SET
+      metadata = CASE
+        WHEN NOT (_recipient_address = ANY(
+          ARRAY(SELECT jsonb_array_elements_text(metadata -> 'sent_to'))::citext[]
+        )) THEN
+          jsonb_build_object(
+            'value', (metadata ->> 'value'),
+            'sent_to', metadata -> 'sent_to' || jsonb_build_array(_recipient_address)
+          )
+        ELSE metadata
+      END,
+      weight = weight + CASE
+        WHEN NOT (_recipient_address = ANY(
+          ARRAY(SELECT jsonb_array_elements_text(metadata -> 'sent_to'))::citext[]
+        )) THEN
+          LEAST(NEW.v, (metadata ->> 'value')::numeric)
+        ELSE 0
+      END
+    WHERE dv.user_id = _user_id
+      AND distribution_id = _distribution_id
+      AND type = 'send_ceiling'
+    RETURNING metadata ->> 'value' INTO _send_ceiling;
+
+    -- If no row was updated, create new verification
+    IF NOT FOUND THEN
+      -- Calculate send ceiling for new verification
+      WITH send_settings AS (
+        SELECT minimum_sends * scaling_divisor AS divider
+        FROM send_slash s_s
+        JOIN distributions d ON d.id = s_s.distribution_id
+        WHERE d.number = _distribution_number
+      ),
+      previous_distribution AS (
+        SELECT ds.user_id,
+          ds.amount AS user_prev_shares
+        FROM distribution_shares ds
+        WHERE ds.distribution_id = (
+          SELECT id
+          FROM distributions
+          WHERE number = _distribution_number - 1
+        )
+        AND ds.user_id = _user_id
+      ),
+      distribution_info AS (
+        SELECT hodler_min_balance
+        FROM distributions
+        WHERE id = _distribution_id
+      )
+      SELECT ROUND(COALESCE(pd.user_prev_shares, di.hodler_min_balance) / NULLIF(ss.divider, 0))::numeric
+      INTO _send_ceiling
+      FROM distribution_info di
+      CROSS JOIN send_settings ss
+      LEFT JOIN previous_distribution pd ON pd.user_id = _user_id;
+
+      -- Handle NULL or zero divider case
+      IF _send_ceiling IS NULL OR _send_ceiling < 0 THEN
+        RAISE NOTICE 'Invalid send ceiling calculation result: %', _send_ceiling;
+        _send_ceiling := 0; -- Default fallback
+      END IF;
+
+      -- Create new verification
+      INSERT INTO distribution_verifications(
+        distribution_id,
+        user_id,
+        type,
+        weight,
+        metadata
+      )
+      VALUES (
+        _distribution_id,
+        _user_id,
+        'send_ceiling',
+        LEAST(NEW.v, _send_ceiling),
+        jsonb_build_object(
+          'value', _send_ceiling::text,
+          'sent_to', jsonb_build_array(_recipient_address)
+        )
+      );
+    END IF;
+  END IF;
+  RETURN NEW;
+EXCEPTION
+  WHEN OTHERS THEN
+    RAISE NOTICE 'Error in insert_verification_send_ceiling: %', SQLERRM;
+    RETURN NEW; -- Continue processing even if this trigger fails
+END;
+$$;
+
+ALTER FUNCTION "public"."insert_verification_send_ceiling"() OWNER TO "postgres";
+
+REVOKE ALL ON FUNCTION "public"."insert_verification_send_ceiling"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."insert_verification_send_ceiling"() TO "anon";
+GRANT ALL ON FUNCTION "public"."insert_verification_send_ceiling"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."insert_verification_send_ceiling"() TO "service_role";
+
+CREATE OR REPLACE FUNCTION "public"."get_recent_senders"() RETURNS TABLE("account_id" bigint, "name" "text", "avatar_url" "text", "address" "public"."citext", "send_id" bigint, "tag" "public"."citext")
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO 'public'
+    AS $$
+DECLARE
+  user_profile profiles;
+BEGIN
+  -- Get the current user's profile
+  SELECT * INTO user_profile FROM profiles WHERE id = auth.uid();
+
+  RETURN QUERY
+  WITH recent_transfers AS (
+    SELECT DISTINCT f, block_time
+    FROM send_account_transfers
+    WHERE t = decode(substring(user_profile.address, 3), 'hex')
+      AND f != decode(substring(user_profile.address, 3), 'hex')
+    ORDER BY block_time DESC
+    LIMIT 100
+  ),
+  sender_profiles AS (
+    SELECT DISTINCT ON (sa.address)
+      sa.id AS account_id,
+      p.name,
+      p.avatar_url,
+      sa.address,
+      p.send_id,
+      t.name AS tag
+    FROM recent_transfers rt
+    JOIN send_accounts sa ON sa.address = concat('0x', encode(rt.f, 'hex'))::citext
+    JOIN profiles p ON p.id = sa.user_id
+    LEFT JOIN tags t ON t.user_id = p.id AND t.status = 'confirmed'
+    WHERE sa.user_id != auth.uid()
+    ORDER BY sa.address, rt.block_time DESC
+  )
+  SELECT sp.*
+  FROM sender_profiles sp
+  LIMIT 50;
+END;
+$$;
+ALTER FUNCTION "public"."get_recent_senders"() OWNER TO "postgres";
+REVOKE ALL ON FUNCTION "public"."get_recent_senders"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."get_recent_senders"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_recent_senders"() TO "service_role";

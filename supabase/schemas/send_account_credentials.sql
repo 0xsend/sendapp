@@ -32,6 +32,9 @@ CREATE POLICY "insert_own_account_credentials" ON "public"."send_account_credent
 CREATE POLICY "delete_own_account_credentials" ON "public"."send_account_credentials" FOR DELETE TO "authenticated" USING (("auth"."uid"() = ( SELECT "send_accounts"."user_id"
    FROM "public"."send_accounts"
   WHERE ("send_accounts"."id" = "send_account_credentials"."account_id"))));
+CREATE POLICY "update_own_account_credentials" ON "public"."send_account_credentials" FOR UPDATE TO "authenticated" USING ((( SELECT "auth"."uid"() AS "uid") = ( SELECT "send_accounts"."user_id"
+   FROM "public"."send_accounts"
+  WHERE ("send_accounts"."id" = "send_account_credentials"."account_id"))));
 
 -- Grants
 GRANT ALL ON TABLE "public"."send_account_credentials" TO "anon";
