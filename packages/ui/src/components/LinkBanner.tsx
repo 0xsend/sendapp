@@ -1,4 +1,4 @@
-import { Card, type CardProps, H1, Paragraph, XStack, YStack } from 'tamagui'
+import { Card, type CardProps, H1, Paragraph, XStack, YStack, Image } from 'tamagui'
 import { Fade } from './Fade'
 import { LinearGradient } from '@tamagui/linear-gradient'
 import { ArrowRight } from '@tamagui/lucide-icons'
@@ -11,13 +11,7 @@ export type LinkBannerProps = {
   subtitle?: string
 } & CardProps
 
-export const LinkBanner = ({
-  href,
-  imgUrl,
-  subtitle,
-  title,
-  backgroundPosition,
-}: LinkBannerProps) => {
+export const LinkBanner = ({ href, imgUrl, subtitle, title }: LinkBannerProps) => {
   return (
     <Fade>
       <Link href={href}>
@@ -27,13 +21,12 @@ export const LinkBanner = ({
           p={'$5'}
           jc={'flex-end'}
           $gtLg={{ p: '$7' }}
-          backgroundImage={imgUrl}
-          backgroundPosition={backgroundPosition || 'center'}
-          backgroundRepeat={'no-repeat'}
-          backgroundSize={'cover'}
           overflow={'hidden'}
           $gtSm={{ h: 300 }}
         >
+          <Card.Background>
+            <Image src={imgUrl} alt={title} objectFit="cover" width="100%" height="100%" />
+          </Card.Background>
           <LinearGradient
             start={[0, 0]}
             end={[0, 1]}
