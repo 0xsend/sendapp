@@ -23,7 +23,7 @@ import { IconBirthday, IconXLogo } from 'app/components/icons'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { adjustUTCDateForTimezone } from 'app/utils/dateHelper'
 import { useReferrer } from 'app/utils/useReferrer'
-import { useFriends } from 'app/features/affiliate/utils/useFriends'
+import { useFriendsFeed } from 'app/features/affiliate/utils/useFriendsFeed'
 import { ReferralLink } from 'app/components/ReferralLink'
 
 type Referral = Pick<
@@ -35,7 +35,7 @@ export const FriendsScreen = () => {
   const media = useMedia()
   const { isAtEnd } = useScrollDirection()
   const [layoutSize, setLayoutSize] = useState<Dimension>({ width: 0, height: 0 })
-  const friendsFeedQuery = useFriends({
+  const friendsFeedQuery = useFriendsFeed({
     pageSize: 10,
   })
   const { data, isLoading, error, isFetchingNextPage, fetchNextPage, hasNextPage } =
