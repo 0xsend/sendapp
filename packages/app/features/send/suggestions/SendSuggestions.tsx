@@ -25,7 +25,7 @@ export const SendSuggestions = ({
       />
       <SuggestionsList
         query={favouriteSendersQuery}
-        title={'Favourite Senders'}
+        title={'Favorite Senders'}
         fallback={'No favourite senders, send it.'}
       />
       <SuggestionsList
