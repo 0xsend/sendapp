@@ -12,19 +12,19 @@ export const ExploreScreen = () => {
     >
       <LinkBanner
         href={'/explore/rewards'}
-        imgUrl={'url(https://ghassets.send.app/app_images/explore_rewards.jpg)'}
+        imgUrl={'https://ghassets.send.app/app_images/explore_rewards.jpg'}
         title={'Get Rewarded'}
         subtitle={'Earn SEND while engaging, referring, and growing the network'}
       />
       <LinkBanner
         href={'/sendpot'}
-        imgUrl={'url(https://ghassets.send.app/app_images/sendpot.jpg)'}
+        imgUrl={'https://ghassets.send.app/app_images/sendpot.jpg'}
         title={'SENDPOT'}
         subtitle={'Challenge your luck, win big prizes'}
       />
       <LinkBanner
         href={'/feed'}
-        imgUrl={'url(https://ghassets.send.app/app_images/feed.jpg)'}
+        imgUrl={'https://ghassets.send.app/app_images/feed.jpg'}
         title={'Community Feed'}
       />
     </YStack>
