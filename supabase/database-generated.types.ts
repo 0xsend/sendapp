@@ -1518,6 +1518,24 @@ export type Database = {
         }
         Relationships: []
       }
+      dashboard_metrics: {
+        Row: {
+          daily_active_receivers: number | null
+          daily_active_senders: number | null
+          daily_active_transfers: number | null
+          new_affiliates: Json | null
+          new_sendtags: Json | null
+          passkeys: number | null
+          send_volume: number | null
+          sendtag_referral_payouts: number | null
+          sendtag_revenue: number | null
+          sendtags: number | null
+          top_all_ips: Json | null
+          total_transactions: number | null
+          usdc_volume: number | null
+        }
+        Relationships: []
+      }
       referrer: {
         Row: {
           about: string | null
@@ -1658,6 +1676,17 @@ export type Database = {
       get_pending_jackpot_tickets_purchased: {
         Args: Record<PropertyKey, never>
         Returns: number
+      }
+      get_recent_senders: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          account_id: number
+          name: string
+          avatar_url: string
+          address: string
+          send_id: number
+          tag: string
+        }[]
       }
       get_user_jackpot_summary: {
         Args: { num_runs: number }
@@ -1878,6 +1907,10 @@ export type Database = {
       user_referrals_count: {
         Args: Record<PropertyKey, never>
         Returns: number
+      }
+      xd: {
+        Args: Record<PropertyKey, never>
+        Returns: Database["public"]["CompositeTypes"]["activity_feed_user"][]
       }
     }
     Enums: {
