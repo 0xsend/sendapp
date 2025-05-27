@@ -10,43 +10,36 @@ import type {
 export const SendSuggestions = ({
   recentSendersQuery,
   favouriteSendersQuery,
+  topSendersQuery,
   todayBirthdaySendersQuery,
 }: {
   recentSendersQuery: SendSuggestionsQueryResult
   favouriteSendersQuery: SendSuggestionsQueryResult
+  topSendersQuery: SendSuggestionsQueryResult
   todayBirthdaySendersQuery: SendSuggestionsQueryResult
 }) => {
   return (
     <>
-      <SuggestionsList
-        query={recentSendersQuery}
-        title={'Recent Activity'}
-        fallback={'Recent activity is empty, send it.'}
-      />
-      <SuggestionsList
-        query={favouriteSendersQuery}
-        title={'Favorite Senders'}
-        fallback={'No favourite senders, send it.'}
-      />
-      <SuggestionsList
-        query={todayBirthdaySendersQuery}
-        title={'Wish Them Happy Birthday'}
-        fallback={'No birthdays today, invite your friends to celebrate with them.'}
-      />
+      <SuggestionsList query={recentSendersQuery} title={'Recent Activity'} />
+      <SuggestionsList query={favouriteSendersQuery} title={'Favorite Senders'} />
+      <SuggestionsList query={topSendersQuery} title={'Top Senders'} />
+      <SuggestionsList query={todayBirthdaySendersQuery} title={'Wish Them Happy Birthday'} />
     </>
   )
 }
 
 const SuggestionsList = ({
   query,
-  fallback,
   title,
 }: {
   query: SendSuggestionsQueryResult
   title: string
-  fallback: string
 }) => {
   const { error, data } = query
+
+  if (!data || data.length === 0) {
+    return null
+  }
 
   return (
     <YStack gap={'$3.5'}>
@@ -57,15 +50,6 @@ const SuggestionsList = ({
             return (
               <Paragraph color={'$error'}>
                 {error.message?.split('.')[0] ?? 'Unknown error'}
-              </Paragraph>
-            )
-          case !data || data.length === 0:
-            return (
-              <Paragraph
-                color={'$lightGrayTextField'}
-                $theme-light={{ color: '$darkGrayTextField' }}
-              >
-                {fallback}
               </Paragraph>
             )
           default:

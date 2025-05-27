@@ -30,6 +30,7 @@ import { useRecentSenders } from 'app/features/send/suggestions/useRecentSenders
 import { SendSuggestions } from 'app/features/send/suggestions/SendSuggestions'
 import { useFavouriteSenders } from 'app/features/send/suggestions/useFavouriteSenders'
 import { useTodayBirthdaySenders } from 'app/features/send/suggestions/useTodayBirthdaySenders'
+import { useTopSenders } from 'app/features/send/suggestions/useTopSenders'
 
 export const SendScreen = () => {
   const [{ recipient, idType }] = useSendScreenParams()
@@ -40,6 +41,7 @@ export const SendScreen = () => {
   } = useProfileLookup(idType ?? 'tag', recipient ?? '')
   const recentSendersQuery = useRecentSenders()
   const favouriteSendersQuery = useFavouriteSenders()
+  const topSendersQuery = useTopSenders()
   const todayBirthdaySendersQuery = useTodayBirthdaySenders()
   const [{ search }] = useRootScreenParams()
 
@@ -47,6 +49,7 @@ export const SendScreen = () => {
     isLoadingProfileLookup ||
     recentSendersQuery.isLoading ||
     favouriteSendersQuery.isLoading ||
+    topSendersQuery.isLoading ||
     todayBirthdaySendersQuery.isLoading
 
   if (isLoading) return <Spinner size="large" color={'$color12'} />
@@ -69,6 +72,7 @@ export const SendScreen = () => {
               recentSendersQuery={recentSendersQuery}
               favouriteSendersQuery={favouriteSendersQuery}
               todayBirthdaySendersQuery={todayBirthdaySendersQuery}
+              topSendersQuery={topSendersQuery}
             />
           )}
           <SendSearchBody />
