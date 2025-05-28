@@ -1,7 +1,6 @@
 import {
   Card,
   type CardProps,
-  H1,
   Paragraph,
   Spinner,
   Theme,
@@ -9,6 +8,7 @@ import {
   useMedia,
   XStack,
   type XStackProps,
+  YStack,
 } from '@my/ui'
 import formatAmount from 'app/utils/formatAmount'
 
@@ -25,6 +25,7 @@ import { useMemo } from 'react'
 import { IconCoin, IconError } from 'app/components/icons'
 import { useCoins } from 'app/provider/coins'
 import { investmentCoins as investmentCoinsList } from 'app/data/coins'
+import { HomeBodyCard } from './screen'
 
 export const InvestmentsBalanceCard = (props: CardProps) => {
   const media = useMedia()
@@ -52,16 +53,7 @@ export const InvestmentsBalanceCard = (props: CardProps) => {
   const formattedBalance = formatAmount(dollarTotal, 9, 0)
 
   return (
-    <Card
-      elevation={'$0.75'}
-      hoverStyle={{ scale: 0.925 }}
-      pressStyle={{ scale: 0.875 }}
-      animation="bouncy"
-      onPress={toggleSubScreen}
-      size={'$5'}
-      br="$7"
-      {...props}
-    >
+    <HomeBodyCard onPress={toggleSubScreen} {...props}>
       <Card.Header padded pb={0} fd="row" ai="center" jc="space-between">
         <Paragraph fontSize={'$5'} fontWeight="400">
           Invest
@@ -81,31 +73,26 @@ export const InvestmentsBalanceCard = (props: CardProps) => {
           />
         )}
       </Card.Header>
-      <Card.Footer padded pt={0} fd="column">
-        {isInvestmentsScreen && !media.gtLg ? (
-          <>
-            <Paragraph color={'$color12'} fontWeight={500} size={'$10'}>
-              {(() => {
-                switch (true) {
-                  case isPriceHidden:
-                    return '///////'
-                  case isLoading || !dollarBalances:
-                    return <Spinner size={'large'} color={'$color12'} />
-                  default:
-                    return `$${formattedBalance}`
-                }
-              })()}
-            </Paragraph>
-            <InvestmentsAggregate />
-          </>
-        ) : (
-          <>
-            <InvestmentsPreview />
-            <InvestmentsAggregate />
-          </>
-        )}
+      <Card.Footer padded pt={0} jc="space-between" ai="center">
+        <YStack jc="space-between">
+          <Paragraph color={'$color12'} fontWeight={500} size={'$10'}>
+            {(() => {
+              switch (true) {
+                case isPriceHidden:
+                  return '///////'
+                case isLoading || !dollarBalances:
+                  return <Spinner size={'large'} color={'$color12'} />
+                default:
+                  return `$${formattedBalance}`
+              }
+            })()}
+          </Paragraph>
+
+          <InvestmentsAggregate />
+        </YStack>
+        {(!isInvestmentsScreen || media.gtLg) && <InvestmentsPreview />}
       </Card.Footer>
-    </Card>
+    </HomeBodyCard>
   )
 }
 
@@ -126,13 +113,13 @@ function InvestmentsPreview() {
     (b?.balance ?? 0n) > (a?.balance ?? 0n) ? 1 : -1
   )
   return (
-    <XStack ai="center" jc="space-between">
+    <XStack ai="center">
       <OverlappingCoinIcons coins={sortedByBalance} />
-      <Card circular ai="center" jc="center" bc="$color0" w={'$3.5'} h="$3.5" mih={0} miw={0}>
+      <ThemeableStack circular ai="center" jc="center" bc="$color0" w={'$3.5'} h="$3.5">
         <Paragraph fontSize={'$4'} fontWeight="500">
           {`+${investmentCoinsList.length - 3}`}
         </Paragraph>
-      </Card>
+      </ThemeableStack>
     </XStack>
   )
 }
@@ -175,7 +162,7 @@ function InvestmentsAggregate() {
     return (
       <XStack gap="$2" ai="center">
         <Paragraph color="$color10" $gtXs={{ fontSize: 14 }} fontSize={12}>
-          Diversify Your Crypto Portfolio
+          Diversify Your Portfolio
         </Paragraph>
       </XStack>
     )

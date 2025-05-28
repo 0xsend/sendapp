@@ -7,6 +7,7 @@ import { useSendEarnBalances, useVaultConvertSharesToAssets } from '../earn/hook
 import { useIsPriceHidden } from './utils/useIsPriceHidden'
 import { formatUnits } from 'viem'
 import { type LinkProps, useLink } from 'solito/link'
+import { HomeBodyCard } from './screen'
 
 export const SavingsBalanceCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'children'>) => {
   const linkProps = useLink({ href })
@@ -32,16 +33,7 @@ export const SavingsBalanceCard = ({ href, ...props }: Omit<CardProps & LinkProp
   )
 
   return (
-    <Card
-      elevation={'$0.75'}
-      hoverStyle={{ scale: 0.925 }}
-      pressStyle={{ scale: 0.875 }}
-      animation="bouncy"
-      size={'$5'}
-      br="$7"
-      {...linkProps}
-      {...props}
-    >
+    <HomeBodyCard {...linkProps} {...props}>
       <Card.Header padded pb={0} fd="row" ai="center" jc="space-between">
         <Paragraph fontSize={'$5'} fontWeight="400">
           Save
@@ -68,7 +60,7 @@ export const SavingsBalanceCard = ({ href, ...props }: Omit<CardProps & LinkProp
         </Paragraph>
         <Paragraph color={'$color10'}>Up to 12% Interest</Paragraph>
       </Card.Footer>
-    </Card>
+    </HomeBodyCard>
   )
 }
 

@@ -1,24 +1,25 @@
-import { Avatar, Card, type CardProps, Paragraph, Spinner, XStack, type XStackProps } from '@my/ui'
+import {
+  Avatar,
+  Card,
+  type CardProps,
+  Paragraph,
+  Spinner,
+  ThemeableStack,
+  XStack,
+  type XStackProps,
+} from '@my/ui'
 
 import { ChevronRight } from '@tamagui/lucide-icons'
 import { type LinkProps, useLink } from 'solito/link'
 import { useFriends } from '../affiliate/utils/useFriends'
 import { IconAccount } from 'app/components/icons'
+import { HomeBodyCard } from './screen'
 
 export const FriendsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'children'>) => {
   const linkProps = useLink({ href })
 
   return (
-    <Card
-      elevation={'$0.75'}
-      hoverStyle={{ scale: 0.925 }}
-      pressStyle={{ scale: 0.875 }}
-      animation="bouncy"
-      size={'$5'}
-      br="$7"
-      {...linkProps}
-      {...props}
-    >
+    <HomeBodyCard {...linkProps} {...props}>
       <Card.Header padded pb={0} fd="row" ai="center" jc="space-between">
         <Paragraph fontSize={'$5'} fontWeight="400">
           Friends
@@ -34,7 +35,7 @@ export const FriendsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
         <FriendsPreview />
         <Paragraph color={'$color10'}>Network with Future Cash</Paragraph>
       </Card.Footer>
-    </Card>
+    </HomeBodyCard>
   )
 }
 
@@ -53,11 +54,20 @@ function FriendsPreview({ limit = 3 }: { limit?: number }) {
   return (
     <XStack ai="center" jc="space-between">
       <OverlappingFriendAvatars friends={filledFriends} />
-      <Card circular ai="center" jc="center" bc="$color0" w={'$3.5'} h="$3.5" mih={0} miw={0}>
+      <ThemeableStack
+        circular
+        ai="center"
+        jc="center"
+        bc="$color0"
+        w={'$3.5'}
+        h="$3.5"
+        mih={0}
+        miw={0}
+      >
         <Paragraph fontSize={'$4'} fontWeight="500">
           {`${data?.count ?? 0}`}
         </Paragraph>
-      </Card>
+      </ThemeableStack>
     </XStack>
   )
 }
