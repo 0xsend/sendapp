@@ -371,3 +371,56 @@ GRANT ALL ON FUNCTION "temporal"."temporal_send_account_transfers_trigger_delete
 
 GRANT ALL ON FUNCTION "temporal"."add_note_activity_temporal_transfer_before_confirmed"() TO "service_role";
 
+revoke delete on table "temporal"."send_account_transfers" from "anon";
+
+revoke insert on table "temporal"."send_account_transfers" from "anon";
+
+revoke references on table "temporal"."send_account_transfers" from "anon";
+
+revoke select on table "temporal"."send_account_transfers" from "anon";
+
+revoke trigger on table "temporal"."send_account_transfers" from "anon";
+
+revoke truncate on table "temporal"."send_account_transfers" from "anon";
+
+revoke update on table "temporal"."send_account_transfers" from "anon";
+
+revoke delete on table "temporal"."send_account_transfers" from "authenticated";
+
+revoke insert on table "temporal"."send_account_transfers" from "authenticated";
+
+revoke references on table "temporal"."send_account_transfers" from "authenticated";
+
+revoke trigger on table "temporal"."send_account_transfers" from "authenticated";
+
+revoke truncate on table "temporal"."send_account_transfers" from "authenticated";
+
+revoke update on table "temporal"."send_account_transfers" from "authenticated";
+
+revoke delete on table "temporal"."send_earn_deposits" from "anon";
+
+revoke insert on table "temporal"."send_earn_deposits" from "anon";
+
+revoke references on table "temporal"."send_earn_deposits" from "anon";
+
+revoke select on table "temporal"."send_earn_deposits" from "anon";
+
+revoke trigger on table "temporal"."send_earn_deposits" from "anon";
+
+revoke truncate on table "temporal"."send_earn_deposits" from "anon";
+
+revoke update on table "temporal"."send_earn_deposits" from "anon";
+
+revoke delete on table "temporal"."send_earn_deposits" from "authenticated";
+
+revoke insert on table "temporal"."send_earn_deposits" from "authenticated";
+
+revoke references on table "temporal"."send_earn_deposits" from "authenticated";
+
+revoke select on table "temporal"."send_earn_deposits" from "authenticated";
+
+revoke trigger on table "temporal"."send_earn_deposits" from "authenticated";
+
+revoke truncate on table "temporal"."send_earn_deposits" from "authenticated";
+
+revoke update on table "temporal"."send_earn_deposits" from "authenticated";

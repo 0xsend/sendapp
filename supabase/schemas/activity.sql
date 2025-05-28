@@ -166,6 +166,7 @@ RETURN QUERY
         FROM user_transfers
     )
 
+-- Step 3: Select only the most recent transfer for each counterparty
 SELECT (counterparty).*  -- Return only the counterparty details
 FROM numbered
 WHERE occurrence_counter = 1  -- Only the most recent interaction with each counterparty

@@ -477,9 +477,11 @@ CREATE OR REPLACE VIEW "public"."referrer" WITH ("security_barrier"='on') AS
 
 ALTER TABLE "public"."referrer" OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "public"."referrer_lookup"("referral_code" "text" DEFAULT NULL::"text") RETURNS TABLE("referrer" "public"."profile_lookup_result", "new_referrer" "public"."profile_lookup_result")
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
+CREATE OR REPLACE FUNCTION public.referrer_lookup(referral_code text DEFAULT NULL::text)
+ RETURNS TABLE(referrer profile_lookup_result, new_referrer profile_lookup_result)
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
 DECLARE
 ref_result profile_lookup_result;
     new_ref_result profile_lookup_result;
@@ -492,6 +494,7 @@ FROM referrals r
 WHERE r.referred_id = auth.uid()
     LIMIT 1;
 
+-- Look up existing referrer if valid send_id exists
 IF referrer_send_id IS NOT NULL AND referrer_send_id != '' THEN
 SELECT * INTO ref_result
 FROM profile_lookup('sendid'::lookup_type_enum, referrer_send_id)
@@ -517,7 +520,8 @@ END IF;
 RETURN QUERY
 SELECT ref_result, new_ref_result;
 END;
-$$;
+$function$
+;
 ALTER FUNCTION "public"."referrer_lookup"("referral_code" "text") OWNER TO "postgres";
 REVOKE ALL ON FUNCTION "public"."referrer_lookup"("referral_code" "text") FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."referrer_lookup"("referral_code" "text") TO "anon";
