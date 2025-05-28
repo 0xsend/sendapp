@@ -158,6 +158,7 @@ AS $function$ BEGIN -- Ensure that a user does not exceed the tag limit
 
 END IF;
 
+-- Return the new record to be inserted or updated
 RETURN NEW;
 
 END;

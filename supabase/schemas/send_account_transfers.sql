@@ -113,6 +113,7 @@ begin
 end;
 $function$
 ;
+
 ALTER FUNCTION "public"."send_account_transfers_trigger_insert_activity"() OWNER TO "postgres";
 
 -- Sequences
