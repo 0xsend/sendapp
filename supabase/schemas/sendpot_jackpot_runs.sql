@@ -96,3 +96,26 @@ REVOKE ALL ON FUNCTION "public"."get_user_jackpot_summary"("num_runs" integer) F
 GRANT ALL ON FUNCTION "public"."get_user_jackpot_summary"("num_runs" integer) TO "anon";
 GRANT ALL ON FUNCTION "public"."get_user_jackpot_summary"("num_runs" integer) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."get_user_jackpot_summary"("num_runs" integer) TO "service_role";
+
+
+CREATE OR REPLACE FUNCTION public.get_pending_jackpot_tickets_purchased()
+ RETURNS numeric
+ LANGUAGE sql
+AS $function$
+WITH last_jackpot AS (
+    -- Retrieve the maximum block number from the sendpot_jackpot_runs table.
+  -- This block number represents the end of the last completed jackpot.
+  -- If no jackpot runs exist, use 0 as the default value.
+  SELECT COALESCE(MAX(block_num), 0) AS last_block
+  FROM public.sendpot_jackpot_runs
+)
+SELECT COALESCE(SUM(tickets_purchased_total_bps), 0) AS total_tickets
+FROM public.sendpot_user_ticket_purchases
+WHERE block_num >= (SELECT last_block FROM last_jackpot);
+$function$
+;
+
+ALTER FUNCTION "public"."get_pending_jackpot_tickets_purchased"() OWNER TO "postgres";
+REVOKE ALL ON FUNCTION "public"."get_pending_jackpot_tickets_purchased"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."get_pending_jackpot_tickets_purchased"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_pending_jackpot_tickets_purchased"() TO "service_role";

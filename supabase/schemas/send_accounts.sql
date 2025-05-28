@@ -195,6 +195,7 @@ $_$;
 
 ALTER FUNCTION "public"."send_accounts_add_webauthn_credential"("send_account_id" "uuid", "webauthn_credential" "public"."webauthn_credentials", "key_slot" integer) OWNER TO "postgres";
 
+
 CREATE OR REPLACE FUNCTION public.send_accounts_after_insert()
  RETURNS trigger
  LANGUAGE plpgsql

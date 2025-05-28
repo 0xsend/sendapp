@@ -403,11 +403,14 @@ BEGIN
                                AND distribution_id >= 6), 0) AS send_score
             FROM
                 referrals r
+                    LEFT JOIN affiliate_stats a ON a.user_id = r.referred_id
                     LEFT JOIN profiles p ON p.id = r.referred_id
                     LEFT JOIN tags t ON t.user_id = r.referred_id
-                        AND t.status = 'confirmed'
             WHERE
-                r.referrer_id = auth.uid())
+                r.referrer_id = auth.uid()
+            ORDER BY
+                r.referred_id,
+                t.created_at DESC)
         SELECT
             o.avatar_url,
             o.x_username,

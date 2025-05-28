@@ -175,36 +175,35 @@ $function$
 ALTER FUNCTION "public"."recent_senders"() OWNER TO "postgres";
 
 -- Functions (that depend on activity table directly)
-CREATE OR REPLACE FUNCTION public.today_birthday_senders()
- RETURNS SETOF activity_feed_user
- LANGUAGE sql
- STABLE
-AS $function$
-   WITH unique_senders AS (
-       SELECT DISTINCT from_user_id
-       FROM activity
-       WHERE to_user_id = auth.uid()
-         AND event_name = 'send_account_transfers'
-         AND from_user_id IS NOT NULL
-   )
-   SELECT (
-       profiles.id,
-       profiles.name,
-       profiles.avatar_url,
-       profiles.send_id,
-       ARRAY(
-           SELECT tags.name
-           FROM public.tags
-           WHERE tags.user_id = profiles.id
-             AND tags.status = 'confirmed'
-       )
-   )::activity_feed_user
-   FROM profiles
-   INNER JOIN unique_senders ON profiles.id = unique_senders.from_user_id
-   WHERE EXTRACT(MONTH FROM profiles.birthday) = EXTRACT(MONTH FROM CURRENT_DATE)
-     AND EXTRACT(DAY FROM profiles.birthday) = EXTRACT(DAY FROM CURRENT_DATE)
-$function$
-;
+CREATE OR REPLACE FUNCTION today_birthday_senders()
+RETURNS SETOF activity_feed_user
+SECURITY DEFINER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+RETURN QUERY
+SELECT (
+   (
+    NULL,
+    p.name,
+    p.avatar_url,
+    p.send_id,
+    (
+        SELECT ARRAY_AGG(name)
+        FROM tags
+        WHERE user_id = p.id
+          AND status = 'confirmed'
+    )
+       )::activity_feed_user
+).*
+FROM profiles p
+WHERE is_public = TRUE
+  AND p.birthday IS NOT NULL
+  AND p.avatar_url IS NOT NULL
+  AND EXTRACT(MONTH FROM p.birthday) = EXTRACT(MONTH FROM CURRENT_DATE)
+  AND EXTRACT(DAY FROM p.birthday) = EXTRACT(DAY FROM CURRENT_DATE);
+END;
+$$;
 ALTER FUNCTION "public"."today_birthday_senders"() OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION public.update_transfer_activity_before_insert()
@@ -212,32 +211,34 @@ CREATE OR REPLACE FUNCTION public.update_transfer_activity_before_insert()
  LANGUAGE plpgsql
 AS $function$
 DECLARE
-    tmp_data jsonb;
-    note_id uuid;
-    note_text text;
-    temporal_status temporal.transfer_status;
+    note text;
+    temporal_event_id text;
 BEGIN
-    -- Check if the event name contains '_transfers'
-    IF position('_transfers' in NEW.event_name) > 0 THEN
-        -- Query the temporal.send_account_transfers table
-        SELECT note, status INTO note_id, temporal_status
-        FROM temporal.send_account_transfers
-        WHERE id::text = NEW.event_id AND status = 'confirmed';
+    IF (
+    NEW.event_name = 'send_account_transfers'
+    OR NEW.event_name = 'send_account_receives'
+    )
+    AND NEW.from_user_id IS NOT NULL
+    AND NEW.to_user_id IS NOT NULL
+    THEN
+        SELECT
+            data->>'note',
+            t_sat.workflow_id INTO note, temporal_event_id
+        FROM temporal.send_account_transfers t_sat
+        WHERE t_sat.send_account_transfers_activity_event_id = NEW.event_id
+        AND t_sat.send_account_transfers_activity_event_name = NEW.event_name;
 
-        -- Check if a confirmed record was found
-        IF note_id IS NOT NULL THEN
-            -- Parse the JSON data to get the note_text
-            note_text := NEW.data ->> 'note';
+        IF note IS NOT NULL THEN
+            NEW.data = NEW.data || jsonb_build_object('note', note);
+        END IF;
 
-            -- Create the temporary JSON object
-            tmp_data := jsonb_build_object('note_id', note_id, 'note', note_text);
-
-            -- Merge tmp_data into NEW.data
-            NEW.data := NEW.data || tmp_data;
+        -- Delete any temporal activity that might exist
+        IF temporal_event_id IS NOT NULL THEN
+            DELETE FROM public.activity
+            WHERE event_id = temporal_event_id
+            AND event_name = 'temporal_send_account_transfers';
         END IF;
     END IF;
-
-    -- Return the modified row
     RETURN NEW;
 END;
 $function$
