@@ -227,6 +227,18 @@ export default defineConfig({
       abi: erc20Abi,
     },
     {
+      name: 'MAMO',
+      address: {
+        [mainnet.id]: '0x7300b37dfdfab110d83290a29dfb31b1740219fe',
+        [localhost.id]: '0x7300b37dfdfab110d83290a29dfb31b1740219fe',
+        [sepolia.id]: '0x7300b37dfdfab110d83290a29dfb31b1740219fe',
+        [base.id]: '0x7300b37dfdfab110d83290a29dfb31b1740219fe',
+        [baseLocal.id]: '0x7300b37dfdfab110d83290a29dfb31b1740219fe',
+        [baseSepolia.id]: '0x7300b37dfdfab110d83290a29dfb31b1740219fe',
+      },
+      abi: erc20Abi,
+    },
+    {
       name: 'EntryPoint',
       address: {
         [mainnet.id]: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
