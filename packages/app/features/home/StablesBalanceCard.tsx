@@ -49,11 +49,11 @@ export const StablesBalanceCard = (props: CardProps) => {
       onPress={toggleSubScreen}
       cursor="pointer"
       overflow="hidden"
-      size={'$4'}
+      size={'$6'}
       br="$7"
       {...props}
     >
-      <Card.Header padded pb={0} jc="space-between" fd="row" ai="center">
+      <Card.Header padded pb={'$1'} jc="space-between" fd="row">
         <Paragraph fontSize={'$6'} fontWeight={300} color={'$color12'} $gtLg={{ fontSize: '$6' }}>
           Cash Balance
         </Paragraph>
@@ -70,7 +70,7 @@ export const StablesBalanceCard = (props: CardProps) => {
           <ChevronRight size={'$1'} color={'$color12'} />
         )}
       </Card.Header>
-      <Card.Footer padded fd="column" gap="$4">
+      <Card.Footer padded size="$6" pt={0} mt={0} fd="column" gap="$2">
         {(() => {
           switch (true) {
             case isPriceHidden:

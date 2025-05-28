@@ -6,6 +6,7 @@ import {
   Paragraph,
   Spinner,
   Stack,
+  styled,
   useMedia,
   XStack,
   type XStackProps,
@@ -119,13 +120,11 @@ function HomeBody(props: XStackProps) {
           ai={'center'}
         >
           <StablesBalanceCard />
+          <SavingsBalanceCard href="/earn" w="100%" />
+          <InvestmentsBalanceCard w="100%" />
           <XStack gap="$3.5" w="100%" mih={136} jc={'center'}>
-            <SavingsBalanceCard href="/earn" maw="50%" f={1} />
-            <InvestmentsBalanceCard maw="50%" f={1} />
-          </XStack>
-          <XStack gap="$3.5" w="100%" mih={136} jc={'center'}>
-            <RewardsCard href="/explore/rewards" maw="50%" f={1} />
-            <FriendsCard href="/account/affiliate" maw="50%" f={1} />
+            <RewardsCard href="/explore/rewards" />
+            <FriendsCard href="/account/affiliate" />
           </XStack>
         </YStack>
         {(() => {
@@ -146,14 +145,12 @@ function HomeBody(props: XStackProps) {
 }
 
 function InvestmentsBody() {
-  const media = useMedia()
   const { investmentCoins: myInvestmentCoins, isLoading } = useCoins()
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const hoverStyles = useHoverStyles()
 
   return (
     <YStack ai="center" $gtXs={{ gap: '$3' }} gap={'$3.5'} f={1}>
-      {media.lg && <InvestmentsBalanceCard />}
       <Card
         bc={'$color1'}
         width="100%"
@@ -221,3 +218,13 @@ function StablesBody() {
     </YStack>
   )
 }
+
+export const HomeBodyCard = styled(Card, {
+  hoverStyle: { scale: 0.925 },
+  pressStyle: { scale: 0.875 },
+  animation: 'bouncy',
+  size: '$5',
+  br: '$7',
+  f: 1,
+  mah: 136,
+})

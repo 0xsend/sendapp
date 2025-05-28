@@ -1,4 +1,4 @@
-import { Card, type CardProps, H1, Paragraph, Spinner, XStack } from '@my/ui'
+import { Card, type CardProps, Paragraph, Spinner, XStack } from '@my/ui'
 import formatAmount from 'app/utils/formatAmount'
 import { ChevronRight } from '@tamagui/lucide-icons'
 import { useMemo } from 'react'
@@ -11,6 +11,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { baseMainnetClient, sendTokenAddress } from '@my/wagmi'
 import { coinsDict } from 'app/data/coins'
+import { HomeBodyCard } from './screen'
 
 export const RewardsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'children'>) => {
   const linkProps = useLink({ href })
@@ -31,16 +32,7 @@ export const RewardsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
   const isLoading = isPricesLoading || isDistributionLoading
 
   return (
-    <Card
-      elevation={'$0.75'}
-      hoverStyle={{ scale: 0.925 }}
-      pressStyle={{ scale: 0.875 }}
-      animation="bouncy"
-      size={'$5'}
-      br="$7"
-      {...linkProps}
-      {...props}
-    >
+    <HomeBodyCard {...linkProps} {...props}>
       <Card.Header padded pb={0} fd="row" ai="center" jc="space-between">
         <Paragraph fontSize={'$5'} fontWeight="400">
           Rewards
@@ -65,9 +57,9 @@ export const RewardsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
             }
           })()}
         </Paragraph>
-        <Paragraph color={'$color10'}>Complete Tasks to Earn Send Back</Paragraph>
+        <Paragraph color={'$color10'}>Complete Tasks for $SEND Back</Paragraph>
       </Card.Footer>
-    </Card>
+    </HomeBodyCard>
   )
 }
 
