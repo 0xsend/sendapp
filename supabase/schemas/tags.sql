@@ -275,6 +275,7 @@ if NEW.status <> 'confirmed'::public.tag_status then return NEW;
 
 end if;
 
+-- get the current distribution id
 curr_distribution_id := (
     select id
     from distributions
@@ -284,6 +285,7 @@ curr_distribution_id := (
     limit 1
 );
 
+-- check if a verification for the same user, tag, and distribution already exists
 if curr_distribution_id is not null
 and not exists (
     select 1
@@ -294,11 +296,15 @@ and not exists (
 ) then -- insert new verification
 insert into public.distribution_verifications (distribution_id, user_id, type, metadata)
 values (
-    curr_distribution_id,
-    NEW.user_id,
-    'tag_registration'::public.verification_type,
-    jsonb_build_object('tag', NEW.name)
-);
+        (
+            select id
+            from distributions
+            where qualification_start <= now()
+                and qualification_end >= now()
+            order by qualification_start desc
+            limit 1
+        ), NEW.user_id, 'tag_registration'::public.verification_type, jsonb_build_object('tag', NEW.name)
+    );
 
 end if;
 

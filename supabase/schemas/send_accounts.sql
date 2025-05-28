@@ -52,6 +52,7 @@ _webauthn_credential webauthn_credentials;
 
 begin --
 
+-- insert the credential
 insert into webauthn_credentials (
     name,
     display_name,
@@ -72,6 +73,7 @@ values (
   )
 returning * into _webauthn_credential;
 
+-- insert the send account
 insert into send_accounts (address, chain_id, init_code)
 values (
     send_account.address,
@@ -82,6 +84,7 @@ update
 set init_code = excluded.init_code
 returning * into _send_account;
 
+-- associate the credential with the send account
 insert into send_account_credentials (account_id, credential_id, key_slot)
 values (
     _send_account.id,
@@ -89,6 +92,7 @@ values (
     $3
   );
 
+-- return the send account
 return json_build_object(
   'send_account',
   _send_account,
@@ -253,13 +257,15 @@ BEGIN
       user_id,
       type,
       metadata,
-      created_at)
-    VALUES(
+      created_at -- Removed the extra comma here
+)
+    VALUES (
       curr_distribution_id,
       NEW.user_id,
-      'create_passkey'::public.verification_type,
-      jsonb_build_object('passkey_created', TRUE),
-      NOW());
+      'create_passkey' ::public.verification_type,
+      jsonb_build_object(
+        'account_created_at', NEW.created_at),
+      NEW.created_at);
   END IF;
   RETURN NEW;
 END;

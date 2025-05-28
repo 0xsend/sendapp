@@ -371,12 +371,3 @@ GRANT ALL ON FUNCTION "temporal"."temporal_send_account_transfers_trigger_delete
 
 GRANT ALL ON FUNCTION "temporal"."add_note_activity_temporal_transfer_before_confirmed"() TO "service_role";
 
--- Table Grants
-GRANT ALL ON TABLE "temporal"."send_account_transfers" TO "anon";
-GRANT ALL ON TABLE "temporal"."send_account_transfers" TO "authenticated";
-GRANT ALL ON TABLE "temporal"."send_account_transfers" TO "service_role";
-
-GRANT ALL ON TABLE "temporal"."send_earn_deposits" TO "anon";
-GRANT ALL ON TABLE "temporal"."send_earn_deposits" TO "authenticated";
-GRANT ALL ON TABLE "temporal"."send_earn_deposits" TO "service_role";
-

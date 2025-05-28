@@ -109,6 +109,8 @@ WITH last_jackpot AS (
   SELECT COALESCE(MAX(block_num), 0) AS last_block
   FROM public.sendpot_jackpot_runs
 )
+-- Sum the tickets purchased (tickets_purchased_total_bps) from the sendpot_user_ticket_purchases
+-- table for all rows where the block_num is greater than or equal to the last completed jackpot's block.
 SELECT COALESCE(SUM(tickets_purchased_total_bps), 0) AS total_tickets
 FROM public.sendpot_user_ticket_purchases
 WHERE block_num >= (SELECT last_block FROM last_jackpot);

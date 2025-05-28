@@ -13,8 +13,8 @@ select case when p.id = ( select auth.uid() ) then p.id end              as id,
         p.name::text                                                      as name,
         p.about::text                                                     as about,
         p.referral_code                                                   as refcode,
-       CASE WHEN p.is_public THEN p.x_username ELSE NULL END AS x_username,
-       CASE WHEN p.is_public THEN p.birthday ELSE NULL END AS birthday,
+       CASE WHEN p.is_public THEN p.x_username ELSE NULL END AS x_username, -- changed to be null if profile is private
+       CASE WHEN p.is_public THEN p.birthday ELSE NULL END AS birthday, -- added birthday to return type, returns null if profile is private
        t.name                                                            as tag,
        sa.address                                                        as address,
        sa.chain_id                                                       as chain_id,
@@ -33,14 +33,15 @@ where ((lookup_type = 'sendid' and p.send_id::text = identifier) or
     (lookup_type = 'tag' and t.name = identifier::citext) or
     (lookup_type = 'refcode' and p.referral_code = identifier) or
     (lookup_type = 'address' and sa.address = identifier) or
-    (p.is_public and lookup_type = 'phone' and a.phone::text = identifier))
-  and (p.is_public
-   or ( select auth.uid() ) is not null
-   or current_setting('role')::text = 'service_role')
+    (p.is_public and lookup_type = 'phone' and a.phone::text = identifier)) -- lookup by phone number when profile is public
+  and (p.is_public -- allow public profiles to be returned
+   or ( select auth.uid() ) is not null -- allow profiles to be returned if the user is authenticated
+   or current_setting('role')::text = 'service_role') -- allow public profiles to be returned to service role
     limit 1;
 end;
 $function$
 ;
+
 
 ALTER FUNCTION "public"."profile_lookup"("lookup_type" "public"."lookup_type_enum", "identifier" "text") OWNER TO "postgres";
 

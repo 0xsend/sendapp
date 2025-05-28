@@ -137,6 +137,11 @@ CREATE OR REPLACE FUNCTION private.aaa_filter_send_earn_deposit_with_no_send_acc
  SECURITY DEFINER
 AS $function$
 begin
+-- Deletes send_earn_deposit with no send_account_created.
+-- This is due to performance issues in our shovel indexer and using filter_ref to limit indexing to only
+-- send_earn_deposit with send_account_created.
+-- For now, we index all rows, and use this function filter any send_earn_deposit with no send_account_created.
+-- See https://github.com/orgs/indexsupply/discussions/268
   if exists ( select 1 from send_account_created where account = new.owner )
   then
     return new;
@@ -156,6 +161,11 @@ CREATE OR REPLACE FUNCTION private.filter_send_earn_withdraw_with_no_send_accoun
  SECURITY DEFINER
 AS $function$
 begin
+-- Deletes send_earn_withdraw with no send_account_created.
+-- This is due to performance issues in our shovel indexer and using filter_ref to limit indexing to only
+-- send_earn_withdraw with send_account_created.
+-- For now, we index all rows, and use this function filter any send_earn_withdraw with no send_account_created.
+-- See https://github.com/orgs/indexsupply/discussions/268
   if exists ( select 1 from send_account_created where account = new.owner )
   then
     return new;

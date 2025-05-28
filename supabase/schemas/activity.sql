@@ -85,6 +85,7 @@ BEGIN
 RETURN QUERY
 
 
+-- Step 1: Filter relevant transfers and determine the counterparty
     WITH user_transfers AS (
     SELECT *,
         -- Determine the counterparty: if the current user is the sender, use the recipient, and vice versa
@@ -100,6 +101,7 @@ RETURN QUERY
       AND ((from_user).id = (select auth.uid()) OR (to_user).id = (select auth.uid())) -- only tx with user involved
 ),
 
+-- Count how many interactions the current user has with each counterparty
 counterparty_counts AS (
     SELECT counterparty,
            COUNT(*) AS interaction_count
@@ -110,11 +112,13 @@ counterparty_counts AS (
     LIMIT 30 -- top 30 most frequent users
 ),
 
+-- need users ids to count send score, activity feed doesnt have it, its not returned by this function, just used in calculations
 with_user_id AS (
   SELECT *, (SELECT id FROM profiles WHERE send_id = (counterparty).send_id) AS user_id
   FROM counterparty_counts
 )
 
+-- Select the top 10 counterparties by send score
 SELECT (counterparty).* -- only fields from activity feed
 FROM with_user_id
     LEFT JOIN LATERAL ( -- calculate send score for top 30 frequent users

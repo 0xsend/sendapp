@@ -9,6 +9,7 @@ AS $function$ BEGIN -- Ensure users can only insert or update their own tags
 
 END IF;
 
+-- Ensure that a user does not exceed the chain_addresses limit
 IF (
     SELECT COUNT(*)
     FROM public.chain_addresses
@@ -18,6 +19,7 @@ IF (
 
 END IF;
 
+-- Return the new record to be inserted or updated
 RETURN NEW;
 
 END;

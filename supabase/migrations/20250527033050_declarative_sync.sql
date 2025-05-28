@@ -4,62 +4,6 @@ alter table "public"."tags" add constraint "tags_name_check" CHECK (((length((na
 
 alter table "public"."tags" validate constraint "tags_name_check";
 
-
-grant delete on table "temporal"."send_account_transfers" to "anon";
-
-grant insert on table "temporal"."send_account_transfers" to "anon";
-
-grant references on table "temporal"."send_account_transfers" to "anon";
-
-grant select on table "temporal"."send_account_transfers" to "anon";
-
-grant trigger on table "temporal"."send_account_transfers" to "anon";
-
-grant truncate on table "temporal"."send_account_transfers" to "anon";
-
-grant update on table "temporal"."send_account_transfers" to "anon";
-
-grant delete on table "temporal"."send_account_transfers" to "authenticated";
-
-grant insert on table "temporal"."send_account_transfers" to "authenticated";
-
-grant references on table "temporal"."send_account_transfers" to "authenticated";
-
-grant trigger on table "temporal"."send_account_transfers" to "authenticated";
-
-grant truncate on table "temporal"."send_account_transfers" to "authenticated";
-
-grant update on table "temporal"."send_account_transfers" to "authenticated";
-
-grant delete on table "temporal"."send_earn_deposits" to "anon";
-
-grant insert on table "temporal"."send_earn_deposits" to "anon";
-
-grant references on table "temporal"."send_earn_deposits" to "anon";
-
-grant select on table "temporal"."send_earn_deposits" to "anon";
-
-grant trigger on table "temporal"."send_earn_deposits" to "anon";
-
-grant truncate on table "temporal"."send_earn_deposits" to "anon";
-
-grant update on table "temporal"."send_earn_deposits" to "anon";
-
-grant delete on table "temporal"."send_earn_deposits" to "authenticated";
-
-grant insert on table "temporal"."send_earn_deposits" to "authenticated";
-
-grant references on table "temporal"."send_earn_deposits" to "authenticated";
-
-grant select on table "temporal"."send_earn_deposits" to "authenticated";
-
-grant trigger on table "temporal"."send_earn_deposits" to "authenticated";
-
-grant truncate on table "temporal"."send_earn_deposits" to "authenticated";
-
-grant update on table "temporal"."send_earn_deposits" to "authenticated";
-
-
 set check_function_bodies = off;
 
 CREATE OR REPLACE FUNCTION private.aaa_filter_send_earn_deposit_with_no_send_account_created()
@@ -267,26 +211,6 @@ WITH last_jackpot AS (
 SELECT COALESCE(SUM(tickets_purchased_total_bps), 0) AS total_tickets
 FROM public.sendpot_user_ticket_purchases
 WHERE block_num >= (SELECT last_block FROM last_jackpot);
-$function$
-;
-
-CREATE OR REPLACE FUNCTION public.insert_challenge()
- RETURNS challenges
- LANGUAGE plpgsql
-AS $function$
-    #variable_conflict use_column
-    declare
-            _created timestamptz := current_timestamp;
-            _expires timestamptz := _created + interval '15 minute';
-            _new_challenge challenges;
-    begin
-        INSERT INTO "public"."challenges"
-        (created_at, expires_at)
-        VALUES (_created, _expires)
-        RETURNING * into _new_challenge;
-
-        return _new_challenge;
-    end
 $function$
 ;
 
@@ -513,145 +437,6 @@ END;
 $function$
 ;
 
-CREATE OR REPLACE FUNCTION public.send_account_receives_insert_activity_trigger()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
-AS $function$
-declare
-    _f_user_id uuid;
-    _t_user_id uuid;
-    _data      jsonb;
-begin
-    -- select send_account_receives.event_id into _f_user_id;
-    select user_id into _f_user_id from send_accounts where address = concat('0x', encode(NEW.sender, 'hex'))::citext;
-    select user_id into _t_user_id from send_accounts where address = concat('0x', encode(NEW.log_addr, 'hex'))::citext;
-
-    _data := jsonb_build_object(
-        'log_addr', NEW.log_addr,
-        'sender', NEW.sender,
-        -- cast value to text to avoid losing precision when converting to json when sending to clients
-        'value', NEW.value::text,
-        'tx_hash', NEW.tx_hash,
-        'block_num', NEW.block_num::text,
-        'tx_idx', NEW.tx_idx::text,
-        'log_idx', NEW.log_idx::text
-    );
-
-    insert into activity (event_name, event_id, from_user_id, to_user_id, data, created_at)
-    values ('send_account_receives',
-            NEW.event_id,
-            _f_user_id,
-            _t_user_id,
-            _data,
-            to_timestamp(NEW.block_time) at time zone 'UTC')
-    on conflict (event_name, event_id) do update set
-        from_user_id = _f_user_id,
-        to_user_id = _t_user_id,
-        data = _data,
-        created_at = to_timestamp(NEW.block_time) at time zone 'UTC';
-
-    return NEW;
-end;
-$function$
-;
-
-CREATE OR REPLACE FUNCTION public.send_account_signing_key_added_trigger_insert_activity()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
-AS $function$
-declare
-    _f_user_id uuid;
-    _data      jsonb;
-begin
-    select user_id from send_accounts where address = concat('0x', encode(NEW.account, 'hex'))::citext into _f_user_id;
-
-    select json_build_object(
-        'log_addr', NEW.log_addr,
-        'account', NEW.account,
-        'key_slot', NEW.key_slot,
-        'key',json_agg(key order by abi_idx),
-        'tx_hash', NEW.tx_hash,
-        'block_num', NEW.block_num::text,
-        'tx_idx', NEW.tx_idx::text,
-        'log_idx', NEW.log_idx::text
-    )
-    from send_account_signing_key_added
-    where src_name = NEW.src_name
-      and ig_name = NEW.ig_name
-      and block_num = NEW.block_num
-      and tx_idx = NEW.tx_idx
-      and log_idx = NEW.log_idx
-    group by ig_name, src_name, block_num, tx_idx, log_idx
-    into _data;
-
-    insert into activity (event_name, event_id, from_user_id, to_user_id, data, created_at)
-    values ('send_account_signing_key_added',
-            NEW.event_id,
-            _f_user_id,
-            null,
-            _data,
-            to_timestamp(NEW.block_time) at time zone 'UTC')
-    on conflict (event_name, event_id) do update set
-        from_user_id = _f_user_id,
-        to_user_id = null,
-        data = _data,
-        created_at = to_timestamp(NEW.block_time) at time zone 'UTC';
-
-    return NEW;
-end;
-$function$
-;
-
-CREATE OR REPLACE FUNCTION public.send_account_signing_key_removed_trigger_insert_activity()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
-AS $function$
-declare
-    _f_user_id uuid;
-    _data      jsonb;
-begin
-    select user_id from send_accounts where address = concat('0x', encode(NEW.account, 'hex'))::citext into _f_user_id;
-
-    select json_build_object(
-        'log_addr',
-        NEW.log_addr,
-        'account', NEW.account,
-        'key_slot', NEW.key_slot,
-        'key', json_agg(key order by abi_idx),
-        'tx_hash', NEW.tx_hash,
-        'block_num', NEW.block_num::text,
-        'tx_idx', NEW.tx_idx::text,
-        'log_idx', NEW.log_idx::text
-    )
-    from send_account_signing_key_removed
-    where src_name = NEW.src_name
-      and ig_name = NEW.ig_name
-      and block_num = NEW.block_num
-      and tx_idx = NEW.tx_idx
-      and log_idx = NEW.log_idx
-    group by ig_name, src_name, block_num, tx_idx, log_idx
-    into _data;
-
-    insert into activity (event_name, event_id, from_user_id, to_user_id, data, created_at)
-    values ('send_account_signing_key_removed',
-            NEW.event_id,
-            _f_user_id,
-            null,
-            _data,
-            to_timestamp(NEW.block_time) at time zone 'UTC')
-    on conflict (event_name, event_id) do update set from_user_id = _f_user_id,
-                                                     to_user_id   = null,
-                                                     data         = _data,
-                                                     created_at   = to_timestamp(NEW.block_time) at time zone 'UTC';
-
-    return NEW;
-end;
-$function$
-;
-
 CREATE OR REPLACE FUNCTION public.send_accounts_after_insert()
  RETURNS trigger
  LANGUAGE plpgsql
@@ -695,4 +480,33 @@ END;
 $function$
 ;
 
-
+CREATE OR REPLACE FUNCTION public.today_birthday_senders()
+ RETURNS SETOF activity_feed_user
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+BEGIN
+RETURN QUERY
+SELECT (
+   (
+    NULL,
+    p.name,
+    p.avatar_url,
+    p.send_id,
+    (
+        SELECT ARRAY_AGG(name)
+        FROM tags
+        WHERE user_id = p.id
+          AND status = 'confirmed'
+    )
+       )::activity_feed_user
+).*
+FROM profiles p
+WHERE is_public = TRUE
+  AND p.birthday IS NOT NULL
+  AND p.avatar_url IS NOT NULL
+  AND EXTRACT(MONTH FROM p.birthday) = EXTRACT(MONTH FROM CURRENT_DATE)
+  AND EXTRACT(DAY FROM p.birthday) = EXTRACT(DAY FROM CURRENT_DATE);
+END;
+$function$
+;
