@@ -71,7 +71,7 @@ schema_paths = [
   "./schemas/temporal.sql",
 
   # Views
-  "./schemas/views.sql",
+  "./schemas/dashboard_metrics.sql",
 
   # Wildcard for any remaining files
   "./schemas/*.sql",
