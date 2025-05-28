@@ -217,6 +217,7 @@ export const useDistributionVerifications = (distributionNumber?: number) => {
           return {
             type: item.type as Database['public']['Enums']['verification_type'],
             weight: totalWeight,
+            count: verifications.length,
             fixed_value: BigInt(item.fixed_value ?? 0),
             metadata: verifications.map((v) => v.metadata).filter(Boolean),
             created_at: latestCreatedAt,
