@@ -1,6 +1,36 @@
 export * from '@tamagui/toast'
 export * from '@tamagui/linear-gradient'
 export * from 'tamagui'
-export * from './components'
 export * from './utils'
 export { config } from './tamagui.config'
+export * from './components/SideBar'
+export * from './components/DatePicker'
+export * from './components/BigHeading'
+export * from './components/Container'
+export * from './components/CornerTriangle'
+export * from './components/SuperScript'
+export * from './components/Link'
+export * from './components/KVTable'
+export * from './components/Fade'
+export * from './components/FadeCard'
+export * from './components/LinkBanner'
+export * from './components/PendingIndicatorBar'
+export * from './components/ProfileAvatar'
+export * from './components/Shake'
+export * from './components/SubmitButton'
+export * from './components/SendLogo'
+export * from './components/CustomToast'
+export * from './components/FieldError'
+export * from './components/FormWrapper'
+export * from './components/LinkableAvatar'
+export * from './components/LinkableButton'
+export * from './components/SafeArea'
+
+export { RecyclerList } from './components/RecyclerList.web'
+export {
+  Card,
+  CardBackground,
+  CardFooter,
+  CardHeader,
+  CardProps,
+} from './components/Card'
