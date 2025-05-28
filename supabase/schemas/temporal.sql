@@ -48,47 +48,18 @@ CREATE OR REPLACE FUNCTION temporal.add_note_activity_temporal_transfer_before_c
  LANGUAGE plpgsql
  SECURITY DEFINER
 AS $function$
-DECLARE
-    note_text text;
-    activity_sender_user_id uuid;
-    activity_receiver_user_id uuid;
 BEGIN
-    -- Only proceed if status is changing to 'confirmed' and data has a note
-    IF NEW.status = 'confirmed' AND OLD.status != 'confirmed' AND NEW.data ? 'note' THEN
-        note_text := NEW.data->>'note';
+  IF NEW.status != 'confirmed' OR NOT (NEW.data ? 'note') THEN
+      RETURN NEW;
+  END IF;
 
-        -- Only proceed if note is not empty
-        IF note_text IS NOT NULL AND length(trim(note_text)) > 0 THEN
-            -- Get sender and receiver user IDs from the activity table
-            SELECT from_user_id, to_user_id INTO activity_sender_user_id, activity_receiver_user_id
-            FROM activity
-            WHERE event_id = NEW.send_account_transfers_activity_event_id
-            AND event_name = 'temporal_send_account_transfers';
 
-            -- Insert note activity with the same timestamp as the transfer
-            INSERT INTO activity (
-                event_name,
-                event_id,
-                from_user_id,
-                to_user_id,
-                data,
-                created_at
-            )
-            VALUES (
-                'temporal_send_account_transfers_note',
-                NEW.send_account_transfers_activity_event_id || '/note',
-                activity_sender_user_id,
-                activity_receiver_user_id,
-                jsonb_build_object(
-                    'note', note_text,
-                    'transfer_event_id', NEW.send_account_transfers_activity_event_id
-                ),
-                (SELECT created_at FROM activity WHERE event_id = NEW.send_account_transfers_activity_event_id AND event_name = 'temporal_send_account_transfers')
-            );
-        END IF;
-    END IF;
+  UPDATE public.activity
+  SET data = data || jsonb_build_object('note', NEW.data->>'note')
+  WHERE event_name = NEW.data->>'event_name'
+  AND event_id = NEW.data->>'event_id';
 
-    RETURN NEW;
+  RETURN NEW;
 END;
 $function$
 ;

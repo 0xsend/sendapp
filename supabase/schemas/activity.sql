@@ -78,45 +78,97 @@ ALTER TABLE "public"."activity_feed" OWNER TO "postgres";
 -- Functions (that depend on activity_feed view)
 CREATE OR REPLACE FUNCTION public.favourite_senders()
  RETURNS SETOF activity_feed_user
- LANGUAGE sql
- STABLE
+ LANGUAGE plpgsql
+ SECURITY DEFINER
 AS $function$
-    WITH recent_transfers AS (
-        SELECT "from_user" AS user, COUNT(*) AS activity_count
-        FROM activity_feed
-        WHERE created_at >= CURRENT_DATE - INTERVAL '30 days'
-        AND event_name = 'send_account_transfers'
-        AND (to_user).id = auth.uid()
-        AND from_user IS NOT NULL
-        GROUP BY from_user
-        HAVING COUNT(*) >= 3
-        ORDER BY activity_count DESC
-        LIMIT 5
-    )
-    SELECT DISTINCT (recent_transfers.user).*
-    FROM recent_transfers
+BEGIN
+RETURN QUERY
+
+
+    WITH user_transfers AS (
+    SELECT *,
+        -- Determine the counterparty: if the current user is the sender, use the recipient, and vice versa
+        CASE
+            WHEN (from_user).id = (select auth.uid()) THEN to_user
+            ELSE from_user
+        END AS counterparty
+    FROM activity_feed
+    -- Only include rows where both from_user and to_user have a send_id (indicates a transfer between users)
+    WHERE created_at >= NOW() - INTERVAL '60 days' -- only last 30 days
+      AND (from_user).send_id IS NOT NULL
+      AND (to_user).send_id IS NOT NULL
+      AND ((from_user).id = (select auth.uid()) OR (to_user).id = (select auth.uid())) -- only tx with user involved
+),
+
+counterparty_counts AS (
+    SELECT counterparty,
+           COUNT(*) AS interaction_count
+    FROM user_transfers
+    WHERE (counterparty).id IS NULL -- ignore if users were sending to their selves
+    GROUP BY counterparty
+    ORDER BY interaction_count DESC
+    LIMIT 30 -- top 30 most frequent users
+),
+
+with_user_id AS (
+  SELECT *, (SELECT id FROM profiles WHERE send_id = (counterparty).send_id) AS user_id
+  FROM counterparty_counts
+)
+
+SELECT (counterparty).* -- only fields from activity feed
+FROM with_user_id
+    LEFT JOIN LATERAL ( -- calculate send score for top 30 frequent users
+        SELECT COALESCE(SUM(ds.amount), 0) AS send_score
+        FROM distribution_shares ds
+        WHERE ds.user_id = with_user_id.user_id
+        AND ds.distribution_id >= 6
+    ) score ON TRUE
+ORDER BY score.send_score DESC
+LIMIT 10; -- return top 10 send score users
+
+END;
 $function$
 ;
 ALTER FUNCTION "public"."favourite_senders"() OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION public.recent_senders()
  RETURNS SETOF activity_feed_user
- LANGUAGE sql
- STABLE
+ LANGUAGE plpgsql
 AS $function$
-    WITH recent_transfers AS (
-        SELECT "from_user" AS user, MAX(created_at) AS last_transfer_date
+BEGIN
+RETURN QUERY
+
+    -- Step 1: Filter relevant transfers and determine the counterparty
+    WITH user_transfers AS (
+        SELECT *,
+            -- Determine the counterparty: if the current user is the sender, use the recipient, and vice versa
+            CASE
+                WHEN (from_user).id = (select auth.uid()) THEN to_user -- only change is to use (select auth.uid()) instead of auth.uid()
+                ELSE from_user
+            END AS counterparty
         FROM activity_feed
-        WHERE created_at >= CURRENT_DATE - INTERVAL '60 days'
-        AND event_name = 'send_account_transfers'
-        AND (to_user).id = auth.uid()
-        AND from_user IS NOT NULL
-        GROUP BY from_user
-        ORDER BY last_transfer_date DESC
-        LIMIT 10
+        -- Only include rows where both from_user and to_user have a send_id (indicates a transfer between users)
+        WHERE (from_user).send_id IS NOT NULL
+          AND (to_user).send_id IS NOT NULL
+    ),
+
+    -- Step 2: Assign a row number to each transfer per counterparty, ordered by most recent
+    numbered AS (
+        SELECT *,
+            ROW_NUMBER() OVER (
+                PARTITION BY (counterparty).send_id  -- Group by each unique counterparty
+                ORDER BY created_at DESC             -- Order by most recent transfer first
+            ) AS occurrence_counter
+        FROM user_transfers
     )
-    SELECT DISTINCT (recent_transfers.user).*
-    FROM recent_transfers
+
+SELECT (counterparty).*  -- Return only the counterparty details
+FROM numbered
+WHERE occurrence_counter = 1  -- Only the most recent interaction with each counterparty
+ORDER BY created_at DESC      -- Order the result by most recent transfer
+    LIMIT 10;                     -- Return only the 10 most recent counterparties
+
+END;
 $function$
 ;
 
