@@ -369,6 +369,10 @@ export class DistributorV2Worker {
       if (!hodler || !hodler.address) continue
       const { address } = hodler
       if (!minBalanceByAddress[address]) continue
+      const hasPurchasedTag = verifications.some(
+        (v) => v.type === 'tag_registration' && v.weight > 0
+      )
+      if (!hasPurchasedTag) continue
 
       let userFixedAmount = 0n
       const multipliers: Record<string, Multiplier> = {}
@@ -477,6 +481,20 @@ export class DistributorV2Worker {
       const slashedBalances = minBalanceAddresses.map((balance) => {
         const userId = hodlerUserIdByAddress[balance.address] ?? ''
         const address = balance.address
+
+        // Check for tag registration verification first
+        const verifications = verificationsByUserId[userId] || []
+        const hasPurchasedTag = verifications.some(
+          (v) => v.type === 'tag_registration' && v.weight > 0
+        )
+        // If no tag registration, set balance to 0
+        if (!hasPurchasedTag) {
+          return {
+            address,
+            balance: '0',
+          }
+        }
+
         const sendCeilingData = sendCeilingByUserId[userId]
         let slashPercentage = 0n
 
