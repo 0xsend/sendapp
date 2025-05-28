@@ -32,16 +32,15 @@ const jsonBigint = (key, value) => {
 }
 
 const getHoursInMonth = (date: Date) => {
-  const year = date.getFullYear()
-  const month = date.getMonth()
-  const lastDay = new Date(year, month + 1, 0).getDate()
+  const year = date.getUTCFullYear()
+  const month = date.getUTCMonth()
+  const lastDay = new Date(Date.UTC(year, month + 1, 0)).getUTCDate()
   return lastDay * 24
 }
 
 const getCurrentHourInMonth = (date: Date) => {
-  return (date.getDate() - 1) * 24 + date.getHours()
+  return (date.getUTCDate() - 1) * 24 + date.getUTCHours()
 }
-
 /**
  * Changes from V1:
  * Fixed Pool Calculation: In V2, fixed pool amounts are calculated first from the total distribution amount, whereas V1 calculated hodler, bonus, and fixed pools separately.
@@ -122,7 +121,6 @@ export class DistributorV2Worker {
     distribution: NonNullable<Awaited<ReturnType<typeof fetchActiveDistributions>>['data']>[number]
   ): Promise<void> {
     const log = this.log.child({ distribution_id: distribution.id })
-    const checkpointTime = new Date().toISOString()
 
     assert(
       !!distribution.merkle_drop_addr && distribution.merkle_drop_addr !== null,
@@ -138,16 +136,13 @@ export class DistributorV2Worker {
       throw new Error('Tranche is active. Cannot calculate distribution shares.')
     }
 
-    log.info(
-      { distribution_id: distribution.id, checkpointTime },
-      'Calculating distribution shares.'
-    )
+    log.info({ distribution_id: distribution.id }, 'Calculating distribution shares.')
 
     const {
       data: verifications,
       error: verificationsError,
       count,
-    } = await fetchAllVerifications(distribution.id, checkpointTime)
+    } = await fetchAllVerifications(distribution.id)
 
     if (verificationsError) {
       throw verificationsError
@@ -302,8 +297,9 @@ export class DistributorV2Worker {
     }
 
     const { data: previousShares, error: previousSharesError } = await fetchDistributionShares(
-      distribution.id - 1
+      distribution.number - 1
     )
+
     if (previousSharesError) {
       throw previousSharesError
     }
@@ -372,6 +368,7 @@ export class DistributorV2Worker {
       const hasPurchasedTag = verifications.some(
         (v) => v.type === 'tag_registration' && v.weight > 0
       )
+
       if (!hasPurchasedTag) continue
 
       let userFixedAmount = 0n
@@ -435,11 +432,13 @@ export class DistributorV2Worker {
         previousSharesByUserId[userId] || BigInt(distribution.hodler_min_balance)
 
       if (sendCeilingData && sendCeilingData.weight > 0n) {
-        const scaledPreviousReward = previousReward / BigInt(sendSlash.scaling_divisor)
+        const scaledPreviousReward =
+          (previousReward * PERC_DENOM) / BigInt(sendSlash.scaling_divisor)
+        const scaledWeight = sendCeilingData.weight * PERC_DENOM
+
         const cappedSendScore =
-          sendCeilingData.weight > scaledPreviousReward
-            ? scaledPreviousReward
-            : sendCeilingData.weight
+          scaledWeight > scaledPreviousReward ? scaledPreviousReward : scaledWeight
+
         if (scaledPreviousReward > 0n) {
           const slashPercentage = (cappedSendScore * PERC_DENOM) / scaledPreviousReward
           amount = (amount * slashPercentage) / PERC_DENOM
@@ -472,50 +471,52 @@ export class DistributorV2Worker {
 
       // Calculate time adjustment for slashed amounts
       const hourlyHodlerAmount = (hodlerPoolAvailableAmount * PERC_DENOM) / BigInt(hoursInMonth)
+
       const timeAdjustedAmount =
         (hourlyHodlerAmount * BigInt(currentHour + 1)) / PERC_DENOM > hodlerPoolAvailableAmount
           ? hodlerPoolAvailableAmount
           : (hourlyHodlerAmount * BigInt(currentHour + 1)) / PERC_DENOM
 
       // First calculate slashed balances for everyone
-      const slashedBalances = minBalanceAddresses.map((balance) => {
-        const userId = hodlerUserIdByAddress[balance.address] ?? ''
-        const address = balance.address
+      const slashedBalances = minBalanceAddresses
+        .map((balance) => {
+          const userId = hodlerUserIdByAddress[balance.address] ?? ''
+          const address = balance.address
 
-        // Check for tag registration verification first
-        const verifications = verificationsByUserId[userId] || []
-        const hasPurchasedTag = verifications.some(
-          (v) => v.type === 'tag_registration' && v.weight > 0
-        )
-        // If no tag registration, set balance to 0
-        if (!hasPurchasedTag) {
+          // Check for tag registration verification first
+          const verifications = verificationsByUserId[userId] || []
+          const hasPurchasedTag = verifications.some(
+            (v) => v.type === 'tag_registration' && v.weight > 0
+          )
+
+          const sendCeilingData = sendCeilingByUserId[userId]
+          let slashPercentage = 0n
+
+          if (sendCeilingData && sendCeilingData.weight > 0n && hasPurchasedTag) {
+            const previousReward =
+              previousSharesByUserId[userId] || BigInt(distribution.hodler_min_balance)
+            const scaledPreviousReward =
+              (previousReward * PERC_DENOM) / (BigInt(sendSlash.scaling_divisor) * PERC_DENOM)
+
+            const scaledWeight = sendCeilingData.weight * PERC_DENOM
+
+            const cappedWeight =
+              scaledWeight > scaledPreviousReward ? scaledPreviousReward : scaledWeight
+
+            slashPercentage = (cappedWeight * PERC_DENOM) / scaledPreviousReward
+          }
+
+          const slashedBalance = (
+            (BigInt(balance.balance) * slashPercentage) /
+            PERC_DENOM
+          ).toString()
+
           return {
             address,
-            balance: '0',
+            balance: slashedBalance,
           }
-        }
-
-        const sendCeilingData = sendCeilingByUserId[userId]
-        let slashPercentage = 0n
-
-        if (sendCeilingData && sendCeilingData.weight > 0n) {
-          const previousReward =
-            previousSharesByUserId[userId] || BigInt(distribution.hodler_min_balance)
-          const scaledPreviousReward = previousReward / BigInt(sendSlash.scaling_divisor)
-          const cappedWeight =
-            sendCeilingData.weight > scaledPreviousReward
-              ? scaledPreviousReward
-              : sendCeilingData.weight
-          slashPercentage = (cappedWeight * PERC_DENOM) / scaledPreviousReward
-        }
-
-        const slashedBalance = ((BigInt(balance.balance) * slashPercentage) / PERC_DENOM).toString()
-
-        return {
-          address,
-          balance: slashedBalance,
-        }
-      })
+        })
+        .filter((balance) => BigInt(balance.balance) >= BigInt('0')) // Remove zero balances
 
       if (log.isLevelEnabled('debug')) {
         await Bun.write(
@@ -684,7 +685,7 @@ export class DistributorV2Worker {
     return await this.workerPromise
   }
 
-  public async calculateDistribution(id: string) {
+  public async calculateDistribution(id: number) {
     const { data: distribution, error } = await fetchDistribution(id)
     if (error) {
       this.log.error({ error: error.message, code: error.code }, 'Error fetching distribution.')

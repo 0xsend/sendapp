@@ -71,18 +71,17 @@ export async function fetchActiveDistributions() {
     .gte('qualification_end', new Date().toISOString())
 }
 
-export async function fetchDistribution(id: string) {
+export async function fetchDistribution(id: number) {
   return fetchDistributionQuery().eq('id', id).single()
 }
 
-export async function fetchAllVerifications(distributionId: number, checkpointTime: string) {
+export async function fetchAllVerifications(distributionId: number) {
   const supabaseAdmin = createSupabaseAdminClient()
   return selectAll(
     supabaseAdmin
       .from('distribution_verifications')
       .select('*', { count: 'exact' })
       .eq('distribution_id', distributionId)
-      .lt('created_at', checkpointTime)
   )
 }
 
@@ -112,13 +111,13 @@ export async function createDistributionShares(
   })
 }
 
-export async function fetchDistributionShares(distributionId: number) {
+export async function fetchDistributionShares(distributionNumber: number) {
   const supabaseAdmin = createSupabaseAdminClient()
   return selectAll(
     supabaseAdmin
       .from('distribution_shares')
-      .select('user_id, amount::text', { count: 'exact' })
-      .eq('distribution_id', distributionId)
+      .select('user_id, amount::text, distributions!inner(number)', { count: 'exact' })
+      .eq('distributions.number', distributionNumber)
   )
 }
 

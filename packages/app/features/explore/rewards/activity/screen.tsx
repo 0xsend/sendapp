@@ -342,61 +342,53 @@ const TaskCard = ({
     : weight
   const isSendStreak = type === 'send_streak'
   const isTagRegistration = type === 'tag_registration'
-  const isCompleted = (() => {
-    if (isSendStreak) {
-      // send streak is completed if the `created_at` date is same as today or the distribution is over and a weight is present
-      const createdAt = new Date(verification.created_at)
-      const today = new Date()
-      return isEqualCalendarDate(createdAt, today) || (Boolean(weight) && isQualificationOver)
-    }
-    return Boolean(weight)
-  })()
+  const isCompleted = isSendStreak
+    ? isEqualCalendarDate(new Date(verification.created_at), new Date()) ||
+      (Boolean(weight) && isQualificationOver)
+    : Boolean(weight)
+
+  const displayValue = isTagRegistration ? verification.count.toString() : value.toString()
+
+  const statusConfig = {
+    completed: {
+      icon: <CheckCircle2 $theme-light={{ color: '$color12' }} color="$primary" size={'$1.5'} />,
+      text: isSendStreak && !isQualificationOver ? 'Ongoing' : 'Completed',
+    },
+    pending: {
+      icon: (
+        <Theme name="red">
+          <IconInfoCircle color={'$color8'} size={'$2'} />
+        </Theme>
+      ),
+      text: 'Pending',
+    },
+  }
+
+  const { icon, text } = statusConfig[isCompleted ? 'completed' : 'pending']
+
+  const status = (
+    <XStack ai="center" gap="$2">
+      {icon}
+      <Paragraph color="$color11">{text}</Paragraph>
+    </XStack>
+  )
 
   return (
     <Card br={12} gap="$4" p="$6" jc={'space-between'} $gtSm={{ maw: 331 }} w={'100%'}>
       <XStack ai={'center'} jc="space-between">
-        {isCompleted ? (
-          <>
-            <XStack ai="center" gap="$2">
-              <CheckCircle2 $theme-light={{ color: '$color12' }} color="$primary" size={'$1.5'} />
-              <Paragraph color="$color11">
-                {isSendStreak && !isQualificationOver ? 'Ongoing' : 'Completed'}
-              </Paragraph>
-            </XStack>
-            {(isSendStreak || isTagRegistration) && (
-              <Paragraph
-                ff={'$mono'}
-                py={'$0.5'}
-                px={'$0.9'}
-                borderWidth={1}
-                borderColor={'$primary'}
-                $theme-light={{ borderColor: '$color12' }}
-                borderRadius={'$4'}
-              >
-                {(value ?? 0).toString()}
-              </Paragraph>
-            )}
-          </>
-        ) : (
-          <>
-            <XStack ai="center" gap="$2">
-              <Theme name="red">
-                <IconInfoCircle color={'$color8'} size={'$2'} />
-              </Theme>
-              <Paragraph color="$color11">Pending</Paragraph>
-            </XStack>
-            <Paragraph
-              ff={'$mono'}
-              py={'$0.5'}
-              px={'$0.9'}
-              borderWidth={1}
-              borderColor={'$primary'}
-              $theme-light={{ borderColor: '$color12' }}
-              borderRadius={'$4'}
-            >
-              {(value ?? 0).toString()}
-            </Paragraph>
-          </>
+        {status}
+        {(isSendStreak || isTagRegistration) && (
+          <Paragraph
+            ff={'$mono'}
+            py={'$0.5'}
+            px={'$0.9'}
+            borderWidth={1}
+            borderColor={'$primary'}
+            $theme-light={{ borderColor: '$color12' }}
+            borderRadius={'$4'}
+          >
+            {displayValue}
+          </Paragraph>
         )}
       </XStack>
       {children}

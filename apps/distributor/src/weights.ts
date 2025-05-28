@@ -8,7 +8,7 @@ export enum Mode {
   EaseInOut = 'ease_in_out',
 }
 
-export const PERC_DENOM = 1000000000n
+export const PERC_DENOM = 1000000000000000000n
 
 export function calculatePercentageWithBips(value: bigint, bips: bigint) {
   const bps = bips * PERC_DENOM
@@ -131,22 +131,26 @@ function calculateCubicBezierWeight(balance: bigint, totalBalance: bigint): bigi
   const t_bn = (balance * PERC_DENOM) / totalBalance
   const inv_t = PERC_DENOM - t_bn
 
+  // Control points:
+  // p0 stays at 0
+  // p1 should be below 20% (like 10%) to reduce weight of bottom 20%
+  // p2 should be below 80% (like 70%) to reduce weight of top 20%
+  // p3 stays at PERC_DENOM
   const p0 = 0n
-  const p1 = (PERC_DENOM * 20n) / 100n
-  const p2 = (PERC_DENOM * 80n) / 100n
+  const p1 = (PERC_DENOM * 10n) / 100n // Below 20% to reduce bottom weights
+  const p2 = (PERC_DENOM * 70n) / 100n // Below 80% to reduce top weights
   const p3 = PERC_DENOM
 
-  // Break down the calculation and divide by PERC_DENOM gradually to maintain precision
-  const t2 = (t_bn * t_bn) / PERC_DENOM
-  const t3 = (t2 * t_bn) / PERC_DENOM
+  const t2 = t_bn * t_bn
+  const t3 = t2 * t_bn
 
-  const inv_t2 = (inv_t * inv_t) / PERC_DENOM
-  const inv_t3 = (inv_t2 * inv_t) / PERC_DENOM
+  const inv_t2 = inv_t * inv_t
+  const inv_t3 = inv_t2 * inv_t
 
-  const term1 = (inv_t3 * p0) / PERC_DENOM
-  const term2 = (((((3n * inv_t2) / PERC_DENOM) * t_bn) / PERC_DENOM) * p1) / PERC_DENOM
-  const term3 = (((((3n * inv_t) / PERC_DENOM) * t2) / PERC_DENOM) * p2) / PERC_DENOM
-  const term4 = (t3 * p3) / PERC_DENOM
+  const term1 = inv_t3 * p0
+  const term2 = 3n * inv_t2 * t_bn * p1
+  const term3 = 3n * inv_t * t2 * p2
+  const term4 = t3 * p3
 
-  return term1 + term2 + term3 + term4
+  return (term1 + term2 + term3 + term4) / (PERC_DENOM * PERC_DENOM * PERC_DENOM)
 }
