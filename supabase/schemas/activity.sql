@@ -76,11 +76,11 @@ CREATE OR REPLACE VIEW "public"."activity_feed" WITH ("security_barrier"='on') A
 ALTER TABLE "public"."activity_feed" OWNER TO "postgres";
 
 -- Functions (that depend on activity_feed view)
-CREATE OR REPLACE FUNCTION public.favourite_senders()
- RETURNS SETOF activity_feed_user
- LANGUAGE plpgsql
- SECURITY DEFINER
-AS $function$
+CREATE OR REPLACE FUNCTION favourite_senders()
+RETURNS SETOF activity_feed_user
+SECURITY DEFINER
+LANGUAGE plpgsql
+AS $$
 BEGIN
 RETURN QUERY
 
@@ -131,8 +131,7 @@ ORDER BY score.send_score DESC
 LIMIT 10; -- return top 10 send score users
 
 END;
-$function$
-;
+$$;
 ALTER FUNCTION "public"."favourite_senders"() OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION public.recent_senders()
@@ -180,11 +179,11 @@ $function$
 ALTER FUNCTION "public"."recent_senders"() OWNER TO "postgres";
 
 -- Functions (that depend on activity table directly)
-CREATE OR REPLACE FUNCTION public.today_birthday_senders()
- RETURNS SETOF activity_feed_user
- LANGUAGE plpgsql
- SECURITY DEFINER
-AS $function$
+CREATE OR REPLACE FUNCTION today_birthday_senders()
+RETURNS SETOF activity_feed_user
+SECURITY DEFINER
+LANGUAGE plpgsql
+AS $$
 BEGIN
 RETURN QUERY
 
@@ -240,8 +239,7 @@ LEFT JOIN LATERAL (
 ) score ON TRUE
 ORDER BY score.send_score DESC;
 END;
-$function$
-;
+$$;
 
 -- Function
 
