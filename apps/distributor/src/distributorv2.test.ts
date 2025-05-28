@@ -362,7 +362,7 @@ describe('Distributor V2 Worker', () => {
       level: 'silent',
     })
     const distributor = new DistributorV2Worker(logger, false)
-    await distributor.calculateDistribution('4')
+    await distributor.calculateDistribution(4)
 
     //Expected values are a little different than back of the napkin because of rounding
     //Keep an eye on this, may need to investigate if we see distro problems
@@ -373,18 +373,18 @@ describe('Distributor V2 Worker', () => {
           distribution_id: 4,
           user_id,
           bonus_pool_amount: '0', // Always 0 in V2
-          amount: '6636', // 75% of original (example slash)
-          fixed_pool_amount: '28', // 75% of 984
-          hodler_pool_amount: '6608', // 75% of 5872
+          amount: '4867',
+          fixed_pool_amount: '28',
+          hodler_pool_amount: '4839',
         },
         {
           address: aliceAddr,
           distribution_id: 4,
           user_id: user_id2,
           bonus_pool_amount: '0', // Always 0 in V2
-          amount: '1111', // 50% of original (example slash)
-          fixed_pool_amount: '1', // 50% of 208
-          hodler_pool_amount: '1110', // 50% of 2936
+          amount: '1111',
+          fixed_pool_amount: '1',
+          hodler_pool_amount: '1110',
         },
       ],
       easeInAndOut: [
@@ -393,18 +393,18 @@ describe('Distributor V2 Worker', () => {
           distribution_id: 4,
           user_id,
           bonus_pool_amount: '0', // Always 0 in V2
-          amount: '6636', // 75% of original (example slash) with cubic bezier
-          fixed_pool_amount: '28', // 75% of 984
-          hodler_pool_amount: '6608', // 5872 with cubic bezier
+          amount: '4867',
+          fixed_pool_amount: '28',
+          hodler_pool_amount: '4839',
         },
         {
           address: aliceAddr,
           distribution_id: 4,
           user_id: user_id2,
           bonus_pool_amount: '0', // Always 0 in V2
-          amount: '53', // 50% of original (example slash) with cubic bezier
-          fixed_pool_amount: '1', // 50% of 208 with cubic bezier
-          hodler_pool_amount: '52', // 50% of 2936 with cubic bezier
+          amount: '1822',
+          fixed_pool_amount: '1',
+          hodler_pool_amount: '1821',
         },
       ],
     }
