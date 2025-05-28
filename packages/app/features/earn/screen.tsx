@@ -1,4 +1,14 @@
-import { Card, Fade, LinearGradient, Paragraph, Separator, Spinner, XStack, YStack } from '@my/ui'
+import {
+  Card,
+  Fade,
+  LinearGradient,
+  Paragraph,
+  Separator,
+  Spinner,
+  XStack,
+  YStack,
+  Image,
+} from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { IconArrowRight, IconStacks } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
@@ -100,12 +110,17 @@ const LearnSection = () => {
           gap={'$7'}
           jc={'space-between'}
           $gtLg={{ p: '$7' }}
-          backgroundImage={'url(https://ghassets.send.app/app_images/deposit.jpg)'}
-          backgroundPosition={'center 15%'}
-          backgroundRepeat={'no-repeat'}
-          backgroundSize={'cover'}
           overflow={'hidden'}
         >
+          <Card.Background>
+            <Image
+              src={'https://ghassets.send.app/app_images/deposit.jpg'}
+              alt={'Send Earn'}
+              width={'100%'}
+              height={'100%'}
+              objectFit={'cover'}
+            />
+          </Card.Background>
           <LinearGradient
             start={[0, 0]}
             end={[0, 1]}
@@ -152,7 +167,7 @@ const EarningsCallToAction = () => {
 
   return (
     <Fade>
-      <Card w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>
+      <Card elevation={'$0.75'} w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>
         <Badge text={'Earnings'} />
         <YStack gap={'$3.5'}>
           <Paragraph size={'$7'} fontWeight={'500'}>
@@ -191,7 +206,7 @@ const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) =
 
   return (
     <Fade>
-      <Card w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>
+      <Card elevation={'$0.75'} w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>
         <Badge text={'Active Earnings'} />
         <YStack gap={'$3.5'}>
           <YStack gap={'$2'}>

@@ -77,9 +77,11 @@ export const SwapSummaryScreen = () => {
     )
   )
 
-  const exchangeRate = (
-    Number(amountOut.replace(/,/g, '')) / Number(amountIn.replace(/,/g, ''))
-  ).toFixed(outCoin?.formatDecimals)
+  const exchangeRate = formatAmount(
+    Number(amountOut.replace(/,/g, '')) / Number(amountIn.replace(/,/g, '')),
+    12,
+    outCoin?.formatDecimals
+  )
 
   const initLoading =
     isLoadingCoins || isSendAccountLoading || isEncodeRouteLoading || isLoadingUserOp

@@ -130,12 +130,11 @@ export default function formatAmount(
   }
 
   return (
-    (lessThanMin ? '>' : '') +
     floor(Number(amount), maxDecimals).toLocaleString('en-US', {
       useGrouping: true,
       minimumFractionDigits: (decimals || 0) < maxDecimals ? decimals : maxDecimals,
       maximumFractionDigits: maxDecimals,
-    })
+    }) + (lessThanMin ? '...' : '')
   )
 }
 

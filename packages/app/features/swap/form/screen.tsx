@@ -28,7 +28,6 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
 import { type BRAND, z } from 'zod'
-import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { convertAmountToUSD } from 'app/utils/convertAmountToUSD'
 
 const SwapFormSchema = z.object({
@@ -53,7 +52,6 @@ export const SwapFormScreen = () => {
   const hoverStyles = useHoverStyles()
   const { resolvedTheme } = useThemeSetting()
   const queryClient = useQueryClient()
-  const { data: prices, isLoading: isLoadingPrices } = useTokenPrices()
 
   const {
     data: swapRoute,
@@ -401,7 +399,7 @@ export const SwapFormScreen = () => {
                       <XStack ai={'center'} jc={'space-between'}>
                         {(() => {
                           switch (true) {
-                            case isLoadingCoins || isLoadingPrices:
+                            case isLoadingCoins:
                               return <Spinner color="$color11" />
                             case !inCoin || !parsedInAmount:
                               return (
@@ -413,14 +411,14 @@ export const SwapFormScreen = () => {
                                   $0
                                 </Paragraph>
                               )
-                            case !prices:
+                            case inCoin?.symbol === 'USDC':
                               return (
                                 <Paragraph
                                   size={'$5'}
                                   color={'$lightGrayTextField'}
                                   $theme-light={{ color: '$darkGrayTextField' }}
                                 >
-                                  {inAmountUsd ? `$${inAmountUsd}` : '$0'}
+                                  ${formInAmount}
                                 </Paragraph>
                               )
                             default:
@@ -430,16 +428,7 @@ export const SwapFormScreen = () => {
                                   color={'$lightGrayTextField'}
                                   $theme-light={{ color: '$darkGrayTextField' }}
                                 >
-                                  $
-                                  {formatAmount(
-                                    convertAmountToUSD(
-                                      parsedInAmount,
-                                      inCoin.decimals,
-                                      inCoin.symbol === 'USDC' ? 1 : prices[inCoin.token]
-                                    ),
-                                    12,
-                                    2
-                                  )}
+                                  {inAmountUsd ? `$${inAmountUsd}` : '$0'}
                                 </Paragraph>
                               )
                           }
@@ -553,7 +542,7 @@ export const SwapFormScreen = () => {
                       <XStack height={'$2'} ai={'center'}>
                         {(() => {
                           switch (true) {
-                            case isFetchingRoute || isLoadingCoins || isLoadingPrices:
+                            case isFetchingRoute || isLoadingCoins:
                               return <Spinner color="$color11" />
                             case !outCoin || !swapRoute?.routeSummary?.amountOut:
                               return (
@@ -565,17 +554,7 @@ export const SwapFormScreen = () => {
                                   $0
                                 </Paragraph>
                               )
-                            case !prices:
-                              return (
-                                <Paragraph
-                                  size={'$5'}
-                                  color={'$lightGrayTextField'}
-                                  $theme-light={{ color: '$darkGrayTextField' }}
-                                >
-                                  {outAmountUsd ? `$${outAmountUsd}` : '$0'}
-                                </Paragraph>
-                              )
-                            default:
+                            case outCoin?.symbol === 'USDC':
                               return (
                                 <Paragraph
                                   size={'$5'}
@@ -587,11 +566,21 @@ export const SwapFormScreen = () => {
                                     convertAmountToUSD(
                                       BigInt(swapRoute.routeSummary.amountOut),
                                       outCoin.decimals,
-                                      outCoin.symbol === 'USDC' ? 1 : prices[outCoin.token]
+                                      1
                                     ),
                                     12,
                                     2
                                   )}
+                                </Paragraph>
+                              )
+                            default:
+                              return (
+                                <Paragraph
+                                  size={'$5'}
+                                  color={'$lightGrayTextField'}
+                                  $theme-light={{ color: '$darkGrayTextField' }}
+                                >
+                                  {outAmountUsd ? `$${outAmountUsd}` : '$0'}
                                 </Paragraph>
                               )
                           }
