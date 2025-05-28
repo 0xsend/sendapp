@@ -178,7 +178,7 @@ const DistributionRequirementsCard = ({
   if (snapshotBalanceError) throw snapshotBalanceError
 
   const sendTagRegistrations = verifications?.verification_values?.reduce(
-    (acc, curr) => acc + (curr.type === 'tag_registration' ? Number(curr.weight) : 0),
+    (acc, curr) => acc + (curr.type === 'tag_registration' ? 1 : 0),
     0
   )
 

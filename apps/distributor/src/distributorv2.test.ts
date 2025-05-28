@@ -243,9 +243,6 @@ describe('Distributor V2 Worker', () => {
             {
               user_id,
               type: 'total_tag_referrals',
-              metadata: {
-                value: 2,
-              },
               weight: 2,
             },
             {
@@ -270,9 +267,6 @@ describe('Distributor V2 Worker', () => {
             {
               user_id: user_id2,
               type: 'total_tag_referrals',
-              metadata: {
-                value: 5,
-              },
               weight: 5,
             },
 
@@ -379,9 +373,9 @@ describe('Distributor V2 Worker', () => {
           distribution_id: 4,
           user_id,
           bonus_pool_amount: '0', // Always 0 in V2
-          amount: '5578', // 75% of original (example slash)
+          amount: '6636', // 75% of original (example slash)
           fixed_pool_amount: '28', // 75% of 984
-          hodler_pool_amount: '5550', // 75% of 5872
+          hodler_pool_amount: '6608', // 75% of 5872
         },
         {
           address: aliceAddr,
@@ -399,18 +393,18 @@ describe('Distributor V2 Worker', () => {
           distribution_id: 4,
           user_id,
           bonus_pool_amount: '0', // Always 0 in V2
-          amount: '5825', // 75% of original (example slash) with cubic bezier
+          amount: '6636', // 75% of original (example slash) with cubic bezier
           fixed_pool_amount: '28', // 75% of 984
-          hodler_pool_amount: '5797', // 5872 with cubic bezier
+          hodler_pool_amount: '6608', // 5872 with cubic bezier
         },
         {
           address: aliceAddr,
           distribution_id: 4,
           user_id: user_id2,
           bonus_pool_amount: '0', // Always 0 in V2
-          amount: '864', // 50% of original (example slash) with cubic bezier
-          fixed_pool_amount: '1', // 50% of 208
-          hodler_pool_amount: '863', // 50% of 2936 with cubic bezier
+          amount: '53', // 50% of original (example slash) with cubic bezier
+          fixed_pool_amount: '1', // 50% of 208 with cubic bezier
+          hodler_pool_amount: '52', // 50% of 2936 with cubic bezier
         },
       ],
     }
