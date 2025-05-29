@@ -9,7 +9,7 @@ contract DeploySendVerifyingPaymasterScript is Script, Helper {
     bytes32 salt = bytes32(uint256(1));
 
     function setUp() public {
-        this.labels();
+        labels();
     }
 
     function run() public {

@@ -9,7 +9,7 @@ import "../src/TokenPaymaster.sol";
 
 contract AddTokenPaymasterDepositScript is Script, Helper {
     function setUp() public {
-        this.labels();
+        labels();
     }
 
     function run() public {

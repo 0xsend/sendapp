@@ -8,7 +8,7 @@ import {SendVerifier, SendVerifierProxy} from "../src/SendVerifier.sol";
 
 contract DeploySendVerifierScript is Script, Helper {
     function setUp() public {
-        this.labels();
+        labels();
     }
 
     function run() public {
