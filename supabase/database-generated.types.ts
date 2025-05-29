@@ -1858,7 +1858,7 @@ export type Database = {
         Returns: Database["public"]["CompositeTypes"]["activity_feed_user"][]
       }
       top_senders: {
-        Args: Record<PropertyKey, never>
+        Args: { limit_count?: number; latest_distribution_count?: number }
         Returns: Database["public"]["CompositeTypes"]["activity_feed_user"][]
       }
       update_distribution_shares: {
