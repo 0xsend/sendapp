@@ -22,11 +22,7 @@ alter table "public"."tags" drop constraint "tags_pkey";
 
 drop index if exists "public"."tags_pkey";
 
-alter table "public"."tags" alter column "status" drop default;
-
-alter type "public"."tag_status" rename to "tag_status__old_version_to_be_dropped";
-
-create type "public"."tag_status" as enum ('pending', 'confirmed', 'available');
+ALTER TYPE "public"."tag_status" ADD VALUE 'available' AFTER 'confirmed';
 
 create table "public"."historical_tag_associations" (
     "id" uuid not null default gen_random_uuid(),
@@ -50,12 +46,6 @@ create table "public"."send_account_tags" (
 
 
 alter table "public"."send_account_tags" enable row level security;
-
-alter table "public"."tags" alter column status type "public"."tag_status" using status::text::"public"."tag_status";
-
-alter table "public"."tags" alter column "status" set default 'pending'::tag_status;
-
-drop type "public"."tag_status__old_version_to_be_dropped";
 
 alter table "public"."send_accounts" add column "main_tag_id" bigint;
 
@@ -86,8 +76,6 @@ CREATE INDEX idx_send_account_tags_tag_id ON public.send_account_tags USING btre
 CREATE UNIQUE INDEX idx_send_account_tags_unique ON public.send_account_tags USING btree (send_account_id, tag_id);
 
 CREATE INDEX idx_send_accounts_main_tag_id ON public.send_accounts USING btree (main_tag_id);
-
-CREATE INDEX idx_tags_status ON public.tags USING btree (status) WHERE (status = 'available'::tag_status);
 
 CREATE UNIQUE INDEX send_account_tags_pkey ON public.send_account_tags USING btree (id);
 

@@ -682,52 +682,6 @@ export type Database = {
         }
         Relationships: []
       }
-      send_account_tags: {
-        Row: {
-          created_at: string
-          id: number
-          send_account_id: string
-          tag_id: number
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          id?: number
-          send_account_id: string
-          tag_id: number
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          id?: number
-          send_account_id?: string
-          tag_id?: number
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "send_account_tags_send_account_id_fkey"
-            columns: ["send_account_id"]
-            isOneToOne: false
-            referencedRelation: "send_accounts"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "send_account_tags_tag_id_fkey"
-            columns: ["tag_id"]
-            isOneToOne: false
-            referencedRelation: "tag_history"
-            referencedColumns: ["tag_id"]
-          },
-          {
-            foreignKeyName: "send_account_tags_tag_id_fkey"
-            columns: ["tag_id"]
-            isOneToOne: false
-            referencedRelation: "tags"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       send_account_transfers: {
         Row: {
           abi_idx: number
@@ -790,7 +744,6 @@ export type Database = {
           deleted_at: string | null
           id: string
           init_code: string
-          main_tag_id: number | null
           updated_at: string
           user_id: string
         }
@@ -801,7 +754,6 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           init_code: string
-          main_tag_id?: number | null
           updated_at?: string
           user_id?: string
         }
@@ -812,7 +764,6 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           init_code?: string
-          main_tag_id?: number | null
           updated_at?: string
           user_id?: string
         }
@@ -1459,7 +1410,6 @@ export type Database = {
           event_id: string | null
           hash: string | null
           id: number
-          tag_id: number
           tag_name: string
         }
         Insert: {
@@ -1467,7 +1417,6 @@ export type Database = {
           event_id?: string | null
           hash?: string | null
           id?: number
-          tag_id: number
           tag_name: string
         }
         Update: {
@@ -1475,50 +1424,36 @@ export type Database = {
           event_id?: string | null
           hash?: string | null
           id?: number
-          tag_id?: number
           tag_name?: string
         }
         Relationships: [
           {
-            foreignKeyName: "tag_receipts_tag_id_fkey"
-            columns: ["tag_id"]
-            isOneToOne: false
-            referencedRelation: "tag_history"
-            referencedColumns: ["tag_id"]
-          },
-          {
-            foreignKeyName: "tag_receipts_tag_id_fkey"
-            columns: ["tag_id"]
+            foreignKeyName: "tag_receipts_tag_name_fkey"
+            columns: ["tag_name"]
             isOneToOne: false
             referencedRelation: "tags"
-            referencedColumns: ["id"]
+            referencedColumns: ["name"]
           },
         ]
       }
       tags: {
         Row: {
           created_at: string
-          id: number
           name: string
           status: Database["public"]["Enums"]["tag_status"]
-          updated_at: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           created_at?: string
-          id?: number
           name: string
           status?: Database["public"]["Enums"]["tag_status"]
-          updated_at?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Update: {
           created_at?: string
-          id?: number
           name?: string
           status?: Database["public"]["Enums"]["tag_status"]
-          updated_at?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -1676,9 +1611,8 @@ export type Database = {
       confirm_tags: {
         Args: {
           tag_names: string[]
-          send_account_id: string
-          _event_id: string
-          _referral_code: string
+          event_id: string
+          referral_code_input: string
         }
         Returns: undefined
       }
@@ -1699,7 +1633,6 @@ export type Database = {
           deleted_at: string | null
           id: string
           init_code: string
-          main_tag_id: number | null
           updated_at: string
           user_id: string
         }[]
