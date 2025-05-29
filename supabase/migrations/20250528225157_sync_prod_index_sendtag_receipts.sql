@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_sendtag_receipts ON public.sendtag_checkout_receipts USING btree (amount, reward);

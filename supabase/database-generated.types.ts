@@ -1518,6 +1518,24 @@ export type Database = {
         }
         Relationships: []
       }
+      dashboard_metrics: {
+        Row: {
+          daily_active_receivers: number | null
+          daily_active_senders: number | null
+          daily_active_transfers: number | null
+          new_affiliates: Json | null
+          new_sendtags: Json | null
+          passkeys: number | null
+          send_volume: number | null
+          sendtag_referral_payouts: number | null
+          sendtag_revenue: number | null
+          sendtags: number | null
+          top_all_ips: Json | null
+          total_transactions: number | null
+          usdc_volume: number | null
+        }
+        Relationships: []
+      }
       referrer: {
         Row: {
           about: string | null

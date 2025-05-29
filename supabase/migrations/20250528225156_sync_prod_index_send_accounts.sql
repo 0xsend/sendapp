@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_send_accounts_address_user ON public.send_accounts USING btree (address, user_id);

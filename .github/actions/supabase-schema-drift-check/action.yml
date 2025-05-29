@@ -1,0 +1,23 @@
+name: Supabase Schema Drift Check
+description: "Check for schema drift by comparing database with declarative schemas"
+runs:
+  using: "composite"
+  steps:
+    - uses: supabase/setup-cli@v1
+      with:
+        version: latest
+    - name: Check for Schema Drift
+      shell: bash
+      working-directory: ./supabase
+      run: supabase db diff -f changes
+    - name: Ensure Declarative Schema is Up to Date
+      shell: bash
+      run: |
+        # Check for modified files
+        git diff --exit-code
+        # Check for untracked files in supabase/migrations
+        if [ -n "$(git ls-files --others --exclude-standard supabase/migrations/)" ]; then
+          echo "Error: Untracked migration files detected in supabase/migrations/"
+          git ls-files --others --exclude-standard supabase/migrations/
+          exit 1
+        fi

@@ -37,7 +37,18 @@ concurrency:
   group: ${{ github.workflow }}
 
 jobs:
+  schema-drift-check:
+    name: Check Schema Drift
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Check for Schema Drift
+        uses: ./.github/actions/supabase-schema-drift-check
+
   deploy:
+    needs: schema-drift-check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
