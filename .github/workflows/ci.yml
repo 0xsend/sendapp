@@ -113,11 +113,12 @@ jobs:
         id: tilt-ci
         shell: bash
         run: tilt ci unit-tests --timeout=15m
-      - name: Tilt Down
-        # always run tilt down if tilt ci started
-        if: always() && steps.tilt-ci.outcome != 'skipped'
-        shell: bash
-        run: tilt down
+      # Since we use ephemeral containers, we don't need to clean up anymore
+      # - name: Tilt Down
+      #   # always run tilt down if tilt ci started
+      #   if: always() && steps.tilt-ci.outcome != 'skipped'
+      #   shell: bash
+      #   run: tilt down
       # @todo anvil fixtures cause dirty repo, but only in github actions 😢
       - name: All Changes Committed
         shell: bash
