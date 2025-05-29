@@ -42,8 +42,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: main
+      # Add after main branch is merged
+      # with:
+      # ref: main
       - name: Check for Schema Drift
         uses: ./.github/actions/supabase-schema-drift-check
 
