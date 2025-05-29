@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_tags_status_created ON public.tags USING btree (status, created_at DESC) WHERE (status = 'confirmed'::tag_status);

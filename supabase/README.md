@@ -1,5 +1,26 @@
 # Supabase
 
+## Declarative Schema Management
+
+This project uses Supabase's [Declarative Database Schemas](https://supabase.com/docs/guides/local-development/declarative-database-schemas) approach. Instead of writing step-by-step migration files, we declare the desired state of our database schema in SQL files located in the `schemas/` directory.
+
+### How It Works
+
+1. **Schema Files**: Database schema is defined in `.sql` files within the `schemas/` directory
+2. **Automatic Migrations**: When you modify schema files, Supabase automatically generates migration files
+3. **CI/CD Integration**: Schema drift checks ensure consistency between declarative schemas and migrations
+
+### Schema Organization
+
+The schema files are organized by domain and loaded in a specific order defined in `config.toml`:
+
+- `extensions.sql` - PostgreSQL extensions
+- `types.sql` - Custom types and enums
+- `utilities.sql` - Utility functions
+- Core tables (profiles, tags, accounts, etc.)
+- Activity system tables
+- Views in `views/` subdirectory
+
 ## Getting Started
 
 Create or obtain a snapshot of your Supabase instance and place it in the `supabase/.snaplet/snapshots` directory.
@@ -22,12 +43,48 @@ Restore the snapshot. Make sure to replace `<SNAPSHOT_NAME>` with the name of yo
 npx snaplet snapshot restore --no-reset ./.snaplet/snapshots/<SNAPSHOT_NAME>.snaplet
 ```
 
-## Setting up Supabase\
+## Working with Declarative Schemas
+
+### Making Schema Changes
+
+1. **Stop the local database** before making changes:
+   ```shell
+   yarn supabase stop
+   ```
+
+2. **Modify the appropriate schema file** in `supabase/schemas/`
+
+3. **Generate a migration** from your changes:
+   ```shell
+   yarn migration:diff <MIGRATION_NAME>
+   ```
+
+4. **Start the database and apply migrations**:
+   ```shell
+   yarn supabase start
+   ```
+
+### Best Practices
+
+- **Append new columns** to the end of CREATE TABLE statements
+- **Review generated migrations** carefully before committing
+- **Use descriptive migration names** that explain the change
+- **Test locally** before pushing changes
+
+### Schema Drift Detection
+
+The CI pipeline includes automatic schema drift detection that:
+- Compares the current database state with declarative schemas
+- Fails if there are uncommitted changes
+- Ensures migrations stay in sync with schema files
+
+## Setting up Supabase
 
 Here are some guides from the official Supabase documentation:
 
 - [Local Development](https://supabase.com/docs/guides/getting-started/local-development)
 - [Managing Environments](https://supabase.com/docs/guides/cli/managing-environments)
+- [Declarative Database Schemas](https://supabase.com/docs/guides/local-development/declarative-database-schemas)
 
 NOTE: This template assumes you have a public storage bucket with the name `avatars` - Make sure to create it if it doesn't exist.
 

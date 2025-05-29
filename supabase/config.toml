@@ -16,6 +16,67 @@ port = 54322
 # server_version;` on the remote database to check.
 major_version = 15
 
+[db.migrations]
+schema_paths = [
+  # Extensions and base setup
+  "./schemas/extensions.sql",
+  "./schemas/types.sql",
+
+  # Utilities
+  "./schemas/utilities.sql",
+
+  # Core tables
+  "./schemas/challenges.sql",
+  "./schemas/profiles.sql",
+  "./schemas/webauthn_credentials.sql",
+  "./schemas/send_accounts.sql",
+  "./schemas/chain_addresses.sql",
+  "./schemas/tags.sql",
+  "./schemas/referrals.sql",
+  "./schemas/distributions.sql",
+  "./schemas/send_earn.sql",
+
+  # Send account related tables
+  "./schemas/send_account_created.sql",
+  "./schemas/send_account_transfers.sql",
+  "./schemas/send_account_receives.sql",
+  "./schemas/send_account_signing_key_added.sql",
+  "./schemas/send_account_signing_key_removed.sql",
+  "./schemas/send_account_credentials.sql",
+
+  # Activity system
+  "./schemas/activity.sql",
+
+  # Receipt tables
+  "./schemas/receipts.sql",
+  "./schemas/tag_receipts.sql",
+  "./schemas/sendtag_checkout_receipts.sql",
+
+  # Sendpot tables
+  "./schemas/sendpot_user_ticket_purchases.sql",
+  "./schemas/sendpot_jackpot_runs.sql",
+
+  # Token transfer tables
+  "./schemas/send_token_transfers.sql",
+  "./schemas/send_token_v0_transfers.sql",
+  "./schemas/send_revenues_safe_receives.sql",
+
+  # Financial tables
+  "./schemas/liquidity_pools.sql",
+  "./schemas/swap_routers.sql",
+  "./schemas/affiliate_stats.sql",
+
+  # Schema-specific tables
+  "./schemas/shovel.sql",
+  "./schemas/temporal.sql",
+
+  # Views
+  "./schemas/views/*.sql",
+
+  # Wildcard for any remaining files
+  "./schemas/*.sql",
+]
+
 [studio]
 # Port to use for Supabase Studio.
 port = 54323

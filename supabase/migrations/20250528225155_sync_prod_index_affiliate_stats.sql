@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_affiliate_stats_user_created ON public.affiliate_stats USING btree (user_id, created_at DESC);

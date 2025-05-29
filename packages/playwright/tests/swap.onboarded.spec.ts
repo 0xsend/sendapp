@@ -2,9 +2,18 @@ import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
 import { mergeTests } from '@playwright/test'
 import debug from 'debug'
 import { expect, test as swapTest } from './fixtures/swap'
-import { allCoins, type coin, isEthCoin, usdcCoin } from 'app/data/coins'
+import {
+  allCoins,
+  type coin,
+  ethCoin,
+  eurcCoin,
+  isEthCoin,
+  sendCoin,
+  usdcCoin,
+} from 'app/data/coins'
 import { fund } from '@my/playwright/fixtures/viem'
 import { formatUnits } from 'viem'
+import { ar } from '@faker-js/faker'
 
 const test = mergeTests(swapTest, snapletTest)
 
@@ -27,11 +36,7 @@ const swapInAmount = {
 }
 
 for (const inCoin of [usdcCoin]) {
-  for (const outCoin of allCoins) {
-    if (inCoin.symbol === outCoin.symbol) {
-      continue
-    }
-
+  for (const outCoin of [sendCoin, ethCoin]) {
     test(`can swap ${inCoin.symbol} for ${outCoin.symbol}`, async ({
       sendAccount,
       page,

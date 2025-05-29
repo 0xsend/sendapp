@@ -76,6 +76,9 @@ yarn lint:fix
 ```
 
 ### Database
+
+Send uses Supabase's **Declarative Schema** approach. Database schemas are defined in `supabase/schemas/` directory rather than writing migrations manually.
+
 ```bash
 # Start local Supabase
 cd supabase && yarn supabase start
@@ -86,9 +89,20 @@ cd supabase && yarn supabase reset
 # Generate TypeScript types
 cd supabase && yarn generate
 
-# Create a new migration
+# Making schema changes (declarative approach):
+# 1. Stop the database
+cd supabase && yarn supabase stop
+
+# 2. Edit schema files in supabase/schemas/
+
+# 3. Generate migration from schema changes
 cd supabase && yarn migration:diff <migration_name>
+
+# 4. Start database to apply changes
+cd supabase && yarn supabase start
 ```
+
+**Important**: Always stop the database before modifying schema files. The CI pipeline includes schema drift detection to ensure migrations stay in sync with declarative schemas.
 
 ### Smart Contracts
 ```bash
@@ -249,11 +263,21 @@ yarn supabase test
 
 **Important Considerations:**
 
-* If you have made changes to database migrations within `/supabase/migrations`, you **must** reset the test database before running tests to ensure the schema is up-to-date. Reset the database using the following command:
+* If you have made changes to:
+  - Database schema files in `/supabase/schemas/`
+  - Database migrations in `/supabase/migrations/`
+  
+  You **must** reset the test database before running tests to ensure the schema is up-to-date:
   ```bash
   cd supabase && yarn supabase reset
   ```
-* Ensure your local Supabase instance (or the designated test instance) is running.
+
+* When using declarative schemas, remember to:
+  1. Stop the database before modifying schema files
+  2. Generate migrations after schema changes
+  3. Start the database to apply changes
+
+* Ensure your local Supabase instance is running:
   ```bash
   cd supabase && yarn supabase start
   ```
