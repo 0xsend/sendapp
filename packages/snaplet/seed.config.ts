@@ -16,5 +16,15 @@ export default defineConfig({
   /**
    * Tables that should be selected when seeding
    */
-  select: ['!pgtle.*', '!realtime.*', 'public.*', 'auth.*', 'shovel.*'],
+  select: [
+    'public.*',
+    'shovel.*',
+    '!pgtle.*',
+    '!auth.*',
+    '!realtime.*',
+    '!_realtime.*',
+    '!*.migrations',
+    '!*.schema_migrations',
+    'auth.users',
+  ],
 })
