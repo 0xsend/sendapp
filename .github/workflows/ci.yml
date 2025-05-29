@@ -81,6 +81,14 @@ jobs:
         id: output-tar
         run: echo "path=next-app-image.tar" >> $GITHUB_OUTPUT
 
+  supabase-schema-drift-check:
+    name: Supabase Schema Drift Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for Schema Drift
+        uses: ./.github/actions/supabase-schema-drift-check
+
   unit-tests:
     name: Unit Tests
     runs-on: ubuntu-latest
