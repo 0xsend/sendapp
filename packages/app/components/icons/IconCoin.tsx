@@ -10,6 +10,7 @@ import { IconAerodrome } from './IconAerodrome'
 import { IconMoonwell } from './IconMoonwell'
 import { IconCbBtc } from './IconCbBtc'
 import { IconEURC } from './IconEURC'
+import { IconMAMO } from './IconMAMO'
 
 const coinSymbolToIcons: Record<coin['symbol'], NamedExoticComponent<IconProps>> = {
   USDC: IconUSDC,
@@ -21,6 +22,7 @@ const coinSymbolToIcons: Record<coin['symbol'], NamedExoticComponent<IconProps>>
   AERO: IconAerodrome,
   CBBTC: IconCbBtc,
   EURC: IconEURC,
+  MAMO: IconMAMO,
 }
 
 export const IconCoin = ({
