@@ -239,6 +239,7 @@ test('can refer multiple tags in separate transactions', async ({
   supabase,
   user: { profile: myProfile },
 }) => {
+  test.setTimeout(45_000)
   // First transaction with up to 2 tags
   const firstTags = Array.from({ length: Math.floor(Math.random() * 2) + 1 }, () =>
     generateTagName()

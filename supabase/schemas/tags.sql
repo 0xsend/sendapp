@@ -284,6 +284,7 @@ GRANT ALL ON TABLE "public"."tags" TO "service_role";
 
 REVOKE ALL ON FUNCTION "public"."confirm_tags"("tag_names" "public"."citext"[], "event_id" "text", "referral_code_input" "text") FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."confirm_tags"("tag_names" "public"."citext"[], "event_id" "text", "referral_code_input" "text") TO "service_role";
+GRANT ALL ON FUNCTION "public"."confirm_tags"("tag_names" "public"."citext"[], "event_id" "text", "referral_code_input" "text") TO "authenticator";
 
 REVOKE ALL ON FUNCTION "public"."tags"("public"."profiles") FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."tags"("public"."profiles") TO "anon";
