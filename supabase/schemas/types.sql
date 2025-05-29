@@ -50,7 +50,8 @@ ALTER TYPE "public"."activity_feed_user" OWNER TO "postgres";
 
 CREATE TYPE "public"."tag_status" AS ENUM (
     'pending',
-    'confirmed'
+    'confirmed',
+    'available'
 );
 ALTER TYPE "public"."tag_status" OWNER TO "postgres";
 
