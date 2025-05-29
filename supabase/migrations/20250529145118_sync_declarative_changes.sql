@@ -223,36 +223,56 @@ begin
 end;
 $function$
 ;
+grant delete on table "temporal"."send_account_transfers" to "anon";
 
+grant insert on table "temporal"."send_account_transfers" to "anon";
 
-revoke select on table "temporal"."send_account_transfers" from "authenticated";
+grant references on table "temporal"."send_account_transfers" to "anon";
 
-revoke delete on table "temporal"."send_account_transfers" from "service_role";
+grant select on table "temporal"."send_account_transfers" to "anon";
 
-revoke insert on table "temporal"."send_account_transfers" from "service_role";
+grant trigger on table "temporal"."send_account_transfers" to "anon";
 
-revoke references on table "temporal"."send_account_transfers" from "service_role";
+grant truncate on table "temporal"."send_account_transfers" to "anon";
 
-revoke select on table "temporal"."send_account_transfers" from "service_role";
+grant update on table "temporal"."send_account_transfers" to "anon";
 
-revoke trigger on table "temporal"."send_account_transfers" from "service_role";
+grant delete on table "temporal"."send_account_transfers" to "authenticated";
 
-revoke truncate on table "temporal"."send_account_transfers" from "service_role";
+grant insert on table "temporal"."send_account_transfers" to "authenticated";
 
-revoke update on table "temporal"."send_account_transfers" from "service_role";
+grant references on table "temporal"."send_account_transfers" to "authenticated";
 
-revoke delete on table "temporal"."send_earn_deposits" from "service_role";
+grant trigger on table "temporal"."send_account_transfers" to "authenticated";
 
-revoke insert on table "temporal"."send_earn_deposits" from "service_role";
+grant truncate on table "temporal"."send_account_transfers" to "authenticated";
 
-revoke references on table "temporal"."send_earn_deposits" from "service_role";
+grant update on table "temporal"."send_account_transfers" to "authenticated";
 
-revoke select on table "temporal"."send_earn_deposits" from "service_role";
+grant delete on table "temporal"."send_earn_deposits" to "anon";
 
-revoke trigger on table "temporal"."send_earn_deposits" from "service_role";
+grant insert on table "temporal"."send_earn_deposits" to "anon";
 
-revoke truncate on table "temporal"."send_earn_deposits" from "service_role";
+grant references on table "temporal"."send_earn_deposits" to "anon";
 
-revoke update on table "temporal"."send_earn_deposits" from "service_role";
+grant select on table "temporal"."send_earn_deposits" to "anon";
 
+grant trigger on table "temporal"."send_earn_deposits" to "anon";
 
+grant truncate on table "temporal"."send_earn_deposits" to "anon";
+
+grant update on table "temporal"."send_earn_deposits" to "anon";
+
+grant delete on table "temporal"."send_earn_deposits" to "authenticated";
+
+grant insert on table "temporal"."send_earn_deposits" to "authenticated";
+
+grant references on table "temporal"."send_earn_deposits" to "authenticated";
+
+grant select on table "temporal"."send_earn_deposits" to "authenticated";
+
+grant trigger on table "temporal"."send_earn_deposits" to "authenticated";
+
+grant truncate on table "temporal"."send_earn_deposits" to "authenticated";
+
+grant update on table "temporal"."send_earn_deposits" to "authenticated";

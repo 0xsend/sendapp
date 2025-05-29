@@ -43,11 +43,12 @@ END;
 $$;
 ALTER FUNCTION "temporal"."temporal_transfer_before_insert"() OWNER TO "postgres";
 
+-- Update transfer activities table with note tx is indexed
 CREATE OR REPLACE FUNCTION temporal.add_note_activity_temporal_transfer_before_confirmed()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
-AS $function$
+  RETURNS TRIGGER
+  LANGUAGE plpgsql
+  SECURITY DEFINER
+  AS $$
 BEGIN
   IF NEW.status != 'confirmed' OR NOT (NEW.data ? 'note') THEN
       RETURN NEW;
@@ -61,8 +62,8 @@ BEGIN
 
   RETURN NEW;
 END;
-$function$
-;
+$$;
+
 ALTER FUNCTION "temporal"."add_note_activity_temporal_transfer_before_confirmed"() OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION "temporal"."temporal_deposit_insert_pending_activity"() RETURNS "trigger"
@@ -371,56 +372,45 @@ GRANT ALL ON FUNCTION "temporal"."temporal_send_account_transfers_trigger_delete
 
 GRANT ALL ON FUNCTION "temporal"."add_note_activity_temporal_transfer_before_confirmed"() TO "service_role";
 
-revoke delete on table "temporal"."send_account_transfers" from "anon";
-
-revoke insert on table "temporal"."send_account_transfers" from "anon";
-
-revoke references on table "temporal"."send_account_transfers" from "anon";
-
-revoke select on table "temporal"."send_account_transfers" from "anon";
-
-revoke trigger on table "temporal"."send_account_transfers" from "anon";
-
-revoke truncate on table "temporal"."send_account_transfers" from "anon";
-
-revoke update on table "temporal"."send_account_transfers" from "anon";
-
-revoke delete on table "temporal"."send_account_transfers" from "authenticated";
-
-revoke insert on table "temporal"."send_account_transfers" from "authenticated";
-
-revoke references on table "temporal"."send_account_transfers" from "authenticated";
-
-revoke trigger on table "temporal"."send_account_transfers" from "authenticated";
-
-revoke truncate on table "temporal"."send_account_transfers" from "authenticated";
-
-revoke update on table "temporal"."send_account_transfers" from "authenticated";
-
-revoke delete on table "temporal"."send_earn_deposits" from "anon";
-
-revoke insert on table "temporal"."send_earn_deposits" from "anon";
-
-revoke references on table "temporal"."send_earn_deposits" from "anon";
-
-revoke select on table "temporal"."send_earn_deposits" from "anon";
-
-revoke trigger on table "temporal"."send_earn_deposits" from "anon";
-
-revoke truncate on table "temporal"."send_earn_deposits" from "anon";
-
-revoke update on table "temporal"."send_earn_deposits" from "anon";
-
-revoke delete on table "temporal"."send_earn_deposits" from "authenticated";
-
-revoke insert on table "temporal"."send_earn_deposits" from "authenticated";
-
-revoke references on table "temporal"."send_earn_deposits" from "authenticated";
-
-revoke select on table "temporal"."send_earn_deposits" from "authenticated";
-
-revoke trigger on table "temporal"."send_earn_deposits" from "authenticated";
-
-revoke truncate on table "temporal"."send_earn_deposits" from "authenticated";
-
-revoke update on table "temporal"."send_earn_deposits" from "authenticated";
+grant delete on table "temporal"."send_account_transfers" to "anon";
+grant insert on table "temporal"."send_account_transfers" to "anon";
+grant references on table "temporal"."send_account_transfers" to "anon";
+grant select on table "temporal"."send_account_transfers" to "anon";
+grant trigger on table "temporal"."send_account_transfers" to "anon";
+grant truncate on table "temporal"."send_account_transfers" to "anon";
+grant update on table "temporal"."send_account_transfers" to "anon";
+grant delete on table "temporal"."send_account_transfers" to "authenticated";
+grant insert on table "temporal"."send_account_transfers" to "authenticated";
+grant references on table "temporal"."send_account_transfers" to "authenticated";
+grant trigger on table "temporal"."send_account_transfers" to "authenticated";
+grant truncate on table "temporal"."send_account_transfers" to "authenticated";
+grant update on table "temporal"."send_account_transfers" to "authenticated";
+grant delete on table "temporal"."send_earn_deposits" to "anon";
+grant insert on table "temporal"."send_earn_deposits" to "anon";
+grant references on table "temporal"."send_earn_deposits" to "anon";
+grant select on table "temporal"."send_earn_deposits" to "anon";
+grant trigger on table "temporal"."send_earn_deposits" to "anon";
+grant truncate on table "temporal"."send_earn_deposits" to "anon";
+grant update on table "temporal"."send_earn_deposits" to "anon";
+grant delete on table "temporal"."send_earn_deposits" to "authenticated";
+grant insert on table "temporal"."send_earn_deposits" to "authenticated";
+grant references on table "temporal"."send_earn_deposits" to "authenticated";
+grant select on table "temporal"."send_earn_deposits" to "authenticated";
+grant trigger on table "temporal"."send_earn_deposits" to "authenticated";
+grant truncate on table "temporal"."send_earn_deposits" to "authenticated";
+grant update on table "temporal"."send_earn_deposits" to "authenticated";
+grant select on table "temporal"."send_account_transfers" to "authenticated";
+grant delete on table "temporal"."send_account_transfers" to "service_role";
+grant insert on table "temporal"."send_account_transfers" to "service_role";
+grant references on table "temporal"."send_account_transfers" to "service_role";
+grant select on table "temporal"."send_account_transfers" to "service_role";
+grant trigger on table "temporal"."send_account_transfers" to "service_role";
+grant truncate on table "temporal"."send_account_transfers" to "service_role";
+grant update on table "temporal"."send_account_transfers" to "service_role";
+grant delete on table "temporal"."send_earn_deposits" to "service_role";
+grant insert on table "temporal"."send_earn_deposits" to "service_role";
+grant references on table "temporal"."send_earn_deposits" to "service_role";
+grant select on table "temporal"."send_earn_deposits" to "service_role";
+grant trigger on table "temporal"."send_earn_deposits" to "service_role";
+grant truncate on table "temporal"."send_earn_deposits" to "service_role";
+grant update on table "temporal"."send_earn_deposits" to "service_role";
