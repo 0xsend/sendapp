@@ -1,12 +1,24 @@
 -- Types
--- Note: tag_status and tag_search_result are defined in prod.sql and shared across tables
+-- Note: tag_status and tag_search_result are defined in types.sql and shared across tables
+
+-- Sequences
+CREATE SEQUENCE IF NOT EXISTS "public"."tags_id_seq"
+    AS bigint START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+ALTER TABLE "public"."tags_id_seq" OWNER TO "postgres";
 
 -- Table
 CREATE TABLE IF NOT EXISTS "public"."tags" (
+    "id" bigint NOT NULL DEFAULT nextval('tags_id_seq'),
     "name" "public"."citext" NOT NULL,
     "status" "public"."tag_status" DEFAULT 'pending'::"public"."tag_status" NOT NULL,
-    "user_id" "uuid" DEFAULT "auth"."uid"() NOT NULL,
-    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL
+    "user_id" "uuid",
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL
 );
 
 alter table "public"."tags" add constraint "tags_name_check" CHECK (((length((name)::text) >= 1) AND (length((name)::text) <= 20) AND (name ~ '^[A-Za-z0-9_]+$'::citext))) not valid;
@@ -17,123 +29,246 @@ ALTER TABLE "public"."tags" OWNER TO "postgres";
 
 -- Primary Keys and Constraints
 ALTER TABLE ONLY "public"."tags"
-    ADD CONSTRAINT "tags_pkey" PRIMARY KEY ("name");
+    ADD CONSTRAINT "tags_pkey" PRIMARY KEY ("id");
+
+ALTER TABLE ONLY "public"."tags"
+    ADD CONSTRAINT "tags_name_unique" UNIQUE ("name");
 
 -- Indexes
 CREATE INDEX "idx_tags_status_created" ON "public"."tags" USING "btree" ("status", "created_at" DESC) WHERE ("status" = 'confirmed'::"public"."tag_status");
 CREATE INDEX "tags_name_trigram_gin_idx" ON "public"."tags" USING "gin" ("name" "extensions"."gin_trgm_ops");
 CREATE INDEX "tags_user_id_idx" ON "public"."tags" USING "btree" ("user_id");
+CREATE INDEX "idx_tags_status" ON "public"."tags" USING "btree" ("status") WHERE ("status" = 'available'::"public"."tag_status");
 
 -- Foreign Keys
 ALTER TABLE ONLY "public"."tags"
     ADD CONSTRAINT "tags_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
 
 -- Functions
-CREATE OR REPLACE FUNCTION "public"."confirm_tags"("tag_names" "public"."citext"[], "event_id" "text", "referral_code_input" "text") RETURNS "void"
+CREATE OR REPLACE FUNCTION public.create_tag(tag_name citext, send_account_id uuid)
+    RETURNS bigint
+    LANGUAGE plpgsql
+    SECURITY DEFINER
+    SET search_path TO 'public'
+    AS $$
+DECLARE
+    _tag_id bigint;
+    _original_error_code text;
+    _original_error_message text;
+BEGIN
+    BEGIN
+        -- Verify user owns the send_account
+        IF NOT EXISTS (
+            SELECT
+                1
+            FROM
+                send_accounts
+            WHERE
+                id = send_account_id
+                AND user_id = auth.uid()) THEN
+        RAISE EXCEPTION 'User does not own this send_account';
+    END IF;
+    -- Check tag count before insert
+    IF (
+        SELECT
+            COUNT(*)
+        FROM
+            tags t
+            JOIN send_account_tags sat ON sat.tag_id = t.id
+            JOIN send_accounts sa ON sa.id = sat.send_account_id
+        WHERE
+            sa.user_id = auth.uid()) >= 5 THEN
+        RAISE EXCEPTION 'User can have at most 5 tags';
+    END IF;
+    -- Check if tag exists and is available
+    WITH available_tag AS (
+        UPDATE
+            tags
+        SET
+            status = 'pending',
+            updated_at = NOW()
+        WHERE
+            name = tag_name
+            AND status = 'available'
+        RETURNING
+            id
+),
+new_tag AS (
+INSERT INTO tags(name, status)
+    SELECT
+        tag_name,
+        'pending'
+    WHERE
+        NOT EXISTS (
+            SELECT
+                1
+            FROM
+                available_tag)
+        RETURNING
+            id)
+    INSERT INTO send_account_tags(send_account_id, tag_id)
+    SELECT
+        send_account_id,
+        id
+    FROM (
+        SELECT
+            id
+        FROM
+            available_tag
+        UNION ALL
+        SELECT
+            id
+        FROM
+            new_tag) tags
+RETURNING
+    tag_id INTO _tag_id;
+    EXCEPTION
+        WHEN OTHERS THEN
+            GET STACKED DIAGNOSTICS
+                _original_error_code = RETURNED_SQLSTATE,
+                _original_error_message = MESSAGE_TEXT;
+            RAISE EXCEPTION USING
+                ERRCODE = _original_error_code,
+                MESSAGE = _original_error_message;
+    END;
+    RETURN _tag_id;
+END;
+$$;
+
+ALTER FUNCTION "public"."create_tag"("tag_name" "public"."citext", "send_account_id" "uuid") OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."confirm_tags"("tag_names" "public"."citext"[], "send_account_id" "uuid", "_event_id" "text", "_referral_code" "text") RETURNS "void"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO 'public'
-    AS $_$
+    AS $$
 DECLARE
-  tag_owner_ids uuid[];
-  distinct_user_ids int;
-  tag_owner_id uuid;
-  referrer_id uuid;
-  _event_id alias FOR $2;
+    _sender bytea;
+    _user_id uuid;
+    _send_account_id ALIAS FOR send_account_id;
+    referrer_id uuid;
 BEGIN
-  -- Check if the tags exist and fetch their owners.
-  SELECT
-    array_agg(user_id) INTO tag_owner_ids
-  FROM
-    public.tags
-  WHERE
-    name = ANY (tag_names)
-    AND status = 'pending'::public.tag_status;
-  -- If any of the tags do not exist or are not in pending status, throw an error.
-  IF array_length(tag_owner_ids, 1) <> array_length(tag_names, 1) THEN
-    RAISE EXCEPTION 'One or more tags do not exist or are not in pending status.';
-  END IF;
-  -- Check if all tags belong to the same user
-  SELECT
-    count(DISTINCT user_id) INTO distinct_user_ids
-  FROM
-    unnest(tag_owner_ids) AS user_id;
-  IF distinct_user_ids <> 1 THEN
-    RAISE EXCEPTION 'Tags must belong to the same user.';
-  END IF;
-  -- Fetch single user_id
-  SELECT DISTINCT
-    user_id INTO tag_owner_id
-  FROM
-    unnest(tag_owner_ids) AS user_id;
-  IF event_id IS NULL OR event_id = '' THEN
-    RAISE EXCEPTION 'Receipt event ID is required for paid tags.';
-  END IF;
-  -- Ensure event_id matches the sender
-  IF (
+    -- Get the sender from the receipt
     SELECT
-      count(DISTINCT scr.sender)
+        scr.sender,
+        sa.user_id INTO _sender,
+        _user_id
     FROM
-      public.sendtag_checkout_receipts scr
-      JOIN send_accounts sa ON decode(substring(sa.address, 3), 'hex') = scr.sender
+        sendtag_checkout_receipts scr
+        JOIN send_accounts sa ON decode(substring(sa.address, 3), 'hex') = scr.sender
     WHERE
-      scr.event_id = _event_id AND sa.user_id = tag_owner_id) <> 1 THEN
-    RAISE EXCEPTION 'Receipt event ID does not match the sender';
-  END IF;
-  -- save receipt event_id
-  INSERT INTO public.receipts(
-    event_id,
-    user_id)
-  VALUES (
-    _event_id,
-    tag_owner_id);
-  -- Associate the tags with the onchain event
-  INSERT INTO public.tag_receipts(
-    tag_name,
-    event_id)
-  SELECT
-    unnest(tag_names),
-    event_id;
-  -- Confirm the tags
-  UPDATE
-    public.tags
-  SET
-    status = 'confirmed'::public.tag_status
-  WHERE
-    name = ANY (tag_names)
-    AND status = 'pending'::public.tag_status;
-  -- Create referral code redemption (only if it doesn't exist)
-  IF referral_code_input IS NOT NULL AND referral_code_input <> '' THEN
-    SELECT
-      id INTO referrer_id
-    FROM
-      public.profiles
-    WHERE
-      referral_code = referral_code_input;
-    IF referrer_id IS NOT NULL AND referrer_id <> tag_owner_id THEN
-      -- Referrer cannot be the tag owner.
-      -- Check if a referral already exists for this user
-      IF NOT EXISTS (
+        scr.event_id = _event_id;
+    -- Verify the sender matches the send_account
+    IF NOT EXISTS (
         SELECT
-          1
+            1
         FROM
-          public.referrals
+            send_accounts sa
         WHERE
-          referred_id = tag_owner_id) THEN
-      -- Insert only one referral for the user
-      INSERT INTO public.referrals(
-        referrer_id,
-        referred_id)
-      SELECT
-        referrer_id,
-        tag_owner_id
-      LIMIT 1;
+            id = _send_account_id
+            AND decode(substring(sa.address, 3), 'hex') = _sender) THEN
+    RAISE EXCEPTION 'Receipt event ID does not match the sender';
+END IF;
+    -- Create receipt
+    INSERT INTO receipts(event_id, user_id)
+        VALUES (_event_id, _user_id);
+    -- First create send_account_tags entries
+    INSERT INTO send_account_tags(send_account_id, tag_id)
+    SELECT DISTINCT
+        _send_account_id,
+        t.id
+    FROM
+        tags t
+    WHERE
+        t.name = ANY (tag_names)
+        AND t.status = 'pending'
+        AND NOT EXISTS (
+            SELECT
+                1
+            FROM
+                send_account_tags sat
+            WHERE
+                sat.send_account_id = _send_account_id
+                AND sat.tag_id = t.id);
+    -- Then update tags status which will trigger the verification
+    UPDATE
+        tags
+    SET
+        status = 'confirmed'
+    WHERE
+        name = ANY (tag_names)
+        AND status = 'pending';
+    -- Associate tags with event
+    INSERT INTO tag_receipts(tag_name, tag_id, event_id)
+    SELECT
+        t.name,
+        t.id,
+        _event_id
+    FROM
+        tags t
+    WHERE
+        t.name = ANY (tag_names)
+        AND t.status = 'confirmed';
+    -- Handle referral
+    IF _referral_code IS NOT NULL AND _referral_code <> '' THEN
+        SELECT
+            id INTO referrer_id
+        FROM
+            public.profiles
+        WHERE
+            referral_code = _referral_code;
+        IF referrer_id IS NOT NULL AND referrer_id != _user_id THEN
+            -- Check if a referral already exists for this user
+            IF NOT EXISTS (
+                SELECT
+                    1
+                FROM
+                    public.referrals
+                WHERE
+                    referred_id = _user_id) THEN
+            -- Insert only one referral for the user with tag_id
+            INSERT INTO referrals(referrer_id, referred_id, tag, tag_id)
+            SELECT
+                referrer_id,
+                _user_id,
+                t.name,
+                t.id
+            FROM
+                tags t
+            WHERE
+                t.name = tag_names[1]
+                AND t.status = 'confirmed'
+            LIMIT 1;
+        END IF;
     END IF;
-  END IF;
 END IF;
 END;
-$_$;
+$$;
 
-ALTER FUNCTION "public"."confirm_tags"("tag_names" "public"."citext"[], "event_id" "text", "referral_code_input" "text") OWNER TO "postgres";
+ALTER FUNCTION "public"."confirm_tags"("tag_names" "public"."citext"[], "send_account_id" "uuid", "_event_id" "text", "_referral_code" "text") OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION public.handle_tag_confirmation()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+    SECURITY DEFINER
+    SET search_path TO 'public'
+    AS $$
+BEGIN
+    -- If this is the first confirmed tag for the send account, set it as main
+    UPDATE
+        send_accounts sa
+    SET
+        main_tag_id = NEW.id
+    FROM
+        send_account_tags sat
+    WHERE
+        sat.tag_id = NEW.id
+        AND sat.send_account_id = sa.id
+        AND sa.main_tag_id IS NULL;
+    RETURN NEW;
+END;
+$$;
+
+ALTER FUNCTION "public"."handle_tag_confirmation"() OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION "public"."tags"("public"."profiles") RETURNS SETOF "public"."tags"
     LANGUAGE "sql" STABLE
@@ -148,142 +283,192 @@ CREATE OR REPLACE FUNCTION public.tags_after_insert_or_update_func()
  LANGUAGE plpgsql
  SECURITY DEFINER
  SET search_path TO 'public'
-AS $function$ BEGIN -- Ensure that a user does not exceed the tag limit
-    IF (
-        SELECT COUNT(*)
-        FROM public.tags
-        WHERE user_id = NEW.user_id
-            AND TG_OP = 'INSERT'
-    ) > 5 THEN RAISE EXCEPTION 'User can have at most 5 tags';
-
-END IF;
-
--- Return the new record to be inserted or updated
-RETURN NEW;
-
+AS $function$
+BEGIN
+    -- Ensure that a user does not exceed the tag limit
+    IF TG_OP = 'INSERT' AND(
+        SELECT
+            COUNT(DISTINCT t.id)
+        FROM
+            public.tags t
+            JOIN send_account_tags sat ON sat.tag_id = t.id
+            JOIN send_accounts sa ON sa.id = sat.send_account_id
+        WHERE
+            sa.user_id = auth.uid()) > 5 THEN
+        RAISE EXCEPTION 'User can have at most 5 tags';
+    END IF;
+    RETURN NEW;
 END;
-
-$function$
-;
+$function$;
 
 ALTER FUNCTION "public"."tags_after_insert_or_update_func"() OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION "public"."tags_before_insert_or_update_func"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO 'public'
-    AS $$
-begin
-    -- Ensure users can only insert or update their own tags
-    if new.user_id <> auth.uid() then
-        raise exception 'Users can only create or modify tags for themselves';
-
-    end if;
+    AS $function$
+DECLARE
+    _debug text;
+BEGIN
     -- Ensure user is not changing their confirmed tag name
-    if new.status = 'confirmed'::public.tag_status and old.name <> new.name and
-	current_setting('role')::text = 'authenticated' then
-        raise exception 'Users cannot change the name of a confirmed tag';
-
-    end if;
+    IF TG_OP = 'UPDATE' AND current_setting('role')::text = 'authenticated' AND NEW.status = 'confirmed'::public.tag_status AND OLD.name <> NEW.name THEN
+        RAISE EXCEPTION 'Users cannot change the name of a confirmed tag';
+    END IF;
     -- Ensure user is not confirming their own tag
-    if new.status = 'confirmed'::public.tag_status and current_setting('role')::text =
-	'authenticated' then
-        raise exception 'Users cannot confirm their own tags';
-
-    end if;
-    -- Ensure no existing pending tag with same name within the last 30 minutes by another user
-    if exists(
-        select
-            1
-        from
-            public.tags
-        where
-            name = new.name
-            and status = 'pending'::public.tag_status
-            and(NOW() - created_at) < INTERVAL '30 minutes'
-            and user_id != new.user_id) then
-    raise exception 'Tag with same name already exists';
-
-end if;
-    -- Delete older pending tags if they belong to the same user, to avoid duplicates
-    delete from public.tags
-    where name = new.name
-        and user_id != new.user_id
-        and status = 'pending'::public.tag_status;
-    -- Return the new record to be inserted or updated
-    return NEW;
-
-end;
-
-$$;
+    IF NEW.status = 'confirmed'::public.tag_status AND current_setting('role')::text = 'authenticated' THEN
+        RAISE EXCEPTION 'Users cannot confirm their own tags';
+    END IF;
+    -- For INSERT operations, handle existing tags
+    IF TG_OP = 'INSERT' THEN
+        -- Check for recent pending tags by other users first
+        IF EXISTS (
+            SELECT
+                1
+            FROM
+                tags t
+                JOIN send_account_tags sat ON sat.tag_id = t.id
+                JOIN send_accounts sa ON sa.id = sat.send_account_id
+            WHERE
+                t.name = NEW.name
+                AND t.status = 'pending'::public.tag_status
+                AND (NOW() - t.created_at) < INTERVAL '30 minutes'
+                AND sa.user_id != auth.uid()) THEN
+        RAISE EXCEPTION 'Tag with same name already exists';
+    END IF;
+    -- Delete send_account_tags for expired pending tags
+    DELETE FROM send_account_tags sat USING tags t, send_accounts sa
+    WHERE sat.tag_id = t.id
+        AND sat.send_account_id = sa.id
+        AND t.name = NEW.name
+        AND t.status = 'pending'::public.tag_status
+        AND (NOW() - t.created_at) > INTERVAL '30 minutes'
+        AND sa.user_id != auth.uid();
+    -- If there's an available tag, update it instead of inserting
+    UPDATE
+        tags
+    SET
+        status = 'available',
+        updated_at = now()
+    WHERE
+        name = NEW.name
+        AND status != 'confirmed';
+    -- If we found and updated a tag, skip the INSERT
+    IF FOUND THEN
+        RETURN NULL;
+    END IF;
+END IF;
+    RETURN NEW;
+END;
+$function$;
 
 ALTER FUNCTION "public"."tags_before_insert_or_update_func"() OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION "public"."tag_search"("query" "text", "limit_val" integer, "offset_val" integer) RETURNS TABLE("send_id_matches" "public"."tag_search_result"[], "tag_matches" "public"."tag_search_result"[], "phone_matches" "public"."tag_search_result"[])
     LANGUAGE "plpgsql" IMMUTABLE SECURITY DEFINER
-    AS $_$
-begin
-    if limit_val is null or (limit_val <= 0 or limit_val > 100) then
-        raise exception 'limit_val must be between 1 and 100';
-    end if;
-    if offset_val is null or offset_val < 0 then
-        raise exception 'offset_val must be greater than or equal to 0';
-    end if;
-    return query --
-        select ( select array_agg(row (sub.avatar_url, sub.tag_name, sub.send_id, sub.phone)::public.tag_search_result)
-                 from ( select p.avatar_url, t.name as tag_name, p.send_id, null::text as phone
-                        from profiles p
-                                left join tags t on t.user_id = p.id and t.status = 'confirmed'
-                        where query similar to '\d+'
-                          and p.send_id::varchar like '%' || query || '%'
-                        order by p.send_id
-                        limit limit_val offset offset_val ) sub ) as send_id_matches,
-               ( select array_agg(row (sub.avatar_url, sub.tag_name, sub.send_id, sub.phone)::public.tag_search_result)
-                 from ( select p.avatar_url, t.name as tag_name, p.send_id, null::text as phone
-                        from profiles p
-                                join tags t on t.user_id = p.id
-                        where t.status = 'confirmed'
-                          and (t.name <<-> query < 0.7 or t.name ilike '%' || query || '%')
-                        order by (t.name <-> query)
-                        limit limit_val offset offset_val ) sub ) as tag_matches,
-               ( select array_agg(row (sub.avatar_url, sub.tag_name, sub.send_id, sub.phone)::public.tag_search_result)
-                 from ( select p.avatar_url, t.name as tag_name, p.send_id, u.phone
-                        from profiles p
-                                 left join tags t on t.user_id = p.id and t.status = 'confirmed'
-                                 join auth.users u on u.id = p.id
-                        where p.is_public
-                          and query ~ '^\d{8,}$'
-                          and u.phone like query || '%'
-                        order by u.phone
-                        limit limit_val offset offset_val ) sub ) as phone_matches;
-end;
-$_$;
+    AS $$
+BEGIN
+    IF limit_val IS NULL OR(limit_val <= 0 OR limit_val > 100) THEN
+        RAISE EXCEPTION 'limit_val must be between 1 and 100';
+    END IF;
+    IF offset_val IS NULL OR offset_val < 0 THEN
+        RAISE EXCEPTION 'offset_val must be greater than or equal to 0';
+    END IF;
+    RETURN query
+    SELECT
+        -- send_id matches
+(
+            SELECT
+                array_agg(ROW(sub.avatar_url, sub.tag_name, sub.send_id, sub.phone)::public.tag_search_result)
+            FROM(
+                SELECT
+                    p.avatar_url,
+                    t.name AS tag_name,
+                    p.send_id,
+                    NULL::text AS phone
+                FROM
+                    profiles p
+                LEFT JOIN send_accounts sa ON sa.user_id = p.id
+                LEFT JOIN send_account_tags sat ON sat.send_account_id = sa.id
+                LEFT JOIN tags t ON t.id = sat.tag_id
+                    AND t.status = 'confirmed'
+            WHERE
+                query SIMILAR TO '\d+'
+                AND p.send_id::varchar LIKE '%' || query || '%'
+            ORDER BY
+                p.send_id
+            LIMIT limit_val offset offset_val) sub) AS send_id_matches,
+    -- tag matches
+(
+        SELECT
+            array_agg(ROW(sub.avatar_url, sub.tag_name, sub.send_id, sub.phone)::public.tag_search_result)
+FROM( SELECT DISTINCT ON(p.id)
+    p.avatar_url, t.name AS tag_name, p.send_id, NULL::text AS phone FROM profiles p
+    JOIN send_accounts sa ON sa.user_id = p.id
+    JOIN send_account_tags sat ON sat.send_account_id = sa.id
+    JOIN tags t ON t.id = sat.tag_id
+        AND t.status = 'confirmed'
+WHERE(t.name <<-> query < 0.7
+        OR t.name ILIKE '%' || query || '%')
+ORDER BY p.id,(t.name <-> query)
+LIMIT limit_val offset offset_val) sub) AS tag_matches,
+    -- phone matches
+(
+        SELECT
+            array_agg(ROW(sub.avatar_url, NULL::text, sub.send_id, sub.phone)::public.tag_search_result)
+        FROM(
+            SELECT
+                p.avatar_url, p.send_id, u.phone
+            FROM profiles p
+            JOIN auth.users u ON u.id = p.id
+        WHERE
+            p.is_public
+            AND query ~ '^\d{8,}$'
+            AND u.phone LIKE query || '%' ORDER BY u.phone LIMIT limit_val offset offset_val) sub) AS phone_matches;
+END;
+$$;
 
 ALTER FUNCTION "public"."tag_search"("query" "text", "limit_val" integer, "offset_val" integer) OWNER TO "postgres";
 
 -- Triggers
-
 CREATE OR REPLACE TRIGGER "trigger_tags_after_insert_or_update" AFTER INSERT OR UPDATE ON "public"."tags" FOR EACH ROW EXECUTE FUNCTION "public"."tags_after_insert_or_update_func"();
 
 CREATE OR REPLACE TRIGGER "trigger_tags_before_insert_or_update" BEFORE INSERT OR UPDATE ON "public"."tags" FOR EACH ROW EXECUTE FUNCTION "public"."tags_before_insert_or_update_func"();
 
+CREATE TRIGGER "set_timestamp"
+    BEFORE UPDATE ON "public"."tags"
+    FOR EACH ROW
+    EXECUTE FUNCTION "public"."set_current_timestamp_updated_at"();
+
+CREATE TRIGGER "set_main_tag_on_confirmation"
+    AFTER UPDATE ON "public"."tags"
+    FOR EACH ROW
+    WHEN(NEW.status = 'confirmed'::public.tag_status)
+    EXECUTE FUNCTION "public"."handle_tag_confirmation"();
+
 -- RLS
 ALTER TABLE "public"."tags" ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "delete_policy" ON "public"."tags" FOR DELETE TO "authenticated" USING ((("auth"."uid"() = "user_id") AND ("status" = 'pending'::"public"."tag_status")));
+CREATE POLICY "delete_policy" ON "public"."tags" FOR DELETE TO "authenticated" USING ((((select "auth"."uid"()) = "user_id") AND ("status" = 'pending'::"public"."tag_status")));
 
-CREATE POLICY "insert_policy" ON "public"."tags" FOR INSERT WITH CHECK (("auth"."uid"() = "user_id"));
+CREATE POLICY "insert_policy" ON "public"."tags" FOR INSERT WITH CHECK (((select "auth"."uid"()) = "user_id"));
 
-CREATE POLICY "select_policy" ON "public"."tags" FOR SELECT USING (("auth"."uid"() = "user_id"));
+CREATE POLICY "select_policy" ON "public"."tags" FOR SELECT USING (((select "auth"."uid"()) = "user_id"));
 
-CREATE POLICY "update_policy" ON "public"."tags" FOR UPDATE USING (("auth"."uid"() = "user_id")) WITH CHECK (("auth"."uid"() = "user_id"));
+CREATE POLICY "update_policy" ON "public"."tags" FOR UPDATE USING (((select "auth"."uid"()) = "user_id")) WITH CHECK (((select "auth"."uid"()) = "user_id"));
 
 -- Grants
 GRANT ALL ON TABLE "public"."tags" TO "anon";
 GRANT ALL ON TABLE "public"."tags" TO "authenticated";
 GRANT ALL ON TABLE "public"."tags" TO "service_role";
 
-REVOKE ALL ON FUNCTION "public"."confirm_tags"("tag_names" "public"."citext"[], "event_id" "text", "referral_code_input" "text") FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."confirm_tags"("tag_names" "public"."citext"[], "event_id" "text", "referral_code_input" "text") TO "service_role";
+GRANT ALL ON SEQUENCE "public"."tags_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."tags_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."tags_id_seq" TO "service_role";
+
+REVOKE ALL ON FUNCTION "public"."confirm_tags"("tag_names" "public"."citext"[], "send_account_id" "uuid", "_event_id" "text", "_referral_code" "text") FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."confirm_tags"("tag_names" "public"."citext"[], "send_account_id" "uuid", "_event_id" "text", "_referral_code" "text") TO "service_role";
+
+GRANT EXECUTE ON FUNCTION "public"."create_tag"("tag_name" "public"."citext", "send_account_id" "uuid") TO "authenticated";
 
 REVOKE ALL ON FUNCTION "public"."tags"("public"."profiles") FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."tags"("public"."profiles") TO "anon";
@@ -303,3 +488,7 @@ GRANT ALL ON FUNCTION "public"."tags_before_insert_or_update_func"() TO "service
 REVOKE ALL ON FUNCTION "public"."tag_search"("query" "text", "limit_val" integer, "offset_val" integer) FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."tag_search"("query" "text", "limit_val" integer, "offset_val" integer) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."tag_search"("query" "text", "limit_val" integer, "offset_val" integer) TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."handle_tag_confirmation"() TO "anon";
+GRANT ALL ON FUNCTION "public"."handle_tag_confirmation"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."handle_tag_confirmation"() TO "service_role";
