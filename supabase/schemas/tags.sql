@@ -303,3 +303,10 @@ GRANT ALL ON FUNCTION "public"."tags_before_insert_or_update_func"() TO "service
 REVOKE ALL ON FUNCTION "public"."tag_search"("query" "text", "limit_val" integer, "offset_val" integer) FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."tag_search"("query" "text", "limit_val" integer, "offset_val" integer) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."tag_search"("query" "text", "limit_val" integer, "offset_val" integer) TO "service_role";
+
+-- test supbase declarative schema diff check in CI. this should cause a failure
+create table tag_priority (
+  tag_name text not null,
+  priority integer not null,
+  primary key (tag_name)
+);
