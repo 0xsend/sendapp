@@ -373,11 +373,18 @@ const TaskCard = ({
     </XStack>
   )
 
+  const shouldShowValue = [
+    'send_streak',
+    'tag_registration',
+    'send_ten',
+    'send_one_hundred',
+  ].includes(type)
+
   return (
     <Card br={12} gap="$4" p="$6" jc={'space-between'} $gtSm={{ maw: 331 }} w={'100%'}>
       <XStack ai={'center'} jc="space-between">
         {status}
-        {(isSendStreak || isTagRegistration) && (
+        {shouldShowValue && (
           <Paragraph
             ff={'$mono'}
             py={'$0.5'}
