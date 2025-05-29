@@ -1677,17 +1677,6 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: number
       }
-      get_recent_senders: {
-        Args: Record<PropertyKey, never>
-        Returns: {
-          account_id: number
-          name: string
-          avatar_url: string
-          address: string
-          send_id: number
-          tag: string
-        }[]
-      }
       get_user_jackpot_summary: {
         Args: { num_runs: number }
         Returns: {
@@ -1907,10 +1896,6 @@ export type Database = {
       user_referrals_count: {
         Args: Record<PropertyKey, never>
         Returns: number
-      }
-      xd: {
-        Args: Record<PropertyKey, never>
-        Returns: Database["public"]["CompositeTypes"]["activity_feed_user"][]
       }
     }
     Enums: {
