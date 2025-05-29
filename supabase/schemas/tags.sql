@@ -260,64 +260,7 @@ $_$;
 
 ALTER FUNCTION "public"."tag_search"("query" "text", "limit_val" integer, "offset_val" integer) OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION public.insert_verification_tag_registration()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-declare curr_distribution_id bigint;
-
-begin --
-    -- check if tag is confirmed
-if NEW.status <> 'confirmed'::public.tag_status then return NEW;
-
-end if;
-
--- get the current distribution id
-curr_distribution_id := (
-    select id
-    from distributions
-    where qualification_start <= now()
-        and qualification_end >= now()
-    order by qualification_start desc
-    limit 1
-);
-
--- check if a verification for the same user, tag, and distribution already exists
-if curr_distribution_id is not null
-and not exists (
-    select 1
-    from public.distribution_verifications
-    where user_id = NEW.user_id
-        and metadata->>'tag' = NEW.name
-        and type = 'tag_registration'::public.verification_type
-) then -- insert new verification
-insert into public.distribution_verifications (distribution_id, user_id, type, metadata)
-values (
-        (
-            select id
-            from distributions
-            where qualification_start <= now()
-                and qualification_end >= now()
-            order by qualification_start desc
-            limit 1
-        ), NEW.user_id, 'tag_registration'::public.verification_type, jsonb_build_object('tag', NEW.name)
-    );
-
-end if;
-
-return NEW;
-
-end;
-
-$function$
-;
-
-ALTER FUNCTION "public"."insert_verification_tag_registration"() OWNER TO "postgres";
-
 -- Triggers
-CREATE OR REPLACE TRIGGER "insert_verification_tag_registration" AFTER INSERT OR UPDATE ON "public"."tags" FOR EACH ROW EXECUTE FUNCTION "public"."insert_verification_tag_registration"();
 
 CREATE OR REPLACE TRIGGER "trigger_tags_after_insert_or_update" AFTER INSERT OR UPDATE ON "public"."tags" FOR EACH ROW EXECUTE FUNCTION "public"."tags_after_insert_or_update_func"();
 
@@ -360,7 +303,3 @@ GRANT ALL ON FUNCTION "public"."tags_before_insert_or_update_func"() TO "service
 REVOKE ALL ON FUNCTION "public"."tag_search"("query" "text", "limit_val" integer, "offset_val" integer) FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."tag_search"("query" "text", "limit_val" integer, "offset_val" integer) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."tag_search"("query" "text", "limit_val" integer, "offset_val" integer) TO "service_role";
-
-GRANT ALL ON FUNCTION "public"."insert_verification_tag_registration"() TO "anon";
-GRANT ALL ON FUNCTION "public"."insert_verification_tag_registration"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."insert_verification_tag_registration"() TO "service_role";

@@ -41,6 +41,62 @@ end;
 $$;
 ALTER FUNCTION "public"."tag_receipts_insert_activity_trigger"() OWNER TO "postgres";
 
+CREATE OR REPLACE FUNCTION public.insert_verification_tag_registration_from_receipt()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = public AS $$
+DECLARE
+    curr_distribution_id bigint;
+    tag_user_id uuid;
+BEGIN
+    -- Get the tag's user_id
+    SELECT user_id INTO tag_user_id
+    FROM tags
+    WHERE name = NEW.tag_name;
+
+    -- If no tag found, return
+    IF tag_user_id IS NULL THEN
+        RETURN NEW;
+    END IF;
+
+    -- get the current distribution id
+    curr_distribution_id := (
+        SELECT id
+        FROM distributions
+        WHERE qualification_start <= (now() AT TIME ZONE 'UTC')
+            AND qualification_end >= (now() AT TIME ZONE 'UTC')
+        ORDER BY qualification_start DESC
+        LIMIT 1
+    );
+
+    -- check if a verification for the same user, tag, and distribution already exists
+    IF curr_distribution_id IS NOT NULL THEN
+        -- insert new verification
+        INSERT INTO public.distribution_verifications (
+            distribution_id,
+            user_id,
+            type,
+            metadata,
+            weight
+        )
+        VALUES (
+            curr_distribution_id,
+            tag_user_id,
+            'tag_registration'::public.verification_type,
+            jsonb_build_object('tag', NEW.tag_name),
+            CASE
+                WHEN LENGTH(NEW.tag_name) >= 6 THEN 1
+                WHEN LENGTH(NEW.tag_name) = 5 THEN 2
+                WHEN LENGTH(NEW.tag_name) = 4 THEN 3
+                WHEN LENGTH(NEW.tag_name) > 0  THEN 4
+                ELSE 0
+            END
+        );
+    END IF;
+
+    RETURN NEW;
+END;
+$$;
+
 -- Sequences
 CREATE SEQUENCE IF NOT EXISTS "public"."tag_receipts_id_seq"
     AS integer
@@ -78,6 +134,11 @@ ALTER TABLE ONLY "public"."tag_receipts"
 
 -- Triggers
 CREATE OR REPLACE TRIGGER "tag_receipts_insert_activity_trigger" AFTER INSERT ON "public"."tag_receipts" REFERENCING NEW TABLE AS "new_table" FOR EACH STATEMENT EXECUTE FUNCTION "public"."tag_receipts_insert_activity_trigger"();
+
+CREATE TRIGGER insert_verification_tag_registration_from_receipt
+AFTER INSERT ON public.tag_receipts
+FOR EACH ROW
+EXECUTE PROCEDURE public.insert_verification_tag_registration_from_receipt();
 
 -- RLS
 alter table "public"."tag_receipts" enable row level security;

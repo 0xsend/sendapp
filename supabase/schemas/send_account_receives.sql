@@ -9,11 +9,10 @@ end;
 $$;
 ALTER FUNCTION "public"."send_account_receives_delete_activity_trigger"() OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION public.send_account_receives_insert_activity_trigger()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
-AS $function$
+create or replace function send_account_receives_insert_activity_trigger() returns trigger
+language plpgsql
+security definer as
+$$
 declare
     _f_user_id uuid;
     _t_user_id uuid;
@@ -49,8 +48,7 @@ begin
 
     return NEW;
 end;
-$function$
-;
+$$;
 
 ALTER FUNCTION "public"."send_account_receives_insert_activity_trigger"() OWNER TO "postgres";
 

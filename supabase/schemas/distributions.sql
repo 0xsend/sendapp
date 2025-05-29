@@ -607,35 +607,39 @@ $$;
 
 ALTER FUNCTION "public"."insert_tag_referral_verifications"("distribution_num" integer) OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "public"."insert_tag_registration_verifications"("distribution_num" integer) RETURNS "void"
-    LANGUAGE "plpgsql"
-    AS $$
+CREATE OR REPLACE FUNCTION insert_tag_registration_verifications(distribution_num integer)
+RETURNS void AS $$
 BEGIN
     INSERT INTO public.distribution_verifications(
         distribution_id,
         user_id,
         type,
         metadata,
-        created_at)
+        weight,
+        created_at
+    )
     SELECT
         (
-            SELECT
-                id
-            FROM
-                distributions
-            WHERE
-                "number" = distribution_num
-            LIMIT 1),
-        user_id,
+            SELECT id
+            FROM distributions
+            WHERE "number" = distribution_num
+            LIMIT 1
+        ),
+        t.user_id,
         'tag_registration'::public.verification_type,
-        jsonb_build_object('tag', "name"),
-        created_at
-    FROM
-        tags
-    WHERE
-        status = 'confirmed'::public.tag_status;
+        jsonb_build_object('tag', t."name"),
+        CASE
+            WHEN LENGTH(t.name) >= 6 THEN 1
+            WHEN LENGTH(t.name) = 5 THEN 2
+            WHEN LENGTH(t.name) = 4 THEN 3 -- Increase reward value of shorter tags
+            WHEN LENGTH(t.name) > 0  THEN 4
+            ELSE 0
+        END,
+        t.created_at
+    FROM tags t
+    INNER JOIN tag_receipt tr ON t.name = tr.tag_name;
 END;
-$$;
+$$ LANGUAGE plpgsql;
 
 ALTER FUNCTION "public"."insert_tag_registration_verifications"("distribution_num" integer) OWNER TO "postgres";
 
