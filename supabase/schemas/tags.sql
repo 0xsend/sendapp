@@ -225,19 +225,9 @@ END IF;
                     public.referrals
                 WHERE
                     referred_id = _user_id) THEN
-            -- Insert only one referral for the user with tag_id
-            INSERT INTO referrals(referrer_id, referred_id, tag, tag_id)
-            SELECT
-                referrer_id,
-                _user_id,
-                t.name,
-                t.id
-            FROM
-                tags t
-            WHERE
-                t.name = tag_names[1]
-                AND t.status = 'confirmed'
-            LIMIT 1;
+            -- Insert only one referral for the user
+            INSERT INTO referrals(referrer_id, referred_id)
+            VALUES (referrer_id, _user_id);
         END IF;
     END IF;
 END IF;
