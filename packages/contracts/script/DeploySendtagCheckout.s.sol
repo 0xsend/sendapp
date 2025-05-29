@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 /// @dev forge script ./script/DeploySendtagCheckout.s.sol:DeploySendtagCheckoutScript
 contract DeploySendtagCheckoutScript is Script, Helper {
     function setUp() public {
-        this.labels();
+        labels();
     }
 
     function run() external returns (SendtagCheckout) {
@@ -19,10 +19,10 @@ contract DeploySendtagCheckoutScript is Script, Helper {
         require(multisig != address(0), "MULTISIG not set");
         require(token != address(0), "TOKEN not set");
         require(owner != address(0), "OWNER not set");
-        return this.deploy(multisig, token, owner);
+        return deploy(multisig, token, owner);
     }
 
-    function deploy(address multisig, address token, address owner) external returns (SendtagCheckout) {
+    function deploy(address multisig, address token, address owner) public returns (SendtagCheckout) {
         vm.startBroadcast();
         bytes32 salt = keccak256("fjord");
         SendtagCheckout sendtagCheckout = new SendtagCheckout{salt: salt}(multisig, token, owner);
