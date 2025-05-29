@@ -325,6 +325,7 @@ describe('isSwapBuyTransfer', () => {
 
   it('should return true if sender address matches a swap router address (ETH)', () => {
     activity = {
+      event_name: 'send_account_receives',
       data: {
         sender: '0x5b8B88f0A15c27B7C1ecf78aFfD6e7f4C54b96F0',
         f: '0x0000000000000000000000000000000000000000',
@@ -337,6 +338,7 @@ describe('isSwapBuyTransfer', () => {
 
   it('should return true if f address matches a swap router address (ERC-20)', () => {
     activity = {
+      event_name: 'send_account_transfers',
       data: {
         sender: '0x0000000000000000000000000000000000000000',
         f: '0x9e64D7edFd8B1b1eBDf20e4e60d070A6A4d0e3A6',
@@ -349,6 +351,7 @@ describe('isSwapBuyTransfer', () => {
 
   it('should return false if neither sender nor f address matches a swap router address', () => {
     activity = {
+      event_name: 'send_account_transfers',
       data: {
         sender: '0x0000000000000000000000000000000000000000',
         f: '0x0000000000000000000000000000000000000000',
@@ -361,6 +364,7 @@ describe('isSwapBuyTransfer', () => {
 
   it('should return false if activity has no sender or f address', () => {
     activity = {
+      event_name: 'send_account_transfers',
       data: {
         sender: undefined,
         f: undefined,
@@ -373,6 +377,7 @@ describe('isSwapBuyTransfer', () => {
 
   it('should return false if no swapRouters are provided', () => {
     activity = {
+      event_name: 'send_account_receives',
       data: {
         sender: '0x5b8B88f0A15c27B7C1ecf78aFfD6e7f4C54b96F0',
         f: '0x0000000000000000000000000000000000000000',
@@ -385,6 +390,7 @@ describe('isSwapBuyTransfer', () => {
 
   it('should return true if sender address matches a swap router address even when no f address is provided', () => {
     activity = {
+      event_name: 'send_account_receives',
       data: {
         sender: '0x5b8B88f0A15c27B7C1ecf78aFfD6e7f4C54b96F0',
         f: undefined,
@@ -393,6 +399,48 @@ describe('isSwapBuyTransfer', () => {
 
     const result = isSwapBuyTransfer(activity, swapRouters)
     expect(result).toBe(true)
+  })
+
+  it('should handle SendAccountTransfers events without sender field correctly', () => {
+    // This test verifies the fix for the InvalidAddressError
+    // SendAccountTransfers events have 'f' and 't' fields, not 'sender'
+    activity = {
+      event_name: 'send_account_transfers',
+      created_at: new Date(),
+      from_user: { id: '1', name: 'Test User', avatar_url: null, send_id: 1, tags: [] },
+      to_user: null,
+      data: {
+        f: '0x9e64D7edFd8B1b1eBDf20e4e60d070A6A4d0e3A6',
+        t: '0x0000000000000000000000000000000000000000',
+        v: 1000n,
+        log_addr: '0x0000000000000000000000000000000000000000',
+        // No 'sender' field - this would previously cause InvalidAddressError
+      },
+    } as Activity
+
+    // Should not throw an error and should return true since 'f' matches a router
+    expect(() => isSwapBuyTransfer(activity, swapRouters)).not.toThrow()
+    expect(isSwapBuyTransfer(activity, swapRouters)).toBe(true)
+  })
+
+  it('should handle SendAccountReceive events without f field correctly', () => {
+    // SendAccountReceive events have 'sender' field, not 'f' and 't'
+    activity = {
+      event_name: 'send_account_receives',
+      created_at: new Date(),
+      from_user: null,
+      to_user: { id: '1', name: 'Test User', avatar_url: null, send_id: 1, tags: [] },
+      data: {
+        sender: '0x5b8B88f0A15c27B7C1ecf78aFfD6e7f4C54b96F0',
+        value: 1000n,
+        log_addr: '0x0000000000000000000000000000000000000000',
+        // No 'f' field - this is expected for receive events
+      },
+    } as Activity
+
+    // Should not throw an error and should return true since 'sender' matches a router
+    expect(() => isSwapBuyTransfer(activity, swapRouters)).not.toThrow()
+    expect(isSwapBuyTransfer(activity, swapRouters)).toBe(true)
   })
 })
 
@@ -411,6 +459,7 @@ describe('isSwapSellTransfer', () => {
 
   it('should return true if t address matches a liquidity pool address', () => {
     activity = {
+      event_name: 'send_account_transfers',
       data: {
         t: '0x3dC60B7fF5F4E4B4462A2B755B96eB8a12A3d2B8',
       },
@@ -422,6 +471,7 @@ describe('isSwapSellTransfer', () => {
 
   it('should return true if t address matches a swap router address', () => {
     activity = {
+      event_name: 'send_account_transfers',
       data: {
         t: '0x5b8B88f0A15c27B7C1ecf78aFfD6e7f4C54b96F0',
       },
@@ -433,6 +483,7 @@ describe('isSwapSellTransfer', () => {
 
   it('should return false if t address does not match any liquidity pool or swap router address', () => {
     activity = {
+      event_name: 'send_account_transfers',
       data: {
         t: '0x0000000000000000000000000000000000000000',
       },
@@ -444,6 +495,7 @@ describe('isSwapSellTransfer', () => {
 
   it('should return false if t address is not provided', () => {
     activity = {
+      event_name: 'send_account_transfers',
       data: {
         t: undefined,
       },
@@ -455,6 +507,7 @@ describe('isSwapSellTransfer', () => {
 
   it('should return false if no swapRouters and no liquidityPools are provided', () => {
     activity = {
+      event_name: 'send_account_transfers',
       data: {
         t: '0x5b8B88f0A15c27B7C1ecf78aFfD6e7f4C54b96F0',
       },
@@ -466,6 +519,7 @@ describe('isSwapSellTransfer', () => {
 
   it('should return true if t address matches a liquidity pool address even if no swap routers are provided', () => {
     activity = {
+      event_name: 'send_account_transfers',
       data: {
         t: '0x3dC60B7fF5F4E4B4462A2B755B96eB8a12A3d2B8',
       },
@@ -477,6 +531,7 @@ describe('isSwapSellTransfer', () => {
 
   it('should return true if t address matches a swap router address even if no liquidity pools are provided', () => {
     activity = {
+      event_name: 'send_account_transfers',
       data: {
         t: '0x9e64D7edFd8B1b1eBDf20e4e60d070A6A4d0e3A6',
       },
@@ -484,6 +539,21 @@ describe('isSwapSellTransfer', () => {
 
     const result = isSwapSellTransfer(activity, swapRouters, [])
     expect(result).toBe(true)
+  })
+
+  it('should return false for non-transfer events', () => {
+    // SendAccountReceive events don't have 't' field, should return false
+    activity = {
+      event_name: 'send_account_receives',
+      data: {
+        sender: '0x5b8B88f0A15c27B7C1ecf78aFfD6e7f4C54b96F0',
+        value: 1000n,
+        log_addr: '0x0000000000000000000000000000000000000000',
+      },
+    } as Activity
+
+    const result = isSwapSellTransfer(activity, swapRouters, liquidityPools)
+    expect(result).toBe(false)
   })
 })
 
@@ -502,6 +572,7 @@ describe('isActivitySwapTransfer', () => {
 
   it('should return true if isSwapBuyTransfer returns true', () => {
     activity = {
+      event_name: 'send_account_receives',
       data: {
         sender: '0x5b8B88f0A15c27B7C1ecf78aFfD6e7f4C54b96F0',
       },
@@ -513,6 +584,7 @@ describe('isActivitySwapTransfer', () => {
 
   it('should return true if isSwapSellTransfer returns true', () => {
     activity = {
+      event_name: 'send_account_transfers',
       data: {
         t: '0x3dC60B7fF5F4E4B4462A2B755B96eB8a12A3d2B8',
       },
@@ -524,6 +596,7 @@ describe('isActivitySwapTransfer', () => {
 
   it('should return false if neither isSwapBuyTransfer nor isSwapSellTransfer return true', () => {
     activity = {
+      event_name: 'send_account_transfers',
       data: {
         sender: '0x0000000000000000000000000000000000000000',
         t: '0x0000000000000000000000000000000000000000',
@@ -536,6 +609,7 @@ describe('isActivitySwapTransfer', () => {
 
   it('should return false if no swapRouters or liquidityPools are provided', () => {
     activity = {
+      event_name: 'send_account_receives',
       data: {
         sender: '0x5b8B88f0A15c27B7C1ecf78aFfD6e7f4C54b96F0',
       },
@@ -547,6 +621,7 @@ describe('isActivitySwapTransfer', () => {
 
   it('should return false if neither isSwapBuyTransfer nor isSwapSellTransfer is true (no t or sender address)', () => {
     activity = {
+      event_name: 'send_account_transfers',
       data: {
         sender: undefined,
         t: undefined,

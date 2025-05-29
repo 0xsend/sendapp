@@ -217,12 +217,17 @@ export const noteFromActivity = (activity: Activity) =>
 export const isSwapBuyTransfer = (activity: Activity, swapRouters: SwapRouter[] = []) => {
   const { data } = activity
 
+  // For ETH receives (SendAccountReceive events), check the sender field
   const isEthBuy =
+    isSendAccountReceiveEvent(activity) &&
     data.sender &&
     swapRouters.some((swapRouter) => isAddressEqual(data.sender, swapRouter.router_addr))
 
+  // For ERC20 transfers (SendAccountTransfers events), check the from (f) field
   const isErc20Buy =
-    data.f && swapRouters.some((swapRouter) => isAddressEqual(data.f, swapRouter.router_addr))
+    isSendAccountTransfersEvent(activity) &&
+    data.f &&
+    swapRouters.some((swapRouter) => isAddressEqual(data.f, swapRouter.router_addr))
 
   return Boolean(isEthBuy || isErc20Buy)
 }
@@ -243,8 +248,10 @@ export const isSwapSellTransfer = (
 ) => {
   const { data } = activity
 
+  // Only check the 't' field for ERC20 transfers (SendAccountTransfers events)
   return Boolean(
-    data.t &&
+    isSendAccountTransfersEvent(activity) &&
+      data.t &&
       (liquidityPools.some((liquidityPool) => isAddressEqual(data.t, liquidityPool.pool_addr)) ||
         swapRouters.some((swapRouter) => isAddressEqual(data.t, swapRouter.router_addr)))
   )
