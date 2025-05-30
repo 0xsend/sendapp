@@ -141,13 +141,15 @@ BEGIN
         PERFORM tests.authenticate_as('collision_user1');
         SELECT create_tag('samename', collision_send_account1_id) INTO collision_tag1_id;
         
-        -- Second user tries to create same name (should fail due to unique constraint)
+        -- Second user tries to create same name (should fail due to collision prevention)
         PERFORM tests.authenticate_as('collision_user2');
         BEGIN
             SELECT create_tag('samename', collision_send_account2_id) INTO collision_tag2_id;
         EXCEPTION
-            WHEN unique_violation THEN
-                error_caught := true;
+            WHEN OTHERS THEN
+                IF SQLERRM LIKE '%Tag with same name already exists%' THEN
+                    error_caught := true;
+                END IF;
         END;
         
         PERFORM ok(error_caught, 'Tag name collision properly prevented');
@@ -202,6 +204,9 @@ BEGIN
         reuse_tag_id bigint;
         reuse_count integer := 0;
     BEGIN
+        -- Re-authenticate as the original test user
+        PERFORM tests.authenticate_as('perf_user');
+        
         -- Create and delete a tag multiple times to test reuse efficiency
         FOR i IN 1..3 LOOP
             SELECT create_tag(available_tag_name, test_send_account_id) INTO reuse_tag_id;

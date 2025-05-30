@@ -87,6 +87,7 @@ BEGIN
     END;
     
     -- Test 6: Cannot set main_tag_id to unowned tag
+    PERFORM tests.authenticate_as('main_tag_other');
     SELECT create_tag('othertag', other_send_account_id) INTO other_tag_id;
     
     SET ROLE service_role;
