@@ -17,37 +17,45 @@ The main sendtag functionality is implemented with minimal database changes:
 1. **main_tag_id column** on `send_accounts` table
    - Foreign key to `tags(id)` with `ON DELETE SET NULL`
    - Indexed for performance (`idx_send_accounts_main_tag_id`)
-   
+
 2. **Automatic main tag assignment**
    - First confirmed tag becomes main automatically via `handle_tag_confirmation()` trigger
    - When deleting current main tag, next oldest confirmed tag becomes main via `handle_send_account_tags_deleted()` trigger
-   
+
 3. **Validation via triggers**
    - `validate_main_tag_update()` ensures:
      - Cannot set main_tag_id to NULL if confirmed tags exist
      - main_tag_id must be one of user's confirmed tags
-   
+
 4. **No API breaking changes**
    - Existing tag operations continue to work
    - Main tag selection is additive functionality
 
 ## Current Implementation Status
 
-The database layer has been fully implemented with the following key changes:
+After rebasing to dev and converting to declarative schemas, the implementation is progressing well:
 
-### Database Schema Updates (Completed)
-- **Tags table**: Now uses numeric `id` as primary key, added 'available' status
-- **New junction table**: `send_account_tags` links send accounts to tags
-- **Send accounts**: Added `main_tag_id` for primary tag tracking
-- **Related tables**: Updated `tag_receipts` and `referrals` to use `tag_id`
-- **Historical tracking**: Added `historical_tag_associations` for audit trail
-- **All declarative schemas**: Updated to reflect the new architecture
+### ✅ Database Schema (Phase 1 - COMPLETED)
+- **Tags table**: Uses numeric `id` as primary key, includes 'available' status for tag reuse
+- **Junction table**: `send_account_tags` fully implemented with proper foreign keys and indexes
+- **Send accounts**: `main_tag_id` field with foreign key constraint and validation triggers
+- **Historical tracking**: `historical_tag_associations` table for audit trail
+- **All schemas**: Converted to declarative schema format in `/supabase/schemas/`
 
-### Key Functions Implemented
-- `create_tag()`: Properly creates tags linked to send accounts
-- `confirm_tags()`: Updated signature to include `send_account_id`
-- Tag lifecycle management through triggers
-- RLS policies updated for new ownership model
+### ✅ Key Database Functions (IMPLEMENTED)
+- `create_tag()`: Creates tags properly linked to send accounts via junction table
+- `confirm_tags()`: Updated to use `send_account_id` parameter and create junction table entries
+- `validate_main_tag_update()`: Prevents invalid main tag assignments
+- `handle_tag_confirmation()`: Auto-assigns first confirmed tag as main
+- `handle_send_account_tags_deleted()`: Manages tag deletion and main tag promotion
+- **RLS policies**: Updated for new ownership model via junction table
+
+### 🔄 API Layer (Phase 2 - PARTIALLY COMPLETED)
+- ✅ `tag.create`: Uses proper `create_tag` function with `send_account_id`
+- ✅ `tag.confirm`: Uses proper `confirm_tags` function with `send_account_id` 
+- ✅ `tag.delete`: Correctly deletes from `send_account_tags` junction table
+- ✅ `sendAccount.updateMainTag`: Fully implemented main tag selection endpoint
+- ❌ `tag.registerFirstSendtag`: **CRITICAL - Still bypasses `send_account_tags` table**
 
 ## API Approach for Main Tags
 
@@ -83,8 +91,8 @@ const mainTag = user.tags.find(t => t.isMain) || user.tags[0];
 
 // Tag management shows radio buttons
 tags.map(tag => (
-  <RadioButton 
-    checked={tag.isMain} 
+  <RadioButton
+    checked={tag.isMain}
     onChange={() => updateMainTag(tag.id)}
   />
 ))
@@ -93,95 +101,142 @@ tags.map(tag => (
 ## Implementation Phases
 
 ### Phase 1: [Database Schema & Migrations](./phase-1-database-schema.md) ✅ COMPLETED
-- Created `send_account_tags` junction table
-- Added `main_tag_id` to send_accounts
-- Migrated existing tags to use numeric IDs
-- Set up validation triggers
-- Converted all migrations to declarative schemas
+- ✅ Created `send_account_tags` junction table with proper foreign keys and indexes
+- ✅ Added `main_tag_id` to send_accounts with validation triggers  
+- ✅ Migrated existing tags to use numeric IDs as primary key
+- ✅ Set up tag lifecycle management triggers (`handle_tag_confirmation`, `handle_send_account_tags_deleted`)
+- ✅ Converted all migrations to declarative schemas in `/supabase/schemas/`
+- ✅ Updated RLS policies for new ownership model
+- ✅ Added 'available' status for tag reuse functionality
 
-### Phase 2: [API Layer Updates](./phase-2-api-layer.md) 🚧 IN PROGRESS
-- Fix `registerFirstSendtag` to use send_account_id (CRITICAL)
-- Add validation to `updateMainTag` endpoint
-- Update tag creation and deletion endpoints
-- Implement proper error handling
+### Phase 2: [API Layer Updates](./phase-2-api-layer.md) 🔄 PARTIALLY COMPLETED
+- ✅ Updated `tag.create` to use proper `create_tag` function with `send_account_id`
+- ✅ Updated `tag.confirm` to use proper `confirm_tags` function with `send_account_id`
+- ✅ Updated `tag.delete` to work with `send_account_tags` junction table
+- ✅ Implemented `sendAccount.updateMainTag` endpoint with validation
+- ❌ **CRITICAL**: Fix `registerFirstSendtag` to create `send_account_tags` associations
+- 📋 Test all API endpoints with new junction table model
 
 ### Phase 3: [Frontend Components](./phase-3-frontend-components.md) 📋 TODO
-- Update sendtag management screen
-- Implement main tag selection and deletion
-- Add visual indicators for main tags
-- Update profile and activity displays
+- Update sendtag management screen to show multiple tags
+- Implement main tag selection UI (radio buttons)
+- Add visual indicators for main tags in profile displays
+- Update activity feed to use main tags
+- Handle tag deletion UI and confirmations
 
 ### Phase 4: [Testing & Polish](./phase-4-testing.md) 📋 TODO
-- Run comprehensive test suite
-- Validate end-to-end functionality
-- Performance optimization
-- User acceptance testing
+- Fix critical `registerFirstSendtag` onboarding issue
+- Run comprehensive test suite (database, API, E2E)
+- Validate tag lifecycle management end-to-end
+- Performance testing with multiple tags per user
+- User acceptance testing for main tag functionality
 
 ## Critical Issues to Address
 
-### 🚨 Priority 1: registerFirstSendtag Fix
-**Issue**: [#1518](https://github.com/0xsend/sendapp/issues/1518) - New user onboarding broken
-- `registerFirstSendtag` bypasses `send_account_tags` table
-- First sendtags not properly linked to send accounts
-- Affects all new user sign-ups
+### 🚨 Priority 1: Fix registerFirstSendtag Onboarding Issue
+**Location**: `packages/api/src/routers/tag/router.ts:96-164`
+**Problem**: The `registerFirstSendtag` endpoint directly inserts into the `tags` table without creating the required `send_account_tags` association:
 
-### ⚠️ Priority 2: API Validation Missing  
-**Issue**: [#1519](https://github.com/0xsend/sendapp/issues/1519) - Security vulnerability
-- `updateMainTag` lacks validation
-- Users can set invalid main_tag_id values
-- No ownership or confirmation checks
+```typescript
+// BROKEN - bypasses send_account_tags table
+const { error: insertError } = await supabaseAdmin
+  .from('tags')
+  .insert({ name, status: 'confirmed', user_id: session.user.id })
+```
+
+**Impact**: 
+- New user onboarding is broken
+- First sendtags are not properly linked to send accounts
+- Users cannot access their first sendtag via junction table queries
+- Database integrity is compromised
+
+**Solution Required**:
+1. Get user's `send_account_id` 
+2. Use `create_tag()` function instead of direct insert
+3. Ensure `send_account_tags` association is created
+4. Test onboarding flow end-to-end
+
+### ✅ Priority 2: API Validation (RESOLVED)
+- `updateMainTag` endpoint is properly implemented with database-level validation
+- Database triggers prevent invalid main_tag_id assignments
+- Proper ownership checks via RLS policies
 
 ## Quick Start
 
-To continue development:
-1. Generate TypeScript types: `cd supabase && yarn generate`
-2. Review [Main Sendtag Implementation Approach](./main-sendtag-approach.md) for detailed design
-3. Start with Phase 2 (API fixes) - addresses critical onboarding issue
-4. Phase 3 (frontend polish) for UX improvements
-5. Phase 4 (testing) to validate everything works
+### Immediate Priority (Critical Fix)
+1. **Fix registerFirstSendtag onboarding issue**:
+   - Location: `packages/api/src/routers/tag/router.ts:96-164`
+   - Replace direct `tags` table insert with proper `create_tag()` function call
+   - Test onboarding flow to ensure `send_account_tags` associations are created
+
+### For Development Continuation:
+1. **Generate TypeScript types**: `cd supabase && yarn generate`
+2. **Review database implementation**: All schema files in `/supabase/schemas/` 
+3. **Phase 2 completion**: Fix critical API issue, then test all endpoints
+4. **Phase 3 (Frontend)**: Implement main tag selection UI
+5. **Phase 4 (Testing)**: Comprehensive validation of the complete feature
+
+### Architecture Reference
+- [Main Sendtag Implementation Approach](./main-sendtag-approach.md) - Detailed design decisions
+- [Phase 1 Database Schema](./phase-1-database-schema.md) - ✅ Completed implementation details
 
 ## Current State Summary
 
-### ✅ Already Implemented in Database
-- `main_tag_id` column on send_accounts table
-- Foreign key constraint with ON DELETE SET NULL
-- Performance index `idx_send_accounts_main_tag_id`
-- `validate_main_tag_update()` trigger for data integrity
-- `handle_tag_confirmation()` auto-assigns first tag as main
-- `handle_send_account_tags_deleted()` auto-promotes next tag
-- All declarative schemas updated and complete
+### ✅ Database Layer (FULLY IMPLEMENTED)
+- ✅ `send_account_tags` junction table with proper foreign keys and indexes
+- ✅ `main_tag_id` column on send_accounts with foreign key constraint (ON DELETE SET NULL)
+- ✅ Performance indexes for efficient queries
+- ✅ `validate_main_tag_update()` trigger prevents invalid main tag assignments
+- ✅ `handle_tag_confirmation()` auto-assigns first confirmed tag as main
+- ✅ `handle_send_account_tags_deleted()` auto-promotes next oldest tag as main
+- ✅ All schemas converted to declarative format in `/supabase/schemas/`
+- ✅ RLS policies updated for new ownership model
+- ✅ Tag reuse functionality with 'available' status
 
-### 🚧 Still Needed
-- API endpoint to manually update main tag
-- Frontend UI for selecting main tag
-- Fix registerFirstSendtag to properly use send_account_tags
+### ✅ API Layer (MOSTLY IMPLEMENTED)
+- ✅ `sendAccount.updateMainTag` endpoint for manual main tag selection
+- ✅ `tag.create`, `tag.confirm`, `tag.delete` all use proper junction table
+- ❌ **CRITICAL**: `tag.registerFirstSendtag` still bypasses send_account_tags
+
+### 📋 Still Needed (Next Engineer Tasks)
+1. **Critical Fix**: Update `registerFirstSendtag` to use `create_tag()` function
+2. **Frontend**: Main tag selection UI (radio buttons in tag management screen)
+3. **Frontend**: Visual indicators for main tags in profile displays
+4. **Testing**: End-to-end validation of tag lifecycle and main tag functionality
 
 ## Testing Commands
 
 ```bash
-# Database tests
+# Database tests (test all schema functions and triggers)
 cd supabase && yarn supabase test
 
-# Reset database after schema changes
-cd supabase && yarn supabase reset
-
-# Generate TypeScript types
-cd supabase && yarn generate
-
-# API tests  
+# API tests (test all endpoints including registerFirstSendtag fix)
 cd packages/api && yarn test | cat
 
-# E2E tests
+# E2E tests (test complete user flows)
 cd packages/playwright && yarn playwright test
+
+# Generate TypeScript types after schema changes
+cd supabase && yarn generate
+
+# Reset database after schema modifications
+cd supabase && yarn supabase reset
 ```
 
 ## Working with Declarative Schemas
 
-All database changes are now managed through declarative schemas in `/supabase/schemas/`. When making changes:
+This project uses **declarative schemas** (not traditional migrations) in `/supabase/schemas/`. 
 
-1. Stop the database: `cd supabase && yarn supabase stop`
-2. Edit schema files in `/supabase/schemas/`
-3. Generate migration: `cd supabase && yarn migration:diff <migration_name>`
-4. Start database: `cd supabase && yarn supabase start`
+### Current Schema Files:
+- `send_account_tags.sql` - Junction table implementation
+- `send_accounts.sql` - Main tag functionality
+- `tags.sql` - Tag creation and lifecycle
+- `tags_rls_policies.sql` - Row-level security
 
-The CI pipeline includes schema drift detection to ensure migrations stay in sync with declarative schemas.
+### Making Database Changes:
+1. **Stop database**: `cd supabase && yarn supabase stop`
+2. **Edit schema files**: Modify files in `/supabase/schemas/`
+3. **Generate migration**: `cd supabase && yarn migration:diff <migration_name>`
+4. **Start database**: `cd supabase && yarn supabase start`
+
+⚠️ **Important**: Always stop the database before editing schema files. The CI pipeline includes schema drift detection to ensure migrations stay synchronized with declarative schemas.
