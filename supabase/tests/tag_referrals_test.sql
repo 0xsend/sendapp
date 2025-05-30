@@ -90,7 +90,6 @@ SELECT
     results_eq($$
         SELECT
             COUNT(*)::integer FROM referrals r
-            JOIN tags t ON t.id = r.tag_id
             WHERE
                 r.referrer_id = tests.get_supabase_uid('bob') -- Bob is the referrer
                 AND r.referred_id = tests.get_supabase_uid('alice') $$, -- Alice was referred
