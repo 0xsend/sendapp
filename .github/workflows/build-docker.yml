@@ -21,7 +21,5 @@ jobs:
       - name: Build & Push Docker Image for next-app
         uses: ./.github/actions/docker-build
         with:
-          build-nextjs-docker: true
-          push-nextjs-docker-image: true
-          dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
-          dockerhub_password: ${{ secrets.DOCKERHUB_TOKEN }}
+          package: next-app
+          ghcr-token: ${{ secrets.GITHUB_TOKEN }}

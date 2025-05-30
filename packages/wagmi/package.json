@@ -16,6 +16,9 @@
     },
     "./contracts/base-jackpot": {
       "import": "./src/contracts/base-jackpot.ts"
+    },
+    "./generated": {
+      "import": "./src/generated.ts"
     }
   },
   "scripts": {

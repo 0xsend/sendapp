@@ -1,0 +1,66 @@
+name: Build Distributor Docker Image
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Environment name (staging, production)'
+        required: true
+        type: string
+    outputs:
+      image-tag:
+        description: 'The full image tag of the built distributor image'
+        value: ${{ jobs.build-distributor.outputs.image-tag }}
+
+jobs:
+  build-distributor:
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ steps.output-tag.outputs.image-tag }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate image metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/sendapp-distributor
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=${{ inputs.environment }}-latest
+            type=raw,value=${{ inputs.environment }}-{{sha}}
+
+      - name: Build and push Docker image
+        id: build-and-push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          target: distributor-runner
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            PACKAGE=distributor
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+      - name: Output image tag
+        id: output-tag
+        run: |
+          echo "Image tags: ${{ steps.meta.outputs.tags }}"
+          echo "image-tag=ghcr.io/${{ github.repository_owner }}/sendapp-distributor:${{ inputs.environment }}-${{ github.sha }}" >> $GITHUB_OUTPUT

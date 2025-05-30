@@ -1,7 +1,10 @@
-name: "Build and Push Next App Docker Image"
-description: "Builds the next-app Docker image using Buildx, caches layers with GHCR, tags, and pushes to GHCR."
+name: "Build and Push Docker Image"
+description: "Builds Docker images for monorepo services using Buildx, caches layers with GHCR, tags, and pushes to GHCR."
 
 inputs:
+  package:
+    description: "Package to build (next-app, distributor, workers, @my/shovel)"
+    required: true
   build-args:
     description: "Build arguments to pass to docker buildx build (e.g., 'ARG1=value1 ARG2=value2')"
     required: false
@@ -11,9 +14,9 @@ inputs:
     required: true
     default: ${{ github.token }}
   image-name:
-    description: "Base name for the image in GHCR (e.g., next-app)"
-    required: true
-    default: "next-app"
+    description: "Base name for the image in GHCR (defaults to service name)"
+    required: false
+    default: ""
 
 outputs:
   image-tag:
@@ -35,7 +38,12 @@ runs:
       shell: bash
       run: |
         SHORT_SHA=$(git rev-parse --short=10 HEAD)
-        IMAGE_TAG="ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}/${{ inputs.image-name }}:${SHORT_SHA}"
+        # Use provided image-name or default to package name
+        IMAGE_NAME="${{ inputs.image-name }}"
+        if [ -z "$IMAGE_NAME" ]; then
+          IMAGE_NAME="${{ inputs.package }}"
+        fi
+        IMAGE_TAG="ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}/${IMAGE_NAME}:${SHORT_SHA}"
         echo "IMAGE_TAG=${IMAGE_TAG,,}" >> $GITHUB_OUTPUT # Lowercase for Docker compatibility
         
     - name: Set Environment Variables from Template
@@ -70,10 +78,12 @@ runs:
 
         docker buildx build \
           --tag ${{ steps.generate-tag.outputs.IMAGE_TAG }} \
+          --target ${{ inputs.package }}-runner \
+          --build-arg PACKAGE=${{ inputs.package }} \
           --cache-from type=gha \
           --cache-to type=gha,mode=max \
           --push \
-          -f ./apps/next/Dockerfile \
+          -f ./Dockerfile \
           ${BUILD_ARGS_STRING} \
           .
 

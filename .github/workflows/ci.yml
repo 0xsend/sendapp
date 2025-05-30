@@ -58,11 +58,14 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./apps/next/Dockerfile
+          file: ./Dockerfile
+          target: next-app-runner
           push: false
           load: true
           tags: ${{ steps.image-tag.outputs.tag }}
-          build-args: ${{ steps.build-args.outputs.args }}
+          build-args: |
+            PACKAGE=next-app
+            ${{ steps.build-args.outputs.args }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

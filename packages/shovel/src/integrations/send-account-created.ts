@@ -5,7 +5,7 @@ import type {
   Integration,
   Table,
 } from '@indexsupply/shovel-config'
-import { sendAccountFactoryAddress } from '@my/wagmi'
+import { sendAccountFactoryAddress } from '@my/wagmi/generated'
 
 export const sendAcctFactoryTable: Table = {
   name: 'send_account_created',
