@@ -22,8 +22,6 @@ import {
   isTemporalEthTransfersEvent,
   isTemporalTokenTransfersEvent,
 } from 'app/utils/zod/activity/TemporalTransfersEventSchema'
-import { useTokenActivityRowSize } from 'app/features/home/utils/useTokenActivityRowSize'
-import { useThemeSetting } from '@tamagui/next-theme'
 
 export function TokenActivityRow({
   activity,
@@ -46,9 +44,6 @@ export function TokenActivityRow({
     isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
   const hoverStyles = useHoverStyles()
   const router = useRouter()
-  const { height } = useTokenActivityRowSize()
-  const { resolvedTheme } = useThemeSetting()
-  const isDark = !!resolvedTheme?.startsWith('dark')
 
   const isUserTransfer =
     (isERC20Transfer || isETHReceive || isTemporalTransfer) &&
@@ -70,14 +65,13 @@ export function TokenActivityRow({
   return (
     <XStack
       width={'100%'}
-      height={height}
+      height={102}
       ai="center"
       jc="space-between"
       gap="$4"
       p="$3.5"
       br={'$4'}
       cursor={onPress ? 'pointer' : 'default'}
-      $gtLg={{ p: '$5' }}
       testID={'TokenActivityRow'}
       hoverStyle={onPress ? hoverStyles : null}
       onPress={handlePress}
@@ -103,7 +97,7 @@ export function TokenActivityRow({
             f={1}
           >
             <Paragraph
-              color={isDark ? '$lightGrayTextField' : '$darkGrayTextField'}
+              color={'$color10'}
               size={'$4'}
               maxWidth={'100%'}
               overflow={'hidden'}
@@ -114,12 +108,7 @@ export function TokenActivityRow({
               {isUserTransfer ? eventName : subtext}
             </Paragraph>
           </XStack>
-          <Paragraph
-            color={isDark ? '$darkGrayTextField' : '$lightGrayTextField'}
-            size={'$3'}
-            flexShrink={0}
-            display={'flex'}
-          >
+          <Paragraph color={'$color10'} size={'$3'} flexShrink={0} display={'flex'} opacity={0.6}>
             {date}
           </Paragraph>
         </YStack>
