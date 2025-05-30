@@ -52,9 +52,11 @@ CREATE OR REPLACE VIEW "public"."activity_feed" WITH ("security_barrier"='on') A
             CASE
                 WHEN ("a"."from_user_id" = ( SELECT "auth"."uid"() AS "uid")) THEN ( SELECT "auth"."uid"() AS "uid")
                 ELSE NULL::"uuid"
-            END, "from_p"."name", "from_p"."avatar_url", "from_p"."send_id", (( SELECT "array_agg"("tags"."name") AS "array_agg"
-               FROM "public"."tags"
-              WHERE (("tags"."user_id" = "from_p"."id") AND ("tags"."status" = 'confirmed'::"public"."tag_status"))))::"text"[])::"public"."activity_feed_user"
+            END, "from_p"."name", "from_p"."avatar_url", "from_p"."send_id", (( SELECT "array_agg"("t"."name") AS "array_agg"
+               FROM "public"."tags" "t"
+               JOIN "public"."send_account_tags" "sat" ON "sat"."tag_id" = "t"."id"
+               JOIN "public"."send_accounts" "sa" ON "sa"."id" = "sat"."send_account_id"
+              WHERE (("sa"."user_id" = "from_p"."id") AND ("t"."status" = 'confirmed'::"public"."tag_status"))))::"text"[])::"public"."activity_feed_user"
             ELSE NULL::"public"."activity_feed_user"
         END AS "from_user",
         CASE
@@ -62,9 +64,11 @@ CREATE OR REPLACE VIEW "public"."activity_feed" WITH ("security_barrier"='on') A
             CASE
                 WHEN ("a"."to_user_id" = ( SELECT "auth"."uid"() AS "uid")) THEN ( SELECT "auth"."uid"() AS "uid")
                 ELSE NULL::"uuid"
-            END, "to_p"."name", "to_p"."avatar_url", "to_p"."send_id", (( SELECT "array_agg"("tags"."name") AS "array_agg"
-               FROM "public"."tags"
-              WHERE (("tags"."user_id" = "to_p"."id") AND ("tags"."status" = 'confirmed'::"public"."tag_status"))))::"text"[])::"public"."activity_feed_user"
+            END, "to_p"."name", "to_p"."avatar_url", "to_p"."send_id", (( SELECT "array_agg"("t"."name") AS "array_agg"
+               FROM "public"."tags" "t"
+               JOIN "public"."send_account_tags" "sat" ON "sat"."tag_id" = "t"."id"
+               JOIN "public"."send_accounts" "sa" ON "sa"."id" = "sat"."send_account_id"
+              WHERE (("sa"."user_id" = "to_p"."id") AND ("t"."status" = 'confirmed'::"public"."tag_status"))))::"text"[])::"public"."activity_feed_user"
             ELSE NULL::"public"."activity_feed_user"
         END AS "to_user",
     "a"."data"

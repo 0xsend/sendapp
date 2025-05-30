@@ -438,14 +438,6 @@ CREATE TRIGGER "set_main_tag_on_confirmation"
 -- RLS
 ALTER TABLE "public"."tags" ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "delete_policy" ON "public"."tags" FOR DELETE TO "authenticated" USING ((((select "auth"."uid"()) = "user_id") AND ("status" = 'pending'::"public"."tag_status")));
-
-CREATE POLICY "insert_policy" ON "public"."tags" FOR INSERT WITH CHECK (((select "auth"."uid"()) = "user_id"));
-
-CREATE POLICY "select_policy" ON "public"."tags" FOR SELECT USING (((select "auth"."uid"()) = "user_id"));
-
-CREATE POLICY "update_policy" ON "public"."tags" FOR UPDATE USING (((select "auth"."uid"()) = "user_id")) WITH CHECK (((select "auth"."uid"()) = "user_id"));
-
 -- Grants
 GRANT ALL ON TABLE "public"."tags" TO "anon";
 GRANT ALL ON TABLE "public"."tags" TO "authenticated";
