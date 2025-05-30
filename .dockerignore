@@ -32,6 +32,7 @@
 .env.development.local
 .env.test.local
 .env.production.local
+.envrc.private
 
 # vercel
 .vercel
@@ -69,3 +70,7 @@ tmp
 **/.tamagui
 .watchman**
 **/vitest.config.ts.timestamp**
+
+# Yarn
+.yarn/*
+scratch
