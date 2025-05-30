@@ -58,11 +58,14 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./apps/next/Dockerfile
+          file: ./Dockerfile
+          target: next-app-runner
           push: false
           load: true
           tags: ${{ steps.image-tag.outputs.tag }}
-          build-args: ${{ steps.build-args.outputs.args }}
+          build-args: |
+            PACKAGE=next-app
+            ${{ steps.build-args.outputs.args }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -84,6 +87,8 @@ jobs:
   supabase-schema-drift-check:
     name: Supabase Schema Drift Check
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - name: Check for Schema Drift
@@ -92,6 +97,8 @@ jobs:
   unit-tests:
     name: Unit Tests
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
@@ -135,6 +142,8 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
@@ -188,7 +197,9 @@ jobs:
     needs: [build_next_image]
     # Testing, uncomment when ready
     # if: ${{ github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' || github.head_ref == 'dev' || github.head_ref == 'main' }}
-    runs-on: arc-runner-set
+    # arc-runner-set had a good run
+    # runs-on: arc-runner-set
+    runs-on: ubuntu-latest
     strategy:
       # Don't stop all shards if one fails
       fail-fast: false
@@ -202,6 +213,7 @@ jobs:
 
     # for writing PR comments
     permissions:
+      contents: read
       pull-requests: write
 
     timeout-minutes: 60
@@ -371,6 +383,7 @@ jobs:
     needs: [playwright-tests]
     # for writing PR comments
     permissions:
+      contents: read
       pull-requests: write
 
     steps:
@@ -430,6 +443,7 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
+      contents: read
       pull-requests: write
 
     env:

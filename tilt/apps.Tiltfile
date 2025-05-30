@@ -20,8 +20,8 @@ next_app_resource_deps = [
     "ui:generate-theme",
 ] if not CFG.dockerize else [])
 
-# Next
-if CFG.dockerize:
+# Next (disabled for now)
+if False and CFG.dockerize:
     GIT_BRANCH = str(local("git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD")).strip()
     GIT_HASH = str(local("git rev-parse --short=10 HEAD")).strip()
 

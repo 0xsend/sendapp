@@ -5,7 +5,7 @@ import type {
   Integration,
   Table,
 } from '@indexsupply/shovel-config'
-import { sendEarnUsdcFactoryAddress } from '@my/wagmi'
+import { sendEarnUsdcFactoryAddress } from '@my/wagmi/generated'
 
 export const sendEarnNewAffiliate: Table = {
   name: 'send_earn_new_affiliate',

@@ -1,5 +1,5 @@
 import type { BlockData, Column, Integration, Table } from '@indexsupply/shovel-config'
-import { sendRevenueSafeAddress } from '@my/wagmi'
+import { sendRevenueSafeAddress } from '@my/wagmi/generated'
 
 export const sendRevenuesSafeReceivesTable: Table = {
   name: 'send_revenues_safe_receives',
