@@ -87,6 +87,8 @@ jobs:
   supabase-schema-drift-check:
     name: Supabase Schema Drift Check
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - name: Check for Schema Drift
@@ -95,6 +97,8 @@ jobs:
   unit-tests:
     name: Unit Tests
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
@@ -138,6 +142,8 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
@@ -205,6 +211,7 @@ jobs:
 
     # for writing PR comments
     permissions:
+      contents: read
       pull-requests: write
 
     timeout-minutes: 60
@@ -374,6 +381,7 @@ jobs:
     needs: [playwright-tests]
     # for writing PR comments
     permissions:
+      contents: read
       pull-requests: write
 
     steps:
@@ -433,6 +441,7 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
+      contents: read
       pull-requests: write
 
     env:

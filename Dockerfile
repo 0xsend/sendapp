@@ -27,6 +27,7 @@ COPY .yarnrc.yml .yarnrc.yml
 COPY .yarn .yarn
 
 # Copy all package.json files
+# git ls-files | grep 'package\.json$' | sort | sed 's#\(.*\)#COPY \1 \1#'
 COPY apps/distributor/package.json apps/distributor/package.json
 COPY apps/expo/package.json apps/expo/package.json
 COPY apps/next/package.json apps/next/package.json

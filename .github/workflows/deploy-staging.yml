@@ -41,6 +41,8 @@ jobs:
   schema-drift-check:
     name: Check Schema Drift
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       # Add after dev branch is merged
@@ -52,6 +54,9 @@ jobs:
   build-distributor:
     name: Build Distributor Docker Image
     uses: ./.github/workflows/build-distributor.yml
+    permissions:
+      contents: read
+      packages: write
     with:
       environment: staging
     secrets: inherit
@@ -59,6 +64,9 @@ jobs:
   build-shovel:
     name: Build Shovel Docker Image
     uses: ./.github/workflows/build-shovel.yml
+    permissions:
+      contents: read
+      packages: write
     with:
       environment: staging
     secrets: inherit
@@ -66,6 +74,8 @@ jobs:
   deploy:
     needs: [schema-drift-check, build-distributor, build-shovel]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
         with:

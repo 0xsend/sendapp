@@ -15,6 +15,9 @@ on:
 jobs:
   build-shovel:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     outputs:
       image-tag: ${{ steps.output-tag.outputs.image-tag }}
     steps:
