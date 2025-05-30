@@ -179,13 +179,16 @@ SELECT
                 AND referred_id = tests.get_supabase_uid('alice') $test$, 'Referral should be created');
 -- Verify user cannot have two referrers
 SELECT
-    confirm_tags('{redroses}',(
+    confirm_tags('{redroses}'::citext[], (
+            SELECT id FROM send_accounts 
+            WHERE user_id = tests.get_supabase_uid('alice')
+        ), (
             SELECT
                 event_id
             FROM sendtag_checkout_receipts
             WHERE
                 sender = '\xa71ce00000000000000000000000000000000000'
-                AND src_name = 'redroses'),(
+                AND src_name = 'redroses'), (
             SELECT
                 referral_code
             FROM public.profiles
@@ -249,7 +252,10 @@ SELECT
 SELECT
     set_config('role', 'service_role', TRUE);
 SELECT
-    confirm_tags('{wonderland}',(
+    confirm_tags('{wonderland}'::citext[], (
+            SELECT id FROM send_accounts 
+            WHERE user_id = tests.get_supabase_uid('alice')
+        ), (
             SELECT
                 event_id
             FROM sendtag_checkout_receipts
@@ -281,13 +287,16 @@ SELECT
 SELECT
     set_config('role', 'service_role', TRUE);
 SELECT
-    confirm_tags('{whiterabbit}',(
+    confirm_tags('{whiterabbit}'::citext[], (
+            SELECT id FROM send_accounts 
+            WHERE user_id = tests.get_supabase_uid('alice')
+        ), (
             SELECT
                 event_id
             FROM sendtag_checkout_receipts
             WHERE
                 sender = '\xa71ce00000000000000000000000000000000000'
-                AND src_name = 'whiterabbit'),(
+                AND src_name = 'whiterabbit'), (
             SELECT
                 referral_code
             FROM public.profiles

@@ -680,12 +680,15 @@ VALUES (
     '\x0000000000000000000000000000000000000000',
     0);
 SELECT
-    confirm_tags('{alice}',(
+    confirm_tags('{alice}'::citext[], (
+            SELECT id FROM send_accounts 
+            WHERE user_id = tests.get_supabase_uid('alice')
+        ), (
             SELECT
                 event_id
             FROM sendtag_checkout_receipts
             WHERE
-                sender = '\xa71ce00000000000000000000000000000000000'),(
+                sender = '\xa71ce00000000000000000000000000000000000'), (
             SELECT
                 referral_code
             FROM public.profiles
