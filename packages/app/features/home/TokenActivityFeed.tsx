@@ -15,7 +15,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ZodError } from 'zod'
 import { TokenActivityRow } from './TokenActivityRow'
 import { useRootScreenParams } from 'app/routers/params'
-import { useTokenActivityRowSize } from 'app/features/home/utils/useTokenActivityRowSize'
 
 export const TokenActivityFeed = ({
   tokenActivityFeedQuery,
@@ -34,7 +33,6 @@ export const TokenActivityFeed = ({
   const queryClient = useQueryClient()
   const wasPendingRef = useRef(false) // Ref to track if a pending activity was seen previously
   const [queryParams] = useRootScreenParams()
-  const { height: rowHeight } = useTokenActivityRowSize()
 
   const layoutSizeAdjustment = media.gtLg ? 32 : 14
 
@@ -91,7 +89,7 @@ export const TokenActivityFeed = ({
   const [dataProvider, setDataProvider] = useState(dataProviderMaker(activities))
 
   const _layoutProvider = layoutProviderMaker({
-    getHeightOrWidth: () => rowHeight,
+    getHeightOrWidth: () => 102,
   })
 
   const _renderRow = useCallback(
