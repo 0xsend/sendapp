@@ -197,7 +197,9 @@ jobs:
     needs: [build_next_image]
     # Testing, uncomment when ready
     # if: ${{ github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' || github.head_ref == 'dev' || github.head_ref == 'main' }}
-    runs-on: arc-runner-set
+    # arc-runner-set had a good run
+    # runs-on: arc-runner-set
+    runs-on: ubuntu-latest
     strategy:
       # Don't stop all shards if one fails
       fail-fast: false
