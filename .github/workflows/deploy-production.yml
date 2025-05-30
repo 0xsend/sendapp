@@ -71,7 +71,7 @@ jobs:
     secrets: inherit
 
   deploy:
-    needs: [schema-drift-check, build-distributor, build-shovel]
+    needs: [schema-drift-check]
     runs-on: ubuntu-latest
     permissions:
       contents: read
