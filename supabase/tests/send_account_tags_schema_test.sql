@@ -12,9 +12,17 @@ SELECT has_column('public', 'send_account_tags', 'tag_id', 'has tag_id column');
 SELECT has_column('public', 'send_account_tags', 'created_at', 'has created_at column');
 SELECT has_column('public', 'send_account_tags', 'updated_at', 'has updated_at column');
 
--- Test 2: Foreign key constraints
-SELECT has_fk('public', 'send_account_tags', 'send_account_tags_send_account_id_fkey', 'has send_account_id foreign key');
-SELECT has_fk('public', 'send_account_tags', 'send_account_tags_tag_id_fkey', 'has tag_id foreign key');
+-- Test 2: Foreign key constraints exist
+SELECT ok(EXISTS(
+    SELECT 1 FROM information_schema.table_constraints 
+    WHERE constraint_name = 'send_account_tags_send_account_id_fkey'
+    AND table_name = 'send_account_tags'
+), 'has send_account_id foreign key');
+SELECT ok(EXISTS(
+    SELECT 1 FROM information_schema.table_constraints 
+    WHERE constraint_name = 'send_account_tags_tag_id_fkey'
+    AND table_name = 'send_account_tags'
+), 'has tag_id foreign key');
 SELECT fk_ok('public', 'send_account_tags', 'send_account_id', 'public', 'send_accounts', 'id', 'send_account_id references send_accounts.id');
 SELECT fk_ok('public', 'send_account_tags', 'tag_id', 'public', 'tags', 'id', 'tag_id references tags.id');
 
