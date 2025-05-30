@@ -1,6 +1,6 @@
 # Phase 3: Frontend Components
 
-**GitHub Issue**: Part of [#1515 - Send Account Tags Feature](https://github.com/0xsend/sendapp/issues/1515)
+**Status**: 📋 TODO - Awaiting Phase 2 completion
 
 ## Objective
 

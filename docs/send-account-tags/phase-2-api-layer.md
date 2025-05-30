@@ -1,6 +1,6 @@
 # Phase 2: API Layer Updates
 
-**GitHub Issues**: [#1518 - Fix registerFirstSendtag](https://github.com/0xsend/sendapp/issues/1518) & [#1519 - Add updateMainTag validation](https://github.com/0xsend/sendapp/issues/1519)
+**Status**: 🔄 PARTIALLY COMPLETED - Critical fix needed for `registerFirstSendtag`
 
 ## Objective
 
