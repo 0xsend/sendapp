@@ -18,13 +18,18 @@ BEGIN
     SELECT tests.create_supabase_user('integration_user') INTO test_user_id;
     SELECT tests.create_supabase_user('referrer_user') INTO referrer_user_id;
     
+    PERFORM tests.authenticate_as('integration_user');
     INSERT INTO send_accounts (user_id, address, chain_id, init_code)
     VALUES (tests.get_supabase_uid('integration_user'), '0x5234567890123456789012345678901234567890', 8453, '\\x00')
     RETURNING id INTO test_send_account_id;
     
+    PERFORM tests.authenticate_as('referrer_user');
     INSERT INTO send_accounts (user_id, address, chain_id, init_code)
     VALUES (tests.get_supabase_uid('referrer_user'), '0x6234567890123456789012345678901234567890', 8453, '\\x00')
     RETURNING id INTO referrer_send_account_id;
+    
+    -- Switch back to main test user for tag creation
+    PERFORM tests.authenticate_as('integration_user');
     
     -- Test 1: Complete flow create -> confirm without referral
     SELECT create_tag('flowtest', test_send_account_id) INTO tag_id;

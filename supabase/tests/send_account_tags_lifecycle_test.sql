@@ -13,6 +13,7 @@ DECLARE
 BEGIN
     -- Setup test user and send account
     SELECT tests.create_supabase_user('lifecycle_user') INTO test_user_id;
+    PERFORM tests.authenticate_as('lifecycle_user');
     
     INSERT INTO send_accounts (user_id, address, chain_id, init_code)
     VALUES (tests.get_supabase_uid('lifecycle_user'), '0x1234567890123456789012345678901234567890', 8453, '\\x00')
@@ -78,7 +79,7 @@ BEGIN
         RETURNING id INTO other_send_account_id;
         
         -- Try to create tag for another user's send account (should fail)
-        SELECT tests.authenticate_as('lifecycle_user');
+        PERFORM tests.authenticate_as('lifecycle_user');
         
         BEGIN
             PERFORM create_tag('unauthorized_tag', other_send_account_id);

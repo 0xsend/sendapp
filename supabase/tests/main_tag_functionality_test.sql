@@ -16,6 +16,7 @@ DECLARE
 BEGIN
     -- Setup test user and send account
     SELECT tests.create_supabase_user('main_tag_user') INTO test_user_id;
+    PERFORM tests.authenticate_as('main_tag_user');
     
     INSERT INTO send_accounts (user_id, address, chain_id, init_code)
     VALUES (tests.get_supabase_uid('main_tag_user'), '0x2234567890123456789012345678901234567890', 8453, '\\x00')
@@ -23,10 +24,14 @@ BEGIN
     
     -- Setup another user for testing validation
     SELECT tests.create_supabase_user('main_tag_other') INTO other_user_id;
+    PERFORM tests.authenticate_as('main_tag_other');
     
     INSERT INTO send_accounts (user_id, address, chain_id, init_code)
     VALUES (tests.get_supabase_uid('main_tag_other'), '0x3234567890123456789012345678901234567890', 8453, '\\x00')
     RETURNING id INTO other_send_account_id;
+    
+    -- Switch back to main test user for tag creation
+    PERFORM tests.authenticate_as('main_tag_user');
     
     -- Test 1: No main tag initially
     PERFORM ok((
@@ -59,7 +64,7 @@ BEGIN
     ), 'Main tag remains the same when additional tags are confirmed');
     
     -- Test 4: Manual main tag change to owned confirmed tag
-    SELECT tests.authenticate_as('main_tag_user');
+    PERFORM tests.authenticate_as('main_tag_user');
     
     UPDATE send_accounts 
     SET main_tag_id = tag2_id 
@@ -88,7 +93,7 @@ BEGIN
     UPDATE tags SET status = 'confirmed' WHERE id = other_tag_id;
     SET ROLE postgres;
     
-    SELECT tests.authenticate_as('main_tag_user');
+    PERFORM tests.authenticate_as('main_tag_user');
     
     BEGIN
         UPDATE send_accounts 
