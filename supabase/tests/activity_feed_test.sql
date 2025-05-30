@@ -9,15 +9,21 @@ SELECT tests.create_supabase_user('test_user_from');
 SELECT tests.create_supabase_user('test_user_to');
 
 
--- Create send accounts for test users
+-- Create send accounts for test users as authenticated users
+SELECT tests.authenticate_as('test_user_from');
 INSERT INTO send_accounts (user_id, address, chain_id, init_code)
-VALUES 
-    (tests.get_supabase_uid('test_user_from'), '0x1234567890123456789012345678901234567890', 8453, '\\x00'),
-    (tests.get_supabase_uid('test_user_to'), '0x2234567890123456789012345678901234567890', 8453, '\\x00');
+VALUES (tests.get_supabase_uid('test_user_from'), '0x1234567890123456789012345678901234567890', 8453, '\\x00');
 
--- Create tags and proper associations using create_tag function
+SELECT tests.authenticate_as('test_user_to');
+INSERT INTO send_accounts (user_id, address, chain_id, init_code)
+VALUES (tests.get_supabase_uid('test_user_to'), '0x2234567890123456789012345678901234567890', 8453, '\\x00');
+
+-- Create tags as the proper authenticated users
+SELECT tests.authenticate_as('test_user_from');
 SELECT create_tag('tag1', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('test_user_from')));
 SELECT create_tag('tag2', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('test_user_from')));
+
+SELECT tests.authenticate_as('test_user_to');
 SELECT create_tag('tag3', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('test_user_to')));
 
 -- Confirm the tags as service_role

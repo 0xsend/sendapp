@@ -15,6 +15,7 @@ DECLARE
 BEGIN
     -- Setup test user and send account
     SELECT tests.create_supabase_user('perf_user') INTO test_user_id;
+    PERFORM tests.authenticate_as('perf_user');
     
     INSERT INTO send_accounts (user_id, address, chain_id, init_code)
     VALUES (tests.get_supabase_uid('perf_user'), '0x6234567890123456789012345678901234567890', 8453, '\\x00')
@@ -95,6 +96,7 @@ BEGIN
         concurrent_tag_count integer;
     BEGIN
         SELECT tests.create_supabase_user('concurrent_user') INTO concurrent_user_id;
+        PERFORM tests.authenticate_as('concurrent_user');
         
         INSERT INTO send_accounts (user_id, address, chain_id, init_code)
         VALUES (tests.get_supabase_uid('concurrent_user'), '0x7234567890123456789012345678901234567890', 8453, '\\x00')
@@ -125,18 +127,22 @@ BEGIN
         SELECT tests.create_supabase_user('collision_user1') INTO collision_user1_id;
         SELECT tests.create_supabase_user('collision_user2') INTO collision_user2_id;
         
+        PERFORM tests.authenticate_as('collision_user1');
         INSERT INTO send_accounts (user_id, address, chain_id, init_code)
         VALUES (tests.get_supabase_uid('collision_user1'), '0x8234567890123456789012345678901234567890', 8453, '\\x00')
         RETURNING id INTO collision_send_account1_id;
         
+        PERFORM tests.authenticate_as('collision_user2');
         INSERT INTO send_accounts (user_id, address, chain_id, init_code)
         VALUES (tests.get_supabase_uid('collision_user2'), '0x9234567890123456789012345678901234567890', 8453, '\\x00')
         RETURNING id INTO collision_send_account2_id;
         
         -- First user creates tag
+        PERFORM tests.authenticate_as('collision_user1');
         SELECT create_tag('samename', collision_send_account1_id) INTO collision_tag1_id;
         
         -- Second user tries to create same name (should fail due to unique constraint)
+        PERFORM tests.authenticate_as('collision_user2');
         BEGIN
             SELECT create_tag('samename', collision_send_account2_id) INTO collision_tag2_id;
         EXCEPTION
@@ -171,6 +177,7 @@ BEGIN
         orphan_tag_id bigint;
     BEGIN
         SELECT tests.create_supabase_user('orphan_user') INTO orphan_user_id;
+        PERFORM tests.authenticate_as('orphan_user');
         
         INSERT INTO send_accounts (user_id, address, chain_id, init_code, main_tag_id)
         VALUES (tests.get_supabase_uid('orphan_user'), '0xA234567890123456789012345678901234567890', 8453, '\\x00', NULL)
@@ -221,6 +228,7 @@ BEGIN
         stress_end_time timestamp;
     BEGIN
         SELECT tests.create_supabase_user('stress_user') INTO stress_user_id;
+        PERFORM tests.authenticate_as('stress_user');
         
         INSERT INTO send_accounts (user_id, address, chain_id, init_code)
         VALUES (tests.get_supabase_uid('stress_user'), '0xB234567890123456789012345678901234567890', 8453, '\\x00')

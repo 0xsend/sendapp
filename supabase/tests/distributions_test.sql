@@ -599,12 +599,15 @@ VALUES (
     0);
 SELECT
     confirm_tags( -- bob confirms tags
-        '{bob}',(
+        '{bob}'::citext[],
+        (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('bob')),
+        (
             SELECT
                 event_id
             FROM sendtag_checkout_receipts
             WHERE
-                sender = '\xB0B0000000000000000000000000000000000000'), NULL);
+                sender = '\xB0B0000000000000000000000000000000000000'),
+        NULL);
 SELECT
     results_eq($$
         SELECT
