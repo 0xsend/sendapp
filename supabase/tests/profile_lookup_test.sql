@@ -83,7 +83,7 @@ SELECT
 SELECT
   is_empty($$
     SELECT
-      id::uuid, avatar_url, name, about, x_username, tag, address, chain_id::bigint, is_public, sendid, all_tags FROM public.profile_lookup('tag', 'kenny_') $$, 'Test kenny_ lookup does not return kennyl');
+      id::uuid, avatar_url, name, about, refcode, x_username, birthday, tag, address, chain_id::bigint, is_public, sendid, all_tags, main_tag_id, main_tag_name FROM public.profile_lookup('tag', 'kenny_') $$, 'Test kenny_ lookup does not return kennyl');
 DO $$
 DECLARE
   send_id int;
@@ -102,30 +102,30 @@ SELECT
 SELECT
   results_eq($$
     SELECT
-      id::uuid, avatar_url, name, about, x_username, tag, address, chain_id::bigint, is_public, sendid, all_tags FROM public.profile_lookup('tag', 'valid_tag') $$, $$
-    VALUES (tests.get_supabase_uid('valid_tag_user'), NULL::text, NULL::text, NULL::text, 'x_valid_tag_user'::text, 'valid_tag'::citext, '0x1234567890abcdef1234567890abcdef12345678'::citext, 1::bigint, TRUE,(
+      id::uuid, avatar_url, name, about, refcode, x_username, birthday, tag, address, chain_id::bigint, is_public, sendid, all_tags, main_tag_id, main_tag_name FROM public.profile_lookup('tag', 'valid_tag') $$, $$
+    VALUES (tests.get_supabase_uid('valid_tag_user'), NULL::text, NULL::text, NULL::text, NULL::text, 'x_valid_tag_user'::text, NULL::date, 'valid_tag'::citext, '0x1234567890abcdef1234567890abcdef12345678'::citext, 1::bigint, TRUE,(
         SELECT
-          current_setting('vars.send_id')::int), ARRAY['valid_tag']::text[]) $$, 'Test valid tag lookup as authenticated user');
+          current_setting('vars.send_id')::int), ARRAY['valid_tag']::text[], NULL::bigint, NULL::text) $$, 'Test valid tag lookup as authenticated user');
 -- Test valid tag lookup as service role
 SELECT
   tests.authenticate_as_service_role();
 SELECT
   results_eq($$
     SELECT
-      id::uuid, avatar_url, name, about, x_username, tag, address, chain_id::bigint, is_public, sendid, all_tags FROM public.profile_lookup('tag', 'valid_tag') $$, $$
-    VALUES (NULL::uuid, NULL, NULL, NULL, 'x_valid_tag_user', 'valid_tag'::citext, '0x1234567890abcdef1234567890abcdef12345678'::citext, 1::bigint, TRUE,(
+      id::uuid, avatar_url, name, about, refcode, x_username, birthday, tag, address, chain_id::bigint, is_public, sendid, all_tags, main_tag_id, main_tag_name FROM public.profile_lookup('tag', 'valid_tag') $$, $$
+    VALUES (NULL::uuid, NULL, NULL, NULL, NULL, 'x_valid_tag_user', NULL::date, 'valid_tag'::citext, '0x1234567890abcdef1234567890abcdef12345678'::citext, 1::bigint, TRUE,(
         SELECT
-          current_setting('vars.send_id')::int), ARRAY['valid_tag']::text[]) $$, 'Test valid tag lookup as service role');
+          current_setting('vars.send_id')::int), ARRAY['valid_tag']::text[], NULL::bigint, NULL::text) $$, 'Test valid tag lookup as service role');
 -- Test valid tag lookup as anon
 SELECT
   tests.clear_authentication();
 SELECT
   results_eq($$
     SELECT
-      id::uuid, avatar_url, name, about, x_username, tag, address, chain_id::bigint, is_public, sendid, all_tags FROM public.profile_lookup('tag', 'valid_tag') $$, $$
-    VALUES (NULL::uuid, NULL, NULL, NULL, 'x_valid_tag_user', 'valid_tag'::citext, '0x1234567890abcdef1234567890abcdef12345678'::citext, 1::bigint, TRUE,(
+      id::uuid, avatar_url, name, about, refcode, x_username, birthday, tag, address, chain_id::bigint, is_public, sendid, all_tags, main_tag_id, main_tag_name FROM public.profile_lookup('tag', 'valid_tag') $$, $$
+    VALUES (NULL::uuid, NULL, NULL, NULL, NULL, 'x_valid_tag_user', NULL::date, 'valid_tag'::citext, '0x1234567890abcdef1234567890abcdef12345678'::citext, 1::bigint, TRUE,(
         SELECT
-          current_setting('vars.send_id')::int), ARRAY['valid_tag']::text[]) $$, 'Test valid tag lookup as anon');
+          current_setting('vars.send_id')::int), ARRAY['valid_tag']::text[], NULL::bigint, NULL::text) $$, 'Test valid tag lookup as anon');
 -- Start tests for is_public
 SELECT
   tests.authenticate_as_service_role();
@@ -141,27 +141,27 @@ SELECT
 SELECT
   results_eq($$
     SELECT
-      id::uuid, avatar_url, name, about, x_username, tag, address, chain_id::bigint, is_public, sendid, all_tags FROM public.profile_lookup('tag', 'valid_tag') $$, $$
-    VALUES (tests.get_supabase_uid('valid_tag_user'), NULL, NULL, NULL, 'x_valid_tag_user', 'valid_tag'::citext, '0x1234567890abcdef1234567890abcdef12345678'::citext, 1::bigint, FALSE,(
+      id::uuid, avatar_url, name, about, refcode, x_username, birthday, tag, address, chain_id::bigint, is_public, sendid, all_tags, main_tag_id, main_tag_name FROM public.profile_lookup('tag', 'valid_tag') $$, $$
+    VALUES (tests.get_supabase_uid('valid_tag_user'), NULL, NULL, NULL, NULL, NULL, NULL::date, 'valid_tag'::citext, '0x1234567890abcdef1234567890abcdef12345678'::citext, 1::bigint, FALSE,(
         SELECT
-          current_setting('vars.send_id')::int), ARRAY['valid_tag']::text[]) $$, 'Test valid tag lookup as authenticated user');
+          current_setting('vars.send_id')::int), ARRAY['valid_tag']::text[], NULL::bigint, NULL::text) $$, 'Test valid tag lookup as authenticated user');
 -- Test valid tag lookup as service role
 SELECT
   tests.authenticate_as_service_role();
 SELECT
   results_eq($$
     SELECT
-      id::uuid, avatar_url, name, about, x_username, tag, address, chain_id::bigint, is_public, sendid, all_tags FROM public.profile_lookup('tag', 'valid_tag') $$, $$
-    VALUES (NULL::uuid, NULL, NULL, NULL, 'x_valid_tag_user', 'valid_tag'::citext, '0x1234567890abcdef1234567890abcdef12345678'::citext, 1::bigint, FALSE,(
+      id::uuid, avatar_url, name, about, refcode, x_username, birthday, tag, address, chain_id::bigint, is_public, sendid, all_tags, main_tag_id, main_tag_name FROM public.profile_lookup('tag', 'valid_tag') $$, $$
+    VALUES (NULL::uuid, NULL, NULL, NULL, NULL, NULL, NULL::date, 'valid_tag'::citext, '0x1234567890abcdef1234567890abcdef12345678'::citext, 1::bigint, FALSE,(
         SELECT
-          current_setting('vars.send_id')::int), ARRAY['valid_tag']::text[]) $$, 'Test valid tag lookup as service role');
+          current_setting('vars.send_id')::int), ARRAY['valid_tag']::text[], NULL::bigint, NULL::text) $$, 'Test valid tag lookup as service role');
 -- Test invalid tag lookup as anon
 SELECT
   tests.clear_authentication();
 SELECT
   is_empty($$
     SELECT
-      id::uuid, avatar_url, name, about, x_username, tag, address, chain_id::bigint, is_public, sendid, all_tags FROM public.profile_lookup('tag', 'invalid_tag') $$, 'Test invalid tag lookup as anon');
+      id::uuid, avatar_url, name, about, refcode, x_username, birthday, tag, address, chain_id::bigint, is_public, sendid, all_tags, main_tag_id, main_tag_name FROM public.profile_lookup('tag', 'invalid_tag') $$, 'Test invalid tag lookup as anon');
 SELECT
   tests.authenticate_as('valid_tag_user');
 -- Test null profile_lookup call
@@ -191,10 +191,10 @@ SELECT
 SELECT
   results_eq($$
     SELECT
-      id::uuid, avatar_url, name, about, x_username, tag, address, chain_id::bigint, is_public, sendid, all_tags FROM public.profile_lookup('tag', 'VALID_TAG') $$, $$
-    VALUES (NULL::uuid, NULL, NULL, NULL, 'x_valid_tag_user', 'valid_tag'::citext, '0x1234567890abcdef1234567890abcdef12345678'::citext, 1::bigint, FALSE,(
+      id::uuid, avatar_url, name, about, refcode, x_username, birthday, tag, address, chain_id::bigint, is_public, sendid, all_tags, main_tag_id, main_tag_name FROM public.profile_lookup('tag', 'VALID_TAG') $$, $$
+    VALUES (NULL::uuid, NULL, NULL, NULL, NULL, NULL, NULL::date, 'valid_tag'::citext, '0x1234567890abcdef1234567890abcdef12345678'::citext, 1::bigint, FALSE,(
         SELECT
-          current_setting('vars.send_id')::int),ARRAY['valid_tag']::text[]) $$, 'Test valid tag lookup is case insensitive');
+          current_setting('vars.send_id')::int),ARRAY['valid_tag']::text[], NULL::bigint, NULL::text) $$, 'Test valid tag lookup is case insensitive');
 
 
 -- Temporarily switch to postgres role to update auth.users
