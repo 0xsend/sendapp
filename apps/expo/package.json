@@ -4,7 +4,7 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "clean": "react-native-clean-project",
+    "reset": "react-native-clean-project",
     "start": "yarn with-env npx expo start -c",
     "start:dev-client": "yarn with-env yarn expo:prebuild && yarn expo start --dev-client",
     "expo:prebuild": "yarn with-env yarn expo prebuild --skip-dependency-update react-native,react",
