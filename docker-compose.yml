@@ -1,10 +1,12 @@
 services:
+  # Dockerizing the Next app does not make much sense yet since it requires pre-rendering and we don't have a good way to do that yet
   next-app:
     image: ${NEXT_APP_IMAGE_TAG:-sendapp/next-app-dev:latest}
     build:
       context: .
-      dockerfile: ./apps/next/Dockerfile
+      dockerfile: ./Dockerfile
       args:
+        - PACKAGE=next-app
         - NEXT_PUBLIC_SUPABASE_PROJECT_ID=${NEXT_PUBLIC_SUPABASE_PROJECT_ID}
         - NEXT_PUBLIC_URL=${NEXT_PUBLIC_URL}
         - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
@@ -23,6 +25,26 @@ services:
         - NEXT_PUBLIC_KYBER_CLIENT_ID=${NEXT_PUBLIC_KYBER_CLIENT_ID}
     ports:
       - ${NEXT_APP_PORT:-3000}:3000
+    env_file:
+      - path: .env.development
+      - path: .env.development.docker
+      - path: .env.local
+        required: false
+      - path: .env.local.docker
+        required: false
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    networks:
+      - supabase_network_send
+
+  # Distributor
+  distributor:
+    image: ${DISTRIBUTOR_IMAGE_TAG:-sendapp/distributor-dev:latest}
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        - PACKAGE=distributor
     env_file:
       - path: .env.development
       - path: .env.development.docker
