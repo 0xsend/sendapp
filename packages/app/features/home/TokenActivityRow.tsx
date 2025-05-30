@@ -1,4 +1,5 @@
-import { Paragraph, Text, XStack, YStack } from '@my/ui'
+import { Text, XStack, YStack } from '@my/ui'
+import { Paragraph } from 'tamagui'
 import {
   useDateFromActivity,
   useEventNameFromActivity,
@@ -21,6 +22,8 @@ import {
   isTemporalEthTransfersEvent,
   isTemporalTokenTransfersEvent,
 } from 'app/utils/zod/activity/TemporalTransfersEventSchema'
+import { useTokenActivityRowSize } from 'app/features/home/utils/useTokenActivityRowSize'
+import { useThemeSetting } from '@tamagui/next-theme'
 
 export function TokenActivityRow({
   activity,
@@ -43,6 +46,9 @@ export function TokenActivityRow({
     isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
   const hoverStyles = useHoverStyles()
   const router = useRouter()
+  const { height } = useTokenActivityRowSize()
+  const { resolvedTheme } = useThemeSetting()
+  const isDark = !!resolvedTheme?.startsWith('dark')
 
   const isUserTransfer =
     (isERC20Transfer || isETHReceive || isTemporalTransfer) &&
@@ -64,6 +70,7 @@ export function TokenActivityRow({
   return (
     <XStack
       width={'100%'}
+      height={height}
       ai="center"
       jc="space-between"
       gap="$4"
@@ -75,15 +82,15 @@ export function TokenActivityRow({
       hoverStyle={onPress ? hoverStyles : null}
       onPress={handlePress}
     >
-      <XStack gap="$3.5" width={'100%'} f={1}>
+      <XStack gap="$3.5" width={'100%'} f={1} alignItems={'flex-start'}>
         <ActivityAvatar activity={activity} />
-        <YStack width={'100%'} f={1} overflow="hidden">
+        <YStack width={'100%'} f={1} overflow="hidden" gap={'$1'}>
           <XStack fd="row" jc="space-between" gap="$1.5" f={1} width={'100%'}>
-            <Text color="$color12" fontSize="$6" fontWeight={'500'}>
+            <Text color="$color12" fontSize="$5" fontWeight={'500'}>
               {isUserTransfer ? subtext : eventName}
             </Text>
             <Text>&nbsp;</Text>
-            <Text color="$color12" fontSize="$6" fontWeight={'500'} ta="right">
+            <Text color="$color12" fontSize="$5" fontWeight={'500'} ta="right">
               {amount}
             </Text>
           </XStack>
@@ -96,19 +103,25 @@ export function TokenActivityRow({
             f={1}
           >
             <Paragraph
-              color="$color10"
+              color={isDark ? '$lightGrayTextField' : '$darkGrayTextField'}
+              size={'$4'}
               maxWidth={'100%'}
               overflow={'hidden'}
               textOverflow={'ellipsis'}
-              numberOfLines={1}
-              fontSize="$5"
+              numberOfLines={2}
+              lineHeight={18}
             >
               {isUserTransfer ? eventName : subtext}
             </Paragraph>
-            <Paragraph color="$color10" size={'$5'} textAlign={'right'} flexShrink={0}>
-              {date}
-            </Paragraph>
           </XStack>
+          <Paragraph
+            color={isDark ? '$darkGrayTextField' : '$lightGrayTextField'}
+            size={'$3'}
+            flexShrink={0}
+            display={'flex'}
+          >
+            {date}
+          </Paragraph>
         </YStack>
       </XStack>
     </XStack>
