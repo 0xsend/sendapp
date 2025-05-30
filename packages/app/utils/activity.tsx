@@ -58,6 +58,8 @@ const AddressLabels = {
 const labelAddress = (address: `0x${string}`): string =>
   AddressLabels[address] ?? shorten(address ?? '', 5, 4)
 
+const amountPrefix = (activity: Activity) => (activity.from_user?.id ? '- ' : '')
+
 /**
  * Returns the counterpart of the activity which could be the logged in user.
  * If the activity is a send account transfer or receive,
@@ -107,17 +109,17 @@ export function amountFromActivity(
       const { v, coin } = activity.data
       if (coin) {
         const amount = formatAmount(formatUnits(v, coin.decimals), 5, coin.formatDecimals)
-        return `${amount} ${coin.symbol}`
+        return `${amountPrefix(activity)}${amount} ${coin.symbol}`
       }
-      return formatAmount(`${v}`, 5, 0)
+      return `${amountPrefix(activity)}${formatAmount(`${v}`, 5, 0)}`
     }
     case isTemporalEthTransfersEvent(activity): {
       const { value, coin } = activity.data
       if (coin) {
         const amount = formatAmount(formatUnits(value, coin.decimals), 5, coin.formatDecimals)
-        return `${amount} ${coin.symbol}`
+        return `${amountPrefix(activity)}${amount} ${coin.symbol}`
       }
-      return formatAmount(`${value}`, 5, 0)
+      return `${amountPrefix(activity)}${formatAmount(`${value}`, 5, 0)}`
     }
     case isSendAccountTransfersEvent(activity): {
       const { v, coin } = activity.data
@@ -136,14 +138,14 @@ export function amountFromActivity(
             coin.formatDecimals
           )
 
-          return `${amount} ${coin.symbol}`
+          return `${amountPrefix(activity)}${amount} ${coin.symbol}`
         }
 
         const amount = formatAmount(formatUnits(v, coin.decimals), 5, coin.formatDecimals)
 
-        return `${isSellTransfer ? '- ' : ''}${amount} ${coin.symbol}`
+        return `${isSellTransfer || activity.from_user?.id ? '- ' : ''}${amount} ${coin.symbol}`
       }
-      return formatAmount(`${v}`, 5, 0)
+      return `${amountPrefix(activity)}${formatAmount(`${v}`, 5, 0)}`
     }
     case isSendAccountReceiveEvent(activity): {
       const { coin } = activity.data
