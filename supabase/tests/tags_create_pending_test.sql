@@ -98,8 +98,8 @@ BEGIN
     SELECT create_tag('reusable_tag', send_account_id) INTO reused_tag_id;
     
     -- Delete association (makes tag available)
-    DELETE FROM send_account_tags 
-    WHERE send_account_tags.send_account_id = send_account_id AND tag_id = reused_tag_id;
+    DELETE FROM send_account_tags sat
+    WHERE sat.send_account_id = send_account_id AND sat.tag_id = reused_tag_id;
     
     -- Create tag with same name (should reuse)
     PERFORM create_tag('reusable_tag', send_account_id);

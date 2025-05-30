@@ -53,8 +53,11 @@ BEGIN
     RETURNING id INTO available_tag_id;
     
     -- Confirm some tags for testing
+    -- Temporarily disable trigger to allow test setup
+    ALTER TABLE tags DISABLE TRIGGER trigger_tags_before_insert_or_update;
     UPDATE tags SET status = 'confirmed' WHERE id = tag2_id;
     UPDATE tags SET status = 'confirmed' WHERE id = tag3_id;
+    ALTER TABLE tags ENABLE TRIGGER trigger_tags_before_insert_or_update;
     
     SET ROLE postgres;
     
@@ -74,44 +77,25 @@ BEGIN
         WHERE send_account_id = send_account2_id AND tag_id = tag2_id
     ), 'User cannot see other users send_account_tags');
     
-    -- Test 3: User can insert their own send_account_tags
-    BEGIN
-        -- Create a tag as service_role first
-        SET ROLE service_role;
-        INSERT INTO tags (name, status, user_id) 
-        VALUES ('inserttest', 'pending', NULL) 
-        RETURNING id INTO test_tag_id;
-        SET ROLE postgres;
-        
-        PERFORM tests.authenticate_as('rls_user1');
-        
-        INSERT INTO send_account_tags (send_account_id, tag_id)
-        VALUES (send_account1_id, test_tag_id);
-        
-        PERFORM ok(EXISTS(
-            SELECT 1 FROM send_account_tags 
-            WHERE send_account_id = send_account1_id AND tag_id = test_tag_id
-        ), 'User can insert their own send_account_tags');
-    END;
+    -- Test 3: User can create tags through proper function (creates send_account_tags entry)
+    PERFORM tests.authenticate_as('rls_user1');
     
-    -- Test 4: User cannot insert send_account_tags for other users
+    SELECT create_tag('inserttest', send_account1_id) INTO test_tag_id;
+    
+    PERFORM ok(EXISTS(
+        SELECT 1 FROM send_account_tags 
+        WHERE send_account_id = send_account1_id AND tag_id = test_tag_id
+    ), 'User can create tags which creates send_account_tags entries');
+    
+    -- Test 4: User cannot create tags for other users' send accounts
+    PERFORM tests.authenticate_as('rls_user1');
+    
     BEGIN
-        SET ROLE service_role;
-        INSERT INTO tags (name, status, user_id) 
-        VALUES ('unauthorizedinsert', 'pending', NULL) 
-        RETURNING id INTO test_tag_id;
-        SET ROLE postgres;
-        
-        PERFORM tests.authenticate_as('rls_user1');
-        
-        BEGIN
-            INSERT INTO send_account_tags (send_account_id, tag_id)
-            VALUES (send_account2_id, test_tag_id);
-            PERFORM ok(false, 'Should not allow inserting send_account_tags for other users');
-        EXCEPTION
-            WHEN insufficient_privilege OR check_violation THEN
-                PERFORM ok(true, 'Correctly prevented unauthorized send_account_tags insert');
-        END;
+        PERFORM create_tag('unauthorizedinsert', send_account2_id);
+        PERFORM ok(false, 'Should not allow creating tags for other users send accounts');
+    EXCEPTION
+        WHEN OTHERS THEN
+            PERFORM ok(SQLERRM LIKE '%does not own this send_account%', 'Correctly prevented unauthorized tag creation: ' || SQLERRM);
     END;
     
     -- **Test tags table RLS policies**
@@ -140,21 +124,21 @@ BEGIN
         SELECT 1 FROM tags WHERE id = tag1_id AND status = 'pending'
     ), 'User cannot see other users pending tags');
     
-    -- Test 9: User can update their own tags status through send_account relationship
+    -- Test 9: User cannot manually update tag status (should use confirm_tags function)
     PERFORM tests.authenticate_as('rls_user1');
     
-    -- This should work because user1 owns the tag through send_account_tags
+    -- This should fail because users cannot manually confirm tags
     DECLARE
-        can_update boolean := false;
+        cannot_update boolean := true;
     BEGIN
         UPDATE tags SET status = 'confirmed' WHERE id = tag1_id;
-        can_update := true;
+        cannot_update := false;
     EXCEPTION
-        WHEN insufficient_privilege THEN
-            can_update := false;
+        WHEN OTHERS THEN
+            cannot_update := true;
     END;
     
-    PERFORM ok(can_update, 'User can update their own tags through send_account relationship');
+    PERFORM ok(cannot_update, 'User cannot manually update tag status to confirmed');
     
     -- Test 10: User cannot update tags they don't own
     DECLARE

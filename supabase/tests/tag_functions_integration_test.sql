@@ -11,7 +11,7 @@ DECLARE
     referrer_send_account_id uuid;
     tag_id bigint;
     referrer_tag_id bigint;
-    mock_event_id text := 'integration_test_event_123';
+    mock_event_id text := 'sendtag_checkout_receipts/integration_test/1/0/0/0';
     referrer_code text;
 BEGIN
     -- Setup test users and send accounts
@@ -44,7 +44,7 @@ BEGIN
     SET ROLE service_role;
     INSERT INTO sendtag_checkout_receipts(
         chain_id, log_addr, tx_hash, ig_name, src_name, block_num, tx_idx, 
-        log_idx, abi_idx, block_time, sender, amount, referrer, reward, event_id
+        log_idx, abi_idx, block_time, sender, amount, referrer, reward
     ) VALUES (
         8453, 
         decode('833589fcd6edb6e08f4c7c32d4f71b54bda02913', 'hex'),
@@ -55,8 +55,7 @@ BEGIN
         decode(substring('0x5234567890123456789012345678901234567890' FROM 3), 'hex'),
         1000000,
         decode('0000000000000000000000000000000000000000', 'hex'),
-        0,
-        mock_event_id
+        0
     );
     SET ROLE postgres;
     
@@ -98,7 +97,7 @@ BEGIN
     -- Create receipt for referrer
     INSERT INTO sendtag_checkout_receipts(
         chain_id, log_addr, tx_hash, ig_name, src_name, block_num, tx_idx, 
-        log_idx, abi_idx, block_time, sender, amount, referrer, reward, event_id
+        log_idx, abi_idx, block_time, sender, amount, referrer, reward
     ) VALUES (
         8453, 
         decode('833589fcd6edb6e08f4c7c32d4f71b54bda02913', 'hex'),
@@ -109,15 +108,14 @@ BEGIN
         decode(substring('0x6234567890123456789012345678901234567890' FROM 3), 'hex'),
         1000000,
         decode('0000000000000000000000000000000000000000', 'hex'),
-        0,
-        'referrer_event_123'
+        0
     );
     SET ROLE postgres;
     
     PERFORM confirm_tags(
         ARRAY['referrertag']::citext[], 
         referrer_send_account_id, 
-        'referrer_event_123', 
+        'sendtag_checkout_receipts/referrer_test/2/0/0/0', 
         NULL
     );
     
@@ -129,7 +127,7 @@ BEGIN
     -- Test 7: Create second tag with referral
     DECLARE
         referred_tag_id bigint;
-        referred_event_id text := 'referred_event_456';
+        referred_event_id text := 'sendtag_checkout_receipts/referred_test/3/0/0/0';
     BEGIN
         SELECT create_tag('referredtag', test_send_account_id) INTO referred_tag_id;
         
@@ -137,7 +135,7 @@ BEGIN
         SET ROLE service_role;
         INSERT INTO sendtag_checkout_receipts(
             chain_id, log_addr, tx_hash, ig_name, src_name, block_num, tx_idx, 
-            log_idx, abi_idx, block_time, sender, amount, referrer, reward, event_id
+            log_idx, abi_idx, block_time, sender, amount, referrer, reward
         ) VALUES (
             8453, 
             decode('833589fcd6edb6e08f4c7c32d4f71b54bda02913', 'hex'),
@@ -148,8 +146,7 @@ BEGIN
             decode(substring('0x5234567890123456789012345678901234567890' FROM 3), 'hex'),
             1000000,
             decode('0000000000000000000000000000000000000000', 'hex'),
-            0,
-            referred_event_id
+            0
         );
         SET ROLE postgres;
         
@@ -178,7 +175,7 @@ BEGIN
     DECLARE
         multi_tag1_id bigint;
         multi_tag2_id bigint;
-        multi_event_id text := 'multi_event_789';
+        multi_event_id text := 'sendtag_checkout_receipts/multi_test/4/0/0/0';
     BEGIN
         SELECT create_tag('multitag1', test_send_account_id) INTO multi_tag1_id;
         SELECT create_tag('multitag2', test_send_account_id) INTO multi_tag2_id;
@@ -187,7 +184,7 @@ BEGIN
         SET ROLE service_role;
         INSERT INTO sendtag_checkout_receipts(
             chain_id, log_addr, tx_hash, ig_name, src_name, block_num, tx_idx, 
-            log_idx, abi_idx, block_time, sender, amount, referrer, reward, event_id
+            log_idx, abi_idx, block_time, sender, amount, referrer, reward
         ) VALUES (
             8453, 
             decode('833589fcd6edb6e08f4c7c32d4f71b54bda02913', 'hex'),
@@ -198,8 +195,7 @@ BEGIN
             decode(substring('0x5234567890123456789012345678901234567890' FROM 3), 'hex'),
             2000000,  -- Double amount for 2 tags
             decode('0000000000000000000000000000000000000000', 'hex'),
-            0,
-            multi_event_id
+            0
         );
         SET ROLE postgres;
         
