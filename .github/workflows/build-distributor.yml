@@ -14,16 +14,13 @@ on:
 
 jobs:
   build-distributor:
-    runs-on: ubuntu-latest
+    runs-on: arc-runner-set
     permissions:
       contents: read
       packages: write
     outputs:
       image-tag: ${{ steps.output-tag.outputs.image-tag }}
     steps:
-      - uses: wimpysworld/nothing-but-nix@main
-        with:
-          hatchet-protocol: 'carve'
       - name: Checkout repository
         uses: actions/checkout@v4
 
