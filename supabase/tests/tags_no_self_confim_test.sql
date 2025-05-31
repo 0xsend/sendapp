@@ -14,11 +14,10 @@ SELECT tests.authenticate_as('tag_creator');
 INSERT INTO send_accounts (user_id, address, chain_id, init_code)
 VALUES (tests.get_supabase_uid('tag_creator'), '0x1234567890123456789012345678901234567890', 8453, '\\x00');
 
--- Inserting a tag for test user
-INSERT INTO tags (name, user_id)
-VALUES (
-    'test_tag',
-    tests.get_supabase_uid('tag_creator')
+-- Use create_tag function to properly create tag with association
+SELECT create_tag(
+    'test_tag'::citext,
+    (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('tag_creator'))
 );
 
 -- Trying to confirm the tag as the tag owner (should raise an exception)
@@ -34,17 +33,17 @@ SELECT throws_ok(
     'User should not be able to confirm their own tag'
 );
 
--- Bypassing rpc call to confirm tag
+-- Bypassing rpc call to confirm tag - create another tag first then try to confirm it
+SELECT create_tag(
+    'test_tagz'::citext,
+    (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('tag_creator'))
+);
+
 SELECT throws_ok(
     $$
-    INSERT INTO tags(name, user_id, status)
-    VALUES(
-        'test_tagz',
-        tests.get_supabase_uid('tag_creator'),
-        'confirmed'::public.tag_status
-      );
-
-$$,
+    UPDATE tags
+    SET status = 'confirmed'::public.tag_status
+    WHERE name = 'test_tagz' $$,
     'Users cannot confirm their own tags',
     'User should not be able to confirm their own tag'
 );

@@ -278,6 +278,7 @@ SELECT throws_ok(
             '0x1234567890ABCDEF1234567890ABCDEF12345678',
             1,
             '\\x00112233445566778899AABBCCDDEEFF',
+            NULL, -- main_tag_id
             now(),
             now(),
             NULL
