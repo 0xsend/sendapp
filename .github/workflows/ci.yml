@@ -3,19 +3,17 @@ name: CI
 on:
   merge_group:
   pull_request:
-  push:
-    branches: [main, dev]
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.ref }}
+  group: ci-${{ github.ref }}-${{ github.event_name }}
   cancel-in-progress: true
 
 jobs:
   build_next_image:
     name: Build Next.js Docker Image
-    # Testing, uncomment when ready
-    # if: ${{ github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' || github.head_ref == 'dev' || github.head_ref == 'main' }}
+    # Only build images for PRs and manual triggers, not for pushes to main/dev (handled by deploy workflows)
+    if: ${{ github.event_name != 'push' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -195,8 +193,8 @@ jobs:
   playwright-tests:
     name: Playwright Tests (Shard ${{ matrix.shard }}/4)
     needs: [build_next_image]
-    # Testing, uncomment when ready
-    # if: ${{ github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' || github.head_ref == 'dev' || github.head_ref == 'main' }}
+    # Only run playwright tests when we build the image (PRs and manual triggers)
+    if: ${{ github.event_name != 'push' }}
     # arc-runner-set had a good run
     # runs-on: arc-runner-set
     runs-on: ubuntu-latest
