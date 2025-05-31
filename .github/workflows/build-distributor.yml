@@ -11,6 +11,16 @@ on:
       image-tag:
         description: 'The full image tag of the built distributor image'
         value: ${{ jobs.build-distributor.outputs.image-tag }}
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment name (staging, production)'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+        default: staging
 
 jobs:
   build-distributor:
