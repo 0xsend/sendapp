@@ -127,6 +127,7 @@ export const tagRouter = createTRPCRouter({
             })
           : null
 
+        // FIXME: use create_tag function or find a way to insert tag and send_account_tag easily with postgrest
         const { error: insertError } = await supabaseAdmin
           .from('tags')
           .insert({ name, status: 'confirmed', user_id: session.user.id })
