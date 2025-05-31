@@ -26,7 +26,16 @@ select tests.create_supabase_user('neo');
 
 select tests.authenticate_as_service_role();
 
--- Inserting a tag for test user
+-- Create send_account for bob
+insert into send_accounts (user_id, address, chain_id, init_code)
+values (
+    tests.get_supabase_uid('bob'),
+    '0x1234567890ABCDEF1234567890ABCDEF12345679',
+    8453,
+    '\\x00112233445566778899AABBCCDDEEFF'
+);
+
+-- Insert tags with proper status (service role can do this)
 insert into tags (name, user_id, status)
 values ('alice', tests.get_supabase_uid('alice'), 'confirmed'),
 ('wonderland', tests.get_supabase_uid('alice'), 'confirmed'),
@@ -44,6 +53,22 @@ values (
     1,
     '\\x00112233445566778899AABBCCDDEEFF'
 );
+
+-- Create send_account_tags associations for alice's confirmed tags
+insert into send_account_tags (send_account_id, tag_id)
+select 
+    (select id from send_accounts where user_id = tests.get_supabase_uid('alice')),
+    t.id
+from tags t 
+where t.user_id = tests.get_supabase_uid('alice') and t.status = 'confirmed';
+
+-- Create send_account_tags association for bob's pending tag
+insert into send_account_tags (send_account_id, tag_id)
+select 
+    (select id from send_accounts where user_id = tests.get_supabase_uid('bob')),
+    t.id
+from tags t 
+where t.user_id = tests.get_supabase_uid('bob') and t.name = 'bob';
 
 -- Verify that the tags are not visible to anon
 select tests.clear_authentication();
