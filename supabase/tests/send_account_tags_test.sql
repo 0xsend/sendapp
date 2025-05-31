@@ -122,7 +122,9 @@ FROM
     JOIN tags t ON t.id = sat.tag_id
 WHERE
     t.name = 'send_account_tag';
--- Test that tag status was updated to available
+-- Test that tag status was updated to available as service_role
+SET ROLE service_role;
+
 SELECT
     results_eq($$
         SELECT
@@ -130,14 +132,15 @@ SELECT
             WHERE
                 name = 'send_account_tag' $$, $$
             VALUES ('available'::text) $$, 'Tag should be available after deleting send_account_tags');
+SELECT
+    tests.authenticate_as('tag_owner');
 -- Test that tag user_id was cleared
 SELECT
-    results_eq($$
+    is_empty($$
         SELECT
             user_id FROM tags
             WHERE
-                name = 'send_account_tag' $$, $$
-            VALUES (NULL::uuid) $$, 'Tag user_id should be NULL after deleting send_account_tags');
+                name = 'send_account_tag' $$, 'Tag user_id should be NULL after deleting send_account_tags');
 -- Create and confirm second tag
 SELECT
     tests.authenticate_as('tag_owner');

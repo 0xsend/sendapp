@@ -264,6 +264,7 @@ BEGIN
             tags
         SET
             status = 'pending',
+            user_id = auth.uid(),
             updated_at = NOW()
         WHERE
             name = tag_name
@@ -272,10 +273,11 @@ BEGIN
             id
 ),
 new_tag AS (
-INSERT INTO tags(name, status)
+INSERT INTO tags(name, status, user_id)
     SELECT
         tag_name,
-        'pending'
+        'pending',
+        auth.uid()
     WHERE
         NOT EXISTS (
             SELECT
@@ -610,7 +612,6 @@ create or replace view "public"."dashboard_metrics" as  WITH time_window AS (
     ( SELECT json_agg(row_to_json(tai.*)) AS json_agg
            FROM top_all_ips tai) AS top_all_ips;
 
-
 CREATE OR REPLACE FUNCTION public.tag_receipts_insert_activity_trigger()
  RETURNS trigger
  LANGUAGE plpgsql
@@ -886,6 +887,47 @@ grant truncate on table "public"."send_account_tags" to "service_role";
 
 grant update on table "public"."send_account_tags" to "service_role";
 
+create policy "delete_policy"
+on "public"."tags"
+as permissive
+for delete
+to authenticated
+using (((status = 'pending'::tag_status) AND (EXISTS ( SELECT 1
+   FROM (send_account_tags sat
+     JOIN send_accounts sa ON ((sa.id = sat.send_account_id)))
+  WHERE ((sat.tag_id = tags.id) AND (sa.user_id = ( SELECT auth.uid() AS uid)))))));
+
+create policy "insert_policy"
+on "public"."tags"
+as permissive
+for insert
+to public
+with check (((( SELECT auth.uid() AS uid) = user_id) AND (user_id IS NOT NULL)));
+
+create policy "select_policy"
+on "public"."tags"
+as permissive
+for select
+to public
+using ((EXISTS ( SELECT 1
+   FROM (send_account_tags sat
+     JOIN send_accounts sa ON ((sa.id = sat.send_account_id)))
+  WHERE ((sat.tag_id = tags.id) AND (sa.user_id = ( SELECT auth.uid() AS uid))))));
+
+create policy "update_policy"
+on "public"."tags"
+as permissive
+for update
+to authenticated
+using (((status = 'pending'::tag_status) AND (EXISTS ( SELECT 1
+   FROM (send_account_tags sat
+     JOIN send_accounts sa ON ((sa.id = sat.send_account_id)))
+  WHERE ((sat.tag_id = tags.id) AND (sa.user_id = ( SELECT auth.uid() AS uid)))))))
+with check (((status = 'pending'::tag_status) AND (EXISTS ( SELECT 1
+   FROM (send_account_tags sat
+     JOIN send_accounts sa ON ((sa.id = sat.send_account_id)))
+  WHERE ((sat.tag_id = tags.id) AND (sa.user_id = ( SELECT auth.uid() AS uid)))))));
+
 create policy "select_policy"
 on "public"."historical_tag_associations"
 as permissive
@@ -912,40 +954,6 @@ to public
 using ((EXISTS ( SELECT 1
    FROM send_accounts sa
   WHERE ((sa.id = send_account_tags.send_account_id) AND (sa.user_id = auth.uid())))));
-
-
-create policy "delete_policy"
-on "public"."tags"
-as permissive
-for delete
-to authenticated
-using (((( SELECT auth.uid() AS uid) = user_id) AND (status = 'pending'::tag_status)));
-
-
-create policy "insert_policy"
-on "public"."tags"
-as permissive
-for insert
-to public
-with check ((( SELECT auth.uid() AS uid) = user_id));
-
-
-create policy "select_policy"
-on "public"."tags"
-as permissive
-for select
-to public
-using ((( SELECT auth.uid() AS uid) = user_id));
-
-
-create policy "update_policy"
-on "public"."tags"
-as permissive
-for update
-to public
-using ((( SELECT auth.uid() AS uid) = user_id))
-with check ((( SELECT auth.uid() AS uid) = user_id));
-
 
 CREATE TRIGGER send_account_tags_deleted AFTER DELETE ON public.send_account_tags FOR EACH ROW EXECUTE FUNCTION handle_send_account_tags_deleted();
 

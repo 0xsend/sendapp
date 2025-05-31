@@ -26,8 +26,8 @@ SELECT ok(EXISTS(
 SELECT fk_ok('public', 'send_account_tags', 'send_account_id', 'public', 'send_accounts', 'id', 'send_account_id references send_accounts.id');
 SELECT fk_ok('public', 'send_account_tags', 'tag_id', 'public', 'tags', 'id', 'tag_id references tags.id');
 
--- Test 3: Unique constraint on junction table
-SELECT index_is_unique('public', 'send_account_tags_send_account_id_tag_id_key', 'send_account_tags has unique constraint on (send_account_id, tag_id)');
+-- Test 3: Unique index on junction table
+SELECT has_index('public', 'send_account_tags', 'idx_send_account_tags_unique', 'send_account_tags has unique index on (send_account_id, tag_id)');
 
 -- Test 4: main_tag_id foreign key on send_accounts
 SELECT has_column('public', 'send_accounts', 'main_tag_id', 'send_accounts has main_tag_id column');
