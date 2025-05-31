@@ -141,6 +141,18 @@ type Override = {
       tenants?: string;
     };
   }
+  historical_tag_associations?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      tag_name?: string;
+      tag_id?: string;
+      user_id?: string;
+      status?: string;
+      captured_at?: string;
+      users?: string;
+    };
+  }
   hooks?: {
     name?: string;
     fields?: {
@@ -278,6 +290,13 @@ type Override = {
       name?: string;
     };
   }
+  seed_files?: {
+    name?: string;
+    fields?: {
+      path?: string;
+      hash?: string;
+    };
+  }
   send_account_created?: {
     name?: string;
     fields?: {
@@ -366,6 +385,18 @@ type Override = {
       event_id?: string;
     };
   }
+  send_account_tags?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      send_account_id?: string;
+      tag_id?: string;
+      created_at?: string;
+      updated_at?: string;
+      send_accounts?: string;
+      tags?: string;
+    };
+  }
   send_account_transfers?: {
     name?: string;
     fields?: {
@@ -397,8 +428,11 @@ type Override = {
       created_at?: string;
       updated_at?: string;
       deleted_at?: string;
+      main_tag_id?: string;
       users?: string;
+      tags?: string;
       send_account_credentials?: string;
+      send_account_tags?: string;
     };
   }
   send_earn_create?: {
@@ -644,6 +678,7 @@ type Override = {
       event_id?: string;
       id?: string;
       created_at?: string;
+      tag_id?: string;
       tags?: string;
     };
   }
@@ -654,7 +689,11 @@ type Override = {
       status?: string;
       user_id?: string;
       created_at?: string;
+      id?: string;
+      updated_at?: string;
       users?: string;
+      send_account_tags?: string;
+      send_accounts?: string;
       tag_receipts?: string;
     };
   }
@@ -723,6 +762,7 @@ type Override = {
       chain_addresses?: string;
       distribution_shares?: string;
       distribution_verifications?: string;
+      historical_tag_associations?: string;
       profiles?: string;
       receipts?: string;
       send_accounts?: string;
@@ -852,6 +892,11 @@ export interface Fingerprint {
     updatedAt?: FingerprintDateField;
     tenant?: FingerprintRelationField;
   }
+  historicalTagAssociations?: {
+    tagId?: FingerprintNumberField;
+    capturedAt?: FingerprintDateField;
+    user?: FingerprintRelationField;
+  }
   hooks?: {
     id?: FingerprintNumberField;
     hookTableId?: FingerprintNumberField;
@@ -919,6 +964,9 @@ export interface Fingerprint {
   supabaseMigrationsSchemaMigrations?: {
 
   }
+  seedFiles?: {
+
+  }
   sendAccountCreateds?: {
     chainId?: FingerprintNumberField;
     blockTime?: FingerprintNumberField;
@@ -963,6 +1011,14 @@ export interface Fingerprint {
     abiIdx?: FingerprintNumberField;
     id?: FingerprintNumberField;
   }
+  sendAccountTags?: {
+    id?: FingerprintNumberField;
+    tagId?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    sendAccount?: FingerprintRelationField;
+    tag?: FingerprintRelationField;
+  }
   sendAccountTransfers?: {
     id?: FingerprintNumberField;
     chainId?: FingerprintNumberField;
@@ -978,8 +1034,11 @@ export interface Fingerprint {
     createdAt?: FingerprintDateField;
     updatedAt?: FingerprintDateField;
     deletedAt?: FingerprintDateField;
+    mainTagId?: FingerprintNumberField;
     user?: FingerprintRelationField;
+    mainTag?: FingerprintRelationField;
     sendAccountCredentialsByAccountId?: FingerprintRelationField;
+    sendAccountTags?: FingerprintRelationField;
   }
   sendEarnCreates?: {
     id?: FingerprintNumberField;
@@ -1105,11 +1164,16 @@ export interface Fingerprint {
   tagReceipts?: {
     id?: FingerprintNumberField;
     createdAt?: FingerprintDateField;
+    tagId?: FingerprintNumberField;
     tag?: FingerprintRelationField;
   }
   tags?: {
     createdAt?: FingerprintDateField;
+    id?: FingerprintNumberField;
+    updatedAt?: FingerprintDateField;
     user?: FingerprintRelationField;
+    sendAccountTags?: FingerprintRelationField;
+    sendAccountsByMainTagId?: FingerprintRelationField;
     tagReceipts?: FingerprintRelationField;
   }
   tenants?: {
@@ -1146,6 +1210,7 @@ export interface Fingerprint {
     chainAddresses?: FingerprintRelationField;
     distributionShares?: FingerprintRelationField;
     distributionVerifications?: FingerprintRelationField;
+    historicalTagAssociations?: FingerprintRelationField;
     profiles?: FingerprintRelationField;
     receipts?: FingerprintRelationField;
     sendAccounts?: FingerprintRelationField;

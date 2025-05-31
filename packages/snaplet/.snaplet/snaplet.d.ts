@@ -12,7 +12,7 @@ type Enum_pgtle_password_types = 'PASSWORD_TYPE_MD5' | 'PASSWORD_TYPE_PLAINTEXT'
 type Enum_pgtle_pg_tle_features = 'clientauth' | 'passcheck';
 type Enum_public_key_type_enum = 'ES256';
 type Enum_public_lookup_type_enum = 'address' | 'phone' | 'refcode' | 'sendid' | 'tag';
-type Enum_public_tag_status = 'confirmed' | 'pending';
+type Enum_public_tag_status = 'available' | 'confirmed' | 'pending';
 type Enum_public_temporal_status = 'confirmed' | 'failed' | 'initialized' | 'sent' | 'submitted';
 type Enum_public_verification_type = 'create_passkey' | 'send_ceiling' | 'send_one_hundred' | 'send_streak' | 'send_ten' | 'tag_referral' | 'tag_registration' | 'total_tag_referrals';
 type Enum_public_verification_value_mode = 'aggregate' | 'individual';
@@ -157,6 +157,14 @@ interface Table_auth_flow_state {
   updated_at: string | null;
   authentication_method: string;
   auth_code_issued_at: string | null;
+}
+interface Table_public_historical_tag_associations {
+  id: string;
+  tag_name: string;
+  tag_id: number;
+  user_id: string;
+  status: Enum_public_tag_status;
+  captured_at: string;
 }
 interface Table_supabase_functions_hooks {
   id: number;
@@ -400,6 +408,10 @@ interface Table_vault_secrets {
   created_at: string;
   updated_at: string;
 }
+interface Table_supabase_migrations_seed_files {
+  path: string;
+  hash: string;
+}
 interface Table_public_send_account_created {
   chain_id: number;
   log_addr: string;
@@ -467,6 +479,13 @@ interface Table_public_send_account_signing_key_removed {
   abi_idx: number;
   id: number;
 }
+interface Table_public_send_account_tags {
+  id: number;
+  send_account_id: string;
+  tag_id: number;
+  created_at: string;
+  updated_at: string;
+}
 interface Table_public_send_account_transfers {
   id: number;
   chain_id: number;
@@ -504,6 +523,7 @@ interface Table_public_send_accounts {
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
+  main_tag_id: number | null;
 }
 interface Table_public_send_earn_create {
   id: number;
@@ -770,12 +790,15 @@ interface Table_public_tag_receipts {
   event_id: string | null;
   id: number;
   created_at: string | null;
+  tag_id: number;
 }
 interface Table_public_tags {
   name: string;
   status: Enum_public_tag_status;
-  user_id: string;
+  user_id: string | null;
   created_at: string;
+  id: number;
+  updated_at: string;
 }
 interface Table_shovel_task_updates {
   num: number | null;
@@ -917,6 +940,7 @@ interface Schema_public {
   distribution_verification_values: Table_public_distribution_verification_values;
   distribution_verifications: Table_public_distribution_verifications;
   distributions: Table_public_distributions;
+  historical_tag_associations: Table_public_historical_tag_associations;
   liquidity_pools: Table_public_liquidity_pools;
   profiles: Table_public_profiles;
   receipts: Table_public_receipts;
@@ -926,6 +950,7 @@ interface Schema_public {
   send_account_receives: Table_public_send_account_receives;
   send_account_signing_key_added: Table_public_send_account_signing_key_added;
   send_account_signing_key_removed: Table_public_send_account_signing_key_removed;
+  send_account_tags: Table_public_send_account_tags;
   send_account_transfers: Table_public_send_account_transfers;
   send_accounts: Table_public_send_accounts;
   send_earn_create: Table_public_send_earn_create;
@@ -970,6 +995,7 @@ interface Schema_supabase_functions {
 }
 interface Schema_supabase_migrations {
   schema_migrations: Table_supabase_migrations_schema_migrations;
+  seed_files: Table_supabase_migrations_seed_files;
 }
 interface Schema_temporal {
   send_account_transfers: Table_temporal_send_account_transfers;
@@ -1124,6 +1150,17 @@ interface Tables_relationships {
     };
     parentDestinationsTables:  | {};
     childDestinationsTables: "auth.saml_relay_states" | {};
+    
+  };
+  "public.historical_tag_associations": {
+    parent: {
+       historical_tag_associations_user_id_fkey: "auth.users";
+    };
+    children: {
+
+    };
+    parentDestinationsTables: "auth.users" | {};
+    childDestinationsTables:  | {};
     
   };
   "auth.identities": {
@@ -1319,15 +1356,29 @@ interface Tables_relationships {
     childDestinationsTables:  | {};
     
   };
+  "public.send_account_tags": {
+    parent: {
+       send_account_tags_send_account_id_fkey: "public.send_accounts";
+       send_account_tags_tag_id_fkey: "public.tags";
+    };
+    children: {
+
+    };
+    parentDestinationsTables: "public.send_accounts" | "public.tags" | {};
+    childDestinationsTables:  | {};
+    
+  };
   "public.send_accounts": {
     parent: {
        send_accounts_user_id_fkey: "auth.users";
+       send_accounts_main_tag_id_fkey: "public.tags";
     };
     children: {
        account_credentials_account_id_fkey: "public.send_account_credentials";
+       send_account_tags_send_account_id_fkey: "public.send_account_tags";
     };
-    parentDestinationsTables: "auth.users" | {};
-    childDestinationsTables: "public.send_account_credentials" | {};
+    parentDestinationsTables: "auth.users" | "public.tags" | {};
+    childDestinationsTables: "public.send_account_credentials" | "public.send_account_tags" | {};
     
   };
   "temporal.send_earn_deposits": {
@@ -1390,7 +1441,7 @@ interface Tables_relationships {
   };
   "public.tag_receipts": {
     parent: {
-       tag_receipts_tag_name_fkey: "public.tags";
+       tag_receipts_tag_id_fkey: "public.tags";
     };
     children: {
 
@@ -1404,10 +1455,12 @@ interface Tables_relationships {
        tags_user_id_fkey: "auth.users";
     };
     children: {
-       tag_receipts_tag_name_fkey: "public.tag_receipts";
+       send_account_tags_tag_id_fkey: "public.send_account_tags";
+       send_accounts_main_tag_id_fkey: "public.send_accounts";
+       tag_receipts_tag_id_fkey: "public.tag_receipts";
     };
     parentDestinationsTables: "auth.users" | {};
-    childDestinationsTables: "public.tag_receipts" | {};
+    childDestinationsTables: "public.send_account_tags" | "public.send_accounts" | "public.tag_receipts" | {};
     
   };
   "_realtime.tenants": {
@@ -1436,6 +1489,7 @@ interface Tables_relationships {
        chain_addresses_user_id_fkey: "public.chain_addresses";
        distribution_shares_user_id_fkey: "public.distribution_shares";
        distribution_verifications_user_id_fkey: "public.distribution_verifications";
+       historical_tag_associations_user_id_fkey: "public.historical_tag_associations";
        profiles_id_fkey: "public.profiles";
        receipts_user_id_fkey: "public.receipts";
        send_accounts_user_id_fkey: "public.send_accounts";
@@ -1443,7 +1497,7 @@ interface Tables_relationships {
        webauthn_credentials_user_id_fkey: "public.webauthn_credentials";
     };
     parentDestinationsTables:  | {};
-    childDestinationsTables: "auth.identities" | "auth.mfa_factors" | "auth.one_time_tokens" | "auth.sessions" | "private.leaderboard_referrals_all_time" | "public.activity" | "public.chain_addresses" | "public.distribution_shares" | "public.distribution_verifications" | "public.profiles" | "public.receipts" | "public.send_accounts" | "public.tags" | "public.webauthn_credentials" | {};
+    childDestinationsTables: "auth.identities" | "auth.mfa_factors" | "auth.one_time_tokens" | "auth.sessions" | "private.leaderboard_referrals_all_time" | "public.activity" | "public.chain_addresses" | "public.distribution_shares" | "public.distribution_verifications" | "public.historical_tag_associations" | "public.profiles" | "public.receipts" | "public.send_accounts" | "public.tags" | "public.webauthn_credentials" | {};
     
   };
   "public.webauthn_credentials": {
