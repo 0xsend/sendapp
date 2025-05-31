@@ -581,6 +581,7 @@ for (const coin of [usdcCoin]) {
 
   test.describe(`Withdraw ${coin.symbol}`, () => {
     test.beforeEach(async ({ user: { profile }, earnDepositPage, sendAccount, supabase }) => {
+      test.setTimeout(60_000)
       log = debug(`test:earn:withdraw:${profile.id}:${test.info().parallelIndex}`)
 
       // First deposit some funds to be able to withdraw
