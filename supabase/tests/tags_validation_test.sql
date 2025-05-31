@@ -10,11 +10,19 @@ SELECT tests.create_supabase_user('tag_creator');
 
 SELECT tests.authenticate_as('tag_creator');
 
--- Inserting a tag for test user and fetching it
-INSERT INTO tags (name, user_id)
+-- Create a send_account for the test user
+INSERT INTO send_accounts (user_id, address, chain_id, init_code)
 VALUES (
-    'test_tag',
-    tests.get_supabase_uid('tag_creator')
+    tests.get_supabase_uid('tag_creator'),
+    '0x1234567890ABCDEF1234567890ABCDEF12345678',
+    8453,
+    '\\x00112233445566778899AABBCCDDEEFF'
+);
+
+-- Use the create_tag function to properly create tag with association
+SELECT create_tag(
+    'test_tag'::citext,
+    (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('tag_creator'))
 );
 
 SELECT results_eq(
@@ -32,14 +40,14 @@ SELECT results_eq(
 
 -- tags cannot be longer than 20 characters
 SELECT throws_ok(
-    'INSERT INTO tags(name, user_id) VALUES (''this_tag_name_is_longer_than_20_characters'', tests.get_supabase_uid(''tag_creator''))',
+    'SELECT create_tag(''this_tag_name_is_longer_than_20_characters''::citext, (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid(''tag_creator'')))',
     '23514',
     'new row for relation "tags" violates check constraint "tags_name_check"'
 );
 
 -- tags cannot be empty
 SELECT throws_ok(
-    'INSERT INTO tags(name, user_id) VALUES ('''', tests.get_supabase_uid(''tag_creator''))',
+    'SELECT create_tag(''''::citext, (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid(''tag_creator'')))',
     '23514',
     'new row for relation "tags" violates check constraint "tags_name_check"'
 );
@@ -47,9 +55,9 @@ SELECT throws_ok(
 -- tags must be English alphanumeric
 SELECT
     throws_ok(
-        'INSERT INTO tags(name, user_id) VALUES (''tag_name_123_'
+        'SELECT create_tag((''tag_name_123_'
         || invalid_char
-        || ''', tests.get_supabase_uid(''tag_creator''))',
+        || ''')::citext, (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid(''tag_creator'')))',
         '23514',
         'new row for relation "tags" violates check constraint "tags_name_check"'
     )

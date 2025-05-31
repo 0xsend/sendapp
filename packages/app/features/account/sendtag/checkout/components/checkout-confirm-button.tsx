@@ -9,6 +9,9 @@ import {
   useMedia,
   YStack,
   type YStackProps,
+  LinkableButton,
+  Text,
+  Input,
 } from '@my/ui'
 import { AlertTriangle } from '@tamagui/lucide-icons'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -35,6 +38,7 @@ import {
   useSendtagCheckout,
   useSendtagCheckoutReceipts,
 } from '../checkout-utils'
+import { useRouter } from 'next/router'
 
 export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
   const { updateProfile } = useUser()
@@ -142,6 +146,10 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
   const [attempts, setAttempts] = useState(0)
   const { userOp, userOpError, isLoadingUserOp, usdcFees, usdcFeesError, isLoadingUSDCFees } =
     useSendtagCheckout()
+  const canAffordTags = useMemo(() => {
+    if (!balance || !usdcFees) return false
+    return balance.value + usdcFees.baseFee + usdcFees.gasFees >= amountDue
+  }, [balance, usdcFees, amountDue])
   const canAffordTags =
     usdc?.balance && usdcFees && usdc.balance + usdcFees.baseFee + usdcFees.gasFees >= amountDue
 
@@ -160,6 +168,31 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
       queryClient.invalidateQueries({ queryKey: [tokensQuery.queryKey] })
     },
   })
+
+  console.log('Debug states:', {
+    canAffordTags,
+    balance: balance?.value.toString(),
+    usdcFees: usdcFees
+      ? {
+          baseFee: usdcFees.baseFee.toString(),
+          gasFees: usdcFees.gasFees.toString(),
+        }
+      : null,
+    amountDue: amountDue.toString(),
+  })
+
+  useEffect(() => {
+    console.log('Confirm Button State:', {
+      sender,
+      pendingTagsLength: pendingTags?.length,
+      amountDue: amountDue.toString(),
+      hasWebauthnCreds: !!webauthnCreds.length,
+      balance: balance?.value.toString(),
+      error,
+      submitting,
+      canAffordTags,
+    })
+  }, [sender, pendingTags, amountDue, webauthnCreds, balance, error, submitting, canAffordTags])
 
   async function handleCheckoutTx() {
     try {
@@ -229,24 +262,31 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
     details?: string
   })[]
 
+  const router = useRouter()
+
+  // Check for insufficient funds error
   if (possibleErrors.some((e) => e?.message)) {
-    for (const err of possibleErrors) {
-      if (err) console.error('encountered error', err.message, err)
-    }
-    return (
-      <ConfirmButtonStack>
-        <ConfirmButtonError>
-          <YStack gap="$2" ai="center">
-            <Paragraph $theme-dark={{ col: '$white' }} $theme-light={{ col: '$black' }}>
-              {possibleErrors
-                .map((e) => (e?.details ?? e?.message ?? '').split('.').at(0))
-                .filter(Boolean)
-                .join(', ')}
-            </Paragraph>
-          </YStack>
-        </ConfirmButtonError>
-      </ConfirmButtonStack>
+    const isInsufficientFunds = possibleErrors.some(
+      (e) => e?.message?.includes('Not enough USDC') || e?.message?.includes('insufficient funds')
     )
+
+    // Show error message for non-balance errors
+    if (!isInsufficientFunds) {
+      return (
+        <ConfirmButtonStack>
+          <ConfirmButtonError buttonText="Error">
+            <YStack gap="$2" ai="center">
+              <Paragraph $theme-dark={{ col: '$white' }} $theme-light={{ col: '$black' }}>
+                {possibleErrors
+                  .map((e) => (e?.details ?? e?.message ?? '').split('.').at(0))
+                  .filter(Boolean)
+                  .join(', ')}
+              </Paragraph>
+            </YStack>
+          </ConfirmButtonError>
+        </ConfirmButtonStack>
+      )
+    }
   }
 
   const canRetry = error && !(submitting || sendTransactionIsPending || txWaitLoading)
@@ -322,7 +362,19 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
                 </>
               )
             case !canAffordTags && (!txWaitLoading || !submitting):
-              return <ButtonText>insufficient funds</ButtonText>
+              return (
+                <LinkableButton
+                  theme="red"
+                  href="/deposit"
+                  px="$3.5"
+                  h="$4.5"
+                  borderRadius="$4"
+                  testID="checkout-deposit-button"
+                  gap="$1.5"
+                >
+                  <ButtonText>Deposit USDC</ButtonText>
+                </LinkableButton>
+              )
             case sendTransactionIsPending:
               return (
                 <>
@@ -358,8 +410,9 @@ const ConfirmButtonError = ({
   children,
   onPress,
   buttonText,
+  href,
   ...props
-}: ButtonProps & { buttonText?: string }) => {
+}: ButtonProps & { buttonText?: string; href?: string }) => {
   const media = useMedia()
   return (
     <Tooltip open={true} placement={media.gtMd ? 'right' : 'bottom'}>

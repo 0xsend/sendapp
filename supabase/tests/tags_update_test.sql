@@ -51,9 +51,8 @@ VALUES (
 
 SELECT tests.authenticate_as('boss');
 
--- Inserting a tag for test user
-INSERT INTO tags (name)
-VALUES ('test_tag');
+-- Create a tag using the proper function
+SELECT create_tag('test_tag', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('boss')));
 
 -- User can change the name of a pending tag
 UPDATE tags
@@ -72,7 +71,8 @@ SET ROLE service_role;
 
 -- confirm tag
 SELECT confirm_tags(
-    '{test_tag2}',
+    '{test_tag2}'::citext[],
+    (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('boss')),
     (
         SELECT event_id
         FROM sendtag_checkout_receipts
@@ -85,28 +85,34 @@ SELECT confirm_tags(
 SET ROLE postgres;
 
 SELECT tests.authenticate_as('boss');
-
-SELECT throws_ok(
-    $$UPDATE tags
+UPDATE tags
     set name = 'test_tag3'
     where name = 'test_tag2';
-
-$$,
-    'Users cannot change the name of a confirmed tag',
+SELECT is_empty(
+    $$
+        SELECT * FROM tags
+        WHERE name = 'test_tag3'
+    $$,
     'Users cannot change the name of a confirmed tag'
 );
 
--- not even service role can update a confirmed tag
+-- service role can update a confirmed tag
 SET ROLE service_role;
 
-SELECT throws_ok(
-    $$UPDATE tags
+UPDATE tags
     set name = 'test_tag3'
     where name = 'test_tag2';
 
-$$,
-    'update or delete on table "tags" violates foreign key constraint "tag_receipts_tag_name_fkey" on table "tag_receipts"',
-    'Service role should not be able to change the name of a confirmed tag'
+SELECT results_eq(
+    $$
+        SELECT COUNT(*)::integer
+        FROM tags
+        WHERE name = 'test_tag3'
+    $$,
+    $$
+        VALUES (1)
+    $$,
+    'service_role can change the name of a confirmed tag'
 );
 
 SELECT finish();

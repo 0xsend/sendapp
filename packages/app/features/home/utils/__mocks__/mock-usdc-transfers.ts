@@ -9,6 +9,8 @@ export const mockUsdcTransfers = [
         'https://fjswgwdweohwejbrmiil.supabase.co/storage/v1/object/public/avatars/db59dfd6-16e6-4c30-8337-4bb33905828f/1697315518383.jpeg',
       send_id: 1,
       tags: ['bigboss'],
+      main_tag_id: 1,
+      main_tag_name: 'bigboss',
     },
     to_user: null,
     data: {
@@ -33,6 +35,8 @@ export const mockUsdcTransfers = [
         'https://fjswgwdweohwejbrmiil.supabase.co/storage/v1/object/public/avatars/db59dfd6-16e6-4c30-8337-4bb33905828f/1697315518383.jpeg',
       send_id: 1,
       tags: ['bigboss'],
+      main_tag_id: 1,
+      main_tag_name: 'bigboss',
     },
     data: {
       f: '\\xa71ce00000000000000000000000000000000000',
@@ -54,6 +58,8 @@ export const mockUsdcTransfers = [
       avatar_url: 'https://i.pravatar.cc/500?u=alice',
       send_id: 42,
       tags: ['alice'],
+      main_tag_id: 1,
+      main_tag_name: 'alice',
     },
     to_user: {
       id: 'db59dfd6-16e6-4c30-8337-4bb33905828f',
@@ -62,6 +68,8 @@ export const mockUsdcTransfers = [
         'https://fjswgwdweohwejbrmiil.supabase.co/storage/v1/object/public/avatars/db59dfd6-16e6-4c30-8337-4bb33905828f/1697315518383.jpeg',
       send_id: 1,
       tags: ['bigboss'],
+      main_tag_id: 1,
+      main_tag_name: 'bigboss',
     },
     data: {
       f: '\\xa0ee7a142d267c1f36714e4a8f75612f20a79720',

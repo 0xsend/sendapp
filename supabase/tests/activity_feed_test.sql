@@ -9,10 +9,27 @@ SELECT tests.create_supabase_user('test_user_from');
 SELECT tests.create_supabase_user('test_user_to');
 
 
-INSERT INTO tags (user_id, name, status)
-VALUES (tests.get_supabase_uid('test_user_from'), 'tag1', 'confirmed'),
-(tests.get_supabase_uid('test_user_from'), 'tag2', 'confirmed'),
-(tests.get_supabase_uid('test_user_to'), 'tag3', 'confirmed');
+-- Create send accounts for test users as authenticated users
+SELECT tests.authenticate_as('test_user_from');
+INSERT INTO send_accounts (user_id, address, chain_id, init_code)
+VALUES (tests.get_supabase_uid('test_user_from'), '0x1234567890123456789012345678901234567890', 8453, '\\x00');
+
+SELECT tests.authenticate_as('test_user_to');
+INSERT INTO send_accounts (user_id, address, chain_id, init_code)
+VALUES (tests.get_supabase_uid('test_user_to'), '0x2234567890123456789012345678901234567890', 8453, '\\x00');
+
+-- Create tags as the proper authenticated users
+SELECT tests.authenticate_as('test_user_from');
+SELECT create_tag('tag1', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('test_user_from')));
+SELECT create_tag('tag2', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('test_user_from')));
+
+SELECT tests.authenticate_as('test_user_to');
+SELECT create_tag('tag3', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('test_user_to')));
+
+-- Confirm the tags as service_role
+SET ROLE service_role;
+UPDATE tags SET status = 'confirmed' WHERE name IN ('tag1', 'tag2', 'tag3');
+SET ROLE postgres;
 
 INSERT INTO activity (
     event_id, created_at, event_name, from_user_id, to_user_id, data

@@ -105,20 +105,19 @@ VALUES (
     '\\x00112233445566778899AABBCCDDEEFF'
 );
 
--- Inserting tags for test user
-INSERT INTO tags (name, user_id)
-VALUES 
-    ('bob', tests.get_supabase_uid('bob')),
-    ('bob_2', tests.get_supabase_uid('bob')),
-    ('bob_3', tests.get_supabase_uid('bob')),
-    ('bob_4', tests.get_supabase_uid('bob'));
+-- Creating tags for test user using create_tag function
+SELECT create_tag('bob', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('bob')));
+SELECT create_tag('bob_2', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('bob')));
+SELECT create_tag('bob_3', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('bob')));
+SELECT create_tag('bob_4', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('bob')));
 
 -- Confirm tags with the service role
 SELECT tests.clear_authentication();
 SELECT set_config('role', 'service_role', true);
 
 SELECT confirm_tags(
-    '{bob,bob_2,bob_3,bob_4}',
+    '{bob,bob_2,bob_3,bob_4}'::citext[],
+    (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('bob')),
     _event_id('\xb0b0000000000000000000000000000000000000'),
     null
 );
@@ -191,16 +190,16 @@ VALUES (
     '\\x00112233445566778899AABBCCDDEEFF'
 );
 
--- Inserting a tag for Alice
-INSERT INTO tags (name, user_id)
-VALUES ('alice', tests.get_supabase_uid('alice'));
+-- Creating a tag for Alice using create_tag function
+SELECT create_tag('alice', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('alice')));
 
 -- Confirm tags with the service role
 SELECT tests.clear_authentication();
 SELECT set_config('role', 'service_role', true);
 
 SELECT confirm_tags(
-    '{alice}',
+    '{alice}'::citext[],
+    (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('alice')),
     _event_id('\xa71ce00000000000000000000000000000000000'),
     null
 );
@@ -276,17 +275,29 @@ SELECT results_eq(
 );
 
 -- Attempt to use duplicate receipt hash to confirm tag
-INSERT INTO tags (name, user_id)
-VALUES ('hacker', tests.get_supabase_uid('hacker'));
+-- First create send account for hacker
+INSERT INTO send_accounts (user_id, address, chain_id, init_code)
+VALUES (
+    tests.get_supabase_uid('hacker'),
+    '0xc401E00000000000000000000000000000000000',
+    1,
+    '\\x00112233445566778899AABBCCDDEEFF'
+);
+
+-- Create tag for hacker using create_tag function
+SELECT create_tag('hacker', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('hacker')));
 
 SELECT tests.clear_authentication();
 SELECT set_config('role', 'service_role', true);
 
 SELECT throws_ok(
     $$
-    SELECT confirm_tags('{hacker}', (
-        _event_id('\xa71ce00000000000000000000000000000000000')
-    ), null);
+    SELECT confirm_tags(
+        '{hacker}'::citext[], 
+        (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('hacker')),
+        _event_id('\xa71ce00000000000000000000000000000000000'),
+        null
+    );
     $$,
     'Receipt event ID does not match the sender'
 );
@@ -294,17 +305,20 @@ SELECT throws_ok(
 -- Alice attempts to reuse her receipt
 SELECT tests.authenticate_as('alice');
 
-INSERT INTO tags (name, user_id)
-VALUES ('queenofhacking', tests.get_supabase_uid('alice'));
+-- Create another tag for Alice using create_tag function
+SELECT create_tag('queenofhacking', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('alice')));
 
 SELECT tests.clear_authentication();
 SELECT set_config('role', 'service_role', true);
 
 SELECT throws_ok(
     $$
-    SELECT confirm_tags('{queenofhacking}', (
-        _event_id('\xa71ce00000000000000000000000000000000000')
-    ), null);
+    SELECT confirm_tags(
+        '{queenofhacking}'::citext[], 
+        (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('alice')),
+        _event_id('\xa71ce00000000000000000000000000000000000'),
+        null
+    );
     $$,
     'duplicate key value violates unique constraint "receipts_event_id_idx"'
 );

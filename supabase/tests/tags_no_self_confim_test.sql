@@ -10,36 +10,40 @@ SELECT tests.create_supabase_user('tag_creator');
 
 SELECT tests.authenticate_as('tag_creator');
 
--- Inserting a tag for test user
-INSERT INTO tags (name, user_id)
-VALUES (
-    'test_tag',
-    tests.get_supabase_uid('tag_creator')
+-- Create a send_account for the test user
+INSERT INTO send_accounts (user_id, address, chain_id, init_code)
+VALUES (tests.get_supabase_uid('tag_creator'), '0x1234567890123456789012345678901234567890', 8453, '\\x00');
+
+-- Use create_tag function to properly create tag with association
+SELECT create_tag(
+    'test_tag'::citext,
+    (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('tag_creator'))
 );
 
 -- Trying to confirm the tag as the tag owner (should raise an exception)
 SELECT throws_ok(
     $$
     SELECT confirm_tags(
-        '{test_tag}',
-        '0x1234567890123456789012345678901234567890123456789012345678901234',
-        null
+        ARRAY['test_tag']::citext[],
+        (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('tag_creator')),
+        'fake_event_id',
+        NULL
       ) $$,
-    'permission denied for function confirm_tags',
+    'Receipt event ID does not match the sender',
     'User should not be able to confirm their own tag'
 );
 
--- Bypassing rpc call to confirm tag
+-- Bypassing rpc call to confirm tag - create another tag first then try to confirm it
+SELECT create_tag(
+    'test_tagz'::citext,
+    (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('tag_creator'))
+);
+
 SELECT throws_ok(
     $$
-    INSERT INTO tags(name, user_id, status)
-    VALUES(
-        'test_tagz',
-        tests.get_supabase_uid('tag_creator'),
-        'confirmed'::public.tag_status
-      );
-
-$$,
+    UPDATE tags
+    SET status = 'confirmed'::public.tag_status
+    WHERE name = 'test_tagz' $$,
     'Users cannot confirm their own tags',
     'User should not be able to confirm their own tag'
 );

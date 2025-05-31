@@ -16,11 +16,13 @@ test.beforeAll(async () => {
   log = debug(`test:profile:logged-in:${test.info().workerIndex}`)
 })
 
-test('can visit other user profile and send by tag', async ({ page, seed }) => {
+test('can visit other user profile and send by tag', async ({ page, seed, pg }) => {
   const plan = await seed.users([userOnboarded])
   const tag = plan.tags[0]
-  const profile = plan.profiles[0]
+  const account = plan.send_accounts[0]
   assert(!!tag?.name, 'tag not found')
+
+  const profile = plan.profiles[0]
   assert(!!profile?.name, 'profile name not found')
   assert(!!profile?.about, 'profile about not found')
   const profilePage = new ProfilePage(page, { name: profile.name, about: profile.about })
@@ -68,14 +70,32 @@ test('can visit other user profile and send by tag', async ({ page, seed }) => {
 test('can visit my own profile', async ({
   page,
   seed,
+  pg,
   user: {
     user: { id: user_id },
     profile,
   },
 }) => {
-  const plan = await seed.tags([{ user_id, status: 'confirmed' }])
-  const tag = plan.tags[0]
+  // Create tag and send_account for existing user
+  const plan = await seed.send_accounts([
+    {
+      user_id,
+      chain_id: 845337,
+    },
+  ])
+
+  const tagPlan = await seed.tags([
+    {
+      user_id,
+      status: 'confirmed',
+    },
+  ])
+
+  const tag = tagPlan.tags[0]
+  const account = plan.send_accounts[0]
   assert(!!tag?.name, 'tag not found')
+  assert(!!account?.id, 'account not found')
+
   assert(!!profile?.name, 'profile name not found')
   assert(!!profile?.about, 'profile about not found')
   const profilePage = new ProfilePage(page, { name: profile.name, about: profile.about })
@@ -83,13 +103,24 @@ test('can visit my own profile', async ({
   await expect(profilePage.sendButton).toBeVisible()
 })
 
-test('can visit private profile', async ({ page, seed }) => {
+test('can visit private profile', async ({ page, seed, pg }) => {
   const plan = await seed.users([
-    { ...userOnboarded, profiles: [{ is_public: false, x_username: null }] },
+    {
+      ...userOnboarded,
+      profiles: [{ is_public: false, x_username: null }],
+      send_accounts: [
+        {
+          chain_id: 845337,
+        },
+      ],
+    },
   ])
   const tag = plan.tags[0]
-  const profile = plan.profiles[0]
+  const account = plan.send_accounts[0]
   assert(!!tag?.name, 'tag not found')
+  assert(!!account?.id, 'account not found')
+
+  const profile = plan.profiles[0]
   assert(!!profile?.name, 'profile name not found')
   assert(!!profile?.about, 'profile about not found')
   const profilePage = new ProfilePage(page, { name: profile.name, about: profile.about })
