@@ -1,15 +1,24 @@
 # Phase 2: API Layer Updates
 
-**Status**: 🔄 PARTIALLY COMPLETED - Critical fix needed for `registerFirstSendtag`
+**Status**: 🚨 CRITICAL BLOCKING ISSUE - `registerFirstSendtag` breaks all new user onboarding
 
 ## Objective
 
 Fix critical API endpoints to properly integrate with the send_account_tags architecture and add missing validation.
 
+## Summary
+
+**Database Layer**: ✅ Fully implemented and tested (40/42 tests passing)
+**API Layer**: 🚨 One critical issue blocks shipping the entire feature
+
+The database foundation is solid, but a single API endpoint (`registerFirstSendtag`) bypasses the new junction table architecture, breaking new user onboarding. This must be fixed before the feature can ship.
+
+**Time to ship**: 2-4 hours to fix the critical API issue + testing
+
 ## Critical Issues
 
-### 🚨 Issue 1: registerFirstSendtag Broken (CRITICAL)
-**Priority**: Must fix immediately - affects all new user onboarding
+### 🚨 Issue 1: registerFirstSendtag Broken (BLOCKS SHIPPING)
+**Priority**: Must fix immediately - BREAKS ALL NEW USER ONBOARDING
 
 **Problem**: 
 - `registerFirstSendtag` bypasses `send_account_tags` junction table
