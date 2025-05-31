@@ -46,11 +46,11 @@ ALTER TABLE ONLY "public"."tags"
 
 -- Functions
 CREATE OR REPLACE FUNCTION public.create_tag(tag_name citext, send_account_id uuid)
-    RETURNS bigint
-    LANGUAGE plpgsql
-    SECURITY DEFINER
-    SET search_path TO 'public'
-    AS $$
+ RETURNS bigint
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
 DECLARE
     _tag_id bigint;
     _original_error_code text;
@@ -135,7 +135,8 @@ RETURNING
     END;
     RETURN _tag_id;
 END;
-$$;
+$function$
+;
 
 ALTER FUNCTION "public"."create_tag"("tag_name" "public"."citext", "send_account_id" "uuid") OWNER TO "postgres";
 
