@@ -27,7 +27,9 @@
       "**/tsconfig.json",
       "**/*.tsconfig.json",
       "postgrestools.jsonc",
-      "tamagui.css"
+      "tamagui.css",
+      "cloudflare-env.d.ts",
+      ".open-next/"
     ]
   },
   "organizeImports": {
