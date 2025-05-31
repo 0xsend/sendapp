@@ -122,10 +122,10 @@ function HomeBody(props: XStackProps) {
           <StablesBalanceCard />
           <SavingsBalanceCard href="/earn" w="100%" />
           <InvestmentsBalanceCard w="100%" />
-          <XStack gap="$3.5" w="100%" mih={136} jc={'center'}>
+          <HomeBodyCardRow>
             <RewardsCard href="/explore/rewards" />
             <FriendsCard href="/account/affiliate" />
-          </XStack>
+          </HomeBodyCardRow>
         </YStack>
         {(() => {
           switch (true) {
@@ -226,5 +226,12 @@ export const HomeBodyCard = styled(Card, {
   size: '$5',
   br: '$7',
   f: 1,
-  mah: 136,
+  mah: 150,
+})
+
+export const HomeBodyCardRow = styled(XStack, {
+  gap: '$3.5',
+  w: '100%',
+  mih: 150,
+  jc: 'center',
 })

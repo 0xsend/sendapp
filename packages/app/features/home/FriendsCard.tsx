@@ -52,7 +52,12 @@ function FriendsPreview({ limit = 3 }: { limit?: number }) {
   const filledFriends: Friend[] = [...friendsArray, ...Array(3 - friendsArray.length).fill({})]
 
   return (
-    <XStack ai="center" jc="space-between">
+    <XStack
+      ai="center"
+      jc="space-between"
+      /* hack to match the height of the rewards $ card */
+      h={50}
+    >
       <OverlappingFriendAvatars friends={filledFriends} />
       <ThemeableStack
         circular
