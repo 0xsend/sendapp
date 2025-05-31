@@ -86,6 +86,7 @@ BEGIN
             tags
         SET
             status = 'pending',
+            user_id = auth.uid(),
             updated_at = NOW()
         WHERE
             name = tag_name
@@ -94,10 +95,11 @@ BEGIN
             id
 ),
 new_tag AS (
-INSERT INTO tags(name, status)
+INSERT INTO tags(name, status, user_id)
     SELECT
         tag_name,
-        'pending'
+        'pending',
+        auth.uid()
     WHERE
         NOT EXISTS (
             SELECT
