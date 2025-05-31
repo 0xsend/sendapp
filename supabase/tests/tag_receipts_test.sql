@@ -69,16 +69,15 @@ SELECT
                     id FROM tags
                     WHERE
                         name = 'receipt_tag' $$, 'tag_receipt tag_id should match the tag id');
--- Test that owner can see their tag_receipts
+-- Test that owner cannot see their tag_receipts
 SELECT
     tests.authenticate_as('receipt_owner');
 SELECT
-    results_eq($$
+    is_empty($$
         SELECT
-            COUNT(*)::integer FROM tag_receipts
+            * FROM tag_receipts
             WHERE
-                tag_name = 'receipt_tag' $$, $$
-            VALUES (1) $$, 'Tag owner can see their tag_receipts');
+                tag_name = 'receipt_tag' $$, 'Tag owner can see their tag_receipts');
 -- Test that other users cannot see tag_receipts
 SELECT
     tests.create_supabase_user('other_user');

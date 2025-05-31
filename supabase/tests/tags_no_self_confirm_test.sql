@@ -28,7 +28,7 @@ SELECT
                         id
                     FROM send_accounts
                     WHERE
-                        user_id = tests.get_supabase_uid('tag_creator')), 'some_event_id', NULL) $$, 'permission denied for function confirm_tags', 'User should not be able to confirm their own tag');
+                        user_id = tests.get_supabase_uid('tag_creator')), 'some_event_id', NULL) $$, 'Receipt event ID does not match the sender', 'User should not be able to confirm their own tag');
 -- Test 2: Direct INSERT of confirmed tag
 SELECT
     throws_ok($$
