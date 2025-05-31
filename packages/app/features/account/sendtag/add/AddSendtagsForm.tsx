@@ -241,6 +241,7 @@ export const AddSendtagsForm = () => {
           Your Sendtag will be secured after payment confirmation
         </Paragraph>
         <LinkableButton
+          elevation={hasPendingTags ? 5 : undefined}
           theme="green"
           py={'$5'}
           br={'$4'}

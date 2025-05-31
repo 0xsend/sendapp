@@ -50,7 +50,7 @@ export function SendTagPricingDialog({ name = '' }: { name: Tables<'tags'>['name
 
         <Dialog.Content
           bordered
-          elevate
+          elevation={'$0.75'}
           key="content"
           animateOnly={['transform', 'opacity']}
           animation={[

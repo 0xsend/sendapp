@@ -28,6 +28,7 @@ const QuickActionButton = ({ href, children }: LinkableButtonProps) => {
 
   return (
     <LinkableButton
+      elevation={5}
       href={href}
       f={1}
       height={'auto'}
@@ -109,8 +110,8 @@ const Trade = () => {
         height={'auto'}
       >
         <Theme name="green">
-          <IconSwap
-            size={'$1'}
+          <IconPlus
+            size={'$1.5'}
             $theme-dark={{ color: '$primary' }}
             $theme-light={{ color: '$color12' }}
           />
@@ -123,7 +124,7 @@ const Trade = () => {
           numberOfLines={1}
           ellipsizeMode="tail"
         >
-          Trade
+          Invest
         </ButtonText>
       </YStack>
     </QuickActionButton>

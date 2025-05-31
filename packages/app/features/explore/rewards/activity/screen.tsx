@@ -1,6 +1,6 @@
 import {
-  Card,
   type CardProps,
+  FadeCard,
   H3,
   Label,
   Paragraph,
@@ -167,11 +167,11 @@ const DistributionRequirementsCard = ({
   } = useSnapshotBalance({ distribution, sendAccount })
   if (verificationsQuery.isLoading || isLoadingSendAccount) {
     return (
-      <Card br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
+      <FadeCard br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
         <Stack ai="center" jc="center" p="$4">
           <Spinner color="$color12" size="large" />
         </Stack>
-      </Card>
+      </FadeCard>
     )
   }
 
@@ -183,7 +183,7 @@ const DistributionRequirementsCard = ({
   )
 
   return (
-    <Card br={12} p="$6" gap="$4" $gtMd={{ gap: '$6' }}>
+    <FadeCard br={12} p="$6" gap="$4" $gtMd={{ gap: '$6' }}>
       <Stack ai="center" jc="space-between" gap="$5" $gtXs={{ flexDirection: 'row' }}>
         <YStack gap="$2">
           <Label fontSize={'$5'} col={'$color10'} miw={120} lh={20}>
@@ -257,7 +257,7 @@ const DistributionRequirementsCard = ({
           </XStack>
         </YStack>
       </Stack>
-    </Card>
+    </FadeCard>
   )
 }
 
@@ -275,11 +275,11 @@ const TaskCards = ({
         <H3 fontWeight={'600'} color={'$color12'}>
           Tasks
         </H3>
-        <Card br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
+        <FadeCard br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
           <Stack ai="center" jc="center" p="$4">
             <Spinner color="$color12" size="large" />
           </Stack>
-        </Card>
+        </FadeCard>
       </YStack>
     )
   }
@@ -381,7 +381,7 @@ const TaskCard = ({
   ].includes(type)
 
   return (
-    <Card br={12} gap="$4" p="$6" jc={'space-between'} $gtSm={{ maw: 331 }} w={'100%'}>
+    <FadeCard br={12} gap="$4" p="$6" jc={'space-between'} $gtSm={{ maw: 331 }} w={'100%'}>
       <XStack ai={'center'} jc="space-between">
         {status}
         {shouldShowValue && (
@@ -399,7 +399,7 @@ const TaskCard = ({
         )}
       </XStack>
       {children}
-    </Card>
+    </FadeCard>
   )
 }
 
@@ -417,11 +417,11 @@ const MultiplierCards = ({
         <H3 fontWeight={'600'} color={'$color12'}>
           Multiplier
         </H3>
-        <Card br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
+        <FadeCard br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
           <Stack ai="center" jc="center" p="$4">
             <Spinner color="$color12" size="large" />
           </Stack>
-        </Card>
+        </FadeCard>
       </YStack>
     )
   }
@@ -476,7 +476,14 @@ const MultiplierCards = ({
 
 const MultiplierCard = ({ children }: PropsWithChildren<CardProps>) => {
   return (
-    <Card br={'$6'} p="$6" jc={'center'} ai={'center'} mih={112} style={{ width: 'fit-content' }}>
+    <FadeCard
+      br={'$6'}
+      p="$6"
+      jc={'center'}
+      ai={'center'}
+      mih={112}
+      style={{ width: 'fit-content' }}
+    >
       <XStack
         ai="center"
         w={'100%'}
@@ -487,7 +494,7 @@ const MultiplierCard = ({ children }: PropsWithChildren<CardProps>) => {
       >
         {children}
       </XStack>
-    </Card>
+    </FadeCard>
   )
 }
 
@@ -510,11 +517,11 @@ const ProgressCard = ({
 
   if (verificationsQuery.isLoading) {
     return (
-      <Card br={12} $gtMd={{ gap: '$4' }} p="$6">
+      <FadeCard br={12} $gtMd={{ gap: '$4' }} p="$6">
         <Stack ai="center" jc="center" p="$4">
           <Spinner color="$color12" size="large" />
         </Stack>
-      </Card>
+      </FadeCard>
     )
   }
 
@@ -530,9 +537,9 @@ const ProgressCard = ({
         <H3 fontWeight={'600'} color={'$color12'}>
           Progress
         </H3>
-        <Card br={'$6'} p="$7" $xs={{ p: '$5' }} w={'100%'} maw={500}>
+        <FadeCard br={'$6'} p="$7" $xs={{ p: '$5' }} w={'100%'} maw={500}>
           <Progress progress={0} />
-        </Card>
+        </FadeCard>
       </YStack>
     )
   }
@@ -561,9 +568,9 @@ const ProgressCard = ({
       <H3 fontWeight={'600'} color={'$color12'}>
         Progress
       </H3>
-      <Card br={'$6'} p="$6" w={'100%'} maw={500}>
+      <FadeCard br={'$6'} p="$6" w={'100%'} maw={500}>
         <Progress progress={progress} />
-      </Card>
+      </FadeCard>
     </YStack>
   )
 }
@@ -624,7 +631,7 @@ const ClaimableRewardsCard = ({
       <H3 fontWeight={'600'} color={'$color12'}>
         {isQualificationOver ? `Total ${distributionMonth}` : ` ${distributionMonth} Rewards`}
       </H3>
-      <Card br={'$6'} p="$7" ai={'center'} w={'100%'}>
+      <FadeCard br={'$6'} p="$7" ai={'center'} w={'100%'}>
         <Stack ai="center" jc="space-between" fd="row" w="100%">
           <Paragraph
             fontFamily={'$mono'}
@@ -643,7 +650,7 @@ const ClaimableRewardsCard = ({
           </Paragraph>
           <DistributionClaimButton distribution={distribution} />
         </Stack>
-      </Card>
+      </FadeCard>
     </YStack>
   )
 }

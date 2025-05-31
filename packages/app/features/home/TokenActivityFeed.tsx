@@ -89,7 +89,7 @@ export const TokenActivityFeed = ({
   const [dataProvider, setDataProvider] = useState(dataProviderMaker(activities))
 
   const _layoutProvider = layoutProviderMaker({
-    getHeightOrWidth: () => 100,
+    getHeightOrWidth: () => 102,
   })
 
   const _renderRow = useCallback(

@@ -79,6 +79,7 @@ export const LoginWithPhoneScreen = () => {
         $theme-dark={{
           variant: canSubmit ? undefined : 'outlined',
         }}
+        elevation={canSubmit ? '$0.75' : undefined}
       >
         <ButtonText
           ff={'$mono'}

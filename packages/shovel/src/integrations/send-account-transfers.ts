@@ -11,7 +11,7 @@ import {
   spx6900Address,
   usdcAddress,
   mamoAddress,
-} from '@my/wagmi'
+} from '@my/wagmi/generated'
 
 export const transfersTable: Table = {
   name: 'send_account_transfers',

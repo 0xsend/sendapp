@@ -1,5 +1,5 @@
 import type { BlockData, Column, Integration, Table } from '@indexsupply/shovel-config'
-import { sendtagCheckoutAddress } from '@my/wagmi'
+import { sendtagCheckoutAddress } from '@my/wagmi/generated'
 
 export const table: Table = {
   name: 'sendtag_checkout_receipts',

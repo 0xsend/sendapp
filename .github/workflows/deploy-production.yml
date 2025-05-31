@@ -40,6 +40,8 @@ jobs:
   schema-drift-check:
     name: Check Schema Drift
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       # Add after main branch is merged
@@ -48,9 +50,31 @@ jobs:
       - name: Check for Schema Drift
         uses: ./.github/actions/supabase-schema-drift-check
 
+  build-distributor:
+    name: Build Distributor Docker Image
+    uses: ./.github/workflows/build-distributor.yml
+    permissions:
+      contents: read
+      packages: write
+    with:
+      environment: production
+    secrets: inherit
+
+  build-shovel:
+    name: Build Shovel Docker Image
+    uses: ./.github/workflows/build-shovel.yml
+    permissions:
+      contents: read
+      packages: write
+    with:
+      environment: production
+    secrets: inherit
+
   deploy:
-    needs: schema-drift-check
+    needs: [schema-drift-check]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
         with:
@@ -68,3 +92,8 @@ jobs:
           supabase-db-password: ${{ secrets.PRODUCTION_SUPABASE_DB_PASSWORD }}
           qa-notification-url: ${{ secrets.CI_QA_NOTIFICATION_URL }}
           skip-supabase-deploy: ${{ inputs.skip-supabase-deploy }}
+
+      - name: Output Docker Image Tags
+        run: |
+          echo "Distributor image built: ${{ needs.build-distributor.outputs.image-tag }}"
+          echo "Shovel image built: ${{ needs.build-shovel.outputs.image-tag }}"

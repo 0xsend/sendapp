@@ -71,7 +71,7 @@ export const ActivityDetails = ({
             p: '$7',
           }}
         >
-          <XStack ai={'center'} jc={'space-between'}>
+          <XStack ai={'center'} jc={'space-between'} elevation={'$0.75'}>
             <XStack f={1} gap={'$3'} ai={'center'}>
               <ActivityAvatar activity={activity} size={'$3.5'} br={'unset'} circular={true} />
               <XStack f={1} gap={'$2'}>

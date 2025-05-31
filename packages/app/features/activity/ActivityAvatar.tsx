@@ -1,5 +1,5 @@
 import { Avatar, LinkableAvatar, type LinkableAvatarProps, Spinner, XStack } from '@my/ui'
-import { Minus, Plus } from '@tamagui/lucide-icons'
+import { Minus, Plus, ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
 import { AvatarSendEarnDeposit } from 'app/components/avatars'
 import { AvatarSendEarnWithdraw } from 'app/components/avatars/AvatarSendEarnWithdraw'
 import { IconUpgrade } from 'app/components/icons'
@@ -57,8 +57,15 @@ export function ActivityAvatar({
         onPress={(e) => {
           e.stopPropagation()
         }}
+        position={'relative'}
       >
-        <LinkableAvatar size="$4.5" br="$4" gap="$2" href={`/profile/${user.send_id}`} {...props}>
+        <LinkableAvatar
+          size="$5"
+          gap="$2"
+          href={`/profile/${user.send_id}`}
+          circular={true}
+          {...props}
+        >
           {(() => {
             switch (true) {
               case !user.avatar_url:
@@ -79,7 +86,7 @@ export function ActivityAvatar({
           })()}
 
           <Avatar.Fallback jc="center" bc="$olive">
-            <Avatar size="$4.5" br="$4" {...props}>
+            <Avatar size="$5" {...props}>
               <Avatar.Image
                 src={`https://ui-avatars.com/api/?name=${
                   user?.name ?? user?.tags?.[0] ?? user?.send_id
@@ -88,6 +95,7 @@ export function ActivityAvatar({
             </Avatar>
           </Avatar.Fallback>
         </LinkableAvatar>
+        <TransferDirectionIndicator activity={activity} />
       </XStack>
     )
   }
@@ -184,6 +192,29 @@ const TradeActivityAvatar = ({ activity }: { activity: Activity }) => {
         shadowOpacity={1}
         shadowRadius={4}
       />
+    </XStack>
+  )
+}
+
+const TransferDirectionIndicator = ({ activity }: { activity: Activity }) => {
+  const { to_user } = activity
+
+  return (
+    <XStack
+      position={'absolute'}
+      bottom={0}
+      right={0}
+      transform={'translate(10%, 15%) scale(0.85)'}
+      bc={to_user?.id ? '$olive' : '$error'}
+      borderRadius={999}
+      borderWidth={2}
+      borderColor={'$background'}
+    >
+      {to_user?.id ? (
+        <ArrowDown size={'$1'} color={'$white'} />
+      ) : (
+        <ArrowUp size={'$1'} color={'$white'} />
+      )}
     </XStack>
   )
 }

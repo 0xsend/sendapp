@@ -3,11 +3,10 @@ import {
   Button,
   Card,
   H1,
-  H4,
   Paragraph,
   Spinner,
   Stack,
-  Theme,
+  styled,
   useMedia,
   XStack,
   type XStackProps,
@@ -15,135 +14,34 @@ import {
 } from '@my/ui'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
-import { TokenBalanceCard } from './TokenBalanceCard'
-import { TokenBalanceList } from './TokenBalanceList'
 import { TokenDetails } from './TokenDetails'
-import Search from 'app/components/SearchBar'
-import { useTagSearch } from 'app/provider/tag-search'
 import { useRootScreenParams } from 'app/routers/params'
-import { HomeButtons } from './HomeButtons'
-import { AlertCircle } from '@tamagui/lucide-icons'
-import { useIsSendingUnlocked } from 'app/utils/useIsSendingUnlocked'
-import { HomeQuickActions } from 'app/features/home/HomeQuickActions'
+
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useRouter } from 'solito/router'
 import { IsPriceHiddenProvider } from 'app/features/home/utils/useIsPriceHidden'
 
-function SendSearchBody() {
-  const { isLoading, error } = useTagSearch()
-
-  return (
-    <AnimatePresence>
-      {isLoading && (
-        <YStack key="loading" gap="$4" mb="$4">
-          <Spinner size="large" color="$send1" />
-        </YStack>
-      )}
-      {error && (
-        <YStack key="red" gap="$4" mb="$4">
-          <H4 theme={'alt2'}>Error</H4>
-          <Paragraph>{error.message}</Paragraph>
-        </YStack>
-      )}
-      <Search.Results />
-    </AnimatePresence>
-  )
-}
-
-function HomeBody(props: XStackProps) {
-  const { coin: selectedCoin } = useCoinFromTokenParam()
-  const { isSendingUnlocked, isLoading } = useIsSendingUnlocked()
-  const quickActionHeightWithOffset = 117
-
-  if (isLoading)
-    return (
-      <Stack w="100%" h="100%" jc={'center'} ai={'center'}>
-        <Spinner size="large" />
-      </Stack>
-    )
-
-  return (
-    <IsPriceHiddenProvider>
-      <XStack
-        w={'100%'}
-        $gtLg={{ gap: '$5', pb: '$3.5' }}
-        $lg={{ f: 1, pt: '$3' }}
-        minHeight={'100%'}
-        {...props}
-      >
-        <YStack
-          $gtLg={{ display: 'flex', w: '45%', gap: '$5', pb: 0 }}
-          display={!selectedCoin ? 'flex' : 'none'}
-          width="100%"
-          gap="$3.5"
-          ai={'center'}
-        >
-          {!isSendingUnlocked ? (
-            <>
-              <Card p={'$4.5'} ai={'center'} gap="$5" jc="space-around" w={'100%'}>
-                <YStack gap="$6" jc="center" ai="center">
-                  <Theme name="red_active">
-                    <AlertCircle size={'$3'} />
-                  </Theme>
-                  <YStack ai="center" gap="$2">
-                    <H1 tt="uppercase" fontWeight={'800'}>
-                      ADD FUNDS
-                    </H1>
-                    <Paragraph color="$color10" $gtMd={{ fontSize: '$6' }} ta="center">
-                      Deposit at least .05 USDC to unlock sending
-                    </Paragraph>
-                  </YStack>
-                  <XStack w="100%">
-                    <HomeButtons.DepositButton mah={40} />
-                  </XStack>
-                </YStack>
-              </Card>
-            </>
-          ) : (
-            <TokenBalanceCard />
-          )}
-          <HomeQuickActions
-            y={selectedCoin ? -quickActionHeightWithOffset : 0}
-            zIndex={selectedCoin ? -1 : 0}
-            animateOnly={['transform']}
-            animation="200ms"
-          >
-            <HomeQuickActions.Deposit />
-            <HomeQuickActions.Earn />
-            <HomeQuickActions.Trade />
-          </HomeQuickActions>
-          <YStack
-            w={'100%'}
-            ai={'center'}
-            y={selectedCoin ? -quickActionHeightWithOffset : 0}
-            animateOnly={['transform']}
-            animation="200ms"
-          >
-            <Card
-              bc={'$color1'}
-              width="100%"
-              p="$2"
-              $gtSm={{
-                p: '$4',
-              }}
-            >
-              <TokenBalanceList />
-            </Card>
-          </YStack>
-        </YStack>
-        {selectedCoin !== undefined && <TokenDetails coin={selectedCoin} />}
-      </XStack>
-    </IsPriceHiddenProvider>
-  )
-}
+import { StablesBalanceCard } from './StablesBalanceCard'
+import { SavingsBalanceCard } from './SavingsBalanceCard'
+import { InvestmentsBalanceCard } from './InvestmentsBalanceCard'
+import { InvestmentsBalanceList } from './InvestmentBalanceList'
+import { StablesBalanceList } from './StablesBalanceList'
+import { RewardsCard } from './RewardsCard'
+import { FriendsCard } from './FriendsCard'
+import { useCoins } from 'app/provider/coins'
+import { useState } from 'react'
+import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { IconPlus } from 'app/components/icons'
+import { investmentCoins } from 'app/data/coins'
+import { CoinSheet } from 'app/components/CoinSheet'
+import { Link } from 'solito/link'
+import { baseMainnet, usdcAddress } from '@my/wagmi'
 
 export function HomeScreen() {
   const media = useMedia()
   const router = useRouter()
   const supabase = useSupabase()
-  const [queryParams] = useRootScreenParams()
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
-  const { search } = queryParams
 
   return (
     <YStack f={1}>
@@ -172,8 +70,6 @@ export function HomeScreen() {
                   <Button onPress={() => supabase.auth.signOut()}>Sign Out</Button>
                 </Stack>
               )
-            case search !== undefined: //@todo remove this
-              return <SendSearchBody />
             default:
               return (
                 <HomeBody
@@ -195,3 +91,147 @@ export function HomeScreen() {
     </YStack>
   )
 }
+
+function HomeBody(props: XStackProps) {
+  const { coin: selectedCoin, isLoading } = useCoinFromTokenParam()
+  const [queryParams] = useRootScreenParams()
+
+  if (isLoading)
+    return (
+      <Stack w="100%" h="100%" jc={'center'} ai={'center'}>
+        <Spinner size="large" />
+      </Stack>
+    )
+
+  return (
+    <IsPriceHiddenProvider>
+      <XStack
+        w={'100%'}
+        $gtLg={{ gap: '$5', pb: '$3.5' }}
+        $lg={{ f: 1, pt: '$3' }}
+        minHeight={'100%'}
+        {...props}
+      >
+        <YStack
+          $gtLg={{ display: 'flex', w: '45%', pb: 0 }}
+          width="100%"
+          display={!queryParams.token ? 'flex' : 'none'}
+          gap="$3.5"
+          ai={'center'}
+        >
+          <StablesBalanceCard />
+          <SavingsBalanceCard href="/earn" w="100%" />
+          <InvestmentsBalanceCard w="100%" />
+          <HomeBodyCardRow>
+            <RewardsCard href="/explore/rewards" />
+            <FriendsCard href="/account/affiliate" />
+          </HomeBodyCardRow>
+        </YStack>
+        {(() => {
+          switch (true) {
+            case selectedCoin !== undefined:
+              return <TokenDetails coin={selectedCoin} />
+            case queryParams.token === 'investments':
+              return <InvestmentsBody />
+            case queryParams.token === 'stables':
+              return <StablesBody />
+            default:
+              return null
+          }
+        })()}
+      </XStack>
+    </IsPriceHiddenProvider>
+  )
+}
+
+function InvestmentsBody() {
+  const { investmentCoins: myInvestmentCoins, isLoading } = useCoins()
+  const [isSheetOpen, setIsSheetOpen] = useState(false)
+  const hoverStyles = useHoverStyles()
+
+  return (
+    <YStack ai="center" $gtXs={{ gap: '$3' }} gap={'$3.5'} f={1}>
+      <Card
+        bc={'$color1'}
+        width="100%"
+        p="$2"
+        $gtSm={{
+          p: '$4',
+        }}
+      >
+        {isLoading ? (
+          <YStack p="$3.5" ai="center">
+            <Spinner />
+          </YStack>
+        ) : (
+          <InvestmentsBalanceList coins={myInvestmentCoins} />
+        )}
+      </Card>
+      <Button
+        elevation={'$0.75'}
+        p="$3"
+        hoverStyle={hoverStyles}
+        onPress={() => setIsSheetOpen(true)}
+      >
+        <Button.Icon>
+          <IconPlus size="$1" color="$color10" />
+        </Button.Icon>
+        <Button.Text>See More</Button.Text>
+      </Button>
+
+      <CoinSheet open={isSheetOpen} onOpenChange={() => setIsSheetOpen(false)}>
+        <CoinSheet.Handle onPress={() => setIsSheetOpen(false)}>New Investments</CoinSheet.Handle>
+        <CoinSheet.Items>
+          {investmentCoins.map((coin) => (
+            <Link
+              key={coin.symbol}
+              href={{
+                pathname: '/trade',
+                query: { inToken: usdcAddress[baseMainnet.id], outToken: coin.token },
+              }}
+            >
+              <CoinSheet.Item coin={coin} />
+            </Link>
+          ))}
+        </CoinSheet.Items>
+      </CoinSheet>
+    </YStack>
+  )
+}
+
+function StablesBody() {
+  const media = useMedia()
+
+  return (
+    <YStack $gtXs={{ gap: '$3' }} gap={'$3.5'} f={1}>
+      {media.lg && <StablesBalanceCard />}
+
+      <Card
+        bc={'$color1'}
+        width="100%"
+        $gtSm={{
+          p: '$4',
+        }}
+      >
+        <StablesBalanceList />
+      </Card>
+    </YStack>
+  )
+}
+
+export const HomeBodyCard = styled(Card, {
+  hoverStyle: { scale: 0.925 },
+  pressStyle: { scale: 0.875 },
+  animation: 'bouncy',
+  size: '$5',
+  br: '$7',
+  f: 1,
+  mah: 150,
+})
+
+export const HomeBodyCardRow = styled(XStack, {
+  gap: '$3.5',
+  w: '100%',
+  mih: 150,
+  jc: 'center',
+})

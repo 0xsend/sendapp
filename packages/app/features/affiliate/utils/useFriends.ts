@@ -1,38 +1,26 @@
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
-import { throwIf } from 'app/utils/throwIf'
 
-const QUERY_KEY = 'affiliate_referrals'
+const QUERY_KEY = 'friends'
 
-/**
- * Infinite query to fetch friends
- * @param pageSize - number of items to fetch per page
- */
-export function useFriends({ pageSize = 10 }: { pageSize?: number } = {}) {
+export function useFriends(limit: number) {
   const supabase = useSupabase()
-  async function fetchFriends({ pageParam }: { pageParam: number }) {
-    const from = pageParam * pageSize
-    const to = (pageParam + 1) * pageSize - 1
-    const request = supabase.rpc('get_friends').select('*').range(from, to)
-    const { data, error } = await request
-    throwIf(error)
-    return data
-  }
 
-  return useInfiniteQuery({
-    queryKey: [QUERY_KEY],
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, _allPages, lastPageParam) => {
-      if (lastPage !== null && lastPage.length < pageSize) return undefined
-      return lastPageParam + 1
-    },
-    getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => {
-      if (firstPageParam <= 1) {
-        return undefined
+  return useQuery({
+    queryKey: [QUERY_KEY, limit] as const,
+    queryFn: async () => {
+      const { data, count, error } = await supabase
+        .rpc('get_friends', {}, { count: 'exact' })
+        .select('*')
+        .limit(limit)
+
+      if (error) throw error
+
+      return {
+        friends: data || [],
+        count: count || 0,
       }
-      return firstPageParam - 1
     },
-    queryFn: fetchFriends,
   })
 }
 

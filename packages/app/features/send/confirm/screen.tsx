@@ -10,6 +10,7 @@ import {
   XStack,
   YStack,
   type TamaguiElement,
+  FadeCard,
 } from '@my/ui'
 import { baseMainnet, baseMainnetClient, entryPointAddress } from '@my/wagmi'
 import { useQueryClient, useMutation } from '@tanstack/react-query'
@@ -42,6 +43,7 @@ import { signUserOp } from 'app/utils/signUserOp'
 import { decodeTransferUserOp } from 'app/utils/decodeTransferUserOp'
 import type { UserOperation } from 'permissionless'
 import { formFields } from 'app/utils/SchemaForm'
+import { useHoverStyles } from 'app/utils/useHoverStyles'
 
 export function SendConfirmScreen() {
   const [queryParams] = useSendScreenParams()
@@ -76,6 +78,7 @@ export function SendConfirm() {
   const { sendToken, recipient, idType, amount, note } = queryParams
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
   const { coin: selectedCoin } = useCoinFromSendTokenParam()
+  const hoverStyles = useHoverStyles()
 
   const submitButtonRef = useRef<TamaguiElement | null>(null)
 
@@ -138,7 +141,7 @@ export function SendConfirm() {
     chainId: baseMainnet.id,
   })
 
-  const hasEnoughBalance = selectedCoin?.balance && selectedCoin.balance >= BigInt(amount ?? '0')
+  const hasEnoughBalance = !!selectedCoin?.balance && selectedCoin.balance >= BigInt(amount ?? '0')
   const gas = usdcFees ? usdcFees.baseFee + usdcFees.gasFees : BigInt(Number.MAX_SAFE_INTEGER)
   const hasEnoughGas =
     (usdc?.balance ?? BigInt(0)) > (isUSDCSelected ? BigInt(amount ?? '0') + gas : gas)
@@ -148,7 +151,8 @@ export function SendConfirm() {
 
   const isSubmitting = isValidatePending || isTransferPending || isTransferInitialized
 
-  const canSubmit = (!isLoading || !isSubmitting) && hasEnoughBalance && hasEnoughGas && feesPerGas
+  const canSubmit =
+    (!isLoading || !isSubmitting) && hasEnoughBalance && hasEnoughGas && feesPerGas !== undefined
 
   const localizedAmount = localizeAmount(
     formatUnits(
@@ -264,8 +268,7 @@ export function SendConfirm() {
       }}
     >
       <YStack gap={'$4'} pt={'$4'}>
-        <YStack
-          bg={'$color1'}
+        <FadeCard
           br={'$6'}
           p={'$6'}
           gap={'$4.5'}
@@ -379,7 +382,7 @@ export function SendConfirm() {
               )}
             </XStack>
           </YStack>
-        </YStack>
+        </FadeCard>
         {Boolean(note) && (
           <YStack
             bg={'$color1'}
@@ -423,6 +426,7 @@ export function SendConfirm() {
         )}
       </YStack>
       <Button
+        elevation={canSubmit ? '$0.75' : undefined}
         ref={submitButtonRef}
         theme={error ? 'red_alt1' : 'green'}
         onPress={onSubmit}

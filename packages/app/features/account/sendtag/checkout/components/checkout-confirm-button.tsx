@@ -278,7 +278,7 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
 
   const canSubmit =
     hasPendingTags &&
-    canAffordTags &&
+    !!canAffordTags &&
     !isLoadingUserOp &&
     !sendTransactionIsPending &&
     !submitting &&
@@ -286,7 +286,7 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
     !usdcFeesError &&
     !isLoadingUSDCFees &&
     !isLoadingReferrer &&
-    (referrerProfile?.address || !referralCodeCookie)
+    !!(referrerProfile?.address || !referralCodeCookie)
 
   return (
     <ConfirmButtonStack w={'100%'} gap="$2">
@@ -297,6 +297,7 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
         <Paragraph color="$error">{usdcFeesError?.message?.split('.').at(0)}</Paragraph>
       )}
       <Button
+        elevation={canSubmit ? '$0.75' : undefined}
         disabled={!canSubmit}
         disabledStyle={{
           pointerEvents: 'none',

@@ -1,4 +1,5 @@
-import { Paragraph, Text, XStack, YStack } from '@my/ui'
+import { Text, XStack, YStack } from '@my/ui'
+import { Paragraph } from 'tamagui'
 import {
   useDateFromActivity,
   useEventNameFromActivity,
@@ -64,26 +65,26 @@ export function TokenActivityRow({
   return (
     <XStack
       width={'100%'}
+      height={102}
       ai="center"
       jc="space-between"
       gap="$4"
       p="$3.5"
       br={'$4'}
       cursor={onPress ? 'pointer' : 'default'}
-      $gtLg={{ p: '$5' }}
       testID={'TokenActivityRow'}
       hoverStyle={onPress ? hoverStyles : null}
       onPress={handlePress}
     >
-      <XStack gap="$3.5" width={'100%'} f={1}>
+      <XStack gap="$3.5" width={'100%'} f={1} alignItems={'flex-start'}>
         <ActivityAvatar activity={activity} />
-        <YStack width={'100%'} f={1} overflow="hidden">
+        <YStack width={'100%'} f={1} overflow="hidden" gap={'$1'}>
           <XStack fd="row" jc="space-between" gap="$1.5" f={1} width={'100%'}>
-            <Text color="$color12" fontSize="$6" fontWeight={'500'}>
+            <Text color="$color12" fontSize="$5" fontWeight={'500'}>
               {isUserTransfer ? subtext : eventName}
             </Text>
             <Text>&nbsp;</Text>
-            <Text color="$color12" fontSize="$6" fontWeight={'500'} ta="right">
+            <Text color="$color12" fontSize="$5" fontWeight={'500'} ta="right">
               {amount}
             </Text>
           </XStack>
@@ -96,19 +97,20 @@ export function TokenActivityRow({
             f={1}
           >
             <Paragraph
-              color="$color10"
+              color={'$color10'}
+              size={'$4'}
               maxWidth={'100%'}
               overflow={'hidden'}
               textOverflow={'ellipsis'}
-              numberOfLines={1}
-              fontSize="$5"
+              numberOfLines={2}
+              lineHeight={18}
             >
               {isUserTransfer ? eventName : subtext}
             </Paragraph>
-            <Paragraph color="$color10" size={'$5'} textAlign={'right'} flexShrink={0}>
-              {date}
-            </Paragraph>
           </XStack>
+          <Paragraph color={'$color10'} size={'$3'} flexShrink={0} display={'flex'} opacity={0.6}>
+            {date}
+          </Paragraph>
         </YStack>
       </XStack>
     </XStack>

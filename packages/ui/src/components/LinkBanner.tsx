@@ -16,6 +16,7 @@ export const LinkBanner = ({ href, imgUrl, subtitle, title }: LinkBannerProps) =
     <Fade>
       <Link href={href}>
         <Card
+          elevation={'$0.75'}
           w={'100%'}
           h={200}
           p={'$5'}

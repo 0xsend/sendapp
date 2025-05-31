@@ -15,11 +15,10 @@ import {
   XStack,
 } from '@my/ui'
 import { useRootScreenParams } from 'app/routers/params'
-import { IconAccount, IconArrowLeft, IconDeviceReset, IconSendLogo } from 'app/components/icons'
+import { IconAccount, IconArrowLeft, IconSendLogo } from 'app/components/icons'
 import { usePathname } from 'app/utils/usePathname'
 import { useRouter } from 'solito/router'
 
-import { useCoinFromTokenParam } from '../utils/useCoinFromTokenParam'
 import { Link } from 'solito/link'
 import { useUser } from 'app/utils/useUser'
 import type { Tables } from '@my/supabase/database-generated.types'
@@ -52,43 +51,12 @@ export function AvatarMenuButton({ profile }: { profile?: Tables<'profiles'> | n
   if (isLoading) return <Spinner size="small" color={'$color12'} alignSelf="center" p="$3" />
 
   return (
-    <LinkableAvatar href={'/account'} size={'$3.5'} circular={true}>
+    <LinkableAvatar elevation={5} href={'/account'} size={'$3.5'} circular={true}>
       <Avatar.Image src={profile?.avatar_url ?? ''} w="100%" h="100%" objectFit="cover" />
       <Avatar.Fallback jc={'center'} ai="center" theme="green_active" bc="$color2">
         <IconAccount size={'$2'} $theme-light={{ color: '$color12' }} />
       </Avatar.Fallback>
     </LinkableAvatar>
-  )
-}
-
-function ActivityMenuButton() {
-  const href = '/activity'
-  const location = usePathname()
-  const parts = location.split('/').filter(Boolean)
-  const isActiveRoute =
-    location === href.toString() ||
-    parts.includes(href.toString()) ||
-    href.toString().startsWith(`/${parts[0]}`)
-
-  return (
-    <LinkableButton
-      href={'/activity'}
-      bc={'$color0'}
-      p={'$2'}
-      circular
-      chromeless
-      hoverStyle={{ bc: '$color0' }}
-      pressStyle={{ bc: '$color0' }}
-      focusStyle={{ bc: '$color0' }}
-    >
-      <LinkableButton.Icon>
-        <IconDeviceReset
-          size={'$1.5'}
-          color={isActiveRoute ? '$primary' : '$color10'}
-          $theme-light={{ color: isActiveRoute ? '$color12' : '$color10' }}
-        />
-      </LinkableButton.Icon>
-    </LinkableButton>
   )
 }
 
@@ -101,23 +69,16 @@ export function TopNav({
   showOnGtLg = false,
   hideRightActions = false,
 }: TopNavProps) {
-  const [queryParams, setRootParams] = useRootScreenParams()
+  const [queryParams] = useRootScreenParams()
   const path = usePathname()
   const parts = path.split('/').filter(Boolean)
   const { push, back } = useRouter()
   const media = useMedia()
-  const { coin: selectedCoin } = useCoinFromTokenParam()
   const { profile } = useUser()
-
-  const hasSelectedCoin = Boolean(selectedCoin)
 
   const handleBack = () => {
     // pop to the base path if subroute. e.g. /account/settings/edit-profile -> /account
     // else, go to home page
-    if (hasSelectedCoin) {
-      setRootParams({ ...queryParams, token: undefined })
-      return
-    }
     if (backFunction === 'router') {
       back()
       return
@@ -169,7 +130,7 @@ export function TopNav({
               )
             case media.gtLg && !showOnGtLg:
               return null
-            case hasSelectedCoin:
+            case queryParams.token !== undefined:
               return (
                 <XStack ai="center" f={1}>
                   <Button onPress={handleBack}>
@@ -182,7 +143,16 @@ export function TopNav({
                     </ButtonOg.Icon>
                   </Button>
                   <Paragraph size={'$8'} col={'$color10'}>
-                    Balance
+                    {(() => {
+                      switch (queryParams.token) {
+                        case 'investments':
+                          return 'Invest'
+                        case 'stables':
+                          return 'Cash'
+                        default:
+                          return 'Balance'
+                      }
+                    })()}
                   </Paragraph>
                 </XStack>
               )
@@ -211,7 +181,6 @@ export function TopNav({
                     }}
                   >
                     {/* We need the buttons to be there for layout purposes */}
-                    <ActivityMenuButton />
                     <AvatarMenuButton profile={profile} />
                   </XStack>
                 </>

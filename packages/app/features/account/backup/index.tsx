@@ -160,7 +160,7 @@ const WebauthnCreds = ({
           <WebAuthnCred key={`${sendAcct.id}-${cred.id}`} sendAcct={sendAcct} cred={cred} />
         ))}
       </YStack>
-      <Button theme="green" borderRadius={'$4'} p={'$4'} {...addPasskeyLink}>
+      <Button elevation={'$0.75'} theme="green" borderRadius={'$4'} p={'$4'} {...addPasskeyLink}>
         <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
           Add a Passkey
         </Button.Text>
@@ -201,7 +201,7 @@ const WebAuthnCred = ({
   })
 
   return (
-    <FadeCard>
+    <FadeCard elevation={'$0.75'}>
       <XStack jc="space-between" ai="center">
         <Paragraph
           testID={`passkey-${cred.display_name}`}

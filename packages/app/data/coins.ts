@@ -209,7 +209,7 @@ export const allCoinsDict = allCoins.reduce((acc, coin) => {
 
 export type allCoinsDict = typeof allCoinsDict
 
-export type CoinWithBalance = allCoins[number] & {
+export type CoinWithBalance = coin & {
   balance: bigint | undefined
 }
 
