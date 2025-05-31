@@ -6,6 +6,16 @@ const require = createRequire(import.meta.url)
 const withBundleAnalyzer = require('@next/bundle-analyzer')
 const { withTamagui } = require('@tamagui/next-plugin')
 
+// Initialize OpenNext Cloudflare for development
+if (process.env.NODE_ENV === 'development') {
+  try {
+    const { initOpenNextCloudflareForDev } = await import('@opennextjs/cloudflare')
+    initOpenNextCloudflareForDev()
+  } catch (e) {
+    console.warn('OpenNext Cloudflare dev initialization failed:', e)
+  }
+}
+
 const boolVals = {
   true: true,
   false: false,
@@ -194,3 +204,6 @@ export default () => {
 
   return config
 }
+
+// import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare'
+// initOpenNextCloudflareForDev()
