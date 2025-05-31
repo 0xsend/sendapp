@@ -14,7 +14,8 @@ jobs:
     name: Build Next.js Docker Image
     # Only build images for PRs and manual triggers, not for pushes to main/dev (handled by deploy workflows)
     if: ${{ github.event_name != 'push' }}
-    runs-on: ubuntu-latest
+    # runs-on: ubuntu-latest
+    runs-on: arc-runner-set
     permissions:
       contents: read
     outputs:
@@ -196,8 +197,8 @@ jobs:
     # Only run playwright tests when we build the image (PRs and manual triggers)
     if: ${{ github.event_name != 'push' }}
     # arc-runner-set had a good run
-    # runs-on: arc-runner-set
-    runs-on: ubuntu-latest
+    runs-on: arc-runner-set
+    # runs-on: ubuntu-latest
     strategy:
       # Don't stop all shards if one fails
       fail-fast: false
