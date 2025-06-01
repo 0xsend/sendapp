@@ -296,19 +296,31 @@ $function$;
 
 ALTER FUNCTION "public"."tags_after_insert_or_update_func"() OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "public"."tags_before_insert_or_update_func"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    SET "search_path" TO 'public'
-    AS $function$
+CREATE OR REPLACE FUNCTION public.tags_before_insert_or_update_func()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
 DECLARE
     _debug text;
+    _is_first_sendtag boolean := false;
 BEGIN
     -- Ensure user is not changing their confirmed tag name
     IF TG_OP = 'UPDATE' AND current_setting('role')::text = 'authenticated' AND NEW.status = 'confirmed'::public.tag_status AND OLD.name <> NEW.name THEN
         RAISE EXCEPTION 'Users cannot change the name of a confirmed tag';
     END IF;
-    -- Ensure user is not confirming their own tag
-    IF NEW.status = 'confirmed'::public.tag_status AND current_setting('role')::text = 'authenticated' THEN
+
+    -- Ensure user is not confirming their own tag (except for first sendtag)
+    IF NEW.status = 'confirmed'::public.tag_status
+        AND current_setting('role')::text = 'authenticated'
+        AND EXISTS (
+            SELECT 1
+            FROM tags t
+            WHERE t.user_id = NEW.user_id
+            AND t.status = 'confirmed'
+            AND t.id != NEW.id)
+    THEN
         RAISE EXCEPTION 'Users cannot confirm their own tags';
     END IF;
     -- For INSERT operations, handle existing tags

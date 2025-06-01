@@ -20,6 +20,10 @@ SELECT create_tag(
     (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('tag_creator'))
 );
 
+-- Confirm tags with the service role
+SELECT tests.clear_authentication();
+SELECT set_config('role', 'service_role', true);
+
 -- Trying to confirm the tag as the tag owner (should raise an exception)
 SELECT throws_ok(
     $$
@@ -32,6 +36,8 @@ SELECT throws_ok(
     'Receipt event ID does not match the sender',
     'User should not be able to confirm their own tag'
 );
+
+select tests.authenticate_as('tag_creator');
 
 -- Bypassing rpc call to confirm tag - create another tag first then try to confirm it
 SELECT create_tag(

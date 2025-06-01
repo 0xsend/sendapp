@@ -1925,6 +1925,14 @@ export type Database = {
           new_referrer: Database["public"]["CompositeTypes"]["profile_lookup_result"]
         }[]
       }
+      register_first_sendtag: {
+        Args: {
+          tag_name: string
+          send_account_id: string
+          _referral_code?: string
+        }
+        Returns: Json
+      }
       send_accounts_add_webauthn_credential: {
         Args: {
           send_account_id: string
