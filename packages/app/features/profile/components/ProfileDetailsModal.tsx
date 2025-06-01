@@ -17,7 +17,6 @@ export const ProfilesDetailsModal = () => {
     default:
       return (
         <YStack
-          elevation={'$0.75'}
           w={'100%'}
           ai={'center'}
           $gtLg={{
