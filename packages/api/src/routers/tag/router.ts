@@ -100,130 +100,32 @@ export const tagRouter = createTRPCRouter({
         sendAccountId: z.string().uuid(),
       })
     )
-    .mutation(
-      async ({ ctx: { supabase, session, referralCode }, input: { name, sendAccountId } }) => {
-        try {
-          const supabaseAdmin = createSupabaseAdminClient()
+    .mutation(async ({ ctx: { supabase, referralCode }, input: { name, sendAccountId } }) => {
+      try {
+        // Use the atomic SQL function that handles everything in a single transaction
+        const { data: result, error } = await supabase.rpc('register_first_sendtag', {
+          tag_name: name,
+          send_account_id: sendAccountId,
+          _referral_code: referralCode || null,
+        })
 
-          // Verify send account belongs to user
-          const { data: sendAccount, error: sendAccountError } = await supabase
-            .from('send_accounts')
-            .select('id, main_tag_id')
-            .eq('id', sendAccountId)
-            .eq('user_id', session.user.id)
-            .single()
-
-          if (sendAccountError || !sendAccount) {
-            throw new TRPCError({
-              code: 'NOT_FOUND',
-              message: 'Send account not found',
-            })
-          }
-
-          const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('*, tags(*)')
-            .eq('tags.status', 'confirmed')
-            .single()
-
-          if (profileError || !profile) {
-            throw new Error(profileError.message || 'Profile not found')
-          }
-
-          if (profile.tags.length > 0) {
-            throw new Error('First sendtag already registered')
-          }
-
-          const referrerProfileLookupResult = referralCode
-            ? await fetchReferrer({
-                supabase,
-                profile,
-                referral_code: referralCode,
-              }).catch((e) => {
-                const error = e as unknown as PostgrestError
-                if (error.code === 'PGRST116') {
-                  return null
-                }
-                throw new Error(error.message || "Unable to fetch referrer's profile")
-              })
-            : null
-
-          // Use create_tag RPC function
-          const { data: tagResult, error: createTagError } = await supabaseAdmin.rpc('create_tag', {
-            tag_name: name,
-            send_account_id: sendAccountId,
-          })
-
-          if (createTagError) {
-            throw new Error(createTagError.message || 'Unable to create tag')
-          }
-
-          // Auto-confirm since it's free first sendtag
-          const { error: confirmError } = await supabaseAdmin.rpc('confirm_tags', {
-            tag_names: [name],
-            send_account_id: sendAccountId,
-            _event_id: '',
-            _referral_code: referrerProfileLookupResult?.refcode || '',
-          })
-
-          if (confirmError) {
-            throw new Error(confirmError.message || 'Unable to confirm tag')
-          }
-
-          // Get the confirmed tag to set as main tag
-          const { data: confirmedTag, error: tagError } = await supabaseAdmin
-            .from('tags')
-            .select('id')
-            .eq('name', name)
-            .eq('status', 'confirmed')
-            .single()
-
-          if (tagError || !confirmedTag) {
-            throw new Error('Unable to find confirmed tag')
-          }
-
-          // Set as main tag if user has no main tag
-          if (!sendAccount.main_tag_id) {
-            const { error: updateMainTagError } = await supabaseAdmin
-              .from('send_accounts')
-              .update({ main_tag_id: confirmedTag.id })
-              .eq('id', sendAccountId)
-
-            if (updateMainTagError) {
-              throw new Error(updateMainTagError.message || 'Unable to set main tag')
-            }
-          }
-
-          if (referrerProfileLookupResult?.refcode) {
-            const { data: referrerProfile, error: referrerProfileError } = await supabaseAdmin
-              .from('profiles')
-              .select('*')
-              .eq('referral_code', referrerProfileLookupResult.refcode)
-              .single()
-
-            if (referrerProfileError || !referrerProfile) {
-              throw new Error(referrerProfileError.message || "Unable to fetch referrer's profile")
-            }
-
-            const { error: insertReferralError } = await supabaseAdmin
-              .from('referrals')
-              .insert({ referrer_id: referrerProfile.id, referred_id: session.user.id })
-
-            if (insertReferralError) {
-              throw new Error(insertReferralError.message || 'Unable to save referral')
-            }
-          }
-
-          return { success: true, tagId: confirmedTag.id }
-        } catch (error) {
+        if (error) {
           log('Error registering first sendtag: ', error)
           throw new TRPCError({
             code: 'INTERNAL_SERVER_ERROR',
-            message: `Failed to register first sendtag: ${error.message}`,
+            message: error.message,
           })
         }
+
+        return result
+      } catch (error) {
+        log('Error registering first sendtag: ', error)
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: `Failed to register first sendtag: ${error.message}`,
+        })
       }
-    ),
+    }),
   confirm: protectedProcedure
     .input(
       z.object({

@@ -14,9 +14,6 @@ ALTER FUNCTION "public"."set_current_timestamp_updated_at"() OWNER TO "postgres"
 
 -- Grants
 
-
-
-
 REVOKE ALL ON FUNCTION "public"."set_current_timestamp_updated_at"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."set_current_timestamp_updated_at"() TO "anon";
 GRANT ALL ON FUNCTION "public"."set_current_timestamp_updated_at"() TO "authenticated";

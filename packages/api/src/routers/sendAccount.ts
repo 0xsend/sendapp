@@ -460,52 +460,37 @@ export const sendAccountRouter = createTRPCRouter({
       const { data: profile } = await supabase.auth.getUser()
       if (!profile.user) throw new TRPCError({ code: 'UNAUTHORIZED' })
 
-      // Get user's send account
-      const { data: sendAccount, error: sendAccountError } = await supabase
-        .from('send_accounts')
-        .select('id')
-        .eq('user_id', profile.user.id)
-        .single()
-
-      if (sendAccountError || !sendAccount) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: 'Send account not found',
-        })
-      }
-
-      // Validate tag exists and belongs to user
-      const { data: tagOwnership, error: tagError } = await supabase
-        .from('send_account_tags')
-        .select(`
-          send_account_tags!inner(*),
-          tags!inner(id, status)
-        `)
-        .eq('send_account_id', sendAccount.id)
-        .eq('tag_id', tagId)
-        .eq('tags.status', 'confirmed') // Must be confirmed
-        .single()
-
-      if (tagError || !tagOwnership) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'Tag not found or not confirmed for this send account',
-        })
-      }
-
-      // Update main tag
-      const { data: result, error: updateError } = await supabase
+      // Leverage RLS - just try to update and let the database constraints and triggers handle validation
+      const { data: result, error } = await supabase
         .from('send_accounts')
         .update({ main_tag_id: tagId })
-        .eq('id', sendAccount.id)
+        .eq('user_id', profile.user.id)
         .select()
         .single()
 
-      if (updateError) {
-        console.error('Error updating main tag:', updateError)
+      if (error) {
+        // Handle specific database errors with meaningful messages
+        if (error.code === 'PGRST116') {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Send account not found',
+          })
+        }
+
+        if (
+          error.message?.includes('foreign key constraint') ||
+          error.message?.includes('main_tag')
+        ) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Tag not found or not confirmed for this account',
+          })
+        }
+
+        console.error('Error updating main tag:', error)
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message: updateError.message,
+          message: error.message,
         })
       }
 
