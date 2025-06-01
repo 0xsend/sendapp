@@ -27,7 +27,7 @@ export const RewardsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
   const sendPrice = prices?.[sendTokenAddress[baseMainnetClient.chain.id]] ?? 0
 
   // Use the hook to get current asset values based on onchain rate
-  const sharesValue = useMemo(() => formatAmount(shares * sendPrice, 0, 0), [shares, sendPrice])
+  const sharesValue = useMemo(() => formatAmount(shares * sendPrice, 3, 0), [shares, sendPrice])
 
   const isLoading = isPricesLoading || isDistributionLoading
 

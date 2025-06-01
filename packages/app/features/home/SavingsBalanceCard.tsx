@@ -66,5 +66,5 @@ export const SavingsBalanceCard = ({ href, ...props }: Omit<CardProps & LinkProp
 
 const formatUSDCValue = (value: bigint): string => {
   const valueInUSDC = Number(formatUnits(value, 6))
-  return formatAmount(valueInUSDC, 9, 0)
+  return formatAmount(valueInUSDC, 9, 2)
 }
