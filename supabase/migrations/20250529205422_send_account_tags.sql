@@ -18,18 +18,6 @@ drop index if exists "public"."tags_pkey";
 
 ALTER TYPE "public"."tag_status" ADD VALUE 'available' AFTER 'confirmed';
 
-create table "public"."historical_tag_associations" (
-    "id" uuid not null default gen_random_uuid(),
-    "tag_name" citext not null,
-    "tag_id" bigint not null,
-    "user_id" uuid not null,
-    "status" tag_status not null,
-    "captured_at" timestamp with time zone not null default now()
-);
-
-
-alter table "public"."historical_tag_associations" enable row level security;
-
 create table "public"."send_account_tags" (
     "id" integer not null default nextval('send_account_tags_id_seq'::regclass),
     "send_account_id" uuid not null,
@@ -55,14 +43,6 @@ alter table "public"."tags" alter column "user_id" drop not null;
 
 alter sequence "public"."send_account_tags_id_seq" owned by "public"."send_account_tags"."id";
 
-CREATE UNIQUE INDEX historical_tag_associations_pkey ON public.historical_tag_associations USING btree (id);
-
-CREATE INDEX idx_historical_tag_associations_tag_id ON public.historical_tag_associations USING btree (tag_id);
-
-CREATE INDEX idx_historical_tag_associations_tag_name ON public.historical_tag_associations USING btree (tag_name);
-
-CREATE INDEX idx_historical_tag_associations_user_id ON public.historical_tag_associations USING btree (user_id);
-
 CREATE INDEX idx_send_account_tags_send_account_id ON public.send_account_tags USING btree (send_account_id);
 
 CREATE INDEX idx_send_account_tags_tag_id ON public.send_account_tags USING btree (tag_id);
@@ -77,15 +57,9 @@ CREATE UNIQUE INDEX tags_name_unique ON public.tags USING btree (name);
 
 CREATE UNIQUE INDEX tags_pkey ON public.tags USING btree (id);
 
-alter table "public"."historical_tag_associations" add constraint "historical_tag_associations_pkey" PRIMARY KEY using index "historical_tag_associations_pkey";
-
 alter table "public"."send_account_tags" add constraint "send_account_tags_pkey" PRIMARY KEY using index "send_account_tags_pkey";
 
 alter table "public"."tags" add constraint "tags_pkey" PRIMARY KEY using index "tags_pkey";
-
-alter table "public"."historical_tag_associations" add constraint "historical_tag_associations_user_id_fkey" FOREIGN KEY (user_id) REFERENCES auth.users(id) not valid;
-
-alter table "public"."historical_tag_associations" validate constraint "historical_tag_associations_user_id_fkey";
 
 alter table "public"."send_account_tags" add constraint "send_account_tags_send_account_id_fkey" FOREIGN KEY (send_account_id) REFERENCES send_accounts(id) ON DELETE CASCADE not valid;
 
@@ -258,21 +232,22 @@ BEGIN
             AND status = 'available'
         RETURNING
             id
-),
-new_tag AS (
-INSERT INTO tags(name, status, user_id)
-    SELECT
-        tag_name,
-        'pending',
-        auth.uid()
-    WHERE
-        NOT EXISTS (
-            SELECT
-                1
-            FROM
-                available_tag)
-        RETURNING
-            id)
+    ),
+    new_tag AS (
+        INSERT INTO tags(name, status, user_id)
+        SELECT
+            tag_name,
+            'pending',
+            auth.uid()
+        WHERE
+            NOT EXISTS (
+                SELECT
+                    1
+                FROM
+                    available_tag)
+            RETURNING
+                id
+    )
     INSERT INTO send_account_tags(send_account_id, tag_id)
     SELECT
         send_account_id,
@@ -287,8 +262,9 @@ INSERT INTO tags(name, status, user_id)
             id
         FROM
             new_tag) tags
-RETURNING
-    tag_id INTO _tag_id;
+    RETURNING
+        tag_id INTO _tag_id;
+
     EXCEPTION
         WHEN OTHERS THEN
             GET STACKED DIAGNOSTICS
@@ -374,17 +350,6 @@ BEGIN
 END;
 $function$
 ;
-
-create or replace view "public"."tag_history" as  SELECT t.id AS tag_id,
-    t.name,
-    t.status,
-    sat.created_at,
-    p.send_id
-   FROM (((tags t
-     JOIN send_account_tags sat ON ((sat.tag_id = t.id)))
-     JOIN send_accounts sa ON ((sa.id = sat.send_account_id)))
-     JOIN profiles p ON ((p.id = sa.user_id)));
-
 
 CREATE OR REPLACE FUNCTION public.validate_main_tag_update()
  RETURNS trigger
@@ -803,48 +768,6 @@ END;
 $function$
 ;
 
-grant delete on table "public"."historical_tag_associations" to "anon";
-
-grant insert on table "public"."historical_tag_associations" to "anon";
-
-grant references on table "public"."historical_tag_associations" to "anon";
-
-grant select on table "public"."historical_tag_associations" to "anon";
-
-grant trigger on table "public"."historical_tag_associations" to "anon";
-
-grant truncate on table "public"."historical_tag_associations" to "anon";
-
-grant update on table "public"."historical_tag_associations" to "anon";
-
-grant delete on table "public"."historical_tag_associations" to "authenticated";
-
-grant insert on table "public"."historical_tag_associations" to "authenticated";
-
-grant references on table "public"."historical_tag_associations" to "authenticated";
-
-grant select on table "public"."historical_tag_associations" to "authenticated";
-
-grant trigger on table "public"."historical_tag_associations" to "authenticated";
-
-grant truncate on table "public"."historical_tag_associations" to "authenticated";
-
-grant update on table "public"."historical_tag_associations" to "authenticated";
-
-grant delete on table "public"."historical_tag_associations" to "service_role";
-
-grant insert on table "public"."historical_tag_associations" to "service_role";
-
-grant references on table "public"."historical_tag_associations" to "service_role";
-
-grant select on table "public"."historical_tag_associations" to "service_role";
-
-grant trigger on table "public"."historical_tag_associations" to "service_role";
-
-grant truncate on table "public"."historical_tag_associations" to "service_role";
-
-grant update on table "public"."historical_tag_associations" to "service_role";
-
 grant delete on table "public"."send_account_tags" to "anon";
 
 grant insert on table "public"."send_account_tags" to "anon";
@@ -934,14 +857,6 @@ WITH CHECK (
         AND sa.user_id = (SELECT auth.uid())
     )
 );
-
-create policy "select_policy"
-on "public"."historical_tag_associations"
-as permissive
-for select
-to public
-using ((auth.uid() = user_id));
-
 
 create policy "delete_policy"
 on "public"."send_account_tags"
