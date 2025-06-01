@@ -1,5 +1,5 @@
 BEGIN;
-SELECT plan(20);
+SELECT plan(21);
 
 CREATE EXTENSION IF NOT EXISTS "basejump-supabase_test_helpers";
 
@@ -40,9 +40,9 @@ UPDATE tags SET status = 'confirmed' WHERE name = 'user3tag';
 
 SET ROLE postgres;
 
--- **Test send_account_tags RLS policies**
+-- **Test: LS policies**
 
--- Test 1: User can see their own send_account_tags
+-- Test: User can see their own send_account_tags
 SELECT tests.authenticate_as('rls_user1');
 
 SELECT ok(EXISTS(
@@ -52,7 +52,7 @@ SELECT ok(EXISTS(
     AND sat.tag_id = (SELECT id FROM tags WHERE name = 'user1tag')
 ), 'User can see own send_account_tags');
 
--- Test 2: User cannot see other users' send_account_tags
+-- Test: User cannot see other users' send_account_tags
 SELECT ok(NOT EXISTS(
     SELECT 1 FROM send_account_tags sat
     JOIN send_accounts sa ON sa.id = sat.send_account_id
@@ -60,7 +60,7 @@ SELECT ok(NOT EXISTS(
     AND sat.tag_id = (SELECT id FROM tags WHERE name = 'user2tag')
 ), 'User cannot see other users send_account_tags');
 
--- Test 3: User can create tags through proper function (creates send_account_tags entry)
+-- Test: User can create tags through proper function (creates send_account_tags entry)
 SELECT tests.authenticate_as('rls_user1');
 
 SELECT create_tag('inserttest', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('rls_user1')));
@@ -72,7 +72,7 @@ SELECT ok(EXISTS(
     AND sat.tag_id = (SELECT id FROM tags WHERE name = 'inserttest')
 ), 'User can create tags which creates send_account_tags entries');
 
--- Test 4: User cannot create tags for other users' send accounts
+-- Test: User cannot create tags for other users' send accounts
 SELECT tests.authenticate_as('rls_user1');
 
 SELECT throws_ok(
@@ -81,9 +81,9 @@ SELECT throws_ok(
     'Correctly prevented unauthorized tag creation'
 );
 
--- **Test tags table RLS policies**
+-- **Test: able RLS policies**
 
--- Test 5: User cannot see available tags
+-- Test: User cannot see available tags
 SELECT tests.authenticate_as('rls_user1');
 
 SELECT is_empty(
@@ -93,12 +93,12 @@ SELECT is_empty(
     'User cannot see available tags'
 );
 
--- Test 6: User can see their own pending tags
+-- Test: User can see their own pending tags
 SELECT ok(EXISTS(
     SELECT 1 FROM tags WHERE name = 'user1tag' AND status = 'pending'
 ), 'User can see own pending tags');
 
--- Test 7: User cannot see confirmed tags from other users
+-- Test: User cannot see confirmed tags from other users
 SELECT is_empty(
     $$
         SELECT * FROM tags WHERE name = 'user2tag' AND status = 'confirmed'
@@ -106,23 +106,31 @@ SELECT is_empty(
     'User cannot see confirmed tags from other users'
 );
 
--- Test 8: User cannot see other users' pending tags
+-- Test: User cannot see other users' pending tags
 SELECT tests.authenticate_as('rls_user3');
 
 SELECT ok(NOT EXISTS(
     SELECT 1 FROM tags WHERE name = 'user1tag' AND status = 'pending'
 ), 'User cannot see other users pending tags');
 
--- Test 9: User cannot manually update tag status (should use confirm_tags function)
+-- Test: User can confirm their first sendtag
 SELECT tests.authenticate_as('rls_user1');
 
+UPDATE tags SET status = 'confirmed' WHERE name = 'user1tag';
+
+SELECT ok(EXISTS(
+    SELECT 1 FROM tags WHERE name = 'user1tag' AND status = 'confirmed'
+), 'User can confirm their first sendtag');
+
+-- Test: User cannot manually confirm a 2nd tag (should use confirm_tags function)
+SELECT create_tag('rls_user1tag2', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('rls_user1')));
 SELECT throws_ok(
-    'UPDATE tags SET status = ''confirmed'' WHERE name = ''user1tag''',
-    NULL,
-    'User cannot manually update tag status to confirmed'
+    'UPDATE tags SET status = ''confirmed'' WHERE name = ''rls_user1tag2''',
+    'Users cannot confirm their own tags',
+    'User cannot manually confirm a 2nd tag'
 );
 
--- Test 10: User cannot update tags they don't own
+-- Test: User cannot update tags they don't own
 UPDATE tags SET status = 'confirmed' WHERE name = 'user2tag';
 SELECT is_empty(
     $$
@@ -131,7 +139,7 @@ SELECT is_empty(
     'User cannot update tags they do not own'
 );
 
--- Test 11: User can delete their own send_account_tags
+-- Test: User can delete their own send_account_tags
 -- Create a tag for deletion test
 SET ROLE service_role;
 SELECT create_tag('deletetest', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('rls_user1')));
@@ -150,43 +158,37 @@ SELECT ok(NOT EXISTS(
     AND sat.tag_id = (SELECT id FROM tags WHERE name = 'deletetest')
 ), 'User can delete their own send_account_tags');
 
--- Test 12: User cannot delete other users' send_account_tags
+-- Test: User cannot delete other users' send_account_tags
 DELETE FROM send_account_tags WHERE send_account_id = (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('rls_user2'));
 SET ROLE postgres;
 SELECT ok(EXISTS (
     SELECT 1 FROM send_account_tags WHERE send_account_id = (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('rls_user2'))
-));
+), 'User cannot delete other users send_account_tags');
 
--- SELECT throws_ok(
---     'DELETE FROM send_account_tags WHERE send_account_id = (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid(''rls_user2''))',
---     NULL,
---     'User cannot delete other users send_account_tags'
--- );
-
--- Test 13: Anonymous users can see available and confirmed tags only
+-- Test: Anonymous users can see available and confirmed tags only
 SELECT tests.clear_authentication();
 
 SELECT is_empty(
     $$SELECT 1 FROM tags WHERE status = 'available'$$, 'Anonymous users cannot see available tags'
 );
 
--- Test 14: Anonymous users can see confirmed tags
+-- Test: Anonymous users can see confirmed tags
 SELECT is_empty($$SELECT 1 FROM tags WHERE status = 'confirmed'$$, 'Anonymous users cannot see confirmed tags');
 
--- Test 15: Anonymous users cannot see pending tags
+-- Test: Anonymous users cannot see pending tags
 SELECT is_empty($$SELECT 1 FROM tags WHERE status = 'pending'$$, 'Anonymous users cannot see pending tags');
 
--- Test 16: Anonymous users cannot see any send_account_tags
+-- Test: Anonymous users cannot see any send_account_tags
 SELECT is_empty($$SELECT 1 FROM send_account_tags$$, 'Anonymous users cannot see any send_account_tags');
 
--- Test 17: Anonymous users cannot insert anything
+-- Test: Anonymous users cannot insert anything
 SELECT throws_ok(
     'INSERT INTO tags (name, status) VALUES (''anontest'', ''pending'')',
     NULL,
     'Anonymous users cannot insert tags'
 );
 
--- Test 18: Test multiple tag ownership scenarios
+-- Test: Test: ag ownership scenarios
 SELECT tests.authenticate_as('rls_user2');
 
 -- User2 should see their confirmed tag and be able to query it
@@ -197,7 +199,7 @@ SELECT ok(EXISTS(
     WHERE sa.user_id = tests.get_supabase_uid('rls_user2') AND t.status = 'confirmed'
 ), 'User can query their own tags through junction table');
 
--- Test 19: Test visibility of tags count
+-- Test: Test: f tags count
 SELECT ok((
     SELECT COUNT(*) FROM tags t
     JOIN send_account_tags sat ON sat.tag_id = t.id
@@ -205,7 +207,7 @@ SELECT ok((
     WHERE sa.user_id = tests.get_supabase_uid('rls_user2')
 ) >= 1, 'User can count their own tags');
 
--- Test 20: Edge cases with tag status transitions
+-- Test: Edge cases with tag status transitions
 SELECT tests.authenticate_as('rls_user3');
 
 -- User should be able to see their tag before and after status change

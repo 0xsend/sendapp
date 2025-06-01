@@ -21,7 +21,7 @@ WITH CHECK (
     ((SELECT auth.uid()) = user_id AND user_id IS NOT NULL)
 );
 
--- Allow users to see their own tags and all confirmed tags
+-- Allow users to see their own tags
 CREATE POLICY "select_policy" ON "public"."tags" FOR SELECT
 USING (
     EXISTS (
@@ -46,8 +46,7 @@ USING (
     )
 )
 WITH CHECK (
-    status = 'pending'::public.tag_status
-    AND EXISTS (
+    EXISTS ( -- Ensure tag is associated with a send account
         SELECT 1
         FROM send_account_tags sat
         JOIN send_accounts sa ON sa.id = sat.send_account_id

@@ -1,5 +1,6 @@
 -- Function to atomically register a user's first sendtag
 -- This combines create_tag, confirm_tags, and main tag assignment in a single transaction
+-- This function is meant to be called by the service role
 CREATE OR REPLACE FUNCTION public.register_first_sendtag(tag_name citext, send_account_id uuid, _referral_code text DEFAULT NULL::text)
  RETURNS json
  LANGUAGE plpgsql
@@ -104,4 +105,5 @@ BEGIN
         'is_main_tag', (_send_account.main_tag_id IS NULL)
     );
 END;
-$function$;
+$function$
+;

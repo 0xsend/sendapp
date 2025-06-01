@@ -104,6 +104,9 @@ SELECT tests.create_supabase_user('referred_user');
 SELECT tests.authenticate_as('referred_user');
 INSERT INTO send_accounts (user_id, address, chain_id, init_code)
 VALUES (tests.get_supabase_uid('referred_user'), '0x5555555555555555555555555555555555555555', 8453, '\\x00');
+
+select set_config('role', 'service_role', true);
+
 SELECT ok(
     (SELECT register_first_sendtag(
         'referredtag'::citext,
@@ -113,19 +116,21 @@ SELECT ok(
     'register_first_sendtag succeeds with referral code'
 );
 
+select tests.authenticate_as('referred_user');
+
 -- Test 8: Verify referral was created
-SELECT ok(EXISTS(
-    SELECT 1 FROM referrals
-    WHERE referred_id = tests.get_supabase_uid('referred_user')
-    AND referrer_id = tests.get_supabase_uid('referrer_user')
-), 'Referral relationship created correctly');
+SELECT results_eq(
+    $$ select tag from public.referrer $$,
+    $$ values ('referrertag'::citext) $$,
+    'Referral relationship created correctly'
+);
 
 -- Test 9: Error - User not authenticated
-SET ROLE anon;
+select tests.clear_authentication();
 SELECT throws_ok(
     format('SELECT register_first_sendtag(''unauthtag''::citext, %L::uuid, NULL)',
            (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('first_sendtag_user'))),
-    'Send account not found or does not belong to user',
+    'User must be authenticated',
     'Function throws error when user not authenticated'
 );
 
