@@ -140,8 +140,9 @@ BEGIN
         WHERE
             id = _send_account_id
             AND decode(substring(sa.address, 3), 'hex') = _sender) THEN
-    RAISE EXCEPTION 'Receipt event ID does not match the sender';
-END IF;
+        RAISE EXCEPTION 'Receipt event ID does not match the sender';
+    END IF;
+
     -- Create receipt
     INSERT INTO receipts(event_id, user_id)
         VALUES (_event_id, _user_id);
@@ -913,19 +914,26 @@ using ((EXISTS ( SELECT 1
      JOIN send_accounts sa ON ((sa.id = sat.send_account_id)))
   WHERE ((sat.tag_id = tags.id) AND (sa.user_id = ( SELECT auth.uid() AS uid))))));
 
-create policy "update_policy"
-on "public"."tags"
-as permissive
-for update
-to authenticated
-using (((status = 'pending'::tag_status) AND (EXISTS ( SELECT 1
-   FROM (send_account_tags sat
-     JOIN send_accounts sa ON ((sa.id = sat.send_account_id)))
-  WHERE ((sat.tag_id = tags.id) AND (sa.user_id = ( SELECT auth.uid() AS uid)))))))
-with check (((status = 'pending'::tag_status) AND (EXISTS ( SELECT 1
-   FROM (send_account_tags sat
-     JOIN send_accounts sa ON ((sa.id = sat.send_account_id)))
-  WHERE ((sat.tag_id = tags.id) AND (sa.user_id = ( SELECT auth.uid() AS uid)))))));
+CREATE POLICY "update_policy" ON "public"."tags" FOR UPDATE TO "authenticated"
+USING (
+    status = 'pending'::public.tag_status
+    AND EXISTS (
+        SELECT 1
+        FROM send_account_tags sat
+        JOIN send_accounts sa ON sa.id = sat.send_account_id
+        WHERE sat.tag_id = tags.id
+        AND sa.user_id = (SELECT auth.uid())
+    )
+)
+WITH CHECK (
+    EXISTS ( -- Ensure tag is associated with a send account
+        SELECT 1
+        FROM send_account_tags sat
+        JOIN send_accounts sa ON sa.id = sat.send_account_id
+        WHERE sat.tag_id = tags.id
+        AND sa.user_id = (SELECT auth.uid())
+    )
+);
 
 create policy "select_policy"
 on "public"."historical_tag_associations"

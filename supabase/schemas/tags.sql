@@ -93,21 +93,22 @@ BEGIN
             AND status = 'available'
         RETURNING
             id
-),
-new_tag AS (
-INSERT INTO tags(name, status, user_id)
-    SELECT
-        tag_name,
-        'pending',
-        auth.uid()
-    WHERE
-        NOT EXISTS (
-            SELECT
-                1
-            FROM
-                available_tag)
-        RETURNING
-            id)
+    ),
+    new_tag AS (
+        INSERT INTO tags(name, status, user_id)
+        SELECT
+            tag_name,
+            'pending',
+            auth.uid()
+        WHERE
+            NOT EXISTS (
+                SELECT
+                    1
+                FROM
+                    available_tag)
+            RETURNING
+                id
+    )
     INSERT INTO send_account_tags(send_account_id, tag_id)
     SELECT
         send_account_id,
@@ -122,8 +123,9 @@ INSERT INTO tags(name, status, user_id)
             id
         FROM
             new_tag) tags
-RETURNING
-    tag_id INTO _tag_id;
+    RETURNING
+        tag_id INTO _tag_id;
+
     EXCEPTION
         WHEN OTHERS THEN
             GET STACKED DIAGNOSTICS
@@ -140,10 +142,12 @@ $function$
 
 ALTER FUNCTION "public"."create_tag"("tag_name" "public"."citext", "send_account_id" "uuid") OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "public"."confirm_tags"("tag_names" "public"."citext"[], "send_account_id" "uuid", "_event_id" "text", "_referral_code" "text") RETURNS "void"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    SET "search_path" TO 'public'
-    AS $$
+CREATE OR REPLACE FUNCTION public.confirm_tags(tag_names citext[], send_account_id uuid, _event_id text, _referral_code text)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
 DECLARE
     _sender bytea;
     _user_id uuid;
@@ -169,8 +173,9 @@ BEGIN
         WHERE
             id = _send_account_id
             AND decode(substring(sa.address, 3), 'hex') = _sender) THEN
-    RAISE EXCEPTION 'Receipt event ID does not match the sender';
-END IF;
+        RAISE EXCEPTION 'Receipt event ID does not match the sender';
+    END IF;
+
     -- Create receipt
     INSERT INTO receipts(event_id, user_id)
         VALUES (_event_id, _user_id);
@@ -235,7 +240,8 @@ END IF;
     END IF;
 END IF;
 END;
-$$;
+$function$
+;
 
 ALTER FUNCTION "public"."confirm_tags"("tag_names" "public"."citext"[], "send_account_id" "uuid", "_event_id" "text", "_referral_code" "text") OWNER TO "postgres";
 
