@@ -16,8 +16,15 @@ export const ProfileAboutTile = ({
 
   return (
     <Fade>
-      <YStack w={'100%'} gap={'$4'} pb={'$4'} testID={'profile-about-tile'} elevation={'$0.75'}>
-        <YStack w={'100%'} bg={'$color1'} borderRadius={'$6'} padding={'$5'} gap={'$4'}>
+      <YStack w={'100%'} gap={'$4'} pb={'$4'} testID={'profile-about-tile'}>
+        <YStack
+          w={'100%'}
+          bg={'$color1'}
+          borderRadius={'$6'}
+          padding={'$5'}
+          gap={'$4'}
+          elevation={'$0.75'}
+        >
           <XStack ai="center" jc="space-between">
             <Paragraph size={'$8'}>About</Paragraph>
             <Button
@@ -38,7 +45,13 @@ export const ProfileAboutTile = ({
               </Button.Icon>
             </Button>
           </XStack>
-          <YStack width="100%" aspectRatio={1} overflow="hidden" position="relative">
+          <YStack
+            width="100%"
+            aspectRatio={1}
+            overflow="hidden"
+            position="relative"
+            elevation={'$0.75'}
+          >
             <Image
               width={'100%'}
               height={'100%'}
@@ -95,6 +108,7 @@ export const ProfileAboutTile = ({
             gap={'$2'}
             cursor={'pointer'}
             onPress={handleOnXRedirect}
+            elevation={'$0.75'}
           >
             <IconXLogo
               size={'$1'}
