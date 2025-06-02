@@ -110,9 +110,10 @@ function InvestmentsPreview() {
       .map((coin) => ({ ...coin, balance: 0n })),
   ]
 
-  const sortedByBalance = coins.toSorted((a, b) =>
+  const sortedByBalance = [...coins].sort((a, b) =>
     (b?.balance ?? 0n) > (a?.balance ?? 0n) ? 1 : -1
   )
+
   return (
     <XStack ai="center">
       <OverlappingCoinIcons coins={sortedByBalance} />
