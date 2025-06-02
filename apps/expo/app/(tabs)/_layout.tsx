@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from '@my/ui'
 export default function Layout() {
   const theme = useTheme()
   const accentColor = theme.color10
+  const backgroundColor = theme.background || theme.color1
 
   const { session } = useUser()
   const insets = useSafeAreaInsets()
@@ -23,14 +24,15 @@ export default function Layout() {
         options={{
           title: '/send',
           headerTitle: () => (
-            <XStack ai="center" jc="center">
+            <XStack ai="center" jc="flex-start" f={1}>
               <IconSendLogo size={'$2'} color={'$color12'} />
             </XStack>
           ),
           headerShown: true,
           headerShadowVisible: false,
-          headerTitleAlign: 'center',
-          headerStyle: {},
+          headerStyle: {
+            backgroundColor: backgroundColor.val,
+          },
           headerTintColor: accentColor.val,
         }}
       />
