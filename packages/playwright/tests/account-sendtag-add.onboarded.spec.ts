@@ -5,6 +5,7 @@ import { pricing } from 'app/data/sendtags'
 import debug from 'debug'
 import { getAuthSessionFromContext } from './fixtures/auth'
 import { type AddSendtagsPage, expect, test as addSendtagsTest } from './fixtures/sendtags/add'
+import { assert } from 'app/utils/assert'
 
 let log: debug.Debugger
 
@@ -77,6 +78,7 @@ test('cannot add more than 5 tags', async ({ addSendtagsPage, supabase }) => {
   const { data: sendAccount } = await supabase.from('send_accounts').select('id').single()
 
   expect(sendAccount).toBeTruthy()
+  assert(!!sendAccount?.id, 'Send account id should be defined')
 
   // Create tags using RPC for each tag
   for (const { name } of tagNames) {

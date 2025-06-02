@@ -40,6 +40,7 @@ const addPendingTags = async (supabase: SupabaseClient<Database>, tagNames: stri
 
   expect(sendAccountError).toBeFalsy()
   expect(sendAccount).toBeTruthy()
+  assert(!!sendAccount?.id, 'Send account id should be defined')
 
   // Create each tag using RPC
   for (const tagName of tagNames) {
