@@ -10,6 +10,7 @@ import { leaderboardReferralsAllTimes, userOnboarded } from '../src/models'
 import { pravatar } from '../src/utils'
 import { baseMainnetClient } from '@my/wagmi'
 import { hexToBytes } from 'viem'
+import { select } from '../seed.config'
 
 const dryRun = process.env.DRY !== '0'
 
@@ -24,12 +25,7 @@ const seed = await createSeedClient({
 console.log('Snaplet resetting database.', `dryRun=${dryRun}`)
 
 // Clears all existing data in the database, but keep the structure
-await seed.$resetDatabase(
-  /**
-   * Tables that should be selected when seeding
-   */
-  ['!pgtle.*', '!net.*', '!pgsodium.key']
-)
+await seed.$resetDatabase(select)
 
 console.log('Snaplet seeding database.')
 
