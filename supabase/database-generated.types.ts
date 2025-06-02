@@ -318,33 +318,6 @@ export type Database = {
         }
         Relationships: []
       }
-      historical_tag_associations: {
-        Row: {
-          captured_at: string
-          id: string
-          status: Database["public"]["Enums"]["tag_status"]
-          tag_id: number
-          tag_name: string
-          user_id: string
-        }
-        Insert: {
-          captured_at?: string
-          id?: string
-          status: Database["public"]["Enums"]["tag_status"]
-          tag_id: number
-          tag_name: string
-          user_id: string
-        }
-        Update: {
-          captured_at?: string
-          id?: string
-          status?: Database["public"]["Enums"]["tag_status"]
-          tag_id?: number
-          tag_name?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       liquidity_pools: {
         Row: {
           chain_id: number
@@ -743,13 +716,6 @@ export type Database = {
             foreignKeyName: "send_account_tags_tag_id_fkey"
             columns: ["tag_id"]
             isOneToOne: false
-            referencedRelation: "tag_history"
-            referencedColumns: ["tag_id"]
-          },
-          {
-            foreignKeyName: "send_account_tags_tag_id_fkey"
-            columns: ["tag_id"]
-            isOneToOne: false
             referencedRelation: "tags"
             referencedColumns: ["id"]
           },
@@ -844,13 +810,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "send_accounts_main_tag_id_fkey"
-            columns: ["main_tag_id"]
-            isOneToOne: false
-            referencedRelation: "tag_history"
-            referencedColumns: ["tag_id"]
-          },
           {
             foreignKeyName: "send_accounts_main_tag_id_fkey"
             columns: ["main_tag_id"]
@@ -1525,13 +1484,6 @@ export type Database = {
             foreignKeyName: "tag_receipts_tag_id_fkey"
             columns: ["tag_id"]
             isOneToOne: false
-            referencedRelation: "tag_history"
-            referencedColumns: ["tag_id"]
-          },
-          {
-            foreignKeyName: "tag_receipts_tag_id_fkey"
-            columns: ["tag_id"]
-            isOneToOne: false
             referencedRelation: "tags"
             referencedColumns: ["id"]
           },
@@ -1684,16 +1636,6 @@ export type Database = {
           log_addr: string | null
           owner: string | null
           shares: number | null
-        }
-        Relationships: []
-      }
-      tag_history: {
-        Row: {
-          created_at: string | null
-          name: string | null
-          send_id: number | null
-          status: Database["public"]["Enums"]["tag_status"] | null
-          tag_id: number | null
         }
         Relationships: []
       }

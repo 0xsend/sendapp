@@ -158,14 +158,6 @@ interface Table_auth_flow_state {
   authentication_method: string;
   auth_code_issued_at: string | null;
 }
-interface Table_public_historical_tag_associations {
-  id: string;
-  tag_name: string;
-  tag_id: number;
-  user_id: string;
-  status: Enum_public_tag_status;
-  captured_at: string;
-}
 interface Table_supabase_functions_hooks {
   id: number;
   hook_table_id: number;
@@ -940,7 +932,6 @@ interface Schema_public {
   distribution_verification_values: Table_public_distribution_verification_values;
   distribution_verifications: Table_public_distribution_verifications;
   distributions: Table_public_distributions;
-  historical_tag_associations: Table_public_historical_tag_associations;
   liquidity_pools: Table_public_liquidity_pools;
   profiles: Table_public_profiles;
   receipts: Table_public_receipts;
@@ -1150,17 +1141,6 @@ interface Tables_relationships {
     };
     parentDestinationsTables:  | {};
     childDestinationsTables: "auth.saml_relay_states" | {};
-    
-  };
-  "public.historical_tag_associations": {
-    parent: {
-       historical_tag_associations_user_id_fkey: "auth.users";
-    };
-    children: {
-
-    };
-    parentDestinationsTables: "auth.users" | {};
-    childDestinationsTables:  | {};
     
   };
   "auth.identities": {
@@ -1489,7 +1469,6 @@ interface Tables_relationships {
        chain_addresses_user_id_fkey: "public.chain_addresses";
        distribution_shares_user_id_fkey: "public.distribution_shares";
        distribution_verifications_user_id_fkey: "public.distribution_verifications";
-       historical_tag_associations_user_id_fkey: "public.historical_tag_associations";
        profiles_id_fkey: "public.profiles";
        receipts_user_id_fkey: "public.receipts";
        send_accounts_user_id_fkey: "public.send_accounts";
@@ -1497,7 +1476,7 @@ interface Tables_relationships {
        webauthn_credentials_user_id_fkey: "public.webauthn_credentials";
     };
     parentDestinationsTables:  | {};
-    childDestinationsTables: "auth.identities" | "auth.mfa_factors" | "auth.one_time_tokens" | "auth.sessions" | "private.leaderboard_referrals_all_time" | "public.activity" | "public.chain_addresses" | "public.distribution_shares" | "public.distribution_verifications" | "public.historical_tag_associations" | "public.profiles" | "public.receipts" | "public.send_accounts" | "public.tags" | "public.webauthn_credentials" | {};
+    childDestinationsTables: "auth.identities" | "auth.mfa_factors" | "auth.one_time_tokens" | "auth.sessions" | "private.leaderboard_referrals_all_time" | "public.activity" | "public.chain_addresses" | "public.distribution_shares" | "public.distribution_verifications" | "public.profiles" | "public.receipts" | "public.send_accounts" | "public.tags" | "public.webauthn_credentials" | {};
     
   };
   "public.webauthn_credentials": {
