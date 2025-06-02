@@ -106,7 +106,7 @@ export const tagRouter = createTRPCRouter({
         const { data: result, error } = await supabase.rpc('register_first_sendtag', {
           tag_name: name,
           send_account_id: sendAccountId,
-          _referral_code: referralCode || null,
+          _referral_code: referralCode,
         })
 
         if (error) {

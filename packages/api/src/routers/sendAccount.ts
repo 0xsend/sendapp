@@ -303,11 +303,13 @@ export const sendAccountRouter = createTRPCRouter({
         })
 
         const { error } = await supabase.rpc('create_send_account', {
+          // @ts-expect-error the database provides the other fields
           send_account: {
             address: senderAddress,
             chain_id: baseMainnetClient.chain.id,
             init_code,
           },
+          // @ts-expect-error the database provides the other fields
           webauthn_credential: {
             name: passkeyName,
             display_name: accountName,
