@@ -19,50 +19,50 @@ export const CheckoutForm = () => {
   const router = useRouter()
 
   function onConfirmed() {
-    console.log('Checkout confirmed, updating profile')
     user?.updateProfile()
     router.replace('/account/sendtag')
   }
 
+  // FIXME: Need to create a new component for this and use the create tag mutation
   // If no pending tags, show the tag creation form
-  if (!pendingTags?.length) {
-    return (
-      <YStack gap="$4">
-        <RowLabel>Create New Tag</RowLabel>
-        <YStack gap="$2">
-          <Input
-            value={tagName}
-            onChangeText={(text) => {
-              setTagName(text)
-              setError(undefined)
-            }}
-            placeholder="Enter tag name"
-          />
-          {error && (
-            <Paragraph color="$error" size="$2">
-              {error}
-            </Paragraph>
-          )}
-        </YStack>
-        <XStack jc="flex-end">
-          <Button theme="active" onPress={handleCreateTag} disabled={createTag.isPending}>
-            {createTag.isPending ? (
-              <XStack gap="$2" ai="center">
-                <Spinner />
-                <ButtonText fontSize={'$4'} fontWeight={'500'}>
-                  Creating...
-                </ButtonText>
-              </XStack>
-            ) : (
-              <ButtonText fontSize={'$4'} fontWeight={'500'}>
-                Create Tag
-              </ButtonText>
-            )}
-          </Button>
-        </XStack>
-      </YStack>
-    )
-  }
+  // if (!pendingTags?.length) {
+  //   return (
+  //     <YStack gap="$4">
+  //       <RowLabel>Create New Tag</RowLabel>
+  //       <YStack gap="$2">
+  //         <Input
+  //           value={tagName}
+  //           onChangeText={(text) => {
+  //             setTagName(text)
+  //             setError(undefined)
+  //           }}
+  //           placeholder="Enter tag name"
+  //         />
+  //         {error && (
+  //           <Paragraph color="$error" size="$2">
+  //             {error}
+  //           </Paragraph>
+  //         )}
+  //       </YStack>
+  //       <XStack jc="flex-end">
+  //         <Button theme="active" onPress={handleCreateTag} disabled={createTag.isPending}>
+  //           {createTag.isPending ? (
+  //             <XStack gap="$2" ai="center">
+  //               <Spinner />
+  //               <ButtonText fontSize={'$4'} fontWeight={'500'}>
+  //                 Creating...
+  //               </ButtonText>
+  //             </XStack>
+  //           ) : (
+  //             <ButtonText fontSize={'$4'} fontWeight={'500'}>
+  //               Create Tag
+  //             </ButtonText>
+  //           )}
+  //         </Button>
+  //       </XStack>
+  //     </YStack>
+  //   )
+  // }
 
   // Show checkout UI when we have pending tags
   return (
@@ -83,6 +83,8 @@ function TotalPrice() {
   const pendingTags = usePendingTags()
   const { usdcFees, usdcFeesError, isLoadingUSDCFees } = useSendtagCheckout()
   const _total = useMemo(() => total(pendingTags ?? []), [pendingTags])
+  const { coin: usdc, isLoading: isCoinLoading } = useCoin('USDC')
+
   return (
     <FadeCard>
       <YStack gap={'$2'}>
@@ -95,7 +97,7 @@ function TotalPrice() {
         </Paragraph>
         <XStack jc={'space-between'} ai={'center'}>
           <Paragraph size={'$11'} fontWeight={'500'}>
-            {formatAmount(formatUnits(_total, usdcCoin.decimals))}
+            {formatUnits(_total, usdcCoin.decimals)}
           </Paragraph>
           <XStack ai={'center'} gap={'$2'}>
             <IconCoin symbol={'USDC'} size={'$2'} />
@@ -113,9 +115,7 @@ function TotalPrice() {
           >
             Price
           </Paragraph>
-          <Paragraph size={'$5'}>
-            {formatAmount(formatUnits(_total, usdcCoin.decimals))} USDC
-          </Paragraph>
+          <Paragraph size={'$5'}>{formatUnits(_total, usdcCoin.decimals)} USDC</Paragraph>
         </XStack>
         <XStack jc={'space-between'} ai={'center'} gap={'$3'}>
           <Paragraph
@@ -150,6 +150,41 @@ function TotalPrice() {
           })()}
         </XStack>
       </YStack>
+      <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
+      <XStack gap={'$2'} ai={'center'}>
+        <Paragraph
+          size={'$5'}
+          color={'$lightGrayTextField'}
+          $theme-light={{ color: '$darkGrayTextField' }}
+        >
+          Balance:
+        </Paragraph>
+        {(() => {
+          switch (true) {
+            case isCoinLoading:
+              return <Spinner color="$color11" />
+            case !isCoinLoading && !usdc:
+              return <Paragraph color="$error">Error fetching balance info</Paragraph>
+            case !usdc?.balance:
+              return (
+                <Paragraph size={'$5'} fontWeight={'500'}>
+                  -
+                </Paragraph>
+              )
+            default:
+              return (
+                <Paragraph size={'$5'} fontWeight={'500'}>
+                  {formatAmount(
+                    formatUnits(usdc.balance, usdcCoin.decimals),
+                    12,
+                    usdcCoin.formatDecimals
+                  )}{' '}
+                  USDC
+                </Paragraph>
+              )
+          }
+        })()}
+      </XStack>
     </FadeCard>
   )
 }

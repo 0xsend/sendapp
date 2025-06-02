@@ -8,8 +8,8 @@ import { useSendAccount } from 'app/utils/send-accounts'
 export function SendTagScreen() {
   const { tags, isLoading } = useUser()
   const { data: sendAccount } = useSendAccount()
-  const isFirstSendtagClaimable = tags?.length === 0
-  const confirmedTags = tags?.filter((tag) => tag.status === 'confirmed')
+  const isFirstSendtagClaimable = Array.isArray(tags) && tags.length === 0
+  const confirmedTags = Array.isArray(tags) ? tags.filter((tag) => tag.status === 'confirmed') : []
   const mainTagId = sendAccount?.main_tag_id
 
   // Sort tags to put main tag first
@@ -23,7 +23,7 @@ export function SendTagScreen() {
 
   if (isLoading)
     return (
-      <Stack width="100%" height="100%" justifyContent="center" alignItems="center">
+      <Stack w="100%" h="100%" jc={'center'} ai={'center'}>
         <Spinner color="$primary" size="large" />
       </Stack>
     )
