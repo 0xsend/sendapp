@@ -176,35 +176,46 @@ BEGIN
         RAISE EXCEPTION 'Receipt event ID does not match the sender';
     END IF;
 
+    -- Verify all tags being confirmed are associated with the send account
+    IF (
+        SELECT
+            COUNT(*)
+        FROM
+            unnest(tag_names) AS tag_name
+    ) > (
+        SELECT
+            COUNT(*)
+        FROM
+            tags t
+            JOIN send_account_tags sat ON sat.tag_id = t.id
+        WHERE
+            t.name = ANY(tag_names)
+            AND sat.send_account_id = _send_account_id
+            AND t.status = 'pending'
+    ) THEN
+        RAISE EXCEPTION 'All tags must be associated with the send account before confirmation';
+    END IF;
+
     -- Create receipt
     INSERT INTO receipts(event_id, user_id)
         VALUES (_event_id, _user_id);
-    -- First create send_account_tags entries
-    INSERT INTO send_account_tags(send_account_id, tag_id)
-    SELECT DISTINCT
-        _send_account_id,
-        t.id
-    FROM
-        tags t
-    WHERE
-        t.name = ANY (tag_names)
-        AND t.status = 'pending'
-        AND NOT EXISTS (
-            SELECT
-                1
-            FROM
-                send_account_tags sat
-            WHERE
-                sat.send_account_id = _send_account_id
-                AND sat.tag_id = t.id);
-    -- Then update tags status which will trigger the verification
+    -- Update tags status which will trigger the verification
     UPDATE
         tags
     SET
         status = 'confirmed'
     WHERE
         name = ANY (tag_names)
-        AND status = 'pending';
+        AND status = 'pending'
+        AND id IN (
+            SELECT
+                t.id
+            FROM
+                tags t
+                JOIN send_account_tags sat ON sat.tag_id = t.id
+            WHERE
+                sat.send_account_id = _send_account_id
+        );
     -- Associate tags with event
     INSERT INTO tag_receipts(tag_name, tag_id, event_id)
     SELECT
@@ -213,9 +224,11 @@ BEGIN
         _event_id
     FROM
         tags t
+        JOIN send_account_tags sat ON sat.tag_id = t.id
     WHERE
         t.name = ANY (tag_names)
-        AND t.status = 'confirmed';
+        AND t.status = 'confirmed'
+        AND sat.send_account_id = _send_account_id;
     -- Handle referral
     IF _referral_code IS NOT NULL AND _referral_code <> '' THEN
         SELECT
