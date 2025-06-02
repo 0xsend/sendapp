@@ -67,6 +67,8 @@ export const mockSwapSellErc20Transfer = {
     avatar_url: null,
     send_id: 65244,
     tags: ['asdf', 'teq', 'yuw'],
+    main_tag_id: 1,
+    main_tag_name: 'asdf',
   },
   to_user: null,
   data: {
@@ -91,6 +93,8 @@ export const mockSwapBuyErc20Transfer = {
     avatar_url: null,
     send_id: 65244,
     tags: ['asdf', 'teq', 'yuw'],
+    main_tag_id: 1,
+    main_tag_name: 'asdf',
   },
   data: {
     f: '\\x6131b5fae19ea4f9d964eac0408e4408b66337b5',
@@ -114,6 +118,8 @@ export const mockSwapBuyEthTransfer = {
     avatar_url: null,
     send_id: 65244,
     tags: ['asdf', 'teq', 'yuw'],
+    main_tag_id: 1,
+    main_tag_name: 'asdf',
   },
   data: {
     value: '10000000000000000',
@@ -348,6 +354,8 @@ export const mockSendEarnDepositEvent = {
     avatar_url: null,
     send_id: 48,
     tags: ['asfd'],
+    main_tag_id: 1,
+    main_tag_name: 'asfd',
   },
   to_user: null,
   data: {
@@ -373,6 +381,8 @@ export const mockSendEarnWithdrawEvent = {
     avatar_url: null,
     send_id: 48,
     tags: ['asfd'],
+    main_tag_id: 1,
+    main_tag_name: 'asfd',
   },
   data: {
     log_addr: '\\x5afe000000000000000000000000000000000000',

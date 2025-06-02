@@ -372,6 +372,8 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
     "from_user": {
       "avatar_url": null,
       "id": "5c833c74-5a6c-461d-8612-b4982d7a7b51",
+      "main_tag_id": 1,
+      "main_tag_name": "asfd",
       "name": null,
       "send_id": 48,
       "tags": [
@@ -399,6 +401,8 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
     "to_user": {
       "avatar_url": null,
       "id": "5c833c74-5a6c-461d-8612-b4982d7a7b51",
+      "main_tag_id": 1,
+      "main_tag_name": "asfd",
       "name": null,
       "send_id": 48,
       "tags": [
