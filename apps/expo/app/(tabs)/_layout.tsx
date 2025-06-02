@@ -1,8 +1,8 @@
-import { Button, useTheme, XStack } from '@my/ui'
-import { Activity, DollarSign, Home, Plus, User } from '@tamagui/lucide-icons'
+import { useTheme, XStack } from '@my/ui'
+import { Activity, DollarSign, Home, User } from '@tamagui/lucide-icons'
 import { IconSendLogo } from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
-import { router, Stack, Tabs, Redirect } from 'expo-router'
+import { Stack, Tabs, Redirect } from 'expo-router'
 import { useSafeAreaInsets } from '@my/ui'
 
 export default function Layout() {
@@ -32,20 +32,6 @@ export default function Layout() {
           headerTitleAlign: 'center',
           headerStyle: {},
           headerTintColor: accentColor.val,
-
-          headerRight: () => (
-            <Button
-              borderStyle="unset"
-              borderWidth={0}
-              marginRight="$-1"
-              backgroundColor="transparent"
-              onPress={() => {
-                router.navigate('create')
-              }}
-            >
-              <Plus size={24} />
-            </Button>
-          ),
         }}
       />
       <Tabs
