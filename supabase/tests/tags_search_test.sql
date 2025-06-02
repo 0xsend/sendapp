@@ -1,7 +1,7 @@
 -- Tag Search
 begin;
 
-select plan(8);
+select plan(6);
 
 create extension "basejump-supabase_test_helpers"; -- noqa: RF05
 
@@ -56,18 +56,18 @@ values (
 
 -- Create send_account_tags associations for alice's confirmed tags
 insert into send_account_tags (send_account_id, tag_id)
-select 
+select
     (select id from send_accounts where user_id = tests.get_supabase_uid('alice')),
     t.id
-from tags t 
+from tags t
 where t.user_id = tests.get_supabase_uid('alice') and t.status = 'confirmed';
 
 -- Create send_account_tags association for bob's pending tag
 insert into send_account_tags (send_account_id, tag_id)
-select 
+select
     (select id from send_accounts where user_id = tests.get_supabase_uid('bob')),
     t.id
-from tags t 
+from tags t
 where t.user_id = tests.get_supabase_uid('bob') and t.name = 'bob';
 
 -- Verify that the tags are not visible to anon
@@ -100,17 +100,17 @@ select results_eq($$
   SELECT coalesce(array_length(tag_matches,1), 0) from tag_search('bob',1,1); $$, $$
     values (0) $$, 'You can only search for confirmed tags');
 
--- can search by phone number
-select results_eq($$
-  SELECT phone_matches from tag_search( $$ || :bobs_phone_number || $$::text, 1, 0); $$, $$
-    values (
-      ARRAY[ROW(
-        'bob_avatar', -- avatar_url
-        null, -- tag_name
-        $$ || :bob_send_id || $$, -- bob's send_id
-        $$ || :bobs_phone_number || $$ -- bob's phone number
-      )::tag_search_result]
-    ) $$, 'You can search by phone number');
+-- DISABLED can search by phone number
+-- select results_eq($$
+--   SELECT phone_matches from tag_search( $$ || :bobs_phone_number || $$::text, 1, 0); $$, $$
+--     values (
+--       ARRAY[ROW(
+--         'bob_avatar', -- avatar_url
+--         null, -- tag_name
+--         $$ || :bob_send_id || $$, -- bob's send_id
+--         $$ || :bobs_phone_number || $$ -- bob's phone number
+--       )::tag_search_result]
+--     ) $$, 'You can search by phone number');
 
 -- can searcch by send_id
 select results_eq($$
@@ -142,17 +142,17 @@ update profiles set is_public = true where id = tests.get_supabase_uid('bob');
 
 select tests.authenticate_as('neo');
 
--- Verify that public profile phone numbers are searchable
-select results_eq($$
-  SELECT phone_matches from tag_search( $$ || :bobs_phone_number || $$::text, 1, 0); $$, $$
-    values (
-      ARRAY[ROW(
-        'bob_avatar', -- avatar_url
-        null, -- tag_name
-        $$ || :bob_send_id || $$, -- bob's send_id
-        $$ || :bobs_phone_number || $$ -- bob's phone number
-      )::tag_search_result]
-    ) $$, 'Public profile phone numbers should be searchable');
+-- DISABLED: Verify that public profile phone numbers are searchable
+-- select results_eq($$
+--   SELECT phone_matches from tag_search( $$ || :bobs_phone_number || $$::text, 1, 0); $$, $$
+--     values (
+--       ARRAY[ROW(
+--         'bob_avatar', -- avatar_url
+--         null, -- tag_name
+--         $$ || :bob_send_id || $$, -- bob's send_id
+--         $$ || :bobs_phone_number || $$ -- bob's phone number
+--       )::tag_search_result]
+--     ) $$, 'Public profile phone numbers should be searchable');
 
 select finish();
 rollback;

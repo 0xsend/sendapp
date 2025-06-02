@@ -1,11 +1,17 @@
 BEGIN;
-SELECT plan(12);
+SELECT plan(13);
 
 CREATE EXTENSION IF NOT EXISTS "basejump-supabase_test_helpers";
 
 -- Setup test users and send accounts
 SELECT tests.create_supabase_user('security_user1');
 SELECT tests.create_supabase_user('security_user2');
+
+-- Clean up any existing tags from previous test runs to avoid conflicts
+DELETE FROM send_account_tags WHERE tag_id IN (
+    SELECT id FROM tags WHERE name IN ('user1_pending', 'user1_confirmed', 'user2_pending', 'user2_confirmed', 'malicious_tag', 'anon_tag')
+);
+DELETE FROM tags WHERE name IN ('user1_pending', 'user1_confirmed', 'user2_pending', 'user2_confirmed', 'malicious_tag', 'anon_tag');
 
 INSERT INTO send_accounts (user_id, address, chain_id, init_code)
 VALUES (tests.get_supabase_uid('security_user1'), '0x1111111111111111111111111111111111111111', 8453, '\\x00');
@@ -21,7 +27,6 @@ SELECT create_tag('user1_confirmed', (SELECT id FROM send_accounts WHERE user_id
 -- Confirm one tag for user1
 SET ROLE service_role;
 UPDATE tags SET status = 'confirmed' WHERE name = 'user1_confirmed';
-SET ROLE postgres;
 
 -- Create tags for user2
 SELECT tests.authenticate_as('security_user2');
@@ -31,7 +36,6 @@ SELECT create_tag('user2_confirmed', (SELECT id FROM send_accounts WHERE user_id
 -- Confirm one tag for user2
 SET ROLE service_role;
 UPDATE tags SET status = 'confirmed' WHERE name = 'user2_confirmed';
-SET ROLE postgres;
 
 -- Test 1: User1 cannot see user2's pending tags
 SELECT tests.authenticate_as('security_user1');
@@ -65,6 +69,7 @@ SELECT ok(EXISTS(
 ), 'User1 cannot update user2 pending tags (tag name unchanged)');
 
 -- Test 5: User1 cannot delete user2's pending tags (silently does nothing due to RLS)
+SELECT tests.authenticate_as('security_user1');
 DELETE FROM tags WHERE name = 'user2_pending';
 SELECT tests.authenticate_as('security_user2');
 SELECT ok(EXISTS(

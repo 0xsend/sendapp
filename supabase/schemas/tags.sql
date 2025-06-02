@@ -253,16 +253,27 @@ CREATE OR REPLACE FUNCTION public.handle_tag_confirmation()
     AS $$
 BEGIN
     -- If this is the first confirmed tag for the send account, set it as main
+    -- But ensure we pick the earliest created tag if multiple are confirmed simultaneously
     UPDATE
         send_accounts sa
     SET
-        main_tag_id = NEW.id
+        main_tag_id = (
+            SELECT t.id
+            FROM send_account_tags sat
+            JOIN tags t ON t.id = sat.tag_id
+            WHERE sat.send_account_id = sa.id
+              AND t.status = 'confirmed'
+            ORDER BY sat.created_at ASC, t.id ASC
+            LIMIT 1
+        )
     FROM
         send_account_tags sat
     WHERE
         sat.tag_id = NEW.id
         AND sat.send_account_id = sa.id
-        AND sa.main_tag_id IS NULL;
+        AND (sa.main_tag_id IS NULL OR NOT EXISTS(
+            SELECT 1 FROM tags WHERE id = sa.main_tag_id AND status = 'confirmed'
+        ));
     RETURN NEW;
 END;
 $$;
@@ -409,32 +420,21 @@ BEGIN
                 p.send_id
             LIMIT limit_val offset offset_val) sub) AS send_id_matches,
     -- tag matches
-(
+    (
         SELECT
             array_agg(ROW(sub.avatar_url, sub.tag_name, sub.send_id, sub.phone)::public.tag_search_result)
-FROM( SELECT DISTINCT ON(p.id)
-    p.avatar_url, t.name AS tag_name, p.send_id, NULL::text AS phone FROM profiles p
-    JOIN send_accounts sa ON sa.user_id = p.id
-    JOIN send_account_tags sat ON sat.send_account_id = sa.id
-    JOIN tags t ON t.id = sat.tag_id
-        AND t.status = 'confirmed'
-WHERE(t.name <<-> query < 0.7
-        OR t.name ILIKE '%' || query || '%')
-ORDER BY p.id,(t.name <-> query)
-LIMIT limit_val offset offset_val) sub) AS tag_matches,
-    -- phone matches
-(
-        SELECT
-            array_agg(ROW(sub.avatar_url, NULL::text, sub.send_id, sub.phone)::public.tag_search_result)
-        FROM(
-            SELECT
-                p.avatar_url, p.send_id, u.phone
-            FROM profiles p
-            JOIN auth.users u ON u.id = p.id
-        WHERE
-            p.is_public
-            AND query ~ '^\d{8,}$'
-            AND u.phone LIKE query || '%' ORDER BY u.phone LIMIT limit_val offset offset_val) sub) AS phone_matches;
+        FROM( SELECT DISTINCT ON(p.id)
+            p.avatar_url, t.name AS tag_name, p.send_id, NULL::text AS phone FROM profiles p
+            JOIN send_accounts sa ON sa.user_id = p.id
+            JOIN send_account_tags sat ON sat.send_account_id = sa.id
+            JOIN tags t ON t.id = sat.tag_id
+                AND t.status = 'confirmed'
+        WHERE(t.name <<-> query < 0.7
+                OR t.name ILIKE '%' || query || '%')
+        ORDER BY p.id,(t.name <-> query)
+        LIMIT limit_val offset offset_val) sub) AS tag_matches,
+    -- phone matches, disabled for now
+    (null::public.tag_search_result[]) AS phone_matches;
 END;
 $$;
 

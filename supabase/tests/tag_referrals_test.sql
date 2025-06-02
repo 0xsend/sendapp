@@ -12,6 +12,40 @@ SELECT
     tests.create_supabase_user('alice');
 SELECT
     tests.create_supabase_user('bob2');
+
+-- Create profiles for the test users with referral codes
+INSERT INTO profiles (id, name, about, avatar_url, is_public)
+VALUES (
+    tests.get_supabase_uid('bob'),
+    'Bob Test',
+    'Test user Bob',
+    'https://example.com/bob.jpg',
+    true
+), (
+    tests.get_supabase_uid('alice'),
+    'Alice Test',
+    'Test user Alice',
+    'https://example.com/alice.jpg',
+    true
+), (
+    tests.get_supabase_uid('bob2'),
+    'Bob2 Test',
+    'Test user Bob2',
+    'https://example.com/bob2.jpg',
+    true
+)
+ON CONFLICT (id) DO UPDATE SET 
+    name = EXCLUDED.name, 
+    about = EXCLUDED.about, 
+    avatar_url = EXCLUDED.avatar_url, 
+    is_public = EXCLUDED.is_public;
+
+-- Clean up any existing tags from previous test runs to avoid conflicts
+DELETE FROM send_account_tags WHERE tag_id IN (
+    SELECT id FROM tags WHERE name IN ('alice', 'redroses', 'wonderland', 'whiterabbit')
+);
+DELETE FROM tags WHERE name IN ('alice', 'redroses', 'wonderland', 'whiterabbit');
+
 INSERT INTO send_accounts(
     user_id,
     address,
@@ -140,11 +174,22 @@ VALUES (
     'redroses',
     tests.get_supabase_uid(
         'alice'));
+
+-- Create junction table entries for the tags
+INSERT INTO send_account_tags(send_account_id, tag_id)
+SELECT 
+    sa.id,
+    t.id
+FROM send_accounts sa
+JOIN tags t ON t.user_id = sa.user_id
+WHERE sa.user_id = tests.get_supabase_uid('alice')
+AND t.name IN ('alice', 'redroses');
 -- Confirm tags with the service role
 SELECT
     tests.clear_authentication();
 SELECT
     set_config('role', 'service_role', TRUE);
+
 SELECT
     confirm_tags(
         '{alice}'::citext[],
@@ -246,6 +291,16 @@ VALUES (
     'wonderland',
     tests.get_supabase_uid(
         'alice'));
+
+-- Create junction table entry for wonderland tag
+INSERT INTO send_account_tags(send_account_id, tag_id)
+SELECT 
+    sa.id,
+    t.id
+FROM send_accounts sa
+JOIN tags t ON t.user_id = sa.user_id
+WHERE sa.user_id = tests.get_supabase_uid('alice')
+AND t.name = 'wonderland';
 -- Confirm tags with the service role
 SELECT
     tests.clear_authentication();
@@ -281,6 +336,16 @@ VALUES (
     'whiterabbit',
     tests.get_supabase_uid(
         'alice'));
+
+-- Create junction table entry for whiterabbit tag
+INSERT INTO send_account_tags(send_account_id, tag_id)
+SELECT 
+    sa.id,
+    t.id
+FROM send_accounts sa
+JOIN tags t ON t.user_id = sa.user_id
+WHERE sa.user_id = tests.get_supabase_uid('alice')
+AND t.name = 'whiterabbit';
 -- Confirm tags with the service role
 SELECT
     tests.clear_authentication();

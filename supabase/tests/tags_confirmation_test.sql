@@ -26,6 +26,12 @@ SELECT tests.create_supabase_user('bob');
 SELECT tests.create_supabase_user('alice');
 SELECT tests.create_supabase_user('hacker');
 
+-- Clean up any existing tags from previous test runs to avoid conflicts
+DELETE FROM send_account_tags WHERE tag_id IN (
+    SELECT id FROM tags WHERE name IN ('bob', 'bob_2', 'bob_3', 'bob_4', 'alice', 'hacker', 'queenofhacking')
+);
+DELETE FROM tags WHERE name IN ('bob', 'bob_2', 'bob_3', 'bob_4', 'alice', 'hacker', 'queenofhacking');
+
 SELECT set_config('role', 'service_role', true);
 
 -- Create some sendtag_checkout_receipts
