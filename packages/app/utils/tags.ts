@@ -1,5 +1,4 @@
 import { useUser } from './useUser'
-import { useEffect } from 'react'
 
 export function usePendingTags() {
   const { tags } = useUser()

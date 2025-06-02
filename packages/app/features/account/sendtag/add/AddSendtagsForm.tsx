@@ -26,8 +26,6 @@ import { RowLabel } from 'app/components/layout/RowLabel'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { usdcCoin } from 'app/data/coins'
 import { useReleaseTag } from 'app/features/account/sendtag/checkout/checkout-utils'
-import { api } from 'app/utils/api'
-import { useQueryClient } from '@tanstack/react-query'
 
 export const AddSendtagsForm = () => {
   const user = useUser()
@@ -41,7 +39,6 @@ export const AddSendtagsForm = () => {
   const { resolvedTheme } = useThemeSetting()
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
   const { mutateAsync: releaseTagMutateAsync } = useReleaseTag()
-  const queryClient = useQueryClient()
 
   const isDarkTheme = resolvedTheme?.startsWith('dark')
 
@@ -58,7 +55,7 @@ export const AddSendtagsForm = () => {
         default:
           form.setError('name', {
             type: 'custom',
-            message: err.message ?? 'Something went wrong',
+            message: error.message ?? 'Something went wrong',
           })
           break
       }
