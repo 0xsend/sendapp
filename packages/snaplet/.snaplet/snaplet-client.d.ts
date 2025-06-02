@@ -141,18 +141,6 @@ type Override = {
       tenants?: string;
     };
   }
-  historical_tag_associations?: {
-    name?: string;
-    fields?: {
-      id?: string;
-      tag_name?: string;
-      tag_id?: string;
-      user_id?: string;
-      status?: string;
-      captured_at?: string;
-      users?: string;
-    };
-  }
   hooks?: {
     name?: string;
     fields?: {
@@ -762,7 +750,6 @@ type Override = {
       chain_addresses?: string;
       distribution_shares?: string;
       distribution_verifications?: string;
-      historical_tag_associations?: string;
       profiles?: string;
       receipts?: string;
       send_accounts?: string;
@@ -891,11 +878,6 @@ export interface Fingerprint {
     insertedAt?: FingerprintDateField;
     updatedAt?: FingerprintDateField;
     tenant?: FingerprintRelationField;
-  }
-  historicalTagAssociations?: {
-    tagId?: FingerprintNumberField;
-    capturedAt?: FingerprintDateField;
-    user?: FingerprintRelationField;
   }
   hooks?: {
     id?: FingerprintNumberField;
@@ -1210,7 +1192,6 @@ export interface Fingerprint {
     chainAddresses?: FingerprintRelationField;
     distributionShares?: FingerprintRelationField;
     distributionVerifications?: FingerprintRelationField;
-    historicalTagAssociations?: FingerprintRelationField;
     profiles?: FingerprintRelationField;
     receipts?: FingerprintRelationField;
     sendAccounts?: FingerprintRelationField;
