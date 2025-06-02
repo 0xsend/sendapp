@@ -70,6 +70,7 @@ export default function HomeLayout() {
             <Stack.Screen name="sendpot" options={{ headerShown: false }} />
             <Stack.Screen name="leaderboard" options={{ headerShown: false }} />
             <Stack.Screen name="secret-shop" options={{ headerShown: false }} />
+            <Stack.Screen name="account" options={{ headerShown: false }} />
             <Stack.Screen
               name="settings/index"
               options={{

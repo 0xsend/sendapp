@@ -13,8 +13,8 @@ import { IconArrowLeft } from 'app/components/icons'
 import { useSendScreenParams } from 'app/routers/params'
 import { usePathname } from 'app/utils/usePathname'
 import { useRouter } from 'solito/router'
-import { AvatarMenuButton } from 'app/components/TopNav'
 import { useUser } from 'app/utils/useUser'
+import AvatarMenuButton from 'app/components/AvatarMenuButton/AvatarMenuButton'
 
 export function SendTopNav() {
   const [sendParams] = useSendScreenParams()

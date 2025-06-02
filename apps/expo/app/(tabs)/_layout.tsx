@@ -1,16 +1,17 @@
 import { useTheme, XStack } from '@my/ui'
-import { Activity, DollarSign, Home, User } from '@tamagui/lucide-icons'
+import { Activity, DollarSign, Home } from '@tamagui/lucide-icons'
 import { IconSendLogo } from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
 import { Stack, Tabs, Redirect } from 'expo-router'
 import { useSafeAreaInsets } from '@my/ui'
+import AvatarMenuButton from 'app/components/AvatarMenuButton/AvatarMenuButton'
 
 export default function Layout() {
   const theme = useTheme()
   const accentColor = theme.color10
   const backgroundColor = theme.background || theme.color1
 
-  const { session } = useUser()
+  const { session, profile } = useUser()
   const insets = useSafeAreaInsets()
 
   // Redirect to root if not logged in - this ensures the tabs layout is only shown for logged-in users
@@ -34,6 +35,7 @@ export default function Layout() {
             backgroundColor: backgroundColor.val,
           },
           headerTintColor: accentColor.val,
+          headerRight: () => <AvatarMenuButton profile={profile} />,
         }}
       />
       <Tabs
@@ -77,17 +79,7 @@ export default function Layout() {
             ),
           }}
         />
-        <Tabs.Screen
-          name="profile"
-          key="profile"
-          options={{
-            headerShown: false,
-            title: 'Profile',
-            tabBarIcon: ({ size, color, focused }) => (
-              <User color={focused ? '$color12' : '$color10'} size={size} strokeWidth={2} />
-            ),
-          }}
-        />
+
         <Tabs.Screen
           name="earn"
           key="earn"
