@@ -206,10 +206,14 @@ begin
                          p.name, -- name
                          p.avatar_url, -- avatar_url
                          p.send_id, -- send_id
+                         sa.main_tag_id, -- main_tag_id
+                         mt.name, -- main_tag_name
                          ( select array_agg(name) from tags where user_id = p.id and status = 'confirmed' ) -- tags
                             )::activity_feed_user                      as "user"
                  from private.leaderboard_referrals_all_time l
                           join profiles p on p.id = user_id
+                          left join send_accounts sa on sa.user_id = p.id
+                          left join tags mt on mt.id = sa.main_tag_id
                  where p.is_public = true;
 end
 $$;
