@@ -1,5 +1,5 @@
-import { Button, Container, H4, Paragraph, Stack, XStack, YStack } from '@my/ui'
-import { Circle, CreditCard, Download } from '@tamagui/lucide-icons'
+import { Button, Container, H4, Paragraph, YStack } from '@my/ui'
+import { Circle, CreditCard } from '@tamagui/lucide-icons'
 import { Stack as StackRouter, useRouter } from 'expo-router'
 
 export default function DepositScreen() {
