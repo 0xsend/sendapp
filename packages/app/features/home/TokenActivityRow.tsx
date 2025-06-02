@@ -67,14 +67,10 @@ export function TokenActivityRow({
       width={'100%'}
       height={102}
       ai="center"
-      w="100%"
-      mx={0}
-      my={0}
+      jc="space-between"
+      gap="$4"
       p="$3.5"
-      br="$4"
-      position="relative"
-      left={0}
-      right={0}
+      br={'$4'}
       cursor={onPress ? 'pointer' : 'default'}
       testID={'TokenActivityRow'}
       hoverStyle={onPress ? hoverStyles : null}

@@ -130,7 +130,6 @@ function ActivityFeed({
       sections={sections}
       testID={'RecentActivity'}
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ width: '100%' }}
       keyExtractor={(activity) =>
         `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`
       }
