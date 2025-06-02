@@ -159,31 +159,10 @@ VALUES (
     1,
     '\x0000000000000000000000000000000000000000',
     0);
--- Inserting a tag for test user
-INSERT INTO tags(
-    name,
-    user_id)
-VALUES (
-    'alice',
-    tests.get_supabase_uid(
-        'alice'));
-INSERT INTO tags(
-    name,
-    user_id)
-VALUES (
-    'redroses',
-    tests.get_supabase_uid(
-        'alice'));
-
--- Create junction table entries for the tags
-INSERT INTO send_account_tags(send_account_id, tag_id)
-SELECT 
-    sa.id,
-    t.id
-FROM send_accounts sa
-JOIN tags t ON t.user_id = sa.user_id
-WHERE sa.user_id = tests.get_supabase_uid('alice')
-AND t.name IN ('alice', 'redroses');
+-- Creating tags for test user using create_tag function
+SELECT tests.authenticate_as('alice');
+SELECT create_tag('alice', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('alice')));
+SELECT create_tag('redroses', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('alice')));
 -- Confirm tags with the service role
 SELECT
     tests.clear_authentication();
@@ -284,23 +263,7 @@ SELECT
 -- Verify invalid referral code still confirms tags
 SELECT
     tests.authenticate_as('alice');
-INSERT INTO tags(
-    name,
-    user_id)
-VALUES (
-    'wonderland',
-    tests.get_supabase_uid(
-        'alice'));
-
--- Create junction table entry for wonderland tag
-INSERT INTO send_account_tags(send_account_id, tag_id)
-SELECT 
-    sa.id,
-    t.id
-FROM send_accounts sa
-JOIN tags t ON t.user_id = sa.user_id
-WHERE sa.user_id = tests.get_supabase_uid('alice')
-AND t.name = 'wonderland';
+SELECT create_tag('wonderland', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('alice')));
 -- Confirm tags with the service role
 SELECT
     tests.clear_authentication();
@@ -329,23 +292,7 @@ SELECT
 -- Verify passing my own referral code does not create a referral
 SELECT
     tests.authenticate_as('alice');
-INSERT INTO tags(
-    name,
-    user_id)
-VALUES (
-    'whiterabbit',
-    tests.get_supabase_uid(
-        'alice'));
-
--- Create junction table entry for whiterabbit tag
-INSERT INTO send_account_tags(send_account_id, tag_id)
-SELECT 
-    sa.id,
-    t.id
-FROM send_accounts sa
-JOIN tags t ON t.user_id = sa.user_id
-WHERE sa.user_id = tests.get_supabase_uid('alice')
-AND t.name = 'whiterabbit';
+SELECT create_tag('whiterabbit', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('alice')));
 -- Confirm tags with the service role
 SELECT
     tests.clear_authentication();
