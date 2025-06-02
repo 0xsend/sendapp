@@ -1,4 +1,4 @@
-import { Container, ScrollView, YStack } from '@my/ui'
+import { Container, ScrollView } from '@my/ui'
 import { HomeScreen } from 'app/features/home/screen'
 import { Stack } from 'expo-router'
 

@@ -1,4 +1,4 @@
-import { Button, Container, H4, Paragraph, Stack, YStack } from '@my/ui'
+import { Button, Container, H4, Paragraph, YStack } from '@my/ui'
 import { Stack as StackRouter, useRouter } from 'expo-router'
 
 export default function SendPotScreen() {

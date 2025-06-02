@@ -81,9 +81,9 @@ export default function Index() {
   const [carouselImages, setCarouselImages] = useState<GetPlaiceholderImage[]>(mobileCarouselImages)
   const [carouselProgress, setCarouselProgress] = useState(0)
 
-  // If user is logged in, redirect to the home screen inside the drawer/tabs layout
+  // If user is logged in, redirect to the home screen inside the tabs layout
   if (session) {
-    return <Redirect href="/(drawer)/(tabs)/" />
+    return <Redirect href="/(tabs)/" />
   }
 
   // If user is not logged in, show the splash screen
