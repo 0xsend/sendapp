@@ -1091,3 +1091,43 @@ BEGIN
     );
 END;
 $function$;
+
+-- Migration: Add constraint to prevent deletion of last confirmed sendtag
+-- Users must always maintain at least one confirmed sendtag once they have one
+
+-- Create function to prevent deletion of last confirmed tag
+CREATE OR REPLACE FUNCTION public.prevent_last_confirmed_tag_deletion()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+    SECURITY DEFINER
+    SET search_path TO 'public'
+    AS $$
+BEGIN
+    -- Check if this deletion would leave the user with zero confirmed tags
+    -- Only prevent deletion if the tag being deleted is confirmed AND it's the last one
+    IF (SELECT status FROM tags WHERE id = OLD.tag_id) = 'confirmed' THEN
+        -- Count remaining confirmed tags after this deletion
+        IF (SELECT COUNT(*)
+            FROM send_account_tags sat
+            JOIN tags t ON t.id = sat.tag_id
+            WHERE sat.send_account_id = OLD.send_account_id
+            AND t.status = 'confirmed'
+            AND sat.tag_id != OLD.tag_id) = 0 THEN
+            RAISE EXCEPTION 'Cannot delete your last confirmed sendtag. Users must maintain at least one confirmed sendtag.';
+        END IF;
+    END IF;
+
+    RETURN OLD;
+END;
+$$;
+
+-- Grant permissions on the function
+GRANT ALL ON FUNCTION "public"."prevent_last_confirmed_tag_deletion"() TO "anon";
+GRANT ALL ON FUNCTION "public"."prevent_last_confirmed_tag_deletion"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."prevent_last_confirmed_tag_deletion"() TO "service_role";
+
+-- Create trigger to enforce the constraint
+CREATE TRIGGER "prevent_last_confirmed_tag_deletion"
+    BEFORE DELETE ON "public"."send_account_tags"
+    FOR EACH ROW
+    EXECUTE FUNCTION "public"."prevent_last_confirmed_tag_deletion"();
