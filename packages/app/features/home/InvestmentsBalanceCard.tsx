@@ -25,6 +25,7 @@ import { useMemo } from 'react'
 import { IconCoin, IconError } from 'app/components/icons'
 import { useCoins } from 'app/provider/coins'
 import { investmentCoins as investmentCoinsList } from 'app/data/coins'
+import { formatUnits } from 'viem'
 import { HomeBodyCard } from './screen'
 
 export const InvestmentsBalanceCard = (props: CardProps) => {
@@ -109,9 +110,10 @@ function InvestmentsPreview() {
       .map((coin) => ({ ...coin, balance: 0n })),
   ]
 
-  const sortedByBalance = coins.toSorted((a, b) =>
+  const sortedByBalance = [...coins].sort((a, b) =>
     (b?.balance ?? 0n) > (a?.balance ?? 0n) ? 1 : -1
   )
+
   return (
     <XStack ai="center">
       <OverlappingCoinIcons coins={sortedByBalance} />
@@ -141,22 +143,41 @@ function OverlappingCoinIcons({
 }
 
 function InvestmentsAggregate() {
-  const tokenIds = useCoins()
-    .investmentCoins.filter((c) => c?.balance && c.balance > 0n)
-    .map((c) => c.coingeckoTokenId)
+  const coins = useCoins().investmentCoins.filter((c) => c?.balance && c.balance > 0n)
 
+  const tokenIds = coins.map((c) => c.coingeckoTokenId)
   const { data: marketData, isLoading, isError } = useMultipleTokensMarketData(tokenIds)
+
+  const { totalValue, assetValues } = useMemo(() => {
+    if (!marketData?.length) return { totalValue: 0, assetValues: [] }
+
+    // Calculate values for each asset and total
+    const assetValues = coins.map((coin) => {
+      const marketInfo = marketData.find((m) => m.id === coin.coingeckoTokenId)
+      if (!marketInfo || !coin.balance) return { value: 0, percentChange: 0 }
+
+      const parsedBalance = formatUnits(coin.balance, coin.decimals)
+      return {
+        value: Number(parsedBalance) * (marketInfo.current_price ?? 0),
+        percentChange: marketInfo.price_change_percentage_24h ?? 0,
+      }
+    })
+
+    const totalValue = assetValues.reduce((sum, asset) => sum + asset.value, 0)
+
+    return { totalValue, assetValues }
+  }, [marketData, coins])
+
   const aggregatePercentage = useMemo(() => {
-    if (!marketData?.length) return 0
+    if (totalValue <= 0) return 0
 
-    // Simple average of percentage changes
-    const aggregatePercentage =
-      marketData.reduce((total, coin) => {
-        return total + (coin?.price_change_percentage_24h ?? 0)
-      }, 0) / marketData.length
+    const weightedPercentage = assetValues.reduce((sum, asset) => {
+      const weight = asset.value / totalValue
+      return sum + asset.percentChange * weight
+    }, 0)
 
-    return Number(aggregatePercentage.toFixed(2))
-  }, [marketData])
+    return Math.round(weightedPercentage * 100) / 100
+  }, [totalValue, assetValues])
 
   if (tokenIds.length === 0)
     return (

@@ -1,27 +1,23 @@
 // TopNav.tsx
 import {
-  Avatar,
   Button as ButtonOg,
   type ButtonProps,
   Container,
   H2,
   Header,
-  LinkableAvatar,
-  LinkableButton,
   Paragraph,
   Separator,
-  Spinner,
   useMedia,
   XStack,
 } from '@my/ui'
 import { useRootScreenParams } from 'app/routers/params'
-import { IconAccount, IconArrowLeft, IconSendLogo } from 'app/components/icons'
+import { IconArrowLeft, IconSendLogo } from 'app/components/icons'
 import { usePathname } from 'app/utils/usePathname'
 import { useRouter } from 'solito/router'
 
 import { Link } from 'solito/link'
 import { useUser } from 'app/utils/useUser'
-import type { Tables } from '@my/supabase/database-generated.types'
+import AvatarMenuButton from 'app/components/AvatarMenuButton/AvatarMenuButton'
 
 interface TopNavProps {
   header?: string
@@ -43,21 +39,6 @@ interface TopNavProps {
    */
   showOnGtLg?: boolean
   hideRightActions?: boolean
-}
-
-export function AvatarMenuButton({ profile }: { profile?: Tables<'profiles'> | null }) {
-  const { isLoading } = useUser()
-
-  if (isLoading) return <Spinner size="small" color={'$color12'} alignSelf="center" p="$3" />
-
-  return (
-    <LinkableAvatar elevation={5} href={'/account'} size={'$3.5'} circular={true}>
-      <Avatar.Image src={profile?.avatar_url ?? ''} w="100%" h="100%" objectFit="cover" />
-      <Avatar.Fallback jc={'center'} ai="center" theme="green_active" bc="$color2">
-        <IconAccount size={'$2'} $theme-light={{ color: '$color12' }} />
-      </Avatar.Fallback>
-    </LinkableAvatar>
-  )
 }
 
 export function TopNav({

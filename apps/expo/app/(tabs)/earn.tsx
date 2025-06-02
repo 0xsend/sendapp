@@ -1,10 +1,8 @@
-import { Button, Card, Container, H4, Paragraph, Stack, XStack, YStack } from '@my/ui'
+import { Button, Card, Container, H4, Paragraph, XStack, YStack } from '@my/ui'
 import { ArrowRight, DollarSign } from '@tamagui/lucide-icons'
-import { Stack as StackRouter, useRouter } from 'expo-router'
+import { Stack as StackRouter } from 'expo-router'
 
 export default function EarnTabScreen() {
-  const router = useRouter()
-
   return (
     <>
       <StackRouter.Screen

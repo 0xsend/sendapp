@@ -62,8 +62,15 @@ export default function HomeLayout() {
         <Provider initialSession={initialSession}>
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="index" options={{ headerShown: false }} />
-            <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            <Stack.Screen name="send" options={{ headerShown: false }} />
+            <Stack.Screen name="deposit" options={{ headerShown: false }} />
+            <Stack.Screen name="trade" options={{ headerShown: false }} />
+            <Stack.Screen name="sendpot" options={{ headerShown: false }} />
+            <Stack.Screen name="leaderboard" options={{ headerShown: false }} />
+            <Stack.Screen name="secret-shop" options={{ headerShown: false }} />
+            <Stack.Screen name="account" options={{ headerShown: false }} />
             <Stack.Screen
               name="settings/index"
               options={{

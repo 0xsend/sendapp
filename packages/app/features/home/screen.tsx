@@ -220,8 +220,8 @@ function StablesBody() {
 }
 
 export const HomeBodyCard = styled(Card, {
-  hoverStyle: { scale: 0.925 },
-  pressStyle: { scale: 0.875 },
+  hoverStyle: { scale: 0.975 },
+  pressStyle: { scale: 0.925 },
   animation: 'bouncy',
   size: '$5',
   br: '$7',

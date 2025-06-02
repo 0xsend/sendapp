@@ -1,16 +1,17 @@
-import { Button, useTheme, XStack } from '@my/ui'
-import { DrawerActions } from '@react-navigation/native'
-import { Activity, DollarSign, Home, Menu, Plus, User } from '@tamagui/lucide-icons'
+import { useTheme, XStack } from '@my/ui'
+import { Activity, DollarSign, Home } from '@tamagui/lucide-icons'
 import { IconSendLogo } from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
-import { router, Stack, Tabs, useNavigation, Redirect } from 'expo-router'
+import { Stack, Tabs, Redirect } from 'expo-router'
 import { useSafeAreaInsets } from '@my/ui'
+import AvatarMenuButton from 'app/components/AvatarMenuButton/AvatarMenuButton'
 
 export default function Layout() {
   const theme = useTheme()
   const accentColor = theme.color10
-  const navigation = useNavigation()
-  const { session } = useUser()
+  const backgroundColor = theme.background || theme.color1
+
+  const { session, profile } = useUser()
   const insets = useSafeAreaInsets()
 
   // Redirect to root if not logged in - this ensures the tabs layout is only shown for logged-in users
@@ -24,42 +25,17 @@ export default function Layout() {
         options={{
           title: '/send',
           headerTitle: () => (
-            <XStack ai="center" jc="center">
+            <XStack ai="center" jc="flex-start" f={1}>
               <IconSendLogo size={'$2'} color={'$color12'} />
             </XStack>
           ),
           headerShown: true,
           headerShadowVisible: false,
-          headerTitleAlign: 'center',
-          headerStyle: {},
+          headerStyle: {
+            backgroundColor: backgroundColor.val,
+          },
           headerTintColor: accentColor.val,
-          headerLeft: () => (
-            <Button
-              borderStyle="unset"
-              borderWidth={0}
-              backgroundColor="transparent"
-              marginLeft="$-1"
-              paddingHorizontal="$4"
-              onPress={() => {
-                navigation.dispatch(DrawerActions.openDrawer())
-              }}
-            >
-              <Menu size={24} />
-            </Button>
-          ),
-          headerRight: () => (
-            <Button
-              borderStyle="unset"
-              borderWidth={0}
-              marginRight="$-1"
-              backgroundColor="transparent"
-              onPress={() => {
-                router.navigate('create')
-              }}
-            >
-              <Plus size={24} />
-            </Button>
-          ),
+          headerRight: () => <AvatarMenuButton profile={profile} />,
         }}
       />
       <Tabs
@@ -103,17 +79,7 @@ export default function Layout() {
             ),
           }}
         />
-        <Tabs.Screen
-          name="profile"
-          key="profile"
-          options={{
-            headerShown: false,
-            title: 'Profile',
-            tabBarIcon: ({ size, color, focused }) => (
-              <User color={focused ? '$color12' : '$color10'} size={size} strokeWidth={2} />
-            ),
-          }}
-        />
+
         <Tabs.Screen
           name="earn"
           key="earn"
