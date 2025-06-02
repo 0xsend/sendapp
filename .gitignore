@@ -71,7 +71,5 @@ var/**
 
 /memory-bank
 
-
 **/.claude/settings.local.json
-# direnv
-CACHEDIR.TAG
+.direnv

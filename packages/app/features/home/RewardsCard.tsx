@@ -21,7 +21,7 @@ export const RewardsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
   const shares = Number(
     formatUnits(
       BigInt(distribution?.distribution_shares?.[0]?.amount ?? 0n),
-      coinsDict[sendTokenAddress[baseMainnetClient.chain.id]]?.formatDecimals ?? 18
+      coinsDict[sendTokenAddress[baseMainnetClient.chain.id]]?.decimals ?? 18
     )
   )
   const sendPrice = prices?.[sendTokenAddress[baseMainnetClient.chain.id]] ?? 0
