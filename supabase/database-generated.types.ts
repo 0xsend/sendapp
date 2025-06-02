@@ -2004,6 +2004,8 @@ export type Database = {
         name: string | null
         avatar_url: string | null
         send_id: number | null
+        main_tag_id: number | null
+        main_tag_name: string | null
         tags: string[] | null
       }
       profile_lookup_result: {
