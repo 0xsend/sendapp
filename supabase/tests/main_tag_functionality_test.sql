@@ -143,30 +143,23 @@ SELECT ok(EXISTS(
     WHERE user_id = tests.get_supabase_uid('main_tag_new') AND main_tag_id IS NULL
 ), 'NULL main_tag_id allowed for new accounts');
 
--- Test 11: Main tag set to NULL when last confirmed tag is deleted
+-- Test 11: Cannot delete last confirmed tag (constraint prevents it)
 SET ROLE service_role;
-DELETE FROM send_account_tags 
-WHERE send_account_id = (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('main_tag_user'))
-AND tag_id = (SELECT id FROM tags WHERE name = 'maintag3');
+SELECT throws_ok(
+    $$ DELETE FROM send_account_tags 
+       WHERE send_account_id = (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('main_tag_user'))
+       AND tag_id = (SELECT id FROM tags WHERE name = 'maintag3') $$,
+    'P0001',
+    'Cannot delete your last confirmed sendtag. Users must maintain at least one confirmed sendtag.'
+);
 SET ROLE postgres;
 
-SELECT ok(EXISTS(
-    SELECT 1 FROM send_accounts 
-    WHERE user_id = tests.get_supabase_uid('main_tag_user') AND main_tag_id IS NULL
-), 'main_tag_id set to NULL when last confirmed tag is deleted');
-
--- Test 12: Verify main tag auto-assignment works after deletion scenario
-SELECT create_tag('maintag_new', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('main_tag_user')));
-
-SET ROLE service_role;
-UPDATE tags SET status = 'confirmed' WHERE name = 'maintag_new';
-SET ROLE postgres;
-
+-- Test 12: Verify main tag remains unchanged after failed deletion attempt
 SELECT ok(EXISTS(
     SELECT 1 FROM send_accounts sa
     JOIN tags t ON t.id = sa.main_tag_id
-    WHERE sa.user_id = tests.get_supabase_uid('main_tag_user') AND t.name = 'maintag_new'
-), 'Main tag auto-assignment works after all tags were deleted');
+    WHERE sa.user_id = tests.get_supabase_uid('main_tag_user') AND t.name = 'maintag3'
+), 'Main tag remains unchanged after constraint prevents deletion');
 
 -- Test 13: Test main_tag_id column exists
 SELECT has_column('public', 'send_accounts', 'main_tag_id', 'send_accounts has main_tag_id column');

@@ -1,6 +1,6 @@
 BEGIN;
 SELECT
-    plan(10);
+    plan(11);
 -- Create extension first
 CREATE EXTENSION IF NOT EXISTS "basejump-supabase_test_helpers";
 -- Create test users
@@ -83,7 +83,22 @@ SELECT
     is_empty($$
         SELECT
             * FROM send_account_tags$$, 'Other users cannot see send_account_tags');
--- Test deleting send_account_tags
+-- Create a second tag so we can test deletion without violating the constraint
+SELECT
+    tests.authenticate_as('tag_owner');
+SELECT
+    create_tag('second_tag',(
+            SELECT
+                id
+            FROM send_accounts
+            WHERE
+                user_id = tests.get_supabase_uid('tag_owner')));
+
+-- Confirm the second tag
+SET ROLE service_role;
+UPDATE tags SET status = 'confirmed' WHERE name = 'second_tag';
+
+-- Test deleting send_account_tags (deleting the second tag, not the main one)
 SELECT
     tests.authenticate_as('tag_owner');
 SELECT
@@ -110,18 +125,20 @@ WHERE id IN (
             JOIN send_accounts sa ON sat.send_account_id = sa.id
             JOIN tags t ON sat.tag_id = t.id
         WHERE
-            t.name = 'send_account_tag');
+            t.name = 'second_tag');
 -- Switch back to authenticated user
 SELECT
     tests.authenticate_as('tag_owner');
 -- Check if delete worked
 SELECT
-    COUNT(*)
-FROM
-    send_account_tags sat
-    JOIN tags t ON t.id = sat.tag_id
-WHERE
-    t.name = 'send_account_tag';
+    is_empty($$
+        SELECT
+            *
+        FROM
+            send_account_tags sat
+            JOIN tags t ON t.id = sat.tag_id
+        WHERE
+            t.name = 'second_tag'$$, 'second_tag should be deleted from send_account_tags');
 -- Test that tag status was updated to available as service_role
 SET ROLE service_role;
 
@@ -130,7 +147,7 @@ SELECT
         SELECT
             status::text FROM tags
             WHERE
-                name = 'send_account_tag' $$, $$
+                name = 'second_tag' $$, $$
             VALUES ('available'::text) $$, 'Tag should be available after deleting send_account_tags');
 SELECT
     tests.authenticate_as('tag_owner');
@@ -140,7 +157,7 @@ SELECT
         SELECT
             user_id FROM tags
             WHERE
-                name = 'send_account_tag' $$, 'Tag user_id should be NULL after deleting send_account_tags');
+                name = 'second_tag' $$, 'Tag user_id should be NULL after deleting send_account_tags');
 -- Create and confirm second tag
 SELECT
     tests.authenticate_as('tag_owner');
