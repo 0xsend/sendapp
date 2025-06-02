@@ -31,6 +31,8 @@ import { toNiceError } from 'app/utils/toNiceError'
 import { min } from 'app/utils/bigint'
 import type { Json } from '@my/supabase/database.types'
 import { sendCoin } from 'app/data/coins'
+import { type LinkProps, useLink } from 'solito/link'
+import { useCoin } from 'app/provider/coins'
 
 //@todo get this from the db
 const verificationTypesAndTitles = {
@@ -333,6 +335,7 @@ const TaskCard = ({
   verification: NonNullable<DistributionsVerificationsQuery['data']>['verification_values'][number]
   isQualificationOver: boolean
 }) => {
+  const { coin: usdc } = useCoin('USDC')
   const type = verification.type
   const metadata = (verification.metadata ?? []) as Json[]
   const weight = verification.weight
@@ -348,6 +351,25 @@ const TaskCard = ({
     : Boolean(weight)
 
   const displayValue = isTagRegistration ? verification.count.toString() : value.toString()
+
+  const getNavigationPath = () => {
+    switch (type) {
+      case 'tag_registration':
+        return '/account/sendtag'
+      case 'send_ten':
+      case 'send_one_hundred':
+      case 'send_streak':
+        return usdc?.balance && usdc.balance > 0n ? '/send' : '/deposit'
+      case 'tag_referral':
+      case 'total_tag_referrals':
+        return '/account/affiliate'
+      default:
+        return null
+    }
+  }
+
+  const navigationPath = getNavigationPath()
+  const linkProps = useLink({ href: navigationPath ?? '' })
 
   const statusConfig = {
     completed: {
@@ -380,8 +402,8 @@ const TaskCard = ({
     'send_one_hundred',
   ].includes(type)
 
-  return (
-    <FadeCard br={12} gap="$4" p="$6" jc={'space-between'} $gtSm={{ maw: 331 }} w={'100%'}>
+  const cardContent = (
+    <>
       <XStack ai={'center'} jc="space-between">
         {status}
         {shouldShowValue && (
@@ -399,6 +421,32 @@ const TaskCard = ({
         )}
       </XStack>
       {children}
+    </>
+  )
+
+  if (navigationPath) {
+    return (
+      <FadeCard
+        {...linkProps}
+        br={12}
+        gap="$4"
+        p="$6"
+        jc={'space-between'}
+        $gtSm={{ maw: 331 }}
+        w={'100%'}
+        cursor="pointer"
+        hoverStyle={{ scale: 0.975 }}
+        pressStyle={{ scale: 0.925 }}
+        animation="bouncy"
+      >
+        {cardContent}
+      </FadeCard>
+    )
+  }
+
+  return (
+    <FadeCard br={12} gap="$4" p="$6" jc={'space-between'} $gtSm={{ maw: 331 }} w={'100%'}>
+      {cardContent}
     </FadeCard>
   )
 }
