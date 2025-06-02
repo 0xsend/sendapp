@@ -30,5 +30,3 @@ export const UserSchema = z.object({
    */
   tags: z.array(z.string()).nullable().default([]),
 })
-
-export type User = z.infer<typeof UserSchema>
