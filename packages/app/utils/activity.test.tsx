@@ -407,7 +407,15 @@ describe('isSwapBuyTransfer', () => {
     activity = {
       event_name: 'send_account_transfers',
       created_at: new Date(),
-      from_user: { id: '1', name: 'Test User', avatar_url: null, send_id: 1, tags: [] },
+      from_user: {
+        id: '1',
+        name: 'Test User',
+        avatar_url: null,
+        send_id: 1,
+        tags: [],
+        main_tag_id: 1,
+        main_tag_name: 'test',
+      },
       to_user: null,
       data: {
         f: '0x9e64D7edFd8B1b1eBDf20e4e60d070A6A4d0e3A6',
@@ -429,7 +437,15 @@ describe('isSwapBuyTransfer', () => {
       event_name: 'send_account_receives',
       created_at: new Date(),
       from_user: null,
-      to_user: { id: '1', name: 'Test User', avatar_url: null, send_id: 1, tags: [] },
+      to_user: {
+        id: '1',
+        name: 'Test User',
+        avatar_url: null,
+        send_id: 1,
+        tags: [],
+        main_tag_id: 1,
+        main_tag_name: 'test',
+      },
       data: {
         sender: '0x5b8B88f0A15c27B7C1ecf78aFfD6e7f4C54b96F0',
         value: 1000n,
