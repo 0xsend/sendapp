@@ -1,13 +1,30 @@
 import type { Tables } from '@my/supabase/database.types'
-import { Fade, H2, LinkableButton, Paragraph, Spinner, Stack, XStack, YGroup, YStack } from '@my/ui'
-import { IconPlus, IconSlash } from 'app/components/icons'
+import {
+  Fade,
+  H2,
+  LinkableButton,
+  Paragraph,
+  Spinner,
+  Stack,
+  XStack,
+  YGroup,
+  YStack,
+  Sheet,
+  Button,
+  H3,
+} from '@my/ui'
+import { IconPlus, IconSlash, IconBadgeCheck } from 'app/components/icons'
 import { maxNumSendTags } from 'app/data/sendtags'
 import { useUser } from 'app/utils/useUser'
 import { useSendAccount } from 'app/utils/send-accounts'
+import { useState } from 'react'
+import { api } from 'app/utils/api'
+import { useToastController } from '@my/ui'
 
 export function SendTagScreen() {
   const { tags, isLoading } = useUser()
   const { data: sendAccount } = useSendAccount()
+  const [mainTagSheetOpen, setMainTagSheetOpen] = useState(false)
   const isFirstSendtagClaimable = Array.isArray(tags) && tags.length === 0
   const confirmedTags = Array.isArray(tags) ? tags.filter((tag) => tag.status === 'confirmed') : []
   const mainTagId = sendAccount?.main_tag_id
@@ -54,9 +71,19 @@ export function SendTagScreen() {
         <Paragraph fontSize={'$7'} fontWeight={'500'}>
           Registered [ {`${confirmedTags?.length || 0}/${maxNumSendTags}`} ]
         </Paragraph>
-        <SendtagList tags={sortedTags} mainTagId={mainTagId} />
+        <SendtagList
+          tags={sortedTags}
+          mainTagId={mainTagId}
+          onMainTagSelect={() => setMainTagSheetOpen(true)}
+        />
       </YStack>
       <AddNewTagButton tags={confirmedTags} isFirstSendtagClaimable={isFirstSendtagClaimable} />
+      <MainTagSelectionSheet
+        open={mainTagSheetOpen}
+        onOpenChange={setMainTagSheetOpen}
+        tags={sortedTags}
+        currentMainTagId={mainTagId}
+      />
     </YStack>
   )
 }
@@ -98,27 +125,44 @@ function AddNewTagButton({
   )
 }
 
-function SendtagList({ tags, mainTagId }: { tags?: Tables<'tags'>[]; mainTagId?: number | null }) {
+function SendtagList({
+  tags,
+  mainTagId,
+  onMainTagSelect,
+}: {
+  tags?: Tables<'tags'>[]
+  mainTagId?: number | null
+  onMainTagSelect?: () => void
+}) {
   if (!tags || tags.length === 0) {
     return null
   }
 
+  const canChangeMainTag = tags.length > 1
+
   return (
-    <Fade>
-      <YGroup
-        elevation={'$0.75'}
-        bc={'$color1'}
-        p={'$2'}
-        $gtLg={{ p: '$3.5' }}
-        testID={'sendtags-list'}
-      >
-        {tags.map((tag) => (
-          <YGroup.Item key={tag.name}>
-            <TagItem tag={tag} isMain={tag.id === mainTagId} />
-          </YGroup.Item>
-        ))}
-      </YGroup>
-    </Fade>
+    <YStack gap="$3">
+      <Fade>
+        <YGroup
+          elevation={'$0.75'}
+          bc={'$color1'}
+          p={'$2'}
+          $gtLg={{ p: '$3.5' }}
+          testID={'sendtags-list'}
+        >
+          {tags.map((tag) => (
+            <YGroup.Item key={tag.name}>
+              <TagItem tag={tag} isMain={tag.id === mainTagId} />
+            </YGroup.Item>
+          ))}
+        </YGroup>
+      </Fade>
+      {canChangeMainTag && (
+        <Button size="$4" onPress={onMainTagSelect} theme="gray" br="$4">
+          Change Main Tag
+        </Button>
+      )}
+    </YStack>
   )
 }
 
@@ -141,5 +185,89 @@ function TagItem({ tag, isMain }: { tag: Tables<'tags'>; isMain?: boolean }) {
         </Paragraph>
       )}
     </XStack>
+  )
+}
+
+function MainTagSelectionSheet({
+  open,
+  onOpenChange,
+  tags,
+  currentMainTagId,
+}: {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  tags: Tables<'tags'>[]
+  currentMainTagId?: number | null
+}) {
+  const toast = useToastController()
+  const { updateProfile } = useUser()
+  const { refetch: refetchSendAccount } = useSendAccount()
+  const { mutateAsync: updateMainTag, isPending } = api.sendAccount.updateMainTag.useMutation({
+    onSuccess: async () => {
+      toast.show('Main tag updated')
+      await updateProfile()
+      await refetchSendAccount()
+      onOpenChange(false)
+    },
+    onError: (error) => {
+      toast.show('Failed to update main tag')
+      console.error('Failed to update main tag:', error)
+    },
+  })
+
+  const handleSelectTag = async (tagId: number) => {
+    if (tagId === currentMainTagId || isPending) return
+    await updateMainTag({ tagId })
+  }
+
+  return (
+    <Sheet
+      modal
+      dismissOnOverlayPress
+      dismissOnSnapToBottom
+      open={open}
+      onOpenChange={onOpenChange}
+      snapPoints={[60]}
+      position={0}
+      zIndex={100_000}
+    >
+      <Sheet.Overlay />
+      <Sheet.Handle bc="$color12" o={0.3} />
+      <Sheet.Frame>
+        <Sheet.ScrollView p="$4" gap="$4">
+          <YStack gap="$4" pb="$4">
+            <H3 ta="center">Select Main Tag</H3>
+            <Paragraph ta="center" size="$3" color="$color11">
+              Choose which tag appears as your primary identity
+            </Paragraph>
+            <YStack gap="$2" mt="$4">
+              {tags.map((tag) => {
+                const isCurrentMain = tag.id === currentMainTagId
+                return (
+                  <Button
+                    key={tag.id}
+                    size="$5"
+                    br="$4"
+                    theme={isCurrentMain ? 'green' : 'gray'}
+                    disabled={isCurrentMain || isPending}
+                    onPress={() => handleSelectTag(tag.id)}
+                    icon={
+                      <XStack gap="$3" ai="center" f={1}>
+                        <IconSlash size="$1.5" />
+                        <Paragraph size="$5" fontWeight="500" f={1}>
+                          {tag.name}
+                        </Paragraph>
+                        {isCurrentMain && <IconBadgeCheck size="$1" color="$color12" />}
+                      </XStack>
+                    }
+                    pressStyle={{ o: 0.8 }}
+                  />
+                )
+              })}
+            </YStack>
+          </YStack>
+        </Sheet.ScrollView>
+      </Sheet.Frame>
+    </Sheet>
   )
 }
