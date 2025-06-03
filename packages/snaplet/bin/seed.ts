@@ -130,8 +130,21 @@ if (!dryRun) {
   try {
     await client.connect()
 
-    // First, ensure send_account_tags are created for all user tags
-    // This creates the necessary relationships between send_accounts and tags
+    // First, update tags with their user_id using the send_account_tags relationship
+    // Since tags are created with send_account_tags relationships, we can use this to set the user_id
+    const tagUpdateResult = await client.query(`
+      UPDATE tags t
+      SET user_id = sa.user_id
+      FROM send_account_tags sat
+      JOIN send_accounts sa ON sa.id = sat.send_account_id
+      WHERE t.id = sat.tag_id
+      AND t.user_id IS NULL
+    `)
+
+    console.log(`Updated ${tagUpdateResult.rowCount} tags with user_id`)
+
+    // Now ensure any remaining send_account_tags are created for all user tags
+    // This creates any missing relationships between send_accounts and tags
     const insertResult = await client.query(`
       INSERT INTO send_account_tags (send_account_id, tag_id)
       SELECT DISTINCT sa.id, t.id
