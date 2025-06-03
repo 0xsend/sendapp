@@ -1,21 +1,7 @@
 import { SeedPg } from '@snaplet/seed/adapter-pg'
 import { defineConfig } from '@snaplet/seed/config'
 import { Client } from 'pg'
-
-/**
- * Tables that should be selected when seeding
- */
-export const select = [
-  'public.*',
-  'shovel.*',
-  '!pgtle.*',
-  '!auth.*',
-  '!realtime.*',
-  '!_realtime.*',
-  '!*.migrations',
-  '!*.schema_migrations',
-  'auth.users',
-]
+import { select } from './src/select'
 
 export default defineConfig({
   adapter: async () => {
