@@ -6141,10 +6141,10 @@ __metadata:
     "@my/workflows": "workspace:*"
     "@supabase/supabase-js": "npm:^2.49.8"
     "@tanstack/react-query": "npm:^5.74.4"
-    "@trpc/client": "npm:^11.1.0"
-    "@trpc/next": "npm:^11.1.0"
-    "@trpc/react-query": "npm:^11.1.0"
-    "@trpc/server": "npm:^11.1.1"
+    "@trpc/client": "npm:^11.2.0"
+    "@trpc/next": "npm:^11.2.0"
+    "@trpc/react-query": "npm:^11.2.0"
+    "@trpc/server": "npm:^11.2.0"
     "@types/jsonwebtoken": "npm:^9.0.2"
     "@wagmi/core": "npm:^2.16.7"
     app: "workspace:*"
@@ -10696,24 +10696,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@trpc/client@npm:^11.1.0":
-  version: 11.1.0
-  resolution: "@trpc/client@npm:11.1.0"
+"@trpc/client@npm:^11.2.0":
+  version: 11.2.0
+  resolution: "@trpc/client@npm:11.2.0"
   peerDependencies:
-    "@trpc/server": 11.1.0
+    "@trpc/server": 11.2.0
     typescript: ">=5.7.2"
-  checksum: 10/e210dfc782e1921ecd90eec352461e4f671a9f4154d326843d379d29b9e2263bf3e1941beea0c25692933147fa97692881da9addeb35b27a46615c834dfc38c9
+  checksum: 10/6569ad95966d5a9b85807686ff5c6ddec031ca2267ab9b472ac2d32f68615b81de888212bee4455225b8b2dfa5dbb72cb8a895e13667ffef80e56551cdcdc09a
   languageName: node
   linkType: hard
 
-"@trpc/next@npm:^11.1.0":
-  version: 11.1.0
-  resolution: "@trpc/next@npm:11.1.0"
+"@trpc/next@npm:^11.2.0":
+  version: 11.2.0
+  resolution: "@trpc/next@npm:11.2.0"
   peerDependencies:
     "@tanstack/react-query": ^5.59.15
-    "@trpc/client": 11.1.0
-    "@trpc/react-query": 11.1.0
-    "@trpc/server": 11.1.0
+    "@trpc/client": 11.2.0
+    "@trpc/react-query": 11.2.0
+    "@trpc/server": 11.2.0
     next: "*"
     react: ">=16.8.0"
     react-dom: ">=16.8.0"
@@ -10723,30 +10723,30 @@ __metadata:
       optional: true
     "@trpc/react-query":
       optional: true
-  checksum: 10/e1fc2c06e46acbda8a4a13dd3204806c979153fe708900988379c9f5e1f29b71e84c1fbe2d354329d6b9ca360db52a50ec957c12c097fa255a270f49ffde37cd
+  checksum: 10/3486ad6e3d0f9e63f9d6ae90df45610632f70567ae356483c9b483299b328948f6bd898211a27389e3f7cc70091f7006b82ba8c1493b2ff0961d721e0391eef7
   languageName: node
   linkType: hard
 
-"@trpc/react-query@npm:^11.1.0":
-  version: 11.1.0
-  resolution: "@trpc/react-query@npm:11.1.0"
+"@trpc/react-query@npm:^11.2.0":
+  version: 11.2.0
+  resolution: "@trpc/react-query@npm:11.2.0"
   peerDependencies:
     "@tanstack/react-query": ^5.67.1
-    "@trpc/client": 11.1.0
-    "@trpc/server": 11.1.0
+    "@trpc/client": 11.2.0
+    "@trpc/server": 11.2.0
     react: ">=18.2.0"
     react-dom: ">=18.2.0"
     typescript: ">=5.7.2"
-  checksum: 10/b824fc273b3166a82f520c6c6edb75c9b7045b6768b79cfa784c61a0e9dd7a9489afed79a11629e4b50e49df30f696ce216d6dc10afe1ef72a3f63979c4c5845
+  checksum: 10/485087b52b4bafe4694be00fb6e907333854072a68432fa08e803fa881fd1764bfedf9a21b3e482f11154b200c3cb03ae86e6b33de7957c03ae0453b8b43eb2f
   languageName: node
   linkType: hard
 
-"@trpc/server@npm:^11.1.1":
-  version: 11.1.2
-  resolution: "@trpc/server@npm:11.1.2"
+"@trpc/server@npm:^11.2.0":
+  version: 11.2.0
+  resolution: "@trpc/server@npm:11.2.0"
   peerDependencies:
     typescript: ">=5.7.2"
-  checksum: 10/4d676d09d0b71998b622940a62fcd5b9a950cd23a387a5ef0919403ea4e71c5c1d6d0645a520f3d95aa02e709f51fd1a79eb66c84b860ca770ee311fa0a733ce
+  checksum: 10/076d07e2645b189102d7adf20c5bf8e88d12d350090bdc004fc3d50040a090c8d0887085b159002bb3234a989a513ee631bb642eb09e9bcd2f3ccc48456c2479
   languageName: node
   linkType: hard
 
@@ -13583,7 +13583,7 @@ __metadata:
     "@tanstack/eslint-plugin-query": "npm:^5.20.1"
     "@tanstack/react-query": "npm:^5.74.4"
     "@testing-library/react-native": "npm:^13.2.0"
-    "@trpc/client": "npm:^11.1.0"
+    "@trpc/client": "npm:^11.2.0"
     "@types/jsonwebtoken": "npm:^9.0.2"
     "@types/qrcode": "npm:^1.5.3"
     "@types/react": "npm:^18.2.15"
@@ -25909,10 +25909,10 @@ __metadata:
     "@tanstack/react-query-devtools": "npm:^5.72.1"
     "@testing-library/jest-dom": "npm:^6.1.5"
     "@testing-library/react": "npm:^14.1.2"
-    "@trpc/client": "npm:^11.1.0"
-    "@trpc/next": "npm:^11.1.0"
-    "@trpc/react-query": "npm:^11.1.0"
-    "@trpc/server": "npm:^11.1.1"
+    "@trpc/client": "npm:^11.2.0"
+    "@trpc/next": "npm:^11.2.0"
+    "@trpc/react-query": "npm:^11.2.0"
+    "@trpc/server": "npm:^11.2.0"
     "@types/node": "npm:^20"
     app: "workspace:*"
     dotenv-cli: "npm:^7.3.0"
