@@ -51,12 +51,12 @@ After intensive database testing and fixes, the implementation status is:
 - **RLS policies**: Updated for new ownership model via junction table
 - **Database tests**: ✅ 100% passing - All functionality tested and validated
 
-### 🚨 API Layer (Phase 2 - CRITICAL ISSUE BLOCKING SHIP)
+### ✅ API Layer (Phase 2 - COMPLETED IN THIS BRANCH)
 - ✅ `tag.create`: Uses proper `create_tag` function with `send_account_id`
 - ✅ `tag.confirm`: Uses proper `confirm_tags` function with `send_account_id` 
 - ✅ `tag.delete`: Correctly deletes from `send_account_tags` junction table
 - ✅ `sendAccount.updateMainTag`: Fully implemented main tag selection endpoint
-- ❌ `tag.registerFirstSendtag`: **BLOCKS ALL NEW USER ONBOARDING - Still bypasses `send_account_tags` table**
+- ✅ `tag.registerFirstSendtag`: **FIXED** - Now properly uses `register_first_sendtag` database function with `send_account_id`
 
 ## API Approach for Main Tags
 
@@ -111,75 +111,83 @@ tags.map(tag => (
 - ✅ Added 'available' status for tag reuse functionality
 - ✅ **Database tests**: ✅ All tests fixed and passing (100% pass rate)
 
-### Phase 2: [API Layer Updates](./phase-2-api-layer.md) 🚨 CRITICAL ISSUE BLOCKS SHIPPING
+### Phase 2: [API Layer Updates](./phase-2-api-layer.md) ✅ COMPLETED IN THIS BRANCH
 - ✅ Updated `tag.create` to use proper `create_tag` function with `send_account_id`
 - ✅ Updated `tag.confirm` to use proper `confirm_tags` function with `send_account_id`
 - ✅ Updated `tag.delete` to work with `send_account_tags` junction table
 - ✅ Implemented `sendAccount.updateMainTag` endpoint with validation
-- 🚨 **BLOCKING**: `registerFirstSendtag` breaks new user onboarding by bypassing `send_account_tags`
-- 📋 Test all API endpoints with new junction table model
+- ✅ **FIXED**: `registerFirstSendtag` now properly uses database function with `send_account_id`
+- ✅ Added database function `register_first_sendtag` that handles junction table creation
 
-### Phase 3: [Frontend Components](./phase-3-frontend-components.md) 📋 TODO
-- Update sendtag management screen to show multiple tags
-- Implement main tag selection UI (radio buttons)
-- Add visual indicators for main tags in profile displays
-- Update activity feed to use main tags
-- Handle tag deletion UI and confirmations
+### Phase 3: [Frontend Components](./phase-3-frontend-components.md) 🚧 IN PROGRESS
+- ✅ Updated sendtag management screen to show multiple tags (COMPLETED IN THIS BRANCH)
+- ✅ Implemented main tag selection UI with sheet component (COMPLETED IN THIS BRANCH)
+- ✅ Added visual indicators for main tags in tag list (COMPLETED IN THIS BRANCH)
+- 📋 Update activity feed to use main tags (TODO)
+- 📋 Update profile displays with main tag indicators (TODO)
+- 📋 Handle tag deletion UI and confirmations (TODO)
 
-### Phase 4: [Testing & Polish](./phase-4-testing.md) 📋 TODO
-- Fix critical `registerFirstSendtag` onboarding issue
-- Run comprehensive test suite (database, API, E2E)
-- Validate tag lifecycle management end-to-end
-- Performance testing with multiple tags per user
-- User acceptance testing for main tag functionality
+### Phase 4: [Testing & Polish](./phase-4-testing.md) 🚧 IN PROGRESS
+- ✅ Fixed critical `registerFirstSendtag` onboarding issue (COMPLETED IN THIS BRANCH)
+- ✅ Added E2E test for happy path: create tags, confirm, change main tag (COMPLETED IN THIS BRANCH)
+- 📋 Run comprehensive test suite (database, API, E2E) (TODO)
+- 📋 Performance testing with multiple tags per user (TODO)
+- 📋 User acceptance testing for main tag functionality (TODO)
 
-## Critical Issues to Address
+## ✅ Critical Issues Resolved in This Branch
 
-### 🚨 Priority 1: Fix registerFirstSendtag Onboarding Issue (BLOCKS SHIPPING)
+### ✅ Priority 1: registerFirstSendtag Onboarding Issue (FIXED)
 **Location**: `packages/api/src/routers/tag/router.ts:96-164`
-**Problem**: The `registerFirstSendtag` endpoint directly inserts into the `tags` table without creating the required `send_account_tags` association:
+**Solution Implemented**: The `registerFirstSendtag` endpoint now properly uses the `register_first_sendtag` database function:
 
 ```typescript
-// BROKEN - bypasses send_account_tags table
-const { error: insertError } = await supabaseAdmin
-  .from('tags')
-  .insert({ name, status: 'confirmed', user_id: session.user.id })
+// FIXED - properly uses database function with send_account_id
+const { data: result, error } = await supabase.rpc('register_first_sendtag', {
+  tag_name: name,
+  send_account_id: sendAccountId,
+  _referral_code: referralCode,
+})
 ```
 
 **Impact**: 
-- 🚨 **ALL NEW USER ONBOARDING IS BROKEN**
-- First sendtags are not properly linked to send accounts
-- Users cannot access their first sendtag via junction table queries
-- Database integrity is compromised
-- Feature cannot ship until this is fixed
+- ✅ **NEW USER ONBOARDING NOW WORKS CORRECTLY**
+- ✅ First sendtags are properly linked to send accounts via junction table
+- ✅ Users can access their first sendtag through proper queries
+- ✅ Database integrity is maintained
+- ✅ Feature is no longer blocked by this issue
 
-**Solution Required**:
-1. Get user's `send_account_id` 
-2. Use `create_tag()` function instead of direct insert
-3. Ensure `send_account_tags` association is created
-4. Test onboarding flow end-to-end
-
-**Time Estimate**: 2-4 hours to fix and test
+**Implementation Details**:
+1. API endpoint now requires `sendAccountId` parameter
+2. Uses `register_first_sendtag` database function
+3. Function creates both tag and `send_account_tags` association atomically
+4. Automatically sets as main tag if no main tag exists
+5. E2E test verifies the complete flow
 
 ### ✅ Priority 2: API Validation (RESOLVED)
 - `updateMainTag` endpoint is properly implemented with database-level validation
 - Database triggers prevent invalid main_tag_id assignments
 - Proper ownership checks via RLS policies
+- Frontend integration completed with proper error handling and toast notifications
 
 ## Quick Start
 
-### Immediate Priority (Critical Fix)
-1. **Fix registerFirstSendtag onboarding issue**:
+### ✅ Critical Fix Completed in This Branch
+1. **registerFirstSendtag onboarding issue has been fixed**:
    - Location: `packages/api/src/routers/tag/router.ts:96-164`
-   - Replace direct `tags` table insert with proper `create_tag()` function call
-   - Test onboarding flow to ensure `send_account_tags` associations are created
+   - Now uses proper `register_first_sendtag` database function
+   - E2E test confirms `send_account_tags` associations are created correctly
 
 ### For Development Continuation:
-1. **Generate TypeScript types**: `cd supabase && yarn generate`
-2. **Review database implementation**: All schema files in `/supabase/schemas/` 
-3. **Phase 2 completion**: Fix critical API issue, then test all endpoints
-4. **Phase 3 (Frontend)**: Implement main tag selection UI
-5. **Phase 4 (Testing)**: Comprehensive validation of the complete feature
+1. **Generate TypeScript types**: `cd supabase && yarn generate` 
+2. **Review completed implementation**:
+   - Database schemas in `/supabase/schemas/`
+   - API fixes in `packages/api/src/routers/tag/router.ts`
+   - Frontend components in `packages/app/features/account/sendtag/screen.tsx`
+   - E2E test in `packages/playwright/tests/sendtag-happy-path.onboarded.spec.ts`
+3. **Phase 3 completion (Frontend)**: 
+   - ✅ Main tag selection UI (DONE)
+   - 📋 Profile displays and activity feed updates (TODO)
+4. **Phase 4 (Testing)**: Additional E2E tests and performance validation
 
 ### Architecture Reference
 - [Main Sendtag Implementation Approach](./main-sendtag-approach.md) - Detailed design decisions
@@ -199,16 +207,22 @@ const { error: insertError } = await supabaseAdmin
 - ✅ Tag reuse functionality with 'available' status
 - ✅ **Database tests**: ✅ All tests passing (100% pass rate), complete functionality validated
 
-### 🚨 API Layer (BLOCKED BY CRITICAL ISSUE)
-- ✅ `sendAccount.updateMainTag` endpoint for manual main tag selection
+### ✅ API Layer (COMPLETED IN THIS BRANCH)
+- ✅ `sendAccount.updateMainTag` endpoint for manual main tag selection with frontend integration
 - ✅ `tag.create`, `tag.confirm`, `tag.delete` all use proper junction table
-- 🚨 **BLOCKS SHIPPING**: `tag.registerFirstSendtag` breaks all new user onboarding
+- ✅ `tag.registerFirstSendtag` fixed to properly create junction table associations
 
-### 📋 Next Engineer Tasks (Priority Order)
-1. **🚨 CRITICAL (2-4 hours)**: Fix `registerFirstSendtag` to use `create_tag()` function - BLOCKS ALL NEW USERS
-2. **Frontend (1-2 days)**: Main tag selection UI (radio buttons in tag management screen)
-3. **Frontend (1 day)**: Visual indicators for main tags in profile displays
-4. **Testing (1 day)**: End-to-end validation of complete tag lifecycle and main tag functionality
+### ✅ Completed in This Branch
+1. **✅ CRITICAL**: Fixed `registerFirstSendtag` to use proper database function
+2. **✅ Frontend**: Main tag selection UI implemented with sheet component
+3. **✅ Frontend**: Visual indicators for main tags in tag list
+4. **✅ Testing**: E2E happy path test for tag creation and main tag selection
+
+### 📋 Remaining Tasks
+1. **Frontend (1 day)**: Update profile displays and activity feeds to show main tags
+2. **Frontend (0.5 day)**: Implement tag deletion UI with confirmations
+3. **Testing (1 day)**: Additional E2E tests for edge cases and error scenarios
+4. **Performance (0.5 day)**: Test with maximum tags per user
 
 ## Testing Commands
 
