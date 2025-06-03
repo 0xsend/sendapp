@@ -1,17 +1,34 @@
 import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server'
 import { createTRPCRouter } from '../trpc'
+import { accountRecoveryRouter } from './account-recovery/router'
 import { authRouter } from './auth/router'
 import { chainAddressRouter } from './chainAddress'
 import { distributionRouter } from './distribution'
-import { tagRouter } from './tag/router'
 import { secretShopRouter } from './secretShop'
 import { sendAccountRouter } from './sendAccount'
 import { sendEarnRouter } from './sendEarn'
-import { temporalRouter } from './temporal'
-import { accountRecoveryRouter } from './account-recovery/router'
 import { swapRouter } from './swap/router'
+import { tagRouter } from './tag/router'
+import { temporalRouter } from './temporal'
 
-export const appRouter = createTRPCRouter({
+// avoids error TS7056: The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed.
+// Keep this in sync with the declared variable below
+type AppRouterType = ReturnType<
+  typeof createTRPCRouter<{
+    chainAddress: typeof chainAddressRouter
+    tag: typeof tagRouter
+    auth: typeof authRouter
+    challenge: typeof accountRecoveryRouter
+    distribution: typeof distributionRouter
+    secretShop: typeof secretShopRouter
+    sendAccount: typeof sendAccountRouter
+    sendEarn: typeof sendEarnRouter
+    temporal: typeof temporalRouter
+    swap: typeof swapRouter
+  }>
+>
+
+export const appRouter: AppRouterType = createTRPCRouter({
   chainAddress: chainAddressRouter,
   tag: tagRouter,
   auth: authRouter,

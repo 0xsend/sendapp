@@ -37,7 +37,7 @@
     "@tamagui/shorthands": "^1.126.1",
     "@tamagui/themes": "^1.126.1",
     "@tanstack/react-query": "^5.74.4",
-    "@trpc/client": "^11.1.0",
+    "@trpc/client": "^11.2.0",
     "@wagmi/chains": "^1.8.0",
     "@wagmi/connectors": "^5.7.12",
     "@wagmi/core": "^2.16.7",
