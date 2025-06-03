@@ -4,13 +4,15 @@
  * Use any TypeScript runner to run this script, for example: `npx tsx seed.ts`
  * Learn more about the Seed Client by following our guide: https://docs.snaplet.dev/seed/getting-started
  */
+import { baseMainnetClient } from '@my/wagmi'
 import { createSeedClient } from '@snaplet/seed'
+import pg from 'pg'
+import { hexToBytes } from 'viem'
 import { models } from '../src'
 import { leaderboardReferralsAllTimes, userOnboarded } from '../src/models'
+import { select } from '../src/select'
 import { pravatar } from '../src/utils'
-import { baseMainnetClient } from '@my/wagmi'
-import { hexToBytes } from 'viem'
-import { select } from '../seed.config'
+const { Client } = pg
 
 const dryRun = process.env.DRY !== '0'
 
@@ -36,7 +38,8 @@ await seed.swap_routers([
   },
 ])
 
-await seed.users([
+// Create users with tags and send accounts
+const seededUsers = await seed.users([
   {
     phone: '17777777777',
     profiles: [
@@ -79,16 +82,16 @@ await seed.users([
         status: 'confirmed',
       },
     ],
-    sendAccounts: [{}],
-    chainAddresses: [{}],
-    leaderboardReferralsAllTimes: [leaderboardReferralsAllTimes],
+    send_accounts: [{}],
+    chain_addresses: [{}],
+    leaderboard_referrals_all_time: [leaderboardReferralsAllTimes],
   },
   {
     phone: '15555555555',
     profiles: [
       {
         name: 'John',
-        avatarUrl: pravatar('John'),
+        avatar_url: pravatar('John'),
         x_username: 'x_john',
       },
     ],
@@ -102,14 +105,77 @@ await seed.users([
         status: 'confirmed',
       },
     ],
-    sendAccounts: [{}],
-    chainAddresses: [{}],
-    leaderboardReferralsAllTimes: [leaderboardReferralsAllTimes],
+    send_accounts: [{}],
+    chain_addresses: [{}],
+    leaderboard_referrals_all_time: [leaderboardReferralsAllTimes],
   },
-  ...Array(100).fill({
+  ...Array.from({ length: 100 }, () => ({
     ...userOnboarded,
-    leaderboardReferralsAllTimes: [leaderboardReferralsAllTimes],
-  }),
+    leaderboard_referrals_all_time: [leaderboardReferralsAllTimes],
+  })),
 ])
-console.log('Snaplet seed done!')
+
+// Post-process to set main_tag_id for each send account
+// We need to run a direct SQL update since Snaplet doesn't handle
+// cross-table references in seed data functions properly
+if (!dryRun) {
+  console.log('Setting up send_account_tags and main tag IDs...')
+
+  // Create a new postgres client for the update
+  const client = new Client({
+    connectionString:
+      process.env.SUPABASE_DB_URL || 'postgresql://postgres:postgres@127.0.0.1:54322/postgres',
+  })
+
+  try {
+    await client.connect()
+
+    // First, ensure send_account_tags are created for all user tags
+    // This creates the necessary relationships between send_accounts and tags
+    const insertResult = await client.query(`
+      INSERT INTO send_account_tags (send_account_id, tag_id)
+      SELECT DISTINCT sa.id, t.id
+      FROM send_accounts sa
+      JOIN tags t ON t.user_id = sa.user_id
+      WHERE t.status = 'confirmed'
+      AND NOT EXISTS (
+        SELECT 1
+        FROM send_account_tags sat
+        WHERE sat.send_account_id = sa.id
+        AND sat.tag_id = t.id
+      )
+    `)
+
+    console.log(`Created ${insertResult.rowCount} send_account_tags relationships`)
+
+    // Now update all send_accounts to set main_tag_id
+    // This sets the main_tag_id to the first (alphabetically) tag for each user
+    const updateResult = await client.query(`
+      UPDATE send_accounts sa
+      SET main_tag_id = (
+        SELECT t.id
+        FROM tags t
+        JOIN send_account_tags sat ON sat.tag_id = t.id
+        WHERE sat.send_account_id = sa.id
+        AND t.status = 'confirmed'
+        ORDER BY t.name ASC
+        LIMIT 1
+      )
+      WHERE sa.main_tag_id IS NULL
+      AND EXISTS (
+        SELECT 1
+        FROM send_account_tags sat
+        JOIN tags t ON t.id = sat.tag_id
+        WHERE sat.send_account_id = sa.id
+        AND t.status = 'confirmed'
+      )
+    `)
+
+    console.log(`Updated ${updateResult.rowCount} send accounts with main tag IDs`)
+  } finally {
+    await client.end()
+  }
+}
+
+console.log(`Snaplet seed done! Seeded ${seededUsers.users.length} users.`)
 process.exit()

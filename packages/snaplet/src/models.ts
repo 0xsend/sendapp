@@ -42,8 +42,9 @@ export const models: SeedClientOptions['models'] = {
         )
       },
       name: (ctx) => {
-        const uniqueId = crypto.randomBytes(2).toString('hex')
-        return `tag${uniqueId}`.toLowerCase()
+        // Generate a valid tag name (alphanumeric + underscore, max 20 chars)
+        const username = copycat.username(ctx.seed, { limit: 16 })
+        return tagName(username).toLowerCase().substring(0, 20)
       },
       status: 'confirmed',
     },
@@ -52,6 +53,7 @@ export const models: SeedClientOptions['models'] = {
     data: {
       address: () => privateKeyToAddress(generatePrivateKey()),
       chain_id: 845337,
+      init_code: () => Buffer.from(crypto.randomBytes(32)),
     },
   },
   send_account_tags: {
@@ -86,8 +88,7 @@ export const models: SeedClientOptions['models'] = {
       tx_hash: Buffer.from(hexToBytes(generatePrivateKey())),
       f: (ctx) => Buffer.from(hexToBytes(generatePrivateKey())),
       t: (ctx) => Buffer.from(hexToBytes(generatePrivateKey())),
-      // @ts-expect-error - thinks it's a number
-      v: (ctx) => faker.number.bigInt({ min: 0, max: BigInt(100_000_000_000) }),
+      v: (ctx) => copycat.int(ctx.seed, { min: 0, max: 100_000_000 }),
     },
   },
 }
@@ -107,12 +108,28 @@ export const userOnboarded: usersInputs = {
     })
     return phone.replace('+', '')
   },
-  send_accounts: [
+  email: (ctx) => copycat.email(ctx.seed),
+  tags: [
     {
-      chain_id: 845337,
+      name: (ctx) => {
+        const username = copycat.username(ctx.seed, { limit: 15 })
+        return tagName(username).toLowerCase().substring(0, 20)
+      },
+      status: 'confirmed',
+    },
+    {
+      name: (ctx) => {
+        const username = copycat.username(ctx.seed, { limit: 12 })
+        return `0x${tagName(username)}`.toLowerCase().substring(0, 20)
+      },
+      status: 'confirmed',
     },
   ],
-  tags: [{}],
+  send_accounts: [
+    {
+      send_account_tags: (x) => x(3),
+    },
+  ],
   profiles: [
     {
       referral_code: (ctx) => crypto.randomBytes(8).toString('hex'),
