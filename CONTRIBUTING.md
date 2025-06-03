@@ -126,6 +126,18 @@ CPPFLAGS=-I/opt/homebrew/opt/sqlite/include
 PKG_CONFIG_PATH=/opt/homebrew/opt/sqlite/lib/pkgconfig
 ```
 
+###### JavaScript Heap Out of Memory
+
+If you encounter "FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory" errors during linting or other build processes, you need to increase the Node.js heap size.
+
+Add the following to your `.env.local` file:
+
+```sh
+NODE_OPTIONS="--max-old-space-size=4096"
+```
+
+This allocates 4GB of memory for Node.js processes. You can adjust the value based on your system's available memory.
+
 </details>
 
 #### [Turborepo](https://turbo.build/repo/docs/installing#install-globally)
