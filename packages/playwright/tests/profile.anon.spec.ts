@@ -47,6 +47,7 @@ test('anon user cannot visit private profile', async ({ page, seed, pg }) => {
   const tag = plan.tags[0]
   const account = plan.send_accounts[0]
   assert(!!tag, 'tag not found')
+  assert(!!account, 'send account not found')
 
   // Manually create the send_account_tag
   await pg.query(
