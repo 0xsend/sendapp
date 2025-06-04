@@ -44,50 +44,50 @@ ALTER TABLE ONLY "public"."activity"
     ADD CONSTRAINT "activity_to_user_id_fkey" FOREIGN KEY ("to_user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
 
 -- Views
-CREATE OR REPLACE VIEW "public"."activity_feed" WITH ("security_barrier"='on') AS
- SELECT "a"."created_at",
-    "a"."event_name",
+create or replace view "public"."activity_feed" as  SELECT a.created_at,
+    a.event_name,
         CASE
-            WHEN ("a"."from_user_id" = "from_p"."id") THEN ROW(
+            WHEN (a.from_user_id = from_p.id) THEN ROW(
             CASE
-                WHEN ("a"."from_user_id" = ( SELECT "auth"."uid"() AS "uid")) THEN ( SELECT "auth"."uid"() AS "uid")
-                ELSE NULL::"uuid"
-            END, "from_p"."name", "from_p"."avatar_url", "from_p"."send_id", 
-            "from_sa"."main_tag_id", 
-            "from_main_tag"."name",
-            (( SELECT "array_agg"("t"."name") AS "array_agg"
-               FROM "public"."tags" "t"
-               JOIN "public"."send_account_tags" "sat" ON "sat"."tag_id" = "t"."id"
-               JOIN "public"."send_accounts" "sa" ON "sa"."id" = "sat"."send_account_id"
-              WHERE (("sa"."user_id" = "from_p"."id") AND ("t"."status" = 'confirmed'::"public"."tag_status"))))::"text"[])::"public"."activity_feed_user"
-            ELSE NULL::"public"."activity_feed_user"
-        END AS "from_user",
+                WHEN (a.from_user_id = ( SELECT auth.uid() AS uid)) THEN ( SELECT auth.uid() AS uid)
+                ELSE NULL::uuid
+            END, from_p.name, from_p.avatar_url, from_p.send_id,
+            CASE
+                WHEN (a.from_user_id = ( SELECT auth.uid() AS uid)) THEN from_sa.main_tag_id
+                ELSE NULL::bigint
+            END, (from_main_tag.name)::text, (( SELECT array_agg(t.name) AS array_agg
+               FROM ((tags t
+                 JOIN send_account_tags sat ON ((sat.tag_id = t.id)))
+                 JOIN send_accounts sa ON ((sa.id = sat.send_account_id)))
+              WHERE ((sa.user_id = from_p.id) AND (t.status = 'confirmed'::tag_status))))::text[])::activity_feed_user
+            ELSE NULL::activity_feed_user
+        END AS from_user,
         CASE
-            WHEN ("a"."to_user_id" = "to_p"."id") THEN ROW(
+            WHEN (a.to_user_id = to_p.id) THEN ROW(
             CASE
-                WHEN ("a"."to_user_id" = ( SELECT "auth"."uid"() AS "uid")) THEN ( SELECT "auth"."uid"() AS "uid")
-                ELSE NULL::"uuid"
-            END, "to_p"."name", "to_p"."avatar_url", "to_p"."send_id", 
-            "to_sa"."main_tag_id", 
-            "to_main_tag"."name",
-            (( SELECT "array_agg"("t"."name") AS "array_agg"
-               FROM "public"."tags" "t"
-               JOIN "public"."send_account_tags" "sat" ON "sat"."tag_id" = "t"."id"
-               JOIN "public"."send_accounts" "sa" ON "sa"."id" = "sat"."send_account_id"
-              WHERE (("sa"."user_id" = "to_p"."id") AND ("t"."status" = 'confirmed'::"public"."tag_status"))))::"text"[])::"public"."activity_feed_user"
-            ELSE NULL::"public"."activity_feed_user"
-        END AS "to_user",
-    "a"."data"
-   FROM (((((("public"."activity" "a"
-     LEFT JOIN "public"."profiles" "from_p" ON (("a"."from_user_id" = "from_p"."id")))
-     LEFT JOIN "public"."profiles" "to_p" ON (("a"."to_user_id" = "to_p"."id")))
-     LEFT JOIN "public"."send_accounts" "from_sa" ON (("from_sa"."user_id" = "from_p"."id")))
-     LEFT JOIN "public"."tags" "from_main_tag" ON (("from_main_tag"."id" = "from_sa"."main_tag_id")))
-     LEFT JOIN "public"."send_accounts" "to_sa" ON (("to_sa"."user_id" = "to_p"."id")))
-     LEFT JOIN "public"."tags" "to_main_tag" ON (("to_main_tag"."id" = "to_sa"."main_tag_id")))
-  WHERE (("a"."from_user_id" = ( SELECT "auth"."uid"() AS "uid")) OR (("a"."to_user_id" = ( SELECT "auth"."uid"() AS "uid")) AND ("a"."event_name" !~~ 'temporal_%'::"text")))
-  GROUP BY "a"."created_at", "a"."event_name", "a"."from_user_id", "a"."to_user_id", "from_p"."id", "from_p"."name", "from_p"."avatar_url", "from_p"."send_id", "to_p"."id", "to_p"."name", "to_p"."avatar_url", "to_p"."send_id", "a"."data", "from_sa"."main_tag_id", "from_main_tag"."name", "to_sa"."main_tag_id", "to_main_tag"."name";
-ALTER TABLE "public"."activity_feed" OWNER TO "postgres";
+                WHEN (a.to_user_id = ( SELECT auth.uid() AS uid)) THEN ( SELECT auth.uid() AS uid)
+                ELSE NULL::uuid
+            END, to_p.name, to_p.avatar_url, to_p.send_id,
+            CASE
+                WHEN (a.to_user_id = ( SELECT auth.uid() AS uid)) THEN to_sa.main_tag_id
+                ELSE NULL::bigint
+            END, (to_main_tag.name)::text, (( SELECT array_agg(t.name) AS array_agg
+               FROM ((tags t
+                 JOIN send_account_tags sat ON ((sat.tag_id = t.id)))
+                 JOIN send_accounts sa ON ((sa.id = sat.send_account_id)))
+              WHERE ((sa.user_id = to_p.id) AND (t.status = 'confirmed'::tag_status))))::text[])::activity_feed_user
+            ELSE NULL::activity_feed_user
+        END AS to_user,
+    a.data
+   FROM ((((((activity a
+     LEFT JOIN profiles from_p ON ((a.from_user_id = from_p.id)))
+     LEFT JOIN profiles to_p ON ((a.to_user_id = to_p.id)))
+     LEFT JOIN send_accounts from_sa ON ((from_sa.user_id = from_p.id)))
+     LEFT JOIN tags from_main_tag ON ((from_main_tag.id = from_sa.main_tag_id)))
+     LEFT JOIN send_accounts to_sa ON ((to_sa.user_id = to_p.id)))
+     LEFT JOIN tags to_main_tag ON ((to_main_tag.id = to_sa.main_tag_id)))
+  WHERE ((a.from_user_id = ( SELECT auth.uid() AS uid)) OR ((a.to_user_id = ( SELECT auth.uid() AS uid)) AND (a.event_name !~~ 'temporal_%'::text)))
+  GROUP BY a.created_at, a.event_name, a.from_user_id, a.to_user_id, from_p.id, from_p.name, from_p.avatar_url, from_p.send_id, to_p.id, to_p.name, to_p.avatar_url, to_p.send_id, a.data, from_sa.main_tag_id, from_main_tag.name, to_sa.main_tag_id, to_main_tag.name;
 
 -- Functions (that depend on activity_feed view)
 CREATE OR REPLACE FUNCTION favourite_senders()

@@ -47,7 +47,7 @@ SELECT (
         vu.name,
         vu.avatar_url,
         vu.send_id,
-        sa.main_tag_id,
+        NULL::bigint,  -- Hide main_tag_id for privacy
         main_tag.name,
         vu.tag_names
     )::activity_feed_user

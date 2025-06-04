@@ -24,7 +24,11 @@ create or replace view "public"."activity_feed" as  SELECT a.created_at,
             CASE
                 WHEN (a.from_user_id = ( SELECT auth.uid() AS uid)) THEN ( SELECT auth.uid() AS uid)
                 ELSE NULL::uuid
-            END, from_p.name, from_p.avatar_url, from_p.send_id, from_sa.main_tag_id, (from_main_tag.name)::text, (( SELECT array_agg(t.name) AS array_agg
+            END, from_p.name, from_p.avatar_url, from_p.send_id,
+            CASE
+                WHEN (a.from_user_id = ( SELECT auth.uid() AS uid)) THEN from_sa.main_tag_id
+                ELSE NULL::bigint
+            END, (from_main_tag.name)::text, (( SELECT array_agg(t.name) AS array_agg
                FROM ((tags t
                  JOIN send_account_tags sat ON ((sat.tag_id = t.id)))
                  JOIN send_accounts sa ON ((sa.id = sat.send_account_id)))
@@ -36,7 +40,11 @@ create or replace view "public"."activity_feed" as  SELECT a.created_at,
             CASE
                 WHEN (a.to_user_id = ( SELECT auth.uid() AS uid)) THEN ( SELECT auth.uid() AS uid)
                 ELSE NULL::uuid
-            END, to_p.name, to_p.avatar_url, to_p.send_id, to_sa.main_tag_id, (to_main_tag.name)::text, (( SELECT array_agg(t.name) AS array_agg
+            END, to_p.name, to_p.avatar_url, to_p.send_id,
+            CASE
+                WHEN (a.to_user_id = ( SELECT auth.uid() AS uid)) THEN to_sa.main_tag_id
+                ELSE NULL::bigint
+            END, (to_main_tag.name)::text, (( SELECT array_agg(t.name) AS array_agg
                FROM ((tags t
                  JOIN send_account_tags sat ON ((sat.tag_id = t.id)))
                  JOIN send_accounts sa ON ((sa.id = sat.send_account_id)))
@@ -223,101 +231,6 @@ $function$
 ;
 
 -- Recreate top_senders function
-CREATE OR REPLACE FUNCTION top_senders(
-    limit_count INTEGER DEFAULT 10,
-    latest_distribution_count INTEGER DEFAULT NULL
-)
-RETURNS SETOF activity_feed_user
-SECURITY DEFINER
-LANGUAGE plpgsql
-AS $$
-BEGIN
-RETURN QUERY
-
--- Get latest distributions ids
-WITH recent_distributions AS (
-  SELECT id
-  FROM distributions
-  ORDER BY "number" DESC -- changed id to number
-  LIMIT COALESCE(latest_distribution_count, GREATEST((SELECT COUNT(*) FROM distributions) - 8, 0)) -- always skip 8 first distributions, no send_ceiling in previous
-),
--- Get all users with scores (no limit yet)
-user_scores AS (
-    SELECT
-        dv.user_id,
-        SUM(dv.weight) AS send_score -- changed to be weight of send_ceiling instead of distribution amount
-    FROM distribution_verifications dv
-    INNER JOIN recent_distributions rd ON dv.distribution_id = rd.id
-    WHERE dv.type = 'send_ceiling'
-    GROUP BY dv.user_id
-),
--- Filter for valid profiles with tags
-valid_users AS (
-    SELECT
-        p.*,
-        us.send_score,
-        sa.main_tag_id,
-        main_tag.name as main_tag_name,
-        ARRAY_AGG(t.name) AS tag_names
-    FROM user_scores us
-    INNER JOIN profiles p ON p.id = us.user_id
-    INNER JOIN tags t ON t.user_id = p.id
-    LEFT JOIN send_accounts sa ON sa.user_id = p.id
-    LEFT JOIN tags main_tag ON main_tag.id = sa.main_tag_id
-    WHERE p.is_public = TRUE
-      AND p.avatar_url IS NOT NULL
-      AND t.status = 'confirmed'
-    GROUP BY p.id, p.name, p.avatar_url, p.send_id, us.send_score, sa.main_tag_id, main_tag.name
-)
--- Return top N with all requirements met
-SELECT (
-    (
-        NULL,
-        vu.name,
-        vu.avatar_url,
-        vu.send_id,
-        vu.main_tag_id,
-        vu.main_tag_name,
-        vu.tag_names
-    )::activity_feed_user
-).*
-FROM valid_users vu
-ORDER BY vu.send_score DESC
-LIMIT limit_count;
-
-END;
-$$;
-
--- Recreate leaderboard_referrals_all_time function
-CREATE OR REPLACE FUNCTION public.leaderboard_referrals_all_time()
- RETURNS TABLE(rewards_usdc numeric, referrals integer, "user" activity_feed_user)
- LANGUAGE plpgsql
- STABLE SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-begin
-    return query select l.rewards_usdc,
-                        l.referrals,
-                        (case when l.user_id = ( select auth.uid() ) then ( select auth.uid() ) end, -- user_id
-                         p.name, -- name
-                         p.avatar_url, -- avatar_url
-                         p.send_id, -- send_id
-                         sa.main_tag_id, -- main_tag_id
-                         mt.name, -- main_tag_name
-                         ( select array_agg(name) from tags where user_id = p.id and status = 'confirmed' ) -- tags
-                            )::activity_feed_user                      as "user"
-                 from private.leaderboard_referrals_all_time l
-                          join profiles p on p.id = user_id
-                          left join send_accounts sa on sa.user_id = p.id
-                          left join tags mt on mt.id = sa.main_tag_id
-                 where p.is_public = true;
-end
-$function$
-;
-
--- Revoke access from anon role for leaderboard function
-revoke all on function leaderboard_referrals_all_time from anon;
-
 CREATE OR REPLACE FUNCTION public.top_senders(limit_count integer DEFAULT 10, latest_distribution_count integer DEFAULT NULL::integer)
  RETURNS SETOF activity_feed_user
  LANGUAGE plpgsql
@@ -364,7 +277,7 @@ SELECT (
         vu.name,
         vu.avatar_url,
         vu.send_id,
-        sa.main_tag_id,
+        NULL::bigint,  -- Hide main_tag_id for privacy
         main_tag.name,
         vu.tag_names
     )::activity_feed_user
@@ -378,3 +291,33 @@ LIMIT limit_count;
 END;
 $function$
 ;
+
+-- Recreate leaderboard_referrals_all_time function
+CREATE OR REPLACE FUNCTION public.leaderboard_referrals_all_time()
+ RETURNS TABLE(rewards_usdc numeric, referrals integer, "user" activity_feed_user)
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+begin
+    return query select l.rewards_usdc,
+                        l.referrals,
+                        (case when l.user_id = ( select auth.uid() ) then ( select auth.uid() ) end, -- user_id
+                         p.name, -- name
+                         p.avatar_url, -- avatar_url
+                         p.send_id, -- send_id
+                         sa.main_tag_id, -- main_tag_id
+                         mt.name, -- main_tag_name
+                         ( select array_agg(name) from tags where user_id = p.id and status = 'confirmed' ) -- tags
+                            )::activity_feed_user                      as "user"
+                 from private.leaderboard_referrals_all_time l
+                          join profiles p on p.id = user_id
+                          left join send_accounts sa on sa.user_id = p.id
+                          left join tags mt on mt.id = sa.main_tag_id
+                 where p.is_public = true;
+end
+$function$
+;
+
+-- Revoke access from anon role for leaderboard function
+revoke all on function leaderboard_referrals_all_time from anon;

@@ -27,7 +27,7 @@ select case when p.id = ( select auth.uid() ) then p.id end              as id,
          join send_account_tags sat2 on sat2.tag_id = t2.id
          join send_accounts sa2 on sa2.id = sat2.send_account_id
          where sa2.user_id = p.id and t2.status = 'confirmed'::tag_status ) as all_tags,
-       sa.main_tag_id                                                    as main_tag_id,
+       case when p.id = ( select auth.uid() ) then sa.main_tag_id end   as main_tag_id,
        mt.name::text                                                     as main_tag_name
 from profiles p
     join auth.users a on a.id = p.id
