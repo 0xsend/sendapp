@@ -5,7 +5,7 @@ import { ActivityScreen } from './screen'
 import { useSearchResultHref } from 'app/utils/useSearchResultHref'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useRootScreenParams } from 'app/routers/params'
-import { ScrollDirectionProvider } from 'app/provider/scroll'
+import ScrollDirectionProvider from 'app/provider/scroll/ScrollDirectionProvider'
 
 jest.unmock('app/provider/tag-search')
 jest.mock('app/utils/useSearchResultHref')

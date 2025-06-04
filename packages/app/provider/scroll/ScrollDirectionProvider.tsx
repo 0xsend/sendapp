@@ -1,26 +1,13 @@
 import { useRouter } from 'next/router'
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import type {
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-  ScrollView,
-  ScrollViewProps,
-} from 'react-native'
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import type { NativeScrollEvent, NativeSyntheticEvent, ScrollView } from 'react-native'
 import { Dimensions } from 'react-native'
+import {
+  ScrollDirection,
+  type ScrollDirectionContextValue,
+} from 'app/provider/scroll/ScrollDirectionContext'
 
 export type ScrollPositions = Record<string, number>
-
-export type ScrollDirectionContextValue = {
-  direction: 'up' | 'down' | null
-  isAtEnd: boolean
-  onScroll: ScrollViewProps['onScroll']
-  onContentSizeChange: ScrollViewProps['onContentSizeChange']
-  ref: React.RefObject<ScrollView>
-}
-
-const ScrollDirection = createContext<ScrollDirectionContextValue>(
-  undefined as unknown as ScrollDirectionContextValue
-)
 
 const THRESHOLD = 50
 
@@ -52,7 +39,7 @@ const generateScrollKey = (
   return `${pathname}?${queryString}`
 }
 
-export const ScrollDirectionProvider = ({ children }: { children: React.ReactNode }) => {
+const ScrollDirectionProvider = ({ children }: { children: ReactNode }) => {
   const ref = useRef<ScrollView>(null)
   const { pathname, query } = useRouter()
 
@@ -140,10 +127,4 @@ export const ScrollDirectionProvider = ({ children }: { children: React.ReactNod
   return <ScrollDirection.Provider value={value}>{children}</ScrollDirection.Provider>
 }
 
-export const useScrollDirection = () => {
-  const context = useContext(ScrollDirection)
-  if (!context) {
-    throw new Error('useScrollDirection must be used within a ScrollDirectionProvider')
-  }
-  return context
-}
+export default ScrollDirectionProvider

@@ -1,27 +1,14 @@
-import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react'
-import type {
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-  ScrollView,
-  ScrollViewProps,
-} from 'react-native'
+import { type ReactNode, useCallback, useMemo, useRef, useState } from 'react'
+import type { NativeScrollEvent, NativeSyntheticEvent, ScrollView } from 'react-native'
 import { Dimensions } from 'react-native'
+import {
+  ScrollDirection,
+  type ScrollDirectionContextValue,
+} from 'app/provider/scroll/ScrollDirectionContext'
 
-export type ScrollDirectionContextValue = {
-  direction: 'up' | 'down' | null
-  isAtEnd: boolean
-  onScroll: ScrollViewProps['onScroll']
-  onContentSizeChange: ScrollViewProps['onContentSizeChange']
-  ref: React.RefObject<ScrollView>
-}
+const THRESHOLD = 20
 
-const ScrollDirection = createContext<ScrollDirectionContextValue>(
-  undefined as unknown as ScrollDirectionContextValue
-)
-
-const THRESHOLD = 50
-
-export const ScrollDirectionProvider = ({ children }: { children: React.ReactNode }) => {
+const ScrollDirectionProvider = ({ children }: { children: ReactNode }) => {
   const ref = useRef<ScrollView>(null)
 
   // Get window dimensions
@@ -88,10 +75,4 @@ export const ScrollDirectionProvider = ({ children }: { children: React.ReactNod
   return <ScrollDirection.Provider value={value}>{children}</ScrollDirection.Provider>
 }
 
-export const useScrollDirection = () => {
-  const context = useContext(ScrollDirection)
-  if (!context) {
-    throw new Error('useScrollDirection must be used within a ScrollDirectionProvider')
-  }
-  return context
-}
+export default ScrollDirectionProvider
