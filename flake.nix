@@ -57,23 +57,28 @@
 
         devShells.default = pkgs.mkShell {
           name = "sendapp-dev";
-          nativeBuildInputs = [
-            pkgs.foundry
-            pkgs.python310
-            pkgs.gnused
-            pkgs.postgresql_15
-            pkgs.bun
+          nativeBuildInputs =
+            [
+              pkgs.foundry
+              pkgs.python310
+              pkgs.gnused
+              pkgs.postgresql_15
+              pkgs.bun
 
-            pkgs.unstable.fnm
-            pkgs.unstable.jq
-            pkgs.unstable.yj
-            pkgs.unstable.caddy
-            pkgs.unstable.tilt
-            pkgs.unstable.temporal-cli
-            pkgs.unstable.ripgrep
-            pkgs.unstable.watchman
-            pkgs.unstable.maestro
-          ];
+              pkgs.unstable.fnm
+              pkgs.unstable.jq
+              pkgs.unstable.yj
+              pkgs.unstable.caddy
+              pkgs.unstable.tilt
+              pkgs.unstable.temporal-cli
+              pkgs.unstable.ripgrep
+              pkgs.unstable.watchman
+              pkgs.unstable.maestro
+            ]
+            ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [
+              # Playwright browser drivers (Linux only)
+              pkgs.unstable.playwright-driver.browsers
+            ];
           shellHook =
             ''
               eval "$(fnm env --use-on-cd --corepack-enabled --shell bash)"
@@ -87,6 +92,12 @@
               unset DEVELOPER_DIR
               # We need to add the system Xcode tools to the PATH so that expo works correctly
               export PATH=/usr/bin:$PATH
+            '')
+            + (pkgs.lib.optionalString pkgs.stdenv.hostPlatform.isLinux ''
+              # Set up Playwright environment variables for Linux
+              export PLAYWRIGHT_BROWSERS_PATH=${pkgs.unstable.playwright-driver.browsers}
+              # may need to set this if encountering validation errors
+              # export PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=true
             '');
         };
 
