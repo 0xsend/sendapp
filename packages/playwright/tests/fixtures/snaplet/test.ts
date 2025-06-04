@@ -12,8 +12,9 @@ let log: debug.Debugger
 export const test = baseTest.extend<{ referrer: Referrer }, { seed: SeedClient; pg: pg.Client }>({
   seed: [
     async ({ pg }, use) => {
-      const key = `test:fixtures:snaplet:${test.info().workerIndex}`
-      log = debug(key)
+      const testInfo = test.info()
+      const key = `test:fixtures:snaplet:${testInfo.workerIndex}:${testInfo.title}:${Date.now()}`
+      log = debug(`test:fixtures:snaplet:${testInfo.workerIndex}`)
 
       log('seed')
 

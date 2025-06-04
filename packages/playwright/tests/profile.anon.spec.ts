@@ -49,16 +49,8 @@ test('anon user cannot visit private profile', async ({ page, seed, pg }) => {
   assert(!!tag, 'tag not found')
   assert(!!account, 'send account not found')
 
-  // Manually create the send_account_tag
-  await pg.query(
-    `
-    INSERT INTO send_account_tags (tag_id, send_account_id)
-    VALUES ($1, $2)
-  `,
-    [tag.id, account.id]
-  )
-
-  // Also ensure send_account is active
+  // The send_account_tags relationship is already created by the seed
+  // Just ensure send_account is active
   await pg.query(
     `
     UPDATE send_accounts

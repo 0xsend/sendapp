@@ -454,13 +454,13 @@ CREATE TRIGGER set_timestamp BEFORE UPDATE ON public.tags FOR EACH ROW EXECUTE F
 CREATE OR REPLACE FUNCTION public.prevent_last_confirmed_tag_deletion()
     RETURNS TRIGGER
     LANGUAGE plpgsql
-    SECURITY DEFINER
     SET search_path TO 'public'
     AS $$
 BEGIN
     -- Check if this deletion would leave the user with zero confirmed tags
     -- Only prevent deletion if the tag being deleted is confirmed AND it's the last one
-    IF (SELECT status FROM tags WHERE id = OLD.tag_id) = 'confirmed' THEN
+    IF current_setting('role')::text = 'authenticated' AND
+        (SELECT status FROM tags WHERE id = OLD.tag_id) = 'confirmed' THEN
         -- Count remaining confirmed tags after this deletion
         IF (SELECT COUNT(*)
             FROM send_account_tags sat

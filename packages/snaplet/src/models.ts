@@ -10,6 +10,16 @@ import { hexToBytes } from 'viem'
 import { generatePrivateKey, privateKeyToAddress } from 'viem/accounts'
 import { pravatar, tagName } from './utils'
 
+// Counter to ensure unique tag names across multiple seed invocations
+let tagCounter = 0
+
+// Generate a unique suffix for tag names
+function getUniqueTagSuffix(): string {
+  const timestamp = Date.now().toString(36).slice(-4)
+  const count = (tagCounter++).toString(36)
+  return `${timestamp}${count}`
+}
+
 export const models: SeedClientOptions['models'] = {
   users: {
     data: {
@@ -35,16 +45,12 @@ export const models: SeedClientOptions['models'] = {
   },
   tags: {
     data: {
-      id: (ctx) => {
-        const parallelIndex = process.env.TEST_PARALLEL_INDEX || '0'
-        return (
-          1000 + Number.parseInt(parallelIndex) * 1000 + copycat.int(ctx.seed, { min: 0, max: 999 })
-        )
-      },
       name: (ctx) => {
         // Generate a valid tag name (alphanumeric + underscore, max 20 chars)
-        const username = copycat.username(ctx.seed, { limit: 16 })
-        return tagName(username).toLowerCase().substring(0, 20)
+        // Use a random suffix to ensure uniqueness
+        const username = copycat.username(ctx.seed, { limit: 8 })
+        const randomSuffix = Math.random().toString(36).substring(2, 6)
+        return tagName(`${username}_${randomSuffix}`).toLowerCase().substring(0, 20)
       },
       status: 'confirmed',
     },
@@ -59,8 +65,15 @@ export const models: SeedClientOptions['models'] = {
   send_account_tags: {
     data: {
       tag_id: (ctx) => {
-        const tag = ctx.store.tags[0]
-        if (!tag?.id) throw new Error('No tag found')
+        // Get the index of the current send_account_tags being created
+        const currentIndex = ctx.store.send_account_tags?.length || 0
+        // Get all available tags
+        const tags = ctx.store.tags
+        if (!tags || tags.length === 0) throw new Error('No tags found')
+        // Use modulo to cycle through available tags if creating more send_account_tags than tags
+        const tagIndex = currentIndex % tags.length
+        const tag = tags[tagIndex]
+        if (!tag?.id) throw new Error(`No tag found at index ${tagIndex}`)
         return tag.id
       },
       send_account_id: (ctx) => {
@@ -112,22 +125,24 @@ export const userOnboarded: usersInputs = {
   tags: [
     {
       name: (ctx) => {
-        const username = copycat.username(ctx.seed, { limit: 15 })
-        return tagName(username).toLowerCase().substring(0, 20)
+        const username = copycat.username(ctx.seed, { limit: 7 })
+        const randomSuffix = Math.random().toString(36).substring(2, 6)
+        return tagName(`${username}_${randomSuffix}`).toLowerCase().substring(0, 20)
       },
       status: 'confirmed',
     },
     {
       name: (ctx) => {
-        const username = copycat.username(ctx.seed, { limit: 12 })
-        return `0x${tagName(username)}`.toLowerCase().substring(0, 20)
+        const username = copycat.username(ctx.seed, { limit: 5 })
+        const randomSuffix = Math.random().toString(36).substring(2, 6)
+        return tagName(`x${username}_${randomSuffix}`).toLowerCase().substring(0, 20)
       },
       status: 'confirmed',
     },
   ],
   send_accounts: [
     {
-      send_account_tags: (x) => x(3),
+      send_account_tags: (x) => x(2), // Match the number of tags created (2)
     },
   ],
   profiles: [
