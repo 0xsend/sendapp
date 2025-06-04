@@ -43,37 +43,51 @@ VALUES (
     '{"key": "value"}'
 );
 
--- Test if the activity_feed view returns the correct 
+-- Test if the activity_feed view returns the correct
 -- data for the authenticated user
 SELECT tests.authenticate_as('test_user_from');
 SELECT results_eq(
     $$
-        SELECT event_name, (from_user).id, (to_user).tags, data
+        SELECT event_name,
+               (from_user).id,
+               (from_user).main_tag_name,
+               (to_user).tags,
+               (to_user).main_tag_name,
+               data
         FROM activity_feed
     $$,
     $$
-        VALUES ('test_event',
+        VALUES ('test_event'::text,
                 tests.get_supabase_uid('test_user_from'),
+                'tag1'::text,
                 '{tag3}'::text[],
+                'tag3'::text,
                 '{"key": "value"}'::jsonb)
     $$,
-    'Test if the activity_feed view returns the correct data for the authenticated user'
+    'Test if the activity_feed view returns the correct data for the authenticated user including main tag'
 );
 
 -- Test if the activity_feed view returns the correct data for the other user
 SELECT tests.authenticate_as('test_user_to');
 SELECT results_eq(
     $$
-        SELECT event_name, (from_user).tags, (to_user).id, data
+        SELECT event_name,
+               (from_user).tags,
+               (from_user).main_tag_name,
+               (to_user).id,
+               (to_user).main_tag_name,
+               data
         FROM activity_feed
     $$,
     $$
-        VALUES ('test_event',
+        VALUES ('test_event'::text,
                 '{tag1,tag2}'::text[],
+                'tag1'::text,
                 tests.get_supabase_uid('test_user_to'),
+                'tag3'::text,
                 '{"key": "value"}'::jsonb)
     $$,
-    'Test if the activity_feed view returns the correct data for the other user'
+    'Test if the activity_feed view returns the correct data for the other user including main tag'
 );
 
 -- Test if the activity_feed view returns no data for an unauthenticated user
