@@ -144,7 +144,7 @@ SELECT ok(EXISTS(
 ), 'NULL main_tag_id allowed for new accounts');
 
 -- Test 11: Cannot delete last confirmed tag (constraint prevents it)
-SET ROLE service_role;
+SELECT tests.authenticate_as('main_tag_user');
 SELECT throws_ok(
     $$ DELETE FROM send_account_tags 
        WHERE send_account_id = (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('main_tag_user'))

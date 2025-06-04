@@ -29,21 +29,21 @@ SELECT ok(EXISTS(
     SELECT 1 FROM tags t
     JOIN send_account_tags sat ON t.id = sat.tag_id
     JOIN send_accounts sa ON sa.id = sat.send_account_id
-    WHERE t.name = 'recyclable_tag' 
-    AND t.status = 'confirmed' 
+    WHERE t.name = 'recyclable_tag'
+    AND t.status = 'confirmed'
     AND sa.user_id = tests.get_supabase_uid('lifecycle_user1')
 ), 'Tag is confirmed and owned by user1');
 
 -- Delete the tag association (simulating user releasing the tag)
-DELETE FROM send_account_tags 
+DELETE FROM send_account_tags
 WHERE tag_id = (SELECT id FROM tags WHERE name = 'recyclable_tag')
 AND send_account_id = (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('lifecycle_user1'));
 
 -- Test 2: Tag becomes available after deletion (status and user_id cleared)
 SELECT ok(EXISTS(
-    SELECT 1 FROM tags 
-    WHERE name = 'recyclable_tag' 
-    AND status = 'available' 
+    SELECT 1 FROM tags
+    WHERE name = 'recyclable_tag'
+    AND status = 'available'
     AND user_id IS NULL
 ), 'Tag becomes available and user_id is cleared after deletion');
 
@@ -55,7 +55,7 @@ SELECT ok(EXISTS(
     SELECT 1 FROM tags t
     JOIN send_account_tags sat ON t.id = sat.tag_id
     JOIN send_accounts sa ON sa.id = sat.send_account_id
-    WHERE t.name = 'recyclable_tag' 
+    WHERE t.name = 'recyclable_tag'
     AND t.status = 'pending'
     AND sa.user_id = tests.get_supabase_uid('lifecycle_user2')
 ), 'Tag can be reclaimed by another user');
@@ -69,7 +69,7 @@ SELECT ok(EXISTS(
     SELECT 1 FROM tags t
     JOIN send_account_tags sat ON t.id = sat.tag_id
     JOIN send_accounts sa ON sa.id = sat.send_account_id
-    WHERE t.name = 'recyclable_tag' 
+    WHERE t.name = 'recyclable_tag'
     AND t.status = 'confirmed'
     AND sa.user_id = tests.get_supabase_uid('lifecycle_user2')
 ), 'Reclaimed tag can be confirmed completing the cycle');
@@ -87,7 +87,7 @@ SELECT create_tag('newest_tag', (SELECT id FROM send_accounts WHERE user_id = te
 -- Confirm all tags in order (oldest first)
 SET ROLE service_role;
 UPDATE tags SET status = 'confirmed' WHERE name = 'oldest_tag';
-UPDATE tags SET status = 'confirmed' WHERE name = 'middle_tag';  
+UPDATE tags SET status = 'confirmed' WHERE name = 'middle_tag';
 UPDATE tags SET status = 'confirmed' WHERE name = 'newest_tag';
 SET ROLE postgres;
 
@@ -99,8 +99,8 @@ SELECT ok(EXISTS(
     AND t.name = 'keepable_tag'
 ), 'Main tag remains the first confirmed tag');
 
--- Test 6: Delete main tag (keepable_tag), oldest_tag should become main  
-DELETE FROM send_account_tags 
+-- Test 6: Delete main tag (keepable_tag), oldest_tag should become main
+DELETE FROM send_account_tags
 WHERE tag_id = (SELECT id FROM tags WHERE name = 'keepable_tag')
 AND send_account_id = (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('lifecycle_user1'));
 
@@ -112,7 +112,7 @@ SELECT ok(EXISTS(
 ), 'Oldest remaining tag becomes main after current main is deleted');
 
 -- Test 7: Delete current main tag (oldest_tag), middle_tag should become main
-DELETE FROM send_account_tags 
+DELETE FROM send_account_tags
 WHERE tag_id = (SELECT id FROM tags WHERE name = 'oldest_tag')
 AND send_account_id = (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('lifecycle_user1'));
 
@@ -124,22 +124,26 @@ SELECT ok(EXISTS(
 ), 'Middle tag becomes main after oldest tag is deleted');
 
 -- Delete middle_tag to make newest_tag the last confirmed tag
-DELETE FROM send_account_tags 
+DELETE FROM send_account_tags
 WHERE tag_id = (SELECT id FROM tags WHERE name = 'middle_tag')
 AND send_account_id = (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('lifecycle_user1'));
 
--- Test 8: Cannot delete the last confirmed tag (constraint prevents it)
+-- Test 8: Cannot delete the last confirmed tag (constraint prevents it) as a user
+SELECT tests.authenticate_as('lifecycle_user1');
 SELECT throws_ok(
-    $$ DELETE FROM send_account_tags 
+    $$ DELETE FROM send_account_tags
        WHERE tag_id = (SELECT id FROM tags WHERE name = 'newest_tag')
        AND send_account_id = (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('lifecycle_user1')) $$,
     'P0001',
     'Cannot delete your last confirmed sendtag. Users must maintain at least one confirmed sendtag.'
 );
 
+-- back to postgres
+SET ROLE postgres;
+
 -- Test 9: User still has their last confirmed tag and main_tag_id is not NULL
 SELECT ok((
-    SELECT main_tag_id FROM send_accounts 
+    SELECT main_tag_id FROM send_accounts
     WHERE user_id = tests.get_supabase_uid('lifecycle_user1')
 ) IS NOT NULL, 'Main tag remains set since last confirmed tag cannot be deleted');
 
@@ -188,7 +192,7 @@ SELECT ok(EXISTS(
 ), 'Main tag remains unchanged when additional tags are confirmed');
 
 -- Test 13: Deleting non-main tag doesn't affect main tag
-DELETE FROM send_account_tags 
+DELETE FROM send_account_tags
 WHERE tag_id = (SELECT id FROM tags WHERE name = 'fresh_start')
 AND send_account_id = (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('lifecycle_user1'));
 
@@ -200,7 +204,7 @@ SELECT ok(EXISTS(
 ), 'Deleting non-main tag does not affect main tag');
 
 -- Test 14: Tags deleted out of order still maintain proper succession
-DELETE FROM send_account_tags 
+DELETE FROM send_account_tags
 WHERE tag_id = (SELECT id FROM tags WHERE name = 'succession_b')  -- Delete middle tag
 AND send_account_id = (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('lifecycle_user1'));
 
@@ -213,8 +217,8 @@ SELECT ok(EXISTS(
 
 -- Test 15: Final cleanup leaves system in valid state
 SELECT ok(
-    (SELECT COUNT(*) FROM send_account_tags sat 
-     JOIN send_accounts sa ON sa.id = sat.send_account_id 
+    (SELECT COUNT(*) FROM send_account_tags sat
+     JOIN send_accounts sa ON sa.id = sat.send_account_id
      WHERE sa.user_id = tests.get_supabase_uid('lifecycle_user1')) >= 1,
     'User still has at least one tag association after all operations'
 );

@@ -73,16 +73,17 @@ $$;
 
 ALTER FUNCTION "public"."handle_send_account_tags_deleted"() OWNER TO "postgres";
 
+-- Create function to prevent deletion of last confirmed tag
 CREATE OR REPLACE FUNCTION public.prevent_last_confirmed_tag_deletion()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+    SET search_path TO 'public'
+    AS $$
 BEGIN
     -- Check if this deletion would leave the user with zero confirmed tags
     -- Only prevent deletion if the tag being deleted is confirmed AND it's the last one
-    IF (SELECT status FROM tags WHERE id = OLD.tag_id) = 'confirmed' THEN
+    IF current_setting('role')::text = 'authenticated' AND
+        (SELECT status FROM tags WHERE id = OLD.tag_id) = 'confirmed' THEN
         -- Count remaining confirmed tags after this deletion
         IF (SELECT COUNT(*)
             FROM send_account_tags sat
@@ -96,8 +97,8 @@ BEGIN
 
     RETURN OLD;
 END;
-$function$
-;
+$$;
+
 
 ALTER FUNCTION "public"."prevent_last_confirmed_tag_deletion"() OWNER TO "postgres";
 
