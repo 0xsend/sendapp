@@ -11,7 +11,7 @@ import {
   Container,
 } from '@my/ui'
 import { HomeButtons } from '../features/home/HomeButtons'
-import { useScrollDirection } from '../provider/scroll'
+import { useScrollDirection } from '../provider/scroll/ScrollDirectionContext'
 import { ProfileButtons } from 'app/features/profile/ProfileButtons'
 import { useUser } from 'app/utils/useUser'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
