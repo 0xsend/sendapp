@@ -12,6 +12,8 @@ import {
   Sheet,
   Button,
   H3,
+  Adapt,
+  Dialog,
 } from '@my/ui'
 import { IconPlus, IconSlash, IconBadgeCheck } from 'app/components/icons'
 import { maxNumSendTags } from 'app/data/sendtags'
@@ -220,54 +222,105 @@ function MainTagSelectionSheet({
     await updateMainTag({ tagId })
   }
 
-  return (
-    <Sheet
-      modal
-      dismissOnOverlayPress
-      dismissOnSnapToBottom
-      open={open}
-      onOpenChange={onOpenChange}
-      snapPoints={[60]}
-      position={0}
-      zIndex={100_000}
-    >
-      <Sheet.Overlay />
-      <Sheet.Handle bc="$color12" o={0.3} />
-      <Sheet.Frame>
-        <Sheet.ScrollView p="$4" gap="$4">
-          <YStack gap="$4" pb="$4">
-            <H3 ta="center">Select Main Tag</H3>
-            <Paragraph ta="center" size="$3" color="$color11">
-              Choose which tag appears as your primary identity
-            </Paragraph>
-            <YStack gap="$2" mt="$4">
-              {tags.map((tag) => {
-                const isCurrentMain = tag.id === currentMainTagId
-                return (
-                  <Button
-                    key={tag.id}
-                    size="$5"
-                    br="$4"
-                    theme={isCurrentMain ? 'green' : 'gray'}
-                    disabled={isCurrentMain || isPending}
-                    onPress={() => handleSelectTag(tag.id)}
-                    icon={
-                      <XStack gap="$3" ai="center" f={1}>
-                        <IconSlash size="$1.5" />
-                        <Paragraph size="$5" fontWeight="500" f={1}>
-                          {tag.name}
-                        </Paragraph>
-                        {isCurrentMain && <IconBadgeCheck size="$1" color="$color12" />}
-                      </XStack>
-                    }
-                    pressStyle={{ o: 0.8 }}
-                  />
+  const content = (
+    <YStack gap="$4" pb="$4">
+      <H3 ta="center">Select Main Tag</H3>
+      <Paragraph ta="center" size="$3" color="$color11">
+        Choose which tag appears as your primary identity
+      </Paragraph>
+      <YStack gap="$2" mt="$4">
+        {tags.map((tag) => {
+          const isCurrentMain = tag.id === currentMainTagId
+          return (
+            <Button
+              key={tag.id}
+              size="$5"
+              br="$4"
+              theme={isCurrentMain ? 'green' : 'gray'}
+              disabled={isCurrentMain || isPending}
+              onPress={() => handleSelectTag(tag.id)}
+              icon={
+                isPending ? (
+                  <Spinner size="small" color="$color11" />
+                ) : (
+                  <XStack gap="$3" ai="center" f={1}>
+                    <IconSlash size="$1.5" />
+                    <Paragraph size="$5" fontWeight="500" f={1}>
+                      {tag.name}
+                    </Paragraph>
+                    {isCurrentMain && <IconBadgeCheck size="$1" color="$color12" />}
+                  </XStack>
                 )
-              })}
-            </YStack>
-          </YStack>
-        </Sheet.ScrollView>
-      </Sheet.Frame>
-    </Sheet>
+              }
+              pressStyle={{ o: 0.8 }}
+            />
+          )
+        })}
+      </YStack>
+      {isPending && (
+        <XStack ai="center" jc="center" gap="$2" mt="$2">
+          <Spinner size="small" color="$primary" />
+          <Paragraph size="$3" color="$color11">
+            Updating main tag...
+          </Paragraph>
+        </XStack>
+      )}
+    </YStack>
+  )
+
+  return (
+    <Dialog modal open={open} onOpenChange={onOpenChange}>
+      <Adapt when="sm" platform="touch">
+        <Sheet
+          modal
+          dismissOnOverlayPress
+          dismissOnSnapToBottom
+          open={open}
+          onOpenChange={onOpenChange}
+          snapPoints={[60]}
+          position={0}
+          zIndex={100_000}
+        >
+          <Sheet.Overlay />
+          <Sheet.Handle bc="$color12" o={0.3} />
+          <Sheet.Frame>
+            <Sheet.ScrollView p="$4" gap="$4">
+              {content}
+            </Sheet.ScrollView>
+          </Sheet.Frame>
+        </Sheet>
+      </Adapt>
+
+      <Dialog.Portal>
+        <Dialog.Overlay
+          key="overlay"
+          animation="quick"
+          o={0.5}
+          enterStyle={{ o: 0 }}
+          exitStyle={{ o: 0 }}
+        />
+        <Dialog.Content
+          bordered
+          elevate
+          key="content"
+          animation={[
+            'quick',
+            {
+              opacity: {
+                overshootClamping: true,
+              },
+            },
+          ]}
+          enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
+          exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
+          gap="$4"
+          maxWidth={450}
+          width="90%"
+          p="$4"
+        >
+          {content}
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog>
   )
 }
