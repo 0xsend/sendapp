@@ -7,11 +7,11 @@ import { CoinsProvider } from './coins'
 import { OnchainKitProvider } from './onchainkit'
 import { QueryClientProvider } from './react-query'
 import { SafeAreaProvider } from './safe-area'
-import { ScrollDirectionProvider } from './scroll'
 import { TamaguiProvider } from './tamagui'
 import { UniversalThemeProvider } from './theme'
 import { ToastProvider } from './toast'
 import { WagmiProvider } from './wagmi'
+import ScrollDirectionProvider from 'app/provider/scroll/ScrollDirectionProvider'
 
 export { loadThemePromise } from './theme/UniversalThemeProvider'
 

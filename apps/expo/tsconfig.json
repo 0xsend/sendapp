@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.base",
   "include": [
     "app",
+    "components",
     "utils",
     "types.d.ts",
     "../../packages/ui",

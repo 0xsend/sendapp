@@ -1,7 +1,7 @@
 import { Container, ScrollView, type ScrollViewProps, YStack, PendingIndicatorBar } from '@my/ui'
 import { HomeSideBarWrapper } from 'app/components/sidebar/HomeSideBar'
 import { TagSearchProvider } from 'app/provider/tag-search'
-import { useScrollDirection } from 'app/provider/scroll'
+import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 import { BOTTOM_NAV_BAR_HEIGHT } from 'app/components/BottomTabBar/BottomNavBar'
 import { BottomNavBarWrapper } from 'app/components/BottomTabBar/BottomNavBarWrapper'
 import { useRouteChange } from 'app/routers/useRouteChange.web'

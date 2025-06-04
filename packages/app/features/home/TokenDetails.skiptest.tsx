@@ -3,7 +3,7 @@ import { TamaguiProvider, config } from '@my/ui'
 import { usdcCoin } from 'app/data/coins'
 import { TokenDetails } from './TokenDetails'
 import { act, render, screen } from '@testing-library/react-native'
-import { ScrollDirectionProvider } from 'app/provider/scroll'
+import ScrollDirectionProvider from 'app/provider/scroll/ScrollDirectionProvider'
 
 jest.mock('app/features/home/utils/useTokenActivityFeed')
 

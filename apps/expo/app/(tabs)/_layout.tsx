@@ -1,18 +1,55 @@
 import { useTheme, XStack } from '@my/ui'
-import { Activity, DollarSign, Home } from '@tamagui/lucide-icons'
-import { IconSendLogo } from 'app/components/icons'
+
+import {
+  IconArrowUp,
+  IconDeviceReset,
+  IconHome,
+  IconSendLogo,
+  IconWorldSearch,
+} from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
-import { Stack, Tabs, Redirect } from 'expo-router'
-import { useSafeAreaInsets } from '@my/ui'
+import { Redirect, Stack, Tabs } from 'expo-router'
 import AvatarMenuButton from 'app/components/AvatarMenuButton/AvatarMenuButton'
+import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
+import { Animated } from 'react-native'
+import { useEffect, useRef } from 'react'
+import { useTabBarSize } from 'apps-expo/utils/layout/useTabBarSize'
+import { useHighlightColor } from 'apps-expo/utils/layout/useHighlightColor'
+
+const TABS = [
+  {
+    Icon: IconHome,
+    key: 'index',
+  },
+  {
+    Icon: IconArrowUp,
+    key: 'send',
+  },
+  {
+    Icon: IconWorldSearch,
+    key: 'explore',
+  },
+  {
+    Icon: IconDeviceReset,
+    key: 'activity',
+  },
+]
 
 export default function Layout() {
   const theme = useTheme()
-  const accentColor = theme.color10
-  const backgroundColor = theme.background || theme.color1
-
+  const { direction } = useScrollDirection()
   const { session, profile } = useUser()
-  const insets = useSafeAreaInsets()
+  const { height, padding } = useTabBarSize()
+  const translateY = useRef(new Animated.Value(0)).current
+  const highlightColor = useHighlightColor()
+
+  useEffect(() => {
+    Animated.timing(translateY, {
+      toValue: direction === 'down' ? height : 0,
+      duration: 250,
+      useNativeDriver: true,
+    }).start()
+  }, [direction, height, translateY])
 
   // Redirect to root if not logged in - this ensures the tabs layout is only shown for logged-in users
   if (!session) {
@@ -32,9 +69,9 @@ export default function Layout() {
           headerShown: true,
           headerShadowVisible: false,
           headerStyle: {
-            backgroundColor: backgroundColor.val,
+            backgroundColor: theme.background.val,
           },
-          headerTintColor: accentColor.val,
+          headerTintColor: theme.color12.val,
           headerRight: () => <AvatarMenuButton profile={profile} />,
         }}
       />
@@ -42,55 +79,42 @@ export default function Layout() {
         screenOptions={{
           tabBarShowLabel: false,
           headerShown: false, // Hide tab headers - use Stack.Screen header instead
-          headerTintColor: accentColor.val,
+          headerTintColor: theme.color12.val,
           tabBarStyle: {
-            paddingTop: 10,
-            paddingBottom: insets.bottom + 10, // reduce bottom padding
-            height: 60,
-            alignContent: 'center',
-            justifyContent: 'center',
+            position: 'absolute',
+            transform: [{ translateY }],
+            paddingTop: padding,
+            paddingBottom: padding,
+            height,
             borderTopWidth: 1,
-            borderTopColor: '$borderColor',
-          },
-          tabBarItemStyle: {
-            paddingBottom: 10,
+            backgroundColor: theme.color1.val,
           },
         }}
       >
-        <Tabs.Screen
-          name="index"
-          key="index"
-          options={{
-            headerShown: false,
-            title: 'Home',
-            tabBarIcon: ({ size, color, focused }) => (
-              <Home color={focused ? '$color12' : '$color10'} size={size} strokeWidth={2} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="activity"
-          key="activity"
-          options={{
-            headerShown: false,
-            title: 'Activity',
-            tabBarIcon: ({ size, color, focused }) => (
-              <Activity color={focused ? '$color12' : '$color10'} size={size} strokeWidth={2} />
-            ),
-          }}
-        />
-
-        <Tabs.Screen
-          name="earn"
-          key="earn"
-          options={{
-            headerShown: false,
-            title: 'Earn',
-            tabBarIcon: ({ size, color, focused }) => (
-              <DollarSign color={focused ? '$color12' : '$color10'} size={size} strokeWidth={2} />
-            ),
-          }}
-        />
+        {TABS.map((tab) => {
+          return (
+            <Tabs.Screen
+              name={tab.key}
+              key={tab.key}
+              options={{
+                headerShown: false,
+                tabBarIcon: ({ focused }) => (
+                  <XStack
+                    p={'$2'}
+                    br={'$3'}
+                    backgroundColor={focused ? highlightColor : 'transparent'}
+                  >
+                    <tab.Icon
+                      size={'$1.5'}
+                      color={focused ? '$primary' : '$silverChalice'}
+                      $theme-light={{ color: focused ? '$color12' : '$darkGrayTextField' }}
+                    />
+                  </XStack>
+                ),
+              }}
+            />
+          )
+        })}
       </Tabs>
     </>
   )

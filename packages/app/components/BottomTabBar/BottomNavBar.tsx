@@ -2,7 +2,7 @@ import { IconArrowUp, IconDeviceReset, IconHome, IconWorldSearch } from 'app/com
 import { Button, LinearGradient, LinkableButton, XStack, Card } from '@my/ui'
 import { usePathname } from 'app/utils/usePathname'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
-import { useScrollDirection } from 'app/provider/scroll'
+import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 
 const TABS = [
   {
