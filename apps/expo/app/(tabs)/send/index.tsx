@@ -1,10 +1,10 @@
-import { HomeScreen } from 'app/features/home/screen'
+import { SendScreen as SendMainScreen } from 'app/features/send/screen'
 import { TabScreenContainer } from 'apps-expo/components/layout/TabScreenContainer'
 
-export default function HomeTabScreen() {
+export default function SendScreen() {
   return (
     <TabScreenContainer>
-      <HomeScreen />
+      <SendMainScreen />
     </TabScreenContainer>
   )
 }

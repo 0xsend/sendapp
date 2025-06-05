@@ -22,11 +22,10 @@ More info here: https://info.send.it/send-docs
 
 ## What are we currently working on?
 1. Send UX: improve our onboarding, UX, and our SEND token experiences.
-3. Send Earn - earn through Moonwell and Morpho immutable vaults
-4. Send Swaps - swap between assets
-5. Send Card - spend stables with a debit card
-6. Send Pot - play simple onchain consumer games.
-7. Send Interporability: add EOA support with EIP-7702 and SuperchainERC20 support
+2. iOS and Android Apps
+3. Send Card - spend stables with a debit card
+4. Virtual Accounts - US Banking Checking and Routing number
+5. Private p2p transactions on Canton
 
 ## Contributing
 

@@ -13,7 +13,7 @@ import {
 import { type PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react'
 import type { Functions } from '@my/supabase/database.types'
 import { toNiceError } from 'app/utils/toNiceError'
-import { useScrollDirection } from 'app/provider/scroll'
+import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 import {
   dataProviderMaker,
   type Dimension,

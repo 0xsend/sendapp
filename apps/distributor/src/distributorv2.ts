@@ -401,6 +401,8 @@ export class DistributorV2Worker {
         if (!multiplierInfo) continue
 
         // Apply multiplier logic
+        // Skip verifications with 0 weight
+        if (weight === 0) continue
         if (weight === 1) {
           if (multiplierInfo.value === undefined) {
             multiplierInfo.value = multiplierInfo.min

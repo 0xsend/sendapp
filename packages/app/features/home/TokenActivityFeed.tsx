@@ -7,7 +7,7 @@ import {
 import type { PostgrestError } from '@supabase/postgrest-js'
 import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
 import { useQueryClient } from '@tanstack/react-query'
-import { useScrollDirection } from 'app/provider/scroll'
+import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 import type { Activity } from 'app/utils/zod/activity'
 import { isTemporalSendEarnDepositEvent } from 'app/utils/zod/activity'
 import { Events } from 'app/utils/zod/activity/events'

@@ -408,7 +408,8 @@ BEGIN
                     LEFT JOIN profiles p ON p.id = r.referred_id
                     LEFT JOIN tags t ON t.user_id = r.referred_id
             WHERE
-                r.referrer_id = auth.uid()
+                r.referrer_id = (SELECT auth.uid())
+                AND t.status = 'confirmed'::tag_status
             ORDER BY
                 r.referred_id,
                 t.created_at DESC)

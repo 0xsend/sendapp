@@ -25,7 +25,7 @@ This provider creates a React context that exposes:
 The provider should be included in your app's provider tree:
 
 ```tsx
-import { ScrollDirectionProvider } from 'app/provider/scroll'
+import { ScrollDirectionProvider } from 'app/provider/scroll/'
 
 function App() {
   return (
@@ -41,7 +41,7 @@ function App() {
 Use the `useScrollDirection` hook to access scroll information:
 
 ```tsx
-import { useScrollDirection } from 'app/provider/scroll'
+import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 
 function MyComponent() {
   const { direction, isAtEnd, onScroll, onContentSizeChange, ref } = useScrollDirection()
@@ -130,7 +130,7 @@ On native, the provider:
 ### Hiding Bottom Navigation on Scroll
 
 ```tsx
-import { useScrollDirection } from 'app/provider/scroll'
+import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 import { XStack } from 'tamagui'
 
 export const BottomNavBar = () => {
@@ -152,7 +152,7 @@ export const BottomNavBar = () => {
 ### Infinite Scroll Implementation
 
 ```tsx
-import { useScrollDirection } from 'app/provider/scroll'
+import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 import { FlatList } from 'react-native'
 
 export const InfiniteList = ({ fetchNextPage, hasNextPage, isFetchingNextPage, data }) => {

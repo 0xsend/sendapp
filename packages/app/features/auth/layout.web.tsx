@@ -1,7 +1,7 @@
 import { Container, Link, YStack, XStack, ScrollView } from '@my/ui'
 import { IconSendLogo } from 'app/components/icons'
 import type { ReactNode } from 'react'
-import { useScrollDirection } from 'app/provider/scroll'
+import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 
 export function AuthLayout({ children }: { children: ReactNode }) {
   const { onScroll, onContentSizeChange, ref } = useScrollDirection()
