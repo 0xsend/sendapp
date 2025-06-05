@@ -637,7 +637,7 @@ BEGIN
         END,
         t.created_at
     FROM tags t
-    INNER JOIN tag_receipt tr ON t.name = tr.tag_name;
+    INNER JOIN tag_receipts tr ON t.name = tr.tag_name;
 END;
 $$ LANGUAGE plpgsql;
 
