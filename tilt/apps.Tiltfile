@@ -101,14 +101,6 @@ local_resource(
 )
 
 local_resource(
-    "caddy:web",
-    auto_init = not CI,
-    labels = labels,
-    serve_cmd = "caddy run --watch --config ../dev.Caddyfile",
-    trigger_mode = TRIGGER_MODE_MANUAL,
-)
-
-local_resource(
     "workers",
     allow_parallel = True,
     labels = labels,
