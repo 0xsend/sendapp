@@ -68,7 +68,6 @@
               pkgs.unstable.fnm
               pkgs.unstable.jq
               pkgs.unstable.yj
-              pkgs.unstable.caddy
               pkgs.unstable.tilt
               pkgs.unstable.temporal-cli
               pkgs.unstable.ripgrep
