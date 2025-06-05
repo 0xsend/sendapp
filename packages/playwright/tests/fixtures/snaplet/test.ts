@@ -131,6 +131,7 @@ export const setupReferrer = async (seed: SeedClient): Promise<Referrer> => {
   assert(!!referrer, 'profile not found')
   assert(!!referrer.referral_code, 'referral code not found')
   assert(!!referrerSendAccount, 'referrer send account not found')
+  assert(referrerTags.length > 0, 'referrer should have at least one tag')
   return { referrer, referrerSendAccount, referrerTags } as {
     referrer: { referral_code: string; send_id: number; id: string }
     referrerSendAccount: { address: `0x${string}` }

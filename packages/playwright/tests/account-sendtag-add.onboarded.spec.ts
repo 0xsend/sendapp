@@ -125,6 +125,6 @@ test('cannot confirm a tag without paying', async ({ addSendtagsPage, supabase }
 
   log('cannot confirm a tag without paying', { tagName }, error)
   expect(error).toBeTruthy()
-  expect(error?.code).toBe('42501')
   expect(error?.message).toBe('permission denied for function confirm_tags')
+  expect(error?.code).toBe('42501')
 })

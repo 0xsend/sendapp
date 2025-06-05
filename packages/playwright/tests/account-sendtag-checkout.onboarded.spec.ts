@@ -42,6 +42,21 @@ const addPendingTags = async (supabase: SupabaseClient<Database>, tagNames: stri
   expect(sendAccount).toBeTruthy()
   assert(!!sendAccount?.id, 'Send account id should be defined')
 
+  // Check current tag count
+  const { data: currentTags } = await supabase
+    .from('send_account_tags')
+    .select('tag_id')
+    .eq('send_account_id', sendAccount.id)
+
+  const currentTagCount = currentTags?.length || 0
+  const totalTagsAfterAdd = currentTagCount + tagNames.length
+
+  if (totalTagsAfterAdd > 5) {
+    throw new Error(
+      `Cannot add ${tagNames.length} tags. User already has ${currentTagCount} tags, and limit is 5.`
+    )
+  }
+
   // Create each tag using RPC
   for (const tagName of tagNames) {
     const { error } = await supabase.rpc('create_tag', {
@@ -88,6 +103,7 @@ const setupReferral = async (
   assert(!!referrer, 'profile not found')
   assert(!!referrer.referral_code, 'referral code not found')
   assert(!!referrerSendAccount, 'referrer send account not found')
+  assert(referrerTags.length > 0, 'referrer should have at least one tag')
   return { referrer, referrerSendAccount, referrerTags } as {
     referrer: { referral_code: string; send_id: number; id: string }
     referrerSendAccount: { address: `0x${string}` }

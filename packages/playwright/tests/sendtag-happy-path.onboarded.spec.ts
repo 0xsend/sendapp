@@ -22,8 +22,8 @@ const debugAuthSession = async (page: Page) => {
   log('user authenticated', `id=${decoded.sub}`, `session=${decoded.session_id}`)
 }
 
-// Helper to generate valid tag names
-const generateTagName = () => faker.string.alphanumeric({ length: { min: 6, max: 12 } })
+// Helper to generate valid tag names (accounting for prefixes in tests)
+const generateTagName = () => faker.string.alphanumeric({ length: { min: 6, max: 15 } })
 
 test.beforeEach(async ({ page }) => {
   log = debug(`test:sendtag-happy-path:${test.info().parallelIndex}`)
