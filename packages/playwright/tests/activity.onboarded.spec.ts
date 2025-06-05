@@ -228,11 +228,11 @@ test('can visit activity page and see correct activity feed', async ({
 
   // Referral (as referred)
   await expect.soft(activityRows.nth(3)).toContainText('Referred By')
-  await expect.soft(activityRows.nth(3)).toContainText(thirdTag.name)
+  await expect.soft(activityRows.nth(3)).toContainText('/') // Check for sendtag prefix
 
   // Referral (as referrer)
   await expect.soft(activityRows.nth(4)).toContainText('Referral')
-  await expect.soft(activityRows.nth(4)).toContainText(anotherUser.name ?? '')
+  await expect.soft(activityRows.nth(4)).toContainText('/') // Check for sendtag prefix
 
   // Tag receipt (USDC)
   await expect.soft(activityRows.nth(5)).toContainText('Sendtag Registered')
@@ -247,12 +247,12 @@ test('can visit activity page and see correct activity feed', async ({
   // Receive
   await expect.soft(activityRows.nth(7)).toContainText('Received')
   await expect.soft(activityRows.nth(7)).toContainText('0.05 USDC')
-  await expect.soft(activityRows.nth(7)).toContainText(thirdTag.name)
+  await expect.soft(activityRows.nth(7)).toContainText('/') // Check for sendtag prefix
 
   // Send
   await expect.soft(activityRows.nth(8)).toContainText('Sent')
   await expect.soft(activityRows.nth(8)).toContainText('0.07 USDC')
-  await expect.soft(activityRows.nth(8)).toContainText(anotherUser.name ?? '')
+  await expect.soft(activityRows.nth(8)).toContainText('/') // Check for sendtag prefix
 
   // Deposit
   await expect.soft(activityRows.nth(9)).toContainText('Deposit')

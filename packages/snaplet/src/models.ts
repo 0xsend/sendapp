@@ -10,16 +10,6 @@ import { hexToBytes } from 'viem'
 import { generatePrivateKey, privateKeyToAddress } from 'viem/accounts'
 import { pravatar, tagName } from './utils'
 
-// Counter to ensure unique tag names across multiple seed invocations
-let tagCounter = 0
-
-// Generate a unique suffix for tag names
-function getUniqueTagSuffix(): string {
-  const timestamp = Date.now().toString(36).slice(-4)
-  const count = (tagCounter++).toString(36)
-  return `${timestamp}${count}`
-}
-
 export const models: SeedClientOptions['models'] = {
   users: {
     data: {
@@ -65,15 +55,11 @@ export const models: SeedClientOptions['models'] = {
   send_account_tags: {
     data: {
       tag_id: (ctx) => {
-        // Get the index of the current send_account_tags being created
-        const currentIndex = ctx.store.send_account_tags?.length || 0
-        // Get all available tags
+        // Get the first (and only) tag for this user
         const tags = ctx.store.tags
         if (!tags || tags.length === 0) throw new Error('No tags found')
-        // Use modulo to cycle through available tags if creating more send_account_tags than tags
-        const tagIndex = currentIndex % tags.length
-        const tag = tags[tagIndex]
-        if (!tag?.id) throw new Error(`No tag found at index ${tagIndex}`)
+        const tag = tags[0]
+        if (!tag?.id) throw new Error('No tag found')
         return tag.id
       },
       send_account_id: (ctx) => {
@@ -131,18 +117,10 @@ export const userOnboarded: usersInputs = {
       },
       status: 'confirmed',
     },
-    {
-      name: (ctx) => {
-        const username = copycat.username(ctx.seed, { limit: 5 })
-        const randomSuffix = Math.random().toString(36).substring(2, 6)
-        return tagName(`x${username}_${randomSuffix}`).toLowerCase().substring(0, 20)
-      },
-      status: 'confirmed',
-    },
   ],
   send_accounts: [
     {
-      send_account_tags: (x) => x(2), // Match the number of tags created (2)
+      send_account_tags: (x) => x(1), // Match the number of tags created (1)
     },
   ],
   profiles: [
