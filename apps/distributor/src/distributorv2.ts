@@ -293,6 +293,7 @@ export class DistributorV2Worker {
     const { data: sendSlash, error: sendSlashError } = await fetchSendSlash(distribution)
 
     if (sendSlashError) {
+      log.error(sendSlashError, 'Error fetching send slash data')
       throw sendSlashError
     }
 
@@ -344,8 +345,102 @@ export class DistributorV2Worker {
       })
     }
 
-    // Calculate fixed pool share weights
+    // Calculate initial hodler rewards using full distribution amount
     const distAmt = BigInt(distribution.amount)
+    let initialHodlerShares: { address: string; amount: bigint }[] = []
+
+    // Initial hodler reward calculation
+    const endDate = new Date(distribution.qualification_end)
+    const currentDate = new Date() > endDate ? endDate : new Date()
+    const hoursInMonth = getHoursInMonth(currentDate)
+    const currentHour = getCurrentHourInMonth(currentDate)
+
+    // Calculate time adjustment for initial amounts using full distribution amount
+    const hourlyHodlerAmount = (distAmt * PERC_DENOM) / BigInt(hoursInMonth)
+    const timeAdjustedAmount =
+      (hourlyHodlerAmount * BigInt(currentHour + 1)) / PERC_DENOM > distAmt
+        ? distAmt
+        : (hourlyHodlerAmount * BigInt(currentHour + 1)) / PERC_DENOM
+
+    // Calculate initial slashed balances
+    const initialSlashedBalances = minBalanceAddresses
+      .map((balance) => {
+        const userId = hodlerUserIdByAddress[balance.address] ?? ''
+        const address = balance.address
+
+        // Check for tag registration verification
+        const verifications = verificationsByUserId[userId] || []
+        const hasPurchasedTag = verifications.some(
+          (v) => v.type === 'tag_registration' && v.weight > 0
+        )
+
+        const sendCeilingData = sendCeilingByUserId[userId]
+        let slashPercentage = 0n
+
+        if (sendCeilingData && sendCeilingData.weight > 0n && hasPurchasedTag) {
+          const previousReward =
+            previousSharesByUserId[userId] || BigInt(distribution.hodler_min_balance)
+          const scaledPreviousReward =
+            (previousReward * PERC_DENOM) / (BigInt(sendSlash.scaling_divisor) * PERC_DENOM)
+
+          const scaledWeight = sendCeilingData.weight * PERC_DENOM
+          const cappedWeight =
+            scaledWeight > scaledPreviousReward ? scaledPreviousReward : scaledWeight
+
+          slashPercentage = (cappedWeight * PERC_DENOM) / scaledPreviousReward
+        }
+
+        const slashedBalance = ((BigInt(balance.balance) * slashPercentage) / PERC_DENOM).toString()
+
+        return {
+          address,
+          balance: slashedBalance,
+        }
+      })
+      .filter((balance) => BigInt(balance.balance) >= BigInt('0'))
+
+    if (log.isLevelEnabled('debug')) {
+      await Bun.write(
+        'dist/initialSlashedBalances.json',
+        JSON.stringify(initialSlashedBalances, jsonBigint, 2)
+      ).catch((e) => {
+        log.error(e, 'Error writing initialSlashedBalances.json')
+      })
+    }
+
+    // Calculate initial weighted shares
+    const initialWeightedShares = calculateWeights(
+      initialSlashedBalances,
+      timeAdjustedAmount,
+      Mode.EaseInOut
+    )
+
+    initialHodlerShares = initialSlashedBalances.map((balance) => ({
+      address: balance.address,
+      amount: initialWeightedShares[balance.address]?.amount || 0n,
+    }))
+
+    log.info(
+      {
+        hoursInMonth,
+        currentHour,
+        hourlyHodlerAmount,
+        timeAdjustedAmount,
+        fullAmount: distAmt,
+      },
+      'Initial time-based hodler pool calculations'
+    )
+
+    // Create lookup for initial hodler amounts (add this before fixed pool calculation)
+    const initialHodlerAmountByAddress = initialHodlerShares.reduce(
+      (acc, share) => {
+        acc[share.address] = share.amount
+        return acc
+      },
+      {} as Record<string, bigint>
+    )
+
+    // Calculate fixed pool share weights
     const fixedPoolAvailableAmount = distAmt
 
     const minBalanceByAddress: Record<string, bigint> = minBalanceAddresses.reduce(
@@ -370,6 +465,9 @@ export class DistributorV2Worker {
       )
 
       if (!hasPurchasedTag) continue
+
+      // Get initial hodler amount - default to 0 if not found
+      const initialHodlerAmount = initialHodlerAmountByAddress[address] || 0n
 
       let userFixedAmount = 0n
       const multipliers: Record<string, Multiplier> = {}
@@ -449,6 +547,16 @@ export class DistributorV2Worker {
         }
       } else {
         amount = 0n
+      }
+
+      if (amount > initialHodlerAmount) {
+        if (log.isLevelEnabled('debug')) {
+          log.debug(
+            { address, original: amount, capped: initialHodlerAmount },
+            'Fixed reward capped by hodler amount'
+          )
+        }
+        amount = initialHodlerAmount
       }
 
       if (fixedPoolAllocatedAmount + amount <= fixedPoolAvailableAmount) {
