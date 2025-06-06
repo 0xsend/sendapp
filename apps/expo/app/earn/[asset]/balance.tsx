@@ -2,16 +2,16 @@ import { Stack as StackRouter } from 'expo-router/build/layouts/Stack'
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
 import { Paragraph } from '@my/ui'
 
-export default function CryptoDepositScreen() {
+export default function BalanceAssetSavingsScreen() {
   return (
     <>
       <StackRouter.Screen
         options={{
-          title: 'Deposit on Base',
+          title: 'Savings Balance',
         }}
       />
       <ScreenContainer>
-        <Paragraph>CryptoDepositScreen</Paragraph>
+        <Paragraph>BalanceAssetSavingsScreen</Paragraph>
       </ScreenContainer>
     </>
   )

@@ -1,14 +1,9 @@
 import { Container, ScrollView } from '@my/ui'
 import type { PropsWithChildren } from 'react'
-import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
-import { useTabBarSize } from 'apps-expo/utils/layout/useTabBarSize'
 
 const CONTAINER_OFFSET = 10
 
-export const TabScreenContainer = ({ children }: PropsWithChildren) => {
-  const { onScroll } = useScrollDirection()
-  const { height } = useTabBarSize()
-
+export const ScreenContainer = ({ children }: PropsWithChildren) => {
   return (
     <Container
       safeAreaProps={{
@@ -23,12 +18,11 @@ export const TabScreenContainer = ({ children }: PropsWithChildren) => {
         contentContainerStyle={{
           flexGrow: 1,
           paddingTop: CONTAINER_OFFSET,
-          paddingBottom: height + CONTAINER_OFFSET * 2,
+          paddingBottom: CONTAINER_OFFSET,
         }}
         showsVerticalScrollIndicator={false}
         bounces={true}
         overScrollMode="always" // Android scroll indicator
-        onScroll={onScroll}
       >
         {children}
       </ScrollView>
