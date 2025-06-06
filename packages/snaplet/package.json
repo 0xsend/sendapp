@@ -13,6 +13,8 @@
   },
   "scripts": {
     "lint": "tsc",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
+    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' jest --watch",
     "seed": "DRY=0 bunx tsx ./bin/seed.ts",
     "restore": "bun run ./bin/snaplet.ts --restore",
     "sync": "bunx @snaplet/snapshot config generate && bunx @snaplet/seed sync",
@@ -23,6 +25,8 @@
     "@snaplet/seed": "^0.98.0",
     "@snaplet/snapshot": "^0.93.2",
     "@types/pg": "^8",
+    "jest": "^29",
+    "ts-jest": "^29",
     "typescript": "^5.8.3",
     "zx": "^8.1.2"
   },
