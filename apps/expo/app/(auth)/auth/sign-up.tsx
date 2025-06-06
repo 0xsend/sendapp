@@ -1,10 +1,10 @@
 import { SignUpScreen } from 'app/features/auth/sign-up/screen'
-import { AuthLayout } from 'app/features/auth/layout'
+import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
 
 export default function Screen() {
   return (
-    <AuthLayout>
+    <ScreenContainer>
       <SignUpScreen />
-    </AuthLayout>
+    </ScreenContainer>
   )
 }
