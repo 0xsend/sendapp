@@ -1,5 +1,5 @@
 import { useUser } from 'app/utils/useUser'
-import { Redirect } from 'expo-router'
+import { Redirect, Stack } from 'expo-router'
 import { Container, YStack } from '@my/ui'
 import { SplashScreen } from 'app/features/splash/screen'
 import { AuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
@@ -88,27 +88,34 @@ export default function Index() {
 
   // If user is not logged in, show the splash screen
   return (
-    <AuthCarouselContext.Provider
-      value={{
-        carouselImages,
-        setCarouselImages,
-        carouselProgress,
-        setCarouselProgress,
-      }}
-    >
-      <Container
-        safeAreaProps={{
-          edges: ['left', 'right', 'bottom'],
-          style: { flex: 1, backgroundColor: 'black' },
+    <>
+      <Stack.Screen
+        options={{
+          headerShown: false,
         }}
-        flex={1}
-        backgroundColor="black"
-        px="$0"
+      />
+      <AuthCarouselContext.Provider
+        value={{
+          carouselImages,
+          setCarouselImages,
+          carouselProgress,
+          setCarouselProgress,
+        }}
       >
-        <YStack flex={1} jc="center" ai="center" f={1} backgroundColor="black">
-          <SplashScreen />
-        </YStack>
-      </Container>
-    </AuthCarouselContext.Provider>
+        <Container
+          safeAreaProps={{
+            edges: ['left', 'right', 'bottom'],
+            style: { flex: 1, backgroundColor: 'black' },
+          }}
+          flex={1}
+          backgroundColor="black"
+          px="$0"
+        >
+          <YStack flex={1} jc="center" ai="center" f={1} backgroundColor="black">
+            <SplashScreen />
+          </YStack>
+        </Container>
+      </AuthCarouselContext.Provider>
+    </>
   )
 }
