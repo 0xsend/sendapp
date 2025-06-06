@@ -1,9 +1,9 @@
-import { copycat, faker } from '@snaplet/copycat'
+import { copycat } from '@snaplet/copycat'
 import type {
   leaderboard_referrals_all_timeInputs,
+  SeedClient,
   SeedClientOptions,
   usersInputs,
-  Store,
 } from '@snaplet/seed'
 import crypto from 'node:crypto'
 import { hexToBytes } from 'viem'
@@ -134,4 +134,169 @@ export const userOnboarded: usersInputs = {
     },
   ],
   chain_addresses: [{}],
+}
+
+/**
+ * Creates a user input config with specified number of confirmed tags
+ * @param tagCount Number of confirmed tags to create (1-5)
+ * @param tagNames Optional specific tag names to use (must match tagCount length)
+ * @returns usersInputs configuration
+ */
+export const createUserWithConfirmedTags = (tagCount = 1, tagNames?: string[]): usersInputs => {
+  if (tagCount < 1 || tagCount > 5) {
+    throw new Error('Tag count must be between 1 and 5')
+  }
+
+  if (tagNames && tagNames.length !== tagCount) {
+    throw new Error(`tagNames length (${tagNames.length}) must match tagCount (${tagCount})`)
+  }
+
+  const tags = Array.from({ length: tagCount }, (_, index) => ({
+    name: tagNames
+      ? tagNames[index]
+      : (ctx: { seed: string }) => {
+          const username = copycat.username(ctx.seed + index, { limit: 7 })
+          const randomSuffix = Math.random().toString(36).substring(2, 6)
+          return tagName(`${username}_${randomSuffix}_${index}`).toLowerCase().substring(0, 20)
+        },
+    status: 'confirmed' as const,
+  }))
+
+  return {
+    phone: (ctx) => {
+      const phone = copycat.phoneNumber(ctx.seed, {
+        length: {
+          min: 7,
+          max: 15,
+        },
+      })
+      return phone.replace('+', '')
+    },
+    email: (ctx) => copycat.email(ctx.seed),
+    tags,
+    send_accounts: [
+      {
+        send_account_tags: (x) => x(tagCount), // Match the number of tags created
+      },
+    ],
+    profiles: [
+      {
+        referral_code: (ctx) => crypto.randomBytes(8).toString('hex'),
+        x_username: null,
+        is_public: true,
+        name: (ctx) => copycat.fullName(ctx.seed),
+        about: (ctx) => copycat.sentence(ctx.seed),
+        send_id: (ctx) => copycat.int(ctx.seed, { min: 10000, max: 99999 }),
+      },
+    ],
+    chain_addresses: [{}],
+  }
+}
+
+/**
+ * Creates a user with tags and send account tags using the seed client
+ * @param seed SeedClient instance
+ * @param options Configuration options for user creation
+ * @returns Promise with created user data
+ */
+export const createUserWithTagsAndAccounts = async (
+  seed: SeedClient,
+  options: {
+    tagCount?: number
+    tagNames?: string[]
+    referralCode?: string
+    isPublic?: boolean
+  } = {}
+) => {
+  const { tagCount = 1, tagNames, referralCode, isPublic = true } = options
+
+  const userConfig = createUserWithConfirmedTags(tagCount, tagNames)
+
+  // Override profile settings if provided
+  if (referralCode !== undefined || isPublic !== undefined) {
+    const existingProfile = userConfig.profiles?.[0] || {}
+    userConfig.profiles = [
+      {
+        ...existingProfile,
+        ...(referralCode !== undefined && { referral_code: referralCode }),
+        ...(isPublic !== undefined && { is_public: isPublic }),
+      },
+    ]
+  }
+
+  const plan = await seed.users([userConfig])
+
+  if (!plan.users[0] || !plan.profiles[0] || !plan.send_accounts[0]) {
+    throw new Error('Failed to create user with tags and accounts')
+  }
+
+  return {
+    user: plan.users[0],
+    profile: plan.profiles[0],
+    tags: plan.tags,
+    sendAccount: plan.send_accounts[0],
+    sendAccountTags: plan.send_account_tags,
+    chainAddresses: plan.chain_addresses,
+  }
+}
+
+/**
+ * Creates multiple users with confirmed tags and send account tags
+ * @param seed SeedClient instance
+ * @param users Array of user configurations
+ * @returns Promise with array of created user data
+ */
+export const createMultipleUsersWithTags = async (
+  seed: SeedClient,
+  users: Array<{
+    tagCount?: number
+    tagNames?: string[]
+    referralCode?: string
+    isPublic?: boolean
+  }>
+) => {
+  const userConfigs = users.map((user) => createUserWithConfirmedTags(user.tagCount, user.tagNames))
+
+  // Apply custom profile settings
+  for (let index = 0; index < users.length; index++) {
+    const user = users[index]
+    if (!user || (user.referralCode === undefined && user.isPublic === undefined)) {
+      continue
+    }
+
+    const config = userConfigs[index]
+    if (!config) continue
+
+    const existingProfile = config.profiles?.[0] || {}
+    config.profiles = [
+      {
+        ...existingProfile,
+        ...(user.referralCode !== undefined && { referral_code: user.referralCode }),
+        ...(user.isPublic !== undefined && { is_public: user.isPublic }),
+      },
+    ]
+  }
+
+  const plan = await seed.users(userConfigs)
+
+  return users.map((_, index) => {
+    const user = plan.users[index]
+    const sendAccount = plan.send_accounts[index]
+    const profile = plan.profiles[index]
+
+    if (!user || !sendAccount || !profile) {
+      throw new Error(`Failed to create user ${index}`)
+    }
+
+    return {
+      user,
+      profile,
+      tags: plan.tags.filter((tag) => tag.user_id === user.id),
+      sendAccount,
+      sendAccountTags: plan.send_account_tags.filter(
+        (sat) => sat.send_account_id === sendAccount.id
+      ),
+      chainAddresses: plan.chain_addresses.filter((_, caIndex) => caIndex === index),
+    }
+  })
 }
