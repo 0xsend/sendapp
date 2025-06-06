@@ -1,19 +1,12 @@
-import { Container } from '@my/ui'
 import { SendConfirmScreen } from 'app/features/send/confirm/screen'
+import { TabScreenContainer } from 'apps-expo/components/layout/TabScreenContainer'
 
 export default function SendConfirm() {
   return (
     <>
-      <Container
-        safeAreaProps={{
-          edges: ['bottom', 'left', 'right'],
-          style: { flex: 1 },
-        }}
-        flex={1}
-        backgroundColor="$background"
-      >
+      <TabScreenContainer>
         <SendConfirmScreen />
-      </Container>
+      </TabScreenContainer>
     </>
   )
 }

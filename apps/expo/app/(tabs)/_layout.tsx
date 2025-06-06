@@ -1,4 +1,4 @@
-import { useTheme, XStack } from '@my/ui'
+import { Paragraph, useTheme, XStack } from '@my/ui'
 
 import {
   IconArrowUp,
@@ -15,23 +15,32 @@ import { Animated } from 'react-native'
 import { useEffect, useRef } from 'react'
 import { useTabBarSize } from 'apps-expo/utils/layout/useTabBarSize'
 import { useHighlightColor } from 'apps-expo/utils/layout/useHighlightColor'
+import { HeaderSlot } from 'apps-expo/components/layout/HeaderSlot'
 
 const TABS = [
   {
     Icon: IconHome,
     key: 'index',
+    title: () => (
+      <XStack ai="center" jc="flex-start" f={1}>
+        <IconSendLogo size={'$2'} color={'$color12'} />
+      </XStack>
+    ),
   },
   {
     Icon: IconArrowUp,
     key: 'send',
+    title: 'Send',
   },
   {
     Icon: IconWorldSearch,
-    key: 'explore',
+    key: 'explore/index',
+    title: 'Explore',
   },
   {
     Icon: IconDeviceReset,
-    key: 'activity',
+    key: 'activity/index',
+    title: 'Activity',
   },
 ]
 
@@ -60,25 +69,16 @@ export default function Layout() {
     <>
       <Stack.Screen
         options={{
-          title: '/send',
-          headerTitle: () => (
-            <XStack ai="center" jc="flex-start" f={1}>
-              <IconSendLogo size={'$2'} color={'$color12'} />
-            </XStack>
-          ),
-          headerShown: true,
-          headerShadowVisible: false,
-          headerStyle: {
-            backgroundColor: theme.background.val,
-          },
-          headerTintColor: theme.color12.val,
-          headerRight: () => <AvatarMenuButton profile={profile} />,
+          headerShown: false,
         }}
       />
       <Tabs
         screenOptions={{
           tabBarShowLabel: false,
-          headerShown: false, // Hide tab headers - use Stack.Screen header instead
+          headerStyle: {
+            backgroundColor: theme.background.val,
+          },
+          headerShadowVisible: false,
           headerTintColor: theme.color12.val,
           tabBarStyle: {
             position: 'absolute',
@@ -97,7 +97,30 @@ export default function Layout() {
               name={tab.key}
               key={tab.key}
               options={{
-                headerShown: false,
+                headerLeft: () => {
+                  if (typeof tab.title === 'string') {
+                    return (
+                      <HeaderSlot>
+                        <Paragraph
+                          fontWeight={'300'}
+                          fontSize={'$8'}
+                          col="$color10"
+                          lineHeight={32}
+                        >
+                          {tab.title}
+                        </Paragraph>
+                      </HeaderSlot>
+                    )
+                  }
+
+                  return <HeaderSlot>{tab.title()}</HeaderSlot>
+                },
+                headerTitle: () => null,
+                headerRight: () => (
+                  <HeaderSlot>
+                    <AvatarMenuButton profile={profile} />
+                  </HeaderSlot>
+                ),
                 tabBarIcon: ({ focused }) => (
                   <XStack
                     p={'$2'}

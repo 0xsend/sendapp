@@ -112,9 +112,6 @@ export const StablesBalanceCard = (props: CardProps) => {
         })()}
         <LinkableButton
           als="flex-end"
-          onPress={(e) => {
-            e.stopPropagation()
-          }}
           href="/deposit"
           p={'$4'}
           w={'100%'}

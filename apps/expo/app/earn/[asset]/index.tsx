@@ -2,17 +2,17 @@ import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
 import { Stack as StackRouter } from 'expo-router'
 import { Link, Paragraph } from '@my/ui'
 
-export default function TradeScreen() {
+export default function SavingsAssetScreen() {
   return (
     <>
       <StackRouter.Screen
         options={{
-          title: 'Trade',
+          title: 'Savings',
         }}
       />
       <ScreenContainer>
-        <Paragraph>TradeScreen</Paragraph>
-        <Link href={'/trade/summary'}>summary</Link>
+        <Paragraph>SavingsAssetScreen</Paragraph>
+        <Link href={'/earn/usdc'}>crypto</Link>
       </ScreenContainer>
     </>
   )
