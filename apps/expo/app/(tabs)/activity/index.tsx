@@ -1,11 +1,11 @@
 import { Paragraph } from '@my/ui'
 import { TabScreenContainer } from 'apps-expo/components/layout/TabScreenContainer'
-import { Stack as StackRouter } from 'expo-router/build/layouts/Stack'
+import { Stack } from 'expo-router/build/layouts/Stack'
 
 export default function ActivityTabScreen() {
   return (
     <>
-      <StackRouter.Screen
+      <Stack.Screen
         options={{
           title: 'Activity',
         }}

@@ -1,11 +1,11 @@
-import { Stack as StackRouter } from 'expo-router/build/layouts/Stack'
+import { Stack } from 'expo-router/build/layouts/Stack'
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
 import { Paragraph } from '@my/ui'
 
 export default function SuccessDepositScreen() {
   return (
     <>
-      <StackRouter.Screen
+      <Stack.Screen
         options={{
           title: 'Success Deposit',
         }}

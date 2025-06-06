@@ -1,11 +1,11 @@
-import { Stack as StackRouter } from 'expo-router'
+import { Stack } from 'expo-router'
 import { Link, Paragraph } from '@my/ui'
 import { TabScreenContainer } from 'apps-expo/components/layout/TabScreenContainer'
 
 export default function ExploreScreen() {
   return (
     <>
-      <StackRouter.Screen
+      <Stack.Screen
         options={{
           title: 'Explore',
         }}

@@ -1,11 +1,11 @@
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
-import { Stack as StackRouter } from 'expo-router'
+import { Stack } from 'expo-router'
 import { Link, Paragraph } from '@my/ui'
 
 export default function SavingsAssetScreen() {
   return (
     <>
-      <StackRouter.Screen
+      <Stack.Screen
         options={{
           title: 'Savings',
         }}
