@@ -125,7 +125,7 @@ CREATE POLICY "select_policy" ON "public"."send_account_tags"
         FROM
             send_accounts sa
         WHERE
-            sa.id = send_account_id AND sa.user_id = auth.uid()));
+            sa.id = send_account_id AND sa.user_id = (select auth.uid())));
 
 CREATE POLICY "delete_policy" ON "public"."send_account_tags"
     FOR DELETE
@@ -135,7 +135,7 @@ CREATE POLICY "delete_policy" ON "public"."send_account_tags"
         FROM
             send_accounts sa
         WHERE
-            sa.id = send_account_id AND sa.user_id = auth.uid()));
+            sa.id = send_account_id AND sa.user_id = (select auth.uid())));
 
 -- Grants
 GRANT ALL ON TABLE "public"."send_account_tags" TO "anon";

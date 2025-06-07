@@ -427,7 +427,7 @@ for delete
 to public
 using ((EXISTS ( SELECT 1
    FROM send_accounts sa
-  WHERE ((sa.id = send_account_tags.send_account_id) AND (sa.user_id = auth.uid())))));
+  WHERE ((sa.id = send_account_tags.send_account_id) AND (sa.user_id = (select auth.uid()))))));
 
 
 create policy "select_policy"
@@ -437,7 +437,7 @@ for select
 to public
 using ((EXISTS ( SELECT 1
    FROM send_accounts sa
-  WHERE ((sa.id = send_account_tags.send_account_id) AND (sa.user_id = auth.uid())))));
+  WHERE ((sa.id = send_account_tags.send_account_id) AND (sa.user_id = (select auth.uid()))))));
 
 CREATE TRIGGER send_account_tags_deleted AFTER DELETE ON public.send_account_tags FOR EACH ROW EXECUTE FUNCTION handle_send_account_tags_deleted();
 
