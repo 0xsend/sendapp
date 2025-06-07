@@ -27,6 +27,8 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
     "to_user": {
       "avatar_url": null,
       "id": "97476407-bf7f-4ebe-86aa-c9d18a0b388a",
+      "main_tag_id": 1,
+      "main_tag_name": "asdf",
       "name": null,
       "send_id": 65244,
       "tags": [
@@ -61,6 +63,8 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
     "from_user": {
       "avatar_url": null,
       "id": "97476407-bf7f-4ebe-86aa-c9d18a0b388a",
+      "main_tag_id": 1,
+      "main_tag_name": "asdf",
       "name": null,
       "send_id": 65244,
       "tags": [
@@ -82,6 +86,8 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
     "from_user": {
       "avatar_url": null,
       "id": "97476407-bf7f-4ebe-86aa-c9d18a0b388a",
+      "main_tag_id": 1,
+      "main_tag_name": "asdf",
       "name": null,
       "send_id": 65244,
       "tags": [
@@ -93,6 +99,8 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
     "to_user": {
       "avatar_url": "https://i.pravatar.cc/500?u=Hortense Ratke",
       "id": null,
+      "main_tag_id": 2,
+      "main_tag_name": "disconnect_whorl7351",
       "name": "Mr. Dan Conn",
       "send_id": 12530,
       "tags": [
@@ -119,6 +127,8 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
     "from_user": {
       "avatar_url": null,
       "id": "97476407-bf7f-4ebe-86aa-c9d18a0b388a",
+      "main_tag_id": null,
+      "main_tag_name": null,
       "name": null,
       "send_id": 55617,
       "tags": null,
@@ -144,6 +154,8 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
     "from_user": {
       "avatar_url": null,
       "id": "97476407-bf7f-4ebe-86aa-c9d18a0b388a",
+      "main_tag_id": null,
+      "main_tag_name": null,
       "name": null,
       "send_id": 55617,
       "tags": null,
@@ -175,6 +187,8 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
     "from_user": {
       "avatar_url": null,
       "id": "97476407-bf7f-4ebe-86aa-c9d18a0b388a",
+      "main_tag_id": 1,
+      "main_tag_name": "asdf",
       "name": null,
       "send_id": 65244,
       "tags": [
@@ -186,6 +200,8 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
     "to_user": {
       "avatar_url": "https://i.pravatar.cc/500?u=Hortense Ratke",
       "id": null,
+      "main_tag_id": 1,
+      "main_tag_name": "dan",
       "name": "Mr. Dan Conn",
       "send_id": 12530,
       "tags": [
@@ -217,6 +233,8 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
     "from_user": {
       "avatar_url": null,
       "id": null,
+      "main_tag_id": null,
+      "main_tag_name": null,
       "name": null,
       "send_id": 65244,
       "tags": null,
@@ -224,6 +242,8 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
     "to_user": {
       "avatar_url": null,
       "id": "97476407-bf7f-4ebe-86aa-c9d18a0b388a",
+      "main_tag_id": 1,
+      "main_tag_name": "asdf",
       "name": null,
       "send_id": 65244,
       "tags": [
@@ -258,6 +278,8 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
     "from_user": {
       "avatar_url": null,
       "id": "97476407-bf7f-4ebe-86aa-c9d18a0b388a",
+      "main_tag_id": 1,
+      "main_tag_name": "asdf",
       "name": null,
       "send_id": 65244,
       "tags": [
@@ -292,6 +314,8 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
     "to_user": {
       "avatar_url": null,
       "id": "5def5ec4-7f0e-4509-990f-d52e85e95187",
+      "main_tag_id": null,
+      "main_tag_name": null,
       "name": null,
       "send_id": 64705,
       "tags": null,
@@ -322,6 +346,8 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
     "to_user": {
       "avatar_url": null,
       "id": "5c833c74-5a6c-461d-8612-b4982d7a7b51",
+      "main_tag_id": 1,
+      "main_tag_name": "asfd",
       "name": null,
       "send_id": 48,
       "tags": [
@@ -346,6 +372,8 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
     "from_user": {
       "avatar_url": null,
       "id": "5c833c74-5a6c-461d-8612-b4982d7a7b51",
+      "main_tag_id": 1,
+      "main_tag_name": "asfd",
       "name": null,
       "send_id": 48,
       "tags": [
@@ -373,6 +401,8 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
     "to_user": {
       "avatar_url": null,
       "id": "5c833c74-5a6c-461d-8612-b4982d7a7b51",
+      "main_tag_id": 1,
+      "main_tag_name": "asfd",
       "name": null,
       "send_id": 48,
       "tags": [

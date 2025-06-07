@@ -23,6 +23,7 @@ export const CheckoutForm = () => {
     router.replace('/account/sendtag')
   }
 
+  // Show checkout UI when we have pending tags
   return (
     <>
       <YStack gap="$5">

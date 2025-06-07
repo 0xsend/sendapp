@@ -1,10 +1,49 @@
-# snaplet
+# Snaplet Seed Package
 
 Snaplet is used for seeding our local development environment with production-like data. It is used both as a CLI tool and as a typescript library.
 
 > [!IMPORTANT]
 > The following commands should be run within the snaplet package directory.
 > `cd packages/snaplet`
+
+## New Features: User Creation with Tags
+
+This package now includes utilities for creating test users with confirmed tags and send account relationships. These are especially useful for testing scenarios that require users with specific tag configurations.
+
+### Quick Start
+
+```typescript
+import { createUserWithTagsAndAccounts, createMultipleUsersWithTags } from '@my/snaplet'
+
+// Create user with 3 confirmed tags
+const user = await createUserWithTagsAndAccounts(seedClient, { tagCount: 3 })
+
+// Create multiple users with different configurations
+const users = await createMultipleUsersWithTags(seedClient, [
+  { tagCount: 1, referralCode: 'referrer1' },
+  { tagCount: 2, tagNames: ['alice', 'alice_crypto'] }
+])
+```
+
+### API Reference
+
+- `createUserWithTagsAndAccounts(seed, options?)` - Creates a user with confirmed tags
+- `createMultipleUsersWithTags(seed, users[])` - Creates multiple users with different tag configs
+- `createUserWithConfirmedTags(tagCount?, tagNames?)` - Creates user configuration objects
+
+Options include `tagCount` (1-5), `tagNames`, `referralCode`, and `isPublic` settings.
+
+### Testing
+
+Run the comprehensive test suite:
+
+```bash
+yarn test
+```
+
+Tests verify database relationships, tag creation, and send account tag associations.
+
+---
 
 It seeds our database using two main methods:
 

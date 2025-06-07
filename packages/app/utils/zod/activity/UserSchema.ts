@@ -18,6 +18,14 @@ export const UserSchema = z.object({
    */
   send_id: z.number(),
   /**
+   * Confirmed main tag id
+   */
+  main_tag_id: z.number().nullable(),
+  /**
+   * Confirmed main tag name
+   */
+  main_tag_name: z.string().nullable(),
+  /**
    * Confirmed sendtags
    */
   tags: z.array(z.string()).nullable().default([]),

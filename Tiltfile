@@ -5,7 +5,7 @@ load("ext://dotenv", "dotenv")
 
 include("./tilt/preamble.tiltfile")
 
-require_tools("yarn", "docker", "jq", "yj", "forge", "anvil", "caddy", "node", "bun")
+require_tools("yarn", "docker", "jq", "yj", "forge", "anvil", "node", "bun")
 
 print(color.cyan("Config: " + str(CFG)))
 

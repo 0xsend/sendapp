@@ -1,21 +1,26 @@
 -- 2. Tag Creation
 BEGIN;
 
-SELECT plan(7);
+SELECT plan(6);
 
 CREATE EXTENSION "basejump-supabase_test_helpers";
 
 -- Creating a test user
 SELECT tests.create_supabase_user('tag_creator');
 
+-- Create send account for the user
+INSERT INTO send_accounts (user_id, address, chain_id, init_code)
+VALUES (
+    tests.get_supabase_uid('tag_creator'),
+    '0x1234567890123456789012345678901234567890',
+    8453,
+    '\\x00'
+);
+
 SELECT tests.authenticate_as('tag_creator');
 
--- Inserting a tag for test user and fetching it
-INSERT INTO tags (name, user_id)
-VALUES (
-    'test_tag',
-    tests.get_supabase_uid('tag_creator')
-);
+-- Creating a tag using create_tag function
+SELECT create_tag('test_tag', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('tag_creator')));
 
 SELECT results_eq(
     'SELECT status FROM tags WHERE name = ''test_tag''',
@@ -27,121 +32,88 @@ SELECT results_eq(
 SELECT results_eq(
     'SELECT status FROM tags WHERE name = ''TEST_TAG''',
     $$VALUES ('pending'::public.tag_status) $$,
-    'User should be able to create a tag with pending status'
+    'Tag names are case insensitive'
 );
 
--- Users can delete their own pending tags
-DELETE FROM tags
-WHERE name = 'test_tag';
+-- Users can delete their own tags through send_account_tags
+DELETE FROM send_account_tags 
+WHERE send_account_id = (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('tag_creator'))
+  AND tag_id = (SELECT id FROM tags WHERE name = 'test_tag');
 
 SELECT results_eq(
     $$SELECT COUNT(*)::integer
-    FROM tags
-    WHERE name = 'test_tag' $$,
+    FROM send_account_tags sat
+    JOIN send_accounts sa ON sa.id = sat.send_account_id
+    WHERE sa.user_id = tests.get_supabase_uid('tag_creator')
+      AND sat.tag_id = (SELECT id FROM tags WHERE name = 'test_tag') $$,
     $$VALUES (0) $$,
-    'Users can delete their own pending tags'
+    'Users can delete their own tag associations'
 );
 
--- User can create up to 5 tags
-INSERT INTO tags (name, user_id)
-VALUES (
-    'test_tag_1',
-    tests.get_supabase_uid('tag_creator')
-),
-(
-    'test_tag_2',
-    tests.get_supabase_uid('tag_creator')
-),
-(
-    'test_tag_3',
-    tests.get_supabase_uid('tag_creator')
-),
-(
-    'test_tag_4',
-    tests.get_supabase_uid('tag_creator')
-),
-(
-    'test_tag_5',
-    tests.get_supabase_uid('tag_creator')
-);
+-- User can create up to 5 tags per send account
+DO $$
+DECLARE 
+    send_account_id uuid;
+BEGIN
+    SELECT id INTO send_account_id FROM send_accounts WHERE user_id = tests.get_supabase_uid('tag_creator');
+    
+    PERFORM create_tag('test_tag_1', send_account_id);
+    PERFORM create_tag('test_tag_2', send_account_id);
+    PERFORM create_tag('test_tag_3', send_account_id);
+    PERFORM create_tag('test_tag_4', send_account_id);
+    PERFORM create_tag('test_tag_5', send_account_id);
+END $$;
 
 SELECT results_eq(
-    'SELECT COUNT(*)::integer FROM tags WHERE user_id = tests.get_supabase_uid(''tag_creator'')',
+    $$SELECT COUNT(*)::integer 
+    FROM send_account_tags sat
+    JOIN send_accounts sa ON sa.id = sat.send_account_id
+    WHERE sa.user_id = tests.get_supabase_uid('tag_creator') $$,
     $$VALUES (5) $$,
-    'User should be able to create up to 5 tags'
+    'User should be able to create up to 5 tags per send account'
 );
 
--- User cannot create more than 5 tags
+-- User cannot create more than 5 tags per send account
 SELECT throws_ok(
-    $$INSERT INTO tags(name, user_id)
-    VALUES (
-        'test_tag_6',
-        tests.get_supabase_uid('tag_creator')
-      ) $$,
+    $$SELECT create_tag('test_tag_6', (
+        SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('tag_creator')
+    )) $$,
     'User can have at most 5 tags',
-    'Users cannot create more than 5 tags'
+    'Users cannot create more than 5 tags per send account'
 );
 
-DELETE FROM tags;
+-- Clean up for next test
+DELETE FROM send_account_tags 
+WHERE send_account_id = (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('tag_creator'));
 
-SELECT throws_ok(
-    $$
-    INSERT INTO tags(name, user_id)
-    VALUES(
-        'test_tag_1',
-        tests.get_supabase_uid('tag_creator')
-      ),
-      (
-        'test_tag_2',
-        tests.get_supabase_uid('tag_creator')
-      ),
-      (
-        'test_tag_3',
-        tests.get_supabase_uid('tag_creator')
-      ),
-      (
-        'test_tag_4',
-        tests.get_supabase_uid('tag_creator')
-      ),
-      (
-        'test_tag_5',
-        tests.get_supabase_uid('tag_creator')
-      ),
-      (
-        'test_tag_6',
-        tests.get_supabase_uid('tag_creator')
-      );
-
-$$,
-    'User can have at most 5 tags',
-    'Users cannot create more than 5 tags'
-);
-
--- Pending tag more than 30 minutes old is claimable by any user
-INSERT INTO tags (name, user_id, status, created_at)
-VALUES (
-    'test_tag',
-    tests.get_supabase_uid('tag_creator'),
-    'pending'::public.tag_status,
-    now() - interval '31 minutes'
-);
-
-SELECT tests.create_supabase_user('tag_taker');
-
-SELECT tests.authenticate_as('tag_taker');
-
-INSERT INTO tags (name, user_id, status)
-VALUES (
-    'test_tag',
-    tests.get_supabase_uid('tag_taker'),
-    'pending'::public.tag_status
-);
+-- Test that available tags can be reused
+DO $$
+DECLARE 
+    send_account_id_var uuid;
+    reused_tag_id bigint;
+BEGIN
+    SELECT id INTO send_account_id_var FROM send_accounts WHERE user_id = tests.get_supabase_uid('tag_creator');
+    
+    -- Create tag
+    SELECT create_tag('reusable_tag', send_account_id_var) INTO reused_tag_id;
+    
+    -- Delete association (makes tag available)
+    DELETE FROM send_account_tags sat
+    WHERE sat.send_account_id = send_account_id_var AND sat.tag_id = reused_tag_id;
+    
+    -- Create tag with same name (should reuse)
+    PERFORM create_tag('reusable_tag', send_account_id_var);
+END $$;
 
 SELECT results_eq(
-    'SELECT status FROM tags WHERE name = ''test_tag''',
-    $$VALUES ('pending'::public.tag_status) $$,
-    'Pending tag more than 30 minutes old is claimable by any user'
+    $$SELECT COUNT(*)::integer 
+    FROM tags 
+    WHERE name = 'reusable_tag' $$,
+    $$VALUES (1) $$,
+    'Available tags are reused when creating tags with same name'
 );
+
+-- Test comment: Multiple send accounts per user not allowed by design
 
 SELECT finish();
 

@@ -89,7 +89,7 @@ export function ActivityAvatar({
             <Avatar size="$5" {...props}>
               <Avatar.Image
                 src={`https://ui-avatars.com/api/?name=${
-                  user?.name ?? user?.tags?.[0] ?? user?.send_id
+                  user?.name ?? user?.main_tag_name ?? user?.send_id
                 }&size=256&format=png&background=86ad7f`}
               />
             </Avatar>

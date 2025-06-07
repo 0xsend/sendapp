@@ -1,6 +1,6 @@
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
 import { test as webauthnTest } from '@my/playwright/fixtures/webauthn'
-import { userOnboarded } from '@my/snaplet'
+import { createUserWithTagsAndAccounts } from '@my/snaplet'
 import { expect, mergeTests } from '@playwright/test'
 import { sendCoin } from 'app/data/coins'
 import { assert } from 'app/utils/assert'
@@ -45,7 +45,7 @@ test('redirect on sign-in', async ({ page, pg }) => {
 
 test('redirect to send confirm page on sign-in', async ({ page, seed, pg }) => {
   const sendtag = generateSendtag()
-  const plan = await seed.users([userOnboarded])
+  const plan = await createUserWithTagsAndAccounts(seed)
   const tag = plan.tags[0]
   assert(!!tag?.name, 'tag not found')
 

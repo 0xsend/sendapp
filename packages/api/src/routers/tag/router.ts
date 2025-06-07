@@ -15,10 +15,54 @@ import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '../../trpc'
 import { SendtagSchema } from 'app/utils/zod/sendtag'
 import { SendtagAvailability } from './types'
+import type { Database } from '@my/supabase/database.types'
 
 const log = debug('api:routers:tag')
 
 export const tagRouter = createTRPCRouter({
+  create: protectedProcedure
+    .input(
+      z.object({
+        name: z.string(),
+      })
+    )
+    .mutation(async ({ ctx: { supabase }, input }) => {
+      // Get the user's send account
+      const { data: sendAccount, error: sendAccountError } = await supabase
+        .from('send_accounts')
+        .select('id')
+        .single()
+
+      if (sendAccountError || !sendAccount) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Send account not found',
+        })
+      }
+
+      const { error } = await supabase.rpc('create_tag', {
+        tag_name: input.name,
+        send_account_id: sendAccount.id,
+      })
+
+      if (error) {
+        console.error("Couldn't create Sendtag", error)
+        switch (error.code) {
+          case '23505':
+            throw new TRPCError({
+              code: 'CONFLICT',
+              message: 'This Sendtag is already taken',
+            })
+          default:
+            throw new TRPCError({
+              code: 'INTERNAL_SERVER_ERROR',
+              message: error.message ?? 'Something went wrong',
+            })
+        }
+      }
+
+      return { success: true }
+    }),
   checkAvailability: publicProcedure.input(SendtagSchema).mutation(async ({ input: { name } }) => {
     log('checking sendtag availability: ', { name })
 
@@ -50,66 +94,30 @@ export const tagRouter = createTRPCRouter({
     }
   }),
   registerFirstSendtag: protectedProcedure
-    .input(SendtagSchema)
-    .mutation(async ({ ctx: { supabase, session, referralCode }, input: { name } }) => {
+    .input(
+      z.object({
+        name: z.string(),
+        sendAccountId: z.string().uuid(),
+      })
+    )
+    .mutation(async ({ ctx: { supabase, referralCode }, input: { name, sendAccountId } }) => {
       try {
-        const supabaseAdmin = createSupabaseAdminClient()
+        // Use the atomic SQL function that handles everything in a single transaction
+        const { data: result, error } = await supabase.rpc('register_first_sendtag', {
+          tag_name: name,
+          send_account_id: sendAccountId,
+          _referral_code: referralCode,
+        })
 
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('*, tags(*)')
-          .eq('tags.status', 'confirmed')
-          .single()
-
-        if (profileError || !profile) {
-          throw new Error(profileError.message || 'Profile not found')
+        if (error) {
+          log('Error registering first sendtag: ', error)
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error.message,
+          })
         }
 
-        if (profile.tags.length > 0) {
-          throw new Error('First sendtag already registered')
-        }
-
-        const referrerProfileLookupResult = referralCode
-          ? await fetchReferrer({
-              supabase,
-              profile,
-              referral_code: referralCode,
-            }).catch((e) => {
-              const error = e as unknown as PostgrestError
-              if (error.code === 'PGRST116') {
-                return null
-              }
-              throw new Error(error.message || "Unable to fetch referrer's profile")
-            })
-          : null
-
-        const { error: insertError } = await supabaseAdmin
-          .from('tags')
-          .insert({ name, status: 'confirmed', user_id: session.user.id })
-
-        if (insertError) {
-          throw new Error(insertError.message || 'Unable to save tag')
-        }
-
-        if (referrerProfileLookupResult?.refcode) {
-          const { data: referrerProfile, error: referrerProfileError } = await supabaseAdmin
-            .from('profiles')
-            .select('*')
-            .eq('referral_code', referrerProfileLookupResult.refcode)
-            .single()
-
-          if (referrerProfileError || !referrerProfile) {
-            throw new Error(referrerProfileError.message || "Unable to fetch referrer's profile")
-          }
-
-          const { error: insertReferralError } = await supabaseAdmin
-            .from('referrals')
-            .insert({ referrer_id: referrerProfile.id, referred_id: session.user.id })
-
-          if (insertReferralError) {
-            throw new Error(insertReferralError.message || 'Unable to save referral')
-          }
-        }
+        return result
       } catch (error) {
         log('Error registering first sendtag: ', error)
         throw new TRPCError({
@@ -255,16 +263,31 @@ export const tagRouter = createTRPCRouter({
         })
       }
 
-      log('confirming tags', `event_id=${event_id}`)
+      // Get the send account directly from the database
+      const { data: sendAccount, error: sendAccountError } = await supabase
+        .from('send_accounts')
+        .select('id')
+        .eq('user_id', profile.id)
+        .single()
+
+      if (sendAccountError || !sendAccount) {
+        log('no send account found', sendAccountError)
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'No send account found',
+        })
+      }
+
+      log('confirming tags', `event_id=${event_id} send_account_id=${sendAccount.id}`)
 
       // confirm all pending tags and save the transaction receipt
       const supabaseAdmin = createSupabaseAdminClient()
       const { error: confirmTagsErr } = await supabaseAdmin.rpc('confirm_tags', {
         tag_names: pendingTags.map((t) => t.name),
-        event_id,
-        referral_code_input: referrerProfile?.refcode ?? '',
+        send_account_id: sendAccount.id,
+        _event_id: event_id,
+        _referral_code: referrerProfile?.refcode ?? '',
       })
-
       if (confirmTagsErr) {
         console.error('confirm tags error', confirmTagsErr)
         throw new TRPCError({
@@ -278,5 +301,70 @@ export const tagRouter = createTRPCRouter({
         pendingTags.map((t) => t.name)
       )
       return ''
+    }),
+  delete: protectedProcedure
+    .input(
+      z.object({
+        tagId: z.number(),
+      })
+    )
+    .mutation(async ({ ctx: { supabase }, input: { tagId } }) => {
+      const { data: profile } = await supabase.auth.getUser()
+      if (!profile.user) throw new TRPCError({ code: 'UNAUTHORIZED' })
+
+      // Get the user's send account
+      const { data: sendAccount, error: sendAccountError } = await supabase
+        .from('send_accounts')
+        .select('id, main_tag_id')
+        .eq('user_id', profile.user.id)
+        .single()
+
+      if (sendAccountError || !sendAccount) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Send account not found',
+        })
+      }
+
+      // Cannot delete main tag
+      if (sendAccount.main_tag_id === tagId) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Cannot delete main tag. Set a different main tag first.',
+        })
+      }
+
+      // Check if the tag belongs to the user's send account
+      const { data: sendAccountTag, error: tagError } = await supabase
+        .from('send_account_tags')
+        .select('*')
+        .eq('tag_id', tagId)
+        .eq('send_account_id', sendAccount.id)
+        .single()
+
+      if (tagError || !sendAccountTag) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Tag not found',
+        })
+      }
+
+      // Delete the send_account_tag association
+      // The database trigger will automatically handle tag status update and main tag succession
+      const { error: deleteError } = await supabase
+        .from('send_account_tags')
+        .delete()
+        .eq('tag_id', tagId)
+        .eq('send_account_id', sendAccount.id)
+
+      if (deleteError) {
+        console.error('Error deleting tag:', deleteError)
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: deleteError.message,
+        })
+      }
+
+      return { success: true }
     }),
 })
