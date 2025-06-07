@@ -459,14 +459,10 @@ export const sendAccountRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx: { supabase }, input: { tagId } }) => {
-      const { data: profile } = await supabase.auth.getUser()
-      if (!profile.user) throw new TRPCError({ code: 'UNAUTHORIZED' })
-
       // Leverage RLS - just try to update and let the database constraints and triggers handle validation
       const { data: result, error } = await supabase
         .from('send_accounts')
         .update({ main_tag_id: tagId })
-        .eq('user_id', profile.user.id)
         .select()
         .single()
 
