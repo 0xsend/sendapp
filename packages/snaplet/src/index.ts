@@ -5,9 +5,3 @@ export type StoreScalar<K extends keyof Store> = Store[K][number]
 
 export { tagName } from './utils'
 export * from './models'
-export {
-  createUserWithConfirmedTags,
-  createUserWithTagsAndAccounts,
-  createMultipleUsersWithTags,
-  createUserWithoutTags,
-} from './models'
