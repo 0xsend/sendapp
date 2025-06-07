@@ -37,10 +37,11 @@ export const models: SeedClientOptions['models'] = {
     data: {
       name: (ctx) => {
         // Generate a valid tag name (alphanumeric + underscore, max 20 chars)
-        // Use a random suffix to ensure uniqueness
-        const username = copycat.username(ctx.seed, { limit: 8 })
-        const randomSuffix = Math.random().toString(36).substring(2, 6)
-        return tagName(`${username}_${randomSuffix}`).toLowerCase().substring(0, 20)
+        // Use nano timestamp + random suffix to ensure uniqueness
+        const username = copycat.username(ctx.seed, { limit: 6 })
+        const nanoTime = process.hrtime.bigint().toString(36).slice(-6)
+        const randomSuffix = Math.random().toString(36).substring(2, 4)
+        return tagName(`${username}_${nanoTime}${randomSuffix}`).toLowerCase().substring(0, 20)
       },
       status: 'confirmed',
     },
@@ -111,9 +112,10 @@ export const userOnboarded: usersInputs = {
   tags: [
     {
       name: (ctx) => {
-        const username = copycat.username(ctx.seed, { limit: 7 })
-        const randomSuffix = Math.random().toString(36).substring(2, 6)
-        return tagName(`${username}_${randomSuffix}`).toLowerCase().substring(0, 20)
+        const username = copycat.username(ctx.seed, { limit: 6 })
+        const nanoTime = process.hrtime.bigint().toString(36).slice(-6)
+        const randomSuffix = Math.random().toString(36).substring(2, 4)
+        return tagName(`${username}_${nanoTime}${randomSuffix}`).toLowerCase().substring(0, 20)
       },
       status: 'confirmed',
     },
@@ -155,9 +157,10 @@ export const createUserWithConfirmedTags = (tagCount = 1, tagNames?: string[]): 
     name: tagNames
       ? tagNames[index]
       : (ctx: { seed: string }) => {
-          const username = copycat.username(ctx.seed + index, { limit: 7 })
-          const randomSuffix = Math.random().toString(36).substring(2, 6)
-          return tagName(`${username}_${randomSuffix}_${index}`).toLowerCase().substring(0, 20)
+          const username = copycat.username(ctx.seed + index, { limit: 6 })
+          const nanoTime = process.hrtime.bigint().toString(36).slice(-6)
+          const randomSuffix = Math.random().toString(36).substring(2, 4)
+          return tagName(`${username}_${nanoTime}${randomSuffix}`).toLowerCase().substring(0, 20)
         },
     status: 'confirmed' as const,
   }))
@@ -299,4 +302,61 @@ export const createMultipleUsersWithTags = async (
       chainAddresses: plan.chain_addresses.filter((_, caIndex) => caIndex === index),
     }
   })
+}
+
+/**
+ * Creates a user without any tags (for testing send ID functionality)
+ * @param seed SeedClient instance
+ * @param options Configuration options for user creation
+ * @returns Promise with created user data
+ */
+export const createUserWithoutTags = async (
+  seed: SeedClient,
+  options: {
+    referralCode?: string
+    isPublic?: boolean
+  } = {}
+) => {
+  const { referralCode, isPublic = true } = options
+
+  const userConfig: usersInputs = {
+    phone: (ctx) => {
+      const phone = copycat.phoneNumber(ctx.seed, {
+        length: {
+          min: 7,
+          max: 15,
+        },
+      })
+      return phone.replace('+', '')
+    },
+    email: (ctx) => copycat.email(ctx.seed),
+    tags: [], // No tags
+    send_accounts: [{}], // Create send account without tags
+    profiles: [
+      {
+        referral_code: referralCode || (() => crypto.randomBytes(8).toString('hex')),
+        x_username: null,
+        is_public: isPublic,
+        name: (ctx) => copycat.fullName(ctx.seed),
+        about: (ctx) => copycat.sentence(ctx.seed),
+        send_id: (ctx) => copycat.int(ctx.seed, { min: 10000, max: 99999 }),
+      },
+    ],
+    chain_addresses: [{}],
+  }
+
+  const plan = await seed.users([userConfig])
+
+  if (!plan.users[0] || !plan.profiles[0] || !plan.send_accounts[0]) {
+    throw new Error('Failed to create user without tags')
+  }
+
+  return {
+    user: plan.users[0],
+    profile: plan.profiles[0],
+    tags: plan.tags, // Will be empty
+    sendAccount: plan.send_accounts[0],
+    sendAccountTags: plan.send_account_tags, // Will be empty
+    chainAddresses: plan.chain_addresses,
+  }
 }

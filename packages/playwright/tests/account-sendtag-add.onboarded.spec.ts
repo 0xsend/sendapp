@@ -112,7 +112,7 @@ test('cannot add more than 5 tags', async ({ addSendtagsPage, supabase }) => {
   expect(error?.code).toBe('P0001')
 })
 
-test('cannot confirm a tag without paying', async ({ addSendtagsPage, supabase }) => {
+test('cannot confirm a tag without paying', async ({ addSendtagsPage, supabase, sendAccount }) => {
   const tagName = `${faker.lorem.word()}_${test.info().parallelIndex}`
   await addPendingTag(addSendtagsPage, tagName)
 
@@ -120,7 +120,7 @@ test('cannot confirm a tag without paying', async ({ addSendtagsPage, supabase }
     tag_names: [tagName],
     _event_id: '',
     _referral_code: '',
-    send_account_id: '123',
+    send_account_id: sendAccount.id,
   })
 
   log('cannot confirm a tag without paying', { tagName }, error)

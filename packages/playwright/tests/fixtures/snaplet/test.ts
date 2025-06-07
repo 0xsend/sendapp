@@ -1,4 +1,4 @@
-import { models, userOnboarded, type SeedClient } from '@my/snaplet'
+import { models, createUserWithTagsAndAccounts, type SeedClient } from '@my/snaplet'
 import { test as baseTest } from '@playwright/test'
 import { copycat } from '@snaplet/copycat'
 import { createSeedClient } from '@snaplet/seed'
@@ -124,9 +124,9 @@ type Referrer = {
  * Sets up a referrer user with a valid referral code and send account
  */
 export const setupReferrer = async (seed: SeedClient): Promise<Referrer> => {
-  const plan = await seed.users([userOnboarded])
-  const referrer = plan.profiles[0]
-  const referrerSendAccount = plan.send_accounts[0] as { address: `0x${string}` }
+  const plan = await createUserWithTagsAndAccounts(seed, { tagCount: 1 })
+  const referrer = plan.profile
+  const referrerSendAccount = plan.sendAccount as { address: `0x${string}` }
   const referrerTags = plan.tags.map((t) => t.name)
   assert(!!referrer, 'profile not found')
   assert(!!referrer.referral_code, 'referral code not found')

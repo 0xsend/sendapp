@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker'
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
-import { type SeedClient, userOnboarded } from '@my/snaplet'
+import { type SeedClient, createUserWithTagsAndAccounts } from '@my/snaplet'
 import type { Database } from '@my/supabase/database.types'
 import { usdcAddress } from '@my/wagmi'
 import { mergeTests, type Page } from '@playwright/test'
@@ -96,9 +96,9 @@ const setupReferral = async (
   referrerSendAccount: { address: `0x${string}` }
   referrerTags: string[]
 }> => {
-  const plan = await seed.users([userOnboarded])
-  const referrer = plan.profiles[0]
-  const referrerSendAccount = plan.send_accounts[0] as { address: `0x${string}` }
+  const plan = await createUserWithTagsAndAccounts(seed)
+  const referrer = plan.profile
+  const referrerSendAccount = plan.sendAccount as { address: `0x${string}` }
   const referrerTags = plan.tags.map((t) => t.name)
   assert(!!referrer, 'profile not found')
   assert(!!referrer.referral_code, 'referral code not found')
