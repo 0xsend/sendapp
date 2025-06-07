@@ -3,15 +3,13 @@ import {
   ButtonIcon,
   type ButtonProps,
   ButtonText,
+  LinkableButton,
   Paragraph,
   Spinner,
   Tooltip,
   useMedia,
   YStack,
   type YStackProps,
-  LinkableButton,
-  Text,
-  Input,
 } from '@my/ui'
 import { AlertTriangle } from '@tamagui/lucide-icons'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
