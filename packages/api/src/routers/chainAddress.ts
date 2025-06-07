@@ -47,7 +47,6 @@ export const chainAddressRouter = createTRPCRouter({
           user_id: session.user.id,
         })
         .select()
-        .returns<ChainAddress[]>()
 
       if (error) {
         if (error.message.includes('duplicate key value violates unique constraint'))
