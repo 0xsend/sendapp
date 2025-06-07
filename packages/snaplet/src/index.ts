@@ -9,4 +9,5 @@ export {
   createUserWithConfirmedTags,
   createUserWithTagsAndAccounts,
   createMultipleUsersWithTags,
+  createUserWithoutTags,
 } from './models'

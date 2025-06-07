@@ -1,4 +1,4 @@
-import { userOnboarded } from '@my/snaplet'
+import { createUserWithoutTags, createUserWithTagsAndAccounts } from '@my/snaplet'
 import { sendtagCheckoutAddress, usdcAddress } from '@my/wagmi'
 import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
@@ -35,15 +35,14 @@ test('can visit activity page and see correct activity feed', async ({
   sendAccount,
   seed,
 }) => {
-  const plan = await seed.users([
-    { ...userOnboarded, tags: [] }, // no tags
-    userOnboarded,
-  ])
-  const anotherUser = plan.profiles[0]
-  const anotherSendAccount = plan.send_accounts[0]
-  const thirdUser = plan.profiles[1]
-  const thirdSendAccount = plan.send_accounts[1]
-  const thirdTag = plan.tags[0]
+  const userWithoutTags = await createUserWithoutTags(seed)
+  const userWithTags = await createUserWithTagsAndAccounts(seed)
+
+  const anotherUser = userWithoutTags.profile
+  const anotherSendAccount = userWithoutTags.sendAccount
+  const thirdUser = userWithTags.profile
+  const thirdSendAccount = userWithTags.sendAccount
+  const thirdTag = userWithTags.tags[0]
 
   assert(!!anotherUser, 'another user not found')
   assert(!!anotherSendAccount, 'another send account not found')

@@ -1,5 +1,5 @@
 import { test } from '@my/playwright/fixtures/snaplet'
-import { userOnboarded } from '@my/snaplet/models'
+import { createUserWithTagsAndAccounts } from '@my/snaplet/models'
 import { expect, type Page } from '@playwright/test'
 import { assert } from 'app/utils/assert'
 import { ProfilePage } from './fixtures/profiles'
@@ -17,12 +17,12 @@ const visitProfile = async ({ page, tag }: { page: Page; tag: string }) => {
 }
 
 test('anon user can visit public profile', async ({ page, seed, pg }) => {
-  const plan = await seed.users([userOnboarded])
+  const plan = await createUserWithTagsAndAccounts(seed)
   const tag = plan.tags[0]
-  const account = plan.send_accounts[0]
+  const account = plan.sendAccount
   assert(!!tag, 'tag not found')
 
-  const profile = plan.profiles[0]
+  const profile = plan.profile
   assert(!!profile, 'profile not found')
   assert(!!profile.name, 'profile name not found')
   assert(!!profile.about, 'profile about not found')
@@ -38,14 +38,9 @@ test('anon user can visit public profile', async ({ page, seed, pg }) => {
 })
 
 test('anon user cannot visit private profile', async ({ page, seed, pg }) => {
-  const plan = await seed.users([
-    {
-      ...userOnboarded,
-      profiles: [{ is_public: false }],
-    },
-  ])
+  const plan = await createUserWithTagsAndAccounts(seed, { isPublic: false })
   const tag = plan.tags[0]
-  const account = plan.send_accounts[0]
+  const account = plan.sendAccount
   assert(!!tag, 'tag not found')
   assert(!!account, 'send account not found')
 
