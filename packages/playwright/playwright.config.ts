@@ -37,8 +37,8 @@ export default defineConfig({
   /* Useful for debugging */
   // timeout: 0,
   // globalTimeout: 0,
-  timeout: 60_000, // 60 seconds
-  globalTimeout: 30 * 60_000, // 30 minutes
+  // timeout: 60_000, // 60 seconds
+  // globalTimeout: 30 * 60_000, // 30 minutes
 
   testDir: './tests',
   /* Run tests in files in parallel */
