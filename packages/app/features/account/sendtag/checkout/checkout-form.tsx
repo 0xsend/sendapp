@@ -23,47 +23,6 @@ export const CheckoutForm = () => {
     router.replace('/account/sendtag')
   }
 
-  // FIXME: Need to create a new component for this and use the create tag mutation
-  // If no pending tags, show the tag creation form
-  // if (!pendingTags?.length) {
-  //   return (
-  //     <YStack gap="$4">
-  //       <RowLabel>Create New Tag</RowLabel>
-  //       <YStack gap="$2">
-  //         <Input
-  //           value={tagName}
-  //           onChangeText={(text) => {
-  //             setTagName(text)
-  //             setError(undefined)
-  //           }}
-  //           placeholder="Enter tag name"
-  //         />
-  //         {error && (
-  //           <Paragraph color="$error" size="$2">
-  //             {error}
-  //           </Paragraph>
-  //         )}
-  //       </YStack>
-  //       <XStack jc="flex-end">
-  //         <Button theme="active" onPress={handleCreateTag} disabled={createTag.isPending}>
-  //           {createTag.isPending ? (
-  //             <XStack gap="$2" ai="center">
-  //               <Spinner />
-  //               <ButtonText fontSize={'$4'} fontWeight={'500'}>
-  //                 Creating...
-  //               </ButtonText>
-  //             </XStack>
-  //           ) : (
-  //             <ButtonText fontSize={'$4'} fontWeight={'500'}>
-  //               Create Tag
-  //             </ButtonText>
-  //           )}
-  //         </Button>
-  //       </XStack>
-  //     </YStack>
-  //   )
-  // }
-
   // Show checkout UI when we have pending tags
   return (
     <>
