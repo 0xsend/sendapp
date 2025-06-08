@@ -31,9 +31,14 @@ alter table "public"."send_account_tags" enable row level security;
 
 alter table "public"."send_accounts" add column "main_tag_id" bigint;
 
-alter table "public"."tag_receipts" add column "tag_id" bigint not null;
+alter table "public"."tag_receipts" add column "tag_id" bigint;
 
 alter table "public"."tags" add column "id" bigint not null default nextval('tags_id_seq'::regclass);
+
+-- update tag_receipts to reference the new tag id
+update public.tag_receipts set tag_id = tag.id from public.tags tag where tag_receipts.tag_name = tag.name;
+
+alter table "public"."tag_receipts" alter column "tag_id" set not null;
 
 alter table "public"."tags" add column "updated_at" timestamp with time zone not null default now();
 
