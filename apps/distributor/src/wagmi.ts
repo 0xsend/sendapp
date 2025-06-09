@@ -8,6 +8,7 @@ import {
 } from '@my/wagmi'
 import { byteaToHex } from 'app/utils/byteaToHex'
 import { assert } from 'app/utils/assert'
+import type { Address } from 'viem'
 
 /**
  * Fetches the balances of all hodler addresses in qualification period
@@ -18,13 +19,13 @@ export async function fetchAllBalances({
   addresses,
   distribution,
 }: {
-  addresses: Array<{ user_id: string; address: `0x${string}` }>
+  addresses: Array<{ user_id: string; address: Address }>
   distribution: { number: number; chain_id: number; snapshot_block_num: number | null }
 }): Promise<
   {
     user_id: string
-    address: `0x${string}`
-    balance: string
+    address: Address
+    balance: bigint
   }[]
 > {
   const results = await baseMainnetClient.multicall({
@@ -44,7 +45,7 @@ export async function fetchAllBalances({
   return results.map((result, i) => {
     const { user_id, address } = addresses[i] ?? {}
     if (!user_id || !address) throw new Error('Invalid user_id or address')
-    const balance = String(result)
+    const balance = BigInt(result)
     return {
       user_id,
       address,
