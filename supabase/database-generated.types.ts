@@ -61,15 +61,7 @@ export type Database = {
           updated_at?: string
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "affiliate_stats_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       chain_addresses: {
         Row: {
@@ -257,6 +249,7 @@ export type Database = {
           claim_end: string
           created_at: string
           description: string | null
+          earn_min_balance: number
           fixed_pool_bips: number
           hodler_min_balance: number
           hodler_pool_bips: number
@@ -279,6 +272,7 @@ export type Database = {
           claim_end: string
           created_at?: string
           description?: string | null
+          earn_min_balance?: number
           fixed_pool_bips: number
           hodler_min_balance: number
           hodler_pool_bips: number
@@ -301,6 +295,7 @@ export type Database = {
           claim_end?: string
           created_at?: string
           description?: string | null
+          earn_min_balance?: number
           fixed_pool_bips?: number
           hodler_min_balance?: number
           hodler_pool_bips?: number
@@ -422,22 +417,7 @@ export type Database = {
           referred_id?: string
           referrer_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "referrals_referred_id_fkey"
-            columns: ["referred_id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "referrals_referrer_id_fkey"
-            columns: ["referrer_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       send_account_created: {
         Row: {
@@ -1636,6 +1616,14 @@ export type Database = {
           log_addr: string | null
           owner: string | null
           shares: number | null
+        }
+        Relationships: []
+      }
+      send_earn_balances_timeline: {
+        Row: {
+          balance: number | null
+          block_time: number | null
+          owner: string | null
         }
         Relationships: []
       }

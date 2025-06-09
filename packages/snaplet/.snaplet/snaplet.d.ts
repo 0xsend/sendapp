@@ -129,6 +129,7 @@ interface Table_public_distributions {
   token_addr: string | null;
   token_decimals: number | null;
   tranche_id: number;
+  earn_min_balance: number;
 }
 interface Table_realtime_extensions {
   id: string;
