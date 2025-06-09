@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router/build/layouts/Stack'
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
-import { Paragraph } from '@my/ui'
+import { EditProfile } from 'app/features/account/components/editProfile/screen'
 
 export default function ProfileScreen() {
   return (
@@ -11,7 +11,7 @@ export default function ProfileScreen() {
         }}
       />
       <ScreenContainer>
-        <Paragraph>profile screen</Paragraph>
+        <EditProfile />
       </ScreenContainer>
     </>
   )
