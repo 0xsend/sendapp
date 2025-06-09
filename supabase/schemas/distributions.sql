@@ -64,7 +64,8 @@ CREATE TABLE IF NOT EXISTS "public"."distributions" (
     "merkle_drop_addr" "bytea",
     "token_addr" "bytea",
     "token_decimals" numeric,
-    "tranche_id" integer NOT NULL
+    "tranche_id" integer NOT NULL,
+    "earn_min_balance" bigint NOT NULL DEFAULT 0
 );
 
 ALTER TABLE "public"."distributions" OWNER TO "postgres";

@@ -123,6 +123,7 @@ type Override = {
       token_addr?: string;
       token_decimals?: string;
       tranche_id?: string;
+      earn_min_balance?: string;
       distribution_shares?: string;
       distribution_verification_values?: string;
       distribution_verifications?: string;
@@ -853,6 +854,7 @@ export interface Fingerprint {
     chainId?: FingerprintNumberField;
     tokenDecimals?: FingerprintNumberField;
     trancheId?: FingerprintNumberField;
+    earnMinBalance?: FingerprintNumberField;
     distributionShares?: FingerprintRelationField;
     distributionVerificationValues?: FingerprintRelationField;
     distributionVerifications?: FingerprintRelationField;
