@@ -1,4 +1,6 @@
-type WeightedShare = { address: `0x${string}`; amount: bigint }
+import type { Address } from 'viem'
+
+type WeightedShare = { address: `0x${string}`; amount: bigint; userId: string }
 
 export enum Mode {
   Linear = 'linear',
@@ -22,15 +24,16 @@ export function calculatePercentageWithBips(value: bigint, bips: bigint) {
 export function calculateWeights(
   balances: readonly {
     address: `0x${string}`
-    balance: string
+    userId: string
+    balance: bigint
   }[],
   timeAdjustedAmount: bigint,
   mode: Mode = Mode.Linear
-): Record<string, WeightedShare> {
-  const poolWeights: Record<`0x${string}`, bigint> = {}
+): Record<Address, WeightedShare> {
+  const poolWeights: Record<Address, bigint> = {}
 
   // First calculate all slashed weights
-  const totalBalance = balances.reduce((acc, { balance }) => acc + BigInt(balance), 0n)
+  const totalBalance = balances.reduce((acc, { balance }) => acc + balance, 0n)
 
   for (const { address, balance } of balances) {
     poolWeights[address] = calculateWeightByMode(
@@ -42,11 +45,11 @@ export function calculateWeights(
   }
 
   // Calculate shares using the two sets of weights
-  const weightedShares: Record<string, WeightedShare> = {}
+  const weightedShares: Record<Address, WeightedShare> = {}
 
   const totalWeight = Object.values(poolWeights).reduce((acc, w) => acc + w, 0n)
 
-  for (const { address } of balances) {
+  for (const { address, userId } of balances) {
     const poolWeight = poolWeights[address] ?? 0n
 
     const amount = (poolWeight * timeAdjustedAmount) / totalWeight
@@ -54,6 +57,7 @@ export function calculateWeights(
     if (amount > 0n) {
       weightedShares[address] = {
         amount,
+        userId,
         address,
       }
     }
