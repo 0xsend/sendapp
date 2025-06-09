@@ -1,8 +1,8 @@
 import { Stack } from 'expo-router/build/layouts/Stack'
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
-import { Paragraph } from '@my/ui'
+import { PersonalInfoScreen } from 'app/features/account/components/personalInfo/screen'
 
-export default function PersonalInfoScreen() {
+export default function Screen() {
   return (
     <>
       <Stack.Screen
@@ -11,7 +11,7 @@ export default function PersonalInfoScreen() {
         }}
       />
       <ScreenContainer>
-        <Paragraph>personal info screen</Paragraph>
+        <PersonalInfoScreen />
       </ScreenContainer>
     </>
   )

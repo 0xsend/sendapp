@@ -23,6 +23,7 @@ import { adjustUTCDateForTimezone } from 'app/utils/dateHelper'
 import { SettingsHeader } from 'app/features/account/components/SettingsHeader'
 import { FieldWithLabel } from 'app/features/account/components/FieldWithLabel'
 import { ReadOnlyFieldWithLabel } from 'app/features/account/components/ReadOnlyFieldWithLabel'
+import { Platform } from 'react-native'
 
 enum FormState {
   Overview = 'Overview',
@@ -223,7 +224,7 @@ export const PersonalInfoScreen = () => {
   return (
     <YStack w={'100%'}>
       <YStack gap={'$3.5'}>
-        <SettingsHeader>Personal Information</SettingsHeader>
+        {Platform.OS === 'web' && <SettingsHeader>Personal Information</SettingsHeader>}
         <FormProvider {...form}>
           {(() => {
             switch (formState) {
