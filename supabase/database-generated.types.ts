@@ -2034,14 +2034,6 @@ export type Database = {
           vault: string
         }[]
       }
-      sum_qualification_sends: {
-        Args: { distribution_number: number }
-        Returns: {
-          user_id: string
-          amount: number
-          sent_to: string[]
-        }[]
-      }
       tag_search: {
         Args: { query: string; limit_val: number; offset_val: number }
         Returns: {

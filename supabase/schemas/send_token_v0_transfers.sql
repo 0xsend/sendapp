@@ -58,3 +58,7 @@ GRANT ALL ON TABLE "public"."send_token_v0_transfers" TO "service_role";
 GRANT ALL ON SEQUENCE "public"."send_token_v0_transfers_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."send_token_v0_transfers_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."send_token_v0_transfers_id_seq" TO "service_role";
+
+-- Triggers
+CREATE OR REPLACE TRIGGER "insert_verification_sends" AFTER INSERT ON "public"."send_token_v0_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."insert_verification_sends"();
+CREATE OR REPLACE TRIGGER "insert_verification_send_ceiling" AFTER INSERT ON "public"."send_token_v0_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."insert_verification_send_ceiling"();
