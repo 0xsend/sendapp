@@ -172,6 +172,15 @@ export default defineConfig({
       send_slash: ({ row }) => {
         return row
       },
+      send_earn_create: ({ row }) => {
+        return row
+      },
+      send_earn_deposit: ({ row }) => {
+        return row
+      },
+      send_earn_withdraw: ({ row }) => {
+        return row
+      },
     },
   },
 })
