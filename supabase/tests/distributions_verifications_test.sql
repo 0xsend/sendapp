@@ -1,29 +1,47 @@
 BEGIN;
-SELECT
-    plan(1);
+SELECT plan(4);
 
--- DO $$
--- BEGIN
---     raise notice 'All distributions %', array_agg(id) FROM distributions;
---     raise notice 'All verification types %', array_agg(type) FROM distribution_verification_values;
---     raise notice 'All distributions that have a verification value for each type %', array_agg(id) FROM distributions WHERE id in (select distinct distribution_id from distribution_verification_values where type in (SELECT unnest(enum_range(NULL::verification_type))));
--- END;
--- $$;
+-- Test distributions 1-6 (early distributions)
+SELECT results_eq(
+    $$SELECT array_agg(DISTINCT type ORDER BY type) FROM distribution_verification_values
+      WHERE distribution_id BETWEEN 1 AND 6$$,
+    $$SELECT array_agg(t ORDER BY t) FROM (
+        VALUES ('tag_referral'::verification_type), ('tag_registration'::verification_type)
+    ) as x(t)$$,
+    'Early distributions (1-6) should only have tag verification types'
+);
 
--- ensure every distribution has a verification value for each type
-select results_eq($$
-        select id from distributions
-    $$,
-    $$
-        select id from distributions
-        where id in (
-            select distinct distribution_id
-            from distribution_verification_values
-            where type in (SELECT unnest(enum_range(NULL::verification_type)))
-        )
-        order by id
-    $$, 'All distributions have a verification value for each type');
+-- Test distribution 7
+SELECT results_eq(
+    $$SELECT array_agg(DISTINCT type ORDER BY type) FROM distribution_verification_values
+      WHERE distribution_id = 7$$,
+    $$SELECT array_agg(t ORDER BY t) FROM (
+        SELECT t FROM unnest(enum_range(NULL::verification_type)) as t
+        WHERE t::text NOT IN ('send_streak', 'send_ceiling')
+    ) x$$,
+    'Distribution 7 should have all types except send_streak and send_ceiling'
+);
 
-SELECT
-    finish();
+-- Test distribution 8
+SELECT results_eq(
+    $$SELECT array_agg(DISTINCT type ORDER BY type) FROM distribution_verification_values
+      WHERE distribution_id = 8$$,
+    $$SELECT array_agg(t ORDER BY t) FROM (
+        SELECT t FROM unnest(enum_range(NULL::verification_type)) as t
+        WHERE t::text != 'send_ceiling'
+    ) x$$,
+    'Distribution 8 should have all types except send_ceiling'
+);
+
+-- Test distributions 9+
+SELECT results_eq(
+    $$SELECT array_agg(DISTINCT type ORDER BY type) FROM distribution_verification_values
+      WHERE distribution_id >= 9$$,
+    $$SELECT array_agg(t ORDER BY t) FROM (
+        SELECT DISTINCT t FROM unnest(enum_range(NULL::verification_type)) as t
+    ) x$$,
+    'Recent distributions (9+) should have all verification types'
+);
+
+SELECT finish();
 ROLLBACK;

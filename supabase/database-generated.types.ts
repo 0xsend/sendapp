@@ -61,7 +61,15 @@ export type Database = {
           updated_at?: string
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       chain_addresses: {
         Row: {
@@ -150,6 +158,20 @@ export type Database = {
             referencedRelation: "distributions"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "distribution_shares_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "send_scores_current"
+            referencedColumns: ["distribution_id"]
+          },
+          {
+            foreignKeyName: "distribution_shares_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "send_scores_history"
+            referencedColumns: ["distribution_id"]
+          },
         ]
       }
       distribution_verification_values: {
@@ -193,6 +215,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "distributions"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "distribution_verification_values_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "send_scores_current"
+            referencedColumns: ["distribution_id"]
+          },
+          {
+            foreignKeyName: "distribution_verification_values_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "send_scores_history"
+            referencedColumns: ["distribution_id"]
           },
         ]
       }
@@ -238,6 +274,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "distributions"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "distribution_verifications_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "send_scores_current"
+            referencedColumns: ["distribution_id"]
+          },
+          {
+            foreignKeyName: "distribution_verifications_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "send_scores_history"
+            referencedColumns: ["distribution_id"]
           },
         ]
       }
@@ -417,7 +467,22 @@ export type Database = {
           referred_id?: string
           referrer_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "referrals_referred_id_fkey"
+            columns: ["referred_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       send_account_created: {
         Row: {
@@ -1135,6 +1200,20 @@ export type Database = {
             referencedRelation: "distributions"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "send_slash_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "send_scores_current"
+            referencedColumns: ["distribution_id"]
+          },
+          {
+            foreignKeyName: "send_slash_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "send_scores_history"
+            referencedColumns: ["distribution_id"]
+          },
         ]
       }
       send_token_transfers: {
@@ -1627,6 +1706,46 @@ export type Database = {
         }
         Relationships: []
       }
+      send_scores: {
+        Row: {
+          distribution_id: number | null
+          score: number | null
+          send_ceiling: number | null
+          unique_sends: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
+      send_scores_current: {
+        Row: {
+          distribution_id: number | null
+          score: number | null
+          send_ceiling: number | null
+          unique_sends: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
+      send_scores_current_unique: {
+        Row: {
+          capped_amount: number | null
+          distribution_id: number | null
+          from_user_id: string | null
+          send_ceiling: number | null
+          to_user_id: string | null
+        }
+        Relationships: []
+      }
+      send_scores_history: {
+        Row: {
+          distribution_id: number | null
+          score: number | null
+          send_ceiling: number | null
+          unique_sends: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       calculate_and_insert_send_ceiling_verification: {
@@ -1854,6 +1973,10 @@ export type Database = {
           referrer: Database["public"]["CompositeTypes"]["profile_lookup_result"]
           new_referrer: Database["public"]["CompositeTypes"]["profile_lookup_result"]
         }[]
+      }
+      refresh_send_scores_history: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       register_first_sendtag: {
         Args: {
