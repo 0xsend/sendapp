@@ -1,9 +1,11 @@
-import { Container, ScrollView } from '@my/ui'
+import { Container, ScrollView, useSafeAreaInsets } from '@my/ui'
 import type { PropsWithChildren } from 'react'
 
 const CONTAINER_OFFSET = 10
 
 export const ScreenContainer = ({ children }: PropsWithChildren) => {
+  const insets = useSafeAreaInsets()
+
   return (
     <Container
       safeAreaProps={{
@@ -18,7 +20,7 @@ export const ScreenContainer = ({ children }: PropsWithChildren) => {
         contentContainerStyle={{
           flexGrow: 1,
           paddingTop: CONTAINER_OFFSET,
-          paddingBottom: CONTAINER_OFFSET,
+          paddingBottom: CONTAINER_OFFSET + insets.bottom,
         }}
         showsVerticalScrollIndicator={false}
         bounces={true}

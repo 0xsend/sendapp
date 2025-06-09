@@ -1,6 +1,6 @@
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
 import { Stack } from 'expo-router'
-import { Link, Paragraph } from '@my/ui'
+import { MobileAccountLayout } from 'app/features/account/AccountScreenLayout'
 
 export default function AccountScreen() {
   return (
@@ -11,12 +11,7 @@ export default function AccountScreen() {
         }}
       />
       <ScreenContainer>
-        <Paragraph>AccountScreen</Paragraph>
-        <Link href={'/account/edit-profile'}>profile</Link>
-        <Link href={'/account/personal-info'}>personal info</Link>
-        <Link href={'/account/affiliate'}>referrals</Link>
-        <Link href={'/account/sendtag'}>sendtags</Link>
-        <Link href={'/account/backup'}>passkeys</Link>
+        <MobileAccountLayout />
       </ScreenContainer>
     </>
   )
