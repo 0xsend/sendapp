@@ -44,9 +44,18 @@ export function ShareProfileDialog({ isOpen, onClose }: ShareProfileDialogProps)
         },
       })
         .then(setQrCodeDataURL)
-        .catch(() => setQrCodeDataURL(''))
+        .catch((e) => {
+          console.error(e)
+          toast.show('Failed to create QR code', {
+            message: 'Something went wrong while creating QR code',
+            customData: {
+              theme: 'red',
+            },
+          })
+          setQrCodeDataURL('')
+        })
     }
-  }, [isOpen, profileUrl])
+  }, [isOpen, profileUrl, toast.show])
 
   const handleCopyLink = async () => {
     try {
