@@ -1449,3 +1449,42 @@ REVOKE ALL ON FUNCTION "public"."insert_verification_send_ceiling"() FROM PUBLIC
 GRANT ALL ON FUNCTION "public"."insert_verification_send_ceiling"() TO "anon";
 GRANT ALL ON FUNCTION "public"."insert_verification_send_ceiling"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."insert_verification_send_ceiling"() TO "service_role";
+
+CREATE OR REPLACE FUNCTION refresh_send_scores_history()
+RETURNS void AS $$
+BEGIN
+  REFRESH MATERIALIZED VIEW CONCURRENTLY send_scores_history;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+ALTER FUNCTION "public"."refresh_send_scores_history"() OWNER TO "postgres";
+
+REVOKE ALL ON FUNCTION "public"."refresh_send_scores_history"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."refresh_send_scores_history"() TO "anon";
+GRANT ALL ON FUNCTION "public"."refresh_send_scores_history"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."refresh_send_scores_history"() TO "service_role";
+
+-- Trigger function
+CREATE OR REPLACE FUNCTION public.refresh_send_scores_history_trigger()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+  PERFORM refresh_send_scores_history();
+  RETURN NEW;
+END;
+$function$
+;
+
+ALTER FUNCTION "public"."refresh_send_scores_history_trigger"() OWNER TO "postgres";
+
+REVOKE ALL ON FUNCTION "public"."refresh_send_scores_history_trigger"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."refresh_send_scores_history_trigger"() TO "anon";
+GRANT ALL ON FUNCTION "public"."refresh_send_scores_history_trigger"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."refresh_send_scores_history_trigger"() TO "service_role";
+
+-- Trigger
+CREATE TRIGGER distribution_ended_refresh_send_scores
+  AFTER INSERT ON distributions
+  FOR EACH ROW
+  EXECUTE FUNCTION refresh_send_scores_history_trigger();
