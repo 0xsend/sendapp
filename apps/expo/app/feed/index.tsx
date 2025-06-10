@@ -1,6 +1,6 @@
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
 import { Stack } from 'expo-router'
-import { Paragraph } from '@my/ui'
+import { ComingSoon } from 'app/components/ComingSoon'
 
 export default function FeedScreen() {
   return (
@@ -11,7 +11,7 @@ export default function FeedScreen() {
         }}
       />
       <ScreenContainer>
-        <Paragraph>Community Feed</Paragraph>
+        <ComingSoon />
       </ScreenContainer>
     </>
   )
