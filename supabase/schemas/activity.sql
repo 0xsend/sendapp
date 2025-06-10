@@ -193,16 +193,16 @@ $function$
 ALTER FUNCTION "public"."recent_senders"() OWNER TO "postgres";
 
 -- Functions (that depend on activity table directly)
-CREATE OR REPLACE FUNCTION today_birthday_senders()
-RETURNS SETOF activity_feed_user
-SECURITY DEFINER
-LANGUAGE plpgsql
-AS $$
+CREATE OR REPLACE FUNCTION public.today_birthday_senders()
+ RETURNS SETOF activity_feed_user
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
 BEGIN
 RETURN QUERY
 
-WITH filtered_profiles AS (
-    SELECT *
+WITH birthday_profiles AS (
+    SELECT p.*
     FROM profiles p
     WHERE p.is_public = TRUE -- only public profiles
     AND p.birthday IS NOT NULL -- Ensure birthday is set
@@ -217,15 +217,22 @@ WITH filtered_profiles AS (
         JOIN tag_receipts tr ON tr.tag_name = t.name
         WHERE t.user_id = p.id
     )
-    -- Ensure user is part of the most recent distribution, means user have sent SEND at least once in current month and has min balance
-    AND EXISTS (
+),
+-- Ensure user has historical send activity
+filtered_profiles AS (
+    SELECT bp.*
+    FROM birthday_profiles bp
+    WHERE EXISTS (
         SELECT 1
-        FROM distribution_shares ds
-        WHERE ds.user_id = p.id
-        AND ds.distribution_id = (
-            SELECT MAX(d.id)
-            FROM distributions d
-        )
+        FROM (
+            SELECT
+                SUM(ss.unique_sends) as total_sends,
+                SUM(ss.score) as total_score
+            FROM send_scores ss
+            WHERE ss.user_id = bp.id
+        ) totals
+        WHERE totals.total_sends > 100
+        AND totals.total_score > (SELECT hodler_min_balance FROM distributions WHERE id = (SELECT MAX(d.id) FROM distributions d))
     )
 )
 
@@ -250,14 +257,14 @@ FROM filtered_profiles fp
 LEFT JOIN send_accounts sa ON sa.user_id = fp.id
 LEFT JOIN tags main_tag ON main_tag.id = sa.main_tag_id
 LEFT JOIN LATERAL (
-    SELECT COALESCE(SUM(ds.amount), 0) AS send_score
-    FROM distribution_shares ds
-    WHERE ds.user_id = fp.id
-    AND ds.distribution_id >= 6
+    SELECT COALESCE(SUM(ss.score), 0) AS send_score
+    FROM send_scores ss
+    WHERE ss.user_id = fp.id
 ) score ON TRUE
 ORDER BY score.send_score DESC;
 END;
-$$;
+$function$
+;
 
 -- Function
 
