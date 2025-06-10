@@ -1,8 +1,8 @@
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
 import { Stack } from 'expo-router'
-import { Link, Paragraph } from '@my/ui'
+import { BackupScreen } from 'app/features/account/backup'
 
-export default function AccountScreen() {
+export default function PasskeysScreen() {
   return (
     <>
       <Stack.Screen
@@ -11,9 +11,7 @@ export default function AccountScreen() {
         }}
       />
       <ScreenContainer>
-        <Paragraph>AccountScreen</Paragraph>
-        <Link href={'/account/backup/create'}>create</Link>
-        <Link href={'/account/backup/confirm/1'}>confirm</Link>
+        <BackupScreen />
       </ScreenContainer>
     </>
   )

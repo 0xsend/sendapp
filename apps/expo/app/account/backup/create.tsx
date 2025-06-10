@@ -1,8 +1,8 @@
 import { Stack } from 'expo-router/build/layouts/Stack'
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
-import { Paragraph } from '@my/ui'
+import { CreatePasskeyScreen } from 'app/features/account/backup/create'
 
-export default function CreatePasskeyScreen() {
+export default function Screen() {
   return (
     <>
       <Stack.Screen
@@ -11,7 +11,7 @@ export default function CreatePasskeyScreen() {
         }}
       />
       <ScreenContainer>
-        <Paragraph>CreatePasskeyScreen</Paragraph>
+        <CreatePasskeyScreen />
       </ScreenContainer>
     </>
   )
