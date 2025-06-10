@@ -1,8 +1,8 @@
 import { Stack } from 'expo-router'
-import { Link, Paragraph } from '@my/ui'
 import { TabScreenContainer } from 'apps-expo/components/layout/TabScreenContainer'
+import { ExploreScreen } from 'app/features/explore/screen'
 
-export default function ExploreScreen() {
+export default function Screen() {
   return (
     <>
       <Stack.Screen
@@ -11,10 +11,7 @@ export default function ExploreScreen() {
         }}
       />
       <TabScreenContainer>
-        <Paragraph>ExploreScreen</Paragraph>
-        <Link href={'/rewards'}>rewards</Link>
-        <Link href={'/sendpot'}>sendpot</Link>
-        <Link href={'/feed'}>community feed</Link>
+        <ExploreScreen />
       </TabScreenContainer>
     </>
   )
