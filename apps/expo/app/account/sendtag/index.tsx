@@ -1,6 +1,6 @@
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
 import { Stack } from 'expo-router'
-import { Link, Paragraph } from '@my/ui'
+import { SendTagScreen } from 'app/features/account/sendtag/screen'
 
 export default function SendtagsScreen() {
   return (
@@ -11,10 +11,7 @@ export default function SendtagsScreen() {
         }}
       />
       <ScreenContainer>
-        <Paragraph>Sendtags screen</Paragraph>
-        <Link href={'/account/sendtag/add'}>add</Link>
-        <Link href={'/account/sendtag/checkout'}>checkout</Link>
-        <Link href={'/account/sendtag/first'}>first</Link>
+        <SendTagScreen />
       </ScreenContainer>
     </>
   )

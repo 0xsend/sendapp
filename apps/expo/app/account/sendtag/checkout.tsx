@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router/build/layouts/Stack'
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
-import { Paragraph } from '@my/ui'
+import { CheckoutScreen } from 'app/features/account/sendtag/checkout/screen'
 
 export default function CheckoutSendtagsScreen() {
   return (
@@ -11,7 +11,7 @@ export default function CheckoutSendtagsScreen() {
         }}
       />
       <ScreenContainer>
-        <Paragraph>CheckoutSendtagsScreen</Paragraph>
+        <CheckoutScreen />
       </ScreenContainer>
     </>
   )
