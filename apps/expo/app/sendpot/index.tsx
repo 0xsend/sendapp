@@ -1,6 +1,6 @@
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
 import { Stack } from 'expo-router'
-import { Link, Paragraph } from '@my/ui'
+import { SendPotScreen } from 'app/features/sendpot/screen'
 
 export default function SendpotScreen() {
   return (
@@ -11,9 +11,7 @@ export default function SendpotScreen() {
         }}
       />
       <ScreenContainer>
-        <Paragraph>SendpotScreen</Paragraph>
-        <Link href={'/sendpot/buy-tickets'}>but tickets</Link>
-        <Link href={'/sendpot/confirm-buy-tickets'}>confirm</Link>
+        <SendPotScreen />
       </ScreenContainer>
     </>
   )
