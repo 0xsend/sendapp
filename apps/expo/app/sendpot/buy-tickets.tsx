@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router/build/layouts/Stack'
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
-import { Paragraph } from '@my/ui'
+import { BuyTicketsScreen } from 'app/features/sendpot/BuyTicketsScreen'
 
 export default function BuySendpotTicketsScreen() {
   return (
@@ -11,7 +11,7 @@ export default function BuySendpotTicketsScreen() {
         }}
       />
       <ScreenContainer>
-        <Paragraph>BuySendpotTicketsScreen</Paragraph>
+        <BuyTicketsScreen />
       </ScreenContainer>
     </>
   )
