@@ -1,6 +1,6 @@
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
 import { Stack } from 'expo-router'
-import { Paragraph } from '@my/ui'
+import { ActivityRewardsScreen } from 'app/features/explore/rewards/activity/screen'
 
 export default function RewardsScreen() {
   return (
@@ -11,7 +11,7 @@ export default function RewardsScreen() {
         }}
       />
       <ScreenContainer>
-        <Paragraph>Rewards</Paragraph>
+        <ActivityRewardsScreen />
       </ScreenContainer>
     </>
   )

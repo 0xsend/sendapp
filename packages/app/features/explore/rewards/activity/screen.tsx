@@ -111,7 +111,7 @@ export function ActivityRewardsScreen() {
               return <Spinner size="small" color={'$color12'} />
             case verificationsQuery.isError:
               return (
-                <Paragraph color={'$color10'} size={'$5'}>
+                <Paragraph color={'$error'} size={'$5'}>
                   Error fetching verifications. {toNiceError(verificationsQuery.error)}
                 </Paragraph>
               )
