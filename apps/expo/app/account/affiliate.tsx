@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router/build/layouts/Stack'
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
-import { Paragraph } from '@my/ui'
+import FriendsScreen from 'app/features/affiliate/screen'
 
 export default function ReferralsScreen() {
   return (
@@ -11,7 +11,7 @@ export default function ReferralsScreen() {
         }}
       />
       <ScreenContainer>
-        <Paragraph>referrals screen</Paragraph>
+        <FriendsScreen />
       </ScreenContainer>
     </>
   )
