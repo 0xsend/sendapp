@@ -21,6 +21,7 @@ import { total, pricing } from 'app/data/sendtags'
 import React, { useMemo, useState } from 'react'
 import { formatUnits } from 'viem'
 import { usdcCoin } from 'app/data/coins'
+import { useThemeSetting } from '@tamagui/next-theme'
 
 export function SendTagPricingDialog({ name = '' }: { name: Tables<'tags'>['name'] }) {
   const price = useMemo(() => total([{ name }]), [name])
@@ -228,20 +229,22 @@ const SendTagPricingButton = ({
   name: string
   price: bigint
 }) => {
+  const { resolvedTheme } = useThemeSetting()
+  const isDark = resolvedTheme?.startsWith('dark')
+
   return (
     <Button
       chromeless
       p={0}
-      $theme-dark={{
-        iconAfter: isOpen ? (
-          <XCircle color="$primary" size={'$1'} />
-        ) : (
+      iconAfter={
+        isOpen ? (
+          <XCircle color={isDark ? '$primary' : '$black'} size={'$1'} />
+        ) : isDark ? (
           <IconInfoGreenCircle color="$primary" size={'$1'} />
-        ),
-      }}
-      $theme-light={{
-        iconAfter: isOpen ? <XCircle color="$black" size={'$1'} /> : <Info size={'$1'} />,
-      }}
+        ) : (
+          <Info size={'$1'} />
+        )
+      }
       hoverStyle={{ bc: 'transparent' }}
       pressStyle={{ bc: 'transparent', borderColor: 'transparent' }}
       // @ts-expect-error tamagui doesn't support this yet

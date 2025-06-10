@@ -1,8 +1,8 @@
 import { Stack } from 'expo-router/build/layouts/Stack'
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
-import { Paragraph } from '@my/ui'
+import { AddSendtagsScreen } from 'app/features/account/sendtag/add/AddSendtagsScreen'
 
-export default function AddSendtagsScreen() {
+export default function Screen() {
   return (
     <>
       <Stack.Screen
@@ -11,7 +11,7 @@ export default function AddSendtagsScreen() {
         }}
       />
       <ScreenContainer>
-        <Paragraph>AddSendtagsScreen</Paragraph>
+        <AddSendtagsScreen />
       </ScreenContainer>
     </>
   )

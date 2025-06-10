@@ -8,6 +8,7 @@ import { useRouter } from 'solito/router'
 import { useUser } from 'app/utils/useUser'
 import { useValidateSendtag } from 'app/utils/tags/useValidateSendtag'
 import { ReferredBy } from 'app/features/account/sendtag/components/ReferredBy'
+import { Platform } from 'react-native'
 
 const SendtagSchemaWithoutRestrictions = z.object({
   name: formFields.text,
@@ -48,7 +49,14 @@ export const FirstSendtagForm = () => {
     }
 
     await user?.updateProfile()
-    router.replace('/account/sendtag')
+
+    // redirect on web is fine, back on native for better ux
+    if (Platform.OS === 'web') {
+      router.replace('/account/sendtag')
+      return
+    }
+
+    router.back()
   }
 
   const renderAfterContent = useCallback(
