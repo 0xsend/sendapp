@@ -32,6 +32,7 @@ import { useRouter } from 'solito/router'
 import { encodeFunctionData } from 'viem'
 import { useEstimateFeesPerGas } from 'wagmi'
 import { z } from 'zod'
+import { Platform } from 'react-native'
 
 const log = debug('app:settings:backup:confirm')
 
@@ -61,7 +62,7 @@ export const ConfirmPasskeyScreen = () => {
 
   return (
     <YStack w={'100%'} gap={'$3.5'}>
-      <SettingsHeader>Passkeys</SettingsHeader>
+      {Platform.OS === 'web' && <SettingsHeader>Passkeys</SettingsHeader>}
       {(() => {
         switch (true) {
           case isLoading:

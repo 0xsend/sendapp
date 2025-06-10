@@ -42,6 +42,7 @@ import { useBalance, useEstimateFeesPerGas } from 'wagmi'
 import { z } from 'zod'
 import { SettingsHeader } from 'app/features/account/components/SettingsHeader'
 import { useThemeSetting } from '@tamagui/next-theme'
+import { Linking, Platform } from 'react-native'
 
 export const BackupScreen = () => {
   const { data: sendAcct, error, isLoading } = useSendAccount()
@@ -89,7 +90,11 @@ export const BackupScreen = () => {
               <YStack w={'100%'} gap={'$6'}>
                 <Paragraph size={'$6'} fontWeight={'300'} color={'$error'}>
                   You have no WebAuthn credentials. This should never happen. Please reach out to
-                  <Link href="/account/settings/support" target="_blank">
+                  <Link
+                    href="https://support.send.app/en/"
+                    target="_blank"
+                    onPress={() => Linking.openURL('https://support.send.app/en/')}
+                  >
                     {' '}
                     support
                   </Link>{' '}
@@ -97,6 +102,11 @@ export const BackupScreen = () => {
                 </Paragraph>
                 <Link
                   href="https://support.send.app/en/articles/9789876-what-are-passkeys"
+                  onPress={() =>
+                    Linking.openURL(
+                      'https://support.send.app/en/articles/9789876-what-are-passkeys'
+                    )
+                  }
                   target="_blank"
                   display="flex"
                   alignItems="center"
@@ -118,6 +128,11 @@ export const BackupScreen = () => {
                 </Paragraph>
                 <Link
                   href="https://support.send.app/en/articles/9789876-what-are-passkeys"
+                  onPress={() =>
+                    Linking.openURL(
+                      'https://support.send.app/en/articles/9789876-what-are-passkeys'
+                    )
+                  }
                   target="_blank"
                   display="flex"
                   alignItems="center"
@@ -155,7 +170,7 @@ const WebauthnCreds = ({
   return (
     <YStack w={'100%'} gap={'$5'}>
       <YStack gap={'$3.5'}>
-        <SettingsHeader>Passkeys</SettingsHeader>
+        {Platform.OS === 'web' && <SettingsHeader>Passkeys</SettingsHeader>}
         {webAuthnCreds.map((cred) => (
           <WebAuthnCred key={`${sendAcct.id}-${cred.id}`} sendAcct={sendAcct} cred={cred} />
         ))}
