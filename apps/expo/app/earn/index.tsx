@@ -1,6 +1,7 @@
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
 import { Stack } from 'expo-router'
-import { Link, Paragraph } from '@my/ui'
+import { SendEarnProvider } from 'app/features/earn/providers/SendEarnProvider'
+import { EarnScreen } from 'app/features/earn/screen'
 
 export default function SavingsScreen() {
   return (
@@ -11,10 +12,9 @@ export default function SavingsScreen() {
         }}
       />
       <ScreenContainer>
-        <Paragraph>SavingsScreen</Paragraph>
-        <Link href={'/earn/usdc/balance'}>balance</Link>
-        <Link href={'/earn/usdc/deposit'}>deposit</Link>
-        <Link href={'/earn/usdc/withdraw'}>withdraw</Link>
+        <SendEarnProvider>
+          <EarnScreen />
+        </SendEarnProvider>
       </ScreenContainer>
     </>
   )

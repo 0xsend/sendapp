@@ -38,6 +38,7 @@ import {
 } from '../params'
 import { useSendEarnWithdrawCalls, useSendEarnWithdrawVault } from './hooks'
 import { useSendEarnAPY } from '../hooks'
+import { Platform } from 'react-native'
 
 export const log = debug('app:earn:withdraw')
 
@@ -143,11 +144,14 @@ export function WithdrawForm() {
 
       toast.show('Withdrawn successfully')
 
-      if (coinData) {
+      if (coinData && Platform.OS === 'web') {
         router.push({
           pathname: `/earn/${coinToParam(coinData)}`,
         })
+        return
       }
+
+      router.back()
     },
     onSettled: (data, error, variables, context) => {
       // Error or success... doesn't matter!
