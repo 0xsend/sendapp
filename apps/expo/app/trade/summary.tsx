@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router/build/layouts/Stack'
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
-import { Paragraph } from '@my/ui'
+import { SwapSummaryScreen } from 'app/features/swap/summary/screen'
 
 export default function TradeSummaryScreen() {
   return (
@@ -11,7 +11,7 @@ export default function TradeSummaryScreen() {
         }}
       />
       <ScreenContainer>
-        <Paragraph>TradeSummaryScreen</Paragraph>
+        <SwapSummaryScreen />
       </ScreenContainer>
     </>
   )
