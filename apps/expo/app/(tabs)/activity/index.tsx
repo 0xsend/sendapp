@@ -1,6 +1,6 @@
-import { Paragraph } from '@my/ui'
 import { TabScreenContainer } from 'apps-expo/components/layout/TabScreenContainer'
 import { Stack } from 'expo-router/build/layouts/Stack'
+import { ActivityScreen } from 'app/features/activity/screen'
 
 export default function ActivityTabScreen() {
   return (
@@ -11,7 +11,7 @@ export default function ActivityTabScreen() {
         }}
       />
       <TabScreenContainer>
-        <Paragraph>ActivityTabScreen</Paragraph>
+        <ActivityScreen />
       </TabScreenContainer>
     </>
   )

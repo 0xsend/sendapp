@@ -3,6 +3,7 @@ import { usePathname } from 'app/utils/usePathname'
 import type { SearchResultCommonType } from 'app/components/SearchBar'
 import { isAddress } from 'viem'
 import { baseMainnet } from '@my/wagmi'
+import { Platform } from 'react-native'
 
 export const useSearchResultHref = (profile?: SearchResultCommonType) => {
   const [queryParams] = useRootScreenParams()
@@ -30,7 +31,9 @@ export const useSearchResultHref = (profile?: SearchResultCommonType) => {
   }
 
   switch (true) {
-    case path === '/activity':
+    // Page-based routing means when you navigate from `/activity` to `/profile/:send_id`, the entire ActivityScreen component unmounts, so the hook doesn't re-execute
+    // Stack-based navigation keeps the previous screen mounted in memory, causing the hook to re-execute with the new pathname
+    case path === '/activity' || (Platform.OS !== 'web' && path.startsWith('/profile/')):
       return `/profile/${profile.send_id}`
     case path === '/send' || path === '/': {
       const _sendParams = JSON.parse(JSON.stringify(sendParams)) //JSON makes sure we don't pass undefined values
