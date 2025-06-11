@@ -1,6 +1,6 @@
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
 import { Stack } from 'expo-router'
-import { Link, Paragraph } from '@my/ui'
+import { SwapFormScreen } from 'app/features/swap/form/screen'
 
 export default function TradeScreen() {
   return (
@@ -11,8 +11,7 @@ export default function TradeScreen() {
         }}
       />
       <ScreenContainer>
-        <Paragraph>TradeScreen</Paragraph>
-        <Link href={'/trade/summary'}>summary</Link>
+        <SwapFormScreen />
       </ScreenContainer>
     </>
   )
