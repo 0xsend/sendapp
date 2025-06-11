@@ -1,7 +1,7 @@
 -- Tag Search
 begin;
 
-select plan(6);
+select plan(9);
 
 create extension "basejump-supabase_test_helpers"; -- noqa: RF05
 
@@ -153,6 +153,88 @@ select tests.authenticate_as('neo');
 --         $$ || :bobs_phone_number || $$ -- bob's phone number
 --       )::tag_search_result]
 --     ) $$, 'Public profile phone numbers should be searchable');
+
+-- Test distance-based ordering and exact matches
+select tests.authenticate_as_service_role();
+
+-- Create additional test users with similar tag names
+select tests.create_supabase_user('bigboss_user');
+select tests.create_supabase_user('boss_user');
+select tests.create_supabase_user('bossman_user');
+
+-- Insert tags for testing distance-based ordering
+insert into tags (name, user_id, status)
+values 
+  ('bigboss', tests.get_supabase_uid('bigboss_user'), 'confirmed'),
+  ('Boss', tests.get_supabase_uid('boss_user'), 'confirmed'),
+  ('bossman', tests.get_supabase_uid('bossman_user'), 'confirmed');
+
+-- Create send accounts for the new users
+insert into send_accounts (user_id, address, chain_id, init_code)
+values 
+  (tests.get_supabase_uid('bigboss_user'), '0xABCDEF1234567890ABCDEF1234567890ABCDEF11', 8453, '\\x00'),
+  (tests.get_supabase_uid('boss_user'), '0xABCDEF1234567890ABCDEF1234567890ABCDEF22', 8453, '\\x00'),
+  (tests.get_supabase_uid('bossman_user'), '0xABCDEF1234567890ABCDEF1234567890ABCDEF33', 8453, '\\x00');
+
+-- Create send_account_tags associations
+insert into send_account_tags (send_account_id, tag_id)
+select sa.id, t.id
+from send_accounts sa
+join tags t on t.user_id = sa.user_id
+where t.name in ('bigboss', 'Boss', 'bossman');
+
+-- Set avatars for testing
+update profiles set avatar_url = 'bigboss_avatar' where id = tests.get_supabase_uid('bigboss_user');
+update profiles set avatar_url = 'boss_avatar' where id = tests.get_supabase_uid('boss_user');
+
+select tests.authenticate_as('neo');
+
+-- Test that searching for "bigboss" returns the exact match first
+select results_eq($$
+  SELECT (tag_matches[1]).tag_name from tag_search('bigboss', 10, 0); $$, $$
+    values ('bigboss'::text) $$, 'Exact match should be returned first when searching for bigboss');
+
+-- Test deduplication: create a user with multiple matching tags
+select tests.authenticate_as_service_role();
+
+select tests.create_supabase_user('multi_tag_user');
+
+-- Insert multiple tags for the same user that would match "test"
+insert into tags (name, user_id, status)
+values 
+  ('test', tests.get_supabase_uid('multi_tag_user'), 'confirmed'),
+  ('tester', tests.get_supabase_uid('multi_tag_user'), 'confirmed'),
+  ('testing', tests.get_supabase_uid('multi_tag_user'), 'confirmed');
+
+-- Create send account for multi_tag_user
+insert into send_accounts (user_id, address, chain_id, init_code)
+values 
+  (tests.get_supabase_uid('multi_tag_user'), '0xABCDEF1234567890ABCDEF1234567890ABCDEF44', 8453, '\\x00');
+
+-- Create send_account_tags associations for all tags
+insert into send_account_tags (send_account_id, tag_id)
+select sa.id, t.id
+from send_accounts sa
+join tags t on t.user_id = sa.user_id
+where sa.user_id = tests.get_supabase_uid('multi_tag_user');
+
+-- Set avatar for testing
+update profiles set avatar_url = 'multi_tag_avatar' where id = tests.get_supabase_uid('multi_tag_user');
+
+select tests.authenticate_as('neo');
+
+-- Test deduplication: should return only ONE result for the user, with the best matching tag
+select results_eq($$
+  SELECT array_length(tag_matches, 1) from tag_search('test', 10, 0) 
+  WHERE (tag_matches[1]).avatar_url = 'multi_tag_avatar'; $$, $$
+    values (1) $$, 'Should return only one result per profile even with multiple matching tags');
+
+-- Test that the best match (exact match "test") is returned for the multi-tag user
+select results_eq($$
+  SELECT (tag_matches[i]).tag_name 
+  FROM tag_search('test', 10, 0), generate_series(1, array_length(tag_matches, 1)) as i
+  WHERE (tag_matches[i]).avatar_url = 'multi_tag_avatar'; $$, $$
+    values ('test'::text) $$, 'Should return the best matching tag (exact match) for profile with multiple tags');
 
 select finish();
 rollback;
