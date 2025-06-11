@@ -1,6 +1,7 @@
 import { Stack } from 'expo-router/build/layouts/Stack'
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
-import { Paragraph } from '@my/ui'
+import { SendEarnProvider } from 'app/features/earn/providers/SendEarnProvider'
+import { WithdrawForm } from 'app/features/earn/withdraw/screen'
 
 export default function WithdrawAssetSavingsScreen() {
   return (
@@ -11,7 +12,9 @@ export default function WithdrawAssetSavingsScreen() {
         }}
       />
       <ScreenContainer>
-        <Paragraph>WithdrawAssetSavingsScreen</Paragraph>
+        <SendEarnProvider>
+          <WithdrawForm />
+        </SendEarnProvider>
       </ScreenContainer>
     </>
   )

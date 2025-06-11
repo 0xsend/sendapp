@@ -47,6 +47,7 @@ import {
 } from '../params'
 import { useSendEarnDepositCalls, useSendEarnDepositVault } from './hooks'
 import { useSendEarnAPY } from '../hooks'
+import { Platform } from 'react-native'
 
 const log = debug('app:earn:deposit')
 const MINIMUM_DEPOSIT = BigInt(5 * 1e6) // 5 USDC
@@ -120,9 +121,16 @@ export function DepositForm() {
         message: 'Your deposit is being processed.',
       })
       if (!coin.data) return
-      router.push({
-        pathname: `/earn/${coinToParam(coin.data)}/balance`,
-      })
+
+      // for web redirect to balance is fine, on native back for better ux
+      if (Platform.OS === 'web') {
+        router.replace({
+          pathname: `/earn/${coinToParam(coin.data)}/balance`,
+        })
+        return
+      }
+
+      router.back()
     },
     onSettled: () => {
       log('sendEarn.deposit.onSettled')

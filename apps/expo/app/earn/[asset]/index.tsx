@@ -1,18 +1,20 @@
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
 import { Stack } from 'expo-router'
-import { Link, Paragraph } from '@my/ui'
+import { SendEarnProvider } from 'app/features/earn/providers/SendEarnProvider'
+import { ActiveEarningsScreen } from 'app/features/earn/active/screen'
 
 export default function SavingsAssetScreen() {
   return (
     <>
       <Stack.Screen
         options={{
-          title: 'Savings',
+          title: 'Details',
         }}
       />
       <ScreenContainer>
-        <Paragraph>SavingsAssetScreen</Paragraph>
-        <Link href={'/earn/usdc'}>crypto</Link>
+        <SendEarnProvider>
+          <ActiveEarningsScreen />
+        </SendEarnProvider>
       </ScreenContainer>
     </>
   )

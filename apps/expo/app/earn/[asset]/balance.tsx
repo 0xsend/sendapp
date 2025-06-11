@@ -1,17 +1,20 @@
 import { Stack } from 'expo-router/build/layouts/Stack'
+import { SendEarnProvider } from 'app/features/earn/providers/SendEarnProvider'
+import { EarningsBalance } from 'app/features/earn/earnings/screen'
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
-import { Paragraph } from '@my/ui'
 
 export default function BalanceAssetSavingsScreen() {
   return (
     <>
       <Stack.Screen
         options={{
-          title: 'Savings Balance',
+          title: 'Balance',
         }}
       />
       <ScreenContainer>
-        <Paragraph>BalanceAssetSavingsScreen</Paragraph>
+        <SendEarnProvider>
+          <EarningsBalance />
+        </SendEarnProvider>
       </ScreenContainer>
     </>
   )
