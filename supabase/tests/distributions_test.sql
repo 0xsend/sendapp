@@ -210,14 +210,8 @@ VALUES (
 -- bob can register and confirm tags with valid receipts
 SELECT
     tests.authenticate_as('bob');
--- Inserting a tag for test user
-INSERT INTO tags(
-    name,
-    user_id)
-VALUES (
-    'bob',
-    tests.get_supabase_uid(
-        'bob'));
+-- Creating a tag for test user using create_tag function
+SELECT create_tag('bob', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('bob')));
 -- Confirm tags with the service role
 SELECT
     tests.clear_authentication();
@@ -599,12 +593,15 @@ VALUES (
     0);
 SELECT
     confirm_tags( -- bob confirms tags
-        '{bob}',(
+        '{bob}'::citext[],
+        (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('bob')),
+        (
             SELECT
                 event_id
             FROM sendtag_checkout_receipts
             WHERE
-                sender = '\xB0B0000000000000000000000000000000000000'), NULL);
+                sender = '\xB0B0000000000000000000000000000000000000'),
+        NULL);
 SELECT
     results_eq($$
         SELECT
@@ -619,13 +616,7 @@ SELECT
 SELECT
     tests.authenticate_as('alice');
 -- can create a free common tag without receipt
-INSERT INTO tags(
-    name,
-    user_id)
-VALUES (
-    'alice',
-    tests.get_supabase_uid(
-        'alice'));
+SELECT create_tag('alice', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('alice')));
 SELECT
     results_eq($$
         SELECT
@@ -677,12 +668,15 @@ VALUES (
     '\x0000000000000000000000000000000000000000',
     0);
 SELECT
-    confirm_tags('{alice}',(
+    confirm_tags('{alice}'::citext[], (
+            SELECT id FROM send_accounts 
+            WHERE user_id = tests.get_supabase_uid('alice')
+        ), (
             SELECT
                 event_id
             FROM sendtag_checkout_receipts
             WHERE
-                sender = '\xa71ce00000000000000000000000000000000000'),(
+                sender = '\xa71ce00000000000000000000000000000000000'), (
             SELECT
                 referral_code
             FROM public.profiles

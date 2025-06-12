@@ -1,6 +1,6 @@
 import { expect, test as sendAccountTest } from '@my/playwright/fixtures/send-accounts'
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
-import { userOnboarded } from '@my/snaplet/models'
+import { createUserWithTagsAndAccounts, createUserWithoutTags } from '@my/snaplet'
 import type { Database } from '@my/supabase/database.types'
 import { mergeTests, type Page } from '@playwright/test'
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -27,10 +27,10 @@ const idTypes = ['tag', 'sendid', 'address'] as const
 
 for (const token of [...coins, ethCoin]) {
   test(`can send ${token.symbol} starting from profile page`, async ({ page, seed, supabase }) => {
-    const plan = await seed.users([userOnboarded])
+    const plan = await createUserWithTagsAndAccounts(seed)
     const tag = plan.tags[0]
-    const profile = plan.profiles[0]
-    const recvAccount = plan.send_accounts[0]
+    const profile = plan.profile
+    const recvAccount = plan.sendAccount
     assert(!!tag?.name, 'tag not found')
     assert(!!profile?.name, 'profile name not found')
     assert(!!profile?.about, 'profile about not found')
@@ -62,26 +62,24 @@ for (const token of [...coins, ethCoin]) {
     }) => {
       const isSendId = idType === 'sendid'
       const isAddress = idType === 'address'
-      const plan = await seed.users(
-        isSendId
-          ? [{ ...userOnboarded, tags: [] }] // no tags for send id
-          : [userOnboarded]
-      )
-      const profile = plan.profiles[0]
+      const plan = isSendId
+        ? await createUserWithoutTags(seed) // no tags for send id
+        : await createUserWithTagsAndAccounts(seed)
+      const profile = plan.profile
       const tag = plan.tags[0]
 
       assert(!!profile, 'profile not found')
       assert(!!profile.name, 'profile name not found')
       assert(!!profile.send_id, 'profile send id not found')
-      assert(!!plan.send_accounts[0], 'send account not found')
+      assert(!!plan.sendAccount, 'send account not found')
 
       const recvAccount: { address: `0x${string}` } = (() => {
         switch (idType) {
           case 'address':
             return { address: privateKeyToAccount(generatePrivateKey()).address }
           default:
-            assert(!!plan.send_accounts[0], 'send account not found')
-            return { address: plan.send_accounts[0].address as `0x${string}` }
+            assert(!!plan.sendAccount, 'send account not found')
+            return { address: plan.sendAccount.address as `0x${string}` }
         }
       })()
 

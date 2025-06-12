@@ -171,16 +171,7 @@ type Override = {
       created_at?: string;
     };
   }
-  storage_migrations?: {
-    name?: string;
-    fields?: {
-      id?: string;
-      name?: string;
-      hash?: string;
-      executed_at?: string;
-    };
-  }
-  supabase_functions_migrations?: {
+  migrations?: {
     name?: string;
     fields?: {
       version?: string;
@@ -262,12 +253,6 @@ type Override = {
     fields?: {
       version?: string;
       inserted_at?: string;
-    };
-  }
-  auth_schema_migrations?: {
-    name?: string;
-    fields?: {
-      version?: string;
     };
   }
   supabase_migrations_schema_migrations?: {
@@ -373,6 +358,18 @@ type Override = {
       event_id?: string;
     };
   }
+  send_account_tags?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      send_account_id?: string;
+      tag_id?: string;
+      created_at?: string;
+      updated_at?: string;
+      send_accounts?: string;
+      tags?: string;
+    };
+  }
   send_account_transfers?: {
     name?: string;
     fields?: {
@@ -404,8 +401,11 @@ type Override = {
       created_at?: string;
       updated_at?: string;
       deleted_at?: string;
+      main_tag_id?: string;
       users?: string;
+      tags?: string;
       send_account_credentials?: string;
+      send_account_tags?: string;
     };
   }
   send_earn_create?: {
@@ -651,6 +651,7 @@ type Override = {
       event_id?: string;
       id?: string;
       created_at?: string;
+      tag_id?: string;
       tags?: string;
     };
   }
@@ -661,7 +662,11 @@ type Override = {
       status?: string;
       user_id?: string;
       created_at?: string;
+      id?: string;
+      updated_at?: string;
       users?: string;
+      send_account_tags?: string;
+      send_accounts?: string;
       tag_receipts?: string;
     };
   }
@@ -875,11 +880,7 @@ export interface Fingerprint {
     chainId?: FingerprintNumberField;
     createdAt?: FingerprintDateField;
   }
-  storageMigrations?: {
-    id?: FingerprintNumberField;
-    executedAt?: FingerprintDateField;
-  }
-  supabaseFunctionsMigrations?: {
+  migrations?: {
     insertedAt?: FingerprintDateField;
   }
   objects?: {
@@ -919,9 +920,6 @@ export interface Fingerprint {
   RealtimeSchemaMigrations?: {
     version?: FingerprintNumberField;
     insertedAt?: FingerprintDateField;
-  }
-  authSchemaMigrations?: {
-
   }
   supabaseMigrationsSchemaMigrations?: {
 
@@ -973,6 +971,14 @@ export interface Fingerprint {
     abiIdx?: FingerprintNumberField;
     id?: FingerprintNumberField;
   }
+  sendAccountTags?: {
+    id?: FingerprintNumberField;
+    tagId?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    sendAccount?: FingerprintRelationField;
+    tag?: FingerprintRelationField;
+  }
   sendAccountTransfers?: {
     id?: FingerprintNumberField;
     chainId?: FingerprintNumberField;
@@ -988,8 +994,11 @@ export interface Fingerprint {
     createdAt?: FingerprintDateField;
     updatedAt?: FingerprintDateField;
     deletedAt?: FingerprintDateField;
+    mainTagId?: FingerprintNumberField;
     user?: FingerprintRelationField;
+    mainTag?: FingerprintRelationField;
     sendAccountCredentialsByAccountId?: FingerprintRelationField;
+    sendAccountTags?: FingerprintRelationField;
   }
   sendEarnCreates?: {
     id?: FingerprintNumberField;
@@ -1115,11 +1124,16 @@ export interface Fingerprint {
   tagReceipts?: {
     id?: FingerprintNumberField;
     createdAt?: FingerprintDateField;
+    tagId?: FingerprintNumberField;
     tag?: FingerprintRelationField;
   }
   tags?: {
     createdAt?: FingerprintDateField;
+    id?: FingerprintNumberField;
+    updatedAt?: FingerprintDateField;
     user?: FingerprintRelationField;
+    sendAccountTags?: FingerprintRelationField;
+    sendAccountsByMainTagId?: FingerprintRelationField;
     tagReceipts?: FingerprintRelationField;
   }
   tenants?: {

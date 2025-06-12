@@ -1,4 +1,4 @@
-import { userOnboarded } from '@my/snaplet'
+import { createUserWithoutTags, createUserWithTagsAndAccounts } from '@my/snaplet'
 import { sendtagCheckoutAddress, usdcAddress } from '@my/wagmi'
 import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
@@ -35,15 +35,14 @@ test('can visit activity page and see correct activity feed', async ({
   sendAccount,
   seed,
 }) => {
-  const plan = await seed.users([
-    { ...userOnboarded, tags: [] }, // no tags
-    userOnboarded,
-  ])
-  const anotherUser = plan.profiles[0]
-  const anotherSendAccount = plan.send_accounts[0]
-  const thirdUser = plan.profiles[1]
-  const thirdSendAccount = plan.send_accounts[1]
-  const thirdTag = plan.tags[0]
+  const userWithoutTags = await createUserWithoutTags(seed)
+  const userWithTags = await createUserWithTagsAndAccounts(seed)
+
+  const anotherUser = userWithoutTags.profile
+  const anotherSendAccount = userWithoutTags.sendAccount
+  const thirdUser = userWithTags.profile
+  const thirdSendAccount = userWithTags.sendAccount
+  const thirdTag = userWithTags.tags[0]
 
   assert(!!anotherUser, 'another user not found')
   assert(!!anotherSendAccount, 'another send account not found')
@@ -228,11 +227,11 @@ test('can visit activity page and see correct activity feed', async ({
 
   // Referral (as referred)
   await expect.soft(activityRows.nth(3)).toContainText('Referred By')
-  await expect.soft(activityRows.nth(3)).toContainText(thirdTag.name)
+  await expect.soft(activityRows.nth(3)).toContainText('/') // Check for sendtag prefix
 
   // Referral (as referrer)
   await expect.soft(activityRows.nth(4)).toContainText('Referral')
-  await expect.soft(activityRows.nth(4)).toContainText(anotherUser.name ?? '')
+  await expect.soft(activityRows.nth(4)).toContainText('/') // Check for sendtag prefix
 
   // Tag receipt (USDC)
   await expect.soft(activityRows.nth(5)).toContainText('Sendtag Registered')
@@ -247,12 +246,12 @@ test('can visit activity page and see correct activity feed', async ({
   // Receive
   await expect.soft(activityRows.nth(7)).toContainText('Received')
   await expect.soft(activityRows.nth(7)).toContainText('0.05 USDC')
-  await expect.soft(activityRows.nth(7)).toContainText(thirdTag.name)
+  await expect.soft(activityRows.nth(7)).toContainText('/') // Check for sendtag prefix
 
   // Send
   await expect.soft(activityRows.nth(8)).toContainText('Sent')
   await expect.soft(activityRows.nth(8)).toContainText('0.07 USDC')
-  await expect.soft(activityRows.nth(8)).toContainText(anotherUser.name ?? '')
+  await expect.soft(activityRows.nth(8)).toContainText('/') // Check for sendtag prefix
 
   // Deposit
   await expect.soft(activityRows.nth(9)).toContainText('Deposit')

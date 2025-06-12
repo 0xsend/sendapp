@@ -13,7 +13,6 @@ import {
 import { IconPlus, IconX } from 'app/components/icons'
 import { maxNumSendTags, price, total } from 'app/data/sendtags'
 import { SchemaForm } from 'app/utils/SchemaForm'
-import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useConfirmedTags, usePendingTags } from 'app/utils/tags'
 import { useUser } from 'app/utils/useUser'
 import { useCallback, useMemo, useState } from 'react'
@@ -26,6 +25,7 @@ import { RowLabel } from 'app/components/layout/RowLabel'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { usdcCoin } from 'app/data/coins'
 import { useReleaseTag } from 'app/features/account/sendtag/checkout/checkout-utils'
+import { api } from 'app/utils/api'
 
 export const AddSendtagsForm = () => {
   const user = useUser()
@@ -33,36 +33,34 @@ export const AddSendtagsForm = () => {
   const confirmedTags = useConfirmedTags()
   const hasPendingTags = pendingTags && pendingTags.length > 0
   const form = useForm<z.infer<typeof SendtagSchema>>()
-  const supabase = useSupabase()
   const has5Tags = user?.tags?.length === 5
   const media = useMedia()
   const { resolvedTheme } = useThemeSetting()
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
   const { mutateAsync: releaseTagMutateAsync } = useReleaseTag()
 
+  const createTagMutation = api.tag.create.useMutation()
+
   const isDarkTheme = resolvedTheme?.startsWith('dark')
 
   async function createSendTag({ name }: z.infer<typeof SendtagSchema>) {
     if (!user.user) return console.error('No user')
-    const { error } = await supabase.from('tags').insert({ name })
 
-    if (error) {
-      console.error("Couldn't create Sendtag", error)
-      switch (error.code) {
-        case '23505':
-          form.setError('name', { type: 'custom', message: 'This Sendtag is already taken' })
-          break
-        default:
-          form.setError('name', {
-            type: 'custom',
-            message: error.message ?? 'Something went wrong',
-          })
-          break
-      }
-    } else {
+    try {
+      await createTagMutation.mutateAsync({ name })
       // form state is successfully submitted, show the purchase confirmation screen
       form.reset()
       user?.updateProfile()
+    } catch (error) {
+      console.error("Couldn't create Sendtag", error)
+      if (error?.message?.includes('already taken')) {
+        form.setError('name', { type: 'custom', message: 'This Sendtag is already taken' })
+      } else {
+        form.setError('name', {
+          type: 'custom',
+          message: error?.message ?? 'Something went wrong',
+        })
+      }
     }
   }
 

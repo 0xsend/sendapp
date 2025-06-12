@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker'
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
-import { type SeedClient, userOnboarded } from '@my/snaplet'
+import { type SeedClient, createUserWithTagsAndAccounts } from '@my/snaplet'
 import type { Database } from '@my/supabase/database.types'
 import { usdcAddress } from '@my/wagmi'
 import { mergeTests, type Page } from '@playwright/test'
@@ -32,14 +32,39 @@ test.beforeEach(async ({ checkoutPage }) => {
 })
 
 const addPendingTags = async (supabase: SupabaseClient<Database>, tagNames: string[]) => {
-  const tagsToInsert = tagNames.map((tagName) => ({ name: tagName }))
+  // Get the user's send account first
+  const { data: sendAccount, error: sendAccountError } = await supabase
+    .from('send_accounts')
+    .select('id')
+    .single()
 
-  await supabase
-    .from('tags')
-    .insert(tagsToInsert)
-    .then(({ error }) => {
-      expect(error).toBeFalsy()
+  expect(sendAccountError).toBeFalsy()
+  expect(sendAccount).toBeTruthy()
+  assert(!!sendAccount?.id, 'Send account id should be defined')
+
+  // Check current tag count
+  const { data: currentTags } = await supabase
+    .from('send_account_tags')
+    .select('tag_id')
+    .eq('send_account_id', sendAccount.id)
+
+  const currentTagCount = currentTags?.length || 0
+  const totalTagsAfterAdd = currentTagCount + tagNames.length
+
+  if (totalTagsAfterAdd > 5) {
+    throw new Error(
+      `Cannot add ${tagNames.length} tags. User already has ${currentTagCount} tags, and limit is 5.`
+    )
+  }
+
+  // Create each tag using RPC
+  for (const tagName of tagNames) {
+    const { error } = await supabase.rpc('create_tag', {
+      tag_name: tagName,
+      send_account_id: sendAccount?.id,
     })
+    expect(error).toBeFalsy()
+  }
 }
 
 const confirmTags = async (checkoutPage: CheckoutPage, tagNames: string[]) => {
@@ -71,13 +96,14 @@ const setupReferral = async (
   referrerSendAccount: { address: `0x${string}` }
   referrerTags: string[]
 }> => {
-  const plan = await seed.users([userOnboarded])
-  const referrer = plan.profiles[0]
-  const referrerSendAccount = plan.send_accounts[0] as { address: `0x${string}` }
+  const plan = await createUserWithTagsAndAccounts(seed)
+  const referrer = plan.profile
+  const referrerSendAccount = plan.sendAccount as { address: `0x${string}` }
   const referrerTags = plan.tags.map((t) => t.name)
   assert(!!referrer, 'profile not found')
   assert(!!referrer.referral_code, 'referral code not found')
   assert(!!referrerSendAccount, 'referrer send account not found')
+  assert(referrerTags.length > 0, 'referrer should have at least one tag')
   return { referrer, referrerSendAccount, referrerTags } as {
     referrer: { referral_code: string; send_id: number; id: string }
     referrerSendAccount: { address: `0x${string}` }

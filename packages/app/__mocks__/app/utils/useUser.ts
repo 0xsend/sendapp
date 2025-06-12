@@ -13,6 +13,8 @@ const mock = {
         name: 'tag1',
       },
     ],
+    main_tag_id: 1,
+    main_tag_name: 'tag1',
   }),
 }
 

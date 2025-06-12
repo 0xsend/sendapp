@@ -4,6 +4,9 @@ import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { verifyMessage, isAddress, getAddress } from 'viem'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
+import type { Database } from '@my/supabase/database.types'
+
+type ChainAddress = Database['public']['Tables']['chain_addresses']['Row']
 
 export const chainAddressRouter = createTRPCRouter({
   verify: protectedProcedure
@@ -37,10 +40,13 @@ export const chainAddressRouter = createTRPCRouter({
       }
 
       const supabaseAdmin = createSupabaseAdminClient()
-      const { data: results, error } = await supabaseAdmin.from('chain_addresses').insert({
-        address,
-        user_id: session.user.id,
-      })
+      const { data: results, error } = await supabaseAdmin
+        .from('chain_addresses')
+        .insert({
+          address,
+          user_id: session.user.id,
+        })
+        .select()
 
       if (error) {
         if (error.message.includes('duplicate key value violates unique constraint'))

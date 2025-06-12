@@ -9,6 +9,8 @@ import { useUser } from 'app/utils/useUser'
 import { useValidateSendtag } from 'app/utils/tags/useValidateSendtag'
 import { ReferredBy } from 'app/features/account/sendtag/components/ReferredBy'
 import { Platform } from 'react-native'
+import { useSendAccount } from 'app/utils/send-accounts'
+import { assert } from 'app/utils/assert'
 
 const SendtagSchemaWithoutRestrictions = z.object({
   name: formFields.text,
@@ -19,6 +21,7 @@ export const FirstSendtagForm = () => {
   const form = useForm<z.infer<typeof SendtagSchemaWithoutRestrictions>>()
   const router = useRouter()
   const user = useUser()
+  const sendAccount = useSendAccount()
 
   const formName = form.watch('name')
   const validationError = form.formState.errors.root
@@ -38,8 +41,9 @@ export const FirstSendtagForm = () => {
 
   const handleSubmit = async ({ name }: z.infer<typeof SendtagSchemaWithoutRestrictions>) => {
     try {
+      assert(!!sendAccount.data?.id, 'No send account id')
       await validateSendtagMutateAsync({ name })
-      await registerFirstSendtagMutateAsync({ name })
+      await registerFirstSendtagMutateAsync({ name, sendAccountId: sendAccount.data.id })
     } catch (error) {
       form.setError('root', {
         type: 'custom',

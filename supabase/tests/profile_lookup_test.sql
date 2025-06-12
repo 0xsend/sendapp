@@ -2,12 +2,8 @@ BEGIN;
 SELECT plan(13);
 CREATE EXTENSION "basejump-supabase_test_helpers";
 SELECT tests.create_supabase_user('valid_tag_user');
-SELECT tests.authenticate_as_service_role();
-INSERT INTO tags (user_id, name, status)
-VALUES (tests.get_supabase_uid('valid_tag_user'), 'valid_tag', 'confirmed');
-UPDATE profiles
-SET x_username = 'x_valid_tag_user', birthday = '2025-05-14'::DATE
-WHERE id = tests.get_supabase_uid('valid_tag_user');
+-- Create send account as authenticated user
+SELECT tests.authenticate_as('valid_tag_user');
 INSERT INTO send_accounts (user_id, address, chain_id, init_code)
 VALUES (
     tests.get_supabase_uid('valid_tag_user'),
@@ -15,10 +11,21 @@ VALUES (
     1,
     '\\x00112233445566778899AABBCCDDEEFF'
 );
+
+-- Create tag using create_tag function and confirm it
+SELECT create_tag('valid_tag', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('valid_tag_user')));
+
+-- Switch to service_role to update tag status
+SELECT tests.authenticate_as_service_role();
+UPDATE tags SET status = 'confirmed' WHERE name = 'valid_tag';
+
+UPDATE profiles
+SET x_username = 'x_valid_tag_user', birthday = '2025-05-14'::DATE
+WHERE id = tests.get_supabase_uid('valid_tag_user');
 SELECT tests.create_supabase_user('kennyl');
 SELECT tests.authenticate_as_service_role();
-INSERT INTO tags (user_id, name, status)
-VALUES (tests.get_supabase_uid('kennyl'), 'kennyl', 'confirmed');
+
+-- Create send account for kennyl
 INSERT INTO send_accounts (user_id, address, chain_id, init_code)
 VALUES (
     tests.get_supabase_uid('kennyl'),
@@ -26,6 +33,14 @@ VALUES (
     1,
     '\\x00112233445566778899AABBCCDDEEFF'
 );
+
+-- Create tag for kennyl as authenticated kennyl user
+SELECT tests.authenticate_as('kennyl');
+SELECT create_tag('kennyl', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('kennyl')));
+
+-- Switch to service_role to update tag status
+SELECT tests.authenticate_as_service_role();
+UPDATE tags SET status = 'confirmed' WHERE name = 'kennyl';
 DO $$
 DECLARE
   send_id int;

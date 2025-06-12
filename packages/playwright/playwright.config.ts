@@ -18,7 +18,7 @@ const workers = Math.min(4, Math.max(1, Math.floor(cpus * (Number.parseInt('50%'
 globalThis.__DEV__ = false
 
 // validate environment ensuring we aren't talking to prod or staging or something
-const _url = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL || '')
+const _url = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ?? '')
 if (!['127.0.0.1', 'localhost', 'host.docker.internal'].some((host) => _url.hostname === host)) {
   console.log(`
 

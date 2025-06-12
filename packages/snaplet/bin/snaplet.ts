@@ -71,7 +71,8 @@ if (argv.restore) {
 
   // now run the snapshot restore command
   await $`bunx supabase db reset`.catch((e) => {
-    console.log(chalk.red('Error resetting database:'), e)
+    console.log(chalk.red('Error resetting database:'))
+    console.log(chalk.red(e.stderr))
     process.exit(1)
   })
   // restore the database from the latest snapshot
@@ -86,11 +87,13 @@ if (argv.restore) {
     // now migrate the database with the latest migrations
     console.log(chalk.blue('Migrating database after restoring snapshot...'))
     await $`git checkout ${prjRoot}/supabase/migrations`.catch((e) => {
-      console.log(chalk.red('Error checking out migrations:'), e)
+      console.log(chalk.red('Error checking out migrations:'))
+      console.log(chalk.red(e.stderr))
       process.exit(1)
     })
     await $`bunx supabase db push --local --include-all`.catch((e) => {
-      console.log(chalk.red('Error migrating database:'), e)
+      console.log(chalk.red('Error migrating database:'))
+      console.log(chalk.red(e.stderr))
       process.exit(1)
     })
     console.log(chalk.green('Done migrating database'))

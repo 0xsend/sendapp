@@ -1,44 +1,41 @@
 -- Functions
-CREATE OR REPLACE FUNCTION "public"."tag_receipts_insert_activity_trigger"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
-begin
-    delete from activity
-    where event_name = 'tag_receipt_usdc'
-      and event_id in (select event_id from NEW_TABLE);
-
-    insert into activity (event_name, event_id, from_user_id, to_user_id, data, created_at)
-    select
+CREATE OR REPLACE FUNCTION public.tag_receipts_insert_activity_trigger()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+    SECURITY DEFINER
+    AS $function$
+BEGIN
+    DELETE FROM activity
+    WHERE event_name = 'tag_receipt_usdc'
+        AND event_id IN(
+            SELECT
+                event_id
+            FROM
+                NEW_TABLE);
+    -- Insert activity records using send_account_id from the confirmation
+    INSERT INTO activity(event_name, event_id, from_user_id, data)
+    SELECT
         'tag_receipt_usdc',
         NEW_TABLE.event_id,
-        t.user_id,
-        null,
-        json_build_object(
-                'log_addr',
-                scr.log_addr,
-                'block_num',
-                scr.block_num,
-                'tx_idx',
-                scr.tx_idx,
-                'log_idx',
-                scr.log_idx,
-                'tx_hash',
-                scr.tx_hash,
-                'tags',
-                array_agg(t.name),
-                'value',
-            -- cast amount to text to avoid losing precision when converting to json when sending to clients
-                scr.amount::text
-        ),
-        current_timestamp
-    from NEW_TABLE
-             join tags t on t.name = NEW_TABLE.tag_name
-             join sendtag_checkout_receipts scr ON NEW_TABLE.event_id = scr.event_id
-    group by t.user_id, NEW_TABLE.event_id, scr.event_id, scr.log_addr, scr.block_num, scr.tx_idx, scr.log_idx,  scr.tx_hash, scr.amount;
-
-    return NULL;
-end;
-$$;
+        r.user_id,
+        jsonb_build_object('log_addr', scr.log_addr, 'block_num', scr.block_num, 'tx_idx', scr.tx_idx, 'log_idx', scr.log_idx, 'tx_hash', scr.tx_hash, 'tags', array_agg(NEW_TABLE.tag_name), 'value', scr.amount::text)
+    FROM
+        NEW_TABLE
+        JOIN receipts r ON r.event_id = NEW_TABLE.event_id
+        JOIN sendtag_checkout_receipts scr ON scr.event_id = NEW_TABLE.event_id
+    GROUP BY
+        r.user_id,
+        NEW_TABLE.event_id,
+        scr.event_id,
+        scr.log_addr,
+        scr.block_num,
+        scr.tx_idx,
+        scr.log_idx,
+        scr.tx_hash,
+        scr.amount;
+    RETURN NULL;
+END;
+$function$;
 ALTER FUNCTION "public"."tag_receipts_insert_activity_trigger"() OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION public.insert_verification_tag_registration_from_receipt()
@@ -110,6 +107,7 @@ ALTER TABLE "public"."tag_receipts_id_seq" OWNER TO "postgres";
 -- Table
 CREATE TABLE IF NOT EXISTS "public"."tag_receipts" (
     "tag_name" "public"."citext" NOT NULL,
+    "tag_id" bigint NOT NULL,
     "hash" "public"."citext",
     "event_id" "text",
     "id" integer NOT NULL,
@@ -130,7 +128,7 @@ CREATE UNIQUE INDEX "tag_receipts_event_id_idx" ON "public"."tag_receipts" USING
 
 -- Foreign Keys
 ALTER TABLE ONLY "public"."tag_receipts"
-    ADD CONSTRAINT "tag_receipts_tag_name_fkey" FOREIGN KEY ("tag_name") REFERENCES "public"."tags"("name") ON DELETE CASCADE;
+    ADD CONSTRAINT "tag_receipts_tag_id_fkey" FOREIGN KEY ("tag_id") REFERENCES "public"."tags"("id") ON DELETE CASCADE;
 
 -- Triggers
 CREATE OR REPLACE TRIGGER "tag_receipts_insert_activity_trigger" AFTER INSERT ON "public"."tag_receipts" REFERENCING NEW TABLE AS "new_table" FOR EACH STATEMENT EXECUTE FUNCTION "public"."tag_receipts_insert_activity_trigger"();

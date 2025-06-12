@@ -32,12 +32,14 @@ export default defineConfig({
       sso_domains: false,
       sso_providers: false,
       one_time_tokens: false,
+      schema_migrations: false,
     },
     storage: {
       buckets: true,
       objects: true,
       s3_multipart_uploads: false,
       s3_multipart_uploads_parts: false,
+      migrations: false,
     },
     dbdev: false,
     extensions: false,
@@ -126,6 +128,9 @@ export default defineConfig({
         }
       },
       send_accounts: ({ row }) => {
+        return row
+      },
+      send_account_tags: ({ row }) => {
         return row
       },
       send_account_transfers: ({ row }) => {

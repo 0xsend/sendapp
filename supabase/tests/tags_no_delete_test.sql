@@ -49,15 +49,15 @@ VALUES (
 );
 SELECT tests.authenticate_as('bob');
 
--- Inserting a tag for test user
-INSERT INTO tags (name)
-VALUES ('bob');
+-- Create a tag using the proper function
+SELECT create_tag('bob', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('bob')));
 
 -- confirm tag
 SET ROLE service_role;
 
 SELECT confirm_tags(
-    '{bob}',
+    '{bob}'::citext[],
+    (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('bob')),
     (
         SELECT event_id
         FROM sendtag_checkout_receipts

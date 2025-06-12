@@ -291,6 +291,26 @@ cmd_button(
 )
 
 local_resource(
+    "snaplet:test",
+    "yarn workspace @my/snaplet test",
+    allow_parallel = True,
+    labels = labels,
+    resource_deps = [
+        "yarn:install",
+        "supabase",
+        "snaplet:sync",
+    ],
+    deps = files_matching(
+        os.path.join(
+            config.main_dir,
+            "packages",
+            "snaplet",
+        ),
+        lambda f: f.endswith(".ts"),
+    ),
+)
+
+local_resource(
     name = "unit-tests",
     allow_parallel = True,
     cmd = "echo 🥳",
@@ -303,6 +323,7 @@ local_resource(
         "contracts:test",
         "workers:test",
         "next:test",
+        "snaplet:test",
     ],
 )
 

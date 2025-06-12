@@ -3,7 +3,7 @@ import { test as sendAccountTest, expect } from '@my/playwright/fixtures/send-ac
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
 import debug from 'debug'
 import { assert } from 'app/utils/assert'
-import { userOnboarded } from '@my/snaplet/models'
+import { createUserWithTagsAndAccounts, createUserWithoutTags } from '@my/snaplet'
 import { ProfilePage } from './fixtures/profiles'
 import { MockActivityFeed } from 'app/features/activity/utils/__mocks__/mock-activity-feed'
 import { SUPABASE_URL } from 'app/utils/supabase/admin'
@@ -16,10 +16,11 @@ test.beforeAll(async () => {
   log = debug(`test:profile:logged-in:${test.info().workerIndex}`)
 })
 
-test('can visit other user profile and send by tag', async ({ page, seed }) => {
-  const plan = await seed.users([userOnboarded])
-  const tag = plan.tags[0]
-  const profile = plan.profiles[0]
+test('can visit other user profile and send by tag', async ({ page, seed, pg }) => {
+  const { profile, tags } = await createUserWithTagsAndAccounts(seed, {
+    tagCount: 1,
+  })
+  const tag = tags[0]
   assert(!!tag?.name, 'tag not found')
   assert(!!profile?.name, 'profile name not found')
   assert(!!profile?.about, 'profile about not found')
@@ -36,10 +37,10 @@ test('can visit other user profile and send by tag', async ({ page, seed }) => {
   await expect(page.locator('h2', { hasText: 'Enter Amount' })).toBeVisible()
 
   // visit another user but without a sendtag
-  const plan2 = await seed.users([{ ...userOnboarded, tags: [] }])
+  const plan2 = await createUserWithTagsAndAccounts(seed, { tagCount: 0 })
   const tag2 = plan2.tags[0]
   assert(!tag2, 'should not have a tag')
-  const profile2 = plan2.profiles[0]
+  const profile2 = plan2.profile
   assert(!!profile2?.send_id, 'profile send_id not found')
   assert(!!profile2?.name, 'profile name not found')
   assert(!!profile2?.about, 'profile about not found')
@@ -73,9 +74,26 @@ test('can visit my own profile', async ({
     profile,
   },
 }) => {
-  const plan = await seed.tags([{ user_id, status: 'confirmed' }])
-  const tag = plan.tags[0]
+  // Create tag and send_account for existing user
+  const plan = await seed.send_accounts([
+    {
+      user_id,
+      chain_id: 845337,
+    },
+  ])
+
+  const tagPlan = await seed.tags([
+    {
+      user_id,
+      status: 'confirmed',
+    },
+  ])
+
+  const tag = tagPlan.tags[0]
+  const account = plan.send_accounts[0]
   assert(!!tag?.name, 'tag not found')
+  assert(!!account?.id, 'account not found')
+
   assert(!!profile?.name, 'profile name not found')
   assert(!!profile?.about, 'profile about not found')
   const profilePage = new ProfilePage(page, { name: profile.name, about: profile.about })
@@ -83,13 +101,14 @@ test('can visit my own profile', async ({
   await expect(profilePage.sendButton).toBeVisible()
 })
 
-test('can visit private profile', async ({ page, seed }) => {
-  const plan = await seed.users([
-    { ...userOnboarded, profiles: [{ is_public: false, x_username: null }] },
-  ])
+test('can visit private profile', async ({ page, seed, pg }) => {
+  const plan = await createUserWithTagsAndAccounts(seed, { isPublic: false })
   const tag = plan.tags[0]
-  const profile = plan.profiles[0]
+  const account = plan.sendAccount
   assert(!!tag?.name, 'tag not found')
+  assert(!!account?.id, 'account not found')
+
+  const profile = plan.profile
   assert(!!profile?.name, 'profile name not found')
   assert(!!profile?.about, 'profile about not found')
   const profilePage = new ProfilePage(page, { name: profile.name, about: profile.about })
@@ -103,8 +122,8 @@ test('can view activities between another profile', async ({
   user: { profile },
   seed,
 }) => {
-  const plan = await seed.users([{ ...userOnboarded, tags: [] }])
-  const anotherUser = plan.profiles[0]
+  const plan = await createUserWithoutTags(seed)
+  const anotherUser = plan.profile
   assert(!!anotherUser, 'another user not found')
   assert(!!anotherUser.name, 'another user name not found')
   assert(!!anotherUser.about, 'another user about not found')

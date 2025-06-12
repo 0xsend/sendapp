@@ -1,6 +1,6 @@
 -- Functions
 CREATE OR REPLACE FUNCTION public.profile_lookup(lookup_type lookup_type_enum, identifier text)
- RETURNS TABLE(id uuid, avatar_url text, name text, about text, refcode text, x_username text, birthday date, tag citext, address citext, chain_id integer, is_public boolean, sendid integer, all_tags text[])
+ RETURNS TABLE(id uuid, avatar_url text, name text, about text, refcode text, x_username text, birthday date, tag citext, address citext, chain_id integer, is_public boolean, sendid integer, all_tags text[], main_tag_id bigint, main_tag_name text)
  LANGUAGE plpgsql
  IMMUTABLE SECURITY DEFINER
 AS $function$
@@ -15,20 +15,26 @@ select case when p.id = ( select auth.uid() ) then p.id end              as id,
         p.referral_code                                                   as refcode,
        CASE WHEN p.is_public THEN p.x_username ELSE NULL END AS x_username, -- changed to be null if profile is private
        CASE WHEN p.is_public THEN p.birthday ELSE NULL END AS birthday, -- added birthday to return type, returns null if profile is private
-       t.name                                                            as tag,
+       COALESCE(mt.name, t.name)                                         as tag,
        sa.address                                                        as address,
        sa.chain_id                                                       as chain_id,
        case when current_setting('role')::text = 'service_role' then p.is_public
             when p.is_public then true
             else false end                                               as is_public,
        p.send_id                                                         as sendid,
-       ( select array_agg(t.name::text)
-         from tags t
-         where t.user_id = p.id and t.status = 'confirmed'::tag_status ) as all_tags
+       ( select array_agg(t2.name::text)
+         from tags t2
+         join send_account_tags sat2 on sat2.tag_id = t2.id
+         join send_accounts sa2 on sa2.id = sat2.send_account_id
+         where sa2.user_id = p.id and t2.status = 'confirmed'::tag_status ) as all_tags,
+       case when p.id = ( select auth.uid() ) then sa.main_tag_id end   as main_tag_id,
+       mt.name::text                                                     as main_tag_name
 from profiles p
     join auth.users a on a.id = p.id
-    left join tags t on t.user_id = p.id and t.status = 'confirmed'::tag_status
     left join send_accounts sa on sa.user_id = p.id
+    left join tags mt on mt.id = sa.main_tag_id
+    left join send_account_tags sat on sat.send_account_id = sa.id
+    left join tags t on t.id = sat.tag_id and t.status = 'confirmed'::tag_status
 where ((lookup_type = 'sendid' and p.send_id::text = identifier) or
     (lookup_type = 'tag' and t.name = identifier::citext) or
     (lookup_type = 'refcode' and p.referral_code = identifier) or
@@ -200,10 +206,14 @@ begin
                          p.name, -- name
                          p.avatar_url, -- avatar_url
                          p.send_id, -- send_id
+                         sa.main_tag_id, -- main_tag_id
+                         mt.name, -- main_tag_name
                          ( select array_agg(name) from tags where user_id = p.id and status = 'confirmed' ) -- tags
                             )::activity_feed_user                      as "user"
                  from private.leaderboard_referrals_all_time l
                           join profiles p on p.id = user_id
+                          left join send_accounts sa on sa.user_id = p.id
+                          left join tags mt on mt.id = sa.main_tag_id
                  where p.is_public = true;
 end
 $$;
@@ -455,9 +465,11 @@ CREATE OR REPLACE VIEW "public"."referrer" WITH ("security_barrier"='on') AS
             "p"."is_public",
             "p"."sendid",
             "p"."all_tags",
+            "p"."main_tag_id",
+            "p"."main_tag_name",
             "referrer"."send_id"
            FROM ("public"."profile_lookup"('sendid'::"public"."lookup_type_enum", ( SELECT ("referrer_1"."send_id")::"text" AS "send_id"
-                   FROM "referrer" "referrer_1")) "p"("id", "avatar_url", "name", "about", "refcode", "x_username", "birthday", "tag", "address", "chain_id", "is_public", "sendid", "all_tags")
+                   FROM "referrer" "referrer_1")) "p"("id", "avatar_url", "name", "about", "refcode", "x_username", "birthday", "tag", "address", "chain_id", "is_public", "sendid", "all_tags", "main_tag_id", "main_tag_name")
              JOIN "referrer" ON (("referrer"."send_id" IS NOT NULL)))
         )
  SELECT "profile_lookup"."id",
@@ -473,6 +485,8 @@ CREATE OR REPLACE VIEW "public"."referrer" WITH ("security_barrier"='on') AS
     "profile_lookup"."is_public",
     "profile_lookup"."sendid",
     "profile_lookup"."all_tags",
+    "profile_lookup"."main_tag_id",
+    "profile_lookup"."main_tag_name",
     "profile_lookup"."send_id"
    FROM "profile_lookup";
 

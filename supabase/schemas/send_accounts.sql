@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS "public"."send_accounts" (
     "address" "public"."citext" NOT NULL,
     "chain_id" integer NOT NULL,
     "init_code" "bytea" NOT NULL,
+    "main_tag_id" bigint,
     "created_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     "updated_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     "deleted_at" timestamp with time zone,
@@ -22,10 +23,14 @@ CREATE INDEX "idx_send_accounts_address" ON "public"."send_accounts" USING "btre
 CREATE INDEX "idx_send_accounts_address_user" ON "public"."send_accounts" USING "btree" ("address", "user_id");
 CREATE UNIQUE INDEX "send_accounts_address_key" ON "public"."send_accounts" USING "btree" ("address", "chain_id");
 CREATE INDEX "send_accounts_user_id_index" ON "public"."send_accounts" USING "btree" ("user_id");
+CREATE INDEX "idx_send_accounts_main_tag_id" ON "public"."send_accounts" USING "btree" ("main_tag_id");
 
 -- Foreign Keys
 ALTER TABLE ONLY "public"."send_accounts"
     ADD CONSTRAINT "send_accounts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
+
+ALTER TABLE ONLY "public"."send_accounts"
+    ADD CONSTRAINT "send_accounts_main_tag_id_fkey" FOREIGN KEY ("main_tag_id") REFERENCES "public"."tags"("id") ON DELETE SET NULL;
 
 -- RLS
 ALTER TABLE "public"."send_accounts" ENABLE ROW LEVEL SECURITY;
@@ -275,11 +280,6 @@ $function$
 
 ALTER FUNCTION "public"."insert_verification_create_passkey"() OWNER TO "postgres";
 
--- Triggers
-CREATE OR REPLACE TRIGGER "insert_verification_create_passkey" AFTER INSERT ON "public"."send_accounts" FOR EACH ROW EXECUTE FUNCTION "public"."insert_verification_create_passkey"();
-
-CREATE OR REPLACE TRIGGER "trigger_send_accounts_after_insert" AFTER INSERT OR UPDATE ON "public"."send_accounts" FOR EACH ROW EXECUTE FUNCTION "public"."send_accounts_after_insert"();
-
 -- Function Grants
 GRANT ALL ON FUNCTION "public"."create_send_account"("send_account" "public"."send_accounts", "webauthn_credential" "public"."webauthn_credentials", "key_slot" integer) TO "anon";
 GRANT ALL ON FUNCTION "public"."create_send_account"("send_account" "public"."send_accounts", "webauthn_credential" "public"."webauthn_credentials", "key_slot" integer) TO "authenticated";
@@ -298,3 +298,54 @@ GRANT ALL ON FUNCTION "public"."distribution_hodler_addresses"("distribution_id"
 GRANT ALL ON FUNCTION "public"."insert_verification_create_passkey"() TO "anon";
 GRANT ALL ON FUNCTION "public"."insert_verification_create_passkey"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."insert_verification_create_passkey"() TO "service_role";
+
+-- Additional Functions for main_tag_id
+CREATE OR REPLACE FUNCTION public.validate_main_tag_update()
+  RETURNS TRIGGER
+  LANGUAGE plpgsql
+  SECURITY DEFINER
+  SET search_path TO 'public'
+  AS $$
+BEGIN
+  -- Only prevent setting to NULL if there are other confirmed tags available
+  IF NEW.main_tag_id IS NULL AND OLD.main_tag_id IS NOT NULL AND EXISTS(
+    SELECT
+      1
+    FROM
+      send_account_tags sat
+      JOIN tags t ON t.id = sat.tag_id
+    WHERE
+      sat.send_account_id = NEW.id AND t.status = 'confirmed') THEN
+    RAISE EXCEPTION 'Cannot set main_tag_id to NULL while you have confirmed tags';
+  END IF;
+  -- Verify the new main_tag_id is one of the user's confirmed tags
+  IF NEW.main_tag_id IS NOT NULL AND NOT EXISTS(
+    SELECT
+      1
+    FROM
+      send_account_tags sat
+      JOIN tags t ON t.id = sat.tag_id
+    WHERE
+      sat.send_account_id = NEW.id AND t.status = 'confirmed' AND t.id = NEW.main_tag_id) THEN
+    RAISE EXCEPTION 'main_tag_id must be one of your confirmed tags';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+ALTER FUNCTION "public"."validate_main_tag_update"() OWNER TO "postgres";
+
+GRANT ALL ON FUNCTION "public"."validate_main_tag_update"() TO "anon";
+GRANT ALL ON FUNCTION "public"."validate_main_tag_update"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."validate_main_tag_update"() TO "service_role";
+
+
+-- Triggers
+CREATE OR REPLACE TRIGGER "insert_verification_create_passkey" AFTER INSERT ON "public"."send_accounts" FOR EACH ROW EXECUTE FUNCTION "public"."insert_verification_create_passkey"();
+
+CREATE OR REPLACE TRIGGER "trigger_send_accounts_after_insert" AFTER INSERT OR UPDATE ON "public"."send_accounts" FOR EACH ROW EXECUTE FUNCTION "public"."send_accounts_after_insert"();
+
+CREATE TRIGGER "validate_main_tag_update"
+    BEFORE UPDATE OF main_tag_id ON "public"."send_accounts"
+    FOR EACH ROW
+    EXECUTE FUNCTION "public"."validate_main_tag_update"();

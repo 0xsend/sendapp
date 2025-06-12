@@ -96,8 +96,11 @@ export function OnboardingScreen() {
       assert(!!user?.id, 'No user id')
 
       await validateSendtagMutateAsync({ name })
-      await createSendAccount({ user, accountName: name })
-      await registerFirstSendtagMutateAsync({ name })
+      const createdSendAccount = await createSendAccount({ user, accountName: name })
+      await registerFirstSendtagMutateAsync({
+        name,
+        sendAccountId: createdSendAccount.id,
+      })
       replace('/')
     } catch (error) {
       console.error('Error creating account', error)
