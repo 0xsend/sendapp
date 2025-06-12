@@ -1,8 +1,8 @@
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
 import { Stack } from 'expo-router'
-import { Link, Paragraph } from '@my/ui'
+import { DepositScreen } from 'app/features/deposit/screen'
 
-export default function DepositScreen() {
+export default function Screen() {
   return (
     <>
       <Stack.Screen
@@ -11,11 +11,7 @@ export default function DepositScreen() {
         }}
       />
       <ScreenContainer>
-        <Paragraph>DepositScreen</Paragraph>
-        <Link href={'/deposit/crypto'}>crypto</Link>
-        <Link href={'/deposit/apple-pay'}>apple pay</Link>
-        <Link href={'/deposit/debit-card'}>debit card</Link>
-        <Link href={'/deposit/success'}>success deposit</Link>
+        <DepositScreen />
       </ScreenContainer>
     </>
   )

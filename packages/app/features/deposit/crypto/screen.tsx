@@ -6,6 +6,7 @@ import * as Clipboard from 'expo-clipboard'
 import { useState } from 'react'
 import { IconCopy } from 'app/components/icons'
 import { CopyAddressDialog } from 'app/features/deposit/components/CopyAddressDialog'
+import { Platform } from 'react-native'
 
 export function DepositCryptoScreen() {
   const { data: sendAccount, isLoading: isLoadingSendAccount } = useSendAccount()
@@ -51,11 +52,13 @@ export function DepositCryptoScreen() {
       <YStack gap={'$3.5'}>
         <FadeCard>
           <Paragraph size={'$7'}>Base Network</Paragraph>
-          <DepositAddressQR
-            address={sendAccount?.address}
-            onPress={() => setCopyAddressDialogIsOpen(true)}
-            isConfirmed={isConfirmed}
-          />
+          {Platform.OS === 'web' && (
+            <DepositAddressQR
+              address={sendAccount?.address}
+              onPress={() => setCopyAddressDialogIsOpen(true)}
+              isConfirmed={isConfirmed}
+            />
+          )}
         </FadeCard>
       </YStack>
       <YStack width={'100%'}>

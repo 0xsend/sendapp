@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router/build/layouts/Stack'
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
-import { Paragraph } from '@my/ui'
+import { DepositCryptoScreen } from 'app/features/deposit/crypto/screen'
 
 export default function CryptoDepositScreen() {
   return (
@@ -11,7 +11,7 @@ export default function CryptoDepositScreen() {
         }}
       />
       <ScreenContainer>
-        <Paragraph>CryptoDepositScreen</Paragraph>
+        <DepositCryptoScreen />
       </ScreenContainer>
     </>
   )
