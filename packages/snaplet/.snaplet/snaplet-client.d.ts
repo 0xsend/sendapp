@@ -171,16 +171,7 @@ type Override = {
       created_at?: string;
     };
   }
-  storage_migrations?: {
-    name?: string;
-    fields?: {
-      id?: string;
-      name?: string;
-      hash?: string;
-      executed_at?: string;
-    };
-  }
-  supabase_functions_migrations?: {
+  migrations?: {
     name?: string;
     fields?: {
       version?: string;
@@ -262,12 +253,6 @@ type Override = {
     fields?: {
       version?: string;
       inserted_at?: string;
-    };
-  }
-  auth_schema_migrations?: {
-    name?: string;
-    fields?: {
-      version?: string;
     };
   }
   supabase_migrations_schema_migrations?: {
@@ -895,11 +880,7 @@ export interface Fingerprint {
     chainId?: FingerprintNumberField;
     createdAt?: FingerprintDateField;
   }
-  storageMigrations?: {
-    id?: FingerprintNumberField;
-    executedAt?: FingerprintDateField;
-  }
-  supabaseFunctionsMigrations?: {
+  migrations?: {
     insertedAt?: FingerprintDateField;
   }
   objects?: {
@@ -939,9 +920,6 @@ export interface Fingerprint {
   RealtimeSchemaMigrations?: {
     version?: FingerprintNumberField;
     insertedAt?: FingerprintDateField;
-  }
-  authSchemaMigrations?: {
-
   }
   supabaseMigrationsSchemaMigrations?: {
 
