@@ -456,50 +456,15 @@ export const sendAccountRouter = createTRPCRouter({
     .input(
       z.object({
         tagId: z.number(),
+        sendAccountId: z.string().min(1).trim(),
       })
     )
-    .mutation(async ({ ctx: { supabase }, input: { tagId } }) => {
-      const { data: profile } = await supabase.auth.getUser()
-      if (!profile.user) throw new TRPCError({ code: 'UNAUTHORIZED' })
-
-      // Get user's send account
-      const { data: sendAccount, error: sendAccountError } = await supabase
-        .from('send_accounts')
-        .select('id')
-        .eq('user_id', profile.user.id)
-        .single()
-
-      if (sendAccountError || !sendAccount) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: 'Send account not found',
-        })
-      }
-
-      // Validate tag exists and belongs to user
-      const { data: tagOwnership, error: tagError } = await supabase
-        .from('send_account_tags')
-        .select(`
-          send_account_tags!inner(*),
-          tags!inner(id, status)
-        `)
-        .eq('send_account_id', sendAccount.id)
-        .eq('tag_id', tagId)
-        .eq('tags.status', 'confirmed') // Must be confirmed
-        .single()
-
-      if (tagError || !tagOwnership) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'Tag not found or not confirmed for this send account',
-        })
-      }
-
+    .mutation(async ({ ctx: { supabase }, input: { tagId, sendAccountId } }) => {
       // Update main tag
       const { data: result, error: updateError } = await supabase
         .from('send_accounts')
         .update({ main_tag_id: tagId })
-        .eq('id', sendAccount.id)
+        .eq('id', sendAccountId)
         .select()
         .single()
 

@@ -11,11 +11,10 @@ import {
   YStack,
   Sheet,
   Button,
-  H3,
   Adapt,
   Dialog,
 } from '@my/ui'
-import { IconPlus, IconSlash, IconBadgeCheck } from 'app/components/icons'
+import { IconPlus, IconSlash, IconBadgeCheck, IconX } from 'app/components/icons'
 import { maxNumSendTags } from 'app/data/sendtags'
 import { useUser } from 'app/utils/useUser'
 import { useSendAccount } from 'app/utils/send-accounts'
@@ -203,7 +202,7 @@ function MainTagSelectionSheet({
 }) {
   const toast = useToastController()
   const { updateProfile } = useUser()
-  const { refetch: refetchSendAccount } = useSendAccount()
+  const { refetch: refetchSendAccount, data: sendAccount } = useSendAccount()
   const { mutateAsync: updateMainTag, isPending } = api.sendAccount.updateMainTag.useMutation({
     onSuccess: async () => {
       toast.show('Main tag updated')
@@ -218,76 +217,18 @@ function MainTagSelectionSheet({
   })
 
   const handleSelectTag = async (tagId: number) => {
-    if (tagId === currentMainTagId || isPending) return
-    await updateMainTag({ tagId })
+    if (tagId === currentMainTagId || isPending || !sendAccount) return
+    await updateMainTag({ tagId, sendAccountId: sendAccount?.id })
   }
-
-  const content = (
-    <YStack gap="$4" pb="$4">
-      <H3 ta="center">Select Main Tag</H3>
-      <Paragraph ta="center" size="$3" color="$color11">
-        Choose which tag appears as your primary identity
-      </Paragraph>
-      <YStack gap="$2" mt="$4">
-        {tags.map((tag) => {
-          const isCurrentMain = tag.id === currentMainTagId
-          return (
-            <Button
-              key={tag.id}
-              size="$5"
-              br="$4"
-              theme={isCurrentMain ? 'green' : 'gray'}
-              disabled={isCurrentMain || isPending}
-              onPress={() => handleSelectTag(tag.id)}
-              icon={
-                isPending ? (
-                  <Spinner size="small" color="$color11" />
-                ) : (
-                  <XStack gap="$3" ai="center" f={1}>
-                    <IconSlash size="$1.5" />
-                    <Paragraph size="$5" fontWeight="500" f={1}>
-                      {tag.name}
-                    </Paragraph>
-                    {isCurrentMain && <IconBadgeCheck size="$1" color="$color12" />}
-                  </XStack>
-                )
-              }
-              pressStyle={{ o: 0.8 }}
-            />
-          )
-        })}
-      </YStack>
-      {isPending && (
-        <XStack ai="center" jc="center" gap="$2" mt="$2">
-          <Spinner size="small" color="$primary" />
-          <Paragraph size="$3" color="$color11">
-            Updating main tag...
-          </Paragraph>
-        </XStack>
-      )}
-    </YStack>
-  )
 
   return (
     <Dialog modal open={open} onOpenChange={onOpenChange}>
       <Adapt when="sm" platform="touch">
-        <Sheet
-          modal
-          dismissOnOverlayPress
-          dismissOnSnapToBottom
-          open={open}
-          onOpenChange={onOpenChange}
-          snapPoints={[60]}
-          position={0}
-          zIndex={100_000}
-        >
-          <Sheet.Overlay />
-          <Sheet.Handle bc="$color12" o={0.3} />
-          <Sheet.Frame>
-            <Sheet.ScrollView p="$4" gap="$4">
-              {content}
-            </Sheet.ScrollView>
+        <Sheet zIndex={200000} modal dismissOnSnapToBottom disableDrag>
+          <Sheet.Frame padding="$4" gap="$4">
+            <Adapt.Contents />
           </Sheet.Frame>
+          <Sheet.Overlay animation="lazy" enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }} />
         </Sheet>
       </Adapt>
 
@@ -295,14 +236,16 @@ function MainTagSelectionSheet({
         <Dialog.Overlay
           key="overlay"
           animation="quick"
-          o={0.5}
-          enterStyle={{ o: 0 }}
-          exitStyle={{ o: 0 }}
+          opacity={0.5}
+          enterStyle={{ opacity: 0 }}
+          exitStyle={{ opacity: 0 }}
         />
+
         <Dialog.Content
           bordered
           elevate
           key="content"
+          animateOnly={['transform', 'opacity']}
           animation={[
             'quick',
             {
@@ -314,11 +257,61 @@ function MainTagSelectionSheet({
           enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
           exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
           gap="$4"
+          width="100%"
           maxWidth={450}
-          width="90%"
-          p="$4"
         >
-          {content}
+          <Dialog.Title ta={'center'}>Select Main Tag</Dialog.Title>
+          <Dialog.Description ta="center" size="$3" color="$color11">
+            Choose which tag appears as your primary identity
+          </Dialog.Description>
+          <YStack gap="$2">
+            {tags.map((tag) => {
+              const isCurrentMain = tag.id === currentMainTagId
+              return (
+                <Button
+                  key={tag.id}
+                  size="$5"
+                  br="$4"
+                  theme={isCurrentMain ? 'green' : 'gray'}
+                  disabled={isCurrentMain || isPending}
+                  onPress={() => handleSelectTag(tag.id)}
+                  icon={
+                    isPending ? (
+                      <Spinner size="small" color="$color11" />
+                    ) : (
+                      <XStack gap="$3" ai="center" f={1}>
+                        <IconSlash size="$1.5" />
+                        <Paragraph size="$5" fontWeight="500" f={1}>
+                          {tag.name}
+                        </Paragraph>
+                        {isCurrentMain && <IconBadgeCheck size="$1" color="$color12" />}
+                      </XStack>
+                    )
+                  }
+                  pressStyle={{ o: 0.8 }}
+                />
+              )
+            })}
+          </YStack>
+          {isPending && (
+            <XStack ai="center" jc="center" gap="$2" mt="$2">
+              <Spinner size="small" color="$primary" />
+              <Paragraph size="$3" color="$color11">
+                Updating main tag...
+              </Paragraph>
+            </XStack>
+          )}
+
+          <Dialog.Close displayWhenAdapted asChild>
+            <Button
+              position="absolute"
+              top="$3"
+              right="$3"
+              size="$2"
+              circular
+              icon={<IconX size={16} color="$color12" />}
+            />
+          </Dialog.Close>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog>
