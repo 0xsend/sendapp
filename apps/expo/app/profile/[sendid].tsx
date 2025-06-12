@@ -1,8 +1,8 @@
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
 import { Stack } from 'expo-router'
-import { Paragraph } from '@my/ui'
+import { ProfileScreen } from 'app/features/profile/screen'
 
-export default function ProfileScreen() {
+export default function Screen() {
   return (
     <>
       <Stack.Screen
@@ -11,7 +11,7 @@ export default function ProfileScreen() {
         }}
       />
       <ScreenContainer>
-        <Paragraph>History</Paragraph>
+        <ProfileScreen />
       </ScreenContainer>
     </>
   )
