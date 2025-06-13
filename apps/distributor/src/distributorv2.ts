@@ -285,9 +285,12 @@ export class DistributorV2Worker {
           )
         }
 
-        return balances.filter(
-          ({ balance }) => BigInt(balance) >= BigInt(distribution.hodler_min_balance)
-        )
+        return balances
+          .map((balance) => ({
+            ...balance,
+            address: normalizeAddress(balance.address), // Normalize the address
+          }))
+          .filter(({ balance }) => BigInt(balance) >= BigInt(distribution.hodler_min_balance))
       })
 
     log.info(

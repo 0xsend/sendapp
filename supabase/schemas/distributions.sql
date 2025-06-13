@@ -325,7 +325,7 @@ BEGIN
             DATE(to_timestamp(stt.block_time) AT TIME ZONE 'UTC') AS transfer_date,
             COUNT(DISTINCT stt.t) AS unique_recipients
         FROM
-            stt stt
+            send_token_transfers stt
             JOIN send_accounts sa ON sa.address = CONCAT('0x', ENCODE(stt.f, 'hex'))::CITEXT
         WHERE
             stt.block_time >= EXTRACT(EPOCH FROM (
@@ -960,65 +960,76 @@ GRANT ALL ON FUNCTION "public"."update_referral_verifications"("distribution_id"
 GRANT ALL ON FUNCTION "public"."update_referral_verifications"("distribution_id" integer, "shares" "public"."distribution_shares"[]) TO "service_role";
 
 CREATE OR REPLACE FUNCTION public.insert_verification_sends()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path TO public
-AS $$
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+DECLARE
+    score_record RECORD;
 BEGIN
-  UPDATE public.distribution_verifications dv
-  SET metadata = jsonb_build_object('value', ss.unique_sends),
-      weight = CASE
-        WHEN dv.type = 'send_ten' AND ss.unique_sends >= 10 THEN 1
-        WHEN dv.type = 'send_one_hundred' AND ss.unique_sends >= 100 THEN 1
-        ELSE 0
-      END,
-      created_at = to_timestamp(NEW.block_time) at time zone 'UTC'
-  FROM send_scores_current ss
-  JOIN send_accounts sa ON sa.user_id = ss.user_id
-  WHERE dv.distribution_id = ss.distribution_id
-    AND dv.user_id = ss.user_id
-    AND dv.type IN ('send_ten', 'send_one_hundred')
-    AND sa.address = concat('0x', encode(NEW.f, 'hex'))::citext;
+    -- Calculate send_scores_current only once by getting the score for this sender
+    SELECT ss.distribution_id, ss.user_id, ss.unique_sends
+    INTO score_record
+    FROM send_scores_current ss
+    JOIN send_accounts sa ON sa.user_id = ss.user_id
+    WHERE sa.address = concat('0x', encode(NEW.f, 'hex'))::citext;
 
-  INSERT INTO public.distribution_verifications(
-    distribution_id,
-    user_id,
-    type,
-    metadata,
-    weight,
-    created_at
-  )
-  SELECT
-    ss.distribution_id,
-    ss.user_id,
-    v.type,
-    jsonb_build_object('value', ss.unique_sends),
-    CASE
-      WHEN v.type = 'send_ten' AND ss.unique_sends >= 10 THEN 1
-      WHEN v.type = 'send_one_hundred' AND ss.unique_sends >= 100 THEN 1
-      ELSE 0
-    END,
-    to_timestamp(NEW.block_time) at time zone 'UTC'
-  FROM send_scores_current ss
-  JOIN send_accounts sa ON sa.user_id = ss.user_id
-  CROSS JOIN (
-    VALUES
-      ('send_ten'::verification_type),
-      ('send_one_hundred'::verification_type)
-  ) v(type)
-  WHERE sa.address = concat('0x', encode(NEW.f, 'hex'))::citext
-    AND NOT EXISTS (
-      SELECT 1
-      FROM distribution_verifications dv
-      WHERE dv.user_id = ss.user_id
-        AND dv.distribution_id = ss.distribution_id
-        AND dv.type = v.type
+    -- Early exit if no score found
+    IF NOT FOUND THEN
+        RETURN NEW;
+    END IF;
+
+    -- Update existing verifications
+    UPDATE public.distribution_verifications dv
+    SET metadata = jsonb_build_object('value', score_record.unique_sends),
+        weight = CASE
+            WHEN dv.type = 'send_ten' AND score_record.unique_sends >= 10 THEN 1
+            WHEN dv.type = 'send_one_hundred' AND score_record.unique_sends >= 100 THEN 1
+            ELSE 0
+        END,
+        created_at = to_timestamp(NEW.block_time) at time zone 'UTC'
+    WHERE dv.distribution_id = score_record.distribution_id
+        AND dv.user_id = score_record.user_id
+        AND dv.type IN ('send_ten', 'send_one_hundred');
+
+    -- Insert new verifications if they don't exist
+    INSERT INTO public.distribution_verifications(
+        distribution_id,
+        user_id,
+        type,
+        metadata,
+        weight,
+        created_at
+    )
+    SELECT
+        score_record.distribution_id,
+        score_record.user_id,
+        v.type,
+        jsonb_build_object('value', score_record.unique_sends),
+        CASE
+            WHEN v.type = 'send_ten' AND score_record.unique_sends >= 10 THEN 1
+            WHEN v.type = 'send_one_hundred' AND score_record.unique_sends >= 100 THEN 1
+            ELSE 0
+        END,
+        to_timestamp(NEW.block_time) at time zone 'UTC'
+    FROM (
+        VALUES
+            ('send_ten'::verification_type),
+            ('send_one_hundred'::verification_type)
+    ) v(type)
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM distribution_verifications dv
+        WHERE dv.user_id = score_record.user_id
+            AND dv.distribution_id = score_record.distribution_id
+            AND dv.type = v.type
     );
 
-  RETURN NEW;
+    RETURN NEW;
 END;
-$$;
+$function$
+;
 
 ALTER FUNCTION "public"."insert_verification_sends"() OWNER TO "postgres";
 
@@ -1026,51 +1037,67 @@ GRANT ALL ON FUNCTION "public"."insert_verification_sends"() TO "anon";
 GRANT ALL ON FUNCTION "public"."insert_verification_sends"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."insert_verification_sends"() TO "service_role";
 
-CREATE OR REPLACE FUNCTION public.insert_verification_send_ceiling()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public
-AS $$
-BEGIN
-  UPDATE distribution_verifications dv
-  SET weight = ss.score,
-      metadata = jsonb_build_object('value', ss.send_ceiling::text)
-  FROM send_scores_current ss
-  JOIN send_accounts sa ON sa.user_id = ss.user_id
-  WHERE dv.user_id = ss.user_id
-    AND dv.distribution_id = ss.distribution_id
-    AND dv.type = 'send_ceiling'
-    AND sa.address = concat('0x', encode(NEW.f, 'hex'))::citext
-    AND NEW.v > 0;
 
-  IF NOT FOUND THEN
-    INSERT INTO distribution_verifications(
-      distribution_id,
-      user_id,
-      type,
-      weight,
-      metadata
-    )
-    SELECT
-      ss.distribution_id,
-      ss.user_id,
-      'send_ceiling',
-      ss.score,
-      jsonb_build_object('value', ss.send_ceiling::text)
+CREATE OR REPLACE FUNCTION public.insert_verification_send_ceiling()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+DECLARE
+    score_record RECORD;
+BEGIN
+    -- Exit early if value is not positive
+    IF NOT (NEW.v > 0) THEN
+        RETURN NEW;
+    END IF;
+
+    -- Get send_scores_current result once
+    SELECT ss.distribution_id, ss.user_id, ss.score, ss.send_ceiling
+    INTO score_record
     FROM send_scores_current ss
     JOIN send_accounts sa ON sa.user_id = ss.user_id
-    WHERE sa.address = concat('0x', encode(NEW.f, 'hex'))::citext
-    AND NEW.v > 0;
-  END IF;
+    WHERE sa.address = concat('0x', encode(NEW.f, 'hex'))::citext;
 
-  RETURN NEW;
-EXCEPTION
-  WHEN OTHERS THEN
-    RAISE NOTICE 'Error in insert_verification_send_ceiling: %', SQLERRM;
+    -- Early exit if no score found
+    IF NOT FOUND THEN
+        RETURN NEW;
+    END IF;
+
+    -- Try to update existing verification
+    UPDATE distribution_verifications dv
+    SET weight = score_record.score,
+        metadata = jsonb_build_object('value', score_record.send_ceiling::text)
+    WHERE dv.user_id = score_record.user_id
+        AND dv.distribution_id = score_record.distribution_id
+        AND dv.type = 'send_ceiling';
+
+    -- If no row was updated, insert new verification
+    IF NOT FOUND THEN
+        INSERT INTO distribution_verifications(
+            distribution_id,
+            user_id,
+            type,
+            weight,
+            metadata
+        )
+        VALUES (
+            score_record.distribution_id,
+            score_record.user_id,
+            'send_ceiling',
+            score_record.score,
+            jsonb_build_object('value', score_record.send_ceiling::text)
+        );
+    END IF;
+
     RETURN NEW;
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE NOTICE 'Error in insert_verification_send_ceiling: %', SQLERRM;
+        RETURN NEW;
 END;
-$$;
+$function$
+;
 
 ALTER FUNCTION "public"."insert_verification_send_ceiling"() OWNER TO "postgres";
 
