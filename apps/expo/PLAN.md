@@ -6,56 +6,59 @@ Complete the Send native app implementation by addressing layout issues, improvi
 
 ## Current Navigation Architecture
 
-The current navigation architecture for the Expo app is built using Expo Router v3 and follows a nested structure:
+The current navigation architecture for the Expo app is built using Expo Router v3 with file-based routing and follows this structure:
 
 1. **Root Layout** (`/app/_layout.tsx`):
-   - Sets up the Provider, theme loading, and authentication state
-   - Configures the main Stack Navigator with screens for:
-     - `index` (splash/login screen)
-     - `(drawer)` (authenticated content)
-     - `(auth)` (authentication flows)
-     - `settings/index` (settings screen)
+   - Sets up the main app provider, theme configuration, and global state
+   - Handles authentication state and routing logic
+   - Configures the root stack navigator
 
-2. **Authentication Flow** (`/app/(auth)/`):
-   - Contained in route group `(auth)`
-   - Includes screens for sign-up, login-with-phone, and onboarding
-   - Uses a Stack navigator for navigation between auth screens
-   - Implements a shared AuthLayout component for consistent UI across auth screens
+2. **Main Entry Point** (`/app/index.tsx`):
+   - App entry screen (splash/home screen)
+   - Handles initial app state and navigation decisions
 
-3. **Main App Flow** (`/app/(drawer)/`):
-   - Protected by authentication check
-   - Uses Drawer Navigator from `expo-router/drawer`
-   - Custom drawer content with profile info and menu items
+3. **Authentication Route Group** (`/app/(auth)/`):
+   - Route group for authentication flows
+   - Contains nested layout (`_layout.tsx`) for auth-specific configuration
+   - Screens include:
+     - `auth/login-with-phone.tsx` - Phone number authentication
+     - `auth/onboarding.tsx` - User onboarding flow
+     - `auth/sign-up.tsx` - User registration
 
-4. **Tab Navigation** (`/app/(drawer)/(tabs)/`):
-   - Nested inside the drawer navigator
-   - Currently includes: index (home), activity, profile, and earn tabs
-   - Custom header with drawer menu toggle and "+" button
+4. **Tabs Route Group** (`/app/(tabs)/`):
+   - Main authenticated app navigation using tab-based routing
+   - Contains nested layout (`_layout.tsx`) for tab configuration
+   - Primary tabs:
+     - `index.tsx` - Home/dashboard screen
+     - `activity/index.tsx` - Activity feed
+     - `explore/index.tsx` - Explore section
+     - `send/` - Send functionality with nested screens:
+       - `index.tsx` - Send screen
+       - `confirm.tsx` - Send confirmation
+       - `_layout.tsx` - Send flow layout
 
-## Current Implementation Status
+5. **Feature-Based Screen Organization**:
+   - **Account Management** (`/app/account/`):
+     - `index.tsx` - Account overview
+     - `edit-profile.tsx` - Profile editing
+     - `personal-info.tsx` - Personal information management
+     - `affiliate.tsx` - Affiliate program
+     - `backup/` - Backup credential management with confirmation flows
+     - `sendtag/` - SendTag management (add, checkout, first tag)
 
-The Expo app has implemented several key components:
+   - **Financial Features**:
+     - `deposit/` - Deposit flows (Apple Pay, crypto, debit card, success)
+     - `earn/` - Earning features with asset-specific screens
+     - `trade/` - Trading functionality with summary screens
+     - `rewards/` - Rewards tracking
 
-1. **Navigation Structure**:
-   - Drawer navigation is complete with ALL menu items:
-     - Home, Activity, Send, Deposit, Earn, Trade, SendPot, Explore, Invest, Feed, Leaderboard, Settings
-   - Tab navigation includes Home, Activity, Profile, and Earn
+   - **Social & Gaming**:
+     - `feed/` - Social feed functionality
+     - `sendpot/` - Lottery/gaming features with ticket purchasing
+     - `profile/` - User profile viewing with dynamic routing
 
-2. **Screens Implemented**:
-   - Complete authentication flow (sign-up, login-with-phone, and onboarding)
-   - Reusable AuthLayout component for consistent styling across auth screens
-   - Consistent screen headers with configureScreenHeader utility
-   - Home screen with optimized HomeQuickActions and TokenActivityFeed
-   - Send flow with confirmation screen
-   - Simple activity, profile, and earn screens
-
-3. **Missing Features**:
-   - Complete account management (backup flow, personal info, affiliate)
-   - Enhanced SendPot with confirmation flows
-   - Apple Pay integration
-   - Complete deposit and withdrawal flows
-   - Trading functionality
-   - Implementation of Feed, Explore, and Invest content
+6. **Error Handling**:
+   - `+not-found.tsx` - 404/not found screen for invalid routes
 
 ## Next.js App Structure
 
@@ -90,68 +93,86 @@ The Next.js app has a comprehensive routing structure with these sections:
 
 ## Implementation Plan
 
-### Phase 1: Navigation Structure Completion (Completed ✅)
+### Phase 1: Project Setup (Completed ✅)
 
-1. **Enhance Drawer Navigation** ✅:
-   - Added missing menu items (Explore, Invest, Feed) to `(drawer)/_layout.tsx`
-   - Ensured consistent styling with web application
-   - Fixed navigation routing between drawer items and tabs
+1. **Initial Expo Setup** ✅:
+   - Configure Expo project with necessary dependencies
+   - Set up TypeScript configuration and build tools
+   - Configure Metro bundler and development environment
+   - Set up Tamagui for consistent UI components
 
-2. **Complete Auth Layout** ✅:
-   - Added login-with-phone screen to auth flow
-   - Created reusable AuthLayout component in packages/app/features/auth/layout.tsx
-   - Ensured consistent styling across all auth screens by applying the shared layout
-   - Fixed navigation nesting issues by separating navigation and UI concerns
+2. **Development Environment** ✅:
+   - Configure ESLint and Prettier for code quality
+   - Set up development scripts and build processes
+   - Configure environment variables and app configuration
+   - Set up iOS and Android build configurations
 
-3. **Create Consistent Headers** ✅:
-   - Implemented the configureScreenHeader utility
-   - Applied consistent headers across all screens
-   - Fixed type issues for proper React Navigation integration
+### Phase 2: Navigation Structure ✅
 
-### Phase 2: Core Screen Implementation (In Progress 🔄)
+1. **File-Based Routing Setup** ✅:
+   - Implement Expo Router v3 with file-based navigation
+   - Create route groups for authentication and main app flows
+   - Set up nested layouts for different app sections
+   - Configure tab navigation for main app features
 
-1. **Home Screen Enhancement** ✅:
-   - Implemented and optimized HomeQuickActions.native.tsx
-   - Fixed and optimized TokenActivityFeed.native.tsx
-   - Added proper skeleton loading states
+2. **Screen Structure Implementation** ✅:
+   - Create all necessary screen files and layouts
+   - Implement proper navigation flow between screens
+   - Set up authentication routing and protection
+   - Configure deep linking and navigation state management
 
-2. **Send/Receive Functionality** ✅:
-   - Completed send flow with confirmation screens
-   - Implemented Send confirmation flow
+### Phase 3: Screen Porting and Critical Issues ✅
 
-3. **Profile Screen Completion** 🔄:
-   - Complete profile viewing functionality
-   - Implement profile editing
-   - Add personal info management screens
+1. **Port All Screens from Next.js** ✅:
+   - Transfer all authentication screens (login, signup, onboarding)
+   - Port main feature screens (home, activity, send, profile)
+   - Implement account management screens (backup, sendtag, personal info)
+   - Port financial features (deposit, earn, trade, rewards)
+   - Transfer social features (feed, profile viewing, sendpot)
 
-4. **Activity Screen Optimization** 🔄:
-   - Complete activity feed implementation
-   - Optimize list rendering for mobile performance
-   - Add proper pull-to-refresh and pagination
+2. **Fix Critical Issues** ✅
 
-### Phase 3: Additional Features (Pending ⏳)
+### Phase 4: Internal Distributed Build
 
-1. **Deposit/Withdraw Flows** ⏳:
-   - Complete deposit options screens
-   - Implement Apple Pay integration
-   - Add crypto deposit/withdrawal flows
-   - Create success and confirmation screens
+1. **Build Configuration**:
+   - Configure EAS Build for internal distribution
+   - Set up development and staging build profiles
+   - Configure code signing for iOS and Android
+   - Set up internal testing distribution channels
 
-2. **Earn & Rewards** ⏳:
-   - Complete earn section with asset-specific screens
-   - Implement rewards tracking
-   - Add proper data visualization for earnings
+2. **Testing Preparation**:
+   - Prepare internal testing builds
+   - Set up crash reporting and analytics
+   - Configure feature flags for controlled rollout
+   - Create testing documentation and guidelines
 
-3. **Trade & SendPot** ⏳:
-   - Implement trade screens with confirmation flow
-   - Complete SendPot with ticket buying functionality
-   - Add ticket confirmation screens
+### Phase 5: Issue Resolution
 
-4. **New Features** ⏳:
-   - Implement Feed section
-   - Create Explore with rewards screens
-   - Add Invest functionality
-   - Complete backup flow with credential management
+1. **Bug Fixes and Polish**:
+   - Address issues found during internal testing
+   - Optimize performance and user experience
+   - Fix platform-specific issues and edge cases
+   - Implement accessibility improvements
+
+2. **Quality Assurance**:
+   - Comprehensive testing across devices and OS versions
+   - Performance optimization and memory management
+   - Security review and vulnerability assessment
+   - Final UI/UX polish and consistency checks
+
+### Phase 6: App Store Submission
+
+1. **Store Preparation**:
+   - Prepare app store listings and metadata
+   - Create app screenshots and promotional materials
+   - Configure app store connect and play console
+   - Set up app store optimization (ASO)
+
+2. **Submission Process**:
+   - Submit to Apple App Store for review
+   - Submit to Google Play Store for review
+   - Address any review feedback and resubmit if needed
+   - Plan launch strategy and rollout schedule
 
 ## Testing and Quality Assurance
 
@@ -202,15 +223,80 @@ You can use the following methods to verify the app is functioning correctly:
    - Run automated tests on CI/CD pipeline
    - See `docs/setting-up-maestro-e2e-tests.md` for setup information
 
-## Next Steps (Prioritized)
+## Known Issues [TO BE SOLVED BEFORE RELEASE]
 
-1. ✅ Update drawer navigation with missing menu items (Feed, Explore, Invest)
-2. ✅ Implement the configureScreenHeader utility for consistent headers
-3. ✅ Fix and optimize HomeQuickActions and TokenActivityFeed native components
-4. ✅ Add login-with-phone to the auth flow
-5. ✅ Complete the send flow with confirmation screens
-6. Implement profile editing and management screens
-7. Create deposit flow with crypto and fiat options
-8. Complete the earn section with rewards tracking
-9. Implement SendPot with ticket buying functionality
-10. Add explore and feed sections
+**Global issues**:
+- visual issues, broken UI/styling
+- referral code reading/writing is not working, due to implementation using cookies
+- dialogs are not appearing
+- QR code generation library is not working on native
+- a lot os stuff is blinking all over the place, too much data fetching, too much fading
+
+**Project Structure**:
+- prepare assets so app doesn't have to fetch images
+
+**Auth**:
+- login issues, passkey is found but error is thrown
+- passkeys for android, right now got passkeys only for ios
+- app crushes on logout
+- no way to input referral, url won't work on native
+
+**Home screen**:
+- rework flow on native, web flow is built on query params, native should use stacking screen
+
+**Send**:
+- rework flow on native, web flow is built on query params, native should use stacking screen
+- sending is not stable, app sometimes crush on confirm screen
+- resetting send screen state after send is done
+
+**Account**:
+- QR code not working
+
+**Sendtags**:
+- pricing dialog not appearing
+- referral code is not working
+- sendtag register is not stable, weird stuff is going on sometimes, like money gone but no sendtag
+- redirect to external address is not working due to broken dialog
+
+**SendPot**:
+- number of tickets purchased is not increased after purchase automatically, its fine after close and open again
+
+**Invest**:
+- risk disclaimer on trade screen doesnt pop up
+
+**Earn**:
+- referral code is not working
+- earn home page doest refresh automatically after deposit
+- a lot os stuff is blinking on earn
+
+**Activity**:
+- redirect to external address is not working due to broken dialog
+
+**History**:
+- rework flow of screens, cannot go back from profile details, history and receipt, use screen stacking
+- cannot go back after pressing send button
+- history scroll is broken, it behaves like standard screen, not like a chat
+
+**Deposit**:
+- QR to deposit by crypto transfer is not working
+- cannot copy address due to not working dialog
+- current implementation of coinbase onramp rely on browser API, need to build version for native https://github.com/coinbase/onramp-demo-mobile
+
+## Planned Improvements [POST RELEASE]
+
+**UX Improvements**:
+- floating bottom navbar instead of standard one
+- pull to refresh data
+- hiding header when scrolling down
+- error page when app crush
+- don't nest scroll views
+
+**Referrals Screen**:
+- number of referrals in header is missing
+- refactor referrals screen to use recycler view
+
+**Invest**:
+- redirect successful trade to better place, right now its home screen
+
+**Activity**:
+- when you go back from details app scroll all the way up, should maintain position
