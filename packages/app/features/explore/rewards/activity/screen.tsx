@@ -31,6 +31,8 @@ import { toNiceError } from 'app/utils/toNiceError'
 import { min } from 'app/utils/bigint'
 import type { Json } from '@my/supabase/database.types'
 import { sendCoin } from 'app/data/coins'
+import { Link } from 'solito/link'
+import { useCoin } from 'app/provider/coins'
 
 //@todo get this from the db
 const verificationTypesAndTitles = {
@@ -42,6 +44,22 @@ const verificationTypesAndTitles = {
   total_tag_referrals: { title: 'Total Referrals' },
   send_streak: { title: 'Send Streak', details: '(per day)' },
 } as const
+
+const getNavigationPath = (verificationType: keyof typeof verificationTypesAndTitles, usdcBalance?: bigint) => {
+  switch (verificationType) {
+    case 'tag_registration':
+      return '/account/sendtag'
+    case 'send_ten':
+    case 'send_one_hundred':
+    case 'send_streak':
+      return (usdcBalance ?? 0n) > 0n ? '/send' : '/deposit'
+    case 'tag_referral':
+    case 'total_tag_referrals':
+      return '/account/affiliate'
+    default:
+      return null
+  }
+}
 
 export function ActivityRewardsScreen() {
   const [queryParams, setRewardsScreenParams] = useRewardsScreenParams()
@@ -268,6 +286,7 @@ const TaskCards = ({
   distribution: UseDistributionsResultData[number]
   verificationsQuery: DistributionsVerificationsQuery
 }) => {
+  const { coin: usdcCoin } = useCoin('USDC')
   const verifications = verificationsQuery.data
   if (verificationsQuery.isLoading) {
     return (
@@ -309,17 +328,30 @@ const TaskCards = ({
             const orderB = Object.keys(verificationTypesAndTitles).indexOf(b.type)
             return orderA - orderB
           })
-          .map((verification) => (
-            <TaskCard
-              key={verification.type}
-              verification={verification}
-              isQualificationOver={isQualificationOver}
-            >
-              <H3 fontWeight={'600'} color={'$color12'}>
-                {verificationTypesAndTitles[verification.type]?.title}
-              </H3>
-            </TaskCard>
-          ))}
+          .map((verification) => {
+            const navigationPath = getNavigationPath(verification.type, usdcCoin?.balance)
+            const title = verificationTypesAndTitles[verification.type]?.title
+
+            return (
+              <TaskCard
+                key={verification.type}
+                verification={verification}
+                isQualificationOver={isQualificationOver}
+              >
+                {navigationPath ? (
+                  <Link href={navigationPath}>
+                    <H3 fontWeight={'600'} color={'$color12'} textDecorationLine="none">
+                      {title}
+                    </H3>
+                  </Link>
+                ) : (
+                  <H3 fontWeight={'600'} color={'$color12'}>
+                    {title}
+                  </H3>
+                )}
+              </TaskCard>
+            )
+          })}
       </Stack>
     </YStack>
   )
@@ -410,6 +442,7 @@ const MultiplierCards = ({
   distribution: UseDistributionsResultData[number]
   verificationsQuery: DistributionsVerificationsQuery
 }) => {
+  const { coin: usdcCoin } = useCoin('USDC')
   const verifications = verificationsQuery.data
   if (verificationsQuery.isLoading) {
     return (
@@ -449,26 +482,54 @@ const MultiplierCards = ({
         Multiplier
       </H3>
       <Stack flexWrap="wrap" gap="$5" $gtXs={{ fd: 'row' }}>
-        {activeMultipliers.map(({ type: verificationType, value }) => (
-          <MultiplierCard key={verificationType}>
-            <XStack ai="center" gap="$2" jc="center">
-              <IconAccount size={'$2'} color={'$color10'} />
-              <H3 fontWeight={'500'} color={'$color10'}>
-                {verificationType === 'tag_referral' ? (distributionMonth ?? 'Monthly') : ''}{' '}
-                {verificationTypesAndTitles[verificationType]?.title}
-              </H3>
-            </XStack>
-            <Paragraph
-              fontSize={'$9'}
-              $sm={{ fontSize: '$8' }}
-              fontWeight={'600'}
-              color={'$color12'}
-              mx="auto"
-            >
-              X {(value ?? 1).toString()}
-            </Paragraph>
-          </MultiplierCard>
-        ))}
+        {activeMultipliers.map(({ type: verificationType, value }) => {
+          const navigationPath = getNavigationPath(verificationType, usdcCoin?.balance)
+          const title = `${verificationType === 'tag_referral' ? (distributionMonth ?? 'Monthly') : ''} ${verificationTypesAndTitles[verificationType]?.title}`.trim()
+          const multiplierText = `X ${(value ?? 1).toString()}`
+
+          return (
+            <MultiplierCard key={verificationType}>
+              <XStack ai="center" gap="$2" jc="center">
+                <IconAccount size={'$2'} color={'$color10'} />
+                {navigationPath ? (
+                  <Link href={navigationPath}>
+                    <H3 fontWeight={'500'} color={'$color10'} textDecorationLine="none">
+                      {title}
+                    </H3>
+                  </Link>
+                ) : (
+                  <H3 fontWeight={'500'} color={'$color10'}>
+                    {title}
+                  </H3>
+                )}
+              </XStack>
+              {navigationPath ? (
+                <Link href={navigationPath}>
+                  <Paragraph
+                    fontSize={'$9'}
+                    $sm={{ fontSize: '$8' }}
+                    fontWeight={'600'}
+                    color={'$color12'}
+                    mx="auto"
+                    textDecorationLine="none"
+                  >
+                    {multiplierText}
+                  </Paragraph>
+                </Link>
+              ) : (
+                <Paragraph
+                  fontSize={'$9'}
+                  $sm={{ fontSize: '$8' }}
+                  fontWeight={'600'}
+                  color={'$color12'}
+                  mx="auto"
+                >
+                  {multiplierText}
+                </Paragraph>
+              )}
+            </MultiplierCard>
+          )
+        })}
       </Stack>
     </YStack>
   )
