@@ -223,15 +223,6 @@ function MainTagSelectionSheet({
 
   return (
     <Dialog modal open={open} onOpenChange={onOpenChange}>
-      <Adapt when="sm" platform="touch">
-        <Sheet zIndex={200000} modal dismissOnSnapToBottom disableDrag>
-          <Sheet.Frame padding="$4" gap="$4">
-            <Adapt.Contents />
-          </Sheet.Frame>
-          <Sheet.Overlay animation="lazy" enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }} />
-        </Sheet>
-      </Adapt>
-
       <Dialog.Portal>
         <Dialog.Overlay
           key="overlay"
