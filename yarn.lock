@@ -19244,6 +19244,7 @@ __metadata:
     burnt: "npm:^0.12.1"
     cbor2: "npm:^1.12.0"
     cross-env: "npm:^7.0.3"
+    dotenv-cli: "npm:^7.3.0"
     eslint-config-custom: "workspace:*"
     eslint-plugin-import: "npm:^2.29.1"
     expo: "npm:~52.0.23"

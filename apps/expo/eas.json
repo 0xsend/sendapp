@@ -1,6 +1,7 @@
 {
   "build": {
     "development": {
+      "developmentClient": true,
       "distribution": "internal",
       "android": {
         "buildType": "apk"
@@ -9,6 +10,9 @@
         "simulator": true,
         "image": "latest"
       }
+    },
+    "preview": {
+      "distribution": "internal"
     },
     "production": {
       "distribution": "store",

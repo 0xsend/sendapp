@@ -66,15 +66,15 @@ SELECT
   (SELECT id FROM active_distribution) as distribution_id,
   from_user_id,
   to_user_id,
-  LEAST(
+  MAX(LEAST(
     CASE
       WHEN earn_balance IS NULL THEN v
       WHEN earn_balance >= (SELECT earn_min_balance FROM active_distribution) THEN v
       ELSE 0
     END,
     send_ceiling
-  ) as capped_amount,
-  send_ceiling
+  )) as capped_amount,
+  MAX(send_ceiling) as send_ceiling
 FROM (
   SELECT
     vt.from_user_id,
@@ -92,7 +92,8 @@ WHERE LEAST(
     ELSE 0
   END,
   send_ceiling
-) > 0;
+) > 0
+GROUP BY from_user_id, to_user_id;
 
 ALTER VIEW send_scores_current_unique OWNER TO postgres;
 
@@ -214,84 +215,97 @@ create or replace view "public"."send_scores_current" as  WITH distributions_wit
              JOIN send_slash ss ON ((ss.distribution_id = d.id)))
           WHERE (((now() AT TIME ZONE 'UTC'::text) >= d.qualification_start) AND ((now() AT TIME ZONE 'UTC'::text) < d.qualification_end))
          LIMIT 1
-        ), previous_shares AS (
+        ), base_ceiling AS (
+         SELECT dws.id AS distribution_id,
+                CASE
+                    WHEN (dws.token_addr = '\x3f14920c99beb920afa163031c4e47a3e03b3e4a'::bytea) THEN (dws.hodler_min_balance * '10000000000000000'::numeric)
+                    ELSE dws.hodler_min_balance
+                END AS base_amount,
+            dws.minimum_sends,
+            dws.scaling_divisor,
+            dws.prev_distribution_id,
+            dws.earn_min_balance,
+            dws.start_time,
+            dws.end_time
+           FROM distributions_with_score dws
+        ), adjusted_amounts AS (
          SELECT ds.user_id,
-            dws.id AS next_distribution_id,
                 CASE
                     WHEN (d.token_addr = '\x3f14920c99beb920afa163031c4e47a3e03b3e4a'::bytea) THEN (ds.amount * '10000000000000000'::numeric)
                     ELSE ds.amount
                 END AS adjusted_amount
-           FROM ((distributions_with_score dws
-             JOIN distribution_shares ds ON ((ds.distribution_id = dws.prev_distribution_id)))
+           FROM ((base_ceiling bc
+             JOIN distribution_shares ds ON ((ds.distribution_id = bc.prev_distribution_id)))
              JOIN distributions d ON ((d.id = ds.distribution_id)))
         ), send_ceiling_settings AS (
          SELECT sa.user_id,
             decode(replace(sa.address, '0x'::citext, ''::citext), 'hex'::text) AS address,
-            dws.id AS distribution_id,
-            round((COALESCE(ps.adjusted_amount,
-                CASE
-                    WHEN (dws.token_addr = '\x3f14920c99beb920afa163031c4e47a3e03b3e4a'::bytea) THEN (dws.hodler_min_balance * '10000000000000000'::numeric)
-                    ELSE dws.hodler_min_balance
-                END) / ((dws.minimum_sends * dws.scaling_divisor))::numeric)) AS send_ceiling
-           FROM ((send_accounts sa
-             CROSS JOIN distributions_with_score dws)
-             LEFT JOIN previous_shares ps ON (((ps.user_id = sa.user_id) AND (ps.next_distribution_id = dws.id))))
+            bc.distribution_id,
+            round((COALESCE(aa.adjusted_amount, bc.base_amount) / ((bc.minimum_sends * bc.scaling_divisor))::numeric)) AS send_ceiling
+           FROM ((base_ceiling bc
+             CROSS JOIN send_accounts sa)
+             LEFT JOIN adjusted_amounts aa ON ((aa.user_id = sa.user_id)))
+        ), earn_balance_data AS (
+         SELECT send_earn_deposit.owner,
+            send_earn_deposit.block_time,
+            send_earn_deposit.assets AS balance
+           FROM send_earn_deposit
+        UNION ALL
+         SELECT send_earn_withdraw.owner,
+            send_earn_withdraw.block_time,
+            (- send_earn_withdraw.assets) AS balance
+           FROM send_earn_withdraw
         ), earn_balances AS (
-         SELECT send_earn_balances_timeline.owner,
-            send_earn_balances_timeline.block_time,
-            send_earn_balances_timeline.balance,
-            lead(send_earn_balances_timeline.block_time) OVER (PARTITION BY send_earn_balances_timeline.owner ORDER BY send_earn_balances_timeline.block_time) AS next_block_time
-           FROM send_earn_balances_timeline
-        ), filtered_transfers AS (
+         SELECT sub.owner,
+            sub.block_time,
+            sub.balance,
+            sub.next_block_time
+           FROM ( SELECT earn_balance_data.owner,
+                    earn_balance_data.block_time,
+                    sum(earn_balance_data.balance) OVER w AS balance,
+                    lead(earn_balance_data.block_time) OVER w AS next_block_time
+                   FROM earn_balance_data
+                  WINDOW w AS (PARTITION BY earn_balance_data.owner ORDER BY earn_balance_data.block_time ROWS UNBOUNDED PRECEDING)) sub
+          WHERE (sub.balance >= (( SELECT base_ceiling.earn_min_balance
+                   FROM base_ceiling))::numeric)
+        ), transfer_sums AS (
          SELECT transfers.f,
+            bc.distribution_id,
             transfers.t,
-            transfers.v,
-            transfers.block_time,
-            dws.id AS distribution_id
-           FROM ( SELECT min(distributions_with_score.start_time) AS min_start,
-                    max(distributions_with_score.end_time) AS max_end
-                   FROM distributions_with_score) bounds,
-            LATERAL ( SELECT send_token_transfers.f,
+            sum(transfers.v) AS transfer_sum
+           FROM (base_ceiling bc
+             CROSS JOIN LATERAL ( SELECT send_token_transfers.f,
                     send_token_transfers.t,
                     send_token_transfers.v,
                     send_token_transfers.block_time
                    FROM send_token_transfers
-                  WHERE ((send_token_transfers.block_time >= bounds.min_start) AND (send_token_transfers.block_time <= bounds.max_end))
+                  WHERE ((send_token_transfers.block_time >= bc.start_time) AND (send_token_transfers.block_time <= bc.end_time))
                 UNION ALL
                  SELECT send_token_v0_transfers.f,
                     send_token_v0_transfers.t,
                     (send_token_v0_transfers.v * '10000000000000000'::numeric),
                     send_token_v0_transfers.block_time
                    FROM send_token_v0_transfers
-                  WHERE ((send_token_v0_transfers.block_time >= bounds.min_start) AND (send_token_v0_transfers.block_time <= bounds.max_end))) transfers,
-            distributions_with_score dws
-          WHERE (((transfers.block_time >= dws.start_time) AND (transfers.block_time <= dws.end_time)) AND ((dws.earn_min_balance = 0) OR (EXISTS ( SELECT 1
+                  WHERE ((send_token_v0_transfers.block_time >= bc.start_time) AND (send_token_v0_transfers.block_time <= bc.end_time))) transfers)
+          WHERE ((bc.earn_min_balance = 0) OR (EXISTS ( SELECT 1
                    FROM earn_balances eb
-                  WHERE ((eb.owner = transfers.t) AND (eb.block_time <= eb.block_time) AND ((eb.next_block_time IS NULL) OR (eb.block_time < eb.next_block_time)) AND (COALESCE(eb.balance, (0)::numeric) >= (dws.earn_min_balance)::numeric))))))
+                  WHERE ((eb.owner = transfers.t) AND (eb.block_time <= transfers.block_time) AND ((eb.next_block_time IS NULL) OR (transfers.block_time < eb.next_block_time))))))
+          GROUP BY transfers.f, bc.distribution_id, transfers.t
         )
  SELECT scs.user_id,
     scs.distribution_id,
     scores.score,
     scores.unique_sends,
     scs.send_ceiling
-   FROM (( SELECT grouped_transfers.f AS address,
-            grouped_transfers.distribution_id,
-            sum(LEAST(grouped_transfers.transfer_sum, grouped_transfers.send_ceiling)) AS score,
-            count(DISTINCT grouped_transfers.t) AS unique_sends
-           FROM ( SELECT ft.f,
-                    ft.distribution_id,
-                    ft.t,
-                    sum(ft.v) AS transfer_sum,
-                    scs_1.send_ceiling
-                   FROM (filtered_transfers ft
-                     JOIN send_ceiling_settings scs_1 ON (((ft.f = scs_1.address) AND (ft.distribution_id = scs_1.distribution_id))))
-                  GROUP BY ft.f, ft.t, ft.distribution_id, scs_1.send_ceiling) grouped_transfers
-          GROUP BY grouped_transfers.f, grouped_transfers.distribution_id
-         HAVING (sum(LEAST(grouped_transfers.transfer_sum, grouped_transfers.send_ceiling)) > (0)::numeric)) scores
-     JOIN send_ceiling_settings scs ON (((scores.address = scs.address) AND (scores.distribution_id = scs.distribution_id))))
-  WHERE (EXISTS ( SELECT 1
-           FROM distributions_with_score d
-          WHERE ((d.id = scs.distribution_id) AND (EXTRACT(epoch FROM (now() AT TIME ZONE 'UTC'::text)) >= d.start_time) AND (EXTRACT(epoch FROM (now() AT TIME ZONE 'UTC'::text)) < d.end_time))));
+   FROM (( SELECT ts.f AS address,
+            ts.distribution_id,
+            sum(LEAST(ts.transfer_sum, scs_1.send_ceiling)) AS score,
+            count(DISTINCT ts.t) AS unique_sends
+           FROM (transfer_sums ts
+             JOIN send_ceiling_settings scs_1 ON (((ts.f = scs_1.address) AND (ts.distribution_id = scs_1.distribution_id))))
+          GROUP BY ts.f, ts.distribution_id
+         HAVING (sum(LEAST(ts.transfer_sum, scs_1.send_ceiling)) > (0)::numeric)) scores
+     JOIN send_ceiling_settings scs ON (((scores.address = scs.address) AND (scores.distribution_id = scs.distribution_id))));
 
 ALTER VIEW send_scores_current OWNER TO postgres;
 
