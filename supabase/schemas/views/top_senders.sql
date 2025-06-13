@@ -47,10 +47,14 @@ SELECT (
         vu.name,
         vu.avatar_url,
         vu.send_id,
+        NULL::bigint,  -- Hide main_tag_id for privacy
+        main_tag.name,
         vu.tag_names
     )::activity_feed_user
 ).*
 FROM valid_users vu
+LEFT JOIN send_accounts sa ON sa.user_id = vu.id
+LEFT JOIN tags main_tag ON main_tag.id = sa.main_tag_id
 ORDER BY vu.send_score DESC
 LIMIT limit_count;
 

@@ -50,6 +50,7 @@ function fetchDistributionQuery() {
       snapshot_block_num,
       token_decimals,
       updated_at,
+      earn_min_balance::text,
       distribution_verification_values (
         bips_value,
         created_at,
@@ -67,8 +68,8 @@ function fetchDistributionQuery() {
 
 export async function fetchActiveDistributions() {
   return fetchDistributionQuery()
-    .gte('qualification_start', new Date().toISOString())
-    .lte('qualification_end', new Date().toISOString())
+    .lte('qualification_start', new Date().toISOString())
+    .gte('qualification_end', new Date().toISOString())
 }
 
 export async function fetchDistribution(id: number) {
@@ -141,4 +142,14 @@ export async function updateReferralVerifications(
     distribution_id: distributionId,
     shares,
   })
+}
+
+export async function fetchAllEarnBalances(distribution: { earn_min_balance: string }) {
+  const supabaseAdmin = createSupabaseAdminClient()
+  return selectAll(
+    supabaseAdmin
+      .from('send_earn_balances')
+      .select('owner, assets::text', { count: 'exact' })
+      .gte('assets', distribution.earn_min_balance)
+  )
 }

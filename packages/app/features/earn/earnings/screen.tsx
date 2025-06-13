@@ -139,6 +139,7 @@ export const EarningsFeed = () => {
         onEndReached={() => hasNextPage && fetchNextPage()}
         ListFooterComponent={!isLoading && isFetchingNextPage ? <Spinner size="small" /> : null}
         stickySectionHeadersEnabled={true}
+        contentContainerStyle={{ gap: 16 }}
       />
     </Fade>
   )

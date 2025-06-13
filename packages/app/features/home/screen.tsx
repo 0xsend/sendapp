@@ -36,6 +36,7 @@ import { investmentCoins } from 'app/data/coins'
 import { CoinSheet } from 'app/components/CoinSheet'
 import { Link } from 'solito/link'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
+import { Platform } from 'react-native'
 
 export function HomeScreen() {
   const media = useMedia()
@@ -123,7 +124,7 @@ function HomeBody(props: XStackProps) {
           <SavingsBalanceCard href="/earn" w="100%" />
           <InvestmentsBalanceCard w="100%" />
           <HomeBodyCardRow>
-            <RewardsCard href="/explore/rewards" />
+            <RewardsCard href={Platform.OS === 'web' ? '/explore/rewards' : '/rewards'} />
             <FriendsCard href="/account/affiliate" />
           </HomeBodyCardRow>
         </YStack>

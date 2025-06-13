@@ -22,6 +22,7 @@ import { ReadOnlyFieldWithLabel } from 'app/features/account/components/ReadOnly
 import { FieldWithLabel } from 'app/features/account/components/FieldWithLabel'
 import { useForm } from 'react-hook-form'
 import type { z } from 'zod'
+import { Platform } from 'react-native'
 
 enum FormState {
   Overview = 'Overview',
@@ -35,7 +36,7 @@ export const EditProfile = () => {
   return (
     <YStack w={'100%'}>
       <YStack gap={'$3.5'}>
-        <SettingsHeader>Profile</SettingsHeader>
+        {Platform.OS === 'web' && <SettingsHeader>Profile</SettingsHeader>}
         {(() => {
           switch (true) {
             case !profile:

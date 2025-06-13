@@ -3,6 +3,7 @@ import { Avatar, Card, LinkableAvatar, Paragraph, XStack } from '@my/ui'
 import { IconAccount, IconArrowRight } from 'app/components/icons'
 import { shorten } from 'app/utils/strings'
 import { useRootScreenParams } from 'app/routers/params'
+import { Platform } from 'react-native'
 
 export const ProfileHeader = ({
   recipient,
@@ -36,9 +37,13 @@ export const ProfileHeader = ({
           size="$6"
           br="$4"
           href={profileHref}
-          onPressOut={(e) => {
-            e.stopPropagation()
-          }}
+          {...(Platform.OS === 'web'
+            ? {
+                onPressOut: (e) => {
+                  e.stopPropagation()
+                },
+              }
+            : {})}
         >
           <Avatar.Image
             src={profile?.avatar_url ?? ''}
@@ -58,6 +63,8 @@ export const ProfileHeader = ({
                 return shorten(recipient, 5, 4)
               case !!profile?.name:
                 return profile?.name
+              case !!profile?.main_tag_name:
+                return `/${profile.main_tag_name}`
               case !!profile?.all_tags?.[0]:
                 return `/${profile.all_tags[0]}`
               case !!profile?.sendid:

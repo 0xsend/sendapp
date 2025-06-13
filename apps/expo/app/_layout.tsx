@@ -1,10 +1,11 @@
 import type { Session } from '@supabase/supabase-js'
-import { Provider, loadThemePromise } from 'app/provider'
+import { loadThemePromise, Provider } from 'app/provider'
 import { supabase } from 'app/utils/supabase/client.native'
-import { SplashScreen, Stack } from 'expo-router'
+import { SplashScreen } from 'expo-router'
 import { useCallback, useEffect, useState } from 'react'
 import { LogBox, View } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import StackNavigator from 'apps-expo/components/layout/StackNavigator'
 
 SplashScreen.preventAutoHideAsync()
 
@@ -16,17 +17,17 @@ LogBox.ignoreLogs([
   'Require cycle',
 ])
 
-export default function HomeLayout() {
+export default function RootLayout() {
   // TODO: use fonts
   // const [fontLoaded] = useFonts({
   //   'DM Sans': require('@tamagui/font-dm-sans/fonts/static/DMSans-Medium.ttf'),
   //   'DM Sans Bold': require('@tamagui/font-dm-sans/fonts/static/DMSans-Bold.ttf'),
   // })
   const [fontLoaded] = useState(true)
-
   const [themeLoaded, setThemeLoaded] = useState(false)
   const [sessionLoadAttempted, setSessionLoadAttempted] = useState(false)
   const [initialSession, setInitialSession] = useState<Session | null>(null)
+
   useEffect(() => {
     supabase.auth
       .getSession()
@@ -60,25 +61,7 @@ export default function HomeLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
         <Provider initialSession={initialSession}>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="index" options={{ headerShown: false }} />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            <Stack.Screen name="send" options={{ headerShown: false }} />
-            <Stack.Screen name="deposit" options={{ headerShown: false }} />
-            <Stack.Screen name="trade" options={{ headerShown: false }} />
-            <Stack.Screen name="sendpot" options={{ headerShown: false }} />
-            <Stack.Screen name="leaderboard" options={{ headerShown: false }} />
-            <Stack.Screen name="secret-shop" options={{ headerShown: false }} />
-            <Stack.Screen name="account" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="settings/index"
-              options={{
-                headerShown: true,
-                headerBackTitle: 'Back',
-              }}
-            />
-          </Stack>
+          <StackNavigator />
         </Provider>
       </View>
     </GestureHandlerRootView>

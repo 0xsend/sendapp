@@ -64,7 +64,8 @@ CREATE TABLE IF NOT EXISTS "public"."distributions" (
     "merkle_drop_addr" "bytea",
     "token_addr" "bytea",
     "token_decimals" numeric,
-    "tranche_id" integer NOT NULL
+    "tranche_id" integer NOT NULL,
+    "earn_min_balance" bigint NOT NULL DEFAULT 0
 );
 
 ALTER TABLE "public"."distributions" OWNER TO "postgres";
@@ -178,134 +179,50 @@ ALTER TABLE ONLY "public"."distribution_verifications"
 ALTER TABLE ONLY "public"."send_slash"
     ADD CONSTRAINT "send_slash_distribution_id_fkey" FOREIGN KEY ("distribution_id") REFERENCES "public"."distributions"("id") ON DELETE CASCADE;
 
--- Functions (now that all tables are defined)
-CREATE OR REPLACE FUNCTION "public"."calculate_and_insert_send_ceiling_verification"("distribution_number" integer) RETURNS "void"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $_$
+CREATE OR REPLACE FUNCTION public.calculate_and_insert_send_ceiling_verification(distribution_number integer)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
 BEGIN
-  -- Step 1: Get qualifying sends first
-  CREATE TEMPORARY TABLE all_qualifying_sends AS
-  SELECT
-    *
-  FROM
-    sum_qualification_sends($1);
-  CREATE TEMPORARY TABLE send_ceiling_settings AS
-  WITH send_settings AS(
-    SELECT
-      minimum_sends * scaling_divisor AS divider
-    FROM
-      send_slash s_s
-      JOIN distributions d ON d.id = s_s.distribution_id
-    WHERE
-      d.number = $1
-),
-previous_distribution AS(
-  SELECT
-    ds.user_id,
-    CASE WHEN $1 = 11 THEN
-      -- scale the amount correctly
-      ds.amount * 1e16
-    ELSE
-      ds.amount
-    END AS user_prev_shares
-  FROM
-    distribution_shares ds
-  WHERE
-    ds.distribution_id =(
-      SELECT
-        id
-      FROM
-        distributions d
-      WHERE
-        d.number = $1 - 1))
-SELECT
-  qs.user_id,
-  ROUND(COALESCE(pd.user_prev_shares, d.hodler_min_balance) /(
-      SELECT
-        minimum_sends * scaling_divisor
-      FROM send_slash s_s
-    WHERE
-      s_s.distribution_id =(
-        SELECT
-          id
-        FROM distributions
-      WHERE
-        number = $1)))::numeric AS send_ceiling
-FROM( SELECT DISTINCT
-    user_id
-  FROM
-    all_qualifying_sends) qs
-  CROSS JOIN(
-    SELECT
-      hodler_min_balance
-    FROM
-      distributions
-    WHERE
-      number = $1) d
-  LEFT JOIN previous_distribution pd ON pd.user_id = qs.user_id;
-  -- Step 2: Update existing verifications
-  UPDATE
-    distribution_verifications dv
-  SET
-    weight = qs.amount,
-    -- Cast to text to avoid overflow errors on client
-    metadata = jsonb_build_object('value', scs.send_ceiling::text, 'sent_to', qs.sent_to)
-  FROM
-    send_ceiling_settings scs
-    JOIN all_qualifying_sends qs ON qs.user_id = scs.user_id
-  WHERE
-    dv.user_id = qs.user_id
-    AND dv.distribution_id =(
-      SELECT
-        id
-      FROM
-        distributions
-      WHERE
-        number = $1)
-    AND dv.type = 'send_ceiling'
-    AND COALESCE(qs.amount, 0) > 0;
-  -- Step 3: Insert new verifications
+  WITH dist_scores AS (
+    SELECT * FROM send_scores ss
+    WHERE ss.distribution_id = (
+      SELECT id FROM distributions WHERE number = $1
+    )
+  ),
+  updated_rows AS (
+    UPDATE distribution_verifications dv
+    SET
+      weight = ds.score,
+      metadata = jsonb_build_object('value', ds.send_ceiling::text)
+    FROM dist_scores ds
+    WHERE dv.user_id = ds.user_id
+      AND dv.distribution_id = ds.distribution_id
+      AND dv.type = 'send_ceiling'
+    RETURNING dv.user_id
+  )
   INSERT INTO distribution_verifications(
     distribution_id,
     user_id,
     type,
     weight,
-    metadata)
+    metadata
+  )
   SELECT
-(
-      SELECT
-        id
-      FROM
-        distributions d
-      WHERE
-        d.number = $1), qs.user_id, 'send_ceiling'::public.verification_type, qs.amount,
-    -- Cast to text to avoid overflow errors on client
-    jsonb_build_object('value', scs.send_ceiling::text, 'sent_to', qs.sent_to)
-  FROM
-    send_ceiling_settings scs
-    JOIN all_qualifying_sends qs ON qs.user_id = scs.user_id
-  WHERE
-    COALESCE(qs.amount, 0) > 0
-    AND NOT EXISTS(
-      SELECT
-        1
-      FROM
-        distribution_verifications dv
-      WHERE
-        dv.user_id = qs.user_id
-        AND dv.distribution_id =(
-          SELECT
-            id
-          FROM
-            distributions
-          WHERE
-            number = $1)
-          AND dv.type = 'send_ceiling');
-  -- Cleanup temporary tables
-  DROP TABLE IF EXISTS send_ceiling_settings;
-  DROP TABLE IF EXISTS all_qualifying_sends;
+    distribution_id,
+    user_id,
+    'send_ceiling'::public.verification_type,
+    score,
+    jsonb_build_object('value', send_ceiling::text)
+  FROM dist_scores ds
+  WHERE NOT EXISTS (
+    SELECT 1 FROM updated_rows ur
+    WHERE ur.user_id = ds.user_id
+  );
 END;
-$_$;
+$$;
 
 ALTER FUNCTION "public"."calculate_and_insert_send_ceiling_verification"("distribution_number" integer) OWNER TO "postgres";
 
@@ -405,23 +322,23 @@ BEGIN
     daily_transfers AS (
         SELECT
             sa.user_id,
-            DATE(to_timestamp(sat.block_time) AT TIME ZONE 'UTC') AS transfer_date,
-            COUNT(DISTINCT sat.t) AS unique_recipients
+            DATE(to_timestamp(stt.block_time) AT TIME ZONE 'UTC') AS transfer_date,
+            COUNT(DISTINCT stt.t) AS unique_recipients
         FROM
-            send_account_transfers sat
-            JOIN send_accounts sa ON sa.address = CONCAT('0x', ENCODE(sat.f, 'hex'))::CITEXT
+            stt stt
+            JOIN send_accounts sa ON sa.address = CONCAT('0x', ENCODE(stt.f, 'hex'))::CITEXT
         WHERE
-            sat.block_time >= EXTRACT(EPOCH FROM (
+            stt.block_time >= EXTRACT(EPOCH FROM (
                 SELECT
                     qualification_start
                 FROM distribution_info))
-            AND sat.block_time < EXTRACT(EPOCH FROM (
+            AND stt.block_time < EXTRACT(EPOCH FROM (
                 SELECT
                     qualification_end
                 FROM distribution_info))
         GROUP BY
             sa.user_id,
-            DATE(to_timestamp(sat.block_time) AT TIME ZONE 'UTC')
+            DATE(to_timestamp(stt.block_time) AT TIME ZONE 'UTC')
     ),
     streaks AS (
         SELECT
@@ -477,42 +394,11 @@ $$;
 
 ALTER FUNCTION "public"."insert_send_streak_verifications"("distribution_num" integer) OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "public"."insert_send_verifications"("distribution_num" integer) RETURNS "void"
-    LANGUAGE "plpgsql"
-    AS $$
+CREATE OR REPLACE FUNCTION public.insert_send_verifications(distribution_num integer)
+RETURNS void
+LANGUAGE plpgsql
+AS $$
 BEGIN
-    -- Perform the entire operation within a single function
-    WITH distribution_info AS (
-        SELECT
-            id,
-            qualification_start,
-            qualification_end
-        FROM
-            distributions
-        WHERE
-            "number" = distribution_num
-        LIMIT 1
-    ),
-    unique_transfer_counts AS (
-        SELECT
-            sa.user_id,
-            COUNT(DISTINCT sat.t) AS unique_recipient_count,
-            MAX(to_timestamp(sat.block_time) AT TIME ZONE 'UTC') AS last_transfer_date
-        FROM
-            send_account_transfers sat
-            JOIN send_accounts sa ON sa.address = CONCAT('0x', ENCODE(sat.f, 'hex'))::CITEXT
-        WHERE
-            sat.block_time >= EXTRACT(EPOCH FROM (
-                SELECT
-                    qualification_start
-                FROM distribution_info))
-            AND sat.block_time < EXTRACT(EPOCH FROM (
-                SELECT
-                    qualification_end
-                FROM distribution_info))
-        GROUP BY
-            sa.user_id
-    )
     INSERT INTO public.distribution_verifications(
         distribution_id,
         user_id,
@@ -522,32 +408,27 @@ BEGIN
         weight
     )
     SELECT
-        (
-            SELECT
-                id
-            FROM
-                distribution_info),
-        utc.user_id,
+        d.id,
+        ss.user_id,
         type,
-        JSONB_BUILD_OBJECT('value', utc.unique_recipient_count),
-        LEAST(utc.last_transfer_date, (
-            SELECT
-                qualification_end
-            FROM distribution_info)),
+        JSONB_BUILD_OBJECT('value', ss.unique_sends),
+        d.qualification_end,
         CASE
             WHEN type = 'send_ten'::public.verification_type
-                AND utc.unique_recipient_count >= 10 THEN 1
+                AND ss.unique_sends >= 10 THEN 1
             WHEN type = 'send_one_hundred'::public.verification_type
-                AND utc.unique_recipient_count >= 100 THEN 1
+                AND ss.unique_sends >= 100 THEN 1
             ELSE 0
         END
     FROM
-        unique_transfer_counts utc
+        distributions d
+        JOIN send_scores ss ON ss.distribution_id = d.id
         CROSS JOIN (
             SELECT 'send_ten'::public.verification_type AS type
             UNION ALL
             SELECT 'send_one_hundred'::public.verification_type
-        ) types;
+        ) types
+    WHERE d.number = distribution_num;
 END;
 $$;
 
@@ -736,113 +617,103 @@ $$;
 
 ALTER FUNCTION "public"."insert_verification_value"("distribution_number" integer, "type" "public"."verification_type", "fixed_value" numeric, "bips_value" integer, "multiplier_min" numeric, "multiplier_max" numeric, "multiplier_step" numeric) OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "public"."sum_qualification_sends"("distribution_number" integer) RETURNS TABLE("user_id" "uuid", "amount" numeric, "sent_to" "public"."citext"[])
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $_$
+-- TODO require recipient to have send earn mininum balance
+CREATE OR REPLACE FUNCTION public."insert_send_streak_verification"()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  curr_distribution_id bigint;
+  from_user_id uuid;
+  current_streak integer;
+  existing_record_id bigint;
+  ignored_addresses bytea[] := ARRAY['\x592e1224d203be4214b15e205f6081fbbacfcd2d'::bytea, '\x36f43082d01df4801af2d95aeed1a0200c5510ae'::bytea];
 BEGIN
-  -- Create temporary table to store qualification period
-  CREATE TEMPORARY TABLE IF NOT EXISTS qual_period AS
-  SELECT
-    extract(epoch FROM qualification_start) AS start_time,
-    extract(epoch FROM qualification_end) AS end_time
-  FROM
-    distributions
-  WHERE
-    number = $1;
-  -- Create temporary table for first sends to each address
-  CREATE TEMPORARY TABLE first_sends AS SELECT DISTINCT ON(sa.user_id, concat('0x', encode(stt.t, 'hex')
-)::citext) sa.user_id,
-  concat('0x', encode(stt.t, 'hex'))::citext AS recipient,
-  stt.v AS send_amount, -- Store full amount, will cap later
-  stt.block_time
-FROM
-  send_token_transfers stt
-  JOIN send_accounts sa ON sa.address = concat('0x', encode(stt.f, 'hex'))::citext
-  CROSS JOIN qual_period qp
-WHERE
-  stt.block_time >= qp.start_time
-    AND stt.block_time < qp.end_time
-  UNION
-  SELECT DISTINCT ON(sa.user_id, concat('0x', encode(stt.t, 'hex')
-)::citext) sa.user_id,
-  concat('0x', encode(stt.t, 'hex'))::citext AS recipient,
-  CASE WHEN $1 = 11 THEN
-    -- scale the amount correctly for distribution 11
-    stt.v * 1e16
-  ELSE
-    stt.v
-  END AS send_amount, -- Store full amount, will cap later
-  stt.block_time
-FROM
-  send_token_v0_transfers stt
-  JOIN send_accounts sa ON sa.address = concat('0x', encode(stt.f, 'hex'))::citext
-  CROSS JOIN qual_period qp
-WHERE
-  stt.block_time >= qp.start_time
-    AND stt.block_time < qp.end_time;
-  -- Create index for performance
-  CREATE INDEX ON first_sends(user_id);
-  -- Create send_ceiling_settings table
-  CREATE TEMPORARY TABLE send_ceiling_settings AS
-  WITH previous_distribution AS(
-    SELECT
-      ds.user_id,
-      CASE WHEN $1 = 11 THEN
-        -- scale the amount correctly for distribution 11
-        ds.amount * 1e16
-      ELSE
-        ds.amount
-      END AS user_prev_shares
-    FROM
-      distribution_shares ds
-      JOIN distributions d ON d.id = ds.distribution_id
-    WHERE
-      d.number = $1 - 1
-)
-  SELECT
-    fs.user_id,
-    ROUND(COALESCE(pd.user_prev_shares, d.hodler_min_balance) /(
-        SELECT
-          minimum_sends * scaling_divisor
-        FROM send_slash s_s
-        WHERE
-          s_s.distribution_id =(
-            SELECT
-              id
-            FROM distributions
-          WHERE
-            number = $1)))::numeric AS send_ceiling
-  FROM( SELECT DISTINCT
-      first_sends.user_id
-    FROM
-      first_sends) fs
-  CROSS JOIN(
-    SELECT
-      hodler_min_balance
-    FROM
-      distributions
-    WHERE
-      number = $1) d
-  LEFT JOIN previous_distribution pd ON pd.user_id = fs.user_id;
-  -- Return aggregated results with per-user send ceiling
-  RETURN QUERY
-  SELECT
-    fs.user_id,
-    SUM(LEAST(fs.send_amount, scs.send_ceiling)) AS amount,
-    array_agg(fs.recipient) AS sent_to
-  FROM
-    first_sends fs
-    JOIN send_ceiling_settings scs ON fs.user_id = scs.user_id
-  GROUP BY
-    fs.user_id;
-  -- Cleanup
-  DROP TABLE IF EXISTS qual_period;
-  DROP TABLE IF EXISTS first_sends;
-  DROP TABLE IF EXISTS send_ceiling_settings;
-END;
-$_$;
+  -- Get the current distribution id
+  SELECT id INTO curr_distribution_id
+  FROM distributions
+  WHERE qualification_start <= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+    AND qualification_end >= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+  ORDER BY qualification_start DESC
+  LIMIT 1;
 
-ALTER FUNCTION "public"."sum_qualification_sends"("distribution_number" integer) OWNER TO "postgres";
+  -- Get user_id from send_accounts
+  SELECT user_id INTO from_user_id
+  FROM send_accounts
+  WHERE address = concat('0x', encode(NEW.f, 'hex'))::citext;
+
+  IF curr_distribution_id IS NOT NULL AND from_user_id IS NOT NULL THEN
+    -- Calculate current streak with unique recipients per day
+    WITH daily_unique_transfers AS (
+      SELECT DISTINCT
+        DATE(to_timestamp(block_time) at time zone 'UTC') AS transfer_date
+      FROM send_token_transfers stt
+      WHERE f = NEW.f
+        AND NOT (t = ANY (ignored_addresses))
+        AND block_time >= (
+          SELECT extract(epoch FROM qualification_start)
+          FROM distributions
+          WHERE id = curr_distribution_id
+        )
+        AND EXISTS (
+          SELECT 1
+          FROM (
+            SELECT DISTINCT t
+            FROM send_token_transfers
+            WHERE f = stt.f
+            AND DATE(to_timestamp(block_time) at time zone 'UTC') = DATE(to_timestamp(stt.block_time) at time zone 'UTC')
+            AND NOT (t = ANY (ignored_addresses))
+          ) unique_recipients
+        )
+    ),
+    streaks AS (
+      SELECT
+        transfer_date,
+        transfer_date - (ROW_NUMBER() OVER (ORDER BY transfer_date))::integer AS streak_group
+      FROM daily_unique_transfers
+    )
+    SELECT COUNT(*) INTO current_streak
+    FROM streaks
+    WHERE streak_group = (
+      SELECT streak_group
+      FROM streaks
+      WHERE transfer_date = DATE(to_timestamp(NEW.block_time) at time zone 'UTC')
+    );
+
+    -- Handle send_streak verification
+    SELECT id INTO existing_record_id
+    FROM public.distribution_verifications
+    WHERE distribution_id = curr_distribution_id
+      AND user_id = from_user_id
+      AND type = 'send_streak'::public.verification_type;
+
+    IF existing_record_id IS NOT NULL THEN
+      UPDATE public.distribution_verifications
+      SET weight = GREATEST(current_streak, weight),
+          created_at = to_timestamp(NEW.block_time) at time zone 'UTC'
+      WHERE id = existing_record_id;
+    ELSE
+      INSERT INTO public.distribution_verifications(
+        distribution_id,
+        user_id,
+        type,
+        created_at,
+        weight
+      )
+      VALUES (
+        curr_distribution_id,
+        from_user_id,
+        'send_streak'::public.verification_type,
+        to_timestamp(NEW.block_time) at time zone 'UTC',
+        current_streak
+      );
+    END IF;
+  END IF;
+  RETURN NEW;
+END;
+$$;
 
 CREATE OR REPLACE FUNCTION "public"."update_distribution_shares"("distribution_id" integer, "shares" "public"."distribution_shares"[]) RETURNS "void"
     LANGUAGE "plpgsql" SECURITY DEFINER
@@ -1080,9 +951,6 @@ GRANT ALL ON FUNCTION "public"."insert_verification_value"("distribution_number"
 GRANT ALL ON FUNCTION "public"."insert_verification_value"("distribution_number" integer, "type" "public"."verification_type", "fixed_value" numeric, "bips_value" integer, "multiplier_min" numeric, "multiplier_max" numeric, "multiplier_step" numeric) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."insert_verification_value"("distribution_number" integer, "type" "public"."verification_type", "fixed_value" numeric, "bips_value" integer, "multiplier_min" numeric, "multiplier_max" numeric, "multiplier_step" numeric) TO "service_role";
 
-REVOKE ALL ON FUNCTION "public"."sum_qualification_sends"("distribution_number" integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."sum_qualification_sends"("distribution_number" integer) TO "service_role";
-
 REVOKE ALL ON FUNCTION "public"."update_distribution_shares"("distribution_id" integer, "shares" "public"."distribution_shares"[]) FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."update_distribution_shares"("distribution_id" integer, "shares" "public"."distribution_shares"[]) TO "service_role";
 
@@ -1091,224 +959,63 @@ GRANT ALL ON FUNCTION "public"."update_referral_verifications"("distribution_id"
 GRANT ALL ON FUNCTION "public"."update_referral_verifications"("distribution_id" integer, "shares" "public"."distribution_shares"[]) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."update_referral_verifications"("distribution_id" integer, "shares" "public"."distribution_shares"[]) TO "service_role";
 
-CREATE OR REPLACE FUNCTION "public"."insert_verification_sends"()
-  RETURNS TRIGGER
-  LANGUAGE plpgsql
-  SECURITY DEFINER
-  SET search_path = public
-  AS $$
-DECLARE
-  curr_distribution_id bigint;
-  from_user_id uuid;
-  to_user_id uuid;
-  unique_recipient_count integer;
-  current_streak integer;
-  existing_record_id bigint;
-  ignored_addresses bytea[] := ARRAY['\x592e1224d203be4214b15e205f6081fbbacfcd2d'::bytea, '\x36f43082d01df4801af2d95aeed1a0200c5510ae'::bytea];
+CREATE OR REPLACE FUNCTION public.insert_verification_sends()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO public
+AS $$
 BEGIN
-  -- Get the current distribution id
-  SELECT
-    id INTO curr_distribution_id
-  FROM
-    distributions
-  WHERE
-    qualification_start <= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
-    AND qualification_end >= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
-  ORDER BY
-    qualification_start DESC
-  LIMIT 1;
-  -- Get user_ids from send_accounts
-  SELECT
-    user_id INTO from_user_id
-  FROM
-    send_accounts
-  WHERE
-    address = concat('0x', encode(NEW.f, 'hex'))::citext;
-  SELECT
-    user_id INTO to_user_id
-  FROM
-    send_accounts
-  WHERE
-    address = concat('0x', encode(NEW.t, 'hex'))::citext;
-  IF curr_distribution_id IS NOT NULL AND from_user_id IS NOT NULL AND to_user_id IS NOT NULL THEN
-    -- Count unique recipients for the sender
-    SELECT
-      COUNT(DISTINCT t) INTO unique_recipient_count
-    FROM
-      send_account_transfers
-    WHERE
-      f = NEW.f
-      AND NOT (t = ANY (ignored_addresses))
-      AND block_time >=(
-        SELECT
-          extract(epoch FROM qualification_start)
-        FROM
-          distributions
-        WHERE
-          id = curr_distribution_id)
-      AND block_time <=(
-        SELECT
-          extract(epoch FROM qualification_end)
-        FROM
-          distributions
-        WHERE
-          id = curr_distribution_id);
-    -- Handle send_ten verification
-    SELECT
-      id INTO existing_record_id
-    FROM
-      public.distribution_verifications
-    WHERE
-      distribution_id = curr_distribution_id
-      AND user_id = from_user_id
-      AND type = 'send_ten'::public.verification_type;
-    IF existing_record_id IS NOT NULL THEN
-      UPDATE
-        public.distribution_verifications
-      SET
-        metadata = jsonb_build_object('value', unique_recipient_count),
-        weight = CASE WHEN unique_recipient_count >= 10 THEN
-          1
-        ELSE
-          0
-        END,
-        created_at = to_timestamp(NEW.block_time) at time zone 'UTC'
-      WHERE
-        id = existing_record_id;
-    ELSE
-      INSERT INTO public.distribution_verifications(
-        distribution_id,
-        user_id,
-        type,
-        metadata,
-        weight,
-        created_at)
-      VALUES (
-        curr_distribution_id,
-        from_user_id,
-        'send_ten' ::public.verification_type,
-        jsonb_build_object(
-          'value', unique_recipient_count),
-        CASE WHEN unique_recipient_count >= 10 THEN
-          1
-        ELSE
-          0
-        END,
-        to_timestamp(
-          NEW.block_time) at time zone 'UTC');
-    END IF;
-    -- Handle send_one_hundred verification
-    SELECT
-      id INTO existing_record_id
-    FROM
-      public.distribution_verifications
-    WHERE
-      distribution_id = curr_distribution_id
-      AND user_id = from_user_id
-      AND type = 'send_one_hundred'::public.verification_type;
-    IF existing_record_id IS NOT NULL THEN
-      UPDATE
-        public.distribution_verifications
-      SET
-        metadata = jsonb_build_object('value', unique_recipient_count),
-        weight = CASE WHEN unique_recipient_count >= 100 THEN
-          1
-        ELSE
-          0
-        END,
-        created_at = to_timestamp(NEW.block_time) at time zone 'UTC'
-      WHERE
-        id = existing_record_id;
-    ELSE
-      INSERT INTO public.distribution_verifications(
-        distribution_id,
-        user_id,
-        type,
-        metadata,
-        weight,
-        created_at)
-      VALUES (
-        curr_distribution_id,
-        from_user_id,
-        'send_one_hundred' ::public.verification_type,
-        jsonb_build_object(
-          'value', unique_recipient_count),
-        CASE WHEN unique_recipient_count >= 100 THEN
-          1
-        ELSE
-          0
-        END,
-        to_timestamp(
-          NEW.block_time) at time zone 'UTC');
-    END IF;
-    -- Calculate current streak
-    WITH daily_transfers AS (
-      SELECT DISTINCT
-        DATE(to_timestamp(block_time) at time zone 'UTC') AS transfer_date
-      FROM
-        send_account_transfers
-      WHERE
-        f = NEW.f
-        AND block_time >=(
-          SELECT
-            extract(epoch FROM qualification_start)
-          FROM
-            distributions
-          WHERE
-            id = curr_distribution_id)
-),
-streaks AS (
-  SELECT
-    transfer_date,
-    transfer_date -(ROW_NUMBER() OVER (ORDER BY transfer_date))::integer AS streak_group
-  FROM
-    daily_transfers
-)
-SELECT
-  COUNT(*) INTO current_streak
-FROM
-  streaks
-WHERE
-  streak_group =(
-    SELECT
-      streak_group
-    FROM
-      streaks
-    WHERE
-      transfer_date = DATE(to_timestamp(NEW.block_time) at time zone 'UTC'));
-  -- Handle send_streak verification
-  SELECT
-    id INTO existing_record_id
-  FROM
-    public.distribution_verifications
-  WHERE
-    distribution_id = curr_distribution_id
-    AND user_id = from_user_id
-    AND type = 'send_streak'::public.verification_type;
-  IF existing_record_id IS NOT NULL THEN
-    UPDATE
-      public.distribution_verifications
-    SET
-      weight = GREATEST(current_streak, weight),
+  UPDATE public.distribution_verifications dv
+  SET metadata = jsonb_build_object('value', ss.unique_sends),
+      weight = CASE
+        WHEN dv.type = 'send_ten' AND ss.unique_sends >= 10 THEN 1
+        WHEN dv.type = 'send_one_hundred' AND ss.unique_sends >= 100 THEN 1
+        ELSE 0
+      END,
       created_at = to_timestamp(NEW.block_time) at time zone 'UTC'
-    WHERE
-      id = existing_record_id;
-  ELSE
-    INSERT INTO public.distribution_verifications(
-      distribution_id,
-      user_id,
-      type,
-      created_at,
-      weight)
-    VALUES (
-      curr_distribution_id,
-      from_user_id,
-      'send_streak' ::public.verification_type,
-      to_timestamp(
-        NEW.block_time) at time zone 'UTC',
-      current_streak);
-  END IF;
-END IF;
+  FROM send_scores_current ss
+  JOIN send_accounts sa ON sa.user_id = ss.user_id
+  WHERE dv.distribution_id = ss.distribution_id
+    AND dv.user_id = ss.user_id
+    AND dv.type IN ('send_ten', 'send_one_hundred')
+    AND sa.address = concat('0x', encode(NEW.f, 'hex'))::citext;
+
+  INSERT INTO public.distribution_verifications(
+    distribution_id,
+    user_id,
+    type,
+    metadata,
+    weight,
+    created_at
+  )
+  SELECT
+    ss.distribution_id,
+    ss.user_id,
+    v.type,
+    jsonb_build_object('value', ss.unique_sends),
+    CASE
+      WHEN v.type = 'send_ten' AND ss.unique_sends >= 10 THEN 1
+      WHEN v.type = 'send_one_hundred' AND ss.unique_sends >= 100 THEN 1
+      ELSE 0
+    END,
+    to_timestamp(NEW.block_time) at time zone 'UTC'
+  FROM send_scores_current ss
+  JOIN send_accounts sa ON sa.user_id = ss.user_id
+  CROSS JOIN (
+    VALUES
+      ('send_ten'::verification_type),
+      ('send_one_hundred'::verification_type)
+  ) v(type)
+  WHERE sa.address = concat('0x', encode(NEW.f, 'hex'))::citext
+    AND NOT EXISTS (
+      SELECT 1
+      FROM distribution_verifications dv
+      WHERE dv.user_id = ss.user_id
+        AND dv.distribution_id = ss.distribution_id
+        AND dv.type = v.type
+    );
+
   RETURN NEW;
 END;
 $$;
@@ -1319,126 +1026,49 @@ GRANT ALL ON FUNCTION "public"."insert_verification_sends"() TO "anon";
 GRANT ALL ON FUNCTION "public"."insert_verification_sends"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."insert_verification_sends"() TO "service_role";
 
-CREATE OR REPLACE FUNCTION "public"."insert_verification_send_ceiling"() RETURNS "trigger"
-    LANGUAGE "plpgsql"
-    AS $$
-DECLARE
-  _user_id uuid;
-  _recipient_address citext;
-  _distribution_id integer;
-  _distribution_number integer;
-  _send_ceiling numeric;
-  _verification_record record;
+CREATE OR REPLACE FUNCTION public.insert_verification_send_ceiling()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
 BEGIN
-  -- Get the sender's user_id
-  SELECT send_accounts.user_id INTO _user_id
-  FROM send_accounts
-  WHERE address = concat('0x', encode(NEW.f, 'hex'))::citext;
+  UPDATE distribution_verifications dv
+  SET weight = ss.score,
+      metadata = jsonb_build_object('value', ss.send_ceiling::text)
+  FROM send_scores_current ss
+  JOIN send_accounts sa ON sa.user_id = ss.user_id
+  WHERE dv.user_id = ss.user_id
+    AND dv.distribution_id = ss.distribution_id
+    AND dv.type = 'send_ceiling'
+    AND sa.address = concat('0x', encode(NEW.f, 'hex'))::citext
+    AND NEW.v > 0;
 
-  -- Get recipient address
-  _recipient_address := concat('0x', encode(NEW.t, 'hex'))::citext;
-
-  -- Validate transaction value
-  IF NEW.v <= 0 THEN
-    RETURN NEW; -- Skip processing for zero or negative values
+  IF NOT FOUND THEN
+    INSERT INTO distribution_verifications(
+      distribution_id,
+      user_id,
+      type,
+      weight,
+      metadata
+    )
+    SELECT
+      ss.distribution_id,
+      ss.user_id,
+      'send_ceiling',
+      ss.score,
+      jsonb_build_object('value', ss.send_ceiling::text)
+    FROM send_scores_current ss
+    JOIN send_accounts sa ON sa.user_id = ss.user_id
+    WHERE sa.address = concat('0x', encode(NEW.f, 'hex'))::citext
+    AND NEW.v > 0;
   END IF;
 
-  -- Get the active distribution id and number
-  SELECT d.id, d.number
-  INTO _distribution_id, _distribution_number
-  FROM distributions d
-  WHERE extract(epoch FROM d.qualification_start) <= NEW.block_time
-    AND extract(epoch FROM d.qualification_end) > NEW.block_time;
-
-  -- If we found matching distribution and user
-  IF _user_id IS NOT NULL AND _distribution_id IS NOT NULL THEN
-    -- Try to update existing verification first
-    UPDATE distribution_verifications dv
-    SET
-      metadata = CASE
-        WHEN NOT (_recipient_address = ANY(
-          ARRAY(SELECT jsonb_array_elements_text(metadata -> 'sent_to'))::citext[]
-        )) THEN
-          jsonb_build_object(
-            'value', (metadata ->> 'value'),
-            'sent_to', metadata -> 'sent_to' || jsonb_build_array(_recipient_address)
-          )
-        ELSE metadata
-      END,
-      weight = weight + CASE
-        WHEN NOT (_recipient_address = ANY(
-          ARRAY(SELECT jsonb_array_elements_text(metadata -> 'sent_to'))::citext[]
-        )) THEN
-          LEAST(NEW.v, (metadata ->> 'value')::numeric)
-        ELSE 0
-      END
-    WHERE dv.user_id = _user_id
-      AND distribution_id = _distribution_id
-      AND type = 'send_ceiling'
-    RETURNING metadata ->> 'value' INTO _send_ceiling;
-
-    -- If no row was updated, create new verification
-    IF NOT FOUND THEN
-      -- Calculate send ceiling for new verification
-      WITH send_settings AS (
-        SELECT minimum_sends * scaling_divisor AS divider
-        FROM send_slash s_s
-        JOIN distributions d ON d.id = s_s.distribution_id
-        WHERE d.number = _distribution_number
-      ),
-      previous_distribution AS (
-        SELECT ds.user_id,
-          ds.amount AS user_prev_shares
-        FROM distribution_shares ds
-        WHERE ds.distribution_id = (
-          SELECT id
-          FROM distributions
-          WHERE number = _distribution_number - 1
-        )
-        AND ds.user_id = _user_id
-      ),
-      distribution_info AS (
-        SELECT hodler_min_balance
-        FROM distributions
-        WHERE id = _distribution_id
-      )
-      SELECT ROUND(COALESCE(pd.user_prev_shares, di.hodler_min_balance) / NULLIF(ss.divider, 0))::numeric
-      INTO _send_ceiling
-      FROM distribution_info di
-      CROSS JOIN send_settings ss
-      LEFT JOIN previous_distribution pd ON pd.user_id = _user_id;
-
-      -- Handle NULL or zero divider case
-      IF _send_ceiling IS NULL OR _send_ceiling < 0 THEN
-        RAISE NOTICE 'Invalid send ceiling calculation result: %', _send_ceiling;
-        _send_ceiling := 0; -- Default fallback
-      END IF;
-
-      -- Create new verification
-      INSERT INTO distribution_verifications(
-        distribution_id,
-        user_id,
-        type,
-        weight,
-        metadata
-      )
-      VALUES (
-        _distribution_id,
-        _user_id,
-        'send_ceiling',
-        LEAST(NEW.v, _send_ceiling),
-        jsonb_build_object(
-          'value', _send_ceiling::text,
-          'sent_to', jsonb_build_array(_recipient_address)
-        )
-      );
-    END IF;
-  END IF;
   RETURN NEW;
 EXCEPTION
   WHEN OTHERS THEN
     RAISE NOTICE 'Error in insert_verification_send_ceiling: %', SQLERRM;
-    RETURN NEW; -- Continue processing even if this trigger fails
+    RETURN NEW;
 END;
 $$;
 
@@ -1448,3 +1078,42 @@ REVOKE ALL ON FUNCTION "public"."insert_verification_send_ceiling"() FROM PUBLIC
 GRANT ALL ON FUNCTION "public"."insert_verification_send_ceiling"() TO "anon";
 GRANT ALL ON FUNCTION "public"."insert_verification_send_ceiling"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."insert_verification_send_ceiling"() TO "service_role";
+
+CREATE OR REPLACE FUNCTION refresh_send_scores_history()
+RETURNS void AS $$
+BEGIN
+  REFRESH MATERIALIZED VIEW CONCURRENTLY send_scores_history;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+ALTER FUNCTION "public"."refresh_send_scores_history"() OWNER TO "postgres";
+
+REVOKE ALL ON FUNCTION "public"."refresh_send_scores_history"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."refresh_send_scores_history"() TO "anon";
+GRANT ALL ON FUNCTION "public"."refresh_send_scores_history"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."refresh_send_scores_history"() TO "service_role";
+
+-- Trigger function
+CREATE OR REPLACE FUNCTION public.refresh_send_scores_history_trigger()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+  PERFORM refresh_send_scores_history();
+  RETURN NEW;
+END;
+$function$
+;
+
+ALTER FUNCTION "public"."refresh_send_scores_history_trigger"() OWNER TO "postgres";
+
+REVOKE ALL ON FUNCTION "public"."refresh_send_scores_history_trigger"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."refresh_send_scores_history_trigger"() TO "anon";
+GRANT ALL ON FUNCTION "public"."refresh_send_scores_history_trigger"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."refresh_send_scores_history_trigger"() TO "service_role";
+
+-- Trigger
+CREATE TRIGGER distribution_ended_refresh_send_scores
+  AFTER INSERT ON distributions
+  FOR EACH ROW
+  EXECUTE FUNCTION refresh_send_scores_history_trigger();

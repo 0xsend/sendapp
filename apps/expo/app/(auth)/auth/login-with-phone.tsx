@@ -1,10 +1,10 @@
 import { LoginWithPhoneScreen } from 'app/features/auth/loginWithPhone/screen'
-import { AuthLayout } from 'app/features/auth/layout'
+import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
 
 export default function LoginWithPhone() {
   return (
-    <AuthLayout>
+    <ScreenContainer>
       <LoginWithPhoneScreen />
-    </AuthLayout>
+    </ScreenContainer>
   )
 }

@@ -210,19 +210,18 @@ VALUES (
 -- bob can register and confirm tags with valid receipts
 SELECT
     tests.authenticate_as('bob');
--- Inserting a tag for test user
-INSERT INTO tags(
-    name,
-    user_id)
-VALUES (
-    'bob',
-    tests.get_supabase_uid(
-        'bob'));
+-- Creating a tag for test user using create_tag function
+SELECT create_tag('bob', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('bob')));
 -- Confirm tags with the service role
 SELECT
     tests.clear_authentication();
 SELECT
     set_config('role', 'service_role', TRUE);
+
+DELETE FROM distributions
+WHERE qualification_start <= (now() AT TIME ZONE 'UTC')
+AND qualification_end >= (now() AT TIME ZONE 'UTC');
+
 INSERT INTO distributions(
     number,
     tranche_id,
@@ -599,12 +598,15 @@ VALUES (
     0);
 SELECT
     confirm_tags( -- bob confirms tags
-        '{bob}',(
+        '{bob}'::citext[],
+        (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('bob')),
+        (
             SELECT
                 event_id
             FROM sendtag_checkout_receipts
             WHERE
-                sender = '\xB0B0000000000000000000000000000000000000'), NULL);
+                sender = '\xB0B0000000000000000000000000000000000000'),
+        NULL);
 SELECT
     results_eq($$
         SELECT
@@ -619,13 +621,7 @@ SELECT
 SELECT
     tests.authenticate_as('alice');
 -- can create a free common tag without receipt
-INSERT INTO tags(
-    name,
-    user_id)
-VALUES (
-    'alice',
-    tests.get_supabase_uid(
-        'alice'));
+SELECT create_tag('alice', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('alice')));
 SELECT
     results_eq($$
         SELECT
@@ -677,12 +673,15 @@ VALUES (
     '\x0000000000000000000000000000000000000000',
     0);
 SELECT
-    confirm_tags('{alice}',(
+    confirm_tags('{alice}'::citext[], (
+            SELECT id FROM send_accounts
+            WHERE user_id = tests.get_supabase_uid('alice')
+        ), (
             SELECT
                 event_id
             FROM sendtag_checkout_receipts
             WHERE
-                sender = '\xa71ce00000000000000000000000000000000000'),(
+                sender = '\xa71ce00000000000000000000000000000000000'), (
             SELECT
                 referral_code
             FROM public.profiles
@@ -721,7 +720,7 @@ SELECT
                 AND type = 'send_ten' $$, $$
             VALUES (0) $$, 'No send ten verification should exist initially');
 -- Insert 3-day streak transfers (with unique recipients)
-INSERT INTO send_account_transfers(
+INSERT INTO send_token_transfers(
     f,
     t,
     block_time,
@@ -747,8 +746,8 @@ VALUES (
                 number = 123) + interval '1 hour')),
     8453,
     '\x1234567890123456789012345678901234567890123456789012345678901236'::bytea,
-    'send_account_transfers',
-    'send_account_transfers',
+    'send_token_transfers',
+    'send_token_transfers',
     1,
     0,
     0,
@@ -765,8 +764,8 @@ VALUES (
                 number = 123) + interval '25 hours')),
     8453,
     '\x1234567890123456789012345678901234567890123456789012345678901237'::bytea,
-    'send_account_transfers',
-    'send_account_transfers',
+    'send_token_transfers',
+    'send_token_transfers',
     2,
     0,
     0,
@@ -783,8 +782,8 @@ VALUES (
                 number = 123) + interval '49 hours')),
     8453,
     '\x1234567890123456789012345678901234567890123456789012345678901238'::bytea,
-    'send_account_transfers',
-    'send_account_transfers',
+    'send_token_transfers',
+    'send_token_transfers',
     3,
     0,
     0,
@@ -800,7 +799,7 @@ SELECT
                 AND type = 'send_streak' $$, $$
             VALUES (3) $$, 'Streak verification should show 3-day streak');
 -- Insert broken streak transfer (with unique recipient)
-INSERT INTO send_account_transfers(
+INSERT INTO send_token_transfers(
     f,
     t,
     block_time,
@@ -826,8 +825,8 @@ VALUES (
                 number = 123) + interval '120 hours')),
     8453,
     '\x1234567890123456789012345678901234567890123456789012345678901239'::bytea,
-    'send_account_transfers',
-    'send_account_transfers',
+    'send_token_transfers',
+    'send_token_transfers',
     4,
     0,
     0,
@@ -843,7 +842,7 @@ SELECT
                 AND type = 'send_streak' $$, $$
             VALUES (3) $$, 'Broken send streak should not increase it');
 -- Insert same-day transfers
-INSERT INTO send_account_transfers(
+INSERT INTO send_token_transfers(
     f,
     t,
     block_time,
@@ -869,8 +868,8 @@ VALUES (
                 number = 123) + interval '1 hour')),
     8453,
     '\x123456789012345678901234567890123456789012345678901234567890123a'::bytea,
-    'send_account_transfers',
-    'send_account_transfers',
+    'send_token_transfers',
+    'send_token_transfers',
     5,
     0,
     0,
@@ -887,8 +886,8 @@ VALUES (
                 number = 123) + interval '1 hour')),
     8453,
     '\x123456789012345678901234567890123456789012345678901234567890123b'::bytea,
-    'send_account_transfers',
-    'send_account_transfers',
+    'send_token_transfers',
+    'send_token_transfers',
     6,
     1,
     0,
@@ -904,7 +903,7 @@ SELECT
                 AND type = 'send_streak' $$, $$
             VALUES (3) $$, 'Multiple transfers to different recipients in same day should not increase streak');
 -- Insert set of transfers - one with send account, one without, one with same send account
-INSERT INTO send_account_transfers(
+INSERT INTO send_token_transfers(
     f,
     t,
     block_time,
@@ -930,8 +929,8 @@ VALUES (
                 number = 123) + interval '1 hour')),
     8453,
     '\x1234567890123456789012345678901234567890123456789012345678901234'::bytea,
-    'send_account_transfers',
-    'send_account_transfers',
+    'send_token_transfers',
+    'send_token_transfers',
     7,
     0,
     0,
@@ -948,8 +947,8 @@ VALUES (
                 number = 123) + interval '1 hour')),
     8453,
     '\x123456789012345678901234567890123456789012345678901234567890123a'::bytea,
-    'send_account_transfers',
-    'send_account_transfers',
+    'send_token_transfers',
+    'send_token_transfers',
     8,
     0,
     0,
@@ -966,22 +965,24 @@ VALUES (
                 number = 123) + interval '1 hour')),
     8453,
     '\x1234567890123456789012345678901234567890123456789012345678901234'::bytea,
-    'send_account_transfers',
-    'send_account_transfers',
+    'send_token_transfers',
+    'send_token_transfers',
     9,
     0,
     0,
     0,
     1000000000000000000,
     '\x5afe000000000000000000000000000000000000'::bytea);
+
 SELECT
     results_eq($$
         SELECT
             metadata ->> 'value' FROM distribution_verifications
             WHERE
                 user_id = tests.get_supabase_uid('bob')
+                AND distribution_id = (SELECT id FROM distributions WHERE number = 123)
                 AND type = 'send_ten' $$, $$
-            VALUES ('8') $$, 'Should only count the recipient with a send account');
+            VALUES ('8') $$, 'Should only count the recipients with a send account');
 
 -- Test update_referral_verifications function
 SELECT

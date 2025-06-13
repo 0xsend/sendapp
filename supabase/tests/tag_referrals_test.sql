@@ -12,6 +12,40 @@ SELECT
     tests.create_supabase_user('alice');
 SELECT
     tests.create_supabase_user('bob2');
+
+-- Create profiles for the test users with referral codes
+INSERT INTO profiles (id, name, about, avatar_url, is_public)
+VALUES (
+    tests.get_supabase_uid('bob'),
+    'Bob Test',
+    'Test user Bob',
+    'https://example.com/bob.jpg',
+    true
+), (
+    tests.get_supabase_uid('alice'),
+    'Alice Test',
+    'Test user Alice',
+    'https://example.com/alice.jpg',
+    true
+), (
+    tests.get_supabase_uid('bob2'),
+    'Bob2 Test',
+    'Test user Bob2',
+    'https://example.com/bob2.jpg',
+    true
+)
+ON CONFLICT (id) DO UPDATE SET 
+    name = EXCLUDED.name, 
+    about = EXCLUDED.about, 
+    avatar_url = EXCLUDED.avatar_url, 
+    is_public = EXCLUDED.is_public;
+
+-- Clean up any existing tags from previous test runs to avoid conflicts
+DELETE FROM send_account_tags WHERE tag_id IN (
+    SELECT id FROM tags WHERE name IN ('alice', 'redroses', 'wonderland', 'whiterabbit')
+);
+DELETE FROM tags WHERE name IN ('alice', 'redroses', 'wonderland', 'whiterabbit');
+
 INSERT INTO send_accounts(
     user_id,
     address,
@@ -125,34 +159,28 @@ VALUES (
     1,
     '\x0000000000000000000000000000000000000000',
     0);
--- Inserting a tag for test user
-INSERT INTO tags(
-    name,
-    user_id)
-VALUES (
-    'alice',
-    tests.get_supabase_uid(
-        'alice'));
-INSERT INTO tags(
-    name,
-    user_id)
-VALUES (
-    'redroses',
-    tests.get_supabase_uid(
-        'alice'));
+-- Creating tags for test user using create_tag function
+SELECT tests.authenticate_as('alice');
+SELECT create_tag('alice', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('alice')));
+SELECT create_tag('redroses', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('alice')));
 -- Confirm tags with the service role
 SELECT
     tests.clear_authentication();
 SELECT
     set_config('role', 'service_role', TRUE);
+
 SELECT
-    confirm_tags('{alice}',(
+    confirm_tags(
+        '{alice}'::citext[],
+        (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('alice')),
+        (
             SELECT
                 event_id
             FROM sendtag_checkout_receipts
             WHERE
                 sender = '\xa71ce00000000000000000000000000000000000'
-                AND src_name = 'alice'),(
+                AND src_name = 'alice'),
+        (
             SELECT
                 referral_code
             FROM public.profiles
@@ -175,13 +203,16 @@ SELECT
                 AND referred_id = tests.get_supabase_uid('alice') $test$, 'Referral should be created');
 -- Verify user cannot have two referrers
 SELECT
-    confirm_tags('{redroses}',(
+    confirm_tags('{redroses}'::citext[], (
+            SELECT id FROM send_accounts 
+            WHERE user_id = tests.get_supabase_uid('alice')
+        ), (
             SELECT
                 event_id
             FROM sendtag_checkout_receipts
             WHERE
                 sender = '\xa71ce00000000000000000000000000000000000'
-                AND src_name = 'redroses'),(
+                AND src_name = 'redroses'), (
             SELECT
                 referral_code
             FROM public.profiles
@@ -232,20 +263,17 @@ SELECT
 -- Verify invalid referral code still confirms tags
 SELECT
     tests.authenticate_as('alice');
-INSERT INTO tags(
-    name,
-    user_id)
-VALUES (
-    'wonderland',
-    tests.get_supabase_uid(
-        'alice'));
+SELECT create_tag('wonderland', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('alice')));
 -- Confirm tags with the service role
 SELECT
     tests.clear_authentication();
 SELECT
     set_config('role', 'service_role', TRUE);
 SELECT
-    confirm_tags('{wonderland}',(
+    confirm_tags('{wonderland}'::citext[], (
+            SELECT id FROM send_accounts 
+            WHERE user_id = tests.get_supabase_uid('alice')
+        ), (
             SELECT
                 event_id
             FROM sendtag_checkout_receipts
@@ -264,26 +292,23 @@ SELECT
 -- Verify passing my own referral code does not create a referral
 SELECT
     tests.authenticate_as('alice');
-INSERT INTO tags(
-    name,
-    user_id)
-VALUES (
-    'whiterabbit',
-    tests.get_supabase_uid(
-        'alice'));
+SELECT create_tag('whiterabbit', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('alice')));
 -- Confirm tags with the service role
 SELECT
     tests.clear_authentication();
 SELECT
     set_config('role', 'service_role', TRUE);
 SELECT
-    confirm_tags('{whiterabbit}',(
+    confirm_tags('{whiterabbit}'::citext[], (
+            SELECT id FROM send_accounts 
+            WHERE user_id = tests.get_supabase_uid('alice')
+        ), (
             SELECT
                 event_id
             FROM sendtag_checkout_receipts
             WHERE
                 sender = '\xa71ce00000000000000000000000000000000000'
-                AND src_name = 'whiterabbit'),(
+                AND src_name = 'whiterabbit'), (
             SELECT
                 referral_code
             FROM public.profiles

@@ -21,6 +21,7 @@ import { useCallback } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { z } from 'zod'
+import { Platform } from 'react-native'
 
 const CreatePasskeySchema = z.object({
   accountName: z.string().min(1).trim().describe('Passkey name'),
@@ -33,7 +34,7 @@ export const CreatePasskeyScreen = () => {
 
   return (
     <YStack w={'100%'} gap={'$3.5'}>
-      <SettingsHeader>Passkeys</SettingsHeader>
+      {Platform.OS === 'web' && <SettingsHeader>Passkeys</SettingsHeader>}
       <CreatePasskeyForm
         onPasskeySaved={(cred) => router.push(`/account/backup/confirm/${cred.id}`)}
       />

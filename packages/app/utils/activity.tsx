@@ -632,7 +632,7 @@ export function useSubtextFromActivity({
 /**
  * Returns the name of the user from the activity user.
  * The cascading fallback is to:
- * 1. First, sendtag
+ * 1. First, main sendtag
  * 2. 2nd, profile name
  * 3. 3rd, Send ID
  */
@@ -640,6 +640,8 @@ export function userNameFromActivityUser(
   user: Activity['from_user'] | Activity['to_user']
 ): string {
   switch (true) {
+    case !!user?.main_tag_name:
+      return `/${user.main_tag_name}`
     case !!user?.tags?.[0]:
       return `/${user.tags[0]}`
     case !!user?.name:

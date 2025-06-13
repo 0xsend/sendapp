@@ -23,7 +23,7 @@ export const TabScreenContainer = ({ children }: PropsWithChildren) => {
         contentContainerStyle={{
           flexGrow: 1,
           paddingTop: CONTAINER_OFFSET,
-          paddingBottom: height + CONTAINER_OFFSET,
+          paddingBottom: height + CONTAINER_OFFSET * 2,
         }}
         showsVerticalScrollIndicator={false}
         bounces={true}

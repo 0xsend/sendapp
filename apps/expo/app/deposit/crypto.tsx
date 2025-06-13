@@ -1,31 +1,18 @@
-import { Container, H4, Paragraph, Stack } from '@my/ui'
-import { Stack as StackRouter } from 'expo-router'
+import { Stack } from 'expo-router/build/layouts/Stack'
+import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
+import { DepositCryptoScreen } from 'app/features/deposit/crypto/screen'
 
 export default function CryptoDepositScreen() {
   return (
     <>
-      <StackRouter.Screen
+      <Stack.Screen
         options={{
-          title: 'Crypto Deposit',
-          headerShown: true,
+          title: 'Deposit on Base',
         }}
       />
-
-      <Container
-        safeAreaProps={{
-          edges: ['left', 'right'],
-          style: { flex: 1 },
-        }}
-        flex={1}
-        backgroundColor="$background"
-      >
-        <Stack f={1} ai="center" jc="center" p="$4">
-          <H4 mb="$4">Crypto Deposit</H4>
-          <Paragraph ta="center" color="$color10">
-            This screen will allow you to deposit crypto to your account.
-          </Paragraph>
-        </Stack>
-      </Container>
+      <ScreenContainer>
+        <DepositCryptoScreen />
+      </ScreenContainer>
     </>
   )
 }

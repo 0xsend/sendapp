@@ -12,7 +12,7 @@ type Enum_pgtle_password_types = 'PASSWORD_TYPE_MD5' | 'PASSWORD_TYPE_PLAINTEXT'
 type Enum_pgtle_pg_tle_features = 'clientauth' | 'passcheck';
 type Enum_public_key_type_enum = 'ES256';
 type Enum_public_lookup_type_enum = 'address' | 'phone' | 'refcode' | 'sendid' | 'tag';
-type Enum_public_tag_status = 'confirmed' | 'pending';
+type Enum_public_tag_status = 'available' | 'confirmed' | 'pending';
 type Enum_public_temporal_status = 'confirmed' | 'failed' | 'initialized' | 'sent' | 'submitted';
 type Enum_public_verification_type = 'create_passkey' | 'send_ceiling' | 'send_one_hundred' | 'send_streak' | 'send_ten' | 'tag_referral' | 'tag_registration' | 'total_tag_referrals';
 type Enum_public_verification_value_mode = 'aggregate' | 'individual';
@@ -129,6 +129,7 @@ interface Table_public_distributions {
   token_addr: string | null;
   token_decimals: number | null;
   tranche_id: number;
+  earn_min_balance: number;
 }
 interface Table_realtime_extensions {
   id: string;
@@ -471,6 +472,13 @@ interface Table_public_send_account_signing_key_removed {
   abi_idx: number;
   id: number;
 }
+interface Table_public_send_account_tags {
+  id: number;
+  send_account_id: string;
+  tag_id: number;
+  created_at: string;
+  updated_at: string;
+}
 interface Table_public_send_account_transfers {
   id: number;
   chain_id: number;
@@ -508,6 +516,7 @@ interface Table_public_send_accounts {
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
+  main_tag_id: number | null;
 }
 interface Table_public_send_earn_create {
   id: number;
@@ -774,12 +783,15 @@ interface Table_public_tag_receipts {
   event_id: string | null;
   id: number;
   created_at: string | null;
+  tag_id: number;
 }
 interface Table_public_tags {
   name: string;
   status: Enum_public_tag_status;
-  user_id: string;
+  user_id: string | null;
   created_at: string;
+  id: number;
+  updated_at: string;
 }
 interface Table_shovel_task_updates {
   num: number | null;
@@ -930,6 +942,7 @@ interface Schema_public {
   send_account_receives: Table_public_send_account_receives;
   send_account_signing_key_added: Table_public_send_account_signing_key_added;
   send_account_signing_key_removed: Table_public_send_account_signing_key_removed;
+  send_account_tags: Table_public_send_account_tags;
   send_account_transfers: Table_public_send_account_transfers;
   send_accounts: Table_public_send_accounts;
   send_earn_create: Table_public_send_earn_create;
@@ -1324,15 +1337,29 @@ interface Tables_relationships {
     childDestinationsTables:  | {};
     
   };
+  "public.send_account_tags": {
+    parent: {
+       send_account_tags_send_account_id_fkey: "public.send_accounts";
+       send_account_tags_tag_id_fkey: "public.tags";
+    };
+    children: {
+
+    };
+    parentDestinationsTables: "public.send_accounts" | "public.tags" | {};
+    childDestinationsTables:  | {};
+    
+  };
   "public.send_accounts": {
     parent: {
        send_accounts_user_id_fkey: "auth.users";
+       send_accounts_main_tag_id_fkey: "public.tags";
     };
     children: {
        account_credentials_account_id_fkey: "public.send_account_credentials";
+       send_account_tags_send_account_id_fkey: "public.send_account_tags";
     };
-    parentDestinationsTables: "auth.users" | {};
-    childDestinationsTables: "public.send_account_credentials" | {};
+    parentDestinationsTables: "auth.users" | "public.tags" | {};
+    childDestinationsTables: "public.send_account_credentials" | "public.send_account_tags" | {};
     
   };
   "temporal.send_earn_deposits": {
@@ -1395,7 +1422,7 @@ interface Tables_relationships {
   };
   "public.tag_receipts": {
     parent: {
-       tag_receipts_tag_name_fkey: "public.tags";
+       tag_receipts_tag_id_fkey: "public.tags";
     };
     children: {
 
@@ -1409,10 +1436,12 @@ interface Tables_relationships {
        tags_user_id_fkey: "auth.users";
     };
     children: {
-       tag_receipts_tag_name_fkey: "public.tag_receipts";
+       send_account_tags_tag_id_fkey: "public.send_account_tags";
+       send_accounts_main_tag_id_fkey: "public.send_accounts";
+       tag_receipts_tag_id_fkey: "public.tag_receipts";
     };
     parentDestinationsTables: "auth.users" | {};
-    childDestinationsTables: "public.tag_receipts" | {};
+    childDestinationsTables: "public.send_account_tags" | "public.send_accounts" | "public.tag_receipts" | {};
     
   };
   "_realtime.tenants": {

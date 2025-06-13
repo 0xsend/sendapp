@@ -158,6 +158,20 @@ export type Database = {
             referencedRelation: "distributions"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "distribution_shares_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "send_scores_current"
+            referencedColumns: ["distribution_id"]
+          },
+          {
+            foreignKeyName: "distribution_shares_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "send_scores_history"
+            referencedColumns: ["distribution_id"]
+          },
         ]
       }
       distribution_verification_values: {
@@ -201,6 +215,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "distributions"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "distribution_verification_values_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "send_scores_current"
+            referencedColumns: ["distribution_id"]
+          },
+          {
+            foreignKeyName: "distribution_verification_values_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "send_scores_history"
+            referencedColumns: ["distribution_id"]
           },
         ]
       }
@@ -247,6 +275,20 @@ export type Database = {
             referencedRelation: "distributions"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "distribution_verifications_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "send_scores_current"
+            referencedColumns: ["distribution_id"]
+          },
+          {
+            foreignKeyName: "distribution_verifications_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "send_scores_history"
+            referencedColumns: ["distribution_id"]
+          },
         ]
       }
       distributions: {
@@ -257,6 +299,7 @@ export type Database = {
           claim_end: string
           created_at: string
           description: string | null
+          earn_min_balance: number
           fixed_pool_bips: number
           hodler_min_balance: number
           hodler_pool_bips: number
@@ -279,6 +322,7 @@ export type Database = {
           claim_end: string
           created_at?: string
           description?: string | null
+          earn_min_balance?: number
           fixed_pool_bips: number
           hodler_min_balance: number
           hodler_pool_bips: number
@@ -301,6 +345,7 @@ export type Database = {
           claim_end?: string
           created_at?: string
           description?: string | null
+          earn_min_balance?: number
           fixed_pool_bips?: number
           hodler_min_balance?: number
           hodler_pool_bips?: number
@@ -682,6 +727,45 @@ export type Database = {
         }
         Relationships: []
       }
+      send_account_tags: {
+        Row: {
+          created_at: string
+          id: number
+          send_account_id: string
+          tag_id: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          send_account_id: string
+          tag_id: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          send_account_id?: string
+          tag_id?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "send_account_tags_send_account_id_fkey"
+            columns: ["send_account_id"]
+            isOneToOne: false
+            referencedRelation: "send_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "send_account_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       send_account_transfers: {
         Row: {
           abi_idx: number
@@ -744,6 +828,7 @@ export type Database = {
           deleted_at: string | null
           id: string
           init_code: string
+          main_tag_id: number | null
           updated_at: string
           user_id: string
         }
@@ -754,6 +839,7 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           init_code: string
+          main_tag_id?: number | null
           updated_at?: string
           user_id?: string
         }
@@ -764,10 +850,19 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           init_code?: string
+          main_tag_id?: number | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "send_accounts_main_tag_id_fkey"
+            columns: ["main_tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       send_earn_create: {
         Row: {
@@ -1105,6 +1200,20 @@ export type Database = {
             referencedRelation: "distributions"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "send_slash_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "send_scores_current"
+            referencedColumns: ["distribution_id"]
+          },
+          {
+            foreignKeyName: "send_slash_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "send_scores_history"
+            referencedColumns: ["distribution_id"]
+          },
         ]
       }
       send_token_transfers: {
@@ -1410,6 +1519,7 @@ export type Database = {
           event_id: string | null
           hash: string | null
           id: number
+          tag_id: number
           tag_name: string
         }
         Insert: {
@@ -1417,6 +1527,7 @@ export type Database = {
           event_id?: string | null
           hash?: string | null
           id?: number
+          tag_id: number
           tag_name: string
         }
         Update: {
@@ -1424,36 +1535,43 @@ export type Database = {
           event_id?: string | null
           hash?: string | null
           id?: number
+          tag_id?: number
           tag_name?: string
         }
         Relationships: [
           {
-            foreignKeyName: "tag_receipts_tag_name_fkey"
-            columns: ["tag_name"]
+            foreignKeyName: "tag_receipts_tag_id_fkey"
+            columns: ["tag_id"]
             isOneToOne: false
             referencedRelation: "tags"
-            referencedColumns: ["name"]
+            referencedColumns: ["id"]
           },
         ]
       }
       tags: {
         Row: {
           created_at: string
+          id: number
           name: string
           status: Database["public"]["Enums"]["tag_status"]
-          user_id: string
+          updated_at: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
+          id?: number
           name: string
           status?: Database["public"]["Enums"]["tag_status"]
-          user_id?: string
+          updated_at?: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
+          id?: number
           name?: string
           status?: Database["public"]["Enums"]["tag_status"]
-          user_id?: string
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -1546,6 +1664,8 @@ export type Database = {
           chain_id: number | null
           id: string | null
           is_public: boolean | null
+          main_tag_id: number | null
+          main_tag_name: string | null
           name: string | null
           refcode: string | null
           send_id: number | null
@@ -1575,6 +1695,54 @@ export type Database = {
           log_addr: string | null
           owner: string | null
           shares: number | null
+        }
+        Relationships: []
+      }
+      send_earn_balances_timeline: {
+        Row: {
+          balance: number | null
+          block_time: number | null
+          owner: string | null
+        }
+        Relationships: []
+      }
+      send_scores: {
+        Row: {
+          distribution_id: number | null
+          score: number | null
+          send_ceiling: number | null
+          unique_sends: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
+      send_scores_current: {
+        Row: {
+          distribution_id: number | null
+          score: number | null
+          send_ceiling: number | null
+          unique_sends: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
+      send_scores_current_unique: {
+        Row: {
+          capped_amount: number | null
+          distribution_id: number | null
+          from_user_id: string | null
+          send_ceiling: number | null
+          to_user_id: string | null
+        }
+        Relationships: []
+      }
+      send_scores_history: {
+        Row: {
+          distribution_id: number | null
+          score: number | null
+          send_ceiling: number | null
+          unique_sends: number | null
+          user_id: string | null
         }
         Relationships: []
       }
@@ -1611,8 +1779,9 @@ export type Database = {
       confirm_tags: {
         Args: {
           tag_names: string[]
-          event_id: string
-          referral_code_input: string
+          send_account_id: string
+          _event_id: string
+          _referral_code: string
         }
         Returns: undefined
       }
@@ -1624,6 +1793,10 @@ export type Database = {
         }
         Returns: Json
       }
+      create_tag: {
+        Args: { tag_name: string; send_account_id: string }
+        Returns: number
+      }
       distribution_hodler_addresses: {
         Args: { distribution_id: number }
         Returns: {
@@ -1633,6 +1806,7 @@ export type Database = {
           deleted_at: string | null
           id: string
           init_code: string
+          main_tag_id: number | null
           updated_at: string
           user_id: string
         }[]
@@ -1768,6 +1942,8 @@ export type Database = {
           is_public: boolean
           sendid: number
           all_tags: string[]
+          main_tag_id: number
+          main_tag_name: string
         }[]
       }
       query_webauthn_credentials_by_phone: {
@@ -1797,6 +1973,18 @@ export type Database = {
           referrer: Database["public"]["CompositeTypes"]["profile_lookup_result"]
           new_referrer: Database["public"]["CompositeTypes"]["profile_lookup_result"]
         }[]
+      }
+      refresh_send_scores_history: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      register_first_sendtag: {
+        Args: {
+          tag_name: string
+          send_account_id: string
+          _referral_code?: string
+        }
+        Returns: Json
       }
       send_accounts_add_webauthn_credential: {
         Args: {
@@ -1846,14 +2034,6 @@ export type Database = {
           vault: string
         }[]
       }
-      sum_qualification_sends: {
-        Args: { distribution_number: number }
-        Returns: {
-          user_id: string
-          amount: number
-          sent_to: string[]
-        }[]
-      }
       tag_search: {
         Args: { query: string; limit_val: number; offset_val: number }
         Returns: {
@@ -1866,9 +2046,11 @@ export type Database = {
         Args: { "": Database["public"]["Tables"]["profiles"]["Row"] }
         Returns: {
           created_at: string
+          id: number
           name: string
           status: Database["public"]["Enums"]["tag_status"]
-          user_id: string
+          updated_at: string
+          user_id: string | null
         }[]
       }
       today_birthday_senders: {
@@ -1901,7 +2083,7 @@ export type Database = {
     Enums: {
       key_type_enum: "ES256"
       lookup_type_enum: "sendid" | "tag" | "refcode" | "address" | "phone"
-      tag_status: "pending" | "confirmed"
+      tag_status: "pending" | "confirmed" | "available"
       temporal_status:
         | "initialized"
         | "submitted"
@@ -1925,6 +2107,8 @@ export type Database = {
         name: string | null
         avatar_url: string | null
         send_id: number | null
+        main_tag_id: number | null
+        main_tag_name: string | null
         tags: string[] | null
       }
       profile_lookup_result: {
@@ -2165,7 +2349,7 @@ export const Constants = {
     Enums: {
       key_type_enum: ["ES256"],
       lookup_type_enum: ["sendid", "tag", "refcode", "address", "phone"],
-      tag_status: ["pending", "confirmed"],
+      tag_status: ["pending", "confirmed", "available"],
       temporal_status: [
         "initialized",
         "submitted",

@@ -548,12 +548,35 @@ CREATE OR REPLACE VIEW "public"."send_earn_balances" WITH ("security_invoker"='o
 
 ALTER TABLE "public"."send_earn_balances" OWNER TO "postgres";
 
+CREATE OR REPLACE VIEW send_earn_balances_timeline AS
+WITH all_transactions AS (
+    SELECT owner, block_time, assets as balance
+    FROM send_earn_deposit
+    UNION ALL
+    SELECT owner, block_time, -assets as balance
+    FROM send_earn_withdraw
+)
+SELECT
+    owner,
+    block_time,
+    SUM(balance) OVER (
+        PARTITION BY owner
+        ORDER BY block_time
+        ROWS UNBOUNDED PRECEDING
+    ) as balance
+FROM all_transactions
+ORDER BY block_time;
+
+ALTER TABLE "public"."send_earn_balances_timeline" OWNER TO "postgres";
+
 -- Indexes
 CREATE INDEX "send_earn_create_block_num" ON "public"."send_earn_create" USING "btree" ("block_num");
 CREATE INDEX "send_earn_create_block_time" ON "public"."send_earn_create" USING "btree" ("block_time");
 CREATE INDEX "send_earn_create_send_earn" ON "public"."send_earn_create" USING "btree" ("send_earn");
 CREATE INDEX "send_earn_deposit_block_num" ON "public"."send_earn_deposit" USING "btree" ("block_num");
 CREATE INDEX "send_earn_deposit_block_time" ON "public"."send_earn_deposit" USING "btree" ("block_time");
+CREATE INDEX idx_earn_deposit_owner_blocktime ON "public"."send_earn_deposit" USING "btree" ("owner", "block_time" DESC);
+CREATE INDEX idx_earn_withdraw_owner_blocktime ON "public"."send_earn_withdraw" USING "btree" ("owner", "block_time" DESC);
 CREATE INDEX "send_earn_deposit_owner_idx" ON "public"."send_earn_deposit" USING "btree" ("owner", "log_addr");
 CREATE INDEX "send_earn_new_affiliate_affiliate_idx" ON "public"."send_earn_new_affiliate" USING "btree" ("affiliate");
 CREATE INDEX "send_earn_new_affiliate_block_num" ON "public"."send_earn_new_affiliate" USING "btree" ("block_num");

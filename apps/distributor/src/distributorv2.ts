@@ -1,9 +1,9 @@
-import { cpus } from 'node:os'
-import type { Database, Tables } from '@my/supabase/database.types'
+import type { Database, Tables, Views } from '@my/supabase/database.types'
 import type { Logger } from 'pino'
 import {
   createDistributionShares,
   fetchActiveDistributions,
+  fetchAllEarnBalances,
   fetchAllHodlers,
   fetchAllVerifications,
   fetchDistribution,
@@ -14,6 +14,8 @@ import {
 import { fetchAllBalances, isMerkleDropActive } from './wagmi'
 import { calculateWeights, Mode, PERC_DENOM } from './weights'
 import { assert } from 'app/utils/assert'
+import { byteaToHex } from 'app/utils/byteaToHex'
+import type { Address } from 'viem'
 
 type Multiplier = {
   value?: number
@@ -41,6 +43,9 @@ const getHoursInMonth = (date: Date) => {
 const getCurrentHourInMonth = (date: Date) => {
   return (date.getUTCDate() - 1) * 24 + date.getUTCHours()
 }
+
+const normalizeAddress = (address: string): Address => address.toLowerCase() as Address
+
 /**
  * Changes from V1:
  * Fixed Pool Calculation: In V2, fixed pool amounts are calculated first from the total distribution amount, whereas V1 calculated hodler, bonus, and fixed pools separately.
@@ -48,6 +53,7 @@ const getCurrentHourInMonth = (date: Date) => {
  * Bonus Shares Elimination: In V2, bonus shares are always 0, effectively removing the bonus pool concept that existed in V1.
  * Multiplier System: V2 introduces a new multiplier system, particularly for referrals and certain verification types
  * Send Slash System: V2 introduces a new system for handling send slashes, where non senders get slashed
+ * Send Earn Minimum Balance: V2 introduces a new minimum balance for send earn deposits
  */
 
 export class DistributorV2Worker {
@@ -137,6 +143,14 @@ export class DistributorV2Worker {
     }
 
     log.info({ distribution_id: distribution.id }, 'Calculating distribution shares.')
+
+    // Fetch send slash data
+    const { data: sendSlash, error: sendSlashError } = await fetchSendSlash(distribution)
+
+    if (sendSlashError) {
+      log.error(sendSlashError, 'Error fetching send slash data')
+      throw sendSlashError
+    }
 
     const {
       data: verifications,
@@ -231,18 +245,18 @@ export class DistributorV2Worker {
     )
 
     const hodlerAddressesByUserId = hodlerAddresses.reduce(
-      (acc, address) => {
-        acc[address.user_id] = address
+      (acc, { address, user_id }) => {
+        acc[user_id] = normalizeAddress(address)
         return acc
       },
-      {} as Record<string, Database['public']['Tables']['chain_addresses']['Row']>
+      {} as Record<string, Address>
     )
     const hodlerUserIdByAddress = hodlerAddresses.reduce(
-      (acc, address) => {
-        acc[address.address] = address.user_id
+      (acc, { user_id, address }) => {
+        acc[normalizeAddress(address)] = user_id
         return acc
       },
-      {} as Record<string, string>
+      {} as Record<Address, string>
     )
 
     log.info(`Found ${hodlerAddresses.length} addresses.`)
@@ -257,7 +271,7 @@ export class DistributorV2Worker {
 
     // lookup balances of all hodler addresses in qualification period
     // Filter out hodler with not enough send token balance
-    const minBalanceAddresses: { user_id: string; address: `0x${string}`; balance: string }[] =
+    const minBalanceAddresses: { user_id: string; address: Address; balance: bigint }[] =
       await fetchAllBalances({
         addresses: hodlerAddresses,
         distribution,
@@ -289,12 +303,36 @@ export class DistributorV2Worker {
       })
     }
 
-    // Fetch send slash data
-    const { data: sendSlash, error: sendSlashError } = await fetchSendSlash(distribution)
+    const {
+      data: earnBalances,
+      error: earnBalancesError,
+      count: earnBalancesCount,
+    } = await fetchAllEarnBalances(distribution)
 
-    if (sendSlashError) {
-      throw sendSlashError
+    if (earnBalancesError) {
+      log.error(earnBalancesError, 'Error fetching earn balances')
+      throw earnBalancesError
     }
+    if (earnBalancesCount === 0 || earnBalances === null) {
+      log.warn('No earn balances found')
+      return
+    }
+    const minEarnBalancesByAddress = earnBalances.reduce(
+      (acc, { owner, assets }) => {
+        const ownerHex = byteaToHex(owner)
+        acc[normalizeAddress(ownerHex)] = BigInt(assets)
+        return acc
+      },
+      {} as Record<Address, bigint>
+    )
+
+    const minBalanceByAddress: Record<Address, bigint> = minBalanceAddresses.reduce(
+      (acc, { address, balance }) => {
+        acc[address] = balance
+        return acc
+      },
+      {} as Record<Address, bigint>
+    )
 
     const { data: previousShares, error: previousSharesError } = await fetchDistributionShares(
       distribution.number - 1
@@ -344,32 +382,126 @@ export class DistributorV2Worker {
       })
     }
 
-    // Calculate fixed pool share weights
-    const distAmt = BigInt(distribution.amount)
-    const fixedPoolAvailableAmount = distAmt
+    const qualifyingUserIds = new Set(
+      minBalanceAddresses
+        .filter(({ address, user_id }) => {
+          return (
+            !!minEarnBalancesByAddress[address] &&
+            !!hodlerUserIdByAddress[address] &&
+            verificationsByUserId[user_id]?.some(
+              (v) => v.type === 'tag_registration' && v.weight > 0
+            )
+          )
+        })
+        .map(({ user_id }) => user_id)
+    )
 
-    const minBalanceByAddress: Record<string, bigint> = minBalanceAddresses.reduce(
-      (acc, balance) => {
-        acc[balance.address] = BigInt(balance.balance)
+    // Calculate initial hodler rewards using full distribution amount
+    const distAmt = BigInt(distribution.amount)
+    let initialHodlerShares: { address: Address; amount: bigint; userId: string }[] = []
+
+    // Initial hodler reward calculation
+    const endDate = new Date(distribution.qualification_end)
+    const currentDate = new Date() > endDate ? endDate : new Date()
+    const hoursInMonth = getHoursInMonth(currentDate)
+    const currentHour = getCurrentHourInMonth(currentDate)
+
+    // Calculate time adjustment for initial amounts using full distribution amount
+    const hourlyHodlerAmount = (distAmt * PERC_DENOM) / BigInt(hoursInMonth)
+    const timeAdjustedAmount =
+      (hourlyHodlerAmount * BigInt(currentHour + 1)) / PERC_DENOM > distAmt
+        ? distAmt
+        : (hourlyHodlerAmount * BigInt(currentHour + 1)) / PERC_DENOM
+
+    // Calculate initial slashed balances
+    const initialSlashedBalances = minBalanceAddresses
+      .map(({ user_id: userId, balance, address }) => {
+        // Check if user is qualifying
+        const isQualifying = qualifyingUserIds.has(userId)
+
+        const sendCeilingData = sendCeilingByUserId[userId]
+        let slashPercentage = 0n
+
+        if (sendCeilingData && sendCeilingData.weight > 0n && isQualifying) {
+          const previousReward =
+            previousSharesByUserId[userId] || BigInt(distribution.hodler_min_balance)
+          const scaledPreviousReward =
+            (previousReward * PERC_DENOM) / (BigInt(sendSlash.scaling_divisor) * PERC_DENOM)
+
+          const scaledWeight = sendCeilingData.weight * PERC_DENOM
+          const cappedWeight =
+            scaledWeight > scaledPreviousReward ? scaledPreviousReward : scaledWeight
+
+          slashPercentage = (cappedWeight * PERC_DENOM) / scaledPreviousReward
+        }
+
+        const slashedBalance = (balance * slashPercentage) / PERC_DENOM
+
+        return {
+          address,
+          userId,
+          balance: slashedBalance,
+        }
+      })
+      .filter(({ balance }) => balance >= BigInt('0'))
+
+    if (log.isLevelEnabled('debug')) {
+      await Bun.write(
+        'dist/initialSlashedBalances.json',
+        JSON.stringify(initialSlashedBalances, jsonBigint, 2)
+      ).catch((e) => {
+        log.error(e, 'Error writing initialSlashedBalances.json')
+      })
+    }
+
+    // Calculate initial weighted shares
+    const initialWeightedShares = calculateWeights(
+      initialSlashedBalances,
+      timeAdjustedAmount,
+      Mode.EaseInOut
+    )
+
+    initialHodlerShares = initialSlashedBalances.map(({ address, userId }) => ({
+      address: address,
+      userId: userId,
+      amount: initialWeightedShares[address]?.amount || 0n,
+    }))
+
+    log.info(
+      {
+        hoursInMonth,
+        currentHour,
+        hourlyHodlerAmount,
+        timeAdjustedAmount,
+        fullAmount: distAmt,
+      },
+      'Initial time-based hodler pool calculations'
+    )
+
+    // Create lookup for initial hodler amounts (add this before fixed pool calculation)
+    const initialHodlerAmountByAddress = initialHodlerShares.reduce(
+      (acc, share) => {
+        acc[share.address] = share.amount
         return acc
       },
       {} as Record<string, bigint>
     )
+
+    // Calculate fixed pool share weights
+    const fixedPoolAvailableAmount = distAmt
 
     let fixedPoolAllocatedAmount = 0n // This tracks slashed amount
     const fixedPoolAmountsByAddress: Record<string, bigint> = {}
 
     // Calculate fixed pool amounts
     for (const [userId, verifications] of Object.entries(verificationsByUserId)) {
-      const hodler = hodlerAddressesByUserId[userId]
-      if (!hodler || !hodler.address) continue
-      const { address } = hodler
-      if (!minBalanceByAddress[address]) continue
-      const hasPurchasedTag = verifications.some(
-        (v) => v.type === 'tag_registration' && v.weight > 0
-      )
+      const isQualifying = qualifyingUserIds.has(userId)
+      const address = hodlerAddressesByUserId[userId]
 
-      if (!hasPurchasedTag) continue
+      if (!isQualifying || !address) continue
+
+      // Get initial hodler amount - default to 0 if not found
+      const initialHodlerAmount = initialHodlerAmountByAddress[address] || 0n
 
       let userFixedAmount = 0n
       const multipliers: Record<string, Multiplier> = {}
@@ -451,6 +583,16 @@ export class DistributorV2Worker {
         amount = 0n
       }
 
+      if (amount > initialHodlerAmount) {
+        if (log.isLevelEnabled('debug')) {
+          log.debug(
+            { address, original: amount, capped: initialHodlerAmount },
+            'Fixed reward capped by hodler amount'
+          )
+        }
+        amount = initialHodlerAmount
+      }
+
       if (fixedPoolAllocatedAmount + amount <= fixedPoolAvailableAmount) {
         fixedPoolAmountsByAddress[address] = amount
         fixedPoolAllocatedAmount += amount
@@ -461,7 +603,8 @@ export class DistributorV2Worker {
     const hodlerPoolAvailableAmount = distAmt - fixedPoolAllocatedAmount
 
     let hodlerShares: {
-      address: string
+      address: Address
+      userId: string
       amount: bigint
     }[] = []
 
@@ -473,52 +616,42 @@ export class DistributorV2Worker {
 
       // Calculate time adjustment for slashed amounts
       const hourlyHodlerAmount = (hodlerPoolAvailableAmount * PERC_DENOM) / BigInt(hoursInMonth)
-
       const timeAdjustedAmount =
         (hourlyHodlerAmount * BigInt(currentHour + 1)) / PERC_DENOM > hodlerPoolAvailableAmount
           ? hodlerPoolAvailableAmount
           : (hourlyHodlerAmount * BigInt(currentHour + 1)) / PERC_DENOM
 
-      // First calculate slashed balances for everyone
+      // Calculate slashed balances
       const slashedBalances = minBalanceAddresses
-        .map((balance) => {
-          const userId = hodlerUserIdByAddress[balance.address] ?? ''
-          const address = balance.address
-
-          // Check for tag registration verification first
-          const verifications = verificationsByUserId[userId] || []
-          const hasPurchasedTag = verifications.some(
-            (v) => v.type === 'tag_registration' && v.weight > 0
-          )
+        .map(({ user_id: userId, balance, address }) => {
+          // Check if user is qualifying
+          const isQualifying = qualifyingUserIds.has(userId)
 
           const sendCeilingData = sendCeilingByUserId[userId]
           let slashPercentage = 0n
 
-          if (sendCeilingData && sendCeilingData.weight > 0n && hasPurchasedTag) {
+          if (sendCeilingData && sendCeilingData.weight > 0n && isQualifying) {
             const previousReward =
               previousSharesByUserId[userId] || BigInt(distribution.hodler_min_balance)
             const scaledPreviousReward =
               (previousReward * PERC_DENOM) / (BigInt(sendSlash.scaling_divisor) * PERC_DENOM)
 
             const scaledWeight = sendCeilingData.weight * PERC_DENOM
-
             const cappedWeight =
               scaledWeight > scaledPreviousReward ? scaledPreviousReward : scaledWeight
 
             slashPercentage = (cappedWeight * PERC_DENOM) / scaledPreviousReward
           }
 
-          const slashedBalance = (
-            (BigInt(balance.balance) * slashPercentage) /
-            PERC_DENOM
-          ).toString()
+          const slashedBalance = (balance * slashPercentage) / PERC_DENOM
 
           return {
             address,
+            userId,
             balance: slashedBalance,
           }
         })
-        .filter((balance) => BigInt(balance.balance) >= BigInt('0')) // Remove zero balances
+        .filter(({ balance }) => balance >= BigInt('0'))
 
       if (log.isLevelEnabled('debug')) {
         await Bun.write(
@@ -529,13 +662,13 @@ export class DistributorV2Worker {
         })
       }
 
-      // Calculate weighted shares for current slashed state
-
+      // Calculate weighted shares
       const weightedShares = calculateWeights(slashedBalances, timeAdjustedAmount, Mode.EaseInOut)
 
-      hodlerShares = slashedBalances.map((balance) => ({
-        address: balance.address,
-        amount: weightedShares[balance.address]?.amount || 0n,
+      hodlerShares = slashedBalances.map(({ address, userId }) => ({
+        address,
+        userId,
+        amount: weightedShares[address]?.amount || 0n,
       }))
 
       log.info(

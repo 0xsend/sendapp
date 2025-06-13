@@ -16,6 +16,7 @@ import {
 import { useCallback, useEffect, useState } from 'react'
 import { api } from 'app/utils/api'
 import { useSignIn } from 'app/utils/send-accounts'
+import { Platform } from 'react-native'
 
 const SignInWithPhoneSchema = z.object({
   countryCode: formFields.countrycode,
@@ -195,6 +196,13 @@ export const LoginWithPhoneScreen = () => {
         bw={0}
         br={0}
         height={'auto'}
+        {...(Platform.OS !== 'web' // on native go back instead of /auth/sign-up, better ux using stack navigation
+          ? {
+              onPress: () => {
+                router.back()
+              },
+            }
+          : {})}
       >
         <Button.Text
           color={'$primary'}

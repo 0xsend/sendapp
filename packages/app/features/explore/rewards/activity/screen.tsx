@@ -1,4 +1,5 @@
 import {
+  Card,
   type CardProps,
   FadeCard,
   H3,
@@ -21,7 +22,7 @@ import {
 } from 'app/utils/distributions'
 import formatAmount from 'app/utils/formatAmount'
 import { formatUnits } from 'viem'
-import type { PropsWithChildren } from 'react'
+import { useMemo, type PropsWithChildren } from 'react'
 import { DistributionClaimButton } from '../components/DistributionClaimButton'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { DistributionSelect } from '../components/DistributionSelect'
@@ -30,7 +31,8 @@ import { isEqualCalendarDate } from 'app/utils/dateHelper'
 import { toNiceError } from 'app/utils/toNiceError'
 import { min } from 'app/utils/bigint'
 import type { Json } from '@my/supabase/database.types'
-import { sendCoin } from 'app/data/coins'
+import { sendCoin, usdcCoin } from 'app/data/coins'
+import { useSendEarnBalances, useVaultConvertSharesToAssets } from 'app/features/earn/hooks'
 
 //@todo get this from the db
 const verificationTypesAndTitles = {
@@ -111,7 +113,7 @@ export function ActivityRewardsScreen() {
               return <Spinner size="small" color={'$color12'} />
             case verificationsQuery.isError:
               return (
-                <Paragraph color={'$color10'} size={'$5'}>
+                <Paragraph color={'$error'} size={'$5'}>
                   Error fetching verifications. {toNiceError(verificationsQuery.error)}
                 </Paragraph>
               )
@@ -165,6 +167,29 @@ const DistributionRequirementsCard = ({
     isLoading: isLoadingSnapshotBalance,
     error: snapshotBalanceError,
   } = useSnapshotBalance({ distribution, sendAccount })
+
+  const { data: sendEarnBalances, isLoading: isLoadingSendEarnBalances } = useSendEarnBalances()
+  // Extract vaults and shares from balances for conversion
+  const vaults =
+    sendEarnBalances
+      ?.filter((balance) => balance.shares > 0n && balance.log_addr !== null)
+      .map((balance) => balance.log_addr) || []
+
+  const shares =
+    sendEarnBalances
+      ?.filter((balance) => balance.shares > 0n && balance.log_addr !== null)
+      .map((balance) => balance.shares) || []
+
+  // Use the hook to get current asset values based on onchain rate
+  const earnAssets = useVaultConvertSharesToAssets({ vaults, shares })
+
+  const totalAssets = useMemo(
+    () => earnAssets.data?.reduce((sum, assets) => sum + assets, 0n) ?? 0n,
+    [earnAssets.data]
+  )
+
+  const hasMinSavings = BigInt(distribution.earn_min_balance) > 0n
+
   if (verificationsQuery.isLoading || isLoadingSendAccount) {
     return (
       <FadeCard br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
@@ -223,7 +248,7 @@ const DistributionRequirementsCard = ({
           </XStack>
           <XStack ai="center" gap="$2">
             <Paragraph>
-              Min. Balance{' '}
+              Balance{' '}
               {formatAmount(
                 formatUnits(
                   BigInt(distribution.hodler_min_balance ?? 0n),
@@ -255,6 +280,39 @@ const DistributionRequirementsCard = ({
               }
             })()}
           </XStack>
+          {hasMinSavings && (
+            <XStack ai="center" gap="$2">
+              <Paragraph>
+                Savings Deposit $
+                {formatAmount(
+                  formatUnits(BigInt(distribution.earn_min_balance ?? 0n), usdcCoin.decimals) ?? 0n,
+                  9,
+                  2
+                )}{' '}
+              </Paragraph>
+              {(() => {
+                switch (true) {
+                  case isLoadingSendEarnBalances:
+                    return <Spinner size="small" />
+                  case distribution.earn_min_balance === undefined ||
+                    BigInt(distribution.earn_min_balance) > (totalAssets ?? 0n):
+                    return (
+                      <Theme name="red">
+                        <IconInfoCircle color={'$color8'} size={'$2'} />
+                      </Theme>
+                    )
+                  default:
+                    return (
+                      <CheckCircle2
+                        $theme-light={{ color: '$color12' }}
+                        color="$primary"
+                        size={'$1.5'}
+                      />
+                    )
+                }
+              })()}
+            </XStack>
+          )}
         </YStack>
       </Stack>
     </FadeCard>
@@ -275,11 +333,11 @@ const TaskCards = ({
         <H3 fontWeight={'600'} color={'$color12'}>
           Tasks
         </H3>
-        <FadeCard br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
+        <Card br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
           <Stack ai="center" jc="center" p="$4">
             <Spinner color="$color12" size="large" />
           </Stack>
-        </FadeCard>
+        </Card>
       </YStack>
     )
   }
@@ -381,7 +439,7 @@ const TaskCard = ({
   ].includes(type)
 
   return (
-    <FadeCard br={12} gap="$4" p="$6" jc={'space-between'} $gtSm={{ maw: 331 }} w={'100%'}>
+    <Card br={12} gap="$4" p="$6" jc={'space-between'} $gtSm={{ maw: 331 }} w={'100%'}>
       <XStack ai={'center'} jc="space-between">
         {status}
         {shouldShowValue && (
@@ -399,7 +457,7 @@ const TaskCard = ({
         )}
       </XStack>
       {children}
-    </FadeCard>
+    </Card>
   )
 }
 

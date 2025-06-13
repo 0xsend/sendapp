@@ -44,36 +44,50 @@ ALTER TABLE ONLY "public"."activity"
     ADD CONSTRAINT "activity_to_user_id_fkey" FOREIGN KEY ("to_user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
 
 -- Views
-CREATE OR REPLACE VIEW "public"."activity_feed" WITH ("security_barrier"='on') AS
- SELECT "a"."created_at",
-    "a"."event_name",
+create or replace view "public"."activity_feed" as  SELECT a.created_at,
+    a.event_name,
         CASE
-            WHEN ("a"."from_user_id" = "from_p"."id") THEN ROW(
+            WHEN (a.from_user_id = from_p.id) THEN ROW(
             CASE
-                WHEN ("a"."from_user_id" = ( SELECT "auth"."uid"() AS "uid")) THEN ( SELECT "auth"."uid"() AS "uid")
-                ELSE NULL::"uuid"
-            END, "from_p"."name", "from_p"."avatar_url", "from_p"."send_id", (( SELECT "array_agg"("tags"."name") AS "array_agg"
-               FROM "public"."tags"
-              WHERE (("tags"."user_id" = "from_p"."id") AND ("tags"."status" = 'confirmed'::"public"."tag_status"))))::"text"[])::"public"."activity_feed_user"
-            ELSE NULL::"public"."activity_feed_user"
-        END AS "from_user",
+                WHEN (a.from_user_id = ( SELECT auth.uid() AS uid)) THEN ( SELECT auth.uid() AS uid)
+                ELSE NULL::uuid
+            END, from_p.name, from_p.avatar_url, from_p.send_id,
+            CASE
+                WHEN (a.from_user_id = ( SELECT auth.uid() AS uid)) THEN from_sa.main_tag_id
+                ELSE NULL::bigint
+            END, (from_main_tag.name)::text, (( SELECT array_agg(t.name) AS array_agg
+               FROM ((tags t
+                 JOIN send_account_tags sat ON ((sat.tag_id = t.id)))
+                 JOIN send_accounts sa ON ((sa.id = sat.send_account_id)))
+              WHERE ((sa.user_id = from_p.id) AND (t.status = 'confirmed'::tag_status))))::text[])::activity_feed_user
+            ELSE NULL::activity_feed_user
+        END AS from_user,
         CASE
-            WHEN ("a"."to_user_id" = "to_p"."id") THEN ROW(
+            WHEN (a.to_user_id = to_p.id) THEN ROW(
             CASE
-                WHEN ("a"."to_user_id" = ( SELECT "auth"."uid"() AS "uid")) THEN ( SELECT "auth"."uid"() AS "uid")
-                ELSE NULL::"uuid"
-            END, "to_p"."name", "to_p"."avatar_url", "to_p"."send_id", (( SELECT "array_agg"("tags"."name") AS "array_agg"
-               FROM "public"."tags"
-              WHERE (("tags"."user_id" = "to_p"."id") AND ("tags"."status" = 'confirmed'::"public"."tag_status"))))::"text"[])::"public"."activity_feed_user"
-            ELSE NULL::"public"."activity_feed_user"
-        END AS "to_user",
-    "a"."data"
-   FROM (("public"."activity" "a"
-     LEFT JOIN "public"."profiles" "from_p" ON (("a"."from_user_id" = "from_p"."id")))
-     LEFT JOIN "public"."profiles" "to_p" ON (("a"."to_user_id" = "to_p"."id")))
-  WHERE (("a"."from_user_id" = ( SELECT "auth"."uid"() AS "uid")) OR (("a"."to_user_id" = ( SELECT "auth"."uid"() AS "uid")) AND ("a"."event_name" !~~ 'temporal_%'::"text")))
-  GROUP BY "a"."created_at", "a"."event_name", "a"."from_user_id", "a"."to_user_id", "from_p"."id", "from_p"."name", "from_p"."avatar_url", "from_p"."send_id", "to_p"."id", "to_p"."name", "to_p"."avatar_url", "to_p"."send_id", "a"."data";
-ALTER TABLE "public"."activity_feed" OWNER TO "postgres";
+                WHEN (a.to_user_id = ( SELECT auth.uid() AS uid)) THEN ( SELECT auth.uid() AS uid)
+                ELSE NULL::uuid
+            END, to_p.name, to_p.avatar_url, to_p.send_id,
+            CASE
+                WHEN (a.to_user_id = ( SELECT auth.uid() AS uid)) THEN to_sa.main_tag_id
+                ELSE NULL::bigint
+            END, (to_main_tag.name)::text, (( SELECT array_agg(t.name) AS array_agg
+               FROM ((tags t
+                 JOIN send_account_tags sat ON ((sat.tag_id = t.id)))
+                 JOIN send_accounts sa ON ((sa.id = sat.send_account_id)))
+              WHERE ((sa.user_id = to_p.id) AND (t.status = 'confirmed'::tag_status))))::text[])::activity_feed_user
+            ELSE NULL::activity_feed_user
+        END AS to_user,
+    a.data
+   FROM ((((((activity a
+     LEFT JOIN profiles from_p ON ((a.from_user_id = from_p.id)))
+     LEFT JOIN profiles to_p ON ((a.to_user_id = to_p.id)))
+     LEFT JOIN send_accounts from_sa ON ((from_sa.user_id = from_p.id)))
+     LEFT JOIN tags from_main_tag ON ((from_main_tag.id = from_sa.main_tag_id)))
+     LEFT JOIN send_accounts to_sa ON ((to_sa.user_id = to_p.id)))
+     LEFT JOIN tags to_main_tag ON ((to_main_tag.id = to_sa.main_tag_id)))
+  WHERE ((a.from_user_id = ( SELECT auth.uid() AS uid)) OR ((a.to_user_id = ( SELECT auth.uid() AS uid)) AND (a.event_name !~~ 'temporal_%'::text)))
+  GROUP BY a.created_at, a.event_name, a.from_user_id, a.to_user_id, from_p.id, from_p.name, from_p.avatar_url, from_p.send_id, to_p.id, to_p.name, to_p.avatar_url, to_p.send_id, a.data, from_sa.main_tag_id, from_main_tag.name, to_sa.main_tag_id, to_main_tag.name;
 
 -- Functions (that depend on activity_feed view)
 CREATE OR REPLACE FUNCTION favourite_senders()
@@ -179,16 +193,16 @@ $function$
 ALTER FUNCTION "public"."recent_senders"() OWNER TO "postgres";
 
 -- Functions (that depend on activity table directly)
-CREATE OR REPLACE FUNCTION today_birthday_senders()
-RETURNS SETOF activity_feed_user
-SECURITY DEFINER
-LANGUAGE plpgsql
-AS $$
+CREATE OR REPLACE FUNCTION public.today_birthday_senders()
+ RETURNS SETOF activity_feed_user
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
 BEGIN
 RETURN QUERY
 
-WITH filtered_profiles AS (
-    SELECT *
+WITH birthday_profiles AS (
+    SELECT p.*
     FROM profiles p
     WHERE p.is_public = TRUE -- only public profiles
     AND p.birthday IS NOT NULL -- Ensure birthday is set
@@ -203,15 +217,22 @@ WITH filtered_profiles AS (
         JOIN tag_receipts tr ON tr.tag_name = t.name
         WHERE t.user_id = p.id
     )
-    -- Ensure user is part of the most recent distribution, means user have sent SEND at least once in current month and has min balance
-    AND EXISTS (
+),
+-- Ensure user has historical send activity
+filtered_profiles AS (
+    SELECT bp.*
+    FROM birthday_profiles bp
+    WHERE EXISTS (
         SELECT 1
-        FROM distribution_shares ds
-        WHERE ds.user_id = p.id
-        AND ds.distribution_id = (
-            SELECT MAX(d.id)
-            FROM distributions d
-        )
+        FROM (
+            SELECT
+                SUM(ss.unique_sends) as total_sends,
+                SUM(ss.score) as total_score
+            FROM send_scores ss
+            WHERE ss.user_id = bp.id
+        ) totals
+        WHERE totals.total_sends > 100
+        AND totals.total_score > (SELECT hodler_min_balance FROM distributions WHERE id = (SELECT MAX(d.id) FROM distributions d))
     )
 )
 
@@ -221,6 +242,8 @@ SELECT (
         fp.name,
         fp.avatar_url,
         fp.send_id,
+        sa.main_tag_id,
+        main_tag.name,
         (
             -- Aggregate all confirmed tags for the user into an array
             SELECT ARRAY_AGG(t.name)
@@ -231,15 +254,17 @@ SELECT (
    )::activity_feed_user
 ).*
 FROM filtered_profiles fp
+LEFT JOIN send_accounts sa ON sa.user_id = fp.id
+LEFT JOIN tags main_tag ON main_tag.id = sa.main_tag_id
 LEFT JOIN LATERAL (
-    SELECT COALESCE(SUM(ds.amount), 0) AS send_score
-    FROM distribution_shares ds
-    WHERE ds.user_id = fp.id
-    AND ds.distribution_id >= 6
+    SELECT COALESCE(SUM(ss.score), 0) AS send_score
+    FROM send_scores ss
+    WHERE ss.user_id = fp.id
 ) score ON TRUE
 ORDER BY score.send_score DESC;
 END;
-$$;
+$function$
+;
 
 -- Function
 

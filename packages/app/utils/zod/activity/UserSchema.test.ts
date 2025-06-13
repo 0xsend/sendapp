@@ -9,6 +9,8 @@ describe('UserSchema', () => {
         name: 'test',
         avatar_url: 'https://avatars.com',
         send_id: 1234,
+        main_tag_id: null,
+        main_tag_name: null,
       })
     ).toEqual({
       id: '123',
@@ -16,6 +18,8 @@ describe('UserSchema', () => {
       avatar_url: 'https://avatars.com',
       send_id: 1234,
       tags: [],
+      main_tag_id: null,
+      main_tag_name: null,
     })
   })
 })

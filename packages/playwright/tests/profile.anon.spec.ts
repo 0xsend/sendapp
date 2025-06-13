@@ -1,9 +1,9 @@
 import { test } from '@my/playwright/fixtures/snaplet'
-import { userOnboarded } from '@my/snaplet/models'
+import { createUserWithTagsAndAccounts } from '@my/snaplet/models'
 import { expect, type Page } from '@playwright/test'
 import { assert } from 'app/utils/assert'
-import debug from 'debug'
 import { ProfilePage } from './fixtures/profiles'
+import debug from 'debug'
 
 let log: debug.Debugger
 
@@ -16,14 +16,17 @@ const visitProfile = async ({ page, tag }: { page: Page; tag: string }) => {
   await page.waitForURL(`/${tag}`)
 }
 
-test('anon user can visit public profile', async ({ page, seed }) => {
-  const plan = await seed.users([userOnboarded])
+test('anon user can visit public profile', async ({ page, seed, pg }) => {
+  const plan = await createUserWithTagsAndAccounts(seed)
   const tag = plan.tags[0]
+  const account = plan.sendAccount
   assert(!!tag, 'tag not found')
-  const profile = plan.profiles[0]
+
+  const profile = plan.profile
   assert(!!profile, 'profile not found')
   assert(!!profile.name, 'profile name not found')
   assert(!!profile.about, 'profile about not found')
+
   await visitProfile({ page, tag: tag.name })
   await expect(async () => {
     const title = await page.title()
@@ -34,10 +37,24 @@ test('anon user can visit public profile', async ({ page, seed }) => {
   await expect(profilePage.sendButton).toBeVisible()
 })
 
-test('anon user cannot visit private profile', async ({ page, seed }) => {
-  const plan = await seed.users([{ ...userOnboarded, profiles: [{ is_public: false }] }])
+test('anon user cannot visit private profile', async ({ page, seed, pg }) => {
+  const plan = await createUserWithTagsAndAccounts(seed, { isPublic: false })
   const tag = plan.tags[0]
+  const account = plan.sendAccount
   assert(!!tag, 'tag not found')
+  assert(!!account, 'send account not found')
+
+  // The send_account_tags relationship is already created by the seed
+  // Just ensure send_account is active
+  await pg.query(
+    `
+    UPDATE send_accounts
+    SET deleted_at = NULL, init_code = 'a'
+    WHERE id = $1
+  `,
+    [account.id]
+  )
+
   await visitProfile({ page, tag: tag.name })
   await expect(async () => {
     const title = await page.title()

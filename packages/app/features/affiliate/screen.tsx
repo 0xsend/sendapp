@@ -31,7 +31,7 @@ type Referral = Pick<
   'avatar_url' | 'x_username' | 'birthday' | 'tag'
 >
 
-export const FriendsScreen = () => {
+export default function FriendsScreen() {
   const media = useMedia()
   const { isAtEnd } = useScrollDirection()
   const [layoutSize, setLayoutSize] = useState<Dimension>({ width: 0, height: 0 })

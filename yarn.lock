@@ -5303,7 +5303,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jest/globals@npm:^29.2.1, @jest/globals@npm:^29.7.0":
+"@jest/globals@npm:^29, @jest/globals@npm:^29.2.1, @jest/globals@npm:^29.7.0":
   version: 29.7.0
   resolution: "@jest/globals@npm:29.7.0"
   dependencies:
@@ -6141,10 +6141,10 @@ __metadata:
     "@my/workflows": "workspace:*"
     "@supabase/supabase-js": "npm:^2.49.8"
     "@tanstack/react-query": "npm:^5.74.4"
-    "@trpc/client": "npm:^11.1.0"
-    "@trpc/next": "npm:^11.1.0"
-    "@trpc/react-query": "npm:^11.1.0"
-    "@trpc/server": "npm:^11.1.1"
+    "@trpc/client": "npm:^11.2.0"
+    "@trpc/next": "npm:^11.2.0"
+    "@trpc/react-query": "npm:^11.2.0"
+    "@trpc/server": "npm:^11.2.0"
     "@types/jsonwebtoken": "npm:^9.0.2"
     "@wagmi/core": "npm:^2.16.7"
     app: "workspace:*"
@@ -6185,7 +6185,7 @@ __metadata:
     "@my/snaplet": "workspace:*"
     "@my/supabase": "workspace:*"
     "@my/wagmi": "workspace:*"
-    "@playwright/test": "npm:^1.48.2"
+    "@playwright/test": "npm:^1.52.0"
     "@supabase/supabase-js": "npm:^2.49.8"
     "@types/bun": "npm:^1.1.6"
     "@types/jsonwebtoken": "npm:^9.0.2"
@@ -6228,7 +6228,9 @@ __metadata:
     "@snaplet/seed": "npm:^0.98.0"
     "@snaplet/snapshot": "npm:^0.93.2"
     "@types/pg": "npm:^8"
+    jest: "npm:^29"
     pg: "npm:^8.12.0"
+    ts-jest: "npm:^29"
     typescript: "npm:^5.8.3"
     viem: "npm:^2.27.2"
     zx: "npm:^8.1.2"
@@ -6318,7 +6320,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@my/workflows@workspace:packages/workflows"
   dependencies:
-    "@jest/globals": "npm:^29.7.0"
+    "@jest/globals": "npm:^29"
     "@my/supabase": "workspace:*"
     "@my/wagmi": "workspace:*"
     "@supabase/supabase-js": "npm:^2.49.8"
@@ -6330,11 +6332,11 @@ __metadata:
     "@wagmi/core": "npm:^2.16.7"
     app: "workspace:*"
     dotenv-cli: "npm:^7.3.0"
-    jest: "npm:^29.7.0"
+    jest: "npm:^29"
     nyc: "npm:^17.0.0"
     permissionless: "npm:^0.1.14"
     source-map-support: "npm:^0.5.21"
-    ts-jest: "npm:^29.3.1"
+    ts-jest: "npm:^29"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.8.3"
     viem: "npm:^2.27.2"
@@ -6894,14 +6896,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@playwright/test@npm:^1.48.2":
-  version: 1.48.2
-  resolution: "@playwright/test@npm:1.48.2"
+"@playwright/test@npm:^1.52.0":
+  version: 1.52.0
+  resolution: "@playwright/test@npm:1.52.0"
   dependencies:
-    playwright: "npm:1.48.2"
+    playwright: "npm:1.52.0"
   bin:
     playwright: cli.js
-  checksum: 10/8557f9d60b93b9a60b66599d46f991b56df26b691f9285e8755298dabd9f42d1421c330a7d7578b76445fdd56040fe790d3f1081daa80e5e89a380170e0fd217
+  checksum: 10/e18a4eb626c7bc6cba212ff2e197cf9ae2e4da1c91bfdf08a744d62e27222751173e4b220fa27da72286a89a3b4dea7c09daf384d23708f284b64f98e9a63a88
   languageName: node
   linkType: hard
 
@@ -10696,24 +10698,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@trpc/client@npm:^11.1.0":
-  version: 11.1.0
-  resolution: "@trpc/client@npm:11.1.0"
+"@trpc/client@npm:^11.2.0":
+  version: 11.2.0
+  resolution: "@trpc/client@npm:11.2.0"
   peerDependencies:
-    "@trpc/server": 11.1.0
+    "@trpc/server": 11.2.0
     typescript: ">=5.7.2"
-  checksum: 10/e210dfc782e1921ecd90eec352461e4f671a9f4154d326843d379d29b9e2263bf3e1941beea0c25692933147fa97692881da9addeb35b27a46615c834dfc38c9
+  checksum: 10/6569ad95966d5a9b85807686ff5c6ddec031ca2267ab9b472ac2d32f68615b81de888212bee4455225b8b2dfa5dbb72cb8a895e13667ffef80e56551cdcdc09a
   languageName: node
   linkType: hard
 
-"@trpc/next@npm:^11.1.0":
-  version: 11.1.0
-  resolution: "@trpc/next@npm:11.1.0"
+"@trpc/next@npm:^11.2.0":
+  version: 11.2.0
+  resolution: "@trpc/next@npm:11.2.0"
   peerDependencies:
     "@tanstack/react-query": ^5.59.15
-    "@trpc/client": 11.1.0
-    "@trpc/react-query": 11.1.0
-    "@trpc/server": 11.1.0
+    "@trpc/client": 11.2.0
+    "@trpc/react-query": 11.2.0
+    "@trpc/server": 11.2.0
     next: "*"
     react: ">=16.8.0"
     react-dom: ">=16.8.0"
@@ -10723,30 +10725,30 @@ __metadata:
       optional: true
     "@trpc/react-query":
       optional: true
-  checksum: 10/e1fc2c06e46acbda8a4a13dd3204806c979153fe708900988379c9f5e1f29b71e84c1fbe2d354329d6b9ca360db52a50ec957c12c097fa255a270f49ffde37cd
+  checksum: 10/3486ad6e3d0f9e63f9d6ae90df45610632f70567ae356483c9b483299b328948f6bd898211a27389e3f7cc70091f7006b82ba8c1493b2ff0961d721e0391eef7
   languageName: node
   linkType: hard
 
-"@trpc/react-query@npm:^11.1.0":
-  version: 11.1.0
-  resolution: "@trpc/react-query@npm:11.1.0"
+"@trpc/react-query@npm:^11.2.0":
+  version: 11.2.0
+  resolution: "@trpc/react-query@npm:11.2.0"
   peerDependencies:
     "@tanstack/react-query": ^5.67.1
-    "@trpc/client": 11.1.0
-    "@trpc/server": 11.1.0
+    "@trpc/client": 11.2.0
+    "@trpc/server": 11.2.0
     react: ">=18.2.0"
     react-dom: ">=18.2.0"
     typescript: ">=5.7.2"
-  checksum: 10/b824fc273b3166a82f520c6c6edb75c9b7045b6768b79cfa784c61a0e9dd7a9489afed79a11629e4b50e49df30f696ce216d6dc10afe1ef72a3f63979c4c5845
+  checksum: 10/485087b52b4bafe4694be00fb6e907333854072a68432fa08e803fa881fd1764bfedf9a21b3e482f11154b200c3cb03ae86e6b33de7957c03ae0453b8b43eb2f
   languageName: node
   linkType: hard
 
-"@trpc/server@npm:^11.1.1":
-  version: 11.1.2
-  resolution: "@trpc/server@npm:11.1.2"
+"@trpc/server@npm:^11.2.0":
+  version: 11.2.0
+  resolution: "@trpc/server@npm:11.2.0"
   peerDependencies:
     typescript: ">=5.7.2"
-  checksum: 10/4d676d09d0b71998b622940a62fcd5b9a950cd23a387a5ef0919403ea4e71c5c1d6d0645a520f3d95aa02e709f51fd1a79eb66c84b860ca770ee311fa0a733ce
+  checksum: 10/076d07e2645b189102d7adf20c5bf8e88d12d350090bdc004fc3d50040a090c8d0887085b159002bb3234a989a513ee631bb642eb09e9bcd2f3ccc48456c2479
   languageName: node
   linkType: hard
 
@@ -13558,7 +13560,7 @@ __metadata:
     "@0xsend/send-earn-contracts": "npm:^0.1.0"
     "@babel/plugin-syntax-import-attributes": "npm:^7.24.7"
     "@coinbase/onchainkit": "npm:^0.38.1"
-    "@jest/globals": "npm:^29.7.0"
+    "@jest/globals": "npm:^29"
     "@marsidev/react-turnstile": "npm:^0.7.1"
     "@my/supabase": "workspace:*"
     "@my/ui": "workspace:*"
@@ -13583,7 +13585,7 @@ __metadata:
     "@tanstack/eslint-plugin-query": "npm:^5.20.1"
     "@tanstack/react-query": "npm:^5.74.4"
     "@testing-library/react-native": "npm:^13.2.0"
-    "@trpc/client": "npm:^11.1.0"
+    "@trpc/client": "npm:^11.2.0"
     "@types/jsonwebtoken": "npm:^9.0.2"
     "@types/qrcode": "npm:^1.5.3"
     "@types/react": "npm:^18.2.15"
@@ -13607,7 +13609,7 @@ __metadata:
     expo-linking: "npm:~7.0.5"
     expo-secure-store: "npm:~14.0.1"
     expo-sharing: "npm:13.0.1"
-    jest: "npm:^29.7.0"
+    jest: "npm:^29"
     jest-expo: "npm:^52.0.6"
     jsonwebtoken: "npm:^9.0.2"
     libphonenumber-js: "npm:^1.10.58"
@@ -23485,7 +23487,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest@npm:^29.7.0":
+"jest@npm:^29":
   version: 29.7.0
   resolution: "jest@npm:29.7.0"
   dependencies:
@@ -25893,7 +25895,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "next-app@workspace:apps/next"
   dependencies:
-    "@jest/globals": "npm:^29.7.0"
+    "@jest/globals": "npm:^29"
     "@my/api": "workspace:*"
     "@my/supabase": "workspace:*"
     "@my/ui": "workspace:*"
@@ -25909,16 +25911,16 @@ __metadata:
     "@tanstack/react-query-devtools": "npm:^5.72.1"
     "@testing-library/jest-dom": "npm:^6.1.5"
     "@testing-library/react": "npm:^14.1.2"
-    "@trpc/client": "npm:^11.1.0"
-    "@trpc/next": "npm:^11.1.0"
-    "@trpc/react-query": "npm:^11.1.0"
-    "@trpc/server": "npm:^11.1.1"
+    "@trpc/client": "npm:^11.2.0"
+    "@trpc/next": "npm:^11.2.0"
+    "@trpc/react-query": "npm:^11.2.0"
+    "@trpc/server": "npm:^11.2.0"
     "@types/node": "npm:^20"
     app: "workspace:*"
     dotenv-cli: "npm:^7.3.0"
     eslint-config-next: "npm:^14.0.4"
     expo-sharing: "npm:13.0.1"
-    jest: "npm:^29.7.0"
+    jest: "npm:^29"
     jest-environment-jsdom: "npm:^29.7.0"
     next: "npm:15.3.1"
     plaiceholder: "npm:^3.0.0"
@@ -27867,27 +27869,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:1.48.2":
-  version: 1.48.2
-  resolution: "playwright-core@npm:1.48.2"
+"playwright-core@npm:1.52.0":
+  version: 1.52.0
+  resolution: "playwright-core@npm:1.52.0"
   bin:
     playwright-core: cli.js
-  checksum: 10/dd029f797b1afb2240713a032fecc50e1ffc5464a39c075570cf10e929c145da3a8d0951a3f2b279e33b2f09cbeb8ff4330822cb1078452c0c75cc4ce34ca171
+  checksum: 10/42e13f5f98dc25ebc95525fb338a215b9097b2ba39d41e99972a190bf75d79979f163f5bc07b1ca06847ee07acb2c9b487d070fab67e9cd55e33310fc05aca3c
   languageName: node
   linkType: hard
 
-"playwright@npm:1.48.2":
-  version: 1.48.2
-  resolution: "playwright@npm:1.48.2"
+"playwright@npm:1.52.0":
+  version: 1.52.0
+  resolution: "playwright@npm:1.52.0"
   dependencies:
     fsevents: "npm:2.3.2"
-    playwright-core: "npm:1.48.2"
+    playwright-core: "npm:1.52.0"
   dependenciesMeta:
     fsevents:
       optional: true
   bin:
     playwright: cli.js
-  checksum: 10/331af352504336f419cdf1369f0ef399c6f0e905fdb79a5e97c41f33e74766efd21430ab6ae2de0b237ae765ebfbe701e119a990d8dc01bcdac3bc43c1fa1fbf
+  checksum: 10/214175446089000c2ac997b925063b95f7d86d129c5d7c74caa5ddcb05bcad598dfd569d2133a10dc82d288bf67e7858877dcd099274b0b928b9c63db7d6ecec
   languageName: node
   linkType: hard
 
@@ -30510,6 +30512,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"semver@npm:^7.7.2":
+  version: 7.7.2
+  resolution: "semver@npm:7.7.2"
+  bin:
+    semver: bin/semver.js
+  checksum: 10/7a24cffcaa13f53c09ce55e05efe25cd41328730b2308678624f8b9f5fc3093fc4d189f47950f0b811ff8f3c3039c24a2c36717ba7961615c682045bf03e1dda
+  languageName: node
+  linkType: hard
+
 "send@npm:0.18.0":
   version: 0.18.0
   resolution: "send@npm:0.18.0"
@@ -32747,9 +32758,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-jest@npm:^29.3.1":
-  version: 29.3.1
-  resolution: "ts-jest@npm:29.3.1"
+"ts-jest@npm:^29":
+  version: 29.3.4
+  resolution: "ts-jest@npm:29.3.4"
   dependencies:
     bs-logger: "npm:^0.2.6"
     ejs: "npm:^3.1.10"
@@ -32758,8 +32769,8 @@ __metadata:
     json5: "npm:^2.2.3"
     lodash.memoize: "npm:^4.1.2"
     make-error: "npm:^1.3.6"
-    semver: "npm:^7.7.1"
-    type-fest: "npm:^4.38.0"
+    semver: "npm:^7.7.2"
+    type-fest: "npm:^4.41.0"
     yargs-parser: "npm:^21.1.1"
   peerDependencies:
     "@babel/core": ">=7.0.0-beta.0 <8"
@@ -32781,7 +32792,7 @@ __metadata:
       optional: true
   bin:
     ts-jest: cli.js
-  checksum: 10/a3450dde2821608bd83cb063eb33fe67c450fd99bf94b4fff12c50f789124fa652e74bd1890068cc1e1a929013fa677fae72da8d864528f1587ec44a9b94d985
+  checksum: 10/9f22469ef9cbdfb819fe03c4554a83af66d810e7ac72efca433d098f09b73c15b5f5d83a56732e01b40baf621e288c2e0178fad45d304ff69d18d8e0490498d3
   languageName: node
   linkType: hard
 
@@ -33149,10 +33160,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"type-fest@npm:^4.38.0":
-  version: 4.39.1
-  resolution: "type-fest@npm:4.39.1"
-  checksum: 10/8f3fc947cb072effd9ba240425397b4d3c08901b344409bc12a0aabf43fd309f87fa214d7ee0b600f6e2335b435f40992cd22c0ce4bc7ab8dc5a987200f83bcc
+"type-fest@npm:^4.41.0":
+  version: 4.41.0
+  resolution: "type-fest@npm:4.41.0"
+  checksum: 10/617ace794ac0893c2986912d28b3065ad1afb484cad59297835a0807dc63286c39e8675d65f7de08fafa339afcb8fe06a36e9a188b9857756ae1e92ee8bda212
   languageName: node
   linkType: hard
 

@@ -86,7 +86,7 @@ export const SignUpScreen = () => {
   const createAccount = async () => {
     const { data: sessionData } = await supabase.auth.getSession()
     assert(!!sessionData?.session?.user?.id, 'No user id')
-    await createSendAccount({ user: sessionData.session.user, accountName: formName })
+    return await createSendAccount({ user: sessionData.session.user, accountName: formName })
   }
 
   const handleSubmit = async ({ name }: z.infer<typeof SignUpScreenFormSchema>) => {
@@ -106,8 +106,11 @@ export const SignUpScreen = () => {
         console.error('Unable to save sendtag into async storage: ', error.message)
       })
 
-      await createAccount()
-      await registerFirstSendtagMutateAsync({ name: validatedSendtag })
+      const createdSendAccount = await createAccount()
+      await registerFirstSendtagMutateAsync({
+        name: validatedSendtag,
+        sendAccountId: createdSendAccount.id,
+      })
       router.replace('/')
     } catch (error) {
       const message = formatErrorMessage(error).split('.')[0] ?? 'Unknown error'

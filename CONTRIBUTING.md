@@ -133,7 +133,7 @@ If you encounter "FATAL ERROR: Reached heap limit Allocation failed - JavaScript
 Add the following to your `.env.local` file:
 
 ```sh
-NODE_OPTIONS="--max-old-space-size=4096"
+NODE_OPTIONS="--max_old_space_size=8192"
 ```
 
 This allocates 4GB of memory for Node.js processes. You can adjust the value based on your system's available memory.

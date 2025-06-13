@@ -9,6 +9,8 @@ export const mockReceivedTransfer = {
     avatar_url: null,
     send_id: 65244,
     tags: ['asdf', 'teq', 'yuw'],
+    main_tag_id: 1,
+    main_tag_name: 'asdf',
   },
   data: {
     f: '\\x760e2928c3aa3af87897be52eb4833d42bbb27cf',
@@ -31,6 +33,8 @@ export const mockSentTransfer = {
     avatar_url: null,
     send_id: 65244,
     tags: ['asdf', 'teq', 'yuw'],
+    main_tag_id: 1,
+    main_tag_name: 'asdf',
   },
   to_user: {
     id: null,
@@ -38,6 +42,8 @@ export const mockSentTransfer = {
     avatar_url: 'https://i.pravatar.cc/500?u=Hortense Ratke',
     send_id: 12530,
     tags: ['dan'],
+    main_tag_id: 1,
+    main_tag_name: 'dan',
   },
   data: {
     f: '\\x760e2928c3aa3af87897be52eb4833d42bbb27cf',
@@ -61,6 +67,8 @@ export const mockSwapSellErc20Transfer = {
     avatar_url: null,
     send_id: 65244,
     tags: ['asdf', 'teq', 'yuw'],
+    main_tag_id: 1,
+    main_tag_name: 'asdf',
   },
   to_user: null,
   data: {
@@ -85,6 +93,8 @@ export const mockSwapBuyErc20Transfer = {
     avatar_url: null,
     send_id: 65244,
     tags: ['asdf', 'teq', 'yuw'],
+    main_tag_id: 1,
+    main_tag_name: 'asdf',
   },
   data: {
     f: '\\x6131b5fae19ea4f9d964eac0408e4408b66337b5',
@@ -108,6 +118,8 @@ export const mockSwapBuyEthTransfer = {
     avatar_url: null,
     send_id: 65244,
     tags: ['asdf', 'teq', 'yuw'],
+    main_tag_id: 1,
+    main_tag_name: 'asdf',
   },
   data: {
     value: '10000000000000000',
@@ -129,6 +141,8 @@ export const mockTagReceipt = {
     avatar_url: null,
     send_id: 65244,
     tags: ['asdf', 'teq', 'yuw'],
+    main_tag_id: 1,
+    main_tag_name: 'asdf',
   },
   to_user: null,
   data: {
@@ -151,6 +165,8 @@ export const mockTagReceiptUSDC = {
     avatar_url: null,
     send_id: 65244,
     tags: ['asdf', 'teq'],
+    main_tag_id: 1,
+    main_tag_name: 'asdf',
   },
   to_user: null,
   data: {
@@ -173,6 +189,8 @@ export const mockReferral = {
     avatar_url: null,
     send_id: 65244,
     tags: ['asdf', 'teq', 'yuw'],
+    main_tag_id: 1,
+    main_tag_name: 'asdf',
   },
   to_user: {
     id: null,
@@ -180,6 +198,8 @@ export const mockReferral = {
     avatar_url: 'https://i.pravatar.cc/500?u=Hortense Ratke',
     send_id: 12530,
     tags: ['disconnect_whorl7351'],
+    main_tag_id: 2,
+    main_tag_name: 'disconnect_whorl7351',
   },
   data: {
     tags: ['disconnect_whorl7351'],
@@ -195,6 +215,8 @@ export const mockSendAccountReceive = {
     avatar_url: null,
     send_id: 65244,
     tags: null,
+    main_tag_id: null,
+    main_tag_name: null,
   },
   to_user: {
     id: '97476407-bf7f-4ebe-86aa-c9d18a0b388a',
@@ -202,6 +224,8 @@ export const mockSendAccountReceive = {
     avatar_url: null,
     send_id: 65244,
     tags: ['asdf', 'teq', 'yuw'],
+    main_tag_id: 1,
+    main_tag_name: 'asdf',
   },
   data: {
     value: '10000000000000000',
@@ -225,6 +249,8 @@ export const mockSendtagReferralRewardUSDC = {
     avatar_url: null,
     send_id: 64705,
     tags: null,
+    main_tag_id: null,
+    main_tag_name: null,
   },
   data: {
     f: '\\xfC1e51BBae1C1Ee9e6Cc629ea0023329EA5023a6',
@@ -247,6 +273,8 @@ const mockSigningKeyAdded = {
     avatar_url: null,
     send_id: 55617,
     tags: null,
+    main_tag_id: null,
+    main_tag_name: null,
   },
   to_user: null,
   data: {
@@ -273,6 +301,8 @@ const mockSigningKeyRemoved = {
     avatar_url: null,
     send_id: 55617,
     tags: null,
+    main_tag_id: null,
+    main_tag_name: null,
   },
   to_user: null,
   data: {
@@ -300,6 +330,8 @@ export const mockSendTokenUpgradeEvent = {
     avatar_url: null,
     send_id: 48,
     tags: ['asfd'],
+    main_tag_id: 1,
+    main_tag_name: 'asfd',
   },
   data: {
     f: '\\x0000000000000000000000000000000000000000',
@@ -322,6 +354,8 @@ export const mockSendEarnDepositEvent = {
     avatar_url: null,
     send_id: 48,
     tags: ['asfd'],
+    main_tag_id: 1,
+    main_tag_name: 'asfd',
   },
   to_user: null,
   data: {
@@ -347,6 +381,8 @@ export const mockSendEarnWithdrawEvent = {
     avatar_url: null,
     send_id: 48,
     tags: ['asfd'],
+    main_tag_id: 1,
+    main_tag_name: 'asfd',
   },
   data: {
     log_addr: '\\x5afe000000000000000000000000000000000000',

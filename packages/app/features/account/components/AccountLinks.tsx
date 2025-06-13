@@ -14,6 +14,7 @@ import {
   IconStarOutline,
 } from 'app/components/icons'
 import { RowLabel } from 'app/components/layout/RowLabel'
+import { Platform } from 'react-native'
 
 const iconProps = {
   size: '$1.5' as SizeTokens,
@@ -54,7 +55,7 @@ const ACCOUNT_LINKS: {
     },
     {
       text: 'Rewards',
-      href: '/explore/rewards',
+      href: Platform.OS === 'web' ? '/explore/rewards' : '/rewards',
       icon: <IconStarOutline {...iconProps} />,
     },
     {
