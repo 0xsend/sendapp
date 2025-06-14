@@ -95,10 +95,8 @@ WHERE LEAST(
 ) > 0
 GROUP BY from_user_id, to_user_id;
 
-ALTER VIEW send_scores_current_unique OWNER TO postgres;
-
 -- Historical materialized view
-create materialized view "public"."send_scores_history" as  WITH distributions_with_score AS (
+create materialized view "private"."send_scores_history" AS WITH distributions_with_score AS (
          SELECT d.id,
             d.number,
             EXTRACT(epoch FROM d.qualification_start) AS start_time,
@@ -190,15 +188,8 @@ create materialized view "public"."send_scores_history" as  WITH distributions_w
          HAVING (sum(LEAST(grouped_transfers.transfer_sum, grouped_transfers.send_ceiling)) > (0)::numeric)) scores
      JOIN send_ceiling_settings scs ON (((scores.address = scs.address) AND (scores.distribution_id = scs.distribution_id))));
 
-CREATE UNIQUE INDEX ON send_scores_history (user_id, distribution_id);
-
-ALTER MATERIALIZED VIEW send_scores_history OWNER TO postgres;
-
--- Add permissions for the materialized view
-GRANT ALL ON send_scores_history TO service_role;
-
 -- Current scores view
-create or replace view "public"."send_scores_current" as  WITH distributions_with_score AS (
+create or replace view "public"."send_scores_current" WITH ("security_invoker"='on') as  WITH distributions_with_score AS (
          SELECT d.id,
             d.number,
             EXTRACT(epoch FROM d.qualification_start) AS start_time,
@@ -307,14 +298,12 @@ create or replace view "public"."send_scores_current" as  WITH distributions_wit
          HAVING (sum(LEAST(ts.transfer_sum, scs_1.send_ceiling)) > (0)::numeric)) scores
      JOIN send_ceiling_settings scs ON (((scores.address = scs.address) AND (scores.distribution_id = scs.distribution_id))));
 
-ALTER VIEW send_scores_current OWNER TO postgres;
-
-create or replace view "public"."send_scores" as  SELECT send_scores_history.user_id,
-    send_scores_history.distribution_id,
-    send_scores_history.score,
-    send_scores_history.unique_sends,
-    send_scores_history.send_ceiling
-   FROM send_scores_history
+create or replace view "public"."send_scores" as  SELECT get_send_scores_history.user_id,
+    get_send_scores_history.distribution_id,
+    get_send_scores_history.score,
+    get_send_scores_history.unique_sends,
+    get_send_scores_history.send_ceiling
+   FROM get_send_scores_history() get_send_scores_history(user_id, distribution_id, score, unique_sends, send_ceiling)
 UNION ALL
  SELECT send_scores_current.user_id,
     send_scores_current.distribution_id,
@@ -323,4 +312,29 @@ UNION ALL
     send_scores_current.send_ceiling
    FROM send_scores_current;
 
-ALTER VIEW send_scores OWNER TO postgres;
+
+-- Indexes
+CREATE UNIQUE INDEX ON "private"."send_scores_history" (user_id, distribution_id);
+
+-- Owners
+ALTER MATERIALIZED VIEW "private"."send_scores_history" OWNER TO postgres;
+ALTER VIEW "public"."send_scores_current_unique" OWNER TO postgres;
+ALTER VIEW "public"."send_scores_current" OWNER TO postgres;
+ALTER VIEW "public"."send_scores" OWNER TO postgres;
+
+-- Permissions
+REVOKE ALL ON "private"."send_scores_history" FROM PUBLIC;
+REVOKE ALL ON "private"."send_scores_history" FROM authenticated;
+GRANT ALL ON "private"."send_scores_history" TO service_role;
+
+REVOKE ALL ON "public"."send_scores_current_unique" FROM PUBLIC;
+GRANT ALL ON "public"."send_scores_current_unique" TO service_role;
+GRANT ALL ON "public"."send_scores_current_unique" TO authenticated;
+
+REVOKE ALL ON "public"."send_scores_current" FROM PUBLIC;
+GRANT ALL ON "public"."send_scores_current" TO service_role;
+GRANT ALL ON "public"."send_scores_current" TO authenticated;
+
+REVOKE ALL ON "public"."send_scores" FROM PUBLIC;
+GRANT ALL ON "public"."send_scores" TO service_role;
+GRANT ALL ON "public"."send_scores" TO authenticated;

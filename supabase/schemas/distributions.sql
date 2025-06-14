@@ -852,113 +852,6 @@ $function$;
 
 ALTER FUNCTION "public"."update_referral_verifications"("distribution_id" integer, "shares" "public"."distribution_shares"[]) OWNER TO "postgres";
 
--- Grants for tables
-GRANT ALL ON TABLE "public"."distributions" TO "anon";
-GRANT ALL ON TABLE "public"."distributions" TO "authenticated";
-GRANT ALL ON TABLE "public"."distributions" TO "service_role";
-
-GRANT ALL ON SEQUENCE "public"."distributions_id_seq" TO "anon";
-GRANT ALL ON SEQUENCE "public"."distributions_id_seq" TO "authenticated";
-GRANT ALL ON SEQUENCE "public"."distributions_id_seq" TO "service_role";
-
-GRANT ALL ON TABLE "public"."distribution_shares" TO "anon";
-GRANT ALL ON TABLE "public"."distribution_shares" TO "authenticated";
-GRANT ALL ON TABLE "public"."distribution_shares" TO "service_role";
-
-GRANT ALL ON SEQUENCE "public"."distribution_shares_id_seq" TO "anon";
-GRANT ALL ON SEQUENCE "public"."distribution_shares_id_seq" TO "authenticated";
-GRANT ALL ON SEQUENCE "public"."distribution_shares_id_seq" TO "service_role";
-
-GRANT ALL ON TABLE "public"."distribution_verifications" TO "anon";
-GRANT ALL ON TABLE "public"."distribution_verifications" TO "authenticated";
-GRANT ALL ON TABLE "public"."distribution_verifications" TO "service_role";
-
-GRANT ALL ON SEQUENCE "public"."distribution_verifications_id_seq" TO "anon";
-GRANT ALL ON SEQUENCE "public"."distribution_verifications_id_seq" TO "authenticated";
-GRANT ALL ON SEQUENCE "public"."distribution_verifications_id_seq" TO "service_role";
-
-GRANT ALL ON TABLE "public"."distribution_verification_values" TO "anon";
-GRANT ALL ON TABLE "public"."distribution_verification_values" TO "authenticated";
-GRANT ALL ON TABLE "public"."distribution_verification_values" TO "service_role";
-
-GRANT ALL ON TABLE "public"."send_slash" TO "anon";
-GRANT ALL ON TABLE "public"."send_slash" TO "authenticated";
-GRANT ALL ON TABLE "public"."send_slash" TO "service_role";
-
--- RLS Policies
--- distributions table
-ALTER TABLE ONLY "public"."distributions" ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Enable read access to public" ON "public"."distribution_verification_values" FOR SELECT TO "authenticated" USING (true);
-CREATE POLICY "Enable read access to public" ON "public"."distributions" FOR SELECT TO "authenticated" USING (true);
-
--- distribution_shares table
-ALTER TABLE ONLY "public"."distribution_shares" ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "User can see own shares" ON "public"."distribution_shares" FOR SELECT USING (("user_id" = "auth"."uid"()));
-
--- distribution_verifications table
-ALTER TABLE ONLY "public"."distribution_verifications" ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Users can see their own distribution verifications" ON "public"."distribution_verifications" FOR SELECT USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
-
--- distribution_verification_values table
-ALTER TABLE ONLY "public"."distribution_verification_values" ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Authenticated users can see distribution_verification_values" ON "public"."distribution_verification_values" FOR SELECT USING ((( SELECT "auth"."uid"() AS "uid") IS NOT NULL));
-
--- send_slash table
-ALTER TABLE ONLY "public"."send_slash" ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Enable read access for all users" ON "public"."send_slash" FOR SELECT USING (true);
-
--- Function grants
-REVOKE ALL ON FUNCTION "public"."calculate_and_insert_send_ceiling_verification"("distribution_number" integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."calculate_and_insert_send_ceiling_verification"("distribution_number" integer) TO "service_role";
-
-REVOKE ALL ON FUNCTION "public"."insert_create_passkey_verifications"("distribution_num" integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."insert_create_passkey_verifications"("distribution_num" integer) TO "anon";
-GRANT ALL ON FUNCTION "public"."insert_create_passkey_verifications"("distribution_num" integer) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."insert_create_passkey_verifications"("distribution_num" integer) TO "service_role";
-
-REVOKE ALL ON FUNCTION "public"."insert_send_slash"("distribution_number" integer, "scaling_divisor" integer, "minimum_sends" integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."insert_send_slash"("distribution_number" integer, "scaling_divisor" integer, "minimum_sends" integer) TO "anon";
-GRANT ALL ON FUNCTION "public"."insert_send_slash"("distribution_number" integer, "scaling_divisor" integer, "minimum_sends" integer) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."insert_send_slash"("distribution_number" integer, "scaling_divisor" integer, "minimum_sends" integer) TO "service_role";
-
-REVOKE ALL ON FUNCTION "public"."insert_send_streak_verifications"("distribution_num" integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."insert_send_streak_verifications"("distribution_num" integer) TO "anon";
-GRANT ALL ON FUNCTION "public"."insert_send_streak_verifications"("distribution_num" integer) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."insert_send_streak_verifications"("distribution_num" integer) TO "service_role";
-
-REVOKE ALL ON FUNCTION "public"."insert_send_verifications"("distribution_num" integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."insert_send_verifications"("distribution_num" integer) TO "anon";
-GRANT ALL ON FUNCTION "public"."insert_send_verifications"("distribution_num" integer) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."insert_send_verifications"("distribution_num" integer) TO "service_role";
-
-REVOKE ALL ON FUNCTION "public"."insert_tag_referral_verifications"("distribution_num" integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."insert_tag_referral_verifications"("distribution_num" integer) TO "anon";
-GRANT ALL ON FUNCTION "public"."insert_tag_referral_verifications"("distribution_num" integer) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."insert_tag_referral_verifications"("distribution_num" integer) TO "service_role";
-
-REVOKE ALL ON FUNCTION "public"."insert_tag_registration_verifications"("distribution_num" integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."insert_tag_registration_verifications"("distribution_num" integer) TO "anon";
-GRANT ALL ON FUNCTION "public"."insert_tag_registration_verifications"("distribution_num" integer) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."insert_tag_registration_verifications"("distribution_num" integer) TO "service_role";
-
-REVOKE ALL ON FUNCTION "public"."insert_total_referral_verifications"("distribution_num" integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."insert_total_referral_verifications"("distribution_num" integer) TO "anon";
-GRANT ALL ON FUNCTION "public"."insert_total_referral_verifications"("distribution_num" integer) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."insert_total_referral_verifications"("distribution_num" integer) TO "service_role";
-
-REVOKE ALL ON FUNCTION "public"."insert_verification_value"("distribution_number" integer, "type" "public"."verification_type", "fixed_value" numeric, "bips_value" integer, "multiplier_min" numeric, "multiplier_max" numeric, "multiplier_step" numeric) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."insert_verification_value"("distribution_number" integer, "type" "public"."verification_type", "fixed_value" numeric, "bips_value" integer, "multiplier_min" numeric, "multiplier_max" numeric, "multiplier_step" numeric) TO "anon";
-GRANT ALL ON FUNCTION "public"."insert_verification_value"("distribution_number" integer, "type" "public"."verification_type", "fixed_value" numeric, "bips_value" integer, "multiplier_min" numeric, "multiplier_max" numeric, "multiplier_step" numeric) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."insert_verification_value"("distribution_number" integer, "type" "public"."verification_type", "fixed_value" numeric, "bips_value" integer, "multiplier_min" numeric, "multiplier_max" numeric, "multiplier_step" numeric) TO "service_role";
-
-REVOKE ALL ON FUNCTION "public"."update_distribution_shares"("distribution_id" integer, "shares" "public"."distribution_shares"[]) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."update_distribution_shares"("distribution_id" integer, "shares" "public"."distribution_shares"[]) TO "service_role";
-
-REVOKE ALL ON FUNCTION "public"."update_referral_verifications"("distribution_id" integer, "shares" "public"."distribution_shares"[]) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."update_referral_verifications"("distribution_id" integer, "shares" "public"."distribution_shares"[]) TO "anon";
-GRANT ALL ON FUNCTION "public"."update_referral_verifications"("distribution_id" integer, "shares" "public"."distribution_shares"[]) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."update_referral_verifications"("distribution_id" integer, "shares" "public"."distribution_shares"[]) TO "service_role";
-
 CREATE OR REPLACE FUNCTION public.insert_verification_sends()
  RETURNS trigger
  LANGUAGE plpgsql
@@ -1030,13 +923,7 @@ BEGIN
 END;
 $function$
 ;
-
 ALTER FUNCTION "public"."insert_verification_sends"() OWNER TO "postgres";
-
-GRANT ALL ON FUNCTION "public"."insert_verification_sends"() TO "anon";
-GRANT ALL ON FUNCTION "public"."insert_verification_sends"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."insert_verification_sends"() TO "service_role";
-
 
 CREATE OR REPLACE FUNCTION public.insert_verification_send_ceiling()
  RETURNS trigger
@@ -1101,29 +988,24 @@ $function$
 
 ALTER FUNCTION "public"."insert_verification_send_ceiling"() OWNER TO "postgres";
 
-REVOKE ALL ON FUNCTION "public"."insert_verification_send_ceiling"() FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."insert_verification_send_ceiling"() TO "anon";
-GRANT ALL ON FUNCTION "public"."insert_verification_send_ceiling"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."insert_verification_send_ceiling"() TO "service_role";
-
-CREATE OR REPLACE FUNCTION refresh_send_scores_history()
-RETURNS void AS $$
+CREATE OR REPLACE FUNCTION public.refresh_send_scores_history()
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
 BEGIN
-  REFRESH MATERIALIZED VIEW CONCURRENTLY send_scores_history;
+  REFRESH MATERIALIZED VIEW CONCURRENTLY private.send_scores_history;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$function$
+;
 
 ALTER FUNCTION "public"."refresh_send_scores_history"() OWNER TO "postgres";
-
-REVOKE ALL ON FUNCTION "public"."refresh_send_scores_history"() FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."refresh_send_scores_history"() TO "anon";
-GRANT ALL ON FUNCTION "public"."refresh_send_scores_history"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."refresh_send_scores_history"() TO "service_role";
 
 -- Trigger function
 CREATE OR REPLACE FUNCTION public.refresh_send_scores_history_trigger()
  RETURNS trigger
  LANGUAGE plpgsql
+ SECURITY DEFINER
 AS $function$
 BEGIN
   PERFORM refresh_send_scores_history();
@@ -1134,13 +1016,172 @@ $function$
 
 ALTER FUNCTION "public"."refresh_send_scores_history_trigger"() OWNER TO "postgres";
 
-REVOKE ALL ON FUNCTION "public"."refresh_send_scores_history_trigger"() FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."refresh_send_scores_history_trigger"() TO "anon";
-GRANT ALL ON FUNCTION "public"."refresh_send_scores_history_trigger"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."refresh_send_scores_history_trigger"() TO "service_role";
-
 -- Trigger
 CREATE TRIGGER distribution_ended_refresh_send_scores
   AFTER INSERT ON distributions
   FOR EACH ROW
   EXECUTE FUNCTION refresh_send_scores_history_trigger();
+
+CREATE OR REPLACE FUNCTION public.get_send_scores_history()
+RETURNS TABLE (
+    user_id uuid,
+    distribution_id integer,
+    score numeric,
+    unique_sends bigint,
+    send_ceiling numeric
+)
+LANGUAGE plpgsql
+SECURITY INVOKER
+SET search_path = private, public
+AS $$
+BEGIN
+    IF auth.role() IN ('service_role', 'postgres') THEN
+        RETURN QUERY SELECT * FROM private.send_scores_history;
+    ELSIF auth.role() = 'authenticated' THEN
+        RETURN QUERY SELECT * FROM private.send_scores_history WHERE user_id = auth.uid();
+    ELSE
+        RETURN;
+    END IF;
+END;
+$$;
+
+ALTER FUNCTION "public"."get_send_scores_history"() OWNER TO "postgres";
+
+-- Grants for tables
+GRANT ALL ON TABLE "public"."distributions" TO "anon";
+GRANT ALL ON TABLE "public"."distributions" TO "authenticated";
+GRANT ALL ON TABLE "public"."distributions" TO "service_role";
+
+GRANT ALL ON SEQUENCE "public"."distributions_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."distributions_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."distributions_id_seq" TO "service_role";
+
+GRANT ALL ON TABLE "public"."distribution_shares" TO "anon";
+GRANT ALL ON TABLE "public"."distribution_shares" TO "authenticated";
+GRANT ALL ON TABLE "public"."distribution_shares" TO "service_role";
+
+GRANT ALL ON SEQUENCE "public"."distribution_shares_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."distribution_shares_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."distribution_shares_id_seq" TO "service_role";
+
+GRANT ALL ON TABLE "public"."distribution_verifications" TO "anon";
+GRANT ALL ON TABLE "public"."distribution_verifications" TO "authenticated";
+GRANT ALL ON TABLE "public"."distribution_verifications" TO "service_role";
+
+GRANT ALL ON SEQUENCE "public"."distribution_verifications_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."distribution_verifications_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."distribution_verifications_id_seq" TO "service_role";
+
+GRANT ALL ON TABLE "public"."distribution_verification_values" TO "anon";
+GRANT ALL ON TABLE "public"."distribution_verification_values" TO "authenticated";
+GRANT ALL ON TABLE "public"."distribution_verification_values" TO "service_role";
+
+GRANT ALL ON TABLE "public"."send_slash" TO "anon";
+GRANT ALL ON TABLE "public"."send_slash" TO "authenticated";
+GRANT ALL ON TABLE "public"."send_slash" TO "service_role";
+
+-- RLS Policies
+-- distributions table
+ALTER TABLE ONLY "public"."distributions" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Enable read access to public" ON "public"."distribution_verification_values" FOR SELECT TO "authenticated" USING (true);
+CREATE POLICY "Enable read access to public" ON "public"."distributions" FOR SELECT TO "authenticated" USING (true);
+
+-- distribution_shares table
+ALTER TABLE ONLY "public"."distribution_shares" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "User can see own shares" ON "public"."distribution_shares" FOR SELECT USING (("user_id" = "auth"."uid"()));
+
+-- distribution_verifications table
+ALTER TABLE ONLY "public"."distribution_verifications" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can see their own distribution verifications" ON "public"."distribution_verifications" FOR SELECT USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
+
+-- distribution_verification_values table
+ALTER TABLE ONLY "public"."distribution_verification_values" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Authenticated users can see distribution_verification_values" ON "public"."distribution_verification_values" FOR SELECT USING ((( SELECT "auth"."uid"() AS "uid") IS NOT NULL));
+
+-- send_slash table
+ALTER TABLE ONLY "public"."send_slash" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Enable read access for all users" ON "public"."send_slash" FOR SELECT USING (true);
+
+-- Function grants
+REVOKE ALL ON FUNCTION "public"."calculate_and_insert_send_ceiling_verification"("distribution_number" integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."calculate_and_insert_send_ceiling_verification"("distribution_number" integer) TO "service_role";
+-- Revoke all public and authenticated access, grant only to service_role
+-- For all functions:
+
+REVOKE ALL ON FUNCTION "public"."insert_create_passkey_verifications"("distribution_num" integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION "public"."insert_create_passkey_verifications"("distribution_num" integer) FROM authenticated;
+GRANT ALL ON FUNCTION "public"."insert_create_passkey_verifications"("distribution_num" integer) TO service_role;
+
+REVOKE ALL ON FUNCTION "public"."insert_send_slash"("distribution_number" integer, "scaling_divisor" integer, "minimum_sends" integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION "public"."insert_send_slash"("distribution_number" integer, "scaling_divisor" integer, "minimum_sends" integer) FROM authenticated;
+GRANT ALL ON FUNCTION "public"."insert_send_slash"("distribution_number" integer, "scaling_divisor" integer, "minimum_sends" integer) TO service_role;
+
+REVOKE ALL ON FUNCTION "public"."insert_send_streak_verifications"("distribution_num" integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION "public"."insert_send_streak_verifications"("distribution_num" integer) FROM authenticated;
+GRANT ALL ON FUNCTION "public"."insert_send_streak_verifications"("distribution_num" integer) TO service_role;
+
+REVOKE ALL ON FUNCTION "public"."insert_send_verifications"("distribution_num" integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION "public"."insert_send_verifications"("distribution_num" integer) FROM authenticated;
+GRANT ALL ON FUNCTION "public"."insert_send_verifications"("distribution_num" integer) TO service_role;
+
+REVOKE ALL ON FUNCTION "public"."insert_tag_referral_verifications"("distribution_num" integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION "public"."insert_tag_referral_verifications"("distribution_num" integer) FROM authenticated;
+GRANT ALL ON FUNCTION "public"."insert_tag_referral_verifications"("distribution_num" integer) TO service_role;
+
+REVOKE ALL ON FUNCTION "public"."insert_tag_registration_verifications"("distribution_num" integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION "public"."insert_tag_registration_verifications"("distribution_num" integer) FROM authenticated;
+GRANT ALL ON FUNCTION "public"."insert_tag_registration_verifications"("distribution_num" integer) TO service_role;
+
+REVOKE ALL ON FUNCTION "public"."insert_total_referral_verifications"("distribution_num" integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION "public"."insert_total_referral_verifications"("distribution_num" integer) FROM authenticated;
+GRANT ALL ON FUNCTION "public"."insert_total_referral_verifications"("distribution_num" integer) TO service_role;
+
+REVOKE ALL ON FUNCTION "public"."insert_verification_value"("distribution_number" integer, "type" "public"."verification_type", "fixed_value" numeric, "bips_value" integer, "multiplier_min" numeric, "multiplier_max" numeric, "multiplier_step" numeric) FROM PUBLIC;
+REVOKE ALL ON FUNCTION "public"."insert_verification_value"("distribution_number" integer, "type" "public"."verification_type", "fixed_value" numeric, "bips_value" integer, "multiplier_min" numeric, "multiplier_max" numeric, "multiplier_step" numeric) FROM authenticated;
+GRANT ALL ON FUNCTION "public"."insert_verification_value"("distribution_number" integer, "type" "public"."verification_type", "fixed_value" numeric, "bips_value" integer, "multiplier_min" numeric, "multiplier_max" numeric, "multiplier_step" numeric) TO service_role;
+
+REVOKE ALL ON FUNCTION "public"."update_referral_verifications"("distribution_id" integer, "shares" "public"."distribution_shares"[]) FROM PUBLIC;
+REVOKE ALL ON FUNCTION "public"."update_referral_verifications"("distribution_id" integer, "shares" "public"."distribution_shares"[]) FROM authenticated;
+GRANT ALL ON FUNCTION "public"."update_referral_verifications"("distribution_id" integer, "shares" "public"."distribution_shares"[]) TO service_role;
+
+REVOKE ALL ON FUNCTION "public"."refresh_send_scores_history"() FROM PUBLIC;
+REVOKE ALL ON FUNCTION "public"."refresh_send_scores_history"() FROM authenticated;
+GRANT ALL ON FUNCTION "public"."refresh_send_scores_history"() TO service_role;
+
+REVOKE ALL ON FUNCTION "public"."refresh_send_scores_history_trigger"() FROM PUBLIC;
+REVOKE ALL ON FUNCTION "public"."refresh_send_scores_history_trigger"() FROM authenticated;
+GRANT ALL ON FUNCTION "public"."refresh_send_scores_history_trigger"() TO service_role;
+
+REVOKE ALL ON FUNCTION "public"."insert_verification_sends"() FROM PUBLIC;
+REVOKE ALL ON FUNCTION "public"."insert_verification_sends"() FROM authenticated;
+GRANT ALL ON FUNCTION "public"."insert_verification_sends"() TO service_role;
+
+REVOKE ALL ON FUNCTION "public"."insert_verification_send_ceiling"() FROM PUBLIC;
+REVOKE ALL ON FUNCTION "public"."insert_verification_send_ceiling"() FROM authenticated;
+GRANT ALL ON FUNCTION "public"."insert_verification_send_ceiling"() TO service_role;
+GRANT ALL ON FUNCTION "public"."update_referral_verifications"("distribution_id" integer, "shares" "public"."distribution_shares"[]) TO "anon";
+GRANT ALL ON FUNCTION "public"."update_referral_verifications"("distribution_id" integer, "shares" "public"."distribution_shares"[]) TO "authenticated";
+GRANT ALL ON FUNCTION "public"."update_referral_verifications"("distribution_id" integer, "shares" "public"."distribution_shares"[]) TO "service_role";
+
+REVOKE ALL ON FUNCTION "public"."insert_verification_send_ceiling"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."insert_verification_send_ceiling"() TO "service_role";
+
+REVOKE ALL ON FUNCTION "public"."refresh_send_scores_history"() FROM PUBLIC;
+REVOKE ALL ON FUNCTION "public"."refresh_send_scores_history"() FROM authenticated;
+REVOKE ALL ON FUNCTION "public"."refresh_send_scores_history"() FROM anon;
+GRANT ALL ON FUNCTION "public"."refresh_send_scores_history"() TO service_role;
+
+REVOKE ALL ON FUNCTION "public"."refresh_send_scores_history_trigger"() FROM PUBLIC;
+REVOKE ALL ON FUNCTION "public"."refresh_send_scores_history_trigger"() FROM authenticated;
+REVOKE ALL ON FUNCTION "public"."refresh_send_scores_history_trigger"() FROM anon;
+GRANT ALL ON FUNCTION "public"."refresh_send_scores_history_trigger"() TO service_role;
+
+REVOKE ALL ON FUNCTION "public"."insert_verification_sends"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."insert_verification_sends"() TO "anon";
+GRANT ALL ON FUNCTION "public"."insert_verification_sends"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."insert_verification_sends"() TO "service_role";
+
+REVOKE ALL ON FUNCTION "public"."get_send_scores_history"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."get_send_scores_history"() TO "anon";
+GRANT ALL ON FUNCTION "public"."get_send_scores_history"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_send_scores_history"() TO "service_role";

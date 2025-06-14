@@ -165,13 +165,6 @@ export type Database = {
             referencedRelation: "send_scores_current"
             referencedColumns: ["distribution_id"]
           },
-          {
-            foreignKeyName: "distribution_shares_distribution_id_fkey"
-            columns: ["distribution_id"]
-            isOneToOne: false
-            referencedRelation: "send_scores_history"
-            referencedColumns: ["distribution_id"]
-          },
         ]
       }
       distribution_verification_values: {
@@ -221,13 +214,6 @@ export type Database = {
             columns: ["distribution_id"]
             isOneToOne: false
             referencedRelation: "send_scores_current"
-            referencedColumns: ["distribution_id"]
-          },
-          {
-            foreignKeyName: "distribution_verification_values_distribution_id_fkey"
-            columns: ["distribution_id"]
-            isOneToOne: false
-            referencedRelation: "send_scores_history"
             referencedColumns: ["distribution_id"]
           },
         ]
@@ -280,13 +266,6 @@ export type Database = {
             columns: ["distribution_id"]
             isOneToOne: false
             referencedRelation: "send_scores_current"
-            referencedColumns: ["distribution_id"]
-          },
-          {
-            foreignKeyName: "distribution_verifications_distribution_id_fkey"
-            columns: ["distribution_id"]
-            isOneToOne: false
-            referencedRelation: "send_scores_history"
             referencedColumns: ["distribution_id"]
           },
         ]
@@ -1207,13 +1186,6 @@ export type Database = {
             referencedRelation: "send_scores_current"
             referencedColumns: ["distribution_id"]
           },
-          {
-            foreignKeyName: "send_slash_distribution_id_fkey"
-            columns: ["distribution_id"]
-            isOneToOne: false
-            referencedRelation: "send_scores_history"
-            referencedColumns: ["distribution_id"]
-          },
         ]
       }
       send_token_transfers: {
@@ -1736,16 +1708,6 @@ export type Database = {
         }
         Relationships: []
       }
-      send_scores_history: {
-        Row: {
-          distribution_id: number | null
-          score: number | null
-          send_ceiling: number | null
-          unique_sends: number | null
-          user_id: string | null
-        }
-        Relationships: []
-      }
     }
     Functions: {
       calculate_and_insert_send_ceiling_verification: {
@@ -1850,6 +1812,16 @@ export type Database = {
       get_pending_jackpot_tickets_purchased: {
         Args: Record<PropertyKey, never>
         Returns: number
+      }
+      get_send_scores_history: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          user_id: string
+          distribution_id: number
+          score: number
+          unique_sends: number
+          send_ceiling: number
+        }[]
       }
       get_user_jackpot_summary: {
         Args: { num_runs: number }
