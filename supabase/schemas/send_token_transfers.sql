@@ -1,3 +1,29 @@
+-- Filter function to ensure transfers only include existing send accounts
+-- create trigger function for filtering send_token_transfers with no send_account_created
+-- Deletes send_token_transfers with no send_account_created.
+-- This is due to performance issues in our shovel indexer and using filter_ref to limit indexing to only
+-- send_token_transfers with send_account_created.
+-- For now, we index all SEND token transfers, and use this function filter any send_token_transfers with no send_account_created.
+-- See https://github.com/orgs/indexsupply/discussions/268
+CREATE OR REPLACE FUNCTION private.filter_send_token_transfers_with_no_send_account_created()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+begin
+  if exists ( select 1 from send_account_created where account = new.f )
+    or exists ( select 1 from send_account_created where account = new.t )
+  then
+    return new;
+  else
+    return null;
+  end if;
+end;
+$function$
+;
+
+ALTER FUNCTION "private"."filter_send_token_transfers_with_no_send_account_created"() OWNER TO "postgres";
+
 -- Sequences
 CREATE SEQUENCE IF NOT EXISTS "public"."send_token_transfers_id_seq"
     AS integer
@@ -43,12 +69,20 @@ CREATE INDEX "send_token_transfers_composite" ON "public"."send_token_transfers"
 CREATE INDEX "send_token_transfers_f" ON "public"."send_token_transfers" USING "btree" ("f");
 CREATE INDEX "send_token_transfers_t" ON "public"."send_token_transfers" USING "btree" ("t");
 CREATE UNIQUE INDEX "u_send_token_transfers" ON "public"."send_token_transfers" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
+CREATE INDEX "idx_send_token_transfers_f_t_block_time" ON "public"."send_token_transfers" USING "btree" ("f", "t", "block_time");
 
 -- RLS
 ALTER TABLE "public"."send_token_transfers" ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Users can see their own token transfers" ON "public"."send_token_transfers" FOR SELECT USING (("auth"."uid"() IN ( SELECT "chain_addresses"."user_id"
-   FROM "public"."chain_addresses"
-  WHERE (("chain_addresses"."address" OPERATOR("public".=) ("lower"("concat"('0x', "encode"("send_token_transfers"."f", 'hex'::"text"))))::"public"."citext") OR ("chain_addresses"."address" OPERATOR("public".=) ("lower"("concat"('0x', "encode"("send_token_transfers"."t", 'hex'::"text"))))::"public"."citext")))));
+create policy "users can see their own transfers"
+on "public"."send_token_transfers"
+as permissive
+for select
+to public
+using ((EXISTS ( SELECT 1
+   FROM send_accounts
+  WHERE ((send_accounts.user_id = ( SELECT auth.uid() AS uid)) AND ((send_accounts.address = (lower(concat('0x', encode(send_token_transfers.f, 'hex'::text))))::citext) OR (send_accounts.address = (lower(concat('0x', encode(send_token_transfers.t, 'hex'::text))))::citext))))));
+
+
 
 -- Grants
 GRANT ALL ON TABLE "public"."send_token_transfers" TO "anon";
@@ -63,3 +97,4 @@ GRANT ALL ON SEQUENCE "public"."send_token_transfers_id_seq" TO "service_role";
 CREATE OR REPLACE TRIGGER "insert_verification_send_ceiling_trigger" AFTER INSERT ON "public"."send_token_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."insert_verification_send_ceiling"();
 CREATE OR REPLACE TRIGGER "insert_verification_sends" AFTER INSERT ON "public"."send_token_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."insert_verification_sends"();
 CREATE OR REPLACE TRIGGER "insert_send_streak_verification" AFTER INSERT ON "public"."send_token_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."insert_send_streak_verification"();
+CREATE OR REPLACE TRIGGER "filter_send_token_transfers_with_no_send_account_created" BEFORE INSERT ON "public"."send_token_transfers" FOR EACH ROW EXECUTE FUNCTION "private"."filter_send_token_transfers_with_no_send_account_created"();
