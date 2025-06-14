@@ -20,7 +20,7 @@
     "eas:build:preview:ios": "cross-env NODE_ENV=preview APP_ENV=preview yarn with-env eas build --profile preview --platform ios"
   },
   "dependencies": {
-    "@babel/runtime": "^7.27.3",
+    "@babel/runtime": "^7.27.6",
     "@my/ui": "workspace:*",
     "@react-native-async-storage/async-storage": "^2.0.0",
     "@react-native-community/netinfo": "11.4.1",
