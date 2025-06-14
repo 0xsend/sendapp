@@ -548,7 +548,7 @@ CREATE OR REPLACE VIEW "public"."send_earn_balances" WITH ("security_invoker"='o
 
 ALTER TABLE "public"."send_earn_balances" OWNER TO "postgres";
 
-CREATE OR REPLACE VIEW send_earn_balances_timeline AS
+CREATE OR REPLACE VIEW "public"."send_earn_balances_timeline" WITH ("security_invoker"='on', "security_barrier"='on') AS
 WITH all_transactions AS (
     SELECT owner, block_time, assets as balance
     FROM send_earn_deposit
@@ -607,6 +607,7 @@ ALTER TABLE "public"."send_earn_deposit" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."send_earn_new_affiliate" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."send_earn_withdraw" ENABLE ROW LEVEL SECURITY;
 
+
 -- Policies
 CREATE POLICY "send_earn_create viewable by authenticated users" ON "public"."send_earn_create" FOR SELECT TO "authenticated" USING (true);
 CREATE POLICY "send_earn_new_affiliate viewable by authenticated users" ON "public"."send_earn_new_affiliate" FOR SELECT TO "authenticated" USING (true);
@@ -661,3 +662,8 @@ GRANT ALL ON SEQUENCE "public"."send_earn_new_affiliate_id_seq" TO "service_role
 GRANT ALL ON SEQUENCE "public"."send_earn_withdraw_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."send_earn_withdraw_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."send_earn_withdraw_id_seq" TO "service_role";
+
+REVOKE ALL ON "public"."send_earn_balances_timeline" FROM PUBLIC;
+REVOKE ALL ON "public"."send_earn_balances_timeline" FROM anon;
+GRANT ALL ON "public"."send_earn_balances_timeline" TO authenticated;
+GRANT ALL ON "public"."send_earn_balances_timeline" TO service_role;

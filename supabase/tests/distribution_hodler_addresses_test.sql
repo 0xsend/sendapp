@@ -13,6 +13,33 @@ SELECT
             * FROM distribution_hodler_addresses(999999) $$, 'Distribution not found.', 'Should raise exception if distribution does not exist');
 SELECT
     tests.create_supabase_user('hodler');
+
+INSERT INTO send_account_created(
+    chain_id,
+    log_addr,
+    block_time,
+    tx_hash,
+    account,
+    ig_name,
+    src_name,
+    block_num,
+    tx_idx,
+    log_idx
+) VALUES
+-- For the hodler
+(
+    8453,
+    decode(:hodler_address, 'hex'),
+    extract(epoch FROM '2023-01-01 00:00:00.000000 +00:00'::timestamp),
+    '\x1234'::bytea,
+    decode(:hodler_address, 'hex'),
+    'send_account_created',
+    'send_account_created',
+    18180000,
+    1,
+    1
+);
+
 -- create a liquidity pool
 INSERT INTO send_liquidity_pools(
     address,
@@ -196,4 +223,3 @@ SELECT
 SELECT
     finish();
 ROLLBACK;
-
