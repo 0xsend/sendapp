@@ -331,14 +331,15 @@ REVOKE ALL ON "private"."send_scores_history" FROM PUBLIC;
 REVOKE ALL ON "private"."send_scores_history" FROM authenticated;
 GRANT ALL ON "private"."send_scores_history" TO service_role;
 
-REVOKE ALL ON "public"."send_scores_current_unique" FROM PUBLIC;
+GRANT ALL ON "public"."send_scores_current_unique" TO PUBLIC;
 GRANT ALL ON "public"."send_scores_current_unique" TO service_role;
 GRANT ALL ON "public"."send_scores_current_unique" TO authenticated;
 
 REVOKE ALL ON "public"."send_scores_current" FROM PUBLIC;
+REVOKE ALL ON "public"."send_scores_current" FROM anon;
 GRANT ALL ON "public"."send_scores_current" TO service_role;
 GRANT ALL ON "public"."send_scores_current" TO authenticated;
 
-REVOKE ALL ON "public"."send_scores" FROM PUBLIC;
+GRANT ALL ON "public"."send_scores" TO PUBLIC;
 GRANT ALL ON "public"."send_scores" TO service_role;
 GRANT ALL ON "public"."send_scores" TO authenticated;
