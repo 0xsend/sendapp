@@ -627,6 +627,8 @@ AS $$
 DECLARE
   curr_distribution_id bigint;
   from_user_id uuid;
+  to_user_id uuid;
+  unique_recipient_count integer;
   current_streak integer;
   existing_record_id bigint;
   ignored_addresses bytea[] := ARRAY['\x592e1224d203be4214b15e205f6081fbbacfcd2d'::bytea, '\x36f43082d01df4801af2d95aeed1a0200c5510ae'::bytea];
@@ -639,15 +641,19 @@ BEGIN
   ORDER BY qualification_start DESC
   LIMIT 1;
 
-  -- Get user_id from send_accounts
+  -- Get user_ids from send_accounts
   SELECT user_id INTO from_user_id
   FROM send_accounts
   WHERE address = concat('0x', encode(NEW.f, 'hex'))::citext;
 
-  IF curr_distribution_id IS NOT NULL AND from_user_id IS NOT NULL THEN
-    -- Calculate current streak with unique recipients per day
+  SELECT user_id INTO to_user_id
+  FROM send_accounts
+  WHERE address = concat('0x', encode(NEW.t, 'hex'))::citext;
+
+  IF curr_distribution_id IS NOT NULL AND from_user_id IS NOT NULL AND to_user_id IS NOT NULL THEN
+    -- Calculate streak with simplified unique recipients per day logic
     WITH daily_unique_transfers AS (
-      SELECT DISTINCT
+      SELECT
         DATE(to_timestamp(block_time) at time zone 'UTC') AS transfer_date
       FROM send_token_transfers stt
       WHERE f = NEW.f
@@ -657,16 +663,8 @@ BEGIN
           FROM distributions
           WHERE id = curr_distribution_id
         )
-        AND EXISTS (
-          SELECT 1
-          FROM (
-            SELECT DISTINCT t
-            FROM send_token_transfers
-            WHERE f = stt.f
-            AND DATE(to_timestamp(block_time) at time zone 'UTC') = DATE(to_timestamp(stt.block_time) at time zone 'UTC')
-            AND NOT (t = ANY (ignored_addresses))
-          ) unique_recipients
-        )
+      GROUP BY DATE(to_timestamp(block_time) at time zone 'UTC')
+      HAVING COUNT(DISTINCT t) > 0
     ),
     streaks AS (
       SELECT
@@ -711,6 +709,7 @@ BEGIN
       );
     END IF;
   END IF;
+
   RETURN NEW;
 END;
 $$;
