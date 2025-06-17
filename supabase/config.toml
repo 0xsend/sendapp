@@ -36,6 +36,7 @@ schema_paths = [
   "./schemas/referrals.sql",
   "./schemas/distributions.sql",
   "./schemas/send_earn.sql",
+  "./schemas/send_scores.sql",
 
   # Send account related tables
   "./schemas/send_account_created.sql",

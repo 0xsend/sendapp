@@ -627,6 +627,8 @@ AS $$
 DECLARE
   curr_distribution_id bigint;
   from_user_id uuid;
+  to_user_id uuid;
+  unique_recipient_count integer;
   current_streak integer;
   existing_record_id bigint;
   ignored_addresses bytea[] := ARRAY['\x592e1224d203be4214b15e205f6081fbbacfcd2d'::bytea, '\x36f43082d01df4801af2d95aeed1a0200c5510ae'::bytea];
@@ -639,15 +641,19 @@ BEGIN
   ORDER BY qualification_start DESC
   LIMIT 1;
 
-  -- Get user_id from send_accounts
+  -- Get user_ids from send_accounts
   SELECT user_id INTO from_user_id
   FROM send_accounts
   WHERE address = concat('0x', encode(NEW.f, 'hex'))::citext;
 
-  IF curr_distribution_id IS NOT NULL AND from_user_id IS NOT NULL THEN
-    -- Calculate current streak with unique recipients per day
+  SELECT user_id INTO to_user_id
+  FROM send_accounts
+  WHERE address = concat('0x', encode(NEW.t, 'hex'))::citext;
+
+  IF curr_distribution_id IS NOT NULL AND from_user_id IS NOT NULL AND to_user_id IS NOT NULL THEN
+    -- Calculate streak with simplified unique recipients per day logic
     WITH daily_unique_transfers AS (
-      SELECT DISTINCT
+      SELECT
         DATE(to_timestamp(block_time) at time zone 'UTC') AS transfer_date
       FROM send_token_transfers stt
       WHERE f = NEW.f
@@ -657,16 +663,8 @@ BEGIN
           FROM distributions
           WHERE id = curr_distribution_id
         )
-        AND EXISTS (
-          SELECT 1
-          FROM (
-            SELECT DISTINCT t
-            FROM send_token_transfers
-            WHERE f = stt.f
-            AND DATE(to_timestamp(block_time) at time zone 'UTC') = DATE(to_timestamp(stt.block_time) at time zone 'UTC')
-            AND NOT (t = ANY (ignored_addresses))
-          ) unique_recipients
-        )
+      GROUP BY DATE(to_timestamp(block_time) at time zone 'UTC')
+      HAVING COUNT(DISTINCT t) > 0
     ),
     streaks AS (
       SELECT
@@ -711,6 +709,7 @@ BEGIN
       );
     END IF;
   END IF;
+
   RETURN NEW;
 END;
 $$;
@@ -852,6 +851,132 @@ $function$;
 
 ALTER FUNCTION "public"."update_referral_verifications"("distribution_id" integer, "shares" "public"."distribution_shares"[]) OWNER TO "postgres";
 
+CREATE OR REPLACE FUNCTION public.insert_verification_sends()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+BEGIN
+    -- Update existing verifications
+    UPDATE public.distribution_verifications dv
+    SET metadata = jsonb_build_object('value', s.unique_sends),
+        weight = CASE
+            WHEN dv.type = 'send_ten' AND s.unique_sends >= 10 THEN 1
+            WHEN dv.type = 'send_one_hundred' AND s.unique_sends >= 100 THEN 1
+            ELSE 0
+        END,
+        created_at = to_timestamp(NEW.block_time) at time zone 'UTC'
+    FROM private.get_send_score(NEW.f) s
+    JOIN send_accounts sa ON sa.address = concat('0x', encode(NEW.f, 'hex'))::citext
+    WHERE dv.distribution_id = s.distribution_id
+        AND dv.user_id = sa.user_id
+        AND dv.type IN ('send_ten', 'send_one_hundred');
+
+    -- Insert new verifications if they don't exist
+    INSERT INTO public.distribution_verifications(
+        distribution_id,
+        user_id,
+        type,
+        metadata,
+        weight,
+        created_at
+    )
+    SELECT
+        s.distribution_id,
+        sa.user_id,
+        v.type,
+        jsonb_build_object('value', s.unique_sends),
+        CASE
+            WHEN v.type = 'send_ten' AND s.unique_sends >= 10 THEN 1
+            WHEN v.type = 'send_one_hundred' AND s.unique_sends >= 100 THEN 1
+            ELSE 0
+        END,
+        to_timestamp(NEW.block_time) at time zone 'UTC'
+    FROM private.get_send_score(NEW.f) s
+    JOIN send_accounts sa ON sa.address = concat('0x', encode(NEW.f, 'hex'))::citext
+    CROSS JOIN (
+        VALUES
+            ('send_ten'::verification_type),
+            ('send_one_hundred'::verification_type)
+    ) v(type)
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM distribution_verifications dv
+        WHERE dv.user_id = sa.user_id
+            AND dv.distribution_id = s.distribution_id
+            AND dv.type = v.type
+    );
+
+    RETURN NEW;
+END;
+$function$
+;
+
+ALTER FUNCTION "public"."insert_verification_sends"() OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION public.insert_verification_send_ceiling()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+BEGIN
+    -- Exit early if value is not positive
+    IF NOT (NEW.v > 0) THEN
+        RETURN NEW;
+    END IF;
+
+    -- Try to update existing verification
+    UPDATE distribution_verifications dv
+    SET
+        weight = s.score,
+        metadata = jsonb_build_object('value', s.send_ceiling::text)
+    FROM private.get_send_score(NEW.f) s
+    CROSS JOIN (
+        SELECT user_id
+        FROM send_accounts
+        WHERE address = concat('0x', encode(NEW.f, 'hex'))::citext
+    ) sa
+    WHERE dv.user_id = sa.user_id
+        AND dv.distribution_id = s.distribution_id
+        AND dv.type = 'send_ceiling';
+
+    -- If no row was updated, insert new verification
+    IF NOT FOUND THEN
+        INSERT INTO distribution_verifications(
+            distribution_id,
+            user_id,
+            type,
+            weight,
+            metadata
+        )
+        SELECT
+            s.distribution_id,
+            sa.user_id,
+            'send_ceiling',
+            s.score,
+            jsonb_build_object('value', s.send_ceiling::text)
+        FROM private.get_send_score(NEW.f) s
+        CROSS JOIN (
+            SELECT user_id
+            FROM send_accounts
+            WHERE address = concat('0x', encode(NEW.f, 'hex'))::citext
+        ) sa
+        WHERE s.score > 0;
+    END IF;
+
+    RETURN NEW;
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE NOTICE 'Error in insert_verification_send_ceiling: %', SQLERRM;
+        RETURN NEW;
+END;
+$function$
+;
+
+ALTER FUNCTION "public"."insert_verification_send_ceiling"() OWNER TO "postgres";
+
 -- Grants for tables
 GRANT ALL ON TABLE "public"."distributions" TO "anon";
 GRANT ALL ON TABLE "public"."distributions" TO "authenticated";
@@ -910,237 +1035,52 @@ CREATE POLICY "Enable read access for all users" ON "public"."send_slash" FOR SE
 -- Function grants
 REVOKE ALL ON FUNCTION "public"."calculate_and_insert_send_ceiling_verification"("distribution_number" integer) FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."calculate_and_insert_send_ceiling_verification"("distribution_number" integer) TO "service_role";
+-- Revoke all public and authenticated access, grant only to service_role
+-- For all functions:
 
 REVOKE ALL ON FUNCTION "public"."insert_create_passkey_verifications"("distribution_num" integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."insert_create_passkey_verifications"("distribution_num" integer) TO "anon";
-GRANT ALL ON FUNCTION "public"."insert_create_passkey_verifications"("distribution_num" integer) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."insert_create_passkey_verifications"("distribution_num" integer) TO "service_role";
+REVOKE ALL ON FUNCTION "public"."insert_create_passkey_verifications"("distribution_num" integer) FROM authenticated;
+GRANT ALL ON FUNCTION "public"."insert_create_passkey_verifications"("distribution_num" integer) TO service_role;
 
 REVOKE ALL ON FUNCTION "public"."insert_send_slash"("distribution_number" integer, "scaling_divisor" integer, "minimum_sends" integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."insert_send_slash"("distribution_number" integer, "scaling_divisor" integer, "minimum_sends" integer) TO "anon";
-GRANT ALL ON FUNCTION "public"."insert_send_slash"("distribution_number" integer, "scaling_divisor" integer, "minimum_sends" integer) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."insert_send_slash"("distribution_number" integer, "scaling_divisor" integer, "minimum_sends" integer) TO "service_role";
+REVOKE ALL ON FUNCTION "public"."insert_send_slash"("distribution_number" integer, "scaling_divisor" integer, "minimum_sends" integer) FROM authenticated;
+GRANT ALL ON FUNCTION "public"."insert_send_slash"("distribution_number" integer, "scaling_divisor" integer, "minimum_sends" integer) TO service_role;
 
 REVOKE ALL ON FUNCTION "public"."insert_send_streak_verifications"("distribution_num" integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."insert_send_streak_verifications"("distribution_num" integer) TO "anon";
-GRANT ALL ON FUNCTION "public"."insert_send_streak_verifications"("distribution_num" integer) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."insert_send_streak_verifications"("distribution_num" integer) TO "service_role";
+REVOKE ALL ON FUNCTION "public"."insert_send_streak_verifications"("distribution_num" integer) FROM authenticated;
+GRANT ALL ON FUNCTION "public"."insert_send_streak_verifications"("distribution_num" integer) TO service_role;
 
 REVOKE ALL ON FUNCTION "public"."insert_send_verifications"("distribution_num" integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."insert_send_verifications"("distribution_num" integer) TO "anon";
-GRANT ALL ON FUNCTION "public"."insert_send_verifications"("distribution_num" integer) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."insert_send_verifications"("distribution_num" integer) TO "service_role";
+REVOKE ALL ON FUNCTION "public"."insert_send_verifications"("distribution_num" integer) FROM authenticated;
+GRANT ALL ON FUNCTION "public"."insert_send_verifications"("distribution_num" integer) TO service_role;
 
 REVOKE ALL ON FUNCTION "public"."insert_tag_referral_verifications"("distribution_num" integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."insert_tag_referral_verifications"("distribution_num" integer) TO "anon";
-GRANT ALL ON FUNCTION "public"."insert_tag_referral_verifications"("distribution_num" integer) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."insert_tag_referral_verifications"("distribution_num" integer) TO "service_role";
+REVOKE ALL ON FUNCTION "public"."insert_tag_referral_verifications"("distribution_num" integer) FROM authenticated;
+GRANT ALL ON FUNCTION "public"."insert_tag_referral_verifications"("distribution_num" integer) TO service_role;
 
 REVOKE ALL ON FUNCTION "public"."insert_tag_registration_verifications"("distribution_num" integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."insert_tag_registration_verifications"("distribution_num" integer) TO "anon";
-GRANT ALL ON FUNCTION "public"."insert_tag_registration_verifications"("distribution_num" integer) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."insert_tag_registration_verifications"("distribution_num" integer) TO "service_role";
+REVOKE ALL ON FUNCTION "public"."insert_tag_registration_verifications"("distribution_num" integer) FROM authenticated;
+GRANT ALL ON FUNCTION "public"."insert_tag_registration_verifications"("distribution_num" integer) TO service_role;
 
 REVOKE ALL ON FUNCTION "public"."insert_total_referral_verifications"("distribution_num" integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."insert_total_referral_verifications"("distribution_num" integer) TO "anon";
-GRANT ALL ON FUNCTION "public"."insert_total_referral_verifications"("distribution_num" integer) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."insert_total_referral_verifications"("distribution_num" integer) TO "service_role";
+REVOKE ALL ON FUNCTION "public"."insert_total_referral_verifications"("distribution_num" integer) FROM authenticated;
+GRANT ALL ON FUNCTION "public"."insert_total_referral_verifications"("distribution_num" integer) TO service_role;
 
 REVOKE ALL ON FUNCTION "public"."insert_verification_value"("distribution_number" integer, "type" "public"."verification_type", "fixed_value" numeric, "bips_value" integer, "multiplier_min" numeric, "multiplier_max" numeric, "multiplier_step" numeric) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."insert_verification_value"("distribution_number" integer, "type" "public"."verification_type", "fixed_value" numeric, "bips_value" integer, "multiplier_min" numeric, "multiplier_max" numeric, "multiplier_step" numeric) TO "anon";
-GRANT ALL ON FUNCTION "public"."insert_verification_value"("distribution_number" integer, "type" "public"."verification_type", "fixed_value" numeric, "bips_value" integer, "multiplier_min" numeric, "multiplier_max" numeric, "multiplier_step" numeric) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."insert_verification_value"("distribution_number" integer, "type" "public"."verification_type", "fixed_value" numeric, "bips_value" integer, "multiplier_min" numeric, "multiplier_max" numeric, "multiplier_step" numeric) TO "service_role";
-
-REVOKE ALL ON FUNCTION "public"."update_distribution_shares"("distribution_id" integer, "shares" "public"."distribution_shares"[]) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."update_distribution_shares"("distribution_id" integer, "shares" "public"."distribution_shares"[]) TO "service_role";
+REVOKE ALL ON FUNCTION "public"."insert_verification_value"("distribution_number" integer, "type" "public"."verification_type", "fixed_value" numeric, "bips_value" integer, "multiplier_min" numeric, "multiplier_max" numeric, "multiplier_step" numeric) FROM authenticated;
+GRANT ALL ON FUNCTION "public"."insert_verification_value"("distribution_number" integer, "type" "public"."verification_type", "fixed_value" numeric, "bips_value" integer, "multiplier_min" numeric, "multiplier_max" numeric, "multiplier_step" numeric) TO service_role;
 
 REVOKE ALL ON FUNCTION "public"."update_referral_verifications"("distribution_id" integer, "shares" "public"."distribution_shares"[]) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."update_referral_verifications"("distribution_id" integer, "shares" "public"."distribution_shares"[]) TO "anon";
-GRANT ALL ON FUNCTION "public"."update_referral_verifications"("distribution_id" integer, "shares" "public"."distribution_shares"[]) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."update_referral_verifications"("distribution_id" integer, "shares" "public"."distribution_shares"[]) TO "service_role";
+REVOKE ALL ON FUNCTION "public"."update_referral_verifications"("distribution_id" integer, "shares" "public"."distribution_shares"[]) FROM authenticated;
+GRANT ALL ON FUNCTION "public"."update_referral_verifications"("distribution_id" integer, "shares" "public"."distribution_shares"[]) TO service_role;
 
-CREATE OR REPLACE FUNCTION public.insert_verification_sends()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-DECLARE
-    score_record RECORD;
-BEGIN
-    -- Calculate send_scores_current only once by getting the score for this sender
-    SELECT ss.distribution_id, ss.user_id, ss.unique_sends
-    INTO score_record
-    FROM send_scores_current ss
-    JOIN send_accounts sa ON sa.user_id = ss.user_id
-    WHERE sa.address = concat('0x', encode(NEW.f, 'hex'))::citext;
-
-    -- Early exit if no score found
-    IF NOT FOUND THEN
-        RETURN NEW;
-    END IF;
-
-    -- Update existing verifications
-    UPDATE public.distribution_verifications dv
-    SET metadata = jsonb_build_object('value', score_record.unique_sends),
-        weight = CASE
-            WHEN dv.type = 'send_ten' AND score_record.unique_sends >= 10 THEN 1
-            WHEN dv.type = 'send_one_hundred' AND score_record.unique_sends >= 100 THEN 1
-            ELSE 0
-        END,
-        created_at = to_timestamp(NEW.block_time) at time zone 'UTC'
-    WHERE dv.distribution_id = score_record.distribution_id
-        AND dv.user_id = score_record.user_id
-        AND dv.type IN ('send_ten', 'send_one_hundred');
-
-    -- Insert new verifications if they don't exist
-    INSERT INTO public.distribution_verifications(
-        distribution_id,
-        user_id,
-        type,
-        metadata,
-        weight,
-        created_at
-    )
-    SELECT
-        score_record.distribution_id,
-        score_record.user_id,
-        v.type,
-        jsonb_build_object('value', score_record.unique_sends),
-        CASE
-            WHEN v.type = 'send_ten' AND score_record.unique_sends >= 10 THEN 1
-            WHEN v.type = 'send_one_hundred' AND score_record.unique_sends >= 100 THEN 1
-            ELSE 0
-        END,
-        to_timestamp(NEW.block_time) at time zone 'UTC'
-    FROM (
-        VALUES
-            ('send_ten'::verification_type),
-            ('send_one_hundred'::verification_type)
-    ) v(type)
-    WHERE NOT EXISTS (
-        SELECT 1
-        FROM distribution_verifications dv
-        WHERE dv.user_id = score_record.user_id
-            AND dv.distribution_id = score_record.distribution_id
-            AND dv.type = v.type
-    );
-
-    RETURN NEW;
-END;
-$function$
-;
-
-ALTER FUNCTION "public"."insert_verification_sends"() OWNER TO "postgres";
-
-GRANT ALL ON FUNCTION "public"."insert_verification_sends"() TO "anon";
-GRANT ALL ON FUNCTION "public"."insert_verification_sends"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."insert_verification_sends"() TO "service_role";
-
-
-CREATE OR REPLACE FUNCTION public.insert_verification_send_ceiling()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-DECLARE
-    score_record RECORD;
-BEGIN
-    -- Exit early if value is not positive
-    IF NOT (NEW.v > 0) THEN
-        RETURN NEW;
-    END IF;
-
-    -- Get send_scores_current result once
-    SELECT ss.distribution_id, ss.user_id, ss.score, ss.send_ceiling
-    INTO score_record
-    FROM send_scores_current ss
-    JOIN send_accounts sa ON sa.user_id = ss.user_id
-    WHERE sa.address = concat('0x', encode(NEW.f, 'hex'))::citext;
-
-    -- Early exit if no score found
-    IF NOT FOUND THEN
-        RETURN NEW;
-    END IF;
-
-    -- Try to update existing verification
-    UPDATE distribution_verifications dv
-    SET weight = score_record.score,
-        metadata = jsonb_build_object('value', score_record.send_ceiling::text)
-    WHERE dv.user_id = score_record.user_id
-        AND dv.distribution_id = score_record.distribution_id
-        AND dv.type = 'send_ceiling';
-
-    -- If no row was updated, insert new verification
-    IF NOT FOUND THEN
-        INSERT INTO distribution_verifications(
-            distribution_id,
-            user_id,
-            type,
-            weight,
-            metadata
-        )
-        VALUES (
-            score_record.distribution_id,
-            score_record.user_id,
-            'send_ceiling',
-            score_record.score,
-            jsonb_build_object('value', score_record.send_ceiling::text)
-        );
-    END IF;
-
-    RETURN NEW;
-EXCEPTION
-    WHEN OTHERS THEN
-        RAISE NOTICE 'Error in insert_verification_send_ceiling: %', SQLERRM;
-        RETURN NEW;
-END;
-$function$
-;
-
-ALTER FUNCTION "public"."insert_verification_send_ceiling"() OWNER TO "postgres";
+REVOKE ALL ON FUNCTION "public"."insert_verification_sends"() FROM PUBLIC;
+REVOKE ALL ON FUNCTION "public"."insert_verification_sends"() FROM authenticated;
+GRANT ALL ON FUNCTION "public"."insert_verification_sends"() TO service_role;
 
 REVOKE ALL ON FUNCTION "public"."insert_verification_send_ceiling"() FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."insert_verification_send_ceiling"() TO "anon";
-GRANT ALL ON FUNCTION "public"."insert_verification_send_ceiling"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."insert_verification_send_ceiling"() TO "service_role";
+REVOKE ALL ON FUNCTION "public"."insert_verification_send_ceiling"() FROM authenticated;
+GRANT ALL ON FUNCTION "public"."insert_verification_send_ceiling"() TO service_role;
 
-CREATE OR REPLACE FUNCTION refresh_send_scores_history()
-RETURNS void AS $$
-BEGIN
-  REFRESH MATERIALIZED VIEW CONCURRENTLY send_scores_history;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-ALTER FUNCTION "public"."refresh_send_scores_history"() OWNER TO "postgres";
-
-REVOKE ALL ON FUNCTION "public"."refresh_send_scores_history"() FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."refresh_send_scores_history"() TO "anon";
-GRANT ALL ON FUNCTION "public"."refresh_send_scores_history"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."refresh_send_scores_history"() TO "service_role";
-
--- Trigger function
-CREATE OR REPLACE FUNCTION public.refresh_send_scores_history_trigger()
- RETURNS trigger
- LANGUAGE plpgsql
-AS $function$
-BEGIN
-  PERFORM refresh_send_scores_history();
-  RETURN NEW;
-END;
-$function$
-;
-
-ALTER FUNCTION "public"."refresh_send_scores_history_trigger"() OWNER TO "postgres";
-
-REVOKE ALL ON FUNCTION "public"."refresh_send_scores_history_trigger"() FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."refresh_send_scores_history_trigger"() TO "anon";
-GRANT ALL ON FUNCTION "public"."refresh_send_scores_history_trigger"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."refresh_send_scores_history_trigger"() TO "service_role";
-
--- Trigger
-CREATE TRIGGER distribution_ended_refresh_send_scores
-  AFTER INSERT ON distributions
-  FOR EACH ROW
-  EXECUTE FUNCTION refresh_send_scores_history_trigger();
+REVOKE ALL ON FUNCTION "public"."insert_verification_send_ceiling"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."insert_verification_send_ceiling"() TO service_role;
