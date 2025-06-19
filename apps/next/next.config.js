@@ -137,6 +137,7 @@ export default () => {
       'expo-device',
       'expo-image-picker',
       'expo-crypto',
+      'expo-blur',
       '@ts-react/form',
       'react-hook-form',
       'react-native-passkeys',
