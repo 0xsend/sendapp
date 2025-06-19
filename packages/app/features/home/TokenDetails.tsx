@@ -1,14 +1,27 @@
-import { Card, Paragraph, Separator, Spinner, Stack, Theme, useMedia, XStack, YStack } from '@my/ui'
-import { ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
-import { IconCoin, IconError } from 'app/components/icons'
-import { stableCoins, type allCoins, type CoinWithBalance } from 'app/data/coins'
-import { HomeQuickActions } from 'app/features/home/HomeQuickActions'
+import {
+  Card,
+  Paragraph,
+  Separator,
+  Spinner,
+  Stack,
+  Theme,
+  useMedia,
+  XStack,
+  YStack,
+  LinkableButton,
+  type LinkableButtonProps,
+} from '@my/ui'
+import { ArrowDown, ArrowUp, Minus, Plus } from '@tamagui/lucide-icons'
+import { IconCoin, IconError, IconPlus, IconArrowUp } from 'app/components/icons'
+import { stableCoins, type allCoins, type CoinWithBalance, usdcCoin } from 'app/data/coins'
 import { useTokenMarketData } from 'app/utils/coin-gecko'
 import { convertBalanceToFiat } from 'app/utils/convertBalanceToUSD'
 import formatAmount from 'app/utils/formatAmount'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { TokenActivity } from './TokenActivity'
 import { useMemo } from 'react'
+import { ButtonText } from '@my/ui'
+import { useHoverStyles } from 'app/utils/useHoverStyles'
 
 export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
   const media = useMedia()
@@ -18,8 +31,8 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
   }, [coin])
 
   return (
-    <YStack f={1} gap={isSmallScreen ? '$3' : '$5'} $gtLg={{ w: '45%', pb: '$0' }} pb="$4">
-      <YStack gap={isSmallScreen ? '$2.5' : '$3.5'} $gtLg={{ gap: '$5' }}>
+    <YStack f={1} gap="$3" $gtLg={{ w: '45%', pb: '$0' }} pb="$4">
+      <YStack gap="$3">
         <Card py="$5" px="$4" w={'100%'} jc={'space-between'}>
           <YStack gap="$4">
             <XStack ai={'center'} gap={'$3'}>
@@ -46,11 +59,19 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
             </YStack>
           </YStack>
         </Card>
-        <HomeQuickActions>
-          {isStableCoin && <HomeQuickActions.Deposit />}
-          <HomeQuickActions.Send />
-          {!isStableCoin && <HomeQuickActions.Trade />}
-        </HomeQuickActions>
+        <XStack w={'100%'} gap={'$3'}>
+          {isStableCoin ? (
+            <>
+              <AddMoneyButton />
+              <WithdrawButton coin={coin} />
+            </>
+          ) : (
+            <>
+              <BuyButton coin={coin} />
+              <SellButton coin={coin} />
+            </>
+          )}
+        </XStack>
       </YStack>
       <YStack gap={'$3'}>
         <TokenActivity coin={coin} />
@@ -190,5 +211,182 @@ const TokenDetailsBalance = ({ coin }: { coin: CoinWithBalance }) => {
         </Paragraph>
       ) : null}
     </XStack>
+  )
+}
+
+const QuickActionButton = ({ href, children }: LinkableButtonProps) => {
+  const hoverStyles = useHoverStyles()
+
+  return (
+    <LinkableButton
+      elevation={5}
+      href={href}
+      f={1}
+      height={'auto'}
+      hoverStyle={hoverStyles}
+      focusStyle={hoverStyles}
+      w="100%"
+    >
+      {children}
+    </LinkableButton>
+  )
+}
+
+const BuyButton = ({ coin }: { coin: allCoins[number] }) => {
+  const media = useMedia()
+  const isSmallScreen = !media.gtXs
+
+  // Buy: USDC -> Token (inToken=USDC, outToken=selectedToken)
+  const getBuyUrl = () => {
+    return `/trade?inToken=${usdcCoin.token}&outToken=${coin.token}`
+  }
+
+  return (
+    <QuickActionButton href={getBuyUrl()}>
+      <YStack
+        testID={'buy-quick-action'}
+        gap="$2"
+        jc={'space-between'}
+        ai="center"
+        px={isSmallScreen ? '$3' : '$4'}
+        py="$3.5"
+        $gtSm={{ py: '$4' }}
+      >
+        <Theme name="green">
+          <Plus
+            size={'$1.5'}
+            $theme-dark={{ color: '$primary' }}
+            $theme-light={{ color: '$color12' }}
+          />
+        </Theme>
+        <ButtonText
+          fontSize={isSmallScreen ? '$4' : '$5'}
+          px="$1"
+          ta="center"
+          w="100%"
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          Buy
+        </ButtonText>
+      </YStack>
+    </QuickActionButton>
+  )
+}
+
+const SellButton = ({ coin }: { coin: allCoins[number] }) => {
+  const media = useMedia()
+  const isSmallScreen = !media.gtXs
+
+  // Sell: Token -> USDC (inToken=selectedToken, outToken=USDC)
+  const getSellUrl = () => {
+    return `/trade?inToken=${coin.token}&outToken=${usdcCoin.token}`
+  }
+
+  return (
+    <QuickActionButton href={getSellUrl()}>
+      <YStack
+        testID={'sell-quick-action'}
+        gap="$2"
+        jc={'space-between'}
+        ai="center"
+        px={isSmallScreen ? '$3' : '$4'}
+        py="$3.5"
+        $gtSm={{ py: '$4' }}
+      >
+        <Theme name="red">
+          <Minus
+            size={'$1.5'}
+            $theme-dark={{ color: '$primary' }}
+            $theme-light={{ color: '$color12' }}
+          />
+        </Theme>
+        <ButtonText
+          fontSize={isSmallScreen ? '$4' : '$5'}
+          px="$1"
+          ta="center"
+          w="100%"
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          Sell
+        </ButtonText>
+      </YStack>
+    </QuickActionButton>
+  )
+}
+
+const AddMoneyButton = () => {
+  const media = useMedia()
+  const isSmallScreen = !media.gtXs
+
+  return (
+    <QuickActionButton href={'/deposit'}>
+      <YStack
+        testID={'add-money-quick-action'}
+        gap="$2"
+        jc={'space-between'}
+        ai="center"
+        px={isSmallScreen ? '$3' : '$4'}
+        py="$3.5"
+        $gtSm={{ py: '$4' }}
+      >
+        <IconPlus
+          size={'$1.5'}
+          $theme-dark={{ color: '$primary' }}
+          $theme-light={{ color: '$color12' }}
+        />
+        <ButtonText
+          fontSize={isSmallScreen ? '$4' : '$5'}
+          px="$1"
+          ta="center"
+          w="100%"
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          Add Money
+        </ButtonText>
+      </YStack>
+    </QuickActionButton>
+  )
+}
+
+const WithdrawButton = ({ coin }: { coin: allCoins[number] }) => {
+  const media = useMedia()
+  const isSmallScreen = !media.gtXs
+
+  // Withdraw: Navigate to send page with the stable coin pre-selected
+  const getWithdrawUrl = () => {
+    return `/send?sendToken=${coin.token}`
+  }
+
+  return (
+    <QuickActionButton href={getWithdrawUrl()}>
+      <YStack
+        testID={'withdraw-quick-action'}
+        gap="$2"
+        jc={'space-between'}
+        ai="center"
+        px={isSmallScreen ? '$3' : '$4'}
+        py="$3.5"
+        $gtSm={{ py: '$4' }}
+      >
+        <IconArrowUp
+          size={'$1.5'}
+          $theme-dark={{ color: '$primary' }}
+          $theme-light={{ color: '$color12' }}
+        />
+        <ButtonText
+          fontSize={isSmallScreen ? '$4' : '$5'}
+          px="$1"
+          ta="center"
+          w="100%"
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          Withdraw
+        </ButtonText>
+      </YStack>
+    </QuickActionButton>
   )
 }
