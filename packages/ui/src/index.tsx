@@ -25,6 +25,7 @@ export * from './components/FormWrapper'
 export * from './components/LinkableAvatar'
 export * from './components/LinkableButton'
 export * from './components/SafeArea'
+export * from './components/BlurStack'
 
 export { RecyclerList } from './components/RecyclerList.web'
 export {
