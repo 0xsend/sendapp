@@ -45,7 +45,7 @@ export const RewardsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
         />
       </Card.Header>
       <Card.Footer padded pt={0} fd="column">
-        <Paragraph color={'$color12'} fontWeight={500} size={'$10'}>
+        <Paragraph color={'$color12'} fontWeight={600} size={'$9'}>
           {(() => {
             switch (true) {
               case isPriceHidden:
@@ -57,7 +57,6 @@ export const RewardsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
             }
           })()}
         </Paragraph>
-        <Paragraph color={'$color10'}>Complete Tasks for $SEND Back</Paragraph>
       </Card.Footer>
     </HomeBodyCard>
   )

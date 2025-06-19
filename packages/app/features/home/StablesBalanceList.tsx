@@ -10,6 +10,7 @@ import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { convertBalanceToFiat } from 'app/utils/convertBalanceToUSD'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { useIsPriceHidden } from 'app/features/home/utils/useIsPriceHidden'
+import { ChevronRight } from '@tamagui/lucide-icons'
 
 export const StablesBalanceList = () => {
   const { stableCoins, isLoading } = useCoins()
@@ -42,13 +43,6 @@ const TokenBalanceItem = ({
 }: {
   coin: CoinWithBalance
 } & Omit<LinkProps, 'children'>) => {
-  const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
-  const balanceInUSD = convertBalanceToFiat(
-    coin,
-    coin.symbol === 'USDC' ? 1 : tokenPrices?.[coin.token]
-  )
-  const { isPriceHidden } = useIsPriceHidden()
-
   return (
     <Link display="flex" {...props}>
       <XStack f={1} gap={'$3.5'} ai={'center'}>
@@ -58,37 +52,35 @@ const TokenBalanceItem = ({
             <Paragraph fontSize={'$6'} fontWeight={'500'} color={'$color12'}>
               {coin.shortLabel || coin.label}
             </Paragraph>
-            <TokenBalance coin={coin} />
           </XStack>
-          <XStack jc={'space-between'} ai={'center'}>
+          <XStack jc={'space-between'} ai={'center'} miw={0}>
             <Paragraph
               fontSize={'$5'}
               color={'$lightGrayTextField'}
               $theme-light={{ color: '$darkGrayTextField' }}
             >
-              {(() => {
-                switch (true) {
-                  case isLoadingTokenPrices || balanceInUSD === undefined:
-                    return '$0.00'
-                  case isPriceHidden:
-                    return '///////'
-                  default:
-                    return `$${formatAmount(balanceInUSD, 12, 2)}`
-                }
-              })()}
+              Base
             </Paragraph>
           </XStack>
         </YStack>
+        <XStack ai={'center'} gap="$2">
+          <TokenBalance coin={coin} />
+          <ChevronRight size={'$1'} color={'$color12'} />
+        </XStack>
       </XStack>
     </Link>
   )
 }
 
 const TokenBalance = ({
-  coin: { decimals, balance, formatDecimals },
+  coin,
 }: {
   coin: CoinWithBalance
 }) => {
+  const { balance, symbol } = coin
+  const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
+  const balanceInUSD = convertBalanceToFiat(coin, symbol === 'USDC' ? 1 : tokenPrices?.[coin.token])
+
   const { isPriceHidden } = useIsPriceHidden()
 
   if (balance === undefined) return <></>
@@ -99,9 +91,16 @@ const TokenBalance = ({
       col="$color12"
       $gtSm={{ fontSize: '$8', fontWeight: '600' }}
     >
-      {isPriceHidden
-        ? '//////'
-        : formatAmount((Number(balance) / 10 ** decimals).toString(), 10, formatDecimals ?? 5)}
+      {(() => {
+        switch (true) {
+          case isLoadingTokenPrices || balanceInUSD === undefined:
+            return '$0.00'
+          case isPriceHidden:
+            return '///////'
+          default:
+            return `$${formatAmount(balanceInUSD, 12, 2)}`
+        }
+      })()}
     </Paragraph>
   )
 }
