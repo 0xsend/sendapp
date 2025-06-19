@@ -3,38 +3,40 @@ import formatAmount from 'app/utils/formatAmount'
 
 import { ChevronRight } from '@tamagui/lucide-icons'
 import { useMemo } from 'react'
-import { useSendEarnBalances, useVaultConvertSharesToAssets } from '../earn/hooks'
+import { useSendEarnAPY } from '../earn/hooks'
+import { useSendEarnCoin } from '../earn/providers/SendEarnProvider'
 import { useIsPriceHidden } from './utils/useIsPriceHidden'
 import { formatUnits } from 'viem'
 import { type LinkProps, useLink } from 'solito/link'
 import { HomeBodyCard } from './screen'
+import { usdcCoin } from 'app/data/coins'
 
 export const SavingsBalanceCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'children'>) => {
   const linkProps = useLink({ href })
   const { isPriceHidden } = useIsPriceHidden()
-  const { data: balances, isLoading } = useSendEarnBalances()
-  // Extract vaults and shares from balances for conversion
-  const vaults =
-    balances
-      ?.filter((balance) => balance.shares > 0n && balance.log_addr !== null)
-      .map((balance) => balance.log_addr) || []
 
-  const shares =
-    balances
-      ?.filter((balance) => balance.shares > 0n && balance.log_addr !== null)
-      .map((balance) => balance.shares) || []
+  // Use the SendEarnProvider pattern
+  const { coinBalances, getTotalAssets } = useSendEarnCoin(usdcCoin)
+  const { totalCurrentValue, vaults } = getTotalAssets()
 
-  // Use the hook to get current asset values based on onchain rate
-  const currentAssets = useVaultConvertSharesToAssets({ vaults, shares })
+  const hasExistingDeposit = totalCurrentValue > 0n
 
-  const totalAssets = useMemo(
-    () => formatUSDCValue(currentAssets.data?.reduce((sum, assets) => sum + assets, 0n) ?? 0n),
-    [currentAssets.data]
-  )
+  // Only fetch APY if user has existing deposits
+  const { data: apyData, isLoading: isApyLoading } = useSendEarnAPY({
+    vault: hasExistingDeposit && vaults?.[0] ? vaults[0] : undefined,
+  })
+
+  const totalAssets = useMemo(() => {
+    if (!hasExistingDeposit) return formatUSDCValue(0n)
+    return formatUSDCValue(totalCurrentValue)
+  }, [hasExistingDeposit, totalCurrentValue])
+
+  // Single loader for both values
+  const isLoading = coinBalances.isLoading || (hasExistingDeposit && isApyLoading)
 
   return (
     <HomeBodyCard {...linkProps} {...props}>
-      <Card.Header padded pb={0} fd="row" ai="center" jc="space-between">
+      <Card.Header padded pb="$4" jc="space-between" fd="row">
         <Paragraph fontSize={'$5'} fontWeight="400">
           Save
         </Paragraph>
@@ -45,20 +47,21 @@ export const SavingsBalanceCard = ({ href, ...props }: Omit<CardProps & LinkProp
           $theme-light={{ color: '$darkGrayTextField' }}
         />
       </Card.Header>
-      <Card.Footer padded pt={0} fd="column">
-        <Paragraph color={'$color12'} fontWeight={500} size={'$10'}>
-          {(() => {
-            switch (true) {
-              case isPriceHidden:
-                return '///////'
-              case isLoading || !balances:
-                return <Spinner size={'large'} color={'$color12'} />
-              default:
-                return `$${totalAssets}`
-            }
-          })()}
-        </Paragraph>
-        <Paragraph color={'$color10'}>Up to 12% Interest</Paragraph>
+      <Card.Footer padded size="$4" pt={0} fd="column" gap="$4">
+        {isLoading ? (
+          <Spinner size={'large'} color={'$color12'} />
+        ) : (
+          <>
+            <Paragraph color={'$color12'} fontWeight={600} size={'$9'}>
+              {isPriceHidden ? '///////' : `$${totalAssets}`}
+            </Paragraph>
+            <Paragraph color={'$color10'}>
+              {hasExistingDeposit
+                ? `Earning ${apyData?.baseApy.toFixed(2)}%`
+                : 'Up to 12% Interest'}
+            </Paragraph>
+          </>
+        )}
       </Card.Footer>
     </HomeBodyCard>
   )
