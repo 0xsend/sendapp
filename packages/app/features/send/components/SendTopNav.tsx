@@ -9,7 +9,7 @@ import {
   XStack,
   type ButtonProps,
 } from '@my/ui'
-import { IconArrowLeft } from 'app/components/icons'
+import { IconArrowLeft, IconSendLogo } from 'app/components/icons'
 import { useSendScreenParams } from 'app/routers/params'
 import { usePathname } from 'app/utils/usePathname'
 import { useRouter } from 'solito/router'
@@ -31,7 +31,7 @@ export function SendTopNav() {
   const isOnSelectRecipient = !(path.includes('/confirm') || sendParams.recipient)
 
   return (
-    <Header w="100%" $lg={{ py: '$3' }}>
+    <Header w="100%" $lg={{ py: '$3.5' }}>
       <Container
         $gtLg={{ jc: 'flex-start', pb: '$2', ai: 'flex-start' }}
         ai="center"
@@ -51,7 +51,7 @@ export function SendTopNav() {
               </ButtonOg.Icon>
             </Button>
           )}
-          <Paragraph size={isOnSelectRecipient ? '$9' : '$8'} col={'$color10'}>
+          <Paragraph fontWeight={'500'} size={isOnSelectRecipient ? '$9' : '$8'} col={'$color12'}>
             {(() => {
               switch (true) {
                 case path.includes('/confirm'):
@@ -59,7 +59,7 @@ export function SendTopNav() {
                 case Boolean(sendParams.recipient):
                   return 'Enter Amount'
                 default:
-                  return 'Send'
+                  return <IconSendLogo size={'$2.5'} color={'$color12'} />
               }
             })()}
           </Paragraph>
@@ -71,14 +71,12 @@ export function SendTopNav() {
         </XStack>
         <Stack $lg={{ display: 'none' }} jc="center">
           <H2
-            fontWeight={'300'}
-            $theme-light={{ col: '$gray10Light' }}
-            $theme-dark={{ col: '$gray8Light' }}
+            fontWeight={'500'}
+            col="$color12"
             lineHeight={32}
             display={'flex'}
             $lg={{ als: 'flex-end' }}
           >
-            {' '}
             {(() => {
               switch (true) {
                 case path.includes('/confirm'):

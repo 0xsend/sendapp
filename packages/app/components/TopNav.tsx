@@ -105,7 +105,7 @@ export function TopNav({
           switch (true) {
             case media.gtLg && isSubRoute:
               return (
-                <H2 fontWeight={'300'} col="$color10" lineHeight={32} als={'center'}>
+                <H2 fontWeight={'500'} col="$color12" lineHeight={32} als={'center'}>
                   {header}
                 </H2>
               )
@@ -123,7 +123,7 @@ export function TopNav({
                       />
                     </ButtonOg.Icon>
                   </Button>
-                  <Paragraph size={'$8'} col={'$color10'}>
+                  <Paragraph size={'$8'} col={'$color12'} fontWeight={'500'}>
                     {(() => {
                       switch (queryParams.token) {
                         case 'investments':
@@ -147,7 +147,7 @@ export function TopNav({
                       </Link>
                     </XStack>
                   ) : (
-                    <H2 fontWeight={'300'} col="$color10" lineHeight={32} als={'center'}>
+                    <H2 fontWeight={'500'} col="$color12" lineHeight={32} als={'center'}>
                       {header}
                     </H2>
                   )}
@@ -197,7 +197,7 @@ export function TopNav({
                       />
                     </ButtonOg.Icon>
                   </Button>
-                  <Paragraph size={'$8'} col={'$color10'}>
+                  <Paragraph size={'$8'} col={'$color12'} fontWeight={'500'}>
                     {header}
                   </Paragraph>
                 </XStack>
@@ -215,7 +215,7 @@ export function TopNav({
             py="$3"
             $gtSm={{ py: '$6' }}
             $gtLg={{ pl: '$1', pb: '$6', pt: '$0' }}
-            col="$color10"
+            col="$color12"
           >
             {subheader}
           </Paragraph>
