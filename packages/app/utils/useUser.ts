@@ -51,7 +51,7 @@ export const useUser = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('*, tags(*), main_tag(*)')
+        .select('*, tags(*), main_tag(*), links_in_bio(*)')
         .eq('id', user?.id ?? '')
         .single()
 
@@ -94,6 +94,7 @@ export const useUser = () => {
     avatarUrl,
     tags: profile?.tags,
     mainTag: profile?.main_tag,
+    linksInBio: profile?.links_in_bio || [],
     updateProfile: refetch,
     isLoadingSession,
     isLoadingProfile,

@@ -15,9 +15,8 @@ import { IconBirthday, IconXLogo } from 'app/components/icons'
 import { adjustUTCDateForTimezone } from 'app/utils/dateHelper'
 import { useFriendsFeed } from 'app/features/affiliate/utils/useFriendsFeed'
 import { ReferralLink } from 'app/components/ReferralLink'
-import { Linking, Pressable } from 'react-native'
 import { RecyclerListView } from 'recyclerlistview'
-import { useLink } from 'solito/link'
+import { Link, useLink } from 'solito/link'
 
 type Referral = Functions<'get_friends'>[number]
 
@@ -127,11 +126,9 @@ const FriendMobileRow = ({ referral }: { referral: Referral }) => {
             </XStack>
           </YStack>
         </XStack>
-        {referral.x_username && (
-          <Pressable onPress={() => Linking.openURL(`https://x.com/${referral.x_username}`)}>
-            <IconXLogo size={'$1'} color={'$primary'} $theme-light={{ color: '$color12' }} />
-          </Pressable>
-        )}
+        <Link href={`/${referral.tag}`}>
+          <IconXLogo size={'$1'} color={'$primary'} $theme-light={{ color: '$color12' }} />
+        </Link>
       </XStack>
     </Card>
   )

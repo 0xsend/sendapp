@@ -12,6 +12,7 @@ import {
   IconQuestionCircle,
   IconSlash,
   IconStarOutline,
+  IconXLogo,
 } from 'app/components/icons'
 import { RowLabel } from 'app/components/layout/RowLabel'
 
@@ -41,6 +42,11 @@ const ACCOUNT_LINKS: {
       text: 'Personal Information',
       href: '/account/personal-info',
       icon: <IconIdCard {...iconProps} />,
+    },
+    {
+      text: 'Link In Bio',
+      href: '/account/link-in-bio',
+      icon: <IconXLogo {...iconProps} />,
     },
     {
       text: 'Passkeys',
