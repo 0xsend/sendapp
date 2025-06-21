@@ -58,7 +58,7 @@ export const SavingsBalanceCard = ({ href, ...props }: Omit<CardProps & LinkProp
             <Paragraph color={'$color10'}>
               {hasExistingDeposit
                 ? `Earning ${apyData?.baseApy.toFixed(2)}%`
-                : 'Up to 12% Interest'}
+                : 'Up to 10% Interest'}
             </Paragraph>
           </>
         )}

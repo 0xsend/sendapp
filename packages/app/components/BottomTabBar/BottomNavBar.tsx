@@ -14,12 +14,12 @@ const TABS = [
     href: '/send',
   },
   {
-    Icon: IconWorldSearch,
-    href: '/explore',
-  },
-  {
     Icon: IconDeviceReset,
     href: '/activity',
+  },
+  {
+    Icon: IconWorldSearch,
+    href: '/explore',
   },
 ]
 
@@ -84,7 +84,7 @@ export const BottomNavBar = () => {
                 <Button.Icon>
                   <tab.Icon
                     size={'$1.5'}
-                    color={isActiveRoute ? '$primary' : '$silverChalice'}
+                    color={isActiveRoute ? '$color12' : '$silverChalice'}
                     $theme-light={{ color: isActiveRoute ? '$color12' : '$darkGrayTextField' }}
                   />
                 </Button.Icon>

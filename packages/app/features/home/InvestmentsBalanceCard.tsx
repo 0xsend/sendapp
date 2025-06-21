@@ -207,9 +207,7 @@ function InvestmentsAggregate() {
   if (tokenIds.length === 0)
     return (
       <XStack gap="$2" ai="center">
-        <Paragraph color="$color10" $gtXs={{ fontSize: 14 }} fontSize={12}>
-          Diversify Your Portfolio
-        </Paragraph>
+        <Paragraph color="$color10">Diversify Your Portfolio</Paragraph>
       </XStack>
     )
 

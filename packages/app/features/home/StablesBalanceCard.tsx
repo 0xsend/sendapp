@@ -29,7 +29,7 @@ const StablesBalanceCardHeader = () => {
   const isStablesScreen = queryParams.token === 'stables'
 
   return (
-    <Card.Header padded pb="$0" jc="space-between" fd="row">
+    <Card.Header padded size="$4" pb={0} jc="space-between" fd="row">
       <Paragraph fontSize={'$6'} fontWeight={300} color={'$color12'} $gtLg={{ fontSize: '$6' }}>
         Cash Balance
       </Paragraph>
