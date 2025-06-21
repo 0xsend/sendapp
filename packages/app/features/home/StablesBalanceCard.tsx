@@ -107,10 +107,9 @@ const StablesBalanceCardFooter = () => {
             )
         }
       })()}
-      <XStack gap="$3" w="100%">
+      <XStack gap="$2.5" w="100%">
         <LinkableButton
           href="/deposit"
-          gap="$0.5"
           jc="center"
           ai="center"
           f={1}
@@ -119,16 +118,17 @@ const StablesBalanceCardFooter = () => {
           hoverStyle={hoverStyles}
           bc={isDarkTheme ? 'rgba(255, 255, 255, 0.10)' : 'rgba(0, 0, 0, 0.10)'}
         >
-          <LinkableButton.Icon>
-            <IconPlus size="$1" color={isDarkTheme ? '$primary' : '$color12'} />
-          </LinkableButton.Icon>
-          <LinkableButton.Text size={'$5'}>Add Money</LinkableButton.Text>
+          <XStack gap="$1.5" ai="center">
+            <LinkableButton.Icon>
+              <IconPlus size="$1" color={isDarkTheme ? '$primary' : '$color12'} />
+            </LinkableButton.Icon>
+            <LinkableButton.Text size={'$5'}>Add Money</LinkableButton.Text>
+          </XStack>
           <BlurStack fullscreen intensity={10} zIndex={-1} br={'$3'} />
         </LinkableButton>
         {shouldShowSendButton && (
           <LinkableButton
             href={`/send?sendToken=${queryParams.token ?? ''}`}
-            gap="$0.5"
             jc="center"
             ai="center"
             f={1}
@@ -137,10 +137,12 @@ const StablesBalanceCardFooter = () => {
             hoverStyle={hoverStyles}
             bc={isDarkTheme ? 'rgba(255, 255, 255, 0.10)' : 'rgba(0, 0, 0, 0.10)'}
           >
-            <LinkableButton.Icon>
-              <IconArrowUp size={'$1'} color={isDarkTheme ? '$primary' : '$color12'} />
-            </LinkableButton.Icon>
-            <LinkableButton.Text size={'$5'}>Send</LinkableButton.Text>
+            <XStack gap="$1.5" ai="center">
+              <LinkableButton.Icon>
+                <IconArrowUp size={'$1'} color={isDarkTheme ? '$primary' : '$color12'} />
+              </LinkableButton.Icon>
+              <LinkableButton.Text size={'$5'}>Send</LinkableButton.Text>
+            </XStack>
             <BlurStack fullscreen intensity={10} zIndex={-1} br={'$3'} />
           </LinkableButton>
         )}

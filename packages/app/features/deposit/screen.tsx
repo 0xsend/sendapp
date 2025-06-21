@@ -1,4 +1,4 @@
-import { Paragraph, YStack } from '@my/ui'
+import { YStack } from '@my/ui'
 import { DepositOptionButton } from './components/DepositOptionButton'
 import { IconApple, IconDebitCard, IconWallet } from 'app/components/icons'
 
@@ -13,18 +13,6 @@ export function DepositScreen() {
         pb: '$3.5',
       }}
     >
-      <YStack gap={'$2'}>
-        <Paragraph size={'$9'} fontWeight={500}>
-          Deposit Funds
-        </Paragraph>
-        <Paragraph
-          fontSize={'$5'}
-          color={'$lightGrayTextField'}
-          $theme-light={{ color: '$darkGrayTextField' }}
-        >
-          Select a deposit method
-        </Paragraph>
-      </YStack>
       <YStack
         width="100%"
         gap="$3.5"
