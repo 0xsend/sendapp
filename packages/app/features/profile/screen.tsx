@@ -1,28 +1,37 @@
-import { Fade, Paragraph, Spinner, Stack, Text, XStack, YStack } from '@my/ui'
-import { useProfileLookup } from 'app/utils/useProfileLookup'
-import { useUser } from 'app/utils/useUser'
-import { AvatarProfile, type AvatarProfileProps } from './AvatarProfile'
-import { useInterUserActivityFeed } from './utils/useInterUserActivityFeed'
-import type { Activity } from 'app/utils/zod/activity'
-import { amountFromActivity } from 'app/utils/activity'
-import { useProfileScreenParams, useRootScreenParams } from 'app/routers/params'
-import { IconArrowRight } from 'app/components/icons'
-import { SendButton } from './ProfileButtons'
-import { ProfileHeader } from 'app/features/profile/components/ProfileHeader'
-import { FlatList } from 'react-native'
-import { ProfilesDetailsModal } from 'app/features/profile/components/ProfileDetailsModal'
-import { useState } from 'react'
-import { ActivityDetails } from 'app/features/activity/ActivityDetails'
+// External libs & UI
+import { ChevronLeft, ChevronRight, Upload } from '@tamagui/lucide-icons'
+import { Link } from 'solito/link'
+import { useRouter } from 'solito/router'
 import {
-  isTemporalEthTransfersEvent,
-  isTemporalTokenTransfersEvent,
-} from 'app/utils/zod/activity/TemporalTransfersEventSchema'
+  Avatar,
+  Button,
+  Card,
+  H2,
+  Image,
+  Paragraph,
+  Spinner,
+  Stack,
+  Text,
+  useTheme,
+  XStack,
+  YStack,
+} from '@my/ui'
+
+// Internal
+import { GradientOverlay } from 'app/components/GradientOverlay'
+import { useProfileLookup } from 'app/utils/useProfileLookup'
+import { useProfileScreenParams, useRootScreenParams } from 'app/routers/params'
+import { useUser } from 'app/utils/useUser'
+import { IconAccount, IconXLogo } from 'app/components/icons'
 
 interface ProfileScreenProps {
   sendid?: number | null
 }
 
+// No utility function needed as we'll use solito/link directly
+
 export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
+  const router = useRouter()
   const [{ sendid: paramSendid }] = useProfileScreenParams()
   const otherUserId = propSendid || Number(paramSendid)
   const {
@@ -30,23 +39,24 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
     isLoading,
     error,
   } = useProfileLookup('sendid', otherUserId?.toString() || '')
-  const { user, profile: currentUserProfile } = useUser()
+  const { user } = useUser()
   const [{ profile: profileParam }] = useRootScreenParams()
-  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
+  const theme = useTheme()
 
-  const {
-    data,
-    isLoading: isLoadingActivities,
-    error: activitiesError,
-    isFetchingNextPage: isFetchingNextPageActivities,
-    fetchNextPage,
-  } = useInterUserActivityFeed({
-    pageSize: 10,
-    otherUserId,
-    currentUserId: currentUserProfile?.send_id,
-  })
-  const { pages } = data ?? {}
-  const activities = pages?.flat() || []
+  const twitterUrl = otherUserProfile?.x_username
+    ? `https://x.com/${otherUserProfile?.x_username}`
+    : null
+
+  // No need for mock data, we'll use actual data directly
+
+  const goBack = (): void => {
+    router.back()
+  }
+
+  const openShareMenu = (): void => {
+    // Implement share functionality
+    console.log('Share profile')
+  }
 
   if (isLoading) {
     return (
@@ -66,231 +76,162 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
     )
   }
 
+  // Use actual data or fallback values for profile
   return (
-    <XStack w={'100%'} gap={'$4'} height={'100%'}>
-      <YStack
-        f={1}
-        height={'100%'}
-        gap={'$2'}
-        display={profileParam || selectedActivity ? 'none' : 'flex'}
-        overflow={'hidden'}
-        $gtLg={{
-          display: 'flex',
-          maxWidth: '50%',
-        }}
-      >
-        {activitiesError !== null && (
-          <YStack f={1}>
-            <Paragraph
-              maxWidth={600}
-              fontFamily={'$mono'}
-              fontSize={'$5'}
-              theme={'red'}
-              color={'$color8'}
-              mt={'$4'}
-              ta={'center'}
-            >
-              {activitiesError?.message.split('.').at(0) ?? `${activitiesError}`}
-            </Paragraph>
-          </YStack>
-        )}
-
-        {Boolean(otherUserProfile) && (
-          <>
-            <ProfileHeader profile={otherUserProfile} />
-            <Stack f={1} $gtLg={{ pb: '$3.5' }}>
-              {Boolean(!activities?.length) && (
-                <YStack f={1}>
-                  <Paragraph
-                    size={'$8'}
-                    fontWeight={'300'}
-                    color={'$color10'}
-                    textAlign={'center'}
-                    pt={'$1.5'}
-                  >
-                    No Activities
-                  </Paragraph>
-                </YStack>
-              )}
-              <FlatList
-                style={{ flex: 1 }}
-                data={activities}
-                keyExtractor={(activity) =>
-                  `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`
-                }
-                renderItem={({ item: activity, index }) => {
-                  const date = activity.created_at.toLocaleDateString()
-                  const nextDate = activities[index + 1]?.created_at.toLocaleDateString()
-                  const shouldShowDatePill = !nextDate || date !== nextDate
-
-                  return (
-                    <>
-                      <Fade>
-                        <TransactionEntry
-                          activity={activity}
-                          sent={activity?.to_user?.id !== user?.id}
-                          otherUserProfile={otherUserProfile}
-                          currentUserProfile={currentUserProfile}
-                          onPress={() => setSelectedActivity(activity)}
-                        />
-                      </Fade>
-                      {shouldShowDatePill ? <DatePill date={date} /> : null}
-                    </>
-                  )
-                }}
-                onEndReached={() => fetchNextPage()}
-                ListEmptyComponent={
-                  !isLoadingActivities && isFetchingNextPageActivities ? (
-                    <Spinner size="small" color={'$color12'} my={'$4'} />
-                  ) : null
-                }
-                ListHeaderComponent={
-                  <SendButton
-                    identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
-                    idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
-                  />
-                }
-                inverted={true}
-                showsVerticalScrollIndicator={false}
-                stickyHeaderIndices={[0]}
-              />
-            </Stack>
-          </>
-        )}
-      </YStack>
-      {selectedActivity ? (
-        <ActivityDetails
-          activity={selectedActivity}
-          onClose={() => setSelectedActivity(null)}
-          w={'100%'}
-          $gtLg={{
-            maxWidth: '47%',
-          }}
+    <YStack f={1} bg="$color1" w="100%" position="relative">
+      {/* Profile Header Image with Gradient Overlay */}
+      <YStack w="100%" h={428} position="relative">
+        {/* <Avatar
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          width="100%"
+          height="100%"
+          borderRadius={0}
+          overflow="hidden"
+        >
+          <Avatar.Image
+            position="absolute"
+            top={0}
+            left={0}
+            right={0}
+            bottom={0}
+            objectFit="cover"
+            src={otherUserProfile?.avatar_url ?? undefined}
+          />
+          <Avatar.Fallback backgroundColor="$color3" justifyContent="center" alignItems="center">
+            <IconAccount color="$olive" />
+          </Avatar.Fallback>
+        </Avatar> */}
+        <Image src={otherUserProfile?.avatar_url ?? undefined} w="100%" h="100%" />
+        <GradientOverlay
+          colors={['transparent', 'rgba(0, 0, 0, 0.7)']}
+          height="100%"
+          position="absolute"
+          bottom={0}
+          left={0}
+          right={0}
+          zIndex={1}
         />
-      ) : (
-        <ProfilesDetailsModal />
-      )}
-    </XStack>
-  )
-}
-
-const TransactionEntry = ({
-  activity,
-  sent,
-  otherUserProfile,
-  currentUserProfile,
-  onPress,
-}: {
-  activity: Activity
-  sent: boolean
-  otherUserProfile?: AvatarProfileProps
-  currentUserProfile?: AvatarProfileProps
-  onPress: () => void
-}) => {
-  const {
-    data: { note },
-  } = activity
-  const amount = amountFromActivity(activity)
-  const date = useTransactionEntryDate({ activity, sent })
-
-  return (
-    <XStack justifyContent={sent ? 'flex-end' : 'flex-start'} testID="activityTest" my={'$2.5'}>
-      <YStack gap={'$1'}>
         <YStack
-          bg={'$color1'}
-          p={'$4'}
-          br={'$4'}
-          maxWidth={300}
-          gap={'$3'}
-          ai={sent ? 'flex-end' : 'flex-start'}
-          onPress={onPress}
-          cursor={'pointer'}
+          position="absolute"
+          bottom={0}
+          left={0}
+          right={0}
+          paddingHorizontal="$4"
+          paddingBottom="$4"
+          gap="$4"
+          zIndex={2}
         >
-          <XStack
-            gap={'$3'}
-            ai={'center'}
-            fd={sent ? 'row-reverse' : 'row'}
-            style={{ width: 'max-content' }}
-            alignSelf={sent ? 'flex-end' : 'flex-start'}
-          >
-            <AvatarProfile
-              profile={sent ? currentUserProfile : otherUserProfile}
-              mx={0}
-              size="$5"
-            />
-            <YStack>
-              <XStack gap={'$2'} ai={'center'} fd={sent ? 'row-reverse' : 'row'}>
-                {!sent && <IconArrowRight size={'$0.9'} rotate={'90deg'} color={'$olive'} />}
-                <Paragraph size={'$3'} color={'$color8'} theme={sent ? 'red' : 'green'}>
-                  You {sent ? 'Sent' : 'Received'}
-                </Paragraph>
-                {sent && <IconArrowRight size={'$0.9'} rotate={'-90deg'} color={'$red10Dark'} />}
-              </XStack>
-              <Paragraph size={'$7'}>{amount}</Paragraph>
-            </YStack>
+          <XStack gap="$2" alignItems="center">
+            <H2 color="$white">{otherUserProfile?.name}</H2>
           </XStack>
-          {note && (
-            <Paragraph
-              fontSize={17}
-              color={'$silverChalice'}
-              w={'100%'}
-              whiteSpace={'pre-wrap'}
-              $theme-light={{
-                color: '$darkGrayTextField',
-              }}
-            >
-              {decodeURIComponent(note)}
+
+          <XStack
+            paddingHorizontal="$2"
+            paddingVertical="$1"
+            bg={'$color10'} // Matches image
+            borderRadius="$2"
+            alignSelf="flex-start" // Ensure it doesn't stretch full width
+          >
+            <Paragraph color="$white" fontSize="$2" fontWeight="400">
+              /{otherUserProfile?.main_tag_name}
             </Paragraph>
-          )}
+          </XStack>
+
+          <Paragraph color="$white" fontSize="$4" fontWeight="400">
+            {otherUserProfile?.about}
+          </Paragraph>
         </YStack>
-        <Paragraph
-          size={'$2'}
-          ta={sent ? 'right' : 'left'}
-          color={'$color4'}
-          $theme-light={{ color: '$silverChalice' }}
-        >
-          {date}
-        </Paragraph>
       </YStack>
-    </XStack>
+
+      {/* Top navigation bar with back button and share */}
+      <YStack
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        paddingTop="$4" // Reduced from $4 to $2 for better top alignment
+        paddingHorizontal="$4"
+        zIndex={3} // Ensure buttons are above everything
+      >
+        <XStack justifyContent="space-between" alignItems="center">
+          <Button
+            size="$3"
+            p="$2"
+            circular
+            bg="rgba(255, 255, 255, 0.1)"
+            backdropFilter="blur(52px)"
+            onPress={goBack}
+            icon={<ChevronLeft size="$6" color="$primary" />}
+          />
+          <Button
+            size="$3"
+            circular
+            p="$2"
+            bg="rgba(255, 255, 255, 0.1)"
+            backdropFilter="blur(52px)"
+            onPress={openShareMenu}
+            icon={<Upload size="$4" color="$white" />}
+          />
+        </XStack>
+      </YStack>
+
+      {/* Content Below Header Image (Send Button, Social Links) */}
+      <YStack paddingHorizontal="$4" paddingTop="$6" gap="$6" pb="$12">
+        {/* Send Button */}
+        <Button theme="green" height={48} borderRadius="$2" justifyContent="center">
+          <Button.Text
+            color="$color1"
+            fontSize="$4"
+            fontFamily="$mono"
+            fontWeight="500"
+            textTransform="uppercase"
+            textAlign="center"
+          >
+            SEND
+          </Button.Text>
+        </Button>
+
+        <YStack gap="$6">
+          <Paragraph color="$color12" fontSize="$6" fontWeight="600">
+            Let's Connect
+          </Paragraph>
+
+          <Card padding="$6" borderRadius="$4" gap="$6" bc="$color0">
+            <Link key={otherUserProfile?.id} href={twitterUrl ?? ''} target="_blank">
+              <Button
+                chromeless
+                width="100%"
+                pressStyle={{ opacity: 0.7 }}
+                hoverStyle={{ opacity: 0.8 }}
+                animation="quick"
+              >
+                <XStack justifyContent="space-between" alignItems="center" width="100%">
+                  <XStack gap="$4" alignItems="center">
+                    <IconXLogo
+                      size={'$2'}
+                      $theme-dark={{ color: '$primary' }}
+                      $theme-light={{ color: '$color12' }}
+                    />
+                  </XStack>
+                  <XStack
+                    p="$1"
+                    bg="rgba(255, 255, 255, 0.10)"
+                    borderRadius="$2"
+                    justifyContent="center"
+                    alignItems="center"
+                  >
+                    <ChevronRight size="$1.5" color="$white" />
+                  </XStack>
+                </XStack>
+              </Button>
+            </Link>
+          </Card>
+        </YStack>
+      </YStack>
+    </YStack>
   )
-}
-
-const DatePill = ({ date }: { date: string }) => {
-  return (
-    <Paragraph
-      ff={'$mono'}
-      textAlign={'center'}
-      size={'$4'}
-      py={'$0.25'}
-      bc={'$background'}
-      color={'$color10'}
-      px={'$0.9'}
-      br={'$2'}
-    >
-      {date}
-    </Paragraph>
-  )
-}
-
-const useTransactionEntryDate = ({ activity, sent }: { activity: Activity; sent: boolean }) => {
-  const { created_at, data } = activity
-  const isTemporalTransfer =
-    isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
-
-  if (isTemporalTransfer) {
-    switch (data.status) {
-      case 'failed':
-      case 'cancelled':
-        return 'Failed'
-      case 'confirmed':
-        return new Date(created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
-      default:
-        return (
-          <Spinner size="small" color={'$color11'} alignItems={sent ? 'flex-end' : 'flex-start'} />
-        )
-    }
-  }
-
-  return new Date(created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
 }

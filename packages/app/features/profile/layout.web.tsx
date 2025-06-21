@@ -1,20 +1,25 @@
-import { Container, ScrollView, type ScrollViewProps, YStack, PendingIndicatorBar } from '@my/ui'
+import type { ReactNode } from 'react'
+import { ScrollView, type ScrollViewProps, PendingIndicatorBar } from '@my/ui'
 import { HomeSideBarWrapper } from 'app/components/sidebar/HomeSideBar'
 import { TagSearchProvider } from 'app/provider/tag-search'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
-import { BOTTOM_NAV_BAR_HEIGHT } from 'app/components/BottomTabBar/BottomNavBar'
 import { BottomNavBarWrapper } from 'app/components/BottomTabBar/BottomNavBarWrapper'
 import { useRouteChange } from 'app/routers/useRouteChange.web'
 
-export function HomeLayout({
+/**
+ * Profile Layout Component
+ *
+ * Specialized layout for profile pages without TopNav
+ * Has bottom navigation, sidebar and proper scrolling support
+ */
+export function ProfileLayout({
   children,
-  TopNav,
   fullHeight,
   ...props
 }: {
-  children: React.ReactNode
-  TopNav?: React.ReactNode
-} & ScrollViewProps & { fullHeight?: boolean }) {
+  children: ReactNode
+  fullHeight?: boolean
+} & ScrollViewProps) {
   const { onScroll, onContentSizeChange, ref } = useScrollDirection()
   const isPending = useRouteChange()
 
@@ -36,26 +41,7 @@ export function HomeLayout({
             showsVerticalScrollIndicator={false}
             {...props}
           >
-            <YStack gap="$3" $gtLg={{ pt: 80 }} w={'100%'}>
-              {TopNav}
-            </YStack>
-
-            <Container
-              safeAreaProps={{
-                style: { flex: 1 },
-                edges: {
-                  top: 'off',
-                  bottom: 'maximum',
-                  left: 'additive',
-                  right: 'additive',
-                },
-              }}
-              pb={BOTTOM_NAV_BAR_HEIGHT}
-              $gtLg={{ pt: '$5', pb: '$0' }}
-              height={fullHeight ? '100%' : 'auto'}
-            >
-              {children}
-            </Container>
+            {children}s
           </ScrollView>
         </TagSearchProvider>
       </BottomNavBarWrapper>
