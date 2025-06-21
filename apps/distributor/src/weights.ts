@@ -141,7 +141,7 @@ function calculateCubicBezierWeight(balance: bigint, totalBalance: bigint): bigi
   // p2 should be below 80% (like 70%) to reduce weight of top 20%
   // p3 stays at PERC_DENOM
   const p0 = 0n
-  const p1 = (PERC_DENOM * 10n) / 100n // Below 20% to reduce bottom weights
+  const p1 = (PERC_DENOM * 7n) / 100n // reduce bottom 7% weights
   const p2 = (PERC_DENOM * 70n) / 100n // Below 80% to reduce top weights
   const p3 = PERC_DENOM
 
