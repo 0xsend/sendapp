@@ -1,6 +1,6 @@
 import type { Functions } from '@my/supabase/database.types'
 import { Button, Fade, Image, LinearGradient, Paragraph, XStack, YStack } from '@my/ui'
-import { IconX, IconXLogo } from 'app/components/icons'
+import { IconX, IconLinkInBio } from 'app/components/icons'
 import { Platform } from 'react-native'
 
 export const ProfileAboutTile = ({
@@ -10,9 +10,9 @@ export const ProfileAboutTile = ({
   profile: Functions<'profile_lookup'>[number]
   onClose: () => void
 }) => {
-  const handleOnXRedirect = () => {
-    const twitterUrl = `https://x.com/${profile.x_username}`
-    window.open(twitterUrl, '_blank', 'noopener,noreferrer')
+  const handleLinkInBioRedirect = (link: { domain: string; handle: string }) => {
+    const url = `https://${link.domain}${link.handle}`
+    window.open(url, '_blank', 'noopener,noreferrer')
   }
 
   return (
@@ -109,26 +109,47 @@ export const ProfileAboutTile = ({
           </YStack>
           <Paragraph>{profile.about}</Paragraph>
         </YStack>
-        {profile.x_username && (
-          <XStack
-            ai="center"
-            jc="center"
-            bg={'$color1'}
-            borderRadius={'$6'}
-            padding={'$5'}
-            w={'100%'}
-            gap={'$2'}
-            cursor={'pointer'}
-            onPress={handleOnXRedirect}
-            elevation={'$0.75'}
-          >
-            <IconXLogo
-              size={'$1'}
-              $theme-dark={{ color: '$primary' }}
-              $theme-light={{ color: '$color12' }}
-            />
-            <Paragraph size={'$5'}>{profile.x_username}</Paragraph>
-          </XStack>
+        {Array.isArray(profile.links_in_bio) && profile.links_in_bio.length > 0 && (
+          <YStack bg={'$color1'} borderRadius={'$6'} padding={'$5'} gap={'$4'} elevation={'$0.75'}>
+            <Paragraph size={'$6'} fontWeight="600">
+              Links
+            </Paragraph>
+            <YStack gap="$3">
+              {profile.links_in_bio.map(({ domain, handle, domain_name }) => (
+                <XStack
+                  key={domain_name}
+                  ai="center"
+                  jc="space-between"
+                  bg={'$color2'}
+                  borderRadius={'$4'}
+                  padding={'$4'}
+                  w={'100%'}
+                  gap={'$3'}
+                  cursor={'pointer'}
+                  onPress={() =>
+                    handleLinkInBioRedirect({ domain: domain || '', handle: handle || '' })
+                  }
+                  pressStyle={{ opacity: 0.7 }}
+                  hoverStyle={{ opacity: 0.8 }}
+                >
+                  <XStack gap={'$3'} ai="center" flex={1}>
+                    <IconLinkInBio domain_name={domain_name} size={'$3'} />
+                    <YStack flex={1}>
+                      <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
+                        {domain_name}
+                      </Paragraph>
+                      <Paragraph size={'$3'} color={'$color10'}>
+                        {handle}
+                      </Paragraph>
+                    </YStack>
+                  </XStack>
+                  <Paragraph size={'$3'} color={'$color10'}>
+                    View →
+                  </Paragraph>
+                </XStack>
+              ))}
+            </YStack>
+          </YStack>
         )}
       </YStack>
     </Fade>

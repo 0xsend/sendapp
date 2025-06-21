@@ -102,7 +102,7 @@ export function ProfileHistoryScreen({ sendid: propSendid }: ProfileScreenProps)
             <ProfileHeader profile={otherUserProfile} />
             <Stack f={1} $gtLg={{ pb: '$3.5' }}>
               {Boolean(!activities?.length) && (
-                <YStack f={1} height={'100%'} ai={'center'} jc={'center'}>
+                <YStack f={1} height={'100%'} ai={'center'} jc={'space-between'}>
                   <Paragraph
                     size={'$4'}
                     fontWeight={'300'}
@@ -112,6 +112,10 @@ export function ProfileHistoryScreen({ sendid: propSendid }: ProfileScreenProps)
                   >
                     There is nothing here. Start sending!
                   </Paragraph>
+                  <SendButton
+                    identifier={otherUserProfile?.main_tag_name ?? otherUserProfile?.sendid ?? ''}
+                    idType={otherUserProfile?.main_tag_name ? 'tag' : 'sendid'}
+                  />
                 </YStack>
               )}
               <FlatList
@@ -148,8 +152,8 @@ export function ProfileHistoryScreen({ sendid: propSendid }: ProfileScreenProps)
                 }
                 ListHeaderComponent={
                   <SendButton
-                    identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
-                    idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
+                    identifier={otherUserProfile?.main_tag_name ?? otherUserProfile?.sendid ?? ''}
+                    idType={otherUserProfile?.main_tag_name ? 'tag' : 'sendid'}
                   />
                 }
                 inverted={true}

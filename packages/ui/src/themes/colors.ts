@@ -38,6 +38,7 @@ export const brandColors = {
   telegramBlue: '#239AD6',
   youtubeRed: '#FF0000',
   spotifyGreen: '#1ED760',
+  instagramPink: '#FF0069',
 } as const
 
 export const greenPalette = {

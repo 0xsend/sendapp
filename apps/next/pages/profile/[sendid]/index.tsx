@@ -6,8 +6,7 @@ import type { GetServerSideProps, GetServerSidePropsContext } from 'next'
 import type { Database } from '@my/supabase/database.types'
 import { userOnboarded } from 'utils/userOnboarded'
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
-import { HomeLayout } from 'app/features/home/layout.web'
-import { TopNav } from 'app/components/TopNav'
+import { ProfileLayout } from 'app/features/profile/layout.web'
 
 interface PageProps {
   profile?: {
@@ -123,10 +122,6 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   }
 }) satisfies GetServerSideProps
 
-Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav backFunction="router" />} fullHeight>
-    {children}
-  </HomeLayout>
-)
+Page.getLayout = (children) => <ProfileLayout>{children}</ProfileLayout>
 
 export default Page
