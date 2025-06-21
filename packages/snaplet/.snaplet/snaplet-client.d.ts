@@ -161,6 +161,19 @@ type Override = {
       users?: string;
     };
   }
+  link_in_bio?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      user_id?: string;
+      handle?: string;
+      domain_name?: string;
+      domain?: string;
+      created_at?: string;
+      updated_at?: string;
+      users?: string;
+    };
+  }
   liquidity_pools?: {
     name?: string;
     fields?: {
