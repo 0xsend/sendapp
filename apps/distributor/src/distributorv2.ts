@@ -491,10 +491,14 @@ export class DistributorV2Worker {
         { error: sendScoresError?.message },
         'Error fetching send scores. Proceeding without scores.'
       )
+      throw sendScoresError
     }
+
     if (sendScores === null || sendScores.length === 0) {
       log.warn('No send scores found. Proceeding without scores.')
-      return
+    }
+    if (sendScores[0]?.distribution_id !== distribution.id) {
+      throw new Error('Send scores are for wrong distribution')
     }
 
     // Create a map of scores by user_id

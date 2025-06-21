@@ -162,10 +162,7 @@ export async function fetchAllEarnBalances(distribution: { earn_min_balance: str
  */
 export async function fetchSendScores(distributionId: number) {
   const supabaseAdmin = createSupabaseAdminClient()
-  return selectAll(
-    supabaseAdmin
-      .from('send_scores')
-      .select('user_id,  score', { count: 'exact' })
-      .eq('distribution_id', distributionId)
-  )
+  return supabaseAdmin
+    .from('send_scores_current')
+    .select('user_id, distribution_id, score', { count: 'exact' })
 }
