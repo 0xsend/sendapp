@@ -6284,6 +6284,7 @@ __metadata:
     "@tamagui/themes": "npm:^1.126.1"
     "@tamagui/toast": "npm:^1.126.1"
     "@ts-react/form": "npm:^1.8.3"
+    expo-blur: "npm:^14.1.5"
     expo-linear-gradient: "npm:~14.0.1"
     moti: "npm:^0.29.0"
     react-hook-form: "npm:^7.48.2"
@@ -19320,6 +19321,17 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 10/0f8151db65de24d4dcd4205dc923600c986dd96fcc75269bdba2b8c16a4f1ff267cc92d0e3b14bd1dc1214fedf85f84d322c8b85e4e1dc64a5019eadd184177a
+  languageName: node
+  linkType: hard
+
+"expo-blur@npm:^14.1.5":
+  version: 14.1.5
+  resolution: "expo-blur@npm:14.1.5"
+  peerDependencies:
+    expo: "*"
+    react: "*"
+    react-native: "*"
+  checksum: 10/2cfb444e7fa8425e4c12a10bee1c0ec58c9fd9137ad5638fb5f57f4308a3a6fb628f1fe5322864c1d32a2d7bfa04c65d08474f91a7ec162bc143ce60a5d4f17b
   languageName: node
   linkType: hard
 

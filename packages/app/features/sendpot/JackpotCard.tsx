@@ -147,7 +147,6 @@ export const JackpotCard = () => {
               fontSize={64}
               $gtSm={{ fontSize: 80 }}
               $gtMd={{ fontSize: 96 }}
-              lineHeight={'$15'}
               fontWeight={'600'}
               color={'$color12'}
               zIndex={1}

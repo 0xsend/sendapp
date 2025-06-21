@@ -117,14 +117,14 @@ function HomeBody(props: XStackProps) {
           $gtLg={{ display: 'flex', w: '45%', pb: 0 }}
           width="100%"
           display={!queryParams.token ? 'flex' : 'none'}
-          gap="$3.5"
+          gap="$3"
           ai={'center'}
         >
           <StablesBalanceCard />
           <SavingsBalanceCard href="/earn" w="100%" />
           <InvestmentsBalanceCard w="100%" />
           <HomeBodyCardRow>
-            <RewardsCard href={Platform.OS === 'web' ? '/explore/rewards' : '/rewards'} />
+            <RewardsCard w="55%" href={Platform.OS === 'web' ? '/explore/rewards' : '/rewards'} />
             <FriendsCard href="/account/affiliate" />
           </HomeBodyCardRow>
         </YStack>
@@ -221,9 +221,6 @@ function StablesBody() {
 }
 
 export const HomeBodyCard = styled(Card, {
-  hoverStyle: { scale: 0.975 },
-  pressStyle: { scale: 0.925 },
-  animation: 'bouncy',
   size: '$5',
   br: '$7',
   f: 1,
@@ -231,8 +228,8 @@ export const HomeBodyCard = styled(Card, {
 })
 
 export const HomeBodyCardRow = styled(XStack, {
-  gap: '$3.5',
+  gap: '$3',
   w: '100%',
-  mih: 150,
+  mih: 115,
   jc: 'center',
 })

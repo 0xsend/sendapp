@@ -17,12 +17,15 @@ import { HomeBodyCard } from './screen'
 
 export const FriendsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'children'>) => {
   const linkProps = useLink({ href })
+  const limit = 3
+  const { data, isLoading } = useFriends(limit)
+  const friendsCount = data?.friends.length ?? 0
 
   return (
     <HomeBodyCard {...linkProps} {...props}>
       <Card.Header padded pb={0} fd="row" ai="center" jc="space-between">
         <Paragraph fontSize={'$5'} fontWeight="400">
-          Friends
+          {isLoading ? '' : friendsCount <= 0 ? 'Invite Friends' : 'Friends'}
         </Paragraph>
         <XStack flex={1} />
         <ChevronRight
@@ -32,8 +35,27 @@ export const FriendsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
         />
       </Card.Header>
       <Card.Footer padded pt={0} fd="column">
-        <FriendsPreview />
-        <Paragraph color={'$color10'}>Network with Future Cash</Paragraph>
+        {isLoading ? (
+          <Spinner size="small" />
+        ) : (
+          <XStack ai="center" jc="space-between">
+            {data?.friends && <OverlappingFriendAvatars friends={data.friends} />}
+            <ThemeableStack
+              circular
+              ai="center"
+              jc="center"
+              bc="$color0"
+              w={'$3.5'}
+              h="$3.5"
+              mih={0}
+              miw={0}
+            >
+              <Paragraph fontSize={'$4'} fontWeight="500">
+                {`${data?.count ?? 0}`}
+              </Paragraph>
+            </ThemeableStack>
+          </XStack>
+        )}
       </Card.Footer>
     </HomeBodyCard>
   )
@@ -42,39 +64,6 @@ export const FriendsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
 type Friend = {
   tag?: string
   avatar_url?: string
-}
-
-function FriendsPreview({ limit = 3 }: { limit?: number }) {
-  const { data, isLoading } = useFriends(limit)
-  if (isLoading) return <Spinner size="small" />
-
-  const friendsArray = data?.friends || []
-  const filledFriends: Friend[] = [...friendsArray, ...Array(3 - friendsArray.length).fill({})]
-
-  return (
-    <XStack
-      ai="center"
-      jc="space-between"
-      /* hack to match the height of the rewards $ card */
-      h={50}
-    >
-      <OverlappingFriendAvatars friends={filledFriends} />
-      <ThemeableStack
-        circular
-        ai="center"
-        jc="center"
-        bc="$color0"
-        w={'$3.5'}
-        h="$3.5"
-        mih={0}
-        miw={0}
-      >
-        <Paragraph fontSize={'$4'} fontWeight="500">
-          {`${data?.count ?? 0}`}
-        </Paragraph>
-      </ThemeableStack>
-    </XStack>
-  )
 }
 
 function OverlappingFriendAvatars({ friends, ...props }: { friends: Friend[] } & XStackProps) {

@@ -55,7 +55,7 @@ export const InvestmentsBalanceCard = (props: CardProps) => {
 
   return (
     <HomeBodyCard onPress={toggleSubScreen} {...props}>
-      <Card.Header padded pb={0} fd="row" ai="center" jc="space-between">
+      <Card.Header padded pb="$4" jc="space-between" fd="row">
         <Paragraph fontSize={'$5'} fontWeight="400">
           Invest
         </Paragraph>
@@ -74,9 +74,9 @@ export const InvestmentsBalanceCard = (props: CardProps) => {
           />
         )}
       </Card.Header>
-      <Card.Footer padded pt={0} jc="space-between" ai="center">
-        <YStack jc="space-between">
-          <Paragraph color={'$color12'} fontWeight={500} size={'$10'}>
+      <Card.Footer padded size="$4" pt={0} jc="space-between" ai="center">
+        <YStack jc="space-between" gap="$4">
+          <Paragraph color={'$color12'} fontWeight={600} size={'$9'}>
             {(() => {
               switch (true) {
                 case isPriceHidden:
@@ -102,26 +102,44 @@ function InvestmentsPreview() {
 
   if (isLoading) return <Spinner size="small" />
 
-  const existingSymbols = new Set(investmentCoins.map((coin) => coin.symbol))
-  const coins = [
-    ...investmentCoins,
-    ...investmentCoinsList
-      .filter((coin) => !existingSymbols.has(coin.symbol))
-      .map((coin) => ({ ...coin, balance: 0n })),
-  ]
+  // Get SEND token
+  const sendCoin = investmentCoinsList.find((coin) => coin.symbol === 'SEND')
+  if (!sendCoin) return null
 
-  const sortedByBalance = [...coins].sort((a, b) =>
+  // Filter coins that have a balance > 0 (excluding SEND to handle separately)
+  const ownedCoins = investmentCoins.filter(
+    (coin) => coin.balance && coin.balance > 0n && coin.symbol !== 'SEND'
+  )
+
+  // Get SEND token with its actual balance or 0
+  const sendCoinWithBalance = investmentCoins.find((coin) => coin.symbol === 'SEND') || {
+    ...sendCoin,
+    balance: 0n,
+  }
+
+  // Sort owned coins by balance (highest first)
+  const sortedOwnedCoins = ownedCoins.sort((a, b) =>
     (b?.balance ?? 0n) > (a?.balance ?? 0n) ? 1 : -1
   )
 
+  // Always start with SEND token, then add other owned tokens
+  const allCoinsToShow = [sendCoinWithBalance, ...sortedOwnedCoins]
+
+  // Show up to 3 tokens total (SEND + 2 others max)
+  const maxDisplay = 3
+  const coinsToShow = allCoinsToShow.slice(0, maxDisplay)
+  const remainingCount = allCoinsToShow.length - maxDisplay
+
   return (
-    <XStack ai="center">
-      <OverlappingCoinIcons coins={sortedByBalance} />
-      <ThemeableStack circular ai="center" jc="center" bc="$color0" w={'$3.5'} h="$3.5">
-        <Paragraph fontSize={'$4'} fontWeight="500">
-          {`+${investmentCoinsList.length - 3}`}
-        </Paragraph>
-      </ThemeableStack>
+    <XStack ai="center" mr={remainingCount > 0 ? '$0' : '$3.5'}>
+      <OverlappingCoinIcons coins={coinsToShow} length={coinsToShow.length} />
+      {remainingCount > 0 ? (
+        <ThemeableStack circular ai="center" jc="center" bc="$color0" w={'$3.5'} h="$3.5">
+          <Paragraph fontSize={'$4'} fontWeight="500">
+            +{remainingCount}
+          </Paragraph>
+        </ThemeableStack>
+      ) : null}
     </XStack>
   )
 }
@@ -133,8 +151,15 @@ function OverlappingCoinIcons({
 }: { coins: CoinWithBalance[]; length?: number } & XStackProps) {
   return (
     <XStack ai="center" {...props}>
-      {coins.slice(0, length).map(({ symbol }) => (
-        <ThemeableStack key={symbol} circular mr={'$-3.5'} bc="transparent" ai="center" jc="center">
+      {coins.slice(0, length).map(({ symbol }, index) => (
+        <ThemeableStack
+          key={symbol}
+          circular
+          mr={index === coins.slice(0, length).length - 1 ? '$0' : '$-3.5'}
+          bc="transparent"
+          ai="center"
+          jc="center"
+        >
           <IconCoin size={'$3'} symbol={symbol} />
         </ThemeableStack>
       ))}
