@@ -8,6 +8,7 @@ import {
   fetchAllVerifications,
   fetchDistribution,
   fetchDistributionShares,
+  fetchSendScores,
   fetchSendSlash,
   updateReferralVerifications,
 } from './supabase'
@@ -468,6 +469,7 @@ export class DistributorV2Worker {
       address: address,
       userId: userId,
       amount: initialWeightedShares[address]?.amount || 0n,
+      score: 0n, // Default score value will be updated if available
     }))
 
     log.info(
@@ -480,6 +482,48 @@ export class DistributorV2Worker {
       },
       'Initial time-based hodler pool calculations'
     )
+
+    // Fetch send scores from the current distribution
+    const { data: sendScores, error: sendScoresError } = await fetchSendScores(distribution.id)
+
+    if (sendScoresError) {
+      log.warn(
+        { error: sendScoresError?.message },
+        'Error fetching send scores. Proceeding without scores.'
+      )
+    }
+    if (sendScores === null || sendScores.length === 0) {
+      log.warn('No send scores found. Proceeding without scores.')
+      return
+    }
+
+    // Create a map of scores by user_id
+    const scoresByUserId = sendScores.reduce(
+      (acc, { user_id, score }) => {
+        if (!score || !user_id) {
+          return acc
+        }
+        acc[user_id] = BigInt(score)
+        return acc
+      },
+      {} as Record<string, bigint>
+    )
+
+    // Add scores to initialHodlerShares
+    initialHodlerShares = initialHodlerShares.map((share) => ({
+      ...share,
+      score: scoresByUserId?.[share.userId] || 0n,
+    }))
+
+    log.info(`Found ${initialHodlerShares.length} hodlers.`)
+
+    if (log.isLevelEnabled('debug')) {
+      await Bun.write('dist/sendScores.json', JSON.stringify(sendScores, jsonBigint, 2)).catch(
+        (e) => {
+          log.error(e, 'Error writing sendScores.json')
+        }
+      )
+    }
 
     // Create lookup for initial hodler amounts (add this before fixed pool calculation)
     const initialHodlerAmountByAddress = initialHodlerShares.reduce(
@@ -504,7 +548,8 @@ export class DistributorV2Worker {
       if (!isQualifying || !address) continue
 
       // Get initial hodler amount - default to 0 if not found
-      const initialHodlerAmount = initialHodlerAmountByAddress[address] || 0n
+      const hodlerCapAmount =
+        (initialHodlerAmountByAddress[address] || 0n) + (scoresByUserId[userId] || 0n)
 
       let userFixedAmount = 0n
       const multipliers: Record<string, Multiplier> = {}
@@ -586,14 +631,14 @@ export class DistributorV2Worker {
         amount = 0n
       }
 
-      if (amount > initialHodlerAmount) {
+      if (amount > hodlerCapAmount) {
         if (log.isLevelEnabled('debug')) {
           log.debug(
-            { address, original: amount, capped: initialHodlerAmount },
+            { address, original: amount, capped: hodlerCapAmount },
             'Fixed reward capped by hodler amount'
           )
         }
-        amount = initialHodlerAmount
+        amount = hodlerCapAmount
       }
 
       if (fixedPoolAllocatedAmount + amount <= fixedPoolAvailableAmount) {
