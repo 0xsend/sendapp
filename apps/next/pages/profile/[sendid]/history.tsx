@@ -7,6 +7,7 @@ import type { Database } from '@my/supabase/database.types'
 import { userOnboarded } from 'utils/userOnboarded'
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { ProfileHistoryScreen } from 'app/features/profile/history/screen'
+import { TopNav } from 'app/components/TopNav'
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -66,6 +67,10 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   }
 }) satisfies GetServerSideProps
 
-Page.getLayout = (children) => <HomeLayout fullHeight>{children}</HomeLayout>
+Page.getLayout = (children) => (
+  <HomeLayout TopNav={<TopNav header="History" backFunction="router" />} fullHeight>
+    {children}
+  </HomeLayout>
+)
 
 export default Page

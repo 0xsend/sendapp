@@ -15,7 +15,7 @@ import { type PropsWithChildren, useCallback, useEffect, useMemo, useState } fro
 import type { Functions } from '@my/supabase/database.types'
 import { toNiceError } from 'app/utils/toNiceError'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
-import { IconBirthday, IconXLogo } from 'app/components/icons'
+import { IconBirthday } from 'app/components/icons'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { adjustUTCDateForTimezone } from 'app/utils/dateHelper'
 import { useReferrer } from 'app/utils/useReferrer'
@@ -194,11 +194,6 @@ const FriendMobileRow = ({
             </YStack>
           </XStack>
         </Link>
-        {referral.x_username && (
-          <Link href={`https://x.com/${referral.x_username}`} target={'_blank'}>
-            <IconXLogo size={'$1'} color={'$primary'} $theme-light={{ color: '$color12' }} />
-          </Link>
-        )}
       </XStack>
     </Card>
   )
@@ -261,27 +256,6 @@ const FriendDesktopRow = ({
         <Paragraph w={'25%'} ta={'right'}>
           {birthday}
         </Paragraph>
-        {referral.x_username ? (
-          <Paragraph
-            w={'25%'}
-            ta={'right'}
-            cursor={'pointer'}
-            textDecorationLine={'underline'}
-            onPress={(e) => {
-              e.stopPropagation?.()
-              e.preventDefault?.()
-              if (window) {
-                window.open(`https://x.com/${referral.x_username}`, '_blank')
-              }
-            }}
-          >
-            @{referral.x_username}
-          </Paragraph>
-        ) : (
-          <Paragraph w={'25%'} ta={'right'}>
-            NA
-          </Paragraph>
-        )}
       </XStack>
     </Link>
   )
