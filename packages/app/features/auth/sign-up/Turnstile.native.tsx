@@ -12,6 +12,7 @@ export const Turnstile = (props: TurnstileProps) => {
         }}
         originWhitelist={['*']}
         source={{
+          baseUrl: process.env.NEXT_PUBLIC_URL,
           html: `
           <html>
             <head>

@@ -5,7 +5,6 @@ import { router, useSegments } from 'expo-router'
 import { createContext, useEffect, useState } from 'react'
 import { Platform } from 'react-native'
 import type { AuthProviderProps } from './AuthProvider'
-import { AuthStateChangeHandler } from './AuthStateChangeHandler'
 
 export const SessionContext = createContext<SessionContextHelper>({
   session: null,
@@ -65,7 +64,6 @@ export const AuthProvider = ({ children, initialSession }: AuthProviderProps) =>
               }
       }
     >
-      <AuthStateChangeHandler />
       {children}
     </SessionContext.Provider>
   )
@@ -75,10 +73,11 @@ export function useProtectedRoute(user: User | null) {
   const segments = useSegments()
   const firstSegment = segments[0]
   useEffect(() => {
-    const inAuthGroup = firstSegment === '(auth)'
-
+    if (!firstSegment) return
     if (firstSegment === '_sitemap') return
     if (firstSegment === '+not-found') return
+
+    const inAuthGroup = firstSegment === '(auth)'
 
     if (
       // If the user is not signed in and the initial segment is not anything in the auth group.

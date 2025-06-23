@@ -1,4 +1,4 @@
-import { getBaseUrl } from './getBaseUrl'
+import getBaseUrl from './getBaseUrl'
 
 export const getReferralHref = (referralCode: string) => {
   let baseUrl = getBaseUrl()

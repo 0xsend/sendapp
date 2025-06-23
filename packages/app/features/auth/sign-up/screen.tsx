@@ -132,13 +132,12 @@ export const SignUpScreen = () => {
       await signInMutateAsync({})
       router.push(redirectUri ?? '/')
     } catch (error) {
+      setFormState(FormState.Idle)
       toast.show(formatErrorMessage(error), {
         preset: 'error',
         isUrgent: true,
         duration: 10000000,
       })
-    } finally {
-      setFormState(FormState.Idle)
     }
   }, [signInMutateAsync, toast.show, router.push, redirectUri])
 
