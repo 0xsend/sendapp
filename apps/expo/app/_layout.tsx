@@ -48,10 +48,13 @@ export default function RootLayout() {
   }, [])
 
   const onLayoutRootView = useCallback(async () => {
-    if (fontLoaded && sessionLoadAttempted) {
+    if (fontLoaded && sessionLoadAttempted && themeLoaded) {
+      // Only workaround I found on github issues or stack overflow that works
+      // https://stackoverflow.com/questions/64780275/at-using-expo-after-splash-screen-blinkflash-with-white-screen
+      await new Promise((resolve) => setTimeout(resolve, 0))
       await SplashScreen.hideAsync()
     }
-  }, [fontLoaded, sessionLoadAttempted])
+  }, [fontLoaded, sessionLoadAttempted, themeLoaded])
 
   if (!themeLoaded || !fontLoaded || !sessionLoadAttempted) {
     return null

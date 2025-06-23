@@ -16167,18 +16167,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cross-env@npm:^7.0.3":
-  version: 7.0.3
-  resolution: "cross-env@npm:7.0.3"
-  dependencies:
-    cross-spawn: "npm:^7.0.1"
-  bin:
-    cross-env: src/bin/cross-env.js
-    cross-env-shell: src/bin/cross-env-shell.js
-  checksum: 10/e99911f0d31c20e990fd92d6fd001f4b01668a303221227cc5cb42ed155f086351b1b3bd2699b200e527ab13011b032801f8ce638e6f09f854bdf744095e604c
-  languageName: node
-  linkType: hard
-
 "cross-fetch@npm:^3.1.4":
   version: 3.1.8
   resolution: "cross-fetch@npm:3.1.8"
@@ -16239,7 +16227,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cross-spawn@npm:^7.0.0, cross-spawn@npm:^7.0.1, cross-spawn@npm:^7.0.2, cross-spawn@npm:^7.0.3":
+"cross-spawn@npm:^7.0.0, cross-spawn@npm:^7.0.2, cross-spawn@npm:^7.0.3":
   version: 7.0.3
   resolution: "cross-spawn@npm:7.0.3"
   dependencies:
@@ -19244,13 +19232,12 @@ __metadata:
     buffer: "npm:^6.0.3"
     burnt: "npm:^0.12.1"
     cbor2: "npm:^1.12.0"
-    cross-env: "npm:^7.0.3"
-    dotenv-cli: "npm:^7.3.0"
     eslint-config-custom: "workspace:*"
     eslint-plugin-import: "npm:^2.29.1"
     expo: "npm:~52.0.23"
     expo-apple-authentication: "npm:~7.1.2"
     expo-application: "npm:~6.0.2"
+    expo-blur: "npm:^14.1.5"
     expo-build-properties: "npm:~0.13.2"
     expo-clipboard: "npm:~7.0.1"
     expo-constants: "npm:~17.0.3"
@@ -19275,7 +19262,6 @@ __metadata:
     react-dom: "npm:^18.3.1"
     react-native: "npm:0.76.9"
     react-native-clean-project: "npm:^4.0.3"
-    react-native-dotenv: "npm:^3.4.9"
     react-native-gesture-handler: "npm:~2.20.2"
     react-native-passkeys: "npm:~0.3.3"
     react-native-reanimated: "npm:~3.16.6"
@@ -28999,17 +28985,6 @@ __metadata:
   bin:
     react-native-clean-project: source/index.js
   checksum: 10/14928d314d77336e1e08eabf94495d1a97bf473b31bd351b3c9ab5c1b35dac18d44e3d55eaf352c9670111b89bd5f54d849457a4d4d42f69a47260e94a8fbc97
-  languageName: node
-  linkType: hard
-
-"react-native-dotenv@npm:^3.4.9":
-  version: 3.4.11
-  resolution: "react-native-dotenv@npm:3.4.11"
-  dependencies:
-    dotenv: "npm:^16.4.5"
-  peerDependencies:
-    "@babel/runtime": ^7.20.6
-  checksum: 10/09e8a7310fcb01ac021e71db9328e9d342d1e117bf68026b12de0392bfe17292ac6a071f03b88e7fb42c82a8f2fdf03bc520c7dedd2f80a1448cb3de5e03d4fb
   languageName: node
   linkType: hard
 

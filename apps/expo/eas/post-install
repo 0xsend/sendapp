@@ -1,0 +1,15 @@
+#!/bin/bash
+
+echo "Running post-install EAS hook..."
+
+# Debug PATH and forge location
+echo "Current PATH: $PATH"
+which forge || echo "forge not found in PATH"
+# Add Foundry to PATH
+export PATH="$HOME/.foundry/bin:$PATH"
+echo "Updated PATH: $PATH"
+echo "Changing to monorepo root directory..."
+cd ../..
+echo "=== Running yarn build ==="
+# Run build with all environment variables properly set
+yarn build

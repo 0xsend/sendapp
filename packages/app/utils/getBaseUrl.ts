@@ -1,8 +1,5 @@
-import { isWeb } from '@my/ui'
-import { replaceLocalhost } from './getLocalhost.native'
-
-export function _getBaseUrl() {
-  if (isWeb && typeof window !== 'undefined') {
+export default function getBaseUrl() {
+  if (typeof window !== 'undefined') {
     // browser should use relative path
     return ''
   }
@@ -24,12 +21,4 @@ export function _getBaseUrl() {
 
   // assume localhost
   return `http://localhost:${process.env.PORT ?? 3000}`
-}
-
-export function getBaseUrl() {
-  let url = _getBaseUrl()
-  if (!isWeb) {
-    url = replaceLocalhost(url)
-  }
-  return url
 }
