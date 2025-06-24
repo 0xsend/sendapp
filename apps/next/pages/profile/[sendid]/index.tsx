@@ -9,13 +9,59 @@ import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { HomeLayout } from 'app/features/home/layout.web'
 import { TopNav } from 'app/components/TopNav'
 
-export const Page: NextPageWithLayout = () => {
+interface PageProps {
+  profile?: {
+    name?: string
+    tag?: string
+    about?: string
+    avatar_url?: string
+  }
+  sendid?: number
+}
+
+export const Page: NextPageWithLayout<PageProps> = ({ profile, sendid }) => {
+  // Generate OG image URL
+  const ogImageUrl = sendid ? `/api/og/profile/${sendid}` : null
+
+  // Generate page title
+  const pageTitle = profile?.tag ? `send.app/${profile.tag}` : 'Send | Profile'
+
+  // Get site URL from environment
+  const siteUrl = process.env.NEXT_PUBLIC_URL
+  const defaultText = `Check out ${profile?.tag ? `/${profile.tag}` : sendid} on /send`
+
   return (
     <>
       <Head>
-        <title>Send | Profile</title>
+        <title>{pageTitle}</title>
+
+        <meta name="description" content={profile?.about || defaultText} />
+        <meta key="og:type" property="og:type" content="profile" />
+        <meta key="og:title" property="og:title" content={pageTitle} />
+        <meta
+          key="og:description"
+          property="og:description"
+          content={profile?.about || defaultText}
+        />
+        <meta key="og:url" property="og:url" content={`${siteUrl}/profile/${sendid}`} />
+        <meta key="og:image" property="og:image" content={`${siteUrl}${ogImageUrl}`} />
+        <meta key="og:image:width" property="og:image:width" content="1200" />
+        <meta key="og:image:height" property="og:image:height" content="630" />
+        <meta key="og:image:type" property="og:image:type" content="image/jpeg" />
+        <meta key="twitter:card" name="twitter:card" content="summary_large_image" />
+        <meta key="twitter:title" name="twitter:title" content={pageTitle} />
+        <meta
+          key="twitter:description"
+          name="twitter:description"
+          content={profile?.about || defaultText}
+        />
+        <meta key="twitter:image" name="twitter:image" content={`${siteUrl}${ogImageUrl}`} />
+        <link
+          rel="canonical"
+          href={profile?.tag ? `${siteUrl}/${profile.tag}` : `${siteUrl}/profile/${sendid}`}
+        />
       </Head>
-      <ProfileScreen />
+      <ProfileScreen sendid={sendid} />
     </>
   )
 }
@@ -63,7 +109,17 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   }
 
   return {
-    props: {},
+    props: {
+      profile: profile
+        ? {
+            name: profile.name,
+            tag: profile.main_tag_name,
+            about: profile.about,
+            avatar_url: profile.avatar_url,
+          }
+        : undefined,
+      sendid,
+    },
   }
 }) satisfies GetServerSideProps
 
