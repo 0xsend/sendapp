@@ -162,8 +162,6 @@ export function ProfileHistoryScreen({ sendid: propSendid }: ProfileScreenProps)
       </YStack>
       {selectedActivity ? (
         <ActivityDetails
-          activity={selectedActivity}
-          onClose={() => setSelectedActivity(null)}
           w={'100%'}
           $gtLg={{
             maxWidth: '47%',
