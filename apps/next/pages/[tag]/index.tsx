@@ -11,11 +11,59 @@ import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { TopNav } from 'app/components/TopNav'
 import { HomeLayout } from 'app/features/home/layout.web'
 
-export const Page: NextPageWithLayout<{ sendid: number | null }> = ({ sendid }) => {
+interface PageProps {
+  profile?: {
+    name?: string
+    tag?: string
+    about?: string
+    avatar_url?: string
+  }
+  sendid: number | null
+  tag?: string
+}
+
+export const Page: NextPageWithLayout<PageProps> = ({ profile, sendid, tag }) => {
+  // Generate OG image URL - prefer tag route since this is accessed via tag
+  const ogImageUrl = tag ? `/api/og/${tag}` : null
+
+  // Generate page title
+  const pageTitle = profile?.tag ? `send.app/${profile.tag}` : 'Send | Profile'
+
+  // Get site URL from environment
+  const siteUrl = process.env.NEXT_PUBLIC_URL
+  const defaultText = `Check out ${profile?.tag ? `/${profile.tag}` : sendid} on /send`
+
+  // Canonical URL should point to the tag route since that's how user accessed it
+  const canonicalUrl = `${siteUrl}/${tag}`
+
   return (
     <>
       <Head>
-        <title>Send | Profile</title>
+        <title>{pageTitle}</title>
+
+        <meta name="description" content={profile?.about || defaultText} />
+        <meta key="og:type" property="og:type" content="profile" />
+        <meta key="og:title" property="og:title" content={pageTitle} />
+        <meta
+          key="og:description"
+          property="og:description"
+          content={profile?.about || defaultText}
+        />
+        <meta key="og:url" property="og:url" content={canonicalUrl} />
+        <meta key="og:image" property="og:image" content={`${siteUrl}${ogImageUrl}`} />
+        <meta key="og:image:width" property="og:image:width" content="1200" />
+        <meta key="og:image:height" property="og:image:height" content="630" />
+        <meta key="og:image:type" property="og:image:type" content="image/jpeg" />
+        <meta key="twitter:card" name="twitter:card" content="summary_large_image" />
+        <meta key="twitter:title" name="twitter:title" content={pageTitle} />
+        <meta
+          key="twitter:description"
+          name="twitter:description"
+          content={profile?.about || defaultText}
+        />
+        <meta key="twitter:image" name="twitter:image" content={`${siteUrl}${ogImageUrl}`} />
+        <meta name="twitter:site" content={tag} />
+        <link rel="canonical" href={canonicalUrl} />
       </Head>
       <ProfileScreen sendid={sendid} />
     </>
@@ -77,7 +125,16 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
 
   return {
     props: {
+      profile: profile
+        ? {
+            name: profile.name,
+            tag: profile.main_tag_name,
+            about: profile.about,
+            avatar_url: profile.avatar_url,
+          }
+        : undefined,
       sendid: profile.sendid,
+      tag,
     },
   }
 }) satisfies GetServerSideProps
