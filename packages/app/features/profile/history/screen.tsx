@@ -98,66 +98,63 @@ export function ProfileHistoryScreen({ sendid: propSendid }: ProfileScreenProps)
         }}
       >
         {Boolean(otherUserProfile) && (
-          <>
-            <ProfileHeader profile={otherUserProfile} />
-            <Stack f={1} $gtLg={{ pb: '$3.5' }}>
-              {Boolean(!activities?.length) && (
-                <YStack f={1}>
-                  <Paragraph
-                    size={'$8'}
-                    fontWeight={'300'}
-                    color={'$color10'}
-                    textAlign={'center'}
-                    pt={'$1.5'}
-                  >
-                    No Activities
-                  </Paragraph>
-                </YStack>
-              )}
-              <FlatList
-                style={{ flex: 1 }}
-                data={activities}
-                keyExtractor={(activity) =>
-                  `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`
-                }
-                renderItem={({ item: activity, index }) => {
-                  const date = activity.created_at.toLocaleDateString()
-                  const nextDate = activities[index + 1]?.created_at.toLocaleDateString()
-                  const shouldShowDatePill = !nextDate || date !== nextDate
+          <Stack f={1} $gtLg={{ pb: '$3.5' }}>
+            {Boolean(!activities?.length) && (
+              <YStack f={1} height={'100%'} ai={'center'} jc={'center'}>
+                <Paragraph
+                  size={'$4'}
+                  fontWeight={'300'}
+                  color={'$color10'}
+                  textAlign={'center'}
+                  pt={'$1.5'}
+                >
+                  There is nothing here. Start sending!
+                </Paragraph>
+              </YStack>
+            )}
+            <FlatList
+              style={{ flex: 1 }}
+              data={activities}
+              keyExtractor={(activity) =>
+                `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`
+              }
+              renderItem={({ item: activity, index }) => {
+                const date = activity.created_at.toLocaleDateString()
+                const nextDate = activities[index + 1]?.created_at.toLocaleDateString()
+                const shouldShowDatePill = !nextDate || date !== nextDate
 
-                  return (
-                    <>
-                      <Fade>
-                        <TransactionEntry
-                          activity={activity}
-                          sent={activity?.to_user?.id !== user?.id}
-                          otherUserProfile={otherUserProfile}
-                          currentUserProfile={currentUserProfile}
-                          onPress={() => setSelectedActivity(activity)}
-                        />
-                      </Fade>
-                      {shouldShowDatePill ? <DatePill date={date} /> : null}
-                    </>
-                  )
-                }}
-                onEndReached={() => fetchNextPage()}
-                ListEmptyComponent={
-                  !isLoadingActivities && isFetchingNextPageActivities ? (
-                    <Spinner size="small" color={'$color12'} my={'$4'} />
-                  ) : null
-                }
-                ListHeaderComponent={
-                  <SendButton
-                    identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
-                    idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
-                  />
-                }
-                inverted={true}
-                showsVerticalScrollIndicator={false}
-                stickyHeaderIndices={[0]}
-              />
-            </Stack>
-          </>
+                return (
+                  <>
+                    <Fade>
+                      <TransactionEntry
+                        activity={activity}
+                        sent={activity?.to_user?.id !== user?.id}
+                        otherUserProfile={otherUserProfile}
+                        currentUserProfile={currentUserProfile}
+                        onPress={() => setSelectedActivity(activity)}
+                      />
+                    </Fade>
+                    {shouldShowDatePill ? <DatePill date={date} /> : null}
+                  </>
+                )
+              }}
+              onEndReached={() => fetchNextPage()}
+              ListEmptyComponent={
+                !isLoadingActivities && isFetchingNextPageActivities ? (
+                  <Spinner size="small" color={'$color12'} my={'$4'} />
+                ) : null
+              }
+              ListHeaderComponent={
+                <SendButton
+                  identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
+                  idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
+                />
+              }
+              inverted={true}
+              showsVerticalScrollIndicator={false}
+              stickyHeaderIndices={[0]}
+            />
+          </Stack>
         )}
       </YStack>
       {selectedActivity ? (
