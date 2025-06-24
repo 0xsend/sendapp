@@ -1,10 +1,9 @@
 import { Avatar, LinkableAvatar, Spinner } from '@my/ui'
 import { IconAccount } from 'app/components/icons'
-import { useUser } from 'app/utils/useUser'
-import type { Tables } from '@my/supabase/database-generated.types'
+import { useUser, type UseUserReturn } from 'app/utils/useUser'
 
 interface AvatarMenuButtonProps {
-  profile?: Tables<'profiles'> | null
+  profile?: UseUserReturn['profile']
 }
 
 const AvatarMenuButton = ({ profile }: AvatarMenuButtonProps) => {
