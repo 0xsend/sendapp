@@ -37,7 +37,7 @@ export const SendScreen = () => {
   const [{ recipient, idType }] = useSendScreenParams()
   const {
     data: profile,
-    isLoading: isLoadingProfileLookup,
+    isLoading,
     error: errorProfileLookup,
   } = useProfileLookup(idType ?? 'tag', recipient ?? '')
   const recentSendersQuery = useRecentSenders()
@@ -45,13 +45,6 @@ export const SendScreen = () => {
   const topSendersQuery = useTopSenders()
   const todayBirthdaySendersQuery = useTodayBirthdaySenders()
   const [{ search }] = useRootScreenParams()
-
-  const isLoading =
-    isLoadingProfileLookup ||
-    recentSendersQuery.isLoading ||
-    favouriteSendersQuery.isLoading ||
-    topSendersQuery.isLoading ||
-    todayBirthdaySendersQuery.isLoading
 
   if (isLoading) return <Spinner size="large" color={'$color12'} />
 

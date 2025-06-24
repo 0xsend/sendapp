@@ -13,13 +13,11 @@ import { CheckCheck } from '@tamagui/lucide-icons'
 import { useEffect, useState } from 'react'
 import { IconCopy } from './icons'
 import * as Clipboard from 'expo-clipboard'
-import { useConfirmedTags } from 'app/utils/tags'
 
 export function ReferralLink(props: ButtonProps) {
   const { profile } = useUser()
   const send_id = profile?.send_id
-  const tags = useConfirmedTags()
-  const referralCode = tags?.[0]?.name
+  const referralCode = profile?.main_tag?.name
   const referralHref = `https://send.app?referral=${referralCode}`
   const toast = useToastController()
   const [hasCopied, setHasCopied] = useState(false)
@@ -60,13 +58,8 @@ export function ReferralLink(props: ButtonProps) {
 
   return (
     <XStack ai={'center'} gap={'$2'} width={'100%'}>
-      <Paragraph size={'$5'} color={'$color10'} flexShrink={0}>
-        Referral Code:
-      </Paragraph>
       <Button
         chromeless
-        flex={1}
-        jc={'space-between'}
         height={'auto'}
         bw={0}
         hoverStyle={{
@@ -84,6 +77,9 @@ export function ReferralLink(props: ButtonProps) {
         }}
         {...props}
       >
+        <ButtonText size={'$5'} color={'$color10'} flexShrink={0}>
+          Referral Code:
+        </ButtonText>
         <ButtonText
           fontSize={'$5'}
           fontWeight={'500'}
