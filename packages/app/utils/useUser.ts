@@ -3,6 +3,7 @@ import debug from 'debug'
 import { useRouter } from 'solito/router'
 import { useSessionContext } from './supabase/useSessionContext'
 import { useSupabase } from './supabase/useSupabase'
+import type { Database } from '@my/supabase/database-generated.types'
 
 const log = debug('app:utils:useUser')
 
@@ -51,9 +52,14 @@ export const useUser = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('*, tags(*)')
+        .select('*, tags(*), main_tag(*)')
         .eq('id', user?.id ?? '')
         .single()
+        .overrideTypes<{
+          tags: Database['public']['Tables']['tags']['Row'][]
+          main_tag: Database['public']['Tables']['tags']['Row'] | null
+        }>()
+
       if (error) {
         // no rows - edge case of user being deleted
         if (error.code === 'PGRST116') {
@@ -92,6 +98,7 @@ export const useUser = () => {
     profile,
     avatarUrl,
     tags: profile?.tags,
+    mainTag: profile?.main_tag,
     updateProfile: refetch,
     isLoadingSession,
     isLoadingProfile,
