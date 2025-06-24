@@ -6,15 +6,14 @@ import { ReferralLink } from 'app/components/ReferralLink'
 import { useEffect, useState } from 'react'
 import * as Sharing from 'expo-sharing'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
-import { useConfirmedTags } from 'app/utils/tags'
 import { ShareProfileDialog } from './ShareProfileDialog'
+import { Link } from 'solito/link'
 
 export const AccountHeader = (props: YStackProps) => {
   const { profile } = useUser()
-  const tags = useConfirmedTags()
   const avatar_url = profile?.avatar_url
   const name = profile?.name
-  const referralCode = tags?.[0]?.name || profile?.referral_code
+  const referralCode = profile?.main_tag?.name || profile?.referral_code
   const referralHref = `https://send.app?referral=${referralCode}`
   const [canShare, setCanShare] = useState(false)
   const [shareDialogOpen, setShareDialogOpen] = useState(false)
@@ -39,23 +38,25 @@ export const AccountHeader = (props: YStackProps) => {
 
   return (
     <YStack gap={'$3.5'} {...props}>
-      <FadeCard>
-        <XStack gap={'$3.5'}>
-          <Avatar size={'$7'} br={'$4'}>
-            <Avatar.Image src={avatar_url ?? ''} />
-            <Avatar.Fallback f={1} ai={'center'} theme="green_active" bc="$color2">
-              <IconAccount $theme-light={{ color: '$color12' }} />
-            </Avatar.Fallback>
-          </Avatar>
-          <YStack jc={'space-between'} f={1}>
-            <Paragraph size={'$8'} fontWeight={600} numberOfLines={1}>
-              {name || '---'}
-            </Paragraph>
-            <Separator width="100%" borderColor="$decay" />
-            <ReferralLink p={0} />
-          </YStack>
-        </XStack>
-      </FadeCard>
+      <Link href={`/profile/${profile?.send_id}`}>
+        <FadeCard>
+          <XStack gap={'$3.5'}>
+            <Avatar size={'$7'} br={'$4'}>
+              <Avatar.Image src={avatar_url ?? ''} />
+              <Avatar.Fallback f={1} ai={'center'} theme="green_active" bc="$color2">
+                <IconAccount $theme-light={{ color: '$color12' }} />
+              </Avatar.Fallback>
+            </Avatar>
+            <YStack jc={'space-between'} f={1}>
+              <Paragraph size={'$8'} fontWeight={600} numberOfLines={1}>
+                {name || '---'}
+              </Paragraph>
+              <Separator width="100%" borderColor="$decay" />
+              <ReferralLink p={0} />
+            </YStack>
+          </XStack>
+        </FadeCard>
+      </Link>
       <Fade>
         <XStack gap={'$3.5'}>
           <Button
