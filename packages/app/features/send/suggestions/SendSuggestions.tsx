@@ -1,4 +1,4 @@
-import { Avatar, Card, Paragraph, YStack } from '@my/ui'
+import { Avatar, Paragraph, YStack } from '@my/ui'
 import { FlatList } from 'react-native'
 import { useSendScreenParams } from 'app/routers/params'
 import { Link } from 'solito/link'
