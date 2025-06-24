@@ -377,6 +377,7 @@ export type Database = {
           referral_code: string | null
           send_id: number
           x_username: string | null
+          main_tag: Database["public"]["Tables"]["tags"]["Row"] | null
           tags: Database["public"]["Tables"]["tags"]["Row"] | null
         }
         Insert: {
@@ -1897,6 +1898,17 @@ export type Database = {
           referrals: number
           user: Database["public"]["CompositeTypes"]["activity_feed_user"]
         }[]
+      }
+      main_tag: {
+        Args: { "": Database["public"]["Tables"]["profiles"]["Row"] }
+        Returns: {
+          created_at: string
+          id: number
+          name: string
+          status: Database["public"]["Enums"]["tag_status"]
+          updated_at: string
+          user_id: string | null
+        }
       }
       profile_lookup: {
         Args: {
