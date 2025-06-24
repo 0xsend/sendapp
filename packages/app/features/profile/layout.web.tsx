@@ -5,10 +5,7 @@ import { TagSearchProvider } from 'app/provider/tag-search'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 import { BottomNavBarWrapper } from 'app/components/BottomTabBar/BottomNavBarWrapper'
 import { useRouteChange } from 'app/routers/useRouteChange.web'
-<<<<<<< HEAD
 import { BOTTOM_NAV_BAR_HEIGHT } from 'app/components/BottomTabBar/BottomNavBar'
-=======
->>>>>>> 78f28925 (feat(profile): implement new profile UI with social links and improved layout)
 
 /**
  * Profile Layout Component
@@ -38,10 +35,7 @@ export function ProfileLayout({
             contentContainerStyle={{
               mih: '100%',
               height: fullHeight ? '100%' : 'auto',
-<<<<<<< HEAD
               pb: BOTTOM_NAV_BAR_HEIGHT,
-=======
->>>>>>> 78f28925 (feat(profile): implement new profile UI with social links and improved layout)
             }}
             scrollEventThrottle={128}
             onScroll={onScroll}
@@ -49,11 +43,7 @@ export function ProfileLayout({
             showsVerticalScrollIndicator={false}
             {...props}
           >
-<<<<<<< HEAD
             {children}
-=======
-            {children}s
->>>>>>> 78f28925 (feat(profile): implement new profile UI with social links and improved layout)
           </ScrollView>
         </TagSearchProvider>
       </BottomNavBarWrapper>

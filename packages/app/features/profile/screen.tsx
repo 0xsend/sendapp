@@ -1,61 +1,63 @@
 // External libs & UI
 import { ChevronLeft, ChevronRight, Upload } from '@tamagui/lucide-icons'
-import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
+import { useState } from 'react'
 import {
-  Avatar,
+  BlurStack,
   Button,
   Card,
   H2,
   Image,
+  LinkableButton,
   Paragraph,
   Spinner,
   Stack,
   Text,
-  useTheme,
   XStack,
   YStack,
+  Link,
+  useMedia,
 } from '@my/ui'
 
 // Internal
 import { GradientOverlay } from 'app/components/GradientOverlay'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
-import { useProfileScreenParams, useRootScreenParams } from 'app/routers/params'
-import { useUser } from 'app/utils/useUser'
-import { IconAccount, IconXLogo } from 'app/components/icons'
+import { useProfileScreenParams } from 'app/routers/params'
+import {
+  IconYoutube,
+  IconDiscord,
+  IconSpotify,
+  IconXLogo,
+  IconTelegramLogo,
+} from 'app/components/icons'
+import { ShareOtherProfileDialog } from './components/ShareOtherProfileDialog'
 
 interface ProfileScreenProps {
   sendid?: number | null
 }
 
-// No utility function needed as we'll use solito/link directly
-
 export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
+  const media = useMedia()
   const router = useRouter()
   const [{ sendid: paramSendid }] = useProfileScreenParams()
   const otherUserId = propSendid || Number(paramSendid)
+  const [shareDialogOpen, setShareDialogOpen] = useState(false)
   const {
     data: otherUserProfile,
     isLoading,
     error,
   } = useProfileLookup('sendid', otherUserId?.toString() || '')
-  const { user } = useUser()
-  const [{ profile: profileParam }] = useRootScreenParams()
-  const theme = useTheme()
 
   const twitterUrl = otherUserProfile?.x_username
     ? `https://x.com/${otherUserProfile?.x_username}`
     : null
-
-  // No need for mock data, we'll use actual data directly
 
   const goBack = (): void => {
     router.back()
   }
 
   const openShareMenu = (): void => {
-    // Implement share functionality
-    console.log('Share profile')
+    setShareDialogOpen(true)
   }
 
   if (isLoading) {
@@ -76,133 +78,184 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
     )
   }
 
-  // Use actual data or fallback values for profile
   return (
-    <YStack f={1} bg="$color1" w="100%" position="relative">
-      {/* Profile Header Image with Gradient Overlay */}
-      <YStack w="100%" h={428} position="relative">
-        {/* <Avatar
+    <YStack f={1} w="100%" position="relative">
+      <Card padded size={media.gtLg ? '$7' : '$3.5'} w="100%" h={428} position="relative">
+        <Card.Background>
+          <Image
+            source={{
+              uri:
+                otherUserProfile?.avatar_url ??
+                `https://ui-avatars.com/api.jpg?name=${otherUserProfile?.main_tag_name}&size=428`,
+              width: 428,
+              height: 428,
+            }}
+            h="100%"
+            w="100%"
+            filter="blur(40px)"
+          />
+        </Card.Background>
+        <Image
+          source={{
+            uri:
+              otherUserProfile?.avatar_url ??
+              `https://ui-avatars.com/api.jpg?name=${otherUserProfile?.main_tag_name}&size=428`,
+            width: 428,
+            height: 428,
+          }}
+          h="100%"
           position="absolute"
           top={0}
-          left={0}
-          right={0}
-          bottom={0}
-          width="100%"
-          height="100%"
-          borderRadius={0}
-          overflow="hidden"
-        >
-          <Avatar.Image
-            position="absolute"
-            top={0}
-            left={0}
-            right={0}
-            bottom={0}
-            objectFit="cover"
-            src={otherUserProfile?.avatar_url ?? undefined}
-          />
-          <Avatar.Fallback backgroundColor="$color3" justifyContent="center" alignItems="center">
-            <IconAccount color="$olive" />
-          </Avatar.Fallback>
-        </Avatar> */}
-        <Image src={otherUserProfile?.avatar_url ?? undefined} w="100%" h="100%" />
-        <GradientOverlay
-          colors={['transparent', 'rgba(0, 0, 0, 0.7)']}
-          height="100%"
-          position="absolute"
           bottom={0}
           left={0}
           right={0}
-          zIndex={1}
+          margin="auto"
         />
-        <YStack
+        <GradientOverlay
+          colors={['transparent', 'black']}
+          height="100%"
           position="absolute"
           bottom={0}
           left={0}
           right={0}
-          paddingHorizontal="$4"
-          paddingBottom="$4"
-          gap="$4"
-          zIndex={2}
+        />
+        <Card.Header p={0} padded={media.gtLg} jc="space-between" ai="center" fd="row">
+          <BlurStack intensity={10} circular>
+            <Button
+              size="$3"
+              circular
+              bc="rgba(102, 102, 102, 0.4)"
+              onPress={goBack}
+              ai="center"
+              jc={'center'}
+              icon={<ChevronLeft size="$1.5" color="$white" />}
+            />
+          </BlurStack>
+          <BlurStack intensity={10} circular>
+            <Button
+              size="$3"
+              circular
+              bc="rgba(102, 102, 102, 0.4)"
+              onPress={openShareMenu}
+              icon={<Upload size="$1" color="$white" />}
+            />
+          </BlurStack>
+        </Card.Header>
+        <Card.Footer
+          padded
+          size={media.gtLg ? '$7' : '$5'}
+          pb={media.gtLg ? 0 : undefined}
+          ai="flex-end"
+          jc="space-between"
+          f={1}
         >
-          <XStack gap="$2" alignItems="center">
-            <H2 color="$white">{otherUserProfile?.name}</H2>
-          </XStack>
+          <YStack gap="$4">
+            <XStack gap="$2" alignItems="center">
+              <H2 color="$white">{otherUserProfile?.name}</H2>
+            </XStack>
+            <XStack gap="$2">
+              {otherUserProfile?.all_tags?.map((tag) => {
+                return (
+                  <BlurStack
+                    intensity={50}
+                    key={tag}
+                    p={8}
+                    bc="rgba(102, 102, 102, 0.4)"
+                    borderRadius={4}
+                    alignSelf="flex-start"
+                  >
+                    <Paragraph color="$white" fontSize="$3" fontWeight="400">
+                      /{tag}
+                    </Paragraph>
+                  </BlurStack>
+                )
+              })}
+            </XStack>
 
-          <XStack
-            paddingHorizontal="$2"
-            paddingVertical="$1"
-            bg={'$color10'} // Matches image
-            borderRadius="$2"
-            alignSelf="flex-start" // Ensure it doesn't stretch full width
-          >
-            <Paragraph color="$white" fontSize="$2" fontWeight="400">
-              /{otherUserProfile?.main_tag_name}
+            <Paragraph color="$white" fontSize="$4" fontWeight="400">
+              {otherUserProfile?.about}
             </Paragraph>
-          </XStack>
+          </YStack>
+          {media.gtLg && (
+            <LinkableButton
+              href={{
+                pathname: '/send',
+                query: { recipient: otherUserProfile?.sendid, idType: 'sendid' },
+              }}
+              theme="green"
+              height={48}
+              borderRadius="$4"
+              justifyContent="center"
+              maw={300}
+              w={'100%'}
+            >
+              <Button.Text
+                color="$color1"
+                fontSize="$4"
+                fontFamily="$mono"
+                fontWeight="500"
+                textTransform="uppercase"
+                textAlign="center"
+              >
+                SEND
+              </Button.Text>
+            </LinkableButton>
+          )}
+        </Card.Footer>
+      </Card>
 
-          <Paragraph color="$white" fontSize="$4" fontWeight="400">
-            {otherUserProfile?.about}
-          </Paragraph>
-        </YStack>
-      </YStack>
-
-      {/* Top navigation bar with back button and share */}
       <YStack
-        position="absolute"
-        top={0}
-        left={0}
-        right={0}
-        paddingTop="$4" // Reduced from $4 to $2 for better top alignment
         paddingHorizontal="$4"
-        zIndex={3} // Ensure buttons are above everything
+        paddingTop="$6"
+        gap="$6"
+        pb="$12"
+        bc={'$color0'}
+        {...(!media.gtLg
+          ? { borderTopLeftRadius: '$6', borderTopRightRadius: '$6', mt: '$-3' }
+          : {})}
       >
-        <XStack justifyContent="space-between" alignItems="center">
-          <Button
-            size="$3"
-            p="$2"
-            circular
-            bg="rgba(255, 255, 255, 0.1)"
-            backdropFilter="blur(52px)"
-            onPress={goBack}
-            icon={<ChevronLeft size="$6" color="$primary" />}
-          />
-          <Button
-            size="$3"
-            circular
-            p="$2"
-            bg="rgba(255, 255, 255, 0.1)"
-            backdropFilter="blur(52px)"
-            onPress={openShareMenu}
-            icon={<Upload size="$4" color="$white" />}
-          />
-        </XStack>
-      </YStack>
-
-      {/* Content Below Header Image (Send Button, Social Links) */}
-      <YStack paddingHorizontal="$4" paddingTop="$6" gap="$6" pb="$12">
-        {/* Send Button */}
-        <Button theme="green" height={48} borderRadius="$2" justifyContent="center">
-          <Button.Text
-            color="$color1"
-            fontSize="$4"
-            fontFamily="$mono"
-            fontWeight="500"
-            textTransform="uppercase"
-            textAlign="center"
+        {!media.gtLg && (
+          <LinkableButton
+            href={{
+              pathname: '/send',
+              query: { recipient: otherUserProfile?.sendid, idType: 'sendid' },
+            }}
+            theme="green"
+            height={48}
+            borderRadius="$4"
+            justifyContent="center"
           >
-            SEND
-          </Button.Text>
-        </Button>
-
+            <Button.Text
+              color="$color1"
+              fontSize="$4"
+              fontFamily="$mono"
+              fontWeight="500"
+              textTransform="uppercase"
+              textAlign="center"
+            >
+              SEND
+            </Button.Text>
+          </LinkableButton>
+        )}
         <YStack gap="$6">
-          <Paragraph color="$color12" fontSize="$6" fontWeight="600">
-            Let's Connect
-          </Paragraph>
-
-          <Card padding="$6" borderRadius="$4" gap="$6" bc="$color0">
-            <Link key={otherUserProfile?.id} href={twitterUrl ?? ''} target="_blank">
-              <Button
+          <XStack ai={'center'} jc="space-between">
+            <Paragraph color="$color12" fontSize="$6" fontWeight="600">
+              {otherUserProfile?.x_username && "Let's Connect"}
+            </Paragraph>
+            <Link
+              textDecorationLine="underline"
+              href={`/profile/${otherUserProfile?.sendid}/history`}
+            >
+              View History
+            </Link>
+          </XStack>
+          {otherUserProfile?.x_username && (
+            <Card padded size="$3" borderRadius="$4" gap="$4">
+              {/* X/Twitter Link */}
+              <LinkableButton
+                key={`${otherUserProfile?.id}-x`}
+                href={twitterUrl ?? ''}
+                target="_blank"
                 chromeless
                 width="100%"
                 pressStyle={{ opacity: 0.7 }}
@@ -211,27 +264,187 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
               >
                 <XStack justifyContent="space-between" alignItems="center" width="100%">
                   <XStack gap="$4" alignItems="center">
-                    <IconXLogo
-                      size={'$2'}
-                      $theme-dark={{ color: '$primary' }}
-                      $theme-light={{ color: '$color12' }}
-                    />
+                    <XStack
+                      borderRadius="$3"
+                      justifyContent="center"
+                      alignItems="center"
+                      padding="$2"
+                      bc="$black"
+                    >
+                      <IconXLogo size={24} color="$white" />
+                    </XStack>
+                    <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
+                      X
+                    </Paragraph>
                   </XStack>
                   <XStack
-                    p="$1"
                     bg="rgba(255, 255, 255, 0.10)"
                     borderRadius="$2"
                     justifyContent="center"
                     alignItems="center"
                   >
-                    <ChevronRight size="$1.5" color="$white" />
+                    <ChevronRight size="$1" color="$color12" />
                   </XStack>
                 </XStack>
-              </Button>
-            </Link>
-          </Card>
+              </LinkableButton>
+
+              {/* Telegram Link */}
+              <LinkableButton
+                key={`${otherUserProfile?.id}-telegram`}
+                href="#"
+                target="_blank"
+                chromeless
+                width="100%"
+                pressStyle={{ opacity: 0.7 }}
+                hoverStyle={{ opacity: 0.8 }}
+                animation="quick"
+              >
+                <XStack justifyContent="space-between" alignItems="center" width="100%">
+                  <XStack gap="$4" alignItems="center">
+                    <XStack
+                      borderRadius="$3"
+                      justifyContent="center"
+                      alignItems="center"
+                      padding="$2"
+                      bc="$telegramBlue"
+                    >
+                      <IconTelegramLogo size={24} color="$white" />
+                    </XStack>
+                    <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
+                      Telegram
+                    </Paragraph>
+                  </XStack>
+                  <XStack
+                    bg="rgba(255, 255, 255, 0.10)"
+                    borderRadius="$2"
+                    justifyContent="center"
+                    alignItems="center"
+                  >
+                    <ChevronRight size="$1" color="$color12" />
+                  </XStack>
+                </XStack>
+              </LinkableButton>
+
+              {/* Discord Link */}
+              <LinkableButton
+                key={`${otherUserProfile?.id}-discord`}
+                href="#"
+                target="_blank"
+                chromeless
+                width="100%"
+                pressStyle={{ opacity: 0.7 }}
+                hoverStyle={{ opacity: 0.8 }}
+                animation="quick"
+              >
+                <XStack justifyContent="space-between" alignItems="center" width="100%">
+                  <XStack gap="$4" alignItems="center">
+                    <XStack
+                      borderRadius="$3"
+                      justifyContent="center"
+                      alignItems="center"
+                      padding="$2"
+                      bc="$discordPurple"
+                    >
+                      <IconDiscord size={24} color="$white" />
+                    </XStack>
+                    <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
+                      Discord
+                    </Paragraph>
+                  </XStack>
+                  <XStack
+                    bg="rgba(255, 255, 255, 0.10)"
+                    borderRadius="$2"
+                    justifyContent="center"
+                    alignItems="center"
+                  >
+                    <ChevronRight size="$1" color="$color12" />
+                  </XStack>
+                </XStack>
+              </LinkableButton>
+
+              {/* Spotify Link */}
+              <LinkableButton
+                key={`${otherUserProfile?.id}-spotify`}
+                href="#"
+                target="_blank"
+                chromeless
+                width="100%"
+                pressStyle={{ opacity: 0.7 }}
+                hoverStyle={{ opacity: 0.8 }}
+                animation="quick"
+              >
+                <XStack justifyContent="space-between" alignItems="center" width="100%">
+                  <XStack gap="$4" alignItems="center">
+                    <XStack
+                      borderRadius="$3"
+                      justifyContent="center"
+                      alignItems="center"
+                      padding="$2"
+                      bc="$spotifyGreen"
+                    >
+                      <IconSpotify size={24} color="$white" />
+                    </XStack>
+                    <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
+                      Spotify
+                    </Paragraph>
+                  </XStack>
+                  <XStack
+                    bg="rgba(255, 255, 255, 0.10)"
+                    borderRadius="$2"
+                    justifyContent="center"
+                    alignItems="center"
+                  >
+                    <ChevronRight size="$1" color="$color12" />
+                  </XStack>
+                </XStack>
+              </LinkableButton>
+
+              {/* YouTube Link */}
+              <LinkableButton
+                key={`${otherUserProfile?.id}-youtube`}
+                href="#"
+                target="_blank"
+                chromeless
+                width="100%"
+                pressStyle={{ opacity: 0.7 }}
+                hoverStyle={{ opacity: 0.8 }}
+                animation="quick"
+              >
+                <XStack justifyContent="space-between" alignItems="center" width="100%">
+                  <XStack gap="$4" alignItems="center">
+                    <XStack
+                      borderRadius="$3"
+                      justifyContent="center"
+                      alignItems="center"
+                      padding="$2"
+                      bc="$youtubeRed"
+                    >
+                      <IconYoutube size={24} color="$white" />
+                    </XStack>
+                    <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
+                      YouTube
+                    </Paragraph>
+                  </XStack>
+                  <XStack
+                    bg="rgba(255, 255, 255, 0.10)"
+                    borderRadius="$2"
+                    justifyContent="center"
+                    alignItems="center"
+                  >
+                    <ChevronRight size="$1" color="$color12" />
+                  </XStack>
+                </XStack>
+              </LinkableButton>
+            </Card>
+          )}
         </YStack>
       </YStack>
+
+      <ShareOtherProfileDialog
+        isOpen={shareDialogOpen}
+        onClose={() => setShareDialogOpen(false)}
+        profile={otherUserProfile}
+      />
     </YStack>
   )
 }
