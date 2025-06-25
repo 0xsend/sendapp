@@ -37,8 +37,9 @@ function MyApp({
       <Head>
         <title>Send</title>
         <meta
+          key="description"
           name="description"
-          content="Send is a peer-to-peer app to send, trade, and earn USDC. Instant, global, and accessible only by you."
+          content="Peer-to-peer money. Send. Save. Invest."
         />
         <meta
           name="viewport"
@@ -54,7 +55,11 @@ function MyApp({
         <meta name="msapplication-TileColor" content="#122023" />
         <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
         <meta name="theme-color" content="#081619" media="(prefers-color-scheme: dark)" />
-        <meta property="og:image" content="https://ghassets.send.app/2024/04/send-og-image.png" />
+        <meta
+          key="og:image"
+          property="og:image"
+          content="https://ghassets.send.app/2024/04/send-og-image.png"
+        />
         <link rel="stylesheet" href="/tamagui.css" />
       </Head>
       <NextThemeProvider
