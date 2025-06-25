@@ -134,7 +134,7 @@ The Next.js app has a comprehensive routing structure with these sections:
 
 ### Phase 4: Internal Distributed Build
 
-1. **Build Configuration**:
+1. **Build Configuration** ✅:
    - Configure EAS Build for internal distribution
    - Set up development and staging build profiles
    - Configure code signing for iOS and Android
@@ -236,9 +236,9 @@ You can use the following methods to verify the app is functioning correctly:
 - prepare assets so app doesn't have to fetch images
 
 **Auth**:
-- login issues, passkey is found but error is thrown
+- login issues, passkey is found but error is thrown ✅
 - passkeys for android, right now got passkeys only for ios
-- app crushes on logout
+- app crushes on logout ✅
 - no way to input referral, url won't work on native
 
 **Home screen**:
@@ -262,7 +262,7 @@ You can use the following methods to verify the app is functioning correctly:
 - number of tickets purchased is not increased after purchase automatically, its fine after close and open again
 
 **Invest**:
-- risk disclaimer on trade screen doesnt pop up
+- risk disclaimer on trade screen doesnt pop up ✅
 
 **Earn**:
 - referral code is not working
