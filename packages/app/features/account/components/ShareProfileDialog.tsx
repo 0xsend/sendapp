@@ -1,10 +1,12 @@
 import {
   Button,
   Dialog,
+  H2,
   Image,
   isWeb,
   Paragraph,
   Separator,
+  Sheet,
   useToastController,
   YStack,
 } from '@my/ui'
@@ -14,6 +16,7 @@ import { useUser } from 'app/utils/useUser'
 import * as Clipboard from 'expo-clipboard'
 import QRCode from 'qrcode'
 import { useEffect, useState } from 'react'
+import { Platform } from 'react-native'
 
 interface ShareProfileDialogProps {
   isOpen: boolean
@@ -71,68 +74,97 @@ export function ShareProfileDialog({ isOpen, onClose }: ShareProfileDialogProps)
     }
   }
 
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <Dialog.Portal>
-        <Dialog.Overlay />
-        <Dialog.Content
-          width={'85%'}
-          br={'$5'}
-          p={'$5'}
-          gap={'$3.5'}
-          maxWidth={400}
-          $gtLg={{ p: '$7', gap: '$5' }}
-        >
-          <Paragraph size={'$8'} fontWeight={500}>
-            Share Profile
+  // Shared content component to avoid duplication
+  const dialogContent = (
+    <>
+      <H2 size={'$8'} fontWeight={500}>
+        Share Profile
+      </H2>
+      <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
+      {qrCodeDataURL && (
+        <YStack ai={'center'} gap={'$3'}>
+          <Image source={{ uri: qrCodeDataURL }} width={200} height={200} br={'$3'} />
+          <Paragraph size={'$4'} color={'$color10'} ta={'center'} numberOfLines={1}>
+            {profileUrl}
           </Paragraph>
-          <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
-
-          {qrCodeDataURL && (
-            <YStack ai={'center'} gap={'$3'}>
-              <Image source={{ uri: qrCodeDataURL }} width={200} height={200} br={'$3'} />
-              <Paragraph size={'$4'} color={'$color10'} ta={'center'} numberOfLines={1}>
-                {profileUrl}
-              </Paragraph>
-            </YStack>
-          )}
-          <YStack
-            justifyContent="space-between"
-            marginTop="$4"
-            gap="$4"
-            $gtLg={{ flexDirection: 'row-reverse' }}
+        </YStack>
+      )}
+      <YStack
+        justifyContent="space-between"
+        marginTop="$4"
+        gap="$4"
+        $gtLg={{ flexDirection: 'row-reverse' }}
+      >
+        <Button
+          theme="green"
+          borderRadius={'$4'}
+          p={'$4'}
+          onPress={handleCopyLink}
+          focusStyle={{ outlineWidth: 0 }}
+        >
+          <Button.Icon>
+            <IconCopy size={16} color={'$black'} />
+          </Button.Icon>
+          <Button.Text
+            ff={'$mono'}
+            fontWeight={'500'}
+            tt="uppercase"
+            size={'$5'}
+            color={'$black'}
+            ml={'$2'}
           >
-            <Button
-              theme="green"
-              borderRadius={'$4'}
-              p={'$4'}
-              onPress={handleCopyLink}
-              focusStyle={{ outlineWidth: 0 }}
-            >
-              <Button.Icon>
-                <IconCopy size={16} color={'$black'} />
-              </Button.Icon>
-              <Button.Text
-                ff={'$mono'}
-                fontWeight={'500'}
-                tt="uppercase"
-                size={'$5'}
-                color={'$black'}
-                ml={'$2'}
-              >
-                copy link
+            copy link
+          </Button.Text>
+        </Button>
+        {Platform.OS === 'web' && (
+          <Dialog.Close asChild>
+            <Button borderRadius={'$4'} p={'$4'} focusStyle={{ outlineWidth: 0 }}>
+              <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'}>
+                close
               </Button.Text>
             </Button>
-            <Dialog.Close asChild>
-              <Button borderRadius={'$4'} p={'$4'} focusStyle={{ outlineWidth: 0 }}>
-                <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'}>
-                  close
-                </Button.Text>
-              </Button>
-            </Dialog.Close>
-          </YStack>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog>
+          </Dialog.Close>
+        )}
+      </YStack>
+    </>
+  )
+
+  // Web version using Dialog
+  if (Platform.OS === 'web') {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <Dialog.Portal>
+          <Dialog.Overlay />
+          <Dialog.Content
+            width={'85%'}
+            br={'$5'}
+            p={'$5'}
+            gap={'$3.5'}
+            maxWidth={400}
+            $gtLg={{ p: '$7', gap: '$5' }}
+          >
+            {dialogContent}
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog>
+    )
+  }
+
+  // Native version using Sheet
+  return (
+    <Sheet
+      open={isOpen}
+      onOpenChange={onClose}
+      modal
+      dismissOnSnapToBottom
+      dismissOnOverlayPress
+      native
+      snapPoints={[70]}
+    >
+      <Sheet.Frame key="share-profile-sheet" gap="$3.5" padding="$5">
+        {dialogContent}
+      </Sheet.Frame>
+      <Sheet.Overlay />
+    </Sheet>
   )
 }
