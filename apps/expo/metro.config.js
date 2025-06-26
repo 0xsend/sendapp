@@ -41,8 +41,40 @@ config.resolver.nodeModulesPaths = [
 config.resolver.resolverMainFields = ['react-native', 'browser', 'main']
 config.resolver.platforms = ['ios', 'android', 'native', 'web']
 
+// Add Node.js polyfills for React Native
+config.resolver.alias = {
+  ...config.resolver.alias,
+  crypto: 'react-native-crypto',
+  'node:crypto': 'react-native-crypto',
+  stream: 'stream-browserify',
+  buffer: 'buffer',
+}
+
 // Custom resolver to handle packages with exports field that Metro doesn't support properly
 config.resolver.resolveRequest = (context, moduleName, platform) => {
+  // Handle Node.js built-in modules that aren't available in React Native
+  if (moduleName === 'node:crypto' || moduleName === 'crypto') {
+    return {
+      filePath: path.resolve(workspaceRoot, 'node_modules/react-native-crypto/index.js'),
+      type: 'sourceFile',
+    }
+  }
+
+  if (moduleName === 'node:stream' || moduleName === 'stream') {
+    return {
+      filePath: path.resolve(workspaceRoot, 'node_modules/stream-browserify/index.js'),
+      type: 'sourceFile',
+    }
+  }
+
+  if (moduleName === 'node:buffer' || moduleName === 'buffer') {
+    return {
+      filePath: path.resolve(workspaceRoot, 'node_modules/buffer/index.js'),
+      type: 'sourceFile',
+    }
+  }
+
+  // Handle @0xsend/send-earn-contracts (existing resolver)
   if (moduleName === '@0xsend/send-earn-contracts') {
     return {
       filePath: path.resolve(
@@ -52,6 +84,62 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
       type: 'sourceFile',
     }
   }
+
+  // Generic handler for @coinbase/onchainkit subpath exports
+  if (moduleName.startsWith('@coinbase/onchainkit/')) {
+    const subpath = moduleName.replace('@coinbase/onchainkit/', '')
+
+    // Handle known subpaths based on the package.json exports
+    const knownSubpaths = [
+      'api',
+      'appchain',
+      'buy',
+      'checkout',
+      'core',
+      'earn',
+      'fund',
+      'identity',
+      'minikit',
+      'nft',
+      'signature',
+      'swap',
+      'token',
+      'transaction',
+      'wallet',
+    ]
+
+    if (knownSubpaths.includes(subpath)) {
+      return {
+        filePath: path.resolve(
+          workspaceRoot,
+          `node_modules/@coinbase/onchainkit/esm/${subpath}/index.js`
+        ),
+        type: 'sourceFile',
+      }
+    }
+
+    // Handle special nested exports like 'nft/view' and 'nft/mint'
+    if (subpath === 'nft/view') {
+      return {
+        filePath: path.resolve(
+          workspaceRoot,
+          'node_modules/@coinbase/onchainkit/esm/nft/components/view/index.js'
+        ),
+        type: 'sourceFile',
+      }
+    }
+
+    if (subpath === 'nft/mint') {
+      return {
+        filePath: path.resolve(
+          workspaceRoot,
+          'node_modules/@coinbase/onchainkit/esm/nft/components/mint/index.js'
+        ),
+        type: 'sourceFile',
+      }
+    }
+  }
+
   // Fall back to default resolver for all other modules
   return context.resolveRequest(context, moduleName, platform)
 }

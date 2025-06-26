@@ -19,7 +19,7 @@ interface OnrampParams {
   amount: number
 }
 
-export function useCoinbaseOnramp({
+export default function useCoinbaseOnramp({
   projectId,
   address,
   partnerUserId,
@@ -156,6 +156,5 @@ export function useCoinbaseOnramp({
     status,
     error: mutation.error as Error | null,
     isLoading: mutation.isPending,
-    isRedirecting: isSuccess,
   }
 }

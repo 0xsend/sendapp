@@ -1,5 +1,5 @@
 import { useSendAccount } from 'app/utils/send-accounts'
-import { useCoinbaseOnramp } from 'app/utils/useCoinbaseOnramp'
+import useCoinbaseOnramp from 'app/utils/useCoinbaseOnramp'
 import { toNiceError } from 'app/utils/toNiceError'
 import { Button, FadeCard, Paragraph, Spinner, YStack } from '@my/ui'
 import { IconError } from 'app/components/icons'
@@ -8,6 +8,7 @@ import { CoinbaseOnrampVerifyScreen } from '../components/CoinbaseOnrampVerifySc
 import { useRouter } from 'solito/router'
 import { useEffect, useState } from 'react'
 import { DepositCoinbaseForm } from 'app/features/deposit/DepositCoinbase/DepositCoinbaseForm'
+import { Platform } from 'react-native'
 
 const COINBASE_APP_ID = process.env.NEXT_PUBLIC_CDP_APP_ID ?? ''
 
@@ -40,7 +41,7 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
   }
 
   useEffect(() => {
-    if (coinbaseStatus === 'success') {
+    if (coinbaseStatus === 'success' && Platform.OS === 'web') {
       router.push('/deposit/success')
     }
   }, [coinbaseStatus, router.push])
