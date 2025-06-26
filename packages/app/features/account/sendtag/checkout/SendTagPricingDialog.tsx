@@ -1,10 +1,10 @@
 import type { Tables } from '@my/supabase/database.types'
 import {
-  Adapt,
   Button,
   ButtonIcon,
   ButtonText,
   Dialog,
+  H2,
   H6,
   Paragraph,
   Separator,
@@ -17,8 +17,9 @@ import {
 } from '@my/ui'
 import { Info, X, XCircle } from '@tamagui/lucide-icons'
 import { IconInfoGreenCircle } from 'app/components/icons'
-import { total, pricing } from 'app/data/sendtags'
+import { pricing, total } from 'app/data/sendtags'
 import React, { useMemo, useState } from 'react'
+import { Platform } from 'react-native'
 import { formatUnits } from 'viem'
 import { usdcCoin } from 'app/data/coins'
 import { useThemeSetting } from '@tamagui/next-theme'
@@ -26,110 +27,135 @@ import { useThemeSetting } from '@tamagui/next-theme'
 export function SendTagPricingDialog({ name = '' }: { name: Tables<'tags'>['name'] }) {
   const price = useMemo(() => total([{ name }]), [name])
   const [isOpen, setIsOpen] = useState(false)
-  return (
-    <Dialog modal onOpenChange={setIsOpen}>
-      <Dialog.Trigger>
-        <SendTagPricingButton isOpen={isOpen} name={name} price={price} />
-      </Dialog.Trigger>
-      <Adapt when="sm" platform="touch">
-        <Sheet zIndex={200000} modal dismissOnSnapToBottom disableDrag>
-          <Sheet.Frame padding="$4" gap="$4">
-            <Adapt.Contents />
-          </Sheet.Frame>
-          <Sheet.Overlay animation="lazy" enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }} />
-        </Sheet>
-      </Adapt>
 
-      <Dialog.Portal>
-        <Dialog.Overlay
-          key="overlay"
-          animation="quick"
-          opacity={0.5}
-          enterStyle={{ opacity: 0 }}
-          exitStyle={{ opacity: 0 }}
-        />
-
-        <Dialog.Content
-          bordered
-          elevation={'$0.75'}
-          key="content"
-          animateOnly={['transform', 'opacity']}
-          animation={[
-            'quick',
-            {
-              opacity: {
-                overshootClamping: true,
-              },
-            },
-          ]}
-          enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
-          exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
-          gap="$4"
-          width="100%"
-          maw={600}
-          $theme-dark={{ bc: '$black' }}
-          $theme-light={{ bc: '$gray4Light' }}
-        >
-          <Dialog.Title
-            ta={'left'}
-            $theme-dark={{ col: '$white' }}
-            $theme-light={{ col: '$black' }}
-            fontFamily={'$mono'}
-          >
-            Sendtag Pricing
-          </Dialog.Title>
-          <Dialog.Description
-            size={'$4'}
-            $theme-dark={{ col: '$white' }}
-            $theme-light={{ col: '$black' }}
-          >
-            Sendtags are priced based on their length. The shorter the Sendtag, the more it costs.
-          </Dialog.Description>
-          <YStack gap="$4" jc="center">
-            {pricing.map((item) => (
-              <XStack key={item.length}>
-                <SizableText
-                  fontWeight="900"
-                  $theme-dark={{ col: '$white' }}
-                  $theme-light={{ col: '$black' }}
-                  w="50%"
-                  fontFamily={'$mono'}
-                >
-                  {item.length}
-                </SizableText>
-                <SizableText
-                  f={1}
-                  ta="left"
-                  $theme-dark={{ col: '$primary' }}
-                  $theme-light={{ col: '$color12' }}
-                  fontFamily={'$mono'}
-                >
-                  {item.price} USDC
-                </SizableText>
-              </XStack>
-            ))}
-          </YStack>
-
-          <XStack alignSelf="flex-end" gap="$4">
-            <Dialog.Close displayWhenAdapted asChild>
-              <Button aria-label="Close">
-                <ButtonText color="$color12">OK</ButtonText>
-              </Button>
-            </Dialog.Close>
+  // Shared content component to avoid duplication
+  const dialogContent = (
+    <>
+      <H2
+        ta={'left'}
+        $theme-dark={{ col: '$white' }}
+        $theme-light={{ col: '$black' }}
+        fontFamily={'$mono'}
+      >
+        Sendtag Pricing
+      </H2>
+      <Paragraph size={'$4'} $theme-dark={{ col: '$white' }} $theme-light={{ col: '$black' }}>
+        Sendtags are priced based on their length. The shorter the Sendtag, the more it costs.
+      </Paragraph>
+      <YStack gap="$4" jc="center">
+        {pricing.map((item) => (
+          <XStack key={item.length}>
+            <SizableText
+              fontWeight="900"
+              $theme-dark={{ col: '$white' }}
+              $theme-light={{ col: '$black' }}
+              w="50%"
+              fontFamily={'$mono'}
+            >
+              {item.length}
+            </SizableText>
+            <SizableText
+              f={1}
+              ta="left"
+              $theme-dark={{ col: '$primary' }}
+              $theme-light={{ col: '$color12' }}
+              fontFamily={'$mono'}
+            >
+              {item.price} USDC
+            </SizableText>
           </XStack>
+        ))}
+      </YStack>
+      <XStack alignSelf="flex-end" gap="$4">
+        {Platform.OS === 'web' && (
+          <Dialog.Close asChild>
+            <Button aria-label="Close">
+              <ButtonText color="$color12">OK</ButtonText>
+            </Button>
+          </Dialog.Close>
+        )}
+      </XStack>
+      {Platform.OS === 'web' && (
+        <Unspaced>
+          <Dialog.Close asChild>
+            <Button position="absolute" top="$3" right="$3" size="$2" circular>
+              <ButtonIcon>
+                <X size={16} color="$color12" />
+              </ButtonIcon>
+            </Button>
+          </Dialog.Close>
+        </Unspaced>
+      )}
+    </>
+  )
 
-          <Unspaced>
-            <Dialog.Close asChild>
-              <Button position="absolute" top="$3" right="$3" size="$2" circular>
-                <ButtonIcon>
-                  <X size={16} color="$color12" />
-                </ButtonIcon>
-              </Button>
-            </Dialog.Close>
-          </Unspaced>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog>
+  // Web version using Dialog
+  if (Platform.OS === 'web') {
+    return (
+      <Dialog modal onOpenChange={setIsOpen}>
+        <Dialog.Trigger>
+          <SendTagPricingButton isOpen={isOpen} name={name} price={price} />
+        </Dialog.Trigger>
+        <Dialog.Portal>
+          <Dialog.Overlay
+            key="overlay"
+            animation="quick"
+            opacity={0.5}
+            enterStyle={{ opacity: 0 }}
+            exitStyle={{ opacity: 0 }}
+          />
+          <Dialog.Content
+            bordered
+            elevation={'$0.75'}
+            key="content"
+            animateOnly={['transform', 'opacity']}
+            animation={[
+              'quick',
+              {
+                opacity: {
+                  overshootClamping: true,
+                },
+              },
+            ]}
+            enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
+            exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
+            gap="$4"
+            width="90%"
+            maw={600}
+            $theme-dark={{ bc: '$black' }}
+            $theme-light={{ bc: '$gray4Light' }}
+          >
+            {dialogContent}
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog>
+    )
+  }
+
+  // Native version using Sheet
+  return (
+    <>
+      <SendTagPricingButton
+        isOpen={isOpen}
+        name={name}
+        price={price}
+        onPress={() => setIsOpen(true)}
+      />
+      <Sheet
+        open={isOpen}
+        onOpenChange={setIsOpen}
+        modal
+        dismissOnSnapToBottom
+        dismissOnOverlayPress
+        native
+        snapPoints={[50]}
+      >
+        <Sheet.Frame key="sendtag-pricing-sheet" gap="$4" padding="$4">
+          {dialogContent}
+        </Sheet.Frame>
+        <Sheet.Overlay />
+      </Sheet>
+    </>
   )
 }
 
@@ -224,10 +250,12 @@ const SendTagPricingButton = ({
   isOpen,
   name,
   price,
+  onPress,
 }: {
   isOpen: boolean
   name: string
   price: bigint
+  onPress?: () => void
 }) => {
   const { resolvedTheme } = useThemeSetting()
   const isDark = resolvedTheme?.startsWith('dark')
@@ -249,6 +277,7 @@ const SendTagPricingButton = ({
       pressStyle={{ bc: 'transparent', borderColor: 'transparent' }}
       // @ts-expect-error tamagui doesn't support this yet
       type="button"
+      onPress={onPress}
     >
       <ButtonText col={'$color12'} fontSize={'$5'}>
         {(() => {
