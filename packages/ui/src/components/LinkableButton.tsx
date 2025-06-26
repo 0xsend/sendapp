@@ -1,9 +1,8 @@
 import { styled, ButtonText, ButtonIcon, ButtonContext, Button, type ButtonProps } from 'tamagui'
 import { withStaticProperties } from '@tamagui/helpers'
-import { useLink } from 'solito/link'
+import { useLink, type LinkProps } from 'solito/link'
 
 import { getButtonSized } from '@tamagui/get-button-sized'
-import type { LinkProps } from './Link'
 
 const BUTTON_NAME = 'Button'
 
@@ -105,4 +104,4 @@ export const LinkableButton = withStaticProperties(LinkableButton_, {
   Icon: ButtonIcon,
 })
 
-export type LinkableButtonProps = ButtonProps & LinkProps
+export type LinkableButtonProps = Omit<ButtonProps, 'href'> & LinkProps
