@@ -4,20 +4,21 @@ import {
   Button,
   ButtonText,
   Card,
+  Dialog,
   H4,
   isWeb,
   Paragraph,
   ScrollView,
+  Sheet,
   Spinner,
   Stack,
   Text,
+  ThemeableStack,
   useMedia,
   View,
   XStack,
   YGroup,
   YStack,
-  Dialog,
-  ThemeableStack,
 } from '@my/ui'
 import { ExternalLink } from '@tamagui/lucide-icons'
 import { useThemeSetting } from '@tamagui/next-theme'
@@ -28,6 +29,7 @@ import { shorten } from 'app/utils/strings'
 import { useSearchResultHref } from 'app/utils/useSearchResultHref'
 import * as Linking from 'expo-linking'
 import { Fragment, useEffect, useState } from 'react'
+import { Platform } from 'react-native'
 import { FormProvider } from 'react-hook-form'
 import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
@@ -309,64 +311,94 @@ const AddressSearchResultRow = ({ address }: { address: Address }) => {
 }
 
 function ConfirmSendDialog({ isOpen, onClose, onConfirm, address }) {
+  // Shared content component to avoid duplication
+  const dialogContent = (
+    <>
+      <YStack gap="$4">
+        <H4>Confirm External Send</H4>
+        <Paragraph>Please confirm you agree to the following before sending:</Paragraph>
+        <Paragraph>1. The external address is on Base Network.</Paragraph>
+        <YStack alignItems={'flex-start'}>
+          <Paragraph>2. I have double checked the address:</Paragraph>
+          <Button
+            size="$2"
+            py="$4"
+            height={'auto'}
+            theme="yellow_active"
+            onPress={() => {
+              if (isWeb) {
+                window.open(
+                  `${baseMainnet.blockExplorers.default.url}/address/${address}`,
+                  '_blank',
+                  'noopener,noreferrer'
+                )
+              } else {
+                Linking.openURL(`${baseMainnet.blockExplorers.default.url}/address/${address}`)
+              }
+            }}
+            fontFamily={'$mono'}
+            fontWeight={'bold'}
+            iconAfter={<ExternalLink size={14} color={'$color11'} />}
+            mt="$4"
+          >
+            <Button.Text color={'$color11'}>{address}</Button.Text>
+          </Button>
+        </YStack>
+        <Paragraph>
+          3. I understand that if I make any mistakes, there is no way to recover the funds.
+        </Paragraph>
+        <XStack justifyContent="flex-end" marginTop="$4" gap="$4">
+          {Platform.OS === 'web' && (
+            <Dialog.Close asChild>
+              <Button theme="red_active" br={'$2'}>
+                <Button.Text>Cancel</Button.Text>
+              </Button>
+            </Dialog.Close>
+          )}
+          <Button
+            theme="green"
+            onPress={onConfirm}
+            br={'$2'}
+            zIndex={100}
+            width={Platform.OS === 'web' ? undefined : '100%'}
+          >
+            <Button.Text color="$color0" $theme-light={{ color: '$color12' }}>
+              I Agree & Continue
+            </Button.Text>
+          </Button>
+        </XStack>
+      </YStack>
+    </>
+  )
+
+  // Web version using Dialog
+  if (Platform.OS === 'web') {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <Dialog.Portal>
+          <Dialog.Overlay />
+          <Dialog.Content gap="$4">{dialogContent}</Dialog.Content>
+        </Dialog.Portal>
+      </Dialog>
+    )
+  }
+
+  // Native version using Sheet
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <Dialog.Portal>
-        <Dialog.Overlay />
-        <Dialog.Content gap="$4">
-          <YStack gap="$4">
-            <Dialog.Title>Confirm External Send</Dialog.Title>
-            <Dialog.Description>
-              Please confirm you agree to the following before sending:
-            </Dialog.Description>
-            <Paragraph>1. The external address is on Base Network.</Paragraph>
-
-            <Paragraph>
-              2. I have double checked the address:
-              <Button
-                size="$2"
-                py="$4"
-                theme="yellow_active"
-                onPress={() => {
-                  if (isWeb) {
-                    window.open(
-                      `${baseMainnet.blockExplorers.default.url}/address/${address}`,
-                      '_blank',
-                      'noopener,noreferrer'
-                    )
-                  } else {
-                    Linking.openURL(`${baseMainnet.blockExplorers.default.url}/address/${address}`)
-                  }
-                }}
-                fontFamily={'$mono'}
-                fontWeight={'bold'}
-                iconAfter={<ExternalLink size={14} $theme-light={{ col: '$color11' }} />}
-                mt="$4"
-              >
-                <Button.Text $theme-light={{ col: '$color11' }}>{address}</Button.Text>
-              </Button>
-            </Paragraph>
-
-            <Paragraph>
-              3. I understand that if I make any mistakes, there is no way to recover the funds.
-            </Paragraph>
-
-            <XStack justifyContent="flex-end" marginTop="$4" gap="$4">
-              <Dialog.Close asChild>
-                <Button theme="red_active" br={'$2'}>
-                  <Button.Text>Cancel</Button.Text>
-                </Button>
-              </Dialog.Close>
-              <Button theme="green" onPress={onConfirm} br={'$2'} zIndex={100}>
-                <Button.Text color="$color0" $theme-light={{ color: '$color12' }}>
-                  I Agree & Continue
-                </Button.Text>
-              </Button>
-            </XStack>
-          </YStack>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog>
+    <Sheet
+      open={isOpen}
+      onOpenChange={onClose}
+      modal
+      dismissOnSnapToBottom
+      dismissOnOverlayPress
+      native
+      snapPoints={[70]}
+    >
+      <Sheet.Frame key="confirm-send-sheet" gap="$4" padding="$4">
+        {dialogContent}
+      </Sheet.Frame>
+      <Sheet.Overlay />
+    </Sheet>
   )
 }
 
