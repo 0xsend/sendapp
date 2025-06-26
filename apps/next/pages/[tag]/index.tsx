@@ -8,8 +8,7 @@ import { userOnboarded } from 'utils/userOnboarded'
 import { SendtagSchema } from 'app/utils/zod/sendtag'
 import { assert } from 'app/utils/assert'
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
-import { TopNav } from 'app/components/TopNav'
-import { HomeLayout } from 'app/features/home/layout.web'
+import { ProfileLayout } from 'app/features/profile/layout.web'
 
 interface PageProps {
   profile?: {
@@ -139,10 +138,6 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   }
 }) satisfies GetServerSideProps
 
-Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav backFunction="router" />} fullHeight>
-    {children}
-  </HomeLayout>
-)
+Page.getLayout = (children) => <ProfileLayout>{children}</ProfileLayout>
 
 export default Page
