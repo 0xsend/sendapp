@@ -56,7 +56,7 @@ export function ShareProfileDialog({ isOpen, onClose }: ShareProfileDialogProps)
       <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
       {profileUrl && (
         <YStack ai={'center'} gap={'$3'}>
-          <QRCodeSVG value={profileUrl} size={200} color="#000000" backgroundColor="#FFFFFF" />
+          <QRCodeSVG value={profileUrl} size={240} />
           <Paragraph size={'$4'} color={'$color10'} ta={'center'} numberOfLines={1}>
             {profileUrl}
           </Paragraph>
