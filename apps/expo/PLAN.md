@@ -228,7 +228,7 @@ You can use the following methods to verify the app is functioning correctly:
 **Global issues**:
 - visual issues, broken UI/styling
 - referral code reading/writing is not working, due to implementation using cookies
-- dialogs are not appearing
+- dialogs are not appearing ✅
 - QR code generation library is not working on native
 - a lot os stuff is blinking all over the place, too much data fetching, too much fading
 
@@ -253,10 +253,9 @@ You can use the following methods to verify the app is functioning correctly:
 - QR code not working
 
 **Sendtags**:
-- pricing dialog not appearing
+- pricing dialog not appearing ✅
 - referral code is not working
 - sendtag register is not stable, weird stuff is going on sometimes, like money gone but no sendtag
-- redirect to external address is not working due to broken dialog
 
 **SendPot**:
 - number of tickets purchased is not increased after purchase automatically, its fine after close and open again
@@ -270,7 +269,7 @@ You can use the following methods to verify the app is functioning correctly:
 - a lot os stuff is blinking on earn
 
 **Activity**:
-- redirect to external address is not working due to broken dialog
+- redirect to external address is not working due to broken dialog ✅
 
 **History**:
 - rework flow of screens, cannot go back from profile details, history and receipt, use screen stacking
@@ -279,7 +278,7 @@ You can use the following methods to verify the app is functioning correctly:
 
 **Deposit**:
 - QR to deposit by crypto transfer is not working
-- cannot copy address due to not working dialog
+- cannot copy address due to not working dialog ✅
 - current implementation of coinbase onramp rely on browser API, need to build version for native https://github.com/coinbase/onramp-demo-mobile
 
 ## Planned Improvements [POST RELEASE]
