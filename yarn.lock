@@ -11295,15 +11295,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/qrcode@npm:^1.5.3":
-  version: 1.5.5
-  resolution: "@types/qrcode@npm:1.5.5"
-  dependencies:
-    "@types/node": "npm:*"
-  checksum: 10/a25686339bd2718e6a93943e7807ed68dd9c74a9da28aa77212086ee0ce9a173c0a232af9e3f6835acd09938dfc8a0f98c6bccf1a6c6a905fb003ab07f9e08f2
-  languageName: node
-  linkType: hard
-
 "@types/qs@npm:*":
   version: 6.9.10
   resolution: "@types/qs@npm:6.9.10"
@@ -13588,7 +13579,6 @@ __metadata:
     "@testing-library/react-native": "npm:^13.2.0"
     "@trpc/client": "npm:^11.2.0"
     "@types/jsonwebtoken": "npm:^9.0.2"
-    "@types/qrcode": "npm:^1.5.3"
     "@types/react": "npm:^18.2.15"
     "@wagmi/chains": "npm:^1.8.0"
     "@wagmi/connectors": "npm:^5.7.12"
@@ -13617,7 +13607,6 @@ __metadata:
     next: "npm:15.3.1"
     nock: "npm:^14.0.3"
     permissionless: "npm:^0.1.14"
-    qrcode: "npm:^1.5.3"
     react-hook-form: "npm:^7.48.2"
     react-native: "npm:0.76.9"
     react-native-passkeys: "npm:~0.3.3"
@@ -28929,7 +28918,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"qrcode@npm:^1.5.3, qrcode@npm:^1.5.4":
+"qrcode@npm:^1.5.4":
   version: 1.5.4
   resolution: "qrcode@npm:1.5.4"
   dependencies:
