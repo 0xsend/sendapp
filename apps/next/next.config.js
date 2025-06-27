@@ -141,6 +141,7 @@ export default () => {
       '@ts-react/form',
       'react-hook-form',
       'react-native-passkeys',
+      'react-native-qrcode-svg',
     ],
     experimental: {
       optimizePackageImports: [
