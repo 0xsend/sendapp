@@ -4,17 +4,17 @@ import {
   H2,
   isWeb,
   Paragraph,
+  QRCode,
   Separator,
   Sheet,
   useToastController,
   YStack,
 } from '@my/ui'
-import { IconCopy } from 'app/components/icons'
+import { IconCopy, IconSend } from 'app/components/icons'
 import { useConfirmedTags } from 'app/utils/tags'
 import { useUser } from 'app/utils/useUser'
 import * as Clipboard from 'expo-clipboard'
 import { Platform } from 'react-native'
-import QRCodeSVG from 'react-native-qrcode-svg'
 
 interface ShareProfileDialogProps {
   isOpen: boolean
@@ -56,7 +56,7 @@ export function ShareProfileDialog({ isOpen, onClose }: ShareProfileDialogProps)
       <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
       {profileUrl && (
         <YStack ai={'center'} gap={'$3'}>
-          <QRCodeSVG value={profileUrl} size={240} />
+          <QRCode value={profileUrl} size={240} centerComponent={<IconSend size={'$5'} />} />
           <Paragraph size={'$4'} color={'$color10'} ta={'center'} numberOfLines={1}>
             {profileUrl}
           </Paragraph>

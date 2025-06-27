@@ -1,6 +1,6 @@
-import { Text, YStack } from '@my/ui'
+import { QRCode, Text, YStack } from '@my/ui'
 import type { Address } from 'viem'
-import QRCodeSVG from 'react-native-qrcode-svg'
+import { IconBase } from 'app/components/icons'
 
 type DepositAddressQR = {
   address?: Address
@@ -28,7 +28,7 @@ export function DepositAddressQR({ address, isConfirmed, onPress }: DepositAddre
             borderRadius: 8,
           }}
         >
-          <QRCodeSVG value={address} size={240} />
+          <QRCode value={address} size={240} centerComponent={<IconBase size={'$5'} />} />
         </YStack>
         {!isConfirmed && (
           <YStack
