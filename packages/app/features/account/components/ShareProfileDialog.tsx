@@ -2,7 +2,6 @@ import {
   Button,
   Dialog,
   H2,
-  Image,
   isWeb,
   Paragraph,
   Separator,
@@ -14,9 +13,8 @@ import { IconCopy } from 'app/components/icons'
 import { useConfirmedTags } from 'app/utils/tags'
 import { useUser } from 'app/utils/useUser'
 import * as Clipboard from 'expo-clipboard'
-import QRCode from 'qrcode'
-import { useEffect, useState } from 'react'
 import { Platform } from 'react-native'
+import QRCodeSVG from 'react-native-qrcode-svg'
 
 interface ShareProfileDialogProps {
   isOpen: boolean
@@ -27,7 +25,6 @@ export function ShareProfileDialog({ isOpen, onClose }: ShareProfileDialogProps)
   const { profile } = useUser()
   const tags = useConfirmedTags()
   const toast = useToastController()
-  const [qrCodeDataURL, setQrCodeDataURL] = useState<string>('')
 
   // Use sendtag if available, otherwise fall back to send_id
   const sendtag = tags?.[0]?.name
@@ -35,30 +32,6 @@ export function ShareProfileDialog({ isOpen, onClose }: ShareProfileDialogProps)
   const profileUrl = sendtag
     ? `https://${hostname}/${sendtag}`
     : `https://${hostname}/profile/${profile?.send_id}`
-
-  useEffect(() => {
-    if (isOpen && profileUrl) {
-      QRCode.toDataURL(profileUrl, {
-        width: 200,
-        margin: 2,
-        color: {
-          dark: '#000000',
-          light: '#FFFFFF',
-        },
-      })
-        .then(setQrCodeDataURL)
-        .catch((e) => {
-          console.error(e)
-          toast.show('Failed to create QR code', {
-            message: 'Something went wrong while creating QR code',
-            customData: {
-              theme: 'red',
-            },
-          })
-          setQrCodeDataURL('')
-        })
-    }
-  }, [isOpen, profileUrl, toast.show])
 
   const handleCopyLink = async () => {
     try {
@@ -81,9 +54,9 @@ export function ShareProfileDialog({ isOpen, onClose }: ShareProfileDialogProps)
         Share Profile
       </H2>
       <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
-      {qrCodeDataURL && (
+      {profileUrl && (
         <YStack ai={'center'} gap={'$3'}>
-          <Image source={{ uri: qrCodeDataURL }} width={200} height={200} br={'$3'} />
+          <QRCodeSVG value={profileUrl} size={200} color="#000000" backgroundColor="#FFFFFF" />
           <Paragraph size={'$4'} color={'$color10'} ta={'center'} numberOfLines={1}>
             {profileUrl}
           </Paragraph>
@@ -159,7 +132,7 @@ export function ShareProfileDialog({ isOpen, onClose }: ShareProfileDialogProps)
       dismissOnSnapToBottom
       dismissOnOverlayPress
       native
-      snapPoints={[70]}
+      snapPoints={[65]}
     >
       <Sheet.Frame key="share-profile-sheet" gap="$3.5" padding="$5">
         {dialogContent}
