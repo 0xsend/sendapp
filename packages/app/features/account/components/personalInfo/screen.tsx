@@ -4,7 +4,6 @@ import {
   Paragraph,
   Separator,
   SubmitButton,
-  Text,
   useToastController,
   YStack,
 } from '@my/ui'
@@ -102,10 +101,9 @@ export const PersonalInfoScreen = () => {
   useEffect(() => {
     form.reset({
       phone: user?.phone ?? '',
-      xUsername: profile?.x_username ?? '',
       birthday,
     })
-  }, [profile?.x_username, user?.phone, form.reset, birthday])
+  }, [user?.phone, form.reset, birthday])
 
   const verificationCode = (
     <FadeCard>
@@ -146,16 +144,6 @@ export const PersonalInfoScreen = () => {
           autoCapitalize: 'none',
           bc: '$color0',
         },
-        xUsername: {
-          'aria-label': 'X username',
-          bc: '$color0',
-          pl: '$8',
-          iconBefore: (
-            <Text ml={'$4'} color="$color10" userSelect={'none'} fontSize={'$6'}>
-              @
-            </Text>
-          ),
-        },
         birthday: {
           'aria-label': 'birthday',
           bc: '$color0',
@@ -171,14 +159,10 @@ export const PersonalInfoScreen = () => {
       }}
       renderAfter={renderAfterContent}
     >
-      {({ birthday, xUsername }) => (
+      {({ birthday }) => (
         <FadeCard elevation={'$0.75'}>
           <FieldWithLabel label={'Date of Birth'} additionalInfo={'(non-editable)'} gap={'$2'}>
             {birthday}
-          </FieldWithLabel>
-          <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
-          <FieldWithLabel label={'X Handle'} gap={'$2'}>
-            {xUsername}
           </FieldWithLabel>
         </FadeCard>
       )}
@@ -192,11 +176,6 @@ export const PersonalInfoScreen = () => {
           label={'Date of Birth'}
           text={formatDate(birthday) || '-'}
           additionalInfo={'(non-editable)'}
-        />
-        <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
-        <ReadOnlyFieldWithLabel
-          label={'X Handle'}
-          text={profile?.x_username ? `@ ${profile?.x_username}` : '-'}
         />
       </FadeCard>
       <SubmitButton onPress={() => setFormState(FormState.PersonalInfoForm)}>
