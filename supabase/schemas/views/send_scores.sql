@@ -1,7 +1,20 @@
 -- non optimized use with caution
+-- Updated with hardcoded access rules
 CREATE OR REPLACE VIEW send_scores_current_unique
 WITH ("security_invoker"='on', "security_barrier"='on') AS
-WITH active_distribution AS (
+WITH access_control AS (
+  SELECT
+    CASE
+      -- Admin callers (postgres, service_role) see all scores
+      WHEN current_user IN ('postgres', 'service_role') THEN true
+      -- Authenticated users see only their own scores  
+      WHEN auth.role() = 'authenticated' AND auth.uid() IS NOT NULL THEN false -- user-specific filtering applied later
+      -- Anonymous/other callers see nothing
+      ELSE null -- will cause empty result
+    END AS show_all_users,
+    auth.uid() AS current_user_id
+),
+active_distribution AS (
   SELECT
     id,
     number,
@@ -93,6 +106,15 @@ WHERE LEAST(
   END,
   send_ceiling
 ) > 0
+  -- Apply access control filtering
+  AND (
+    (SELECT show_all_users FROM access_control) = true -- Admin sees all
+    OR (
+      (SELECT show_all_users FROM access_control) = false 
+      AND from_user_id = (SELECT current_user_id FROM access_control) -- Authenticated user sees only their own
+    )
+    -- If show_all_users is null (anonymous), no results
+  )
 GROUP BY from_user_id, to_user_id;
 
 -- Historical materialized view
@@ -188,9 +210,20 @@ create materialized view "private"."send_scores_history" as  WITH distributions_
          HAVING (sum(LEAST(grouped_transfers.transfer_sum, grouped_transfers.send_ceiling)) > (0)::numeric)) scores
      JOIN send_ceiling_settings scs ON (((scores.address = scs.address) AND (scores.distribution_id = scs.distribution_id))));
 
--- Current scores view
-create or replace view "public"."send_scores_current" as  WITH authorized_user AS (
-         SELECT auth.uid() AS user_id
+-- Current scores view with hardcoded access rules
+create or replace view "public"."send_scores_current" as  WITH authorized_accounts AS (
+         SELECT sa.user_id,
+            decode(replace((sa.address)::text, ('0x'::citext)::text, ''::text), 'hex'::text) AS address_bytes
+           FROM send_accounts sa
+          WHERE
+                CASE
+                    -- Admin callers (postgres, service_role) see all scores
+                    WHEN current_user IN ('postgres', 'service_role') THEN true
+                    -- Authenticated users see only their own scores
+                    WHEN auth.role() = 'authenticated' AND auth.uid() IS NOT NULL THEN (sa.user_id = auth.uid())
+                    -- Anonymous/other callers see nothing
+                    ELSE false
+                END
         ), distributions_with_score AS (
          SELECT d.id,
             d.number,
@@ -221,12 +254,6 @@ create or replace view "public"."send_scores_current" as  WITH authorized_user A
             dws.start_time,
             dws.end_time
            FROM distributions_with_score dws
-        ), authorized_accounts AS (
-         SELECT sa.user_id,
-            decode(replace((sa.address)::text, ('0x'::citext)::text, ''::text), 'hex'::text) AS address_bytes
-           FROM (send_accounts sa
-             CROSS JOIN authorized_user au)
-          WHERE ((au.user_id IS NULL) OR (sa.user_id = au.user_id))
         ), authorized_distribution_shares AS (
          SELECT ds.user_id,
                 CASE
@@ -260,6 +287,11 @@ create or replace view "public"."send_scores_current" as  WITH authorized_user A
                     (- send_earn_withdraw.assets)
                    FROM send_earn_withdraw) earn_data
           WINDOW w AS (PARTITION BY earn_data.owner ORDER BY earn_data.block_time ROWS UNBOUNDED PRECEDING)
+        ), eligible_earn_accounts AS (
+         SELECT DISTINCT ebt.owner
+           FROM (earn_balances_timeline ebt
+             CROSS JOIN base_ceiling bc)
+          WHERE (ebt.balance >= (bc.earn_min_balance)::numeric)
         ), transfer_sums AS (
          SELECT transfers.f,
             bc.distribution_id,
@@ -270,20 +302,19 @@ create or replace view "public"."send_scores_current" as  WITH authorized_user A
                     stt.t,
                     stt.v,
                     stt.block_time
-                   FROM send_token_transfers stt
-                  WHERE ((stt.block_time >= bc.start_time) AND (stt.block_time <= bc.end_time) AND (stt.f IN ( SELECT authorized_accounts.address_bytes
-                           FROM authorized_accounts)))
+                   FROM (send_token_transfers stt
+                     JOIN authorized_accounts aa ON ((aa.address_bytes = stt.f)))
+                  WHERE ((stt.block_time >= bc.start_time) AND (stt.block_time <= bc.end_time))
                 UNION ALL
                  SELECT stv.f,
                     stv.t,
                     (stv.v * '10000000000000000'::numeric),
                     stv.block_time
-                   FROM send_token_v0_transfers stv
-                  WHERE ((stv.block_time >= bc.start_time) AND (stv.block_time <= bc.end_time) AND (stv.f IN ( SELECT authorized_accounts.address_bytes
-                           FROM authorized_accounts)))) transfers)
-          WHERE ((bc.earn_min_balance = 0) OR (EXISTS ( SELECT 1
-                   FROM earn_balances_timeline ebt
-                  WHERE ((ebt.owner = transfers.t) AND (ebt.balance >= (bc.earn_min_balance)::numeric) AND (ebt.block_time <= transfers.block_time) AND ((ebt.next_block_time IS NULL) OR (transfers.block_time < ebt.next_block_time))))))
+                   FROM (send_token_v0_transfers stv
+                     JOIN authorized_accounts aa ON ((aa.address_bytes = stv.f)))
+                  WHERE ((stv.block_time >= bc.start_time) AND (stv.block_time <= bc.end_time))) transfers)
+          WHERE ((bc.earn_min_balance = 0) OR (transfers.t IN ( SELECT eligible_earn_accounts.owner
+                   FROM eligible_earn_accounts)))
           GROUP BY transfers.f, bc.distribution_id, transfers.t
         )
  SELECT scs.user_id,
@@ -331,15 +362,17 @@ REVOKE ALL ON "private"."send_scores_history" FROM PUBLIC;
 REVOKE ALL ON "private"."send_scores_history" FROM authenticated;
 GRANT ALL ON "private"."send_scores_history" TO service_role;
 
-GRANT ALL ON "public"."send_scores_current_unique" TO PUBLIC;
-GRANT ALL ON "public"."send_scores_current_unique" TO service_role;
+REVOKE ALL ON "public"."send_scores_current_unique" FROM PUBLIC;
+GRANT ALL ON "public"."send_scores_current_unique" TO anon;
 GRANT ALL ON "public"."send_scores_current_unique" TO authenticated;
+GRANT ALL ON "public"."send_scores_current_unique" TO service_role;
 
 REVOKE ALL ON "public"."send_scores_current" FROM PUBLIC;
-REVOKE ALL ON "public"."send_scores_current" FROM anon;
-GRANT ALL ON "public"."send_scores_current" TO service_role;
+GRANT ALL ON "public"."send_scores_current" TO anon;
 GRANT ALL ON "public"."send_scores_current" TO authenticated;
+GRANT ALL ON "public"."send_scores_current" TO service_role;
 
-GRANT ALL ON "public"."send_scores" TO PUBLIC;
-GRANT ALL ON "public"."send_scores" TO service_role;
+REVOKE ALL ON "public"."send_scores" FROM PUBLIC;
+GRANT ALL ON "public"."send_scores" TO anon;
 GRANT ALL ON "public"."send_scores" TO authenticated;
+GRANT ALL ON "public"."send_scores" TO service_role;
