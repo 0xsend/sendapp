@@ -3,7 +3,7 @@ import { describe, beforeEach, test, jest, expect } from '@jest/globals'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native'
 import { DepositCoinbaseScreen } from './screen'
 import { useSendAccount } from 'app/utils/send-accounts'
-import { useCoinbaseOnramp } from 'app/utils/useCoinbaseOnramp'
+import useCoinbaseOnramp from 'app/utils/useCoinbaseOnramp'
 import { Provider } from 'app/__mocks__/app/provider'
 // Mock dependencies
 jest.mock('app/utils/send-accounts', () => ({

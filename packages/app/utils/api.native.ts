@@ -3,7 +3,7 @@ import { type CreateTRPCReact, createTRPCReact } from '@trpc/react-query'
 import type { AppRouter } from '@my/api'
 import { httpBatchLink } from '@trpc/client'
 import SuperJSON from 'superjson'
-import { getBaseUrl } from './getBaseUrl'
+import getBaseUrl from './getBaseUrl'
 import { supabase } from './supabase/client.native'
 
 export const api: CreateTRPCReact<AppRouter, unknown> = createTRPCReact<AppRouter>()

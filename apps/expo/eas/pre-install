@@ -1,0 +1,14 @@
+#!/bin/bash
+
+echo "Running pre-install EAS hook..."
+echo "Installing Foundry..."
+curl -L https://foundry.paradigm.xyz | bash
+source ~/.zshenv
+foundryup
+echo "Installing Bun..."
+curl -fsSL https://bun.sh/install | bash
+export PATH="$HOME/.bun/bin:$PATH"
+source ~/.zshenv
+echo "Verifying installations..."
+which forge
+which bun

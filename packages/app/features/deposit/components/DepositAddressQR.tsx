@@ -1,6 +1,6 @@
-import { Image, Paragraph, Text, YStack } from '@my/ui'
+import { QRCode, Text, YStack } from '@my/ui'
 import type { Address } from 'viem'
-import { useQRCode } from 'app/utils/useQRCode'
+import { IconBase } from 'app/components/icons'
 
 type DepositAddressQR = {
   address?: Address
@@ -9,20 +9,7 @@ type DepositAddressQR = {
 }
 
 export function DepositAddressQR({ address, isConfirmed, onPress }: DepositAddressQR) {
-  const { data: qrData, error } = useQRCode(address, {
-    width: 240,
-    logo: {
-      path: '/logos/base.svg',
-      size: 36,
-    },
-  })
-
   if (!address) return null
-
-  if (error) {
-    console.error(error)
-    return <Paragraph color={'$error'}>Could not generate QR code</Paragraph>
-  }
 
   return (
     <YStack ai="center" gap="$4" width="100%" cursor={'pointer'}>
@@ -41,38 +28,7 @@ export function DepositAddressQR({ address, isConfirmed, onPress }: DepositAddre
             borderRadius: 8,
           }}
         >
-          {qrData?.qrCodeUrl && (
-            <YStack position="relative">
-              <Image
-                source={{ uri: qrData.qrCodeUrl }}
-                width={240}
-                height={240}
-                objectFit="contain"
-                alt="QR Code"
-              />
-              {qrData.logoOverlay && (
-                <YStack
-                  position="absolute"
-                  backgroundColor="white"
-                  padding={4}
-                  borderRadius={4}
-                  top={Number(qrData.logoOverlay.position.top)}
-                  left={Number(qrData.logoOverlay.position.left)}
-                  style={{
-                    transform: qrData.logoOverlay.position.transform,
-                  }}
-                >
-                  <Image
-                    source={{ uri: qrData.logoOverlay.uri }}
-                    width={qrData.logoOverlay.size}
-                    height={qrData.logoOverlay.size}
-                    objectFit="contain"
-                    alt="Base Logo"
-                  />
-                </YStack>
-              )}
-            </YStack>
-          )}
+          <QRCode value={address} size={240} centerComponent={<IconBase size={'$5'} />} />
         </YStack>
         {!isConfirmed && (
           <YStack

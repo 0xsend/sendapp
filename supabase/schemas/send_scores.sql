@@ -119,10 +119,15 @@ CREATE OR REPLACE FUNCTION public.get_send_scores_history()
 AS $function$
 
 BEGIN
-    IF auth.role() = 'authenticated' THEN
-        RETURN QUERY SELECT * FROM private.send_scores_history WHERE send_scores_history.user_id = (select auth.uid());
-    ELSE
+    -- Admin callers (postgres, service_role) see all scores
+    IF current_user IN ('postgres', 'service_role') THEN
         RETURN QUERY SELECT * FROM private.send_scores_history;
+    -- Authenticated users see only their own scores
+    ELSIF auth.role() = 'authenticated' AND auth.uid() IS NOT NULL THEN
+        RETURN QUERY SELECT * FROM private.send_scores_history WHERE send_scores_history.user_id = auth.uid();
+    -- Anonymous/other callers see nothing
+    ELSE
+        RETURN;
     END IF;
 END;
 $function$
@@ -180,7 +185,7 @@ GRANT ALL ON FUNCTION "public"."refresh_send_scores_history"() TO service_role;
 
 
 REVOKE ALL ON FUNCTION "public"."get_send_scores_history"() FROM PUBLIC;
-REVOKE ALL ON FUNCTION "public"."get_send_scores_history"() FROM anon;
+GRANT ALL ON FUNCTION "public"."get_send_scores_history"() TO anon;
 GRANT ALL ON FUNCTION "public"."get_send_scores_history"() TO authenticated;
 GRANT ALL ON FUNCTION "public"."get_send_scores_history"() TO service_role;
 

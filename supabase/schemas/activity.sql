@@ -90,17 +90,35 @@ create or replace view "public"."activity_feed" as  SELECT a.created_at,
   GROUP BY a.created_at, a.event_name, a.from_user_id, a.to_user_id, from_p.id, from_p.name, from_p.avatar_url, from_p.send_id, to_p.id, to_p.name, to_p.avatar_url, to_p.send_id, a.data, from_sa.main_tag_id, from_main_tag.name, to_sa.main_tag_id, to_main_tag.name;
 
 -- Functions (that depend on activity_feed view)
-CREATE OR REPLACE FUNCTION favourite_senders()
-RETURNS SETOF activity_feed_user
-SECURITY DEFINER
-LANGUAGE plpgsql
-AS $$
+
+CREATE OR REPLACE FUNCTION public.favourite_senders()
+ RETURNS SETOF activity_feed_user
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
 BEGIN
 RETURN QUERY
 
-
--- Step 1: Filter relevant transfers and determine the counterparty
-    WITH user_transfers AS (
+-- Query each expensive view exactly once
+WITH user_send_scores AS (
+    SELECT
+        ss.user_id,
+        COALESCE(SUM(ss.score), 0) AS total_score
+    FROM send_scores ss
+    GROUP BY ss.user_id
+),
+user_earn_balances AS (
+    SELECT
+        sa.user_id,
+        COALESCE(MAX(seb.assets), 0) AS earn_balance
+    FROM send_accounts sa
+    INNER JOIN send_earn_balances seb ON (
+        decode(replace(sa.address::text, '0x', ''), 'hex') = seb.owner
+    )
+    GROUP BY sa.user_id
+),
+-- Filter relevant transfers and determine the counterparty
+user_transfers AS (
     SELECT *,
         -- Determine the counterparty: if the current user is the sender, use the recipient, and vice versa
         CASE
@@ -109,43 +127,44 @@ RETURN QUERY
         END AS counterparty
     FROM activity_feed
     -- Only include rows where both from_user and to_user have a send_id (indicates a transfer between users)
-    WHERE created_at >= NOW() - INTERVAL '60 days' -- only last 30 days
+    WHERE created_at >= NOW() - INTERVAL '60 days' -- only last 60 days
       AND (from_user).send_id IS NOT NULL
       AND (to_user).send_id IS NOT NULL
       AND ((from_user).id = (select auth.uid()) OR (to_user).id = (select auth.uid())) -- only tx with user involved
 ),
-
 -- Count how many interactions the current user has with each counterparty
 counterparty_counts AS (
     SELECT counterparty,
            COUNT(*) AS interaction_count
     FROM user_transfers
-    WHERE (counterparty).id IS NULL -- ignore if users were sending to their selves
+    WHERE (counterparty).id IS NOT NULL -- include only valid counterparties
     GROUP BY counterparty
     ORDER BY interaction_count DESC
     LIMIT 30 -- top 30 most frequent users
 ),
-
--- need users ids to count send score, activity feed doesnt have it, its not returned by this function, just used in calculations
+-- Get user IDs for counterparties
 with_user_id AS (
-  SELECT *, (SELECT id FROM profiles WHERE send_id = (counterparty).send_id) AS user_id
-  FROM counterparty_counts
+    SELECT *, (SELECT id FROM profiles WHERE send_id = (counterparty).send_id) AS user_id
+    FROM counterparty_counts
+    WHERE (SELECT id FROM profiles WHERE send_id = (counterparty).send_id) IS NOT NULL
 )
 
--- Select the top 10 counterparties by send score
+-- Select the top 10 counterparties by send score with earn balance requirement
 SELECT (counterparty).* -- only fields from activity feed
-FROM with_user_id
-    LEFT JOIN LATERAL ( -- calculate send score for top 30 frequent users
-        SELECT COALESCE(SUM(ds.amount), 0) AS send_score
-        FROM distribution_shares ds
-        WHERE ds.user_id = with_user_id.user_id
-        AND ds.distribution_id >= 6
-    ) score ON TRUE
-ORDER BY score.send_score DESC
+FROM with_user_id wui
+INNER JOIN user_send_scores uss ON uss.user_id = wui.user_id
+INNER JOIN user_earn_balances ueb ON ueb.user_id = wui.user_id
+WHERE ueb.earn_balance >= (
+    SELECT d.earn_min_balance
+    FROM distributions d
+    WHERE d.id = (SELECT MAX(id) FROM distributions)
+)
+ORDER BY uss.total_score DESC
 LIMIT 10; -- return top 10 send score users
 
 END;
-$$;
+$function$
+;
 ALTER FUNCTION "public"."favourite_senders"() OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION public.recent_senders()
@@ -218,22 +237,37 @@ WITH birthday_profiles AS (
         WHERE t.user_id = p.id
     )
 ),
--- Ensure user has historical send activity
-filtered_profiles AS (
-    SELECT bp.*
-    FROM birthday_profiles bp
-    WHERE EXISTS (
-        SELECT 1
-        FROM (
-            SELECT
-                SUM(ss.unique_sends) as total_sends,
-                SUM(ss.score) as total_score
-            FROM send_scores ss
-            WHERE ss.user_id = bp.id
-        ) totals
-        WHERE totals.total_sends > 100
-        AND totals.total_score > (SELECT hodler_min_balance FROM distributions WHERE id = (SELECT MAX(d.id) FROM distributions d))
+user_send_scores AS (
+    SELECT
+        ss.user_id,
+        COALESCE(SUM(ss.unique_sends), 0) AS total_sends,
+        COALESCE(SUM(ss.score), 0) AS total_score
+    FROM send_scores ss
+    GROUP BY ss.user_id
+),
+user_earn_balances AS (
+    SELECT
+        sa.user_id,
+        COALESCE(MAX(seb.assets), 0) AS earn_balance
+    FROM send_accounts sa
+    INNER JOIN send_earn_balances seb ON (
+        decode(replace(sa.address::text, '0x', ''), 'hex') = seb.owner
     )
+    GROUP BY sa.user_id
+),
+-- Ensure user has historical send activity and sufficient earn balance
+filtered_profiles AS (
+    SELECT bp.*, uss.total_score as send_score
+    FROM birthday_profiles bp
+    INNER JOIN user_send_scores uss ON uss.user_id = bp.id
+    INNER JOIN user_earn_balances ueb ON ueb.user_id = bp.id
+    WHERE uss.total_sends > 100
+      AND uss.total_score > (SELECT hodler_min_balance FROM distributions WHERE id = (SELECT MAX(d.id) FROM distributions d))
+      AND ueb.earn_balance >= (
+          SELECT d.earn_min_balance
+          FROM distributions d
+          WHERE d.id = (SELECT MAX(id) FROM distributions)
+      )
 )
 
 SELECT (
@@ -256,12 +290,7 @@ SELECT (
 FROM filtered_profiles fp
 LEFT JOIN send_accounts sa ON sa.user_id = fp.id
 LEFT JOIN tags main_tag ON main_tag.id = sa.main_tag_id
-LEFT JOIN LATERAL (
-    SELECT COALESCE(SUM(ss.score), 0) AS send_score
-    FROM send_scores ss
-    WHERE ss.user_id = fp.id
-) score ON TRUE
-ORDER BY score.send_score DESC;
+ORDER BY fp.send_score DESC;
 END;
 $function$
 ;

@@ -3,6 +3,9 @@ module.exports = (api) => {
   return {
     presets: [['babel-preset-expo', { jsxRuntime: 'automatic' }]],
     plugins: [
+      // Move transform-inline-environment-variables to the beginning
+      // This ensures environment variables are transformed early
+      'transform-inline-environment-variables',
       [
         require.resolve('babel-plugin-module-resolver'),
         {
@@ -20,6 +23,7 @@ module.exports = (api) => {
       ],
       // if you want reanimated support
       'react-native-reanimated/plugin',
+      // eslint-disable-next-line no-undef
       ...(process.env.EAS_BUILD_PLATFORM === 'android'
         ? []
         : [
@@ -31,7 +35,6 @@ module.exports = (api) => {
               },
             ],
           ]),
-      'transform-inline-environment-variables',
     ],
   }
 }

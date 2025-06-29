@@ -1,6 +1,5 @@
 CREATE OR REPLACE FUNCTION top_senders(
-    limit_count INTEGER DEFAULT 10,
-    latest_distribution_count INTEGER DEFAULT NULL
+    limit_count INTEGER DEFAULT 10
 )
 RETURNS SETOF activity_feed_user
 SECURITY DEFINER
@@ -8,42 +7,49 @@ LANGUAGE plpgsql
 AS $$
 BEGIN
 RETURN QUERY
-
--- Get latest distributions ids
-WITH recent_distributions AS (
-  SELECT id
-  FROM distributions
-  ORDER BY "number" DESC -- changed id to number
-  LIMIT COALESCE(latest_distribution_count, GREATEST((SELECT COUNT(*) FROM distributions) - 8, 0)) -- always skip 8 first distributions, no send_ceiling in previous
-),
--- Get all users with scores (no limit yet)
-user_scores AS (
+WITH user_scores AS (
     SELECT
-        dv.user_id,
-        SUM(dv.weight) AS send_score -- changed to be weight of send_ceiling instead of distribution amount
-    FROM distribution_verifications dv
-    INNER JOIN recent_distributions rd ON dv.distribution_id = rd.id
-    WHERE dv.type = 'send_ceiling'
-    GROUP BY dv.user_id
+        ss.user_id,
+        COALESCE(SUM(ss.score), 0) AS send_score,
+        COALESCE(SUM(ss.unique_sends), 0) AS total_sends
+    FROM send_scores ss
+    GROUP BY ss.user_id
+    HAVING COALESCE(SUM(ss.score), 0) > 0
+       AND COALESCE(SUM(ss.unique_sends), 0) > 0
 ),
--- Filter for valid profiles with tags
+user_earn_balances AS (
+    SELECT
+        sa.user_id,
+        COALESCE(MAX(seb.assets), 0) AS earn_balance
+    FROM send_accounts sa
+    INNER JOIN send_earn_balances seb ON (
+        decode(replace(sa.address::text, '0x', ''), 'hex') = seb.owner
+    )
+    GROUP BY sa.user_id
+),
 valid_users AS (
     SELECT
         p.*,
         us.send_score,
         ARRAY_AGG(t.name) AS tag_names
     FROM user_scores us
+    INNER JOIN user_earn_balances ueb ON ueb.user_id = us.user_id
     INNER JOIN profiles p ON p.id = us.user_id
     INNER JOIN tags t ON t.user_id = p.id
     WHERE p.is_public = TRUE
       AND p.avatar_url IS NOT NULL
       AND t.status = 'confirmed'
-    GROUP BY p.id, p.name, p.avatar_url, p.send_id, us.send_score
+      AND ueb.earn_balance >= (
+          SELECT d.earn_min_balance
+          FROM distributions d
+          WHERE d.id = (SELECT MAX(id) FROM distributions)
+      )
+    GROUP BY p.id, p.avatar_url, p.name, p.about, p.referral_code, p.is_public, p.send_id, p.x_username, p.birthday, us.send_score
 )
 -- Return top N with all requirements met
 SELECT (
     (
-        NULL,
+        NULL, -- Placeholder for the 'id' field in activity_feed_user, don't want to show users' IDs
         vu.name,
         vu.avatar_url,
         vu.send_id,
@@ -57,6 +63,5 @@ LEFT JOIN send_accounts sa ON sa.user_id = vu.id
 LEFT JOIN tags main_tag ON main_tag.id = sa.main_tag_id
 ORDER BY vu.send_score DESC
 LIMIT limit_count;
-
 END;
 $$;

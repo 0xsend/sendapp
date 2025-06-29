@@ -26,6 +26,7 @@ export * from './components/LinkableAvatar'
 export * from './components/LinkableButton'
 export * from './components/SafeArea'
 export * from './components/BlurStack'
+export * from './components/QRCode'
 
 export { RecyclerList } from './components/RecyclerList.web'
 export {

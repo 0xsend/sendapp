@@ -23,7 +23,11 @@ function getLocalhost() {
  * Replaces localhost with the device IP in URLs
  */
 function replaceLocalhost(address: string) {
-  return address.replace('://localhost:', `://${getLocalhost()}:`)
+  if (address.includes('://localhost:')) {
+    return address.replace('://localhost:', `://${getLocalhost()}:`)
+  }
+
+  return address
 }
 
 /**
@@ -36,6 +40,10 @@ function replaceLocalhost(address: string) {
  */
 export function getRpcUrl(url: string): string {
   // Handle 127.0.0.1 format - convert to localhost format first
+  if (!__DEV__) {
+    return url
+  }
+
   const localhostUrl = url.replace('://127.0.0.1:', '://localhost:')
 
   // Replace localhost with device IP

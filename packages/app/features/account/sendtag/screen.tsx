@@ -11,7 +11,6 @@ import {
   YStack,
   Sheet,
   Button,
-  Adapt,
   Dialog,
 } from '@my/ui'
 import { IconPlus, IconSlash, IconBadgeCheck, IconX } from 'app/components/icons'
@@ -19,6 +18,7 @@ import { maxNumSendTags } from 'app/data/sendtags'
 import { useUser } from 'app/utils/useUser'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useState } from 'react'
+import { Platform } from 'react-native'
 import { api } from 'app/utils/api'
 import { useToastController } from '@my/ui'
 
@@ -221,90 +221,118 @@ function MainTagSelectionSheet({
     await updateMainTag({ tagId, sendAccountId: sendAccount?.id })
   }
 
-  return (
-    <Dialog modal open={open} onOpenChange={onOpenChange}>
-      <Dialog.Portal>
-        <Dialog.Overlay
-          key="overlay"
-          animation="quick"
-          opacity={0.5}
-          enterStyle={{ opacity: 0 }}
-          exitStyle={{ opacity: 0 }}
-        />
-
-        <Dialog.Content
-          bordered
-          elevate
-          key="content"
-          animateOnly={['transform', 'opacity']}
-          animation={[
-            'quick',
-            {
-              opacity: {
-                overshootClamping: true,
-              },
-            },
-          ]}
-          enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
-          exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
-          gap="$4"
-          width="100%"
-          maxWidth={450}
-        >
-          <Dialog.Title ta={'center'}>Select Main Tag</Dialog.Title>
-          <Dialog.Description ta="center" size="$3" color="$color11">
-            Choose which tag appears as your primary identity
-          </Dialog.Description>
-          <YStack gap="$2">
-            {tags.map((tag) => {
-              const isCurrentMain = tag.id === currentMainTagId
-              return (
-                <Button
-                  key={tag.id}
-                  size="$5"
-                  br="$4"
-                  theme={isCurrentMain ? 'green' : 'gray'}
-                  disabled={isCurrentMain || isPending}
-                  onPress={() => handleSelectTag(tag.id)}
-                  icon={
-                    isPending ? (
-                      <Spinner size="small" color="$color11" />
-                    ) : (
-                      <XStack gap="$3" ai="center" f={1}>
-                        <IconSlash size="$1.5" />
-                        <Paragraph size="$5" fontWeight="500" f={1}>
-                          {tag.name}
-                        </Paragraph>
-                        {isCurrentMain && <IconBadgeCheck size="$1" color="$color12" />}
-                      </XStack>
-                    )
-                  }
-                  pressStyle={{ o: 0.8 }}
-                />
-              )
-            })}
-          </YStack>
-          {isPending && (
-            <XStack ai="center" jc="center" gap="$2" mt="$2">
-              <Spinner size="small" color="$primary" />
-              <Paragraph size="$3" color="$color11">
-                Updating main tag...
-              </Paragraph>
-            </XStack>
-          )}
-
-          <Dialog.Close displayWhenAdapted asChild>
+  // Shared content component to avoid duplication
+  const dialogContent = (
+    <>
+      <H2 ta={'center'}>Select Main Tag</H2>
+      <Paragraph ta="center" size="$3" color="$color11">
+        Choose which tag appears as your primary identity
+      </Paragraph>
+      <YStack gap="$2">
+        {tags.map((tag) => {
+          const isCurrentMain = tag.id === currentMainTagId
+          return (
             <Button
-              position="absolute"
-              top="$3"
-              right="$3"
-              size="$2"
-              circular
-              icon={<IconX size={16} color="$color12" />}
+              key={tag.id}
+              size="$5"
+              br="$4"
+              theme={isCurrentMain ? 'green' : 'gray'}
+              disabled={isCurrentMain || isPending}
+              onPress={() => handleSelectTag(tag.id)}
+              icon={
+                isPending ? (
+                  <Spinner size="small" color="$color11" />
+                ) : (
+                  <XStack gap="$3" ai="center" f={1}>
+                    <IconSlash size="$1.5" />
+                    <Paragraph size="$5" fontWeight="500" f={1}>
+                      {tag.name}
+                    </Paragraph>
+                    {isCurrentMain ? <IconBadgeCheck size="$1" color="$color12" /> : null}
+                  </XStack>
+                )
+              }
+              pressStyle={{ o: 0.8 }}
             />
-          </Dialog.Close>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog>
+          )
+        })}
+      </YStack>
+      {isPending && (
+        <XStack ai="center" jc="center" gap="$2" mt="$2">
+          <Spinner size="small" color="$primary" />
+          <Paragraph size="$3" color="$color11">
+            Updating main tag...
+          </Paragraph>
+        </XStack>
+      )}
+      {Platform.OS === 'web' && (
+        <Dialog.Close asChild>
+          <Button
+            position="absolute"
+            top="$3"
+            right="$3"
+            size="$2"
+            circular
+            icon={<IconX size={16} color="$color12" />}
+          />
+        </Dialog.Close>
+      )}
+    </>
+  )
+
+  // Web version using Dialog
+  if (Platform.OS === 'web') {
+    return (
+      <Dialog modal open={open} onOpenChange={onOpenChange}>
+        <Dialog.Portal>
+          <Dialog.Overlay
+            key="overlay"
+            animation="quick"
+            opacity={0.5}
+            enterStyle={{ opacity: 0 }}
+            exitStyle={{ opacity: 0 }}
+          />
+          <Dialog.Content
+            bordered
+            elevate
+            key="content"
+            animateOnly={['transform', 'opacity']}
+            animation={[
+              'quick',
+              {
+                opacity: {
+                  overshootClamping: true,
+                },
+              },
+            ]}
+            enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
+            exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
+            gap="$4"
+            width="100%"
+            maxWidth={450}
+          >
+            {dialogContent}
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog>
+    )
+  }
+
+  // Native version using Sheet
+  return (
+    <Sheet
+      open={open}
+      modal
+      onOpenChange={onOpenChange}
+      dismissOnSnapToBottom
+      dismissOnOverlayPress
+      native
+      snapPoints={[60]}
+    >
+      <Sheet.Frame key="main-tag-selection-sheet" gap="$4" padding="$4">
+        {dialogContent}
+      </Sheet.Frame>
+      <Sheet.Overlay />
+    </Sheet>
   )
 }

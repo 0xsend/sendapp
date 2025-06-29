@@ -1,17 +1,23 @@
 import { Stack } from 'expo-router/build/layouts/Stack'
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
-import { Paragraph } from '@my/ui'
+import { DepositSuccessScreen } from 'app/features/deposit/success/screen'
+import { useEffect } from 'react'
+import * as WebBrowser from 'expo-web-browser'
 
 export default function SuccessDepositScreen() {
+  useEffect(() => {
+    void WebBrowser.dismissBrowser()
+  }, [])
+
   return (
     <>
       <Stack.Screen
         options={{
-          title: 'Success Deposit',
+          title: 'Success',
         }}
       />
       <ScreenContainer>
-        <Paragraph>SuccessDepositScreen</Paragraph>
+        <DepositSuccessScreen />
       </ScreenContainer>
     </>
   )
