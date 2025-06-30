@@ -6,6 +6,31 @@ runs:
     - uses: supabase/setup-cli@v1
       with:
         version: latest
+    - name: Start Supabase Local Instance
+      shell: bash
+      run: |
+        # Start Supabase local instance
+        supabase start --ignore-health-check
+        
+        # Wait for database to be ready
+        echo "Waiting for database to be ready..."
+        timeout=60
+        count=0
+        while [ $count -lt $timeout ]; do
+          if supabase status | grep -q "API URL.*http://127.0.0.1:54321"; then
+            echo "Database is ready!"
+            break
+          fi
+          echo "Waiting... ($count/$timeout)"
+          sleep 2
+          count=$((count + 2))
+        done
+        
+        if [ $count -ge $timeout ]; then
+          echo "Timeout waiting for database to start"
+          supabase status
+          exit 1
+        fi
     - name: Check for Schema Drift
       shell: bash
       working-directory: ./supabase
