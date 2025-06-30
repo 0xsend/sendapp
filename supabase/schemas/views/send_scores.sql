@@ -7,8 +7,8 @@ WITH access_control AS (
     CASE
       -- Admin callers (postgres, service_role) see all scores
       WHEN current_user IN ('postgres', 'service_role') THEN true
-      -- Authenticated users see only their own scores  
-      WHEN auth.role() = 'authenticated' AND auth.uid() IS NOT NULL THEN false -- user-specific filtering applied later
+      -- Authenticated users see only their own scores
+      WHEN current_user = 'authenticated' AND auth.uid() IS NOT NULL THEN false -- user-specific filtering applied later
       -- Anonymous/other callers see nothing
       ELSE null -- will cause empty result
     END AS show_all_users,
@@ -110,7 +110,7 @@ WHERE LEAST(
   AND (
     (SELECT show_all_users FROM access_control) = true -- Admin sees all
     OR (
-      (SELECT show_all_users FROM access_control) = false 
+      (SELECT show_all_users FROM access_control) = false
       AND from_user_id = (SELECT current_user_id FROM access_control) -- Authenticated user sees only their own
     )
     -- If show_all_users is null (anonymous), no results
@@ -220,7 +220,7 @@ create or replace view "public"."send_scores_current" as  WITH authorized_accoun
                     -- Admin callers (postgres, service_role) see all scores
                     WHEN current_user IN ('postgres', 'service_role') THEN true
                     -- Authenticated users see only their own scores
-                    WHEN auth.role() = 'authenticated' AND auth.uid() IS NOT NULL THEN (sa.user_id = auth.uid())
+                    WHEN current_user = 'authenticated' AND auth.uid() IS NOT NULL THEN (sa.user_id = auth.uid())
                     -- Anonymous/other callers see nothing
                     ELSE false
                 END

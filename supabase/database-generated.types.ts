@@ -2030,7 +2030,7 @@ export type Database = {
         Returns: Database["public"]["CompositeTypes"]["activity_feed_user"][]
       }
       top_senders: {
-        Args: { limit_count?: number; latest_distribution_count?: number }
+        Args: { limit_count?: number }
         Returns: Database["public"]["CompositeTypes"]["activity_feed_user"][]
       }
       update_distribution_shares: {
