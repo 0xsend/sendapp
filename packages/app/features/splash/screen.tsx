@@ -25,8 +25,19 @@ import { useLink } from 'solito/link'
 import { useRouter } from 'solito/router'
 import { AnimationLayout } from '../../components/layout/animation-layout'
 import { useSignIn } from 'app/utils/send-accounts'
+import { Platform } from 'react-native'
+import { useSetReferralCode } from 'app/utils/useReferralCode'
 
 export function SplashScreen() {
+  const [{ referral }] = useAuthScreenParams()
+  const { mutateAsync: setReferralCodeMutateAsync } = useSetReferralCode()
+
+  useEffect(() => {
+    if (Platform.OS === 'web' && referral) {
+      void setReferralCodeMutateAsync(referral)
+    }
+  }, [referral, setReferralCodeMutateAsync])
+
   return (
     <XStack
       flex={1}

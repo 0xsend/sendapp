@@ -23,7 +23,6 @@ import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
 import { usePendingTags } from 'app/utils/tags'
 import { throwIf } from 'app/utils/throwIf'
 import { useReceipts } from 'app/utils/useReceipts'
-import { useReferralCodeCookie } from 'app/utils/useReferralCodeCookie'
 import { useReferrer } from 'app/utils/useReferrer'
 import { useUser } from 'app/utils/useUser'
 import { sendUserOpTransfer } from 'app/utils/useUserOpTransferMutation'
@@ -36,6 +35,7 @@ import {
   useSendtagCheckout,
   useSendtagCheckoutReceipts,
 } from '../checkout-utils'
+import { useReferralCodeQuery } from 'app/utils/useReferralCode'
 
 export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
   const { updateProfile } = useUser()
@@ -50,7 +50,7 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
     error: referrerError,
   } = useReferrer()
   const { data: rewardDue } = useReferralReward({ tags: pendingTags })
-  const { data: referralCodeCookie } = useReferralCodeCookie()
+  const { data: referralCode } = useReferralCodeQuery()
   const { coin: usdc, tokensQuery, isLoading: isLoadingUSDC } = useCoin('USDC')
 
   const webauthnCreds =
@@ -287,7 +287,7 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
     !usdcFeesError &&
     !isLoadingUSDCFees &&
     !isLoadingReferrer &&
-    !!(referrerProfile?.address || !referralCodeCookie)
+    !!(referrerProfile?.address || !referralCode)
 
   return (
     <ConfirmButtonStack w={'100%'} gap="$2">

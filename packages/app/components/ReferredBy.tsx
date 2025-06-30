@@ -3,26 +3,21 @@ import { Check } from '@tamagui/lucide-icons'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconX } from 'app/components/icons'
 import { useCallback, useEffect, useState } from 'react'
-import { setCookie } from 'app/utils/cookie'
-import {
-  useReferralCode,
-  REFERRAL_COOKIE_NAME,
-  REFERRAL_COOKIE_MAX_AGE,
-  useReferrer,
-  useReferredBy,
-} from 'app/utils/referrer'
+import { useReferredBy, useReferrer } from 'app/utils/referrer'
+import { useReferralCodeQuery, useSetReferralCode } from 'app/utils/useReferralCode'
 
 /**
  * Shows the referral code and the user's profile if they have one
  */
 export function ReferredBy() {
-  const { data: referralCodeFromCookie, isLoading: isLoadingReferralCodeFromCookie } =
-    useReferralCode()
+  const { data: referralCodeFromStorage, isLoading: isLoadingReferralCodeFromStorage } =
+    useReferralCodeQuery()
+  const { mutateAsync: setReferralCodeMutateAsync } = useSetReferralCode()
   const queryClient = useQueryClient()
   const mutation = useMutation({
     mutationFn: async (newReferralCode: string) => {
-      setCookie(REFERRAL_COOKIE_NAME, newReferralCode, REFERRAL_COOKIE_MAX_AGE)
-      return Promise.resolve(newReferralCode)
+      await setReferralCodeMutateAsync(newReferralCode)
+      return newReferralCode
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['referralCode'] })
@@ -33,7 +28,7 @@ export function ReferredBy() {
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
   const [referralCode, setReferralCode] = useState<string>('')
 
-  const updateReferralCodeCookie = useDebounce(
+  const updateReferralCodeInStorage = useDebounce(
     useCallback(
       (text: string) => {
         mutation.mutate(text)
@@ -46,14 +41,14 @@ export function ReferredBy() {
   )
 
   useEffect(() => {
-    updateReferralCodeCookie(referralCode)
-  }, [referralCode, updateReferralCodeCookie])
+    updateReferralCodeInStorage(referralCode)
+  }, [referralCode, updateReferralCodeInStorage])
 
   useEffect(() => {
-    if (!isLoadingReferralCodeFromCookie && referralCodeFromCookie) {
-      setReferralCode(referralCodeFromCookie)
+    if (!isLoadingReferralCodeFromStorage && referralCodeFromStorage) {
+      setReferralCode(referralCodeFromStorage)
     }
-  }, [isLoadingReferralCodeFromCookie, referralCodeFromCookie])
+  }, [isLoadingReferralCodeFromStorage, referralCodeFromStorage])
 
   if (isLoadingReferredBy) {
     return <Spinner color="$color11" />
@@ -66,7 +61,8 @@ export function ReferredBy() {
   return (
     <FadeCard
       borderColor={
-        referrerError || (referralCodeFromCookie && referralCode && !referrer && !isLoadingReferrer)
+        referrerError ||
+        (referralCodeFromStorage && referralCode && !referrer && !isLoadingReferrer)
           ? '$error'
           : 'transparent'
       }
@@ -107,7 +103,7 @@ export function ReferredBy() {
                   <Check color="$primary" size="$1" $theme-light={{ color: '$color12' }} />
                 </Fade>
               )
-            case !!referralCodeFromCookie && !!referralCode:
+            case !!referralCodeFromStorage && !!referralCode:
               return (
                 <Fade>
                   <Button
@@ -150,7 +146,7 @@ export function ReferredBy() {
             return <Paragraph>Validating referral code</Paragraph>
           case !!referrerError:
             return <Paragraph color="$error">{referrerError.message}</Paragraph>
-          case !!referralCodeFromCookie && !!referralCode && !referrer:
+          case !!referralCodeFromStorage && !!referralCode && !referrer:
             return <Paragraph color="$error">Invalid referral code</Paragraph>
           case !!referrer:
             return <Paragraph>Referral code applied</Paragraph>

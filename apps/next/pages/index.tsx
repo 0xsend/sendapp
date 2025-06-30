@@ -71,7 +71,6 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
   )
 }
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  setReferralCodeCookie(ctx)
   log('connecting to supabase', process.env.NEXT_PUBLIC_SUPABASE_URL)
   const supabase = createPagesServerClient<Database>(ctx)
 
@@ -102,19 +101,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       initialSession: session,
       images: [],
     },
-  }
-}
-
-function setReferralCodeCookie(context: GetServerSidePropsContext) {
-  // Read the 'code' query parameter from the request URL
-  const referralCode = context.query.referral
-
-  // Set the cookie on the client side if the referral code exists
-  if (referralCode) {
-    context.res.setHeader(
-      'Set-Cookie',
-      `referral=${referralCode}; Max-Age=${30 * 24 * 60 * 60}; Path=/;` // 30 days
-    )
   }
 }
 
