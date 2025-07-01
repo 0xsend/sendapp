@@ -55,8 +55,8 @@ distributorRouter.post('/merkle', checkAuthorization, async (req: Request, res: 
   const { data: shares, error: sharesError } = await selectAll(
     supabaseAdmin
       .from('distribution_shares')
-      .select('index, address, amount_after_slash::text', { count: 'exact' })
-      .eq('distribution_id', id)
+      .select('index, address, amount::text', { count: 'exact' })
+      .eq('distribution_id', Number(id))
       .order('index', { ascending: true })
   )
   if (sharesError) {
@@ -74,11 +74,7 @@ distributorRouter.post('/merkle', checkAuthorization, async (req: Request, res: 
     logger.info(`Found ${shares.length} shares for distribution ${id}`)
 
     const tree = StandardMerkleTree.of(
-      shares.map(({ index, address, amount_after_slash }, i) => [
-        index,
-        address,
-        BigInt(amount_after_slash),
-      ]),
+      shares.map(({ index, address, amount }, i) => [index, address, BigInt(amount)]),
       ['uint256', 'address', 'uint256']
     )
 
@@ -89,10 +85,7 @@ distributorRouter.post('/merkle', checkAuthorization, async (req: Request, res: 
       proofs[i] = proof
     }
 
-    const total = shares.reduce(
-      (acc, { amount_after_slash }) => acc + BigInt(amount_after_slash),
-      0n
-    )
+    const total = shares.reduce((acc, { amount }) => acc + BigInt(amount), 0n)
     const result = {
       id,
       root: tree.root,
@@ -117,7 +110,7 @@ distributorRouter.post('/v2', checkAuthorization, async (req, res) => {
   const { id } = req.body as { id: string }
   logger.info({ id }, 'Received request to calculate distribution')
   try {
-    await distributorV2Worker.calculateDistribution(id)
+    await distributorV2Worker.calculateDistribution(Number(id))
   } catch (err) {
     logger.error(err, 'Error while calculating distribution')
     throw err
