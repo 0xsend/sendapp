@@ -125,7 +125,7 @@ export class DistributorV2Worker {
   }
 
   private async _calculateDistributionShares(
-    distribution: NonNullable<Awaited<ReturnType<typeof fetchActiveDistributions>>['data']>[number]
+    distribution: NonNullable<Awaited<ReturnType<typeof fetchDistribution>>['data']>
   ): Promise<void> {
     const log = this.log.child({ distribution_id: distribution.id })
 
@@ -224,7 +224,7 @@ export class DistributorV2Worker {
       })
     }
 
-    const { data: rawHodlerAddresses, error: hodlerAddressesError } = await fetchAllHodlers(
+    const { data: hodlerAddresses, error: hodlerAddressesError } = await fetchAllHodlers(
       distribution.id
     )
 
@@ -232,18 +232,9 @@ export class DistributorV2Worker {
       throw hodlerAddressesError
     }
 
-    if (rawHodlerAddresses === null || rawHodlerAddresses.length === 0) {
+    if (hodlerAddresses === null || hodlerAddresses.length === 0) {
       throw new Error('No hodler addresses found')
     }
-
-    // Deduplicate hodler addresses
-    const hodlerAddresses = [
-      ...new Map(rawHodlerAddresses.map((item) => [item.address, item])).values(),
-    ]
-
-    log.info(
-      `Deduplicated hodler addresses from ${rawHodlerAddresses.length} to ${hodlerAddresses.length}`
-    )
 
     const hodlerAddressesByUserId = hodlerAddresses.reduce(
       (acc, { address, user_id }) => {
@@ -430,7 +421,7 @@ export class DistributorV2Worker {
           const previousReward =
             previousSharesByUserId[userId] || BigInt(distribution.hodler_min_balance)
           const scaledPreviousReward =
-            (previousReward * PERC_DENOM) / (BigInt(sendSlash.scaling_divisor) * PERC_DENOM)
+            (previousReward * PERC_DENOM) / BigInt(sendSlash.scaling_divisor)
 
           const scaledWeight = sendCeilingData.weight * PERC_DENOM
           const cappedWeight =
@@ -494,11 +485,9 @@ export class DistributorV2Worker {
       throw sendScoresError
     }
 
-    if (sendScores === null || sendScores.length === 0) {
+    if (!sendScores || sendScores.length === 0) {
       log.warn('No send scores found. Proceeding without scores.')
-    }
-    if (sendScores[0]?.distribution_id !== distribution.id) {
-      throw new Error('Send scores are for wrong distribution')
+      throw new Error('No send scores found.')
     }
 
     // Create a map of scores by user_id
@@ -686,7 +675,7 @@ export class DistributorV2Worker {
             const previousReward =
               previousSharesByUserId[userId] || BigInt(distribution.hodler_min_balance)
             const scaledPreviousReward =
-              (previousReward * PERC_DENOM) / (BigInt(sendSlash.scaling_divisor) * PERC_DENOM)
+              (previousReward * PERC_DENOM) / BigInt(sendSlash.scaling_divisor)
 
             const scaledWeight = sendCeilingData.weight * PERC_DENOM
             const cappedWeight =

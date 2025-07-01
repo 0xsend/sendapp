@@ -4,7 +4,11 @@ globalThis.__DEV__ = true
 import { describe, expect, it, mock } from 'bun:test'
 import request from 'supertest'
 import app from './app'
-import { type fetchActiveDistributions, createSupabaseAdminClient } from './supabase'
+import {
+  type fetchActiveDistributions,
+  createSupabaseAdminClient,
+  type fetchDistribution,
+} from './supabase'
 import pino from 'pino'
 import { DistributorV2Worker } from './distributorv2'
 import type { Tables } from '@my/supabase/database.types'
@@ -108,6 +112,7 @@ describe('Distributor V2 Worker', () => {
       send_slash_divisor: 150,
       merkle_drop_addr: '\\xC8B80B16C40AAE14D8FCBBDA94FFA5041089D048',
       token_decimals: 0,
+      earn_min_balance: '0',
       distribution_verification_values: [
         {
           type: 'tag_referral',
@@ -172,7 +177,7 @@ describe('Distributor V2 Worker', () => {
           updated_at: '2024-04-06T16:49:02.569245+00:00',
         },
       ],
-    } as NonNullable<Awaited<ReturnType<typeof fetchActiveDistributions>>['data']>[number]
+    } as NonNullable<Awaited<ReturnType<typeof fetchDistribution>>['data']>
     const user_id = crypto.randomUUID()
     const user_id2 = crypto.randomUUID()
     const bobAddr = '0xb0b0000000000000000000000000000000000000'

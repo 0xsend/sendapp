@@ -123,7 +123,7 @@ BEGIN
     IF current_user IN ('postgres', 'service_role') THEN
         RETURN QUERY SELECT * FROM private.send_scores_history;
     -- Authenticated users see only their own scores
-    ELSIF auth.role() = 'authenticated' AND auth.uid() IS NOT NULL THEN
+    ELSIF current_user= 'authenticated' AND auth.uid() IS NOT NULL THEN
         RETURN QUERY SELECT * FROM private.send_scores_history WHERE send_scores_history.user_id = auth.uid();
     -- Anonymous/other callers see nothing
     ELSE
