@@ -377,7 +377,9 @@ function ConfirmSendDialog({ isOpen, onClose, onConfirm, address }) {
       <Dialog open={isOpen} onOpenChange={onClose}>
         <Dialog.Portal>
           <Dialog.Overlay />
-          <Dialog.Content gap="$4">{dialogContent}</Dialog.Content>
+          <Dialog.Content gap="$4" testID={'address-send-dialog'}>
+            {dialogContent}
+          </Dialog.Content>
         </Dialog.Portal>
       </Dialog>
     )

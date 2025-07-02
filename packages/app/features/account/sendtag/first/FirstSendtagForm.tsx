@@ -11,6 +11,7 @@ import { ReferredBy } from 'app/features/account/sendtag/components/ReferredBy'
 import { Platform } from 'react-native'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { assert } from 'app/utils/assert'
+import { useReferralCodeQuery } from 'app/utils/useReferralCode'
 
 const SendtagSchemaWithoutRestrictions = z.object({
   name: formFields.text,
@@ -22,6 +23,7 @@ export const FirstSendtagForm = () => {
   const router = useRouter()
   const user = useUser()
   const sendAccount = useSendAccount()
+  const { data: referralCode } = useReferralCodeQuery()
 
   const formName = form.watch('name')
   const validationError = form.formState.errors.root
@@ -43,7 +45,11 @@ export const FirstSendtagForm = () => {
     try {
       assert(!!sendAccount.data?.id, 'No send account id')
       await validateSendtagMutateAsync({ name })
-      await registerFirstSendtagMutateAsync({ name, sendAccountId: sendAccount.data.id })
+      await registerFirstSendtagMutateAsync({
+        name,
+        sendAccountId: sendAccount.data.id,
+        referralCode,
+      })
     } catch (error) {
       form.setError('root', {
         type: 'custom',

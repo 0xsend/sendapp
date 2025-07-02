@@ -48,11 +48,6 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
     supabase,
 
     /**
-     * Referral code cookie
-     */
-    referralCode: opts.req.cookies?.referral,
-
-    /**
      * Response object
      */
     res: opts.res,

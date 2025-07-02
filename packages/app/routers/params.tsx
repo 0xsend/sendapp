@@ -8,6 +8,7 @@ import { useCallback } from 'react'
 
 export type AuthScreenParams = {
   redirectUri?: string
+  referral?: string
 }
 
 const { useParam: useAuthParam, useParams: useAuthParams } = createParam<AuthScreenParams>()
@@ -25,13 +26,21 @@ const useRedirectUri = () => {
   return [redirectUri, setRedirectUriParam] as const
 }
 
+const useReferral = () => {
+  const [referral, setReferral] = useAuthParam('referral')
+
+  return [referral, setReferral] as const
+}
+
 export const useAuthScreenParams = () => {
   const { setParams } = useAuthParams()
   const [redirectUri] = useRedirectUri()
+  const [referral] = useReferral()
 
   return [
     {
       redirectUri,
+      referral,
     },
     setParams,
   ] as const

@@ -21,6 +21,7 @@ import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import { useValidateSendtag } from 'app/utils/tags/useValidateSendtag'
 import { formatErrorMessage } from 'app/utils/formatErrorMessage'
 import { useFirstSendtagQuery } from 'app/utils/useFirstSendtag'
+import { useReferralCodeQuery } from 'app/utils/useReferralCode'
 
 const OnboardingSchema = z.object({
   name: formFields.text,
@@ -35,6 +36,7 @@ export function OnboardingScreen() {
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
   const isClient = useIsClient()
   const { data: firstSendtag } = useFirstSendtagQuery()
+  const { data: referralCode } = useReferralCodeQuery()
 
   const formName = form.watch('name')
   const validationError = form.formState.errors.root
@@ -100,6 +102,7 @@ export function OnboardingScreen() {
       await registerFirstSendtagMutateAsync({
         name,
         sendAccountId: createdSendAccount.id,
+        referralCode,
       })
       replace('/')
     } catch (error) {

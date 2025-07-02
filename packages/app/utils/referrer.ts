@@ -4,21 +4,11 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { useQuery } from '@tanstack/react-query'
 import type { Merge } from 'type-fest'
 import { assert } from './assert'
-import { getCookie } from './cookie'
 import { useSupabase } from './supabase/useSupabase'
 import { throwIf } from './throwIf'
 import { fetchProfile } from './useProfileLookup'
 import { useUser } from './useUser'
-
-export const REFERRAL_COOKIE_NAME = 'referral'
-export const REFERRAL_COOKIE_MAX_AGE = 30 * 24 * 60 * 60 * 1000 // 30 days
-
-export function useReferralCode() {
-  return useQuery({
-    queryKey: ['referralCode'] as const,
-    queryFn: () => getCookie(REFERRAL_COOKIE_NAME) || null,
-  })
-}
+import { useReferralCodeQuery } from 'app/utils/useReferralCode'
 
 type ReferrerProfile = Merge<Functions<'profile_lookup'>[number], { address: `0x${string}` }>
 
@@ -107,7 +97,7 @@ export async function fetchReferrer({
 export function useReferrer() {
   const supabase = useSupabase()
   const { profile } = useUser()
-  const referralCode = useReferralCode()
+  const referralCode = useReferralCodeQuery()
   return useQuery({
     queryKey: ['referrer', { referralCode, supabase, profile }] as const,
     queryFn: async ({ queryKey: [, { referralCode, supabase, profile }], signal }) => {

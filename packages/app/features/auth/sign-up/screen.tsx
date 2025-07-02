@@ -27,6 +27,7 @@ import { useCallback, useEffect, useId, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { z } from 'zod'
+import { useReferralCodeQuery } from 'app/utils/useReferralCode'
 
 const SignUpScreenFormSchema = z.object({
   name: formFields.text,
@@ -56,6 +57,7 @@ export const SignUpScreen = () => {
   const { resolvedTheme } = useThemeSetting()
   const isDarkTheme = resolvedTheme?.startsWith('dark')
   const { createSendAccount } = useCreateSendAccount()
+  const { data: referralCode } = useReferralCodeQuery()
 
   const formName = form.watch('name')
   const formIsAgreedToTerms = form.watch('isAgreedToTerms')
@@ -110,6 +112,7 @@ export const SignUpScreen = () => {
       await registerFirstSendtagMutateAsync({
         name: validatedSendtag,
         sendAccountId: createdSendAccount.id,
+        referralCode,
       })
       router.replace('/')
     } catch (error) {

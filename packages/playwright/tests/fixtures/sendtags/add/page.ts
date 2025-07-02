@@ -15,7 +15,7 @@ export class AddSendtagsPage {
   constructor(page: Page, wallet: Web3ProviderBackend) {
     this.page = page
     this.wallet = wallet
-    this.pricingDialog = page.getByLabel('Sendtag Pricing')
+    this.pricingDialog = page.getByTestId('sendtag-pricing-dialog')
     this.pricingTooltip = page.getByTestId('SendTagPricingTooltipContent')
     this.submitTagButton = page.getByRole('button', { name: 'Add Tag' })
   }

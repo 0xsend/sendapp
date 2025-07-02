@@ -99,13 +99,9 @@ for (const token of [...coins, ethCoin]) {
       // goto send page
       await page.goto('/')
 
-      // Click on the token from the token balance list
-      const tokenButton = page.getByTestId(`token-balance-list-${token.label}`)
-      await expect(tokenButton).toBeVisible()
-      await tokenButton.click()
-      const sendButton = page.getByTestId('send-quick-action')
-      await expect(sendButton).toBeVisible()
-      await sendButton.click()
+      const sendLink = page.getByTestId('sidebar-nav-send')
+      await expect(sendLink).toBeVisible()
+      await sendLink.click()
 
       await expect(async () => {
         // fill search input
@@ -126,7 +122,7 @@ for (const token of [...coins, ethCoin]) {
 
       if (isAddress) {
         // confirm sending to external address
-        const dialog = page.getByRole('dialog', { name: 'Confirm External Send' })
+        const dialog = page.getByTestId('address-send-dialog')
         await expect(dialog).toBeVisible()
         const confirmButton = dialog.getByRole('button', { name: 'I Agree & Continue' })
         await expect(confirmButton).toBeVisible()
@@ -140,7 +136,6 @@ for (const token of [...coins, ethCoin]) {
         expect(Object.fromEntries(url.searchParams.entries())).toMatchObject({
           recipient: query,
           idType,
-          sendToken: token.token,
         })
       }).toPass({
         timeout: 5000,
