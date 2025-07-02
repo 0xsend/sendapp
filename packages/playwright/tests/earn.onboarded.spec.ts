@@ -75,11 +75,7 @@ const readSendEarnConvertToAssets = async ({
   })
 }
 
-const readSendEarnDecimals = async ({
-  vault,
-}: {
-  vault: `0x${string}`
-}) => {
+const readSendEarnDecimals = async ({ vault }: { vault: `0x${string}` }) => {
   return readContract(testBaseClient, {
     address: vault,
     abi: sendEarnAbi,
@@ -416,7 +412,7 @@ for (const coin of [usdcCoin]) {
       sendAccount,
       supabase,
       user: { profile },
-      referrer: { referrer, referrerTags, referrerSendAccount },
+      referrer: { referrer, referrerSendAccount },
       pg,
     }) => {
       log = debug(`test:earn:deposit:referrer:${profile.id}:${test.info().parallelIndex}`)
@@ -723,7 +719,7 @@ for (const coin of [usdcCoin]) {
   })
 
   test.describe(`Affiliate Rewards for ${coin.symbol}`, () => {
-    test.beforeEach(async ({ user: { profile }, earnDepositPage, sendAccount, supabase }) => {
+    test.beforeEach(async ({ user: { profile } }) => {
       log = debug(`test:earn:affiliate:${profile.id}:${test.info().parallelIndex}`)
     })
 
@@ -1070,7 +1066,7 @@ async function verifyActivity({
   await page.goto('/activity')
   await expect(
     page.getByText(
-      `${event} ${formatAmount(
+      `${event} - ${formatAmount(
         formatUnits(BigInt(assets), coin.decimals),
         5,
         coin.formatDecimals

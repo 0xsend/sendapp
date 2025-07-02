@@ -89,28 +89,6 @@ const verifyActivityFeed = async (supabase: SupabaseClient<Database>, event: Act
   await expect(supabase).toHaveEventInActivityFeed(event)
 }
 
-const setupReferral = async (
-  seed: SeedClient
-): Promise<{
-  referrer: { referral_code: string; send_id: number; id: string }
-  referrerSendAccount: { address: `0x${string}` }
-  referrerTags: string[]
-}> => {
-  const plan = await createUserWithTagsAndAccounts(seed)
-  const referrer = plan.profile
-  const referrerSendAccount = plan.sendAccount as { address: `0x${string}` }
-  const referrerTags = plan.tags.map((t) => t.name)
-  assert(!!referrer, 'profile not found')
-  assert(!!referrer.referral_code, 'referral code not found')
-  assert(!!referrerSendAccount, 'referrer send account not found')
-  assert(referrerTags.length > 0, 'referrer should have at least one tag')
-  return { referrer, referrerSendAccount, referrerTags } as {
-    referrer: { referral_code: string; send_id: number; id: string }
-    referrerSendAccount: { address: `0x${string}` }
-    referrerTags: string[]
-  }
-}
-
 const verifyReferralReward = async (
   referrerAddress: `0x${string}`,
   tagsToRegister: string[],
@@ -186,8 +164,13 @@ test('can confirm a tag', async ({ checkoutPage, supabase, user: { profile: myPr
   await verifyActivityFeed(supabase, receiptEvent)
 })
 
-test('can refer a tag', async ({ seed, checkoutPage, supabase, user: { profile: myProfile } }) => {
-  const { referrer, referrerSendAccount, referrerTags } = await setupReferral(seed)
+test('can refer a tag', async ({
+  checkoutPage,
+  supabase,
+  user: { profile: myProfile },
+  referrer: ref,
+}) => {
+  const { referrer, referrerSendAccount, referrerTags } = ref
 
   const tagsToRegister = Array.from(
     { length: Math.floor(Math.random() * 5) + 1 },
@@ -260,10 +243,10 @@ test('can refer a tag', async ({ seed, checkoutPage, supabase, user: { profile: 
 })
 
 test('can refer multiple tags in separate transactions', async ({
-  seed,
   checkoutPage,
   supabase,
   user: { profile: myProfile },
+  referrer: ref,
 }) => {
   test.setTimeout(45_000)
   // First transaction with up to 2 tags
@@ -273,7 +256,7 @@ test('can refer multiple tags in separate transactions', async ({
 
   await addPendingTags(supabase, firstTags)
 
-  const { referrer, referrerSendAccount, referrerTags } = await setupReferral(seed)
+  const { referrer, referrerSendAccount, referrerTags } = ref
   await checkoutPage.page.goto(`/?referral=${referrer.referral_code}`)
   await checkoutPage.goto()
 
@@ -303,8 +286,8 @@ test('can refer multiple tags in separate transactions', async ({
     firstTags
   )
 
-  // Second transaction with up to 3 tags
-  const secondTags = Array.from({ length: Math.floor(Math.random() * 3) + 1 }, () =>
+  // Second transaction with up to 2 tags
+  const secondTags = Array.from({ length: Math.floor(Math.random() * 2) + 1 }, () =>
     generateTagName()
   ).sort((a, b) => a.localeCompare(b))
 

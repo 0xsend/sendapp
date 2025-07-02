@@ -179,7 +179,7 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
       setAttempts((a) => a + 1)
       setSubmitting(true)
       confirm
-        .mutateAsync({ transaction: tx })
+        .mutateAsync({ transaction: tx, referralCode })
         .then(async () => {
           setSubmitting(false)
           await updateProfile().then(() => {
@@ -212,7 +212,7 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
           setSubmitting(false)
         })
     },
-    [attempts, refetchReceipts, confirm.mutateAsync, onConfirmed, updateProfile]
+    [attempts, refetchReceipts, confirm.mutateAsync, onConfirmed, updateProfile, referralCode]
   )
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: otherwise it infinite loops

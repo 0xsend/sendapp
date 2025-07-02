@@ -15,7 +15,6 @@ import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '../../trpc'
 import { SendtagSchema } from 'app/utils/zod/sendtag'
 import { SendtagAvailability } from './types'
-import type { Database } from '@my/supabase/database.types'
 
 const log = debug('api:routers:tag')
 
@@ -98,15 +97,48 @@ export const tagRouter = createTRPCRouter({
       z.object({
         name: z.string(),
         sendAccountId: z.string().uuid(),
+        referralCode: z.string().optional().nullable(),
       })
     )
-    .mutation(async ({ ctx: { supabase, referralCode }, input: { name, sendAccountId } }) => {
+    .mutation(async ({ ctx: { supabase }, input: { name, sendAccountId, referralCode } }) => {
       try {
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .single()
+
+        // if profile error, return early
+        if (profileError || !profile) {
+          log('profile not found', profileError)
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: profileError.message || 'Profile not found',
+          })
+        }
+
+        // if referral code is present and not the same as the profile, fetch the referrer profile
+        const referrerProfile = referralCode
+          ? await fetchReferrer({
+              supabase,
+              profile,
+              referral_code: referralCode,
+            }).catch((e) => {
+              const error = e as unknown as PostgrestError
+              if (error.code === 'PGRST116') {
+                return null
+              }
+              throw new TRPCError({
+                code: 'INTERNAL_SERVER_ERROR',
+                message: error.message,
+              })
+            })
+          : null
+
         // Use the atomic SQL function that handles everything in a single transaction
         const { data: result, error } = await supabase.rpc('register_first_sendtag', {
           tag_name: name,
           send_account_id: sendAccountId,
-          _referral_code: referralCode,
+          _referral_code: referrerProfile?.refcode ?? '',
         })
 
         if (error) {
@@ -133,9 +165,10 @@ export const tagRouter = createTRPCRouter({
           .string()
           .regex(/^0x[0-9a-f]{64}$/i)
           .optional(),
+        referralCode: z.string().optional().nullable(),
       })
     )
-    .mutation(async ({ ctx: { supabase, referralCode }, input: { transaction: txHash } }) => {
+    .mutation(async ({ ctx: { supabase }, input: { transaction: txHash, referralCode } }) => {
       const { data: tags, error: tagsError } = await supabase.from('tags').select('*')
       const { data: profile, error: profileError } = await supabase
         .from('profiles')

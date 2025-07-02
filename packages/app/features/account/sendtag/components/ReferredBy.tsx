@@ -26,7 +26,7 @@ export function ReferredBy() {
     useReferralCodeQuery()
 
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
-  const [referralCode, setReferralCode] = useState<string>('')
+  const [referralCode, setReferralCode] = useState<string | null>(null)
 
   const updateReferralCodeInStorage = useDebounce(
     useCallback(
@@ -41,6 +41,9 @@ export function ReferredBy() {
   )
 
   useEffect(() => {
+    if (referralCode === null) {
+      return
+    }
     updateReferralCodeInStorage(referralCode)
   }, [referralCode, updateReferralCodeInStorage])
 
@@ -67,7 +70,7 @@ export function ReferredBy() {
         <Input
           disabled={!!referrer && !referrer.isNew}
           disabledStyle={{ opacity: 0.5 }}
-          value={referralCode}
+          value={referralCode || ''}
           onChangeText={(text) => setReferralCode(text)}
           placeholder={'Referral Code'}
           col={'$color12'}
@@ -93,7 +96,7 @@ export function ReferredBy() {
           switch (true) {
             case isReferrerLoading ||
               isLoadingReferralCodeFromStorage ||
-              referralCode !== referralCodeFromStorage:
+              (referralCode !== null && referralCode !== referralCodeFromStorage):
               return <Spinner color="$color11" />
             case !!referrer:
               return (
@@ -146,7 +149,10 @@ export function ReferredBy() {
             return <Paragraph>Validating referral code</Paragraph>
           case !!referrerError:
             return <Paragraph color="$error">{referrerError.message}</Paragraph>
-          case !isReferrerLoading && !referrer && referralCode === referralCodeFromStorage:
+          case !isReferrerLoading &&
+            !referrer &&
+            referralCode !== null &&
+            referralCode === referralCodeFromStorage:
             return <Paragraph color="$error">Invalid referral code</Paragraph>
           case !!referrer:
             return <Paragraph>Referral code applied</Paragraph>

@@ -86,8 +86,8 @@ export const models: SeedClientOptions['models'] = {
       block_num: (ctx) => copycat.int(ctx.seed, { min: 0, max: 100_000_000 }),
       block_time: Math.floor(new Date().getTime() / 1000),
       tx_hash: Buffer.from(hexToBytes(generatePrivateKey())),
-      f: (ctx) => Buffer.from(hexToBytes(generatePrivateKey())),
-      t: (ctx) => Buffer.from(hexToBytes(generatePrivateKey())),
+      f: () => Buffer.from(hexToBytes(generatePrivateKey())),
+      t: () => Buffer.from(hexToBytes(generatePrivateKey())),
       v: (ctx) => copycat.int(ctx.seed, { min: 0, max: 100_000_000 }),
     },
   },
@@ -127,7 +127,7 @@ export const userOnboarded: usersInputs = {
   ],
   profiles: [
     {
-      referral_code: (ctx) => crypto.randomBytes(8).toString('hex'),
+      referral_code: () => crypto.randomBytes(8).toString('hex'),
       x_username: null,
       is_public: true,
       name: (ctx) => copycat.fullName(ctx.seed),
@@ -140,13 +140,13 @@ export const userOnboarded: usersInputs = {
 
 /**
  * Creates a user input config with specified number of confirmed tags
- * @param tagCount Number of confirmed tags to create (1-5)
+ * @param tagCount Number of confirmed tags to create (0-5)
  * @param tagNames Optional specific tag names to use (must match tagCount length)
  * @returns usersInputs configuration
  */
 export const createUserWithConfirmedTags = (tagCount = 1, tagNames?: string[]): usersInputs => {
-  if (tagCount < 1 || tagCount > 5) {
-    throw new Error('Tag count must be between 1 and 5')
+  if (tagCount < 0 || tagCount > 5) {
+    throw new Error('Tag count must be between 0 and 5')
   }
 
   if (tagNames && tagNames.length !== tagCount) {
@@ -184,7 +184,7 @@ export const createUserWithConfirmedTags = (tagCount = 1, tagNames?: string[]): 
     ],
     profiles: [
       {
-        referral_code: (ctx) => crypto.randomBytes(8).toString('hex'),
+        referral_code: () => crypto.randomBytes(8).toString('hex'),
         x_username: null,
         is_public: true,
         name: (ctx) => copycat.fullName(ctx.seed),

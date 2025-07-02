@@ -26,7 +26,7 @@ export function ReferredBy() {
   const { data: referrer, error: referrerError, isLoading: isLoadingReferrer } = useReferrer()
   const { data: referredBy, isLoading: isLoadingReferredBy } = useReferredBy()
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
-  const [referralCode, setReferralCode] = useState<string>('')
+  const [referralCode, setReferralCode] = useState<string | null>(null)
 
   const updateReferralCodeInStorage = useDebounce(
     useCallback(
@@ -41,6 +41,9 @@ export function ReferredBy() {
   )
 
   useEffect(() => {
+    if (referralCode === null) {
+      return
+    }
     updateReferralCodeInStorage(referralCode)
   }, [referralCode, updateReferralCodeInStorage])
 
@@ -71,7 +74,7 @@ export function ReferredBy() {
     >
       <XStack gap="$2" position="relative" ai={'center'} jc={'space-between'}>
         <Input
-          value={referralCode}
+          value={referralCode || ''}
           onChangeText={(text) => setReferralCode(text)}
           placeholder={'Referral Code'}
           col={'$color12'}

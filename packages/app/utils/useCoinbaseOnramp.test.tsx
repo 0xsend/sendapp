@@ -1,5 +1,6 @@
 import { jest, describe, beforeEach, afterEach, it, expect } from '@jest/globals'
-import useCoinbaseOnramp from './useCoinbaseOnramp'
+// @ts-expect-error I want to specifically import standard (web, non-native) version
+import useCoinbaseOnramp from './useCoinbaseOnramp.ts'
 import { act, renderHook, waitFor } from '@testing-library/react-native'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { getOnrampBuyUrl } from '@coinbase/onchainkit/fund'
