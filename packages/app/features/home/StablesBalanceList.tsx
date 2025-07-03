@@ -11,6 +11,7 @@ import { convertBalanceToFiat } from 'app/utils/convertBalanceToUSD'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { useIsPriceHidden } from 'app/features/home/utils/useIsPriceHidden'
 import { ChevronRight } from '@tamagui/lucide-icons'
+import { Platform } from 'react-native'
 
 export const StablesBalanceList = () => {
   const { stableCoins, isLoading } = useCoins()
@@ -27,7 +28,7 @@ export const StablesBalanceList = () => {
         p={'$3.5'}
         br={'$4'}
         href={{
-          pathname: '/',
+          pathname: Platform.OS === 'web' ? '/' : '/token',
           query: { token: coin.token },
         }}
         hoverStyle={hoverStyles}
@@ -72,11 +73,7 @@ const TokenBalanceItem = ({
   )
 }
 
-const TokenBalance = ({
-  coin,
-}: {
-  coin: CoinWithBalance
-}) => {
+const TokenBalance = ({ coin }: { coin: CoinWithBalance }) => {
   const { balance, symbol } = coin
   const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
   const balanceInUSD = convertBalanceToFiat(coin, symbol === 'USDC' ? 1 : tokenPrices?.[coin.token])

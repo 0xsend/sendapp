@@ -242,7 +242,7 @@ You can use the following methods to verify the app is functioning correctly:
 - app crushes on logout ✅
 
 **Home screen**:
-- rework flow on native, web flow is built on query params, native should use stacking screen
+- rework flow on native, web flow is built on query params, native should use stacking screen ✅
 
 **Send**:
 - rework flow on native, web flow is built on query params, native should use stacking screen
@@ -257,15 +257,11 @@ You can use the following methods to verify the app is functioning correctly:
 - referral code is not working ✅
 - sendtag register is not stable, weird stuff is going on sometimes, like money gone but no sendtag (possibly only on simulator or localhost)
 
-**SendPot**:
-- number of tickets purchased is not increased after purchase automatically, its fine after close and open again
-
 **Invest**:
 - risk disclaimer on trade screen doesnt pop up ✅
 
 **Earn**:
 - referral code is not working ✅
-- earn home page doest refresh automatically after deposit
 - a lot os stuff is blinking on earn
 
 **Activity**:
@@ -301,6 +297,12 @@ You can use the following methods to verify the app is functioning correctly:
 
 **Invest**:
 - redirect successful trade to better place, right now its home screen
+
+**Earn**:
+- earn home page doest refresh automatically after deposit
+
+**SendPot**:
+- number of tickets purchased is not increased after purchase automatically, its fine after close and open again
 
 **Activity**:
 - when you go back from details app scroll all the way up, should maintain position
