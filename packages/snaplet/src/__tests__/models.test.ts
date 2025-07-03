@@ -125,8 +125,8 @@ describe('Snaplet Models', () => {
     })
 
     it('should throw error for invalid tag count', () => {
-      expect(() => createUserWithConfirmedTags(0)).toThrow('Tag count must be between 1 and 5')
-      expect(() => createUserWithConfirmedTags(6)).toThrow('Tag count must be between 1 and 5')
+      expect(() => createUserWithConfirmedTags(-1)).toThrow('Tag count must be between 0 and 5')
+      expect(() => createUserWithConfirmedTags(6)).toThrow('Tag count must be between 0 and 5')
     })
 
     it('should throw error for mismatched tag names length', () => {

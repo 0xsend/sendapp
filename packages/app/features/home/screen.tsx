@@ -116,11 +116,14 @@ function HomeBody(props: XStackProps) {
         <YStack
           $gtLg={{ display: 'flex', w: '45%', pb: 0 }}
           width="100%"
-          display={!queryParams.token ? 'flex' : 'none'}
+          display={!queryParams.token || Platform.OS !== 'web' ? 'flex' : 'none'}
           gap="$3"
           ai={'center'}
         >
-          <StablesBalanceCard />
+          <StablesBalanceCard>
+            <StablesBalanceCard.Header />
+            <StablesBalanceCard.Footer />
+          </StablesBalanceCard>
           <SavingsBalanceCard href="/earn" w="100%" />
           <InvestmentsBalanceCard w="100%" />
           <HomeBodyCardRow>
@@ -130,6 +133,8 @@ function HomeBody(props: XStackProps) {
         </YStack>
         {(() => {
           switch (true) {
+            case Platform.OS !== 'web':
+              return null
             case selectedCoin !== undefined:
               return <TokenDetails coin={selectedCoin} />
             case queryParams.token === 'investments':
@@ -145,7 +150,7 @@ function HomeBody(props: XStackProps) {
   )
 }
 
-function InvestmentsBody() {
+export function InvestmentsBody() {
   const { investmentCoins: myInvestmentCoins, isLoading } = useCoins()
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const hoverStyles = useHoverStyles()
@@ -200,12 +205,16 @@ function InvestmentsBody() {
   )
 }
 
-function StablesBody() {
+export function StablesBody() {
   const media = useMedia()
 
   return (
     <YStack $gtXs={{ gap: '$3' }} gap={'$3.5'} f={1}>
-      {media.lg && <StablesBalanceCard />}
+      {media.lg && (
+        <StablesBalanceCard>
+          <StablesBalanceCard.Footer />
+        </StablesBalanceCard>
+      )}
 
       <Card
         bc={'$color1'}

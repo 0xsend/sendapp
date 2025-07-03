@@ -6,7 +6,7 @@ import {
   LinkableButton,
   Paragraph,
   Spinner,
-  useMedia,
+  withStaticProperties,
   XStack,
 } from '@my/ui'
 import formatAmount from 'app/utils/formatAmount'
@@ -19,6 +19,8 @@ import { useRootScreenParams } from 'app/routers/params'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { IconArrowUp, IconPlus } from 'app/components/icons'
 import { useThemeSetting } from 'app/provider/theme'
+import { Platform } from 'react-native'
+import { useRouter } from 'solito/router'
 
 const StablesBalanceCardHeader = () => {
   const [queryParams] = useRootScreenParams()
@@ -151,16 +153,18 @@ const StablesBalanceCardFooter = () => {
   )
 }
 
-export const StablesBalanceCard = (props: CardProps) => {
-  const media = useMedia()
+export const StablesBalanceCardContent = (props: CardProps) => {
   const [queryParams, setParams] = useRootScreenParams()
-  const isStablesScreen = queryParams.token === 'stables'
+  const router = useRouter()
 
-  const toggleSubScreen = () =>
-    setParams(
-      { ...queryParams, token: queryParams.token === 'stables' ? undefined : 'stables' },
-      { webBehavior: 'push' }
-    )
+  const toggleSubScreen = () => {
+    if (Platform.OS === 'web') {
+      setParams({ ...queryParams, token: 'stables' }, { webBehavior: 'push' })
+      return
+    }
+
+    router.push('/stables')
+  }
 
   return (
     <Card
@@ -172,8 +176,12 @@ export const StablesBalanceCard = (props: CardProps) => {
       br="$7"
       {...props}
     >
-      {!(isStablesScreen && !media.gtLg) && <StablesBalanceCardHeader />}
-      <StablesBalanceCardFooter />
+      {props.children}
     </Card>
   )
 }
+
+export const StablesBalanceCard = withStaticProperties(StablesBalanceCardContent, {
+  Header: StablesBalanceCardHeader,
+  Footer: StablesBalanceCardFooter,
+})
