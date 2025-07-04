@@ -1,4 +1,6 @@
 import { LinkableButton, XStack } from '@my/ui'
+import { Platform } from 'react-native'
+import { baseMainnet, sendTokenAddress } from '@my/wagmi'
 
 export const SendButton = ({
   identifier,
@@ -8,7 +10,7 @@ export const SendButton = ({
   idType: string
 }) => (
   <LinkableButton
-    href={`/send?idType=${idType}&recipient=${identifier}`}
+    href={`/send${Platform.OS === 'web' ? '' : '/form'}?idType=${idType}&recipient=${identifier}&sendToken=${sendTokenAddress[baseMainnet.id]}`}
     br="$4"
     px={'$3.5'}
     h={'$4.5'}

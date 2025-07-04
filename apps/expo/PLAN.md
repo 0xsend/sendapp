@@ -245,8 +245,8 @@ You can use the following methods to verify the app is functioning correctly:
 - rework flow on native, web flow is built on query params, native should use stacking screen ✅
 
 **Send**:
-- rework flow on native, web flow is built on query params, native should use stacking screen
-- sending is not stable, app sometimes crush on confirm screen (possibly only on simulator or localhost)
+- rework flow on native, web flow is built on query params, native should use stacking screen ✅
+- sending is not stable, app sometimes crush on confirm screen ✅
 - resetting send screen state after send is done
 
 **Account**:

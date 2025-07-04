@@ -15,6 +15,12 @@ const sendParams: SendScreenParams = {
   sendToken: '0xEab49138BA2Ea6dd776220fE26b7b8E446638956',
 }
 
+jest.mock('react-native', () => ({
+  Platform: {
+    OS: 'web',
+  },
+}))
+
 jest.mock('app/routers/params', () => ({
   useSendScreenParams: jest.fn().mockReturnValue([sendParams]),
   useRootScreenParams: jest.fn().mockReturnValue([{ search: 'alice' }]),
@@ -70,9 +76,10 @@ describe('useSearchResultHref', () => {
       '/send?idType=sendid&recipient=12530&amount=0.01&sendToken=0xEab49138BA2Ea6dd776220fE26b7b8E446638956'
     )
   })
-  it('throws an error for unhandled paths', () => {
+  it('should return profile url by default', () => {
     // @ts-expect-error mock
     usePathname.mockReturnValue('/unhandled-path')
-    expect(() => useSearchResultHref(item)).toThrow('Unhandled path: /unhandled-path')
+    const href = useSearchResultHref(item)
+    expect(href).toBe('/profile/12530')
   })
 })

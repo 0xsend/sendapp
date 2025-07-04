@@ -303,7 +303,14 @@ const AddressSearchResultRow = ({ address }: { address: Address }) => {
       <ConfirmSendDialog
         isOpen={sendConfirmDialogIsOpen}
         onClose={() => setSendConfirmDialogIsOpen(false)}
-        onConfirm={() => router.push(href)}
+        onConfirm={() => {
+          if (Platform.OS !== 'web' && !href.startsWith('/')) {
+            Linking.openURL(href)
+            return
+          }
+          setSendConfirmDialogIsOpen(false)
+          router.push(href)
+        }}
         address={address}
       />
     </View>
