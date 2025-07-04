@@ -21,6 +21,7 @@ import { IconArrowUp, IconPlus } from 'app/components/icons'
 import { useThemeSetting } from 'app/provider/theme'
 import { Platform } from 'react-native'
 import { useRouter } from 'solito/router'
+import { baseMainnet, usdcAddress } from '@my/wagmi'
 
 const StablesBalanceCardHeader = () => {
   const [queryParams] = useRootScreenParams()
@@ -130,7 +131,7 @@ const StablesBalanceCardFooter = () => {
         </LinkableButton>
         {shouldShowSendButton && (
           <LinkableButton
-            href={`/send?sendToken=${queryParams.token ?? ''}`}
+            href={`/send?sendToken=${queryParams.token ?? usdcAddress[baseMainnet.id]}`}
             jc="center"
             ai="center"
             f={1}

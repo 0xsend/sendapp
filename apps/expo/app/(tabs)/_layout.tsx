@@ -8,7 +8,7 @@ import {
   IconWorldSearch,
 } from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
-import { Redirect, Stack, Tabs } from 'expo-router'
+import { Redirect, Stack, Tabs, useRouter } from 'expo-router'
 import AvatarMenuButton from 'app/components/AvatarMenuButton/AvatarMenuButton'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 import { Animated } from 'react-native'
@@ -16,6 +16,7 @@ import { useEffect, useRef } from 'react'
 import { useTabBarSize } from 'apps-expo/utils/layout/useTabBarSize'
 import { useHighlightColor } from 'apps-expo/utils/layout/useHighlightColor'
 import { HeaderSlot } from 'apps-expo/components/layout/HeaderSlot'
+import { baseMainnet, sendTokenAddress } from '@my/wagmi'
 
 const TABS = [
   {
@@ -29,7 +30,7 @@ const TABS = [
   },
   {
     Icon: IconArrowUp,
-    key: 'send',
+    key: 'send/index',
     title: 'Send',
   },
   {
@@ -51,6 +52,7 @@ export default function Layout() {
   const { height, padding } = useTabBarSize()
   const translateY = useRef(new Animated.Value(0)).current
   const highlightColor = useHighlightColor()
+  const router = useRouter()
 
   useEffect(() => {
     Animated.timing(translateY, {
@@ -135,6 +137,17 @@ export default function Layout() {
                     />
                   </XStack>
                 ),
+              }}
+              listeners={{
+                tabPress: (e) => {
+                  if (tab.key !== 'send/index') {
+                    return
+                  }
+                  e.preventDefault()
+                  router.push(
+                    `/send?${new URLSearchParams({ sendToken: sendTokenAddress[baseMainnet.id] })}`
+                  )
+                },
               }}
             />
           )

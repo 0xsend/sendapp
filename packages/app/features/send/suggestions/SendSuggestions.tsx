@@ -1,5 +1,5 @@
-import { Avatar, Card, Paragraph, YStack } from '@my/ui'
-import { FlatList } from 'react-native'
+import { Avatar, Paragraph, YStack } from '@my/ui'
+import { FlatList, Platform } from 'react-native'
 import { useSendScreenParams } from 'app/routers/params'
 import { Link } from 'solito/link'
 import type {
@@ -73,12 +73,12 @@ const SenderSuggestion = ({ item, index }: { item: SendSuggestionItem; index: nu
   const _sendParams = JSON.parse(JSON.stringify(sendParams)) //JSON makes sure we don't pass undefined values
 
   const href = item?.tags?.[0]
-    ? `/send?${new URLSearchParams({
+    ? `/send${Platform.OS === 'web' ? '' : '/form'}?${new URLSearchParams({
         ..._sendParams,
         idType: 'tag',
         recipient: item.tags[0],
       }).toString()}`
-    : `/send?${new URLSearchParams({
+    : `/send${Platform.OS === 'web' ? '' : '/form'}?${new URLSearchParams({
         ..._sendParams,
         idType: 'sendid',
         recipient: item?.send_id,
