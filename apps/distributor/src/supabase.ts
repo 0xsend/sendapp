@@ -155,6 +155,26 @@ export async function fetchAllEarnBalances(distribution: { earn_min_balance: str
 }
 
 /**
+ * Fetches all historical earn balances from the send_earn_balances_timeline view.
+ * This includes all balance changes over time for all owners.
+ *
+ * @returns Promise with all the historical earn balances timeline data
+ */
+export async function fetchAllEarnBalancesTimeline(distribution: { qualification_end: string }) {
+  const qualificationEndTimestamp = Math.floor(
+    new Date(distribution.qualification_end).getTime() / 1000
+  )
+  const supabaseAdmin = createSupabaseAdminClient()
+  return selectAll(
+    supabaseAdmin
+      .from('send_earn_balances_timeline')
+      .select('owner, block_time, balance::text', { count: 'exact' })
+      .lte('block_time', qualificationEndTimestamp)
+      .order('block_time', { ascending: false })
+  )
+}
+
+/**
  * Fetches send scores for the current distribution period from the send_scores_current view.
  *
  * @param distributionId - The ID of the distribution to filter by
