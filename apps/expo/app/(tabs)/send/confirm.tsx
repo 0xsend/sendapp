@@ -3,10 +3,8 @@ import { TabScreenContainer } from 'apps-expo/components/layout/TabScreenContain
 
 export default function SendConfirm() {
   return (
-    <>
-      <TabScreenContainer>
-        <SendConfirmScreen />
-      </TabScreenContainer>
-    </>
+    <TabScreenContainer>
+      <SendConfirmScreen />
+    </TabScreenContainer>
   )
 }

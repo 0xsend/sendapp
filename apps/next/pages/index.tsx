@@ -17,6 +17,8 @@ import type { GetPlaiceholderImage } from 'app/utils/getPlaiceholderImage'
 import { useQueryClient } from '@tanstack/react-query'
 import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
 import { SendEarnProvider } from 'app/features/earn/providers/SendEarnProvider'
+import { useAuthScreenParams } from '../../../packages/app/routers/params'
+import { useSetReferralCode } from '../../../packages/app/utils/useReferralCode'
 
 const log = debug('app:pages:index')
 
@@ -27,6 +29,8 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
   const [carouselImages, setCarouselImages] = useState<GetPlaiceholderImage[]>([])
   const [carouselProgress, setCarouselProgress] = useState(0)
   const queryClient = useQueryClient()
+  const [{ referral }] = useAuthScreenParams()
+  const { mutateAsync: setReferralCodeMutateAsync } = useSetReferralCode()
 
   const cancelAndRemoveAccountsQueries = useCallback(async () => {
     if (!session) {
@@ -35,6 +39,12 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
       queryClient.removeQueries(options)
     }
   }, [session, queryClient])
+
+  useEffect(() => {
+    if (referral) {
+      void setReferralCodeMutateAsync(referral)
+    }
+  }, [referral, setReferralCodeMutateAsync])
 
   useEffect(() => {
     if (carouselImages.length === 0) setCarouselImages(images)
@@ -71,7 +81,6 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
   )
 }
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  setReferralCodeCookie(ctx)
   log('connecting to supabase', process.env.NEXT_PUBLIC_SUPABASE_URL)
   const supabase = createPagesServerClient<Database>(ctx)
 
@@ -102,19 +111,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       initialSession: session,
       images: [],
     },
-  }
-}
-
-function setReferralCodeCookie(context: GetServerSidePropsContext) {
-  // Read the 'code' query parameter from the request URL
-  const referralCode = context.query.referral
-
-  // Set the cookie on the client side if the referral code exists
-  if (referralCode) {
-    context.res.setHeader(
-      'Set-Cookie',
-      `referral=${referralCode}; Max-Age=${30 * 24 * 60 * 60}; Path=/;` // 30 days
-    )
   }
 }
 

@@ -29,6 +29,7 @@ export function SideBarNavLink({
   return (
     <Link
       fontSize={'$7'}
+      testID={`sidebar-nav-${text.toLowerCase()}`}
       gap="$3.5"
       display="flex"
       alignItems="center"

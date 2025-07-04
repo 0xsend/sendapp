@@ -3,7 +3,7 @@ import type { Logger } from 'pino'
 import {
   createDistributionShares,
   fetchActiveDistributions,
-  fetchAllEarnBalances,
+  fetchAllEarnBalancesTimeline,
   fetchAllHodlers,
   fetchAllVerifications,
   fetchDistribution,
@@ -299,23 +299,47 @@ export class DistributorV2Worker {
     }
 
     const {
-      data: earnBalances,
+      data: earnBalancesTimeline,
       error: earnBalancesError,
       count: earnBalancesCount,
-    } = await fetchAllEarnBalances(distribution)
+    } = await fetchAllEarnBalancesTimeline(distribution)
 
     if (earnBalancesError) {
-      log.error(earnBalancesError, 'Error fetching earn balances')
+      log.error(earnBalancesError, 'Error fetching earn balances timeline')
       throw earnBalancesError
     }
-    if (earnBalancesCount === 0 || earnBalances === null) {
-      log.warn('No earn balances found')
+    if (earnBalancesCount === 0 || earnBalancesTimeline === null) {
+      log.warn('No earn balances timeline found')
       return
     }
-    const minEarnBalancesByAddress = earnBalances.reduce(
-      (acc, { owner, assets }) => {
-        const ownerHex = byteaToHex(owner)
-        acc[normalizeAddress(ownerHex)] = BigInt(assets)
+
+    // Filter out null values - timeline data is already filtered by qualification_end time at DB level
+    const filteredBalances = earnBalancesTimeline.filter(
+      (item): item is { owner: string; block_time: number; balance: string } =>
+        item.block_time !== null && item.owner !== null && item.balance !== null
+    )
+
+    const relevantBalances = filteredBalances
+      // Get the latest balance per owner (first occurrence is already the latest due to query ordering)
+      .reduce(
+        (acc, current) => {
+          if (!acc.some((item) => item.owner === current.owner)) {
+            acc.push(current)
+          }
+          return acc
+        },
+        [] as typeof filteredBalances
+      )
+      // Filter by minimum balance requirement
+      .filter(({ balance }) => BigInt(balance) >= BigInt(distribution.earn_min_balance))
+
+    const minEarnBalancesByAddress = relevantBalances.reduce(
+      (acc, { owner, balance }) => {
+        // Type guard ensures owner is a string, but we need to verify it's the right format
+        if (typeof owner === 'string' && owner.startsWith('\\x')) {
+          const ownerHex = byteaToHex(owner as `\\x${string}`)
+          acc[normalizeAddress(ownerHex)] = BigInt(balance)
+        }
         return acc
       },
       {} as Record<Address, bigint>

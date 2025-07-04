@@ -10,12 +10,9 @@ import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { type MarketData, useMultipleTokensMarketData } from 'app/utils/coin-gecko'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { useIsPriceHidden } from 'app/features/home/utils/useIsPriceHidden'
+import { Platform } from 'react-native'
 
-export const InvestmentsBalanceList = ({
-  coins,
-}: {
-  coins: CoinWithBalance[]
-}) => {
+export const InvestmentsBalanceList = ({ coins }: { coins: CoinWithBalance[] }) => {
   const hoverStyles = useHoverStyles()
   const { data: tokensMarketData, isLoading: isLoadingTokensMarketData } =
     useMultipleTokensMarketData(coins?.map((c) => c.coingeckoTokenId) || [])
@@ -30,7 +27,7 @@ export const InvestmentsBalanceList = ({
         p={'$3.5'}
         br={'$4'}
         href={{
-          pathname: '/',
+          pathname: Platform.OS === 'web' ? '/' : '/token',
           query: { token: coin.token },
         }}
         hoverStyle={hoverStyles}

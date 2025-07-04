@@ -4,7 +4,7 @@ import { useSupabase } from './supabase/useSupabase'
 import { useUser } from './useUser'
 import { useQuery } from '@tanstack/react-query'
 import { assert } from './assert'
-import { useReferralCodeCookie } from './useReferralCodeCookie'
+import { useReferralCodeQuery } from 'app/utils/useReferralCode'
 
 /**
  * Fetches the referrer profile of existing referrer. Takes an optional identifier in case the user has no existing referrer./
@@ -53,17 +53,17 @@ export async function fetchReferrer({
 export function useReferrer() {
   const supabase = useSupabase()
   const { profile } = useUser()
-  const { data: referralCodeCookie, isLoading } = useReferralCodeCookie()
+  const { data: referralCode, isLoading } = useReferralCodeQuery()
 
   return useQuery({
-    queryKey: ['referrer', { referralCodeCookie, supabase, profile }] as const,
-    queryFn: async ({ queryKey: [, { referralCodeCookie, supabase, profile }], signal }) => {
+    queryKey: ['referrer', { referralCode, supabase, profile }] as const,
+    queryFn: async ({ queryKey: [, { referralCode, supabase, profile }], signal }) => {
       assert(!!supabase, 'supabase is required')
       assert(!!profile, 'profile is required')
       return fetchReferrer({
         supabase,
         profile,
-        referral_code: referralCodeCookie,
+        referral_code: referralCode || undefined,
         signal,
       })
     },

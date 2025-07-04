@@ -124,6 +124,7 @@ export function SendTagPricingDialog({ name = '' }: { name: Tables<'tags'>['name
             maw={600}
             $theme-dark={{ bc: '$black' }}
             $theme-light={{ bc: '$gray4Light' }}
+            testID={'sendtag-pricing-dialog'}
           >
             {dialogContent}
           </Dialog.Content>

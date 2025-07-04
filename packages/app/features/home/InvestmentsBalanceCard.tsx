@@ -27,20 +27,29 @@ import { useCoins } from 'app/provider/coins'
 import { investmentCoins as investmentCoinsList } from 'app/data/coins'
 import { formatUnits } from 'viem'
 import { HomeBodyCard } from './screen'
+import { Platform } from 'react-native'
+import { useRouter } from 'solito/router'
 
 export const InvestmentsBalanceCard = (props: CardProps) => {
   const media = useMedia()
   const [queryParams, setParams] = useRootScreenParams()
+  const router = useRouter()
   const isInvestmentCoin = investmentCoins.some(
     (coin) => coin.token.toLowerCase() === queryParams.token?.toLowerCase()
   )
   const isInvestmentsScreen = queryParams.token === 'investments'
 
-  const toggleSubScreen = () =>
-    setParams(
-      { ...queryParams, token: queryParams.token === 'investments' ? undefined : 'investments' },
-      { webBehavior: 'push' }
-    )
+  const toggleSubScreen = () => {
+    if (Platform.OS === 'web') {
+      setParams(
+        { ...queryParams, token: queryParams.token === 'investments' ? undefined : 'investments' },
+        { webBehavior: 'push' }
+      )
+      return
+    }
+
+    router.push('/investments')
+  }
 
   const { isPriceHidden } = useIsPriceHidden()
 

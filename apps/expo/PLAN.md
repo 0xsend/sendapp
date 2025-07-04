@@ -227,49 +227,46 @@ You can use the following methods to verify the app is functioning correctly:
 
 **Global issues**:
 - visual issues, broken UI/styling
-- referral code reading/writing is not working, due to implementation using cookies
+- referral code reading/writing is not working, due to implementation using cookies ✅
 - dialogs are not appearing ✅
-- QR code generation library is not working on native
+- QR code generation library is not working on native ✅
 - a lot os stuff is blinking all over the place, too much data fetching, too much fading
 
 **Project Structure**:
-- prepare assets so app doesn't have to fetch images
+- check images loading 
+- check fonts loading
+- prepare splash screen and icons for ios ✅
 
 **Auth**:
 - login issues, passkey is found but error is thrown ✅
-- passkeys for android, right now got passkeys only for ios
 - app crushes on logout ✅
-- no way to input referral, url won't work on native
 
 **Home screen**:
-- rework flow on native, web flow is built on query params, native should use stacking screen
+- rework flow on native, web flow is built on query params, native should use stacking screen ✅
 
 **Send**:
 - rework flow on native, web flow is built on query params, native should use stacking screen
-- sending is not stable, app sometimes crush on confirm screen
+- sending is not stable, app sometimes crush on confirm screen (possibly only on simulator or localhost)
 - resetting send screen state after send is done
 
 **Account**:
-- QR code not working
+- QR code not working ✅
 
 **Sendtags**:
 - pricing dialog not appearing ✅
-- referral code is not working
-- sendtag register is not stable, weird stuff is going on sometimes, like money gone but no sendtag
-
-**SendPot**:
-- number of tickets purchased is not increased after purchase automatically, its fine after close and open again
+- referral code is not working ✅
+- sendtag register is not stable, weird stuff is going on sometimes, like money gone but no sendtag (possibly only on simulator or localhost)
 
 **Invest**:
 - risk disclaimer on trade screen doesnt pop up ✅
 
 **Earn**:
-- referral code is not working
-- earn home page doest refresh automatically after deposit
+- referral code is not working ✅
 - a lot os stuff is blinking on earn
 
 **Activity**:
 - redirect to external address is not working due to broken dialog ✅
+- only 1st page is visible
 
 **History**:
 - rework flow of screens, cannot go back from profile details, history and receipt, use screen stacking
@@ -277,9 +274,9 @@ You can use the following methods to verify the app is functioning correctly:
 - history scroll is broken, it behaves like standard screen, not like a chat
 
 **Deposit**:
-- QR to deposit by crypto transfer is not working
+- QR to deposit by crypto transfer is not working ✅
 - cannot copy address due to not working dialog ✅
-- current implementation of coinbase onramp rely on browser API, need to build version for native https://github.com/coinbase/onramp-demo-mobile
+- current implementation of coinbase onramp rely on browser API, need to build version for native https://github.com/coinbase/onramp-demo-mobile ✅
 
 ## Planned Improvements [POST RELEASE]
 
@@ -290,12 +287,22 @@ You can use the following methods to verify the app is functioning correctly:
 - error page when app crush
 - don't nest scroll views
 
+**Auth**:
+- passkeys for android, right now got passkeys only for ios
+- no way to input referral, url won't work on native
+
 **Referrals Screen**:
 - number of referrals in header is missing
 - refactor referrals screen to use recycler view
 
 **Invest**:
 - redirect successful trade to better place, right now its home screen
+
+**Earn**:
+- earn home page doest refresh automatically after deposit
+
+**SendPot**:
+- number of tickets purchased is not increased after purchase automatically, its fine after close and open again
 
 **Activity**:
 - when you go back from details app scroll all the way up, should maintain position

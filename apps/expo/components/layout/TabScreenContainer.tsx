@@ -3,7 +3,7 @@ import type { PropsWithChildren } from 'react'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 import { useTabBarSize } from 'apps-expo/utils/layout/useTabBarSize'
 
-const CONTAINER_OFFSET = 10
+const CONTAINER_OFFSET = 20
 
 export const TabScreenContainer = ({ children }: PropsWithChildren) => {
   const { onScroll } = useScrollDirection()
@@ -22,8 +22,7 @@ export const TabScreenContainer = ({ children }: PropsWithChildren) => {
         flex={1}
         contentContainerStyle={{
           flexGrow: 1,
-          paddingTop: CONTAINER_OFFSET,
-          paddingBottom: height + CONTAINER_OFFSET * 2,
+          paddingBottom: height + CONTAINER_OFFSET,
         }}
         showsVerticalScrollIndicator={false}
         bounces={true}
