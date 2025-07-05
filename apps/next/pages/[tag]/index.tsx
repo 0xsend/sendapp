@@ -1,8 +1,7 @@
 import { ProfileScreen } from 'app/features/profile/screen'
-import { HomeLayout } from 'app/features/home/layout.web'
 import Head from 'next/head'
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
-import type { NextPageWithLayout } from './_app'
+import type { NextPageWithLayout } from '../_app'
 import type { GetServerSideProps, GetServerSidePropsContext } from 'next'
 import type { Database } from '@my/supabase/database.types'
 import { userOnboarded } from 'utils/userOnboarded'
@@ -10,6 +9,7 @@ import { SendtagSchema } from 'app/utils/zod/sendtag'
 import { assert } from 'app/utils/assert'
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { TopNav } from 'app/components/TopNav'
+import { HomeLayout } from 'app/features/home/layout.web'
 
 export const Page: NextPageWithLayout<{ sendid: number | null }> = ({ sendid }) => {
   return (
@@ -83,7 +83,7 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
 }) satisfies GetServerSideProps
 
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="History" backFunction="router" />} fullHeight>
+  <HomeLayout TopNav={<TopNav backFunction="router" />} fullHeight>
     {children}
   </HomeLayout>
 )
