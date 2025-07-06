@@ -37,7 +37,7 @@ import { useSendEarnBalances, useVaultConvertSharesToAssets } from 'app/features
 //@todo get this from the db
 const verificationTypesAndTitles = {
   create_passkey: { title: 'Create a Passkey' },
-  tag_registration: { title: 'Register a Sendtag', details: '(per tag)' },
+  tag_registration: { title: 'Purchase a Sendtag', details: '(per tag)' },
   send_ten: { title: '10+ Sends' },
   send_one_hundred: { title: '100+ Sends' },
   tag_referral: { title: 'Referrals' },
@@ -237,7 +237,7 @@ const DistributionRequirementsCard = ({
         </YStack>
         <YStack gap="$2" ai={'flex-end'}>
           <XStack ai="center" gap="$2">
-            <Paragraph>Sendtag Registered</Paragraph>
+            <Paragraph>Sendtag Purchased</Paragraph>
             {sendTagRegistrations ? (
               <CheckCircle2 $theme-light={{ color: '$color12' }} color="$primary" size={'$1.5'} />
             ) : (
