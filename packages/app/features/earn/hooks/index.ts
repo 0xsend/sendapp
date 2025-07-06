@@ -183,6 +183,82 @@ export function useSendEarnBalances(): UseQueryReturnType<SendEarnBalance[]> {
   return useQuery(sendEarnBalancesQueryOptions(supabase))
 }
 
+const SendEarnBalanceTimelineSchema = z.object({
+  log_addr: byteaToHexEthAddress,
+  owner: byteaToHexEthAddress,
+  assets: decimalStrToBigInt,
+  shares: decimalStrToBigInt,
+  block_num: decimalStrToBigInt,
+  block_time: decimalStrToBigInt,
+})
+const SendEarnBalancesTimelineSchema = z.array(SendEarnBalanceTimelineSchema)
+export type SendEarnBalanceTimiline = z.infer<typeof SendEarnBalanceTimelineSchema>
+
+async function fetchSendEarnBalancesTimeline(supabase: SupabaseClient<Database>) {
+  const { data, error } = await supabase
+    .from('send_earn_balances_timeline')
+    .select('assets::text,log_addr,owner,shares::text, block_num::text, block_time::text')
+  if (error) throw error
+  return SendEarnBalancesTimelineSchema.parse(data)
+}
+
+export function sendEarnBalancesTimelineQueryOptions(supabase: SupabaseClient<Database>) {
+  return queryOptions({
+    queryKey: ['send_earn_balances_timeline', { supabase }] as const,
+    queryFn: async () => fetchSendEarnBalancesTimeline(supabase),
+    staleTime: 30_000,
+  })
+}
+
+export function useSendEarnBalancesTimeline(): UseQueryReturnType<SendEarnBalance[]> {
+  const supabase = useSupabase()
+  return useQuery(sendEarnBalancesQueryOptions(supabase))
+}
+
+async function fetchSendEarnBalancesAtBlock(
+  supabase: SupabaseClient<Database>,
+  block_num: bigint | null
+) {
+  let query = supabase
+    .from('send_earn_balances_timeline')
+    .select('assets::text,log_addr,owner,shares::text, block_num::text, block_time::text')
+    .order('block_num', { ascending: false })
+
+  if (block_num !== null) {
+    query = query.lte('block_num', block_num)
+  }
+
+  const { data, error } = await query
+
+  if (error) throw error
+
+  // Filter to keep only the first occurrence of each log_addr
+  const seen = new Set()
+  const filtered = data.filter((row) => {
+    if (seen.has(row.log_addr)) return false
+    seen.add(row.log_addr)
+    return true
+  })
+
+  return SendEarnBalancesTimelineSchema.parse(filtered)
+}
+
+export function sendEarnBalancesAtBlockQueryOptions(
+  supabase: SupabaseClient<Database>,
+  block_num: bigint | null
+) {
+  return queryOptions({
+    queryKey: ['send_earn_balances_at_block', { supabase, block_num }] as const,
+    queryFn: async () => fetchSendEarnBalancesAtBlock(supabase, block_num),
+    staleTime: 30_000,
+  })
+}
+
+export function useSendEarnBalancesAtBlock(block_num: bigint | null) {
+  const supabase = useSupabase()
+  return useQuery(sendEarnBalancesAtBlockQueryOptions(supabase, block_num))
+}
+
 /**
  * Given a list of vault addresses, fetches the underlying asset for each vault.
  */
