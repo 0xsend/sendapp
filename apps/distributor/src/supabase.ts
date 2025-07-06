@@ -68,8 +68,8 @@ function fetchDistributionQuery() {
 
 export async function fetchActiveDistributions() {
   return fetchDistributionQuery()
-    .lte('qualification_start', new Date().toISOString())
-    .gte('qualification_end', new Date().toISOString())
+    .lte('qualification_start', new Date().toUTCString())
+    .gte('qualification_end', new Date().toUTCString())
 }
 
 export async function fetchDistribution(id: number) {

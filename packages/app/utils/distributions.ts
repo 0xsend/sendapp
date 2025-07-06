@@ -135,6 +135,7 @@ export const useMonthlyDistributions = () => {
       const { data, error } = await fetchDistributions(supabase)
         .gt('number', 6)
         .gt('qualification_end', sendAccount?.created_at)
+        .lte('qualification_start', new Date().toUTCString())
         .order('number', { ascending: false })
 
       if (error) throw error

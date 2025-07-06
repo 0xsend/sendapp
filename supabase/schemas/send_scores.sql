@@ -104,19 +104,17 @@ CREATE OR REPLACE FUNCTION public.get_send_scores_history()
 AS $function$
 
 BEGIN
-    -- Admin callers (postgres, service_role) see all scores
-    IF current_user IN ('postgres', 'service_role') THEN
-        RETURN QUERY SELECT * FROM private.send_scores_history;
     -- Authenticated users see only their own scores
-    ELSIF current_user= 'authenticated' AND auth.uid() IS NOT NULL THEN
+    IF current_setting('role') = 'authenticated' AND auth.uid() IS NOT NULL THEN
         RETURN QUERY SELECT * FROM private.send_scores_history WHERE send_scores_history.user_id = auth.uid();
-    -- Anonymous/other callers see nothing
+    -- Admin callers see all scores
+    ELSIF current_setting('role') = 'none' THEN  -- covers both postgres and service_role
+        RETURN QUERY SELECT * FROM private.send_scores_history;
     ELSE
         RETURN;
     END IF;
 END;
-$function$
-;
+$function$;
 
 ALTER FUNCTION "public"."get_send_scores_history"() OWNER TO "postgres";
 
@@ -133,35 +131,8 @@ $function$
 
 ALTER FUNCTION "public"."refresh_send_scores_history"() OWNER TO "postgres";
 
--- Trigger function
-CREATE OR REPLACE FUNCTION public.refresh_send_scores_history_trigger()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
-AS $function$
-BEGIN
-  PERFORM refresh_send_scores_history();
-  RETURN NEW;
-END;
-$function$
-;
-
-ALTER FUNCTION "public"."refresh_send_scores_history_trigger"() OWNER TO "postgres";
-
--- Trigger
-CREATE TRIGGER distribution_ended_refresh_send_scores
-  AFTER INSERT ON distributions
-  FOR EACH ROW
-  EXECUTE FUNCTION refresh_send_scores_history_trigger();
-
-
 -- Revoke all public and authenticated access, grant only to service_role
 -- For all functions:
-REVOKE ALL ON FUNCTION "public"."refresh_send_scores_history_trigger"() FROM PUBLIC;
-REVOKE ALL ON FUNCTION "public"."refresh_send_scores_history_trigger"() FROM authenticated;
-REVOKE ALL ON FUNCTION "public"."refresh_send_scores_history_trigger"() FROM anon;
-GRANT ALL ON FUNCTION "public"."refresh_send_scores_history_trigger"() TO service_role;
-
 
 REVOKE ALL ON FUNCTION "public"."refresh_send_scores_history"() FROM PUBLIC;
 REVOKE ALL ON FUNCTION "public"."refresh_send_scores_history"() FROM authenticated;
