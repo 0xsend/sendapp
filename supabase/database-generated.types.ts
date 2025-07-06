@@ -1672,9 +1672,12 @@ export type Database = {
       }
       send_earn_balances_timeline: {
         Row: {
-          balance: number | null
+          assets: number | null
+          block_num: number | null
           block_time: number | null
+          log_addr: string | null
           owner: string | null
+          shares: number | null
         }
         Relationships: []
       }

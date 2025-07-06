@@ -50,20 +50,6 @@ BEGIN
             ad.start_time,
             ad.end_time
         FROM active_distribution ad
-    ),
-    earn_balances_timeline AS (
-        SELECT owner,
-            block_time,
-            sum(balance) OVER w AS balance,
-            lead(block_time) OVER w AS next_block_time
-        FROM (
-            SELECT owner, block_time, assets AS balance
-            FROM send_earn_deposit
-            UNION ALL
-            SELECT owner, block_time, -assets
-            FROM send_earn_withdraw
-        ) earn_data
-        WINDOW w AS (PARTITION BY owner ORDER BY block_time ROWS UNBOUNDED PRECEDING)
     )
     SELECT
         sc.distribution_id,
@@ -95,11 +81,10 @@ BEGIN
         WHERE sc.earn_min_balance = 0
         OR EXISTS (
             SELECT 1
-            FROM earn_balances_timeline ebt
+            FROM send_earn_balances_timeline ebt
             WHERE ebt.owner = transfers.t
-            AND ebt.balance >= sc.earn_min_balance
+            AND ebt.assets >= sc.earn_min_balance
             AND ebt.block_time <= transfers.block_time
-            AND (ebt.next_block_time IS NULL OR transfers.block_time < ebt.next_block_time)
         )
         GROUP BY t
     ) transfer_sums ON true

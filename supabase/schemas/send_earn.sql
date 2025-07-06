@@ -550,22 +550,29 @@ ALTER TABLE "public"."send_earn_balances" OWNER TO "postgres";
 
 CREATE OR REPLACE VIEW "public"."send_earn_balances_timeline" WITH ("security_invoker"='on', "security_barrier"='on') AS
 WITH all_transactions AS (
-    SELECT owner, block_time, assets as balance
+    SELECT log_addr,owner, block_time, block_num, assets, shares
     FROM send_earn_deposit
     UNION ALL
-    SELECT owner, block_time, -assets as balance
+    SELECT log_addr, owner, block_time, block_num, -assets, -shares
     FROM send_earn_withdraw
 )
 SELECT
+    log_addr,
     owner,
     block_time,
-    SUM(balance) OVER (
-        PARTITION BY owner
-        ORDER BY block_time
+    block_num,
+    SUM(assets) OVER (
+        PARTITION BY log_addr, owner
+        ORDER BY block_num
         ROWS UNBOUNDED PRECEDING
-    ) as balance
+    ) as assets,
+    SUM(shares) OVER (
+        PARTITION BY log_addr, owner
+        ORDER BY block_num
+        ROWS UNBOUNDED PRECEDING
+    ) as shares
 FROM all_transactions
-ORDER BY block_time;
+ORDER BY block_num;
 
 ALTER TABLE "public"."send_earn_balances_timeline" OWNER TO "postgres";
 
@@ -585,6 +592,8 @@ CREATE INDEX "send_earn_new_affiliate_send_earn_affiliate_idx" ON "public"."send
 CREATE INDEX "send_earn_withdraw_block_num" ON "public"."send_earn_withdraw" USING "btree" ("block_num");
 CREATE INDEX "send_earn_withdraw_block_time" ON "public"."send_earn_withdraw" USING "btree" ("block_time");
 CREATE INDEX "send_earn_withdraw_owner_idx" ON "public"."send_earn_withdraw" USING "btree" ("owner", "log_addr");
+CREATE INDEX "idx_earn_deposit_owner_logaddr_blocknum" ON "public"."send_earn_deposit" USING "btree" ("owner", "log_addr", "block_num");
+CREATE INDEX "idx_earn_withdraw_owner_logaddr_blocknum" ON "public"."send_earn_withdraw" USING "btree" ("owner", "log_addr", "block_num");
 CREATE UNIQUE INDEX "u_send_earn_create" ON "public"."send_earn_create" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
 CREATE UNIQUE INDEX "u_send_earn_deposit" ON "public"."send_earn_deposit" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
 CREATE UNIQUE INDEX "u_send_earn_new_affiliate" ON "public"."send_earn_new_affiliate" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
