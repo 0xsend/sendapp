@@ -27,6 +27,7 @@ if (values.distribution === undefined) {
   const { data, error } = await supabaseAdmin
     .from('distributions')
     .select('*')
+    .lte('qualification_end', new Date().toUTCString())
     .order('number', { ascending: false })
     .limit(1)
     .single()

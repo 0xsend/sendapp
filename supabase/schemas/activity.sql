@@ -137,7 +137,7 @@ counterparty_counts AS (
     SELECT counterparty,
            COUNT(*) AS interaction_count
     FROM user_transfers
-    WHERE (counterparty).id IS NOT NULL -- include only valid counterparties
+    WHERE (counterparty).id IS NULL -- include only valid counterparties
     GROUP BY counterparty
     ORDER BY interaction_count DESC
     LIMIT 30 -- top 30 most frequent users
@@ -157,7 +157,10 @@ INNER JOIN user_earn_balances ueb ON ueb.user_id = wui.user_id
 WHERE ueb.earn_balance >= (
     SELECT d.earn_min_balance
     FROM distributions d
-    WHERE d.id = (SELECT MAX(id) FROM distributions)
+    WHERE d.qualification_start <= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+      AND d.qualification_end >= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+    ORDER BY d.qualification_start DESC
+    LIMIT 1
 )
 ORDER BY uss.total_score DESC
 LIMIT 10; -- return top 10 send score users
@@ -261,12 +264,22 @@ filtered_profiles AS (
     FROM birthday_profiles bp
     INNER JOIN user_send_scores uss ON uss.user_id = bp.id
     INNER JOIN user_earn_balances ueb ON ueb.user_id = bp.id
-    WHERE uss.total_sends > 100
-      AND uss.total_score > (SELECT hodler_min_balance FROM distributions WHERE id = (SELECT MAX(d.id) FROM distributions d))
+WHERE uss.total_sends > 100
+      AND uss.total_score > (
+          SELECT hodler_min_balance
+          FROM distributions
+          WHERE qualification_start <= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+            AND qualification_end >= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+          ORDER BY qualification_start DESC
+          LIMIT 1
+      )
       AND ueb.earn_balance >= (
           SELECT d.earn_min_balance
           FROM distributions d
-          WHERE d.id = (SELECT MAX(id) FROM distributions)
+          WHERE d.qualification_start <= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+            AND d.qualification_end >= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+          ORDER BY d.qualification_start DESC
+          LIMIT 1
       )
 )
 
