@@ -313,13 +313,7 @@ export class DistributorV2Worker {
       return
     }
 
-    // Filter out null values - timeline data is already filtered by qualification_end time at DB level
-    const filteredBalances = earnBalancesTimeline.filter(
-      (item): item is { owner: string; block_time: number; balance: string } =>
-        item.block_time !== null && item.owner !== null && item.balance !== null
-    )
-
-    const relevantBalances = filteredBalances
+    const relevantBalances = earnBalancesTimeline
       // Get the latest balance per owner (first occurrence is already the latest due to query ordering)
       .reduce(
         (acc, current) => {
@@ -328,26 +322,18 @@ export class DistributorV2Worker {
           }
           return acc
         },
-        [] as typeof filteredBalances
+        [] as typeof earnBalancesTimeline
       )
       // Filter by minimum balance requirement
-      .filter(({ balance }) => BigInt(balance) >= BigInt(distribution.earn_min_balance))
+      .filter(({ assets }) => BigInt(assets) >= BigInt(distribution.earn_min_balance))
 
     const minEarnBalancesByAddress = relevantBalances.reduce(
-      (acc, { owner, balance }) => {
+      (acc, { owner, assets }) => {
         // Type guard ensures owner is a string, but we need to verify it's the right format
         if (typeof owner === 'string' && owner.startsWith('\\x')) {
           const ownerHex = byteaToHex(owner as `\\x${string}`)
-          acc[normalizeAddress(ownerHex)] = BigInt(balance)
+          acc[normalizeAddress(ownerHex)] = BigInt(assets)
         }
-        return acc
-      },
-      {} as Record<Address, bigint>
-    )
-
-    const minBalanceByAddress: Record<Address, bigint> = minBalanceAddresses.reduce(
-      (acc, { address, balance }) => {
-        acc[address] = balance
         return acc
       },
       {} as Record<Address, bigint>

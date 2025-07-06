@@ -168,7 +168,7 @@ export async function fetchAllEarnBalancesTimeline(distribution: { qualification
   return selectAll(
     supabaseAdmin
       .from('send_earn_balances_timeline')
-      .select('owner, block_time, balance::text', { count: 'exact' })
+      .select('owner, block_time, assets::text, shares::text', { count: 'exact' })
       .lte('block_time', qualificationEndTimestamp)
       .order('block_time', { ascending: false })
   )
