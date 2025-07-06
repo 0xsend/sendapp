@@ -127,7 +127,7 @@ function HomeBody(props: XStackProps) {
           <SavingsBalanceCard href="/earn" w="100%" />
           <InvestmentsBalanceCard w="100%" />
           <HomeBodyCardRow>
-            <RewardsCard w="55%" href={Platform.OS === 'web' ? '/explore/rewards' : '/rewards'} />
+            <RewardsCard w="55%" href={'/rewards'} />
             <FriendsCard href="/account/affiliate" />
           </HomeBodyCardRow>
         </YStack>

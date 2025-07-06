@@ -180,7 +180,12 @@ export default () => {
         },
         {
           source: '/account/rewards/activity',
-          destination: '/explore/rewards',
+          destination: '/rewards',
+          permanent: true,
+        },
+        {
+          source: '/explore/rewards',
+          destination: '/rewards',
           permanent: true,
         },
       ]
