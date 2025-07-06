@@ -1,5 +1,4 @@
 import { LinkBanner, YStack } from '@my/ui'
-import { Platform } from 'react-native'
 
 export const ExploreScreen = () => {
   return (
@@ -12,7 +11,7 @@ export const ExploreScreen = () => {
       }}
     >
       <LinkBanner
-        href={Platform.OS === 'web' ? '/explore/rewards' : '/rewards'}
+        href={'/rewards'}
         imgUrl={'https://ghassets.send.app/app_images/explore_rewards.jpg'}
         title={'Get Rewarded'}
         subtitle={'Earn SEND while engaging, referring, and growing the network'}
