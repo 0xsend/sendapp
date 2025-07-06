@@ -62,7 +62,7 @@ function fetchDistributions(supabase: SupabaseClient<Database>) {
       tranche_id,
       qualification_end,
       qualification_start,
-      snapshot_block_num,
+      snapshot_block_num::text,
       token_addr,
       token_decimals,
       updated_at,
