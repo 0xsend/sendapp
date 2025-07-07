@@ -52,18 +52,22 @@ erDiagram
 ### Key Tables:
 
 1. **send_earn_create**: Records the creation of Send Earn vaults
+
    - Stores vault address, fee configuration, and creator information
    - Links to protocol and platform accounts
 
 2. **send_earn_new_affiliate**: Tracks new affiliate relationships
+
    - Connects user accounts to their Send Earn affiliate contracts
    - Used to resolve referral relationships
 
 3. **send_earn_deposit**: Records user deposits into Send Earn vaults
+
    - Tracks amount, shares, and transaction details
    - Creates activity feed entries via database triggers
 
 4. **send_earn_withdraw**: Records user withdrawals from Send Earn vaults
+
    - Tracks amount, shares, and transaction details
    - Creates activity feed entries via database triggers
 
@@ -73,9 +77,11 @@ erDiagram
 
 ### Views and Computed Data:
 
-1. **send_earn_balances**: Computed view showing user balances by vault
-   - Aggregates deposits and withdrawals to calculate current balances
-   - Used by the frontend to display user holdings
+1. **send_earn_balances**: Real-time table tracking historical vault total assets from onchain events
+
+   - Records `UpdateLastTotalAssets` events from Send Earn contracts over time
+   - Provides accurate vault balance history including yield accrual
+   - Foreign key linked to `send_earn_create` for data integrity
 
 2. **send_earn_activity**: View combining deposit and withdrawal activities
    - Provides a chronological history of user actions
@@ -99,11 +105,13 @@ The frontend implementation provides users with intuitive interfaces for interac
 ### Key Screens:
 
 1. **Deposit Screen**: Allows users to deposit USDC into Send Earn vaults
+
    - Amount input with balance display
    - APY and earnings calculator
    - Terms acceptance and submission logic
 
 2. **Withdraw Screen**: Enables users to withdraw their funds
+
    - Amount selection with available balance check
    - Transaction confirmation and submission
 
@@ -151,10 +159,12 @@ Send App interacts with the Send Earn protocol through Account Abstraction and U
 ### UserOp System:
 
 1. **Transaction Preparation**:
+
    - The app prepares transactions using [`useSendEarnDepositCalls`](../packages/app/features/earn/deposit/hooks/index.ts) or `useSendEarnWithdrawCalls`
    - These hooks generate the necessary contract calls based on user actions
 
 2. **Signature Process**:
+
    - Transactions are signed using WebAuthn credentials
    - The [`signUserOp`](../packages/workflows/src/utils/userop.ts) utility handles the signature process
 
@@ -167,6 +177,7 @@ Send App interacts with the Send Earn protocol through Account Abstraction and U
 The app implements smart vault selection logic:
 
 1. For deposits:
+
    - If the user has existing deposits, use their current vault
    - If the user was referred, use the referrer's affiliate vault
    - Otherwise, create a new vault through the factory
@@ -180,10 +191,12 @@ The app implements smart vault selection logic:
 The app interacts with three main contracts:
 
 1. **Send Earn Factory (SEF)**:
+
    - Creates new vaults and affiliate contracts
    - Manages deposit routing for new users
 
 2. **Send Earn Vault (SEV)**:
+
    - Handles direct deposits and withdrawals
    - Manages yield accrual and fee distributions
 
@@ -198,6 +211,7 @@ While the frontend prepares and signs the UserOperation (UserOp) for a deposit, 
 ### Purpose
 
 Using Temporal for deposit orchestration provides several benefits:
+
 - **Reliability:** Handles transient errors (e.g., network issues, bundler downtime) with built-in retries.
 - **State Management:** Tracks the precise state of each deposit UserOp throughout its lifecycle.
 - **Observability:** Offers visibility into the workflow progress and any failures.
@@ -207,11 +221,11 @@ Using Temporal for deposit orchestration provides several benefits:
 
 1.  **[`DepositWorkflow`](../packages/workflows/src/deposit-workflow/workflow.ts)**: The main Temporal workflow orchestrating the deposit process. It's typically initiated by the backend API after receiving a signed UserOp from the client.
 2.  **[Temporal Activities](../packages/workflows/src/deposit-workflow/activities.ts)**: Discrete units of work executed by the workflow:
-    *   `upsertTemporalDepositActivity`: Creates or updates the initial record in the tracking table.
-    *   `simulateDepositActivity`: Simulates the UserOp against the bundler to catch potential issues before submission.
-    *   `updateTemporalDepositActivity`: Updates the status and details of the deposit in the tracking table at various stages.
-    *   `waitForTransactionReceiptActivity`: Polls the blockchain for the transaction receipt once the UserOp is submitted.
-    *   `verifyDepositIndexedActivity`: Polls the public database table (`public.send_earn_deposit`) to confirm the event has been successfully indexed by Shovel.
+    - `upsertTemporalDepositActivity`: Creates or updates the initial record in the tracking table.
+    - `simulateDepositActivity`: Simulates the UserOp against the bundler to catch potential issues before submission.
+    - `updateTemporalDepositActivity`: Updates the status and details of the deposit in the tracking table at various stages.
+    - `waitForTransactionReceiptActivity`: Polls the blockchain for the transaction receipt once the UserOp is submitted.
+    - `verifyDepositIndexedActivity`: Polls the public database table (`public.send_earn_deposit`) to confirm the event has been successfully indexed by Shovel.
 3.  **[`temporal.send_earn_deposits` Table](../supabase/migrations/20250401044160_send_earn.sql)**: A dedicated Supabase table within the `temporal` schema used by the workflow to track the intermediate state of each deposit (e.g., `initiated`, `simulated`, `submitted`, `sent`, `mined`, `indexed`, `failed`). This table mirrors the structure of `public.send_earn_deposit` but includes additional status fields for workflow management.
 
 ### Workflow Steps
@@ -296,14 +310,17 @@ sequenceDiagram
 ### Implementation Components:
 
 1. **[`useReferrer` and `useReferredBy` Hooks](../packages/app/features/earn/hooks/index.ts)**:
+
    - Track referral relationships in both directions
    - Used to display referral information and calculate earnings
 
 2. **`ReferredBy` Component**:
+
    - Displays the user's referrer in the UI
    - Shows during the deposit flow
 
 3. **[`useSendEarnDepositVault` Hook](../packages/app/features/earn/deposit/hooks/index.ts)**:
+
    - Determines the appropriate vault based on referral status
    - Prioritizes existing deposits, then referrer relationships
 
@@ -329,10 +346,12 @@ Send Earn activities are integrated into the main Send App activity feed.
 ### Event Tracking:
 
 1. **Deposit and Withdraw Events**:
+
    - Captured from blockchain by the Shovel indexer
    - Stored in dedicated tables with transaction details
 
 2. **Database Triggers**:
+
    - Convert raw blockchain events into user-friendly activity records
    - Link activities to user accounts for permission control
 
@@ -343,19 +362,22 @@ Send Earn activities are integrated into the main Send App activity feed.
 ### Implementation Details:
 
 1. **[Trigger Functions](../supabase/migrations/20250401044160_send_earn.sql)**:
+
    - `aab_send_earn_deposit_trigger_insert_activity`: Creates activity entries for deposits
    - `aab_send_earn_withdraw_trigger_insert_activity`: Creates activity entries for withdrawals
    - `aab_temporal_deposit_update_activity_on_status_change`: Updates activity entries for failed deposits (initiated via Temporal)
 
 2. **Activity States**:
+
    - Successful deposits and withdrawals appear as distinct events.
    - Failed deposit attempts (orchestrated via Temporal) also appear in the feed, marked with a 'failed' status and including the specific error message encountered during the workflow.
 
 3. **Data Transformation**:
+
    - Raw blockchain data and Temporal workflow outcomes are transformed into user-friendly formats.
    - Includes human-readable amounts, timestamps, and transaction references
 
-3. **UI Components**:
+4. **UI Components**:
    - Activities appear in the main feed with appropriate icons and descriptions
    - Users can view transaction details and follow links to related screens
 

@@ -165,7 +165,6 @@ async function fetchSendEarnBalances(supabase: SupabaseClient<Database>) {
   if (error) throw error
   return SendEarnBalancesSchema.parse(data)
 }
-
 /**
  * Fetches the user's send earn balances from supabase. This includes all
  * send earn vaults the user has deposited into.

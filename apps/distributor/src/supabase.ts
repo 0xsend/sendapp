@@ -148,7 +148,7 @@ export async function fetchAllEarnBalances(distribution: { earn_min_balance: str
   const supabaseAdmin = createSupabaseAdminClient()
   return selectAll(
     supabaseAdmin
-      .from('send_earn_balances')
+      .from('send_earn_balances_legacy')
       .select('owner, assets::text', { count: 'exact' })
       .gte('assets', distribution.earn_min_balance)
   )

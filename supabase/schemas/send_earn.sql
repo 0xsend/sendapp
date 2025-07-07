@@ -178,6 +178,27 @@ $function$
 
 ALTER FUNCTION "private"."filter_send_earn_withdraw_with_no_send_account_created"() OWNER TO "postgres";
 
+CREATE OR REPLACE FUNCTION private.filter_send_earn_balances_with_valid_contract()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+begin
+-- Filters send_earn_balances to only include events from valid send_earn contracts.
+-- This ensures log_addr references a known send_earn contract in send_earn_create table.
+-- The foreign key constraint will also enforce this, but this trigger provides early filtering.
+  if exists ( select 1 from send_earn_create where send_earn = new.log_addr )
+  then
+    return new;
+  else
+    return null;
+  end if;
+end;
+$function$
+;
+
+ALTER FUNCTION "private"."filter_send_earn_balances_with_valid_contract"() OWNER TO "postgres";
+
 CREATE OR REPLACE FUNCTION "private"."insert_referral_on_create"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -525,28 +546,35 @@ UNION ALL
 
 ALTER TABLE "public"."send_earn_activity" OWNER TO "postgres";
 
-CREATE OR REPLACE VIEW "public"."send_earn_balances" WITH ("security_invoker"='on', "security_barrier"='on') AS
- WITH "txs" AS (
-         SELECT "send_earn_deposit"."log_addr",
-            "send_earn_deposit"."owner",
-            "send_earn_deposit"."assets",
-            "send_earn_deposit"."shares"
-           FROM "public"."send_earn_deposit"
-        UNION
-         SELECT "send_earn_withdraw"."log_addr",
-            "send_earn_withdraw"."owner",
-            ("send_earn_withdraw"."assets" * ('-1'::integer)::numeric),
-            ("send_earn_withdraw"."shares" * ('-1'::integer)::numeric)
-           FROM "public"."send_earn_withdraw"
-        )
- SELECT "t"."log_addr",
-    "t"."owner",
-    "sum"("t"."assets") AS "assets",
-    "sum"("t"."shares") AS "shares"
-   FROM "txs" "t"
-  GROUP BY "t"."log_addr", "t"."owner";
+-- Table: send_earn_balances
+CREATE TABLE IF NOT EXISTS "public"."send_earn_balances" (
+    "id" bigint NOT NULL,
+    "chain_id" numeric NOT NULL,
+    "log_addr" "bytea" NOT NULL,
+    "block_time" numeric NOT NULL,
+    "tx_hash" "bytea" NOT NULL,
+    "balance" numeric NOT NULL,
+    "ig_name" "text" NOT NULL,
+    "src_name" "text" NOT NULL,
+    "block_num" numeric NOT NULL,
+    "tx_idx" integer NOT NULL,
+    "log_idx" integer NOT NULL,
+    "abi_idx" smallint NOT NULL,
+    "event_id" "text" GENERATED ALWAYS AS ((((((((("ig_name" || '/'::text) || "src_name") || '/'::text) || ("block_num")::text) || '/'::text) || ("tx_idx")::text) || '/'::text) || ("log_idx")::text)) STORED NOT NULL
+);
+
 
 ALTER TABLE "public"."send_earn_balances" OWNER TO "postgres";
+
+-- Sequence for send_earn_balances
+ALTER TABLE "public"."send_earn_balances" ALTER COLUMN "id" ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME "public"."send_earn_balances_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
 
 CREATE OR REPLACE VIEW "public"."send_earn_balances_timeline" WITH ("security_invoker"='on', "security_barrier"='on') AS
 WITH all_transactions AS (
@@ -594,14 +622,27 @@ CREATE INDEX "send_earn_withdraw_block_time" ON "public"."send_earn_withdraw" US
 CREATE INDEX "send_earn_withdraw_owner_idx" ON "public"."send_earn_withdraw" USING "btree" ("owner", "log_addr");
 CREATE INDEX "idx_earn_deposit_owner_logaddr_blocknum" ON "public"."send_earn_deposit" USING "btree" ("owner", "log_addr", "block_num");
 CREATE INDEX "idx_earn_withdraw_owner_logaddr_blocknum" ON "public"."send_earn_withdraw" USING "btree" ("owner", "log_addr", "block_num");
+CREATE INDEX "send_earn_balances_block_num" ON "public"."send_earn_balances" USING "btree" ("block_num");
+CREATE INDEX "send_earn_balances_block_time" ON "public"."send_earn_balances" USING "btree" ("block_time");
+CREATE INDEX "send_earn_balances_log_addr" ON "public"."send_earn_balances" USING "btree" ("log_addr");
+CREATE INDEX "send_earn_balances_log_addr_blocktime" ON "public"."send_earn_balances" USING "btree" ("log_addr", "block_time" DESC);
 CREATE UNIQUE INDEX "u_send_earn_create" ON "public"."send_earn_create" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
 CREATE UNIQUE INDEX "u_send_earn_deposit" ON "public"."send_earn_deposit" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
 CREATE UNIQUE INDEX "u_send_earn_new_affiliate" ON "public"."send_earn_new_affiliate" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
 CREATE UNIQUE INDEX "u_send_earn_withdraw" ON "public"."send_earn_withdraw" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
+CREATE UNIQUE INDEX "u_send_earn_balances" ON "public"."send_earn_balances" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
+
+-- Add unique constraint on send_earn column
+CREATE UNIQUE INDEX "send_earn_create_send_earn_unique" ON "public"."send_earn_create" USING "btree" ("send_earn");
+
+-- Add foreign key constraint
+ALTER TABLE "public"."send_earn_balances" ADD CONSTRAINT "fk_send_earn_balances_log_addr" 
+    FOREIGN KEY ("log_addr") REFERENCES "public"."send_earn_create" ("send_earn");
 
 -- Triggers
 CREATE OR REPLACE TRIGGER "aaa_filter_send_earn_deposit_with_no_send_account_created" BEFORE INSERT ON "public"."send_earn_deposit" FOR EACH ROW EXECUTE FUNCTION "private"."aaa_filter_send_earn_deposit_with_no_send_account_created"();
 CREATE OR REPLACE TRIGGER "aaa_filter_send_earn_withdraw_with_no_send_account_created" BEFORE INSERT ON "public"."send_earn_withdraw" FOR EACH ROW EXECUTE FUNCTION "private"."filter_send_earn_withdraw_with_no_send_account_created"();
+CREATE OR REPLACE TRIGGER "aaa_filter_send_earn_balances_with_valid_contract" BEFORE INSERT ON "public"."send_earn_balances" FOR EACH ROW EXECUTE FUNCTION "private"."filter_send_earn_balances_with_valid_contract"();
 CREATE OR REPLACE TRIGGER "aaa_send_earn_deposit_trigger_delete_activity" AFTER DELETE ON "public"."send_earn_deposit" FOR EACH ROW EXECUTE FUNCTION "private"."send_earn_deposit_trigger_delete_activity"();
 CREATE OR REPLACE TRIGGER "aaa_send_earn_withdraw_trigger_delete_activity" AFTER DELETE ON "public"."send_earn_withdraw" FOR EACH ROW EXECUTE FUNCTION "private"."send_earn_withdraw_trigger_delete_activity"();
 CREATE OR REPLACE TRIGGER "aab_send_earn_deposit_trigger_insert_activity" AFTER INSERT ON "public"."send_earn_deposit" FOR EACH ROW EXECUTE FUNCTION "private"."send_earn_deposit_trigger_insert_activity"();
@@ -615,6 +656,7 @@ ALTER TABLE "public"."send_earn_create" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."send_earn_deposit" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."send_earn_new_affiliate" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."send_earn_withdraw" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."send_earn_balances" ENABLE ROW LEVEL SECURITY;
 
 
 -- Policies
@@ -626,7 +668,17 @@ CREATE POLICY "users can see their own send_earn_deposit" ON "public"."send_earn
 CREATE POLICY "users can see their own send_earn_withdraw" ON "public"."send_earn_withdraw" FOR SELECT USING ((("lower"("concat"('0x', "encode"("owner", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY ( SELECT "send_accounts"."address"
    FROM "public"."send_accounts"
   WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid")))));
-
+CREATE POLICY "users can see their own send_earn_balances" ON "public"."send_earn_balances"
+FOR SELECT USING (
+  EXISTS (
+    SELECT 1
+    FROM "public"."send_earn_create" sec
+    JOIN "public"."send_accounts" sa ON
+      "lower"("concat"('0x', "encode"(sec.caller, 'hex'::"text")))::"public"."citext" = sa.address
+    WHERE sa.user_id = auth.uid()
+    AND sec.send_earn = send_earn_balances.log_addr
+  )
+);
 -- Grants
 GRANT ALL ON TABLE "public"."send_earn_create" TO "anon";
 GRANT ALL ON TABLE "public"."send_earn_create" TO "authenticated";
@@ -656,6 +708,10 @@ GRANT ALL ON TABLE "public"."send_earn_balances" TO "anon";
 GRANT ALL ON TABLE "public"."send_earn_balances" TO "authenticated";
 GRANT ALL ON TABLE "public"."send_earn_balances" TO "service_role";
 
+GRANT ALL ON TABLE "public"."send_earn_balances_timeline" TO "anon";
+GRANT ALL ON TABLE "public"."send_earn_balances_timeline" TO "authenticated";
+GRANT ALL ON TABLE "public"."send_earn_balances_timeline" TO "service_role";
+
 GRANT ALL ON SEQUENCE "public"."send_earn_create_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."send_earn_create_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."send_earn_create_id_seq" TO "service_role";
@@ -672,7 +728,6 @@ GRANT ALL ON SEQUENCE "public"."send_earn_withdraw_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."send_earn_withdraw_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."send_earn_withdraw_id_seq" TO "service_role";
 
-REVOKE ALL ON "public"."send_earn_balances_timeline" FROM PUBLIC;
-REVOKE ALL ON "public"."send_earn_balances_timeline" FROM anon;
-GRANT ALL ON "public"."send_earn_balances_timeline" TO authenticated;
-GRANT ALL ON "public"."send_earn_balances_timeline" TO service_role;
+GRANT ALL ON SEQUENCE "public"."send_earn_balances_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."send_earn_balances_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."send_earn_balances_id_seq" TO "service_role";
