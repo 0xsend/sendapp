@@ -12,6 +12,7 @@ import { UniversalThemeProvider } from './theme'
 import { ToastProvider } from './toast'
 import { WagmiProvider } from './wagmi'
 import ScrollDirectionProvider from 'app/provider/scroll/ScrollDirectionProvider'
+import { ActivityDetailsProvider } from './activity-details'
 
 export { loadThemePromise } from './theme/UniversalThemeProvider'
 
@@ -54,4 +55,5 @@ const Providers = compose([
   ToastProvider,
   ScrollDirectionProvider,
   CoinsProvider,
+  ActivityDetailsProvider,
 ])

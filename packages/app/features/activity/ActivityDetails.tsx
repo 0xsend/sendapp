@@ -31,7 +31,8 @@ import {
   isSendtagCheckoutEvent,
   isSendTokenUpgradeEvent,
 } from 'app/utils/zod/activity/SendAccountTransfersEventSchema'
-import { useActivityDetails } from './context'
+import { useActivityDetails } from 'app/provider/activity-details'
+import { Platform } from 'react-native'
 
 export const ActivityDetails = (props: StackProps) => {
   const { selectedActivity } = useActivityDetails()
@@ -63,9 +64,11 @@ const ActivityDetailsContent = ({ activity, ...props }: { activity: Activity } &
   return (
     <Fade {...props}>
       <YStack w={'100%'} gap={'$3.5'}>
-        <H4 fontWeight={'600'} size={'$7'}>
-          Transaction details
-        </H4>
+        {Platform.OS === 'web' && (
+          <H4 fontWeight={'600'} size={'$7'}>
+            Transaction details
+          </H4>
+        )}
         <YStack
           w={'100%'}
           bg={'$color1'}
@@ -139,13 +142,15 @@ const ActivityDetailsContent = ({ activity, ...props }: { activity: Activity } &
                 </Paragraph>
               </XStack>
             </XStack>
-            <Stack onPress={closeActivityDetails} cursor={'pointer'}>
-              <IconX
-                size={'$1.5'}
-                $theme-dark={{ color: '$primary' }}
-                $theme-light={{ color: '$color12' }}
-              />
-            </Stack>
+            {Platform.OS === 'web' && (
+              <Stack onPress={closeActivityDetails} cursor={'pointer'}>
+                <IconX
+                  size={'$1.5'}
+                  $theme-dark={{ color: '$primary' }}
+                  $theme-light={{ color: '$color12' }}
+                />
+              </Stack>
+            )}
           </XStack>
           <XStack gap={'$2'} ai={'center'}>
             <Paragraph

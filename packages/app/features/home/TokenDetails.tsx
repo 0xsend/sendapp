@@ -1,5 +1,8 @@
 import {
+  ButtonText,
   Card,
+  LinkableButton,
+  type LinkableButtonProps,
   Paragraph,
   Separator,
   Spinner,
@@ -8,21 +11,17 @@ import {
   useMedia,
   XStack,
   YStack,
-  LinkableButton,
-  type LinkableButtonProps,
 } from '@my/ui'
 import { ArrowDown, ArrowUp, Minus, Plus } from '@tamagui/lucide-icons'
-import { IconCoin, IconError, IconPlus, IconArrowUp } from 'app/components/icons'
-import { stableCoins, type allCoins, type CoinWithBalance, usdcCoin } from 'app/data/coins'
+import { IconArrowUp, IconCoin, IconError, IconPlus } from 'app/components/icons'
+import { type allCoins, type CoinWithBalance, stableCoins, usdcCoin } from 'app/data/coins'
 import { useTokenMarketData } from 'app/utils/coin-gecko'
 import { convertBalanceToFiat } from 'app/utils/convertBalanceToUSD'
 import formatAmount from 'app/utils/formatAmount'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { TokenActivity } from './TokenActivity'
 import { useMemo } from 'react'
-import { ButtonText } from '@my/ui'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
-import { ActivityDetailsProvider } from 'app/features/activity/context'
 
 export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
   const media = useMedia()
@@ -75,9 +74,7 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
         </XStack>
       </YStack>
       <YStack gap={'$3'}>
-        <ActivityDetailsProvider>
-          <TokenActivity coin={coin} />
-        </ActivityDetailsProvider>
+        <TokenActivity coin={coin} />
       </YStack>
     </YStack>
   )

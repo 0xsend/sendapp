@@ -16,21 +16,13 @@ import {
   isTemporalEthTransfersEvent,
   isTemporalTokenTransfersEvent,
 } from 'app/utils/zod/activity/TemporalTransfersEventSchema'
-import { useActivityDetails, ActivityDetailsProvider } from 'app/features/activity/context'
+import { useActivityDetails } from 'app/provider/activity-details'
 
 interface ProfileScreenProps {
   sendid?: number | null
 }
 
 export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
-  return (
-    <ActivityDetailsProvider>
-      <ProfileScreenContent sendid={propSendid} />
-    </ActivityDetailsProvider>
-  )
-}
-
-function ProfileScreenContent({ sendid: propSendid }: ProfileScreenProps) {
   const [{ sendid: paramSendid }] = useProfileScreenParams()
   const otherUserId = propSendid || Number(paramSendid)
   const {

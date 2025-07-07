@@ -9,7 +9,7 @@ import { type PropsWithChildren, useEffect, useMemo } from 'react'
 import { SectionList } from 'react-native'
 import type { ZodError } from 'zod'
 import { useActivityFeed } from './utils/useActivityFeed'
-import { useActivityDetails } from './context'
+import { useActivityDetails } from 'app/provider/activity-details'
 
 export function RecentActivity() {
   const result = useActivityFeed()
