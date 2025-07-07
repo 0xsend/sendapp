@@ -2,25 +2,13 @@ import { H4, Paragraph, Spinner, YStack } from '@my/ui'
 import type { CoinWithBalance } from 'app/data/coins'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { toNiceError } from 'app/utils/toNiceError'
-import type { Activity } from 'app/utils/zod/activity'
-import { useState } from 'react'
 import { ActivityDetails } from '../activity/ActivityDetails'
 import { TokenActivityFeed } from './TokenActivityFeed'
 import { useTokenActivityFeed } from './utils/useTokenActivityFeed'
-import { useRootScreenParams } from 'app/routers/params'
+import { useActivityDetails } from '../activity/context'
 
 export const TokenActivity = ({ coin }: { coin: CoinWithBalance }) => {
-  const [queryParams, setParams] = useRootScreenParams()
-  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
-
-  const handleActivityPress = (activity: Activity) => {
-    setParams({ ...queryParams, activity: 'details' }, { webBehavior: 'replace' })
-    setSelectedActivity(activity)
-  }
-  const handleCloseActivityDetails = () => {
-    setParams({ ...queryParams, activity: undefined }, { webBehavior: 'replace' })
-    setSelectedActivity(null)
-  }
+  const { isOpen, selectActivity } = useActivityDetails()
 
   const tokenActivityFeedQuery = useTokenActivityFeed({
     pageSize: 10,
@@ -40,8 +28,8 @@ export const TokenActivity = ({ coin }: { coin: CoinWithBalance }) => {
     )
   }
 
-  if (selectedActivity && queryParams.activity) {
-    return <ActivityDetails activity={selectedActivity} onClose={handleCloseActivityDetails} />
+  if (isOpen) {
+    return <ActivityDetails />
   }
   return (
     <YStack gap={'$3'}>
@@ -51,7 +39,7 @@ export const TokenActivity = ({ coin }: { coin: CoinWithBalance }) => {
       <TokenActivityFeed
         testID="TokenActivityFeed"
         tokenActivityFeedQuery={tokenActivityFeedQuery}
-        onActivityPress={handleActivityPress}
+        onActivityPress={selectActivity}
         $gtLg={{
           p: '$3.5',
         }}

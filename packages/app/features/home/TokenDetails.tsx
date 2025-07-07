@@ -22,6 +22,7 @@ import { TokenActivity } from './TokenActivity'
 import { useMemo } from 'react'
 import { ButtonText } from '@my/ui'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { ActivityDetailsProvider } from 'app/features/activity/context'
 
 export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
   const media = useMedia()
@@ -74,7 +75,9 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
         </XStack>
       </YStack>
       <YStack gap={'$3'}>
-        <TokenActivity coin={coin} />
+        <ActivityDetailsProvider>
+          <TokenActivity coin={coin} />
+        </ActivityDetailsProvider>
       </YStack>
     </YStack>
   )
