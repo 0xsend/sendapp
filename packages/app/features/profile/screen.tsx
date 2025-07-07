@@ -11,18 +11,26 @@ import { SendButton } from './ProfileButtons'
 import { ProfileHeader } from 'app/features/profile/components/ProfileHeader'
 import { FlatList } from 'react-native'
 import { ProfilesDetailsModal } from 'app/features/profile/components/ProfileDetailsModal'
-import { useState } from 'react'
 import { ActivityDetails } from 'app/features/activity/ActivityDetails'
 import {
   isTemporalEthTransfersEvent,
   isTemporalTokenTransfersEvent,
 } from 'app/utils/zod/activity/TemporalTransfersEventSchema'
+import { useActivityDetails, ActivityDetailsProvider } from 'app/features/activity/context'
 
 interface ProfileScreenProps {
   sendid?: number | null
 }
 
 export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
+  return (
+    <ActivityDetailsProvider>
+      <ProfileScreenContent sendid={propSendid} />
+    </ActivityDetailsProvider>
+  )
+}
+
+function ProfileScreenContent({ sendid: propSendid }: ProfileScreenProps) {
   const [{ sendid: paramSendid }] = useProfileScreenParams()
   const otherUserId = propSendid || Number(paramSendid)
   const {
@@ -32,7 +40,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   } = useProfileLookup('sendid', otherUserId?.toString() || '')
   const { user, profile: currentUserProfile } = useUser()
   const [{ profile: profileParam }] = useRootScreenParams()
-  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
+  const { selectActivity, isOpen } = useActivityDetails()
 
   const {
     data,
@@ -72,7 +80,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
         f={1}
         height={'100%'}
         gap={'$2'}
-        display={profileParam || selectedActivity ? 'none' : 'flex'}
+        display={profileParam || isOpen ? 'none' : 'flex'}
         overflow={'hidden'}
         $gtLg={{
           display: 'flex',
@@ -131,7 +139,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                           sent={activity?.to_user?.id !== user?.id}
                           otherUserProfile={otherUserProfile}
                           currentUserProfile={currentUserProfile}
-                          onPress={() => setSelectedActivity(activity)}
+                          onPress={() => selectActivity(activity)}
                         />
                       </Fade>
                       {shouldShowDatePill ? <DatePill date={date} /> : null}
@@ -158,10 +166,8 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
           </>
         )}
       </YStack>
-      {selectedActivity ? (
+      {isOpen ? (
         <ActivityDetails
-          activity={selectedActivity}
-          onClose={() => setSelectedActivity(null)}
           w={'100%'}
           $gtLg={{
             maxWidth: '47%',

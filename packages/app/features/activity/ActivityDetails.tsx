@@ -25,21 +25,26 @@ import { useAmountFromActivity } from 'app/utils/activity-hooks'
 import { useAddressBook } from 'app/utils/useAddressBook'
 import { useLiquidityPools } from 'app/utils/useLiquidityPools'
 import { useSwapRouters } from 'app/utils/useSwapRouters'
-import { isSendEarnEvent, type Activity } from 'app/utils/zod/activity'
+import { type Activity, isSendEarnEvent } from 'app/utils/zod/activity'
 import {
   isSendAccountTransfersEvent,
   isSendtagCheckoutEvent,
   isSendTokenUpgradeEvent,
 } from 'app/utils/zod/activity/SendAccountTransfersEventSchema'
+import { useActivityDetails } from './context'
 
-export const ActivityDetails = ({
-  activity,
-  onClose,
-  ...props
-}: {
-  activity: Activity
-  onClose: () => void
-} & StackProps) => {
+export const ActivityDetails = (props: StackProps) => {
+  const { selectedActivity } = useActivityDetails()
+
+  if (!selectedActivity) {
+    return null
+  }
+
+  return <ActivityDetailsContent activity={selectedActivity} {...props} />
+}
+
+const ActivityDetailsContent = ({ activity, ...props }: { activity: Activity } & StackProps) => {
+  const { closeActivityDetails } = useActivityDetails()
   const { data: swapRouters } = useSwapRouters()
   const { data: liquidityPools } = useLiquidityPools()
   const activityEventName = useEventNameFromActivity({ activity, swapRouters, liquidityPools })
@@ -134,7 +139,7 @@ export const ActivityDetails = ({
                 </Paragraph>
               </XStack>
             </XStack>
-            <Stack onPress={onClose} cursor={'pointer'}>
+            <Stack onPress={closeActivityDetails} cursor={'pointer'}>
               <IconX
                 size={'$1.5'}
                 $theme-dark={{ color: '$primary' }}
