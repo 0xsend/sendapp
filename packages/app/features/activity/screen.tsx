@@ -3,29 +3,26 @@ import { AnimatePresence, H4, Spinner, Text, useMedia, YStack } from '@my/ui'
 import { TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
 import Search from '../../components/SearchBar'
 import { Platform } from 'react-native'
-import { ActivityDetailsProvider } from './context'
 
 export function ActivityScreen() {
   return (
-    <ActivityDetailsProvider>
-      <TagSearchProvider>
-        <YStack
-          f={1}
-          width={'100%'}
-          pb={Platform.OS === 'web' ? '$3' : 0}
-          pt="$3"
-          gap="$6"
-          $gtLg={{ pt: 0, gap: '$7' }}
-        >
-          <YStack width={'100%'} gap="$1.5" $gtSm={{ gap: '$2.5' }} $gtLg={{ display: 'none' }}>
-            <Search />
-          </YStack>
-          <AnimatePresence>
-            <ActivityBody />
-          </AnimatePresence>
+    <TagSearchProvider>
+      <YStack
+        f={1}
+        width={'100%'}
+        pb={Platform.OS === 'web' ? '$3' : 0}
+        pt="$3"
+        gap="$6"
+        $gtLg={{ pt: 0, gap: '$7' }}
+      >
+        <YStack width={'100%'} gap="$1.5" $gtSm={{ gap: '$2.5' }} $gtLg={{ display: 'none' }}>
+          <Search />
         </YStack>
-      </TagSearchProvider>
-    </ActivityDetailsProvider>
+        <AnimatePresence>
+          <ActivityBody />
+        </AnimatePresence>
+      </YStack>
+    </TagSearchProvider>
   )
 }
 

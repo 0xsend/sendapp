@@ -5,7 +5,7 @@ import { toNiceError } from 'app/utils/toNiceError'
 import { ActivityDetails } from '../activity/ActivityDetails'
 import { TokenActivityFeed } from './TokenActivityFeed'
 import { useTokenActivityFeed } from './utils/useTokenActivityFeed'
-import { useActivityDetails } from '../activity/context'
+import { useActivityDetails } from 'app/provider/activity-details'
 
 export const TokenActivity = ({ coin }: { coin: CoinWithBalance }) => {
   const { isOpen, selectActivity } = useActivityDetails()
