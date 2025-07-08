@@ -4051,6 +4051,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@expo-google-fonts/dm-mono@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@expo-google-fonts/dm-mono@npm:0.4.1"
+  checksum: 10/bd765a55ddbf63715ce891cff0fd220602f36b448cc68cbb6072b99fd4d680ca531b314280329d769bb15dbbc6209d0683ab1694b90f6413f284ae58b21d0455
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/dm-sans@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@expo-google-fonts/dm-sans@npm:0.4.1"
+  checksum: 10/9ffd9a791fb19482c3f649b4f920a2ecca79ce708f7dde1c71ac10cea07a4d4177d6d5d9c10762255982b6f2f9cdf2940abc4b63d18fc9b772f8f9cd3867d8f7
+  languageName: node
+  linkType: hard
+
 "@expo/bunyan@npm:^4.0.0":
   version: 4.0.0
   resolution: "@expo/bunyan@npm:4.0.0"
@@ -19414,6 +19428,8 @@ __metadata:
   dependencies:
     "@babel/core": "npm:^7.24"
     "@babel/runtime": "npm:^7.27.3"
+    "@expo-google-fonts/dm-mono": "npm:^0.4.1"
+    "@expo-google-fonts/dm-sans": "npm:^0.4.1"
     "@expo/metro-config": "npm:~0.19.0"
     "@my/ui": "workspace:*"
     "@react-native-async-storage/async-storage": "npm:^2.0.0"
@@ -19440,7 +19456,7 @@ __metadata:
     expo-dev-client: "npm:~5.0.20"
     expo-device: "npm:~7.0.3"
     expo-document-picker: "npm:~13.0.3"
-    expo-font: "npm:~13.0.2"
+    expo-font: "npm:~13.0.4"
     expo-image: "npm:~2.0.3"
     expo-image-picker: "npm:~16.0.6"
     expo-linear-gradient: "npm:~14.0.1"
@@ -19647,7 +19663,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-font@npm:~13.0.2, expo-font@npm:~13.0.4":
+"expo-font@npm:~13.0.4":
   version: 13.0.4
   resolution: "expo-font@npm:13.0.4"
   dependencies:
