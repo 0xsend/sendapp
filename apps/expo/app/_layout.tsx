@@ -6,6 +6,9 @@ import { useCallback, useEffect, useState } from 'react'
 import { LogBox, View } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import StackNavigator from 'apps-expo/components/layout/StackNavigator'
+import { useFonts } from 'expo-font'
+import { DMSans_400Regular, DMSans_700Bold } from '@expo-google-fonts/dm-sans'
+import { DMMono_400Regular } from '@expo-google-fonts/dm-mono'
 
 SplashScreen.preventAutoHideAsync()
 
@@ -18,12 +21,11 @@ LogBox.ignoreLogs([
 ])
 
 export default function RootLayout() {
-  // TODO: use fonts
-  // const [fontLoaded] = useFonts({
-  //   'DM Sans': require('@tamagui/font-dm-sans/fonts/static/DMSans-Medium.ttf'),
-  //   'DM Sans Bold': require('@tamagui/font-dm-sans/fonts/static/DMSans-Bold.ttf'),
-  // })
-  const [fontLoaded] = useState(true)
+  const [fontsLoaded] = useFonts({
+    'DM Sans': DMSans_400Regular,
+    'DM Sans Bold': DMSans_700Bold,
+    'DM Mono': DMMono_400Regular,
+  })
   const [themeLoaded, setThemeLoaded] = useState(false)
   const [sessionLoadAttempted, setSessionLoadAttempted] = useState(false)
   const [initialSession, setInitialSession] = useState<Session | null>(null)
@@ -48,15 +50,15 @@ export default function RootLayout() {
   }, [])
 
   const onLayoutRootView = useCallback(async () => {
-    if (fontLoaded && sessionLoadAttempted && themeLoaded) {
+    if (fontsLoaded && sessionLoadAttempted && themeLoaded) {
       // Only workaround I found on github issues or stack overflow that works
       // https://stackoverflow.com/questions/64780275/at-using-expo-after-splash-screen-blinkflash-with-white-screen
       await new Promise((resolve) => setTimeout(resolve, 0))
       await SplashScreen.hideAsync()
     }
-  }, [fontLoaded, sessionLoadAttempted, themeLoaded])
+  }, [fontsLoaded, sessionLoadAttempted, themeLoaded])
 
-  if (!themeLoaded || !fontLoaded || !sessionLoadAttempted) {
+  if (!themeLoaded || !fontsLoaded || !sessionLoadAttempted) {
     return null
   }
 

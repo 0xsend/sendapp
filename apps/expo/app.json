@@ -62,7 +62,8 @@
             "backgroundColor": "#122023"
           }
         }
-      ]
+      ],
+      "expo-font"
     ],
     "extra": {
       "eas": {
