@@ -2381,10 +2381,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.27.3":
-  version: 7.27.4
-  resolution: "@babel/runtime@npm:7.27.4"
-  checksum: 10/ce2495a1773c6f52c7c201f45a1e5c317f2630ff98bec8caa282d574e25f58b0f87ab6e2e2dba0e24ad819792cb0dff3423f90771635620c1f01ff24e73f770d
+"@babel/runtime@npm:^7.27.6":
+  version: 7.27.6
+  resolution: "@babel/runtime@npm:7.27.6"
+  checksum: 10/cc957a12ba3781241b83d528eb69ddeb86ca5ac43179a825e83aa81263a6b3eb88c57bed8a937cdeacfc3192e07ec24c73acdfea4507d0c0428c8e23d6322bfe
   languageName: node
   linkType: hard
 
@@ -6282,7 +6282,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@my/ui@workspace:packages/ui"
   dependencies:
-    "@babel/runtime": "npm:^7.27.3"
+    "@babel/runtime": "npm:^7.27.6"
     "@hookform/resolvers": "npm:^3.3.2"
     "@react-navigation/elements": "npm:1.3.17"
     "@tamagui/animations-moti": "npm:^1.126.1"
@@ -14625,12 +14625,12 @@ __metadata:
   linkType: hard
 
 "brace-expansion@npm:^1.1.7":
-  version: 1.1.11
-  resolution: "brace-expansion@npm:1.1.11"
+  version: 1.1.12
+  resolution: "brace-expansion@npm:1.1.12"
   dependencies:
     balanced-match: "npm:^1.0.0"
     concat-map: "npm:0.0.1"
-  checksum: 10/faf34a7bb0c3fcf4b59c7808bc5d2a96a40988addf2e7e09dfbb67a2251800e0d14cd2bfc1aa79174f2f5095c54ff27f46fb1289fe2d77dac755b5eb3434cc07
+  checksum: 10/12cb6d6310629e3048cadb003e1aca4d8c9bb5c67c3c321bafdd7e7a50155de081f78ea3e0ed92ecc75a9015e784f301efc8132383132f4f7904ad1ac529c562
   languageName: node
   linkType: hard
 
@@ -19427,7 +19427,7 @@ __metadata:
   resolution: "expo-app@workspace:apps/expo"
   dependencies:
     "@babel/core": "npm:^7.24"
-    "@babel/runtime": "npm:^7.27.3"
+    "@babel/runtime": "npm:^7.27.6"
     "@expo-google-fonts/dm-mono": "npm:^0.4.1"
     "@expo-google-fonts/dm-sans": "npm:^0.4.1"
     "@expo/metro-config": "npm:~0.19.0"
@@ -30976,7 +30976,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "sendapp@workspace:."
   dependencies:
-    "@babel/runtime": "npm:^7.27.3"
+    "@babel/runtime": "npm:^7.27.6"
     "@biomejs/biome": "npm:^1.9.4"
     "@manypkg/cli": "npm:^0.19.1"
     "@nderscore/tamagui-typescript-plugin": "npm:^0.6.0"
