@@ -9,6 +9,7 @@ import {
   type UseDistributionsResultData,
   useGenerateClaimUserOp,
   useSendMerkleDropIsClaimed,
+  useSendMerkleDropsAreClaimed,
   useSendMerkleDropTrancheActive,
   useUserOpClaimMutation,
 } from 'app/utils/distributions'
@@ -178,6 +179,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
       assert(receipt.success, 'Failed to send user op')
       setSentTxHash(receipt.receipt.transactionHash)
       refetchIsClaimed()
+      await queryClient.invalidateQueries({ queryKey: [useSendMerkleDropsAreClaimed.queryKey] })
     } catch (e) {
       console.error(e)
       setError(e)
