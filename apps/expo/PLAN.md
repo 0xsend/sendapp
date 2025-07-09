@@ -234,7 +234,7 @@ You can use the following methods to verify the app is functioning correctly:
 
 **Project Structure**:
 - check images loading 
-- check fonts loading
+- check fonts loading ✅
 - prepare splash screen and icons for ios ✅
 
 **Auth**:
@@ -247,7 +247,7 @@ You can use the following methods to verify the app is functioning correctly:
 **Send**:
 - rework flow on native, web flow is built on query params, native should use stacking screen ✅
 - sending is not stable, app sometimes crush on confirm screen ✅
-- resetting send screen state after send is done
+- resetting send screen state after send is done ✅
 
 **Account**:
 - QR code not working ✅
