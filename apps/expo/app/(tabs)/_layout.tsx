@@ -1,5 +1,4 @@
 import { Paragraph, useTheme, XStack } from '@my/ui'
-
 import {
   IconArrowUp,
   IconDeviceReset,
@@ -8,7 +7,7 @@ import {
   IconWorldSearch,
 } from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
-import { Redirect, Stack, Tabs, useRouter } from 'expo-router'
+import { Redirect, router, Stack, Tabs } from 'expo-router'
 import AvatarMenuButton from 'app/components/AvatarMenuButton/AvatarMenuButton'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 import { Animated } from 'react-native'
@@ -27,21 +26,47 @@ const TABS = [
         <IconSendLogo size={'$2'} color={'$color12'} />
       </XStack>
     ),
+    listeners: {
+      tabPress: (e) => {
+        e.preventDefault()
+        router.push('/(tabs)/')
+      },
+    },
   },
   {
     Icon: IconArrowUp,
     key: 'send/index',
     title: 'Send',
+    listeners: {
+      tabPress: (e) => {
+        e.preventDefault()
+        router.push(
+          `/(tabs)/send?${new URLSearchParams({ sendToken: sendTokenAddress[baseMainnet.id] })}`
+        )
+      },
+    },
   },
   {
     Icon: IconWorldSearch,
     key: 'explore/index',
     title: 'Explore',
+    listeners: {
+      tabPress: (e) => {
+        e.preventDefault()
+        router.push('/(tabs)/explore')
+      },
+    },
   },
   {
     Icon: IconDeviceReset,
     key: 'activity/index',
     title: 'Activity',
+    listeners: {
+      tabPress: (e) => {
+        e.preventDefault()
+        router.push('/(tabs)/activity')
+      },
+    },
   },
 ]
 
@@ -52,7 +77,6 @@ export default function Layout() {
   const { height, padding } = useTabBarSize()
   const translateY = useRef(new Animated.Value(0)).current
   const highlightColor = useHighlightColor()
-  const router = useRouter()
 
   useEffect(() => {
     Animated.timing(translateY, {
@@ -99,6 +123,7 @@ export default function Layout() {
             <Tabs.Screen
               name={tab.key}
               key={tab.key}
+              listeners={tab.listeners}
               options={{
                 headerLeft: () => {
                   if (typeof tab.title === 'string') {
@@ -137,17 +162,6 @@ export default function Layout() {
                     />
                   </XStack>
                 ),
-              }}
-              listeners={{
-                tabPress: (e) => {
-                  if (tab.key !== 'send/index') {
-                    return
-                  }
-                  e.preventDefault()
-                  router.push(
-                    `/send?${new URLSearchParams({ sendToken: sendTokenAddress[baseMainnet.id] })}`
-                  )
-                },
               }}
             />
           )
