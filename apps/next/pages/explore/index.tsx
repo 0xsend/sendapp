@@ -10,7 +10,13 @@ export const Page: NextPageWithLayout = () => {
       <Head>
         <title>Send | Explore</title>
       </Head>
-      <ExploreScreen />
+      <ExploreScreen
+        images={{
+          rewards: 'https://ghassets.send.app/app_images/explore_rewards.jpg',
+          sendpot: 'https://ghassets.send.app/app_images/sendpot.jpg',
+          feed: 'https://ghassets.send.app/app_images/feed.jpg',
+        }}
+      />
     </>
   )
 }

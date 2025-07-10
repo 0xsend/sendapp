@@ -3,6 +3,7 @@ import {
   baseMainnetBundlerClient,
   baseMainnetClient,
   entryPointAddress,
+  multicall3Address,
   sendAccountAbi,
   sendMerkleDropAbi,
   type sendMerkleDropAddress,
@@ -20,8 +21,14 @@ import {
   type UserOperation,
 } from 'permissionless'
 import type { MergeDeep } from 'type-fest'
-import { type CallExecutionError, encodeFunctionData, isAddress, zeroAddress } from 'viem'
-import { useReadContract, useSimulateContract } from 'wagmi'
+import {
+  type Address,
+  type CallExecutionError,
+  encodeFunctionData,
+  isAddress,
+  zeroAddress,
+} from 'viem'
+import { useReadContract, useReadContracts, useSimulateContract } from 'wagmi'
 import { api } from './api'
 import { assert } from './assert'
 import { byteaToBase64URLNoPad } from './byteaToBase64URLNoPad'
@@ -32,6 +39,7 @@ import { signUserOpHash } from './signUserOp'
 import { selectAll } from './supabase/selectAll'
 import { throwNiceError } from './userop'
 import { defaultUserOp } from 'app/utils/userOpConstants'
+
 export const DISTRIBUTION_INITIAL_POOL_AMOUNT = BigInt(20e9)
 
 export type UseDistributionsResultData = MergeDeep<
@@ -366,6 +374,53 @@ export function useSendMerkleDropIsClaimed({
     query,
   })
 }
+
+const useSendMerkleDropsAreClaimedQueryKey = 'sendMerkleDropsAreClaimed'
+
+export type MerkleDropClaimParams = {
+  chainId: keyof typeof sendMerkleDropAddress
+  tranche: bigint
+  index?: bigint | undefined
+  address: Address
+}
+
+/**
+ * Checks whether multiple merkle drops have been claimed by querying the `isClaimed` function
+ * for each provided merkle drop configuration.
+ *
+ * @param merkleDrops Array of merkle drop configurations to check claim status for
+ * @returns Query result with claim status data for each merkle drop
+ *
+ * @businessLogic
+ * This hook batches multiple `isClaimed` contract calls using multicall for efficiency.
+ * It's optimized for minimal refetching since claim status rarely changes.
+ *
+ */
+export function useSendMerkleDropsAreClaimed(merkleDrops: MerkleDropClaimParams[]) {
+  const contracts = merkleDrops.map(
+    ({ chainId, tranche, index, address }) =>
+      ({
+        address,
+        chainId,
+        abi: sendMerkleDropAbi,
+        functionName: 'isClaimed',
+        args: [tranche, index],
+      }) as const
+  )
+
+  return useReadContracts({
+    contracts,
+    query: {
+      enabled: contracts.length > 0,
+      refetchInterval: Number.POSITIVE_INFINITY,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      refetchOnWindowFocus: false,
+    },
+    multicallAddress: multicall3Address[baseMainnetClient.chain.id],
+  })
+}
+useSendMerkleDropsAreClaimed.queryKey = useSendMerkleDropsAreClaimedQueryKey
 
 type SendMerkleDropClaimTrancheArgs = {
   distribution: UseDistributionsResultData[number]

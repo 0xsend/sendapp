@@ -33,6 +33,9 @@ import type { SwapRouter } from 'app/utils/zod/SwapRouterSchema'
 import type { LiquidityPool } from 'app/utils/zod/LiquidityPoolSchema'
 
 jest.mock('@my/wagmi')
+jest.mock('@my/ui', () => ({
+  Spinner: jest.fn(),
+}))
 
 const mockSwapRouters = [
   {

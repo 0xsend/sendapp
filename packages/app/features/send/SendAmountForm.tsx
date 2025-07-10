@@ -30,6 +30,7 @@ import { ProfilesDetailsModal } from 'app/features/profile/components/ProfileDet
 import { IconX } from 'app/components/icons'
 import { MAX_NOTE_LENGTH } from 'app/components/FormFields/NoteField'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { Platform } from 'react-native'
 
 const SendAmountSchema = z.object({
   amount: formFields.text,
@@ -224,7 +225,7 @@ export function SendAmountForm() {
                 fieldsetProps: {
                   width: '60%',
                 },
-                autoFocus: true,
+                autoFocus: Platform.OS === 'web',
               },
               token: {
                 defaultValue: coin?.token,

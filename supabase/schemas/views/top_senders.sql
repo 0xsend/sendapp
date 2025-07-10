@@ -12,7 +12,11 @@ WITH user_scores AS (
         ss.user_id,
         COALESCE(SUM(ss.score), 0) AS send_score,
         COALESCE(SUM(ss.unique_sends), 0) AS total_sends
-    FROM send_scores ss
+    FROM (
+        SELECT user_id, score, unique_sends FROM private.send_scores_history
+        UNION ALL
+        SELECT user_id, score, unique_sends FROM public.send_scores_current
+    ) ss
     GROUP BY ss.user_id
     HAVING COALESCE(SUM(ss.score), 0) > 0
        AND COALESCE(SUM(ss.unique_sends), 0) > 0

@@ -104,7 +104,11 @@ WITH user_send_scores AS (
     SELECT
         ss.user_id,
         COALESCE(SUM(ss.score), 0) AS total_score
-    FROM send_scores ss
+    FROM (
+        SELECT user_id, score FROM private.send_scores_history
+        UNION ALL
+        SELECT user_id, score FROM public.send_scores_current
+    ) ss
     GROUP BY ss.user_id
 ),
 user_earn_balances AS (
@@ -245,7 +249,11 @@ user_send_scores AS (
         ss.user_id,
         COALESCE(SUM(ss.unique_sends), 0) AS total_sends,
         COALESCE(SUM(ss.score), 0) AS total_score
-    FROM send_scores ss
+    FROM (
+        SELECT user_id, score, unique_sends FROM private.send_scores_history
+        UNION ALL
+        SELECT user_id, score, unique_sends FROM public.send_scores_current
+    ) ss
     GROUP BY ss.user_id
 ),
 user_earn_balances AS (
