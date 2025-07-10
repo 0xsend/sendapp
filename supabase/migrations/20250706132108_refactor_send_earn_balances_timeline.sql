@@ -1,123 +1,138 @@
--- non optimized use with caution
--- Updated with hardcoded access rules
-CREATE OR REPLACE VIEW send_scores_current_unique
-WITH ("security_invoker"='on', "security_barrier"='on') AS
-WITH access_control AS (
-  SELECT
-    CASE
-      -- Admin callers (postgres, service_role) see all scores
-      WHEN current_user IN ('postgres', 'service_role') THEN true
-      -- Authenticated users see only their own scores
-      WHEN current_user = 'authenticated' AND auth.uid() IS NOT NULL THEN false -- user-specific filtering applied later
-      -- Anonymous/other callers see nothing
-      ELSE null -- will cause empty result
-    END AS show_all_users,
-    auth.uid() AS current_user_id
-),
-active_distribution AS (
-  SELECT
-    id,
-    number,
-    extract(epoch FROM qualification_start) AS start_time,
-    extract(epoch FROM qualification_end) AS end_time,
-    hodler_min_balance,
-    earn_min_balance,
-    token_addr
-  FROM distributions
-  WHERE (now() AT TIME ZONE 'UTC') >= qualification_start
-    AND (now() AT TIME ZONE 'UTC') < qualification_end
-  LIMIT 1
-),
-send_ceiling_settings AS (
-  WITH previous_distribution AS (
-    SELECT
-      ds.user_id,
-      ds.amount AS user_prev_shares
-    FROM distribution_shares ds
-    JOIN distributions d ON d.id = ds.distribution_id
-    WHERE d.number = (SELECT number - 1 FROM active_distribution)
-  )
-  SELECT
-    sa.user_id,
-    ROUND(COALESCE(pd.user_prev_shares, ad.hodler_min_balance) / (
-      SELECT minimum_sends * scaling_divisor
-      FROM send_slash s_s
-      WHERE s_s.distribution_id = (SELECT id FROM active_distribution)
-    ))::numeric AS send_ceiling
-  FROM send_accounts sa
-  CROSS JOIN active_distribution ad
-  LEFT JOIN previous_distribution pd ON pd.user_id = sa.user_id
-),
-valid_transfers AS (
-  SELECT
-      stt.f,
-      stt.t,
-      stt.v,
-      stt.block_time,
-      sa_from.user_id as from_user_id,
-      sa_to.user_id as to_user_id,
-      CASE
-        WHEN (SELECT earn_min_balance FROM active_distribution) > 0 THEN
-          COALESCE((
-              SELECT bt.assets
-              FROM send_earn_balances_timeline bt
-              WHERE bt.owner = stt.t
-                AND bt.block_time <= stt.block_time
-              ORDER BY bt.block_time DESC
-              LIMIT 1
-          ), 0)
-        ELSE NULL
-      END as earn_balance
-  FROM send_token_transfers stt
-  JOIN send_accounts sa_from ON sa_from.address = concat('0x', encode(stt.f, 'hex'))::citext
-  LEFT JOIN send_accounts sa_to ON sa_to.address = concat('0x', encode(stt.t, 'hex'))::citext
-  CROSS JOIN active_distribution ad
-  WHERE stt.block_time >= ad.start_time
-      AND stt.block_time < ad.end_time
-)
-SELECT
-  (SELECT id FROM active_distribution) as distribution_id,
-  from_user_id,
-  to_user_id,
-  MAX(LEAST(
-    CASE
-      WHEN earn_balance IS NULL THEN v
-      WHEN earn_balance >= (SELECT earn_min_balance FROM active_distribution) THEN v
-      ELSE 0
-    END,
-    send_ceiling
-  )) as capped_amount,
-  MAX(send_ceiling) as send_ceiling
-FROM (
-  SELECT
-    vt.from_user_id,
-    vt.to_user_id,
-    vt.v,
-    vt.earn_balance,
-    scs.send_ceiling
-  FROM valid_transfers vt
-  JOIN send_ceiling_settings scs ON vt.from_user_id = scs.user_id
-) subq
-WHERE LEAST(
-  CASE
-    WHEN earn_balance IS NULL THEN v
-    WHEN earn_balance >= (SELECT earn_min_balance FROM active_distribution) THEN v
-    ELSE 0
-  END,
-  send_ceiling
-) > 0
-  -- Apply access control filtering
-  AND (
-    (SELECT show_all_users FROM access_control) = true -- Admin sees all
-    OR (
-      (SELECT show_all_users FROM access_control) = false
-      AND from_user_id = (SELECT current_user_id FROM access_control) -- Authenticated user sees only their own
-    )
-    -- If show_all_users is null (anonymous), no results
-  )
-GROUP BY from_user_id, to_user_id;
+drop materialized view if exists "private"."send_scores_history";
 
--- Historical materialized view
+drop view if exists "public"."send_scores";
+
+drop view if exists "public"."send_scores_current";
+
+drop view if exists "public"."send_scores_current_unique";
+
+drop view if exists "public"."send_earn_balances_timeline";
+
+set check_function_bodies = off;
+
+create or replace view "public"."send_earn_balances_timeline" as  WITH all_transactions AS (
+         SELECT send_earn_deposit.log_addr,
+            send_earn_deposit.owner,
+            send_earn_deposit.block_time,
+            send_earn_deposit.block_num,
+            send_earn_deposit.assets,
+            send_earn_deposit.shares
+           FROM send_earn_deposit
+        UNION ALL
+         SELECT send_earn_withdraw.log_addr,
+            send_earn_withdraw.owner,
+            send_earn_withdraw.block_time,
+            send_earn_withdraw.block_num,
+            (- send_earn_withdraw.assets),
+            (- send_earn_withdraw.shares)
+           FROM send_earn_withdraw
+        )
+ SELECT all_transactions.log_addr,
+    all_transactions.owner,
+    all_transactions.block_time,
+    all_transactions.block_num,
+    sum(all_transactions.assets) OVER (PARTITION BY all_transactions.log_addr, all_transactions.owner ORDER BY all_transactions.block_num ROWS UNBOUNDED PRECEDING) AS assets,
+    sum(all_transactions.shares) OVER (PARTITION BY all_transactions.log_addr, all_transactions.owner ORDER BY all_transactions.block_num ROWS UNBOUNDED PRECEDING) AS shares
+   FROM all_transactions
+  ORDER BY all_transactions.block_num;
+
+
+CREATE OR REPLACE FUNCTION private.get_send_score(addr bytea)
+ RETURNS TABLE(distribution_id integer, score numeric, unique_sends bigint, send_ceiling numeric)
+ LANGUAGE plpgsql
+ STABLE
+AS $function$
+BEGIN
+    RETURN QUERY
+    WITH active_distribution AS (
+        SELECT
+            d.id,
+            d.number,
+            EXTRACT(epoch FROM d.qualification_start) AS start_time,
+            EXTRACT(epoch FROM d.qualification_end) AS end_time,
+            d.hodler_min_balance,
+            d.earn_min_balance,
+            d.token_addr,
+            ss.minimum_sends,
+            ss.scaling_divisor,
+            (SELECT distributions.id FROM distributions WHERE distributions.number = (d.number - 1)) AS prev_distribution_id
+        FROM distributions d
+        JOIN send_slash ss ON ss.distribution_id = d.id
+        WHERE now() AT TIME ZONE 'UTC' >= d.qualification_start
+        AND now() AT TIME ZONE 'UTC' < d.qualification_end
+        LIMIT 1
+    ),
+    send_ceiling AS (
+        SELECT
+            ad.id AS distribution_id,
+            ROUND((
+                COALESCE(
+                    (SELECT
+                        CASE
+                            WHEN d.token_addr = '\x3f14920c99beb920afa163031c4e47a3e03b3e4a'::bytea
+                            THEN ds.amount * '10000000000000000'::numeric
+                            ELSE ds.amount
+                        END
+                    FROM distribution_shares ds
+                    JOIN distributions d ON d.id = ds.distribution_id
+                    JOIN send_accounts sa ON sa.user_id = ds.user_id
+                    WHERE ds.distribution_id = ad.prev_distribution_id
+                    AND sa.address = concat('0x', encode(addr, 'hex'))::citext),
+                    CASE
+                        WHEN ad.token_addr = '\x3f14920c99beb920afa163031c4e47a3e03b3e4a'::bytea
+                        THEN ad.hodler_min_balance * '10000000000000000'::numeric
+                        ELSE ad.hodler_min_balance
+                    END
+                ) / (ad.minimum_sends * ad.scaling_divisor)
+            ))::numeric AS send_ceiling,
+            ad.earn_min_balance,
+            ad.start_time,
+            ad.end_time
+        FROM active_distribution ad
+    )
+    SELECT
+        sc.distribution_id,
+        SUM(LEAST(transfer_sums.amount, sc.send_ceiling)) as score,
+        COUNT(DISTINCT transfer_sums.t) as unique_sends,
+        sc.send_ceiling
+    FROM send_ceiling sc
+    LEFT JOIN LATERAL (
+        SELECT t, SUM(v) as amount
+        FROM (
+            SELECT
+                stt.t,
+                stt.v,
+                stt.block_time
+            FROM send_token_transfers stt
+            WHERE stt.f = addr
+            AND stt.block_time >= sc.start_time
+            AND stt.block_time <= sc.end_time
+            UNION ALL
+            SELECT
+                stv.t,
+                stv.v * '10000000000000000'::numeric,
+                stv.block_time
+            FROM send_token_v0_transfers stv
+            WHERE stv.f = addr
+            AND stv.block_time >= sc.start_time
+            AND stv.block_time <= sc.end_time
+        ) transfers
+        WHERE sc.earn_min_balance = 0
+        OR EXISTS (
+            SELECT 1
+            FROM send_earn_balances_timeline ebt
+            WHERE ebt.owner = transfers.t
+            AND ebt.assets >= sc.earn_min_balance
+            AND ebt.block_time <= transfers.block_time
+        )
+        GROUP BY t
+    ) transfer_sums ON true
+    GROUP BY sc.distribution_id, sc.send_ceiling
+    HAVING SUM(LEAST(transfer_sums.amount, sc.send_ceiling)) > 0;
+END;
+$function$
+;
+
 create materialized view "private"."send_scores_history" as  WITH distributions_with_score AS (
          SELECT d.id,
             d.number,
@@ -210,18 +225,18 @@ create materialized view "private"."send_scores_history" as  WITH distributions_
          HAVING (sum(LEAST(grouped_transfers.transfer_sum, grouped_transfers.send_ceiling)) > (0)::numeric)) scores
      JOIN send_ceiling_settings scs ON (((scores.address = scs.address) AND (scores.distribution_id = scs.distribution_id))));
 
--- Current scores view with hardcoded access rules
+CREATE INDEX idx_earn_deposit_owner_logaddr_blocknum ON public.send_earn_deposit USING btree (owner, log_addr, block_num);
+
+CREATE INDEX idx_earn_withdraw_owner_logaddr_blocknum ON public.send_earn_withdraw USING btree (owner, log_addr, block_num);
+
 create or replace view "public"."send_scores_current" as  WITH authorized_accounts AS (
          SELECT sa.user_id,
             decode(replace((sa.address)::text, ('0x'::citext)::text, ''::text), 'hex'::text) AS address_bytes
            FROM send_accounts sa
           WHERE
                 CASE
-                    -- Admin callers (postgres, service_role) see all scores
-                    WHEN current_user IN ('postgres', 'service_role') THEN true
-                    -- Authenticated users see only their own scores
-                    WHEN current_user = 'authenticated' AND auth.uid() IS NOT NULL THEN (sa.user_id = auth.uid())
-                    -- Anonymous/other callers see nothing
+                    WHEN (CURRENT_USER = ANY (ARRAY['postgres'::name, 'service_role'::name])) THEN true
+                    WHEN ((CURRENT_USER = 'authenticated'::name) AND (auth.uid() IS NOT NULL)) THEN (sa.user_id = auth.uid())
                     ELSE false
                 END
         ), distributions_with_score AS (
@@ -317,6 +332,97 @@ create or replace view "public"."send_scores_current" as  WITH authorized_accoun
          HAVING (sum(LEAST(ts.transfer_sum, scs_1.send_ceiling)) > (0)::numeric)) scores
      JOIN send_ceiling_settings scs ON (((scores.address = scs.address) AND (scores.distribution_id = scs.distribution_id))));
 
+
+create or replace view "public"."send_scores_current_unique" as  WITH access_control AS (
+         SELECT
+                CASE
+                    WHEN (CURRENT_USER = ANY (ARRAY['postgres'::name, 'service_role'::name])) THEN true
+                    WHEN ((CURRENT_USER = 'authenticated'::name) AND (auth.uid() IS NOT NULL)) THEN false
+                    ELSE NULL::boolean
+                END AS show_all_users,
+            auth.uid() AS current_user_id
+        ), active_distribution AS (
+         SELECT distributions.id,
+            distributions.number,
+            EXTRACT(epoch FROM distributions.qualification_start) AS start_time,
+            EXTRACT(epoch FROM distributions.qualification_end) AS end_time,
+            distributions.hodler_min_balance,
+            distributions.earn_min_balance,
+            distributions.token_addr
+           FROM distributions
+          WHERE (((now() AT TIME ZONE 'UTC'::text) >= distributions.qualification_start) AND ((now() AT TIME ZONE 'UTC'::text) < distributions.qualification_end))
+         LIMIT 1
+        ), send_ceiling_settings AS (
+         WITH previous_distribution AS (
+                 SELECT ds.user_id,
+                    ds.amount AS user_prev_shares
+                   FROM (distribution_shares ds
+                     JOIN distributions d ON ((d.id = ds.distribution_id)))
+                  WHERE (d.number = ( SELECT (active_distribution.number - 1)
+                           FROM active_distribution))
+                )
+         SELECT sa.user_id,
+            round((COALESCE(pd.user_prev_shares, ad.hodler_min_balance) / (( SELECT (s_s.minimum_sends * s_s.scaling_divisor)
+                   FROM send_slash s_s
+                  WHERE (s_s.distribution_id = ( SELECT active_distribution.id
+                           FROM active_distribution))))::numeric)) AS send_ceiling
+           FROM ((send_accounts sa
+             CROSS JOIN active_distribution ad)
+             LEFT JOIN previous_distribution pd ON ((pd.user_id = sa.user_id)))
+        ), valid_transfers AS (
+         SELECT stt.f,
+            stt.t,
+            stt.v,
+            stt.block_time,
+            sa_from.user_id AS from_user_id,
+            sa_to.user_id AS to_user_id,
+                CASE
+                    WHEN (( SELECT active_distribution.earn_min_balance
+                       FROM active_distribution) > 0) THEN COALESCE(( SELECT bt.assets
+                       FROM send_earn_balances_timeline bt
+                      WHERE ((bt.owner = stt.t) AND (bt.block_time <= stt.block_time))
+                      ORDER BY bt.block_time DESC
+                     LIMIT 1), (0)::numeric)
+                    ELSE NULL::numeric
+                END AS earn_balance
+           FROM (((send_token_transfers stt
+             JOIN send_accounts sa_from ON ((sa_from.address = (concat('0x', encode(stt.f, 'hex'::text)))::citext)))
+             LEFT JOIN send_accounts sa_to ON ((sa_to.address = (concat('0x', encode(stt.t, 'hex'::text)))::citext)))
+             CROSS JOIN active_distribution ad)
+          WHERE ((stt.block_time >= ad.start_time) AND (stt.block_time < ad.end_time))
+        )
+ SELECT ( SELECT active_distribution.id
+           FROM active_distribution) AS distribution_id,
+    subq.from_user_id,
+    subq.to_user_id,
+    max(LEAST(
+        CASE
+            WHEN (subq.earn_balance IS NULL) THEN subq.v
+            WHEN (subq.earn_balance >= (( SELECT active_distribution.earn_min_balance
+               FROM active_distribution))::numeric) THEN subq.v
+            ELSE (0)::numeric
+        END, subq.send_ceiling)) AS capped_amount,
+    max(subq.send_ceiling) AS send_ceiling
+   FROM ( SELECT vt.from_user_id,
+            vt.to_user_id,
+            vt.v,
+            vt.earn_balance,
+            scs.send_ceiling
+           FROM (valid_transfers vt
+             JOIN send_ceiling_settings scs ON ((vt.from_user_id = scs.user_id)))) subq
+  WHERE ((LEAST(
+        CASE
+            WHEN (subq.earn_balance IS NULL) THEN subq.v
+            WHEN (subq.earn_balance >= (( SELECT active_distribution.earn_min_balance
+               FROM active_distribution))::numeric) THEN subq.v
+            ELSE (0)::numeric
+        END, subq.send_ceiling) > (0)::numeric) AND ((( SELECT access_control.show_all_users
+           FROM access_control) = true) OR ((( SELECT access_control.show_all_users
+           FROM access_control) = false) AND (subq.from_user_id = ( SELECT access_control.current_user_id
+           FROM access_control)))))
+  GROUP BY subq.from_user_id, subq.to_user_id;
+
+
 create or replace view "public"."send_scores" as  SELECT get_send_scores_history.user_id,
     get_send_scores_history.distribution_id,
     get_send_scores_history.score,
@@ -331,33 +437,4 @@ UNION ALL
     send_scores_current.send_ceiling
    FROM send_scores_current;
 
-
--- Indexes
 CREATE UNIQUE INDEX send_scores_history_user_id_distribution_id_idx ON private.send_scores_history USING btree (user_id, distribution_id);
-
-
--- Owners
-ALTER MATERIALIZED VIEW "private"."send_scores_history" OWNER TO postgres;
-ALTER VIEW "public"."send_scores_current_unique" OWNER TO postgres;
-ALTER VIEW "public"."send_scores_current" OWNER TO postgres;
-ALTER VIEW "public"."send_scores" OWNER TO postgres;
-
--- Permissions
-REVOKE ALL ON "private"."send_scores_history" FROM PUBLIC;
-REVOKE ALL ON "private"."send_scores_history" FROM authenticated;
-GRANT ALL ON "private"."send_scores_history" TO service_role;
-
-REVOKE ALL ON "public"."send_scores_current_unique" FROM PUBLIC;
-GRANT ALL ON "public"."send_scores_current_unique" TO anon;
-GRANT ALL ON "public"."send_scores_current_unique" TO authenticated;
-GRANT ALL ON "public"."send_scores_current_unique" TO service_role;
-
-REVOKE ALL ON "public"."send_scores_current" FROM PUBLIC;
-GRANT ALL ON "public"."send_scores_current" TO anon;
-GRANT ALL ON "public"."send_scores_current" TO authenticated;
-GRANT ALL ON "public"."send_scores_current" TO service_role;
-
-REVOKE ALL ON "public"."send_scores" FROM PUBLIC;
-GRANT ALL ON "public"."send_scores" TO anon;
-GRANT ALL ON "public"."send_scores" TO authenticated;
-GRANT ALL ON "public"."send_scores" TO service_role;

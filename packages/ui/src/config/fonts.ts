@@ -3,7 +3,7 @@ import { createFont, isWeb } from 'tamagui'
 export const headingFont = createFont({
   family: isWeb
     ? 'DM Sans, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif '
-    : 'DM Sans, sans-serif',
+    : 'DM Sans, System',
   size: {
     1: 11,
     2: 12,
@@ -46,7 +46,7 @@ export const headingFont = createFont({
 export const bodyFont = createFont({
   family: isWeb
     ? 'DM Sans, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
-    : 'DM Sans, sans-serif',
+    : 'DM Sans, System',
   size: {
     1: 11,
     2: 12,
@@ -88,7 +88,7 @@ export const bodyFont = createFont({
 export const monoFont = createFont({
   family: isWeb
     ? 'DM Mono, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, monospace'
-    : 'DM Mono, monospace',
+    : 'DM Mono, System',
   size: {
     1: 11,
     2: 12,

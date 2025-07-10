@@ -1,17 +1,17 @@
+import { SendConfirmScreen } from 'app/features/send/confirm/screen'
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
 import { Stack } from 'expo-router'
-import { ActivityRewardsScreen } from 'app/features/rewards/activity/screen'
 
-export default function RewardsScreen() {
+export default function SendConfirm() {
   return (
     <>
       <Stack.Screen
         options={{
-          title: 'Rewards',
+          title: 'Preview and Send',
         }}
       />
       <ScreenContainer>
-        <ActivityRewardsScreen />
+        <SendConfirmScreen />
       </ScreenContainer>
     </>
   )

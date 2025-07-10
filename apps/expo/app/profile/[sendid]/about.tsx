@@ -1,17 +1,17 @@
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
 import { Stack } from 'expo-router'
-import { ActivityRewardsScreen } from 'app/features/rewards/activity/screen'
+import { ProfilesDetailsModal } from 'app/features/profile/components/ProfileDetailsModal'
 
-export default function RewardsScreen() {
+export default function AboutScreen() {
   return (
     <>
       <Stack.Screen
         options={{
-          title: 'Rewards',
+          title: 'About',
         }}
       />
       <ScreenContainer>
-        <ActivityRewardsScreen />
+        <ProfilesDetailsModal />
       </ScreenContainer>
     </>
   )

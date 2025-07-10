@@ -25,21 +25,27 @@ import { useAmountFromActivity } from 'app/utils/activity-hooks'
 import { useAddressBook } from 'app/utils/useAddressBook'
 import { useLiquidityPools } from 'app/utils/useLiquidityPools'
 import { useSwapRouters } from 'app/utils/useSwapRouters'
-import { isSendEarnEvent, type Activity } from 'app/utils/zod/activity'
+import { type Activity, isSendEarnEvent } from 'app/utils/zod/activity'
 import {
   isSendAccountTransfersEvent,
   isSendtagCheckoutEvent,
   isSendTokenUpgradeEvent,
 } from 'app/utils/zod/activity/SendAccountTransfersEventSchema'
+import { useActivityDetails } from 'app/provider/activity-details'
+import { Platform } from 'react-native'
 
-export const ActivityDetails = ({
-  activity,
-  onClose,
-  ...props
-}: {
-  activity: Activity
-  onClose: () => void
-} & StackProps) => {
+export const ActivityDetails = (props: StackProps) => {
+  const { selectedActivity } = useActivityDetails()
+
+  if (!selectedActivity) {
+    return null
+  }
+
+  return <ActivityDetailsContent activity={selectedActivity} {...props} />
+}
+
+const ActivityDetailsContent = ({ activity, ...props }: { activity: Activity } & StackProps) => {
+  const { closeActivityDetails } = useActivityDetails()
   const { data: swapRouters } = useSwapRouters()
   const { data: liquidityPools } = useLiquidityPools()
   const activityEventName = useEventNameFromActivity({ activity, swapRouters, liquidityPools })
@@ -58,9 +64,11 @@ export const ActivityDetails = ({
   return (
     <Fade {...props}>
       <YStack w={'100%'} gap={'$3.5'}>
-        <H4 fontWeight={'600'} size={'$7'}>
-          Transaction details
-        </H4>
+        {Platform.OS === 'web' && (
+          <H4 fontWeight={'600'} size={'$7'}>
+            Transaction details
+          </H4>
+        )}
         <YStack
           w={'100%'}
           bg={'$color1'}
@@ -134,13 +142,15 @@ export const ActivityDetails = ({
                 </Paragraph>
               </XStack>
             </XStack>
-            <Stack onPress={onClose} cursor={'pointer'}>
-              <IconX
-                size={'$1.5'}
-                $theme-dark={{ color: '$primary' }}
-                $theme-light={{ color: '$color12' }}
-              />
-            </Stack>
+            {Platform.OS === 'web' && (
+              <Stack onPress={closeActivityDetails} cursor={'pointer'}>
+                <IconX
+                  size={'$1.5'}
+                  $theme-dark={{ color: '$primary' }}
+                  $theme-light={{ color: '$color12' }}
+                />
+              </Stack>
+            )}
           </XStack>
           <XStack gap={'$2'} ai={'center'}>
             <Paragraph

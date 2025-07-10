@@ -1,6 +1,7 @@
 import type { Functions } from '@my/supabase/database.types'
 import { Button, Fade, Image, LinearGradient, Paragraph, XStack, YStack } from '@my/ui'
 import { IconX, IconXLogo } from 'app/components/icons'
+import { Platform } from 'react-native'
 
 export const ProfileAboutTile = ({
   profile,
@@ -26,7 +27,7 @@ export const ProfileAboutTile = ({
           elevation={'$0.75'}
         >
           <XStack ai="center" jc="space-between">
-            <Paragraph size={'$8'}>About</Paragraph>
+            {Platform.OS === 'web' && <Paragraph size={'$8'}>About</Paragraph>}
             <Button
               onPress={onClose}
               chromeless

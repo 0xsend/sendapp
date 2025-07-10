@@ -303,7 +303,14 @@ const AddressSearchResultRow = ({ address }: { address: Address }) => {
       <ConfirmSendDialog
         isOpen={sendConfirmDialogIsOpen}
         onClose={() => setSendConfirmDialogIsOpen(false)}
-        onConfirm={() => router.push(href)}
+        onConfirm={() => {
+          if (Platform.OS !== 'web' && !href.startsWith('/')) {
+            Linking.openURL(href)
+            return
+          }
+          setSendConfirmDialogIsOpen(false)
+          router.push(href)
+        }}
         address={address}
       />
     </View>
@@ -506,6 +513,12 @@ function Search({ label, placeholder = 'Search', autoFocus = false }: SearchProp
     })
     return () => subscription.unsubscribe()
   }, [form, setRootParams, queryParams])
+
+  useEffect(() => {
+    if (!query) {
+      form.setValue('query', '')
+    }
+  }, [query, form.setValue])
 
   const handleClearClick = () => {
     form.setValue('query', '')

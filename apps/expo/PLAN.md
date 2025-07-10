@@ -234,7 +234,7 @@ You can use the following methods to verify the app is functioning correctly:
 
 **Project Structure**:
 - check images loading 
-- check fonts loading
+- check fonts loading ✅
 - prepare splash screen and icons for ios ✅
 
 **Auth**:
@@ -245,9 +245,9 @@ You can use the following methods to verify the app is functioning correctly:
 - rework flow on native, web flow is built on query params, native should use stacking screen ✅
 
 **Send**:
-- rework flow on native, web flow is built on query params, native should use stacking screen
-- sending is not stable, app sometimes crush on confirm screen (possibly only on simulator or localhost)
-- resetting send screen state after send is done
+- rework flow on native, web flow is built on query params, native should use stacking screen ✅
+- sending is not stable, app sometimes crush on confirm screen ✅
+- resetting send screen state after send is done ✅
 
 **Account**:
 - QR code not working ✅
@@ -269,8 +269,8 @@ You can use the following methods to verify the app is functioning correctly:
 - only 1st page is visible
 
 **History**:
-- rework flow of screens, cannot go back from profile details, history and receipt, use screen stacking
-- cannot go back after pressing send button
+- rework flow of screens, cannot go back from profile details, history and receipt, use screen stacking ✅
+- cannot go back after pressing send button ✅
 - history scroll is broken, it behaves like standard screen, not like a chat
 
 **Deposit**:

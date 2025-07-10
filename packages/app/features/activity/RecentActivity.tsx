@@ -4,43 +4,31 @@ import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query
 import { ActivityDetails } from 'app/features/activity/ActivityDetails'
 import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
-import { useRootScreenParams } from 'app/routers/params'
 import type { Activity } from 'app/utils/zod/activity'
-import { type PropsWithChildren, useEffect, useMemo, useState } from 'react'
+import { type PropsWithChildren, useEffect, useMemo } from 'react'
 import { SectionList } from 'react-native'
 import type { ZodError } from 'zod'
 import { useActivityFeed } from './utils/useActivityFeed'
+import { useActivityDetails } from 'app/provider/activity-details'
 
 export function RecentActivity() {
   const result = useActivityFeed()
-  const [queryParams, setParams] = useRootScreenParams()
-  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
-
-  const handleActivityPress = (activity: Activity) => {
-    setParams({ ...queryParams, activity: 'details' }, { webBehavior: 'replace' })
-    setSelectedActivity(activity)
-  }
-  const handleCloseActivityDetails = () => {
-    setParams({ ...queryParams, activity: undefined }, { webBehavior: 'replace' })
-    setSelectedActivity(null)
-  }
+  const { isOpen, selectActivity } = useActivityDetails()
 
   return (
     <XStack w={'100%'} gap={'$5'} f={1}>
       <YStack
         f={1}
-        display={selectedActivity && queryParams.activity ? 'none' : 'flex'}
+        display={isOpen ? 'none' : 'flex'}
         $gtLg={{
           display: 'flex',
           maxWidth: '50%',
         }}
       >
-        <ActivityFeed activityFeedQuery={result} onActivityPress={handleActivityPress} />
+        <ActivityFeed activityFeedQuery={result} onActivityPress={selectActivity} />
       </YStack>
-      {selectedActivity && queryParams.activity && (
+      {isOpen && (
         <ActivityDetails
-          activity={selectedActivity}
-          onClose={handleCloseActivityDetails}
           w={'100%'}
           $platform-web={{
             height: 'fit-content',

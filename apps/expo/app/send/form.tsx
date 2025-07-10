@@ -1,17 +1,17 @@
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
 import { Stack } from 'expo-router'
-import { ActivityRewardsScreen } from 'app/features/rewards/activity/screen'
+import { SendAmountForm } from 'app/features/send/SendAmountForm'
 
-export default function RewardsScreen() {
+export default function SendFormScreen() {
   return (
     <>
       <Stack.Screen
         options={{
-          title: 'Rewards',
+          title: 'Enter Amount',
         }}
       />
       <ScreenContainer>
-        <ActivityRewardsScreen />
+        <SendAmountForm />
       </ScreenContainer>
     </>
   )

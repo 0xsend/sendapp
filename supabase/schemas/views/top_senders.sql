@@ -42,7 +42,10 @@ valid_users AS (
       AND ueb.earn_balance >= (
           SELECT d.earn_min_balance
           FROM distributions d
-          WHERE d.id = (SELECT MAX(id) FROM distributions)
+          WHERE d.qualification_start <= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+            AND d.qualification_end >= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+          ORDER BY d.qualification_start DESC
+          LIMIT 1
       )
     GROUP BY p.id, p.avatar_url, p.name, p.about, p.referral_code, p.is_public, p.send_id, p.x_username, p.birthday, us.send_score
 )

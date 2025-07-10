@@ -1,19 +1,19 @@
 import {
   Avatar,
   Button,
+  FadeCard,
   LinkableAvatar,
   Paragraph,
   type ParagraphProps,
   ScrollView,
   Separator,
   Spinner,
+  type TamaguiElement,
   XStack,
   YStack,
-  type TamaguiElement,
-  FadeCard,
 } from '@my/ui'
 import { baseMainnet, baseMainnetClient, entryPointAddress } from '@my/wagmi'
-import { useQueryClient, useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconAccount } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { useSendScreenParams } from 'app/routers/params'
@@ -36,14 +36,14 @@ import { allCoins, allCoinsDict } from 'app/data/coins'
 
 import debug from 'debug'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
-
-const log = debug('app:features:send:confirm:screen')
 import { api } from 'app/utils/api'
 import { signUserOp } from 'app/utils/signUserOp'
 import { decodeTransferUserOp } from 'app/utils/decodeTransferUserOp'
 import type { UserOperation } from 'permissionless'
 import { formFields } from 'app/utils/SchemaForm'
-import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { Platform } from 'react-native'
+
+const log = debug('app:features:send:confirm:screen')
 
 export function SendConfirmScreen() {
   const [queryParams] = useSendScreenParams()
@@ -78,7 +78,6 @@ export function SendConfirm() {
   const { sendToken, recipient, idType, amount, note } = queryParams
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
   const { coin: selectedCoin } = useCoinFromSendTokenParam()
-  const hoverStyles = useHoverStyles()
 
   const submitButtonRef = useRef<TamaguiElement | null>(null)
 
@@ -172,16 +171,22 @@ export function SendConfirm() {
     )
 
   const onEdit = () => {
-    router.push({
-      pathname: '/send',
-      query: {
-        idType,
-        recipient,
-        amount: amount ?? '',
-        sendToken,
-        note,
-      },
-    })
+    if (Platform.OS === 'web') {
+      router.push({
+        pathname: '/send',
+        query: {
+          idType,
+          recipient,
+          amount: amount ?? '',
+          sendToken,
+          note,
+        },
+      })
+
+      return
+    }
+
+    router.back()
   }
 
   async function onSubmit() {
@@ -233,7 +238,13 @@ export function SendConfirm() {
           queryKey: ['token_activity_feed', { address: selectedCoin.token }],
           exact: false,
         })
-        router.replace({ pathname: '/', query: { token: sendToken } })
+
+        if (Platform.OS === 'web') {
+          router.replace({ pathname: '/', query: { token: sendToken } })
+          return
+        }
+        router.push('/(tabs)/')
+        router.push({ pathname: '/token', query: { token: sendToken } })
       }
     } catch (e) {
       // @TODO: handle sending repeated tx when nonce is still pending
@@ -248,7 +259,7 @@ export function SendConfirm() {
   }
 
   useEffect(() => {
-    if (submitButtonRef.current) {
+    if (Platform.OS === 'web' && submitButtonRef.current) {
       submitButtonRef.current.focus()
     }
   }, [])

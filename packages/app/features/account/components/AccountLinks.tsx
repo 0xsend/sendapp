@@ -55,7 +55,7 @@ const ACCOUNT_LINKS: {
     },
     {
       text: 'Rewards',
-      href: Platform.OS === 'web' ? '/explore/rewards' : '/rewards',
+      href: '/rewards',
       icon: <IconStarOutline {...iconProps} />,
     },
     {

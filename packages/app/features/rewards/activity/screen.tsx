@@ -32,12 +32,12 @@ import { toNiceError } from 'app/utils/toNiceError'
 import { min } from 'app/utils/bigint'
 import type { Json } from '@my/supabase/database.types'
 import { sendCoin, usdcCoin } from 'app/data/coins'
-import { useSendEarnBalances, useVaultConvertSharesToAssets } from 'app/features/earn/hooks'
+import { useSendEarnBalancesAtBlock } from 'app/features/earn/hooks'
 
 //@todo get this from the db
 const verificationTypesAndTitles = {
   create_passkey: { title: 'Create a Passkey' },
-  tag_registration: { title: 'Register a Sendtag', details: '(per tag)' },
+  tag_registration: { title: 'Purchase a Sendtag', details: '(per tag)' },
   send_ten: { title: '10+ Sends' },
   send_one_hundred: { title: '100+ Sends' },
   tag_referral: { title: 'Referrals' },
@@ -98,13 +98,13 @@ export function ActivityRewardsScreen() {
         <H3 fontWeight={'600'} color={'$color12'} pr={'$2'}>
           {`${distributionDates[selectedDistributionIndex]?.split(' ')[0] ?? 'Monthly'} Rewards`}
         </H3>
-        {distributions.length > 1 && (
+        {distributions.length > 1 ? (
           <DistributionSelect
             distributions={distributions}
             selectedIndex={selectedDistributionIndex}
             onValueChange={onValueChange}
           />
-        )}
+        ) : null}
       </XStack>
       <YStack f={1} w={'100%'} gap={'$7'}>
         {(() => {
@@ -168,27 +168,17 @@ const DistributionRequirementsCard = ({
     error: snapshotBalanceError,
   } = useSnapshotBalance({ distribution, sendAccount })
 
-  const { data: sendEarnBalances, isLoading: isLoadingSendEarnBalances } = useSendEarnBalances()
-  // Extract vaults and shares from balances for conversion
-  const vaults =
-    sendEarnBalances
-      ?.filter((balance) => balance.shares > 0n && balance.log_addr !== null)
-      .map((balance) => balance.log_addr) || []
-
-  const shares =
-    sendEarnBalances
-      ?.filter((balance) => balance.shares > 0n && balance.log_addr !== null)
-      .map((balance) => balance.shares) || []
-
-  // Use the hook to get current asset values based on onchain rate
-  const earnAssets = useVaultConvertSharesToAssets({ vaults, shares })
+  const { data: sendEarnBalances, isLoading: isLoadingSendEarnBalances } =
+    useSendEarnBalancesAtBlock(
+      distribution.snapshot_block_num ? BigInt(distribution.snapshot_block_num) : null
+    )
 
   const totalAssets = useMemo(
-    () => earnAssets.data?.reduce((sum, assets) => sum + assets, 0n) ?? 0n,
-    [earnAssets.data]
+    () => sendEarnBalances?.reduce((sum, { assets }) => sum + assets, 0n) ?? 0n,
+    [sendEarnBalances]
   )
 
-  const hasMinSavings = BigInt(distribution.earn_min_balance) > 0n
+  const hasMinSavings = BigInt(distribution.earn_min_balance) < totalAssets
 
   if (verificationsQuery.isLoading || isLoadingSendAccount) {
     return (
@@ -237,7 +227,7 @@ const DistributionRequirementsCard = ({
         </YStack>
         <YStack gap="$2" ai={'flex-end'}>
           <XStack ai="center" gap="$2">
-            <Paragraph>Sendtag Registered</Paragraph>
+            <Paragraph>Sendtag Purchased</Paragraph>
             {sendTagRegistrations ? (
               <CheckCircle2 $theme-light={{ color: '$color12' }} color="$primary" size={'$1.5'} />
             ) : (
@@ -280,39 +270,37 @@ const DistributionRequirementsCard = ({
               }
             })()}
           </XStack>
-          {hasMinSavings && (
-            <XStack ai="center" gap="$2">
-              <Paragraph>
-                Savings Deposit $
-                {formatAmount(
-                  formatUnits(BigInt(distribution.earn_min_balance ?? 0n), usdcCoin.decimals) ?? 0n,
-                  9,
-                  2
-                )}{' '}
-              </Paragraph>
-              {(() => {
-                switch (true) {
-                  case isLoadingSendEarnBalances:
-                    return <Spinner size="small" />
-                  case distribution.earn_min_balance === undefined ||
-                    BigInt(distribution.earn_min_balance) > (totalAssets ?? 0n):
-                    return (
-                      <Theme name="red">
-                        <IconInfoCircle color={'$color8'} size={'$2'} />
-                      </Theme>
-                    )
-                  default:
-                    return (
-                      <CheckCircle2
-                        $theme-light={{ color: '$color12' }}
-                        color="$primary"
-                        size={'$1.5'}
-                      />
-                    )
-                }
-              })()}
-            </XStack>
-          )}
+
+          <XStack ai="center" gap="$2">
+            <Paragraph>
+              Savings Deposit $
+              {formatAmount(
+                formatUnits(BigInt(distribution.earn_min_balance ?? 0n), usdcCoin.decimals) ?? 0n,
+                9,
+                2
+              )}{' '}
+            </Paragraph>
+            {(() => {
+              switch (true) {
+                case isLoadingSendEarnBalances:
+                  return <Spinner size="small" />
+                case distribution.earn_min_balance === undefined || !hasMinSavings:
+                  return (
+                    <Theme name="red">
+                      <IconInfoCircle color={'$color8'} size={'$2'} />
+                    </Theme>
+                  )
+                default:
+                  return (
+                    <CheckCircle2
+                      $theme-light={{ color: '$color12' }}
+                      color="$primary"
+                      size={'$1.5'}
+                    />
+                  )
+              }
+            })()}
+          </XStack>
         </YStack>
       </Stack>
     </FadeCard>
@@ -442,7 +430,7 @@ const TaskCard = ({
     <Card br={12} gap="$4" p="$6" jc={'space-between'} $gtSm={{ maw: 331 }} w={'100%'}>
       <XStack ai={'center'} jc="space-between">
         {status}
-        {shouldShowValue && (
+        {shouldShowValue ? (
           <Paragraph
             ff={'$mono'}
             py={'$0.5'}
@@ -454,7 +442,7 @@ const TaskCard = ({
           >
             {displayValue}
           </Paragraph>
-        )}
+        ) : null}
       </XStack>
       {children}
     </Card>
