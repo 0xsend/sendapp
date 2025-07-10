@@ -233,7 +233,7 @@ You can use the following methods to verify the app is functioning correctly:
 - a lot os stuff is blinking all over the place, too much data fetching, too much fading
 
 **Project Structure**:
-- check images loading 
+- check images loading ✅
 - check fonts loading ✅
 - prepare splash screen and icons for ios ✅
 

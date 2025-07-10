@@ -1,6 +1,6 @@
 import { LinkBanner, YStack } from '@my/ui'
 
-export const ExploreScreen = () => {
+export const ExploreScreen = ({ images }: { images: Record<string, string> }) => {
   return (
     <YStack
       w={'100%'}
@@ -12,21 +12,17 @@ export const ExploreScreen = () => {
     >
       <LinkBanner
         href={'/rewards'}
-        imgUrl={'https://ghassets.send.app/app_images/explore_rewards.jpg'}
+        imgUrl={images.rewards || ''}
         title={'Get Rewarded'}
         subtitle={'Earn SEND while engaging, referring, and growing the network'}
       />
       <LinkBanner
         href={'/sendpot'}
-        imgUrl={'https://ghassets.send.app/app_images/sendpot.jpg'}
+        imgUrl={images.sendpot || ''}
         title={'SENDPOT'}
         subtitle={'Challenge your luck, win big prizes'}
       />
-      <LinkBanner
-        href={'/feed'}
-        imgUrl={'https://ghassets.send.app/app_images/feed.jpg'}
-        title={'Community Feed'}
-      />
+      <LinkBanner href={'/feed'} imgUrl={images.feed || ''} title={'Community Feed'} />
     </YStack>
   )
 }

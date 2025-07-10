@@ -13,7 +13,11 @@ export default function SavingsScreen() {
       />
       <ScreenContainer>
         <SendEarnProvider>
-          <EarnScreen />
+          <EarnScreen
+            images={{
+              learn: require('../../assets/images/deposit.jpg'),
+            }}
+          />
         </SendEarnProvider>
       </ScreenContainer>
     </>
