@@ -77,6 +77,7 @@ const useCurrentDistributionShares = () => {
             amount::text
           )
         `)
+        .lte('qualification_start', new Date().toUTCString())
         .gte('qualification_end', new Date().toUTCString())
         .order('number', { ascending: false })
         .limit(1)
