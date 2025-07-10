@@ -13,7 +13,11 @@ export const Page: NextPageWithLayout = () => {
         <title>Send | Earn</title>
       </Head>
       <SendEarnProvider>
-        <EarnScreen />
+        <EarnScreen
+          images={{
+            learn: 'https://ghassets.send.app/app_images/deposit.jpg',
+          }}
+        />
       </SendEarnProvider>
     </>
   )

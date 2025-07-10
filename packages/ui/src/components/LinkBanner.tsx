@@ -1,8 +1,9 @@
-import { Card, type CardProps, H1, Paragraph, XStack, YStack, Image } from 'tamagui'
+import { Card, type CardProps, H1, Paragraph, XStack, YStack } from 'tamagui'
 import { Fade } from './Fade'
 import { LinearGradient } from '@tamagui/linear-gradient'
 import { ArrowRight } from '@tamagui/lucide-icons'
 import { Link } from './Link'
+import { SolitoImage } from 'solito/image'
 
 export type LinkBannerProps = {
   href: string
@@ -26,7 +27,7 @@ export const LinkBanner = ({ href, imgUrl, subtitle, title }: LinkBannerProps) =
           $gtSm={{ h: 300 }}
         >
           <Card.Background>
-            <Image src={imgUrl} alt={title} objectFit="cover" width="100%" height="100%" />
+            <SolitoImage src={imgUrl} alt={title} resizeMode="cover" fill={true} />
           </Card.Background>
           <LinearGradient
             start={[0, 0]}

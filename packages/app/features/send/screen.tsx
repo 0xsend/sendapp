@@ -31,6 +31,7 @@ import { SendSuggestions } from 'app/features/send/suggestions/SendSuggestions'
 import { useFavouriteSenders } from 'app/features/send/suggestions/useFavouriteSenders'
 import { useTodayBirthdaySenders } from 'app/features/send/suggestions/useTodayBirthdaySenders'
 import { useTopSenders } from 'app/features/send/suggestions/useTopSenders'
+import { Platform } from 'react-native'
 
 export const SendScreen = () => {
   const [{ recipient, idType }] = useSendScreenParams()
@@ -65,7 +66,7 @@ export const SendScreen = () => {
       <TagSearchProvider>
         <YStack f={1} width={'100%'} pb="$4" gap="$6" $lg={{ pt: '$3' }}>
           <YStack width={'100%'} gap="$1.5" $gtSm={{ gap: '$2.5' }}>
-            <Search autoFocus={true} />
+            <Search autoFocus={Platform.OS === 'web'} />
           </YStack>
           {!search && (
             <SendSuggestions

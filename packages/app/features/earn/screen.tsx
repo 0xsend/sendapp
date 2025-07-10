@@ -25,7 +25,7 @@ import { useSendEarn } from './providers/SendEarnProvider'
 
 const log = debug('app:earn:screen')
 
-export function EarnScreen() {
+export function EarnScreen({ images }: { images: Record<string, string> }) {
   const { allBalances, isLoading } = useSendEarn()
 
   if (isLoading) {
@@ -43,7 +43,7 @@ export function EarnScreen() {
   const detailsSection = (
     <DetailsSection hasActiveDeposits={hasActiveDeposits} balances={balancesData} />
   )
-  const learnSection = <LearnSection />
+  const learnSection = <LearnSection learnImage={images.learn || ''} />
 
   const sections = hasActiveDeposits
     ? [detailsSection, learnSection]
@@ -99,7 +99,7 @@ const Badge = ({ text }: { text: string }) => {
   )
 }
 
-const LearnSection = () => {
+const LearnSection = ({ learnImage }: { learnImage: string }) => {
   return (
     <Fade>
       <Link href="https://info.send.it/send-docs/features-and-products/send-earn">
@@ -114,7 +114,7 @@ const LearnSection = () => {
         >
           <Card.Background>
             <Image
-              src={'https://ghassets.send.app/app_images/deposit.jpg'}
+              src={learnImage}
               alt={'Send Earn'}
               width={'100%'}
               height={'100%'}

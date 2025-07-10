@@ -5,7 +5,13 @@ export default function Screen() {
   return (
     <>
       <TabScreenContainer>
-        <ExploreScreen />
+        <ExploreScreen
+          images={{
+            rewards: require('../../../assets/images/explore_rewards.jpg'),
+            sendpot: require('../../../assets/images/sendpot.jpg'),
+            feed: require('../../../assets/images/feed.jpg'),
+          }}
+        />
       </TabScreenContainer>
     </>
   )
