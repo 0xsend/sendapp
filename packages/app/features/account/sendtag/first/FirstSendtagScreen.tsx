@@ -3,6 +3,7 @@ import { useRouter } from 'solito/router'
 import { YStack } from '@my/ui'
 import { useUser } from 'app/utils/useUser'
 import { FirstSendtagForm } from 'app/features/account/sendtag/first/FirstSendtagForm'
+import { Platform } from 'react-native'
 
 export const FirstSendtagScreen = () => {
   const { tags } = useUser()
@@ -16,6 +17,7 @@ export const FirstSendtagScreen = () => {
 
   return (
     <YStack
+      f={Platform.OS === 'web' ? undefined : 1}
       width={'100%'}
       gap="$5"
       jc={'space-between'}

@@ -1,4 +1,4 @@
-import { Link, type LinkProps, Paragraph, XStack, YStack } from '@my/ui'
+import { Link, Paragraph, XStack, YStack } from '@my/ui'
 
 import { IconCoin } from 'app/components/icons/IconCoin'
 import type { CoinWithBalance } from 'app/data/coins'
@@ -12,64 +12,86 @@ import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { useIsPriceHidden } from 'app/features/home/utils/useIsPriceHidden'
 import { ChevronRight } from '@tamagui/lucide-icons'
 import { Platform } from 'react-native'
+import { useLink } from 'solito/link'
 
 export const StablesBalanceList = () => {
   const { stableCoins, isLoading } = useCoins()
-  const hoverStyles = useHoverStyles()
 
   if (isLoading) return null
 
   return stableCoins.map((coin) => (
     <Fragment key={`token-balance-list-${coin.label}`}>
-      <TokenBalanceItem
-        coin={coin}
-        jc={'space-between'}
-        ai={'center'}
-        p={'$3.5'}
-        br={'$4'}
-        href={{
-          pathname: Platform.OS === 'web' ? '/' : '/token',
-          query: { token: coin.token },
-        }}
-        hoverStyle={hoverStyles}
-      />
+      <TokenBalanceItem coin={coin} />
     </Fragment>
   ))
 }
 
-const TokenBalanceItem = ({
-  coin,
+const TokenBalanceItem = ({ coin }: { coin: CoinWithBalance }) => {
+  const hoverStyles = useHoverStyles()
+  const linkProps = useLink({
+    href: {
+      pathname: Platform.OS === 'web' ? '/' : '/token',
+      query: { token: coin.token },
+    },
+  })
 
-  ...props
-}: {
-  coin: CoinWithBalance
-} & Omit<LinkProps, 'children'>) => {
-  return (
-    <Link display="flex" {...props}>
-      <XStack f={1} gap={'$3.5'} ai={'center'}>
-        <IconCoin symbol={coin.symbol} size={'$3.5'} />
-        <YStack f={1} jc={'space-between'}>
-          <XStack jc={'space-between'} ai={'center'}>
-            <Paragraph fontSize={'$6'} fontWeight={'500'} color={'$color12'}>
-              {coin.shortLabel || coin.label}
-            </Paragraph>
-          </XStack>
-          <XStack jc={'space-between'} ai={'center'} miw={0}>
-            <Paragraph
-              fontSize={'$5'}
-              color={'$lightGrayTextField'}
-              $theme-light={{ color: '$darkGrayTextField' }}
-            >
-              Base
-            </Paragraph>
-          </XStack>
-        </YStack>
-        <XStack ai={'center'} gap="$2">
-          <TokenBalance coin={coin} />
-          <ChevronRight size={'$1'} color={'$color12'} />
+  const content = (
+    <>
+      <IconCoin symbol={coin.symbol} size={'$3.5'} />
+      <YStack f={1} jc={'space-between'}>
+        <XStack jc={'space-between'} ai={'center'}>
+          <Paragraph fontSize={'$6'} fontWeight={'500'} color={'$color12'}>
+            {coin.shortLabel || coin.label}
+          </Paragraph>
         </XStack>
+        <XStack jc={'space-between'} ai={'center'} miw={0}>
+          <Paragraph
+            fontSize={'$5'}
+            color={'$lightGrayTextField'}
+            $theme-light={{ color: '$darkGrayTextField' }}
+          >
+            Base
+          </Paragraph>
+        </XStack>
+      </YStack>
+      <XStack ai={'center'} gap="$2">
+        <TokenBalance coin={coin} />
+        <ChevronRight size={'$1'} color={'$color12'} />
       </XStack>
-    </Link>
+    </>
+  )
+
+  if (Platform.OS === 'web') {
+    return (
+      <Link
+        display="flex"
+        jc={'space-between'}
+        ai={'center'}
+        p={'$3.5'}
+        br={'$4'}
+        hoverStyle={hoverStyles}
+        {...linkProps}
+      >
+        <XStack f={1} gap={'$3.5'} ai={'center'}>
+          {content}
+        </XStack>
+      </Link>
+    )
+  }
+
+  return (
+    <XStack
+      f={1}
+      gap={'$3.5'}
+      jc={'space-between'}
+      ai={'center'}
+      p={'$3.5'}
+      br={'$4'}
+      hoverStyle={hoverStyles}
+      {...linkProps}
+    >
+      {content}
+    </XStack>
   )
 }
 

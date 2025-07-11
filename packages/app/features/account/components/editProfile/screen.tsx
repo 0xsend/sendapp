@@ -120,16 +120,8 @@ const Overview = ({ profile, onPress }: { profile: Tables<'profiles'>; onPress: 
           <Paragraph size={'$5'}>{`${is_public ? 'Public' : 'Private'}`} Profile</Paragraph>
         </XStack>
       </FadeCard>
-      <SubmitButton
-        elevation={'$0.75'}
-        theme="green"
-        borderRadius={'$4'}
-        p={'$4'}
-        onPress={onPress}
-      >
-        <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
-          edit profile
-        </Button.Text>
+      <SubmitButton onPress={onPress}>
+        <SubmitButton.Text>edit profile</SubmitButton.Text>
       </SubmitButton>
     </YStack>
   )
@@ -143,17 +135,8 @@ function EditProfileForm({ profile, onSave }: { profile: Tables<'profiles'>; onS
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (
       <YStack>
-        <SubmitButton
-          elevation={'$0.75'}
-          theme="green"
-          borderRadius={'$4'}
-          p={'$4'}
-          mt={'$1'}
-          onPress={() => submit()}
-        >
-          <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
-            SAVE CHANGES
-          </Button.Text>
+        <SubmitButton onPress={() => submit()}>
+          <SubmitButton.Text>SAVE CHANGES</SubmitButton.Text>
         </SubmitButton>
         {error && (
           <Paragraph marginTop={'$3'} theme="red" color="$color9">
@@ -199,6 +182,7 @@ function EditProfileForm({ profile, onSave }: { profile: Tables<'profiles'>; onS
         isPublic: is_public !== null ? is_public : true,
       }}
       formProps={{
+        footerProps: { p: 0 },
         $gtSm: {
           maxWidth: '100%',
         },

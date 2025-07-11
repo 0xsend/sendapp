@@ -29,10 +29,5 @@ export * from './components/BlurStack'
 export * from './components/QRCode'
 
 export { RecyclerList } from './components/RecyclerList.web'
-export {
-  Card,
-  CardBackground,
-  CardFooter,
-  CardHeader,
-  CardProps,
-} from './components/Card'
+export { Card, CardBackground, CardFooter, CardHeader, CardProps } from './components/Card'
+export * from './components/PrimaryButton'

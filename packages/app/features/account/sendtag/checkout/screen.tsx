@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'solito/router'
 import { CheckoutForm } from './checkout-form'
 import { useUser } from 'app/utils/useUser'
+import { Platform } from 'react-native'
 
 export const CheckoutScreen = () => {
   const { isLoading } = useUser()
@@ -19,6 +20,7 @@ export const CheckoutScreen = () => {
 
   return (
     <YStack
+      f={Platform.OS === 'web' ? undefined : 1}
       width={'100%'}
       gap="$5"
       jc={'space-between'}

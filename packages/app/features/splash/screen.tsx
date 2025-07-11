@@ -281,7 +281,14 @@ function AuthButtons() {
         alignSelf="center"
         width="100%"
       >
-        <SubmitButton size="$4" w="$12" onPress={handleSignIn} disabled={isSigningIn}>
+        <SubmitButton
+          size="$4"
+          w="$12"
+          height={'unset'}
+          py={0}
+          onPress={handleSignIn}
+          disabled={isSigningIn}
+        >
           <ButtonText>{isSigningIn ? 'SIGNING IN...' : 'SIGN-IN'}</ButtonText>
         </SubmitButton>
 

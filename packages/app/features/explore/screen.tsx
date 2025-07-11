@@ -1,4 +1,5 @@
 import { LinkBanner, YStack } from '@my/ui'
+import { Platform } from 'react-native'
 
 export const ExploreScreen = ({ images }: { images: Record<string, string> }) => {
   return (
@@ -6,6 +7,7 @@ export const ExploreScreen = ({ images }: { images: Record<string, string> }) =>
       w={'100%'}
       gap="$5"
       pb={'$3.5'}
+      mt={Platform.OS === 'web' ? undefined : '$3'}
       $gtLg={{
         w: '50%',
       }}

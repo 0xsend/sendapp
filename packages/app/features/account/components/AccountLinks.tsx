@@ -1,7 +1,7 @@
 import { AccountNavLink } from './AccountNavLink'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import type { PropsWithChildren, ReactNode } from 'react'
-import { Button, type ColorTokens, Fade, type SizeTokens, YGroup, YStack } from '@my/ui'
+import { type ColorTokens, Fade, PrimaryButton, type SizeTokens, YGroup, YStack } from '@my/ui'
 import {
   IconAccount,
   IconDollar,
@@ -14,7 +14,6 @@ import {
   IconStarOutline,
 } from 'app/components/icons'
 import { RowLabel } from 'app/components/layout/RowLabel'
-import { Platform } from 'react-native'
 
 const iconProps = {
   size: '$1.5' as SizeTokens,
@@ -99,20 +98,12 @@ export function AccountLinks(): JSX.Element {
           </YStack>
         )
       })}
-      <Button
-        elevation={'$0.75'}
-        theme="green"
-        onPress={() => supabase.auth.signOut()}
-        py={'$5'}
-        br={'$4'}
-      >
-        <Button.Icon>
+      <PrimaryButton onPress={() => supabase.auth.signOut()}>
+        <PrimaryButton.Icon>
           <IconLogout {...iconProps} color={'$black'} />
-        </Button.Icon>
-        <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
-          sign out
-        </Button.Text>
-      </Button>
+        </PrimaryButton.Icon>
+        <PrimaryButton.Text>sign out</PrimaryButton.Text>
+      </PrimaryButton>
     </YStack>
   )
 }

@@ -29,7 +29,7 @@ import { StablesBalanceList } from './StablesBalanceList'
 import { RewardsCard } from './RewardsCard'
 import { FriendsCard } from './FriendsCard'
 import { useCoins } from 'app/provider/coins'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { IconPlus } from 'app/components/icons'
 import { investmentCoins } from 'app/data/coins'
@@ -37,6 +37,7 @@ import { CoinSheet } from 'app/components/CoinSheet'
 import { Link } from 'solito/link'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
 import { Platform } from 'react-native'
+import { usePathname } from 'app/utils/usePathname'
 
 export function HomeScreen() {
   const media = useMedia()
@@ -154,6 +155,13 @@ export function InvestmentsBody() {
   const { investmentCoins: myInvestmentCoins, isLoading } = useCoins()
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const hoverStyles = useHoverStyles()
+  const pathname = usePathname()
+
+  useEffect(() => {
+    if (pathname === '/trade') {
+      setIsSheetOpen(false)
+    }
+  }, [pathname])
 
   return (
     <YStack ai="center" $gtXs={{ gap: '$3' }} gap={'$3.5'} f={1}>
@@ -186,7 +194,9 @@ export function InvestmentsBody() {
       </Button>
 
       <CoinSheet open={isSheetOpen} onOpenChange={() => setIsSheetOpen(false)}>
-        <CoinSheet.Handle onPress={() => setIsSheetOpen(false)}>New Investments</CoinSheet.Handle>
+        {Platform.OS === 'web' && (
+          <CoinSheet.Handle onPress={() => setIsSheetOpen(false)}>New Investments</CoinSheet.Handle>
+        )}
         <CoinSheet.Items>
           {investmentCoins.map((coin) => (
             <Link

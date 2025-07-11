@@ -11,6 +11,7 @@ import {
   XStack,
   YStack,
   FadeCard,
+  PrimaryButton,
 } from '@my/ui'
 import {
   baseMainnetClient,
@@ -175,11 +176,9 @@ const WebauthnCreds = ({
           <WebAuthnCred key={`${sendAcct.id}-${cred.id}`} sendAcct={sendAcct} cred={cred} />
         ))}
       </YStack>
-      <Button elevation={'$0.75'} theme="green" borderRadius={'$4'} p={'$4'} {...addPasskeyLink}>
-        <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
-          Add a Passkey
-        </Button.Text>
-      </Button>
+      <PrimaryButton {...addPasskeyLink}>
+        <PrimaryButton.Text>Add a Passkey</PrimaryButton.Text>
+      </PrimaryButton>
     </YStack>
   )
 }
@@ -237,7 +236,7 @@ const WebAuthnCred = ({
             {cardStatus === 'default' ? (
               <IconDots color={'$primary'} $theme-light={{ color: '$color12' }} />
             ) : (
-              <IconX />
+              <IconX size={'$2'} />
             )}
           </Button>
         )}
