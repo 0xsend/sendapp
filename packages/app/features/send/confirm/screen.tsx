@@ -151,7 +151,7 @@ export function SendConfirm() {
   const isSubmitting = isValidatePending || isTransferPending || isTransferInitialized
 
   const canSubmit =
-    (!isLoading || !isSubmitting) && hasEnoughBalance && hasEnoughGas && feesPerGas !== undefined
+    !isLoading && !isSubmitting && hasEnoughBalance && hasEnoughGas && feesPerGas !== undefined
 
   const localizedAmount = localizeAmount(
     formatUnits(
