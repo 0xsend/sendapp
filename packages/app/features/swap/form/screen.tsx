@@ -90,17 +90,8 @@ export const SwapFormScreen = () => {
 
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (
-      <SubmitButton
-        theme="green"
-        onPress={submit}
-        py={'$5'}
-        br={'$4'}
-        disabledStyle={{ opacity: 0.5 }}
-        disabled={!canSubmit}
-      >
-        <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
-          review
-        </Button.Text>
+      <SubmitButton onPress={submit} disabled={!canSubmit}>
+        <SubmitButton.Text>review</SubmitButton.Text>
       </SubmitButton>
     ),
     [canSubmit]
