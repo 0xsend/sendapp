@@ -29,6 +29,7 @@ import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
 import { type BRAND, z } from 'zod'
 import { convertAmountToUSD } from 'app/utils/convertAmountToUSD'
+import { Platform } from 'react-native'
 
 const SwapFormSchema = z.object({
   outToken: formFields.coin,
@@ -193,6 +194,7 @@ export const SwapFormScreen = () => {
 
   return (
     <YStack
+      f={Platform.OS === 'web' ? undefined : 1}
       w={'100%'}
       gap="$5"
       jc={'space-between'}
