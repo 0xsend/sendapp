@@ -7,7 +7,7 @@
  * - Generate a deterministic address from the public key
  * - Ask the user to deposit funds
  */
-import { Button, FadeCard, Paragraph, SubmitButton, XStack, YStack } from '@my/ui'
+import { FadeCard, Paragraph, SubmitButton, XStack, YStack } from '@my/ui'
 import { useUser } from 'app/utils/useUser'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -22,6 +22,7 @@ import { useValidateSendtag } from 'app/utils/tags/useValidateSendtag'
 import { formatErrorMessage } from 'app/utils/formatErrorMessage'
 import { useFirstSendtagQuery } from 'app/utils/useFirstSendtag'
 import { useReferralCodeQuery } from 'app/utils/useReferralCode'
+import { Platform } from 'react-native'
 
 const OnboardingSchema = z.object({
   name: formFields.text,
@@ -143,34 +144,8 @@ export function OnboardingScreen() {
 
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (
-      <SubmitButton
-        alignSelf={'center'}
-        w={'100%'}
-        theme="green"
-        onPress={submit}
-        py={'$5'}
-        br={'$4'}
-        bw={'$1'}
-        disabled={!canSubmit}
-        $theme-light={{
-          disabledStyle: { opacity: 0.5 },
-        }}
-        $theme-dark={{
-          variant: canSubmit ? undefined : 'outlined',
-        }}
-      >
-        <Button.Text
-          ff={'$mono'}
-          fontWeight={'500'}
-          tt="uppercase"
-          size={'$5'}
-          color={canSubmit ? '$black' : '$primary'}
-          $theme-light={{
-            color: '$black',
-          }}
-        >
-          finish account
-        </Button.Text>
+      <SubmitButton onPress={submit} disabled={!canSubmit}>
+        <SubmitButton.Text>finish account</SubmitButton.Text>
       </SubmitButton>
     ),
     [canSubmit]
@@ -222,7 +197,12 @@ export function OnboardingScreen() {
                   width: '100%',
                 },
                 iconBefore: (
-                  <Paragraph ml={-12} size={'$5'} opacity={formName ? 1 : 0}>
+                  <Paragraph
+                    ml={Platform.OS === 'web' ? 4 : 3}
+                    mb={Platform.OS === 'web' ? 0 : 2}
+                    size={'$5'}
+                    opacity={formName ? 1 : 0}
+                  >
                     /
                   </Paragraph>
                 ),
@@ -230,7 +210,7 @@ export function OnboardingScreen() {
             }}
             formProps={{
               w: '100%',
-              footerProps: { pb: 0 },
+              footerProps: { p: 0 },
               $gtSm: {
                 maxWidth: '100%',
               },

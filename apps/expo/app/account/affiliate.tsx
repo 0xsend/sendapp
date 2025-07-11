@@ -7,7 +7,7 @@ export default function ReferralsScreen() {
     <>
       <Stack.Screen
         options={{
-          title: 'Referrals',
+          title: 'Friends',
         }}
       />
       <ScreenContainer>

@@ -4,6 +4,7 @@ import {
   H2,
   isWeb,
   Paragraph,
+  PrimaryButton,
   QRCode,
   Separator,
   Sheet,
@@ -68,27 +69,12 @@ export function ShareProfileDialog({ isOpen, onClose }: ShareProfileDialogProps)
         gap="$4"
         $gtLg={{ flexDirection: 'row-reverse' }}
       >
-        <Button
-          theme="green"
-          borderRadius={'$4'}
-          p={'$4'}
-          onPress={handleCopyLink}
-          focusStyle={{ outlineWidth: 0 }}
-        >
-          <Button.Icon>
+        <PrimaryButton onPress={handleCopyLink}>
+          <PrimaryButton.Icon>
             <IconCopy size={16} color={'$black'} />
-          </Button.Icon>
-          <Button.Text
-            ff={'$mono'}
-            fontWeight={'500'}
-            tt="uppercase"
-            size={'$5'}
-            color={'$black'}
-            ml={'$2'}
-          >
-            copy link
-          </Button.Text>
-        </Button>
+          </PrimaryButton.Icon>
+          <PrimaryButton.Text>copy link</PrimaryButton.Text>
+        </PrimaryButton>
         {Platform.OS === 'web' && (
           <Dialog.Close asChild>
             <Button borderRadius={'$4'} p={'$4'} focusStyle={{ outlineWidth: 0 }}>

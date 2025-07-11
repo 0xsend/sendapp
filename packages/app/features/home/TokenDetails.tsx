@@ -1,7 +1,7 @@
 import {
+  Button,
   ButtonText,
   Card,
-  LinkableButton,
   type LinkableButtonProps,
   Paragraph,
   Separator,
@@ -22,6 +22,8 @@ import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { TokenActivity } from './TokenActivity'
 import { useMemo } from 'react'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { Platform } from 'react-native'
+import { useLink } from 'solito/link'
 
 export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
   const media = useMedia()
@@ -46,7 +48,7 @@ export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
                 {coin.label}
               </Paragraph>
             </XStack>
-            <YStack gap={'$4'}>
+            <YStack gap={Platform.OS === 'web' ? '$4' : '$2'}>
               <TokenDetailsBalance coin={coin} />
               {coin.symbol !== 'USDC' && (
                 <>
@@ -191,10 +193,13 @@ const TokenDetailsBalance = ({ coin }: { coin: CoinWithBalance }) => {
   const balanceWithDecimalsLength = balanceWithDecimals.toString().replace('.', '').length
 
   return (
-    <XStack ai="flex-end" gap="$2">
+    <XStack alignItems={'baseline'} gap="$2">
       <Paragraph
         $platform-web={{ width: 'fit-content' }}
-        $sm={{ fontSize: balanceWithDecimalsLength ? '$10' : '$12', lineHeight: 32 }}
+        $sm={{
+          fontSize: balanceWithDecimalsLength ? '$10' : '$12',
+          lineHeight: Platform.OS === 'web' ? 32 : 42,
+        }}
         fontSize={isSmallScreen ? 42 : 60}
         fontWeight={'900'}
         lineHeight={isSmallScreen ? 48 : 57}
@@ -216,19 +221,20 @@ const TokenDetailsBalance = ({ coin }: { coin: CoinWithBalance }) => {
 
 const QuickActionButton = ({ href, children }: LinkableButtonProps) => {
   const hoverStyles = useHoverStyles()
+  const linkProps = useLink({ href })
 
   return (
-    <LinkableButton
+    <Button
       elevation={5}
-      href={href}
       f={1}
       height={'auto'}
       hoverStyle={hoverStyles}
       focusStyle={hoverStyles}
       w="100%"
+      {...linkProps}
     >
       {children}
-    </LinkableButton>
+    </Button>
   )
 }
 

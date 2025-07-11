@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Button, FadeCard, Paragraph, SubmitButton, XStack, YStack } from '@my/ui'
+import { FadeCard, Paragraph, SubmitButton, XStack, YStack } from '@my/ui'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { formFields, SchemaForm } from 'app/utils/SchemaForm'
@@ -55,18 +55,8 @@ export function DepositCoinbaseForm({ onConfirmTransaction, isLoading }: Deposit
 
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (
-      <SubmitButton
-        testID="onramp-button"
-        theme="green"
-        onPress={submit}
-        py={'$5'}
-        br={'$4'}
-        disabledStyle={{ opacity: 0.5 }}
-        disabled={!canSubmit}
-      >
-        <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
-          {isLoading ? 'processing...' : 'confirm deposit'}
-        </Button.Text>
+      <SubmitButton testID="onramp-button" onPress={submit} disabled={!canSubmit}>
+        <SubmitButton.Text>{isLoading ? 'processing...' : 'confirm deposit'}</SubmitButton.Text>
       </SubmitButton>
     ),
     [canSubmit, isLoading]
@@ -135,7 +125,7 @@ export function DepositCoinbaseForm({ onConfirmTransaction, isLoading }: Deposit
             },
           }}
           formProps={{
-            footerProps: { pb: 0 },
+            footerProps: { p: 0 },
             $gtSm: {
               maxWidth: '100%',
             },
@@ -179,13 +169,14 @@ export function DepositCoinbaseForm({ onConfirmTransaction, isLoading }: Deposit
                       })(),
                     }}
                     fontWeight={500}
+                    lineHeight={40}
                     color={formDepositAmount ? '$color12' : '$darkGrayTextField'}
                   >
                     $
                   </Paragraph>
                   {depositAmount}
                 </XStack>
-                <Paragraph fontSize="$8" fontWeight={500}>
+                <Paragraph fontSize="$8" lineHeight={40} fontWeight={500}>
                   USD
                 </Paragraph>
                 <XStack

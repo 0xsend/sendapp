@@ -1,5 +1,7 @@
 import { useFormState } from 'react-hook-form'
-import { AnimatePresence, Button, type ButtonProps, ButtonText, Spinner, Unspaced } from 'tamagui'
+import { AnimatePresence, type ButtonProps, Spinner, Unspaced, type SpinnerProps } from 'tamagui'
+import { withStaticProperties } from '@tamagui/helpers'
+import { PrimaryButton, PrimaryButtonText } from '../components/PrimaryButton'
 
 // hack to prevent it from breaking on the server
 const useIsSubmitting = () => {
@@ -13,11 +15,17 @@ const useIsSubmitting = () => {
  * created to be used in forms
  * will show loading spinners and disable submission when already submitting
  */
-export const SubmitButton = ({ children, theme = 'green', ...props }: ButtonProps) => {
+const _SubmitButton = ({
+  children,
+  theme = 'green',
+  disabled,
+  spinnerProps,
+  ...props
+}: ButtonProps & { spinnerProps?: SpinnerProps }) => {
   const isSubmitting = useIsSubmitting()
 
   return (
-    <Button
+    <PrimaryButton
       testID={'SubmitButton'}
       tabIndex={0}
       aria-busy={isSubmitting}
@@ -40,16 +48,21 @@ export const SubmitButton = ({ children, theme = 'green', ...props }: ButtonProp
                   opacity: 0,
                   y: 4,
                 }}
+                {...spinnerProps}
               />
             ) : null}
           </AnimatePresence>
         </Unspaced>
       }
-      disabled={isSubmitting}
+      disabled={disabled || isSubmitting}
       theme={theme}
       {...props}
     >
-      {!isSubmitting ? <ButtonText>{children}</ButtonText> : <></>}
-    </Button>
+      {!isSubmitting ? children : <></>}
+    </PrimaryButton>
   )
 }
+
+export const SubmitButton = withStaticProperties(_SubmitButton, {
+  Text: PrimaryButtonText,
+})

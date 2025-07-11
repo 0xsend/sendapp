@@ -1,4 +1,4 @@
-import { Button, FadeCard, Paragraph, Spinner, XStack, YStack } from '@my/ui'
+import { Button, FadeCard, Paragraph, PrimaryButton, Spinner, XStack, YStack } from '@my/ui'
 import { ArrowDown } from '@tamagui/lucide-icons'
 import type { KyberRouteSummary } from '@my/api/src/routers/swap/types'
 import formatAmount, { localizeAmount } from 'app/utils/formatAmount'
@@ -19,6 +19,7 @@ import { baseMainnet } from '@my/wagmi'
 import { useLiquidityPools } from 'app/utils/useLiquidityPools'
 import { useSwapRouters } from 'app/utils/useSwapRouters'
 import { toNiceError } from 'app/utils/toNiceError'
+import { Platform } from 'react-native'
 
 export const SwapSummaryScreen = () => {
   const router = useRouter()
@@ -157,6 +158,7 @@ export const SwapSummaryScreen = () => {
 
   return (
     <YStack
+      f={Platform.OS === 'web' ? undefined : 1}
       w={'100%'}
       gap="$5"
       jc={'space-between'}
@@ -233,15 +235,18 @@ export const SwapSummaryScreen = () => {
               </Paragraph>
             </FadeCard>
             <YStack
-              bc={'$color0'}
               position={'absolute'}
-              top={'50%'}
-              left={'50%'}
-              borderRadius={9999}
-              transform={'translate(-50%, -50%)'}
-              p={'$3.5'}
+              top={0}
+              left={0}
+              right={0}
+              bottom={0}
+              justifyContent="center"
+              alignItems="center"
+              pointerEvents="none" // Prevent blocking interactions
             >
-              <ArrowDown size={'$1'} />
+              <YStack bc={'$color0'} borderRadius={9999} p={'$3.5'}>
+                <ArrowDown size={'$1'} />
+              </YStack>
             </YStack>
           </YStack>
           <FadeCard>
@@ -290,7 +295,7 @@ export const SwapSummaryScreen = () => {
           })()}
         </Paragraph>
       </YStack>
-      <Button
+      <PrimaryButton
         theme={
           (!hasEnoughGas || !hasEnoughBalance) &&
           !isEncodeRouteLoading &&
@@ -301,9 +306,6 @@ export const SwapSummaryScreen = () => {
             : 'green'
         }
         onPress={submit}
-        py={'$5'}
-        br={'$4'}
-        disabledStyle={{ opacity: 0.5 }}
         disabled={!canSubmit}
       >
         {(() => {
@@ -313,49 +315,23 @@ export const SwapSummaryScreen = () => {
               !isLoadingUserOp &&
               !encodeRouteError &&
               !userOpError:
-              return (
-                <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'}>
-                  insufficient balance
-                </Button.Text>
-              )
+              return <PrimaryButton.Text>insufficient balance</PrimaryButton.Text>
             case !hasEnoughGas && !encodeRouteError && !userOpError:
-              return (
-                <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'}>
-                  insufficient gas
-                </Button.Text>
-              )
+              return <PrimaryButton.Text>insufficient gas</PrimaryButton.Text>
             case isSendUserOpPending:
               return (
                 <>
-                  <Button.Icon>
+                  <PrimaryButton.Icon>
                     <Spinner size="small" color="$color12" mr={'$2'} />
-                  </Button.Icon>
-                  <Button.Text
-                    ff={'$mono'}
-                    fontWeight={'500'}
-                    tt="uppercase"
-                    size={'$5'}
-                    color={'$black'}
-                  >
-                    trading...
-                  </Button.Text>
+                  </PrimaryButton.Icon>
+                  <PrimaryButton.Text>trading...</PrimaryButton.Text>
                 </>
               )
             default:
-              return (
-                <Button.Text
-                  ff={'$mono'}
-                  fontWeight={'500'}
-                  tt="uppercase"
-                  size={'$5'}
-                  color={'$black'}
-                >
-                  confirm trade
-                </Button.Text>
-              )
+              return <PrimaryButton.Text>confirm trade</PrimaryButton.Text>
           }
         })()}
-      </Button>
+      </PrimaryButton>
     </YStack>
   )
 }

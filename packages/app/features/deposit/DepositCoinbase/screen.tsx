@@ -1,7 +1,7 @@
 import { useSendAccount } from 'app/utils/send-accounts'
 import useCoinbaseOnramp from 'app/utils/useCoinbaseOnramp'
 import { toNiceError } from 'app/utils/toNiceError'
-import { Button, FadeCard, Paragraph, Spinner, YStack } from '@my/ui'
+import { Button, FadeCard, Paragraph, PrimaryButton, Spinner, YStack } from '@my/ui'
 import { IconError } from 'app/components/icons'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { CoinbaseOnrampVerifyScreen } from '../components/CoinbaseOnrampVerifyScreen'
@@ -65,17 +65,9 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
                 {toNiceError(error)}
               </Paragraph>
             </YStack>
-            <Button theme="green" py={'$5'} br={'$4'} mt={'$4'} onPress={closeOnramp} w={'100%'}>
-              <Button.Text
-                ff={'$mono'}
-                fontWeight={'500'}
-                tt="uppercase"
-                size={'$5'}
-                color={'$black'}
-              >
-                try again
-              </Button.Text>
-            </Button>
+            <PrimaryButton onPress={closeOnramp}>
+              <PrimaryButton.Text>try again</PrimaryButton.Text>
+            </PrimaryButton>
           </FadeCard>
         )
       case coinbaseStatus === 'success':
@@ -162,17 +154,9 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
                 Your payment took too long to process. Please try again.
               </Paragraph>
             </YStack>
-            <Button theme="green" py={'$5'} br={'$4'} mt={'$4'} onPress={closeOnramp} w={'100%'}>
-              <Button.Text
-                ff={'$mono'}
-                fontWeight={'500'}
-                tt="uppercase"
-                size={'$5'}
-                color={'$black'}
-              >
-                try again
-              </Button.Text>
-            </Button>
+            <PrimaryButton onPress={closeOnramp}>
+              <PrimaryButton.Text>try again</PrimaryButton.Text>
+            </PrimaryButton>
           </FadeCard>
         )
       case coinbaseStatus === 'failed':
@@ -192,17 +176,9 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
                 Please check your connection or try a different card.
               </Paragraph>
             </YStack>
-            <Button theme="green" py={'$5'} br={'$4'} mt={'$4'} onPress={closeOnramp} w={'100%'}>
-              <Button.Text
-                ff={'$mono'}
-                fontWeight={'500'}
-                tt="uppercase"
-                size={'$5'}
-                color={'$black'}
-              >
-                try again
-              </Button.Text>
-            </Button>
+            <PrimaryButton onPress={closeOnramp}>
+              <PrimaryButton.Text>try again</PrimaryButton.Text>
+            </PrimaryButton>
           </FadeCard>
         )
       default:

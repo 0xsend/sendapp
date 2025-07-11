@@ -21,7 +21,6 @@ import {
   YStack,
 } from '@my/ui'
 import { ExternalLink } from '@tamagui/lucide-icons'
-import { useThemeSetting } from '@tamagui/next-theme'
 import { SearchSchema, useTagSearch } from 'app/provider/tag-search'
 import { useRootScreenParams } from 'app/routers/params'
 import { SchemaForm } from 'app/utils/SchemaForm'
@@ -38,6 +37,7 @@ import { IconAccount, IconArrowRight, IconSearch, IconX } from './icons'
 import { baseMainnet } from '@my/wagmi'
 import { useEnsName } from 'wagmi'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { useThemeName } from 'tamagui'
 
 type SearchResultsType = Functions<'tag_search'>[number]
 type SearchResultsKeysType = keyof SearchResultsType
@@ -207,14 +207,16 @@ function SearchFilterButton({
   active: boolean
   onPress: () => void
 }) {
+  const theme = useThemeName()
+  const isDark = theme?.startsWith('dark')
+
   return (
     <Button
       chromeless
       unstyled
       onPress={onPress}
-      borderBottomColor={'$primary'}
+      borderBottomColor={isDark ? '$primary' : '$color12'}
       borderBottomWidth={active ? 1 : 0}
-      $theme-light={{ borderBottomColor: '$color12' }}
     >
       <ButtonText
         color={active ? '$color12' : '$silverChalice'}
@@ -425,6 +427,8 @@ function SearchResultRow({
 
   if (!query) return null
 
+  const label = profile.tag_name || profile.send_id || '??'
+
   return (
     <Stack
       br="$5"
@@ -438,14 +442,11 @@ function SearchResultRow({
           <XStack testID={`tag-search-${profile.send_id}`} ai="center" gap="$4">
             <Avatar size="$4.5" br="$3">
               <Avatar.Image testID="avatar" src={profile.avatar_url ?? undefined} />
-              <Avatar.Fallback>
+              <Avatar.Fallback jc="center" bc="$olive">
                 <Avatar size="$4.5" br="$3">
                   <Avatar.Image
-                    src={`https://ui-avatars.com/api.jpg?name=${profile.tag_name}&size=256`}
+                    src={`https://ui-avatars.com/api/?name=${label}&size=256&format=png&background=86ad7f`}
                   />
-                  <Avatar.Fallback>
-                    <Paragraph>??</Paragraph>
-                  </Avatar.Fallback>
                 </Avatar>
               </Avatar.Fallback>
             </Avatar>
@@ -498,8 +499,8 @@ function Search({ label, placeholder = 'Search', autoFocus = false }: SearchProp
   const [queryParams, setRootParams] = useRootScreenParams()
   const { search: query } = queryParams
 
-  const { resolvedTheme } = useThemeSetting()
-  const borderColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$color12'
+  const theme = useThemeName()
+  const borderColor = theme?.startsWith('dark') ? '$primary' : '$color12'
 
   useEffect(() => {
     const subscription = form.watch(({ query }) => {
@@ -572,6 +573,7 @@ function Search({ label, placeholder = 'Search', autoFocus = false }: SearchProp
                 fontSize: 17,
                 iconBefore: (
                   <IconSearch
+                    ml={'$3'}
                     color={'$silverChalice'}
                     $theme-light={{ color: '$darkGrayTextField' }}
                   />
@@ -581,6 +583,7 @@ function Search({ label, placeholder = 'Search', autoFocus = false }: SearchProp
                     chromeless
                     unstyled
                     cursor={'pointer'}
+                    mr={'$3'}
                     icon={
                       <IconX
                         color={'$silverChalice'}

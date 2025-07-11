@@ -1,5 +1,5 @@
 import type { Tables } from '@my/supabase/database-generated.types'
-import { Button, FadeCard, H1, Paragraph, Shake, Spinner, SubmitButton, YStack } from '@my/ui'
+import { FadeCard, H1, Paragraph, Shake, Spinner, SubmitButton, YStack } from '@my/ui'
 import {
   baseMainnetClient,
   useReadSendAccountGetActiveSigningKeys,
@@ -144,16 +144,8 @@ const CreatePasskeyForm = ({
         {isLoading ? (
           <Spinner size="small" color={'$color'} />
         ) : (
-          <SubmitButton onPress={submit} theme="green" borderRadius={'$4'} p={'$4'} mt={'$1.5'}>
-            <Button.Text
-              ff={'$mono'}
-              fontWeight={'600'}
-              tt="uppercase"
-              size={'$5'}
-              color={'$black'}
-            >
-              Add a Passkey
-            </Button.Text>
+          <SubmitButton onPress={submit}>
+            <SubmitButton.Text>Add a Passkey</SubmitButton.Text>
           </SubmitButton>
         )}
       </>
@@ -167,6 +159,9 @@ const CreatePasskeyForm = ({
         <SchemaForm
           form={form}
           formProps={{
+            footerProps: {
+              p: 0,
+            },
             $gtLg: {
               maxWidth: '100%',
               als: 'flex-start',

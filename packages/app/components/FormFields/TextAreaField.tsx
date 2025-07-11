@@ -47,58 +47,68 @@ export const TextAreaField = (
           </Label>
         )}
         <Shake shakeKey={error?.errorMessage}>
-          {props.iconBefore && (
-            <Stack
-              pos={'absolute'}
-              top="50%"
-              p={'$3'}
-              left={2}
-              transform={'translateY(-50%)'}
-              zIndex={1}
-            >
-              {props.iconBefore}
-            </Stack>
-          )}
-          <TextArea
-            disabled={disabled}
-            borderWidth={0}
-            borderRadius={'$4'}
-            $theme-dark={{
-              // placeholderTextColor fails in test env for some reason
-              ...(process.env.NODE_ENV !== 'test' ? { placeholderTextColor: '$gray10Dark' } : {}),
-            }}
-            $theme-light={{
-              // placeholderTextColor fails in test env for some reason
-              ...(process.env.NODE_ENV !== 'test' ? { placeholderTextColor: '$gray10Light' } : {}),
-            }}
-            // @todo use the theme colors if we ever have the palette scales
-            // bc={'$color2'}
-            // color={'$color12'}
-            // placeholderTextColor={'$color10'}
-            value={field.value}
-            onChangeText={(text) => field.onChange(text)}
-            onBlur={field.onBlur}
-            ref={field.ref}
-            placeholder={placeholder}
-            id={id}
-            focusStyle={{
-              fontStyle: 'italic',
-              borderColor: '$color12',
-            }}
-            {...props}
-          />
-          {props.iconAfter && (
-            <Stack
-              pos={'absolute'}
-              top="50%"
-              p={'$5'}
-              right={2}
-              transform={'translateY(-50%)'}
-              zIndex={1}
-            >
-              {props.iconAfter}
-            </Stack>
-          )}
+          <Stack pos="relative">
+            {props.iconBefore && (
+              <Stack
+                pos={'absolute'}
+                top={0}
+                bottom={0}
+                left={0}
+                right={0}
+                justifyContent="center"
+                zIndex={1}
+                pointerEvents="box-none"
+              >
+                {props.iconBefore}
+              </Stack>
+            )}
+            <TextArea
+              disabled={disabled}
+              width={'100%'}
+              borderWidth={0}
+              borderRadius={'$4'}
+              $theme-dark={{
+                // placeholderTextColor fails in test env for some reason
+                ...(process.env.NODE_ENV !== 'test' ? { placeholderTextColor: '$gray10Dark' } : {}),
+              }}
+              $theme-light={{
+                // placeholderTextColor fails in test env for some reason
+                ...(process.env.NODE_ENV !== 'test'
+                  ? { placeholderTextColor: '$gray10Light' }
+                  : {}),
+              }}
+              // @todo use the theme colors if we ever have the palette scales
+              // bc={'$color2'}
+              // color={'$color12'}
+              // placeholderTextColor={'$color10'}
+              value={field.value}
+              onChangeText={(text) => field.onChange(text)}
+              onBlur={field.onBlur}
+              ref={field.ref}
+              placeholder={placeholder}
+              id={id}
+              focusStyle={{
+                fontStyle: 'italic',
+                borderColor: '$color12',
+              }}
+              {...props}
+            />
+            {props.iconAfter && (
+              <Stack
+                pos={'absolute'}
+                top={0}
+                bottom={0}
+                left={0}
+                right={0}
+                justifyContent="center"
+                alignItems={'flex-end'}
+                zIndex={1}
+                pointerEvents="box-none" // Prevent blocking interactions
+              >
+                {props.iconAfter}
+              </Stack>
+            )}
+          </Stack>
         </Shake>
         <FieldError message={error?.errorMessage} />
       </Fieldset>

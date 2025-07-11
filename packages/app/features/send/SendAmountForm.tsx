@@ -29,7 +29,6 @@ import { ProfileHeader } from 'app/features/profile/components/ProfileHeader'
 import { ProfilesDetailsModal } from 'app/features/profile/components/ProfileDetailsModal'
 import { IconX } from 'app/components/icons'
 import { MAX_NOTE_LENGTH } from 'app/components/FormFields/NoteField'
-import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { Platform } from 'react-native'
 
 const SendAmountSchema = z.object({
@@ -51,8 +50,6 @@ export function SendAmountForm() {
   const [isAmountInputFocused, setIsAmountInputFocused] = useState<boolean>(false)
   const [isNoteInputFocused, setIsNoteInputFocused] = useState<boolean>(false)
   const noteFieldRef = useRef<TamaguiElement>(null)
-
-  const hoverStyles = useHoverStyles()
 
   const noteValidationError = form.formState.errors.note
 
@@ -138,26 +135,17 @@ export function SendAmountForm() {
 
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (
-      <SubmitButton
-        elevation={canSubmit ? '$0.75' : undefined}
-        theme="green"
-        onPress={submit}
-        py={'$5'}
-        br={'$4'}
-        disabledStyle={{ opacity: 0.5 }}
-        disabled={!canSubmit}
-        hoverStyle={hoverStyles}
-      >
-        <Button.Text fontWeight={'600'}>CONTINUE</Button.Text>
+      <SubmitButton onPress={submit} disabled={!canSubmit}>
+        <SubmitButton.Text>CONTINUE</SubmitButton.Text>
       </SubmitButton>
     ),
-    [canSubmit, hoverStyles]
+    [canSubmit]
   )
 
   const noteBorderActiveColor = form.formState.errors.note ? '$error' : 'transparent'
 
   return (
-    <XStack w={'100%'} gap={'$4'}>
+    <XStack w={'100%'} gap={'$4'} f={Platform.OS === 'web' ? undefined : 1}>
       <YStack
         f={1}
         gap={'$5'}
@@ -179,15 +167,13 @@ export function SendAmountForm() {
               amount: {
                 fontSize: (() => {
                   switch (true) {
-                    case formAmount?.length <= 8:
-                      return '$11'
-                    case formAmount?.length > 16:
-                      return '$7'
+                    case formAmount?.length > 12:
+                      return '$6'
                     default:
                       return '$8'
                   }
                 })(),
-                $gtSm: {
+                $gtLg: {
                   fontSize: (() => {
                     switch (true) {
                       case formAmount?.length <= 9:
@@ -260,6 +246,7 @@ export function SendAmountForm() {
                     unstyled
                     chromeless
                     cursor={'pointer'}
+                    mr={'$3'}
                     icon={
                       <IconX
                         color={'$primary'}
@@ -276,7 +263,7 @@ export function SendAmountForm() {
             }}
             formProps={{
               testID: 'SendForm',
-              footerProps: { pb: 0 },
+              footerProps: { p: 0 },
               justifyContent: 'space-between',
               $gtSm: {
                 maxWidth: '100%',
@@ -374,8 +361,7 @@ export function SendAmountForm() {
                     >
                       {noteValidationError
                         ? noteValidationError.message
-                        : `Max: ${MAX_NOTE_LENGTH}
-                      characters`}
+                        : `Max: ${MAX_NOTE_LENGTH} characters`}
                     </Paragraph>
                   )}
                 </YStack>

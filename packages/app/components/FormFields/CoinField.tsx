@@ -27,6 +27,7 @@ import { IconCoin } from '../icons/IconCoin'
 import type { CoinWithBalance } from 'app/data/coins'
 import { useCoins } from 'app/provider/coins'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { Platform } from 'react-native'
 
 export const CoinField = ({
   native = false,
@@ -116,26 +117,28 @@ export const CoinField = ({
                 animation={'quick'}
               >
                 <Sheet.Frame maw={738} bc={'$color1'}>
-                  <Sheet.Handle
-                    py="$5"
-                    f={1}
-                    bc="transparent"
-                    jc={'space-between'}
-                    opacity={1}
-                    m={0}
-                  >
-                    <XStack ai="center" jc="space-between" w="100%" px="$4">
-                      <Paragraph fontSize={'$5'} fontWeight={'700'} color={'$color12'}>
-                        Select Currency
-                      </Paragraph>
-                      <Button
-                        chromeless
-                        unstyled
-                        icon={<IconX color={'$color12'} size={'$1.5'} />}
-                        onPress={() => setIsOpen(false)}
-                      />
-                    </XStack>
-                  </Sheet.Handle>
+                  {Platform.OS === 'web' && (
+                    <Sheet.Handle
+                      py="$5"
+                      f={1}
+                      bc="transparent"
+                      jc={'space-between'}
+                      opacity={1}
+                      m={0}
+                    >
+                      <XStack ai="center" jc="space-between" w="100%" px="$4">
+                        <Paragraph fontSize={'$5'} fontWeight={'700'} color={'$color12'}>
+                          Select Currency
+                        </Paragraph>
+                        <Button
+                          chromeless
+                          unstyled
+                          icon={<IconX color={'$color12'} size={'$1.5'} />}
+                          onPress={() => setIsOpen(false)}
+                        />
+                      </XStack>
+                    </Sheet.Handle>
+                  )}
                   <Sheet.ScrollView>
                     <Adapt.Contents />
                   </Sheet.ScrollView>

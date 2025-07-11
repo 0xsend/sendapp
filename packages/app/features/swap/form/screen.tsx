@@ -29,6 +29,7 @@ import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
 import { type BRAND, z } from 'zod'
 import { convertAmountToUSD } from 'app/utils/convertAmountToUSD'
+import { Platform } from 'react-native'
 
 const SwapFormSchema = z.object({
   outToken: formFields.coin,
@@ -90,17 +91,8 @@ export const SwapFormScreen = () => {
 
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (
-      <SubmitButton
-        theme="green"
-        onPress={submit}
-        py={'$5'}
-        br={'$4'}
-        disabledStyle={{ opacity: 0.5 }}
-        disabled={!canSubmit}
-      >
-        <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
-          review
-        </Button.Text>
+      <SubmitButton onPress={submit} disabled={!canSubmit}>
+        <SubmitButton.Text>review</SubmitButton.Text>
       </SubmitButton>
     ),
     [canSubmit]
@@ -202,6 +194,7 @@ export const SwapFormScreen = () => {
 
   return (
     <YStack
+      f={Platform.OS === 'web' ? undefined : 1}
       w={'100%'}
       gap="$5"
       jc={'space-between'}
@@ -344,7 +337,7 @@ export const SwapFormScreen = () => {
             },
           }}
           formProps={{
-            footerProps: { pb: 0 },
+            footerProps: { p: 0 },
             $gtSm: {
               maxWidth: '100%',
             },
@@ -588,28 +581,35 @@ export const SwapFormScreen = () => {
                       </XStack>
                     </FadeCard>
                     <YStack
-                      bc={'$color0'}
                       position={'absolute'}
-                      top={'50%'}
-                      left={'50%'}
-                      borderRadius={9999}
-                      transform={'translate(-50%, -50%)'}
+                      top={0}
+                      left={0}
+                      right={0}
+                      bottom={0}
+                      justifyContent="center"
+                      alignItems="center"
+                      pointerEvents="none" // Prevent blocking interactions
                     >
-                      <Button
-                        // @ts-expect-error tamagui is tripping here
-                        type={'button'}
-                        testID={'flipTokensButton'}
+                      <YStack
                         bc={'$color0'}
-                        circular={true}
-                        size={'$5'}
-                        borderWidth={0}
-                        hoverStyle={hoverStyles}
-                        onPress={handleFlipTokens}
+                        borderRadius={9999}
+                        pointerEvents="auto" // Re-enable interactions for the button
                       >
-                        <Button.Icon>
-                          <IconSwap size={'$1'} />
-                        </Button.Icon>
-                      </Button>
+                        <Button
+                          type={'button'}
+                          testID={'flipTokensButton'}
+                          bc={'$color0'}
+                          circular={true}
+                          size={'$5'}
+                          borderWidth={0}
+                          hoverStyle={hoverStyles}
+                          onPress={handleFlipTokens}
+                        >
+                          <Button.Icon>
+                            <IconSwap size={'$1'} />
+                          </Button.Icon>
+                        </Button>
+                      </YStack>
                     </YStack>
                   </YStack>
                 </YStack>
@@ -772,7 +772,7 @@ export const Slippage = ({
               top="50%"
               p={'$3'}
               right={2}
-              transform={'translateY(-50%)'}
+              transform={'translateY(-22px)'}
               zIndex={1}
             >
               <Paragraph>%</Paragraph>
