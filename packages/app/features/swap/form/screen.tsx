@@ -592,6 +592,7 @@ export const SwapFormScreen = () => {
                     >
                       <YStack bc={'$color0'} borderRadius={9999}>
                         <Button
+                          // @ts-expect-error tamagui is tripping here
                           type={'button'}
                           testID={'flipTokensButton'}
                           bc={'$color0'}
@@ -768,7 +769,7 @@ export const Slippage = ({
               top="50%"
               p={'$3'}
               right={2}
-              transform={'translateY(-22px)'}
+              transform={'translate(0, -22px)'}
               zIndex={1}
             >
               <Paragraph>%</Paragraph>
