@@ -588,10 +588,13 @@ export const SwapFormScreen = () => {
                       bottom={0}
                       justifyContent="center"
                       alignItems="center"
-                      pointerEvents="box-none" // Prevent blocking interactions
+                      style={{
+                        pointerEvents: 'box-none',
+                      }}
                     >
                       <YStack bc={'$color0'} borderRadius={9999}>
                         <Button
+                          // @ts-expect-error tamagui is tripping here
                           type={'button'}
                           testID={'flipTokensButton'}
                           bc={'$color0'}
