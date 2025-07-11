@@ -581,12 +581,14 @@ export const SwapFormScreen = () => {
                       </XStack>
                     </FadeCard>
                     <YStack
-                      bc={'$color0'}
                       position={'absolute'}
-                      top={'50%'}
-                      left={'50%'}
-                      borderRadius={9999}
-                      transform={'translate(-50%, -50%)'}
+                      top={0}
+                      left={0}
+                      right={0}
+                      bottom={0}
+                      justifyContent="center"
+                      alignItems="center"
+                      pointerEvents="box-none" // Prevent blocking interactions
                     >
                       <Button
                         // @ts-expect-error tamagui is tripping here
