@@ -588,7 +588,6 @@ export const SwapFormScreen = () => {
                       bottom={0}
                       justifyContent={'center'}
                       alignItems={'center'}
-                      pointerEvents={'box-none'}
                     >
                       <Button
                         // @ts-expect-error tamagui is tripping here
