@@ -34,6 +34,10 @@ export const brandColors = {
   aztec: '#111f22',
   lunarGreen: '#3E4A3C',
   mineShaft: '#343434',
+  discordPurple: '#5663F7',
+  telegramBlue: '#239AD6',
+  youtubeRed: '#FF0000',
+  spotifyGreen: '#1ED760',
 } as const
 
 export const greenPalette = {
