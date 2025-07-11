@@ -18,12 +18,14 @@ export const ExploreScreen = ({ images }: { images: Record<string, string> }) =>
         title={'Get Rewarded'}
         subtitle={'Earn SEND while engaging, referring, and growing the network'}
       />
-      <LinkBanner
-        href={'/sendpot'}
-        imgUrl={images.sendpot || ''}
-        title={'SENDPOT'}
-        subtitle={'Challenge your luck, win big prizes'}
-      />
+      {Platform.OS === 'web' && (
+        <LinkBanner
+          href={'/sendpot'}
+          imgUrl={images.sendpot || ''}
+          title={'SENDPOT'}
+          subtitle={'Challenge your luck, win big prizes'}
+        />
+      )}
       <LinkBanner href={'/feed'} imgUrl={images.feed || ''} title={'Community Feed'} />
     </YStack>
   )
