@@ -337,7 +337,7 @@ export const SwapFormScreen = () => {
             },
           }}
           formProps={{
-            footerProps: { pb: 0 },
+            footerProps: { p: 0 },
             $gtSm: {
               maxWidth: '100%',
             },
