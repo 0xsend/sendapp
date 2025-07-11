@@ -589,21 +589,23 @@ export const SwapFormScreen = () => {
                       justifyContent={'center'}
                       alignItems={'center'}
                     >
-                      <Button
-                        // @ts-expect-error tamagui is tripping here
-                        type={'button'}
-                        testID={'flipTokensButton'}
-                        bc={'$color0'}
-                        circular={true}
-                        size={'$5'}
-                        borderWidth={0}
-                        hoverStyle={hoverStyles}
-                        onPress={handleFlipTokens}
-                      >
-                        <Button.Icon>
-                          <IconSwap size={'$1'} />
-                        </Button.Icon>
-                      </Button>
+                      <YStack bc={'$color0'} borderRadius={9999}>
+                        <Button
+                          // @ts-expect-error tamagui is tripping here
+                          type={'button'}
+                          testID={'flipTokensButton'}
+                          bc={'$color0'}
+                          circular={true}
+                          size={'$5'}
+                          borderWidth={0}
+                          hoverStyle={hoverStyles}
+                          onPress={handleFlipTokens}
+                        >
+                          <Button.Icon>
+                            <IconSwap size={'$1'} />
+                          </Button.Icon>
+                        </Button>
+                      </YStack>
                     </YStack>
                   </YStack>
                 </YStack>
@@ -766,7 +768,7 @@ export const Slippage = ({
               top="50%"
               p={'$3'}
               right={2}
-              transform={'translateY(-50%)'}
+              transform={'translateY(-22px)'}
               zIndex={1}
             >
               <Paragraph>%</Paragraph>
