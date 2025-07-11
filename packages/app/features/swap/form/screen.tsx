@@ -588,13 +588,9 @@ export const SwapFormScreen = () => {
                       bottom={0}
                       justifyContent="center"
                       alignItems="center"
-                      pointerEvents="none" // Prevent blocking interactions
+                      pointerEvents="box-none" // Prevent blocking interactions
                     >
-                      <YStack
-                        bc={'$color0'}
-                        borderRadius={9999}
-                        pointerEvents="auto" // Re-enable interactions for the button
-                      >
+                      <YStack bc={'$color0'} borderRadius={9999}>
                         <Button
                           type={'button'}
                           testID={'flipTokensButton'}

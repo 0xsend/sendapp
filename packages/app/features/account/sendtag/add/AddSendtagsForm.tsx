@@ -84,7 +84,7 @@ export const AddSendtagsForm = () => {
           borderColor={isDarkTheme ? '$primary' : '$color12'}
           height={40}
           borderWidth={1}
-          spinnerProps={{ theme: '$dark' }}
+          spinnerProps={{ theme: 'dark' }}
           icon={<IconPlus size={'$1'} color={'$primary'} $theme-light={{ color: '$color12' }} />}
         >
           <SubmitButton.Text color={'$white'} $theme-light={{ color: '$color12' }}>
@@ -193,7 +193,6 @@ export const AddSendtagsForm = () => {
                             isDarkTheme ? 'rgba(255,255,255, 0.1)' : 'rgba(0,0,0, 0.1)'
                           }
                           borderRadius={'$3'}
-                          width={'fit-content'}
                           maxWidth={'80%'}
                           testID={`pending-tag-${tag.name}`}
                         >
