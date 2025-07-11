@@ -586,8 +586,11 @@ export const SwapFormScreen = () => {
                       left={0}
                       right={0}
                       bottom={0}
-                      justifyContent={'center'}
-                      alignItems={'center'}
+                      justifyContent="center"
+                      alignItems="center"
+                      style={{
+                        pointerEvents: 'box-none',
+                      }}
                     >
                       <YStack bc={'$color0'} borderRadius={9999}>
                         <Button
