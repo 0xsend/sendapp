@@ -320,7 +320,7 @@ export function SendConfirm() {
                   case !!profile?.sendid:
                     return `#${profile?.sendid}`
                   default:
-                    return '??'
+                    return ''
                 }
               })()}
             </Paragraph>
