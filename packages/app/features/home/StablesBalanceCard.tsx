@@ -117,6 +117,7 @@ const StablesBalanceCardFooter = () => {
           ai="center"
           f={1}
           w="100%"
+          overflow={'hidden'}
           borderRadius="$4"
           hoverStyle={hoverStyles}
           bc={isDarkTheme ? 'rgba(255, 255, 255, 0.10)' : 'rgba(0, 0, 0, 0.10)'}
@@ -134,6 +135,7 @@ const StablesBalanceCardFooter = () => {
             href={`/send?sendToken=${queryParams.token ?? usdcAddress[baseMainnet.id]}`}
             jc="center"
             ai="center"
+            overflow={'hidden'}
             f={1}
             w="100%"
             borderRadius="$4"
