@@ -13,6 +13,8 @@ import { ChevronDown, ChevronUp, Dot } from '@tamagui/lucide-icons'
 import { memo, useRef, useState } from 'react'
 import type { UseDistributionsResultData } from 'app/utils/distributions'
 import { IconX } from 'app/components/icons'
+import { Platform } from 'react-native'
+import { useThemeName } from 'tamagui'
 
 const DistributionItem = ({
   isActive,
@@ -57,6 +59,8 @@ export const DistributionSelect = memo(
   ({ distributions, selectedIndex, onValueChange }: DistributionSelectProps) => {
     const [isOpen, setIsOpen] = useState(false)
     const selectTriggerRef = useRef<HTMLSelectElement>(null)
+    const theme = useThemeName()
+    const isDark = theme?.startsWith('dark')
 
     const distributionDates = distributions.map(
       (d) =>
@@ -79,31 +83,13 @@ export const DistributionSelect = memo(
           br="$3"
           bw={'$1'}
           width={'$14'}
-          $theme-light={{
-            boc: isOpen ? '$color1' : '$black',
-            bc: isOpen ? '$color1' : 'transparent',
-          }}
-          $theme-dark={{
-            boc: isOpen ? '$color1' : '$primary',
-            bc: isOpen ? '$color1' : 'transparent',
-            hoverStyle: { bc: '$color1' },
-          }}
+          boc={isOpen ? '$color1' : isDark ? '$primary' : '$black'}
+          bc={isOpen ? '$color1' : 'transparent'}
           iconAfter={
             isOpen ? (
-              <ChevronUp
-                $theme-dark={{
-                  color: '$color12',
-                }}
-                color={'$color11'}
-              />
+              <ChevronUp color={isDark ? '$color12' : '$color11'} />
             ) : (
-              <ChevronDown
-                $theme-dark={{
-                  color: '$primary',
-                  hoverStyle: { color: '$color0' },
-                }}
-                color="$black"
-              />
+              <ChevronDown color={isDark ? '$primary' : '$black'} />
             )
           }
         >
@@ -125,19 +111,21 @@ export const DistributionSelect = memo(
             disableDrag
           >
             <Sheet.Frame maw={738} bc={'$color1'}>
-              <Sheet.Handle py="$5" f={1} bc="transparent" jc={'space-between'} opacity={1} m={0}>
-                <XStack ai="center" jc="space-between" w="100%" px="$4">
-                  <Paragraph fontSize={'$5'} fontWeight={'700'} color={'$color12'}>
-                    Select Month
-                  </Paragraph>
-                  <Button
-                    chromeless
-                    unstyled
-                    icon={<IconX color={'$color12'} size={'$1.5'} />}
-                    onPress={() => setIsOpen(false)}
-                  />
-                </XStack>
-              </Sheet.Handle>
+              {Platform.OS === 'web' && (
+                <Sheet.Handle py="$5" f={1} bc="transparent" jc={'space-between'} opacity={1} m={0}>
+                  <XStack ai="center" jc="space-between" w="100%" px="$4">
+                    <Paragraph fontSize={'$5'} fontWeight={'700'} color={'$color12'}>
+                      Select Month
+                    </Paragraph>
+                    <Button
+                      chromeless
+                      unstyled
+                      icon={<IconX color={'$color12'} size={'$1.5'} />}
+                      onPress={() => setIsOpen(false)}
+                    />
+                  </XStack>
+                </Sheet.Handle>
+              )}
               <Sheet.ScrollView>
                 <Adapt.Contents />
               </Sheet.ScrollView>
