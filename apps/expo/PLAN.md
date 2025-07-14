@@ -271,7 +271,7 @@ You can use the following methods to verify the app is functioning correctly:
 **History**:
 - rework flow of screens, cannot go back from profile details, history and receipt, use screen stacking ✅
 - cannot go back after pressing send button ✅
-- history scroll is broken, it behaves like standard screen, not like a chat
+- history scroll is broken, it behaves like standard screen, not like a chat ✅
 
 **Deposit**:
 - QR to deposit by crypto transfer is not working ✅

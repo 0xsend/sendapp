@@ -9,7 +9,7 @@ import { useProfileScreenParams, useRootScreenParams } from 'app/routers/params'
 import { IconArrowRight } from 'app/components/icons'
 import { SendButton } from './ProfileButtons'
 import { ProfileHeader } from 'app/features/profile/components/ProfileHeader'
-import { FlatList } from 'react-native'
+import { FlatList, Platform } from 'react-native'
 import { ProfilesDetailsModal } from 'app/features/profile/components/ProfileDetailsModal'
 import { ActivityDetails } from 'app/features/activity/ActivityDetails'
 import {
@@ -73,7 +73,6 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
         height={'100%'}
         gap={'$2'}
         display={profileParam || isOpen ? 'none' : 'flex'}
-        overflow={'hidden'}
         $gtLg={{
           display: 'flex',
           maxWidth: '50%',
@@ -98,7 +97,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
         {Boolean(otherUserProfile) && (
           <>
             <ProfileHeader profile={otherUserProfile} />
-            <Stack f={1} $gtLg={{ pb: '$3.5' }}>
+            <Stack f={1} mt={'$2'} $gtLg={{ pb: '$3.5' }}>
               {Boolean(!activities?.length) && (
                 <YStack f={1}>
                   <Paragraph
@@ -145,16 +144,24 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                   ) : null
                 }
                 ListHeaderComponent={
-                  <SendButton
-                    identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
-                    idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
-                  />
+                  Platform.OS === 'web' ? (
+                    <SendButton
+                      identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
+                      idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
+                    />
+                  ) : null
                 }
                 inverted={true}
                 showsVerticalScrollIndicator={false}
                 stickyHeaderIndices={[0]}
               />
             </Stack>
+            {Platform.OS !== 'web' && (
+              <SendButton
+                identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
+                idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
+              />
+            )}
           </>
         )}
       </YStack>
