@@ -9,58 +9,47 @@ import { SendtagSchema } from 'app/utils/zod/sendtag'
 import { assert } from 'app/utils/assert'
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { ProfileLayout } from 'app/features/profile/layout.web'
+import {
+  generateProfileOpenGraphData,
+  type ProfileOpenGraphData,
+} from 'utils/generateProfileOpenGraphData'
 
 interface PageProps {
-  profile?: {
-    name?: string
-    tag?: string
-    about?: string
-    avatar_url?: string
-  }
   sendid: number | null
   tag?: string
+  siteUrl: string
+  openGraphData?: ProfileOpenGraphData
 }
 
-export const Page: NextPageWithLayout<PageProps> = ({ profile, sendid, tag }) => {
-  // Generate OG image URL - prefer tag route since this is accessed via tag
-  const ogImageUrl = tag ? `/api/og/${tag}` : null
-
-  // Generate page title
-  const pageTitle = profile?.tag ? `send.app/${profile.tag}` : 'Send | Profile'
-
-  // Get site URL from environment
-  const siteUrl = process.env.NEXT_PUBLIC_URL
-  const defaultText = `Check out ${profile?.tag ? `/${profile.tag}` : sendid} on /send`
-
-  // Canonical URL should point to the tag route since that's how user accessed it
-  const canonicalUrl = `${siteUrl}/${tag}`
+export const Page: NextPageWithLayout<PageProps> = ({ sendid, tag, siteUrl, openGraphData }) => {
+  // Use OpenGraph data from getServerSideProps if available, otherwise fallback to defaults
+  const pageTitle = openGraphData?.title || 'Send | Profile'
+  const description = openGraphData?.description || `Check out ${tag ? `/${tag}` : sendid} on /send`
+  const canonicalUrl = openGraphData?.canonicalUrl || `${siteUrl}/${tag}`
+  const ogImageUrl = openGraphData?.imageUrl || null
 
   return (
     <>
       <Head>
         <title>{pageTitle}</title>
 
-        <meta name="description" content={profile?.about || defaultText} />
+        <meta name="description" content={description} />
         <meta key="og:type" property="og:type" content="profile" />
         <meta key="og:title" property="og:title" content={pageTitle} />
-        <meta
-          key="og:description"
-          property="og:description"
-          content={profile?.about || defaultText}
-        />
+        <meta key="og:description" property="og:description" content={description} />
         <meta key="og:url" property="og:url" content={canonicalUrl} />
-        <meta key="og:image" property="og:image" content={`${siteUrl}${ogImageUrl}`} />
-        <meta key="og:image:width" property="og:image:width" content="1200" />
-        <meta key="og:image:height" property="og:image:height" content="630" />
-        <meta key="og:image:type" property="og:image:type" content="image/jpeg" />
+        {ogImageUrl && (
+          <>
+            <meta key="og:image" property="og:image" content={ogImageUrl} />
+            <meta key="og:image:width" property="og:image:width" content="1200" />
+            <meta key="og:image:height" property="og:image:height" content="630" />
+            <meta key="og:image:type" property="og:image:type" content="image/jpeg" />
+          </>
+        )}
         <meta key="twitter:card" name="twitter:card" content="summary_large_image" />
         <meta key="twitter:title" name="twitter:title" content={pageTitle} />
-        <meta
-          key="twitter:description"
-          name="twitter:description"
-          content={profile?.about || defaultText}
-        />
-        <meta key="twitter:image" name="twitter:image" content={`${siteUrl}${ogImageUrl}`} />
+        <meta key="twitter:description" name="twitter:description" content={description} />
+        {ogImageUrl && <meta key="twitter:image" name="twitter:image" content={ogImageUrl} />}
         <meta name="twitter:site" content={tag} />
         <link rel="canonical" href={canonicalUrl} />
       </Head>
@@ -88,6 +77,11 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
 
   assert(!!tag, 'tag is required')
   assert(typeof tag === 'string', 'Identifier tag must be a string')
+
+  // Get site URL from request headers
+  const protocol = ctx.req.headers['x-forwarded-proto'] || 'http'
+  const host = ctx.req.headers['x-forwarded-host'] || ctx.req.headers.host
+  const siteUrl = `${protocol}://${host}`
 
   const supabase = createPagesServerClient<Database>(ctx)
   const {
@@ -122,18 +116,21 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
     }
   }
 
+  // Generate OpenGraph data server-side
+  let openGraphData: ProfileOpenGraphData | undefined
+  try {
+    openGraphData = await generateProfileOpenGraphData(profile, siteUrl, `/${tag}`)
+  } catch (error) {
+    console.error('Error generating OpenGraph data:', error)
+    // Continue without OpenGraph data if generation fails
+  }
+
   return {
     props: {
-      profile: profile
-        ? {
-            name: profile.name,
-            tag: profile.main_tag_name,
-            about: profile.about,
-            avatar_url: profile.avatar_url,
-          }
-        : undefined,
       sendid: profile.sendid,
       tag,
+      siteUrl,
+      openGraphData,
     },
   }
 }) satisfies GetServerSideProps
