@@ -80,7 +80,7 @@ export const ProfileHeader = ({
               case !!profile?.sendid:
                 return `#${profile?.sendid}`
               default:
-                return '??'
+                return ''
             }
           })()}
         </Paragraph>

@@ -60,7 +60,7 @@ export const ProfileAboutTile = ({
               objectFit="cover"
               src={
                 profile.avatar_url ??
-                `https://ui-avatars.com/api.jpg?name=${profile.name ?? '??'}&size=256`
+                `https://ui-avatars.com/api?name=${profile?.main_tag_name ?? profile?.name ?? '??'}&size=256&format=png&background=86ad7f`
               }
             />
             <LinearGradient
@@ -81,7 +81,7 @@ export const ProfileAboutTile = ({
                 gap={'$3'}
               >
                 <Paragraph size={'$9'} $theme-light={{ color: '$white' }}>
-                  {profile?.name || (profile?.main_tag_name ? `/${profile?.main_tag_name}` : '??')}
+                  {profile?.main_tag_name ?? profile?.name ?? ''}
                 </Paragraph>
                 <XStack flexWrap="wrap" columnGap={'$2.5'} rowGap={'$2'}>
                   {profile?.all_tags?.map((tag: string) => (

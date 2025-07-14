@@ -83,7 +83,7 @@ export const useUser = () => {
     const name = profile?.name || user?.email || ''
     params.append('name', name)
     params.append('size', '256') // will be resized again by NextImage/SolitoImage
-    return `https://ui-avatars.com/api.jpg?${params.toString()}`
+    return `https://ui-avatars.com/api?${params.toString()}&format=png&background=86ad7f`
   })()
 
   return {
