@@ -116,7 +116,12 @@ const SuggestionTile = ({
 }) => {
   return (
     <Link href={href}>
-      <YStack gap={'$1'} mr={'$2'} $gtLg={{ mr: '$3.5' }} elevation={'$0.75'}>
+      <YStack
+        gap={'$1'}
+        mr={'$2'}
+        $gtLg={{ mr: '$3.5' }}
+        elevation={Platform.OS === 'web' ? undefined : '$0.75'}
+      >
         <Avatar size="$7" br="$4" elevation={'$0.75'}>
           <Avatar.Image src={avatarUrl} />
           <Avatar.Fallback jc="center" bc="$olive">
