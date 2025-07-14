@@ -60,6 +60,9 @@ const SuggestionsList = ({
                 renderItem={({ item, index }) => <SenderSuggestion item={item} index={index} />}
                 keyExtractor={(item, index) => item?.send_id?.toString() ?? String(index)}
                 showsHorizontalScrollIndicator={false}
+                style={{
+                  overflow: 'visible',
+                }}
               />
             )
         }
@@ -113,7 +116,7 @@ const SuggestionTile = ({
 }) => {
   return (
     <Link href={href}>
-      <YStack gap={'$1'} mr={'$2'} $gtLg={{ mr: '$3.5' }}>
+      <YStack gap={'$1'} mr={'$2'} $gtLg={{ mr: '$3.5' }} elevation={'$0.75'}>
         <Avatar size="$7" br="$4" elevation={'$0.75'}>
           <Avatar.Image src={avatarUrl} />
           <Avatar.Fallback jc="center" bc="$olive">
