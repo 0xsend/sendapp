@@ -367,7 +367,7 @@ export function SendConfirm() {
               edit
             </Paragraph>
           </XStack>
-          <Separator px="$4" bw="$0.75" borderRadius={'$4'} />
+          <Separator px="$4" />
           <YStack gap={'$2'}>
             <XStack ai={'center'} jc={'space-between'} gap={'$4'}>
               <Paragraph
@@ -400,6 +400,7 @@ export function SendConfirm() {
             br={'$6'}
             p={'$6'}
             gap={'$4.5'}
+            elevation={'$0.75'}
             $gtSm={{
               gap: '$5',
             }}
