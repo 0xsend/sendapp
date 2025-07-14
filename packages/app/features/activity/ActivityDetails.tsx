@@ -177,7 +177,7 @@ const ActivityDetailsContent = ({ activity, ...props }: { activity: Activity } &
               {decodeURIComponent(note)}
             </Paragraph>
           )}
-          <Separator px="$4" bw="$0.75" borderRadius={'$4'} />
+          <Separator px="$4" />
           <YStack gap={'$2'}>
             <XStack jc={'space-between'} ai={'center'}>
               <Paragraph

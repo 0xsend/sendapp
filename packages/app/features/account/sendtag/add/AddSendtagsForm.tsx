@@ -26,6 +26,7 @@ import { usdcCoin } from 'app/data/coins'
 import { useReleaseTag } from 'app/features/account/sendtag/checkout/checkout-utils'
 import { api } from 'app/utils/api'
 import { useLink } from 'solito/link'
+import { Platform } from 'react-native'
 
 export const AddSendtagsForm = () => {
   const user = useUser()
@@ -113,7 +114,7 @@ export const AddSendtagsForm = () => {
                   }}
                   props={{
                     name: {
-                      autoFocus: true,
+                      autoFocus: Platform.OS === 'web',
                       'aria-label': 'Sendtag name',
                       placeholder: 'Enter Sendtag name',
                       color: '$color12',

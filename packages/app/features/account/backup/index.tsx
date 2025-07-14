@@ -596,7 +596,7 @@ const RemovePasskeyConfirmation = ({
             borderRadius: '$4',
             color: '$color11',
             bc: '$color0',
-            autoFocus: true,
+            autoFocus: Platform.OS === 'web',
           },
         }}
         schema={RemovePasskeySchema}

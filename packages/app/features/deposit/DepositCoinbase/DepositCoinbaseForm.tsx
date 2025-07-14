@@ -6,6 +6,7 @@ import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import { useDepositScreenParams } from 'app/routers/params'
 import { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
 import { formatUnits } from 'viem'
+import { Platform } from 'react-native'
 
 const DepositFormScreenSchema = z.object({
   depositAmount: formFields.text,
@@ -121,7 +122,7 @@ export function DepositCoinbaseForm({ onConfirmTransaction, isLoading }: Deposit
               fieldsetProps: {
                 flex: 1,
               },
-              autoFocus: true,
+              autoFocus: Platform.OS === 'web',
             },
           }}
           formProps={{
