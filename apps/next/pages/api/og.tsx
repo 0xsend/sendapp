@@ -1,7 +1,25 @@
+import { ImageResponse } from '@vercel/og'
+import type { NextRequest } from 'next/server'
+import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
+import { z } from 'zod'
 import type { Database } from '@my/supabase/database.types'
 import type React from 'react'
 
-export async function loadGoogleFont(font: string, weight: number, text: string) {
+export const config = {
+  runtime: 'edge',
+}
+
+// Edge-runtime compatible sendtag validation
+const SendtagSchema = z.object({
+  name: z
+    .string()
+    .min(1)
+    .max(20)
+    .trim()
+    .regex(/^[a-zA-Z0-9_]+$/, 'Only English alphabet, numbers, and underscore'),
+})
+
+async function loadGoogleFont(font: string, weight: number, text: string) {
   const url = `https://fonts.googleapis.com/css2?family=${font}:wght@${weight}&text=${encodeURIComponent(text)}`
   const css = await (await fetch(url)).text()
   const resource = css.match(/src: url\((.+)\) format\('(opentype|truetype)'\)/)
@@ -15,7 +33,8 @@ export async function loadGoogleFont(font: string, weight: number, text: string)
 
   throw new Error('failed to load font data')
 }
-export const profileReactElement = (
+
+const profileReactElement = (
   profile: Database['public']['Functions']['profile_lookup']['Returns'][number]
 ): React.ReactElement => {
   const avatarUrl =
@@ -66,7 +85,6 @@ export const profileReactElement = (
           top: '0%',
         }}
       />
-      {/* Avatar with fallback pattern matching profile screen */}
       <div
         style={{
           position: 'absolute',
@@ -97,7 +115,7 @@ export const profileReactElement = (
           {profile.name || ''}
         </h2>
 
-        {/* Tag */}
+        {/* Tags */}
         <div style={{ display: 'flex', flexDirection: 'row', gap: '8px' }}>
           {profile?.all_tags
             ? profile.all_tags.map((tag) => {
@@ -121,7 +139,6 @@ export const profileReactElement = (
                         fontSize: '32px',
                         color: 'white',
                         fontWeight: 400,
-
                         margin: 0,
                       }}
                     >
@@ -167,4 +184,120 @@ export const profileReactElement = (
       </div>
     </div>
   )
+}
+
+/**
+ * Consolidated OpenGraph image generation API route
+ * Handles both tag-based and sendid-based profile image generation
+ *
+ * Query parameters:
+ * - type: 'tag' | 'sendid'
+ * - value: the tag name or sendid value
+ *
+ * Examples:
+ * - /api/og?type=tag&value=johndoe
+ * - /api/og?type=sendid&value=123
+ *
+ * @businessLogic
+ * Generates social media preview images for profile pages using the same
+ * avatar fallback pattern as the profile screen component
+ *
+ * @edgeCases
+ * - Returns 400 for missing or invalid parameters
+ * - Returns 404 for invalid sendid/tag or non-public profiles
+ * - Falls back to random auth images when no avatar_url exists
+ */
+export default async function handler(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url)
+    const type = searchParams.get('type')
+    const value = searchParams.get('value')
+
+    if (!type || !value) {
+      return new Response('Missing type or value parameter', { status: 400 })
+    }
+
+    if (type !== 'tag' && type !== 'sendid') {
+      return new Response('Invalid type parameter. Must be "tag" or "sendid"', { status: 400 })
+    }
+
+    const supabaseAdmin = createSupabaseAdminClient()
+    let profile: Database['public']['Functions']['profile_lookup']['Returns'][number] | null
+    let error: unknown
+
+    if (type === 'tag') {
+      // Validate tag format
+      const result = SendtagSchema.safeParse({
+        name: value.match(/^@/) ? value.slice(1) : value,
+      })
+
+      if (!result.success) {
+        return new Response('Invalid tag format', { status: 400 })
+      }
+
+      const { name: tag } = result.data
+
+      const { data, error: tagError } = await supabaseAdmin
+        .rpc('profile_lookup', { lookup_type: 'tag', identifier: tag })
+        .maybeSingle()
+
+      profile = data
+      error = tagError
+    } else {
+      // sendid lookup
+      const sendid = Number(value)
+      if (Number.isNaN(sendid)) {
+        return new Response('Invalid sendid', { status: 400 })
+      }
+
+      const { data, error: sendidError } = await supabaseAdmin
+        .rpc('profile_lookup', { lookup_type: 'sendid', identifier: sendid.toString() })
+        .maybeSingle()
+
+      profile = data
+      error = sendidError
+    }
+
+    if (error) {
+      console.error('Error fetching profile for OG image:', error)
+      return new Response('Error fetching profile', { status: 500 })
+    }
+
+    if (!profile || !profile.is_public) {
+      return new Response('Profile not found or not public', { status: 404 })
+    }
+
+    // Collect all text that will be rendered for font optimization
+    const text = [profile.name || '', profile.tag || '', profile.about || '', '/send']
+      .concat(profile?.all_tags || [])
+      .join('')
+
+    return new ImageResponse(profileReactElement(profile), {
+      width: 1200,
+      height: 630,
+      fonts: [
+        {
+          name: 'DM Sans',
+          data: await loadGoogleFont('DM Sans', 400, text),
+          style: 'normal',
+          weight: 400,
+        },
+        {
+          name: 'DM Sans',
+          data: await loadGoogleFont('DM Sans', 500, text),
+          style: 'normal',
+          weight: 500,
+        },
+        {
+          name: 'DM Sans',
+          data: await loadGoogleFont('DM Sans', 700, text),
+          style: 'normal',
+          weight: 700,
+        },
+      ],
+    })
+  } catch (e) {
+    console.error('Error generating OG image:', e)
+    return new Response('Failed to generate image', { status: 500 })
+  }
 }

@@ -33,16 +33,18 @@ export async function generateProfileOpenGraphData(
   // Generate canonical URL
   const canonicalUrl = `${siteUrl}${route}`
 
-  // Generate OpenGraph image URL (using the existing API routes)
+  // Generate OpenGraph image URL (using the consolidated API route)
   let imageUrl = ''
 
   if (profile.main_tag_name) {
-    // For tag-based routes, use the tag API endpoint
-    imageUrl = `${siteUrl}/api/og/${profile.main_tag_name}`
+    // For tag-based routes, use the tag parameter
+    imageUrl = `${siteUrl}/api/og?type=tag&value=${encodeURIComponent(profile.main_tag_name)}`
   } else {
-    // For sendid-based routes, use the sendid API endpoint
-    imageUrl = `${siteUrl}/api/og/profile/${profile.sendid}`
+    // For sendid-based routes, use the sendid parameter
+    imageUrl = `${siteUrl}/api/og?type=sendid&value=${profile.sendid}`
   }
+
+  console.log('Generated OpenGraph image URL:', imageUrl)
 
   return {
     imageUrl,
