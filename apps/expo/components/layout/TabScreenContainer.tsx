@@ -6,7 +6,7 @@ import { useTabBarSize } from 'apps-expo/utils/layout/useTabBarSize'
 const CONTAINER_OFFSET = 20
 
 export const TabScreenContainer = ({ children }: PropsWithChildren) => {
-  const { onScroll } = useScrollDirection()
+  const { onScroll, onContentSizeChange, ref } = useScrollDirection()
   const { height } = useTabBarSize()
 
   return (
@@ -19,16 +19,19 @@ export const TabScreenContainer = ({ children }: PropsWithChildren) => {
       backgroundColor="$background"
     >
       <ScrollView
+        ref={ref}
         flex={1}
         contentContainerStyle={{
           flexGrow: 1,
           paddingBottom: height + CONTAINER_OFFSET,
         }}
         showsVerticalScrollIndicator={false}
+        scrollEventThrottle={128}
         bounces={true}
         overScrollMode="always" // Android scroll indicator
         overflow={'visible'}
         onScroll={onScroll}
+        onContentSizeChange={onContentSizeChange}
       >
         {children}
       </ScrollView>
