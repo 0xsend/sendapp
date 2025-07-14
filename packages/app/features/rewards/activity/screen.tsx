@@ -33,6 +33,8 @@ import { min } from 'app/utils/bigint'
 import type { Json } from '@my/supabase/database.types'
 import { sendCoin, usdcCoin } from 'app/data/coins'
 import { useSendEarnBalancesAtBlock } from 'app/features/earn/hooks'
+import { useThemeName } from 'tamagui'
+import { Platform } from 'react-native'
 
 //@todo get this from the db
 const verificationTypesAndTitles = {
@@ -160,6 +162,8 @@ const DistributionRequirementsCard = ({
   distribution: UseDistributionsResultData[number]
   verificationsQuery: DistributionsVerificationsQuery
 }) => {
+  const theme = useThemeName()
+  const isDark = theme?.startsWith('dark')
   const { data: sendAccount, isLoading: isLoadingSendAccount } = useSendAccount()
   const verifications = verificationsQuery.data
   const {
@@ -198,10 +202,10 @@ const DistributionRequirementsCard = ({
   )
 
   return (
-    <FadeCard br={12} p="$6" gap="$4" $gtMd={{ gap: '$6' }}>
+    <FadeCard br={12} p="$4" gap="$4" $gtMd={{ gap: '$6', p: '$6' }}>
       <Stack ai="center" jc="space-between" gap="$5" $gtXs={{ flexDirection: 'row' }}>
-        <YStack gap="$2">
-          <Label fontSize={'$5'} col={'$color10'} miw={120} lh={20}>
+        <YStack>
+          <Label fontSize={'$5'} col={'$color10'} miw={120}>
             Your SEND Balance
           </Label>
           {isLoadingSnapshotBalance ? (
@@ -212,7 +216,7 @@ const DistributionRequirementsCard = ({
                 fontFamily={'$mono'}
                 fontWeight={'500'}
                 color={'$color12'}
-                lh={'$8'}
+                lh={35}
                 fontSize={'$9'}
                 $gtXl={{ fontSize: '$10' }}
               >
@@ -229,7 +233,7 @@ const DistributionRequirementsCard = ({
           <XStack ai="center" gap="$2">
             <Paragraph>Sendtag Purchased</Paragraph>
             {sendTagRegistrations ? (
-              <CheckCircle2 $theme-light={{ color: '$color12' }} color="$primary" size={'$1.5'} />
+              <CheckCircle2 color={isDark ? '$primary' : '$color12'} size={'$1.5'} />
             ) : (
               <Theme name="red">
                 <IconInfoCircle color={'$color8'} size={'$2'} />
@@ -260,13 +264,7 @@ const DistributionRequirementsCard = ({
                     </Theme>
                   )
                 default:
-                  return (
-                    <CheckCircle2
-                      $theme-light={{ color: '$color12' }}
-                      color="$primary"
-                      size={'$1.5'}
-                    />
-                  )
+                  return <CheckCircle2 color={isDark ? '$primary' : '$color12'} size={'$1.5'} />
               }
             })()}
           </XStack>
@@ -291,13 +289,7 @@ const DistributionRequirementsCard = ({
                     </Theme>
                   )
                 default:
-                  return (
-                    <CheckCircle2
-                      $theme-light={{ color: '$color12' }}
-                      color="$primary"
-                      size={'$1.5'}
-                    />
-                  )
+                  return <CheckCircle2 color={isDark ? '$primary' : '$color12'} size={'$1.5'} />
               }
             })()}
           </XStack>
@@ -392,12 +384,14 @@ const TaskCard = ({
     ? isEqualCalendarDate(new Date(verification.created_at), new Date()) ||
       (Boolean(weight) && isQualificationOver)
     : Boolean(weight)
+  const theme = useThemeName()
+  const isDark = theme?.startsWith('dark')
 
   const displayValue = isTagRegistration ? verification.count.toString() : value.toString()
 
   const statusConfig = {
     completed: {
-      icon: <CheckCircle2 $theme-light={{ color: '$color12' }} color="$primary" size={'$1.5'} />,
+      icon: <CheckCircle2 color={isDark ? '$primary' : '$color12'} size={'$1.5'} />,
       text: isSendStreak && !isQualificationOver ? 'Ongoing' : 'Completed',
     },
     pending: {
@@ -431,17 +425,17 @@ const TaskCard = ({
       <XStack ai={'center'} jc="space-between">
         {status}
         {shouldShowValue ? (
-          <Paragraph
-            ff={'$mono'}
-            py={'$0.5'}
-            px={'$0.9'}
+          <XStack
             borderWidth={1}
-            borderColor={'$primary'}
-            $theme-light={{ borderColor: '$color12' }}
+            borderColor={isDark ? '$primary' : '$color12'}
+            ai={'center'}
+            jc={'center'}
             borderRadius={'$4'}
           >
-            {displayValue}
-          </Paragraph>
+            <Paragraph ff={'$mono'} p={'$2'} lineHeight={16}>
+              {displayValue}
+            </Paragraph>
+          </XStack>
         ) : null}
       </XStack>
       {children}
@@ -509,6 +503,7 @@ const MultiplierCards = ({
               $sm={{ fontSize: '$8' }}
               fontWeight={'600'}
               color={'$color12'}
+              lineHeight={22}
               mx="auto"
             >
               X {(value ?? 1).toString()}
@@ -622,20 +617,17 @@ const ProgressCard = ({
 }
 
 const Progress = ({ progress }: { progress: number }) => {
+  const theme = useThemeName()
+  const isDark = theme?.startsWith('dark')
+
   return (
     <YStack gap="$4" w="100%">
       <XStack jc="flex-end">
-        <Paragraph
-          ff={'$mono'}
-          py={'$0.5'}
-          px={'$0.9'}
-          borderWidth={1}
-          borderColor={'$primary'}
-          $theme-light={{ borderColor: '$color12' }}
-          borderRadius={'$4'}
-        >
-          {progress.toFixed(1)}%
-        </Paragraph>
+        <XStack borderWidth={1} borderColor={isDark ? '$primary' : '$color12'} borderRadius={'$4'}>
+          <Paragraph ff={'$mono'} p={'$2'} lineHeight={16}>
+            {progress.toFixed(1)}%
+          </Paragraph>
+        </XStack>
       </XStack>
       <Stack w="100%" h="$1" br="$10" bc="$color3">
         <Stack
@@ -643,12 +635,7 @@ const Progress = ({ progress }: { progress: number }) => {
           h="100%"
           br="$10"
           animation="quick"
-          $theme-light={{
-            bc: '$color12',
-          }}
-          $theme-dark={{
-            bc: '$primary',
-          }}
+          bc={isDark ? '$primary' : '$color12'}
         />
       </Stack>
     </YStack>
@@ -673,12 +660,18 @@ const ClaimableRewardsCard = ({
   )
 
   return (
-    <YStack f={1} w={'100%'} gap="$5" $sm={{ display: 'none' }}>
+    <YStack f={1} w={'100%'} gap="$5" $sm={{ display: Platform.OS === 'web' ? 'none' : undefined }}>
       <H3 fontWeight={'600'} color={'$color12'}>
         {isQualificationOver ? `Total ${distributionMonth}` : ` ${distributionMonth} Rewards`}
       </H3>
       <FadeCard br={'$6'} p="$7" ai={'center'} w={'100%'}>
-        <Stack ai="center" jc="space-between" fd="row" w="100%">
+        <Stack
+          ai="center"
+          jc="space-between"
+          fd={Platform.OS === 'web' ? 'row' : 'column'}
+          w="100%"
+          gap={'$4'}
+        >
           <Paragraph
             fontFamily={'$mono'}
             $gtXs={{ fontSize: '$10' }}

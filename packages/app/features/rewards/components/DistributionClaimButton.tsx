@@ -1,7 +1,6 @@
 import { Button as ButtonOg, Spinner, type ButtonProps, YStack, useToastController } from '@my/ui'
 import { baseMainnet, type sendMerkleDropAddress } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
-import { IconDollar } from 'app/components/icons'
 import { useCoin } from 'app/provider/coins'
 import { assert } from 'app/utils/assert'
 import { byteaToHex } from 'app/utils/byteaToHex'
@@ -210,6 +209,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
         gap={4}
         maw={194}
         width={'100%'}
+        height={'auto'}
       >
         {(() => {
           switch (true) {
@@ -227,14 +227,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
                 </ButtonOg.Icon>
               )
             case isClaimed:
-              return (
-                <>
-                  <ButtonOg.Icon>
-                    <IconDollar color="$black" size={'$1.5'} />
-                  </ButtonOg.Icon>
-                  <ButtonOg.Text>Claimed</ButtonOg.Text>
-                </>
-              )
+              return <ButtonOg.Text>$ Claimed</ButtonOg.Text>
             case !isTrancheActive:
               return (
                 <ButtonOg.Text opacity={0.5} disabled>
@@ -259,14 +252,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
             case !hasEnoughGas:
               return <ButtonOg.Text>Insufficient Gas</ButtonOg.Text>
             default:
-              return (
-                <>
-                  <ButtonOg.Icon>
-                    <IconDollar color="$black" size={'$1'} />
-                  </ButtonOg.Icon>
-                  <ButtonOg.Text fontWeight={'500'}>Claim Reward</ButtonOg.Text>
-                </>
-              )
+              return <ButtonOg.Text fontWeight={'500'}>$ Claim Reward</ButtonOg.Text>
           }
         })()}
       </Button>
