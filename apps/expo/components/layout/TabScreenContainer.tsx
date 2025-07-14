@@ -27,6 +27,7 @@ export const TabScreenContainer = ({ children }: PropsWithChildren) => {
         showsVerticalScrollIndicator={false}
         bounces={true}
         overScrollMode="always" // Android scroll indicator
+        overflow={'visible'}
         onScroll={onScroll}
       >
         {children}

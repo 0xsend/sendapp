@@ -23,6 +23,7 @@ export const ScreenContainer = ({ children }: PropsWithChildren) => {
           paddingBottom: CONTAINER_OFFSET + insets.bottom,
         }}
         showsVerticalScrollIndicator={false}
+        overflow={'visible'}
         bounces={true}
         overScrollMode="always" // Android scroll indicator
       >
