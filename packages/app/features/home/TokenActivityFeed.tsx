@@ -1,9 +1,11 @@
-import { Card, type CardProps, RecyclerList, Spinner, useMedia } from '@my/ui'
 import {
-  dataProviderMaker,
-  type Dimension,
-  layoutProviderMaker,
-} from '@my/ui/src/components/RecyclerList.web'
+  Card,
+  type CardProps,
+  Spinner,
+  useMedia,
+  dataProviderMakerWeb,
+  layoutProviderMakerWeb,
+} from '@my/ui'
 import type { PostgrestError } from '@supabase/postgrest-js'
 import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
 import { useQueryClient } from '@tanstack/react-query'
@@ -15,8 +17,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ZodError } from 'zod'
 import { TokenActivityRow } from './TokenActivityRow'
 import { useRootScreenParams } from 'app/routers/params'
+import { RecyclerListView, type Dimension } from 'recyclerlistview/web'
+import type { CoinWithBalance } from 'app/data/coins'
 
-export const TokenActivityFeed = ({
+export default function TokenActivityFeed({
   tokenActivityFeedQuery,
   onActivityPress,
   ...props
@@ -26,7 +30,8 @@ export const TokenActivityFeed = ({
     PostgrestError | ZodError
   >
   onActivityPress: (activity: Activity) => void
-} & CardProps) => {
+  coin?: CoinWithBalance
+} & CardProps) {
   const { isAtEnd } = useScrollDirection()
   const [layoutSize, setLayoutSize] = useState<Dimension>({ width: 0, height: 0 })
   const media = useMedia()
@@ -86,9 +91,9 @@ export const TokenActivityFeed = ({
     wasPendingRef.current = isCurrentlyPending
   }, [data, queryClient, queryParams.token])
 
-  const [dataProvider, setDataProvider] = useState(dataProviderMaker(activities))
+  const [dataProvider, setDataProvider] = useState(dataProviderMakerWeb(activities))
 
-  const _layoutProvider = layoutProviderMaker({
+  const _layoutProvider = layoutProviderMakerWeb({
     getHeightOrWidth: () => 102,
   })
 
@@ -130,7 +135,7 @@ export const TokenActivityFeed = ({
   return (
     <Card {...props} f={1} onLayout={onCardLayout}>
       {dataProvider.getSize() > 0 && layoutSize.height > 0 ? (
-        <RecyclerList
+        <RecyclerListView
           style={{ flex: 1, overflow: 'auto' }}
           dataProvider={dataProvider}
           rowRenderer={_renderRow}

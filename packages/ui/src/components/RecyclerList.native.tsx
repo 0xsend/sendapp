@@ -1,4 +1,4 @@
-import { DataProvider, GridLayoutProvider } from 'recyclerlistview/web'
+import { DataProvider, GridLayoutProvider } from 'recyclerlistview'
 
 /**
  * Creates a DataProvider that determines when to recycle list elements.
@@ -9,7 +9,7 @@ import { DataProvider, GridLayoutProvider } from 'recyclerlistview/web'
  * @param options.getStableId Optional function to generate stable IDs for items
  * @returns DataProvider instance configured with the provided data and comparison logic
  */
-export const dataProviderMakerWeb = <T = never>(
+export const dataProviderMakerNative = <T = never>(
   data?: T[],
   options: {
     rowHasChanged?: (r1: T, r2: T) => boolean
@@ -52,7 +52,7 @@ export const dataProviderMakerWeb = <T = never>(
  * })
  * @returns GridLayoutProvider instance configured with the provided layout options
  */
-export const layoutProviderMakerWeb = (options: {
+export const layoutProviderMakerNative = (options: {
   maxSpan?: number
   getLayoutType?: (index: number) => string | number
   getSpan?: (index: number) => number
