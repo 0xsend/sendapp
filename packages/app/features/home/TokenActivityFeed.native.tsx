@@ -187,7 +187,7 @@ export default function TokenActivityFeed({
   }, [hasNextPage, isFetchingNextPageActivities, fetchNextPage])
 
   return (
-    <YStack f={1}>
+    <YStack f={1} elevation={'$0.75'}>
       <RecyclerListView
         style={{ flex: 1, overflow: 'visible' }}
         dataProvider={dataProvider}

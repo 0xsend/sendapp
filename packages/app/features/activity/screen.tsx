@@ -15,9 +15,11 @@ export function ActivityScreen() {
         gap="$6"
         $gtLg={{ pt: 0, gap: '$7' }}
       >
-        <YStack width={'100%'} gap="$1.5" $gtSm={{ gap: '$2.5' }} $gtLg={{ display: 'none' }}>
-          <Search />
-        </YStack>
+        {Platform.OS === 'web' && (
+          <YStack width={'100%'} gap="$1.5" $gtSm={{ gap: '$2.5' }} $gtLg={{ display: 'none' }}>
+            <Search />
+          </YStack>
+        )}
         <AnimatePresence>
           <ActivityBody />
         </AnimatePresence>

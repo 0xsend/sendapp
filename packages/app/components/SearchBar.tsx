@@ -118,6 +118,7 @@ function SearchResults() {
         opacity: 0,
         y: -10,
       }}
+      showsVerticalScrollIndicator={false}
       overflow="visible"
     >
       {query && matchesCount > 1 && (
@@ -612,7 +613,7 @@ function Search({ label, placeholder = 'Search', autoFocus = false }: SearchProp
             }}
           >
             {({ query }) => (
-              <ThemeableStack elevation={'$0.75'} br="$4">
+              <ThemeableStack elevation={Platform.OS === 'web' ? '$0.75' : 0} br="$4">
                 {query}
               </ThemeableStack>
             )}
