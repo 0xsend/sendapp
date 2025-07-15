@@ -1,29 +1,44 @@
-import { Card, type CardProps, Fade, Paragraph, Spinner, YStack } from '@my/ui'
+import {
+  type CardProps,
+  dataProviderMakerNative,
+  H4,
+  layoutProviderMakerNative,
+  Spinner,
+  XStack,
+  YStack,
+} from '@my/ui'
 import type { PostgrestError } from '@supabase/postgrest-js'
 import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
 import { useQueryClient } from '@tanstack/react-query'
-import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
-import { useRootScreenParams } from 'app/routers/params'
 import type { Activity } from 'app/utils/zod/activity'
 import { isTemporalSendEarnDepositEvent } from 'app/utils/zod/activity'
 import { Events } from 'app/utils/zod/activity/events'
 import { useCallback, useEffect, useMemo, useRef } from 'react'
-import { FlatList } from 'react-native'
 import type { ZodError } from 'zod'
 import { TokenActivityRow } from './TokenActivityRow'
+import { useRootScreenParams } from 'app/routers/params'
+import { RecyclerListView } from 'recyclerlistview'
+import { TokenDetailsHeader } from './TokenDetailsHeader'
+import type { CoinWithBalance } from 'app/data/coins'
 
-export const TokenActivityFeed = ({
+// Define the list item types
+type ListItem =
+  | { type: 'header'; data: CoinWithBalance }
+  | { type: 'activity-header'; data: { title: string; hasActivities: boolean } }
+  | { type: 'activity'; data: Activity }
+
+export default function TokenActivityFeed({
   tokenActivityFeedQuery,
   onActivityPress,
-  ...props
+  coin,
 }: {
   tokenActivityFeedQuery: UseInfiniteQueryResult<
     InfiniteData<Activity[]>,
     PostgrestError | ZodError
   >
   onActivityPress: (activity: Activity) => void
-} & CardProps) => {
-  const { isAtEnd } = useScrollDirection()
+  coin: CoinWithBalance
+} & CardProps) {
   const queryClient = useQueryClient()
   const wasPendingRef = useRef(false) // Ref to track if a pending activity was seen previously
   const [queryParams] = useRootScreenParams()
@@ -34,19 +49,37 @@ export const TokenActivityFeed = ({
     isFetchingNextPage: isFetchingNextPageActivities,
     fetchNextPage,
     hasNextPage,
-    refetch,
   } = tokenActivityFeedQuery
 
-  const activities = useMemo(() => data?.pages?.flat() || [], [data])
+  const activities = useMemo(() => data?.pages.flat() || [], [data])
 
-  // Handle pagination
-  useEffect(() => {
-    if (isAtEnd && hasNextPage && !isFetchingNextPageActivities) {
-      fetchNextPage()
+  // Create the mixed data structure with header + activities
+  const { listData, firstActivityIndex, lastActivityIndex } = useMemo(() => {
+    const items: ListItem[] = []
+
+    // Add the token details header
+    items.push({ type: 'header', data: coin })
+
+    // Add activity header
+    items.push({
+      type: 'activity-header',
+      data: {
+        title: !activities.length ? 'No Activity' : 'Activity',
+        hasActivities: activities.length > 0,
+      },
+    })
+
+    for (const activity of activities) {
+      items.push({ type: 'activity', data: activity })
     }
-  }, [isAtEnd, hasNextPage, fetchNextPage, isFetchingNextPageActivities])
 
-  // Monitor for pending activities that become confirmed
+    return {
+      listData: items,
+      firstActivityIndex: 2,
+      lastActivityIndex: items.length - 1,
+    }
+  }, [coin, activities])
+
   useEffect(() => {
     // Only proceed if data is available
     if (!data?.pages) return
@@ -87,61 +120,92 @@ export const TokenActivityFeed = ({
     wasPendingRef.current = isCurrentlyPending
   }, [data, queryClient, queryParams.token])
 
-  // Optimize rendering for FlatList
-  const renderItem = useCallback(
-    ({ item: activity }) => <TokenActivityRow activity={activity} onPress={onActivityPress} />,
-    [onActivityPress]
+  const dataProvider = useMemo(() => {
+    return dataProviderMakerNative(listData)
+  }, [listData])
+
+  const layoutProvider = useMemo(
+    () =>
+      layoutProviderMakerNative({
+        getLayoutType: (index) => {
+          return listData[index]?.type || 'activity'
+        },
+        getHeightOrWidth: (index) => {
+          const item = listData[index]
+          switch (item?.type) {
+            case 'header':
+              // Approximate height for token details header (card + buttons + gaps)
+              return 290
+            case 'activity-header':
+              // Height for activity title
+              return 35
+            default:
+              return 102
+          }
+        },
+      }),
+    [listData]
   )
 
-  const keyExtractor = useCallback(
-    (activity: Activity) =>
-      `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`,
-    []
+  const rowRenderer = useCallback(
+    (type: string | number, item: ListItem, index: number) => {
+      const isFirst = index === firstActivityIndex
+      const isLast = index === lastActivityIndex
+
+      switch (item.type) {
+        case 'header':
+          return <TokenDetailsHeader coin={item.data} />
+        case 'activity-header':
+          return (
+            <H4 fontWeight={'600'} size={'$7'}>
+              {item.data.title}
+            </H4>
+          )
+        case 'activity':
+          return (
+            <XStack
+              backgroundColor={'$color1'}
+              borderTopLeftRadius={isFirst ? '$6' : 0}
+              borderTopRightRadius={isFirst ? '$6' : 0}
+              borderBottomLeftRadius={isLast ? '$6' : 0}
+              borderBottomRightRadius={isLast ? '$6' : 0}
+            >
+              <TokenActivityRow activity={item.data} onPress={onActivityPress} />
+            </XStack>
+          )
+        default:
+          return null
+      }
+    },
+    [onActivityPress, firstActivityIndex, lastActivityIndex]
   )
 
-  const renderFooter = useCallback(() => {
-    if (!isLoadingActivities && isFetchingNextPageActivities) {
-      return <Spinner size="small" color={'$color12'} mb="$3.5" />
+  const handleEndReach = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPageActivities) {
+      void fetchNextPage()
     }
-    return null
-  }, [isLoadingActivities, isFetchingNextPageActivities])
-
-  const onRefresh = useCallback(() => {
-    refetch()
-  }, [refetch])
-
-  // Show empty state when there are no activities
-  if (!activities.length) {
-    return (
-      <Card {...props} f={1} jc="center" ai="center" p="$4">
-        <YStack ai="center" gap="$2" p="$4">
-          <Paragraph color="$color10" ta="center">
-            No activity to display yet.
-          </Paragraph>
-        </YStack>
-      </Card>
-    )
-  }
+  }, [hasNextPage, isFetchingNextPageActivities, fetchNextPage])
 
   return (
-    <Card {...props} f={1}>
-      <Fade>
-        <FlatList
-          style={{ flex: 1 }}
-          data={activities}
-          keyExtractor={keyExtractor}
-          renderItem={renderItem}
-          ListFooterComponent={renderFooter}
-          showsVerticalScrollIndicator={false}
-          initialNumToRender={10}
-          maxToRenderPerBatch={10}
-          windowSize={5}
-          removeClippedSubviews={true}
-          refreshing={isLoadingActivities && !isFetchingNextPageActivities}
-          onRefresh={onRefresh}
-          contentContainerStyle={{ paddingBottom: 20 }}
+    <YStack f={1}>
+      <RecyclerListView
+        style={{ flex: 1, overflow: 'visible' }}
+        dataProvider={dataProvider}
+        rowRenderer={rowRenderer}
+        layoutProvider={layoutProvider}
+        scrollViewProps={{
+          showsVerticalScrollIndicator: false,
+        }}
+        onEndReached={handleEndReach}
+        onEndReachedThreshold={0.5}
+      />
+      <XStack py={'$3.5'} jc={'center'}>
+        <Spinner
+          opacity={!isLoadingActivities && isFetchingNextPageActivities ? 1 : 0}
+          size="small"
+          color={'$color12'}
         />
-      </Fade>
-    </Card>
+      </XStack>
+    </YStack>
   )
 }
