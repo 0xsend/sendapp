@@ -1,5 +1,4 @@
 import {
-  Button,
   Dialog,
   H2,
   isWeb,
@@ -69,7 +68,7 @@ export function ShareProfileDialog({ isOpen, onClose }: ShareProfileDialogProps)
         gap="$4"
         $gtLg={{ flexDirection: 'row-reverse' }}
       >
-        <PrimaryButton onPress={handleCopyLink}>
+        <PrimaryButton onPress={handleCopyLink} f={Platform.OS === 'web' ? 1 : undefined}>
           <PrimaryButton.Icon>
             <IconCopy size={16} color={'$black'} />
           </PrimaryButton.Icon>
@@ -77,11 +76,9 @@ export function ShareProfileDialog({ isOpen, onClose }: ShareProfileDialogProps)
         </PrimaryButton>
         {Platform.OS === 'web' && (
           <Dialog.Close asChild>
-            <Button borderRadius={'$4'} p={'$4'} focusStyle={{ outlineWidth: 0 }}>
-              <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'}>
-                close
-              </Button.Text>
-            </Button>
+            <PrimaryButton focusStyle={{ outlineWidth: 0 }} theme={undefined} f={1}>
+              <PrimaryButton.Text>close</PrimaryButton.Text>
+            </PrimaryButton>
           </Dialog.Close>
         )}
       </YStack>

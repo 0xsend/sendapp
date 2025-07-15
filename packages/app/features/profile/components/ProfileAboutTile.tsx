@@ -50,6 +50,7 @@ export const ProfileAboutTile = ({
             width="100%"
             aspectRatio={1}
             overflow="hidden"
+            borderRadius={'$6'}
             position="relative"
             elevation={'$0.75'}
           >

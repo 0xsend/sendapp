@@ -83,7 +83,7 @@ export function AccountLinks(): JSX.Element {
   const supabase = useSupabase()
 
   return (
-    <YStack gap={'$5'}>
+    <YStack gap={'$5'} pb={'$3.5'}>
       {Object.entries(ACCOUNT_LINKS).map(([category, links]) => {
         return (
           <YStack key={category} gap={'$3.5'}>
