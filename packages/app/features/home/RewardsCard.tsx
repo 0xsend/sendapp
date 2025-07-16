@@ -126,11 +126,12 @@ const useDistributionShares = () => {
   const { data: sendAccount } = useSendAccount()
 
   return useQuery({
-    queryKey: ['distribution_shares', supabase, sendAccount?.created_at],
+    queryKey: ['distribution_shares', sendAccount?.created_at],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('distributions')
-        .select(`
+        .select(
+          `
           number,
           token_addr,
           chain_id,
@@ -141,7 +142,8 @@ const useDistributionShares = () => {
             amount::text,
             index::text
           )
-        `)
+        `
+        )
         .lte('qualification_start', new Date().toUTCString())
         .gt('qualification_end', sendAccount?.created_at)
         .not('distribution_shares[0]', 'is', null) // checks if first element exists

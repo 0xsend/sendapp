@@ -36,8 +36,8 @@ export function useActivityFeed({
   const addressBook = useAddressBook()
   const enabled = useMemo(() => addressBook.isError || addressBook.isSuccess, [addressBook])
   const queryKey = useMemo(
-    () => ['activity_feed', { addressBook, supabase, pageSize }] as const,
-    [addressBook, supabase, pageSize]
+    () => ['activity_feed', { addressBook, pageSize }] as const,
+    [addressBook, pageSize]
   )
   return useInfiniteQuery<
     Activity[],
@@ -47,6 +47,7 @@ export function useActivityFeed({
     number
   >({
     enabled,
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey,
     initialPageParam: 0,
     getNextPageParam: (lastPage, _allPages, lastPageParam) => {
@@ -59,7 +60,7 @@ export function useActivityFeed({
       }
       return firstPageParam - 1
     },
-    queryFn: async ({ queryKey: [, { addressBook, supabase, pageSize }], pageParam }) => {
+    queryFn: async ({ queryKey: [, { addressBook, pageSize }], pageParam }) => {
       throwIf(addressBook.error)
       assert(!!addressBook.data, 'Fetching address book failed')
       return await fetchActivityFeed({
