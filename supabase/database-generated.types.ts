@@ -1807,6 +1807,7 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: {
           avatar_url: string
+          send_id: number
           x_username: string
           birthday: string
           tag: string
