@@ -589,10 +589,10 @@ export const SwapFormScreen = () => {
                       justifyContent="center"
                       alignItems="center"
                       style={{
-                        pointerEvents: 'box-none',
+                        pointerEvents: Platform.OS === 'web' ? 'none' : 'box-none',
                       }}
                     >
-                      <YStack bc={'$color0'} borderRadius={9999}>
+                      <YStack bc={'$color0'} borderRadius={9999} pointerEvents={'auto'}>
                         <Button
                           // @ts-expect-error tamagui is tripping here
                           type={'button'}
