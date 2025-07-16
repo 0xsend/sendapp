@@ -39,8 +39,9 @@ export function useReferralReward({ tags }: { tags: { name: string }[] }) {
 
 function sendtagCheckoutReceiptsQueryOptions(supabase: SupabaseClient<Database>) {
   return queryOptions({
-    queryKey: ['sendtag_checkout_transfers', supabase] as const,
-    queryFn: async ({ queryKey: [, supabase] }) => {
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: ['sendtag_checkout_transfers'] as const,
+    queryFn: async () => {
       const { data, error } = await fetchSendtagCheckoutReceipts(supabase)
       throwIf(error)
       return data

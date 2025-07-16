@@ -111,9 +111,9 @@ export function useEarnRewardsActivityFeed(params?: {
     () =>
       [
         'earn_rewards_activity_feed',
-        { addressBook, supabase, pageSize, sendAccount, sendAccountData, myAffiliateVault },
+        { addressBook, pageSize, sendAccount, sendAccountData, myAffiliateVault },
       ] as const,
-    [addressBook, supabase, pageSize, sendAccount, sendAccountData, myAffiliateVault]
+    [addressBook, pageSize, sendAccount, sendAccountData, myAffiliateVault]
   )
 
   return useInfiniteQuery<
@@ -124,6 +124,7 @@ export function useEarnRewardsActivityFeed(params?: {
     number
   >({
     enabled,
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey,
     refetchInterval,
     initialPageParam: 0,
@@ -138,10 +139,7 @@ export function useEarnRewardsActivityFeed(params?: {
       return firstPageParam - 1
     },
     queryFn: async ({
-      queryKey: [
-        ,
-        { addressBook, supabase, pageSize, sendAccount, sendAccountData, myAffiliateVault },
-      ],
+      queryKey: [, { addressBook, pageSize, sendAccount, sendAccountData, myAffiliateVault }],
       pageParam,
     }) => {
       throwIf(addressBook.error)

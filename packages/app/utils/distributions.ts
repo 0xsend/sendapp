@@ -106,7 +106,8 @@ function fetchDistributions(supabase: SupabaseClient<Database>) {
 export const useDistributions = (): UseQueryResult<UseDistributionsResultData, PostgrestError> => {
   const supabase = useSupabase()
   return useQuery({
-    queryKey: ['distributions', supabase],
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: ['distributions'],
     queryFn: async () => {
       const { data, error } = await fetchDistributions(supabase).order('number', {
         ascending: false,
@@ -138,7 +139,8 @@ export const useMonthlyDistributions = () => {
   const { data: sendAccount } = useSendAccount()
 
   return useQuery({
-    queryKey: ['monthly_distributions', supabase, sendAccount?.created_at],
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: ['monthly_distributions', sendAccount?.created_at],
     queryFn: async () => {
       const { data, error } = await fetchDistributions(supabase)
         .gt('number', 6)
@@ -204,8 +206,9 @@ export const useDistributionVerifications = (distributionNumber?: number) => {
   const supabase = useSupabase()
 
   return useQuery({
-    queryKey: ['distribution_verifications', { distributionNumber, supabase }] as const,
-    queryFn: async ({ queryKey: [, { distributionNumber, supabase }] }) => {
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: ['distribution_verifications', { distributionNumber }] as const,
+    queryFn: async ({ queryKey: [, { distributionNumber }] }) => {
       assert(!!distributionNumber, 'distributionNumber is required')
 
       const { data, error } = await fetchDistributionVerifications(supabase, distributionNumber)
