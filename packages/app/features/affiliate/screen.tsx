@@ -3,28 +3,25 @@ import {
   Card,
   Link,
   Paragraph,
-  RecyclerList,
   Separator,
   Spinner,
   useMedia,
   XStack,
   YStack,
+  dataProviderMakerWeb,
+  layoutProviderMakerWeb,
 } from '@my/ui'
 import { type PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react'
 import type { Functions } from '@my/supabase/database.types'
 import { toNiceError } from 'app/utils/toNiceError'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
-import {
-  dataProviderMaker,
-  type Dimension,
-  layoutProviderMaker,
-} from '@my/ui/src/components/RecyclerList.web'
 import { IconBirthday, IconXLogo } from 'app/components/icons'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { adjustUTCDateForTimezone } from 'app/utils/dateHelper'
 import { useReferrer } from 'app/utils/useReferrer'
 import { useFriendsFeed } from 'app/features/affiliate/utils/useFriendsFeed'
 import { ReferralLink } from 'app/components/ReferralLink'
+import { RecyclerListView, type Dimension } from 'recyclerlistview/web'
 
 type Referral = Pick<
   Functions<'profile_lookup'>[number],
@@ -55,11 +52,11 @@ export default function FriendsScreen() {
 
     return refs
   }, [data, referrer])
-  const [dataProvider, setDataProvider] = useState(dataProviderMaker(referrals))
+  const [dataProvider, setDataProvider] = useState(dataProviderMakerWeb(referrals))
 
   const layoutSizeAdjustment = media.gtLg ? 78 : 0
 
-  const _layoutProvider = layoutProviderMaker({
+  const _layoutProvider = layoutProviderMakerWeb({
     getHeightOrWidth: () => (media.gtLg ? 42 : 96),
   })
 
@@ -131,7 +128,7 @@ export default function FriendsScreen() {
     <YStack flex={1} onLayout={onCardLayout} pb={'$3.5'}>
       {dataProvider.getSize() > 0 && layoutSize.height > 0 ? (
         <FriendsListTable>
-          <RecyclerList
+          <RecyclerListView
             style={{ flex: 1, overflow: 'auto' }}
             dataProvider={dataProvider}
             rowRenderer={_renderRow}

@@ -17,7 +17,7 @@ import {
 import { useThemeSetting } from '@tamagui/next-theme'
 
 export const BooleanCheckboxField = (
-  props: Pick<CheckboxProps, 'id' | 'size' | 'native' | 'defaultChecked' | 'disabled'> & {
+  props: CheckboxProps & {
     labelProps?: LabelProps
   }
 ) => {

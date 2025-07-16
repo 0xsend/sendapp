@@ -10,12 +10,12 @@ import {
   YGroup,
   YStack,
   useToastController,
+  PrimaryButton,
 } from '@my/ui'
 import { baseMainnetBundlerClient, entryPointAddress } from '@my/wagmi'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import type { erc20Coin } from 'app/data/coins'
-import { SectionButton } from 'app/features/earn/components/SectionButton'
 import { useSendEarn } from 'app/features/earn/providers/SendEarnProvider'
 import { useERC20AssetCoin } from 'app/features/earn/params'
 import { useSendEarnClaimRewardsCalls } from 'app/features/earn/rewards/hooks'
@@ -224,13 +224,13 @@ function RewardsBalance() {
             )}
         </XStack>
 
-        <SectionButton
+        <PrimaryButton
           onPress={handleClaimPress}
           disabled={!canClaim || mutation.isPending}
           iconAfter={mutation.isPending ? <Spinner size="small" /> : undefined}
         >
-          CLAIM REWARDS
-        </SectionButton>
+          <PrimaryButton.Text>CLAIM REWARDS</PrimaryButton.Text>
+        </PrimaryButton>
       </YStack>
     </YStack>
   )

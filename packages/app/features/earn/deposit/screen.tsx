@@ -1,5 +1,4 @@
 import {
-  Button,
   Card,
   Fade,
   Paragraph,
@@ -122,15 +121,13 @@ export function DepositForm() {
       })
       if (!coin.data) return
 
-      // for web redirect to balance is fine, on native back for better ux
-      if (Platform.OS === 'web') {
-        router.replace({
-          pathname: `/earn/${coinToParam(coin.data)}/balance`,
-        })
-        return
+      if (Platform.OS !== 'web') {
+        router.back()
       }
 
-      router.back()
+      router.replace({
+        pathname: `/earn/${coinToParam(coin.data)}/balance`,
+      })
     },
     onSettled: () => {
       log('sendEarn.deposit.onSettled')
@@ -252,8 +249,6 @@ export function DepositForm() {
           ) : null
         )}
         <SubmitButton
-          elevation={canSubmit ? '$0.75' : undefined}
-          theme="green"
           onPress={() => {
             if (!areTermsAccepted) {
               form.setError(
@@ -269,21 +264,9 @@ export function DepositForm() {
             }
             submit()
           }}
-          py={'$5'}
-          br={'$4'}
-          disabledStyle={{ opacity: 0.5 }}
           disabled={!canSubmit}
-          iconAfter={depositMutation.isPending ? <Spinner size="small" /> : undefined}
         >
-          {[calls.isLoading, sendAccount.isLoading, uop.isLoading, depositMutation.isPending].some(
-            (p) => p
-          ) ? (
-            <Spinner size="small" />
-          ) : (
-            <Button.Text size={'$5'} fontWeight={'500'} fontFamily={'$mono'} color={'$black'}>
-              CONFIRM DEPOSIT
-            </Button.Text>
-          )}
+          <SubmitButton.Text>CONFIRM DEPOSIT</SubmitButton.Text>
         </SubmitButton>
       </YStack>
     ),
@@ -295,9 +278,6 @@ export function DepositForm() {
       areTermsAccepted,
       form.setError,
       canSubmit,
-      calls.isLoading,
-      sendAccount.isLoading,
-      uop.isLoading,
     ]
   )
 
@@ -344,7 +324,14 @@ export function DepositForm() {
   })
 
   return (
-    <YStack testID="DepositForm" w={'100%'} gap={'$4'} pb={'$3'} $gtLg={{ w: '50%' }}>
+    <YStack
+      testID="DepositForm"
+      w={'100%'}
+      gap={'$4'}
+      pb={'$3'}
+      f={Platform.OS === 'web' ? undefined : 1}
+      $gtLg={{ w: '50%' }}
+    >
       <Paragraph size={'$7'} fontWeight={'500'}>
         Deposit Amount
       </Paragraph>
@@ -401,6 +388,9 @@ export function DepositForm() {
                 })(),
               },
             },
+            areTermsAccepted: {
+              backgroundColor: form.getValues().areTermsAccepted ? '$primary' : '$color1',
+            },
           }}
           formProps={{
             testID: 'earning-form',
@@ -409,6 +399,7 @@ export function DepositForm() {
             },
             // using tamagui props there is bug with justify content set to center after refreshing the page
             style: { justifyContent: 'space-between' },
+            footerProps: { p: 0 },
           }}
           defaultValues={{
             amount:
