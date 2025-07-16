@@ -304,7 +304,7 @@ You can use the following methods to verify the app is functioning correctly:
 - refactor referrals screen to use recycler view ✅
 
 **Invest**:
-- redirect successful trade to better place, right now its home screen
+- redirect successful trade to better place, right now its home screen ✅
 - remove blink after confirmation
 
 **Earn**:

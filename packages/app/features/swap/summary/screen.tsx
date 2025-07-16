@@ -136,7 +136,13 @@ export const SwapSummaryScreen = () => {
         queryClient.invalidateQueries({ queryKey: ['token_activity_feed', outCoin?.token] }),
       ])
 
-      router.push(`/?token=${outCoin?.token}`)
+      if (Platform.OS === 'web') {
+        router.push(`/?token=${outCoin?.token}`)
+        return
+      }
+
+      router.back()
+      router.back()
     } catch (e) {
       console.error(e)
     }
