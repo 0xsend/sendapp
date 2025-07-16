@@ -1,5 +1,4 @@
 import {
-  Button,
   Fade,
   Paragraph,
   Spinner,
@@ -291,11 +290,7 @@ export function WithdrawForm() {
           ) : null
         )}
         <SubmitButton
-          theme="green"
           onPress={() => submit()}
-          py={'$5'}
-          br={'$4'}
-          disabledStyle={{ opacity: 0.5 }}
           disabled={!canSubmit}
           iconAfter={mutation.isPending ? <Spinner size="small" /> : undefined}
         >
@@ -303,9 +298,7 @@ export function WithdrawForm() {
           !mutation.isPending ? (
             <Spinner size="small" />
           ) : (
-            <Button.Text size={'$5'} fontWeight={'500'} fontFamily={'$mono'} color={'$black'}>
-              CONFIRM WITHDRAW
-            </Button.Text>
+            <SubmitButton.Text>CONFIRM WITHDRAW</SubmitButton.Text>
           )}
         </SubmitButton>
       </YStack>
@@ -333,7 +326,13 @@ export function WithdrawForm() {
     return <Spinner size="large" color={'$color12'} />
   }
   return (
-    <YStack testID="WithdrawForm" w={'100%'} gap={'$4'} $gtLg={{ w: '50%', pb: '$3.5' }}>
+    <YStack
+      testID="WithdrawForm"
+      w={'100%'}
+      gap={'$4'}
+      f={Platform.OS === 'web' ? undefined : 1}
+      $gtLg={{ w: '50%', pb: '$3.5' }}
+    >
       <Paragraph size={'$7'} fontWeight={'500'}>
         Withdraw Amount
       </Paragraph>
@@ -392,7 +391,7 @@ export function WithdrawForm() {
           }}
           formProps={{
             testID: 'withdraw-deposit-form',
-            footerProps: { pb: 0 },
+            footerProps: { p: 0 },
             $gtSm: {
               maxWidth: '100%',
             },
@@ -418,6 +417,7 @@ export function WithdrawForm() {
                   p={'$5'}
                   borderColor={insufficientAmount ? '$error' : 'transparent'}
                   bw={1}
+                  elevation={'$0.75'}
                 >
                   <XStack ai={'center'} position="relative" jc={'space-between'}>
                     {amount}

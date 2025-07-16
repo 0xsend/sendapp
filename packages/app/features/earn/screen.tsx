@@ -1,22 +1,22 @@
 import {
   Card,
   Fade,
+  Image,
   LinearGradient,
   Paragraph,
+  PrimaryButton,
   Separator,
   Spinner,
   XStack,
   YStack,
-  Image,
 } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { IconArrowRight, IconStacks } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { Row } from 'app/features/earn/components/Row'
-import { SectionButton } from 'app/features/earn/components/SectionButton'
 import formatAmount from 'app/utils/formatAmount'
 import debug from 'debug'
-import { useMemo, type ReactNode } from 'react'
+import { type ReactNode, useMemo } from 'react'
 import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
@@ -107,6 +107,7 @@ const LearnSection = ({ learnImage }: { learnImage: string }) => {
           w={'100%'}
           h={300}
           p={'$5'}
+          ai={'flex-start'}
           gap={'$7'}
           jc={'space-between'}
           $gtLg={{ p: '$7' }}
@@ -142,7 +143,7 @@ const LearnSection = ({ learnImage }: { learnImage: string }) => {
               Deposits
             </Paragraph>
           </XStack>
-          <YStack>
+          <YStack width={'100%'}>
             <Paragraph color={'$white'} size={'$9'}>
               Start Growing
             </Paragraph>
@@ -167,7 +168,14 @@ const EarningsCallToAction = () => {
 
   return (
     <Fade>
-      <Card elevation={'$0.75'} w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>
+      <Card
+        elevation={'$0.75'}
+        w={'100%'}
+        p={'$5'}
+        gap={'$7'}
+        ai={'flex-start'}
+        $gtLg={{ p: '$7' }}
+      >
         <Badge text={'Earnings'} />
         <YStack gap={'$3.5'}>
           <Paragraph size={'$7'} fontWeight={'500'}>
@@ -180,7 +188,9 @@ const EarningsCallToAction = () => {
             <ListItem>Rewards: Bonus SEND tokens</ListItem>
           </YStack>
         </YStack>
-        <SectionButton onPress={() => push('/earn/usdc/deposit')}>START EARNING</SectionButton>
+        <PrimaryButton onPress={() => push('/earn/usdc/deposit')}>
+          <PrimaryButton.Text>START EARNING</PrimaryButton.Text>
+        </PrimaryButton>
       </Card>
     </Fade>
   )
@@ -206,9 +216,16 @@ const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) =
 
   return (
     <Fade>
-      <Card elevation={'$0.75'} w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>
+      <Card
+        elevation={'$0.75'}
+        w={'100%'}
+        p={'$5'}
+        gap={'$7'}
+        ai={'flex-start'}
+        $gtLg={{ p: '$7' }}
+      >
         <Badge text={'Active Earnings'} />
-        <YStack gap={'$3.5'}>
+        <YStack gap={'$3.5'} w={'100%'}>
           <YStack gap={'$2'}>
             <Paragraph
               size={'$5'}
@@ -260,7 +277,9 @@ const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) =
             */}
           </YStack>
         </YStack>
-        <SectionButton onPress={() => push('/earn/usdc')}>VIEW DETAILS</SectionButton>
+        <PrimaryButton onPress={() => push('/earn/usdc')}>
+          <PrimaryButton.Text>VIEW DETAILS</PrimaryButton.Text>
+        </PrimaryButton>
       </Card>
     </Fade>
   )
