@@ -226,11 +226,11 @@ You can use the following methods to verify the app is functioning correctly:
 ## Known Issues [TO BE SOLVED BEFORE RELEASE]
 
 **Global issues**:
-- visual issues, broken UI/styling
+- visual issues, broken UI/styling ✅
 - referral code reading/writing is not working, due to implementation using cookies ✅
 - dialogs are not appearing ✅
 - QR code generation library is not working on native ✅
-- a lot os stuff is blinking all over the place, too much data fetching, too much fading
+- a lot os stuff is blinking all over the place, too much data fetching, too much fading ✅ (reduced)
 
 **Project Structure**:
 - check images loading ✅
@@ -243,6 +243,7 @@ You can use the following methods to verify the app is functioning correctly:
 
 **Home screen**:
 - rework flow on native, web flow is built on query params, native should use stacking screen ✅
+- increase lists performance ✅
 
 **Send**:
 - rework flow on native, web flow is built on query params, native should use stacking screen ✅
@@ -262,11 +263,12 @@ You can use the following methods to verify the app is functioning correctly:
 
 **Earn**:
 - referral code is not working ✅
-- a lot os stuff is blinking on earn
+- a lot os stuff is blinking on earn ✅ (reduced)
 
 **Activity**:
 - redirect to external address is not working due to broken dialog ✅
-- only 1st page is visible
+- only 1st page is visible ✅
+- increase list performance ✅
 
 **History**:
 - rework flow of screens, cannot go back from profile details, history and receipt, use screen stacking ✅
@@ -287,22 +289,26 @@ You can use the following methods to verify the app is functioning correctly:
 - error page when app crush
 - don't nest scroll views
 
+**Send**:
+- remove blink after confirmation
+
+**Earn**:
+- remove blinking completely
+
 **Auth**:
 - passkeys for android, right now got passkeys only for ios
 - no way to input referral, url won't work on native
 
 **Referrals Screen**:
 - number of referrals in header is missing
-- refactor referrals screen to use recycler view
+- refactor referrals screen to use recycler view ✅
 
 **Invest**:
 - redirect successful trade to better place, right now its home screen
+- remove blink after confirmation
 
 **Earn**:
 - earn home page doest refresh automatically after deposit
 
-**SendPot**:
-- number of tickets purchased is not increased after purchase automatically, its fine after close and open again
-
 **Activity**:
-- when you go back from details app scroll all the way up, should maintain position
+- when you go back from details app scroll all the way up, should maintain position ✅
