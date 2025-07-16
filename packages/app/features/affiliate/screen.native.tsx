@@ -17,11 +17,9 @@ import { useFriendsFeed } from 'app/features/affiliate/utils/useFriendsFeed'
 import { ReferralLink } from 'app/components/ReferralLink'
 import { Linking, Pressable } from 'react-native'
 import { RecyclerListView } from 'recyclerlistview'
+import { useLink } from 'solito/link'
 
-type Referral = Pick<
-  Functions<'profile_lookup'>[number],
-  'avatar_url' | 'x_username' | 'birthday' | 'tag'
->
+type Referral = Functions<'get_friends'>[number]
 
 export default function FriendsScreen() {
   const friendsFeedQuery = useFriendsFeed({
@@ -99,6 +97,7 @@ export default function FriendsScreen() {
 }
 
 const FriendMobileRow = ({ referral }: { referral: Referral }) => {
+  const linkProps = useLink({ href: `/profile/${referral.send_id}` })
   const birthday = referral.birthday
     ? adjustUTCDateForTimezone(new Date(referral.birthday)).toLocaleString(undefined, {
         day: 'numeric',
@@ -107,7 +106,7 @@ const FriendMobileRow = ({ referral }: { referral: Referral }) => {
     : 'NA'
 
   return (
-    <Card w={'100%'} gap={'$3.5'} br={'$5'} p={'$3.5'}>
+    <Card w={'100%'} gap={'$3.5'} br={'$5'} p={'$3.5'} {...linkProps}>
       <XStack w={'100%'} ai={'center'}>
         <XStack f={1} w={'100%'} gap={'$3.5'}>
           <Avatar size="$4.5" br="$4" gap="$2">
