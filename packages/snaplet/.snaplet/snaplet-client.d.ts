@@ -39,7 +39,6 @@ type Override = {
       allowed_mime_types?: string;
       owner_id?: string;
       objects?: string;
-      prefixes?: string;
     };
   }
   chain_addresses?: {
@@ -194,18 +193,6 @@ type Override = {
       version?: string;
       owner_id?: string;
       user_metadata?: string;
-      level?: string;
-      buckets?: string;
-    };
-  }
-  prefixes?: {
-    name?: string;
-    fields?: {
-      bucket_id?: string;
-      name?: string;
-      level?: string;
-      created_at?: string;
-      updated_at?: string;
       buckets?: string;
     };
   }
@@ -262,13 +249,6 @@ type Override = {
       version?: string;
       statements?: string;
       name?: string;
-    };
-  }
-  seed_files?: {
-    name?: string;
-    fields?: {
-      path?: string;
-      hash?: string;
     };
   }
   send_account_created?: {
@@ -691,6 +671,7 @@ type Override = {
       notify_private_alpha?: string;
       private_only?: string;
       migrations_ran?: string;
+      broadcast_adapter?: string;
       extensions?: string;
     };
   }
@@ -796,7 +777,6 @@ export interface Fingerprint {
     updatedAt?: FingerprintDateField;
     fileSizeLimit?: FingerprintNumberField;
     objects?: FingerprintRelationField;
-    prefixes?: FingerprintRelationField;
   }
   chainAddresses?: {
     createdAt?: FingerprintDateField;
@@ -891,13 +871,6 @@ export interface Fingerprint {
     lastAccessedAt?: FingerprintDateField;
     metadata?: FingerprintJsonField;
     userMetadata?: FingerprintJsonField;
-    level?: FingerprintNumberField;
-    bucket?: FingerprintRelationField;
-  }
-  prefixes?: {
-    level?: FingerprintNumberField;
-    createdAt?: FingerprintDateField;
-    updatedAt?: FingerprintDateField;
     bucket?: FingerprintRelationField;
   }
   profiles?: {
@@ -924,9 +897,6 @@ export interface Fingerprint {
     insertedAt?: FingerprintDateField;
   }
   supabaseMigrationsSchemaMigrations?: {
-
-  }
-  seedFiles?: {
 
   }
   sendAccountCreateds?: {
