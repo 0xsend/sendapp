@@ -19,13 +19,12 @@ export const FriendsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
   const linkProps = useLink({ href })
   const limit = 3
   const { data, isLoading } = useFriends(limit)
-  const friendsCount = data?.friends.length ?? 0
 
   return (
     <HomeBodyCard {...linkProps} {...props}>
       <Card.Header padded pb={0} fd="row" ai="center" jc="space-between">
         <Paragraph fontSize={'$5'} fontWeight="400">
-          {isLoading ? '' : friendsCount <= 0 ? 'Invite Friends' : 'Friends'}
+          Referrals
         </Paragraph>
         <XStack flex={1} />
         <ChevronRight
