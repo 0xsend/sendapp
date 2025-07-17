@@ -14,7 +14,6 @@ export const Page: NextPageWithLayout = () => {
         images={{
           rewards: 'https://ghassets.send.app/app_images/explore_rewards.jpg',
           sendpot: 'https://ghassets.send.app/app_images/sendpot.jpg',
-          feed: 'https://ghassets.send.app/app_images/feed.jpg',
         }}
       />
     </>
