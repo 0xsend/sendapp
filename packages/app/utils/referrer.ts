@@ -28,7 +28,7 @@ export async function fetchReferrer({
   signal,
 }: {
   supabase: SupabaseClient
-  profile: Tables<'profiles'>
+  profile: Database['public']['Tables']['profiles']['Row']
   referralCode: string
   signal?: AbortSignal
 }): Promise<ReferrerProfile | null> {

@@ -25,7 +25,7 @@ import { RecyclerListView, type Dimension } from 'recyclerlistview/web'
 
 type Referral = Pick<
   Functions<'profile_lookup'>[number],
-  'avatar_url' | 'x_username' | 'birthday' | 'tag'
+  'avatar_url' | 'x_username' | 'links_in_bio' | 'birthday' | 'tag'
 >
 
 export default function FriendsScreen() {

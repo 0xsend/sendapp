@@ -11,6 +11,7 @@ type Enum_net_request_status = 'ERROR' | 'PENDING' | 'SUCCESS';
 type Enum_pgtle_password_types = 'PASSWORD_TYPE_MD5' | 'PASSWORD_TYPE_PLAINTEXT' | 'PASSWORD_TYPE_SCRAM_SHA_256';
 type Enum_pgtle_pg_tle_features = 'clientauth' | 'passcheck';
 type Enum_public_key_type_enum = 'ES256';
+type Enum_public_link_in_bio_domain_names = 'Discord' | 'GitHub' | 'Instagram' | 'Telegram' | 'TikTok' | 'X' | 'YouTube';
 type Enum_public_lookup_type_enum = 'address' | 'phone' | 'refcode' | 'sendid' | 'tag';
 type Enum_public_tag_status = 'available' | 'confirmed' | 'pending';
 type Enum_public_temporal_status = 'confirmed' | 'failed' | 'initialized' | 'sent' | 'submitted';
@@ -210,6 +211,14 @@ interface Table_private_leaderboard_referrals_all_time {
   rewards_usdc: number | null;
   updated_at: string | null;
 }
+interface Table_public_link_in_bio {
+  id: number;
+  user_id: string;
+  handle: string | null;
+  domain_name: Enum_public_link_in_bio_domain_names;
+  created_at: string;
+  updated_at: string;
+}
 interface Table_public_liquidity_pools {
   pool_name: string;
   pool_type: string;
@@ -279,7 +288,6 @@ interface Table_storage_objects {
   version: string | null;
   owner_id: string | null;
   user_metadata: Json | null;
-  level: number | null;
 }
 interface Table_auth_one_time_tokens {
   id: string;
@@ -289,12 +297,6 @@ interface Table_auth_one_time_tokens {
   relates_to: string;
   created_at: string;
   updated_at: string;
-}
-interface Table_storage_prefixes {
-  bucket_id: string;
-  name: string;
-  created_at: string | null;
-  updated_at: string | null;
 }
 interface Table_public_profiles {
   id: string;
@@ -400,10 +402,6 @@ interface Table_vault_secrets {
   nonce: string | null;
   created_at: string;
   updated_at: string;
-}
-interface Table_supabase_migrations_seed_files {
-  path: string;
-  hash: string;
 }
 interface Table_public_send_account_created {
   chain_id: number;
@@ -825,6 +823,7 @@ interface Table_realtime_tenants {
   notify_private_alpha: boolean | null;
   private_only: boolean;
   migrations_ran: number | null;
+  broadcast_adapter: string | null;
 }
 interface Table_auth_users {
   instance_id: string | null;
@@ -933,6 +932,7 @@ interface Schema_public {
   distribution_verification_values: Table_public_distribution_verification_values;
   distribution_verifications: Table_public_distribution_verifications;
   distributions: Table_public_distributions;
+  link_in_bio: Table_public_link_in_bio;
   liquidity_pools: Table_public_liquidity_pools;
   profiles: Table_public_profiles;
   receipts: Table_public_receipts;
@@ -977,7 +977,6 @@ interface Schema_storage {
   buckets: Table_storage_buckets;
   migrations: Table_storage_migrations;
   objects: Table_storage_objects;
-  prefixes: Table_storage_prefixes;
   s3_multipart_uploads: Table_storage_s_3_multipart_uploads;
   s3_multipart_uploads_parts: Table_storage_s_3_multipart_uploads_parts;
 }
@@ -987,7 +986,6 @@ interface Schema_supabase_functions {
 }
 interface Schema_supabase_migrations {
   schema_migrations: Table_supabase_migrations_schema_migrations;
-  seed_files: Table_supabase_migrations_seed_files;
 }
 interface Schema_temporal {
   send_account_transfers: Table_temporal_send_account_transfers;
@@ -1053,12 +1051,11 @@ interface Tables_relationships {
     };
     children: {
        objects_bucketId_fkey: "storage.objects";
-       prefixes_bucketId_fkey: "storage.prefixes";
        s3_multipart_uploads_bucket_id_fkey: "storage.s3_multipart_uploads";
        s3_multipart_uploads_parts_bucket_id_fkey: "storage.s3_multipart_uploads_parts";
     };
     parentDestinationsTables:  | {};
-    childDestinationsTables: "storage.objects" | "storage.prefixes" | "storage.s3_multipart_uploads" | "storage.s3_multipart_uploads_parts" | {};
+    childDestinationsTables: "storage.objects" | "storage.s3_multipart_uploads" | "storage.s3_multipart_uploads_parts" | {};
     
   };
   "public.chain_addresses": {
@@ -1166,6 +1163,17 @@ interface Tables_relationships {
     childDestinationsTables:  | {};
     
   };
+  "public.link_in_bio": {
+    parent: {
+       link_in_bio_user_id_fkey: "auth.users";
+    };
+    children: {
+
+    };
+    parentDestinationsTables: "auth.users" | {};
+    childDestinationsTables:  | {};
+    
+  };
   "auth.mfa_amr_claims": {
     parent: {
        mfa_amr_claims_session_id_fkey: "auth.sessions";
@@ -1218,17 +1226,6 @@ interface Tables_relationships {
 
     };
     parentDestinationsTables: "auth.users" | {};
-    childDestinationsTables:  | {};
-    
-  };
-  "storage.prefixes": {
-    parent: {
-       prefixes_bucketId_fkey: "storage.buckets";
-    };
-    children: {
-
-    };
-    parentDestinationsTables: "storage.buckets" | {};
     childDestinationsTables:  | {};
     
   };
@@ -1470,6 +1467,7 @@ interface Tables_relationships {
        chain_addresses_user_id_fkey: "public.chain_addresses";
        distribution_shares_user_id_fkey: "public.distribution_shares";
        distribution_verifications_user_id_fkey: "public.distribution_verifications";
+       link_in_bio_user_id_fkey: "public.link_in_bio";
        profiles_id_fkey: "public.profiles";
        receipts_user_id_fkey: "public.receipts";
        send_accounts_user_id_fkey: "public.send_accounts";
@@ -1477,7 +1475,7 @@ interface Tables_relationships {
        webauthn_credentials_user_id_fkey: "public.webauthn_credentials";
     };
     parentDestinationsTables:  | {};
-    childDestinationsTables: "auth.identities" | "auth.mfa_factors" | "auth.one_time_tokens" | "auth.sessions" | "private.leaderboard_referrals_all_time" | "public.activity" | "public.chain_addresses" | "public.distribution_shares" | "public.distribution_verifications" | "public.profiles" | "public.receipts" | "public.send_accounts" | "public.tags" | "public.webauthn_credentials" | {};
+    childDestinationsTables: "auth.identities" | "auth.mfa_factors" | "auth.one_time_tokens" | "auth.sessions" | "private.leaderboard_referrals_all_time" | "public.activity" | "public.chain_addresses" | "public.distribution_shares" | "public.distribution_verifications" | "public.link_in_bio" | "public.profiles" | "public.receipts" | "public.send_accounts" | "public.tags" | "public.webauthn_credentials" | {};
     
   };
   "public.webauthn_credentials": {
