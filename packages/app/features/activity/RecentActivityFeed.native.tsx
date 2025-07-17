@@ -137,7 +137,7 @@ export default function ActivityFeed({
     (type: string | number, item: ListItem) => {
       switch (item.type) {
         case 'search':
-          return <Search />
+          return <Search containerProps={{ elevation: 0 }} />
         case 'date-separator':
           return <DateSeparatorRow dateKey={item.data.dateKey} />
         case 'activity':

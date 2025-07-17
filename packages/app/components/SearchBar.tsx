@@ -37,7 +37,7 @@ import { IconAccount, IconArrowRight, IconSearch, IconX } from './icons'
 import { baseMainnet } from '@my/wagmi'
 import { useEnsName } from 'wagmi'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
-import { useThemeName } from 'tamagui'
+import { useThemeName, type YStackProps } from 'tamagui'
 
 type SearchResultsType = Functions<'tag_search'>[number]
 type SearchResultsKeysType = keyof SearchResultsType
@@ -493,9 +493,10 @@ type SearchProps = {
   label?: string
   placeholder?: string
   autoFocus?: boolean
+  containerProps?: YStackProps
 }
 
-function Search({ label, placeholder = 'Search', autoFocus = false }: SearchProps) {
+function Search({ label, placeholder = 'Search', autoFocus = false, containerProps }: SearchProps) {
   const { form } = useTagSearch()
   const [queryParams, setRootParams] = useRootScreenParams()
   const { search: query } = queryParams
@@ -613,7 +614,7 @@ function Search({ label, placeholder = 'Search', autoFocus = false }: SearchProp
             }}
           >
             {({ query }) => (
-              <ThemeableStack elevation={Platform.OS === 'web' ? '$0.75' : 0} br="$4">
+              <ThemeableStack elevation={'$0.75'} br="$4" {...containerProps}>
                 {query}
               </ThemeableStack>
             )}
