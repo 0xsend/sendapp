@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { LinkInBiosSchema } from '../LinkInBioSchema'
 
 export const UserSchema = z.object({
   /**
@@ -29,4 +30,8 @@ export const UserSchema = z.object({
    * Confirmed sendtags
    */
   tags: z.array(z.string()).nullable().default([]),
+  /**
+   * Social media links
+   */
+  link_in_bio: LinkInBiosSchema.nullable().default([]),
 })

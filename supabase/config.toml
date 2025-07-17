@@ -68,6 +68,9 @@ schema_paths = [
   "./schemas/swap_routers.sql",
   "./schemas/affiliate_stats.sql",
 
+  #  Social tables
+  "./schemas/link_in_bio.sql",
+
   # Schema-specific tables
   "./schemas/shovel.sql",
   "./schemas/temporal.sql",

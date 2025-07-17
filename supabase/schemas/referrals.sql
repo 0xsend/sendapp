@@ -1,6 +1,6 @@
 -- Functions
 CREATE OR REPLACE FUNCTION public.profile_lookup(lookup_type lookup_type_enum, identifier text)
- RETURNS TABLE(id uuid, avatar_url text, name text, about text, refcode text, x_username text, birthday date, tag citext, address citext, chain_id integer, is_public boolean, sendid integer, all_tags text[], main_tag_id bigint, main_tag_name text)
+ RETURNS TABLE(id uuid, avatar_url text, name text, about text, refcode text, link_in_bio jsonb, birthday date, tag citext, address citext, chain_id integer, is_public boolean, sendid integer, all_tags text[], main_tag_id bigint, main_tag_name text)
  LANGUAGE plpgsql
  IMMUTABLE SECURITY DEFINER
 AS $function$
@@ -13,7 +13,13 @@ select case when p.id = ( select auth.uid() ) then p.id end              as id,
         p.name::text                                                      as name,
         p.about::text                                                     as about,
         p.referral_code                                                   as refcode,
-       CASE WHEN p.is_public THEN p.x_username ELSE NULL END AS x_username, -- changed to be null if profile is private
+       CASE WHEN p.is_public THEN p.x_username ELSE NULL END AS x_username,
+       CASE WHEN p.is_public THEN
+           (SELECT jsonb_agg(jsonb_build_object('domain', domain, 'handle', handle, 'domain_name', domain_name))
+            FROM link_in_bio sl2
+            WHERE sl2.user_id = p.id)
+       ELSE NULL
+       END AS link_in_bio,
        CASE WHEN p.is_public THEN p.birthday ELSE NULL END AS birthday, -- added birthday to return type, returns null if profile is private
        COALESCE(mt.name, t.name)                                         as tag,
        sa.address                                                        as address,
@@ -390,7 +396,7 @@ GRANT ALL ON FUNCTION "public"."profile_lookup"("lookup_type" "public"."lookup_t
 -- Functions
 
 CREATE OR REPLACE FUNCTION public.get_friends()
- RETURNS TABLE(avatar_url text, send_id int, x_username text, birthday date, tag citext, created_at timestamp with time zone)
+ RETURNS TABLE(avatar_url text, send_id int, x_username text, link_in_bio jsonb, birthday date, tag citext, created_at timestamp with time zone)
  LANGUAGE plpgsql
  SECURITY DEFINER
  SET search_path TO 'public'
@@ -403,6 +409,12 @@ BEGIN
                 p.avatar_url,
                 p.send_id,
                 CASE WHEN p.is_public THEN p.x_username ELSE NULL END AS x_username,
+                CASE WHEN p.is_public THEN
+                    (SELECT jsonb_agg(jsonb_build_object('domain', domain, 'handle', handle, 'domain_name', domain_name))
+                     FROM link_in_bio sl
+                     WHERE sl.user_id = p.id)
+                ELSE NULL
+                END AS link_in_bio,
                 CASE WHEN p.is_public THEN p.birthday ELSE NULL END AS birthday,
                 t.name AS tag,
                 t.created_at,
@@ -427,7 +439,7 @@ BEGIN
         SELECT
             o.avatar_url,
             o.send_id,
-            o.x_username,
+            o.link_in_bio,
             o.birthday,
             o.tag,
             o.created_at
@@ -460,6 +472,7 @@ CREATE OR REPLACE VIEW "public"."referrer" WITH ("security_barrier"='on') AS
             "p"."about",
             "p"."refcode",
             "p"."x_username",
+            "p"."link_in_bio",
             "p"."birthday",
             "p"."tag",
             "p"."address",
@@ -471,7 +484,7 @@ CREATE OR REPLACE VIEW "public"."referrer" WITH ("security_barrier"='on') AS
             "p"."main_tag_name",
             "referrer"."send_id"
            FROM ("public"."profile_lookup"('sendid'::"public"."lookup_type_enum", ( SELECT ("referrer_1"."send_id")::"text" AS "send_id"
-                   FROM "referrer" "referrer_1")) "p"("id", "avatar_url", "name", "about", "refcode", "x_username", "birthday", "tag", "address", "chain_id", "is_public", "sendid", "all_tags", "main_tag_id", "main_tag_name")
+                   FROM "referrer" "referrer_1")) "p"("id", "avatar_url", "name", "about", "refcode", "x_username", "link_in_bio", "birthday", "tag", "address", "chain_id", "is_public", "sendid", "all_tags", "main_tag_id", "main_tag_name")
              JOIN "referrer" ON (("referrer"."send_id" IS NOT NULL)))
         )
  SELECT "profile_lookup"."id",
@@ -480,6 +493,7 @@ CREATE OR REPLACE VIEW "public"."referrer" WITH ("security_barrier"='on') AS
     "profile_lookup"."about",
     "profile_lookup"."refcode",
     "profile_lookup"."x_username",
+    "profile_lookup"."link_in_bio",
     "profile_lookup"."birthday",
     "profile_lookup"."tag",
     "profile_lookup"."address",
