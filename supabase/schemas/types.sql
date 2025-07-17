@@ -14,6 +14,18 @@ CREATE TYPE "public"."lookup_type_enum" AS ENUM (
 );
 ALTER TYPE "public"."lookup_type_enum" OWNER TO "postgres";
 
+CREATE TYPE "public"."link_in_bio_domain_names" AS ENUM (
+		'X',
+		'Instagram',
+		'YouTube',
+		'TikTok',
+		'GitHub',
+		'Telegram',
+		'Discord'
+);
+
+ALTER TYPE "public"."link_in_bio_domain_names" OWNER TO "postgres";
+
 CREATE TYPE "public"."tag_search_result" AS (
 	"avatar_url" "text",
 	"tag_name" "text",
