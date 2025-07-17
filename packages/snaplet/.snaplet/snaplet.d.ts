@@ -11,6 +11,7 @@ type Enum_net_request_status = 'ERROR' | 'PENDING' | 'SUCCESS';
 type Enum_pgtle_password_types = 'PASSWORD_TYPE_MD5' | 'PASSWORD_TYPE_PLAINTEXT' | 'PASSWORD_TYPE_SCRAM_SHA_256';
 type Enum_pgtle_pg_tle_features = 'clientauth' | 'passcheck';
 type Enum_public_key_type_enum = 'ES256';
+type Enum_public_link_in_bio_domain_names = 'Discord' | 'GitHub' | 'Instagram' | 'Telegram' | 'TikTok' | 'X' | 'YouTube';
 type Enum_public_lookup_type_enum = 'address' | 'phone' | 'refcode' | 'sendid' | 'tag';
 type Enum_public_tag_status = 'available' | 'confirmed' | 'pending';
 type Enum_public_temporal_status = 'confirmed' | 'failed' | 'initialized' | 'sent' | 'submitted';
@@ -209,6 +210,14 @@ interface Table_private_leaderboard_referrals_all_time {
   referrals: number | null;
   rewards_usdc: number | null;
   updated_at: string | null;
+}
+interface Table_public_link_in_bio {
+  id: number;
+  user_id: string;
+  handle: string | null;
+  domain_name: Enum_public_link_in_bio_domain_names;
+  created_at: string;
+  updated_at: string;
 }
 interface Table_public_liquidity_pools {
   pool_name: string;
@@ -923,6 +932,7 @@ interface Schema_public {
   distribution_verification_values: Table_public_distribution_verification_values;
   distribution_verifications: Table_public_distribution_verifications;
   distributions: Table_public_distributions;
+  link_in_bio: Table_public_link_in_bio;
   liquidity_pools: Table_public_liquidity_pools;
   profiles: Table_public_profiles;
   receipts: Table_public_receipts;
@@ -1145,6 +1155,17 @@ interface Tables_relationships {
   "private.leaderboard_referrals_all_time": {
     parent: {
        leaderboard_referrals_all_time_user_id_fkey: "auth.users";
+    };
+    children: {
+
+    };
+    parentDestinationsTables: "auth.users" | {};
+    childDestinationsTables:  | {};
+    
+  };
+  "public.link_in_bio": {
+    parent: {
+       link_in_bio_user_id_fkey: "auth.users";
     };
     children: {
 
@@ -1446,6 +1467,7 @@ interface Tables_relationships {
        chain_addresses_user_id_fkey: "public.chain_addresses";
        distribution_shares_user_id_fkey: "public.distribution_shares";
        distribution_verifications_user_id_fkey: "public.distribution_verifications";
+       link_in_bio_user_id_fkey: "public.link_in_bio";
        profiles_id_fkey: "public.profiles";
        receipts_user_id_fkey: "public.receipts";
        send_accounts_user_id_fkey: "public.send_accounts";
@@ -1453,7 +1475,7 @@ interface Tables_relationships {
        webauthn_credentials_user_id_fkey: "public.webauthn_credentials";
     };
     parentDestinationsTables:  | {};
-    childDestinationsTables: "auth.identities" | "auth.mfa_factors" | "auth.one_time_tokens" | "auth.sessions" | "private.leaderboard_referrals_all_time" | "public.activity" | "public.chain_addresses" | "public.distribution_shares" | "public.distribution_verifications" | "public.profiles" | "public.receipts" | "public.send_accounts" | "public.tags" | "public.webauthn_credentials" | {};
+    childDestinationsTables: "auth.identities" | "auth.mfa_factors" | "auth.one_time_tokens" | "auth.sessions" | "private.leaderboard_referrals_all_time" | "public.activity" | "public.chain_addresses" | "public.distribution_shares" | "public.distribution_verifications" | "public.link_in_bio" | "public.profiles" | "public.receipts" | "public.send_accounts" | "public.tags" | "public.webauthn_credentials" | {};
     
   };
   "public.webauthn_credentials": {

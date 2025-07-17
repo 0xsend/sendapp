@@ -5,6 +5,7 @@ import {
   Paragraph,
   Separator,
   Spinner,
+  Text,
   useMedia,
   XStack,
   YStack,
@@ -25,7 +26,7 @@ import { RecyclerListView, type Dimension } from 'recyclerlistview/web'
 
 type Referral = Pick<
   Functions<'profile_lookup'>[number],
-  'avatar_url' | 'x_username' | 'birthday' | 'tag'
+  'avatar_url' | 'link_in_bio' | 'birthday' | 'tag'
 >
 
 export default function FriendsScreen() {
@@ -194,11 +195,6 @@ const FriendMobileRow = ({
             </YStack>
           </XStack>
         </Link>
-        {referral.x_username && (
-          <Link href={`https://x.com/${referral.x_username}`} target={'_blank'}>
-            <IconXLogo size={'$1'} color={'$primary'} $theme-light={{ color: '$color12' }} />
-          </Link>
-        )}
       </XStack>
     </Card>
   )
@@ -261,27 +257,6 @@ const FriendDesktopRow = ({
         <Paragraph w={'25%'} ta={'right'}>
           {birthday}
         </Paragraph>
-        {referral.x_username ? (
-          <Paragraph
-            w={'25%'}
-            ta={'right'}
-            cursor={'pointer'}
-            textDecorationLine={'underline'}
-            onPress={(e) => {
-              e.stopPropagation?.()
-              e.preventDefault?.()
-              if (window) {
-                window.open(`https://x.com/${referral.x_username}`, '_blank')
-              }
-            }}
-          >
-            @{referral.x_username}
-          </Paragraph>
-        ) : (
-          <Paragraph w={'25%'} ta={'right'}>
-            NA
-          </Paragraph>
-        )}
       </XStack>
     </Link>
   )

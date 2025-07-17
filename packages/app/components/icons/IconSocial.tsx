@@ -7,8 +7,19 @@ import { IconXLogo } from './IconXLogo'
 import { IconTelegramLogo } from './IconTelegramLogo'
 import { IconYoutube } from './IconYoutube'
 import { IconDiscord } from './IconDiscord'
+import type { LinkInBioDomainName } from 'app/utils/zod/LinkInBioSchema'
 
-const socialToIcons: Record<string, NamedExoticComponent<IconProps>> = {
+export const socialToColors = {
+  X: '$black',
+  Telegram: '$telegramBlue',
+  Discord: '$discordPurple',
+  YouTube: '$youtubeRed',
+  Instagram: '$instagramGradient',
+  TikTok: '$white',
+  GitHub: '$black',
+}
+
+const socialToIcons: Record<LinkInBioDomainName, NamedExoticComponent<IconProps>> = {
   X: IconXLogo,
   Telegram: IconTelegramLogo,
   YouTube: IconYoutube,
