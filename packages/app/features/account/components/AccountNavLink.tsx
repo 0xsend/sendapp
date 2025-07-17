@@ -40,6 +40,7 @@ const LinkContent = ({ text, icon }: { text: string; icon: ReactNode }) => {
       gap="$4"
       p="$3.5"
       br={'$4'}
+      w={'100%'}
       $gtLg={{ p: '$5' }}
       hoverStyle={hoverStyles}
     >
