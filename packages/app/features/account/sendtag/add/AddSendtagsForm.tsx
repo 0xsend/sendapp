@@ -4,7 +4,7 @@ import {
   Paragraph,
   PrimaryButton,
   Separator,
-  SubmitButton,
+  Spinner,
   useMedia,
   useThemeName,
   XStack,
@@ -15,7 +15,7 @@ import { maxNumSendTags, price, total } from 'app/data/sendtags'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { useConfirmedTags, usePendingTags } from 'app/utils/tags'
 import { useUser } from 'app/utils/useUser'
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { formatUnits } from 'viem'
 import type { z } from 'zod'
@@ -44,13 +44,25 @@ export const AddSendtagsForm = () => {
     href: '/account/sendtag/checkout',
   })
 
-  const createTagMutation = api.tag.create.useMutation()
+  const { mutateAsync: createTagMutateAsync, isPending: isCreateSendtagLoading } =
+    api.tag.create.useMutation()
 
-  async function createSendTag({ name }: z.infer<typeof SendtagSchema>) {
+  async function createSendTag() {
     if (!user.user) return console.error('No user')
 
+    const values = form.getValues()
+    const { data, error } = SendtagSchema.safeParse(values)
+
+    if (error || !data) {
+      form.setError('name', {
+        type: 'custom',
+        message: error?.errors?.[0]?.message ?? 'Invalid input',
+      })
+      return
+    }
+
     try {
-      await createTagMutation.mutateAsync({ name })
+      await createTagMutateAsync({ name: data.name })
       // form state is successfully submitted, show the purchase confirmation screen
       form.reset()
       user?.updateProfile()
@@ -66,36 +78,6 @@ export const AddSendtagsForm = () => {
       }
     }
   }
-
-  const renderAfterContent = useCallback(
-    ({ submit }: { submit: () => void }) => (
-      <XStack jc="space-between" ai={'center'}>
-        {media.gtMd ? (
-          <SendTagPricingTooltip name={form.watch('name', '')} />
-        ) : (
-          <SendTagPricingDialog name={form.watch('name', '')} />
-        )}
-        <SubmitButton
-          onPress={submit}
-          borderRadius={'$4'}
-          variant="outlined"
-          px={'$3'}
-          py={'$1.5'}
-          width={'auto'}
-          borderColor={isDarkTheme ? '$primary' : '$color12'}
-          height={40}
-          borderWidth={1}
-          spinnerProps={{ theme: 'dark' }}
-          icon={<IconPlus size={'$1'} color={'$primary'} $theme-light={{ color: '$color12' }} />}
-        >
-          <SubmitButton.Text color={'$white'} $theme-light={{ color: '$color12' }}>
-            ADD TAG
-          </SubmitButton.Text>
-        </SubmitButton>
-      </XStack>
-    ),
-    [media, form, isDarkTheme]
-  )
 
   return (
     <>
@@ -140,24 +122,63 @@ export const AddSendtagsForm = () => {
                     f: 0,
                     footerProps: { p: 0 },
                   }}
-                  renderAfter={renderAfterContent}
                 >
                   {({ name }) => {
                     return (
-                      <XStack position="relative">
-                        {name}
-                        <XStack
-                          position="absolute"
-                          bottom={-8}
-                          left={0}
-                          right={0}
-                          height={1}
-                          backgroundColor={isInputFocused ? '$primary' : '$silverChalice'}
-                          $theme-light={{
-                            backgroundColor: isInputFocused ? '$color12' : '$silverChalice',
-                          }}
-                        />
-                      </XStack>
+                      <>
+                        <XStack position="relative">
+                          {name}
+                          <XStack
+                            position="absolute"
+                            bottom={-8}
+                            left={0}
+                            right={0}
+                            height={1}
+                            backgroundColor={isInputFocused ? '$primary' : '$silverChalice'}
+                            $theme-light={{
+                              backgroundColor: isInputFocused ? '$color12' : '$silverChalice',
+                            }}
+                          />
+                        </XStack>
+                        <XStack jc="space-between" ai={'center'}>
+                          {media.gtMd ? (
+                            <SendTagPricingTooltip name={form.watch('name', '')} />
+                          ) : (
+                            <SendTagPricingDialog name={form.watch('name', '')} />
+                          )}
+                          <PrimaryButton
+                            onPress={() => createSendTag()}
+                            disabled={isCreateSendtagLoading}
+                            borderRadius={'$4'}
+                            variant="outlined"
+                            px={'$3'}
+                            py={'$1.5'}
+                            width={'auto'}
+                            borderColor={isDarkTheme ? '$primary' : '$color12'}
+                            height={40}
+                            borderWidth={1}
+                            spinnerProps={{ theme: 'dark' }}
+                            icon={
+                              isCreateSendtagLoading ? (
+                                <Spinner size={'small'} />
+                              ) : (
+                                <IconPlus
+                                  size={'$1'}
+                                  color={'$primary'}
+                                  $theme-light={{ color: '$color12' }}
+                                />
+                              )
+                            }
+                          >
+                            <PrimaryButton.Text
+                              color={'$white'}
+                              $theme-light={{ color: '$color12' }}
+                            >
+                              ADD TAG
+                            </PrimaryButton.Text>
+                          </PrimaryButton>
+                        </XStack>
+                      </>
                     )
                   }}
                 </SchemaForm>
