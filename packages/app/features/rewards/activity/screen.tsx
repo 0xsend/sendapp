@@ -182,7 +182,7 @@ const DistributionRequirementsCard = ({
     [sendEarnBalances]
   )
 
-  const hasMinSavings = BigInt(distribution.earn_min_balance) < totalAssets
+  const hasMinSavings = totalAssets >= BigInt(distribution.earn_min_balance)
 
   if (verificationsQuery.isLoading || isLoadingSendAccount) {
     return (
@@ -268,31 +268,32 @@ const DistributionRequirementsCard = ({
               }
             })()}
           </XStack>
-
-          <XStack ai="center" gap="$2">
-            <Paragraph>
-              Savings Deposit $
-              {formatAmount(
-                formatUnits(BigInt(distribution.earn_min_balance ?? 0n), usdcCoin.decimals) ?? 0n,
-                9,
-                2
-              )}{' '}
-            </Paragraph>
-            {(() => {
-              switch (true) {
-                case isLoadingSendEarnBalances:
-                  return <Spinner size="small" />
-                case distribution.earn_min_balance === undefined || !hasMinSavings:
-                  return (
-                    <Theme name="red">
-                      <IconInfoCircle color={'$color8'} size={'$2'} />
-                    </Theme>
-                  )
-                default:
-                  return <CheckCircle2 color={isDark ? '$primary' : '$color12'} size={'$1.5'} />
-              }
-            })()}
-          </XStack>
+          {BigInt(distribution.earn_min_balance ?? 0n) > 0n ? (
+            <XStack ai="center" gap="$2">
+              <Paragraph>
+                Savings Deposit $
+                {formatAmount(
+                  formatUnits(BigInt(distribution.earn_min_balance ?? 0n), usdcCoin.decimals) ?? 0n,
+                  9,
+                  2
+                )}{' '}
+              </Paragraph>
+              {(() => {
+                switch (true) {
+                  case isLoadingSendEarnBalances:
+                    return <Spinner size="small" />
+                  case !hasMinSavings:
+                    return (
+                      <Theme name="red">
+                        <IconInfoCircle color={'$color8'} size={'$2'} />
+                      </Theme>
+                    )
+                  default:
+                    return <CheckCircle2 color={isDark ? '$primary' : '$color12'} size={'$1.5'} />
+                }
+              })()}
+            </XStack>
+          ) : null}
         </YStack>
       </Stack>
     </FadeCard>
