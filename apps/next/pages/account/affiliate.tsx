@@ -13,7 +13,7 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Friends</title>
+        <title>Send | Referrals</title>
         <meta name="description" content="View invited friends and track activity." key="desc" />
       </Head>
       <FriendsScreen />
@@ -59,7 +59,7 @@ export const getServerSideProps = userProtectedGetSSP(
 )
 
 Page.getLayout = (children) => {
-  const header = children.props.count ? `Friends (${children.props.count})` : 'Friends'
+  const header = children.props.count ? `Referrals (${children.props.count})` : 'Referrals'
   return <HomeLayout TopNav={<TopNav header={header} />}>{children}</HomeLayout>
 }
 
