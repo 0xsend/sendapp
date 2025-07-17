@@ -33,14 +33,14 @@ SELECT ok(EXISTS(
 -- Mock receipt for confirmation
 SET ROLE service_role;
 INSERT INTO sendtag_checkout_receipts(
-    chain_id, log_addr, tx_hash, ig_name, src_name, block_num, tx_idx, 
+    chain_id, log_addr, tx_hash, ig_name, src_name, block_num, tx_idx,
     log_idx, abi_idx, block_time, sender, amount, referrer, reward
 ) VALUES (
-    8453, 
+    8453,
     decode('833589fcd6edb6e08f4c7c32d4f71b54bda02913', 'hex'),
     decode('1234567890123456789012345678901234567890123456789012345678901234', 'hex'),
-    'sendtag_checkout_receipts', 
-    'integration_test', 
+    'sendtag_checkout_receipts',
+    'integration_test',
     1, 0, 0, 0, 1234567890,
     decode(substring('0x5234567890123456789012345678901234567890' FROM 3), 'hex'),
     1000000,
@@ -51,9 +51,9 @@ SET ROLE postgres;
 
 -- Test 2: confirm_tags function integration
 SELECT confirm_tags(
-    ARRAY['flowtest']::citext[], 
-    (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('integration_user')), 
-    'sendtag_checkout_receipts/integration_test/1/0/0/0', 
+    ARRAY['flowtest']::citext[],
+    (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('integration_user')),
+    'sendtag_checkout_receipts/integration_test/1/0/0/0',
     NULL
 );
 
@@ -63,15 +63,15 @@ SELECT ok(EXISTS(
 
 -- Test 3: Receipt created properly
 SELECT ok(EXISTS(
-    SELECT 1 FROM receipts 
-    WHERE event_id = 'sendtag_checkout_receipts/integration_test/1/0/0/0' 
+    SELECT 1 FROM receipts
+    WHERE event_id = 'sendtag_checkout_receipts/integration_test/1/0/0/0'
     AND user_id = tests.get_supabase_uid('integration_user')
 ), 'Receipt created for user');
 
 -- Test 4: Tag receipt association created
 SELECT ok(EXISTS(
     SELECT 1 FROM tag_receipts tr
-    WHERE tr.event_id = 'sendtag_checkout_receipts/integration_test/1/0/0/0' 
+    WHERE tr.event_id = 'sendtag_checkout_receipts/integration_test/1/0/0/0'
     AND tr.tag_id = (SELECT id FROM tags WHERE name = 'flowtest')
 ), 'Tag receipt association created');
 
@@ -90,14 +90,14 @@ SELECT create_tag('referrertag', (SELECT id FROM send_accounts WHERE user_id = t
 SET ROLE service_role;
 -- Create receipt for referrer
 INSERT INTO sendtag_checkout_receipts(
-    chain_id, log_addr, tx_hash, ig_name, src_name, block_num, tx_idx, 
+    chain_id, log_addr, tx_hash, ig_name, src_name, block_num, tx_idx,
     log_idx, abi_idx, block_time, sender, amount, referrer, reward
 ) VALUES (
-    8453, 
+    8453,
     decode('833589fcd6edb6e08f4c7c32d4f71b54bda02913', 'hex'),
     decode('2234567890123456789012345678901234567890123456789012345678901234', 'hex'),
-    'sendtag_checkout_receipts', 
-    'referrer_test', 
+    'sendtag_checkout_receipts',
+    'referrer_test',
     2, 0, 0, 0, 1234567890,
     decode(substring('0x6234567890123456789012345678901234567890' FROM 3), 'hex'),
     1000000,
@@ -107,9 +107,9 @@ INSERT INTO sendtag_checkout_receipts(
 SET ROLE postgres;
 
 SELECT confirm_tags(
-    ARRAY['referrertag']::citext[], 
-    (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('referrer_user')), 
-    'sendtag_checkout_receipts/referrer_test/2/0/0/0', 
+    ARRAY['referrertag']::citext[],
+    (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('referrer_user')),
+    'sendtag_checkout_receipts/referrer_test/2/0/0/0',
     NULL
 );
 
@@ -124,14 +124,14 @@ SELECT create_tag('referredtag', (SELECT id FROM send_accounts WHERE user_id = t
 -- Mock receipt for referred tag
 SET ROLE service_role;
 INSERT INTO sendtag_checkout_receipts(
-    chain_id, log_addr, tx_hash, ig_name, src_name, block_num, tx_idx, 
+    chain_id, log_addr, tx_hash, ig_name, src_name, block_num, tx_idx,
     log_idx, abi_idx, block_time, sender, amount, referrer, reward
 ) VALUES (
-    8453, 
+    8453,
     decode('833589fcd6edb6e08f4c7c32d4f71b54bda02913', 'hex'),
     decode('3234567890123456789012345678901234567890123456789012345678901234', 'hex'),
-    'sendtag_checkout_receipts', 
-    'referred_test', 
+    'sendtag_checkout_receipts',
+    'referred_test',
     3, 0, 0, 0, 1234567890,
     decode(substring('0x5234567890123456789012345678901234567890' FROM 3), 'hex'),
     1000000,
@@ -142,9 +142,9 @@ SET ROLE postgres;
 
 -- Confirm with referral
 SELECT confirm_tags(
-    ARRAY['referredtag']::citext[], 
-    (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('integration_user')), 
-    'sendtag_checkout_receipts/referred_test/3/0/0/0', 
+    ARRAY['referredtag']::citext[],
+    (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('integration_user')),
+    'sendtag_checkout_receipts/referred_test/3/0/0/0',
     (SELECT referral_code FROM profiles WHERE id = tests.get_supabase_uid('referrer_user'))
 );
 
@@ -154,7 +154,7 @@ SELECT ok(EXISTS(
 
 -- Test 8: Referral relationship created
 SELECT ok(EXISTS(
-    SELECT 1 FROM referrals 
+    SELECT 1 FROM referrals
     WHERE referred_id = tests.get_supabase_uid('integration_user')
     AND referrer_id = tests.get_supabase_uid('referrer_user')
 ), 'Referral relationship created');
@@ -166,14 +166,14 @@ SELECT create_tag('multitag2', (SELECT id FROM send_accounts WHERE user_id = tes
 -- Mock receipt for multiple tags
 SET ROLE service_role;
 INSERT INTO sendtag_checkout_receipts(
-    chain_id, log_addr, tx_hash, ig_name, src_name, block_num, tx_idx, 
+    chain_id, log_addr, tx_hash, ig_name, src_name, block_num, tx_idx,
     log_idx, abi_idx, block_time, sender, amount, referrer, reward
 ) VALUES (
-    8453, 
+    8453,
     decode('833589fcd6edb6e08f4c7c32d4f71b54bda02913', 'hex'),
     decode('4234567890123456789012345678901234567890123456789012345678901234', 'hex'),
-    'sendtag_checkout_receipts', 
-    'multi_test', 
+    'sendtag_checkout_receipts',
+    'multi_test',
     4, 0, 0, 0, 1234567890,
     decode(substring('0x5234567890123456789012345678901234567890' FROM 3), 'hex'),
     2000000,  -- Double amount for 2 tags
@@ -184,9 +184,9 @@ SET ROLE postgres;
 
 -- Confirm multiple tags
 SELECT confirm_tags(
-    ARRAY['multitag1', 'multitag2']::citext[], 
-    (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('integration_user')), 
-    'sendtag_checkout_receipts/multi_test/4/0/0/0', 
+    ARRAY['multitag1', 'multitag2']::citext[],
+    (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('integration_user')),
+    'sendtag_checkout_receipts/multi_test/4/0/0/0',
     NULL
 );
 

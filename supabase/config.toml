@@ -33,6 +33,7 @@ schema_paths = [
   "./schemas/tags.sql",
   "./schemas/send_accounts.sql",
   "./schemas/send_account_tags.sql",
+  "./schemas/link_in_bio.sql",
   "./schemas/referrals.sql",
   "./schemas/distributions.sql",
   "./schemas/send_earn.sql",

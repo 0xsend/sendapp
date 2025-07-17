@@ -1,3 +1,4 @@
+
 CREATE TYPE "public"."profile_lookup_result" AS (
 	"id" "uuid",
 	"avatar_url" "text",
@@ -12,8 +13,9 @@ CREATE TYPE "public"."profile_lookup_result" AS (
 	"is_public" boolean,
 	"sendid" integer,
 	"all_tags" "text"[],
-	"main_tag_id" integer,
-	"main_tag_name" "text"
+	"main_tag_id" bigint,
+	"main_tag_name" "text",
+	"links_in_bio" link_in_bio[]
 );
 ALTER TYPE "public"."profile_lookup_result" OWNER TO "postgres";
 
@@ -28,7 +30,7 @@ begin
     if lookup_type is null then raise exception 'lookup_type cannot be null'; end if;
 
     RETURN QUERY
-    SELECT ROW(
+    SELECT
         case when p.id = ( select auth.uid() ) then p.id end,
         p.avatar_url::text,
         p.name::text,
@@ -49,8 +51,13 @@ begin
           join send_accounts sa2 on sa2.id = sat2.send_account_id
           where sa2.user_id = p.id and t2.status = 'confirmed'::tag_status ),
         case when p.id = ( select auth.uid() ) then sa.main_tag_id end,
-        mt.name::text
-    )::profile_lookup_result
+        mt.name::text,
+        CASE WHEN p.is_public THEN
+            (SELECT array_agg((NULL::integer, NULL::uuid, sl2.handle, sl2.domain_name, sl2.domain, sl2.created_at, sl2.updated_at)::link_in_bio)
+            FROM link_in_bio sl2
+            WHERE sl2.user_id = p.id AND sl2.handle IS NOT NULL)
+        ELSE NULL
+        END
     from profiles p
     join auth.users a on a.id = p.id
     left join send_accounts sa on sa.user_id = p.id
@@ -411,7 +418,7 @@ GRANT ALL ON FUNCTION "public"."profile_lookup"("lookup_type" "public"."lookup_t
 -- Functions
 
 CREATE OR REPLACE FUNCTION public.get_friends()
- RETURNS TABLE(avatar_url text, send_id int, x_username text, birthday date, tag citext, created_at timestamp with time zone)
+ RETURNS TABLE(avatar_url text, send_id int, x_username text, links_in_bio link_in_bio[], birthday date, tag citext, created_at timestamp with time zone)
  LANGUAGE plpgsql
  SECURITY DEFINER
  SET search_path TO 'public'
@@ -424,6 +431,12 @@ BEGIN
                 p.avatar_url,
                 p.send_id,
                 CASE WHEN p.is_public THEN p.x_username ELSE NULL END AS x_username,
+                CASE WHEN p.is_public THEN
+                    (SELECT array_agg((NULL::integer, NULL::uuid, sl.handle, sl.domain_name, sl.domain, sl.created_at, sl.updated_at)::link_in_bio)
+                     FROM link_in_bio sl
+                     WHERE sl.user_id = p.id AND sl.handle IS NOT NULL)
+                ELSE NULL
+                END AS links_in_bio,
                 CASE WHEN p.is_public THEN p.birthday ELSE NULL END AS birthday,
                 t.name AS tag,
                 t.created_at,
@@ -449,6 +462,7 @@ BEGIN
             o.avatar_url,
             o.send_id,
             o.x_username,
+            o.links_in_bio,
             o.birthday,
             o.tag,
             o.created_at
@@ -466,15 +480,14 @@ GRANT ALL ON FUNCTION "public"."get_friends"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."get_friends"() TO "service_role";
 
 -- Views
-CREATE OR REPLACE VIEW "public"."referrer" WITH ("security_barrier"='on') AS
- WITH "referrer" AS (
-         SELECT "p"."send_id"
-           FROM ("public"."referrals" "r"
-             JOIN "public"."profiles" "p" ON (("r"."referrer_id" = "p"."id")))
-          WHERE ("r"."referred_id" = ( SELECT "auth"."uid"() AS "uid"))
-          ORDER BY "r"."created_at"
+create or replace view "public"."referrer" as  WITH referrer AS (
+         SELECT p.send_id
+           FROM (referrals r
+             JOIN profiles p ON ((r.referrer_id = p.id)))
+          WHERE (r.referred_id = ( SELECT auth.uid() AS uid))
+          ORDER BY r.created_at
          LIMIT 1
-        ), "profile_lookup" AS (
+        ), profile_lookup AS (
          SELECT "p"."id",
             "p"."avatar_url",
             "p"."name",
@@ -490,28 +503,30 @@ CREATE OR REPLACE VIEW "public"."referrer" WITH ("security_barrier"='on') AS
             "p"."all_tags",
             "p"."main_tag_id",
             "p"."main_tag_name",
+            "p"."links_in_bio",
             "referrer"."send_id"
-           FROM ("public"."profile_lookup"('sendid'::"public"."lookup_type_enum", ( SELECT ("referrer_1"."send_id")::"text" AS "send_id"
-                   FROM "referrer" "referrer_1")) "p"("id", "avatar_url", "name", "about", "refcode", "x_username", "birthday", "tag", "address", "chain_id", "is_public", "sendid", "all_tags", "main_tag_id", "main_tag_name")
-             JOIN "referrer" ON (("referrer"."send_id" IS NOT NULL)))
+           FROM (profile_lookup('sendid'::lookup_type_enum, ( SELECT (referrer_1.send_id)::text AS send_id
+                   FROM referrer referrer_1)) p(id, avatar_url, name, about, refcode, x_username, birthday, tag, address, chain_id, is_public, sendid, all_tags, main_tag_id, main_tag_name, links_in_bio)
+             JOIN referrer ON ((referrer.send_id IS NOT NULL)))
         )
- SELECT "profile_lookup"."id",
-    "profile_lookup"."avatar_url",
-    "profile_lookup"."name",
-    "profile_lookup"."about",
-    "profile_lookup"."refcode",
-    "profile_lookup"."x_username",
-    "profile_lookup"."birthday",
-    "profile_lookup"."tag",
-    "profile_lookup"."address",
-    "profile_lookup"."chain_id",
-    "profile_lookup"."is_public",
-    "profile_lookup"."sendid",
-    "profile_lookup"."all_tags",
-    "profile_lookup"."main_tag_id",
-    "profile_lookup"."main_tag_name",
-    "profile_lookup"."send_id"
-   FROM "profile_lookup";
+ SELECT profile_lookup.id,
+    profile_lookup.avatar_url,
+    profile_lookup.name,
+    profile_lookup.about,
+    profile_lookup.refcode,
+    profile_lookup.x_username,
+    profile_lookup.birthday,
+    profile_lookup.tag,
+    profile_lookup.address,
+    profile_lookup.chain_id,
+    profile_lookup.is_public,
+    profile_lookup.sendid,
+    profile_lookup.all_tags,
+    profile_lookup.main_tag_id,
+    profile_lookup.main_tag_name,
+    profile_lookup.links_in_bio,
+    profile_lookup.send_id
+   FROM profile_lookup;
 
 ALTER TABLE "public"."referrer" OWNER TO "postgres";
 
@@ -525,7 +540,7 @@ DECLARE
     new_ref_result profile_lookup_result;
     referrer_send_id text;
 BEGIN
-    -- Find the current user's referrer's send_id (if exists)
+
     SELECT send_id INTO referrer_send_id
     FROM referrals r
     JOIN profiles p ON r.referrer_id = p.id
@@ -538,7 +553,6 @@ BEGIN
         FROM profile_lookup('sendid'::lookup_type_enum, referrer_send_id)
         LIMIT 1;
     END IF;
-
     -- Look up new referrer if:
     -- 1. referral_code is valid AND
     -- 2. No existing referrer found
