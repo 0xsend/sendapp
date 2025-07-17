@@ -7,7 +7,6 @@ import { useToastController } from '@my/ui'
 export const AuthUserSchema = z.object({
   phone: formFields.text,
   birthday: formFields.date.optional(),
-  xUsername: formFields.text.optional(),
   // email: formFields.text.describe('Email'),
   // address: formFields.text.describe('Address'),
 })
