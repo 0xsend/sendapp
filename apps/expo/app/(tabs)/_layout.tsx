@@ -47,17 +47,6 @@ const TABS = [
     },
   },
   {
-    Icon: IconWorldSearch,
-    key: 'explore/index',
-    title: 'Explore',
-    listeners: {
-      tabPress: (e) => {
-        e.preventDefault()
-        router.push('/(tabs)/explore')
-      },
-    },
-  },
-  {
     Icon: IconDeviceReset,
     key: 'activity/index',
     title: 'Activity',
@@ -65,6 +54,17 @@ const TABS = [
       tabPress: (e) => {
         e.preventDefault()
         router.push('/(tabs)/activity')
+      },
+    },
+  },
+  {
+    Icon: IconWorldSearch,
+    key: 'explore/index',
+    title: 'Explore',
+    listeners: {
+      tabPress: (e) => {
+        e.preventDefault()
+        router.push('/(tabs)/explore')
       },
     },
   },
