@@ -8,7 +8,6 @@ export default function Screen() {
         <ExploreScreen
           images={{
             rewards: require('../../../assets/images/explore_rewards.jpg'),
-            feed: require('../../../assets/images/feed.jpg'),
           }}
         />
       </TabScreenContainer>

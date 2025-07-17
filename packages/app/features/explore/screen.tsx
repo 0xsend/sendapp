@@ -26,7 +26,6 @@ export const ExploreScreen = ({ images }: { images: Record<string, string> }) =>
           subtitle={'Challenge your luck, win big prizes'}
         />
       )}
-      <LinkBanner href={'/feed'} imgUrl={images.feed || ''} title={'Community Feed'} />
     </YStack>
   )
 }
