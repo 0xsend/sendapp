@@ -1916,23 +1916,7 @@ export type Database = {
           lookup_type: Database["public"]["Enums"]["lookup_type_enum"]
           identifier: string
         }
-        Returns: {
-          id: string
-          avatar_url: string
-          name: string
-          about: string
-          refcode: string
-          x_username: string
-          birthday: string
-          tag: string
-          address: string
-          chain_id: number
-          is_public: boolean
-          sendid: number
-          all_tags: string[]
-          main_tag_id: number
-          main_tag_name: string
-        }[]
+        Returns: Database["public"]["CompositeTypes"]["profile_lookup_result"][]
       }
       query_webauthn_credentials_by_phone: {
         Args: { phone_number: string }
@@ -2113,6 +2097,8 @@ export type Database = {
         is_public: boolean | null
         sendid: number | null
         all_tags: string[] | null
+        main_tag_id: number | null
+        main_tag_name: string | null
       }
       tag_search_result: {
         avatar_url: string | null

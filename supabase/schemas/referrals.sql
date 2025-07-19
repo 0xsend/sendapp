@@ -1,53 +1,74 @@
+CREATE TYPE "public"."profile_lookup_result" AS (
+	"id" "uuid",
+	"avatar_url" "text",
+	"name" "text",
+	"about" "text",
+	"refcode" "text",
+	"x_username" "text",
+	"birthday" "date",
+	"tag" "public"."citext",
+	"address" "public"."citext",
+	"chain_id" integer,
+	"is_public" boolean,
+	"sendid" integer,
+	"all_tags" "text"[],
+	"main_tag_id" integer,
+	"main_tag_name" "text"
+);
+ALTER TYPE "public"."profile_lookup_result" OWNER TO "postgres";
+
 -- Functions
 CREATE OR REPLACE FUNCTION public.profile_lookup(lookup_type lookup_type_enum, identifier text)
- RETURNS TABLE(id uuid, avatar_url text, name text, about text, refcode text, x_username text, birthday date, tag citext, address citext, chain_id integer, is_public boolean, sendid integer, all_tags text[], main_tag_id bigint, main_tag_name text)
+ RETURNS SETOF profile_lookup_result
  LANGUAGE plpgsql
  IMMUTABLE SECURITY DEFINER
 AS $function$
 begin
     if identifier is null or identifier = '' then raise exception 'identifier cannot be null or empty'; end if;
     if lookup_type is null then raise exception 'lookup_type cannot be null'; end if;
-return query --
-select case when p.id = ( select auth.uid() ) then p.id end              as id,
-       p.avatar_url::text                                                as avatar_url,
-        p.name::text                                                      as name,
-        p.about::text                                                     as about,
-        p.referral_code                                                   as refcode,
-       CASE WHEN p.is_public THEN p.x_username ELSE NULL END AS x_username, -- changed to be null if profile is private
-       CASE WHEN p.is_public THEN p.birthday ELSE NULL END AS birthday, -- added birthday to return type, returns null if profile is private
-       COALESCE(mt.name, t.name)                                         as tag,
-       sa.address                                                        as address,
-       sa.chain_id                                                       as chain_id,
-       case when current_setting('role')::text = 'service_role' then p.is_public
+
+    RETURN QUERY
+    SELECT ROW(
+        case when p.id = ( select auth.uid() ) then p.id end,
+        p.avatar_url::text,
+        p.name::text,
+        p.about::text,
+        p.referral_code,
+        CASE WHEN p.is_public THEN p.x_username ELSE NULL END,
+        CASE WHEN p.is_public THEN p.birthday ELSE NULL END,
+        COALESCE(mt.name, t.name),
+        sa.address,
+        sa.chain_id,
+        case when current_setting('role')::text = 'service_role' then p.is_public
             when p.is_public then true
-            else false end                                               as is_public,
-       p.send_id                                                         as sendid,
-       ( select array_agg(t2.name::text)
-         from tags t2
-         join send_account_tags sat2 on sat2.tag_id = t2.id
-         join send_accounts sa2 on sa2.id = sat2.send_account_id
-         where sa2.user_id = p.id and t2.status = 'confirmed'::tag_status ) as all_tags,
-       case when p.id = ( select auth.uid() ) then sa.main_tag_id end   as main_tag_id,
-       mt.name::text                                                     as main_tag_name
-from profiles p
+            else false end,
+        p.send_id,
+        ( select array_agg(t2.name::text)
+          from tags t2
+          join send_account_tags sat2 on sat2.tag_id = t2.id
+          join send_accounts sa2 on sa2.id = sat2.send_account_id
+          where sa2.user_id = p.id and t2.status = 'confirmed'::tag_status ),
+        case when p.id = ( select auth.uid() ) then sa.main_tag_id end,
+        mt.name::text
+    )::profile_lookup_result
+    from profiles p
     join auth.users a on a.id = p.id
     left join send_accounts sa on sa.user_id = p.id
     left join tags mt on mt.id = sa.main_tag_id
     left join send_account_tags sat on sat.send_account_id = sa.id
     left join tags t on t.id = sat.tag_id and t.status = 'confirmed'::tag_status
-where ((lookup_type = 'sendid' and p.send_id::text = identifier) or
-    (lookup_type = 'tag' and t.name = identifier::citext) or
-    (lookup_type = 'refcode' and p.referral_code = identifier) or
-    (lookup_type = 'address' and sa.address = identifier) or
-    (p.is_public and lookup_type = 'phone' and a.phone::text = identifier)) -- lookup by phone number when profile is public
-  and (p.is_public -- allow public profiles to be returned
-   or ( select auth.uid() ) is not null -- allow profiles to be returned if the user is authenticated
-   or current_setting('role')::text = 'service_role') -- allow public profiles to be returned to service role
+    where ((lookup_type = 'sendid' and p.send_id::text = identifier) or
+        (lookup_type = 'tag' and t.name = identifier::citext) or
+        (lookup_type = 'refcode' and p.referral_code = identifier) or
+        (lookup_type = 'address' and sa.address = identifier) or
+        (p.is_public and lookup_type = 'phone' and a.phone::text = identifier))
+    and (p.is_public
+     or ( select auth.uid() ) is not null
+     or current_setting('role')::text = 'service_role')
     limit 1;
 end;
 $function$
 ;
-
 
 ALTER FUNCTION "public"."profile_lookup"("lookup_type" "public"."lookup_type_enum", "identifier" "text") OWNER TO "postgres";
 
@@ -500,45 +521,45 @@ CREATE OR REPLACE FUNCTION public.referrer_lookup(referral_code text DEFAULT NUL
  SECURITY DEFINER
 AS $function$
 DECLARE
-ref_result profile_lookup_result;
+    ref_result profile_lookup_result;
     new_ref_result profile_lookup_result;
     referrer_send_id text;
 BEGIN
     -- Find the current user's referrer's send_id (if exists)
-SELECT send_id INTO referrer_send_id
-FROM referrals r
-         JOIN profiles p ON r.referrer_id = p.id
-WHERE r.referred_id = auth.uid()
+    SELECT send_id INTO referrer_send_id
+    FROM referrals r
+    JOIN profiles p ON r.referrer_id = p.id
+    WHERE r.referred_id = auth.uid()
     LIMIT 1;
 
--- Look up existing referrer if valid send_id exists
-IF referrer_send_id IS NOT NULL AND referrer_send_id != '' THEN
-SELECT * INTO ref_result
-FROM profile_lookup('sendid'::lookup_type_enum, referrer_send_id)
-         LIMIT 1;
-END IF;
+    -- Look up existing referrer if valid send_id exists
+    IF referrer_send_id IS NOT NULL AND referrer_send_id != '' THEN
+        SELECT * INTO ref_result
+        FROM profile_lookup('sendid'::lookup_type_enum, referrer_send_id)
+        LIMIT 1;
+    END IF;
 
     -- Look up new referrer if:
     -- 1. referral_code is valid AND
     -- 2. No existing referrer found
     IF referral_code IS NOT NULL AND referral_code != '' AND referrer_send_id IS NULL THEN
         -- Try tag lookup first, then refcode if needed
-SELECT * INTO new_ref_result
-FROM profile_lookup('tag'::lookup_type_enum, referral_code)
-         LIMIT 1;
+        SELECT * INTO new_ref_result
+        FROM profile_lookup('tag'::lookup_type_enum, referral_code)
+        LIMIT 1;
 
-IF new_ref_result IS NULL THEN
-SELECT * INTO new_ref_result
-FROM profile_lookup('refcode'::lookup_type_enum, referral_code)
-         LIMIT 1;
-END IF;
-END IF;
+        IF new_ref_result IS NULL THEN
+            SELECT * INTO new_ref_result
+            FROM profile_lookup('refcode'::lookup_type_enum, referral_code)
+            LIMIT 1;
+        END IF;
+    END IF;
 
-RETURN QUERY
-SELECT ref_result, new_ref_result;
+    RETURN QUERY
+    SELECT ref_result, new_ref_result;
 END;
-$function$
-;
+$function$;
+
 ALTER FUNCTION "public"."referrer_lookup"("referral_code" "text") OWNER TO "postgres";
 REVOKE ALL ON FUNCTION "public"."referrer_lookup"("referral_code" "text") FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."referrer_lookup"("referral_code" "text") TO "anon";

@@ -3,7 +3,6 @@ import debug from 'debug'
 import { useRouter } from 'solito/router'
 import { useSessionContext } from './supabase/useSessionContext'
 import { useSupabase } from './supabase/useSupabase'
-import type { Database } from '@my/supabase/database-generated.types'
 
 const log = debug('app:utils:useUser')
 
