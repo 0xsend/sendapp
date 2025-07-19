@@ -18,6 +18,7 @@ import {
   Link,
   useMedia,
   useThemeName,
+  styled,
 } from '@my/ui'
 
 // Internal
@@ -27,6 +28,12 @@ import { useProfileScreenParams } from 'app/routers/params'
 import { IconLinkInBio } from 'app/components/icons'
 import { ShareOtherProfileDialog } from './components/ShareOtherProfileDialog'
 import type { Functions } from '@my/supabase/database.types'
+import { useTokenPrices } from 'app/utils/useTokenPrices'
+import { sendTokenAddress } from '@my/wagmi'
+import { baseMainnet } from '@my/wagmi'
+import { parseUnits } from 'viem'
+import { type allCoins, type allCoinsDict, coinsDict } from 'app/data/coins'
+import { IconFYSI } from 'app/components/icons/IconFYSI'
 
 interface ProfileScreenProps {
   sendid?: number | null
@@ -40,9 +47,21 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   const [shareDialogOpen, setShareDialogOpen] = useState(false)
   const {
     data: otherUserProfile,
-    isLoading,
+    isLoading: isLoadingProfile,
     error,
   } = useProfileLookup('sendid', otherUserId?.toString() || '')
+
+  const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
+
+  const isLoading = isLoadingProfile || isLoadingTokenPrices
+
+  const goBack = (): void => {
+    router.back()
+  }
+
+  const openShareMenu = (): void => {
+    setShareDialogOpen(true)
+  }
 
   if (isLoading) {
     return (
@@ -52,11 +71,11 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
     )
   }
 
-  if (error) {
+  if (error || !otherUserProfile) {
     return (
       <Stack w="100%" h="100%" jc={'center'} ai={'center'} f={1} gap="$6">
         <Text theme="red" color={'$color8'}>
-          {error.message}
+          {error?.message || 'Profile not found'}
         </Text>
       </Stack>
     )
@@ -111,13 +130,13 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
           right={0}
           zIndex={1}
         />
-        <Card.Header p={0} padded={media.gtLg} jc="space-between" ai="center" fd="row">
+        <Card.Header p={0} padded={media.gtMd} jc="space-between" ai="center" fd="row">
           <BlurStack intensity={10} circular>
             <Button
               size="$3"
               circular
               bc="rgba(102, 102, 102, 0.4)"
-              onPress={() => router.back()}
+              onPress={goBack}
               ai="center"
               jc={'center'}
               icon={<ChevronLeft size="$1.5" color="$white" />}
@@ -128,7 +147,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
               size="$3"
               circular
               bc="rgba(102, 102, 102, 0.4)"
-              onPress={() => setShareDialogOpen(true)}
+              onPress={openShareMenu}
               icon={<Upload size="$1" color="$white" />}
             />
           </BlurStack>
@@ -213,6 +232,9 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
       >
         <YStack gap="$4" f={1}>
           <XStack ai={'center'} jc="space-between">
+            <Paragraph color="$color12" fontSize="$6" fontWeight="600">
+              Send Vibes
+            </Paragraph>
             <Link
               textDecorationLine="underline"
               href={`/profile/${otherUserProfile?.sendid}/history`}
@@ -220,6 +242,8 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
               View History
             </Link>
           </XStack>
+
+          <Vibes profile={otherUserProfile} tokenPrices={tokenPrices} />
         </YStack>
         {otherUserProfile?.links_in_bio ? (
           <YStack gap="$4" f={1} miw="48%">
@@ -241,45 +265,198 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   )
 }
 
+const VibeButton = styled(LinkableButton, {
+  elevation: 1,
+  br: '$6',
+  ai: 'center',
+  jc: 'space-around',
+  w: 100,
+  h: 'auto',
+  gap: '$2',
+  f: 1,
+  fd: 'column',
+  p: '$3.5',
+})
+
+const Vibe = ({
+  amount,
+  sendToken,
+  note,
+  children,
+  profile,
+}: {
+  amount: bigint
+  sendToken: keyof allCoinsDict
+  note: string
+  children: React.ReactNode
+  profile: Functions<'profile_lookup'>[number]
+}) => {
+  return (
+    <YStack>
+      <VibeButton
+        href={{
+          pathname: '/send/confirm',
+          query: {
+            recipient: profile?.main_tag_name ? profile?.main_tag_name : (profile?.sendid ?? ''),
+            idType: profile?.main_tag_name ? 'tag' : 'sendid',
+            sendToken,
+            amount: amount.toString(),
+            note: encodeURIComponent(note),
+          },
+        }}
+      >
+        {children}
+      </VibeButton>
+    </YStack>
+  )
+}
+
+const Vibes = ({
+  profile,
+  tokenPrices,
+}: {
+  profile: Functions<'profile_lookup'>[number]
+  tokenPrices: Record<allCoins[number]['token'], number> | undefined
+}) => {
+  const dollarToTokenAmount = ({
+    amount,
+    tokenPrice,
+    token,
+  }: { amount: number; tokenPrice: number; token: keyof allCoinsDict }) => {
+    const coinData = coinsDict[token]
+
+    if (tokenPrice <= 0 || !coinData) {
+      return 0n
+    }
+
+    const tokenAmount = amount / tokenPrice
+    const decimals = coinData.decimals || 18
+
+    // Round to 2 decimal places
+    const roundedTokenAmount = Math.floor(tokenAmount * 100) / 100
+
+    // Convert to the proper bigint representation
+    // For example: 250.00 SEND tokens = 250 * 10^18 = 250000000000000000000n
+    return parseUnits(roundedTokenAmount.toFixed(2), decimals)
+  }
+
+  const isDark = useThemeName()?.startsWith('dark')
+  const sendTokenPrice = tokenPrices?.[sendTokenAddress[baseMainnet.id]] ?? 0
+  return (
+    <XStack w={'100%'} gap={'$2'} maw={509}>
+      <Vibe
+        amount={dollarToTokenAmount({
+          amount: 1,
+          tokenPrice: sendTokenPrice,
+          token: sendTokenAddress[baseMainnet.id],
+        })}
+        sendToken={sendTokenAddress[baseMainnet.id]}
+        note="😊"
+        profile={profile}
+      >
+        <Button.Text size={'$9'}>😊</Button.Text>
+        <Paragraph size={'$3'}>$1</Paragraph>
+      </Vibe>
+      <Vibe
+        amount={dollarToTokenAmount({
+          amount: 2,
+          tokenPrice: sendTokenPrice,
+          token: sendTokenAddress[baseMainnet.id],
+        })}
+        sendToken={sendTokenAddress[baseMainnet.id]}
+        note="🔥"
+        profile={profile}
+      >
+        <Button.Text size={'$9'}>🔥</Button.Text>
+        <Paragraph size={'$3'}>$2</Paragraph>
+      </Vibe>
+      <Vibe
+        amount={dollarToTokenAmount({
+          amount: 3,
+          tokenPrice: sendTokenPrice,
+          token: sendTokenAddress[baseMainnet.id],
+        })}
+        sendToken={sendTokenAddress[baseMainnet.id]}
+        note="💯"
+        profile={profile}
+      >
+        <Button.Text size={'$9'}>💯</Button.Text>
+        <Paragraph size={'$3'}>$3</Paragraph>
+      </Vibe>
+      <Vibe
+        amount={dollarToTokenAmount({
+          amount: 4,
+          tokenPrice: sendTokenPrice,
+          token: sendTokenAddress[baseMainnet.id],
+        })}
+        sendToken={sendTokenAddress[baseMainnet.id]}
+        note="🚀"
+        profile={profile}
+      >
+        <Button.Text size={'$9'}>🚀</Button.Text>
+        <Paragraph size={'$3'}>$4</Paragraph>
+      </Vibe>
+      <Vibe
+        amount={dollarToTokenAmount({
+          amount: 5,
+          tokenPrice: sendTokenPrice,
+          token: sendTokenAddress[baseMainnet.id],
+        })}
+        sendToken={sendTokenAddress[baseMainnet.id]}
+        note="FYSI"
+        profile={profile}
+      >
+        <Button.Icon>
+          <IconFYSI size={'$3'} color={isDark ? '$primary' : '$color12'} />
+        </Button.Icon>
+        <Paragraph size={'$3'}>$5</Paragraph>
+      </Vibe>
+    </XStack>
+  )
+}
+
 const LinksInBio = ({ profile }: { profile: Functions<'profile_lookup'>[number] }) => {
   const theme = useThemeName()
   const isDark = theme?.startsWith('dark')
   return (
-    <Card padded size="$4" px="$2" borderRadius="$4" w={'100%'} fd="column" gap="$4">
-      {profile?.links_in_bio?.map((link) => {
-        const fullUrl = `https://${link.domain}${link.handle}`
-        return (
-          <LinkableButton
-            key={`${link.domain_name}`}
-            href={fullUrl}
-            target="_blank"
-            width="100%"
-            p={'$3'}
-            f={1}
-            chromeless
-            hoverStyle={{ backgroundColor: 'transparent' }}
-            pressStyle={{ backgroundColor: 'transparent', borderColor: 'transparent' }}
-            focusStyle={{ backgroundColor: 'transparent' }}
-          >
-            <XStack justifyContent="space-between" alignItems="center" width="100%">
-              <XStack gap="$4" alignItems="center">
-                <IconLinkInBio domain_name={link.domain_name} size={40} color="$white" />
-                <Paragraph size={'$5'} fontWeight={600} color={'$color12'}>
-                  {link.domain_name}
-                </Paragraph>
+    <Card padded size="$4" px="$2" borderRadius="$4" gap="$4" w={'100%'}>
+      <Card.Footer>
+        {profile?.links_in_bio?.map((link) => {
+          const fullUrl = `https://${link.domain}${link.handle}`
+          return (
+            <LinkableButton
+              key={`${link.domain_name}`}
+              href={fullUrl}
+              target="_blank"
+              width="100%"
+              p={'$3'}
+              f={1}
+              chromeless
+              hoverStyle={{ backgroundColor: 'transparent' }}
+              pressStyle={{ backgroundColor: 'transparent', borderColor: 'transparent' }}
+              focusStyle={{ backgroundColor: 'transparent' }}
+            >
+              <XStack justifyContent="space-between" alignItems="center" width="100%">
+                <XStack gap="$4" alignItems="center">
+                  <IconLinkInBio domain_name={link.domain_name} size={24} color="$white" />
+
+                  <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
+                    {link.domain_name}
+                  </Paragraph>
+                </XStack>
+                <XStack
+                  bg={isDark ? 'rgba(255, 255, 255, 0.10)' : 'rgba(0, 0, 0, 0.10)'}
+                  borderRadius="$2"
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  <ChevronRight size="$1" color="$color12" />
+                </XStack>
               </XStack>
-              <XStack
-                bg={isDark ? 'rgba(255, 255, 255, 0.10)' : 'rgba(0, 0, 0, 0.10)'}
-                borderRadius="$2"
-                justifyContent="center"
-                alignItems="center"
-              >
-                <ChevronRight size="$1" color="$color12" />
-              </XStack>
-            </XStack>
-          </LinkableButton>
-        )
-      })}
+            </LinkableButton>
+          )
+        })}
+      </Card.Footer>
     </Card>
   )
 }

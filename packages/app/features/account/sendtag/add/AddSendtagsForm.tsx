@@ -157,7 +157,6 @@ export const AddSendtagsForm = () => {
                             borderColor={isDarkTheme ? '$primary' : '$color12'}
                             height={40}
                             borderWidth={1}
-                            spinnerProps={{ theme: 'dark' }}
                             icon={
                               isCreateSendtagLoading ? (
                                 <Spinner size={'small'} />
