@@ -1,4 +1,3 @@
-import type { Tables } from '@my/supabase/database-generated.types'
 import type { Database, Functions } from '@my/supabase/database.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { useQuery } from '@tanstack/react-query'
