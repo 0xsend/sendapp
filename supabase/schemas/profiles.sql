@@ -38,11 +38,9 @@ CREATE TABLE IF NOT EXISTS "public"."profiles" (
     "referral_code" "text" DEFAULT "public"."generate_referral_code"(),
     "is_public" boolean DEFAULT true,
     "send_id" integer DEFAULT "nextval"('"public"."profiles_send_id_seq"'::"regclass") NOT NULL,
-    "x_username" "text",
     "birthday" "date",
     CONSTRAINT "profiles_about_update" CHECK (("length"("about") < 255)),
-    CONSTRAINT "profiles_name_update" CHECK (("length"("name") < 63)),
-    CONSTRAINT "profiles_x_username_update" CHECK (("length"("x_username") <= 64))
+    CONSTRAINT "profiles_name_update" CHECK (("length"("name") < 63))
 );
 
 
