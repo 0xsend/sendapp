@@ -11,6 +11,7 @@ import {
   generateProfileOpenGraphData,
   type ProfileOpenGraphData,
 } from 'utils/generateProfileOpenGraphData'
+import { getSiteUrl } from 'utils/getSiteUrl'
 
 interface PageProps {
   sendid?: number
@@ -23,7 +24,8 @@ export const Page: NextPageWithLayout<PageProps> = ({ sendid, siteUrl, openGraph
   const pageTitle = openGraphData?.title || 'Send | Profile'
   const description = openGraphData?.description || `Check out ${sendid} on /send`
   const canonicalUrl = openGraphData?.canonicalUrl || `${siteUrl}/profile/${sendid}`
-  const ogImageUrl = openGraphData?.imageUrl || null
+  const ogImageUrl =
+    openGraphData?.imageUrl || 'https://ghassets.send.app/2024/04/send-og-image.png'
 
   return (
     <>
@@ -35,18 +37,16 @@ export const Page: NextPageWithLayout<PageProps> = ({ sendid, siteUrl, openGraph
         <meta key="og:title" property="og:title" content={pageTitle} />
         <meta key="og:description" property="og:description" content={description} />
         <meta key="og:url" property="og:url" content={canonicalUrl} />
-        {ogImageUrl && (
-          <>
-            <meta key="og:image" property="og:image" content={ogImageUrl} />
-            <meta key="og:image:width" property="og:image:width" content="1200" />
-            <meta key="og:image:height" property="og:image:height" content="630" />
-            <meta key="og:image:type" property="og:image:type" content="image/jpeg" />
-          </>
-        )}
+
+        <meta key="og:image" property="og:image" content={ogImageUrl} />
+        <meta key="og:image:width" property="og:image:width" content="1200" />
+        <meta key="og:image:height" property="og:image:height" content="630" />
+        <meta key="og:image:type" property="og:image:type" content="image/png" />
+
         <meta key="twitter:card" name="twitter:card" content="summary_large_image" />
         <meta key="twitter:title" name="twitter:title" content={pageTitle} />
         <meta key="twitter:description" name="twitter:description" content={description} />
-        {ogImageUrl && <meta key="twitter:image" name="twitter:image" content={ogImageUrl} />}
+        <meta key="twitter:image" name="twitter:image" content={ogImageUrl} />
         <link rel="canonical" href={canonicalUrl} />
       </Head>
       <ProfileScreen sendid={sendid} />
@@ -65,10 +65,8 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
     }
   }
 
-  // Get site URL from request headers
-  const protocol = ctx.req.headers['x-forwarded-proto'] || 'http'
-  const host = ctx.req.headers['x-forwarded-host'] || ctx.req.headers.host
-  const siteUrl = `${protocol}://${host}`
+  // Get site URL securely using Vercel environment variables
+  const siteUrl = getSiteUrl()
 
   const supabase = createPagesServerClient<Database>(ctx)
   const {

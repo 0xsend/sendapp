@@ -71,7 +71,7 @@ function MyApp({
           property="og:image"
           content="https://ghassets.send.app/2024/04/send-og-image.png"
         />
-        <meta key="og:image:width" property="og:image:width" content="1200" />
+        <meta key="og:image:width" property="og:image:width" content="800" />
         <meta key="og:image:height" property="og:image:height" content="630" />
         <meta key="og:image:type" property="og:image:type" content="image/png" />
 
