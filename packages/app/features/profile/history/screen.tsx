@@ -16,6 +16,9 @@ import {
   isTemporalTokenTransfersEvent,
 } from 'app/utils/zod/activity/TemporalTransfersEventSchema'
 import { useProfileScreenParams, useRootScreenParams } from 'app/routers/params'
+import { ShareOtherProfileDialog } from '../components/ShareOtherProfileDialog'
+import { useActivityDetails } from 'app/provider/activity-details'
+import { Platform } from 'react-native'
 
 interface ProfileScreenProps {
   sendid?: number | null
@@ -30,8 +33,8 @@ export function ProfileHistoryScreen({ sendid: propSendid }: ProfileScreenProps)
     error,
   } = useProfileLookup('sendid', otherUserId?.toString() || '')
   const { user, profile: currentUserProfile } = useUser()
-  const [{ profile: profileParam }] = useRootScreenParams()
-  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
+  const [{ profile: profileParam }, setRootScreenParams] = useRootScreenParams()
+  const { selectActivity, isOpen } = useActivityDetails()
 
   const {
     data,
@@ -44,7 +47,6 @@ export function ProfileHistoryScreen({ sendid: propSendid }: ProfileScreenProps)
     otherUserId,
     currentUserId: currentUserProfile?.send_id,
   })
-
   const { pages } = data ?? {}
   const activities = pages?.flat() || []
 
@@ -55,7 +57,6 @@ export function ProfileHistoryScreen({ sendid: propSendid }: ProfileScreenProps)
       </Stack>
     )
   }
-
   if (error) {
     return (
       <Stack w="100%" h="100%" jc={'center'} ai={'center'} f={1} gap="$6">
@@ -65,57 +66,48 @@ export function ProfileHistoryScreen({ sendid: propSendid }: ProfileScreenProps)
       </Stack>
     )
   }
-
-  if (activitiesError) {
-    return (
-      <YStack f={1}>
-        <Paragraph
-          maxWidth={600}
-          fontFamily={'$mono'}
-          fontSize={'$5'}
-          theme={'red'}
-          color={'$color8'}
-          mt={'$4'}
-          ta={'center'}
-        >
-          {activitiesError?.message.split('.').at(0) ?? `${activitiesError}`}
-        </Paragraph>
-      </YStack>
-    )
-  }
-
   return (
     <XStack w={'100%'} gap={'$4'} height={'100%'}>
       <YStack
         f={1}
         height={'100%'}
         gap={'$2'}
-        display={profileParam || selectedActivity ? 'none' : 'flex'}
-        overflow={'hidden'}
+        display={profileParam || isOpen ? 'none' : 'flex'}
         $gtLg={{
           display: 'flex',
           maxWidth: '50%',
         }}
       >
+        {activitiesError !== null && (
+          <YStack f={1}>
+            <Paragraph
+              maxWidth={600}
+              fontFamily={'$mono'}
+              fontSize={'$5'}
+              theme={'red'}
+              color={'$color8'}
+              mt={'$4'}
+              ta={'center'}
+            >
+              {activitiesError?.message.split('.').at(0) ?? `${activitiesError}`}
+            </Paragraph>
+          </YStack>
+        )}
         {Boolean(otherUserProfile) && (
           <>
             <ProfileHeader profile={otherUserProfile} />
-            <Stack f={1} $gtLg={{ pb: '$3.5' }}>
+            <Stack f={1} mt={'$2'} $gtLg={{ pb: '$3.5' }}>
               {Boolean(!activities?.length) && (
-                <YStack f={1} height={'100%'} ai={'center'} jc={'space-between'}>
+                <YStack f={1}>
                   <Paragraph
-                    size={'$4'}
+                    size={'$8'}
                     fontWeight={'300'}
                     color={'$color10'}
                     textAlign={'center'}
                     pt={'$1.5'}
                   >
-                    There is nothing here. Start sending!
+                    No Activities
                   </Paragraph>
-                  <SendButton
-                    identifier={otherUserProfile?.main_tag_name ?? otherUserProfile?.sendid ?? ''}
-                    idType={otherUserProfile?.main_tag_name ? 'tag' : 'sendid'}
-                  />
                 </YStack>
               )}
               <FlatList
@@ -137,7 +129,7 @@ export function ProfileHistoryScreen({ sendid: propSendid }: ProfileScreenProps)
                           sent={activity?.to_user?.id !== user?.id}
                           otherUserProfile={otherUserProfile}
                           currentUserProfile={currentUserProfile}
-                          onPress={() => setSelectedActivity(activity)}
+                          onPress={() => selectActivity(activity)}
                         />
                       </Fade>
                       {shouldShowDatePill ? <DatePill date={date} /> : null}
@@ -151,27 +143,41 @@ export function ProfileHistoryScreen({ sendid: propSendid }: ProfileScreenProps)
                   ) : null
                 }
                 ListHeaderComponent={
-                  <SendButton
-                    identifier={otherUserProfile?.main_tag_name ?? otherUserProfile?.sendid ?? ''}
-                    idType={otherUserProfile?.main_tag_name ? 'tag' : 'sendid'}
-                  />
+                  Platform.OS === 'web' ? (
+                    <SendButton
+                      identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
+                      idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
+                    />
+                  ) : null
                 }
                 inverted={true}
                 showsVerticalScrollIndicator={false}
                 stickyHeaderIndices={[0]}
               />
             </Stack>
+            {Platform.OS !== 'web' && (
+              <SendButton
+                identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
+                idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
+              />
+            )}
           </>
         )}
       </YStack>
-      {selectedActivity ? (
+      {isOpen ? (
         <ActivityDetails
           w={'100%'}
           $gtLg={{
             maxWidth: '47%',
           }}
         />
-      ) : null}
+      ) : (
+        <ShareOtherProfileDialog
+          profile={otherUserProfile}
+          isOpen={profileParam !== undefined}
+          onClose={() => setRootScreenParams({ profile: undefined }, { webBehavior: 'replace' })}
+        />
+      )}
     </XStack>
   )
 }
