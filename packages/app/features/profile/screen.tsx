@@ -19,6 +19,8 @@ import {
   useMedia,
   useThemeName,
   styled,
+  useSafeAreaInsets,
+  View,
 } from '@my/ui'
 
 // Internal
@@ -34,6 +36,7 @@ import { baseMainnet } from '@my/wagmi'
 import { parseUnits } from 'viem'
 import { type allCoins, type allCoinsDict, coinsDict } from 'app/data/coins'
 import { IconFYSI } from 'app/components/icons/IconFYSI'
+import { useHoverStyles } from 'app/utils/useHoverStyles'
 
 interface ProfileScreenProps {
   sendid?: number | null
@@ -50,6 +53,8 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
     isLoading: isLoadingProfile,
     error,
   } = useProfileLookup('sendid', otherUserId?.toString() || '')
+
+  const safeAreaInsets = useSafeAreaInsets()
 
   const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
 
@@ -82,7 +87,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   }
 
   return (
-    <YStack f={1} w="100%" position="relative">
+    <>
       <Card
         elevation={0}
         padded
@@ -130,7 +135,14 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
           right={0}
           zIndex={1}
         />
-        <Card.Header p={0} padded={media.gtMd} jc="space-between" ai="center" fd="row">
+        <Card.Header
+          p={0}
+          pt={safeAreaInsets.top}
+          padded={media.gtMd}
+          jc="space-between"
+          ai="center"
+          fd="row"
+        >
           <BlurStack intensity={10} circular>
             <Button
               size="$3"
@@ -159,7 +171,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
           ai={media.gtMd ? 'flex-end' : 'flex-start'}
           jc={media.gtMd ? 'space-between' : 'flex-end'}
           f={1}
-          fd={media.gtMd ? 'row' : 'column'}
+          flexDirection={media.gtMd ? 'row' : 'column'}
           gap={media.gtMd ? '$8' : '$4'}
         >
           <YStack gap="$4">
@@ -216,21 +228,20 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
           </LinkableButton>
         </Card.Footer>
       </Card>
-
-      <YStack
-        paddingHorizontal="$4"
-        paddingTop="$6"
-        gap="$6"
-        pb="$12"
-        bc={'$color0'}
+      <View
+        maw={media.gtMd ? 1042 : 509}
+        display="flex"
         fd={media.gtMd ? 'row-reverse' : 'column'}
+        px="$4"
+        pt="$6"
+        pb="$12"
+        gap="$4"
+        bc={'$color0'}
         als={'center'}
         jc={'center'}
-        f={1}
-        maw={media.gtMd ? 1042 : 509}
         width={'100%'}
       >
-        <YStack gap="$4" f={1}>
+        <YStack gap="$4" f={1} w="100%">
           <XStack ai={'center'} jc="space-between">
             <Paragraph color="$color12" fontSize="$6" fontWeight="600">
               Send Vibes
@@ -242,18 +253,17 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
               View History
             </Link>
           </XStack>
-
           <Vibes profile={otherUserProfile} tokenPrices={tokenPrices} />
         </YStack>
         {otherUserProfile?.links_in_bio ? (
-          <YStack gap="$4" f={1} miw="48%">
+          <YStack gap="$4" f={1} w="100%">
             <Paragraph color="$color12" fontSize="$6" fontWeight="600">
               Let&apos;s Connect
             </Paragraph>
             <LinksInBio profile={otherUserProfile} />
           </YStack>
         ) : null}
-      </YStack>
+      </View>
       {otherUserProfile ? (
         <ShareOtherProfileDialog
           isOpen={shareDialogOpen}
@@ -261,7 +271,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
           profile={otherUserProfile}
         />
       ) : null}
-    </YStack>
+    </>
   )
 }
 
@@ -270,7 +280,8 @@ const VibeButton = styled(LinkableButton, {
   br: '$6',
   ai: 'center',
   jc: 'space-around',
-  w: 100,
+  w: 'auto',
+  maw: 100,
   h: 'auto',
   gap: '$2',
   f: 1,
@@ -291,23 +302,24 @@ const Vibe = ({
   children: React.ReactNode
   profile: Functions<'profile_lookup'>[number]
 }) => {
+  const hoverStyle = useHoverStyles()
   return (
-    <YStack>
-      <VibeButton
-        href={{
-          pathname: '/send/confirm',
-          query: {
-            recipient: profile?.main_tag_name ? profile?.main_tag_name : (profile?.sendid ?? ''),
-            idType: profile?.main_tag_name ? 'tag' : 'sendid',
-            sendToken,
-            amount: amount.toString(),
-            note: encodeURIComponent(note),
-          },
-        }}
-      >
-        {children}
-      </VibeButton>
-    </YStack>
+    <VibeButton
+      href={{
+        pathname: '/send/confirm',
+        query: {
+          recipient: profile?.main_tag_name ? profile?.main_tag_name : (profile?.sendid ?? ''),
+          idType: profile?.main_tag_name ? 'tag' : 'sendid',
+          sendToken,
+          amount: amount.toString(),
+          note: encodeURIComponent(note),
+        },
+      }}
+      bc="$color1"
+      hoverStyle={hoverStyle}
+    >
+      {children}
+    </VibeButton>
   )
 }
 
@@ -318,6 +330,7 @@ const Vibes = ({
   profile: Functions<'profile_lookup'>[number]
   tokenPrices: Record<allCoins[number]['token'], number> | undefined
 }) => {
+  const media = useMedia()
   const dollarToTokenAmount = ({
     amount,
     tokenPrice,
@@ -343,7 +356,7 @@ const Vibes = ({
   const isDark = useThemeName()?.startsWith('dark')
   const sendTokenPrice = tokenPrices?.[sendTokenAddress[baseMainnet.id]] ?? 0
   return (
-    <XStack w={'100%'} gap={'$2'} maw={509}>
+    <XStack jc="flex-start" gap={'$2'} p={2} overflowX={media.gtMd ? 'visible' : 'scroll'}>
       <Vibe
         amount={dollarToTokenAmount({
           amount: 1,
@@ -354,7 +367,7 @@ const Vibes = ({
         note="😊"
         profile={profile}
       >
-        <Button.Text size={'$9'}>😊</Button.Text>
+        <Button.Text size={media.xxs ? '$7' : '$9'}>😊</Button.Text>
         <Paragraph size={'$3'}>$1</Paragraph>
       </Vibe>
       <Vibe
@@ -367,7 +380,7 @@ const Vibes = ({
         note="🔥"
         profile={profile}
       >
-        <Button.Text size={'$9'}>🔥</Button.Text>
+        <Button.Text size={media.xxs ? '$7' : '$9'}>🔥</Button.Text>
         <Paragraph size={'$3'}>$2</Paragraph>
       </Vibe>
       <Vibe
@@ -380,7 +393,7 @@ const Vibes = ({
         note="💯"
         profile={profile}
       >
-        <Button.Text size={'$9'}>💯</Button.Text>
+        <Button.Text size={media.xxs ? '$7' : '$9'}>💯</Button.Text>
         <Paragraph size={'$3'}>$3</Paragraph>
       </Vibe>
       <Vibe
@@ -393,7 +406,7 @@ const Vibes = ({
         note="🚀"
         profile={profile}
       >
-        <Button.Text size={'$9'}>🚀</Button.Text>
+        <Button.Text size={media.xxs ? '$7' : '$9'}>🚀</Button.Text>
         <Paragraph size={'$3'}>$4</Paragraph>
       </Vibe>
       <Vibe
@@ -419,7 +432,7 @@ const LinksInBio = ({ profile }: { profile: Functions<'profile_lookup'>[number] 
   const theme = useThemeName()
   const isDark = theme?.startsWith('dark')
   return (
-    <Card padded size="$4" px="$2" borderRadius="$4" gap="$4" w={'100%'}>
+    <Card elevation={1} padded size="$4" px="$2" borderRadius="$4" gap="$4">
       <Card.Footer>
         {profile?.links_in_bio?.map((link) => {
           const fullUrl = `https://${link.domain}${link.handle}`
