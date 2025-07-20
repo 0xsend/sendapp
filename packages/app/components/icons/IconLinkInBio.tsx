@@ -52,7 +52,7 @@ export const IconLinkInBio = ({ domain_name, ...props }: { domain_name: string }
       bc={domainColors[domain_name]}
       br={12}
     >
-      <Icon size={'$4'} {...props} />
+      <Icon size={'$4'} color="white" {...props} />
     </XStack>
   )
 }
