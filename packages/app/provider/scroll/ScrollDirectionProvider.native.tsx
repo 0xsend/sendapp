@@ -5,6 +5,7 @@ import {
   ScrollDirection,
   type ScrollDirectionContextValue,
 } from 'app/provider/scroll/ScrollDirectionContext'
+import { usePathname } from 'app/utils/usePathname'
 
 const THRESHOLD = 20
 
@@ -19,45 +20,48 @@ const ScrollDirectionProvider = ({ children }: { children: ReactNode }) => {
 
   // State for UI updates
   const [direction, setDirection] = useState<ScrollDirectionContextValue['direction']>(null)
-  const [contentHeight, setContentHeight] = useState<number>(0)
+  const contentHeight = useRef<Record<string, number>>({})
   const [isAtEnd, setIsAtEnd] = useState(false)
+  const pathname = usePathname()
 
   // Callback for content size change
   const onContentSizeChange = useCallback(
     (w: number, height: number) => {
-      setContentHeight(height)
+      contentHeight.current[pathname] = height
       setIsAtEnd(height <= windowHeight)
     },
-    [windowHeight]
+    [windowHeight, pathname]
   )
 
   // Scroll event handler
   const onScroll = useCallback(
-    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    (e: NativeSyntheticEvent<NativeScrollEvent>, threshold?: number) => {
+      const _threshold = threshold ?? THRESHOLD
       const { contentOffset } = e.nativeEvent
       const contentOffsetY = contentOffset.y
 
       // Determine scroll direction
-      if (contentOffsetY < THRESHOLD) {
+      if (contentOffsetY < _threshold) {
         setDirection('up')
-      } else if (contentOffsetRef.current - contentOffsetY > THRESHOLD && !isAtEnd) {
+      } else if (contentOffsetRef.current - contentOffsetY > _threshold && !isAtEnd) {
         setDirection('up')
-      } else if (contentOffsetY - contentOffsetRef.current > THRESHOLD || isAtEnd) {
+      } else if (contentOffsetY - contentOffsetRef.current > _threshold || isAtEnd) {
         setDirection('down')
       }
 
       // Update last scroll position
       contentOffsetRef.current = contentOffsetY
+      const _contentHeight = contentHeight.current[pathname] || 0
 
       // Check if at the end of content
       const isScrollAtEnd =
-        contentHeight > windowHeight
-          ? windowHeight + contentOffsetY >= contentHeight - THRESHOLD
+        _contentHeight > windowHeight
+          ? windowHeight + contentOffsetY >= _contentHeight - THRESHOLD
           : false
 
       setIsAtEnd(isScrollAtEnd)
     },
-    [isAtEnd, contentHeight, windowHeight]
+    [isAtEnd, windowHeight, pathname]
   )
 
   // Memoized context value

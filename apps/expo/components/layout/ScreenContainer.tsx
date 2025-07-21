@@ -1,12 +1,10 @@
 import { Container, ScrollView, useSafeAreaInsets } from '@my/ui'
 import type { PropsWithChildren } from 'react'
-import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 
 export const CONTAINER_OFFSET = 10
 
 export const ScreenContainer = ({ children }: PropsWithChildren) => {
   const insets = useSafeAreaInsets()
-  const { onContentSizeChange, ref, onScroll } = useScrollDirection()
 
   return (
     <Container
@@ -18,7 +16,6 @@ export const ScreenContainer = ({ children }: PropsWithChildren) => {
       backgroundColor="$background"
     >
       <ScrollView
-        ref={ref}
         flex={1}
         contentContainerStyle={{
           flexGrow: 1,
@@ -29,9 +26,6 @@ export const ScreenContainer = ({ children }: PropsWithChildren) => {
         overflow={'visible'}
         bounces={true}
         overScrollMode="always" // Android scroll indicator
-        onScroll={onScroll}
-        onContentSizeChange={onContentSizeChange}
-        scrollEventThrottle={128}
       >
         {children}
       </ScrollView>

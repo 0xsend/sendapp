@@ -38,6 +38,7 @@ import { baseMainnet } from '@my/wagmi'
 import { useEnsName } from 'wagmi'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { useThemeName, type YStackProps } from 'tamagui'
+import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 
 type SearchResultsType = Functions<'tag_search'>[number]
 type SearchResultsKeysType = keyof SearchResultsType
@@ -58,6 +59,7 @@ function SearchResults() {
   const { results, isLoading, error } = useTagSearch()
   const [queryParams] = useRootScreenParams()
   const { search: query } = queryParams
+  const { onScroll, onContentSizeChange } = useScrollDirection()
 
   const [resultsFilter, setResultsFilter] = useState<SearchResultsKeysType | null>(null)
   if (isLoading) {
@@ -120,6 +122,13 @@ function SearchResults() {
       }}
       showsVerticalScrollIndicator={false}
       overflow="visible"
+      {...(Platform.OS === 'web'
+        ? {}
+        : {
+            onScroll,
+            onContentSizeChange,
+            scrollEventThrottle: 128,
+          })}
     >
       {query && matchesCount > 1 && (
         <YStack mb={'$4'}>

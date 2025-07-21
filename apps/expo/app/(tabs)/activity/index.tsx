@@ -7,19 +7,18 @@ export default function ActivityTabScreen() {
   const { height } = useTabBarSize()
 
   return (
-    <>
-      <Container
-        safeAreaProps={{
-          edges: ['left', 'right'],
-          style: { flex: 1 },
-        }}
-        flex={1}
-        backgroundColor="$background"
-        overflow={'hidden'}
-        paddingBottom={CONTAINER_OFFSET + height}
-      >
-        <ActivityScreen />
-      </Container>
-    </>
+    <Container
+      safeAreaProps={{
+        edges: ['left', 'right'],
+        style: { flex: 1 },
+      }}
+      flex={1}
+      backgroundColor="$background"
+      overflow={'hidden'}
+      paddingBottom={CONTAINER_OFFSET + height}
+      paddingHorizontal={0}
+    >
+      <ActivityScreen />
+    </Container>
   )
 }
