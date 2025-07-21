@@ -3,14 +3,12 @@ import { ExploreScreen } from 'app/features/explore/screen'
 
 export default function Screen() {
   return (
-    <>
-      <TabScreenContainer>
-        <ExploreScreen
-          images={{
-            rewards: require('../../../assets/images/explore_rewards.jpg'),
-          }}
-        />
-      </TabScreenContainer>
-    </>
+    <TabScreenContainer>
+      <ExploreScreen
+        images={{
+          rewards: require('../../../assets/images/explore_rewards.jpg'),
+        }}
+      />
+    </TabScreenContainer>
   )
 }

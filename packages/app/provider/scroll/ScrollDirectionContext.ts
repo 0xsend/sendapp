@@ -1,10 +1,15 @@
-import type { ScrollView, ScrollViewProps } from 'react-native'
+import type {
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  ScrollView,
+  ScrollViewProps,
+} from 'react-native'
 import { createContext, type RefObject, useContext } from 'react'
 
 export type ScrollDirectionContextValue = {
   direction: 'up' | 'down' | null
   isAtEnd: boolean
-  onScroll: ScrollViewProps['onScroll']
+  onScroll: (e: NativeSyntheticEvent<NativeScrollEvent>, threshold?: number) => void
   onContentSizeChange: ScrollViewProps['onContentSizeChange']
   ref: RefObject<ScrollView>
 }

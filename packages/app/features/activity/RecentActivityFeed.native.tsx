@@ -2,7 +2,7 @@ import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query
 import type { Activity } from 'app/utils/zod/activity'
 import type { PostgrestError } from '@supabase/postgrest-js'
 import type { ZodError } from 'zod'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import {
   dataProviderMakerNative,
   layoutProviderMakerNative,
@@ -13,7 +13,9 @@ import {
 } from '@my/ui'
 import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
 import { RecyclerListView } from 'recyclerlistview'
-import Search from 'app/components/SearchBar'
+import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
+import { useIsFocused } from '@react-navigation/native'
+import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
 
 // Date separator component
 const DateSeparatorRow = ({ dateKey }: { dateKey: string }) => (
@@ -36,7 +38,6 @@ type ListItem =
   | { type: 'activity'; data: Activity; isLastInGroup: boolean }
   | { type: 'date-separator'; data: { dateKey: string } }
   | { type: 'spacer' }
-  | { type: 'search' }
 
 export default function ActivityFeed({
   activityFeedQuery,
@@ -45,6 +46,10 @@ export default function ActivityFeed({
   activityFeedQuery: UseInfiniteQueryResult<InfiniteData<Activity[]>, PostgrestError | ZodError>
   onActivityPress: (activity: Activity) => void
 }) {
+  const { onScroll, onContentSizeChange } = useScrollDirection()
+  const isFocused = useIsFocused()
+  const justLoadedRef = useRef(false)
+
   const {
     data,
     isLoading: isLoadingActivities,
@@ -59,8 +64,6 @@ export default function ActivityFeed({
   // Create the mixed data structure with date separators + activities
   const { listData } = useMemo(() => {
     const items: ListItem[] = []
-
-    items.push({ type: 'search' })
 
     if (activities.length === 0) {
       return { listData: items }
@@ -119,8 +122,6 @@ export default function ActivityFeed({
         getHeightOrWidth: (index) => {
           const item = listData[index]
           switch (item?.type) {
-            case 'search':
-              return 40
             case 'spacer':
               return 20
             case 'date-separator':
@@ -136,8 +137,6 @@ export default function ActivityFeed({
   const rowRenderer = useCallback(
     (type: string | number, item: ListItem) => {
       switch (item.type) {
-        case 'search':
-          return <Search containerProps={{ elevation: 0 }} />
         case 'date-separator':
           return <DateSeparatorRow dateKey={item.data.dateKey} />
         case 'activity':
@@ -162,6 +161,17 @@ export default function ActivityFeed({
       void fetchNextPage()
     }
   }, [hasNextPage, isFetchingNextPageActivities, fetchNextPage])
+
+  useEffect(() => {
+    if (isFetchingNextPageActivities) {
+      justLoadedRef.current = true
+    } else if (justLoadedRef.current) {
+      // clear flag shortly after load
+      setTimeout(() => {
+        justLoadedRef.current = false
+      }, 200)
+    }
+  }, [isFetchingNextPageActivities])
 
   if (isLoadingActivities) {
     return <Spinner size="small" />
@@ -193,6 +203,13 @@ export default function ActivityFeed({
         scrollViewProps={{
           showsVerticalScrollIndicator: false,
         }}
+        onContentSizeChange={onContentSizeChange}
+        onScroll={(e) => {
+          if (isFocused && !justLoadedRef.current && !isFetchingNextPageActivities) {
+            onScroll(e as NativeSyntheticEvent<NativeScrollEvent>, 70)
+          }
+        }}
+        scrollThrottle={128}
         onEndReached={handleEndReach}
         onEndReachedThreshold={0.5}
       />
