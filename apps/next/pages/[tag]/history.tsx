@@ -1,6 +1,6 @@
 import { ProfileHistoryScreen } from 'app/features/profile/history/screen'
 import { HomeLayout } from 'app/features/home/layout.web'
-import Head from 'next/head'
+import { NextSeo } from 'next-seo'
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
 import type { NextPageWithLayout } from '../_app'
 import type { GetServerSideProps, GetServerSidePropsContext } from 'next'
@@ -13,9 +13,7 @@ import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 export const Page: NextPageWithLayout<{ sendid: number | null }> = ({ sendid }) => {
   return (
     <>
-      <Head>
-        <title>Send | Profile History</title>
-      </Head>
+      <NextSeo title="Send | Profile History" />
       <ProfileHistoryScreen sendid={sendid} />
     </>
   )

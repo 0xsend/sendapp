@@ -1,5 +1,5 @@
 import { ActivityRewardsScreen } from 'app/features/rewards/activity/screen'
-import Head from 'next/head'
+import { NextSeo } from 'next-seo'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from 'next-app/pages/_app'
 import { HomeLayout } from 'app/features/home/layout.web'
@@ -9,9 +9,7 @@ import { MobileButtonRowLayout } from 'app/components/MobileButtonRowLayout'
 export const Page: NextPageWithLayout = () => {
   return (
     <>
-      <Head>
-        <title>Send | Rewards</title>
-      </Head>
+      <NextSeo title="Send | Rewards" />
       <ActivityRewardsScreen />
     </>
   )

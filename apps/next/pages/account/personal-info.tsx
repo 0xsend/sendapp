@@ -1,5 +1,5 @@
 import { HomeLayout } from 'app/features/home/layout.web'
-import Head from 'next/head'
+import { NextSeo } from 'next-seo'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from '../_app'
 import { TopNav } from 'app/components/TopNav'
@@ -9,10 +9,7 @@ import { PersonalInfoScreen } from 'app/features/account/components/personalInfo
 export const Page: NextPageWithLayout = () => {
   return (
     <>
-      <Head>
-        <title>Send | Personal Information</title>
-        <meta name="description" content="Personal Information" key="desc" />
-      </Head>
+      <NextSeo title="Send | Personal Information" description="Personal Information" />
       <PersonalInfoScreen />
     </>
   )

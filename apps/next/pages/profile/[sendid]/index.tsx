@@ -1,5 +1,5 @@
 import { ProfileScreen } from 'app/features/profile/screen'
-import Head from 'next/head'
+import { NextSeo } from 'next-seo'
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
 import type { NextPageWithLayout } from '../../_app'
 import type { GetServerSideProps, GetServerSidePropsContext } from 'next'
@@ -7,15 +7,17 @@ import type { Database } from '@my/supabase/database.types'
 import { userOnboarded } from 'utils/userOnboarded'
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { ProfileLayout } from 'app/features/profile/layout.web'
-import {
-  generateProfileOpenGraphData,
-  type ProfileOpenGraphData,
-} from 'utils/generateProfileOpenGraphData'
+import { getSiteUrl } from 'utils/getSiteUrl'
 
 interface PageProps {
   sendid?: number
   siteUrl: string
-  openGraphData?: ProfileOpenGraphData
+  openGraphData?: {
+    title?: string
+    description?: string
+    canonicalUrl?: string
+    imageUrl?: string
+  }
 }
 
 export const Page: NextPageWithLayout<PageProps> = ({ sendid, siteUrl, openGraphData }) => {
@@ -23,32 +25,36 @@ export const Page: NextPageWithLayout<PageProps> = ({ sendid, siteUrl, openGraph
   const pageTitle = openGraphData?.title || 'Send | Profile'
   const description = openGraphData?.description || `Check out ${sendid} on /send`
   const canonicalUrl = openGraphData?.canonicalUrl || `${siteUrl}/profile/${sendid}`
-  const ogImageUrl = openGraphData?.imageUrl || null
+  const ogImageUrl =
+    openGraphData?.imageUrl || 'https://ghassets.send.app/2024/04/send-og-image.png'
 
   return (
     <>
-      <Head>
-        <title>{pageTitle}</title>
-
-        <meta name="description" content={description} />
-        <meta key="og:type" property="og:type" content="profile" />
-        <meta key="og:title" property="og:title" content={pageTitle} />
-        <meta key="og:description" property="og:description" content={description} />
-        <meta key="og:url" property="og:url" content={canonicalUrl} />
-        {ogImageUrl && (
-          <>
-            <meta key="og:image" property="og:image" content={ogImageUrl} />
-            <meta key="og:image:width" property="og:image:width" content="1200" />
-            <meta key="og:image:height" property="og:image:height" content="630" />
-            <meta key="og:image:type" property="og:image:type" content="image/jpeg" />
-          </>
-        )}
-        <meta key="twitter:card" name="twitter:card" content="summary_large_image" />
-        <meta key="twitter:title" name="twitter:title" content={pageTitle} />
-        <meta key="twitter:description" name="twitter:description" content={description} />
-        {ogImageUrl && <meta key="twitter:image" name="twitter:image" content={ogImageUrl} />}
-        <link rel="canonical" href={canonicalUrl} />
-      </Head>
+      <NextSeo
+        title={pageTitle}
+        description={description}
+        canonical={canonicalUrl}
+        openGraph={{
+          type: 'profile',
+          url: canonicalUrl,
+          title: pageTitle,
+          description: description,
+          images: [
+            {
+              url: ogImageUrl,
+              width: 1200,
+              height: 630,
+              alt: 'og-image',
+              type: 'image/png',
+            },
+          ],
+        }}
+        twitter={{
+          cardType: 'summary_large_image',
+          title: pageTitle,
+          description: description,
+        }}
+      />
       <ProfileScreen sendid={sendid} />
     </>
   )
@@ -65,10 +71,8 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
     }
   }
 
-  // Get site URL from request headers
-  const protocol = ctx.req.headers['x-forwarded-proto'] || 'http'
-  const host = ctx.req.headers['x-forwarded-host'] || ctx.req.headers.host
-  const siteUrl = `${protocol}://${host}`
+  // Get site URL securely using Vercel environment variables
+  const siteUrl = getSiteUrl()
 
   const supabase = createPagesServerClient<Database>(ctx)
   const {
@@ -101,13 +105,11 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
     }
   }
 
-  // Generate OpenGraph data server-side
-  let openGraphData: ProfileOpenGraphData | undefined
-  try {
-    openGraphData = await generateProfileOpenGraphData(profile, siteUrl, `/profile/${sendid}`)
-  } catch (error) {
-    console.error('Error generating OpenGraph data:', error)
-    // Continue without OpenGraph data if generation fails
+  // Populate default OpenGraph data if needed
+  const openGraphData = {
+    title: `Profile of ${profile.name}`,
+    description: `Learn more about ${profile.name} on Send`,
+    imageUrl: profile.avatar_url || undefined,
   }
 
   return {

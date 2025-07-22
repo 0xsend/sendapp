@@ -1,5 +1,5 @@
 import { HomeLayout } from 'app/features/home/layout.web'
-import Head from 'next/head'
+import { NextSeo } from 'next-seo'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from '../_app'
 import { TopNav } from 'app/components/TopNav'
@@ -9,9 +9,7 @@ import { SendEarnProvider } from 'app/features/earn/providers/SendEarnProvider'
 export const Page: NextPageWithLayout = () => {
   return (
     <>
-      <Head>
-        <title>Send | Earn</title>
-      </Head>
+      <NextSeo title="Send | Earn" />
       <SendEarnProvider>
         <EarnScreen
           images={{

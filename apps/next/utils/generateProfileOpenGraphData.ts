@@ -34,15 +34,17 @@ export async function generateProfileOpenGraphData(
   const canonicalUrl = `${siteUrl}${route}`
 
   // Generate OpenGraph image URL (using the consolidated API route)
-  let imageUrl = ''
+  // Always provide a fallback to prevent undefined/empty imageUrl
+  let imageUrl = 'https://ghassets.send.app/2024/04/send-og-image.png'
 
   if (profile.main_tag_name) {
     // For tag-based routes, use the tag parameter
     imageUrl = `${siteUrl}/api/og?type=tag&value=${encodeURIComponent(profile.main_tag_name)}`
-  } else {
+  } else if (profile.sendid) {
     // For sendid-based routes, use the sendid parameter
     imageUrl = `${siteUrl}/api/og?type=sendid&value=${profile.sendid}`
   }
+  // If neither condition is met, we keep the fallback image
 
   console.log('Generated OpenGraph image URL:', imageUrl)
 

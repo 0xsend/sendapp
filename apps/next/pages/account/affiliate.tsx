@@ -1,4 +1,4 @@
-import Head from 'next/head'
+import { NextSeo } from 'next-seo'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from '../_app'
 import { HomeLayout } from 'app/features/home/layout.web'
@@ -12,10 +12,7 @@ import { createSupabaseAdminClient } from '../../../../packages/app/utils/supaba
 export const Page: NextPageWithLayout = () => {
   return (
     <>
-      <Head>
-        <title>Send | Referrals</title>
-        <meta name="description" content="View invited friends and track activity." key="desc" />
-      </Head>
+      <NextSeo title="Send | Referrals" description="View invited friends and track activity." />
       <FriendsScreen />
     </>
   )

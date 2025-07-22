@@ -1,5 +1,5 @@
 import { OnboardingScreen } from 'app/features/auth/onboarding/screen'
-import Head from 'next/head'
+import { NextSeo } from 'next-seo'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from '../_app'
 import { AuthLayout } from 'app/features/auth/layout.web'
@@ -10,9 +10,7 @@ export const Page: NextPageWithLayout<
 > = () => {
   return (
     <>
-      <Head>
-        <title>Send | Onboarding</title>
-      </Head>
+      <NextSeo title="Send | Onboarding" />
       <OnboardingScreen />
     </>
   )

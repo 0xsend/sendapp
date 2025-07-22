@@ -1,4 +1,4 @@
-import Head from 'next/head'
+import { NextSeo } from 'next-seo'
 import type { NextPageWithLayout } from '../_app'
 import { AuthLayout } from 'app/features/auth/layout.web'
 import { LoginWithPhoneScreen } from 'app/features/auth/loginWithPhone/screen'
@@ -6,9 +6,7 @@ import { LoginWithPhoneScreen } from 'app/features/auth/loginWithPhone/screen'
 export const Page: NextPageWithLayout = () => {
   return (
     <>
-      <Head>
-        <title>Send | Login With Phone</title>
-      </Head>
+      <NextSeo title="Send | Login With Phone" />
       <LoginWithPhoneScreen />
     </>
   )

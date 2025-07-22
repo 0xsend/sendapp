@@ -1,5 +1,5 @@
 import { HomeLayout } from 'app/features/home/layout.web'
-import Head from 'next/head'
+import { NextSeo } from 'next-seo'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from '../_app'
 import { TopNav } from 'app/components/TopNav'
@@ -9,10 +9,7 @@ import { LinkInBioScreen } from 'app/features/account/components/linkInBio/scree
 export const Page: NextPageWithLayout = () => {
   return (
     <>
-      <Head>
-        <title>Send | Link In Bio</title>
-        <meta name="description" content="Manage your social media links" key="desc" />
-      </Head>
+      <NextSeo title="Send | Link In Bio" description="Manage your social media links" />
       <LinkInBioScreen />
     </>
   )
