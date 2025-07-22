@@ -15,6 +15,7 @@ import {
   IconXLogo,
 } from 'app/components/icons'
 import { RowLabel } from 'app/components/layout/RowLabel'
+import useIntercom from 'app/utils/intercom/useIntercom'
 
 const iconProps = {
   size: '$1.5' as SizeTokens,
@@ -27,44 +28,53 @@ const iconProps = {
 const ACCOUNT_LINKS: {
   [category: string]: {
     text: string
-    href: string
+    key: string
+    href?: string
     icon: ReactNode
     target?: string
+    onPress?: () => void
   }[]
 } = {
   Settings: [
     {
       text: 'Profile',
+      key: 'account-link-profile',
       href: '/account/edit-profile',
       icon: <IconAccount {...iconProps} />,
     },
     {
       text: 'Personal Information',
+      key: 'account-link-personal-info',
       href: '/account/personal-info',
       icon: <IconIdCard {...iconProps} />,
     },
     {
       text: 'Link In Bio',
+      key: 'account-link-link-in-bio',
       href: '/account/link-in-bio',
       icon: <IconXLogo {...iconProps} />,
     },
     {
       text: 'Passkeys',
+      key: 'account-link-passkeys',
       href: '/account/backup',
       icon: <IconFingerprint {...iconProps} />,
     },
     {
       text: 'Sendtags',
+      key: 'account-link-sendtags',
       href: '/account/sendtag',
       icon: <IconSlash {...iconProps} />,
     },
     {
       text: 'Rewards',
+      key: 'account-link-rewards',
       href: '/rewards',
       icon: <IconStarOutline {...iconProps} />,
     },
     {
       text: 'Referrals',
+      key: 'account-link-referrals',
       href: '/account/affiliate',
       icon: <IconDollar {...iconProps} scale={1.2} />,
     },
@@ -72,14 +82,9 @@ const ACCOUNT_LINKS: {
   Support: [
     {
       text: 'Learn more about Send',
+      key: 'account-link-learn-more',
       href: 'https://support.send.app/en/',
       icon: <IconInfoCircle {...iconProps} />,
-      target: '_blank',
-    },
-    {
-      text: 'Contact Support',
-      href: 'https://support.send.app/en/collections/10273227-reach-out',
-      icon: <IconQuestionCircle {...iconProps} />,
       target: '_blank',
     },
   ],
@@ -87,17 +92,31 @@ const ACCOUNT_LINKS: {
 
 export function AccountLinks(): JSX.Element {
   const supabase = useSupabase()
+  const { openChat } = useIntercom()
+
+  const _links = {
+    ...ACCOUNT_LINKS,
+    Support: [
+      ...(ACCOUNT_LINKS.Support || []),
+      {
+        text: 'Live Chat Support',
+        key: 'account-link-live-chat-support',
+        icon: <IconQuestionCircle {...iconProps} />,
+        onPress: openChat,
+      },
+    ],
+  }
 
   return (
     <YStack gap={'$5'} pb={'$3.5'}>
-      {Object.entries(ACCOUNT_LINKS).map(([category, links]) => {
+      {Object.entries(_links).map(([category, links]) => {
         return (
           <YStack key={category} gap={'$3.5'}>
             <RowLabel>{category}</RowLabel>
             <LinksGroup>
-              {links.map((link) => (
-                <YGroup.Item key={link.href}>
-                  <AccountNavLink {...link} />
+              {links.map(({ key, ...props }) => (
+                <YGroup.Item key={key}>
+                  <AccountNavLink {...props} />
                 </YGroup.Item>
               ))}
             </LinksGroup>

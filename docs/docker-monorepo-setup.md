@@ -166,6 +166,7 @@ The Next.js app requires these build arguments for static optimization:
 - `NEXT_PUBLIC_ONCHAINKIT_API_KEY`
 - `NEXT_PUBLIC_KYBER_SWAP_BASE_URL`
 - `NEXT_PUBLIC_KYBER_CLIENT_ID`
+- `NEXT_PUBLIC_INTERCOM_APP_ID`
 - `NEXT_PUBLIC_GEOBLOCK`
 
 ### Distributor Runtime Variables
