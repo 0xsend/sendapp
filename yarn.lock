@@ -5142,6 +5142,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@intercom/intercom-react-native@npm:^8.6.0":
+  version: 8.6.0
+  resolution: "@intercom/intercom-react-native@npm:8.6.0"
+  dependencies:
+    node-fetch: "npm:^2.6.1"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 10/b8f4ffc1e47e4f2e4006c82c7aef08bcbb0782da02f026eebc9e60d5fe5cf7a51bd86c50333ca4521a6fa208597ad56d1b801f5576c77a92d79c5176b2f614ad
+  languageName: node
+  linkType: hard
+
+"@intercom/messenger-js-sdk@npm:^0.0.14":
+  version: 0.0.14
+  resolution: "@intercom/messenger-js-sdk@npm:0.0.14"
+  checksum: 10/49a95cdb701553df45e8c526596ab7ae9b44f462ef3317e9397b44e9358c5e9cbd556f49722984a714f7052645998876aa8721d43c5f77479e3b9ba94699c7ed
+  languageName: node
+  linkType: hard
+
 "@ioredis/commands@npm:^1.1.1":
   version: 1.2.0
   resolution: "@ioredis/commands@npm:1.2.0"
@@ -13596,6 +13615,8 @@ __metadata:
     "@0xsend/send-earn-contracts": "npm:^0.1.0"
     "@babel/plugin-syntax-import-attributes": "npm:^7.24.7"
     "@coinbase/onchainkit": "npm:^0.38.1"
+    "@intercom/intercom-react-native": "npm:^8.6.0"
+    "@intercom/messenger-js-sdk": "npm:^0.0.14"
     "@jest/globals": "npm:^29"
     "@marsidev/react-turnstile": "npm:^0.7.1"
     "@my/supabase": "workspace:*"
@@ -19514,6 +19535,7 @@ __metadata:
     "@expo-google-fonts/dm-mono": "npm:^0.4.1"
     "@expo-google-fonts/dm-sans": "npm:^0.4.1"
     "@expo/metro-config": "npm:~0.19.0"
+    "@intercom/intercom-react-native": "npm:^8.6.0"
     "@my/ui": "workspace:*"
     "@react-native-async-storage/async-storage": "npm:^2.0.0"
     "@react-native-community/netinfo": "npm:11.4.1"

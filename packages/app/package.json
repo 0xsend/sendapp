@@ -16,6 +16,8 @@
   "dependencies": {
     "@0xsend/send-earn-contracts": "^0.1.0",
     "@coinbase/onchainkit": "^0.38.1",
+    "@intercom/intercom-react-native": "^8.6.0",
+    "@intercom/messenger-js-sdk": "^0.0.14",
     "@marsidev/react-turnstile": "^0.7.1",
     "@my/supabase": "workspace:*",
     "@my/ui": "workspace:*",
