@@ -1,10 +1,13 @@
 import { useEffect } from 'react'
-import Intercom, { hide, showNewMessage } from '@intercom/messenger-js-sdk'
+import Intercom, { hide, show } from '@intercom/messenger-js-sdk'
 
 export default function useIntercom() {
   useEffect(() => {
     try {
-      Intercom({ app_id: process.env.NEXT_PUBLIC_INTERCOM_APP_ID, hide_default_launcher: true })
+      Intercom({
+        app_id: process.env.NEXT_PUBLIC_INTERCOM_APP_ID || '',
+        hide_default_launcher: true,
+      })
     } catch (error) {
       console.error('Failed to initialize Intercom:', error)
     }
@@ -15,7 +18,7 @@ export default function useIntercom() {
   }, [])
 
   const openChat = () => {
-    showNewMessage('')
+    show()
   }
 
   return { openChat }
