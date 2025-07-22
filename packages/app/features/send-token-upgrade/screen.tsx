@@ -10,7 +10,7 @@ import {
   Spinner,
   Stack,
   Theme,
-  useToastController,
+  useAppToast,
   XStack,
   YStack,
 } from '@my/ui'
@@ -256,7 +256,7 @@ function UpgradeTokenButton() {
     calls,
   })
 
-  const toast = useToastController()
+  const toast = useAppToast()
   const queryClient = useQueryClient()
 
   const canSendUserOp = uop.isSuccess && !uop.isPending && !paymasterSign.isPending

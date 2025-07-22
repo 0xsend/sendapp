@@ -7,7 +7,7 @@ import {
   Spinner,
   Stack,
   SubmitButton,
-  useToastController,
+  useAppToast,
   XStack,
   YStack,
 } from '@my/ui'
@@ -100,7 +100,7 @@ export function DepositForm() {
   )
 
   // MUTATION DEPOSIT USEROP via Temporal
-  const toast = useToastController()
+  const toast = useAppToast()
   const queryClient = useQueryClient()
 
   const depositMutation = api.sendEarn.deposit.useMutation({
@@ -109,9 +109,8 @@ export function DepositForm() {
     },
     onError: (error) => {
       log('sendEarn.deposit.onError', error)
-      toast.show('Deposit Error', {
+      toast.error('Deposit Error', {
         message: toNiceError(error),
-        preset: 'error',
       })
     },
     onSuccess: (data) => {

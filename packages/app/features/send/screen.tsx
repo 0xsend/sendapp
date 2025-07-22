@@ -11,7 +11,7 @@ import {
   Paragraph,
   Spinner,
   Text,
-  useToastController,
+  useAppToast,
   XStack,
   YStack,
   type YStackProps,
@@ -182,7 +182,7 @@ export function SendRecipient({ ...props }: YStackProps) {
 }
 
 function NoSendAccount({ profile }: { profile: Functions<'profile_lookup'>[number] }) {
-  const toast = useToastController()
+  const toast = useAppToast()
   const [clicked, setClicked] = useState(false)
   return (
     <YStack testID="NoSendAccount" gap="$4" mb="$4" maw={600} $lg={{ mx: 'auto' }} width={'100%'}>

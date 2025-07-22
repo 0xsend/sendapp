@@ -1,6 +1,6 @@
 import { useSendAccount } from 'app/utils/send-accounts'
 import { DepositAddressQR } from 'app/features/deposit/components/DepositAddressQR'
-import { Button, FadeCard, Paragraph, Spinner, useToastController, YStack } from '@my/ui'
+import { Button, FadeCard, Paragraph, Spinner, useAppToast, YStack } from '@my/ui'
 import { Check } from '@tamagui/lucide-icons'
 import * as Clipboard from 'expo-clipboard'
 import { useState } from 'react'
@@ -9,18 +9,15 @@ import { CopyAddressDialog } from 'app/features/deposit/components/CopyAddressDi
 
 export function DepositCryptoScreen() {
   const { data: sendAccount, isLoading: isLoadingSendAccount } = useSendAccount()
-  const toast = useToastController()
+  const toast = useAppToast()
   const [hasCopied, setHasCopied] = useState(false)
   const [isConfirmed, setIsConfirmed] = useState(false)
   const [copyAddressDialogIsOpen, setCopyAddressDialogIsOpen] = useState(false)
 
   const copyToClipboard = async () => {
     await Clipboard.setStringAsync(sendAccount?.address || '').catch(() =>
-      toast.show('Something went wrong', {
+      toast.error('Something went wrong', {
         message: 'We were unable to copy your address to the clipboard',
-        customData: {
-          theme: 'red',
-        },
       })
     )
     setHasCopied(true)

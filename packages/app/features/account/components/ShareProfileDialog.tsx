@@ -7,7 +7,7 @@ import {
   QRCode,
   Separator,
   Sheet,
-  useToastController,
+  useAppToast,
   YStack,
 } from '@my/ui'
 import { IconCopy, IconSend } from 'app/components/icons'
@@ -24,7 +24,7 @@ interface ShareProfileDialogProps {
 export function ShareProfileDialog({ isOpen, onClose }: ShareProfileDialogProps) {
   const { profile } = useUser()
   const tags = useConfirmedTags()
-  const toast = useToastController()
+  const toast = useAppToast()
 
   // Use sendtag if available, otherwise fall back to send_id
   const sendtag = tags?.[0]?.name
@@ -37,12 +37,10 @@ export function ShareProfileDialog({ isOpen, onClose }: ShareProfileDialogProps)
     try {
       await Clipboard.setStringAsync(profileUrl)
       toast.show('Profile link copied to clipboard')
+      onClose()
     } catch {
-      toast.show('Failed to copy link', {
+      toast.error('Failed to copy link', {
         message: 'Something went wrong while copying the link',
-        customData: {
-          theme: 'red',
-        },
       })
     }
   }

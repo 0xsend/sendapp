@@ -5,7 +5,7 @@ import {
   type ButtonProps,
   ButtonText,
   Paragraph,
-  useToastController,
+  useAppToast,
   XStack,
 } from '@my/ui'
 import { useUser } from 'app/utils/useUser'
@@ -19,18 +19,15 @@ export function ReferralLink(props: ButtonProps) {
   const send_id = profile?.send_id
   const referralCode = profile?.main_tag?.name
   const referralHref = `https://send.app?referral=${referralCode}`
-  const toast = useToastController()
+  const toast = useAppToast()
   const [hasCopied, setHasCopied] = useState(false)
 
   const copyAndMaybeShareOnPress = async () => {
     await Clipboard.setStringAsync(referralHref)
       .then(() => toast.show('Copied your referral link to the clipboard'))
       .catch(() =>
-        toast.show('Something went wrong', {
+        toast.error('Something went wrong', {
           message: 'We were unable to copy your referral link to the clipboard',
-          customData: {
-            theme: 'red',
-          },
         })
       )
   }
@@ -71,7 +68,8 @@ export function ReferralLink(props: ButtonProps) {
         focusStyle={{
           backgroundColor: 'transparent',
         }}
-        onPress={() => {
+        onPress={(e) => {
+          e.preventDefault()
           setHasCopied(true)
           copyAndMaybeShareOnPress()
         }}

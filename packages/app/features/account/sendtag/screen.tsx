@@ -9,7 +9,7 @@ import {
   Sheet,
   Spinner,
   Stack,
-  useToastController,
+  useAppToast,
   XStack,
   YGroup,
   YStack,
@@ -197,7 +197,7 @@ function MainTagSelectionSheet({
   tags: Tables<'tags'>[]
   currentMainTagId?: number | null
 }) {
-  const toast = useToastController()
+  const toast = useAppToast()
   const { updateProfile } = useUser()
   const hoverStyles = useHoverStyles()
   const { refetch: refetchSendAccount, data: sendAccount } = useSendAccount()
@@ -209,7 +209,7 @@ function MainTagSelectionSheet({
       onOpenChange(false)
     },
     onError: (error) => {
-      toast.show('Failed to update main tag')
+      toast.error('Failed to update main tag')
       console.error('Failed to update main tag:', error)
     },
   })

@@ -9,7 +9,7 @@ import {
   XStack,
   YGroup,
   YStack,
-  useToastController,
+  useAppToast,
   PrimaryButton,
 } from '@my/ui'
 import { baseMainnetBundlerClient, entryPointAddress } from '@my/wagmi'
@@ -44,7 +44,7 @@ export function RewardsBalanceScreen() {
 
 function RewardsBalance() {
   const [useropState, setUseropState] = useState('')
-  const toast = useToastController()
+  const toast = useAppToast()
   const queryClient = useQueryClient()
   const chainId = useChainId()
   const coin = useERC20AssetCoin()

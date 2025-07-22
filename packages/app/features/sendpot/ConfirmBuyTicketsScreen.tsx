@@ -6,7 +6,7 @@ import {
   YStack,
   Separator,
   FadeCard,
-  useToastController,
+  useAppToast,
 } from '@my/ui'
 import { createParam } from 'solito'
 import { useRouter } from 'solito/router'
@@ -36,7 +36,7 @@ const { useParam } = createParam<ConfirmBuyTicketsScreenParams>()
 export function ConfirmBuyTicketsScreen() {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const toast = useToastController()
+  const toast = useAppToast()
   const [rawNumberOfTickets] = useParam('numberOfTickets')
   const numberOfTickets = Number.parseInt(rawNumberOfTickets || '0', 10) || 0
 
@@ -84,9 +84,8 @@ export function ConfirmBuyTicketsScreen() {
       },
       onError: (error) => {
         console.error('Purchase mutation failed:', error)
-        toast.show('Purchase Failed', {
+        toast.error('Purchase Failed', {
           message: toNiceError(error),
-          type: 'error',
         })
       },
     }
@@ -114,7 +113,7 @@ export function ConfirmBuyTicketsScreen() {
 
     if (webauthnCreds.length === 0) {
       console.error('No WebAuthn credentials found for the account.')
-      toast.show('Error', { message: 'No Passkey found for this account.', type: 'error' })
+      toast.error('Error', { message: 'No Passkey found for this account.' })
       return
     }
 

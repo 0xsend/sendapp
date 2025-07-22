@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { z } from 'zod'
-import { useToastController } from '@my/ui'
+import { useAppToast } from '@my/ui'
 import { useUser } from './useUser'
 import type { Database, TablesInsert } from '@my/supabase/database-generated.types'
 
@@ -29,7 +29,7 @@ export const useLinkInBioMutation = () => {
   const supabase = useSupabase()
   const { user } = useUser()
   const queryClient = useQueryClient()
-  const toast = useToastController()
+  const toast = useAppToast()
 
   return useMutation({
     async mutationFn(linkInBios: LinkInBioFormData) {

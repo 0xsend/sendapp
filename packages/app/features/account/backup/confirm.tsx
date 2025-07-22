@@ -6,7 +6,7 @@ import {
   Paragraph,
   Spinner,
   SubmitButton,
-  useToastController,
+  useAppToast,
   YStack,
 } from '@my/ui'
 import { baseMainnetClient, sendAccountAbi, tokenPaymasterAddress } from '@my/wagmi'
@@ -112,7 +112,7 @@ const AddPasskeySigner = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cre
 }
 
 const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_credentials'> }) => {
-  const toast = useToastController()
+  const toast = useAppToast()
   const queryClient = useQueryClient()
   const {
     data: sendAccount,
