@@ -3,7 +3,7 @@ import {
   Stack,
   YStack,
   Theme,
-  useToastController,
+  useAppToast,
   Button,
   XStack,
   Container,
@@ -40,7 +40,7 @@ const testClient = createTestClient({
   PublicActions
 
 export function SecretShopScreen() {
-  const toast = useToastController()
+  const toast = useAppToast()
   const {
     mutate: fundMutation,
     error: fundError,

@@ -1,13 +1,4 @@
-import {
-  Button,
-  Dialog,
-  Image,
-  isWeb,
-  Paragraph,
-  Separator,
-  useToastController,
-  YStack,
-} from '@my/ui'
+import { Button, Dialog, Image, isWeb, Paragraph, Separator, useAppToast, YStack } from '@my/ui'
 import { IconCopy } from 'app/components/icons'
 import type { Functions } from '@my/supabase/database.types'
 import * as Clipboard from 'expo-clipboard'
@@ -25,7 +16,7 @@ export function ShareOtherProfileDialog({
   onClose,
   profile,
 }: ShareOtherProfileDialogProps) {
-  const toast = useToastController()
+  const toast = useAppToast()
   const [qrCodeDataURL, setQrCodeDataURL] = useState<string>('')
 
   const hostname = isWeb ? window.location.hostname : 'send.app'
@@ -48,27 +39,21 @@ export function ShareOtherProfileDialog({
         .then(setQrCodeDataURL)
         .catch((e) => {
           console.error(e)
-          toast.show('Failed to create QR code', {
+          toast.error('Failed to create QR code', {
             message: 'Something went wrong while creating QR code',
-            customData: {
-              theme: 'red',
-            },
           })
           setQrCodeDataURL('')
         })
     }
-  }, [isOpen, profileUrl, profile, toast.show])
+  }, [isOpen, profileUrl, profile, toast.error])
 
   const handleCopyLink = async () => {
     try {
       await Clipboard.setStringAsync(profileUrl)
       toast.show('Profile link copied to clipboard')
     } catch {
-      toast.show('Failed to copy link', {
+      toast.error('Failed to copy link', {
         message: 'Something went wrong while copying the link',
-        customData: {
-          theme: 'red',
-        },
       })
     }
   }

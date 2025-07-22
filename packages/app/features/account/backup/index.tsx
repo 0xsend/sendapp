@@ -7,7 +7,7 @@ import {
   Spinner,
   SubmitButton,
   Text,
-  useToastController,
+  useAppToast,
   XStack,
   YStack,
   FadeCard,
@@ -524,6 +524,7 @@ const RemovePasskeyConfirmation = ({
           theme={'red'}
           variant="outlined"
           flex={1}
+          w={'auto'}
           hoverStyle={{ borderColor: '$error' }}
           disabledStyle={{ opacity: 0.5 }}
           onPress={submit}
@@ -661,7 +662,7 @@ const UpdateKeySlotButton = ({
   const supabase = useSupabase()
   const queryClient = useQueryClient()
   const sendAcctCred = cred.send_account_credentials?.[0] // should be impossible but just in case
-  const toast = useToastController()
+  const toast = useAppToast()
   const {
     mutate: updateKeySlot,
     isPending,

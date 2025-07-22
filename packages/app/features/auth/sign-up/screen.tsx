@@ -7,7 +7,7 @@ import {
   Paragraph,
   Separator,
   SubmitButton,
-  useToastController,
+  useAppToast,
   XStack,
   YStack,
 } from '@my/ui'
@@ -51,7 +51,7 @@ export const SignUpScreen = () => {
   const router = useRouter()
   const [queryParams] = useAuthScreenParams()
   const { redirectUri } = queryParams
-  const toast = useToastController()
+  const toast = useAppToast()
   const supabase = useSupabase()
   const { user } = useUser()
   const termsCheckboxId = useId()
@@ -137,13 +137,9 @@ export const SignUpScreen = () => {
       router.push(redirectUri ?? '/')
     } catch (error) {
       setFormState(FormState.Idle)
-      toast.show(formatErrorMessage(error), {
-        preset: 'error',
-        isUrgent: true,
-        duration: 10000000,
-      })
+      toast.error(formatErrorMessage(error))
     }
-  }, [signInMutateAsync, toast.show, router.push, redirectUri])
+  }, [signInMutateAsync, toast.error, router.push, redirectUri])
 
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (

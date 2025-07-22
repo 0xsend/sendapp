@@ -285,6 +285,7 @@ You can use the following methods to verify the app is functioning correctly:
 **UX Improvements**:
 - floating bottom navbar instead of standard one
 - pull to refresh data
+- push notifications
 - hiding header when scrolling down
 - error page when app crush
 - don't nest scroll views

@@ -7,10 +7,10 @@ import {
   Paragraph,
   Stack,
   SubmitButton,
+  useAppToast,
   useMedia,
   usePwa,
   useSafeAreaInsets,
-  useToastController,
   XStack,
   YStack,
 } from '@my/ui'
@@ -19,7 +19,7 @@ import { useAuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
 import { Carousel, carouselImagePositions } from 'app/features/auth/components/Carousel'
 import { useAuthScreenParams } from 'app/routers/params'
 import { formatErrorMessage } from 'app/utils/formatErrorMessage'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { SolitoImage } from 'solito/image'
 import { useLink } from 'solito/link'
 import { useRouter } from 'solito/router'
@@ -247,7 +247,7 @@ function Hero() {
 function AuthButtons() {
   const [queryParams] = useAuthScreenParams()
   const { redirectUri } = queryParams
-  const toast = useToastController()
+  const toast = useAppToast()
   const router = useRouter()
   const signUpLink = useLink({ href: '/auth/sign-up' })
   const [isSigningIn, setIsSigningIn] = useState(false)
@@ -259,17 +259,11 @@ function AuthButtons() {
       await signInMutateAsync({})
       router.push(redirectUri ?? '/')
     } catch (error) {
-      toast.show(formatErrorMessage(error), {
-        preset: 'error',
-        isUrgent: true,
-        duration: 10000000,
-      })
+      toast.error(formatErrorMessage(error))
     } finally {
       setIsSigningIn(false)
     }
   }
-
-  useEffect(() => () => toast.hide(), [toast])
 
   return (
     <YStack width="100%" gap="$4">

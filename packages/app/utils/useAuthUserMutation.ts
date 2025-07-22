@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { formFields } from 'app/utils/SchemaForm'
 import { z } from 'zod'
-import { useToastController } from '@my/ui'
+import { useAppToast } from '@my/ui'
 
 export const AuthUserSchema = z.object({
   phone: formFields.text,
@@ -15,7 +15,7 @@ export const AuthUserSchema = z.object({
 export const useAuthUserMutation = () => {
   const supabase = useSupabase()
   const queryClient = useQueryClient()
-  const toast = useToastController()
+  const toast = useAppToast()
 
   return useMutation({
     async mutationFn(data: z.infer<typeof AuthUserSchema>) {

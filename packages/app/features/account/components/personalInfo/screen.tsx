@@ -5,7 +5,7 @@ import {
   Separator,
   SubmitButton,
   Text,
-  useToastController,
+  useAppToast,
   YStack,
 } from '@my/ui'
 import { SchemaForm } from 'app/utils/SchemaForm'
@@ -47,7 +47,7 @@ export const PersonalInfoScreen = () => {
     },
   })
   const supabase = useSupabase()
-  const toast = useToastController()
+  const toast = useAppToast()
   const form = useForm<z.infer<typeof AuthUserSchema>>() // Using react-hook-form
   const { mutateAsync: mutateAuthAsync } = useAuthUserMutation()
   const { mutateAsync: mutateProfileAsync } = useProfileMutation()

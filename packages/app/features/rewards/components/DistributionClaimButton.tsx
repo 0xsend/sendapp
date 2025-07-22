@@ -1,4 +1,4 @@
-import { Button as ButtonOg, Spinner, type ButtonProps, YStack, useToastController } from '@my/ui'
+import { Button as ButtonOg, Spinner, type ButtonProps, YStack, useAppToast } from '@my/ui'
 import { baseMainnet, type sendMerkleDropAddress } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
 import { useCoin } from 'app/provider/coins'
@@ -39,7 +39,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     : undefined
   const [sentTxHash, setSentTxHash] = useState<Hex>()
   const [error, setError] = useState<Error>()
-  const toast = useToastController()
+  const toast = useAppToast()
 
   const { coin: usdc, isLoading: isUSDCLoading } = useCoin('USDC')
 
@@ -147,11 +147,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   useEffect(() => {
     if (error) {
       console.log(error)
-      toast.show(toNiceError(error), {
-        preset: 'error',
-        isUrgent: true,
-        duration: 10000000,
-      })
+      toast.error(toNiceError(error))
     }
   }, [error, toast])
 
