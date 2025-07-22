@@ -228,42 +228,82 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
           </LinkableButton>
         </Card.Footer>
       </Card>
-      <View
-        maw={media.gtMd ? 1042 : 509}
-        display="flex"
-        fd={media.gtMd ? 'row-reverse' : 'column'}
-        px="$4"
-        pt="$6"
-        pb="$12"
-        gap="$4"
-        bc={'$color0'}
-        als={'center'}
-        jc={'center'}
-        width={'100%'}
-      >
-        <YStack gap="$4" f={1} w="100%">
-          <XStack ai={'center'} jc="space-between">
-            <Paragraph color="$color12" fontSize="$6" fontWeight="600">
-              Send Vibes
-            </Paragraph>
-            <Link
-              textDecorationLine="underline"
-              href={`/profile/${otherUserProfile?.sendid}/history`}
-            >
-              View History
-            </Link>
-          </XStack>
-          <Vibes profile={otherUserProfile} tokenPrices={tokenPrices} />
-        </YStack>
-        {otherUserProfile?.links_in_bio ? (
+      {media.gtMd ? (
+        <XStack
+          maw={1042}
+          display="flex"
+          fd={'row-reverse'}
+          px="$4"
+          pt="$6"
+          pb="$12"
+          gap="$4"
+          bc={'$color0'}
+          als={'center'}
+          jc={'center'}
+          width={'100%'}
+        >
           <YStack gap="$4" f={1} w="100%">
-            <Paragraph color="$color12" fontSize="$6" fontWeight="600">
-              Let&apos;s Connect
-            </Paragraph>
-            <LinksInBio profile={otherUserProfile} />
+            <XStack ai={'center'} jc="space-between">
+              <Paragraph color="$color12" fontSize="$6" fontWeight="600">
+                Send Vibes
+              </Paragraph>
+              <Link
+                textDecorationLine="underline"
+                href={`/profile/${otherUserProfile?.sendid}/history`}
+              >
+                View History
+              </Link>
+            </XStack>
+            <Vibes profile={otherUserProfile} tokenPrices={tokenPrices} />
           </YStack>
-        ) : null}
-      </View>
+          {otherUserProfile?.links_in_bio ? (
+            <YStack gap="$4" f={1} w="100%">
+              <Paragraph color="$color12" fontSize="$6" fontWeight="600">
+                Let&apos;s Connect
+              </Paragraph>
+              <LinksInBio profile={otherUserProfile} />
+            </YStack>
+          ) : null}
+        </XStack>
+      ) : (
+        <YStack
+          maw={509}
+          display="flex"
+          fd={'column'}
+          px="$4"
+          pt="$6"
+          pb="$12"
+          gap="$4"
+          bc={'$color0'}
+          als={'center'}
+          jc={'center'}
+          width={'100%'}
+        >
+          <YStack gap="$4" f={1} w="100%">
+            <XStack ai={'center'} jc="space-between">
+              <Paragraph color="$color12" fontSize="$6" fontWeight="600">
+                Send Vibes
+              </Paragraph>
+              <Link
+                textDecorationLine="underline"
+                href={`/profile/${otherUserProfile?.sendid}/history`}
+              >
+                View History
+              </Link>
+            </XStack>
+            <Vibes profile={otherUserProfile} tokenPrices={tokenPrices} />
+          </YStack>
+          {otherUserProfile?.links_in_bio ? (
+            <YStack gap="$4" f={1} w="100%">
+              <Paragraph color="$color12" fontSize="$6" fontWeight="600">
+                Let&apos;s Connect
+              </Paragraph>
+              <LinksInBio profile={otherUserProfile} />
+            </YStack>
+          ) : null}
+        </YStack>
+      )}
+
       {otherUserProfile ? (
         <ShareOtherProfileDialog
           isOpen={shareDialogOpen}
@@ -433,43 +473,41 @@ const LinksInBio = ({ profile }: { profile: Functions<'profile_lookup'>[number] 
   const isDark = theme?.startsWith('dark')
   return (
     <Card elevation={1} padded size="$4" px="$2" borderRadius="$4" gap="$4">
-      <Card.Footer>
-        {profile?.links_in_bio?.map((link) => {
-          const fullUrl = `https://${link.domain}${link.handle}`
-          return (
-            <LinkableButton
-              key={`${link.domain_name}`}
-              href={fullUrl}
-              target="_blank"
-              width="100%"
-              p={'$3'}
-              f={1}
-              chromeless
-              hoverStyle={{ backgroundColor: 'transparent' }}
-              pressStyle={{ backgroundColor: 'transparent', borderColor: 'transparent' }}
-              focusStyle={{ backgroundColor: 'transparent' }}
-            >
-              <XStack justifyContent="space-between" alignItems="center" width="100%">
-                <XStack gap="$4" alignItems="center">
-                  <IconLinkInBio domain_name={link.domain_name} size={24} color="$white" />
+      {profile?.links_in_bio?.map((link) => {
+        const fullUrl = `https://${link.domain}${link.handle}`
+        return (
+          <LinkableButton
+            key={`${link.domain_name}`}
+            href={fullUrl}
+            target="_blank"
+            width="100%"
+            p={'$3'}
+            f={1}
+            chromeless
+            hoverStyle={{ backgroundColor: 'transparent' }}
+            pressStyle={{ backgroundColor: 'transparent', borderColor: 'transparent' }}
+            focusStyle={{ backgroundColor: 'transparent' }}
+          >
+            <XStack justifyContent="space-between" alignItems="center" width="100%">
+              <XStack gap="$4" alignItems="center">
+                <IconLinkInBio domain_name={link.domain_name} size={24} color="$white" />
 
-                  <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
-                    {link.domain_name}
-                  </Paragraph>
-                </XStack>
-                <XStack
-                  bg={isDark ? 'rgba(255, 255, 255, 0.10)' : 'rgba(0, 0, 0, 0.10)'}
-                  borderRadius="$2"
-                  justifyContent="center"
-                  alignItems="center"
-                >
-                  <ChevronRight size="$1" color="$color12" />
-                </XStack>
+                <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
+                  {link.domain_name}
+                </Paragraph>
               </XStack>
-            </LinkableButton>
-          )
-        })}
-      </Card.Footer>
+              <XStack
+                bg={isDark ? 'rgba(255, 255, 255, 0.10)' : 'rgba(0, 0, 0, 0.10)'}
+                borderRadius="$2"
+                justifyContent="center"
+                alignItems="center"
+              >
+                <ChevronRight size="$1" color="$color12" />
+              </XStack>
+            </XStack>
+          </LinkableButton>
+        )
+      })}
     </Card>
   )
 }
