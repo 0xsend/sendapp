@@ -4,14 +4,12 @@ import { NextSeo } from 'next-seo'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from '../_app'
 import { AccountScreenLayout } from 'app/features/account/AccountScreenLayout'
+import { PAGE_TITLES, PAGE_DESCRIPTIONS } from 'utils/seoHelpers'
 
 export const Page: NextPageWithLayout = () => {
   return (
     <>
-      <NextSeo
-        title="Send | Account"
-        description="Sendtags simplify transactions by replacing long wallet addresses with memorable identifiers."
-      />
+      <NextSeo title={PAGE_TITLES.account} description={PAGE_DESCRIPTIONS.account} />
     </>
   )
 }

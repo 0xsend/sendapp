@@ -1,16 +1,15 @@
 import { LeaderboardScreen } from 'app/features/leaderboard/screen'
 import { HomeLayout } from 'app/features/home/layout.web'
-import Head from 'next/head'
+import { NextSeo } from 'next-seo'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from './_app'
 import { TopNav } from 'app/components/TopNav'
+import { PAGE_TITLES, PAGE_DESCRIPTIONS } from 'utils/seoHelpers'
 
 export const Page: NextPageWithLayout = () => {
   return (
     <>
-      <Head>
-        <title>Send | Leaderboard</title>
-      </Head>
+      <NextSeo title={PAGE_TITLES.leaderboard} description={PAGE_DESCRIPTIONS.leaderboard} />
       <LeaderboardScreen />
     </>
   )

@@ -4,11 +4,12 @@ import { NextSeo } from 'next-seo'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from './_app'
 import { TopNav } from 'app/components/TopNav'
+import { PAGE_TITLES, PAGE_DESCRIPTIONS } from 'utils/seoHelpers'
 
 export const Page: NextPageWithLayout = () => {
   return (
     <>
-      <NextSeo title="Send | Activity" />
+      <NextSeo title={PAGE_TITLES.activity} description={PAGE_DESCRIPTIONS.activity} />
       <ActivityScreen />
     </>
   )
