@@ -9,32 +9,35 @@ import { SendtagSchema } from 'app/utils/zod/sendtag'
 import { assert } from 'app/utils/assert'
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { ProfileLayout } from 'app/features/profile/layout.web'
-import {
-  generateProfileOpenGraphData,
-  type ProfileOpenGraphData,
-} from 'utils/generateProfileOpenGraphData'
 import { getSiteUrl } from 'utils/getSiteUrl'
 import { buildSeo } from 'utils/seo'
+import { generateProfileSeoData, type ProfileSeoData } from 'utils/seoHelpers'
 
 interface PageProps {
   sendid: number | null
   tag?: string
   siteUrl: string
-  openGraphData?: ProfileOpenGraphData
+  profileSeoData?: {
+    title: string
+    description: string
+    canonicalUrl: string
+    imageUrl: string
+  }
 }
 
-export const Page: NextPageWithLayout<PageProps> = ({ sendid, tag, siteUrl, openGraphData }) => {
-  // Use OpenGraph data from getServerSideProps if available, otherwise fallback to defaults
+export const Page: NextPageWithLayout<PageProps> = ({ sendid, tag, siteUrl, profileSeoData }) => {
+  // Generate SEO configuration using buildSeo utility with consistent fallbacks
   const seo = buildSeo({
-    title: openGraphData?.title ?? 'Send | Profile',
-    description: openGraphData?.description ?? `Check out ${tag ? `/${tag}` : sendid} on Send`,
-    url: openGraphData?.canonicalUrl ?? `${siteUrl}/${tag}`,
-    image: openGraphData?.imageUrl ?? 'https://ghassets.send.app/2024/04/send-og-image.png',
+    title: profileSeoData?.title ?? 'Send | Profile',
+    description: profileSeoData?.description ?? `Check out ${tag ? `/${tag}` : sendid} on Send`,
+    url: profileSeoData?.canonicalUrl ?? `${siteUrl}/${tag}`,
+    image: profileSeoData?.imageUrl,
+    type: 'profile',
   })
 
   return (
     <>
-      {seo && <NextSeo {...seo} />}
+      <NextSeo {...seo} />
       <ProfileScreen sendid={sendid} />
     </>
   )
@@ -96,21 +99,26 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
     }
   }
 
-  // Generate OpenGraph data server-side
-  let openGraphData: ProfileOpenGraphData | undefined
-  try {
-    openGraphData = await generateProfileOpenGraphData(profile, siteUrl, `/${tag}`)
-  } catch (error) {
-    console.error('Error generating OpenGraph data:', error)
-    // Continue without OpenGraph data if generation fails
+  // Generate SEO data using helper functions for consistency
+  const profileData: ProfileSeoData = {
+    name: profile.name || undefined,
+    sendid: profile.sendid,
+    tag: profile.main_tag_name || tag,
+    about: profile.about || undefined,
+    avatarUrl: profile.avatar_url || undefined,
   }
+
+  const profileSeoData = generateProfileSeoData(profileData, {
+    siteUrl,
+    route: `/${tag}`,
+  })
 
   return {
     props: {
       sendid: profile.sendid,
       tag,
       siteUrl,
-      openGraphData,
+      profileSeoData,
     },
   }
 }) satisfies GetServerSideProps
