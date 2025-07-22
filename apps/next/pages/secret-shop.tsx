@@ -1,6 +1,6 @@
 import { SecretShopScreen } from 'app/features/secret-shop/screen'
 import { HomeLayout } from 'app/features/home/layout.web'
-import Head from 'next/head'
+import { NextSeo } from 'next-seo'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from './_app'
 import { TopNav } from 'app/components/TopNav'
@@ -8,9 +8,7 @@ import { TopNav } from 'app/components/TopNav'
 export const Page: NextPageWithLayout = () => {
   return (
     <>
-      <Head>
-        <title>Send | Secret Shop</title>
-      </Head>
+      <NextSeo title="Send | Secret Shop" />
       <SecretShopScreen />
     </>
   )

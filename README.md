@@ -27,6 +27,57 @@ More info here: https://info.send.it/send-docs
 4. Virtual Accounts - US Banking Checking and Routing number
 5. Private p2p transactions on Canton
 
+## Using `buildSeo`
+
+The `buildSeo` function simplifies the process of managing SEO across our application. It integrates with [NextSeo](https://github.com/garmeeh/next-seo) to provide a seamless way to handle SEO metadata.
+
+### How to Use
+
+1. **Import `buildSeo`:** Import the function from the relevant module in your component.
+   
+   ```javascript
+   import { buildSeo } from 'your-seo-module';
+   ```
+
+2. **Define SEO Metadata:** Use `buildSeo` to define SEO metadata for your page.
+   
+   ```javascript
+   const seoConfig = buildSeo({
+       title: 'Your Page Title',
+       description: 'Description of your page',
+       openGraph: {
+         url: 'http://example.com',
+         title: 'Your OG Title',
+         description: 'Description for open graph',
+         images: [
+           {
+             url: 'http://example.com/og-image.jpg',
+             width: 800,
+             height: 600,
+             alt: 'Og Image Alt',
+           }
+         ]
+       }
+   });
+   ```
+
+3. **Integrate with Next.js SEO:** Use the generated config with `NextSeo`.
+   
+   ```jsx
+   import { NextSeo } from 'next-seo';
+
+   export default function YourPage() {
+       return (
+           <>
+               <NextSeo {...seoConfig} />
+               {/* Page content */}
+           </>
+       );
+   }
+   ```
+
+For more details on customization and advanced configurations, please refer to the [NextSeo documentation](https://github.com/garmeeh/next-seo).
+
 ## Contributing
 
 See the [CONTRIBUTING.md](CONTRIBUTING.md) file for details.

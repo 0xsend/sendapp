@@ -1,0 +1,26 @@
+User-agent: *
+
+# Allow OG image generation for social sharing
+Allow: /api/og/*
+
+# Disallow sensitive user account pages
+Disallow: /account/*
+Disallow: /auth/*
+
+# Disallow financial/sensitive functionality
+Disallow: /deposit/*
+Disallow: /send/*
+Disallow: /earn/*
+Disallow: /trade/*
+Disallow: /invest/*
+Disallow: /sendpot/*
+
+# Disallow API endpoints (except OG images already allowed above)
+Disallow: /api/auth/*
+Disallow: /api/trpc/*
+
+# Disallow all history pages (user transaction data)
+Disallow: */history
+
+# Allow everything else by default (including tag pages and public profiles)
+# This means /alice/, /profile/bob/, etc. will be crawlable

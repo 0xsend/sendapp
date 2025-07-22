@@ -11221,6 +11221,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/next-seo@npm:^2.1.2":
+  version: 2.1.2
+  resolution: "@types/next-seo@npm:2.1.2"
+  dependencies:
+    next-seo: "npm:*"
+  checksum: 10/85f444f9b2aa1c44ea7c6d2435b33ec4eb6025e0f494bf651f5352355f6d35a737964a5cd78c4ccc94a7131382b3e4e0f2377ca988ac7a6bb6fbfadb5455742f
+  languageName: node
+  linkType: hard
+
 "@types/node-fetch@npm:^2.6.4":
   version: 2.6.11
   resolution: "@types/node-fetch@npm:2.6.11"
@@ -26328,6 +26337,7 @@ __metadata:
     "@trpc/next": "npm:^11.2.0"
     "@trpc/react-query": "npm:^11.2.0"
     "@trpc/server": "npm:^11.2.0"
+    "@types/next-seo": "npm:^2.1.2"
     "@types/node": "npm:^20"
     "@vercel/og": "npm:^0.6.8"
     app: "workspace:*"
@@ -26337,6 +26347,7 @@ __metadata:
     jest: "npm:^29"
     jest-environment-jsdom: "npm:^29.7.0"
     next: "npm:15.3.1"
+    next-seo: "npm:^6.8.0"
     plaiceholder: "npm:^3.0.0"
     raf: "npm:^3.4.1"
     react: "npm:^18.3.1"
@@ -26349,6 +26360,17 @@ __metadata:
     zod: "npm:^3.23.8"
   languageName: unknown
   linkType: soft
+
+"next-seo@npm:*, next-seo@npm:^6.8.0":
+  version: 6.8.0
+  resolution: "next-seo@npm:6.8.0"
+  peerDependencies:
+    next: ^8.1.1-canary.54 || >=9.0.0
+    react: ">=16.0.0"
+    react-dom: ">=16.0.0"
+  checksum: 10/0b7f08b682719c0f27408ab1f5c5267e7a475a43e7b0711b7d6c3db440996d1b83226ce88d69c1049a00d27fd55585b9f1134b094ec617e08b7e56cb27221846
+  languageName: node
+  linkType: hard
 
 "next@npm:15.3.1":
   version: 15.3.1

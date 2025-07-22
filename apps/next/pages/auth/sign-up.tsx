@@ -1,15 +1,12 @@
 import { SignUpScreen } from 'app/features/auth/sign-up/screen'
-import Head from 'next/head'
+import { NextSeo } from 'next-seo'
 import type { NextPageWithLayout } from '../_app'
 import { AuthLayout } from 'app/features/auth/layout.web'
 
 export const Page: NextPageWithLayout = () => {
   return (
     <>
-      <Head>
-        <title>Send | Sign Up</title>
-        <meta name="description" content="Future Cash. Sign up for Send." key="desc" />
-      </Head>
+      <NextSeo title="Send | Sign Up" description="Future Cash. Sign up for Send." />
       <SignUpScreen />
     </>
   )

@@ -1,5 +1,5 @@
 import { HomeLayout } from 'app/features/home/layout.web'
-import Head from 'next/head'
+import { NextSeo } from 'next-seo'
 import type { NextPageWithLayout } from '../_app'
 import { TopNav } from 'app/components/TopNav'
 import { ExploreScreen } from 'app/features/explore/screen'
@@ -7,9 +7,7 @@ import { ExploreScreen } from 'app/features/explore/screen'
 export const Page: NextPageWithLayout = () => {
   return (
     <>
-      <Head>
-        <title>Send | Explore</title>
-      </Head>
+      <NextSeo title="Send | Explore" />
       <ExploreScreen
         images={{
           rewards: 'https://ghassets.send.app/app_images/explore_rewards.jpg',

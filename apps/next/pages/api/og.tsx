@@ -51,19 +51,49 @@ const SendtagSchema = z.object({
     .regex(/^[a-zA-Z0-9_]+$/, 'Only English alphabet, numbers, and underscore'),
 })
 
-async function loadGoogleFont(font: string, weight: number, text: string) {
-  const url = `https://fonts.googleapis.com/css2?family=${font}:wght@${weight}&text=${encodeURIComponent(text)}`
-  const css = await (await fetch(url)).text()
-  const resource = css.match(/src: url\((.+)\) format\('(opentype|truetype)'\)/)
+// Simple font cache to avoid re-downloading
+const fontCache = new Map<string, ArrayBuffer>()
 
-  if (resource) {
-    const response = await fetch(resource[1])
-    if (response.status === 200) {
-      return await response.arrayBuffer()
-    }
+async function loadGoogleFont(font: string, weight: number, text: string) {
+  const cacheKey = `${font}-${weight}`
+
+  // Check cache first
+  if (fontCache.has(cacheKey)) {
+    return fontCache.get(cacheKey)
   }
 
-  throw new Error('failed to load font data')
+  try {
+    // Use a smaller text subset to reduce font size
+    const limitedText = text.slice(0, 50) // Limit text for font subsetting
+    const url = `https://fonts.googleapis.com/css2?family=${font}:wght@${weight}&text=${encodeURIComponent(limitedText)}&display=swap`
+
+    const cssResponse = await fetch(url, {
+      headers: { 'User-Agent': 'Mozilla/5.0' },
+    })
+
+    if (!cssResponse.ok) {
+      throw new Error(`Failed to fetch CSS: ${cssResponse.status}`)
+    }
+
+    const css = await cssResponse.text()
+    const resource = css.match(/src: url\((.+?)\) format\('(woff2?|opentype|truetype)'\)/)
+
+    if (resource) {
+      const fontResponse = await fetch(resource[1], {
+        headers: { 'User-Agent': 'Mozilla/5.0' },
+      })
+
+      if (fontResponse.ok) {
+        const fontData = await fontResponse.arrayBuffer()
+        fontCache.set(cacheKey, fontData) // Cache the font
+        return fontData
+      }
+    }
+  } catch (error) {
+    console.warn(`Font loading failed for ${font}:${weight}:`, error)
+  }
+
+  throw new Error(`Failed to load font data for ${font}:${weight}`)
 }
 
 const profileReactElement = (
@@ -190,7 +220,7 @@ const profileReactElement = (
               color: 'rgba(255, 255, 255)',
               margin: '0',
               maxWidth: '800px',
-              fontWeight: 600,
+              fontWeight: 400,
             }}
           >
             {profile.about.length > 100 ? `${profile.about.substring(0, 100)}...` : profile.about}
@@ -240,11 +270,14 @@ const profileReactElement = (
  * - Falls back to random auth images when no avatar_url exists
  */
 export default async function handler(req: NextRequest) {
+  const startTime = Date.now()
   try {
     // Use nextUrl instead of new URL(req.url) for Edge Runtime compatibility
     const { searchParams } = req.nextUrl
     const type = searchParams.get('type')
     const value = searchParams.get('value')
+
+    console.log(`[OG] Starting image generation for ${type}:${value}`)
 
     if (!type || !value) {
       return new Response('Missing type or value parameter', { status: 400 })
@@ -260,7 +293,7 @@ export default async function handler(req: NextRequest) {
     if (type === 'tag') {
       // Validate tag format
       const result = SendtagSchema.safeParse({
-        name: value.match(/^@/) ? value.slice(1) : value,
+        name: value,
       })
 
       if (!result.success) {
@@ -307,35 +340,53 @@ export default async function handler(req: NextRequest) {
       return new Response('Profile not found or not public', { status: 404 })
     }
 
+    const profileTime = Date.now()
+    console.log(`[OG] Profile lookup took ${profileTime - startTime}ms`)
+
     // Collect all text that will be rendered for font optimization
     const text = [profile.name || '', profile.tag || '', profile.about || '', '/send']
       .concat(profile?.all_tags || [])
       .join('')
 
-    return new ImageResponse(profileReactElement(profile), {
+    console.log(`[OG] Loading fonts for text length: ${text.length}`)
+    // Load fonts in parallel for speed
+    const fontStart = Date.now()
+    const [font400, font700] = await Promise.all([
+      loadGoogleFont('DM Sans', 400, text),
+      loadGoogleFont('DM Sans', 700, text),
+    ])
+    console.log(`[OG] Font loading took ${Date.now() - fontStart}ms`)
+
+    const imageStart = Date.now()
+    if (!font400 || !font700) {
+      throw new Error('Failed to load fonts')
+    }
+    const response = new ImageResponse(profileReactElement(profile), {
       width: 1200,
       height: 630,
       fonts: [
         {
           name: 'DM Sans',
-          data: await loadGoogleFont('DM Sans', 400, text),
+          data: font400,
           style: 'normal',
           weight: 400,
         },
         {
           name: 'DM Sans',
-          data: await loadGoogleFont('DM Sans', 500, text),
-          style: 'normal',
-          weight: 500,
-        },
-        {
-          name: 'DM Sans',
-          data: await loadGoogleFont('DM Sans', 700, text),
+          data: font700,
           style: 'normal',
           weight: 700,
         },
       ],
     })
+    console.log(`[OG] Image generation took ${Date.now() - imageStart}ms`)
+    console.log(`[OG] Total time: ${Date.now() - startTime}ms`)
+
+    response.headers.set('Content-Type', 'image/png')
+    response.headers.set('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=43200')
+    response.headers.set('Access-Control-Allow-Origin', '*')
+    response.headers.set('Access-Control-Allow-Methods', 'GET')
+    return response
   } catch (e) {
     console.error('Error generating OG image:', e)
     return new Response('Failed to generate image', { status: 500 })

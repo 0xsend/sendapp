@@ -1,4 +1,4 @@
-import Head from 'next/head'
+import { NextSeo } from 'next-seo'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from '../../_app'
 import { HomeLayout } from 'app/features/home/layout.web'
@@ -8,9 +8,7 @@ import { FirstSendtagScreen } from 'app/features/account/sendtag/first/FirstSend
 export const Page: NextPageWithLayout = () => {
   return (
     <>
-      <Head>
-        <title>Send | First Sendtag</title>
-      </Head>
+      <NextSeo title="Send | First Sendtag" />
       <FirstSendtagScreen />
     </>
   )
