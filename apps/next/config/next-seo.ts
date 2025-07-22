@@ -28,36 +28,3 @@ export const defaultSEOConfig: DefaultSeoProps = {
     handle: '@send',
   },
 }
-
-type BuildOpenGraphParams = {
-  title: string
-  description: string
-  image: string
-  url: string
-}
-
-export function buildOpenGraph({ title, description, image, url }: BuildOpenGraphParams) {
-  return {
-    title,
-    description,
-    canonical: url,
-    openGraph: {
-      title,
-      description,
-      url,
-      images: [
-        {
-          url: image,
-          width: 800,
-          height: 630,
-          alt: `${title} - Send`,
-          type: 'image/png',
-        },
-      ],
-    },
-    twitter: {
-      cardType: 'summary_large_image' as const,
-      site: '@send',
-    },
-  }
-}
