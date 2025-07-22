@@ -77,24 +77,21 @@ export function generateCanonicalUrl({ siteUrl, route }: SeoGenerationOptions): 
  *
  * @param profile - Profile data object
  * @param siteUrl - Base site URL for API routes
- * @returns Image URL (custom profile image, generated OG image, or fallback)
+ * @returns Image URL (uses new profile API route with data as search params)
  */
 export function getProfileImageUrl(profile: ProfileSeoData, siteUrl: string): string {
   const fallbackImage = 'https://ghassets.send.app/2024/04/send-og-image.png'
 
-  // Use avatar if available
-  if (profile.avatarUrl) {
-    return profile.avatarUrl
-  }
+  // Only generate dynamic image if we have meaningful profile data
+  if (profile.name || profile.avatarUrl || profile.tag || profile.about) {
+    const searchParams = new URLSearchParams()
 
-  // Generate dynamic OG image for tags
-  if (profile.tag) {
-    return `${siteUrl}/api/og?type=tag&value=${encodeURIComponent(profile.tag)}`
-  }
+    if (profile.name) searchParams.set('name', profile.name)
+    if (profile.avatarUrl) searchParams.set('avatar_url', profile.avatarUrl)
+    if (profile.tag) searchParams.set('all_tags', profile.tag)
+    if (profile.about) searchParams.set('about', profile.about)
 
-  // Generate dynamic OG image for sendids
-  if (profile.sendid) {
-    return `${siteUrl}/api/og?type=sendid&value=${profile.sendid}`
+    return `${siteUrl}/api/og/profile?${searchParams.toString()}`
   }
 
   return fallbackImage

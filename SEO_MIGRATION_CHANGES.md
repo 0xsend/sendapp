@@ -1,11 +1,13 @@
 # Complete SEO Migration Changes Documentation
 
 ## Overview
+
 This document records all changes made during the migration from manual `<Head>` tags to NextSeo library for improved SEO management across the sendapp project.
 
 ## 1. Package Installation
 
 ### Dependencies Added
+
 ```bash
 yarn add next-seo
 yarn add -D @types/next-seo
@@ -14,6 +16,7 @@ yarn add -D @types/next-seo
 ## 2. New Files Created
 
 ### `apps/next/config/next-seo.ts`
+
 ```typescript
 import type { DefaultSeoProps } from 'next-seo'
 
@@ -81,6 +84,7 @@ export function buildOpenGraph({ title, description, image, url }: BuildOpenGrap
 ```
 
 ### `utils/seo.ts`
+
 ```typescript
 import { NextSeoProps } from 'next-seo'
 
@@ -105,7 +109,7 @@ export function buildSeo({ title, description, url, image }: BuildSeoParams): Ne
     },
     twitter: {
       cardType: 'summary_large_image',
-      handle: '@send',         // override if needed
+      handle: '@send', // override if needed
       site: '@send',
     },
   }
@@ -113,6 +117,7 @@ export function buildSeo({ title, description, url, image }: BuildSeoParams): Ne
 ```
 
 ### `packages/docs/changelog.md`
+
 ```markdown
 # Changelog
 
@@ -132,6 +137,7 @@ Migrating to `buildSeo` aligns with our mission to keep our tech stack modern an
 ```
 
 ### Test File: `apps/next/pages/profile/[sendid]/index.test.ts`
+
 ```typescript
 // Filename: /Users/vict0xr/documents/Send/sendapp/apps/next/pages/profile/[sendid]/index.test.ts
 
@@ -151,11 +157,13 @@ test('should use fallback OpenGraph image URL', () => {
 ## 3. Modified Files
 
 ### `apps/next/pages/_app.tsx`
+
 **Changes Made:**
+
 1. Added import: `import { DefaultSeo } from 'next-seo'`
 2. Added import: `import { defaultSEOConfig } from '../config/next-seo'`
 3. Added `<DefaultSeo {...defaultSEOConfig} />` component
-4. **REMOVED** all the following Head content (moved to _document.tsx):
+4. **REMOVED** all the following Head content (moved to \_document.tsx):
    - viewport meta tag
    - mobile-web-app-capable meta tag
    - apple-mobile-web-app-status-bar-style meta tag
@@ -169,6 +177,7 @@ test('should use fallback OpenGraph image URL', () => {
    - **REMOVED** entire `<Head>` block
 
 **Final Structure:**
+
 ```typescript
 import '../public/reset.css'
 import '../styles/globals.css'
@@ -227,10 +236,13 @@ export default api.withTRPC(MyApp)
 ```
 
 ### `apps/next/pages/_document.tsx`
+
 **Changes Made:**
+
 - **ADDED** all PWA and favicon-related tags to the `<Head>` section
 
 **Final Structure:**
+
 ```typescript
 import NextDocument, {
   type DocumentContext,
@@ -310,13 +322,16 @@ export default class Document extends NextDocument {
 ```
 
 ### `apps/next/pages/[tag]/index.tsx`
+
 **Changes Made:**
+
 1. Replaced `import Head from 'next/head'` with `import { NextSeo } from 'next-seo'`
 2. Added `import { buildSeo } from 'utils/seo'`
 3. Replaced manual Head implementation with NextSeo
 4. Updated to use `buildSeo` function
 
 **Key Changes:**
+
 ```typescript
 // OLD
 const pageTitle = openGraphData?.title || 'Send | Profile'
@@ -350,13 +365,16 @@ return (
 ```
 
 ### `apps/next/pages/profile/[sendid]/index.tsx`
+
 **Changes Made:**
+
 1. Replaced `import Head from 'next/head'` with `import { NextSeo } from 'next-seo'`
 2. Removed import of `generateProfileOpenGraphData`
 3. Simplified OpenGraph data generation
 4. Replaced manual Head with NextSeo
 
 **Key Changes:**
+
 ```typescript
 // OLD - Complex Head with multiple meta tags
 <Head>
@@ -402,11 +420,14 @@ const openGraphData = {
 ```
 
 ### `apps/next/utils/generateProfileOpenGraphData.ts`
+
 **Changes Made:**
+
 - Added fallback image URL to prevent undefined/empty imageUrl
 - Enhanced error handling
 
 **Key Changes:**
+
 ```typescript
 // OLD
 let imageUrl = ''
@@ -432,6 +453,7 @@ if (profile.main_tag_name) {
 ### All Static Pages Converted to NextSeo
 
 **Pages Modified (42 total):**
+
 1. `apps/next/pages/secret-shop.tsx`
 2. `apps/next/pages/account/sendtag/index.tsx`
 3. `apps/next/pages/account/personal-info.tsx`
@@ -469,6 +491,7 @@ if (profile.main_tag_name) {
 35. `apps/next/pages/account/backup/index.tsx`
 
 **Pattern for Simple Pages:**
+
 ```typescript
 // OLD
 import Head from 'next/head'
@@ -483,6 +506,7 @@ import { NextSeo } from 'next-seo'
 ```
 
 **Pattern for Complex Pages:**
+
 ```typescript
 // OLD
 <Head>
@@ -501,11 +525,14 @@ import { NextSeo } from 'next-seo'
 ```
 
 ### `README.md`
+
 **Changes Made:**
+
 - Added comprehensive section on using `buildSeo`
 
 **Added Section:**
-```markdown
+
+````markdown
 ## Using `buildSeo`
 
 The `buildSeo` function simplifies the process of managing SEO across our application. It integrates with [NextSeo](https://github.com/garmeeh/next-seo) to provide a seamless way to handle SEO metadata.
@@ -513,50 +540,52 @@ The `buildSeo` function simplifies the process of managing SEO across our applic
 ### How to Use
 
 1. **Import `buildSeo`:** Import the function from the relevant module in your component.
-   
+
    ```javascript
-   import { buildSeo } from 'your-seo-module';
+   import { buildSeo } from 'your-seo-module'
    ```
+````
 
 2. **Define SEO Metadata:** Use `buildSeo` to define SEO metadata for your page.
-   
+
    ```javascript
    const seoConfig = buildSeo({
-       title: 'Your Page Title',
-       description: 'Description of your page',
-       openGraph: {
-         url: 'http://example.com',
-         title: 'Your OG Title',
-         description: 'Description for open graph',
-         images: [
-           {
-             url: 'http://example.com/og-image.jpg',
-             width: 800,
-             height: 600,
-             alt: 'Og Image Alt',
-           }
-         ]
-       }
-   });
+     title: 'Your Page Title',
+     description: 'Description of your page',
+     openGraph: {
+       url: 'http://example.com',
+       title: 'Your OG Title',
+       description: 'Description for open graph',
+       images: [
+         {
+           url: 'http://example.com/og-image.jpg',
+           width: 800,
+           height: 600,
+           alt: 'Og Image Alt',
+         },
+       ],
+     },
+   })
    ```
 
 3. **Integrate with Next.js SEO:** Use the generated config with `NextSeo`.
-   
+
    ```jsx
-   import { NextSeo } from 'next-seo';
+   import { NextSeo } from 'next-seo'
 
    export default function YourPage() {
-       return (
-           <>
-               <NextSeo {...seoConfig} />
-               {/* Page content */}
-           </>
-       );
+     return (
+       <>
+         <NextSeo {...seoConfig} />
+         {/* Page content */}
+       </>
+     )
    }
    ```
 
 For more details on customization and advanced configurations, please refer to the [NextSeo documentation](https://github.com/garmeeh/next-seo).
-```
+
+````
 
 ## 4. Package.json Changes
 
@@ -567,9 +596,10 @@ For more details on customization and advanced configurations, please refer to t
     "next-seo": "^6.8.0"
   }
 }
-```
+````
 
 ### apps/next/package.json
+
 ```json
 {
   "dependencies": {
@@ -591,13 +621,67 @@ For more details on customization and advanced configurations, please refer to t
 6. **Maintainability**: Easier to update SEO configuration globally
 7. **Performance**: Better tree-shaking and bundle optimization
 
-## 6. Migration Statistics
+## 6. API Route Optimization
 
-- **Files Created**: 4 new files
-- **Files Modified**: 47 files
+### `/api/og.tsx` → `/api/og/profile.tsx`
+
+**Changes Made:**
+
+- **MOVED** `/api/og.tsx` to `/api/og/profile.tsx`
+- **REMOVED** database lookups from API route
+- **CHANGED** to accept profile data as search parameters
+- **SIMPLIFIED** by removing Supabase RPC calls and edge runtime complexity
+
+**New API Usage:**
+
+```typescript
+// OLD - Required database lookup
+/api/og?type=tag&value=johndoe
+/api/og?type=sendid&value=123
+
+// NEW - Profile data passed as parameters
+/api/og/profile?name=John&avatar_url=https://example.com/avatar.jpg&all_tags=tag1,tag2&about=Bio text
+```
+
+**Benefits:**
+
+- **Performance**: Eliminates database queries in edge function
+- **Reliability**: Reduces potential points of failure
+- **Flexibility**: Easier to customize with different profile data
+- **Caching**: Better cache hits since data is explicit in URL
+
+### Updated Helper Functions
+
+**Files Modified:**
+
+- `apps/next/utils/generateProfileOpenGraphData.ts`
+- `apps/next/utils/seoHelpers.ts`
+
+**Key Changes:**
+
+```typescript
+// Updated to use new API route with profile data
+if (profile.name || profile.avatar_url || profile.all_tags?.length || profile.about) {
+  const searchParams = new URLSearchParams()
+
+  if (profile.name) searchParams.set('name', profile.name)
+  if (profile.avatar_url) searchParams.set('avatar_url', profile.avatar_url)
+  if (profile.all_tags?.length) searchParams.set('all_tags', profile.all_tags.join(','))
+  if (profile.about) searchParams.set('about', profile.about)
+
+  imageUrl = `${siteUrl}/api/og/profile?${searchParams.toString()}`
+}
+```
+
+## 7. Migration Statistics
+
+- **Files Created**: 5 new files (including new API route)
+- **Files Modified**: 49 files
+- **Files Moved**: 1 file (`/api/og.tsx` → `/api/og/profile.tsx`)
 - **Lines of Code Reduced**: ~500 lines
 - **Pages Converted**: 42 pages
 - **Import Changes**: 47 import statement updates
+- **API Endpoints Optimized**: 1 endpoint (removed database dependency)
 - **Manual Head Tags Removed**: ~500 individual meta/link tags
 
 ## 7. Testing Added
@@ -611,7 +695,7 @@ For more details on customization and advanced configurations, please refer to t
 1. **Fallback Images**: Always provide fallback OG images
 2. **Type Safety**: Use proper TypeScript types throughout
 3. **Consistent Patterns**: Standardized SEO implementation across pages
-4. **Clean Separation**: PWA/favicon tags in _document.tsx, SEO in components
+4. **Clean Separation**: PWA/favicon tags in \_document.tsx, SEO in components
 5. **Documentation**: Comprehensive usage guides and migration notes
 
 This migration successfully modernizes the SEO architecture while maintaining all existing functionality and improving maintainability.

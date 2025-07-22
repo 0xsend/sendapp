@@ -1,55 +1,10 @@
 import { ImageResponse } from '@vercel/og'
 import type { NextRequest } from 'next/server'
-import { z } from 'zod'
-import type { Database } from '@my/supabase/database.types'
 import type React from 'react'
-
-/**
- * Edge Runtime compatible Supabase RPC client
- * Uses direct HTTP calls instead of @supabase/supabase-js to avoid Node.js dependencies
- */
-const callSupabaseRPC = async (functionName: string, params: Record<string, unknown>) => {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseServiceRole = process.env.SUPABASE_SERVICE_ROLE
-
-  if (!supabaseUrl) {
-    throw new Error('NEXT_PUBLIC_SUPABASE_URL is not set')
-  }
-  if (!supabaseServiceRole) {
-    throw new Error('SUPABASE_SERVICE_ROLE is not set')
-  }
-
-  const response = await fetch(`${supabaseUrl}/rest/v1/rpc/${functionName}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      apikey: supabaseServiceRole,
-      Authorization: `Bearer ${supabaseServiceRole}`,
-    },
-    body: JSON.stringify(params),
-  })
-
-  if (!response.ok) {
-    const errorText = await response.text()
-    throw new Error(`Supabase RPC error: ${response.status} ${errorText}`)
-  }
-
-  return response.json()
-}
 
 export const config = {
   runtime: 'edge',
 }
-
-// Edge-runtime compatible sendtag validation
-const SendtagSchema = z.object({
-  name: z
-    .string()
-    .min(1)
-    .max(20)
-    .trim()
-    .regex(/^[a-zA-Z0-9_]+$/, 'Only English alphabet, numbers, and underscore'),
-})
 
 // Simple font cache to avoid re-downloading
 const fontCache = new Map<string, ArrayBuffer>()
@@ -96,9 +51,14 @@ async function loadGoogleFont(font: string, weight: number, text: string) {
   throw new Error(`Failed to load font data for ${font}:${weight}`)
 }
 
-const profileReactElement = (
-  profile: Database['public']['Functions']['profile_lookup']['Returns'][number]
-): React.ReactElement => {
+interface ProfileData {
+  name?: string
+  avatar_url?: string
+  all_tags?: string[]
+  about?: string
+}
+
+const profileReactElement = (profile: ProfileData): React.ReactElement => {
   const avatarUrl =
     profile.avatar_url ??
     `https://ghassets.send.app/app_images/auth_image_${Math.floor(Math.random() * 3) + 1}.jpg`
@@ -249,118 +209,75 @@ const profileReactElement = (
 }
 
 /**
- * Consolidated OpenGraph image generation API route
- * Handles both tag-based and sendid-based profile image generation
+ * Optimized OpenGraph image generation API route for profiles
+ * Accepts profile data as search parameters instead of fetching from database
  *
  * Query parameters:
- * - type: 'tag' | 'sendid'
- * - value: the tag name or sendid value
+ * - name: profile name
+ * - avatar_url: profile avatar URL
+ * - all_tags: comma-separated list of tags
+ * - about: profile bio/description
  *
  * Examples:
- * - /api/og?type=tag&value=johndoe
- * - /api/og?type=sendid&value=123
+ * - /api/og/profile?name=John&avatar_url=https://example.com/avatar.jpg&all_tags=tag1,tag2&about=Bio text
  *
  * @businessLogic
- * Generates social media preview images for profile pages using the same
- * avatar fallback pattern as the profile screen component
+ * Generates social media preview images for profile pages using provided profile data
+ * Eliminates database queries in edge function for better performance and reliability
  *
  * @edgeCases
- * - Returns 400 for missing or invalid parameters
- * - Returns 404 for invalid sendid/tag or non-public profiles
+ * - Returns 400 for completely missing profile data
  * - Falls back to random auth images when no avatar_url exists
+ * - Handles missing optional fields gracefully
+ *
+ * @improvements
+ * This approach eliminates database dependencies in the edge function and improves
+ * cache hit rates since profile data is explicit in the URL parameters
  */
 export default async function handler(req: NextRequest) {
   const startTime = Date.now()
   try {
-    // Use nextUrl instead of new URL(req.url) for Edge Runtime compatibility
     const { searchParams } = req.nextUrl
-    const type = searchParams.get('type')
-    const value = searchParams.get('value')
 
-    console.log(`[OG] Starting image generation for ${type}:${value}`)
+    // Extract profile data from search parameters
+    const name = searchParams.get('name') || undefined
+    const avatar_url = searchParams.get('avatar_url') || undefined
+    const all_tags_param = searchParams.get('all_tags')
+    const about = searchParams.get('about') || undefined
 
-    if (!type || !value) {
-      return new Response('Missing type or value parameter', { status: 400 })
+    // Parse comma-separated tags
+    const all_tags = all_tags_param ? all_tags_param.split(',').filter(Boolean) : undefined
+
+    console.log(`[OG Profile] Starting image generation for profile: ${name}`)
+
+    // Build profile object
+    const profile: ProfileData = {
+      name,
+      avatar_url,
+      all_tags,
+      about,
     }
-
-    if (type !== 'tag' && type !== 'sendid') {
-      return new Response('Invalid type parameter. Must be "tag" or "sendid"', { status: 400 })
-    }
-
-    let profile: Database['public']['Functions']['profile_lookup']['Returns'][number] | null = null
-    let error: unknown = null
-
-    if (type === 'tag') {
-      // Validate tag format
-      const result = SendtagSchema.safeParse({
-        name: value,
-      })
-
-      if (!result.success) {
-        return new Response('Invalid tag format', { status: 400 })
-      }
-
-      const { name: tag } = result.data
-
-      try {
-        const data = await callSupabaseRPC('profile_lookup', {
-          lookup_type: 'tag',
-          identifier: tag,
-        })
-        // Supabase RPC returns array, get first item or null for maybeSingle behavior
-        profile = Array.isArray(data) && data.length > 0 ? data[0] : null
-      } catch (tagError) {
-        error = tagError
-      }
-    } else {
-      // sendid lookup
-      const sendid = Number(value)
-      if (Number.isNaN(sendid)) {
-        return new Response('Invalid sendid', { status: 400 })
-      }
-
-      try {
-        const data = await callSupabaseRPC('profile_lookup', {
-          lookup_type: 'sendid',
-          identifier: sendid.toString(),
-        })
-        // Supabase RPC returns array, get first item or null for maybeSingle behavior
-        profile = Array.isArray(data) && data.length > 0 ? data[0] : null
-      } catch (sendidError) {
-        error = sendidError
-      }
-    }
-
-    if (error) {
-      console.error('Error fetching profile for OG image:', error)
-      return new Response('Error fetching profile', { status: 500 })
-    }
-
-    if (!profile || !profile.is_public) {
-      return new Response('Profile not found or not public', { status: 404 })
-    }
-
-    const profileTime = Date.now()
-    console.log(`[OG] Profile lookup took ${profileTime - startTime}ms`)
 
     // Collect all text that will be rendered for font optimization
-    const text = [profile.name || '', profile.tag || '', profile.about || '', '/send']
+    const text = [profile.name || '', profile.about || '', '/send']
       .concat(profile?.all_tags || [])
       .join('')
 
-    console.log(`[OG] Loading fonts for text length: ${text.length}`)
+    console.log(`[OG Profile] Loading fonts for text length: ${text.length}`)
+
     // Load fonts in parallel for speed
     const fontStart = Date.now()
     const [font400, font700] = await Promise.all([
       loadGoogleFont('DM Sans', 400, text),
       loadGoogleFont('DM Sans', 700, text),
     ])
-    console.log(`[OG] Font loading took ${Date.now() - fontStart}ms`)
+    console.log(`[OG Profile] Font loading took ${Date.now() - fontStart}ms`)
 
     const imageStart = Date.now()
     if (!font400 || !font700) {
       throw new Error('Failed to load fonts')
     }
+
     const response = new ImageResponse(profileReactElement(profile), {
       width: 1200,
       height: 630,
@@ -379,8 +296,9 @@ export default async function handler(req: NextRequest) {
         },
       ],
     })
-    console.log(`[OG] Image generation took ${Date.now() - imageStart}ms`)
-    console.log(`[OG] Total time: ${Date.now() - startTime}ms`)
+
+    console.log(`[OG Profile] Image generation took ${Date.now() - imageStart}ms`)
+    console.log(`[OG Profile] Total time: ${Date.now() - startTime}ms`)
 
     response.headers.set('Content-Type', 'image/png')
     response.headers.set('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=43200')
@@ -388,7 +306,7 @@ export default async function handler(req: NextRequest) {
     response.headers.set('Access-Control-Allow-Methods', 'GET')
     return response
   } catch (e) {
-    console.error('Error generating OG image:', e)
+    console.error('Error generating OG profile image:', e)
     return new Response('Failed to generate image', { status: 500 })
   }
 }
