@@ -8,53 +8,33 @@ import { userOnboarded } from 'utils/userOnboarded'
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { ProfileLayout } from 'app/features/profile/layout.web'
 import { getSiteUrl } from 'utils/getSiteUrl'
+import { buildSeo } from 'utils/seo'
+import { generateProfileSeoData, type ProfileSeoData } from 'utils/seoHelpers'
 
 interface PageProps {
   sendid?: number
   siteUrl: string
-  openGraphData?: {
-    title?: string
-    description?: string
-    canonicalUrl?: string
-    imageUrl?: string
+  profileSeoData?: {
+    title: string
+    description: string
+    canonicalUrl: string
+    imageUrl: string
   }
 }
 
-export const Page: NextPageWithLayout<PageProps> = ({ sendid, siteUrl, openGraphData }) => {
-  // Use OpenGraph data from getServerSideProps if available, otherwise fallback to defaults
-  const pageTitle = openGraphData?.title || 'Send | Profile'
-  const description = openGraphData?.description || `Check out ${sendid} on /send`
-  const canonicalUrl = openGraphData?.canonicalUrl || `${siteUrl}/profile/${sendid}`
-  const ogImageUrl =
-    openGraphData?.imageUrl || 'https://ghassets.send.app/2024/04/send-og-image.png'
+export const Page: NextPageWithLayout<PageProps> = ({ sendid, siteUrl, profileSeoData }) => {
+  // Generate SEO configuration using buildSeo utility
+  const seo = buildSeo({
+    title: profileSeoData?.title || 'Send | Profile',
+    description: profileSeoData?.description || `Check out ${sendid} on Send`,
+    url: profileSeoData?.canonicalUrl || `${siteUrl}/profile/${sendid}`,
+    image: profileSeoData?.imageUrl,
+    type: 'profile',
+  })
 
   return (
     <>
-      <NextSeo
-        title={pageTitle}
-        description={description}
-        canonical={canonicalUrl}
-        openGraph={{
-          type: 'profile',
-          url: canonicalUrl,
-          title: pageTitle,
-          description: description,
-          images: [
-            {
-              url: ogImageUrl,
-              width: 1200,
-              height: 630,
-              alt: 'og-image',
-              type: 'image/png',
-            },
-          ],
-        }}
-        twitter={{
-          cardType: 'summary_large_image',
-          title: pageTitle,
-          description: description,
-        }}
-      />
+      <NextSeo {...seo} />
       <ProfileScreen sendid={sendid} />
     </>
   )
@@ -105,18 +85,23 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
     }
   }
 
-  // Populate default OpenGraph data if needed
-  const openGraphData = {
-    title: `Profile of ${profile.name}`,
-    description: `Learn more about ${profile.name} on Send`,
-    imageUrl: profile.avatar_url || undefined,
+  // Generate SEO data using helper functions
+  const profileData: ProfileSeoData = {
+    name: profile.name || undefined,
+    sendid,
+    avatarUrl: profile.avatar_url || undefined,
   }
+
+  const profileSeoData = generateProfileSeoData(profileData, {
+    siteUrl,
+    route: `/profile/${sendid}`,
+  })
 
   return {
     props: {
       sendid,
       siteUrl,
-      openGraphData,
+      profileSeoData,
     },
   }
 }) satisfies GetServerSideProps
