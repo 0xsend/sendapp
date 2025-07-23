@@ -9,9 +9,10 @@ const Spotify = (props) => {
   return (
     <Svg
       color={color as ColorTokens | undefined}
-      width={size}
-      height={size}
+      width={size ?? 256}
+      height={size ?? 256}
       viewBox="0 0 256 256"
+      preserveAspectRatio="xMidYMid meet"
       {...rest}
     >
       <Path

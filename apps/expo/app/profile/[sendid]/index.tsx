@@ -1,30 +1,31 @@
-import { CONTAINER_OFFSET } from 'apps-expo/components/layout/ScreenContainer'
 import { Stack } from 'expo-router'
 import { ProfileScreen } from 'app/features/profile/screen'
-import { Container, useSafeAreaInsets } from '@my/ui'
+import { ScrollView } from '@my/ui'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 export default function Screen() {
   const insets = useSafeAreaInsets()
-
   return (
     <>
       <Stack.Screen
         options={{
-          title: 'History',
+          title: 'Profile',
+          headerShown: false,
         }}
       />
-      <Container
-        safeAreaProps={{
-          edges: ['left', 'right'],
-          style: { flex: 1 },
-        }}
+      <ScrollView
         flex={1}
-        backgroundColor="$background"
-        paddingTop={CONTAINER_OFFSET}
-        paddingBottom={insets.bottom}
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingBottom: insets.bottom,
+        }}
+        showsVerticalScrollIndicator={false}
+        overflow={'visible'}
+        bounces={false}
+        overScrollMode="always" // Android scroll indicator
       >
         <ProfileScreen />
-      </Container>
+      </ScrollView>
     </>
   )
 }

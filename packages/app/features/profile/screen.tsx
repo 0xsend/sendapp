@@ -15,12 +15,13 @@ import {
   Text,
   XStack,
   YStack,
-  Link,
   useMedia,
   useThemeName,
   styled,
   useSafeAreaInsets,
-  View,
+  Link,
+  Anchor,
+  isWeb,
 } from '@my/ui'
 
 // Internal
@@ -188,6 +189,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                     bc="rgba(102, 102, 102, 0.4)"
                     borderRadius={4}
                     alignSelf="flex-start"
+                    overflow="hidden"
                   >
                     <Paragraph color="$white" fontSize="$3" fontWeight="400">
                       /{tag}
@@ -196,24 +198,27 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                 )
               })}
             </XStack>
-
-            <Paragraph color="$white" fontSize="$4" fontWeight="400">
-              {otherUserProfile?.about}
-            </Paragraph>
+            {otherUserProfile?.about && (
+              <Paragraph color="$white" fontSize="$4" fontWeight="400">
+                {otherUserProfile?.about}
+              </Paragraph>
+            )}
           </YStack>
 
           <LinkableButton
             als={media.gtMd ? 'flex-end' : 'flex-start'}
             href={{
-              pathname: '/send',
+              pathname: isWeb ? '/send' : '/send/form',
               query: { recipient: otherUserProfile?.sendid, idType: 'sendid' },
             }}
             theme="green"
             height={32}
             borderRadius="$4"
             jc="center"
+            ai="center"
             maw={398}
             w={'100%'}
+            bc="$primary"
           >
             <Button.Text
               color="$black"
@@ -272,7 +277,6 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
           fd={'column'}
           px="$4"
           pt="$6"
-          pb="$12"
           gap="$4"
           bc={'$color0'}
           als={'center'}
@@ -476,22 +480,24 @@ const LinksInBio = ({ profile }: { profile: Functions<'profile_lookup'>[number] 
       {profile?.links_in_bio?.map((link) => {
         const fullUrl = `https://${link.domain}${link.handle}`
         return (
-          <LinkableButton
-            key={`${link.domain_name}`}
+          <Anchor
+            key={`lets-connect-${link.domain}${link.handle}`}
             href={fullUrl}
             target="_blank"
             width="100%"
-            p={'$3'}
             f={1}
-            chromeless
-            hoverStyle={{ backgroundColor: 'transparent' }}
-            pressStyle={{ backgroundColor: 'transparent', borderColor: 'transparent' }}
-            focusStyle={{ backgroundColor: 'transparent' }}
+            textDecorationLine="none"
           >
-            <XStack justifyContent="space-between" alignItems="center" width="100%">
+            <XStack
+              p={'$3'}
+              f={1}
+              width="100%"
+              h="100%"
+              justifyContent="space-between"
+              alignItems="center"
+            >
               <XStack gap="$4" alignItems="center">
                 <IconLinkInBio domain_name={link.domain_name} size={24} color="$white" />
-
                 <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
                   {link.domain_name}
                 </Paragraph>
@@ -505,7 +511,7 @@ const LinksInBio = ({ profile }: { profile: Functions<'profile_lookup'>[number] 
                 <ChevronRight size="$1" color="$color12" />
               </XStack>
             </XStack>
-          </LinkableButton>
+          </Anchor>
         )
       })}
     </Card>
