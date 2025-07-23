@@ -1,5 +1,5 @@
 import type { Functions } from '@my/supabase/database.types'
-import { Button, Fade, Image, LinearGradient, Paragraph, XStack, YStack } from '@my/ui'
+import { Anchor, Button, Fade, Image, LinearGradient, Paragraph, XStack, YStack } from '@my/ui'
 import { IconX, IconLinkInBio } from 'app/components/icons'
 import { Platform } from 'react-native'
 
@@ -10,11 +10,6 @@ export const ProfileAboutTile = ({
   profile: Functions<'profile_lookup'>[number]
   onClose: () => void
 }) => {
-  const handleLinkInBioRedirect = (link: { domain: string; handle: string }) => {
-    const url = `https://${link.domain}${link.handle}`
-    window.open(url, '_blank', 'noopener,noreferrer')
-  }
-
   return (
     <Fade>
       <YStack w={'100%'} gap={'$4'} pb={'$4'} testID={'profile-about-tile'}>
@@ -115,39 +110,45 @@ export const ProfileAboutTile = ({
               Links
             </Paragraph>
             <YStack gap="$3">
-              {profile.links_in_bio.map(({ domain, handle, domain_name }) => (
-                <XStack
-                  key={domain_name}
-                  ai="center"
-                  jc="space-between"
-                  bg={'$color2'}
-                  borderRadius={'$4'}
-                  padding={'$4'}
-                  w={'100%'}
-                  gap={'$3'}
-                  cursor={'pointer'}
-                  onPress={() =>
-                    handleLinkInBioRedirect({ domain: domain || '', handle: handle || '' })
-                  }
-                  pressStyle={{ opacity: 0.7 }}
-                  hoverStyle={{ opacity: 0.8 }}
-                >
-                  <XStack gap={'$3'} ai="center" flex={1}>
-                    <IconLinkInBio domain_name={domain_name} size={'$3'} />
-                    <YStack flex={1}>
-                      <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
-                        {domain_name}
-                      </Paragraph>
+              {profile.links_in_bio.map(({ domain, handle, domain_name }) => {
+                const fullUrl = `https://${domain}${handle}`
+                return (
+                  <Anchor
+                    key={domain_name}
+                    href={fullUrl}
+                    target="_blank"
+                    width="100%"
+                    f={1}
+                    textDecorationLine="none"
+                  >
+                    <XStack
+                      ai="center"
+                      jc="space-between"
+                      bg={'$color2'}
+                      borderRadius={'$4'}
+                      padding={'$4'}
+                      w={'100%'}
+                      gap={'$3'}
+                      cursor={'pointer'}
+                    >
+                      <XStack gap={'$3'} ai="center" flex={1}>
+                        <IconLinkInBio domain_name={domain_name} />
+                        <YStack flex={1}>
+                          <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
+                            {domain_name}
+                          </Paragraph>
+                          <Paragraph size={'$3'} color={'$color10'}>
+                            {handle}
+                          </Paragraph>
+                        </YStack>
+                      </XStack>
                       <Paragraph size={'$3'} color={'$color10'}>
-                        {handle}
+                        View →
                       </Paragraph>
-                    </YStack>
-                  </XStack>
-                  <Paragraph size={'$3'} color={'$color10'}>
-                    View →
-                  </Paragraph>
-                </XStack>
-              ))}
+                    </XStack>
+                  </Anchor>
+                )
+              })}
             </YStack>
           </YStack>
         )}

@@ -9,6 +9,7 @@ import { IconYoutube } from './IconYoutube'
 import { IconDiscord } from './IconDiscord'
 import type { Database } from '@my/supabase/database-generated.types'
 import { XStack } from '@my/ui'
+import { IconWorldSearch } from './IconWorldSearch'
 
 export const domainColors = {
   X: 'black',
@@ -37,8 +38,20 @@ export const IconLinkInBio = ({ domain_name, ...props }: { domain_name: string }
   const Icon = domainIcons[domain_name]
 
   if (!Icon) {
-    console.warn(`No icon found for ${domain_name}`)
-    return null
+    return (
+      <XStack
+        justifyContent="center"
+        alignItems="center"
+        padding="$2"
+        aspectRatio={1}
+        w={40}
+        h={40}
+        bc={'$color11'}
+        br={12}
+      >
+        <IconWorldSearch size="$100%" color="$color1" {...props} />
+      </XStack>
+    )
   }
 
   return (
@@ -47,12 +60,12 @@ export const IconLinkInBio = ({ domain_name, ...props }: { domain_name: string }
       alignItems="center"
       padding="$2"
       aspectRatio={1}
-      maw={40}
-      mah={40}
+      w={40}
+      h={40}
       bc={domainColors[domain_name]}
       br={12}
     >
-      <Icon size={'$4'} color="white" {...props} />
+      <Icon size="$100%" color="white" {...props} />
     </XStack>
   )
 }

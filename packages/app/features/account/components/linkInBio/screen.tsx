@@ -92,6 +92,7 @@ export const LinkInBioScreen = () => {
           maw={398}
           w={'100%'}
           onPress={() => submit()}
+          py={0}
         >
           <Button.Text
             color="$black"
@@ -174,6 +175,7 @@ export const LinkInBioScreen = () => {
         maw={398}
         w={'100%'}
         onPress={() => setFormState(FormState.LinkInBioForm)}
+        py={0}
       >
         <Button.Text
           color="$black"

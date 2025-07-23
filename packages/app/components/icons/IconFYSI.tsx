@@ -11,6 +11,7 @@ const FYSI = (props) => {
       width={size}
       height={size}
       viewBox="0 0 41 41"
+      preserveAspectRatio="xMidYMid meet"
       {...rest}
     >
       <Path d="M37.6641 28.3407V12.7822H40.9983V28.3407H37.6641Z" fill="currentColor" />
