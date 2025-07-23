@@ -20,12 +20,14 @@ import { useRouter } from 'solito/router'
 const SwapRiskDialog = () => {
   const [isChecked, setIsChecked] = useState<boolean>(false)
   const [isOpen, setIsOpen] = useState<boolean>(false)
+  const [isConfirmed, setIsConfirmed] = useState<boolean>(false)
   const didUserSwap = useDidUserSwap()
   const router = useRouter()
   const id = useId()
 
   const handleConfirm = () => {
     setIsOpen(false)
+    setIsConfirmed(true)
   }
 
   const handleClose = () => {
@@ -33,10 +35,10 @@ const SwapRiskDialog = () => {
   }
 
   useEffect(() => {
-    if (didUserSwap.data === false || didUserSwap.error) {
+    if (!isConfirmed && (didUserSwap.data === false || didUserSwap.error)) {
       setIsOpen(true)
     }
-  }, [didUserSwap.data, didUserSwap.error])
+  }, [didUserSwap.data, didUserSwap.error, isConfirmed])
 
   // Shared content component to avoid duplication
   const dialogContent = (
