@@ -78,11 +78,18 @@ export function buildSeo({
         },
       ],
       type,
+      siteName: 'Send',
     },
     twitter: {
       cardType: 'summary_large_image',
       handle: twitterHandle,
       site: DEFAULT_TWITTER_SITE,
     },
+    additionalMetaTags: [
+      {
+        property: 'og:url',
+        content: url,
+      },
+    ],
   }
 }

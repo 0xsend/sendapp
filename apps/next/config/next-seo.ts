@@ -2,7 +2,6 @@ import type { DefaultSeoProps } from 'next-seo'
 
 export const defaultSEOConfig: DefaultSeoProps = {
   title: 'Send',
-  titleTemplate: '%s | Send',
   description: 'Peer-to-peer money. Send. Save. Invest.',
   canonical: 'https://send.app',
   openGraph: {

@@ -18,7 +18,6 @@ async function loadGoogleFont(font: string, weight: number, text: string) {
   }
 
   try {
-    // Use a smaller text subset to reduce font size
     const url = `https://fonts.googleapis.com/css2?family=${font}:wght@${weight}&text=${encodeURIComponent(text)}&display=swap`
 
     const cssResponse = await fetch(url, {
@@ -126,7 +125,7 @@ const profileReactElement = (profile: ProfileData): React.ReactElement => {
         {/* Name */}
         <h2
           style={{
-            fontSize: '98px',
+            fontSize: '72px',
             textAlign: 'center',
             maxWidth: '1000px',
             color: 'white',
@@ -137,7 +136,15 @@ const profileReactElement = (profile: ProfileData): React.ReactElement => {
         </h2>
 
         {/* Tags */}
-        <div style={{ display: 'flex', flexDirection: 'row', gap: '8px' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            gap: '8px',
+            flexWrap: 'wrap',
+            maxWidth: '60%',
+          }}
+        >
           {profile?.all_tags
             ? profile.all_tags.map((tag) => {
                 return (
@@ -175,7 +182,7 @@ const profileReactElement = (profile: ProfileData): React.ReactElement => {
         {profile.about ? (
           <p
             style={{
-              fontSize: '48px',
+              fontSize: '32px',
               color: 'rgba(255, 255, 255)',
               margin: '0',
               maxWidth: '800px',
