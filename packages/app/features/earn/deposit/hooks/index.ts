@@ -27,9 +27,9 @@ export function useReferrerVault(): UseQueryReturnType<`0x${string}` | null> {
   const referredBy = useReferredBy()
 
   return useQuery({
-    queryKey: ['referrerVault', { supabase, referredBy, referrer }] as const,
+    queryKey: ['referrerVault', { referredBy, referrer }] as const,
     queryFn: async ({
-      queryKey: [, { supabase, referredBy, referrer }],
+      queryKey: [, { referredBy, referrer }],
       signal,
     }): Promise<`0x${string}` | null> => {
       throwIf(referredBy.isError)
@@ -71,7 +71,9 @@ export function useReferrerVault(): UseQueryReturnType<`0x${string}` | null> {
  */
 export function useSendEarnDepositVault({
   asset,
-}: { asset: `0x${string}` | undefined }): UseQueryReturnType<`0x${string}` | null> {
+}: {
+  asset: `0x${string}` | undefined
+}): UseQueryReturnType<`0x${string}` | null> {
   const referrerVault = useReferrerVault()
   const balances = useSendEarnBalances()
   const sendAccount = useSendAccount()
@@ -267,7 +269,9 @@ export function useSendEarnDepositCalls({
  */
 function useSendEarnFactory({
   asset,
-}: { asset: `0x${string}` | undefined }): UseQueryReturnType<`0x${string}`> {
+}: {
+  asset: `0x${string}` | undefined
+}): UseQueryReturnType<`0x${string}`> {
   const chainId = useChainId()
   return useQuery({
     enabled: asset !== undefined,

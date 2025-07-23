@@ -21,7 +21,6 @@ import {
   YStack,
 } from '@my/ui'
 import { ExternalLink } from '@tamagui/lucide-icons'
-import { useThemeSetting } from '@tamagui/next-theme'
 import { SearchSchema, useTagSearch } from 'app/provider/tag-search'
 import { useRootScreenParams } from 'app/routers/params'
 import { SchemaForm } from 'app/utils/SchemaForm'
@@ -38,6 +37,8 @@ import { IconAccount, IconArrowRight, IconSearch, IconX } from './icons'
 import { baseMainnet } from '@my/wagmi'
 import { useEnsName } from 'wagmi'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { useThemeName, type YStackProps } from 'tamagui'
+import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 
 type SearchResultsType = Functions<'tag_search'>[number]
 type SearchResultsKeysType = keyof SearchResultsType
@@ -58,6 +59,7 @@ function SearchResults() {
   const { results, isLoading, error } = useTagSearch()
   const [queryParams] = useRootScreenParams()
   const { search: query } = queryParams
+  const { onScroll, onContentSizeChange } = useScrollDirection()
 
   const [resultsFilter, setResultsFilter] = useState<SearchResultsKeysType | null>(null)
   if (isLoading) {
@@ -118,7 +120,15 @@ function SearchResults() {
         opacity: 0,
         y: -10,
       }}
+      showsVerticalScrollIndicator={false}
       overflow="visible"
+      {...(Platform.OS === 'web'
+        ? {}
+        : {
+            onScroll,
+            onContentSizeChange,
+            scrollEventThrottle: 128,
+          })}
     >
       {query && matchesCount > 1 && (
         <YStack mb={'$4'}>
@@ -207,14 +217,16 @@ function SearchFilterButton({
   active: boolean
   onPress: () => void
 }) {
+  const theme = useThemeName()
+  const isDark = theme?.startsWith('dark')
+
   return (
     <Button
       chromeless
       unstyled
       onPress={onPress}
-      borderBottomColor={'$primary'}
+      borderBottomColor={isDark ? '$primary' : '$color12'}
       borderBottomWidth={active ? 1 : 0}
-      $theme-light={{ borderBottomColor: '$color12' }}
     >
       <ButtonText
         color={active ? '$color12' : '$silverChalice'}
@@ -425,6 +437,8 @@ function SearchResultRow({
 
   if (!query) return null
 
+  const label = profile.tag_name || profile.send_id || '??'
+
   return (
     <Stack
       br="$5"
@@ -438,14 +452,11 @@ function SearchResultRow({
           <XStack testID={`tag-search-${profile.send_id}`} ai="center" gap="$4">
             <Avatar size="$4.5" br="$3">
               <Avatar.Image testID="avatar" src={profile.avatar_url ?? undefined} />
-              <Avatar.Fallback>
+              <Avatar.Fallback jc="center" bc="$olive">
                 <Avatar size="$4.5" br="$3">
                   <Avatar.Image
-                    src={`https://ui-avatars.com/api.jpg?name=${profile.tag_name}&size=256`}
+                    src={`https://ui-avatars.com/api/?name=${label}&size=256&format=png&background=86ad7f`}
                   />
-                  <Avatar.Fallback>
-                    <Paragraph>??</Paragraph>
-                  </Avatar.Fallback>
                 </Avatar>
               </Avatar.Fallback>
             </Avatar>
@@ -491,15 +502,16 @@ type SearchProps = {
   label?: string
   placeholder?: string
   autoFocus?: boolean
+  containerProps?: YStackProps
 }
 
-function Search({ label, placeholder = 'Search', autoFocus = false }: SearchProps) {
+function Search({ label, placeholder = 'Search', autoFocus = false, containerProps }: SearchProps) {
   const { form } = useTagSearch()
   const [queryParams, setRootParams] = useRootScreenParams()
   const { search: query } = queryParams
 
-  const { resolvedTheme } = useThemeSetting()
-  const borderColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$color12'
+  const theme = useThemeName()
+  const borderColor = theme?.startsWith('dark') ? '$primary' : '$color12'
 
   useEffect(() => {
     const subscription = form.watch(({ query }) => {
@@ -572,6 +584,7 @@ function Search({ label, placeholder = 'Search', autoFocus = false }: SearchProp
                 fontSize: 17,
                 iconBefore: (
                   <IconSearch
+                    ml={'$3'}
                     color={'$silverChalice'}
                     $theme-light={{ color: '$darkGrayTextField' }}
                   />
@@ -581,6 +594,7 @@ function Search({ label, placeholder = 'Search', autoFocus = false }: SearchProp
                     chromeless
                     unstyled
                     cursor={'pointer'}
+                    mr={'$3'}
                     icon={
                       <IconX
                         color={'$silverChalice'}
@@ -609,7 +623,7 @@ function Search({ label, placeholder = 'Search', autoFocus = false }: SearchProp
             }}
           >
             {({ query }) => (
-              <ThemeableStack elevation={'$0.75'} br="$4">
+              <ThemeableStack elevation={'$0.75'} br="$4" {...containerProps}>
                 {query}
               </ThemeableStack>
             )}

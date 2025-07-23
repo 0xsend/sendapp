@@ -1,7 +1,7 @@
 import { Container, ScrollView, useSafeAreaInsets } from '@my/ui'
 import type { PropsWithChildren } from 'react'
 
-const CONTAINER_OFFSET = 10
+export const CONTAINER_OFFSET = 10
 
 export const ScreenContainer = ({ children }: PropsWithChildren) => {
   const insets = useSafeAreaInsets()
@@ -23,6 +23,7 @@ export const ScreenContainer = ({ children }: PropsWithChildren) => {
           paddingBottom: CONTAINER_OFFSET + insets.bottom,
         }}
         showsVerticalScrollIndicator={false}
+        overflow={'visible'}
         bounces={true}
         overScrollMode="always" // Android scroll indicator
       >

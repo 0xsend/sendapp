@@ -1,17 +1,28 @@
-import { Card, Fade, Paragraph, Separator, Spinner, Stack, XStack, YStack } from '@my/ui'
+import {
+  Card,
+  Fade,
+  Paragraph,
+  PrimaryButton,
+  Separator,
+  Spinner,
+  Stack,
+  XStack,
+  YStack,
+} from '@my/ui'
 import type { IconProps } from '@tamagui/helpers-icon'
 import { ArrowDown } from '@tamagui/lucide-icons'
-import { IconStarOutline, IconStacks } from 'app/components/icons'
+import { IconStacks, IconStarOutline } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
-import { SectionButton } from 'app/features/earn/components/SectionButton'
 import { formatCoinAmount } from 'app/utils/formatCoinAmount'
 import { toNiceError } from 'app/utils/toNiceError'
 import debug from 'debug'
-import { useMemo, type NamedExoticComponent } from 'react'
+import { type NamedExoticComponent, useMemo } from 'react'
 import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
 import { useSendEarnCoin } from '../providers/SendEarnProvider'
 import { coinToParam, useERC20AssetCoin } from '../params'
+import { Platform } from 'react-native'
+import { useHoverStyles } from 'app/utils/useHoverStyles'
 
 const log = debug('app:earn:active')
 
@@ -63,7 +74,13 @@ function ActiveEarnings() {
   log('ActiveEarnings', { coin })
 
   return (
-    <YStack w={'100%'} gap={'$4'} jc={'space-between'} $gtLg={{ w: '50%', pb: '$3.5' }}>
+    <YStack
+      w={'100%'}
+      gap={'$4'}
+      jc={'space-between'}
+      f={Platform.OS === 'web' ? undefined : 1}
+      $gtLg={{ w: '50%', pb: '$3.5' }}
+    >
       <YStack w={'100%'} gap={'$4'}>
         <TotalValue />
         <XStack flexGrow={1} gap={'$3.5'}>
@@ -73,11 +90,11 @@ function ActiveEarnings() {
         </XStack>
         <ActiveEarningBreakdown />
       </YStack>
-      <SectionButton
+      <PrimaryButton
         onPress={() => (!coin.data ? undefined : push(`/earn/${coinToParam(coin.data)}/deposit`))}
       >
-        ADD MORE DEPOSITS
-      </SectionButton>
+        <PrimaryButton.Text>ADD MORE DEPOSITS</PrimaryButton.Text>
+      </PrimaryButton>
     </YStack>
   )
 }
@@ -263,17 +280,27 @@ const EarningButton = ({
   Icon: NamedExoticComponent<IconProps>
   href: string
 }) => {
+  const hoverStyles = useHoverStyles()
+
   return (
     <Fade flexGrow={1} flexShrink={1}>
       <Link href={href}>
-        <XStack jc={'center'} px={'$5'} py={'$3.5'} br={'$6'} backgroundColor={'$color1'}>
+        <XStack
+          jc={'center'}
+          px={'$5'}
+          py={'$3.5'}
+          br={'$6'}
+          backgroundColor={'$color1'}
+          elevation={'$0.75'}
+          hoverStyle={hoverStyles}
+        >
           <Stack
             flexDirection={'column'}
             gap={'$2'}
             jc={'center'}
             ai={'center'}
             width={'100%'}
-            flexWrap={'wrap'}
+            flexWrap={Platform.OS === 'web' ? 'wrap' : undefined}
             $gtSm={{
               flexDirection: 'row',
               gap: '$3',

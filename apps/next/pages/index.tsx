@@ -7,7 +7,7 @@ import { SplashScreen } from 'app/features/splash/screen'
 import { useUser } from 'app/utils/useUser'
 import debug from 'debug'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import Head from 'next/head'
+import { NextSeo } from 'next-seo'
 import { userOnboarded } from 'utils/userOnboarded'
 import type { NextPageWithLayout } from './_app'
 import { AuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
@@ -56,9 +56,7 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
 
   return (
     <>
-      <Head>
-        <title>Send</title>
-      </Head>
+      <NextSeo title="Send" />
       {session ? (
         <HomeLayout TopNav={<TopNav header="Home" showLogo={true} backFunction="home" />}>
           <SendEarnProvider>

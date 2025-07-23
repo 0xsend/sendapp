@@ -39,7 +39,6 @@ type Override = {
       allowed_mime_types?: string;
       owner_id?: string;
       objects?: string;
-      prefixes?: string;
     };
   }
   chain_addresses?: {
@@ -162,6 +161,19 @@ type Override = {
       users?: string;
     };
   }
+  link_in_bio?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      user_id?: string;
+      handle?: string;
+      domain_name?: string;
+      domain?: string;
+      created_at?: string;
+      updated_at?: string;
+      users?: string;
+    };
+  }
   liquidity_pools?: {
     name?: string;
     fields?: {
@@ -194,18 +206,6 @@ type Override = {
       version?: string;
       owner_id?: string;
       user_metadata?: string;
-      level?: string;
-      buckets?: string;
-    };
-  }
-  prefixes?: {
-    name?: string;
-    fields?: {
-      bucket_id?: string;
-      name?: string;
-      level?: string;
-      created_at?: string;
-      updated_at?: string;
       buckets?: string;
     };
   }
@@ -691,6 +691,7 @@ type Override = {
       notify_private_alpha?: string;
       private_only?: string;
       migrations_ran?: string;
+      broadcast_adapter?: string;
       extensions?: string;
     };
   }
@@ -736,6 +737,7 @@ type Override = {
       chain_addresses?: string;
       distribution_shares?: string;
       distribution_verifications?: string;
+      link_in_bio?: string;
       profiles?: string;
       receipts?: string;
       send_accounts?: string;
@@ -796,7 +798,6 @@ export interface Fingerprint {
     updatedAt?: FingerprintDateField;
     fileSizeLimit?: FingerprintNumberField;
     objects?: FingerprintRelationField;
-    prefixes?: FingerprintRelationField;
   }
   chainAddresses?: {
     createdAt?: FingerprintDateField;
@@ -878,6 +879,12 @@ export interface Fingerprint {
     updatedAt?: FingerprintDateField;
     user?: FingerprintRelationField;
   }
+  linkInBios?: {
+    id?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    user?: FingerprintRelationField;
+  }
   liquidityPools?: {
     chainId?: FingerprintNumberField;
     createdAt?: FingerprintDateField;
@@ -891,13 +898,6 @@ export interface Fingerprint {
     lastAccessedAt?: FingerprintDateField;
     metadata?: FingerprintJsonField;
     userMetadata?: FingerprintJsonField;
-    level?: FingerprintNumberField;
-    bucket?: FingerprintRelationField;
-  }
-  prefixes?: {
-    level?: FingerprintNumberField;
-    createdAt?: FingerprintDateField;
-    updatedAt?: FingerprintDateField;
     bucket?: FingerprintRelationField;
   }
   profiles?: {
@@ -1172,6 +1172,7 @@ export interface Fingerprint {
     chainAddresses?: FingerprintRelationField;
     distributionShares?: FingerprintRelationField;
     distributionVerifications?: FingerprintRelationField;
+    linkInBios?: FingerprintRelationField;
     profiles?: FingerprintRelationField;
     receipts?: FingerprintRelationField;
     sendAccounts?: FingerprintRelationField;

@@ -178,20 +178,20 @@ const TradeActivityAvatar = ({ activity }: { activity: Activity }) => {
   const Icon = isBuyTransfer ? Plus : Minus
 
   return (
-    <XStack w="$4.5" h={'$4.5'} br="$4" ai={'center'} jc={'center'} position={'relative'}>
-      <IconCoin symbol={activity.data?.coin?.symbol ?? ''} width={'90%'} height={'90%'} />
-      <Icon
+    <XStack w="$5" h={'$5'} br="$4" ai={'center'} jc={'center'} position={'relative'}>
+      <IconCoin symbol={activity.data?.coin?.symbol ?? ''} size={'$5'} />
+      <XStack
         position={'absolute'}
-        top={'-5%'}
-        right={'-5%'}
-        size={'$1'}
+        top={0}
+        right={0}
+        transform={'translate(5px, -5px) scale(0.85)'}
         bc={isBuyTransfer ? '$olive' : '$error'}
         borderRadius={999}
-        shadowColor={'$black'}
-        shadowOffset={{ width: 0, height: 2 }}
-        shadowOpacity={1}
-        shadowRadius={4}
-      />
+        borderWidth={2}
+        borderColor={'$color1'}
+      >
+        <Icon size={'$1'} />
+      </XStack>
     </XStack>
   )
 }
@@ -204,11 +204,11 @@ const TransferDirectionIndicator = ({ activity }: { activity: Activity }) => {
       position={'absolute'}
       bottom={0}
       right={0}
-      transform={'translate(10%, 15%) scale(0.85)'}
+      transform={'translate(5px, 5px) scale(0.85)'}
       bc={to_user?.id ? '$olive' : '$error'}
       borderRadius={999}
       borderWidth={2}
-      borderColor={'$background'}
+      borderColor={'$color1'}
     >
       {to_user?.id ? (
         <ArrowDown size={'$1'} color={'$white'} />

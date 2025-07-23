@@ -72,7 +72,7 @@ const SwapRiskDialog = () => {
                 setIsChecked(checked === true)
               }}
               borderWidth={0}
-              backgroundColor={isChecked ? '$primary' : '$background'}
+              backgroundColor={isChecked ? '$primary' : '$color1'}
               circular={true}
               focusStyle={{ outlineWidth: 0 }}
             >

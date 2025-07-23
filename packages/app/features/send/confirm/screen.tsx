@@ -1,10 +1,10 @@
 import {
   Avatar,
-  Button,
   FadeCard,
   LinkableAvatar,
   Paragraph,
   type ParagraphProps,
+  PrimaryButton,
   ScrollView,
   Separator,
   Spinner,
@@ -151,7 +151,7 @@ export function SendConfirm() {
   const isSubmitting = isValidatePending || isTransferPending || isTransferInitialized
 
   const canSubmit =
-    (!isLoading || !isSubmitting) && hasEnoughBalance && hasEnoughGas && feesPerGas !== undefined
+    !isLoading && !isSubmitting && hasEnoughBalance && hasEnoughGas && feesPerGas !== undefined
 
   const localizedAmount = localizeAmount(
     formatUnits(
@@ -320,7 +320,7 @@ export function SendConfirm() {
                   case !!profile?.sendid:
                     return `#${profile?.sendid}`
                   default:
-                    return '??'
+                    return ''
                 }
               })()}
             </Paragraph>
@@ -367,7 +367,7 @@ export function SendConfirm() {
               edit
             </Paragraph>
           </XStack>
-          <Separator px="$4" bw="$0.75" borderRadius={'$4'} />
+          <Separator px="$4" />
           <YStack gap={'$2'}>
             <XStack ai={'center'} jc={'space-between'} gap={'$4'}>
               <Paragraph
@@ -400,6 +400,7 @@ export function SendConfirm() {
             br={'$6'}
             p={'$6'}
             gap={'$4.5'}
+            elevation={'$0.75'}
             $gtSm={{
               gap: '$5',
             }}
@@ -436,35 +437,29 @@ export function SendConfirm() {
           />
         )}
       </YStack>
-      <Button
-        elevation={canSubmit ? '$0.75' : undefined}
+      <PrimaryButton
         ref={submitButtonRef}
         theme={error ? 'red_alt1' : 'green'}
         onPress={onSubmit}
-        disabledStyle={{ opacity: 0.7, cursor: 'not-allowed', pointerEvents: 'none' }}
         disabled={!canSubmit}
-        br={'$4'}
-        gap={4}
-        py={'$5'}
-        width={'100%'}
       >
         {(() => {
           switch (true) {
             case isSubmitting:
               return (
-                <Button.Icon>
+                <PrimaryButton.Icon>
                   <Spinner size="small" color="$color12" />
-                </Button.Icon>
+                </PrimaryButton.Icon>
               )
             case !hasEnoughBalance:
-              return <Button.Text fontWeight={'600'}>Insufficient Balance</Button.Text>
+              return <PrimaryButton.Text>Insufficient Balance</PrimaryButton.Text>
             case !hasEnoughGas:
-              return <Button.Text fontWeight={'600'}>Insufficient Gas</Button.Text>
+              return <PrimaryButton.Text>Insufficient Gas</PrimaryButton.Text>
             default:
-              return <Button.Text fontWeight={'600'}>SEND</Button.Text>
+              return <PrimaryButton.Text>SEND</PrimaryButton.Text>
           }
         })()}
-      </Button>
+      </PrimaryButton>
     </YStack>
   )
 }

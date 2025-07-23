@@ -1,9 +1,4 @@
-// @TODO eventually we will have to tamagui-ify this
-
-import { DataProvider, GridLayoutProvider, RecyclerListView } from 'recyclerlistview/web'
-export * from 'recyclerlistview/web'
-
-export const RecyclerList = RecyclerListView
+import { DataProvider, GridLayoutProvider } from 'recyclerlistview/web'
 
 /**
  * Creates a DataProvider that determines when to recycle list elements.
@@ -14,7 +9,7 @@ export const RecyclerList = RecyclerListView
  * @param options.getStableId Optional function to generate stable IDs for items
  * @returns DataProvider instance configured with the provided data and comparison logic
  */
-export const dataProviderMaker = <T = never>(
+export const dataProviderMakerWeb = <T = never>(
   data?: T[],
   options: {
     rowHasChanged?: (r1: T, r2: T) => boolean
@@ -57,7 +52,7 @@ export const dataProviderMaker = <T = never>(
  * })
  * @returns GridLayoutProvider instance configured with the provided layout options
  */
-export const layoutProviderMaker = (options: {
+export const layoutProviderMakerWeb = (options: {
   maxSpan?: number
   getLayoutType?: (index: number) => string | number
   getSpan?: (index: number) => number

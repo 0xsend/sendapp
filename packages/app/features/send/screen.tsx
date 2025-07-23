@@ -11,7 +11,7 @@ import {
   Paragraph,
   Spinner,
   Text,
-  useToastController,
+  useAppToast,
   XStack,
   YStack,
   type YStackProps,
@@ -37,7 +37,7 @@ export const SendScreen = () => {
   const [{ recipient, idType }] = useSendScreenParams()
   const {
     data: profile,
-    isLoading: isLoadingProfileLookup,
+    isLoading,
     error: errorProfileLookup,
   } = useProfileLookup(idType ?? 'tag', recipient ?? '')
   const recentSendersQuery = useRecentSenders()
@@ -45,13 +45,6 @@ export const SendScreen = () => {
   const topSendersQuery = useTopSenders()
   const todayBirthdaySendersQuery = useTodayBirthdaySenders()
   const [{ search }] = useRootScreenParams()
-
-  const isLoading =
-    isLoadingProfileLookup ||
-    recentSendersQuery.isLoading ||
-    favouriteSendersQuery.isLoading ||
-    topSendersQuery.isLoading ||
-    todayBirthdaySendersQuery.isLoading
 
   if (isLoading) return <Spinner size="large" color={'$color12'} />
 
@@ -189,7 +182,7 @@ export function SendRecipient({ ...props }: YStackProps) {
 }
 
 function NoSendAccount({ profile }: { profile: Functions<'profile_lookup'>[number] }) {
-  const toast = useToastController()
+  const toast = useAppToast()
   const [clicked, setClicked] = useState(false)
   return (
     <YStack testID="NoSendAccount" gap="$4" mb="$4" maw={600} $lg={{ mx: 'auto' }} width={'100%'}>

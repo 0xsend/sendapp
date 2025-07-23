@@ -2,12 +2,12 @@ import {
   Button,
   ButtonIcon,
   type ButtonProps,
-  ButtonText,
-  LinkableButton,
   Paragraph,
+  PrimaryButton,
   Spinner,
   Tooltip,
   useMedia,
+  useThemeName,
   YStack,
   type YStackProps,
 } from '@my/ui'
@@ -27,7 +27,7 @@ import { useReferrer } from 'app/utils/useReferrer'
 import { useUser } from 'app/utils/useUser'
 import { sendUserOpTransfer } from 'app/utils/useUserOpTransferMutation'
 import { useAccountNonce } from 'app/utils/userop'
-import { type PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { isAddressEqual, zeroAddress } from 'viem'
 import { useWaitForTransactionReceipt } from 'wagmi'
 import {
@@ -36,12 +36,14 @@ import {
   useSendtagCheckoutReceipts,
 } from '../checkout-utils'
 import { useReferralCodeQuery } from 'app/utils/useReferralCode'
+import { useLink } from 'solito/link'
 
 export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
   const { updateProfile } = useUser()
   const { data: sendAccount } = useSendAccount()
   const sender = useMemo(() => sendAccount?.address, [sendAccount?.address])
-
+  const depositLinkProps = useLink({ href: '/deposit' })
+  const theme = useThemeName()
   const pendingTags = usePendingTags() ?? []
   const amountDue = useMemo(() => total(pendingTags ?? []), [pendingTags])
   const {
@@ -297,72 +299,54 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
       {usdcFeesError && (
         <Paragraph color="$error">{usdcFeesError?.message?.split('.').at(0)}</Paragraph>
       )}
-      <Button
-        elevation={canSubmit ? '$0.75' : undefined}
-        disabled={!canSubmit}
-        disabledStyle={{
-          pointerEvents: 'none',
-          opacity: 0.5,
-        }}
-        gap="$1.5"
-        onPress={handleCheckoutTx}
-        theme="green"
-        py={'$5'}
-        br={'$4'}
-      >
-        {(() => {
-          switch (true) {
-            case isLoadingUserOp ||
-              isLoadingUSDC ||
-              isLoadingUSDCFees ||
-              isLoadingReceipts ||
-              isLoadingReferrer:
-              return (
-                <>
-                  <Spinner color="$color11" />
-                  <ConfirmButtonText>loading...</ConfirmButtonText>
-                </>
-              )
-            case !canAffordTags && (!txWaitLoading || !submitting):
-              return (
-                <LinkableButton
-                  theme="red"
-                  href="/deposit"
-                  px="$3.5"
-                  h="$4.5"
-                  borderRadius="$4"
-                  testID="checkout-deposit-button"
-                  gap="$1.5"
-                >
-                  <ButtonText>Deposit USDC</ButtonText>
-                </LinkableButton>
-              )
-            case sendTransactionIsPending:
-              return (
-                <>
-                  <Spinner color="$color11" />
-                  <ConfirmButtonText>requesting...</ConfirmButtonText>
-                </>
-              )
-            case txWaitLoading:
-              return (
-                <>
-                  <Spinner color="$color11" />
-                  <ConfirmButtonText>processing...</ConfirmButtonText>
-                </>
-              )
-            case submitting:
-              return (
-                <>
-                  <Spinner color="$color11" />
-                  <ConfirmButtonText>registering...</ConfirmButtonText>
-                </>
-              )
-            default:
-              return <ConfirmButtonText>complete purchase</ConfirmButtonText>
-          }
-        })()}
-      </Button>
+      {(() => {
+        switch (true) {
+          case isLoadingUserOp ||
+            isLoadingUSDC ||
+            isLoadingUSDCFees ||
+            isLoadingReceipts ||
+            isLoadingReferrer:
+            return (
+              <PrimaryButton disabled gap="$1.5">
+                <Spinner theme={theme} />
+                <PrimaryButton.Text>loading...</PrimaryButton.Text>
+              </PrimaryButton>
+            )
+          case !canAffordTags && (!txWaitLoading || !submitting):
+            return (
+              <PrimaryButton theme="red" testID="checkout-deposit-button" {...depositLinkProps}>
+                <PrimaryButton.Text color={'$white'}>Deposit USDC</PrimaryButton.Text>
+              </PrimaryButton>
+            )
+          case sendTransactionIsPending:
+            return (
+              <PrimaryButton disabled gap="$1.5">
+                <Spinner theme={theme} />
+                <PrimaryButton.Text>requesting...</PrimaryButton.Text>
+              </PrimaryButton>
+            )
+          case txWaitLoading:
+            return (
+              <PrimaryButton disabled gap="$1.5">
+                <Spinner theme={theme} />
+                <PrimaryButton.Text>processing...</PrimaryButton.Text>
+              </PrimaryButton>
+            )
+          case submitting:
+            return (
+              <PrimaryButton disabled gap="$1.5">
+                <Spinner theme={theme} />
+                <PrimaryButton.Text>registering...</PrimaryButton.Text>
+              </PrimaryButton>
+            )
+          default:
+            return (
+              <PrimaryButton disabled={!canSubmit} onPress={handleCheckoutTx}>
+                <PrimaryButton.Text>complete purchase</PrimaryButton.Text>
+              </PrimaryButton>
+            )
+        }
+      })()}
     </ConfirmButtonStack>
   )
 }
@@ -403,21 +387,13 @@ const ConfirmButtonError = ({
       </Tooltip.Content>
       <Tooltip.Trigger>
         <Button theme="green" py={'$5'} br={'$4'} onPress={onPress} {...props}>
-          <ConfirmButtonText>{buttonText || 'error'}</ConfirmButtonText>
+          <PrimaryButton.Text>{buttonText || 'error'}</PrimaryButton.Text>
           <ButtonIcon>
             <AlertTriangle color={'$error'} size={'$1'} />
           </ButtonIcon>
         </Button>
       </Tooltip.Trigger>
     </Tooltip>
-  )
-}
-
-function ConfirmButtonText({ children }: PropsWithChildren) {
-  return (
-    <ButtonText ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
-      {children}
-    </ButtonText>
   )
 }
 

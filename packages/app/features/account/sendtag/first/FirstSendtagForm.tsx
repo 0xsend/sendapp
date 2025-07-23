@@ -1,4 +1,4 @@
-import { Button, FadeCard, Paragraph, SubmitButton, XStack, YStack } from '@my/ui'
+import { FadeCard, Paragraph, SubmitButton, XStack, YStack } from '@my/ui'
 import { useCallback, useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -71,17 +71,8 @@ export const FirstSendtagForm = () => {
 
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (
-      <SubmitButton
-        theme="green"
-        onPress={submit}
-        py={'$5'}
-        br={'$4'}
-        disabled={!canSubmit}
-        disabledStyle={{ opacity: 0.5 }}
-      >
-        <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'}>
-          register
-        </Button.Text>
+      <SubmitButton onPress={submit} disabled={!canSubmit}>
+        <SubmitButton.Text>register</SubmitButton.Text>
       </SubmitButton>
     ),
     [canSubmit]
@@ -133,7 +124,12 @@ export const FirstSendtagForm = () => {
                 width: '100%',
               },
               iconBefore: (
-                <Paragraph ml={-12} size={'$5'} opacity={formName ? 1 : 0}>
+                <Paragraph
+                  ml={4}
+                  size={'$5'}
+                  opacity={formName ? 1 : 0}
+                  mb={Platform.OS === 'web' ? undefined : 2}
+                >
                   /
                 </Paragraph>
               ),
@@ -141,7 +137,7 @@ export const FirstSendtagForm = () => {
           }}
           formProps={{
             w: '100%',
-            footerProps: { pb: 0 },
+            footerProps: { p: 0 },
             $gtSm: {
               maxWidth: '100%',
             },

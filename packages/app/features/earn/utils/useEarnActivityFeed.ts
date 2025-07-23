@@ -43,8 +43,8 @@ export function useEarnActivityFeed(params?: {
   )
 
   const queryKey = useMemo(
-    () => ['earn_activity_feed', { addressBook, supabase, pageSize, sendAccount }] as const,
-    [addressBook, supabase, pageSize, sendAccount]
+    () => ['earn_activity_feed', { addressBook, pageSize, sendAccount }] as const,
+    [addressBook, pageSize, sendAccount]
   )
 
   return useInfiniteQuery<
@@ -55,6 +55,7 @@ export function useEarnActivityFeed(params?: {
     number
   >({
     enabled,
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey,
     initialPageParam: 0,
     getNextPageParam: (lastPage, _allPages, lastPageParam) => {
@@ -67,10 +68,7 @@ export function useEarnActivityFeed(params?: {
       }
       return firstPageParam - 1
     },
-    queryFn: async ({
-      queryKey: [, { addressBook, supabase, pageSize, sendAccount }],
-      pageParam,
-    }) => {
+    queryFn: async ({ queryKey: [, { addressBook, pageSize, sendAccount }], pageParam }) => {
       throwIf(addressBook.error)
       throwIf(sendAccount.error)
       assert(!!addressBook.data, 'Fetching address book failed')

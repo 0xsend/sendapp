@@ -1,4 +1,4 @@
-import { Link, type LinkProps, Paragraph, XStack } from '@my/ui'
+import { Link, Paragraph, XStack } from '@my/ui'
 import type { ReactElement, ReactNode } from 'react'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { ChevronRight } from '@tamagui/lucide-icons'
@@ -8,16 +8,33 @@ export function AccountNavLink({
   text,
   icon,
   href,
+  onPress,
   ...props
-}: { text: string; icon: ReactNode } & Omit<LinkProps, 'children'>): ReactElement {
-  // Convert href to string for checking if it's external
-  const hrefString = typeof href === 'string' ? href : href.pathname || ''
-  const isExternalLink = hrefString.startsWith('http://') || hrefString.startsWith('https://')
+}: {
+  text: string
+  href?: string
+  icon: ReactNode
+  target?: string
+  onPress?: () => void
+}): ReactElement | null {
+  if (onPress) {
+    return (
+      <Pressable onPress={onPress}>
+        <LinkContent icon={icon} text={text} />
+      </Pressable>
+    )
+  }
+
+  if (!href) {
+    return null
+  }
+
+  const isExternalLink = href.startsWith('http://') || href.startsWith('https://')
 
   // Handle external links
   if (isExternalLink && Platform.OS !== 'web') {
     return (
-      <Pressable onPress={() => Linking.openURL(hrefString)}>
+      <Pressable onPress={() => Linking.openURL(href)}>
         <LinkContent icon={icon} text={text} />
       </Pressable>
     )
@@ -40,6 +57,7 @@ const LinkContent = ({ text, icon }: { text: string; icon: ReactNode }) => {
       gap="$4"
       p="$3.5"
       br={'$4'}
+      w={'100%'}
       $gtLg={{ p: '$5' }}
       hoverStyle={hoverStyles}
     >

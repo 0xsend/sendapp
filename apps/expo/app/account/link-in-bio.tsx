@@ -1,17 +1,17 @@
 import { Stack } from 'expo-router/build/layouts/Stack'
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
-import { ConfirmBuyTicketsScreen } from 'app/features/sendpot/ConfirmBuyTicketsScreen'
+import { LinkInBioScreen } from 'app/features/account/components/linkInBio/screen'
 
-export default function ConfirmBuySendpotTicketsScreen() {
+export default function Screen() {
   return (
     <>
       <Stack.Screen
         options={{
-          title: 'Summary',
+          title: 'Link In Bio',
         }}
       />
       <ScreenContainer>
-        <ConfirmBuyTicketsScreen />
+        <LinkInBioScreen />
       </ScreenContainer>
     </>
   )

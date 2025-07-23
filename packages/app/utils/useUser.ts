@@ -51,9 +51,10 @@ export const useUser = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('*, tags(*)')
+        .select('*, tags(*), main_tag(*), links_in_bio(*)')
         .eq('id', user?.id ?? '')
         .single()
+
       if (error) {
         // no rows - edge case of user being deleted
         if (error.code === 'PGRST116') {
@@ -83,7 +84,7 @@ export const useUser = () => {
     const name = profile?.name || user?.email || ''
     params.append('name', name)
     params.append('size', '256') // will be resized again by NextImage/SolitoImage
-    return `https://ui-avatars.com/api.jpg?${params.toString()}`
+    return `https://ui-avatars.com/api?${params.toString()}&format=png&background=86ad7f`
   })()
 
   return {
@@ -92,6 +93,8 @@ export const useUser = () => {
     profile,
     avatarUrl,
     tags: profile?.tags,
+    mainTag: profile?.main_tag,
+    linksInBio: profile?.links_in_bio || [],
     updateProfile: refetch,
     isLoadingSession,
     isLoadingProfile,
@@ -99,3 +102,5 @@ export const useUser = () => {
     validateToken,
   }
 }
+
+export type UseUserReturn = ReturnType<typeof useUser>

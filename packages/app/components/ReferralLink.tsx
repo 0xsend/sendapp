@@ -5,7 +5,7 @@ import {
   type ButtonProps,
   ButtonText,
   Paragraph,
-  useToastController,
+  useAppToast,
   XStack,
 } from '@my/ui'
 import { useUser } from 'app/utils/useUser'
@@ -13,26 +13,21 @@ import { CheckCheck } from '@tamagui/lucide-icons'
 import { useEffect, useState } from 'react'
 import { IconCopy } from './icons'
 import * as Clipboard from 'expo-clipboard'
-import { useConfirmedTags } from 'app/utils/tags'
 
 export function ReferralLink(props: ButtonProps) {
   const { profile } = useUser()
   const send_id = profile?.send_id
-  const tags = useConfirmedTags()
-  const referralCode = tags?.[0]?.name
+  const referralCode = profile?.main_tag?.name
   const referralHref = `https://send.app?referral=${referralCode}`
-  const toast = useToastController()
+  const toast = useAppToast()
   const [hasCopied, setHasCopied] = useState(false)
 
   const copyAndMaybeShareOnPress = async () => {
     await Clipboard.setStringAsync(referralHref)
       .then(() => toast.show('Copied your referral link to the clipboard'))
       .catch(() =>
-        toast.show('Something went wrong', {
+        toast.error('Something went wrong', {
           message: 'We were unable to copy your referral link to the clipboard',
-          customData: {
-            theme: 'red',
-          },
         })
       )
   }
@@ -60,13 +55,8 @@ export function ReferralLink(props: ButtonProps) {
 
   return (
     <XStack ai={'center'} gap={'$2'} width={'100%'}>
-      <Paragraph size={'$5'} color={'$color10'} flexShrink={0}>
-        Referral Code:
-      </Paragraph>
       <Button
         chromeless
-        flex={1}
-        jc={'space-between'}
         height={'auto'}
         bw={0}
         hoverStyle={{
@@ -78,12 +68,16 @@ export function ReferralLink(props: ButtonProps) {
         focusStyle={{
           backgroundColor: 'transparent',
         }}
-        onPress={() => {
+        onPress={(e) => {
+          e.preventDefault()
           setHasCopied(true)
           copyAndMaybeShareOnPress()
         }}
         {...props}
       >
+        <ButtonText size={'$5'} color={'$color10'} flexShrink={0}>
+          Referral Code:
+        </ButtonText>
         <ButtonText
           fontSize={'$5'}
           fontWeight={'500'}

@@ -1,6 +1,6 @@
 import { HomeLayout } from 'app/features/home/layout.web'
 import { TopNav } from 'app/components/TopNav'
-import Head from 'next/head'
+import { NextSeo } from 'next-seo'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from '../_app'
 import { DepositCryptoScreen } from 'app/features/deposit/crypto/screen'
@@ -8,9 +8,7 @@ import { DepositCryptoScreen } from 'app/features/deposit/crypto/screen'
 export const Page: NextPageWithLayout = () => {
   return (
     <>
-      <Head>
-        <title>Send | Crypto Deposit</title>
-      </Head>
+      <NextSeo title="Send | Crypto Deposit" />
       <DepositCryptoScreen />
     </>
   )

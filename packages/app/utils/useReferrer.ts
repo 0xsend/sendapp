@@ -56,8 +56,9 @@ export function useReferrer() {
   const { data: referralCode, isLoading } = useReferralCodeQuery()
 
   return useQuery({
-    queryKey: ['referrer', { referralCode, supabase, profile }] as const,
-    queryFn: async ({ queryKey: [, { referralCode, supabase, profile }], signal }) => {
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: ['referrer', { referralCode, profile }] as const,
+    queryFn: async ({ queryKey: [, { referralCode, profile }], signal }) => {
       assert(!!supabase, 'supabase is required')
       assert(!!profile, 'profile is required')
       return fetchReferrer({

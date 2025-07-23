@@ -27,12 +27,7 @@ export * from './components/LinkableButton'
 export * from './components/SafeArea'
 export * from './components/BlurStack'
 export * from './components/QRCode'
-
-export { RecyclerList } from './components/RecyclerList.web'
-export {
-  Card,
-  CardBackground,
-  CardFooter,
-  CardHeader,
-  CardProps,
-} from './components/Card'
+export * from './components/RecyclerList.web'
+export * from './components/RecyclerList.native'
+export { Card, CardBackground, CardFooter, CardHeader, type CardProps } from './components/Card'
+export * from './components/PrimaryButton'

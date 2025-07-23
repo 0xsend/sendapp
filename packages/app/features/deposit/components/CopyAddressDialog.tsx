@@ -1,4 +1,4 @@
-import { Button, Dialog, Paragraph, Separator, Sheet, YStack, Anchor } from '@my/ui'
+import { Button, Dialog, Paragraph, Separator, Sheet, YStack, Anchor, PrimaryButton } from '@my/ui'
 import { allCoins } from 'app/data/coins'
 import { Platform } from 'react-native'
 
@@ -37,17 +37,9 @@ export function CopyAddressDialog({ isOpen, onClose, onConfirm }) {
         gap="$4"
         $gtLg={{ flexDirection: 'row-reverse' }}
       >
-        <Button
-          theme="green"
-          borderRadius={'$4'}
-          p={'$4'}
-          onPress={onConfirm}
-          focusStyle={{ outlineWidth: 0 }}
-        >
-          <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
-            i agree & proceed
-          </Button.Text>
-        </Button>
+        <PrimaryButton onPress={onConfirm} focusStyle={{ outlineWidth: 0 }}>
+          <PrimaryButton.Text>i agree & proceed</PrimaryButton.Text>
+        </PrimaryButton>
         {Platform.OS === 'web' && (
           <Dialog.Close asChild>
             <Button borderRadius={'$4'} p={'$4'} focusStyle={{ outlineWidth: 0 }}>

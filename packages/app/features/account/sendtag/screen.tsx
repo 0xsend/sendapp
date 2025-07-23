@@ -1,26 +1,28 @@
 import type { Tables } from '@my/supabase/database.types'
 import {
+  Button,
+  Dialog,
   Fade,
   H2,
-  LinkableButton,
   Paragraph,
+  PrimaryButton,
+  Sheet,
   Spinner,
   Stack,
+  useAppToast,
   XStack,
   YGroup,
   YStack,
-  Sheet,
-  Button,
-  Dialog,
 } from '@my/ui'
-import { IconPlus, IconSlash, IconBadgeCheck, IconX } from 'app/components/icons'
+import { IconBadgeCheck, IconPlus, IconSlash, IconX } from 'app/components/icons'
 import { maxNumSendTags } from 'app/data/sendtags'
 import { useUser } from 'app/utils/useUser'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useState } from 'react'
 import { Platform } from 'react-native'
 import { api } from 'app/utils/api'
-import { useToastController } from '@my/ui'
+import { useLink } from 'solito/link'
+import { useHoverStyles } from 'app/utils/useHoverStyles'
 
 export function SendTagScreen() {
   const { tags, isLoading } = useUser()
@@ -49,6 +51,7 @@ export function SendTagScreen() {
   return (
     <YStack
       width={'100%'}
+      f={Platform.OS === 'web' ? undefined : 1}
       gap="$5"
       jc={'space-between'}
       $gtLg={{
@@ -96,33 +99,25 @@ function AddNewTagButton({
   tags?: Tables<'tags'>[]
   isFirstSendtagClaimable: boolean
 }) {
+  const linkProps = useLink({
+    href: isFirstSendtagClaimable ? '/account/sendtag/first' : '/account/sendtag/add',
+  })
+
   if (tags && tags.length >= maxNumSendTags) {
     return null
   }
 
   return (
-    <LinkableButton
-      elevation={5}
-      theme="green"
-      py={'$5'}
-      br={'$4'}
-      href={isFirstSendtagClaimable ? '/account/sendtag/first' : '/account/sendtag/add'}
-    >
+    <PrimaryButton {...linkProps}>
       {!isFirstSendtagClaimable && (
-        <LinkableButton.Icon>
+        <PrimaryButton.Icon>
           <IconPlus size={'$1'} color={'$black'} />
-        </LinkableButton.Icon>
+        </PrimaryButton.Icon>
       )}
-      <LinkableButton.Text
-        ff={'$mono'}
-        fontWeight={'500'}
-        tt="uppercase"
-        size={'$5'}
-        color={'$black'}
-      >
+      <PrimaryButton.Text>
         {isFirstSendtagClaimable ? 'register free sendtag' : 'add new'}
-      </LinkableButton.Text>
-    </LinkableButton>
+      </PrimaryButton.Text>
+    </PrimaryButton>
   )
 }
 
@@ -159,8 +154,8 @@ function SendtagList({
         </YGroup>
       </Fade>
       {canChangeMainTag && (
-        <Button size="$4" onPress={onMainTagSelect} theme="gray" br="$4">
-          Change Main Tag
+        <Button onPress={onMainTagSelect} br="$4">
+          <Button.Text fontSize={'$5'}>Change Main Tag</Button.Text>
         </Button>
       )}
     </YStack>
@@ -169,17 +164,19 @@ function SendtagList({
 
 function TagItem({ tag, isMain }: { tag: Tables<'tags'>; isMain?: boolean }) {
   return (
-    <XStack ai="center" gap="$3" p="$3.5" br={'$4'} $gtLg={{ p: '$5' }}>
-      <IconSlash size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
-      <Paragraph
-        size={'$8'}
-        fontWeight={'500'}
-        width={'80%'}
-        testID={`confirmed-tag-${tag.name}`}
-        aria-label={`Tag ${tag.name}${isMain ? ' (Main)' : ''}`}
-      >
-        {tag.name}
-      </Paragraph>
+    <XStack jc={'space-between'} ai="center" gap="$2" p="$3.5" br={'$4'} $gtLg={{ p: '$5' }}>
+      <XStack width={'75%'}>
+        <IconSlash size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
+        <Paragraph
+          size={'$8'}
+          fontWeight={'500'}
+          numberOfLines={1}
+          testID={`confirmed-tag-${tag.name}`}
+          aria-label={`Tag ${tag.name}${isMain ? ' (Main)' : ''}`}
+        >
+          {tag.name}
+        </Paragraph>
+      </XStack>
       {isMain && (
         <Paragraph size={'$6'} color={'$primary'} fontWeight={'600'}>
           Main
@@ -200,8 +197,9 @@ function MainTagSelectionSheet({
   tags: Tables<'tags'>[]
   currentMainTagId?: number | null
 }) {
-  const toast = useToastController()
+  const toast = useAppToast()
   const { updateProfile } = useUser()
+  const hoverStyles = useHoverStyles()
   const { refetch: refetchSendAccount, data: sendAccount } = useSendAccount()
   const { mutateAsync: updateMainTag, isPending } = api.sendAccount.updateMainTag.useMutation({
     onSuccess: async () => {
@@ -211,7 +209,7 @@ function MainTagSelectionSheet({
       onOpenChange(false)
     },
     onError: (error) => {
-      toast.show('Failed to update main tag')
+      toast.error('Failed to update main tag')
       console.error('Failed to update main tag:', error)
     },
   })
@@ -224,8 +222,10 @@ function MainTagSelectionSheet({
   // Shared content component to avoid duplication
   const dialogContent = (
     <>
-      <H2 ta={'center'}>Select Main Tag</H2>
-      <Paragraph ta="center" size="$3" color="$color11">
+      <H2 fontSize={'$7'} ta={'center'}>
+        Select Main Tag
+      </H2>
+      <Paragraph ta="center" size="$4" color="$color11">
         Choose which tag appears as your primary identity
       </Paragraph>
       <YStack gap="$2">
@@ -236,9 +236,10 @@ function MainTagSelectionSheet({
               key={tag.id}
               size="$5"
               br="$4"
-              theme={isCurrentMain ? 'green' : 'gray'}
+              theme={isCurrentMain ? 'green' : undefined}
               disabled={isCurrentMain || isPending}
               onPress={() => handleSelectTag(tag.id)}
+              hoverStyle={hoverStyles}
               icon={
                 isPending ? (
                   <Spinner size="small" color="$color11" />

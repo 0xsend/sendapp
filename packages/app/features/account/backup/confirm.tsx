@@ -1,13 +1,12 @@
 import type { Tables } from '@my/supabase/database-generated.types'
 import {
-  Button,
   Fade,
   FormWrapper,
   H1,
   Paragraph,
   Spinner,
   SubmitButton,
-  useToastController,
+  useAppToast,
   YStack,
 } from '@my/ui'
 import { baseMainnetClient, sendAccountAbi, tokenPaymasterAddress } from '@my/wagmi'
@@ -95,7 +94,7 @@ const AddPasskeySigner = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cre
         p={'$5'}
         $gtLg={{ p: '$7', gap: '$5', als: 'flex-start', maxWidth: '100%' }}
       >
-        <H1 size={'$9'} fontWeight={'600'} color="$color12">
+        <H1 fontSize={'$8'} fontWeight={'600'} color="$color12">
           Add Passkey as Signer
         </H1>
         <Paragraph size={'$5'} color={'$color10'}>
@@ -113,7 +112,7 @@ const AddPasskeySigner = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cre
 }
 
 const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_credentials'> }) => {
-  const toast = useToastController()
+  const toast = useAppToast()
   const queryClient = useQueryClient()
   const {
     data: sendAccount,
@@ -249,17 +248,8 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
 
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (
-      <SubmitButton
-        onPress={submit}
-        theme="green"
-        borderRadius={'$4'}
-        p={'$4'}
-        mt={'$1.5'}
-        {...(isLoading ? { disabled: true } : {})}
-      >
-        <Button.Text ff={'$mono'} fontWeight={'600'} tt="uppercase" size={'$5'} color={'$black'}>
-          Add Passkey as Signer
-        </Button.Text>
+      <SubmitButton onPress={submit} disabled={isLoading}>
+        <SubmitButton.Text>Add Passkey as Signer</SubmitButton.Text>
       </SubmitButton>
     ),
     [isLoading]
@@ -270,6 +260,9 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
       <SchemaForm
         form={form}
         formProps={{
+          footerProps: {
+            p: 0,
+          },
           $gtLg: {
             maxWidth: '100%',
             als: 'flex-start',

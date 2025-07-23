@@ -9,18 +9,17 @@ import {
   XStack,
   YGroup,
   YStack,
-  useToastController,
+  useAppToast,
+  PrimaryButton,
 } from '@my/ui'
 import { baseMainnetBundlerClient, entryPointAddress } from '@my/wagmi'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import type { erc20Coin } from 'app/data/coins'
-import { SectionButton } from 'app/features/earn/components/SectionButton'
 import { useSendEarn } from 'app/features/earn/providers/SendEarnProvider'
 import { useERC20AssetCoin } from 'app/features/earn/params'
 import { useSendEarnClaimRewardsCalls } from 'app/features/earn/rewards/hooks'
 import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
-import { TokenDetailsMarketData } from 'app/features/home/TokenDetails'
 import { assert } from 'app/utils/assert'
 import { formatCoinAmount } from 'app/utils/formatCoinAmount'
 import { useSendAccount } from 'app/utils/send-accounts'
@@ -33,6 +32,7 @@ import { SectionList } from 'react-native'
 import { formatUnits, withRetry } from 'viem'
 import { useChainId } from 'wagmi'
 import { useEarnRewardsActivityFeed } from './hooks'
+import { TokenDetailsMarketData } from 'app/features/home/TokenDetailsHeader'
 
 const log = debug('app:features:earn:rewards')
 
@@ -44,7 +44,7 @@ export function RewardsBalanceScreen() {
 
 function RewardsBalance() {
   const [useropState, setUseropState] = useState('')
-  const toast = useToastController()
+  const toast = useAppToast()
   const queryClient = useQueryClient()
   const chainId = useChainId()
   const coin = useERC20AssetCoin()
@@ -224,13 +224,13 @@ function RewardsBalance() {
             )}
         </XStack>
 
-        <SectionButton
+        <PrimaryButton
           onPress={handleClaimPress}
           disabled={!canClaim || mutation.isPending}
           iconAfter={mutation.isPending ? <Spinner size="small" /> : undefined}
         >
-          CLAIM REWARDS
-        </SectionButton>
+          <PrimaryButton.Text>CLAIM REWARDS</PrimaryButton.Text>
+        </PrimaryButton>
       </YStack>
     </YStack>
   )

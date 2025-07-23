@@ -1,22 +1,43 @@
 import { ProfileScreen } from 'app/features/profile/screen'
-import { HomeLayout } from 'app/features/home/layout.web'
-import Head from 'next/head'
+import { NextSeo } from 'next-seo'
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
-import type { NextPageWithLayout } from './_app'
+import type { NextPageWithLayout } from '../_app'
 import type { GetServerSideProps, GetServerSidePropsContext } from 'next'
 import type { Database } from '@my/supabase/database.types'
 import { userOnboarded } from 'utils/userOnboarded'
 import { SendtagSchema } from 'app/utils/zod/sendtag'
 import { assert } from 'app/utils/assert'
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
-import { TopNav } from 'app/components/TopNav'
+import { ProfileLayout } from 'app/features/profile/layout.web'
+import { getSiteUrl } from 'utils/getSiteUrl'
+import { buildSeo } from 'utils/seo'
+import { generateProfileSeoData, type ProfileSeoData } from 'utils/seoHelpers'
 
-export const Page: NextPageWithLayout<{ sendid: number | null }> = ({ sendid }) => {
+interface PageProps {
+  sendid: number | null
+  tag?: string
+  siteUrl: string
+  profileSeoData?: {
+    title: string
+    description: string
+    canonicalUrl: string
+    imageUrl: string
+  }
+}
+
+export const Page: NextPageWithLayout<PageProps> = ({ sendid, tag, siteUrl, profileSeoData }) => {
+  // Generate SEO configuration using buildSeo utility with consistent fallbacks
+  const seo = buildSeo({
+    title: profileSeoData?.title ?? 'Send | Profile',
+    description: profileSeoData?.description ?? `Check out ${tag ? `/${tag}` : sendid} on Send`,
+    url: profileSeoData?.canonicalUrl ?? `${siteUrl}/${tag}`,
+    image: profileSeoData?.imageUrl,
+    type: 'profile',
+  })
+
   return (
     <>
-      <Head>
-        <title>Send | Profile</title>
-      </Head>
+      <NextSeo {...seo} />
       <ProfileScreen sendid={sendid} />
     </>
   )
@@ -41,6 +62,9 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
 
   assert(!!tag, 'tag is required')
   assert(typeof tag === 'string', 'Identifier tag must be a string')
+
+  // Get site URL securely using Vercel environment variables
+  const siteUrl = getSiteUrl()
 
   const supabase = createPagesServerClient<Database>(ctx)
   const {
@@ -75,17 +99,30 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
     }
   }
 
+  // Generate SEO data using helper functions for consistency
+  const profileData: ProfileSeoData = {
+    name: profile.name || undefined,
+    sendid: profile.sendid,
+    tag: profile.main_tag_name || tag,
+    about: profile.about || undefined,
+    avatarUrl: profile.avatar_url || undefined,
+  }
+
+  const profileSeoData = generateProfileSeoData(profileData, {
+    siteUrl,
+    route: `/${tag}`,
+  })
+
   return {
     props: {
       sendid: profile.sendid,
+      tag,
+      siteUrl,
+      profileSeoData,
     },
   }
 }) satisfies GetServerSideProps
 
-Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="History" backFunction="router" />} fullHeight>
-    {children}
-  </HomeLayout>
-)
+Page.getLayout = (children) => <ProfileLayout>{children}</ProfileLayout>
 
 export default Page

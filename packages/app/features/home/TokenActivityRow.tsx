@@ -78,8 +78,8 @@ export function TokenActivityRow({
     >
       <XStack gap="$3.5" width={'100%'} f={1} alignItems={'flex-start'}>
         <ActivityAvatar activity={activity} />
-        <YStack width={'100%'} f={1} overflow="hidden" gap={'$1'}>
-          <XStack fd="row" jc="space-between" gap="$1.5" f={1} width={'100%'}>
+        <YStack width={'100%'} f={1} height={'auto'} overflow="hidden" gap={'$1'}>
+          <XStack jc="space-between" gap="$1.5" width={'100%'}>
             <Text color="$color12" fontSize="$5" fontWeight={'500'}>
               {isUserTransfer ? subtext : eventName}
             </Text>
@@ -88,26 +88,17 @@ export function TokenActivityRow({
               {amount}
             </Text>
           </XStack>
-          <XStack
-            gap="$2"
-            alignItems="center"
-            justifyContent="space-between"
-            width="100%"
-            overflow="hidden"
-            f={1}
+          <Paragraph
+            color={'$color10'}
+            size={'$4'}
+            maxWidth={'100%'}
+            overflow={'hidden'}
+            textOverflow={'ellipsis'}
+            numberOfLines={2}
+            lineHeight={18}
           >
-            <Paragraph
-              color={'$color10'}
-              size={'$4'}
-              maxWidth={'100%'}
-              overflow={'hidden'}
-              textOverflow={'ellipsis'}
-              numberOfLines={2}
-              lineHeight={18}
-            >
-              {isUserTransfer ? eventName : subtext}
-            </Paragraph>
-          </XStack>
+            {isUserTransfer ? eventName : subtext}
+          </Paragraph>
           <Paragraph color={'$color10'} size={'$3'} flexShrink={0} display={'flex'} opacity={0.6}>
             {date}
           </Paragraph>

@@ -1,11 +1,11 @@
 import { jest } from '@jest/globals'
 
 const mockToast = {
-  useToastController: jest.fn(() => ({
+  useAppToast: jest.fn(() => ({
     show: jest.fn(),
   })),
 }
 
-export const useToastController = mockToast.useToastController
+export const useAppToast = mockToast.useAppToast
 
 export default mockToast

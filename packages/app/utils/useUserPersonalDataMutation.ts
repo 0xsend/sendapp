@@ -1,7 +1,7 @@
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useUser } from 'app/utils/useUser'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useToastController } from '@my/ui'
+import { useAppToast } from '@my/ui'
 import type { z } from 'zod'
 import type { AuthUserSchema } from 'app/utils/useAuthUserMutation'
 import { adjustDatePickerDateToTimezone } from 'app/utils/dateHelper'
@@ -10,7 +10,7 @@ export const useProfileMutation = () => {
   const supabase = useSupabase()
   const { user } = useUser()
   const queryClient = useQueryClient()
-  const toast = useToastController()
+  const toast = useAppToast()
 
   return useMutation({
     async mutationFn(data: z.infer<typeof AuthUserSchema>) {

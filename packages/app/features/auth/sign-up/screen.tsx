@@ -7,7 +7,7 @@ import {
   Paragraph,
   Separator,
   SubmitButton,
-  useToastController,
+  useAppToast,
   XStack,
   YStack,
 } from '@my/ui'
@@ -28,6 +28,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { z } from 'zod'
 import { useReferralCodeQuery } from 'app/utils/useReferralCode'
+import { Platform } from 'react-native'
 
 const SignUpScreenFormSchema = z.object({
   name: formFields.text,
@@ -50,7 +51,7 @@ export const SignUpScreen = () => {
   const router = useRouter()
   const [queryParams] = useAuthScreenParams()
   const { redirectUri } = queryParams
-  const toast = useToastController()
+  const toast = useAppToast()
   const supabase = useSupabase()
   const { user } = useUser()
   const termsCheckboxId = useId()
@@ -136,46 +137,15 @@ export const SignUpScreen = () => {
       router.push(redirectUri ?? '/')
     } catch (error) {
       setFormState(FormState.Idle)
-      toast.show(formatErrorMessage(error), {
-        preset: 'error',
-        isUrgent: true,
-        duration: 10000000,
-      })
+      toast.error(formatErrorMessage(error))
     }
-  }, [signInMutateAsync, toast.show, router.push, redirectUri])
+  }, [signInMutateAsync, toast.error, router.push, redirectUri])
 
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (
       <YStack>
-        <SubmitButton
-          elevation={'$0.75'}
-          alignSelf={'center'}
-          w={'100%'}
-          theme="green"
-          onPress={submit}
-          py={'$5'}
-          br={'$4'}
-          bw={'$1'}
-          disabled={!canSubmit || formState !== FormState.Idle}
-          $theme-light={{
-            disabledStyle: { opacity: 0.5 },
-          }}
-          $theme-dark={{
-            variant: canSubmit ? undefined : 'outlined',
-          }}
-        >
-          <Button.Text
-            ff={'$mono'}
-            fontWeight={'500'}
-            tt="uppercase"
-            size={'$5'}
-            color={canSubmit ? '$black' : '$primary'}
-            $theme-light={{
-              color: '$black',
-            }}
-          >
-            create account
-          </Button.Text>
+        <SubmitButton disabled={!canSubmit || formState !== FormState.Idle} onPress={submit}>
+          <SubmitButton.Text>create account</SubmitButton.Text>
         </SubmitButton>
         <YStack w={'100%'} gap={'$3.5'} mt={'$3.5'}>
           <XStack w={'100%'} gap={'$3.5'} ai={'center'}>
@@ -255,7 +225,12 @@ export const SignUpScreen = () => {
                   width: '100%',
                 },
                 iconBefore: (
-                  <Paragraph ml={-12} size={'$5'} opacity={formName ? 1 : 0}>
+                  <Paragraph
+                    ml={4}
+                    size={'$5'}
+                    opacity={formName ? 1 : 0}
+                    mb={Platform.OS === 'web' ? 0 : 2}
+                  >
                     /
                   </Paragraph>
                 ),
@@ -266,7 +241,7 @@ export const SignUpScreen = () => {
             }}
             formProps={{
               w: '100%',
-              footerProps: { pb: 0 },
+              footerProps: { padding: 0 },
               $gtSm: {
                 maxWidth: '100%',
               },
@@ -363,6 +338,7 @@ export const SignUpScreen = () => {
                 color: '$color12',
               }}
               ta={'center'}
+              numberOfLines={2}
             >
               Don&apos;t see your passkey? Try login with phone number
             </Button.Text>

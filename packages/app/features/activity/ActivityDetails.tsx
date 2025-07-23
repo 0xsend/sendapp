@@ -75,11 +75,12 @@ const ActivityDetailsContent = ({ activity, ...props }: { activity: Activity } &
           br={'$6'}
           p={'$4'}
           gap={'$3.5'}
+          elevation={'$0.75'}
           $gtLg={{
             p: '$7',
           }}
         >
-          <XStack ai={'center'} jc={'space-between'} elevation={'$0.75'}>
+          <XStack ai={'center'} jc={'space-between'}>
             <XStack f={1} gap={'$3'} ai={'center'}>
               <ActivityAvatar activity={activity} size={'$3.5'} br={'unset'} circular={true} />
               <XStack f={1} gap={'$2'}>
@@ -176,7 +177,7 @@ const ActivityDetailsContent = ({ activity, ...props }: { activity: Activity } &
               {decodeURIComponent(note)}
             </Paragraph>
           )}
-          <Separator px="$4" bw="$0.75" borderRadius={'$4'} />
+          <Separator px="$4" />
           <YStack gap={'$2'}>
             <XStack jc={'space-between'} ai={'center'}>
               <Paragraph

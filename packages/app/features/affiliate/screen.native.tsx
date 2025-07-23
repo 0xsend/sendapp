@@ -1,18 +1,24 @@
-import { Avatar, Card, Link, Paragraph, Spinner, XStack, YStack } from '@my/ui'
+import {
+  Avatar,
+  Card,
+  dataProviderMakerNative,
+  layoutProviderMakerNative,
+  Paragraph,
+  Spinner,
+  XStack,
+  YStack,
+} from '@my/ui'
 import { useCallback, useMemo } from 'react'
 import type { Functions } from '@my/supabase/database.types'
 import { toNiceError } from 'app/utils/toNiceError'
 import { IconBirthday, IconXLogo } from 'app/components/icons'
-import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { adjustUTCDateForTimezone } from 'app/utils/dateHelper'
 import { useFriendsFeed } from 'app/features/affiliate/utils/useFriendsFeed'
 import { ReferralLink } from 'app/components/ReferralLink'
-import { FlatList, Linking, Pressable } from 'react-native'
+import { RecyclerListView } from 'recyclerlistview'
+import { Link, useLink } from 'solito/link'
 
-type Referral = Pick<
-  Functions<'profile_lookup'>[number],
-  'avatar_url' | 'x_username' | 'birthday' | 'tag'
->
+type Referral = Functions<'get_friends'>[number]
 
 export default function FriendsScreen() {
   const friendsFeedQuery = useFriendsFeed({
@@ -21,32 +27,28 @@ export default function FriendsScreen() {
   const { data, isLoading, error, isFetchingNextPage, fetchNextPage, hasNextPage } =
     friendsFeedQuery
 
-  const referrals = useMemo(() => {
-    const refs: Referral[] = []
+  const referrals = useMemo(() => data?.pages.flat() || [], [data])
 
-    if (data?.pages) {
-      refs.push(...(data.pages.flat() as Referral[]))
-    }
+  const dataProvider = useMemo(() => {
+    return dataProviderMakerNative(referrals)
+  }, [referrals])
 
-    return refs
-  }, [data])
-
-  const renderItem = useCallback(
-    ({ item }: { item: Referral }) => <FriendMobileRow referral={item} />,
+  const layoutProvider = useMemo(
+    () =>
+      layoutProviderMakerNative({
+        getHeightOrWidth: () => 90,
+      }),
     []
   )
 
-  const renderFooter = useCallback(() => {
-    if (!isLoading && isFetchingNextPage) {
-      return <Spinner size="small" color={'$color12'} mb="$3.5" />
-    }
-  }, [isLoading, isFetchingNextPage])
+  const rowRenderer = useCallback(
+    (type: string | number, item: Referral) => <FriendMobileRow referral={item} />,
+    []
+  )
 
-  const keyExtractor = useCallback((item: Referral) => item.tag || '', [])
-
-  const onEndReached = useCallback(() => {
+  const handleEndReach = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) {
-      fetchNextPage()
+      void fetchNextPage()
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
@@ -70,24 +72,31 @@ export default function FriendsScreen() {
   }
 
   return (
-    <YStack flex={1}>
-      <FlatList
-        data={referrals}
-        renderItem={renderItem}
-        keyExtractor={keyExtractor}
-        ListFooterComponent={renderFooter}
-        onEndReached={onEndReached}
-        onEndReachedThreshold={0.1}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ gap: 16 }}
+    <YStack f={1}>
+      <RecyclerListView
+        style={{ flex: 1, overflow: 'visible' }}
+        dataProvider={dataProvider}
+        rowRenderer={rowRenderer}
+        layoutProvider={layoutProvider}
+        scrollViewProps={{
+          showsVerticalScrollIndicator: false,
+        }}
+        onEndReached={handleEndReach}
+        onEndReachedThreshold={0.5}
       />
+      <XStack py={'$3.5'} jc={'center'}>
+        <Spinner
+          opacity={!isLoading && isFetchingNextPage ? 1 : 0}
+          size="small"
+          color={'$color12'}
+        />
+      </XStack>
     </YStack>
   )
 }
 
 const FriendMobileRow = ({ referral }: { referral: Referral }) => {
-  const hoverStyles = useHoverStyles()
-
+  const linkProps = useLink({ href: `/profile/${referral.send_id}` })
   const birthday = referral.birthday
     ? adjustUTCDateForTimezone(new Date(referral.birthday)).toLocaleString(undefined, {
         day: 'numeric',
@@ -96,39 +105,30 @@ const FriendMobileRow = ({ referral }: { referral: Referral }) => {
     : 'NA'
 
   return (
-    <Card w={'100%'} gap={'$3.5'} br={'$5'} p={'$3.5'} cursor={'pointer'} hoverStyle={hoverStyles}>
-      <XStack f={1} w={'100%'} ai={'center'}>
-        <Link
-          href={`/${referral.tag}`}
-          containerProps={{
-            f: 1,
-          }}
-        >
-          <XStack f={1} w={'100%'} gap={'$3.5'}>
-            <Avatar size="$4.5" br="$4" gap="$2">
-              <Avatar.Image src={referral.avatar_url ?? ''} />
-              <Avatar.Fallback jc="center" bc="$olive">
-                <Avatar size="$4.5" br="$4">
-                  <Avatar.Image
-                    src={`https://ui-avatars.com/api/?name=${referral.tag}&size=256&format=png&background=86ad7f`}
-                  />
-                </Avatar>
-              </Avatar.Fallback>
-            </Avatar>
-            <YStack gap={'$2'} f={1}>
-              <Paragraph lineHeight={20}>/{referral.tag}</Paragraph>
-              <XStack gap={'$2'} alignItems={'center'}>
-                <IconBirthday size={'$1'} />
-                <Paragraph lineHeight={20}>{birthday}</Paragraph>
-              </XStack>
-            </YStack>
-          </XStack>
+    <Card w={'100%'} gap={'$3.5'} br={'$5'} p={'$3.5'} {...linkProps}>
+      <XStack w={'100%'} ai={'center'}>
+        <XStack f={1} w={'100%'} gap={'$3.5'}>
+          <Avatar size="$4.5" br="$4" gap="$2">
+            <Avatar.Image src={referral.avatar_url ?? ''} />
+            <Avatar.Fallback jc="center" bc="$olive">
+              <Avatar size="$4.5" br="$4">
+                <Avatar.Image
+                  src={`https://ui-avatars.com/api/?name=${referral.tag}&size=256&format=png&background=86ad7f`}
+                />
+              </Avatar>
+            </Avatar.Fallback>
+          </Avatar>
+          <YStack gap={'$2'} f={1}>
+            <Paragraph lineHeight={20}>/{referral.tag}</Paragraph>
+            <XStack gap={'$2'} alignItems={'center'}>
+              <IconBirthday size={'$1'} />
+              <Paragraph lineHeight={20}>{birthday}</Paragraph>
+            </XStack>
+          </YStack>
+        </XStack>
+        <Link href={`/${referral.tag}`}>
+          <IconXLogo size={'$1'} color={'$primary'} $theme-light={{ color: '$color12' }} />
         </Link>
-        {referral.x_username && (
-          <Pressable onPress={() => Linking.openURL(`https://x.com/${referral.x_username}`)}>
-            <IconXLogo size={'$1'} color={'$primary'} $theme-light={{ color: '$color12' }} />
-          </Pressable>
-        )}
       </XStack>
     </Card>
   )

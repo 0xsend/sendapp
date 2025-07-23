@@ -5142,6 +5142,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@intercom/intercom-react-native@npm:^8.6.0":
+  version: 8.6.0
+  resolution: "@intercom/intercom-react-native@npm:8.6.0"
+  dependencies:
+    node-fetch: "npm:^2.6.1"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 10/b8f4ffc1e47e4f2e4006c82c7aef08bcbb0782da02f026eebc9e60d5fe5cf7a51bd86c50333ca4521a6fa208597ad56d1b801f5576c77a92d79c5176b2f614ad
+  languageName: node
+  linkType: hard
+
+"@intercom/messenger-js-sdk@npm:^0.0.14":
+  version: 0.0.14
+  resolution: "@intercom/messenger-js-sdk@npm:0.0.14"
+  checksum: 10/49a95cdb701553df45e8c526596ab7ae9b44f462ef3317e9397b44e9358c5e9cbd556f49722984a714f7052645998876aa8721d43c5f77479e3b9ba94699c7ed
+  languageName: node
+  linkType: hard
+
 "@ioredis/commands@npm:^1.1.1":
   version: 1.2.0
   resolution: "@ioredis/commands@npm:1.2.0"
@@ -7557,6 +7576,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@resvg/resvg-wasm@npm:2.4.0":
+  version: 2.4.0
+  resolution: "@resvg/resvg-wasm@npm:2.4.0"
+  checksum: 10/82f0f734787f676259c78546f5c37a708b74061ee84e349746d4d89ce204423782a59125d48bc2a9cedcfbb8b1653d25113691c24adb06479288febd86afd8f5
+  languageName: node
+  linkType: hard
+
 "@rollup/plugin-commonjs@npm:^25.0.7":
   version: 25.0.7
   resolution: "@rollup/plugin-commonjs@npm:25.0.7"
@@ -8192,6 +8218,18 @@ __metadata:
     "@sentry/types": "npm:7.48.0"
     tslib: "npm:^1.9.3"
   checksum: 10/cf703418539a68117ef552011a1acd3947d76fb598c31e337a2f969a2af668adfdeacc13f25300c77ff3715f80b9c8bc41e49e1fb13db5437a2372071e2a613c
+  languageName: node
+  linkType: hard
+
+"@shuding/opentype.js@npm:1.4.0-beta.0":
+  version: 1.4.0-beta.0
+  resolution: "@shuding/opentype.js@npm:1.4.0-beta.0"
+  dependencies:
+    fflate: "npm:^0.7.3"
+    string.prototype.codepointat: "npm:^0.2.1"
+  bin:
+    ot: bin/ot
+  checksum: 10/0a39d17ef88ff44db4e83590ec4ba3f98b9a9a4e3a8b3a99c55227b008647a1fa8788ea5920ac02b8dcf8b75ff33096996c539b874233f039d7d41fc58119785
   languageName: node
   linkType: hard
 
@@ -11183,6 +11221,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/next-seo@npm:^2.1.2":
+  version: 2.1.2
+  resolution: "@types/next-seo@npm:2.1.2"
+  dependencies:
+    next-seo: "npm:*"
+  checksum: 10/85f444f9b2aa1c44ea7c6d2435b33ec4eb6025e0f494bf651f5352355f6d35a737964a5cd78c4ccc94a7131382b3e4e0f2377ca988ac7a6bb6fbfadb5455742f
+  languageName: node
+  linkType: hard
+
 "@types/node-fetch@npm:^2.6.4":
   version: 2.6.11
   resolution: "@types/node-fetch@npm:2.6.11"
@@ -12178,6 +12225,17 @@ __metadata:
     typescript: "npm:4.9.5"
     undici: "npm:5.26.5"
   checksum: 10/a095c7c1fe177f30bd5013f7b3c554f719df4d326d35ca5c2811d68c81a7f89ab5f893147b6f41c4efc1bbde70de8a40e12abd74a6e2e26baa3ec7c9b7acb5aa
+  languageName: node
+  linkType: hard
+
+"@vercel/og@npm:^0.6.8":
+  version: 0.6.8
+  resolution: "@vercel/og@npm:0.6.8"
+  dependencies:
+    "@resvg/resvg-wasm": "npm:2.4.0"
+    satori: "npm:0.12.2"
+    yoga-wasm-web: "npm:0.3.3"
+  checksum: 10/43b1e7c43dcd86c6c78376c190e71138f83e5619bb89adbbf253832b2e1dfbfbc5fe60eab3a0bb5b292cea6ce4b56a2e74fbbbd74a67ac4e035b82819e46b743
   languageName: node
   linkType: hard
 
@@ -13566,6 +13624,8 @@ __metadata:
     "@0xsend/send-earn-contracts": "npm:^0.1.0"
     "@babel/plugin-syntax-import-attributes": "npm:^7.24.7"
     "@coinbase/onchainkit": "npm:^0.38.1"
+    "@intercom/intercom-react-native": "npm:^8.6.0"
+    "@intercom/messenger-js-sdk": "npm:^0.0.14"
     "@jest/globals": "npm:^29"
     "@marsidev/react-turnstile": "npm:^0.7.1"
     "@my/supabase": "workspace:*"
@@ -14407,6 +14467,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"base64-js@npm:0.0.8":
+  version: 0.0.8
+  resolution: "base64-js@npm:0.0.8"
+  checksum: 10/ab7f7b09a5cd0ca51f5d37196ebf4be293732e26a27c4b3f970b7e0efca7215efb8ae6128c833581e7b3808fe006262a49fe3be538d84d6af617ac2dc1f0537e
+  languageName: node
+  linkType: hard
+
 "base64-js@npm:^1.0.2, base64-js@npm:^1.2.3, base64-js@npm:^1.3.0, base64-js@npm:^1.3.1, base64-js@npm:^1.5.1":
   version: 1.5.1
   resolution: "base64-js@npm:1.5.1"
@@ -15215,6 +15282,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"camelize@npm:^1.0.0":
+  version: 1.0.1
+  resolution: "camelize@npm:1.0.1"
+  checksum: 10/0e147b4299ac6363c50050716aadfae42831257ec56ce54773ffd2a94a88abb2e2540c5ccc38345e8a39963105b76d86cb24477165a36b78c9958fb304513db3
+  languageName: node
+  linkType: hard
+
 "caniuse-lite@npm:^1.0.30001565":
   version: 1.0.30001576
   resolution: "caniuse-lite@npm:1.0.30001576"
@@ -15892,7 +15966,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"color-name@npm:^1.0.0, color-name@npm:~1.1.4":
+"color-name@npm:^1.0.0, color-name@npm:^1.1.4, color-name@npm:~1.1.4":
   version: 1.1.4
   resolution: "color-name@npm:1.1.4"
   checksum: 10/b0445859521eb4021cd0fb0cc1a75cecf67fceecae89b63f62b201cca8d345baf8b952c966862a9d9a2632987d4f6581f0ec8d957dfacece86f0a7919316f610
@@ -16440,6 +16514,34 @@ __metadata:
   languageName: node
   linkType: hard
 
+"css-background-parser@npm:^0.1.0":
+  version: 0.1.0
+  resolution: "css-background-parser@npm:0.1.0"
+  checksum: 10/6b606e45dc15afb682a9b9fee8c99cab8b0444f030de680c9c51067f29eeb53bab4b9365627025c1e02d85be329082adbd690ab78677648138d4b75b91505a5c
+  languageName: node
+  linkType: hard
+
+"css-box-shadow@npm:1.0.0-3":
+  version: 1.0.0-3
+  resolution: "css-box-shadow@npm:1.0.0-3"
+  checksum: 10/a52a3bcc9167146e696c4ace5667eded91deb419a95b97e44028f93cd5691d8c1ef834aef9b653f81774c9164ac990b6df958db4835dacb5a8a589c96177240e
+  languageName: node
+  linkType: hard
+
+"css-color-keywords@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "css-color-keywords@npm:1.0.0"
+  checksum: 10/8f125e3ad477bd03c77b533044bd9e8a6f7c0da52d49bbc0bbe38327b3829d6ba04d368ca49dd9ff3b667d2fc8f1698d891c198bbf8feade1a5501bf5a296408
+  languageName: node
+  linkType: hard
+
+"css-gradient-parser@npm:^0.0.16":
+  version: 0.0.16
+  resolution: "css-gradient-parser@npm:0.0.16"
+  checksum: 10/280195e77ec1c7c3eebb98d7fa26ec80b2072167133c0f6b9b28478b5c311bac4f77d4ae9b0abb36e17676953b9ceff0bab24327eb21964bafa9514e1ee94796
+  languageName: node
+  linkType: hard
+
 "css-in-js-utils@npm:^3.1.0":
   version: 3.1.0
   resolution: "css-in-js-utils@npm:3.1.0"
@@ -16490,6 +16592,17 @@ __metadata:
     domutils: "npm:^3.0.1"
     nth-check: "npm:^2.0.1"
   checksum: 10/d486b1e7eb140468218a5ab5af53257e01f937d2173ac46981f6b7de9c5283d55427a36715dc8decfc0c079cf89259ac5b41ef58f6e1a422eee44ab8bfdc78da
+  languageName: node
+  linkType: hard
+
+"css-to-react-native@npm:^3.0.0":
+  version: 3.2.0
+  resolution: "css-to-react-native@npm:3.2.0"
+  dependencies:
+    camelize: "npm:^1.0.0"
+    css-color-keywords: "npm:^1.0.0"
+    postcss-value-parser: "npm:^4.0.2"
+  checksum: 10/62ef744254e333abc696efdc945ecf13ad6ba7b726d0a39c0405b2fcb86542aa2f3fe7b7b6770f67ae9679d98b159b4d66353107bf7d6144a445eafcf5fa250a
   languageName: node
   linkType: hard
 
@@ -17598,7 +17711,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"emoji-regex@npm:^10.3.0":
+"emoji-regex@npm:^10.2.1, emoji-regex@npm:^10.3.0":
   version: 10.4.0
   resolution: "emoji-regex@npm:10.4.0"
   checksum: 10/76bb92c5bcf0b6980d37e535156231e4a9d0aa6ab3b9f5eabf7690231d5aa5d5b8e516f36e6804cbdd0f1c23dfef2a60c40ab7bb8aedd890584281a565b97c50
@@ -19431,6 +19544,7 @@ __metadata:
     "@expo-google-fonts/dm-mono": "npm:^0.4.1"
     "@expo-google-fonts/dm-sans": "npm:^0.4.1"
     "@expo/metro-config": "npm:~0.19.0"
+    "@intercom/intercom-react-native": "npm:^8.6.0"
     "@my/ui": "workspace:*"
     "@react-native-async-storage/async-storage": "npm:^2.0.0"
     "@react-native-community/netinfo": "npm:11.4.1"
@@ -20294,6 +20408,13 @@ __metadata:
   version: 4.1.1
   resolution: "fetch-retry@npm:4.1.1"
   checksum: 10/c97006c2b604a817cbd4e35085965d07a8f1c51b475bf037f305b98d5748ee742ec98aba119b4df6bf727e61f2f0ee05c5fa714701c4234b91c4b43e0f119bd9
+  languageName: node
+  linkType: hard
+
+"fflate@npm:^0.7.3":
+  version: 0.7.4
+  resolution: "fflate@npm:0.7.4"
+  checksum: 10/27f61b3536c3a23b0ccdab4b616103be0e8e7241924cda063486822c50ae11930eb1ce6e34dedbfccb2705d04a66380d04e28c67387e1dd48159d41ea14bfda5
   languageName: node
   linkType: hard
 
@@ -21844,6 +21965,13 @@ __metadata:
   dependencies:
     hermes-estree: "npm:0.25.1"
   checksum: 10/805efc05691420f236654349872c70731121791fa54de521c7ee51059eae34f84dd19f22ee846741dcb60372f8fb5335719b96b4ecb010d2aed7d872f2eff9cc
+  languageName: node
+  linkType: hard
+
+"hex-rgb@npm:^4.1.0":
+  version: 4.3.0
+  resolution: "hex-rgb@npm:4.3.0"
+  checksum: 10/c0d59346b6e7c4523ef606154979b173d0e58be266e3a218d10d3298c1aa21bba124110604c8e4f9e9f76dac0196ced2bed04390879ba504d5ae412492f590cf
   languageName: node
   linkType: hard
 
@@ -24594,6 +24722,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"linebreak@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "linebreak@npm:1.1.0"
+  dependencies:
+    base64-js: "npm:0.0.8"
+    unicode-trie: "npm:^2.0.0"
+  checksum: 10/f294fc9b34103b317eb58ee2e047b3041d82a915943b9b6a39bcc8f6f06982a904dad9a9783f61a84da64d06f2dca582b544e66fea7c1b304b58a653a7767bb9
+  languageName: node
+  linkType: hard
+
 "lines-and-columns@npm:^1.1.6":
   version: 1.2.4
   resolution: "lines-and-columns@npm:1.2.4"
@@ -26199,7 +26337,9 @@ __metadata:
     "@trpc/next": "npm:^11.2.0"
     "@trpc/react-query": "npm:^11.2.0"
     "@trpc/server": "npm:^11.2.0"
+    "@types/next-seo": "npm:^2.1.2"
     "@types/node": "npm:^20"
+    "@vercel/og": "npm:^0.6.8"
     app: "workspace:*"
     dotenv-cli: "npm:^7.3.0"
     eslint-config-next: "npm:^14.0.4"
@@ -26207,6 +26347,7 @@ __metadata:
     jest: "npm:^29"
     jest-environment-jsdom: "npm:^29.7.0"
     next: "npm:15.3.1"
+    next-seo: "npm:^6.8.0"
     plaiceholder: "npm:^3.0.0"
     raf: "npm:^3.4.1"
     react: "npm:^18.3.1"
@@ -26219,6 +26360,17 @@ __metadata:
     zod: "npm:^3.23.8"
   languageName: unknown
   linkType: soft
+
+"next-seo@npm:*, next-seo@npm:^6.8.0":
+  version: 6.8.0
+  resolution: "next-seo@npm:6.8.0"
+  peerDependencies:
+    next: ^8.1.1-canary.54 || >=9.0.0
+    react: ">=16.0.0"
+    react-dom: ">=16.0.0"
+  checksum: 10/0b7f08b682719c0f27408ab1f5c5267e7a475a43e7b0711b7d6c3db440996d1b83226ce88d69c1049a00d27fd55585b9f1134b094ec617e08b7e56cb27221846
+  languageName: node
+  linkType: hard
 
 "next@npm:15.3.1":
   version: 15.3.1
@@ -27502,6 +27654,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"parse-css-color@npm:^0.2.1":
+  version: 0.2.1
+  resolution: "parse-css-color@npm:0.2.1"
+  dependencies:
+    color-name: "npm:^1.1.4"
+    hex-rgb: "npm:^4.1.0"
+  checksum: 10/319ff24afa6050b2fb1d87f52cf3a98760f20224c2ec38299f1619d9e5ae98375eda91c2ea2b15a9ff6c4693683679edd68208e186dec0a255391af291e1d5ee
+  languageName: node
+  linkType: hard
+
 "parse-github-url@npm:^1.0.2":
   version: 1.0.2
   resolution: "parse-github-url@npm:1.0.2"
@@ -28327,7 +28489,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-value-parser@npm:^4.1.0, postcss-value-parser@npm:^4.2.0":
+"postcss-value-parser@npm:^4.0.2, postcss-value-parser@npm:^4.1.0, postcss-value-parser@npm:^4.2.0":
   version: 4.2.0
   resolution: "postcss-value-parser@npm:4.2.0"
   checksum: 10/e4e4486f33b3163a606a6ed94f9c196ab49a37a7a7163abfcd469e5f113210120d70b8dd5e33d64636f41ad52316a3725655421eb9a1094f1bcab1db2f555c62
@@ -30728,6 +30890,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"satori@npm:0.12.2":
+  version: 0.12.2
+  resolution: "satori@npm:0.12.2"
+  dependencies:
+    "@shuding/opentype.js": "npm:1.4.0-beta.0"
+    css-background-parser: "npm:^0.1.0"
+    css-box-shadow: "npm:1.0.0-3"
+    css-gradient-parser: "npm:^0.0.16"
+    css-to-react-native: "npm:^3.0.0"
+    emoji-regex: "npm:^10.2.1"
+    escape-html: "npm:^1.0.3"
+    linebreak: "npm:^1.1.0"
+    parse-css-color: "npm:^0.2.1"
+    postcss-value-parser: "npm:^4.2.0"
+    yoga-wasm-web: "npm:^0.3.3"
+  checksum: 10/e927b0fcbe5c48d79e277f5c32c8f1ad880436b6a497205165070ff2513b12f3a93a370171e7e5c01ad4a5bd89c503abe5436304a11f3b94dde814b637d8bb1b
+  languageName: node
+  linkType: hard
+
 "sax@npm:>=0.6.0":
   version: 1.2.4
   resolution: "sax@npm:1.2.4"
@@ -32127,6 +32308,13 @@ __metadata:
     get-east-asian-width: "npm:^1.0.0"
     strip-ansi: "npm:^7.1.0"
   checksum: 10/42f9e82f61314904a81393f6ef75b832c39f39761797250de68c041d8ba4df2ef80db49ab6cd3a292923a6f0f409b8c9980d120f7d32c820b4a8a84a2598a295
+  languageName: node
+  linkType: hard
+
+"string.prototype.codepointat@npm:^0.2.1":
+  version: 0.2.1
+  resolution: "string.prototype.codepointat@npm:0.2.1"
+  checksum: 10/bafa15844d7ea5bed24a01fa8954327c0c49226cefe68ab70573f1338f6a4680587db962724924f2cceb91abe408e11bd38c80095f25ee080f136a6c9d300f00
   languageName: node
   linkType: hard
 
@@ -35814,6 +36002,13 @@ __metadata:
   version: 2.1.2
   resolution: "yoctocolors-cjs@npm:2.1.2"
   checksum: 10/d731e3ba776a0ee19021d909787942933a6c2eafb2bbe85541f0c59aa5c7d475ce86fcb860d5803105e32244c3dd5ba875b87c4c6bf2d6f297da416aa54e556f
+  languageName: node
+  linkType: hard
+
+"yoga-wasm-web@npm:0.3.3, yoga-wasm-web@npm:^0.3.3":
+  version: 0.3.3
+  resolution: "yoga-wasm-web@npm:0.3.3"
+  checksum: 10/7a60a7dbb6dc0383395f2b40c9fac6e4f7b322f934ebb07cefc92997baca597f3ef01f67fe37e5e61c128de917760aa7639980ed2f8d94c2dfbef83bd5f61e36
   languageName: node
   linkType: hard
 

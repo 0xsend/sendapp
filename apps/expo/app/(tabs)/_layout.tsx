@@ -7,7 +7,7 @@ import {
   IconWorldSearch,
 } from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
-import { Redirect, router, Stack, Tabs } from 'expo-router'
+import { Redirect, router, Stack, Tabs, useSegments } from 'expo-router'
 import AvatarMenuButton from 'app/components/AvatarMenuButton/AvatarMenuButton'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 import { Animated } from 'react-native'
@@ -47,17 +47,6 @@ const TABS = [
     },
   },
   {
-    Icon: IconWorldSearch,
-    key: 'explore/index',
-    title: 'Explore',
-    listeners: {
-      tabPress: (e) => {
-        e.preventDefault()
-        router.push('/(tabs)/explore')
-      },
-    },
-  },
-  {
     Icon: IconDeviceReset,
     key: 'activity/index',
     title: 'Activity',
@@ -65,6 +54,17 @@ const TABS = [
       tabPress: (e) => {
         e.preventDefault()
         router.push('/(tabs)/activity')
+      },
+    },
+  },
+  {
+    Icon: IconWorldSearch,
+    key: 'explore/index',
+    title: 'Explore',
+    listeners: {
+      tabPress: (e) => {
+        e.preventDefault()
+        router.push('/(tabs)/explore')
       },
     },
   },
@@ -77,14 +77,26 @@ export default function Layout() {
   const { height, padding } = useTabBarSize()
   const translateY = useRef(new Animated.Value(0)).current
   const highlightColor = useHighlightColor()
+  const segments = useSegments()
+  const firstSegment = segments[0]
+  const prevDirectionRef = useRef(direction)
 
   useEffect(() => {
-    Animated.timing(translateY, {
-      toValue: direction === 'down' ? height : 0,
-      duration: 250,
-      useNativeDriver: true,
-    }).start()
-  }, [direction, height, translateY])
+    const prevDirection = prevDirectionRef.current
+    const changedToDown = prevDirection === 'up' && direction === 'down'
+    const changedToUp = prevDirection === 'down' && direction === 'up'
+    const shouldAnimate = firstSegment === '(tabs)' && (changedToDown || changedToUp)
+
+    if (shouldAnimate) {
+      Animated.timing(translateY, {
+        toValue: changedToDown ? height : 0,
+        duration: 250,
+        useNativeDriver: true,
+      }).start()
+    }
+
+    prevDirectionRef.current = direction
+  }, [direction, height, translateY, firstSegment])
 
   // Redirect to root if not logged in - this ensures the tabs layout is only shown for logged-in users
   if (!session) {

@@ -1,21 +1,15 @@
 import { TopNav } from 'app/components/TopNav'
 import { HomeLayout } from 'app/features/home/layout.web'
-import Head from 'next/head'
+import { NextSeo } from 'next-seo'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from '../_app'
 import { AccountScreenLayout } from 'app/features/account/AccountScreenLayout'
+import { PAGE_TITLES, PAGE_DESCRIPTIONS } from 'utils/seoHelpers'
 
 export const Page: NextPageWithLayout = () => {
   return (
     <>
-      <Head>
-        <title>Send | Account</title>
-        <meta
-          name="description"
-          content="Sendtags simplify transactions by replacing long wallet addresses with memorable identifiers."
-          key="desc"
-        />
-      </Head>
+      <NextSeo title={PAGE_TITLES.account} description={PAGE_DESCRIPTIONS.account} />
     </>
   )
 }

@@ -34,9 +34,10 @@ export function profileLookupQueryOptions({
   identifier: string | undefined
 }) {
   return queryOptions({
-    queryKey: ['profile', { lookup_type, identifier, supabase }] as const,
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: ['profile', { lookup_type, identifier }] as const,
     queryFn: async ({
-      queryKey: [, { supabase, lookup_type, identifier }],
+      queryKey: [, { lookup_type, identifier }],
     }): Promise<Functions<'profile_lookup'>[number] | null> => {
       assert(!!lookup_type, 'lookup_type is required')
       assert(!!identifier, 'identifier is required')

@@ -34,8 +34,8 @@ export function useTokenActivityFeed(params: {
   const supabase = useSupabase()
   const enabled = useMemo(() => enabledProp, [enabledProp])
   const queryKey = useMemo(
-    () => ['token_activity_feed', { supabase, pageSize, address }] as const,
-    [supabase, pageSize, address]
+    () => ['token_activity_feed', { pageSize, address }] as const,
+    [pageSize, address]
   )
   return useInfiniteQuery<
     Activity[],
@@ -45,6 +45,7 @@ export function useTokenActivityFeed(params: {
     number
   >({
     enabled,
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey,
     initialPageParam: 0,
     getNextPageParam: (lastPage, _allPages, lastPageParam) => {
@@ -57,7 +58,7 @@ export function useTokenActivityFeed(params: {
       }
       return firstPageParam - 1
     },
-    queryFn: async ({ queryKey: [, { supabase, pageSize, address }], pageParam }) => {
+    queryFn: async ({ queryKey: [, { pageSize, address }], pageParam }) => {
       return await fetchTokenActivityFeed({
         address,
         pageParam,

@@ -70,6 +70,11 @@ declare global {
        * Kyberswap clientId, a stricter rate limit will be applied if a clientId is not provided
        */
       NEXT_PUBLIC_KYBER_CLIENT_ID: string
+
+      /**
+       * Intercom app id
+       */
+      NEXT_PUBLIC_INTERCOM_APP_ID: string
     }
   }
   /**

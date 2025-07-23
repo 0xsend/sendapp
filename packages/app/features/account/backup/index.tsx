@@ -7,10 +7,11 @@ import {
   Spinner,
   SubmitButton,
   Text,
-  useToastController,
+  useAppToast,
   XStack,
   YStack,
   FadeCard,
+  PrimaryButton,
 } from '@my/ui'
 import {
   baseMainnetClient,
@@ -175,11 +176,9 @@ const WebauthnCreds = ({
           <WebAuthnCred key={`${sendAcct.id}-${cred.id}`} sendAcct={sendAcct} cred={cred} />
         ))}
       </YStack>
-      <Button elevation={'$0.75'} theme="green" borderRadius={'$4'} p={'$4'} {...addPasskeyLink}>
-        <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
-          Add a Passkey
-        </Button.Text>
-      </Button>
+      <PrimaryButton {...addPasskeyLink}>
+        <PrimaryButton.Text>Add a Passkey</PrimaryButton.Text>
+      </PrimaryButton>
     </YStack>
   )
 }
@@ -237,7 +236,7 @@ const WebAuthnCred = ({
             {cardStatus === 'default' ? (
               <IconDots color={'$primary'} $theme-light={{ color: '$color12' }} />
             ) : (
-              <IconX />
+              <IconX size={'$2'} />
             )}
           </Button>
         )}
@@ -525,6 +524,7 @@ const RemovePasskeyConfirmation = ({
           theme={'red'}
           variant="outlined"
           flex={1}
+          w={'auto'}
           hoverStyle={{ borderColor: '$error' }}
           disabledStyle={{ opacity: 0.5 }}
           onPress={submit}
@@ -597,7 +597,7 @@ const RemovePasskeyConfirmation = ({
             borderRadius: '$4',
             color: '$color11',
             bc: '$color0',
-            autoFocus: true,
+            autoFocus: Platform.OS === 'web',
           },
         }}
         schema={RemovePasskeySchema}
@@ -662,7 +662,7 @@ const UpdateKeySlotButton = ({
   const supabase = useSupabase()
   const queryClient = useQueryClient()
   const sendAcctCred = cred.send_account_credentials?.[0] // should be impossible but just in case
-  const toast = useToastController()
+  const toast = useAppToast()
   const {
     mutate: updateKeySlot,
     isPending,

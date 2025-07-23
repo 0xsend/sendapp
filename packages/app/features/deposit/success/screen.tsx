@@ -1,8 +1,11 @@
 import { CheckCircle } from '@tamagui/lucide-icons'
-import { Button, FadeCard, LinkableButton, Paragraph, YStack } from '@my/ui'
+import { FadeCard, Paragraph, PrimaryButton, YStack } from '@my/ui'
 import { Platform } from 'react-native'
+import { useLink } from 'solito/link'
 
 export function DepositSuccessScreen() {
+  const linkProps = useLink({ href: Platform.OS === 'web' ? '/deposit' : '/(tabs)/' })
+
   return (
     <YStack
       w={'100%'}
@@ -28,18 +31,11 @@ export function DepositSuccessScreen() {
             You’re all set — your funds will appear in your wallet soon
           </Paragraph>
         </YStack>
-        <LinkableButton
-          href={Platform.OS === 'web' ? '/deposit' : '/(tabs)/'}
-          theme="green"
-          py={'$5'}
-          br={'$4'}
-          mt={'$4'}
-          w={'100%'}
-        >
-          <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
+        <PrimaryButton {...linkProps}>
+          <PrimaryButton.Text>
             {Platform.OS === 'web' ? 'deposit again' : 'continue'}
-          </Button.Text>
-        </LinkableButton>
+          </PrimaryButton.Text>
+        </PrimaryButton>
       </FadeCard>
     </YStack>
   )

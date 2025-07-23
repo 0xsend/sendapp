@@ -342,6 +342,36 @@ export type Database = {
         }
         Relationships: []
       }
+      link_in_bio: {
+        Row: {
+          created_at: string
+          domain: string | null
+          domain_name: Database["public"]["Enums"]["link_in_bio_domain_names"]
+          handle: string | null
+          id: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          domain?: string | null
+          domain_name: Database["public"]["Enums"]["link_in_bio_domain_names"]
+          handle?: string | null
+          id?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          domain?: string | null
+          domain_name?: Database["public"]["Enums"]["link_in_bio_domain_names"]
+          handle?: string | null
+          id?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       liquidity_pools: {
         Row: {
           chain_id: number
@@ -377,6 +407,10 @@ export type Database = {
           referral_code: string | null
           send_id: number
           x_username: string | null
+          links_in_bio:
+            | Database["public"]["Tables"]["link_in_bio"]["Row"]
+            | null
+          main_tag: Database["public"]["Tables"]["tags"]["Row"] | null
           tags: Database["public"]["Tables"]["tags"]["Row"] | null
         }
         Insert: {
@@ -1636,6 +1670,9 @@ export type Database = {
           chain_id: number | null
           id: string | null
           is_public: boolean | null
+          links_in_bio:
+            | Database["public"]["Tables"]["link_in_bio"]["Row"][]
+            | null
           main_tag_id: number | null
           main_tag_name: string | null
           name: string | null
@@ -1806,7 +1843,9 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: {
           avatar_url: string
+          send_id: number
           x_username: string
+          links_in_bio: Database["public"]["Tables"]["link_in_bio"]["Row"][]
           birthday: string
           tag: string
           created_at: string
@@ -1898,28 +1937,35 @@ export type Database = {
           user: Database["public"]["CompositeTypes"]["activity_feed_user"]
         }[]
       }
+      links_in_bio: {
+        Args: { "": Database["public"]["Tables"]["profiles"]["Row"] }
+        Returns: {
+          created_at: string
+          domain: string | null
+          domain_name: Database["public"]["Enums"]["link_in_bio_domain_names"]
+          handle: string | null
+          id: number
+          updated_at: string
+          user_id: string
+        }[]
+      }
+      main_tag: {
+        Args: { "": Database["public"]["Tables"]["profiles"]["Row"] }
+        Returns: {
+          created_at: string
+          id: number
+          name: string
+          status: Database["public"]["Enums"]["tag_status"]
+          updated_at: string
+          user_id: string | null
+        }
+      }
       profile_lookup: {
         Args: {
           lookup_type: Database["public"]["Enums"]["lookup_type_enum"]
           identifier: string
         }
-        Returns: {
-          id: string
-          avatar_url: string
-          name: string
-          about: string
-          refcode: string
-          x_username: string
-          birthday: string
-          tag: string
-          address: string
-          chain_id: number
-          is_public: boolean
-          sendid: number
-          all_tags: string[]
-          main_tag_id: number
-          main_tag_name: string
-        }[]
+        Returns: Database["public"]["CompositeTypes"]["profile_lookup_result"][]
       }
       query_webauthn_credentials_by_phone: {
         Args: { phone_number: string }
@@ -2057,6 +2103,14 @@ export type Database = {
     }
     Enums: {
       key_type_enum: "ES256"
+      link_in_bio_domain_names:
+        | "X"
+        | "Instagram"
+        | "YouTube"
+        | "TikTok"
+        | "GitHub"
+        | "Telegram"
+        | "Discord"
       lookup_type_enum: "sendid" | "tag" | "refcode" | "address" | "phone"
       tag_status: "pending" | "confirmed" | "available"
       temporal_status:
@@ -2100,6 +2154,11 @@ export type Database = {
         is_public: boolean | null
         sendid: number | null
         all_tags: string[] | null
+        main_tag_id: number | null
+        main_tag_name: string | null
+        links_in_bio:
+          | Database["public"]["Tables"]["link_in_bio"]["Row"][]
+          | null
       }
       tag_search_result: {
         avatar_url: string | null
@@ -2323,6 +2382,15 @@ export const Constants = {
   public: {
     Enums: {
       key_type_enum: ["ES256"],
+      link_in_bio_domain_names: [
+        "X",
+        "Instagram",
+        "YouTube",
+        "TikTok",
+        "GitHub",
+        "Telegram",
+        "Discord",
+      ],
       lookup_type_enum: ["sendid", "tag", "refcode", "address", "phone"],
       tag_status: ["pending", "confirmed", "available"],
       temporal_status: [

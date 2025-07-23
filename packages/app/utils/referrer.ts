@@ -1,4 +1,3 @@
-import type { Tables } from '@my/supabase/database-generated.types'
 import type { Database, Functions } from '@my/supabase/database.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { useQuery } from '@tanstack/react-query'
@@ -28,7 +27,7 @@ export async function fetchReferrer({
   signal,
 }: {
   supabase: SupabaseClient
-  profile: Tables<'profiles'>
+  profile: Database['public']['Tables']['profiles']['Row']
   referralCode: string
   signal?: AbortSignal
 }): Promise<ReferrerProfile | null> {
@@ -99,8 +98,9 @@ export function useReferrer() {
   const { profile } = useUser()
   const referralCode = useReferralCodeQuery()
   return useQuery({
-    queryKey: ['referrer', { referralCode, supabase, profile }] as const,
-    queryFn: async ({ queryKey: [, { referralCode, supabase, profile }], signal }) => {
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: ['referrer', { referralCode, profile }] as const,
+    queryFn: async ({ queryKey: [, { referralCode, profile }], signal }) => {
       throwIf(referralCode.error)
       assert(!!supabase, 'supabase is required')
       assert(!!profile, 'profile is required')
@@ -123,8 +123,9 @@ export function fetchReferredBy({ supabase }: { supabase: SupabaseClient<Databas
 export function useReferredBy() {
   const supabase = useSupabase()
   return useQuery({
-    queryKey: ['referredBy', { supabase }] as const,
-    queryFn: async ({ queryKey: [, { supabase }], signal }) => {
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: ['referredBy'] as const,
+    queryFn: async ({ signal }) => {
       assert(!!supabase, 'supabase is required')
       const { data, error } = await fetchReferredBy({ supabase }).abortSignal(signal).maybeSingle()
       if (error) {

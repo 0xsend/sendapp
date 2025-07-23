@@ -1,4 +1,4 @@
-import Head from 'next/head'
+import { NextSeo } from 'next-seo'
 import { HomeLayout } from 'app/features/home/layout.web'
 import { TopNav } from 'app/components/TopNav'
 import { userProtectedGetSSP } from 'utils/userProtected'
@@ -8,9 +8,7 @@ import { DepositSuccessScreen } from 'app/features/deposit/success/screen'
 export const Page: NextPageWithLayout = () => {
   return (
     <>
-      <Head>
-        <title>Send | Deposit</title>
-      </Head>
+      <NextSeo title="Send | Deposit" />
       <DepositSuccessScreen />
     </>
   )

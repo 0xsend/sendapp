@@ -1,12 +1,11 @@
 import {
-  Button,
   FadeCard,
   isWeb,
   Paragraph,
   Separator,
   SubmitButton,
   Text,
-  useToastController,
+  useAppToast,
   YStack,
 } from '@my/ui'
 import { SchemaForm } from 'app/utils/SchemaForm'
@@ -48,7 +47,7 @@ export const PersonalInfoScreen = () => {
     },
   })
   const supabase = useSupabase()
-  const toast = useToastController()
+  const toast = useAppToast()
   const form = useForm<z.infer<typeof AuthUserSchema>>() // Using react-hook-form
   const { mutateAsync: mutateAuthAsync } = useAuthUserMutation()
   const { mutateAsync: mutateProfileAsync } = useProfileMutation()
@@ -121,17 +120,8 @@ export const PersonalInfoScreen = () => {
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (
       <YStack>
-        <SubmitButton
-          elevation={'$0.75'}
-          theme="green"
-          borderRadius={'$4'}
-          p={'$4'}
-          mt={'$1'}
-          onPress={() => submit()}
-        >
-          <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
-            SAVE CHANGES
-          </Button.Text>
+        <SubmitButton onPress={() => submit()}>
+          <SubmitButton.Text>SAVE CHANGES</SubmitButton.Text>
         </SubmitButton>
         {errorMessage && (
           <Paragraph marginTop={'$5'} theme="red" color="$color9">
@@ -161,7 +151,7 @@ export const PersonalInfoScreen = () => {
           bc: '$color0',
           pl: '$8',
           iconBefore: (
-            <Text color="$color10" userSelect={'none'} lineHeight={8}>
+            <Text ml={'$4'} color="$color10" userSelect={'none'} fontSize={'$6'}>
               @
             </Text>
           ),
@@ -174,6 +164,7 @@ export const PersonalInfoScreen = () => {
         },
       }}
       formProps={{
+        footerProps: { p: 0 },
         $gtSm: {
           maxWidth: '100%',
         },
@@ -208,15 +199,8 @@ export const PersonalInfoScreen = () => {
           text={profile?.x_username ? `@ ${profile?.x_username}` : '-'}
         />
       </FadeCard>
-      <SubmitButton
-        theme="green"
-        borderRadius={'$4'}
-        p={'$4'}
-        onPress={() => setFormState(FormState.PersonalInfoForm)}
-      >
-        <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
-          edit personal information
-        </Button.Text>
+      <SubmitButton onPress={() => setFormState(FormState.PersonalInfoForm)}>
+        <SubmitButton.Text>edit personal information</SubmitButton.Text>
       </SubmitButton>
     </YStack>
   )

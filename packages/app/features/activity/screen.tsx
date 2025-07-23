@@ -1,10 +1,21 @@
 import { RecentActivity } from './RecentActivity'
-import { AnimatePresence, H4, Spinner, Text, useMedia, YStack } from '@my/ui'
+import {
+  AnimatePresence,
+  H4,
+  LinearGradient,
+  Spinner,
+  Text,
+  useMedia,
+  useTheme,
+  YStack,
+} from '@my/ui'
 import { TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
 import Search from '../../components/SearchBar'
 import { Platform } from 'react-native'
 
 export function ActivityScreen() {
+  const theme = useTheme()
+
   return (
     <TagSearchProvider>
       <YStack
@@ -13,11 +24,40 @@ export function ActivityScreen() {
         pb={Platform.OS === 'web' ? '$3' : 0}
         pt="$3"
         gap="$6"
-        $gtLg={{ pt: 0, gap: '$7' }}
+        px={Platform.OS === 'web' ? 0 : '$4'}
+        $gtMd={{ px: Platform.OS === 'web' ? 0 : '$6' }}
+        $gtLg={{ pt: 0, gap: '$7', px: Platform.OS === 'web' ? 0 : '$11' }}
       >
-        <YStack width={'100%'} gap="$1.5" $gtSm={{ gap: '$2.5' }} $gtLg={{ display: 'none' }}>
-          <Search />
-        </YStack>
+        {Platform.OS === 'web' ? (
+          <YStack width={'100%'} gap="$1.5" $gtSm={{ gap: '$2.5' }} $gtLg={{ display: 'none' }}>
+            <Search />
+          </YStack>
+        ) : (
+          <>
+            <LinearGradient
+              start={[0, 0]}
+              end={[0, 1]}
+              height={40}
+              fullscreen
+              zIndex={1}
+              colors={['$background', '$background', `${theme.background.val}00`]}
+              locations={[0, 0.3, 1]}
+            />
+            <YStack
+              position={'absolute'}
+              top={0}
+              left={0}
+              right={0}
+              zIndex={1}
+              paddingTop={'$3'}
+              px={'$4'}
+              $gtMd={{ px: '$6' }}
+              $gtLg={{ px: '$11' }}
+            >
+              <Search />
+            </YStack>
+          </>
+        )}
         <AnimatePresence>
           <ActivityBody />
         </AnimatePresence>
@@ -50,7 +90,7 @@ function ActivityBody() {
   }
 
   return (
-    <>
+    <YStack f={1} pt={Platform.OS === 'web' ? 0 : '$9'}>
       {isLoading && (
         <YStack
           key="loading"
@@ -72,6 +112,6 @@ function ActivityBody() {
       <Search.Results key="results" />
 
       {results === null && !isLoading && !error && recentActivity}
-    </>
+    </YStack>
   )
 }

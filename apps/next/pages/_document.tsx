@@ -49,6 +49,21 @@ export default class Document extends NextDocument {
             <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
           ) : null}
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+          <meta
+            name="viewport"
+            content="viewport-fit=cover, user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1"
+          />
+          <meta name="mobile-web-app-capable" content="yes" />
+          <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+          <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
+          <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png" />
+          <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png" />
+          <link rel="manifest" href="/favicon/site.webmanifest" />
+          <link rel="mask-icon" href="/favicon/safari-pinned-tab.svg" color="#122023" />
+          <meta name="msapplication-TileColor" content="#122023" />
+          <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
+          <meta name="theme-color" content="#081619" media="(prefers-color-scheme: dark)" />
+          <link rel="stylesheet" href="/tamagui.css" />
         </Head>
         <body>
           <Main />

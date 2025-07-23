@@ -56,11 +56,13 @@ export const TextField = (
           {props.iconBefore && (
             <Stack
               pos={'absolute'}
-              top="50%"
-              p={'$3'}
-              left={2}
-              transform={'translateY(-50%)'}
+              top={0}
+              bottom={0}
+              left={0}
+              right={0}
+              justifyContent="center"
               zIndex={1}
+              pointerEvents="box-none" // Prevent blocking interactions
             >
               {props.iconBefore}
             </Stack>
@@ -97,11 +99,14 @@ export const TextField = (
           {props.iconAfter && (
             <Stack
               pos={'absolute'}
-              top="50%"
-              p={'$3'}
-              right={2}
-              transform={'translateY(-50%)'}
+              top={0}
+              bottom={0}
+              left={0}
+              right={0}
+              justifyContent="center"
+              alignItems={'flex-end'}
               zIndex={1}
+              pointerEvents="box-none" // Prevent blocking interactions
             >
               {props.iconAfter}
             </Stack>
@@ -125,9 +130,11 @@ export const TextField = (
           })()}
         </Stack>
         <Shake shakeKey={error?.errorMessage}>
-          <Paragraph size={'$4'} $theme-dark={{ col: '$white' }} $theme-light={{ col: '$black' }}>
-            {error?.errorMessage}
-          </Paragraph>
+          {error?.errorMessage && (
+            <Paragraph size={'$4'} $theme-dark={{ col: '$white' }} $theme-light={{ col: '$black' }}>
+              {error?.errorMessage}
+            </Paragraph>
+          )}
         </Shake>
       </Fieldset>
     </Theme>

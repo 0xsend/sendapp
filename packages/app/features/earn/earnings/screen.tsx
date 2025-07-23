@@ -4,15 +4,21 @@ import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
 import { formatCoinAmount } from 'app/utils/formatCoinAmount'
 import { isTemporalSendEarnDepositEvent } from 'app/utils/zod/activity'
 import { useEffect, useMemo, useRef } from 'react'
-import { SectionList } from 'react-native'
+import { Platform, SectionList } from 'react-native'
 import { useERC20AssetCoin } from '../params'
 import { useSendEarnCoin } from '../providers/SendEarnProvider'
 import { useEarnActivityFeed } from '../utils/useEarnActivityFeed'
 
 export const EarningsBalance = () => {
   return (
-    <YStack w={'100%'} gap={'$4'} pb={'$3'} $gtLg={{ w: '50%' }}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+    <YStack
+      w={'100%'}
+      gap={'$4'}
+      pb={'$3'}
+      $gtLg={{ w: '50%' }}
+      elevation={Platform.OS === 'web' ? 0 : '$0.75'}
+    >
+      <ScrollView showsVerticalScrollIndicator={false} overflow={'visible'}>
         <YStack gap={'$4'}>
           <TotalEarning />
           <Paragraph size={'$7'} fontWeight={'500'}>
@@ -99,47 +105,60 @@ export const EarningsFeed = () => {
         keyExtractor={(activity) => `${activity.event_name}-${activity.created_at.getTime()}`}
         renderItem={({ item: activity, index, section }) => (
           <YStack
-            elevation={'$0.75'}
             bc="$color1"
             px="$2"
             $gtLg={{
               px: '$3.5',
             }}
-            {...(index === 0 && {
-              pt: '$2',
-              $gtLg: {
-                pt: '$3.5',
-              },
-              borderTopLeftRadius: '$4',
-              borderTopRightRadius: '$4',
-            })}
+            {...(index === 0 &&
+              Platform.OS === 'web' && {
+                pt: '$2',
+                $gtLg: {
+                  pt: '$3.5',
+                },
+                borderTopLeftRadius: '$6',
+                borderTopRightRadius: '$6',
+              })}
             {...(index === section.data.length - 1 && {
               pb: '$2',
               $gtLg: {
                 pb: '$3.5',
               },
-              borderBottomLeftRadius: '$4',
-              borderBottomRightRadius: '$4',
+              borderBottomLeftRadius: '$6',
+              borderBottomRightRadius: '$6',
             })}
           >
             <TokenActivityRow activity={activity} />
           </YStack>
         )}
-        renderSectionHeader={({ section: { title, index } }) => (
-          <H4
-            fontWeight={'600'}
-            size={'$7'}
-            pt={index === 0 ? 0 : '$3.5'}
-            pb="$3.5"
-            bc="$background"
-          >
-            {title}
-          </H4>
-        )}
+        renderSectionHeader={({ section: { title, index } }) =>
+          Platform.OS === 'web' ? (
+            <H4
+              fontWeight={'600'}
+              size={'$7'}
+              pt={index === 0 ? 0 : '$3.5'}
+              pb={'$3.5'}
+              bc={'$background'}
+            >
+              {title}
+            </H4>
+          ) : (
+            <XStack
+              p={'$3.5'}
+              pb={0}
+              bc={'$color1'}
+              borderTopLeftRadius={'$6'}
+              borderTopRightRadius={'$6'}
+            >
+              <Paragraph fontWeight={'900'} size={'$5'}>
+                {title}
+              </Paragraph>
+            </XStack>
+          )
+        }
         onEndReached={() => hasNextPage && fetchNextPage()}
         ListFooterComponent={!isLoading && isFetchingNextPage ? <Spinner size="small" /> : null}
         stickySectionHeadersEnabled={true}
-        contentContainerStyle={{ gap: 16 }}
       />
     </Fade>
   )
@@ -185,7 +204,13 @@ function TotalEarning() {
 
   return (
     <Fade>
-      <Card w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>
+      <Card
+        w={'100%'}
+        p={'$5'}
+        gap={'$7'}
+        elevation={Platform.OS === 'web' ? '$0.75' : 0}
+        $gtLg={{ p: '$7' }}
+      >
         <YStack gap={'$4'}>
           <XStack ai={'center'} gap={'$2'}>
             <IconCoin symbol={coin.data.symbol} size={'$2'} />

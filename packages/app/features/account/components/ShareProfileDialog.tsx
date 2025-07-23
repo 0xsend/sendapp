@@ -1,13 +1,13 @@
 import {
-  Button,
   Dialog,
   H2,
   isWeb,
   Paragraph,
+  PrimaryButton,
   QRCode,
   Separator,
   Sheet,
-  useToastController,
+  useAppToast,
   YStack,
 } from '@my/ui'
 import { IconCopy, IconSend } from 'app/components/icons'
@@ -24,7 +24,7 @@ interface ShareProfileDialogProps {
 export function ShareProfileDialog({ isOpen, onClose }: ShareProfileDialogProps) {
   const { profile } = useUser()
   const tags = useConfirmedTags()
-  const toast = useToastController()
+  const toast = useAppToast()
 
   // Use sendtag if available, otherwise fall back to send_id
   const sendtag = tags?.[0]?.name
@@ -37,12 +37,10 @@ export function ShareProfileDialog({ isOpen, onClose }: ShareProfileDialogProps)
     try {
       await Clipboard.setStringAsync(profileUrl)
       toast.show('Profile link copied to clipboard')
+      onClose()
     } catch {
-      toast.show('Failed to copy link', {
+      toast.error('Failed to copy link', {
         message: 'Something went wrong while copying the link',
-        customData: {
-          theme: 'red',
-        },
       })
     }
   }
@@ -68,34 +66,17 @@ export function ShareProfileDialog({ isOpen, onClose }: ShareProfileDialogProps)
         gap="$4"
         $gtLg={{ flexDirection: 'row-reverse' }}
       >
-        <Button
-          theme="green"
-          borderRadius={'$4'}
-          p={'$4'}
-          onPress={handleCopyLink}
-          focusStyle={{ outlineWidth: 0 }}
-        >
-          <Button.Icon>
+        <PrimaryButton onPress={handleCopyLink} f={Platform.OS === 'web' ? 1 : undefined}>
+          <PrimaryButton.Icon>
             <IconCopy size={16} color={'$black'} />
-          </Button.Icon>
-          <Button.Text
-            ff={'$mono'}
-            fontWeight={'500'}
-            tt="uppercase"
-            size={'$5'}
-            color={'$black'}
-            ml={'$2'}
-          >
-            copy link
-          </Button.Text>
-        </Button>
+          </PrimaryButton.Icon>
+          <PrimaryButton.Text>copy link</PrimaryButton.Text>
+        </PrimaryButton>
         {Platform.OS === 'web' && (
           <Dialog.Close asChild>
-            <Button borderRadius={'$4'} p={'$4'} focusStyle={{ outlineWidth: 0 }}>
-              <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'}>
-                close
-              </Button.Text>
-            </Button>
+            <PrimaryButton focusStyle={{ outlineWidth: 0 }} theme={undefined} f={1}>
+              <PrimaryButton.Text>close</PrimaryButton.Text>
+            </PrimaryButton>
           </Dialog.Close>
         )}
       </YStack>

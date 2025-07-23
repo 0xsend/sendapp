@@ -1,14 +1,4 @@
-import {
-  Paragraph,
-  XStack,
-  YStack,
-  Spinner,
-  Card,
-  H3,
-  Input,
-  Button,
-  useToastController,
-} from '@my/ui'
+import { Paragraph, XStack, YStack, Spinner, Card, H3, Input, Button, useAppToast } from '@my/ui'
 import { useState, useMemo, useEffect } from 'react'
 import { useRouter } from 'solito/router'
 import { createParam } from 'solito'
@@ -28,7 +18,7 @@ const { useParam } = createParam<BuyTicketsScreenParams>()
 
 export function BuyTicketsScreen() {
   const router = useRouter()
-  const toast = useToastController()
+  const toast = useAppToast()
   const [ticketCount, setTicketCount] = useState('1')
   const [isInputFocused, setIsInputFocused] = useState(false)
   const [queryTickets] = useParam('numberOfTickets')
@@ -89,15 +79,15 @@ export function BuyTicketsScreen() {
 
   const handleProceedToConfirm = () => {
     if (insufficientFunds) {
-      toast.show('Error', { message: 'Insufficient funds.' })
+      toast.error('Error', { message: 'Insufficient funds.' })
       return
     }
     if (numTickets <= 0n) {
-      toast.show('Error', { message: 'Please enter a valid number of tickets.' })
+      toast.error('Error', { message: 'Please enter a valid number of tickets.' })
       return
     }
     if (isDataLoading) {
-      toast.show('Info', { message: 'Please wait, loading data...' })
+      toast.error('Info', { message: 'Please wait, loading data...' })
       return
     }
 

@@ -3,16 +3,7 @@ import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { useAuthScreenParams } from 'app/routers/params'
-import {
-  Button,
-  ButtonText,
-  FadeCard,
-  LinkableButton,
-  Paragraph,
-  SubmitButton,
-  XStack,
-  YStack,
-} from '@my/ui'
+import { Button, FadeCard, LinkableButton, Paragraph, SubmitButton, XStack, YStack } from '@my/ui'
 import { useCallback, useEffect, useState } from 'react'
 import { api } from 'app/utils/api'
 import { useSignIn } from 'app/utils/send-accounts'
@@ -65,35 +56,8 @@ export const LoginWithPhoneScreen = () => {
 
   const renderAfter = useCallback(
     ({ submit }: { submit: () => void }) => (
-      <SubmitButton
-        alignSelf={'center'}
-        w={'100%'}
-        theme="green"
-        onPress={submit}
-        py={'$5'}
-        br={'$4'}
-        bw={'$1'}
-        disabled={!canSubmit}
-        $theme-light={{
-          disabledStyle: { opacity: 0.5 },
-        }}
-        $theme-dark={{
-          variant: canSubmit ? undefined : 'outlined',
-        }}
-        elevation={canSubmit ? '$0.75' : undefined}
-      >
-        <ButtonText
-          ff={'$mono'}
-          fontWeight={'500'}
-          tt="uppercase"
-          size={'$5'}
-          color={canSubmit ? '$black' : '$primary'}
-          $theme-light={{
-            color: '$black',
-          }}
-        >
-          login
-        </ButtonText>
+      <SubmitButton onPress={submit} disabled={!canSubmit}>
+        <SubmitButton.Text>login</SubmitButton.Text>
       </SubmitButton>
     ),
     [canSubmit]
@@ -119,7 +83,7 @@ export const LoginWithPhoneScreen = () => {
             formProps={{
               w: '100%',
               f: 0,
-              footerProps: { pb: 0 },
+              footerProps: { p: 0 },
               $gtSm: {
                 maxWidth: '100%',
               },

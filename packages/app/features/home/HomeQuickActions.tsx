@@ -8,7 +8,7 @@ import {
   YStack,
   useMedia,
 } from '@my/ui'
-import { IconArrowUp, IconPlus, IconStacks, IconSwap } from 'app/components/icons'
+import { IconArrowUp, IconPlus, IconStacks } from 'app/components/icons'
 import { usdcCoin } from 'app/data/coins'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { useHoverStyles } from 'app/utils/useHoverStyles'

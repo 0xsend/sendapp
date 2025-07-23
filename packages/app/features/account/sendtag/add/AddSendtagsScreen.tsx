@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'solito/router'
 import { AddSendtagsForm } from 'app/features/account/sendtag/add/AddSendtagsForm'
 import { YStack } from '@my/ui'
+import { Platform } from 'react-native'
 
 export const AddSendtagsScreen = () => {
   const confirmedTags = useConfirmedTags()
@@ -16,6 +17,7 @@ export const AddSendtagsScreen = () => {
 
   return (
     <YStack
+      f={Platform.OS === 'web' ? undefined : 1}
       width={'100%'}
       gap="$5"
       jc={'space-between'}

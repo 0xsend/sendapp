@@ -172,7 +172,8 @@ async function fetchSendEarnBalances(supabase: SupabaseClient<Database>) {
  */
 export function sendEarnBalancesQueryOptions(supabase: SupabaseClient<Database>) {
   return queryOptions({
-    queryKey: ['send_earn_balances', { supabase }] as const,
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: ['send_earn_balances'] as const,
     queryFn: async () => fetchSendEarnBalances(supabase),
     staleTime: 30_000,
   })
@@ -204,7 +205,8 @@ async function fetchSendEarnBalancesTimeline(supabase: SupabaseClient<Database>)
 
 export function sendEarnBalancesTimelineQueryOptions(supabase: SupabaseClient<Database>) {
   return queryOptions({
-    queryKey: ['send_earn_balances_timeline', { supabase }] as const,
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: ['send_earn_balances_timeline'] as const,
     queryFn: async () => fetchSendEarnBalancesTimeline(supabase),
     staleTime: 30_000,
   })
@@ -248,7 +250,8 @@ export function sendEarnBalancesAtBlockQueryOptions(
   block_num: bigint | null
 ) {
   return queryOptions({
-    queryKey: ['send_earn_balances_at_block', { supabase, block_num }] as const,
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: ['send_earn_balances_at_block', { block_num }] as const,
     queryFn: async () => fetchSendEarnBalancesAtBlock(supabase, block_num),
     staleTime: 30_000,
   })

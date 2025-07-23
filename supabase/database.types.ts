@@ -42,6 +42,13 @@ export type Database = MergeDeep<
             address: Hex
           }
         }
+        profiles: {
+          Row: {
+            tags: DatabaseGenerated['public']['Tables']['tags']['Row'][]
+            main_tag: DatabaseGenerated['public']['Tables']['tags']['Row']
+            links_in_bio: DatabaseGenerated['public']['Tables']['link_in_bio']['Row'][]
+          }
+        }
         webauthn_credentials: {
           Row: {
             raw_credential_id: PgBytea

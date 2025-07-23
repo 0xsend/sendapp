@@ -14,22 +14,17 @@ CREATE TYPE "public"."lookup_type_enum" AS ENUM (
 );
 ALTER TYPE "public"."lookup_type_enum" OWNER TO "postgres";
 
-CREATE TYPE "public"."profile_lookup_result" AS (
-	"id" "uuid",
-	"avatar_url" "text",
-	"name" "text",
-	"about" "text",
-	"refcode" "text",
-	"x_username" "text",
-	"birthday" "date",
-	"tag" "public"."citext",
-	"address" "public"."citext",
-	"chain_id" integer,
-	"is_public" boolean,
-	"sendid" integer,
-	"all_tags" "text"[]
+CREATE TYPE "public"."link_in_bio_domain_names" AS ENUM (
+		'X',
+		'Instagram',
+		'YouTube',
+		'TikTok',
+		'GitHub',
+		'Telegram',
+		'Discord'
 );
-ALTER TYPE "public"."profile_lookup_result" OWNER TO "postgres";
+
+ALTER TYPE "public"."link_in_bio_domain_names" OWNER TO "postgres";
 
 CREATE TYPE "public"."tag_search_result" AS (
 	"avatar_url" "text",
