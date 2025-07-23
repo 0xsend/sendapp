@@ -178,7 +178,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
             <XStack gap="$2" alignItems="center">
               <H2 color="$white">{otherUserProfile?.name}</H2>
             </XStack>
-            <XStack gap="$2">
+            <XStack gap="$2" flexWrap="wrap" maw="100%">
               {otherUserProfile?.all_tags?.map((tag) => {
                 return (
                   <BlurStack
