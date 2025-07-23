@@ -19,8 +19,7 @@ async function loadGoogleFont(font: string, weight: number, text: string) {
 
   try {
     // Use a smaller text subset to reduce font size
-    const limitedText = text.slice(0, 50) // Limit text for font subsetting
-    const url = `https://fonts.googleapis.com/css2?family=${font}:wght@${weight}&text=${encodeURIComponent(limitedText)}&display=swap`
+    const url = `https://fonts.googleapis.com/css2?family=${font}:wght@${weight}&text=${encodeURIComponent(text)}&display=swap`
 
     const cssResponse = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0' },
