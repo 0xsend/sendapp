@@ -1,5 +1,4 @@
 import { ProfileScreen } from 'app/features/profile/screen'
-import { NextSeo } from 'next-seo'
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
 import type { NextPageWithLayout } from '../_app'
 import type { GetServerSideProps, GetServerSidePropsContext } from 'next'
@@ -9,38 +8,16 @@ import { SendtagSchema } from 'app/utils/zod/sendtag'
 import { assert } from 'app/utils/assert'
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { ProfileLayout } from 'app/features/profile/layout.web'
-import { getSiteUrl } from 'utils/getSiteUrl'
 import { buildSeo } from 'utils/seo'
 import { generateProfileSeoData, type ProfileSeoData } from 'utils/seoHelpers'
 
 interface PageProps {
   sendid: number | null
-  tag?: string
-  siteUrl: string
-  profileSeoData?: {
-    title: string
-    description: string
-    canonicalUrl: string
-    imageUrl: string
-  }
+  seo: ReturnType<typeof buildSeo>
 }
 
-export const Page: NextPageWithLayout<PageProps> = ({ sendid, tag, siteUrl, profileSeoData }) => {
-  // Generate SEO configuration using buildSeo utility with consistent fallbacks
-  const seo = buildSeo({
-    title: profileSeoData?.title ?? 'Send | Profile',
-    description: profileSeoData?.description ?? `Check out ${tag ? `/${tag}` : sendid} on Send`,
-    url: profileSeoData?.canonicalUrl ?? `${siteUrl}/${tag}`,
-    image: profileSeoData?.imageUrl,
-    type: 'profile',
-  })
-
-  return (
-    <>
-      <NextSeo {...seo} />
-      <ProfileScreen sendid={sendid} />
-    </>
-  )
+export const Page: NextPageWithLayout<PageProps> = ({ sendid }) => {
+  return <ProfileScreen sendid={sendid} />
 }
 
 // Profile page is not protected, but we need to look up the user profile by tag in case we have to show a 404
@@ -63,7 +40,7 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   assert(typeof tag === 'string', 'Identifier tag must be a string')
 
   // Get site URL securely using Vercel environment variables
-  const siteUrl = getSiteUrl()
+  const siteUrl = process.env.NEXT_PUBLIC_URL || 'https://send.app'
 
   const supabase = createPagesServerClient<Database>(ctx)
   const {
@@ -113,6 +90,7 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   const profileData: ProfileSeoData = {
     name: profile.name || undefined,
     sendid: profile.sendid ?? undefined,
+    all_tags: profile.all_tags,
     tag: profile.main_tag_name || tag,
     about: profile.about || undefined,
     avatarUrl: profile.avatar_url || undefined,
@@ -123,12 +101,20 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
     route: `/${tag}`,
   })
 
+  // Generate SEO configuration server-side
+  const seo = buildSeo({
+    title: profileSeoData?.title ?? 'Send | Profile',
+    description:
+      profileSeoData?.description ?? `Check out ${tag ? `/${tag}` : profile.sendid} on Send`,
+    url: profileSeoData?.canonicalUrl ?? `${siteUrl}/${tag}`,
+    image: profileSeoData?.imageUrl,
+    type: 'profile',
+  })
+
   return {
     props: {
       sendid: profile.sendid,
-      tag,
-      siteUrl,
-      profileSeoData,
+      seo,
     },
   }
 }) satisfies GetServerSideProps

@@ -1,26 +1,30 @@
+# Social media bots - all get same rules
+User-agent: facebookexternalhit
+User-agent: facebookexternalhit/1.1
+User-agent: Facebot
+User-agent: Twitterbot
+User-agent: TelegramBot
+User-agent: Discordbot
+User-agent: LinkedInBot
+User-agent: WhatsApp
+User-agent: Slackbot
+User-agent: Slackbot-LinkExpanding
+Allow: /
+Disallow: /account/*
+Disallow: /api/auth/*
+Disallow: /api/trpc/*
+
+# Rules for everyone else
 User-agent: *
-
-# Allow OG image generation for social sharing
 Allow: /api/og/*
-
-# Disallow sensitive user account pages
 Disallow: /account/*
 Disallow: /auth/*
-
-# Disallow financial/sensitive functionality
 Disallow: /deposit/*
 Disallow: /send/*
 Disallow: /earn/*
 Disallow: /trade/*
 Disallow: /invest/*
 Disallow: /sendpot/*
-
-# Disallow API endpoints (except OG images already allowed above)
 Disallow: /api/auth/*
 Disallow: /api/trpc/*
-
-# Disallow all history pages (user transaction data)
 Disallow: */history
-
-# Allow everything else by default (including tag pages and public profiles)
-# This means /alice/, /profile/bob/, etc. will be crawlable
