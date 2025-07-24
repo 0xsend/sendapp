@@ -1,11 +1,5 @@
 import { Paragraph, useTheme, XStack } from '@my/ui'
-import {
-  IconArrowUp,
-  IconDeviceReset,
-  IconHome,
-  IconSendLogo,
-  IconWorldSearch,
-} from 'app/components/icons'
+import { IconArrowUp, IconDeviceReset, IconHome, IconSendLogo } from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
 import { Redirect, router, Stack, Tabs, useSegments } from 'expo-router'
 import AvatarMenuButton from 'app/components/AvatarMenuButton/AvatarMenuButton'
@@ -54,17 +48,6 @@ const TABS = [
       tabPress: (e) => {
         e.preventDefault()
         router.push('/(tabs)/activity')
-      },
-    },
-  },
-  {
-    Icon: IconWorldSearch,
-    key: 'explore/index',
-    title: 'Explore',
-    listeners: {
-      tabPress: (e) => {
-        e.preventDefault()
-        router.push('/(tabs)/explore')
       },
     },
   },
