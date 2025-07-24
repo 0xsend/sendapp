@@ -1,19 +1,20 @@
-import { SizableText, Spinner, useThemeName, YStack } from '@my/ui'
-import { IconAccount, IconRefresh } from 'app/components/icons'
+import { SizableText, Spinner, useThemeName, YStack, type YStackProps } from '@my/ui'
+import { Camera } from '@tamagui/lucide-icons'
+import { IconRefresh } from 'app/components/icons'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useUser } from 'app/utils/useUser'
 import { decode } from 'base64-arraybuffer'
 import * as ImagePicker from 'expo-image-picker'
 import type React from 'react'
-import { type Ref, forwardRef, useImperativeHandle, useState } from 'react'
+import { type PropsWithChildren, type Ref, forwardRef, useImperativeHandle, useState } from 'react'
 
-export interface UploadAvatarRefObject {
+export interface UploadBannerRefObject {
   pickImage: () => void
 }
 
-export const UploadAvatar = forwardRef(function UploadAvatar(
-  { children }: { children: React.ReactNode },
-  ref: Ref<UploadAvatarRefObject>
+export const UploadBanner = forwardRef(function UploadBanner(
+  { children, ...props }: PropsWithChildren<YStackProps>,
+  ref: Ref<UploadBannerRefObject>
 ) {
   const { user, profile, updateProfile } = useUser()
   const supabase = useSupabase()
@@ -28,7 +29,7 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [1, 1],
+      aspect: [21, 9], // Banner aspect ratio
       quality: 1,
       base64: true,
     })
@@ -85,7 +86,7 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
 
     const { error: update_error } = await supabase
       .from('profiles')
-      .update({ avatar_url: publicUrlRes.data.publicUrl })
+      .update({ banner_url: publicUrlRes.data.publicUrl }) // Update banner_url
       .eq('id', user.id)
     if (update_error) {
       setErrMsg(update_error.message)
@@ -97,28 +98,27 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
   }
 
   return (
-    <YStack gap={'$4'}>
+    <YStack gap="$4" {...props}>
+      {errMsg ? (
+        <SizableText theme="red" color="$color9">
+          {errMsg}
+        </SizableText>
+      ) : (
+        <></>
+      )}
       <YStack
         position="relative"
         alignSelf="flex-start"
         flexShrink={1}
         onPress={() => pickImage()}
         cursor="pointer"
+        w="100%"
       >
         {children}
-        <YStack
-          position="absolute"
-          left={0}
-          right={0}
-          top={0}
-          bottom={0}
-          jc="center"
-          ai="center"
-          zIndex={100}
-        >
+        <YStack position="absolute" left={0} right={0} top={0} bottom={0} jc="center" ai="center">
           <YStack
-            backgroundColor="$color0"
-            opacity={0.66}
+            backgroundColor="$black"
+            opacity={0.76}
             borderRadius={'$3'}
             position="absolute"
             left={0}
@@ -126,24 +126,23 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
             top={0}
             bottom={0}
             $theme-light={{
-              backgroundColor: '$color2',
+              backgroundColor: '$color9',
             }}
           />
           <YStack position="absolute" left={0} right={0} top={0} bottom={0} jc="center" ai="center">
             {(() => {
               switch (true) {
                 case isUploading:
-                  return <Spinner size="small" color={isDark ? '$primary' : '$color12'} />
-                case !!profile?.avatar_url:
-                  return <IconRefresh color={isDark ? '$primary' : '$color12'} size="$1.5" />
+                  return <Spinner size="large" color={isDark ? '$primary' : '$color12'} />
+                case !!profile?.banner_url:
+                  return <IconRefresh color={isDark ? '$primary' : '$color12'} />
                 default:
-                  return <IconAccount color={isDark ? '$primary' : '$color12'} size={'$4'} />
+                  return <Camera color={isDark ? '$primary' : '$color12'} size={'$4'} />
               }
             })()}
           </YStack>
         </YStack>
       </YStack>
-      {errMsg ? <SizableText theme="red">{errMsg}</SizableText> : <></>}
     </YStack>
   )
 })
