@@ -4246,6 +4246,20 @@
           "maxLength": null
         },
         {
+          "id": "public.profiles.banner_url",
+          "name": "banner_url",
+          "columnName": "banner_url",
+          "type": "text",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
           "name": "users",
           "type": "users",
           "isRequired": true,

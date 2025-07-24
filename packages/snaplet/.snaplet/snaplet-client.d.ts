@@ -221,6 +221,7 @@ type Override = {
       send_id?: string;
       x_username?: string;
       birthday?: string;
+      banner_url?: string;
       users?: string;
       affiliate_stats?: string;
       referrals_referrals_referred_idToprofiles?: string;
