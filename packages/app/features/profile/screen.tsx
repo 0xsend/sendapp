@@ -100,6 +100,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
           <Image
             source={{
               uri:
+                otherUserProfile?.banner_url ??
                 otherUserProfile?.avatar_url ??
                 `https://ui-avatars.com/api.jpg?name=${otherUserProfile?.main_tag_name}&size=428`,
               width: 428,
@@ -107,25 +108,11 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
             }}
             h="100%"
             w="100%"
-            filter="blur(12px)"
+            filter={otherUserProfile?.banner_url ? 'none' : 'blur(12px)'}
+            objectFit={otherUserProfile?.banner_url ? 'cover' : 'contain'}
           />
         </Card.Background>
-        <Image
-          source={{
-            uri:
-              otherUserProfile?.avatar_url ??
-              `https://ui-avatars.com/api.jpg?name=${otherUserProfile?.main_tag_name}&size=428`,
-            width: 428,
-            height: 428,
-          }}
-          h="100%"
-          position="absolute"
-          top={0}
-          bottom={0}
-          left={0}
-          right={0}
-          margin="auto"
-        />
+
         <GradientOverlay
           colors={['transparent', 'black']}
           height="100%"
@@ -168,42 +155,58 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
           padded
           size={media.gtMd ? '$7' : '$5'}
           pb={media.gtMd ? 0 : undefined}
-          ai={media.gtMd ? 'flex-end' : 'flex-start'}
-          jc={media.gtMd ? 'space-between' : 'flex-end'}
+          jc={'flex-end'}
           f={1}
-          flexDirection={media.gtMd ? 'row' : 'column'}
-          gap={media.gtMd ? '$8' : '$4'}
+          fd="column"
+          gap={'$5'}
         >
-          <YStack gap="$4">
-            <XStack gap="$2" alignItems="center">
-              <H2 color="$white">{otherUserProfile?.name}</H2>
-            </XStack>
-            <XStack gap="$2" flexWrap="wrap" maw="100%">
-              {otherUserProfile?.all_tags?.map((tag) => {
-                return (
-                  <BlurStack
-                    intensity={50}
-                    key={tag}
-                    p={8}
-                    bc="rgba(102, 102, 102, 0.4)"
-                    borderRadius={4}
-                    alignSelf="flex-start"
-                  >
-                    <Paragraph color="$white" fontSize="$3" fontWeight="400">
-                      /{tag}
-                    </Paragraph>
-                  </BlurStack>
-                )
-              })}
-            </XStack>
-
-            <Paragraph color="$white" fontSize="$4" fontWeight="400">
-              {otherUserProfile?.about}
-            </Paragraph>
-          </YStack>
+          <XStack gap="$4" alignItems="center">
+            <Image
+              source={{
+                uri:
+                  otherUserProfile?.avatar_url ??
+                  `https://ui-avatars.com/api.jpg?name=${otherUserProfile?.main_tag_name}&size=428`,
+                width: 428,
+                height: 428,
+              }}
+              aspectRatio={1}
+              w={80}
+              h={80}
+              bw={'$1'}
+              boc="$lightGrayTextField"
+              objectFit="cover"
+              br={'$4'}
+            />
+            <YStack gap="$2">
+              <XStack gap="$2" alignItems="center">
+                <H2 color="$white">{otherUserProfile?.name ?? '---'}</H2>
+              </XStack>
+              <XStack gap="$2" flexWrap="wrap" maw="100%">
+                {otherUserProfile?.all_tags?.map((tag) => {
+                  return (
+                    <BlurStack
+                      intensity={50}
+                      key={tag}
+                      px={8}
+                      py={4}
+                      bc="rgba(102, 102, 102, 0.4)"
+                      borderRadius={4}
+                      alignSelf="flex-start"
+                    >
+                      <Paragraph color="$white" fontSize="$3" fontWeight="400">
+                        /{tag}
+                      </Paragraph>
+                    </BlurStack>
+                  )
+                })}
+              </XStack>
+            </YStack>
+          </XStack>
+          <Paragraph color="$white" fontSize="$4" fontWeight="400">
+            {otherUserProfile?.about}
+          </Paragraph>
 
           <LinkableButton
-            als={media.gtMd ? 'flex-end' : 'flex-start'}
             href={{
               pathname: '/send',
               query: { recipient: otherUserProfile?.sendid, idType: 'sendid' },
