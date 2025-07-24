@@ -7,7 +7,6 @@ import type { Database } from '@my/supabase/database.types'
 import { userOnboarded } from 'utils/userOnboarded'
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { ProfileLayout } from 'app/features/profile/layout.web'
-import { getSiteUrl } from 'utils/getSiteUrl'
 import { buildSeo } from 'utils/seo'
 import { generateProfileSeoData, type ProfileSeoData } from 'utils/seoHelpers'
 
@@ -52,7 +51,7 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   }
 
   // Get site URL securely using Vercel environment variables
-  const siteUrl = getSiteUrl()
+  const siteUrl = process.env.NEXT_PUBLIC_URL || 'https://send.app'
 
   const supabase = createPagesServerClient<Database>(ctx)
   const {

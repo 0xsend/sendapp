@@ -9,6 +9,7 @@ import debug from 'debug'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { NextSeo } from 'next-seo'
 import { userOnboarded } from 'utils/userOnboarded'
+import { buildSeo } from 'utils/seo'
 import type { NextPageWithLayout } from './_app'
 import { AuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
 import { useCallback, useEffect, useState } from 'react'
@@ -31,6 +32,15 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
   const queryClient = useQueryClient()
   const [{ referral }] = useAuthScreenParams()
   const { mutateAsync: setReferralCodeMutateAsync } = useSetReferralCode()
+
+  // Generate SEO configuration for home page
+  const siteUrl = process.env.NEXT_PUBLIC_URL || 'https://send.app'
+  const seo = buildSeo({
+    title: 'Send',
+    description: 'Peer-to-peer money. Send. Save. Invest.',
+    url: siteUrl,
+    type: 'website',
+  })
 
   const cancelAndRemoveAccountsQueries = useCallback(async () => {
     if (!session) {
@@ -56,7 +66,7 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
 
   return (
     <>
-      <NextSeo title="Send" />
+      <NextSeo {...seo} />
       {session ? (
         <HomeLayout TopNav={<TopNav header="Home" showLogo={true} backFunction="home" />}>
           <SendEarnProvider>

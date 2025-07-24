@@ -9,7 +9,6 @@ import { SendtagSchema } from 'app/utils/zod/sendtag'
 import { assert } from 'app/utils/assert'
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { ProfileLayout } from 'app/features/profile/layout.web'
-import { getSiteUrl } from 'utils/getSiteUrl'
 import { buildSeo } from 'utils/seo'
 import { generateProfileSeoData, type ProfileSeoData } from 'utils/seoHelpers'
 
@@ -64,7 +63,7 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   assert(typeof tag === 'string', 'Identifier tag must be a string')
 
   // Get site URL securely using Vercel environment variables
-  const siteUrl = getSiteUrl()
+  const siteUrl = process.env.NEXT_PUBLIC_URL || 'https://send.app'
 
   const supabase = createPagesServerClient<Database>(ctx)
   const {
@@ -103,6 +102,7 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   const profileData: ProfileSeoData = {
     name: profile.name || undefined,
     sendid: profile.sendid,
+    all_tags: profile.all_tags,
     tag: profile.main_tag_name || tag,
     about: profile.about || undefined,
     avatarUrl: profile.avatar_url || undefined,
