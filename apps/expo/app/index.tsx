@@ -1,10 +1,11 @@
 import { useUser } from 'app/utils/useUser'
-import { Redirect, Stack } from 'expo-router'
+import { Redirect, Stack, useFocusEffect } from 'expo-router'
 import { Container, YStack } from '@my/ui'
 import { SplashScreen } from 'app/features/splash/screen'
 import { AuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import type { GetPlaiceholderImage } from 'app/utils/getPlaiceholderImage'
+import { useQueryClient } from '@tanstack/react-query'
 
 // Hardcoded carousel images for mobile
 const mobileCarouselImages = [
@@ -29,6 +30,13 @@ export default function Index() {
   const { session } = useUser()
   const [carouselImages, setCarouselImages] = useState<GetPlaiceholderImage[]>(mobileCarouselImages)
   const [carouselProgress, setCarouselProgress] = useState(0)
+  const queryClient = useQueryClient()
+
+  useFocusEffect(
+    useCallback(() => {
+      queryClient.clear()
+    }, [queryClient.clear])
+  )
 
   // If user is logged in, redirect to the home screen inside the tabs layout
   if (session) {
