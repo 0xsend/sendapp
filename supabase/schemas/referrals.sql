@@ -15,7 +15,8 @@ CREATE TYPE "public"."profile_lookup_result" AS (
 	"all_tags" "text"[],
 	"main_tag_id" bigint,
 	"main_tag_name" "text",
-	"links_in_bio" link_in_bio[]
+	"links_in_bio" link_in_bio[],
+	"banner_url" "text"
 );
 ALTER TYPE "public"."profile_lookup_result" OWNER TO "postgres";
 
@@ -57,7 +58,8 @@ begin
             FROM link_in_bio sl2
             WHERE sl2.user_id = p.id AND sl2.handle IS NOT NULL)
         ELSE NULL
-        END
+        END,
+        p.banner_url::text
     from profiles p
     join auth.users a on a.id = p.id
     left join send_accounts sa on sa.user_id = p.id
@@ -488,25 +490,26 @@ create or replace view "public"."referrer" as  WITH referrer AS (
           ORDER BY r.created_at
          LIMIT 1
         ), profile_lookup AS (
-         SELECT "p"."id",
-            "p"."avatar_url",
-            "p"."name",
-            "p"."about",
-            "p"."refcode",
-            "p"."x_username",
-            "p"."birthday",
-            "p"."tag",
-            "p"."address",
-            "p"."chain_id",
-            "p"."is_public",
-            "p"."sendid",
-            "p"."all_tags",
-            "p"."main_tag_id",
-            "p"."main_tag_name",
-            "p"."links_in_bio",
-            "referrer"."send_id"
+         SELECT p.id,
+            p.avatar_url,
+            p.name,
+            p.about,
+            p.refcode,
+            p.x_username,
+            p.birthday,
+            p.tag,
+            p.address,
+            p.chain_id,
+            p.is_public,
+            p.sendid,
+            p.all_tags,
+            p.main_tag_id,
+            p.main_tag_name,
+            p.links_in_bio,
+            p.banner_url,
+            referrer.send_id
            FROM (profile_lookup('sendid'::lookup_type_enum, ( SELECT (referrer_1.send_id)::text AS send_id
-                   FROM referrer referrer_1)) p(id, avatar_url, name, about, refcode, x_username, birthday, tag, address, chain_id, is_public, sendid, all_tags, main_tag_id, main_tag_name, links_in_bio)
+                   FROM referrer referrer_1)) p(id, avatar_url, name, about, refcode, x_username, birthday, tag, address, chain_id, is_public, sendid, all_tags, main_tag_id, main_tag_name, links_in_bio, banner_url)
              JOIN referrer ON ((referrer.send_id IS NOT NULL)))
         )
  SELECT profile_lookup.id,
@@ -525,7 +528,8 @@ create or replace view "public"."referrer" as  WITH referrer AS (
     profile_lookup.main_tag_id,
     profile_lookup.main_tag_name,
     profile_lookup.links_in_bio,
-    profile_lookup.send_id
+    profile_lookup.send_id,
+    profile_lookup.banner_url
    FROM profile_lookup;
 
 ALTER TABLE "public"."referrer" OWNER TO "postgres";

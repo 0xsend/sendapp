@@ -48,6 +48,7 @@ npx snaplet snapshot restore --no-reset ./.snaplet/snapshots/<SNAPSHOT_NAME>.sna
 ### Making Schema Changes
 
 1. **Stop the local database** before making changes:
+
    ```shell
    yarn supabase stop
    ```
@@ -55,6 +56,7 @@ npx snaplet snapshot restore --no-reset ./.snaplet/snapshots/<SNAPSHOT_NAME>.sna
 2. **Modify the appropriate schema file** in `supabase/schemas/`
 
 3. **Generate a migration** from your changes:
+
    ```shell
    yarn migration:diff <MIGRATION_NAME>
    ```
@@ -74,11 +76,10 @@ npx snaplet snapshot restore --no-reset ./.snaplet/snapshots/<SNAPSHOT_NAME>.sna
 ### Schema Drift Detection
 
 The CI pipeline includes automatic schema drift detection that:
+
 - Compares the current database state with declarative schemas
 - Fails if there are uncommitted changes
 - Ensures migrations stay in sync with schema files
-
-## Setting up Supabase
 
 Here are some guides from the official Supabase documentation:
 

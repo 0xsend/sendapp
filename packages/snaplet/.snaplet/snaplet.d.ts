@@ -308,6 +308,7 @@ interface Table_public_profiles {
   send_id: number;
   x_username: string | null;
   birthday: string | null;
+  banner_url: string | null;
 }
 interface Table_public_receipts {
   hash: string | null;
