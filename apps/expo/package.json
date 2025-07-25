@@ -15,6 +15,9 @@
     "eas:build:dev:ios": "eas build --profile development --platform ios",
     "eas:build:preview:android": "eas build --profile preview --platform android",
     "eas:build:preview:ios": "eas build --profile preview --platform ios",
+    "eas:build:production:android": "eas build --profile production --platform android",
+    "eas:build:production:ios": "eas build --profile production --platform ios",
+    "eas:submit:ios": "eas submit --platform ios",
     "eas-build-pre-install": "./eas/pre-install",
     "eas-build-post-install": "./eas/post-install"
   },
