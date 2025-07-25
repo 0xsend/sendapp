@@ -5,10 +5,12 @@ import { createParam } from 'solito'
 import { type Address, isAddress } from 'viem'
 import { useCoin } from 'app/provider/coins'
 import { useCallback } from 'react'
+import { SendtagSchema } from 'app/utils/zod/sendtag'
 
 export type AuthScreenParams = {
   redirectUri?: string
   referral?: string
+  tag?: string
 }
 
 const { useParam: useAuthParam, useParams: useAuthParams } = createParam<AuthScreenParams>()
@@ -32,15 +34,34 @@ const useReferral = () => {
   return [referral, setReferral] as const
 }
 
+const useAuthTag = () => {
+  const [tag, setTag] = useAuthParam('tag', {
+    initial: undefined,
+    parse: (value) => {
+      if (value === undefined) return undefined
+      const tagValue = Array.isArray(value) ? value[0] : value
+      if (!tagValue) return undefined
+
+      // Validate using the same Zod schema used throughout the app
+      const result = SendtagSchema.safeParse({ name: tagValue })
+      return result.success ? result.data.name : undefined
+    },
+  })
+
+  return [tag, setTag] as const
+}
+
 export const useAuthScreenParams = () => {
   const { setParams } = useAuthParams()
   const [redirectUri] = useRedirectUri()
   const [referral] = useReferral()
+  const [tag] = useAuthTag()
 
   return [
     {
       redirectUri,
       referral,
+      tag,
     },
     setParams,
   ] as const
