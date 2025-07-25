@@ -1,12 +1,12 @@
 {
   "webcredentials": {
-    "apps": ["8S6R4SU556.app.send"]
+    "apps": ["8S6R4SU556.send.app"]
   },
   "applinks": {
     "apps": [],
     "details": [
       {
-        "appID": "8S6R4SU556.app.send",
+        "appID": "8S6R4SU556.send.app",
         "paths": ["*"]
       }
     ]
