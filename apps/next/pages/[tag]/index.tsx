@@ -47,7 +47,6 @@ export const Page: NextPageWithLayout<PageProps> = ({ sendid, tag, siteUrl, prof
 export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   const { tag: tagParam } = ctx.params ?? {}
 
-  // ensure identifier is valid before proceeding
   const result = SendtagSchema.safeParse({
     name: tagParam?.toString().match(/^@/) ? tagParam.toString().slice(1) : tagParam,
   })
@@ -77,7 +76,7 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
     if (needsOnboarding) return needsOnboarding
   }
 
-  // check if profile exists
+  // Use profile_lookup to check existence and get full profile data in one call
   const supabaseAdmin = createSupabaseAdminClient()
   const { data: profile, error } = await supabaseAdmin
     .rpc('profile_lookup', {
@@ -91,8 +90,19 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
     throw error
   }
 
-  if (profile === null || (!profile.is_public && !session)) {
-    // no profile or profile is private and user is not logged in
+  if (profile === null) {
+    // profile doesn't exist, redirect to onboarding
+    console.log(`Profile not found for tag: ${tag}, redirecting to onboarding`)
+    return {
+      redirect: {
+        destination: `/auth/sign-up?tag=${encodeURIComponent(tag)}`,
+        permanent: false,
+      },
+    }
+  }
+
+  if (!profile.is_public && !session) {
+    // profile is private and user is not logged in
     // return 404
     return {
       notFound: true,
@@ -102,7 +112,7 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   // Generate SEO data using helper functions for consistency
   const profileData: ProfileSeoData = {
     name: profile.name || undefined,
-    sendid: profile.sendid,
+    sendid: profile.sendid ?? undefined,
     tag: profile.main_tag_name || tag,
     about: profile.about || undefined,
     avatarUrl: profile.avatar_url || undefined,
