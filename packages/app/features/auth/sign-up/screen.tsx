@@ -24,6 +24,7 @@ import { useValidateSendtag } from 'app/utils/tags/useValidateSendtag'
 import { useSetFirstSendtag } from 'app/utils/useFirstSendtag'
 import { useUser } from 'app/utils/useUser'
 import { useCallback, useEffect, useId, useState } from 'react'
+import { useDebounce } from '@my/ui'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { z } from 'zod'
@@ -49,8 +50,8 @@ export const SignUpScreen = () => {
   const [formState, setFormState] = useState<FormState>(FormState.Idle)
   const form = useForm<z.infer<typeof SignUpScreenFormSchema>>()
   const router = useRouter()
-  const [queryParams] = useAuthScreenParams()
-  const { redirectUri } = queryParams
+  const [queryParams, setAuthParams] = useAuthScreenParams()
+  const { redirectUri, tag } = queryParams
   const toast = useAppToast()
   const supabase = useSupabase()
   const { user } = useUser()
@@ -72,13 +73,46 @@ export const SignUpScreen = () => {
     api.tag.registerFirstSendtag.useMutation()
   const { mutateAsync: setFirstSendtagMutateAsync } = useSetFirstSendtag()
 
+  // Handle form changes and sync to URL
+  const onFormChange = useDebounce(
+    useCallback(
+      (values) => {
+        const { name } = values
+        if (name && name.trim() !== tag) {
+          setAuthParams(
+            {
+              ...queryParams,
+              tag: name.trim(),
+            },
+            { webBehavior: 'replace' }
+          )
+        }
+      },
+      [setAuthParams, queryParams, tag]
+    ),
+    300,
+    { leading: false },
+    []
+  )
+
   useEffect(() => {
-    const subscription = form.watch(() => {
+    const subscription = form.watch((values) => {
       form.clearErrors('root')
+      onFormChange(values)
     })
 
-    return () => subscription.unsubscribe()
-  }, [form.watch, form.clearErrors])
+    return () => {
+      subscription.unsubscribe()
+      onFormChange.cancel()
+    }
+  }, [form.watch, form.clearErrors, onFormChange])
+
+  // Set initial tag value from URL if available
+  useEffect(() => {
+    if (tag && !formName) {
+      form.setValue('name', tag)
+    }
+  }, [tag, formName, form.setValue])
 
   useEffect(() => {
     if (user?.id && formState === FormState.Idle) {
@@ -196,7 +230,7 @@ export const SignUpScreen = () => {
             onSubmit={handleSubmit}
             schema={SignUpScreenFormSchema}
             defaultValues={{
-              name: '',
+              name: tag || '',
               isAgreedToTerms: false,
             }}
             props={{
