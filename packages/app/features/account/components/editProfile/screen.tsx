@@ -1,7 +1,9 @@
 import {
-  Button,
+  Card,
   Checkbox,
+  Fade,
   FadeCard,
+  Image,
   Paragraph,
   ProfileAvatar,
   Separator,
@@ -14,6 +16,7 @@ import { SchemaForm } from 'app/utils/SchemaForm'
 import { ProfileSchema, useProfileMutation } from 'app/utils/useProfileMutation'
 import { useUser } from 'app/utils/useUser'
 import { UploadAvatar, type UploadAvatarRefObject } from '../uploadProfileImage/screen'
+import { UploadBanner, type UploadBannerRefObject } from '../UploadProfileBanner'
 import { useCallback, useRef, useState } from 'react'
 import type { Tables } from '@my/supabase/database.types'
 import { Check } from '@tamagui/lucide-icons'
@@ -60,66 +63,78 @@ export const EditProfile = () => {
 }
 
 const Overview = ({ profile, onPress }: { profile: Tables<'profiles'>; onPress: () => void }) => {
-  const { name, about, is_public, avatar_url } = profile
+  const { name, about, is_public, avatar_url, banner_url } = profile
   const avatarRef = useRef<UploadAvatarRefObject>(null)
+  const bannerRef = useRef<UploadBannerRefObject>(null)
 
   return (
     <YStack gap={'$5'}>
-      <FadeCard>
-        <XStack gap={'$5'} width={'100%'}>
-          <UploadAvatar ref={avatarRef}>
-            <ProfileAvatar
-              avatarUrl={avatar_url ? avatar_url : undefined}
-              $gtMd={{ size: 88 }}
-              size={88}
-            />
-          </UploadAvatar>
-          <YStack gap={'$2'} ai={'flex-start'}>
-            <YStack>
-              <Paragraph
-                size={'$5'}
-                fontWeight={500}
-                color={'$lightGrayTextField'}
-                $theme-light={{ color: '$darkGrayTextField' }}
+      <Fade>
+        <Card padded size={'$4.5'} gap={'$3.5'} br={'$5'}>
+          <YStack w="100%" position="relative" mb="$4">
+            <UploadBanner ref={bannerRef} w="100%">
+              <YStack
+                w="100%"
+                aspectRatio={21 / 9}
+                backgroundColor="$color2"
+                borderRadius="$3"
+                jc="center"
+                ai="center"
+                overflow="hidden"
               >
-                Profile Picture
-              </Paragraph>
+                {banner_url ? (
+                  <Image
+                    source={{ uri: banner_url }}
+                    w="100%"
+                    h="100%"
+                    borderRadius="$3"
+                    objectFit="cover"
+                  />
+                ) : null}
+              </YStack>
+            </UploadBanner>
+            <YStack
+              position="absolute"
+              bottom={-30}
+              left={16}
+              zIndex={10}
+              bw="$1.5"
+              boc={'$color1'}
+              br="$4"
+            >
+              <UploadAvatar ref={avatarRef}>
+                <ProfileAvatar
+                  avatarUrl={avatar_url ? avatar_url : undefined}
+                  $gtMd={{ size: 88 }}
+                  size={88}
+                />
+              </UploadAvatar>
             </YStack>
-            <Button unstyled onPress={() => avatarRef.current?.pickImage()}>
-              <Button.Text
-                textDecorationLine="underline"
-                color="$primary"
-                $theme-light={{ color: '$color12' }}
-                size={'$5'}
-              >
-                Update
-              </Button.Text>
-            </Button>
           </YStack>
-        </XStack>
-        <FieldWithLabel label={'Name'}>
-          <Paragraph size={'$8'} fontWeight={'500'}>
-            {name || '-'}
-          </Paragraph>
-        </FieldWithLabel>
-        <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
-        <ReadOnlyFieldWithLabel label={'About'} text={about || '-'} />
-        <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
-        <XStack gap={'$3'} ai={'center'}>
-          <Checkbox
-            disabled={true}
-            checked={!!is_public}
-            borderWidth={0}
-            backgroundColor={is_public ? '$primary' : '$background'}
-            circular={true}
-          >
-            <Checkbox.Indicator>
-              <Check color={'$black'} />
-            </Checkbox.Indicator>
-          </Checkbox>
-          <Paragraph size={'$5'}>{`${is_public ? 'Public' : 'Private'}`} Profile</Paragraph>
-        </XStack>
-      </FadeCard>
+          <FieldWithLabel label={'Name'} mt="$4">
+            <Paragraph size={'$8'} fontWeight={'500'}>
+              {name || '-'}
+            </Paragraph>
+          </FieldWithLabel>
+          <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
+          <ReadOnlyFieldWithLabel label={'About'} text={about || '-'} />
+          <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
+          <XStack gap={'$3'} ai={'center'}>
+            <Checkbox
+              disabled={true}
+              checked={!!is_public}
+              borderWidth={0}
+              backgroundColor={is_public ? '$primary' : '$background'}
+              circular={true}
+            >
+              <Checkbox.Indicator>
+                <Check color={'$black'} />
+              </Checkbox.Indicator>
+            </Checkbox>
+            <Paragraph size={'$5'}>{`${is_public ? 'Public' : 'Private'}`} Profile</Paragraph>
+          </XStack>
+        </Card>
+      </Fade>
       <SubmitButton onPress={onPress}>
         <SubmitButton.Text>edit profile</SubmitButton.Text>
       </SubmitButton>
