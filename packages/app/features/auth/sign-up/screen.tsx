@@ -51,7 +51,6 @@ export const SignUpScreen = () => {
   const form = useForm<z.infer<typeof SignUpScreenFormSchema>>()
   const router = useRouter()
   const [queryParams, setAuthParams] = useAuthScreenParams()
-  const { redirectUri, tag } = queryParams
   const toast = useAppToast()
   const supabase = useSupabase()
   const { user } = useUser()
@@ -78,17 +77,18 @@ export const SignUpScreen = () => {
     useCallback(
       (values) => {
         const { name } = values
-        if (name && name.trim() !== tag) {
-          setAuthParams(
-            {
-              ...queryParams,
-              tag: name.trim(),
-            },
-            { webBehavior: 'replace' }
-          )
-        }
+        const trimmedName = name?.trim()
+
+        // Always update the URL params, use undefined to remove empty values
+        setAuthParams(
+          {
+            ...queryParams,
+            tag: trimmedName || undefined,
+          },
+          { webBehavior: 'replace' }
+        )
       },
-      [setAuthParams, queryParams, tag]
+      [setAuthParams, queryParams]
     ),
     300,
     { leading: false },
@@ -107,12 +107,14 @@ export const SignUpScreen = () => {
     }
   }, [form.watch, form.clearErrors, onFormChange])
 
-  // Set initial tag value from URL if available
+  // Set initial tag value from URL parameter
   useEffect(() => {
-    if (tag && !formName) {
-      form.setValue('name', tag)
+    const currentFormValue = form.getValues('name')
+    const urlTag = queryParams.tag
+    if (urlTag && (!currentFormValue || currentFormValue === '')) {
+      form.setValue('name', urlTag)
     }
-  }, [tag, formName, form.setValue])
+  }, [queryParams.tag, form])
 
   useEffect(() => {
     if (user?.id && formState === FormState.Idle) {
@@ -168,12 +170,12 @@ export const SignUpScreen = () => {
 
     try {
       await signInMutateAsync({})
-      router.push(redirectUri ?? '/')
+      router.push(queryParams.redirectUri ?? '/')
     } catch (error) {
       setFormState(FormState.Idle)
       toast.error(formatErrorMessage(error))
     }
-  }, [signInMutateAsync, toast.error, router.push, redirectUri])
+  }, [signInMutateAsync, toast.error, router.push, queryParams.redirectUri])
 
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (
@@ -230,7 +232,7 @@ export const SignUpScreen = () => {
             onSubmit={handleSubmit}
             schema={SignUpScreenFormSchema}
             defaultValues={{
-              name: tag || '',
+              name: queryParams.tag ?? '',
               isAgreedToTerms: false,
             }}
             props={{
@@ -243,6 +245,7 @@ export const SignUpScreen = () => {
                 br: 0,
                 p: 0,
                 pl: '$2.5',
+                onChangeText: (text: string) => form.setValue('name', text),
                 focusStyle: {
                   outlineWidth: 0,
                 },
@@ -264,6 +267,8 @@ export const SignUpScreen = () => {
                     size={'$5'}
                     opacity={formName ? 1 : 0}
                     mb={Platform.OS === 'web' ? 0 : 2}
+                    maw={0}
+                    overflow="visible"
                   >
                     /
                   </Paragraph>
@@ -275,7 +280,6 @@ export const SignUpScreen = () => {
             }}
             formProps={{
               w: '100%',
-              footerProps: { padding: 0 },
               $gtSm: {
                 maxWidth: '100%',
               },
