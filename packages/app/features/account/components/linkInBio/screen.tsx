@@ -1,5 +1,4 @@
 import {
-  Button,
   FadeCard,
   Paragraph,
   SubmitButton,
@@ -99,8 +98,13 @@ export const LinkInBioScreen = () => {
   const socialLinksForm = (
     <YStack gap={'$5'}>
       <FadeCard elevation={'$0.75'}>
+        {errorMessage && (
+          <Paragraph marginBottom={'$5'} theme="red" color="$color9">
+            {errorMessage}
+          </Paragraph>
+        )}
         <YStack gap={'$4'}>
-          {LinkInBioDomainNamesEnum.options.map((domain_name) => {
+          {Object.values(LinkInBioDomainNamesEnum).map((domain_name) => {
             const currentHandle = domainHandles[domain_name] || ''
 
             return (

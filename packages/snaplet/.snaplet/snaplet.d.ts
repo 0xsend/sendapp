@@ -11,7 +11,7 @@ type Enum_net_request_status = 'ERROR' | 'PENDING' | 'SUCCESS';
 type Enum_pgtle_password_types = 'PASSWORD_TYPE_MD5' | 'PASSWORD_TYPE_PLAINTEXT' | 'PASSWORD_TYPE_SCRAM_SHA_256';
 type Enum_pgtle_pg_tle_features = 'clientauth' | 'passcheck';
 type Enum_public_key_type_enum = 'ES256';
-type Enum_public_link_in_bio_domain_names = 'Discord' | 'GitHub' | 'Instagram' | 'Telegram' | 'TikTok' | 'X' | 'YouTube';
+type Enum_public_link_in_bio_domain_names = 'Discord' | 'Facebook' | 'GitHub' | 'Instagram' | 'OnlyFans' | 'Snapchat' | 'Telegram' | 'TikTok' | 'Twitch' | 'WhatsApp' | 'X' | 'YouTube';
 type Enum_public_lookup_type_enum = 'address' | 'phone' | 'refcode' | 'sendid' | 'tag';
 type Enum_public_tag_status = 'available' | 'confirmed' | 'pending';
 type Enum_public_temporal_status = 'confirmed' | 'failed' | 'initialized' | 'sent' | 'submitted';
@@ -403,6 +403,10 @@ interface Table_vault_secrets {
   nonce: string | null;
   created_at: string;
   updated_at: string;
+}
+interface Table_supabase_migrations_seed_files {
+  path: string;
+  hash: string;
 }
 interface Table_public_send_account_created {
   chain_id: number;
@@ -987,6 +991,7 @@ interface Schema_supabase_functions {
 }
 interface Schema_supabase_migrations {
   schema_migrations: Table_supabase_migrations_schema_migrations;
+  seed_files: Table_supabase_migrations_seed_files;
 }
 interface Schema_temporal {
   send_account_transfers: Table_temporal_send_account_transfers;

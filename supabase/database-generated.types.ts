@@ -2115,6 +2115,11 @@ export type Database = {
         | "GitHub"
         | "Telegram"
         | "Discord"
+        | "Facebook"
+        | "OnlyFans"
+        | "WhatsApp"
+        | "Snapchat"
+        | "Twitch"
       lookup_type_enum: "sendid" | "tag" | "refcode" | "address" | "phone"
       tag_status: "pending" | "confirmed" | "available"
       temporal_status:
@@ -2395,6 +2400,11 @@ export const Constants = {
         "GitHub",
         "Telegram",
         "Discord",
+        "Facebook",
+        "OnlyFans",
+        "WhatsApp",
+        "Snapchat",
+        "Twitch",
       ],
       lookup_type_enum: ["sendid", "tag", "refcode", "address", "phone"],
       tag_status: ["pending", "confirmed", "available"],
