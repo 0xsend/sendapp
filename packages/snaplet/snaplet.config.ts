@@ -181,6 +181,9 @@ export default defineConfig({
       send_earn_withdraw: ({ row }) => {
         return row
       },
+      link_in_bio: ({ row }) => {
+        return row
+      },
     },
   },
 })

@@ -7,11 +7,11 @@ import { IconXLogo } from './IconXLogo'
 import { IconTelegramLogo } from './IconTelegramLogo'
 import { IconYoutube } from './IconYoutube'
 import { IconDiscord } from './IconDiscord'
-import type { Database } from '@my/supabase/database-generated.types'
-import { XStack } from '@my/ui'
+import { type ColorTokens, XStack } from '@my/ui'
 import { IconWorldSearch } from './IconWorldSearch'
+import type { LinkInBioDomainNamesEnum } from 'app/utils/useLinkInBioMutation'
 
-export const domainColors = {
+export const domainColors: Partial<Record<LinkInBioDomainNamesEnum, ColorTokens>> = {
   X: 'black',
   Telegram: '$telegramBlue',
   Discord: '$discordPurple',
@@ -21,10 +21,7 @@ export const domainColors = {
   GitHub: 'black',
 } as const
 
-const domainIcons: Record<
-  Database['public']['Enums']['link_in_bio_domain_names'],
-  NamedExoticComponent<IconProps>
-> = {
+const domainIcons: Partial<Record<LinkInBioDomainNamesEnum, NamedExoticComponent<IconProps>>> = {
   X: IconXLogo,
   Telegram: IconTelegramLogo,
   YouTube: IconYoutube,

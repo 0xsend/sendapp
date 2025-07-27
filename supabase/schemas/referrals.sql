@@ -54,9 +54,20 @@ begin
         case when p.id = ( select auth.uid() ) then sa.main_tag_id end,
         mt.name::text,
         CASE WHEN p.is_public THEN
-            (SELECT array_agg((NULL::integer, NULL::uuid, sl2.handle, sl2.domain_name, sl2.domain, sl2.created_at, sl2.updated_at)::link_in_bio)
-            FROM link_in_bio sl2
-            WHERE sl2.user_id = p.id AND sl2.handle IS NOT NULL)
+(SELECT array_agg(link_in_bio_row)
+            FROM (
+                SELECT ROW(
+                    id,
+                    user_id,
+                    handle,
+                    domain_name,
+                    created_at,
+                    updated_at,
+                    domain
+                )::link_in_bio as link_in_bio_row
+                FROM link_in_bio
+                WHERE user_id = p.id AND handle IS NOT NULL
+            ) sub)
         ELSE NULL
         END,
         p.banner_url::text
@@ -434,9 +445,20 @@ BEGIN
                 p.send_id,
                 CASE WHEN p.is_public THEN p.x_username ELSE NULL END AS x_username,
                 CASE WHEN p.is_public THEN
-                    (SELECT array_agg((NULL::integer, NULL::uuid, sl.handle, sl.domain_name, sl.domain, sl.created_at, sl.updated_at)::link_in_bio)
-                     FROM link_in_bio sl
-                     WHERE sl.user_id = p.id AND sl.handle IS NOT NULL)
+(SELECT array_agg(link_in_bio_row)
+                    FROM (
+                        SELECT ROW(
+                            id,
+                            user_id,
+                            handle,
+                            domain_name,
+                            created_at,
+                            updated_at,
+                            domain
+                        )::link_in_bio as link_in_bio_row
+                        FROM link_in_bio
+                        WHERE user_id = p.id AND handle IS NOT NULL
+                    ) sub)
                 ELSE NULL
                 END AS links_in_bio,
                 CASE WHEN p.is_public THEN p.birthday ELSE NULL END AS birthday,

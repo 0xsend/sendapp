@@ -168,9 +168,9 @@ type Override = {
       user_id?: string;
       handle?: string;
       domain_name?: string;
-      domain?: string;
       created_at?: string;
       updated_at?: string;
+      domain?: string;
       users?: string;
     };
   }

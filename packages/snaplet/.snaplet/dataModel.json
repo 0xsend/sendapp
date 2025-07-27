@@ -2903,20 +2903,6 @@
           "maxLength": null
         },
         {
-          "id": "public.link_in_bio.domain",
-          "name": "domain",
-          "columnName": "domain",
-          "type": "text",
-          "isRequired": false,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": true,
-          "sequence": false,
-          "hasDefaultValue": false,
-          "isId": false,
-          "maxLength": null
-        },
-        {
           "id": "public.link_in_bio.created_at",
           "name": "created_at",
           "columnName": "created_at",
@@ -2941,6 +2927,20 @@
           "isGenerated": false,
           "sequence": false,
           "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.link_in_bio.domain",
+          "name": "domain",
+          "columnName": "domain",
+          "type": "text",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": true,
+          "sequence": false,
+          "hasDefaultValue": false,
           "isId": false,
           "maxLength": null
         },
@@ -12938,16 +12938,31 @@
           "name": "Discord"
         },
         {
+          "name": "Facebook"
+        },
+        {
           "name": "GitHub"
         },
         {
           "name": "Instagram"
         },
         {
+          "name": "OnlyFans"
+        },
+        {
+          "name": "Snapchat"
+        },
+        {
           "name": "Telegram"
         },
         {
           "name": "TikTok"
+        },
+        {
+          "name": "Twitch"
+        },
+        {
+          "name": "WhatsApp"
         },
         {
           "name": "X"
