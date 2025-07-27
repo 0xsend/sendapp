@@ -1,6 +1,8 @@
+import { forwardRef } from 'react'
 import { styled, ButtonText, ButtonIcon, ButtonContext, Button, type ButtonProps } from 'tamagui'
 import { withStaticProperties } from '@tamagui/helpers'
 import { useLink, type LinkProps } from 'solito/link'
+import type { TamaguiElement } from '@tamagui/core'
 
 import { getButtonSized } from '@tamagui/get-button-sized'
 
@@ -85,19 +87,22 @@ const LinkableButtonFrame = styled(Button, {
   },
 })
 
-const LinkableButton_ = ({ href, ...props }: LinkableButtonProps) => {
-  const { onPress: linkOnPress, ...linkProps } = useLink({ href })
-  return (
-    <LinkableButtonFrame
-      onPress={(e) => {
-        e.stopPropagation()
-        linkOnPress(e)
-      }}
-      {...props}
-      {...linkProps}
-    />
-  )
-}
+const LinkableButton_ = forwardRef<TamaguiElement, LinkableButtonProps>(
+  ({ href, ...props }, ref) => {
+    const { onPress: linkOnPress, ...linkProps } = useLink({ href })
+    return (
+      <LinkableButtonFrame
+        ref={ref}
+        onPress={(e) => {
+          e.stopPropagation()
+          linkOnPress(e)
+        }}
+        {...props}
+        {...linkProps}
+      />
+    )
+  }
+)
 
 export const LinkableButton = withStaticProperties(LinkableButton_, {
   Text: ButtonText,
