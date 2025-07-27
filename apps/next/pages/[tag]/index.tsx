@@ -78,6 +78,20 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
     }
   }
 
+  // Cache responses for anonymous users (including social media crawlers)
+  // but always serve fresh data to logged-in users
+  if (!session) {
+    // Anonymous users get cached responses - prevents social media crawler spam
+    ctx.res.setHeader(
+      'Cache-Control',
+      'public, s-maxage=86400, max-age=3600, stale-while-revalidate=172800'
+    )
+    ctx.res.setHeader('CDN-Cache-Control', 'max-age=86400')
+  } else {
+    // Logged-in users always get fresh data
+    ctx.res.setHeader('Cache-Control', 'private, no-cache, no-store, must-revalidate')
+  }
+
   if (!profile.is_public && !session) {
     // profile is private and user is not logged in
     // return 404

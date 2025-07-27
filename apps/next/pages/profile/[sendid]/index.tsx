@@ -63,12 +63,26 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
     }
   }
 
+  // Cache responses for anonymous users (including social media crawlers)
+  // but always serve fresh data to logged-in users
+  if (!session) {
+    // Anonymous users get cached responses - prevents social media crawler spam
+    ctx.res.setHeader(
+      'Cache-Control',
+      'public, s-maxage=86400, max-age=3600, stale-while-revalidate=172800'
+    )
+    ctx.res.setHeader('CDN-Cache-Control', 'max-age=86400')
+  } else {
+    // Logged-in users always get fresh data
+    ctx.res.setHeader('Cache-Control', 'private, no-cache, no-store, must-revalidate')
+  }
+
   // Generate SEO data using helper functions
   const profileData: ProfileSeoData = {
     name: profile.name || undefined,
     sendid: profile.sendid ?? undefined,
     all_tags: profile.all_tags,
-    tag: profile.main_tag_name || tag,
+    tag: profile.main_tag_name || undefined,
     about: profile.about || undefined,
     avatarUrl: profile.avatar_url || undefined,
   }

@@ -27,10 +27,13 @@ export type SeoGenerationOptions = {
  */
 export function generateProfileTitle(profile: ProfileSeoData): string {
   if (profile.tag) {
-    return `send.app/${profile.tag}`
+    const hostname = process.env.NEXT_PUBLIC_URL
+      ? new URL(process.env.NEXT_PUBLIC_URL).hostname
+      : 'send.app'
+    return `${hostname}/${profile.tag}`
   }
   if (profile.name) {
-    return `Profile of ${profile.name}`
+    return `Send | ${profile.name}`
   }
   return 'Send | Profile'
 }
