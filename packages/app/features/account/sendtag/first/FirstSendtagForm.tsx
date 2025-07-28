@@ -125,7 +125,7 @@ export const FirstSendtagForm = () => {
               },
               iconBefore: (
                 <Paragraph
-                  ml={4}
+                  ml={Platform.OS === 'web' ? -12 : 4}
                   size={'$5'}
                   opacity={formName ? 1 : 0}
                   mb={Platform.OS === 'web' ? undefined : 2}

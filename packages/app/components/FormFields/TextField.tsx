@@ -10,11 +10,14 @@ import {
   Stack,
   Theme,
   useThemeName,
+  type StackProps,
 } from '@my/ui'
 import type { IconProps } from '@tamagui/helpers-icon'
 import { AlertTriangle } from '@tamagui/lucide-icons'
 import { useStringFieldInfo, useTsController } from '@ts-react/form'
 import { useId } from 'react'
+import IconBefore from './IconBefore/IconBefore'
+import IconAfter from './IconAfter/IconAfter'
 
 export const TextField = (
   props: InputProps & {
@@ -23,6 +26,8 @@ export const TextField = (
     iconBefore?: React.ReactNode
     iconAfter?: React.ReactNode
     iconProps?: IconProps
+    iconBeforeProps?: StackProps
+    iconAfterProps?: StackProps
   }
 ) => {
   const {
@@ -54,18 +59,7 @@ export const TextField = (
         )}
         <Stack pos="relative">
           {props.iconBefore && (
-            <Stack
-              pos={'absolute'}
-              top={0}
-              bottom={0}
-              left={0}
-              right={0}
-              justifyContent="center"
-              zIndex={1}
-              pointerEvents="box-none" // Prevent blocking interactions
-            >
-              {props.iconBefore}
-            </Stack>
+            <IconBefore {...props.iconBeforeProps}>{props.iconBefore}</IconBefore>
           )}
           <Input
             aria-label={label ?? field.name}
@@ -96,21 +90,7 @@ export const TextField = (
             position="relative"
             {...props}
           />
-          {props.iconAfter && (
-            <Stack
-              pos={'absolute'}
-              top={0}
-              bottom={0}
-              left={0}
-              right={0}
-              justifyContent="center"
-              alignItems={'flex-end'}
-              zIndex={1}
-              pointerEvents="box-none" // Prevent blocking interactions
-            >
-              {props.iconAfter}
-            </Stack>
-          )}
+          {props.iconAfter && <IconAfter {...props.iconAfterProps}>{props.iconAfter}</IconAfter>}
         </Stack>
         <Stack position="absolute" right="$4" gap="$2">
           {(() => {

@@ -263,16 +263,18 @@ export const SignUpScreen = () => {
                 },
                 iconBefore: (
                   <Paragraph
-                    ml={4}
+                    ml={Platform.OS === 'web' ? -12 : 4}
                     size={'$5'}
                     opacity={formName ? 1 : 0}
                     mb={Platform.OS === 'web' ? 0 : 2}
-                    maw={0}
-                    overflow="visible"
                   >
                     /
                   </Paragraph>
                 ),
+                iconBeforeProps: {
+                  padding: 0,
+                  paddingLeft: Platform.OS === 'web' ? '$3' : 0,
+                },
               },
               isAgreedToTerms: {
                 id: termsCheckboxId,
@@ -280,6 +282,7 @@ export const SignUpScreen = () => {
             }}
             formProps={{
               w: '100%',
+              footerProps: { padding: 0 },
               $gtSm: {
                 maxWidth: '100%',
               },
