@@ -11,7 +11,7 @@ export default function IconBefore({ children, ...props }: PropsWithChildren & S
       right={0}
       justifyContent="center"
       zIndex={1}
-      pointerEvents="box-none"
+      pointerEvents="none"
       {...props}
     >
       {children}
