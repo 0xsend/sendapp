@@ -584,7 +584,7 @@ function Search({ label, placeholder = 'Search', autoFocus = false, containerPro
                 fontSize: 17,
                 iconBefore: (
                   <IconSearch
-                    ml={'$3'}
+                    ml={Platform.OS === 'web' ? 0 : '$3'}
                     color={'$silverChalice'}
                     $theme-light={{ color: '$darkGrayTextField' }}
                   />
@@ -594,7 +594,7 @@ function Search({ label, placeholder = 'Search', autoFocus = false, containerPro
                     chromeless
                     unstyled
                     cursor={'pointer'}
-                    mr={'$3'}
+                    mr={Platform.OS === 'web' ? 0 : '$3'}
                     icon={
                       <IconX
                         color={'$silverChalice'}

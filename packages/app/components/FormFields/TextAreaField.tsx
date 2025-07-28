@@ -5,6 +5,7 @@ import {
   type LabelProps,
   Shake,
   Stack,
+  type StackProps,
   TextArea,
   type TextAreaProps,
   Theme,
@@ -14,9 +15,17 @@ import {
 import { useThemeSetting } from '@tamagui/next-theme'
 import { useStringFieldInfo, useTsController } from '@ts-react/form'
 import { type ReactNode, useId } from 'react'
+import IconBefore from './IconBefore/IconBefore'
+import IconAfter from './IconAfter/IconAfter'
 
 export const TextAreaField = (
-  props: TextAreaProps & { labelProps?: LabelProps; iconBefore?: ReactNode; iconAfter?: ReactNode }
+  props: TextAreaProps & {
+    labelProps?: LabelProps
+    iconBefore?: ReactNode
+    iconAfter?: ReactNode
+    iconBeforeProps?: StackProps
+    iconAfterProps?: StackProps
+  }
 ) => {
   const {
     field,
@@ -49,18 +58,7 @@ export const TextAreaField = (
         <Shake shakeKey={error?.errorMessage}>
           <Stack pos="relative">
             {props.iconBefore && (
-              <Stack
-                pos={'absolute'}
-                top={0}
-                bottom={0}
-                left={0}
-                right={0}
-                justifyContent="center"
-                zIndex={1}
-                pointerEvents="box-none"
-              >
-                {props.iconBefore}
-              </Stack>
+              <IconBefore {...props.iconBeforeProps}>{props.iconBefore}</IconBefore>
             )}
             <TextArea
               disabled={disabled}
@@ -93,21 +91,7 @@ export const TextAreaField = (
               }}
               {...props}
             />
-            {props.iconAfter && (
-              <Stack
-                pos={'absolute'}
-                top={0}
-                bottom={0}
-                left={0}
-                right={0}
-                justifyContent="center"
-                alignItems={'flex-end'}
-                zIndex={1}
-                pointerEvents="box-none" // Prevent blocking interactions
-              >
-                {props.iconAfter}
-              </Stack>
-            )}
+            {props.iconAfter && <IconAfter {...props.iconAfterProps}>{props.iconAfter}</IconAfter>}
           </Stack>
         </Shake>
         <FieldError message={error?.errorMessage} />

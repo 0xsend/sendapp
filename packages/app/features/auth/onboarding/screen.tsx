@@ -198,7 +198,7 @@ export function OnboardingScreen() {
                 },
                 iconBefore: (
                   <Paragraph
-                    ml={Platform.OS === 'web' ? 4 : 3}
+                    ml={Platform.OS === 'web' ? -12 : 4}
                     mb={Platform.OS === 'web' ? 0 : 2}
                     size={'$5'}
                     opacity={formName ? 1 : 0}
