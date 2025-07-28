@@ -262,14 +262,13 @@ export const SignUpScreen = () => {
                   width: '100%',
                 },
                 iconBefore: (
-                  <Paragraph
+                  <XStack
                     ml={Platform.OS === 'web' ? -12 : 4}
-                    size={'$5'}
                     opacity={formName ? 1 : 0}
                     mb={Platform.OS === 'web' ? 0 : 2}
                   >
-                    /
-                  </Paragraph>
+                    <Paragraph size={'$5'}>/</Paragraph>
+                  </XStack>
                 ),
                 iconBeforeProps: {
                   padding: 0,
