@@ -3,14 +3,13 @@ import {
   Fade,
   H4,
   Paragraph,
+  PrimaryButton,
   ScrollView,
   Separator,
   Spinner,
-  XStack,
-  YGroup,
-  YStack,
   useAppToast,
-  PrimaryButton,
+  XStack,
+  YStack,
 } from '@my/ui'
 import { baseMainnetBundlerClient, entryPointAddress } from '@my/wagmi'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -28,7 +27,7 @@ import { toNiceError } from 'app/utils/toNiceError'
 import { useAccountNonce, useUserOp } from 'app/utils/userop'
 import debug from 'debug'
 import { useMemo, useState } from 'react'
-import { SectionList } from 'react-native'
+import { Platform, SectionList } from 'react-native'
 import { formatUnits, withRetry } from 'viem'
 import { useChainId } from 'wagmi'
 import { useEarnRewardsActivityFeed } from './hooks'
@@ -180,8 +179,15 @@ function RewardsBalance() {
   // We don't need to show a loading spinner here since TotalRewards handles it
 
   return (
-    <YStack w={'100%'} gap={'$4'} pb={'$3'} $gtLg={{ w: '50%' }}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+    <YStack
+      w={'100%'}
+      gap={'$4'}
+      pb={'$3'}
+      f={Platform.OS === 'web' ? undefined : 1}
+      $gtLg={{ w: '50%' }}
+      elevation={Platform.OS === 'web' ? 0 : '$0.75'}
+    >
+      <ScrollView showsVerticalScrollIndicator={false} overflow={'visible'}>
         <YStack gap={'$4'}>
           <TotalRewards
             rewards={formattedRewards}
@@ -283,45 +289,59 @@ const RewardsFeed = () => {
         showsVerticalScrollIndicator={false}
         keyExtractor={(activity) => `${activity.event_name}-${activity.created_at.getTime()}`}
         renderItem={({ item: activity, index, section }) => (
-          <YGroup
+          <YStack
             bc="$color1"
             px="$2"
             $gtLg={{
               px: '$3.5',
             }}
-            {...(index === 0 && {
-              pt: '$2',
-              $gtLg: {
-                pt: '$3.5',
-              },
-              borderTopLeftRadius: '$4',
-              borderTopRightRadius: '$4',
-            })}
+            {...(index === 0 &&
+              Platform.OS === 'web' && {
+                pt: '$2',
+                $gtLg: {
+                  pt: '$3.5',
+                },
+                borderTopLeftRadius: '$6',
+                borderTopRightRadius: '$6',
+              })}
             {...(index === section.data.length - 1 && {
               pb: '$2',
               $gtLg: {
                 pb: '$3.5',
               },
-              borderBottomLeftRadius: '$4',
-              borderBottomRightRadius: '$4',
+              borderBottomLeftRadius: '$6',
+              borderBottomRightRadius: '$6',
             })}
           >
-            <YGroup.Item>
-              <TokenActivityRow activity={activity} />
-            </YGroup.Item>
-          </YGroup>
+            <TokenActivityRow activity={activity} />
+          </YStack>
         )}
-        renderSectionHeader={({ section: { title, index } }) => (
-          <H4
-            fontWeight={'600'}
-            size={'$7'}
-            pt={index === 0 ? 0 : '$3.5'}
-            pb="$3.5"
-            bc="$background"
-          >
-            {title}
-          </H4>
-        )}
+        renderSectionHeader={({ section: { title, index } }) =>
+          Platform.OS === 'web' ? (
+            <H4
+              fontWeight={'600'}
+              size={'$7'}
+              pt={index === 0 ? 0 : '$3.5'}
+              pb={'$3.5'}
+              bc={'$background'}
+            >
+              {title}
+            </H4>
+          ) : (
+            <XStack
+              mt={index === 0 ? 0 : '$3.5'}
+              p={'$3.5'}
+              pb={0}
+              bc={'$color1'}
+              borderTopLeftRadius={'$6'}
+              borderTopRightRadius={'$6'}
+            >
+              <Paragraph fontWeight={'900'} size={'$5'}>
+                {title}
+              </Paragraph>
+            </XStack>
+          )
+        }
         onEndReached={() => hasNextPage && fetchNextPage()}
         ListFooterComponent={!isLoading && isFetchingNextPage ? <Spinner size="small" /> : null}
         stickySectionHeadersEnabled={true}
@@ -354,7 +374,13 @@ const TotalRewards = ({ rewards, isLoading, coin }: TotalRewardsProps = {}) => {
 
   return (
     <Fade>
-      <Card w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>
+      <Card
+        w={'100%'}
+        p={'$5'}
+        gap={'$7'}
+        elevation={Platform.OS === 'web' ? '$0.75' : 0}
+        $gtLg={{ p: '$7' }}
+      >
         <YStack gap={'$4'}>
           <XStack ai={'center'} gap={'$2'}>
             <IconCoin symbol={coin?.symbol || ''} size={'$2'} />

@@ -144,6 +144,7 @@ export const EarningsFeed = () => {
             </H4>
           ) : (
             <XStack
+              mt={index === 0 ? 0 : '$3.5'}
               p={'$3.5'}
               pb={0}
               bc={'$color1'}

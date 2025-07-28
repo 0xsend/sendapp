@@ -287,7 +287,6 @@ const EarningButton = ({
       <Link href={href}>
         <XStack
           jc={'center'}
-          px={'$5'}
           py={'$3.5'}
           br={'$6'}
           backgroundColor={'$color1'}
