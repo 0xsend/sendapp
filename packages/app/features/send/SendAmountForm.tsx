@@ -246,7 +246,7 @@ export function SendAmountForm() {
                     unstyled
                     chromeless
                     cursor={'pointer'}
-                    mr={'$3'}
+                    mr={Platform.OS === 'web' ? 0 : '$3'}
                     icon={
                       <IconX
                         color={'$primary'}

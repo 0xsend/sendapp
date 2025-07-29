@@ -2,21 +2,23 @@ import { useThemeSetting } from '@tamagui/next-theme'
 import { useStringFieldInfo, useTsController } from '@ts-react/form'
 import { forwardRef, type ReactNode, useEffect, useId, useRef } from 'react'
 import {
+  FieldError,
   Fieldset,
+  isWeb,
   Label,
+  type LabelProps,
+  Shake,
+  type StackProps,
+  type TamaguiElement,
   TextArea,
   type TextAreaProps,
   Theme,
   type ThemeName,
-  useThemeName,
-  FieldError,
-  Shake,
-  type LabelProps,
-  Stack,
   useComposedRefs,
-  type TamaguiElement,
-  isWeb,
+  useThemeName,
 } from '@my/ui'
+import IconBefore from './IconBefore/IconBefore'
+import IconAfter from './IconAfter/IconAfter'
 
 export const MAX_NOTE_LENGTH = 100
 const MIN_NOTE_ROWS = 1
@@ -32,7 +34,13 @@ function adjustNoteFieldHeightForWeb(noteField: HTMLTextAreaElement) {
 
 export const NoteField = forwardRef<
   TamaguiElement,
-  TextAreaProps & { labelProps?: LabelProps; iconBefore?: ReactNode; iconAfter?: ReactNode }
+  TextAreaProps & {
+    labelProps?: LabelProps
+    iconBefore?: ReactNode
+    iconAfter?: ReactNode
+    iconBeforeProps?: StackProps
+    iconAfterProps?: StackProps
+  }
 >((props, forwardedRef) => {
   const {
     field,
@@ -78,18 +86,7 @@ export const NoteField = forwardRef<
         )}
         <Shake shakeKey={error?.errorMessage}>
           {props.iconBefore && (
-            <Stack
-              pos={'absolute'}
-              top={0}
-              bottom={0}
-              left={0}
-              right={0}
-              justifyContent="center"
-              zIndex={1}
-              pointerEvents="box-none" // Prevent blocking interactions
-            >
-              {props.iconBefore}
-            </Stack>
+            <IconBefore {...props.iconBeforeProps}>{props.iconBefore}</IconBefore>
           )}
           <TextArea
             disabled={disabled}
@@ -122,21 +119,7 @@ export const NoteField = forwardRef<
             bw={1}
             {...props}
           />
-          {props.iconAfter && (
-            <Stack
-              pos={'absolute'}
-              top={0}
-              bottom={0}
-              left={0}
-              right={0}
-              justifyContent="center"
-              alignItems={'flex-end'}
-              zIndex={1}
-              pointerEvents="box-none" // Prevent blocking interactions
-            >
-              {props.iconAfter}
-            </Stack>
-          )}
+          {props.iconAfter && <IconAfter {...props.iconAfterProps}>{props.iconAfter}</IconAfter>}
         </Shake>
         <FieldError message={error?.errorMessage} />
       </Fieldset>

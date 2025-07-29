@@ -1,5 +1,4 @@
 import { ProfileScreen } from 'app/features/profile/screen'
-import { NextSeo } from 'next-seo'
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
 import type { NextPageWithLayout } from '../_app'
 import type { GetServerSideProps, GetServerSidePropsContext } from 'next'
@@ -9,45 +8,22 @@ import { SendtagSchema } from 'app/utils/zod/sendtag'
 import { assert } from 'app/utils/assert'
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { ProfileLayout } from 'app/features/profile/layout.web'
-import { getSiteUrl } from 'utils/getSiteUrl'
 import { buildSeo } from 'utils/seo'
 import { generateProfileSeoData, type ProfileSeoData } from 'utils/seoHelpers'
 
 interface PageProps {
   sendid: number | null
-  tag?: string
-  siteUrl: string
-  profileSeoData?: {
-    title: string
-    description: string
-    canonicalUrl: string
-    imageUrl: string
-  }
+  seo: ReturnType<typeof buildSeo>
 }
 
-export const Page: NextPageWithLayout<PageProps> = ({ sendid, tag, siteUrl, profileSeoData }) => {
-  // Generate SEO configuration using buildSeo utility with consistent fallbacks
-  const seo = buildSeo({
-    title: profileSeoData?.title ?? 'Send | Profile',
-    description: profileSeoData?.description ?? `Check out ${tag ? `/${tag}` : sendid} on Send`,
-    url: profileSeoData?.canonicalUrl ?? `${siteUrl}/${tag}`,
-    image: profileSeoData?.imageUrl,
-    type: 'profile',
-  })
-
-  return (
-    <>
-      <NextSeo {...seo} />
-      <ProfileScreen sendid={sendid} />
-    </>
-  )
+export const Page: NextPageWithLayout<PageProps> = ({ sendid }) => {
+  return <ProfileScreen sendid={sendid} />
 }
 
 // Profile page is not protected, but we need to look up the user profile by tag in case we have to show a 404
 export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   const { tag: tagParam } = ctx.params ?? {}
 
-  // ensure identifier is valid before proceeding
   const result = SendtagSchema.safeParse({
     name: tagParam?.toString().match(/^@/) ? tagParam.toString().slice(1) : tagParam,
   })
@@ -64,7 +40,7 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   assert(typeof tag === 'string', 'Identifier tag must be a string')
 
   // Get site URL securely using Vercel environment variables
-  const siteUrl = getSiteUrl()
+  const siteUrl = process.env.NEXT_PUBLIC_URL || 'https://send.app'
 
   const supabase = createPagesServerClient<Database>(ctx)
   const {
@@ -77,7 +53,7 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
     if (needsOnboarding) return needsOnboarding
   }
 
-  // check if profile exists
+  // Use profile_lookup to check existence and get full profile data in one call
   const supabaseAdmin = createSupabaseAdminClient()
   const { data: profile, error } = await supabaseAdmin
     .rpc('profile_lookup', {
@@ -91,8 +67,33 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
     throw error
   }
 
-  if (profile === null || (!profile.is_public && !session)) {
-    // no profile or profile is private and user is not logged in
+  if (profile === null) {
+    // profile doesn't exist, redirect to onboarding
+    console.log(`Profile not found for tag: ${tag}, redirecting to onboarding`)
+    return {
+      redirect: {
+        destination: `/auth/sign-up?tag=${encodeURIComponent(tag)}`,
+        permanent: false,
+      },
+    }
+  }
+
+  // Cache responses for anonymous users (including social media crawlers)
+  // but always serve fresh data to logged-in users
+  if (!session) {
+    // Anonymous users get cached responses - prevents social media crawler spam
+    ctx.res.setHeader(
+      'Cache-Control',
+      'public, s-maxage=86400, max-age=3600, stale-while-revalidate=172800'
+    )
+    ctx.res.setHeader('CDN-Cache-Control', 'max-age=86400')
+  } else {
+    // Logged-in users always get fresh data
+    ctx.res.setHeader('Cache-Control', 'private, no-cache, no-store, must-revalidate')
+  }
+
+  if (!profile.is_public && !session) {
+    // profile is private and user is not logged in
     // return 404
     return {
       notFound: true,
@@ -102,7 +103,8 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   // Generate SEO data using helper functions for consistency
   const profileData: ProfileSeoData = {
     name: profile.name || undefined,
-    sendid: profile.sendid,
+    sendid: profile.sendid ?? undefined,
+    all_tags: profile.all_tags,
     tag: profile.main_tag_name || tag,
     about: profile.about || undefined,
     avatarUrl: profile.avatar_url || undefined,
@@ -113,12 +115,20 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
     route: `/${tag}`,
   })
 
+  // Generate SEO configuration server-side
+  const seo = buildSeo({
+    title: profileSeoData?.title ?? 'Send | Profile',
+    description:
+      profileSeoData?.description ?? `Check out ${tag ? `/${tag}` : profile.sendid} on Send`,
+    url: profileSeoData?.canonicalUrl ?? `${siteUrl}/${tag}`,
+    image: profileSeoData?.imageUrl,
+    type: 'profile',
+  })
+
   return {
     props: {
       sendid: profile.sendid,
-      tag,
-      siteUrl,
-      profileSeoData,
+      seo,
     },
   }
 }) satisfies GetServerSideProps

@@ -151,7 +151,12 @@ export const PersonalInfoScreen = () => {
           bc: '$color0',
           pl: '$8',
           iconBefore: (
-            <Text ml={'$4'} color="$color10" userSelect={'none'} fontSize={'$6'}>
+            <Text
+              ml={Platform.OS === 'web' ? 0 : '$4'}
+              color="$color10"
+              userSelect={'none'}
+              fontSize={'$6'}
+            >
               @
             </Text>
           ),

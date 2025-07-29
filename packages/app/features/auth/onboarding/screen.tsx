@@ -197,14 +197,13 @@ export function OnboardingScreen() {
                   width: '100%',
                 },
                 iconBefore: (
-                  <Paragraph
-                    ml={Platform.OS === 'web' ? 4 : 3}
+                  <XStack
+                    ml={Platform.OS === 'web' ? -12 : 4}
                     mb={Platform.OS === 'web' ? 0 : 2}
-                    size={'$5'}
                     opacity={formName ? 1 : 0}
                   >
-                    /
-                  </Paragraph>
+                    <Paragraph size={'$5'}>/</Paragraph>
+                  </XStack>
                 ),
               },
             }}

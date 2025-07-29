@@ -124,14 +124,13 @@ export const FirstSendtagForm = () => {
                 width: '100%',
               },
               iconBefore: (
-                <Paragraph
-                  ml={4}
-                  size={'$5'}
+                <XStack
+                  ml={Platform.OS === 'web' ? -12 : 4}
                   opacity={formName ? 1 : 0}
                   mb={Platform.OS === 'web' ? undefined : 2}
                 >
-                  /
-                </Paragraph>
+                  <Paragraph size={'$5'}>/</Paragraph>
+                </XStack>
               ),
             },
           }}

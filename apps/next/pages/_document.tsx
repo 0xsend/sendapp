@@ -49,10 +49,6 @@ export default class Document extends NextDocument {
             <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
           ) : null}
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-          <meta
-            name="viewport"
-            content="viewport-fit=cover, user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1"
-          />
           <meta name="mobile-web-app-capable" content="yes" />
           <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
           <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />

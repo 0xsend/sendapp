@@ -400,6 +400,7 @@ export type Database = {
         Row: {
           about: string | null
           avatar_url: string | null
+          banner_url: string | null
           birthday: string | null
           id: string
           is_public: boolean | null
@@ -416,6 +417,7 @@ export type Database = {
         Insert: {
           about?: string | null
           avatar_url?: string | null
+          banner_url?: string | null
           birthday?: string | null
           id: string
           is_public?: boolean | null
@@ -427,6 +429,7 @@ export type Database = {
         Update: {
           about?: string | null
           avatar_url?: string | null
+          banner_url?: string | null
           birthday?: string | null
           id?: string
           is_public?: boolean | null
@@ -1666,6 +1669,7 @@ export type Database = {
           address: string | null
           all_tags: string[] | null
           avatar_url: string | null
+          banner_url: string | null
           birthday: string | null
           chain_id: number | null
           id: string | null
@@ -2159,6 +2163,7 @@ export type Database = {
         links_in_bio:
           | Database["public"]["Tables"]["link_in_bio"]["Row"][]
           | null
+        banner_url: string | null
       }
       tag_search_result: {
         avatar_url: string | null

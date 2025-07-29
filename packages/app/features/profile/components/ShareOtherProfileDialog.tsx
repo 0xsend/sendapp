@@ -1,9 +1,7 @@
-import { Button, Dialog, Image, isWeb, Paragraph, Separator, useAppToast, YStack } from '@my/ui'
-import { IconCopy } from 'app/components/icons'
+import { Button, Dialog, isWeb, Paragraph, Separator, useAppToast, YStack, QRCode } from '@my/ui'
+import { IconCopy, IconSend } from 'app/components/icons'
 import type { Functions } from '@my/supabase/database.types'
 import * as Clipboard from 'expo-clipboard'
-import QRCode from 'qrcode'
-import { useEffect, useState } from 'react'
 
 interface ShareOtherProfileDialogProps {
   isOpen: boolean
@@ -17,40 +15,18 @@ export function ShareOtherProfileDialog({
   profile,
 }: ShareOtherProfileDialogProps) {
   const toast = useAppToast()
-  const [qrCodeDataURL, setQrCodeDataURL] = useState<string>('')
 
-  const hostname = isWeb ? window.location.hostname : 'send.app'
   const sendtag = profile?.main_tag_name
-
+  const hostname = isWeb ? window.location.hostname : 'send.app'
   const profileUrl = sendtag
     ? `https://${hostname}/${sendtag}`
     : `https://${hostname}/profile/${profile?.sendid}`
-
-  useEffect(() => {
-    if (isOpen && profileUrl && profile) {
-      QRCode.toDataURL(profileUrl, {
-        width: 200,
-        margin: 2,
-        color: {
-          dark: '#000000',
-          light: '#FFFFFF',
-        },
-      })
-        .then(setQrCodeDataURL)
-        .catch((e) => {
-          console.error(e)
-          toast.error('Failed to create QR code', {
-            message: 'Something went wrong while creating QR code',
-          })
-          setQrCodeDataURL('')
-        })
-    }
-  }, [isOpen, profileUrl, profile, toast.error])
 
   const handleCopyLink = async () => {
     try {
       await Clipboard.setStringAsync(profileUrl)
       toast.show('Profile link copied to clipboard')
+      onClose()
     } catch {
       toast.error('Failed to copy link', {
         message: 'Something went wrong while copying the link',
@@ -79,9 +55,9 @@ export function ShareOtherProfileDialog({
           </Paragraph>
           <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
 
-          {qrCodeDataURL && (
+          {profileUrl && (
             <YStack ai={'center'} gap={'$3'}>
-              <Image source={{ uri: qrCodeDataURL }} width={200} height={200} br={'$3'} />
+              <QRCode value={profileUrl} size={240} centerComponent={<IconSend size={'$5'} />} />
               <Paragraph size={'$4'} color={'$color10'} ta={'center'} numberOfLines={1}>
                 {profileUrl}
               </Paragraph>
@@ -96,7 +72,6 @@ export function ShareOtherProfileDialog({
             <Button
               theme="green"
               borderRadius={'$4'}
-              p={'$4'}
               onPress={handleCopyLink}
               focusStyle={{ outlineWidth: 0 }}
             >
@@ -124,6 +99,15 @@ export function ShareOtherProfileDialog({
           </YStack>
         </Dialog.Content>
       </Dialog.Portal>
+
+      <Dialog.Adapt platform="native">
+        <Dialog.Sheet modal dismissOnSnapToBottom dismissOnOverlayPress native snapPoints={[65]}>
+          <Dialog.Sheet.Frame gap="$3.5" padding="$5">
+            <Dialog.Adapt.Contents />
+          </Dialog.Sheet.Frame>
+          <Dialog.Sheet.Overlay />
+        </Dialog.Sheet>
+      </Dialog.Adapt>
     </Dialog>
   )
 }

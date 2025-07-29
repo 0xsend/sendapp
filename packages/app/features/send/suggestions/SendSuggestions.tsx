@@ -61,7 +61,7 @@ const SuggestionsList = ({
                 keyExtractor={(item, index) => item?.send_id?.toString() ?? String(index)}
                 showsHorizontalScrollIndicator={false}
                 style={{
-                  overflow: 'visible',
+                  overflow: Platform.OS === 'web' ? undefined : 'visible',
                 }}
               />
             )

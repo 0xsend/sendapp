@@ -12,6 +12,7 @@ const Instagram = (props) => {
       width={size ?? 24}
       height={size ?? 24}
       viewBox="0 0 24 24"
+      preserveAspectRatio="xMidYMid meet"
       {...rest}
     >
       <Path

@@ -6,11 +6,12 @@
  */
 
 export type ProfileSeoData = {
-  name?: string
-  sendid?: number
-  tag?: string
-  about?: string
-  avatarUrl?: string
+  name?: string | null
+  sendid?: number | null
+  all_tags?: string[] | null
+  tag?: string | null
+  about?: string | null
+  avatarUrl?: string | null
 }
 
 export type SeoGenerationOptions = {
@@ -26,10 +27,13 @@ export type SeoGenerationOptions = {
  */
 export function generateProfileTitle(profile: ProfileSeoData): string {
   if (profile.tag) {
-    return `send.app/${profile.tag}`
+    const hostname = process.env.NEXT_PUBLIC_URL
+      ? new URL(process.env.NEXT_PUBLIC_URL).hostname
+      : 'send.app'
+    return `${hostname}/${profile.tag}`
   }
   if (profile.name) {
-    return `Profile of ${profile.name}`
+    return `Send | ${profile.name}`
   }
   return 'Send | Profile'
 }
@@ -83,12 +87,14 @@ export function getProfileImageUrl(profile: ProfileSeoData, siteUrl: string): st
   const fallbackImage = 'https://ghassets.send.app/2024/04/send-og-image.png'
 
   // Only generate dynamic image if we have meaningful profile data
-  if (profile.name || profile.avatarUrl || profile.tag || profile.about) {
+  if (profile.name || profile.avatarUrl || profile.all_tags?.length || profile.about) {
     const searchParams = new URLSearchParams()
 
     if (profile.name) searchParams.set('name', profile.name)
     if (profile.avatarUrl) searchParams.set('avatar_url', profile.avatarUrl)
-    if (profile.tag) searchParams.set('all_tags', profile.tag)
+    if (profile.all_tags && profile.all_tags.length > 0) {
+      searchParams.set('all_tags', profile.all_tags.join(','))
+    }
     if (profile.about) searchParams.set('about', profile.about)
 
     return `${siteUrl}/api/og/profile?${searchParams.toString()}`

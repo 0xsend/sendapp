@@ -14,7 +14,7 @@ module.exports = {
   assetBundlePatterns: ['**/*'],
   ios: {
     supportsTablet: true,
-    bundleIdentifier: 'app.send',
+    bundleIdentifier: 'send.app',
     displayName: 'Send',
     associatedDomains: ['webcredentials:send.app'],
     appleTeamId: '8S6R4SU556',

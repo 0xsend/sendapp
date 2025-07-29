@@ -24,6 +24,7 @@ import { useValidateSendtag } from 'app/utils/tags/useValidateSendtag'
 import { useSetFirstSendtag } from 'app/utils/useFirstSendtag'
 import { useUser } from 'app/utils/useUser'
 import { useCallback, useEffect, useId, useState } from 'react'
+import { useDebounce } from '@my/ui'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { z } from 'zod'
@@ -49,8 +50,7 @@ export const SignUpScreen = () => {
   const [formState, setFormState] = useState<FormState>(FormState.Idle)
   const form = useForm<z.infer<typeof SignUpScreenFormSchema>>()
   const router = useRouter()
-  const [queryParams] = useAuthScreenParams()
-  const { redirectUri } = queryParams
+  const [queryParams, setAuthParams] = useAuthScreenParams()
   const toast = useAppToast()
   const supabase = useSupabase()
   const { user } = useUser()
@@ -72,13 +72,49 @@ export const SignUpScreen = () => {
     api.tag.registerFirstSendtag.useMutation()
   const { mutateAsync: setFirstSendtagMutateAsync } = useSetFirstSendtag()
 
+  // Handle form changes and sync to URL
+  const onFormChange = useDebounce(
+    useCallback(
+      (values) => {
+        const { name } = values
+        const trimmedName = name?.trim()
+
+        // Always update the URL params, use undefined to remove empty values
+        setAuthParams(
+          {
+            ...queryParams,
+            tag: trimmedName || undefined,
+          },
+          { webBehavior: 'replace' }
+        )
+      },
+      [setAuthParams, queryParams]
+    ),
+    300,
+    { leading: false },
+    []
+  )
+
   useEffect(() => {
-    const subscription = form.watch(() => {
+    const subscription = form.watch((values) => {
       form.clearErrors('root')
+      onFormChange(values)
     })
 
-    return () => subscription.unsubscribe()
-  }, [form.watch, form.clearErrors])
+    return () => {
+      subscription.unsubscribe()
+      onFormChange.cancel()
+    }
+  }, [form.watch, form.clearErrors, onFormChange])
+
+  // Set initial tag value from URL parameter
+  useEffect(() => {
+    const currentFormValue = form.getValues('name')
+    const urlTag = queryParams.tag
+    if (urlTag && (!currentFormValue || currentFormValue === '')) {
+      form.setValue('name', urlTag)
+    }
+  }, [queryParams.tag, form])
 
   useEffect(() => {
     if (user?.id && formState === FormState.Idle) {
@@ -134,12 +170,12 @@ export const SignUpScreen = () => {
 
     try {
       await signInMutateAsync({})
-      router.push(redirectUri ?? '/')
+      router.push(queryParams.redirectUri ?? '/')
     } catch (error) {
       setFormState(FormState.Idle)
       toast.error(formatErrorMessage(error))
     }
-  }, [signInMutateAsync, toast.error, router.push, redirectUri])
+  }, [signInMutateAsync, toast.error, router.push, queryParams.redirectUri])
 
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (
@@ -196,7 +232,7 @@ export const SignUpScreen = () => {
             onSubmit={handleSubmit}
             schema={SignUpScreenFormSchema}
             defaultValues={{
-              name: '',
+              name: queryParams.tag ?? '',
               isAgreedToTerms: false,
             }}
             props={{
@@ -209,6 +245,7 @@ export const SignUpScreen = () => {
                 br: 0,
                 p: 0,
                 pl: '$2.5',
+                onChangeText: (text: string) => form.setValue('name', text),
                 focusStyle: {
                   outlineWidth: 0,
                 },
@@ -225,15 +262,18 @@ export const SignUpScreen = () => {
                   width: '100%',
                 },
                 iconBefore: (
-                  <Paragraph
-                    ml={4}
-                    size={'$5'}
+                  <XStack
+                    ml={Platform.OS === 'web' ? -12 : 4}
                     opacity={formName ? 1 : 0}
                     mb={Platform.OS === 'web' ? 0 : 2}
                   >
-                    /
-                  </Paragraph>
+                    <Paragraph size={'$5'}>/</Paragraph>
+                  </XStack>
                 ),
+                iconBeforeProps: {
+                  padding: 0,
+                  paddingLeft: Platform.OS === 'web' ? '$3' : 0,
+                },
               },
               isAgreedToTerms: {
                 id: termsCheckboxId,

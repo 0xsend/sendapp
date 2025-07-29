@@ -3,20 +3,16 @@ import { type IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
 import { Path, Svg } from 'react-native-svg'
 
-const aspectRatio = 256 / 199
-
 const Discord = (props) => {
   const { size, color, ...rest } = props
-
-  const height = size / aspectRatio
-  const width = size
 
   return (
     <Svg
       color={color as ColorTokens | undefined}
-      width={width}
-      height={height}
+      width={size}
+      height={size}
       viewBox="0 0 256 199"
+      preserveAspectRatio="xMidYMid meet"
       {...rest}
     >
       <Path
