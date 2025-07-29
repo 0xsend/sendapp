@@ -258,6 +258,9 @@ const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) =
                     }
                   })(),
                 }}
+                style={{
+                  lineHeight: 50,
+                }}
               >
                 {totalAssets}
               </Paragraph>

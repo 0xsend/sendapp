@@ -302,7 +302,7 @@ export function SendAmountForm() {
                       height={1}
                       backgroundColor={isAmountInputFocused ? '$primary' : '$darkGrayTextField'}
                       $theme-light={{
-                        backgroundColor: isAmountInputFocused ? '$color12' : '$darkGrayTextField',
+                        backgroundColor: isAmountInputFocused ? '$color12' : '$lightGrayTextField',
                       }}
                     />
                   </XStack>

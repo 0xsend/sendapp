@@ -125,7 +125,7 @@ export default function Layout() {
                     return (
                       <HeaderSlot>
                         <Paragraph
-                          fontWeight={'500'}
+                          fontWeight={'600'}
                           fontSize={'$8'}
                           col="$color12"
                           lineHeight={32}

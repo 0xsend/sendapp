@@ -155,7 +155,7 @@ function SendtagList({
         </YGroup>
       </Fade>
       {canChangeMainTag && (
-        <Button onPress={onMainTagSelect} br="$4">
+        <Button onPress={onMainTagSelect} br="$4" elevation={'$0.75'}>
           <Button.Text fontSize={'$5'}>Change Main Tag</Button.Text>
         </Button>
       )}
@@ -180,7 +180,12 @@ function TagItem({ tag, isMain }: { tag: Tables<'tags'>; isMain?: boolean }) {
         </Paragraph>
       </XStack>
       {isMain && (
-        <Paragraph size={'$6'} color={'$primary'} fontWeight={'600'}>
+        <Paragraph
+          size={'$6'}
+          color={'$primary'}
+          fontWeight={'600'}
+          $theme-light={{ color: '$color12' }}
+        >
           Main
         </Paragraph>
       )}
