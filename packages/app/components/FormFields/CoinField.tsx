@@ -116,7 +116,7 @@ export const CoinField = ({
                 snapPointsMode="fit"
                 animation={'quick'}
               >
-                <Sheet.Frame maw={738} bc={'$color1'}>
+                <Sheet.Frame maw={738} bc={'$color1'} pb={'$3.5'}>
                   {Platform.OS === 'web' && (
                     <Sheet.Handle
                       py="$5"

@@ -43,7 +43,9 @@ const SuggestionsList = ({
 
   return (
     <YStack gap={'$3.5'}>
-      <Paragraph size="$7">{title}</Paragraph>
+      <Paragraph size="$7" fontWeight={600}>
+        {title}
+      </Paragraph>
       {(() => {
         switch (true) {
           case !!error:
@@ -117,7 +119,7 @@ const SuggestionTile = ({
   return (
     <Link href={href}>
       <YStack
-        gap={'$1'}
+        gap={'$2'}
         mr={'$2'}
         $gtLg={{ mr: '$3.5' }}
         elevation={Platform.OS === 'web' ? undefined : '$0.75'}

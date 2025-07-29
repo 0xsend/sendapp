@@ -227,7 +227,7 @@ export function SendAmountForm() {
                 fontStyle: 'normal',
                 minHeight: 40,
                 '$theme-dark': {
-                  placeholderTextColor: '$silverChalice',
+                  placeholderTextColor: '$darkGrayTextField',
                 },
                 '$theme-light': {
                   placeholderTextColor: '$darkGrayTextField',
@@ -241,7 +241,7 @@ export function SendAmountForm() {
                 hoverStyle: {
                   boc: noteBorderActiveColor,
                 },
-                iconAfter: (
+                iconAfter: sendParams.note && (
                   <Button
                     unstyled
                     chromeless
@@ -300,9 +300,9 @@ export function SendAmountForm() {
                       left={0}
                       right={0}
                       height={1}
-                      backgroundColor={isAmountInputFocused ? '$primary' : '$silverChalice'}
+                      backgroundColor={isAmountInputFocused ? '$primary' : '$darkGrayTextField'}
                       $theme-light={{
-                        backgroundColor: isAmountInputFocused ? '$color12' : '$silverChalice',
+                        backgroundColor: isAmountInputFocused ? '$color12' : '$darkGrayTextField',
                       }}
                     />
                   </XStack>
