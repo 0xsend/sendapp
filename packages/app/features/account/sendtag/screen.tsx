@@ -23,6 +23,7 @@ import { Platform } from 'react-native'
 import { api } from 'app/utils/api'
 import { useLink } from 'solito/link'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { useThemeName } from 'tamagui'
 
 export function SendTagScreen() {
   const { tags, isLoading } = useUser()
@@ -72,7 +73,7 @@ export function SendTagScreen() {
             Own your identity on Send. Register up to 5 verified tags and make them yours.
           </Paragraph>
         </YStack>
-        <Paragraph fontSize={'$7'} fontWeight={'500'}>
+        <Paragraph fontSize={'$7'} fontWeight={'500'} lineHeight={24}>
           Registered [ {`${confirmedTags?.length || 0}/${maxNumSendTags}`} ]
         </Paragraph>
         <SendtagList
@@ -173,6 +174,7 @@ function TagItem({ tag, isMain }: { tag: Tables<'tags'>; isMain?: boolean }) {
           numberOfLines={1}
           testID={`confirmed-tag-${tag.name}`}
           aria-label={`Tag ${tag.name}${isMain ? ' (Main)' : ''}`}
+          lineHeight={28}
         >
           {tag.name}
         </Paragraph>
@@ -198,6 +200,8 @@ function MainTagSelectionSheet({
   currentMainTagId?: number | null
 }) {
   const toast = useAppToast()
+  const theme = useThemeName()
+  const isDark = theme?.startsWith('dark')
   const { updateProfile } = useUser()
   const hoverStyles = useHoverStyles()
   const { refetch: refetchSendAccount, data: sendAccount } = useSendAccount()
@@ -245,11 +249,21 @@ function MainTagSelectionSheet({
                   <Spinner size="small" color="$color11" />
                 ) : (
                   <XStack gap="$3" ai="center" f={1}>
-                    <IconSlash size="$1.5" />
-                    <Paragraph size="$5" fontWeight="500" f={1}>
+                    <IconSlash
+                      size="$1.5"
+                      color={isDark ? (isCurrentMain ? '$black' : '$primary') : '$color12'}
+                    />
+                    <Paragraph
+                      size="$5"
+                      fontWeight="500"
+                      f={1}
+                      color={isCurrentMain ? '$black' : '$color12'}
+                    >
                       {tag.name}
                     </Paragraph>
-                    {isCurrentMain ? <IconBadgeCheck size="$1" color="$color12" /> : null}
+                    {isCurrentMain ? (
+                      <IconBadgeCheck size="$1" color={isDark ? '$black' : '$color12'} />
+                    ) : null}
                   </XStack>
                 )
               }
