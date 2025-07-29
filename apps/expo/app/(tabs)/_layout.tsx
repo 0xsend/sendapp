@@ -125,9 +125,9 @@ export default function Layout() {
                     return (
                       <HeaderSlot>
                         <Paragraph
-                          fontWeight={'300'}
+                          fontWeight={'500'}
                           fontSize={'$8'}
-                          col="$color10"
+                          col="$color12"
                           lineHeight={32}
                         >
                           {tab.title}
