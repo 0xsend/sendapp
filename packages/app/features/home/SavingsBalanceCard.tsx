@@ -37,7 +37,12 @@ export const SavingsBalanceCard = ({ href, ...props }: Omit<CardProps & LinkProp
   return (
     <HomeBodyCard {...linkProps} {...props}>
       <Card.Header padded pb="$4" jc="space-between" fd="row">
-        <Paragraph fontSize={'$5'} fontWeight="400">
+        <Paragraph
+          fontSize={'$5'}
+          fontWeight="400"
+          color={'$lightGrayTextField'}
+          $theme-light={{ color: '$darkGrayTextField' }}
+        >
           Save
         </Paragraph>
 
@@ -52,7 +57,7 @@ export const SavingsBalanceCard = ({ href, ...props }: Omit<CardProps & LinkProp
           <Spinner size={'large'} color={'$color12'} />
         ) : (
           <>
-            <Paragraph color={'$color12'} fontWeight={600} size={'$9'}>
+            <Paragraph color={'$color12'} fontWeight={600} size={'$9'} lineHeight={34}>
               {isPriceHidden ? '///////' : `$${totalAssets}`}
             </Paragraph>
             <Paragraph color={'$color10'}>

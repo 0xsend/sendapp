@@ -165,6 +165,7 @@ export function InvestmentsBody() {
 
   return (
     <YStack ai="center" $gtXs={{ gap: '$3' }} gap={'$3.5'} f={1}>
+      <InvestmentsBalanceCard w="100%" $gtLg={{ display: 'none' }} />
       <Card
         bc={'$color1'}
         width="100%"

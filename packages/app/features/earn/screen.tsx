@@ -10,7 +10,6 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { useThemeSetting } from '@tamagui/next-theme'
 import { IconArrowRight, IconStacks } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { Row } from 'app/features/earn/components/Row'
@@ -22,6 +21,7 @@ import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
 import type { SendEarnBalance } from './hooks'
 import { useSendEarn } from './providers/SendEarnProvider'
+import { useThemeName } from 'tamagui'
 
 const log = debug('app:earn:screen')
 
@@ -78,11 +78,10 @@ const ListItem = ({ children }: { children: ReactNode }) => {
 }
 
 const Badge = ({ text }: { text: string }) => {
-  const { resolvedTheme } = useThemeSetting()
+  const theme = useThemeName()
+  const isDark = theme?.startsWith('dark')
 
-  const badgeBackgroundColor = resolvedTheme?.startsWith('dark')
-    ? 'rgba(255,255,255, 0.1)'
-    : 'rgba(0,0,0, 0.1)'
+  const badgeBackgroundColor = isDark ? 'rgba(255,255,255, 0.1)' : 'rgba(0,0,0, 0.1)'
 
   return (
     <XStack
@@ -220,9 +219,9 @@ const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) =
         elevation={'$0.75'}
         w={'100%'}
         p={'$5'}
-        gap={'$7'}
+        gap={'$5'}
         ai={'flex-start'}
-        $gtLg={{ p: '$7' }}
+        $gtLg={{ p: '$7', gap: '$7' }}
       >
         <Badge text={'Active Earnings'} />
         <YStack gap={'$3.5'} w={'100%'}>
@@ -258,6 +257,9 @@ const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) =
                         return '$11'
                     }
                   })(),
+                }}
+                style={{
+                  lineHeight: 50,
                 }}
               >
                 {totalAssets}

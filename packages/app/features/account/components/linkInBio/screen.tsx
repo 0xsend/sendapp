@@ -83,27 +83,8 @@ export const LinkInBioScreen = () => {
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (
       <YStack>
-        <SubmitButton
-          elevation={'$0.75'}
-          theme="green"
-          height={32}
-          borderRadius="$4"
-          jc="center"
-          maw={398}
-          w={'100%'}
-          onPress={() => submit()}
-          py={0}
-        >
-          <Button.Text
-            color="$black"
-            fontSize="$4"
-            fontFamily="$mono"
-            fontWeight="500"
-            textTransform="uppercase"
-            textAlign="center"
-          >
-            SAVE CHANGES
-          </Button.Text>
+        <SubmitButton onPress={() => submit()}>
+          <SubmitButton.Text>SAVE CHANGES</SubmitButton.Text>
         </SubmitButton>
         {errorMessage && (
           <Paragraph marginTop={'$5'} theme="red" color="$color9">
@@ -167,26 +148,8 @@ export const LinkInBioScreen = () => {
           <Text>No social links added yet.</Text>
         )}
       </FadeCard>
-      <SubmitButton
-        theme="green"
-        height={32}
-        borderRadius="$4"
-        jc="center"
-        maw={398}
-        w={'100%'}
-        onPress={() => setFormState(FormState.LinkInBioForm)}
-        py={0}
-      >
-        <Button.Text
-          color="$black"
-          fontSize="$4"
-          fontFamily="$mono"
-          fontWeight="500"
-          textTransform="uppercase"
-          textAlign="center"
-        >
-          edit links
-        </Button.Text>
+      <SubmitButton onPress={() => setFormState(FormState.LinkInBioForm)}>
+        <SubmitButton.Text>edit links</SubmitButton.Text>
       </SubmitButton>
     </YStack>
   )

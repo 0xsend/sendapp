@@ -9,9 +9,8 @@ import {
   XStack,
 } from '@my/ui'
 import { useUser } from 'app/utils/useUser'
-import { CheckCheck } from '@tamagui/lucide-icons'
+import { CheckCheck, Copy } from '@tamagui/lucide-icons'
 import { useEffect, useState } from 'react'
-import { IconCopy } from './icons'
 import * as Clipboard from 'expo-clipboard'
 
 export function ReferralLink(props: ButtonProps) {
@@ -109,7 +108,7 @@ export function ReferralLink(props: ButtonProps) {
                 }}
               />
             ) : (
-              <IconCopy
+              <Copy
                 size={16}
                 flexShrink={0}
                 $theme-dark={{ color: '$primary' }}

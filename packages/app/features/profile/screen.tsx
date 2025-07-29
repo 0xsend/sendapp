@@ -22,6 +22,7 @@ import {
   Link,
   Anchor,
   isWeb,
+  PrimaryButton,
 } from '@my/ui'
 
 // Internal
@@ -38,6 +39,7 @@ import { parseUnits } from 'viem'
 import { type allCoins, type allCoinsDict, coinsDict } from 'app/data/coins'
 import { IconFYSI } from 'app/components/icons/IconFYSI'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { useLink } from 'solito/link'
 
 interface ProfileScreenProps {
   sendid?: number | null
@@ -54,6 +56,16 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
     isLoading: isLoadingProfile,
     error,
   } = useProfileLookup('sendid', otherUserId?.toString() || '')
+  const linkProps = useLink({
+    href: {
+      pathname: isWeb ? '/send' : '/send/form',
+      query: {
+        recipient: otherUserProfile?.sendid,
+        idType: 'sendid',
+        sendToken: sendTokenAddress[baseMainnet.id],
+      },
+    },
+  })
 
   const safeAreaInsets = useSafeAreaInsets()
 
@@ -144,7 +156,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
           ai="center"
           fd="row"
         >
-          <BlurStack intensity={10} circular>
+          <BlurStack intensity={10} circular overflow="hidden">
             <Button
               size="$3"
               circular
@@ -155,7 +167,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
               icon={<ChevronLeft size="$1.5" color="$white" />}
             />
           </BlurStack>
-          <BlurStack intensity={10} circular>
+          <BlurStack intensity={10} circular overflow="hidden">
             <Button
               size="$3"
               circular
@@ -183,7 +195,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
               {otherUserProfile?.all_tags?.map((tag) => {
                 return (
                   <BlurStack
-                    intensity={50}
+                    intensity={10}
                     key={tag}
                     p={8}
                     bc="rgba(102, 102, 102, 0.4)"
@@ -204,33 +216,9 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
               </Paragraph>
             )}
           </YStack>
-
-          <LinkableButton
-            als={media.gtMd ? 'flex-end' : 'flex-start'}
-            href={{
-              pathname: isWeb ? '/send' : '/send/form',
-              query: { recipient: otherUserProfile?.sendid, idType: 'sendid' },
-            }}
-            theme="green"
-            height={32}
-            borderRadius="$4"
-            jc="center"
-            ai="center"
-            maw={398}
-            w={'100%'}
-            bc="$primary"
-          >
-            <Button.Text
-              color="$black"
-              fontSize="$4"
-              fontFamily="$mono"
-              fontWeight="500"
-              textTransform="uppercase"
-              textAlign="center"
-            >
-              SEND
-            </Button.Text>
-          </LinkableButton>
+          <PrimaryButton als={media.gtMd ? 'flex-end' : 'flex-start'} maw={398} {...linkProps}>
+            <PrimaryButton.Text>SEND</PrimaryButton.Text>
+          </PrimaryButton>
         </Card.Footer>
       </Card>
       {media.gtMd ? (
@@ -379,7 +367,11 @@ const Vibes = ({
     amount,
     tokenPrice,
     token,
-  }: { amount: number; tokenPrice: number; token: keyof allCoinsDict }) => {
+  }: {
+    amount: number
+    tokenPrice: number
+    token: keyof allCoinsDict
+  }) => {
     const coinData = coinsDict[token]
 
     if (tokenPrice <= 0 || !coinData) {
@@ -411,7 +403,9 @@ const Vibes = ({
         note="😊"
         profile={profile}
       >
-        <Button.Text size={media.xxs ? '$7' : '$9'}>😊</Button.Text>
+        <Button.Text size={media.xxs ? '$7' : '$9'} lineHeight={34}>
+          😊
+        </Button.Text>
         <Paragraph size={'$3'}>$1</Paragraph>
       </Vibe>
       <Vibe
@@ -424,7 +418,9 @@ const Vibes = ({
         note="🔥"
         profile={profile}
       >
-        <Button.Text size={media.xxs ? '$7' : '$9'}>🔥</Button.Text>
+        <Button.Text size={media.xxs ? '$7' : '$9'} lineHeight={34}>
+          🔥
+        </Button.Text>
         <Paragraph size={'$3'}>$2</Paragraph>
       </Vibe>
       <Vibe
@@ -437,7 +433,9 @@ const Vibes = ({
         note="💯"
         profile={profile}
       >
-        <Button.Text size={media.xxs ? '$7' : '$9'}>💯</Button.Text>
+        <Button.Text size={media.xxs ? '$7' : '$9'} lineHeight={34}>
+          💯
+        </Button.Text>
         <Paragraph size={'$3'}>$3</Paragraph>
       </Vibe>
       <Vibe
@@ -450,7 +448,9 @@ const Vibes = ({
         note="🚀"
         profile={profile}
       >
-        <Button.Text size={media.xxs ? '$7' : '$9'}>🚀</Button.Text>
+        <Button.Text size={media.xxs ? '$7' : '$9'} lineHeight={34}>
+          🚀
+        </Button.Text>
         <Paragraph size={'$3'}>$4</Paragraph>
       </Vibe>
       <Vibe

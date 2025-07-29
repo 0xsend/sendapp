@@ -139,9 +139,10 @@ const SwapRiskDialog = () => {
       dismissOnSnapToBottom
       dismissOnOverlayPress
       native
-      snapPoints={[60]}
+      snapPoints={['fit']}
+      snapPointsMode="fit"
     >
-      <Sheet.Frame key="swap-risk-sheet" gap="$4" padding="$4">
+      <Sheet.Frame key="swap-risk-sheet" gap="$4" padding="$4" pb={'$6'}>
         {dialogContent}
       </Sheet.Frame>
       <Sheet.Overlay />

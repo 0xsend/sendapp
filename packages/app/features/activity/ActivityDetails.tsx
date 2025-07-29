@@ -153,25 +153,28 @@ const ActivityDetailsContent = ({ activity, ...props }: { activity: Activity } &
               </Stack>
             )}
           </XStack>
-          <XStack gap={'$2'} ai={'center'}>
-            <Paragraph
-              size={'$9'}
-              fontWeight={700}
-              textTransform={'uppercase'}
-              // @ts-expect-error end value for text-align is valid value, left is not working properly in this case
-              ta={'end'}
-              $gtLg={{
-                size: '$10',
-              }}
-            >
-              {amount}
-            </Paragraph>
-            {activity.data.coin?.symbol && (
-              <XStack>
-                <IconCoin symbol={activity.data.coin.symbol} size={'$2'} />
-              </XStack>
-            )}
-          </XStack>
+          {amount && (
+            <XStack gap={'$2'} ai={'center'}>
+              <Paragraph
+                size={'$9'}
+                fontWeight={700}
+                textTransform={'uppercase'}
+                // @ts-expect-error end value for text-align is valid value, left is not working properly in this case
+                ta={'end'}
+                lineHeight={40}
+                $gtLg={{
+                  size: '$10',
+                }}
+              >
+                {amount}
+              </Paragraph>
+              {activity.data.coin?.symbol && (
+                <XStack>
+                  <IconCoin symbol={activity.data.coin.symbol} size={'$2'} />
+                </XStack>
+              )}
+            </XStack>
+          )}
           {note && (
             <Paragraph size={'$7'} color={'$color10'} w={'100%'} whiteSpace={'pre-wrap'} pl="$3">
               {decodeURIComponent(note)}

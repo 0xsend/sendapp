@@ -289,9 +289,14 @@ You can use the following methods to verify the app is functioning correctly:
 - hiding header when scrolling down
 - error page when app crush
 - don't nest scroll views
+- adjust icon for glass iOS
 
 **Send**:
 - remove blink after confirmation
+- remove resetting scroll position in token activity after send when tx is pending
+
+**Trade**:
+- remove blink after trade
 
 **Earn**:
 - remove blinking completely

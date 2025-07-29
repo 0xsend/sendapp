@@ -23,6 +23,7 @@ import { Platform } from 'react-native'
 import { api } from 'app/utils/api'
 import { useLink } from 'solito/link'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { useThemeName } from 'tamagui'
 
 export function SendTagScreen() {
   const { tags, isLoading } = useUser()
@@ -72,7 +73,7 @@ export function SendTagScreen() {
             Own your identity on Send. Register up to 5 verified tags and make them yours.
           </Paragraph>
         </YStack>
-        <Paragraph fontSize={'$7'} fontWeight={'500'}>
+        <Paragraph fontSize={'$7'} fontWeight={'500'} lineHeight={24}>
           Registered [ {`${confirmedTags?.length || 0}/${maxNumSendTags}`} ]
         </Paragraph>
         <SendtagList
@@ -154,7 +155,7 @@ function SendtagList({
         </YGroup>
       </Fade>
       {canChangeMainTag && (
-        <Button onPress={onMainTagSelect} br="$4">
+        <Button onPress={onMainTagSelect} br="$4" elevation={'$0.75'}>
           <Button.Text fontSize={'$5'}>Change Main Tag</Button.Text>
         </Button>
       )}
@@ -173,12 +174,18 @@ function TagItem({ tag, isMain }: { tag: Tables<'tags'>; isMain?: boolean }) {
           numberOfLines={1}
           testID={`confirmed-tag-${tag.name}`}
           aria-label={`Tag ${tag.name}${isMain ? ' (Main)' : ''}`}
+          lineHeight={28}
         >
           {tag.name}
         </Paragraph>
       </XStack>
       {isMain && (
-        <Paragraph size={'$6'} color={'$primary'} fontWeight={'600'}>
+        <Paragraph
+          size={'$6'}
+          color={'$primary'}
+          fontWeight={'600'}
+          $theme-light={{ color: '$color12' }}
+        >
           Main
         </Paragraph>
       )}
@@ -198,6 +205,8 @@ function MainTagSelectionSheet({
   currentMainTagId?: number | null
 }) {
   const toast = useAppToast()
+  const theme = useThemeName()
+  const isDark = theme?.startsWith('dark')
   const { updateProfile } = useUser()
   const hoverStyles = useHoverStyles()
   const { refetch: refetchSendAccount, data: sendAccount } = useSendAccount()
@@ -245,11 +254,21 @@ function MainTagSelectionSheet({
                   <Spinner size="small" color="$color11" />
                 ) : (
                   <XStack gap="$3" ai="center" f={1}>
-                    <IconSlash size="$1.5" />
-                    <Paragraph size="$5" fontWeight="500" f={1}>
+                    <IconSlash
+                      size="$1.5"
+                      color={isDark ? (isCurrentMain ? '$black' : '$primary') : '$color12'}
+                    />
+                    <Paragraph
+                      size="$5"
+                      fontWeight="500"
+                      f={1}
+                      color={isCurrentMain ? '$black' : '$color12'}
+                    >
                       {tag.name}
                     </Paragraph>
-                    {isCurrentMain ? <IconBadgeCheck size="$1" color="$color12" /> : null}
+                    {isCurrentMain ? (
+                      <IconBadgeCheck size="$1" color={isDark ? '$black' : '$color12'} />
+                    ) : null}
                   </XStack>
                 )
               }
@@ -328,9 +347,10 @@ function MainTagSelectionSheet({
       dismissOnSnapToBottom
       dismissOnOverlayPress
       native
-      snapPoints={[60]}
+      snapPoints={['fit']}
+      snapPointsMode="fit"
     >
-      <Sheet.Frame key="main-tag-selection-sheet" gap="$4" padding="$4">
+      <Sheet.Frame key="main-tag-selection-sheet" gap="$4" padding="$4" pb={'$6'}>
         {dialogContent}
       </Sheet.Frame>
       <Sheet.Overlay />

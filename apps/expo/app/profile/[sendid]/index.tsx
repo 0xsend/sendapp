@@ -23,6 +23,7 @@ export default function Screen() {
         overflow={'visible'}
         bounces={false}
         overScrollMode="always" // Android scroll indicator
+        backgroundColor="$background"
       >
         <ProfileScreen />
       </ScrollView>

@@ -83,7 +83,8 @@ export function CopyAddressDialog({ isOpen, onClose, onConfirm }) {
       dismissOnSnapToBottom
       dismissOnOverlayPress
       native
-      snapPoints={[70]}
+      snapPoints={['fit']}
+      snapPointsMode="fit"
     >
       <Sheet.Frame key="copy-address-sheet" gap="$3.5" padding="$5">
         {dialogContent}

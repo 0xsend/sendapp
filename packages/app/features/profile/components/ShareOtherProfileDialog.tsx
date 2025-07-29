@@ -1,7 +1,18 @@
-import { Button, Dialog, isWeb, Paragraph, Separator, useAppToast, YStack, QRCode } from '@my/ui'
-import { IconCopy, IconSend } from 'app/components/icons'
+import {
+  Button,
+  Dialog,
+  isWeb,
+  Paragraph,
+  PrimaryButton,
+  QRCode,
+  Separator,
+  useAppToast,
+  YStack,
+} from '@my/ui'
+import { IconSend } from 'app/components/icons'
 import type { Functions } from '@my/supabase/database.types'
 import * as Clipboard from 'expo-clipboard'
+import { Copy } from '@tamagui/lucide-icons'
 
 interface ShareOtherProfileDialogProps {
   isOpen: boolean
@@ -69,26 +80,17 @@ export function ShareOtherProfileDialog({
             gap="$4"
             $gtLg={{ flexDirection: 'row-reverse' }}
           >
-            <Button
+            <PrimaryButton
               theme="green"
               borderRadius={'$4'}
               onPress={handleCopyLink}
               focusStyle={{ outlineWidth: 0 }}
             >
-              <Button.Icon>
-                <IconCopy size={16} color={'$black'} />
-              </Button.Icon>
-              <Button.Text
-                ff={'$mono'}
-                fontWeight={'500'}
-                tt="uppercase"
-                size={'$5'}
-                color={'$black'}
-                ml={'$2'}
-              >
-                copy link
-              </Button.Text>
-            </Button>
+              <PrimaryButton.Icon>
+                <Copy size={16} color={'$black'} />
+              </PrimaryButton.Icon>
+              <PrimaryButton.Text>copy link</PrimaryButton.Text>
+            </PrimaryButton>
             <Dialog.Close asChild>
               <Button borderRadius={'$4'} p={'$4'} focusStyle={{ outlineWidth: 0 }}>
                 <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'}>
@@ -101,8 +103,15 @@ export function ShareOtherProfileDialog({
       </Dialog.Portal>
 
       <Dialog.Adapt platform="native">
-        <Dialog.Sheet modal dismissOnSnapToBottom dismissOnOverlayPress native snapPoints={[65]}>
-          <Dialog.Sheet.Frame gap="$3.5" padding="$5">
+        <Dialog.Sheet
+          modal
+          dismissOnSnapToBottom
+          dismissOnOverlayPress
+          native
+          snapPoints={['fit']}
+          snapPointsMode="fit"
+        >
+          <Dialog.Sheet.Frame gap="$3.5" padding="$6">
             <Dialog.Adapt.Contents />
           </Dialog.Sheet.Frame>
           <Dialog.Sheet.Overlay />

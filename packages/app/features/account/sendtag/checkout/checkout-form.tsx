@@ -13,6 +13,7 @@ import { formatUnits } from 'viem'
 import { useSendtagCheckout } from './checkout-utils'
 import { ConfirmButton } from './components/checkout-confirm-button'
 import { ReferredBy } from 'app/features/account/sendtag/components/ReferredBy'
+import { Platform } from 'react-native'
 
 export const CheckoutForm = () => {
   const user = useUser()
@@ -20,7 +21,14 @@ export const CheckoutForm = () => {
 
   function onConfirmed() {
     user?.updateProfile()
-    router.replace('/account/sendtag')
+
+    if (Platform.OS === 'web') {
+      router.replace('/account/sendtag')
+      return
+    }
+
+    router.back()
+    router.back()
   }
 
   // Show checkout UI when we have pending tags
@@ -55,7 +63,7 @@ function TotalPrice() {
           Total Price
         </Paragraph>
         <XStack jc={'space-between'} ai={'center'}>
-          <Paragraph size={'$11'} fontWeight={'500'}>
+          <Paragraph size={'$11'} fontWeight={'500'} lineHeight={50}>
             {formatUnits(_total, usdcCoin.decimals)}
           </Paragraph>
           <XStack ai={'center'} gap={'$2'}>

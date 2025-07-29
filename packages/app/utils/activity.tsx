@@ -473,6 +473,8 @@ export function phraseFromActivity({
       return 'Referred'
     case isReferralsEvent(activity) && !!to_user?.id:
       return 'Referred you'
+    case event_name === 'send_account_signing_key_added':
+      return 'Added'
     default:
       return event_name
         .split('_')
@@ -532,7 +534,7 @@ export function subtextFromActivity({
   liquidityPools?: LiquidityPool[]
 }): string | null {
   const _user = counterpart(activity)
-  const { from_user, to_user, data } = activity
+  const { from_user, to_user, data, event_name } = activity
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
   const isSwapTransfer = isActivitySwapTransfer(activity, swapRouters, liquidityPools)
@@ -591,6 +593,9 @@ export function subtextFromActivity({
   }
   if (isTemporalEthTransfersEvent(activity)) {
     return labelAddress(activity.data.log_addr)
+  }
+  if (event_name === 'send_account_signing_key_added') {
+    return 'Send Account Signing Key'
   }
   return null
 }
