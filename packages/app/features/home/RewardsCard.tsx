@@ -93,7 +93,12 @@ export const RewardsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
   return (
     <HomeBodyCard {...linkProps} {...props}>
       <Card.Header padded pb={0} fd="row" ai="center" jc="space-between">
-        <Paragraph fontSize={'$5'} fontWeight="400">
+        <Paragraph
+          fontSize={'$5'}
+          fontWeight="400"
+          color={'$lightGrayTextField'}
+          $theme-light={{ color: '$darkGrayTextField' }}
+        >
           Rewards
         </Paragraph>
         <XStack flex={1} />
@@ -104,7 +109,7 @@ export const RewardsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
         />
       </Card.Header>
       <Card.Footer padded pt={0} fd="column">
-        <Paragraph color={'$color12'} fontWeight={600} size={'$9'}>
+        <Paragraph color={'$color12'} fontWeight={600} size={'$9'} lineHeight={34}>
           {(() => {
             switch (true) {
               case isPriceHidden:

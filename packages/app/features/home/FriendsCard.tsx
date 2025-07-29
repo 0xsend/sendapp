@@ -23,7 +23,12 @@ export const FriendsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
   return (
     <HomeBodyCard {...linkProps} {...props}>
       <Card.Header padded pb={0} fd="row" ai="center" jc="space-between">
-        <Paragraph fontSize={'$5'} fontWeight="400">
+        <Paragraph
+          fontSize={'$5'}
+          fontWeight="400"
+          color={'$lightGrayTextField'}
+          $theme-light={{ color: '$darkGrayTextField' }}
+        >
           Referrals
         </Paragraph>
         <XStack flex={1} />
@@ -73,12 +78,13 @@ function OverlappingFriendAvatars({ friends, ...props }: { friends: Friend[] } &
           testID="avatar"
           key={friend.tag || `empty-${index}`}
           circular
-          mr={'$-5'}
+          mr={-16}
           ai="center"
           jc="center"
           bc="$color2"
           borderWidth="$0.75"
           borderColor="$color1"
+          $gtMd={{ mr: -8 }}
         >
           <Avatar.Image
             testID="avatarImage"

@@ -65,7 +65,12 @@ export const InvestmentsBalanceCard = (props: CardProps) => {
   return (
     <HomeBodyCard onPress={toggleSubScreen} {...props}>
       <Card.Header padded pb="$4" jc="space-between" fd="row">
-        <Paragraph fontSize={'$5'} fontWeight="400">
+        <Paragraph
+          fontSize={'$5'}
+          fontWeight="400"
+          color={'$lightGrayTextField'}
+          $theme-light={{ color: '$darkGrayTextField' }}
+        >
           Invest
         </Paragraph>
         {isInvestmentCoin || isInvestmentsScreen ? (
@@ -85,7 +90,7 @@ export const InvestmentsBalanceCard = (props: CardProps) => {
       </Card.Header>
       <Card.Footer padded size="$4" pt={0} jc="space-between" ai="center">
         <YStack jc="space-between" gap="$4">
-          <Paragraph color={'$color12'} fontWeight={600} size={'$9'}>
+          <Paragraph color={'$color12'} fontWeight={600} size={'$9'} lineHeight={34}>
             {(() => {
               switch (true) {
                 case isPriceHidden:
@@ -164,7 +169,7 @@ function OverlappingCoinIcons({
         <ThemeableStack
           key={symbol}
           circular
-          mr={index === coins.slice(0, length).length - 1 ? '$0' : '$-3.5'}
+          mr={index === coins.slice(0, length).length - 1 ? '$0' : -8}
           bc="transparent"
           ai="center"
           jc="center"

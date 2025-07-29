@@ -33,7 +33,12 @@ const StablesBalanceCardHeader = () => {
 
   return (
     <Card.Header padded size="$4" pb={0} jc="space-between" fd="row">
-      <Paragraph fontSize={'$6'} fontWeight={300} color={'$color12'} $gtLg={{ fontSize: '$6' }}>
+      <Paragraph
+        fontSize={'$5'}
+        fontWeight={300}
+        color={'$lightGrayTextField'}
+        $theme-light={{ color: '$darkGrayTextField' }}
+      >
         Cash Balance
       </Paragraph>
       <XStack flex={1} />
@@ -45,7 +50,11 @@ const StablesBalanceCardHeader = () => {
           $lg={{ display: 'none' }}
         />
       ) : (
-        <ChevronRight size={'$1'} color={'$color12'} />
+        <ChevronRight
+          size={'$1'}
+          color={'$lightGrayTextField'}
+          $theme-light={{ color: '$darkGrayTextField' }}
+        />
       )}
     </Card.Header>
   )

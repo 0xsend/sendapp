@@ -7,7 +7,12 @@ import { LogBox, View } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import StackNavigator from 'apps-expo/components/layout/StackNavigator'
 import { useFonts } from 'expo-font'
-import { DMSans_400Regular, DMSans_700Bold } from '@expo-google-fonts/dm-sans'
+import {
+  DMSans_400Regular,
+  DMSans_500Medium,
+  DMSans_600SemiBold,
+  DMSans_700Bold,
+} from '@expo-google-fonts/dm-sans'
 import { DMMono_400Regular } from '@expo-google-fonts/dm-mono'
 
 SplashScreen.preventAutoHideAsync()
@@ -23,6 +28,8 @@ LogBox.ignoreLogs([
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     'DM Sans': DMSans_400Regular,
+    'DM Sans Medium': DMSans_500Medium,
+    'DM Sans SemiBold': DMSans_600SemiBold,
     'DM Sans Bold': DMSans_700Bold,
     'DM Mono': DMMono_400Regular,
   })
