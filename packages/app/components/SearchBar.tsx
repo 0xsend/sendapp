@@ -413,9 +413,10 @@ function ConfirmSendDialog({ isOpen, onClose, onConfirm, address }) {
       dismissOnSnapToBottom
       dismissOnOverlayPress
       native
-      snapPoints={[70]}
+      snapPoints={['fit']}
+      snapPointsMode="fit"
     >
-      <Sheet.Frame key="confirm-send-sheet" gap="$4" padding="$4">
+      <Sheet.Frame key="confirm-send-sheet" gap="$4" padding="$4" pb={'$6'}>
         {dialogContent}
       </Sheet.Frame>
       <Sheet.Overlay />

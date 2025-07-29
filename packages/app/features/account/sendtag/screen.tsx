@@ -342,9 +342,10 @@ function MainTagSelectionSheet({
       dismissOnSnapToBottom
       dismissOnOverlayPress
       native
-      snapPoints={[60]}
+      snapPoints={['fit']}
+      snapPointsMode="fit"
     >
-      <Sheet.Frame key="main-tag-selection-sheet" gap="$4" padding="$4">
+      <Sheet.Frame key="main-tag-selection-sheet" gap="$4" padding="$4" pb={'$6'}>
         {dialogContent}
       </Sheet.Frame>
       <Sheet.Overlay />

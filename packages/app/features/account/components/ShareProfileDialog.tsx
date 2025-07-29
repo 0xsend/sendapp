@@ -114,9 +114,10 @@ export function ShareProfileDialog({ isOpen, onClose }: ShareProfileDialogProps)
       dismissOnSnapToBottom
       dismissOnOverlayPress
       native
-      snapPoints={[65]}
+      snapPoints={['fit']}
+      snapPointsMode="fit"
     >
-      <Sheet.Frame key="share-profile-sheet" gap="$3.5" padding="$5">
+      <Sheet.Frame key="share-profile-sheet" gap="$3.5" padding="$6">
         {dialogContent}
       </Sheet.Frame>
       <Sheet.Overlay />

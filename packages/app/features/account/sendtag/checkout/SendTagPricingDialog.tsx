@@ -149,7 +149,8 @@ export function SendTagPricingDialog({ name = '' }: { name: Tables<'tags'>['name
         dismissOnSnapToBottom
         dismissOnOverlayPress
         native
-        snapPoints={[50]}
+        snapPoints={['fit']}
+        snapPointsMode="fit"
       >
         <Sheet.Frame key="sendtag-pricing-sheet" gap="$4" padding="$4">
           {dialogContent}

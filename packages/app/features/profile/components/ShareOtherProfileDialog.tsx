@@ -103,8 +103,15 @@ export function ShareOtherProfileDialog({
       </Dialog.Portal>
 
       <Dialog.Adapt platform="native">
-        <Dialog.Sheet modal dismissOnSnapToBottom dismissOnOverlayPress native snapPoints={[65]}>
-          <Dialog.Sheet.Frame gap="$3.5" padding="$5">
+        <Dialog.Sheet
+          modal
+          dismissOnSnapToBottom
+          dismissOnOverlayPress
+          native
+          snapPoints={['fit']}
+          snapPointsMode="fit"
+        >
+          <Dialog.Sheet.Frame gap="$3.5" padding="$6">
             <Dialog.Adapt.Contents />
           </Dialog.Sheet.Frame>
           <Dialog.Sheet.Overlay />
