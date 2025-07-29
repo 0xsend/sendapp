@@ -403,7 +403,7 @@ const Vibes = ({
         note="😊"
         profile={profile}
       >
-        <Button.Text size={media.xxs ? '$7' : '$9'} lineHeight={34}>
+        <Button.Text size={media.xs ? '$8' : '$9'} lineHeight={34}>
           😊
         </Button.Text>
         <Paragraph size={'$3'}>$1</Paragraph>
@@ -418,7 +418,7 @@ const Vibes = ({
         note="🔥"
         profile={profile}
       >
-        <Button.Text size={media.xxs ? '$7' : '$9'} lineHeight={34}>
+        <Button.Text size={media.xs ? '$8' : '$9'} lineHeight={34}>
           🔥
         </Button.Text>
         <Paragraph size={'$3'}>$2</Paragraph>
@@ -433,7 +433,7 @@ const Vibes = ({
         note="💯"
         profile={profile}
       >
-        <Button.Text size={media.xxs ? '$7' : '$9'} lineHeight={34}>
+        <Button.Text size={media.xs ? '$8' : '$9'} lineHeight={34}>
           💯
         </Button.Text>
         <Paragraph size={'$3'}>$3</Paragraph>
@@ -448,7 +448,7 @@ const Vibes = ({
         note="🚀"
         profile={profile}
       >
-        <Button.Text size={media.xxs ? '$7' : '$9'} lineHeight={34}>
+        <Button.Text size={media.xs ? '$8' : '$9'} lineHeight={34}>
           🚀
         </Button.Text>
         <Paragraph size={'$3'}>$4</Paragraph>
