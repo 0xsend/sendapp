@@ -148,7 +148,7 @@ const TokenBalance = ({
 
   if (balance === undefined) return <></>
   return (
-    <Paragraph fontSize={'$8'} fontWeight={'500'} col="$color12" lineHeight={22}>
+    <Paragraph fontSize={'$8'} fontWeight={'500'} col="$color12" lineHeight={24}>
       {isPriceHidden
         ? '//////'
         : formatAmount((Number(balance) / 10 ** decimals).toString(), 10, formatDecimals ?? 5)}

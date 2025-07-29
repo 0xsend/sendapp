@@ -29,15 +29,17 @@ import { formatUnits } from 'viem'
 import { HomeBodyCard } from './screen'
 import { Platform } from 'react-native'
 import { useRouter } from 'solito/router'
+import { usePathname } from 'app/utils/usePathname'
 
 export const InvestmentsBalanceCard = (props: CardProps) => {
   const media = useMedia()
   const [queryParams, setParams] = useRootScreenParams()
   const router = useRouter()
+  const pathname = usePathname()
   const isInvestmentCoin = investmentCoins.some(
     (coin) => coin.token.toLowerCase() === queryParams.token?.toLowerCase()
   )
-  const isInvestmentsScreen = queryParams.token === 'investments'
+  const isInvestmentsScreen = queryParams.token === 'investments' || pathname === '/investments'
 
   const toggleSubScreen = () => {
     if (Platform.OS === 'web') {
