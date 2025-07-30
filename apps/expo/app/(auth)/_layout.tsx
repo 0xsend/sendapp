@@ -21,8 +21,8 @@ export default function AuthLayout() {
             backgroundColor: theme.background.val,
           },
           headerTitle: () => (
-            <XStack ai="center" jc="flex-start" f={1}>
-              <IconSendLogo size={'$2'} color={'$color12'} />
+            <XStack ai="center" jc="center" f={1} mt={'$2'}>
+              <IconSendLogo size={'$3'} color={'$color12'} />
             </XStack>
           ),
         }}

@@ -155,100 +155,112 @@ export function OnboardingScreen() {
   if (!isClient) return null
 
   return (
-    <YStack f={1} jc={'space-between'} ai={'center'} gap={'$3.5'} py={'$10'}>
-      <FormProvider {...form}>
-        <YStack w={'100%'} ai={'center'}>
-          <Paragraph w={'100%'} size={'$8'} fontWeight={500} tt={'uppercase'}>
-            finish your account
-          </Paragraph>
-          <Paragraph w={'100%'} size={'$5'} color={'$olive'}>
-            Choose your Sendtag — your unique username on Send.
-          </Paragraph>
-          <SchemaForm
-            form={form}
-            onSubmit={handleSubmit}
-            schema={OnboardingSchema}
-            defaultValues={{
-              name: firstSendtag || '',
-            }}
-            props={{
-              name: {
-                placeholder: 'Input desired Sendtag',
-                color: '$color12',
-                fontWeight: '500',
-                bw: 0,
-                br: 0,
-                p: 0,
-                pl: '$2.5',
-                focusStyle: {
-                  outlineWidth: 0,
-                },
-                '$theme-dark': {
-                  placeholderTextColor: '$darkGrayTextField',
-                },
-                '$theme-light': {
-                  placeholderTextColor: '$darkGrayTextField',
-                },
-                fontSize: '$5',
-                onFocus: () => setIsInputFocused(true),
-                onBlur: () => setIsInputFocused(false),
-                testID: 'sendtag-input',
-                fieldsetProps: {
-                  width: '100%',
-                },
-                iconBefore: (
-                  <XStack
-                    ml={Platform.OS === 'web' ? -12 : 4}
-                    mb={Platform.OS === 'web' ? 0 : 2}
-                    opacity={formName ? 1 : 0}
-                  >
-                    <Paragraph size={'$5'}>/</Paragraph>
-                  </XStack>
-                ),
-              },
-            }}
-            formProps={{
-              w: '100%',
-              footerProps: { p: 0 },
-              $gtSm: {
-                maxWidth: '100%',
-              },
-              style: { justifyContent: 'space-between' },
-            }}
-            renderAfter={renderAfterContent}
-          >
-            {({ name }) => {
-              return (
-                <FadeCard
-                  w={'100%'}
-                  mt={'$5'}
-                  borderColor={validationError ? '$error' : 'transparent'}
-                  bw={1}
-                  pb={validationError ? '$5' : '$6'}
-                >
-                  <XStack position="relative">
-                    {name}
+    <YStack f={1} jc={'center'} ai={'center'} gap={'$5'} pb={100}>
+      <YStack ai={'center'} gap={'$2'}>
+        <Paragraph w={'100%'} size={'$8'} fontWeight={600} ta={'center'}>
+          Finish your account
+        </Paragraph>
+        <Paragraph
+          px={'$3'}
+          size={'$3'}
+          color={'$lightGrayTextField'}
+          ta={'center'}
+          $theme-light={{ color: '$darkGrayTextField' }}
+          numberOfLines={2}
+        >
+          Choose your Sendtag — your unique username on Send
+        </Paragraph>
+      </YStack>
+      <FadeCard
+        borderColor={validationError ? '$error' : 'transparent'}
+        bw={1}
+        fadeProps={{
+          width: '100%',
+          maxWidth: 550,
+        }}
+      >
+        <FormProvider {...form}>
+          <YStack w={'100%'} ai={'center'}>
+            <SchemaForm
+              form={form}
+              onSubmit={handleSubmit}
+              schema={OnboardingSchema}
+              defaultValues={{
+                name: firstSendtag || '',
+              }}
+              props={{
+                name: {
+                  placeholder: 'Input desired Sendtag',
+                  color: '$color12',
+                  fontWeight: '500',
+                  bw: 0,
+                  br: 0,
+                  p: 0,
+                  pl: '$2.5',
+                  focusStyle: {
+                    outlineWidth: 0,
+                  },
+                  '$theme-dark': {
+                    placeholderTextColor: '$darkGrayTextField',
+                  },
+                  '$theme-light': {
+                    placeholderTextColor: '$darkGrayTextField',
+                  },
+                  fontSize: '$5',
+                  onFocus: () => setIsInputFocused(true),
+                  onBlur: () => setIsInputFocused(false),
+                  testID: 'sendtag-input',
+                  fieldsetProps: {
+                    width: '100%',
+                  },
+                  iconBefore: (
                     <XStack
-                      position="absolute"
-                      bottom={0}
-                      left={0}
-                      right={0}
-                      height={1}
-                      backgroundColor={isInputFocused ? '$primary' : '$darkGrayTextField'}
-                      $theme-light={{
-                        backgroundColor: isInputFocused ? '$color12' : '$silverChalice',
-                      }}
-                    />
-                  </XStack>
-                  {validationError && (
-                    <Paragraph color={'$error'}>{validationError.message}</Paragraph>
-                  )}
-                </FadeCard>
-              )
-            }}
-          </SchemaForm>
-        </YStack>
-      </FormProvider>
+                      ml={Platform.OS === 'web' ? -12 : 4}
+                      mb={Platform.OS === 'web' ? 0 : 2}
+                      opacity={formName ? 1 : 0}
+                    >
+                      <Paragraph size={'$5'}>/</Paragraph>
+                    </XStack>
+                  ),
+                },
+              }}
+              formProps={{
+                w: '100%',
+                footerProps: { p: 0 },
+                $gtSm: {
+                  maxWidth: '100%',
+                },
+                style: { justifyContent: 'space-between' },
+              }}
+              renderAfter={renderAfterContent}
+            >
+              {({ name }) => {
+                return (
+                  <YStack gap={'$2'}>
+                    <XStack position="relative">
+                      {name}
+                      <XStack
+                        position="absolute"
+                        bottom={0}
+                        left={0}
+                        right={0}
+                        height={1}
+                        backgroundColor={isInputFocused ? '$primary' : '$darkGrayTextField'}
+                        $theme-light={{
+                          backgroundColor: isInputFocused ? '$color12' : '$silverChalice',
+                        }}
+                      />
+                    </XStack>
+                    {validationError && (
+                      <Paragraph color={'$error'}>{validationError.message}</Paragraph>
+                    )}
+                  </YStack>
+                )
+              }}
+            </SchemaForm>
+          </YStack>
+        </FormProvider>
+      </FadeCard>
     </YStack>
   )
 }

@@ -56,7 +56,7 @@ export const LoginWithPhoneScreen = () => {
 
   const renderAfter = useCallback(
     ({ submit }: { submit: () => void }) => (
-      <SubmitButton onPress={submit} disabled={!canSubmit}>
+      <SubmitButton onPress={submit} disabled={!canSubmit} mt={'$3'}>
         <SubmitButton.Text>login</SubmitButton.Text>
       </SubmitButton>
     ),
@@ -64,119 +64,136 @@ export const LoginWithPhoneScreen = () => {
   )
 
   return (
-    <YStack f={1} jc={'space-between'} ai={'center'} gap={'$3.5'} py={'$10'}>
-      <YStack w={'100%'} ai={'center'}>
-        <FormProvider {...form}>
-          <YStack w={'100%'} ai={'center'}>
-            <Paragraph w={'100%'} size={'$8'} fontWeight={500} tt={'uppercase'}>
-              login with your phone
-            </Paragraph>
-            <Paragraph w={'100%'} size={'$5'} color={'$olive'}>
-              If you created your account with phone number, login using it
-            </Paragraph>
-          </YStack>
-          <SchemaForm
-            form={form}
-            schema={SignInWithPhoneSchema}
-            onSubmit={handleSubmit}
-            defaultValues={{ phone: '', countryCode: '' }}
-            formProps={{
-              w: '100%',
-              f: 0,
-              footerProps: { p: 0 },
-              $gtSm: {
-                maxWidth: '100%',
-              },
-              style: { justifyContent: 'space-between' },
-            }}
-            props={{
-              phone: {
-                testID: 'phone-number-input',
-                placeholder: 'Input phone number',
-                color: '$color12',
-                fontWeight: '500',
-                bw: 0,
-                br: 0,
-                p: 0,
-                pl: '$2.5',
-                focusStyle: {
-                  outlineWidth: 0,
-                },
-                '$theme-dark': {
-                  placeholderTextColor: '$darkGrayTextField',
-                },
-                '$theme-light': {
-                  placeholderTextColor: '$darkGrayTextField',
-                },
-                fontSize: '$5',
-                onFocus: () => setIsInputFocused(true),
-                onBlur: () => setIsInputFocused(false),
-                fieldsetProps: {
-                  f: 1,
-                },
-              },
-            }}
-            renderAfter={renderAfter}
-          >
-            {({ countryCode, phone }) => (
-              <FadeCard
-                w={'100%'}
-                mt={'$5'}
-                borderColor={validationError ? '$error' : 'transparent'}
-                bw={1}
-                pb={validationError ? '$5' : '$6'}
-              >
-                <XStack position="relative" ai={'center'}>
-                  {countryCode}
-                  {phone}
-                  <XStack
-                    position="absolute"
-                    bottom={-8}
-                    left={0}
-                    right={0}
-                    height={1}
-                    backgroundColor={isInputFocused ? '$primary' : '$darkGrayTextField'}
-                    $theme-light={{
-                      backgroundColor: isInputFocused ? '$color12' : '$silverChalice',
-                    }}
-                  />
-                </XStack>
-                {validationError && (
-                  <Paragraph color={'$error'}>{validationError.message}</Paragraph>
-                )}
-              </FadeCard>
-            )}
-          </SchemaForm>
-        </FormProvider>
-      </YStack>
-      <LinkableButton
-        href={'/auth/sign-up'}
-        transparent
-        chromeless
-        backgroundColor="transparent"
-        hoverStyle={{ backgroundColor: 'transparent' }}
-        pressStyle={{ backgroundColor: 'transparent' }}
-        focusStyle={{ backgroundColor: 'transparent' }}
-        bw={0}
-        br={0}
-        height={'auto'}
-        {...(Platform.OS !== 'web' // on native go back instead of /auth/sign-up, better ux using stack navigation
-          ? {
-              onPress: () => {
-                router.back()
-              },
-            }
-          : {})}
-      >
-        <Button.Text
-          color={'$primary'}
-          $theme-light={{
-            color: '$color12',
-          }}
+    <YStack f={1} jc={'center'} ai={'center'} gap={'$5'} pb={100}>
+      <YStack ai={'center'} gap={'$2'}>
+        <Paragraph w={'100%'} size={'$8'} fontWeight={600} ta={'center'}>
+          Login with your phone
+        </Paragraph>
+        <Paragraph
+          px={'$3'}
+          size={'$3'}
+          color={'$lightGrayTextField'}
+          ta={'center'}
+          $theme-light={{ color: '$darkGrayTextField' }}
+          numberOfLines={2}
         >
-          Sign up
-        </Button.Text>
-      </LinkableButton>
+          If you created your account with phone number, login using it
+        </Paragraph>
+      </YStack>
+      <YStack w={'100%'} ai={'center'}>
+        <FadeCard
+          fadeProps={{
+            width: '100%',
+            maxWidth: 550,
+          }}
+          borderColor={validationError ? '$error' : 'transparent'}
+          bw={1}
+          pb={validationError ? '$5' : '$6'}
+        >
+          <FormProvider {...form}>
+            <SchemaForm
+              form={form}
+              schema={SignInWithPhoneSchema}
+              onSubmit={handleSubmit}
+              defaultValues={{ phone: '', countryCode: '' }}
+              formProps={{
+                w: '100%',
+                f: 0,
+                footerProps: { p: 0 },
+                $gtSm: {
+                  maxWidth: '100%',
+                },
+                style: { justifyContent: 'space-between' },
+              }}
+              props={{
+                phone: {
+                  testID: 'phone-number-input',
+                  placeholder: 'Input phone number',
+                  color: '$color12',
+                  fontWeight: '500',
+                  bw: 0,
+                  br: 0,
+                  p: 0,
+                  pl: '$2.5',
+                  focusStyle: {
+                    outlineWidth: 0,
+                  },
+                  '$theme-dark': {
+                    placeholderTextColor: '$darkGrayTextField',
+                  },
+                  '$theme-light': {
+                    placeholderTextColor: '$darkGrayTextField',
+                  },
+                  fontSize: '$5',
+                  onFocus: () => setIsInputFocused(true),
+                  onBlur: () => setIsInputFocused(false),
+                  fieldsetProps: {
+                    f: 1,
+                  },
+                },
+              }}
+              renderAfter={renderAfter}
+            >
+              {({ countryCode, phone }) => (
+                <>
+                  <XStack position="relative" ai={'center'}>
+                    {countryCode}
+                    {phone}
+                    <XStack
+                      position="absolute"
+                      bottom={-8}
+                      left={0}
+                      right={0}
+                      height={1}
+                      backgroundColor={isInputFocused ? '$primary' : '$darkGrayTextField'}
+                      $theme-light={{
+                        backgroundColor: isInputFocused ? '$color12' : '$silverChalice',
+                      }}
+                    />
+                  </XStack>
+                  {validationError && (
+                    <Paragraph color={'$error'}>{validationError.message}</Paragraph>
+                  )}
+                </>
+              )}
+            </SchemaForm>
+          </FormProvider>
+          <XStack w={'100%'} gap={'$2'} jc={'center'} ai={'center'}>
+            <Paragraph $theme-light={{ color: '$darkGrayTextField' }}>
+              Don&apos;t have account yet?
+            </Paragraph>
+            <LinkableButton
+              href={'/auth/sign-up'}
+              transparent
+              chromeless
+              backgroundColor="transparent"
+              hoverStyle={{ backgroundColor: 'transparent' }}
+              pressStyle={{ backgroundColor: 'transparent' }}
+              focusStyle={{ backgroundColor: 'transparent' }}
+              bw={0}
+              br={0}
+              height={'auto'}
+              p={0}
+              {...(Platform.OS !== 'web' // on native go back instead of /auth/sign-up, better ux using stack navigation
+                ? {
+                    onPress: () => {
+                      router.back()
+                    },
+                  }
+                : {})}
+            >
+              <Button.Text
+                color={'$primary'}
+                $theme-light={{
+                  color: '$color12',
+                }}
+              >
+                Sign up
+              </Button.Text>
+            </LinkableButton>
+          </XStack>
+        </FadeCard>
+      </YStack>
     </YStack>
   )
 }
