@@ -81,16 +81,18 @@ export const FirstSendtagForm = () => {
   return (
     <YStack f={1} gap={'$3.5'}>
       <FormProvider {...form}>
-        <Paragraph size={'$8'} fontWeight={500} tt={'uppercase'}>
-          register your first sendtag
-        </Paragraph>
-        <Paragraph
-          fontSize={'$5'}
-          color={'$lightGrayTextField'}
-          $theme-light={{ color: '$darkGrayTextField' }}
-        >
-          Own your identity on Send. Register up to 5 verified tags and make them yours.
-        </Paragraph>
+        <YStack gap="$2">
+          <Paragraph w={'100%'} size={'$8'} fontWeight={600}>
+            Register first sendtag
+          </Paragraph>
+          <Paragraph
+            fontSize={'$4'}
+            color={'$lightGrayTextField'}
+            $theme-light={{ color: '$darkGrayTextField' }}
+          >
+            Own your identity on Send. Register up to 5 verified tags and make them yours.
+          </Paragraph>
+        </YStack>
         <SchemaForm
           form={form}
           onSubmit={handleSubmit}
@@ -146,13 +148,13 @@ export const FirstSendtagForm = () => {
         >
           {({ name }) => {
             return (
-              <YStack>
+              <YStack gap={'$5'}>
                 <FadeCard
                   w={'100%'}
-                  my={'$5'}
                   borderColor={validationError ? '$error' : 'transparent'}
                   bw={1}
                   pb={validationError ? '$5' : '$6'}
+                  mt={'$2'}
                 >
                   <XStack position="relative">
                     {name}

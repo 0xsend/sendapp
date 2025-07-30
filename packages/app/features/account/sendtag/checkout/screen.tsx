@@ -22,6 +22,7 @@ export const CheckoutScreen = () => {
     <YStack
       f={Platform.OS === 'web' ? undefined : 1}
       width={'100%'}
+      pt={'$3.5'}
       gap="$5"
       jc={'space-between'}
       $gtLg={{

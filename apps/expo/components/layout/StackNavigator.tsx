@@ -30,6 +30,7 @@ export default function StackNavigator() {
           <XStack flex={1} ai="center" jc="flex-start">
             <Paragraph
               fontWeight="500"
+              ml={'$1'}
               fontSize="$8"
               color="$color12"
               lineHeight={32}

@@ -223,7 +223,7 @@ export const SignUpScreen = () => {
         </Paragraph>
         <Paragraph
           px={'$3'}
-          size={'$3'}
+          size={'$4'}
           color={'$lightGrayTextField'}
           ta={'center'}
           $theme-light={{ color: '$darkGrayTextField' }}
@@ -325,7 +325,7 @@ export const SignUpScreen = () => {
                       {isAgreedToTerms}
                       <Label
                         cursor={'pointer'}
-                        size={'$3'}
+                        size={'$4'}
                         htmlFor={termsCheckboxId}
                         color={'$lightGrayTextField'}
                         $theme-light={{ color: '$darkGrayTextField' }}
@@ -335,7 +335,7 @@ export const SignUpScreen = () => {
                       >
                         I agree to the&nbsp;
                         <Anchor
-                          size={'$3'}
+                          size={'$4'}
                           href={'https://support.send.app/en/articles/10916356-privacy-policy'}
                           target="_blank"
                           textDecorationLine="underline"
@@ -346,7 +346,7 @@ export const SignUpScreen = () => {
                         </Anchor>
                         &nbsp;and&nbsp;
                         <Anchor
-                          size={'$3'}
+                          size={'$4'}
                           href={'https://support.send.app/en/articles/10916009-terms-of-service'}
                           target="_blank"
                           textDecorationLine="underline"
@@ -383,7 +383,7 @@ export const SignUpScreen = () => {
           disabled={formState !== FormState.Idle}
         >
           <Button.Text
-            size={'$3'}
+            size={'$4'}
             color={'$lightGrayTextField'}
             $theme-light={{ color: '$darkGrayTextField' }}
             ta={'center'}
