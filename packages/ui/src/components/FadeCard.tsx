@@ -1,9 +1,13 @@
-import { Card, type CardProps } from 'tamagui'
+import { Card, type CardProps, type StackProps } from 'tamagui'
 import { Fade } from './Fade'
 
-export const FadeCard = ({ children, ...props }: CardProps) => {
+export const FadeCard = ({
+  children,
+  fadeProps,
+  ...props
+}: CardProps & { fadeProps?: StackProps }) => {
   return (
-    <Fade>
+    <Fade {...fadeProps}>
       <Card
         w={'100%'}
         gap={'$3.5'}

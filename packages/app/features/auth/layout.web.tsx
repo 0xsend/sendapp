@@ -32,7 +32,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
           }}
           flexDirection={'column'}
         >
-          <XStack w={'100%'} alignSelf={'center'}>
+          <XStack w={'100%'} alignSelf={'center'} jc={'center'}>
             <Link href={'/'} pt="$7">
               <IconSendLogo size={'$3.5'} color={'$color12'} />
             </Link>
