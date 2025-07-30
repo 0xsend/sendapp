@@ -74,12 +74,7 @@ export function ShareOtherProfileDialog({
               </Paragraph>
             </YStack>
           )}
-          <YStack
-            justifyContent="space-between"
-            marginTop="$4"
-            gap="$4"
-            $gtLg={{ flexDirection: 'row-reverse' }}
-          >
+          <YStack justifyContent="space-between" marginTop="$4" gap="$4">
             <PrimaryButton
               theme="green"
               borderRadius={'$4'}
