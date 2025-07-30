@@ -222,7 +222,6 @@ export const SignUpScreen = () => {
           Create your account
         </Paragraph>
         <Paragraph
-          px={'$3'}
           size={'$4'}
           color={'$lightGrayTextField'}
           ta={'center'}
