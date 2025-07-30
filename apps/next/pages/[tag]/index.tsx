@@ -7,9 +7,11 @@ import { userOnboarded } from 'utils/userOnboarded'
 import { SendtagSchema } from 'app/utils/zod/sendtag'
 import { assert } from 'app/utils/assert'
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
-import { ProfileLayout } from 'app/features/profile/layout.web'
+import { HomeLayout } from 'app/features/home/layout.web'
 import { buildSeo } from 'utils/seo'
 import { generateProfileSeoData, type ProfileSeoData } from 'utils/seoHelpers'
+
+import { ProfileTopNav } from 'app/components/ProfileTopNav'
 
 interface PageProps {
   sendid: number | null
@@ -133,6 +135,6 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   }
 }) satisfies GetServerSideProps
 
-Page.getLayout = (children) => <ProfileLayout>{children}</ProfileLayout>
+Page.getLayout = (children) => <HomeLayout TopNav={<ProfileTopNav />}>{children}</HomeLayout>
 
 export default Page

@@ -12,6 +12,8 @@ import { IconArrowLeft } from 'app/components/icons'
 import { useRouter } from 'solito/router'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useParams } from 'next/navigation'
+import AvatarMenuButton from './AvatarMenuButton/AvatarMenuButton'
+import { useUser } from 'app/utils/useUser'
 
 interface ProfileTopNavProps {
   /**
@@ -29,14 +31,15 @@ export function ProfileTopNav({ backFunction = 'router' }: ProfileTopNavProps) {
   // Use the appropriate lookup based on the route params
   const lookupType = params.tag ? 'tag' : 'sendid'
   const identifier = params.tag || params.sendid || ''
-  const { data: profile } = useProfileLookup(lookupType, identifier)
+  const { data: otherUserProfile } = useProfileLookup(lookupType, identifier)
+  const { profile } = useUser()
 
   const handleBack = () => {
     back()
   }
 
   // Don't render on large screens or if no profile data
-  if (media.gtLg || !profile) {
+  if (media.gtLg) {
     return null
   }
 
@@ -60,18 +63,13 @@ export function ProfileTopNav({ backFunction = 'router' }: ProfileTopNavProps) {
             </ButtonOg.Icon>
           </Button>
           <Paragraph size={'$8'} col={'$color12'} fontWeight={'500'}>
-            {profile.name || profile.main_tag_name || `#${profile.sendid}`}
+            {otherUserProfile?.name ||
+              otherUserProfile?.main_tag_name ||
+              `#${otherUserProfile?.sendid} || ""`}
           </Paragraph>
         </XStack>
         <XStack ai="center">
-          <Avatar size={'$3'} circular>
-            <Avatar.Image src={profile.avatar_url || ''} w="100%" h="100%" objectFit="cover" />
-            <Avatar.Fallback jc={'center'} ai="center" theme="green_active" bc="$color2">
-              <Paragraph size={'$4'} fontWeight={'600'}>
-                {((profile?.name || profile?.main_tag_name || 'U')[0] || 'U').toUpperCase()}
-              </Paragraph>
-            </Avatar.Fallback>
-          </Avatar>
+          <AvatarMenuButton profile={profile} />
         </XStack>
       </Container>
     </Header>
