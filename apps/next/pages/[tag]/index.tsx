@@ -10,6 +10,8 @@ import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { ProfileLayout } from 'app/features/profile/layout.web'
 import { buildSeo } from 'utils/seo'
 import { generateProfileSeoData, type ProfileSeoData } from 'utils/seoHelpers'
+import { ProfileTopNav } from 'app/components/ProfileTopNav'
+import { HomeLayout } from 'app/features/home/layout.web'
 
 interface PageProps {
   sendid: number | null
@@ -133,6 +135,6 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   }
 }) satisfies GetServerSideProps
 
-Page.getLayout = (children) => <ProfileLayout>{children}</ProfileLayout>
+Page.getLayout = (children) => <HomeLayout TopNav={ProfileTopNav}>{children}</HomeLayout>
 
 export default Page
