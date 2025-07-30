@@ -161,8 +161,7 @@ export function OnboardingScreen() {
           Finish your account
         </Paragraph>
         <Paragraph
-          px={'$3'}
-          size={'$3'}
+          size={'$4'}
           color={'$lightGrayTextField'}
           ta={'center'}
           $theme-light={{ color: '$darkGrayTextField' }}
