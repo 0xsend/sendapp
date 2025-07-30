@@ -7,11 +7,11 @@ import { userOnboarded } from 'utils/userOnboarded'
 import { SendtagSchema } from 'app/utils/zod/sendtag'
 import { assert } from 'app/utils/assert'
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
-import { ProfileLayout } from 'app/features/profile/layout.web'
+import { HomeLayout } from 'app/features/home/layout.web'
 import { buildSeo } from 'utils/seo'
 import { generateProfileSeoData, type ProfileSeoData } from 'utils/seoHelpers'
+
 import { ProfileTopNav } from 'app/components/ProfileTopNav'
-import { HomeLayout } from 'app/features/home/layout.web'
 
 interface PageProps {
   sendid: number | null
