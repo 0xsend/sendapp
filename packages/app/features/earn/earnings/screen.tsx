@@ -21,7 +21,7 @@ export const EarningsBalance = () => {
       <ScrollView showsVerticalScrollIndicator={false} overflow={'visible'}>
         <YStack gap={'$4'}>
           <TotalEarning />
-          <Paragraph size={'$7'} fontWeight={'500'}>
+          <Paragraph size={'$7'} fontWeight={'600'}>
             Earnings History
           </Paragraph>
           <EarningsFeed />
@@ -212,23 +212,26 @@ function TotalEarning() {
         elevation={Platform.OS === 'web' ? '$0.75' : 0}
         $gtLg={{ p: '$7' }}
       >
-        <YStack gap={'$4'}>
+        <YStack gap={'$3.5'}>
           <XStack ai={'center'} gap={'$2'}>
             <IconCoin symbol={coin.data.symbol} size={'$2'} />
-            <Paragraph size={'$7'}>{coin.data.symbol}</Paragraph>
+            <Paragraph size={'$7'} fontWeight={600} lineHeight={28}>
+              {coin.data.symbol}
+            </Paragraph>
           </XStack>
-          <YStack gap={'$2'}>
+          <YStack gap={Platform.OS === 'web' ? '$3.5' : '$2'}>
             <Paragraph
-              fontWeight={'500'}
+              fontWeight={'600'}
               size={displayString.length > 16 ? '$9' : '$11'}
+              lineHeight={56}
               $gtLg={{
                 size: displayString.length > 16 ? '$9' : displayString.length > 8 ? '$10' : '$11',
               }}
             >
               {displayString}
             </Paragraph>
+            <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
           </YStack>
-          <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
           <Paragraph
             size={'$5'}
             color={'$lightGrayTextField'}

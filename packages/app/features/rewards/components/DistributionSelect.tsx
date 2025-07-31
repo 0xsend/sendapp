@@ -1,18 +1,9 @@
 // In a new file: components/DistributionSelect.tsx
-import {
-  Adapt,
-  Button,
-  Paragraph,
-  Select,
-  type SelectItemProps,
-  Sheet,
-  Theme,
-  XStack,
-} from '@my/ui'
-import { ChevronDown, ChevronUp, Dot } from '@tamagui/lucide-icons'
+import { Adapt, Button, Paragraph, Select, type SelectItemProps, Sheet, XStack } from '@my/ui'
+import { ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
 import { memo, useRef, useState } from 'react'
 import type { UseDistributionsResultData } from 'app/utils/distributions'
-import { IconX } from 'app/components/icons'
+import { IconCheckCircle, IconX } from 'app/components/icons'
 import { Platform } from 'react-native'
 import { useThemeName } from 'tamagui'
 
@@ -26,23 +17,32 @@ const DistributionItem = ({
   isActive: boolean
 } & SelectItemProps) => {
   return (
-    <Select.Item index={index} value={value} bc="transparent" f={1} w="100%" {...props}>
-      <XStack gap={'$1'} $gtLg={{ gap: '$3.5' }} f={1} ai={'center'} jc={'center'}>
+    <Select.Item
+      index={index}
+      value={value}
+      bc="transparent"
+      f={1}
+      w="100%"
+      p={'$2'}
+      m={0}
+      style={{
+        minHeight: 'unset',
+      }}
+      {...props}
+    >
+      <XStack gap={'$3.5'} f={1} ai={'center'} jc={'center'}>
         <Select.ItemText
           display="flex"
           fontSize={'$5'}
-          fontWeight={'500'}
-          textTransform={'uppercase'}
-          color={'$color12'}
+          fontWeight={'700'}
+          color={isActive ? '$color12' : '$color10'}
           jc={'center'}
           ai={'center'}
         >
           {children}
         </Select.ItemText>
         {isActive && (
-          <Theme name="green_active">
-            <Dot size={'$3'} />
-          </Theme>
+          <IconCheckCircle size="$0.9" color={'$primary'} $theme-light={{ color: '$color12' }} />
         )}
       </XStack>
     </Select.Item>
@@ -110,7 +110,7 @@ export const DistributionSelect = memo(
             animation={'quick'}
             disableDrag
           >
-            <Sheet.Frame maw={738} bc={'$color1'}>
+            <Sheet.Frame maw={738} bc={'$color1'} p={'$5'}>
               {Platform.OS === 'web' && (
                 <Sheet.Handle py="$5" f={1} bc="transparent" jc={'space-between'} opacity={1} m={0}>
                   <XStack ai="center" jc="space-between" w="100%" px="$4">

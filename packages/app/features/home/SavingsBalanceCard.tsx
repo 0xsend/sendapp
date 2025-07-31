@@ -10,6 +10,7 @@ import { formatUnits } from 'viem'
 import { type LinkProps, useLink } from 'solito/link'
 import { HomeBodyCard } from './screen'
 import { usdcCoin } from 'app/data/coins'
+import { Platform } from 'react-native'
 
 export const SavingsBalanceCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'children'>) => {
   const linkProps = useLink({ href })
@@ -52,7 +53,7 @@ export const SavingsBalanceCard = ({ href, ...props }: Omit<CardProps & LinkProp
           $theme-light={{ color: '$darkGrayTextField' }}
         />
       </Card.Header>
-      <Card.Footer padded size="$4" pt={0} fd="column" gap="$4">
+      <Card.Footer padded size="$4" pt={0} fd="column" gap={Platform.OS === 'web' ? '$2' : '$1'}>
         {isLoading ? (
           <Spinner size={'large'} color={'$color12'} />
         ) : (

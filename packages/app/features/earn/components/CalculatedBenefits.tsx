@@ -19,7 +19,7 @@ export const CalculatedBenefits = ({
   return (
     <Fade>
       <YStack gap={'$3.5'}>
-        <Paragraph size={'$7'} fontWeight={'500'}>
+        <Paragraph size={'$7'} fontWeight={'600'}>
           Benefits
         </Paragraph>
         <Card w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>

@@ -14,11 +14,13 @@ import { type LinkProps, useLink } from 'solito/link'
 import { useFriends } from '../affiliate/utils/useFriends'
 import { IconAccount } from 'app/components/icons'
 import { HomeBodyCard } from './screen'
+import { useHoverStyles } from 'app/utils/useHoverStyles'
 
 export const FriendsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'children'>) => {
   const linkProps = useLink({ href })
   const limit = 3
   const { data, isLoading } = useFriends(limit)
+  const hoverStyles = useHoverStyles()
 
   return (
     <HomeBodyCard {...linkProps} {...props}>
@@ -48,7 +50,7 @@ export const FriendsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
               circular
               ai="center"
               jc="center"
-              bc="$color0"
+              bc={hoverStyles.backgroundColor}
               w={'$3.5'}
               h="$3.5"
               mih={0}
@@ -78,13 +80,13 @@ function OverlappingFriendAvatars({ friends, ...props }: { friends: Friend[] } &
           testID="avatar"
           key={friend.tag || `empty-${index}`}
           circular
-          mr={-16}
+          mr={-8}
           ai="center"
           jc="center"
           bc="$color2"
           borderWidth="$0.75"
           borderColor="$color1"
-          $gtMd={{ mr: -8 }}
+          size={'$2.5'}
         >
           <Avatar.Image
             testID="avatarImage"

@@ -324,7 +324,7 @@ export function WithdrawForm() {
       f={Platform.OS === 'web' ? undefined : 1}
       $gtLg={{ w: '50%', pb: '$3.5' }}
     >
-      <Paragraph size={'$7'} fontWeight={'500'}>
+      <Paragraph size={'$7'} fontWeight={'600'}>
         Withdraw Amount
       </Paragraph>
       <FormProvider {...form}>
