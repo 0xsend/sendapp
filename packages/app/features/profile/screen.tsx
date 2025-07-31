@@ -1,12 +1,10 @@
 // External libs & UI
-import { ChevronLeft, ChevronRight, Upload } from '@tamagui/lucide-icons'
-import { useRouter } from 'solito/router'
+import { ChevronRight, Upload } from '@tamagui/lucide-icons'
 import { useState } from 'react'
 import {
   BlurStack,
   Button,
   Card,
-  H2,
   Image,
   LinkableButton,
   Paragraph,
@@ -82,152 +80,158 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   }
 
   return (
-    <YStack flexDirection={media.gtMd ? 'row' : 'column'} gap="$4" ai="center" w="100%">
-      <YStack
-        gap="$4"
-        f={1}
-        maw={509}
-        w="100%"
-        als={media.gtMd ? 'flex-start' : 'center'}
-        jc={media.gtMd ? 'flex-start' : 'center'}
-      >
-        <Card elevation={0} w="100%" h={200} position="relative" br="$5">
-          <Card.Background br="$5">
-            {otherUserProfile?.banner_url ? null : (
-              <BlurStack fullscreen intensity={30} zIndex={100} />
-            )}
-            <Image
-              source={{
-                uri:
-                  otherUserProfile?.banner_url ??
-                  otherUserProfile?.avatar_url ??
-                  `https://ghassets.send.app/app_images/auth_image_${Math.floor(Math.random() * 3) + 1}.jpg`,
-                width: 428,
-                height: 200,
-              }}
-              h="100%"
-              w="100%"
-              objectFit={'cover'}
-              br="$5"
-            />
-          </Card.Background>
-        </Card>
-        <Card gap="$4" size="$4" padded elevation={1}>
-          <XStack ai="center" w="100%">
-            <Avatar
-              size={64}
-              aspectRatio={1}
-              objectFit="cover"
-              br={'$3'}
-              bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
-            >
-              <Avatar.Image src={otherUserProfile?.avatar_url ?? undefined} objectFit="cover" />
-              <Avatar.Fallback f={1} jc={'center'} ai={'center'}>
-                <IconAccount color="$color12" size={'100%'} />
-              </Avatar.Fallback>
-            </Avatar>
-            <YStack px="$4" gap="$2" jc="space-around" f={1}>
-              <H3 lineHeight={32} color="$color12">
-                {otherUserProfile?.name ?? '---'}
-              </H3>
-              <XStack gap="$2" flexWrap="wrap" w="100%">
-                {otherUserProfile?.all_tags?.map((tag) => {
-                  return (
-                    <XStack
-                      key={tag}
-                      px={8}
-                      py={4}
-                      bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
-                      borderRadius={4}
-                      alignSelf="flex-start"
-                    >
-                      <Paragraph color="$color12" fontSize="$3" fontWeight="400">
-                        /{tag}
-                      </Paragraph>
-                    </XStack>
-                  )
-                })}
-              </XStack>
-            </YStack>
-          </XStack>
-          <Paragraph color="$color12" fontSize="$4" fontWeight="400">
-            {otherUserProfile?.about}
-          </Paragraph>
-          <XStack w="100%" gap="$4">
-            <LinkableButton
-              href={{
-                pathname: isWeb ? '/send' : '/send/form',
-                query: { recipient: otherUserProfile?.sendid, idType: 'sendid' },
-              }}
-              borderRadius={'$4'}
-              jc="center"
-              ai="center"
-              position="relative"
-              bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
-              f={1}
-            >
-              <Button.Icon>
-                <IconArrowUp size={'$1.5'} color={isDark ? '$primary' : '$color12'} />
-              </Button.Icon>
-              <Button.Text
-                color="$color12"
-                fontSize={'$4'}
-                fontFamily={'$mono'}
-                fontWeight={'500'}
-                textTransform={'uppercase'}
-                textAlign="center"
+    <YStack gap="$4" ai="center" w="100%" maw={1024}>
+      <Card elevation={0} w="100%" h={200} position="relative" br="$5">
+        <Card.Background br="$5">
+          <BlurStack
+            fullscreen
+            intensity={otherUserProfile?.banner_url ? 0 : 30}
+            zIndex={100}
+            tint={isDark ? 'dark' : 'light'}
+            overflow="hidden"
+          />
+          <Image
+            source={{
+              uri:
+                otherUserProfile?.banner_url ??
+                otherUserProfile?.avatar_url ??
+                `https://ghassets.send.app/app_images/auth_image_${Math.floor(Math.random() * 3) + 1}.jpg`,
+              width: 428,
+              height: 200,
+            }}
+            h="100%"
+            w="100%"
+            objectFit="cover"
+            br="$5"
+          />
+        </Card.Background>
+      </Card>
+      <YStack gap="$4" flexDirection={media.gtMd ? 'row' : 'column'} w="100%">
+        <YStack
+          gap="$4"
+          f={1}
+          maw={509}
+          w="100%"
+          als={media.gtMd ? 'flex-start' : 'center'}
+          jc={media.gtMd ? 'flex-start' : 'center'}
+        >
+          <Card gap="$4" size="$4" padded elevation={1}>
+            <XStack ai="center" w="100%">
+              <Avatar
+                size={64}
+                aspectRatio={1}
+                objectFit="cover"
+                br={'$3'}
+                bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
               >
-                SEND
-              </Button.Text>
-            </LinkableButton>
-            <Button
-              br="$4"
-              bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
-              onPress={openShareMenu}
-              icon={<Upload size="$1" color="$color12" />}
-            />
-          </XStack>
-        </Card>
-      </YStack>
-      <YStack
-        maw={509}
-        gap="$4"
-        als={media.gtMd ? 'flex-start' : 'center'}
-        jc={media.gtMd ? 'flex-start' : 'center'}
-        width={'100%'}
-        f={1}
-      >
-        <YStack gap="$4" w="100%">
-          <XStack ai={'center'} jc="space-between">
-            <Paragraph color="$color12" fontSize="$6" fontWeight="600">
-              Send Vibes
+                <Avatar.Image src={otherUserProfile?.avatar_url ?? undefined} objectFit="cover" />
+                <Avatar.Fallback f={1} jc={'center'} ai={'center'}>
+                  <IconAccount color="$color12" size={'100%'} />
+                </Avatar.Fallback>
+              </Avatar>
+              <YStack px="$4" gap="$2" jc="space-around" f={1}>
+                <H3 lineHeight={32} color="$color12">
+                  {otherUserProfile?.name ?? '---'}
+                </H3>
+                <XStack gap="$2" flexWrap="wrap" w="100%">
+                  {otherUserProfile?.all_tags?.map((tag) => {
+                    return (
+                      <XStack
+                        key={tag}
+                        px={8}
+                        py={4}
+                        bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
+                        borderRadius={4}
+                        alignSelf="flex-start"
+                      >
+                        <Paragraph color="$color12" fontSize="$3" fontWeight="400">
+                          /{tag}
+                        </Paragraph>
+                      </XStack>
+                    )
+                  })}
+                </XStack>
+              </YStack>
+            </XStack>
+            <Paragraph color="$color12" fontSize="$4" fontWeight="400">
+              {otherUserProfile?.about}
             </Paragraph>
-            <Link
-              textDecorationLine="underline"
-              href={`/profile/${otherUserProfile?.sendid}/history`}
-            >
-              View History
-            </Link>
-          </XStack>
-          <Vibes profile={otherUserProfile} tokenPrices={tokenPrices} />
+            <XStack w="100%" gap="$4">
+              <LinkableButton
+                href={{
+                  pathname: isWeb ? '/send' : '/send/form',
+                  query: { recipient: otherUserProfile?.sendid, idType: 'sendid' },
+                }}
+                borderRadius={'$4'}
+                jc="center"
+                ai="center"
+                position="relative"
+                bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
+                f={1}
+              >
+                <Button.Icon>
+                  <IconArrowUp size={'$1.5'} color={isDark ? '$primary' : '$color12'} />
+                </Button.Icon>
+                <Button.Text
+                  color="$color12"
+                  fontSize={'$4'}
+                  fontFamily={'$mono'}
+                  fontWeight={'500'}
+                  textTransform={'uppercase'}
+                  textAlign="center"
+                >
+                  SEND
+                </Button.Text>
+              </LinkableButton>
+              <Button
+                br="$4"
+                bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
+                onPress={openShareMenu}
+                icon={<Upload size="$1" color="$color12" />}
+              />
+            </XStack>
+          </Card>
         </YStack>
-        {otherUserProfile?.links_in_bio ? (
+        <YStack
+          maw={509}
+          gap="$4"
+          als={media.gtMd ? 'flex-start' : 'center'}
+          jc={media.gtMd ? 'flex-start' : 'center'}
+          width={'100%'}
+          f={1}
+        >
           <YStack gap="$4" w="100%">
-            <Paragraph color="$color12" fontSize="$6" fontWeight="600">
-              Let&apos;s Connect
-            </Paragraph>
-            <LinksInBio profile={otherUserProfile} />
+            <XStack ai={'center'} jc="space-between">
+              <Paragraph color="$color12" fontSize="$6" fontWeight="600">
+                Send Vibes
+              </Paragraph>
+              <Link
+                textDecorationLine="underline"
+                href={`/profile/${otherUserProfile?.sendid}/history`}
+              >
+                View History
+              </Link>
+            </XStack>
+            <Vibes profile={otherUserProfile} tokenPrices={tokenPrices} />
           </YStack>
+          {otherUserProfile?.links_in_bio ? (
+            <YStack gap="$4" w="100%">
+              <Paragraph color="$color12" fontSize="$6" fontWeight="600">
+                Let&apos;s Connect
+              </Paragraph>
+              <LinksInBio profile={otherUserProfile} />
+            </YStack>
+          ) : null}
+        </YStack>
+
+        {otherUserProfile ? (
+          <ShareOtherProfileDialog
+            isOpen={shareDialogOpen}
+            onClose={() => setShareDialogOpen(false)}
+            profile={otherUserProfile}
+          />
         ) : null}
       </YStack>
-
-      {otherUserProfile ? (
-        <ShareOtherProfileDialog
-          isOpen={shareDialogOpen}
-          onClose={() => setShareDialogOpen(false)}
-          profile={otherUserProfile}
-        />
-      ) : null}
     </YStack>
   )
 }
