@@ -4,7 +4,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { useAuthScreenParams } from 'app/routers/params'
 import { Button, FadeCard, LinkableButton, Paragraph, SubmitButton, XStack, YStack } from '@my/ui'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { api } from 'app/utils/api'
 import { useSignIn } from 'app/utils/send-accounts'
 import { Platform } from 'react-native'
@@ -54,15 +54,6 @@ export const LoginWithPhoneScreen = () => {
     router.push(redirectUri ?? '/')
   }
 
-  const renderAfter = useCallback(
-    ({ submit }: { submit: () => void }) => (
-      <SubmitButton onPress={submit} disabled={!canSubmit} mt={'$3'}>
-        <SubmitButton.Text>login</SubmitButton.Text>
-      </SubmitButton>
-    ),
-    [canSubmit]
-  )
-
   return (
     <YStack f={1} jc={'center'} ai={'center'} gap={'$5'} pb={100}>
       <YStack ai={'center'} gap={'$2'}>
@@ -87,7 +78,6 @@ export const LoginWithPhoneScreen = () => {
           }}
           borderColor={validationError ? '$error' : 'transparent'}
           bw={1}
-          pb={validationError ? '$5' : '$6'}
         >
           <FormProvider {...form}>
             <SchemaForm
@@ -131,7 +121,6 @@ export const LoginWithPhoneScreen = () => {
                   },
                 },
               }}
-              renderAfter={renderAfter}
             >
               {({ countryCode, phone }) => (
                 <>
@@ -153,6 +142,12 @@ export const LoginWithPhoneScreen = () => {
                   {validationError && (
                     <Paragraph color={'$error'}>{validationError.message}</Paragraph>
                   )}
+                  <SubmitButton
+                    onPress={() => form.handleSubmit(handleSubmit)()}
+                    disabled={!canSubmit}
+                  >
+                    <SubmitButton.Text>login</SubmitButton.Text>
+                  </SubmitButton>
                 </>
               )}
             </SchemaForm>

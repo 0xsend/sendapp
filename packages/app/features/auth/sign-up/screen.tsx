@@ -177,45 +177,6 @@ export const SignUpScreen = () => {
     }
   }, [signInMutateAsync, toast.error, router.push, queryParams.redirectUri])
 
-  const renderAfterContent = useCallback(
-    ({ submit }: { submit: () => void }) => (
-      <YStack gap={'$3.5'}>
-        <SubmitButton disabled={!canSubmit || formState !== FormState.Idle} onPress={submit}>
-          <SubmitButton.Text>create account</SubmitButton.Text>
-        </SubmitButton>
-        <XStack w={'100%'} gap={'$2'} jc={'center'} ai={'center'}>
-          <Paragraph $theme-light={{ color: '$darkGrayTextField' }}>
-            Already have an account?
-          </Paragraph>
-          <Button
-            onPress={handleSignIn}
-            transparent
-            chromeless
-            backgroundColor="transparent"
-            hoverStyle={{ backgroundColor: 'transparent' }}
-            pressStyle={{ backgroundColor: 'transparent' }}
-            focusStyle={{ backgroundColor: 'transparent' }}
-            bw={0}
-            br={0}
-            height={'auto'}
-            p={0}
-            disabled={formState !== FormState.Idle}
-          >
-            <Button.Text
-              color={'$primary'}
-              $theme-light={{
-                color: '$color12',
-              }}
-            >
-              {formState === FormState.SigningIn ? 'Signing in...' : 'Sign in'}
-            </Button.Text>
-          </Button>
-        </XStack>
-      </YStack>
-    ),
-    [canSubmit, formState, handleSignIn]
-  )
-
   return (
     <YStack f={1} jc={'center'} ai={'center'} gap={'$7'} w={'100%'}>
       <YStack ai={'center'} gap={'$2'}>
@@ -302,65 +263,102 @@ export const SignUpScreen = () => {
                 },
                 style: { justifyContent: 'space-between' },
               }}
-              renderAfter={renderAfterContent}
             >
               {({ name, isAgreedToTerms }) => {
                 return (
-                  <YStack gap={'$2'}>
-                    <XStack position="relative">
-                      {name}
-                      <XStack
-                        position="absolute"
-                        bottom={0}
-                        left={0}
-                        right={0}
-                        height={1}
-                        backgroundColor={isInputFocused ? '$primary' : '$darkGrayTextField'}
-                        $theme-light={{
-                          backgroundColor: isInputFocused ? '$color12' : '$silverChalice',
-                        }}
-                      />
-                    </XStack>
-                    <XStack gap={'$2'} ai={'center'}>
-                      {isAgreedToTerms}
-                      <Label
-                        cursor={'pointer'}
-                        size={'$4'}
-                        htmlFor={termsCheckboxId}
-                        color={'$lightGrayTextField'}
-                        $theme-light={{ color: '$darkGrayTextField' }}
-                        pressStyle={{
-                          color: isDarkTheme ? '$lightGrayTextField' : '$darkGrayTextField',
-                        }}
+                  <>
+                    <YStack gap={'$2'}>
+                      <XStack position="relative">
+                        {name}
+                        <XStack
+                          position="absolute"
+                          bottom={0}
+                          left={0}
+                          right={0}
+                          height={1}
+                          backgroundColor={isInputFocused ? '$primary' : '$darkGrayTextField'}
+                          $theme-light={{
+                            backgroundColor: isInputFocused ? '$color12' : '$silverChalice',
+                          }}
+                        />
+                      </XStack>
+                      <XStack gap={'$2'} ai={'center'}>
+                        {isAgreedToTerms}
+                        <Label
+                          cursor={'pointer'}
+                          size={'$4'}
+                          htmlFor={termsCheckboxId}
+                          color={'$lightGrayTextField'}
+                          $theme-light={{ color: '$darkGrayTextField' }}
+                          pressStyle={{
+                            color: isDarkTheme ? '$lightGrayTextField' : '$darkGrayTextField',
+                          }}
+                        >
+                          I agree to the&nbsp;
+                          <Anchor
+                            size={'$4'}
+                            href={'https://support.send.app/en/articles/10916356-privacy-policy'}
+                            target="_blank"
+                            textDecorationLine="underline"
+                            color={'$primary'}
+                            $theme-light={{ color: '$darkGrayTextField' }}
+                          >
+                            Privacy Policy
+                          </Anchor>
+                          &nbsp;and&nbsp;
+                          <Anchor
+                            size={'$4'}
+                            href={'https://support.send.app/en/articles/10916009-terms-of-service'}
+                            target="_blank"
+                            textDecorationLine="underline"
+                            color={'$primary'}
+                            $theme-light={{ color: '$darkGrayTextField' }}
+                          >
+                            Terms
+                          </Anchor>
+                        </Label>
+                      </XStack>
+                      {validationError && (
+                        <Paragraph color={'$error'}>{validationError.message}</Paragraph>
+                      )}
+                    </YStack>
+                    <YStack gap={'$3.5'}>
+                      <SubmitButton
+                        disabled={!canSubmit || formState !== FormState.Idle}
+                        onPress={() => form.handleSubmit(handleSubmit)()}
                       >
-                        I agree to the&nbsp;
-                        <Anchor
-                          size={'$4'}
-                          href={'https://support.send.app/en/articles/10916356-privacy-policy'}
-                          target="_blank"
-                          textDecorationLine="underline"
-                          color={'$primary'}
-                          $theme-light={{ color: '$darkGrayTextField' }}
+                        <SubmitButton.Text>create account</SubmitButton.Text>
+                      </SubmitButton>
+                      <XStack w={'100%'} gap={'$2'} jc={'center'} ai={'center'}>
+                        <Paragraph $theme-light={{ color: '$darkGrayTextField' }}>
+                          Already have an account?
+                        </Paragraph>
+                        <Button
+                          onPress={handleSignIn}
+                          transparent
+                          chromeless
+                          backgroundColor="transparent"
+                          hoverStyle={{ backgroundColor: 'transparent' }}
+                          pressStyle={{ backgroundColor: 'transparent' }}
+                          focusStyle={{ backgroundColor: 'transparent' }}
+                          bw={0}
+                          br={0}
+                          height={'auto'}
+                          p={0}
+                          disabled={formState !== FormState.Idle}
                         >
-                          Privacy Policy
-                        </Anchor>
-                        &nbsp;and&nbsp;
-                        <Anchor
-                          size={'$4'}
-                          href={'https://support.send.app/en/articles/10916009-terms-of-service'}
-                          target="_blank"
-                          textDecorationLine="underline"
-                          color={'$primary'}
-                          $theme-light={{ color: '$darkGrayTextField' }}
-                        >
-                          Terms
-                        </Anchor>
-                      </Label>
-                    </XStack>
-                    {validationError && (
-                      <Paragraph color={'$error'}>{validationError.message}</Paragraph>
-                    )}
-                  </YStack>
+                          <Button.Text
+                            color={'$primary'}
+                            $theme-light={{
+                              color: '$color12',
+                            }}
+                          >
+                            {formState === FormState.SigningIn ? 'Signing in...' : 'Sign in'}
+                          </Button.Text>
+                        </Button>
+                      </XStack>
+                    </YStack>
+                  </>
                 )
               }}
             </SchemaForm>
