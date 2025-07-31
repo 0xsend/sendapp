@@ -24,8 +24,8 @@ interface ProfileTopNavProps {
 }
 
 export function ProfileTopNav({ backFunction = 'router' }: ProfileTopNavProps) {
-  const { back } = useRouter()
   const media = useMedia()
+  const { back } = useRouter()
   const params = useParams<{ tag?: string; sendid?: string }>()
 
   // Use the appropriate lookup based on the route params
@@ -36,11 +36,6 @@ export function ProfileTopNav({ backFunction = 'router' }: ProfileTopNavProps) {
 
   const handleBack = () => {
     back()
-  }
-
-  // Don't render on large screens or if no profile data
-  if (media.gtLg) {
-    return null
   }
 
   return (
@@ -68,9 +63,11 @@ export function ProfileTopNav({ backFunction = 'router' }: ProfileTopNavProps) {
               `#${otherUserProfile?.sendid} || ""`}
           </Paragraph>
         </XStack>
-        <XStack ai="center">
-          <AvatarMenuButton profile={profile} />
-        </XStack>
+        {media.gtLg ? null : (
+          <XStack ai="center">
+            <AvatarMenuButton profile={profile} />
+          </XStack>
+        )}
       </Container>
     </Header>
   )

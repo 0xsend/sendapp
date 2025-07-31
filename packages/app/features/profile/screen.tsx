@@ -115,24 +115,32 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
           als={media.gtMd ? 'flex-start' : 'center'}
           jc={media.gtMd ? 'flex-start' : 'center'}
         >
-          <Card gap="$4" size="$4" padded elevation={1}>
-            <XStack ai="center" w="100%">
+          {media.gtMd ? (
+            <Paragraph color="$color12" fontSize="$6" fontWeight="600">
+              About
+            </Paragraph>
+          ) : null}
+          <Card gap="$4" size={media.gtMd ? '$7' : '$5'} padded elevation={1}>
+            <XStack jc="space-between" w="100%">
               <Avatar
-                size={64}
+                size={media.gtMd ? 80 : 64}
                 aspectRatio={1}
                 objectFit="cover"
                 br={'$3'}
                 bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
+                als="center"
               >
                 <Avatar.Image src={otherUserProfile?.avatar_url ?? undefined} objectFit="cover" />
                 <Avatar.Fallback f={1} jc={'center'} ai={'center'}>
                   <IconAccount color="$color12" size={'100%'} />
                 </Avatar.Fallback>
               </Avatar>
-              <YStack px="$4" gap="$2" jc="space-around" f={1}>
+
+              <YStack px="$4" gap="$2" jc="space-around" f={1} als="center">
                 <H3 lineHeight={32} color="$color12">
                   {otherUserProfile?.name ?? '---'}
                 </H3>
+
                 <XStack gap="$2" flexWrap="wrap" w="100%">
                   {otherUserProfile?.all_tags?.map((tag) => {
                     return (
@@ -152,7 +160,15 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                   })}
                 </XStack>
               </YStack>
+              <Link
+                textDecorationLine="underline"
+                href={`/profile/${otherUserProfile?.sendid}/history`}
+                als="flex-start"
+              >
+                View History
+              </Link>
             </XStack>
+
             <Paragraph color="$color12" fontSize="$4" fontWeight="400">
               {otherUserProfile?.about}
             </Paragraph>
@@ -170,24 +186,19 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                 f={1}
               >
                 <Button.Icon>
-                  <IconArrowUp size={'$1.5'} color={isDark ? '$primary' : '$color12'} />
+                  <IconArrowUp size={'$1'} color={isDark ? '$primary' : '$color12'} />
                 </Button.Icon>
-                <Button.Text
-                  color="$color12"
-                  fontSize={'$4'}
-                  fontFamily={'$mono'}
-                  fontWeight={'500'}
-                  textTransform={'uppercase'}
-                  textAlign="center"
-                >
-                  SEND
+                <Button.Text color="$color12" fontSize={'$4'} fontWeight={'400'} textAlign="center">
+                  Send
                 </Button.Text>
               </LinkableButton>
               <Button
+                aspectRatio={1}
+                p={0}
                 br="$4"
                 bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
                 onPress={openShareMenu}
-                icon={<Upload size="$1" color="$color12" />}
+                icon={<Upload size="$1" color="$color12" padding="$1" />}
               />
             </XStack>
           </Card>
@@ -200,20 +211,6 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
           width={'100%'}
           f={1}
         >
-          <YStack gap="$4" w="100%">
-            <XStack ai={'center'} jc="space-between">
-              <Paragraph color="$color12" fontSize="$6" fontWeight="600">
-                Send Vibes
-              </Paragraph>
-              <Link
-                textDecorationLine="underline"
-                href={`/profile/${otherUserProfile?.sendid}/history`}
-              >
-                View History
-              </Link>
-            </XStack>
-            <Vibes profile={otherUserProfile} tokenPrices={tokenPrices} />
-          </YStack>
           {otherUserProfile?.links_in_bio ? (
             <YStack gap="$4" w="100%">
               <Paragraph color="$color12" fontSize="$6" fontWeight="600">
@@ -222,6 +219,13 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
               <LinksInBio profile={otherUserProfile} />
             </YStack>
           ) : null}
+          <YStack gap="$4" w="100%">
+            <Paragraph color="$color12" fontSize="$6" fontWeight="600">
+              Send Vibes
+            </Paragraph>
+
+            <Vibes profile={otherUserProfile} tokenPrices={tokenPrices} />
+          </YStack>
         </YStack>
 
         {otherUserProfile ? (
@@ -402,10 +406,11 @@ const Vibes = ({
 }
 
 const LinksInBio = ({ profile }: { profile: Functions<'profile_lookup'>[number] }) => {
+  const media = useMedia()
   const theme = useThemeName()
   const isDark = theme?.startsWith('dark')
   return (
-    <Card elevation={1} padded size="$4" px="$2" borderRadius="$4" gap="$4">
+    <Card elevation={1} padded size={media.gtMd ? '$7' : '$5'} borderRadius="$6" gap="$4">
       {profile?.links_in_bio?.map((link) => {
         const fullUrl = `https://${link.domain}${link.handle}`
         return (
@@ -417,14 +422,7 @@ const LinksInBio = ({ profile }: { profile: Functions<'profile_lookup'>[number] 
             f={1}
             textDecorationLine="none"
           >
-            <XStack
-              p={'$3'}
-              f={1}
-              width="100%"
-              h="100%"
-              justifyContent="space-between"
-              alignItems="center"
-            >
+            <XStack f={1} width="100%" h="100%" justifyContent="space-between" alignItems="center">
               <XStack gap="$4" alignItems="center">
                 <IconLinkInBio domain_name={link.domain_name} size={24} color="$white" />
                 <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
@@ -433,11 +431,11 @@ const LinksInBio = ({ profile }: { profile: Functions<'profile_lookup'>[number] 
               </XStack>
               <XStack
                 bg={isDark ? 'rgba(255, 255, 255, 0.10)' : 'rgba(0, 0, 0, 0.10)'}
-                borderRadius="$2"
+                borderRadius="$3"
                 justifyContent="center"
                 alignItems="center"
               >
-                <ChevronRight size="$1" color="$color12" />
+                <ChevronRight size="$1.5" color="$color12" />
               </XStack>
             </XStack>
           </Anchor>
