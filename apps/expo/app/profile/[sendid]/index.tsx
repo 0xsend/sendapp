@@ -5,13 +5,15 @@ import { useProfileLookup } from 'app/utils/useProfileLookup'
 
 export default function Screen() {
   const sendid = useLocalSearchParams<{ sendid: string }>()?.sendid
-  const { data: otherUserProfile } = useProfileLookup('sendid', sendid)
+  const { data: otherUserProfile, isLoading } = useProfileLookup('sendid', sendid)
 
   return (
     <>
       <Stack.Screen
         options={{
-          title: otherUserProfile?.name || otherUserProfile?.main_tag_name || `#${sendid}`,
+          title: isLoading
+            ? ''
+            : otherUserProfile?.name || otherUserProfile?.main_tag_name || `#${sendid}`,
           headerShown: true,
         }}
       />

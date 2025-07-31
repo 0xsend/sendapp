@@ -31,7 +31,7 @@ export function ProfileTopNav({ backFunction = 'router' }: ProfileTopNavProps) {
   // Use the appropriate lookup based on the route params
   const lookupType = params.tag ? 'tag' : 'sendid'
   const identifier = params.tag || params.sendid || ''
-  const { data: otherUserProfile } = useProfileLookup(lookupType, identifier)
+  const { data: otherUserProfile, isLoading } = useProfileLookup(lookupType, identifier)
   const { profile } = useUser()
 
   const handleBack = () => {
@@ -57,11 +57,14 @@ export function ProfileTopNav({ backFunction = 'router' }: ProfileTopNavProps) {
               />
             </ButtonOg.Icon>
           </Button>
-          <Paragraph size={'$8'} col={'$color12'} fontWeight={'500'}>
-            {otherUserProfile?.name ||
-              otherUserProfile?.main_tag_name ||
-              `#${otherUserProfile?.sendid} || ""`}
-          </Paragraph>
+          {isLoading ? null : (
+            <Paragraph size={'$8'} col={'$color12'} fontWeight={'500'}>
+              {otherUserProfile?.name ||
+                otherUserProfile?.main_tag_name ||
+                `#${otherUserProfile?.sendid}` ||
+                ''}
+            </Paragraph>
+          )}
         </XStack>
         {media.gtLg ? null : (
           <XStack ai="center">
