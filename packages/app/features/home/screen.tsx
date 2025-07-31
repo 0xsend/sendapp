@@ -245,11 +245,12 @@ export const HomeBodyCard = styled(Card, {
   br: '$7',
   f: 1,
   mah: 150,
+  p: '$1.5',
 })
 
 export const HomeBodyCardRow = styled(XStack, {
   gap: '$3',
   w: '100%',
-  mih: 115,
+  mih: 125,
   jc: 'center',
 })

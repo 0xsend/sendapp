@@ -91,23 +91,31 @@ export const TextField = (
             {...props}
           />
           {props.iconAfter && <IconAfter {...props.iconAfterProps}>{props.iconAfter}</IconAfter>}
-        </Stack>
-        <Stack position="absolute" right="$4" gap="$2">
-          {(() => {
-            switch (true) {
-              case error !== undefined:
-                return (
-                  <Theme name={'red'}>
-                    <AlertTriangle color={'$color9'} />
-                  </Theme>
-                )
-              //@todo: Validating logic isn't working like it expect it to
-              // case isValid:
-              //   return <Check color={'$primary'} />
-              default:
-                return null
-            }
-          })()}
+          <Stack
+            position="absolute"
+            alignItems={'center'}
+            jc={'center'}
+            right="$4"
+            t={0}
+            b={0}
+            gap="$2"
+          >
+            {(() => {
+              switch (true) {
+                case error !== undefined:
+                  return (
+                    <Theme name={'red'}>
+                      <AlertTriangle color={'$color9'} />
+                    </Theme>
+                  )
+                //@todo: Validating logic isn't working like it expect it to
+                // case isValid:
+                //   return <Check color={'$primary'} />
+                default:
+                  return null
+              }
+            })()}
+          </Stack>
         </Stack>
         <Shake shakeKey={error?.errorMessage}>
           {error?.errorMessage && (

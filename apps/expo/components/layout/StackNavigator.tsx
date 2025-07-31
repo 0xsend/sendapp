@@ -29,10 +29,10 @@ export default function StackNavigator() {
         headerTitle: ({ children }) => (
           <XStack flex={1} ai="center" jc="flex-start">
             <Paragraph
-              fontWeight="500"
+              fontWeight="600"
               ml={'$1'}
               fontSize="$8"
-              color="$color12"
+              color="$color10"
               lineHeight={32}
               numberOfLines={1}
             >
