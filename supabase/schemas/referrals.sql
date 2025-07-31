@@ -57,16 +57,16 @@ begin
 (SELECT array_agg(link_in_bio_row)
             FROM (
                 SELECT ROW(
-                    id,
-                    user_id,
-                    handle,
-                    domain_name,
-                    created_at,
-                    updated_at,
-                    domain
+                    CASE WHEN lib.user_id = (SELECT auth.uid()) THEN lib.id ELSE NULL END,
+                    CASE WHEN lib.user_id = (SELECT auth.uid()) THEN lib.user_id ELSE NULL END,
+                    lib.handle,
+                    lib.domain_name,
+                    lib.created_at,
+                    lib.updated_at,
+                    lib.domain
                 )::link_in_bio as link_in_bio_row
-                FROM link_in_bio
-                WHERE user_id = p.id AND handle IS NOT NULL
+                FROM link_in_bio lib
+                WHERE lib.user_id = p.id AND lib.handle IS NOT NULL
             ) sub)
         ELSE NULL
         END,
@@ -448,16 +448,16 @@ BEGIN
 (SELECT array_agg(link_in_bio_row)
                     FROM (
                         SELECT ROW(
-                            id,
-                            user_id,
-                            handle,
-                            domain_name,
-                            created_at,
-                            updated_at,
-                            domain
+                            CASE WHEN lib.user_id = (SELECT auth.uid()) THEN lib.id ELSE NULL END,
+                            CASE WHEN lib.user_id = (SELECT auth.uid()) THEN lib.user_id ELSE NULL END,
+                            lib.handle,
+                            lib.domain_name,
+                            lib.created_at,
+                            lib.updated_at,
+                            lib.domain
                         )::link_in_bio as link_in_bio_row
-                        FROM link_in_bio
-                        WHERE user_id = p.id AND handle IS NOT NULL
+                        FROM link_in_bio lib
+                        WHERE lib.user_id = p.id AND lib.handle IS NOT NULL
                     ) sub)
                 ELSE NULL
                 END AS links_in_bio,
@@ -495,7 +495,7 @@ BEGIN
         ORDER BY
             send_score DESC;
 END;
-$function$
+$function$;
 ;
 
 ALTER FUNCTION "public"."get_friends"() OWNER TO "postgres";
