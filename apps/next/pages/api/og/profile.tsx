@@ -52,14 +52,18 @@ async function loadGoogleFont(font: string, weight: number, text: string) {
 interface ProfileData {
   name?: string
   avatar_url?: string
+  banner_url?: string
   all_tags?: string[]
   about?: string
 }
 
 const profileReactElement = (profile: ProfileData): React.ReactElement => {
-  const avatarUrl =
+  const bannerUrl =
+    profile.banner_url ??
     profile.avatar_url ??
     `https://ghassets.send.app/app_images/auth_image_${Math.floor(Math.random() * 3) + 1}.jpg`
+  const avatarUrl =
+    profile.avatar_url ?? `https://ui-avatars.com/api/avatars/${Math.floor(Math.random() * 1000)}`
 
   return (
     <div
@@ -74,7 +78,7 @@ const profileReactElement = (profile: ProfileData): React.ReactElement => {
       }}
     >
       <img
-        src={avatarUrl}
+        src={bannerUrl}
         alt="Profile Avatar Background"
         width={1200}
         height={630}
@@ -85,24 +89,8 @@ const profileReactElement = (profile: ProfileData): React.ReactElement => {
           width: '100%',
           objectFit: 'cover',
           objectPosition: 'center',
-          filter: 'blur(40px)',
-          WebkitFilter: 'blur(40px)',
-        }}
-      />
-      <img
-        src={avatarUrl}
-        alt="Profile Avatar"
-        width={630}
-        height={630}
-        loading="lazy"
-        style={{
-          position: 'absolute',
-          height: 630,
-          width: 630,
-          objectFit: 'cover',
-          objectPosition: 'center',
-          right: '0%',
-          top: '0%',
+          filter: profile.banner_url ? '' : 'blur(40px)',
+          WebkitFilter: profile.banner_url ? '' : 'blur(40px)',
         }}
       />
       <div
@@ -122,60 +110,90 @@ const profileReactElement = (profile: ProfileData): React.ReactElement => {
           paddingBottom: '40px',
         }}
       >
-        {/* Name */}
-        <h2
-          style={{
-            fontSize: '72px',
-            textAlign: 'center',
-            maxWidth: '1000px',
-            color: 'white',
-            fontWeight: 700,
-          }}
-        >
-          {profile.name || ''}
-        </h2>
-
-        {/* Tags */}
         <div
           style={{
             display: 'flex',
             flexDirection: 'row',
-            gap: '8px',
-            flexWrap: 'wrap',
-            maxWidth: '60%',
           }}
         >
-          {profile?.all_tags
-            ? profile.all_tags.map((tag) => {
-                return (
-                  <div
-                    key={tag}
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      borderRadius: '6px',
-                      backgroundColor: 'rgba(102, 102, 102, 0.4)',
-                      padding: '12px',
-                      alignSelf: 'flex-start',
-                      backdropFilter: 'blur(40px)',
-                      WebkitBackdropFilter: 'blur(40px)',
-                    }}
-                  >
-                    <p
-                      style={{
-                        fontSize: '32px',
-                        color: 'white',
-                        fontWeight: 400,
-                        margin: 0,
-                      }}
-                    >
-                      /{tag}
-                    </p>
-                  </div>
-                )
-              })
-            : null}
+          <img
+            src={avatarUrl}
+            alt="Profile Avatar"
+            width={64}
+            height={64}
+            loading="lazy"
+            style={{
+              height: 64,
+              width: 64,
+              objectFit: 'cover',
+              objectPosition: 'center',
+            }}
+          />
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px',
+              paddingLeft: '5px',
+              paddingRight: '5px',
+            }}
+          >
+            {/* Name */}
+            <h2
+              style={{
+                fontSize: '72px',
+                textAlign: 'center',
+                maxWidth: '1000px',
+                color: 'white',
+                fontWeight: 700,
+              }}
+            >
+              {profile.name || ''}
+            </h2>
+
+            {/* Tags */}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                gap: '8px',
+                flexWrap: 'wrap',
+                maxWidth: '60%',
+              }}
+            >
+              {profile?.all_tags
+                ? profile.all_tags.map((tag) => {
+                    return (
+                      <div
+                        key={tag}
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          borderRadius: '6px',
+                          backgroundColor: 'rgba(102, 102, 102, 0.4)',
+                          padding: '12px',
+                          alignSelf: 'flex-start',
+                          backdropFilter: 'blur(40px)',
+                          WebkitBackdropFilter: 'blur(40px)',
+                        }}
+                      >
+                        <p
+                          style={{
+                            fontSize: '32px',
+                            color: 'white',
+                            fontWeight: 400,
+                            margin: 0,
+                          }}
+                        >
+                          /{tag}
+                        </p>
+                      </div>
+                    )
+                  })
+                : null}
+            </div>
+          </div>
         </div>
 
         {/* Bio/About */}
@@ -193,8 +211,6 @@ const profileReactElement = (profile: ProfileData): React.ReactElement => {
           </p>
         ) : null}
       </div>
-
-      {/* Branding */}
       <div
         style={{
           position: 'absolute',

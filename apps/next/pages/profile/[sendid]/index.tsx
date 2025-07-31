@@ -87,8 +87,8 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
     tag: profile.main_tag_name || undefined,
     about: profile.about || undefined,
     avatarUrl: profile.avatar_url || undefined,
+    bannerUrl: profile.banner_url || undefined,
   }
-
   const profileSeoData = generateProfileSeoData(profileData, {
     siteUrl,
     route: `/profile/${sendid}`,
