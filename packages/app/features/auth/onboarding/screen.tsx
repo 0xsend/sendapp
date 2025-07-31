@@ -13,7 +13,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { useCreateSendAccount, useSendAccount } from 'app/utils/send-accounts'
 import { useRouter } from 'solito/router'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useIsClient } from 'app/utils/useIsClient'
 import { api } from 'app/utils/api'
 import { assert } from 'app/utils/assert'
@@ -142,15 +142,6 @@ export function OnboardingScreen() {
     }
   }
 
-  const renderAfterContent = useCallback(
-    ({ submit }: { submit: () => void }) => (
-      <SubmitButton onPress={submit} disabled={!canSubmit}>
-        <SubmitButton.Text>finish account</SubmitButton.Text>
-      </SubmitButton>
-    ),
-    [canSubmit]
-  )
-
   // If we're not in the client, or the user isn't available, don't render
   if (!isClient) return null
 
@@ -231,29 +222,36 @@ export function OnboardingScreen() {
                 },
                 style: { justifyContent: 'space-between' },
               }}
-              renderAfter={renderAfterContent}
             >
               {({ name }) => {
                 return (
-                  <YStack gap={'$2'}>
-                    <XStack position="relative">
-                      {name}
-                      <XStack
-                        position="absolute"
-                        bottom={0}
-                        left={0}
-                        right={0}
-                        height={1}
-                        backgroundColor={isInputFocused ? '$primary' : '$darkGrayTextField'}
-                        $theme-light={{
-                          backgroundColor: isInputFocused ? '$color12' : '$silverChalice',
-                        }}
-                      />
-                    </XStack>
-                    {validationError && (
-                      <Paragraph color={'$error'}>{validationError.message}</Paragraph>
-                    )}
-                  </YStack>
+                  <>
+                    <YStack gap={'$2'}>
+                      <XStack position="relative">
+                        {name}
+                        <XStack
+                          position="absolute"
+                          bottom={0}
+                          left={0}
+                          right={0}
+                          height={1}
+                          backgroundColor={isInputFocused ? '$primary' : '$darkGrayTextField'}
+                          $theme-light={{
+                            backgroundColor: isInputFocused ? '$color12' : '$silverChalice',
+                          }}
+                        />
+                      </XStack>
+                      {validationError && (
+                        <Paragraph color={'$error'}>{validationError.message}</Paragraph>
+                      )}
+                    </YStack>
+                    <SubmitButton
+                      onPress={() => form.handleSubmit(handleSubmit)()}
+                      disabled={!canSubmit}
+                    >
+                      <SubmitButton.Text>finish account</SubmitButton.Text>
+                    </SubmitButton>
+                  </>
                 )
               }}
             </SchemaForm>
