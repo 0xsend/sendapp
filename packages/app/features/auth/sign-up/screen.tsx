@@ -29,6 +29,7 @@ import { useRouter } from 'solito/router'
 import { z } from 'zod'
 import { useReferralCodeQuery } from 'app/utils/useReferralCode'
 import { Platform } from 'react-native'
+import useIsScreenFocused from 'app/utils/useIsScreenFocused'
 
 const SignUpScreenFormSchema = z.object({
   name: formFields.text,
@@ -58,6 +59,7 @@ export const SignUpScreen = () => {
   const isDarkTheme = resolvedTheme?.startsWith('dark')
   const { createSendAccount } = useCreateSendAccount()
   const { data: referralCode } = useReferralCodeQuery()
+  const isScreenFocused = useIsScreenFocused()
 
   const formName = form.watch('name')
   const formIsAgreedToTerms = form.watch('isAgreedToTerms')
@@ -116,10 +118,10 @@ export const SignUpScreen = () => {
   }, [queryParams.tag, form])
 
   useEffect(() => {
-    if (user?.id && formState === FormState.Idle) {
+    if (user?.id && formState === FormState.Idle && isScreenFocused) {
       router.replace('/auth/onboarding')
     }
-  }, [user?.id, router.replace, formState])
+  }, [user?.id, router.replace, formState, isScreenFocused])
 
   const createAccount = async () => {
     const { data: sessionData } = await supabase.auth.getSession()
@@ -152,6 +154,7 @@ export const SignUpScreen = () => {
       })
       router.replace('/')
     } catch (error) {
+      setFormState(FormState.Idle)
       const message = formatErrorMessage(error).split('.')[0] ?? 'Unknown error'
 
       form.setError('root', {
@@ -159,8 +162,6 @@ export const SignUpScreen = () => {
         message,
       })
       return
-    } finally {
-      setFormState(FormState.Idle)
     }
   }
 
