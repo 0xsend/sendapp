@@ -104,7 +104,7 @@ export const LinkInBioScreen = () => {
           </Paragraph>
         )}
         <YStack gap={'$4'}>
-          {Object.values(LinkInBioDomainNamesEnum).map((domain_name) => {
+          {LinkInBioDomainNamesEnum.options.map((domain_name) => {
             const currentHandle = domainHandles[domain_name] || ''
 
             return (
@@ -113,7 +113,9 @@ export const LinkInBioScreen = () => {
                   <IconLinkInBio domain_name={domain_name} />
                   <YStack flex={1} bbc={'$color12'}>
                     <Input
-                      placeholder={domain_name}
+                      placeholder={
+                        domain_name === 'WhatsApp' ? 'Whatsapp Phone Number' : domain_name
+                      }
                       placeholderTextColor={'$color10'}
                       value={currentHandle}
                       onChangeText={(value) => updateDomainHandle(domain_name, value)}

@@ -6,24 +6,20 @@ import { useUser } from './useUser'
 import type { Database, TablesInsert } from '@my/supabase/database-generated.types'
 
 // Create Zod enum from database enum type
-export const LinkInBioDomainNamesEnum: z.ZodType<
-  Database['public']['Enums']['link_in_bio_domain_names']
-> = z
-  .enum([
-    'X',
-    'Instagram',
-    'YouTube',
-    'TikTok',
-    'GitHub',
-    'Telegram',
-    'Discord',
-    'Facebook',
-    'OnlyFans',
-    'WhatsApp',
-    'Snapchat',
-    'Twitch',
-  ] as const)
-  .readonly()
+export const LinkInBioDomainNamesEnum = z.enum([
+  'X',
+  'Instagram',
+  'YouTube',
+  'TikTok',
+  'GitHub',
+  'Telegram',
+  'Discord',
+  'Facebook',
+  'OnlyFans',
+  'WhatsApp',
+  'Snapchat',
+  'Twitch',
+] as const satisfies ReadonlyArray<Database['public']['Enums']['link_in_bio_domain_names']>)
 
 export type LinkInBioDomainNamesEnum = z.infer<typeof LinkInBioDomainNamesEnum>
 
