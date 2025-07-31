@@ -31,7 +31,7 @@ export const ProfileHeader = ({
     }
 
     const _params = JSON.parse(JSON.stringify(params)) //JSON makes sure we don't pass undefined values
-    router.push(`/profile/${profile?.sendid}/about?${new URLSearchParams(_params).toString()}`)
+    router.push(`/profile/${profile?.sendid}?${new URLSearchParams(_params).toString()}`)
   }
 
   return (
@@ -42,7 +42,7 @@ export const ProfileHeader = ({
       padding={'$5'}
       onPressOut={handlePressOut}
     >
-      <XStack ai="center" gap={'$1.5'} width={'80%'}>
+      <XStack ai="center" gap={'$3'} width={'80%'}>
         <LinkableAvatar
           size="$6"
           br="$4"

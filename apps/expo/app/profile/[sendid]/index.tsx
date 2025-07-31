@@ -1,31 +1,25 @@
-import { Stack } from 'expo-router'
+import { Stack, useLocalSearchParams } from 'expo-router'
 import { ProfileScreen } from 'app/features/profile/screen'
-import { ScrollView } from '@my/ui'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
+import { useProfileLookup } from 'app/utils/useProfileLookup'
 
 export default function Screen() {
-  const insets = useSafeAreaInsets()
+  const sendid = useLocalSearchParams<{ sendid: string }>()?.sendid
+  const { data: otherUserProfile, isLoading } = useProfileLookup('sendid', sendid)
+
   return (
     <>
       <Stack.Screen
         options={{
-          title: 'Profile',
-          headerShown: false,
+          title: isLoading
+            ? ''
+            : otherUserProfile?.name || otherUserProfile?.main_tag_name || `#${sendid}`,
+          headerShown: true,
         }}
       />
-      <ScrollView
-        flex={1}
-        contentContainerStyle={{
-          flexGrow: 1,
-          paddingBottom: insets.bottom,
-        }}
-        showsVerticalScrollIndicator={false}
-        overflow={'visible'}
-        bounces={false}
-        overScrollMode="always" // Android scroll indicator
-      >
+      <ScreenContainer>
         <ProfileScreen />
-      </ScrollView>
+      </ScreenContainer>
     </>
   )
 }

@@ -21,7 +21,12 @@ CREATE TYPE "public"."link_in_bio_domain_names" AS ENUM (
 		'TikTok',
 		'GitHub',
 		'Telegram',
-		'Discord'
+		'Discord',
+        'Facebook',
+        'OnlyFans',
+        'WhatsApp',
+        'Snapchat',
+        'Twitch'
 );
 
 ALTER TYPE "public"."link_in_bio_domain_names" OWNER TO "postgres";

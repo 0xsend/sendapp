@@ -5,9 +5,9 @@ import {
   Label,
   LinkableButton,
   Paragraph,
-  Separator,
   SubmitButton,
   useAppToast,
+  useDebounce,
   XStack,
   YStack,
 } from '@my/ui'
@@ -24,12 +24,12 @@ import { useValidateSendtag } from 'app/utils/tags/useValidateSendtag'
 import { useSetFirstSendtag } from 'app/utils/useFirstSendtag'
 import { useUser } from 'app/utils/useUser'
 import { useCallback, useEffect, useId, useState } from 'react'
-import { useDebounce } from '@my/ui'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { z } from 'zod'
 import { useReferralCodeQuery } from 'app/utils/useReferralCode'
 import { Platform } from 'react-native'
+import useIsScreenFocused from 'app/utils/useIsScreenFocused'
 
 const SignUpScreenFormSchema = z.object({
   name: formFields.text,
@@ -59,6 +59,7 @@ export const SignUpScreen = () => {
   const isDarkTheme = resolvedTheme?.startsWith('dark')
   const { createSendAccount } = useCreateSendAccount()
   const { data: referralCode } = useReferralCodeQuery()
+  const isScreenFocused = useIsScreenFocused()
 
   const formName = form.watch('name')
   const formIsAgreedToTerms = form.watch('isAgreedToTerms')
@@ -117,10 +118,10 @@ export const SignUpScreen = () => {
   }, [queryParams.tag, form])
 
   useEffect(() => {
-    if (user?.id && formState === FormState.Idle) {
+    if (user?.id && formState === FormState.Idle && isScreenFocused) {
       router.replace('/auth/onboarding')
     }
-  }, [user?.id, router.replace, formState])
+  }, [user?.id, router.replace, formState, isScreenFocused])
 
   const createAccount = async () => {
     const { data: sessionData } = await supabase.auth.getSession()
@@ -153,6 +154,7 @@ export const SignUpScreen = () => {
       })
       router.replace('/')
     } catch (error) {
+      setFormState(FormState.Idle)
       const message = formatErrorMessage(error).split('.')[0] ?? 'Unknown error'
 
       form.setError('root', {
@@ -160,8 +162,6 @@ export const SignUpScreen = () => {
         message,
       })
       return
-    } finally {
-      setFormState(FormState.Idle)
     }
   }
 
@@ -177,214 +177,220 @@ export const SignUpScreen = () => {
     }
   }, [signInMutateAsync, toast.error, router.push, queryParams.redirectUri])
 
-  const renderAfterContent = useCallback(
-    ({ submit }: { submit: () => void }) => (
-      <YStack>
-        <SubmitButton disabled={!canSubmit || formState !== FormState.Idle} onPress={submit}>
-          <SubmitButton.Text>create account</SubmitButton.Text>
-        </SubmitButton>
-        <YStack w={'100%'} gap={'$3.5'} mt={'$3.5'}>
-          <XStack w={'100%'} gap={'$3.5'} ai={'center'}>
-            <Separator bc={'$color10'} />
-            <Paragraph tt={'uppercase'}>or</Paragraph>
-            <Separator bc={'$color10'} />
-          </XStack>
-          <Button
-            onPress={handleSignIn}
-            transparent
-            chromeless
-            backgroundColor="transparent"
-            hoverStyle={{ backgroundColor: 'transparent' }}
-            pressStyle={{ backgroundColor: 'transparent' }}
-            focusStyle={{ backgroundColor: 'transparent' }}
-            bw={0}
-            br={0}
-            height={'auto'}
-            disabled={formState !== FormState.Idle}
-          >
-            <Button.Text
-              color={'$primary'}
-              $theme-light={{
-                color: '$color12',
-              }}
-            >
-              {formState === FormState.SigningIn ? 'Signing in...' : 'Sign in'}
-            </Button.Text>
-          </Button>
-        </YStack>
-      </YStack>
-    ),
-    [canSubmit, formState, handleSignIn]
-  )
-
   return (
-    <YStack f={1} jc={'space-around'} ai={'center'} gap={'$3.5'} pt={'$5'}>
-      <FormProvider {...form}>
-        <YStack w={'100%'} ai={'center'}>
-          <Paragraph w={'100%'} size={'$8'} fontWeight={500} tt={'uppercase'}>
-            create your account
-          </Paragraph>
-          <Paragraph w={'100%'} size={'$5'} color={'$olive'}>
-            Choose your Sendtag — your unique username on Send.
-          </Paragraph>
-          <SchemaForm
-            form={form}
-            onSubmit={handleSubmit}
-            schema={SignUpScreenFormSchema}
-            defaultValues={{
-              name: queryParams.tag ?? '',
-              isAgreedToTerms: false,
-            }}
-            props={{
-              name: {
-                testID: 'sendtag-input',
-                placeholder: 'Input desired Sendtag',
-                color: '$color12',
-                fontWeight: '500',
-                bw: 0,
-                br: 0,
-                p: 0,
-                pl: '$2.5',
-                onChangeText: (text: string) => form.setValue('name', text),
-                focusStyle: {
-                  outlineWidth: 0,
-                },
-                '$theme-dark': {
-                  placeholderTextColor: '$darkGrayTextField',
-                },
-                '$theme-light': {
-                  placeholderTextColor: '$darkGrayTextField',
-                },
-                fontSize: '$5',
-                onFocus: () => setIsInputFocused(true),
-                onBlur: () => setIsInputFocused(false),
-                fieldsetProps: {
-                  width: '100%',
-                },
-                iconBefore: (
-                  <XStack
-                    ml={Platform.OS === 'web' ? -12 : 4}
-                    opacity={formName ? 1 : 0}
-                    mb={Platform.OS === 'web' ? 0 : 2}
-                  >
-                    <Paragraph size={'$5'}>/</Paragraph>
-                  </XStack>
-                ),
-                iconBeforeProps: {
-                  padding: 0,
-                  paddingLeft: Platform.OS === 'web' ? '$3' : 0,
-                },
-              },
-              isAgreedToTerms: {
-                id: termsCheckboxId,
-              },
-            }}
-            formProps={{
-              w: '100%',
-              footerProps: { padding: 0 },
-              $gtSm: {
-                maxWidth: '100%',
-              },
-              style: { justifyContent: 'space-between' },
-            }}
-            renderAfter={renderAfterContent}
-          >
-            {({ name, isAgreedToTerms }) => {
-              return (
-                <FadeCard
-                  w={'100%'}
-                  mt={'$5'}
-                  borderColor={validationError ? '$error' : 'transparent'}
-                  bw={1}
-                >
-                  <XStack position="relative">
-                    {name}
-                    <XStack
-                      position="absolute"
-                      bottom={0}
-                      left={0}
-                      right={0}
-                      height={1}
-                      backgroundColor={isInputFocused ? '$primary' : '$darkGrayTextField'}
-                      $theme-light={{
-                        backgroundColor: isInputFocused ? '$color12' : '$silverChalice',
-                      }}
-                    />
-                  </XStack>
-                  <XStack gap={'$2'} ai={'center'}>
-                    {isAgreedToTerms}
-                    <Label
-                      cursor={'pointer'}
-                      size={'$5'}
-                      htmlFor={termsCheckboxId}
-                      color={'$lightGrayTextField'}
-                      lineHeight={'$5'}
-                      $theme-light={{ color: '$darkGrayTextField' }}
-                      pressStyle={{
-                        color: isDarkTheme ? '$lightGrayTextField' : '$darkGrayTextField',
-                      }}
-                    >
-                      Agree to&nbsp;
-                      <Anchor
-                        size={'$5'}
-                        href={'https://support.send.app/en/articles/10916356-privacy-policy'}
-                        target="_blank"
-                        textDecorationLine="underline"
-                        color={'$primary'}
-                        $theme-light={{ color: '$color12' }}
-                      >
-                        Privacy
-                      </Anchor>
-                      &nbsp;and&nbsp;
-                      <Anchor
-                        size={'$5'}
-                        href={'https://support.send.app/en/articles/10916009-terms-of-service'}
-                        target="_blank"
-                        textDecorationLine="underline"
-                        color={'$primary'}
-                        $theme-light={{ color: '$color12' }}
-                      >
-                        Terms
-                      </Anchor>
-                    </Label>
-                  </XStack>
-                  {validationError && (
-                    <Paragraph color={'$error'}>{validationError.message}</Paragraph>
-                  )}
-                </FadeCard>
-              )
-            }}
-          </SchemaForm>
-        </YStack>
-        <YStack w={'100%'} ai={'center'} gap={'$3.5'}>
-          <Turnstile onSuccess={(t) => setCaptchaToken(t)} />
-          <LinkableButton
-            href={'/auth/login-with-phone'}
-            transparent
-            chromeless
-            backgroundColor="transparent"
-            hoverStyle={{ backgroundColor: 'transparent' }}
-            pressStyle={{ backgroundColor: 'transparent' }}
-            focusStyle={{ backgroundColor: 'transparent' }}
-            bw={0}
-            br={0}
-            height={'auto'}
-            disabled={formState !== FormState.Idle}
-            pb={'$3.5'}
-          >
-            <Button.Text
-              color={'$primary'}
-              $theme-light={{
-                color: '$color12',
+    <YStack f={1} jc={'center'} ai={'center'} gap={'$7'} w={'100%'}>
+      <YStack ai={'center'} gap={'$2'}>
+        <Paragraph w={'100%'} size={'$8'} fontWeight={600} ta={'center'}>
+          Create your account
+        </Paragraph>
+        <Paragraph
+          size={'$4'}
+          color={'$lightGrayTextField'}
+          ta={'center'}
+          $theme-light={{ color: '$darkGrayTextField' }}
+          numberOfLines={2}
+        >
+          Choose your Sendtag — your unique username on Send
+        </Paragraph>
+      </YStack>
+      <FadeCard
+        borderColor={validationError ? '$error' : 'transparent'}
+        bw={1}
+        fadeProps={{
+          width: '100%',
+          maxWidth: 550,
+        }}
+      >
+        <FormProvider {...form}>
+          <YStack w={'100%'} ai={'center'}>
+            <SchemaForm
+              form={form}
+              onSubmit={handleSubmit}
+              schema={SignUpScreenFormSchema}
+              defaultValues={{
+                name: queryParams.tag ?? '',
+                isAgreedToTerms: false,
               }}
-              ta={'center'}
-              numberOfLines={2}
+              props={{
+                name: {
+                  testID: 'sendtag-input',
+                  placeholder: 'Enter your desired Sendtag',
+                  color: '$color12',
+                  fontWeight: '500',
+                  bw: 0,
+                  br: 0,
+                  p: 0,
+                  pl: '$2.5',
+                  onChangeText: (text: string) => form.setValue('name', text),
+                  focusStyle: {
+                    outlineWidth: 0,
+                  },
+                  '$theme-dark': {
+                    placeholderTextColor: '$darkGrayTextField',
+                  },
+                  '$theme-light': {
+                    placeholderTextColor: '$darkGrayTextField',
+                  },
+                  fontSize: '$5',
+                  onFocus: () => setIsInputFocused(true),
+                  onBlur: () => setIsInputFocused(false),
+                  fieldsetProps: {
+                    width: '100%',
+                  },
+                  iconBefore: (
+                    <XStack
+                      ml={Platform.OS === 'web' ? -12 : 4}
+                      opacity={formName ? 1 : 0}
+                      mb={Platform.OS === 'web' ? 0 : 2}
+                    >
+                      <Paragraph size={'$5'}>/</Paragraph>
+                    </XStack>
+                  ),
+                  iconBeforeProps: {
+                    padding: 0,
+                    paddingLeft: Platform.OS === 'web' ? '$3' : 0,
+                  },
+                },
+                isAgreedToTerms: {
+                  id: termsCheckboxId,
+                },
+              }}
+              formProps={{
+                w: '100%',
+                footerProps: { padding: 0 },
+                $gtSm: {
+                  maxWidth: '100%',
+                },
+                style: { justifyContent: 'space-between' },
+              }}
             >
-              Don&apos;t see your passkey? Try login with phone number
-            </Button.Text>
-          </LinkableButton>
-        </YStack>
-      </FormProvider>
+              {({ name, isAgreedToTerms }) => {
+                return (
+                  <>
+                    <YStack gap={'$2'}>
+                      <XStack position="relative">
+                        {name}
+                        <XStack
+                          position="absolute"
+                          bottom={0}
+                          left={0}
+                          right={0}
+                          height={1}
+                          backgroundColor={isInputFocused ? '$primary' : '$darkGrayTextField'}
+                          $theme-light={{
+                            backgroundColor: isInputFocused ? '$color12' : '$silverChalice',
+                          }}
+                        />
+                      </XStack>
+                      <XStack gap={'$2'} ai={'center'}>
+                        {isAgreedToTerms}
+                        <Label
+                          cursor={'pointer'}
+                          size={'$4'}
+                          htmlFor={termsCheckboxId}
+                          color={'$lightGrayTextField'}
+                          $theme-light={{ color: '$darkGrayTextField' }}
+                          pressStyle={{
+                            color: isDarkTheme ? '$lightGrayTextField' : '$darkGrayTextField',
+                          }}
+                        >
+                          I agree to the&nbsp;
+                          <Anchor
+                            size={'$4'}
+                            href={'https://support.send.app/en/articles/10916356-privacy-policy'}
+                            target="_blank"
+                            textDecorationLine="underline"
+                            color={'$primary'}
+                            $theme-light={{ color: '$darkGrayTextField' }}
+                          >
+                            Privacy Policy
+                          </Anchor>
+                          &nbsp;and&nbsp;
+                          <Anchor
+                            size={'$4'}
+                            href={'https://support.send.app/en/articles/10916009-terms-of-service'}
+                            target="_blank"
+                            textDecorationLine="underline"
+                            color={'$primary'}
+                            $theme-light={{ color: '$darkGrayTextField' }}
+                          >
+                            Terms
+                          </Anchor>
+                        </Label>
+                      </XStack>
+                      {validationError && (
+                        <Paragraph color={'$error'}>{validationError.message}</Paragraph>
+                      )}
+                    </YStack>
+                    <YStack gap={'$3.5'}>
+                      <SubmitButton
+                        disabled={!canSubmit || formState !== FormState.Idle}
+                        onPress={() => form.handleSubmit(handleSubmit)()}
+                      >
+                        <SubmitButton.Text>create account</SubmitButton.Text>
+                      </SubmitButton>
+                      <XStack w={'100%'} gap={'$2'} jc={'center'} ai={'center'}>
+                        <Paragraph $theme-light={{ color: '$darkGrayTextField' }}>
+                          Already have an account?
+                        </Paragraph>
+                        <Button
+                          onPress={handleSignIn}
+                          transparent
+                          chromeless
+                          backgroundColor="transparent"
+                          hoverStyle={{ backgroundColor: 'transparent' }}
+                          pressStyle={{ backgroundColor: 'transparent' }}
+                          focusStyle={{ backgroundColor: 'transparent' }}
+                          bw={0}
+                          br={0}
+                          height={'auto'}
+                          p={0}
+                          disabled={formState !== FormState.Idle}
+                        >
+                          <Button.Text
+                            color={'$primary'}
+                            $theme-light={{
+                              color: '$color12',
+                            }}
+                          >
+                            {formState === FormState.SigningIn ? 'Signing in...' : 'Sign in'}
+                          </Button.Text>
+                        </Button>
+                      </XStack>
+                    </YStack>
+                  </>
+                )
+              }}
+            </SchemaForm>
+          </YStack>
+        </FormProvider>
+      </FadeCard>
+      <YStack w={'100%'} ai={'center'} gap={Platform.OS === 'web' ? '$5' : 0}>
+        <Turnstile onSuccess={(t) => setCaptchaToken(t)} />
+        <LinkableButton
+          href={'/auth/login-with-phone'}
+          transparent
+          chromeless
+          backgroundColor="transparent"
+          hoverStyle={{ backgroundColor: 'transparent' }}
+          pressStyle={{ backgroundColor: 'transparent' }}
+          focusStyle={{ backgroundColor: 'transparent' }}
+          bw={0}
+          br={0}
+          height={'auto'}
+          disabled={formState !== FormState.Idle}
+        >
+          <Button.Text
+            size={'$4'}
+            color={'$lightGrayTextField'}
+            $theme-light={{ color: '$darkGrayTextField' }}
+            ta={'center'}
+            numberOfLines={2}
+          >
+            Need help? Try login with phone number
+          </Button.Text>
+        </LinkableButton>
+      </YStack>
     </YStack>
   )
 }

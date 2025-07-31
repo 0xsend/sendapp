@@ -82,7 +82,7 @@ export const Carousel = (props: { currentKey: string | undefined; fullscreen: bo
       fullscreen={props.fullscreen}
     >
       <Stack fd="column" $gtMd={{ fd: 'row', ai: 'flex-end' }} gap="$3">
-        <H1 color="$white" fontWeight={'500'} $gtMd={{ w: '33%' }}>
+        <H1 color="$white" fontWeight={'500'} $gtMd={{ w: '33%' }} lineHeight={42}>
           {item?.title}
         </H1>
         <Paragraph

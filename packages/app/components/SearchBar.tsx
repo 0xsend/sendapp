@@ -1,13 +1,14 @@
 import type { Functions } from '@my/supabase/database.types'
 import {
+  Anchor,
   Avatar,
   Button,
   ButtonText,
   Card,
   Dialog,
   H4,
-  isWeb,
   Paragraph,
+  PrimaryButton,
   ScrollView,
   Sheet,
   Spinner,
@@ -20,7 +21,6 @@ import {
   YGroup,
   YStack,
 } from '@my/ui'
-import { ExternalLink } from '@tamagui/lucide-icons'
 import { SearchSchema, useTagSearch } from 'app/provider/tag-search'
 import { useRootScreenParams } from 'app/routers/params'
 import { SchemaForm } from 'app/utils/SchemaForm'
@@ -330,62 +330,61 @@ const AddressSearchResultRow = ({ address }: { address: Address }) => {
 }
 
 function ConfirmSendDialog({ isOpen, onClose, onConfirm, address }) {
-  // Shared content component to avoid duplication
   const dialogContent = (
     <>
       <YStack gap="$4">
-        <H4>Confirm External Send</H4>
-        <Paragraph>Please confirm you agree to the following before sending:</Paragraph>
-        <Paragraph>1. The external address is on Base Network.</Paragraph>
+        <Paragraph size={'$8'} fontWeight={600} ta={'center'}>
+          Confirm External Send
+        </Paragraph>
+        <Paragraph color={'$lightGrayTextField'} $theme-light={{ color: '$darkGrayTextField' }}>
+          Please confirm you agree to the following before sending:
+        </Paragraph>
+        <Paragraph
+          pl={'$2'}
+          color={'$lightGrayTextField'}
+          $theme-light={{ color: '$darkGrayTextField' }}
+        >
+          1. The external address is on Base Network.
+        </Paragraph>
         <YStack alignItems={'flex-start'}>
-          <Paragraph>2. I have double checked the address:</Paragraph>
-          <Button
-            size="$2"
-            py="$4"
-            height={'auto'}
-            theme="yellow_active"
-            onPress={() => {
-              if (isWeb) {
-                window.open(
-                  `${baseMainnet.blockExplorers.default.url}/address/${address}`,
-                  '_blank',
-                  'noopener,noreferrer'
-                )
-              } else {
-                Linking.openURL(`${baseMainnet.blockExplorers.default.url}/address/${address}`)
-              }
-            }}
-            fontFamily={'$mono'}
-            fontWeight={'bold'}
-            iconAfter={<ExternalLink size={14} color={'$color11'} />}
-            mt="$4"
+          <Paragraph
+            pl={'$2'}
+            color={'$lightGrayTextField'}
+            $theme-light={{ color: '$darkGrayTextField' }}
           >
-            <Button.Text color={'$color11'}>{address}</Button.Text>
-          </Button>
+            2. I have double checked the address:
+          </Paragraph>
+          <Anchor
+            pl={'$2'}
+            target="_blank"
+            href={`${baseMainnet.blockExplorers.default.url}/address/${address}`}
+            rel="noreferrer"
+            textDecorationLine={'underline'}
+          >
+            {address}
+          </Anchor>
         </YStack>
-        <Paragraph>
+        <Paragraph
+          pl={'$2'}
+          color={'$lightGrayTextField'}
+          $theme-light={{ color: '$darkGrayTextField' }}
+        >
           3. I understand that if I make any mistakes, there is no way to recover the funds.
         </Paragraph>
-        <XStack justifyContent="flex-end" marginTop="$4" gap="$4">
+        <YStack justifyContent="space-between" marginTop="$4" gap="$4">
+          <PrimaryButton onPress={onConfirm} zIndex={100}>
+            <PrimaryButton.Text>I Agree & Continue</PrimaryButton.Text>
+          </PrimaryButton>
           {Platform.OS === 'web' && (
             <Dialog.Close asChild>
-              <Button theme="red_active" br={'$2'}>
-                <Button.Text>Cancel</Button.Text>
+              <Button borderRadius={'$4'} p={'$4'} focusStyle={{ outlineWidth: 0 }}>
+                <Button.Text fontWeight={'500'} tt="uppercase" size={'$4'}>
+                  Cancel
+                </Button.Text>
               </Button>
             </Dialog.Close>
           )}
-          <Button
-            theme="green"
-            onPress={onConfirm}
-            br={'$2'}
-            zIndex={100}
-            width={Platform.OS === 'web' ? undefined : '100%'}
-          >
-            <Button.Text color="$color0" $theme-light={{ color: '$color12' }}>
-              I Agree & Continue
-            </Button.Text>
-          </Button>
-        </XStack>
+        </YStack>
       </YStack>
     </>
   )
@@ -396,7 +395,15 @@ function ConfirmSendDialog({ isOpen, onClose, onConfirm, address }) {
       <Dialog open={isOpen} onOpenChange={onClose}>
         <Dialog.Portal>
           <Dialog.Overlay />
-          <Dialog.Content gap="$4" testID={'address-send-dialog'}>
+          <Dialog.Content
+            width={'85%'}
+            br={'$5'}
+            p={'$5'}
+            gap={'$3.5'}
+            maxWidth={400}
+            $gtLg={{ p: '$7', gap: '$5' }}
+            testID={'address-send-dialog'}
+          >
             {dialogContent}
           </Dialog.Content>
         </Dialog.Portal>
@@ -413,9 +420,10 @@ function ConfirmSendDialog({ isOpen, onClose, onConfirm, address }) {
       dismissOnSnapToBottom
       dismissOnOverlayPress
       native
-      snapPoints={[70]}
+      snapPoints={['fit']}
+      snapPointsMode="fit"
     >
-      <Sheet.Frame key="confirm-send-sheet" gap="$4" padding="$4">
+      <Sheet.Frame key="confirm-send-sheet" gap="$4" padding="$6">
         {dialogContent}
       </Sheet.Frame>
       <Sheet.Overlay />

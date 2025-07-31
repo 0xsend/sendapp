@@ -38,9 +38,16 @@ export const headingFont = createFont({
     13: 56,
     14: 114 + 10,
   },
-  face: {
-    900: { normal: 'DM Sans Bold' },
-  },
+  face: isWeb
+    ? {
+        900: { normal: 'DM Sans Bold' },
+      }
+    : {
+        400: { normal: 'DM Sans' },
+        500: { normal: 'DM Sans Medium' },
+        600: { normal: 'DM Sans SemiBold' },
+        700: { normal: 'DM Sans Bold' },
+      },
 })
 
 export const bodyFont = createFont({
@@ -81,9 +88,16 @@ export const bodyFont = createFont({
     13: 56,
     14: 114 + 10,
   },
-  face: {
-    900: { normal: 'DM Sans Bold' },
-  },
+  face: isWeb
+    ? {
+        900: { normal: 'DM Sans Bold' },
+      }
+    : {
+        400: { normal: 'DM Sans' },
+        500: { normal: 'DM Sans Medium' },
+        600: { normal: 'DM Sans SemiBold' },
+        700: { normal: 'DM Sans Bold' },
+      },
 })
 export const monoFont = createFont({
   family: isWeb

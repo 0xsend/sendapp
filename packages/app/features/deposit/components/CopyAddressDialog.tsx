@@ -1,4 +1,4 @@
-import { Button, Dialog, Paragraph, Separator, Sheet, YStack, Anchor, PrimaryButton } from '@my/ui'
+import { Anchor, Button, Dialog, Paragraph, PrimaryButton, Sheet, YStack } from '@my/ui'
 import { allCoins } from 'app/data/coins'
 import { Platform } from 'react-native'
 
@@ -6,10 +6,9 @@ export function CopyAddressDialog({ isOpen, onClose, onConfirm }) {
   // Shared content component to avoid duplication
   const dialogContent = (
     <>
-      <Paragraph size={'$8'} fontWeight={500}>
+      <Paragraph size={'$8'} fontWeight={600} ta={'center'}>
         Confirm External Deposit
       </Paragraph>
-      <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
       <Paragraph color={'$lightGrayTextField'} $theme-light={{ color: '$darkGrayTextField' }}>
         Please confirm you agree to the following before proceeding:
       </Paragraph>
@@ -31,19 +30,14 @@ export function CopyAddressDialog({ isOpen, onClose, onConfirm }) {
       <Paragraph color={'$lightGrayTextField'} $theme-light={{ color: '$darkGrayTextField' }}>
         3. I understand that if I make any mistakes, there is no way to recover the funds.
       </Paragraph>
-      <YStack
-        justifyContent="space-between"
-        marginTop="$4"
-        gap="$4"
-        $gtLg={{ flexDirection: 'row-reverse' }}
-      >
+      <YStack justifyContent="space-between" marginTop="$4" gap="$4">
         <PrimaryButton onPress={onConfirm} focusStyle={{ outlineWidth: 0 }}>
           <PrimaryButton.Text>i agree & proceed</PrimaryButton.Text>
         </PrimaryButton>
         {Platform.OS === 'web' && (
           <Dialog.Close asChild>
             <Button borderRadius={'$4'} p={'$4'} focusStyle={{ outlineWidth: 0 }}>
-              <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'}>
+              <Button.Text fontWeight={'500'} tt="uppercase" size={'$4'}>
                 cancel
               </Button.Text>
             </Button>
@@ -83,9 +77,10 @@ export function CopyAddressDialog({ isOpen, onClose, onConfirm }) {
       dismissOnSnapToBottom
       dismissOnOverlayPress
       native
-      snapPoints={[70]}
+      snapPoints={['fit']}
+      snapPointsMode="fit"
     >
-      <Sheet.Frame key="copy-address-sheet" gap="$3.5" padding="$5">
+      <Sheet.Frame key="copy-address-sheet" gap="$3.5" padding="$6">
         {dialogContent}
       </Sheet.Frame>
       <Sheet.Overlay />

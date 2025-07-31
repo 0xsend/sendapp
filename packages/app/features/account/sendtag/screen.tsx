@@ -2,7 +2,7 @@ import type { Tables } from '@my/supabase/database.types'
 import {
   Button,
   Dialog,
-  Fade,
+  FadeCard,
   H2,
   Paragraph,
   PrimaryButton,
@@ -11,10 +11,9 @@ import {
   Stack,
   useAppToast,
   XStack,
-  YGroup,
   YStack,
 } from '@my/ui'
-import { IconBadgeCheck, IconPlus, IconSlash, IconX } from 'app/components/icons'
+import { IconCheckCircle, IconPlus, IconSlash, IconX } from 'app/components/icons'
 import { maxNumSendTags } from 'app/data/sendtags'
 import { useUser } from 'app/utils/useUser'
 import { useSendAccount } from 'app/utils/send-accounts'
@@ -23,6 +22,7 @@ import { Platform } from 'react-native'
 import { api } from 'app/utils/api'
 import { useLink } from 'solito/link'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { useThemeName } from 'tamagui'
 
 export function SendTagScreen() {
   const { tags, isLoading } = useUser()
@@ -54,27 +54,25 @@ export function SendTagScreen() {
       f={Platform.OS === 'web' ? undefined : 1}
       gap="$5"
       jc={'space-between'}
+      pt={'$3.5'}
       $gtLg={{
         width: '50%',
         pb: '$3.5',
       }}
     >
       <YStack gap="$5">
-        <YStack gap="$3">
-          <H2 tt={'uppercase'}>
-            {isFirstSendtagClaimable ? 'Register your first Sendtag' : 'Your verified Sendtags'}
-          </H2>
+        <YStack gap="$2">
+          <Paragraph w={'100%'} size={'$8'} fontWeight={600}>
+            {isFirstSendtagClaimable ? 'Register first Sendtag' : 'Verified Sendtags'}
+          </Paragraph>
           <Paragraph
-            fontSize={'$5'}
+            fontSize={'$4'}
             color={'$lightGrayTextField'}
             $theme-light={{ color: '$darkGrayTextField' }}
           >
             Own your identity on Send. Register up to 5 verified tags and make them yours.
           </Paragraph>
         </YStack>
-        <Paragraph fontSize={'$7'} fontWeight={'500'}>
-          Registered [ {`${confirmedTags?.length || 0}/${maxNumSendTags}`} ]
-        </Paragraph>
         <SendtagList
           tags={sortedTags}
           mainTagId={mainTagId}
@@ -130,6 +128,10 @@ function SendtagList({
   mainTagId?: number | null
   onMainTagSelect?: () => void
 }) {
+  const theme = useThemeName()
+  const isDark = theme?.startsWith('dark')
+  const hoverStyles = useHoverStyles()
+
   if (!tags || tags.length === 0) {
     return null
   }
@@ -137,34 +139,27 @@ function SendtagList({
   const canChangeMainTag = tags.length > 1
 
   return (
-    <YStack gap="$3">
-      <Fade>
-        <YGroup
-          elevation={'$0.75'}
-          bc={'$color1'}
-          p={'$2'}
-          $gtLg={{ p: '$3.5' }}
-          testID={'sendtags-list'}
-        >
-          {tags.map((tag) => (
-            <YGroup.Item key={tag.name}>
-              <TagItem tag={tag} isMain={tag.id === mainTagId} />
-            </YGroup.Item>
-          ))}
-        </YGroup>
-      </Fade>
+    <FadeCard testID={'sendtags-list'} elevation={'$0.75'} bc={'$color1'} gap={'$5'}>
+      {tags.map((tag) => (
+        <TagItem key={tag.name} tag={tag} isMain={tag.id === mainTagId} />
+      ))}
       {canChangeMainTag && (
-        <Button onPress={onMainTagSelect} br="$4">
+        <Button
+          onPress={onMainTagSelect}
+          br="$4"
+          hoverStyle={hoverStyles}
+          bc={isDark ? 'rgba(255, 255, 255, 0.10)' : 'rgba(0, 0, 0, 0.10)'}
+        >
           <Button.Text fontSize={'$5'}>Change Main Tag</Button.Text>
         </Button>
       )}
-    </YStack>
+    </FadeCard>
   )
 }
 
 function TagItem({ tag, isMain }: { tag: Tables<'tags'>; isMain?: boolean }) {
   return (
-    <XStack jc={'space-between'} ai="center" gap="$2" p="$3.5" br={'$4'} $gtLg={{ p: '$5' }}>
+    <XStack jc={'space-between'} ai="center" gap="$2" br={'$4'}>
       <XStack width={'75%'}>
         <IconSlash size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
         <Paragraph
@@ -173,14 +168,13 @@ function TagItem({ tag, isMain }: { tag: Tables<'tags'>; isMain?: boolean }) {
           numberOfLines={1}
           testID={`confirmed-tag-${tag.name}`}
           aria-label={`Tag ${tag.name}${isMain ? ' (Main)' : ''}`}
+          lineHeight={28}
         >
           {tag.name}
         </Paragraph>
       </XStack>
       {isMain && (
-        <Paragraph size={'$6'} color={'$primary'} fontWeight={'600'}>
-          Main
-        </Paragraph>
+        <IconCheckCircle size="$1" color={'$primary'} $theme-light={{ color: '$color12' }} />
       )}
     </XStack>
   )
@@ -198,6 +192,8 @@ function MainTagSelectionSheet({
   currentMainTagId?: number | null
 }) {
   const toast = useAppToast()
+  const theme = useThemeName()
+  const isDark = theme?.startsWith('dark')
   const { updateProfile } = useUser()
   const hoverStyles = useHoverStyles()
   const { refetch: refetchSendAccount, data: sendAccount } = useSendAccount()
@@ -245,11 +241,21 @@ function MainTagSelectionSheet({
                   <Spinner size="small" color="$color11" />
                 ) : (
                   <XStack gap="$3" ai="center" f={1}>
-                    <IconSlash size="$1.5" />
-                    <Paragraph size="$5" fontWeight="500" f={1}>
+                    <IconSlash
+                      size="$1.5"
+                      color={isDark ? (isCurrentMain ? '$black' : '$primary') : '$color12'}
+                    />
+                    <Paragraph
+                      size="$5"
+                      fontWeight="500"
+                      f={1}
+                      color={isCurrentMain ? '$black' : '$color12'}
+                    >
                       {tag.name}
                     </Paragraph>
-                    {isCurrentMain ? <IconBadgeCheck size="$1" color="$color12" /> : null}
+                    {isCurrentMain ? (
+                      <IconCheckCircle size="$1" color={isDark ? '$black' : '$color12'} />
+                    ) : null}
                   </XStack>
                 )
               }
@@ -328,9 +334,10 @@ function MainTagSelectionSheet({
       dismissOnSnapToBottom
       dismissOnOverlayPress
       native
-      snapPoints={[60]}
+      snapPoints={['fit']}
+      snapPointsMode="fit"
     >
-      <Sheet.Frame key="main-tag-selection-sheet" gap="$4" padding="$4">
+      <Sheet.Frame key="main-tag-selection-sheet" gap="$4" padding="$4" pb={'$6'}>
         {dialogContent}
       </Sheet.Frame>
       <Sheet.Overlay />

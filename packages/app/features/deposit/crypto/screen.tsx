@@ -1,10 +1,9 @@
 import { useSendAccount } from 'app/utils/send-accounts'
 import { DepositAddressQR } from 'app/features/deposit/components/DepositAddressQR'
 import { Button, FadeCard, Paragraph, Spinner, useAppToast, YStack } from '@my/ui'
-import { Check } from '@tamagui/lucide-icons'
+import { Check, Copy } from '@tamagui/lucide-icons'
 import * as Clipboard from 'expo-clipboard'
 import { useState } from 'react'
-import { IconCopy } from 'app/components/icons'
 import { CopyAddressDialog } from 'app/features/deposit/components/CopyAddressDialog'
 
 export function DepositCryptoScreen() {
@@ -84,7 +83,7 @@ export function DepositCryptoScreen() {
                 {hasCopied ? (
                   <Check color="$primary" size="$1" $theme-light={{ color: '$color12' }} />
                 ) : (
-                  <IconCopy
+                  <Copy
                     flexShrink={0}
                     size="$1"
                     $theme-dark={{ color: '$primary' }}

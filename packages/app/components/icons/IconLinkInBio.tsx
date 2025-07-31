@@ -1,5 +1,10 @@
 import type { IconProps } from '@tamagui/helpers-icon'
 import type { NamedExoticComponent } from 'react'
+import { IconFacebook } from './IconFacebook'
+import { IconSnapchat } from './IconSnapchat'
+import { IconWhatsApp } from './IconWhatsApp'
+import { IconTwitch } from './IconTwitch'
+import { IconOnlyFans } from './IconOnlyFans'
 import { IconGithub } from './IconGithub'
 import { IconInstagram } from './IconInstagram'
 import { IconTikTok } from './IconTikTok'
@@ -7,11 +12,11 @@ import { IconXLogo } from './IconXLogo'
 import { IconTelegramLogo } from './IconTelegramLogo'
 import { IconYoutube } from './IconYoutube'
 import { IconDiscord } from './IconDiscord'
-import type { Database } from '@my/supabase/database-generated.types'
-import { XStack } from '@my/ui'
+import { type ColorTokens, XStack } from '@my/ui'
 import { IconWorldSearch } from './IconWorldSearch'
+import type { LinkInBioDomainNamesEnum } from 'app/utils/useLinkInBioMutation'
 
-export const domainColors = {
+export const domainColors: Partial<Record<LinkInBioDomainNamesEnum, ColorTokens>> = {
   X: 'black',
   Telegram: '$telegramBlue',
   Discord: '$discordPurple',
@@ -19,12 +24,14 @@ export const domainColors = {
   Instagram: '$instagramPink',
   TikTok: '$white',
   GitHub: 'black',
+  Facebook: '$facebookBlue',
+  Snapchat: '$snapchatYellow',
+  WhatsApp: '$whatsappGreen',
+  Twitch: '$twitchPurple',
+  OnlyFans: '$onlyFansBlue',
 } as const
 
-const domainIcons: Record<
-  Database['public']['Enums']['link_in_bio_domain_names'],
-  NamedExoticComponent<IconProps>
-> = {
+const domainIcons: Partial<Record<LinkInBioDomainNamesEnum, NamedExoticComponent<IconProps>>> = {
   X: IconXLogo,
   Telegram: IconTelegramLogo,
   YouTube: IconYoutube,
@@ -32,6 +39,11 @@ const domainIcons: Record<
   TikTok: IconTikTok,
   Instagram: IconInstagram,
   GitHub: IconGithub,
+  Facebook: IconFacebook,
+  Snapchat: IconSnapchat,
+  WhatsApp: IconWhatsApp,
+  Twitch: IconTwitch,
+  OnlyFans: IconOnlyFans,
 } as const
 
 export const IconLinkInBio = ({ domain_name, ...props }: { domain_name: string } & IconProps) => {

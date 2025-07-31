@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS "public"."link_in_bio" (
     "handle" "text",
     "domain_name" "public"."link_in_bio_domain_names" NOT NULL,
     "domain" "text" GENERATED ALWAYS AS(
-          CASE
+         CASE
             WHEN "domain_name" = 'X' THEN 'x.com/'
             WHEN "domain_name" = 'Instagram' THEN 'instagram.com/'
             WHEN "domain_name" = 'Discord' THEN 'discord.gg/'
@@ -15,8 +15,13 @@ CREATE TABLE IF NOT EXISTS "public"."link_in_bio" (
             WHEN "domain_name" = 'TikTok' THEN 'tiktok.com/@'
             WHEN "domain_name" = 'GitHub' THEN 'github.com/'
             WHEN "domain_name" = 'Telegram' THEN 't.me/'
-            ELSE NULL
-          END
+            WHEN "domain_name" = 'Facebook' THEN 'facebook.com/'
+            WHEN "domain_name" = 'OnlyFans' THEN 'onlyfans.com/'
+            WHEN "domain_name" = 'WhatsApp' THEN 'wa.me/'
+            WHEN "domain_name" = 'Snapchat' THEN 'snapchat.com/@'
+            WHEN "domain_name" = 'Twitch' THEN 'twitch.tv/'
+        ELSE NULL
+    END
     ) STORED,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,

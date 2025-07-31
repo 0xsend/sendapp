@@ -1,12 +1,10 @@
 // External libs & UI
-import { ChevronLeft, ChevronRight, Upload } from '@tamagui/lucide-icons'
-import { useRouter } from 'solito/router'
+import { ChevronRight, Upload } from '@tamagui/lucide-icons'
 import { useState } from 'react'
 import {
   BlurStack,
   Button,
   Card,
-  H2,
   Image,
   LinkableButton,
   Paragraph,
@@ -18,17 +16,17 @@ import {
   useMedia,
   useThemeName,
   styled,
-  useSafeAreaInsets,
   Link,
   Anchor,
   isWeb,
+  Avatar,
+  H3,
 } from '@my/ui'
 
 // Internal
-import { GradientOverlay } from 'app/components/GradientOverlay'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useProfileScreenParams } from 'app/routers/params'
-import { IconLinkInBio } from 'app/components/icons'
+import { IconAccount, IconArrowUp, IconLinkInBio } from 'app/components/icons'
 import { ShareOtherProfileDialog } from './components/ShareOtherProfileDialog'
 import type { Functions } from '@my/supabase/database.types'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
@@ -45,25 +43,19 @@ interface ProfileScreenProps {
 
 export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   const media = useMedia()
-  const router = useRouter()
   const [{ sendid: paramSendid }] = useProfileScreenParams()
   const otherUserId = propSendid || Number(paramSendid)
   const [shareDialogOpen, setShareDialogOpen] = useState(false)
+  const isDark = useThemeName()?.startsWith('dark')
   const {
     data: otherUserProfile,
     isLoading: isLoadingProfile,
     error,
   } = useProfileLookup('sendid', otherUserId?.toString() || '')
 
-  const safeAreaInsets = useSafeAreaInsets()
-
   const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
 
   const isLoading = isLoadingProfile || isLoadingTokenPrices
-
-  const goBack = (): void => {
-    router.back()
-  }
 
   const openShareMenu = (): void => {
     setShareDialogOpen(true)
@@ -88,234 +80,163 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   }
 
   return (
-    <>
-      <Card
-        elevation={0}
-        padded
-        size={media.gtMd ? '$7' : '$3.5'}
-        w="100%"
-        h={428}
-        position="relative"
-      >
-        <Card.Background>
+    <YStack gap="$4" ai="center" w="100%" maw={1024}>
+      <Card elevation={0} w="100%" h={200} position="relative" br="$5">
+        <Card.Background br="$5">
+          <BlurStack
+            fullscreen
+            intensity={otherUserProfile?.banner_url ? 0 : 30}
+            zIndex={100}
+            tint={isDark ? 'dark' : 'light'}
+            overflow="hidden"
+          />
           <Image
             source={{
               uri:
+                otherUserProfile?.banner_url ??
                 otherUserProfile?.avatar_url ??
-                `https://ui-avatars.com/api.jpg?name=${otherUserProfile?.main_tag_name}&size=428`,
+                `https://ghassets.send.app/app_images/auth_image_${Math.floor(Math.random() * 3) + 1}.jpg`,
               width: 428,
-              height: 428,
+              height: 200,
             }}
             h="100%"
             w="100%"
-            filter="blur(12px)"
+            objectFit="cover"
+            br="$5"
           />
         </Card.Background>
-        <Image
-          source={{
-            uri:
-              otherUserProfile?.avatar_url ??
-              `https://ui-avatars.com/api.jpg?name=${otherUserProfile?.main_tag_name}&size=428`,
-            width: 428,
-            height: 428,
-          }}
-          h="100%"
-          position="absolute"
-          top={0}
-          bottom={0}
-          left={0}
-          right={0}
-          margin="auto"
-        />
-        <GradientOverlay
-          colors={['transparent', 'black']}
-          height="100%"
-          position="absolute"
-          bottom={0}
-          left={0}
-          right={0}
-          zIndex={1}
-        />
-        <Card.Header
-          p={0}
-          pt={safeAreaInsets.top}
-          padded={media.gtMd}
-          jc="space-between"
-          ai="center"
-          fd="row"
-        >
-          <BlurStack intensity={10} circular>
-            <Button
-              size="$3"
-              circular
-              bc="rgba(102, 102, 102, 0.4)"
-              onPress={goBack}
-              ai="center"
-              jc={'center'}
-              icon={<ChevronLeft size="$1.5" color="$white" />}
-            />
-          </BlurStack>
-          <BlurStack intensity={10} circular>
-            <Button
-              size="$3"
-              circular
-              bc="rgba(102, 102, 102, 0.4)"
-              onPress={openShareMenu}
-              icon={<Upload size="$1" color="$white" />}
-            />
-          </BlurStack>
-        </Card.Header>
-        <Card.Footer
-          padded
-          size={media.gtMd ? '$7' : '$5'}
-          pb={media.gtMd ? 0 : undefined}
-          ai={media.gtMd ? 'flex-end' : 'flex-start'}
-          jc={media.gtMd ? 'space-between' : 'flex-end'}
-          f={1}
-          flexDirection={media.gtMd ? 'row' : 'column'}
-          gap={media.gtMd ? '$8' : '$4'}
-        >
-          <YStack gap="$4">
-            <XStack gap="$2" alignItems="center">
-              <H2 color="$white">{otherUserProfile?.name}</H2>
-            </XStack>
-            <XStack gap="$2" flexWrap="wrap" maw="100%">
-              {otherUserProfile?.all_tags?.map((tag) => {
-                return (
-                  <BlurStack
-                    intensity={50}
-                    key={tag}
-                    p={8}
-                    bc="rgba(102, 102, 102, 0.4)"
-                    borderRadius={4}
-                    alignSelf="flex-start"
-                    overflow="hidden"
-                  >
-                    <Paragraph color="$white" fontSize="$3" fontWeight="400">
-                      /{tag}
-                    </Paragraph>
-                  </BlurStack>
-                )
-              })}
-            </XStack>
-            {otherUserProfile?.about && (
-              <Paragraph color="$white" fontSize="$4" fontWeight="400">
-                {otherUserProfile?.about}
-              </Paragraph>
-            )}
-          </YStack>
-
-          <LinkableButton
-            als={media.gtMd ? 'flex-end' : 'flex-start'}
-            href={{
-              pathname: isWeb ? '/send' : '/send/form',
-              query: { recipient: otherUserProfile?.sendid, idType: 'sendid' },
-            }}
-            theme="green"
-            height={32}
-            borderRadius="$4"
-            jc="center"
-            ai="center"
-            maw={398}
-            w={'100%'}
-            bc="$primary"
-          >
-            <Button.Text
-              color="$black"
-              fontSize="$4"
-              fontFamily="$mono"
-              fontWeight="500"
-              textTransform="uppercase"
-              textAlign="center"
-            >
-              SEND
-            </Button.Text>
-          </LinkableButton>
-        </Card.Footer>
       </Card>
-      {media.gtMd ? (
-        <XStack
-          maw={1042}
-          display="flex"
-          fd={'row-reverse'}
-          px="$4"
-          pt="$6"
-          pb="$12"
+      <YStack gap="$4" flexDirection={media.gtMd ? 'row' : 'column'} w="100%">
+        <YStack
           gap="$4"
-          bc={'$color0'}
-          als={'center'}
-          jc={'center'}
-          width={'100%'}
+          f={1}
+          maw={509}
+          w="100%"
+          als={media.gtMd ? 'flex-start' : 'center'}
+          jc={media.gtMd ? 'flex-start' : 'center'}
         >
-          <YStack gap="$4" f={1} w="100%">
-            <XStack ai={'center'} jc="space-between">
-              <Paragraph color="$color12" fontSize="$6" fontWeight="600">
-                Send Vibes
-              </Paragraph>
+          {media.gtMd ? (
+            <Paragraph color="$color12" fontSize="$6" fontWeight="600">
+              About
+            </Paragraph>
+          ) : null}
+          <Card gap="$4" size={media.gtMd ? '$7' : '$5'} padded elevation={1}>
+            <XStack jc="space-between" w="100%">
+              <Avatar
+                size={media.gtMd ? 80 : 64}
+                aspectRatio={1}
+                objectFit="cover"
+                br={'$3'}
+                bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
+                als="center"
+              >
+                <Avatar.Image src={otherUserProfile?.avatar_url ?? undefined} objectFit="cover" />
+                <Avatar.Fallback f={1} jc={'center'} ai={'center'}>
+                  <IconAccount color="$color12" size={'100%'} />
+                </Avatar.Fallback>
+              </Avatar>
+
+              <YStack px="$4" gap="$2" jc="space-around" f={1} als="center">
+                <H3 lineHeight={32} color="$color12">
+                  {otherUserProfile?.name ?? '---'}
+                </H3>
+
+                <XStack gap="$2" flexWrap="wrap" w="100%">
+                  {otherUserProfile?.all_tags?.map((tag) => {
+                    return (
+                      <XStack
+                        key={tag}
+                        px={8}
+                        py={4}
+                        bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
+                        borderRadius={4}
+                        alignSelf="flex-start"
+                      >
+                        <Paragraph color="$color12" fontSize="$3" fontWeight="400">
+                          /{tag}
+                        </Paragraph>
+                      </XStack>
+                    )
+                  })}
+                </XStack>
+              </YStack>
               <Link
                 textDecorationLine="underline"
                 href={`/profile/${otherUserProfile?.sendid}/history`}
+                als="flex-start"
               >
                 View History
               </Link>
             </XStack>
-            <Vibes profile={otherUserProfile} tokenPrices={tokenPrices} />
-          </YStack>
-          {otherUserProfile?.links_in_bio ? (
-            <YStack gap="$4" f={1} w="100%">
-              <Paragraph color="$color12" fontSize="$6" fontWeight="600">
-                Let&apos;s Connect
-              </Paragraph>
-              <LinksInBio profile={otherUserProfile} />
-            </YStack>
-          ) : null}
-        </XStack>
-      ) : (
+
+            <Paragraph color="$color12" fontSize="$4" fontWeight="400">
+              {otherUserProfile?.about}
+            </Paragraph>
+            <XStack w="100%" gap="$4">
+              <LinkableButton
+                href={{
+                  pathname: isWeb ? '/send' : '/send/form',
+                  query: { recipient: otherUserProfile?.sendid, idType: 'sendid' },
+                }}
+                borderRadius={'$4'}
+                jc="center"
+                ai="center"
+                position="relative"
+                bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
+                f={1}
+              >
+                <Button.Icon>
+                  <IconArrowUp size={'$1'} color={isDark ? '$primary' : '$color12'} />
+                </Button.Icon>
+                <Button.Text color="$color12" fontSize={'$4'} fontWeight={'400'} textAlign="center">
+                  Send
+                </Button.Text>
+              </LinkableButton>
+              <Button
+                aspectRatio={1}
+                p={0}
+                br="$4"
+                bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
+                onPress={openShareMenu}
+                icon={<Upload size="$1" color="$color12" padding="$1" />}
+              />
+            </XStack>
+          </Card>
+        </YStack>
         <YStack
           maw={509}
-          display="flex"
-          fd={'column'}
-          px="$4"
-          pt="$6"
           gap="$4"
-          bc={'$color0'}
-          als={'center'}
-          jc={'center'}
+          als={media.gtMd ? 'flex-start' : 'center'}
+          jc={media.gtMd ? 'flex-start' : 'center'}
           width={'100%'}
+          f={1}
         >
-          <YStack gap="$4" f={1} w="100%">
-            <XStack ai={'center'} jc="space-between">
-              <Paragraph color="$color12" fontSize="$6" fontWeight="600">
-                Send Vibes
-              </Paragraph>
-              <Link
-                textDecorationLine="underline"
-                href={`/profile/${otherUserProfile?.sendid}/history`}
-              >
-                View History
-              </Link>
-            </XStack>
-            <Vibes profile={otherUserProfile} tokenPrices={tokenPrices} />
-          </YStack>
           {otherUserProfile?.links_in_bio ? (
-            <YStack gap="$4" f={1} w="100%">
+            <YStack gap="$4" w="100%">
               <Paragraph color="$color12" fontSize="$6" fontWeight="600">
                 Let&apos;s Connect
               </Paragraph>
               <LinksInBio profile={otherUserProfile} />
             </YStack>
           ) : null}
-        </YStack>
-      )}
+          <YStack gap="$4" w="100%">
+            <Paragraph color="$color12" fontSize="$6" fontWeight="600">
+              Send Vibes
+            </Paragraph>
 
-      {otherUserProfile ? (
-        <ShareOtherProfileDialog
-          isOpen={shareDialogOpen}
-          onClose={() => setShareDialogOpen(false)}
-          profile={otherUserProfile}
-        />
-      ) : null}
-    </>
+            <Vibes profile={otherUserProfile} tokenPrices={tokenPrices} />
+          </YStack>
+        </YStack>
+
+        {otherUserProfile ? (
+          <ShareOtherProfileDialog
+            isOpen={shareDialogOpen}
+            onClose={() => setShareDialogOpen(false)}
+            profile={otherUserProfile}
+          />
+        ) : null}
+      </YStack>
+    </YStack>
   )
 }
 
@@ -379,7 +300,11 @@ const Vibes = ({
     amount,
     tokenPrice,
     token,
-  }: { amount: number; tokenPrice: number; token: keyof allCoinsDict }) => {
+  }: {
+    amount: number
+    tokenPrice: number
+    token: keyof allCoinsDict
+  }) => {
     const coinData = coinsDict[token]
 
     if (tokenPrice <= 0 || !coinData) {
@@ -411,7 +336,9 @@ const Vibes = ({
         note="😊"
         profile={profile}
       >
-        <Button.Text size={media.xxs ? '$7' : '$9'}>😊</Button.Text>
+        <Button.Text size={media.xs ? '$8' : '$9'} lineHeight={34}>
+          😊
+        </Button.Text>
         <Paragraph size={'$3'}>$1</Paragraph>
       </Vibe>
       <Vibe
@@ -424,7 +351,9 @@ const Vibes = ({
         note="🔥"
         profile={profile}
       >
-        <Button.Text size={media.xxs ? '$7' : '$9'}>🔥</Button.Text>
+        <Button.Text size={media.xs ? '$8' : '$9'} lineHeight={34}>
+          🔥
+        </Button.Text>
         <Paragraph size={'$3'}>$2</Paragraph>
       </Vibe>
       <Vibe
@@ -437,7 +366,9 @@ const Vibes = ({
         note="💯"
         profile={profile}
       >
-        <Button.Text size={media.xxs ? '$7' : '$9'}>💯</Button.Text>
+        <Button.Text size={media.xs ? '$8' : '$9'} lineHeight={34}>
+          💯
+        </Button.Text>
         <Paragraph size={'$3'}>$3</Paragraph>
       </Vibe>
       <Vibe
@@ -450,7 +381,9 @@ const Vibes = ({
         note="🚀"
         profile={profile}
       >
-        <Button.Text size={media.xxs ? '$7' : '$9'}>🚀</Button.Text>
+        <Button.Text size={media.xs ? '$8' : '$9'} lineHeight={34}>
+          🚀
+        </Button.Text>
         <Paragraph size={'$3'}>$4</Paragraph>
       </Vibe>
       <Vibe
@@ -473,10 +406,11 @@ const Vibes = ({
 }
 
 const LinksInBio = ({ profile }: { profile: Functions<'profile_lookup'>[number] }) => {
+  const media = useMedia()
   const theme = useThemeName()
   const isDark = theme?.startsWith('dark')
   return (
-    <Card elevation={1} padded size="$4" px="$2" borderRadius="$4" gap="$4">
+    <Card elevation={1} padded size={media.gtMd ? '$7' : '$5'} borderRadius="$6" gap="$4">
       {profile?.links_in_bio?.map((link) => {
         const fullUrl = `https://${link.domain}${link.handle}`
         return (
@@ -488,14 +422,7 @@ const LinksInBio = ({ profile }: { profile: Functions<'profile_lookup'>[number] 
             f={1}
             textDecorationLine="none"
           >
-            <XStack
-              p={'$3'}
-              f={1}
-              width="100%"
-              h="100%"
-              justifyContent="space-between"
-              alignItems="center"
-            >
+            <XStack f={1} width="100%" h="100%" justifyContent="space-between" alignItems="center">
               <XStack gap="$4" alignItems="center">
                 <IconLinkInBio domain_name={link.domain_name} size={24} color="$white" />
                 <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
@@ -504,11 +431,11 @@ const LinksInBio = ({ profile }: { profile: Functions<'profile_lookup'>[number] 
               </XStack>
               <XStack
                 bg={isDark ? 'rgba(255, 255, 255, 0.10)' : 'rgba(0, 0, 0, 0.10)'}
-                borderRadius="$2"
+                borderRadius="$3"
                 justifyContent="center"
                 alignItems="center"
               >
-                <ChevronRight size="$1" color="$color12" />
+                <ChevronRight size="$1.5" color="$color12" />
               </XStack>
             </XStack>
           </Anchor>

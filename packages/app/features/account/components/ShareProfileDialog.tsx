@@ -10,11 +10,12 @@ import {
   useAppToast,
   YStack,
 } from '@my/ui'
-import { IconCopy, IconSend } from 'app/components/icons'
+import { IconSend } from 'app/components/icons'
 import { useConfirmedTags } from 'app/utils/tags'
 import { useUser } from 'app/utils/useUser'
 import * as Clipboard from 'expo-clipboard'
 import { Platform } from 'react-native'
+import { Copy } from '@tamagui/lucide-icons'
 
 interface ShareProfileDialogProps {
   isOpen: boolean
@@ -68,7 +69,7 @@ export function ShareProfileDialog({ isOpen, onClose }: ShareProfileDialogProps)
       >
         <PrimaryButton onPress={handleCopyLink} f={Platform.OS === 'web' ? 1 : undefined}>
           <PrimaryButton.Icon>
-            <IconCopy size={16} color={'$black'} />
+            <Copy size={16} color={'$black'} />
           </PrimaryButton.Icon>
           <PrimaryButton.Text>copy link</PrimaryButton.Text>
         </PrimaryButton>
@@ -113,9 +114,10 @@ export function ShareProfileDialog({ isOpen, onClose }: ShareProfileDialogProps)
       dismissOnSnapToBottom
       dismissOnOverlayPress
       native
-      snapPoints={[65]}
+      snapPoints={['fit']}
+      snapPointsMode="fit"
     >
-      <Sheet.Frame key="share-profile-sheet" gap="$3.5" padding="$5">
+      <Sheet.Frame key="share-profile-sheet" gap="$3.5" padding="$6">
         {dialogContent}
       </Sheet.Frame>
       <Sheet.Overlay />

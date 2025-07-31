@@ -20,6 +20,7 @@ export const AddSendtagsScreen = () => {
       f={Platform.OS === 'web' ? undefined : 1}
       width={'100%'}
       gap="$5"
+      pt={'$3.5'}
       jc={'space-between'}
       $gtLg={{
         width: '50%',

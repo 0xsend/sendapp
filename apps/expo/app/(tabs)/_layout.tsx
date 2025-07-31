@@ -125,9 +125,9 @@ export default function Layout() {
                     return (
                       <HeaderSlot>
                         <Paragraph
-                          fontWeight={'300'}
+                          fontWeight={'600'}
                           fontSize={'$8'}
-                          col="$color10"
+                          col="$color12"
                           lineHeight={32}
                         >
                           {tab.title}
@@ -152,7 +152,7 @@ export default function Layout() {
                   >
                     <tab.Icon
                       size={'$1.5'}
-                      color={focused ? '$primary' : '$silverChalice'}
+                      color={focused ? '$color12' : '$silverChalice'}
                       $theme-light={{ color: focused ? '$color12' : '$darkGrayTextField' }}
                     />
                   </XStack>

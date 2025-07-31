@@ -21,6 +21,7 @@ export const FirstSendtagScreen = () => {
       width={'100%'}
       gap="$5"
       jc={'space-between'}
+      pt={'$3.5'}
       $gtLg={{
         width: '50%',
         pb: '$3.5',

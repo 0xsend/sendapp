@@ -49,7 +49,7 @@ const Handle = ({ children, ...props }: GetProps<typeof Sheet.Handle>) => (
 
 const Item = ({ coin, ...props }: { coin: coin } & XStackProps) => {
   return (
-    <XStack gap={'$2'} jc={'space-between'} py="$2" px="$3" {...props}>
+    <XStack gap={'$2'} jc={'space-between'} py="$2.5" px="$3.5" {...props}>
       <XStack gap={'$2'} ai={'center'}>
         <IconCoin symbol={coin.symbol} />
         <Paragraph
@@ -69,7 +69,7 @@ const Items = ({ children, ...props }: GetProps<typeof Sheet.ScrollView>) => {
   return (
     <Sheet.ScrollView {...props}>
       <XStack als="flex-start" w="100%" boc={'transparent'} f={1} jc={'flex-start'}>
-        <YStack gap="$1" p={'$2'} w="100%">
+        <YStack gap="$1" px={'$2'} pt={'$3'} pb={'$5'} w="100%">
           {children}
         </YStack>
       </XStack>
