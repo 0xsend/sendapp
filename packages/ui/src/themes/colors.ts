@@ -39,6 +39,11 @@ export const brandColors = {
   youtubeRed: '#FF0000',
   spotifyGreen: '#1ED760',
   instagramPink: '#FF0069',
+  facebookBlue: '#1877f2',
+  snapchatYellow: '#FFFC00',
+  whatsappGreen: '#25D366',
+  twitchPurple: '#6441A4',
+  onlyFansBlue: '#00aff0',
 } as const
 
 export const greenPalette = {

@@ -1,5 +1,10 @@
 import type { IconProps } from '@tamagui/helpers-icon'
 import type { NamedExoticComponent } from 'react'
+import { IconFacebook } from './IconFacebook'
+import { IconSnapchat } from './IconSnapchat'
+import { IconWhatsApp } from './IconWhatsApp'
+import { IconTwitch } from './IconTwitch'
+import { IconOnlyFans } from './IconOnlyFans'
 import { IconGithub } from './IconGithub'
 import { IconInstagram } from './IconInstagram'
 import { IconTikTok } from './IconTikTok'
@@ -19,6 +24,11 @@ export const domainColors: Partial<Record<LinkInBioDomainNamesEnum, ColorTokens>
   Instagram: '$instagramPink',
   TikTok: '$white',
   GitHub: 'black',
+  Facebook: '$facebookBlue',
+  Snapchat: '$snapchatYellow',
+  WhatsApp: '$whatsappGreen',
+  Twitch: '$twitchPurple',
+  OnlyFans: '$onlyFansBlue',
 } as const
 
 const domainIcons: Partial<Record<LinkInBioDomainNamesEnum, NamedExoticComponent<IconProps>>> = {
@@ -29,6 +39,11 @@ const domainIcons: Partial<Record<LinkInBioDomainNamesEnum, NamedExoticComponent
   TikTok: IconTikTok,
   Instagram: IconInstagram,
   GitHub: IconGithub,
+  Facebook: IconFacebook,
+  Snapchat: IconSnapchat,
+  WhatsApp: IconWhatsApp,
+  Twitch: IconTwitch,
+  OnlyFans: IconOnlyFans,
 } as const
 
 export const IconLinkInBio = ({ domain_name, ...props }: { domain_name: string } & IconProps) => {
