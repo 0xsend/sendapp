@@ -125,17 +125,19 @@ function TotalValue() {
   return (
     <Fade>
       <Card w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>
-        <YStack gap={'$4'}>
+        <YStack gap={'$3.5'}>
           <XStack ai={'center'} gap={'$2'}>
             <IconCoin symbol={coin.data?.symbol || ''} size={'$2'} />
-            <Paragraph size={'$7'}>{coin.data?.symbol || ''}</Paragraph>
+            <Paragraph size={'$7'} fontWeight={600} lineHeight={28}>
+              {coin.data?.symbol || ''}
+            </Paragraph>
           </XStack>
           <YStack gap={'$2'}>
             {isLoading ? (
               <Spinner size={'large'} alignSelf="flex-start" flexShrink={1} />
             ) : (
               <Paragraph
-                fontWeight={'500'}
+                fontWeight={'600'}
                 size={(() => {
                   switch (true) {
                     case totalValue.length > 16:
@@ -156,12 +158,15 @@ function TotalValue() {
                     }
                   })(),
                 }}
+                style={{
+                  lineHeight: 62,
+                }}
               >
                 {totalValue}
               </Paragraph>
             )}
+            <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
           </YStack>
-          <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
           {[coin.isError, coinBalances.error].some((e) => e) ? (
             <Paragraph size={'$5'} color={'$error'}>
               {[coin.error, coinBalances.error].map((e) => toNiceError(e)).join('. ')}
@@ -264,9 +269,13 @@ const BreakdownRow = ({
     <XStack jc={'space-between'} ai={'center'} flexWrap={'wrap'} rowGap={'$3'} gap={'$3'}>
       <XStack ai={'center'} gap={'$3.5'}>
         <IconCoin symbol={symbol} size={'$2'} />
-        <Paragraph size={'$7'}>{label}</Paragraph>
+        <Paragraph size={'$7'} fontWeight={600}>
+          {label}
+        </Paragraph>
       </XStack>
-      <Paragraph size={'$7'}>{value}</Paragraph>
+      <Paragraph size={'$7'} fontWeight={600}>
+        {value}
+      </Paragraph>
     </XStack>
   )
 }

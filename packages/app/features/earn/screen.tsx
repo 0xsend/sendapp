@@ -224,7 +224,7 @@ const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) =
         $gtLg={{ p: '$7', gap: '$7' }}
       >
         <Badge text={'Active Earnings'} />
-        <YStack gap={'$3.5'} w={'100%'}>
+        <YStack gap={'$3'} w={'100%'}>
           <YStack gap={'$2'}>
             <Paragraph
               size={'$5'}
@@ -235,7 +235,7 @@ const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) =
             </Paragraph>
             <XStack ai={'center'} jc={'space-between'}>
               <Paragraph
-                fontWeight={'500'}
+                fontWeight={'600'}
                 size={(() => {
                   switch (true) {
                     case totalAssets.length > 14:
@@ -259,14 +259,16 @@ const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) =
                   })(),
                 }}
                 style={{
-                  lineHeight: 50,
+                  lineHeight: 55,
                 }}
               >
                 {totalAssets}
               </Paragraph>
               <XStack ai={'center'} gap={'$2'}>
                 <IconCoin symbol={'USDC'} size={totalAssets.length > 16 ? '$1.5' : '$2.5'} />
-                <Paragraph size={'$7'}>USDC</Paragraph>
+                <Paragraph size={'$7'} fontWeight={600} lineHeight={26}>
+                  USDC
+                </Paragraph>
               </XStack>
             </XStack>
           </YStack>

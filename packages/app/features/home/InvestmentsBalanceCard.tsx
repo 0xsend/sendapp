@@ -90,8 +90,8 @@ export const InvestmentsBalanceCard = (props: CardProps) => {
           />
         )}
       </Card.Header>
-      <Card.Footer padded size="$4" pt={0} jc="space-between" ai="center">
-        <YStack jc="space-between" gap="$4">
+      <Card.Footer padded size="$4" pt={0} jc="space-between" ai="flex-start">
+        <YStack jc="space-between" gap={Platform.OS === 'web' ? '$2' : '$1'}>
           <Paragraph color={'$color12'} fontWeight={600} size={'$9'} lineHeight={34}>
             {(() => {
               switch (true) {
@@ -104,7 +104,6 @@ export const InvestmentsBalanceCard = (props: CardProps) => {
               }
             })()}
           </Paragraph>
-
           <InvestmentsAggregate />
         </YStack>
         {(!isInvestmentsScreen || media.gtLg) && <InvestmentsPreview />}
@@ -147,7 +146,7 @@ function InvestmentsPreview() {
   const remainingCount = allCoinsToShow.length - maxDisplay
 
   return (
-    <XStack ai="center" mr={remainingCount > 0 ? '$0' : '$3.5'}>
+    <XStack ai="center">
       <OverlappingCoinIcons coins={coinsToShow} length={coinsToShow.length} />
       {remainingCount > 0 ? (
         <ThemeableStack circular ai="center" jc="center" bc="$color0" w={'$3.5'} h="$3.5">
@@ -176,7 +175,7 @@ function OverlappingCoinIcons({
           ai="center"
           jc="center"
         >
-          <IconCoin size={'$3'} symbol={symbol} />
+          <IconCoin size={'$2.5'} symbol={symbol} />
         </ThemeableStack>
       ))}
     </XStack>

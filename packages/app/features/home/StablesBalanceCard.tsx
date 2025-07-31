@@ -179,7 +179,15 @@ export const StablesBalanceCardContent = (props: CardProps) => {
   }
 
   return (
-    <Card w="100%" onPress={toggleSubScreen} cursor="pointer" size={'$5'} br="$7" {...props}>
+    <Card
+      w="100%"
+      onPress={toggleSubScreen}
+      cursor="pointer"
+      size={'$5'}
+      br="$7"
+      p={'$1.5'}
+      {...props}
+    >
       {props.children}
     </Card>
   )

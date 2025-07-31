@@ -18,9 +18,9 @@ import {
   YStack,
 } from '@my/ui'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
-import { CheckCircle as IconCheckCircle, ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
+import { ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
 import { useTsController } from '@ts-react/form'
-import { IconX } from 'app/components/icons'
+import { IconCheckCircle, IconX } from 'app/components/icons'
 import formatAmount from 'app/utils/formatAmount'
 import { useId, useState } from 'react'
 import { IconCoin } from '../icons/IconCoin'
@@ -116,7 +116,7 @@ export const CoinField = ({
                 snapPointsMode="fit"
                 animation={'quick'}
               >
-                <Sheet.Frame maw={738} bc={'$color1'} pb={'$3.5'}>
+                <Sheet.Frame maw={738} bc={'$color1'} px={'$3.5'} py={'$6'}>
                   {Platform.OS === 'web' && (
                     <Sheet.Handle
                       py="$5"
@@ -236,14 +236,17 @@ const CoinFieldItem = ({
       <XStack gap={'$2'} $gtLg={{ gap: '$3.5' }} ai={'center'} jc={'space-between'}>
         <IconCoin symbol={coin.symbol} />
         <Select.ItemText
-          fontSize={'$5'}
-          fontWeight={'500'}
+          fontSize={'$7'}
+          fontWeight={Platform.OS === 'web' ? '500' : '600'}
           textTransform={'uppercase'}
           color={'$color12'}
+          lineHeight={36}
         >
           {coin.symbol}
         </Select.ItemText>
-        {active && <IconCheckCircle color={'$color12'} size={'$1.5'} />}
+        {active && (
+          <IconCheckCircle size="$0.9" color={'$primary'} $theme-light={{ color: '$color12' }} />
+        )}
       </XStack>
       <XStack gap={'$3.5'} ai={'center'}>
         <TokenBalance coin={coin} />
@@ -262,7 +265,11 @@ const TokenBalance = ({ coin: { balance, decimals } }: { coin: CoinWithBalance }
     return <></>
   }
   return (
-    <Paragraph fontFamily={'$mono'} fontSize={'$7'} fontWeight={'500'} color={'$color12'}>
+    <Paragraph
+      fontSize={'$7'}
+      fontWeight={Platform.OS === 'web' ? '500' : '600'}
+      color={'$color12'}
+    >
       {formatAmount((Number(balance) / 10 ** decimals).toString())}
     </Paragraph>
   )

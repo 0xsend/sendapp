@@ -43,12 +43,7 @@ export const TokenDetailsHeader = ({ coin }: { coin: CoinWithBalance }) => {
         <YStack gap="$4">
           <XStack ai={'center'} gap={'$3'}>
             <IconCoin size={'$2'} symbol={coin.symbol} />
-            <Paragraph
-              size={isSmallScreen ? '$6' : '$7'}
-              fontFamily={'$mono'}
-              col={'$color12'}
-              fontWeight={'500'}
-            >
+            <Paragraph size={isSmallScreen ? '$6' : '$7'} col={'$color12'} fontWeight={'600'}>
               {coin.label}
             </Paragraph>
           </XStack>

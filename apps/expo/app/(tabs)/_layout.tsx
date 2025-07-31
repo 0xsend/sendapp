@@ -107,6 +107,7 @@ export default function Layout() {
             transform: [{ translateY }],
             paddingTop: padding,
             paddingBottom: padding,
+            paddingHorizontal: '15%',
             height,
             borderTopWidth: 1,
             backgroundColor: theme.color1.val,
