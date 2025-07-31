@@ -12,6 +12,7 @@ export type ProfileSeoData = {
   tag?: string | null
   about?: string | null
   avatarUrl?: string | null
+  bannerUrl?: string | null
 }
 
 export type SeoGenerationOptions = {
@@ -92,6 +93,7 @@ export function getProfileImageUrl(profile: ProfileSeoData, siteUrl: string): st
 
     if (profile.name) searchParams.set('name', profile.name)
     if (profile.avatarUrl) searchParams.set('avatar_url', profile.avatarUrl)
+    if (profile.bannerUrl) searchParams.set('banner_url', profile.bannerUrl)
     if (profile.all_tags && profile.all_tags.length > 0) {
       searchParams.set('all_tags', profile.all_tags.join(','))
     }
