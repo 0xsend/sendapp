@@ -136,37 +136,38 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                 </Avatar.Fallback>
               </Avatar>
 
-              <YStack px="$4" gap="$2" jc="space-around" f={1} als="center">
+              <YStack px="$4" gap="$3" jc="space-around" f={1} als="center">
                 <H3 lineHeight={32} color="$color12">
                   {otherUserProfile?.name ?? '---'}
                 </H3>
-
-                <XStack gap="$2" flexWrap="wrap" w="100%">
-                  {otherUserProfile?.all_tags?.map((tag) => {
-                    return (
-                      <XStack
-                        key={tag}
-                        px={8}
-                        py={4}
-                        bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
-                        borderRadius={4}
-                        alignSelf="flex-start"
-                      >
-                        <Paragraph color="$color12" fontSize="$3" fontWeight="400">
-                          /{tag}
-                        </Paragraph>
-                      </XStack>
-                    )
-                  })}
-                </XStack>
+                <Link
+                  textDecorationLine="underline"
+                  href={`/profile/${otherUserProfile?.sendid}/history`}
+                  als="flex-start"
+                  fontSize={'$5'}
+                  color="$color10"
+                >
+                  View History
+                </Link>
               </YStack>
-              <Link
-                textDecorationLine="underline"
-                href={`/profile/${otherUserProfile?.sendid}/history`}
-                als="flex-start"
-              >
-                View History
-              </Link>
+            </XStack>
+            <XStack gap="$2" flexWrap="wrap" w="100%">
+              {otherUserProfile?.all_tags?.map((tag) => {
+                return (
+                  <XStack
+                    key={tag}
+                    px={8}
+                    py={4}
+                    bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
+                    borderRadius={4}
+                    alignSelf="flex-start"
+                  >
+                    <Paragraph color="$color12" fontSize="$3" fontWeight="400">
+                      /{tag}
+                    </Paragraph>
+                  </XStack>
+                )
+              })}
             </XStack>
 
             <Paragraph color="$color12" fontSize="$4" fontWeight="400">
