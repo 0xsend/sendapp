@@ -96,7 +96,7 @@ export function ActivityRewardsScreen() {
 
   return (
     <YStack f={1} pb={'$12'} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
-      <XStack w={'100%'} jc={'space-between'} ai={'center'}>
+      <XStack w={'100%'} jc={'space-between'} ai={'center'} flexWrap={'wrap'} gap={'$2'}>
         <H3 fontWeight={'600'} color={'$color12'} pr={'$2'}>
           {`${distributionDates[selectedDistributionIndex]?.split(' ')[0] ?? 'Monthly'} Rewards`}
         </H3>
