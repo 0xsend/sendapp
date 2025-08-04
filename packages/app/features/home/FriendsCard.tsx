@@ -51,12 +51,12 @@ export const FriendsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
               ai="center"
               jc="center"
               bc={hoverStyles.backgroundColor}
-              w={'$3.5'}
-              h="$3.5"
+              w={'$2.5'}
+              h="$2.5"
               mih={0}
               miw={0}
             >
-              <Paragraph fontSize={'$4'} fontWeight="500">
+              <Paragraph fontSize={'$2'} fontWeight="400">
                 {`${data?.count ?? 0}`}
               </Paragraph>
             </ThemeableStack>
