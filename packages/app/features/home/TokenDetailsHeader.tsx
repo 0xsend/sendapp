@@ -68,8 +68,8 @@ export const TokenDetailsHeader = ({ coin }: { coin: CoinWithBalance }) => {
           </>
         ) : (
           <>
-            <BuyButton coin={coin} />
             <SellButton coin={coin} />
+            <BuyButton coin={coin} />
           </>
         )}
       </XStack>
