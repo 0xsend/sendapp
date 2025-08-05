@@ -96,13 +96,19 @@ export default function FriendsScreen() {
 }
 
 const FriendMobileRow = ({ referral }: { referral: Referral }) => {
-  const linkProps = useLink({ href: `/profile/${referral.send_id}` })
+  const linkProps = useLink({ href: `/profile/${referral.sendid}` })
   const birthday = referral.birthday
     ? adjustUTCDateForTimezone(new Date(referral.birthday)).toLocaleString(undefined, {
         day: 'numeric',
         month: 'long',
       })
     : 'NA'
+
+  const label = referral.tag
+    ? `/${referral.tag}`
+    : referral.name || referral.sendid
+      ? `#${referral.sendid}`
+      : '??'
 
   return (
     <Card w={'100%'} gap={'$3.5'} br={'$5'} p={'$3.5'} {...linkProps}>
@@ -119,7 +125,7 @@ const FriendMobileRow = ({ referral }: { referral: Referral }) => {
             </Avatar.Fallback>
           </Avatar>
           <YStack gap={'$2'} f={1}>
-            <Paragraph lineHeight={20}>/{referral.tag}</Paragraph>
+            <Paragraph lineHeight={20}>{label}</Paragraph>
             <XStack gap={'$2'} alignItems={'center'}>
               <IconBirthday size={'$1'} />
               <Paragraph lineHeight={20}>{birthday}</Paragraph>

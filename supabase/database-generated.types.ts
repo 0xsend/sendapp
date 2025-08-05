@@ -1847,7 +1847,8 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: {
           avatar_url: string
-          send_id: number
+          name: string
+          sendid: number
           x_username: string
           links_in_bio: Database["public"]["Tables"]["link_in_bio"]["Row"][]
           birthday: string

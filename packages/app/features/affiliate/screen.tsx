@@ -25,7 +25,7 @@ import { RecyclerListView, type Dimension } from 'recyclerlistview/web'
 
 type Referral = Pick<
   Functions<'profile_lookup'>[number],
-  'avatar_url' | 'x_username' | 'links_in_bio' | 'birthday' | 'tag'
+  'avatar_url' | 'x_username' | 'links_in_bio' | 'birthday' | 'tag' | 'name' | 'sendid'
 >
 
 export default function FriendsScreen() {
@@ -162,11 +162,17 @@ const FriendMobileRow = ({
       })
     : 'NA'
 
+  const label = referral.tag
+    ? `/${referral.tag}`
+    : referral.name || referral.sendid
+      ? `#${referral.sendid}`
+      : '??'
+
   return (
     <Card w={'100%'} gap={'$3.5'} br={'$5'} p={'$3.5'} cursor={'pointer'} hoverStyle={hoverStyles}>
       <XStack f={1} w={'100%'} ai={'center'}>
         <Link
-          href={`/${referral.tag}`}
+          href={referral.tag ? `/${referral.tag}` : `/profile/${referral.sendid}`}
           containerProps={{
             f: 1,
           }}
@@ -184,8 +190,8 @@ const FriendMobileRow = ({
             </Avatar>
             <YStack gap={'$2'} f={1}>
               <Paragraph lineHeight={20}>
-                /{referral.tag}
-                {referral.tag === referrer?.tag ? ' (Invited you to Send)' : ''}
+                {label}
+                {referral.sendid === referrer?.sendid ? ' (Invited you to Send)' : ''}
               </Paragraph>
               <XStack gap={'$2'} alignItems={'center'}>
                 <IconBirthday size={'$1'} />
