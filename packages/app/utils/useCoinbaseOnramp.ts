@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react'
 import { getOnrampBuyUrl } from '@coinbase/onchainkit/fund'
 import { useMutation } from '@tanstack/react-query'
 import debug from 'debug'
+import { api } from 'app/utils/api'
 
 const log = debug('app:utils:useCoinbaseOnramp')
 const COINBASE_PAY_ORIGIN = 'https://pay.coinbase.com'
@@ -32,6 +33,9 @@ export default function useCoinbaseOnramp({
   const paymentSubmittedRef = useRef(false)
   // Keep state for UI updates, but use the ref for the Promise logic
   const [paymentSubmitted, setPaymentSubmitted] = useState(false)
+
+  const { mutateAsync: getSessionTokenMutateAsync } = api.onramp.getSessionToken.useMutation()
+
   const cleanup = useCallback(() => {
     if (popupRef.current) {
       popupRef.current.close()
@@ -47,6 +51,17 @@ export default function useCoinbaseOnramp({
     mutationFn: async ({ amount }) => {
       log('Starting transaction for:', amount, 'USD')
 
+      const addresses = [
+        {
+          address,
+          blockchains: ['base'],
+        },
+      ]
+
+      const assets = ['USDC']
+
+      const { token } = await getSessionTokenMutateAsync({ addresses, assets })
+
       const onrampUrl = getOnrampBuyUrl({
         projectId,
         addresses: {
@@ -57,6 +72,7 @@ export default function useCoinbaseOnramp({
         assets: ['USDC'],
         presetFiatAmount: amount,
         fiatCurrency: 'USD',
+        sessionToken: token,
       })
 
       cleanup()

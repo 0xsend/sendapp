@@ -3,6 +3,7 @@ import { getOnrampBuyUrl } from '@coinbase/onchainkit/fund'
 import { useMutation } from '@tanstack/react-query'
 import debug from 'debug'
 import * as WebBrowser from 'expo-web-browser'
+import { api } from 'app/utils/api'
 
 const log = debug('app:utils:useCoinbaseOnramp')
 
@@ -24,9 +25,22 @@ export default function useCoinbaseOnramp({
   partnerUserId,
   defaultPaymentMethod = 'CARD',
 }: OnrampConfig) {
+  const { mutateAsync: getSessionTokenMutateAsync } = api.onramp.getSessionToken.useMutation()
+
   const mutation = useMutation<void, Error, OnrampParams>({
     mutationFn: async ({ amount }) => {
       log('Starting transaction for:', amount, 'USD')
+
+      const addresses = [
+        {
+          address,
+          blockchains: ['base'],
+        },
+      ]
+
+      const assets = ['USDC']
+
+      const { token } = await getSessionTokenMutateAsync({ addresses, assets })
 
       const onrampUrl = getOnrampBuyUrl({
         projectId,
@@ -39,6 +53,7 @@ export default function useCoinbaseOnramp({
         presetFiatAmount: amount,
         fiatCurrency: 'USD',
         redirectUrl: 'app.send://deposit/success',
+        sessionToken: token,
       })
 
       await WebBrowser.openBrowserAsync(onrampUrl, {
