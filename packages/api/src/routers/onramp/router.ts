@@ -80,7 +80,7 @@ export const onrampRouter = createTRPCRouter({
         hasAssets: !!assets,
       })
 
-      let response = null
+      let response: Response
       try {
         response = await fetch(cdpApiUrl, {
           method: 'POST',
@@ -111,7 +111,7 @@ export const onrampRouter = createTRPCRouter({
       }
 
       // Parse successful response
-      let data = null
+      let data: { token?: string; channelId?: string; channel_id?: string }
       try {
         data = JSON.parse(responseText)
       } catch (error) {
