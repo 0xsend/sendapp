@@ -122,8 +122,11 @@ function HomeBody(props: XStackProps) {
           ai={'center'}
         >
           <StablesBalanceCard>
-            <StablesBalanceCard.Header />
-            <StablesBalanceCard.Footer />
+            <StablesBalanceCard.HomeScreenHeader />
+            <StablesBalanceCard.Footer>
+              <StablesBalanceCard.Balance />
+              <StablesBalanceCard.Actions />
+            </StablesBalanceCard.Footer>
           </StablesBalanceCard>
           <SavingsBalanceCard href="/earn" w="100%" />
           <InvestmentsBalanceCard w="100%" />
@@ -223,7 +226,10 @@ export function StablesBody() {
     <YStack $gtXs={{ gap: '$3' }} gap={'$3.5'} f={1}>
       {media.lg && (
         <StablesBalanceCard>
-          <StablesBalanceCard.Footer />
+          <StablesBalanceCard.StablesScreenHeader />
+          <StablesBalanceCard.Footer>
+            <StablesBalanceCard.Balance />
+          </StablesBalanceCard.Footer>
         </StablesBalanceCard>
       )}
 
