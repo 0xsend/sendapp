@@ -431,7 +431,7 @@ GRANT ALL ON FUNCTION "public"."profile_lookup"("lookup_type" "public"."lookup_t
 -- Functions
 
 CREATE OR REPLACE FUNCTION public.get_friends()
- RETURNS TABLE(avatar_url text, send_id int, x_username text, links_in_bio link_in_bio[], birthday date, tag citext, created_at timestamp with time zone)
+ RETURNS TABLE(avatar_url text, name text, sendid int, x_username text, links_in_bio link_in_bio[], birthday date, tag citext, created_at timestamp with time zone)
  LANGUAGE plpgsql
  SECURITY DEFINER
  SET search_path TO 'public'
@@ -442,6 +442,7 @@ BEGIN
             SELECT
                 DISTINCT ON (r.referred_id)
                 p.avatar_url,
+                p.name,
                 p.send_id,
                 CASE WHEN p.is_public THEN p.x_username ELSE NULL END AS x_username,
                 CASE WHEN p.is_public THEN
@@ -484,7 +485,8 @@ BEGIN
                 t.created_at DESC)
         SELECT
             o.avatar_url,
-            o.send_id,
+            o.name,
+            o.send_id as sendid, -- so it's the same as return type in profile lookup
             o.x_username,
             o.links_in_bio,
             o.birthday,

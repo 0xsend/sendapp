@@ -7,6 +7,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "@coinbase/cdp-sdk": "^1.21.0",
     "@my/supabase": "workspace:*",
     "@my/temporal": "workspace:*",
     "@my/wagmi": "workspace:*",
