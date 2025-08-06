@@ -46,7 +46,7 @@ export default function useCoinbaseOnramp({
         defaultPaymentMethod,
         presetFiatAmount: amount,
         fiatCurrency: 'USD',
-        redirectUrl: 'app.send://deposit/success',
+        redirectUrl: 'send.app://deposit/success',
       }
 
       const onrampUrl = getOnrampBuyUrl(params)
