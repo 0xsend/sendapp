@@ -14,6 +14,20 @@ jest.mock('@coinbase/onchainkit/fund', () => ({
   getOnrampBuyUrl: jest.fn().mockReturnValue('https://pay.coinbase.com'),
 }))
 
+jest.mock('app/utils/api', () => ({
+  api: {
+    onramp: {
+      getSessionToken: {
+        useMutation: jest.fn().mockReturnValue({
+          mutateAsync: jest
+            .fn<() => Promise<{ token: string }>>()
+            .mockResolvedValue({ token: 'session-token' }),
+        }),
+      },
+    },
+  },
+}))
+
 describe('useCoinbaseOnramp', () => {
   const mockAddress = '0x123'
   const mockUrl = 'https://pay.coinbase.com'
@@ -68,13 +82,11 @@ describe('useCoinbaseOnramp', () => {
     })
 
     expect(getOnrampBuyUrl).toBeCalledWith({
-      addresses: { [mockAddress]: ['base'] },
-      assets: ['USDC'],
       defaultPaymentMethod: 'CARD',
       fiatCurrency: 'USD',
       partnerUserId: mockPartnerUserId,
       presetFiatAmount: 100,
-      projectId: mockProjectId,
+      sessionToken: 'session-token',
     })
     expect(window.open).toHaveBeenCalledWith(mockUrl, 'Coinbase Onramp', 'width=600,height=800')
   })

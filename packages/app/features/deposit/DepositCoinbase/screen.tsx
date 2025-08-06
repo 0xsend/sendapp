@@ -10,8 +10,6 @@ import { useEffect, useState } from 'react'
 import { DepositCoinbaseForm } from 'app/features/deposit/DepositCoinbase/DepositCoinbaseForm'
 import { Platform } from 'react-native'
 
-const COINBASE_APP_ID = process.env.NEXT_PUBLIC_CDP_APP_ID ?? ''
-
 interface DepositCoinbaseScreenProps {
   defaultPaymentMethod?: 'APPLE_PAY' | 'CARD'
 }
@@ -26,7 +24,6 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
     error,
     isLoading,
   } = useCoinbaseOnramp({
-    projectId: COINBASE_APP_ID,
     address: sendAccount?.address ?? '',
     partnerUserId: sendAccount?.user_id ?? '',
     defaultPaymentMethod,

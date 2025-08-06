@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { getOnrampBuyUrl } from '@coinbase/onchainkit/fund'
+import { getOnrampBuyUrl, type GetOnrampUrlWithSessionTokenParams } from '@coinbase/onchainkit/fund'
 import { useMutation } from '@tanstack/react-query'
 import debug from 'debug'
 import * as WebBrowser from 'expo-web-browser'
@@ -9,7 +9,6 @@ const log = debug('app:utils:useCoinbaseOnramp')
 
 type OnrampStatus = 'idle' | 'pending_payment' | 'success' | 'failed' | 'payment_submitted'
 interface OnrampConfig {
-  projectId: string
   address: string
   partnerUserId: string
   defaultPaymentMethod?: 'APPLE_PAY' | 'CARD'
@@ -20,7 +19,6 @@ interface OnrampParams {
 }
 
 export default function useCoinbaseOnramp({
-  projectId,
   address,
   partnerUserId,
   defaultPaymentMethod = 'CARD',
@@ -42,19 +40,16 @@ export default function useCoinbaseOnramp({
 
       const { token } = await getSessionTokenMutateAsync({ addresses, assets })
 
-      const onrampUrl = getOnrampBuyUrl({
-        projectId,
-        addresses: {
-          [address]: ['base'],
-        },
+      const params: GetOnrampUrlWithSessionTokenParams = {
+        sessionToken: token,
         partnerUserId,
         defaultPaymentMethod,
-        assets: ['USDC'],
         presetFiatAmount: amount,
         fiatCurrency: 'USD',
         redirectUrl: 'app.send://deposit/success',
-        sessionToken: token,
-      })
+      }
+
+      const onrampUrl = getOnrampBuyUrl(params)
 
       await WebBrowser.openBrowserAsync(onrampUrl, {
         dismissButtonStyle: 'cancel',

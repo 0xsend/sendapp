@@ -46,8 +46,6 @@ export const onrampRouter = createTRPCRouter({
       const keySecret = process.env.CDP_API_SECRET
 
       if (!keyName || !keySecret) {
-        log('Missing CDP API credentials')
-        log('Missing CDP API credentials')
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message: 'Missing CDP API credentials',
@@ -58,8 +56,6 @@ export const onrampRouter = createTRPCRouter({
 
       try {
         jwtToken = await generateJWT(keyName, keySecret)
-        log('JWT generated successfully')
-        log('Missing CDP API credentials')
       } catch (error) {
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',

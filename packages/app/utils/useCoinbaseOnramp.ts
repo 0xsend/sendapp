@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { getOnrampBuyUrl } from '@coinbase/onchainkit/fund'
+import { getOnrampBuyUrl, type GetOnrampUrlWithSessionTokenParams } from '@coinbase/onchainkit/fund'
 import { useMutation } from '@tanstack/react-query'
 import debug from 'debug'
 import { api } from 'app/utils/api'
@@ -10,7 +10,6 @@ const COINBASE_PAYMENT_SUBMITTED_PAGE_ROUTE = '/v2/guest/onramp/order-submitted'
 
 type OnrampStatus = 'idle' | 'pending_payment' | 'success' | 'failed' | 'payment_submitted'
 interface OnrampConfig {
-  projectId: string
   address: string
   partnerUserId: string
   defaultPaymentMethod?: 'APPLE_PAY' | 'CARD'
@@ -21,7 +20,6 @@ interface OnrampParams {
 }
 
 export default function useCoinbaseOnramp({
-  projectId,
   address,
   partnerUserId,
   defaultPaymentMethod = 'CARD',
@@ -62,18 +60,15 @@ export default function useCoinbaseOnramp({
 
       const { token } = await getSessionTokenMutateAsync({ addresses, assets })
 
-      const onrampUrl = getOnrampBuyUrl({
-        projectId,
-        addresses: {
-          [address]: ['base'],
-        },
+      const params: GetOnrampUrlWithSessionTokenParams = {
+        sessionToken: token,
         partnerUserId,
         defaultPaymentMethod,
-        assets: ['USDC'],
         presetFiatAmount: amount,
         fiatCurrency: 'USD',
-        sessionToken: token,
-      })
+      }
+
+      const onrampUrl = getOnrampBuyUrl(params)
 
       cleanup()
       const newPopup = window.open(onrampUrl, 'Coinbase Onramp', 'width=600,height=800')
