@@ -1,7 +1,8 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { getOnrampBuyUrl } from '@coinbase/onchainkit/fund'
+import { getOnrampBuyUrl, type GetOnrampUrlWithSessionTokenParams } from '@coinbase/onchainkit/fund'
 import { useMutation } from '@tanstack/react-query'
 import debug from 'debug'
+import { api } from 'app/utils/api'
 
 const log = debug('app:utils:useCoinbaseOnramp')
 const COINBASE_PAY_ORIGIN = 'https://pay.coinbase.com'
@@ -9,7 +10,6 @@ const COINBASE_PAYMENT_SUBMITTED_PAGE_ROUTE = '/v2/guest/onramp/order-submitted'
 
 type OnrampStatus = 'idle' | 'pending_payment' | 'success' | 'failed' | 'payment_submitted'
 interface OnrampConfig {
-  projectId: string
   address: string
   partnerUserId: string
   defaultPaymentMethod?: 'APPLE_PAY' | 'CARD'
@@ -20,7 +20,6 @@ interface OnrampParams {
 }
 
 export default function useCoinbaseOnramp({
-  projectId,
   address,
   partnerUserId,
   defaultPaymentMethod = 'CARD',
@@ -32,6 +31,9 @@ export default function useCoinbaseOnramp({
   const paymentSubmittedRef = useRef(false)
   // Keep state for UI updates, but use the ref for the Promise logic
   const [paymentSubmitted, setPaymentSubmitted] = useState(false)
+
+  const { mutateAsync: getSessionTokenMutateAsync } = api.onramp.getSessionToken.useMutation()
+
   const cleanup = useCallback(() => {
     if (popupRef.current) {
       popupRef.current.close()
@@ -47,17 +49,26 @@ export default function useCoinbaseOnramp({
     mutationFn: async ({ amount }) => {
       log('Starting transaction for:', amount, 'USD')
 
-      const onrampUrl = getOnrampBuyUrl({
-        projectId,
-        addresses: {
-          [address]: ['base'],
+      const addresses = [
+        {
+          address,
+          blockchains: ['base'],
         },
+      ]
+
+      const assets = ['USDC']
+
+      const { token } = await getSessionTokenMutateAsync({ addresses, assets })
+
+      const params: GetOnrampUrlWithSessionTokenParams = {
+        sessionToken: token,
         partnerUserId,
         defaultPaymentMethod,
-        assets: ['USDC'],
         presetFiatAmount: amount,
         fiatCurrency: 'USD',
-      })
+      }
+
+      const onrampUrl = getOnrampBuyUrl(params)
 
       cleanup()
       const newPopup = window.open(onrampUrl, 'Coinbase Onramp', 'width=600,height=800')

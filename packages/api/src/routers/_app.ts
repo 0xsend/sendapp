@@ -10,6 +10,7 @@ import { sendEarnRouter } from './sendEarn'
 import { swapRouter } from './swap/router'
 import { tagRouter } from './tag/router'
 import { temporalRouter } from './temporal'
+import { onrampRouter } from './onramp/router'
 
 // avoids error TS7056: The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed.
 // Keep this in sync with the declared variable below
@@ -25,6 +26,7 @@ type AppRouterType = ReturnType<
     sendEarn: typeof sendEarnRouter
     temporal: typeof temporalRouter
     swap: typeof swapRouter
+    onramp: typeof onrampRouter
   }>
 >
 
@@ -39,6 +41,7 @@ export const appRouter: AppRouterType = createTRPCRouter({
   sendEarn: sendEarnRouter,
   temporal: temporalRouter,
   swap: swapRouter,
+  onramp: onrampRouter,
 })
 
 export type AppRouter = typeof appRouter
