@@ -267,7 +267,7 @@ function InvestmentsAggregate() {
       </XStack>
     )
 
-  if (isLoading) return <Spinner size="small" />
+  if (isLoading) return <Spinner alignSelf={'flex-start'} size="small" />
 
   if (isError)
     return (
