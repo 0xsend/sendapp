@@ -4,7 +4,6 @@ import { signChallenge } from 'app/utils/signChallenge'
 import { bytesToHex, hexToBytes } from 'viem'
 import { RecoveryOptions } from '@my/api/src/routers/account-recovery/types'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
-import { Platform } from 'react-native'
 
 export const useSignIn = () => {
   const supabase = useSupabase()
@@ -36,12 +35,10 @@ export const useSignIn = () => {
         identifier: `${accountName}.${keySlot}`,
       })
 
-      if (Platform.OS !== 'web') {
-        void supabase.auth.setSession({
-          access_token: jwt,
-          refresh_token: 'not-used',
-        })
-      }
+      await supabase.auth.setSession({
+        access_token: jwt,
+        refresh_token: 'not-used',
+      })
     },
     retry: false,
   })
