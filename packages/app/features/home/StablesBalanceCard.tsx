@@ -6,6 +6,7 @@ import {
   LinkableButton,
   Paragraph,
   Spinner,
+  useMedia,
   withStaticProperties,
   XStack,
 } from '@my/ui'
@@ -195,10 +196,17 @@ const StablesBalanceCardActions = () => {
 export const StablesBalanceCardContent = (props: CardProps) => {
   const [queryParams, setParams] = useRootScreenParams()
   const router = useRouter()
+  const { gtMd } = useMedia()
 
   const toggleSubScreen = () => {
     if (Platform.OS === 'web') {
-      setParams({ ...queryParams, token: 'stables' }, { webBehavior: 'push' })
+      setParams(
+        {
+          ...queryParams,
+          token: queryParams.token === 'stables' && gtMd ? undefined : 'stables',
+        },
+        { webBehavior: 'push' }
+      )
       return
     }
 

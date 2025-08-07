@@ -2,49 +2,48 @@ import {
   Card,
   type CardProps,
   Paragraph,
+  type ParagraphProps,
   Spinner,
   Theme,
   ThemeableStack,
-  useMedia,
+  withStaticProperties,
   XStack,
   type XStackProps,
   YStack,
+  type YStackProps,
+  useMedia,
 } from '@my/ui'
 import formatAmount from 'app/utils/formatAmount'
-
 import { ChevronLeft, ChevronRight } from '@tamagui/lucide-icons'
-
 import { useIsPriceHidden } from './utils/useIsPriceHidden'
-
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
-import { type CoinWithBalance, investmentCoins } from 'app/data/coins'
-
+import {
+  type CoinWithBalance,
+  investmentCoins,
+  investmentCoins as investmentCoinsList,
+} from 'app/data/coins'
 import { useRootScreenParams } from 'app/routers/params'
 import { useMultipleTokensMarketData } from 'app/utils/coin-gecko'
-import { useMemo } from 'react'
+import { type PropsWithChildren, useMemo } from 'react'
 import { IconCoin, IconError } from 'app/components/icons'
 import { useCoins } from 'app/provider/coins'
-import { investmentCoins as investmentCoinsList } from 'app/data/coins'
 import { formatUnits } from 'viem'
 import { HomeBodyCard } from './screen'
 import { Platform } from 'react-native'
 import { useRouter } from 'solito/router'
-import { usePathname } from 'app/utils/usePathname'
 
-export const InvestmentsBalanceCard = (props: CardProps) => {
-  const media = useMedia()
+const InvestmentsBalanceCardContent = (props: CardProps) => {
   const [queryParams, setParams] = useRootScreenParams()
   const router = useRouter()
-  const pathname = usePathname()
-  const isInvestmentCoin = investmentCoins.some(
-    (coin) => coin.token.toLowerCase() === queryParams.token?.toLowerCase()
-  )
-  const isInvestmentsScreen = queryParams.token === 'investments' || pathname === '/investments'
+  const { gtMd } = useMedia()
 
   const toggleSubScreen = () => {
     if (Platform.OS === 'web') {
       setParams(
-        { ...queryParams, token: queryParams.token === 'investments' ? undefined : 'investments' },
+        {
+          ...queryParams,
+          token: queryParams.token === 'investments' && gtMd ? undefined : 'investments',
+        },
         { webBehavior: 'push' }
       )
       return
@@ -53,9 +52,83 @@ export const InvestmentsBalanceCard = (props: CardProps) => {
     router.push('/investments')
   }
 
-  const { isPriceHidden } = useIsPriceHidden()
+  return (
+    <HomeBodyCard onPress={toggleSubScreen} {...props}>
+      {props.children}
+    </HomeBodyCard>
+  )
+}
 
+const InvestmentsBalanceCardHomeScreenHeader = () => {
+  const [queryParams] = useRootScreenParams()
+  const isInvestmentCoin = investmentCoins.some(
+    (coin) => coin.token.toLowerCase() === queryParams.token?.toLowerCase()
+  )
+  const isInvestmentsScreen = queryParams.token === 'investments'
+
+  return (
+    <Card.Header padded pb="$4" jc="space-between" fd="row">
+      <Paragraph
+        fontSize={'$5'}
+        fontWeight="400"
+        color={'$lightGrayTextField'}
+        $theme-light={{ color: '$darkGrayTextField' }}
+      >
+        Invest
+      </Paragraph>
+      {isInvestmentCoin || isInvestmentsScreen ? (
+        <ChevronLeft
+          size={'$1'}
+          color={'$primary'}
+          $theme-light={{ color: '$color12' }}
+          $lg={{ display: 'none' }}
+        />
+      ) : (
+        <ChevronRight
+          size={'$1'}
+          color={'$lightGrayTextField'}
+          $theme-light={{ color: '$darkGrayTextField' }}
+        />
+      )}
+    </Card.Header>
+  )
+}
+
+const InvestmentsBalanceCardInvestmentsScreenHeader = () => {
+  return (
+    <Card.Header padded pb="$4" jc="space-between" fd="row">
+      <Paragraph
+        fontSize={'$5'}
+        fontWeight="400"
+        color={'$lightGrayTextField'}
+        $theme-light={{ color: '$darkGrayTextField' }}
+      >
+        Total Balance
+      </Paragraph>
+    </Card.Header>
+  )
+}
+
+const InvestmentsBalanceCardFooter = ({ children }: PropsWithChildren) => {
+  return (
+    <Card.Footer padded size="$4" pt={0} jc="space-between" ai="flex-start">
+      {children}
+    </Card.Footer>
+  )
+}
+
+const InvestmentsBalanceCardFooterStack = (props: YStackProps) => {
+  return (
+    <YStack jc="space-between" gap={Platform.OS === 'web' ? '$2' : '$1'} {...props}>
+      {props.children}
+    </YStack>
+  )
+}
+
+const InvestmentsBalanceCardBalance = (props: ParagraphProps) => {
+  const { isPriceHidden } = useIsPriceHidden()
   const { dollarBalances, isLoading } = useSendAccountBalances()
+
   const dollarTotal = Object.entries(dollarBalances ?? {})
     .filter(([address]) =>
       investmentCoins.some((coin) => coin.token.toLowerCase() === address.toLowerCase())
@@ -65,50 +138,18 @@ export const InvestmentsBalanceCard = (props: CardProps) => {
   const formattedBalance = formatAmount(dollarTotal, 9, 0)
 
   return (
-    <HomeBodyCard onPress={toggleSubScreen} {...props}>
-      <Card.Header padded pb="$4" jc="space-between" fd="row">
-        <Paragraph
-          fontSize={'$5'}
-          fontWeight="400"
-          color={'$lightGrayTextField'}
-          $theme-light={{ color: '$darkGrayTextField' }}
-        >
-          Invest
-        </Paragraph>
-        {isInvestmentCoin || isInvestmentsScreen ? (
-          <ChevronLeft
-            size={'$1'}
-            color={'$primary'}
-            $theme-light={{ color: '$color12' }}
-            $lg={{ display: 'none' }}
-          />
-        ) : (
-          <ChevronRight
-            size={'$1'}
-            color={'$lightGrayTextField'}
-            $theme-light={{ color: '$darkGrayTextField' }}
-          />
-        )}
-      </Card.Header>
-      <Card.Footer padded size="$4" pt={0} jc="space-between" ai="flex-start">
-        <YStack jc="space-between" gap={Platform.OS === 'web' ? '$2' : '$1'}>
-          <Paragraph color={'$color12'} fontWeight={600} size={'$9'} lineHeight={34}>
-            {(() => {
-              switch (true) {
-                case isPriceHidden:
-                  return '///////'
-                case isLoading || !dollarBalances:
-                  return <Spinner size={'large'} color={'$color12'} />
-                default:
-                  return `$${formattedBalance}`
-              }
-            })()}
-          </Paragraph>
-          <InvestmentsAggregate />
-        </YStack>
-        {(!isInvestmentsScreen || media.gtLg) && <InvestmentsPreview />}
-      </Card.Footer>
-    </HomeBodyCard>
+    <Paragraph color={'$color12'} fontWeight={600} size={'$9'} lineHeight={34} {...props}>
+      {(() => {
+        switch (true) {
+          case isPriceHidden:
+            return '///////'
+          case isLoading || !dollarBalances:
+            return <Spinner size={'large'} color={'$color12'} />
+          default:
+            return `$${formattedBalance}`
+        }
+      })()}
+    </Paragraph>
   )
 }
 
@@ -256,3 +297,13 @@ function InvestmentsAggregate() {
     </Paragraph>
   )
 }
+
+export const InvestmentsBalanceCard = withStaticProperties(InvestmentsBalanceCardContent, {
+  HomeScreenHeader: InvestmentsBalanceCardHomeScreenHeader,
+  InvestmentsScreenHeader: InvestmentsBalanceCardInvestmentsScreenHeader,
+  Footer: InvestmentsBalanceCardFooter,
+  FooterStack: InvestmentsBalanceCardFooterStack,
+  Preview: InvestmentsPreview,
+  Aggregate: InvestmentsAggregate,
+  Balance: InvestmentsBalanceCardBalance,
+})
