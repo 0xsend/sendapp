@@ -64,8 +64,6 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
     void cancelAndRemoveAccountsQueries()
   }, [cancelAndRemoveAccountsQueries])
 
-  console.log('session in index', session)
-
   return (
     <>
       <NextSeo {...seo} />
