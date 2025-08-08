@@ -1,7 +1,6 @@
-import { CONTAINER_OFFSET } from 'apps-expo/components/layout/TabScreenContainer'
 import { ActivityScreen } from 'app/features/activity/screen'
 import { Container } from '@my/ui'
-import { useTabBarSize } from 'apps-expo/utils/layout/useTabBarSize'
+import { useTabBarSize } from 'app/components/BottomTabBar/useTabBarSize'
 
 export default function ActivityTabScreen() {
   const { height } = useTabBarSize()
@@ -15,7 +14,7 @@ export default function ActivityTabScreen() {
       flex={1}
       backgroundColor="$background"
       overflow={'hidden'}
-      paddingBottom={CONTAINER_OFFSET + height}
+      paddingBottom={height}
       paddingHorizontal={0}
     >
       <ActivityScreen />
