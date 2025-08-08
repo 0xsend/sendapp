@@ -1,9 +1,9 @@
 import { ScrollView, useMedia, XStack, YStack } from '@my/ui'
 import type { ReactNode } from 'react'
 import { AccountLinks } from 'app/features/account/components/AccountLinks'
-import { BOTTOM_NAV_BAR_HEIGHT } from 'app/components/BottomTabBar/BottomNavBar'
 import { AccountHeader } from 'app/features/account/components/AccountHeader'
 import { Platform } from 'react-native'
+import { useTabBarSize } from 'app/components/BottomTabBar/useTabBarSize'
 
 export type SettingsLayoutProps = {
   children?: ReactNode
@@ -44,13 +44,15 @@ const DesktopAccountLayout = ({ children }: SettingsLayoutProps) => {
 }
 
 export const MobileAccountLayout = ({ children }: SettingsLayoutProps) => {
+  const { height } = useTabBarSize()
+
   return (
     <YStack w={'100%'} gap={'$3.5'}>
       <YStack
         w={'100%'}
         testID={'settings-links'}
         display={children ? 'none' : 'flex'}
-        pb={Platform.OS === 'web' ? BOTTOM_NAV_BAR_HEIGHT : 0}
+        pb={Platform.OS === 'web' ? height : 0}
       >
         <AccountHeader mb={'$3.5'} />
         <AccountLinks />
@@ -59,7 +61,7 @@ export const MobileAccountLayout = ({ children }: SettingsLayoutProps) => {
         w={'100%'}
         testID={'settings-links'}
         display={children ? 'flex' : 'none'}
-        pb={Platform.OS === 'web' ? BOTTOM_NAV_BAR_HEIGHT : 0}
+        pb={Platform.OS === 'web' ? height : 0}
       >
         {children}
       </YStack>

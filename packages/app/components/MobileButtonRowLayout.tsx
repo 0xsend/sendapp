@@ -1,14 +1,14 @@
 import {
-  XStack,
-  Stack,
-  styled,
-  type XStackProps,
+  AnimatePresence,
+  Container,
+  H3,
   LinearGradient,
   Paragraph,
-  H3,
-  AnimatePresence,
+  Stack,
+  styled,
   useSafeAreaInsets,
-  Container,
+  XStack,
+  type XStackProps,
 } from '@my/ui'
 import { HomeButtons } from '../features/home/HomeButtons'
 import { useScrollDirection } from '../provider/scroll/ScrollDirectionContext'
@@ -23,7 +23,7 @@ import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { useIsSendingUnlocked } from 'app/utils/useIsSendingUnlocked'
 import { formatUnits } from 'viem'
 import { sendCoin } from 'app/data/coins'
-import { BOTTOM_NAV_BAR_HEIGHT } from 'app/components/BottomTabBar/BottomNavBar'
+import { useTabBarSize } from 'app/components/BottomTabBar/useTabBarSize'
 
 const Row = styled(XStack, {
   w: '100%',
@@ -84,6 +84,7 @@ const Home = ({ children, ...props }: XStackProps) => {
   const { isSendingUnlocked, isLoading } = useIsSendingUnlocked()
   const { direction } = useScrollDirection()
   const isVisible = !isLoading && isSendingUnlocked && direction !== 'down' && selectedCoin
+  const { height } = useTabBarSize()
 
   return (
     <>
@@ -94,7 +95,7 @@ const Home = ({ children, ...props }: XStackProps) => {
             $platform-web={{
               position: 'fixed',
             }}
-            bottom={BOTTOM_NAV_BAR_HEIGHT}
+            bottom={height}
             left={0}
             right={0}
             zIndex={100}
