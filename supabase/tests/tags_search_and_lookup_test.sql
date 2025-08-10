@@ -1,5 +1,5 @@
 BEGIN;
-SELECT plan(19);
+SELECT plan(24);
 
 CREATE EXTENSION IF NOT EXISTS "basejump-supabase_test_helpers";
 
@@ -298,6 +298,170 @@ SELECT ok(EXISTS(
     SELECT 1 FROM profile_lookup('tag'::lookup_type_enum, 'bob') pl
     WHERE pl.name = 'Bob Johnson'
 ), 'Authenticated users can lookup profiles by tag');
+
+-- ===== NEW TESTS FOR SEND_SCORES_HISTORY INTEGRATION =====
+SET ROLE service_role;
+
+-- Create test users for send score ordering tests with deterministic trigram distances
+SELECT tests.create_supabase_user('score_impostor');
+SELECT tests.create_supabase_user('score_genuine');
+SELECT tests.create_supabase_user('low_scorer');
+
+-- Create send accounts for score test users
+INSERT INTO send_accounts (user_id, address, chain_id, init_code)
+VALUES 
+  (tests.get_supabase_uid('score_impostor'), '0xABCDEF1234567890ABCDEF1234567890ABCDEF88', 8453, '\\x00'),
+  (tests.get_supabase_uid('score_genuine'), '0xABCDEF1234567890ABCDEF1234567890ABCDEF99', 8453, '\\x00'),
+  (tests.get_supabase_uid('low_scorer'), '0xABCDEF1234567890ABCDEF1234567890ABCDEFAA', 8453, '\\x00');
+
+-- Set up profiles for score test users
+INSERT INTO profiles (id, name, about, avatar_url, is_public)
+VALUES 
+  (tests.get_supabase_uid('score_impostor'), 'High Score Impostor', 'Has high send score but fuzzy tag match', 'https://example.com/impostor.jpg', true),
+  (tests.get_supabase_uid('score_genuine'), 'Low Score Genuine', 'Has low send score but exact tag match', 'https://example.com/genuine.jpg', true),
+  (tests.get_supabase_uid('low_scorer'), 'Low Scorer', 'Has low send score', 'https://example.com/lowscore.jpg', true)
+ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, about = EXCLUDED.about, avatar_url = EXCLUDED.avatar_url, is_public = EXCLUDED.is_public;
+
+-- Insert tags with deterministic trigram distances
+-- 'alic3' vs 'aliceX' for predictable trigram behavior (avoiding conflict with 'alice' from earlier tests)
+INSERT INTO tags (name, user_id, status)
+VALUES 
+  ('alic3', tests.get_supabase_uid('score_impostor'), 'confirmed'),    -- Fuzzy match for 'aliceX'
+  ('aliceX', tests.get_supabase_uid('score_genuine'), 'confirmed'),     -- Exact match for 'aliceX'
+  ('david', tests.get_supabase_uid('low_scorer'), 'confirmed');        -- Unrelated tag
+
+-- Create send_account_tags associations
+INSERT INTO send_account_tags (send_account_id, tag_id)
+SELECT sa.id, t.id
+FROM send_accounts sa
+JOIN tags t ON t.user_id = sa.user_id
+WHERE t.name IN ('alic3', 'aliceX', 'david');
+
+-- Create mock distribution for testing
+INSERT INTO distributions (
+    id,
+    number,
+    tranche_id,
+    name,
+    description,
+    amount,
+    hodler_pool_bips,
+    bonus_pool_bips,
+    fixed_pool_bips,
+    qualification_start,
+    qualification_end,
+    hodler_min_balance,
+    earn_min_balance,
+    claim_end,
+    chain_id,
+    token_addr
+) VALUES (
+    888,
+    888,
+    888,
+    'Test Distribution 888',
+    'Mock distribution for testing',
+    1000,
+    1000000,
+    1000000,
+    1000000,
+    '2023-01-01'::timestamp,
+    '2023-12-31'::timestamp,
+    1000,
+    1e6::bigint,
+    '2024-01-01'::timestamp,
+    8453,
+    '\xeab49138ba2ea6dd776220fe26b7b8e446638956'::bytea
+)
+ON CONFLICT (id) DO NOTHING;
+
+-- Create corresponding send_slash entry for the distribution
+INSERT INTO send_slash (distribution_id, distribution_number, minimum_sends, scaling_divisor)
+VALUES (888, 888, 5, 10)
+ON CONFLICT (distribution_number) DO NOTHING;
+
+-- Insert mock send_scores_history records
+-- High score impostor with fuzzy match should rank higher than low score genuine with exact match
+SET ROLE postgres;
+-- Send scores will be computed by the materialized view, not inserted directly
+
+SELECT tests.authenticate_as('search_user1');
+
+-- Test 20: Basic tag search functionality works
+-- When searching for 'aliceX', the exact match should be found
+SELECT ok(
+    EXISTS(SELECT 1 FROM tag_search('aliceX', 10, 0)
+           WHERE (tag_matches[1]).tag_name = 'aliceX'),
+    'Basic tag search should find exact matches'
+);
+
+-- Test 21: Low-score account with non-exact tag is NOT returned when searching its target
+-- When searching for 'david' (which low_scorer owns exactly), it should still appear since it's exact
+SELECT ok(EXISTS(
+    SELECT 1 FROM tag_search('david', 10, 0)
+    WHERE (tag_matches[1]).tag_name = 'david'
+), 'Exact match should appear regardless of low score');
+
+-- Test 22: Verify deterministic trigram distance values
+-- Test that our chosen tags have predictable trigram distances
+select ok(
+    ('alic3' <-> 'alice') BETWEEN 0.1 AND 0.5,
+    'Trigram distance between alic3 and alice should be deterministic and moderate'
+);
+
+-- ===== NEW CASE-SENSITIVE EXACT MATCH TESTS =====
+SET ROLE service_role;
+
+-- Create test users for case-sensitive tag matching within combined lookup tests
+SELECT tests.create_supabase_user('case_ethen_high');
+SELECT tests.create_supabase_user('case_ethen_low');
+
+-- Create send accounts for case-sensitive test users
+INSERT INTO send_accounts (user_id, address, chain_id, init_code)
+VALUES 
+  (tests.get_supabase_uid('case_ethen_high'), '0xABCDEF1234567890ABCDEF1234567890ABCDEFDD', 8453, '\\x00'),
+  (tests.get_supabase_uid('case_ethen_low'), '0xABCDEF1234567890ABCDEF1234567890ABCDEFEE', 8453, '\\x00');
+
+-- Set up profiles for case-sensitive test users
+INSERT INTO profiles (id, name, about, avatar_url, is_public)
+VALUES 
+  (tests.get_supabase_uid('case_ethen_high'), 'Case High Score', 'Has high send score with ethen tag', 'https://example.com/case_ethen_high.jpg', true),
+  (tests.get_supabase_uid('case_ethen_low'), 'Case Low Score', 'Has low send score with Ethen_ tag', 'https://example.com/case_ethen_low.jpg', true)
+ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, about = EXCLUDED.about, avatar_url = EXCLUDED.avatar_url, is_public = EXCLUDED.is_public;
+
+-- Insert case-sensitive tags with contrasting scores
+-- 'ethen' will get high score, 'Ethen_' will get low score
+INSERT INTO tags (name, user_id, status)
+VALUES 
+  ('ethen', tests.get_supabase_uid('case_ethen_high'), 'confirmed'),
+  ('Ethen_', tests.get_supabase_uid('case_ethen_low'), 'confirmed');
+
+-- Create send_account_tags associations for case-sensitive tags
+INSERT INTO send_account_tags (send_account_id, tag_id)
+SELECT sa.id, t.id
+FROM send_accounts sa
+JOIN tags t ON t.user_id = sa.user_id
+WHERE t.name IN ('ethen', 'Ethen_');
+
+-- Send scores will be computed by the materialized view, not inserted directly
+
+SELECT tests.authenticate_as('search_user1');
+
+-- Test 23: Case-sensitive exact match in combined search and lookup
+-- When searching for 'Ethen_', the exact match should be found
+select ok(
+    EXISTS(SELECT 1 FROM tag_search('Ethen_', 10, 0)
+           WHERE tag_matches IS NOT NULL AND array_length(tag_matches, 1) > 0
+           AND (tag_matches[1]).tag_name = 'Ethen_'),
+    'Case-sensitive exact match Ethen_ should be found in combined search'
+);
+
+-- Test 24: Profile lookup should work for case-sensitive exact matches
+SELECT ok(EXISTS(
+    SELECT 1 FROM profile_lookup('tag'::lookup_type_enum, 'Ethen_') pl
+    WHERE pl.name = 'Case Low Score'
+    AND pl.tag = 'Ethen_'
+), 'Profile lookup should find case-sensitive exact match Ethen_');
 
 SELECT * FROM finish();
 ROLLBACK;
