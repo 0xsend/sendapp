@@ -60,9 +60,9 @@ Searches through confirmed tags using trigram similarity with deduplication logi
 
 #### Deduplication Logic
 
-**Problem Solved**: Previously, users with multiple tags matching a query would appear multiple times in results.
+**Problem Solved**: Users with multiple tags matching a query could appear multiple times in results.
 
-**Solution**: The function now implements profile deduplication using window functions:
+**Solution**: The function implements profile deduplication using window functions:
 
 ```sql
 SELECT
@@ -80,11 +80,11 @@ WHERE (t.name <<-> query < 0.7 OR t.name ILIKE '%' || query || '%')
 ```
 
 **Key Features**:
-1. **`ROW_NUMBER()` Window Function**: Ranks each user's tags by distance from query
-2. **`PARTITION BY p.id`**: Groups by profile to ensure one result per user
-3. **`ORDER BY (t.name <-> query)`**: Ranks by trigram distance (0 = exact match)
+1. **`ROW_NUMBER()` Window Function**: Ranks each user's tags by combined priority and distance
+2. **`PARTITION BY tm.send_id`**: Groups by user to ensure one result per profile
+3. **`ORDER BY primary_rank, secondary_rank`**: Prioritizes exact matches, then by score/distance
 4. **Filter `WHERE rn = 1`**: Keeps only the best matching tag per profile
-5. **Final `ORDER BY distance`**: Sorts results by relevance (exact matches first)
+5. **Final ordering**: `ORDER BY primary_rank ASC, secondary_rank ASC` (exact matches first)
 
 #### Example Scenarios
 
@@ -120,6 +120,97 @@ The function uses PostgreSQL's trigram extension for similarity scoring:
 - **`<->`**: Trigram distance (0 = identical, higher = more different)
 - **`<<->`**: Trigram similarity threshold operator
 - **`ILIKE`**: Case-insensitive pattern matching for broader coverage
+
+## Exact Match Priority System
+
+### Overview
+
+The ranking system ensures exact matches always appear before fuzzy matches by implementing a **two-tier ranking approach** that guarantees case-insensitive exact matches always outrank fuzzy matches:
+
+#### Primary Ranking
+1. **Primary rank**: Distinguishes between exact and fuzzy matches
+   - `CASE WHEN LOWER(name) = LOWER(query) THEN 0 ELSE 1 END`
+   - Exact matches get rank = 0 (best)
+   - Fuzzy matches get rank = 1 (worse)
+
+2. **Secondary rank**: Provides ordering within each tier
+   - **For exact matches (rank=0)**: Use `-send_score` (higher score = better)
+   - **For fuzzy matches (rank=1)**: Use existing trigram + send_score formula
+
+#### Final Ordering Strategy
+
+Results are ordered by: `ORDER BY (primary_rank ASC, secondary_rank ASC)`
+
+This guarantees:
+- ✅ All exact matches appear before any fuzzy matches
+- ✅ Within exact matches, higher send_score users appear first
+- ✅ Within fuzzy matches, trigram distance and send score ranking is used
+- ✅ Deduplication logic ensures one row per profile
+
+#### Implementation Details
+
+```sql
+-- Primary ranking: exact matches (rank=0) always outrank fuzzy matches (rank=1)
+CASE WHEN LOWER(t.name) = LOWER(query) THEN 0 ELSE 1 END AS primary_rank,
+
+-- Secondary ranking varies by match type
+CASE 
+    WHEN LOWER(t.name) = LOWER(query) THEN 
+        -COALESCE(scores.total_score, 0)  -- Negative for DESC ordering within exact matches
+    ELSE 
+        -- Fuzzy ranking formula: distance - (send_score / 1M)
+        CASE WHEN (t.name <-> query) IS NULL THEN 0 ELSE (t.name <-> query) END
+        - (COALESCE(scores.total_score, 0) / 1000000.0)
+END AS secondary_rank
+```
+
+### Example Scenarios
+
+#### Scenario 1: Mixed exact and fuzzy matches
+```
+Query: "alice"
+Users:
+- User A: tag="alice", send_score=100 
+- User B: tag="alic3", send_score=10000
+
+Result order:
+1. User A (exact match, primary_rank=0, secondary_rank=-100)
+2. User B (fuzzy match, primary_rank=1, secondary_rank=distance-10)
+```
+
+#### Scenario 2: Multiple exact matches
+```  
+Query: "boss"
+Users:
+- User A: tag="boss", send_score=500
+- User B: tag="boss", send_score=1000  
+
+Result order:
+1. User B (exact match, primary_rank=0, secondary_rank=-1000)
+2. User A (exact match, primary_rank=0, secondary_rank=-500)
+```
+
+#### Scenario 3: Case-sensitive exact matching
+```
+Query: "Ethen_"
+Users:
+- User A: tag="ethen", send_score=75000
+- User B: tag="Ethen_", send_score=25
+
+Result order:
+1. User B (case-insensitive exact match for "Ethen_")
+2. User A (fuzzy match)
+```
+
+### Preserved Functionality
+
+The exact match priority system preserves all existing functionality:
+- ✅ Trigram fuzzy matching with 0.7 distance threshold
+- ✅ ILIKE pattern matching for broader coverage  
+- ✅ Profile deduplication (one result per user)
+- ✅ Send score integration from `private.send_scores_history`
+- ✅ Existing parameter validation and security controls
+- ✅ Send ID and phone number search (unchanged)
 
 ## Security & Access Control
 
@@ -181,6 +272,9 @@ The function includes comprehensive test coverage in `supabase/tests/tags_search
 6. **Distance Ordering**: Validates exact matches appear first
 7. **Deduplication**: Ensures one result per profile with multiple matching tags
 8. **Best Match Selection**: Confirms closest match returned per profile
+9. **Exact Match Priority**: Verifies exact matches always outrank fuzzy matches regardless of send_score
+10. **Case-Sensitive Exact Matching**: Tests that case-insensitive exact matches work correctly
+11. **Send Score Ordering**: Confirms higher scoring users appear first within exact matches
 
 ### Running Tests
 ```bash
@@ -191,14 +285,152 @@ yarn supabase test db
 
 The deduplication logic was implemented to fix issues where users with multiple tags would appear multiple times in search results. The solution uses window functions for efficient, accurate deduplication while maintaining distance-based relevance ranking.
 
-### Key Changes
-- Replaced `DISTINCT ON(profile_id)` with `ROW_NUMBER()` window function
-- Added proper distance calculation and ranking
-- Ensured consistent implementation between migration and schema files
-- Added comprehensive test coverage for edge cases
+### Key Features Implemented
+- Uses `ROW_NUMBER()` window function for efficient deduplication
+- Implements proper distance calculation and ranking
+- Ensures consistent implementation between migration and schema files
+- Includes comprehensive test coverage for edge cases
+- Exact match priority system with two-tier ranking
+- Case-insensitive exact match detection with `LOWER()` comparison
+- Send score integration for enhanced ranking within match categories
+
+## New Ranking Formula and 10,000-Point Fuzzy Threshold
+
+### Overview
+
+The tag search function has been enhanced with a new ranking formula and 10,000-point fuzzy threshold system to improve search result quality and relevance.
+
+### Ranking Formula Implementation
+
+The new ranking formula incorporates multiple factors to determine the relevance and priority of search results:
+
+#### Formula Components
+
+1. **Base Score Calculation**
+   - Primary matching criteria using trigram distance
+   - Distance-based scoring (0 = exact match, higher = more different)
+   - Relevance weighting based on match quality
+
+### Send Score Integration**
+   - User activity metrics from `send_scores_history`
+   - Cumulative activity score (SUM aggregation)
+   - Total user engagement across all activities
+
+3. **Composite Ranking Value**
+   - Weighted combination of distance and send score
+   - Normalization to 10,000-point scale
+   - Threshold application for result filtering
+
+#### Scoring Mechanism
+
+```sql
+-- Current ranking calculation
+WITH scores AS (
+    SELECT 
+        user_id,
+        SUM(score) AS total_score
+    FROM private.send_scores_history
+    GROUP BY user_id
+)
+SELECT 
+    *,
+    -- Primary ranking: exact vs fuzzy matches
+    CASE WHEN LOWER(t.name) = LOWER(query) THEN 0 ELSE 1 END AS primary_rank,
+    -- Secondary ranking varies by match type
+    CASE 
+        WHEN LOWER(t.name) = LOWER(query) THEN 
+            -COALESCE(scores.total_score, 0)  -- Higher score = better for exact matches
+        ELSE 
+            -- Fuzzy ranking: distance - (send_score / 1M)
+            CASE WHEN (t.name <-> query) IS NULL THEN 0 ELSE (t.name <-> query) END
+            - (COALESCE(scores.total_score, 0) / 1000000.0)
+    END AS secondary_rank
+FROM tag_matches tm
+LEFT JOIN scores ON scores.user_id = tm.user_id
+```
+
+### 10,000-Point Fuzzy Threshold System
+
+#### Purpose
+
+The 10,000-point fuzzy threshold system:
+- Improves search result quality by filtering low-relevance matches
+- Provides consistent ranking across different search contexts
+- Balances precision and recall in search results
+
+#### Threshold Levels
+
+```
+High Confidence:    Rank value < 2000 (exact + high score)
+Medium Confidence:  Rank value 2000-5000 (good matches)
+Low Confidence:     Rank value 5000-8000 (acceptable matches)
+Below Threshold:    Rank value > 8000 (filtered out)
+```
+
+#### Result Ordering Strategy
+
+Final results are ordered by:
+1. **rank_value ASC** - Best composite score first
+2. **send_score DESC** - Highest score as tie-breaker
+3. **distance ASC** - Closest match as final tie-breaker
+
+This ordering places:
+- High-score exact matches first
+- High-score fuzzy matches second
+- Low-score exact matches third
+- Low-score fuzzy matches last
+
+### Integration with Existing Search
+
+The enhanced ranking system integrates seamlessly with the existing:
+- Trigram-based fuzzy matching (distance < 0.7 threshold)
+- Profile deduplication logic using window functions
+- Privacy controls and authentication requirements
+- Limit/offset pagination
+
+### Performance Considerations
+
+#### Computational Complexity
+- Formula calculation: O(n log n) for n candidates
+- Threshold filtering: O(n) linear scan
+- Overall impact: Acceptable for real-time queries
+
+#### Optimization Strategies
+- Pre-computed scores for static user data
+- Efficient indexes on scoring columns
+- Result caching for common queries
+
+### Configuration Parameters
+
+```typescript
+// Ranking system configuration
+interface TagSearchConfig {
+  fuzzyThreshold: number;        // Default: 10000
+  confidenceLevels: {
+    high: number;               // Default: 2000
+    medium: number;             // Default: 5000
+    low: number;                // Default: 8000
+  };
+  weightingFactors: {
+    distance: number;           // Default: 1000 (distance multiplier)
+    scoreOffset: number;        // Default: 10000 (score normalization)
+  };
+}
+```
+
+## Backward Compatibility
+
+The exact match priority changes modify search result ordering but maintain:
+- Same function signature and return types
+- Same parameter validation and limits
+- Same security and access control behavior  
+- Same deduplication guarantees
+
+The only behavioral change is the ordering of results, which should be perceived as an improvement by users expecting exact matches to appear first.
 
 ## Related Documentation
 
 - [Send Account Tags Documentation](./send-account-tags/)
 - [Profile Lookup Function](./profile-lookup-function.md)
 - [Database Schema](./database-schema.md)
+- [Send Scores System](./send-scores.md)
