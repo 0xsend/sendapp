@@ -55,7 +55,7 @@ export const LoginWithPhoneScreen = () => {
   }
 
   return (
-    <YStack f={1} jc={'center'} ai={'center'} gap={'$5'} pb={100}>
+    <YStack f={1} jc={'center'} ai={'center'} gap={'$5'}>
       <YStack ai={'center'} gap={'$2'}>
         <Paragraph w={'100%'} size={'$8'} fontWeight={600} ta={'center'}>
           Login with your phone
