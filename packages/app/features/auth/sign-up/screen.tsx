@@ -8,6 +8,7 @@ import {
   SubmitButton,
   useAppToast,
   useDebounce,
+  useMedia,
   XStack,
   YStack,
 } from '@my/ui'
@@ -60,6 +61,7 @@ export const SignUpScreen = () => {
   const { createSendAccount } = useCreateSendAccount()
   const { data: referralCode } = useReferralCodeQuery()
   const isScreenFocused = useIsScreenFocused()
+  const { xxs } = useMedia()
 
   const formName = form.watch('name')
   const formIsAgreedToTerms = form.watch('isAgreedToTerms')
@@ -178,7 +180,7 @@ export const SignUpScreen = () => {
   }, [signInMutateAsync, toast.error, router.push, queryParams.redirectUri])
 
   return (
-    <YStack f={1} jc={'center'} ai={'center'} gap={'$7'} w={'100%'}>
+    <YStack f={1} jc={'center'} ai={'center'} gap={xxs ? '$3.5' : '$7'} w={'100%'}>
       <YStack ai={'center'} gap={'$2'}>
         <Paragraph w={'100%'} size={'$8'} fontWeight={600} ta={'center'}>
           Create your account
