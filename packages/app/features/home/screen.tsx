@@ -4,6 +4,7 @@ import {
   Card,
   H1,
   Paragraph,
+  Separator,
   Spinner,
   Stack,
   styled,
@@ -122,11 +123,23 @@ function HomeBody(props: XStackProps) {
           ai={'center'}
         >
           <StablesBalanceCard>
-            <StablesBalanceCard.Header />
-            <StablesBalanceCard.Footer />
+            <StablesBalanceCard.HomeScreenHeader />
+            <StablesBalanceCard.Footer>
+              <StablesBalanceCard.Balance />
+              <StablesBalanceCard.Actions />
+            </StablesBalanceCard.Footer>
           </StablesBalanceCard>
           <SavingsBalanceCard href="/earn" w="100%" />
-          <InvestmentsBalanceCard w="100%" />
+          <InvestmentsBalanceCard w="100%">
+            <InvestmentsBalanceCard.HomeScreenHeader />
+            <InvestmentsBalanceCard.Footer>
+              <InvestmentsBalanceCard.FooterStack>
+                <InvestmentsBalanceCard.Balance />
+                <InvestmentsBalanceCard.Aggregate />
+              </InvestmentsBalanceCard.FooterStack>
+              <InvestmentsBalanceCard.Preview />
+            </InvestmentsBalanceCard.Footer>
+          </InvestmentsBalanceCard>
           <HomeBodyCardRow>
             <RewardsCard w="55%" href={'/rewards'} />
             <FriendsCard href="/account/affiliate" />
@@ -165,7 +178,20 @@ export function InvestmentsBody() {
 
   return (
     <YStack ai="center" $gtXs={{ gap: '$3' }} gap={'$3.5'} f={1}>
-      <InvestmentsBalanceCard w="100%" $gtLg={{ display: 'none' }} />
+      <InvestmentsBalanceCard w="100%" mah={190} $gtLg={{ display: 'none' }}>
+        <InvestmentsBalanceCard.InvestmentsScreenHeader />
+        <InvestmentsBalanceCard.Footer>
+          <InvestmentsBalanceCard.FooterStack w={'100%'} gap={'$2.5'}>
+            <InvestmentsBalanceCard.Balance size={'$11'} lineHeight={60} />
+            <Separator
+              boc={'$silverChalice'}
+              $theme-light={{ boc: '$darkGrayTextField' }}
+              mb={'$1.5'}
+            />
+            <InvestmentsBalanceCard.Aggregate />
+          </InvestmentsBalanceCard.FooterStack>
+        </InvestmentsBalanceCard.Footer>
+      </InvestmentsBalanceCard>
       <Card
         bc={'$color1'}
         width="100%"
@@ -223,7 +249,10 @@ export function StablesBody() {
     <YStack $gtXs={{ gap: '$3' }} gap={'$3.5'} f={1}>
       {media.lg && (
         <StablesBalanceCard>
-          <StablesBalanceCard.Footer />
+          <StablesBalanceCard.StablesScreenHeader />
+          <StablesBalanceCard.Footer>
+            <StablesBalanceCard.Balance />
+          </StablesBalanceCard.Footer>
         </StablesBalanceCard>
       )}
 

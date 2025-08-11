@@ -1,10 +1,10 @@
-import { Container, ScrollView, type ScrollViewProps, YStack, PendingIndicatorBar } from '@my/ui'
+import { Container, PendingIndicatorBar, ScrollView, type ScrollViewProps, YStack } from '@my/ui'
 import { HomeSideBarWrapper } from 'app/components/sidebar/HomeSideBar'
 import { TagSearchProvider } from 'app/provider/tag-search'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
-import { BOTTOM_NAV_BAR_HEIGHT } from 'app/components/BottomTabBar/BottomNavBar'
 import { BottomNavBarWrapper } from 'app/components/BottomTabBar/BottomNavBarWrapper'
 import { useRouteChange } from 'app/routers/useRouteChange.web'
+import { useTabBarSize } from 'app/components/BottomTabBar/useTabBarSize'
 
 export function HomeLayout({
   children,
@@ -17,6 +17,7 @@ export function HomeLayout({
 } & ScrollViewProps & { fullHeight?: boolean }) {
   const { onScroll, onContentSizeChange, ref } = useScrollDirection()
   const isPending = useRouteChange()
+  const { height } = useTabBarSize()
 
   return (
     <HomeSideBarWrapper>
@@ -49,7 +50,7 @@ export function HomeLayout({
                   right: 'additive',
                 },
               }}
-              pb={BOTTOM_NAV_BAR_HEIGHT}
+              pb={height}
               $gtLg={{ pt: '$5', pb: '$0' }}
               height={fullHeight ? '100%' : 'auto'}
             >

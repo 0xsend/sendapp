@@ -7,6 +7,6 @@ export const useTabBarSize = () => {
 
   return {
     padding,
-    height: iconSize + 2 * padding + Math.max(insets.bottom, 15),
+    height: iconSize + 2 * padding + Math.max(insets.bottom, 25) * 2,
   }
 }
