@@ -178,12 +178,127 @@ export const createTransferActivities = (
 
       return upsertedData
     },
-    async cleanupTemporalActivityAfterConfirmation({ workflow_id }) {
+    async cleanupTemporalActivityAfterConfirmation({
+      workflow_id,
+      final_event_id,
+      final_event_name,
+    }) {
+      // Enhanced defensive checks for audit compliance
+      if (!workflow_id || !final_event_id || !final_event_name) {
+        log.warn('Invalid parameters for cleanup activity', {
+          workflow_id,
+          final_event_id,
+          final_event_name,
+        })
+        return
+      }
+
+      // Validate workflow_id format to prevent SQL injection and ensure compliance
+      const workflowIdPattern = /^temporal\/transfer\/[\w-]+\/0x[a-fA-F0-9]{64}$/
+      if (!workflowIdPattern.test(workflow_id)) {
+        log.warn('Invalid workflow_id format, skipping cleanup for security', {
+          workflow_id,
+        })
+        return
+      }
+
       // Import createSupabaseAdminClient here to match pattern from supabase.ts
       const { createSupabaseAdminClient } = await import('app/utils/supabase/admin')
 
       const supabaseAdmin = createSupabaseAdminClient()
 
+      // Enhanced verification with additional safety checks
+      // This ensures we only cleanup after the blockchain record is confirmed
+      const { data: finalActivity, error: verifyError } = await supabaseAdmin
+        .from('activity')
+        .select('id, created_at')
+        .eq('event_name', final_event_name)
+        .eq('event_id', final_event_id)
+        .single()
+
+      if (verifyError && verifyError.code !== 'PGRST116') {
+        // PGRST116 = not found
+        if (isRetryableDBError(verifyError)) {
+          throw ApplicationFailure.retryable(
+            'Database connection error during cleanup verification, retrying...',
+            verifyError.code,
+            {
+              error: verifyError,
+              workflow_id,
+              final_event_id,
+              final_event_name,
+            }
+          )
+        }
+        log.warn('Failed to verify final activity exists before cleanup', {
+          error: verifyError,
+          workflow_id,
+          final_event_id,
+          final_event_name,
+        })
+        // Continue with cleanup even if verification fails - the temporal trigger will handle it
+      } else if (!finalActivity) {
+        log.warn('Final blockchain activity not found, skipping temporal cleanup', {
+          workflow_id,
+          final_event_id,
+          final_event_name,
+        })
+        // Don't cleanup if final record doesn't exist - let the temporal trigger handle it
+        return
+      }
+
+      // Additional timing safety check - ensure some time has passed for proper sequencing
+      if (finalActivity?.created_at) {
+        const createdAt = new Date(finalActivity.created_at)
+        const now = new Date()
+        const timeDiff = now.getTime() - createdAt.getTime()
+        const minDelayMs = 1000 // 1 second minimum delay
+
+        if (timeDiff < minDelayMs) {
+          log.info('Delaying cleanup to ensure proper sequencing', {
+            workflow_id,
+            time_diff_ms: timeDiff,
+            min_delay_ms: minDelayMs,
+          })
+          // Brief delay to ensure proper timing
+          await new Promise((resolve) => setTimeout(resolve, minDelayMs - timeDiff))
+        }
+      }
+
+      // Check if temporal activity still exists before attempting cleanup
+      const { data: temporalActivity, error: checkError } = await supabaseAdmin
+        .from('activity')
+        .select('id')
+        .eq('event_name', 'temporal_send_account_transfers')
+        .eq('event_id', workflow_id)
+        .single()
+
+      if (checkError && checkError.code === 'PGRST116') {
+        log.info('Temporal activity already cleaned up', {
+          workflow_id,
+        })
+        return
+      }
+
+      if (checkError) {
+        if (isRetryableDBError(checkError)) {
+          throw ApplicationFailure.retryable(
+            'Database connection error during temporal activity check, retrying...',
+            checkError.code,
+            {
+              error: checkError,
+              workflow_id,
+            }
+          )
+        }
+        log.warn('Failed to check temporal activity existence', {
+          error: checkError,
+          workflow_id,
+        })
+        // Continue with cleanup attempt
+      }
+
+      // Proceed with cleanup since final blockchain activity exists
       const { error } = await supabaseAdmin
         .from('activity')
         .delete()
@@ -208,6 +323,12 @@ export const createTransferActivities = (
         })
         // Don't throw - cleanup failure should not fail the entire workflow
         // since the temporal entry will eventually be cleaned up by other means
+      } else {
+        log.info('Successfully cleaned up temporal activity', {
+          workflow_id,
+          final_event_id,
+          final_event_name,
+        })
       }
     },
     async getEventFromTransferActivity({ bundlerReceipt, token, from, to }) {
