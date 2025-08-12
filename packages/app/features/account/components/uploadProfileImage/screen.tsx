@@ -69,6 +69,7 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
       .from('avatars')
       .upload(`${user.id}/${Number(new Date())}.jpeg`, res, {
         contentType: 'image/jpeg',
+        cacheControl: '31536000',
         upsert: true,
       })
     if (result.error) {

@@ -71,6 +71,7 @@ export const UploadBanner = forwardRef(function UploadBanner(
       .upload(`${user.id}/${Number(new Date())}.jpeg`, res, {
         contentType: 'image/jpeg',
         upsert: true,
+        cacheControl: '31536000',
       })
     if (result.error) {
       setErrMsg(result.error.message)

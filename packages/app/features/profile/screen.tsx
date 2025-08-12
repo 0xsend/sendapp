@@ -28,6 +28,7 @@ import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useProfileScreenParams } from 'app/routers/params'
 import { IconAccount, IconArrowUp, IconLinkInBio } from 'app/components/icons'
 import { ShareOtherProfileDialog } from './components/ShareOtherProfileDialog'
+import { BannerImage } from 'app/components/BannerImage'
 import type { Functions } from '@my/supabase/database.types'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { sendTokenAddress } from '@my/wagmi'
@@ -90,15 +91,12 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
             tint={isDark ? 'dark' : 'light'}
             overflow="hidden"
           />
-          <Image
-            source={{
-              uri:
-                otherUserProfile?.banner_url ??
-                otherUserProfile?.avatar_url ??
-                `https://ghassets.send.app/app_images/auth_image_${Math.floor(Math.random() * 3) + 1}.jpg`,
-              width: 428,
-              height: 200,
-            }}
+          <BannerImage
+            uri={
+              otherUserProfile?.banner_url ??
+              otherUserProfile?.avatar_url ??
+              `https://ghassets.send.app/app_images/auth_image_${((otherUserProfile?.sendid ?? 0) % 3) + 1}.jpg`
+            }
             h="100%"
             w="100%"
             objectFit="cover"

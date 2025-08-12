@@ -12,6 +12,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
+import { BannerImage } from 'app/components/BannerImage'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { ProfileSchema, useProfileMutation } from 'app/utils/useProfileMutation'
 import { useUser } from 'app/utils/useUser'
@@ -83,13 +84,7 @@ const Overview = ({ profile, onPress }: { profile: Tables<'profiles'>; onPress: 
                 overflow="hidden"
               >
                 {banner_url ? (
-                  <Image
-                    source={{ uri: banner_url }}
-                    w="100%"
-                    h="100%"
-                    borderRadius="$3"
-                    objectFit="cover"
-                  />
+                  <BannerImage uri={banner_url} w="100%" h="100%" borderRadius="$3" />
                 ) : null}
               </YStack>
             </UploadBanner>
