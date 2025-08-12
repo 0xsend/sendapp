@@ -36,6 +36,7 @@ import { parseUnits } from 'viem'
 import { type allCoins, type allCoinsDict, coinsDict } from 'app/data/coins'
 import { IconFYSI } from 'app/components/icons/IconFYSI'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { SolitoImage } from 'solito/image'
 
 interface ProfileScreenProps {
   sendid?: number | null
@@ -83,27 +84,26 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
     <YStack gap="$4" ai="center" w="100%" maw={1024}>
       <Card elevation={0} w="100%" h={200} position="relative" br="$5">
         <Card.Background br="$5">
-          <BlurStack
-            fullscreen
-            intensity={otherUserProfile?.banner_url ? 0 : 30}
-            zIndex={100}
-            tint={isDark ? 'dark' : 'light'}
-            overflow="hidden"
-          />
-          <Image
-            source={{
-              uri:
-                otherUserProfile?.banner_url ??
-                otherUserProfile?.avatar_url ??
-                `https://ghassets.send.app/app_images/auth_image_${Math.floor(Math.random() * 3) + 1}.jpg`,
-              width: 428,
-              height: 200,
-            }}
-            h="100%"
-            w="100%"
-            objectFit="cover"
-            br="$5"
-          />
+          <Avatar h="100%" w="100%" br="$5">
+            <Avatar.Image
+              src={otherUserProfile?.banner_url ?? undefined}
+              objectFit="cover"
+              h="100%"
+              w="100%"
+            />
+            <Avatar.Fallback backgroundColor="$color2" fullscreen>
+              <SolitoImage
+                placeholder="blur"
+                src={
+                  otherUserProfile?.avatar_url ??
+                  `https://ghassets.send.app/app_images/auth_image_${((otherUserProfile?.sendid ?? 0) % 3) + 1}.jpg`
+                }
+                fill={true}
+                contentFit="cover"
+                alt="profile-banner-fallback"
+              />
+            </Avatar.Fallback>
+          </Avatar>
         </Card.Background>
       </Card>
       <YStack gap="$4" flexDirection={media.gtMd ? 'row' : 'column'} w="100%">

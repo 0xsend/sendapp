@@ -11,6 +11,7 @@ import {
   SubmitButton,
   XStack,
   YStack,
+  Avatar,
 } from '@my/ui'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { ProfileSchema, useProfileMutation } from 'app/utils/useProfileMutation'
@@ -83,13 +84,10 @@ const Overview = ({ profile, onPress }: { profile: Tables<'profiles'>; onPress: 
                 overflow="hidden"
               >
                 {banner_url ? (
-                  <Image
-                    source={{ uri: banner_url }}
-                    w="100%"
-                    h="100%"
-                    borderRadius="$3"
-                    objectFit="cover"
-                  />
+                  <Avatar w="100%" h="100%" borderRadius="$3">
+                    <Avatar.Image src={banner_url} objectFit="cover" />
+                    <Avatar.Fallback backgroundColor="$color2" />
+                  </Avatar>
                 ) : null}
               </YStack>
             </UploadBanner>
