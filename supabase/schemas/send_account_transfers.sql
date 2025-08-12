@@ -1,6 +1,45 @@
 -- Send Account Transfers
 -- This table tracks transfers between send accounts on the blockchain
 
+-- Cleanup legacy racey triggers (idempotent)
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM pg_trigger
+    WHERE tgname = 'send_account_transfers_trigger_delete_temporal_activity'
+  ) THEN
+    DROP TRIGGER "send_account_transfers_trigger_delete_temporal_activity" ON "public"."send_account_transfers";
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM pg_proc
+    WHERE proname = 'send_account_transfers_delete_temporal_activity'
+      AND pg_function_is_visible(oid)
+  ) THEN
+    DROP FUNCTION IF EXISTS "public"."send_account_transfers_delete_temporal_activity"();
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM pg_trigger
+    WHERE tgname = 'send_account_transfers_trigger_insert_activity'
+  ) THEN
+    DROP TRIGGER "send_account_transfers_trigger_insert_activity" ON "public"."send_account_transfers";
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM pg_proc
+    WHERE proname = 'send_account_transfers_trigger_insert_activity'
+      AND pg_function_is_visible(oid)
+  ) THEN
+    DROP FUNCTION IF EXISTS "public"."send_account_transfers_trigger_insert_activity"();
+  END IF;
+END
+$$;
+
 -- Functions
 
 -- Filter function to ensure transfers only include existing send accounts
@@ -27,30 +66,6 @@ end;
 $$;
 ALTER FUNCTION "private"."filter_send_account_transfers_with_no_send_account_created"() OWNER TO "postgres";
 
--- Delete temporal activity function
-CREATE OR REPLACE FUNCTION "public"."send_account_transfers_delete_temporal_activity"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
-declare
-    paymaster bytea = '\xb1b01dc21a6537af7f9a46c76276b14fd7ceac67'::bytea;
-    workflow_ids text[];
-begin
-    -- Check if it's from or to paymaster
-    if (NEW.f is not null and NEW.f = paymaster) or
-       (NEW.t is not null and NEW.t = paymaster) then
-        return NEW;
-    end if;
-    -- Only proceed with deletions if we have workflow IDs
-    delete from public.activity a
-    where a.event_name = 'temporal_send_account_transfers'
-      and a.event_id in (select t_sat.workflow_id
-                         from temporal.send_account_transfers t_sat
-                         where t_sat.created_at_block_num <= NEW.block_num
-                           and t_sat.status != 'failed');
-    return NEW;
-end;
-$$;
-ALTER FUNCTION "public"."send_account_transfers_delete_temporal_activity"() OWNER TO "postgres";
 
 -- Activity trigger functions
 CREATE OR REPLACE FUNCTION public.send_account_transfers_trigger_delete_activity()
@@ -70,51 +85,6 @@ $function$
 
 ALTER FUNCTION "public"."send_account_transfers_trigger_delete_activity"() OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION public.send_account_transfers_trigger_insert_activity()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
-AS $function$
-declare
-    _f_user_id uuid;
-    _t_user_id uuid;
-    _data jsonb;
-begin
-    -- select send app info for from address
-    select user_id into _f_user_id from send_accounts where address = concat('0x', encode(NEW.f, 'hex'))::citext;
-    select user_id into _t_user_id from send_accounts where address = concat('0x', encode(NEW.t, 'hex'))::citext;
-
-    -- cast v to text to avoid losing precision when converting to json when sending to clients
-    _data := json_build_object(
-        'log_addr', NEW.log_addr,
-        'f', NEW.f,
-        't', NEW.t,
-        'v', NEW.v::text,
-        'tx_hash', NEW.tx_hash,
-        'block_num', NEW.block_num::text,
-        'tx_idx', NEW.tx_idx::text,
-        'log_idx', NEW.log_idx::text
-    );
-
-    insert into activity (event_name, event_id, from_user_id, to_user_id, data, created_at)
-    values ('send_account_transfers',
-            NEW.event_id,
-            _f_user_id,
-            _t_user_id,
-            _data,
-            to_timestamp(NEW.block_time) at time zone 'UTC')
-    on conflict (event_name, event_id) do update set
-        from_user_id = _f_user_id,
-        to_user_id = _t_user_id,
-        data = _data,
-        created_at = to_timestamp(NEW.block_time) at time zone 'UTC';
-
-    return NEW;
-end;
-$function$
-;
-
-ALTER FUNCTION "public"."send_account_transfers_trigger_insert_activity"() OWNER TO "postgres";
 
 -- Sequences
 CREATE SEQUENCE IF NOT EXISTS "public"."send_account_transfers_id_seq"
@@ -168,8 +138,6 @@ CREATE UNIQUE INDEX "u_send_account_transfers" ON "public"."send_account_transfe
 -- Triggers
 CREATE OR REPLACE TRIGGER "filter_send_account_transfers_with_no_send_account_created" BEFORE INSERT ON "public"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "private"."filter_send_account_transfers_with_no_send_account_created"();
 CREATE OR REPLACE TRIGGER "send_account_transfers_trigger_delete_activity" AFTER DELETE ON "public"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."send_account_transfers_trigger_delete_activity"();
-CREATE OR REPLACE TRIGGER "send_account_transfers_trigger_delete_temporal_activity" BEFORE INSERT ON "public"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."send_account_transfers_delete_temporal_activity"();
-CREATE OR REPLACE TRIGGER "send_account_transfers_trigger_insert_activity" AFTER INSERT ON "public"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."send_account_transfers_trigger_insert_activity"();
 
 -- RLS
 ALTER TABLE "public"."send_account_transfers" ENABLE ROW LEVEL SECURITY;

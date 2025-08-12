@@ -11,8 +11,9 @@ const {
   decodeTransferUserOpActivity,
   updateTemporalSendAccountTransferActivity,
   getUserIdByAddressActivity,
-  insertEthTransferActivity,
+  insertEthTransferActivity, // will remove usage below
   insertTransferEventActivity,
+  verifyTransferIndexedActivity, // NEW
 } = proxyActivities<ReturnType<typeof createTransferActivities>>({
   // TODO: make this configurable
   startToCloseTimeout: '10 minutes',
@@ -136,20 +137,25 @@ export async function transfer(userOp: UserOperation<'v0.7'>, note?: string) {
       },
     })
 
+    // Wait for indexer to catch up using heartbeat-based verification
+    await verifyTransferIndexedActivity({
+      bundlerReceipt,
+      token,
+      sender,
+      recipient,
+    })
+
+    // We no longer insert ETH receive rows manually; rely on indexer and heartbeat verification
+    // if (!token && !recipientUserId) {
+    //   await insertEthTransferActivity({ ... })
+    // }
+
+    // Fetch block timestamp (unchanged)
     const block = await getBaseBlockActivity({
       blockHash: bundlerReceipt.receipt.blockHash,
     })
 
-    if (!token && !recipientUserId) {
-      await insertEthTransferActivity({
-        bundlerReceipt,
-        recipient,
-        sender,
-        amount,
-        blockTime: block.timestamp,
-      })
-    }
-
+    // Insert the activity event idempotently (unchanged signature, now upsert under the hood)
     log.debug('Inserting indexed transfers events into activity table', { workflowId })
     await insertTransferEventActivity({
       workflowId,
