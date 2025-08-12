@@ -18,8 +18,8 @@ import type { GetPlaiceholderImage } from 'app/utils/getPlaiceholderImage'
 import { useQueryClient } from '@tanstack/react-query'
 import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
 import { SendEarnProvider } from 'app/features/earn/providers/SendEarnProvider'
-import { useAuthScreenParams } from '../../../packages/app/routers/params'
-import { useSetReferralCode } from '../../../packages/app/utils/useReferralCode'
+import { useAuthScreenParams } from 'app/routers/params'
+import { useSetReferralCode } from 'app/utils/useReferralCode'
 
 const log = debug('app:pages:index')
 
