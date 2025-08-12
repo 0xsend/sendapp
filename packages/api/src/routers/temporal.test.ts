@@ -45,7 +45,7 @@ describe('Temporal Router - Race Condition Fix Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    
+
     mockSession = {
       user: {
         id: 'test-user-123',
@@ -55,7 +55,7 @@ describe('Temporal Router - Race Condition Fix Tests', () => {
     // Setup default mocks
     mockGetTemporalClient.mockResolvedValue({})
     mockStartWorkflow.mockResolvedValue({
-      workflowId: 'temporal/transfer/test-user-123/0xtest-user-op-hash'
+      workflowId: 'temporal/transfer/test-user-123/0xtest-user-op-hash',
     })
 
     // Mock baseMainnetClient.call to succeed
@@ -79,7 +79,7 @@ describe('Temporal Router - Race Condition Fix Tests', () => {
       factoryData: '0x',
       callData: '0xb61d27f60000000000000000000000001234567890abcdef1234567890abcdef12345678',
       callGasLimit: '0x5208',
-      verificationGasLimit: '0x5208', 
+      verificationGasLimit: '0x5208',
       preVerificationGas: '0x5208',
       maxFeePerGas: '0x3b9aca00',
       maxPriorityFeePerGas: '0x3b9aca00',
@@ -92,7 +92,7 @@ describe('Temporal Router - Race Condition Fix Tests', () => {
 
     it('should return immediately after starting workflow without waiting for activity creation', async () => {
       const startTime = Date.now()
-      
+
       const caller = createCallerFactory(temporalRouter)({
         session: mockSession,
       })
@@ -107,10 +107,10 @@ describe('Temporal Router - Race Condition Fix Tests', () => {
 
       // Verify response is immediate (less than 1 second)
       expect(executionTime).toBeLessThan(1000)
-      
+
       // Verify correct workflow ID is returned
       expect(result).toEqual({
-        workflowId: 'temporal/transfer/test-user-123/0xtest-user-op-hash'
+        workflowId: 'temporal/transfer/test-user-123/0xtest-user-op-hash',
       })
 
       // Verify workflow was started with correct parameters
@@ -125,7 +125,7 @@ describe('Temporal Router - Race Condition Fix Tests', () => {
     it('should not contain any retry logic or activity waiting', async () => {
       // This test verifies that the API doesn't wait for activity creation
       // by checking that no additional async operations occur after workflow start
-      
+
       let asyncOperationCount = 0
       const originalSetTimeout = global.setTimeout
       const originalPromiseAny = Promise.any
@@ -209,7 +209,7 @@ describe('Temporal Router - Race Condition Fix Tests', () => {
 
       // Test with valid note
       mockSafeParse.mockReturnValue({ error: null })
-      
+
       const caller = createCallerFactory(temporalRouter)({
         session: mockSession,
       })
@@ -222,8 +222,8 @@ describe('Temporal Router - Race Condition Fix Tests', () => {
       expect(mockSafeParse).toHaveBeenCalledWith('valid note')
 
       // Test with invalid note
-      mockSafeParse.mockReturnValue({ 
-        error: { message: 'Note too long' }
+      mockSafeParse.mockReturnValue({
+        error: { message: 'Note too long' },
       })
 
       await expect(
@@ -278,11 +278,11 @@ describe('Temporal Router - Race Condition Fix Tests', () => {
 
     it('should generate correct workflow IDs consistently', async () => {
       const { getUserOperationHash } = require('permissionless')
-      
+
       // Mock consistent hash generation
       getUserOperationHash.mockReturnValue('0xconsistent-hash')
       mockStartWorkflow.mockResolvedValue({
-        workflowId: 'temporal/transfer/test-user-123/0xconsistent-hash'
+        workflowId: 'temporal/transfer/test-user-123/0xconsistent-hash',
       })
 
       const caller = createCallerFactory(temporalRouter)({
@@ -317,11 +317,11 @@ describe('Temporal Router - Race Condition Fix Tests', () => {
       mockStartWorkflow.mockImplementation(() => {
         requestCount++
         return Promise.resolve({
-          workflowId: `temporal/transfer/test-user-123/0xhash-${requestCount}`
+          workflowId: `temporal/transfer/test-user-123/0xhash-${requestCount}`,
         })
       })
 
-      const requests = Array.from({ length: concurrentRequests }, (_, i) => 
+      const requests = Array.from({ length: concurrentRequests }, (_, i) =>
         caller.transfer({
           userOp: {
             ...validUserOp,
@@ -337,7 +337,7 @@ describe('Temporal Router - Race Condition Fix Tests', () => {
 
       // All requests should complete quickly (less than 5 seconds total)
       expect(totalTime).toBeLessThan(5000)
-      
+
       // All requests should succeed
       expect(results).toHaveLength(concurrentRequests)
       results.forEach((result, i) => {
@@ -356,7 +356,7 @@ describe('Temporal Router - Race Condition Fix Tests', () => {
       // Track promise creation
       let promiseCount = 0
       const originalPromise = Promise
-      
+
       // Override Promise constructor to count instances
       global.Promise = class extends originalPromise<any> {
         constructor(executor: any) {
@@ -386,7 +386,7 @@ describe('Temporal Router - Race Condition Fix Tests', () => {
       mockStartWorkflow.mockImplementation(() => {
         workflowIdCounter++
         return Promise.resolve({
-          workflowId: `temporal/transfer/test-user-123/0xsequential-${workflowIdCounter}`
+          workflowId: `temporal/transfer/test-user-123/0xsequential-${workflowIdCounter}`,
         })
       })
 
@@ -404,7 +404,7 @@ describe('Temporal Router - Race Condition Fix Tests', () => {
       }
 
       // Each should get a unique workflow ID
-      const workflowIds = results.map(r => r.workflowId)
+      const workflowIds = results.map((r) => r.workflowId)
       const uniqueIds = new Set(workflowIds)
       expect(uniqueIds.size).toBe(5)
 
@@ -490,7 +490,7 @@ describe('Temporal Router - Race Condition Fix Tests', () => {
 
       // Should have decoded the note properly for validation
       expect(formFields.note.safeParse).toHaveBeenCalledWith(specialNote)
-      
+
       // Should have passed the original encoded note to workflow
       expect(mockStartWorkflow).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -550,10 +550,7 @@ describe('Temporal Router - Race Condition Fix Tests', () => {
       // The workflow should be started with IDs that enable proper duplicate detection
       expect(mockStartWorkflow).toHaveBeenCalledWith(
         expect.objectContaining({
-          ids: expect.arrayContaining([
-            'test-user-123',
-            '0xtest-user-op-hash'
-          ]),
+          ids: expect.arrayContaining(['test-user-123', '0xtest-user-op-hash']),
         })
       )
     })
@@ -572,7 +569,7 @@ describe('Temporal Router - Race Condition Fix Tests', () => {
       })
 
       expect(resultWithNote).toEqual({
-        workflowId: expect.stringMatching(/^temporal\/transfer\//)
+        workflowId: expect.stringMatching(/^temporal\/transfer\//),
       })
 
       // Test without note
@@ -581,7 +578,7 @@ describe('Temporal Router - Race Condition Fix Tests', () => {
       })
 
       expect(resultWithoutNote).toEqual({
-        workflowId: expect.stringMatching(/^temporal\/transfer\//)
+        workflowId: expect.stringMatching(/^temporal\/transfer\//),
       })
     })
 

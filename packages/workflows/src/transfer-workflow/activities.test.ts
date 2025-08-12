@@ -61,20 +61,20 @@ const mockIsRetryableDBError = jest.fn()
 
 describe('Transfer Workflow Activities', () => {
   let activities: ReturnType<typeof createTransferActivities>
-  
+
   beforeEach(() => {
     jest.clearAllMocks()
-    
+
     // Setup mocks
     jest.doMock('app/utils/supabase/admin', () => ({
       createSupabaseAdminClient: mockCreateSupabaseAdminClient,
     }))
-    
+
     jest.doMock('@my/workflows/utils', () => ({
       bootstrap: jest.fn(),
       isRetryableDBError: mockIsRetryableDBError,
     }))
-    
+
     activities = createTransferActivities({})
   })
 
@@ -84,7 +84,8 @@ describe('Transfer Workflow Activities', () => {
 
   describe('cleanupTemporalActivityAfterConfirmation', () => {
     const validParams = {
-      workflow_id: 'temporal/transfer/user-123/0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
+      workflow_id:
+        'temporal/transfer/user-123/0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
       final_event_id: 'send_account_transfers/base_logs/12345/0/1',
       final_event_name: 'send_account_transfers',
     }
@@ -132,15 +133,18 @@ describe('Transfer Workflow Activities', () => {
 
       it('should reject invalid workflow_id format for security', async () => {
         const invalidWorkflowId = 'malicious-workflow-id'
-        
+
         await activities.cleanupTemporalActivityAfterConfirmation({
           ...validParams,
           workflow_id: invalidWorkflowId,
         })
 
-        expect(mockLog.warn).toHaveBeenCalledWith('Invalid workflow_id format, skipping cleanup for security', {
-          workflow_id: invalidWorkflowId,
-        })
+        expect(mockLog.warn).toHaveBeenCalledWith(
+          'Invalid workflow_id format, skipping cleanup for security',
+          {
+            workflow_id: invalidWorkflowId,
+          }
+        )
         expect(mockCreateSupabaseAdminClient).not.toHaveBeenCalled()
       })
 
@@ -154,7 +158,7 @@ describe('Transfer Workflow Activities', () => {
             })),
           })),
         }))
-        
+
         mockSupabaseClient.from = mockFrom
 
         await activities.cleanupTemporalActivityAfterConfirmation(validParams)
@@ -176,7 +180,7 @@ describe('Transfer Workflow Activities', () => {
           data: { id: 'activity-123', created_at: new Date().toISOString() },
           error: null,
         })
-        
+
         const mockEq2 = jest.fn(() => ({ single: mockSingle }))
         const mockEq1 = jest.fn(() => ({ eq: mockEq2 }))
         const mockSelect = jest.fn(() => ({ eq: mockEq1 }))
@@ -205,7 +209,7 @@ describe('Transfer Workflow Activities', () => {
           data: null,
           error: null,
         })
-        
+
         const mockEq2 = jest.fn(() => ({ single: mockSingle }))
         const mockEq1 = jest.fn(() => ({ eq: mockEq2 }))
         const mockSelect = jest.fn(() => ({ eq: mockEq1 }))
@@ -226,12 +230,12 @@ describe('Transfer Workflow Activities', () => {
       it('should handle retryable database errors during verification', async () => {
         const dbError = { code: 'CONNECTION_ERROR', message: 'Connection lost' }
         mockIsRetryableDBError.mockReturnValue(true)
-        
+
         const mockSingle = jest.fn().mockResolvedValue({
           data: null,
           error: dbError,
         })
-        
+
         const mockEq2 = jest.fn(() => ({ single: mockSingle }))
         const mockEq1 = jest.fn(() => ({ eq: mockEq2 }))
         const mockSelect = jest.fn(() => ({ eq: mockEq1 }))
@@ -260,8 +264,9 @@ describe('Transfer Workflow Activities', () => {
     describe('Timing Safety Tests', () => {
       it('should delay cleanup if minimum time has not passed', async () => {
         const recentTime = new Date(Date.now() - 500) // 500ms ago
-        
-        const mockSingle = jest.fn()
+
+        const mockSingle = jest
+          .fn()
           .mockResolvedValueOnce({
             data: { id: 'activity-123', created_at: recentTime.toISOString() },
             error: null,
@@ -270,7 +275,7 @@ describe('Transfer Workflow Activities', () => {
             data: null,
             error: { code: 'PGRST116' }, // Temporal activity not found
           })
-        
+
         const mockEq2 = jest.fn(() => ({ single: mockSingle }))
         const mockEq1 = jest.fn(() => ({ eq: mockEq2 }))
         const mockSelect = jest.fn(() => ({ eq: mockEq1 }))
@@ -301,8 +306,9 @@ describe('Transfer Workflow Activities', () => {
 
       it('should not delay if sufficient time has passed', async () => {
         const oldTime = new Date(Date.now() - 5000) // 5 seconds ago
-        
-        const mockSingle = jest.fn()
+
+        const mockSingle = jest
+          .fn()
           .mockResolvedValueOnce({
             data: { id: 'activity-123', created_at: oldTime.toISOString() },
             error: null,
@@ -311,7 +317,7 @@ describe('Transfer Workflow Activities', () => {
             data: null,
             error: { code: 'PGRST116' }, // Temporal activity not found
           })
-        
+
         const mockEq2 = jest.fn(() => ({ single: mockSingle }))
         const mockEq1 = jest.fn(() => ({ eq: mockEq2 }))
         const mockSelect = jest.fn(() => ({ eq: mockEq1 }))
@@ -322,9 +328,7 @@ describe('Transfer Workflow Activities', () => {
 
         await activities.cleanupTemporalActivityAfterConfirmation(validParams)
 
-        expect(mockLog.info).not.toHaveBeenCalledWith(
-          expect.stringContaining('Delaying cleanup')
-        )
+        expect(mockLog.info).not.toHaveBeenCalledWith(expect.stringContaining('Delaying cleanup'))
         expect(global.setTimeout).not.toHaveBeenCalled()
       })
     })
@@ -332,12 +336,11 @@ describe('Transfer Workflow Activities', () => {
     describe('Temporal Activity Existence Check Tests', () => {
       beforeEach(() => {
         // Setup default final activity verification to succeed
-        const mockSingle = jest.fn()
-          .mockResolvedValueOnce({
-            data: { id: 'final-activity', created_at: new Date(Date.now() - 5000).toISOString() },
-            error: null,
-          })
-        
+        const mockSingle = jest.fn().mockResolvedValueOnce({
+          data: { id: 'final-activity', created_at: new Date(Date.now() - 5000).toISOString() },
+          error: null,
+        })
+
         const mockEq2 = jest.fn(() => ({ single: mockSingle }))
         const mockEq1 = jest.fn(() => ({ eq: mockEq2 }))
         const mockSelect = jest.fn(() => ({ eq: mockEq1 }))
@@ -345,7 +348,8 @@ describe('Transfer Workflow Activities', () => {
       })
 
       it('should return early if temporal activity already cleaned up', async () => {
-        const mockSingle = jest.fn()
+        const mockSingle = jest
+          .fn()
           .mockResolvedValueOnce({
             data: { id: 'final-activity', created_at: new Date(Date.now() - 5000).toISOString() },
             error: null,
@@ -374,7 +378,8 @@ describe('Transfer Workflow Activities', () => {
         const dbError = { code: 'TIMEOUT_ERROR', message: 'Query timeout' }
         mockIsRetryableDBError.mockReturnValue(true)
 
-        const mockSingle = jest.fn()
+        const mockSingle = jest
+          .fn()
           .mockResolvedValueOnce({
             data: { id: 'final-activity', created_at: new Date(Date.now() - 5000).toISOString() },
             error: null,
@@ -412,7 +417,8 @@ describe('Transfer Workflow Activities', () => {
     describe('Cleanup Execution Tests', () => {
       beforeEach(() => {
         // Setup default mocks for successful verification path
-        const mockSingle = jest.fn()
+        const mockSingle = jest
+          .fn()
           .mockResolvedValueOnce({
             data: { id: 'final-activity', created_at: new Date(Date.now() - 5000).toISOString() },
             error: null,
@@ -441,7 +447,8 @@ describe('Transfer Workflow Activities', () => {
             return { delete: mockDeleteChain }
           }
           // For select operations (verification)
-          const mockSingle = jest.fn()
+          const mockSingle = jest
+            .fn()
             .mockResolvedValueOnce({
               data: { id: 'final-activity', created_at: new Date(Date.now() - 5000).toISOString() },
               error: null,
@@ -485,7 +492,8 @@ describe('Transfer Workflow Activities', () => {
             return { delete: mockDeleteChain }
           }
           // For select operations
-          const mockSingle = jest.fn()
+          const mockSingle = jest
+            .fn()
             .mockResolvedValueOnce({
               data: { id: 'final-activity', created_at: new Date(Date.now() - 5000).toISOString() },
               error: null,
@@ -533,7 +541,8 @@ describe('Transfer Workflow Activities', () => {
             return { delete: mockDeleteChain }
           }
           // For select operations
-          const mockSingle = jest.fn()
+          const mockSingle = jest
+            .fn()
             .mockResolvedValueOnce({
               data: { id: 'final-activity', created_at: new Date(Date.now() - 5000).toISOString() },
               error: null,
@@ -572,7 +581,8 @@ describe('Transfer Workflow Activities', () => {
         const recentTime = new Date(Date.now() - 500) // Recent activity
         let cleanupExecuted = false
 
-        const mockSingle = jest.fn()
+        const mockSingle = jest
+          .fn()
           .mockResolvedValueOnce({
             data: { id: 'final-activity', created_at: recentTime.toISOString() },
             error: null,
@@ -654,7 +664,8 @@ describe('Transfer Workflow Activities', () => {
     describe('Performance and Resource Management Tests', () => {
       it('should properly clean up resources and not leak connections', async () => {
         // Mock successful cleanup path
-        const mockSingle = jest.fn()
+        const mockSingle = jest
+          .fn()
           .mockResolvedValueOnce({
             data: { id: 'final-activity', created_at: new Date(Date.now() - 5000).toISOString() },
             error: null,
@@ -684,7 +695,7 @@ describe('Transfer Workflow Activities', () => {
 
         // Verify that supabase client was created exactly once
         expect(mockCreateSupabaseAdminClient).toHaveBeenCalledTimes(1)
-        
+
         // Verify successful completion
         expect(mockLog.info).toHaveBeenCalledWith(
           'Successfully cleaned up temporal activity',
@@ -694,17 +705,19 @@ describe('Transfer Workflow Activities', () => {
 
       it('should handle high-frequency cleanup requests efficiently', async () => {
         // Setup mocks for successful cleanup
-        const mockSingle = jest.fn(() => 
-          Promise.resolve({
-            data: { id: 'final-activity', created_at: new Date(Date.now() - 5000).toISOString() },
-            error: null,
-          })
-        ).mockImplementation(() =>
-          Promise.resolve({
-            data: null,
-            error: { code: 'PGRST116' },
-          })
-        )
+        const mockSingle = jest
+          .fn(() =>
+            Promise.resolve({
+              data: { id: 'final-activity', created_at: new Date(Date.now() - 5000).toISOString() },
+              error: null,
+            })
+          )
+          .mockImplementation(() =>
+            Promise.resolve({
+              data: null,
+              error: { code: 'PGRST116' },
+            })
+          )
 
         const mockEq2 = jest.fn(() => ({ single: mockSingle }))
         const mockEq1 = jest.fn(() => ({ eq: mockEq2 }))
@@ -712,7 +725,7 @@ describe('Transfer Workflow Activities', () => {
         mockSupabaseClient.from = jest.fn(() => ({ select: mockSelect }))
 
         // Simulate multiple concurrent cleanup requests
-        const cleanupPromises = Array.from({ length: 10 }, (_, i) => 
+        const cleanupPromises = Array.from({ length: 10 }, (_, i) =>
           activities.cleanupTemporalActivityAfterConfirmation({
             ...validParams,
             workflow_id: `temporal/transfer/user-${i}/0x${'a'.repeat(64)}`,

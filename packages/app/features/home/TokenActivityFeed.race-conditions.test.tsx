@@ -12,11 +12,14 @@ jest.mock('app/features/activity/utils/useActivityFeed', () => ({
 
 // Mock other dependencies
 jest.mock('@my/ui', () => ({
-  Spinner: ({ children }: { children?: React.ReactNode }) => <div data-testid="spinner">{children}</div>,
+  Spinner: ({ children }: { children?: React.ReactNode }) => (
+    <div data-testid="spinner">{children}</div>
+  ),
   YStack: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Text: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
-  Button: ({ children, onPress }: { children: React.ReactNode, onPress?: () => void }) => 
-    <button onClick={onPress}>{children}</button>,
+  Button: ({ children, onPress }: { children: React.ReactNode; onPress?: () => void }) => (
+    <button onClick={onPress}>{children}</button>
+  ),
 }))
 
 jest.mock('./TokenActivityRow', () => ({
@@ -53,12 +56,15 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
   })
 
   const createMockActivity = (
-    id: string, 
-    eventName: 'send_account_transfers' | 'temporal_send_account_transfers' | 'send_account_receives',
+    id: string,
+    eventName:
+      | 'send_account_transfers'
+      | 'temporal_send_account_transfers'
+      | 'send_account_receives',
     status?: string,
     note?: string
   ): Activity => ({
-    id: parseInt(id),
+    id: Number.parseInt(id),
     event_id: `event-${id}`,
     event_name: eventName,
     from_user_id: 'user-1',
@@ -82,7 +88,7 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
       main_tag_name: 'test',
     },
     to_user: {
-      id: 'user-2', 
+      id: 'user-2',
       name: 'Recipient User',
       avatar_url: null,
       send_id: 2,
@@ -93,17 +99,13 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
   })
 
   const renderWithQueryClient = (component: React.ReactElement) => {
-    return render(
-      <QueryClientProvider client={queryClient}>
-        {component}
-      </QueryClientProvider>
-    )
+    return render(<QueryClientProvider client={queryClient}>{component}</QueryClientProvider>)
   }
 
   describe('Bug 1 Tests: Note Lookup Race Condition', () => {
     it('should display note when found via primary lookup mechanism', async () => {
       const activitiesWithNote = [
-        createMockActivity('1', 'send_account_transfers', 'confirmed', 'Primary lookup note')
+        createMockActivity('1', 'send_account_transfers', 'confirmed', 'Primary lookup note'),
       ]
 
       mockUseActivityFeed.mockReturnValue({
@@ -116,9 +118,7 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
       })
 
       renderWithQueryClient(
-        <TokenActivityFeed 
-          queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} 
-        />
+        <TokenActivityFeed queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} />
       )
 
       expect(screen.getByText('Primary lookup note - send_account_transfers')).toBeInTheDocument()
@@ -126,7 +126,7 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
 
     it('should display note when found via fallback lookup mechanism', async () => {
       const activitiesWithFallbackNote = [
-        createMockActivity('2', 'send_account_transfers', 'confirmed', 'Fallback lookup note')
+        createMockActivity('2', 'send_account_transfers', 'confirmed', 'Fallback lookup note'),
       ]
 
       mockUseActivityFeed.mockReturnValue({
@@ -139,18 +139,14 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
       })
 
       renderWithQueryClient(
-        <TokenActivityFeed 
-          queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} 
-        />
+        <TokenActivityFeed queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} />
       )
 
       expect(screen.getByText('Fallback lookup note - send_account_transfers')).toBeInTheDocument()
     })
 
     it('should handle activities without notes gracefully', async () => {
-      const activitiesWithoutNote = [
-        createMockActivity('3', 'send_account_transfers', 'confirmed')
-      ]
+      const activitiesWithoutNote = [createMockActivity('3', 'send_account_transfers', 'confirmed')]
 
       mockUseActivityFeed.mockReturnValue({
         data: activitiesWithoutNote,
@@ -162,9 +158,7 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
       })
 
       renderWithQueryClient(
-        <TokenActivityFeed 
-          queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} 
-        />
+        <TokenActivityFeed queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} />
       )
 
       expect(screen.getByText('No note - send_account_transfers')).toBeInTheDocument()
@@ -173,7 +167,7 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
     it('should display notes for both send and receive activities', async () => {
       const mixedActivities = [
         createMockActivity('4', 'send_account_transfers', 'confirmed', 'Send note'),
-        createMockActivity('5', 'send_account_receives', 'confirmed', 'Receive note')
+        createMockActivity('5', 'send_account_receives', 'confirmed', 'Receive note'),
       ]
 
       mockUseActivityFeed.mockReturnValue({
@@ -186,9 +180,7 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
       })
 
       renderWithQueryClient(
-        <TokenActivityFeed 
-          queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} 
-        />
+        <TokenActivityFeed queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} />
       )
 
       expect(screen.getByText('Send note - send_account_transfers')).toBeInTheDocument()
@@ -200,7 +192,7 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
     it('should not show duplicate activities when cleanup is working correctly', async () => {
       // Only blockchain activity should be present after cleanup
       const cleanActivities = [
-        createMockActivity('6', 'send_account_transfers', 'confirmed', 'Clean activity')
+        createMockActivity('6', 'send_account_transfers', 'confirmed', 'Clean activity'),
       ]
 
       mockUseActivityFeed.mockReturnValue({
@@ -213,9 +205,7 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
       })
 
       renderWithQueryClient(
-        <TokenActivityFeed 
-          queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} 
-        />
+        <TokenActivityFeed queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} />
       )
 
       // Should only see one activity
@@ -226,11 +216,11 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
 
     it('should handle pending state transition correctly without duplicates', async () => {
       let currentActivities = [
-        createMockActivity('7', 'temporal_send_account_transfers', 'pending', 'Pending transfer')
+        createMockActivity('7', 'temporal_send_account_transfers', 'pending', 'Pending transfer'),
       ]
 
       const mockFetchNextPage = jest.fn()
-      
+
       mockUseActivityFeed.mockReturnValue({
         data: currentActivities,
         isLoading: false,
@@ -241,17 +231,17 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
       })
 
       const { rerender } = renderWithQueryClient(
-        <TokenActivityFeed 
-          queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} 
-        />
+        <TokenActivityFeed queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} />
       )
 
       // Initially should show pending activity
-      expect(screen.getByText('Pending transfer - temporal_send_account_transfers')).toBeInTheDocument()
+      expect(
+        screen.getByText('Pending transfer - temporal_send_account_transfers')
+      ).toBeInTheDocument()
 
       // Simulate state transition - temporal activity replaced by blockchain activity
       currentActivities = [
-        createMockActivity('8', 'send_account_transfers', 'confirmed', 'Confirmed transfer')
+        createMockActivity('8', 'send_account_transfers', 'confirmed', 'Confirmed transfer'),
       ]
 
       mockUseActivityFeed.mockReturnValue({
@@ -265,8 +255,8 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
 
       rerender(
         <QueryClientProvider client={queryClient}>
-          <TokenActivityFeed 
-            queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} 
+          <TokenActivityFeed
+            queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }}
           />
         </QueryClientProvider>
       )
@@ -275,14 +265,21 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
       const activities = screen.getAllByTestId(/^activity-/)
       expect(activities).toHaveLength(1)
       expect(screen.getByText('Confirmed transfer - send_account_transfers')).toBeInTheDocument()
-      expect(screen.queryByText('Pending transfer - temporal_send_account_transfers')).not.toBeInTheDocument()
+      expect(
+        screen.queryByText('Pending transfer - temporal_send_account_transfers')
+      ).not.toBeInTheDocument()
     })
 
     it('should handle race condition where both temporal and blockchain activities exist temporarily', async () => {
       // This simulates the race condition state where both activities exist
       const duplicateActivities = [
-        createMockActivity('9', 'temporal_send_account_transfers', 'pending', 'Race condition transfer'),
-        createMockActivity('10', 'send_account_transfers', 'confirmed', 'Race condition transfer')
+        createMockActivity(
+          '9',
+          'temporal_send_account_transfers',
+          'pending',
+          'Race condition transfer'
+        ),
+        createMockActivity('10', 'send_account_transfers', 'confirmed', 'Race condition transfer'),
       ]
 
       mockUseActivityFeed.mockReturnValue({
@@ -295,19 +292,17 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
       })
 
       renderWithQueryClient(
-        <TokenActivityFeed 
-          queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} 
-        />
+        <TokenActivityFeed queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} />
       )
 
       // Should show both activities (representing the race condition state)
       // In a real scenario, cleanup would remove the temporal one
       const activities = screen.getAllByTestId(/^activity-/)
       expect(activities).toHaveLength(2)
-      
+
       const temporalActivity = screen.getByTestId('activity-event-9')
       const blockchainActivity = screen.getByTestId('activity-event-10')
-      
+
       expect(temporalActivity).toHaveAttribute('data-event-name', 'temporal_send_account_transfers')
       expect(blockchainActivity).toHaveAttribute('data-event-name', 'send_account_transfers')
     })
@@ -315,16 +310,21 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
     it('should invalidate queries when pending state changes to confirmed', async () => {
       const mockInvalidateQueries = jest.spyOn(queryClient, 'invalidateQueries')
 
-      let wasPending = true
-      let isCurrentlyPending = false
+      const wasPending = true
+      const isCurrentlyPending = false
 
       // Mock the pending detection logic
       const pendingActivities = [
-        createMockActivity('11', 'temporal_send_account_transfers', 'submitted', 'Pending transfer')
+        createMockActivity(
+          '11',
+          'temporal_send_account_transfers',
+          'submitted',
+          'Pending transfer'
+        ),
       ]
 
       const confirmedActivities = [
-        createMockActivity('12', 'send_account_transfers', 'confirmed', 'Confirmed transfer')
+        createMockActivity('12', 'send_account_transfers', 'confirmed', 'Confirmed transfer'),
       ]
 
       // Initial render with pending activity
@@ -338,9 +338,7 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
       })
 
       const { rerender } = renderWithQueryClient(
-        <TokenActivityFeed 
-          queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} 
-        />
+        <TokenActivityFeed queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} />
       )
 
       // Simulate transition to confirmed state
@@ -356,14 +354,14 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
       act(() => {
         rerender(
           <QueryClientProvider client={queryClient}>
-            <TokenActivityFeed 
-              queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} 
+            <TokenActivityFeed
+              queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }}
             />
           </QueryClientProvider>
         )
       })
 
-      // Note: The actual query invalidation logic would need to be tested 
+      // Note: The actual query invalidation logic would need to be tested
       // in the TokenActivityFeed component implementation
       expect(screen.getByText('Confirmed transfer - send_account_transfers')).toBeInTheDocument()
     })
@@ -384,9 +382,7 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
       })
 
       renderWithQueryClient(
-        <TokenActivityFeed 
-          queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} 
-        />
+        <TokenActivityFeed queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} />
       )
 
       // Should render without activities initially (after API returned immediately)
@@ -394,7 +390,7 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
 
       // Simulate activity appearing after workflow starts processing
       const newActivities = [
-        createMockActivity('13', 'temporal_send_account_transfers', 'initialized', 'New workflow')
+        createMockActivity('13', 'temporal_send_account_transfers', 'initialized', 'New workflow'),
       ]
 
       mockUseActivityFeed.mockReturnValue({
@@ -410,7 +406,9 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
       queryClient.setQueryData(['activity_feed'], newActivities)
 
       await waitFor(() => {
-        expect(screen.getByText('New workflow - temporal_send_account_transfers')).toBeInTheDocument()
+        expect(
+          screen.getByText('New workflow - temporal_send_account_transfers')
+        ).toBeInTheDocument()
       })
     })
 
@@ -425,17 +423,15 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
       })
 
       renderWithQueryClient(
-        <TokenActivityFeed 
-          queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} 
-        />
+        <TokenActivityFeed queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} />
       )
 
       expect(screen.getByTestId('spinner')).toBeInTheDocument()
 
       // Quick resolution (no long waits)
       await act(async () => {
-        await new Promise(resolve => setTimeout(resolve, 100))
-        
+        await new Promise((resolve) => setTimeout(resolve, 100))
+
         mockUseActivityFeed.mockReturnValue({
           data: [createMockActivity('14', 'send_account_transfers', 'confirmed', 'Quick load')],
           isLoading: false,
@@ -464,25 +460,45 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
         // Step 2: Temporal activity appears
         {
           activities: [
-            createMockActivity('15', 'temporal_send_account_transfers', 'submitted', 'Integration test note')
+            createMockActivity(
+              '15',
+              'temporal_send_account_transfers',
+              'submitted',
+              'Integration test note'
+            ),
           ],
-          description: 'temporal activity phase'
+          description: 'temporal activity phase',
         },
         // Step 3: Both activities exist (race condition state)
         {
           activities: [
-            createMockActivity('15', 'temporal_send_account_transfers', 'submitted', 'Integration test note'),
-            createMockActivity('16', 'send_account_transfers', 'confirmed', 'Integration test note') // Note from fallback lookup
+            createMockActivity(
+              '15',
+              'temporal_send_account_transfers',
+              'submitted',
+              'Integration test note'
+            ),
+            createMockActivity(
+              '16',
+              'send_account_transfers',
+              'confirmed',
+              'Integration test note'
+            ), // Note from fallback lookup
           ],
-          description: 'race condition phase'
+          description: 'race condition phase',
         },
         // Step 4: Final state after cleanup
         {
           activities: [
-            createMockActivity('16', 'send_account_transfers', 'confirmed', 'Integration test note')
+            createMockActivity(
+              '16',
+              'send_account_transfers',
+              'confirmed',
+              'Integration test note'
+            ),
           ],
-          description: 'final state phase'
-        }
+          description: 'final state phase',
+        },
       ]
 
       mockUseActivityFeed.mockReturnValue({
@@ -495,13 +511,13 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
       })
 
       const { rerender } = renderWithQueryClient(
-        <TokenActivityFeed 
-          queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} 
-        />
+        <TokenActivityFeed queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} />
       )
 
       // Step 2: Should show temporal activity
-      expect(screen.getByText('Integration test note - temporal_send_account_transfers')).toBeInTheDocument()
+      expect(
+        screen.getByText('Integration test note - temporal_send_account_transfers')
+      ).toBeInTheDocument()
       expect(screen.getAllByTestId(/^activity-/)).toHaveLength(1)
 
       // Step 3: Race condition state - both activities exist
@@ -516,16 +532,22 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
 
       rerender(
         <QueryClientProvider client={queryClient}>
-          <TokenActivityFeed 
-            queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} 
+          <TokenActivityFeed
+            queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }}
           />
         </QueryClientProvider>
       )
 
       // Should show both activities temporarily
       expect(screen.getAllByTestId(/^activity-/)).toHaveLength(2)
-      expect(screen.getByTestId('activity-event-15')).toHaveAttribute('data-event-name', 'temporal_send_account_transfers')
-      expect(screen.getByTestId('activity-event-16')).toHaveAttribute('data-event-name', 'send_account_transfers')
+      expect(screen.getByTestId('activity-event-15')).toHaveAttribute(
+        'data-event-name',
+        'temporal_send_account_transfers'
+      )
+      expect(screen.getByTestId('activity-event-16')).toHaveAttribute(
+        'data-event-name',
+        'send_account_transfers'
+      )
 
       // Step 4: Final state - only blockchain activity remains
       mockUseActivityFeed.mockReturnValue({
@@ -539,8 +561,8 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
 
       rerender(
         <QueryClientProvider client={queryClient}>
-          <TokenActivityFeed 
-            queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} 
+          <TokenActivityFeed
+            queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }}
           />
         </QueryClientProvider>
       )
@@ -562,9 +584,9 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
         [createMockActivity('17', 'temporal_send_account_transfers', 'submitted')],
         [
           createMockActivity('17', 'temporal_send_account_transfers', 'submitted'),
-          createMockActivity('18', 'send_account_transfers', 'confirmed', 'Rapid update note')
+          createMockActivity('18', 'send_account_transfers', 'confirmed', 'Rapid update note'),
         ],
-        [createMockActivity('18', 'send_account_transfers', 'confirmed', 'Rapid update note')]
+        [createMockActivity('18', 'send_account_transfers', 'confirmed', 'Rapid update note')],
       ]
 
       let stateIndex = 0
@@ -578,9 +600,7 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
       }))
 
       const { rerender } = renderWithQueryClient(
-        <TokenActivityFeed 
-          queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} 
-        />
+        <TokenActivityFeed queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} />
       )
 
       // Rapidly cycle through states
@@ -589,8 +609,8 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
           stateIndex = i
           rerender(
             <QueryClientProvider client={queryClient}>
-              <TokenActivityFeed 
-                queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} 
+              <TokenActivityFeed
+                queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }}
               />
             </QueryClientProvider>
           )
@@ -618,9 +638,7 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
       })
 
       renderWithQueryClient(
-        <TokenActivityFeed 
-          queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} 
-        />
+        <TokenActivityFeed queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} />
       )
 
       // Should handle error state without crashing
@@ -638,9 +656,7 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
       })
 
       renderWithQueryClient(
-        <TokenActivityFeed 
-          queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} 
-        />
+        <TokenActivityFeed queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} />
       )
 
       // Should render empty state correctly
@@ -668,8 +684,8 @@ describe('TokenActivityFeed - Race Condition Tests', () => {
       // Should not crash even with malformed data
       expect(() => {
         renderWithQueryClient(
-          <TokenActivityFeed 
-            queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }} 
+          <TokenActivityFeed
+            queryParams={{ token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' }}
           />
         )
       }).not.toThrow()
