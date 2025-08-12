@@ -78,6 +78,12 @@ type TransferActivities = {
     amount: bigint
     blockTime: bigint
   }) => Promise<IndexedTransfer>
+  verifyTransferIndexedActivity: (params: {
+    bundlerReceipt: GetUserOperationReceiptReturnType
+    token: Address | null
+    sender: Address
+    recipient: Address
+  }) => Promise<boolean>
 }
 export const createTransferActivities = (
   env: Record<string, string | undefined>
@@ -275,7 +281,10 @@ export const createTransferActivities = (
       const { data, error } = await supabaseAdmin
         .schema('public')
         .from('activity')
-        .insert(event)
+        .upsert(event, {
+          onConflict: 'event_name,event_id',
+          ignoreDuplicates: false,
+        })
         .select('*')
         .single()
 
@@ -453,6 +462,166 @@ export const createTransferActivities = (
         })
       }
       return data
+    },
+    async verifyTransferIndexedActivity({ bundlerReceipt, token, sender, recipient }) {
+      const maxAttempts = 10
+      const initialDelayMs = 1000
+      const backoffCoefficient = 2
+
+      const block_num_bigint = bundlerReceipt.receipt.blockNumber
+      const tx_idx_bigint = bundlerReceipt.receipt.transactionIndex
+      const log_idx = findLogIndex({
+        logs: bundlerReceipt.logs,
+        sender,
+        recipient,
+        token,
+      })
+
+      if (log_idx === undefined) {
+        throw ApplicationFailure.nonRetryable(
+          'Transaction receipt does not contain a log of the transfer',
+          'LOG_INDEX_NOT_FOUND',
+          { sender, recipient, token, txHash: bundlerReceipt.receipt.transactionHash }
+        )
+      }
+
+      const tableName = token ? 'send_account_transfers' : 'send_account_receives'
+      const supabaseAdmin = createSupabaseAdminClient()
+
+      const senderBytea = hexToBytea(sender)
+      const recipientBytea = hexToBytea(recipient)
+      const tokenBytea = token ? hexToBytea(token) : null
+
+      // For logging and error messages, use string versions
+      const block_num_str = block_num_bigint.toString()
+      const tx_idx_str = tx_idx_bigint.toString()
+      const log_idx_str = log_idx.toString()
+
+      log.info('Starting verification for indexed transfer', {
+        tableName,
+        block_num: block_num_str,
+        tx_idx: tx_idx_str,
+        log_idx: log_idx_str,
+        token,
+        sender,
+        recipient,
+      })
+
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        ActivityContext.current().heartbeat(`Attempt ${attempt}/${maxAttempts}`)
+
+        try {
+          let query = supabaseAdmin
+            .from(tableName)
+            .select('id', { count: 'exact', head: true })
+            // All columns are numbers according to generated types
+            .eq('block_num', Number(block_num_str))
+            .eq('tx_idx', Number(tx_idx_bigint))
+            .eq('log_idx', Number(log_idx))
+
+          if (token && tokenBytea) {
+            query = query.eq('log_addr', tokenBytea).eq('f', senderBytea).eq('t', recipientBytea)
+          } else {
+            query = query.eq('sender', senderBytea).eq('log_addr', recipientBytea)
+          }
+
+          const { error, count } = await query
+
+          if (error) {
+            log.error('DB error checking transfer index', {
+              tableName,
+              block_num: block_num_str,
+              tx_idx: tx_idx_str,
+              log_idx: log_idx_str,
+              token,
+              sender,
+              recipient,
+              attempt,
+              error,
+            })
+            if (isRetryableDBError(error)) {
+              throw ApplicationFailure.retryable(
+                `Retryable DB error on attempt ${attempt}`,
+                error.code,
+                { error }
+              )
+            }
+            throw ApplicationFailure.nonRetryable(
+              'Non-retryable DB error checking transfer index',
+              error.code,
+              { error }
+            )
+          }
+
+          if (count !== null && count > 0) {
+            log.info('Transfer successfully verified as indexed', {
+              tableName,
+              block_num: block_num_str,
+              tx_idx: tx_idx_str,
+              log_idx: log_idx_str,
+              attempt,
+            })
+            return true
+          }
+
+          log.info(`Transfer not yet indexed, attempt ${attempt}/${maxAttempts}`, {
+            tableName,
+            block_num: block_num_str,
+            tx_idx: tx_idx_str,
+            log_idx: log_idx_str,
+          })
+        } catch (error) {
+          log.error('Error during transfer verification attempt', {
+            tableName,
+            block_num: block_num_str,
+            tx_idx: tx_idx_str,
+            log_idx: log_idx_str,
+            token,
+            sender,
+            recipient,
+            attempt,
+            error,
+          })
+          if (error instanceof ApplicationFailure) {
+            throw error
+          }
+          throw ApplicationFailure.nonRetryable(
+            error.message ?? `Unexpected error during verification attempt ${attempt}`,
+            'TRANSFER_VERIFICATION_ATTEMPT_FAILED',
+            { error }
+          )
+        }
+
+        if (attempt < maxAttempts) {
+          const delay = initialDelayMs * backoffCoefficient ** (attempt - 1)
+          log.info(`Waiting ${delay}ms before next verification attempt`, {
+            tableName,
+            block_num: block_num_str,
+            tx_idx: tx_idx_str,
+            log_idx: log_idx_str,
+          })
+          await sleep(delay)
+        }
+      }
+
+      log.error('Transfer indexing verification timed out after max attempts', {
+        tableName,
+        block_num: block_num_str,
+        tx_idx: tx_idx_str,
+        log_idx: log_idx_str,
+        maxAttempts,
+      })
+      throw ApplicationFailure.nonRetryable(
+        'Transfer indexing verification failed after maximum attempts',
+        'TRANSFER_VERIFICATION_TIMEOUT',
+        {
+          tableName,
+          block_num: block_num_str,
+          tx_idx: tx_idx_str,
+          log_idx: log_idx_str,
+          maxAttempts,
+        }
+      )
     },
   }
 }
