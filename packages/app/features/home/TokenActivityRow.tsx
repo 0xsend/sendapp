@@ -54,7 +54,7 @@ export function TokenActivityRow({
     if (onPress) {
       if (isUserTransfer) {
         router.push(
-          `/profile/${profile?.send_id === from_user?.send_id ? to_user?.send_id : from_user?.send_id}`
+          `/profile/${profile?.send_id === from_user?.send_id ? to_user?.send_id : from_user?.send_id}/history`
         )
         return
       }

@@ -2,7 +2,6 @@ import type { Functions } from '@my/supabase/database.types'
 import { Avatar, Card, LinkableAvatar, Paragraph, XStack } from '@my/ui'
 import { IconAccount, IconArrowRight } from 'app/components/icons'
 import { shorten } from 'app/utils/strings'
-import { useRootScreenParams } from 'app/routers/params'
 import { Platform } from 'react-native'
 import { useRouter } from 'solito/router'
 
@@ -16,23 +15,9 @@ export const ProfileHeader = ({
   recipient?: string
 }) => {
   const profileHref = profile ? `/profile/${profile?.sendid}` : ''
-  const [rootParams, setRootParams] = useRootScreenParams()
   const router = useRouter()
 
-  const handlePressOut = () => {
-    const params = {
-      ...rootParams,
-      profile: rootParams.profile ? undefined : profile?.sendid?.toString(),
-    }
-
-    if (Platform.OS === 'web') {
-      setRootParams(params)
-      return
-    }
-
-    const _params = JSON.parse(JSON.stringify(params)) //JSON makes sure we don't pass undefined values
-    router.push(`/profile/${profile?.sendid}?${new URLSearchParams(_params).toString()}`)
-  }
+  const handlePressOut = () => router.push(`/profile/${profile?.sendid}`)
 
   return (
     <Card
