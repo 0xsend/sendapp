@@ -27,30 +27,8 @@ end;
 $$;
 ALTER FUNCTION "private"."filter_send_account_transfers_with_no_send_account_created"() OWNER TO "postgres";
 
--- Delete temporal activity function
-CREATE OR REPLACE FUNCTION "public"."send_account_transfers_delete_temporal_activity"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
-declare
-    paymaster bytea = '\xb1b01dc21a6537af7f9a46c76276b14fd7ceac67'::bytea;
-    workflow_ids text[];
-begin
-    -- Check if it's from or to paymaster
-    if (NEW.f is not null and NEW.f = paymaster) or
-       (NEW.t is not null and NEW.t = paymaster) then
-        return NEW;
-    end if;
-    -- Only proceed with deletions if we have workflow IDs
-    delete from public.activity a
-    where a.event_name = 'temporal_send_account_transfers'
-      and a.event_id in (select t_sat.workflow_id
-                         from temporal.send_account_transfers t_sat
-                         where t_sat.created_at_block_num <= NEW.block_num
-                           and t_sat.status != 'failed');
-    return NEW;
-end;
-$$;
-ALTER FUNCTION "public"."send_account_transfers_delete_temporal_activity"() OWNER TO "postgres";
+-- NOTE: Removed send_account_transfers_delete_temporal_activity function
+-- Temporal cleanup is now handled by the workflow after confirmation
 
 -- Activity trigger functions
 CREATE OR REPLACE FUNCTION public.send_account_transfers_trigger_delete_activity()
@@ -168,7 +146,7 @@ CREATE UNIQUE INDEX "u_send_account_transfers" ON "public"."send_account_transfe
 -- Triggers
 CREATE OR REPLACE TRIGGER "filter_send_account_transfers_with_no_send_account_created" BEFORE INSERT ON "public"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "private"."filter_send_account_transfers_with_no_send_account_created"();
 CREATE OR REPLACE TRIGGER "send_account_transfers_trigger_delete_activity" AFTER DELETE ON "public"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."send_account_transfers_trigger_delete_activity"();
-CREATE OR REPLACE TRIGGER "send_account_transfers_trigger_delete_temporal_activity" BEFORE INSERT ON "public"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."send_account_transfers_delete_temporal_activity"();
+-- NOTE: Removed send_account_transfers_trigger_delete_temporal_activity trigger - temporal cleanup now handled by workflow
 CREATE OR REPLACE TRIGGER "send_account_transfers_trigger_insert_activity" AFTER INSERT ON "public"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."send_account_transfers_trigger_insert_activity"();
 
 -- RLS

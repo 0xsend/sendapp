@@ -12,6 +12,7 @@ const {
   upsertTemporalSendAccountTransferActivity,
   decodeTransferUserOpActivity,
   updateTemporalSendAccountTransferActivity,
+  cleanupTemporalActivityAfterConfirmation,
   getEventFromTransferActivity,
 } = proxyActivities<ReturnType<typeof createTransferActivities>>({
   // TODO: make this configurable
@@ -141,6 +142,13 @@ export async function transfer(userOp: UserOperation<'v0.7'>, note?: string) {
       event_name: eventName,
       event_id: eventId,
     },
+  })
+
+  // Clean up the temporal activity after confirmation to prevent duplicates
+  await cleanupTemporalActivityAfterConfirmation({
+    workflow_id: workflowId,
+    final_event_id: eventId,
+    final_event_name: eventName,
   })
 
   return hash

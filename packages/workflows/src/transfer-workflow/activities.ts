@@ -29,6 +29,11 @@ type TransferActivities = {
   updateTemporalSendAccountTransferActivity: (
     params: TemporalTransferUpdate
   ) => Promise<TemporalTransfer>
+  cleanupTemporalActivityAfterConfirmation: (params: {
+    workflow_id: string
+    final_event_id: string
+    final_event_name: string
+  }) => Promise<void>
   getEventFromTransferActivity: ({
     bundlerReceipt,
     token,
@@ -172,6 +177,38 @@ export const createTransferActivities = (
       }
 
       return upsertedData
+    },
+    async cleanupTemporalActivityAfterConfirmation({ workflow_id }) {
+      // Import createSupabaseAdminClient here to match pattern from supabase.ts
+      const { createSupabaseAdminClient } = await import('app/utils/supabase/admin')
+
+      const supabaseAdmin = createSupabaseAdminClient()
+
+      const { error } = await supabaseAdmin
+        .from('activity')
+        .delete()
+        .eq('event_name', 'temporal_send_account_transfers')
+        .eq('event_id', workflow_id)
+
+      if (error) {
+        if (isRetryableDBError(error)) {
+          throw ApplicationFailure.retryable(
+            'Database connection error during cleanup, retrying...',
+            error.code,
+            {
+              error,
+              workflow_id,
+            }
+          )
+        }
+
+        log.warn('Failed to cleanup temporal activity (non-critical)', {
+          error,
+          workflow_id,
+        })
+        // Don't throw - cleanup failure should not fail the entire workflow
+        // since the temporal entry will eventually be cleaned up by other means
+      }
     },
     async getEventFromTransferActivity({ bundlerReceipt, token, from, to }) {
       const logs = bundlerReceipt.logs
