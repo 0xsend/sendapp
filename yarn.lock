@@ -20022,7 +20022,7 @@ __metadata:
     expo: "npm:~52.0.23"
     expo-apple-authentication: "npm:~7.1.2"
     expo-application: "npm:~6.0.2"
-    expo-blur: "npm:^14.1.5"
+    expo-blur: "npm:~14.0.3"
     expo-build-properties: "npm:~0.13.2"
     expo-clipboard: "npm:~7.0.1"
     expo-constants: "npm:~17.0.3"
@@ -20106,6 +20106,17 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 10/2cfb444e7fa8425e4c12a10bee1c0ec58c9fd9137ad5638fb5f57f4308a3a6fb628f1fe5322864c1d32a2d7bfa04c65d08474f91a7ec162bc143ce60a5d4f17b
+  languageName: node
+  linkType: hard
+
+"expo-blur@npm:~14.0.3":
+  version: 14.0.3
+  resolution: "expo-blur@npm:14.0.3"
+  peerDependencies:
+    expo: "*"
+    react: "*"
+    react-native: "*"
+  checksum: 10/c69dfb542530dae4ca66caf341b8e72f1555ef0cf700c94603e487a31d53f31885a03f3aadd208e9d531969dbcd558856f4475ccb9b77a37580fc6062dee4cda
   languageName: node
   linkType: hard
 

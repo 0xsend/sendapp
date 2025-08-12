@@ -107,6 +107,7 @@ export function OnboardingScreen() {
       })
       replace('/')
     } catch (error) {
+      console.error(error)
       console.error('Error creating account', error)
 
       // Check for authentication errors
