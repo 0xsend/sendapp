@@ -10,15 +10,28 @@ import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { HomeLayout } from 'app/features/home/layout.web'
 import { buildSeo } from 'utils/seo'
 import { generateProfileSeoData, type ProfileSeoData } from 'utils/seoHelpers'
+import { useEffect } from 'react'
+import { useUser } from 'app/utils/useUser'
+import { useSetReferralCode } from 'app/utils/useReferralCode'
 
 import { ProfileTopNav } from 'app/components/ProfileTopNav'
 
 interface PageProps {
   sendid: number | null
   seo: ReturnType<typeof buildSeo>
+  resolvedTag?: string
 }
 
-export const Page: NextPageWithLayout<PageProps> = ({ sendid }) => {
+export const Page: NextPageWithLayout<PageProps> = ({ sendid, resolvedTag }) => {
+  const { session } = useUser()
+  const { mutateAsync: setReferralCodeMutateAsync } = useSetReferralCode()
+
+  useEffect(() => {
+    if (!session && resolvedTag) {
+      void setReferralCodeMutateAsync(resolvedTag)
+    }
+  }, [session, resolvedTag, setReferralCodeMutateAsync])
+
   return <ProfileScreen sendid={sendid} />
 }
 
@@ -131,6 +144,7 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
     props: {
       sendid: profile.sendid,
       seo,
+      resolvedTag: tag,
     },
   }
 }) satisfies GetServerSideProps
