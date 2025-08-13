@@ -1,14 +1,115 @@
 #!/bin/bash
 
 echo "Running pre-install EAS hook..."
+
+# Function to detect appropriate shell configuration file
+detect_shell_config() {
+    if [ -n "$ZSH_VERSION" ]; then
+        echo "$HOME/.zshenv"
+    elif [ -n "$BASH_VERSION" ]; then
+        echo "$HOME/.bashrc"
+    else
+        # Fallback - try to detect from $SHELL
+        case "$SHELL" in
+            */zsh) echo "$HOME/.zshenv" ;;
+            */bash) echo "$HOME/.bashrc" ;;
+            *) echo "$HOME/.profile" ;;  # Universal fallback
+        esac
+    fi
+}
+
+# Function to create config file if it doesn't exist
+ensure_shell_config() {
+    local config_file="$1"
+    if [ ! -f "$config_file" ]; then
+        touch "$config_file"
+        echo "Created shell config file: $config_file"
+    fi
+}
+
+# Function to safely add PATH to config file
+add_to_path() {
+    local path_dir="$1"
+    local config_file="$2"
+    
+    if ! grep -q "$path_dir" "$config_file" 2>/dev/null; then
+        echo "export PATH=\"$path_dir:\$PATH\"" >> "$config_file"
+        echo "Added $path_dir to PATH in $config_file"
+    fi
+}
+
+# Detect shell and config file
+SHELL_CONFIG=$(detect_shell_config)
+echo "Detected shell config file: $SHELL_CONFIG"
+
+# Ensure config file exists
+ensure_shell_config "$SHELL_CONFIG"
+
 echo "Installing Foundry..."
+# Install Foundry
 curl -L https://foundry.paradigm.xyz | bash
-source ~/.zshenv
-foundryup
+
+# Add Foundry to PATH immediately for this session
+export PATH="$HOME/.foundry/bin:$PATH"
+
+# Add Foundry to shell config for persistence
+add_to_path "$HOME/.foundry/bin" "$SHELL_CONFIG"
+
+# Source the config file if it exists and is readable
+if [ -f "$SHELL_CONFIG" ] && [ -r "$SHELL_CONFIG" ]; then
+    source "$SHELL_CONFIG" 2>/dev/null || echo "Note: Could not source $SHELL_CONFIG, but PATH is set for current session"
+fi
+
+# Run foundryup with error handling
+echo "Running foundryup..."
+if command -v foundryup >/dev/null 2>&1; then
+    foundryup
+else
+    echo "foundryup not found in PATH, trying direct execution..."
+    if [ -f "$HOME/.foundry/bin/foundryup" ]; then
+        "$HOME/.foundry/bin/foundryup"
+    else
+        echo "ERROR: foundryup not found. Foundry installation may have failed."
+        exit 1
+    fi
+fi
+
 echo "Installing Bun..."
+# Install Bun
 curl -fsSL https://bun.sh/install | bash
+
+# Add Bun to PATH immediately for this session
 export PATH="$HOME/.bun/bin:$PATH"
-source ~/.zshenv
+
+# Add Bun to shell config for persistence
+add_to_path "$HOME/.bun/bin" "$SHELL_CONFIG"
+
+# Source the config file again if it exists and is readable
+if [ -f "$SHELL_CONFIG" ] && [ -r "$SHELL_CONFIG" ]; then
+    source "$SHELL_CONFIG" 2>/dev/null || echo "Note: Could not source $SHELL_CONFIG, but PATH is set for current session"
+fi
+
 echo "Verifying installations..."
-which forge
-which bun
+echo "Current PATH: $PATH"
+
+# Verify Foundry installation
+if command -v forge >/dev/null 2>&1; then
+    echo "✓ Foundry (forge) installed successfully: $(which forge)"
+else
+    echo "⚠ Foundry (forge) not found in PATH"
+    if [ -f "$HOME/.foundry/bin/forge" ]; then
+        echo "  But found at: $HOME/.foundry/bin/forge"
+    fi
+fi
+
+# Verify Bun installation
+if command -v bun >/dev/null 2>&1; then
+    echo "✓ Bun installed successfully: $(which bun)"
+else
+    echo "⚠ Bun not found in PATH"
+    if [ -f "$HOME/.bun/bin/bun" ]; then
+        echo "  But found at: $HOME/.bun/bin/bun"
+    fi
+fi
+
+echo "Pre-install hook completed."
