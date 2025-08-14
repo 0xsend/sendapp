@@ -51,9 +51,9 @@ const Providers = compose([
   QueryClientProvider,
   UniversalThemeProvider,
   SafeAreaProvider,
+  CoinsProvider,
   TamaguiProvider,
   ToastProvider,
   ScrollDirectionProvider,
-  CoinsProvider,
   ActivityDetailsProvider,
 ])
