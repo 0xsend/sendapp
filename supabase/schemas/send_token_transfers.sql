@@ -94,7 +94,4 @@ GRANT ALL ON SEQUENCE "public"."send_token_transfers_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."send_token_transfers_id_seq" TO "service_role";
 
 -- Triggers
-CREATE OR REPLACE TRIGGER "insert_verification_send_ceiling_trigger" AFTER INSERT ON "public"."send_token_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."insert_verification_send_ceiling"();
-CREATE OR REPLACE TRIGGER "insert_verification_sends" AFTER INSERT ON "public"."send_token_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."insert_verification_sends"();
-CREATE OR REPLACE TRIGGER "insert_send_streak_verification" AFTER INSERT ON "public"."send_token_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."insert_send_streak_verification"();
 CREATE OR REPLACE TRIGGER "filter_send_token_transfers_with_no_send_account_created" BEFORE INSERT ON "public"."send_token_transfers" FOR EACH ROW EXECUTE FUNCTION "private"."filter_send_token_transfers_with_no_send_account_created"();
