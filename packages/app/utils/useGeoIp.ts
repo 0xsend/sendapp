@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { Platform } from 'react-native'
 
 type GeoIp = {
   /**
@@ -8,7 +9,16 @@ type GeoIp = {
 }
 
 const fetchGeoIp = async () => {
-  const response = await fetch('https://ipapi.co/json/')
+  const response = await fetch(
+    'https://ipapi.co/json/',
+    Platform.OS !== 'web'
+      ? {
+          headers: {
+            'User-Agent': 'SendApp/1.0',
+          },
+        }
+      : {}
+  )
   if (!response.ok) {
     throw new Error('Failed to fetch geo IP data')
   }
