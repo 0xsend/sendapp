@@ -14,14 +14,24 @@ type Base64URLString = string
 export async function createPasskey({
   user,
   keySlot,
-  challenge,
+  // challenge,
   accountName,
-}: { user: { id: string }; keySlot: number; challenge: string; accountName: string }): Promise<
-  [RegistrationResponseJSON, ParsedCredAuthData]
-> {
+}: {
+  user: { id: string }
+  keySlot: number
+  challenge: string
+  accountName: string
+}): Promise<[RegistrationResponseJSON, ParsedCredAuthData]> {
   if (!isSupported()) {
     throw new Error('Passkeys not supported')
   }
+
+  // Generate proper 32-byte challenge
+  const challengeBytes = new Uint8Array(32)
+  for (let i = 0; i < 32; i++) {
+    challengeBytes[i] = Math.floor(Math.random() * 256)
+  }
+  const challenge = base64urlnopad.encode(challengeBytes)
 
   return await create(
     createSendAccountPasskeyArgs({
@@ -58,6 +68,17 @@ export function createSendAccountPasskeyArgs({
 }): PublicKeyCredentialCreationOptionsJSON {
   const passkeyName = `${user.id}.${keySlot}` // 64 bytes max
   const id = base64urlnopad.encode(Buffer.from(passkeyName))
+
+  console.log('=== Passkey Creation Debug ===')
+  console.log('rpId:', getRpId())
+  console.log('user.id length:', user.id?.length)
+  console.log('passkeyName:', passkeyName)
+  console.log('passkeyName length:', passkeyName.length)
+  console.log('challenge:', challenge)
+  console.log('challenge length:', challenge.length)
+  console.log('accountName:', accountName)
+  console.log('accountName:', accountName.length)
+
   return {
     challenge,
     user: {
@@ -71,8 +92,9 @@ export function createSendAccountPasskeyArgs({
       id: getRpId(),
     },
     authenticatorSelection: {
-      userVerification: 'required',
-      residentKey: 'required',
+      userVerification: 'preferred',
+      residentKey: 'preferred',
+      requireResidentKey: false, // Add this
     },
   } as const satisfies PublicKeyCredentialCreationOptionsJSON
 }
