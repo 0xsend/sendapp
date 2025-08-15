@@ -5,13 +5,13 @@ runs:
   steps:
     - uses: supabase/setup-cli@v1
       with:
-        version: latest
+        version: 2.30.4
     - name: Start Supabase Local Instance
       shell: bash
       run: |
         # Start Supabase local instance
         supabase start --ignore-health-check
-        
+
         # Wait for database to be ready
         echo "Waiting for database to be ready..."
         timeout=60
@@ -25,7 +25,7 @@ runs:
           sleep 2
           count=$((count + 2))
         done
-        
+
         if [ $count -ge $timeout ]; then
           echo "Timeout waiting for database to start"
           supabase status
