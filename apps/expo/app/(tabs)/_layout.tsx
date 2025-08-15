@@ -11,7 +11,7 @@ const TABS = [
   {
     key: 'index',
     title: () => (
-      <XStack ai="center" jc="flex-start" f={1}>
+      <XStack ai="center" jc="flex-start">
         <IconSendLogo size={'$2'} color={'$color12'} />
       </XStack>
     ),
