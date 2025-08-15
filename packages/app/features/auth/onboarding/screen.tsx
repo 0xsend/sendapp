@@ -170,7 +170,7 @@ export function OnboardingScreen() {
         }}
       >
         <FormProvider {...form}>
-          <YStack w={'100%'} ai={'center'}>
+          <YStack w={'100%'} ai={'center'} height={112}>
             <SchemaForm
               form={form}
               onSubmit={handleSubmit}

@@ -204,7 +204,7 @@ export const SignUpScreen = () => {
         }}
       >
         <FormProvider {...form}>
-          <YStack w={'100%'} ai={'center'}>
+          <YStack w={'100%'} ai={'center'} height={200}>
             <SchemaForm
               form={form}
               onSubmit={handleSubmit}
@@ -269,7 +269,7 @@ export const SignUpScreen = () => {
               {({ name, isAgreedToTerms }) => {
                 return (
                   <>
-                    <YStack gap={'$2'}>
+                    <YStack gap={'$3.5'}>
                       <XStack position="relative">
                         {name}
                         <XStack
@@ -292,6 +292,7 @@ export const SignUpScreen = () => {
                           htmlFor={termsCheckboxId}
                           color={'$lightGrayTextField'}
                           $theme-light={{ color: '$darkGrayTextField' }}
+                          lineHeight={16}
                           pressStyle={{
                             color: isDarkTheme ? '$lightGrayTextField' : '$darkGrayTextField',
                           }}
