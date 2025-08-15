@@ -1,9 +1,10 @@
 import { LinearGradient } from '@tamagui/linear-gradient'
 import { Check, ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
 import { useTsController } from '@ts-react/form'
-import { countries } from 'app/utils/country'
+import { countries, type Country } from 'app/utils/country'
 import { useGeoIp } from 'app/utils/useGeoIp'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { FlatList, type ListRenderItem } from 'react-native'
 import {
   Adapt,
   Fieldset,
@@ -16,6 +17,38 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
+
+const ITEM_HEIGHT = 56
+
+// Country item component for FlatList
+const CountryItem = ({
+  country,
+  onSelect,
+  isSelected,
+}: {
+  country: Country
+  onSelect: (country: Country) => void
+  isSelected: boolean
+  themeName: string
+}) => {
+  return (
+    <XStack
+      paddingHorizontal="$4"
+      paddingVertical="$3"
+      alignItems="center"
+      backgroundColor={isSelected ? '$color4' : 'transparent'}
+      pressStyle={{ backgroundColor: '$color3' }}
+      onPress={() => onSelect(country)}
+      cursor="pointer"
+      height={ITEM_HEIGHT}
+    >
+      <Text fontSize="$4" flex={1}>
+        {country.flag}&nbsp;+{country.dialCode} {country.name}
+      </Text>
+      {isSelected && <Check size={16} color="$color12" />}
+    </XStack>
+  )
+}
 
 export const CountryCodeField = ({
   native = false,
@@ -41,6 +74,36 @@ export const CountryCodeField = ({
     if (!country?.dialCode || field.value === country.dialCode) return
     field.onChange(country.dialCode)
   }, [country?.dialCode, field.onChange, field.value])
+
+  // FlatList callbacks
+  const handleCountrySelect = useCallback((selectedCountry: Country) => {
+    setCountry(selectedCountry)
+    // Close the sheet by setting isOpen to false
+    setIsOpen(false)
+  }, [])
+
+  const renderCountryItem: ListRenderItem<Country> = useCallback(
+    ({ item }) => (
+      <CountryItem
+        country={item}
+        onSelect={handleCountrySelect}
+        isSelected={country?.code === item.code}
+        themeName={themeName}
+      />
+    ),
+    [country?.code, handleCountrySelect, themeName]
+  )
+
+  const keyExtractor = useCallback((item: Country) => item.code, [])
+
+  const getItemLayout = useCallback(
+    (data: ArrayLike<Country> | null | undefined, index: number) => ({
+      length: ITEM_HEIGHT,
+      offset: ITEM_HEIGHT * index,
+      index,
+    }),
+    []
+  )
 
   const countryOptions = useMemo(() => {
     return countries?.map((country, i) => {
@@ -68,6 +131,7 @@ export const CountryCodeField = ({
     <Theme name={error ? 'red' : themeName} forceClassName>
       <Fieldset>
         <Select
+          open={isOpen}
           native={native}
           autoComplete="tel-country-code"
           onOpenChange={setIsOpen}
@@ -107,11 +171,22 @@ export const CountryCodeField = ({
           </Select.Trigger>
 
           <Adapt platform="touch" when="sm">
-            <Sheet native modal dismissOnSnapToBottom>
+            <Sheet open={isOpen} native modal dismissOnSnapToBottom disableDrag={true}>
               <Sheet.Frame>
-                <Sheet.ScrollView>
-                  <Adapt.Contents />
-                </Sheet.ScrollView>
+                <YStack flex={1} paddingTop="$4">
+                  <Text fontSize="$6" fontWeight="bold" paddingHorizontal="$4" paddingBottom="$3">
+                    Select Country
+                  </Text>
+                  <FlatList
+                    data={countries}
+                    renderItem={renderCountryItem}
+                    keyExtractor={keyExtractor}
+                    getItemLayout={getItemLayout}
+                    showsVerticalScrollIndicator={true}
+                    bounces={false}
+                    style={{ flex: 1 }}
+                  />
+                </YStack>
               </Sheet.Frame>
               <Sheet.Overlay />
             </Sheet>
