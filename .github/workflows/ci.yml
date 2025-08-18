@@ -378,7 +378,7 @@ jobs:
   playwright-merge-reports:
     name: Playwright Merge Reports
     runs-on: ubuntu-latest
-    if: ${{ !cancelled() }}
+    if: false
     needs: [playwright-tests]
     # for writing PR comments
     permissions:
