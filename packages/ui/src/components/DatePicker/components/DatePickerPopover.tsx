@@ -50,17 +50,17 @@ export const DatePickerPopover = ({
   }, [hideDatePickerOnScrollOnWeb])
 
   return (
-    <DatePickerProvider config={config}>
-      <Popover ref={popoverRef} keepChildrenMounted size="$5" allowFlip {...rest}>
-        <Adapt when="sm">
-          <Popover.Sheet modal dismissOnSnapToBottom snapPointsMode="fit">
-            <Popover.Sheet.Frame padding="$8" alignItems="center">
+    <Popover ref={popoverRef} keepChildrenMounted size="$5" allowFlip {...rest}>
+      <Adapt when="sm">
+        <Popover.Sheet modal dismissOnSnapToBottom snapPointsMode="fit">
+          <Popover.Sheet.Frame padding="$8" alignItems="center">
+            <DatePickerProvider config={config}>
               <Adapt.Contents />
-            </Popover.Sheet.Frame>
-          </Popover.Sheet>
-        </Adapt>
-        {children}
-      </Popover>
-    </DatePickerProvider>
+            </DatePickerProvider>
+          </Popover.Sheet.Frame>
+        </Popover.Sheet>
+      </Adapt>
+      <DatePickerProvider config={config}>{children}</DatePickerProvider>
+    </Popover>
   )
 }
