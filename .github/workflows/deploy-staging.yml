@@ -52,6 +52,7 @@ jobs:
         uses: ./.github/actions/supabase-schema-drift-check
 
   build-distributor:
+    if: false
     name: Build Distributor Docker Image
     uses: ./.github/workflows/build-distributor.yml
     permissions:
@@ -62,6 +63,7 @@ jobs:
     secrets: inherit
 
   build-shovel:
+    if: false
     name: Build Shovel Docker Image
     uses: ./.github/workflows/build-shovel.yml
     permissions:
