@@ -39,7 +39,7 @@ concurrency:
 jobs:
   schema-drift-check:
     name: Check Schema Drift
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     permissions:
       contents: read
     steps:
@@ -72,7 +72,7 @@ jobs:
 
   deploy:
     needs: [schema-drift-check]
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     permissions:
       contents: read
     steps:

@@ -24,7 +24,7 @@ on:
 
 jobs:
   build-shovel:
-    runs-on: arc-runner-set
+    runs-on: blacksmith-8vcpu-ubuntu-2404
     permissions:
       contents: read
       packages: write

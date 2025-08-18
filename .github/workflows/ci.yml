@@ -15,7 +15,7 @@ jobs:
     # Only build images for PRs and manual triggers, not for pushes to main/dev (handled by deploy workflows)
     if: false
     # runs-on: ubuntu-latest
-    runs-on: arc-runner-set
+    runs-on: blacksmith-8vcpu-ubuntu-2404
     permissions:
       contents: read
     outputs:
@@ -85,7 +85,7 @@ jobs:
 
   supabase-schema-drift-check:
     name: Supabase Schema Drift Check
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     permissions:
       contents: read
     steps:
@@ -95,7 +95,7 @@ jobs:
 
   unit-tests:
     name: Unit Tests
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     permissions:
       contents: read
     env:
@@ -140,7 +140,7 @@ jobs:
 
   lint:
     name: Lint
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     permissions:
       contents: read
     env:
@@ -197,7 +197,7 @@ jobs:
     # Only run playwright tests when we build the image (PRs and manual triggers)
     if: false
     # arc-runner-set had a good run
-    runs-on: arc-runner-set
+    runs-on: blacksmith-8vcpu-ubuntu-2404
     # runs-on: ubuntu-latest
     strategy:
       # Don't stop all shards if one fails
@@ -377,7 +377,7 @@ jobs:
 
   playwright-merge-reports:
     name: Playwright Merge Reports
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     if: false
     needs: [playwright-tests]
     # for writing PR comments
@@ -439,7 +439,7 @@ jobs:
   vercel-deploy-preview:
     # **always** skip if on dev and main since it will be deployed with another workflow
     if: ${{ github.ref != 'refs/heads/dev' && github.ref != 'refs/heads/main' && github.head_ref != 'dev' && github.head_ref != 'main'  }}
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     permissions:
       contents: read
