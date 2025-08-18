@@ -17,7 +17,7 @@ import { ProfileSchema, useProfileMutation } from 'app/utils/useProfileMutation'
 import { useUser } from 'app/utils/useUser'
 import { UploadAvatar, type UploadAvatarRefObject } from '../uploadProfileImage/screen'
 import { UploadBanner, type UploadBannerRefObject } from '../UploadProfileBanner'
-import { useCallback, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import type { Tables } from '@my/supabase/database.types'
 import { Check } from '@tamagui/lucide-icons'
 import { SettingsHeader } from 'app/features/account/components/SettingsHeader'
@@ -147,22 +147,6 @@ function EditProfileForm({ profile, onSave }: { profile: Tables<'profiles'>; onS
   const { mutateAsync, error } = useProfileMutation(id)
   const form = useForm<z.infer<typeof ProfileSchema>>()
 
-  const renderAfterContent = useCallback(
-    ({ submit }: { submit: () => void }) => (
-      <YStack>
-        <SubmitButton onPress={() => submit()}>
-          <SubmitButton.Text>SAVE CHANGES</SubmitButton.Text>
-        </SubmitButton>
-        {error && (
-          <Paragraph marginTop={'$3'} theme="red" color="$color9">
-            {error.message}
-          </Paragraph>
-        )}
-      </YStack>
-    ),
-    [error]
-  )
-
   const handleSubmit = async () => {
     const values = form.getValues()
     await mutateAsync(values)
@@ -203,23 +187,32 @@ function EditProfileForm({ profile, onSave }: { profile: Tables<'profiles'>; onS
         },
       }}
       onSubmit={handleSubmit}
-      renderAfter={renderAfterContent}
     >
       {({ name, about, isPublic }) => (
-        <FadeCard>
-          <FieldWithLabel label={'Name'} gap={'$2'}>
-            {name}
-          </FieldWithLabel>
-          <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
-          <FieldWithLabel label={'About'} gap={'$2'}>
-            {about}
-          </FieldWithLabel>
-          <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
-          <XStack gap={'$3'} ai={'center'}>
-            {isPublic}
-            <Paragraph size={'$5'}>Make Profile Public</Paragraph>
-          </XStack>
-        </FadeCard>
+        <YStack gap={'$3.5'} $platform-android={{ height: 500 }}>
+          <FadeCard>
+            <FieldWithLabel label={'Name'} gap={'$2'}>
+              {name}
+            </FieldWithLabel>
+            <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
+            <FieldWithLabel label={'About'} gap={'$2'}>
+              {about}
+            </FieldWithLabel>
+            <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
+            <XStack gap={'$3'} ai={'center'}>
+              {isPublic}
+              <Paragraph size={'$5'}>Make Profile Public</Paragraph>
+            </XStack>
+          </FadeCard>
+          <SubmitButton onPress={() => form.handleSubmit(handleSubmit)()}>
+            <SubmitButton.Text>SAVE CHANGES</SubmitButton.Text>
+          </SubmitButton>
+          {error && (
+            <Paragraph theme="red" color="$color9">
+              {error.message}
+            </Paragraph>
+          )}
+        </YStack>
       )}
     </SchemaForm>
   )
