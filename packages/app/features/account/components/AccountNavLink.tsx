@@ -3,6 +3,7 @@ import type { ReactElement, ReactNode } from 'react'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { ChevronRight } from '@tamagui/lucide-icons'
 import { Linking, Platform, Pressable } from 'react-native'
+import { useLink } from 'solito/link'
 
 export function AccountNavLink({
   text,
@@ -40,10 +41,31 @@ export function AccountNavLink({
     )
   }
 
+  if (Platform.OS === 'web') {
+    return (
+      <Link href={href} {...props}>
+        <LinkContent icon={icon} text={text} />
+      </Link>
+    )
+  }
+
+  return <NativeAccountNavLink icon={icon} text={text} href={href} />
+}
+
+const NativeAccountNavLink = ({
+  text,
+  icon,
+  href,
+}: {
+  text: string
+  icon: ReactNode
+  href: string
+}) => {
+  const linkProps = useLink({ href })
   return (
-    <Link href={href} {...props}>
+    <XStack {...linkProps}>
       <LinkContent icon={icon} text={text} />
-    </Link>
+    </XStack>
   )
 }
 

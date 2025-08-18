@@ -3,11 +3,11 @@ import type { YStackProps } from 'tamagui'
 import { IconAccount, IconQRFull, IconShare } from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
 import { ReferralLink } from 'app/components/ReferralLink'
-import { useEffect, useState } from 'react'
-import * as Sharing from 'expo-sharing'
+import { useState } from 'react'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { ShareProfileDialog } from './ShareProfileDialog'
 import { Link } from 'solito/link'
+import { Platform, Share } from 'react-native'
 
 export const AccountHeader = (props: YStackProps) => {
   const { profile } = useUser()
@@ -15,25 +15,14 @@ export const AccountHeader = (props: YStackProps) => {
   const name = profile?.name
   const referralCode = profile?.main_tag?.name || profile?.referral_code
   const referralHref = `https://send.app?referral=${referralCode}`
-  const [canShare, setCanShare] = useState(false)
   const [shareDialogOpen, setShareDialogOpen] = useState(false)
   const hoverStyles = useHoverStyles()
 
-  useEffect(() => {
-    const canShare = async () => {
-      const canShare = await Sharing.isAvailableAsync()
-      setCanShare(canShare)
-    }
-
-    void canShare()
-  }, [])
-
   const handleSharePress = async () => {
-    if (!canShare) {
-      return
-    }
-
-    void Sharing.shareAsync(referralHref).catch(() => null)
+    void Share.share({
+      message: referralHref,
+      url: referralHref,
+    }).catch(() => null)
   }
 
   return (
@@ -42,10 +31,18 @@ export const AccountHeader = (props: YStackProps) => {
         <FadeCard>
           <XStack gap={'$3.5'}>
             <Avatar size={'$7'} br={'$4'}>
-              <Avatar.Image src={avatar_url ?? ''} />
-              <Avatar.Fallback f={1} ai={'center'} theme="green_active" bc="$color2">
-                <IconAccount $theme-light={{ color: '$color12' }} />
-              </Avatar.Fallback>
+              {Platform.OS === 'android' && !avatar_url ? (
+                <XStack f={1} bc="$color2">
+                  <IconAccount color={'$primary'} $theme-light={{ color: '$color12' }} />
+                </XStack>
+              ) : (
+                <>
+                  <Avatar.Image src={avatar_url ?? ''} />
+                  <Avatar.Fallback f={1} ai={'center'} bc="$color2">
+                    <IconAccount color={'$primary'} $theme-light={{ color: '$color12' }} />
+                  </Avatar.Fallback>
+                </>
+              )}
             </Avatar>
             <YStack jc={'space-between'} f={1}>
               <Paragraph size={'$8'} fontWeight={600} numberOfLines={1}>
