@@ -167,6 +167,12 @@ const CreatePasskeyForm = ({
               als: 'flex-start',
             },
             px: '$0',
+            // Add Android-specific height handling
+            ...(Platform.OS === 'android' && {
+              minHeight: 'auto',
+              height: 'auto',
+              flex: 0,
+            }),
           }}
           defaultValues={{
             accountName: deviceName,

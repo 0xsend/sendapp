@@ -24,7 +24,6 @@ import { defaultUserOp } from 'app/utils/userOpConstants'
 import { useAccountNonce } from 'app/utils/userop'
 import debug from 'debug'
 import type { UserOperation } from 'permissionless'
-import { useCallback } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { createParam } from 'solito'
 import { useRouter } from 'solito/router'
@@ -84,7 +83,7 @@ export const ConfirmPasskeyScreen = () => {
 
 const AddPasskeySigner = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_credentials'> }) => {
   return (
-    <Fade>
+    <Fade gap={'$3.5'} $platform-android={{ height: 500 }}>
       <FormWrapper
         elevation={'$0.75'}
         w={'100%'}
@@ -93,6 +92,7 @@ const AddPasskeySigner = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cre
         borderRadius={'$5'}
         p={'$5'}
         $gtLg={{ p: '$7', gap: '$5', als: 'flex-start', maxWidth: '100%' }}
+        f={0}
       >
         <H1 fontSize={'$8'} fontWeight={'600'} color="$color12">
           Add Passkey as Signer
@@ -105,8 +105,8 @@ const AddPasskeySigner = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cre
           has been saved. Add your new passkey as a signer. This will allow you to sign transactions
           on your account with your new passkey.
         </Paragraph>
-        <AddSignerButton webauthnCred={webauthnCred} />
       </FormWrapper>
+      <AddSignerButton webauthnCred={webauthnCred} />
     </Fade>
   )
 }
@@ -246,15 +246,6 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
 
   const isLoading = isLoadingNonce || isLoadingGasFees || isLoadingSendAccount || isLoadingUserOp
 
-  const renderAfterContent = useCallback(
-    ({ submit }: { submit: () => void }) => (
-      <SubmitButton onPress={submit} disabled={isLoading}>
-        <SubmitButton.Text>Add Passkey as Signer</SubmitButton.Text>
-      </SubmitButton>
-    ),
-    [isLoading]
-  )
-
   return (
     <FormProvider {...form}>
       <SchemaForm
@@ -271,16 +262,18 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
         }}
         schema={z.object({})}
         onSubmit={onSubmit}
-        renderAfter={renderAfterContent}
       >
         {() => (
-          <>
+          <YStack gap={'$3.5'}>
+            <SubmitButton onPress={() => form.handleSubmit(onSubmit)()} disabled={isLoading}>
+              <SubmitButton.Text>Add Passkey as Signer</SubmitButton.Text>
+            </SubmitButton>
             {form.formState.errors?.root?.message ? (
               <Paragraph size={'$6'} fontWeight={'300'} color={'$error'}>
                 {form.formState.errors?.root?.message}
               </Paragraph>
             ) : null}
-          </>
+          </YStack>
         )}
       </SchemaForm>
     </FormProvider>
