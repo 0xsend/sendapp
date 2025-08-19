@@ -51,7 +51,7 @@ ALTER TABLE ONLY "public"."affiliate_stats"
 -- RLS
 ALTER TABLE "public"."affiliate_stats" ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "User can see own affiliate stats" ON "public"."affiliate_stats" FOR SELECT USING (("auth"."uid"() = "user_id"));
+CREATE POLICY "User can see own affiliate stats" ON "public"."affiliate_stats" FOR SELECT USING (((SELECT auth.uid()) = "user_id"));
 
 GRANT ALL ON FUNCTION "public"."get_affiliate_stats_summary"() TO "anon";
 GRANT ALL ON FUNCTION "public"."get_affiliate_stats_summary"() TO "authenticated";
