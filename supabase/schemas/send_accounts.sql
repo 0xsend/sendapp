@@ -35,11 +35,11 @@ ALTER TABLE ONLY "public"."send_accounts"
 -- RLS
 ALTER TABLE "public"."send_accounts" ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "insert_own_accounts" ON "public"."send_accounts" FOR INSERT TO "authenticated" WITH CHECK (("auth"."uid"() = "user_id"));
+CREATE POLICY "insert_own_accounts" ON "public"."send_accounts" FOR INSERT TO "authenticated" WITH CHECK (((SELECT auth.uid()) = "user_id"));
 
-CREATE POLICY "select_own_accounts" ON "public"."send_accounts" FOR SELECT TO "authenticated" USING (("auth"."uid"() = "user_id"));
+CREATE POLICY "select_own_accounts" ON "public"."send_accounts" FOR SELECT TO "authenticated" USING (((SELECT auth.uid()) = "user_id"));
 
-CREATE POLICY "update_own_accounts" ON "public"."send_accounts" FOR UPDATE TO "authenticated" USING (("auth"."uid"() = "user_id"));
+CREATE POLICY "update_own_accounts" ON "public"."send_accounts" FOR UPDATE TO "authenticated" USING (((SELECT auth.uid()) = "user_id"));
 
 -- Grants
 GRANT ALL ON TABLE "public"."send_accounts" TO "anon";

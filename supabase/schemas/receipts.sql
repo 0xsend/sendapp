@@ -38,7 +38,7 @@ ALTER TABLE ONLY "public"."receipts"
 -- RLS
 ALTER TABLE "public"."receipts" ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Receipts are viewable by users." ON "public"."receipts" FOR SELECT USING (("auth"."uid"() = "user_id"));
+CREATE POLICY "Receipts are viewable by users." ON "public"."receipts" FOR SELECT USING (((SELECT auth.uid()) = "user_id"));
 
 -- Grants
 GRANT ALL ON TABLE "public"."receipts" TO "anon";

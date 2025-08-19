@@ -1018,7 +1018,7 @@ CREATE POLICY "Enable read access to public" ON "public"."distributions" FOR SEL
 
 -- distribution_shares table
 ALTER TABLE ONLY "public"."distribution_shares" ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "User can see own shares" ON "public"."distribution_shares" FOR SELECT USING (("user_id" = "auth"."uid"()));
+CREATE POLICY "User can see own shares" ON "public"."distribution_shares" FOR SELECT USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
 -- distribution_verifications table
 ALTER TABLE ONLY "public"."distribution_verifications" ENABLE ROW LEVEL SECURITY;

@@ -66,11 +66,11 @@ ALTER TABLE ONLY "public"."profiles"
 -- RLS
 ALTER TABLE "public"."profiles" ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Profiles are viewable by users who created them." ON "public"."profiles" FOR SELECT USING (("auth"."uid"() = "id"));
+CREATE POLICY "Profiles are viewable by users who created them." ON "public"."profiles" FOR SELECT USING (((SELECT auth.uid()) = "id"));
 
-CREATE POLICY "Users can insert their own profile." ON "public"."profiles" FOR INSERT WITH CHECK (("auth"."uid"() = "id"));
+CREATE POLICY "Users can insert their own profile." ON "public"."profiles" FOR INSERT WITH CHECK (((SELECT auth.uid()) = "id"));
 
-CREATE POLICY "Users can update own profile." ON "public"."profiles" FOR UPDATE USING (("auth"."uid"() = "id"));
+CREATE POLICY "Users can update own profile." ON "public"."profiles" FOR UPDATE USING (((SELECT auth.uid()) = "id"));
 
 -- Grants
 GRANT ALL ON TABLE "public"."profiles" TO "anon";
