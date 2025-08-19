@@ -17,6 +17,7 @@ import { useFriendsFeed } from 'app/features/affiliate/utils/useFriendsFeed'
 import { ReferralLink } from 'app/components/ReferralLink'
 import { RecyclerListView } from 'recyclerlistview'
 import { useLink } from 'solito/link'
+import { Platform } from 'react-native'
 
 type Referral = Functions<'get_friends'>[number]
 
@@ -114,16 +115,24 @@ const FriendMobileRow = ({ referral }: { referral: Referral }) => {
     <Card w={'100%'} gap={'$3.5'} br={'$5'} p={'$3.5'} {...linkProps}>
       <XStack w={'100%'} ai={'center'}>
         <XStack f={1} w={'100%'} gap={'$3.5'}>
-          <Avatar size="$4.5" br="$4" gap="$2">
-            <Avatar.Image src={referral.avatar_url ?? ''} />
-            <Avatar.Fallback jc="center" bc="$olive">
-              <Avatar size="$4.5" br="$4">
-                <Avatar.Image
-                  src={`https://ui-avatars.com/api/?name=${referral.tag}&size=256&format=png&background=86ad7f`}
-                />
-              </Avatar>
-            </Avatar.Fallback>
-          </Avatar>
+          {Platform.OS === 'android' && !referral.avatar_url ? (
+            <Avatar size="$4.5" br="$4">
+              <Avatar.Image
+                src={`https://ui-avatars.com/api/?name=${referral.tag}&size=256&format=png&background=86ad7f`}
+              />
+            </Avatar>
+          ) : (
+            <Avatar size="$4.5" br="$4" gap="$2">
+              <Avatar.Image src={referral.avatar_url ?? ''} />
+              <Avatar.Fallback jc="center" bc="$olive">
+                <Avatar size="$4.5" br="$4">
+                  <Avatar.Image
+                    src={`https://ui-avatars.com/api/?name=${referral.tag}&size=256&format=png&background=86ad7f`}
+                  />
+                </Avatar>
+              </Avatar.Fallback>
+            </Avatar>
+          )}
           <YStack gap={'$2'} f={1}>
             <Paragraph lineHeight={20}>{label}</Paragraph>
             <XStack gap={'$2'} alignItems={'center'}>
