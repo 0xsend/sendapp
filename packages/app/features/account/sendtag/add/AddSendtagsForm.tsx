@@ -113,6 +113,7 @@ export const AddSendtagsForm = () => {
                       '$theme-light': {
                         placeholderTextColor: '$darkGrayTextField',
                       },
+                      fieldsetProps: { width: '100%' },
                       fontSize: '$8',
                       onFocus: () => setIsInputFocused(true),
                       onBlur: () => setIsInputFocused(false),
