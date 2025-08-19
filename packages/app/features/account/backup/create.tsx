@@ -154,7 +154,7 @@ const CreatePasskeyForm = ({
   )
 
   return (
-    <FadeCard>
+    <FadeCard $platform-android={{ height: 405 }}>
       <FormProvider {...form}>
         <SchemaForm
           form={form}

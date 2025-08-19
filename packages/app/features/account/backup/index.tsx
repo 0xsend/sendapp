@@ -300,28 +300,28 @@ const WebAuthnCred = ({
                       )
                     case !isActive:
                       return (
-                        <YStack gap={'$1.5'} ai="flex-start">
+                        <YStack gap={'$3'} ai="flex-start">
                           <CardTextBlock
                             label="Status"
                             text="Passkey is not confirmed onchain. Finish confirming the passkey onchain."
                             warningText
                           />
-                          <Button
+                          <PrimaryButton
                             theme={'green'}
                             variant="outlined"
                             borderColor={'$primary'}
                             hoverStyle={{ borderColor: '$primary' }}
                             {...link}
                           >
-                            <Button.Text
+                            <PrimaryButton.Text
                               color="$primary"
                               $theme-light={{
                                 color: '$color12',
                               }}
                             >
                               CONFIRM
-                            </Button.Text>
-                          </Button>
+                            </PrimaryButton.Text>
+                          </PrimaryButton>
                         </YStack>
                       )
 
@@ -499,32 +499,31 @@ const RemovePasskeyConfirmation = ({
 
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (
-      <XStack gap="$1" jc="space-between" w={'100%'} pt={'$0.9'}>
-        <Button
+      <XStack gap="$2" jc="space-between" w={'100%'} pt={'$0.9'}>
+        <PrimaryButton
           borderColor={'$primary'}
           variant="outlined"
-          flex={1}
+          w={'50%'}
           hoverStyle={{ borderColor: isDarkTheme ? '$primary' : '$color12' }}
           $theme-light={{
             borderColor: '$color12',
           }}
           onPress={onCancel}
         >
-          <Button.Text
+          <PrimaryButton.Text
             color="$primary"
             $theme-light={{
               color: '$color12',
             }}
           >
             CANCEL
-          </Button.Text>
-        </Button>
+          </PrimaryButton.Text>
+        </PrimaryButton>
         <SubmitButton
           testID={'RemovePasskeyButton'}
           theme={'red'}
           variant="outlined"
-          flex={1}
-          w={'auto'}
+          w={'50%'}
           hoverStyle={{ borderColor: '$error' }}
           disabledStyle={{ opacity: 0.5 }}
           onPress={submit}
@@ -583,6 +582,7 @@ const RemovePasskeyConfirmation = ({
       <SchemaForm
         form={form}
         formProps={{
+          footerProps: { p: 0 },
           $gtLg: {
             als: 'flex-start',
           },
@@ -590,6 +590,12 @@ const RemovePasskeyConfirmation = ({
             maxWidth: '100%',
           },
           px: '$0',
+          // Add Android-specific height handling
+          ...(Platform.OS === 'android' && {
+            minHeight: 'auto',
+            height: 'auto',
+            flex: 0,
+          }),
         }}
         props={{
           name: {
