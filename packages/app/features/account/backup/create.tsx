@@ -154,7 +154,7 @@ const CreatePasskeyForm = ({
   )
 
   return (
-    <FadeCard $platform-android={{ height: 405 }}>
+    <FadeCard>
       <FormProvider {...form}>
         <SchemaForm
           form={form}
@@ -167,6 +167,12 @@ const CreatePasskeyForm = ({
               als: 'flex-start',
             },
             px: '$0',
+            // Add Android-specific height handling
+            ...(Platform.OS === 'android' && {
+              minHeight: 'auto',
+              height: 'auto',
+              flex: 0,
+            }),
           }}
           defaultValues={{
             accountName: deviceName,
