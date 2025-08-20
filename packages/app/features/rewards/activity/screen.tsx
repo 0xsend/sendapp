@@ -95,7 +95,7 @@ export function ActivityRewardsScreen() {
   )
 
   return (
-    <YStack f={1} pb={'$12'} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
+    <YStack pb={'$12'} pt={'$3.5'} gap={'$7'} $gtLg={{ pt: '$0' }} $platform-web={{ f: 1 }}>
       <XStack w={'100%'} jc={'space-between'} ai={'center'} flexWrap={'wrap'} gap={'$2'}>
         <H3 fontWeight={'600'} color={'$color12'} pr={'$2'}>
           {`${distributionDates[selectedDistributionIndex]?.split(' ')[0] ?? 'Monthly'} Rewards`}
@@ -108,7 +108,7 @@ export function ActivityRewardsScreen() {
           />
         ) : null}
       </XStack>
-      <YStack f={1} w={'100%'} gap={'$7'}>
+      <YStack w={'100%'} gap={'$7'}>
         {(() => {
           switch (true) {
             case verificationsQuery.isLoading:
@@ -327,11 +327,11 @@ const TaskCards = ({
   const isQualificationOver = distribution.qualification_end < now
 
   return (
-    <YStack f={1} w={'100%'} gap="$5">
+    <YStack w={'100%'} gap="$5">
       <H3 fontWeight={'600'} color={'$color12'}>
         Tasks
       </H3>
-      <Stack flexWrap="wrap" gap="$5" $gtXs={{ fd: 'row' }}>
+      <Stack gap="$5" $gtXs={{ fd: 'row' }} $platform-web={{ flexWrap: 'wrap' }}>
         {verifications?.verification_values
           ?.map((verification) => ({
             ...verification,
@@ -433,7 +433,7 @@ const TaskCard = ({
             jc={'center'}
             borderRadius={'$4'}
           >
-            <Paragraph ff={'$mono'} p={'$2'} lineHeight={16}>
+            <Paragraph ff={'$mono'} p={'$2'} lineHeight={20}>
               {displayValue}
             </Paragraph>
           </XStack>
@@ -485,11 +485,11 @@ const MultiplierCards = ({
   if (!activeMultipliers || activeMultipliers.length === 0) return null
 
   return (
-    <YStack f={1} w={'100%'} gap="$5">
+    <YStack w={'100%'} gap="$5">
       <H3 fontWeight={'600'} color={'$color12'}>
         Multiplier
       </H3>
-      <Stack flexWrap="wrap" gap="$5" $gtXs={{ fd: 'row' }}>
+      <Stack gap="$5" $gtXs={{ fd: 'row' }} $platform-web={{ flexWrap: 'wrap' }}>
         {activeMultipliers.map(({ type: verificationType, value }) => (
           <MultiplierCard key={verificationType}>
             <XStack ai="center" gap="$2" jc="center">
@@ -504,7 +504,7 @@ const MultiplierCards = ({
               $sm={{ fontSize: '$8' }}
               fontWeight={'600'}
               color={'$color12'}
-              lineHeight={22}
+              lineHeight={32}
               mx="auto"
             >
               X {(value ?? 1).toString()}
@@ -575,7 +575,7 @@ const ProgressCard = ({
 
   if (!sendCeiling) {
     return (
-      <YStack f={1} w={'100%'} gap="$5">
+      <YStack w={'100%'} gap="$5">
         <H3 fontWeight={'600'} color={'$color12'}>
           Progress
         </H3>
@@ -606,7 +606,7 @@ const ProgressCard = ({
         ) / 100
 
   return (
-    <YStack f={1} w={'100%'} gap="$5">
+    <YStack w={'100%'} gap="$5">
       <H3 fontWeight={'600'} color={'$color12'}>
         Progress
       </H3>
@@ -661,7 +661,7 @@ const ClaimableRewardsCard = ({
   )
 
   return (
-    <YStack f={1} w={'100%'} gap="$5" $sm={{ display: Platform.OS === 'web' ? 'none' : undefined }}>
+    <YStack w={'100%'} gap="$5" $sm={{ display: Platform.OS === 'web' ? 'none' : undefined }}>
       <H3 fontWeight={'600'} color={'$color12'}>
         {isQualificationOver ? `Total ${distributionMonth}` : ` ${distributionMonth} Rewards`}
       </H3>
