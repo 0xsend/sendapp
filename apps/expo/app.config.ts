@@ -26,8 +26,8 @@ module.exports = {
   },
   android: {
     adaptiveIcon: {
-      foregroundImage: './assets/icons/adaptive-icon.png',
-      backgroundColor: '#FFFFFF',
+      foregroundImage: './assets/icons/android-adaptive-icon.png',
+      backgroundColor: '#40FB50',
     },
     package: 'app.send',
     permissions: ['android.permission.RECORD_AUDIO'],
