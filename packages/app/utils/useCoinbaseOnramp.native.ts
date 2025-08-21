@@ -46,7 +46,7 @@ export default function useCoinbaseOnramp({
         defaultPaymentMethod,
         presetFiatAmount: amount,
         fiatCurrency: 'USD',
-        redirectUrl: 'send.app://deposit/success',
+        redirectUrl: 'send://deposit/success',
       }
 
       const onrampUrl = getOnrampBuyUrl(params)
@@ -54,6 +54,10 @@ export default function useCoinbaseOnramp({
       await WebBrowser.openBrowserAsync(onrampUrl, {
         dismissButtonStyle: 'cancel',
         readerMode: false,
+        createTask: true,
+        showTitle: true,
+        enableBarCollapsing: false,
+        showInRecents: true,
       })
     },
     onError: (error) => {
