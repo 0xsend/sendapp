@@ -2,25 +2,25 @@
 import { ChevronRight, Upload } from '@tamagui/lucide-icons'
 import { useState } from 'react'
 import {
+  Anchor,
+  Avatar,
   BlurStack,
   Button,
   Card,
+  H3,
   Image,
+  isWeb,
+  Link,
   LinkableButton,
   Paragraph,
   Spinner,
   Stack,
+  styled,
   Text,
-  XStack,
-  YStack,
   useMedia,
   useThemeName,
-  styled,
-  Link,
-  Anchor,
-  isWeb,
-  Avatar,
-  H3,
+  XStack,
+  YStack,
 } from '@my/ui'
 
 // Internal
@@ -30,12 +30,12 @@ import { IconAccount, IconArrowUp, IconLinkInBio } from 'app/components/icons'
 import { ShareOtherProfileDialog } from './components/ShareOtherProfileDialog'
 import type { Functions } from '@my/supabase/database.types'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
-import { sendTokenAddress } from '@my/wagmi'
-import { baseMainnet } from '@my/wagmi'
+import { baseMainnet, sendTokenAddress } from '@my/wagmi'
 import { parseUnits } from 'viem'
 import { type allCoins, type allCoinsDict, coinsDict } from 'app/data/coins'
 import { IconFYSI } from 'app/components/icons/IconFYSI'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { Linking, Platform, Pressable } from 'react-native'
 
 interface ProfileScreenProps {
   sendid?: number | null
@@ -109,11 +109,13 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
       <YStack gap="$4" flexDirection={media.gtMd ? 'row' : 'column'} w="100%">
         <YStack
           gap="$4"
-          f={1}
           maw={509}
           w="100%"
-          als={media.gtMd ? 'flex-start' : 'center'}
-          jc={media.gtMd ? 'flex-start' : 'center'}
+          $platform-web={{
+            f: media.gtMd ? 1 : undefined,
+            als: media.gtMd ? 'flex-start' : 'center',
+            jc: media.gtMd ? 'flex-start' : 'center',
+          }}
         >
           {media.gtMd ? (
             <Paragraph color="$color12" fontSize="$6" fontWeight="600">
@@ -122,20 +124,32 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
           ) : null}
           <Card gap="$4" size={media.gtMd ? '$7' : '$5'} padded elevation={1}>
             <XStack jc="space-between" w="100%">
-              <Avatar
-                size={media.gtMd ? 80 : 64}
-                aspectRatio={1}
-                objectFit="cover"
-                br={'$3'}
-                bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
-                als="center"
-              >
-                <Avatar.Image src={otherUserProfile?.avatar_url ?? undefined} objectFit="cover" />
-                <Avatar.Fallback f={1} jc={'center'} ai={'center'}>
+              {Platform.OS === 'android' && !otherUserProfile?.avatar_url ? (
+                <XStack
+                  w={media.gtMd ? 80 : 64}
+                  h={media.gtMd ? 80 : 64}
+                  jc={'center'}
+                  ai={'center'}
+                  br={'$3'}
+                  bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
+                >
                   <IconAccount color="$color12" size={'100%'} />
-                </Avatar.Fallback>
-              </Avatar>
-
+                </XStack>
+              ) : (
+                <Avatar
+                  size={media.gtMd ? 80 : 64}
+                  aspectRatio={1}
+                  objectFit="cover"
+                  br={'$3'}
+                  bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
+                  als="center"
+                >
+                  <Avatar.Image src={otherUserProfile?.avatar_url ?? undefined} objectFit="cover" />
+                  <Avatar.Fallback f={1} jc={'center'} ai={'center'}>
+                    <IconAccount color="$color12" size={'100%'} />
+                  </Avatar.Fallback>
+                </Avatar>
+              )}
               <YStack px="$4" gap="$3" jc="space-around" f={1} als="center">
                 <H3 lineHeight={32} color="$color12">
                   {otherUserProfile?.name ?? '---'}
@@ -207,10 +221,12 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
         <YStack
           maw={509}
           gap="$4"
-          als={media.gtMd ? 'flex-start' : 'center'}
-          jc={media.gtMd ? 'flex-start' : 'center'}
           width={'100%'}
-          f={1}
+          $platform-web={{
+            f: media.gtMd ? 1 : undefined,
+            als: media.gtMd ? 'flex-start' : 'center',
+            jc: media.gtMd ? 'flex-start' : 'center',
+          }}
         >
           {otherUserProfile?.links_in_bio ? (
             <YStack gap="$4" w="100%">
@@ -408,40 +424,48 @@ const Vibes = ({
 
 const LinksInBio = ({ profile }: { profile: Functions<'profile_lookup'>[number] }) => {
   const media = useMedia()
-  const theme = useThemeName()
-  const isDark = theme?.startsWith('dark')
   return (
     <Card elevation={1} padded size={media.gtMd ? '$7' : '$5'} borderRadius="$6" gap="$4">
       {profile?.links_in_bio?.map((link) => {
-        const fullUrl = `https://${link.domain}${link.handle}`
-        return (
-          <Anchor
-            key={`lets-connect-${link.domain}${link.handle}`}
-            href={fullUrl}
-            target="_blank"
-            width="100%"
-            f={1}
-            textDecorationLine="none"
-          >
-            <XStack f={1} width="100%" h="100%" justifyContent="space-between" alignItems="center">
-              <XStack gap="$4" alignItems="center">
-                <IconLinkInBio domain_name={link.domain_name} size={24} color="$white" />
-                <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
-                  {link.domain_name}
-                </Paragraph>
-              </XStack>
-              <XStack
-                bg={isDark ? 'rgba(255, 255, 255, 0.10)' : 'rgba(0, 0, 0, 0.10)'}
-                borderRadius="$3"
-                justifyContent="center"
-                alignItems="center"
-              >
-                <ChevronRight size="$1.5" color="$color12" />
-              </XStack>
-            </XStack>
-          </Anchor>
-        )
+        return <LinkInBio link={link} key={`lets-connect-${link.domain}${link.handle}`} />
       })}
     </Card>
   )
+}
+
+type ProfileLink = NonNullable<Functions<'profile_lookup'>[number]['links_in_bio']>[number]
+
+const LinkInBio = ({ link }: { link: ProfileLink }) => {
+  const theme = useThemeName()
+  const isDark = theme?.startsWith('dark')
+  const fullUrl = `https://${link.domain}${link.handle}`
+
+  const content = (
+    <XStack width="100%" justifyContent="space-between" alignItems="center">
+      <XStack gap="$4" alignItems="center">
+        <IconLinkInBio domain_name={link.domain_name} size={24} color="$white" />
+        <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
+          {link.domain_name}
+        </Paragraph>
+      </XStack>
+      <XStack
+        bg={isDark ? 'rgba(255, 255, 255, 0.10)' : 'rgba(0, 0, 0, 0.10)'}
+        borderRadius="$3"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <ChevronRight size="$1.5" color="$color12" />
+      </XStack>
+    </XStack>
+  )
+
+  if (Platform.OS === 'web') {
+    return (
+      <Anchor href={fullUrl} target="_blank" width="100%" f={1} textDecorationLine="none">
+        {content}
+      </Anchor>
+    )
+  }
+
+  return <Pressable onPress={() => Linking.openURL(fullUrl)}>{content}</Pressable>
 }
