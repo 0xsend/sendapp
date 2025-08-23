@@ -83,7 +83,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
     <YStack gap="$4" ai="center" w="100%" maw={1024}>
       <Card elevation={0} w="100%" h={200} position="relative" br="$5">
         <Card.Background br="$5">
-          <BlurStack // TODO blur is not working on android
+          <BlurStack
             fullscreen
             intensity={otherUserProfile?.banner_url ? 0 : 30}
             zIndex={100}
