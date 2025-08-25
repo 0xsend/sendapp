@@ -125,7 +125,6 @@ const TokenBalanceItem = ({
 
   return (
     <XStack
-      f={1}
       gap={'$3.5'}
       testID={`token-balance-list-${coin.label}`}
       jc={'space-between'}
