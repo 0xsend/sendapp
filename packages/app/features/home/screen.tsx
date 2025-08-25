@@ -217,7 +217,9 @@ export function InvestmentsBody() {
         <Button.Icon>
           <IconPlus size="$1" color="$color10" />
         </Button.Icon>
-        <Button.Text>See More</Button.Text>
+        <Button.Text lineHeight={16} $platform-android={{ lineHeight: 17 }}>
+          See More
+        </Button.Text>
       </Button>
 
       <CoinSheet open={isSheetOpen} onOpenChange={() => setIsSheetOpen(false)}>
