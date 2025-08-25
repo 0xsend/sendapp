@@ -170,7 +170,7 @@ export function OnboardingScreen() {
         }}
       >
         <FormProvider {...form}>
-          <YStack w={'100%'} ai={'center'} height={112}>
+          <YStack w={'100%'} ai={'center'}>
             <SchemaForm
               form={form}
               onSubmit={handleSubmit}
@@ -220,6 +220,11 @@ export function OnboardingScreen() {
                 $gtSm: {
                   maxWidth: '100%',
                 },
+                ...(Platform.OS === 'android' && {
+                  minHeight: 'auto',
+                  height: 'auto',
+                  flex: 0,
+                }),
                 style: { justifyContent: 'space-between' },
               }}
             >

@@ -157,10 +157,15 @@ export const PersonalInfoScreen = () => {
         $gtSm: {
           maxWidth: '100%',
         },
+        ...(Platform.OS === 'android' && {
+          minHeight: 'auto',
+          height: 'auto',
+          flex: 0,
+        }),
       }}
     >
       {({ birthday, xUsername }) => (
-        <YStack gap={'$3.5'} $platform-android={{ height: 500 }}>
+        <YStack gap={'$3.5'}>
           <FadeCard>
             <FieldWithLabel label={'Date of Birth'} additionalInfo={'(non-editable)'} gap={'$2'}>
               {birthday}
