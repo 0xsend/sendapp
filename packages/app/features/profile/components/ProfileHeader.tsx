@@ -40,16 +40,22 @@ export const ProfileHeader = ({
               }
             : {})}
         >
-          <Avatar.Image
-            src={profile?.avatar_url ?? ''}
-            testID="avatarImage"
-            accessibilityLabel={profile?.name ?? '??'}
-            accessibilityRole="image"
-            accessible
-          />
-          <Avatar.Fallback jc="center">
+          {Platform.OS === 'android' && !profile?.avatar_url ? (
             <IconAccount size="$6" color="$olive" />
-          </Avatar.Fallback>
+          ) : (
+            <>
+              <Avatar.Image
+                src={profile?.avatar_url ?? ''}
+                testID="avatarImage"
+                accessibilityLabel={profile?.name ?? '??'}
+                accessibilityRole="image"
+                accessible
+              />
+              <Avatar.Fallback jc="center">
+                <IconAccount size="$6" color="$olive" />
+              </Avatar.Fallback>
+            </>
+          )}
         </LinkableAvatar>
         <Paragraph nativeID="profileName" size={'$8'} width={'80%'}>
           {(() => {
