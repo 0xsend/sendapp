@@ -204,7 +204,7 @@ export const SignUpScreen = () => {
         }}
       >
         <FormProvider {...form}>
-          <YStack w={'100%'} ai={'center'} height={200}>
+          <YStack w={'100%'} ai={'center'}>
             <SchemaForm
               form={form}
               onSubmit={handleSubmit}
@@ -263,6 +263,11 @@ export const SignUpScreen = () => {
                 $gtSm: {
                   maxWidth: '100%',
                 },
+                ...(Platform.OS === 'android' && {
+                  minHeight: 'auto',
+                  height: 'auto',
+                  flex: 0,
+                }),
                 style: { justifyContent: 'space-between' },
               }}
             >

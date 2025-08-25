@@ -185,11 +185,16 @@ function EditProfileForm({ profile, onSave }: { profile: Tables<'profiles'>; onS
         $gtSm: {
           maxWidth: '100%',
         },
+        ...(Platform.OS === 'android' && {
+          minHeight: 'auto',
+          height: 'auto',
+          flex: 0,
+        }),
       }}
       onSubmit={handleSubmit}
     >
       {({ name, about, isPublic }) => (
-        <YStack gap={'$3.5'} $platform-android={{ height: 500 }}>
+        <YStack gap={'$3.5'}>
           <FadeCard>
             <FieldWithLabel label={'Name'} gap={'$2'}>
               {name}
