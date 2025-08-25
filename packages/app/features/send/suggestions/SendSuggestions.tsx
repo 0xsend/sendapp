@@ -125,14 +125,22 @@ const SuggestionTile = ({
         elevation={Platform.OS === 'web' ? undefined : '$0.75'}
       >
         <Avatar size="$7" br="$4" elevation={'$0.75'}>
-          <Avatar.Image src={avatarUrl} />
-          <Avatar.Fallback jc="center" bc="$olive">
-            <Avatar size="$7" br="$4">
-              <Avatar.Image
-                src={`https://ui-avatars.com/api/?name=${label}&size=256&format=png&background=86ad7f`}
-              />
-            </Avatar>
-          </Avatar.Fallback>
+          {Platform.OS === 'android' && !avatarUrl ? (
+            <Avatar.Image
+              src={`https://ui-avatars.com/api/?name=${label}&size=256&format=png&background=86ad7f`}
+            />
+          ) : (
+            <>
+              <Avatar.Image src={avatarUrl} />
+              <Avatar.Fallback jc="center" bc="$olive">
+                <Avatar size="$7" br="$4">
+                  <Avatar.Image
+                    src={`https://ui-avatars.com/api/?name=${label}&size=256&format=png&background=86ad7f`}
+                  />
+                </Avatar>
+              </Avatar.Fallback>
+            </>
+          )}
         </Avatar>
         <Paragraph
           w={74}

@@ -15,6 +15,7 @@ import { useFriends } from '../affiliate/utils/useFriends'
 import { IconAccount } from 'app/components/icons'
 import { HomeBodyCard } from './screen'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { Platform } from 'react-native'
 
 export const FriendsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'children'>) => {
   const linkProps = useLink({ href })
@@ -75,32 +76,39 @@ type Friend = {
 function OverlappingFriendAvatars({ friends, ...props }: { friends: Friend[] } & XStackProps) {
   return (
     <XStack ai="center" {...props}>
-      {friends.map((friend, index) => (
-        <Avatar
-          testID="avatar"
-          key={friend.tag || `empty-${index}`}
-          circular
-          mr={-8}
-          ai="center"
-          jc="center"
-          bc="$color2"
-          borderWidth="$0.75"
-          borderColor="$color1"
-          size={'$2.5'}
-        >
-          <Avatar.Image
-            testID="avatarImage"
-            accessibilityLabel={friend?.tag ?? '??'}
-            accessibilityRole="image"
-            accessible
-            src={friend.avatar_url}
-          />
-
-          <Avatar.Fallback jc="center" ai="center" boc={'$color1'}>
-            <IconAccount size="$2" color="$olive" />
-          </Avatar.Fallback>
-        </Avatar>
-      ))}
+      {friends.map((friend, index) => {
+        return (
+          <Avatar
+            testID="avatar"
+            key={friend.tag || `empty-${index}`}
+            circular
+            mr={-8}
+            ai="center"
+            jc="center"
+            bc="$color2"
+            borderWidth="$0.75"
+            borderColor="$color1"
+            size={'$2.5'}
+          >
+            {Platform.OS === 'android' && !friend.avatar_url ? (
+              <IconAccount size="$2" color="$olive" />
+            ) : (
+              <>
+                <Avatar.Image
+                  testID="avatarImage"
+                  accessibilityLabel={friend?.tag ?? '??'}
+                  accessibilityRole="image"
+                  accessible
+                  src={friend.avatar_url}
+                />
+                <Avatar.Fallback jc="center" ai="center" boc={'$color1'}>
+                  <IconAccount size="$2" color="$olive" />
+                </Avatar.Fallback>
+              </>
+            )}
+          </Avatar>
+        )
+      })}
     </XStack>
   )
 }
