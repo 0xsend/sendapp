@@ -725,7 +725,7 @@ export const Slippage = ({
         </XStack>
       </XStack>
       {isOpen && (
-        <XStack gap={'$2'} columnGap={'$2'} flexWrap={'wrap'} flex={1}>
+        <XStack gap={'$2'} columnGap={'$2'} flexWrap={'wrap'}>
           {SLIPPAGE_OPTIONS.map((slippageOption) => (
             <Button
               // @ts-expect-error tamagui is tripping here

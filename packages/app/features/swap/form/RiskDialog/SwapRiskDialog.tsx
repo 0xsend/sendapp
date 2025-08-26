@@ -82,7 +82,7 @@ const SwapRiskDialog = () => {
                 <Check color={'$black'} />
               </Checkbox.Indicator>
             </Checkbox>
-            <Label htmlFor={id} cursor={'pointer'} lineHeight={0}>
+            <Label htmlFor={id} cursor={'pointer'} lineHeight={20}>
               I have read and understand the risks involved.
             </Label>
           </XStack>
