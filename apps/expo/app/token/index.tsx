@@ -13,7 +13,7 @@ export default function TokenScreen() {
     <>
       <Stack.Screen
         options={{
-          title: 'Balance',
+          title: 'Invest',
         }}
       />
       <Container

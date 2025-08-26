@@ -18,19 +18,16 @@ import type { ZodError } from 'zod'
 import { TokenActivityRow } from './TokenActivityRow'
 import { useRootScreenParams } from 'app/routers/params'
 import { RecyclerListView } from 'recyclerlistview'
-import { TokenDetailsHeader } from './TokenDetailsHeader'
 import type { CoinWithBalance } from 'app/data/coins'
 
 // Define the list item types
 type ListItem =
-  | { type: 'header'; data: CoinWithBalance }
   | { type: 'activity-header'; data: { title: string; hasActivities: boolean } }
   | { type: 'activity'; data: Activity }
 
 export default function TokenActivityFeed({
   tokenActivityFeedQuery,
   onActivityPress,
-  coin,
 }: {
   tokenActivityFeedQuery: UseInfiniteQueryResult<
     InfiniteData<Activity[]>,
@@ -57,9 +54,6 @@ export default function TokenActivityFeed({
   const { listData, firstActivityIndex, lastActivityIndex } = useMemo(() => {
     const items: ListItem[] = []
 
-    // Add the token details header
-    items.push({ type: 'header', data: coin })
-
     // Add activity header
     items.push({
       type: 'activity-header',
@@ -78,7 +72,7 @@ export default function TokenActivityFeed({
       firstActivityIndex: 2,
       lastActivityIndex: items.length - 1,
     }
-  }, [coin, activities])
+  }, [activities])
 
   useEffect(() => {
     // Only proceed if data is available
@@ -133,9 +127,6 @@ export default function TokenActivityFeed({
         getHeightOrWidth: (index) => {
           const item = listData[index]
           switch (item?.type) {
-            case 'header':
-              // Approximate height for token details header (card + buttons + gaps)
-              return 290
             case 'activity-header':
               // Height for activity title
               return 35
@@ -153,8 +144,6 @@ export default function TokenActivityFeed({
       const isLast = index === lastActivityIndex
 
       switch (item.type) {
-        case 'header':
-          return <TokenDetailsHeader coin={item.data} />
         case 'activity-header':
           return (
             <H4 fontWeight={'600'} size={'$7'}>
