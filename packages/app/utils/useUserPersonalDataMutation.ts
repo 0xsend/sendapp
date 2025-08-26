@@ -18,14 +18,14 @@ export const useProfileMutation = () => {
         return
       }
 
-      const xUsernameToUpdate = data.xUsername || null
       const birthdayToUpdate = data.birthday
         ? adjustDatePickerDateToTimezone(data.birthday).toISOString()
         : null
 
+      // Update birthday in profiles table
       const { error: profileUpdateError } = await supabase
         .from('profiles')
-        .update({ x_username: xUsernameToUpdate, birthday: birthdayToUpdate })
+        .update({ birthday: birthdayToUpdate })
         .eq('id', user?.id)
 
       if (profileUpdateError) {
