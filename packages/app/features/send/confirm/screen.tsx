@@ -239,12 +239,7 @@ export function SendConfirm() {
           exact: false,
         })
 
-        if (Platform.OS === 'web') {
-          router.replace({ pathname: '/', query: { token: sendToken } })
-          return
-        }
-        router.push('/(tabs)/')
-        router.push({ pathname: '/token', query: { token: sendToken } })
+        router.replace({ pathname: `/profile/${profile?.sendid}/history` })
       }
     } catch (e) {
       // @TODO: handle sending repeated tx when nonce is still pending
