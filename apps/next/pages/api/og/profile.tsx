@@ -10,7 +10,13 @@ export const config = {
 const fontCache = new Map<string, ArrayBuffer>()
 
 async function loadGoogleFont(font: string, weight: number, text: string) {
-  const cacheKey = `${font}-${weight}`
+  // Include the exact glyph subset in the cache key.
+  // We request DM Sans via Google Fonts with text= (per-request subsetting).
+  // Normalizing to a unique+sorted set prevents reusing a smaller subset from a
+  // previous request, which caused missing bold glyphs in OG images.
+  // Docs: https://developers.google.com/fonts/docs/css2#optimize_your_font_requests
+  const normalizedText = Array.from(new Set(text)).sort().join('')
+  const cacheKey = `${font}-${weight}-${normalizedText}`
 
   // Check cache first
   if (fontCache.has(cacheKey)) {
@@ -18,7 +24,8 @@ async function loadGoogleFont(font: string, weight: number, text: string) {
   }
 
   try {
-    const url = `https://fonts.googleapis.com/css2?family=${font}:wght@${weight}&text=${encodeURIComponent(text)}&display=swap`
+    const encodedFamily = encodeURIComponent(font).replace(/%20/g, '+')
+    const url = `https://fonts.googleapis.com/css2?family=${encodedFamily}:wght@${weight}&text=${encodeURIComponent(normalizedText)}&display=swap`
 
     const cssResponse = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0' },
@@ -107,26 +114,30 @@ const profileReactElement = (profile: ProfileData): React.ReactElement => {
           flexDirection: 'column',
           gap: '10px',
           padding: '80px',
-          paddingBottom: '40px',
+          paddingBottom: '80px',
         }}
       >
         <div
           style={{
             display: 'flex',
             flexDirection: 'row',
+            alignItems: 'center',
+            gap: '16px',
           }}
         >
           <img
             src={avatarUrl}
             alt="Profile Avatar"
-            width={64}
-            height={64}
             loading="lazy"
             style={{
-              height: 64,
-              width: 64,
+              // Stretch to the row height and keep square shape
+              height: '100%',
+              aspectRatio: '1 / 1',
+              width: 'auto',
+              alignSelf: 'stretch',
               objectFit: 'cover',
               objectPosition: 'center',
+              borderRadius: 12,
             }}
           />
           <div
@@ -134,16 +145,13 @@ const profileReactElement = (profile: ProfileData): React.ReactElement => {
               display: 'flex',
               flexDirection: 'column',
               gap: '8px',
-              paddingLeft: '5px',
-              paddingRight: '5px',
             }}
           >
             {/* Name */}
             <h2
               style={{
                 fontSize: '72px',
-                textAlign: 'center',
-                maxWidth: '1000px',
+                textAlign: 'left',
                 color: 'white',
                 fontWeight: 700,
               }}
@@ -158,7 +166,7 @@ const profileReactElement = (profile: ProfileData): React.ReactElement => {
                 flexDirection: 'row',
                 gap: '8px',
                 flexWrap: 'wrap',
-                maxWidth: '60%',
+                maxWidth: '1000px',
               }}
             >
               {profile?.all_tags
@@ -264,6 +272,7 @@ export default async function handler(req: NextRequest) {
     // Extract profile data from search parameters
     const name = searchParams.get('name') || undefined
     const avatar_url = searchParams.get('avatar_url') || undefined
+    const banner_url = searchParams.get('banner_url') || undefined
     const all_tags_param = searchParams.get('all_tags')
     const about = searchParams.get('about') || undefined
 
@@ -276,6 +285,7 @@ export default async function handler(req: NextRequest) {
     const profile: ProfileData = {
       name,
       avatar_url,
+      banner_url,
       all_tags,
       about,
     }
