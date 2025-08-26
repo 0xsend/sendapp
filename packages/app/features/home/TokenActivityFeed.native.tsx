@@ -164,6 +164,8 @@ export default function TokenActivityFeed({
         case 'activity':
           return (
             <XStack
+              elevation={'$0.75'}
+              position={'relative'}
               backgroundColor={'$color1'}
               borderTopLeftRadius={isFirst ? '$6' : 0}
               borderTopRightRadius={isFirst ? '$6' : 0}
@@ -171,6 +173,16 @@ export default function TokenActivityFeed({
               borderBottomRightRadius={isLast ? '$6' : 0}
             >
               <TokenActivityRow activity={item.data} onPress={onActivityPress} />
+              {!isFirst && (
+                <XStack
+                  position={'absolute'}
+                  top={-10}
+                  right={0}
+                  left={0}
+                  height={10}
+                  backgroundColor={'$color1'}
+                />
+              )}
             </XStack>
           )
         default:
@@ -187,7 +199,7 @@ export default function TokenActivityFeed({
   }, [hasNextPage, isFetchingNextPageActivities, fetchNextPage])
 
   return (
-    <YStack f={1} elevation={'$0.75'}>
+    <YStack f={1}>
       <RecyclerListView
         style={{ flex: 1, overflow: 'visible' }}
         dataProvider={dataProvider}
