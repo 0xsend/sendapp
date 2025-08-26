@@ -107,26 +107,29 @@ const profileReactElement = (profile: ProfileData): React.ReactElement => {
           flexDirection: 'column',
           gap: '10px',
           padding: '80px',
-          paddingBottom: '40px',
+          paddingBottom: '80px',
         }}
       >
         <div
           style={{
             display: 'flex',
             flexDirection: 'row',
+            alignItems: 'center',
+            gap: '16px',
           }}
         >
           <img
             src={avatarUrl}
             alt="Profile Avatar"
-            width={64}
-            height={64}
+            width={88}
+            height={88}
             loading="lazy"
             style={{
-              height: 64,
-              width: 64,
+              height: 88,
+              width: 88,
               objectFit: 'cover',
               objectPosition: 'center',
+              borderRadius: 12,
             }}
           />
           <div
@@ -134,16 +137,13 @@ const profileReactElement = (profile: ProfileData): React.ReactElement => {
               display: 'flex',
               flexDirection: 'column',
               gap: '8px',
-              paddingLeft: '5px',
-              paddingRight: '5px',
             }}
           >
             {/* Name */}
             <h2
               style={{
                 fontSize: '72px',
-                textAlign: 'center',
-                maxWidth: '1000px',
+                textAlign: 'left',
                 color: 'white',
                 fontWeight: 700,
               }}
@@ -158,7 +158,7 @@ const profileReactElement = (profile: ProfileData): React.ReactElement => {
                 flexDirection: 'row',
                 gap: '8px',
                 flexWrap: 'wrap',
-                maxWidth: '60%',
+                maxWidth: '1000px',
               }}
             >
               {profile?.all_tags
@@ -264,6 +264,7 @@ export default async function handler(req: NextRequest) {
     // Extract profile data from search parameters
     const name = searchParams.get('name') || undefined
     const avatar_url = searchParams.get('avatar_url') || undefined
+    const banner_url = searchParams.get('banner_url') || undefined
     const all_tags_param = searchParams.get('all_tags')
     const about = searchParams.get('about') || undefined
 
@@ -276,6 +277,7 @@ export default async function handler(req: NextRequest) {
     const profile: ProfileData = {
       name,
       avatar_url,
+      banner_url,
       all_tags,
       about,
     }
