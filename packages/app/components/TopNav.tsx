@@ -132,7 +132,7 @@ export function TopNav({
                         case 'stables':
                           return 'Cash'
                         default:
-                          return 'Balance'
+                          return 'Invest'
                       }
                     })()}
                   </Paragraph>

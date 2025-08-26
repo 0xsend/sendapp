@@ -231,8 +231,8 @@ export function InvestmentsBody() {
             <Link
               key={coin.symbol}
               href={{
-                pathname: '/trade',
-                query: { inToken: usdcAddress[baseMainnet.id], outToken: coin.token },
+                pathname: '/',
+                query: { token: coin.token },
               }}
             >
               <CoinSheet.Item coin={coin} />
