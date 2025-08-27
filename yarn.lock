@@ -6346,6 +6346,14 @@ __metadata:
     tamagui: "npm:1.126.5"
     typescript: "npm:^5.8.3"
     zod: "npm:^3.23.8"
+  peerDependencies:
+    d3-scale: "*"
+    d3-shape: "*"
+    react: "*"
+    react-native: "*"
+    react-native-gesture-handler: "*"
+    react-native-reanimated: "*"
+    react-native-svg: "*"
   languageName: unknown
   linkType: soft
 
