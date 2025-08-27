@@ -1,6 +1,6 @@
 import { Card, H4, Paragraph, Spinner, Theme, XStack, YStack } from '@my/ui'
 import type { CoinWithBalance } from 'app/data/coins'
-import { useCoinData } from 'app/utils/coin-gecko'
+import type { CoinData } from 'app/utils/coin-gecko'
 import formatAmount from 'app/utils/formatAmount'
 
 function MetricTile({
@@ -77,9 +77,17 @@ function MetricTile({
   )
 }
 
-export function TokenKeyMetrics({ coin }: { coin: CoinWithBalance }) {
-  const { data, isLoading } = useCoinData(coin.coingeckoTokenId)
-  const md = data?.market_data
+export function TokenKeyMetrics({
+  coin,
+  coinData,
+  isLoadingCoinData,
+}: {
+  coin: CoinWithBalance
+  coinData?: CoinData
+  isLoadingCoinData?: boolean
+}) {
+  const isLoading = !!isLoadingCoinData
+  const md = coinData?.market_data
 
   const marketCap = md?.market_cap?.usd ?? null
   const marketCapChange = md?.market_cap_change_percentage_24h ?? null
