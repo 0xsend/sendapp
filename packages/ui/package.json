@@ -5,7 +5,7 @@
     "*.css"
   ],
   "private": true,
-  "types": "./types/index",
+  "types": "src/index.d.ts",
   "main": "src/index.tsx",
   "module:jsx": "src",
   "files": [
@@ -44,6 +44,15 @@
     "solito": "^4.4.1",
     "tamagui": "^1.126.1",
     "zod": "^3.23.8"
+  },
+  "peerDependencies": {
+    "d3-scale": "*",
+    "d3-shape": "*",
+    "react": "*",
+    "react-native": "*",
+    "react-native-gesture-handler": "*",
+    "react-native-reanimated": "*",
+    "react-native-svg": "*"
   },
   "devDependencies": {
     "@tamagui/build": "^1.126.1",
