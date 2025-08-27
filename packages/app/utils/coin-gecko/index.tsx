@@ -340,3 +340,16 @@ export const useTokenMarketChartRange = <
     staleTime: getRangeStaleTimeMs(params.from, params.to),
   })
 }
+
+/**
+ * Adapter: map CoinGecko market_chart/range prices to chart points { x, y }.
+ * Mirrors mapping style from Rainbow migration repo:
+ *   /Users/vict0xr/Documents/Rainbow/rainbow-charts-migration/src/hooks/charts/useChartInfo.ts (lines 31–34)
+ * which transforms [x, y] tuples into { x, y } objects.
+ */
+export type ChartPoint = { x: number; y: number }
+export function toChartPointsFromPrices(input: Pick<MarketChartRange, 'prices'>): ChartPoint[] {
+  const prices = input?.prices ?? []
+  // CG returns timestamps ascending; keep order to match UI expectations.
+  return prices.map(([ts, price]) => ({ x: ts, y: price }))
+}
