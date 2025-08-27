@@ -2,6 +2,13 @@ import { useQuery } from '@tanstack/react-query'
 import type { allCoins, coins, CoinWithBalance } from 'app/data/coins'
 import { z } from 'zod'
 
+// Use Pro API only when a key is present; otherwise default to Free API.
+// Do not read .env directly; rely on process.env at runtime/build time.
+const COINGECKO_PRO_KEY: string | undefined =
+  typeof process !== 'undefined'
+    ? (process.env?.COINGECKO_PRO_KEY as string | undefined)
+    : undefined
+
 export const MarketDataSchema = z
   .object({
     id: z.custom<coins[number]['coingeckoTokenId']>(),
@@ -108,14 +115,15 @@ export const useMultipleTokensMarketData = <
 >(
   tokenIds: T[]
 ) => {
-  const joinedTokenIds = tokenIds.join(', ')
+  // Canonicalize ids for stable caching across callers (sort + comma-join)
+  const canonicalIds = Array.from(new Set(tokenIds)).sort().join(',')
 
   return useQuery({
-    queryKey: ['coin-market-data', joinedTokenIds],
-    enabled: joinedTokenIds.length > 0,
+    queryKey: ['coin-market-data', canonicalIds],
+    enabled: canonicalIds.length > 0,
     queryFn: async () => {
       const response = await fetch(
-        `https://api.coingecko.com/api/v3/coins/markets?ids=${joinedTokenIds}&vs_currency=usd&price_change_percentage=24h,7d`,
+        `https://api.coingecko.com/api/v3/coins/markets?ids=${canonicalIds}&vs_currency=usd`,
         {
           headers: {
             Accept: 'application/json',
@@ -125,7 +133,7 @@ export const useMultipleTokensMarketData = <
       )
 
       if (!response.ok)
-        throw new Error(`Failed to fetch market data for: ${joinedTokenIds}, ${response.status}`)
+        throw new Error(`Failed to fetch market data for: ${canonicalIds}, ${response.status}`)
       const data = await response.json()
       return MarketDataSchema.parse(data)
     },
@@ -139,14 +147,6 @@ const CoinDescriptionSchema = z
     en: z.string().optional().nullable(),
   })
   .passthrough()
-
-export const CoinDetailsSchema = z
-  .object({
-    description: CoinDescriptionSchema.optional(),
-  })
-  .passthrough()
-
-export type CoinDetails = z.infer<typeof CoinDetailsSchema>
 
 // Minimal market_data subset for /coins/{id}?market_data=true
 const CoinMarketDataSchema = z
@@ -197,23 +197,28 @@ export type CoinData = z.infer<typeof CoinDataSchema>
  * Unified coin data hook: fetches description and market_data in a single request.
  * Endpoint: /api/v3/coins/{id}?market_data=true
  */
+type UseCoinDataOptions = { includeMarketData?: boolean }
+
 export const useCoinData = <
   T extends coins[number]['coingeckoTokenId'] | CoinWithBalance['coingeckoTokenId'],
 >(
-  tokenId: T
+  tokenId: T,
+  options?: UseCoinDataOptions
 ) => {
+  const includeMarketData = options?.includeMarketData ?? true
   return useQuery({
-    queryKey: ['coin-data', tokenId],
+    queryKey: ['coin-data', tokenId, includeMarketData],
     queryFn: async () => {
-      const response = await fetch(
-        `https://api.coingecko.com/api/v3/coins/${tokenId}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false`,
-        {
-          headers: {
-            Accept: 'application/json',
-          },
-          mode: 'cors',
-        }
-      )
+      const usePro = !!COINGECKO_PRO_KEY
+      const baseUrl = usePro ? 'https://pro-api.coingecko.com' : 'https://api.coingecko.com'
+      const url = `${baseUrl}/api/v3/coins/${tokenId}?localization=false&tickers=false&market_data=${includeMarketData ? 'true' : 'false'}&community_data=false&developer_data=false&sparkline=false`
+      const headers: Record<string, string> = { Accept: 'application/json' }
+      if (usePro && COINGECKO_PRO_KEY) headers['x-cg-pro-api-key'] = COINGECKO_PRO_KEY
+
+      const response = await fetch(url, {
+        headers,
+        mode: 'cors',
+      })
 
       if (!response.ok) throw new Error(`Failed to fetch coin data ${tokenId} ${response.status}`)
       const data = await response.json()
@@ -224,31 +229,81 @@ export const useCoinData = <
 }
 
 /**
- * React query function to fetch minimal coin details (description only)
+ * Coin historical chart data (prices)
+ * Endpoint: /api/v3/coins/{id}/market_chart
+ * Notes:
+ * - We only parse and return `prices` per the product need; other fields are passthrough/ignored.
+ * - days is a string
+ *
+ *
+ * Pattern and style follow existing examples in this repo:
+ * - Fetch + headers + error handling mirrors useTokenMarketData and useTokenPrices
+ * - Zod tuple/object parsing mirrors existing schemas in this file
  */
-export const useCoinDetails = <
+const PricesTupleSchema = z.tuple([z.number(), z.number()])
+export const MarketChartSchema = z
+  .object({
+    prices: PricesTupleSchema.array(),
+  })
+  .passthrough()
+
+export type MarketChart = z.infer<typeof MarketChartSchema>
+
+export const useTokenMarketChart = <
   T extends coins[number]['coingeckoTokenId'] | CoinWithBalance['coingeckoTokenId'],
 >(
-  tokenId: T
+  tokenId: T,
+  params: {
+    days: string
+    vsCurrency?: 'usd'
+    interval?: string
+    precision?: string
+  }
 ) => {
+  const vs = params.vsCurrency ?? 'usd'
+  const days = params.days ?? '1'
+  const interval = params.interval ?? null
+  const precision = params.precision ?? null
+
   return useQuery({
-    queryKey: ['coin-details', tokenId],
+    queryKey: ['coin-market-chart', tokenId, vs, days, interval, precision],
+    enabled: Boolean(tokenId) && Boolean(days),
     queryFn: async () => {
-      const response = await fetch(
-        `https://api.coingecko.com/api/v3/coins/${tokenId}?localization=false&tickers=false&market_data=false&community_data=false&developer_data=false&sparkline=false`,
-        {
-          headers: {
-            Accept: 'application/json',
-          },
-          mode: 'cors',
-        }
-      )
+      const usePro = !!COINGECKO_PRO_KEY
+      const baseUrl = usePro ? 'https://pro-api.coingecko.com' : 'https://api.coingecko.com'
+      const url = new URL(`${baseUrl}/api/v3/coins/${tokenId}/market_chart`)
+      url.searchParams.set('vs_currency', vs)
+      url.searchParams.set('days', days)
+
+      if (interval) url.searchParams.set('interval', interval)
+      if (precision) url.searchParams.set('precision', precision)
+
+      const headers: Record<string, string> = { Accept: 'application/json' }
+      if (usePro && COINGECKO_PRO_KEY) headers['x-cg-pro-api-key'] = COINGECKO_PRO_KEY
+
+      const response = await fetch(url.toString(), {
+        headers,
+        mode: 'cors',
+      })
 
       if (!response.ok)
-        throw new Error(`Failed to fetch coin details ${tokenId} ${response.status}`)
+        throw new Error(`Failed to fetch market chart for ${tokenId}: ${response.status}`)
+
       const data = await response.json()
-      return CoinDetailsSchema.parse(data)
+      const parsed = MarketChartSchema.parse(data)
+      return parsed
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 12 * 60 * 60 * 1000,
   })
+}
+
+/**
+ * Adapter: map CoinGecko market_chart prices to chart points { x, y }.
+ * which transforms [x, y] tuples into { x, y } objects.
+ */
+export type ChartPoint = { x: number; y: number }
+export function toChartPointsFromPrices(input: Pick<MarketChart, 'prices'>): ChartPoint[] {
+  const prices = input?.prices ?? []
+  // CG returns timestamps ascending; keep order to match UI expectations.
+  return prices.map(([ts, price]) => ({ x: ts, y: price }))
 }

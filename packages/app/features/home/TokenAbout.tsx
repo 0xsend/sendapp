@@ -1,6 +1,6 @@
 import { Button, Card, H4, Paragraph, Spinner, useThemeName, XStack, YStack } from '@my/ui'
 import type { CoinWithBalance } from 'app/data/coins'
-import { useCoinData } from 'app/utils/coin-gecko'
+import type { CoinData } from 'app/utils/coin-gecko'
 import type { NativeSyntheticEvent, TextLayoutEventData } from 'react-native'
 import { Platform } from 'react-native'
 import { useMemo, useState } from 'react'
@@ -8,15 +8,23 @@ import { useMemo, useState } from 'react'
 const MAX_LINES = 3 // 3 lines * 24px lineHeight = 72px
 const CLAMP_HEIGHT = 24 * MAX_LINES
 
-export const TokenAbout = ({ coin }: { coin: CoinWithBalance }) => {
+export const TokenAbout = ({
+  coin,
+  coinData,
+  isLoadingCoinData,
+}: {
+  coin: CoinWithBalance
+  coinData?: CoinData
+  isLoadingCoinData?: boolean
+}) => {
   const theme = useThemeName()
   const isDark = theme?.startsWith('dark')
-  const { data, isLoading } = useCoinData(coin.coingeckoTokenId)
+  const isLoading = !!isLoadingCoinData
   const [expanded, setExpanded] = useState(false)
   const [isTruncated, setIsTruncated] = useState(false)
   const [measuredHeight, setMeasuredHeight] = useState<number>(0)
 
-  const raw = data?.description?.en ?? ''
+  const raw = coinData?.description?.en ?? ''
   const aboutFromApi = typeof raw === 'string' ? raw.replace(/\r\n/g, '\n').trim() : ''
   const about = useMemo(() => {
     if (coin.coingeckoTokenId === 'send-token-2') {

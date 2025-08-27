@@ -16,6 +16,12 @@ export const TokenDetailsHeader = ({ coin }: { coin: CoinWithBalance }) => {
     return stableCoins.some((c) => c.token === coin.token)
   }, [coin])
 
+  const { data: tokenMarketData, isLoading: isLoadingMarketData } = useTokenMarketData(
+    coin.coingeckoTokenId
+  )
+  const md = tokenMarketData?.at(0)
+  const changePercent24h = md?.price_change_percentage_24h ?? null
+
   return (
     <YStack gap="$3" pb="$3">
       <Card py="$5" px="$4" w={'100%'} jc={'space-between'} elevation={1}>
@@ -27,7 +33,12 @@ export const TokenDetailsHeader = ({ coin }: { coin: CoinWithBalance }) => {
             </Paragraph>
           </XStack>
           <YStack gap={Platform.OS === 'web' ? '$4' : '$2'}>
-            <TokenDetailsBalance coin={coin} isStableCoin={isStableCoin} />
+            <TokenDetailsBalance
+              coin={coin}
+              isStableCoin={isStableCoin}
+              changePercent24h={changePercent24h}
+              isLoadingMarketData={isLoadingMarketData}
+            />
           </YStack>
         </YStack>
       </Card>
@@ -100,20 +111,20 @@ export const TokenDetailsMarketData = ({ coin }: { coin: CoinWithBalance }) => {
 const TokenDetailsBalance = ({
   coin,
   isStableCoin,
-}: { coin: CoinWithBalance; isStableCoin: boolean }) => {
+  changePercent24h,
+  isLoadingMarketData,
+}: {
+  coin: CoinWithBalance
+  isStableCoin: boolean
+  changePercent24h: number | null
+  isLoadingMarketData: boolean
+}) => {
   const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
 
   const media = useMedia()
   const isSmallScreen = !media.gtXs
 
   const balanceInUSD = convertBalanceToFiat(coin, tokenPrices?.[coin.token])
-
-  // fetch market data for 24h percent change
-  const { data: tokenMarketData, isLoading: isLoadingMarketData } = useTokenMarketData(
-    coin.coingeckoTokenId
-  )
-
-  const changePercent24h = tokenMarketData?.at(0)?.price_change_percentage_24h ?? null
 
   // Compute the main USD balance and the USD delta for today
   const mainUSDBalance = balanceInUSD ?? 0
