@@ -208,12 +208,7 @@ export function InvestmentsBody() {
           <InvestmentsBalanceList coins={myInvestmentCoins} />
         )}
       </Card>
-      <Button
-        elevation={'$0.75'}
-        p="$3"
-        hoverStyle={hoverStyles}
-        onPress={() => setIsSheetOpen(true)}
-      >
+      <Button elevation={1} p="$3" hoverStyle={hoverStyles} onPress={() => setIsSheetOpen(true)}>
         <Button.Icon>
           <IconPlus size="$1" color="$color10" />
         </Button.Icon>
