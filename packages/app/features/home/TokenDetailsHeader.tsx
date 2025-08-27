@@ -33,7 +33,7 @@ export const TokenDetailsHeader = ({ coin }: { coin: CoinWithBalance }) => {
 
   return (
     <YStack gap="$3" pb="$3">
-      <Card py="$5" px="$4" w={'100%'} jc={'space-between'} elevation={'$0.75'}>
+      <Card py="$5" px="$4" w={'100%'} jc={'space-between'} elevation={1}>
         <YStack gap="$4">
           <XStack ai={'center'} gap={'$3'}>
             <IconCoin size={'$2'} symbol={coin.symbol} />
@@ -213,7 +213,7 @@ const QuickActionButton = ({ href, children }: LinkableButtonProps) => {
 
   return (
     <Button
-      elevation={'$0.75'}
+      elevation={1}
       f={1}
       height={'auto'}
       hoverStyle={hoverStyles}
