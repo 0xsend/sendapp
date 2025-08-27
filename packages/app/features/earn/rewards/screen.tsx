@@ -5,16 +5,16 @@ import {
   Paragraph,
   PrimaryButton,
   ScrollView,
-  Separator,
   Spinner,
   useAppToast,
   XStack,
   YStack,
+  Separator,
 } from '@my/ui'
 import { baseMainnetBundlerClient, entryPointAddress } from '@my/wagmi'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
-import type { erc20Coin } from 'app/data/coins'
+import type { CoinWithBalance } from 'app/data/coins'
 import { useSendEarn } from 'app/features/earn/providers/SendEarnProvider'
 import { useERC20AssetCoin } from 'app/features/earn/params'
 import { useSendEarnClaimRewardsCalls } from 'app/features/earn/rewards/hooks'
@@ -32,6 +32,7 @@ import { formatUnits, withRetry } from 'viem'
 import { useChainId } from 'wagmi'
 import { useEarnRewardsActivityFeed } from './hooks'
 import { TokenDetailsMarketData } from 'app/features/home/TokenDetailsHeader'
+import { useCoin } from 'app/provider/coins'
 
 const log = debug('app:features:earn:rewards')
 
@@ -47,6 +48,7 @@ function RewardsBalance() {
   const queryClient = useQueryClient()
   const chainId = useChainId()
   const coin = useERC20AssetCoin()
+  const balanceCoin = useCoin(coin.data?.symbol)
 
   // Get the user's send account
   const sendAccount = useSendAccount()
@@ -191,8 +193,8 @@ function RewardsBalance() {
         <YStack gap={'$4'}>
           <TotalRewards
             rewards={formattedRewards}
-            isLoading={affiliateRewards.isLoading || coin.isLoading}
-            coin={coin.data || undefined}
+            isLoading={affiliateRewards.isLoading || coin.isLoading || balanceCoin.isLoading}
+            coin={balanceCoin.coin || undefined}
           />
           <Paragraph size={'$7'} fontWeight={'500'}>
             Rewards History
@@ -353,7 +355,7 @@ const RewardsFeed = () => {
 interface TotalRewardsProps {
   rewards?: string
   isLoading?: boolean
-  coin?: erc20Coin
+  coin?: CoinWithBalance
 }
 
 const TotalRewards = ({ rewards, isLoading, coin }: TotalRewardsProps = {}) => {
