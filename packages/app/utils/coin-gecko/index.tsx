@@ -252,3 +252,91 @@ export const useCoinDetails = <
     staleTime: 1000 * 60 * 5, // 5 minutes
   })
 }
+
+/**
+ * Coin historical chart data (prices) within a time range
+ * Endpoint: /api/v3/coins/{id}/market_chart/range
+ * Notes:
+ * - We only parse and return `prices` per the product need; other fields are passthrough/ignored.
+ * - from/to support UNIX seconds, UNIX ms, Date, or ISO strings. We coerce to UNIX seconds per CG docs.
+ * - staleTime aligns with CG cache guidance (<=1d: 30s, 2–90d: 30m, >90d: 12h).
+ *
+ * Pattern and style follow existing examples in this repo:
+ * - Fetch + headers + error handling mirrors useTokenMarketData and useTokenPrices
+ * - Zod tuple/object parsing mirrors existing schemas in this file
+ */
+const PricesTupleSchema = z.tuple([z.number(), z.number()])
+export const MarketChartRangeSchema = z
+  .object({
+    prices: PricesTupleSchema.array(),
+  })
+  .passthrough()
+
+export type MarketChartRange = z.infer<typeof MarketChartRangeSchema>
+
+function toUnixSeconds(input: number | string | Date): string {
+  if (input instanceof Date) return Math.floor(input.getTime() / 1000).toString()
+  if (typeof input === 'number') {
+    // Heuristic: treat numbers >= 10^12 as ms and down-convert
+    const sec = input >= 1_000_000_000_000 ? Math.floor(input / 1000) : Math.floor(input)
+    return sec.toString()
+  }
+  // If ISO or already stringified UNIX seconds, pass through
+  return input
+}
+
+function getRangeStaleTimeMs(from: number | string | Date, to: number | string | Date): number {
+  const fromSec = Number(toUnixSeconds(from))
+  const toSec = Number(toUnixSeconds(to))
+  const range = Math.max(0, toSec - fromSec)
+  if (range <= 86_400) return 30_000 // 30s
+  if (range <= 90 * 86_400) return 30 * 60 * 1000 // 30m
+  return 12 * 60 * 60 * 1000 // 12h
+}
+
+export const useTokenMarketChartRange = <
+  T extends coins[number]['coingeckoTokenId'] | CoinWithBalance['coingeckoTokenId'],
+>(
+  tokenId: T,
+  params: {
+    from: number | string | Date
+    to: number | string | Date
+    vsCurrency?: 'usd'
+    interval?: string
+    precision?: string
+  }
+) => {
+  const vs = params.vsCurrency ?? 'usd'
+  const from = toUnixSeconds(params.from)
+  const to = toUnixSeconds(params.to)
+  const interval = params.interval ?? null
+  const precision = params.precision ?? null
+
+  return useQuery({
+    queryKey: ['coin-market-chart-range', tokenId, vs, from, to, interval, precision],
+    enabled: Boolean(tokenId) && Boolean(from) && Boolean(to),
+    queryFn: async () => {
+      const url = new URL(`https://api.coingecko.com/api/v3/coins/${tokenId}/market_chart/range`)
+      url.searchParams.set('vs_currency', vs)
+      url.searchParams.set('from', from)
+      url.searchParams.set('to', to)
+      if (interval) url.searchParams.set('interval', interval)
+      if (precision) url.searchParams.set('precision', precision)
+
+      const response = await fetch(url.toString(), {
+        headers: {
+          Accept: 'application/json',
+        },
+        mode: 'cors',
+      })
+
+      if (!response.ok)
+        throw new Error(`Failed to fetch market chart range for ${tokenId}: ${response.status}`)
+
+      const data = await response.json()
+      const parsed = MarketChartRangeSchema.parse(data)
+      return parsed
+    },
+    staleTime: getRangeStaleTimeMs(params.from, params.to),
+  })
+}
