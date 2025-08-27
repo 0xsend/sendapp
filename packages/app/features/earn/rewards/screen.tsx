@@ -5,11 +5,11 @@ import {
   Paragraph,
   PrimaryButton,
   ScrollView,
-  Separator,
   Spinner,
   useAppToast,
   XStack,
   YStack,
+  Separator,
 } from '@my/ui'
 import { baseMainnetBundlerClient, entryPointAddress } from '@my/wagmi'
 import { useMutation, useQueryClient } from '@tanstack/react-query'

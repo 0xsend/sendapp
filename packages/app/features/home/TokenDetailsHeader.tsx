@@ -1,28 +1,13 @@
-import {
-  Button,
-  ButtonText,
-  Card,
-  type LinkableButtonProps,
-  Paragraph,
-  Separator,
-  Spinner,
-  Stack,
-  Theme,
-  useMedia,
-  XStack,
-  YStack,
-} from '@my/ui'
-import { ArrowDown, ArrowUp, Minus, Plus } from '@tamagui/lucide-icons'
-import { IconArrowUp, IconCoin, IconError, IconPlus } from 'app/components/icons'
-import { type allCoins, type CoinWithBalance, stableCoins, usdcCoin } from 'app/data/coins'
+import { Card, Paragraph, Theme, useMedia, XStack, YStack, Spinner } from '@my/ui'
+import { IconCoin } from 'app/components/icons'
+import { type CoinWithBalance, stableCoins, type erc20Coin } from 'app/data/coins'
 import { useTokenMarketData } from 'app/utils/coin-gecko'
 import { convertBalanceToFiat } from 'app/utils/convertBalanceToUSD'
 import formatAmount from 'app/utils/formatAmount'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { useMemo } from 'react'
-import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { Platform } from 'react-native'
-import { useLink } from 'solito/link'
+import { TokenQuickActions } from './TokenQuickActions'
 
 export const TokenDetailsHeader = ({ coin }: { coin: CoinWithBalance }) => {
   const media = useMedia()
@@ -42,345 +27,171 @@ export const TokenDetailsHeader = ({ coin }: { coin: CoinWithBalance }) => {
             </Paragraph>
           </XStack>
           <YStack gap={Platform.OS === 'web' ? '$4' : '$2'}>
-            <TokenDetailsBalance coin={coin} />
-            {coin.symbol !== 'USDC' && (
-              <>
-                <Stack w={'100%'}>
-                  <Separator bc={'$color10'} />
-                </Stack>
-                <TokenDetailsMarketData coin={coin} />
-              </>
-            )}
+            <TokenDetailsBalance coin={coin} isStableCoin={isStableCoin} />
           </YStack>
         </YStack>
       </Card>
-      <XStack w={'100%'} gap={'$3'}>
-        {isStableCoin ? (
-          <>
-            <AddMoneyButton />
-            <WithdrawButton coin={coin} />
-          </>
-        ) : (
-          <>
-            <SellButton coin={coin} />
-            <BuyButton coin={coin} />
-          </>
-        )}
-      </XStack>
+      <TokenQuickActions coin={coin} />
     </YStack>
   )
 }
-export const TokenDetailsMarketData = ({ coin }: { coin: allCoins[number] }) => {
-  const { data: tokenMarketData, isLoading: isLoadingMarketData } = useTokenMarketData(
-    coin.coingeckoTokenId
-  )
-  const media = useMedia()
-  const isSmallScreen = !media.gtXs
 
-  const { data: prices, isLoading: isLoadingPrices } = useTokenPrices()
+// Lightweight market data summary used by other screens (e.g., Rewards)
+// Shows current price and 24h change pill; hides change for stablecoins
+export const TokenDetailsMarketData = ({ coin }: { coin: erc20Coin }) => {
+  const { data: tokenMarketData, isLoading } = useTokenMarketData(coin.coingeckoTokenId)
+  const md = tokenMarketData?.at(0)
+  const price = md?.current_price ?? null
+  const changePercent24h = md?.price_change_percentage_24h ?? null
+  const isStableCoin = useMemo(() => stableCoins.some((c) => c.token === coin.token), [coin.token])
 
-  const price = tokenMarketData?.at(0)?.current_price ?? prices?.[coin.token]
-
-  const changePercent24h = tokenMarketData?.at(0)?.price_change_percentage_24h ?? null
-
-  // Coingecko API returns a formatted price already. For now, we just want to make sure it doesn't have more than 8 digits
-  // so the text doesn't get cut off.
-  const formatPrice = (price: number) => price.toString().slice(0, 7)
-
-  const formatPriceChange = (change: number) => {
-    const fixedChange = change.toFixed(2)
-    if (change > 0)
+  const changeBadge = (() => {
+    if (changePercent24h === null || isStableCoin) return null
+    const formatted = `${changePercent24h > 0 ? '+' : ''}${changePercent24h.toFixed(2)}%`
+    if (changePercent24h > 0)
       return (
         <Theme name="green_active">
           <Paragraph
-            fontSize={isSmallScreen ? '$3' : '$4'}
-            fontWeight="500"
-          >{`${fixedChange}%`}</Paragraph>
-          <ArrowUp size={'$0.9'} />
+            fontSize={'$3'}
+            fontWeight={500}
+            bc={'$color2'}
+            $theme-dark={{ bc: 'rgba(134, 174, 128, 0.2)' }}
+            $theme-light={{ bc: 'rgba(134, 174, 128, 0.16)' }}
+            px={'$1.5'}
+            br={'$2'}
+          >
+            {formatted}
+          </Paragraph>
         </Theme>
       )
-    if (change < 0)
+    if (changePercent24h < 0)
       return (
         <Theme name="red_active">
           <Paragraph
-            fontSize={isSmallScreen ? '$3' : '$4'}
-            fontWeight="500"
-          >{`${fixedChange}%`}</Paragraph>
-          <ArrowDown size={'$0.9'} />
+            fontSize={'$3'}
+            fontWeight={500}
+            bc={'$color2'}
+            $theme-dark={{ bc: 'rgba(229, 115, 115, 0.2)' }}
+            $theme-light={{ bc: 'rgba(229, 115, 115, 0.16)' }}
+            px={'$1.5'}
+            br={'$2'}
+          >
+            {formatted}
+          </Paragraph>
         </Theme>
       )
-    return (
-      <Paragraph
-        fontSize={isSmallScreen ? '$3' : '$4'}
-        fontWeight="500"
-      >{`${fixedChange}%`}</Paragraph>
-    )
-  }
+    return <Paragraph fontSize={'$3'}>{formatted}</Paragraph>
+  })()
 
-  if (isLoadingMarketData && isLoadingPrices) return <Spinner size="small" color={'$color12'} />
-
-  const isUSDC = coin.symbol === 'USDC'
+  if (isLoading) return <Spinner size="small" />
+  if (price === null) return null
 
   return (
-    <XStack gap="$3" flexWrap="wrap">
-      <Paragraph
-        fontSize={isSmallScreen ? 12 : 14}
-        fontWeight="500"
-        $theme-dark={{ color: '$gray8Light' }}
-        color={'$color12'}
-      >
-        {(() => {
-          switch (true) {
-            case isLoadingPrices:
-              return <Spinner size="small" color={'$color12'} />
-            case price === undefined:
-              return null
-            case isUSDC:
-              return `1 ${coin.symbol} = 1 USD`
-            default:
-              return `1 ${coin.symbol} = ${formatPrice(price)} USD`
-          }
-        })()}
-      </Paragraph>
-      {(() => {
-        switch (true) {
-          case isLoadingMarketData:
-            return <Spinner size="small" color={'$color12'} />
-          case changePercent24h === null:
-            return Platform.OS === 'web' ? (
-              <XStack gap="$2" ai="center">
-                <Paragraph color="$color10" fontSize={isSmallScreen ? 12 : 14}>
-                  Failed to load market data
-                </Paragraph>
-                <IconError size="$1.5" color={'$error'} />
-              </XStack>
-            ) : null
-          case isUSDC:
-            return null
-          default:
-            return formatPriceChange(changePercent24h)
-        }
-      })()}
+    <XStack ai="center" jc="space-between">
+      <XStack ai="center" gap={'$2'}>
+        <Paragraph size={'$6'} fontWeight={500} color={'$color12'}>
+          {`$${formatAmount(price, 9, 2)}`}
+        </Paragraph>
+        {changeBadge}
+      </XStack>
     </XStack>
   )
 }
 
-const TokenDetailsBalance = ({ coin }: { coin: CoinWithBalance }) => {
+const TokenDetailsBalance = ({
+  coin,
+  isStableCoin,
+}: { coin: CoinWithBalance; isStableCoin: boolean }) => {
   const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
-  const { balance, decimals, formatDecimals = 5 } = coin
+  const { balance, decimals } = coin
   const media = useMedia()
   const isSmallScreen = !media.gtXs
+
+  const balanceInUSD = convertBalanceToFiat(coin, tokenPrices?.[coin.token])
+
+  // fetch market data for 24h percent change
+  const { data: tokenMarketData, isLoading: isLoadingMarketData } = useTokenMarketData(
+    coin.coingeckoTokenId
+  )
+
+  const changePercent24h = tokenMarketData?.at(0)?.price_change_percentage_24h ?? null
+
+  // Compute the main USD balance and the USD delta for today
+  const mainUSDBalance = balanceInUSD ?? 0
+  let usdDelta = 0
+  if (changePercent24h !== null && mainUSDBalance) {
+    usdDelta = (mainUSDBalance * changePercent24h) / 100
+  }
+
+  const changeBadge = (() => {
+    if (changePercent24h === null) return null
+    const formatted = `${changePercent24h > 0 ? '+' : ''}${changePercent24h.toFixed(2)}%`
+    if (changePercent24h > 0)
+      return (
+        <Theme name="green_active">
+          <Paragraph
+            fontSize={'$3'}
+            fontWeight={500}
+            bc={'$color2'}
+            $theme-dark={{ bc: 'rgba(134, 174, 128, 0.2)' }}
+            $theme-light={{ bc: 'rgba(134, 174, 128, 0.16)' }}
+            px={'$1.5'}
+            br={'$2'}
+          >
+            {formatted}
+          </Paragraph>
+        </Theme>
+      )
+    if (changePercent24h < 0)
+      return (
+        <Theme name="red_active">
+          <Paragraph
+            fontSize={'$3'}
+            fontWeight={500}
+            bc={'$color2'}
+            $theme-dark={{ bc: 'rgba(229, 115, 115, 0.2)' }}
+            $theme-light={{ bc: 'rgba(229, 115, 115, 0.16)' }}
+            px={'$1.5'}
+            br={'$2'}
+          >
+            {formatted}
+          </Paragraph>
+        </Theme>
+      )
+    return <Paragraph fontSize={'$3'}>{formatted}</Paragraph>
+  })()
 
   if (coin.balance === undefined) {
     return <></>
   }
 
-  const balanceInUSD = convertBalanceToFiat(coin, tokenPrices?.[coin.token])
-
-  const balanceWithDecimals = Number(balance) / 10 ** (decimals ?? 0)
-  const balanceWithDecimalsLength = balanceWithDecimals.toString().replace('.', '').length
-
   return (
-    <XStack alignItems={'baseline'} gap="$2">
-      <Paragraph
-        $platform-web={{ width: 'fit-content' }}
-        $sm={{
-          fontSize: balanceWithDecimalsLength ? '$10' : '$12',
-          lineHeight: Platform.OS === 'web' ? 32 : 42,
-        }}
-        fontSize={isSmallScreen ? 42 : 60}
-        fontWeight={'900'}
-        lineHeight={isSmallScreen ? 48 : 57}
-        color={'$color12'}
-      >
-        {formatAmount(balanceWithDecimals.toString(), 10, formatDecimals)}
-      </Paragraph>
-
-      {coin.symbol !== 'USDC' ? (
-        <Paragraph color={'$color10'} fontSize={isSmallScreen ? '$2' : '$3'} fontFamily={'$mono'}>
-          {isLoadingTokenPrices || balanceInUSD === undefined
+    <YStack gap={'$2'}>
+      <XStack alignItems={'center'} gap="$4">
+        <Paragraph
+          $platform-web={{ width: 'fit-content' }}
+          $sm={{
+            lineHeight: Platform.OS === 'web' ? 32 : 42,
+          }}
+          fontSize={'$10'}
+          fontWeight={'600'}
+          lineHeight={isSmallScreen ? 48 : 57}
+          color={'$color12'}
+        >
+          {isLoadingTokenPrices || mainUSDBalance === undefined
             ? ''
-            : `($${formatAmount(balanceInUSD)})`}
+            : `$${formatAmount(mainUSDBalance, 9, 2)}`}
+        </Paragraph>
+        {/* Percent change badge to the right */}
+        {!isStableCoin && !isLoadingMarketData && changeBadge}
+      </XStack>
+
+      {/* USD delta under main balance */}
+      {!isStableCoin && !isLoadingMarketData && changePercent24h !== null ? (
+        <Paragraph color={'$color10'} fontWeight={'400'} size={'$5'}>
+          {`${usdDelta >= 0 ? '+' : ''}$${formatAmount(Math.abs(usdDelta), 9, 2)} today`}
         </Paragraph>
       ) : null}
-    </XStack>
-  )
-}
-
-const QuickActionButton = ({ href, children }: LinkableButtonProps) => {
-  const hoverStyles = useHoverStyles()
-  const linkProps = useLink({ href })
-
-  return (
-    <Button
-      elevation={'$0.75'}
-      f={1}
-      height={'auto'}
-      hoverStyle={hoverStyles}
-      focusStyle={hoverStyles}
-      w="100%"
-      {...linkProps}
-    >
-      {children}
-    </Button>
-  )
-}
-
-const BuyButton = ({ coin }: { coin: allCoins[number] }) => {
-  const media = useMedia()
-  const isSmallScreen = !media.gtXs
-
-  // Buy: USDC -> Token (inToken=USDC, outToken=selectedToken)
-  const getBuyUrl = () => {
-    return `/trade?inToken=${usdcCoin.token}&outToken=${coin.token}`
-  }
-
-  return (
-    <QuickActionButton href={getBuyUrl()}>
-      <YStack
-        testID={'buy-quick-action'}
-        gap="$2"
-        jc={'space-between'}
-        ai="center"
-        px={isSmallScreen ? '$3' : '$4'}
-        py="$3.5"
-        $gtSm={{ py: '$4' }}
-      >
-        <Theme name="green">
-          <Plus
-            size={'$1.5'}
-            $theme-dark={{ color: '$primary' }}
-            $theme-light={{ color: '$color12' }}
-          />
-        </Theme>
-        <ButtonText
-          fontSize={isSmallScreen ? '$4' : '$5'}
-          px="$1"
-          ta="center"
-          w="100%"
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          Buy
-        </ButtonText>
-      </YStack>
-    </QuickActionButton>
-  )
-}
-
-const SellButton = ({ coin }: { coin: allCoins[number] }) => {
-  const media = useMedia()
-  const isSmallScreen = !media.gtXs
-
-  // Sell: Token -> USDC (inToken=selectedToken, outToken=USDC)
-  const getSellUrl = () => {
-    return `/trade?inToken=${coin.token}&outToken=${usdcCoin.token}`
-  }
-
-  return (
-    <QuickActionButton href={getSellUrl()}>
-      <YStack
-        testID={'sell-quick-action'}
-        gap="$2"
-        jc={'space-between'}
-        ai="center"
-        px={isSmallScreen ? '$3' : '$4'}
-        py="$3.5"
-        $gtSm={{ py: '$4' }}
-      >
-        <Theme name="red">
-          <Minus
-            size={'$1.5'}
-            $theme-dark={{ color: '$primary' }}
-            $theme-light={{ color: '$color12' }}
-          />
-        </Theme>
-        <ButtonText
-          fontSize={isSmallScreen ? '$4' : '$5'}
-          px="$1"
-          ta="center"
-          w="100%"
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          Sell
-        </ButtonText>
-      </YStack>
-    </QuickActionButton>
-  )
-}
-
-const AddMoneyButton = () => {
-  const media = useMedia()
-  const isSmallScreen = !media.gtXs
-
-  return (
-    <QuickActionButton href={'/deposit'}>
-      <YStack
-        testID={'add-money-quick-action'}
-        gap="$2"
-        jc={'space-between'}
-        ai="center"
-        px={isSmallScreen ? '$3' : '$4'}
-        py="$3.5"
-        $gtSm={{ py: '$4' }}
-      >
-        <IconPlus
-          size={'$1.5'}
-          $theme-dark={{ color: '$primary' }}
-          $theme-light={{ color: '$color12' }}
-        />
-        <ButtonText
-          fontSize={isSmallScreen ? '$4' : '$5'}
-          px="$1"
-          ta="center"
-          w="100%"
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          Add Money
-        </ButtonText>
-      </YStack>
-    </QuickActionButton>
-  )
-}
-
-const WithdrawButton = ({ coin }: { coin: allCoins[number] }) => {
-  const media = useMedia()
-  const isSmallScreen = !media.gtXs
-
-  // Withdraw: Navigate to send page with the stable coin pre-selected
-  const getWithdrawUrl = () => {
-    return `/send?sendToken=${coin.token}`
-  }
-
-  return (
-    <QuickActionButton href={getWithdrawUrl()}>
-      <YStack
-        testID={'withdraw-quick-action'}
-        gap="$2"
-        jc={'space-between'}
-        ai="center"
-        px={isSmallScreen ? '$3' : '$4'}
-        py="$3.5"
-        $gtSm={{ py: '$4' }}
-      >
-        <IconArrowUp
-          size={'$1.5'}
-          $theme-dark={{ color: '$primary' }}
-          $theme-light={{ color: '$color12' }}
-        />
-        <ButtonText
-          fontSize={isSmallScreen ? '$4' : '$5'}
-          px="$1"
-          ta="center"
-          w="100%"
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          Withdraw
-        </ButtonText>
-      </YStack>
-    </QuickActionButton>
+    </YStack>
   )
 }
