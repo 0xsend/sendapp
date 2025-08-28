@@ -13,6 +13,7 @@ type ChartPathWebProps = PathProps & {
   strokeWidth?: number
   selectedStrokeWidth?: number
   gestureEnabled?: boolean
+  onScrub?: (payload: { active: boolean; ox?: number; oy?: number }) => void
 }
 
 function least(length: number, compare: (value: number) => number) {
@@ -60,6 +61,7 @@ export const ChartPath = React.memo(
     stroke = 'black',
     strokeWidth = 1,
     gestureEnabled = true,
+    onScrub,
     ...rest
   }: ChartPathWebProps) => {
     const {
@@ -130,9 +132,12 @@ export const ChartPath = React.memo(
         if (d) {
           originalX.value = d.x.toString()
           originalY.value = d.y.toString()
+          if (onScrub) {
+            onScrub({ active: true, ox: d.x, oy: d.y })
+          }
         }
       },
-      [currentPath, positionX, positionY, originalX, originalY, chartPathWidth]
+      [currentPath, positionX, positionY, originalX, originalY, chartPathWidth, onScrub]
     )
 
     const handleMove = useCallback(
@@ -156,7 +161,8 @@ export const ChartPath = React.memo(
 
     const handleLeave = useCallback(() => {
       resetGestureState()
-    }, [resetGestureState])
+      if (onScrub) onScrub({ active: false })
+    }, [resetGestureState, onScrub])
 
     const pathD = useMemo(() => currentPath?.path ?? '', [currentPath?.path])
     const finalStroke = stroke ?? ctxStroke
