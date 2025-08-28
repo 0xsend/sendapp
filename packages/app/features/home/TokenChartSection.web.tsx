@@ -8,7 +8,7 @@ import { TimeframeTabs } from './charts/shared/components/TimeframeTabs'
 import { ChartLineSection } from './charts/shared/components/ChartLineSection'
 import { ChartExtremeLabels } from './charts/shared/components/ChartExtremeLabels'
 import { useTokenChartData } from './charts/shared/useTokenChartData'
-import { useScrubState } from './charts/shared/useScrubState.native'
+import { useScrubState } from './charts/shared/useScrubState.web'
 import type { Timeframe } from './charts/shared/timeframes'
 
 export function TokenChartSection({
@@ -21,6 +21,8 @@ export function TokenChartSection({
   const theme = useThemeName()
   const isDark = theme?.startsWith('dark')
 
+  const stroke = isDark ? '#40FB50' : '#000000'
+
   const fetched = useTokenChartData(coin.coingeckoTokenId, tf)
   const points = fetched.points
   const smoothed = fetched.smoothed
@@ -28,6 +30,28 @@ export function TokenChartSection({
   const change = fetched.change
   const isLoading = fetched.isLoading
   const isError = fetched.isError
+
+  const changeBadge = (() => {
+    if (change === null || change === undefined) return null
+    const formatted = `${change > 0 ? '+' : ''}${change.toFixed(2)}%`
+    if (change > 0)
+      return (
+        <Theme name="green_active">
+          <Paragraph fontSize={'$3'} fontWeight={500} bc={'$color1'} px={'$1.5'} br={'$2'}>
+            {formatted}
+          </Paragraph>
+        </Theme>
+      )
+    if (change < 0)
+      return (
+        <Theme name="red_active">
+          <Paragraph fontSize={'$3'} fontWeight={500} bc={'$color1'} px={'$1.5'} br={'$2'}>
+            {formatted}
+          </Paragraph>
+        </Theme>
+      )
+    return <Paragraph fontSize={'$3'}>{formatted}</Paragraph>
+  })()
 
   const onLayoutContainer = (e: import('react-native').LayoutChangeEvent) => {
     const w = e.nativeEvent.layout.width
@@ -38,17 +62,32 @@ export function TokenChartSection({
 
   const containerWidth = measuredWidth || Dimensions.get('window').width
 
+  const { active, price, ts, onScrub } = useScrubState()
+  const pathProps = { onScrub }
+
   return (
     <ChartCardSection title="Price Overview" isLoading={isLoading}>
       <YStack onLayout={onLayoutContainer}>
-        <ChartSection
+        <ChartLineSection
           points={points}
           smoothed={smoothed}
           width={containerWidth}
-          last={last}
-          change={change}
-          isLoading={isLoading}
-          isError={points.length === 0 || isError}
+          stroke={stroke}
+          pathProps={pathProps}
+          childrenBeforePath={
+            isLoading ? null : isError && !isLoading ? (
+              <Paragraph color={'$color10'}>Failed to load chart data</Paragraph>
+            ) : (
+              <ChartScrubReadoutWeb
+                fallbackPrice={last}
+                decimals={last > 0.1 ? 2 : 5}
+                changeBadge={changeBadge}
+                price={price}
+                ts={ts}
+              />
+            )
+          }
+          childrenAfterPath={<ChartExtremeLabels decimals={last > 0.1 ? 2 : 5} active={active} />}
         />
       </YStack>
       <TimeframeTabs value={tf} onChange={setTf} isDark={isDark} />
@@ -56,79 +95,19 @@ export function TokenChartSection({
   )
 }
 
-function ChartSection({
-  points,
-  smoothed,
-  width,
-  last,
-  change,
-  isError,
-  isLoading,
-}: {
-  points: { x: number; y: number }[]
-  smoothed: { x: number; y: number }[]
-  width: number
-  last: number
-  change: number | null
-  isError: boolean
-  isLoading: boolean
-}) {
-  const isDark = useThemeName()?.startsWith('dark')
-  const stroke = isDark ? '#40FB50' : '#000000'
-  const changeBadge = (() => {
-    if (change === null || change === undefined) return null as React.ReactNode
-    const formatted = `${change > 0 ? '+' : ''}${change.toFixed(2)}%`
-    if (change > 0)
-      return (
-        <Theme name="green_active">
-          <Paragraph fontSize={'$3'} fontWeight={500} bc={'$color2'} px={'$1.5'} br={'$2'}>
-            {formatted}
-          </Paragraph>
-        </Theme>
-      )
-    if (change < 0)
-      return (
-        <Theme name="red_active">
-          <Paragraph fontSize={'$3'} fontWeight={500} bc={'$color2'} px={'$1.5'} br={'$2'}>
-            {formatted}
-          </Paragraph>
-        </Theme>
-      )
-    return <Paragraph fontSize={'$3'}>{formatted}</Paragraph>
-  })()
-
-  return (
-    <ChartLineSection
-      points={points}
-      smoothed={smoothed}
-      width={width}
-      stroke={stroke}
-      childrenBeforePath={
-        isLoading ? null : isError ? (
-          <Paragraph color={'$color10'}>Failed to load chart data</Paragraph>
-        ) : (
-          <ChartScrubReadout
-            fallbackPrice={last}
-            decimals={last > 0.1 ? 2 : 5}
-            changeBadge={changeBadge}
-          />
-        )
-      }
-      childrenAfterPath={<ChartExtremeLabelsWithActive decimals={last > 0.1 ? 2 : 5} />}
-    />
-  )
-}
-
-function ChartScrubReadout({
+function ChartScrubReadoutWeb({
   fallbackPrice,
-  decimals,
   changeBadge,
+  decimals,
+  price,
+  ts,
 }: {
   fallbackPrice: number
-  decimals: number
   changeBadge: React.ReactNode
+  decimals: number
+  price: number | null
+  ts: number | null
 }) {
-  const { price, ts } = useScrubState()
   const displayPrice = price ?? fallbackPrice
   const formattedPrice = `$${formatAmount(displayPrice, 9, decimals)}`
 
@@ -158,9 +137,4 @@ function ChartScrubReadout({
       ) : null}
     </YStack>
   )
-}
-
-function ChartExtremeLabelsWithActive({ decimals }: { decimals: number }) {
-  const { active } = useScrubState()
-  return <ChartExtremeLabels decimals={decimals} active={active} />
 }
