@@ -15,7 +15,14 @@ import { useTokenMarketChartRange, toChartPointsFromPrices } from 'app/utils/coi
 import formatAmount from 'app/utils/formatAmount'
 import { useMemo, useState, useCallback } from 'react'
 import { Dimensions, Platform } from 'react-native'
-import { ChartPathProvider, ChartPath, ChartDot, monotoneCubicInterpolation } from '@my/ui'
+import Animated, { useAnimatedReaction, runOnJS } from 'react-native-reanimated'
+import {
+  ChartPathProvider,
+  ChartPath,
+  ChartDot,
+  monotoneCubicInterpolation,
+  useChartData,
+} from '@my/ui'
 
 // Tabs styling mirrors SearchFilterButton in packages/app/components/SearchBar.tsx (lines 223–239)
 // Width measurement mirrors onLayout pattern in packages/ui/src/components/FormWrapper.native.tsx (lines 37–41)
@@ -170,14 +177,15 @@ export function TokenChartSection({ coin }: { coin: CoinWithBalance }) {
             <Paragraph color={'$color10'}>No chart data</Paragraph>
           ) : (
             <>
-              <XStack ai="center" gap={'$2'}>
-                <Paragraph size={'$5'} fontWeight={500} color={'$color12'}>
-                  ${formatAmount(last ?? undefined, 9, coin.formatDecimals ?? 2)}
-                </Paragraph>
-                {changeBadge}
-              </XStack>
               <YStack onLayout={onLayoutContainer}>
-                <ChartSectionChart points={points} smoothed={smoothed} width={containerWidth} />
+                <ChartSectionChart
+                  points={points}
+                  smoothed={smoothed}
+                  width={containerWidth}
+                  last={last ?? 0}
+                  changeBadge={changeBadge}
+                  decimals={coin.formatDecimals ?? 2}
+                />
               </YStack>
             </>
           )}
@@ -191,10 +199,16 @@ function ChartSectionChart({
   points,
   smoothed,
   width,
+  last,
+  changeBadge,
+  decimals,
 }: {
   points: { x: number; y: number }[]
   smoothed: { x: number; y: number }[]
   width: number
+  last: number
+  changeBadge: React.ReactNode
+  decimals: number
 }) {
   const H = 150
   const stroke = '#4e7aff'
@@ -212,6 +226,7 @@ function ChartSectionChart({
       selectedColor={stroke}
       endPadding={32}
     >
+      <ChartScrubReadout fallbackPrice={last} changeBadge={changeBadge} decimals={decimals} />
       <ChartPath
         hapticsEnabled={false}
         width={width}
@@ -222,5 +237,61 @@ function ChartSectionChart({
       />
       <ChartDot color={stroke} size={10} />
     </ChartPathProvider>
+  )
+}
+
+function ChartScrubReadout({
+  fallbackPrice,
+  changeBadge,
+  decimals,
+}: {
+  fallbackPrice: number
+  changeBadge: React.ReactNode
+  decimals: number
+}) {
+  const { isActive, originalX, originalY } = useChartData()
+  const [price, setPrice] = useState<number | null>(null)
+  const [ts, setTs] = useState<number | null>(null)
+
+  useAnimatedReaction(
+    () => ({ active: isActive.value, ox: originalX.value, oy: originalY.value }),
+    (v) => {
+      if (v.active && v.oy !== '') {
+        runOnJS(setPrice)(Number(v.oy))
+        if (v.ox !== '') runOnJS(setTs)(Number(v.ox))
+      } else {
+        runOnJS(setPrice)(null)
+        runOnJS(setTs)(null)
+      }
+    }
+  )
+
+  const displayPrice = price ?? fallbackPrice
+  const formattedPrice = `$${formatAmount(displayPrice, 9, decimals)}`
+
+  const timeLabel = (() => {
+    if (ts === null) return null
+    try {
+      const d = new Date(ts)
+      return d.toLocaleString()
+    } catch {
+      return null
+    }
+  })()
+
+  return (
+    <YStack gap="$1" mb={'$1'}>
+      <XStack ai="center" gap={'$2'}>
+        <Paragraph size={'$5'} fontWeight={500} color={'$color12'}>
+          {formattedPrice}
+        </Paragraph>
+        {price === null ? changeBadge : null}
+      </XStack>
+      {timeLabel ? (
+        <Paragraph size={'$3'} color={'$color10'}>
+          {timeLabel}
+        </Paragraph>
+      ) : null}
+    </YStack>
   )
 }
