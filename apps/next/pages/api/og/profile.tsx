@@ -68,9 +68,10 @@ const profileReactElement = (profile: ProfileData): React.ReactElement => {
   const bannerUrl =
     profile.banner_url ??
     profile.avatar_url ??
-    `https://ghassets.send.app/app_images/auth_image_${Math.floor(Math.random() * 3) + 1}.jpg`
+    'https://ghassets.send.app/app_images/auth_image_1.jpg'
   const avatarUrl =
-    profile.avatar_url ?? `https://ui-avatars.com/api/avatars/${Math.floor(Math.random() * 1000)}`
+    profile.avatar_url ??
+    `https://ui-avatars.com/api?name=${encodeURIComponent(profile.name || 'User')}&size=256&format=png&background=86ad7f`
 
   return (
     <div
@@ -96,8 +97,7 @@ const profileReactElement = (profile: ProfileData): React.ReactElement => {
           width: '100%',
           objectFit: 'cover',
           objectPosition: 'center',
-          filter: profile.banner_url ? '' : 'blur(40px)',
-          WebkitFilter: profile.banner_url ? '' : 'blur(40px)',
+          ...(profile.banner_url ? {} : { filter: 'blur(40px)', WebkitFilter: 'blur(40px)' }),
         }}
       />
       <div
@@ -125,21 +125,26 @@ const profileReactElement = (profile: ProfileData): React.ReactElement => {
             gap: '16px',
           }}
         >
-          <img
-            src={avatarUrl}
-            alt="Profile Avatar"
-            loading="lazy"
+          <div
             style={{
-              // Stretch to the row height and keep square shape
-              height: '100%',
-              aspectRatio: '1 / 1',
-              width: 'auto',
-              alignSelf: 'stretch',
-              objectFit: 'cover',
-              objectPosition: 'center',
-              borderRadius: 12,
+              display: 'flex',
+              width: 128,
+              height: 128,
             }}
-          />
+          >
+            <img
+              src={avatarUrl}
+              alt="Profile Avatar"
+              loading="lazy"
+              style={{
+                width: 128,
+                height: 128,
+                objectFit: 'cover',
+                objectPosition: 'center',
+                borderRadius: 12,
+              }}
+            />
+          </div>
           <div
             style={{
               display: 'flex',
