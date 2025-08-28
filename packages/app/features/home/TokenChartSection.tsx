@@ -11,7 +11,7 @@ import {
   useThemeName,
 } from '@my/ui'
 import type { CoinWithBalance } from 'app/data/coins'
-import { useTokenMarketChartRange, toChartPointsFromPrices } from 'app/utils/coin-gecko'
+import { useTokenMarketChart, toChartPointsFromPrices } from 'app/utils/coin-gecko'
 import formatAmount from 'app/utils/formatAmount'
 import { useMemo, useState, useCallback } from 'react'
 import { Dimensions, Platform } from 'react-native'
@@ -100,7 +100,7 @@ export function TokenChartSection({ coin }: { coin: CoinWithBalance }) {
 
   const { interval, precision } = getCgParams(tf)
 
-  const { data, isLoading, isError } = useTokenMarketChartRange(coin.coingeckoTokenId, {
+  const { data, isLoading, isError } = useTokenMarketChart(coin.coingeckoTokenId, {
     days,
     interval: interval ?? undefined,
     precision: precision ?? undefined,
