@@ -2,6 +2,8 @@ import '../public/reset.css'
 import '../styles/globals.css'
 
 import 'raf/polyfill'
+import 'react-native-gesture-handler'
+import 'react-native-reanimated'
 
 import '@my/ui/src/config/fonts.css'
 

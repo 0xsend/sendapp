@@ -128,6 +128,10 @@ export default () => {
     transpilePackages: [
       'solito',
       'react-native-web',
+      'react-native-reanimated',
+      'react-native-gesture-handler',
+      'react-native-svg',
+      '@my/ui',
       'expo-application',
       'expo-linking',
       'expo-constants',
@@ -158,7 +162,6 @@ export default () => {
         'p-queue',
         'permissionless',
         'superjson',
-        'react-native-reanimated',
         '@tamagui/animations-moti',
         '@tamagui/animations-react-native',
         '@tamagui/config',
