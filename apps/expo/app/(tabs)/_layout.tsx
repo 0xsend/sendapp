@@ -52,7 +52,6 @@ export default function Layout() {
       <Stack.Screen
         options={{
           headerShown: false,
-          gestureEnabled: false,
         }}
       />
       <Tabs

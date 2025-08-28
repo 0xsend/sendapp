@@ -22,9 +22,9 @@ import { formatErrorMessage } from 'app/utils/formatErrorMessage'
 import { useState } from 'react'
 import { SolitoImage } from 'solito/image'
 import { useLink } from 'solito/link'
-import { useRouter } from 'solito/router'
 import { AnimationLayout } from '../../components/layout/animation-layout'
 import { useSignIn } from 'app/utils/send-accounts'
+import useAuthRedirect from 'app/utils/useAuthRedirect/useAuthRedirect'
 
 export function SplashScreen() {
   return (
@@ -244,16 +244,16 @@ function AuthButtons() {
   const [queryParams] = useAuthScreenParams()
   const { redirectUri } = queryParams
   const toast = useAppToast()
-  const router = useRouter()
   const signUpLink = useLink({ href: '/auth/sign-up' })
   const [isSigningIn, setIsSigningIn] = useState(false)
   const { mutateAsync: signInMutateAsync } = useSignIn()
+  const { redirect } = useAuthRedirect()
 
   const handleSignIn = async () => {
     setIsSigningIn(true)
     try {
       await signInMutateAsync({})
-      router.push(redirectUri ?? '/')
+      redirect(redirectUri)
     } catch (error) {
       toast.error(formatErrorMessage(error))
     } finally {
