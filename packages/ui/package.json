@@ -46,8 +46,6 @@
     "zod": "^3.23.8"
   },
   "peerDependencies": {
-    "d3-scale": "*",
-    "d3-shape": "*",
     "react": "*",
     "react-native": "*",
     "react-native-gesture-handler": "*",
