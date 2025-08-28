@@ -10,7 +10,13 @@ export const config = {
 const fontCache = new Map<string, ArrayBuffer>()
 
 async function loadGoogleFont(font: string, weight: number, text: string) {
-  const cacheKey = `${font}-${weight}`
+  // Include the exact glyph subset in the cache key.
+  // We request DM Sans via Google Fonts with text= (per-request subsetting).
+  // Normalizing to a unique+sorted set prevents reusing a smaller subset from a
+  // previous request, which caused missing bold glyphs in OG images.
+  // Docs: https://developers.google.com/fonts/docs/css2#optimize_your_font_requests
+  const normalizedText = Array.from(new Set(text)).sort().join('')
+  const cacheKey = `${font}-${weight}-${normalizedText}`
 
   // Check cache first
   if (fontCache.has(cacheKey)) {
@@ -18,7 +24,8 @@ async function loadGoogleFont(font: string, weight: number, text: string) {
   }
 
   try {
-    const url = `https://fonts.googleapis.com/css2?family=${font}:wght@${weight}&text=${encodeURIComponent(text)}&display=swap`
+    const encodedFamily = encodeURIComponent(font).replace(/%20/g, '+')
+    const url = `https://fonts.googleapis.com/css2?family=${encodedFamily}:wght@${weight}&text=${encodeURIComponent(normalizedText)}&display=swap`
 
     const cssResponse = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0' },
