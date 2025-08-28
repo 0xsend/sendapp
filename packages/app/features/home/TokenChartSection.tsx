@@ -56,20 +56,38 @@ function getFromForTimeframe(tf: Timeframe, nowSec: number): number {
 function getInterpolationRange(tf: Timeframe): number {
   switch (tf) {
     case '1D':
-      return 100
+      return 120
     case '1W':
-      return 130
-    case '1M':
       return 160
-    case '3M':
-      return 180
-    case '6M':
+    case '1M':
       return 200
+    case '3M':
+      return 220
+    case '6M':
+      return 240
+    case '1Y':
+      return 280
+    case 'ALL':
+      return 300
+    default:
+      return 120
+  }
+}
+
+// Coingecko interval/precision hints inspired by common usage patterns
+function getCgParams(tf: Timeframe): { interval: string | null; precision: string | null } {
+  switch (tf) {
+    case '1D':
+    case '1W':
+    case '1M':
+      return { interval: 'hourly', precision: '2' }
+    case '3M':
+    case '6M':
     case '1Y':
     case 'ALL':
-      return 220
+      return { interval: 'daily', precision: '2' }
     default:
-      return 100
+      return { interval: null, precision: null }
   }
 }
 
@@ -82,9 +100,13 @@ export function TokenChartSection({ coin }: { coin: CoinWithBalance }) {
   const nowSec = Math.floor(Date.now() / 1000)
   const from = getFromForTimeframe(tf, nowSec)
 
+  const { interval, precision } = getCgParams(tf)
+
   const { data, isLoading, isError } = useTokenMarketChartRange(coin.coingeckoTokenId, {
     from,
     to: nowSec,
+    interval: interval ?? undefined,
+    precision: precision ?? undefined,
   })
 
   const points = useMemo(() => {
