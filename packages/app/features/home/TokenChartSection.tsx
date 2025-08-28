@@ -257,6 +257,7 @@ function ChartSectionChart({
         selectedStrokeWidth={3}
         strokeWidth={3.5}
       />
+      <ChartExtremeLabels decimals={decimals} />
       <ChartDot color={stroke} size={10} />
     </ChartPathProvider>
   )
@@ -314,6 +315,81 @@ function ChartScrubReadout({
           {timeLabel}
         </Paragraph>
       ) : null}
+    </YStack>
+  )
+}
+
+function ChartExtremeLabels({ decimals }: { decimals: number }) {
+  const { currentPath, isActive, width, height } = useChartData()
+  const [hidden, setHidden] = useState(false)
+
+  useAnimatedReaction(
+    () => isActive.value,
+    (active) => {
+      runOnJS(setHidden)(!!active)
+    }
+  )
+
+  const labels = useMemo(() => {
+    if (!currentPath || !currentPath.points || currentPath.points.length === 0) return null
+
+    // Find extremes by originalY among scaled points
+    let minP = currentPath.points[0]
+    let maxP = currentPath.points[0]
+    for (const p of currentPath.points) {
+      if (!p) continue
+      if (p.originalY < (minP?.originalY ?? Number.POSITIVE_INFINITY)) minP = p
+      if (p.originalY > (maxP?.originalY ?? Number.NEGATIVE_INFINITY)) maxP = p
+    }
+    if (!minP || !maxP) return null
+
+    const labelFor = (p: typeof minP) => {
+      const rawY = p.originalY
+      const text = `$${formatAmount(rawY, 9, decimals)}`
+      // Position the label slightly above the point; clamp within chart bounds
+      const estWidth = 72 // rough width for clamping
+      const estHeight = 20
+      const x = Math.min(Math.max(p.x - estWidth / 2, 0), Math.max(0, width - estWidth))
+      const y = Math.max(p.y - estHeight - 6, 0)
+      return { x, y, text }
+    }
+
+    return { min: labelFor(minP), max: labelFor(maxP) }
+  }, [currentPath, width, decimals])
+
+  if (!labels || hidden) return null
+
+  return (
+    <YStack style={{ position: 'absolute', left: 0, top: 0, width, height }} pointerEvents="none">
+      {/* Max label */}
+      <YStack
+        position="absolute"
+        left={labels.max.x}
+        top={labels.max.y}
+        bg={'$color2'}
+        px={'$1.5'}
+        py={'$0.5'}
+        br={'$2'}
+      >
+        <Paragraph size={'$3'} color={'$color12'} fontWeight={500}>
+          {labels.max.text}
+        </Paragraph>
+      </YStack>
+
+      {/* Min label */}
+      <YStack
+        position="absolute"
+        left={labels.min.x}
+        top={labels.min.y}
+        bg={'$color2'}
+        px={'$1.5'}
+        py={'$0.5'}
+        br={'$2'}
+      >
+        <Paragraph size={'$3'} color={'$color12'} fontWeight={500}>
+          {labels.min.text}
+        </Paragraph>
+      </YStack>
     </YStack>
   )
 }
