@@ -17,6 +17,10 @@ export const MarketDataSchema = z
     low_24h: z.number().nullable(),
     price_change_24h: z.number().nullable(),
     price_change_percentage_24h: z.number().nullable(),
+    // When requesting price_change_percentage=24h,7d the API also returns
+    // *_in_currency fields per vs_currency (usd)
+    price_change_percentage_24h_in_currency: z.number().nullable().optional(),
+    price_change_percentage_7d_in_currency: z.number().nullable().optional(),
     market_cap_change_24h: z.number().nullable(),
     market_cap_change_percentage_24h: z.number().nullable(),
     circulating_supply: z.number(),
@@ -76,7 +80,7 @@ export const useTokenMarketData = <
     queryKey: ['coin-market-data', tokenId],
     queryFn: async () => {
       const response = await fetch(
-        `https://api.coingecko.com/api/v3/coins/markets?ids=${tokenId}&vs_currency=usd`,
+        `https://api.coingecko.com/api/v3/coins/markets?ids=${tokenId}&vs_currency=usd&price_change_percentage=24h,7d`,
         {
           headers: {
             Accept: 'application/json',
@@ -111,7 +115,7 @@ export const useMultipleTokensMarketData = <
     enabled: joinedTokenIds.length > 0,
     queryFn: async () => {
       const response = await fetch(
-        `https://api.coingecko.com/api/v3/coins/markets?ids=${joinedTokenIds}&vs_currency=usd`,
+        `https://api.coingecko.com/api/v3/coins/markets?ids=${joinedTokenIds}&vs_currency=usd&price_change_percentage=24h,7d`,
         {
           headers: {
             Accept: 'application/json',
