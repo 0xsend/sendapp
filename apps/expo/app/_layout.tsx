@@ -3,7 +3,7 @@ import { loadThemePromise, Provider } from 'app/provider'
 import { supabase } from 'app/utils/supabase/client.native'
 import { SplashScreen } from 'expo-router'
 import { useCallback, useEffect, useState } from 'react'
-import { LogBox, View } from 'react-native'
+import { LogBox, useColorScheme, View } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import StackNavigator from 'apps-expo/components/layout/StackNavigator'
 import { useFonts } from 'expo-font'
@@ -14,6 +14,7 @@ import {
   DMSans_700Bold,
 } from '@expo-google-fonts/dm-sans'
 import { DMMono_400Regular } from '@expo-google-fonts/dm-mono'
+import * as SystemUI from 'expo-system-ui'
 
 SplashScreen.preventAutoHideAsync()
 
@@ -36,6 +37,15 @@ export default function RootLayout() {
   const [themeLoaded, setThemeLoaded] = useState(false)
   const [sessionLoadAttempted, setSessionLoadAttempted] = useState(false)
   const [initialSession, setInitialSession] = useState<Session | null>(null)
+  const scheme = useColorScheme()
+
+  useEffect(() => {
+    if (scheme === 'dark') {
+      void SystemUI.setBackgroundColorAsync('#081619')
+    } else {
+      void SystemUI.setBackgroundColorAsync('#f7f7f7')
+    }
+  }, [scheme])
 
   useEffect(() => {
     supabase.auth
