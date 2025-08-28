@@ -72,7 +72,7 @@ const normalizeCoingeckoPrices = (prices: z.infer<typeof CoingeckoTokenPricesSch
   )
 }
 
-const fetchDexScreenerPrices = async () => {
+export const fetchDexScreenerPrices = async () => {
   // hardcoded to avoid testnet tokens
   const tokensToFetch = [
     '0x4200000000000000000000000000000000000006', // WETH

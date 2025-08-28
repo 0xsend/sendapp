@@ -36,13 +36,16 @@ import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { investmentCoins } from 'app/data/coins'
 import { CoinSheet } from 'app/components/CoinSheet'
 import { Link } from 'solito/link'
-import { baseMainnet, usdcAddress } from '@my/wagmi'
 import { Platform } from 'react-native'
 import { usePathname } from 'app/utils/usePathname'
 import { useMultipleTokensMarketData } from 'app/utils/coin-gecko'
 import { formatUnits } from 'viem'
 
-export function HomeScreen() {
+export function HomeScreen({
+  serverCoinData,
+}: {
+  serverCoinData?: import('app/utils/coin-gecko').CoinData | null
+} = {}) {
   const media = useMedia()
   const router = useRouter()
   const supabase = useSupabase()
@@ -88,6 +91,7 @@ export function HomeScreen() {
                     opacity: 0,
                     y: media.gtLg ? 0 : 300,
                   }}
+                  serverCoinData={serverCoinData ?? undefined}
                 />
               )
           }
@@ -97,7 +101,11 @@ export function HomeScreen() {
   )
 }
 
-function HomeBody(props: XStackProps) {
+function HomeBody(
+  props: XStackProps & {
+    serverCoinData?: import('app/utils/coin-gecko').CoinData | null
+  }
+) {
   const { coin: selectedCoin, isLoading } = useCoinFromTokenParam()
   const [queryParams] = useRootScreenParams()
 
@@ -155,7 +163,12 @@ function HomeBody(props: XStackProps) {
             case Platform.OS !== 'web':
               return null
             case selectedCoin !== undefined:
-              return <TokenDetails coin={selectedCoin} />
+              return (
+                <TokenDetails
+                  coin={selectedCoin}
+                  serverCoinData={props.serverCoinData ?? undefined}
+                />
+              )
             case queryParams.token === 'investments':
               return <InvestmentsBody />
             case queryParams.token === 'stables':

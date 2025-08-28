@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect } from 'react'
 import { View, Platform } from 'react-native'
 import {
-  LongPressGestureHandler,
-  type LongPressGestureHandlerGestureEvent,
-  type LongPressGestureHandlerProperties,
+  PanGestureHandler,
+  type PanGestureHandlerGestureEvent,
+  type PanGestureHandlerProperties,
 } from 'react-native-gesture-handler'
 import Animated, {
   FadeIn,
@@ -77,10 +77,12 @@ interface ChartPathProps extends PathProps {
   selectedStrokeWidth?: number
   gestureEnabled?: boolean
   springConfig?: WithSpringConfig
-  longPressGestureHandlerProps?: LongPressGestureHandlerProperties
+  panGestureHandlerProps?: PanGestureHandlerProperties
   timingFeedbackConfig?: WithTimingConfig
   timingAnimationConfig?: WithTimingConfig
   isCard?: boolean
+  // Swallowed on native to avoid forwarding to AnimatedPath; used only on web
+  onScrub?: unknown
 }
 
 function positionXWithMargin(x: number, margin: number, width: number) {
@@ -139,7 +141,7 @@ const ChartPathInner = React.memo(
     containerWidth,
     timingFeedbackConfig,
     timingAnimationConfig,
-    longPressGestureHandlerProps,
+    panGestureHandlerProps,
     positionX,
     positionY,
     originalX,
@@ -301,13 +303,15 @@ const ChartPathInner = React.memo(
       }
     }, [currentPath])
 
-    const onGestureEvent = useAnimatedGestureHandler<LongPressGestureHandlerGestureEvent>(
+    const onGestureEvent = useAnimatedGestureHandler<PanGestureHandlerGestureEvent>(
       {
+        onStart: (event) => {
+          state.value = event.state
+          isActive.value = true
+          if (hapticsEnabled) runOnJS(triggerHaptics)('soft')
+          updatePosition({ x: positionXWithMargin(event.x, hitSlop, width), y: event.y })
+        },
         onActive: (event) => {
-          if (!isActive.value) {
-            isActive.value = true
-            if (hapticsEnabled) runOnJS(triggerHaptics)('soft')
-          }
           state.value = event.state
           updatePosition({ x: positionXWithMargin(event.x, hitSlop, width), y: event.y })
         },
@@ -318,37 +322,23 @@ const ChartPathInner = React.memo(
         onEnd: (event) => {
           state.value = event.state
           resetGestureState()
-
           if (hapticsEnabled) runOnJS(triggerHaptics)('soft')
         },
         onFail: (event) => {
           state.value = event.state
           resetGestureState()
         },
-        onStart: (event) => {
-          // WARNING: the following code does not run on using iOS, but it does on Android.
-          // I use the same code from onActive
-          // platform is for safety
-          if (IS_ANDROID) {
-            state.value = event.state
-            isActive.value = true
-
-            if (hapticsEnabled) runOnJS(triggerHaptics)('soft')
-          }
-        },
       },
       [width, height, hapticsEnabled, hitSlop, timingFeedbackConfig, updatePosition]
     )
 
     return (
-      <LongPressGestureHandler
+      <PanGestureHandler
         enabled={gestureEnabled}
-        maxDist={100000}
-        minDurationMs={0}
         onGestureEvent={onGestureEvent}
-        shouldCancelWhenOutside={false}
+        shouldCancelWhenOutside
         // eslint-disable-next-line react/jsx-props-no-spreading
-        {...longPressGestureHandlerProps}
+        {...panGestureHandlerProps}
       >
         <Animated.View>
           <Svg
@@ -368,7 +358,7 @@ const ChartPathInner = React.memo(
             />
           </Svg>
         </Animated.View>
-      </LongPressGestureHandler>
+      </PanGestureHandler>
     )
   }
 )
@@ -384,8 +374,9 @@ export const ChartPath = React.memo(
     gestureEnabled,
     timingFeedbackConfig,
     timingAnimationConfig,
-    longPressGestureHandlerProps = {},
+    panGestureHandlerProps = {},
     isCard = false,
+    onScrub: _onScrubIgnored,
     ...props
   }: ChartPathProps) => {
     const {
@@ -418,7 +409,7 @@ export const ChartPath = React.memo(
                 height,
                 hitSlop,
                 isActive,
-                longPressGestureHandlerProps,
+                panGestureHandlerProps,
                 originalX,
                 originalY,
                 positionX,
