@@ -62,10 +62,10 @@ const TokenBalanceItem = ({
       <IconCoin symbol={coin.symbol} size={'$3.5'} />
       <YStack f={1} jc={'space-between'}>
         <XStack jc={'space-between'} ai={'center'}>
-          <Paragraph fontSize={'$6'} fontWeight={'500'} color={'$color12'}>
+          <Paragraph fontSize={'$5'} fontWeight={'400'} color={'$color12'}>
             {coin.label}
           </Paragraph>
-          <TokenBalance coin={coin} />
+          <TokenUSDBalance coin={coin} />
         </XStack>
         <XStack jc={'space-between'} ai={'center'}>
           <Paragraph
@@ -73,21 +73,18 @@ const TokenBalanceItem = ({
             color={'$lightGrayTextField'}
             $theme-light={{ color: '$darkGrayTextField' }}
           >
-            {(() => {
-              switch (true) {
-                case isLoadingTokenPrices || balanceInUSD === undefined:
-                  return '$0.00'
-                case isPriceHidden:
-                  return '///////'
-                default:
-                  return `$${formatAmount(balanceInUSD, 12, 2)}`
-              }
-            })()}
+            {isPriceHidden
+              ? '//////'
+              : `${formatAmount(
+                  (Number(coin.balance) / 10 ** coin.decimals).toString(),
+                  10,
+                  coin.formatDecimals ?? 5
+                )} ${coin.symbol}`}
           </Paragraph>
           <Paragraph
             color={(() => {
               switch (true) {
-                case isLoadingTokensMarketData || changePercent24h === null || isNeutral:
+                case isLoadingTokenPrices || balanceInUSD === undefined:
                   return isDarkTheme ? '$lightGrayTextField' : '$darkGrayTextField'
                 case changePercent24h !== null && changePercent24h >= 0:
                   return '$olive'
@@ -96,9 +93,19 @@ const TokenBalanceItem = ({
               }
             })()}
           >
-            {isLoadingTokensMarketData || changePercent24h === null || isNeutral
-              ? '0.00%'
-              : `${changePercent24h >= 0 ? '+' : ''}${changePercent24h.toFixed(2)}%`}
+            {(() => {
+              switch (true) {
+                case isLoadingTokensMarketData ||
+                  changePercent24h === null ||
+                  isNeutral ||
+                  coin.balance === 0n:
+                  return '---'
+                case isPriceHidden:
+                  return '///////'
+                default:
+                  return `${changePercent24h >= 0 ? '+' : ''}${changePercent24h.toFixed(2)}%`
+              }
+            })()}
           </Paragraph>
         </XStack>
       </YStack>
@@ -138,19 +145,22 @@ const TokenBalanceItem = ({
   )
 }
 
-const TokenBalance = ({
-  coin: { decimals, balance, formatDecimals },
+const TokenUSDBalance = ({
+  coin,
 }: {
   coin: CoinWithBalance
 }) => {
+  const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
+  const balanceInUSD = convertBalanceToFiat(
+    coin,
+    coin.symbol === 'USDC' ? 1 : tokenPrices?.[coin.token]
+  )
   const { isPriceHidden } = useIsPriceHidden()
 
-  if (balance === undefined) return <></>
+  if (coin.balance === undefined) return <></>
   return (
     <Paragraph fontSize={'$8'} fontWeight={'500'} col="$color12" lineHeight={24}>
-      {isPriceHidden
-        ? '//////'
-        : formatAmount((Number(balance) / 10 ** decimals).toString(), 10, formatDecimals ?? 5)}
+      {isPriceHidden ? '//////' : `$${formatAmount(balanceInUSD, 12, 2) || 0}`}
     </Paragraph>
   )
 }

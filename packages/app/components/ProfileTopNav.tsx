@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Button as ButtonOg,
   type ButtonProps,
   Container,
@@ -23,7 +22,7 @@ interface ProfileTopNavProps {
   backFunction?: 'root' | 'pop' | 'router' | 'home'
 }
 
-export function ProfileTopNav({ backFunction = 'router' }: ProfileTopNavProps) {
+export function ProfileTopNav() {
   const media = useMedia()
   const { back } = useRouter()
   const params = useParams<{ tag?: string; sendid?: string }>()

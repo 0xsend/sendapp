@@ -3,8 +3,8 @@ import {
   Button,
   Card,
   H1,
+  H4,
   Paragraph,
-  Separator,
   Spinner,
   Stack,
   styled,
@@ -12,6 +12,7 @@ import {
   XStack,
   type XStackProps,
   YStack,
+  Theme,
 } from '@my/ui'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
@@ -24,21 +25,22 @@ import { IsPriceHiddenProvider } from 'app/features/home/utils/useIsPriceHidden'
 
 import { StablesBalanceCard } from './StablesBalanceCard'
 import { SavingsBalanceCard } from './SavingsBalanceCard'
-import { InvestmentsBalanceCard } from './InvestmentsBalanceCard'
+import { InvestmentsBalanceCard, InvestmentsPortfolioCard } from './InvestmentsBalanceCard'
 import { InvestmentsBalanceList } from './InvestmentBalanceList'
 import { StablesBalanceList } from './StablesBalanceList'
 import { RewardsCard } from './RewardsCard'
 import { FriendsCard } from './FriendsCard'
 import { useCoins } from 'app/provider/coins'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
-import { IconPlus } from 'app/components/icons'
 import { investmentCoins } from 'app/data/coins'
 import { CoinSheet } from 'app/components/CoinSheet'
 import { Link } from 'solito/link'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
 import { Platform } from 'react-native'
 import { usePathname } from 'app/utils/usePathname'
+import { useMultipleTokensMarketData } from 'app/utils/coin-gecko'
+import { formatUnits } from 'viem'
 
 export function HomeScreen() {
   const media = useMedia()
@@ -130,15 +132,18 @@ function HomeBody(props: XStackProps) {
             </StablesBalanceCard.Footer>
           </StablesBalanceCard>
           <SavingsBalanceCard href="/earn" w="100%" />
-          <InvestmentsBalanceCard w="100%">
+          <InvestmentsBalanceCard padded size="$5" gap="$3" w="100%">
             <InvestmentsBalanceCard.HomeScreenHeader />
-            <InvestmentsBalanceCard.Footer>
-              <InvestmentsBalanceCard.FooterStack>
-                <InvestmentsBalanceCard.Balance />
-                <InvestmentsBalanceCard.Aggregate />
-              </InvestmentsBalanceCard.FooterStack>
+            <Card.Footer jc="space-between" ai="center">
+              <YStack gap="$3">
+                <XStack ai="center" gap={'$3'} w="100%">
+                  <InvestmentsBalanceCard.Balance />
+                  <InvestmentsBalanceCard.Aggregate />
+                </XStack>
+                <InvestmentsBalanceCard.WeeklyDelta />
+              </YStack>
               <InvestmentsBalanceCard.Preview />
-            </InvestmentsBalanceCard.Footer>
+            </Card.Footer>
           </InvestmentsBalanceCard>
           <HomeBodyCardRow>
             <RewardsCard w="55%" href={'/rewards'} />
@@ -167,8 +172,33 @@ function HomeBody(props: XStackProps) {
 export function InvestmentsBody() {
   const { investmentCoins: myInvestmentCoins, isLoading } = useCoins()
   const [isSheetOpen, setIsSheetOpen] = useState(false)
-  const hoverStyles = useHoverStyles()
+  useHoverStyles()
   const pathname = usePathname()
+
+  // Market data for portfolio-level computations
+  const ownedCoins = myInvestmentCoins.filter((c) => c?.balance && c.balance > 0n)
+  const tokenIds = ownedCoins.map((c) => c.coingeckoTokenId)
+  const { data: marketData, isLoading: isLoadingMarket } = useMultipleTokensMarketData(tokenIds)
+
+  const { delta24hUSD, pct24h } = useMemo(() => {
+    if (!marketData?.length || ownedCoins.length === 0) return { delta24hUSD: 0, pct24h: 0 }
+
+    const assets = ownedCoins.map((coin) => {
+      const md = marketData.find((m) => m.id === coin.coingeckoTokenId)
+      if (!md || !coin.balance) return { value: 0, pct24h: 0 }
+      const balance = Number(formatUnits(coin.balance, coin.decimals))
+      const value = balance * (md.current_price ?? 0)
+      const pct24h =
+        md.price_change_percentage_24h_in_currency ?? md.price_change_percentage_24h ?? 0
+      return { value, pct24h }
+    })
+
+    const total = assets.reduce((s, a) => s + a.value, 0)
+    const delta = assets.reduce((s, a) => s + (a.value * a.pct24h) / 100, 0)
+    const weightedPct =
+      total === 0 ? 0 : assets.reduce((s, a) => s + (a.value / total) * a.pct24h, 0)
+    return { delta24hUSD: delta, pct24h: weightedPct }
+  }, [marketData, ownedCoins])
 
   useEffect(() => {
     if (pathname === '/trade') {
@@ -178,44 +208,120 @@ export function InvestmentsBody() {
 
   return (
     <YStack ai="center" $gtXs={{ gap: '$3' }} gap={'$3.5'} f={1}>
-      <InvestmentsBalanceCard w="100%" mah={190} $gtLg={{ display: 'none' }}>
-        <InvestmentsBalanceCard.InvestmentsScreenHeader />
-        <InvestmentsBalanceCard.Footer>
-          <InvestmentsBalanceCard.FooterStack w={'100%'} gap={'$2.5'}>
-            <InvestmentsBalanceCard.Balance size={'$11'} lineHeight={60} />
-            <Separator
-              boc={'$silverChalice'}
-              $theme-light={{ boc: '$darkGrayTextField' }}
-              mb={'$1.5'}
-            />
-            <InvestmentsBalanceCard.Aggregate />
-          </InvestmentsBalanceCard.FooterStack>
-        </InvestmentsBalanceCard.Footer>
-      </InvestmentsBalanceCard>
-      <Card
-        bc={'$color1'}
-        width="100%"
-        p="$2"
-        $gtSm={{
-          p: '$4',
-        }}
-      >
-        {isLoading ? (
-          <YStack p="$3.5" ai="center">
-            <Spinner />
+      <InvestmentsPortfolioCard padded size="$6" w="100%" mah={220} gap="$5">
+        <Card.Header p={0}>
+          <Paragraph
+            fontSize={'$5'}
+            fontWeight="400"
+            color={'$lightGrayTextField'}
+            $theme-light={{ color: '$darkGrayTextField' }}
+          >
+            Portfolio Value
+          </Paragraph>
+        </Card.Header>
+
+        <InvestmentsBalanceCard.Body />
+        <InvestmentsBalanceCard.Footer onInvest={() => setIsSheetOpen(true)} />
+      </InvestmentsPortfolioCard>
+
+      {/* Summary cards under the header */}
+      <XStack w={'100%'} gap={'$3'}>
+        <Card f={1} padded elevation={'$0.75'} jc={'center'} ai={'center'} w="100%">
+          <YStack gap={'$2'} jc={'center'} ai={'center'}>
+            <Paragraph color={'$color10'} size={'$4'}>
+              Today
+            </Paragraph>
+            {isLoadingMarket ? (
+              <Spinner size={'small'} />
+            ) : (
+              <YStack ai={'center'} gap={'$2'}>
+                <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
+                  {`${delta24hUSD > 0 ? '+' : delta24hUSD < 0 ? '-' : ''}$${Math.abs(delta24hUSD).toFixed(2)}`}
+                </Paragraph>
+                {/* Small neutral pill to mirror style (no color change) */}
+                <Theme name={pct24h >= 0 ? 'green_active' : 'red_active'}>
+                  <Paragraph
+                    fontSize={'$2'}
+                    fontWeight={400}
+                    bc={'$color2'}
+                    $theme-dark={{
+                      bc: pct24h >= 0 ? 'rgba(134, 174, 128, 0.2)' : 'rgba(229, 115, 115, 0.2)',
+                    }}
+                    $theme-light={{
+                      bc: pct24h >= 0 ? 'rgba(134, 174, 128, 0.16)' : 'rgba(229, 115, 115, 0.16)',
+                    }}
+                    px={'$1.5'}
+                    br={'$2'}
+                  >
+                    {`${pct24h > 0 ? '+' : pct24h < 0 ? '-' : ''}${Math.abs(pct24h).toFixed(2)}%`}
+                  </Paragraph>
+                </Theme>
+              </YStack>
+            )}
           </YStack>
-        ) : (
-          <InvestmentsBalanceList coins={myInvestmentCoins} />
-        )}
-      </Card>
-      <Button elevation={1} p="$3" hoverStyle={hoverStyles} onPress={() => setIsSheetOpen(true)}>
-        <Button.Icon>
-          <IconPlus size="$1" color="$color10" />
-        </Button.Icon>
-        <Button.Text lineHeight={16} $platform-android={{ lineHeight: 17 }}>
-          See More
-        </Button.Text>
-      </Button>
+        </Card>
+        <Card f={1} padded elevation={'$0.75'} jc={'center'} ai={'center'} w="100%">
+          <YStack gap={'$2'} jc={'center'} ai={'center'}>
+            <Paragraph color={'$color10'} size={'$4'}>
+              Total Return
+            </Paragraph>
+            {isLoadingMarket ? (
+              <Spinner size={'small'} />
+            ) : (
+              <YStack ai={'center'} gap={'$2'}>
+                <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
+                  —
+                </Paragraph>
+                <Paragraph fontSize={'$2'} fontWeight={400} bc={'$color2'} px={'$1.5'} br={'$2'}>
+                  —
+                </Paragraph>
+              </YStack>
+            )}
+          </YStack>
+        </Card>
+        <Card f={1} padded elevation={'$0.75'} jc={'center'} ai={'center'} w="100%">
+          <YStack gap={'$2'} jc={'center'} ai={'center'}>
+            <Paragraph color={'$color10'} size={'$4'}>
+              Investment
+            </Paragraph>
+            {isLoadingMarket ? (
+              <Spinner size={'small'} />
+            ) : (
+              <YStack ai={'center'} gap={'$2'}>
+                <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
+                  —
+                </Paragraph>
+                <Paragraph fontSize={'$2'} fontWeight={400} bc={'$color2'} px={'$1.5'} br={'$2'}>
+                  —
+                </Paragraph>
+              </YStack>
+            )}
+          </YStack>
+        </Card>
+      </XStack>
+
+      {/* Holdings list */}
+      <YStack w={'100%'} gap={'$2'}>
+        <H4 fontWeight={600} size={'$7'}>
+          Your Holdings
+        </H4>
+        <Card
+          bc={'$color1'}
+          width="100%"
+          p="$2"
+          $gtSm={{
+            p: '$4',
+          }}
+        >
+          {isLoading ? (
+            <YStack p="$3.5" ai="center">
+              <Spinner />
+            </YStack>
+          ) : (
+            <InvestmentsBalanceList coins={myInvestmentCoins} />
+          )}
+        </Card>
+      </YStack>
 
       <CoinSheet open={isSheetOpen} onOpenChange={() => setIsSheetOpen(false)}>
         {Platform.OS === 'web' && (
