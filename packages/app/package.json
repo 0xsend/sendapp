@@ -53,6 +53,7 @@
     "expo-device": "~7.0.3",
     "expo-image-picker": "~16.0.6",
     "expo-linking": "~7.0.5",
+    "expo-router": "~4.0.15",
     "expo-secure-store": "~14.0.1",
     "expo-sharing": "13.0.1",
     "jsonwebtoken": "^9.0.2",

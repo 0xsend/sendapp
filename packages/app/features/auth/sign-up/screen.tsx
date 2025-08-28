@@ -31,6 +31,7 @@ import { z } from 'zod'
 import { useReferralCodeQuery } from 'app/utils/useReferralCode'
 import { Platform } from 'react-native'
 import useIsScreenFocused from 'app/utils/useIsScreenFocused'
+import useAuthRedirect from 'app/utils/useAuthRedirect/useAuthRedirect'
 
 const SignUpScreenFormSchema = z.object({
   name: formFields.text,
@@ -62,6 +63,7 @@ export const SignUpScreen = () => {
   const { data: referralCode } = useReferralCodeQuery()
   const isScreenFocused = useIsScreenFocused()
   const { xxs } = useMedia()
+  const { redirect } = useAuthRedirect()
 
   const formName = form.watch('name')
   const formIsAgreedToTerms = form.watch('isAgreedToTerms')
@@ -154,7 +156,7 @@ export const SignUpScreen = () => {
         sendAccountId: createdSendAccount.id,
         referralCode,
       })
-      router.replace('/')
+      redirect()
     } catch (error) {
       setFormState(FormState.Idle)
       const message = formatErrorMessage(error).split('.')[0] ?? 'Unknown error'
@@ -172,12 +174,12 @@ export const SignUpScreen = () => {
 
     try {
       await signInMutateAsync({})
-      router.push(queryParams.redirectUri ?? '/')
+      redirect(queryParams.redirectUri)
     } catch (error) {
       setFormState(FormState.Idle)
       toast.error(formatErrorMessage(error))
     }
-  }, [signInMutateAsync, toast.error, router.push, queryParams.redirectUri])
+  }, [signInMutateAsync, toast.error, redirect, queryParams.redirectUri])
 
   return (
     <YStack f={1} jc={'center'} ai={'center'} gap={xxs ? '$3.5' : '$7'} w={'100%'}>

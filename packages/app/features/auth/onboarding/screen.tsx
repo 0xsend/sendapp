@@ -23,6 +23,7 @@ import { formatErrorMessage } from 'app/utils/formatErrorMessage'
 import { useFirstSendtagQuery } from 'app/utils/useFirstSendtag'
 import { useReferralCodeQuery } from 'app/utils/useReferralCode'
 import { Platform } from 'react-native'
+import useAuthRedirect from 'app/utils/useAuthRedirect/useAuthRedirect'
 
 const OnboardingSchema = z.object({
   name: formFields.text,
@@ -38,6 +39,7 @@ export function OnboardingScreen() {
   const isClient = useIsClient()
   const { data: firstSendtag } = useFirstSendtagQuery()
   const { data: referralCode } = useReferralCodeQuery()
+  const { redirect } = useAuthRedirect()
 
   const formName = form.watch('name')
   const validationError = form.formState.errors.root
@@ -105,7 +107,7 @@ export function OnboardingScreen() {
         sendAccountId: createdSendAccount.id,
         referralCode,
       })
-      replace('/')
+      redirect()
     } catch (error) {
       console.error('Error creating account', error)
 

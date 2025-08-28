@@ -13998,6 +13998,7 @@ __metadata:
     expo-device: "npm:~7.0.3"
     expo-image-picker: "npm:~16.0.6"
     expo-linking: "npm:~7.0.5"
+    expo-router: "npm:~4.0.15"
     expo-secure-store: "npm:~14.0.1"
     expo-sharing: "npm:13.0.1"
     jest: "npm:^29"
