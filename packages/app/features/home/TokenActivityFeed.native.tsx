@@ -163,6 +163,8 @@ export default function TokenActivityFeed({
           return (
             <XStack
               backgroundColor={'$color1'}
+              borderWidth={1}
+              borderColor={'$color1'}
               borderTopLeftRadius={isFirst ? '$6' : 0}
               borderTopRightRadius={isFirst ? '$6' : 0}
               borderBottomLeftRadius={isLast ? '$6' : 0}

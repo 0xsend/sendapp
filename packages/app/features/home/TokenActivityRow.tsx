@@ -71,6 +71,8 @@ export function TokenActivityRow({
       gap="$4"
       p="$3.5"
       br={'$4'}
+      borderWidth={1}
+      borderColor={'$color1'}
       cursor={onPress ? 'pointer' : 'default'}
       testID={'TokenActivityRow'}
       hoverStyle={onPress ? hoverStyles : null}
