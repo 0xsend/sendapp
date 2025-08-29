@@ -202,6 +202,7 @@ export default function ActivityFeed({
         layoutProvider={layoutProvider}
         scrollViewProps={{
           showsVerticalScrollIndicator: false,
+          overScrollMode: 'never',
         }}
         onContentSizeChange={onContentSizeChange}
         onScroll={(e) => {

@@ -122,6 +122,7 @@ function SearchResults() {
       }}
       showsVerticalScrollIndicator={false}
       overflow="visible"
+      overScrollMode={'never'}
       {...(Platform.OS === 'web'
         ? {}
         : {

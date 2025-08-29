@@ -185,9 +185,12 @@ function RewardsBalance() {
       pb={'$3'}
       f={Platform.OS === 'web' ? undefined : 1}
       $gtLg={{ w: '50%' }}
-      elevation={Platform.OS === 'web' ? 0 : '$0.75'}
     >
-      <ScrollView showsVerticalScrollIndicator={false} overflow={'visible'}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        overflow={'visible'}
+        overScrollMode={'never'}
+      >
         <YStack gap={'$4'}>
           <TotalRewards
             rewards={formattedRewards}
@@ -374,13 +377,7 @@ const TotalRewards = ({ rewards, isLoading, coin }: TotalRewardsProps = {}) => {
 
   return (
     <Fade>
-      <Card
-        w={'100%'}
-        p={'$5'}
-        gap={'$7'}
-        elevation={Platform.OS === 'web' ? '$0.75' : 0}
-        $gtLg={{ p: '$7' }}
-      >
+      <Card w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>
         <YStack gap={'$4'}>
           <XStack ai={'center'} gap={'$2'}>
             <IconCoin symbol={coin?.symbol || ''} size={'$2'} />

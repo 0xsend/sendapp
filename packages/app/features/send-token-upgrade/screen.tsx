@@ -101,6 +101,7 @@ export function SendV0TokenUpgradeScreen({ children }: { children?: React.ReactN
       w="100%"
       maw="100%"
       mih={600}
+      overScrollMode={'never'}
       f={1}
     >
       <IconSendLogo size="$8" color="$color12" mx="auto" />

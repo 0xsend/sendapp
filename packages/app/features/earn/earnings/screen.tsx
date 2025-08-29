@@ -11,14 +11,12 @@ import { useEarnActivityFeed } from '../utils/useEarnActivityFeed'
 
 export const EarningsBalance = () => {
   return (
-    <YStack
-      w={'100%'}
-      gap={'$4'}
-      pb={'$3'}
-      $gtLg={{ w: '50%' }}
-      elevation={Platform.OS === 'web' ? 0 : '$0.75'}
-    >
-      <ScrollView showsVerticalScrollIndicator={false} overflow={'visible'}>
+    <YStack w={'100%'} gap={'$4'} pb={'$3'} $gtLg={{ w: '50%' }}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        overflow={'visible'}
+        overScrollMode={'never'}
+      >
         <YStack gap={'$4'}>
           <TotalEarning />
           <Paragraph size={'$7'} fontWeight={'600'}>
@@ -205,13 +203,7 @@ function TotalEarning() {
 
   return (
     <Fade>
-      <Card
-        w={'100%'}
-        p={'$5'}
-        gap={'$7'}
-        elevation={Platform.OS === 'web' ? '$0.75' : 0}
-        $gtLg={{ p: '$7' }}
-      >
+      <Card w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>
         <YStack gap={'$3.5'}>
           <XStack ai={'center'} gap={'$2'}>
             <IconCoin symbol={coin.data.symbol} size={'$2'} />

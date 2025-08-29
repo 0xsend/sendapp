@@ -81,6 +81,7 @@ export default function FriendsScreen() {
         layoutProvider={layoutProvider}
         scrollViewProps={{
           showsVerticalScrollIndicator: false,
+          overScrollMode: 'never',
         }}
         onEndReached={handleEndReach}
         onEndReachedThreshold={0.5}
