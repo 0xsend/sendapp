@@ -30,7 +30,7 @@ export const BottomNavBarContent = ({
       jc={'center'}
       overflow={'visible'}
     >
-      <Card elevate fd="row" gap="$7" br={'$6'} ai={'center'} jc={'center'} py={'$3'} px="$7">
+      <Card elevation={5} fd="row" gap="$7" br={'$6'} ai={'center'} jc={'center'} py={'$3'} px="$7">
         {tabs.map((tab) => {
           const isActiveRoute = currentRoute === tab.key
 
