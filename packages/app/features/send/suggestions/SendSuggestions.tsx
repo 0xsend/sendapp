@@ -1,4 +1,4 @@
-import { Avatar, Paragraph, YStack } from '@my/ui'
+import { Avatar, Paragraph, Text, YStack } from '@my/ui'
 import { FlatList, Platform } from 'react-native'
 import { useSendScreenParams } from 'app/routers/params'
 import { Link } from 'solito/link'
@@ -142,17 +142,17 @@ const SuggestionTile = ({
             </>
           )}
         </Avatar>
-        <Paragraph
+        <Text
           w={74}
-          size={'$3'}
-          textOverflow={'ellipsis'}
+          fontSize={'$3'}
           numberOfLines={1}
+          ellipsizeMode="tail"
           color={'$lightGrayTextField'}
           ta={'center'}
           $theme-light={{ color: '$color12' }}
         >
           {label}
-        </Paragraph>
+        </Text>
       </YStack>
     </Link>
   )
