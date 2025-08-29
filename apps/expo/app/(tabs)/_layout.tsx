@@ -1,11 +1,14 @@
 import { Paragraph, useTheme, XStack } from '@my/ui'
 import { IconSendLogo } from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
-import { Redirect, Stack, Tabs } from 'expo-router'
+import { Redirect, Stack, Tabs, useFocusEffect } from 'expo-router'
 import AvatarMenuButton from 'app/components/AvatarMenuButton/AvatarMenuButton'
 import { HeaderSlot } from 'apps-expo/components/layout/HeaderSlot'
 import BottomNavBar from 'app/components/BottomTabBar/BottomNavBar'
 import type { NavigationState, PartialState, Route } from '@react-navigation/native'
+import { useCallback } from 'react'
+import * as NavigationBar from 'expo-navigation-bar'
+import { useColorScheme } from 'react-native'
 
 const TABS = [
   {
@@ -41,6 +44,21 @@ function getActiveTabName(state: NavigationState | PartialState<NavigationState>
 export default function Layout() {
   const theme = useTheme()
   const { session, profile } = useUser()
+  const scheme = useColorScheme()
+
+  useFocusEffect(
+    useCallback(() => {
+      if (scheme === 'dark') {
+        setTimeout(() => {
+          void NavigationBar.setBackgroundColorAsync('#081619')
+        }, 0)
+      } else {
+        setTimeout(() => {
+          void NavigationBar.setBackgroundColorAsync('#f7f7f7')
+        }, 0)
+      }
+    }, [scheme])
+  )
 
   // Redirect to root if not logged in - this ensures the tabs layout is only shown for logged-in users
   if (!session) {
