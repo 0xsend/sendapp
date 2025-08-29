@@ -504,7 +504,7 @@ function ErrorMessage({ error, ...props }: ParagraphProps & { error?: string }) 
   if (!error) return null
 
   return (
-    <ScrollView height="$4">
+    <ScrollView height="$4" overScrollMode={'never'}>
       <Paragraph testID="SendConfirmError" size="$2" width="100%" col={'$error'} {...props}>
         {error.split('.').at(0)}
       </Paragraph>

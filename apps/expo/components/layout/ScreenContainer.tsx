@@ -25,7 +25,7 @@ export const ScreenContainer = ({ children }: PropsWithChildren) => {
         showsVerticalScrollIndicator={false}
         overflow={'visible'}
         bounces={true}
-        overScrollMode="always" // Android scroll indicator
+        overScrollMode="never" // Android scroll indicator
       >
         {children}
       </ScrollView>

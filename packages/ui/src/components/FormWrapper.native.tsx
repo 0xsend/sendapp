@@ -56,7 +56,7 @@ const Wrapper = forwardRef<TamaguiElement, YStackProps>(function Wrapper(props, 
 
 const Body = forwardRef<TamaguiElement, YStackProps>(function Body(props, ref) {
   return (
-    <ScrollView>
+    <ScrollView overScrollMode={'never'}>
       <YStack p="$4" ref={ref} gap="$2" pb="$8" {...props} />
     </ScrollView>
   )
