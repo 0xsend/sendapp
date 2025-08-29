@@ -143,6 +143,8 @@ export default function ActivityFeed({
           return (
             <XStack
               backgroundColor={'$color1'}
+              borderWidth={1}
+              borderColor={'$color1'}
               borderTopLeftRadius={item.isFirstInGroup ? '$6' : 0}
               borderTopRightRadius={item.isFirstInGroup ? '$6' : 0}
               borderBottomLeftRadius={item.isLastInGroup ? '$6' : 0}
