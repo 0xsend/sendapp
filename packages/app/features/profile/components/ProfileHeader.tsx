@@ -57,7 +57,7 @@ export const ProfileHeader = ({
             </>
           )}
         </LinkableAvatar>
-        <Paragraph nativeID="profileName" size={'$8'} width={'80%'}>
+        <Paragraph nativeID="profileName" size={'$8'} width={'80%'} lineHeight={28}>
           {(() => {
             switch (true) {
               case idType === 'address':
