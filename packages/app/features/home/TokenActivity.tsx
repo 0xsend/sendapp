@@ -12,7 +12,7 @@ export const TokenActivity = ({ coin }: { coin: CoinWithBalance }) => {
   const { isOpen, selectActivity } = useActivityDetails()
 
   const tokenActivityFeedQuery = useTokenActivityFeed({
-    pageSize: 10,
+    pageSize: 50,
     address: coin.token === 'eth' ? undefined : hexToBytea(coin.token),
   })
 

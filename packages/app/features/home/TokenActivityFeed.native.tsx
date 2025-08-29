@@ -3,6 +3,7 @@ import {
   dataProviderMakerNative,
   H4,
   layoutProviderMakerNative,
+  Paragraph,
   Spinner,
   XStack,
   YStack,
@@ -24,6 +25,7 @@ import type { CoinWithBalance } from 'app/data/coins'
 type ListItem =
   | { type: 'activity-header'; data: { title: string; hasActivities: boolean } }
   | { type: 'activity'; data: Activity }
+  | { type: 'loader' }
 
 export default function TokenActivityFeed({
   tokenActivityFeedQuery,
@@ -44,6 +46,7 @@ export default function TokenActivityFeed({
     data,
     isLoading: isLoadingActivities,
     isFetchingNextPage: isFetchingNextPageActivities,
+    error: activitiesError,
     fetchNextPage,
     hasNextPage,
   } = tokenActivityFeedQuery
@@ -67,10 +70,14 @@ export default function TokenActivityFeed({
       items.push({ type: 'activity', data: activity })
     }
 
+    items.push({
+      type: 'loader',
+    })
+
     return {
       listData: items,
-      firstActivityIndex: 2,
-      lastActivityIndex: items.length - 1,
+      firstActivityIndex: 1,
+      lastActivityIndex: items.length - 2,
     }
   }, [activities])
 
@@ -130,6 +137,8 @@ export default function TokenActivityFeed({
             case 'activity-header':
               // Height for activity title
               return 35
+            case 'loader':
+              return 40
             default:
               return 102
           }
@@ -153,8 +162,6 @@ export default function TokenActivityFeed({
         case 'activity':
           return (
             <XStack
-              elevation={'$0.75'}
-              position={'relative'}
               backgroundColor={'$color1'}
               borderTopLeftRadius={isFirst ? '$6' : 0}
               borderTopRightRadius={isFirst ? '$6' : 0}
@@ -162,23 +169,17 @@ export default function TokenActivityFeed({
               borderBottomRightRadius={isLast ? '$6' : 0}
             >
               <TokenActivityRow activity={item.data} onPress={onActivityPress} />
-              {!isFirst && (
-                <XStack
-                  position={'absolute'}
-                  top={-10}
-                  right={0}
-                  left={0}
-                  height={10}
-                  backgroundColor={'$color1'}
-                />
-              )}
             </XStack>
+          )
+        case 'loader':
+          return (
+            <Spinner opacity={hasNextPage ? 1 : 0} pt={'$3.5'} size="small" color={'$color12'} />
           )
         default:
           return null
       }
     },
-    [onActivityPress, firstActivityIndex, lastActivityIndex]
+    [onActivityPress, firstActivityIndex, lastActivityIndex, hasNextPage]
   )
 
   const handleEndReach = useCallback(() => {
@@ -186,6 +187,26 @@ export default function TokenActivityFeed({
       void fetchNextPage()
     }
   }, [hasNextPage, isFetchingNextPageActivities, fetchNextPage])
+
+  if (isLoadingActivities) {
+    return <Spinner size="small" />
+  }
+
+  if (activitiesError) {
+    return (
+      <Paragraph maxWidth={600} fontFamily={'$mono'} fontSize={'$5'} color={'$error'}>
+        {activitiesError?.message.split('.').at(0) ?? `${activitiesError}`}
+      </Paragraph>
+    )
+  }
+
+  if (!activities.length) {
+    return (
+      <Paragraph fontSize={'$5'} color={'$color12'} ta={'center'} w={'100%'} mt={'$3.5'}>
+        No activities, just send it!
+      </Paragraph>
+    )
+  }
 
   return (
     <YStack f={1}>
@@ -199,15 +220,9 @@ export default function TokenActivityFeed({
           overScrollMode: 'never',
         }}
         onEndReached={handleEndReach}
-        onEndReachedThreshold={0.5}
+        onEndReachedThreshold={1000}
+        renderAheadOffset={2000}
       />
-      <XStack py={'$3.5'} jc={'center'}>
-        <Spinner
-          opacity={!isLoadingActivities && isFetchingNextPageActivities ? 1 : 0}
-          size="small"
-          color={'$color12'}
-        />
-      </XStack>
     </YStack>
   )
 }

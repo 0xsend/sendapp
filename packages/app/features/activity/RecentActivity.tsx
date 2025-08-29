@@ -5,7 +5,7 @@ import { useActivityDetails } from 'app/provider/activity-details'
 import ActivityFeed from 'app/features/activity/RecentActivityFeed'
 
 export function RecentActivity() {
-  const result = useActivityFeed()
+  const result = useActivityFeed({ pageSize: 50 })
   const { isOpen, selectActivity } = useActivityDetails()
 
   return (
