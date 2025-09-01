@@ -41,6 +41,7 @@ export function ProfileHistoryScreen({ sendid: propSendid }: ProfileScreenProps)
     error: activitiesError,
     isFetchingNextPage: isFetchingNextPageActivities,
     fetchNextPage,
+    hasNextPage,
   } = useInterUserActivityFeed({
     pageSize: 10,
     otherUserId,
@@ -136,6 +137,9 @@ export function ProfileHistoryScreen({ sendid: propSendid }: ProfileScreenProps)
                         idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
                       />
                     ) : null
+                  }
+                  ListFooterComponent={
+                    hasNextPage ? <Spinner size="small" color={'$color12'} my={'$4'} /> : null
                   }
                   inverted={true}
                   showsVerticalScrollIndicator={false}
