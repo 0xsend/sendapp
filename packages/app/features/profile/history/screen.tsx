@@ -96,7 +96,52 @@ export function ProfileHistoryScreen({ sendid: propSendid }: ProfileScreenProps)
           <>
             <ProfileHeader profile={otherUserProfile} />
             <Stack f={1} mt={'$2'} $gtLg={{ pb: '$3.5' }}>
-              {Boolean(!activities?.length) && (
+              {activities?.length ? (
+                <FlatList
+                  style={{ flex: 1 }}
+                  data={activities}
+                  keyExtractor={(activity) =>
+                    `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`
+                  }
+                  renderItem={({ item: activity, index }) => {
+                    const date = activity.created_at.toLocaleDateString()
+                    const nextDate = activities[index + 1]?.created_at.toLocaleDateString()
+                    const shouldShowDatePill = !nextDate || date !== nextDate
+
+                    return (
+                      <>
+                        <Fade>
+                          <TransactionEntry
+                            activity={activity}
+                            sent={activity?.to_user?.id !== user?.id}
+                            otherUserProfile={otherUserProfile}
+                            currentUserProfile={currentUserProfile}
+                            onPress={() => selectActivity(activity)}
+                          />
+                        </Fade>
+                        {shouldShowDatePill ? <DatePill date={date} /> : null}
+                      </>
+                    )
+                  }}
+                  onEndReached={() => fetchNextPage()}
+                  ListEmptyComponent={
+                    !isLoadingActivities && isFetchingNextPageActivities ? (
+                      <Spinner size="small" color={'$color12'} my={'$4'} />
+                    ) : null
+                  }
+                  ListHeaderComponent={
+                    Platform.OS === 'web' ? (
+                      <SendButton
+                        identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
+                        idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
+                      />
+                    ) : null
+                  }
+                  inverted={true}
+                  showsVerticalScrollIndicator={false}
+                  stickyHeaderIndices={[0]}
+                />
+              ) : (
                 <YStack f={1}>
                   <Paragraph
                     size={'$8'}
@@ -109,50 +154,6 @@ export function ProfileHistoryScreen({ sendid: propSendid }: ProfileScreenProps)
                   </Paragraph>
                 </YStack>
               )}
-              <FlatList
-                style={{ flex: 1 }}
-                data={activities}
-                keyExtractor={(activity) =>
-                  `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`
-                }
-                renderItem={({ item: activity, index }) => {
-                  const date = activity.created_at.toLocaleDateString()
-                  const nextDate = activities[index + 1]?.created_at.toLocaleDateString()
-                  const shouldShowDatePill = !nextDate || date !== nextDate
-
-                  return (
-                    <>
-                      <Fade>
-                        <TransactionEntry
-                          activity={activity}
-                          sent={activity?.to_user?.id !== user?.id}
-                          otherUserProfile={otherUserProfile}
-                          currentUserProfile={currentUserProfile}
-                          onPress={() => selectActivity(activity)}
-                        />
-                      </Fade>
-                      {shouldShowDatePill ? <DatePill date={date} /> : null}
-                    </>
-                  )
-                }}
-                onEndReached={() => fetchNextPage()}
-                ListEmptyComponent={
-                  !isLoadingActivities && isFetchingNextPageActivities ? (
-                    <Spinner size="small" color={'$color12'} my={'$4'} />
-                  ) : null
-                }
-                ListHeaderComponent={
-                  Platform.OS === 'web' ? (
-                    <SendButton
-                      identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
-                      idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
-                    />
-                  ) : null
-                }
-                inverted={true}
-                showsVerticalScrollIndicator={false}
-                stickyHeaderIndices={[0]}
-              />
             </Stack>
             {Platform.OS !== 'web' && (
               <SendButton
