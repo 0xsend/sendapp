@@ -1,6 +1,7 @@
 import { createContext, useContext, useMemo } from 'react'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import type { allCoins, CoinWithBalance } from 'app/data/coins'
+import { useTokenPrices } from 'app/utils/useTokenPrices'
 import {
   coins as coinsOg,
   partnerCoins,
@@ -26,7 +27,9 @@ type CoinsContextType = {
 const CoinsContext = createContext<CoinsContextType | undefined>(undefined)
 
 export function CoinsProvider({ children }: { children: React.ReactNode }) {
-  const { balances, isLoading, ethQuery, tokensQuery, pricesQuery } = useSendAccountBalances()
+  const { balances, isLoading, ethQuery, tokensQuery } = useSendAccountBalances()
+  // Defer any external price fetching until session is present (handled inside useTokenPrices)
+  const pricesQuery = useTokenPrices()
 
   const coins = useMemo(() => {
     // Create coins array regardless of balances

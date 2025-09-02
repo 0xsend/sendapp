@@ -1,34 +1,23 @@
 import { YStack } from '@my/ui'
-import type { CoinWithBalance } from 'app/data/coins'
 import { TokenDetailsHeader } from 'app/features/home/TokenDetailsHeader'
 import { TokenAbout } from 'app/features/home/TokenAbout'
 import { TokenKeyMetrics } from './TokenKeyMetrics'
-import { useCoinData, type CoinData } from 'app/utils/coin-gecko'
 import { TokenChartSection } from 'app/features/home/TokenChartSection'
+import { baseMainnet, usdcAddress } from '@my/wagmi'
+import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 
-export const TokenDetails = ({
-  coin,
-  serverCoinData,
-}: {
-  coin: CoinWithBalance
-  serverCoinData?: CoinData
-}) => {
-  const { data: fetchedCoinData, isLoading: isLoadingCoinData } = useCoinData(coin.coingeckoTokenId)
-  const coinData = serverCoinData ?? fetchedCoinData
+export const TokenDetails = () => {
+  const { coin } = useCoinFromTokenParam()
+  if (coin === undefined) return null
+
+  const isUSDC = coin.token === usdcAddress[baseMainnet.id]
+
   return (
     <YStack f={1} gap="$5" $gtLg={{ w: '45%', pb: '$0' }} pb="$4">
-      <TokenDetailsHeader coin={coin} />
-      <TokenChartSection coin={coin} />
-      <TokenKeyMetrics
-        coin={coin}
-        coinData={coinData}
-        isLoadingCoinData={isLoadingCoinData && !serverCoinData}
-      />
-      <TokenAbout
-        coin={coin}
-        coinData={coinData}
-        isLoadingCoinData={isLoadingCoinData && !serverCoinData}
-      />
+      <TokenDetailsHeader />
+      {!isUSDC ? <TokenChartSection /> : null}
+      <TokenKeyMetrics />
+      <TokenAbout />
     </YStack>
   )
 }

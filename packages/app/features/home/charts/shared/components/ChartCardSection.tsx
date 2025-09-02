@@ -1,20 +1,25 @@
 import { Card, H4, Spinner, YStack } from '@my/ui'
+import type { Timeframe } from '../timeframes'
+import { useTokenChartData } from '../useTokenChartData'
+import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 
 export function ChartCardSection({
+  tf,
   title,
-  isLoading,
   children,
 }: {
+  tf: Timeframe
   title: string
-  isLoading: boolean
   children: React.ReactNode
 }) {
+  const { coin } = useCoinFromTokenParam()
+  const { isLoading } = useTokenChartData(coin?.coingeckoTokenId, tf)
   return (
     <YStack gap={'$3'}>
       <H4 fontWeight={600} size={'$7'}>
         {title}
       </H4>
-      <Card padded size={'$5'} w={'100%'} elevation={'$0.75'}>
+      <Card padded size={'$5'} w={'100%'} elevation={1}>
         <YStack gap={'$3'} position="relative">
           {children}
           {isLoading ? (
@@ -28,7 +33,7 @@ export function ChartCardSection({
               jc="center"
               pointerEvents="none"
             >
-              <Spinner size="small" color={'$color12'} />
+              <Spinner size="large" color={'$color12'} />
             </YStack>
           ) : null}
         </YStack>

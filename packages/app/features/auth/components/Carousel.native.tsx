@@ -1,6 +1,6 @@
 import { H1, Paragraph, Progress, Stack, XStack } from '@my/ui'
 import { AnimationLayout } from 'app/components/layout/animation-layout'
-import { useContext, useEffect, useCallback, useRef } from 'react'
+import { useContext, useEffect, useCallback } from 'react'
 import { AuthCarouselContext } from '../AuthCarouselContext'
 import Animated, {
   useSharedValue,
@@ -9,6 +9,7 @@ import Animated, {
   runOnJS,
   cancelAnimation,
 } from 'react-native-reanimated'
+import type { SharedValue } from 'react-native-reanimated'
 
 const carouselItems = [
   {
@@ -36,19 +37,56 @@ export const carouselImagePositions = [
 
 const PROGRESS_DURATION = 5000 // 5 seconds per slide
 
+// Separate child component so hooks are called at top level per segment
+const CarouselProgressSegment = ({
+  index,
+  title,
+  progress,
+  currentSlide,
+}: {
+  index: number
+  title: string
+  progress: SharedValue<number>
+  currentSlide: number
+}) => {
+  const animatedStyle = useAnimatedStyle(() => {
+    let progressValue = 0
+
+    if (currentSlide < index) {
+      progressValue = 0
+    } else if (currentSlide === index) {
+      progressValue = progress.value
+    } else {
+      progressValue = 100
+    }
+
+    return {
+      width: `${progressValue}%`,
+    }
+  }, [currentSlide])
+
+  return (
+    <Progress key={title} f={1} h={1} backgroundColor={'$color3'} direction="ltr" miw={0} value={0}>
+      <Animated.View
+        style={[
+          {
+            height: '100%',
+            backgroundColor: 'white',
+          },
+          animatedStyle,
+        ]}
+      />
+    </Progress>
+  )
+}
+
 const CarouselProgress = () => {
   const { carouselProgress, setCarouselProgress } = useContext(AuthCarouselContext)
   const progress = useSharedValue(0)
-  const currentSlideRef = useRef(carouselProgress)
 
   const moveToNext = useCallback(() => {
     setCarouselProgress((prev) => (prev + 1) % carouselItems.length)
   }, [setCarouselProgress])
-
-  // Update ref when carouselProgress changes
-  useEffect(() => {
-    currentSlideRef.current = carouselProgress
-  }, [carouselProgress])
 
   useEffect(() => {
     // Cancel any existing animation
@@ -65,45 +103,15 @@ const CarouselProgress = () => {
 
   return (
     <XStack w="100%" jc="center" py="$5" gap="$2">
-      {carouselItems?.map(({ title }, i) => {
-        const animatedStyle = useAnimatedStyle(() => {
-          let progressValue = 0
-
-          if (currentSlideRef.current < i) {
-            progressValue = 0
-          } else if (currentSlideRef.current === i) {
-            progressValue = progress.value
-          } else {
-            progressValue = 100
-          }
-
-          return {
-            width: `${progressValue}%`,
-          }
-        }, [carouselProgress])
-
-        return (
-          <Progress
-            key={title}
-            f={1}
-            h={1}
-            backgroundColor={'$color3'}
-            direction="ltr"
-            miw={0}
-            value={0} // We'll override this with animated style
-          >
-            <Animated.View
-              style={[
-                {
-                  height: '100%',
-                  backgroundColor: 'white',
-                },
-                animatedStyle,
-              ]}
-            />
-          </Progress>
-        )
-      })}
+      {carouselItems?.map(({ title }, i) => (
+        <CarouselProgressSegment
+          key={title}
+          title={title}
+          index={i}
+          progress={progress}
+          currentSlide={carouselProgress}
+        />
+      ))}
     </XStack>
   )
 }

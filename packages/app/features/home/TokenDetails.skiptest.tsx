@@ -1,6 +1,5 @@
 import { describe, beforeEach, afterEach, test, jest, expect } from '@jest/globals'
 import { TamaguiProvider, config } from '@my/ui'
-import { usdcCoin } from 'app/data/coins'
 import { TokenDetails } from './TokenDetails'
 import { act, render, screen } from '@testing-library/react-native'
 import ScrollDirectionProvider from 'app/provider/scroll/ScrollDirectionProvider'
@@ -53,7 +52,7 @@ describe('TokenDetails', () => {
     render(
       <TamaguiProvider defaultTheme={'dark'} config={config}>
         <ScrollDirectionProvider>
-          <TokenDetails coin={{ ...usdcCoin, balance: 1n }} />
+          <TokenDetails />
         </ScrollDirectionProvider>
       </TamaguiProvider>
     )

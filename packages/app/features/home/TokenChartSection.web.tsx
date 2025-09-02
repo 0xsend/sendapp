@@ -1,5 +1,4 @@
 import { Paragraph, Theme, YStack, XStack, useThemeName } from '@my/ui'
-import type { CoinWithBalance } from 'app/data/coins'
 import formatAmount from 'app/utils/formatAmount'
 import { useState } from 'react'
 import { Dimensions } from 'react-native'
@@ -10,26 +9,21 @@ import { ChartExtremeLabels } from './charts/shared/components/ChartExtremeLabel
 import { useTokenChartData } from './charts/shared/useTokenChartData'
 import { useScrubState } from './charts/shared/useScrubState.web'
 import type { Timeframe } from './charts/shared/timeframes'
+import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 
-export function TokenChartSection({
-  coin,
-}: {
-  coin: CoinWithBalance
-}) {
-  const [tf, setTf] = useState<Timeframe>('1D')
+export function TokenChartSection() {
+  const [tf, setTf] = useState<Timeframe>('1W')
+  const { coin } = useCoinFromTokenParam()
+  const { points, smoothed, last, change, isLoading, isError } = useTokenChartData(
+    coin?.coingeckoTokenId,
+    tf
+  )
+
   const [measuredWidth, setMeasuredWidth] = useState<number>(0)
   const theme = useThemeName()
   const isDark = theme?.startsWith('dark')
 
   const stroke = isDark ? '#40FB50' : '#000000'
-
-  const fetched = useTokenChartData(coin.coingeckoTokenId, tf)
-  const points = fetched.points
-  const smoothed = fetched.smoothed
-  const last = fetched.last
-  const change = fetched.change
-  const isLoading = fetched.isLoading
-  const isError = fetched.isError
 
   const changeBadge = (() => {
     if (change === null || change === undefined) return null
@@ -66,7 +60,7 @@ export function TokenChartSection({
   const pathProps = { onScrub }
 
   return (
-    <ChartCardSection title="Price Overview" isLoading={isLoading}>
+    <ChartCardSection title="Price Overview" tf={tf}>
       <YStack onLayout={onLayoutContainer}>
         <ChartLineSection
           points={points}

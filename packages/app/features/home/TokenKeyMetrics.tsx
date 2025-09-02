@@ -1,7 +1,7 @@
 import { Card, H4, Paragraph, Spinner, Theme, XStack, YStack } from '@my/ui'
-import type { CoinWithBalance } from 'app/data/coins'
-import type { CoinData } from 'app/utils/coin-gecko'
+import { useCoingeckoCoin, useTokensMarketData } from 'app/utils/coin-gecko'
 import formatAmount from 'app/utils/formatAmount'
+import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 
 function MetricTile({
   title,
@@ -77,25 +77,24 @@ function MetricTile({
   )
 }
 
-export function TokenKeyMetrics({
-  coin,
-  coinData,
-  isLoadingCoinData,
-}: {
-  coin: CoinWithBalance
-  coinData?: CoinData
-  isLoadingCoinData?: boolean
-}) {
-  const isLoading = !!isLoadingCoinData
-  const md = coinData?.market_data
+export function TokenKeyMetrics() {
+  const { coin } = useCoinFromTokenParam()
+  const { data: coingeckoCoin, isLoading: isLoadingCoingeckoCoin } = useCoingeckoCoin(
+    coin?.coingeckoTokenId
+  )
+  const { data: marketData, isLoading: isLoadingMarketData } = useTokensMarketData()
+  const mdM = marketData?.find((m) => m.id === coin?.coingeckoTokenId)
+  const md = coingeckoCoin?.market_data
 
-  const marketCap = md?.market_cap?.usd ?? null
-  const marketCapChange = md?.market_cap_change_percentage_24h ?? null
-  const fdv = md?.fully_diluted_valuation?.usd ?? null
+  const isLoading = !!isLoadingMarketData || isLoadingCoingeckoCoin
+
+  const marketCap = mdM?.market_cap ?? null
+  const marketCapChange = mdM?.market_cap_change_percentage_24h ?? null
+  const fdv = mdM?.fully_diluted_valuation ?? null
   // FDV change is not provided explicitly;
   const fdvChange = null
 
-  const volume = md?.total_volume?.usd ?? null
+  const volume = mdM?.total_volume ?? null
   // Volume 24h change is not provided by the endpoint; omit the badge when not available.
   const volumeChange = null
   const circulating = md?.circulating_supply ?? null
@@ -126,7 +125,7 @@ export function TokenKeyMetrics({
           />
           <MetricTile
             title="Circulating Supply"
-            value={`${formatAmount(circulating ?? undefined, 5, 0)} ${coin.symbol}`}
+            value={`${formatAmount(circulating ?? undefined, 5, 0)} ${coin?.symbol ?? ''}`}
             change={null}
           />
         </XStack>

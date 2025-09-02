@@ -1,37 +1,33 @@
 import { Button, Card, H4, Paragraph, Spinner, useThemeName, XStack, YStack } from '@my/ui'
-import type { CoinWithBalance } from 'app/data/coins'
-import type { CoinData } from 'app/utils/coin-gecko'
 import type { NativeSyntheticEvent, TextLayoutEventData } from 'react-native'
 import { Platform } from 'react-native'
 import { useMemo, useState } from 'react'
+import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
+import { useCoingeckoCoin } from 'app/utils/coin-gecko'
 
 const MAX_LINES = 3 // 3 lines * 24px lineHeight = 72px
 const CLAMP_HEIGHT = 24 * MAX_LINES
 
-export const TokenAbout = ({
-  coin,
-  coinData,
-  isLoadingCoinData,
-}: {
-  coin: CoinWithBalance
-  coinData?: CoinData
-  isLoadingCoinData?: boolean
-}) => {
+export const TokenAbout = () => {
+  const { coin, isLoading: isLoadingCoin } = useCoinFromTokenParam()
+  const { data: coingeckoCoin, isLoading: isLoadingCoingeckoCoin } = useCoingeckoCoin(
+    coin?.coingeckoTokenId
+  )
   const theme = useThemeName()
   const isDark = theme?.startsWith('dark')
-  const isLoading = !!isLoadingCoinData
+  const isLoading = !!isLoadingCoin || isLoadingCoingeckoCoin
   const [expanded, setExpanded] = useState(false)
   const [isTruncated, setIsTruncated] = useState(false)
   const [measuredHeight, setMeasuredHeight] = useState<number>(0)
 
-  const raw = coinData?.description?.en ?? ''
+  const raw = coingeckoCoin?.description?.en ?? ''
   const aboutFromApi = typeof raw === 'string' ? raw.replace(/\r\n/g, '\n').trim() : ''
   const about = useMemo(() => {
-    if (coin.coingeckoTokenId === 'send-token-2') {
+    if (coin?.coingeckoTokenId === 'send-token-2') {
       return 'Send, Save, Invest. Your global wallet app, built for real life.'
     }
     return aboutFromApi
-  }, [coin.coingeckoTokenId, aboutFromApi])
+  }, [coin?.coingeckoTokenId, aboutFromApi])
 
   const showReadMore = useMemo(
     () => !expanded && (isTruncated || measuredHeight > CLAMP_HEIGHT),
@@ -53,7 +49,7 @@ export const TokenAbout = ({
   return (
     <YStack gap={'$3'}>
       <H4 fontWeight={600} size={'$7'}>
-        About {coin.label}
+        About {coin?.label ?? 'This Coin'}
       </H4>
       {isLoading ? (
         <Spinner size="small" color={'$color12'} />
@@ -66,7 +62,7 @@ export const TokenAbout = ({
               numberOfLines={expanded ? undefined : MAX_LINES}
               lineHeight={24}
               textOverflow={'ellipsis'}
-              onTextLayout={Platform.OS !== 'web' ? handleTextLayout : undefined}
+              {...(Platform.OS !== 'web' ? { onTextLayout: handleTextLayout } : {})}
             >
               {about}
             </Paragraph>

@@ -1,14 +1,18 @@
 import { useQuery } from '@tanstack/react-query'
-import { allCoins, type coins, type CoinWithBalance } from 'app/data/coins'
+import type { coins, CoinWithBalance } from 'app/data/coins'
+import { allCoins, COINGECKO_IDS } from 'app/data/coins'
 import { z } from 'zod'
-import { fetchDexScreenerPrices } from '../useTokenPrices'
+import { api } from 'app/utils/api'
 
-// Web: Routes CoinGecko Pro calls via serverless (Vercel) using tRPC.
-// Native: See index.native.tsx for direct Pro usage when key present.
+// Market data (current prices) is fetched from the free CoinGecko API on the client.
+// Detailed coin data and charts are fetched via our server API (Pro keys stay server-only).
+
+// Strict runtime validation against supported CoinGecko IDs
+export const CoinIdEnum = z.enum(COINGECKO_IDS)
 
 export const MarketDataSchema = z
   .object({
-    id: z.custom<coins[number]['coingeckoTokenId']>(),
+    id: CoinIdEnum,
     symbol: z.string(),
     name: z.string(),
     image: z.string(),
@@ -47,150 +51,18 @@ export const MarketDataSchema = z
   .array()
 
 export type MarketData = z.infer<typeof MarketDataSchema>
-
-// Canonicalize token ids for stable multi-token requests and caching
-const canonicalizeTokenIds = <T extends coins[number]['coingeckoTokenId']>(tokenIds: T[]) =>
-  Array.from(new Set(tokenIds)).sort()
-
-// Build a minimal MarketData object using a DexScreener-derived price
-const buildFallbackMarketData = (args: {
-  tokenId: coins[number]['coingeckoTokenId']
-  usd: number
-}): MarketData[number] => {
-  const { tokenId, usd } = args
-  return {
-    id: tokenId,
-    symbol: tokenId,
-    name: tokenId,
-    image: '',
-    current_price: usd,
-    market_cap: 0,
-    market_cap_rank: null,
-    fully_diluted_valuation: 0,
-    total_volume: 0,
-    high_24h: null,
-    low_24h: null,
-    price_change_24h: null,
-    price_change_percentage_24h: null,
-    price_change_percentage_24h_in_currency: null,
-    price_change_percentage_7d_in_currency: null,
-    market_cap_change_24h: null,
-    market_cap_change_percentage_24h: null,
-    circulating_supply: 0,
-    total_supply: 0,
-    max_supply: null,
-    ath: 0,
-    ath_change_percentage: 0,
-    ath_date: '',
-    atl: 0,
-    atl_change_percentage: 0,
-    atl_date: '',
-    roi: null,
-  }
-}
-
-// Fetch CoinGecko markets snapshot once for a set of ids; conditionally fill price via DexScreener
-async function fetchMarketsSnapshot<T extends coins[number]['coingeckoTokenId']>(
-  tokenIds: T[]
-): Promise<MarketData> {
-  const ids = canonicalizeTokenIds(tokenIds)
-  const canonicalIds = ids.join(',')
-
-  // Attempt CoinGecko /coins/markets once
-  try {
-    const response = await fetch(
-      `https://api.coingecko.com/api/v3/coins/markets?ids=${canonicalIds}&vs_currency=usd&price_change_percentage=24h,7d`,
-      {
-        headers: { Accept: 'application/json' },
-        mode: 'cors',
-      }
-    )
-
-    if (!response.ok) throw new Error(`Failed to fetch markets: ${response.status}`)
-    const raw = await response.json()
-    const cgData = MarketDataSchema.parse(raw)
-
-    // Determine which requested ids are still missing
-    const present = new Set(cgData.map((d) => d.id))
-    const missing = ids.filter((id) => !present.has(id))
-
-    if (missing.length === 0) {
-      // No need for DexScreener
-      return cgData
-    }
-
-    // Fetch DexScreener once for any missing ids we can map
-    const dexPrices = await fetchDexScreenerPrices()
-
-    const fallback = missing
-      .map((id) => {
-        const coin = allCoins.find((c) => c.coingeckoTokenId === id)
-        if (!coin) return null
-        const key = coin.token as string
-        const usd = dexPrices[key]
-        if (typeof usd !== 'number') return null
-        return buildFallbackMarketData({ tokenId: id, usd })
-      })
-      .filter(Boolean) as MarketData
-
-    return [...cgData, ...fallback]
-  } catch (err) {
-    // Entire CG call failed: fall back to DexScreener for all ids we can map
-    const dexPrices = await fetchDexScreenerPrices()
-    const fallback = ids
-      .map((id) => {
-        const coin = allCoins.find((c) => c.coingeckoTokenId === id)
-        if (!coin) return null
-        const key = coin.token as string
-        const usd = dexPrices[key]
-        if (typeof usd !== 'number') return null
-        return buildFallbackMarketData({ tokenId: id, usd })
-      })
-      .filter(Boolean) as MarketData
-
-    if (fallback.length === 0) {
-      // Surface error behavior same as before when both fail
-      throw err
-    }
-
-    return fallback
-  }
-}
-
-// Unified snapshot hook used by web hooks
-export const useTokensMarketSnapshot = <
-  T extends coins[number]['coingeckoTokenId'] | CoinWithBalance['coingeckoTokenId'],
->(
-  tokenIds: T[]
-) => {
-  const ids = canonicalizeTokenIds(tokenIds)
-  const canonicalIds = ids.join(',')
-  return useQuery({
-    queryKey: ['cg:markets', canonicalIds, ids, 'usd', '24h,7d'],
-    enabled: canonicalIds.length > 0,
-    queryFn: async () => fetchMarketsSnapshot(ids as coins[number]['coingeckoTokenId'][]),
-    staleTime: 1000 * 60 * 5, // 5 minutes
-  })
-}
-
 /**
- * React query function to fetch current token price for a given token id.
- * Adapter over the unified market snapshot; retains DexScreener fallback behavior.
+/**
+ * React query function to fetch current token price for a given token id
+ * Delegates to the multi-token markets fetch and selects the first.
  */
-export const useTokenPrice = <T extends allCoins[number]['coingeckoTokenId']>(tokenId: T) => {
-  const ids = [tokenId] as T[]
-  const canonicalIds = canonicalizeTokenIds(ids).join(',')
-  return useQuery({
-    queryKey: ['cg:markets', canonicalIds, ids, 'usd', '24h,7d'],
-    queryFn: async () => fetchMarketsSnapshot(ids as coins[number]['coingeckoTokenId'][]),
-    // Derive the legacy simple/price shape from snapshot data
-    select: (arr: MarketData) => {
-      const price = arr?.[0]?.current_price ?? 0
-      return { [tokenId]: { usd: price } } as { [key in T]: { usd: number } }
-    },
-    refetchInterval: 1000 * 60 * 5, // 5 minutes
-    staleTime: 1000 * 60 * 5, // 5 minutes
-  })
+export const useTokenPrice = <T extends coins[number]['coingeckoTokenId']>(tokenId: T) => {
+  const q = useTokensMarketData()
+  const price = q.data?.find((m) => m.id === tokenId)?.current_price ?? 0
+  return {
+    ...q,
+    data: q.data ? ({ [tokenId]: { usd: price } } as { [key in T]: { usd: number } }) : undefined,
+  }
 }
 
 /**
@@ -199,36 +71,65 @@ export const useTokenPrice = <T extends allCoins[number]['coingeckoTokenId']>(to
 export const useSendPrice = () => useTokenPrice('send-token-2' as const)
 
 /**
- * Fetch coin market data (delegates to unified snapshot)
+ * Fetch coin market data for multiple tokens at once
  */
-export const useTokenMarketData = <
-  T extends coins[number]['coingeckoTokenId'] | CoinWithBalance['coingeckoTokenId'],
->(
-  tokenId: T
-) => {
-  return useTokensMarketSnapshot([tokenId])
+type VsCurrency = 'usd'
+
+function buildCgMarketsUrl(params: {
+  ids: readonly (typeof COINGECKO_IDS)[number][]
+  vsCurrency: VsCurrency
+  priceChangePercentage: readonly ('24h' | '7d')[]
+}) {
+  const canonicalIds = Array.from(new Set(params.ids)).sort().join(',')
+  const url = new URL('https://api.coingecko.com/api/v3/coins/markets')
+  url.searchParams.set('ids', canonicalIds)
+  url.searchParams.set('vs_currency', params.vsCurrency)
+  url.searchParams.set('price_change_percentage', params.priceChangePercentage.join(','))
+  return url
 }
 
-/**
- * Fetch coin market data for multiple tokens at once (delegates to unified snapshot)
- */
-export const useMultipleTokensMarketData = <
-  T extends coins[number]['coingeckoTokenId'] | CoinWithBalance['coingeckoTokenId'],
->(
-  tokenIds: T[]
-) => {
-  return useTokensMarketSnapshot(tokenIds)
+export const useTokensMarketData = <R = MarketData>(options?: {
+  select?: (data: MarketData) => R
+  enabled?: boolean
+}) => {
+  const ids = allCoins.map((c) => c.coingeckoTokenId)
+  const canonicalIds = Array.from(new Set(ids)).sort().join(',')
+
+  return useQuery<MarketData, Error, R>({
+    queryKey: ['coin-market-data', canonicalIds, ids],
+    enabled: options?.enabled ?? canonicalIds.length > 0,
+    queryFn: async () => {
+      const url = buildCgMarketsUrl({
+        ids,
+        vsCurrency: 'usd',
+        priceChangePercentage: ['24h', '7d'],
+      })
+
+      const response = await fetch(url.toString(), {
+        headers: { Accept: 'application/json' },
+        mode: 'cors',
+      })
+
+      if (!response.ok)
+        throw new Error(`Failed to fetch market data for: ${canonicalIds}, ${response.status}`)
+      const data = await response.json()
+      return MarketDataSchema.parse(data)
+    },
+    select: options?.select,
+    staleTime: 45000,
+    refetchInterval: 45000,
+  })
 }
 
 // Minimal schema for /coins/{id} when only description is needed
-const CoinDescriptionSchema = z
+const CoingeckoCoinDescriptionSchema = z
   .object({
     en: z.string().optional().nullable(),
   })
   .passthrough()
 
 // Minimal market_data subset for /coins/{id}?market_data=true
-const CoinMarketDataSchema = z
+const CoingeckoCoinMarketSchema = z
   .object({
     current_price: z
       .object({
@@ -252,9 +153,9 @@ const CoinMarketDataSchema = z
   })
   .partial()
 
-export const CoinDataSchema = z
+export const CoingeckoCoinSchema = z
   .object({
-    id: z.custom<coins[number]['coingeckoTokenId']>(),
+    id: z.enum(COINGECKO_IDS),
     symbol: z.string(),
     name: z.string(),
     image: z
@@ -265,37 +166,28 @@ export const CoinDataSchema = z
       })
       .partial()
       .optional(),
-    description: CoinDescriptionSchema.optional(),
-    market_data: CoinMarketDataSchema.optional(),
+    description: CoingeckoCoinDescriptionSchema.optional(),
+    market_data: CoingeckoCoinMarketSchema.optional(),
   })
   .passthrough()
 
-export type CoinData = z.infer<typeof CoinDataSchema>
+export type CoingeckoCoin = z.infer<typeof CoingeckoCoinSchema>
 
 /**
  * Unified coin data hook: fetches description and market_data in a single request.
  * Endpoint: /api/v3/coins/{id}?market_data=true
  */
-type UseCoinDataOptions = { includeMarketData?: boolean }
 
-export const useCoinData = <
-  T extends coins[number]['coingeckoTokenId'] | CoinWithBalance['coingeckoTokenId'],
+export const useCoingeckoCoin = <
+  T extends coins[number]['coingeckoTokenId'] | CoinWithBalance['coingeckoTokenId'] | undefined,
 >(
-  tokenId: T,
-  options?: UseCoinDataOptions
+  tokenId: T
 ) => {
-  const includeMarketData = options?.includeMarketData ?? true
-  return useQuery({
-    queryKey: ['cg:coin', tokenId, includeMarketData],
-    queryFn: async () => {
-      const url = `https://api.coingecko.com/api/v3/coins/${tokenId}?market_data=${includeMarketData ? 'true' : 'false'}`
-      const response = await fetch(url, { headers: { Accept: 'application/json' }, mode: 'cors' })
-      if (!response.ok) throw new Error(`Failed to fetch coin data: ${response.status}`)
-      const raw = await response.json()
-      return CoinDataSchema.parse(raw)
-    },
-    staleTime: 1000 * 60 * 5, // 5 minutes
-  })
+  return api.coinGecko.getCoingeckoCoin.useQuery(
+    // @ts-expect-error - disable when undefined
+    { token: tokenId },
+    { enabled: Boolean(tokenId), staleTime: 1000 * 60 * 5 }
+  )
 }
 
 /**
@@ -320,37 +212,30 @@ export const MarketChartSchema = z
 export type MarketChart = z.infer<typeof MarketChartSchema>
 
 export const useTokenMarketChart = <
-  T extends coins[number]['coingeckoTokenId'] | CoinWithBalance['coingeckoTokenId'],
+  T extends coins[number]['coingeckoTokenId'] | CoinWithBalance['coingeckoTokenId'] | undefined,
 >(
   tokenId: T,
   params: {
-    days: string
+    days: '1' | '7' | '30' | '90' | '180' | '365' | 'max'
     vsCurrency?: 'usd'
-    interval?: string
-    precision?: string
   }
 ) => {
   const vs = params.vsCurrency ?? 'usd'
   const days = params.days ?? '1'
-  const interval = params.interval ?? null
-  const precision = params.precision ?? null
 
-  const qs = new URLSearchParams({ vs_currency: vs, days })
-  if (interval) qs.set('interval', interval)
-  if (precision) qs.set('precision', precision)
-  const url = `https://api.coingecko.com/api/v3/coins/${tokenId}/market_chart?${qs.toString()}`
-
-  return useQuery({
-    queryKey: ['cg:market_chart', tokenId, vs, days, interval, precision, url],
-    queryFn: async () => {
-      const response = await fetch(url, { headers: { Accept: 'application/json' }, mode: 'cors' })
-      if (!response.ok) throw new Error(`Failed to fetch market chart: ${response.status}`)
-      const raw = await response.json()
-      return MarketChartSchema.parse(raw)
+  return api.coinGecko.getMarketChart.useQuery(
+    {
+      // @ts-expect-error - disable when undefined
+      token: tokenId,
+      vsCurrency: vs,
+      days,
+      precision: 'full',
     },
-    enabled: Boolean(tokenId) && Boolean(days),
-    staleTime: 12 * 60 * 60 * 1000,
-  })
+    {
+      enabled: Boolean(tokenId) && Boolean(days),
+      staleTime: 12 * 60 * 60 * 1000,
+    }
+  )
 }
 
 /**

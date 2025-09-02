@@ -7,15 +7,14 @@ import { Fragment } from 'react'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { convertBalanceToFiat } from 'app/utils/convertBalanceToUSD'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
-import { type MarketData, useMultipleTokensMarketData } from 'app/utils/coin-gecko'
+import { type MarketData, useTokensMarketData } from 'app/utils/coin-gecko'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { useIsPriceHidden } from 'app/features/home/utils/useIsPriceHidden'
 import { Platform } from 'react-native'
 import { useLink } from 'solito/link'
 
 export const InvestmentsBalanceList = ({ coins }: { coins: CoinWithBalance[] }) => {
-  const { data: tokensMarketData, isLoading: isLoadingTokensMarketData } =
-    useMultipleTokensMarketData(coins?.map((c) => c.coingeckoTokenId) || [])
+  const { data: tokensMarketData, isLoading: isLoadingTokensMarketData } = useTokensMarketData()
 
   return coins.map((coin) => (
     <Fragment key={`token-balance-list-${coin.label}`}>
@@ -150,7 +149,7 @@ const TokenUSDBalance = ({
 }: {
   coin: CoinWithBalance
 }) => {
-  const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
+  const { data: tokenPrices } = useTokenPrices()
   const balanceInUSD = convertBalanceToFiat(
     coin,
     coin.symbol === 'USDC' ? 1 : tokenPrices?.[coin.token]
