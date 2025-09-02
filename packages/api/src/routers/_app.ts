@@ -11,6 +11,7 @@ import { swapRouter } from './swap/router'
 import { tagRouter } from './tag/router'
 import { temporalRouter } from './temporal'
 import { onrampRouter } from './onramp/router'
+import { coinGeckoRouter } from './coingecko/router'
 
 // avoids error TS7056: The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed.
 // Keep this in sync with the declared variable below
@@ -27,9 +28,9 @@ type AppRouterType = ReturnType<
     temporal: typeof temporalRouter
     swap: typeof swapRouter
     onramp: typeof onrampRouter
+    coinGecko: typeof coinGeckoRouter
   }>
 >
-
 export const appRouter: AppRouterType = createTRPCRouter({
   chainAddress: chainAddressRouter,
   tag: tagRouter,
@@ -42,6 +43,7 @@ export const appRouter: AppRouterType = createTRPCRouter({
   temporal: temporalRouter,
   swap: swapRouter,
   onramp: onrampRouter,
+  coinGecko: coinGeckoRouter,
 })
 
 export type AppRouter = typeof appRouter

@@ -11,7 +11,6 @@ import {
   type XStackProps,
   YStack,
   useMedia,
-  PrimaryButton,
   type ButtonProps,
   Button,
 } from '@my/ui'
@@ -25,7 +24,7 @@ import {
   investmentCoins as investmentCoinsList,
 } from 'app/data/coins'
 import { useRootScreenParams } from 'app/routers/params'
-import { useMultipleTokensMarketData } from 'app/utils/coin-gecko'
+import { useTokensMarketData } from 'app/utils/coin-gecko'
 import { useMemo } from 'react'
 import { IconCoin, IconError } from 'app/components/icons'
 import { useCoins } from 'app/provider/coins'
@@ -243,8 +242,7 @@ function OverlappingCoinIcons({
 function InvestmentsAggregate() {
   const coins = useCoins().investmentCoins.filter((c) => c?.balance && c.balance > 0n)
 
-  const tokenIds = coins.map((c) => c.coingeckoTokenId)
-  const { data: marketData, isLoading } = useMultipleTokensMarketData(tokenIds)
+  const { data: marketData, isLoading } = useTokensMarketData()
 
   const { totalValue, assetValues } = useMemo(() => {
     if (!marketData?.length) return { totalValue: 0, assetValues: [] }
@@ -259,7 +257,7 @@ function InvestmentsAggregate() {
         ('price_change_percentage_7d_in_currency' in marketInfo &&
         marketInfo.price_change_percentage_7d_in_currency !== null
           ? marketInfo.price_change_percentage_7d_in_currency
-          : marketInfo.price_change_percentage_24h) ?? 0
+          : 0) ?? 0
       return {
         value: Number(parsedBalance) * (marketInfo.current_price ?? 0),
         percentChange7d,
@@ -321,8 +319,7 @@ function InvestmentsAggregate() {
 
 function InvestmentsWeeklyDelta() {
   const coins = useCoins().investmentCoins.filter((c) => c?.balance && c.balance > 0n)
-  const tokenIds = coins.map((c) => c.coingeckoTokenId)
-  const { data: marketData, isLoading, isError } = useMultipleTokensMarketData(tokenIds)
+  const { data: marketData, isLoading, isError } = useTokensMarketData()
 
   const deltaUSD = useMemo(() => {
     if (!marketData?.length) return 0
@@ -334,14 +331,14 @@ function InvestmentsWeeklyDelta() {
         ('price_change_percentage_7d_in_currency' in md &&
         md.price_change_percentage_7d_in_currency !== null
           ? md.price_change_percentage_7d_in_currency
-          : md.price_change_percentage_24h) ?? 0
+          : 0) ?? 0
       return sum + (value * pct7d) / 100
     }, 0)
   }, [marketData, coins])
 
   if (isLoading) return null
 
-  if (tokenIds.length === 0)
+  if (coins.length === 0)
     return (
       <XStack gap="$2" ai="center">
         <Paragraph color="$color10">Diversify Your Portfolio</Paragraph>
@@ -358,7 +355,7 @@ function InvestmentsWeeklyDelta() {
       </XStack>
     )
 
-  const sign = deltaUSD >= 0 ? '+' : ''
+  const sign = deltaUSD >= 0 ? '+' : '-'
   return (
     <Paragraph color={'$color10'} fontWeight={400} size={'$5'}>
       {`${sign}$${Math.abs(deltaUSD).toFixed(2)} this week`}

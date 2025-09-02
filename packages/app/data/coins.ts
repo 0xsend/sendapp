@@ -13,6 +13,22 @@ import {
 } from '@my/wagmi'
 import { z } from 'zod'
 
+// Compile-time union of supported CoinGecko IDs for type-safety across app and api
+export const COINGECKO_IDS = [
+  'usd-coin',
+  'ethereum',
+  'send-token-2',
+  'send-token',
+  'spx6900',
+  'moonwell-artemis',
+  'morpho',
+  'aerodrome-finance',
+  'coinbase-wrapped-btc',
+  'euro-coin',
+  'mamo',
+] as const satisfies readonly [string, ...string[]]
+export type CoingeckoId = (typeof COINGECKO_IDS)[number]
+
 // Base coin schema with common properties
 const BaseCoinSchema = z.object({
   label: z.string(),
@@ -20,7 +36,7 @@ const BaseCoinSchema = z.object({
   decimals: z.number().min(0).max(18),
   formatDecimals: z.number().min(0).optional(),
   shortLabel: z.string().optional(),
-  coingeckoTokenId: z.string(),
+  coingeckoTokenId: z.enum(COINGECKO_IDS),
 })
 
 // ERC20 specific schema

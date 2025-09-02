@@ -38,14 +38,10 @@ import { CoinSheet } from 'app/components/CoinSheet'
 import { Link } from 'solito/link'
 import { Platform } from 'react-native'
 import { usePathname } from 'app/utils/usePathname'
-import { useMultipleTokensMarketData } from 'app/utils/coin-gecko'
+import { useTokensMarketData } from 'app/utils/coin-gecko'
 import { formatUnits } from 'viem'
 
-export function HomeScreen({
-  serverCoinData,
-}: {
-  serverCoinData?: import('app/utils/coin-gecko').CoinData | null
-} = {}) {
+export function HomeScreen() {
   const media = useMedia()
   const router = useRouter()
   const supabase = useSupabase()
@@ -91,7 +87,6 @@ export function HomeScreen({
                     opacity: 0,
                     y: media.gtLg ? 0 : 300,
                   }}
-                  serverCoinData={serverCoinData ?? undefined}
                 />
               )
           }
@@ -101,11 +96,7 @@ export function HomeScreen({
   )
 }
 
-function HomeBody(
-  props: XStackProps & {
-    serverCoinData?: import('app/utils/coin-gecko').CoinData | null
-  }
-) {
+function HomeBody(props: XStackProps) {
   const { coin: selectedCoin, isLoading } = useCoinFromTokenParam()
   const [queryParams] = useRootScreenParams()
 
@@ -163,12 +154,7 @@ function HomeBody(
             case Platform.OS !== 'web':
               return null
             case selectedCoin !== undefined:
-              return (
-                <TokenDetails
-                  coin={selectedCoin}
-                  serverCoinData={props.serverCoinData ?? undefined}
-                />
-              )
+              return <TokenDetails />
             case queryParams.token === 'investments':
               return <InvestmentsBody />
             case queryParams.token === 'stables':
@@ -190,8 +176,7 @@ export function InvestmentsBody() {
 
   // Market data for portfolio-level computations
   const ownedCoins = myInvestmentCoins.filter((c) => c?.balance && c.balance > 0n)
-  const tokenIds = ownedCoins.map((c) => c.coingeckoTokenId)
-  const { data: marketData, isLoading: isLoadingMarket } = useMultipleTokensMarketData(tokenIds)
+  const { data: marketData, isLoading: isLoadingMarket } = useTokensMarketData()
 
   const { delta24hUSD, pct24h } = useMemo(() => {
     if (!marketData?.length || ownedCoins.length === 0) return { delta24hUSD: 0, pct24h: 0 }

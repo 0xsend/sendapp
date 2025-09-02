@@ -1,25 +1,27 @@
 import { Card, Paragraph, Theme, useMedia, XStack, YStack, Spinner } from '@my/ui'
 import { IconCoin } from 'app/components/icons'
 import { type CoinWithBalance, stableCoins } from 'app/data/coins'
-import { useTokenMarketData } from 'app/utils/coin-gecko'
+import { useTokensMarketData } from 'app/utils/coin-gecko'
 import { convertBalanceToFiat } from 'app/utils/convertBalanceToUSD'
 import formatAmount from 'app/utils/formatAmount'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { useMemo } from 'react'
 import { Platform } from 'react-native'
 import { TokenQuickActions } from './TokenQuickActions'
+import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 
-export const TokenDetailsHeader = ({ coin }: { coin: CoinWithBalance }) => {
+export const TokenDetailsHeader = () => {
+  const { coin } = useCoinFromTokenParam()
+  const { data: marketData, isLoading: isLoadingMarketData } = useTokensMarketData()
   const media = useMedia()
   const isSmallScreen = !media.gtXs
   const isStableCoin = useMemo(() => {
-    return stableCoins.some((c) => c.token === coin.token)
+    return stableCoins.some((c) => c.token === coin?.token)
   }, [coin])
 
-  const { data: tokenMarketData, isLoading: isLoadingMarketData } = useTokenMarketData(
-    coin.coingeckoTokenId
-  )
-  const md = tokenMarketData?.at(0)
+  if (coin === undefined) return null
+
+  const md = marketData?.find((m) => m.id === coin.coingeckoTokenId)
   const changePercent24h = md?.price_change_percentage_24h ?? null
 
   return (
@@ -50,8 +52,8 @@ export const TokenDetailsHeader = ({ coin }: { coin: CoinWithBalance }) => {
 // Lightweight market data summary used by other screens (e.g., Rewards)
 // Shows current price and 24h change pill; hides change for stablecoins
 export const TokenDetailsMarketData = ({ coin }: { coin: CoinWithBalance }) => {
-  const { data: tokenMarketData, isLoading } = useTokenMarketData(coin.coingeckoTokenId)
-  const md = tokenMarketData?.at(0)
+  const { data: marketData, isLoading } = useTokensMarketData()
+  const md = marketData?.find((m) => m.id === coin.coingeckoTokenId)
   const price = md?.current_price ?? null
   const changePercent24h = md?.price_change_percentage_24h ?? null
   const isStableCoin = useMemo(() => stableCoins.some((c) => c.token === coin.token), [coin.token])

@@ -1,21 +1,14 @@
 import { useMemo } from 'react'
 import { useTokenMarketChart, toChartPointsFromPrices } from 'app/utils/coin-gecko'
-import {
-  getCgParams,
-  getDaysForTimeframe,
-  getInterpolationRange,
-  type Timeframe,
-} from './timeframes'
+import { getDaysForTimeframe, getInterpolationRange, type Timeframe } from './timeframes'
 import { monotoneCubicInterpolation } from '@my/ui'
+import type { CoingeckoId } from 'app/data/coins'
 
-export function useTokenChartData(tokenId: string, tf: Timeframe) {
-  const { interval, precision } = getCgParams(tf)
+export function useTokenChartData(tokenId: CoingeckoId | undefined, tf: Timeframe) {
   const days = getDaysForTimeframe(tf)
 
   const { data, isLoading, isError } = useTokenMarketChart(tokenId, {
     days,
-    interval: interval ?? undefined,
-    precision: precision ?? undefined,
   })
 
   const points = useMemo(() => {

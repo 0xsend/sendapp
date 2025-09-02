@@ -33,7 +33,7 @@ Note: This updates the earlier plan-only draft; the features above are implement
 - Weekly delta “this week” in USD (InvestmentsBalanceCard.WeeklyDelta).
 - “Today” summary card using 24h changes (USD delta + 24h percent pill).
 - “Your Holdings” label above the list.
-- Market data via useMultipleTokensMarketData, using 7d where available and falling back to 24h.
+- Market data via useTokensMarketData (CoinGecko free /coins/markets) with 7d where available and fallback to 24h. Token USD conversions use useTokenPrices with automatic fallback to DexScreener on CoinGecko 429/5xx.
 
 ## Out of Scope (for now)
 
@@ -67,9 +67,12 @@ Note: This updates the earlier plan-only draft; the features above are implement
 
 ## Data & Hooks
 
-- useMultipleTokensMarketData is used for market data across investment tokens.
-  - 7d percentage is read from price_change_percentage_7d_in_currency when present; otherwise falls back to 24h.
-  - 24h percentage is used by the “Today” card in InvestmentsBody.
+- Markets and prices
+  - Market data across investment tokens comes from useTokensMarketData (client → CoinGecko free /coins/markets via GET, no auth). We use price_change_percentage_7d_in_currency when present; otherwise we fall back to 24h.
+  - Token USD conversions come from useTokenPrices. Primary source is CoinGecko; if CoinGecko free returns 429/5xx or a network error, we automatically fall back to DexScreener.
+- Polling behavior (client)
+  - Markets polling is adaptive and conservative: only when the tab is visible and the device is online; interval is ~60s on good networks, ~120s on 3g, and ~180s on 2g/slow-2g or Data Saver.
+  - Errors use jittered backoff; we avoid hammering on 429/5xx.
 - Backward compatibility: existing 24h consumers continue to work unchanged.
 
 ## Aggregations
@@ -93,6 +96,9 @@ Note: This updates the earlier plan-only draft; the features above are implement
   - Weighted 7d percent pill (Aggregate).
   - “This week” USD delta (WeeklyDelta).
   - “Today” card (24h USD delta + 24h weighted percent).
+- Market data and prices:
+  - Market data: useTokensMarketData with adaptive polling and 7d→24h fallback for percent.
+  - Prices: useTokenPrices primary CoinGecko, automatic fallback to DexScreener on errors.
 - Total Return and Investment: placeholders only.
 - Holdings section header present; list renders InvestmentsBalanceList.
 
@@ -116,6 +122,11 @@ Note: This updates the earlier plan-only draft; the features above are implement
 - packages/app/features/home/screen.tsx (InvestmentsBody)
   - Composes the header card, summary cards, holdings list, and CoinSheet.
   - Computes delta24hUSD and pct24h for the “Today” card.
+- packages/app/utils/coin-gecko/index.tsx
+  - useTokensMarketData fetches markets from CoinGecko free API via GET and validates responses with Zod.
+  - Adaptive polling (visibility/online-aware) and conservative retry/backoff.
+- packages/app/utils/useTokenPrices.ts
+  - Aggregates prices by token address; falls back to DexScreener if CoinGecko errors.
 - packages/app/features/home/TokenAbout.tsx and TokenKeyMetrics.tsx
   - Section heading styles used as references for “Your Holdings”.
 

@@ -2,7 +2,7 @@ import { Paragraph, Theme, YStack, XStack, useThemeName } from '@my/ui'
 import type { CoinWithBalance } from 'app/data/coins'
 import formatAmount from 'app/utils/formatAmount'
 import { useState } from 'react'
-import { Dimensions } from 'react-native'
+import { Dimensions, type LayoutChangeEvent } from 'react-native'
 import { ChartCardSection } from './charts/shared/components/ChartCardSection'
 import { TimeframeTabs } from './charts/shared/components/TimeframeTabs'
 import { ChartLineSection } from './charts/shared/components/ChartLineSection'
@@ -10,26 +10,18 @@ import { ChartExtremeLabels } from './charts/shared/components/ChartExtremeLabel
 import { useTokenChartData } from './charts/shared/useTokenChartData'
 import { useScrubState } from './charts/shared/useScrubState.native'
 import type { Timeframe } from './charts/shared/timeframes'
+import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 
-export function TokenChartSection({
-  coin,
-}: {
-  coin: CoinWithBalance
-}) {
-  const [tf, setTf] = useState<Timeframe>('1D')
+export function TokenChartSection() {
+  const [tf, setTf] = useState<Timeframe>('1W')
+  const { coin } = useCoinFromTokenParam()
+  const { points, smoothed, last, change } = useTokenChartData(coin?.coingeckoTokenId, tf)
+
   const [measuredWidth, setMeasuredWidth] = useState<number>(0)
   const theme = useThemeName()
   const isDark = theme?.startsWith('dark')
 
-  const fetched = useTokenChartData(coin.coingeckoTokenId, tf)
-  const points = fetched.points
-  const smoothed = fetched.smoothed
-  const last = fetched.last
-  const change = fetched.change
-  const isLoading = fetched.isLoading
-  const isError = fetched.isError
-
-  const onLayoutContainer = (e: import('react-native').LayoutChangeEvent) => {
+  const onLayoutContainer = (e: LayoutChangeEvent) => {
     const w = e.nativeEvent.layout.width
     if (typeof w === 'number' && w > 0 && w !== measuredWidth) {
       setMeasuredWidth(w)
@@ -38,17 +30,19 @@ export function TokenChartSection({
 
   const containerWidth = measuredWidth || Dimensions.get('window').width
 
+  if (coin === undefined) return null
+
   return (
-    <ChartCardSection title="Price Overview" isLoading={isLoading}>
+    <ChartCardSection title="Price Overview" tf={tf}>
       <YStack onLayout={onLayoutContainer}>
         <ChartSection
+          coin={coin}
+          tf={tf}
           points={points}
           smoothed={smoothed}
           width={containerWidth}
           last={last}
           change={change}
-          isLoading={isLoading}
-          isError={points.length === 0 || isError}
         />
       </YStack>
       <TimeframeTabs value={tf} onChange={setTf} isDark={isDark} />
@@ -57,22 +51,23 @@ export function TokenChartSection({
 }
 
 function ChartSection({
+  coin,
+  tf,
   points,
   smoothed,
   width,
   last,
   change,
-  isError,
-  isLoading,
 }: {
+  coin: CoinWithBalance
+  tf: Timeframe
   points: { x: number; y: number }[]
   smoothed: { x: number; y: number }[]
   width: number
   last: number
   change: number | null
-  isError: boolean
-  isLoading: boolean
 }) {
+  const { isError, isLoading } = useTokenChartData(coin.coingeckoTokenId, tf)
   const isDark = useThemeName()?.startsWith('dark')
   const stroke = isDark ? '#40FB50' : '#000000'
   const changeBadge = (() => {
