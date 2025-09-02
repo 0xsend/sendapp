@@ -1,6 +1,7 @@
 import {
   type GetProps,
   Paragraph,
+  ScrollView,
   Sheet,
   type SheetProps,
   useMedia,
@@ -67,13 +68,13 @@ const Item = ({ coin, ...props }: { coin: coin } & XStackProps) => {
 
 const Items = ({ children, ...props }: GetProps<typeof Sheet.ScrollView>) => {
   return (
-    <Sheet.ScrollView {...props}>
+    <ScrollView {...props}>
       <XStack als="flex-start" w="100%" boc={'transparent'} f={1} jc={'flex-start'}>
         <YStack gap="$1" px={'$2'} pt={'$3'} pb={'$5'} w="100%">
           {children}
         </YStack>
       </XStack>
-    </Sheet.ScrollView>
+    </ScrollView>
   )
 }
 
