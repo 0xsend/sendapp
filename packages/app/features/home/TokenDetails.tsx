@@ -1,18 +1,23 @@
 import { YStack } from '@my/ui'
-import type { CoinWithBalance } from 'app/data/coins'
-import { TokenActivity } from './TokenActivity'
-import { Platform } from 'react-native'
 import { TokenDetailsHeader } from 'app/features/home/TokenDetailsHeader'
+import { TokenAbout } from 'app/features/home/TokenAbout'
+import { TokenKeyMetrics } from './TokenKeyMetrics'
+import { TokenChartSection } from 'app/features/home/TokenChartSection'
+import { baseMainnet, usdcAddress } from '@my/wagmi'
+import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 
-export const TokenDetails = ({ coin }: { coin: CoinWithBalance }) => {
-  if (Platform.OS === 'web') {
-    return (
-      <YStack f={1} gap="$3" $gtLg={{ w: '45%', pb: '$0' }} pb="$4">
-        <TokenDetailsHeader coin={coin} />
-        <TokenActivity coin={coin} />
-      </YStack>
-    )
-  }
+export const TokenDetails = () => {
+  const { coin } = useCoinFromTokenParam()
+  if (coin === undefined) return null
 
-  return <TokenActivity coin={coin} />
+  const isUSDC = coin.token === usdcAddress[baseMainnet.id]
+
+  return (
+    <YStack gap="$5" pb="$4" $gtLg={{ w: '45%', pb: '$0' }} $platform-web={{ f: 1 }}>
+      <TokenDetailsHeader />
+      {!isUSDC ? <TokenChartSection /> : null}
+      <TokenKeyMetrics />
+      <TokenAbout />
+    </YStack>
+  )
 }

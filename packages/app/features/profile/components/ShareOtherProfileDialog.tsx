@@ -60,6 +60,7 @@ export function ShareOtherProfileDialog({
           gap={'$3.5'}
           maxWidth={400}
           $gtLg={{ p: '$7', gap: '$5' }}
+          key={'share-other-profile-dialog-content'}
         >
           <Paragraph size={'$8'} fontWeight={500}>
             {profile.name ? `Share ${profile.name}'s Profile` : 'Share Profile'}

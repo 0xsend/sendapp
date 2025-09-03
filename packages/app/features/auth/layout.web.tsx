@@ -1,10 +1,12 @@
-import { Container, Link, YStack, XStack, ScrollView } from '@my/ui'
+import { Container, Link, ScrollView, XStack, YStack, useMedia, usePwa } from '@my/ui'
 import { IconSendLogo } from 'app/components/icons'
 import type { ReactNode } from 'react'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 
 export function AuthLayout({ children }: { children: ReactNode }) {
   const { onScroll, onContentSizeChange, ref } = useScrollDirection()
+  const { xxs } = useMedia()
+  const isPwa = usePwa()
 
   return (
     <YStack f={1}>
@@ -24,7 +26,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
           safeAreaProps={{
             style: { flex: 1 },
             edges: {
-              top: 'off',
+              top: 'maximum',
               bottom: 'maximum',
               left: 'additive',
               right: 'additive',
@@ -32,11 +34,20 @@ export function AuthLayout({ children }: { children: ReactNode }) {
           }}
           flexDirection={'column'}
         >
-          <XStack w={'100%'} alignSelf={'center'} jc={'center'}>
-            <Link href={'/'} pt="$7">
-              <IconSendLogo size={'$3.5'} color={'$color12'} />
-            </Link>
-          </XStack>
+          {!(xxs && !isPwa) && (
+            <XStack
+              w={'100%'}
+              alignSelf={'center'}
+              jc={'center'}
+              position={'absolute'}
+              top={0}
+              pt={'$3'}
+            >
+              <Link href={'/'}>
+                <IconSendLogo size={'$3.5'} color={'$color12'} />
+              </Link>
+            </XStack>
+          )}
           <YStack f={1} width={'100%'} maxWidth={600} alignSelf={'center'}>
             {children}
           </YStack>

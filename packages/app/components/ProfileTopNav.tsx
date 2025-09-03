@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Button as ButtonOg,
   type ButtonProps,
   Container,
@@ -15,15 +14,7 @@ import { useParams } from 'next/navigation'
 import AvatarMenuButton from './AvatarMenuButton/AvatarMenuButton'
 import { useUser } from 'app/utils/useUser'
 
-interface ProfileTopNavProps {
-  /**
-   * Whether the back arrow navigates to the root path
-   * @default "router"
-   */
-  backFunction?: 'root' | 'pop' | 'router' | 'home'
-}
-
-export function ProfileTopNav({ backFunction = 'router' }: ProfileTopNavProps) {
+export function ProfileTopNav() {
   const media = useMedia()
   const { back } = useRouter()
   const params = useParams<{ tag?: string; sendid?: string }>()

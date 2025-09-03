@@ -1,7 +1,7 @@
 import { Stack, useRouter } from 'expo-router'
 import { config, Paragraph, useTheme, XStack } from '@my/ui'
 import { useIsDarkTheme } from 'apps-expo/utils/layout/useIsDarkTheme'
-import { Pressable } from 'react-native'
+import { Platform, Pressable } from 'react-native'
 import { IconArrowLeft } from 'app/components/icons'
 
 export default function StackNavigator() {
@@ -27,7 +27,7 @@ export default function StackNavigator() {
         ),
         headerTitleAlign: 'left',
         headerTitle: ({ children }) => (
-          <XStack flex={1} ai="center" jc="flex-start">
+          <XStack flex={1} ai="center" jc="flex-start" pl={Platform.OS === 'android' ? '$2' : 0}>
             <Paragraph
               fontWeight="600"
               ml={'$1'}

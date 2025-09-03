@@ -2,7 +2,7 @@ import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query
 import type { Activity } from 'app/utils/zod/activity'
 import type { PostgrestError } from '@supabase/postgrest-js'
 import type { ZodError } from 'zod'
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 import {
   dataProviderMakerNative,
   layoutProviderMakerNative,
@@ -19,25 +19,17 @@ import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
 
 // Date separator component
 const DateSeparatorRow = ({ dateKey }: { dateKey: string }) => (
-  <XStack
-    f={1}
-    backgroundColor={'$color1'}
-    p="$3.5"
-    pb={0}
-    borderTopRightRadius={'$6'}
-    borderTopLeftRadius={'$6'}
-  >
-    <Paragraph size={'$5'} fontWeight={900}>
-      {dateKey}
-    </Paragraph>
-  </XStack>
+  <Paragraph size={'$7'} fontWeight={900}>
+    {dateKey}
+  </Paragraph>
 )
 
 // Define the list item types
 type ListItem =
-  | { type: 'activity'; data: Activity; isLastInGroup: boolean }
+  | { type: 'activity'; data: Activity; isLastInGroup: boolean; isFirstInGroup: boolean }
   | { type: 'date-separator'; data: { dateKey: string } }
   | { type: 'spacer' }
+  | { type: 'loader' }
 
 export default function ActivityFeed({
   activityFeedQuery,
@@ -96,15 +88,21 @@ export default function ActivityFeed({
 
       // Add activities for this date group with proper first/last tracking
       groupActivities.forEach((activity, activityIndex) => {
+        const isFirstInGroup = activityIndex === 0
         const isLastInGroup = activityIndex === groupActivities.length - 1
 
         items.push({
           type: 'activity',
           data: activity,
           isLastInGroup,
+          isFirstInGroup,
         })
       })
     }
+
+    items.push({
+      type: 'loader',
+    })
 
     return { listData: items }
   }, [activities])
@@ -126,6 +124,8 @@ export default function ActivityFeed({
               return 20
             case 'date-separator':
               return 40
+            case 'loader':
+              return 40
             default:
               return 102
           }
@@ -143,17 +143,25 @@ export default function ActivityFeed({
           return (
             <XStack
               backgroundColor={'$color1'}
+              borderWidth={1}
+              borderColor={'$color1'}
+              borderTopLeftRadius={item.isFirstInGroup ? '$6' : 0}
+              borderTopRightRadius={item.isFirstInGroup ? '$6' : 0}
               borderBottomLeftRadius={item.isLastInGroup ? '$6' : 0}
               borderBottomRightRadius={item.isLastInGroup ? '$6' : 0}
             >
               <TokenActivityRow activity={item.data} onPress={onActivityPress} />
             </XStack>
           )
+        case 'loader':
+          return (
+            <Spinner opacity={hasNextPage ? 1 : 0} pt={'$3.5'} size="small" color={'$color12'} />
+          )
         default:
           return null
       }
     },
-    [onActivityPress]
+    [onActivityPress, hasNextPage]
   )
 
   const handleEndReach = useCallback(() => {
@@ -162,24 +170,13 @@ export default function ActivityFeed({
     }
   }, [hasNextPage, isFetchingNextPageActivities, fetchNextPage])
 
-  useEffect(() => {
-    if (isFetchingNextPageActivities) {
-      justLoadedRef.current = true
-    } else if (justLoadedRef.current) {
-      // clear flag shortly after load
-      setTimeout(() => {
-        justLoadedRef.current = false
-      }, 200)
-    }
-  }, [isFetchingNextPageActivities])
-
   if (isLoadingActivities) {
-    return <Spinner size="small" />
+    return <Spinner size="small" mt={'$3.5'} />
   }
 
   if (activitiesError) {
     return (
-      <Paragraph maxWidth={600} fontFamily={'$mono'} fontSize={'$5'} color={'$color12'}>
+      <Paragraph maxWidth={600} fontFamily={'$mono'} fontSize={'$5'} color={'$error'} mt={'$3.5'}>
         {activitiesError?.message.split('.').at(0) ?? `${activitiesError}`}
       </Paragraph>
     )
@@ -187,14 +184,14 @@ export default function ActivityFeed({
 
   if (!activities.length) {
     return (
-      <Paragraph fontSize={'$5'} color={'$color12'}>
+      <Paragraph fontSize={'$5'} color={'$color12'} mt={'$3.5'} ta={'center'} w={'100%'}>
         No activities, just send it!
       </Paragraph>
     )
   }
 
   return (
-    <YStack f={1} elevation={'$0.75'}>
+    <YStack f={1}>
       <RecyclerListView
         style={{ flex: 1, overflow: 'visible' }}
         dataProvider={dataProvider}
@@ -202,6 +199,7 @@ export default function ActivityFeed({
         layoutProvider={layoutProvider}
         scrollViewProps={{
           showsVerticalScrollIndicator: false,
+          overScrollMode: 'never',
         }}
         onContentSizeChange={onContentSizeChange}
         onScroll={(e) => {
@@ -211,15 +209,9 @@ export default function ActivityFeed({
         }}
         scrollThrottle={128}
         onEndReached={handleEndReach}
-        onEndReachedThreshold={0.5}
+        onEndReachedThreshold={1000}
+        renderAheadOffset={2000}
       />
-      <XStack py={'$3.5'} jc={'center'}>
-        <Spinner
-          opacity={!isLoadingActivities && isFetchingNextPageActivities ? 1 : 0}
-          size="small"
-          color={'$color12'}
-        />
-      </XStack>
     </YStack>
   )
 }

@@ -8,6 +8,7 @@ import {
   SubmitButton,
   useAppToast,
   useDebounce,
+  useMedia,
   XStack,
   YStack,
 } from '@my/ui'
@@ -30,6 +31,7 @@ import { z } from 'zod'
 import { useReferralCodeQuery } from 'app/utils/useReferralCode'
 import { Platform } from 'react-native'
 import useIsScreenFocused from 'app/utils/useIsScreenFocused'
+import useAuthRedirect from 'app/utils/useAuthRedirect/useAuthRedirect'
 
 const SignUpScreenFormSchema = z.object({
   name: formFields.text,
@@ -60,6 +62,8 @@ export const SignUpScreen = () => {
   const { createSendAccount } = useCreateSendAccount()
   const { data: referralCode } = useReferralCodeQuery()
   const isScreenFocused = useIsScreenFocused()
+  const { xxs } = useMedia()
+  const { redirect } = useAuthRedirect()
 
   const formName = form.watch('name')
   const formIsAgreedToTerms = form.watch('isAgreedToTerms')
@@ -152,7 +156,7 @@ export const SignUpScreen = () => {
         sendAccountId: createdSendAccount.id,
         referralCode,
       })
-      router.replace('/')
+      redirect()
     } catch (error) {
       setFormState(FormState.Idle)
       const message = formatErrorMessage(error).split('.')[0] ?? 'Unknown error'
@@ -170,15 +174,15 @@ export const SignUpScreen = () => {
 
     try {
       await signInMutateAsync({})
-      router.push(queryParams.redirectUri ?? '/')
+      redirect(queryParams.redirectUri)
     } catch (error) {
       setFormState(FormState.Idle)
       toast.error(formatErrorMessage(error))
     }
-  }, [signInMutateAsync, toast.error, router.push, queryParams.redirectUri])
+  }, [signInMutateAsync, toast.error, redirect, queryParams.redirectUri])
 
   return (
-    <YStack f={1} jc={'center'} ai={'center'} gap={'$7'} w={'100%'}>
+    <YStack f={1} jc={'center'} ai={'center'} gap={xxs ? '$3.5' : '$7'} w={'100%'}>
       <YStack ai={'center'} gap={'$2'}>
         <Paragraph w={'100%'} size={'$8'} fontWeight={600} ta={'center'}>
           Create your account
@@ -261,13 +265,18 @@ export const SignUpScreen = () => {
                 $gtSm: {
                   maxWidth: '100%',
                 },
+                ...(Platform.OS === 'android' && {
+                  minHeight: 'auto',
+                  height: 'auto',
+                  flex: 0,
+                }),
                 style: { justifyContent: 'space-between' },
               }}
             >
               {({ name, isAgreedToTerms }) => {
                 return (
                   <>
-                    <YStack gap={'$2'}>
+                    <YStack gap={'$3.5'}>
                       <XStack position="relative">
                         {name}
                         <XStack
@@ -290,6 +299,7 @@ export const SignUpScreen = () => {
                           htmlFor={termsCheckboxId}
                           color={'$lightGrayTextField'}
                           $theme-light={{ color: '$darkGrayTextField' }}
+                          lineHeight={16}
                           pressStyle={{
                             color: isDarkTheme ? '$lightGrayTextField' : '$darkGrayTextField',
                           }}

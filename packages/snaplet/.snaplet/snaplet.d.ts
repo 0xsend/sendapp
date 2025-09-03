@@ -288,6 +288,7 @@ interface Table_storage_objects {
   version: string | null;
   owner_id: string | null;
   user_metadata: Json | null;
+  level: number | null;
 }
 interface Table_auth_one_time_tokens {
   id: string;
@@ -297,6 +298,12 @@ interface Table_auth_one_time_tokens {
   relates_to: string;
   created_at: string;
   updated_at: string;
+}
+interface Table_storage_prefixes {
+  bucket_id: string;
+  name: string;
+  created_at: string | null;
+  updated_at: string | null;
 }
 interface Table_public_profiles {
   id: string;
@@ -982,6 +989,7 @@ interface Schema_storage {
   buckets: Table_storage_buckets;
   migrations: Table_storage_migrations;
   objects: Table_storage_objects;
+  prefixes: Table_storage_prefixes;
   s3_multipart_uploads: Table_storage_s_3_multipart_uploads;
   s3_multipart_uploads_parts: Table_storage_s_3_multipart_uploads_parts;
 }
@@ -1057,11 +1065,12 @@ interface Tables_relationships {
     };
     children: {
        objects_bucketId_fkey: "storage.objects";
+       prefixes_bucketId_fkey: "storage.prefixes";
        s3_multipart_uploads_bucket_id_fkey: "storage.s3_multipart_uploads";
        s3_multipart_uploads_parts_bucket_id_fkey: "storage.s3_multipart_uploads_parts";
     };
     parentDestinationsTables:  | {};
-    childDestinationsTables: "storage.objects" | "storage.s3_multipart_uploads" | "storage.s3_multipart_uploads_parts" | {};
+    childDestinationsTables: "storage.objects" | "storage.prefixes" | "storage.s3_multipart_uploads" | "storage.s3_multipart_uploads_parts" | {};
     
   };
   "public.chain_addresses": {
@@ -1232,6 +1241,17 @@ interface Tables_relationships {
 
     };
     parentDestinationsTables: "auth.users" | {};
+    childDestinationsTables:  | {};
+    
+  };
+  "storage.prefixes": {
+    parent: {
+       prefixes_bucketId_fkey: "storage.buckets";
+    };
+    children: {
+
+    };
+    parentDestinationsTables: "storage.buckets" | {};
     childDestinationsTables:  | {};
     
   };

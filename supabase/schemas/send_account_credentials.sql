@@ -23,13 +23,13 @@ ALTER TABLE ONLY "public"."send_account_credentials"
 
 -- RLS
 ALTER TABLE "public"."send_account_credentials" ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "select_own_account_credentials" ON "public"."send_account_credentials" FOR SELECT TO "authenticated" USING (("auth"."uid"() = ( SELECT "send_accounts"."user_id"
+CREATE POLICY "select_own_account_credentials" ON "public"."send_account_credentials" FOR SELECT TO "authenticated" USING (((SELECT auth.uid()) = ( SELECT "send_accounts"."user_id"
    FROM "public"."send_accounts"
   WHERE ("send_accounts"."id" = "send_account_credentials"."account_id"))));
-CREATE POLICY "insert_own_account_credentials" ON "public"."send_account_credentials" FOR INSERT TO "authenticated" WITH CHECK (("auth"."uid"() = ( SELECT "send_accounts"."user_id"
+CREATE POLICY "insert_own_account_credentials" ON "public"."send_account_credentials" FOR INSERT TO "authenticated" WITH CHECK (((SELECT auth.uid()) = ( SELECT "send_accounts"."user_id"
    FROM "public"."send_accounts"
   WHERE ("send_accounts"."id" = "send_account_credentials"."account_id"))));
-CREATE POLICY "delete_own_account_credentials" ON "public"."send_account_credentials" FOR DELETE TO "authenticated" USING (("auth"."uid"() = ( SELECT "send_accounts"."user_id"
+CREATE POLICY "delete_own_account_credentials" ON "public"."send_account_credentials" FOR DELETE TO "authenticated" USING (((SELECT auth.uid()) = ( SELECT "send_accounts"."user_id"
    FROM "public"."send_accounts"
   WHERE ("send_accounts"."id" = "send_account_credentials"."account_id"))));
 CREATE POLICY "update_own_account_credentials" ON "public"."send_account_credentials" FOR UPDATE TO "authenticated" USING ((( SELECT "auth"."uid"() AS "uid") = ( SELECT "send_accounts"."user_id"

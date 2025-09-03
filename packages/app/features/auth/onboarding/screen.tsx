@@ -23,6 +23,7 @@ import { formatErrorMessage } from 'app/utils/formatErrorMessage'
 import { useFirstSendtagQuery } from 'app/utils/useFirstSendtag'
 import { useReferralCodeQuery } from 'app/utils/useReferralCode'
 import { Platform } from 'react-native'
+import useAuthRedirect from 'app/utils/useAuthRedirect/useAuthRedirect'
 
 const OnboardingSchema = z.object({
   name: formFields.text,
@@ -38,6 +39,7 @@ export function OnboardingScreen() {
   const isClient = useIsClient()
   const { data: firstSendtag } = useFirstSendtagQuery()
   const { data: referralCode } = useReferralCodeQuery()
+  const { redirect } = useAuthRedirect()
 
   const formName = form.watch('name')
   const validationError = form.formState.errors.root
@@ -105,7 +107,7 @@ export function OnboardingScreen() {
         sendAccountId: createdSendAccount.id,
         referralCode,
       })
-      replace('/')
+      redirect()
     } catch (error) {
       console.error('Error creating account', error)
 
@@ -146,7 +148,7 @@ export function OnboardingScreen() {
   if (!isClient) return null
 
   return (
-    <YStack f={1} jc={'center'} ai={'center'} gap={'$5'} pb={100}>
+    <YStack f={1} jc={'center'} ai={'center'} gap={'$5'}>
       <YStack ai={'center'} gap={'$2'}>
         <Paragraph w={'100%'} size={'$8'} fontWeight={600} ta={'center'}>
           Finish your account
@@ -220,6 +222,11 @@ export function OnboardingScreen() {
                 $gtSm: {
                   maxWidth: '100%',
                 },
+                ...(Platform.OS === 'android' && {
+                  minHeight: 'auto',
+                  height: 'auto',
+                  flex: 0,
+                }),
                 style: { justifyContent: 'space-between' },
               }}
             >

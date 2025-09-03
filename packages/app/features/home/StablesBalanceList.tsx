@@ -40,7 +40,7 @@ const TokenBalanceItem = ({ coin }: { coin: CoinWithBalance }) => {
       <IconCoin symbol={coin.symbol} size={'$3.5'} />
       <YStack f={1} jc={'space-between'}>
         <XStack jc={'space-between'} ai={'center'}>
-          <Paragraph fontSize={'$6'} fontWeight={'500'} color={'$color12'}>
+          <Paragraph fontSize={'$6'} fontWeight={'500'} lineHeight={24} color={'$color12'}>
             {coin.shortLabel || coin.label}
           </Paragraph>
         </XStack>
@@ -81,7 +81,6 @@ const TokenBalanceItem = ({ coin }: { coin: CoinWithBalance }) => {
 
   return (
     <XStack
-      f={1}
       gap={'$3.5'}
       jc={'space-between'}
       ai={'center'}

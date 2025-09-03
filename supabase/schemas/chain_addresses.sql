@@ -56,7 +56,7 @@ CREATE OR REPLACE TRIGGER "trigger_chain_addresses_after_insert" AFTER INSERT OR
 -- RLS
 ALTER TABLE "public"."chain_addresses" ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Addresses are viewable by users who created them." ON "public"."chain_addresses" FOR SELECT USING (("auth"."uid"() = "user_id"));
+CREATE POLICY "Addresses are viewable by users who created them." ON "public"."chain_addresses" FOR SELECT USING (((SELECT auth.uid()) = "user_id"));
 
 -- Grants
 REVOKE ALL ON FUNCTION "public"."chain_addresses_after_insert"() FROM PUBLIC;

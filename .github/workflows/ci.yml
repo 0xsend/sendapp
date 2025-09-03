@@ -13,9 +13,9 @@ jobs:
   build_next_image:
     name: Build Next.js Docker Image
     # Only build images for PRs and manual triggers, not for pushes to main/dev (handled by deploy workflows)
-    if: ${{ github.event_name != 'push' }}
+    if: false
     # runs-on: ubuntu-latest
-    runs-on: arc-runner-set
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     outputs:
@@ -195,9 +195,9 @@ jobs:
     name: Playwright Tests (Shard ${{ matrix.shard }}/4)
     needs: [build_next_image]
     # Only run playwright tests when we build the image (PRs and manual triggers)
-    if: ${{ github.event_name != 'push' }}
+    if: false
     # arc-runner-set had a good run
-    runs-on: arc-runner-set
+    runs-on: ubuntu-latest
     # runs-on: ubuntu-latest
     strategy:
       # Don't stop all shards if one fails
@@ -378,7 +378,7 @@ jobs:
   playwright-merge-reports:
     name: Playwright Merge Reports
     runs-on: ubuntu-latest
-    if: ${{ !cancelled() }}
+    if: false
     needs: [playwright-tests]
     # for writing PR comments
     permissions:

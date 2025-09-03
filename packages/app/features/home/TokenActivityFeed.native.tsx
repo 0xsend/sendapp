@@ -3,6 +3,7 @@ import {
   dataProviderMakerNative,
   H4,
   layoutProviderMakerNative,
+  Paragraph,
   Spinner,
   XStack,
   YStack,
@@ -18,19 +19,17 @@ import type { ZodError } from 'zod'
 import { TokenActivityRow } from './TokenActivityRow'
 import { useRootScreenParams } from 'app/routers/params'
 import { RecyclerListView } from 'recyclerlistview'
-import { TokenDetailsHeader } from './TokenDetailsHeader'
 import type { CoinWithBalance } from 'app/data/coins'
 
 // Define the list item types
 type ListItem =
-  | { type: 'header'; data: CoinWithBalance }
   | { type: 'activity-header'; data: { title: string; hasActivities: boolean } }
   | { type: 'activity'; data: Activity }
+  | { type: 'loader' }
 
 export default function TokenActivityFeed({
   tokenActivityFeedQuery,
   onActivityPress,
-  coin,
 }: {
   tokenActivityFeedQuery: UseInfiniteQueryResult<
     InfiniteData<Activity[]>,
@@ -47,6 +46,7 @@ export default function TokenActivityFeed({
     data,
     isLoading: isLoadingActivities,
     isFetchingNextPage: isFetchingNextPageActivities,
+    error: activitiesError,
     fetchNextPage,
     hasNextPage,
   } = tokenActivityFeedQuery
@@ -56,9 +56,6 @@ export default function TokenActivityFeed({
   // Create the mixed data structure with header + activities
   const { listData, firstActivityIndex, lastActivityIndex } = useMemo(() => {
     const items: ListItem[] = []
-
-    // Add the token details header
-    items.push({ type: 'header', data: coin })
 
     // Add activity header
     items.push({
@@ -73,12 +70,16 @@ export default function TokenActivityFeed({
       items.push({ type: 'activity', data: activity })
     }
 
+    items.push({
+      type: 'loader',
+    })
+
     return {
       listData: items,
-      firstActivityIndex: 2,
-      lastActivityIndex: items.length - 1,
+      firstActivityIndex: 1,
+      lastActivityIndex: items.length - 2,
     }
-  }, [coin, activities])
+  }, [activities])
 
   useEffect(() => {
     // Only proceed if data is available
@@ -133,12 +134,11 @@ export default function TokenActivityFeed({
         getHeightOrWidth: (index) => {
           const item = listData[index]
           switch (item?.type) {
-            case 'header':
-              // Approximate height for token details header (card + buttons + gaps)
-              return 290
             case 'activity-header':
               // Height for activity title
               return 35
+            case 'loader':
+              return 40
             default:
               return 102
           }
@@ -153,8 +153,6 @@ export default function TokenActivityFeed({
       const isLast = index === lastActivityIndex
 
       switch (item.type) {
-        case 'header':
-          return <TokenDetailsHeader coin={item.data} />
         case 'activity-header':
           return (
             <H4 fontWeight={'600'} size={'$7'}>
@@ -165,6 +163,8 @@ export default function TokenActivityFeed({
           return (
             <XStack
               backgroundColor={'$color1'}
+              borderWidth={1}
+              borderColor={'$color1'}
               borderTopLeftRadius={isFirst ? '$6' : 0}
               borderTopRightRadius={isFirst ? '$6' : 0}
               borderBottomLeftRadius={isLast ? '$6' : 0}
@@ -173,11 +173,15 @@ export default function TokenActivityFeed({
               <TokenActivityRow activity={item.data} onPress={onActivityPress} />
             </XStack>
           )
+        case 'loader':
+          return (
+            <Spinner opacity={hasNextPage ? 1 : 0} pt={'$3.5'} size="small" color={'$color12'} />
+          )
         default:
           return null
       }
     },
-    [onActivityPress, firstActivityIndex, lastActivityIndex]
+    [onActivityPress, firstActivityIndex, lastActivityIndex, hasNextPage]
   )
 
   const handleEndReach = useCallback(() => {
@@ -186,8 +190,28 @@ export default function TokenActivityFeed({
     }
   }, [hasNextPage, isFetchingNextPageActivities, fetchNextPage])
 
+  if (isLoadingActivities) {
+    return <Spinner size="small" />
+  }
+
+  if (activitiesError) {
+    return (
+      <Paragraph maxWidth={600} fontFamily={'$mono'} fontSize={'$5'} color={'$error'}>
+        {activitiesError?.message.split('.').at(0) ?? `${activitiesError}`}
+      </Paragraph>
+    )
+  }
+
+  if (!activities.length) {
+    return (
+      <Paragraph fontSize={'$5'} color={'$color12'} ta={'center'} w={'100%'} mt={'$3.5'}>
+        No activities, just send it!
+      </Paragraph>
+    )
+  }
+
   return (
-    <YStack f={1} elevation={'$0.75'}>
+    <YStack f={1}>
       <RecyclerListView
         style={{ flex: 1, overflow: 'visible' }}
         dataProvider={dataProvider}
@@ -195,17 +219,12 @@ export default function TokenActivityFeed({
         layoutProvider={layoutProvider}
         scrollViewProps={{
           showsVerticalScrollIndicator: false,
+          overScrollMode: 'never',
         }}
         onEndReached={handleEndReach}
-        onEndReachedThreshold={0.5}
+        onEndReachedThreshold={1000}
+        renderAheadOffset={2000}
       />
-      <XStack py={'$3.5'} jc={'center'}>
-        <Spinner
-          opacity={!isLoadingActivities && isFetchingNextPageActivities ? 1 : 0}
-          size="small"
-          color={'$color12'}
-        />
-      </XStack>
     </YStack>
   )
 }

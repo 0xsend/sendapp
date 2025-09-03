@@ -13,6 +13,7 @@ import { ToastProvider } from './toast'
 import { WagmiProvider } from './wagmi'
 import ScrollDirectionProvider from 'app/provider/scroll/ScrollDirectionProvider'
 import { ActivityDetailsProvider } from './activity-details'
+import { GlobalDatePickerProvider } from './datepicker'
 
 export { loadThemePromise } from './theme/UniversalThemeProvider'
 
@@ -51,9 +52,10 @@ const Providers = compose([
   QueryClientProvider,
   UniversalThemeProvider,
   SafeAreaProvider,
+  CoinsProvider,
+  GlobalDatePickerProvider,
   TamaguiProvider,
   ToastProvider,
   ScrollDirectionProvider,
-  CoinsProvider,
   ActivityDetailsProvider,
 ])

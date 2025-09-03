@@ -2,14 +2,117 @@
 
 echo "Running post-install EAS hook..."
 
-# Debug PATH and forge location
+# Function to check if a command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# Function to find and add tool to PATH if it exists in expected location
+find_and_add_tool() {
+    local tool_name="$1"
+    local tool_path="$2"
+    
+    if [ -f "$tool_path" ]; then
+        local tool_dir=$(dirname "$tool_path")
+        export PATH="$tool_dir:$PATH"
+        echo "Added $tool_dir to PATH for $tool_name"
+        return 0
+    fi
+    return 1
+}
+
+# Explicitly set PATH with all required directories
+# Add common tool locations to PATH
+export PATH="$HOME/.foundry/bin:$HOME/.bun/bin:$PATH"
+
+# Debug PATH and tool locations
 echo "Current PATH: $PATH"
-which forge || echo "forge not found in PATH"
-# Add Foundry to PATH
-export PATH="$HOME/.foundry/bin:$PATH"
+
+# Check for tools and try to find them if not in PATH
+echo "Checking for required tools..."
+
+# Check for forge
+if command_exists forge; then
+    echo "✓ forge found: $(which forge)"
+else
+    echo "⚠ forge not found in PATH, searching..."
+    if find_and_add_tool "forge" "$HOME/.foundry/bin/forge"; then
+        if command_exists forge; then
+            echo "✓ forge found after PATH update: $(which forge)"
+        else
+            echo "✗ forge still not accessible"
+        fi
+    else
+        echo "✗ forge not found in expected location: $HOME/.foundry/bin/forge"
+    fi
+fi
+
+# Check for bun
+if command_exists bun; then
+    echo "✓ bun found: $(which bun)"
+else
+    echo "⚠ bun not found in PATH, searching..."
+    if find_and_add_tool "bun" "$HOME/.bun/bin/bun"; then
+        if command_exists bun; then
+            echo "✓ bun found after PATH update: $(which bun)"
+        else
+            echo "✗ bun still not accessible"
+        fi
+    else
+        echo "✗ bun not found in expected location: $HOME/.bun/bin/bun"
+    fi
+fi
+
+# Final PATH after all updates
 echo "Updated PATH: $PATH"
+
+# Verify all required tools are available
+echo "Final tool verification..."
+missing_tools=()
+
+if ! command_exists forge; then
+    missing_tools+=("forge")
+    echo "✗ forge: MISSING"
+else
+    echo "✓ forge: $(which forge)"
+fi
+
+if ! command_exists bun; then
+    missing_tools+=("bun")
+    echo "✗ bun: MISSING"
+else
+    echo "✓ bun: $(which bun)"
+fi
+
+# If tools are missing, provide helpful error information
+if [ ${#missing_tools[@]} -gt 0 ]; then
+    echo ""
+    echo "ERROR: Missing required tools: ${missing_tools[*]}"
+    echo ""
+    echo "Debugging information:"
+    echo "- HOME: $HOME"
+    echo "- SHELL: $SHELL"
+    echo "- PATH: $PATH"
+    echo ""
+    echo "Expected tool locations:"
+    echo "- forge: $HOME/.foundry/bin/forge"
+    echo "- bun: $HOME/.bun/bin/bun"
+    echo ""
+    echo "Checking if files exist:"
+    [ -f "$HOME/.foundry/bin/forge" ] && echo "- $HOME/.foundry/bin/forge: EXISTS" || echo "- $HOME/.foundry/bin/forge: MISSING"
+    [ -f "$HOME/.bun/bin/bun" ] && echo "- $HOME/.bun/bin/bun: EXISTS" || echo "- $HOME/.bun/bin/bun: MISSING"
+    echo ""
+    echo "This suggests the pre-install script may have failed to install the tools properly."
+    exit 1
+fi
+
+echo "All required tools are available. Proceeding with build..."
+
 echo "Changing to monorepo root directory..."
 cd ../..
+
 echo "=== Running yarn build ==="
 # Run build with all environment variables properly set
 yarn build
+
+echo "Post-install hook completed successfully."

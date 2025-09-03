@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react'
 import { api } from 'app/utils/api'
 import { useSignIn } from 'app/utils/send-accounts'
 import { Platform } from 'react-native'
+import useAuthRedirect from 'app/utils/useAuthRedirect/useAuthRedirect'
 
 const SignInWithPhoneSchema = z.object({
   countryCode: formFields.countrycode,
@@ -20,6 +21,7 @@ export const LoginWithPhoneScreen = () => {
   const [queryParams] = useAuthScreenParams()
   const { redirectUri } = queryParams
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
+  const { redirect } = useAuthRedirect()
 
   const formPhone = form.watch('phone')
   const validationError = form.formState.errors.root
@@ -51,11 +53,11 @@ export const LoginWithPhoneScreen = () => {
       return
     }
 
-    router.push(redirectUri ?? '/')
+    redirect(redirectUri)
   }
 
   return (
-    <YStack f={1} jc={'center'} ai={'center'} gap={'$5'} pb={100}>
+    <YStack f={1} jc={'center'} ai={'center'} gap={'$5'}>
       <YStack ai={'center'} gap={'$2'}>
         <Paragraph w={'100%'} size={'$8'} fontWeight={600} ta={'center'}>
           Login with your phone

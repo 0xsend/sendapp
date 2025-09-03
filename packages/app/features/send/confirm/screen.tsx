@@ -239,12 +239,7 @@ export function SendConfirm() {
           exact: false,
         })
 
-        if (Platform.OS === 'web') {
-          router.replace({ pathname: '/', query: { token: sendToken } })
-          return
-        }
-        router.push('/(tabs)/')
-        router.push({ pathname: '/token', query: { token: sendToken } })
+        router.replace({ pathname: `/profile/${profile?.sendid}/history` })
       }
     } catch (e) {
       // @TODO: handle sending repeated tx when nonce is still pending
@@ -289,16 +284,22 @@ export function SendConfirm() {
         >
           <XStack gap={'$4'} ai={'center'}>
             <LinkableAvatar circular size={'$3'} href={href}>
-              <Avatar.Image
-                src={profile?.avatar_url ?? ''}
-                testID="avatarImage"
-                accessibilityLabel={profile?.name ?? '??'}
-                accessibilityRole="image"
-                accessible
-              />
-              <Avatar.Fallback jc="center">
+              {Platform.OS === 'android' && !profile?.avatar_url ? (
                 <IconAccount size={'$3'} color="$olive" />
-              </Avatar.Fallback>
+              ) : (
+                <>
+                  <Avatar.Image
+                    src={profile?.avatar_url ?? ''}
+                    testID="avatarImage"
+                    accessibilityLabel={profile?.name ?? '??'}
+                    accessibilityRole="image"
+                    accessible
+                  />
+                  <Avatar.Fallback jc="center">
+                    <IconAccount size={'$3'} color="$olive" />
+                  </Avatar.Fallback>
+                </>
+              )}
             </LinkableAvatar>
             <Paragraph
               nativeID="profileName"
@@ -331,6 +332,7 @@ export function SendConfirm() {
                 <Paragraph
                   fontWeight={'700'}
                   size={localizedAmount.length > 18 ? '$7' : '$9'}
+                  lineHeight={40}
                   $gtSm={{
                     size: localizedAmount.length > 16 ? '$8' : '$10',
                   }}
@@ -502,7 +504,7 @@ function ErrorMessage({ error, ...props }: ParagraphProps & { error?: string }) 
   if (!error) return null
 
   return (
-    <ScrollView height="$4">
+    <ScrollView height="$4" overScrollMode={'never'}>
       <Paragraph testID="SendConfirmError" size="$2" width="100%" col={'$error'} {...props}>
         {error.split('.').at(0)}
       </Paragraph>

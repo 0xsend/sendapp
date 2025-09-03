@@ -6,6 +6,7 @@ import { AuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
 import { useCallback, useState } from 'react'
 import type { GetPlaiceholderImage } from 'app/utils/getPlaiceholderImage'
 import { useQueryClient } from '@tanstack/react-query'
+import * as NavigationBar from 'expo-navigation-bar'
 
 // Hardcoded carousel images for mobile
 const mobileCarouselImages = [
@@ -35,6 +36,9 @@ export default function Index() {
   useFocusEffect(
     useCallback(() => {
       queryClient.clear()
+      setTimeout(() => {
+        void NavigationBar.setBackgroundColorAsync('#000000')
+      }, 0)
     }, [queryClient.clear])
   )
 

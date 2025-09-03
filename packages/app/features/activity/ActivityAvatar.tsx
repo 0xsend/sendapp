@@ -26,6 +26,7 @@ import {
   isSendEarnWithdrawEvent,
   isSendTokenUpgradeEvent,
 } from 'app/utils/zod/activity'
+import { Platform } from 'react-native'
 
 export function ActivityAvatar({
   activity,
@@ -69,7 +70,11 @@ export function ActivityAvatar({
           {(() => {
             switch (true) {
               case !user.avatar_url:
-                return <Avatar.Image src={undefined} />
+                return Platform.OS === 'android' ? (
+                  <UserImage user={user} />
+                ) : (
+                  <Avatar.Image src={undefined} />
+                )
               case Boolean(to_user?.send_id) && Boolean(from_user?.send_id):
                 return <Avatar.Image src={user.avatar_url} />
               case isERC20Transfer || isETHReceive:
@@ -81,17 +86,17 @@ export function ActivityAvatar({
                   />
                 )
               default:
-                return <Avatar.Image src={user?.avatar_url ?? undefined} />
+                return Platform.OS === 'android' && !user?.avatar_url ? (
+                  <UserImage user={user} />
+                ) : (
+                  <Avatar.Image src={user?.avatar_url ?? undefined} />
+                )
             }
           })()}
 
           <Avatar.Fallback jc="center" bc="$olive">
             <Avatar size="$5" {...props}>
-              <Avatar.Image
-                src={`https://ui-avatars.com/api/?name=${
-                  user?.name ?? user?.main_tag_name ?? user?.send_id
-                }&size=256&format=png&background=86ad7f`}
-              />
+              <UserImage user={user} />
             </Avatar>
           </Avatar.Fallback>
         </LinkableAvatar>
@@ -216,5 +221,15 @@ const TransferDirectionIndicator = ({ activity }: { activity: Activity }) => {
         <ArrowUp size={'$1'} color={'$white'} />
       )}
     </XStack>
+  )
+}
+
+const UserImage = ({ user }: { user?: Activity['from_user'] | Activity['to_user'] }) => {
+  return (
+    <Avatar.Image
+      src={`https://ui-avatars.com/api/?name=${
+        user?.name ?? user?.main_tag_name ?? user?.send_id
+      }&size=256&format=png&background=86ad7f`}
+    />
   )
 }

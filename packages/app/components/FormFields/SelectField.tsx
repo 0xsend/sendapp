@@ -4,19 +4,20 @@ import { useFieldInfo, useTsController } from '@ts-react/form'
 import { useId } from 'react'
 import {
   Adapt,
+  FieldError,
   Fieldset,
-  Label,
-  Select,
-  type SelectProps,
-  Sheet,
-  Theme,
-  XStack,
-  YStack,
   getFontSize,
   isWeb,
-  useThemeName,
-  FieldError,
+  Label,
+  ScrollView,
+  Select,
+  type SelectProps,
   Shake,
+  Sheet,
+  Theme,
+  useThemeName,
+  XStack,
+  YStack,
 } from '@my/ui'
 
 type SelectItem = {
@@ -74,11 +75,11 @@ export const SelectField = ({
             </Select.Trigger>
 
             <Adapt when="sm" platform="touch">
-              <Sheet native modal dismissOnSnapToBottom>
+              <Sheet native modal dismissOnSnapToBottom animation={'quick'}>
                 <Sheet.Frame>
-                  <Sheet.ScrollView>
+                  <ScrollView>
                     <Adapt.Contents />
-                  </Sheet.ScrollView>
+                  </ScrollView>
                 </Sheet.Frame>
                 <Sheet.Overlay />
               </Sheet>

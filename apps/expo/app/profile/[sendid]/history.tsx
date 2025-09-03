@@ -21,7 +21,7 @@ export default function Screen() {
         flex={1}
         backgroundColor="$background"
         paddingTop={CONTAINER_OFFSET}
-        paddingBottom={insets.bottom}
+        paddingBottom={insets.bottom + CONTAINER_OFFSET}
       >
         <ProfileHistoryScreen />
       </Container>

@@ -1,4 +1,4 @@
-import { Avatar, Paragraph, YStack } from '@my/ui'
+import { Avatar, Paragraph, Text, YStack } from '@my/ui'
 import { FlatList, Platform } from 'react-native'
 import { useSendScreenParams } from 'app/routers/params'
 import { Link } from 'solito/link'
@@ -125,26 +125,34 @@ const SuggestionTile = ({
         elevation={Platform.OS === 'web' ? undefined : '$0.75'}
       >
         <Avatar size="$7" br="$4" elevation={'$0.75'}>
-          <Avatar.Image src={avatarUrl} />
-          <Avatar.Fallback jc="center" bc="$olive">
-            <Avatar size="$7" br="$4">
-              <Avatar.Image
-                src={`https://ui-avatars.com/api/?name=${label}&size=256&format=png&background=86ad7f`}
-              />
-            </Avatar>
-          </Avatar.Fallback>
+          {Platform.OS === 'android' && !avatarUrl ? (
+            <Avatar.Image
+              src={`https://ui-avatars.com/api/?name=${label}&size=256&format=png&background=86ad7f`}
+            />
+          ) : (
+            <>
+              <Avatar.Image src={avatarUrl} />
+              <Avatar.Fallback jc="center" bc="$olive">
+                <Avatar size="$7" br="$4">
+                  <Avatar.Image
+                    src={`https://ui-avatars.com/api/?name=${label}&size=256&format=png&background=86ad7f`}
+                  />
+                </Avatar>
+              </Avatar.Fallback>
+            </>
+          )}
         </Avatar>
-        <Paragraph
+        <Text
           w={74}
-          size={'$3'}
-          textOverflow={'ellipsis'}
+          fontSize={'$3'}
           numberOfLines={1}
+          ellipsizeMode="tail"
           color={'$lightGrayTextField'}
           ta={'center'}
           $theme-light={{ color: '$color12' }}
         >
           {label}
-        </Paragraph>
+        </Text>
       </YStack>
     </Link>
   )

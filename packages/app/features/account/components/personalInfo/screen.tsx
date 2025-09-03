@@ -15,7 +15,7 @@ import type { z } from 'zod'
 import { FormProvider, useForm } from 'react-hook-form'
 import { VerifyCode } from 'app/features/auth/components/VerifyCode'
 import { AuthUserSchema, useAuthUserMutation } from 'app/utils/useAuthUserMutation'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useProfileMutation } from 'app/utils/useUserPersonalDataMutation'
 import { useQuery } from '@tanstack/react-query'
 import { adjustUTCDateForTimezone } from 'app/utils/dateHelper'
@@ -117,22 +117,6 @@ export const PersonalInfoScreen = () => {
     </FadeCard>
   )
 
-  const renderAfterContent = useCallback(
-    ({ submit }: { submit: () => void }) => (
-      <YStack>
-        <SubmitButton onPress={() => submit()}>
-          <SubmitButton.Text>SAVE CHANGES</SubmitButton.Text>
-        </SubmitButton>
-        {errorMessage && (
-          <Paragraph marginTop={'$5'} theme="red" color="$color9">
-            {errorMessage}
-          </Paragraph>
-        )}
-      </YStack>
-    ),
-    [errorMessage]
-  )
-
   const personalInfoForm = (
     <SchemaForm
       form={form}
@@ -173,19 +157,33 @@ export const PersonalInfoScreen = () => {
         $gtSm: {
           maxWidth: '100%',
         },
+        ...(Platform.OS === 'android' && {
+          minHeight: 'auto',
+          height: 'auto',
+          flex: 0,
+        }),
       }}
-      renderAfter={renderAfterContent}
     >
       {({ birthday, xUsername }) => (
-        <FadeCard elevation={'$0.75'}>
-          <FieldWithLabel label={'Date of Birth'} additionalInfo={'(non-editable)'} gap={'$2'}>
-            {birthday}
-          </FieldWithLabel>
-          <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
-          <FieldWithLabel label={'X Handle'} gap={'$2'}>
-            {xUsername}
-          </FieldWithLabel>
-        </FadeCard>
+        <YStack gap={'$3.5'}>
+          <FadeCard>
+            <FieldWithLabel label={'Date of Birth'} additionalInfo={'(non-editable)'} gap={'$2'}>
+              {birthday}
+            </FieldWithLabel>
+            <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
+            <FieldWithLabel label={'X Handle'} gap={'$2'}>
+              {xUsername}
+            </FieldWithLabel>
+          </FadeCard>
+          <SubmitButton onPress={() => form.handleSubmit(handleSubmit)()}>
+            <SubmitButton.Text>SAVE CHANGES</SubmitButton.Text>
+          </SubmitButton>
+          {errorMessage && (
+            <Paragraph theme="red" color="$color9">
+              {errorMessage}
+            </Paragraph>
+          )}
+        </YStack>
       )}
     </SchemaForm>
   )

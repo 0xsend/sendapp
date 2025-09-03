@@ -148,10 +148,16 @@ export function SendRecipient({ ...props }: YStackProps) {
         $theme-light={{ bc: '$gray3Light' }}
       >
         <LinkableAvatar size="$4.5" br="$3" href={href}>
-          <Avatar.Image src={profile?.avatar_url ?? ''} />
-          <Avatar.Fallback jc="center">
+          {Platform.OS === 'android' && !profile?.avatar_url ? (
             <IconAccount size="$4.5" color="$olive" />
-          </Avatar.Fallback>
+          ) : (
+            <>
+              <Avatar.Image src={profile?.avatar_url ?? ''} />
+              <Avatar.Fallback jc="center">
+                <IconAccount size="$4.5" color="$olive" />
+              </Avatar.Fallback>
+            </>
+          )}
         </LinkableAvatar>
         <YStack gap="$1.5">
           <Paragraph fontSize="$4" fontWeight="500" color="$color12">

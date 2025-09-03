@@ -7,6 +7,7 @@ import {
   isTouchable,
   isWeb,
   Paragraph,
+  ScrollView,
   Select,
   type SelectProps,
   Shake,
@@ -139,9 +140,9 @@ export const CoinField = ({
                       </XStack>
                     </Sheet.Handle>
                   )}
-                  <Sheet.ScrollView>
+                  <ScrollView>
                     <Adapt.Contents />
-                  </Sheet.ScrollView>
+                  </ScrollView>
                 </Sheet.Frame>
                 <Sheet.Overlay />
               </Sheet>

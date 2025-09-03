@@ -122,6 +122,7 @@ function SearchResults() {
       }}
       showsVerticalScrollIndicator={false}
       overflow="visible"
+      overScrollMode={'never'}
       {...(Platform.OS === 'web'
         ? {}
         : {
@@ -459,14 +460,24 @@ function SearchResultRow({
         <XStack ai={'center'} jc={'space-between'}>
           <XStack testID={`tag-search-${profile.send_id}`} ai="center" gap="$4">
             <Avatar size="$4.5" br="$3">
-              <Avatar.Image testID="avatar" src={profile.avatar_url ?? undefined} />
-              <Avatar.Fallback jc="center" bc="$olive">
+              {Platform.OS === 'android' && !profile.avatar_url ? (
                 <Avatar size="$4.5" br="$3">
                   <Avatar.Image
                     src={`https://ui-avatars.com/api/?name=${label}&size=256&format=png&background=86ad7f`}
                   />
                 </Avatar>
-              </Avatar.Fallback>
+              ) : (
+                <>
+                  <Avatar.Image testID="avatar" src={profile.avatar_url ?? undefined} />
+                  <Avatar.Fallback jc="center" bc="$olive">
+                    <Avatar size="$4.5" br="$3">
+                      <Avatar.Image
+                        src={`https://ui-avatars.com/api/?name=${label}&size=256&format=png&background=86ad7f`}
+                      />
+                    </Avatar>
+                  </Avatar.Fallback>
+                </>
+              )}
             </Avatar>
             <YStack gap="$1">
               <HighlightMatchingText

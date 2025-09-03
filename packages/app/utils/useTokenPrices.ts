@@ -12,6 +12,8 @@ import {
 import { z } from 'zod'
 import { useQuery, type UseQueryResult } from '@tanstack/react-query'
 import { allCoins } from 'app/data/coins'
+import { useUser } from 'app/utils/useUser'
+import { useTokensMarketData, type MarketData } from 'app/utils/coin-gecko'
 
 const CoingeckoTokenPriceSchema = z.object({
   usd: z.number(),
@@ -40,39 +42,19 @@ const DexScreenerTokenPriceSchema = z.object({
 
 export const DexScreenerTokenPricesSchema = z.array(DexScreenerTokenPriceSchema)
 
-const fetchCoingeckoPrices = async () => {
-  const coingeckoIds = allCoins.map((coin) => coin.coingeckoTokenId).toString()
-
-  const res = await fetch(
-    `https://api.coingecko.com/api/v3/simple/price?ids=${coingeckoIds}&vs_currencies=usd`,
-    {
-      headers: {
-        Accept: 'application/json',
-      },
-      mode: 'cors',
-    }
-  )
-
-  if (!res.ok) {
-    throw new Error(`Failed to fetch Coingecko prices. Status: ${res.status}`)
-  }
-
-  const json = await res.json()
-  const prices = CoingeckoTokenPricesSchema.parse(json)
-  return normalizeCoingeckoPrices(prices)
-}
-
-const normalizeCoingeckoPrices = (prices: z.infer<typeof CoingeckoTokenPricesSchema>) => {
+const normalizeCoingeckoPrices = (marketData: MarketData) => {
+  // Normalize CoinGecko market data current_price into our token-keyed record
+  const byId = new Map(marketData.map((d) => [d.id, d.current_price ?? 0]))
   return allCoins.reduce(
     (acc, coin) => {
-      acc[coin.token] = prices[coin.coingeckoTokenId].usd
+      acc[coin.token] = byId.get(coin.coingeckoTokenId) ?? 0
       return acc
     },
     {} as Record<string, number>
   )
 }
 
-const fetchDexScreenerPrices = async () => {
+export const fetchDexScreenerPrices = async () => {
   // hardcoded to avoid testnet tokens
   const tokensToFetch = [
     '0x4200000000000000000000000000000000000006', // WETH
@@ -138,33 +120,31 @@ const normalizeDexScreenerPrices = (prices: z.infer<typeof DexScreenerTokenPrice
   )
 }
 
-const fetchWithFallback = async () => {
-  try {
-    return await fetchCoingeckoPrices()
-  } catch (error) {
-    console.warn('Coingecko request failed, falling back to DexScreener')
-    return await fetchDexScreenerPrices()
-  }
-}
-
 type priceSource = 'coingecko' | 'dexscreener'
 //takes a price source as an argument
 //if no argument is passed, it uses a fallback approach
 export const useTokenPrices = (
   source?: priceSource
 ): UseQueryResult<Record<allCoins[number]['token'], number>, Error> => {
-  return useQuery({
-    queryKey: ['tokenPrices', source],
-    staleTime: 1000 * 60,
-    queryFn: async () => {
-      switch (source) {
-        case 'coingecko':
-          return await fetchCoingeckoPrices()
-        case 'dexscreener':
-          return await fetchDexScreenerPrices()
-        default:
-          return await fetchWithFallback()
-      }
-    },
+  const { session } = useUser()
+  const isLoggedIn = !!session
+
+  // Always define both  queries, but gate with enabled to satisfy hooks rules
+
+  const cgQuery = useTokensMarketData<Record<(typeof allCoins)[number]['token'], number>>({
+    enabled: isLoggedIn && source === 'coingecko',
+    select: normalizeCoingeckoPrices,
   })
+
+  const dexQuery = useQuery<Record<(typeof allCoins)[number]['token'], number>, Error>({
+    queryKey: ['tokenPrices', 'dexscreener'],
+    enabled: isLoggedIn && source === 'dexscreener',
+    staleTime: 1000 * 60,
+    queryFn: fetchDexScreenerPrices,
+  })
+
+  return (source === 'dexscreener' ? dexQuery : cgQuery) as UseQueryResult<
+    Record<(typeof allCoins)[number]['token'], number>,
+    Error
+  >
 }

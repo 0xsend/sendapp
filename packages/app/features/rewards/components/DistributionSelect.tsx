@@ -1,5 +1,14 @@
 // In a new file: components/DistributionSelect.tsx
-import { Adapt, Button, Paragraph, Select, type SelectItemProps, Sheet, XStack } from '@my/ui'
+import {
+  Adapt,
+  Button,
+  Paragraph,
+  ScrollView,
+  Select,
+  type SelectItemProps,
+  Sheet,
+  XStack,
+} from '@my/ui'
 import { ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
 import { memo, useRef, useState } from 'react'
 import type { UseDistributionsResultData } from 'app/utils/distributions'
@@ -126,9 +135,9 @@ export const DistributionSelect = memo(
                   </XStack>
                 </Sheet.Handle>
               )}
-              <Sheet.ScrollView>
+              <ScrollView>
                 <Adapt.Contents />
-              </Sheet.ScrollView>
+              </ScrollView>
             </Sheet.Frame>
             <Sheet.Overlay />
           </Sheet>

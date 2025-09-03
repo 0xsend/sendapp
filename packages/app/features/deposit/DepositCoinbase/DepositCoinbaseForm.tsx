@@ -130,6 +130,12 @@ export function DepositCoinbaseForm({ onConfirmTransaction, isLoading }: Deposit
             $gtSm: {
               maxWidth: '100%',
             },
+            // Add Android-specific height handling
+            ...(Platform.OS === 'android' && {
+              minHeight: 'auto',
+              height: 'auto',
+              flex: 0,
+            }),
             style: { justifyContent: 'space-between' },
           }}
           defaultValues={{

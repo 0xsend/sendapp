@@ -80,6 +80,7 @@ const blurStackVariants = {
   },
 } as const
 
+// TODO BlurView is not working on android, its experimental feature on android
 /**
  * @summary A view that arranges its children in a vertical line and applies a blur effect.
  * @description Utilizes Expo's BlurView for cross-platform blur effect.

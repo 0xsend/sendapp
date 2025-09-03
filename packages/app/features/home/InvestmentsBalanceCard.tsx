@@ -10,8 +10,9 @@ import {
   XStack,
   type XStackProps,
   YStack,
-  type YStackProps,
   useMedia,
+  type ButtonProps,
+  Button,
 } from '@my/ui'
 import formatAmount from 'app/utils/formatAmount'
 import { ChevronLeft, ChevronRight } from '@tamagui/lucide-icons'
@@ -23,8 +24,8 @@ import {
   investmentCoins as investmentCoinsList,
 } from 'app/data/coins'
 import { useRootScreenParams } from 'app/routers/params'
-import { useMultipleTokensMarketData } from 'app/utils/coin-gecko'
-import { type PropsWithChildren, useMemo } from 'react'
+import { useTokensMarketData } from 'app/utils/coin-gecko'
+import { useMemo } from 'react'
 import { IconCoin, IconError } from 'app/components/icons'
 import { useCoins } from 'app/provider/coins'
 import { formatUnits } from 'viem'
@@ -67,7 +68,7 @@ const InvestmentsBalanceCardHomeScreenHeader = () => {
   const isInvestmentsScreen = queryParams.token === 'investments'
 
   return (
-    <Card.Header padded pb="$4" jc="space-between" fd="row">
+    <Card.Header p={0} jc="space-between" fd="row">
       <Paragraph
         fontSize={'$5'}
         fontWeight="400"
@@ -94,38 +95,47 @@ const InvestmentsBalanceCardHomeScreenHeader = () => {
   )
 }
 
-const InvestmentsBalanceCardInvestmentsScreenHeader = () => {
+const InvestmentsBalanceCardFooter = ({ onInvest }: { onInvest?: () => void }) => {
   return (
-    <Card.Header padded pb="$4" jc="space-between" fd="row">
-      <Paragraph
-        fontSize={'$5'}
-        fontWeight="400"
-        color={'$lightGrayTextField'}
-        $theme-light={{ color: '$darkGrayTextField' }}
-      >
-        Total Balance
-      </Paragraph>
-    </Card.Header>
-  )
-}
-
-const InvestmentsBalanceCardFooter = ({ children }: PropsWithChildren) => {
-  return (
-    <Card.Footer padded size="$4" pt={0} jc="space-between" ai="flex-start">
-      {children}
+    <Card.Footer jc="center" ai="center">
+      {onInvest ? <InvestmentsBalanceCardInvestButton onPress={onInvest} /> : null}
     </Card.Footer>
   )
 }
 
-const InvestmentsBalanceCardFooterStack = (props: YStackProps) => {
-  return (
-    <YStack jc="space-between" gap={Platform.OS === 'web' ? '$2' : '$1'} {...props}>
-      {props.children}
-    </YStack>
-  )
-}
+// Primary Invest button
+const InvestmentsBalanceCardInvestButton = ({
+  children = 'INVEST',
+  ...props
+}: ButtonProps & { children?: React.ReactNode }) => (
+  <Button
+    borderRadius={'$4'}
+    jc="center"
+    ai="center"
+    position="relative"
+    bc={'$primary'}
+    f={1}
+    mah={32}
+    {...props}
+  >
+    <Button.Text color="$black">{children}</Button.Text>
+  </Button>
+)
+
+const InvestmentsBalanceCardBody = () => (
+  <YStack w={'100%'} gap={'$3'}>
+    <XStack ai="center" gap={'$2.5'}>
+      <InvestmentsBalanceCardBalance />
+      <InvestmentsAggregate />
+    </XStack>
+    <InvestmentsWeeklyDelta />
+  </YStack>
+)
 
 const InvestmentsBalanceCardBalance = (props: ParagraphProps) => {
+  const media = useMedia()
+  const [queryParams] = useRootScreenParams()
+  const isInvestmentsScreen = queryParams.token === 'investments'
   const { isPriceHidden } = useIsPriceHidden()
   const { dollarBalances, isLoading } = useSendAccountBalances()
 
@@ -135,10 +145,16 @@ const InvestmentsBalanceCardBalance = (props: ParagraphProps) => {
     )
     .reduce((total, [, balance]) => total + balance, 0)
 
-  const formattedBalance = formatAmount(dollarTotal, 9, 0)
+  const formattedBalance = formatAmount(dollarTotal, 6, 0)
 
   return (
-    <Paragraph color={'$color12'} fontWeight={600} size={'$9'} lineHeight={34} {...props}>
+    <Paragraph
+      color={'$color12'}
+      fontWeight={600}
+      size={media.lg && isInvestmentsScreen ? '$10' : '$9'}
+      lineHeight={34}
+      {...props}
+    >
       {(() => {
         switch (true) {
           case isPriceHidden:
@@ -153,7 +169,7 @@ const InvestmentsBalanceCardBalance = (props: ParagraphProps) => {
   )
 }
 
-function InvestmentsPreview() {
+function InvestmentsPreview(props: XStackProps) {
   const { investmentCoins, isLoading } = useCoins()
 
   if (isLoading) return <Spinner size="small" />
@@ -187,7 +203,7 @@ function InvestmentsPreview() {
   const remainingCount = allCoinsToShow.length - maxDisplay
 
   return (
-    <XStack ai="center">
+    <XStack ai="center" {...props}>
       <OverlappingCoinIcons coins={coinsToShow} length={coinsToShow.length} />
       {remainingCount > 0 ? (
         <ThemeableStack circular ai="center" jc="center" bc="$color0" w={'$3.5'} h="$3.5">
@@ -226,8 +242,7 @@ function OverlappingCoinIcons({
 function InvestmentsAggregate() {
   const coins = useCoins().investmentCoins.filter((c) => c?.balance && c.balance > 0n)
 
-  const tokenIds = coins.map((c) => c.coingeckoTokenId)
-  const { data: marketData, isLoading, isError } = useMultipleTokensMarketData(tokenIds)
+  const { data: marketData, isLoading } = useTokensMarketData()
 
   const { totalValue, assetValues } = useMemo(() => {
     if (!marketData?.length) return { totalValue: 0, assetValues: [] }
@@ -235,12 +250,17 @@ function InvestmentsAggregate() {
     // Calculate values for each asset and total
     const assetValues = coins.map((coin) => {
       const marketInfo = marketData.find((m) => m.id === coin.coingeckoTokenId)
-      if (!marketInfo || !coin.balance) return { value: 0, percentChange: 0 }
+      if (!marketInfo || !coin.balance) return { value: 0, percentChange7d: 0 }
 
       const parsedBalance = formatUnits(coin.balance, coin.decimals)
+      const percentChange7d =
+        ('price_change_percentage_7d_in_currency' in marketInfo &&
+        marketInfo.price_change_percentage_7d_in_currency !== null
+          ? marketInfo.price_change_percentage_7d_in_currency
+          : 0) ?? 0
       return {
         value: Number(parsedBalance) * (marketInfo.current_price ?? 0),
-        percentChange: marketInfo.price_change_percentage_24h ?? 0,
+        percentChange7d,
       }
     })
 
@@ -254,20 +274,76 @@ function InvestmentsAggregate() {
 
     const weightedPercentage = assetValues.reduce((sum, asset) => {
       const weight = asset.value / totalValue
-      return sum + asset.percentChange * weight
+      return sum + asset.percentChange7d * weight
     }, 0)
 
     return Math.round(weightedPercentage * 100) / 100
   }, [totalValue, assetValues])
 
-  if (tokenIds.length === 0)
+  if (isLoading) return <Spinner alignSelf={'flex-start'} size="small" />
+
+  const formatted = `${aggregatePercentage > 0 ? '+' : ''}${aggregatePercentage}%`
+
+  if (aggregatePercentage > 0)
+    return (
+      <Theme name={'green_active'}>
+        <Paragraph
+          fontSize={'$3'}
+          fontWeight={500}
+          $theme-dark={{ bc: 'rgba(134, 174, 128, 0.2)' }}
+          $theme-light={{ bc: 'rgba(134, 174, 128, 0.16)' }}
+          px={'$1.5'}
+          br={'$2'}
+        >
+          {formatted}
+        </Paragraph>
+      </Theme>
+    )
+  if (aggregatePercentage < 0)
+    return (
+      <Theme name={'red_active'}>
+        <Paragraph
+          fontSize={'$3'}
+          fontWeight={500}
+          $theme-dark={{ bc: 'rgba(229, 115, 115, 0.2)' }}
+          $theme-light={{ bc: 'rgba(229, 115, 115, 0.16)' }}
+          px={'$1.5'}
+          br={'$2'}
+        >
+          {formatted}
+        </Paragraph>
+      </Theme>
+    )
+  return null
+}
+
+function InvestmentsWeeklyDelta() {
+  const coins = useCoins().investmentCoins.filter((c) => c?.balance && c.balance > 0n)
+  const { data: marketData, isLoading, isError } = useTokensMarketData()
+
+  const deltaUSD = useMemo(() => {
+    if (!marketData?.length) return 0
+    return coins.reduce((sum, coin) => {
+      const md = marketData.find((m) => m.id === coin.coingeckoTokenId)
+      if (!md || !coin.balance) return sum
+      const value = Number(formatUnits(coin.balance, coin.decimals)) * (md.current_price ?? 0)
+      const pct7d =
+        ('price_change_percentage_7d_in_currency' in md &&
+        md.price_change_percentage_7d_in_currency !== null
+          ? md.price_change_percentage_7d_in_currency
+          : 0) ?? 0
+      return sum + (value * pct7d) / 100
+    }, 0)
+  }, [marketData, coins])
+
+  if (isLoading) return null
+
+  if (coins.length === 0)
     return (
       <XStack gap="$2" ai="center">
         <Paragraph color="$color10">Diversify Your Portfolio</Paragraph>
       </XStack>
     )
-
-  if (isLoading) return <Spinner alignSelf={'flex-start'} size="small" />
 
   if (isError)
     return (
@@ -279,31 +355,40 @@ function InvestmentsAggregate() {
       </XStack>
     )
 
-  if (aggregatePercentage > 0)
-    return (
-      <Theme name={'green_active'}>
-        <Paragraph fontSize={'$4'}>+{aggregatePercentage}%</Paragraph>
-      </Theme>
-    )
-  if (aggregatePercentage < 0)
-    return (
-      <Theme name={'red_active'}>
-        <Paragraph fontSize={'$4'}>{aggregatePercentage}%</Paragraph>
-      </Theme>
-    )
+  const sign = deltaUSD >= 0 ? '+' : '-'
   return (
-    <Paragraph fontSize={'$4'} color="$color10">
-      {aggregatePercentage}%
+    <Paragraph color={'$color10'} fontWeight={400} size={'$5'}>
+      {`${sign}$${Math.abs(deltaUSD).toFixed(2)} this week`}
     </Paragraph>
+  )
+}
+
+const InvestmentsBalanceCardStaticContent = (props: CardProps) => {
+  return (
+    <Card w={'100%'} {...props}>
+      {props.children}
+    </Card>
   )
 }
 
 export const InvestmentsBalanceCard = withStaticProperties(InvestmentsBalanceCardContent, {
   HomeScreenHeader: InvestmentsBalanceCardHomeScreenHeader,
-  InvestmentsScreenHeader: InvestmentsBalanceCardInvestmentsScreenHeader,
   Footer: InvestmentsBalanceCardFooter,
-  FooterStack: InvestmentsBalanceCardFooterStack,
+  Body: InvestmentsBalanceCardBody,
+  Button: InvestmentsBalanceCardInvestButton,
   Preview: InvestmentsPreview,
   Aggregate: InvestmentsAggregate,
+  WeeklyDelta: InvestmentsWeeklyDelta,
+  Balance: InvestmentsBalanceCardBalance,
+})
+
+export const InvestmentsPortfolioCard = withStaticProperties(InvestmentsBalanceCardStaticContent, {
+  HomeScreenHeader: InvestmentsBalanceCardHomeScreenHeader,
+  Footer: InvestmentsBalanceCardFooter,
+  Body: InvestmentsBalanceCardBody,
+  Button: InvestmentsBalanceCardInvestButton,
+  Preview: InvestmentsPreview,
+  Aggregate: InvestmentsAggregate,
+  WeeklyDelta: InvestmentsWeeklyDelta,
   Balance: InvestmentsBalanceCardBalance,
 })
