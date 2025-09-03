@@ -7,7 +7,7 @@ import { amountFromActivity } from 'app/utils/activity'
 import { FlatList } from 'react-native'
 import { ActivityDetails } from 'app/features/activity/ActivityDetails'
 import { SendButton } from '../ProfileButtons'
-import { ProfileHeader } from '../components/ProfileHeader'
+import ProfileHeader from '../components/ProfileHeader'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { IconArrowRight } from 'app/components/icons'
 import {
