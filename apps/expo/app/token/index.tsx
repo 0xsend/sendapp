@@ -24,7 +24,7 @@ export default function TokenScreen() {
               case !selectedCoin:
                 return <Paragraph color={'$error'}>Error loading selected coin</Paragraph>
               default:
-                return <TokenDetails coin={selectedCoin} />
+                return <TokenDetails />
             }
           })()}
         </IsPriceHiddenProvider>
