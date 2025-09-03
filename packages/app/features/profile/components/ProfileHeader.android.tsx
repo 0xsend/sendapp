@@ -1,5 +1,5 @@
 import type { Functions } from '@my/supabase/database.types'
-import { Link } from 'solito/link'
+import { useRouter } from 'expo-router'
 import { ProfileHeaderContent } from 'app/features/profile/components/ProfileHeaderContent'
 
 export default function ProfileHeader({
@@ -11,9 +11,14 @@ export default function ProfileHeader({
   idType?: string
   recipient?: string
 }) {
+  const router = useRouter()
+
   return (
-    <Link href={`/profile/${profile?.sendid}`}>
-      <ProfileHeaderContent profile={profile} idType={idType} recipient={recipient} />
-    </Link>
+    <ProfileHeaderContent
+      profile={profile}
+      idType={idType}
+      recipient={recipient}
+      onPress={() => router.push(`/profile/${profile?.sendid}`)}
+    />
   )
 }
