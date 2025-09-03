@@ -13,7 +13,7 @@ export const TokenDetails = () => {
   const isUSDC = coin.token === usdcAddress[baseMainnet.id]
 
   return (
-    <YStack f={1} gap="$5" $gtLg={{ w: '45%', pb: '$0' }} pb="$4">
+    <YStack gap="$5" pb="$4" $gtLg={{ w: '45%', pb: '$0' }} $platform-web={{ f: 1 }}>
       <TokenDetailsHeader />
       {!isUSDC ? <TokenChartSection /> : null}
       <TokenKeyMetrics />
