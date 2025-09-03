@@ -199,7 +199,7 @@ export function InvestmentsBody() {
   }, [marketData, ownedCoins])
 
   useEffect(() => {
-    if (pathname === '/trade') {
+    if (pathname === '/token') {
       setIsSheetOpen(false)
     }
   }, [pathname])
@@ -330,7 +330,7 @@ export function InvestmentsBody() {
             <Link
               key={coin.symbol}
               href={{
-                pathname: '/',
+                pathname: Platform.OS === 'web' ? '/' : '/token',
                 query: { token: coin.token },
               }}
             >
