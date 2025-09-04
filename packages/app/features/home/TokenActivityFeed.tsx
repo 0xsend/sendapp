@@ -32,9 +32,9 @@ export default function TokenActivityFeed({
   onActivityPress: (activity: Activity) => void
   coin?: CoinWithBalance
 } & CardProps) {
-  const { isAtEnd } = useScrollDirection()
   const [layoutSize, setLayoutSize] = useState<Dimension>({ width: 0, height: 0 })
   const media = useMedia()
+  const { isAtEnd } = useScrollDirection()
   const queryClient = useQueryClient()
   const wasPendingRef = useRef(false) // Ref to track if a pending activity was seen previously
   const [queryParams] = useRootScreenParams()
@@ -91,7 +91,18 @@ export default function TokenActivityFeed({
     wasPendingRef.current = isCurrentlyPending
   }, [data, queryClient, queryParams.token])
 
-  const [dataProvider, setDataProvider] = useState(dataProviderMakerWeb(activities))
+  const dataProvider = useMemo(
+    () =>
+      dataProviderMakerWeb(activities, {
+        getStableId: (index) => {
+          const a = activities[index]
+          return a
+            ? `${a.event_name}-${a.created_at}-${a?.from_user?.id ?? ''}-${a?.to_user?.id ?? ''}`
+            : `${index}`
+        },
+      }),
+    [activities]
+  )
 
   const _layoutProvider = layoutProviderMakerWeb({
     getHeightOrWidth: () => 102,
@@ -103,6 +114,12 @@ export default function TokenActivityFeed({
     },
     [onActivityPress]
   )
+
+  const handleEndReached = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPageActivities) {
+      void fetchNextPage()
+    }
+  }, [hasNextPage, isFetchingNextPageActivities, fetchNextPage])
 
   const renderFooter = () => {
     if (!isLoadingActivities && isFetchingNextPageActivities) {
@@ -116,17 +133,10 @@ export default function TokenActivityFeed({
   }, [])
 
   useEffect(() => {
-    setDataProvider((prev) => prev.cloneWithRows(activities))
-  }, [activities])
-
-  useEffect(() => {
-    if (isAtEnd && hasNextPage && !isFetchingNextPageActivities) {
-      fetchNextPage().then(({ data }) => {
-        const activities = data?.pages.flat() || []
-        setDataProvider((prev) => prev.cloneWithRows(activities))
-      })
+    if (isAtEnd) {
+      handleEndReached()
     }
-  }, [isAtEnd, hasNextPage, fetchNextPage, isFetchingNextPageActivities])
+  }, [isAtEnd, handleEndReached])
 
   if (activities.length === 0) {
     return null
@@ -143,8 +153,9 @@ export default function TokenActivityFeed({
           renderFooter={renderFooter}
           // Need this for SSR
           layoutSize={{ width: layoutSize.width - layoutSizeAdjustment, height: layoutSize.height }}
-          // Need this so it rerenders when layout changes
-          key={`recycler-${layoutSize.width}-${layoutSize.height}`}
+          onEndReached={handleEndReached}
+          onEndReachedThreshold={1000}
+          renderAheadOffset={2000}
         />
       ) : null}
     </Card>
