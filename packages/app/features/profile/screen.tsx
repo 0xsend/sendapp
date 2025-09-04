@@ -9,7 +9,6 @@ import {
   Card,
   H3,
   Image,
-  isWeb,
   Link,
   LinkableButton,
   Paragraph,
@@ -26,7 +25,7 @@ import {
 // Internal
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useProfileScreenParams } from 'app/routers/params'
-import { IconAccount, IconArrowUp, IconLinkInBio } from 'app/components/icons'
+import { IconAccount, IconLinkInBio } from 'app/components/icons'
 import { ShareOtherProfileDialog } from './components/ShareOtherProfileDialog'
 import type { Functions } from '@my/supabase/database.types'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
@@ -36,6 +35,7 @@ import { type allCoins, type allCoinsDict, coinsDict } from 'app/data/coins'
 import { IconFYSI } from 'app/components/icons/IconFYSI'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { Linking, Platform, Pressable } from 'react-native'
+import ProfileSendButton from 'app/features/profile/utils/ProfileSendButton'
 
 interface ProfileScreenProps {
   sendid?: number | null
@@ -188,25 +188,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
               {otherUserProfile?.about}
             </Paragraph>
             <XStack w="100%" gap="$4">
-              <LinkableButton
-                href={{
-                  pathname: isWeb ? '/send' : '/send/form',
-                  query: { recipient: otherUserProfile?.sendid, idType: 'sendid' },
-                }}
-                borderRadius={'$4'}
-                jc="center"
-                ai="center"
-                position="relative"
-                bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
-                f={1}
-              >
-                <Button.Icon>
-                  <IconArrowUp size={'$1'} color={isDark ? '$primary' : '$color12'} />
-                </Button.Icon>
-                <Button.Text color="$color12" fontSize={'$4'} fontWeight={'400'} textAlign="center">
-                  Send
-                </Button.Text>
-              </LinkableButton>
+              <ProfileSendButton sendId={otherUserProfile?.sendid} />
               <Button
                 aspectRatio={1}
                 p={0}
