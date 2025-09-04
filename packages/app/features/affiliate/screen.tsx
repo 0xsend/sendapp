@@ -52,7 +52,17 @@ export default function FriendsScreen() {
 
     return refs
   }, [data, referrer])
-  const [dataProvider, setDataProvider] = useState(dataProviderMakerWeb(referrals))
+  const dataProvider = useMemo(
+    () =>
+      dataProviderMakerWeb(referrals, {
+        getStableId: (index) => {
+          const r = referrals[index]
+          // Prefer sendid (numeric) then tag, else index fallback
+          return r?.sendid != null ? `sendid-${r.sendid}` : r?.tag ? `tag-${r.tag}` : `${index}`
+        },
+      }),
+    [referrals]
+  )
 
   const layoutSizeAdjustment = media.gtLg ? 78 : 0
 
@@ -77,29 +87,17 @@ export default function FriendsScreen() {
     return <Spinner opacity={0} mb="$3.5" />
   }
 
-  useEffect(() => {
-    setDataProvider((prev) => prev.cloneWithRows(referrals))
-  }, [referrals])
+  const handleEndReached = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      void fetchNextPage()
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
   useEffect(() => {
-    setTimeout(() => {
-      if (isAtEnd && hasNextPage && !isFetchingNextPage) {
-        fetchNextPage().then(({ data }) => {
-          const referrals: Referral[] = []
-
-          if (referrer) {
-            referrals.push(referrer)
-          }
-
-          if (data?.pages) {
-            referrals.push(...(data.pages.flat() as Referral[]))
-          }
-
-          setDataProvider((prev) => prev.cloneWithRows(referrals))
-        })
-      }
-    }, 50)
-  }, [isAtEnd, hasNextPage, fetchNextPage, isFetchingNextPage, referrer])
+    if (isAtEnd) {
+      handleEndReached()
+    }
+  }, [isAtEnd, handleEndReached])
 
   const onCardLayout = useCallback((e) => {
     setLayoutSize({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height })
@@ -138,7 +136,9 @@ export default function FriendsScreen() {
               width: layoutSize.width - layoutSizeAdjustment,
               height: layoutSize.height,
             }}
-            key={`recycler-${layoutSize.width}-${layoutSize.height}`}
+            onEndReached={handleEndReached}
+            onEndReachedThreshold={1000}
+            renderAheadOffset={2000}
           />
         </FriendsListTable>
       ) : null}
