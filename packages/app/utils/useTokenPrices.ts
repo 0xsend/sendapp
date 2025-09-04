@@ -12,7 +12,7 @@ import {
 import { z } from 'zod'
 import { useQuery, type UseQueryResult } from '@tanstack/react-query'
 import { allCoins } from 'app/data/coins'
-import { useUser } from 'app/utils/useUser'
+import { usePathname } from 'app/utils/usePathname'
 import { useTokensMarketData, type MarketData } from 'app/utils/coin-gecko'
 
 const CoingeckoTokenPriceSchema = z.object({
@@ -121,30 +121,30 @@ const normalizeDexScreenerPrices = (prices: z.infer<typeof DexScreenerTokenPrice
 }
 
 type priceSource = 'coingecko' | 'dexscreener'
-//takes a price source as an argument
-//if no argument is passed, it uses a fallback approach
-export const useTokenPrices = (
-  source?: priceSource
-): UseQueryResult<Record<allCoins[number]['token'], number>, Error> => {
-  const { session } = useUser()
-  const isLoggedIn = !!session
 
-  // Always define both  queries, but gate with enabled to satisfy hooks rules
+// Takes a price source as an argument
+// If no argument is passed, it uses a fallback approach
+export const useTokenPrices = (
+  source: priceSource = 'coingecko'
+): UseQueryResult<Record<allCoins[number]['token'], number>, Error> => {
+  const pathname = usePathname()
+  const isAuthRoute = pathname.startsWith('/auth')
 
   const cgQuery = useTokensMarketData<Record<(typeof allCoins)[number]['token'], number>>({
-    enabled: isLoggedIn && source === 'coingecko',
+    enabled: !isAuthRoute && source === 'coingecko',
     select: normalizeCoingeckoPrices,
   })
 
   const dexQuery = useQuery<Record<(typeof allCoins)[number]['token'], number>, Error>({
     queryKey: ['tokenPrices', 'dexscreener'],
-    enabled: isLoggedIn && source === 'dexscreener',
+    enabled:
+      !isAuthRoute && (source === 'dexscreener' || (source === 'coingecko' && cgQuery.isError)),
     staleTime: 1000 * 60,
     queryFn: fetchDexScreenerPrices,
   })
 
-  return (source === 'dexscreener' ? dexQuery : cgQuery) as UseQueryResult<
-    Record<(typeof allCoins)[number]['token'], number>,
-    Error
-  >
+  // Fallback: if CoinGecko errors, immediately use DexScreener (no need to wait for success)
+  const useDex = source === 'dexscreener' || (source === 'coingecko' && cgQuery.isError)
+
+  return useDex ? dexQuery : cgQuery
 }
