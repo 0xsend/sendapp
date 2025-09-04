@@ -5,6 +5,7 @@ import { createRequire } from 'node:module'
 const require = createRequire(import.meta.url)
 const withBundleAnalyzer = require('@next/bundle-analyzer')
 const { withTamagui } = require('@tamagui/next-plugin')
+import { allowedImageHosts } from './config/allowedImageHosts.js'
 
 const boolVals = {
   true: true,
@@ -84,36 +85,10 @@ export default () => {
   let config = {
     images: {
       remotePatterns: [
-        {
-          hostname: '*-0xsend.vercel.app',
-        },
-        {
-          hostname: 'ugqtoulexhvahevsysuq.supabase.co', // staging
-        },
-        {
-          hostname: 'fjswgwdweohwejbrmiil.supabase.co', // production
-        },
-        {
-          hostname: 'ui-avatars.com',
-        },
-        {
-          hostname: 'localhost',
-        },
-        {
-          hostname: 'avatars.githubusercontent.com',
-        },
-        {
-          hostname: 'cloudflare-ipfs.com',
-        },
-        {
-          protocol: 'https',
-          hostname: 'github.com',
-          pathname: '/0xsend/assets/**',
-        },
-        {
-          protocol: 'https',
-          hostname: 'ghassets.send.app',
-        },
+        // Derived from a single source of truth
+        ...allowedImageHosts.filter((h) => h !== 'github.com').map((hostname) => ({ hostname })),
+        { hostname: '*-0xsend.vercel.app' },
+        { protocol: 'https', hostname: 'github.com', pathname: '/0xsend/assets/**' },
       ],
     },
     typescript: {
