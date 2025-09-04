@@ -9,7 +9,6 @@ import {
   Card,
   H3,
   Image,
-  Link,
   LinkableButton,
   Paragraph,
   Spinner,
@@ -35,7 +34,8 @@ import { type allCoins, type allCoinsDict, coinsDict } from 'app/data/coins'
 import { IconFYSI } from 'app/components/icons/IconFYSI'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { Linking, Platform, Pressable } from 'react-native'
-import ProfileSendButton from 'app/features/profile/utils/ProfileSendButton'
+import ProfileSendButton from 'app/features/profile/ProfileSendButton'
+import ViewHistoryButton from 'app/features/profile/ViewHistoryButton'
 
 interface ProfileScreenProps {
   sendid?: number | null
@@ -154,15 +154,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                 <H3 lineHeight={32} color="$color12">
                   {otherUserProfile?.name ?? '---'}
                 </H3>
-                <Link
-                  textDecorationLine="underline"
-                  href={`/profile/${otherUserProfile?.sendid}/history`}
-                  als="flex-start"
-                  fontSize={'$5'}
-                  color="$color10"
-                >
-                  View History
-                </Link>
+                <ViewHistoryButton sendId={otherUserProfile?.sendid} />
               </YStack>
             </XStack>
             <XStack gap="$2" flexWrap="wrap" w="100%">
