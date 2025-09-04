@@ -5,7 +5,7 @@ runs:
   steps:
     - uses: supabase/setup-cli@v1
       with:
-        version: 2.30.4
+        version: latest
     - name: Start Supabase Local Instance
       shell: bash
       run: |
