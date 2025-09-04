@@ -97,7 +97,7 @@ export default function TokenActivityFeed({
         getStableId: (index) => {
           const a = activities[index]
           return a
-            ? `${a.event_name}-${a.created_at}-${a?.from_user?.id ?? ''}-${a?.to_user?.id ?? ''}`
+            ? `${index}-evt:${a.event_name}-ts:${a.created_at}-${a?.from_user?.id ?? ''}-${a?.to_user?.id ?? ''}`
             : `${index}`
         },
       }),
@@ -146,7 +146,7 @@ export default function TokenActivityFeed({
     <Card {...props} f={1} onLayout={onCardLayout}>
       {dataProvider.getSize() > 0 && layoutSize.height > 0 ? (
         <RecyclerListView
-          style={{ flex: 1, overflow: 'auto' }}
+          style={{ flex: 1 }}
           dataProvider={dataProvider}
           rowRenderer={_renderRow}
           layoutProvider={_layoutProvider}
@@ -156,6 +156,7 @@ export default function TokenActivityFeed({
           onEndReached={handleEndReached}
           onEndReachedThreshold={1000}
           renderAheadOffset={2000}
+          canChangeSize
         />
       ) : null}
     </Card>
