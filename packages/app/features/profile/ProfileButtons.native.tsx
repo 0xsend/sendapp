@@ -1,5 +1,4 @@
 import { PrimaryButton } from '@my/ui'
-import { Platform } from 'react-native'
 import { baseMainnet, sendTokenAddress } from '@my/wagmi'
 import { useRouter } from 'expo-router'
 
@@ -14,7 +13,7 @@ export default function SendButton({
 
   const onPress = () => {
     router.push(
-      `/send${Platform.OS === 'web' ? '' : '/form'}?idType=${idType}&recipient=${identifier}&sendToken=${sendTokenAddress[baseMainnet.id]}`
+      `/send/form?idType=${idType}&recipient=${identifier}&sendToken=${sendTokenAddress[baseMainnet.id]}`
     )
   }
 

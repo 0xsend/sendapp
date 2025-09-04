@@ -1,5 +1,4 @@
 import { PrimaryButton } from '@my/ui'
-import { Platform } from 'react-native'
 import { baseMainnet, sendTokenAddress } from '@my/wagmi'
 import { useLink } from 'solito/link'
 
@@ -11,7 +10,7 @@ export default function SendButton({
   idType: string
 }) {
   const linkProps = useLink({
-    href: `/send${Platform.OS === 'web' ? '' : '/form'}?idType=${idType}&recipient=${identifier}&sendToken=${sendTokenAddress[baseMainnet.id]}`,
+    href: `/send?idType=${idType}&recipient=${identifier}&sendToken=${sendTokenAddress[baseMainnet.id]}`,
   })
 
   return (
