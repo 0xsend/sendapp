@@ -1,6 +1,12 @@
 import { ImageResponse } from '@vercel/og'
 import type { NextRequest } from 'next/server'
 import type React from 'react'
+import { z } from 'zod'
+import {
+  allowedImageHosts,
+  type AllowedImageHost,
+  type VercelWildcardHost,
+} from 'next-app/config/allowedImageHosts'
 
 export const config = {
   runtime: 'edge',
@@ -93,6 +99,50 @@ function supabaseRenderUrl(url: string, width?: number, height?: number) {
   }
   return url
 }
+
+// Safe decode patterned after validateRedirectUrl.ts (decode inside try/catch and fallback)
+// apps/next/utils/validateRedirectUrl.ts
+function safeDecode(input: string | undefined | null): string | undefined {
+  if (!input) return undefined
+  try {
+    return decodeURIComponent(input)
+  } catch {
+    return input || undefined
+  }
+}
+
+// Allowlist remote image hosts (single source of truth)
+const ALLOWED_SET = new Set<AllowedImageHost>(allowedImageHosts)
+
+function isAllowedHostname(host: string): host is AllowedImageHost | VercelWildcardHost {
+  return ALLOWED_SET.has(host as AllowedImageHost) || host.endsWith('-0xsend.vercel.app')
+}
+
+function isAllowedImageUrl(urlStr: string | undefined): boolean {
+  if (!urlStr) return false
+  try {
+    const u = new URL(urlStr)
+    if (u.protocol !== 'https:' && u.protocol !== 'http:') return false
+    const host = u.hostname.toLowerCase()
+    if (!isAllowedHostname(host)) return false
+    if (host === 'github.com') {
+      // Only allow our assets path
+      return u.pathname.startsWith('/0xsend/assets/')
+    }
+    return true
+  } catch {
+    return false
+  }
+}
+
+// Zod schema modeled after existing API routers (e.g., packages/api/src/routers/tag/router.ts)
+const OGParamsSchema = z.object({
+  name: z.string().trim().max(80).optional(),
+  avatar_url: z.string().trim().url().optional(),
+  banner_url: z.string().trim().url().optional(),
+  all_tags: z.string().trim().optional(),
+  about: z.string().trim().max(280).optional(),
+})
 
 const profileReactElement = (profile: ProfileData): React.ReactElement => {
   const bannerUrl =
@@ -316,15 +366,46 @@ export default async function handler(req: NextRequest) {
   try {
     const { searchParams } = req.nextUrl
 
-    // Extract profile data from search parameters
-    const name = searchParams.get('name') || undefined
-    const avatar_url = searchParams.get('avatar_url') || undefined
-    const banner_url = searchParams.get('banner_url') || undefined
-    const all_tags_param = searchParams.get('all_tags')
-    const about = searchParams.get('about') || undefined
+    // Extract and validate using zod + allowlist
+    const decoded = {
+      name: safeDecode(searchParams.get('name') || undefined),
+      avatar_url: safeDecode(searchParams.get('avatar_url') || undefined),
+      banner_url: safeDecode(searchParams.get('banner_url') || undefined),
+      all_tags: safeDecode(searchParams.get('all_tags') || undefined),
+      about: safeDecode(searchParams.get('about') || undefined),
+    }
 
-    // Parse comma-separated tags
-    const all_tags = all_tags_param ? all_tags_param.split(',').filter(Boolean) : undefined
+    const parsed = OGParamsSchema.safeParse(decoded)
+
+    const safeName = parsed.success && parsed.data.name ? parsed.data.name : undefined
+    const safeAbout = parsed.success && parsed.data.about ? parsed.data.about : undefined
+
+    // Parse comma-separated tags with limits to avoid abuse
+    const safeTags =
+      parsed.success && parsed.data.all_tags
+        ? parsed.data.all_tags
+            .split(',')
+            .map((t) => t.trim())
+            .filter(Boolean)
+            .slice(0, 10) // max 10 tags
+            .map((t) => t.slice(0, 24)) // max 24 chars each
+        : undefined
+
+    // Enforce host allowlist for remote image URLs
+    const safeAvatarUrl =
+      parsed.success && parsed.data.avatar_url && isAllowedImageUrl(parsed.data.avatar_url)
+        ? parsed.data.avatar_url
+        : undefined
+    const safeBannerUrl =
+      parsed.success && parsed.data.banner_url && isAllowedImageUrl(parsed.data.banner_url)
+        ? parsed.data.banner_url
+        : undefined
+
+    const name = safeName
+    const about = safeAbout
+    const avatar_url = safeAvatarUrl
+    const banner_url = safeBannerUrl
+    const all_tags = safeTags
 
     console.log(`[OG Profile] Starting image generation for profile: ${name}`)
 
