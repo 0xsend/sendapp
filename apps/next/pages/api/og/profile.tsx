@@ -64,6 +64,36 @@ interface ProfileData {
   about?: string
 }
 
+// Normalize Supabase Storage image URLs via the render/image transformation endpoint.
+// This endpoint proxies through imgproxy and typically auto-rotates based on EXIF data
+// while also allowing resize/quality parameters.
+// Docs: https://supabase.com/docs/guides/storage/image-transformations
+function supabaseRenderUrl(url: string, width?: number, height?: number) {
+  try {
+    const u = new URL(url)
+    // Match Supabase Storage public object URLs
+    if (u.hostname.endsWith('.supabase.co') && u.pathname.includes('/storage/v1/object/public/')) {
+      // Convert to the render/image path
+      u.pathname = u.pathname.replace(
+        '/storage/v1/object/public/',
+        '/storage/v1/render/image/public/'
+      )
+      const params = new URLSearchParams(u.search)
+      if (width) params.set('width', String(width))
+      if (height) params.set('height', String(height))
+      // Use cover to fill target box and set a sane quality
+      params.set('resize', 'cover')
+      params.set('quality', '85')
+      u.search = params.toString() ? `?${params.toString()}` : ''
+      return u.toString()
+    }
+  } catch {
+    // If URL parsing fails, fall back to the original URL
+    return url
+  }
+  return url
+}
+
 const profileReactElement = (profile: ProfileData): React.ReactElement => {
   const bannerUrl =
     profile.banner_url ??
@@ -72,6 +102,10 @@ const profileReactElement = (profile: ProfileData): React.ReactElement => {
   const avatarUrl =
     profile.avatar_url ??
     `https://ui-avatars.com/api?name=${encodeURIComponent(profile.name || 'User')}&size=256&format=png&background=86ad7f`
+
+  // Route Supabase images through the render/image endpoint to normalize EXIF orientation
+  const bannerSrc = supabaseRenderUrl(bannerUrl, 1200, 630)
+  const avatarSrc = supabaseRenderUrl(avatarUrl, 192, 192)
 
   return (
     <div
@@ -86,7 +120,7 @@ const profileReactElement = (profile: ProfileData): React.ReactElement => {
       }}
     >
       <img
-        src={bannerUrl}
+        src={bannerSrc}
         alt="Profile Avatar Background"
         width={1200}
         height={630}
@@ -128,20 +162,25 @@ const profileReactElement = (profile: ProfileData): React.ReactElement => {
           <div
             style={{
               display: 'flex',
-              width: 128,
-              height: 128,
+              justifyContent: 'center',
+              alignItems: 'center',
+              alignSelf: 'center',
+              marginTop: 'auto',
+              marginBottom: 'auto',
+              width: 192,
+              height: 192,
             }}
           >
             <img
-              src={avatarUrl}
+              src={avatarSrc}
               alt="Profile Avatar"
               loading="lazy"
               style={{
-                width: 128,
-                height: 128,
+                width: '100%',
+                height: '100%',
                 objectFit: 'cover',
                 objectPosition: 'center',
-                borderRadius: 12,
+                borderRadius: 16,
               }}
             />
           </div>
@@ -149,63 +188,66 @@ const profileReactElement = (profile: ProfileData): React.ReactElement => {
             style={{
               display: 'flex',
               flexDirection: 'column',
-              gap: '8px',
+              gap: '3px',
+              justifyContent: 'center',
             }}
           >
             {/* Name */}
-            <h2
-              style={{
-                fontSize: '72px',
-                textAlign: 'left',
-                color: 'white',
-                fontWeight: 700,
-              }}
-            >
-              {profile.name || ''}
-            </h2>
+            {profile.name ? (
+              <h2
+                style={{
+                  fontSize: '64px',
+                  textAlign: 'left',
+                  color: 'white',
+                  fontWeight: 700,
+                }}
+              >
+                {profile.name || ''}
+              </h2>
+            ) : null}
 
             {/* Tags */}
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                gap: '8px',
-                flexWrap: 'wrap',
-                maxWidth: '1000px',
-              }}
-            >
-              {profile?.all_tags
-                ? profile.all_tags.map((tag) => {
-                    return (
-                      <div
-                        key={tag}
+            {profile?.all_tags ? (
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  gap: '8px',
+                  flexWrap: 'wrap',
+                  maxWidth: '1000px',
+                }}
+              >
+                {profile.all_tags.map((tag) => {
+                  return (
+                    <div
+                      key={tag}
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        borderRadius: '6px',
+                        backgroundColor: 'rgba(102, 102, 102, 0.4)',
+                        padding: '12px',
+                        alignSelf: 'flex-start',
+                        backdropFilter: 'blur(40px)',
+                        WebkitBackdropFilter: 'blur(40px)',
+                      }}
+                    >
+                      <p
                         style={{
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          borderRadius: '6px',
-                          backgroundColor: 'rgba(102, 102, 102, 0.4)',
-                          padding: '12px',
-                          alignSelf: 'flex-start',
-                          backdropFilter: 'blur(40px)',
-                          WebkitBackdropFilter: 'blur(40px)',
+                          fontSize: '32px',
+                          color: 'white',
+                          fontWeight: 400,
+                          margin: 0,
                         }}
                       >
-                        <p
-                          style={{
-                            fontSize: '32px',
-                            color: 'white',
-                            fontWeight: 400,
-                            margin: 0,
-                          }}
-                        >
-                          /{tag}
-                        </p>
-                      </div>
-                    )
-                  })
-                : null}
-            </div>
+                        /{tag}
+                      </p>
+                    </div>
+                  )
+                })}
+              </div>
+            ) : null}
           </div>
         </div>
 
