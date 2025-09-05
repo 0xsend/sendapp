@@ -9,13 +9,9 @@ import {
   Card,
   H3,
   Image,
-  isWeb,
-  Link,
-  LinkableButton,
   Paragraph,
   Spinner,
   Stack,
-  styled,
   Text,
   useMedia,
   useThemeName,
@@ -26,7 +22,7 @@ import {
 // Internal
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useProfileScreenParams } from 'app/routers/params'
-import { IconAccount, IconArrowUp, IconLinkInBio } from 'app/components/icons'
+import { IconAccount, IconLinkInBio } from 'app/components/icons'
 import { ShareOtherProfileDialog } from './components/ShareOtherProfileDialog'
 import type { Functions } from '@my/supabase/database.types'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
@@ -36,6 +32,9 @@ import { type allCoins, type allCoinsDict, coinsDict } from 'app/data/coins'
 import { IconFYSI } from 'app/components/icons/IconFYSI'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { Linking, Platform, Pressable } from 'react-native'
+import ProfileSendButton from 'app/features/profile/ProfileSendButton'
+import ViewHistoryButton from 'app/features/profile/ViewHistoryButton'
+import VibeButton from 'app/features/profile/VibeButton'
 
 interface ProfileScreenProps {
   sendid?: number | null
@@ -154,15 +153,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                 <H3 lineHeight={32} color="$color12">
                   {otherUserProfile?.name ?? '---'}
                 </H3>
-                <Link
-                  textDecorationLine="underline"
-                  href={`/profile/${otherUserProfile?.sendid}/history`}
-                  als="flex-start"
-                  fontSize={'$5'}
-                  color="$color10"
-                >
-                  View History
-                </Link>
+                <ViewHistoryButton sendId={otherUserProfile?.sendid} />
               </YStack>
             </XStack>
             <XStack gap="$2" flexWrap="wrap" w="100%">
@@ -188,25 +179,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
               {otherUserProfile?.about}
             </Paragraph>
             <XStack w="100%" gap="$4">
-              <LinkableButton
-                href={{
-                  pathname: isWeb ? '/send' : '/send/form',
-                  query: { recipient: otherUserProfile?.sendid, idType: 'sendid' },
-                }}
-                borderRadius={'$4'}
-                jc="center"
-                ai="center"
-                position="relative"
-                bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
-                f={1}
-              >
-                <Button.Icon>
-                  <IconArrowUp size={'$1'} color={isDark ? '$primary' : '$color12'} />
-                </Button.Icon>
-                <Button.Text color="$color12" fontSize={'$4'} fontWeight={'400'} textAlign="center">
-                  Send
-                </Button.Text>
-              </LinkableButton>
+              <ProfileSendButton sendId={otherUserProfile?.sendid} />
               <Button
                 aspectRatio={1}
                 p={0}
@@ -256,20 +229,6 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
     </YStack>
   )
 }
-
-const VibeButton = styled(LinkableButton, {
-  elevation: 1,
-  br: '$6',
-  ai: 'center',
-  jc: 'space-around',
-  w: 'auto',
-  maw: 100,
-  h: 'auto',
-  gap: '$2',
-  f: 1,
-  fd: 'column',
-  p: '$3.5',
-})
 
 const Vibe = ({
   amount,

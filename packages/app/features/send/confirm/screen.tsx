@@ -1,7 +1,5 @@
 import {
-  Avatar,
   FadeCard,
-  LinkableAvatar,
   Paragraph,
   type ParagraphProps,
   PrimaryButton,
@@ -14,7 +12,6 @@ import {
 } from '@my/ui'
 import { baseMainnet, baseMainnetClient, entryPointAddress } from '@my/wagmi'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { IconAccount } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { useSendScreenParams } from 'app/routers/params'
 import { assert } from 'app/utils/assert'
@@ -42,6 +39,8 @@ import { decodeTransferUserOp } from 'app/utils/decodeTransferUserOp'
 import type { UserOperation } from 'permissionless'
 import { formFields } from 'app/utils/SchemaForm'
 import { Platform } from 'react-native'
+import ConfirmScreenAvatar from 'app/features/send/confirm/ConfirmScreenAvatar'
+import useRedirectAfterSend from 'app/features/send/confirm/useRedirectAfterSend'
 
 const log = debug('app:features:send:confirm:screen')
 
@@ -78,6 +77,7 @@ export function SendConfirm() {
   const { sendToken, recipient, idType, amount, note } = queryParams
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
   const { coin: selectedCoin } = useCoinFromSendTokenParam()
+  const { redirect } = useRedirectAfterSend()
 
   const submitButtonRef = useRef<TamaguiElement | null>(null)
 
@@ -239,7 +239,7 @@ export function SendConfirm() {
           exact: false,
         })
 
-        router.replace({ pathname: `/profile/${profile?.sendid}/history` })
+        redirect(profile?.sendid)
       }
     } catch (e) {
       // @TODO: handle sending repeated tx when nonce is still pending
@@ -283,24 +283,7 @@ export function SendConfirm() {
           }}
         >
           <XStack gap={'$4'} ai={'center'}>
-            <LinkableAvatar circular size={'$3'} href={href}>
-              {Platform.OS === 'android' && !profile?.avatar_url ? (
-                <IconAccount size={'$3'} color="$olive" />
-              ) : (
-                <>
-                  <Avatar.Image
-                    src={profile?.avatar_url ?? ''}
-                    testID="avatarImage"
-                    accessibilityLabel={profile?.name ?? '??'}
-                    accessibilityRole="image"
-                    accessible
-                  />
-                  <Avatar.Fallback jc="center">
-                    <IconAccount size={'$3'} color="$olive" />
-                  </Avatar.Fallback>
-                </>
-              )}
-            </LinkableAvatar>
+            <ConfirmScreenAvatar profile={profile} href={href} />
             <Paragraph
               nativeID="profileName"
               size={'$6'}

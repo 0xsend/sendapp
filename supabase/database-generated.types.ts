@@ -1784,23 +1784,23 @@ export type Database = {
       }
       confirm_tags: {
         Args: {
-          tag_names: string[]
-          send_account_id: string
           _event_id: string
           _referral_code: string
+          send_account_id: string
+          tag_names: string[]
         }
         Returns: undefined
       }
       create_send_account: {
         Args: {
+          key_slot: number
           send_account: Database["public"]["Tables"]["send_accounts"]["Row"]
           webauthn_credential: Database["public"]["Tables"]["webauthn_credentials"]["Row"]
-          key_slot: number
         }
         Returns: Json
       }
       create_tag: {
-        Args: { tag_name: string; send_account_id: string }
+        Args: { send_account_id: string; tag_name: string }
         Returns: number
       }
       distribution_hodler_addresses: {
@@ -1828,32 +1828,32 @@ export type Database = {
       get_affiliate_referrals: {
         Args: Record<PropertyKey, never>
         Returns: {
-          send_plus_minus: number
           avatar_url: string
-          tag: string
           created_at: string
+          send_plus_minus: number
+          tag: string
         }[]
       }
       get_affiliate_stats_summary: {
         Args: Record<PropertyKey, never>
         Returns: {
-          id: string
           created_at: string
-          user_id: string
+          id: string
           referral_count: number
+          user_id: string
         }[]
       }
       get_friends: {
         Args: Record<PropertyKey, never>
         Returns: {
           avatar_url: string
+          birthday: string
+          created_at: string
+          links_in_bio: Database["public"]["Tables"]["link_in_bio"]["Row"][]
           name: string
           sendid: number
-          x_username: string
-          links_in_bio: Database["public"]["Tables"]["link_in_bio"]["Row"][]
-          birthday: string
           tag: string
-          created_at: string
+          x_username: string
         }[]
       }
       get_pending_jackpot_tickets_purchased: {
@@ -1863,22 +1863,22 @@ export type Database = {
       get_send_scores_history: {
         Args: Record<PropertyKey, never>
         Returns: {
-          user_id: string
           distribution_id: number
           score: number
-          unique_sends: number
           send_ceiling: number
+          unique_sends: number
+          user_id: string
         }[]
       }
       get_user_jackpot_summary: {
         Args: { num_runs: number }
         Returns: {
-          jackpot_run_id: number
           jackpot_block_num: number
           jackpot_block_time: number
-          winner: string
-          win_amount: number
+          jackpot_run_id: number
           total_tickets: number
+          win_amount: number
+          winner: string
         }[]
       }
       insert_challenge: {
@@ -1897,8 +1897,8 @@ export type Database = {
       insert_send_slash: {
         Args: {
           distribution_number: number
-          scaling_divisor?: number
           minimum_sends?: number
+          scaling_divisor?: number
         }
         Returns: undefined
       }
@@ -1924,21 +1924,21 @@ export type Database = {
       }
       insert_verification_value: {
         Args: {
-          distribution_number: number
-          type: Database["public"]["Enums"]["verification_type"]
-          fixed_value?: number
           bips_value?: number
-          multiplier_min?: number
+          distribution_number: number
+          fixed_value?: number
           multiplier_max?: number
+          multiplier_min?: number
           multiplier_step?: number
+          type: Database["public"]["Enums"]["verification_type"]
         }
         Returns: undefined
       }
       leaderboard_referrals_all_time: {
         Args: Record<PropertyKey, never>
         Returns: {
-          rewards_usdc: number
           referrals: number
+          rewards_usdc: number
           user: Database["public"]["CompositeTypes"]["activity_feed_user"]
         }[]
       }
@@ -1967,8 +1967,8 @@ export type Database = {
       }
       profile_lookup: {
         Args: {
-          lookup_type: Database["public"]["Enums"]["lookup_type_enum"]
           identifier: string
+          lookup_type: Database["public"]["Enums"]["lookup_type_enum"]
         }
         Returns: Database["public"]["CompositeTypes"]["profile_lookup_result"][]
       }
@@ -1996,8 +1996,8 @@ export type Database = {
       referrer_lookup: {
         Args: { referral_code?: string }
         Returns: {
-          referrer: Database["public"]["CompositeTypes"]["profile_lookup_result"]
           new_referrer: Database["public"]["CompositeTypes"]["profile_lookup_result"]
+          referrer: Database["public"]["CompositeTypes"]["profile_lookup_result"]
         }[]
       }
       refresh_send_scores_history: {
@@ -2006,17 +2006,17 @@ export type Database = {
       }
       register_first_sendtag: {
         Args: {
-          tag_name: string
-          send_account_id: string
           _referral_code?: string
+          send_account_id: string
+          tag_name: string
         }
         Returns: Json
       }
       send_accounts_add_webauthn_credential: {
         Args: {
+          key_slot: number
           send_account_id: string
           webauthn_credential: Database["public"]["Tables"]["webauthn_credentials"]["Row"]
-          key_slot: number
         }
         Returns: {
           attestation_object: string
@@ -2061,11 +2061,11 @@ export type Database = {
         }[]
       }
       tag_search: {
-        Args: { query: string; limit_val: number; offset_val: number }
+        Args: { limit_val: number; offset_val: number; query: string }
         Returns: {
+          phone_matches: Database["public"]["CompositeTypes"]["tag_search_result"][]
           send_id_matches: Database["public"]["CompositeTypes"]["tag_search_result"][]
           tag_matches: Database["public"]["CompositeTypes"]["tag_search_result"][]
-          phone_matches: Database["public"]["CompositeTypes"]["tag_search_result"][]
         }[]
       }
       tags: {
@@ -2284,21 +2284,25 @@ export type Database = {
   }
 }
 
-type DefaultSchema = Database[Extract<keyof Database, "public">]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
@@ -2316,14 +2320,16 @@ export type Tables<
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
@@ -2339,14 +2345,16 @@ export type TablesInsert<
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
@@ -2362,14 +2370,16 @@ export type TablesUpdate<
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
@@ -2377,14 +2387,16 @@ export type Enums<
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never

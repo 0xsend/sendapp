@@ -6,8 +6,8 @@ import type { Activity } from 'app/utils/zod/activity'
 import { amountFromActivity } from 'app/utils/activity'
 import { FlatList } from 'react-native'
 import { ActivityDetails } from 'app/features/activity/ActivityDetails'
-import { SendButton } from '../ProfileButtons'
-import { ProfileHeader } from '../components/ProfileHeader'
+import SendButton from '../ProfileButtons'
+import ProfileHeader from '../components/ProfileHeader'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { IconArrowRight } from 'app/components/icons'
 import {
@@ -17,7 +17,7 @@ import {
 import { useProfileScreenParams, useRootScreenParams } from 'app/routers/params'
 import { ShareOtherProfileDialog } from '../components/ShareOtherProfileDialog'
 import { useActivityDetails } from 'app/provider/activity-details'
-import { Platform } from 'react-native'
+import type { PropsWithChildren } from 'react'
 
 interface ProfileScreenProps {
   sendid?: number | null
@@ -76,6 +76,7 @@ export function ProfileHistoryScreen({ sendid: propSendid }: ProfileScreenProps)
         $gtLg={{
           display: 'flex',
           maxWidth: '50%',
+          pb: '$3.5',
         }}
       >
         {activitiesError !== null && (
@@ -96,7 +97,7 @@ export function ProfileHistoryScreen({ sendid: propSendid }: ProfileScreenProps)
         {Boolean(otherUserProfile) && (
           <>
             <ProfileHeader profile={otherUserProfile} />
-            <Stack f={1} mt={'$2'} $gtLg={{ pb: '$3.5' }}>
+            <Stack f={1} mt={'$2'}>
               {activities?.length ? (
                 <FlatList
                   style={{ flex: 1 }}
@@ -130,14 +131,6 @@ export function ProfileHistoryScreen({ sendid: propSendid }: ProfileScreenProps)
                       <Spinner size="small" color={'$color12'} my={'$4'} />
                     ) : null
                   }
-                  ListHeaderComponent={
-                    Platform.OS === 'web' ? (
-                      <SendButton
-                        identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
-                        idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
-                      />
-                    ) : null
-                  }
                   ListFooterComponent={
                     hasNextPage ? <Spinner size="small" color={'$color12'} my={'$4'} /> : null
                   }
@@ -159,12 +152,10 @@ export function ProfileHistoryScreen({ sendid: propSendid }: ProfileScreenProps)
                 </YStack>
               )}
             </Stack>
-            {Platform.OS !== 'web' && (
-              <SendButton
-                identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
-                idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
-              />
-            )}
+            <SendButton
+              identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
+              idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
+            />
           </>
         )}
       </YStack>
@@ -255,14 +246,7 @@ const TransactionEntry = ({
             </Paragraph>
           )}
         </YStack>
-        <Paragraph
-          size={'$2'}
-          ta={sent ? 'right' : 'left'}
-          color={'$color4'}
-          $theme-light={{ color: '$silverChalice' }}
-        >
-          {date}
-        </Paragraph>
+        <XStack jc={sent ? 'flex-end' : 'flex-start'}>{date}</XStack>
       </YStack>
     </XStack>
   )
@@ -294,15 +278,35 @@ const useTransactionEntryDate = ({ activity, sent }: { activity: Activity; sent:
     switch (data.status) {
       case 'failed':
       case 'cancelled':
-        return 'Failed'
+        return <DateText sent={sent}>Failed</DateText>
       case 'confirmed':
-        return new Date(created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
-      default:
         return (
-          <Spinner size="small" color={'$color11'} alignItems={sent ? 'flex-end' : 'flex-start'} />
+          <DateText sent={sent}>
+            {new Date(created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+          </DateText>
         )
+      default:
+        return <Spinner size="small" color={'$color11'} />
     }
   }
 
-  return new Date(created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+  return (
+    <DateText sent={sent}>
+      {new Date(created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+    </DateText>
+  )
+}
+
+const DateText = ({ children, sent }: PropsWithChildren & { sent: boolean }) => {
+  return (
+    <Paragraph
+      display={'flex'}
+      size={'$2'}
+      ta={sent ? 'right' : 'left'}
+      color={'$color4'}
+      $theme-light={{ color: '$silverChalice' }}
+    >
+      {children}
+    </Paragraph>
+  )
 }

@@ -1,6 +1,12 @@
 import { ImageResponse } from '@vercel/og'
 import type { NextRequest } from 'next/server'
 import type React from 'react'
+import { z } from 'zod'
+import {
+  allowedImageHosts,
+  type AllowedImageHost,
+  type VercelWildcardHost,
+} from 'next-app/config/allowedImageHosts'
 
 export const config = {
   runtime: 'edge',
@@ -10,7 +16,13 @@ export const config = {
 const fontCache = new Map<string, ArrayBuffer>()
 
 async function loadGoogleFont(font: string, weight: number, text: string) {
-  const cacheKey = `${font}-${weight}`
+  // Include the exact glyph subset in the cache key.
+  // We request DM Sans via Google Fonts with text= (per-request subsetting).
+  // Normalizing to a unique+sorted set prevents reusing a smaller subset from a
+  // previous request, which caused missing bold glyphs in OG images.
+  // Docs: https://developers.google.com/fonts/docs/css2#optimize_your_font_requests
+  const normalizedText = Array.from(new Set(text)).sort().join('')
+  const cacheKey = `${font}-${weight}-${normalizedText}`
 
   // Check cache first
   if (fontCache.has(cacheKey)) {
@@ -18,7 +30,8 @@ async function loadGoogleFont(font: string, weight: number, text: string) {
   }
 
   try {
-    const url = `https://fonts.googleapis.com/css2?family=${font}:wght@${weight}&text=${encodeURIComponent(text)}&display=swap`
+    const encodedFamily = encodeURIComponent(font).replace(/%20/g, '+')
+    const url = `https://fonts.googleapis.com/css2?family=${encodedFamily}:wght@${weight}&text=${encodeURIComponent(normalizedText)}&display=swap`
 
     const cssResponse = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0' },
@@ -52,14 +65,97 @@ async function loadGoogleFont(font: string, weight: number, text: string) {
 interface ProfileData {
   name?: string
   avatar_url?: string
+  banner_url?: string
   all_tags?: string[]
   about?: string
 }
 
+// Normalize Supabase Storage image URLs via the render/image transformation endpoint.
+// This endpoint proxies through imgproxy and typically auto-rotates based on EXIF data
+// while also allowing resize/quality parameters.
+// Docs: https://supabase.com/docs/guides/storage/image-transformations
+function supabaseRenderUrl(url: string, width?: number, height?: number) {
+  try {
+    const u = new URL(url)
+    // Match Supabase Storage public object URLs
+    if (u.hostname.endsWith('.supabase.co') && u.pathname.includes('/storage/v1/object/public/')) {
+      // Convert to the render/image path
+      u.pathname = u.pathname.replace(
+        '/storage/v1/object/public/',
+        '/storage/v1/render/image/public/'
+      )
+      const params = new URLSearchParams(u.search)
+      if (width) params.set('width', String(width))
+      if (height) params.set('height', String(height))
+      // Use cover to fill target box and set a sane quality
+      params.set('resize', 'cover')
+      params.set('quality', '85')
+      u.search = params.toString() ? `?${params.toString()}` : ''
+      return u.toString()
+    }
+  } catch {
+    // If URL parsing fails, fall back to the original URL
+    return url
+  }
+  return url
+}
+
+// Safe decode patterned after validateRedirectUrl.ts (decode inside try/catch and fallback)
+// apps/next/utils/validateRedirectUrl.ts
+function safeDecode(input: string | undefined | null): string | undefined {
+  if (!input) return undefined
+  try {
+    return decodeURIComponent(input)
+  } catch {
+    return input || undefined
+  }
+}
+
+// Allowlist remote image hosts (single source of truth)
+const ALLOWED_SET = new Set<AllowedImageHost>(allowedImageHosts)
+
+function isAllowedHostname(host: string): host is AllowedImageHost | VercelWildcardHost {
+  return ALLOWED_SET.has(host as AllowedImageHost) || host.endsWith('-0xsend.vercel.app')
+}
+
+function isAllowedImageUrl(urlStr: string | undefined): boolean {
+  if (!urlStr) return false
+  try {
+    const u = new URL(urlStr)
+    if (u.protocol !== 'https:' && u.protocol !== 'http:') return false
+    const host = u.hostname.toLowerCase()
+    if (!isAllowedHostname(host)) return false
+    if (host === 'github.com') {
+      // Only allow our assets path
+      return u.pathname.startsWith('/0xsend/assets/')
+    }
+    return true
+  } catch {
+    return false
+  }
+}
+
+// Zod schema modeled after existing API routers (e.g., packages/api/src/routers/tag/router.ts)
+const OGParamsSchema = z.object({
+  name: z.string().trim().max(80).optional(),
+  avatar_url: z.string().trim().url().optional(),
+  banner_url: z.string().trim().url().optional(),
+  all_tags: z.string().trim().optional(),
+  about: z.string().trim().max(280).optional(),
+})
+
 const profileReactElement = (profile: ProfileData): React.ReactElement => {
+  const bannerUrl =
+    profile.banner_url ??
+    profile.avatar_url ??
+    'https://ghassets.send.app/app_images/auth_image_1.jpg'
   const avatarUrl =
     profile.avatar_url ??
-    `https://ghassets.send.app/app_images/auth_image_${Math.floor(Math.random() * 3) + 1}.jpg`
+    `https://ui-avatars.com/api?name=${encodeURIComponent(profile.name || 'User')}&size=256&format=png&background=86ad7f`
+
+  // Route Supabase images through the render/image endpoint to normalize EXIF orientation
+  const bannerSrc = supabaseRenderUrl(bannerUrl, 1200, 630)
+  const avatarSrc = supabaseRenderUrl(avatarUrl, 192, 192)
 
   return (
     <div
@@ -74,7 +170,7 @@ const profileReactElement = (profile: ProfileData): React.ReactElement => {
       }}
     >
       <img
-        src={avatarUrl}
+        src={bannerSrc}
         alt="Profile Avatar Background"
         width={1200}
         height={630}
@@ -85,24 +181,7 @@ const profileReactElement = (profile: ProfileData): React.ReactElement => {
           width: '100%',
           objectFit: 'cover',
           objectPosition: 'center',
-          filter: 'blur(40px)',
-          WebkitFilter: 'blur(40px)',
-        }}
-      />
-      <img
-        src={avatarUrl}
-        alt="Profile Avatar"
-        width={630}
-        height={630}
-        loading="lazy"
-        style={{
-          position: 'absolute',
-          height: 630,
-          width: 630,
-          objectFit: 'cover',
-          objectPosition: 'center',
-          right: '0%',
-          top: '0%',
+          ...(profile.banner_url ? {} : { filter: 'blur(40px)', WebkitFilter: 'blur(40px)' }),
         }}
       />
       <div
@@ -119,63 +198,107 @@ const profileReactElement = (profile: ProfileData): React.ReactElement => {
           flexDirection: 'column',
           gap: '10px',
           padding: '80px',
-          paddingBottom: '40px',
+          paddingBottom: '80px',
         }}
       >
-        {/* Name */}
-        <h2
-          style={{
-            fontSize: '72px',
-            textAlign: 'center',
-            maxWidth: '1000px',
-            color: 'white',
-            fontWeight: 700,
-          }}
-        >
-          {profile.name || ''}
-        </h2>
-
-        {/* Tags */}
         <div
           style={{
             display: 'flex',
             flexDirection: 'row',
-            gap: '8px',
-            flexWrap: 'wrap',
-            maxWidth: '60%',
+            alignItems: 'center',
+            gap: '16px',
           }}
         >
-          {profile?.all_tags
-            ? profile.all_tags.map((tag) => {
-                return (
-                  <div
-                    key={tag}
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      borderRadius: '6px',
-                      backgroundColor: 'rgba(102, 102, 102, 0.4)',
-                      padding: '12px',
-                      alignSelf: 'flex-start',
-                      backdropFilter: 'blur(40px)',
-                      WebkitBackdropFilter: 'blur(40px)',
-                    }}
-                  >
-                    <p
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              alignSelf: 'center',
+              marginTop: 'auto',
+              marginBottom: 'auto',
+              width: 192,
+              height: 192,
+            }}
+          >
+            <img
+              src={avatarSrc}
+              alt="Profile Avatar"
+              loading="lazy"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                objectPosition: 'center',
+                borderRadius: 16,
+              }}
+            />
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '3px',
+              justifyContent: 'center',
+            }}
+          >
+            {/* Name */}
+            {profile.name ? (
+              <h2
+                style={{
+                  fontSize: '64px',
+                  textAlign: 'left',
+                  color: 'white',
+                  fontWeight: 700,
+                }}
+              >
+                {profile.name || ''}
+              </h2>
+            ) : null}
+
+            {/* Tags */}
+            {profile?.all_tags ? (
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  gap: '8px',
+                  flexWrap: 'wrap',
+                  maxWidth: '1000px',
+                }}
+              >
+                {profile.all_tags.map((tag) => {
+                  return (
+                    <div
+                      key={tag}
                       style={{
-                        fontSize: '32px',
-                        color: 'white',
-                        fontWeight: 400,
-                        margin: 0,
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        borderRadius: '6px',
+                        backgroundColor: 'rgba(102, 102, 102, 0.4)',
+                        padding: '12px',
+                        alignSelf: 'flex-start',
+                        backdropFilter: 'blur(40px)',
+                        WebkitBackdropFilter: 'blur(40px)',
                       }}
                     >
-                      /{tag}
-                    </p>
-                  </div>
-                )
-              })
-            : null}
+                      <p
+                        style={{
+                          fontSize: '32px',
+                          color: 'white',
+                          fontWeight: 400,
+                          margin: 0,
+                        }}
+                      >
+                        /{tag}
+                      </p>
+                    </div>
+                  )
+                })}
+              </div>
+            ) : null}
+          </div>
         </div>
 
         {/* Bio/About */}
@@ -193,8 +316,6 @@ const profileReactElement = (profile: ProfileData): React.ReactElement => {
           </p>
         ) : null}
       </div>
-
-      {/* Branding */}
       <div
         style={{
           position: 'absolute',
@@ -245,14 +366,46 @@ export default async function handler(req: NextRequest) {
   try {
     const { searchParams } = req.nextUrl
 
-    // Extract profile data from search parameters
-    const name = searchParams.get('name') || undefined
-    const avatar_url = searchParams.get('avatar_url') || undefined
-    const all_tags_param = searchParams.get('all_tags')
-    const about = searchParams.get('about') || undefined
+    // Extract and validate using zod + allowlist
+    const decoded = {
+      name: safeDecode(searchParams.get('name') || undefined),
+      avatar_url: safeDecode(searchParams.get('avatar_url') || undefined),
+      banner_url: safeDecode(searchParams.get('banner_url') || undefined),
+      all_tags: safeDecode(searchParams.get('all_tags') || undefined),
+      about: safeDecode(searchParams.get('about') || undefined),
+    }
 
-    // Parse comma-separated tags
-    const all_tags = all_tags_param ? all_tags_param.split(',').filter(Boolean) : undefined
+    const parsed = OGParamsSchema.safeParse(decoded)
+
+    const safeName = parsed.success && parsed.data.name ? parsed.data.name : undefined
+    const safeAbout = parsed.success && parsed.data.about ? parsed.data.about : undefined
+
+    // Parse comma-separated tags with limits to avoid abuse
+    const safeTags =
+      parsed.success && parsed.data.all_tags
+        ? parsed.data.all_tags
+            .split(',')
+            .map((t) => t.trim())
+            .filter(Boolean)
+            .slice(0, 10) // max 10 tags
+            .map((t) => t.slice(0, 24)) // max 24 chars each
+        : undefined
+
+    // Enforce host allowlist for remote image URLs
+    const safeAvatarUrl =
+      parsed.success && parsed.data.avatar_url && isAllowedImageUrl(parsed.data.avatar_url)
+        ? parsed.data.avatar_url
+        : undefined
+    const safeBannerUrl =
+      parsed.success && parsed.data.banner_url && isAllowedImageUrl(parsed.data.banner_url)
+        ? parsed.data.banner_url
+        : undefined
+
+    const name = safeName
+    const about = safeAbout
+    const avatar_url = safeAvatarUrl
+    const banner_url = safeBannerUrl
+    const all_tags = safeTags
 
     console.log(`[OG Profile] Starting image generation for profile: ${name}`)
 
@@ -260,6 +413,7 @@ export default async function handler(req: NextRequest) {
     const profile: ProfileData = {
       name,
       avatar_url,
+      banner_url,
       all_tags,
       about,
     }
