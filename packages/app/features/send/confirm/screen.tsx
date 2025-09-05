@@ -40,6 +40,7 @@ import type { UserOperation } from 'permissionless'
 import { formFields } from 'app/utils/SchemaForm'
 import { Platform } from 'react-native'
 import ConfirmScreenAvatar from 'app/features/send/confirm/ConfirmScreenAvatar'
+import useRedirectAfterSend from 'app/features/send/confirm/useRedirectAfterSend'
 
 const log = debug('app:features:send:confirm:screen')
 
@@ -76,6 +77,7 @@ export function SendConfirm() {
   const { sendToken, recipient, idType, amount, note } = queryParams
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
   const { coin: selectedCoin } = useCoinFromSendTokenParam()
+  const { redirect } = useRedirectAfterSend()
 
   const submitButtonRef = useRef<TamaguiElement | null>(null)
 
@@ -237,7 +239,7 @@ export function SendConfirm() {
           exact: false,
         })
 
-        router.replace({ pathname: `/profile/${profile?.sendid}/history` })
+        redirect(profile?.sendid)
       }
     } catch (e) {
       // @TODO: handle sending repeated tx when nonce is still pending
