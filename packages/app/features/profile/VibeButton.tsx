@@ -11,7 +11,8 @@ const VibeButton = styled(LinkableButton, {
   gap: '$2',
   f: 1,
   fd: 'column',
-  p: '$3.5',
+  p: 0,
+  py: '$3.5',
 })
 
 export default VibeButton
