@@ -1,6 +1,6 @@
 // External libs & UI
 import { ChevronRight, Upload } from '@tamagui/lucide-icons'
-import { useState } from 'react'
+import { type PropsWithChildren, useState } from 'react'
 import {
   Anchor,
   Avatar,
@@ -312,9 +312,7 @@ const Vibes = ({
         note="😊"
         profile={profile}
       >
-        <Button.Text size={media.xs ? '$8' : '$9'} lineHeight={34}>
-          😊
-        </Button.Text>
+        <VibeButtonText>😊</VibeButtonText>
         <Paragraph size={'$3'}>$1</Paragraph>
       </Vibe>
       <Vibe
@@ -327,9 +325,7 @@ const Vibes = ({
         note="🔥"
         profile={profile}
       >
-        <Button.Text size={media.xs ? '$8' : '$9'} lineHeight={34}>
-          🔥
-        </Button.Text>
+        <VibeButtonText>🔥</VibeButtonText>
         <Paragraph size={'$3'}>$2</Paragraph>
       </Vibe>
       <Vibe
@@ -342,9 +338,7 @@ const Vibes = ({
         note="💯"
         profile={profile}
       >
-        <Button.Text size={media.xs ? '$8' : '$9'} lineHeight={34}>
-          💯
-        </Button.Text>
+        <VibeButtonText>💯</VibeButtonText>
         <Paragraph size={'$3'}>$3</Paragraph>
       </Vibe>
       <Vibe
@@ -357,9 +351,7 @@ const Vibes = ({
         note="🚀"
         profile={profile}
       >
-        <Button.Text size={media.xs ? '$8' : '$9'} lineHeight={34}>
-          🚀
-        </Button.Text>
+        <VibeButtonText>🚀</VibeButtonText>
         <Paragraph size={'$3'}>$4</Paragraph>
       </Vibe>
       <Vibe
@@ -373,7 +365,16 @@ const Vibes = ({
         profile={profile}
       >
         <Button.Icon>
-          <IconFYSI size={'$3'} color={isDark ? '$primary' : '$color12'} />
+          <IconFYSI
+            size={(() => {
+              if (media.xxs) {
+                return '$2'
+              }
+
+              return '$3'
+            })()}
+            color={isDark ? '$primary' : '$color12'}
+          />
         </Button.Icon>
         <Paragraph size={'$3'}>$5</Paragraph>
       </Vibe>
@@ -427,4 +428,29 @@ const LinkInBio = ({ link }: { link: ProfileLink }) => {
   }
 
   return <Pressable onPress={() => Linking.openURL(fullUrl)}>{content}</Pressable>
+}
+
+const VibeButtonText = ({ children }: PropsWithChildren) => {
+  const media = useMedia()
+
+  return (
+    <Button.Text
+      ta={'center'}
+      w={'100%'}
+      size={(() => {
+        if (media.xxs) {
+          return '$5'
+        }
+
+        if (media.xs) {
+          return '$7'
+        }
+
+        return '$9'
+      })()}
+      ellipsizeMode="clip"
+    >
+      {children}
+    </Button.Text>
+  )
 }
