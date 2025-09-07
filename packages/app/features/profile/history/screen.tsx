@@ -136,7 +136,6 @@ export function ProfileHistoryScreen({ sendid: propSendid }: ProfileScreenProps)
                   }
                   inverted={true}
                   showsVerticalScrollIndicator={false}
-                  stickyHeaderIndices={[0]}
                 />
               ) : (
                 <YStack f={1}>
