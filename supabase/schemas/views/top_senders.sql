@@ -1,10 +1,8 @@
-CREATE OR REPLACE FUNCTION top_senders(
-    limit_count INTEGER DEFAULT 10
-)
-RETURNS SETOF activity_feed_user
-SECURITY DEFINER
-LANGUAGE plpgsql
-AS $$
+CREATE OR REPLACE FUNCTION public.top_senders(limit_count integer DEFAULT 10)
+ RETURNS SETOF activity_feed_user
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
 BEGIN
 RETURN QUERY
 WITH user_scores AS (
@@ -26,6 +24,7 @@ user_earn_balances AS (
         sa.user_id,
         COALESCE(MAX(seb.assets), 0) AS earn_balance
     FROM send_accounts sa
+    JOIN user_scores us ON us.user_id = sa.user_id
     INNER JOIN send_earn_balances seb ON (
         decode(replace(sa.address::text, '0x', ''), 'hex') = seb.owner
     )
@@ -33,7 +32,10 @@ user_earn_balances AS (
 ),
 valid_users AS (
     SELECT
-        p.*,
+        p.id,
+        p.name,
+        p.avatar_url,
+        p.send_id,
         us.send_score,
         ARRAY_AGG(t.name) AS tag_names
     FROM user_scores us
@@ -51,7 +53,7 @@ valid_users AS (
           ORDER BY d.qualification_start DESC
           LIMIT 1
       )
-    GROUP BY p.id, p.avatar_url, p.name, p.about, p.referral_code, p.is_public, p.send_id, p.x_username, p.birthday, us.send_score
+    GROUP BY p.id, p.name, p.avatar_url, p.send_id, us.send_score
 )
 -- Return top N with all requirements met
 SELECT (
@@ -71,4 +73,5 @@ LEFT JOIN tags main_tag ON main_tag.id = sa.main_tag_id
 ORDER BY vu.send_score DESC
 LIMIT limit_count;
 END;
-$$;
+$function$
+;
