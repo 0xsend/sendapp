@@ -188,6 +188,23 @@ WHERE user_id = auth.uid()
 
 ## Performance Considerations
 
+### Benchmarks (Snaplet dataset)
+
+These measurements were taken locally on the restored Snaplet dataset; absolute timings will vary by hardware and data size, but the plan shapes should be similar.
+
+- refresh_send_scores_history() (CONCURRENTLY)
+  - EXPLAIN ANALYZE SELECT refresh_send_scores_history();
+  - Execution time: ~2.78 s
+- public.send_scores_current
+  - count(*) execution time: ~38 ms
+  - top-20 (ORDER BY score DESC) execution time: ~45.9 ms
+- private.send_scores_history
+  - top-20 aggregation (SUM(score), SUM(unique_sends) GROUP BY user_id): ~11.4 ms
+
+Notes
+- The history view is materialized; SELECTs are fast by design. The refresh cost is acceptable for periodic updates (e.g., upon distribution completion) and runs concurrently to minimize blocking.
+- The current view is fully dynamic (no refresh) and benefits from early filters and index-only scans on (f, block_time) and timeline tables.
+
 ### Materialized View Strategy
 
 **Benefits**:
@@ -213,9 +230,35 @@ ON private.send_scores_history (user_id, distribution_id);
 
 **Query Optimization**:
 
-- User lookups: O(log n) via user_id index
-- Distribution queries: Efficient via compound indexes
-- Tag search integration: Minimal overhead due to pre-aggregation
+- Scan-once strategy for both current and history:
+  - Pre-aggregate transfers within the active (or closed) window via
+    window_transfers, grouping by (f, t). Combine v0 and current token
+    streams with UNION ALL; scale v0 values by 1e16 to normalize
+    decimals.
+  - Join once to send_ceiling settings per sender (address_bytes) and
+    cap with LEAST(transfer_sum, send_ceiling) before aggregating per
+    sender. This avoids repeated per-transfer ceiling checks.
+  - Apply early filters for earn_min_balance by building an eligible
+    recipient set (eligible_earn_accounts) and filtering membership
+    at the window stage.
+- Current view access control:
+  - Use authorized_accounts to restrict rows to the caller (unless
+    service role), ensuring we only scan senders relevant to the caller.
+- History materialization:
+  - Use the same scan-once pattern over closed distributions and store
+    results in a materialized view with a unique index on
+    (user_id, distribution_id) for fast lookups and aggregations.
+  - Refresh concurrently to minimize blocking.
+- Index usage:
+  - Benefit from indexes on token transfer block_time and timeline
+    tables to keep scans bounded to active windows and enable early
+    pruning.
+- Normalization details:
+  - v0 token amounts are scaled by 1e16 at read time to match the
+    current token’s decimals.
+- Tag search integration:
+  - Cumulative scoring uses pre-aggregated history; unified current +
+    history is read via the public.send_scores view for ranking.
 
 ## API Functions
 
@@ -323,3 +366,5 @@ ORDER BY distribution_id DESC;
 - [Database Schema](./database-schema.md) - Underlying table structures
 - [Send Account Tags](./send-account-tags/) - Integration with user profiles
 - [Distribution System](./distributions.md) - Distribution period management
+
+
