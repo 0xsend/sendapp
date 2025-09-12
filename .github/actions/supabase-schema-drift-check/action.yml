@@ -34,6 +34,8 @@ runs:
     - name: Check for Schema Drift
       shell: bash
       working-directory: ./supabase
+      env:
+        PGSSLMODE: disable
       run: supabase db diff -f changes
     - name: Ensure Declarative Schema is Up to Date
       shell: bash
