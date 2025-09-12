@@ -4,7 +4,8 @@ export default function useRedirectAfterSend() {
   const router = useRouter()
 
   const redirect = (sendId?: number | null) => {
-    router.replace({ pathname: `/profile/${sendId}/history` })
+    const pathname = sendId ? `/profile/${sendId}/history` : '/activity'
+    router.replace({ pathname })
   }
 
   return {

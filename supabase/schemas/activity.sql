@@ -250,9 +250,13 @@ user_send_scores AS (
         COALESCE(SUM(ss.unique_sends), 0) AS total_sends,
         COALESCE(SUM(ss.score), 0) AS total_score
     FROM (
-        SELECT user_id, score, unique_sends FROM private.send_scores_history
+        SELECT user_id, score, unique_sends
+        FROM private.send_scores_history
+        WHERE user_id IN (SELECT id FROM birthday_profiles)
         UNION ALL
-        SELECT user_id, score, unique_sends FROM public.send_scores_current
+        SELECT user_id, score, unique_sends
+        FROM public.send_scores_current
+        WHERE user_id IN (SELECT id FROM birthday_profiles)
     ) ss
     GROUP BY ss.user_id
 ),
@@ -261,6 +265,7 @@ user_earn_balances AS (
         sa.user_id,
         COALESCE(MAX(seb.assets), 0) AS earn_balance
     FROM send_accounts sa
+    JOIN birthday_profiles bp ON bp.id = sa.user_id
     INNER JOIN send_earn_balances seb ON (
         decode(replace(sa.address::text, '0x', ''), 'hex') = seb.owner
     )
