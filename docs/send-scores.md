@@ -360,6 +360,52 @@ ORDER BY distribution_id DESC;
 - **Tag Search Weight**: `/1,000,000` divisor in ranking formula
 - **Access Levels**: RLS policies and role permissions
 
+## Automated refresh (deferrable trigger)
+
+A DEFERRABLE INITIALLY DEFERRED constraint trigger (`refresh_send_scores_on_first_transfer`) on
+`public.send_token_transfers` keeps `private.send_scores_history` up to date without cron jobs.
+It runs at commit (not per statement), so business logic executes after the inserting
+transaction completes.
+
+What happens at commit
+- Determine the active distribution (if any) and the “previous” distribution in a single query
+  (CTEs). Previous is normally `active.number - 1`; if no active distribution exists,
+  we fall back to the most recently closed distribution.
+- Run-once guard for the transaction: a tx-local GUC
+  `vars.refresh_scores_on_distribution_change_done` prevents duplicate work when the trigger
+  fires FOR EACH ROW.
+- Single-winner gating with an advisory xact lock: we take
+  `pg_try_advisory_xact_lock(918273645, previous_distribution_id::int)` so that exactly one
+  committing transaction (the “winner”) may examine/refresh the MV. Other concurrent commits
+  skip the MV section and proceed immediately.
+- Idempotent refresh: if the MV already has rows for `previous_distribution_id`, we skip; if it
+  does not, the winner runs `REFRESH MATERIALIZED VIEW private.send_scores_history;`.
+  Note: this is a non-concurrent refresh by design because triggers run inside the transaction;
+  `REFRESH MATERIALIZED VIEW CONCURRENTLY` is not allowed inside a transaction block.
+- One-time inserts for the active distribution: the function also seeds tag-registration
+  verifications for the active window if missing (requires a DVV row for
+  `tag_registration` on the active distribution).
+
+Performance characteristics (big‑O)
+- Advisory lock gating reduces total refresh work per previous distribution to O(S) once; other
+  concurrent commits do O(1) in the gated section.
+- The existence probe is O(log H) with an index on `private.send_scores_history(distribution_id)`.
+- Distribution lookups are O(log D) with proper indexes (e.g., `distributions(number)` and an
+  index that supports time-window checks).
+
+Operational notes
+- Indexes recommended:
+  - `private.send_scores_history(distribution_id)` (btree); unique index on `(user_id, distribution_id)` remains useful
+  - `distributions(number)` (btree), and an index aiding time-window detection
+  - For verifications, composite indexes such as `(distribution_id, type)` as needed
+- Advisory lock namespace `918273645` partitions the lock keyspace for this feature and avoids
+  collisions with other app locks.
+
+Test coverage
+- `supabase/tests/refresh_send_scores_trigger_test.sql` (pgTAP): seeds minimal data, commits a
+  transfer to trigger exactly one refresh, then commits again to assert the refresh count remains
+  1 (gating works). This test runs with all triggers enabled.
+
 ## Related Documentation
 
 - [Tag Search Function](./tag-search-function.md) - Usage in search ranking
