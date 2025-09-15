@@ -11,7 +11,7 @@ export default function HomeTabScreen() {
     useCallback(() => {
       router.dismissAll()
       router.replace('/(tabs)/')
-    }, [router])
+    }, [router.dismissAll, router.replace])
   )
 
   return (
