@@ -238,9 +238,7 @@ export function InvestmentsBody() {
                 </Paragraph>
                 {/* Small neutral pill to mirror style (no color change) */}
                 <Theme name={pct24h >= 0 ? 'green_active' : 'red_active'}>
-                  <Paragraph
-                    fontSize={'$2'}
-                    fontWeight={400}
+                  <XStack
                     bc={'$color2'}
                     $theme-dark={{
                       bc: pct24h >= 0 ? 'rgba(134, 174, 128, 0.2)' : 'rgba(229, 115, 115, 0.2)',
@@ -251,8 +249,10 @@ export function InvestmentsBody() {
                     px={'$1.5'}
                     br={'$2'}
                   >
-                    {`${pct24h > 0 ? '+' : pct24h < 0 ? '-' : ''}${Math.abs(pct24h).toFixed(2)}%`}
-                  </Paragraph>
+                    <Paragraph fontSize={'$2'} fontWeight={400}>
+                      {`${pct24h > 0 ? '+' : pct24h < 0 ? '-' : ''}${Math.abs(pct24h).toFixed(2)}%`}
+                    </Paragraph>
+                  </XStack>
                 </Theme>
               </YStack>
             )}
@@ -270,9 +270,11 @@ export function InvestmentsBody() {
                 <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
                   —
                 </Paragraph>
-                <Paragraph fontSize={'$2'} fontWeight={400} bc={'$color2'} px={'$1.5'} br={'$2'}>
-                  —
-                </Paragraph>
+                <XStack bc={'$color2'} px={'$1.5'} br={'$2'}>
+                  <Paragraph fontSize={'$2'} fontWeight={400}>
+                    —
+                  </Paragraph>
+                </XStack>
               </YStack>
             )}
           </YStack>
@@ -289,9 +291,11 @@ export function InvestmentsBody() {
                 <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
                   —
                 </Paragraph>
-                <Paragraph fontSize={'$2'} fontWeight={400} bc={'$color2'} px={'$1.5'} br={'$2'}>
-                  —
-                </Paragraph>
+                <XStack bc={'$color2'} px={'$1.5'} br={'$2'}>
+                  <Paragraph fontSize={'$2'} fontWeight={400}>
+                    —
+                  </Paragraph>
+                </XStack>
               </YStack>
             )}
           </YStack>
