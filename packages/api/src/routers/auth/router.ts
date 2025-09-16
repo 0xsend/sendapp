@@ -3,11 +3,42 @@ import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import debug from 'debug'
 import { z } from 'zod'
 import { createTRPCRouter, publicProcedure } from '../../trpc'
-import { AuthStatus } from './types'
 
 const log = debug('api:auth')
 
 export const authRouter = createTRPCRouter({
+  appReviewSignIn: publicProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+        password: z.string(),
+      })
+    )
+    .mutation(async ({ input: { email, password } }) => {
+      log('App review sign in: ', email)
+
+      try {
+        // Use admin client to bypass captcha
+        const supabaseAdmin = createSupabaseAdminClient()
+
+        const { data, error } = await supabaseAdmin.auth.signInWithPassword({
+          email,
+          password,
+        })
+
+        if (error) {
+          throw new Error(error.message || 'Invalid credentials')
+        }
+
+        return data
+      } catch (error) {
+        log('Error signing in for app review: ', error)
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          message: `Failed to sign in: ${error.message}`,
+        })
+      }
+    }),
   signUp: publicProcedure
     .input(
       z.object({
