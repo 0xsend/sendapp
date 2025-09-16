@@ -76,17 +76,31 @@ function ChartSection({
     if (change > 0)
       return (
         <Theme name="green_active">
-          <Paragraph fontSize={'$3'} fontWeight={500} bc={'$color2'} px={'$1.5'} br={'$2'}>
-            {formatted}
-          </Paragraph>
+          <XStack
+            px={'$1.5'}
+            br={'$2'}
+            $theme-dark={{ bc: 'rgba(134, 174, 128, 0.2)' }}
+            $theme-light={{ bc: 'rgba(134, 174, 128, 0.16)' }}
+          >
+            <Paragraph fontSize={'$3'} fontWeight={500}>
+              {formatted}
+            </Paragraph>
+          </XStack>
         </Theme>
       )
     if (change < 0)
       return (
         <Theme name="red_active">
-          <Paragraph fontSize={'$3'} fontWeight={500} bc={'$color2'} px={'$1.5'} br={'$2'}>
-            {formatted}
-          </Paragraph>
+          <XStack
+            px={'$1.5'}
+            br={'$2'}
+            $theme-dark={{ bc: 'rgba(134, 174, 128, 0.2)' }}
+            $theme-light={{ bc: 'rgba(134, 174, 128, 0.16)' }}
+          >
+            <Paragraph fontSize={'$3'} fontWeight={500}>
+              {formatted}
+            </Paragraph>
+          </XStack>
         </Theme>
       )
     return <Paragraph fontSize={'$3'}>{formatted}</Paragraph>
