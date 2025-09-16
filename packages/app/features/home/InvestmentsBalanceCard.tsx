@@ -287,31 +287,31 @@ function InvestmentsAggregate() {
   if (aggregatePercentage > 0)
     return (
       <Theme name={'green_active'}>
-        <Paragraph
-          fontSize={'$3'}
-          fontWeight={500}
+        <XStack
           $theme-dark={{ bc: 'rgba(134, 174, 128, 0.2)' }}
           $theme-light={{ bc: 'rgba(134, 174, 128, 0.16)' }}
           px={'$1.5'}
           br={'$2'}
         >
-          {formatted}
-        </Paragraph>
+          <Paragraph fontSize={'$3'} fontWeight={500}>
+            {formatted}
+          </Paragraph>
+        </XStack>
       </Theme>
     )
   if (aggregatePercentage < 0)
     return (
       <Theme name={'red_active'}>
-        <Paragraph
-          fontSize={'$3'}
-          fontWeight={500}
+        <XStack
           $theme-dark={{ bc: 'rgba(229, 115, 115, 0.2)' }}
           $theme-light={{ bc: 'rgba(229, 115, 115, 0.16)' }}
           px={'$1.5'}
           br={'$2'}
         >
-          {formatted}
-        </Paragraph>
+          <Paragraph fontSize={'$3'} fontWeight={500}>
+            {formatted}
+          </Paragraph>
+        </XStack>
       </Theme>
     )
   return null
