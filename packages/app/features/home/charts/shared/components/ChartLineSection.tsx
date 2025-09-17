@@ -1,6 +1,6 @@
-import { ChartPathProvider, ChartPath, ChartDot } from '@my/ui'
+import { ChartPathProvider, ChartPath, ChartDot, View } from '@my/ui'
 import { useMemo } from 'react'
-import { View } from 'react-native'
+import { useScrollNativeGesture } from '@my/ui/src/gestures/ScrollGestureContext'
 
 export function ChartLineSection({
   points,
@@ -27,8 +27,22 @@ export function ChartLineSection({
     [points, smoothed]
   )
 
+  const native = useScrollNativeGesture()
+
+  const gesturePad = 24
+  const { onScrub, ...restPathProps } = (pathProps ?? {}) as {
+    onScrub?: (payload: { active: boolean; ox?: number; oy?: number }) => void
+  } & Record<string, unknown>
+
+  const mergedPanProps = {
+    shouldCancelWhenOutside: false,
+    hitSlop: { top: gesturePad, bottom: gesturePad },
+    nativeScrollGesture: native ?? undefined,
+    ...restPathProps,
+  } as never
+
   return (
-    <View style={{ width }}>
+    <View w={width}>
       <ChartPathProvider
         data={data}
         width={width}
@@ -40,15 +54,15 @@ export function ChartLineSection({
         {/* Scrub readout in normal flow above the chart */}
         {childrenBeforePath}
         {/* Fixed-height chart area below */}
-        <View style={{ height: H, width }}>
+        <View h={H} w={width}>
           <ChartPath
             width={width}
             height={H}
             stroke={stroke}
             fill="none"
-            selectedStrokeWidth={3}
+            selectedStrokeWidth={5}
             strokeWidth={3.5}
-            panGestureHandlerProps={pathProps as never}
+            panGestureHandlerProps={mergedPanProps}
             onScrub={
               typeof pathProps?.onScrub === 'function'
                 ? (pathProps.onScrub as (payload: {
