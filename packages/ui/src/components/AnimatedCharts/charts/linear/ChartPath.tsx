@@ -1,14 +1,9 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { View, Platform } from 'react-native'
-import {
-  PanGestureHandler,
-  type PanGestureHandlerGestureEvent,
-  type PanGestureHandlerProperties,
-} from 'react-native-gesture-handler'
+import { GestureDetector, Gesture } from 'react-native-gesture-handler'
 import Animated, {
   FadeIn,
   runOnJS,
-  useAnimatedGestureHandler,
   useAnimatedProps,
   useAnimatedReaction,
   useSharedValue,
@@ -26,6 +21,9 @@ import { useChartData } from '../../helpers/useChartData'
 // These not being set to 0 makes it harder to reason about the chart height, and I cannot see any difference when they are set to 0. Keeping in place in case it is needed for some reason.
 export const FIX_CLIPPED_PATH_MAGIC_NUMBER = 0 // 22
 export const FIX_CLIPPED_PATH_FOR_CARD_MAGIC_NUMBER = 0 // 3
+
+// Extra vertical hit area (in px) to make scrubbing more forgiving without affecting layout
+const EXTRA_VERTICAL_HITSLOP = 24
 
 function least(length: number, compare: (value: number) => number) {
   'worklet'
@@ -66,6 +64,14 @@ export const timingAnimationDefaultConfig = {
 
 const AnimatedPath = Animated.createAnimatedComponent(Path)
 
+type GH2HitSlop = number | Partial<{ left: number; right: number; top: number; bottom: number }>
+
+interface GH2HandlerProps {
+  hitSlop?: GH2HitSlop
+  shouldCancelWhenOutside?: boolean
+  nativeScrollGesture?: ReturnType<typeof Gesture.Native>
+}
+
 interface ChartPathProps extends PathProps {
   hapticsEnabled?: boolean
   hitSlop?: number
@@ -77,7 +83,8 @@ interface ChartPathProps extends PathProps {
   selectedStrokeWidth?: number
   gestureEnabled?: boolean
   springConfig?: WithSpringConfig
-  panGestureHandlerProps?: PanGestureHandlerProperties
+  // On native GH2, we will map the few supported keys from this object (hitSlop, shouldCancelWhenOutside)
+  panGestureHandlerProps?: Record<string, unknown>
   timingFeedbackConfig?: WithTimingConfig
   timingAnimationConfig?: WithTimingConfig
   isCard?: boolean
@@ -157,7 +164,14 @@ const ChartPathInner = React.memo(
     Omit<ChartData, 'data' | 'dotScale' | 'color'> & { containerWidth: number }) => {
     ChartPathInner.displayName = 'chartPathInner'
     const selectedStrokeProgress = useSharedValue(0)
-
+    // Hold-to-activate (native): gate scrubbing with GH2 long press
+    // Shared state for GH2 gestures
+    const armed = useSharedValue(false) // becomes true after long-press starts
+    const didPan = useSharedValue(false)
+    const panBegan = useSharedValue(false)
+    // Capture initial press location so we can show indicator on hold
+    const pressX = useSharedValue(0)
+    const pressY = useSharedValue(0)
     const strokeColorAnimated = useDerivedValue(() => {
       return interpolateColor(selectedStrokeProgress.value, [0, 1], [stroke, selectedStroke])
     })
@@ -205,10 +219,28 @@ const ChartPathInner = React.memo(
     )
 
     useEffect(() => {
+      // On dataset/timeframe change, clear any active scrubbing and reset origins
+      armed.value = false
+      didPan.value = false
+      panBegan.value = false
+      isActive.value = false
+      positionY.value = -1
+      originalX.value = ''
+      originalY.value = ''
       if (currentPath) {
         setOriginData(currentPath)
       }
-    }, [currentPath, setOriginData])
+    }, [
+      currentPath,
+      setOriginData,
+      isActive,
+      positionY,
+      originalX,
+      originalY,
+      armed,
+      didPan,
+      panBegan,
+    ])
 
     const updatePosition = useCallback(
       ({ x, y }: { x: number | null; y: number | null }) => {
@@ -278,14 +310,32 @@ const ChartPathInner = React.memo(
       [currentPath, positionX, positionY, progress, setOriginData]
     )
 
+    // Show indicator as soon as long-press starts (armed)
+    useAnimatedReaction(
+      () => armed.value,
+      (armedNow) => {
+        if (armedNow) {
+          if (!isActive.value) {
+            isActive.value = true
+            if (hapticsEnabled) runOnJS(triggerHaptics)('soft')
+          }
+          updatePosition({ x: pressX.value, y: pressY.value })
+        }
+      }
+    )
+
     const resetGestureState = useCallback(() => {
       'worklet'
+      // Clear indicator and scrub state
+      armed.value = false
+      didPan.value = false
+      panBegan.value = false
       originalX.value = ''
       originalY.value = ''
       positionY.value = -1
       isActive.value = false
       updatePosition({ x: null, y: null })
-    }, [originalX, originalY, positionY, isActive, updatePosition])
+    }, [originalX, originalY, positionY, isActive, updatePosition, armed, didPan, panBegan])
 
     const animatedProps = useAnimatedProps(() => {
       if (!currentPath) {
@@ -303,43 +353,127 @@ const ChartPathInner = React.memo(
       }
     }, [currentPath])
 
-    const onGestureEvent = useAnimatedGestureHandler<PanGestureHandlerGestureEvent>(
-      {
-        onStart: (event) => {
-          state.value = event.state
+    // Map wrapper props to GH2 (hitSlop, shouldCancelWhenOutside)
+    const handlerProps = (panGestureHandlerProps ?? {}) as GH2HandlerProps
+    const externalHitSlop = handlerProps.hitSlop
+    const externalShouldCancel = handlerProps.shouldCancelWhenOutside ?? true
+    const externalNativeGesture = handlerProps.nativeScrollGesture
+
+    const panHitSlop = useMemo(
+      () =>
+        (externalHitSlop as unknown) ?? {
+          // Default conservatively: do not expand vertical hit area so scroll remains responsive.
+          // Callers (e.g., ChartLineSection) can opt-in to vertical padding via panGestureHandlerProps.
+          left: hitSlop,
+          right: hitSlop,
+        },
+      [externalHitSlop, hitSlop]
+    )
+
+    const nativeGesture = useMemo(() => {
+      const g = externalNativeGesture as ReturnType<typeof Gesture.Native> | null
+      return (g as ReturnType<typeof Gesture.Native>) || Gesture.Native()
+    }, [externalNativeGesture])
+
+    const longPressGesture = useMemo(() => {
+      let lg = Gesture.LongPress()
+        .minDuration(500)
+        .maxDistance(4)
+        .hitSlop(panHitSlop as GH2HitSlop)
+        .shouldCancelWhenOutside(externalShouldCancel)
+        .simultaneousWithExternalGesture(nativeGesture)
+
+      lg = lg
+        .onBegin((e) => {
+          'worklet'
+          state.value = 1
+          pressX.value = positionXWithMargin(e.x, hitSlop, width)
+          pressY.value = e.y
+        })
+        .onStart((e) => {
+          'worklet'
+          // Arm and show indicator immediately at press
+          armed.value = true
           isActive.value = true
+          pressX.value = positionXWithMargin(e.x, hitSlop, width)
+          pressY.value = e.y
+          updatePosition({ x: pressX.value, y: pressY.value })
           if (hapticsEnabled) runOnJS(triggerHaptics)('soft')
-          updatePosition({ x: positionXWithMargin(event.x, hitSlop, width), y: event.y })
-        },
-        onActive: (event) => {
-          state.value = event.state
-          updatePosition({ x: positionXWithMargin(event.x, hitSlop, width), y: event.y })
-        },
-        onCancel: (event) => {
-          state.value = event.state
+        })
+        .onFinalize(() => {
+          'worklet'
+          // If user releases without panning, reset
+          if (!panBegan.value) {
+            resetGestureState()
+          }
+        })
+
+      return lg
+    }, [
+      panHitSlop,
+      externalShouldCancel,
+      hitSlop,
+      width,
+      hapticsEnabled,
+      state,
+      pressX,
+      pressY,
+      armed,
+      isActive,
+      updatePosition,
+      resetGestureState,
+      panBegan,
+      nativeGesture,
+    ])
+
+    const panGesture = useMemo(() => {
+      let pg = Gesture.Pan()
+        // Require meaningful horizontal movement
+        .minDistance(8)
+        .activeOffsetX([-8, 8])
+        .hitSlop(panHitSlop as GH2HitSlop)
+        .shouldCancelWhenOutside(externalShouldCancel)
+        .simultaneousWithExternalGesture(nativeGesture)
+
+      pg = pg
+        .onBegin((_e) => {
+          'worklet'
+          didPan.value = false
+          panBegan.value = true
+        })
+        .onUpdate((e) => {
+          'worklet'
+          if (!armed.value || !isActive.value) return
+          didPan.value = true
+          updatePosition({ x: positionXWithMargin(e.x, hitSlop, width), y: e.y })
+        })
+        .onFinalize(() => {
+          'worklet'
           resetGestureState()
-        },
-        onEnd: (event) => {
-          state.value = event.state
-          resetGestureState()
-          if (hapticsEnabled) runOnJS(triggerHaptics)('soft')
-        },
-        onFail: (event) => {
-          state.value = event.state
-          resetGestureState()
-        },
-      },
-      [width, height, hapticsEnabled, hitSlop, timingFeedbackConfig, updatePosition]
+        })
+
+      return pg
+    }, [
+      panHitSlop,
+      externalShouldCancel,
+      armed,
+      isActive,
+      updatePosition,
+      hitSlop,
+      width,
+      didPan,
+      panBegan,
+      resetGestureState,
+      nativeGesture,
+    ])
+
+    const composedGesture = useMemo(
+      () => Gesture.Simultaneous(longPressGesture, panGesture),
+      [longPressGesture, panGesture]
     )
 
     return (
-      <PanGestureHandler
-        enabled={gestureEnabled}
-        onGestureEvent={onGestureEvent}
-        shouldCancelWhenOutside
-        // eslint-disable-next-line react/jsx-props-no-spreading
-        {...panGestureHandlerProps}
-      >
+      <GestureDetector gesture={composedGesture}>
         <Animated.View>
           <Svg
             style={{
@@ -358,7 +492,7 @@ const ChartPathInner = React.memo(
             />
           </Svg>
         </Animated.View>
-      </PanGestureHandler>
+      </GestureDetector>
     )
   }
 )
