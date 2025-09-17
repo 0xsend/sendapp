@@ -253,7 +253,7 @@ const Vibe = ({
           idType: profile?.main_tag_name ? 'tag' : 'sendid',
           sendToken,
           amount: amount.toString(),
-          note: encodeURIComponent(note),
+          note,
         },
       }}
       bc="$color1"
