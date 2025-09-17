@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { View } from 'react-native'
 import type { StyleProp, ViewStyle } from 'react-native'
 import Svg, { Path, type PathProps } from 'react-native-svg'
@@ -83,8 +83,20 @@ export const ChartPath = React.memo(
     const containerRef = useRef<View | null>(null)
     const startXRef = useRef<number | null>(null)
     const startYRef = useRef<number | null>(null)
+    // Hold-to-activate state (web: JS timers)
+    const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const holdActiveRef = useRef<boolean>(false)
+    const isTouchRef = useRef<boolean>(false)
+    const [focused, setFocused] = useState(false)
 
     const resetGestureState = useCallback(() => {
+      // clear any pending hold timer
+      if (holdTimerRef.current) {
+        clearTimeout(holdTimerRef.current)
+        holdTimerRef.current = null
+      }
+      holdActiveRef.current = false
+      setFocused(false)
       originalX.value = ''
       originalY.value = ''
       positionY.value = -1
@@ -154,6 +166,9 @@ export const ChartPath = React.memo(
           clientX?: number
           clientY?: number
           currentTarget?: { getBoundingClientRect: () => DOMRect }
+          pointerType?: string
+          nativeEvent?: { pointerType?: string; touches?: unknown[] }
+          touches?: unknown[]
         }
         const target = evt.currentTarget as unknown as HTMLElement
         const rect = target.getBoundingClientRect()
@@ -162,6 +177,45 @@ export const ChartPath = React.memo(
         if (typeof cx !== 'number' || typeof cy !== 'number') return
         startXRef.current = cx - rect.left
         startYRef.current = cy - rect.top
+
+        // Determine if this is a touch pointer without using any
+        type Pointerish = {
+          pointerType?: string
+          touches?: unknown[]
+          nativeEvent?: { pointerType?: string; touches?: unknown[] }
+        }
+        const evObj = evt as Pointerish
+        const ne = evObj.nativeEvent
+        const pType =
+          typeof ne?.pointerType === 'string'
+            ? ne.pointerType
+            : typeof evObj.pointerType === 'string'
+              ? evObj.pointerType
+              : undefined
+        const hasTouches = Array.isArray(ne?.touches) || Array.isArray(evObj.touches)
+        isTouchRef.current = pType === 'touch' || (!!hasTouches && pType !== 'mouse')
+        isTouchRef.current = pType === 'touch' || (!!hasTouches && pType !== 'mouse')
+
+        // For touch: require 500ms hold. For mouse/pen: enable immediately and focus via hover.
+        if (isTouchRef.current) {
+          if (holdTimerRef.current) {
+            clearTimeout(holdTimerRef.current)
+            holdTimerRef.current = null
+          }
+          holdActiveRef.current = false
+          setFocused(false)
+          holdTimerRef.current = setTimeout(() => {
+            holdActiveRef.current = true
+            setFocused(true)
+          }, 500)
+        } else {
+          if (holdTimerRef.current) {
+            clearTimeout(holdTimerRef.current)
+            holdTimerRef.current = null
+          }
+          holdActiveRef.current = true
+          setFocused(true)
+        }
       },
       [gestureEnabled]
     )
@@ -220,22 +274,38 @@ export const ChartPath = React.memo(
         // Determine intent: allow vertical scroll if vertical movement dominates.
         const sx = startXRef.current
         const sy = startYRef.current
-        if (!isActive.value) {
-          if (sx == null || sy == null) {
+        // Require hold-to-activate for touch; for mouse/pen, allow immediate scrubbing.
+        if (!holdActiveRef.current) {
+          // Keep tracking start positions but do not activate (touch only)
+          if (startXRef.current == null || startYRef.current == null) {
             startXRef.current = x
             startYRef.current = y
-            return
           }
-          const dx = Math.abs(x - sx)
-          const dy = Math.abs(y - sy)
-          if (dy > dx && dy > 8) {
-            // vertical intent: let page scroll
-            return
-          }
-          if (dx >= 8 && dx >= dy) {
+          return
+        }
+
+        if (!isActive.value) {
+          if (!isTouchRef.current) {
+            // Mouse/pen: activate immediately when moving within bounds
             isActive.value = true
           } else {
-            return
+            // Touch: enforce intent threshold
+            if (sx == null || sy == null) {
+              startXRef.current = x
+              startYRef.current = y
+              return
+            }
+            const dx = Math.abs(x - sx)
+            const dy = Math.abs(y - sy)
+            if (dy > dx && dy > 8) {
+              // vertical intent: let page scroll
+              return
+            }
+            if (dx >= 8 && dx >= dy) {
+              isActive.value = true
+            } else {
+              return
+            }
           }
         }
         if (typeof evt.preventDefault === 'function') evt.preventDefault()
@@ -260,6 +330,9 @@ export const ChartPath = React.memo(
       onPointerUp: handleLeave,
       onPointerCancel: handleLeave,
       onPointerLeave: handleLeave,
+      onPointerEnter: () => {
+        if (!isTouchRef.current) setFocused(true)
+      },
     } as const
 
     return (
@@ -276,7 +349,7 @@ export const ChartPath = React.memo(
             <Path
               d={pathD}
               stroke={finalStroke}
-              strokeWidth={strokeWidth}
+              strokeWidth={focused ? (strokeWidth ?? 1) + 1 : strokeWidth}
               strokeLinecap="round"
               fill="none"
               {...rest}

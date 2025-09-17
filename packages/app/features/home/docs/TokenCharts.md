@@ -125,3 +125,40 @@ Additional file references
   - packages/ui/src/components/AnimatedCharts/charts/linear/ChartPath.web.tsx (web Path)
   - packages/ui/src/components/AnimatedCharts/charts/linear/ChartPathProvider.tsx (shared context)
   - packages/ui/src/components/AnimatedCharts/charts/linear/ChartPath.tsx (native)
+
+## Charts: require 500ms hold to scrub
+
+
+Why:
+Users should be able to start a vertical page scroll even when the
+first touch starts on the chart. Requiring a 500ms hold to "focus"
+chart scrubbing prevents accidental interception of vertical scroll.
+Native already animates stroke on focus; web gets a minimal active
+indicator (e.g., stroke bump/tint) while focused. This change keeps
+existing vertical-intent escape checks and clears focus on end/cancel.
+
+Test plan:
+Web:
+- On a touch device/emulator, drag vertically starting on the chart:
+  the page should scroll; scrubbing should NOT start immediately.
+- Press and hold ~500ms on the chart, then move horizontally:
+  scrubbing should begin; extremes labels should hide as before.
+- Mouse: press-hold ~500ms, then move to scrub; release resets focus.
+- Verify the active indicator appears only while focused.
+
+Native:
+- On iOS/Android (Expo), vertical scroll starting on the chart should
+  pass through until a ~500ms hold is recognized.
+- After hold, panning scrubs the price; stroke/haptics behavior remains.
+- Release/cancel resets focus and deactivates scrubbing.
+
+Acceptance:
+- Both platforms require ~500ms hold before scrubbing.
+- Vertical page scroll is not blocked when starting on chart.
+- Optional focus indicator shows after hold (native already animates).
+
+### Implementation references (in-repo examples)
+- packages/ui/src/components/AnimatedCharts/charts/linear/ChartPath.web.tsx
+  - Existing pointer-event gating and vertical-intent guard (pan-y, preventDefault only when active). We extended this by requiring a 500ms hold before activating scrubbing.
+- packages/ui/src/components/PendingIndicatorBar.tsx
+  - setTimeout/clearTimeout pattern used as a reference for reliable JS-timer lifecycle on web. We applied the same pattern for the 500ms hold timer.

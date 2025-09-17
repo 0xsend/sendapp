@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { View, Platform } from 'react-native'
 import {
   PanGestureHandler,
@@ -157,6 +157,32 @@ const ChartPathInner = React.memo(
     Omit<ChartData, 'data' | 'dotScale' | 'color'> & { containerWidth: number }) => {
     ChartPathInner.displayName = 'chartPathInner'
     const selectedStrokeProgress = useSharedValue(0)
+    // Hold-to-activate (native): gate scrubbing until a 500ms press is recognized
+    const holdReady = useSharedValue(false)
+    const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+    // Capture initial press location so we can show indicator on hold
+    const pressX = useSharedValue(0)
+    const pressY = useSharedValue(0)
+    // Track whether the finger is still down; only activate on hold if true
+    const pressing = useSharedValue(false)
+
+    const startHoldTimerJS = useCallback(() => {
+      if (holdTimerRef.current) {
+        clearTimeout(holdTimerRef.current)
+        holdTimerRef.current = null
+      }
+      holdTimerRef.current = setTimeout(() => {
+        holdReady.value = true
+      }, 500)
+    }, [holdReady])
+
+    const clearHoldTimerJS = useCallback(() => {
+      if (holdTimerRef.current) {
+        clearTimeout(holdTimerRef.current)
+        holdTimerRef.current = null
+      }
+      holdReady.value = false
+    }, [holdReady])
 
     const strokeColorAnimated = useDerivedValue(() => {
       return interpolateColor(selectedStrokeProgress.value, [0, 1], [stroke, selectedStroke])
@@ -205,10 +231,29 @@ const ChartPathInner = React.memo(
     )
 
     useEffect(() => {
+      // On dataset/timeframe change, clear any active scrubbing and reset origins
+      // Clear any pending hold timer on the JS thread
+      clearHoldTimerJS()
+      holdReady.value = false
+      pressing.value = false
+      isActive.value = false
+      positionY.value = -1
+      originalX.value = ''
+      originalY.value = ''
       if (currentPath) {
         setOriginData(currentPath)
       }
-    }, [currentPath, setOriginData])
+    }, [
+      currentPath,
+      setOriginData,
+      clearHoldTimerJS,
+      holdReady,
+      isActive,
+      positionY,
+      originalX,
+      originalY,
+      pressing,
+    ])
 
     const updatePosition = useCallback(
       ({ x, y }: { x: number | null; y: number | null }) => {
@@ -278,14 +323,34 @@ const ChartPathInner = React.memo(
       [currentPath, positionX, positionY, progress, setOriginData]
     )
 
+    // When the 500ms hold completes, only activate if the finger is still down
+    // and position the indicator at the initial press location.
+    useAnimatedReaction(
+      () => holdReady.value && pressing.value,
+      (readyAndPressing) => {
+        if (readyAndPressing) {
+          if (!isActive.value) {
+            isActive.value = true
+            if (hapticsEnabled) runOnJS(triggerHaptics)('soft')
+          }
+          // Use the clamped X captured on start; Y is raw event space which
+          // updatePosition translates to chart coordinates via interpolation.
+          updatePosition({ x: pressX.value, y: pressY.value })
+        }
+      }
+    )
+
     const resetGestureState = useCallback(() => {
       'worklet'
+      // clear hold timer on JS and reset holdReady
+      runOnJS(clearHoldTimerJS)()
+      pressing.value = false
       originalX.value = ''
       originalY.value = ''
       positionY.value = -1
       isActive.value = false
       updatePosition({ x: null, y: null })
-    }, [originalX, originalY, positionY, isActive, updatePosition])
+    }, [originalX, originalY, positionY, isActive, updatePosition, clearHoldTimerJS, pressing])
 
     const animatedProps = useAnimatedProps(() => {
       if (!currentPath) {
@@ -307,25 +372,43 @@ const ChartPathInner = React.memo(
       {
         onStart: (event) => {
           state.value = event.state
-          isActive.value = true
-          if (hapticsEnabled) runOnJS(triggerHaptics)('soft')
-          updatePosition({ x: positionXWithMargin(event.x, hitSlop, width), y: event.y })
+          // Mark finger down
+          pressing.value = true
+          // Capture initial press to reveal indicator upon hold
+          pressX.value = positionXWithMargin(event.x, hitSlop, width)
+          pressY.value = event.y
+          // Begin 500ms hold; do not activate immediately
+          runOnJS(startHoldTimerJS)()
         },
         onActive: (event) => {
           state.value = event.state
+          // Require hold gate before allowing scrubbing
+          if (!holdReady.value) {
+            return
+          }
+          if (!isActive.value) {
+            isActive.value = true
+            if (hapticsEnabled) runOnJS(triggerHaptics)('soft')
+          }
           updatePosition({ x: positionXWithMargin(event.x, hitSlop, width), y: event.y })
         },
         onCancel: (event) => {
           state.value = event.state
+          // Clear hold timer then reset
+          runOnJS(clearHoldTimerJS)()
           resetGestureState()
         },
         onEnd: (event) => {
           state.value = event.state
+          // Clear hold timer then reset
+          runOnJS(clearHoldTimerJS)()
           resetGestureState()
           if (hapticsEnabled) runOnJS(triggerHaptics)('soft')
         },
         onFail: (event) => {
           state.value = event.state
+          // Clear hold timer then reset
+          runOnJS(clearHoldTimerJS)()
           resetGestureState()
         },
       },

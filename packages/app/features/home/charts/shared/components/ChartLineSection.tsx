@@ -46,7 +46,7 @@ export function ChartLineSection({
             height={H}
             stroke={stroke}
             fill="none"
-            selectedStrokeWidth={3}
+            selectedStrokeWidth={5}
             strokeWidth={3.5}
             panGestureHandlerProps={pathProps as never}
             onScrub={
