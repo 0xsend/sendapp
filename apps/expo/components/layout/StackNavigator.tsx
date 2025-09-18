@@ -19,10 +19,7 @@ export default function StackNavigator() {
         headerTintColor: isDark ? config.tokens.color.primary.val : theme.color12.val,
         headerLeft: () => (
           <Pressable onPress={() => router.back()}>
-            <IconArrowLeft
-              size={'$1.5'}
-              color={isDark ? config.tokens.color.primary.val : theme.color12.val}
-            />
+            <IconArrowLeft size={'$1.5'} color={isDark ? '$primary' : '$color12'} />
           </Pressable>
         ),
         headerTitleAlign: 'left',
@@ -40,6 +37,13 @@ export default function StackNavigator() {
             </Paragraph>
           </XStack>
         ),
+        // Performance optimizations for Android
+        animation: 'slide_from_right',
+        animationDuration: Platform.OS === 'android' ? 200 : undefined,
+        gestureEnabled: true,
+        gestureDirection: 'horizontal',
+        // Enable native stack optimizations
+        freezeOnBlur: true,
       }}
     />
   )
