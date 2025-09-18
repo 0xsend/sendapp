@@ -461,11 +461,9 @@ function SearchResultRow({
           <XStack testID={`tag-search-${profile.send_id}`} ai="center" gap="$4">
             <Avatar size="$4.5" br="$3">
               {Platform.OS === 'android' && !profile.avatar_url ? (
-                <Avatar size="$4.5" br="$3">
-                  <Avatar.Image
-                    src={`https://ui-avatars.com/api/?name=${label}&size=256&format=png&background=86ad7f`}
-                  />
-                </Avatar>
+                <Avatar.Image
+                  src={`https://ui-avatars.com/api/?name=${label}&size=256&format=png&background=86ad7f`}
+                />
               ) : (
                 <>
                   <Avatar.Image testID="avatar" src={profile.avatar_url ?? undefined} />
