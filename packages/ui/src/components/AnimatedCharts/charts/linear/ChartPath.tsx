@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { View, Platform } from 'react-native'
 import {
   PanGestureHandler,
@@ -26,6 +26,9 @@ import { useChartData } from '../../helpers/useChartData'
 // These not being set to 0 makes it harder to reason about the chart height, and I cannot see any difference when they are set to 0. Keeping in place in case it is needed for some reason.
 export const FIX_CLIPPED_PATH_MAGIC_NUMBER = 0 // 22
 export const FIX_CLIPPED_PATH_FOR_CARD_MAGIC_NUMBER = 0 // 3
+
+// Extra vertical hit area (in px) to make scrubbing more forgiving without affecting layout
+const EXTRA_VERTICAL_HITSLOP = 24
 
 function least(length: number, compare: (value: number) => number) {
   'worklet'
@@ -415,11 +418,22 @@ const ChartPathInner = React.memo(
       [width, height, hapticsEnabled, hitSlop, timingFeedbackConfig, updatePosition]
     )
 
+    const panHitSlop = useMemo(
+      () => ({
+        top: EXTRA_VERTICAL_HITSLOP,
+        bottom: EXTRA_VERTICAL_HITSLOP,
+        left: hitSlop,
+        right: hitSlop,
+      }),
+      [hitSlop]
+    )
+
     return (
       <PanGestureHandler
         enabled={gestureEnabled}
         onGestureEvent={onGestureEvent}
         shouldCancelWhenOutside
+        hitSlop={panHitSlop}
         // eslint-disable-next-line react/jsx-props-no-spreading
         {...panGestureHandlerProps}
       >

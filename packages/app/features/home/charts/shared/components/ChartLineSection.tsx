@@ -27,6 +27,22 @@ export function ChartLineSection({
     [points, smoothed]
   )
 
+  // Increase vertical gesture capture without changing visual height:
+  // - Pass shouldCancelWhenOutside: false so slight vertical drift doesn't cancel
+  // - Add vertical hitSlop on the PanGestureHandler via panGestureHandlerProps
+  const gesturePad = 24
+  // Separate onScrub (web-only) from other handler props to avoid forwarding
+  // unknown props to the native PanGestureHandler
+  const { onScrub, ...restPathProps } = (pathProps ?? {}) as {
+    onScrub?: (payload: { active: boolean; ox?: number; oy?: number }) => void
+  } & Record<string, unknown>
+
+  const mergedPanProps = {
+    shouldCancelWhenOutside: false,
+    hitSlop: { top: gesturePad, bottom: gesturePad },
+    ...restPathProps,
+  } as never
+
   return (
     <View style={{ width }}>
       <ChartPathProvider
@@ -48,10 +64,10 @@ export function ChartLineSection({
             fill="none"
             selectedStrokeWidth={5}
             strokeWidth={3.5}
-            panGestureHandlerProps={pathProps as never}
+            panGestureHandlerProps={mergedPanProps}
             onScrub={
-              typeof pathProps?.onScrub === 'function'
-                ? (pathProps.onScrub as (payload: {
+              typeof onScrub === 'function'
+                ? (onScrub as (payload: {
                     active: boolean
                     ox?: number
                     oy?: number

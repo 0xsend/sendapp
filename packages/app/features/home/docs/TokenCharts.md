@@ -162,3 +162,24 @@ Acceptance:
   - Existing pointer-event gating and vertical-intent guard (pan-y, preventDefault only when active). We extended this by requiring a 500ms hold before activating scrubbing.
 - packages/ui/src/components/PendingIndicatorBar.tsx
   - setTimeout/clearTimeout pattern used as a reference for reliable JS-timer lifecycle on web. We applied the same pattern for the 500ms hold timer.
+
+## Native: widen vertical hit area for scrubbing
+
+Why:
+Users could inadvertently drag off the chart and cancel scrubbing because the
+interactive area was exactly the chart bounds. Increasing the vertical gesture
+hit area makes scrubbing more forgiving without changing layout.
+
+How:
+- Increase PanGestureHandler hitSlop top/bottom by +24px in
+  packages/ui/src/components/AnimatedCharts/charts/linear/ChartPath.tsx
+- In ChartLineSection (wrapper), pass panGestureHandlerProps with:
+  - shouldCancelWhenOutside: false (prevents cancellation on slight drift outside)
+  - hitSlop: { top: 24, bottom: 24 } (extra vertical capture without visual height change)
+  File: packages/app/features/home/charts/shared/components/ChartLineSection.tsx
+- Visual layout unchanged (same SVG height); only gesture hit area grows.
+
+Test plan:
+- Start scrubbing near the top/bottom of the chart; slight vertical drift should
+  no longer cancel scrubbing immediately.
+- Verify no layout shifts and chart height remains constant.
