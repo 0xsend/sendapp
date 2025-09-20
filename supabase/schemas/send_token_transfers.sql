@@ -93,8 +93,97 @@ GRANT ALL ON SEQUENCE "public"."send_token_transfers_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."send_token_transfers_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."send_token_transfers_id_seq" TO "service_role";
 
+
+-- DEFERRABLE trigger: on distribution change, refresh history as needed and insert tag registrations
+CREATE OR REPLACE FUNCTION public.refresh_scores_on_distribution_change()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  active_distribution_id bigint;
+  active_distribution_number integer;
+  previous_distribution_id bigint;
+BEGIN
+  -- Run-once per transaction guard: emulate statement-level deferral so this
+  -- function executes its core logic only once at commit, even though the
+  -- trigger is FOR EACH ROW and DEFERRABLE. We use a tx-local GUC flag.
+  IF current_setting('vars.refresh_scores_on_distribution_change_done', true) = '1' THEN
+    RETURN NEW;
+  END IF;
+  PERFORM set_config('vars.refresh_scores_on_distribution_change_done', '1', true);
+
+  -- Compute active distribution and previous distribution id in one pass
+  WITH now_utc AS (
+    SELECT CURRENT_TIMESTAMP AT TIME ZONE 'UTC' AS now_ts
+  ), active AS (
+    SELECT id, number
+    FROM distributions, now_utc n
+    WHERE n.now_ts >= qualification_start
+      AND n.now_ts <  qualification_end
+    ORDER BY qualification_start DESC
+    LIMIT 1
+  ), prev AS (
+    SELECT d.id
+    FROM distributions d
+    JOIN active a ON d.number = a.number - 1
+    LIMIT 1
+  ), prev_closed AS (
+    SELECT id
+    FROM distributions, now_utc n
+    WHERE qualification_end < n.now_ts
+    ORDER BY qualification_end DESC
+    LIMIT 1
+  )
+  SELECT
+    (SELECT id FROM active),
+    (SELECT number FROM active),
+    COALESCE((SELECT id FROM prev), (SELECT id FROM prev_closed))
+  INTO active_distribution_id, active_distribution_number, previous_distribution_id;
+
+  -- Winner-only gating: take an advisory lock per previous_distribution_id so only one
+  -- transaction checks and refreshes the MV. Others skip this section and proceed.
+  IF previous_distribution_id IS NOT NULL THEN
+    -- Use two-key advisory lock: namespace 918273645 and the distribution id (cast to int4).
+    -- Distribution ids are small in this system; cast is safe. Adjust if that changes.
+    IF pg_try_advisory_xact_lock(918273645, previous_distribution_id::int) THEN
+      -- Now safe to access the MV; non-winners won't block on MV locks.
+      IF NOT EXISTS (
+        SELECT 1 FROM private.send_scores_history h
+        WHERE h.distribution_id = previous_distribution_id
+        LIMIT 1
+      ) THEN
+        REFRESH MATERIALIZED VIEW private.send_scores_history;
+      END IF;
+    END IF;
+  END IF;
+
+  -- Insert tag registration verifications for the current active distribution once
+  IF active_distribution_id IS NOT NULL AND NOT EXISTS (
+    SELECT 1 FROM public.distribution_verifications dv
+    WHERE dv.distribution_id = active_distribution_id
+      AND dv.type = 'tag_registration'
+    LIMIT 1
+  ) THEN
+    PERFORM public.insert_tag_registration_verifications(active_distribution_number);
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.refresh_scores_on_distribution_change() FROM PUBLIC;
+GRANT ALL ON FUNCTION public.refresh_scores_on_distribution_change() TO service_role;
+
 -- Triggers
 CREATE OR REPLACE TRIGGER "insert_verification_send_ceiling_trigger" AFTER INSERT ON "public"."send_token_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."insert_verification_send_ceiling"();
 CREATE OR REPLACE TRIGGER "insert_verification_sends" AFTER INSERT ON "public"."send_token_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."insert_verification_sends"();
 CREATE OR REPLACE TRIGGER "insert_send_streak_verification" AFTER INSERT ON "public"."send_token_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."insert_send_streak_verification"();
+-- Single DEFERRABLE trigger that refreshes history and inserts tag registrations on distribution change
+CREATE CONSTRAINT TRIGGER "refresh_send_scores_on_first_transfer"
+AFTER INSERT ON "public"."send_token_transfers"
+DEFERRABLE INITIALLY DEFERRED
+FOR EACH ROW EXECUTE FUNCTION "public"."refresh_scores_on_distribution_change"();
+
 CREATE OR REPLACE TRIGGER "filter_send_token_transfers_with_no_send_account_created" BEFORE INSERT ON "public"."send_token_transfers" FOR EACH ROW EXECUTE FUNCTION "private"."filter_send_token_transfers_with_no_send_account_created"();

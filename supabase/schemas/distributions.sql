@@ -491,6 +491,7 @@ ALTER FUNCTION "public"."insert_tag_referral_verifications"("distribution_num" i
 CREATE OR REPLACE FUNCTION insert_tag_registration_verifications(distribution_num integer)
 RETURNS void AS $$
 BEGIN
+    -- Idempotent insert: avoid duplicating rows per (distribution_id, user_id, type, tag)
     INSERT INTO public.distribution_verifications(
         distribution_id,
         user_id,
@@ -505,20 +506,30 @@ BEGIN
             FROM distributions
             WHERE "number" = distribution_num
             LIMIT 1
-        ),
+        ) AS distribution_id,
         t.user_id,
-        'tag_registration'::public.verification_type,
-        jsonb_build_object('tag', t."name"),
+        'tag_registration'::public.verification_type AS type,
+        jsonb_build_object('tag', t."name") AS metadata,
         CASE
             WHEN LENGTH(t.name) >= 6 THEN 1
             WHEN LENGTH(t.name) = 5 THEN 2
             WHEN LENGTH(t.name) = 4 THEN 3 -- Increase reward value of shorter tags
             WHEN LENGTH(t.name) > 0  THEN 4
             ELSE 0
-        END,
-        t.created_at
+        END AS weight,
+        t.created_at AS created_at
     FROM tags t
-    INNER JOIN tag_receipts tr ON t.name = tr.tag_name;
+    INNER JOIN tag_receipts tr ON t.name = tr.tag_name
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM public.distribution_verifications dv
+        WHERE dv.distribution_id = (
+            SELECT id FROM distributions WHERE "number" = distribution_num LIMIT 1
+        )
+        AND dv.user_id = t.user_id
+        AND dv.type = 'tag_registration'::public.verification_type
+        AND dv.metadata->>'tag' = t.name
+    );
 END;
 $$ LANGUAGE plpgsql;
 
