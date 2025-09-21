@@ -411,23 +411,34 @@ BEGIN
         RAISE EXCEPTION 'offset_val must be greater than or equal to 0';
     END IF;
     RETURN query
+    WITH current_distribution_id AS (
+        -- Get current distribution once
+        SELECT id FROM distributions
+        WHERE qualification_start <= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+          AND qualification_end >= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+        ORDER BY qualification_start DESC
+        LIMIT 1
+    )
     SELECT
         -- send_id matches
 (
             SELECT
-                array_agg(ROW(sub.avatar_url, sub.tag_name, sub.send_id, sub.phone)::public.tag_search_result)
+                array_agg(ROW(sub.avatar_url, sub.tag_name, sub.send_id, sub.phone, sub.is_verified)::public.tag_search_result)
             FROM(
                 SELECT
                     p.avatar_url,
                     t.name AS tag_name,
                     p.send_id,
-                    NULL::text AS phone
+                    NULL::text AS phone,
+                    CASE WHEN ds.user_id IS NOT NULL THEN true ELSE false END AS is_verified
                 FROM
                     profiles p
                 LEFT JOIN send_accounts sa ON sa.user_id = p.id
                 LEFT JOIN send_account_tags sat ON sat.send_account_id = sa.id
                 LEFT JOIN tags t ON t.id = sat.tag_id
                     AND t.status = 'confirmed'
+                LEFT JOIN distribution_shares ds ON ds.user_id = p.id
+                LEFT JOIN current_distribution_id cdi ON cdi.id = ds.distribution_id
             WHERE
                 query SIMILAR TO '\d+'
                 AND p.send_id::varchar LIKE '%' || query || '%'
@@ -437,13 +448,14 @@ BEGIN
     -- tag matches
     (
         SELECT
-            array_agg(ROW(sub.avatar_url, sub.tag_name, sub.send_id, sub.phone)::public.tag_search_result)
+            array_agg(ROW(sub.avatar_url, sub.tag_name, sub.send_id, sub.phone, sub.is_verified)::public.tag_search_result)
         FROM (
             SELECT
                 ranked_matches.avatar_url,
                 ranked_matches.tag_name,
                 ranked_matches.send_id,
-                ranked_matches.phone
+                ranked_matches.phone,
+                ranked_matches.is_verified
             FROM (
                 WITH scores AS (
                     -- Aggregate user send scores, summing all scores for cumulative activity
@@ -459,6 +471,7 @@ BEGIN
                         t.name AS tag_name,
                         p.send_id,
                         NULL::text AS phone,
+                        CASE WHEN ds.user_id IS NOT NULL THEN true ELSE false END AS is_verified,
                         (t.name <-> query) AS distance,  -- Trigram distance: 0=exact, higher=different
                         COALESCE(scores.total_score, 0) AS send_score,
                         -- Compute exact match flag in CTE
@@ -471,6 +484,8 @@ BEGIN
                     JOIN tags t ON t.id = sat.tag_id
                         AND t.status = 'confirmed'
                     LEFT JOIN scores ON scores.user_id = p.id
+                    LEFT JOIN distribution_shares ds ON ds.user_id = p.id
+                    LEFT JOIN current_distribution_id cdi ON cdi.id = ds.distribution_id
                     WHERE
                         -- Use ILIKE '%' only when NOT exact to avoid excluding true exact matches like 'Ethen_'
                         LOWER(t.name) = LOWER(query)
@@ -481,6 +496,7 @@ BEGIN
                     tm.tag_name,
                     tm.send_id,
                     tm.phone,
+                    tm.is_verified,
                     tm.distance,
                     tm.send_score,
                     tm.is_exact,

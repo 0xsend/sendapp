@@ -35,7 +35,8 @@ CREATE TYPE "public"."tag_search_result" AS (
 	"avatar_url" "text",
 	"tag_name" "text",
 	"send_id" integer,
-	"phone" "text"
+	"phone" "text",
+    "is_verified" boolean
 );
 ALTER TYPE "public"."tag_search_result" OWNER TO "postgres";
 

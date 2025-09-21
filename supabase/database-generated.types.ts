@@ -2176,6 +2176,7 @@ export type Database = {
         tag_name: string | null
         send_id: number | null
         phone: string | null
+        is_verified: boolean | null
       }
     }
   }

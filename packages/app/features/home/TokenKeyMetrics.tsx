@@ -18,33 +18,33 @@ function MetricTile({
     if (change > 0)
       return (
         <Theme name="green_active">
-          <Paragraph
-            fontSize={'$2'}
-            fontWeight={400}
+          <XStack
             bc={'$color2'}
             $theme-dark={{ bc: 'rgba(134, 174, 128, 0.2)' }}
             $theme-light={{ bc: 'rgba(134, 174, 128, 0.16)' }}
             px={'$1.5'}
             br={'$2'}
           >
-            {formatted}
-          </Paragraph>
+            <Paragraph fontSize={'$2'} fontWeight={400}>
+              {formatted}
+            </Paragraph>
+          </XStack>
         </Theme>
       )
     if (change < 0)
       return (
         <Theme name="red_active">
-          <Paragraph
-            fontSize={'$2'}
-            fontWeight={400}
+          <XStack
             bc={'$color2'}
             $theme-dark={{ bc: 'rgba(229, 115, 115, 0.2)' }}
             $theme-light={{ bc: 'rgba(229, 115, 115, 0.16)' }}
             px={'$1.5'}
             br={'$2'}
           >
-            {formatted}
-          </Paragraph>
+            <Paragraph fontSize={'$2'} fontWeight={400}>
+              {formatted}
+            </Paragraph>
+          </XStack>
         </Theme>
       )
     return <Paragraph fontSize={'$2'}>{formatted}</Paragraph>
