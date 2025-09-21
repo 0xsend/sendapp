@@ -33,7 +33,7 @@ import { FormProvider } from 'react-hook-form'
 import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
 import { type Address, isAddress } from 'viem'
-import { IconAccount, IconArrowRight, IconSearch, IconX } from './icons'
+import { IconAccount, IconArrowRight, IconCheckCircle, IconSearch, IconX } from './icons'
 import { baseMainnet } from '@my/wagmi'
 import { useEnsName } from 'wagmi'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
@@ -478,21 +478,30 @@ function SearchResultRow({
               )}
             </Avatar>
             <YStack gap="$1">
-              <HighlightMatchingText
-                text={(() => {
-                  switch (keyField) {
-                    case 'phone_matches':
-                      return profile.phone ?? ''
-                    case 'tag_matches':
-                      return profile.tag_name ?? ''
-                    case 'send_id_matches':
-                      return `#${profile.send_id}`
-                    default:
-                      return ''
-                  }
-                })()}
-                highlight={query}
-              />
+              <XStack ai="center" gap="$2">
+                <HighlightMatchingText
+                  text={(() => {
+                    switch (keyField) {
+                      case 'phone_matches':
+                        return profile.phone ?? ''
+                      case 'tag_matches':
+                        return profile.tag_name ?? ''
+                      case 'send_id_matches':
+                        return `#${profile.send_id}`
+                      default:
+                        return ''
+                    }
+                  })()}
+                  highlight={query}
+                />
+                {profile.is_verified && (
+                  <IconCheckCircle
+                    size={15}
+                    color={'$primary'}
+                    $theme-light={{ color: '$color12' }}
+                  />
+                )}
+              </XStack>
               <Text
                 fontSize="$3"
                 $theme-light={{ color: '$darkGrayTextField' }}

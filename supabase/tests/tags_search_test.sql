@@ -86,7 +86,8 @@ select results_eq($$
         'alice_avatar', -- avatar_url
         'alice', -- tag_name
         $$ || :alice_send_id || $$, -- alice's send_id
-        null -- phone
+        null, -- phone,
+        false -- is_verified
       )::tag_search_result]
     ) $$, 'Tags should be visible to the authenticated user');
 
@@ -120,7 +121,8 @@ select results_eq($$
         'alice_avatar', -- avatar_url
         'alice', -- tag_name
         $$ || :alice_send_id || $$, -- alice's send_id
-        null -- phone
+        null, -- phone
+        false -- is_verified
       )::tag_search_result]
     ) $$, 'You can search by send_id');
 
