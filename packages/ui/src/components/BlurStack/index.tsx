@@ -1,4 +1,4 @@
-import type { GetProps, SizeTokens } from '@tamagui/core'
+import type { GetProps } from '@tamagui/core'
 import { styled } from '@tamagui/core'
 import { BlurView } from 'expo-blur'
 
@@ -97,7 +97,7 @@ export const BlurStack = styled(
   },
   {
     defaultProps: {
-      experimentalBlurMethod: 'dimezisBlurView',
+      experimentalBlurMethod: 'none',
       intensity: 10,
     },
   }
