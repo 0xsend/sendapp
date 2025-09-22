@@ -438,7 +438,7 @@ BEGIN
                 LEFT JOIN tags t ON t.id = sat.tag_id
                     AND t.status = 'confirmed'
                 LEFT JOIN distribution_shares ds ON ds.user_id = p.id
-                LEFT JOIN current_distribution_id cdi ON cdi.id = ds.distribution_id
+                    AND ds.distribution_id = (SELECT id FROM current_distribution_id)
             WHERE
                 query SIMILAR TO '\d+'
                 AND p.send_id::varchar LIKE '%' || query || '%'
@@ -485,7 +485,7 @@ BEGIN
                         AND t.status = 'confirmed'
                     LEFT JOIN scores ON scores.user_id = p.id
                     LEFT JOIN distribution_shares ds ON ds.user_id = p.id
-                    LEFT JOIN current_distribution_id cdi ON cdi.id = ds.distribution_id
+                        AND ds.distribution_id = (SELECT id FROM current_distribution_id)
                     WHERE
                         -- Use ILIKE '%' only when NOT exact to avoid excluding true exact matches like 'Ethen_'
                         LOWER(t.name) = LOWER(query)
