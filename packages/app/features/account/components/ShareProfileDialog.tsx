@@ -16,25 +16,31 @@ import { useUser } from 'app/utils/useUser'
 import * as Clipboard from 'expo-clipboard'
 import { Platform } from 'react-native'
 import { Copy } from '@tamagui/lucide-icons'
+import { memo, useMemo, useCallback } from 'react'
 
 interface ShareProfileDialogProps {
   isOpen: boolean
   onClose: () => void
 }
 
-export function ShareProfileDialog({ isOpen, onClose }: ShareProfileDialogProps) {
+export const ShareProfileDialog = memo<ShareProfileDialogProps>(function ShareProfileDialog({
+  isOpen,
+  onClose,
+}) {
   const { profile } = useUser()
   const tags = useConfirmedTags()
   const toast = useAppToast()
 
-  // Use sendtag if available, otherwise fall back to send_id
-  const sendtag = tags?.[0]?.name
-  const hostname = isWeb ? window.location.hostname : 'send.app'
-  const profileUrl = sendtag
-    ? `https://${hostname}/${sendtag}`
-    : `https://${hostname}/profile/${profile?.send_id}`
+  const sendtag = useMemo(() => tags?.[0]?.name, [tags])
+  const hostname = useMemo(() => (isWeb ? window.location.hostname : 'send.app'), [])
+  const profileUrl = useMemo(() => {
+    if (!profile?.send_id) return ''
+    return sendtag
+      ? `https://${hostname}/${sendtag}`
+      : `https://${hostname}/profile/${profile.send_id}`
+  }, [sendtag, hostname, profile?.send_id])
 
-  const handleCopyLink = async () => {
+  const handleCopyLink = useCallback(async () => {
     try {
       await Clipboard.setStringAsync(profileUrl)
       toast.show('Profile link copied to clipboard')
@@ -44,9 +50,18 @@ export function ShareProfileDialog({ isOpen, onClose }: ShareProfileDialogProps)
         message: 'Something went wrong while copying the link',
       })
     }
-  }
+  }, [profileUrl, toast, onClose])
 
-  // Shared content component to avoid duplication
+  const icons = useMemo(
+    () => ({
+      send: <IconSend size={'$5'} />,
+      copy: <Copy size={16} color={'$black'} />,
+    }),
+    []
+  )
+
+  if (!isOpen) return null
+
   const dialogContent = (
     <>
       <H2 size={'$8'} fontWeight={500}>
@@ -55,7 +70,7 @@ export function ShareProfileDialog({ isOpen, onClose }: ShareProfileDialogProps)
       <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
       {profileUrl && (
         <YStack ai={'center'} gap={'$3'}>
-          <QRCode value={profileUrl} size={240} centerComponent={<IconSend size={'$5'} />} />
+          <QRCode value={profileUrl} size={240} centerComponent={icons.send} />
           <Paragraph size={'$4'} color={'$color10'} ta={'center'} numberOfLines={1}>
             {profileUrl}
           </Paragraph>
@@ -68,9 +83,7 @@ export function ShareProfileDialog({ isOpen, onClose }: ShareProfileDialogProps)
         $gtLg={{ flexDirection: 'row-reverse' }}
       >
         <PrimaryButton onPress={handleCopyLink} f={Platform.OS === 'web' ? 1 : undefined}>
-          <PrimaryButton.Icon>
-            <Copy size={16} color={'$black'} />
-          </PrimaryButton.Icon>
+          <PrimaryButton.Icon>{icons.copy}</PrimaryButton.Icon>
           <PrimaryButton.Text>copy link</PrimaryButton.Text>
         </PrimaryButton>
         {Platform.OS === 'web' && (
@@ -123,4 +136,4 @@ export function ShareProfileDialog({ isOpen, onClose }: ShareProfileDialogProps)
       <Sheet.Overlay />
     </Sheet>
   )
-}
+})
