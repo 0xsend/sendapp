@@ -19,7 +19,7 @@ export const ProfileAboutTile = ({
           borderRadius={'$6'}
           padding={'$5'}
           gap={'$4'}
-          elevation={'$0.75'}
+          elevation={Platform.OS === 'android' ? undefined : '$0.75'}
         >
           <XStack ai="center" jc="space-between">
             {Platform.OS === 'web' && <Paragraph size={'$8'}>About</Paragraph>}
@@ -47,7 +47,7 @@ export const ProfileAboutTile = ({
             overflow="hidden"
             borderRadius={'$6'}
             position="relative"
-            elevation={'$0.75'}
+            elevation={Platform.OS === 'android' ? undefined : '$0.75'}
           >
             <Image
               width={'100%'}
@@ -105,7 +105,13 @@ export const ProfileAboutTile = ({
           <Paragraph>{profile.about}</Paragraph>
         </YStack>
         {Array.isArray(profile.links_in_bio) && profile.links_in_bio.length > 0 && (
-          <YStack bg={'$color1'} borderRadius={'$6'} padding={'$5'} gap={'$4'} elevation={'$0.75'}>
+          <YStack
+            bg={'$color1'}
+            borderRadius={'$6'}
+            padding={'$5'}
+            gap={'$4'}
+            elevation={Platform.OS === 'android' ? undefined : '$0.75'}
+          >
             <Paragraph size={'$6'} fontWeight="600">
               Links
             </Paragraph>

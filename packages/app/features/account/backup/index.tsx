@@ -215,7 +215,7 @@ const WebAuthnCred = ({
   })
 
   return (
-    <FadeCard elevation={'$0.75'}>
+    <FadeCard>
       <XStack jc="space-between" ai="center">
         <Paragraph
           testID={`passkey-${cred.display_name}`}

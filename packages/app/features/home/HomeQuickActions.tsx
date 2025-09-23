@@ -12,6 +12,7 @@ import { IconArrowUp, IconPlus, IconStacks } from 'app/components/icons'
 import { usdcCoin } from 'app/data/coins'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { Platform } from 'react-native'
 
 type HomeQuickActionsProps = XStackProps
 
@@ -28,7 +29,7 @@ const QuickActionButton = ({ href, children }: LinkableButtonProps) => {
 
   return (
     <LinkableButton
-      elevation={5}
+      elevation={Platform.OS === 'android' ? undefined : 5}
       href={href}
       f={1}
       height={'auto'}

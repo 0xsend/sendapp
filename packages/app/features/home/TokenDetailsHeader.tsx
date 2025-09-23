@@ -26,7 +26,13 @@ export const TokenDetailsHeader = () => {
 
   return (
     <YStack gap="$3" pb="$3">
-      <Card py="$5" px="$4" w={'100%'} jc={'space-between'} elevation={1}>
+      <Card
+        py="$5"
+        px="$4"
+        w={'100%'}
+        jc={'space-between'}
+        elevation={Platform.OS === 'android' ? undefined : 1}
+      >
         <YStack gap="$4">
           <XStack ai={'center'} gap={'$3'}>
             <IconCoin size={'$2'} symbol={coin.symbol} />
