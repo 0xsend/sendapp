@@ -33,11 +33,18 @@ export const BooleanCheckboxField = (
   const { resolvedTheme } = useThemeSetting()
   const themeName = (resolvedTheme ?? defaultTheme) as ThemeName
 
-  const [isChecked, setIsChecked] = useState(props.defaultChecked)
+  // Filter out props that shouldn't reach the DOM (e.g., enumValues from ts-react/form)
+  const {
+    labelProps: labelPropsIn,
+    enumValues: _enumValues,
+    ...checkboxProps
+  } = (props as unknown as CheckboxProps & { enumValues?: unknown; labelProps?: LabelProps }) || {}
+
+  const [isChecked, setIsChecked] = useState(checkboxProps.defaultChecked)
 
   useEffect(() => {
-    setIsChecked(props.defaultChecked)
-  }, [props.defaultChecked])
+    setIsChecked(checkboxProps.defaultChecked)
+  }, [checkboxProps.defaultChecked])
 
   return (
     <Theme name={error ? 'red' : themeName} forceClassName>
@@ -45,13 +52,13 @@ export const BooleanCheckboxField = (
         <XStack gap="$4" ai={'center'}>
           {!!label && (
             <Label
-              size={props.size || '$5'}
+              size={checkboxProps.size || '$5'}
               fontFamily={'$mono'}
               lineHeight={52}
               htmlFor={id}
               textTransform={'uppercase'}
-              color={props.labelProps?.color ?? '$olive'}
-              {...props.labelProps}
+              color={labelPropsIn?.color ?? '$olive'}
+              {...labelPropsIn}
             >
               {label} {isOptional && '(Optional)'}
             </Label>
@@ -68,7 +75,7 @@ export const BooleanCheckboxField = (
             borderWidth={0}
             backgroundColor={isChecked ? '$primary' : '$background'}
             circular={true}
-            {...props}
+            {...checkboxProps}
           >
             <Checkbox.Indicator>
               <Check color={'$black'} />
