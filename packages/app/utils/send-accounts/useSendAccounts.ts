@@ -70,13 +70,15 @@ export function sendAccountQueryOptions({
         return null
       }
 
+      // Use maybeSingle to avoid 406 (PGRST116) when no rows exist yet during onboarding
       const { data, error } = await supabase
         .from('send_accounts')
         .select('*, send_account_credentials(*, webauthn_credentials(*))')
-        .single()
+        .maybeSingle()
 
       if (error) {
-        // no rows
+        // No rows case is handled by maybeSingle() returning data=null without error,
+        // but keep this guard for defensive compatibility.
         if (error.code === 'PGRST116') {
           return null
         }

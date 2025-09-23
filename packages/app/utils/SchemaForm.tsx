@@ -77,8 +77,12 @@ const mapping = [
 ] as const
 
 const FormComponent = (props: FormProps & { footerProps?: YStackProps }) => {
+  // Avoid leaking non-DOM props like `footerProps` onto the underlying form element
+  const formOnlyProps = { ...(props as FormProps & { footerProps?: YStackProps }) }
+  ;(formOnlyProps as { footerProps?: undefined }).footerProps = undefined
+
   return (
-    <Form asChild {...props}>
+    <Form asChild {...formOnlyProps}>
       <FormWrapper tag="form">{props.children}</FormWrapper>
     </Form>
   )
