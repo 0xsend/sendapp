@@ -65,7 +65,7 @@ export const ReferralLink = memo<ButtonProps>(function ReferralLink(props) {
           message: 'We were unable to copy your referral link to the clipboard',
         })
       )
-  }, [referralHref, toast])
+  }, [referralHref, toast.show, toast.error])
 
   const handlePress = useCallback(
     (e) => {

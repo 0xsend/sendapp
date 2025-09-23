@@ -50,7 +50,7 @@ export const ShareProfileDialog = memo<ShareProfileDialogProps>(function SharePr
         message: 'Something went wrong while copying the link',
       })
     }
-  }, [profileUrl, toast, onClose])
+  }, [profileUrl, toast.show, onClose, toast.error])
 
   const icons = useMemo(
     () => ({
