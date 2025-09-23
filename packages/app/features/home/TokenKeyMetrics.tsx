@@ -2,6 +2,7 @@ import { Card, H4, Paragraph, Spinner, Theme, XStack, YStack } from '@my/ui'
 import { useCoingeckoCoin, useTokensMarketData } from 'app/utils/coin-gecko'
 import formatAmount from 'app/utils/formatAmount'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
+import { Platform } from 'react-native'
 
 function MetricTile({
   title,
@@ -54,7 +55,7 @@ function MetricTile({
     <Card
       padded
       size={'$5'}
-      elevation={1}
+      elevation={Platform.OS === 'android' ? undefined : 1}
       f={1}
       fb="48%"
       $xxs={{ fb: '100%' }}

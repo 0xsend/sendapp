@@ -224,7 +224,14 @@ export function InvestmentsBody() {
 
       {/* Summary cards under the header */}
       <XStack w={'100%'} gap={'$3'}>
-        <Card f={1} padded elevation={'$0.75'} jc={'center'} ai={'center'} w="100%">
+        <Card
+          f={1}
+          padded
+          elevation={Platform.OS === 'android' ? undefined : '$0.75'}
+          jc={'center'}
+          ai={'center'}
+          w="100%"
+        >
           <YStack gap={'$2'} jc={'center'} ai={'center'}>
             <Paragraph color={'$color10'} size={'$4'}>
               Today
@@ -258,7 +265,14 @@ export function InvestmentsBody() {
             )}
           </YStack>
         </Card>
-        <Card f={1} padded elevation={'$0.75'} jc={'center'} ai={'center'} w="100%">
+        <Card
+          f={1}
+          padded
+          elevation={Platform.OS === 'android' ? undefined : '$0.75'}
+          jc={'center'}
+          ai={'center'}
+          w="100%"
+        >
           <YStack gap={'$2'} jc={'center'} ai={'center'}>
             <Paragraph color={'$color10'} size={'$4'}>
               Total Return
@@ -279,7 +293,14 @@ export function InvestmentsBody() {
             )}
           </YStack>
         </Card>
-        <Card f={1} padded elevation={'$0.75'} jc={'center'} ai={'center'} w="100%">
+        <Card
+          f={1}
+          padded
+          elevation={Platform.OS === 'android' ? undefined : '$0.75'}
+          jc={'center'}
+          ai={'center'}
+          w="100%"
+        >
           <YStack gap={'$2'} jc={'center'} ai={'center'}>
             <Paragraph color={'$color10'} size={'$4'}>
               Investment

@@ -122,9 +122,9 @@ const SuggestionTile = ({
         gap={'$2'}
         mr={'$2'}
         $gtLg={{ mr: '$3.5' }}
-        elevation={Platform.OS === 'web' ? undefined : '$0.75'}
+        elevation={Platform.OS === 'ios' ? '$0.75' : undefined}
       >
-        <Avatar size="$7" br="$4" elevation={'$0.75'}>
+        <Avatar size="$7" br="$4" elevation={Platform.OS === 'android' ? undefined : '$0.75'}>
           {Platform.OS === 'android' && !avatarUrl ? (
             <Avatar.Image
               src={`https://ui-avatars.com/api/?name=${label}&size=256&format=png&background=86ad7f`}
