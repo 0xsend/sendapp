@@ -34,11 +34,13 @@ export const BooleanCheckboxField = (
   const themeName = (resolvedTheme ?? defaultTheme) as ThemeName
 
   // Filter out props that shouldn't reach the DOM (e.g., enumValues from ts-react/form)
-  const {
-    labelProps: labelPropsIn,
-    enumValues: _enumValues,
-    ...checkboxProps
-  } = (props as unknown as CheckboxProps & { enumValues?: unknown; labelProps?: LabelProps }) || {}
+  const { labelProps: labelPropsIn } =
+    (props as unknown as CheckboxProps & { enumValues?: unknown; labelProps?: LabelProps }) || {}
+  const checkboxProps = {
+    ...(props as unknown as CheckboxProps & { enumValues?: unknown; labelProps?: LabelProps }),
+  }
+  // Remove non-DOM prop to avoid leaking to Checkbox/web
+  ;(checkboxProps as { enumValues?: undefined }).enumValues = undefined
 
   const [isChecked, setIsChecked] = useState(checkboxProps.defaultChecked)
 

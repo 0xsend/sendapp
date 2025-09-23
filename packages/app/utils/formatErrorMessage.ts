@@ -1,10 +1,17 @@
-export const formatErrorMessage = (error: Error) => {
-  const message = error.message || ''
-  const statusCode = error?.response?.status || error?.status
-  const url = error?.response?.url || error?.config?.url || ''
+export const formatErrorMessage = (error: unknown) => {
+  type Httpish = {
+    message?: string
+    status?: number
+    response?: { status?: number; url?: string }
+    config?: { url?: string }
+  }
+  const e = (error as Httpish) || {}
+  const message = e.message || ''
+  const statusCode = e.response?.status ?? e.status
+  const url = e.response?.url || e.config?.url || ''
 
   // Network security blocking
-  if (statusCode >= 400 && statusCode < 500) {
+  if (typeof statusCode === 'number' && statusCode >= 400 && statusCode < 500) {
     if (url.includes('cloudflare')) {
       return 'Cloudflare is blocking this request. Try disabling your VPN or switching networks.'
     }
