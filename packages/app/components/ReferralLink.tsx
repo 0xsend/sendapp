@@ -10,18 +10,54 @@ import {
 } from '@my/ui'
 import { useUser } from 'app/utils/useUser'
 import { CheckCheck, Copy } from '@tamagui/lucide-icons'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, memo, useMemo, useCallback } from 'react'
 import * as Clipboard from 'expo-clipboard'
 
-export function ReferralLink(props: ButtonProps) {
+export const ReferralLink = memo<ButtonProps>(function ReferralLink(props) {
   const { profile } = useUser()
-  const send_id = profile?.send_id
-  const referralCode = profile?.main_tag?.name
-  const referralHref = `https://send.app?referral=${referralCode}`
   const toast = useAppToast()
   const [hasCopied, setHasCopied] = useState(false)
 
-  const copyAndMaybeShareOnPress = async () => {
+  const send_id = useMemo(() => profile?.send_id, [profile?.send_id])
+  const referralCode = useMemo(() => profile?.main_tag?.name, [profile?.main_tag?.name])
+  const referralHref = useMemo(
+    () => (referralCode ? `https://send.app?referral=${referralCode}` : ''),
+    [referralCode]
+  )
+
+  const icons = useMemo(
+    () => ({
+      copy: (
+        <Copy
+          size={16}
+          flexShrink={0}
+          $theme-dark={{ color: '$primary' }}
+          $theme-light={{ color: '$color12' }}
+        />
+      ),
+      checkCheck: (
+        <CheckCheck
+          size={16}
+          $theme-dark={{ color: '$primary' }}
+          $theme-light={{ color: '$color12' }}
+          key="referral-link-icon"
+          animation="bouncy"
+          flexShrink={0}
+          enterStyle={{
+            opacity: 0,
+            scale: 0.9,
+          }}
+          exitStyle={{
+            opacity: 0,
+            scale: 0.9,
+          }}
+        />
+      ),
+    }),
+    []
+  )
+
+  const copyAndMaybeShareOnPress = useCallback(async () => {
     await Clipboard.setStringAsync(referralHref)
       .then(() => toast.show('Copied your referral link to the clipboard'))
       .catch(() =>
@@ -29,13 +65,23 @@ export function ReferralLink(props: ButtonProps) {
           message: 'We were unable to copy your referral link to the clipboard',
         })
       )
-  }
+  }, [referralHref, toast.show, toast.error])
+
+  const handlePress = useCallback(
+    (e) => {
+      e.preventDefault()
+      setHasCopied(true)
+      void copyAndMaybeShareOnPress()
+    },
+    [copyAndMaybeShareOnPress]
+  )
 
   useEffect(() => {
     if (hasCopied) {
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         setHasCopied(false)
       }, 2000)
+      return () => clearTimeout(timeoutId)
     }
   }, [hasCopied])
 
@@ -67,11 +113,7 @@ export function ReferralLink(props: ButtonProps) {
         focusStyle={{
           backgroundColor: 'transparent',
         }}
-        onPress={(e) => {
-          e.preventDefault()
-          setHasCopied(true)
-          copyAndMaybeShareOnPress()
-        }}
+        onPress={handlePress}
         {...props}
       >
         <ButtonText size={'$5'} color={'$color10'} flexShrink={0}>
@@ -90,34 +132,10 @@ export function ReferralLink(props: ButtonProps) {
         </ButtonText>
         <ButtonIcon>
           <AnimatePresence exitBeforeEnter>
-            {hasCopied ? (
-              <CheckCheck
-                size={16}
-                $theme-dark={{ color: '$primary' }}
-                $theme-light={{ color: '$color12' }}
-                key="referral-link-icon"
-                animation="bouncy"
-                flexShrink={0}
-                enterStyle={{
-                  opacity: 0,
-                  scale: 0.9,
-                }}
-                exitStyle={{
-                  opacity: 0,
-                  scale: 0.9,
-                }}
-              />
-            ) : (
-              <Copy
-                size={16}
-                flexShrink={0}
-                $theme-dark={{ color: '$primary' }}
-                $theme-light={{ color: '$color12' }}
-              />
-            )}
+            {hasCopied ? icons.checkCheck : icons.copy}
           </AnimatePresence>
         </ButtonIcon>
       </Button>
     </XStack>
   )
-}
+})
