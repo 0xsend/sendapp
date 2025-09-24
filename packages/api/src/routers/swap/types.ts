@@ -83,3 +83,22 @@ export const KyberEncodeRouteResponseSchema = z.object({
     routerAddress: addressLower,
   }),
 })
+
+// Estimate amountIn for a desired amountOut (EXACT_OUT)
+export const EstimateAmountInFromAmountOutRequestSchema = z.object({
+  tokenIn: z.string(),
+  tokenOut: z.string(),
+  amountOut: z.string(),
+})
+export type EstimateAmountInFromAmountOutRequest = z.infer<
+  typeof EstimateAmountInFromAmountOutRequestSchema
+>
+
+export const EstimateAmountInFromAmountOutResponseSchema = z.object({
+  estimatedAmountIn: z.string(),
+  amountInUsd: z.string(),
+  amountOutUsd: z.string(),
+})
+export type EstimateAmountInFromAmountOutResponse = z.infer<
+  typeof EstimateAmountInFromAmountOutResponseSchema
+>
