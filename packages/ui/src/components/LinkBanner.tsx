@@ -19,7 +19,7 @@ export const LinkBanner = ({ href, imgUrl, subtitle, title }: LinkBannerProps) =
 
   const content = (
     <Card
-      elevation={'$0.75'}
+      elevation={Platform.OS === 'android' ? undefined : '$0.75'}
       w={'100%'}
       h={200}
       p={'$5'}

@@ -4,20 +4,26 @@ import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { ChevronRight } from '@tamagui/lucide-icons'
 import { Linking, Platform, Pressable } from 'react-native'
 import { useLink } from 'solito/link'
+import { memo, useCallback, useMemo } from 'react'
 
-export function AccountNavLink({
-  text,
-  icon,
-  href,
-  onPress,
-  ...props
-}: {
+export const AccountNavLink = memo<{
   text: string
   href?: string
   icon: ReactNode
   target?: string
   onPress?: () => void
-}): ReactElement | null {
+}>(function AccountNavLink({ text, icon, href, onPress, ...props }): ReactElement | null {
+  const isExternalLink = useMemo(
+    () => (href ? href.startsWith('http://') || href.startsWith('https://') : false),
+    [href]
+  )
+
+  const handleExternalLink = useCallback(() => {
+    if (href) {
+      void Linking.openURL(href)
+    }
+  }, [href])
+
   if (onPress) {
     return (
       <Pressable onPress={onPress}>
@@ -30,12 +36,10 @@ export function AccountNavLink({
     return null
   }
 
-  const isExternalLink = href.startsWith('http://') || href.startsWith('https://')
-
   // Handle external links
   if (isExternalLink && Platform.OS !== 'web') {
     return (
-      <Pressable onPress={() => Linking.openURL(href)}>
+      <Pressable onPress={handleExternalLink}>
         <LinkContent icon={icon} text={text} />
       </Pressable>
     )
@@ -50,26 +54,22 @@ export function AccountNavLink({
   }
 
   return <NativeAccountNavLink icon={icon} text={text} href={href} />
-}
+})
 
-const NativeAccountNavLink = ({
-  text,
-  icon,
-  href,
-}: {
+const NativeAccountNavLink = memo<{
   text: string
   icon: ReactNode
   href: string
-}) => {
+}>(function NativeAccountNavLink({ text, icon, href }) {
   const linkProps = useLink({ href })
   return (
     <XStack {...linkProps}>
       <LinkContent icon={icon} text={text} />
     </XStack>
   )
-}
+})
 
-const LinkContent = ({ text, icon }: { text: string; icon: ReactNode }) => {
+const LinkContent = memo<{ text: string; icon: ReactNode }>(function LinkContent({ text, icon }) {
   const hoverStyles = useHoverStyles()
 
   return (
@@ -94,4 +94,4 @@ const LinkContent = ({ text, icon }: { text: string; icon: ReactNode }) => {
       />
     </XStack>
   )
-}
+})

@@ -28,7 +28,6 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
 import { type BRAND, z } from 'zod'
-import { convertAmountToUSD } from 'app/utils/convertAmountToUSD'
 import { Platform } from 'react-native'
 
 const SwapFormSchema = z.object({
@@ -49,26 +48,40 @@ export const SwapFormScreen = () => {
   const { outToken, inToken, inAmount, slippage } = swapParams
   const { coin: inCoin } = useCoin(inToken)
   const { coin: outCoin } = useCoin(outToken)
-  const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
   const hoverStyles = useHoverStyles()
   const { resolvedTheme } = useThemeSetting()
   const queryClient = useQueryClient()
 
-  const {
-    data: swapRoute,
-    error: swapRouteError,
-    isFetching: isFetchingRoute,
-  } = api.swap.fetchSwapRoute.useQuery(
-    {
-      tokenIn: inCoin?.token || '',
-      tokenOut: outCoin?.token || '',
-      amountIn: inAmount || '',
-    },
-    {
-      enabled: Boolean(inCoin && outCoin && inAmount),
-      refetchInterval: 20_000,
-    }
+  // Track which side the user is editing
+  const [quoteSide, setQuoteSide] = useState<'EXACT_IN' | 'EXACT_OUT'>('EXACT_IN')
+
+  const sanitizedOutWei =
+    outCoin && form.getValues().outAmount
+      ? sanitizeAmount(form.getValues().outAmount, outCoin.decimals)?.toString()
+      : undefined
+
+  // Debounce outAmount (sanitized) before driving EXACT_OUT queries
+  const [debouncedOutWei, setDebouncedOutWei] = useState<string | undefined>(undefined)
+  const updateDebouncedOutWei = useDebounce(
+    useCallback((value?: string) => {
+      setDebouncedOutWei(value && value.length > 0 ? value : undefined)
+    }, []),
+    300,
+    { leading: false },
+    []
   )
+  useEffect(() => {
+    if (quoteSide === 'EXACT_OUT') {
+      updateDebouncedOutWei(sanitizedOutWei)
+    } else {
+      // cancel and clear when not editing outAmount
+      updateDebouncedOutWei.cancel?.()
+      setDebouncedOutWei(undefined)
+    }
+  }, [quoteSide, sanitizedOutWei, updateDebouncedOutWei])
+
+  // Compute per-direction inputs
+  const amountOutForQuery = quoteSide === 'EXACT_OUT' ? debouncedOutWei || '' : ''
 
   const formOutAmount = form.watch('outAmount')
   const formInAmount = form.watch('inAmount')
@@ -76,39 +89,91 @@ export const SwapFormScreen = () => {
 
   const parsedInAmount = BigInt(swapParams.inAmount ?? '0')
   const parsedSlippage = Number(slippage || 0)
-  const inAmountUsd = formatAmount(swapRoute?.routeSummary.amountInUsd)
-  const outAmountUsd = formatAmount(swapRoute?.routeSummary.amountOutUsd)
+
+  const {
+    data: estimate,
+    error: estimateError,
+    isFetching: isEstimating,
+  } = api.swap.estimateAmountInFromAmountOut.useQuery(
+    {
+      tokenIn: inCoin?.token || '',
+      tokenOut: outCoin?.token || '',
+      amountOut: amountOutForQuery || '',
+    },
+    {
+      enabled: Boolean(inCoin && outCoin && quoteSide === 'EXACT_OUT' && amountOutForQuery),
+      staleTime: 10_000,
+    }
+  )
+
+  const {
+    data: swapRoute,
+    isFetching: isFetchingSwap,
+    refetch: refetchSwap,
+  } = api.swap.fetchSwapRoute.useQuery(
+    {
+      tokenIn: inCoin?.token || '',
+      tokenOut: outCoin?.token || '',
+      amountIn: inAmount || '',
+    },
+    {
+      enabled: Boolean(quoteSide === 'EXACT_IN' && inCoin && outCoin && inAmount),
+      refetchInterval: 20_000,
+    }
+  )
+
+  const displaySummary = swapRoute?.routeSummary
+  const inAmountUsd = formatAmount(
+    quoteSide === 'EXACT_OUT' ? estimate?.amountInUsd : displaySummary?.amountInUsd
+  )
+  const outAmountUsd = formatAmount(
+    quoteSide === 'EXACT_OUT' ? estimate?.amountOutUsd : displaySummary?.amountOutUsd
+  )
   const isDarkTheme = resolvedTheme?.startsWith('dark')
 
   const canSubmit =
     !isLoadingCoins &&
-    !isFetchingRoute &&
+    !(
+      (quoteSide === 'EXACT_IN' && isFetchingSwap) ||
+      (quoteSide === 'EXACT_OUT' && isEstimating)
+    ) &&
     inCoin?.balance !== undefined &&
     inAmount !== undefined &&
     inCoin.balance >= parsedInAmount &&
-    parsedInAmount > BigInt(0) &&
-    swapRoute
+    parsedInAmount > BigInt(0)
 
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (
-      <SubmitButton onPress={submit} disabled={!canSubmit}>
-        <SubmitButton.Text>review</SubmitButton.Text>
+      <SubmitButton
+        onPress={submit}
+        disabled={!canSubmit || (quoteSide === 'EXACT_IN' ? isFetchingSwap : isEstimating)}
+      >
+        {(quoteSide === 'EXACT_IN' ? isFetchingSwap : isEstimating) ? (
+          <>
+            <Spinner size="small" color="$color12" mr={'$2'} />
+            <SubmitButton.Text>loading</SubmitButton.Text>
+          </>
+        ) : (
+          <SubmitButton.Text>review</SubmitButton.Text>
+        )}
       </SubmitButton>
     ),
-    [canSubmit]
+    [canSubmit, isFetchingSwap, isEstimating, quoteSide]
   )
 
   const insufficientAmount =
     inCoin?.balance !== undefined && inAmount !== undefined && parsedInAmount > inCoin?.balance
 
-  const handleSubmit = () => {
-    if (!canSubmit || !swapRoute) return
+  const handleSubmit = async () => {
+    if (!canSubmit) return
+    if (!inCoin || !outCoin || !swapParams.inAmount) return
 
-    queryClient.setQueryDefaults([SWAP_ROUTE_SUMMARY_QUERY_KEY], {
-      gcTime: 20 * 60_000, // 20 minutes
-      staleTime: 10 * 1000, // 10 seconds
-    })
-    queryClient.setQueryData([SWAP_ROUTE_SUMMARY_QUERY_KEY], swapRoute.routeSummary)
+    // Always refetch to ensure the freshest swap route on submit
+    const res = await refetchSwap()
+    const routeSummary = res.data?.routeSummary || null
+    if (!routeSummary) return
+
+    queryClient.setQueryData([SWAP_ROUTE_SUMMARY_QUERY_KEY], routeSummary)
 
     router.push({
       pathname: '/trade/summary',
@@ -122,30 +187,50 @@ export const SwapFormScreen = () => {
   }
 
   const handleFlipTokens = () => {
-    const { inToken: _inToken, outToken: _outToken } = form.getValues()
+    const { inToken: _inToken, outToken: _outToken, outAmount: _outAmount } = form.getValues()
+
+    // Move out -> in
     form.setValue('inToken', _outToken)
+    form.setValue('inAmount', _outAmount || '')
+
+    // Move in -> out (clear amount to avoid showing stale value while route loads)
     form.setValue('outToken', _inToken)
+    form.setValue('outAmount', '')
+
+    // After flip, drive quoting from inAmount (EXACT_IN) so outAmount recomputes
+    setQuoteSide('EXACT_IN')
   }
 
   const onFormChange = useDebounce(
     useCallback(
       (values) => {
         const { inAmount, outToken, inToken, slippage } = values
-
         const sanitizedInAmount = sanitizeAmount(inAmount, allCoinsDict[inToken]?.decimals)
+        const nextInWei = sanitizedInAmount ? sanitizedInAmount.toString() : undefined
 
-        setSwapParams(
-          {
-            ...swapParams,
-            inAmount: sanitizedInAmount ? sanitizedInAmount.toString() : undefined,
-            inToken,
-            outToken,
-            slippage,
-          },
-          { webBehavior: 'replace' }
-        )
+        // For EXACT_OUT, avoid writing inAmount here to prevent duplicate fetches.
+        const nextInWeiToWrite = quoteSide === 'EXACT_OUT' ? swapParams.inAmount : nextInWei
+
+        // Only write URL params when they actually change to avoid router thrash
+        if (
+          nextInWeiToWrite !== swapParams.inAmount ||
+          inToken !== swapParams.inToken ||
+          outToken !== swapParams.outToken ||
+          slippage !== swapParams.slippage
+        ) {
+          setSwapParams(
+            {
+              ...swapParams,
+              inAmount: nextInWeiToWrite,
+              inToken,
+              outToken,
+              slippage,
+            },
+            { webBehavior: 'replace' }
+          )
+        }
       },
-      [swapParams, setSwapParams]
+      [swapParams, setSwapParams, quoteSide]
     ),
     300,
     { leading: false },
@@ -160,6 +245,34 @@ export const SwapFormScreen = () => {
     [form.clearErrors, form.setValue]
   )
 
+  // Debounced writer for EXACT_OUT URL param updates
+  const writeExactOutParams = useDebounce(
+    useCallback(
+      (payload: {
+        inWei: string
+        inToken: `0x${string}` | 'eth'
+        outToken: `0x${string}` | 'eth'
+        slippage: number
+      }) => {
+        const { inWei, inToken: inTok, outToken: outTok, slippage: sl } = payload
+        setSwapParams(
+          {
+            ...swapParams,
+            inAmount: inWei,
+            inToken: inTok,
+            outToken: outTok,
+            slippage: String(sl),
+          },
+          { webBehavior: 'replace' }
+        )
+      },
+      [swapParams, setSwapParams]
+    ),
+    300,
+    { leading: false },
+    []
+  )
+
   useEffect(() => {
     const subscription = form.watch((values) => {
       onFormChange(values)
@@ -171,26 +284,75 @@ export const SwapFormScreen = () => {
     }
   }, [form.watch, onFormChange])
 
+  // When editing inAmount, derive outAmount from swap route (write only on change)
   useEffect(() => {
-    if (!swapRoute || !formInAmount) {
-      return
-    }
-
-    form.setValue(
-      'outAmount',
-      localizeAmount(
-        formatAmount(
-          formatUnits(BigInt(swapRoute.routeSummary.amountOut), outCoin?.decimals || 0),
-          12,
-          outCoin?.formatDecimals
-        )
+    if (quoteSide !== 'EXACT_IN') return
+    if (!swapRoute || !formInAmount) return
+    const nextOutDisplay = localizeAmount(
+      formatAmount(
+        formatUnits(BigInt(swapRoute.routeSummary.amountOut), outCoin?.decimals || 0),
+        12,
+        outCoin?.formatDecimals
       )
     )
-  }, [swapRoute, outCoin?.decimals, form.setValue, formInAmount, outCoin?.formatDecimals])
+    const prevOutDisplay = form.getValues().outAmount
+    if (nextOutDisplay !== prevOutDisplay) {
+      form.setValue('outAmount', nextOutDisplay)
+    }
+  }, [
+    swapRoute,
+    outCoin?.decimals,
+    form.setValue,
+    form.getValues,
+    formInAmount,
+    outCoin?.formatDecimals,
+    quoteSide,
+  ])
+
+  // When editing outAmount, estimate required inAmount (server computed)
+  useEffect(() => {
+    if (quoteSide !== 'EXACT_OUT') return
+    if (!estimate || !outCoin || !inCoin) return
+    const inWei = BigInt(estimate.estimatedAmountIn || '0')
+    const nextInDisplay = localizeAmount(
+      formatAmount(formatUnits(inWei, inCoin.decimals || 0), 12, 2)
+    )
+    const prevInDisplay = form.getValues().inAmount
+    const prevInWei = swapParams.inAmount
+    if (nextInDisplay !== prevInDisplay) {
+      form.setValue('inAmount', nextInDisplay)
+    }
+    // Only write URL params when actual wei changed (debounced)
+    if (inWei.toString() !== prevInWei) {
+      writeExactOutParams({
+        inWei: inWei.toString(),
+        inToken,
+        outToken,
+        slippage: Number(slippage || DEFAULT_SLIPPAGE),
+      })
+    }
+  }, [
+    estimate,
+    outCoin,
+    inCoin,
+    form.setValue,
+    form.getValues,
+    quoteSide,
+    writeExactOutParams,
+    swapParams,
+    inToken,
+    outToken,
+    slippage,
+  ])
 
   useEffect(() => {
     queryClient.removeQueries({ queryKey: [SWAP_ROUTE_SUMMARY_QUERY_KEY] })
-  }, [queryClient.removeQueries])
+    return () => {
+      // cancel debounced writer on unmount
+      writeExactOutParams.cancel?.()
+      updateDebouncedOutWei.cancel?.()
+    }
+  }, [queryClient.removeQueries, writeExactOutParams, updateDebouncedOutWei])
 
   return (
     <YStack
@@ -253,13 +415,11 @@ export const SwapFormScreen = () => {
               onChangeText: (amount) => {
                 const localizedInAmount = localizeAmount(amount)
                 form.setValue('inAmount', localizedInAmount)
-
+                setQuoteSide('EXACT_IN')
                 if (!amount) {
                   form.setValue('outAmount', '')
                 }
               },
-              onFocus: () => setIsInputFocused(true),
-              onBlur: () => setIsInputFocused(false),
               fieldsetProps: {
                 width: '60%',
               },
@@ -307,8 +467,15 @@ export const SwapFormScreen = () => {
               fieldsetProps: {
                 width: '60%',
               },
-              disabled: true,
-              pointerEvents: 'none',
+              inputMode: outCoin?.decimals ? 'decimal' : 'numeric',
+              onChangeText: (amount) => {
+                const localizedOutAmount = localizeAmount(amount)
+                form.setValue('outAmount', localizedOutAmount)
+                setQuoteSide('EXACT_OUT')
+                if (!amount) {
+                  form.setValue('inAmount', '')
+                }
+              },
               textOverflow: 'ellipsis',
             },
             inToken: {
@@ -383,9 +550,9 @@ export const SwapFormScreen = () => {
                           left={0}
                           right={0}
                           height={1}
-                          backgroundColor={isInputFocused ? '$primary' : '$darkGrayTextField'}
+                          backgroundColor={'$darkGrayTextField'}
                           $theme-light={{
-                            backgroundColor: isInputFocused ? '$color12' : '$silverChalice',
+                            backgroundColor: '$silverChalice',
                           }}
                         />
                       </XStack>
@@ -535,9 +702,10 @@ export const SwapFormScreen = () => {
                       <XStack height={'$2'} ai={'center'}>
                         {(() => {
                           switch (true) {
-                            case isFetchingRoute || isLoadingCoins:
+                            case (quoteSide === 'EXACT_IN' ? isFetchingSwap : isEstimating) ||
+                              isLoadingCoins:
                               return <Spinner color="$color11" />
-                            case !outCoin || !swapRoute?.routeSummary?.amountOut:
+                            case !outCoin || !outAmountUsd:
                               return (
                                 <Paragraph
                                   size={'$5'}
@@ -554,16 +722,7 @@ export const SwapFormScreen = () => {
                                   color={'$lightGrayTextField'}
                                   $theme-light={{ color: '$darkGrayTextField' }}
                                 >
-                                  $
-                                  {formatAmount(
-                                    convertAmountToUSD(
-                                      BigInt(swapRoute.routeSummary.amountOut),
-                                      outCoin.decimals,
-                                      1
-                                    ),
-                                    12,
-                                    2
-                                  )}
+                                  {outAmountUsd ? `$${outAmountUsd}` : '$0'}
                                 </Paragraph>
                               )
                             default:
@@ -621,8 +780,8 @@ export const SwapFormScreen = () => {
                   switch (true) {
                     case !!form.formState.errors?.slippage:
                       return form.formState.errors.slippage.message
-                    case !!swapRouteError:
-                      return swapRouteError.message
+                    case !!estimateError:
+                      return estimateError.message
                     default:
                       return ''
                   }

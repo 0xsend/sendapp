@@ -97,7 +97,7 @@ export const LinkInBioScreen = () => {
 
   const socialLinksForm = (
     <YStack gap={'$5'}>
-      <FadeCard elevation={'$0.75'}>
+      <FadeCard>
         {errorMessage && (
           <Paragraph marginBottom={'$5'} theme="red" color="$color9">
             {errorMessage}

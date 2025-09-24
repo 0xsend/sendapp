@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import Intercom, { Visibility } from '@intercom/intercom-react-native'
 
 export default function useIntercom() {
@@ -15,9 +15,9 @@ export default function useIntercom() {
     void initializeIntercom()
   }, [])
 
-  const openChat = () => {
+  const openChat = useCallback(() => {
     void Intercom.present()
-  }
+  }, [])
 
   return { openChat }
 }

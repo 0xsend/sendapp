@@ -3,9 +3,10 @@ import { TRPCError } from '@trpc/server'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { address } from 'app/utils/zod'
-import debug from 'debug'
 import { isAddress, isAddressEqual } from 'viem'
 import { createTRPCRouter, protectedProcedure } from '../../trpc'
+import debug from 'debug'
+import { allCoinsDict } from 'app/data/coins'
 import {
   type KyberEncodeRouteRequest,
   KyberEncodeRouteRequestSchema,
@@ -13,6 +14,7 @@ import {
   type KyberGetSwapRouteRequest,
   KyberGetSwapRouteRequestSchema,
   KyberGetSwapRouteResponseSchema,
+  EstimateAmountInFromAmountOutRequestSchema,
 } from './types'
 
 const log = debug('api:routers:swap')
@@ -159,6 +161,16 @@ const encodeKyberSwapRoute = async ({
   }
 }
 
+const getDecimalsFromCoins = (token: string) => {
+  // Prefer coin registry (includes 'eth')
+  const coin = (allCoinsDict as Record<string, { decimals?: number }>)[token]
+  if (coin?.decimals !== undefined) return coin.decimals
+  if (token === 'eth') return 18
+  // Fallback: assume 18 if unknown (conservative default)
+  log('decimals lookup fallback: assuming 18 for', token)
+  return 18
+}
+
 export const swapRouter = createTRPCRouter({
   fetchSwapRoute: protectedProcedure
     .input(KyberGetSwapRouteRequestSchema)
@@ -176,5 +188,60 @@ export const swapRouter = createTRPCRouter({
         recipient,
       })
       return await encodeKyberSwapRoute({ routeSummary, slippageTolerance, sender, recipient })
+    }),
+  estimateAmountInFromAmountOut: protectedProcedure
+    .input(EstimateAmountInFromAmountOutRequestSchema)
+    .query(async ({ input: { tokenIn, tokenOut, amountOut } }) => {
+      log('estimateAmountInFromAmountOut input', { tokenIn, tokenOut, amountOut })
+      try {
+        const desiredOut = BigInt(amountOut)
+        if (desiredOut <= 0n) {
+          throw new Error('Invalid amountOut')
+        }
+        const decimalsIn = getDecimalsFromCoins(tokenIn)
+        const probeIn = BigInt(10) ** BigInt(decimalsIn)
+        const probe = await fetchKyberSwapRoute({
+          tokenIn,
+          tokenOut,
+          amountIn: probeIn.toString(),
+        })
+        const outProbe = BigInt(probe.routeSummary.amountOut || '0')
+        if (outProbe === 0n) {
+          throw new Error('Probe quote returned zero amountOut')
+        }
+        const estimatedAmountIn = (desiredOut * probeIn) / outProbe || 1n
+
+        // Estimate USD values linearly from probe quote
+        const inUsdProbe = Number(probe.routeSummary.amountInUsd || '0')
+        const outUsdProbe = Number(probe.routeSummary.amountOutUsd || '0')
+        const probeInNum = Number(probeIn)
+        const outProbeNum = Number(outProbe)
+        const estimatedAmountInNum = Number(estimatedAmountIn)
+        const desiredOutNum = Number(desiredOut)
+
+        const amountInUsd = probeInNum > 0 ? (inUsdProbe / probeInNum) * estimatedAmountInNum : 0
+        const amountOutUsd = outProbeNum > 0 ? (outUsdProbe / outProbeNum) * desiredOutNum : 0
+
+        log('estimateAmountInFromAmountOut result', {
+          decimalsIn,
+          probeIn: probeIn.toString(),
+          outProbe: outProbe.toString(),
+          desiredOut: desiredOut.toString(),
+          estimatedAmountIn: estimatedAmountIn.toString(),
+          amountInUsd: amountInUsd.toFixed(6),
+          amountOutUsd: amountOutUsd.toFixed(6),
+        })
+        return {
+          estimatedAmountIn: estimatedAmountIn.toString(),
+          amountInUsd: amountInUsd.toFixed(6),
+          amountOutUsd: amountOutUsd.toFixed(6),
+        }
+      } catch (error) {
+        log('Error in estimateAmountInFromAmountOut', error)
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to estimate amountIn.',
+        })
+      }
     }),
 })

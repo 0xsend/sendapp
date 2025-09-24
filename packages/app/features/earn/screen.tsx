@@ -22,6 +22,7 @@ import { formatUnits } from 'viem'
 import type { SendEarnBalance } from './hooks'
 import { useSendEarn } from './providers/SendEarnProvider'
 import { useThemeName } from 'tamagui'
+import { Platform } from 'react-native'
 
 const log = debug('app:earn:screen')
 
@@ -168,7 +169,7 @@ const EarningsCallToAction = () => {
   return (
     <Fade>
       <Card
-        elevation={'$0.75'}
+        elevation={Platform.OS === 'android' ? undefined : '$0.75'}
         w={'100%'}
         p={'$5'}
         gap={'$7'}
@@ -216,7 +217,7 @@ const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) =
   return (
     <Fade>
       <Card
-        elevation={'$0.75'}
+        elevation={Platform.OS === 'android' ? undefined : '$0.75'}
         w={'100%'}
         p={'$5'}
         gap={'$5'}

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import Intercom, { hide, show } from '@intercom/messenger-js-sdk'
 
 export default function useIntercom() {
@@ -17,9 +17,9 @@ export default function useIntercom() {
     }
   }, [])
 
-  const openChat = () => {
+  const openChat = useCallback(() => {
     show()
-  }
+  }, [])
 
   return { openChat }
 }

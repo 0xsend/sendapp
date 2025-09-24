@@ -23,18 +23,13 @@ module.exports = (api) => {
       ],
       // if you want reanimated support
       'react-native-reanimated/plugin',
-      // eslint-disable-next-line no-undef
-      ...(process.env.EAS_BUILD_PLATFORM === 'android'
-        ? []
-        : [
-            [
-              '@tamagui/babel-plugin',
-              {
-                components: ['@my/ui', 'tamagui'],
-                config: './tamagui.config.ts',
-              },
-            ],
-          ]),
+      [
+        '@tamagui/babel-plugin',
+        {
+          components: ['@my/ui', 'tamagui'],
+          config: './tamagui.config.ts',
+        },
+      ],
     ],
   }
 }

@@ -121,7 +121,12 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
               About
             </Paragraph>
           ) : null}
-          <Card gap="$4" size={media.gtMd ? '$7' : '$5'} padded elevation={1}>
+          <Card
+            gap="$4"
+            size={media.gtMd ? '$7' : '$5'}
+            padded
+            elevation={Platform.OS === 'android' ? undefined : 1}
+          >
             <XStack jc="space-between" w="100%">
               {Platform.OS === 'android' && !otherUserProfile?.avatar_url ? (
                 <XStack
@@ -385,7 +390,13 @@ const Vibes = ({
 const LinksInBio = ({ profile }: { profile: Functions<'profile_lookup'>[number] }) => {
   const media = useMedia()
   return (
-    <Card elevation={1} padded size={media.gtMd ? '$7' : '$5'} borderRadius="$6" gap="$4">
+    <Card
+      elevation={Platform.OS === 'android' ? undefined : 1}
+      padded
+      size={media.gtMd ? '$7' : '$5'}
+      borderRadius="$6"
+      gap="$4"
+    >
       {profile?.links_in_bio?.map((link) => {
         return <LinkInBio link={link} key={`lets-connect-${link.domain}${link.handle}`} />
       })}

@@ -1,7 +1,6 @@
 import { AccountNavLink } from './AccountNavLink'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
-import type { PropsWithChildren, ReactNode } from 'react'
-import { type ColorTokens, Fade, PrimaryButton, type SizeTokens, YGroup, YStack } from '@my/ui'
+import { type ColorTokens, PrimaryButton, type SizeTokens, YGroup, YStack } from '@my/ui'
 import {
   IconAccount,
   IconDollar,
@@ -16,6 +15,8 @@ import {
 } from 'app/components/icons'
 import { RowLabel } from 'app/components/layout/RowLabel'
 import useIntercom from 'app/utils/intercom/useIntercom'
+import { memo, useCallback, useMemo } from 'react'
+import { Platform } from 'react-native'
 
 const iconProps = {
   size: '$1.5' as SizeTokens,
@@ -25,105 +26,84 @@ const iconProps = {
   },
 }
 
-const ACCOUNT_LINKS: {
-  [category: string]: {
-    text: string
-    key: string
-    href?: string
-    icon: ReactNode
-    target?: string
-    onPress?: () => void
-  }[]
-} = {
-  Settings: [
-    {
-      text: 'Profile',
-      key: 'account-link-profile',
-      href: '/account/edit-profile',
-      icon: <IconAccount {...iconProps} />,
-    },
-    {
-      text: 'Personal Information',
-      key: 'account-link-personal-info',
-      href: '/account/personal-info',
-      icon: <IconIdCard {...iconProps} />,
-    },
-    {
-      text: 'Link In Bio',
-      key: 'account-link-link-in-bio',
-      href: '/account/link-in-bio',
-      icon: <IconXLogo {...iconProps} />,
-    },
-    {
-      text: 'Passkeys',
-      key: 'account-link-passkeys',
-      href: '/account/backup',
-      icon: <IconFingerprint {...iconProps} />,
-    },
-    {
-      text: 'Sendtags',
-      key: 'account-link-sendtags',
-      href: '/account/sendtag',
-      icon: <IconSlash {...iconProps} />,
-    },
-    {
-      text: 'Rewards',
-      key: 'account-link-rewards',
-      href: '/rewards',
-      icon: <IconStarOutline {...iconProps} />,
-    },
-    {
-      text: 'Referrals',
-      key: 'account-link-referrals',
-      href: '/account/affiliate',
-      icon: <IconDollar {...iconProps} scale={1.2} />,
-    },
-  ],
-  Support: [
-    {
-      text: 'Learn more about Send',
-      key: 'account-link-learn-more',
-      href: 'https://support.send.app/en/',
-      icon: <IconInfoCircle {...iconProps} />,
-      target: '_blank',
-    },
-  ],
-}
-
-export function AccountLinks(): JSX.Element {
+export const AccountLinks = memo(function AccountLinks(): JSX.Element {
   const supabase = useSupabase()
   const { openChat } = useIntercom()
 
-  const _links = {
-    ...ACCOUNT_LINKS,
-    Support: [
-      ...(ACCOUNT_LINKS.Support || []),
-      {
-        text: 'Live Chat Support',
-        key: 'account-link-live-chat-support',
-        icon: <IconQuestionCircle {...iconProps} />,
-        onPress: openChat,
-      },
-    ],
-  }
+  const handleSignOut = useCallback(() => {
+    void supabase.auth.signOut()
+  }, [supabase.auth.signOut])
+
+  const icons = useMemo(
+    () => ({
+      account: <IconAccount {...iconProps} />,
+      idCard: <IconIdCard {...iconProps} />,
+      xLogo: <IconXLogo {...iconProps} />,
+      fingerprint: <IconFingerprint {...iconProps} />,
+      slash: <IconSlash {...iconProps} />,
+      starOutline: <IconStarOutline {...iconProps} />,
+      dollar: <IconDollar {...iconProps} scale={1.2} />,
+      infoCircle: <IconInfoCircle {...iconProps} />,
+      questionCircle: <IconQuestionCircle {...iconProps} />,
+    }),
+    []
+  )
+
+  const elevation = useMemo(() => (Platform.OS === 'android' ? undefined : '$0.75'), [])
 
   return (
     <YStack gap={'$5'} pb={'$3.5'}>
-      {Object.entries(_links).map(([category, links]) => {
-        return (
-          <YStack key={category} gap={'$3.5'}>
-            <RowLabel>{category}</RowLabel>
-            <LinksGroup>
-              {links.map(({ key, ...props }) => (
-                <YGroup.Item key={key}>
-                  <AccountNavLink {...props} />
-                </YGroup.Item>
-              ))}
-            </LinksGroup>
-          </YStack>
-        )
-      })}
-      <PrimaryButton onPress={() => supabase.auth.signOut()}>
+      <YStack gap={'$3.5'}>
+        <RowLabel>Settings</RowLabel>
+        <YGroup elevation={elevation} bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }}>
+          <YGroup.Item>
+            <AccountNavLink text="Profile" href="/account/edit-profile" icon={icons.account} />
+          </YGroup.Item>
+          <YGroup.Item>
+            <AccountNavLink
+              text="Personal Information"
+              href="/account/personal-info"
+              icon={icons.idCard}
+            />
+          </YGroup.Item>
+          <YGroup.Item>
+            <AccountNavLink text="Link In Bio" href="/account/link-in-bio" icon={icons.xLogo} />
+          </YGroup.Item>
+          <YGroup.Item>
+            <AccountNavLink text="Passkeys" href="/account/backup" icon={icons.fingerprint} />
+          </YGroup.Item>
+          <YGroup.Item>
+            <AccountNavLink text="Sendtags" href="/account/sendtag" icon={icons.slash} />
+          </YGroup.Item>
+          <YGroup.Item>
+            <AccountNavLink text="Rewards" href="/rewards" icon={icons.starOutline} />
+          </YGroup.Item>
+          <YGroup.Item>
+            <AccountNavLink text="Referrals" href="/account/affiliate" icon={icons.dollar} />
+          </YGroup.Item>
+        </YGroup>
+      </YStack>
+      <YStack gap={'$3.5'}>
+        <RowLabel>Support</RowLabel>
+        <YGroup elevation={elevation} bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }}>
+          <YGroup.Item>
+            <AccountNavLink
+              text="Learn more about Send"
+              href="https://support.send.app/en/"
+              target="_blank"
+              icon={icons.infoCircle}
+            />
+          </YGroup.Item>
+          <YGroup.Item>
+            <AccountNavLink
+              text="Live Chat Support"
+              onPress={openChat}
+              icon={icons.questionCircle}
+            />
+          </YGroup.Item>
+        </YGroup>
+      </YStack>
+      <PrimaryButton onPress={handleSignOut}>
         <PrimaryButton.Icon>
           <IconLogout {...iconProps} color={'$black'} />
         </PrimaryButton.Icon>
@@ -131,14 +111,4 @@ export function AccountLinks(): JSX.Element {
       </PrimaryButton>
     </YStack>
   )
-}
-
-const LinksGroup = ({ children }: PropsWithChildren) => {
-  return (
-    <Fade>
-      <YGroup elevation={'$0.75'} bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }}>
-        {children}
-      </YGroup>
-    </Fade>
-  )
-}
+})
