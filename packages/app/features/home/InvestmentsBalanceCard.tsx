@@ -14,7 +14,7 @@ import {
   type ButtonProps,
   Button,
 } from '@my/ui'
-import formatAmount from 'app/utils/formatAmount'
+import formatAmount, { localizeAmount } from 'app/utils/formatAmount'
 import { ChevronLeft, ChevronRight } from '@tamagui/lucide-icons'
 import { useIsPriceHidden } from './utils/useIsPriceHidden'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
@@ -29,6 +29,7 @@ import { useMemo } from 'react'
 import { IconCoin, IconError } from 'app/components/icons'
 import { useCoins } from 'app/provider/coins'
 import { formatUnits } from 'viem'
+import { calculatePercentageChange } from './utils/calculatePercentageChange'
 import { HomeBodyCard } from './screen'
 import { Platform } from 'react-native'
 import { useRouter } from 'solito/router'
@@ -333,9 +334,7 @@ function InvestmentsWeeklyDelta() {
           ? md.price_change_percentage_7d_in_currency
           : 0) ?? 0
 
-      // Calculate the actual dollar change from 7 days ago to now
-      const previousValue = value / (1 + pct7d / 100)
-      const actualChange = value - previousValue
+      const actualChange = calculatePercentageChange(value, pct7d)
 
       return sum + actualChange
     }, 0)
@@ -361,9 +360,10 @@ function InvestmentsWeeklyDelta() {
     )
 
   const sign = deltaUSD >= 0 ? '+' : '-'
+  const formattedDeltaUSD = localizeAmount(Math.abs(deltaUSD).toFixed(2))
   return (
     <Paragraph color={'$color10'} fontWeight={400} size={'$5'}>
-      {`${sign}$${Math.abs(deltaUSD).toFixed(2)} this week`}
+      {`${sign}$${formattedDeltaUSD} this week`}
     </Paragraph>
   )
 }
