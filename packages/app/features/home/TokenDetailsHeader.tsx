@@ -138,7 +138,9 @@ const TokenDetailsBalance = ({
   const mainUSDBalance = balanceInUSD ?? 0
   let usdDelta = 0
   if (changePercent24h !== null && mainUSDBalance) {
-    usdDelta = (mainUSDBalance * changePercent24h) / 100
+    // Calculate the actual dollar change from 24h ago to now
+    const previousValue = mainUSDBalance / (1 + changePercent24h / 100)
+    usdDelta = mainUSDBalance - previousValue
   }
 
   const changeBadge = (() => {
