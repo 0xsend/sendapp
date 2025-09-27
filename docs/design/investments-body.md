@@ -17,7 +17,7 @@ Implemented behavior:
   - Investments subscreen: InvestmentsPortfolioCard (wraps Card) has no onPress; clicking the card does not close the subscreen.
 - The card header shows “Portfolio Value”. The primary Invest button appears in the card footer (label: “INVEST”) and opens the CoinSheet (on web the sheet handle reads “New Investments”).
 - A portfolio-wide weighted 7d percentage pill is displayed next to the balance (green for positive, red for negative), implemented by InvestmentsBalanceCard.Aggregate.
-- A weekly USD delta summary shows “+$X.XX this week”, implemented by InvestmentsBalanceCard.WeeklyDelta (aggregated via 7d percent; falls back to 24h if 7d is unavailable).
+- A weekly USD delta summary shows “+$X.XX this week”, implemented by InvestmentsBalanceCard.WeeklyDelta (actual dollar change computed as current_usd - previous_usd, where previous_usd = current_usd / (1 + pct/100); uses 7d percent when available, falling back to 24h).
 - Three summary cards appear below the header: Today (implemented), Total Return (placeholder), Investment (placeholder).
 - A “Your Holdings” section header precedes the holdings list.
 
@@ -56,7 +56,7 @@ Note: This updates the earlier plan-only draft; the features above are implement
 ### Summary Cards
 - Today (implemented)
   - Shows the portfolio USD delta over the past 24h and a small percent pill for the weighted 24h change.
-  - Calculation: For each owned investment asset, usd_value * pct_change_24h; sum across assets for the USD delta. The 24h percent is a value-weighted average.
+  - Calculation: For each asset, previous_usd = current_usd / (1 + pct_change_24h/100); change_usd = current_usd - previous_usd; USD delta is the sum of change_usd across assets. The 24h percent is a value-weighted average.
 - Total Return (placeholder)
   - Placeholder component and copy.
 - Investment (placeholder)
@@ -118,7 +118,7 @@ Note: This updates the earlier plan-only draft; the features above are implement
   - Exports InvestmentsBalanceCard (Home) and InvestmentsPortfolioCard (InvestmentsBody) via withStaticProperties, sharing Body/Footer/Aggregate/WeeklyDelta/Balance.
   - Balance: displays total investment USD balance; respects privacy and loading states.
   - Aggregate: computes and renders the weighted 7d percentage pill.
-  - WeeklyDelta: shows “+$X.XX this week” using 7d percent aggregation.
+  - WeeklyDelta: shows “+$X.XX this week” as an actual dollar change using the previous-value method derived from 7d percent (fallback to 24h).
 - packages/app/features/home/screen.tsx (InvestmentsBody)
   - Composes the header card, summary cards, holdings list, and CoinSheet.
   - Computes delta24hUSD and pct24h for the “Today” card.
@@ -129,4 +129,27 @@ Note: This updates the earlier plan-only draft; the features above are implement
   - Aggregates prices by token address; falls back to DexScreener if CoinGecko errors.
 - packages/app/features/home/TokenAbout.tsx and TokenKeyMetrics.tsx
   - Section heading styles used as references for “Your Holdings”.
+
+## Fix USD delta to use previous value
+
+Why:
+Prior code multiplied current value by the percent change, which
+overstated the dollar delta. The correct delta is current minus
+previous value, where previous = current / (1 + pct/100). Apply this
+for 24h and 7d computations. Also comment out placeholder UI elements
+on the Investments screen.
+
+Affected files:
+- packages/app/features/home/InvestmentsBalanceCard.tsx
+- packages/app/features/home/TokenDetailsHeader.tsx
+- packages/app/features/home/screen.tsx
+
+Test plan:
+- Confirm staged hunks are as intended:
+  git --no-pager diff --cached --stat
+- Sanity check with a sample: if current=110 and pct=10, previous
+  should be 100 and delta should be 10 (not 11).
+- Launch the app and open Home/Investments screens; verify 24h and
+  7d USD deltas reflect actual dollar changes and UI renders without
+  the commented placeholders.
 

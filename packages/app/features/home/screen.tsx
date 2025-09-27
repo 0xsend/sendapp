@@ -192,7 +192,12 @@ export function InvestmentsBody() {
     })
 
     const total = assets.reduce((s, a) => s + a.value, 0)
-    const delta = assets.reduce((s, a) => s + (a.value * a.pct24h) / 100, 0)
+    const delta = assets.reduce((s, a) => {
+      // Calculate the actual dollar change from 24h ago to now
+      const previousValue = a.value / (1 + a.pct24h / 100)
+      const actualChange = a.value - previousValue
+      return s + actualChange
+    }, 0)
     const weightedPct =
       total === 0 ? 0 : assets.reduce((s, a) => s + (a.value / total) * a.pct24h, 0)
     return { delta24hUSD: delta, pct24h: weightedPct }
@@ -274,20 +279,20 @@ export function InvestmentsBody() {
           w="100%"
         >
           <YStack gap={'$2'} jc={'center'} ai={'center'}>
-            <Paragraph color={'$color10'} size={'$4'}>
+            {/* <Paragraph color={'$color10'} size={'$4'}>
               Total Return
-            </Paragraph>
+            </Paragraph> */}
             {isLoadingMarket ? (
               <Spinner size={'small'} />
             ) : (
               <YStack ai={'center'} gap={'$2'}>
-                <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
+                {/* <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
                   —
-                </Paragraph>
+                </Paragraph> */}
                 <XStack bc={'$color2'} px={'$1.5'} br={'$2'}>
-                  <Paragraph fontSize={'$2'} fontWeight={400}>
+                  {/* <Paragraph fontSize={'$2'} fontWeight={400}>
                     —
-                  </Paragraph>
+                  </Paragraph> */}
                 </XStack>
               </YStack>
             )}
@@ -302,20 +307,20 @@ export function InvestmentsBody() {
           w="100%"
         >
           <YStack gap={'$2'} jc={'center'} ai={'center'}>
-            <Paragraph color={'$color10'} size={'$4'}>
+            {/* <Paragraph color={'$color10'} size={'$4'}>
               Investment
-            </Paragraph>
+            </Paragraph> */}
             {isLoadingMarket ? (
               <Spinner size={'small'} />
             ) : (
               <YStack ai={'center'} gap={'$2'}>
-                <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
+                {/* <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
                   —
-                </Paragraph>
+                </Paragraph> */}
                 <XStack bc={'$color2'} px={'$1.5'} br={'$2'}>
-                  <Paragraph fontSize={'$2'} fontWeight={400}>
+                  {/* <Paragraph fontSize={'$2'} fontWeight={400}>
                     —
-                  </Paragraph>
+                  </Paragraph> */}
                 </XStack>
               </YStack>
             )}

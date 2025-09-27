@@ -332,7 +332,12 @@ function InvestmentsWeeklyDelta() {
         md.price_change_percentage_7d_in_currency !== null
           ? md.price_change_percentage_7d_in_currency
           : 0) ?? 0
-      return sum + (value * pct7d) / 100
+
+      // Calculate the actual dollar change from 7 days ago to now
+      const previousValue = value / (1 + pct7d / 100)
+      const actualChange = value - previousValue
+
+      return sum + actualChange
     }, 0)
   }, [marketData, coins])
 
