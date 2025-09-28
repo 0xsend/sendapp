@@ -11,15 +11,15 @@ export const EarnTerms = ({ hasError }: { hasError?: boolean }) => {
   return (
     <Paragraph flexShrink={1} maxWidth={'100%'} {...colorProps}>
       I accept{' '}
-      <TermsLink href="https://info.send.it/send-docs/legal/terms-of-service" {...colorProps}>
+      <TermsLink href="https://info.send.it/docs/legal/terms-of-service" {...colorProps}>
         Terms of Service
       </TermsLink>
       ,{' '}
-      <TermsLink href="https://info.send.it/send-docs/legal/privacy-policy" {...colorProps}>
+      <TermsLink href="https://info.send.it/docs/legal/privacy-policy" {...colorProps}>
         Privacy Policy
       </TermsLink>{' '}
       &{' '}
-      <TermsLink href="https://info.send.it/send-docs/legal/disclaimer" {...colorProps}>
+      <TermsLink href="https://info.send.it/docs/legal/disclaimer" {...colorProps}>
         Disclaimer of the Send Earn Program
       </TermsLink>
     </Paragraph>
