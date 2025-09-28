@@ -1,22 +1,10 @@
-import {
-  Card,
-  Fade,
-  Image,
-  LinearGradient,
-  Paragraph,
-  PrimaryButton,
-  Separator,
-  Spinner,
-  XStack,
-  YStack,
-} from '@my/ui'
-import { IconArrowRight, IconStacks } from 'app/components/icons'
+import { Card, Fade, Paragraph, PrimaryButton, Separator, Spinner, XStack, YStack } from '@my/ui'
+import { IconStacks } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { Row } from 'app/features/earn/components/Row'
 import formatAmount from 'app/utils/formatAmount'
 import debug from 'debug'
 import { type ReactNode, useMemo } from 'react'
-import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
 import type { SendEarnBalance } from './hooks'
@@ -26,7 +14,7 @@ import { Platform } from 'react-native'
 
 const log = debug('app:earn:screen')
 
-export function EarnScreen({ images }: { images: Record<string, string> }) {
+export function EarnScreen() {
   const { allBalances, isLoading } = useSendEarn()
 
   if (isLoading) {
@@ -41,18 +29,9 @@ export function EarnScreen({ images }: { images: Record<string, string> }) {
   // Convert undefined to null for type safety
   const balancesData = allBalances.data ?? null
 
-  const detailsSection = (
-    <DetailsSection hasActiveDeposits={hasActiveDeposits} balances={balancesData} />
-  )
-  const learnSection = <LearnSection learnImage={images.learn || ''} />
-
-  const sections = hasActiveDeposits
-    ? [detailsSection, learnSection]
-    : [learnSection, detailsSection]
-
   return (
-    <YStack w={'100%'} gap={'$4'} pb={'$3'} $gtLg={{ w: '50%' }}>
-      {sections}
+    <YStack w={'100%'} $gtLg={{ w: '50%' }}>
+      <DetailsSection hasActiveDeposits={hasActiveDeposits} balances={balancesData} />
     </YStack>
   )
 }
@@ -96,70 +75,6 @@ const Badge = ({ text }: { text: string }) => {
       <IconStacks size={'$2'} color="$primary" $theme-light={{ color: '$color12' }} />
       <Paragraph size={'$5'}>{text}</Paragraph>
     </XStack>
-  )
-}
-
-const LearnSection = ({ learnImage }: { learnImage: string }) => {
-  return (
-    <Fade>
-      <Link href="https://info.send.it/send-docs/features-and-products/send-earn">
-        <Card
-          w={'100%'}
-          h={300}
-          p={'$5'}
-          ai={'flex-start'}
-          gap={'$7'}
-          jc={'space-between'}
-          $gtLg={{ p: '$7' }}
-          overflow={'hidden'}
-        >
-          <Card.Background>
-            <Image
-              src={learnImage}
-              alt={'Send Earn'}
-              width={'100%'}
-              height={'100%'}
-              objectFit={'cover'}
-            />
-          </Card.Background>
-          <LinearGradient
-            start={[0, 0]}
-            end={[0, 1]}
-            fullscreen
-            colors={['transparent', 'rgba(0,0,0,0.4)']}
-          >
-            <YStack position="absolute" top={0} left={0} bottom={0} right={0} />
-          </LinearGradient>
-          <XStack
-            backgroundColor={'$oliveDrab'}
-            px={'$3.5'}
-            py={'$2'}
-            br={'$4'}
-            gap={'$2'}
-            ai={'center'}
-          >
-            <IconCoin symbol={'USDC'} size={'$2'} />
-            <Paragraph color={'$white'} size={'$5'}>
-              Deposits
-            </Paragraph>
-          </XStack>
-          <YStack width={'100%'}>
-            <Paragraph color={'$white'} size={'$9'}>
-              Start Growing
-            </Paragraph>
-            <Paragraph color={'$white'} size={'$9'}>
-              Your USDC Savings
-            </Paragraph>
-            <XStack mt={'$3'} ai={'center'} jc={'space-between'}>
-              <Paragraph color={'$white'} size={'$5'}>
-                Learn How It Works
-              </Paragraph>
-              <IconArrowRight size={'$2'} color={'$primary'} />
-            </XStack>
-          </YStack>
-        </Card>
-      </Link>
-    </Fade>
   )
 }
 
