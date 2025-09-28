@@ -2,7 +2,7 @@ import type { Session, SessionContext as SessionContextHelper } from '@supabase/
 import { AuthError, type User } from '@supabase/supabase-js'
 import { supabase } from 'app/utils/supabase/client.native'
 import { router, useSegments } from 'expo-router'
-import { createContext, useEffect, useState } from 'react'
+import { createContext, useEffect, useMemo, useState } from 'react'
 import { Platform } from 'react-native'
 import type { AuthProviderProps } from './AuthProvider'
 
@@ -39,34 +39,34 @@ export const AuthProvider = ({ children, initialSession }: AuthProviderProps) =>
     }
   }, [])
 
-  return (
-    <SessionContext.Provider
-      value={
-        session
-          ? {
-              session,
-              isLoading: false,
-              error: null,
-              supabaseClient: supabase,
-            }
-          : error
-            ? {
-                error,
-                isLoading: false,
-                session: null,
-                supabaseClient: supabase,
-              }
-            : {
-                error: null,
-                isLoading,
-                session: null,
-                supabaseClient: supabase,
-              }
+  const contextValue = useMemo(() => {
+    if (session) {
+      return {
+        session,
+        isLoading: false as const,
+        error: null,
+        supabaseClient: supabase,
       }
-    >
-      {children}
-    </SessionContext.Provider>
-  )
+    }
+
+    if (error) {
+      return {
+        error,
+        isLoading: false as const,
+        session: null,
+        supabaseClient: supabase,
+      }
+    }
+
+    return {
+      error: null,
+      isLoading,
+      session: null,
+      supabaseClient: supabase,
+    }
+  }, [session, error, isLoading])
+
+  return <SessionContext.Provider value={contextValue}>{children}</SessionContext.Provider>
 }
 
 export function useProtectedRoute(user: User | null) {
