@@ -114,6 +114,7 @@ export const ReferralLink = memo<ButtonProps>(function ReferralLink(props) {
           backgroundColor: 'transparent',
         }}
         onPress={handlePress}
+        flexWrap="wrap"
         {...props}
       >
         <ButtonText size={'$5'} color={'$color10'} flexShrink={0}>

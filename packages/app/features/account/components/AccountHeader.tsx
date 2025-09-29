@@ -1,19 +1,37 @@
-import { Avatar, Button, Fade, FadeCard, Paragraph, Separator, XStack, YStack } from '@my/ui'
+import {
+  Avatar,
+  Button,
+  Fade,
+  FadeCard,
+  Paragraph,
+  Separator,
+  Tooltip,
+  XStack,
+  YStack,
+  Theme,
+} from '@my/ui'
 import type { YStackProps } from 'tamagui'
-import { IconAccount, IconQRFull, IconShare } from 'app/components/icons'
+import {
+  IconAccount,
+  IconCheckCircle,
+  IconInfoCircle,
+  IconQRFull,
+  IconShare,
+} from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
 import { ReferralLink } from 'app/components/ReferralLink'
 import { lazy, memo, Suspense, useCallback, useMemo, useState } from 'react'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { Link } from 'solito/link'
 import { Platform, Share } from 'react-native'
+import { ChevronRight } from '@tamagui/lucide-icons'
 
 const ShareProfileDialog = lazy(() =>
   import('./ShareProfileDialog').then((module) => ({ default: module.ShareProfileDialog }))
 )
 
 export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
-  const { profile } = useUser()
+  const { profile, distributionShares } = useUser()
   const [shareDialogOpen, setShareDialogOpen] = useState(false)
   const hoverStyles = useHoverStyles()
 
@@ -37,6 +55,11 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
     []
   )
 
+  const isVerified = useMemo(
+    () => distributionShares[0] && distributionShares[0].amount > 0n,
+    [distributionShares]
+  )
+
   const handleSharePress = useCallback(async () => {
     if (!referralHref) return
 
@@ -52,6 +75,21 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
   const handleCloseDialog = useCallback(() => {
     setShareDialogOpen(false)
   }, [])
+
+  // Verification status icon component
+  const VerificationIcon = () => {
+    if (isVerified) {
+      return (
+        <IconCheckCircle size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
+      )
+    }
+
+    return (
+      <Theme name="red">
+        <IconInfoCircle bc={'$color0'} color={'$color8'} size={'$1.5'} br={9999} />
+      </Theme>
+    )
+  }
 
   const avatarContent = useMemo(() => {
     if (Platform.OS === 'android' && !avatar_url) {
@@ -82,16 +120,76 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
           $gtLg={{ p: '$7', gap: '$5' }}
           elevation={'$0.75'}
         >
+          <ChevronRight
+            position="absolute"
+            right={'$3'}
+            top={'$3'}
+            size={'$1'}
+            color={'$lightGrayTextField'}
+            $theme-light={{ color: '$darkGrayTextField' }}
+          />
           <XStack gap={'$3.5'}>
-            <Avatar size={'$7'} br={'$4'}>
-              {avatarContent}
-            </Avatar>
+            <XStack position="relative">
+              {!isVerified ? (
+                <Tooltip placement={'bottom'} delay={0}>
+                  <Tooltip.Content
+                    enterStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
+                    exitStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
+                    scale={1}
+                    x={0}
+                    y={0}
+                    opacity={1}
+                    animation={[
+                      'quick',
+                      {
+                        opacity: {
+                          overshootClamping: true,
+                        },
+                      },
+                    ]}
+                    boc={'$error'}
+                    borderWidth={1}
+                    $theme-dark={{ bc: '$black' }}
+                    $theme-light={{ bc: '$white' }}
+                  >
+                    <Tooltip.Arrow borderColor={'$error'} bw={4} />
+                    <Paragraph
+                      size={'$4'}
+                      $theme-dark={{ col: '$white' }}
+                      $theme-light={{ col: '$black' }}
+                    >
+                      Not verified
+                    </Paragraph>
+                  </Tooltip.Content>
+                  <Tooltip.Trigger>
+                    <XStack position="relative" onPress={(e) => e.preventDefault()}>
+                      <Avatar size={'$7'} br={'$4'}>
+                        {avatarContent}
+                      </Avatar>
+                      <XStack position="absolute" top={-10} right={-10} ai="center" jc="center">
+                        <VerificationIcon />
+                      </XStack>
+                    </XStack>
+                  </Tooltip.Trigger>
+                </Tooltip>
+              ) : (
+                <XStack position="relative">
+                  <Avatar size={'$7'} br={'$4'}>
+                    {avatarContent}
+                  </Avatar>
+                  <XStack position="absolute" top={-10} right={-10} ai="center" jc="center">
+                    <VerificationIcon />
+                  </XStack>
+                </XStack>
+              )}
+            </XStack>
+
             <YStack jc={'space-between'} f={1}>
               <Paragraph size={'$8'} fontWeight={600} numberOfLines={1}>
                 {name || '---'}
               </Paragraph>
               <Separator width="100%" borderColor="$decay" />
-              <ReferralLink p={0} />
+              <ReferralLink p={0} w="100%" jc="flex-start" />
             </YStack>
           </XStack>
         </FadeCard>
