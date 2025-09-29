@@ -45,7 +45,7 @@ export const useUser = () => {
   const queryFn = useCallback(async () => {
     const { data, error } = await supabase
       .from('profiles')
-      .select('*, tags(*), main_tag(*), links_in_bio(*)')
+      .select('*, tags(*), main_tag(*), links_in_bio(*), distribution_shares(*)')
       .eq('id', user?.id ?? '')
       .single()
 
@@ -98,6 +98,7 @@ export const useUser = () => {
     tags: profile?.tags,
     mainTag: profile?.main_tag,
     linksInBio: profile?.links_in_bio || [],
+    distributionShares: profile?.distribution_shares || [],
     updateProfile: refetch,
     isLoadingSession,
     isLoadingProfile,
