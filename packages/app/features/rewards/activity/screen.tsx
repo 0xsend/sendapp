@@ -196,9 +196,8 @@ const DistributionRequirementsCard = ({
 
   if (snapshotBalanceError) throw snapshotBalanceError
 
-  const sendTagRegistrations = verifications?.verification_values?.reduce(
-    (acc, curr) => acc + (curr.type === 'tag_registration' ? 1 : 0),
-    0
+  const sendTagPurchased = verifications?.verification_values?.some(
+    (v) => v.type === 'tag_registration' && v.weight > 0n
   )
 
   return (
@@ -232,7 +231,7 @@ const DistributionRequirementsCard = ({
         <YStack gap="$2" ai={'flex-end'}>
           <XStack ai="center" gap="$2">
             <Paragraph>Sendtag Purchased</Paragraph>
-            {sendTagRegistrations ? (
+            {sendTagPurchased ? (
               <CheckCircle2 color={isDark ? '$primary' : '$color12'} size={'$1.5'} />
             ) : (
               <Theme name="red">
