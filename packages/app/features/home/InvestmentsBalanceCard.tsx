@@ -321,6 +321,7 @@ function InvestmentsAggregate() {
 function InvestmentsWeeklyDelta() {
   const coins = useCoins().investmentCoins.filter((c) => c?.balance && c.balance > 0n)
   const { data: marketData, isLoading, isError } = useTokensMarketData()
+  const { isPriceHidden } = useIsPriceHidden()
 
   const deltaUSD = useMemo(() => {
     if (!marketData?.length) return 0
@@ -363,7 +364,7 @@ function InvestmentsWeeklyDelta() {
   const formattedDeltaUSD = localizeAmount(Math.abs(deltaUSD).toFixed(2))
   return (
     <Paragraph color={'$color10'} fontWeight={400} size={'$5'}>
-      {`${sign}$${formattedDeltaUSD} this week`}
+      {isPriceHidden ? '///////' : `${sign}$${formattedDeltaUSD} this week`}
     </Paragraph>
   )
 }
