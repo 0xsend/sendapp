@@ -1043,6 +1043,15 @@ CREATE POLICY "Authenticated users can see distribution_verification_values" ON 
 ALTER TABLE ONLY "public"."send_slash" ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Enable read access for all users" ON "public"."send_slash" FOR SELECT USING (true);
 
+-- Functions for relationships
+CREATE OR REPLACE FUNCTION "public"."distribution_shares"("public"."profiles") RETURNS SETOF "public"."distribution_shares"
+    LANGUAGE "sql" STABLE
+    AS $_$
+    SELECT * FROM distribution_shares WHERE user_id = $1.id
+$_$;
+
+ALTER FUNCTION "public"."distribution_shares"("public"."profiles") OWNER TO "postgres";
+
 -- Function grants
 REVOKE ALL ON FUNCTION "public"."calculate_and_insert_send_ceiling_verification"("distribution_number" integer) FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."calculate_and_insert_send_ceiling_verification"("distribution_number" integer) TO "service_role";
@@ -1093,5 +1102,7 @@ REVOKE ALL ON FUNCTION "public"."insert_verification_send_ceiling"() FROM PUBLIC
 REVOKE ALL ON FUNCTION "public"."insert_verification_send_ceiling"() FROM authenticated;
 GRANT ALL ON FUNCTION "public"."insert_verification_send_ceiling"() TO service_role;
 
-REVOKE ALL ON FUNCTION "public"."insert_verification_send_ceiling"() FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."insert_verification_send_ceiling"() TO service_role;
+REVOKE ALL ON FUNCTION "public"."distribution_shares"("public"."profiles") FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."distribution_shares"("public"."profiles") TO "anon";
+GRANT ALL ON FUNCTION "public"."distribution_shares"("public"."profiles") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."distribution_shares"("public"."profiles") TO "service_role";

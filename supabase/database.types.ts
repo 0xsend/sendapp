@@ -15,6 +15,21 @@ type ProfileLookup = {
   [K in keyof ProfileLookupRow]: K extends 'address' ? Hex | null : ProfileLookupRow[K] | null
 }
 
+type ProfileDistributionSharesRow =
+  DatabaseGenerated['public']['Tables']['distribution_shares']['Row']
+type ProfileDistributionShares = {
+  [K in keyof ProfileDistributionSharesRow]: K extends 'address'
+    ? Hex | null
+    : K extends
+          | 'amount'
+          | 'bonus_pool_amount'
+          | 'fixed_pool_amount'
+          | 'hodler_pool_amount'
+          | 'index'
+      ? bigint
+      : ProfileDistributionSharesRow[K] | null
+}
+
 export type Database = MergeDeep<
   DatabaseGenerated,
   {
@@ -32,6 +47,7 @@ export type Database = MergeDeep<
           }
         }
         distribution_shares: {
+          // TODO: Update amount type to bigint
           Row: {
             address: Hex
           }
@@ -47,6 +63,7 @@ export type Database = MergeDeep<
             tags: DatabaseGenerated['public']['Tables']['tags']['Row'][]
             main_tag: DatabaseGenerated['public']['Tables']['tags']['Row']
             links_in_bio: DatabaseGenerated['public']['Tables']['link_in_bio']['Row'][]
+            distribution_shares: ProfileDistributionShares[]
           }
         }
         webauthn_credentials: {
