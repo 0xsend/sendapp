@@ -42,7 +42,6 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
 
     void Share.share({
       message: referralHref,
-      url: referralHref,
     }).catch(() => null)
   }, [referralHref])
 
