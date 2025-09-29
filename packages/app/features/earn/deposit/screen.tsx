@@ -482,41 +482,39 @@ export function DepositForm() {
                                 flexDirection={'column'}
                                 $gtSm={{ flexDirection: 'row' }}
                               >
-                                <YStack gap={'$1.5'}>
-                                  <XStack gap={'$2'}>
-                                    <Paragraph
-                                      testID="earning-form-balance"
-                                      color={insufficientAmount ? '$error' : '$silverChalice'}
-                                      size={'$5'}
-                                      $theme-light={{
-                                        color: insufficientAmount ? '$error' : '$darkGrayTextField',
-                                      }}
-                                    >
-                                      Balance:
-                                    </Paragraph>
-                                    <Paragraph
-                                      color={insufficientAmount ? '$error' : '$color12'}
-                                      size={'$5'}
-                                      fontWeight={'600'}
-                                    >
-                                      {coin.data?.decimals
-                                        ? formatAmount(
-                                            formatUnits(
-                                              coinBalance.coin.balance,
-                                              coin.data?.decimals
-                                            ),
-                                            12,
-                                            2
-                                          )
-                                        : '-'}
-                                    </Paragraph>
-                                  </XStack>
-                                  {insufficientAmount && (
-                                    <Paragraph color={'$error'} size={'$5'}>
-                                      Insufficient funds
-                                    </Paragraph>
-                                  )}
-                                </YStack>
+                                <XStack gap={'$2'}>
+                                  <Paragraph
+                                    testID="earning-form-balance"
+                                    color={insufficientAmount ? '$error' : '$silverChalice'}
+                                    size={'$5'}
+                                    $theme-light={{
+                                      color: insufficientAmount ? '$error' : '$darkGrayTextField',
+                                    }}
+                                  >
+                                    Balance:
+                                  </Paragraph>
+                                  <Paragraph
+                                    color={insufficientAmount ? '$error' : '$color12'}
+                                    size={'$5'}
+                                    fontWeight={'600'}
+                                  >
+                                    {coin.data?.decimals
+                                      ? formatAmount(
+                                          formatUnits(
+                                            coinBalance.coin.balance,
+                                            coin.data?.decimals
+                                          ),
+                                          12,
+                                          2
+                                        )
+                                      : '-'}
+                                  </Paragraph>
+                                </XStack>
+                                {insufficientAmount && (
+                                  <Paragraph color={'$error'} size={'$5'}>
+                                    Insufficient funds
+                                  </Paragraph>
+                                )}
                               </XStack>
                             )
                         }
