@@ -54,8 +54,6 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
     setShareDialogOpen(false)
   }, [])
 
-  const elevation = useMemo(() => (Platform.OS === 'android' ? undefined : '$0.75'), [])
-
   const avatarContent = useMemo(() => {
     if (Platform.OS === 'android' && !avatar_url) {
       return (
@@ -83,7 +81,7 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
           br={'$5'}
           p={'$5'}
           $gtLg={{ p: '$7', gap: '$5' }}
-          elevation={elevation}
+          elevation={'$0.75'}
         >
           <XStack gap={'$3.5'}>
             <Avatar size={'$7'} br={'$4'}>
@@ -102,7 +100,7 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
       <Fade>
         <XStack gap={'$3.5'}>
           <Button
-            elevation={elevation}
+            elevation={'$0.75'}
             f={1}
             py={'$5'}
             bw={0}
@@ -115,7 +113,7 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
             <Button.Text size={'$5'}>Invite Friends</Button.Text>
           </Button>
           <Button
-            elevation={elevation}
+            elevation={'$0.75'}
             f={1}
             py={'$5'}
             h={'auto'}
