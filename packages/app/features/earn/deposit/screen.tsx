@@ -90,14 +90,11 @@ export function DepositForm() {
 
   // Disable automatic gas estimation - only estimate when user clicks deposit
   const [enableGasEstimation, setEnableGasEstimation] = useState(false)
+  // Estimate gas without paymaster first (SendVerifyingPaymaster requires signature for estimation)
+  // We'll add the paymaster signature before submitting the transaction
   const uop = useUserOp({
     sender: enableGasEstimation ? sender : undefined,
     calls: enableGasEstimation ? (calls.data ?? undefined) : undefined,
-    // Use SendVerifyingPaymaster to sponsor gas for deposits
-    paymaster: sendVerifyingPaymasterAddress[chainId],
-    paymasterVerificationGasLimit: 200000n,
-    paymasterPostOpGasLimit: 200000n,
-    paymasterData: '0x',
   })
   const webauthnCreds = useMemo(
     () =>
@@ -154,7 +151,12 @@ export function DepositForm() {
     assert(uop.isSuccess, 'uop is not success')
 
     try {
-      // First, get the paymaster signature to sponsor gas
+      // Add SendVerifyingPaymaster fields to the user operation
+      uop.data.paymaster = sendVerifyingPaymasterAddress[chainId]
+      uop.data.paymasterVerificationGasLimit = 200000n
+      uop.data.paymasterPostOpGasLimit = 200000n
+
+      // Get the paymaster signature to sponsor gas
       log('Requesting paymaster signature')
       const paymasterResult = await paymasterSignMutation.mutateAsync({
         userop: uop.data,
