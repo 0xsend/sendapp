@@ -39,6 +39,7 @@ import {
   http,
   isAddress,
   maxUint256,
+  parseUnits,
   publicActions,
   withRetry,
   zeroAddress,
@@ -61,6 +62,8 @@ const sendAccountFactoryClient = createWalletClient({
   chain: baseMainnet,
   transport: http(baseMainnetClient.transport.url),
 }).extend(publicActions)
+
+const MINIMUM_DEPOSIT = parseUnits('5', 6) // 5 USDC
 
 // nonce storage to avoid nonce conflicts
 const nonceQueue = new PQueue({ concurrency: 1 })
@@ -386,7 +389,6 @@ export const sendAccountRouter = createTRPCRouter({
         let isValidOperation = false
 
         // Try to decode as SendEarn deposit
-        const MINIMUM_DEPOSIT = BigInt(5 * 1e6) // 5 USDC (6 decimals)
         try {
           const depositArgs = decodeSendEarnDepositUserOp({ userOp: userop })
           if (isSendEarnVaultDeposit(depositArgs)) {
