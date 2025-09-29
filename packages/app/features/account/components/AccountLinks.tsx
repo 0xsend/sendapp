@@ -16,7 +16,6 @@ import {
 import { RowLabel } from 'app/components/layout/RowLabel'
 import useIntercom from 'app/utils/intercom/useIntercom'
 import { memo, useCallback, useMemo } from 'react'
-import { Platform } from 'react-native'
 
 const iconProps = {
   size: '$1.5' as SizeTokens,
@@ -49,13 +48,11 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
     []
   )
 
-  const elevation = useMemo(() => (Platform.OS === 'android' ? undefined : '$0.75'), [])
-
   return (
     <YStack gap={'$5'} pb={'$3.5'}>
       <YStack gap={'$3.5'}>
         <RowLabel>Settings</RowLabel>
-        <YGroup elevation={elevation} bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }}>
+        <YGroup elevation={'$0.75'} bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }}>
           <YGroup.Item>
             <AccountNavLink text="Profile" href="/account/edit-profile" icon={icons.account} />
           </YGroup.Item>
@@ -85,7 +82,7 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
       </YStack>
       <YStack gap={'$3.5'}>
         <RowLabel>Support</RowLabel>
-        <YGroup elevation={elevation} bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }}>
+        <YGroup elevation={'$0.75'} bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }}>
           <YGroup.Item>
             <AccountNavLink
               text="Learn more about Send"

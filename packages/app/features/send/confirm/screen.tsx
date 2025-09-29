@@ -385,7 +385,7 @@ export function SendConfirm() {
             br={'$6'}
             p={'$6'}
             gap={'$4.5'}
-            elevation={Platform.OS === 'android' ? undefined : '$0.75'}
+            elevation={'$0.75'}
             $gtSm={{
               gap: '$5',
             }}

@@ -12,7 +12,6 @@ import {
 import { IconCoin } from 'app/components/icons/IconCoin'
 import type { coin } from 'app/data/coins'
 import { IconX } from './icons'
-import { Platform } from 'react-native'
 
 export const CoinSheet = ({ children, ...props }: SheetProps) => {
   const media = useMedia()
@@ -26,11 +25,7 @@ export const CoinSheet = ({ children, ...props }: SheetProps) => {
       zIndex={100_000}
       {...props}
     >
-      <Sheet.Frame
-        elevation={Platform.OS === 'android' ? undefined : '$5'}
-        w={'100%'}
-        bc={'$color1'}
-      >
+      <Sheet.Frame elevation={'$5'} w={'100%'} bc={'$color1'}>
         {children}
       </Sheet.Frame>
       {media.lg ? (

@@ -2,7 +2,6 @@ import { Card, H4, Spinner, YStack } from '@my/ui'
 import type { Timeframe } from '../timeframes'
 import { useTokenChartData } from '../useTokenChartData'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
-import { Platform } from 'react-native'
 
 export function ChartCardSection({
   tf,
@@ -20,7 +19,7 @@ export function ChartCardSection({
       <H4 fontWeight={600} size={'$7'}>
         {title}
       </H4>
-      <Card padded size={'$5'} w={'100%'} elevation={Platform.OS === 'android' ? undefined : 1}>
+      <Card padded size={'$5'} w={'100%'} elevation={1}>
         <YStack gap={'$3'} position="relative">
           {children}
           {isLoading ? (
