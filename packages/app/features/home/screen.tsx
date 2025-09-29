@@ -21,7 +21,7 @@ import { useRootScreenParams } from 'app/routers/params'
 
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useRouter } from 'solito/router'
-import { IsPriceHiddenProvider } from 'app/features/home/utils/useIsPriceHidden'
+import { IsPriceHiddenProvider, useIsPriceHidden } from 'app/features/home/utils/useIsPriceHidden'
 
 import { StablesBalanceCard } from './StablesBalanceCard'
 import { SavingsBalanceCard } from './SavingsBalanceCard'
@@ -175,6 +175,7 @@ export function InvestmentsBody() {
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   useHoverStyles()
   const pathname = usePathname()
+  const { isPriceHidden } = useIsPriceHidden()
 
   // Market data for portfolio-level computations
   const ownedCoins = myInvestmentCoins.filter((c) => c?.balance && c.balance > 0n)
@@ -242,7 +243,7 @@ export function InvestmentsBody() {
             ) : (
               <YStack ai={'center'} gap={'$2'}>
                 <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
-                  {`${sign}$${formattedDeltaUSD}`}
+                  {isPriceHidden ? '///////' : `${sign}$${formattedDeltaUSD}`}
                 </Paragraph>
                 {/* Small neutral pill to mirror style (no color change) */}
                 <Theme name={pct24h >= 0 ? 'green_active' : 'red_active'}>
