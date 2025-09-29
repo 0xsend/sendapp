@@ -11,7 +11,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { entryPointAddress, sendEarnAddress } from '@my/wagmi'
+import { entryPointAddress, sendEarnAddress, sendVerifyingPaymasterAddress } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { ReferredBy } from 'app/components/ReferredBy'
@@ -87,9 +87,14 @@ export function DepositForm() {
   const sender = useMemo(() => sendAccount?.data?.address, [sendAccount?.data?.address])
   const nonce = useAccountNonce({ sender })
   const calls = useSendEarnDepositCalls({ sender, asset, amount: parsedAmount })
+
   const uop = useUserOp({
+    paymaster: sendVerifyingPaymasterAddress[chainId],
+    paymasterVerificationGasLimit: 200000n,
+    paymasterPostOpGasLimit: 200000n,
+    callGasLimit: 1_000_000n,
     sender,
-    calls: calls.data ?? undefined,
+    calls: calls.data,
   })
   const webauthnCreds = useMemo(
     () =>
@@ -102,6 +107,8 @@ export function DepositForm() {
   // MUTATION DEPOSIT USEROP via Temporal
   const toast = useAppToast()
   const queryClient = useQueryClient()
+
+  const paymasterSignMutation = api.sendAccount.paymasterSign.useMutation()
 
   const depositMutation = api.sendEarn.deposit.useMutation({
     onMutate: () => {
@@ -141,9 +148,22 @@ export function DepositForm() {
   const handleDepositSubmit = useCallback(async () => {
     log('handleDepositSubmit: formState', form.formState)
     assert(Object.keys(form.formState.errors).length === 0, 'form is not valid')
+    assert(sender !== undefined, 'sender is not defined')
+    assert(calls.isSuccess, 'calls is not success')
     assert(uop.isSuccess, 'uop is not success')
 
     try {
+      log('Requesting paymaster signature')
+      const paymasterResult = await paymasterSignMutation.mutateAsync({
+        userop: uop.data,
+        entryPoint: entryPointAddress[chainId],
+      })
+      log('Paymaster signature received', paymasterResult)
+
+      // Update the user operation with the paymaster data
+      uop.data.paymasterData = paymasterResult.paymasterData
+
+      // Sign with the user's passkey
       uop.data.signature = await signUserOp({
         userOp: uop.data,
         webauthnCreds,
@@ -157,17 +177,31 @@ export function DepositForm() {
       })
     } catch (error) {
       log('Error during signing or mutation', error)
+      toast.error('Deposit Error', {
+        message: toNiceError(error),
+      })
     }
-  }, [form.formState, uop.isSuccess, uop.data, webauthnCreds, chainId, depositMutation])
+  }, [
+    form.formState,
+    sender,
+    calls.isSuccess,
+    uop.isSuccess,
+    uop.data,
+    webauthnCreds,
+    chainId,
+    depositMutation,
+    paymasterSignMutation,
+    toast,
+  ])
 
   // DEBUG
-  log('uop', uop)
   log('calls', calls)
   log('depositMutation', depositMutation)
 
+  // Check if amount exceeds available balance
   const insufficientAmount =
     coinBalance.coin?.balance !== undefined &&
-    parsedAmount > coinBalance.coin?.balance &&
+    parsedAmount > coinBalance.coin.balance &&
     !depositMutation.isSuccess
 
   const canSubmit =
@@ -176,8 +210,8 @@ export function DepositForm() {
     coinBalance.coin.balance >= parsedAmount &&
     parsedAmount > BigInt(0) &&
     calls.isSuccess &&
-    uop.isSuccess &&
     !calls.isPending &&
+    uop.isSuccess &&
     !uop.isPending &&
     !depositMutation.isPending &&
     !insufficientAmount &&
@@ -231,14 +265,7 @@ export function DepositForm() {
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (
       <YStack>
-        {depositMutation.isPending ? (
-          <Fade key="userop-state">
-            <Paragraph color={'$color10'} ta="center" size="$3">
-              Requesting signature...
-            </Paragraph>
-          </Fade>
-        ) : null}
-        {[calls.error, sendAccount.error, uop.error].filter(Boolean).map((e) =>
+        {[calls.error, uop.error, sendAccount.error].filter(Boolean).map((e) =>
           e ? (
             <Fade key={`error-${e.message}`}>
               <XStack alignItems="center" jc="center" gap={'$2'} role="alert">
@@ -269,15 +296,7 @@ export function DepositForm() {
         </SubmitButton>
       </YStack>
     ),
-    [
-      depositMutation.isPending,
-      calls.error,
-      sendAccount.error,
-      uop.error,
-      areTermsAccepted,
-      form.setError,
-      canSubmit,
-    ]
+    [calls.error, uop.error, sendAccount.error, areTermsAccepted, form.setError, canSubmit]
   )
 
   // RESET FORM ERRORS for terms or auto accept if user has existing deposit
