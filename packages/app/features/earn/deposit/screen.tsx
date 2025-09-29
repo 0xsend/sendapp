@@ -87,11 +87,16 @@ export function DepositForm() {
   const sender = useMemo(() => sendAccount?.data?.address, [sendAccount?.data?.address])
   const nonce = useAccountNonce({ sender })
   const calls = useSendEarnDepositCalls({ sender, asset, amount: parsedAmount })
+
+  // Disable automatic gas estimation - only estimate when user clicks deposit
+  const [enableGasEstimation, setEnableGasEstimation] = useState(false)
   const uop = useUserOp({
-    sender,
-    calls: calls.data ?? undefined,
+    sender: enableGasEstimation ? sender : undefined,
+    calls: enableGasEstimation ? (calls.data ?? undefined) : undefined,
     // Use SendVerifyingPaymaster to sponsor gas for deposits
     paymaster: sendVerifyingPaymasterAddress[chainId],
+    paymasterVerificationGasLimit: 200000n,
+    paymasterPostOpGasLimit: 200000n,
     paymasterData: '0x',
   })
   const webauthnCreds = useMemo(
@@ -105,6 +110,8 @@ export function DepositForm() {
   // MUTATION DEPOSIT USEROP via Temporal
   const toast = useAppToast()
   const queryClient = useQueryClient()
+
+  const paymasterSignMutation = api.sendAccount.paymasterSign.useMutation()
 
   const depositMutation = api.sendEarn.deposit.useMutation({
     onMutate: () => {
@@ -149,7 +156,7 @@ export function DepositForm() {
     try {
       // First, get the paymaster signature to sponsor gas
       log('Requesting paymaster signature')
-      const paymasterResult = await api.sendAccount.paymasterSign.mutateAsync({
+      const paymasterResult = await paymasterSignMutation.mutateAsync({
         userop: uop.data,
         entryPoint: entryPointAddress[chainId],
       })
@@ -176,7 +183,23 @@ export function DepositForm() {
         message: toNiceError(error),
       })
     }
-  }, [form.formState, uop.isSuccess, uop.data, webauthnCreds, chainId, depositMutation, toast])
+  }, [
+    form.formState,
+    uop.isSuccess,
+    uop.data,
+    webauthnCreds,
+    chainId,
+    depositMutation,
+    paymasterSignMutation,
+    toast,
+  ])
+
+  // Auto-submit once gas estimation completes
+  useEffect(() => {
+    if (enableGasEstimation && uop.isSuccess && !depositMutation.isPending) {
+      handleDepositSubmit()
+    }
+  }, [enableGasEstimation, uop.isSuccess, depositMutation.isPending, handleDepositSubmit])
 
   // DEBUG
   log('uop', uop)
@@ -189,18 +212,20 @@ export function DepositForm() {
     parsedAmount > coinBalance.coin.balance &&
     !depositMutation.isSuccess
 
-  const canSubmit =
+  // Can initiate submit if basic validations pass (gas estimation happens after click)
+  const canInitiateSubmit =
     !coin.isLoading &&
     coinBalance.coin?.balance !== undefined &&
     coinBalance.coin.balance >= parsedAmount &&
     parsedAmount > BigInt(0) &&
     calls.isSuccess &&
-    uop.isSuccess &&
     !calls.isPending &&
-    !uop.isPending &&
     !depositMutation.isPending &&
     !insufficientAmount &&
     Object.keys(form.formState.errors).length === 0
+
+  // Can actually submit once gas estimation is complete
+  const canSubmit = canInitiateSubmit && uop.isSuccess && !uop.isPending
 
   const validateAndSanitizeAmount = useCallback(
     ({ amount: _amount }: { amount: string | undefined }) => {
@@ -280,11 +305,25 @@ export function DepositForm() {
               )
               return
             }
-            submit()
+
+            // Enable gas estimation if not already enabled
+            if (!enableGasEstimation) {
+              setEnableGasEstimation(true)
+              return
+            }
+
+            // Once gas estimation is complete, submit
+            if (canSubmit) {
+              submit()
+            }
           }}
-          disabled={!canSubmit}
+          disabled={
+            (!canInitiateSubmit && !uop.isPending) || (uop.isPending && enableGasEstimation)
+          }
         >
-          <SubmitButton.Text>CONFIRM DEPOSIT</SubmitButton.Text>
+          <SubmitButton.Text>
+            {uop.isPending && enableGasEstimation ? 'ESTIMATING GAS...' : 'CONFIRM DEPOSIT'}
+          </SubmitButton.Text>
         </SubmitButton>
       </YStack>
     ),
@@ -293,9 +332,12 @@ export function DepositForm() {
       calls.error,
       sendAccount.error,
       uop.error,
+      uop.isPending,
       areTermsAccepted,
       form.setError,
       canSubmit,
+      canInitiateSubmit,
+      enableGasEstimation,
     ]
   )
 
