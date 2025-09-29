@@ -90,6 +90,7 @@ export function DepositForm() {
 
   // Disable automatic gas estimation - only estimate when user clicks deposit
   const [enableGasEstimation, setEnableGasEstimation] = useState(false)
+  const [hasSubmitted, setHasSubmitted] = useState(false)
   // Estimate gas without paymaster first (SendVerifyingPaymaster requires signature for estimation)
   // We'll add the paymaster signature before submitting the transaction
   const uop = useUserOp({
@@ -150,6 +151,13 @@ export function DepositForm() {
     assert(Object.keys(form.formState.errors).length === 0, 'form is not valid')
     assert(uop.isSuccess, 'uop is not success')
 
+    // Prevent multiple submissions
+    if (hasSubmitted) {
+      log('Already submitted, skipping')
+      return
+    }
+    setHasSubmitted(true)
+
     try {
       // Add SendVerifyingPaymaster fields to the user operation
       uop.data.paymaster = sendVerifyingPaymasterAddress[chainId]
@@ -184,6 +192,8 @@ export function DepositForm() {
       toast.error('Deposit Error', {
         message: toNiceError(error),
       })
+      // Reset submission flag on error so user can retry
+      setHasSubmitted(false)
     }
   }, [
     form.formState,
@@ -194,14 +204,21 @@ export function DepositForm() {
     depositMutation,
     paymasterSignMutation,
     toast,
+    hasSubmitted,
   ])
 
   // Auto-submit once gas estimation completes
   useEffect(() => {
-    if (enableGasEstimation && uop.isSuccess && !depositMutation.isPending) {
+    if (enableGasEstimation && uop.isSuccess && !depositMutation.isPending && !hasSubmitted) {
       handleDepositSubmit()
     }
-  }, [enableGasEstimation, uop.isSuccess, depositMutation.isPending, handleDepositSubmit])
+  }, [
+    enableGasEstimation,
+    uop.isSuccess,
+    depositMutation.isPending,
+    hasSubmitted,
+    handleDepositSubmit,
+  ])
 
   // DEBUG
   log('uop', uop)
@@ -243,6 +260,12 @@ export function DepositForm() {
         form.clearErrors('amount')
       }
 
+      // Reset gas estimation flags when amount changes
+      if (enableGasEstimation || hasSubmitted) {
+        setEnableGasEstimation(false)
+        setHasSubmitted(false)
+      }
+
       if (!depositMutation.isSuccess) {
         setParams(
           {
@@ -260,6 +283,8 @@ export function DepositForm() {
       coin.data?.decimals,
       params,
       depositMutation.isSuccess,
+      enableGasEstimation,
+      hasSubmitted,
     ]
   )
 
