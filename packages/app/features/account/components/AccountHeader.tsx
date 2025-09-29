@@ -80,7 +80,13 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
   const VerificationIcon = () => {
     if (isVerified) {
       return (
-        <IconCheckCircle size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
+        <IconCheckCircle
+          size={'$1.5'}
+          color={'$primary'}
+          br={9999}
+          bc={'$color0'}
+          $theme-light={{ bc: '$color12' }}
+        />
       )
     }
 
@@ -118,7 +124,7 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
           br={'$5'}
           p={'$5'}
           $gtLg={{ p: '$7', gap: '$5' }}
-          elevation={'$0.75'}
+          elevation={1}
         >
           <ChevronRight
             position="absolute"
@@ -174,6 +180,8 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
                       ai="center"
                       jc="center"
                       zIndex={10}
+                      elevation={'$0.75'}
+                      br={9999}
                     >
                       <VerificationIcon />
                     </XStack>
