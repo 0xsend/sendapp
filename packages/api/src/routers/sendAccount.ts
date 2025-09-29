@@ -13,6 +13,11 @@ import {
   tokenPaymasterAddress,
   usdcAddress,
 } from '@my/wagmi'
+import {
+  decodeSendEarnDepositUserOp,
+  isFactoryDeposit as isSendEarnFactoryDeposit,
+  isVaultDeposit as isSendEarnVaultDeposit,
+} from 'app/utils/decodeSendEarnDepositUserOp'
 import { base16 } from '@scure/base'
 import { TRPCError } from '@trpc/server'
 import { base16Regex } from 'app/utils/base16Regex'
@@ -336,12 +341,11 @@ export const sendAccountRouter = createTRPCRouter({
   /**
    * Requests a signature for a user op from the paymaster.
    *
-   * Requires the user send the userop, plus the send account calls to ensure
-   * the userop is for a whitelisted user ops.
+   * This endpoint sponsors gas for whitelisted operations:
+   * 1. Send token V0 upgrade operations
+   * 2. SendEarn deposit operations
    *
-   * This is so we don't inadvertently sponsor userops..
-   *
-   * TODO: move this into it's own paymaster router and leverage it's own EOA or share with the send account factory
+   * The userop is validated to ensure it's for an approved operation before signing.
    */
   paymasterSign: protectedProcedure
     .input(
@@ -351,17 +355,18 @@ export const sendAccountRouter = createTRPCRouter({
          */
         userop: UserOperationSchema,
         /**
-         * The send account calls to prove the userop is for upgrading the send token.
+         * Optional: The send account calls for send token upgrade.
+         * Required for send token upgrade, not needed for SendEarn deposits.
          */
-        sendAccountCalls: SendAccountCallsSchema,
+        sendAccountCalls: SendAccountCallsSchema.optional(),
         entryPoint: address,
       })
     )
     .mutation(
       async ({ ctx: { session, supabase }, input: { userop, sendAccountCalls, entryPoint } }) => {
-        const log = debug(`api:routers:sendTokenUpgrade:${session.user.id}`)
+        const log = debug(`api:routers:sendAccount:paymasterSign:${session.user.id}`)
 
-        log('Received send token upgrade userop', { userop, sendAccountCalls, entryPoint })
+        log('Received paymaster sign request', { userop, sendAccountCalls, entryPoint })
 
         // ensure send account is valid
         const { data: sendAccount, error: sendAccountError } = await supabase
@@ -376,53 +381,64 @@ export const sendAccountRouter = createTRPCRouter({
           })
         }
 
-        // ensure send account calls are for send token upgrade
-        // 1. approve send token v0 to lockbox
-        // 2. call lockbox.deposit
-        // TODO: move to another function before adding more send account calls
-        const [approval, deposit] = sendAccountCalls
+        // Determine operation type and validate
+        let isValidOperation = false
 
-        if (!approval || !deposit) {
-          log('send account calls are not valid')
-          throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message: 'Send account calls are not valid',
-          })
-        }
-
-        if (
-          approval.dest !== sendTokenV0Address[sendAccount.chain_id] ||
-          !approval.data.startsWith('0x095ea7b3') // approve(address,uint256)
-        ) {
-          log('approval.dest is not send token v0')
-          throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message: 'Approval call is not for send token v0',
-          })
-        }
-        if (
-          deposit.dest !== sendTokenV0LockboxAddress[sendAccount.chain_id] ||
-          !deposit.data.startsWith('0xb6b55f25') // deposit(uint256)
-        ) {
-          log('deposit.dest is not send token v0 lockbox')
-          throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message: 'Deposit call is not for send token v0 lockbox',
-          })
-        }
-        const _calldata = encodeFunctionData({
-          abi: sendAccountAbi,
-          functionName: 'executeBatch',
-          args: [sendAccountCalls],
-        })
-        if (userop.callData !== _calldata) {
-          log('callData mismatch', userop.callData, _calldata)
-          throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message: 'Call data mismatch',
-          })
+        // Try to decode as SendEarn deposit
+        try {
+          const depositArgs = decodeSendEarnDepositUserOp({ userOp: userop })
+          if (isSendEarnVaultDeposit(depositArgs)) {
+            const { owner, assets, vault } = depositArgs
+            if (isAddress(owner) && isAddress(vault) && assets > 0n) {
+              log('Validated as SendEarn vault deposit')
+              isValidOperation = true
+            }
+          } else if (isSendEarnFactoryDeposit(depositArgs)) {
+            const { owner, assets, referrer } = depositArgs
+            if (isAddress(owner) && isAddress(referrer) && assets > 0n) {
+              log('Validated as SendEarn factory deposit')
+              isValidOperation = true
+            }
+          }
+        } catch (e) {
+          log('Not a SendEarn deposit operation', e)
         }
 
+        // If not SendEarn, try to validate as send token upgrade
+        if (!isValidOperation && sendAccountCalls) {
+          const [approval, deposit] = sendAccountCalls
+
+          if (approval && deposit) {
+            if (
+              approval.dest === sendTokenV0Address[sendAccount.chain_id] &&
+              approval.data.startsWith('0x095ea7b3') && // approve(address,uint256)
+              deposit.dest === sendTokenV0LockboxAddress[sendAccount.chain_id] &&
+              deposit.data.startsWith('0xb6b55f25') // deposit(uint256)
+            ) {
+              const _calldata = encodeFunctionData({
+                abi: sendAccountAbi,
+                functionName: 'executeBatch',
+                args: [sendAccountCalls],
+              })
+              if (userop.callData === _calldata) {
+                log('Validated as send token upgrade')
+                isValidOperation = true
+              } else {
+                log('callData mismatch for send token upgrade')
+              }
+            }
+          }
+        }
+
+        if (!isValidOperation) {
+          log('Operation is not whitelisted for gas sponsorship')
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Operation is not whitelisted for gas sponsorship',
+          })
+        }
+
+        // Create paymaster signature
         const validUntil = Math.floor((Date.now() + 1000 * 120) / 1000)
         const validAfter = 0
         const paymasterAddress = sendVerifyingPaymasterAddress[sendAccount.chain_id]

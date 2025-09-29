@@ -155,7 +155,7 @@ export function DepositForm() {
     try {
       // First, get the paymaster signature to sponsor gas
       log('Requesting paymaster signature')
-      const paymasterResult = await api.sendEarn.paymasterSign.mutate({
+      const paymasterResult = await api.sendAccount.paymasterSign.mutate({
         userop: uop.data,
         entryPoint: entryPointAddress[chainId],
       })
