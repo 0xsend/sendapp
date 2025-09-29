@@ -11,7 +11,14 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { entryPointAddress, sendEarnAddress, sendVerifyingPaymasterAddress } from '@my/wagmi'
+import {
+  baseMainnetBundlerClient,
+  baseMainnetClient,
+  entryPointAddress,
+  sendAccountAbi,
+  sendEarnAddress,
+  sendVerifyingPaymasterAddress,
+} from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { ReferredBy } from 'app/components/ReferredBy'
@@ -33,7 +40,7 @@ import debug from 'debug'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
-import { formatUnits } from 'viem'
+import { encodeFunctionData, formatUnits } from 'viem'
 import { useChainId } from 'wagmi'
 import { type BRAND, z } from 'zod'
 import { useSendEarnCoin } from '../providers/SendEarnProvider'
@@ -88,14 +95,11 @@ export function DepositForm() {
   const nonce = useAccountNonce({ sender })
   const calls = useSendEarnDepositCalls({ sender, asset, amount: parsedAmount })
 
-  // Disable automatic gas estimation - only estimate when user clicks deposit
-  const [enableGasEstimation, setEnableGasEstimation] = useState(false)
-  const [hasSubmitted, setHasSubmitted] = useState(false)
-  // Estimate gas without paymaster first (SendVerifyingPaymaster requires signature for estimation)
-  // We'll add the paymaster signature before submitting the transaction
+  // Don't auto-estimate gas - we'll do it manually in handleDepositSubmit
+  // This prevents spamming gas estimation on every input change
   const uop = useUserOp({
-    sender: enableGasEstimation ? sender : undefined,
-    calls: enableGasEstimation ? (calls.data ?? undefined) : undefined,
+    sender: undefined,
+    calls: undefined,
   })
   const webauthnCreds = useMemo(
     () =>
@@ -149,42 +153,94 @@ export function DepositForm() {
   const handleDepositSubmit = useCallback(async () => {
     log('handleDepositSubmit: formState', form.formState)
     assert(Object.keys(form.formState.errors).length === 0, 'form is not valid')
-    assert(uop.isSuccess, 'uop is not success')
-
-    // Prevent multiple submissions
-    if (hasSubmitted) {
-      log('Already submitted, skipping')
-      return
-    }
-    setHasSubmitted(true)
+    assert(sender, 'sender is not defined')
+    assert(calls.isSuccess, 'calls is not success')
 
     try {
-      // Add SendVerifyingPaymaster fields to the user operation
-      uop.data.paymaster = sendVerifyingPaymasterAddress[chainId]
-      uop.data.paymasterVerificationGasLimit = 200000n
-      uop.data.paymasterPostOpGasLimit = 200000n
+      // Manually estimate gas using the userop query function
+      // We use the query client to trigger a one-time fetch without auto-refetch
+      log('Estimating gas...')
+      const estimatedUserOp = await queryClient.fetchQuery({
+        queryKey: ['userop', { sender, calls: calls.data }],
+        queryFn: async () => {
+          const { data: nonce } = await queryClient.fetchQuery({
+            queryKey: ['accountNonce', sender],
+            queryFn: async () => {
+              const { getAccountNonce } = await import('permissionless')
+              return getAccountNonce(baseMainnetClient, {
+                sender,
+                entryPoint: entryPointAddress[chainId],
+              })
+            },
+          })
+
+          const { data: feesPerGas } = await queryClient.fetchQuery({
+            queryKey: ['estimateFeesPerGas', chainId],
+            queryFn: async () => {
+              return baseMainnetClient.estimateFeesPerGas()
+            },
+          })
+
+          // Build and estimate the user operation
+          const callData = encodeFunctionData({
+            abi: sendAccountAbi,
+            functionName: 'executeBatch',
+            args: [calls.data],
+          })
+
+          const userOp = {
+            sender,
+            nonce,
+            callData,
+            callGasLimit: 150000n,
+            verificationGasLimit: 550000n,
+            preVerificationGas: 70000n,
+            maxFeePerGas: feesPerGas.maxFeePerGas,
+            maxPriorityFeePerGas: feesPerGas.maxPriorityFeePerGas,
+            signature: '0x' as const,
+          }
+
+          // Estimate gas without paymaster
+          const gasEstimate = await baseMainnetBundlerClient.estimateUserOperationGas({
+            userOperation: userOp,
+          })
+
+          return {
+            ...userOp,
+            callGasLimit: gasEstimate.callGasLimit,
+            preVerificationGas: gasEstimate.preVerificationGas,
+          }
+        },
+      })
+
+      log('Gas estimation complete', estimatedUserOp)
+
+      // Add SendVerifyingPaymaster fields
+      estimatedUserOp.paymaster = sendVerifyingPaymasterAddress[chainId]
+      estimatedUserOp.paymasterVerificationGasLimit = 200000n
+      estimatedUserOp.paymasterPostOpGasLimit = 200000n
 
       // Get the paymaster signature to sponsor gas
       log('Requesting paymaster signature')
       const paymasterResult = await paymasterSignMutation.mutateAsync({
-        userop: uop.data,
+        userop: estimatedUserOp,
         entryPoint: entryPointAddress[chainId],
       })
       log('Paymaster signature received', paymasterResult)
 
       // Update the user operation with the paymaster data
-      uop.data.paymasterData = paymasterResult.paymasterData
+      estimatedUserOp.paymasterData = paymasterResult.paymasterData
 
       // Then sign with the user's passkey
-      uop.data.signature = await signUserOp({
-        userOp: uop.data,
+      estimatedUserOp.signature = await signUserOp({
+        userOp: estimatedUserOp,
         webauthnCreds,
         chainId: chainId,
         entryPoint: entryPointAddress[chainId],
       })
 
       await depositMutation.mutateAsync({
-        userop: uop.data,
+        userop: estimatedUserOp,
         entryPoint: entryPointAddress[chainId],
       })
     } catch (error) {
@@ -192,36 +248,21 @@ export function DepositForm() {
       toast.error('Deposit Error', {
         message: toNiceError(error),
       })
-      // Reset submission flag on error so user can retry
-      setHasSubmitted(false)
     }
   }, [
     form.formState,
-    uop.isSuccess,
-    uop.data,
+    sender,
+    calls.isSuccess,
+    calls.data,
     webauthnCreds,
     chainId,
     depositMutation,
     paymasterSignMutation,
     toast,
-    hasSubmitted,
-  ])
-
-  // Auto-submit once gas estimation completes
-  useEffect(() => {
-    if (enableGasEstimation && uop.isSuccess && !depositMutation.isPending && !hasSubmitted) {
-      handleDepositSubmit()
-    }
-  }, [
-    enableGasEstimation,
-    uop.isSuccess,
-    depositMutation.isPending,
-    hasSubmitted,
-    handleDepositSubmit,
+    queryClient,
   ])
 
   // DEBUG
-  log('uop', uop)
   log('calls', calls)
   log('depositMutation', depositMutation)
 
@@ -231,8 +272,7 @@ export function DepositForm() {
     parsedAmount > coinBalance.coin.balance &&
     !depositMutation.isSuccess
 
-  // Can initiate submit if basic validations pass (gas estimation happens after click)
-  const canInitiateSubmit =
+  const canSubmit =
     !coin.isLoading &&
     coinBalance.coin?.balance !== undefined &&
     coinBalance.coin.balance >= parsedAmount &&
@@ -242,9 +282,6 @@ export function DepositForm() {
     !depositMutation.isPending &&
     !insufficientAmount &&
     Object.keys(form.formState.errors).length === 0
-
-  // Can actually submit once gas estimation is complete
-  const canSubmit = canInitiateSubmit && uop.isSuccess && !uop.isPending
 
   const validateAndSanitizeAmount = useCallback(
     ({ amount: _amount }: { amount: string | undefined }) => {
@@ -258,12 +295,6 @@ export function DepositForm() {
         })
       } else {
         form.clearErrors('amount')
-      }
-
-      // Reset gas estimation flags when amount changes
-      if (enableGasEstimation || hasSubmitted) {
-        setEnableGasEstimation(false)
-        setHasSubmitted(false)
       }
 
       if (!depositMutation.isSuccess) {
@@ -283,8 +314,6 @@ export function DepositForm() {
       coin.data?.decimals,
       params,
       depositMutation.isSuccess,
-      enableGasEstimation,
-      hasSubmitted,
     ]
   )
 
@@ -309,7 +338,7 @@ export function DepositForm() {
             </Paragraph>
           </Fade>
         ) : null}
-        {[calls.error, sendAccount.error, uop.error].filter(Boolean).map((e) =>
+        {[calls.error, sendAccount.error].filter(Boolean).map((e) =>
           e ? (
             <Fade key={`error-${e.message}`}>
               <XStack alignItems="center" jc="center" gap={'$2'} role="alert">
@@ -332,25 +361,11 @@ export function DepositForm() {
               )
               return
             }
-
-            // Enable gas estimation if not already enabled
-            if (!enableGasEstimation) {
-              setEnableGasEstimation(true)
-              return
-            }
-
-            // Once gas estimation is complete, submit
-            if (canSubmit) {
-              submit()
-            }
+            submit()
           }}
-          disabled={
-            (!canInitiateSubmit && !uop.isPending) || (uop.isPending && enableGasEstimation)
-          }
+          disabled={!canSubmit}
         >
-          <SubmitButton.Text>
-            {uop.isPending && enableGasEstimation ? 'ESTIMATING GAS...' : 'CONFIRM DEPOSIT'}
-          </SubmitButton.Text>
+          <SubmitButton.Text>CONFIRM DEPOSIT</SubmitButton.Text>
         </SubmitButton>
       </YStack>
     ),
@@ -358,13 +373,9 @@ export function DepositForm() {
       depositMutation.isPending,
       calls.error,
       sendAccount.error,
-      uop.error,
-      uop.isPending,
       areTermsAccepted,
       form.setError,
       canSubmit,
-      canInitiateSubmit,
-      enableGasEstimation,
     ]
   )
 
