@@ -63,7 +63,7 @@ const sendAccountFactoryClient = createWalletClient({
   transport: http(baseMainnetClient.transport.url),
 }).extend(publicActions)
 
-const MINIMUM_DEPOSIT = parseUnits('5', 6) // 5 USDC
+const MINIMUM_USDC_VAULT_DEPOSIT = parseUnits('5', 6) // 5 USDC
 
 // nonce storage to avoid nonce conflicts
 const nonceQueue = new PQueue({ concurrency: 1 })
@@ -393,25 +393,25 @@ export const sendAccountRouter = createTRPCRouter({
           const depositArgs = decodeSendEarnDepositUserOp({ userOp: userop })
           if (isSendEarnVaultDeposit(depositArgs)) {
             const { owner, assets, vault } = depositArgs
-            if (isAddress(owner) && isAddress(vault) && assets >= MINIMUM_DEPOSIT) {
+            if (isAddress(owner) && isAddress(vault) && assets >= MINIMUM_USDC_VAULT_DEPOSIT) {
               log('Validated as SendEarn vault deposit', { assets: assets.toString() })
               isValidOperation = true
-            } else if (assets < MINIMUM_DEPOSIT) {
+            } else if (assets < MINIMUM_USDC_VAULT_DEPOSIT) {
               log('Deposit amount below minimum', {
                 assets: assets.toString(),
-                minimum: MINIMUM_DEPOSIT.toString(),
+                minimum: MINIMUM_USDC_VAULT_DEPOSIT.toString(),
               })
             }
           } else if (isSendEarnFactoryDeposit(depositArgs)) {
             const { owner, assets } = depositArgs
             // Referrer can be zero address (no referral), so we don't validate it
-            if (isAddress(owner) && assets >= MINIMUM_DEPOSIT) {
+            if (isAddress(owner) && assets >= MINIMUM_USDC_VAULT_DEPOSIT) {
               log('Validated as SendEarn factory deposit', { assets: assets.toString() })
               isValidOperation = true
-            } else if (assets < MINIMUM_DEPOSIT) {
+            } else if (assets < MINIMUM_USDC_VAULT_DEPOSIT) {
               log('Deposit amount below minimum', {
                 assets: assets.toString(),
-                minimum: MINIMUM_DEPOSIT.toString(),
+                minimum: MINIMUM_USDC_VAULT_DEPOSIT.toString(),
               })
             }
           }
