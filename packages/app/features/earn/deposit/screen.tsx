@@ -92,7 +92,7 @@ export function DepositForm() {
     paymaster: sendVerifyingPaymasterAddress[chainId],
     paymasterVerificationGasLimit: 200000n,
     paymasterPostOpGasLimit: 200000n,
-    callGasLimit: 150000n,
+    callGasLimit: 1_000_000n,
     sender,
     calls: calls.data,
   })
@@ -148,7 +148,7 @@ export function DepositForm() {
   const handleDepositSubmit = useCallback(async () => {
     log('handleDepositSubmit: formState', form.formState)
     assert(Object.keys(form.formState.errors).length === 0, 'form is not valid')
-    assert(sender, 'sender is not defined')
+    assert(sender !== undefined, 'sender is not defined')
     assert(calls.isSuccess, 'calls is not success')
     assert(uop.isSuccess, 'uop is not success')
 
@@ -265,13 +265,6 @@ export function DepositForm() {
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (
       <YStack>
-        {depositMutation.isPending ? (
-          <Fade key="userop-state">
-            <Paragraph color={'$color10'} ta="center" size="$3">
-              Requesting signature...
-            </Paragraph>
-          </Fade>
-        ) : null}
         {[calls.error, uop.error, sendAccount.error].filter(Boolean).map((e) =>
           e ? (
             <Fade key={`error-${e.message}`}>
@@ -303,15 +296,7 @@ export function DepositForm() {
         </SubmitButton>
       </YStack>
     ),
-    [
-      depositMutation.isPending,
-      calls.error,
-      uop.error,
-      sendAccount.error,
-      areTermsAccepted,
-      form.setError,
-      canSubmit,
-    ]
+    [calls.error, uop.error, sendAccount.error, areTermsAccepted, form.setError, canSubmit]
   )
 
   // RESET FORM ERRORS for terms or auto accept if user has existing deposit
