@@ -11,14 +11,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import {
-  baseMainnetBundlerClient,
-  baseMainnetClient,
-  entryPointAddress,
-  sendAccountAbi,
-  sendEarnAddress,
-  sendVerifyingPaymasterAddress,
-} from '@my/wagmi'
+import { entryPointAddress, sendEarnAddress, sendVerifyingPaymasterAddress } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { ReferredBy } from 'app/components/ReferredBy'
@@ -40,7 +33,7 @@ import debug from 'debug'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
-import { encodeFunctionData, formatUnits } from 'viem'
+import { formatUnits } from 'viem'
 import { useChainId } from 'wagmi'
 import { type BRAND, z } from 'zod'
 import { useSendEarnCoin } from '../providers/SendEarnProvider'
@@ -95,11 +88,13 @@ export function DepositForm() {
   const nonce = useAccountNonce({ sender })
   const calls = useSendEarnDepositCalls({ sender, asset, amount: parsedAmount })
 
-  // Don't auto-estimate gas - we'll do it manually in handleDepositSubmit
-  // This prevents spamming gas estimation on every input change
   const uop = useUserOp({
-    sender: undefined,
-    calls: undefined,
+    paymaster: sendVerifyingPaymasterAddress[chainId],
+    paymasterVerificationGasLimit: 200000n,
+    paymasterPostOpGasLimit: 200000n,
+    callGasLimit: 150000n,
+    sender,
+    calls: calls.data,
   })
   const webauthnCreds = useMemo(
     () =>
@@ -155,79 +150,29 @@ export function DepositForm() {
     assert(Object.keys(form.formState.errors).length === 0, 'form is not valid')
     assert(sender, 'sender is not defined')
     assert(calls.isSuccess, 'calls is not success')
+    assert(uop.isSuccess, 'uop is not success')
 
     try {
-      // Manually estimate gas - build the user operation directly
-      log('Estimating gas...')
-
-      // Get nonce
-      const { getAccountNonce } = await import('permissionless')
-      const nonce = await getAccountNonce(baseMainnetClient, {
-        sender,
-        entryPoint: entryPointAddress[chainId],
-      })
-
-      // Get gas fees
-      const feesPerGas = await baseMainnetClient.estimateFeesPerGas()
-
-      // Build and estimate the user operation
-      const callData = encodeFunctionData({
-        abi: sendAccountAbi,
-        functionName: 'executeBatch',
-        args: [calls.data],
-      })
-
-      const userOp = {
-        sender,
-        nonce,
-        callData,
-        callGasLimit: 150000n,
-        verificationGasLimit: 550000n,
-        preVerificationGas: 70000n,
-        maxFeePerGas: feesPerGas.maxFeePerGas,
-        maxPriorityFeePerGas: feesPerGas.maxPriorityFeePerGas,
-        signature: '0x' as const,
-      }
-
-      // Estimate gas without paymaster
-      const gasEstimate = await baseMainnetBundlerClient.estimateUserOperationGas({
-        userOperation: userOp,
-      })
-
-      const estimatedUserOp = {
-        ...userOp,
-        callGasLimit: gasEstimate.callGasLimit,
-        preVerificationGas: gasEstimate.preVerificationGas,
-      }
-
-      log('Gas estimation complete', estimatedUserOp)
-
-      // Add SendVerifyingPaymaster fields
-      estimatedUserOp.paymaster = sendVerifyingPaymasterAddress[chainId]
-      estimatedUserOp.paymasterVerificationGasLimit = 200000n
-      estimatedUserOp.paymasterPostOpGasLimit = 200000n
-
-      // Get the paymaster signature to sponsor gas
       log('Requesting paymaster signature')
       const paymasterResult = await paymasterSignMutation.mutateAsync({
-        userop: estimatedUserOp,
+        userop: uop.data,
         entryPoint: entryPointAddress[chainId],
       })
       log('Paymaster signature received', paymasterResult)
 
       // Update the user operation with the paymaster data
-      estimatedUserOp.paymasterData = paymasterResult.paymasterData
+      uop.data.paymasterData = paymasterResult.paymasterData
 
-      // Then sign with the user's passkey
-      estimatedUserOp.signature = await signUserOp({
-        userOp: estimatedUserOp,
+      // Sign with the user's passkey
+      uop.data.signature = await signUserOp({
+        userOp: uop.data,
         webauthnCreds,
         chainId: chainId,
         entryPoint: entryPointAddress[chainId],
       })
 
       await depositMutation.mutateAsync({
-        userop: estimatedUserOp,
+        userop: uop.data,
         entryPoint: entryPointAddress[chainId],
       })
     } catch (error) {
@@ -240,7 +185,8 @@ export function DepositForm() {
     form.formState,
     sender,
     calls.isSuccess,
-    calls.data,
+    uop.isSuccess,
+    uop.data,
     webauthnCreds,
     chainId,
     depositMutation,
@@ -265,6 +211,8 @@ export function DepositForm() {
     parsedAmount > BigInt(0) &&
     calls.isSuccess &&
     !calls.isPending &&
+    uop.isSuccess &&
+    !uop.isPending &&
     !depositMutation.isPending &&
     !insufficientAmount &&
     Object.keys(form.formState.errors).length === 0
@@ -324,7 +272,7 @@ export function DepositForm() {
             </Paragraph>
           </Fade>
         ) : null}
-        {[calls.error, sendAccount.error].filter(Boolean).map((e) =>
+        {[calls.error, uop.error, sendAccount.error].filter(Boolean).map((e) =>
           e ? (
             <Fade key={`error-${e.message}`}>
               <XStack alignItems="center" jc="center" gap={'$2'} role="alert">
@@ -358,6 +306,7 @@ export function DepositForm() {
     [
       depositMutation.isPending,
       calls.error,
+      uop.error,
       sendAccount.error,
       areTermsAccepted,
       form.setError,
