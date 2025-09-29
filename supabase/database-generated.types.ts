@@ -408,6 +408,9 @@ export type Database = {
           referral_code: string | null
           send_id: number
           x_username: string | null
+          distribution_shares:
+            | Database["public"]["Tables"]["distribution_shares"]["Row"]
+            | null
           links_in_bio:
             | Database["public"]["Tables"]["link_in_bio"]["Row"]
             | null
@@ -1813,6 +1816,22 @@ export type Database = {
           id: string
           init_code: string
           main_tag_id: number | null
+          updated_at: string
+          user_id: string
+        }[]
+      }
+      distribution_shares: {
+        Args: { "": Database["public"]["Tables"]["profiles"]["Row"] }
+        Returns: {
+          address: string
+          amount: number
+          bonus_pool_amount: number
+          created_at: string
+          distribution_id: number
+          fixed_pool_amount: number
+          hodler_pool_amount: number
+          id: number
+          index: number
           updated_at: string
           user_id: string
         }[]

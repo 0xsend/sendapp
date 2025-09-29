@@ -56,7 +56,7 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
   )
 
   const isVerified = useMemo(
-    () => distributionShares[0] && distributionShares[0].amount > 0n,
+    () => Boolean(distributionShares[0] && distributionShares[0].amount > 0n),
     [distributionShares]
   )
 
@@ -122,8 +122,8 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
         >
           <ChevronRight
             position="absolute"
-            right={'$3'}
-            top={'$3'}
+            right={'$4'}
+            top={'$4'}
             size={'$1'}
             color={'$lightGrayTextField'}
             $theme-light={{ color: '$darkGrayTextField' }}
@@ -166,9 +166,16 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
                       <Avatar size={'$7'} br={'$4'}>
                         {avatarContent}
                       </Avatar>
-                      <XStack position="absolute" top={-10} right={-10} ai="center" jc="center">
-                        <VerificationIcon />
-                      </XStack>
+                    </XStack>
+                    <XStack
+                      position="absolute"
+                      top={-10}
+                      right={-10}
+                      ai="center"
+                      jc="center"
+                      zIndex={10}
+                    >
+                      <VerificationIcon />
                     </XStack>
                   </Tooltip.Trigger>
                 </Tooltip>
@@ -177,7 +184,14 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
                   <Avatar size={'$7'} br={'$4'}>
                     {avatarContent}
                   </Avatar>
-                  <XStack position="absolute" top={-10} right={-10} ai="center" jc="center">
+                  <XStack
+                    position="absolute"
+                    top={-10}
+                    right={-10}
+                    ai="center"
+                    jc="center"
+                    zIndex={10}
+                  >
                     <VerificationIcon />
                   </XStack>
                 </XStack>
