@@ -37,6 +37,7 @@ import {
   getAbiItem,
   type Hex,
   http,
+  isAddress,
   maxUint256,
   publicActions,
   withRetry,
