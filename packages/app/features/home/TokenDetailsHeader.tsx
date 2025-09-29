@@ -9,6 +9,7 @@ import { useMemo } from 'react'
 import { Platform } from 'react-native'
 import { TokenQuickActions } from './TokenQuickActions'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
+import { useIsPriceHidden } from './utils/useIsPriceHidden'
 import { calculatePercentageChange } from './utils/calculatePercentageChange'
 
 export const TokenDetailsHeader = () => {
@@ -123,6 +124,7 @@ const TokenDetailsBalance = ({
   isLoadingMarketData: boolean
 }) => {
   const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
+  const { isPriceHidden, toggleIsPriceHidden } = useIsPriceHidden()
 
   const media = useMedia()
   const isSmallScreen = !media.gtXs
@@ -178,7 +180,7 @@ const TokenDetailsBalance = ({
   }
 
   return (
-    <YStack gap={'$2'}>
+    <YStack gap={'$2'} onPress={() => toggleIsPriceHidden()}>
       <XStack alignItems={'center'} gap="$4">
         <Paragraph
           $platform-web={{ width: 'fit-content' }}
@@ -190,9 +192,11 @@ const TokenDetailsBalance = ({
           lineHeight={isSmallScreen ? 48 : 57}
           color={'$color12'}
         >
-          {isLoadingTokenPrices || mainUSDBalance === undefined
-            ? ''
-            : `$${formatAmount(mainUSDBalance, 9, 2)}`}
+          {isPriceHidden
+            ? '//////'
+            : isLoadingTokenPrices || mainUSDBalance === undefined
+              ? ''
+              : `$${formatAmount(mainUSDBalance, 9, 2)}`}
         </Paragraph>
         {/* Percent change badge to the right */}
         {!isStableCoin && !isLoadingMarketData && changeBadge}
@@ -201,7 +205,7 @@ const TokenDetailsBalance = ({
       {/* USD delta under main balance */}
       {!isStableCoin && !isLoadingMarketData && changePercent24h !== null ? (
         <Paragraph color={'$color10'} fontWeight={'400'} size={'$5'}>
-          {`${sign}$${formattedDeltaUSD} today`}
+          {`${isPriceHidden ? '///////' : `${sign}$${formattedDeltaUSD} today`}`}
         </Paragraph>
       ) : null}
     </YStack>
