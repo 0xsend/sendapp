@@ -47,9 +47,11 @@ import {
 import { useSendEarnDepositCalls, useSendEarnDepositVault } from './hooks'
 import { useSendEarnAPY } from '../hooks'
 import { Platform } from 'react-native'
+import { useUSDCFees } from 'app/utils/useUSDCFees'
 
 const log = debug('app:earn:deposit')
 const MINIMUM_DEPOSIT = BigInt(5 * 1e6) // 5 USDC
+const GAS_BUFFER_MULTIPLIER = 1.2 // 20% buffer for gas price fluctuations
 
 const DepositFormSchema = z.object({
   amount: formFields.text,
@@ -98,6 +100,23 @@ export function DepositForm() {
         .map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? [],
     [sendAccount?.data?.send_account_credentials]
   )
+
+  // Calculate gas fees in USDC
+  const usdcFees = useUSDCFees({ userOp: uop.data })
+  const totalGasCost = useMemo(() => {
+    if (!usdcFees.data) return BigInt(0)
+    const { gasFees, baseFee } = usdcFees.data
+    // Apply buffer to account for gas price fluctuations
+    const totalCost = gasFees + baseFee
+    return BigInt(Math.ceil(Number(totalCost) * GAS_BUFFER_MULTIPLIER))
+  }, [usdcFees.data])
+
+  // Calculate maximum depositable amount (balance - gas costs)
+  const maxDepositAmount = useMemo(() => {
+    if (!coinBalance.coin?.balance) return BigInt(0)
+    const available = coinBalance.coin.balance - totalGasCost
+    return available > 0n ? available : BigInt(0)
+  }, [coinBalance.coin?.balance, totalGasCost])
 
   // MUTATION DEPOSIT USEROP via Temporal
   const toast = useAppToast()
@@ -165,16 +184,18 @@ export function DepositForm() {
   log('calls', calls)
   log('depositMutation', depositMutation)
 
+  // Check if amount exceeds available balance (accounting for gas costs)
   const insufficientAmount =
     coinBalance.coin?.balance !== undefined &&
-    parsedAmount > coinBalance.coin?.balance &&
+    (parsedAmount > maxDepositAmount || parsedAmount + totalGasCost > coinBalance.coin.balance) &&
     !depositMutation.isSuccess
 
   const canSubmit =
     !coin.isLoading &&
     coinBalance.coin?.balance !== undefined &&
-    coinBalance.coin.balance >= parsedAmount &&
     parsedAmount > BigInt(0) &&
+    parsedAmount <= maxDepositAmount &&
+    parsedAmount + totalGasCost <= coinBalance.coin.balance &&
     calls.isSuccess &&
     uop.isSuccess &&
     !calls.isPending &&
@@ -320,6 +341,9 @@ export function DepositForm() {
     hasExistingDeposit,
     areTermsAccepted,
     insufficientAmount,
+    totalGasCost,
+    maxDepositAmount,
+    usdcFees: usdcFees.data,
   })
 
   return (
@@ -456,39 +480,83 @@ export function DepositForm() {
                                 flexDirection={'column'}
                                 $gtSm={{ flexDirection: 'row' }}
                               >
-                                <XStack gap={'$2'}>
-                                  <Paragraph
-                                    testID="earning-form-balance"
-                                    color={insufficientAmount ? '$error' : '$silverChalice'}
-                                    size={'$5'}
-                                    $theme-light={{
-                                      color: insufficientAmount ? '$error' : '$darkGrayTextField',
-                                    }}
-                                  >
-                                    Balance:
-                                  </Paragraph>
-                                  <Paragraph
-                                    color={insufficientAmount ? '$error' : '$color12'}
-                                    size={'$5'}
-                                    fontWeight={'600'}
-                                  >
-                                    {coin.data?.decimals
-                                      ? formatAmount(
-                                          formatUnits(
-                                            coinBalance.coin.balance,
-                                            coin.data?.decimals
-                                          ),
+                                <YStack gap={'$1.5'}>
+                                  <XStack gap={'$2'}>
+                                    <Paragraph
+                                      testID="earning-form-balance"
+                                      color={insufficientAmount ? '$error' : '$silverChalice'}
+                                      size={'$5'}
+                                      $theme-light={{
+                                        color: insufficientAmount ? '$error' : '$darkGrayTextField',
+                                      }}
+                                    >
+                                      Balance:
+                                    </Paragraph>
+                                    <Paragraph
+                                      color={insufficientAmount ? '$error' : '$color12'}
+                                      size={'$5'}
+                                      fontWeight={'600'}
+                                    >
+                                      {coin.data?.decimals
+                                        ? formatAmount(
+                                            formatUnits(
+                                              coinBalance.coin.balance,
+                                              coin.data?.decimals
+                                            ),
+                                            12,
+                                            2
+                                          )
+                                        : '-'}
+                                    </Paragraph>
+                                  </XStack>
+                                  {totalGasCost > 0n && coin.data?.decimals && (
+                                    <XStack gap={'$2'}>
+                                      <Paragraph
+                                        color={'$silverChalice'}
+                                        size={'$4'}
+                                        $theme-light={{
+                                          color: '$darkGrayTextField',
+                                        }}
+                                      >
+                                        Est. Gas:
+                                      </Paragraph>
+                                      <Paragraph color={'$color11'} size={'$4'}>
+                                        ~
+                                        {formatAmount(
+                                          formatUnits(totalGasCost, coin.data.decimals),
                                           12,
                                           2
-                                        )
-                                      : '-'}
-                                  </Paragraph>
-                                </XStack>
-                                {insufficientAmount && (
-                                  <Paragraph color={'$error'} size={'$5'}>
-                                    Insufficient funds
-                                  </Paragraph>
-                                )}
+                                        )}{' '}
+                                        USDC
+                                      </Paragraph>
+                                    </XStack>
+                                  )}
+                                  {maxDepositAmount > 0n && coin.data?.decimals && (
+                                    <XStack gap={'$2'}>
+                                      <Paragraph
+                                        color={'$silverChalice'}
+                                        size={'$4'}
+                                        $theme-light={{
+                                          color: '$darkGrayTextField',
+                                        }}
+                                      >
+                                        Available:
+                                      </Paragraph>
+                                      <Paragraph color={'$color12'} size={'$4'} fontWeight={'600'}>
+                                        {formatAmount(
+                                          formatUnits(maxDepositAmount, coin.data.decimals),
+                                          12,
+                                          2
+                                        )}
+                                      </Paragraph>
+                                    </XStack>
+                                  )}
+                                  {insufficientAmount && (
+                                    <Paragraph color={'$error'} size={'$5'}>
+                                      Insufficient funds (including gas)
+                                    </Paragraph>
+                                  )}
+                                </YStack>
                               </XStack>
                             )
                         }
