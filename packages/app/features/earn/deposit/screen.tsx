@@ -89,7 +89,7 @@ export function DepositForm() {
   const calls = useSendEarnDepositCalls({ sender, asset, amount: parsedAmount })
   const uop = useUserOp({
     sender,
-    calls: calls.data ?? undefined,
+    calls: calls.data || undefined,
   })
   const webauthnCreds = useMemo(
     () =>
