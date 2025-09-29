@@ -386,20 +386,31 @@ export const sendAccountRouter = createTRPCRouter({
         let isValidOperation = false
 
         // Try to decode as SendEarn deposit
+        const MINIMUM_DEPOSIT = BigInt(5 * 1e6) // 5 USDC (6 decimals)
         try {
           const depositArgs = decodeSendEarnDepositUserOp({ userOp: userop })
           if (isSendEarnVaultDeposit(depositArgs)) {
             const { owner, assets, vault } = depositArgs
-            if (isAddress(owner) && isAddress(vault) && assets > 0n) {
-              log('Validated as SendEarn vault deposit')
+            if (isAddress(owner) && isAddress(vault) && assets >= MINIMUM_DEPOSIT) {
+              log('Validated as SendEarn vault deposit', { assets: assets.toString() })
               isValidOperation = true
+            } else if (assets < MINIMUM_DEPOSIT) {
+              log('Deposit amount below minimum', {
+                assets: assets.toString(),
+                minimum: MINIMUM_DEPOSIT.toString(),
+              })
             }
           } else if (isSendEarnFactoryDeposit(depositArgs)) {
             const { owner, assets } = depositArgs
             // Referrer can be zero address (no referral), so we don't validate it
-            if (isAddress(owner) && assets > 0n) {
-              log('Validated as SendEarn factory deposit')
+            if (isAddress(owner) && assets >= MINIMUM_DEPOSIT) {
+              log('Validated as SendEarn factory deposit', { assets: assets.toString() })
               isValidOperation = true
+            } else if (assets < MINIMUM_DEPOSIT) {
+              log('Deposit amount below minimum', {
+                assets: assets.toString(),
+                minimum: MINIMUM_DEPOSIT.toString(),
+              })
             }
           }
         } catch (e) {
