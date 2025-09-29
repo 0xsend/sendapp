@@ -395,8 +395,9 @@ export const sendAccountRouter = createTRPCRouter({
               isValidOperation = true
             }
           } else if (isSendEarnFactoryDeposit(depositArgs)) {
-            const { owner, assets, referrer } = depositArgs
-            if (isAddress(owner) && isAddress(referrer) && assets > 0n) {
+            const { owner, assets } = depositArgs
+            // Referrer can be zero address (no referral), so we don't validate it
+            if (isAddress(owner) && assets > 0n) {
               log('Validated as SendEarn factory deposit')
               isValidOperation = true
             }
