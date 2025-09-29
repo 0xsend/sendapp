@@ -565,6 +565,46 @@ export function DepositForm() {
                   </XStack>
                 </YStack>
               </Fade>
+              {/* Gas Cost Summary Card */}
+              {parsedAmount > 0n && totalGasCost > 0n && coin.data?.decimals && (
+                <Fade>
+                  <Card bg={'$color2'} p={'$4'} gap={'$3'} br={'$4'}>
+                    <YStack gap={'$2'}>
+                      <XStack jc={'space-between'} ai={'center'}>
+                        <Paragraph size={'$4'} color={'$color11'}>
+                          Deposit Amount
+                        </Paragraph>
+                        <Paragraph size={'$4'} fontWeight={'500'}>
+                          {formatAmount(formatUnits(parsedAmount, coin.data.decimals), 12, 2)} USDC
+                        </Paragraph>
+                      </XStack>
+                      <XStack jc={'space-between'} ai={'center'}>
+                        <Paragraph size={'$4'} color={'$color11'}>
+                          + Transaction Fee (paid in USDC)
+                        </Paragraph>
+                        <Paragraph size={'$4'} fontWeight={'500'}>
+                          ~{formatAmount(formatUnits(totalGasCost, coin.data.decimals), 12, 2)} USDC
+                        </Paragraph>
+                      </XStack>
+                      <Separator boc={'$color5'} my={'$1'} />
+                      <XStack jc={'space-between'} ai={'center'}>
+                        <Paragraph size={'$5'} fontWeight={'600'}>
+                          Total Cost
+                        </Paragraph>
+                        <Paragraph size={'$5'} fontWeight={'600'}>
+                          ~
+                          {formatAmount(
+                            formatUnits(parsedAmount + totalGasCost, coin.data.decimals),
+                            12,
+                            2
+                          )}{' '}
+                          USDC
+                        </Paragraph>
+                      </XStack>
+                    </YStack>
+                  </Card>
+                </Fade>
+              )}
               {(() => {
                 switch (true) {
                   case baseApy.isLoading:
