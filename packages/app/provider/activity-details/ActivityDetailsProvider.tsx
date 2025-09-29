@@ -3,7 +3,7 @@ import { ActivityDetailsContext, type ActivityDetailsContextValue } from './Acti
 import { useRootScreenParams } from 'app/routers/params'
 import type { Activity } from 'app/utils/zod/activity'
 import { Platform } from 'react-native'
-import { useRouter } from 'solito/router'
+import { usePush } from 'app/utils/usePush'
 
 interface ActivityDetailsProviderProps {
   children: ReactNode
@@ -12,17 +12,17 @@ interface ActivityDetailsProviderProps {
 export const ActivityDetailsProvider = ({ children }: ActivityDetailsProviderProps) => {
   const [queryParams, setParams] = useRootScreenParams()
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
-  const router = useRouter()
+  const push = usePush()
 
   const selectActivity = useCallback(
     (activity: Activity) => {
       if (Platform.OS !== 'web') {
-        router.push('/activity/details')
+        push('/activity/details')
       }
       setParams({ ...queryParams, activity: 'details' })
       setSelectedActivity(activity)
     },
-    [queryParams, setParams, router.push]
+    [queryParams, setParams, push]
   )
 
   const closeActivityDetails = useCallback(() => {

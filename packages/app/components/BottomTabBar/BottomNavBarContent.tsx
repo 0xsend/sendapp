@@ -2,7 +2,6 @@ import { Button, Card, LinearGradient, LinkableButton, useTheme } from '@my/ui'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import type { NamedExoticComponent } from 'react'
 import type { IconProps } from '@tamagui/helpers-icon'
-import { Platform } from 'react-native'
 
 type Tab = {
   Icon: NamedExoticComponent<IconProps>
@@ -31,16 +30,7 @@ export const BottomNavBarContent = ({
       jc={'center'}
       overflow={'visible'}
     >
-      <Card
-        elevation={Platform.OS === 'android' ? undefined : 5}
-        fd="row"
-        gap="$7"
-        br={'$6'}
-        ai={'center'}
-        jc={'center'}
-        py={'$3'}
-        px="$7"
-      >
+      <Card elevation={5} fd="row" gap="$7" br={'$6'} ai={'center'} jc={'center'} py={'$3'} px="$7">
         {tabs.map((tab) => {
           const isActiveRoute = currentRoute === tab.key
 

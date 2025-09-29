@@ -40,6 +40,8 @@ import { Platform } from 'react-native'
 import { usePathname } from 'app/utils/usePathname'
 import { useTokensMarketData } from 'app/utils/coin-gecko'
 import { formatUnits } from 'viem'
+import { calculatePercentageChange } from './utils/calculatePercentageChange'
+import { localizeAmount } from 'app/utils/formatAmount'
 
 export function HomeScreen() {
   const media = useMedia()
@@ -193,9 +195,7 @@ export function InvestmentsBody() {
 
     const total = assets.reduce((s, a) => s + a.value, 0)
     const delta = assets.reduce((s, a) => {
-      // Calculate the actual dollar change from 24h ago to now
-      const previousValue = a.value / (1 + a.pct24h / 100)
-      const actualChange = a.value - previousValue
+      const actualChange = calculatePercentageChange(a.value, a.pct24h)
       return s + actualChange
     }, 0)
     const weightedPct =
@@ -208,6 +208,9 @@ export function InvestmentsBody() {
       setIsSheetOpen(false)
     }
   }, [pathname])
+
+  const formattedDeltaUSD = localizeAmount(Math.abs(delta24hUSD).toFixed(2))
+  const sign = delta24hUSD >= 0 ? '+' : '-'
 
   return (
     <YStack ai="center" $gtXs={{ gap: '$3' }} gap={'$3.5'} f={1}>
@@ -229,14 +232,7 @@ export function InvestmentsBody() {
 
       {/* Summary cards under the header */}
       <XStack w={'100%'} gap={'$3'}>
-        <Card
-          f={1}
-          padded
-          elevation={Platform.OS === 'android' ? undefined : '$0.75'}
-          jc={'center'}
-          ai={'center'}
-          w="100%"
-        >
+        <Card f={1} padded elevation={'$0.75'} jc={'center'} ai={'center'} w="100%">
           <YStack gap={'$2'} jc={'center'} ai={'center'}>
             <Paragraph color={'$color10'} size={'$4'}>
               Today
@@ -246,7 +242,7 @@ export function InvestmentsBody() {
             ) : (
               <YStack ai={'center'} gap={'$2'}>
                 <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
-                  {`${delta24hUSD > 0 ? '+' : delta24hUSD < 0 ? '-' : ''}$${Math.abs(delta24hUSD).toFixed(2)}`}
+                  {`${sign}$${formattedDeltaUSD}`}
                 </Paragraph>
                 {/* Small neutral pill to mirror style (no color change) */}
                 <Theme name={pct24h >= 0 ? 'green_active' : 'red_active'}>
@@ -270,14 +266,7 @@ export function InvestmentsBody() {
             )}
           </YStack>
         </Card>
-        <Card
-          f={1}
-          padded
-          elevation={Platform.OS === 'android' ? undefined : '$0.75'}
-          jc={'center'}
-          ai={'center'}
-          w="100%"
-        >
+        <Card f={1} padded elevation={'$0.75'} jc={'center'} ai={'center'} w="100%">
           <YStack gap={'$2'} jc={'center'} ai={'center'}>
             {/* <Paragraph color={'$color10'} size={'$4'}>
               Total Return
@@ -298,14 +287,7 @@ export function InvestmentsBody() {
             )}
           </YStack>
         </Card>
-        <Card
-          f={1}
-          padded
-          elevation={Platform.OS === 'android' ? undefined : '$0.75'}
-          jc={'center'}
-          ai={'center'}
-          w="100%"
-        >
+        <Card f={1} padded elevation={'$0.75'} jc={'center'} ai={'center'} w="100%">
           <YStack gap={'$2'} jc={'center'} ai={'center'}>
             {/* <Paragraph color={'$color10'} size={'$4'}>
               Investment

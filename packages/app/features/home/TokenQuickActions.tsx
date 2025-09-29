@@ -5,7 +5,6 @@ import type { LinkableButtonProps } from '@my/ui'
 import { type CoinWithBalance, stableCoins, usdcCoin } from 'app/data/coins'
 import { useLink } from 'solito/link'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
-import { Platform } from 'react-native'
 
 const QuickActionButton = ({ href, children }: LinkableButtonProps) => {
   const hoverStyles = useHoverStyles()
@@ -13,7 +12,7 @@ const QuickActionButton = ({ href, children }: LinkableButtonProps) => {
 
   return (
     <Button
-      elevation={Platform.OS === 'android' ? undefined : 1}
+      elevation={1}
       f={1}
       height={'auto'}
       hoverStyle={hoverStyles}

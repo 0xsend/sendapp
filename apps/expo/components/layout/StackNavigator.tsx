@@ -39,7 +39,7 @@ export default function StackNavigator() {
         ),
         // Performance optimizations for Android
         animation: 'slide_from_right',
-        animationDuration: Platform.OS === 'android' ? 200 : undefined,
+        animationDuration: Platform.OS === 'android' ? 150 : undefined,
         gestureEnabled: true,
         gestureDirection: 'horizontal',
         // Enable native stack optimizations

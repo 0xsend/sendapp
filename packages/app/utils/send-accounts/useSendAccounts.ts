@@ -1,8 +1,8 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import debug from 'debug'
-import { useRouter } from 'solito/router'
 import { useSupabase } from '../supabase/useSupabase'
 import { useUser } from '../useUser'
+import { useReplace } from 'app/utils/useReplace'
 
 const log = debug('app:utils:send-accounts')
 
@@ -12,7 +12,7 @@ const log = debug('app:utils:send-accounts')
 export function useSendAccounts() {
   const { user, validateToken } = useUser()
   const supabase = useSupabase()
-  const router = useRouter()
+  const replace = useReplace()
 
   return useQuery({
     queryKey: ['send_accounts'],
@@ -37,7 +37,7 @@ export function useSendAccounts() {
         if (error.code === 'PGRST301' || error.code === 'PGRST401') {
           log('unauthorized or invalid token in useSendAccounts')
           await supabase.auth.signOut()
-          router.replace('/')
+          replace('/')
           return []
         }
         throw new Error(error.message)
@@ -53,12 +53,12 @@ export function sendAccountQueryOptions({
   user,
   supabase,
   validateToken,
-  router,
+  replace,
 }: {
   user: ReturnType<typeof useUser>['user']
   supabase: ReturnType<typeof useSupabase>
   validateToken: () => Promise<boolean>
-  router: ReturnType<typeof useRouter>
+  replace: (url: string) => void
 }) {
   return queryOptions({
     queryKey: [useSendAccountQueryKey],
@@ -86,7 +86,7 @@ export function sendAccountQueryOptions({
         if (error.code === 'PGRST301' || error.code === 'PGRST401') {
           log('unauthorized or invalid token in sendAccountQueryOptions')
           await supabase.auth.signOut()
-          router.replace('/')
+          replace('/')
           return null
         }
         throw new Error(error.message)
@@ -100,9 +100,9 @@ export function sendAccountQueryOptions({
 export function useSendAccount() {
   const { user, validateToken } = useUser()
   const supabase = useSupabase()
-  const router = useRouter()
+  const replace = useReplace()
 
-  return useQuery(sendAccountQueryOptions({ user, supabase, validateToken, router }))
+  return useQuery(sendAccountQueryOptions({ user, supabase, validateToken, replace }))
 }
 
 useSendAccount.queryKey = useSendAccountQueryKey

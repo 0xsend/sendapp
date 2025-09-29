@@ -1,6 +1,5 @@
 import { Card, type CardProps, type StackProps } from 'tamagui'
 import { Fade } from './Fade'
-import { Platform } from 'react-native'
 
 export const FadeCard = ({
   children,
@@ -15,7 +14,7 @@ export const FadeCard = ({
         br={'$5'}
         p={'$5'}
         $gtLg={{ p: '$7', gap: '$5' }}
-        elevation={Platform.OS === 'android' ? undefined : '$0.75'}
+        elevation={'$0.75'}
         {...props}
       >
         {children}

@@ -1,36 +1,37 @@
 import { useQuery } from '@tanstack/react-query'
 import debug from 'debug'
-import { useRouter } from 'solito/router'
 import { useSessionContext } from './supabase/useSessionContext'
 import { useSupabase } from './supabase/useSupabase'
+import { useCallback, useMemo } from 'react'
+import { useReplace } from 'app/utils/useReplace'
 
 const log = debug('app:utils:useUser')
 
 export const useUser = () => {
   const { session, isLoading: isLoadingSession } = useSessionContext()
   const user = session?.user
-  const router = useRouter()
+  const replace = useReplace()
   const supabase = useSupabase()
 
   // Enhance validation for the token
-  const validateToken = async () => {
+  const validateToken = useCallback(async () => {
     try {
       // Test token validity with a lightweight API call
       const { error } = await supabase.auth.getUser()
       if (error) {
         log('invalid token detected', error)
         await supabase.auth.signOut()
-        router.replace('/')
+        replace('/')
         return false
       }
       return true
     } catch (e) {
       log('error validating token', e)
       await supabase.auth.signOut()
-      router.replace('/')
+      replace('/')
       return false
     }
-  }
+  }, [supabase.auth.getUser, supabase.auth.signOut, replace])
 
   // Run validation on mount if we have a session
   useQuery({
@@ -41,6 +42,33 @@ export const useUser = () => {
     staleTime: 60_000, // Cache validation for 1 minute
   })
 
+  const queryFn = useCallback(async () => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*, tags(*), main_tag(*), links_in_bio(*), distribution_shares(*)')
+      .eq('id', user?.id ?? '')
+      .single()
+
+    if (error) {
+      // no rows - edge case of user being deleted
+      if (error.code === 'PGRST116') {
+        log('no profile found for user', user?.id)
+        await supabase.auth.signOut()
+        replace('/')
+        return null
+      }
+      // check unauthorized or jwt error
+      if (error.code === 'PGRST301' || error.code === 'PGRST401') {
+        log('unauthorized or invalid JWT token')
+        await supabase.auth.signOut()
+        replace('/')
+        return null
+      }
+      throw new Error(error.message)
+    }
+    return data
+  }, [supabase, user?.id, replace])
+
   const {
     data: profile,
     isLoading: isLoadingProfile,
@@ -48,35 +76,10 @@ export const useUser = () => {
   } = useQuery({
     queryKey: ['profile', user?.id],
     enabled: !!user?.id,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*, tags(*), main_tag(*), links_in_bio(*)')
-        .eq('id', user?.id ?? '')
-        .single()
-
-      if (error) {
-        // no rows - edge case of user being deleted
-        if (error.code === 'PGRST116') {
-          log('no profile found for user', user?.id)
-          await supabase.auth.signOut()
-          router.replace('/')
-          return null
-        }
-        // check unauthorized or jwt error
-        if (error.code === 'PGRST301' || error.code === 'PGRST401') {
-          log('unauthorized or invalid JWT token')
-          await supabase.auth.signOut()
-          router.replace('/')
-          return null
-        }
-        throw new Error(error.message)
-      }
-      return data
-    },
+    queryFn,
   })
 
-  const avatarUrl = (() => {
+  const avatarUrl = useMemo(() => {
     if (profile?.avatar_url) return profile.avatar_url
     if (typeof user?.user_metadata?.avatar_url === 'string') return user.user_metadata.avatar_url
 
@@ -85,7 +88,7 @@ export const useUser = () => {
     params.append('name', name)
     params.append('size', '256') // will be resized again by NextImage/SolitoImage
     return `https://ui-avatars.com/api?${params.toString()}&format=png&background=86ad7f`
-  })()
+  }, [profile?.avatar_url, profile?.name, user?.email, user?.user_metadata?.avatar_url])
 
   return {
     session,
@@ -95,6 +98,7 @@ export const useUser = () => {
     tags: profile?.tags,
     mainTag: profile?.main_tag,
     linksInBio: profile?.links_in_bio || [],
+    distributionShares: profile?.distribution_shares || [],
     updateProfile: refetch,
     isLoadingSession,
     isLoadingProfile,

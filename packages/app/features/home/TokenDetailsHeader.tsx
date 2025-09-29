@@ -3,12 +3,13 @@ import { IconCoin } from 'app/components/icons'
 import { type CoinWithBalance, stableCoins } from 'app/data/coins'
 import { useTokensMarketData } from 'app/utils/coin-gecko'
 import { convertBalanceToFiat } from 'app/utils/convertBalanceToUSD'
-import formatAmount from 'app/utils/formatAmount'
+import formatAmount, { localizeAmount } from 'app/utils/formatAmount'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { useMemo } from 'react'
 import { Platform } from 'react-native'
 import { TokenQuickActions } from './TokenQuickActions'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
+import { calculatePercentageChange } from './utils/calculatePercentageChange'
 
 export const TokenDetailsHeader = () => {
   const { coin } = useCoinFromTokenParam()
@@ -26,13 +27,7 @@ export const TokenDetailsHeader = () => {
 
   return (
     <YStack gap="$3" pb="$3">
-      <Card
-        py="$5"
-        px="$4"
-        w={'100%'}
-        jc={'space-between'}
-        elevation={Platform.OS === 'android' ? undefined : 1}
-      >
+      <Card py="$5" px="$4" w={'100%'} jc={'space-between'} elevation={1}>
         <YStack gap="$4">
           <XStack ai={'center'} gap={'$3'}>
             <IconCoin size={'$2'} symbol={coin.symbol} />
@@ -136,12 +131,9 @@ const TokenDetailsBalance = ({
 
   // Compute the main USD balance and the USD delta for today
   const mainUSDBalance = balanceInUSD ?? 0
-  let usdDelta = 0
-  if (changePercent24h !== null && mainUSDBalance) {
-    // Calculate the actual dollar change from 24h ago to now
-    const previousValue = mainUSDBalance / (1 + changePercent24h / 100)
-    usdDelta = mainUSDBalance - previousValue
-  }
+  const usdDelta = calculatePercentageChange(mainUSDBalance, changePercent24h)
+  const formattedDeltaUSD = localizeAmount(Math.abs(usdDelta).toFixed(2))
+  const sign = usdDelta >= 0 ? '+' : '-'
 
   const changeBadge = (() => {
     if (changePercent24h === null || coin?.balance === 0n) return null
@@ -209,7 +201,7 @@ const TokenDetailsBalance = ({
       {/* USD delta under main balance */}
       {!isStableCoin && !isLoadingMarketData && changePercent24h !== null ? (
         <Paragraph color={'$color10'} fontWeight={'400'} size={'$5'}>
-          {`${usdDelta >= 0 ? '+' : '-'}$${formatAmount(Math.abs(usdDelta), 9, 2)} today`}
+          {`${sign}$${formattedDeltaUSD} today`}
         </Paragraph>
       ) : null}
     </YStack>

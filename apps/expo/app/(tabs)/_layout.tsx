@@ -75,6 +75,7 @@ export default function Layout() {
       <Tabs
         tabBar={(props) => <BottomNavBar currentRoute={getActiveTabName(props.state)} />}
         screenOptions={{
+          freezeOnBlur: true,
           headerStyle: {
             backgroundColor: theme.background.val,
           },
