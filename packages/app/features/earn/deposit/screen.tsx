@@ -11,7 +11,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { entryPointAddress, sendEarnAddress } from '@my/wagmi'
+import { entryPointAddress, sendEarnAddress, sendVerifyingPaymasterAddress } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { ReferredBy } from 'app/components/ReferredBy'
@@ -47,11 +47,9 @@ import {
 import { useSendEarnDepositCalls, useSendEarnDepositVault } from './hooks'
 import { useSendEarnAPY } from '../hooks'
 import { Platform } from 'react-native'
-import { useUSDCFees } from 'app/utils/useUSDCFees'
 
 const log = debug('app:earn:deposit')
 const MINIMUM_DEPOSIT = BigInt(5 * 1e6) // 5 USDC
-const GAS_BUFFER_MULTIPLIER = 1.2 // 20% buffer for gas price fluctuations
 
 const DepositFormSchema = z.object({
   amount: formFields.text,
@@ -92,6 +90,9 @@ export function DepositForm() {
   const uop = useUserOp({
     sender,
     calls: calls.data ?? undefined,
+    // Use SendVerifyingPaymaster to sponsor gas for deposits
+    paymaster: sendVerifyingPaymasterAddress[chainId],
+    paymasterData: '0x',
   })
   const webauthnCreds = useMemo(
     () =>
@@ -101,22 +102,11 @@ export function DepositForm() {
     [sendAccount?.data?.send_account_credentials]
   )
 
-  // Calculate gas fees in USDC
-  const usdcFees = useUSDCFees({ userOp: uop.data })
-  const totalGasCost = useMemo(() => {
-    if (!usdcFees.data) return BigInt(0)
-    const { gasFees, baseFee } = usdcFees.data
-    // Apply buffer to account for gas price fluctuations
-    const totalCost = gasFees + baseFee
-    return BigInt(Math.ceil(Number(totalCost) * GAS_BUFFER_MULTIPLIER))
-  }, [usdcFees.data])
-
-  // Calculate maximum depositable amount (balance - gas costs)
+  // Gas is sponsored for deposits, so no gas costs to calculate
   const maxDepositAmount = useMemo(() => {
     if (!coinBalance.coin?.balance) return BigInt(0)
-    const available = coinBalance.coin.balance - totalGasCost
-    return available > 0n ? available : BigInt(0)
-  }, [coinBalance.coin?.balance, totalGasCost])
+    return coinBalance.coin.balance
+  }, [coinBalance.coin?.balance])
 
   // MUTATION DEPOSIT USEROP via Temporal
   const toast = useAppToast()
@@ -163,6 +153,18 @@ export function DepositForm() {
     assert(uop.isSuccess, 'uop is not success')
 
     try {
+      // First, get the paymaster signature to sponsor gas
+      log('Requesting paymaster signature')
+      const paymasterResult = await api.sendEarn.paymasterSign.mutate({
+        userop: uop.data,
+        entryPoint: entryPointAddress[chainId],
+      })
+      log('Paymaster signature received', paymasterResult)
+
+      // Update the user operation with the paymaster data
+      uop.data.paymasterData = paymasterResult.paymasterData
+
+      // Then sign with the user's passkey
       uop.data.signature = await signUserOp({
         userOp: uop.data,
         webauthnCreds,
@@ -176,18 +178,21 @@ export function DepositForm() {
       })
     } catch (error) {
       log('Error during signing or mutation', error)
+      toast.error('Deposit Error', {
+        message: toNiceError(error),
+      })
     }
-  }, [form.formState, uop.isSuccess, uop.data, webauthnCreds, chainId, depositMutation])
+  }, [form.formState, uop.isSuccess, uop.data, webauthnCreds, chainId, depositMutation, toast])
 
   // DEBUG
   log('uop', uop)
   log('calls', calls)
   log('depositMutation', depositMutation)
 
-  // Check if amount exceeds available balance (accounting for gas costs)
+  // Check if amount exceeds available balance
   const insufficientAmount =
     coinBalance.coin?.balance !== undefined &&
-    (parsedAmount > maxDepositAmount || parsedAmount + totalGasCost > coinBalance.coin.balance) &&
+    parsedAmount > maxDepositAmount &&
     !depositMutation.isSuccess
 
   const canSubmit =
@@ -195,7 +200,6 @@ export function DepositForm() {
     coinBalance.coin?.balance !== undefined &&
     parsedAmount > BigInt(0) &&
     parsedAmount <= maxDepositAmount &&
-    parsedAmount + totalGasCost <= coinBalance.coin.balance &&
     calls.isSuccess &&
     uop.isSuccess &&
     !calls.isPending &&
@@ -341,9 +345,7 @@ export function DepositForm() {
     hasExistingDeposit,
     areTermsAccepted,
     insufficientAmount,
-    totalGasCost,
     maxDepositAmount,
-    usdcFees: usdcFees.data,
   })
 
   return (
@@ -509,51 +511,9 @@ export function DepositForm() {
                                         : '-'}
                                     </Paragraph>
                                   </XStack>
-                                  {totalGasCost > 0n && coin.data?.decimals && (
-                                    <XStack gap={'$2'}>
-                                      <Paragraph
-                                        color={'$silverChalice'}
-                                        size={'$4'}
-                                        $theme-light={{
-                                          color: '$darkGrayTextField',
-                                        }}
-                                      >
-                                        Est. Gas:
-                                      </Paragraph>
-                                      <Paragraph color={'$color11'} size={'$4'}>
-                                        ~
-                                        {formatAmount(
-                                          formatUnits(totalGasCost, coin.data.decimals),
-                                          12,
-                                          2
-                                        )}{' '}
-                                        USDC
-                                      </Paragraph>
-                                    </XStack>
-                                  )}
-                                  {maxDepositAmount > 0n && coin.data?.decimals && (
-                                    <XStack gap={'$2'}>
-                                      <Paragraph
-                                        color={'$silverChalice'}
-                                        size={'$4'}
-                                        $theme-light={{
-                                          color: '$darkGrayTextField',
-                                        }}
-                                      >
-                                        Available:
-                                      </Paragraph>
-                                      <Paragraph color={'$color12'} size={'$4'} fontWeight={'600'}>
-                                        {formatAmount(
-                                          formatUnits(maxDepositAmount, coin.data.decimals),
-                                          12,
-                                          2
-                                        )}
-                                      </Paragraph>
-                                    </XStack>
-                                  )}
                                   {insufficientAmount && (
                                     <Paragraph color={'$error'} size={'$5'}>
-                                      Insufficient funds (including gas)
+                                      Insufficient funds
                                     </Paragraph>
                                   )}
                                 </YStack>
@@ -565,46 +525,6 @@ export function DepositForm() {
                   </XStack>
                 </YStack>
               </Fade>
-              {/* Gas Cost Summary Card */}
-              {parsedAmount > 0n && totalGasCost > 0n && coin.data?.decimals && (
-                <Fade>
-                  <Card bg={'$color2'} p={'$4'} gap={'$3'} br={'$4'}>
-                    <YStack gap={'$2'}>
-                      <XStack jc={'space-between'} ai={'center'}>
-                        <Paragraph size={'$4'} color={'$color11'}>
-                          Deposit Amount
-                        </Paragraph>
-                        <Paragraph size={'$4'} fontWeight={'500'}>
-                          {formatAmount(formatUnits(parsedAmount, coin.data.decimals), 12, 2)} USDC
-                        </Paragraph>
-                      </XStack>
-                      <XStack jc={'space-between'} ai={'center'}>
-                        <Paragraph size={'$4'} color={'$color11'}>
-                          + Transaction Fee (paid in USDC)
-                        </Paragraph>
-                        <Paragraph size={'$4'} fontWeight={'500'}>
-                          ~{formatAmount(formatUnits(totalGasCost, coin.data.decimals), 12, 2)} USDC
-                        </Paragraph>
-                      </XStack>
-                      <Separator boc={'$color5'} my={'$1'} />
-                      <XStack jc={'space-between'} ai={'center'}>
-                        <Paragraph size={'$5'} fontWeight={'600'}>
-                          Total Cost
-                        </Paragraph>
-                        <Paragraph size={'$5'} fontWeight={'600'}>
-                          ~
-                          {formatAmount(
-                            formatUnits(parsedAmount + totalGasCost, coin.data.decimals),
-                            12,
-                            2
-                          )}{' '}
-                          USDC
-                        </Paragraph>
-                      </XStack>
-                    </YStack>
-                  </Card>
-                </Fade>
-              )}
               {(() => {
                 switch (true) {
                   case baseApy.isLoading:
