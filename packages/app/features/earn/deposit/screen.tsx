@@ -102,12 +102,6 @@ export function DepositForm() {
     [sendAccount?.data?.send_account_credentials]
   )
 
-  // Gas is sponsored for deposits, so no gas costs to calculate
-  const maxDepositAmount = useMemo(() => {
-    if (!coinBalance.coin?.balance) return BigInt(0)
-    return coinBalance.coin.balance
-  }, [coinBalance.coin?.balance])
-
   // MUTATION DEPOSIT USEROP via Temporal
   const toast = useAppToast()
   const queryClient = useQueryClient()
@@ -192,14 +186,14 @@ export function DepositForm() {
   // Check if amount exceeds available balance
   const insufficientAmount =
     coinBalance.coin?.balance !== undefined &&
-    parsedAmount > maxDepositAmount &&
+    parsedAmount > coinBalance.coin.balance &&
     !depositMutation.isSuccess
 
   const canSubmit =
     !coin.isLoading &&
     coinBalance.coin?.balance !== undefined &&
+    coinBalance.coin.balance >= parsedAmount &&
     parsedAmount > BigInt(0) &&
-    parsedAmount <= maxDepositAmount &&
     calls.isSuccess &&
     uop.isSuccess &&
     !calls.isPending &&
@@ -345,7 +339,6 @@ export function DepositForm() {
     hasExistingDeposit,
     areTermsAccepted,
     insufficientAmount,
-    maxDepositAmount,
   })
 
   return (
