@@ -14,7 +14,13 @@ const AvatarMenuButton = ({ profile }: AvatarMenuButtonProps) => {
   if (isLoading) return <Spinner size="small" color={'$color12'} alignSelf="center" p="$3" />
 
   return (
-    <LinkableAvatar href={'/account'} size={'$3.5'} circular={true} backgroundColor={'$color1'}>
+    <LinkableAvatar
+      elevation={5}
+      href={'/account'}
+      size={'$3.5'}
+      circular={true}
+      backgroundColor={'$color1'}
+    >
       {profile?.avatar_url ? (
         <>
           <Avatar.Image src={profile.avatar_url} w="100%" h="100%" objectFit="cover" />

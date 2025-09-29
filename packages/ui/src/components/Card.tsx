@@ -1,7 +1,6 @@
 import { ThemeableStack } from '@tamagui/stacks'
 import type { GetProps, SizeTokens } from '@tamagui/web'
 import { createStyledContext, styled, withStaticProperties } from '@tamagui/web'
-import { Platform } from 'react-native'
 
 const CardContext = createStyledContext({
   size: '$true' as SizeTokens,
@@ -10,7 +9,7 @@ const CardContext = createStyledContext({
 export const CardFrame = styled(ThemeableStack, {
   name: 'Card',
   context: CardContext,
-  elevation: Platform.OS === 'android' ? undefined : '$0.75',
+  elevation: '$0.75',
 
   variants: {
     unstyled: {

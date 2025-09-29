@@ -155,7 +155,7 @@ function SearchResults() {
       )}
       {query && (
         <YGroup
-          elevation={Platform.OS === 'android' ? undefined : '$0.75'}
+          elevation={'$0.75'}
           bc={'$color1'}
           p={'$3'}
           $gtLg={{
@@ -649,11 +649,7 @@ function Search({ label, placeholder = 'Search', autoFocus = false, containerPro
             }}
           >
             {({ query }) => (
-              <ThemeableStack
-                elevation={Platform.OS === 'android' ? undefined : '$0.75'}
-                br="$4"
-                {...containerProps}
-              >
+              <ThemeableStack elevation={'$0.75'} br="$4" {...containerProps}>
                 {query}
               </ThemeableStack>
             )}

@@ -299,7 +299,7 @@ const EarningButton = ({
           py={'$3.5'}
           br={'$6'}
           backgroundColor={'$color1'}
-          elevation={Platform.OS === 'android' ? undefined : '$0.75'}
+          elevation={'$0.75'}
           hoverStyle={hoverStyles}
         >
           <Stack

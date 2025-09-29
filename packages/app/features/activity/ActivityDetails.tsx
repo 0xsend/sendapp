@@ -75,7 +75,7 @@ const ActivityDetailsContent = ({ activity, ...props }: { activity: Activity } &
           br={'$6'}
           p={'$4'}
           gap={'$3.5'}
-          elevation={Platform.OS === 'android' ? undefined : '$0.75'}
+          elevation={'$0.75'}
           $gtLg={{
             p: '$7',
           }}

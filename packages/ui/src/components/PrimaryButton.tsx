@@ -8,7 +8,6 @@ import {
 } from 'tamagui'
 import type { PropsWithChildren } from 'react'
 import { forwardRef } from 'react'
-import { Platform } from 'react-native'
 
 export const _PrimaryButton = forwardRef<TamaguiElement | null, ButtonProps>(
   ({ disabled, children, ...props }, ref) => {
@@ -16,7 +15,7 @@ export const _PrimaryButton = forwardRef<TamaguiElement | null, ButtonProps>(
       <Button
         ref={ref}
         theme={'green'}
-        elevation={disabled && Platform.OS !== 'android' ? '$0.75' : undefined}
+        elevation={disabled ? '$0.75' : undefined}
         alignSelf={'center'}
         w={'100%'}
         py={'$3'}

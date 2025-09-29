@@ -139,7 +139,7 @@ function SendtagList({
   const canChangeMainTag = tags.length > 1
 
   return (
-    <FadeCard testID={'sendtags-list'} bc={'$color1'} gap={'$5'}>
+    <FadeCard testID={'sendtags-list'} elevation={'$0.75'} bc={'$color1'} gap={'$5'}>
       {tags.map((tag) => (
         <TagItem key={tag.name} tag={tag} isMain={tag.id === mainTagId} />
       ))}
