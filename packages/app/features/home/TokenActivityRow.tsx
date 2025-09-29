@@ -17,19 +17,22 @@ import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { useSwapRouters } from 'app/utils/useSwapRouters'
 import { useLiquidityPools } from 'app/utils/useLiquidityPools'
 import { useUser } from 'app/utils/useUser'
-import { useRouter } from 'solito/router'
 import {
   isTemporalEthTransfersEvent,
   isTemporalTokenTransfersEvent,
 } from 'app/utils/zod/activity/TemporalTransfersEventSchema'
+import type { ReactNode } from 'react'
+import { memo, useCallback } from 'react'
+import { usePush } from 'app/utils/usePush'
 
-export function TokenActivityRow({
+export const TokenActivityRow = ({
   activity,
   onPress,
 }: {
   activity: Activity
   onPress?: (activity: Activity) => void
-}) {
+}) => {
+  const push = usePush()
   const { profile } = useUser()
   const { data: swapRouters } = useSwapRouters()
   const { data: liquidityPools } = useLiquidityPools()
@@ -42,70 +45,111 @@ export function TokenActivityRow({
   const isETHReceive = isSendAccountReceiveEvent(activity)
   const isTemporalTransfer =
     isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
-  const hoverStyles = useHoverStyles()
-  const router = useRouter()
-
   const isUserTransfer =
     (isERC20Transfer || isETHReceive || isTemporalTransfer) &&
     Boolean(to_user?.send_id) &&
     Boolean(from_user?.send_id)
 
-  const handlePress = () => {
+  const handlePress = useCallback(() => {
     if (onPress) {
       if (isUserTransfer) {
-        router.push(
+        push(
           `/profile/${profile?.send_id === from_user?.send_id ? to_user?.send_id : from_user?.send_id}/history`
         )
         return
       }
       onPress(activity)
     }
-  }
+  }, [
+    onPress,
+    isUserTransfer,
+    push,
+    profile?.send_id,
+    from_user?.send_id,
+    to_user?.send_id,
+    activity,
+  ])
 
   return (
-    <XStack
-      width={'100%'}
-      height={102}
-      ai="center"
-      jc="space-between"
-      gap="$4"
-      p="$3.5"
-      br={'$4'}
-      borderWidth={1}
-      borderColor={'$color1'}
-      cursor={onPress ? 'pointer' : 'default'}
-      testID={'TokenActivityRow'}
-      hoverStyle={onPress ? hoverStyles : null}
-      onPress={handlePress}
-    >
-      <XStack gap="$3.5" width={'100%'} f={1} alignItems={'flex-start'}>
-        <ActivityAvatar activity={activity} />
-        <YStack width={'100%'} f={1} height={'auto'} overflow="hidden" gap={'$1'}>
-          <XStack jc="space-between" gap="$1.5" width={'100%'}>
-            <Text color="$color12" fontSize="$5" fontWeight={'500'}>
-              {isUserTransfer ? subtext : eventName}
-            </Text>
-            <Text>&nbsp;</Text>
-            <Text color="$color12" fontSize="$5" fontWeight={'500'} ta="right">
-              {amount}
-            </Text>
-          </XStack>
-          <Paragraph
-            color={'$color10'}
-            size={'$4'}
-            maxWidth={'100%'}
-            overflow={'hidden'}
-            textOverflow={'ellipsis'}
-            numberOfLines={2}
-            lineHeight={18}
-          >
-            {isUserTransfer ? eventName : subtext}
-          </Paragraph>
-          <Paragraph color={'$color10'} size={'$3'} flexShrink={0} display={'flex'} opacity={0.6}>
-            {date}
-          </Paragraph>
-        </YStack>
-      </XStack>
-    </XStack>
+    <TokenActivityRowContent
+      amount={amount}
+      date={date}
+      eventName={eventName}
+      subtext={subtext}
+      isUserTransfer={isUserTransfer}
+      activity={activity}
+      onPress={onPress ? handlePress : undefined}
+    />
   )
 }
+
+const TokenActivityRowContent = memo(
+  ({
+    amount,
+    date,
+    eventName,
+    subtext,
+    isUserTransfer,
+    activity,
+    onPress,
+  }: {
+    amount: ReactNode
+    date: ReactNode
+    eventName: string
+    subtext: string | null
+    isUserTransfer: boolean
+    activity: Activity
+    onPress?: () => void
+  }) => {
+    const hoverStyles = useHoverStyles()
+
+    return (
+      <XStack
+        width={'100%'}
+        height={102}
+        ai="center"
+        jc="space-between"
+        gap="$4"
+        p="$3.5"
+        br={'$4'}
+        borderWidth={1}
+        borderColor={'$color1'}
+        cursor={onPress ? 'pointer' : 'default'}
+        testID={'TokenActivityRow'}
+        hoverStyle={onPress ? hoverStyles : null}
+        onPress={onPress}
+      >
+        <XStack gap="$3.5" width={'100%'} f={1} alignItems={'flex-start'}>
+          <ActivityAvatar activity={activity} />
+          <YStack width={'100%'} f={1} height={'auto'} overflow="hidden" gap={'$1'}>
+            <XStack jc="space-between" gap="$1.5" width={'100%'}>
+              <Text color="$color12" fontSize="$5" fontWeight={'500'}>
+                {isUserTransfer ? subtext : eventName}
+              </Text>
+              <Text>&nbsp;</Text>
+              <Text color="$color12" fontSize="$5" fontWeight={'500'} ta="right">
+                {amount}
+              </Text>
+            </XStack>
+            <Paragraph
+              color={'$color10'}
+              size={'$4'}
+              maxWidth={'100%'}
+              overflow={'hidden'}
+              textOverflow={'ellipsis'}
+              numberOfLines={2}
+              lineHeight={18}
+            >
+              {isUserTransfer ? eventName : subtext}
+            </Paragraph>
+            <Paragraph color={'$color10'} size={'$3'} flexShrink={0} display={'flex'} opacity={0.6}>
+              {date}
+            </Paragraph>
+          </YStack>
+        </XStack>
+      </XStack>
+    )
+  }
+)
+
+TokenActivityRowContent.displayName = 'TokenActivityRowContent'
