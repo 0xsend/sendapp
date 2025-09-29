@@ -157,61 +157,48 @@ export function DepositForm() {
     assert(calls.isSuccess, 'calls is not success')
 
     try {
-      // Manually estimate gas using the userop query function
-      // We use the query client to trigger a one-time fetch without auto-refetch
+      // Manually estimate gas - build the user operation directly
       log('Estimating gas...')
-      const estimatedUserOp = await queryClient.fetchQuery({
-        queryKey: ['userop', { sender, calls: calls.data }],
-        queryFn: async () => {
-          const { data: nonce } = await queryClient.fetchQuery({
-            queryKey: ['accountNonce', sender],
-            queryFn: async () => {
-              const { getAccountNonce } = await import('permissionless')
-              return getAccountNonce(baseMainnetClient, {
-                sender,
-                entryPoint: entryPointAddress[chainId],
-              })
-            },
-          })
 
-          const { data: feesPerGas } = await queryClient.fetchQuery({
-            queryKey: ['estimateFeesPerGas', chainId],
-            queryFn: async () => {
-              return baseMainnetClient.estimateFeesPerGas()
-            },
-          })
-
-          // Build and estimate the user operation
-          const callData = encodeFunctionData({
-            abi: sendAccountAbi,
-            functionName: 'executeBatch',
-            args: [calls.data],
-          })
-
-          const userOp = {
-            sender,
-            nonce,
-            callData,
-            callGasLimit: 150000n,
-            verificationGasLimit: 550000n,
-            preVerificationGas: 70000n,
-            maxFeePerGas: feesPerGas.maxFeePerGas,
-            maxPriorityFeePerGas: feesPerGas.maxPriorityFeePerGas,
-            signature: '0x' as const,
-          }
-
-          // Estimate gas without paymaster
-          const gasEstimate = await baseMainnetBundlerClient.estimateUserOperationGas({
-            userOperation: userOp,
-          })
-
-          return {
-            ...userOp,
-            callGasLimit: gasEstimate.callGasLimit,
-            preVerificationGas: gasEstimate.preVerificationGas,
-          }
-        },
+      // Get nonce
+      const { getAccountNonce } = await import('permissionless')
+      const nonce = await getAccountNonce(baseMainnetClient, {
+        sender,
+        entryPoint: entryPointAddress[chainId],
       })
+
+      // Get gas fees
+      const feesPerGas = await baseMainnetClient.estimateFeesPerGas()
+
+      // Build and estimate the user operation
+      const callData = encodeFunctionData({
+        abi: sendAccountAbi,
+        functionName: 'executeBatch',
+        args: [calls.data],
+      })
+
+      const userOp = {
+        sender,
+        nonce,
+        callData,
+        callGasLimit: 150000n,
+        verificationGasLimit: 550000n,
+        preVerificationGas: 70000n,
+        maxFeePerGas: feesPerGas.maxFeePerGas,
+        maxPriorityFeePerGas: feesPerGas.maxPriorityFeePerGas,
+        signature: '0x' as const,
+      }
+
+      // Estimate gas without paymaster
+      const gasEstimate = await baseMainnetBundlerClient.estimateUserOperationGas({
+        userOperation: userOp,
+      })
+
+      const estimatedUserOp = {
+        ...userOp,
+        callGasLimit: gasEstimate.callGasLimit,
+        preVerificationGas: gasEstimate.preVerificationGas,
+      }
 
       log('Gas estimation complete', estimatedUserOp)
 
@@ -259,7 +246,6 @@ export function DepositForm() {
     depositMutation,
     paymasterSignMutation,
     toast,
-    queryClient,
   ])
 
   // DEBUG
