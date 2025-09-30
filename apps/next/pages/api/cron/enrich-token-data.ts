@@ -119,6 +119,9 @@ async function fetchCoinGeckoMetadata(
  *
  * This endpoint:
  * 1. Fetches tokens that need enrichment (missing name, symbol, or decimals)
+ *    - Prioritized by total balance held by users (highest first)
+ *    - Then by number of holders (most holders first)
+ *    - Then by block time (newest first)
  * 2. Calls the token contract to get on-chain metadata (name, symbol, decimals, totalSupply)
  * 3. Updates the erc20_tokens table with on-chain data
  * 4. Fetches off-chain metadata from CoinGecko (logo, description, price, market data)

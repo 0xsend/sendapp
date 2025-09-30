@@ -13,8 +13,10 @@ type UndiscoveredToken = {
  *
  * This endpoint:
  * 1. Queries send_account_transfers for tokens not yet in erc20_tokens
+ *    - Prioritized by total balance held by users (highest first)
+ *    - Then by number of holders (most holders first)
+ *    - Then by block time (newest first)
  * 2. Inserts placeholder records (will be enriched by enrich-token-data cron)
- * 3. Initializes activity tracking
  *
  * This is primarily for bootstrapping from existing data.
  * Going forward, the trigger on send_account_transfers will handle discovery automatically.
@@ -91,19 +93,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             console.error(`Failed to insert token ${addressHex}:`, tokenError)
             failed.push(addressHex)
             continue
-          }
-        }
-
-        // Initialize activity tracking
-        const { error: activityError } = await supabase.from('erc20_token_activity').insert({
-          token_address: token.token_address,
-          chain_id: token.chain_id,
-        })
-
-        if (activityError) {
-          // Ignore conflicts (already exists)
-          if (activityError.code !== '23505') {
-            console.error(`Failed to insert activity for ${addressHex}:`, activityError)
           }
         }
 
