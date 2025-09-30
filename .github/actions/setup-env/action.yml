@@ -53,6 +53,13 @@ runs:
       uses: foundry-rs/foundry-toolchain@v1
       with:
         version: stable
+    - name: Mount node_modules Sticky Disk
+      if: ${{ inputs.yarn-install == 'true' }}
+      uses: useblacksmith/stickydisk@v1
+      continue-on-error: true
+      with:
+        key: ${{ github.repository }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+        path: ./node_modules
     - name: Yarn Install
       if: ${{ inputs.yarn-install == 'true' }}
       shell: bash
@@ -60,6 +67,23 @@ runs:
     - name: Install Tilt
       if: ${{ inputs.install-tilt == 'true' }}
       uses: ./.github/actions/install-tilt
+    - name: Fix Git Config Permissions for Homebrew
+      if: ${{ inputs.brew-bundle == 'true' }}
+      shell: bash
+      run: |
+        # Ensure Git config directory exists and has proper permissions
+        mkdir -p $HOME/.config/git
+        touch $HOME/.gitconfig
+        chmod 644 $HOME/.gitconfig
+
+        # Pre-add safe directories that Homebrew will need
+        git config --global --add safe.directory /home/linuxbrew/.linuxbrew/Homebrew
+        git config --global --add safe.directory /home/linuxbrew/.linuxbrew/Homebrew/Library/Taps/homebrew/homebrew-core
+        git config --global --add safe.directory /home/linuxbrew/.linuxbrew/Homebrew/Library/Taps/homebrew/homebrew-cask
+
+        # Ensure Homebrew directories exist with proper permissions
+        sudo mkdir -p /home/linuxbrew/.linuxbrew
+        sudo chown -R $(whoami) /home/linuxbrew/.linuxbrew || true
     - name: Set up Homebrew
       if: ${{ inputs.brew-bundle == 'true' }}
       id: set-up-homebrew
