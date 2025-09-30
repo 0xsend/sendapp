@@ -1071,10 +1071,10 @@ interface Tables_relationships {
 
     };
     children: {
-      objects_bucketId_fkey: "storage.objects";
-      prefixes_bucketId_fkey: "storage.prefixes";
-      s3_multipart_uploads_bucket_id_fkey: "storage.s3_multipart_uploads";
-      s3_multipart_uploads_parts_bucket_id_fkey: "storage.s3_multipart_uploads_parts";
+       objects_bucketId_fkey: "storage.objects";
+       prefixes_bucketId_fkey: "storage.prefixes";
+       s3_multipart_uploads_bucket_id_fkey: "storage.s3_multipart_uploads";
+       s3_multipart_uploads_parts_bucket_id_fkey: "storage.s3_multipart_uploads_parts";
     };
     parentDestinationsTables:  | {};
     childDestinationsTables: "storage.objects" | "storage.prefixes" | "storage.s3_multipart_uploads" | "storage.s3_multipart_uploads_parts" | {};
