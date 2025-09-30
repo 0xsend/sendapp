@@ -54,22 +54,22 @@ interface Table_auth_audit_log_entries {
   ip_address: string;
 }
 interface Table_storage_buckets {
-  id: string
-  name: string
-  owner: string | null
-  created_at: string | null
-  updated_at: string | null
-  public: boolean | null
-  avif_autodetection: boolean | null
-  file_size_limit: number | null
-  allowed_mime_types: string[] | null
-  owner_id: string | null
+  id: string;
+  name: string;
+  owner: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  public: boolean | null;
+  avif_autodetection: boolean | null;
+  file_size_limit: number | null;
+  allowed_mime_types: string[] | null;
+  owner_id: string | null;
 }
 interface Table_public_canton_party_verifications {
-  id: string
-  user_id: string
-  canton_wallet_address: string
-  created_at: string
+  id: string;
+  user_id: string;
+  canton_wallet_address: string;
+  created_at: string;
 }
 interface Table_public_chain_addresses {
   address: string;
@@ -942,44 +942,44 @@ interface Schema_private {
   leaderboard_referrals_all_time: Table_private_leaderboard_referrals_all_time;
 }
 interface Schema_public {
-  activity: Table_public_activity
-  affiliate_stats: Table_public_affiliate_stats
-  canton_party_verifications: Table_public_canton_party_verifications
-  chain_addresses: Table_public_chain_addresses
-  challenges: Table_public_challenges
-  distribution_shares: Table_public_distribution_shares
-  distribution_verification_values: Table_public_distribution_verification_values
-  distribution_verifications: Table_public_distribution_verifications
-  distributions: Table_public_distributions
-  link_in_bio: Table_public_link_in_bio
-  liquidity_pools: Table_public_liquidity_pools
-  profiles: Table_public_profiles
-  receipts: Table_public_receipts
-  referrals: Table_public_referrals
-  send_account_created: Table_public_send_account_created
-  send_account_credentials: Table_public_send_account_credentials
-  send_account_receives: Table_public_send_account_receives
-  send_account_signing_key_added: Table_public_send_account_signing_key_added
-  send_account_signing_key_removed: Table_public_send_account_signing_key_removed
-  send_account_tags: Table_public_send_account_tags
-  send_account_transfers: Table_public_send_account_transfers
-  send_accounts: Table_public_send_accounts
-  send_earn_create: Table_public_send_earn_create
-  send_earn_deposit: Table_public_send_earn_deposit
-  send_earn_new_affiliate: Table_public_send_earn_new_affiliate
-  send_earn_withdraw: Table_public_send_earn_withdraw
-  send_liquidity_pools: Table_public_send_liquidity_pools
-  send_revenues_safe_receives: Table_public_send_revenues_safe_receives
-  send_slash: Table_public_send_slash
-  send_token_transfers: Table_public_send_token_transfers
-  send_token_v0_transfers: Table_public_send_token_v_0_transfers
-  sendpot_jackpot_runs: Table_public_sendpot_jackpot_runs
-  sendpot_user_ticket_purchases: Table_public_sendpot_user_ticket_purchases
-  sendtag_checkout_receipts: Table_public_sendtag_checkout_receipts
-  swap_routers: Table_public_swap_routers
-  tag_receipts: Table_public_tag_receipts
-  tags: Table_public_tags
-  webauthn_credentials: Table_public_webauthn_credentials
+  activity: Table_public_activity;
+  affiliate_stats: Table_public_affiliate_stats;
+  canton_party_verifications: Table_public_canton_party_verifications;
+  chain_addresses: Table_public_chain_addresses;
+  challenges: Table_public_challenges;
+  distribution_shares: Table_public_distribution_shares;
+  distribution_verification_values: Table_public_distribution_verification_values;
+  distribution_verifications: Table_public_distribution_verifications;
+  distributions: Table_public_distributions;
+  link_in_bio: Table_public_link_in_bio;
+  liquidity_pools: Table_public_liquidity_pools;
+  profiles: Table_public_profiles;
+  receipts: Table_public_receipts;
+  referrals: Table_public_referrals;
+  send_account_created: Table_public_send_account_created;
+  send_account_credentials: Table_public_send_account_credentials;
+  send_account_receives: Table_public_send_account_receives;
+  send_account_signing_key_added: Table_public_send_account_signing_key_added;
+  send_account_signing_key_removed: Table_public_send_account_signing_key_removed;
+  send_account_tags: Table_public_send_account_tags;
+  send_account_transfers: Table_public_send_account_transfers;
+  send_accounts: Table_public_send_accounts;
+  send_earn_create: Table_public_send_earn_create;
+  send_earn_deposit: Table_public_send_earn_deposit;
+  send_earn_new_affiliate: Table_public_send_earn_new_affiliate;
+  send_earn_withdraw: Table_public_send_earn_withdraw;
+  send_liquidity_pools: Table_public_send_liquidity_pools;
+  send_revenues_safe_receives: Table_public_send_revenues_safe_receives;
+  send_slash: Table_public_send_slash;
+  send_token_transfers: Table_public_send_token_transfers;
+  send_token_v0_transfers: Table_public_send_token_v_0_transfers;
+  sendpot_jackpot_runs: Table_public_sendpot_jackpot_runs;
+  sendpot_user_ticket_purchases: Table_public_sendpot_user_ticket_purchases;
+  sendtag_checkout_receipts: Table_public_sendtag_checkout_receipts;
+  swap_routers: Table_public_swap_routers;
+  tag_receipts: Table_public_tag_receipts;
+  tags: Table_public_tags;
+  webauthn_credentials: Table_public_webauthn_credentials;
 }
 interface Schema_realtime {
   messages: Table_realtime_messages;
@@ -1492,45 +1492,29 @@ interface Tables_relationships {
 
     };
     children: {
-      identities_user_id_fkey: 'auth.identities'
-      mfa_factors_user_id_fkey: 'auth.mfa_factors'
-      one_time_tokens_user_id_fkey: 'auth.one_time_tokens'
-      sessions_user_id_fkey: 'auth.sessions'
-      leaderboard_referrals_all_time_user_id_fkey: 'private.leaderboard_referrals_all_time'
-      activity_from_user_id_fkey: 'public.activity'
-      activity_to_user_id_fkey: 'public.activity'
-      canton_party_verifications_user_id_fkey: 'public.canton_party_verifications'
-      chain_addresses_user_id_fkey: 'public.chain_addresses'
-      distribution_shares_user_id_fkey: 'public.distribution_shares'
-      distribution_verifications_user_id_fkey: 'public.distribution_verifications'
-      link_in_bio_user_id_fkey: 'public.link_in_bio'
-      profiles_id_fkey: 'public.profiles'
-      receipts_user_id_fkey: 'public.receipts'
-      send_accounts_user_id_fkey: 'public.send_accounts'
-      tags_user_id_fkey: 'public.tags'
-      webauthn_credentials_user_id_fkey: 'public.webauthn_credentials'
-    }
-    parentDestinationsTables: {}
-    childDestinationsTables:
-      | 'auth.identities'
-      | 'auth.mfa_factors'
-      | 'auth.one_time_tokens'
-      | 'auth.sessions'
-      | 'private.leaderboard_referrals_all_time'
-      | 'public.activity'
-      | 'public.canton_party_verifications'
-      | 'public.chain_addresses'
-      | 'public.distribution_shares'
-      | 'public.distribution_verifications'
-      | 'public.link_in_bio'
-      | 'public.profiles'
-      | 'public.receipts'
-      | 'public.send_accounts'
-      | 'public.tags'
-      | 'public.webauthn_credentials'
-      | {}
-  }
-  'public.webauthn_credentials': {
+       identities_user_id_fkey: "auth.identities";
+       mfa_factors_user_id_fkey: "auth.mfa_factors";
+       one_time_tokens_user_id_fkey: "auth.one_time_tokens";
+       sessions_user_id_fkey: "auth.sessions";
+       leaderboard_referrals_all_time_user_id_fkey: "private.leaderboard_referrals_all_time";
+       activity_from_user_id_fkey: "public.activity";
+       activity_to_user_id_fkey: "public.activity";
+       canton_party_verifications_user_id_fkey: "public.canton_party_verifications";
+       chain_addresses_user_id_fkey: "public.chain_addresses";
+       distribution_shares_user_id_fkey: "public.distribution_shares";
+       distribution_verifications_user_id_fkey: "public.distribution_verifications";
+       link_in_bio_user_id_fkey: "public.link_in_bio";
+       profiles_id_fkey: "public.profiles";
+       receipts_user_id_fkey: "public.receipts";
+       send_accounts_user_id_fkey: "public.send_accounts";
+       tags_user_id_fkey: "public.tags";
+       webauthn_credentials_user_id_fkey: "public.webauthn_credentials";
+    };
+    parentDestinationsTables:  | {};
+    childDestinationsTables: "auth.identities" | "auth.mfa_factors" | "auth.one_time_tokens" | "auth.sessions" | "private.leaderboard_referrals_all_time" | "public.activity" | "public.canton_party_verifications" | "public.chain_addresses" | "public.distribution_shares" | "public.distribution_verifications" | "public.link_in_bio" | "public.profiles" | "public.receipts" | "public.send_accounts" | "public.tags" | "public.webauthn_credentials" | {};
+    
+  };
+  "public.webauthn_credentials": {
     parent: {
        webauthn_credentials_user_id_fkey: "auth.users";
     };

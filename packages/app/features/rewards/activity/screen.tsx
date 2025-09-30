@@ -247,7 +247,7 @@ const DistributionRequirementsCard = ({
               />
             ) : (
               <Theme name="red">
-                <IconInfoCircle bc={'$color0'} color={'$color8'} size={'$1.5'} br={9999} />
+                <IconInfoCircle color={'$color8'} size={'$2'} />
               </Theme>
             )}
           </XStack>
@@ -271,7 +271,7 @@ const DistributionRequirementsCard = ({
                   BigInt(pickedDistribution.hodler_min_balance ?? 0n) > (snapshotBalance ?? 0):
                   return (
                     <Theme name="red">
-                      <IconInfoCircle bc={'$color0'} color={'$color8'} size={'$1.5'} br={9999} />
+                      <IconInfoCircle color={'$color8'} size={'$2'} />
                     </Theme>
                   )
                 default:
@@ -305,7 +305,7 @@ const DistributionRequirementsCard = ({
                   case !hasMinSavings:
                     return (
                       <Theme name="red">
-                        <IconInfoCircle bc={'$color0'} color={'$color8'} size={'$1.5'} br={9999} />
+                        <IconInfoCircle color={'$color8'} size={'$2'} />
                       </Theme>
                     )
                   default:
@@ -430,8 +430,6 @@ const TaskCard = ({
       icon: (
         <IconBadgeCheckSolid
           size={'$1.5'}
-          mih={'$1.5'}
-          miw={'$1.5'}
           color={'$primary'}
           $theme-light={{ color: '$color12' }}
         />
@@ -441,7 +439,7 @@ const TaskCard = ({
     pending: {
       icon: (
         <Theme name="red">
-          <IconInfoCircle bc={'$color0'} color={'$color8'} size={'$1.5'} br={9999} />
+          <IconInfoCircle color={'$color8'} size={'$2'} />
         </Theme>
       ),
       text: 'Pending',
