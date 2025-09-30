@@ -11,8 +11,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { CheckCircle2 } from '@tamagui/lucide-icons'
-import { IconAccount, IconInfoCircle } from 'app/components/icons'
+import { IconAccount, IconBadgeCheckSolid, IconInfoCircle } from 'app/components/icons'
 import {
   type DistributionsVerificationsQuery,
   type UseDistributionsResultData,
@@ -22,7 +21,7 @@ import {
 } from 'app/utils/distributions'
 import formatAmount from 'app/utils/formatAmount'
 import { formatUnits } from 'viem'
-import { useMemo, type PropsWithChildren } from 'react'
+import { type PropsWithChildren, useMemo, useState } from 'react'
 import { DistributionClaimButton } from '../components/DistributionClaimButton'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { DistributionSelect } from '../components/DistributionSelect'
@@ -35,6 +34,8 @@ import { sendCoin, usdcCoin } from 'app/data/coins'
 import { useSendEarnBalancesAtBlock } from 'app/features/earn/hooks'
 import { useThemeName } from 'tamagui'
 import { Platform } from 'react-native'
+import { CantonWalletStatus } from '../components/CantonWalletStatus'
+import { CantonWalletForm } from '../components/CantonWalletForm'
 
 //@todo get this from the db
 const verificationTypesAndTitles = {
@@ -129,7 +130,8 @@ export function ActivityRewardsScreen() {
               return (
                 <>
                   <DistributionRequirementsCard
-                    distribution={distributions[selectedDistributionIndex]}
+                    pickedDistribution={distributions[selectedDistributionIndex]}
+                    latestDistribution={distributions[0]}
                     verificationsQuery={verificationsQuery}
                   />
                   <TaskCards
@@ -156,25 +158,26 @@ export function ActivityRewardsScreen() {
 }
 
 const DistributionRequirementsCard = ({
-  distribution,
+  pickedDistribution,
   verificationsQuery,
+  latestDistribution,
 }: {
-  distribution: UseDistributionsResultData[number]
+  pickedDistribution: UseDistributionsResultData[number]
+  latestDistribution?: UseDistributionsResultData[number]
   verificationsQuery: DistributionsVerificationsQuery
 }) => {
-  const theme = useThemeName()
-  const isDark = theme?.startsWith('dark')
   const { data: sendAccount, isLoading: isLoadingSendAccount } = useSendAccount()
   const verifications = verificationsQuery.data
+  const [isCantonFormExpanded, setIsCantonFormExpanded] = useState(false)
   const {
     data: snapshotBalance,
     isLoading: isLoadingSnapshotBalance,
     error: snapshotBalanceError,
-  } = useSnapshotBalance({ distribution, sendAccount })
+  } = useSnapshotBalance({ distribution: pickedDistribution, sendAccount })
 
   const { data: sendEarnBalances, isLoading: isLoadingSendEarnBalances } =
     useSendEarnBalancesAtBlock(
-      distribution.snapshot_block_num ? BigInt(distribution.snapshot_block_num) : null
+      pickedDistribution.snapshot_block_num ? BigInt(pickedDistribution.snapshot_block_num) : null
     )
 
   const totalAssets = useMemo(
@@ -182,7 +185,7 @@ const DistributionRequirementsCard = ({
     [sendEarnBalances]
   )
 
-  const hasMinSavings = totalAssets >= BigInt(distribution.earn_min_balance)
+  const hasMinSavings = totalAssets >= BigInt(pickedDistribution.earn_min_balance)
 
   if (verificationsQuery.isLoading || isLoadingSendAccount) {
     return (
@@ -199,6 +202,11 @@ const DistributionRequirementsCard = ({
   const sendTagPurchased = verifications?.verification_values?.some(
     (v) => v.type === 'tag_registration' && v.weight > 0n
   )
+
+  const hasRewardsInLatestDistribution =
+    latestDistribution?.distribution_shares &&
+    latestDistribution.distribution_shares.length > 0 &&
+    BigInt(latestDistribution.distribution_shares[0]?.amount ?? 0) > 0n
 
   return (
     <FadeCard br={12} p="$4" gap="$4" $gtMd={{ gap: '$6', p: '$6' }}>
@@ -220,7 +228,7 @@ const DistributionRequirementsCard = ({
                 $gtXl={{ fontSize: '$10' }}
               >
                 {`${formatAmount(
-                  formatUnits(snapshotBalance ?? 0n, distribution.token_decimals ?? 18) ?? 0,
+                  formatUnits(snapshotBalance ?? 0n, pickedDistribution.token_decimals ?? 18) ?? 0,
                   9,
                   0
                 )} SEND`}
@@ -232,7 +240,11 @@ const DistributionRequirementsCard = ({
           <XStack ai="center" gap="$2">
             <Paragraph>Sendtag Purchased</Paragraph>
             {sendTagPurchased ? (
-              <CheckCircle2 color={isDark ? '$primary' : '$color12'} size={'$1.5'} />
+              <IconBadgeCheckSolid
+                size={'$1.5'}
+                color={'$primary'}
+                $theme-light={{ color: '$color12' }}
+              />
             ) : (
               <Theme name="red">
                 <IconInfoCircle color={'$color8'} size={'$2'} />
@@ -244,8 +256,8 @@ const DistributionRequirementsCard = ({
               Balance{' '}
               {formatAmount(
                 formatUnits(
-                  BigInt(distribution.hodler_min_balance ?? 0n),
-                  distribution.token_decimals ?? 18
+                  BigInt(pickedDistribution.hodler_min_balance ?? 0n),
+                  pickedDistribution.token_decimals ?? 18
                 ) ?? 0,
                 9,
                 sendCoin.formatDecimals
@@ -255,24 +267,33 @@ const DistributionRequirementsCard = ({
               switch (true) {
                 case isLoadingSnapshotBalance:
                   return <Spinner size="small" />
-                case distribution.hodler_min_balance === undefined ||
-                  BigInt(distribution.hodler_min_balance ?? 0n) > (snapshotBalance ?? 0):
+                case pickedDistribution.hodler_min_balance === undefined ||
+                  BigInt(pickedDistribution.hodler_min_balance ?? 0n) > (snapshotBalance ?? 0):
                   return (
                     <Theme name="red">
                       <IconInfoCircle color={'$color8'} size={'$2'} />
                     </Theme>
                   )
                 default:
-                  return <CheckCircle2 color={isDark ? '$primary' : '$color12'} size={'$1.5'} />
+                  return (
+                    <IconBadgeCheckSolid
+                      size={'$1.5'}
+                      color={'$primary'}
+                      $theme-light={{ color: '$color12' }}
+                    />
+                  )
               }
             })()}
           </XStack>
-          {BigInt(distribution.earn_min_balance ?? 0n) > 0n ? (
+          {BigInt(pickedDistribution.earn_min_balance ?? 0n) > 0n ? (
             <XStack ai="center" gap="$2">
               <Paragraph>
                 Savings Deposit $
                 {formatAmount(
-                  formatUnits(BigInt(distribution.earn_min_balance ?? 0n), usdcCoin.decimals) ?? 0n,
+                  formatUnits(
+                    BigInt(pickedDistribution.earn_min_balance ?? 0n),
+                    usdcCoin.decimals
+                  ) ?? 0n,
                   9,
                   2
                 )}{' '}
@@ -288,13 +309,28 @@ const DistributionRequirementsCard = ({
                       </Theme>
                     )
                   default:
-                    return <CheckCircle2 color={isDark ? '$primary' : '$color12'} size={'$1.5'} />
+                    return (
+                      <IconBadgeCheckSolid
+                        size={'$1.5'}
+                        color={'$primary'}
+                        $theme-light={{ color: '$color12' }}
+                      />
+                    )
                 }
               })()}
             </XStack>
           ) : null}
+          <CantonWalletStatus
+            hasRewardsInLatestDistribution={hasRewardsInLatestDistribution}
+            isExpanded={isCantonFormExpanded}
+            onToggle={() => setIsCantonFormExpanded(!isCantonFormExpanded)}
+          />
         </YStack>
       </Stack>
+      <CantonWalletForm
+        isVisible={isCantonFormExpanded}
+        onSuccess={() => setIsCantonFormExpanded(false)}
+      />
     </FadeCard>
   )
 }
@@ -391,7 +427,13 @@ const TaskCard = ({
 
   const statusConfig = {
     completed: {
-      icon: <CheckCircle2 color={isDark ? '$primary' : '$color12'} size={'$1.5'} />,
+      icon: (
+        <IconBadgeCheckSolid
+          size={'$1.5'}
+          color={'$primary'}
+          $theme-light={{ color: '$color12' }}
+        />
+      ),
       text: isSendStreak && !isQualificationOver ? 'Ongoing' : 'Completed',
     },
     pending: {

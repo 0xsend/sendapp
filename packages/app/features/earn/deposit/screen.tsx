@@ -94,7 +94,7 @@ export function DepositForm() {
     paymasterPostOpGasLimit: 200000n,
     callGasLimit: 1_000_000n,
     sender,
-    calls: calls.data,
+    calls: calls.data ?? undefined,
   })
   const webauthnCreds = useMemo(
     () =>

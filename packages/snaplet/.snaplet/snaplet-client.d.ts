@@ -42,6 +42,16 @@ type Override = {
       prefixes?: string;
     };
   }
+  canton_party_verifications?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      user_id?: string;
+      canton_wallet_address?: string;
+      created_at?: string;
+      users?: string;
+    };
+  }
   chain_addresses?: {
     name?: string;
     fields?: {
@@ -748,6 +758,7 @@ type Override = {
       deleted_at?: string;
       is_anonymous?: string;
       leaderboard_referrals_all_time?: string;
+      canton_party_verifications?: string;
       chain_addresses?: string;
       distribution_shares?: string;
       distribution_verifications?: string;
@@ -813,6 +824,10 @@ export interface Fingerprint {
     fileSizeLimit?: FingerprintNumberField;
     objects?: FingerprintRelationField;
     prefixes?: FingerprintRelationField;
+  }
+  cantonPartyVerifications?: {
+    createdAt?: FingerprintDateField;
+    user?: FingerprintRelationField;
   }
   chainAddresses?: {
     createdAt?: FingerprintDateField;
@@ -1191,6 +1206,7 @@ export interface Fingerprint {
     reauthenticationSentAt?: FingerprintDateField;
     deletedAt?: FingerprintDateField;
     leaderboardReferralsAllTimes?: FingerprintRelationField;
+    cantonPartyVerifications?: FingerprintRelationField;
     chainAddresses?: FingerprintRelationField;
     distributionShares?: FingerprintRelationField;
     distributionVerifications?: FingerprintRelationField;

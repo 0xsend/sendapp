@@ -71,6 +71,27 @@ export type Database = {
           },
         ]
       }
+      canton_party_verifications: {
+        Row: {
+          canton_wallet_address: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          canton_wallet_address: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          canton_wallet_address?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       chain_addresses: {
         Row: {
           address: string
@@ -408,6 +429,9 @@ export type Database = {
           referral_code: string | null
           send_id: number
           x_username: string | null
+          canton_party_verifications:
+            | Database["public"]["Tables"]["canton_party_verifications"]["Row"]
+            | null
           distribution_shares:
             | Database["public"]["Tables"]["distribution_shares"]["Row"]
             | null
@@ -1760,6 +1784,15 @@ export type Database = {
       calculate_and_insert_send_ceiling_verification: {
         Args: { distribution_number: number }
         Returns: undefined
+      }
+      canton_party_verifications: {
+        Args: { "": Database["public"]["Tables"]["profiles"]["Row"] }
+        Returns: {
+          canton_wallet_address: string
+          created_at: string
+          id: string
+          user_id: string
+        }[]
       }
       citext: {
         Args: { "": boolean } | { "": string } | { "": unknown }
