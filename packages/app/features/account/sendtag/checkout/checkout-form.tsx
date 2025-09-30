@@ -67,7 +67,7 @@ function TotalPrice() {
             {formatUnits(_total, usdcCoin.decimals)}
           </Paragraph>
           <XStack ai={'center'} gap={'$2'}>
-            <IconCoin symbol={'USDC'} size={'$2'} />
+            <IconCoin tokenAddress={usdcCoin.token} size={'$2'} />
             <Paragraph size={'$7'}>USDC</Paragraph>
           </XStack>
         </XStack>

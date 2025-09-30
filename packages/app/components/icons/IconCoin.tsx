@@ -1,40 +1,72 @@
-import type { allCoins, coin } from 'app/data/coins'
-import { IconEthereum } from './IconEthereum'
-import { IconSend } from './IconSend'
-import { IconUSDC } from './IconUSDC'
-import { IconSPX6900 } from './IconSPX6900'
 import type { IconProps } from '@tamagui/helpers-icon'
-import type { NamedExoticComponent } from 'react'
-import { IconMopho } from './IconMorpho'
-import { IconAerodrome } from './IconAerodrome'
-import { IconMoonwell } from './IconMoonwell'
-import { IconCbBtc } from './IconCbBtc'
-import { IconEURC } from './IconEURC'
-import { IconMAMO } from './IconMAMO'
+import { Image } from '@my/ui'
+import { Coins } from '@tamagui/lucide-icons'
+import type { Address } from 'viem'
+import { useSupabase } from 'app/utils/supabase/useSupabase'
+import { useQuery } from '@tanstack/react-query'
+import { baseMainnet } from '@my/wagmi'
 
-const coinSymbolToIcons: Record<coin['symbol'], NamedExoticComponent<IconProps>> = {
-  USDC: IconUSDC,
-  ETH: IconEthereum,
-  SEND: IconSend,
-  SPX: IconSPX6900,
-  WELL: IconMoonwell,
-  MORPHO: IconMopho,
-  AERO: IconAerodrome,
-  CBBTC: IconCbBtc,
-  EURC: IconEURC,
-  MAMO: IconMAMO,
+/**
+ * Hook to fetch token logo URL from database
+ */
+function useTokenLogo(tokenAddress?: Address | 'eth' | string) {
+  const supabase = useSupabase()
+
+  return useQuery({
+    queryKey: ['token-logo', tokenAddress],
+    queryFn: async () => {
+      if (!tokenAddress || tokenAddress === 'eth' || !tokenAddress.startsWith('0x')) return null
+
+      const addressBytes = tokenAddress.toLowerCase().slice(2)
+
+      const { data } = await supabase
+        .from('erc20_token_metadata')
+        .select('logo_url')
+        .eq('token_address', `\\x${addressBytes}`)
+        .eq('chain_id', baseMainnet.id)
+        .single()
+
+      return data?.logo_url || null
+    },
+    enabled: !!tokenAddress && tokenAddress !== 'eth' && tokenAddress.startsWith('0x'),
+    staleTime: 1000 * 60 * 60, // Cache for 1 hour
+  })
 }
 
+/**
+ * IconCoin component that displays token logos from the database
+ *
+ * @param tokenAddress - The token address to fetch logo for
+ * @param logoUrl - Optional: directly provide a logo URL (skips database fetch)
+ */
 export const IconCoin = ({
-  symbol,
+  tokenAddress,
+  logoUrl: providedLogoUrl,
   ...props
-}: { symbol: allCoins[number]['symbol'] } & IconProps) => {
-  const Icon = coinSymbolToIcons[symbol]
+}: {
+  tokenAddress?: Address | 'eth' | string
+  logoUrl?: string | null
+} & IconProps) => {
+  // Fetch logo from database if token address provided but no logo URL
+  const { data: fetchedLogoUrl } = useTokenLogo(
+    !providedLogoUrl && tokenAddress ? tokenAddress : undefined
+  )
 
-  if (!Icon) {
-    console.warn(`No icon found for symbol ${symbol}`)
-    return null
+  const logoUrl = providedLogoUrl || fetchedLogoUrl
+
+  // Use logo URL from database if available
+  if (logoUrl) {
+    return (
+      <Image
+        source={{ uri: logoUrl }}
+        width={props.size || '$2.5'}
+        height={props.size || '$2.5'}
+        borderRadius="$12"
+        {...props}
+      />
+    )
   }
 
-  return <Icon size={'$2.5'} {...props} />
+  // Fallback to generic coin icon
+  return <Coins size={'$2.5'} {...props} />
 }

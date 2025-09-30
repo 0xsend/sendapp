@@ -54,7 +54,7 @@ export const CoinField = ({
   const id = useId()
   const disabled = isSubmitting
 
-  const pickedCoinSymbol = coins.find((coin) => coin.token === field.value)?.symbol
+  const pickedCoin = coins.find((coin) => coin.token === field.value)
 
   return (
     <Theme name={error ? 'red' : themeName} forceClassName>
@@ -95,7 +95,7 @@ export const CoinField = ({
               }}
             >
               <XStack gap={'$2'} ai={'center'}>
-                {pickedCoinSymbol && <IconCoin symbol={pickedCoinSymbol} size={'$2'} />}
+                {pickedCoin && <IconCoin tokenAddress={pickedCoin.token} size={'$2'} />}
                 <Select.Value
                   testID={'SelectCoinValue'}
                   size={'$5'}
@@ -235,7 +235,7 @@ const CoinFieldItem = ({
       hoverStyle={{ backgroundColor: 'transparent' }}
     >
       <XStack gap={'$2'} $gtLg={{ gap: '$3.5' }} ai={'center'} jc={'space-between'}>
-        <IconCoin symbol={coin.symbol} />
+        <IconCoin tokenAddress={coin.token} />
         <Select.ItemText
           fontSize={'$7'}
           fontWeight={Platform.OS === 'web' ? '500' : '600'}

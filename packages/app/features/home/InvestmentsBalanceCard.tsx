@@ -224,16 +224,16 @@ function OverlappingCoinIcons({
 }: { coins: CoinWithBalance[]; length?: number } & XStackProps) {
   return (
     <XStack ai="center" {...props}>
-      {coins.slice(0, length).map(({ symbol }, index) => (
+      {coins.slice(0, length).map((coin, index) => (
         <ThemeableStack
-          key={symbol}
+          key={coin.symbol}
           circular
           mr={index === coins.slice(0, length).length - 1 ? '$0' : -8}
           bc="transparent"
           ai="center"
           jc="center"
         >
-          <IconCoin size={'$2.5'} symbol={symbol} />
+          <IconCoin size={'$2.5'} tokenAddress={coin.token} />
         </ThemeableStack>
       ))}
     </XStack>

@@ -28,6 +28,7 @@ import {
 } from '../params'
 import { useSendEarnWithdrawCalls, useSendEarnWithdrawVault } from './hooks'
 import { useSendEarnAPY } from '../hooks'
+import { usdcCoin } from 'app/data/coins'
 import { Platform } from 'react-native'
 
 export const log = debug('app:earn:withdraw')
@@ -413,7 +414,7 @@ export function WithdrawForm() {
                   <XStack ai={'center'} position="relative" jc={'space-between'}>
                     {amount}
                     <XStack ai={'center'} gap={'$2'}>
-                      <IconCoin symbol={'USDC'} size={'$2'} />
+                      <IconCoin tokenAddress={usdcCoin.token} size={'$2'} />
                       <Paragraph size={'$6'}>USDC</Paragraph>
                     </XStack>
                     <XStack

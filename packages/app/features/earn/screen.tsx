@@ -10,6 +10,7 @@ import { formatUnits } from 'viem'
 import type { SendEarnBalance } from './hooks'
 import { useSendEarn } from './providers/SendEarnProvider'
 import { useThemeName } from 'tamagui'
+import { usdcCoin } from 'app/data/coins'
 
 const log = debug('app:earn:screen')
 
@@ -180,7 +181,10 @@ const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) =
                 {totalAssets}
               </Paragraph>
               <XStack ai={'center'} gap={'$2'}>
-                <IconCoin symbol={'USDC'} size={totalAssets.length > 16 ? '$1.5' : '$2.5'} />
+                <IconCoin
+                  tokenAddress={usdcCoin.token}
+                  size={totalAssets.length > 16 ? '$1.5' : '$2.5'}
+                />
                 <Paragraph size={'$7'} fontWeight={600} lineHeight={26}>
                   USDC
                 </Paragraph>

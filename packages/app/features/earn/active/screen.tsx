@@ -127,7 +127,7 @@ function TotalValue() {
       <Card w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>
         <YStack gap={'$3.5'}>
           <XStack ai={'center'} gap={'$2'}>
-            <IconCoin symbol={coin.data?.symbol || ''} size={'$2'} />
+            <IconCoin tokenAddress={coin.data?.token} size={'$2'} />
             <Paragraph size={'$7'} fontWeight={600} lineHeight={28}>
               {coin.data?.symbol || ''}
             </Paragraph>
@@ -225,18 +225,18 @@ function ActiveEarningBreakdown() {
     <Fade>
       <Card w={'100%'} p={'$5'} gap={'$6'} $gtLg={{ p: '$7' }}>
         <BreakdownRow
-          symbol={coin.data.symbol}
+          tokenAddress={coin.data.token}
           label={'Deposits'}
           value={formatCoinAmount({ amount: totalDeposits, coin: coin.data })}
         />
         <BreakdownRow
-          symbol={coin.data.symbol}
+          tokenAddress={coin.data.token}
           label={'Earnings'}
           value={formatCoinAmount({ amount: totalEarnings, coin: coin.data })}
         />
         {affiliateRewards.data && affiliateRewards.data.assets > 0n ? (
           <BreakdownRow
-            symbol={coin.data.symbol}
+            tokenAddress={coin.data.token}
             label={'Rewards'}
             value={formatCoinAmount({ amount: affiliateRewards.data.assets, coin: coin.data })}
           />
@@ -257,18 +257,18 @@ const ErrorMessage = ({ error }: { error: Error | undefined }) => {
 }
 
 const BreakdownRow = ({
-  symbol,
+  tokenAddress,
   value,
   label,
 }: {
-  symbol: string
+  tokenAddress: string
   label: string
   value: string
 }) => {
   return (
     <XStack jc={'space-between'} ai={'center'} flexWrap={'wrap'} rowGap={'$3'} gap={'$3'}>
       <XStack ai={'center'} gap={'$3.5'}>
-        <IconCoin symbol={symbol} size={'$2'} />
+        <IconCoin tokenAddress={tokenAddress} size={'$2'} />
         <Paragraph size={'$7'} fontWeight={600}>
           {label}
         </Paragraph>

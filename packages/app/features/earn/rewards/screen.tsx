@@ -382,7 +382,7 @@ const TotalRewards = ({ rewards, isLoading, coin }: TotalRewardsProps = {}) => {
       <Card w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>
         <YStack gap={'$4'}>
           <XStack ai={'center'} gap={'$2'}>
-            <IconCoin symbol={coin?.symbol || ''} size={'$2'} />
+            <IconCoin tokenAddress={coin?.token} size={'$2'} />
             <Paragraph size={'$7'}>{coin?.symbol || ''}</Paragraph>
           </XStack>
           <YStack gap={'$2'}>

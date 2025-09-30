@@ -52,7 +52,7 @@ const Item = ({ coin, ...props }: { coin: coin } & XStackProps) => {
   return (
     <XStack gap={'$2'} jc={'space-between'} py="$2.5" px="$3.5" {...props}>
       <XStack gap={'$2'} ai={'center'}>
-        <IconCoin symbol={coin.symbol} />
+        <IconCoin tokenAddress={coin.token} />
         <Paragraph
           fontSize={'$5'}
           fontWeight={'500'}

@@ -168,9 +168,9 @@ const ActivityDetailsContent = ({ activity, ...props }: { activity: Activity } &
               >
                 {amount}
               </Paragraph>
-              {activity.data.coin?.symbol && (
+              {activity.data.coin?.token && (
                 <XStack>
-                  <IconCoin symbol={activity.data.coin.symbol} size={'$2'} />
+                  <IconCoin tokenAddress={activity.data.coin.token} size={'$2'} />
                 </XStack>
               )}
             </XStack>

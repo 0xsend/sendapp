@@ -11,7 +11,18 @@ import {
 } from 'app/data/coins'
 import { isAddress } from 'viem'
 import type { UseQueryResult } from '@tanstack/react-query'
-import type { UseBalanceReturnType, UseReadContractsReturnType } from 'wagmi'
+import type { UseBalanceReturnType } from 'wagmi'
+
+type ERC20BalanceData = {
+  token_address: string
+  balance: number
+  last_updated_time: string
+  erc20_tokens: {
+    name: string | null
+    symbol: string | null
+    decimals: number | null
+  }
+}
 
 type CoinsContextType = {
   coins: CoinWithBalance[]
@@ -20,7 +31,7 @@ type CoinsContextType = {
   stableCoins: CoinWithBalance[]
   isLoading: boolean
   ethQuery: UseBalanceReturnType
-  tokensQuery: UseReadContractsReturnType
+  tokensQuery: UseQueryResult<ERC20BalanceData[] | null, Error> & { queryKey: readonly unknown[] }
   pricesQuery: UseQueryResult<Record<allCoins[number]['token'], number>, Error>
 }
 
