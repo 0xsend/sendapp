@@ -444,7 +444,7 @@ export function DepositForm() {
                   <XStack ai={'center'} position="relative" jc={'space-between'}>
                     {amount}
                     <XStack ai={'center'} gap={'$2'}>
-                      <IconCoin symbol={'USDC'} size={'$2'} />
+                      <IconCoin tokenAddress={usdcCoin.token} size={'$2'} />
                       <Paragraph size={'$6'}>{coin.data?.symbol}</Paragraph>
                     </XStack>
                     <XStack

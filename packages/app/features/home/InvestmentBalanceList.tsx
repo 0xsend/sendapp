@@ -58,7 +58,7 @@ const TokenBalanceItem = ({
 
   const content = (
     <>
-      <IconCoin symbol={coin.symbol} size={'$3.5'} />
+      <IconCoin tokenAddress={coin.token} size={'$3.5'} />
       <YStack f={1} jc={'space-between'}>
         <XStack jc={'space-between'} ai={'center'}>
           <Paragraph fontSize={'$5'} fontWeight={'400'} color={'$color12'}>

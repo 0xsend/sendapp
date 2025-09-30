@@ -179,7 +179,7 @@ export const SwapSummaryScreen = () => {
             <FadeCard>
               <XStack ai={'center'} jc={'space-between'}>
                 <XStack gap={'$2'} ai={'center'}>
-                  <IconCoin symbol={inCoin?.symbol || ''} />
+                  <IconCoin tokenAddress={inCoin?.token} />
                   <Paragraph testID={'inTokenSymbol'} size={'$5'}>
                     {inCoin?.symbol}
                   </Paragraph>
@@ -211,7 +211,7 @@ export const SwapSummaryScreen = () => {
             <FadeCard>
               <XStack ai={'center'} jc={'space-between'}>
                 <XStack gap={'$2'} ai={'center'}>
-                  <IconCoin symbol={outCoin?.symbol || ''} />
+                  <IconCoin tokenAddress={outCoin?.token} />
                   <Paragraph testID={'outTokenSymbol'} size={'$5'}>
                     {outCoin?.symbol}
                   </Paragraph>

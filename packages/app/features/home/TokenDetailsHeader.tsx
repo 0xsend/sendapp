@@ -31,7 +31,7 @@ export const TokenDetailsHeader = () => {
       <Card py="$5" px="$4" w={'100%'} jc={'space-between'} elevation={1}>
         <YStack gap="$4">
           <XStack ai={'center'} gap={'$3'}>
-            <IconCoin size={'$2'} symbol={coin.symbol} />
+            <IconCoin size={'$2'} tokenAddress={coin.token} />
             <Paragraph size={isSmallScreen ? '$6' : '$7'} col={'$color12'} fontWeight={'600'}>
               {coin.label}
             </Paragraph>

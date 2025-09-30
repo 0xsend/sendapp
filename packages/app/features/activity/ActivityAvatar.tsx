@@ -184,7 +184,7 @@ const TradeActivityAvatar = ({ activity }: { activity: Activity }) => {
 
   return (
     <XStack w="$5" h={'$5'} br="$4" ai={'center'} jc={'center'} position={'relative'}>
-      <IconCoin symbol={activity.data?.coin?.symbol ?? ''} size={'$5'} />
+      <IconCoin tokenAddress={activity.data?.coin?.token} size={'$5'} />
       <XStack
         position={'absolute'}
         top={0}

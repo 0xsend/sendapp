@@ -342,6 +342,237 @@ export type Database = {
         }
         Relationships: []
       }
+      erc20_balances: {
+        Row: {
+          balance: number
+          chain_id: number
+          last_updated_block: number
+          last_updated_time: string
+          send_account_address: string
+          token_address: string
+        }
+        Insert: {
+          balance?: number
+          chain_id: number
+          last_updated_block: number
+          last_updated_time: string
+          send_account_address: string
+          token_address: string
+        }
+        Update: {
+          balance?: number
+          chain_id?: number
+          last_updated_block?: number
+          last_updated_time?: string
+          send_account_address?: string
+          token_address?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "erc20_balances_token_fkey"
+            columns: ["token_address", "chain_id"]
+            isOneToOne: false
+            referencedRelation: "erc20_tokens"
+            referencedColumns: ["address", "chain_id"]
+          },
+        ]
+      }
+      erc20_token_activity: {
+        Row: {
+          chain_id: number
+          last_updated: string
+          priority_score: number | null
+          token_address: string
+          total_transfers: number | null
+          total_unique_holders: number | null
+          total_volume: number | null
+          transfer_count_24h: number | null
+          transfer_count_30d: number | null
+          transfer_count_7d: number | null
+          unique_holders_24h: number | null
+          unique_holders_30d: number | null
+          unique_holders_7d: number | null
+          volume_24h: number | null
+          volume_30d: number | null
+          volume_7d: number | null
+        }
+        Insert: {
+          chain_id: number
+          last_updated?: string
+          priority_score?: number | null
+          token_address: string
+          total_transfers?: number | null
+          total_unique_holders?: number | null
+          total_volume?: number | null
+          transfer_count_24h?: number | null
+          transfer_count_30d?: number | null
+          transfer_count_7d?: number | null
+          unique_holders_24h?: number | null
+          unique_holders_30d?: number | null
+          unique_holders_7d?: number | null
+          volume_24h?: number | null
+          volume_30d?: number | null
+          volume_7d?: number | null
+        }
+        Update: {
+          chain_id?: number
+          last_updated?: string
+          priority_score?: number | null
+          token_address?: string
+          total_transfers?: number | null
+          total_unique_holders?: number | null
+          total_volume?: number | null
+          transfer_count_24h?: number | null
+          transfer_count_30d?: number | null
+          transfer_count_7d?: number | null
+          unique_holders_24h?: number | null
+          unique_holders_30d?: number | null
+          unique_holders_7d?: number | null
+          volume_24h?: number | null
+          volume_30d?: number | null
+          volume_7d?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "erc20_token_activity_token_fkey"
+            columns: ["token_address", "chain_id"]
+            isOneToOne: true
+            referencedRelation: "erc20_tokens"
+            referencedColumns: ["address", "chain_id"]
+          },
+        ]
+      }
+      erc20_token_metadata: {
+        Row: {
+          chain_id: number
+          circulating_supply: number | null
+          cmc_id: number | null
+          coingecko_id: string | null
+          created_at: string
+          description: string | null
+          discord: string | null
+          enrichment_attempts: number | null
+          last_enrichment_attempt: string | null
+          last_successful_enrichment: string | null
+          logo_url: string | null
+          market_cap_usd: number | null
+          max_supply: number | null
+          metadata_source: string | null
+          price_usd: number | null
+          telegram: string | null
+          token_address: string
+          twitter: string | null
+          updated_at: string
+          volume_24h_usd: number | null
+          website: string | null
+        }
+        Insert: {
+          chain_id: number
+          circulating_supply?: number | null
+          cmc_id?: number | null
+          coingecko_id?: string | null
+          created_at?: string
+          description?: string | null
+          discord?: string | null
+          enrichment_attempts?: number | null
+          last_enrichment_attempt?: string | null
+          last_successful_enrichment?: string | null
+          logo_url?: string | null
+          market_cap_usd?: number | null
+          max_supply?: number | null
+          metadata_source?: string | null
+          price_usd?: number | null
+          telegram?: string | null
+          token_address: string
+          twitter?: string | null
+          updated_at?: string
+          volume_24h_usd?: number | null
+          website?: string | null
+        }
+        Update: {
+          chain_id?: number
+          circulating_supply?: number | null
+          cmc_id?: number | null
+          coingecko_id?: string | null
+          created_at?: string
+          description?: string | null
+          discord?: string | null
+          enrichment_attempts?: number | null
+          last_enrichment_attempt?: string | null
+          last_successful_enrichment?: string | null
+          logo_url?: string | null
+          market_cap_usd?: number | null
+          max_supply?: number | null
+          metadata_source?: string | null
+          price_usd?: number | null
+          telegram?: string | null
+          token_address?: string
+          twitter?: string | null
+          updated_at?: string
+          volume_24h_usd?: number | null
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "erc20_token_metadata_token_fkey"
+            columns: ["token_address", "chain_id"]
+            isOneToOne: true
+            referencedRelation: "erc20_tokens"
+            referencedColumns: ["address", "chain_id"]
+          },
+        ]
+      }
+      erc20_tokens: {
+        Row: {
+          address: string
+          block_num: number
+          block_time: number
+          chain_id: number
+          created_at: string
+          decimals: number | null
+          ig_name: string | null
+          log_idx: number | null
+          name: string | null
+          src_name: string | null
+          symbol: string | null
+          total_supply: number | null
+          tx_hash: string
+          tx_idx: number | null
+        }
+        Insert: {
+          address: string
+          block_num: number
+          block_time: number
+          chain_id: number
+          created_at?: string
+          decimals?: number | null
+          ig_name?: string | null
+          log_idx?: number | null
+          name?: string | null
+          src_name?: string | null
+          symbol?: string | null
+          total_supply?: number | null
+          tx_hash: string
+          tx_idx?: number | null
+        }
+        Update: {
+          address?: string
+          block_num?: number
+          block_time?: number
+          chain_id?: number
+          created_at?: string
+          decimals?: number | null
+          ig_name?: string | null
+          log_idx?: number | null
+          name?: string | null
+          src_name?: string | null
+          symbol?: string | null
+          total_supply?: number | null
+          tx_hash?: string
+          tx_idx?: number | null
+        }
+        Relationships: []
+      }
       link_in_bio: {
         Row: {
           created_at: string
@@ -1761,6 +1992,17 @@ export type Database = {
         Args: { distribution_number: number }
         Returns: undefined
       }
+      calculate_token_priority_score: {
+        Args: {
+          holders_24h: number
+          holders_7d: number
+          transfers_24h: number
+          transfers_7d: number
+          volume_24h: number
+          volume_7d: number
+        }
+        Returns: number
+      }
       citext: {
         Args: { "": boolean } | { "": string } | { "": unknown }
         Returns: string
@@ -1889,6 +2131,23 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_tokens_needing_enrichment: {
+        Args: { limit_count?: number }
+        Returns: {
+          block_time: number
+          chain_id: number
+          token_address: string
+        }[]
+      }
+      get_undiscovered_tokens: {
+        Args: { limit_count?: number }
+        Returns: {
+          block_time: number
+          chain_id: number
+          token_address: string
+          tx_hash: string
+        }[]
+      }
       get_user_jackpot_summary: {
         Args: { num_runs: number }
         Returns: {
@@ -1898,6 +2157,18 @@ export type Database = {
           total_tickets: number
           win_amount: number
           winner: string
+        }[]
+      }
+      get_user_token_balances: {
+        Args: { p_chain_id?: number; p_user_id: string }
+        Returns: {
+          balance: number
+          balance_formatted: string
+          last_updated_time: string
+          token_address: string
+          token_decimals: number
+          token_name: string
+          token_symbol: string
         }[]
       }
       insert_challenge: {
@@ -2006,6 +2277,16 @@ export type Database = {
           sign_count: number
           updated_at: string
           user_id: string
+        }[]
+      }
+      recalculate_erc20_balances: {
+        Args: {
+          p_chain_id?: number
+          p_send_account_address?: string
+          p_token_address?: string
+        }
+        Returns: {
+          processed_count: number
         }[]
       }
       recent_senders: {

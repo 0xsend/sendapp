@@ -206,7 +206,7 @@ function TotalEarning() {
       <Card w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>
         <YStack gap={'$3.5'}>
           <XStack ai={'center'} gap={'$2'}>
-            <IconCoin symbol={coin.data.symbol} size={'$2'} />
+            <IconCoin tokenAddress={coin.data.token} size={'$2'} />
             <Paragraph size={'$7'} fontWeight={600} lineHeight={28}>
               {coin.data.symbol}
             </Paragraph>
