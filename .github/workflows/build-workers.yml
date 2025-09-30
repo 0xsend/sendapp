@@ -1,4 +1,4 @@
-name: Build Distributor Docker Image
+name: Build Workers Docker Image
 
 on:
   workflow_call:
@@ -9,8 +9,8 @@ on:
         type: string
     outputs:
       image-tag:
-        description: 'The full image tag of the built distributor image'
-        value: ${{ jobs.build-distributor.outputs.image-tag }}
+        description: 'The full image tag of the built workers image'
+        value: ${{ jobs.build-workers.outputs.image-tag }}
   workflow_dispatch:
     inputs:
       environment:
@@ -23,7 +23,7 @@ on:
         default: staging
 
 jobs:
-  build-distributor:
+  build-workers:
     runs-on: blacksmith-4vcpu-ubuntu-2404
     permissions:
       contents: read
@@ -50,7 +50,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository_owner }}/sendapp-distributor
+          images: ghcr.io/${{ github.repository_owner }}/sendapp-workers
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -64,16 +64,16 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          target: distributor-runner
+          target: workers-runner
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            PACKAGE=distributor
+            PACKAGE=workers
           platforms: linux/amd64
 
       - name: Output image tag
         id: output-tag
         run: |
           echo "Image tags: ${{ steps.meta.outputs.tags }}"
-          echo "image-tag=ghcr.io/${{ github.repository_owner }}/sendapp-distributor:${{ inputs.environment }}-${{ github.sha }}" >> $GITHUB_OUTPUT
+          echo "image-tag=ghcr.io/${{ github.repository_owner }}/sendapp-workers:${{ inputs.environment }}-${{ github.sha }}" >> $GITHUB_OUTPUT
