@@ -12542,6 +12542,20 @@
           "hasDefaultValue": false
         },
         {
+          "name": "canton_party_verifications",
+          "type": "canton_party_verifications",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "canton_party_verificationsTousers",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
           "name": "chain_addresses",
           "type": "chain_addresses",
           "isRequired": false,

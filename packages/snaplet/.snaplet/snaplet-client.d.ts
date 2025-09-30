@@ -42,6 +42,16 @@ type Override = {
       prefixes?: string;
     };
   }
+  canton_party_verifications?: {
+    name?: string
+    fields?: {
+      id?: string
+      user_id?: string
+      canton_wallet_address?: string
+      created_at?: string
+      users?: string
+    }
+  }
   chain_addresses?: {
     name?: string;
     fields?: {
@@ -712,52 +722,53 @@ type Override = {
   users?: {
     name?: string;
     fields?: {
-      instance_id?: string;
-      id?: string;
-      aud?: string;
-      role?: string;
-      email?: string;
-      encrypted_password?: string;
-      email_confirmed_at?: string;
-      invited_at?: string;
-      confirmation_token?: string;
-      confirmation_sent_at?: string;
-      recovery_token?: string;
-      recovery_sent_at?: string;
-      email_change_token_new?: string;
-      email_change?: string;
-      email_change_sent_at?: string;
-      last_sign_in_at?: string;
-      raw_app_meta_data?: string;
-      raw_user_meta_data?: string;
-      is_super_admin?: string;
-      created_at?: string;
-      updated_at?: string;
-      phone?: string;
-      phone_confirmed_at?: string;
-      phone_change?: string;
-      phone_change_token?: string;
-      phone_change_sent_at?: string;
-      confirmed_at?: string;
-      email_change_token_current?: string;
-      email_change_confirm_status?: string;
-      banned_until?: string;
-      reauthentication_token?: string;
-      reauthentication_sent_at?: string;
-      is_sso_user?: string;
-      deleted_at?: string;
-      is_anonymous?: string;
-      leaderboard_referrals_all_time?: string;
-      chain_addresses?: string;
-      distribution_shares?: string;
-      distribution_verifications?: string;
-      link_in_bio?: string;
-      profiles?: string;
-      receipts?: string;
-      send_accounts?: string;
-      tags?: string;
-      webauthn_credentials?: string;
-    };
+      instance_id?: string
+      id?: string
+      aud?: string
+      role?: string
+      email?: string
+      encrypted_password?: string
+      email_confirmed_at?: string
+      invited_at?: string
+      confirmation_token?: string
+      confirmation_sent_at?: string
+      recovery_token?: string
+      recovery_sent_at?: string
+      email_change_token_new?: string
+      email_change?: string
+      email_change_sent_at?: string
+      last_sign_in_at?: string
+      raw_app_meta_data?: string
+      raw_user_meta_data?: string
+      is_super_admin?: string
+      created_at?: string
+      updated_at?: string
+      phone?: string
+      phone_confirmed_at?: string
+      phone_change?: string
+      phone_change_token?: string
+      phone_change_sent_at?: string
+      confirmed_at?: string
+      email_change_token_current?: string
+      email_change_confirm_status?: string
+      banned_until?: string
+      reauthentication_token?: string
+      reauthentication_sent_at?: string
+      is_sso_user?: string
+      deleted_at?: string
+      is_anonymous?: string
+      leaderboard_referrals_all_time?: string
+      canton_party_verifications?: string
+      chain_addresses?: string
+      distribution_shares?: string
+      distribution_verifications?: string
+      link_in_bio?: string
+      profiles?: string
+      receipts?: string
+      send_accounts?: string
+      tags?: string
+      webauthn_credentials?: string
+    }
   }
   webauthn_credentials?: {
     name?: string;
@@ -813,6 +824,10 @@ export interface Fingerprint {
     fileSizeLimit?: FingerprintNumberField;
     objects?: FingerprintRelationField;
     prefixes?: FingerprintRelationField;
+  }
+  cantonPartyVerifications?: {
+    createdAt?: FingerprintDateField
+    user?: FingerprintRelationField
   }
   chainAddresses?: {
     createdAt?: FingerprintDateField;
@@ -1173,33 +1188,34 @@ export interface Fingerprint {
     extensions?: FingerprintRelationField;
   }
   users?: {
-    emailConfirmedAt?: FingerprintDateField;
-    invitedAt?: FingerprintDateField;
-    confirmationSentAt?: FingerprintDateField;
-    recoverySentAt?: FingerprintDateField;
-    emailChangeSentAt?: FingerprintDateField;
-    lastSignInAt?: FingerprintDateField;
-    rawAppMetaData?: FingerprintJsonField;
-    rawUserMetaData?: FingerprintJsonField;
-    createdAt?: FingerprintDateField;
-    updatedAt?: FingerprintDateField;
-    phoneConfirmedAt?: FingerprintDateField;
-    phoneChangeSentAt?: FingerprintDateField;
-    confirmedAt?: FingerprintDateField;
-    emailChangeConfirmStatus?: FingerprintNumberField;
-    bannedUntil?: FingerprintDateField;
-    reauthenticationSentAt?: FingerprintDateField;
-    deletedAt?: FingerprintDateField;
-    leaderboardReferralsAllTimes?: FingerprintRelationField;
-    chainAddresses?: FingerprintRelationField;
-    distributionShares?: FingerprintRelationField;
-    distributionVerifications?: FingerprintRelationField;
-    linkInBios?: FingerprintRelationField;
-    profiles?: FingerprintRelationField;
-    receipts?: FingerprintRelationField;
-    sendAccounts?: FingerprintRelationField;
-    tags?: FingerprintRelationField;
-    webauthnCredentials?: FingerprintRelationField;
+    emailConfirmedAt?: FingerprintDateField
+    invitedAt?: FingerprintDateField
+    confirmationSentAt?: FingerprintDateField
+    recoverySentAt?: FingerprintDateField
+    emailChangeSentAt?: FingerprintDateField
+    lastSignInAt?: FingerprintDateField
+    rawAppMetaData?: FingerprintJsonField
+    rawUserMetaData?: FingerprintJsonField
+    createdAt?: FingerprintDateField
+    updatedAt?: FingerprintDateField
+    phoneConfirmedAt?: FingerprintDateField
+    phoneChangeSentAt?: FingerprintDateField
+    confirmedAt?: FingerprintDateField
+    emailChangeConfirmStatus?: FingerprintNumberField
+    bannedUntil?: FingerprintDateField
+    reauthenticationSentAt?: FingerprintDateField
+    deletedAt?: FingerprintDateField
+    leaderboardReferralsAllTimes?: FingerprintRelationField
+    cantonPartyVerifications?: FingerprintRelationField
+    chainAddresses?: FingerprintRelationField
+    distributionShares?: FingerprintRelationField
+    distributionVerifications?: FingerprintRelationField
+    linkInBios?: FingerprintRelationField
+    profiles?: FingerprintRelationField
+    receipts?: FingerprintRelationField
+    sendAccounts?: FingerprintRelationField
+    tags?: FingerprintRelationField
+    webauthnCredentials?: FingerprintRelationField
   }
   webauthnCredentials?: {
     signCount?: FingerprintNumberField;
