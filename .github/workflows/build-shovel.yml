@@ -70,7 +70,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             PACKAGE=@my/shovel
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
 
       - name: Output image tag
         id: output-tag

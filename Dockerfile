@@ -153,16 +153,28 @@ ENTRYPOINT [ "/usr/bin/tini", "--", "/root/.bun/bin/bun" ]
 
 CMD ["--bun", "run", "./src/server.ts"]
 
-# Workers runner (example)
+# Workers runner
 FROM node:20-slim AS workers-runner
 WORKDIR /sendapp
+
+# Create non-root user
 RUN addgroup --system --gid 900 nodejs && \
   adduser --system --uid 900 workers
 USER workers
-COPY --from=builder --chown=workers:nodejs /sendapp/apps/workers/dist /sendapp/apps/workers/dist
+
+# Copy workers app files
+COPY --from=builder --chown=workers:nodejs /sendapp/apps/workers /sendapp/apps/workers
 COPY --from=builder --chown=workers:nodejs /sendapp/node_modules /sendapp/node_modules
 COPY --from=builder --chown=workers:nodejs /sendapp/packages /sendapp/packages
-CMD ["node", "apps/workers/dist/worker.js"]
+COPY --from=builder --chown=workers:nodejs /sendapp/package.json /sendapp/package.json
+COPY --from=builder --chown=workers:nodejs /sendapp/yarn.lock /sendapp/yarn.lock
+COPY --from=builder --chown=workers:nodejs /sendapp/.yarnrc.yml /sendapp/.yarnrc.yml
+COPY --from=builder --chown=workers:nodejs /sendapp/.yarn /sendapp/.yarn
+COPY --from=builder --chown=workers:nodejs /sendapp/tsconfig.base.json /sendapp/tsconfig.base.json
+
+WORKDIR /sendapp/apps/workers
+
+CMD ["yarn", "docker"]
 
 # Shovel runner
 FROM docker.io/indexsupply/shovel:af07 AS shovel-runner
