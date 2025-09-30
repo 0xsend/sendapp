@@ -28,7 +28,7 @@ export function CantonWalletStatus({
   if (shouldShowStatus) {
     return (
       <XStack ai="center" gap="$2">
-        <Paragraph>Verify Canton Wallet Address</Paragraph>
+        <Paragraph>Canton Wallet Address Verified</Paragraph>
         <IconBadgeCheckSolid
           size={'$1.5'}
           color={'$primary'}
@@ -39,15 +39,16 @@ export function CantonWalletStatus({
   }
 
   return (
-    <XStack ai="center" gap="$2">
-      <Paragraph>Verify Canton Wallet Address</Paragraph>
-      <Button chromeless unstyled onPress={onToggle}>
+    <Button chromeless unstyled onPress={onToggle}>
+      <XStack ai="center" gap="$2">
+        <Paragraph>Verify Canton Wallet Address</Paragraph>
+
         {isExpanded ? (
           <ChevronUp size={'$1.5'} color="$primary" $theme-light={{ color: '$color12' }} />
         ) : (
           <ChevronDown size={'$1.5'} color="$primary" $theme-light={{ color: '$color12' }} />
         )}
-      </Button>
-    </XStack>
+      </XStack>
+    </Button>
   )
 }
