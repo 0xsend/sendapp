@@ -1068,21 +1068,29 @@ interface Tables_relationships {
   };
   "storage.buckets": {
     parent: {
-      canton_party_verifications_user_id_fkey: 'auth.users'
-    }
-    children: {}
-    parentDestinationsTables: 'auth.users' | {}
-    childDestinationsTables: {}
-  }
-  'public.chain_addresses': {
+
+    };
+    children: {
+      objects_bucketId_fkey: "storage.objects";
+      prefixes_bucketId_fkey: "storage.prefixes";
+      s3_multipart_uploads_bucket_id_fkey: "storage.s3_multipart_uploads";
+      s3_multipart_uploads_parts_bucket_id_fkey: "storage.s3_multipart_uploads_parts";
+    };
+    parentDestinationsTables:  | {};
+    childDestinationsTables: "storage.objects" | "storage.prefixes" | "storage.s3_multipart_uploads" | "storage.s3_multipart_uploads_parts" | {};
+  };
+  "public.canton_party_verifications": {
     parent: {
-      chain_addresses_user_id_fkey: 'auth.users'
-    }
-    children: {}
-    parentDestinationsTables: 'auth.users' | {}
-    childDestinationsTables: {}
-  }
-  'public.distribution_shares': {
+       canton_party_verifications_user_id_fkey: "auth.users";
+    };
+    children: {
+
+    };
+    parentDestinationsTables: "auth.users" | {};
+    childDestinationsTables:  | {};
+    
+  };
+  "public.chain_addresses": {
     parent: {
        chain_addresses_user_id_fkey: "auth.users";
     };
