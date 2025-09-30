@@ -570,6 +570,49 @@ If the system grows beyond capacity:
    - Supabase handles this automatically
    - Monitor connection pool usage
 
+### Future Enhancement: K8s-Based Enrichment Service
+
+**Current limitation:** Vercel Cron has 10-minute execution limits and per-invocation costs.
+
+**Proposed improvement:** Replace Vercel cron jobs with a dedicated Node.js service running on the existing K8s fleet.
+
+**Benefits:**
+- **Cost savings:** No per-invocation Vercel fees, uses existing K8s capacity
+- **Faster enrichment:** Continuous processing instead of 10-minute batches
+  - Current: ~180 tokens/hour (30 tokens every 10 min)
+  - With K8s: ~2,400+ tokens/hour (continuous processing)
+- **Better control:** Adjust rate limits, batch sizes, retry logic dynamically
+- **No execution limits:** Process large backlogs without timeout constraints
+- **Resource efficiency:** Scale pods based on enrichment queue depth
+
+**Implementation approach:**
+```
+┌─────────────────────────────────────────┐
+│  K8s Pod: erc20-enrichment-worker       │
+│  - Polls get_tokens_needing_enrichment()│
+│  - Continuous processing loop           │
+│  - Configurable rate limits             │
+│  - Prometheus metrics export            │
+│  - Health checks for liveness/readiness │
+└─────────────────────────────────────────┘
+```
+
+**Configuration via environment variables:**
+- `ENRICHMENT_BATCH_SIZE` - Tokens per batch (default: 100)
+- `ENRICHMENT_RATE_LIMIT_MS` - Delay between tokens (default: 1500)
+- `COINGECKO_API_KEY` - Pro API key for higher limits
+- `WORKER_CONCURRENCY` - Number of parallel workers (default: 1)
+- `POLL_INTERVAL_MS` - How often to check for new tokens (default: 5000)
+
+**Migration path:**
+1. Deploy enrichment worker to K8s as Deployment with 1 replica
+2. Run in parallel with Vercel cron initially (idempotent upserts)
+3. Monitor metrics to ensure worker keeps up with discovery rate
+4. Disable Vercel cron once worker is proven stable
+5. Scale up replicas if enrichment queue grows
+
+**Estimated improvement:** 13x faster enrichment with continuous processing.
+
 ## Benefits Summary
 
 ✅ **Real-time** - Balances update as Shovel indexes new blocks
