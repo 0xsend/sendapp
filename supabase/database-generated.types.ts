@@ -2222,6 +2222,7 @@ export type Database = {
           | Database["public"]["Tables"]["link_in_bio"]["Row"][]
           | null
         banner_url: string | null
+        is_verified: boolean | null
       }
       tag_search_result: {
         avatar_url: string | null
