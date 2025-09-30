@@ -16,7 +16,8 @@ CREATE TYPE "public"."profile_lookup_result" AS (
 	"main_tag_id" bigint,
 	"main_tag_name" "text",
 	"links_in_bio" link_in_bio[],
-	"banner_url" "text"
+	"banner_url" "text",
+	"is_verified" boolean
 );
 ALTER TYPE "public"."profile_lookup_result" OWNER TO "postgres";
 
@@ -31,6 +32,13 @@ begin
     if lookup_type is null then raise exception 'lookup_type cannot be null'; end if;
 
     RETURN QUERY
+    WITH current_distribution_id AS (
+        SELECT id FROM distributions
+        WHERE qualification_start <= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+          AND qualification_end >= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+        ORDER BY qualification_start DESC
+        LIMIT 1
+    )
     SELECT
         case when p.id = ( select auth.uid() ) then p.id end,
         p.avatar_url::text,
@@ -70,13 +78,16 @@ begin
             ) sub)
         ELSE NULL
         END,
-        p.banner_url::text
+        p.banner_url::text,
+        CASE WHEN ds.user_id IS NOT NULL THEN true ELSE false END AS is_verified
     from profiles p
     join auth.users a on a.id = p.id
     left join send_accounts sa on sa.user_id = p.id
     left join tags mt on mt.id = sa.main_tag_id
     left join send_account_tags sat on sat.send_account_id = sa.id
     left join tags t on t.id = sat.tag_id and t.status = 'confirmed'::tag_status
+    left join distribution_shares ds on ds.user_id = p.id
+        and ds.distribution_id = (select id from current_distribution_id)
     where ((lookup_type = 'sendid' and p.send_id::text = identifier) or
         (lookup_type = 'tag' and t.name = identifier::citext) or
         (lookup_type = 'refcode' and p.referral_code = identifier) or
@@ -533,7 +544,7 @@ create or replace view "public"."referrer" as  WITH referrer AS (
             p.banner_url,
             referrer.send_id
            FROM (profile_lookup('sendid'::lookup_type_enum, ( SELECT (referrer_1.send_id)::text AS send_id
-                   FROM referrer referrer_1)) p(id, avatar_url, name, about, refcode, x_username, birthday, tag, address, chain_id, is_public, sendid, all_tags, main_tag_id, main_tag_name, links_in_bio, banner_url)
+                   FROM referrer referrer_1)) p(id, avatar_url, name, about, refcode, x_username, birthday, tag, address, chain_id, is_public, sendid, all_tags, main_tag_id, main_tag_name, links_in_bio, banner_url, is_verified)
              JOIN referrer ON ((referrer.send_id IS NOT NULL)))
         )
  SELECT profile_lookup.id,
