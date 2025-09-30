@@ -89,27 +89,26 @@ CREATE POLICY "Users can see own balances"
     );
 ```
 
-### Optional: `erc20_balance_history`
+### Historical Balances
 
-Track balance changes over time for historical queries.
+Historical balance data is **not** stored in a separate table. Instead, it can be derived from `send_account_transfers` when needed:
 
 ```sql
-CREATE TABLE public.erc20_balance_history (
-    id bigserial PRIMARY KEY,
-    send_account_address bytea NOT NULL,
-    chain_id numeric NOT NULL,
-    token_address bytea NOT NULL,
-    balance numeric NOT NULL,
-    balance_change numeric NOT NULL, -- +/- amount
-    block_num numeric NOT NULL,
-    block_time numeric NOT NULL,
-    tx_hash bytea NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL
-);
-
-CREATE INDEX erc20_balance_history_address_token_time_idx
-    ON erc20_balance_history(send_account_address, token_address, block_time DESC);
+-- Balance at specific timestamp
+SELECT
+  SUM(CASE WHEN t = :address THEN v ELSE 0 END) -
+  SUM(CASE WHEN f = :address THEN v ELSE 0 END) as balance
+FROM send_account_transfers
+WHERE log_addr = :token_address
+  AND (f = :address OR t = :address)
+  AND block_time <= :timestamp
 ```
+
+**Benefits of no separate history table:**
+- ✅ No data duplication - transfers are the source of truth
+- ✅ Flexible queries - calculate balance at any point in time
+- ✅ Less storage - no need to store balance snapshots
+- ✅ Less maintenance - no extra table to keep in sync
 
 ## Balance Calculation Logic
 
@@ -357,7 +356,7 @@ export const erc20Router = router({
       return balance
     }),
 
-  // Get balance history
+  // Get balance history (derived from transfers)
   getBalanceHistory: protectedProcedure
     .input(z.object({
       tokenAddress: z.string(),
@@ -374,17 +373,31 @@ export const erc20Router = router({
 
       if (!sendAccount) return []
 
-      const { data: history } = await ctx.supabase
-        .from('erc20_balance_history')
-        .select('balance, balance_change, block_time, tx_hash')
-        .eq('send_account_address', sendAccount.address)
+      // Calculate balance at each transfer
+      const { data: transfers } = await ctx.supabase
+        .from('send_account_transfers')
+        .select('f, t, v, block_time, tx_hash')
+        .eq('log_addr', input.tokenAddress)
         .eq('chain_id', input.chainId ?? sendAccount.chain_id)
-        .eq('token_address', input.tokenAddress)
+        .or(`f.eq.${sendAccount.address},t.eq.${sendAccount.address}`)
         .gte('block_time', input.startTime?.getTime() ?? 0)
         .lte('block_time', input.endTime?.getTime() ?? Date.now())
         .order('block_time', { ascending: true })
 
-      return history
+      // Calculate running balance
+      let balance = 0n
+      return transfers.map(transfer => {
+        const change = transfer.t === sendAccount.address
+          ? BigInt(transfer.v)
+          : -BigInt(transfer.v)
+        balance += change
+        return {
+          balance: balance.toString(),
+          balance_change: change.toString(),
+          block_time: transfer.block_time,
+          tx_hash: transfer.tx_hash,
+        }
+      })
     }),
 })
 ```
