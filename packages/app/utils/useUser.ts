@@ -45,7 +45,9 @@ export const useUser = () => {
   const queryFn = useCallback(async () => {
     const { data, error } = await supabase
       .from('profiles')
-      .select('*, tags(*), main_tag(*), links_in_bio(*), distribution_shares(*)')
+      .select(
+        '*, tags(*), main_tag(*), links_in_bio(*), distribution_shares(*), canton_party_verifications(*)'
+      )
       .eq('id', user?.id ?? '')
       .single()
 

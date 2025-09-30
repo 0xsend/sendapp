@@ -65,6 +65,12 @@ interface Table_storage_buckets {
   allowed_mime_types: string[] | null;
   owner_id: string | null;
 }
+interface Table_public_canton_party_verifications {
+  id: string;
+  user_id: string;
+  canton_wallet_address: string;
+  created_at: string;
+}
 interface Table_public_chain_addresses {
   address: string;
   user_id: string;
@@ -938,6 +944,7 @@ interface Schema_private {
 interface Schema_public {
   activity: Table_public_activity;
   affiliate_stats: Table_public_affiliate_stats;
+  canton_party_verifications: Table_public_canton_party_verifications;
   chain_addresses: Table_public_chain_addresses;
   challenges: Table_public_challenges;
   distribution_shares: Table_public_distribution_shares;
@@ -1071,6 +1078,16 @@ interface Tables_relationships {
     };
     parentDestinationsTables:  | {};
     childDestinationsTables: "storage.objects" | "storage.prefixes" | "storage.s3_multipart_uploads" | "storage.s3_multipart_uploads_parts" | {};
+  };
+  "public.canton_party_verifications": {
+    parent: {
+       canton_party_verifications_user_id_fkey: "auth.users";
+    };
+    children: {
+
+    };
+    parentDestinationsTables: "auth.users" | {};
+    childDestinationsTables:  | {};
     
   };
   "public.chain_addresses": {
@@ -1490,6 +1507,7 @@ interface Tables_relationships {
        leaderboard_referrals_all_time_user_id_fkey: "private.leaderboard_referrals_all_time";
        activity_from_user_id_fkey: "public.activity";
        activity_to_user_id_fkey: "public.activity";
+       canton_party_verifications_user_id_fkey: "public.canton_party_verifications";
        chain_addresses_user_id_fkey: "public.chain_addresses";
        distribution_shares_user_id_fkey: "public.distribution_shares";
        distribution_verifications_user_id_fkey: "public.distribution_verifications";
@@ -1501,7 +1519,7 @@ interface Tables_relationships {
        webauthn_credentials_user_id_fkey: "public.webauthn_credentials";
     };
     parentDestinationsTables:  | {};
-    childDestinationsTables: "auth.identities" | "auth.mfa_factors" | "auth.one_time_tokens" | "auth.sessions" | "private.leaderboard_referrals_all_time" | "public.activity" | "public.chain_addresses" | "public.distribution_shares" | "public.distribution_verifications" | "public.link_in_bio" | "public.profiles" | "public.receipts" | "public.send_accounts" | "public.tags" | "public.webauthn_credentials" | {};
+    childDestinationsTables: "auth.identities" | "auth.mfa_factors" | "auth.one_time_tokens" | "auth.sessions" | "private.leaderboard_referrals_all_time" | "public.activity" | "public.canton_party_verifications" | "public.chain_addresses" | "public.distribution_shares" | "public.distribution_verifications" | "public.link_in_bio" | "public.profiles" | "public.receipts" | "public.send_accounts" | "public.tags" | "public.webauthn_credentials" | {};
     
   };
   "public.webauthn_credentials": {

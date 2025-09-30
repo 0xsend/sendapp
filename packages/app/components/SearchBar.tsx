@@ -33,7 +33,7 @@ import { FormProvider } from 'react-hook-form'
 import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
 import { type Address, isAddress } from 'viem'
-import { IconAccount, IconArrowRight, IconCheckCircle, IconSearch, IconX } from './icons'
+import { IconAccount, IconArrowRight, IconBadgeCheckSolid, IconSearch, IconX } from './icons'
 import { baseMainnet } from '@my/wagmi'
 import { useEnsName } from 'wagmi'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
@@ -495,8 +495,8 @@ function SearchResultRow({
                   highlight={query}
                 />
                 {profile.is_verified && (
-                  <IconCheckCircle
-                    size={15}
+                  <IconBadgeCheckSolid
+                    size={'$1'}
                     color={'$primary'}
                     $theme-light={{ color: '$color12' }}
                   />
