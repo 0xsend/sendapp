@@ -17,8 +17,8 @@ A complete ERC20 token indexing system for Send app that automatically discovers
 ```
 ┌─────────────────────────────────────────────────────┐
 │  Shovel: send_account_transfers                     │
-│  (Currently indexes ALL transfers for whitelisted   │
-│   tokens, then filtered at DB layer)                │
+│  (Indexes ALL ERC20 transfers, filtered by Send     │
+│   addresses at database layer via BEFORE trigger)   │
 └──────────────────┬──────────────────────────────────┘
                    │
                    ▼
@@ -594,18 +594,6 @@ If the system grows beyond capacity:
 - Better privacy (only opted-in users)
 - Faster enrichment (fewer tokens to process)
 - Lower costs (less storage, fewer API calls)
-
-**Current Implementation Detail:**
-The Shovel `send_account_transfers` integration currently indexes ALL transfers for a whitelisted set of tokens (SEND, USDC, SPX6900, Moonwell, Morpho, Aerodrome, cbBTC, EURC, MAMO), not just transfers involving Send addresses. Filtering to Send-only addresses happens at the database layer via triggers. This is because Shovel doesn't yet support filtering on indexed event parameters (from/to addresses). See: https://github.com/orgs/indexsupply/discussions/268
-
-**Planned Migration:**
-Once we transition to indexing all ERC20 transfers (removing the hardcoded token whitelist), we will:
-1. Remove the `filter_op: 'contains'` and `filter_arg` whitelist from the `log_addr` field in Shovel config
-2. Keep `log_addr` column (it identifies which token contract emitted the Transfer event)
-3. Index all ERC20 Transfer events on Base (any token address)
-4. Backfill historical transfers to capture any previously missed tokens
-5. Continue filtering at the DB layer to only process Send account transfers
-6. This enables automatic discovery of any token a Send user interacts with
 
 ### Why Database-Driven Balances?
 
