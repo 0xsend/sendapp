@@ -2241,6 +2241,7 @@ export type Database = {
           created_at_block_num: number | null
           data: Json | null
           id: number
+          nonce: number | null
           send_account_transfers_activity_event_id: string | null
           send_account_transfers_activity_event_name: string | null
           status: Database["temporal"]["Enums"]["transfer_status"]
@@ -2253,6 +2254,7 @@ export type Database = {
           created_at_block_num?: number | null
           data?: Json | null
           id?: number
+          nonce?: number | null
           send_account_transfers_activity_event_id?: string | null
           send_account_transfers_activity_event_name?: string | null
           status?: Database["temporal"]["Enums"]["transfer_status"]
@@ -2265,6 +2267,7 @@ export type Database = {
           created_at_block_num?: number | null
           data?: Json | null
           id?: number
+          nonce?: number | null
           send_account_transfers_activity_event_id?: string | null
           send_account_transfers_activity_event_name?: string | null
           status?: Database["temporal"]["Enums"]["transfer_status"]
@@ -2272,7 +2275,15 @@ export type Database = {
           user_id?: string | null
           workflow_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "temporal_send_account_transfers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       send_earn_deposits: {
         Row: {
