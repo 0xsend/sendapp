@@ -1,0 +1,25 @@
+{
+  "name": "token-enrichment-worker",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "yarn with-env tsx src/index.ts",
+    "dev": "yarn with-env tsx watch src/index.ts",
+    "lint": "tsc --noEmit",
+    "with-env": "dotenv -e ../../.env -c --"
+  },
+  "dependencies": {
+    "@my/supabase": "workspace:*",
+    "@my/wagmi": "workspace:*",
+    "@supabase/supabase-js": "^2.49.8",
+    "viem": "^2.27.2",
+    "pino": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "dotenv-cli": "^7.3.0",
+    "tsx": "^4.7.1",
+    "typescript": "^5.8.3"
+  }
+}

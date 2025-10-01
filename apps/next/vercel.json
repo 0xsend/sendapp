@@ -4,20 +4,7 @@
       "maxDuration": 90
     }
   },
-  "crons": [
-    {
-      "path": "/api/cron/enrich-token-data",
-      "schedule": "*/10 * * * *"
-    },
-    {
-      "path": "/api/cron/discover-tokens",
-      "schedule": "0 * * * *"
-    },
-    {
-      "path": "/api/cron/bootstrap-balances",
-      "schedule": "0 3 * * *"
-    }
-  ],
+  "crons": [],
   "headers": [
     {
       "source": "/.well-known/apple-app-site-association",

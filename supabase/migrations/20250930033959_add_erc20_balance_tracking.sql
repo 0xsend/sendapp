@@ -108,89 +108,6 @@ $$ language plpgsql security definer;
 create trigger "trigger_update_balances_from_transfer" after insert on "public"."send_account_transfers" for each row execute function "public"."update_erc20_balances_from_transfer"();
 
 -- =============================================================================
--- Function: Recalculate balances (bootstrap & verification)
--- =============================================================================
-
-create
-or replace function "public"."recalculate_erc20_balances"(
-    p_send_account_address bytea default null,
-    p_token_address bytea default null,
-    p_chain_id numeric default null
-) returns table(processed_count bigint) as $$
-DECLARE
-  v_processed_count bigint := 0;
-BEGIN
-  -- Clear existing balances if specific parameters provided
-  IF p_send_account_address IS NOT NULL OR p_token_address IS NOT NULL OR p_chain_id IS NOT NULL THEN
-    DELETE FROM erc20_balances
-    WHERE (p_send_account_address IS NULL OR send_account_address = p_send_account_address)
-      AND (p_token_address IS NULL OR token_address = p_token_address)
-      AND (p_chain_id IS NULL OR chain_id = p_chain_id);
-  ELSE
-    -- Full recalculation - clear all
-    TRUNCATE erc20_balances;
-  END IF;
-
-  -- Calculate balances from transfers
-  WITH calculated_balances AS (
-    SELECT
-      sat.chain_id,
-      address_token.address,
-      address_token.token_address,
-      COALESCE(SUM(CASE WHEN sat.t = address_token.address THEN sat.v ELSE 0 END), 0) -
-      COALESCE(SUM(CASE WHEN sat.f = address_token.address THEN sat.v ELSE 0 END), 0) as balance,
-      MAX(sat.block_num) as last_block_num,
-      MAX(sat.block_time) as last_block_time
-    FROM (
-      SELECT DISTINCT
-        sat.chain_id,
-        sat.log_addr as token_address,
-        addr.address
-      FROM send_account_transfers sat
-      CROSS JOIN LATERAL (
-        SELECT DISTINCT unnest(ARRAY[sat.f, sat.t]) as address
-      ) addr
-      WHERE (p_token_address IS NULL OR sat.log_addr = p_token_address)
-        AND (p_chain_id IS NULL OR sat.chain_id = p_chain_id)
-        AND (p_send_account_address IS NULL OR addr.address = p_send_account_address)
-    ) address_token
-    LEFT JOIN send_account_transfers sat ON
-      sat.chain_id = address_token.chain_id AND
-      sat.log_addr = address_token.token_address AND
-      (sat.f = address_token.address OR sat.t = address_token.address)
-    GROUP BY sat.chain_id, address_token.address, address_token.token_address
-    HAVING COALESCE(SUM(CASE WHEN sat.t = address_token.address THEN sat.v ELSE 0 END), 0) -
-           COALESCE(SUM(CASE WHEN sat.f = address_token.address THEN sat.v ELSE 0 END), 0) != 0
-  )
-  INSERT INTO erc20_balances (
-    send_account_address,
-    chain_id,
-    token_address,
-    balance,
-    last_updated_block,
-    last_updated_time
-  )
-  SELECT
-    address,
-    chain_id,
-    token_address,
-    balance,
-    last_block_num,
-    to_timestamp(last_block_time)
-  FROM calculated_balances
-  ON CONFLICT (send_account_address, chain_id, token_address)
-  DO UPDATE SET
-    balance = EXCLUDED.balance,
-    last_updated_block = EXCLUDED.last_updated_block,
-    last_updated_time = EXCLUDED.last_updated_time;
-
-  GET DIAGNOSTICS v_processed_count = ROW_COUNT;
-  processed_count := v_processed_count;
-  RETURN NEXT;
-END;
-$$ language plpgsql security definer;
-
--- =============================================================================
 -- Helper function: Get user balances with token metadata
 -- =============================================================================
 
@@ -250,15 +167,6 @@ execute on function "public"."update_erc20_balances_from_transfer"() to "authent
 
 grant
 execute on function "public"."update_erc20_balances_from_transfer"() to "service_role";
-
-grant
-execute on function "public"."recalculate_erc20_balances"(bytea, bytea, numeric) to "anon";
-
-grant
-execute on function "public"."recalculate_erc20_balances"(bytea, bytea, numeric) to "authenticated";
-
-grant
-execute on function "public"."recalculate_erc20_balances"(bytea, bytea, numeric) to "service_role";
 
 grant
 execute on function "public"."get_user_token_balances"(uuid, numeric) to "anon";

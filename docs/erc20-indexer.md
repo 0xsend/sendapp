@@ -2,11 +2,13 @@
 
 ## Overview
 
-A complete ERC20 token indexing system for Send app that automatically discovers, tracks, and enriches tokens used by Send addresses. The system uses Shovel for on-chain data ingestion, database triggers for automatic discovery and balance tracking, and Vercel Cron jobs for metadata enrichment from CoinGecko.
+A complete ERC20 token indexing system for Send app that automatically discovers, tracks, and enriches tokens used by Send addresses. The system uses Shovel for on-chain data ingestion, database triggers for automatic discovery and balance tracking, and Kubernetes workers for metadata enrichment from CoinGecko.
 
 **Key Features:**
 - ✅ Automatic token discovery from Send user transfers
 - ✅ Real-time balance tracking via database triggers
+- ✅ Hybrid balance system: fast DB queries + RPC reconciliation
+- ✅ Handles rebasing tokens and missed transactions via reconciliation worker
 - ✅ Metadata enrichment (logos, prices, descriptions) from CoinGecko
 - ✅ Database-driven token icons (no hardcoded SVGs)
 - ✅ Scalable to any number of tokens
@@ -32,18 +34,26 @@ A complete ERC20 token indexing system for Send app that automatically discovers
 │  PostgreSQL / Supabase                              │
 │  • erc20_tokens (discovered tokens)                 │
 │  • erc20_token_metadata (enriched data)             │
-│  • erc20_balances (current balances)                │
+│  • erc20_balances (calculated from transfers)       │
+│  • erc20_balance_snapshots (RPC snapshots)          │
+│  • erc20_balance_reconciliations (drift tracking)   │
 └──────────────────┬──────────────────────────────────┘
                    │
-                   ▼
-┌─────────────────────────────────────────────────────┐
-│  Vercel Cron: /api/cron/enrich-token-data          │
-│  (Every 10 min)                                     │
-│  1. Calls get_tokens_needing_enrichment()          │
-│  2. Reads contract (name, symbol, decimals)         │
-│  3. Fetches CoinGecko (logo, price, metadata)       │
-│  4. Updates erc20_tokens + erc20_token_metadata     │
-└─────────────────────────────────────────────────────┘
+           ┌───────┴────────┐
+           │                │
+           ▼                ▼
+┌──────────────────┐  ┌─────────────────────────────┐
+│  Token           │  │  Balance Reconciliation     │
+│  Enrichment      │  │  Worker (K8s)               │
+│  Worker (K8s)    │  │                             │
+│  (Every 10 min)  │  │  Every 60s (configurable):  │
+│                  │  │  1. Query balances to       │
+│  1. Get tokens   │  │     reconcile (prioritized) │
+│  2. Read contract│  │  2. Fetch RPC balance       │
+│  3. CoinGecko    │  │  3. Compare with DB         │
+│  4. Update DB    │  │  4. Store snapshot          │
+└──────────────────┘  │  5. Reconcile drift if >1%  │
+                      └─────────────────────────────┘
 ```
 
 ## Database Schema
@@ -257,15 +267,238 @@ SELECT * FROM recalculate_erc20_balances();
 
 **Performance:** ~5-10 minutes for full bootstrap, ~100ms per user for incremental.
 
+## Balance Reconciliation System
+
+### Problem: Limitations of Transfer-Based Accounting
+
+While calculating balances from transfers is fast and accurate for most tokens, it has critical limitations:
+
+1. **Rebasing tokens** (stETH, aUSDC, etc.) change balances without emitting transfer events
+2. **Missed transactions** create permanent drift if the indexer skips blocks or drops transfers
+3. **RPC polling is too slow** for real-time UI (200-500ms per query)
+
+### Solution: Hybrid Balance System
+
+The reconciliation system provides the best of both worlds:
+- **Primary**: Fast DB-driven balances for UI (<10ms queries, updated from transfers)
+- **Secondary**: Periodic RPC snapshots to detect and correct drift
+
+### New Schema
+
+#### Table 4: `erc20_balance_snapshots`
+
+Periodic RPC-based balance snapshots (source of truth):
+
+```sql
+CREATE TABLE erc20_balance_snapshots (
+    send_account_address bytea NOT NULL,
+    chain_id numeric NOT NULL,
+    token_address bytea NOT NULL,
+    balance numeric NOT NULL,
+    snapshot_time timestamp with time zone NOT NULL DEFAULT now(),
+    snapshot_block numeric NOT NULL,
+    drift_from_calculated numeric, -- difference from erc20_balances
+    PRIMARY KEY (send_account_address, chain_id, token_address, snapshot_time)
+);
+
+-- View: Latest snapshot for each address/token pair
+CREATE VIEW erc20_balance_latest_snapshot AS
+SELECT DISTINCT ON (send_account_address, chain_id, token_address)
+    send_account_address, chain_id, token_address,
+    balance AS snapshot_balance,
+    snapshot_time, snapshot_block, drift_from_calculated
+FROM erc20_balance_snapshots
+ORDER BY send_account_address, chain_id, token_address, snapshot_time DESC;
+```
+
+#### Table 5: `erc20_balance_reconciliations`
+
+Track all balance corrections and their reasons:
+
+```sql
+CREATE TABLE erc20_balance_reconciliations (
+    id bigserial PRIMARY KEY,
+    send_account_address bytea NOT NULL,
+    chain_id numeric NOT NULL,
+    token_address bytea NOT NULL,
+    -- What was wrong
+    drift_amount numeric NOT NULL, -- positive = DB was too low
+    db_balance_before numeric NOT NULL,
+    rpc_balance numeric NOT NULL,
+    -- Why it happened
+    reconciliation_reason text, -- 'rebasing', 'missed_transfer', 'indexing_lag', 'unknown'
+    -- When it was fixed
+    reconciled_at timestamp with time zone NOT NULL DEFAULT now(),
+    reconciled_block numeric NOT NULL
+);
+```
+
+#### Updated: `erc20_tokens`
+
+Added `is_rebasing` flag to prioritize reconciliation for rebasing tokens:
+
+```sql
+ALTER TABLE erc20_tokens ADD COLUMN is_rebasing boolean DEFAULT false;
+
+-- Mark known rebasing tokens
+UPDATE erc20_tokens SET is_rebasing = true
+WHERE address IN ('\x...stETH...', '\x...aUSDC...');
+```
+
+### Reconciliation Worker
+
+**Location:** `apps/balance-reconciliation-worker/`
+
+Async worker service that continuously reconciles balances between DB and RPC.
+
+#### How It Works
+
+```
+Every 60 seconds (configurable):
+
+1. Query get_balances_to_reconcile(limit: 100)
+   - Prioritized by:
+     a. Rebasing tokens (most frequent drift)
+     b. High USD value balances (most important)
+     c. Recent activity (likely to change)
+     d. Stale snapshots (longest since last check)
+
+2. For each balance:
+   - Get indexer's last processed block (N)
+   - Reconcile at block N-1 (ensures indexer finished that block)
+   - Fetch actual balance from RPC at block N-1
+   - Compare with DB calculated balance
+   - Store snapshot
+
+3. If drift detected (any amount):
+   - Determine reason (rebasing, missed_transfer, unknown)
+   - Store reconciliation record
+   - Apply adjustment to erc20_balances
+```
+
+**N-1 Block Lag Strategy**: If last indexed transfer is at block 1000, reconcile at block 999. This prevents race conditions where the indexer is still processing multiple transfers for block 1000.
+
+#### Configuration
+
+```bash
+# Required
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+RECONCILIATION_RPC_URL=https://mainnet.base.org
+
+# Optional (defaults shown)
+RECONCILIATION_BATCH_SIZE=100              # Balances per loop
+RECONCILIATION_RATE_LIMIT_MS=100           # RPC call delay
+RECONCILIATION_POLL_INTERVAL_MS=60000      # Loop interval (60s)
+```
+
+#### Running the Worker
+
+```bash
+# Local development
+yarn workspace balance-reconciliation-worker dev
+
+# Docker
+docker build -t balance-reconciliation-worker apps/balance-reconciliation-worker
+docker run --env-file .env balance-reconciliation-worker
+
+# Kubernetes (see apps/balance-reconciliation-worker/README.md)
+```
+
+### Reconciliation Functions
+
+```sql
+-- Get balances needing reconciliation (prioritized)
+CREATE FUNCTION get_balances_to_reconcile(p_limit integer DEFAULT 100);
+
+-- Store RPC snapshot
+CREATE FUNCTION store_balance_snapshot(
+    p_send_account_address bytea,
+    p_chain_id numeric,
+    p_token_address bytea,
+    p_balance numeric,
+    p_snapshot_block numeric,
+    p_drift_from_calculated numeric
+);
+
+-- Store reconciliation record
+CREATE FUNCTION store_reconciliation(
+    p_send_account_address bytea,
+    p_chain_id numeric,
+    p_token_address bytea,
+    p_drift_amount numeric,
+    p_db_balance_before numeric,
+    p_rpc_balance numeric,
+    p_reconciliation_reason text,
+    p_reconciled_block numeric
+);
+
+-- Apply balance correction
+CREATE FUNCTION apply_balance_reconciliation(
+    p_send_account_address bytea,
+    p_chain_id numeric,
+    p_token_address bytea,
+    p_adjustment numeric,
+    p_block_num numeric
+);
+```
+
+### Monitoring Reconciliation
+
+```sql
+-- View recent reconciliations
+SELECT
+    concat('0x', encode(send_account_address, 'hex')) as address,
+    concat('0x', encode(token_address, 'hex')) as token,
+    drift_amount / power(10, 18) as drift_tokens,
+    reconciliation_reason,
+    reconciled_at
+FROM erc20_balance_reconciliations
+ORDER BY reconciled_at DESC
+LIMIT 50;
+
+-- Check drift frequency per token
+SELECT
+    concat('0x', encode(token_address, 'hex')) as token,
+    COUNT(*) as reconciliation_count,
+    AVG(ABS(drift_amount)) as avg_drift,
+    reconciliation_reason
+FROM erc20_balance_reconciliations
+WHERE reconciled_at > now() - interval '7 days'
+GROUP BY token_address, reconciliation_reason
+ORDER BY reconciliation_count DESC;
+
+-- Check snapshot coverage
+SELECT
+    COUNT(DISTINCT (send_account_address, token_address)) as unique_balances,
+    COUNT(*) as total_snapshots,
+    MAX(snapshot_time) as latest_snapshot
+FROM erc20_balance_snapshots
+WHERE snapshot_time > now() - interval '1 hour';
+```
+
+### Benefits
+
+✅ **Real-time UI**: DB balances update instantly from transfers (<10ms queries)
+✅ **Accuracy**: RPC snapshots catch rebasing tokens + missed transactions
+✅ **Scalability**: Worker processes balances in priority order
+✅ **Reconciliation**: Auto-fixes drift when detected
+✅ **Async**: Slow RPC calls don't block UI
+✅ **Observable**: Snapshot history shows drift over time
+✅ **Auditability**: All corrections logged with reasons
+
 ## Metadata Enrichment
 
-### Vercel Cron: `/api/cron/enrich-token-data`
+### Token Enrichment Worker
 
-**Schedule:** Every 10 minutes
-**File:** `apps/next/pages/api/cron/enrich-token-data.ts`
+**Location:** `apps/token-enrichment-worker/`
+
+Kubernetes worker service that continuously enriches ERC20 token metadata from both on-chain contracts and off-chain data sources (CoinGecko).
+
+**Schedule:** Every 10 minutes (configurable)
 
 **Process:**
-1. Query `get_tokens_needing_enrichment()` → 30 tokens
+1. Query `get_tokens_needing_enrichment()` → 30 tokens per batch
    - **Prioritized by user balances:** Tokens with highest total balances enriched first
    - Then by holder count (most popular tokens)
    - Then by newest tokens
@@ -276,11 +509,16 @@ SELECT * FROM recalculate_erc20_balances();
    - Upsert `erc20_token_metadata` with off-chain data
 3. Rate limit: 1.5s between tokens (respects CoinGecko free tier)
 
-**Rate:** ~180 tokens/hour enriched
+**Rate:** ~180 tokens/hour enriched (configurable based on API tier)
 
 **Environment Variables:**
+- `TOKEN_ENRICHMENT_RPC_URL` (required) - RPC endpoint for contract calls
 - `COINGECKO_API_KEY` (optional) - Pro API key for higher rate limits
-- `CRON_SECRET` (required) - For securing the endpoint
+- `TOKEN_ENRICHMENT_BATCH_SIZE` (default: 30) - Tokens per loop
+- `TOKEN_ENRICHMENT_RATE_LIMIT_MS` (default: 1500) - Delay between tokens
+- `TOKEN_ENRICHMENT_POLL_INTERVAL_MS` (default: 600000) - Loop interval (10 min)
+
+See [apps/token-enrichment-worker/README.md](../apps/token-enrichment-worker/README.md) for full details.
 
 ### CoinGecko Integration
 
@@ -311,44 +549,6 @@ async function fetchCoinGeckoMetadata(address: string, chainId: number) {
 - Circulating supply, max supply
 - CoinGecko ID for future lookups
 
-### Vercel Cron: `/api/cron/discover-tokens`
-
-**Schedule:** Hourly
-**File:** `apps/next/pages/api/cron/discover-tokens.ts`
-
-Bootstrap discovery from historical transfers (safety net for missed discoveries).
-
-**Prioritization:** Tokens with highest user balances and most holders discovered first.
-
-### Vercel Cron: `/api/cron/bootstrap-balances`
-
-**Schedule:** Daily at 3am
-**File:** `apps/next/pages/api/cron/bootstrap-balances.ts`
-
-Runs `recalculate_erc20_balances()` for verification and reconciliation.
-
-### Vercel Configuration
-
-**File:** `apps/next/vercel.json`
-
-```json
-{
-  "crons": [
-    {
-      "path": "/api/cron/enrich-token-data",
-      "schedule": "*/10 * * * *"
-    },
-    {
-      "path": "/api/cron/discover-tokens",
-      "schedule": "0 * * * *"
-    },
-    {
-      "path": "/api/cron/bootstrap-balances",
-      "schedule": "0 3 * * *"
-    }
-  ]
-}
-```
 
 ## Frontend Integration
 
@@ -445,45 +645,68 @@ cd supabase
 yarn supabase db push
 ```
 
-Three migrations will be applied:
+Four migrations will be applied:
 1. `20250930011614_create_erc20_tokens_tables.sql`
 2. `20250930015920_add_erc20_token_discovery_trigger.sql`
 3. `20250930033959_add_erc20_balance_tracking.sql`
+4. `20251001000000_add_balance_reconciliation.sql`
 
-### 2. Bootstrap Existing Data
+### 2. Set Environment Variables
+
+For Kubernetes workers:
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `TOKEN_ENRICHMENT_RPC_URL` (Base RPC endpoint)
+- `RECONCILIATION_RPC_URL` (Base RPC endpoint)
+- `COINGECKO_API_KEY` (optional) - For Pro API higher rate limits
+
+### 3. Deploy Token Enrichment Worker
+
+```bash
+# Local development
+yarn workspace token-enrichment-worker dev
+
+# Docker
+cd apps/token-enrichment-worker
+docker build -t token-enrichment-worker .
+docker run --env-file ../../.env token-enrichment-worker
+
+# Kubernetes
+kubectl apply -f apps/token-enrichment-worker/k8s/
+```
+
+### 4. Deploy Balance Reconciliation Worker
+
+```bash
+# Local development
+yarn workspace balance-reconciliation-worker dev
+
+# Docker
+cd apps/balance-reconciliation-worker
+docker build -t balance-reconciliation-worker .
+docker run --env-file ../../.env balance-reconciliation-worker
+
+# Kubernetes
+kubectl apply -f apps/balance-reconciliation-worker/k8s/
+```
+
+See [apps/balance-reconciliation-worker/README.md](../apps/balance-reconciliation-worker/README.md) for configuration details.
+
+### 5. Mark Rebasing Tokens
+
+Identify and mark rebasing tokens to prioritize their reconciliation:
 
 ```sql
--- Populate balances from historical transfers (one-time, ~5-10 min)
-SELECT * FROM recalculate_erc20_balances();
+UPDATE erc20_tokens SET is_rebasing = true
+WHERE address = '\x...' AND chain_id = 8453;  -- stETH, aUSDC, etc.
 ```
 
-Or call the cron endpoint:
-```bash
-curl -X POST https://your-app.vercel.app/api/cron/bootstrap-balances \
-  -H "Authorization: Bearer $CRON_SECRET"
-```
+### 6. Monitor
 
-### 3. Set Environment Variables
-
-In Vercel dashboard:
-- `CRON_SECRET` (required) - Random secure string
-- `COINGECKO_API_KEY` (optional) - For Pro API higher rate limits
-- `NEXT_PUBLIC_SUPABASE_URL` (already set)
-- `SUPABASE_SERVICE_ROLE_KEY` (already set)
-
-### 4. Deploy to Vercel
-
-```bash
-git push origin main
-```
-
-Vercel crons will start automatically after deployment.
-
-### 5. Monitor
-
-- Check Vercel cron logs for execution status
-- Monitor enrichment rate: ~180 tokens/hour
-- Check database for new tokens being discovered
+- Check token enrichment worker logs for enrichment execution
+- Monitor enrichment rate: ~180 tokens/hour (configurable)
+- Check reconciliation worker logs for drift detection
+- Monitor reconciliation rate and reasons (SQL queries in reconciliation section)
 - Verify balances match user expectations
 
 ## Monitoring & Maintenance
@@ -570,48 +793,6 @@ If the system grows beyond capacity:
    - Supabase handles this automatically
    - Monitor connection pool usage
 
-### Future Enhancement: K8s-Based Enrichment Service
-
-**Current limitation:** Vercel Cron has 10-minute execution limits and per-invocation costs.
-
-**Proposed improvement:** Replace Vercel cron jobs with a dedicated Node.js service running on the existing K8s fleet.
-
-**Benefits:**
-- **Cost savings:** No per-invocation Vercel fees, uses existing K8s capacity
-- **Faster enrichment:** Continuous processing instead of 10-minute batches
-  - Current: ~180 tokens/hour (30 tokens every 10 min)
-  - With K8s: ~2,400+ tokens/hour (continuous processing)
-- **Better control:** Adjust rate limits, batch sizes, retry logic dynamically
-- **No execution limits:** Process large backlogs without timeout constraints
-- **Resource efficiency:** Scale pods based on enrichment queue depth
-
-**Implementation approach:**
-```
-┌─────────────────────────────────────────┐
-│  K8s Pod: erc20-enrichment-worker       │
-│  - Polls get_tokens_needing_enrichment()│
-│  - Continuous processing loop           │
-│  - Configurable rate limits             │
-│  - Prometheus metrics export            │
-│  - Health checks for liveness/readiness │
-└─────────────────────────────────────────┘
-```
-
-**Configuration via environment variables:**
-- `ENRICHMENT_BATCH_SIZE` - Tokens per batch (default: 100)
-- `ENRICHMENT_RATE_LIMIT_MS` - Delay between tokens (default: 1500)
-- `COINGECKO_API_KEY` - Pro API key for higher limits
-- `WORKER_CONCURRENCY` - Number of parallel workers (default: 1)
-- `POLL_INTERVAL_MS` - How often to check for new tokens (default: 5000)
-
-**Migration path:**
-1. Deploy enrichment worker to K8s as Deployment with 1 replica
-2. Run in parallel with Vercel cron initially (idempotent upserts)
-3. Monitor metrics to ensure worker keeps up with discovery rate
-4. Disable Vercel cron once worker is proven stable
-5. Scale up replicas if enrichment queue grows
-
-**Estimated improvement:** 13x faster enrichment with continuous processing.
 
 ## Benefits Summary
 
@@ -650,16 +831,17 @@ If the system grows beyond capacity:
 - **Accuracy:** Source of truth from indexed transfers
 - **Real-time:** Updates via trigger, no polling lag
 
-### Why Vercel Cron?
+### Why Kubernetes Workers?
 
-**Decision:** Use Vercel Cron instead of standalone enrichment service.
+**Decision:** Use Kubernetes workers instead of Vercel Cron jobs.
 
 **Rationale:**
-- Already using Next.js/Vercel
-- No additional infrastructure
-- Easy to deploy and monitor
-- Built-in scheduling
-- Serverless scaling
+- **Cost savings:** No per-invocation Vercel fees, uses existing K8s capacity
+- **Better control:** Adjust rate limits, batch sizes, retry logic dynamically
+- **No execution limits:** Process large backlogs without timeout constraints
+- **Simpler deployment:** Part of monorepo, uses workspace dependencies
+- **Better observability:** Structured logging, metrics, health checks
+- **Graceful shutdown:** Proper SIGTERM/SIGINT handling
 
 ### Why CoinGecko?
 
@@ -683,17 +865,43 @@ If the system grows beyond capacity:
 - Less maintenance (no extra table to keep in sync)
 - Can derive history from `send_account_transfers` when needed
 
+### Why Reconciliation Worker?
+
+**Decision:** Create separate worker service for balance reconciliation instead of relying solely on transfer-based accounting.
+
+**Rationale:**
+- **Handles rebasing tokens:** Tokens like stETH/aUSDC change balances without transfers
+- **Catches missed transactions:** If indexer skips blocks, reconciliation fixes drift
+- **Maintains fast UI:** DB queries remain <10ms, worker handles slow RPC calls async
+- **Prioritization:** Checks high-value balances and rebasing tokens more frequently
+- **Auditability:** All corrections logged with reasons
+- **Observable:** Drift tracking helps identify indexer issues early
+
 ## Files Created/Modified
 
 ### Database Migrations
 1. `supabase/migrations/20250930011614_create_erc20_tokens_tables.sql`
 2. `supabase/migrations/20250930015920_add_erc20_token_discovery_trigger.sql`
 3. `supabase/migrations/20250930033959_add_erc20_balance_tracking.sql`
+4. `supabase/migrations/20251001000000_add_balance_reconciliation.sql`
 
-### API Routes
-1. `apps/next/pages/api/cron/enrich-token-data.ts`
-2. `apps/next/pages/api/cron/discover-tokens.ts`
-3. `apps/next/pages/api/cron/bootstrap-balances.ts`
+### Token Enrichment Worker
+1. `apps/token-enrichment-worker/src/index.ts`
+2. `apps/token-enrichment-worker/src/enrichment-worker.ts`
+3. `apps/token-enrichment-worker/package.json`
+4. `apps/token-enrichment-worker/tsconfig.json`
+5. `apps/token-enrichment-worker/Dockerfile`
+6. `apps/token-enrichment-worker/README.md`
+7. `apps/token-enrichment-worker/.env.example`
+
+### Balance Reconciliation Worker
+1. `apps/balance-reconciliation-worker/src/index.ts`
+2. `apps/balance-reconciliation-worker/src/reconciliation-worker.ts`
+3. `apps/balance-reconciliation-worker/package.json`
+4. `apps/balance-reconciliation-worker/tsconfig.json`
+5. `apps/balance-reconciliation-worker/Dockerfile`
+6. `apps/balance-reconciliation-worker/README.md`
+7. `apps/balance-reconciliation-worker/.env.example`
 
 ### Frontend Components
 1. `packages/app/components/icons/IconCoin.tsx` - Database-driven logo fetching
