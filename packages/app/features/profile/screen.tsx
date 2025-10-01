@@ -22,7 +22,12 @@ import {
 // Internal
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useProfileScreenParams } from 'app/routers/params'
-import { IconAccount, IconLinkInBio } from 'app/components/icons'
+import {
+  IconAccount,
+  IconLinkInBio,
+  IconCheckCircle,
+  IconBadgeCheckSolid,
+} from 'app/components/icons'
 import { ShareOtherProfileDialog } from './components/ShareOtherProfileDialog'
 import type { Functions } from '@my/supabase/database.types'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
@@ -150,9 +155,20 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                 </Avatar>
               )}
               <YStack px="$4" gap="$3" jc="space-around" f={1} als="center">
-                <H3 lineHeight={32} color="$color12">
-                  {otherUserProfile?.name ?? '---'}
-                </H3>
+                <XStack ai="center" gap="$2">
+                  <H3 lineHeight={32} color="$color12">
+                    {otherUserProfile?.name ?? '---'}
+                  </H3>
+                  {otherUserProfile?.is_verified ? (
+                    <IconBadgeCheckSolid
+                      size={'$1.5'}
+                      mih={'$1.5'}
+                      miw={'$1.5'}
+                      color={'$primary'}
+                      $theme-light={{ color: '$color12' }}
+                    />
+                  ) : null}
+                </XStack>
                 <ViewHistoryButton sendId={otherUserProfile?.sendid} />
               </YStack>
             </XStack>
