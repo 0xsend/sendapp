@@ -35,7 +35,6 @@ A complete ERC20 token indexing system for Send app that automatically discovers
 │  • erc20_tokens (discovered tokens)                 │
 │  • erc20_token_metadata (enriched data)             │
 │  • erc20_balances (calculated from transfers)       │
-│  • erc20_balance_snapshots (RPC snapshots)          │
 │  • erc20_balance_reconciliations (drift tracking)   │
 └──────────────────┬──────────────────────────────────┘
                    │
@@ -51,9 +50,8 @@ A complete ERC20 token indexing system for Send app that automatically discovers
 │  1. Get tokens   │  │     reconcile (prioritized) │
 │  2. Read contract│  │  2. Fetch RPC balance       │
 │  3. CoinGecko    │  │  3. Compare with DB         │
-│  4. Update DB    │  │  4. Store snapshot          │
-└──────────────────┘  │  5. Reconcile drift if >1%  │
-                      └─────────────────────────────┘
+│  4. Update DB    │  │  4. Reconcile any drift     │
+└──────────────────┘  └─────────────────────────────┘
 ```
 
 ## Database Schema
@@ -281,37 +279,11 @@ While calculating balances from transfers is fast and accurate for most tokens, 
 
 The reconciliation system provides the best of both worlds:
 - **Primary**: Fast DB-driven balances for UI (<10ms queries, updated from transfers)
-- **Secondary**: Periodic RPC snapshots to detect and correct drift
+- **Secondary**: Periodic RPC checks to detect and correct drift
 
 ### New Schema
 
-#### Table 4: `erc20_balance_snapshots`
-
-Periodic RPC-based balance snapshots (source of truth):
-
-```sql
-CREATE TABLE erc20_balance_snapshots (
-    send_account_address bytea NOT NULL,
-    chain_id numeric NOT NULL,
-    token_address bytea NOT NULL,
-    balance numeric NOT NULL,
-    snapshot_time timestamp with time zone NOT NULL DEFAULT now(),
-    snapshot_block numeric NOT NULL,
-    drift_from_calculated numeric, -- difference from erc20_balances
-    PRIMARY KEY (send_account_address, chain_id, token_address, snapshot_time)
-);
-
--- View: Latest snapshot for each address/token pair
-CREATE VIEW erc20_balance_latest_snapshot AS
-SELECT DISTINCT ON (send_account_address, chain_id, token_address)
-    send_account_address, chain_id, token_address,
-    balance AS snapshot_balance,
-    snapshot_time, snapshot_block, drift_from_calculated
-FROM erc20_balance_snapshots
-ORDER BY send_account_address, chain_id, token_address, snapshot_time DESC;
-```
-
-#### Table 5: `erc20_balance_reconciliations`
+#### Table 4: `erc20_balance_reconciliations`
 
 Track all balance corrections and their reasons:
 
@@ -368,7 +340,6 @@ Every 60 seconds (configurable):
    - Reconcile at block N-1 (ensures indexer finished that block)
    - Fetch actual balance from RPC at block N-1
    - Compare with DB calculated balance
-   - Store snapshot
 
 3. If drift detected (any amount):
    - Determine reason (rebasing, missed_transfer, unknown)
@@ -410,16 +381,6 @@ docker run --env-file .env balance-reconciliation-worker
 ```sql
 -- Get balances needing reconciliation (prioritized)
 CREATE FUNCTION get_balances_to_reconcile(p_limit integer DEFAULT 100);
-
--- Store RPC snapshot
-CREATE FUNCTION store_balance_snapshot(
-    p_send_account_address bytea,
-    p_chain_id numeric,
-    p_token_address bytea,
-    p_balance numeric,
-    p_snapshot_block numeric,
-    p_drift_from_calculated numeric
-);
 
 -- Store reconciliation record
 CREATE FUNCTION store_reconciliation(
@@ -468,23 +429,22 @@ WHERE reconciled_at > now() - interval '7 days'
 GROUP BY token_address, reconciliation_reason
 ORDER BY reconciliation_count DESC;
 
--- Check snapshot coverage
+-- Check reconciliation coverage
 SELECT
-    COUNT(DISTINCT (send_account_address, token_address)) as unique_balances,
-    COUNT(*) as total_snapshots,
-    MAX(snapshot_time) as latest_snapshot
-FROM erc20_balance_snapshots
-WHERE snapshot_time > now() - interval '1 hour';
+    COUNT(DISTINCT (send_account_address, chain_id, token_address)) as unique_balances_checked,
+    COUNT(*) as total_reconciliations,
+    MAX(reconciled_at) as latest_reconciliation
+FROM erc20_balance_reconciliations
+WHERE reconciled_at > now() - interval '1 hour';
 ```
 
 ### Benefits
 
 ✅ **Real-time UI**: DB balances update instantly from transfers (<10ms queries)
-✅ **Accuracy**: RPC snapshots catch rebasing tokens + missed transactions
+✅ **Accuracy**: RPC checks catch rebasing tokens + missed transactions
 ✅ **Scalability**: Worker processes balances in priority order
-✅ **Reconciliation**: Auto-fixes drift when detected
+✅ **Reconciliation**: Auto-fixes any drift detected
 ✅ **Async**: Slow RPC calls don't block UI
-✅ **Observable**: Snapshot history shows drift over time
 ✅ **Auditability**: All corrections logged with reasons
 
 ## Metadata Enrichment

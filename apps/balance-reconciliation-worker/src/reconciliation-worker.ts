@@ -175,9 +175,6 @@ export class ReconciliationWorker {
     const dbBalance = BigInt(calculated_balance)
     const drift = rpcBalance - dbBalance
 
-    // Store snapshot at the safe reconciliation block
-    await this.storeSnapshot(pair, rpcBalance, safeReconciliationBlock, drift)
-
     // Check if reconciliation is needed
     const needsReconciliation = this.shouldReconcile(dbBalance, rpcBalance, drift)
 
@@ -229,26 +226,6 @@ export class ReconciliationWorker {
     // TODO: Add logic to detect missed transfers by checking block gaps
     // For now, classify as unknown
     return 'unknown'
-  }
-
-  private async storeSnapshot(
-    pair: BalancePair,
-    balance: bigint,
-    block: bigint,
-    drift: bigint
-  ): Promise<void> {
-    const { error } = await this.deps.supabase.rpc('store_balance_snapshot', {
-      p_send_account_address: `\\x${pair.send_account_address}`,
-      p_chain_id: pair.chain_id,
-      p_token_address: `\\x${pair.token_address}`,
-      p_balance: balance.toString(),
-      p_snapshot_block: block.toString(),
-      p_drift_from_calculated: drift.toString(),
-    })
-
-    if (error) {
-      throw new Error(`Failed to store snapshot: ${error.message}`)
-    }
   }
 
   private async storeReconciliation(

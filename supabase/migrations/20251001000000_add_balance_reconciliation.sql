@@ -1,61 +1,5 @@
 -- Add balance reconciliation system for handling rebasing tokens and missed transactions
--- This migration adds snapshot tracking and reconciliation adjustments
-
--- =============================================================================
--- Table: erc20_balance_snapshots
--- Periodic RPC-based balance snapshots (source of truth)
--- =============================================================================
-
-CREATE TABLE IF NOT EXISTS "public"."erc20_balance_snapshots" (
-    "send_account_address" bytea NOT NULL,
-    "chain_id" numeric NOT NULL,
-    "token_address" bytea NOT NULL,
-    "balance" numeric NOT NULL,
-    "snapshot_time" timestamp with time zone NOT NULL DEFAULT now(),
-    "snapshot_block" numeric NOT NULL,
-    "drift_from_calculated" numeric, -- difference from erc20_balances
-    CONSTRAINT "erc20_balance_snapshots_pkey" PRIMARY KEY ("send_account_address", "chain_id", "token_address", "snapshot_time"),
-    CONSTRAINT "erc20_balance_snapshots_token_fkey" FOREIGN KEY ("token_address", "chain_id")
-        REFERENCES "public"."erc20_tokens"("address", "chain_id") ON DELETE CASCADE
-);
-
--- Indexes for snapshots
-CREATE INDEX "erc20_balance_snapshots_time_idx" ON "public"."erc20_balance_snapshots"
-    USING btree("snapshot_time" DESC);
-
-CREATE INDEX "erc20_balance_snapshots_address_token_idx" ON "public"."erc20_balance_snapshots"
-    USING btree("send_account_address", "chain_id", "token_address", "snapshot_time" DESC);
-
--- RLS policies for snapshots
-ALTER TABLE "public"."erc20_balance_snapshots" ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can see own snapshots" ON "public"."erc20_balance_snapshots"
-FOR SELECT USING (
-    EXISTS (
-        SELECT 1
-        FROM send_accounts sa
-        WHERE lower(concat('0x', encode(erc20_balance_snapshots.send_account_address, 'hex')))::citext = sa.address
-            AND sa.user_id = auth.uid()
-            AND sa.chain_id = erc20_balance_snapshots.chain_id
-    )
-);
-
--- =============================================================================
--- View: erc20_balance_latest_snapshot
--- Latest snapshot for each address/token pair
--- =============================================================================
-
-CREATE OR REPLACE VIEW "public"."erc20_balance_latest_snapshot" AS
-SELECT DISTINCT ON (send_account_address, chain_id, token_address)
-    send_account_address,
-    chain_id,
-    token_address,
-    balance AS snapshot_balance,
-    snapshot_time,
-    snapshot_block,
-    drift_from_calculated
-FROM erc20_balance_snapshots
-ORDER BY send_account_address, chain_id, token_address, snapshot_time DESC;
+-- This migration adds reconciliation tracking and adjustments
 
 -- =============================================================================
 -- Table: erc20_balance_reconciliations
@@ -179,56 +123,28 @@ BEGIN
         eb.token_address,
         eb.balance AS calculated_balance,
         COALESCE(et.is_rebasing, false) AS is_rebasing,
-        COALESCE(ls.snapshot_time, '1970-01-01'::timestamp with time zone) AS last_snapshot,
+        COALESCE(lr.reconciled_at, '1970-01-01'::timestamp with time zone) AS last_snapshot,
         COALESCE(etm.price_usd * eb.balance / power(10, COALESCE(et.decimals, 18)), 0) AS usd_value,
         eb.last_updated_time
     FROM erc20_balances eb
     JOIN erc20_tokens et ON et.address = eb.token_address AND et.chain_id = eb.chain_id
     LEFT JOIN erc20_token_metadata etm ON etm.token_address = eb.token_address AND etm.chain_id = eb.chain_id
-    LEFT JOIN erc20_balance_latest_snapshot ls ON
-        ls.send_account_address = eb.send_account_address
-        AND ls.chain_id = eb.chain_id
-        AND ls.token_address = eb.token_address
+    LEFT JOIN LATERAL (
+        SELECT reconciled_at
+        FROM erc20_balance_reconciliations
+        WHERE send_account_address = eb.send_account_address
+          AND chain_id = eb.chain_id
+          AND token_address = eb.token_address
+        ORDER BY reconciled_at DESC
+        LIMIT 1
+    ) lr ON true
     WHERE eb.balance > 0
     ORDER BY
         COALESCE(et.is_rebasing, false) DESC,                    -- Rebasing tokens first
         COALESCE(etm.price_usd * eb.balance / power(10, COALESCE(et.decimals, 18)), 0) DESC, -- High value second
         eb.last_updated_time DESC,                               -- Recent activity third
-        COALESCE(ls.snapshot_time, '1970-01-01'::timestamp with time zone) ASC  -- Stale snapshots last
+        COALESCE(lr.reconciled_at, '1970-01-01'::timestamp with time zone) ASC  -- Stale reconciliations last
     LIMIT p_limit;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- =============================================================================
--- Function: Store balance snapshot
--- =============================================================================
-
-CREATE OR REPLACE FUNCTION "public"."store_balance_snapshot"(
-    p_send_account_address bytea,
-    p_chain_id numeric,
-    p_token_address bytea,
-    p_balance numeric,
-    p_snapshot_block numeric,
-    p_drift_from_calculated numeric
-) RETURNS void AS $$
-BEGIN
-    INSERT INTO erc20_balance_snapshots (
-        send_account_address,
-        chain_id,
-        token_address,
-        balance,
-        snapshot_block,
-        drift_from_calculated,
-        snapshot_time
-    ) VALUES (
-        p_send_account_address,
-        p_chain_id,
-        p_token_address,
-        p_balance,
-        p_snapshot_block,
-        p_drift_from_calculated,
-        now()
-    );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
@@ -279,19 +195,10 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- Grants
 -- =============================================================================
 
-GRANT ALL ON TABLE "public"."erc20_balance_snapshots" TO "anon";
-GRANT ALL ON TABLE "public"."erc20_balance_snapshots" TO "authenticated";
-GRANT ALL ON TABLE "public"."erc20_balance_snapshots" TO "service_role";
-
 GRANT ALL ON TABLE "public"."erc20_balance_reconciliations" TO "anon";
 GRANT ALL ON TABLE "public"."erc20_balance_reconciliations" TO "authenticated";
 GRANT ALL ON TABLE "public"."erc20_balance_reconciliations" TO "service_role";
 
-GRANT SELECT ON "public"."erc20_balance_latest_snapshot" TO "anon";
-GRANT SELECT ON "public"."erc20_balance_latest_snapshot" TO "authenticated";
-GRANT SELECT ON "public"."erc20_balance_latest_snapshot" TO "service_role";
-
 GRANT EXECUTE ON FUNCTION "public"."apply_balance_reconciliation"(bytea, numeric, bytea, numeric, numeric) TO "service_role";
 GRANT EXECUTE ON FUNCTION "public"."get_balances_to_reconcile"(integer) TO "service_role";
-GRANT EXECUTE ON FUNCTION "public"."store_balance_snapshot"(bytea, numeric, bytea, numeric, numeric, numeric) TO "service_role";
 GRANT EXECUTE ON FUNCTION "public"."store_reconciliation"(bytea, numeric, bytea, numeric, numeric, numeric, text, numeric) TO "service_role";
