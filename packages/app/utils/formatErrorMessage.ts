@@ -49,7 +49,7 @@ export const formatErrorMessage = (error: unknown) => {
     (combinedMessage.includes('cloudflare') || isCloudflareUrl)
 
   if (isCloudflareUrl || isCloudflareHeaders || isCloudflareNetworkError) {
-    return 'Cloudflare is blocking this request. Try disabling your VPN then reload with Ctrl+R, or use an incognito window for signup.'
+    return 'Cloudflare is blocking this request — try disabling your VPN then reload with Ctrl+R, or use an incognito window for signup.'
   }
 
   // Network security blocking
